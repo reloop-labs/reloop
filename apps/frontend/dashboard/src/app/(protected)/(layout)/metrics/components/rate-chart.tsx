@@ -135,7 +135,7 @@ export const RateChart = ({
 								formatter={(val: unknown) => {
 									if (val === undefined || val === null) return "";
 									const num = Number(val);
-									return num === 0 ? "0%" : `${Number(num.toFixed(2))}%`;
+									return num === 0 ? "" : `${Number(num.toFixed(2))}%`;
 								}}
 								style={{
 									fill: "#888888",

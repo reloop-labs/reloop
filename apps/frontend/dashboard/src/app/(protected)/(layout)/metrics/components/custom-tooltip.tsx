@@ -7,6 +7,7 @@ interface PayloadEntry {
 	dataKey?: string;
 	payload?: {
 		date?: string;
+		fullDate?: string;
 		[key: string]: unknown;
 	};
 }
@@ -17,10 +18,15 @@ interface CustomTooltipProps {
 	label?: string;
 }
 
-export const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+export const CustomTooltip = ({
+	active,
+	payload,
+	label,
+}: CustomTooltipProps) => {
 	if (!active || !payload || !payload.length) return null;
 
-	const date = payload[0]?.payload?.date ?? label ?? "";
+	const date =
+		payload[0]?.payload?.fullDate ?? payload[0]?.payload?.date ?? label ?? "";
 
 	return (
 		<div className="flex min-w-[190px] flex-col gap-3 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 pt-3 pb-4 shadow-lg dark:border-stroke-soft-100/50 dark:bg-zinc-950">
@@ -34,7 +40,8 @@ export const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) =>
 			{/* Dynamic Metrics */}
 			<div className="flex flex-col gap-2">
 				{payload.map((entry, i) => {
-					const seriesColor = entry.stroke ?? entry.color ?? entry.fill ?? "#888";
+					const seriesColor =
+						entry.stroke ?? entry.color ?? entry.fill ?? "#888";
 					const seriesName = entry.name ?? entry.dataKey ?? "Value";
 					const value = entry.value ?? 0;
 
@@ -53,7 +60,7 @@ export const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) =>
 						<div key={i} className="flex items-center justify-between gap-4">
 							<div className="flex items-center gap-2">
 								<div
-									className="h-2 w-2 rounded-full flex-shrink-0"
+									className="h-2 w-2 flex-shrink-0 rounded-full"
 									style={{ backgroundColor: seriesColor }}
 								/>
 								<span className="text-text-sub-600 text-xs">{seriesName}</span>

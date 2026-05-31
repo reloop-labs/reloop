@@ -58,13 +58,30 @@ export const generateContinuousDateList = (
 		current.setDate(current.getDate() + 1);
 	}
 
-	// Always ensure at least 15 points for aesthetics
-	while (datesList.length < 15) {
-		const first = datesList[0] || new Date();
-		const prev = new Date(first);
-		prev.setDate(prev.getDate() - 1);
-		datesList.unshift(prev);
-	}
-
 	return datesList;
+};
+
+export const getBucketSize = (numDays: number): number => {
+	if (numDays >= 25) return 6;
+	if (numDays >= 10) return 3;
+	return 1;
+};
+
+export const formatBucketDateLabel = (startDate: Date, endDate: Date) => {
+	const startDay = startDate.getDate();
+	const endDay = endDate.getDate();
+	const startMonth = startDate
+		.toLocaleDateString("en-US", { month: "short" })
+		.toLowerCase();
+	const endMonth = endDate
+		.toLocaleDateString("en-US", { month: "short" })
+		.toLowerCase();
+
+	if (startMonth === endMonth) {
+		if (startDay === endDay) {
+			return `${startDay} ${startMonth}`;
+		}
+		return `${startDay}-${endDay} ${startMonth}`;
+	}
+	return `${startDay} ${startMonth} - ${endDay} ${endMonth}`;
 };

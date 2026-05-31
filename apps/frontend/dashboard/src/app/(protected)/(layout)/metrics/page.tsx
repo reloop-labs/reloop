@@ -9,8 +9,10 @@ import { DeliverabilityChart } from "./components/deliverability-chart";
 import { RateChart } from "./components/rate-chart";
 
 import {
+	formatBucketDateLabel,
 	formatDateLabel,
 	generateContinuousDateList,
+	getBucketSize,
 	getLocalKey,
 	getYearMonthDayKey,
 } from "./utils";
@@ -128,6 +130,7 @@ const MetricsPage = () => {
 			string,
 			{
 				sent: number;
+				delivered: number;
 				transient: number;
 				permanent: number;
 				undetermined: number;
@@ -143,6 +146,7 @@ const MetricsPage = () => {
 			if (key) {
 				statsMap.set(key, {
 					sent: data.sent[i] ?? 0,
+					delivered: data.delivered[i] ?? 0,
 					transient: data.bounceBreakdown.transient[i] ?? 0,
 					permanent: data.bounceBreakdown.permanent[i] ?? 0,
 					undetermined: data.bounceBreakdown.undetermined[i] ?? 0,
@@ -158,24 +162,64 @@ const MetricsPage = () => {
 			effectiveEndDate,
 		);
 
-		const chartData = datesList.map((date) => {
-			const key = getYearMonthDayKey(date);
-			const formattedDate = formatDateLabel(date);
-			const existing = statsMap.get(key);
+		const chunks: Date[][] = [];
+		const bucketSize = getBucketSize(datesList.length);
+		for (let i = 0; i < datesList.length; i += bucketSize) {
+			chunks.push(datesList.slice(i, i + bucketSize));
+		}
+
+		const chartData = chunks.map((chunk, index) => {
+			const startDate = chunk[0];
+			const endDate = chunk[chunk.length - 1];
+
+			let formattedDate = "";
+			let fullDate = "";
+			if (bucketSize > 1 && startDate && endDate) {
+				formattedDate = formatBucketDateLabel(startDate, endDate);
+				fullDate = formattedDate;
+			} else if (startDate) {
+				formattedDate = formatDateLabel(startDate);
+				fullDate = formattedDate;
+			}
+
+			let totalSentInBucket = 0;
+			let totalDeliveredInBucket = 0;
+			let transientBounced = 0;
+			let permanentBounced = 0;
+			let undeterminedBounced = 0;
+			let totalComplaintInBucket = 0;
+
+			for (const date of chunk) {
+				const key = getYearMonthDayKey(date);
+				const existing = statsMap.get(key);
+				if (existing) {
+					totalSentInBucket += existing.sent;
+					totalDeliveredInBucket += existing.delivered;
+					transientBounced += existing.transient;
+					permanentBounced += existing.permanent;
+					undeterminedBounced += existing.undetermined;
+					totalComplaintInBucket += existing.complaint;
+				}
+			}
 
 			const bounceCount =
-				(existing?.transient ?? 0) +
-				(existing?.permanent ?? 0) +
-				(existing?.undetermined ?? 0);
-			const complaintCount = existing?.complaint ?? 0;
+				transientBounced + permanentBounced + undeterminedBounced;
 
 			return {
 				date: formattedDate,
-				bounceRate: totalSent > 0 ? (bounceCount / totalSent) * 100 : 0,
-				complaintRate: totalSent > 0 ? (complaintCount / totalSent) * 100 : 0,
-				sent: existing?.sent ?? 0,
+				fullDate: fullDate,
+				bounceRate:
+					totalSentInBucket > 0 ? (bounceCount / totalSentInBucket) * 100 : 0,
+				complaintRate:
+					totalSentInBucket > 0
+						? (totalComplaintInBucket / totalSentInBucket) * 100
+						: 0,
+				sent: totalSentInBucket,
 				bounced: bounceCount,
-				deliveryRate: existing?.rate ?? 0,
+				deliveryRate:
+					totalSentInBucket > 0
+						? (totalDeliveredInBucket / totalSentInBucket) * 100
+						: 0,
 			};
 		});
 

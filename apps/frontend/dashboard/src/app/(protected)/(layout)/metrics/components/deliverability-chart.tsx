@@ -96,6 +96,7 @@ export const DeliverabilityChart = ({
 
 			return {
 				date: formattedDate,
+				fullDate: formatDateLabel(date),
 				sent: existing?.sent ?? 0,
 				delivered: existing?.delivered ?? 0,
 				bounced: existing?.bounced ?? 0,
