@@ -1,5 +1,3 @@
-import React from "react";
-
 interface CustomTooltipProps {
 	active?: boolean;
 	payload?: Array<{

@@ -1,7 +1,6 @@
 "use client";
 
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
-import * as Select from "@reloop/ui/select";
 import { useMemo, useState } from "react";
 import {
 	Area,
@@ -21,6 +20,7 @@ import {
 	getYearMonthDayKey,
 } from "../utils";
 import { CustomTooltip } from "./custom-tooltip";
+import { EventSelector } from "./event-selector";
 
 interface EmailStatsResponse {
 	dates: string[];
@@ -43,7 +43,7 @@ export const DeliverabilityChart = ({
 	domain,
 }: DeliverabilityChartProps) => {
 	const { activeOrganization } = useUserOrganization();
-	const [eventType, setEventType] = useState("all");
+	const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
 
 	const buildApiUrl = () => {
 		if (!activeOrganization?.id) return null;
@@ -164,22 +164,7 @@ export const DeliverabilityChart = ({
 				</div>
 
 				<div className="flex items-center">
-					<Select.Root
-						value={eventType}
-						onValueChange={setEventType}
-						size="xsmall"
-						variant="compact"
-					>
-						<Select.Trigger className="min-w-[120px] rounded-xl border-stroke-soft-100 bg-bg-weak-50 hover:bg-bg-weak-100">
-							<Select.Value />
-						</Select.Trigger>
-						<Select.Content>
-							<Select.Item value="all">All Events</Select.Item>
-							<Select.Item value="delivered">Delivered</Select.Item>
-							<Select.Item value="bounced">Bounced</Select.Item>
-							<Select.Item value="spam">Complaints</Select.Item>
-						</Select.Content>
-					</Select.Root>
+					<EventSelector value={selectedEvents} onChange={setSelectedEvents} />
 				</div>
 			</div>
 
