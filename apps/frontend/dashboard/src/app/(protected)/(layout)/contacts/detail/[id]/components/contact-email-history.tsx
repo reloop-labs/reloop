@@ -197,14 +197,7 @@ function buildFlatTimeline(
 		const eventTypes = new Set(entry.events.map((e) => e.type));
 		const allEvents = [...entry.events];
 
-		if (entry.deliveredAt && !eventTypes.has("delivered")) {
-			allEvents.push({
-				id: `synth-delivered-${entry.id}`,
-				type: "delivered",
-				createdAt: entry.deliveredAt,
-				metadata: null,
-			});
-		}
+		// Synthesise a "failed" event from failedAt if not already in the event list
 		if (entry.failedAt && !eventTypes.has("failed") && !eventTypes.has("bounced")) {
 			allEvents.push({
 				id: `synth-failed-${entry.id}`,
@@ -214,8 +207,11 @@ function buildFlatTimeline(
 			});
 		}
 
-		// Remove "sent" events — already shown on the email row
-		const subsequentEvents = allEvents.filter((e) => e.type !== "sent");
+		// Remove "sent" and "delivered" events — the email row already shows the
+		// delivery status via its status pill, so a separate "delivered" row is redundant.
+		const subsequentEvents = allEvents.filter(
+			(e) => e.type !== "sent" && e.type !== "delivered",
+		);
 		subsequentEvents.sort(
 			(a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
 		);
