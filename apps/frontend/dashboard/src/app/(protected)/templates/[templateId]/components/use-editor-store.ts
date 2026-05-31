@@ -28,6 +28,10 @@ interface EditorState {
 	setHasUnsavedChanges: (hasChanges: boolean) => void;
 	setIsSavingDraft: (saving: boolean) => void;
 	setIsPublishing: (publishing: boolean) => void;
+
+	// View mode (visual editor or split screens)
+	viewMode: "visual" | "code" | "history";
+	setViewMode: (mode: "visual" | "code" | "history") => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
@@ -63,4 +67,8 @@ export const useEditorStore = create<EditorState>((set) => ({
 	setHasUnsavedChanges: (hasUnsavedChanges) => set({ hasUnsavedChanges }),
 	setIsSavingDraft: (isSavingDraft) => set({ isSavingDraft }),
 	setIsPublishing: (isPublishing) => set({ isPublishing }),
+
+	// View mode
+	viewMode: "visual",
+	setViewMode: (viewMode) => set({ viewMode }),
 }));

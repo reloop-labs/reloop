@@ -9,7 +9,7 @@ import * as Modal from "@reloop/ui/modal";
 import * as Popover from "@reloop/ui/popover";
 import * as Textarea from "@reloop/ui/textarea";
 import { useCurrentEditor } from "@tiptap/react";
-import { ChevronDown, ChevronUp, Save } from "lucide-react";
+import { ChevronDown, ChevronUp, Save, Layout, Code } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -269,6 +269,8 @@ export const EditorHeaderActions = ({
 		fromEmail,
 		replyTo,
 		previewText,
+		viewMode,
+		setViewMode,
 	} = useEditorStore();
 
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);

@@ -145,12 +145,12 @@ export function VersionSidebar() {
 		setFromEmail,
 		setReplyTo,
 		setPreviewText,
+		subject,
+		setViewMode,
 		lastSavedAt,
 		lastSavedDraftNumber,
-		subject,
 	} = useEditorStore();
 
-	const [isExpanded, setIsExpanded] = useState(false);
 	const [activeTab, setActiveTab] = useState<"published" | "drafts">("drafts");
 
 	// Modals & Triggers
@@ -251,50 +251,17 @@ export function VersionSidebar() {
 	};
 
 	return (
-		<div
-			className={cn(
-				"relative flex shrink-0 flex-col transition-all duration-300 ease-in-out",
-				isExpanded
-					? "m-2 h-[calc(100vh-79px)] w-72 overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]"
-					: "m-0 h-[calc(100vh-79px)] w-0 overflow-visible border-none",
-			)}
-		>
-			{/* Floating toggle button when collapsed */}
-			{!isExpanded && (
-				<Tooltip.Root>
-					<Tooltip.Trigger asChild>
-						<button
-							type="button"
-							onClick={() => setIsExpanded(true)}
-							className="absolute top-4 left-4 z-20 flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 shadow-sm transition-all duration-200 hover:scale-105 hover:bg-bg-soft-200 hover:text-text-strong-950 active:scale-95 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a] dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
-						>
-							<History size={16} />
-						</button>
-					</Tooltip.Trigger>
-					<Tooltip.Content side="right" sideOffset={8}>
-						Version history
-					</Tooltip.Content>
-				</Tooltip.Root>
-			)}
-
-			{/* Expanded state: full sidebar */}
-			<div
-				className={cn(
-					"top-0 left-0 flex h-full w-[286px] shrink-0 flex-col transition-opacity duration-300",
-					isExpanded
-						? "relative opacity-100"
-						: "pointer-events-none invisible absolute opacity-0",
-				)}
-			>
+		<div className="flex-1 flex flex-col h-full bg-[#0a0a0a] overflow-hidden py-4 pr-4 pl-14 shrink-0">
+			<div className="flex flex-col h-full rounded-[18px] border border-stroke-soft-200 dark:border-stroke-soft-100/40 bg-bg-white-0 dark:bg-[#0a0a0a] overflow-hidden shadow-sm">
 				{/* Header */}
 				<div className="flex h-10 items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-3 dark:bg-[#0a0a0a]">
 					<div className="flex items-center gap-1.5 p-0">
 						<History
 							size={14}
-							className="text-text-strong-950"
+							className="text-text-strong-950 dark:text-white"
 							strokeWidth={2}
 						/>
-						<span className="font-semibold text-text-strong-950 text-xs capitalize">
+						<span className="font-semibold text-text-strong-950 dark:text-white text-xs capitalize">
 							History
 						</span>
 					</div>
@@ -303,7 +270,7 @@ export function VersionSidebar() {
 						variant="neutral"
 						mode="ghost"
 						size="xxsmall"
-						onClick={() => setIsExpanded(false)}
+						onClick={() => setViewMode("visual")}
 						className="size-7 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
 					>
 						<ChevronLeft size={24} />
