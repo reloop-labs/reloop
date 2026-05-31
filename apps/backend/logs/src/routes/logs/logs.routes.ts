@@ -1,4 +1,5 @@
 import { Elysia } from "elysia";
+import { contactActivityRoute } from "./contact-activity/contact-activity.route";
 import { getEmailLogRoute } from "./get-email-log/get-email-log.route";
 import { getEmailStatsRoute } from "./get-email-stats/get-email-stats.route";
 import { getLogRoute } from "./get-log/get-log.route";
@@ -12,5 +13,6 @@ export const logsRoutes = new Elysia({
 	.use(listLogsRoute)
 	.use(getLogRoute)
 	.use(listEmailLogsRoute)
+	.use(contactActivityRoute) // Must come before getEmailLogRoute (:id param)
 	.use(getEmailLogRoute)
 	.use(getEmailStatsRoute);

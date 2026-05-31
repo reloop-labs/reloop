@@ -219,6 +219,13 @@ export namespace LogsModel {
 		api_key_id: t.Optional(t.String()),
 		start_date: t.Optional(t.String({ format: "date-time" })),
 		end_date: t.Optional(t.String({ format: "date-time" })),
+		/** Filter logs where toEmails contains this exact address */
+		recipient: t.Optional(
+			t.String({
+				description:
+					"Return only emails sent to this recipient address",
+			}),
+		),
 	});
 	export type ListEmailLogsQuery = typeof listEmailLogsQuery.static;
 
@@ -306,4 +313,55 @@ export namespace LogsModel {
 		id: t.String(),
 	});
 	export type GetEmailLogParams = typeof getEmailLogParams.static;
+
+	// ─── Contact Activity ───────────────────────────────────────────────
+	// Dedicated endpoint: GET /emails/contact-activity?email=<addr>
+	// Returns all emails sent to a given recipient address with full event
+	// timelines — used to power the "Activity" section on contact detail pages.
+
+	export const contactActivityQuery = t.Object({
+		/** Recipient email address to look up activity for */
+		email: t.String({
+			description: "Recipient email address",
+		}),
+		page: t.Optional(t.Numeric({ default: 1, minimum: 1 })),
+		limit: t.Optional(
+			t.Numeric({ default: 10, minimum: 1, maximum: 50 }),
+		),
+	});
+	export type ContactActivityQuery = typeof contactActivityQuery.static;
+
+	export const contactActivityEmailEntry = t.Object({
+		id: t.String(),
+		subject: t.String(),
+		fromEmail: t.String(),
+		toEmails: t.Array(t.String()),
+		status: t.String(),
+		sentAt: t.Union([t.String(), t.Null()]),
+		deliveredAt: t.Union([t.String(), t.Null()]),
+		failedAt: t.Union([t.String(), t.Null()]),
+		errorMessage: t.Union([t.String(), t.Null()]),
+		createdAt: t.String(),
+		events: t.Array(
+			t.Object({
+				id: t.String(),
+				type: t.String(),
+				metadata: t.Union([t.Any(), t.Null()]),
+				createdAt: t.String(),
+			}),
+		),
+	});
+	export type ContactActivityEmailEntry =
+		typeof contactActivityEmailEntry.static;
+
+	export const contactActivityResponse = t.Object({
+		object: t.Literal("contact_activity"),
+		email: t.String(),
+		data: t.Array(contactActivityEmailEntry),
+		total: t.Number(),
+		page: t.Number(),
+		limit: t.Number(),
+	});
+	export type ContactActivityResponse =
+		typeof contactActivityResponse.static;
 }

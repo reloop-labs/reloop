@@ -1,6 +1,7 @@
 "use client";
 import { DeleteContactModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/contacts/delete-contact-modal";
 import { EditContactModal } from "@fe/dashboard/app/(protected)/(layout)/contacts/components/contacts/edit-contact-modal";
+import { ContactEmailHistory } from "@fe/dashboard/app/(protected)/(layout)/contacts/detail/[id]/components/contact-email-history";
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
@@ -450,6 +451,14 @@ export const ContactHeader = ({
 						))}
 					</div>
 				</div>
+
+				{/* Sent Emails History */}
+				{contact?.email && (
+					<ContactEmailHistory
+						email={contact.email}
+						contactCreatedAt={contact.createdAt}
+					/>
+				)}
 			</div>
 
 			{/* Edit Contact Modal */}

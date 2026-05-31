@@ -10,6 +10,7 @@ import {
 	ilike,
 	lte,
 	or,
+	sql,
 	type SQL,
 } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
@@ -33,6 +34,7 @@ export async function listEmailLogsController({
 		api_key_id,
 		start_date,
 		end_date,
+		recipient,
 	} = query;
 	const offset = (page - 1) * limit;
 
@@ -78,6 +80,13 @@ export async function listEmailLogsController({
 					ilike(schema.emailLog.subject, `%${search}%`),
 					ilike(schema.emailLog.fromEmail, `%${search}%`),
 				) as SQL,
+			);
+		}
+
+		if (recipient) {
+			// Postgres jsonb array-contains: to_emails @> '["addr"]'::jsonb
+			conditions.push(
+				sql`${schema.emailLog.toEmails} @> ${JSON.stringify([recipient])}::jsonb` as SQL,
 			);
 		}
 
