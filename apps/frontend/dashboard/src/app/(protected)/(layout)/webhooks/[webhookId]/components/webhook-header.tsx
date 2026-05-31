@@ -6,6 +6,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Modal from "@reloop/ui/modal";
 import {
 	Content as PopoverContent,
 	Root as PopoverRoot,
@@ -13,10 +14,11 @@ import {
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { EditWebhookModal } from "../../components/edit-webhook-modal";
+import { useSWRConfig } from "swr";
 
 interface WebhookData {
 	id: string;
@@ -104,9 +106,11 @@ export const WebhookHeader = ({
 	onTriggerTest,
 }: WebhookHeaderProps) => {
 	const router = useRouter();
-	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const { mutate } = useSWRConfig();
 	const [copiedSecret, setCopiedSecret] = useState(false);
 	const [isSecretVisible, setIsSecretVisible] = useState(false);
+	const [isRotatingSecret, setIsRotatingSecret] = useState(false);
+	const [isRotateModalOpen, setIsRotateModalOpen] = useState(false);
 
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -124,23 +128,40 @@ export const WebhookHeader = ({
 		}
 	};
 
+	const handleRotateSecret = async () => {
+		if (!webhook) return;
+
+		try {
+			setIsRotatingSecret(true);
+			const array = new Uint8Array(16);
+			window.crypto.getRandomValues(array);
+			const newSecret = `whsec_${Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join("")}`;
+
+			await axios.patch(
+				`/api/webhook/v1/${webhook.id}`,
+				{
+					secret: newSecret,
+				},
+				{ headers: { credentials: "include" } },
+			);
+
+			await mutate(
+				(key) => typeof key === "string" && key.startsWith("/api/webhook/v1"),
+			);
+			toast.success("Webhook secret rotated successfully");
+			setIsRotateModalOpen(false);
+		} catch (error) {
+			toast.error("Failed to rotate webhook secret");
+		} finally {
+			setIsRotatingSecret(false);
+		}
+	};
+
 	const getMenuItems = (status: string) => [
 		{
 			id: "docs",
 			label: "Go to docs",
 			icon: "file-text" as const,
-			isDanger: false,
-		},
-		{
-			id: "rotate",
-			label: "Rotate secret",
-			icon: "rotate-cw" as const,
-			isDanger: false,
-		},
-		{
-			id: "edit",
-			label: "Edit Webhook",
-			icon: "edit" as const,
 			isDanger: false,
 		},
 		{
@@ -166,8 +187,6 @@ export const WebhookHeader = ({
 	const handleMenuItemClick = (itemId: string) => {
 		if (itemId === "docs") {
 			window.open("https://reloop.sh/docs/webhooks", "_blank");
-		} else if (itemId === "edit") {
-			setIsEditModalOpen(true);
 		} else if (itemId === "delete") {
 			onDeleteWebhook?.();
 		}
@@ -307,14 +326,7 @@ export const WebhookHeader = ({
 									<Icon name="webhook" className="h-4 w-4" />
 									Trigger Test Event
 								</Button.Root>
-								<Button.Root
-									variant="neutral"
-									size="xsmall"
-									onClick={() => setIsEditModalOpen(true)}
-								>
-									<Icon name="edit" className="h-4 w-4" />
-									Edit Webhook
-								</Button.Root>
+
 								<PopoverRoot>
 									<PopoverTrigger asChild>
 										<Button.Root variant="neutral" mode="stroke" size="xsmall">
@@ -527,6 +539,23 @@ export const WebhookHeader = ({
 													)}
 												/>
 											</Button.Root>
+											<Button.Root
+												variant="neutral"
+												mode="stroke"
+												size="xxsmall"
+												className="h-7 w-7 p-0"
+												onClick={() => setIsRotateModalOpen(true)}
+												disabled={isRotatingSecret}
+												title="Rotate secret"
+											>
+												<Icon
+													name={isRotatingSecret ? "loader-2" : "rotate-cw"}
+													className={cn(
+														"h-4 w-4 text-text-sub-600",
+														isRotatingSecret && "animate-spin",
+													)}
+												/>
+											</Button.Root>
 										</Input.InlineAffix>
 									)}
 								</Input.Wrapper>
@@ -581,14 +610,86 @@ export const WebhookHeader = ({
 				</div>
 			</div>
 
-			{/* Modals */}
 			{webhook && (
-				<EditWebhookModal
-					isOpen={isEditModalOpen}
-					onClose={() => setIsEditModalOpen(false)}
-					webhook={webhook}
+				<RotateWebhookSecretModal
+					isOpen={isRotateModalOpen}
+					onClose={() => setIsRotateModalOpen(false)}
+					onConfirm={handleRotateSecret}
+					isRotating={isRotatingSecret}
 				/>
 			)}
 		</>
+	);
+};
+
+interface RotateWebhookSecretModalProps {
+	isOpen: boolean;
+	onClose: () => void;
+	onConfirm: () => void;
+	isRotating: boolean;
+}
+
+export const RotateWebhookSecretModal = ({
+	isOpen,
+	onClose,
+	onConfirm,
+	isRotating,
+}: RotateWebhookSecretModalProps) => {
+	return (
+		<Modal.Root open={isOpen} onOpenChange={onClose}>
+			<Modal.Content className="data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=open]:zoom-in-95 data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4 data-[state=closed]:zoom-out-95 max-w-md overflow-hidden p-0 duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in sm:max-w-md">
+				<Modal.Body className="p-6">
+					<div className="flex items-start gap-4">
+						<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-500">
+							<Icon name="rotate-cw" className="h-5 w-5" />
+						</div>
+						<div className="space-y-1.5">
+							<Modal.Title className="font-semibold text-gray-900 text-lg leading-6">
+								Rotate Webhook Secret
+							</Modal.Title>
+							<p className="text-sm text-text-sub-600 leading-relaxed">
+								Are you sure you want to rotate the webhook secret? Any current
+								integrations using this secret will fail until updated with the
+								new one.
+							</p>
+						</div>
+					</div>
+				</Modal.Body>
+				<Modal.Footer className="flex items-center justify-end gap-3 border-stroke-soft-100 border-t bg-bg-weak-50/50 px-6 py-4 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30">
+					<Button.Root
+						type="button"
+						variant="neutral"
+						mode="stroke"
+						onClick={onClose}
+						disabled={isRotating}
+						className="gap-1.5"
+					>
+						Cancel
+						<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
+							Esc
+						</span>
+					</Button.Root>
+					<Button.Root
+						type="button"
+						variant="neutral"
+						onClick={onConfirm}
+						disabled={isRotating}
+						className="gap-2"
+					>
+						{isRotating ? (
+							<>
+								<Icon name="loader-2" className="h-4 w-4 animate-spin" />
+								Rotating...
+							</>
+						) : (
+							<>
+								Rotate Secret
+								<Icon name="rotate-cw" className="h-4 w-4" />
+							</>
+						)}
+					</Button.Root>
+				</Modal.Footer>
+			</Modal.Content>
+		</Modal.Root>
 	);
 };

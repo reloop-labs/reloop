@@ -1,5 +1,6 @@
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import axios from "axios";
+import { usePathname, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -23,6 +24,8 @@ export function useDeleteWebhook(
 		}
 	}, [deletedWebhookName]);
 
+	const router = useRouter();
+	const pathname = usePathname();
 	const [confirmationName, setConfirmationName] = useState("");
 	const [isDeleting, setIsDeleting] = useState(false);
 
@@ -70,6 +73,9 @@ export function useDeleteWebhook(
 		setDeleteId(null);
 		setDeletedWebhookName(null);
 		setConfirmationName("");
+		if (pathname !== "/webhooks") {
+			router.push("/webhooks");
+		}
 	};
 
 	return {

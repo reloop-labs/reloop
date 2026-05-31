@@ -16,7 +16,7 @@ export function SuccessView({
 			<div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-success-base text-text-white-0 dark:bg-success-base/20 dark:text-success-base">
 				<Icon name="check" className="h-7 w-7" />
 			</div>
-			<Modal.Title className="mb-3 font-medium text-text-strong-950 text-title-h5">
+			<Modal.Title className="mb-3 text-center font-medium text-text-strong-950 text-title-h5">
 				Webhook deleted
 			</Modal.Title>
 			<p className="mb-8 text-sm text-text-sub-600 leading-relaxed sm:max-w-[320px]">
