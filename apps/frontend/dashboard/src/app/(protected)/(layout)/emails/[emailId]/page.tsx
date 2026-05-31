@@ -26,6 +26,7 @@ interface EmailLogData {
 	headers: Record<string, string> | null;
 	sentAt: string | null;
 	deliveredAt: string | null;
+	failedAt: string | null;
 	createdAt: string;
 	updatedAt: string;
 	events?: {

@@ -27,7 +27,9 @@ interface EmailDetailProps {
 		headers: Record<string, string> | null;
 		sentAt: string | null;
 		deliveredAt: string | null;
+		failedAt?: string | null;
 		createdAt: string;
+		updatedAt?: string;
 		events?: {
 			id: string;
 			type: string;
@@ -314,17 +316,6 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 					</div>
 				</div>
 			</section>
-
-			{/* Event Tracking Timeline */}
-			<section className="py-4">
-				<EmailTimeline
-					events={email.events || []}
-					sentAt={email.sentAt || email.createdAt}
-					deliveredAt={email.deliveredAt}
-				/>
-			</section>
-
-			{/* Error Message if failed */}
 			{email.errorMessage && (
 				<section>
 					<h3 className="mb-4 font-medium text-paragraph-sm text-text-strong-950">
@@ -337,6 +328,17 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 					</div>
 				</section>
 			)}
+
+			{/* Event Tracking Timeline */}
+			<section className="py-4">
+				<EmailTimeline
+					events={email.events || []}
+					sentAt={email.sentAt || email.createdAt}
+					deliveredAt={email.deliveredAt}
+					failedAt={email.failedAt}
+					errorMessage={email.errorMessage}
+				/>
+			</section>
 
 			{/* Content Preview Tabs */}
 			<section>

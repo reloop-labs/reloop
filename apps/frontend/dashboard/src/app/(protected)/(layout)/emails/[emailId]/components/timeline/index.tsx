@@ -2,19 +2,29 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Fragment } from "react";
-import { TIMELINE_COMPONENTS } from "./steps";
+import {
+	SentStep,
+	DeliveredStep,
+	OpenedStep,
+	ClickedStep,
+	FailedStep,
+} from "./steps";
 import type { EmailEvent } from "./types";
 
 export function EmailTimeline({
 	events,
 	sentAt,
 	deliveredAt,
+	failedAt,
+	errorMessage,
 }: {
 	events: EmailEvent[];
 	sentAt?: string | null;
 	deliveredAt?: string | null;
+	failedAt?: string | null;
+	errorMessage?: string | null;
 }) {
-	// Synthesize events for sent and delivered if they don't exist in the events array
+	// Synthesize events for sent, delivered, and failed if they don't exist in the events array
 	const allEvents = [...events];
 
 	if (sentAt && !allEvents.find((e) => e.type === "sent")) {
@@ -26,7 +36,21 @@ export function EmailTimeline({
 		});
 	}
 
-	if (deliveredAt && !allEvents.find((e) => e.type === "delivered")) {
+	const isFailed =
+		!!errorMessage ||
+		!!failedAt ||
+		events.some((e) => e.type === "bounced" || e.type === "failed");
+
+	if (isFailed && !allEvents.find((e) => e.type === "failed")) {
+		allEvents.push({
+			id: "synth-failed",
+			type: "failed",
+			createdAt: failedAt || sentAt || new Date().toISOString(),
+			metadata: {},
+		});
+	}
+
+	if (!isFailed && deliveredAt && !allEvents.find((e) => e.type === "delivered")) {
 		allEvents.push({
 			id: "synth-delivered",
 			type: "delivered",
@@ -35,17 +59,27 @@ export function EmailTimeline({
 		});
 	}
 
+	const steps = isFailed ? ["sent", "failed"] : ["sent", "delivered", "opened", "clicked"];
+
 	return (
 		<div className="relative flex w-full items-start justify-between gap-0 rounded-3xl border border-stroke-soft-100 px-4 pt-10 pb-8 transition-all hover:border-stroke-soft-200">
-			{TIMELINE_COMPONENTS.map((StepComponent, index: number) => {
-				const eventTypes = ["sent", "delivered", "opened", "clicked"];
-				const eventType = eventTypes[index];
-				const event = allEvents.find((e) => e.type === eventType);
+			{steps.map((type, index: number) => {
+				const event = allEvents.find((e) => e.type === type);
 
 				return (
 					<Fragment key={index}>
-						<StepComponent event={event} />
-						{index < TIMELINE_COMPONENTS.length - 1 && (
+						{type === "sent" && <SentStep event={event} />}
+						{type === "failed" && (
+							<FailedStep
+								event={event}
+								failedAt={failedAt}
+								errorMessage={errorMessage}
+							/>
+						)}
+						{type === "delivered" && <DeliveredStep event={event} />}
+						{type === "opened" && <OpenedStep event={event} />}
+						{type === "clicked" && <ClickedStep event={event} />}
+						{index < steps.length - 1 && (
 							<div
 								className={cn(
 									"mt-5 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed",
@@ -58,3 +92,4 @@ export function EmailTimeline({
 		</div>
 	);
 }
+
