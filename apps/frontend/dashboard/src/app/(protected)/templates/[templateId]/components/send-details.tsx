@@ -25,7 +25,7 @@ const FieldRow = ({ label, children, hideBorder, required }: FieldRowProps) => {
 	return (
 		<div
 			className={cn(
-				"flex items-center border-stroke-soft-200 border-b px-3 py-3",
+				"flex items-center border-stroke-soft-200 border-b px-3 py-3 dark:border-stroke-soft-100/50",
 				hideBorder && "border-b-0",
 			)}
 		>
@@ -173,7 +173,7 @@ export const SendDetails = () => {
 	}
 
 	return (
-		<div className="mx-auto mt-4 w-full max-w-[600px] overflow-hidden rounded-2xl border border-stroke-soft-200">
+		<div className="mx-auto mt-4 w-full max-w-[600px] overflow-hidden rounded-2xl border border-stroke-soft-200 dark:border-stroke-soft-100/50">
 			{/* From Row */}
 			<FieldRow label="From" required>
 				<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-sm text-text-sub-600">
