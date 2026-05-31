@@ -43,7 +43,7 @@ export const generateContinuousDateList = (
 		resolvedStartDate = new Date(data.dates[0]);
 	} else {
 		resolvedStartDate = new Date(resolvedEndDate);
-		resolvedStartDate.setDate(resolvedStartDate.getDate() - 7);
+		resolvedStartDate.setDate(resolvedStartDate.getDate() - 14);
 	}
 
 	const datesList: Date[] = [];
@@ -58,8 +58,8 @@ export const generateContinuousDateList = (
 		current.setDate(current.getDate() + 1);
 	}
 
-	// Always ensure at least 5 points for aesthetics
-	while (datesList.length < 5) {
+	// Always ensure at least 15 points for aesthetics
+	while (datesList.length < 15) {
 		const first = datesList[0] || new Date();
 		const prev = new Date(first);
 		prev.setDate(prev.getDate() - 1);

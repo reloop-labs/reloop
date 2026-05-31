@@ -20,7 +20,7 @@ import {
 	getYearMonthDayKey,
 } from "../utils";
 import { CustomTooltip } from "./custom-tooltip";
-import { EventSelector } from "./event-selector";
+import { EVENTS, EventSelector } from "./event-selector";
 
 interface EmailStatsResponse {
 	dates: string[];
@@ -101,15 +101,43 @@ export const DeliverabilityChart = ({
 				bounced: existing?.bounced ?? 0,
 				complaint: existing?.complaint ?? 0,
 				rate: existing?.rate ?? 0,
+				received: 0,
+				opened: 0,
+				clicked: 0,
+				unsubscribed: 0,
+				delivery_delayed: 0,
+				failed: 0,
+				suppressed: 0,
 			};
 		});
 	}, [data, startDate, endDate]);
 
+	const isAllSelected = useMemo(() => {
+		return (
+			selectedEvents.length === 0 ||
+			selectedEvents.includes("all") ||
+			selectedEvents.length === EVENTS.length
+		);
+	}, [selectedEvents]);
+
 	const maxSentValue = useMemo(() => {
-		if (!data || data.sent.length === 0) return 10;
-		const max = Math.max(...data.sent);
+		if (!data) return 10;
+		const keysToPlot: string[] = isAllSelected
+			? ["sent", "bounced"]
+			: selectedEvents.map((id) => (id === "complained" ? "complaint" : id));
+
+		let max = 10;
+		for (const key of keysToPlot) {
+			const array = data[key as keyof EmailStatsResponse] as
+				| number[]
+				| undefined;
+			if (array && array.length > 0) {
+				const m = Math.max(...array);
+				if (m > max) max = m;
+			}
+		}
 		return max > 0 ? max : 10;
-	}, [data]);
+	}, [data, selectedEvents, isAllSelected]);
 
 	if (isLoading) {
 		return (
@@ -194,9 +222,7 @@ export const DeliverabilityChart = ({
 							tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
 							dy={10}
 						/>
-						<YAxis yAxisId="left" hide />
 						<YAxis
-							yAxisId="right"
 							orientation="right"
 							domain={[0, maxSentValue]}
 							ticks={[0, Math.round(maxSentValue / 2), maxSentValue]}
@@ -206,28 +232,49 @@ export const DeliverabilityChart = ({
 							width={35}
 						/>
 						<Tooltip content={<CustomTooltip />} />
-						<Area
-							yAxisId="left"
-							type="linear"
-							dataKey="rate"
-							name="Deliverability Rate"
-							stroke="#888888"
-							strokeWidth={2}
-							fillOpacity={1}
-							fill="url(#colorRate)"
-							isAnimationActive={false}
-						/>
-						<Line
-							yAxisId="right"
-							type="linear"
-							dataKey="bounced"
-							name="Bounces"
-							stroke="#F04438"
-							strokeWidth={2}
-							dot={{ r: 3, fill: "#F04438" }}
-							activeDot={{ r: 5 }}
-							isAnimationActive={false}
-						/>
+						{isAllSelected ? (
+							<>
+								<Area
+									type="monotone"
+									dataKey="sent"
+									name="Emails Sent"
+									stroke="#888888"
+									strokeWidth={2}
+									fillOpacity={1}
+									fill="url(#colorRate)"
+									isAnimationActive={false}
+								/>
+								<Line
+									type="monotone"
+									dataKey="bounced"
+									name="Bounces"
+									stroke="#F04438"
+									strokeWidth={2}
+									dot={false}
+									activeDot={{ r: 5 }}
+									isAnimationActive={false}
+								/>
+							</>
+						) : (
+							selectedEvents.map((eventId) => {
+								const event = EVENTS.find((e) => e.id === eventId);
+								if (!event) return null;
+								const key = event.id === "complained" ? "complaint" : event.id;
+								return (
+									<Line
+										key={event.id}
+										type="monotone"
+										dataKey={key}
+										name={event.label}
+										stroke={event.color}
+										strokeWidth={2}
+										dot={false}
+										activeDot={{ r: 5 }}
+										isAnimationActive={false}
+									/>
+								);
+							})
+						)}
 					</ComposedChart>
 				</ResponsiveContainer>
 			</div>
