@@ -4,6 +4,7 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import type { DomainListResponse } from "@fe/dashboard/types/api.types";
 import { cn } from "@reloop/ui/cn";
 import * as Tooltip from "@reloop/ui/tooltip";
+import { AnimatePresence, motion } from "framer-motion";
 import { XCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
@@ -124,7 +125,7 @@ export const SendDetails = () => {
 					/>
 					<div className="flex items-center gap-2">
 						{fromError && (
-							<Tooltip.Root>
+							<Tooltip.Root delayDuration={0}>
 								<Tooltip.Trigger asChild>
 									<div className="flex cursor-pointer items-center justify-center text-red-500 transition-transform hover:scale-105 dark:text-red-400">
 										<XCircle size={15} />
@@ -147,34 +148,44 @@ export const SendDetails = () => {
 			</FieldRow>
 
 			{/* Reply-To Row */}
-			{showReplyTo && (
-				<FieldRow label="Reply-To">
-					<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-sm text-text-sub-600">
-						<input
-							ref={replyToInputRef}
-							value={replyTo}
-							onChange={(e) => setReplyTo(e.target.value)}
-							onBlur={() => {
-								if (!replyTo.trim()) {
-									setShowReplyTo(false);
-								}
-							}}
-							placeholder="replyto@example.com"
-							className="flex-1 bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
-						/>
-						{replyToError && (
-							<Tooltip.Root>
-								<Tooltip.Trigger asChild>
-									<div className="flex cursor-pointer items-center justify-center text-red-500 transition-transform hover:scale-105 dark:text-red-400">
-										<XCircle size={15} />
-									</div>
-								</Tooltip.Trigger>
-								<Tooltip.Content side="top">{replyToError}</Tooltip.Content>
-							</Tooltip.Root>
-						)}
-					</div>
-				</FieldRow>
-			)}
+			<AnimatePresence initial={false}>
+				{showReplyTo && (
+					<motion.div
+						initial={{ height: 0, opacity: 0 }}
+						animate={{ height: "auto", opacity: 1 }}
+						exit={{ height: 0, opacity: 0 }}
+						transition={{ duration: 0.2, ease: "easeInOut" }}
+						className="overflow-hidden"
+					>
+						<FieldRow label="Reply-To">
+							<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-sm text-text-sub-600">
+								<input
+									ref={replyToInputRef}
+									value={replyTo}
+									onChange={(e) => setReplyTo(e.target.value)}
+									onBlur={() => {
+										if (!replyTo.trim()) {
+											setShowReplyTo(false);
+										}
+									}}
+									placeholder="replyto@example.com"
+									className="flex-1 bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+								/>
+								{replyToError && (
+									<Tooltip.Root delayDuration={0}>
+										<Tooltip.Trigger asChild>
+											<div className="flex cursor-pointer items-center justify-center text-red-500 transition-transform hover:scale-105 dark:text-red-400">
+												<XCircle size={15} />
+											</div>
+										</Tooltip.Trigger>
+										<Tooltip.Content side="top">{replyToError}</Tooltip.Content>
+									</Tooltip.Root>
+								)}
+							</div>
+						</FieldRow>
+					</motion.div>
+				)}
+			</AnimatePresence>
 
 			{/* Preview Row */}
 			<FieldRow label="Preview">
