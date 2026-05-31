@@ -123,6 +123,7 @@ export const RateChart = ({
 						)}
 						<Bar
 							dataKey="rate"
+							name={title}
 							fill={color}
 							radius={[4, 4, 0, 0]}
 							maxBarSize={16}
