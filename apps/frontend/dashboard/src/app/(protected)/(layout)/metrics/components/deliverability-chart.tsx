@@ -232,59 +232,69 @@ export const DeliverabilityChart = ({
 							width={35}
 						/>
 						<Tooltip content={<CustomTooltip />} />
-						{isAllSelected ? (
-							<>
-								<Area
-									type="monotone"
-									dataKey="delivered"
-									name="Delivered"
-									stroke="#10B981"
-									strokeWidth={2}
-									fillOpacity={1}
-									fill="url(#colorDelivered)"
-									isAnimationActive={false}
-								/>
-								<Line
-									type="monotone"
-									dataKey="bounced"
-									name="Bounces"
-									stroke="#EF4444"
-									strokeWidth={2}
-									dot={false}
-									activeDot={{ r: 5 }}
-									isAnimationActive={false}
-								/>
-								<Line
-									type="monotone"
-									dataKey="complaint"
-									name="Complained"
-									stroke="#D97706"
-									strokeWidth={2}
-									dot={false}
-									activeDot={{ r: 5 }}
-									isAnimationActive={false}
-								/>
-							</>
-						) : (
-							selectedEvents.map((eventId) => {
-								const event = EVENTS.find((e) => e.id === eventId);
-								if (!event) return null;
-								const key = event.id === "complained" ? "complaint" : event.id;
-								return (
-									<Line
-										key={event.id}
-										type="monotone"
-										dataKey={key}
-										name={event.label}
-										stroke={event.color}
-										strokeWidth={2}
-										dot={false}
-										activeDot={{ r: 5 }}
-										isAnimationActive={false}
-									/>
-								);
-							})
+						{(isAllSelected || selectedEvents.includes("delivered")) && (
+							<Area
+								type="monotone"
+								dataKey="delivered"
+								name="Delivered"
+								stroke="#10B981"
+								strokeWidth={2}
+								fillOpacity={1}
+								fill="url(#colorDelivered)"
+								isAnimationActive={false}
+							/>
 						)}
+						{(isAllSelected || selectedEvents.includes("bounced")) && (
+							<Line
+								type="monotone"
+								dataKey="bounced"
+								name="Bounces"
+								stroke="#EF4444"
+								strokeWidth={2}
+								dot={false}
+								activeDot={{ r: 5 }}
+								isAnimationActive={false}
+							/>
+						)}
+						{(isAllSelected || selectedEvents.includes("complained")) && (
+							<Line
+								type="monotone"
+								dataKey="complaint"
+								name="Complained"
+								stroke="#D97706"
+								strokeWidth={2}
+								dot={false}
+								activeDot={{ r: 5 }}
+								isAnimationActive={false}
+							/>
+						)}
+						{!isAllSelected &&
+							selectedEvents
+								.filter(
+									(id) =>
+										id !== "delivered" &&
+										id !== "bounced" &&
+										id !== "complained",
+								)
+								.map((eventId) => {
+									const event = EVENTS.find((e) => e.id === eventId);
+									if (!event) return null;
+									const key =
+										event.id === "complained" ? "complaint" : event.id;
+									return (
+										<Line
+											key={event.id}
+											type="monotone"
+											dataKey={key}
+											name={event.label}
+											stroke={event.color}
+											strokeWidth={2}
+											dot={false}
+											activeDot={{ r: 5 }}
+											isAnimationActive={false}
+										/>
+									);
+								})}
 					</ComposedChart>
 				</ResponsiveContainer>
 			</div>
