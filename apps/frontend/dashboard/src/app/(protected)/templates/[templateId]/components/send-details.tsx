@@ -21,7 +21,7 @@ const FieldRow = ({ label, children, hideBorder }: FieldRowProps) => {
 	return (
 		<div
 			className={cn(
-				"flex items-center border-stroke-soft-200 border-b py-3",
+				"flex items-center border-stroke-soft-200 border-b px-3 py-3",
 				hideBorder && "border-b-0",
 			)}
 		>
@@ -96,7 +96,7 @@ export const SendDetails = () => {
 	}
 
 	return (
-		<div className="mx-auto w-full max-w-[600px] overflow-hidden rounded-2xl border border-stroke-soft-200">
+		<div className="mx-auto mt-4 w-full max-w-[600px] overflow-hidden rounded-2xl border border-stroke-soft-200">
 			{/* From Row */}
 			<FieldRow label="From">
 				<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-sm text-text-sub-600">
@@ -151,15 +151,14 @@ export const SendDetails = () => {
 				/>
 			</FieldRow>
 
-			{/* Subject Row (No label) */}
-			<div className="flex items-center border-stroke-soft-200 border-b py-3">
+			<FieldRow label="Subject" hideBorder>
 				<input
 					value={subject}
 					onChange={(e) => setSubject(e.target.value)}
 					placeholder="Subject"
 					className="flex-1 bg-transparent font-medium text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
 				/>
-			</div>
+			</FieldRow>
 		</div>
 	);
 };
