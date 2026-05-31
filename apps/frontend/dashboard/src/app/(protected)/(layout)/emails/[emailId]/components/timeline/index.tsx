@@ -3,11 +3,11 @@
 import { cn } from "@reloop/ui/cn";
 import { Fragment } from "react";
 import {
-	SentStep,
-	DeliveredStep,
-	OpenedStep,
 	ClickedStep,
+	DeliveredStep,
 	FailedStep,
+	OpenedStep,
+	SentStep,
 } from "./steps";
 import type { EmailEvent } from "./types";
 
@@ -50,7 +50,11 @@ export function EmailTimeline({
 		});
 	}
 
-	if (!isFailed && deliveredAt && !allEvents.find((e) => e.type === "delivered")) {
+	if (
+		!isFailed &&
+		deliveredAt &&
+		!allEvents.find((e) => e.type === "delivered")
+	) {
 		allEvents.push({
 			id: "synth-delivered",
 			type: "delivered",
@@ -83,8 +87,8 @@ export function EmailTimeline({
 									index === 0 && isFailed
 										? "border-stroke-soft-100 border-dashed"
 										: !isFailed
-										? "border-stroke-soft-100 border-dashed"
-										: "border-transparent",
+											? "border-stroke-soft-100 border-dashed"
+											: "border-transparent",
 								)}
 							/>
 						)}
@@ -94,4 +98,3 @@ export function EmailTimeline({
 		</div>
 	);
 }
-

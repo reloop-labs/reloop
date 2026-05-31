@@ -10,6 +10,197 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { EmailTimeline } from "./timeline";
 
+// ─── Error classification ──────────────────────────────────────────────────
+
+interface ErrorClassification {
+	category: string;
+	summary: string;
+	fixes: string[];
+}
+
+function classifyError(msg: string): ErrorClassification {
+	const m = msg.toLowerCase();
+
+	// SMTP authentication / credential issues
+	if (
+		m.includes("535") ||
+		m.includes("authentication") ||
+		m.includes("auth failed") ||
+		m.includes("invalid credentials") ||
+		m.includes("username") ||
+		m.includes("password") ||
+		m.includes("unauthorized")
+	) {
+		return {
+			category: "Authentication Failure",
+			summary: "SMTP credentials were rejected by the sending server.",
+			fixes: [
+				"Verify SMTP username & password",
+				"Use an App Password (Gmail)",
+				"Regenerate API key or credentials",
+			],
+		};
+	}
+
+	// DNS / domain resolution failures
+	if (
+		m.includes("dns") ||
+		m.includes("no mx") ||
+		m.includes("no such host") ||
+		m.includes("name or service not known") ||
+		m.includes("could not resolve") ||
+		m.includes("domain not found")
+	) {
+		return {
+			category: "DNS Resolution Error",
+			summary: "Recipient domain has no valid MX record or doesn't exist.",
+			fixes: [
+				"Check recipient address spelling",
+				"Verify domain MX records exist",
+				"Allow DNS propagation time",
+			],
+		};
+	}
+
+	// Bounce / recipient rejection
+	if (
+		m.includes("550") ||
+		m.includes("551") ||
+		m.includes("552") ||
+		m.includes("553") ||
+		m.includes("bounce") ||
+		m.includes("user unknown") ||
+		m.includes("no such user") ||
+		m.includes("mailbox not found") ||
+		m.includes("recipient rejected") ||
+		m.includes("does not exist")
+	) {
+		return {
+			category: "Mailbox Rejected",
+			summary: "Receiving server rejected the address — inbox may not exist.",
+			fixes: [
+				"Confirm recipient address is valid",
+				"Add SPF & DKIM to your domain",
+				"Check IP blocklists (MXToolbox)",
+			],
+		};
+	}
+
+	// Spam / policy block
+	if (
+		m.includes("spam") ||
+		m.includes("blocked") ||
+		m.includes("policy") ||
+		m.includes("abuse") ||
+		m.includes("blacklist") ||
+		m.includes("dnsbl") ||
+		m.includes("content rejected")
+	) {
+		return {
+			category: "Spam / Policy Block",
+			summary:
+				"A spam filter or policy on the receiving server blocked delivery.",
+			fixes: [
+				"Remove IP from blocklists",
+				"Configure SPF, DKIM & DMARC",
+				"Clean your mailing list",
+			],
+		};
+	}
+
+	// Rate limiting / throttling
+	if (
+		m.includes("rate limit") ||
+		m.includes("too many") ||
+		m.includes("throttle") ||
+		m.includes("quota") ||
+		m.includes("limit exceeded") ||
+		m.includes("421") ||
+		m.includes("452")
+	) {
+		return {
+			category: "Rate Limit Exceeded",
+			summary:
+				"Sending quota was exceeded on your provider or the recipient server.",
+			fixes: [
+				"Reduce sending frequency",
+				"Upgrade your sending plan",
+				"Add retry with back-off",
+			],
+		};
+	}
+
+	// TLS / connection security
+	if (
+		m.includes("tls") ||
+		m.includes("ssl") ||
+		m.includes("certificate") ||
+		m.includes("handshake") ||
+		m.includes("secure connection") ||
+		m.includes("starttls")
+	) {
+		return {
+			category: "TLS Handshake Error",
+			summary: "TLS/SSL negotiation failed — likely a cert or port mismatch.",
+			fixes: [
+				"Use port 587 (STARTTLS) or 465 (SSL)",
+				"Renew expired SSL certificate",
+				"Require TLS 1.2+",
+			],
+		};
+	}
+
+	// Connection / timeout
+	if (
+		m.includes("timeout") ||
+		m.includes("connection refused") ||
+		m.includes("could not connect") ||
+		m.includes("network") ||
+		m.includes("unreachable") ||
+		m.includes("connection reset")
+	) {
+		return {
+			category: "Connection Error",
+			summary: "Could not connect to the mail server — firewall or wrong host.",
+			fixes: [
+				"Check SMTP host & port config",
+				"Allow SMTP egress in firewall",
+				"Check provider status page",
+			],
+		};
+	}
+
+	// Attachment / size
+	if (
+		m.includes("message too large") ||
+		m.includes("size limit") ||
+		m.includes("attachment") ||
+		m.includes("552") ||
+		m.includes("file too big")
+	) {
+		return {
+			category: "Message Too Large",
+			summary: "Email exceeds the size limit set by the receiving server.",
+			fixes: [
+				"Remove or compress attachments",
+				"Link to files instead of attaching",
+				"Check provider size limits",
+			],
+		};
+	}
+
+	// Generic fallback
+	return {
+		category: "Delivery Error",
+		summary: "Email delivery failed — check technical details below.",
+		fixes: [
+			"Verify SMTP host, port & credentials",
+			"Confirm recipient address is valid",
+			"Contact your email provider support",
+		],
+	};
+}
+
 interface EmailDetailProps {
 	email?: {
 		id: string;
@@ -206,6 +397,75 @@ function CopyButton({ value, label }: { value: string; label?: string }) {
 	);
 }
 
+function ErrorDetailsPanel({ errorMessage }: { errorMessage: string }) {
+	const [showRaw, setShowRaw] = useState(false);
+	const { summary } = classifyError(errorMessage);
+
+	return (
+		<section>
+			<div className="overflow-hidden rounded-2xl border border-error-light/40 bg-error-lighter/30 dark:bg-error-lighter/10">
+				{/* Top row */}
+				<div className="flex items-center justify-between gap-3 px-3.5 py-2.5 text-paragraph-sm">
+					<div className="flex min-w-0 items-center gap-2.5">
+						<Icon
+							name="cross-circle"
+							className="h-4 w-4 flex-shrink-0 text-error-base"
+						/>
+						<span className="flex-shrink-0 font-semibold text-error-base">
+							Delivery Failed
+						</span>
+						<span className="flex-shrink-0 text-stroke-sub-300 dark:text-stroke-sub-300/40">
+							|
+						</span>
+						<span className="truncate font-medium text-text-sub-600">
+							{summary}
+						</span>
+					</div>
+					<button
+						type="button"
+						onClick={() => setShowRaw((v) => !v)}
+						className="flex flex-shrink-0 cursor-pointer items-center gap-1 font-semibold text-text-soft-400 text-xs transition-colors hover:text-text-strong-950"
+					>
+						<span>{showRaw ? "Hide details" : "Technical details"}</span>
+						<motion.div
+							animate={{ rotate: showRaw ? 180 : 0 }}
+							transition={{ duration: 0.2 }}
+							className="flex items-center justify-center"
+						>
+							<Icon
+								name="chevron-down"
+								className="h-3 w-3 text-text-soft-400"
+							/>
+						</motion.div>
+					</button>
+				</div>
+
+				{/* Expanded details - inside the same container! */}
+				<AnimatePresence initial={false}>
+					{showRaw && (
+						<motion.div
+							initial={{ height: 0, opacity: 0 }}
+							animate={{ height: "auto", opacity: 1 }}
+							exit={{ height: 0, opacity: 0 }}
+							transition={{ duration: 0.2, ease: "easeInOut" }}
+							className="overflow-hidden"
+						>
+							<div className="relative border-error-light/20 border-t bg-bg-weak-50/30 p-3.5 dark:bg-bg-weak-50/5">
+								<div className="absolute top-3 right-3 z-10">
+									<CopyButton value={errorMessage} label="Error details" />
+								</div>
+								<pre className="overflow-x-auto whitespace-pre-wrap break-all pr-8 text-error-base text-sm leading-relaxed">
+									{errorMessage}
+								</pre>
+							</div>
+						</motion.div>
+					)}
+				</AnimatePresence>
+			</div>
+		</section>
+	);
+}
+
 export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 	const [activeTab, setActiveTab] = useState<string>("preview");
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
@@ -317,16 +577,7 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 				</div>
 			</section>
 			{email.errorMessage && (
-				<section>
-					<h3 className="mb-4 font-medium text-paragraph-sm text-text-strong-950">
-						Error Details
-					</h3>
-					<div className="rounded-xl border border-error-soft-200 bg-error-alpha-10 p-6">
-						<p className="whitespace-pre-wrap font-mono text-error-base text-sm">
-							{email.errorMessage}
-						</p>
-					</div>
-				</section>
+				<ErrorDetailsPanel errorMessage={email.errorMessage} />
 			)}
 
 			{/* Event Tracking Timeline */}
