@@ -67,33 +67,63 @@ const EVENT_ACTION_MAP: Partial<Record<KumomtaEventType, EventAction>> = {
 // ─── userId Resolution ────────────────────────────────────────────────────────
 
 /**
- * Resolves a valid userId for the contact row.
- * Priority: emailLog.userId → apikey.userId → first org member
- * Returns null only if the org has no members at all (should never happen in prod).
+ * Resolves the userId that should own the auto-created contact.
+ *
+ * Resolution order (strict — no random fallback):
+ *  1. emailLog.userId         — the logged-in user who triggered the send
+ *  2. apikey.userId           — the user who owns the API key used for the send
+ *
+ * After resolution we validate that the userId is an active member of the
+ * given organizationId. This prevents cross-org contamination in edge cases.
+ *
+ * Returns null if the userId cannot be traced to the sending organization.
  */
-async function resolveUserId(
+async function resolveAndValidateUserId(
 	emailLog: { userId: string | null; apikeyId: string | null },
 	organizationId: string,
 ): Promise<string | null> {
-	// 1. Direct user attribution from the email log
-	if (emailLog.userId) return emailLog.userId;
+	let candidateUserId: string | null = null;
 
-	// 2. API-key sends: look up the key owner
-	if (emailLog.apikeyId) {
+	// 1. Direct user attribution from the email log
+	if (emailLog.userId) {
+		candidateUserId = emailLog.userId;
+	}
+	// 2. API-key sends: trace the key back to its owner within this exact org
+	else if (emailLog.apikeyId) {
 		const key = await db.query.apikey.findFirst({
-			where: eq(schema.apikey.id, emailLog.apikeyId),
+			where: and(
+				eq(schema.apikey.id, emailLog.apikeyId),
+				eq(schema.apikey.organizationId, organizationId),
+			),
 			columns: { userId: true },
 		});
-		if (key?.userId) return key.userId;
+		candidateUserId = key?.userId ?? null;
 	}
 
-	// 3. Fallback: any member of the org (e.g., system-initiated)
-	const member = await db.query.member.findFirst({
-		where: eq(schema.member.organizationId, organizationId),
+	if (!candidateUserId) return null;
+
+	// ── Org-membership gate ────────────────────────────────────────────────────
+	// Confirm the resolved user actually belongs to this organization.
+	// Guards against stale emailLog data or cross-org API key misuse.
+	const membership = await db.query.member.findFirst({
+		where: and(
+			eq(schema.member.userId, candidateUserId),
+			eq(schema.member.organizationId, organizationId),
+		),
 		columns: { userId: true },
 	});
 
-	return member?.userId ?? null;
+	if (!membership) {
+		log.warn({
+			candidateUserId,
+			organizationId,
+			message:
+				"[auto-contact] Resolved userId is not a member of this organization — skipping contact upsert",
+		});
+		return null;
+	}
+
+	return candidateUserId;
 }
 
 // ─── Contact Upsert ───────────────────────────────────────────────────────────
@@ -344,7 +374,12 @@ export async function initKumomtaContactSubscriber() {
 					return;
 				}
 
-				// ── Fetch emailLog for org context ─────────────────────────────────
+				// ── Resolve organizationId ────────────────────────────────────────
+				// Primary source: X-Org-ID stamped directly on the message by KumoMTA.
+				// This is available without any DB lookup and is org-authoritative.
+				const headerOrgId = event.headers?.["X-Org-ID"];
+
+				// ── Fetch emailLog for userId + recipient context ──────────────────
 				const emailLog = await db.query.emailLog.findFirst({
 					where: eq(schema.emailLog.id, emailLogId),
 					columns: {
@@ -365,10 +400,25 @@ export async function initKumomtaContactSubscriber() {
 					return;
 				}
 
-				const { organizationId, toEmails } = emailLog;
+				// ── Cross-validate org ────────────────────────────────────────────
+				// Use X-Org-ID header when present; fall back to emailLog.organizationId.
+				// If both exist they MUST agree — a mismatch indicates message tampering.
+				const organizationId = headerOrgId ?? emailLog.organizationId;
 
-				// ── Resolve userId ─────────────────────────────────────────────────
-				const userId = await resolveUserId(emailLog, organizationId);
+				if (headerOrgId && headerOrgId !== emailLog.organizationId) {
+					log.warn({
+						emailLogId,
+						headerOrgId,
+						logOrgId: emailLog.organizationId,
+						kumomtaId: event.id,
+						message:
+							"[auto-contact] X-Org-ID header does not match emailLog.organizationId — skipping contact upsert",
+					});
+					return;
+				}
+
+				// ── Resolve userId (org-scoped, membership-validated) ──────────────
+				const userId = await resolveAndValidateUserId(emailLog, organizationId);
 
 				if (!userId) {
 					log.warn({
@@ -384,6 +434,7 @@ export async function initKumomtaContactSubscriber() {
 				// KumoMTA fires one event per recipient, so event.recipient is the
 				// exact address for this delivery attempt. Fall back to toEmails from
 				// the log if the recipient field is unexpectedly empty.
+				const { toEmails } = emailLog;
 				const recipientEmails: string[] =
 					event.recipient
 						? [event.recipient]
