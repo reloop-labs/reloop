@@ -375,7 +375,7 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 						</AnimatePresence>
 					</TabMenu.List>
 
-					<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
+					<div className="mb-10 overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
 						<TabMenu.Content value="preview">
 							<div className="bg-white p-6">
 								{email.htmlBody && <IframePreview html={email.htmlBody} />}

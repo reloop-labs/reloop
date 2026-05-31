@@ -36,7 +36,7 @@ export function EmailTimeline({
 	}
 
 	return (
-		<div className="relative flex w-full items-start justify-between gap-0 rounded-xl border border-stroke-soft-100 px-4 pt-10 pb-8 transition-all hover:border-stroke-soft-200">
+		<div className="relative flex w-full items-start justify-between gap-0 rounded-3xl border border-stroke-soft-100 px-4 pt-10 pb-8 transition-all hover:border-stroke-soft-200">
 			{TIMELINE_COMPONENTS.map((StepComponent, index: number) => {
 				const eventTypes = ["sent", "delivered", "opened", "clicked"];
 				const eventType = eventTypes[index];
