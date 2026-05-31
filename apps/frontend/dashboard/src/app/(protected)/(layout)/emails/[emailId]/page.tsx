@@ -3,6 +3,7 @@
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { useParams, useRouter } from "next/navigation";
 import useSWR from "swr";
+import { EmailNotFound } from "../components/email-not-found";
 import { EmailDetail } from "./components/email-detail";
 
 interface EmailLogData {
@@ -52,13 +53,8 @@ const EmailDetailPage = () => {
 
 	if (error) {
 		return (
-			<div className="mx-auto max-w-3xl sm:px-8">
-				<div className="pt-10 pb-8">
-					<AnimatedBackButton onClick={() => router.push("/emails")} />
-				</div>
-				<div className="pt-20">
-					<p>sdd</p>
-				</div>
+			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-3xl flex-col items-center justify-center sm:px-8">
+				<EmailNotFound />
 			</div>
 		);
 	}

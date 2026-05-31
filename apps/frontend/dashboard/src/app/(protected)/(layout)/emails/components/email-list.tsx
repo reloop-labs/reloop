@@ -3,6 +3,7 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import { AnimatePresence, motion } from "framer-motion";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 import useSWR from "swr";
@@ -32,6 +33,7 @@ interface EmailListResponse {
 export const EmailList = () => {
 	const { activeOrganization } = useUserOrganization();
 	const [searchQuery, setSearchQuery] = useState<string>("");
+	const [isSearchActive, setIsSearchActive] = useState(false);
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
 		parseAsInteger.withDefault(1),
@@ -128,7 +130,11 @@ export const EmailList = () => {
 	return (
 		<div>
 			<div className="flex items-center gap-2">
-				<div className="flex-1">
+				<motion.div
+					layout
+					className="flex-1"
+					transition={{ type: "spring", stiffness: 350, damping: 30 }}
+				>
 					<Input.Root size="xsmall" className="rounded-[10px]">
 						<Input.Wrapper>
 							<Input.Icon as={Icon} name="search" size="xsmall" />
@@ -139,49 +145,82 @@ export const EmailList = () => {
 									setSearchQuery(e.target.value);
 									setCurrentPage(1);
 								}}
+								onFocus={() => setIsSearchActive(true)}
+								onBlur={() => setIsSearchActive(false)}
+								onKeyDown={(e) => {
+									if (e.key === "Escape") {
+										e.currentTarget.blur();
+									}
+								}}
 							/>
+							{searchQuery && (
+								<button
+									type="button"
+									onMouseDown={(e) => e.preventDefault()}
+									onClick={() => {
+										setSearchQuery("");
+										setCurrentPage(1);
+									}}
+									className="mr-1 rounded p-0.5 text-text-soft-400 transition-colors hover:bg-neutral-alpha-10 hover:text-text-strong-950"
+								>
+									<Icon name="cross" className="h-3 w-3" />
+								</button>
+							)}
 						</Input.Wrapper>
 					</Input.Root>
-				</div>
+				</motion.div>
 
-				<DateRangeFilter
-					startDate={startDate || null}
-					endDate={endDate || null}
-					activePreset={datePreset || null}
-					onDateChange={handleDateChange}
-				/>
-				<StatusSelector
-					value={selectedStatus}
-					onChange={(val) => {
-						setSelectedStatus(val);
-						setCurrentPage(1);
-					}}
-				/>
-				<DomainSelector
-					value={selectedDomain}
-					onChange={(val) => {
-						setSelectedDomain(val);
-						setCurrentPage(1);
-					}}
-				/>
-				<ApiKeySelector
-					value={selectedApiKey}
-					onChange={(val) => {
-						setSelectedApiKey(val);
-						setCurrentPage(1);
-					}}
-				/>
-				{hasAnyFilter && (
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						onClick={handleClearAll}
-						className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
-					>
-						Clear filters
-					</Button.Root>
-				)}
+				<AnimatePresence initial={false}>
+					{!isSearchActive && (
+						<motion.div
+							key="filters"
+							initial={{ opacity: 0, width: 0, scale: 0.95 }}
+							animate={{ opacity: 1, width: "auto", scale: 1 }}
+							exit={{ opacity: 0, width: 0, scale: 0.95 }}
+							transition={{ type: "spring", stiffness: 350, damping: 30 }}
+							className="flex shrink-0 items-center gap-2 overflow-hidden whitespace-nowrap"
+						>
+							<DateRangeFilter
+								startDate={startDate || null}
+								endDate={endDate || null}
+								activePreset={datePreset || null}
+								onDateChange={handleDateChange}
+							/>
+							<StatusSelector
+								value={selectedStatus}
+								onChange={(val) => {
+									setSelectedStatus(val);
+									setCurrentPage(1);
+								}}
+							/>
+							<DomainSelector
+								value={selectedDomain}
+								onChange={(val) => {
+									setSelectedDomain(val);
+									setCurrentPage(1);
+								}}
+							/>
+							<ApiKeySelector
+								value={selectedApiKey}
+								onChange={(val) => {
+									setSelectedApiKey(val);
+									setCurrentPage(1);
+								}}
+							/>
+							{hasAnyFilter && (
+								<Button.Root
+									variant="neutral"
+									mode="stroke"
+									size="xsmall"
+									onClick={handleClearAll}
+									className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
+								>
+									Clear filters
+								</Button.Root>
+							)}
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</div>
 
 			<div className="mt-4">
