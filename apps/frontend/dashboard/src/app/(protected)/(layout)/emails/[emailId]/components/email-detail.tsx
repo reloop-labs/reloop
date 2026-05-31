@@ -41,42 +41,93 @@ interface EmailDetailProps {
 function IframePreview({ html }: { html: string }) {
 	const iframeRef = useRef<HTMLIFrameElement>(null);
 
-	const updateHeight = useCallback(() => {
-		const iframe = iframeRef.current;
-		if (iframe?.contentWindow) {
-			try {
-				const body = iframe.contentWindow.document.body;
-				const htmlDoc = iframe.contentWindow.document.documentElement;
-				const height = Math.max(
-					body.scrollHeight,
-					body.offsetHeight,
-					htmlDoc.clientHeight,
-					htmlDoc.scrollHeight,
-					htmlDoc.offsetHeight,
-				);
-				iframe.style.height = `${height}px`;
-			} catch (_e) {
-				// Ignore cross-origin issues if any
-			}
-		}
-	}, []);
-
 	useEffect(() => {
 		const iframe = iframeRef.current;
-		if (iframe) {
-			const interval = setInterval(updateHeight, 500);
-			return () => clearInterval(interval);
+		if (!iframe) return;
+
+		let observer: ResizeObserver | null = null;
+
+		const updateHeight = () => {
+			if (iframe.contentWindow) {
+				try {
+					const doc = iframe.contentWindow.document;
+
+					// Force height: auto on html/body inside the iframe to avoid viewport/height constraints
+					if (doc.body) {
+						doc.body.style.setProperty("height", "auto", "important");
+					}
+					if (doc.documentElement) {
+						doc.documentElement.style.setProperty(
+							"height",
+							"auto",
+							"important",
+						);
+					}
+
+					// Read height directly from the body's scrollHeight/offsetHeight.
+					// Since html and body have height: auto, they wrap the content, and
+					// body.scrollHeight/offsetHeight represents the actual content size
+					// without needing to collapse the iframe to 0px.
+					const height = Math.max(
+						doc.body?.scrollHeight || 0,
+						doc.body?.offsetHeight || 0,
+					);
+
+					if (height > 0) {
+						// Add a tiny buffer (4px) to ensure no scrollbars show due to subpixel rendering or margins
+						iframe.style.height = `${height + 4}px`;
+					}
+				} catch (_e) {
+					// Ignore cross-origin issues if any
+				}
+			}
+		};
+
+		const handleLoad = () => {
+			if (observer) {
+				observer.disconnect();
+				observer = null;
+			}
+
+			updateHeight();
+
+			if (iframe.contentWindow) {
+				try {
+					const body = iframe.contentWindow.document.body;
+					if (body) {
+						observer = new ResizeObserver(() => {
+							updateHeight();
+						});
+						observer.observe(body);
+					}
+				} catch (_e) {
+					// Ignore
+				}
+			}
+		};
+
+		// If the iframe document is already loaded
+		if (iframe.contentWindow?.document.readyState === "complete") {
+			handleLoad();
 		}
-	}, [updateHeight]);
+
+		iframe.addEventListener("load", handleLoad);
+
+		return () => {
+			iframe.removeEventListener("load", handleLoad);
+			if (observer) {
+				observer.disconnect();
+			}
+		};
+	}, [html]);
 
 	return (
 		<iframe
 			ref={iframeRef}
 			srcDoc={html}
 			className="w-full overflow-hidden border-none"
-			onLoad={updateHeight}
 			title="Email Preview"
-			sandbox="allow-popups allow-popups-to-escape-sandbox"
+			sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin"
 		/>
 	);
 }

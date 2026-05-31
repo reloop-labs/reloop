@@ -45,7 +45,7 @@ export const EmailList = () => {
 		parseAsString.withDefault(""),
 	);
 	const [selectedApiKey, setSelectedApiKey] = useQueryState(
-		"api_key",
+		"api_key_id",
 		parseAsString.withDefault(""),
 	);
 	const [selectedStatus, setSelectedStatus] = useQueryState(
@@ -69,7 +69,7 @@ export const EmailList = () => {
 		? `/api/logs/v1/emails?limit=${pageSize}&page=${currentPage}${
 				searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ""
 			}${selectedDomain ? `&domain=${selectedDomain}` : ""}${
-				selectedApiKey ? `&api_key=${selectedApiKey}` : ""
+				selectedApiKey ? `&api_key_id=${selectedApiKey}` : ""
 			}${selectedStatus ? `&status=${selectedStatus}` : ""}${
 				startDate ? `&start_date=${startDate}` : ""
 			}${endDate ? `&end_date=${endDate}` : ""}`

@@ -30,7 +30,7 @@ export async function listEmailLogsController({
 		search,
 		status,
 		domain,
-		api_key,
+		api_key_id,
 		start_date,
 		end_date,
 	} = query;
@@ -60,8 +60,8 @@ export async function listEmailLogsController({
 			}
 		}
 
-		if (api_key) {
-			conditions.push(eq(schema.emailLog.apikeyId, api_key));
+		if (api_key_id) {
+			conditions.push(eq(schema.emailLog.apikeyId, api_key_id));
 		}
 
 		if (start_date) {
