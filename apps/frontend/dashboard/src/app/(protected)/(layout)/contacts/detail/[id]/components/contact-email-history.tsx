@@ -48,15 +48,6 @@ type TimelineItem =
 			timestamp: string;
 	  }
 	| {
-			kind: "event";
-			id: string;
-			emailId: string;
-			subject: string;
-			eventType: string;
-			timestamp: string;
-			metadata: Record<string, string> | null;
-	  }
-	| {
 			kind: "contact_created";
 			id: string;
 			timestamp: string;
@@ -129,26 +120,13 @@ const EVENT_ICON: Record<string, { icon: string; bg: string; text: string }> = {
 		bg: "bg-red-100",
 		text: "text-red-600",
 	},
-	email_failed: { icon: "x-circle", bg: "bg-red-100", text: "text-red-600" },
+	email_failed: {
+		icon: "cross-circle",
+		bg: "bg-red-100",
+		text: "text-red-600",
+	},
 	email_pending: { icon: "clock", bg: "bg-amber-100", text: "text-amber-600" },
 	email_spam: { icon: "alert-octagon", bg: "bg-red-100", text: "text-red-600" },
-	// Event-level
-	sent: { icon: "send-1", bg: "bg-blue-100", text: "text-blue-600" },
-	delivered: {
-		icon: "check-circle",
-		bg: "bg-emerald-100",
-		text: "text-emerald-600",
-	},
-	opened: { icon: "mail-open", bg: "bg-purple-100", text: "text-purple-600" },
-	clicked: {
-		icon: "mouse-pointer-outline",
-		bg: "bg-indigo-100",
-		text: "text-indigo-600",
-	},
-	bounced: { icon: "alert-circle", bg: "bg-red-100", text: "text-red-600" },
-	failed: { icon: "x-circle", bg: "bg-red-100", text: "text-red-600" },
-	complaint: { icon: "alert-octagon", bg: "bg-red-100", text: "text-red-600" },
-	deferred: { icon: "clock", bg: "bg-amber-100", text: "text-amber-600" },
 	// Contact created
 	contact_created: {
 		icon: "user-plus",
@@ -157,45 +135,114 @@ const EVENT_ICON: Record<string, { icon: string; bg: string; text: string }> = {
 	},
 };
 
-const EVENT_LABELS: Record<string, string> = {
-	sent: "sent",
-	delivered: "delivered",
-	opened: "opened",
-	clicked: "clicked a link in",
-	bounced: "bounced for",
-	failed: "failed to deliver",
-	complaint: "marked as spam",
-	deferred: "deferred delivery of",
-};
-
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getIconConfig(key: string) {
 	return (
 		EVENT_ICON[key] ?? {
-			icon: "circle",
+			icon: "mail",
 			bg: "bg-neutral-100",
 			text: "text-text-sub-600",
 		}
 	);
 }
 
-function getInitials(email: string): string {
-	return email.charAt(0).toUpperCase();
+interface ParsedLifecycle {
+	hasSent: boolean;
+	sentTime: string | null;
+	hasDelivered: boolean;
+	deliveredTime: string | null;
+	hasOpened: boolean;
+	openedTime: string | null;
+	openedCount: number;
+	hasClicked: boolean;
+	clickedTime: string | null;
+	clickedCount: number;
+	hasFailed: boolean;
+	failedType: "failed" | "bounced" | "complaint" | null;
+	failedTime: string | null;
+	failedReason: string | null;
 }
 
-function getAvatarGradient(email: string): string {
-	// Deterministic gradient based on email string
-	const gradients = [
-		"from-blue-500 to-indigo-600",
-		"from-emerald-500 to-teal-600",
-		"from-violet-500 to-purple-600",
-		"from-rose-500 to-pink-600",
-		"from-amber-500 to-orange-600",
-		"from-cyan-500 to-sky-600",
-	];
-	const hash = email.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-	return gradients[hash % gradients.length] ?? "from-blue-500 to-indigo-600";
+function parseLifecycle(entry: ActivityEntry): ParsedLifecycle {
+	const sentEvent = entry.events.find((e) => e.type === "sent");
+	const deliveredEvent = entry.events.find((e) => e.type === "delivered");
+	const openedEvents = entry.events.filter((e) => e.type === "opened");
+	const clickedEvents = entry.events.filter((e) => e.type === "clicked");
+
+	const bouncedEvent = entry.events.find((e) => e.type === "bounced");
+	const failedEvent = entry.events.find((e) => e.type === "failed");
+	const complaintEvent = entry.events.find((e) => e.type === "complaint");
+
+	const hasSent = true;
+	const sentTime = entry.sentAt || sentEvent?.createdAt || entry.createdAt;
+
+	const hasDelivered = !!(
+		entry.deliveredAt ||
+		deliveredEvent ||
+		openedEvents.length > 0 ||
+		clickedEvents.length > 0
+	);
+	const deliveredTime =
+		entry.deliveredAt ||
+		deliveredEvent?.createdAt ||
+		openedEvents[0]?.createdAt ||
+		clickedEvents[0]?.createdAt ||
+		null;
+
+	const hasOpened = openedEvents.length > 0 || clickedEvents.length > 0;
+	const openedTime =
+		openedEvents[0]?.createdAt || clickedEvents[0]?.createdAt || null;
+	const openedCount = openedEvents.length;
+
+	const hasClicked = clickedEvents.length > 0;
+	const clickedTime = clickedEvents[0]?.createdAt || null;
+	const clickedCount = clickedEvents.length;
+
+	let failedType: "failed" | "bounced" | "complaint" | null = null;
+	let failedTime: string | null = null;
+	let failedReason: string | null = null;
+
+	if (complaintEvent) {
+		failedType = "complaint";
+		failedTime = complaintEvent.createdAt;
+		failedReason =
+			complaintEvent.metadata?.reason ||
+			complaintEvent.metadata?.description ||
+			null;
+	} else if (bouncedEvent) {
+		failedType = "bounced";
+		failedTime = bouncedEvent.createdAt;
+		failedReason =
+			bouncedEvent.metadata?.reason ||
+			bouncedEvent.metadata?.description ||
+			null;
+	} else if (failedEvent || entry.failedAt || entry.status === "failed") {
+		failedType = "failed";
+		failedTime = entry.failedAt || failedEvent?.createdAt || entry.createdAt;
+		failedReason =
+			entry.errorMessage ||
+			failedEvent?.metadata?.reason ||
+			failedEvent?.metadata?.error ||
+			null;
+	}
+
+	return {
+		hasSent,
+		sentTime,
+		hasDelivered,
+		deliveredTime,
+		hasOpened,
+		openedTime,
+		openedCount,
+		hasClicked,
+		clickedTime,
+		clickedCount,
+		hasFailed: failedType !== null,
+		failedType,
+		failedTime,
+		failedReason,
+	};
 }
 
 /**
@@ -208,56 +255,14 @@ function buildFlatTimeline(
 	const items: TimelineItem[] = [];
 
 	for (const entry of entries) {
-		// 1. The email send itself
 		items.push({
 			kind: "email",
 			id: `email-${entry.id}`,
 			entry,
 			timestamp: entry.createdAt,
 		});
-
-		// 2. Build events from explicit records + synthesised timestamps
-		const eventTypes = new Set(entry.events.map((e) => e.type));
-		const allEvents = [...entry.events];
-
-		// Synthesise a "failed" event from failedAt if not already in the event list
-		if (
-			entry.failedAt &&
-			!eventTypes.has("failed") &&
-			!eventTypes.has("bounced")
-		) {
-			allEvents.push({
-				id: `synth-failed-${entry.id}`,
-				type: "failed",
-				createdAt: entry.failedAt,
-				metadata: null,
-			});
-		}
-
-		// Remove "sent" and "delivered" events — the email row already shows the
-		// delivery status via its status pill, so a separate "delivered" row is redundant.
-		const subsequentEvents = allEvents.filter(
-			(e) => e.type !== "sent" && e.type !== "delivered",
-		);
-		subsequentEvents.sort(
-			(a, b) =>
-				new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-		);
-
-		for (const ev of subsequentEvents) {
-			items.push({
-				kind: "event",
-				id: ev.id,
-				emailId: entry.id,
-				subject: entry.subject,
-				eventType: ev.type,
-				timestamp: ev.createdAt,
-				metadata: ev.metadata,
-			});
-		}
 	}
 
-	// 3. Contact created — always at the bottom
 	if (contactCreatedAt) {
 		items.push({
 			kind: "contact_created",
@@ -278,38 +283,24 @@ function buildFlatTimeline(
 
 // ─── Avatar node ─────────────────────────────────────────────────────────────
 
-function AvatarNode({
-	iconKey,
-	email,
-	isLast,
-}: {
-	iconKey: string;
-	email?: string;
-	isLast: boolean;
-}) {
+function AvatarNode({ iconKey, isLast }: { iconKey: string; isLast: boolean }) {
 	const cfg = getIconConfig(iconKey);
 	return (
 		<div
 			className="relative flex flex-shrink-0 flex-col items-center"
 			style={{ width: 32 }}
 		>
-			{/* Avatar / icon circle */}
+			{/* Icon circle */}
 			<div
 				className={cn(
-					"relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full",
-					email ? `bg-gradient-to-br ${getAvatarGradient(email)}` : cfg.bg,
+					"relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-stroke-soft-200",
+					cfg.bg,
 				)}
 			>
-				{email ? (
-					<span className="select-none font-semibold text-[13px] text-white">
-						{getInitials(email)}
-					</span>
-				) : (
-					<Icon
-						name={cfg.icon as Parameters<typeof Icon>[0]["name"]}
-						className={cn("h-4 w-4", cfg.text)}
-					/>
-				)}
+				<Icon
+					name={cfg.icon as Parameters<typeof Icon>[0]["name"]}
+					className={cn("h-4 w-4", cfg.text)}
+				/>
 			</div>
 			{/* Vertical connector */}
 			{!isLast && (
@@ -341,32 +332,213 @@ function StatusPill({ status }: { status: string }) {
 	);
 }
 
+// ─── Stepper Component ───────────────────────────────────────────────────────
+
+const STEP_STYLE: Record<
+	string,
+	{ activeCls: string; icon: string }
+> = {
+	Sent: {
+		activeCls: "border-blue-200 bg-blue-50 text-blue-600",
+		icon: "send-1",
+	},
+	Delivered: {
+		activeCls: "border-emerald-200 bg-emerald-50 text-emerald-600",
+		icon: "check-circle",
+	},
+	Opened: {
+		activeCls: "border-orange-200 bg-orange-50 text-orange-600",
+		icon: "eye-outline",
+	},
+	Clicked: {
+		activeCls: "border-purple-200 bg-purple-50 text-purple-600",
+		icon: "cursor-click",
+	},
+	Failed: {
+		activeCls: "border-red-200 bg-red-50 text-red-600",
+		icon: "cross-circle",
+	},
+	Bounced: {
+		activeCls: "border-red-200 bg-red-50 text-red-600",
+		icon: "cross-circle",
+	},
+	Spam: {
+		activeCls: "border-red-200 bg-red-50 text-red-600",
+		icon: "cross-circle",
+	},
+};
+
+function StepperItem({
+	label,
+	isActive,
+	time,
+	isLast,
+	badge,
+}: {
+	label: string;
+	isActive: boolean;
+	time: string | null;
+	isLast: boolean;
+	badge?: string;
+}) {
+	const cfg = STEP_STYLE[label] || {
+		activeCls: "border-information-base/20 bg-information-lighter/50 text-information-base",
+		icon: "send-1",
+	};
+
+	return (
+		<div className="flex flex-1 items-center last:flex-none">
+			<div className="relative flex min-w-[90px] flex-col items-start pr-4">
+				<div className="flex items-center gap-2">
+					<div
+						className={cn(
+							"flex h-8 w-8 items-center justify-center rounded-[8px] border transition-all duration-300",
+							isActive
+								? cfg.activeCls
+								: "border-stroke-soft-200 bg-bg-weak-50 text-text-soft-400/60",
+						)}
+					>
+						<Icon
+							name={cfg.icon as Parameters<typeof Icon>[0]["name"]}
+							className="h-4 w-4"
+						/>
+					</div>
+					<div className="flex flex-col justify-center">
+						<div className="flex items-center gap-1.5">
+							<span
+								className={cn(
+									"font-semibold text-xs leading-none transition-colors",
+									isActive
+										? label === "Failed" ||
+											label === "Bounced" ||
+											label === "Spam"
+											? "text-error-base"
+											: label === "Sent"
+												? "text-information-base"
+												: label === "Delivered"
+													? "text-success-base"
+													: label === "Opened"
+														? "text-orange-600"
+														: "text-purple-600"
+										: "text-text-sub-600",
+								)}
+							>
+								{label}
+							</span>
+							{badge && isActive && (
+								<span className="rounded border border-purple-100 bg-purple-50 px-1 py-0.5 font-semibold text-[9px] text-purple-600 leading-none">
+									{badge}
+								</span>
+							)}
+						</div>
+						{time && isActive && (
+							<span className="mt-1 whitespace-nowrap text-[10px] leading-none text-text-soft-400">
+								{formatRelativeTime(time)}
+							</span>
+						)}
+					</div>
+				</div>
+			</div>
+			{!isLast && (
+				<div
+					className={cn(
+						"mr-4 h-[1.5px] flex-1 border-t-[1.5px] border-dashed border-stroke-soft-200",
+					)}
+				/>
+			)}
+		</div>
+	);
+}
+
+function EmailStatusSteps({ lifecycle }: { lifecycle: ParsedLifecycle }) {
+	interface StepItem {
+		label: string;
+		isActive: boolean;
+		time: string | null;
+		badge?: string;
+	}
+
+	const steps: StepItem[] = lifecycle.hasFailed
+		? [
+				{ label: "Sent", isActive: lifecycle.hasSent, time: lifecycle.sentTime },
+				{
+					label:
+						lifecycle.failedType === "bounced"
+							? "Bounced"
+							: lifecycle.failedType === "complaint"
+								? "Spam"
+								: "Failed",
+					isActive: true,
+					time: lifecycle.failedTime,
+				},
+			]
+		: [
+				{ label: "Sent", isActive: lifecycle.hasSent, time: lifecycle.sentTime },
+				{
+					label: "Delivered",
+					isActive: lifecycle.hasDelivered,
+					time: lifecycle.deliveredTime,
+				},
+				{
+					label: "Opened",
+					isActive: lifecycle.hasOpened,
+					time: lifecycle.openedTime,
+					badge: lifecycle.openedCount > 1 ? `${lifecycle.openedCount}x` : undefined,
+				},
+				{
+					label: "Clicked",
+					isActive: lifecycle.hasClicked,
+					time: lifecycle.clickedTime,
+					badge: lifecycle.clickedCount > 1 ? `${lifecycle.clickedCount}x` : undefined,
+				},
+			];
+
+	return (
+		<div className="flex w-full items-center px-2 py-1">
+			{steps.map((step, idx) => (
+				<StepperItem
+					key={step.label}
+					label={step.label}
+					isActive={step.isActive}
+					time={step.time}
+					badge={step.badge}
+					isLast={idx === steps.length - 1}
+				/>
+			))}
+		</div>
+	);
+}
+
 // ─── Detail card (nested below action row) ───────────────────────────────────
 
-function DetailCard({
-	subject,
-	emailId,
-	errorMessage,
-}: {
-	subject?: string;
-	emailId?: string;
-	errorMessage?: string | null;
-}) {
-	if (!subject && !errorMessage) return null;
+function EmailActivityCard({ entry }: { entry: ActivityEntry }) {
+	const lifecycle = parseLifecycle(entry);
+
 	return (
-		<div className="mt-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-3">
-			{subject && emailId && (
-				<Link
-					href={`/emails/${emailId}`}
-					className="block truncate font-medium text-[12px] text-text-strong-950 transition-colors hover:text-primary-base"
-				>
-					{subject}
-				</Link>
-			)}
-			{errorMessage && (
-				<p className="mt-1 text-[12px] text-error-base leading-relaxed">
-					{errorMessage}
-				</p>
+		<div className="mt-2.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-2 py-3">
+			<EmailStatusSteps lifecycle={lifecycle} />
+
+			{lifecycle.hasFailed && lifecycle.failedReason && (
+				<div className="mt-3 rounded-lg border border-red-100 bg-red-50/50 p-2.5">
+					<div className="flex gap-2">
+						<Icon
+							name="alert-circle"
+							className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600"
+						/>
+						<div className="flex flex-col gap-0.5">
+							<span className="font-semibold text-[10px] text-red-800 uppercase leading-none tracking-wide">
+								{lifecycle.failedType === "bounced"
+									? "Bounced"
+									: lifecycle.failedType === "complaint"
+										? "Spam Complaint"
+										: "Delivery Failure"}
+							</span>
+							<p className="font-medium text-[11px] text-red-600 leading-normal">
+								{lifecycle.failedReason}
+							</p>
+						</div>
+					</div>
+				</div>
 			)}
 		</div>
 	);
@@ -377,7 +549,6 @@ function DetailCard({
 function EmailRow({
 	entry,
 	isLast,
-	contactEmail,
 }: {
 	entry: ActivityEntry;
 	isLast: boolean;
@@ -387,97 +558,25 @@ function EmailRow({
 
 	return (
 		<div className="relative flex gap-3 pb-6">
-			<AvatarNode
-				iconKey={`email_${status}`}
-				email={contactEmail}
-				isLast={isLast}
-			/>
+			<AvatarNode iconKey={`email_${status}`} isLast={isLast} />
 
 			<div className="min-w-0 flex-1 pt-0.5">
 				{/* Action line */}
-				<div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-					<span className="max-w-[160px] truncate font-medium text-[13px] text-text-strong-950">
-						{contactEmail}
-					</span>
-					<span className="text-[13px] text-text-sub-600">
-						received an email
-					</span>
-					<StatusPill status={status} />
+				<div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+					<Link
+						href={`/emails/${entry.id}`}
+						className="max-w-[320px] truncate font-medium text-[13px] text-text-strong-950 underline decoration-stroke-soft-200 decoration-dashed underline-offset-4 transition-colors hover:text-primary-base"
+					>
+						{entry.subject || "(no subject)"}
+					</Link>
 					<span className="text-[11px] text-text-soft-400">·</span>
 					<span className="whitespace-nowrap text-[11px] text-text-soft-400">
 						{formatRelativeTime(entry.createdAt)}
 					</span>
 				</div>
 
-				{/* Nested card with subject */}
-				<DetailCard
-					subject={entry.subject || "(no subject)"}
-					emailId={entry.id}
-				/>
-			</div>
-		</div>
-	);
-}
-
-// ─── Event row ───────────────────────────────────────────────────────────────
-
-function EventRow({
-	emailId,
-	subject,
-	eventType,
-	timestamp,
-	metadata,
-	isLast,
-	contactEmail,
-}: {
-	emailId: string;
-	subject: string;
-	eventType: string;
-	timestamp: string;
-	metadata: Record<string, string> | null;
-	isLast: boolean;
-	contactEmail: string;
-}) {
-	const actionVerb = EVENT_LABELS[eventType] ?? eventType;
-
-	// Determine if this event warrants a detail card
-	const showCard =
-		eventType === "failed" ||
-		eventType === "bounced" ||
-		eventType === "complaint" ||
-		eventType === "clicked" ||
-		eventType === "opened" ||
-		eventType === "deferred";
-
-	// Error / detail info from metadata
-	const errorDetail =
-		metadata?.reason || metadata?.error || metadata?.description || null;
-
-	return (
-		<div className="relative flex gap-3 pb-6">
-			<AvatarNode iconKey={eventType} isLast={isLast} />
-
-			<div className="min-w-0 flex-1 pt-0.5">
-				{/* Action line */}
-				<div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-					<span className="max-w-[160px] truncate font-medium text-[13px] text-text-strong-950">
-						{contactEmail}
-					</span>
-					<span className="text-[13px] text-text-sub-600">{actionVerb}</span>
-					<span className="text-[11px] text-text-soft-400">·</span>
-					<span className="whitespace-nowrap text-[11px] text-text-soft-400">
-						{formatRelativeTime(timestamp)}
-					</span>
-				</div>
-
-				{/* Nested card */}
-				{showCard && (
-					<DetailCard
-						subject={subject || "(no subject)"}
-						emailId={emailId}
-						errorMessage={errorDetail}
-					/>
-				)}
+				{/* Nested card with stepper */}
+				<EmailActivityCard entry={entry} />
 			</div>
 		</div>
 	);
@@ -497,7 +596,7 @@ function ContactCreatedRow({
 			<AvatarNode iconKey="contact_created" isLast={isLast} />
 			<div className="min-w-0 flex-1 pt-0.5">
 				<div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-					<span className="font-medium text-[13px] text-text-strong-950">
+					<span className="font-semibold text-[13px] text-text-strong-950">
 						Contact created
 					</span>
 					<span className="text-[11px] text-text-soft-400">·</span>
@@ -580,10 +679,6 @@ export function ContactEmailHistory({
 					</span>
 				)}
 			</div>
-
-			{/* Divider */}
-			<div className="mb-6 h-px bg-stroke-soft-200" />
-
 			{/* Timeline */}
 			{isLoading ? (
 				<TimelineSkeleton />
@@ -611,20 +706,6 @@ export function ContactEmailHistory({
 								<EmailRow
 									key={item.id}
 									entry={item.entry}
-									isLast={isLast}
-									contactEmail={email}
-								/>
-							);
-						}
-						if (item.kind === "event") {
-							return (
-								<EventRow
-									key={item.id}
-									emailId={item.emailId}
-									subject={item.subject}
-									eventType={item.eventType}
-									timestamp={item.timestamp}
-									metadata={item.metadata}
 									isLast={isLast}
 									contactEmail={email}
 								/>
