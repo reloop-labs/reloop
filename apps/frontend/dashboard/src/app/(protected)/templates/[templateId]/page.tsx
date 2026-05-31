@@ -1,7 +1,6 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { AIAssistant } from "./components/ai-assistant";
 import { FullEmailBuilder } from "./components/editor";
 import { EditorProvider } from "./components/editor-provider";
 import { GeneratingOverlay } from "./components/generating-overlay";
@@ -24,7 +23,6 @@ const Page = () => {
 							<GeneratingOverlay />
 							<FullEmailBuilder />
 						</main>
-						<AIAssistant />
 					</div>
 					<div className="m-2 h-[calc(100vh-79px)] w-72 shrink-0 overflow-y-auto rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 						<EmailInspector />
