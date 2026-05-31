@@ -59,30 +59,32 @@ export function EmailTimeline({
 		});
 	}
 
-	const steps = isFailed ? ["sent", "failed"] : ["sent", "delivered", "opened", "clicked"];
+	const steps = isFailed
+		? ["sent", "failed", "", ""]
+		: ["sent", "delivered", "opened", "clicked"];
 
 	return (
 		<div className="relative flex w-full items-start justify-between gap-0 rounded-3xl border border-stroke-soft-100 px-4 pt-10 pb-8 transition-all hover:border-stroke-soft-200">
 			{steps.map((type, index: number) => {
-				const event = allEvents.find((e) => e.type === type);
+				const event = type ? allEvents.find((e) => e.type === type) : undefined;
 
 				return (
 					<Fragment key={index}>
 						{type === "sent" && <SentStep event={event} />}
-						{type === "failed" && (
-							<FailedStep
-								event={event}
-								failedAt={failedAt}
-								errorMessage={errorMessage}
-							/>
-						)}
+						{type === "failed" && <FailedStep event={event} />}
 						{type === "delivered" && <DeliveredStep event={event} />}
 						{type === "opened" && <OpenedStep event={event} />}
 						{type === "clicked" && <ClickedStep event={event} />}
+						{!type && <div className="w-10 flex-shrink-0" />}
 						{index < steps.length - 1 && (
 							<div
 								className={cn(
-									"mt-5 h-0 flex-1 border-stroke-soft-100 border-t-[1.5px] border-dashed",
+									"mt-5 h-0 flex-1 border-t-[1.5px]",
+									index === 0 && isFailed
+										? "border-stroke-soft-100 border-dashed"
+										: !isFailed
+										? "border-stroke-soft-100 border-dashed"
+										: "border-transparent",
 								)}
 							/>
 						)}
