@@ -215,6 +215,10 @@ export namespace LogsModel {
 		limit: t.Optional(t.Numeric({ default: 10 })),
 		search: t.Optional(t.String()),
 		status: t.Optional(t.String()),
+		domain: t.Optional(t.String()),
+		api_key: t.Optional(t.String()),
+		start_date: t.Optional(t.String({ format: "date-time" })),
+		end_date: t.Optional(t.String({ format: "date-time" })),
 	});
 	export type ListEmailLogsQuery = typeof listEmailLogsQuery.static;
 

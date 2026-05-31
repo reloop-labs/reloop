@@ -1,7 +1,17 @@
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { LogsModel } from "@reloop/logs/model/logs.model";
-import { and, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
+import {
+	and,
+	count,
+	desc,
+	eq,
+	gte,
+	ilike,
+	lte,
+	or,
+	type SQL,
+} from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 type EmailStatus = (typeof schema.emailStatusEnum.enumValues)[number];
@@ -14,7 +24,16 @@ export async function listEmailLogsController({
 	organizationId: string;
 }): Promise<LogsModel.ListEmailLogsResponse> {
 	const log = useLogger();
-	const { page = 1, limit = 10, search, status } = query;
+	const {
+		page = 1,
+		limit = 10,
+		search,
+		status,
+		domain,
+		api_key,
+		start_date,
+		end_date,
+	} = query;
 	const offset = (page - 1) * limit;
 
 	log.info("Listing email logs", { query, organizationId });
@@ -25,6 +44,32 @@ export async function listEmailLogsController({
 
 		if (status) {
 			conditions.push(eq(schema.emailLog.status, status as EmailStatus));
+		}
+
+		if (domain) {
+			const domainRecord = await db.query.domain.findFirst({
+				where: and(
+					eq(schema.domain.domain, domain),
+					eq(schema.domain.organizationId, organizationId),
+				),
+			});
+			if (domainRecord) {
+				conditions.push(eq(schema.emailLog.domainId, domainRecord.id));
+			} else {
+				conditions.push(eq(schema.emailLog.domainId, "non-existent-domain-id"));
+			}
+		}
+
+		if (api_key) {
+			conditions.push(eq(schema.emailLog.apikeyId, api_key));
+		}
+
+		if (start_date) {
+			conditions.push(gte(schema.emailLog.createdAt, new Date(start_date)));
+		}
+
+		if (end_date) {
+			conditions.push(lte(schema.emailLog.createdAt, new Date(end_date)));
 		}
 
 		if (search) {

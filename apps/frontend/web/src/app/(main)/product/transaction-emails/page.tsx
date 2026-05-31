@@ -122,7 +122,7 @@ func main() {
     "from": "Security <auth@yourdomain.com>",
     "to": ["user@example.com"],
     "subject": "Reset your password",
-    "html": "<p>Click <a href=\"...\">here</a> to reset password</p>"
+    "html": "<p>Click <a href="...">here</a> to reset password</p>"
   }'`,
 	},
 	receipt: {
@@ -190,12 +190,16 @@ const highlightCode = (code: string) => {
 				className: "text-violet-400 font-semibold",
 			}, // Keywords
 			{ regex: /\b\d+\b/g, className: "text-cyan-400" }, // Numbers
-			{ regex: /\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?=\()/g, className: "text-emerald-300" }, // Functions
+			{
+				regex: /\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?=\()/g,
+				className: "text-emerald-300",
+			}, // Functions
 		];
 
 		const parts: Array<{ text: string; className?: string }> = [];
 		let lastIndex = 0;
-		const matches: Array<{ start: number; end: number; className: string }> = [];
+		const matches: Array<{ start: number; end: number; className: string }> =
+			[];
 
 		for (const pattern of patterns) {
 			const regex = new RegExp(pattern.regex.source, pattern.regex.flags);
@@ -256,7 +260,9 @@ const highlightCode = (code: string) => {
 const TransactionEmailsPage = () => {
 	const [activeLang, setActiveLang] = useState<Language>("node");
 	const [activeEvent, setActiveEvent] = useState<EmailEvent>("welcome");
-	const [simulationState, setSimulationState] = useState<"idle" | "sending" | "success">("idle");
+	const [simulationState, setSimulationState] = useState<
+		"idle" | "sending" | "success"
+	>("idle");
 	const [simulationLogs, setSimulationLogs] = useState<string[]>([]);
 	const [copied, setCopied] = useState(false);
 
@@ -297,19 +303,19 @@ const TransactionEmailsPage = () => {
 	};
 
 	return (
-		<div className="relative min-h-screen bg-white text-[#0a0d12] selection:bg-neutral-200 overflow-x-hidden font-sans">
+		<div className="relative min-h-screen overflow-x-hidden bg-white font-sans text-[#0a0d12] selection:bg-neutral-200">
 			{/* Dark Hero Section (Aligned with Home Page Hero) */}
-			<section className="relative flex min-h-[85vh] items-center justify-center overflow-hidden bg-[#05070b] text-white py-24 sm:py-32">
+			<section className="relative flex min-h-[85vh] items-center justify-center overflow-hidden bg-[#05070b] py-24 text-white sm:py-32">
 				{/* Background Grid Pattern */}
-				<div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_80%,transparent_100%)] pointer-events-none" />
-				<div className="absolute top-0 left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-violet-600/5 blur-[120px] pointer-events-none" />
+				<div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_80%,transparent_100%)]" />
+				<div className="-translate-x-1/2 pointer-events-none absolute top-0 left-1/2 h-[500px] w-[800px] rounded-full bg-violet-600/5 blur-[120px]" />
 
-				<div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
-					<p className="font-semibold text-white/40 text-[11px] uppercase tracking-[0.16em]">
+				<div className="relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+					<p className="font-semibold text-[11px] text-white/40 uppercase tracking-[0.16em]">
 						Product / Transaction Emails
 					</p>
 
-					<h1 className="mt-6 font-semibold text-[2.8rem] leading-[1.05] tracking-tighter drop-shadow-[0_10px_34px_rgba(0,0,0,0.32)] sm:text-[4.2rem] bg-gradient-to-b from-white via-white to-white/40 bg-clip-text text-transparent">
+					<h1 className="mt-6 bg-gradient-to-b from-white via-white to-white/40 bg-clip-text font-semibold text-[2.8rem] text-transparent leading-[1.05] tracking-tighter drop-shadow-[0_10px_34px_rgba(0,0,0,0.32)] sm:text-[4.2rem]">
 						Programmatic Email Delivery <br />
 						For Developers
 					</h1>
@@ -338,9 +344,9 @@ const TransactionEmailsPage = () => {
 			</section>
 
 			{/* Interactive Sandbox Section (Light Theme matching Features) */}
-			<section id="playground" className="bg-white py-24 sm:py-32 scroll-mt-10">
+			<section id="playground" className="scroll-mt-10 bg-white py-24 sm:py-32">
 				<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
-					<div className="text-center max-w-3xl mx-auto mb-16">
+					<div className="mx-auto mb-16 max-w-3xl text-center">
 						<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
 							DevEx Playground
 						</p>
@@ -348,98 +354,112 @@ const TransactionEmailsPage = () => {
 							Interactive Sandbox
 						</h2>
 						<p className="mx-auto mt-6 max-w-[620px] text-[#0a0d12]/60 text-[15px] leading-relaxed sm:text-[17px]">
-							Choose your client environment, edit the payload, and trigger a test transmission to trace delivery performance in real-time.
+							Choose your client environment, edit the payload, and trigger a
+							test transmission to trace delivery performance in real-time.
 						</p>
 					</div>
 
-					<div className="rounded-2xl border border-[#0a0d12]/8 bg-zinc-50/30 p-6 md:p-8 backdrop-blur-xl shadow-sm">
+					<div className="rounded-2xl border border-[#0a0d12]/8 bg-zinc-50/30 p-6 shadow-sm backdrop-blur-xl md:p-8">
 						<div className="flex flex-col gap-8 lg:flex-row">
 							{/* Sandbox Editor (Left Side) */}
-							<div className="flex-1 flex flex-col min-w-0">
-								<div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#0a0d12]/5 pb-4">
+							<div className="flex min-w-0 flex-1 flex-col">
+								<div className="flex flex-wrap items-center justify-between gap-4 border-[#0a0d12]/5 border-b pb-4">
 									{/* Language Selector */}
-									<div className="flex gap-1 p-1 rounded-xl bg-[#0a0d12]/4 border border-[#0a0d12]/6">
-										{(["node", "python", "go", "curl"] as Language[]).map((lang) => {
-											const isSelected = activeLang === lang;
-											return (
-												<button
-													key={lang}
-													type="button"
-													onClick={() => setActiveLang(lang)}
-													className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-														isSelected
-															? "bg-white text-[#0a0d12] shadow-sm"
-															: "text-[#0a0d12]/40 hover:text-[#0a0d12]/70"
-													}`}
-												>
-													{lang === "node" && (
-														<svg viewBox="0 0 24 24" className="size-3.5 fill-current">
-															<path d={siNodedotjs.path} />
-														</svg>
-													)}
-													{lang === "python" && (
-														<svg viewBox="0 0 24 24" className="size-3.5 fill-current">
-															<path d={siPython.path} />
-														</svg>
-													)}
-													{lang === "go" && (
-														<svg viewBox="0 0 24 24" className="size-3.5 fill-current">
-															<path d={siGo.path} />
-														</svg>
-													)}
-													{lang === "curl" && (
-														<Icon name="laptop" className="size-3.5" />
-													)}
-													<span className="capitalize">
-														{lang === "node" ? "Node.js" : lang}
-													</span>
-												</button>
-											);
-										})}
+									<div className="flex gap-1 rounded-xl border border-[#0a0d12]/6 bg-[#0a0d12]/4 p-1">
+										{(["node", "python", "go", "curl"] as Language[]).map(
+											(lang) => {
+												const isSelected = activeLang === lang;
+												return (
+													<button
+														key={lang}
+														type="button"
+														onClick={() => setActiveLang(lang)}
+														className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-semibold text-xs transition-all ${
+															isSelected
+																? "bg-white text-[#0a0d12] shadow-sm"
+																: "text-[#0a0d12]/40 hover:text-[#0a0d12]/70"
+														}`}
+													>
+														{lang === "node" && (
+															<svg
+																viewBox="0 0 24 24"
+																className="size-3.5 fill-current"
+															>
+																<path d={siNodedotjs.path} />
+															</svg>
+														)}
+														{lang === "python" && (
+															<svg
+																viewBox="0 0 24 24"
+																className="size-3.5 fill-current"
+															>
+																<path d={siPython.path} />
+															</svg>
+														)}
+														{lang === "go" && (
+															<svg
+																viewBox="0 0 24 24"
+																className="size-3.5 fill-current"
+															>
+																<path d={siGo.path} />
+															</svg>
+														)}
+														{lang === "curl" && (
+															<Icon name="laptop" className="size-3.5" />
+														)}
+														<span className="capitalize">
+															{lang === "node" ? "Node.js" : lang}
+														</span>
+													</button>
+												);
+											},
+										)}
 									</div>
 
 									{/* Event Selector */}
-									<div className="flex gap-1 p-1 rounded-xl bg-[#0a0d12]/4 border border-[#0a0d12]/6">
-										{(["welcome", "reset", "receipt"] as EmailEvent[]).map((evt) => {
-											const isSelected = activeEvent === evt;
-											return (
-												<button
-													key={evt}
-													type="button"
-													onClick={() => setActiveEvent(evt)}
-													className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-														isSelected
-															? "bg-[#0a0d12] text-white"
-															: "text-[#0a0d12]/40 hover:text-[#0a0d12]/70"
-													}`}
-												>
-													<span className="capitalize">
-														{evt === "welcome"
-															? "Welcome"
-															: evt === "reset"
-																? "Password Reset"
-																: "Receipt"}
-													</span>
-												</button>
-											);
-										})}
+									<div className="flex gap-1 rounded-xl border border-[#0a0d12]/6 bg-[#0a0d12]/4 p-1">
+										{(["welcome", "reset", "receipt"] as EmailEvent[]).map(
+											(evt) => {
+												const isSelected = activeEvent === evt;
+												return (
+													<button
+														key={evt}
+														type="button"
+														onClick={() => setActiveEvent(evt)}
+														className={`rounded-lg px-3 py-1.5 font-semibold text-xs transition-all ${
+															isSelected
+																? "bg-[#0a0d12] text-white"
+																: "text-[#0a0d12]/40 hover:text-[#0a0d12]/70"
+														}`}
+													>
+														<span className="capitalize">
+															{evt === "welcome"
+																? "Welcome"
+																: evt === "reset"
+																	? "Password Reset"
+																	: "Receipt"}
+														</span>
+													</button>
+												);
+											},
+										)}
 									</div>
 								</div>
 
 								{/* Code Snippet Box */}
-								<div className="mt-4 flex-1 flex flex-col rounded-xl border border-zinc-200 bg-[#0a0a0a] overflow-hidden font-mono text-[13px] leading-relaxed shadow-lg">
-									<div className="flex items-center justify-between border-white/5 border-b bg-white/[0.02] px-4 py-2 text-xs text-white/40">
+								<div className="mt-4 flex flex-1 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-[#0a0a0a] font-mono text-[13px] leading-relaxed shadow-lg">
+									<div className="flex items-center justify-between border-white/5 border-b bg-white/[0.02] px-4 py-2 text-white/40 text-xs">
 										<span>request.js</span>
 										<button
 											type="button"
 											onClick={handleCopy}
-											className="flex items-center gap-1.5 rounded-md px-2 py-1 hover:bg-white/5 hover:text-white transition-colors"
+											className="flex items-center gap-1.5 rounded-md px-2 py-1 transition-colors hover:bg-white/5 hover:text-white"
 										>
 											<Icon name="copy" className="size-3.5" />
 											{copied ? "Copied" : "Copy"}
 										</button>
 									</div>
-									<div className="flex-1 overflow-x-auto p-4 max-h-[300px]">
+									<div className="max-h-[300px] flex-1 overflow-x-auto p-4">
 										<pre className="text-white/80">
 											<code>{highlightCode(activeCode)}</code>
 										</pre>
@@ -452,9 +472,9 @@ const TransactionEmailsPage = () => {
 										type="button"
 										onClick={triggerSimulation}
 										disabled={simulationState === "sending"}
-										className="inline-flex h-12 items-center justify-center rounded-2xl bg-[#0a0d12] px-8 font-semibold text-[14px] text-white transition-colors hover:bg-[#0a0d12]/90 disabled:bg-[#0a0d12]/50 disabled:pointer-events-none active:scale-[0.98]"
+										className="inline-flex h-12 items-center justify-center rounded-2xl bg-[#0a0d12] px-8 font-semibold text-[14px] text-white transition-colors hover:bg-[#0a0d12]/90 active:scale-[0.98] disabled:pointer-events-none disabled:bg-[#0a0d12]/50"
 									>
-										<Icon name="send-2" className="size-4 mr-2" />
+										<Icon name="send-2" className="mr-2 size-4" />
 										{simulationState === "sending"
 											? "Sending request..."
 											: simulationState === "success"
@@ -463,7 +483,7 @@ const TransactionEmailsPage = () => {
 									</button>
 
 									{simulationState === "success" && (
-										<span className="flex items-center gap-1.5 text-xs text-emerald-600 font-semibold animate-fade-in">
+										<span className="flex animate-fade-in items-center gap-1.5 font-semibold text-emerald-600 text-xs">
 											<Icon name="check-circle" className="size-4" />
 											Delivered in 11ms
 										</span>
@@ -472,28 +492,34 @@ const TransactionEmailsPage = () => {
 							</div>
 
 							{/* Sandbox Logs & Preview (Right Side) */}
-							<div className="w-full lg:w-[460px] flex flex-col gap-4">
+							<div className="flex w-full flex-col gap-4 lg:w-[460px]">
 								{/* Mock Email Preview */}
 								<div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-									<div className="flex items-center gap-2 border-b border-zinc-100 pb-3 mb-3 text-xs text-[#0a0d12]/40 font-mono">
+									<div className="mb-3 flex items-center gap-2 border-zinc-100 border-b pb-3 font-mono text-[#0a0d12]/40 text-xs">
 										<span className="size-2.5 rounded-full bg-[#0a0d12]/10" />
 										<span>Inbox Preview</span>
 									</div>
 
-									<div className="rounded-lg border border-zinc-100 p-4 min-h-[220px] flex flex-col justify-between">
+									<div className="flex min-h-[220px] flex-col justify-between rounded-lg border border-zinc-100 p-4">
 										{activeEvent === "welcome" && (
 											<div>
-												<div className="flex items-center gap-2 mb-4 border-b border-neutral-100 pb-2">
-													<div className="h-6 w-6 rounded bg-[#0a0d12] flex items-center justify-center text-white text-[10px] font-bold">
+												<div className="mb-4 flex items-center gap-2 border-neutral-100 border-b pb-2">
+													<div className="flex h-6 w-6 items-center justify-center rounded bg-[#0a0d12] font-bold text-[10px] text-white">
 														R
 													</div>
-													<span className="font-semibold text-xs text-neutral-800">Reloop Onboarding</span>
+													<span className="font-semibold text-neutral-800 text-xs">
+														Reloop Onboarding
+													</span>
 												</div>
-												<h3 className="font-bold text-base text-neutral-950">Welcome aboard, Jane!</h3>
-												<p className="mt-2 text-xs text-neutral-600 leading-relaxed">
-													Thanks for creating a Reloop account. We are excited to help you manage and scale your programmatic communications. Let's send your first API call!
+												<h3 className="font-bold text-base text-neutral-950">
+													Welcome aboard, Jane!
+												</h3>
+												<p className="mt-2 text-neutral-600 text-xs leading-relaxed">
+													Thanks for creating a Reloop account. We are excited
+													to help you manage and scale your programmatic
+													communications. Let's send your first API call!
 												</p>
-												<div className="mt-4 inline-block bg-[#0a0d12] text-white font-semibold text-[11px] px-3.5 py-1.5 rounded-md">
+												<div className="mt-4 inline-block rounded-md bg-[#0a0d12] px-3.5 py-1.5 font-semibold text-[11px] text-white">
 													Get Started
 												</div>
 											</div>
@@ -501,17 +527,23 @@ const TransactionEmailsPage = () => {
 
 										{activeEvent === "reset" && (
 											<div>
-												<div className="flex items-center gap-2 mb-4 border-b border-neutral-100 pb-2">
-													<div className="h-6 w-6 rounded bg-[#0a0d12] flex items-center justify-center text-white text-[10px] font-bold">
+												<div className="mb-4 flex items-center gap-2 border-neutral-100 border-b pb-2">
+													<div className="flex h-6 w-6 items-center justify-center rounded bg-[#0a0d12] font-bold text-[10px] text-white">
 														S
 													</div>
-													<span className="font-semibold text-xs text-neutral-800">Security Team</span>
+													<span className="font-semibold text-neutral-800 text-xs">
+														Security Team
+													</span>
 												</div>
-												<h3 className="font-bold text-base text-neutral-950">Reset your password</h3>
-												<p className="mt-2 text-xs text-neutral-600 leading-relaxed">
-													We received a request to reset the password for your account. If you did not make this request, you can ignore this email safely.
+												<h3 className="font-bold text-base text-neutral-950">
+													Reset your password
+												</h3>
+												<p className="mt-2 text-neutral-600 text-xs leading-relaxed">
+													We received a request to reset the password for your
+													account. If you did not make this request, you can
+													ignore this email safely.
 												</p>
-												<div className="mt-4 inline-block bg-neutral-900 text-white font-semibold text-[11px] px-3.5 py-1.5 rounded-md">
+												<div className="mt-4 inline-block rounded-md bg-neutral-900 px-3.5 py-1.5 font-semibold text-[11px] text-white">
 													Reset Password
 												</div>
 											</div>
@@ -519,34 +551,46 @@ const TransactionEmailsPage = () => {
 
 										{activeEvent === "receipt" && (
 											<div>
-												<div className="flex items-center justify-between mb-4 border-b border-neutral-100 pb-2">
+												<div className="mb-4 flex items-center justify-between border-neutral-100 border-b pb-2">
 													<div className="flex items-center gap-2">
-														<div className="h-6 w-6 rounded bg-[#0a0d12] flex items-center justify-center text-white text-[10px] font-bold">
+														<div className="flex h-6 w-6 items-center justify-center rounded bg-[#0a0d12] font-bold text-[10px] text-white">
 															B
 														</div>
-														<span className="font-semibold text-xs text-neutral-800">Billing Service</span>
+														<span className="font-semibold text-neutral-800 text-xs">
+															Billing Service
+														</span>
 													</div>
-													<span className="text-neutral-400 text-[10px]">Order #39281</span>
+													<span className="text-[10px] text-neutral-400">
+														Order #39281
+													</span>
 												</div>
-												<h3 className="font-bold text-base text-neutral-950">Payment Receipt</h3>
-												<div className="mt-3 space-y-1.5 border-t border-b border-neutral-100 py-2.5">
+												<h3 className="font-bold text-base text-neutral-950">
+													Payment Receipt
+												</h3>
+												<div className="mt-3 space-y-1.5 border-neutral-100 border-t border-b py-2.5">
 													<div className="flex justify-between text-[11px]">
-														<span className="text-neutral-500">Reloop Pro (1 Month)</span>
-														<span className="font-semibold text-neutral-900">$19.00</span>
+														<span className="text-neutral-500">
+															Reloop Pro (1 Month)
+														</span>
+														<span className="font-semibold text-neutral-900">
+															$19.00
+														</span>
 													</div>
 													<div className="flex justify-between text-[11px]">
 														<span className="text-neutral-500">Tax</span>
-														<span className="font-semibold text-neutral-900">$0.00</span>
+														<span className="font-semibold text-neutral-900">
+															$0.00
+														</span>
 													</div>
 												</div>
-												<div className="flex justify-between text-xs font-bold text-neutral-950 mt-2.5">
+												<div className="mt-2.5 flex justify-between font-bold text-neutral-950 text-xs">
 													<span>Total paid</span>
 													<span>$19.00</span>
 												</div>
 											</div>
 										)}
 
-										<div className="border-t border-neutral-100 pt-3 mt-4 text-[9px] text-neutral-400 flex items-center justify-between">
+										<div className="mt-4 flex items-center justify-between border-neutral-100 border-t pt-3 text-[9px] text-neutral-400">
 											<span>Reloop Inc, Delaware</span>
 											<span>Unsubscribe</span>
 										</div>
@@ -554,15 +598,17 @@ const TransactionEmailsPage = () => {
 								</div>
 
 								{/* Delivery execution trace logs */}
-								<div className="flex-1 rounded-xl border border-zinc-200 bg-[#0a0a0a] p-4 font-mono text-[11px] leading-relaxed flex flex-col justify-between min-h-[160px] shadow-sm">
+								<div className="flex min-h-[160px] flex-1 flex-col justify-between rounded-xl border border-zinc-200 bg-[#0a0a0a] p-4 font-mono text-[11px] leading-relaxed shadow-sm">
 									<div>
-										<div className="flex items-center justify-between border-white/5 border-b pb-2 mb-2 text-white/40">
+										<div className="mb-2 flex items-center justify-between border-white/5 border-b pb-2 text-white/40">
 											<span>Delivery Logs Simulator</span>
-											<span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+											<span className="size-2 animate-pulse rounded-full bg-emerald-500" />
 										</div>
-										<div className="space-y-1 text-white/70 max-h-[140px] overflow-y-auto">
+										<div className="max-h-[140px] space-y-1 overflow-y-auto text-white/70">
 											{simulationLogs.length === 0 && (
-												<span className="text-white/20">Click "Trigger API Call" to watch execution trace.</span>
+												<span className="text-white/20">
+													Click "Trigger API Call" to watch execution trace.
+												</span>
 											)}
 											{simulationLogs.map((log, index) => (
 												<motion.div
@@ -571,7 +617,7 @@ const TransactionEmailsPage = () => {
 													key={index}
 													className={
 														log.includes("200 OK")
-															? "text-emerald-400 font-semibold"
+															? "font-semibold text-emerald-400"
 															: log.includes("authentication successful")
 																? "text-indigo-300"
 																: ""
@@ -584,7 +630,7 @@ const TransactionEmailsPage = () => {
 									</div>
 
 									{simulationState === "success" && (
-										<div className="border-t border-white/5 pt-2 mt-2 flex justify-between text-white/40 text-[10px]">
+										<div className="mt-2 flex justify-between border-white/5 border-t pt-2 text-[10px] text-white/40">
 											<span>Status: Delivered</span>
 											<span>Latency: 11ms</span>
 										</div>
@@ -597,69 +643,96 @@ const TransactionEmailsPage = () => {
 			</section>
 
 			{/* Specs Bento Grid (Aligned with Features highlight style) */}
-			<section className="bg-white py-24 sm:py-32 border-t border-[#0a0d12]/5">
+			<section className="border-[#0a0d12]/5 border-t bg-white py-24 sm:py-32">
 				<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
-					<div className="text-center mb-20">
+					<div className="mb-20 text-center">
 						<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
 							Core Infrastructure
 						</p>
 						<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 							SMTP Relay &amp; HTTP APIs
 						</h2>
-						<p className="mt-4 max-w-xl mx-auto text-base text-[#0a0d12]/50">
-							Connect using standard protocols. Run on a zero-latency, failover edge mesh network.
+						<p className="mx-auto mt-4 max-w-xl text-[#0a0d12]/50 text-base">
+							Connect using standard protocols. Run on a zero-latency, failover
+							edge mesh network.
 						</p>
 					</div>
 
 					<div className="grid gap-px overflow-hidden rounded-2xl border border-[#0a0d12]/8 bg-[#0a0d12]/8 sm:grid-cols-2 lg:grid-cols-3">
 						{/* Card 1: Multi-Protocol */}
-						<div className="col-span-1 lg:col-span-2 bg-white p-8 lg:p-10 flex flex-col justify-between hover:bg-zinc-50/50 transition-colors">
+						<div className="col-span-1 flex flex-col justify-between bg-white p-8 transition-colors hover:bg-zinc-50/50 lg:col-span-2 lg:p-10">
 							<div>
-								<div className="inline-flex size-10 items-center justify-center rounded-xl border border-[#0a0d12]/8 bg-[#0a0d12]/4 mb-6">
-									<Icon name="arrow-swap" className="size-5 text-[#0a0d12]/60" />
+								<div className="mb-6 inline-flex size-10 items-center justify-center rounded-xl border border-[#0a0d12]/8 bg-[#0a0d12]/4">
+									<Icon
+										name="arrow-swap"
+										className="size-5 text-[#0a0d12]/60"
+									/>
 								</div>
-								<h3 className="font-semibold text-[#0a0d12] text-[18px] leading-snug sm:text-[20px] mb-3">
+								<h3 className="mb-3 font-semibold text-[#0a0d12] text-[18px] leading-snug sm:text-[20px]">
 									SMTP Relay &amp; HTTP REST API
 								</h3>
-								<p className="text-[#0a0d12]/56 text-[14px] leading-[1.7] max-w-md">
-									Connect via lightweight client SDKs or point your existing mailers straight to our relays. Zero configuration migration required.
+								<p className="max-w-md text-[#0a0d12]/56 text-[14px] leading-[1.7]">
+									Connect via lightweight client SDKs or point your existing
+									mailers straight to our relays. Zero configuration migration
+									required.
 								</p>
 							</div>
 
-							<div className="mt-12 grid gap-4 grid-cols-2">
-								<div className="p-4 rounded-xl bg-zinc-50 border border-zinc-100">
-									<div className="font-mono text-xs text-[#0a0d12]/40 mb-1">SMTP HOST</div>
-									<div className="font-mono text-[13px] font-semibold text-[#0a0d12]">smtp.reloop.dev</div>
-									<div className="font-mono text-[11px] text-[#0a0d12]/30 mt-1">Ports: 587 (TLS), 465 (SSL)</div>
+							<div className="mt-12 grid grid-cols-2 gap-4">
+								<div className="rounded-xl border border-zinc-100 bg-zinc-50 p-4">
+									<div className="mb-1 font-mono text-[#0a0d12]/40 text-xs">
+										SMTP HOST
+									</div>
+									<div className="font-mono font-semibold text-[#0a0d12] text-[13px]">
+										smtp.reloop.dev
+									</div>
+									<div className="mt-1 font-mono text-[#0a0d12]/30 text-[11px]">
+										Ports: 587 (TLS), 465 (SSL)
+									</div>
 								</div>
-								<div className="p-4 rounded-xl bg-zinc-50 border border-zinc-100">
-									<div className="font-mono text-xs text-[#0a0d12]/40 mb-1">HTTP ENDPOINT</div>
-									<div className="font-mono text-[13px] font-semibold text-[#0a0d12]">api.reloop.dev/v1</div>
-									<div className="font-mono text-[11px] text-[#0a0d12]/30 mt-1">HTTPS POST /send</div>
+								<div className="rounded-xl border border-zinc-100 bg-zinc-50 p-4">
+									<div className="mb-1 font-mono text-[#0a0d12]/40 text-xs">
+										HTTP ENDPOINT
+									</div>
+									<div className="font-mono font-semibold text-[#0a0d12] text-[13px]">
+										api.reloop.dev/v1
+									</div>
+									<div className="mt-1 font-mono text-[#0a0d12]/30 text-[11px]">
+										HTTPS POST /send
+									</div>
 								</div>
 							</div>
 						</div>
 
 						{/* Card 2: Latency & SLA */}
-						<div className="bg-white p-8 lg:p-10 flex flex-col justify-between hover:bg-zinc-50/50 transition-colors">
+						<div className="flex flex-col justify-between bg-white p-8 transition-colors hover:bg-zinc-50/50 lg:p-10">
 							<div>
-								<div className="inline-flex size-10 items-center justify-center rounded-xl border border-[#0a0d12]/8 bg-[#0a0d12]/4 mb-6">
+								<div className="mb-6 inline-flex size-10 items-center justify-center rounded-xl border border-[#0a0d12]/8 bg-[#0a0d12]/4">
 									<Icon name="graph-up" className="size-5 text-[#0a0d12]/60" />
 								</div>
-								<h3 className="font-semibold text-[#0a0d12] text-[18px] leading-snug sm:text-[20px] mb-3">
+								<h3 className="mb-3 font-semibold text-[#0a0d12] text-[18px] leading-snug sm:text-[20px]">
 									99.99% Global Uptime
 								</h3>
 								<p className="text-[#0a0d12]/56 text-[14px] leading-[1.7]">
-									Reloop routes requests through distributed edge nodes. Built for failover safety during cloud zone anomalies.
+									Reloop routes requests through distributed edge nodes. Built
+									for failover safety during cloud zone anomalies.
 								</p>
 							</div>
 							<div className="mt-12 flex items-end justify-between">
 								<div>
-									<div className="text-3xl font-bold text-[#0a0d12] tracking-tight">11.8ms</div>
-									<div className="text-[11px] text-[#0a0d12]/40 mt-1">Average US-East Delivery</div>
+									<div className="font-bold text-3xl text-[#0a0d12] tracking-tight">
+										11.8ms
+									</div>
+									<div className="mt-1 text-[#0a0d12]/40 text-[11px]">
+										Average US-East Delivery
+									</div>
 								</div>
 								{/* Mini Sparkline */}
-								<svg className="h-8 w-20 text-emerald-500" viewBox="0 0 100 30" fill="none">
+								<svg
+									className="h-8 w-20 text-emerald-500"
+									viewBox="0 0 100 30"
+									fill="none"
+								>
 									<path
 										d="M0 25 L15 24 L30 18 L45 20 L60 12 L75 14 L90 3 L100 5"
 										stroke="currentColor"
@@ -672,40 +745,48 @@ const TransactionEmailsPage = () => {
 						</div>
 
 						{/* Card 3: SPF/DKIM */}
-						<div className="bg-white p-8 lg:p-10 flex flex-col justify-between hover:bg-zinc-50/50 transition-colors">
+						<div className="flex flex-col justify-between bg-white p-8 transition-colors hover:bg-zinc-50/50 lg:p-10">
 							<div>
-								<div className="inline-flex size-10 items-center justify-center rounded-xl border border-[#0a0d12]/8 bg-[#0a0d12]/4 mb-6">
+								<div className="mb-6 inline-flex size-10 items-center justify-center rounded-xl border border-[#0a0d12]/8 bg-[#0a0d12]/4">
 									<Icon name="lock" className="size-5 text-[#0a0d12]/60" />
 								</div>
-								<h3 className="font-semibold text-[#0a0d12] text-[18px] leading-snug sm:text-[20px] mb-3">
+								<h3 className="mb-3 font-semibold text-[#0a0d12] text-[18px] leading-snug sm:text-[20px]">
 									Auto-SPF/DKIM Signing
 								</h3>
 								<p className="text-[#0a0d12]/56 text-[14px] leading-[1.7]">
-									We analyze your domains dynamically and automatically apply SPF alignments, custom DKIM signing keys, and DMARC validations.
+									We analyze your domains dynamically and automatically apply
+									SPF alignments, custom DKIM signing keys, and DMARC
+									validations.
 								</p>
 							</div>
 							<div className="mt-12 flex flex-wrap gap-2">
-								<span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] text-emerald-600 font-semibold border border-emerald-100">DKIM Checked</span>
-								<span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] text-emerald-600 font-semibold border border-emerald-100">SPF Alignment Pass</span>
+								<span className="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 font-semibold text-[11px] text-emerald-600">
+									DKIM Checked
+								</span>
+								<span className="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 font-semibold text-[11px] text-emerald-600">
+									SPF Alignment Pass
+								</span>
 							</div>
 						</div>
 
 						{/* Card 4: Suppression Sync Webhook */}
-						<div className="col-span-1 lg:col-span-2 bg-white p-8 lg:p-10 flex flex-col justify-between hover:bg-zinc-50/50 transition-colors">
+						<div className="col-span-1 flex flex-col justify-between bg-white p-8 transition-colors hover:bg-zinc-50/50 lg:col-span-2 lg:p-10">
 							<div>
-								<div className="inline-flex size-10 items-center justify-center rounded-xl border border-[#0a0d12]/8 bg-[#0a0d12]/4 mb-6">
+								<div className="mb-6 inline-flex size-10 items-center justify-center rounded-xl border border-[#0a0d12]/8 bg-[#0a0d12]/4">
 									<Icon name="webhook" className="size-5 text-[#0a0d12]/60" />
 								</div>
-								<h3 className="font-semibold text-[#0a0d12] text-[18px] leading-snug sm:text-[20px] mb-3">
+								<h3 className="mb-3 font-semibold text-[#0a0d12] text-[18px] leading-snug sm:text-[20px]">
 									Suppression List Webhooks
 								</h3>
-								<p className="text-[#0a0d12]/56 text-[14px] leading-[1.7] max-w-md">
-									Instantly alerts your app webhooks if an address bounces or triggers a spam report, protecting your active mailing list quality.
+								<p className="max-w-md text-[#0a0d12]/56 text-[14px] leading-[1.7]">
+									Instantly alerts your app webhooks if an address bounces or
+									triggers a spam report, protecting your active mailing list
+									quality.
 								</p>
 							</div>
 
-							<div className="mt-12 font-mono text-[11px] rounded-xl bg-[#0a0a0a] p-4 space-y-1 shadow-inner">
-								<div className="flex justify-between text-white/30 border-b border-white/5 pb-2 mb-2">
+							<div className="mt-12 space-y-1 rounded-xl bg-[#0a0a0a] p-4 font-mono text-[11px] shadow-inner">
+								<div className="mb-2 flex justify-between border-white/5 border-b pb-2 text-white/30">
 									<span>WEBHOOK DISPATCH</span>
 									<span className="text-emerald-400">ACTIVE</span>
 								</div>
@@ -714,7 +795,8 @@ const TransactionEmailsPage = () => {
 									<span className="text-emerald-400">200 OK</span>
 								</div>
 								<div className="text-white/40">
-									&#123; "event": "email.bounced", "recipient": "user@aol.com", "code": 550 &#125;
+									&#123; "event": "email.bounced", "recipient": "user@aol.com",
+									"code": 550 &#125;
 								</div>
 							</div>
 						</div>
@@ -723,50 +805,66 @@ const TransactionEmailsPage = () => {
 			</section>
 
 			{/* Quick Start Guide Section (Alternating light gray bg-[#f8f8f8]) */}
-			<section className="bg-[#f8f8f8] text-[#0a0d12] py-24 sm:py-32 border-t border-[#0a0d12]/5">
+			<section className="border-[#0a0d12]/5 border-t bg-[#f8f8f8] py-24 text-[#0a0d12] sm:py-32">
 				<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
-					<div className="text-center mb-20">
+					<div className="mb-20 text-center">
 						<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
 							Get Started
 						</p>
 						<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 							Setup in 5 Minutes
 						</h2>
-						<p className="mt-4 max-w-xl mx-auto text-base text-[#0a0d12]/50">
-							No sales calls or enterprise agreements. Build and send immediately.
+						<p className="mx-auto mt-4 max-w-xl text-[#0a0d12]/50 text-base">
+							No sales calls or enterprise agreements. Build and send
+							immediately.
 						</p>
 					</div>
 
 					<div className="grid gap-px overflow-hidden rounded-2xl border border-[#0a0d12]/8 bg-[#0a0d12]/8 md:grid-cols-3">
-						<div className="bg-white p-8 lg:p-10 flex flex-col justify-between">
+						<div className="flex flex-col justify-between bg-white p-8 lg:p-10">
 							<div>
-								<div className="size-8 rounded-lg bg-[#0a0d12] text-white flex items-center justify-center text-xs font-bold font-mono">1</div>
-								<h3 className="mt-4 font-semibold text-lg text-[#0a0d12] leading-snug">Generate Credentials</h3>
+								<div className="flex size-8 items-center justify-center rounded-lg bg-[#0a0d12] font-bold font-mono text-white text-xs">
+									1
+								</div>
+								<h3 className="mt-4 font-semibold text-[#0a0d12] text-lg leading-snug">
+									Generate Credentials
+								</h3>
 								<p className="mt-4 text-[#0a0d12]/56 text-[14px] leading-[1.7]">
-									Create an account, verify domain TXT records, and generate private API keys in the dashboard interface.
+									Create an account, verify domain TXT records, and generate
+									private API keys in the dashboard interface.
 								</p>
 							</div>
 						</div>
 
-						<div className="bg-white p-8 lg:p-10 flex flex-col justify-between">
+						<div className="flex flex-col justify-between bg-white p-8 lg:p-10">
 							<div>
-								<div className="size-8 rounded-lg bg-[#0a0d12] text-white flex items-center justify-center text-xs font-bold font-mono">2</div>
-								<h3 className="mt-4 font-semibold text-lg text-[#0a0d12] leading-snug">Add Reloop SDK</h3>
+								<div className="flex size-8 items-center justify-center rounded-lg bg-[#0a0d12] font-bold font-mono text-white text-xs">
+									2
+								</div>
+								<h3 className="mt-4 font-semibold text-[#0a0d12] text-lg leading-snug">
+									Add Reloop SDK
+								</h3>
 								<p className="mt-4 text-[#0a0d12]/56 text-[14px] leading-[1.7]">
-									Install our client library package into your local codebase dependencies:
-									<code className="block mt-4 font-mono text-[11.5px] p-2 bg-[#0a0a0a] rounded text-violet-300 border border-white/5">
+									Install our client library package into your local codebase
+									dependencies:
+									<code className="mt-4 block rounded border border-white/5 bg-[#0a0a0a] p-2 font-mono text-[11.5px] text-violet-300">
 										npm install @reloop/sdk
 									</code>
 								</p>
 							</div>
 						</div>
 
-						<div className="bg-white p-8 lg:p-10 flex flex-col justify-between">
+						<div className="flex flex-col justify-between bg-white p-8 lg:p-10">
 							<div>
-								<div className="size-8 rounded-lg bg-[#0a0d12] text-white flex items-center justify-center text-xs font-bold font-mono">3</div>
-								<h3 className="mt-4 font-semibold text-lg text-[#0a0d12] leading-snug">Trigger Sends</h3>
+								<div className="flex size-8 items-center justify-center rounded-lg bg-[#0a0d12] font-bold font-mono text-white text-xs">
+									3
+								</div>
+								<h3 className="mt-4 font-semibold text-[#0a0d12] text-lg leading-snug">
+									Trigger Sends
+								</h3>
 								<p className="mt-4 text-[#0a0d12]/56 text-[14px] leading-[1.7]">
-									Point calls to the endpoints using payload templates, and view live audit trails in the platform dashboard.
+									Point calls to the endpoints using payload templates, and view
+									live audit trails in the platform dashboard.
 								</p>
 							</div>
 						</div>
@@ -775,7 +873,7 @@ const TransactionEmailsPage = () => {
 			</section>
 
 			{/* CTA Banner Section (Light White bg-white) */}
-			<section className="bg-white text-[#0a0d12] py-24 sm:py-32 border-t border-[#0a0d12]/5">
+			<section className="border-[#0a0d12]/5 border-t bg-white py-24 text-[#0a0d12] sm:py-32">
 				<div className="mx-auto max-w-[920px] px-4 text-center">
 					<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
 						Start today
@@ -786,7 +884,8 @@ const TransactionEmailsPage = () => {
 						<span className="text-[#0a0d12]/40">per month.</span>
 					</h2>
 					<p className="mx-auto mt-8 max-w-[550px] font-medium text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[17px]">
-						No credit card required. Connect your endpoints, optimize deliverability, and trigger emails at low-latency scale.
+						No credit card required. Connect your endpoints, optimize
+						deliverability, and trigger emails at low-latency scale.
 					</p>
 
 					<div className="mt-10 flex flex-wrap items-center justify-center gap-4">
