@@ -123,7 +123,7 @@ export const DeliverabilityChart = ({
 	const maxSentValue = useMemo(() => {
 		if (!data) return 10;
 		const keysToPlot: string[] = isAllSelected
-			? ["sent", "bounced"]
+			? ["delivered", "bounced", "complaint"]
 			: selectedEvents.map((id) => (id === "complained" ? "complaint" : id));
 
 		let max = 10;
@@ -204,9 +204,9 @@ export const DeliverabilityChart = ({
 						margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
 					>
 						<defs>
-							<linearGradient id="colorRate" x1="0" y1="0" x2="0" y2="1">
-								<stop offset="5%" stopColor="#888888" stopOpacity={0.15} />
-								<stop offset="95%" stopColor="#888888" stopOpacity={0} />
+							<linearGradient id="colorDelivered" x1="0" y1="0" x2="0" y2="1">
+								<stop offset="5%" stopColor="#10B981" stopOpacity={0.15} />
+								<stop offset="95%" stopColor="#10B981" stopOpacity={0} />
 							</linearGradient>
 						</defs>
 						<CartesianGrid
@@ -236,19 +236,29 @@ export const DeliverabilityChart = ({
 							<>
 								<Area
 									type="monotone"
-									dataKey="sent"
-									name="Emails Sent"
-									stroke="#888888"
+									dataKey="delivered"
+									name="Delivered"
+									stroke="#10B981"
 									strokeWidth={2}
 									fillOpacity={1}
-									fill="url(#colorRate)"
+									fill="url(#colorDelivered)"
 									isAnimationActive={false}
 								/>
 								<Line
 									type="monotone"
 									dataKey="bounced"
 									name="Bounces"
-									stroke="#F04438"
+									stroke="#EF4444"
+									strokeWidth={2}
+									dot={false}
+									activeDot={{ r: 5 }}
+									isAnimationActive={false}
+								/>
+								<Line
+									type="monotone"
+									dataKey="complaint"
+									name="Complained"
+									stroke="#D97706"
 									strokeWidth={2}
 									dot={false}
 									activeDot={{ r: 5 }}
