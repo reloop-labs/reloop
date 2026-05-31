@@ -17,7 +17,7 @@ export const ClickedStep = ({ event }: { event: EmailEvent | undefined }) => {
 					className={cn(
 						"flex h-10 w-10 items-center justify-center rounded-[10px] border text-text-sub-600 transition-all duration-300",
 						isCompleted
-							? "border-success-base/20 bg-success-lighter/50 text-success-base"
+							? "border-purple-500/20 bg-purple-50/50 text-purple-600 dark:bg-purple-950/30 dark:text-purple-400"
 							: "border-stroke-soft-200 bg-bg-weak-50",
 					)}
 				>
@@ -29,7 +29,7 @@ export const ClickedStep = ({ event }: { event: EmailEvent | undefined }) => {
 						className={cn(
 							"rounded-md px-2 py-1 font-semibold text-xs",
 							isCompleted
-								? "bg-success-lighter text-success-base"
+								? "bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400"
 								: "bg-bg-weak-50 text-text-sub-600",
 						)}
 					>

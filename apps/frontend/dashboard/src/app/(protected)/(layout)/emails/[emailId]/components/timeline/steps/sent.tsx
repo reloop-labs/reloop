@@ -1,3 +1,4 @@
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import type { EmailEvent } from "../types";
 
@@ -9,12 +10,26 @@ export const SentStep = ({ event }: { event: EmailEvent | undefined }) => {
 		<div className="group relative flex flex-col items-center">
 			{/* Icon Node */}
 			<div className="relative z-10 flex flex-col items-center gap-2">
-				<div className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600 transition-all duration-300">
+				<div
+					className={cn(
+						"flex h-10 w-10 items-center justify-center rounded-[10px] border text-text-sub-600 transition-all duration-300",
+						isCompleted
+							? "border-information-base/20 bg-information-lighter/50 text-information-base"
+							: "border-stroke-soft-200 bg-bg-weak-50",
+					)}
+				>
 					<Icon name="send-1" className="h-5 w-5" />
 				</div>
 
 				<div className="flex flex-col items-center text-center">
-					<span className="rounded-md bg-bg-weak-50 px-2 py-1 font-semibold text-text-sub-600 text-xs">
+					<span
+						className={cn(
+							"rounded-md px-2 py-1 font-semibold text-xs",
+							isCompleted
+								? "bg-information-lighter text-information-base"
+								: "bg-bg-weak-50 text-text-sub-600",
+						)}
+					>
 						Sent
 					</span>
 					{isCompleted && timestamp && (
