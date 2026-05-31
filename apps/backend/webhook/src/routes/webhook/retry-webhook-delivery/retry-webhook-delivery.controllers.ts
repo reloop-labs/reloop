@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { webhookConfig } from "../../../webhook.config";
 
-const workflowQueue = new Queue("workflow-tasks", {
+const workflowQueue = new Queue("workflow-queue", {
 	connection: {
 		url: webhookConfig.REDIS_URL,
 	},
@@ -34,11 +34,14 @@ export async function retryWebhookDeliveryController({
 		});
 	}
 
-	if (delivery.webhook.status === "disabled") {
+	if (
+		delivery.webhook.status === "disabled" ||
+		delivery.webhook.status === "failed"
+	) {
 		throw createError({
 			status: 400,
-			message: "Webhook is disabled",
-			why: "Cannot retry delivery for a disabled webhook.",
+			message: "Webhook is not active",
+			why: `Cannot retry delivery because the webhook is currently "${delivery.webhook.status}".`,
 			fix: "Enable the webhook first before retrying delivery.",
 		});
 	}

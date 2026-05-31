@@ -477,8 +477,12 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 			await mutate(
 				`/api/webhook/v1/${webhookId}/deliveries?page=${currentPage}&limit=${pageSize}&status=${statusFilter === "all" ? "" : statusFilter}`,
 			);
-		} catch {
-			toast.error("Failed to retry delivery");
+		} catch (error) {
+			if (axios.isAxiosError(error) && error.response?.data?.message) {
+				toast.error(error.response.data.message);
+			} else {
+				toast.error("Failed to retry delivery");
+			}
 		}
 	};
 

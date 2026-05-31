@@ -1,4 +1,3 @@
-import { decryptSecret } from "@reloop/db";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import type { WebhookEventName } from "@reloop/webhook-events";
@@ -51,7 +50,7 @@ export async function listWebhooksController({
 				id: webhook.id,
 				name: webhook.name,
 				url: webhook.url,
-				secret: decryptSecret(webhook.secret),
+				secret: "whsec_••••••••",
 				status: webhook.status,
 				customHeaders: webhook.customHeaders,
 				rateLimitEnabled: webhook.rateLimitEnabled,
