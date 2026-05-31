@@ -477,41 +477,29 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 		}
 	}, [email]);
 
-	if (isLoading) {
-		return (
-			<div className="space-y-8">
-				<div className="space-y-4">
-					<Skeleton className="h-6 w-32" />
-					<div className="grid grid-cols-2 gap-8">
-						<Skeleton className="h-20 w-full rounded-xl" />
-						<Skeleton className="h-20 w-full rounded-xl" />
-					</div>
-				</div>
-				<div className="space-y-4">
-					<Skeleton className="h-6 w-32" />
-					<Skeleton className="h-64 w-full rounded-xl" />
-				</div>
-			</div>
-		);
-	}
+	if (!email && !isLoading) return null;
 
-	if (!email) return null;
-
-	const tabItems = [
-		...(email.htmlBody
-			? [
-					{ title: "Preview", value: "preview", icon: "mail-single" as const },
-					{ title: "Plain Text", value: "plain", icon: "file-text" as const },
-					{ title: "HTML Source", value: "html", icon: "code" as const },
-				]
-			: [
-					{
-						title: "Plain Text",
-						value: "plain",
-						icon: "file-text" as const,
-					},
-				]),
-	];
+	const tabItems = isLoading
+		? [
+				{ title: "Preview", value: "preview", icon: "mail-single" as const },
+				{ title: "Plain Text", value: "plain", icon: "file-text" as const },
+				{ title: "HTML Source", value: "html", icon: "code" as const },
+			]
+		: [
+				...(email?.htmlBody
+					? [
+							{ title: "Preview", value: "preview", icon: "mail-single" as const },
+							{ title: "Plain Text", value: "plain", icon: "file-text" as const },
+							{ title: "HTML Source", value: "html", icon: "code" as const },
+						]
+					: [
+							{
+								title: "Plain Text",
+								value: "plain",
+								icon: "file-text" as const,
+							},
+						]),
+			];
 
 	const activeIndex = tabItems.findIndex((item) => item.value === activeTab);
 	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
@@ -528,9 +516,13 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 							From
 						</span>
 						<span className="font-medium text-paragraph-sm text-text-strong-950">
-							{email.fromName
-								? `${email.fromName} <${email.fromEmail}>`
-								: email.fromEmail}
+							{isLoading ? (
+								<Skeleton className="h-4 w-64 rounded-md" />
+							) : email?.fromName ? (
+								`${email.fromName} <${email.fromEmail}>`
+							) : (
+								email?.fromEmail
+							)}
 						</span>
 					</div>
 					<div className="flex items-start gap-4">
@@ -538,10 +530,14 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 							To
 						</span>
 						<span className="font-medium text-paragraph-sm text-text-strong-950">
-							{email.toEmails.join(", ")}
+							{isLoading ? (
+								<Skeleton className="h-4 w-48 rounded-md" />
+							) : (
+								email?.toEmails.join(", ")
+							)}
 						</span>
 					</div>
-					{email.ccEmails && email.ccEmails.length > 0 && (
+					{!isLoading && email?.ccEmails && email.ccEmails.length > 0 && (
 						<div className="flex items-start gap-4">
 							<span className="w-16 flex-shrink-0 font-medium text-paragraph-sm text-text-sub-600">
 								Cc
@@ -556,14 +552,19 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 							Date
 						</span>
 						<span className="font-medium text-paragraph-sm text-text-strong-950">
-							{new Date(email.createdAt).toLocaleString(undefined, {
-								weekday: "long",
-								year: "numeric",
-								month: "long",
-								day: "numeric",
-								hour: "2-digit",
-								minute: "2-digit",
-							})}
+							{isLoading ? (
+								<Skeleton className="h-4 w-40 rounded-md" />
+							) : (
+								email &&
+								new Date(email.createdAt).toLocaleString(undefined, {
+									weekday: "long",
+									year: "numeric",
+									month: "long",
+									day: "numeric",
+									hour: "2-digit",
+									minute: "2-digit",
+								})
+							)}
 						</span>
 					</div>
 					<div className="flex items-start gap-4">
@@ -571,23 +572,28 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 							Subject
 						</span>
 						<span className="font-medium text-paragraph-sm text-text-strong-950">
-							{email.subject}
+							{isLoading ? (
+								<Skeleton className="h-4 w-96 rounded-md" />
+							) : (
+								email?.subject
+							)}
 						</span>
 					</div>
 				</div>
 			</section>
-			{email.errorMessage && (
+			{!isLoading && email?.errorMessage && (
 				<ErrorDetailsPanel errorMessage={email.errorMessage} />
 			)}
 
 			{/* Event Tracking Timeline */}
 			<section>
 				<EmailTimeline
-					events={email.events || []}
-					sentAt={email.sentAt || email.createdAt}
-					deliveredAt={email.deliveredAt}
-					failedAt={email.failedAt}
-					errorMessage={email.errorMessage}
+					events={email?.events || []}
+					sentAt={email?.sentAt || email?.createdAt}
+					deliveredAt={email?.deliveredAt}
+					failedAt={email?.failedAt}
+					errorMessage={email?.errorMessage}
+					isLoading={isLoading}
 				/>
 			</section>
 
@@ -672,59 +678,77 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 					</TabMenu.List>
 
 					<div className="mb-10 overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
-						<TabMenu.Content value="preview">
-							<div className="bg-white p-6">
-								{email.htmlBody && <IframePreview html={email.htmlBody} />}
+						{isLoading ? (
+							<div className="p-6">
+								<Skeleton className="h-64 w-full rounded-lg" />
 							</div>
-						</TabMenu.Content>
+						) : (
+							<>
+								<TabMenu.Content value="preview">
+									<div className="bg-white p-6">
+										{email?.htmlBody && <IframePreview html={email.htmlBody} />}
+									</div>
+								</TabMenu.Content>
 
-						<TabMenu.Content value="plain">
-							<div className="relative">
-								<div className="absolute top-4 right-4 z-10">
-									{email.textBody && (
-										<CopyButton value={email.textBody} label="Plain Text" />
-									)}
-								</div>
-								<pre className="whitespace-pre-wrap bg-bg-weak-50/50 p-6 font-mono text-sm text-text-strong-950">
-									{email.textBody || "No text content"}
-								</pre>
-							</div>
-						</TabMenu.Content>
+								<TabMenu.Content value="plain">
+									<div className="relative">
+										<div className="absolute top-4 right-4 z-10">
+											{email?.textBody && (
+												<CopyButton value={email.textBody} label="Plain Text" />
+											)}
+										</div>
+										<pre className="whitespace-pre-wrap bg-bg-weak-50/50 p-6 font-mono text-sm text-text-strong-950">
+											{email?.textBody || "No text content"}
+										</pre>
+									</div>
+								</TabMenu.Content>
 
-						<TabMenu.Content value="html">
-							<div className="relative">
-								<div className="absolute top-4 right-4 z-10">
-									{email.htmlBody && (
-										<CopyButton value={email.htmlBody} label="HTML Source" />
-									)}
-								</div>
-								<div className="bg-bg-weak-50/50">
-									{email.htmlBody && (
-										<CodeBlock code={formatHtml(email.htmlBody)} lang="html" />
-									)}
-								</div>
-							</div>
-						</TabMenu.Content>
+								<TabMenu.Content value="html">
+									<div className="relative">
+										<div className="absolute top-4 right-4 z-10">
+											{email?.htmlBody && (
+												<CopyButton value={email.htmlBody} label="HTML Source" />
+											)}
+										</div>
+										<div className="bg-bg-weak-50/50">
+											{email?.htmlBody && (
+												<CodeBlock code={formatHtml(email.htmlBody)} lang="html" />
+											)}
+										</div>
+									</div>
+								</TabMenu.Content>
+							</>
+						)}
 					</div>
 				</TabMenu.Root>
 			</section>
 
 			{/* Headers */}
-			{email.headers && Object.keys(email.headers).length > 0 && (
+			{(isLoading || (email?.headers && Object.keys(email.headers).length > 0)) && (
 				<section>
 					<div className="mb-4 flex items-center justify-between">
 						<h3 className="font-medium text-paragraph-sm text-text-strong-950">
 							SMTP Headers
 						</h3>
-						<CopyButton
-							value={JSON.stringify(email.headers, null, 2)}
-							label="Headers"
-						/>
+						{!isLoading && (
+							<CopyButton
+								value={JSON.stringify(email?.headers, null, 2)}
+								label="Headers"
+							/>
+						)}
 					</div>
 					<div className="overflow-auto rounded-xl border border-stroke-soft-100 p-6 dark:border-stroke-soft-100/50">
-						<pre className="font-mono text-[11px] text-text-sub-600 leading-relaxed">
-							{JSON.stringify(email.headers, null, 2)}
-						</pre>
+						{isLoading ? (
+							<div className="space-y-2">
+								<Skeleton className="h-3 w-3/4 rounded-md" />
+								<Skeleton className="h-3 w-1/2 rounded-md" />
+								<Skeleton className="h-3 w-5/6 rounded-md" />
+							</div>
+						) : (
+							<pre className="font-mono text-[11px] text-text-sub-600 leading-relaxed">
+								{JSON.stringify(email?.headers, null, 2)}
+							</pre>
+						)}
 					</div>
 				</section>
 			)}
