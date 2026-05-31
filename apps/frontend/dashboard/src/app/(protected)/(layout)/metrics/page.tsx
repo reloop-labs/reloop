@@ -106,6 +106,7 @@ const MetricsPage = () => {
 				permanent: number;
 				undetermined: number;
 				complaint: number;
+				rate: number;
 			}
 		>();
 
@@ -120,6 +121,7 @@ const MetricsPage = () => {
 					permanent: data.bounceBreakdown.permanent[i] ?? 0,
 					undetermined: data.bounceBreakdown.undetermined[i] ?? 0,
 					complaint: data.complaint[i] ?? 0,
+					rate: data.rate[i] ?? 0,
 				});
 			}
 		}
@@ -141,6 +143,9 @@ const MetricsPage = () => {
 				date: formattedDate,
 				bounceRate: totalSent > 0 ? (bounceCount / totalSent) * 100 : 0,
 				complaintRate: totalSent > 0 ? (complaintCount / totalSent) * 100 : 0,
+				sent: existing?.sent ?? 0,
+				bounced: bounceCount,
+				deliveryRate: existing?.rate ?? 0,
 			};
 		});
 
@@ -238,6 +243,9 @@ const MetricsPage = () => {
 							stats?.chartData.map((d) => ({
 								date: d.date,
 								rate: d.bounceRate,
+								sent: d.sent,
+								bounced: d.bounced,
+								deliveryRate: d.deliveryRate,
 							})) || []
 						}
 						breakdown={stats?.breakdown.bounce || []}
@@ -251,6 +259,9 @@ const MetricsPage = () => {
 							stats?.chartData.map((d) => ({
 								date: d.date,
 								rate: d.complaintRate,
+								sent: d.sent,
+								bounced: d.bounced,
+								deliveryRate: d.deliveryRate,
 							})) || []
 						}
 						breakdown={stats?.breakdown.complaint || []}

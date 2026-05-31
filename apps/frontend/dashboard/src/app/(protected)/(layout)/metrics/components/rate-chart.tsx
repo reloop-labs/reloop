@@ -12,6 +12,7 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
+import { CustomTooltip } from "./custom-tooltip";
 
 interface BreakdownItem {
 	label: string;
@@ -23,7 +24,13 @@ interface BreakdownItem {
 interface RateChartProps {
 	title: string;
 	rate: number;
-	data: { date: string; rate: number }[];
+	data: {
+		date: string;
+		rate: number;
+		sent?: number;
+		bounced?: number;
+		deliveryRate?: number;
+	}[];
 	breakdown: BreakdownItem[];
 	color: string;
 	yAxisDomain?: [number, number];
@@ -96,11 +103,7 @@ export const RateChart = ({
 							interval="preserveStartEnd"
 						/>
 						<Tooltip
-							contentStyle={{
-								backgroundColor: "var(--bg-white-0)",
-								border: "1px solid var(--stroke-soft-100)",
-								borderRadius: "12px",
-							}}
+							content={<CustomTooltip />}
 							cursor={{ fill: "rgba(0, 0, 0, 0.05)" }}
 						/>
 						{riskValue !== undefined && (

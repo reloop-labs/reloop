@@ -14,13 +14,13 @@ import {
 	YAxis,
 } from "recharts";
 import useSWR from "swr";
-
 import {
 	formatDateLabel,
 	generateContinuousDateList,
 	getLocalKey,
 	getYearMonthDayKey,
 } from "../utils";
+import { CustomTooltip } from "./custom-tooltip";
 
 interface EmailStatsResponse {
 	dates: string[];
@@ -220,13 +220,7 @@ export const DeliverabilityChart = ({
 							tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
 							width={35}
 						/>
-						<Tooltip
-							contentStyle={{
-								backgroundColor: "var(--bg-white-0)",
-								border: "1px solid var(--stroke-soft-100)",
-								borderRadius: "12px",
-							}}
-						/>
+						<Tooltip content={<CustomTooltip />} />
 						<Area
 							yAxisId="left"
 							type="linear"

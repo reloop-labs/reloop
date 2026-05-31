@@ -488,8 +488,16 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 		: [
 				...(email?.htmlBody
 					? [
-							{ title: "Preview", value: "preview", icon: "mail-single" as const },
-							{ title: "Plain Text", value: "plain", icon: "file-text" as const },
+							{
+								title: "Preview",
+								value: "preview",
+								icon: "mail-single" as const,
+							},
+							{
+								title: "Plain Text",
+								value: "plain",
+								icon: "file-text" as const,
+							},
 							{ title: "HTML Source", value: "html", icon: "code" as const },
 						]
 					: [
@@ -707,12 +715,18 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 									<div className="relative">
 										<div className="absolute top-4 right-4 z-10">
 											{email?.htmlBody && (
-												<CopyButton value={email.htmlBody} label="HTML Source" />
+												<CopyButton
+													value={email.htmlBody}
+													label="HTML Source"
+												/>
 											)}
 										</div>
 										<div className="bg-bg-weak-50/50">
 											{email?.htmlBody && (
-												<CodeBlock code={formatHtml(email.htmlBody)} lang="html" />
+												<CodeBlock
+													code={formatHtml(email.htmlBody)}
+													lang="html"
+												/>
 											)}
 										</div>
 									</div>
@@ -724,7 +738,8 @@ export const EmailDetail = ({ email, isLoading }: EmailDetailProps) => {
 			</section>
 
 			{/* Headers */}
-			{(isLoading || (email?.headers && Object.keys(email.headers).length > 0)) && (
+			{(isLoading ||
+				(email?.headers && Object.keys(email.headers).length > 0)) && (
 				<section>
 					<div className="mb-4 flex items-center justify-between">
 						<h3 className="font-medium text-paragraph-sm text-text-strong-950">
