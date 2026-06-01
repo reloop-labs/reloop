@@ -23,16 +23,16 @@ const Page = () => {
 
 	return (
 		<EditorProvider key={templateId} roomId={templateId}>
-			<div className="flex h-[calc(100vh-45px)] items-start overflow-hidden pl-4 pr-2 pt-2">
+			<div className="flex h-[calc(100vh-45px)] items-start overflow-hidden pt-2 pr-2 pl-4">
 				{/* Sidebar Editor Toolbar (Vertical, Left, Top-aligned) */}
 				<div className="flex flex-col justify-start py-2">
 					<EditorToolbar />
 				</div>
 
-				<div className="flex flex-1 h-full overflow-hidden">
+				<div className="flex h-full flex-1 overflow-hidden">
 					{/* Left panel (Code, history, or subpanels) - Only visible when split/non-visual */}
 					{viewMode !== "visual" && (
-						<div className="relative m-2 flex flex-1 overflow-hidden rounded-[24px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#080808]">
+						<div className="relative m-2 flex w-1/4 min-w-[320px] shrink-0 overflow-hidden rounded-[24px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#080808]">
 							{viewMode === "code" && <CodeEditor />}
 							{viewMode === "history" && <VersionSidebar />}
 							{viewMode === "variables" && (
