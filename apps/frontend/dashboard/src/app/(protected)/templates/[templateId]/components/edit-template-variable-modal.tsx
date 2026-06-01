@@ -259,7 +259,7 @@ export const EditTemplateVariableModal = ({
 													"flex flex-col items-start gap-2 rounded-xl border-2 p-3 text-left transition-all duration-150",
 													isSelected
 														? "border-primary-base bg-primary-light/10"
-														: "border-stroke-soft-100 bg-bg-soft-200/20 hover:border-stroke-soft-200 hover:bg-bg-soft-200/40 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10",
+														: "border-stroke-soft-200 bg-bg-soft-200/20 hover:border-stroke-soft-300 hover:bg-bg-soft-200/40 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10",
 												)}
 											>
 												<div className="flex w-full justify-between">
@@ -268,7 +268,7 @@ export const EditTemplateVariableModal = ({
 															"flex h-6 w-6 items-center justify-center rounded-lg border",
 															isSelected
 																? "border-primary-base/30 bg-primary-light/20"
-																: "border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40",
+																: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40",
 														)}
 													>
 														<Icon
@@ -370,19 +370,6 @@ export const EditTemplateVariableModal = ({
 							</div>
 						</Modal.Body>
 						<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
-							{onDelete && (
-								<Button.Root
-									type="button"
-									variant="error"
-									mode="stroke"
-									size="xsmall"
-									onClick={handleDelete}
-									disabled={isSubmitting}
-									className="mr-auto!"
-								>
-									Delete
-								</Button.Root>
-							)}
 							<Button.Root
 								type="button"
 								variant="neutral"

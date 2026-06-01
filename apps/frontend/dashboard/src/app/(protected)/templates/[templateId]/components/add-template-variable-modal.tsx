@@ -229,7 +229,7 @@ export const AddTemplateVariableModal = ({
 													"flex flex-col items-start gap-2 rounded-xl border-2 p-3 text-left transition-all duration-150",
 													isSelected
 														? "border-primary-base bg-primary-light/10"
-														: "border-stroke-soft-100 bg-bg-soft-200/20 hover:border-stroke-soft-200 hover:bg-bg-soft-200/40 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10",
+														: "border-stroke-soft-200 bg-bg-soft-200/20 hover:border-stroke-soft-300 hover:bg-bg-soft-200/40 dark:border-stroke-soft-100/40 dark:bg-bg-soft-200/10",
 												)}
 											>
 												<div className="flex w-full justify-between">
@@ -238,7 +238,7 @@ export const AddTemplateVariableModal = ({
 															"flex h-6 w-6 items-center justify-center rounded-lg border",
 															isSelected
 																? "border-primary-base/30 bg-primary-light/20"
-																: "border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40",
+																: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40",
 														)}
 													>
 														<Icon
