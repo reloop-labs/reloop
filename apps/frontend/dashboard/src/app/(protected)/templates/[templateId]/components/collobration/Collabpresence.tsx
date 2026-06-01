@@ -1,11 +1,14 @@
 "use client";
 
+import {
+	getAvatarGradient,
+	getAvatarInitial,
+} from "@fe/dashboard/utils/avatar";
+import { cn } from "@reloop/ui/cn";
 import type React from "react";
 import type { ConnectionStatus as ConnectionStatusType } from "./hooks/useCollaboration";
 import type { PresenceUser } from "./hooks/usePresence";
 import { usePresenceOthers, usePresenceSelf } from "./PresenceProvider";
-import { cn } from "@reloop/ui/cn";
-import { getAvatarGradient, getAvatarInitial } from "@fe/dashboard/utils/avatar";
 
 // ── Avatar component ─────────────────────────────────────────────────────────
 
@@ -26,21 +29,14 @@ function UserAvatar({ user, isSelf = false, statusConfig }: UserAvatarProps) {
 		<div className="group/avatar relative">
 			<div
 				className={cn(
-					"flex h-8 w-8 items-center justify-center rounded-full border-2 font-semibold text-white text-xs transition-all duration-150 uppercase tracking-wide shadow-sm",
-					isSelf
-						? `ring-2 ring-transparent ring-offset-1 group-hover/avatar:ring-2 ${statusConfig?.border || "border-white"}`
-						: "border-white ring-2 ring-transparent group-hover/avatar:ring-2",
-					user.email ? getAvatarGradient(user.email) : ""
+					"flex h-8 w-8 items-center justify-center rounded-full border-2 font-semibold text-white text-xs uppercase tracking-wide shadow-sm transition-all duration-150",
+					isSelf ? statusConfig?.border || "border-white" : "border-white",
+					user.email ? getAvatarGradient(user.email) : "",
 				)}
 				style={
-					user.email
-						? ({
-								"--tw-ring-color": user.color || "rgba(59, 130, 246, 0.5)",
-							} as React.CSSProperties)
-						: ({
-								backgroundColor: user.color,
-								"--tw-ring-color": user.color,
-							} as React.CSSProperties)
+					{
+						backgroundColor: user.email ? undefined : user.color,
+					} as React.CSSProperties
 				}
 			>
 				{user.avatar ? (
@@ -168,4 +164,3 @@ export function CollabPresence({ status, isSynced }: CollabPresenceProps) {
 		</div>
 	);
 }
-
