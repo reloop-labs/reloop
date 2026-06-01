@@ -24,6 +24,9 @@ export const authMiddleware = new Elysia({ name: "better-auth" })
 					return {
 						userId: sessionResult.userId,
 						organizationId: sessionResult.organizationId,
+						userEmail: sessionResult.email,
+						userName: sessionResult.name,
+						userImage: sessionResult.image,
 						authType: "auth" as const,
 						traceId,
 					};
@@ -105,6 +108,9 @@ export const authMiddleware = new Elysia({ name: "better-auth" })
 							return {
 								userId: sessionResult.userId,
 								organizationId: sessionResult.organizationId,
+								userEmail: sessionResult.email,
+								userName: sessionResult.name,
+								userImage: sessionResult.image,
 								authType: "auth" as const,
 								traceId,
 							};

@@ -4,6 +4,8 @@ import type React from "react";
 import type { ConnectionStatus as ConnectionStatusType } from "./hooks/useCollaboration";
 import type { PresenceUser } from "./hooks/usePresence";
 import { usePresenceOthers, usePresenceSelf } from "./PresenceProvider";
+import { cn } from "@reloop/ui/cn";
+import { getAvatarGradient, getAvatarInitial } from "@fe/dashboard/utils/avatar";
 
 // ── Avatar component ─────────────────────────────────────────────────────────
 
@@ -18,29 +20,37 @@ interface UserAvatarProps {
 }
 
 function UserAvatar({ user, isSelf = false, statusConfig }: UserAvatarProps) {
+	const displayName = user.name || user.email || "Anonymous";
+
 	return (
 		<div className="group/avatar relative">
 			<div
-				className={`flex h-8 w-8 items-center justify-center rounded-full border-2 font-semibold text-white text-xs transition-all duration-150 ${
+				className={cn(
+					"flex h-8 w-8 items-center justify-center rounded-full border-2 font-semibold text-white text-xs transition-all duration-150 uppercase tracking-wide shadow-sm",
 					isSelf
 						? `ring-2 ring-transparent ring-offset-1 group-hover/avatar:ring-2 ${statusConfig?.border || "border-white"}`
-						: "border-white ring-2 ring-transparent group-hover/avatar:ring-2"
-				}`}
+						: "border-white ring-2 ring-transparent group-hover/avatar:ring-2",
+					user.email ? getAvatarGradient(user.email) : ""
+				)}
 				style={
-					{
-						backgroundColor: user.color,
-						"--tw-ring-color": user.color,
-					} as React.CSSProperties
+					user.email
+						? ({
+								"--tw-ring-color": user.color || "rgba(59, 130, 246, 0.5)",
+							} as React.CSSProperties)
+						: ({
+								backgroundColor: user.color,
+								"--tw-ring-color": user.color,
+							} as React.CSSProperties)
 				}
 			>
 				{user.avatar ? (
 					<img
 						src={user.avatar}
-						alt={user.name}
+						alt={displayName}
 						className="h-full w-full rounded-full object-cover"
 					/>
 				) : (
-					getInitials(user.name)
+					getAvatarInitial(user.name ?? null, user.email || "")
 				)}
 			</div>
 
@@ -48,14 +58,14 @@ function UserAvatar({ user, isSelf = false, statusConfig }: UserAvatarProps) {
 			<div className="-translate-x-1/2 pointer-events-none absolute top-full left-1/2 z-50 mt-1.5 whitespace-nowrap rounded bg-gray-900 px-2.5 py-1.5 font-medium text-white text-xs opacity-0 shadow-sm transition-opacity group-hover/avatar:opacity-100">
 				{isSelf && statusConfig ? (
 					<div className="flex items-center gap-1.5">
-						<span className="text-gray-300">{user.name} (you)</span>
+						<span className="text-gray-300">{displayName} (you)</span>
 						<span className="text-gray-500">•</span>
 						<span className="text-white">{statusConfig.label}</span>
 					</div>
 				) : isSelf ? (
-					`${user.name} (you)`
+					`${displayName} (you)`
 				) : (
-					user.name
+					displayName
 				)}
 				<div className="-ml-1 absolute bottom-full left-1/2 border-4 border-transparent border-b-gray-900" />
 			</div>
@@ -159,12 +169,3 @@ export function CollabPresence({ status, isSynced }: CollabPresenceProps) {
 	);
 }
 
-function getInitials(name: string): string {
-	if (!name) return "?";
-	return name
-		.split(" ")
-		.map((n) => n[0])
-		.slice(0, 2)
-		.join("")
-		.toUpperCase();
-}

@@ -6,6 +6,9 @@ export type SessionResult = {
 	userId: string;
 	organizationId: string;
 	authType: "auth";
+	email: string;
+	name?: string;
+	image?: string;
 };
 
 export async function validateSession(
@@ -36,6 +39,9 @@ export async function validateSession(
 	const session = (await response.json()) as {
 		user?: {
 			id: string;
+			email: string;
+			name?: string;
+			image?: string;
 			activeOrganizationId?: string;
 		};
 	};
@@ -45,6 +51,9 @@ export async function validateSession(
 			userId: session.user.id,
 			organizationId: session.user.activeOrganizationId,
 			authType: "auth" as const,
+			email: session.user.email,
+			name: session.user.name,
+			image: session.user.image,
 		};
 		try {
 			await redis.set(cacheKey, result, 30);

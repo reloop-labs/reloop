@@ -5,9 +5,10 @@ import type { WebsocketProvider } from "y-websocket";
 
 export interface RemoteCursor {
 	clientId: number;
-	name: string;
+	name?: string;
 	color: string;
 	avatar?: string;
+	email?: string;
 	x: number; // percentage
 	y: number; // percentage
 }
@@ -33,6 +34,7 @@ export function useRemoteCursors(
 					name: state.user.name,
 					color: state.user.color,
 					avatar: state.user.avatar,
+					email: state.user.email,
 					x,
 					y,
 				});

@@ -13,7 +13,7 @@ import { VariableSuggestion } from "./extensions/variable-suggestion";
 export interface CollabOptions {
 	ydoc: Y.Doc;
 	provider: WebsocketProvider | null;
-	user: { name: string; color: string };
+	user: { name?: string; color: string; avatar?: string; email?: string };
 }
 
 const baseExtensions = [
@@ -60,7 +60,11 @@ export const useEditorHook = (collab: CollabOptions) => {
 						provider: {
 							awareness: makeSafeAwarenessProxy(collab.provider),
 						},
-						user: collab.user,
+						user: {
+							name: collab.user.name || collab.user.email || "Anonymous",
+							color: collab.user.color,
+							avatar: collab.user.avatar,
+						},
 					}),
 				]
 			: [];

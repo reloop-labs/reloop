@@ -44,7 +44,7 @@ const CursorDot = memo(function CursorDot({
 				className="absolute top-4 left-4 whitespace-nowrap rounded-full px-2 py-0.5 font-medium text-[10px] text-white shadow-sm"
 				style={{ backgroundColor: cursor.color }}
 			>
-				{cursor.name}
+				{cursor.name || cursor.email || "Anonymous"}
 			</div>
 		</div>
 	);

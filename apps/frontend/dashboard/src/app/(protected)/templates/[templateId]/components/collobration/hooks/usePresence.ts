@@ -8,9 +8,10 @@ import type { Awareness } from "y-protocols/awareness";
 export interface PresenceUser {
 	/** Yjs client id */
 	clientId: number;
-	name: string;
+	name?: string;
 	color: string;
 	avatar?: string;
+	email?: string;
 	/** Any extra fields callers set via awareness.setLocalStateField */
 	[key: string]: unknown;
 }

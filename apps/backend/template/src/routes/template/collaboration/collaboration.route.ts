@@ -21,7 +21,7 @@ export const collaborationRoute = new Elysia({
 	.ws("/collab/:roomName", {
 		auth: true,
 		async open(ws) {
-			const { userId, organizationId } = ws.data;
+			const { userId, organizationId, userEmail, userName, userImage } = ws.data;
 			if (!userId) return ws.close(1008, "Unauthorized");
 			const { roomName } = ws.data.params;
 
@@ -53,6 +53,9 @@ export const collaborationRoute = new Elysia({
 					const userDetails = {
 						id: userId,
 						activeOrganizationId: organizationId,
+						email: userEmail,
+						name: userName,
+						image: userImage,
 					};
 					const encoder = encoding.createEncoder();
 					encoding.writeVarUint(encoder, MESSAGE_USER_INFO);

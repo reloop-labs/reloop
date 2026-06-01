@@ -10,9 +10,10 @@ const MESSAGE_USER_INFO = 2;
 // ── Types ──────────────────────────────────────────────────────────────────
 
 export interface CollabUser {
-	name: string;
+	name?: string;
 	color: string;
 	avatar?: string;
+	email?: string;
 }
 
 export interface AwarenessUser extends CollabUser {
@@ -160,6 +161,7 @@ export function useCollaboration({
 						name: userData.name,
 						color: userRef.current.color,
 						avatar: userData.image,
+						email: userData.email,
 					});
 				}
 			} catch (err) {
@@ -190,6 +192,7 @@ export function useCollaboration({
 			name: userRef.current.name,
 			color: userRef.current.color,
 			avatar: userRef.current.avatar,
+			email: userRef.current.email,
 		});
 
 		const updateAwareness = () => {
@@ -202,6 +205,7 @@ export function useCollaboration({
 					name: state.user.name,
 					color: state.user.color,
 					avatar: state.user.avatar,
+					email: state.user.email,
 				}));
 			setAwarenessUsers(users);
 		};
@@ -244,9 +248,10 @@ export function useCollaboration({
 				name: activeUser.name,
 				color: activeUser.color,
 				avatar: activeUser.avatar,
+				email: activeUser.email,
 			});
 		}
-	}, [collab?.provider, user.name, user.color, user.avatar, serverUser]);
+	}, [collab?.provider, user.name, user.color, user.avatar, user.email, serverUser]);
 
 	return {
 		ydoc: collab?.ydoc ?? (null as any),

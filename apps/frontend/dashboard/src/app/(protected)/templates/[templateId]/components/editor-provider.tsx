@@ -99,9 +99,10 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 	const { user } = useUserOrganization();
 
 	const collabUser = {
-		name: user?.name ?? "Anonymous",
+		name: user?.name || undefined,
 		color: getRandomColor(user?.id ?? ""),
 		avatar: user?.image ?? undefined,
+		email: user?.email ?? undefined,
 	};
 
 	const { ydoc, provider, connectionStatus, isSynced } = useCollaboration({
