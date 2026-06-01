@@ -21,6 +21,16 @@ export function SocialLogin({
 
 	useEffect(() => {
 		setLastLoggedIn(authClient.getLastUsedLoginMethod() || undefined);
+
+		const handlePageShow = (event: PageTransitionEvent) => {
+			if (event.persisted) {
+				setLoading({ name: "email", loading: false });
+			}
+		};
+		window.addEventListener("pageshow", handlePageShow);
+		return () => {
+			window.removeEventListener("pageshow", handlePageShow);
+		};
 	}, []);
 
 	const [loading, setLoading] = useState<{

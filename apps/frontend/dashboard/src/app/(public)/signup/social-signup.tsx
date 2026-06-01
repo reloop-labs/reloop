@@ -6,7 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as LinkButton from "@reloop/ui/link-button";
 import Spinner from "@reloop/ui/spinner";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function SocialSignup({
 	onContinueWithEmail,
@@ -19,6 +19,18 @@ export function SocialSignup({
 		name: "google" | "github" | "email";
 		loading: boolean;
 	}>({ name: "email", loading: false });
+
+	useEffect(() => {
+		const handlePageShow = (event: PageTransitionEvent) => {
+			if (event.persisted) {
+				setLoading({ name: "email", loading: false });
+			}
+		};
+		window.addEventListener("pageshow", handlePageShow);
+		return () => {
+			window.removeEventListener("pageshow", handlePageShow);
+		};
+	}, []);
 	const [, setError] = useState<{
 		name: "google" | "github" | "email";
 		error: string | null;
