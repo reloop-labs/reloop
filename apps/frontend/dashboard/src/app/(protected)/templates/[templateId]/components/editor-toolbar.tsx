@@ -1,9 +1,8 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { Braces } from "lucide-react";
+import { Award, Braces, Brush, Code2, History, Send } from "lucide-react";
 import { useEditorStore } from "./use-editor-store";
 
 export function EditorToolbar() {
@@ -23,7 +22,7 @@ export function EditorToolbar() {
 								: "text-text-sub-600 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white",
 						)}
 					>
-						<Icon name="layout" className="h-4 w-4" />
+						<Brush className="h-4 w-4" />
 					</button>
 				</Tooltip.Trigger>
 				<Tooltip.Content side="right" sideOffset={8}>
@@ -43,7 +42,7 @@ export function EditorToolbar() {
 								: "text-text-sub-600 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white",
 						)}
 					>
-						<Icon name="code" className="h-4 w-4" />
+						<Code2 className="h-4 w-4" />
 					</button>
 				</Tooltip.Trigger>
 				<Tooltip.Content side="right" sideOffset={8}>
@@ -83,7 +82,7 @@ export function EditorToolbar() {
 								: "text-text-sub-600 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white",
 						)}
 					>
-						<Icon name="history" className="h-4 w-4" />
+						<History className="h-4 w-4" />
 					</button>
 				</Tooltip.Trigger>
 				<Tooltip.Content side="right" sideOffset={8}>
@@ -103,7 +102,7 @@ export function EditorToolbar() {
 								: "text-text-sub-600 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white",
 						)}
 					>
-						<Icon name="send-2" className="h-4 w-4" />
+						<Send className="h-4 w-4" />
 					</button>
 				</Tooltip.Trigger>
 				<Tooltip.Content side="right" sideOffset={8}>
@@ -123,7 +122,7 @@ export function EditorToolbar() {
 								: "text-text-sub-600 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white",
 						)}
 					>
-						<Icon name="award" className="h-4 w-4" />
+						<Award className="h-4 w-4" />
 					</button>
 				</Tooltip.Trigger>
 				<Tooltip.Content side="right" sideOffset={8}>
