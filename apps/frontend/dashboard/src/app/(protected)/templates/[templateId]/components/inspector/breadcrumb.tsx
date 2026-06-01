@@ -2,6 +2,7 @@ import { Inspector } from "@react-email/editor/ui";
 import * as Button from "@reloop/ui/button";
 import {
 	Box,
+	Braces,
 	Columns,
 	FileText,
 	Image as ImageIcon,
@@ -10,7 +11,6 @@ import {
 	Quote,
 	Rows,
 	Type,
-	Braces,
 } from "lucide-react";
 
 const getIcon = (type: string) => {

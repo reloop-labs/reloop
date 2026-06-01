@@ -9,10 +9,10 @@ import {
 	SlashCommand,
 } from "@react-email/editor/ui";
 import { EditorContext } from "@tiptap/react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import useSWR from "swr";
-import { toast } from "sonner";
 import { Braces } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import useSWR from "swr";
 import { AddTemplateVariableModal } from "./add-template-variable-modal";
 import {
 	getRandomColor,
@@ -39,12 +39,7 @@ export const variableSlashCommand = {
 	category: "Basic",
 	searchTerms: ["variable", "dynamic", "custom", "tag", "bracket"],
 	command: ({ editor, range }: { editor: any; range: any }) => {
-		editor
-			.chain()
-			.focus()
-			.deleteRange(range)
-			.insertContent("{{")
-			.run();
+		editor.chain().focus().deleteRange(range).insertContent("{{").run();
 	},
 };
 
@@ -151,10 +146,14 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 		try {
 			// 1. Insert custom Variable node into editor
 			if (editor) {
-				editor.chain().focus().insertContent({
-					type: "variable",
-					attrs: { name },
-				}).run();
+				editor
+					.chain()
+					.focus()
+					.insertContent({
+						type: "variable",
+						attrs: { name },
+					})
+					.run();
 				toast.success(`Inserted variable ${name}`);
 			} else {
 				const placeholder = `{{{${name}}}}`;
@@ -446,7 +445,13 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 					<BubbleMenu.LinkDefault />
 					<BubbleMenu.ButtonDefault />
 					<BubbleMenu.ImageDefault />
-					<SlashCommand items={[...defaultSlashCommands, imageSlashCommand, variableSlashCommand]} />
+					<SlashCommand
+						items={[
+							...defaultSlashCommands,
+							imageSlashCommand,
+							variableSlashCommand,
+						]}
+					/>
 				</div>
 				<AddTemplateVariableModal
 					open={isCreatingVar}

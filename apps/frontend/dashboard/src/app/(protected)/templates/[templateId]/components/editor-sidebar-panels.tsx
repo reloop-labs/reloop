@@ -298,10 +298,14 @@ export function VariablesPanel({ onClose }: PanelProps) {
 													type="button"
 													onClick={() => {
 														if (editor) {
-															editor.chain().focus().insertContent({
-																type: "variable",
-																attrs: { name: v.name },
-															}).run();
+															editor
+																.chain()
+																.focus()
+																.insertContent({
+																	type: "variable",
+																	attrs: { name: v.name },
+																})
+																.run();
 															toast.success(`Inserted variable ${v.name}`);
 														} else {
 															handleCopy(key);

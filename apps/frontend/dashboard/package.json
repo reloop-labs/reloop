@@ -44,6 +44,7 @@
 		"ollama-ai-provider": "^1.2.0",
 		"perfect-cursors": "catalog:ui",
 		"react": "catalog:ui",
+		"@monaco-editor/react": "catalog:ui",
 		"react-colorful": "catalog:ui",
 		"react-dom": "catalog:ui",
 		"react-dropzone": "catalog:ui",

@@ -1,20 +1,52 @@
 "use client";
 
+import Editor, { type Monaco } from "@monaco-editor/react";
 import { composeReactEmail } from "@react-email/editor/core";
 import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
 import { useCurrentEditor } from "@tiptap/react";
 import { Check, Code2, Copy, Loader2, RefreshCw } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+const EDITOR_OPTIONS = {
+	fontSize: 12,
+	fontFamily: "var(--font-mono), Menlo, Monaco, 'Courier New', monospace",
+	minimap: { enabled: false },
+	wordWrap: "on" as const,
+	lineNumbers: "on" as const,
+	automaticLayout: true,
+	tabSize: 2,
+	scrollBeyondLastLine: false,
+	padding: { top: 12, bottom: 12 },
+	domReadOnly: false,
+	readOnly: false,
+	glyphMargin: false,
+	folding: true,
+	lineDecorationsWidth: 10,
+	lineNumbersMinChars: 3,
+};
+
+const LoadingSkeleton = () => (
+	<div className="flex h-full w-full flex-col gap-3 bg-bg-weak-50 p-4 dark:bg-[#282a36]">
+		<div className="h-4 w-1/3 animate-pulse rounded bg-bg-soft-200 dark:bg-[#44475a]" />
+		<div className="h-4 w-2/3 animate-pulse rounded bg-bg-soft-200 dark:bg-[#44475a]" />
+		<div className="h-4 w-1/2 animate-pulse rounded bg-bg-soft-200 dark:bg-[#44475a]" />
+		<div className="h-4 w-3/4 animate-pulse rounded bg-bg-soft-200 dark:bg-[#44475a]" />
+		<div className="h-4 w-2/5 animate-pulse rounded bg-bg-soft-200 dark:bg-[#44475a]" />
+	</div>
+);
+
 export function CodeEditor() {
 	const { editor } = useCurrentEditor();
+	const { resolvedTheme } = useTheme();
 	const [htmlCode, setHtmlCode] = useState<string>("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [copied, setCopied] = useState(false);
 	const [isFocused, setIsFocused] = useState(false);
 	const isSelfUpdatingRef = useRef(false);
+	// biome-ignore lint/suspicious/noExplicitAny: monaco editor reference
+	const editorRef = useRef<any>(null);
 
 	// Fetch compiled email HTML
 	const updateHtmlCode = useCallback(async () => {
@@ -81,6 +113,61 @@ export function CodeEditor() {
 		[editor],
 	);
 
+	const handleEditorDidMount = useCallback(
+		// biome-ignore lint/suspicious/noExplicitAny: monaco editor instance
+		(editorInstance: any, monaco: Monaco) => {
+			editorRef.current = editorInstance;
+
+			monaco.editor.defineTheme("reloop-dark", {
+				base: "vs-dark",
+				inherit: true,
+				rules: [
+					{ token: "comment", foreground: "6272a4", fontStyle: "italic" },
+					{ token: "keyword", foreground: "ff79c6" },
+					{ token: "identifier", foreground: "f8f8f2" },
+					{ token: "string", foreground: "f1fa8c" },
+					{ token: "number", foreground: "bd93f9" },
+					{ token: "tag", foreground: "ff79c6" },
+					{ token: "tag.id", foreground: "8be9fd" },
+					{ token: "tag.class", foreground: "8be9fd" },
+					{ token: "attribute.name", foreground: "50fa7b" },
+					{ token: "attribute.value", foreground: "f1fa8c" },
+					{ token: "delimiter", foreground: "f8f8f2" },
+					{ token: "delimiter.html", foreground: "f8f8f2" },
+				],
+				colors: {
+					"editor.background": "#282a36",
+					"editor.foreground": "#f8f8f2",
+					"editor.lineHighlightBackground": "#44475a44",
+					"editorCursor.foreground": "#f8f8f0",
+					"editor.selectionBackground": "#44475a55",
+					"editor.inactiveSelectionBackground": "#44475a33",
+				},
+			});
+
+			monaco.editor.defineTheme("reloop-light", {
+				base: "vs",
+				inherit: true,
+				rules: [],
+				colors: {
+					"editor.background": "#f9fafb",
+					"editor.lineHighlightBackground": "#f3f4f6",
+					"editorCursor.foreground": "#000000",
+				},
+			});
+
+			// Track focus
+			editorInstance.onDidFocusEditorText(() => {
+				setIsFocused(true);
+			});
+			editorInstance.onDidBlurEditorText(() => {
+				setIsFocused(false);
+				updateHtmlCode();
+			});
+		},
+		[updateHtmlCode],
+	);
+
 	// Format HTML (regenerate clean compiled HTML from visual editor state)
 	const handleFormat = useCallback(() => {
 		updateHtmlCode();
@@ -98,7 +185,7 @@ export function CodeEditor() {
 
 	return (
 		<div className="flex h-full w-full flex-col overflow-hidden bg-transparent">
-			<div className="flex h-10 shrink-0 items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-3 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+			<div className="flex h-10 shrink-0 items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-3 dark:border-stroke-soft-100/40 dark:bg-[#1e1f29]">
 				<div className="flex items-center gap-1.5 p-0">
 					<Code2 size={14} className="text-text-strong-950 dark:text-white" />
 					<span className="mr-1 font-semibold text-text-strong-950 text-xs dark:text-white">
@@ -116,7 +203,7 @@ export function CodeEditor() {
 						size="xxsmall"
 						onClick={handleFormat}
 						disabled={isLoading}
-						className="h-7 gap-1 rounded-md px-2 font-medium text-[11px] text-text-sub-600 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+						className="h-7 gap-1 rounded-md px-2 font-medium text-[11px] text-text-sub-600 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-400 dark:hover:bg-[#44475a] dark:hover:text-white"
 					>
 						<RefreshCw size={12} />
 						Format
@@ -128,7 +215,7 @@ export function CodeEditor() {
 						size="xxsmall"
 						onClick={handleCopy}
 						disabled={!htmlCode || isLoading}
-						className="h-7 gap-1 rounded-md px-2 font-medium text-[11px] text-text-sub-600 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+						className="h-7 gap-1 rounded-md px-2 font-medium text-[11px] text-text-sub-600 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-400 dark:hover:bg-[#44475a] dark:hover:text-white"
 					>
 						{copied ? (
 							<Check size={12} className="text-emerald-500" />
@@ -140,21 +227,20 @@ export function CodeEditor() {
 				</div>
 			</div>
 			<div className="relative min-h-0 flex-1">
-				<textarea
+				<Editor
+					height="100%"
+					width="100%"
+					language="html"
+					theme={resolvedTheme === "dark" ? "reloop-dark" : "reloop-light"}
 					value={htmlCode}
-					onChange={(e) => handleCodeChange(e.target.value)}
-					onFocus={() => setIsFocused(true)}
-					onBlur={() => {
-						setIsFocused(false);
-						updateHtmlCode();
+					onChange={(val) => {
+						if (val !== undefined) {
+							handleCodeChange(val);
+						}
 					}}
-					placeholder={
-						isLoading
-							? "Generating email HTML..."
-							: "Paste your compiled email HTML template or code here..."
-					}
-					className="absolute inset-0 h-full w-full resize-none overflow-y-auto bg-transparent p-4 font-mono text-text-strong-950 text-xs leading-relaxed focus:outline-none focus:ring-0 dark:text-zinc-100"
-					spellCheck={false}
+					onMount={handleEditorDidMount}
+					loading={<LoadingSkeleton />}
+					options={EDITOR_OPTIONS}
 				/>
 			</div>
 		</div>

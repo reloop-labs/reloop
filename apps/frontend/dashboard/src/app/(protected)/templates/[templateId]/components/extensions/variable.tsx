@@ -4,7 +4,7 @@ import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
 import { AlertTriangle } from "lucide-react";
 import { useParams } from "next/navigation";
-import React from "react";
+import type React from "react";
 import useSWR from "swr";
 
 const fetcher = (url: string) =>
@@ -102,7 +102,6 @@ export const Variable = EmailNode.create({
 			},
 		};
 	},
-
 
 	parseHTML() {
 		return [
