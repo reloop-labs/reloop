@@ -8,7 +8,7 @@ import { useLoading } from "@reloop/ui/use-loading";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function VerifyOTP({
 	email,
@@ -18,6 +18,16 @@ export function VerifyOTP({
 	onBack: () => void;
 }) {
 	const router = useRouter();
+	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	useEffect(() => {
+		return () => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
+	}, []);
+
 	const [enterCode, setEnterCode] = useQueryState(
 		"enterCode",
 		parseAsBoolean.withDefault(false),
@@ -43,21 +53,21 @@ export function VerifyOTP({
 			if (data?.user.id) {
 				setIsSuccess(true);
 				changeStatus("idle");
-				setTimeout(() => {
+				timeoutRef.current = setTimeout(() => {
 					router.push("/");
 				}, 2000);
 			} else {
 				changeStatus("idle");
 				setError({
 					name: "email",
-					error: error?.message || "Failed to login with email",
+					error: error?.message || "Invalid verification code. Please try again.",
 				});
 			}
 		} catch (e) {
 			changeStatus("idle");
 			setError({
 				name: "email",
-				error: "Failed to login with email",
+				error: "An error occurred during verification. Please try again.",
 			});
 		}
 	};

@@ -8,7 +8,7 @@ import { useLoading } from "@reloop/ui/use-loading";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function VerifyOTP({
 	email,
@@ -18,6 +18,16 @@ export function VerifyOTP({
 	onBack: () => void;
 }) {
 	const router = useRouter();
+	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	useEffect(() => {
+		return () => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
+	}, []);
+
 	const [enterCode, setEnterCode] = useQueryState(
 		"enterCode",
 		parseAsBoolean.withDefault(false),
@@ -36,28 +46,28 @@ export function VerifyOTP({
 	const handleVerify = async (otpToVerify: string) => {
 		try {
 			changeStatus("loading");
-			const { data } = await authClient.signIn.emailOtp({
+			const { data, error } = await authClient.signIn.emailOtp({
 				email: email,
 				otp: otpToVerify,
 			});
 			if (data?.user.id) {
 				setIsSuccess(true);
 				changeStatus("idle");
-				setTimeout(() => {
+				timeoutRef.current = setTimeout(() => {
 					router.push("/");
 				}, 3000);
 			} else {
 				changeStatus("idle");
 				setError({
 					name: "email",
-					error: "Failed to signup with email",
+					error: error?.message || "Invalid verification code. Please try again.",
 				});
 			}
 		} catch (e) {
 			changeStatus("idle");
 			setError({
 				name: "email",
-				error: "Failed to signup with email",
+				error: "An error occurred during verification. Please try again.",
 			});
 		}
 	};
