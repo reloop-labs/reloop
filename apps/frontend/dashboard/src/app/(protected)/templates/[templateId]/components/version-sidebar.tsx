@@ -251,8 +251,7 @@ export function VersionSidebar() {
 	};
 
 	return (
-		<div className="flex h-full flex-1 shrink-0 flex-col overflow-hidden bg-transparent py-4 pr-4 pl-14">
-			<div className="flex h-full flex-col overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+		<div className="flex h-full w-full flex-col overflow-hidden bg-transparent">
 				{/* Header */}
 				<div className="flex h-10 items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-3 dark:bg-[#0a0a0a]">
 					<div className="flex items-center gap-1.5 p-0">
@@ -491,7 +490,6 @@ export function VersionSidebar() {
 					}}
 					versionLabel={versionToDelete?.label || "Version"}
 				/>
-			</div>
 		</div>
 	);
 }
