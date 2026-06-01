@@ -41,7 +41,6 @@
 				"@radix-ui/react-switch": "1.2.5",
 				"sugar-high": "^1.2.0",
 				"@radix-ui/react-tabs": "1.1.12",
-				"@monaco-editor/react": "^4.7.0",
 				"@radix-ui/react-toast": "1.2.14",
 				"@radix-ui/react-tooltip": "1.2.7",
 				"class-variance-authority": "0.7.1",

@@ -33,7 +33,7 @@ const Page = () => {
 					{/* Left panel (Code, history, or subpanels) - Only visible when split/non-visual */}
 					{viewMode !== "visual" && (
 						<div
-							className={`relative m-2 flex shrink-0 overflow-hidden rounded-[24px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#080808] ${
+							className={`relative m-2 flex shrink-0 overflow-hidden ${
 								viewMode === "code" ? "w-1/2" : "w-[356px]"
 							}`}
 						>
