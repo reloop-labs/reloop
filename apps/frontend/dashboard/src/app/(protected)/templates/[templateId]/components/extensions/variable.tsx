@@ -1,5 +1,6 @@
 import { EmailNode } from "@react-email/editor/core";
 import { mergeAttributes, nodeInputRule, nodePasteRule } from "@tiptap/core";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
 import React from "react";
 
 export const Variable = EmailNode.create({
@@ -8,6 +9,7 @@ export const Variable = EmailNode.create({
 	inline: true,
 	selectable: true,
 	atom: true,
+	marks: "",
 
 	addAttributes() {
 		return {
@@ -15,6 +17,26 @@ export const Variable = EmailNode.create({
 				default: "",
 			},
 		};
+	},
+
+	addProseMirrorPlugins() {
+		return [
+			new Plugin({
+				key: new PluginKey("variableClick"),
+				props: {
+					handleClick(view, pos, event) {
+						const target = event.target as HTMLElement;
+						const badge = target.closest("span[data-variable]");
+						if (badge) {
+							const { useEditorStore } = require("../use-editor-store");
+							useEditorStore.getState().setViewMode("variables");
+							return true;
+						}
+						return false;
+					},
+				},
+			}),
+		];
 	},
 
 	parseHTML() {
@@ -34,10 +56,8 @@ export const Variable = EmailNode.create({
 			"span",
 			mergeAttributes(HTMLAttributes, {
 				"data-variable": name,
-				class:
-					"variable-badge bg-violet-50 text-violet-700 border border-violet-200 dark:bg-violet-950/30 dark:text-violet-300 dark:border-violet-800/40 rounded px-1.5 py-0.5 font-semibold text-xs inline-block mx-0.5 cursor-default select-all",
-				style:
-					"padding: 2px 6px; background-color: #eef2ff; border: 1px solid #c7d2fe; color: #4338ca; border-radius: 4px; font-weight: 600; font-size: 12px; display: inline-block; margin: 0 2px;",
+				class: "variable-badge font-semibold cursor-default select-all inline-block",
+				style: "font-weight: 600 !important; display: inline-block !important; margin: 0 1px !important; color: inherit !important; background: transparent !important; border: none !important; padding: 0 !important; font-size: inherit !important;",
 			}),
 			`{{{${name}}}}`,
 		];

@@ -440,7 +440,7 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 					<div className="min-h-0 flex-1 overflow-hidden">{children}</div>
 					<RemoteCursors cursors={remoteCursors} />
 					<BubbleMenu
-						hideWhenActiveNodes={["button", "image"]}
+						hideWhenActiveNodes={["button", "image", "variable"]}
 						hideWhenActiveMarks={["link"]}
 					/>
 					<BubbleMenu.LinkDefault />
