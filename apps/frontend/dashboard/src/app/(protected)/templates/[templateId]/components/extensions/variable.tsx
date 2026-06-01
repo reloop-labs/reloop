@@ -10,7 +10,15 @@ import useSWR from "swr";
 const fetcher = (url: string) =>
 	fetch(url, { credentials: "include" }).then((r) => r.json());
 
-export function VariableNodeView({ node }: { node: any }) {
+export function VariableNodeView({
+	node,
+	editor,
+	getPos,
+}: {
+	node: any;
+	editor: any;
+	getPos: any;
+}) {
 	const name = node.attrs?.name || "";
 	const params = useParams<{ templateId: string }>();
 	const templateId = params?.templateId;
@@ -34,10 +42,22 @@ export function VariableNodeView({ node }: { node: any }) {
 		matchedVar.defaultValue !== null &&
 		matchedVar.defaultValue !== "";
 
+	const handleClick = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		if (typeof getPos === "function") {
+			const pos = getPos();
+			if (typeof pos === "number") {
+				editor.commands.selectNodeAt(pos);
+			}
+		}
+	};
+
 	return (
 		<NodeViewWrapper
 			as="span"
-			className="variable-badge mx-0.5 inline-flex cursor-default select-all items-center gap-1 align-baseline font-semibold"
+			onClick={handleClick}
+			className="variable-badge mx-0.5 inline-flex cursor-pointer select-all items-center gap-1 align-baseline font-semibold"
 			style={{
 				fontWeight: 600,
 				display: "inline-flex",
@@ -83,25 +103,6 @@ export const Variable = EmailNode.create({
 		};
 	},
 
-	addProseMirrorPlugins() {
-		return [
-			new Plugin({
-				key: new PluginKey("variableClick"),
-				props: {
-					handleClick(view, pos, event) {
-						const target = event.target as HTMLElement;
-						const badge = target.closest(".variable-badge");
-						if (badge) {
-							const { useEditorStore } = require("../use-editor-store");
-							useEditorStore.getState().setViewMode("variables");
-							return true;
-						}
-						return false;
-					},
-				},
-			}),
-		];
-	},
 
 	parseHTML() {
 		return [

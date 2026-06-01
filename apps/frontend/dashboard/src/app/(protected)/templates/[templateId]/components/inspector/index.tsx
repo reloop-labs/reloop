@@ -39,6 +39,60 @@ function ColorRow({
 	);
 }
 
+function VariableInspectorCard({ name }: { name: string }) {
+	const params = useParams<{ templateId: string }>();
+	const templateId = params?.templateId;
+
+	// Fetch variable meta config from DB to find type and default value
+	const { data: templateData } = useSWR(
+		templateId ? `/api/template/v1/${templateId}` : null,
+		(url) => fetch(url, { credentials: "include" }).then((res) => res.json())
+	);
+
+	const variables = templateData?.variables ?? [];
+	const matchedVar = variables.find((v: any) => {
+		if (typeof v === "string") {
+			return v.replace(/^\{\{|\}\}$/g, "").trim() === name;
+		}
+		return v?.name === name;
+	});
+
+	const varType = matchedVar?.type ?? "string";
+	const defaultValue = matchedVar?.defaultValue ?? "";
+
+	return (
+		<InspectorSection>
+			<SectionHeader label="Variable Properties" />
+			
+			<PropRow label="Name">
+				<div className="text-xs font-semibold text-text-strong-950 dark:text-zinc-300 bg-bg-soft-150 dark:bg-zinc-900 rounded px-2 py-1 font-mono select-all truncate border border-stroke-soft-200 dark:border-stroke-soft-100/10">
+					{name}
+				</div>
+			</PropRow>
+
+			<PropRow label="Type">
+				<div className="text-xs text-text-sub-600 dark:text-zinc-400 capitalize font-semibold bg-violet-50 dark:bg-violet-950/20 text-violet-600 dark:text-violet-400 rounded px-2 py-1 inline-block">
+					{varType}
+				</div>
+			</PropRow>
+
+			<PropRow label="Default Value">
+				<div className="text-xs text-text-sub-600 dark:text-zinc-400 italic">
+					{defaultValue !== null && defaultValue !== "" ? (
+						<code className="rounded bg-bg-soft-150 px-1 py-0.5 font-mono text-violet-600 dark:bg-zinc-800/80 dark:text-violet-400 font-semibold">
+							"{defaultValue}"
+						</code>
+					) : (
+						<span className="text-text-disabled-300 dark:text-zinc-500 font-medium">
+							No default value set
+						</span>
+					)}
+				</div>
+			</PropRow>
+		</InspectorSection>
+	);
+}
+
 type InspectorStyleProperty =
 	| "color"
 	| "fontSize"
@@ -212,59 +266,8 @@ export const EmailInspector = () => {
 				<Inspector.Node>
 					{({ nodeType, getAttr }) => {
 						if (nodeType !== "variable") return null;
-
 						const name = (getAttr("name") as string) || "";
-						const params = useParams<{ templateId: string }>();
-						const templateId = params?.templateId;
-
-						// Fetch variable meta config from DB to find type and default value
-						const { data: templateData } = useSWR(
-							templateId ? `/api/template/v1/${templateId}` : null,
-							(url) => fetch(url, { credentials: "include" }).then((res) => res.json())
-						);
-
-						const variables = templateData?.variables ?? [];
-						const matchedVar = variables.find((v: any) => {
-							if (typeof v === "string") {
-								return v.replace(/^\{\{|\}\}$/g, "").trim() === name;
-							}
-							return v?.name === name;
-						});
-
-						const varType = matchedVar?.type ?? "string";
-						const defaultValue = matchedVar?.defaultValue ?? "";
-
-						return (
-							<InspectorSection>
-								<SectionHeader label="Variable Properties" />
-								
-								<PropRow label="Name">
-									<div className="text-xs font-semibold text-text-strong-950 dark:text-zinc-300 bg-bg-soft-150 dark:bg-zinc-900 rounded px-2 py-1 font-mono select-all truncate border border-stroke-soft-200 dark:border-stroke-soft-100/10">
-										{name}
-									</div>
-								</PropRow>
-
-								<PropRow label="Type">
-									<div className="text-xs text-text-sub-600 dark:text-zinc-400 capitalize font-semibold bg-violet-50 dark:bg-violet-950/20 text-violet-600 dark:text-violet-400 rounded px-2 py-1 inline-block">
-										{varType}
-									</div>
-								</PropRow>
-
-								<PropRow label="Default Value">
-									<div className="text-xs text-text-sub-600 dark:text-zinc-400 italic">
-										{defaultValue !== null && defaultValue !== "" ? (
-											<code className="rounded bg-bg-soft-150 px-1 py-0.5 font-mono text-violet-600 dark:bg-zinc-800/80 dark:text-violet-400 font-semibold">
-												"{defaultValue}"
-											</code>
-										) : (
-											<span className="text-text-disabled-300 dark:text-zinc-500 font-medium">
-												No default value set
-											</span>
-										)}
-									</div>
-								</PropRow>
-							</InspectorSection>
-						);
+						return <VariableInspectorCard name={name} />;
 					}}
 				</Inspector.Node>
 
