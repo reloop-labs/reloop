@@ -52,11 +52,16 @@ export function VariableNodeView({ node }: { node: any }) {
 		>
 			<span className="align-middle">{`{{{${name}}}}`}</span>
 			{!hasDefaultValue && (
-				<AlertTriangle
-					size={14}
-					className="mr-0.5 inline-block shrink-0 align-middle text-red-500"
-					style={{ color: "#ef4444" }}
-				/>
+				<span
+					title="There is no default value for this variable, please provide a default value."
+					className="mr-0.5 inline-block shrink-0 align-middle"
+				>
+					<AlertTriangle
+						size={14}
+						className="text-red-500"
+						style={{ color: "#ef4444" }}
+					/>
+				</span>
 			)}
 		</NodeViewWrapper>
 	);
