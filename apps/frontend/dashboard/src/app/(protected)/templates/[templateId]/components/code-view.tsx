@@ -11,6 +11,7 @@ import CodeMirror from "@uiw/react-codemirror";
 import { Check, Code2, Copy, Loader2, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useEditorStore } from "./use-editor-store";
 
 export function CodeEditor() {
 	const { editor } = useCurrentEditor();
@@ -200,7 +201,10 @@ const FORBIDDEN_TAGS = new Set([
  *  3. Strip email layout centering (<center>, align="center", text-align:center)
  *     so that ProseMirror/TipTap doesn't inherit center-alignment from the
  *     outer email scaffold tables and wrapper elements.
- *  4. Return `body.innerHTML` so `generateJSON` receives clean inner HTML.
+ *  4. Expand CSS shorthand properties (padding, margin, border-radius, border)
+ *     into longhand equivalents so the editor's inspector can read per-side
+ *     values (paddingTop, borderRadius, etc.) via parseCssValue.
+ *  5. Return `body.innerHTML` so `generateJSON` receives clean inner HTML.
  *
  * We do NOT strip tables, divs, or any structural elements — the editor's
  * own `parseHTML()` rules (container, section, button, image, link, …) are
@@ -210,21 +214,147 @@ function sanitizeEmailHtml(rawHtml: string): string {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(rawHtml, "text/html");
 
-	// Remove dangerous elements
+	// 1. Extract and clean preview text
+	let previewText = "";
+	const divs = Array.from(doc.querySelectorAll("div"));
+	for (const div of divs) {
+		const style = div.getAttribute("style") || "";
+		const hasHiddenStyle =
+			style.includes("display:none") ||
+			style.includes("display: none") ||
+			(style.includes("opacity:0") && style.includes("max-height:0")) ||
+			div.getAttribute("data-skip-in-text") === "true";
+
+		if (hasHiddenStyle) {
+			const rawText = div.textContent || "";
+			const cleaned = rawText.replace(/\u00a0/g, "").trim();
+			if (cleaned) {
+				previewText = cleaned;
+				// Remove the preview div so it's not parsed as editor content
+				div.remove();
+				break;
+			}
+		}
+	}
+
+	// 2. Extract title/subject
+	const titleEl = doc.querySelector("title");
+	const subject = titleEl ? titleEl.textContent?.trim() : "";
+
+	// 3. Update global editor store with extracted values
+	if (previewText) {
+		useEditorStore.getState().setPreviewText(previewText);
+	}
+	if (subject) {
+		useEditorStore.getState().setSubject(subject);
+	} else if (previewText) {
+		useEditorStore.getState().setSubject(previewText);
+	}
+
+	// 4. Find content cell to strip outer structural delivery tables
+	const contentCell = findContentCell(doc.body);
+	if (contentCell) {
+		const contentNodes = Array.from(contentCell.childNodes);
+		doc.body.innerHTML = "";
+		for (const node of contentNodes) {
+			doc.body.appendChild(node);
+		}
+	}
+
+	// 5. Remove dangerous elements
 	for (const tag of FORBIDDEN_TAGS) {
 		for (const el of Array.from(doc.body.getElementsByTagName(tag))) {
 			el.remove();
 		}
 	}
 
-	// Strip email-layout centering so TipTap doesn't inherit center-alignment
+	// 6. Strip email-layout centering so TipTap doesn't inherit center-alignment
 	// from the outer scaffold. Email HTML typically centers content via:
 	//   <center>…</center>
 	//   <table align="center">…</table>
 	//   style="text-align: center" on wrapper elements
 	stripEmailCentering(doc.body);
 
+	// 7. Expand CSS shorthand properties (padding, margin, border, border-radius)
+	// into their individual longhand equivalents. Email HTML often uses
+	// `padding: 10px 20px` etc., but the editor's inspector reads per-side
+	// values (paddingTop, paddingRight, …) via parseCssValue. The browser
+	// CSSOM expands shorthands automatically when we set cssText, so we use
+	// that to produce explicit longhands on every element.
+	expandShorthandStyles(doc.body);
+
 	return doc.body.innerHTML;
+}
+
+function findContentCell(root: HTMLElement): Element | null {
+	// Check for a column TD (standard react-email columns)
+	const columnTd = root.querySelector('td[data-id="__react-email-column"]');
+	if (columnTd) {
+		const innerTable = columnTd.querySelector("table");
+		if (innerTable) {
+			const cell =
+				innerTable.querySelector("tbody > tr > td") ||
+				innerTable.querySelector("tr > td") ||
+				innerTable.querySelector("td");
+			if (cell && isContentCell(cell)) {
+				return cell;
+			}
+		}
+		if (isContentCell(columnTd)) {
+			return columnTd;
+		}
+	}
+
+	// General structural table walker
+	let current: Element | null = root.querySelector("table");
+	while (current) {
+		const cell =
+			current.querySelector("tbody > tr > td") ||
+			current.querySelector("tr > td") ||
+			current.querySelector("td");
+
+		if (cell) {
+			if (isContentCell(cell)) {
+				return cell;
+			}
+			const nextTable = cell.querySelector("table");
+			if (nextTable && cell.children.length === 1) {
+				current = nextTable;
+			} else {
+				break;
+			}
+		} else {
+			break;
+		}
+	}
+
+	return null;
+}
+
+function isContentCell(el: Element): boolean {
+	const children = Array.from(el.children).filter((child) => {
+		const style = child.getAttribute("style") || "";
+		const isHiddenDiv =
+			child.tagName.toLowerCase() === "div" &&
+			(style.includes("display:none") ||
+				style.includes("display: none") ||
+				style.includes("opacity:0") ||
+				child.getAttribute("data-skip-in-text") === "true");
+		return !isHiddenDiv;
+	});
+
+	if (children.length > 1) {
+		return true;
+	}
+
+	if (children.length === 1 && children[0]) {
+		const tag = children[0].tagName.toLowerCase();
+		if (tag !== "table" && tag !== "tbody" && tag !== "tr" && tag !== "td") {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /**
@@ -257,6 +387,125 @@ function stripEmailCentering(root: Element): void {
 		const style = (el as HTMLElement).style;
 		if (style && style.textAlign?.toLowerCase() === "center") {
 			style.removeProperty("text-align");
+		}
+
+		node = walker.nextNode();
+	}
+}
+
+/**
+ * The longhand CSS properties we want to ensure are always written out
+ * explicitly so the editor's inspector (which reads paddingTop, borderRadius,
+ * etc. individually) can parse them correctly.
+ *
+ * We use a scratch `<div>` to let the browser expand shorthands via cssText,
+ * then read back only the longhands we need.
+ */
+const SPACING_LONGHANDS = [
+	"padding-top",
+	"padding-right",
+	"padding-bottom",
+	"padding-left",
+	"margin-top",
+	"margin-right",
+	"margin-bottom",
+	"margin-left",
+	"border-top-left-radius",
+	"border-top-right-radius",
+	"border-bottom-right-radius",
+	"border-bottom-left-radius",
+	"border-top-width",
+	"border-right-width",
+	"border-bottom-width",
+	"border-left-width",
+	"border-top-color",
+	"border-right-color",
+	"border-bottom-color",
+	"border-left-color",
+	"border-top-style",
+	"border-right-style",
+	"border-bottom-style",
+	"border-left-style",
+] as const;
+
+// Scratch element reused across calls to avoid repeated DOM creation.
+// Declared lazily so this module works in SSR (no document available).
+let _scratch: HTMLDivElement | null = null;
+function getScratch(): HTMLDivElement {
+	if (!_scratch) _scratch = document.createElement("div");
+	return _scratch;
+}
+
+/**
+ * The shorthand roots that will be replaced by the longhands above.
+ * Any property whose name starts with one of these will be dropped in
+ * favour of the expanded longhand equivalents.
+ */
+const SHORTHAND_ROOTS = new Set([
+	"padding",
+	"margin",
+	"border",
+	"border-radius",
+	"border-width",
+	"border-color",
+	"border-style",
+]);
+
+/**
+ * Walks every element under `root` and rewrites its `style` attribute so that
+ * all shorthand properties (padding, margin, border, border-radius) are
+ * replaced by their explicit longhand equivalents.
+ *
+ * This lets the editor's `parseCssValue` read `padding-top: 10px` directly
+ * rather than having to understand `padding: 10px 20px 10px 20px`.
+ */
+function expandShorthandStyles(root: Element): void {
+	const scratch = getScratch();
+	const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+	let node: Node | null = root;
+
+	while (node) {
+		const el = node as HTMLElement;
+		const rawStyle = el.getAttribute?.("style");
+
+		if (rawStyle) {
+			// Let the browser parse and expand all shorthands
+			scratch.style.cssText = rawStyle;
+
+			// Gather longhands for all spacing/border properties
+			const expansions: string[] = [];
+			for (const prop of SPACING_LONGHANDS) {
+				const val = scratch.style.getPropertyValue(prop);
+				if (val) {
+					expansions.push(`${prop}:${val}`);
+				}
+			}
+
+			// Keep all remaining non-shorthand properties (color, font-size, etc.)
+			const kept: string[] = [];
+			for (let i = 0; i < scratch.style.length; i++) {
+				const prop: string | undefined = scratch.style[i];
+				if (!prop) continue;
+				// Skip any property whose root is a shorthand we're expanding
+				const isShorthand =
+					SHORTHAND_ROOTS.has(prop) ||
+					SPACING_LONGHANDS.includes(prop as (typeof SPACING_LONGHANDS)[number]);
+				if (!isShorthand) {
+					const val = scratch.style.getPropertyValue(prop);
+					if (val) kept.push(`${prop}:${val}`);
+				}
+			}
+
+			// Write the fully-expanded style back onto the real element
+			const combined = [...kept, ...expansions].join(";");
+			if (combined) {
+				el.setAttribute("style", combined);
+			} else {
+				el.removeAttribute("style");
+			}
+
+			// Reset scratch for the next iteration
+			scratch.style.cssText = "";
 		}
 
 		node = walker.nextNode();
