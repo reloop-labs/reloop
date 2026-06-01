@@ -89,6 +89,13 @@ export const TemplateErrors = {
 			why: "An unexpected error occurred while inserting the template into the database.",
 			fix: "Please try again later or contact support if the issue persists.",
 		}),
+	testFailed: (why: string, fix?: string) =>
+		createError({
+			status: 400,
+			message: "Failed to send test email",
+			why,
+			fix: fix ?? "Check your SMTP configuration, sender address, and recipient address.",
+		}),
 	updateFailed: (id: string) =>
 		createError({
 			status: 500,

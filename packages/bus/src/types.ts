@@ -281,6 +281,13 @@ export interface ContactDeliverabilityUpdatedPayload {
 	suppressed: boolean;
 }
 
+export interface SendTestEmailPayload {
+	to: string;
+	from: string;
+	subject: string;
+	html: string;
+}
+
 export interface EventPayloads {
 	[BusEvent.USER_CREATED]: UserCreatedPayload;
 	[BusEvent.USER_UPDATED]: UserUpdatedPayload;
@@ -293,6 +300,7 @@ export interface EventPayloads {
 	[BusEvent.DOMAIN_DNS_REVERIFICATION_REQUESTED]: DomainDnsReverificationRequestedPayload;
 	[BusEvent.WEBHOOK_TRIGGERED]: WebhookTriggeredPayload;
 	[BusEvent.EMAIL_SENT]: EmailSentPayload;
+	[BusEvent.SEND_TEST_EMAIL]: SendTestEmailPayload;
 	[BusEvent.ORGANIZATION_CREATED]: OrganizationCreatedPayload;
 	[BusEvent.ORGANIZATION_JOINED]: OrganizationJoinedPayload;
 	[BusEvent.LOG_CREATED]: LogCreatedPayload;

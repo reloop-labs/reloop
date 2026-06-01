@@ -17,6 +17,7 @@ export enum BusEvent {
 
 	// Email Events
 	EMAIL_SENT = "email.sent",
+	SEND_TEST_EMAIL = "email.send_test",
 	INVITE_CREATED = "invite.created",
 	OTP_REQUESTED = "otp.requested",
 	PAYMENT_FAILED = "payment.failed",

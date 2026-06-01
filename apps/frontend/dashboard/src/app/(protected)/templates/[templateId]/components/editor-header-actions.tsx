@@ -454,6 +454,8 @@ export const EditorHeaderActions = ({
 			setIsDeleteModalOpen(true);
 		} else if (itemId === "duplicate") {
 			handleDuplicate();
+		} else if (itemId === "test") {
+			setViewMode("test");
 		}
 	};
 

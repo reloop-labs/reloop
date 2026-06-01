@@ -21,7 +21,7 @@ import {
 	Trash2,
 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { DeleteTemplateVariableModal } from "./delete-template-variable-modal";
@@ -489,25 +489,120 @@ export function ScorePanel({ onClose }: PanelProps) {
 /* Testing Panel Component                                           */
 /* ------------------------------------------------------------------ */
 export function TestPanel({ onClose }: PanelProps) {
+	const params = useParams<{ templateId: string }>();
+	const templateId = params?.templateId;
+
+	const { editor } = useCurrentEditor();
+	const { subject, fromEmail } = useEditorStore();
+
 	const [testEmail, setTestEmail] = useState("");
 	const [sending, setSending] = useState(false);
 	const [lastSent, setLastSent] = useState<string | null>(null);
 
-	const handleSendTest = (e: React.FormEvent) => {
+	// Fetch template data to read variables
+	const { data: templateData } = useSWR<any>(
+		templateId ? `/api/template/v1/${templateId}` : null,
+		fetcher,
+	);
+
+	interface MappedVariable {
+		name: string;
+		type: "string" | "number";
+		defaultValue: string | null;
+	}
+
+	const rawVars = templateData?.variables ?? [];
+	const detectedVars: MappedVariable[] = rawVars.map(
+		(v: any): MappedVariable => {
+			if (typeof v === "string") {
+				return {
+					name: v.replace(/^\{\{|\}\}$/g, "").trim(),
+					type: "string" as const,
+					defaultValue: null,
+				};
+			}
+			return {
+				name: v?.name ?? "",
+				type: (v?.type ?? "string") as "string" | "number",
+				defaultValue: v?.defaultValue ?? null,
+			};
+		},
+	);
+
+	// State for variable values entered by the user
+	const [variableValues, setVariableValues] = useState<Record<string, string>>({});
+
+	// Initialize variableValues with default values when templateData is fetched
+	useEffect(() => {
+		if (detectedVars && detectedVars.length > 0) {
+			const initialValues: Record<string, string> = {};
+			for (const v of detectedVars) {
+				if (variableValues[v.name] === undefined) {
+					initialValues[v.name] = v.defaultValue ?? "";
+				} else {
+					initialValues[v.name] = variableValues[v.name] ?? "";
+				}
+			}
+			setVariableValues(initialValues);
+		}
+	}, [templateData]);
+
+	const handleVariableChange = (name: string, value: string) => {
+		setVariableValues((prev) => ({
+			...prev,
+			[name]: value,
+		}));
+	};
+
+	const handleSendTest = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!testEmail) {
 			toast.error("Please enter a valid email address");
 			return;
 		}
 
+		if (!templateId) {
+			toast.error("Template ID not found");
+			return;
+		}
+
 		setSending(true);
-		// Simulate network latency
-		setTimeout(() => {
-			setSending(false);
+
+		try {
+			// Compile current visual editor content to HTML if editor is present
+			const currentHtml = editor ? editor.getHTML() : undefined;
+
+			// Send POST request to backend test endpoint
+			const response = await fetch(`/api/template/v1/${templateId}/test`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					to: testEmail,
+					fromEmail: fromEmail || undefined,
+					subject: subject || undefined,
+					html: currentHtml,
+					variables: variableValues,
+				}),
+				credentials: "include",
+			});
+
+			const result = await response.json();
+
+			if (!response.ok) {
+				throw new Error(result.why || result.message || "Failed to send test email");
+			}
+
 			setLastSent(testEmail);
 			toast.success(`Test email sent successfully to ${testEmail}`);
 			setTestEmail("");
-		}, 1200);
+		} catch (error: any) {
+			console.error("Error sending test email:", error);
+			toast.error(error.message || "Failed to send test email");
+		} finally {
+			setSending(false);
+		}
 	};
 
 	return (
@@ -532,14 +627,14 @@ export function TestPanel({ onClose }: PanelProps) {
 				</Button.Root>
 			</div>
 
-			<div className="hide-scrollbar flex flex-1 flex-col justify-between p-4">
+			<div className="hide-scrollbar flex flex-1 flex-col justify-between p-4 overflow-y-auto">
 				<div className="space-y-4">
 					<p className="text-[11px] text-text-soft-400 leading-normal dark:text-zinc-400">
 						Verify exactly how this email template will render across different
 						client mailboxes by sending a live test copy.
 					</p>
 
-					<form onSubmit={handleSendTest} className="space-y-3">
+					<form onSubmit={handleSendTest} className="space-y-4">
 						<div className="space-y-1">
 							<label
 								htmlFor="recipient-address"
@@ -548,6 +643,7 @@ export function TestPanel({ onClose }: PanelProps) {
 								Recipient Address
 							</label>
 							<input
+								id="recipient-address"
 								type="email"
 								required
 								placeholder="e.g. name@domain.com"
@@ -556,6 +652,35 @@ export function TestPanel({ onClose }: PanelProps) {
 								className="w-full rounded-lg border border-stroke-soft-200 bg-bg-weak-50 px-3 py-2 text-text-strong-950 text-xs focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:border-stroke-soft-100/30 dark:bg-zinc-900 dark:text-white"
 							/>
 						</div>
+
+						{detectedVars.length > 0 && (
+							<div className="space-y-3 pt-3 border-t border-stroke-soft-200 dark:border-stroke-soft-100/10">
+								<span className="font-bold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-zinc-400">
+									Template Variables
+								</span>
+								<div className="space-y-3 max-h-[300px] overflow-y-auto pr-1 hide-scrollbar">
+									{detectedVars.map((v) => (
+										<div key={v.name} className="space-y-1">
+											<div className="flex justify-between items-center">
+												<label className="font-semibold text-[10px] text-text-strong-950 dark:text-zinc-300">
+													{v.name}
+												</label>
+												<span className="text-[9px] text-text-soft-400 dark:text-zinc-500">
+													{v.type}
+												</span>
+											</div>
+											<input
+												type={v.type === "number" ? "number" : "text"}
+												placeholder={v.defaultValue ? `Default: ${v.defaultValue}` : "Enter value..."}
+												value={variableValues[v.name] ?? ""}
+												onChange={(e) => handleVariableChange(v.name, e.target.value)}
+												className="w-full rounded-lg border border-stroke-soft-200 bg-bg-weak-50 px-3 py-2 text-text-strong-950 text-xs focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:border-stroke-soft-100/30 dark:bg-zinc-900 dark:text-white"
+											/>
+										</div>
+									))}
+								</div>
+							</div>
+						)}
 
 						<Button.Root
 							type="submit"
@@ -573,7 +698,7 @@ export function TestPanel({ onClose }: PanelProps) {
 
 				{/* Send Log History */}
 				{lastSent && (
-					<div className="mt-auto border-stroke-soft-200 border-t pt-4 dark:border-stroke-soft-100/20">
+					<div className="mt-6 border-stroke-soft-200 border-t pt-4 dark:border-stroke-soft-100/20">
 						<span className="mb-2 block font-bold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-zinc-400">
 							Recent Sends
 						</span>
