@@ -16,8 +16,10 @@ import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import type React from "react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { useSWRConfig } from "swr";
 
 export const CreateOrgStep = () => {
+	const { mutate } = useSWRConfig();
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [name, setName] = useQueryState("name", parseAsString.withDefault(""));
 	const [orgId, setOrgId] = useQueryState(
@@ -163,6 +165,15 @@ export const CreateOrgStep = () => {
 				console.error("Error setting active organization:", error);
 			}
 			await authClient.updateUser({ activeOrganizationId: organization.id });
+			try {
+				await mutate(
+					"organizations",
+					async () => (await authClient.organization.list()).data,
+					{ revalidate: false },
+				);
+			} catch (error) {
+				console.error("Error mutating organizations:", error);
+			}
 		}
 		setStep(step + 1);
 	};

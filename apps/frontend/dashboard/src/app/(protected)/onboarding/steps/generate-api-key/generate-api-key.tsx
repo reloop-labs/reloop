@@ -6,11 +6,13 @@ import { useRouter } from "next/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useSWRConfig } from "swr";
 import { PostGenerate } from "./components/post-generate";
 import { PreGenerate } from "./components/pre-generate";
 import type { LanguageCode } from "./data";
 
 export const GenerateApiKeyStep = () => {
+	const { mutate } = useSWRConfig();
 	const router = useRouter();
 	const [, _setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [apiKey, setApiKey] = useQueryState(
@@ -53,6 +55,15 @@ export const GenerateApiKeyStep = () => {
 					onLanguageChange={(l) => setSelectedLang(l)}
 					onDone={async () => {
 						await authClient.getSession();
+						try {
+							await mutate(
+								"organizations",
+								async () => (await authClient.organization.list()).data,
+								{ revalidate: false },
+							);
+						} catch (error) {
+							console.error("Error mutating organizations:", error);
+						}
 						router.push("/");
 					}}
 				/>
