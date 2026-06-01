@@ -1,5 +1,6 @@
 "use client";
 
+import { imageSlashCommand } from "@react-email/editor/plugins";
 import {
 	defaultSlashCommands,
 	type SlashCommandItem,
@@ -15,11 +16,16 @@ export function FloatingMenu() {
 
 	if (!editor || isGenerating) return null;
 
+	const floatingCommands = [
+		...defaultSlashCommands,
+		imageSlashCommand,
+	] as SlashCommandItem[];
+
 	return (
 		<Tooltip.Provider>
 			<div className="-translate-x-1/2 absolute bottom-6 left-1/2 z-10">
 				<div className="flex items-center gap-1 rounded-full border border-white/10 bg-bg-strong-950 p-1.5 text-white shadow-2xl backdrop-blur-md">
-					{(defaultSlashCommands as SlashCommandItem[]).map((item, index) => {
+					{floatingCommands.map((item, index) => {
 						return (
 							<Tooltip.Root key={index}>
 								<Tooltip.Trigger asChild>

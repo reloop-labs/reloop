@@ -101,7 +101,7 @@ export function CodeEditor() {
 			<div className="flex h-10 shrink-0 items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-3 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 				<div className="flex items-center gap-1.5 p-0">
 					<Code2 size={14} className="text-text-strong-950 dark:text-white" />
-					<span className="font-semibold text-text-strong-950 text-xs dark:text-white mr-1">
+					<span className="mr-1 font-semibold text-text-strong-950 text-xs dark:text-white">
 						HTML Source
 					</span>
 					{isLoading && (
@@ -222,7 +222,6 @@ function cleanHtmlBeforeSetContent(html: string): string {
 				}
 
 				table.parentNode?.replaceChild(link, table);
-				continue;
 			}
 		}
 	}

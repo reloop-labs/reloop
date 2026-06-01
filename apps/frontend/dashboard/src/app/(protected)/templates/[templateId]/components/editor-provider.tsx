@@ -2,6 +2,7 @@
 
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { imageSlashCommand } from "@react-email/editor/plugins";
 import {
 	BubbleMenu,
 	defaultSlashCommands,
@@ -344,12 +345,13 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 					{children}
 					<RemoteCursors cursors={remoteCursors} />
 					<BubbleMenu
-						hideWhenActiveNodes={["button"]}
+						hideWhenActiveNodes={["button", "image"]}
 						hideWhenActiveMarks={["link"]}
 					/>
 					<BubbleMenu.LinkDefault />
 					<BubbleMenu.ButtonDefault />
-					<SlashCommand items={defaultSlashCommands} />
+					<BubbleMenu.ImageDefault />
+					<SlashCommand items={[...defaultSlashCommands, imageSlashCommand]} />
 				</div>
 			</EditorContext.Provider>
 		</PresenceProvider>
