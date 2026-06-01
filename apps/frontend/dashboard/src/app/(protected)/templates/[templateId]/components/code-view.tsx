@@ -108,7 +108,7 @@ export function CodeEditor() {
 						HTML code editor
 					</span>
 					{isLoading && (
-						<Loader2 size={12} className="animate-spin text-[#6272a4]" />
+						<Loader2 size={12} className="animate-spin text-foreground/50" />
 					)}
 				</div>
 				<div className="flex items-center gap-1.5">
@@ -119,7 +119,7 @@ export function CodeEditor() {
 						size="xxsmall"
 						onClick={handleFormat}
 						disabled={isLoading}
-						className="h-7 gap-1 rounded-md px-2 font-medium text-[11px] text-foreground/70 hover:bg-[#44475a] hover:text-foreground dark:hover:bg-[#44475a]"
+						className="h-7 gap-1 rounded-md px-2 font-medium text-[11px] text-foreground/70 hover:bg-neutral-100 hover:text-foreground dark:hover:bg-neutral-800"
 					>
 						<RefreshCw size={12} />
 						Format
@@ -131,10 +131,10 @@ export function CodeEditor() {
 						size="xxsmall"
 						onClick={handleCopy}
 						disabled={!htmlCode || isLoading}
-						className="h-7 gap-1 rounded-md px-2 font-medium text-[#f8f8f2]/70 text-[11px] hover:bg-[#44475a] hover:text-[#f8f8f2] dark:hover:bg-[#44475a]"
+						className="h-7 gap-1 rounded-md px-2 font-medium text-foreground/70 text-[11px] hover:bg-neutral-100 hover:text-foreground dark:hover:bg-neutral-800"
 					>
 						{copied ? (
-							<Check size={12} className="text-[#50fa7b]" />
+							<Check size={12} className="text-green-600 dark:text-green-400" />
 						) : (
 							<Copy size={12} />
 						)}
