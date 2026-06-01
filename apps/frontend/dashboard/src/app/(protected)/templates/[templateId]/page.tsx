@@ -54,7 +54,7 @@ const Page = () => {
 							<GeneratingOverlay />
 							<FullEmailBuilder />
 						</main>
-						<div className="m-2 h-[calc(100vh-79px)] w-72 shrink-0 overflow-y-auto rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+						<div className="m-2 h-[calc(100vh-87px)] w-72 shrink-0 overflow-y-auto rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 							<EmailInspector />
 						</div>
 					</div>
