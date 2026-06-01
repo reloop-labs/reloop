@@ -1,23 +1,13 @@
 "use client";
 
-import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
-import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCurrentEditor } from "@tiptap/react";
-import {
-	CheckCircle2,
-	ChevronLeft,
-	Clock,
-	Eye,
-	History,
-	Loader2,
-	Trash2,
-} from "lucide-react";
+import { Clock, Eye, Loader2, Trash2, X } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -130,10 +120,28 @@ function formatRelativeTime(dateStr: string) {
 	const days = Math.floor(hours / 24);
 
 	if (seconds < 60) return "just now";
-	if (minutes < 60) return `${minutes}m ago`;
-	if (hours < 24) return `${hours}h ago`;
-	if (days < 7) return `${days}d ago`;
-	return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+	if (minutes < 60) {
+		return minutes === 1 ? "1 minute ago" : `${minutes} minutes ago`;
+	}
+	if (hours < 24) {
+		return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+	}
+	if (days === 1) {
+		return "Yesterday";
+	}
+	if (days < 7) {
+		return `${days} days ago`;
+	}
+
+	const day = date.getDate();
+	const month = date.toLocaleDateString("en-US", { month: "short" });
+	const year = date.getFullYear();
+	const currentYear = now.getFullYear();
+
+	if (year === currentYear) {
+		return `${day} ${month}`;
+	}
+	return `${day} ${month}, ${year}`;
 }
 
 export function VersionSidebar() {
@@ -150,8 +158,6 @@ export function VersionSidebar() {
 		lastSavedAt,
 		lastSavedDraftNumber,
 	} = useEditorStore();
-
-	const [activeTab, setActiveTab] = useState<"published" | "drafts">("drafts");
 
 	// Modals & Triggers
 	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -224,20 +230,25 @@ export function VersionSidebar() {
 
 			await mutate();
 			toast.success(`Deleted ${versionLabel}`);
-		} catch (error: any) {
+		} catch (error) {
 			console.error("Failed to delete version:", error);
-			toast.error(
-				error.message || "Cannot delete the active template version.",
-			);
+			const err = error as Error;
+			toast.error(err.message || "Cannot delete the active template version.");
 		} finally {
 			setDeletingId(null);
 		}
 	};
 
-	// Categorize versions
-	const published = versions?.filter((v) => v.isMajor) || [];
-	const drafts = versions?.filter((v) => !v.isMajor) || [];
-	const currentList = activeTab === "published" ? published : drafts;
+	// Clean list containing all versions
+	const currentList = versions || [];
+
+	const majorVersions = currentList.filter((v) => v.isMajor);
+
+	const getMajorVersionNumber = (versionId: string) => {
+		const index = majorVersions.findIndex((v) => v.id === versionId);
+		if (index === -1) return null;
+		return majorVersions.length - index;
+	};
 
 	// Build last saved status text
 	const getStatusText = () => {
@@ -251,60 +262,23 @@ export function VersionSidebar() {
 	};
 
 	return (
-		<div className="flex h-full w-full flex-col overflow-hidden bg-transparent">
+		<div className="flex h-full w-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-white shadow-xl dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a]">
 			{/* Header */}
-			<div className="flex h-10 items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-3 dark:bg-[#0a0a0a]">
-				<div className="flex items-center gap-1.5 p-0">
-					<History
-						size={14}
-						className="text-text-strong-950 dark:text-white"
-						strokeWidth={2}
-					/>
-					<span className="font-semibold text-text-strong-950 text-xs capitalize dark:text-white">
-						History
-					</span>
-				</div>
-				<Button.Root
+			<div className="flex shrink-0 items-center justify-between px-6 pt-6 pb-4">
+				<h2 className="font-bold text-lg text-text-strong-950 dark:text-white">
+					Version History
+				</h2>
+				<button
 					type="button"
-					variant="neutral"
-					mode="ghost"
-					size="xxsmall"
 					onClick={() => setViewMode("visual")}
-					className="size-7 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
+					className="rounded-lg p-1 text-zinc-400 transition-all hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-300"
 				>
-					<ChevronLeft size={24} />
-				</Button.Root>
+					<X size={18} />
+				</button>
 			</div>
 
-			{/* Published / Drafts Tabs */}
-			<TabMenuHorizontal.Root
-				value={activeTab}
-				onValueChange={(val) => setActiveTab(val as "drafts" | "published")}
-			>
-				<TabMenuHorizontal.List className="flex h-10 w-full gap-0 border-stroke-soft-200 border-b bg-bg-weak-50/10 py-0 dark:border-stroke-soft-100/30">
-					<TabMenuHorizontal.Trigger
-						value="drafts"
-						className="flex h-10 flex-1 cursor-pointer items-center justify-center gap-1.5 px-2.5 py-0 font-semibold text-xs outline-none transition-all data-[state=active]:text-text-strong-950 dark:data-[state=active]:text-white"
-					>
-						<span>Drafts</span>
-						<span className="rounded bg-bg-soft-200 px-1.5 py-0.5 font-bold text-[10px] dark:bg-zinc-900 dark:text-zinc-300">
-							{drafts.length}
-						</span>
-					</TabMenuHorizontal.Trigger>
-					<TabMenuHorizontal.Trigger
-						value="published"
-						className="flex h-10 flex-1 cursor-pointer items-center justify-center gap-1.5 px-2.5 py-0 font-semibold text-xs outline-none transition-all data-[state=active]:text-text-strong-950 dark:data-[state=active]:text-white"
-					>
-						<span>Published</span>
-						<span className="rounded bg-bg-soft-200 px-1.5 py-0.5 font-bold text-[10px] dark:bg-zinc-900 dark:text-zinc-300">
-							{published.length}
-						</span>
-					</TabMenuHorizontal.Trigger>
-				</TabMenuHorizontal.List>
-			</TabMenuHorizontal.Root>
-
 			{/* Version List */}
-			<div className="hide-scrollbar flex-1 overflow-y-auto">
+			<div className="hide-scrollbar flex-1 overflow-y-auto px-4 pb-6">
 				{isLoading ? (
 					<div className="flex items-center justify-center py-12">
 						<Loader2
@@ -322,131 +296,125 @@ export function VersionSidebar() {
 						</div>
 						<div className="space-y-1">
 							<p className="font-semibold text-text-strong-950 text-xs dark:text-zinc-200">
-								No {activeTab === "published" ? "published versions" : "drafts"}{" "}
-								yet
+								No versions yet
 							</p>
 							<p className="mx-auto max-w-[180px] text-[11px] text-text-soft-400 leading-normal">
-								{activeTab === "published"
-									? 'Click "Publish" in the header to create your first published version.'
-									: 'Click "Save Draft" in the header to save your current progress.'}
+								Click "Save Draft" or "Publish" in the header to record version
+								history.
 							</p>
 						</div>
 					</div>
 				) : (
-					<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/20">
+					<div className="flex flex-col">
 						{currentList.map((version, index) => {
-							const isRestoring = restoringId === version.id;
+							const _isRestoring = restoringId === version.id;
 							const isDeleting = deletingId === version.id;
 
-							// Compute display number from position (list is sorted newest-first)
-							const displayNumber = currentList.length - index;
-							const displayLabel = version.isMajor
-								? version.name || `v${displayNumber}`
-								: version.name || `Draft ${displayNumber}`;
+							const isFirstMajor = majorVersions[0]?.id === version.id;
+							const majorNum = getMajorVersionNumber(version.id);
+							const displayLabel = version.isMajor ? `v${majorNum}.0` : "Draft";
 
 							return (
 								<div
 									key={version.id}
 									onClick={() => handleRestore(version)}
-									className="group relative flex w-full cursor-pointer flex-col border-stroke-soft-100 border-b px-4 py-3.5 transition-all hover:bg-bg-weak-50 dark:border-stroke-soft-100/10 dark:hover:bg-zinc-900/30"
+									className="group relative flex w-full cursor-pointer items-start rounded-xl px-2 py-3.5 transition-all hover:bg-zinc-50 dark:hover:bg-zinc-900/30"
 								>
-									{/* Top header: Version label & relative time */}
-									<div className="flex items-center justify-between">
-										<div className="flex items-center gap-1.5">
-											{version.isMajor ? (
-												<span className="flex items-center gap-1 rounded bg-emerald-50 px-2 py-0.5 font-bold font-mono text-[10px] text-emerald-600 leading-none dark:bg-emerald-950/30 dark:text-emerald-400">
-													<CheckCircle2 size={10} />
-													{displayLabel}
-												</span>
-											) : (
-												<span className="rounded bg-bg-soft-200 px-2 py-0.5 font-bold font-mono text-[10px] text-text-sub-600 leading-none dark:bg-zinc-800 dark:text-zinc-400">
-													{displayLabel}
-												</span>
+									{/* Timeline Left Column */}
+									<div className="relative flex w-12 shrink-0 flex-col items-center justify-start self-stretch pt-1.5">
+										{/* Line segment */}
+										<div
+											className={cn(
+												"-translate-x-1/2 absolute left-1/2 z-0 w-[1px] bg-zinc-200 dark:bg-zinc-800/80",
+												index === 0 ? "top-[16px] bottom-0" : "top-0 bottom-0",
 											)}
-										</div>
-										<span className="font-medium text-[10px] text-text-soft-400 dark:text-zinc-500">
+										/>
+
+										{/* Badge / Dot container */}
+										{version.isMajor ? (
+											<span
+												className={cn(
+													"relative z-10 flex h-5 select-none items-center justify-center rounded-full px-2 font-bold font-mono text-[9px] leading-none transition-all",
+													isFirstMajor
+														? "bg-black text-white dark:bg-white dark:text-black"
+														: "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400",
+												)}
+											>
+												{displayLabel}
+											</span>
+										) : (
+											<div className="relative z-10 flex h-5 w-5 items-center justify-center">
+												<div className="size-2 rounded-full bg-zinc-300 dark:bg-zinc-500" />
+											</div>
+										)}
+									</div>
+
+									{/* Content Column */}
+									<div className="flex min-w-0 flex-1 flex-col gap-1 pr-6 pl-4">
+										<h4 className="break-words pr-2 font-medium text-text-strong-950 text-xs leading-5 dark:text-zinc-100">
+											{version.description ||
+												version.name ||
+												(version.isMajor
+													? "Published version"
+													: "Draft version")}
+										</h4>
+										<span className="font-normal text-[10px] text-text-soft-400 dark:text-zinc-500">
+											{version.createdBy?.name || "Developer"} •{" "}
 											{formatRelativeTime(version.createdAt)}
 										</span>
 									</div>
 
-									{/* Description log */}
-									{version.description && (
-										<p className="mt-1.5 line-clamp-2 text-text-sub-600 text-xs leading-relaxed dark:text-zinc-400">
-											{version.description}
-										</p>
-									)}
+									{/* Interactive Actions (shown on hover) */}
+									<div className="absolute top-3 right-2 flex items-center gap-1 rounded bg-zinc-50 p-0.5 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-zinc-900/55">
+										{/* Preview action */}
+										<Tooltip.Root>
+											<Tooltip.Trigger asChild>
+												<Button.Root
+													variant="neutral"
+													mode="ghost"
+													size="xxsmall"
+													onClick={(e) => {
+														e.stopPropagation();
+														setSelectedPreviewVersion(version);
+														setIsPreviewOpen(true);
+													}}
+													className="size-6 rounded p-1 text-text-sub-600 ring-0 transition-colors hover:bg-bg-soft-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
+												>
+													<Eye size={13} />
+												</Button.Root>
+											</Tooltip.Trigger>
+											<Tooltip.Content side="top">Preview</Tooltip.Content>
+										</Tooltip.Root>
 
-									{/* Author avatar & Quick actions strip */}
-									<div className="mt-3 flex items-center justify-between">
-										{/* Author metadata */}
-										<div className="flex items-center gap-1.5">
-											<Avatar.Root size="20" color="gray">
-												{version.createdBy?.image ? (
-													<Avatar.Image
-														src={version.createdBy.image}
-														alt={version.createdBy.name}
-													/>
-												) : (
-													<span className="font-bold text-[9px] text-text-strong-950 dark:text-zinc-300">
-														{version.createdBy?.name?.charAt(0) || "U"}
-													</span>
-												)}
-											</Avatar.Root>
-											<span className="max-w-[90px] truncate font-medium text-[10px] text-text-soft-400 dark:text-zinc-400">
-												{version.createdBy?.name || "Developer"}
-											</span>
-										</div>
-
-										{/* Interactive Actions (shown on hover/focus) */}
-										<div className="flex items-center gap-1.5 transition-all duration-200 md:opacity-0 md:group-hover:opacity-100">
-											{/* Preview action */}
-											<Tooltip.Root>
-												<Tooltip.Trigger asChild>
-													<Button.Root
-														variant="neutral"
-														mode="ghost"
-														size="xxsmall"
-														onClick={(e) => {
-															e.stopPropagation();
-															setSelectedPreviewVersion(version);
-															setIsPreviewOpen(true);
-														}}
-														className="size-6 rounded p-1 text-text-sub-600 ring-0 transition-colors hover:bg-bg-soft-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
-													>
-														<Eye size={13} />
-													</Button.Root>
-												</Tooltip.Trigger>
-												<Tooltip.Content side="top">Preview</Tooltip.Content>
-											</Tooltip.Root>
-
-											{/* Delete action */}
-											<Tooltip.Root>
-												<Tooltip.Trigger asChild>
-													<Button.Root
-														variant="neutral"
-														mode="ghost"
-														size="xxsmall"
-														onClick={(e) => {
-															e.stopPropagation();
-															setVersionToDelete({
-																id: version.id,
-																label: displayLabel,
-															});
-															setIsDeleteModalOpen(true);
-														}}
-														disabled={isDeleting}
-														className="size-6 rounded p-1 text-text-sub-600 ring-0 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-rose-950/40"
-													>
-														{isDeleting ? (
-															<Loader2 size={13} className="animate-spin" />
-														) : (
-															<Trash2 size={13} />
-														)}
-													</Button.Root>
-												</Tooltip.Trigger>
-												<Tooltip.Content side="top">Delete</Tooltip.Content>
-											</Tooltip.Root>
-										</div>
+										{/* Delete action */}
+										<Tooltip.Root>
+											<Tooltip.Trigger asChild>
+												<Button.Root
+													variant="neutral"
+													mode="ghost"
+													size="xxsmall"
+													onClick={(e) => {
+														e.stopPropagation();
+														setVersionToDelete({
+															id: version.id,
+															label: version.isMajor
+																? displayLabel
+																: "Draft version",
+														});
+														setIsDeleteModalOpen(true);
+													}}
+													disabled={isDeleting}
+													className="size-6 rounded p-1 text-text-sub-600 ring-0 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-rose-950/40"
+												>
+													{isDeleting ? (
+														<Loader2 size={13} className="animate-spin" />
+													) : (
+														<Trash2 size={13} />
+													)}
+												</Button.Root>
+											</Tooltip.Trigger>
+											<Tooltip.Content side="top">Delete</Tooltip.Content>
+										</Tooltip.Root>
 									</div>
 								</div>
 							);
