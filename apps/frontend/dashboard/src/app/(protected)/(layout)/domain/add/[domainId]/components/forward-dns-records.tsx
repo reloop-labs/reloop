@@ -2,6 +2,7 @@
 
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as CompactButton from "@reloop/ui/compact-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Popover from "@reloop/ui/popover";
@@ -91,17 +92,19 @@ export const ForwardDNSRecordsButton = ({
 								required
 								disabled={isSending}
 							/>
-							<button
+							<CompactButton.Root
 								type="submit"
+								variant="ghost"
+								size="medium"
 								disabled={isSending || !email.trim()}
-								className="flex items-center justify-center rounded p-1 text-text-sub-600 outline-none transition duration-150 hover:bg-neutral-alpha-10 disabled:text-text-disabled-300"
+								className="text-text-sub-600 transition duration-150 disabled:text-text-disabled-300"
 							>
 								{isSending ? (
 									<Spinner size={14} color="currentColor" />
 								) : (
 									<Icon name="send-1" className="h-4 w-4" />
 								)}
-							</button>
+							</CompactButton.Root>
 						</Input.Wrapper>
 					</Input.Root>
 				</form>
