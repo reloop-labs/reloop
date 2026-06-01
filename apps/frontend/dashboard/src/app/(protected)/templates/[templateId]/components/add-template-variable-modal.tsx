@@ -112,7 +112,26 @@ export const AddTemplateVariableModal = ({
 		setNameError(validatePropertyName(slugged));
 	};
 
-	const canSubmit = !!propertyName && !nameError && !isSubmitting;
+	const defaultValueError =
+		propertyType === "number" &&
+		defaultValue !== "" &&
+		!/^-?\d+(?:\.\d+)?$/.test(defaultValue.trim())
+			? "Must be a valid number"
+			: "";
+
+	const canSubmit =
+		!!propertyName && !nameError && !defaultValueError && !isSubmitting;
+
+	const handleDefaultValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const val = e.target.value;
+		if (propertyType === "number") {
+			if (val === "" || /^-?\d*\.?\d*$/.test(val)) {
+				setDefaultValue(val);
+			}
+		} else {
+			setDefaultValue(val);
+		}
+	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -181,16 +200,13 @@ export const AddTemplateVariableModal = ({
 										className="rounded-xl"
 									>
 										<Input.Wrapper>
-											<Input.Icon
-												as={Icon}
-												name="tag"
-												size="small"
-												className="h-3.5 w-3.5"
-											/>
+											<Input.InlineAffix className="font-semibold text-text-strong-950">
+												{"{{"}
+											</Input.InlineAffix>
 											<Input.Input
 												ref={nameInputRef}
 												id="propertyName"
-												placeholder="e.g., first_name, company_plan"
+												placeholder="variable_name"
 												value={propertyName}
 												onChange={handleNameChange}
 												onBlur={handleSlugify}
@@ -198,6 +214,9 @@ export const AddTemplateVariableModal = ({
 												autoComplete="off"
 												spellCheck={false}
 											/>
+											<Input.InlineAffix className="font-semibold text-text-strong-950">
+												{"}}"}
+											</Input.InlineAffix>
 										</Input.Wrapper>
 									</Input.Root>
 									{nameError ? (
@@ -289,7 +308,11 @@ export const AddTemplateVariableModal = ({
 								{/* Default Value */}
 								<div className="flex flex-col gap-1.5">
 									<Label.Root htmlFor="defaultValue">Default Value</Label.Root>
-									<Input.Root size="small" className="rounded-xl">
+									<Input.Root
+										size="small"
+										className="rounded-xl"
+										hasError={!!defaultValueError}
+									>
 										<Input.Wrapper>
 											<Input.Input
 												id="defaultValue"
@@ -299,7 +322,7 @@ export const AddTemplateVariableModal = ({
 														: "e.g., unknown"
 												}
 												value={defaultValue}
-												onChange={(e) => setDefaultValue(e.target.value)}
+												onChange={handleDefaultValueChange}
 												disabled={isSubmitting}
 												inputMode={
 													propertyType === "number" ? "numeric" : "text"
@@ -307,9 +330,15 @@ export const AddTemplateVariableModal = ({
 											/>
 										</Input.Wrapper>
 									</Input.Root>
-									<p className="text-text-sub-600 text-xs leading-normal">
-										Used when a contact doesn&apos;t have this property set
-									</p>
+									{defaultValueError ? (
+										<p className="text-error-base text-xs">
+											{defaultValueError}
+										</p>
+									) : (
+										<p className="text-text-sub-600 text-xs leading-normal">
+											Used when a contact doesn&apos;t have this property set
+										</p>
+									)}
 								</div>
 							</div>
 
@@ -325,15 +354,17 @@ export const AddTemplateVariableModal = ({
 											<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-neutral-600 to-neutral-500 shadow-sm">
 												<Icon name="tag" className="h-3.5 w-3.5 text-white" />
 											</div>
-											<div>
+											<div className="flex items-center gap-2">
 												<p className="font-semibold text-text-strong-950 text-xs">
+													{"{{"}
 													{previewName}
+													{"}}"}
 												</p>
 												<Badge.Root
 													size="small"
 													variant="lighter"
 													color={selectedType.badgeColor}
-													className="mt-0.5 h-5 rounded-md px-1.5 font-medium text-xs capitalize"
+													className="mt-0.5 h-[18px] rounded-full px-1.5 font-semibold text-[11px] capitalize"
 												>
 													{selectedType.label}
 												</Badge.Root>
@@ -343,10 +374,12 @@ export const AddTemplateVariableModal = ({
 										<div className="divide-y divide-stroke-soft-100 rounded-lg border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/30 dark:border-stroke-soft-100/30 dark:bg-bg-weak-50/30">
 											<div className="flex items-center justify-between px-3 py-2">
 												<span className="font-medium text-[11px] text-text-sub-600">
-													Name
+													Property
 												</span>
 												<span className="font-mono font-semibold text-[11px] text-text-strong-950">
+													{"{{"}
 													{previewName}
+													{"}}"}
 												</span>
 											</div>
 											<div className="flex items-center justify-between px-3 py-2">
@@ -357,7 +390,7 @@ export const AddTemplateVariableModal = ({
 													size="small"
 													variant="lighter"
 													color={selectedType.badgeColor}
-													className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
+													className="mt-0.5 h-[18px] rounded-full px-1.5 font-semibold text-[11px] capitalize"
 												>
 													{selectedType.label}
 												</Badge.Root>

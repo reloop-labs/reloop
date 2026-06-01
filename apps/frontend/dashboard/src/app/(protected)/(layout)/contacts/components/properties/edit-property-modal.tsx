@@ -60,20 +60,28 @@ export const EditPropertyModal = ({
 		}
 	}, [open, property]);
 
+	const fallbackValueError =
+		property?.propertyType?.toLowerCase() === "number" &&
+		fallbackValue !== "" &&
+		!/^-?\d+(?:\.\d+)?$/.test(fallbackValue.trim())
+			? "Must be a valid number"
+			: "";
+
 	// Cmd/Ctrl + Enter to submit
 	useHotkeys(
 		"mod+enter",
 		(e) => {
 			e.preventDefault();
-			if (open && !isSubmitting && property) {
+			if (open && !isSubmitting && property && !fallbackValueError) {
 				handleSubmit();
 			}
 		},
 		{ enableOnFormTags: ["INPUT"] },
+		[open, isSubmitting, property, fallbackValue, fallbackValueError],
 	);
 
 	const handleSubmit = async () => {
-		if (!property) return;
+		if (!property || fallbackValueError) return;
 
 		try {
 			setIsSubmitting(true);
@@ -168,23 +176,44 @@ export const EditPropertyModal = ({
 							{/* Fallback Value (Editable) */}
 							<div className="space-y-1.5">
 								<Label.Root htmlFor="fallback-value">Default Value</Label.Root>
-								<Input.Root size="small" className="rounded-xl">
+								<Input.Root
+									size="small"
+									className="rounded-xl"
+									hasError={!!fallbackValueError}
+								>
 									<Input.Wrapper>
 										<Input.Input
 											id="fallback-value"
 											type="text"
 											className="px-2"
 											value={fallbackValue}
-											onChange={(e) => setFallbackValue(e.target.value)}
+											onChange={(e) => {
+												const val = e.target.value;
+												if (
+													property?.propertyType?.toLowerCase() === "number"
+												) {
+													if (val === "" || /^-?\d*\.?\d*$/.test(val)) {
+														setFallbackValue(val);
+													}
+												} else {
+													setFallbackValue(val);
+												}
+											}}
 											placeholder="e.g. unknown"
 											disabled={isSubmitting}
 										/>
 									</Input.Wrapper>
 								</Input.Root>
-								<p className="text-text-sub-600 text-xs">
-									This value will be used when a contact doesn't have this
-									property set.
-								</p>
+								{fallbackValueError ? (
+									<p className="text-error-base text-xs">
+										{fallbackValueError}
+									</p>
+								) : (
+									<p className="text-text-sub-600 text-xs">
+										This value will be used when a contact doesn't have this
+										property set.
+									</p>
+								)}
 							</div>
 						</Modal.Body>
 						<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
@@ -203,7 +232,7 @@ export const EditPropertyModal = ({
 								type="submit"
 								variant="neutral"
 								size="xsmall"
-								disabled={isSubmitting}
+								disabled={isSubmitting || !!fallbackValueError}
 							>
 								{isSubmitting ? (
 									<>

@@ -105,7 +105,15 @@ export const AddPropertyModal = ({
 		setNameError(validatePropertyName(slugged));
 	};
 
-	const canSubmit = !!propertyName && !nameError && !isCreating;
+	const defaultValueError =
+		propertyType === "number" &&
+		defaultValue !== "" &&
+		!/^-?\d+(?:\.\d+)?$/.test(defaultValue.trim())
+			? "Must be a valid number"
+			: "";
+
+	const canSubmit =
+		!!propertyName && !nameError && !defaultValueError && !isCreating;
 
 	useHotkeys(
 		"mod+enter",
@@ -116,7 +124,14 @@ export const AddPropertyModal = ({
 			}
 		},
 		{ enableOnFormTags: true, enabled: open },
-		[open, canSubmit, propertyName, propertyType, defaultValue],
+		[
+			open,
+			canSubmit,
+			propertyName,
+			propertyType,
+			defaultValue,
+			defaultValueError,
+		],
 	);
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -323,7 +338,11 @@ export const AddPropertyModal = ({
 								{/* Default Value */}
 								<div className="flex flex-col gap-1.5">
 									<Label.Root htmlFor="defaultValue">Default Value</Label.Root>
-									<Input.Root size="small" className="rounded-xl">
+									<Input.Root
+										size="small"
+										className="rounded-xl"
+										hasError={!!defaultValueError}
+									>
 										<Input.Wrapper>
 											<Input.Input
 												id="defaultValue"
@@ -333,7 +352,16 @@ export const AddPropertyModal = ({
 														: "e.g., unknown"
 												}
 												value={defaultValue}
-												onChange={(e) => setDefaultValue(e.target.value)}
+												onChange={(e) => {
+													const val = e.target.value;
+													if (propertyType === "number") {
+														if (val === "" || /^-?\d*\.?\d*$/.test(val)) {
+															setDefaultValue(val);
+														}
+													} else {
+														setDefaultValue(val);
+													}
+												}}
 												disabled={isCreating}
 												inputMode={
 													propertyType === "number" ? "numeric" : "text"
@@ -341,9 +369,15 @@ export const AddPropertyModal = ({
 											/>
 										</Input.Wrapper>
 									</Input.Root>
-									<p className="text-text-sub-600 text-xs">
-										Used when a contact doesn&apos;t have this property set
-									</p>
+									{defaultValueError ? (
+										<p className="text-error-base text-xs">
+											{defaultValueError}
+										</p>
+									) : (
+										<p className="text-text-sub-600 text-xs">
+											Used when a contact doesn&apos;t have this property set
+										</p>
+									)}
 								</div>
 							</div>
 

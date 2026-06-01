@@ -68,9 +68,31 @@ export const EditTemplateVariableModal = ({
 		}
 	}, [open, property]);
 
+	const fallbackValueError =
+		propertyType === "number" &&
+		fallbackValue !== "" &&
+		!/^-?\d+(?:\.\d+)?$/.test(fallbackValue.trim())
+			? "Must be a valid number"
+			: "";
+
+	const canSubmit = !fallbackValueError && !isSubmitting;
+
+	const handleFallbackValueChange = (
+		e: React.ChangeEvent<HTMLInputElement>,
+	) => {
+		const val = e.target.value;
+		if (propertyType === "number") {
+			if (val === "" || /^-?\d*\.?\d*$/.test(val)) {
+				setFallbackValue(val);
+			}
+		} else {
+			setFallbackValue(val);
+		}
+	};
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!property) return;
+		if (!property || !canSubmit) return;
 		await onSave({
 			name: property.name,
 			type: propertyType,
@@ -206,23 +228,33 @@ export const EditTemplateVariableModal = ({
 								<Label.Root htmlFor="edit-fallback-value">
 									Default Value
 								</Label.Root>
-								<Input.Root size="small" className="rounded-xl">
+								<Input.Root
+									size="small"
+									className="rounded-xl"
+									hasError={!!fallbackValueError}
+								>
 									<Input.Wrapper>
 										<Input.Input
 											id="edit-fallback-value"
 											type="text"
 											className="px-2"
 											value={fallbackValue}
-											onChange={(e) => setFallbackValue(e.target.value)}
+											onChange={handleFallbackValueChange}
 											placeholder="e.g. unknown"
 											disabled={isSubmitting}
 										/>
 									</Input.Wrapper>
 								</Input.Root>
-								<p className="text-text-sub-600 text-xs leading-normal">
-									This value will be used when a contact doesn't have this
-									property set.
-								</p>
+								{fallbackValueError ? (
+									<p className="text-error-base text-xs">
+										{fallbackValueError}
+									</p>
+								) : (
+									<p className="text-text-sub-600 text-xs leading-normal">
+										This value will be used when a contact doesn't have this
+										property set.
+									</p>
+								)}
 							</div>
 						</Modal.Body>
 						<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
@@ -241,7 +273,7 @@ export const EditTemplateVariableModal = ({
 								type="submit"
 								variant="neutral"
 								size="xsmall"
-								disabled={isSubmitting}
+								disabled={!canSubmit}
 							>
 								{isSubmitting ? (
 									<>
