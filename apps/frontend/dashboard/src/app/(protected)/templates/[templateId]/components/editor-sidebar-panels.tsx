@@ -12,7 +12,6 @@ import {
 	FileCode2,
 	Loader2,
 	Plus,
-	Search,
 	Send,
 	ShieldAlert,
 	Sparkles,
@@ -148,7 +147,6 @@ export function VariablesPanel({ onClose }: PanelProps) {
 	const { editor } = useCurrentEditor();
 
 	const [copiedKey, setCopiedKey] = useState<string | null>(null);
-	const [searchQuery, setSearchQuery] = useState("");
 	const [isCreatingVar, setIsCreatingVar] = useState(false);
 	const [isSavingConfig, setIsSavingConfig] = useState(false);
 	const [editingVar, setEditingVar] = useState<MappedVariable | null>(null);
@@ -237,11 +235,6 @@ export function VariablesPanel({ onClose }: PanelProps) {
 			setIsSavingConfig(false);
 		}
 	};
-
-	const filteredDetected = detectedVars.filter((v) =>
-		v.name.toLowerCase().includes(searchQuery.toLowerCase()),
-	);
-
 	return (
 		<div className="relative flex h-full w-full flex-col overflow-hidden">
 			{/* ── Header ── */}
@@ -266,28 +259,6 @@ export function VariablesPanel({ onClose }: PanelProps) {
 
 			{/* ── Scrollable Body ── */}
 			<div className="hide-scrollbar flex-1 overflow-y-auto">
-				{/* Search */}
-				<div className="sticky top-0 z-10 border-stroke-soft-200 border-b bg-bg-weak-50 p-3 dark:border-stroke-soft-100/20 dark:bg-[#0a0a0a]">
-					<div className="relative">
-						<Search className="absolute top-2.5 left-2.5 size-3.5 text-text-soft-400 dark:text-zinc-500" />
-						<input
-							type="text"
-							placeholder="Search variables…"
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
-							className="w-full rounded-lg border border-stroke-soft-200 bg-white py-1.5 pr-8 pl-8 text-text-strong-950 text-xs placeholder-text-soft-400 focus:outline-none focus:ring-1 focus:ring-violet-400 dark:border-stroke-soft-100/30 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500"
-						/>
-						{searchQuery && (
-							<button
-								type="button"
-								onClick={() => setSearchQuery("")}
-								className="absolute top-2.5 right-2.5 text-text-soft-400 hover:text-text-strong-950 dark:text-zinc-500 dark:hover:text-white"
-							>
-								<X size={12} />
-							</button>
-						)}
-					</div>
-				</div>
 
 				{/* ── Insert/Create Variable Button ── */}
 				<div className="border-stroke-soft-200 border-b px-3 py-2.5 dark:border-stroke-soft-100/20">
@@ -329,36 +300,28 @@ export function VariablesPanel({ onClose }: PanelProps) {
 								className="animate-spin text-text-disabled-300 dark:text-zinc-600"
 							/>
 						</div>
-					) : filteredDetected.length === 0 ? (
+					) : detectedVars.length === 0 ? (
 						<div className="rounded-xl border border-stroke-soft-200 border-dashed bg-bg-weak-50/50 px-4 py-5 text-center dark:border-stroke-soft-100/20 dark:bg-zinc-900/20">
-							{searchQuery ? (
-								<p className="text-[11px] text-text-soft-400 dark:text-zinc-500">
-									No matches in template
-								</p>
-							) : (
-								<>
-									<div className="mx-auto mb-2.5 flex size-8 items-center justify-center rounded-lg bg-bg-soft-200 dark:bg-zinc-800">
-										<Braces
-											size={14}
-											className="text-text-disabled-300 dark:text-zinc-500"
-										/>
-									</div>
-									<p className="font-medium text-text-strong-950 text-xs dark:text-zinc-300">
-										No variables yet
-									</p>
-									<p className="mt-0.5 text-[11px] text-text-soft-400 leading-normal dark:text-zinc-500">
-										Type{" "}
-										<code className="rounded bg-bg-soft-200 px-1 font-mono dark:bg-zinc-800">
-											{"{{variable}}"}
-										</code>{" "}
-										in your email and save a draft to see it here.
-									</p>
-								</>
-							)}
+							<div className="mx-auto mb-2.5 flex size-8 items-center justify-center rounded-lg bg-bg-soft-200 dark:bg-zinc-800">
+								<Braces
+									size={14}
+									className="text-text-disabled-300 dark:text-zinc-500"
+								/>
+							</div>
+							<p className="font-medium text-text-strong-950 text-xs dark:text-zinc-300">
+								No variables yet
+							</p>
+							<p className="mt-0.5 text-[11px] text-text-soft-400 leading-normal dark:text-zinc-500">
+								Type{" "}
+								<code className="rounded bg-bg-soft-200 px-1 font-mono dark:bg-zinc-800">
+									{"{{variable}}"}
+								</code>{" "}
+								in your email and save a draft to see it here.
+							</p>
 						</div>
 					) : (
 						<div className="space-y-2">
-							{filteredDetected.map((v) => {
+							{detectedVars.map((v) => {
 								const key = `{{${v.name}}}`;
 								return (
 									<div
