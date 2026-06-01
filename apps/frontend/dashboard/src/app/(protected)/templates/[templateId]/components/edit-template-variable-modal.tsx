@@ -88,6 +88,7 @@ interface EditTemplateVariableModalProps {
 			defaultValue: string | null;
 		},
 	) => Promise<void>;
+	onDelete?: (name: string) => Promise<void>;
 	isSubmitting: boolean;
 }
 
@@ -96,6 +97,7 @@ export const EditTemplateVariableModal = ({
 	open,
 	onOpenChange,
 	onSave,
+	onDelete,
 	isSubmitting,
 }: EditTemplateVariableModalProps) => {
 	const {
@@ -151,6 +153,12 @@ export const EditTemplateVariableModal = ({
 		});
 		handleOpenChange(false);
 	});
+
+	const handleDelete = async () => {
+		if (!variable || !onDelete) return;
+		await onDelete(variable.name);
+		handleOpenChange(false);
+	};
 
 	const variableNameRegister = register("variableName");
 
@@ -362,6 +370,19 @@ export const EditTemplateVariableModal = ({
 							</div>
 						</Modal.Body>
 						<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
+							{onDelete && (
+								<Button.Root
+									type="button"
+									variant="error"
+									mode="stroke"
+									size="xsmall"
+									onClick={handleDelete}
+									disabled={isSubmitting}
+									className="mr-auto!"
+								>
+									Delete
+								</Button.Root>
+							)}
 							<Button.Root
 								type="button"
 								variant="neutral"

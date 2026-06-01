@@ -18,12 +18,14 @@ import {
 	Send,
 	ShieldAlert,
 	Sparkles,
+	Trash2,
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { AddTemplateVariableModal } from "./add-template-variable-modal";
+import { DeleteTemplateVariableModal } from "./delete-template-variable-modal";
 import { EditTemplateVariableModal } from "./edit-template-variable-modal";
 
 interface PanelProps {
@@ -88,6 +90,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 	const [isCreatingVar, setIsCreatingVar] = useState(false);
 	const [isSavingConfig, setIsSavingConfig] = useState(false);
 	const [editingVar, setEditingVar] = useState<MappedVariable | null>(null);
+	const [deletingVar, setDeletingVar] = useState<MappedVariable | null>(null);
 
 	const handleCopy = (key: string) => {
 		navigator.clipboard.writeText(key);
@@ -180,6 +183,40 @@ export function VariablesPanel({ onClose }: PanelProps) {
 			setIsSavingConfig(false);
 		}
 	};
+
+	const handleDeleteVariable = async (nameToDelete: string) => {
+		if (!templateId) return;
+		setIsSavingConfig(true);
+		try {
+			const updatedVariables = detectedVars.filter(
+				(v: MappedVariable) => v.name !== nameToDelete,
+			);
+
+			const response = await fetch(`/api/template/v1/${templateId}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					variables: updatedVariables,
+				}),
+			});
+
+			if (!response.ok) {
+				const err = await response.json();
+				throw new Error(err.message || "Failed to delete variable");
+			}
+
+			toast.success(`Deleted variable ${nameToDelete}`);
+			mutate();
+		} catch (error) {
+			const err = error as Error;
+			toast.error(err.message || "Something went wrong");
+		} finally {
+			setIsSavingConfig(false);
+		}
+	};
+
 	return (
 		<div className="relative flex h-full w-full flex-col overflow-hidden">
 			{/* ── Header ── */}
@@ -305,7 +342,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 												</p>
 											)}
 
-											{/* Action Buttons: Edit, Copy/Insert (Visible on hover, or compact) */}
+											{/* Action Buttons: Edit, Delete, Copy/Insert (Visible on hover) */}
 											<div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
 												<button
 													type="button"
@@ -314,6 +351,14 @@ export function VariablesPanel({ onClose }: PanelProps) {
 													className="rounded-lg p-1 text-text-soft-400 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-white"
 												>
 													<Pencil size={11} />
+												</button>
+												<button
+													type="button"
+													onClick={() => setDeletingVar(v)}
+													title="Delete variable"
+													className="rounded-lg p-1 text-text-soft-400 hover:bg-bg-soft-200 hover:text-error-base dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-error-base"
+												>
+													<Trash2 size={11} />
 												</button>
 												<button
 													type="button"
@@ -354,6 +399,22 @@ export function VariablesPanel({ onClose }: PanelProps) {
 					if (!isOpen) setEditingVar(null);
 				}}
 				onSave={handleSaveVariableConfig}
+				onDelete={async (_name) => {
+					setDeletingVar(editingVar);
+					setEditingVar(null);
+				}}
+				isSubmitting={isSavingConfig}
+			/>
+
+			<DeleteTemplateVariableModal
+				isOpen={!!deletingVar}
+				onClose={() => setDeletingVar(null)}
+				variableName={deletingVar?.name ?? ""}
+				onConfirm={async () => {
+					if (deletingVar) {
+						await handleDeleteVariable(deletingVar.name);
+					}
+				}}
 				isSubmitting={isSavingConfig}
 			/>
 
