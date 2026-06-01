@@ -23,45 +23,40 @@ const Page = () => {
 
 	return (
 		<EditorProvider key={templateId} roomId={templateId}>
-			<div className="flex h-[calc(100vh-45px)] overflow-hidden">
-				<div className="relative m-2 flex flex-1 overflow-hidden rounded-[24px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
-					<div className="relative flex flex-1 overflow-hidden">
-						{/* Floating View Mode & History Toggles */}
-						<EditorToolbar />
+			<div className="flex h-[calc(100vh-45px)] items-center overflow-hidden pl-4 pr-2">
+				{/* Sidebar Editor Toolbar */}
+				<div className="flex flex-col justify-start py-4">
+					<EditorToolbar />
+				</div>
 
-						{viewMode !== "visual" ? (
-							<div className="flex h-full flex-1 overflow-hidden">
-								{/* Left side: Code Editor, History or Subpanels */}
-								<div className="flex h-full w-1/2 flex-col border-stroke-soft-200 border-r bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#080808]">
-									{viewMode === "code" && <CodeEditor />}
-									{viewMode === "history" && <VersionSidebar />}
-									{viewMode === "variables" && (
-										<VariablesPanel onClose={() => setViewMode("visual")} />
-									)}
-									{viewMode === "score" && (
-										<ScorePanel onClose={() => setViewMode("visual")} />
-									)}
-									{viewMode === "test" && (
-										<TestPanel onClose={() => setViewMode("visual")} />
-									)}
-								</div>
-								{/* Right side: Visual Editor & Send Details */}
-								<main className="hide-scrollbar flex h-full w-1/2 flex-col overflow-y-auto bg-bg-white-0 dark:bg-[#0a0a0a]">
-									<SendDetails />
-									<GeneratingOverlay />
-									<FullEmailBuilder />
-								</main>
-							</div>
-						) : (
-							<main className="hide-scrollbar flex h-full flex-1 flex-col overflow-y-auto">
-								<SendDetails />
-								<GeneratingOverlay />
-								<FullEmailBuilder />
-							</main>
-						)}
-					</div>
-					<div className="m-2 h-[calc(100vh-79px)] w-72 shrink-0 overflow-y-auto rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
-						<EmailInspector />
+				<div className="flex flex-1 h-full overflow-hidden">
+					{/* Left panel (Code, history, or subpanels) - Only visible when split/non-visual */}
+					{viewMode !== "visual" && (
+						<div className="relative m-2 flex flex-1 overflow-hidden rounded-[24px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#080808]">
+							{viewMode === "code" && <CodeEditor />}
+							{viewMode === "history" && <VersionSidebar />}
+							{viewMode === "variables" && (
+								<VariablesPanel onClose={() => setViewMode("visual")} />
+							)}
+							{viewMode === "score" && (
+								<ScorePanel onClose={() => setViewMode("visual")} />
+							)}
+							{viewMode === "test" && (
+								<TestPanel onClose={() => setViewMode("visual")} />
+							)}
+						</div>
+					)}
+
+					{/* Right panel (Visual builder + inspector) - Always visible */}
+					<div className="relative m-2 flex flex-1 overflow-hidden rounded-[24px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+						<main className="hide-scrollbar flex h-full flex-1 flex-col overflow-y-auto">
+							<SendDetails />
+							<GeneratingOverlay />
+							<FullEmailBuilder />
+						</main>
+						<div className="m-2 h-[calc(100vh-79px)] w-72 shrink-0 overflow-y-auto rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+							<EmailInspector />
+						</div>
 					</div>
 				</div>
 			</div>
