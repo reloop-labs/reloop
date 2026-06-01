@@ -224,7 +224,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 							return (
 								<div
 									key={v.name}
-									className="group relative flex flex-col gap-1.5 rounded-xl border border-stroke-soft-200 bg-white p-3 shadow-[0_1px_2px_rgba(0,0,0,0.02)] transition-all hover:border-violet-200 hover:bg-violet-50/10 dark:border-stroke-soft-100/10 dark:bg-zinc-900/30 dark:hover:border-violet-800/20 dark:hover:bg-violet-950/5"
+									className="group relative flex flex-col gap-1.5 rounded-2xl border border-stroke-soft-200 bg-white p-3 transition-all hover:border-stroke-soft-300 hover:bg-bg-weak-50 dark:border-stroke-soft-100/10 dark:bg-zinc-900/30 dark:hover:border-stroke-soft-100/20 dark:hover:bg-zinc-800/10"
 								>
 									{/* Top Row: Name and Type Badge */}
 									<div className="flex items-center justify-between">
@@ -260,38 +260,47 @@ export function VariablesPanel({ onClose }: PanelProps) {
 										)}
 
 										{/* Action Buttons: Edit, Delete, Copy/Insert (Visible on hover) */}
-										<div className="flex items-center gap-1">
-											<button
+										<div className="flex items-center">
+											<Button.Root
 												type="button"
+												variant="neutral"
+												mode="ghost"
+												size="xxsmall"
 												onClick={() => setEditingVar(v)}
 												title="Configure variable"
-												className="rounded-lg p-1 text-text-soft-400 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-white"
+												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
 											>
-												<Pencil size={11} />
-											</button>
-											<button
+												<Pencil size={15} />
+											</Button.Root>
+											<Button.Root
 												type="button"
+												variant="neutral"
+												mode="ghost"
+												size="xxsmall"
 												onClick={() => setDeletingVar(v)}
 												title="Delete variable"
-												className="rounded-lg p-1 text-text-soft-400 hover:bg-bg-soft-200 hover:text-error-base dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-error-base"
+												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-error-lighter hover:text-error-base dark:text-zinc-400 dark:hover:bg-error-base/10 dark:hover:text-error-base"
 											>
-												<Trash2 size={11} />
-											</button>
-											<button
+												<Trash2 size={15} />
+											</Button.Root>
+											<Button.Root
 												type="button"
+												variant="neutral"
+												mode="ghost"
+												size="xxsmall"
 												onClick={() => handleCopy(key)}
 												title="Copy placeholder"
-												className="rounded-lg p-1 text-text-soft-400 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-white"
+												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
 											>
 												{copiedKey === key ? (
 													<Check
-														size={11}
+														size={15}
 														className="fade-in zoom-in-50 animate-in text-emerald-500 duration-200"
 													/>
 												) : (
-													<Copy size={11} />
+													<Copy size={15} />
 												)}
-											</button>
+											</Button.Root>
 										</div>
 									</div>
 								</div>
