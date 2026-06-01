@@ -1,10 +1,10 @@
 "use client";
 
-import { useCurrentEditor } from "@tiptap/react";
-import { Copy, Check, RefreshCw, Code2 } from "lucide-react";
-import { useState, useEffect, useRef, useCallback } from "react";
-import { toast } from "sonner";
 import * as Button from "@reloop/ui/button";
+import { useCurrentEditor } from "@tiptap/react";
+import { Check, Code2, Copy, RefreshCw } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 // Helper to format HTML with clean indentation
 function formatHtml(html: string): string {
@@ -19,7 +19,10 @@ function formatHtml(html: string): string {
 			indent = Math.max(0, indent - 1);
 		}
 		formatted += "  ".repeat(indent) + trimmed + "\n";
-		if (trimmed.match(/^<\w[^>]*[^\/]>$/) && !trimmed.match(/^<(br|hr|img|input|link|meta)/)) {
+		if (
+			trimmed.match(/^<\w[^>]*[^/]>$/) &&
+			!trimmed.match(/^<(br|hr|img|input|link|meta)/)
+		) {
 			indent++;
 		}
 	});
@@ -91,12 +94,14 @@ export function CodeEditor() {
 	}, [htmlCode]);
 
 	return (
-		<div className="flex-1 flex flex-col h-full bg-zinc-950 overflow-hidden py-4 pr-4 pl-14 shrink-0">
-			<div className="flex flex-col h-full rounded-[18px] border border-stroke-soft-200 dark:border-stroke-soft-100/40 bg-zinc-950 overflow-hidden shadow-sm">
-				<div className="flex items-center justify-between px-4 py-2 border-b border-zinc-800 bg-zinc-900/60 shrink-0">
-					<div className="flex items-center gap-2">
-						<Code2 size={14} className="text-zinc-400" />
-						<span className="font-semibold text-zinc-200 text-xs">HTML Source</span>
+		<div className="flex h-full flex-1 shrink-0 flex-col overflow-hidden bg-transparent py-4 pr-4 pl-14">
+			<div className="flex h-full flex-col overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+				<div className="flex h-10 shrink-0 items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-3 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+					<div className="flex items-center gap-1.5 p-0">
+						<Code2 size={14} className="text-text-strong-950 dark:text-white" />
+						<span className="font-semibold text-text-strong-950 text-xs dark:text-white">
+							HTML Source
+						</span>
 					</div>
 					<div className="flex items-center gap-1.5">
 						<Button.Root
@@ -105,7 +110,7 @@ export function CodeEditor() {
 							mode="ghost"
 							size="xxsmall"
 							onClick={handleFormat}
-							className="h-7 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 px-2 rounded-md font-medium text-[11px] gap-1"
+							className="h-7 gap-1 rounded-md px-2 font-medium text-[11px] text-text-sub-600 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
 						>
 							<RefreshCw size={12} />
 							Format
@@ -116,19 +121,23 @@ export function CodeEditor() {
 							mode="ghost"
 							size="xxsmall"
 							onClick={handleCopy}
-							className="h-7 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 px-2 rounded-md font-medium text-[11px] gap-1"
+							className="h-7 gap-1 rounded-md px-2 font-medium text-[11px] text-text-sub-600 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
 						>
-							{copied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+							{copied ? (
+								<Check size={12} className="text-emerald-500" />
+							) : (
+								<Copy size={12} />
+							)}
 							Copy
 						</Button.Root>
 					</div>
 				</div>
-				<div className="flex-1 min-h-0 relative">
+				<div className="relative min-h-0 flex-1">
 					<textarea
 						value={htmlCode}
 						onChange={(e) => handleCodeChange(e.target.value)}
 						placeholder="<!-- Type your raw email HTML code here -->"
-						className="absolute inset-0 w-full h-full bg-transparent text-zinc-100 font-mono text-xs leading-relaxed p-4 resize-none focus:outline-none focus:ring-0 overflow-y-auto"
+						className="absolute inset-0 h-full w-full resize-none overflow-y-auto bg-transparent p-4 font-mono text-text-strong-950 text-xs leading-relaxed focus:outline-none focus:ring-0 dark:text-zinc-100"
 						spellCheck={false}
 					/>
 				</div>

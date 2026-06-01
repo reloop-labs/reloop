@@ -251,8 +251,8 @@ export function VersionSidebar() {
 	};
 
 	return (
-		<div className="flex-1 flex flex-col h-full bg-[#0a0a0a] overflow-hidden py-4 pr-4 pl-14 shrink-0">
-			<div className="flex flex-col h-full rounded-[18px] border border-stroke-soft-200 dark:border-stroke-soft-100/40 bg-bg-white-0 dark:bg-[#0a0a0a] overflow-hidden shadow-sm">
+		<div className="flex h-full flex-1 shrink-0 flex-col overflow-hidden bg-transparent py-4 pr-4 pl-14">
+			<div className="flex h-full flex-col overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 				{/* Header */}
 				<div className="flex h-10 items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-3 dark:bg-[#0a0a0a]">
 					<div className="flex items-center gap-1.5 p-0">
@@ -261,7 +261,7 @@ export function VersionSidebar() {
 							className="text-text-strong-950 dark:text-white"
 							strokeWidth={2}
 						/>
-						<span className="font-semibold text-text-strong-950 dark:text-white text-xs capitalize">
+						<span className="font-semibold text-text-strong-950 text-xs capitalize dark:text-white">
 							History
 						</span>
 					</div>

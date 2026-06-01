@@ -113,7 +113,10 @@ export const WebhookEventInlineSelector = ({
 	};
 
 	const groupedEvents = useMemo(() => {
-		const groups: { category: string; events: (typeof WEBHOOK_EVENTS)[number][] }[] = [];
+		const groups: {
+			category: string;
+			events: (typeof WEBHOOK_EVENTS)[number][];
+		}[] = [];
 		const seen = new Map<string, number>();
 
 		for (const event of WEBHOOK_EVENTS) {

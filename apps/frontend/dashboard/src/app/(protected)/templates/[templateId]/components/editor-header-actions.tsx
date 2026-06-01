@@ -9,7 +9,7 @@ import * as Modal from "@reloop/ui/modal";
 import * as Popover from "@reloop/ui/popover";
 import * as Textarea from "@reloop/ui/textarea";
 import { useCurrentEditor } from "@tiptap/react";
-import { ChevronDown, ChevronUp, Save, Layout, Code } from "lucide-react";
+import { ChevronDown, ChevronUp, Code, Layout, Save } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";

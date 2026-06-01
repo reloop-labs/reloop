@@ -334,10 +334,7 @@ function StatusPill({ status }: { status: string }) {
 
 // ─── Stepper Component ───────────────────────────────────────────────────────
 
-const STEP_STYLE: Record<
-	string,
-	{ activeCls: string; icon: string }
-> = {
+const STEP_STYLE: Record<string, { activeCls: string; icon: string }> = {
 	Sent: {
 		activeCls: "border-blue-200 bg-blue-50 text-blue-600",
 		icon: "send-1",
@@ -382,7 +379,8 @@ function StepperItem({
 	badge?: string;
 }) {
 	const cfg = STEP_STYLE[label] || {
-		activeCls: "border-information-base/20 bg-information-lighter/50 text-information-base",
+		activeCls:
+			"border-information-base/20 bg-information-lighter/50 text-information-base",
 		icon: "send-1",
 	};
 
@@ -432,7 +430,7 @@ function StepperItem({
 							)}
 						</div>
 						{time && isActive && (
-							<span className="mt-1 whitespace-nowrap text-[10px] leading-none text-text-soft-400">
+							<span className="mt-1 whitespace-nowrap text-[10px] text-text-soft-400 leading-none">
 								{formatRelativeTime(time)}
 							</span>
 						)}
@@ -442,7 +440,7 @@ function StepperItem({
 			{!isLast && (
 				<div
 					className={cn(
-						"mr-4 h-[1.5px] flex-1 border-t-[1.5px] border-dashed border-stroke-soft-200",
+						"mr-4 h-[1.5px] flex-1 border-stroke-soft-200 border-t-[1.5px] border-dashed",
 					)}
 				/>
 			)}
@@ -460,7 +458,11 @@ function EmailStatusSteps({ lifecycle }: { lifecycle: ParsedLifecycle }) {
 
 	const steps: StepItem[] = lifecycle.hasFailed
 		? [
-				{ label: "Sent", isActive: lifecycle.hasSent, time: lifecycle.sentTime },
+				{
+					label: "Sent",
+					isActive: lifecycle.hasSent,
+					time: lifecycle.sentTime,
+				},
 				{
 					label:
 						lifecycle.failedType === "bounced"
@@ -473,7 +475,11 @@ function EmailStatusSteps({ lifecycle }: { lifecycle: ParsedLifecycle }) {
 				},
 			]
 		: [
-				{ label: "Sent", isActive: lifecycle.hasSent, time: lifecycle.sentTime },
+				{
+					label: "Sent",
+					isActive: lifecycle.hasSent,
+					time: lifecycle.sentTime,
+				},
 				{
 					label: "Delivered",
 					isActive: lifecycle.hasDelivered,
@@ -483,13 +489,17 @@ function EmailStatusSteps({ lifecycle }: { lifecycle: ParsedLifecycle }) {
 					label: "Opened",
 					isActive: lifecycle.hasOpened,
 					time: lifecycle.openedTime,
-					badge: lifecycle.openedCount > 1 ? `${lifecycle.openedCount}x` : undefined,
+					badge:
+						lifecycle.openedCount > 1 ? `${lifecycle.openedCount}x` : undefined,
 				},
 				{
 					label: "Clicked",
 					isActive: lifecycle.hasClicked,
 					time: lifecycle.clickedTime,
-					badge: lifecycle.clickedCount > 1 ? `${lifecycle.clickedCount}x` : undefined,
+					badge:
+						lifecycle.clickedCount > 1
+							? `${lifecycle.clickedCount}x`
+							: undefined,
 				},
 			];
 

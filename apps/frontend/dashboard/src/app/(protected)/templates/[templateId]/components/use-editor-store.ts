@@ -31,7 +31,9 @@ interface EditorState {
 
 	// View mode (visual editor or split screens)
 	viewMode: "visual" | "code" | "history" | "variables" | "score" | "test";
-	setViewMode: (mode: "visual" | "code" | "history" | "variables" | "score" | "test") => void;
+	setViewMode: (
+		mode: "visual" | "code" | "history" | "variables" | "score" | "test",
+	) => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
