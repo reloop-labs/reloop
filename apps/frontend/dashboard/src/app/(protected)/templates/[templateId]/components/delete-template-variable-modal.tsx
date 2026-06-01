@@ -37,7 +37,7 @@ export const DeleteTemplateVariableModal = ({
 							<Icon name="trash" className="h-4 w-4 text-error-base" />
 						</div>
 						<div className="flex-1">
-							<Modal.Title>
+							<Modal.Title className="font-medium">
 								Delete {"{{{"} {variableName} {"}}}"}
 							</Modal.Title>
 						</div>
