@@ -10,6 +10,7 @@ import {
 	Quote,
 	Rows,
 	Type,
+	Braces,
 } from "lucide-react";
 
 const getIcon = (type: string) => {
@@ -35,6 +36,8 @@ const getIcon = (type: string) => {
 			return Rows;
 		case "body":
 			return FileText;
+		case "variable":
+			return Braces;
 		default:
 			return Box;
 	}

@@ -87,9 +87,14 @@ export const VariablesDropdown = forwardRef((props: VariablesDropdownProps, ref)
 	};
 
 	return (
-		<div className="z-50 min-w-[220px] rounded-xl border border-stroke-soft-200 bg-white p-1 shadow-xl dark:border-stroke-soft-100/20 dark:bg-zinc-950">
+		<div className="z-50 min-w-[220px] rounded-xl border border-[#333333] bg-[#222222] p-1.5 shadow-2xl select-none">
+			{/* Category Heading to match Slash Command Panelette style */}
+			<div className="px-2.5 py-1 text-[10px] font-bold tracking-wider text-[#888888] uppercase">
+				Variables
+			</div>
+
 			{filtered.length === 0 ? (
-				<div className="px-3 py-2 text-text-soft-400 text-xs italic dark:text-zinc-500">
+				<div className="px-2.5 py-1.5 text-xs italic text-[#666666]">
 					No matching variables
 				</div>
 			) : (
@@ -102,18 +107,18 @@ export const VariablesDropdown = forwardRef((props: VariablesDropdownProps, ref)
 							onClick={() => selectItem(index)}
 							className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs font-medium transition-colors ${
 								isSelected
-									? "bg-violet-50 text-violet-600 dark:bg-violet-950/30 dark:text-violet-400"
-									: "text-text-strong-950 hover:bg-bg-soft-100 dark:text-zinc-300 dark:hover:bg-zinc-900"
+									? "bg-[#383838] text-white"
+									: "text-[#d1d1d6] hover:bg-[#2c2c2c] hover:text-white"
 							}`}
 						>
-							<Braces size={12} className="shrink-0 text-violet-500" />
+							<Braces size={12} className={`shrink-0 ${isSelected ? "text-white" : "text-[#777777]"}`} />
 							<span className="truncate">{item}</span>
 						</button>
 					);
 				})
 			)}
 
-			<div className="my-1 border-stroke-soft-100 border-t dark:border-stroke-soft-100/10" />
+			<div className="my-1 border-t border-[#333333]" />
 
 			{/* Create Option */}
 			<button
@@ -121,8 +126,8 @@ export const VariablesDropdown = forwardRef((props: VariablesDropdownProps, ref)
 				onClick={() => selectItem(filtered.length)}
 				className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs font-semibold transition-colors ${
 					selectedIndex === filtered.length
-						? "bg-violet-50 text-violet-600 dark:bg-violet-950/30 dark:text-violet-400"
-						: "text-violet-500 hover:bg-violet-50/50 dark:hover:bg-violet-950/10"
+						? "bg-[#383838] text-white"
+						: "text-[#d1d1d6] hover:bg-[#2c2c2c] hover:text-white"
 				}`}
 			>
 				<Plus size={12} className="shrink-0" />
