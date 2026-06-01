@@ -56,7 +56,15 @@ export const createVersionRoute = new Elysia().use(authMiddleware).post(
 			name: t.Optional(t.String({ maxLength: 255 })),
 			isMajor: t.Optional(t.Boolean()),
 			renderedHtml: t.Optional(t.String()),
-			variables: t.Optional(t.Array(t.String())),
+			variables: t.Optional(
+				t.Array(
+					t.Object({
+						name: t.String(),
+						type: t.Union([t.Literal("string"), t.Literal("number")]),
+						defaultValue: t.Union([t.String(), t.Null()]),
+					})
+				)
+			),
 		}),
 		response: {
 			200: t.Composite([

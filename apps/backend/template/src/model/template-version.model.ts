@@ -14,7 +14,7 @@ export interface CreateVersionInput {
 	previewText?: string;
 	description?: string;
 	content: TemplateBlock[];
-	variables?: string[];
+	variables?: schema.TemplateVariable[];
 	renderedHtml?: string;
 	createdByUserId: string;
 }

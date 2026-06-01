@@ -2,6 +2,7 @@ import { TemplateErrors } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
 import { templateVersionModel } from "@be/template/model/template-version.model";
 import { extractVariablesFromContent } from "@be/template/utils/extract-variables";
+import * as schema from "@reloop/db/schema";
 import type { TemplateBlock } from "@reloop/db/schema";
 import { log } from "evlog";
 
@@ -18,7 +19,7 @@ export async function createVersion(params: {
 	name?: string;
 	isMajor?: boolean;
 	renderedHtml?: string;
-	variables?: string[];
+	variables?: schema.TemplateVariable[];
 }) {
 	const {
 		templateId,
@@ -78,8 +79,23 @@ export async function createVersion(params: {
 		}
 
 		// Auto-extract variables from content if not explicitly provided
-		const variables =
-			explicitVariables ?? extractVariablesFromContent(content);
+		let variables: schema.TemplateVariable[];
+		if (explicitVariables) {
+			variables = explicitVariables;
+		} else {
+			const rawVariables = extractVariablesFromContent(content);
+			const existingVars = existing.variables ?? [];
+			variables = rawVariables.map((raw) => {
+				const name = raw.replace(/^\{\{|\}\}$/g, "").trim();
+				const existingVar = existingVars.find((v) => v.name === name);
+				if (existingVar) return existingVar;
+				return {
+					name,
+					type: "string" as const,
+					defaultValue: null,
+				};
+			});
+		}
 
 		const result = await templateVersionModel.create({
 			templateId,
@@ -104,7 +120,7 @@ export async function createVersion(params: {
 		// Sync variables (and status/version for major) back to the parent template
 		const templateUpdatePayload: {
 			id: string;
-			variables: string[];
+			variables: schema.TemplateVariable[];
 			status?: "published";
 			currentVersion?: number;
 		} = {

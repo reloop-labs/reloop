@@ -41,19 +41,37 @@ export async function resolveTemplate_step5({
 		finalSubject = templateRecord.subject || finalSubject;
 		finalHtml = latestPublished?.renderedHtml || finalHtml;
 
-		if (template.variables) {
-			const substitute = (str: string) => {
-				let substituted = str;
-				for (const [key, value] of Object.entries(template.variables!)) {
-					const regex = new RegExp(`{{\\s*${key}\\s*}}`, "g");
-					substituted = substituted.replace(regex, String(value));
+		// 1. Populate default fallback values defined on the template
+		const finalVariables: Record<string, string | number> = {};
+		const templateVariables = (templateRecord.variables as any[]) || [];
+		for (const v of templateVariables) {
+			if (v && typeof v === "object" && v.name) {
+				if (v.defaultValue !== undefined && v.defaultValue !== null) {
+					finalVariables[v.name] = v.defaultValue;
 				}
-				return substituted;
-			};
-			if (finalSubject) finalSubject = substitute(finalSubject);
-			if (finalHtml) finalHtml = substitute(finalHtml);
-			if (finalText) finalText = substitute(finalText);
+			}
 		}
+
+		// 2. Override with request-specific variables
+		if (template.variables) {
+			for (const [key, value] of Object.entries(template.variables)) {
+				finalVariables[key] = value;
+			}
+		}
+
+		// 3. Substitute placeholders in subject, html, and text
+		const substitute = (str: string) => {
+			let substituted = str;
+			for (const [key, value] of Object.entries(finalVariables)) {
+				const regex = new RegExp(`{{\\s*${key}\\s*}}`, "g");
+				substituted = substituted.replace(regex, String(value));
+			}
+			return substituted;
+		};
+
+		if (finalSubject) finalSubject = substitute(finalSubject);
+		if (finalHtml) finalHtml = substitute(finalHtml);
+		if (finalText) finalText = substitute(finalText);
 	}
 
 	if (!finalHtml && !finalText) {

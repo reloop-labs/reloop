@@ -32,7 +32,15 @@ export const updateTemplateRoute = new Elysia().use(authMiddleware).put(
 			replyTo: t.Optional(t.String({ maxLength: 255 })),
 			previewText: t.Optional(t.String()),
 			content: t.Optional(t.Array(t.Any())),
-			variables: t.Optional(t.Array(t.String())),
+			variables: t.Optional(
+				t.Array(
+					t.Object({
+						name: t.String(),
+						type: t.Union([t.Literal("string"), t.Literal("number")]),
+						defaultValue: t.Union([t.String(), t.Null()]),
+					})
+				)
+			),
 			status: t.Optional(
 				t.Union([
 					t.Literal("draft"),

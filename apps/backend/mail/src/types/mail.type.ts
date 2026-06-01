@@ -50,5 +50,6 @@ export namespace MailTypes {
 		messageId: string;
 		status: string;
 		timestamp: string;
+		id: string;
 	}
 }

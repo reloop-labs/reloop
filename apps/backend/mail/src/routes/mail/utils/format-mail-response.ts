@@ -8,5 +8,6 @@ export function formatSendEmailResponse(
 		messageId: data.messageId,
 		status: data.status,
 		timestamp: data.timestamp,
+		id: data.id,
 	};
 }

@@ -21,10 +21,16 @@ export async function createTemplate(params: {
 		}
 
 		// Auto-extract variables from initial content if provided
-		const variables =
+		const rawVariables =
 			content && content.length > 0
 				? extractVariablesFromContent(content)
 				: [];
+
+		const variables = rawVariables.map((raw) => ({
+			name: raw.replace(/^\{\{|\}\}$/g, "").trim(),
+			type: "string" as const,
+			defaultValue: null,
+		}));
 
 		const result = await templateModel.create({
 			name: name.trim(),

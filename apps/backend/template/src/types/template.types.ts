@@ -26,7 +26,7 @@ export namespace TemplateTypes {
 		description?: string;
 		subject?: string;
 		content?: unknown[];
-		variables?: string[];
+		variables?: schema.TemplateVariable[];
 		status?: "draft" | "published" | "archived";
 	}
 

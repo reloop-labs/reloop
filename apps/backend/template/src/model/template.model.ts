@@ -13,7 +13,7 @@ export interface CreateTemplateInput {
 	organizationId: string;
 	createdByUserId: string;
 	content?: TemplateBlock[];
-	variables?: string[];
+	variables?: schema.TemplateVariable[];
 }
 
 export interface UpdateTemplateInput {
@@ -25,7 +25,7 @@ export interface UpdateTemplateInput {
 	replyTo?: string;
 	previewText?: string;
 	content?: TemplateBlock[];
-	variables?: string[];
+	variables?: schema.TemplateVariable[];
 	status?: "draft" | "published" | "archived";
 	currentVersion?: number;
 }
@@ -173,7 +173,16 @@ export const templateResponseSchema = t.Object({
 		t.Literal("archived"),
 	]),
 	content: t.Array(t.Any()),
-	variables: t.Union([t.Array(t.String()), t.Null()]),
+	variables: t.Union([
+		t.Array(
+			t.Object({
+				name: t.String(),
+				type: t.Union([t.Literal("string"), t.Literal("number")]),
+				defaultValue: t.Union([t.String(), t.Null()]),
+			})
+		),
+		t.Null(),
+	]),
 	currentVersion: t.Union([t.Number(), t.Null()]),
 	thumbnailUrl: t.Union([t.String(), t.Null()]),
 	isDefault: t.Boolean(),
@@ -194,7 +203,16 @@ export const templateVersionResponseSchema = t.Object({
 	previewText: t.Union([t.String(), t.Null()]),
 	description: t.Union([t.String(), t.Null()]),
 	content: t.Array(t.Any()),
-	variables: t.Union([t.Array(t.String()), t.Null()]),
+	variables: t.Union([
+		t.Array(
+			t.Object({
+				name: t.String(),
+				type: t.Union([t.Literal("string"), t.Literal("number")]),
+				defaultValue: t.Union([t.String(), t.Null()]),
+			})
+		),
+		t.Null(),
+	]),
 	renderedHtml: t.Union([t.String(), t.Null()]),
 	createdByUserId: t.String(),
 	createdAt: t.Date(),

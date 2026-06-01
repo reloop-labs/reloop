@@ -1,7 +1,7 @@
 import { TemplateErrors } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
 import { extractVariablesFromContent } from "@be/template/utils/extract-variables";
-import type { TemplateBlock } from "@reloop/db/schema";
+import type { TemplateBlock, TemplateVariable } from "@reloop/db/schema";
 import { log } from "evlog";
 
 export async function updateTemplate(params: {
@@ -14,7 +14,7 @@ export async function updateTemplate(params: {
 	replyTo?: string;
 	previewText?: string;
 	content?: TemplateBlock[];
-	variables?: string[];
+	variables?: TemplateVariable[];
 	status?: "draft" | "published" | "archived";
 }) {
 	const { id, organizationId, ...updateData } = params;
@@ -29,7 +29,18 @@ export async function updateTemplate(params: {
 		// Auto-extract variables from content when content is updated and
 		// variables are not explicitly provided in the payload
 		if (updateData.content !== undefined && updateData.variables === undefined) {
-			updateData.variables = extractVariablesFromContent(updateData.content);
+			const rawVariables = extractVariablesFromContent(updateData.content);
+			const existingVars = existing.variables ?? [];
+			updateData.variables = rawVariables.map((raw) => {
+				const name = raw.replace(/^\{\{|\}\}$/g, "").trim();
+				const existingVar = existingVars.find((v) => v.name === name);
+				if (existingVar) return existingVar;
+				return {
+					name,
+					type: "string" as const,
+					defaultValue: null,
+				};
+			});
 		}
 
 		const result = await templateModel.update({

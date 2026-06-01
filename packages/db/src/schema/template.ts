@@ -24,6 +24,13 @@ export const templateStatusEnum = pgEnum("template_status", [
 	"archived",
 ]);
 
+export interface TemplateVariable {
+	name: string;
+	type: "string" | "number";
+	defaultValue: string | null;
+}
+
+
 // Block type enum for email components
 export const templateBlockTypeEnum = pgEnum("template_block_type", [
 	"heading",
@@ -72,7 +79,7 @@ export const template = pgTable(
 		// The template content as Lexical JSON state
 		content: jsonb("content").$type<TemplateBlock[]>().notNull().default([]),
 		// Extracted variables from content
-		variables: jsonb("variables").$type<string[]>().default([]),
+		variables: jsonb("variables").$type<TemplateVariable[]>().default([]),
 		// Current published version number
 		currentVersion: integer("current_version").default(1),
 		// Thumbnail preview URL
@@ -115,7 +122,7 @@ export const templateVersion = pgTable(
 		previewText: text("preview_text"),
 		description: text("description"),
 		content: jsonb("content").$type<TemplateBlock[]>().notNull(),
-		variables: jsonb("variables").$type<string[]>().default([]),
+		variables: jsonb("variables").$type<TemplateVariable[]>().default([]),
 		// Rendered HTML for quick access
 		renderedHtml: text("rendered_html"),
 		createdByUserId: text("created_by_user_id")
