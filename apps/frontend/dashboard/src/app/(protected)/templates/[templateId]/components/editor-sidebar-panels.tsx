@@ -21,11 +21,24 @@ import {
 } from "lucide-react";
 import { useCurrentEditor } from "@tiptap/react";
 import { useParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { AddTemplateVariableModal } from "./add-template-variable-modal";
+import { EditTemplateVariableModal } from "./edit-template-variable-modal";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
+import * as Badge from "@reloop/ui/badge";
+import Spinner from "@reloop/ui/spinner";
+import { KbdCommand } from "@reloop/ui/kbd-command";
+import { KbdEnter } from "@reloop/ui/kbd-enter";
+import { KbdEsc } from "@reloop/ui/kbd-esc";
+import * as Modal from "@reloop/ui/modal";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface PanelProps {
+	onOpenChange?: (open: boolean) => void;
 	onClose: () => void;
 }
 
@@ -54,6 +67,48 @@ function toLabel(key: string) {
 	const inner = key.replace(/^\{\{|\}\}$/g, "").trim();
 	return inner.replace(/[._]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
+
+type PropertyType = "string" | "number";
+
+const TYPE_OPTIONS: {
+	value: PropertyType;
+	label: string;
+	icon: string;
+	description: string;
+	color: string;
+	badgeColor: "blue" | "purple";
+}[] = [
+	{
+		value: "string",
+		label: "String",
+		icon: "type",
+		description: "Free-form text",
+		color: "text-primary-base",
+		badgeColor: "blue",
+	},
+	{
+		value: "number",
+		label: "Number",
+		icon: "hash",
+		description: "Integer or decimal",
+		color: "text-primary-base",
+		badgeColor: "purple",
+	},
+];
+
+const slugify = (value: string) =>
+	value
+		.toLowerCase()
+		.replace(/\s+/g, "_")
+		.replace(/[^a-z0-9_]/g, "");
+
+const validatePropertyName = (name: string): string => {
+	if (!name) return "";
+	if (!/^[a-zA-Z0-9_]*$/.test(name))
+		return "Only letters, numbers, and underscores";
+	if (!/^[a-zA-Z_]/.test(name)) return "Must start with a letter or underscore";
+	return "";
+};
 
 /* ------------------------------------------------------------------ */
 /* Variables Panel Component                                         */
@@ -94,12 +149,9 @@ export function VariablesPanel({ onClose }: PanelProps) {
 
 	const [copiedKey, setCopiedKey] = useState<string | null>(null);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [insertKey, setInsertKey] = useState("");
-	const [isInserting, setIsInserting] = useState(false);
-	const insertInputRef = useRef<HTMLInputElement>(null);
-
-	const [editingVar, setEditingVar] = useState<MappedVariable | null>(null);
+	const [isCreatingVar, setIsCreatingVar] = useState(false);
 	const [isSavingConfig, setIsSavingConfig] = useState(false);
+	const [editingVar, setEditingVar] = useState<MappedVariable | null>(null);
 
 	const handleCopy = (key: string) => {
 		navigator.clipboard.writeText(key);
@@ -108,30 +160,58 @@ export function VariablesPanel({ onClose }: PanelProps) {
 		setTimeout(() => setCopiedKey(null), 2000);
 	};
 
-	/** Insert {{key}} at the current cursor position in the editor */
-	const handleInsert = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!insertKey.trim()) return;
-		const raw = insertKey.trim();
-		if (!raw) return;
-		const k = raw.startsWith("{{" ) ? (raw.endsWith("}}") ? raw : raw + "}}") : `{{${raw}}}`;
-		if (editor) {
-			editor.chain().focus().insertContent(k).run();
-			toast.success(`Inserted ${k}`);
-		} else {
-			navigator.clipboard.writeText(k);
-			toast.success(`Copied ${k} — paste into your email`);
+	const handleCreateAndInsertVar = async (name: string, type: "string" | "number", defaultValue: string | null) => {
+		if (!name.trim() || !templateId) return;
+
+		setIsSavingConfig(true);
+		try {
+			// 1. Insert into editor
+			const placeholder = `{{${name}}}`;
+			if (editor) {
+				editor.chain().focus().insertContent(placeholder).run();
+				toast.success(`Inserted ${placeholder}`);
+			} else {
+				navigator.clipboard.writeText(placeholder);
+				toast.success(`Copied ${placeholder} — paste into your email`);
+			}
+
+			// 2. Add to template variables list in DB
+			const newVar = { name, type, defaultValue };
+			const exists = detectedVars.some((v) => v.name === name);
+			const updatedVariables = exists
+				? detectedVars.map((v) => (v.name === name ? newVar : v))
+				: [...detectedVars, newVar];
+
+			const response = await fetch(`/api/template/v1/${templateId}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					variables: updatedVariables,
+				}),
+			});
+
+			if (!response.ok) {
+				const err = await response.json();
+				throw new Error(err.message || "Failed to save variable configuration");
+			}
+
+			toast.success(`Variable ${name} configured successfully`);
+			mutate();
+		} catch (error: any) {
+			toast.error(error.message || "Something went wrong");
+		} finally {
+			setIsSavingConfig(false);
 		}
-		setInsertKey("");
-		setIsInserting(false);
 	};
 
-	const handleSaveVariableConfig = async () => {
-		if (!editingVar || !templateId) return;
+	const handleSaveVariableConfig = async (updatedVar: MappedVariable) => {
+		if (!templateId) return;
 		setIsSavingConfig(true);
 		try {
 			const updatedVariables = detectedVars.map((v: MappedVariable) =>
-				v.name === editingVar.name ? editingVar : v,
+				v.name === updatedVar.name ? updatedVar : v,
 			);
 
 			const response = await fetch(`/api/template/v1/${templateId}`, {
@@ -149,9 +229,8 @@ export function VariablesPanel({ onClose }: PanelProps) {
 				throw new Error(err.message || "Failed to update variable config");
 			}
 
-			toast.success(`Updated variable properties for ${editingVar.name}`);
+			toast.success(`Updated variable properties for ${updatedVar.name}`);
 			mutate();
-			setEditingVar(null);
 		} catch (error: any) {
 			toast.error(error.message || "Something went wrong");
 		} finally {
@@ -210,62 +289,16 @@ export function VariablesPanel({ onClose }: PanelProps) {
 					</div>
 				</div>
 
-				{/* ── Insert Variable ── */}
+				{/* ── Insert/Create Variable Button ── */}
 				<div className="border-stroke-soft-200 border-b px-3 py-2.5 dark:border-stroke-soft-100/20">
-					{!isInserting ? (
-						<button
-							type="button"
-							onClick={() => {
-								setIsInserting(true);
-								setTimeout(() => insertInputRef.current?.focus(), 50);
-							}}
-							className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-stroke-soft-200 py-2 font-semibold text-[11px] text-text-sub-600 transition-colors hover:border-violet-300 hover:bg-violet-50/30 hover:text-violet-600 dark:border-stroke-soft-100/20 dark:text-zinc-400 dark:hover:border-violet-700/40 dark:hover:bg-violet-950/10 dark:hover:text-violet-400"
-						>
-							<Plus size={12} />
-							Insert Variable
-						</button>
-					) : (
-						<form onSubmit={handleInsert} className="flex items-center gap-1.5">
-							<div className="relative flex-1">
-								<span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 font-mono text-[10px] text-text-soft-400 dark:text-zinc-500">
-									{"{{"}{"}"}
-								</span>
-								<input
-									ref={insertInputRef}
-									type="text"
-									placeholder="variable_name"
-									value={insertKey}
-									onChange={(e) => setInsertKey(e.target.value)}
-									onKeyDown={(e) => {
-										if (e.key === "Escape") {
-											setIsInserting(false);
-											setInsertKey("");
-										}
-									}}
-									className="w-full rounded-lg border border-violet-300 bg-white py-1.5 pr-2.5 pl-8 font-mono text-text-strong-950 text-xs focus:outline-none focus:ring-1 focus:ring-violet-400 dark:border-violet-700/50 dark:bg-zinc-900 dark:text-white"
-								/>
-							</div>
-							<Button.Root
-								type="submit"
-								variant="primary"
-								size="xxsmall"
-								disabled={!insertKey.trim()}
-								className="shrink-0 px-2.5 text-[10px]"
-							>
-								Insert
-							</Button.Root>
-							<button
-								type="button"
-								onClick={() => {
-									setIsInserting(false);
-									setInsertKey("");
-								}}
-								className="shrink-0 rounded p-1 text-text-soft-400 hover:text-text-strong-950 dark:text-zinc-500 dark:hover:text-white"
-							>
-								<X size={13} />
-							</button>
-						</form>
-					)}
+					<button
+						type="button"
+						onClick={() => setIsCreatingVar(true)}
+						className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-stroke-soft-200 py-2 font-semibold text-[11px] text-text-sub-600 transition-colors hover:border-violet-300 hover:bg-violet-50/30 hover:text-violet-600 dark:border-stroke-soft-100/20 dark:text-zinc-400 dark:hover:border-violet-700/40 dark:hover:bg-violet-950/10 dark:hover:text-violet-400"
+					>
+						<Plus size={12} />
+						Create &amp; Insert Variable
+					</button>
 				</div>
 
 				{/* ── Section 1: Detected in template ── */}
@@ -348,16 +381,14 @@ export function VariablesPanel({ onClose }: PanelProps) {
 												</span>
 											</div>
 
-											<span
-												className={cn(
-													"rounded-full px-2 py-0.5 text-[9px] font-medium leading-none border uppercase tracking-wider",
-													v.type === "number"
-														? "bg-amber-50 text-amber-700 border-amber-200/50 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30"
-														: "bg-violet-50 text-violet-700 border-violet-200/50 dark:bg-violet-950/20 dark:text-violet-400 dark:border-violet-900/30",
-												)}
+											<Badge.Root
+												size="small"
+												variant="light"
+												color={v.type === "number" ? "purple" : "blue"}
+												className="capitalize font-semibold text-[9px]"
 											>
 												{v.type}
-											</span>
+											</Badge.Root>
 										</div>
 
 										{/* Middle Row: Fallback/Default value if configured */}
@@ -410,112 +441,23 @@ export function VariablesPanel({ onClose }: PanelProps) {
 				</div>
 			</div>
 
-			{/* ── Slide-in Edit Panel ── */}
-			{editingVar && (
-				<div className="absolute inset-0 z-20 flex flex-col bg-white dark:bg-[#0a0a0a] p-4">
-					{/* Edit Header */}
-					<div className="mb-4 flex items-center justify-between border-b border-stroke-soft-200 pb-2 dark:border-stroke-soft-100/20">
-						<span className="font-semibold text-text-strong-950 text-xs dark:text-white">
-							Configure: {editingVar.name}
-						</span>
-						<button
-							type="button"
-							onClick={() => setEditingVar(null)}
-							className="rounded p-1 text-text-soft-400 hover:text-text-strong-950 dark:text-zinc-500 dark:hover:text-white"
-						>
-							<X size={14} />
-						</button>
-					</div>
+			<AddTemplateVariableModal
+				open={isCreatingVar}
+				onOpenChange={setIsCreatingVar}
+				onAdd={handleCreateAndInsertVar}
+				isSubmitting={isSavingConfig}
+				detectedVars={detectedVars}
+			/>
 
-					{/* Edit Form */}
-					<div className="flex-1 space-y-4">
-						<div className="space-y-1.5">
-							<label className="font-medium text-[11px] text-text-sub-600 dark:text-zinc-400">
-								Property Type
-							</label>
-							<div className="grid grid-cols-2 gap-2">
-								<button
-									type="button"
-									onClick={() =>
-										setEditingVar({ ...editingVar, type: "string" })
-									}
-									className={cn(
-										"flex items-center justify-center gap-1.5 rounded-lg border py-2 text-xs font-medium transition-all",
-										editingVar.type === "string"
-											? "border-violet-500 bg-violet-50 text-violet-700 dark:bg-violet-950/20 dark:text-violet-400"
-											: "border-stroke-soft-200 hover:bg-bg-soft-100 dark:border-stroke-soft-100/20 dark:hover:bg-zinc-800",
-									)}
-								>
-									String
-								</button>
-								<button
-									type="button"
-									onClick={() =>
-										setEditingVar({ ...editingVar, type: "number" })
-									}
-									className={cn(
-										"flex items-center justify-center gap-1.5 rounded-lg border py-2 text-xs font-medium transition-all",
-										editingVar.type === "number"
-											? "border-violet-500 bg-violet-50 text-violet-700 dark:bg-violet-950/20 dark:text-violet-400"
-											: "border-stroke-soft-200 hover:bg-bg-soft-100 dark:border-stroke-soft-100/20 dark:hover:bg-zinc-800",
-									)}
-								>
-									Number
-								</button>
-							</div>
-						</div>
-
-						<div className="space-y-1.5">
-							<label className="font-medium text-[11px] text-text-sub-600 dark:text-zinc-400">
-								Default Fallback Value
-							</label>
-							<input
-								type="text"
-								value={editingVar.defaultValue ?? ""}
-								onChange={(e) =>
-									setEditingVar({
-										...editingVar,
-										defaultValue: e.target.value || null,
-									})
-								}
-								placeholder="e.g. large, WELCOME10"
-								className="w-full rounded-lg border border-stroke-soft-200 bg-white px-3 py-1.5 text-text-strong-950 text-xs focus:outline-none focus:ring-1 focus:ring-violet-400 dark:border-stroke-soft-100/30 dark:bg-zinc-900 dark:text-white"
-							/>
-							<p className="text-[10px] text-text-soft-400 leading-normal dark:text-zinc-500">
-								This fallback default value will be used during resolution if the
-								variable is not supplied at send-time.
-							</p>
-						</div>
-					</div>
-
-					{/* Save/Cancel Buttons */}
-					<div className="mt-4 flex gap-2 border-t border-stroke-soft-200 pt-3 dark:border-stroke-soft-100/20">
-						<Button.Root
-							type="button"
-							variant="neutral"
-							size="xsmall"
-							onClick={() => setEditingVar(null)}
-							className="flex-1"
-						>
-							Cancel
-						</Button.Root>
-						<Button.Root
-							type="button"
-							variant="primary"
-							size="xsmall"
-							onClick={handleSaveVariableConfig}
-							disabled={isSavingConfig}
-							className="flex-1 text-white bg-violet-600 hover:bg-violet-700 dark:bg-violet-600 dark:hover:bg-violet-700"
-						>
-							{isSavingConfig ? (
-								<Loader2 size={12} className="animate-spin text-white" />
-							) : (
-								"Save Property"
-							)}
-						</Button.Root>
-					</div>
-				</div>
-			)}
+			<EditTemplateVariableModal
+				property={editingVar}
+				open={!!editingVar}
+				onOpenChange={(isOpen) => {
+					if (!isOpen) setEditingVar(null);
+				}}
+				onSave={handleSaveVariableConfig}
+				isSubmitting={isSavingConfig}
+			/>
 
 			{/* ── Footer hint ── */}
 			<div className="shrink-0 border-stroke-soft-100 border-t bg-bg-weak-50 px-4 py-2 dark:border-stroke-soft-100/10 dark:bg-zinc-900/10">
