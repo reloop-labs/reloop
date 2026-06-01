@@ -327,8 +327,11 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 	return (
 		<PresenceProvider awareness={provider?.awareness ?? null}>
 			<EditorContext.Provider value={{ editor }}>
-				<div ref={containerRef} className="bg-bg-weak-50 dark:bg-black">
-					<div className="grid grid-cols-3 items-center px-4 pt-2">
+				<div
+					ref={containerRef}
+					className="flex h-screen flex-col overflow-hidden bg-bg-weak-50 dark:bg-black"
+				>
+					<div className="grid shrink-0 grid-cols-3 items-center px-4 pt-2">
 						<div className="flex items-center justify-start">
 							<AnimatedBackButton />
 						</div>
@@ -342,7 +345,7 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 							/>
 						</div>
 					</div>
-					{children}
+					<div className="min-h-0 flex-1 overflow-hidden">{children}</div>
 					<RemoteCursors cursors={remoteCursors} />
 					<BubbleMenu
 						hideWhenActiveNodes={["button", "image"]}

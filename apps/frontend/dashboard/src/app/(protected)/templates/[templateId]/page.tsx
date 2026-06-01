@@ -23,7 +23,7 @@ const Page = () => {
 
 	return (
 		<EditorProvider key={templateId} roomId={templateId}>
-			<div className="flex h-[calc(100vh-45px)] items-start overflow-hidden pt-2 pr-2 pl-4">
+			<div className="flex h-full items-stretch overflow-hidden pt-2 pr-2 pl-4">
 				{/* Sidebar Editor Toolbar (Vertical, Left, Top-aligned) */}
 				<div className="flex flex-col justify-start py-2">
 					<EditorToolbar />
@@ -49,12 +49,14 @@ const Page = () => {
 
 					{/* Right panel (Visual builder + inspector) - Always visible */}
 					<div className="relative m-2 flex flex-1 overflow-hidden rounded-[24px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
-						<main className="hide-scrollbar flex h-full flex-1 flex-col overflow-y-auto">
+						<main className="flex h-full flex-1 flex-col overflow-hidden">
 							<SendDetails />
 							<GeneratingOverlay />
-							<FullEmailBuilder />
+							<div className="min-h-0 flex-1 overflow-y-auto py-4">
+								<FullEmailBuilder />
+							</div>
 						</main>
-						<div className="m-2 h-[calc(100vh-87px)] w-72 shrink-0 overflow-y-auto rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+						<div className="my-2 mr-2 h-[calc(100%-16px)] w-72 shrink-0 overflow-y-auto rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 							<EmailInspector />
 						</div>
 					</div>
