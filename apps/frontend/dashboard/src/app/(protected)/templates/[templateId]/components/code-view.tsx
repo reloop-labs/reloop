@@ -4,6 +4,7 @@ import { html } from "@codemirror/lang-html";
 import { EditorView } from "@codemirror/view";
 import { composeReactEmail } from "@react-email/editor/core";
 import * as Button from "@reloop/ui/button";
+import { generateJSON } from "@tiptap/html";
 import { useCurrentEditor } from "@tiptap/react";
 import { xcodeDark } from "@uiw/codemirror-theme-xcode";
 import CodeMirror from "@uiw/react-codemirror";
@@ -59,22 +60,32 @@ export function CodeEditor() {
 	}, [editor, isFocused, updateHtmlCode]);
 
 	// 3. Sync code changes (Code -> Visual)
+	//
+	// We use `generateJSON` from `@tiptap/html` — the exact same function that
+	// the editor's internal paste handler uses (see createPasteHandler.ts in
+	// @react-email/editor source). It runs the HTML through the editor's own
+	// extension schema (parseHTML rules) which correctly maps:
+	//   - table[role="presentation"] + max-width  →  container node
+	//   - a[data-id="react-email-button"]         →  button node
+	//   - img[src]                                →  image node
+	//   - a[href] / a[target]                     →  link mark
+	//   - span[style]                             →  preserved-style mark
+	//   - body                                    →  body node
 	const handleCodeChange = useCallback(
 		(newVal: string) => {
 			setHtmlCode(newVal);
 			if (editor) {
 				isSelfUpdatingRef.current = true;
 				try {
-					let contentToSet = newVal;
-					const lowerVal = newVal.toLowerCase();
-					if (
-						lowerVal.includes("<table") ||
-						lowerVal.includes("<html") ||
-						lowerVal.includes("<!doctype")
-					) {
-						contentToSet = cleanHtmlBeforeSetContent(newVal);
-					}
-					editor.commands.setContent(contentToSet, { emitUpdate: false });
+					// Strip outer document scaffold (DOCTYPE / <html> / <head>) and
+					// remove dangerous tags before handing off to the schema parser.
+					const safeHtml = sanitizeEmailHtml(newVal);
+
+					// generateJSON parses the HTML through the live schema — identical
+					// to how the editor processes clipboard paste events internally.
+					const extensions = editor.extensionManager.extensions;
+					const json = generateJSON(safeHtml, extensions);
+					editor.commands.setContent(json, { emitUpdate: false });
 				} catch (err) {
 					console.error("Failed to set content from HTML code editor:", err);
 				}
@@ -131,7 +142,7 @@ export function CodeEditor() {
 						size="xxsmall"
 						onClick={handleCopy}
 						disabled={!htmlCode || isLoading}
-						className="h-7 gap-1 rounded-md px-2 font-medium text-foreground/70 text-[11px] hover:bg-neutral-100 hover:text-foreground dark:hover:bg-neutral-800"
+						className="h-7 gap-1 rounded-md px-2 font-medium text-[11px] text-foreground/70 hover:bg-neutral-100 hover:text-foreground dark:hover:bg-neutral-800"
 					>
 						{copied ? (
 							<Check size={12} className="text-green-600 dark:text-green-400" />
@@ -161,196 +172,93 @@ export function CodeEditor() {
 						borderRadius: "24px",
 						overflow: "hidden",
 					}}
-					className="h-full w-full rounded-[24px] overflow-hidden font-mono"
+					className="h-full w-full overflow-hidden rounded-[24px] font-mono"
 				/>
 			</div>
 		</div>
 	);
 }
 
-// Sanitizes full email HTML by stripping structural layout tables/wrappers and extracting only semantic blocks
-function cleanHtmlBeforeSetContent(html: string): string {
+/** Tags that must never appear in the editor content. */
+const FORBIDDEN_TAGS = new Set([
+	"script",
+	"iframe",
+	"object",
+	"embed",
+	"meta",
+	"base",
+	"style",
+	"link",
+]);
+
+/**
+ * Minimal sanitizer that mirrors what the `@react-email/editor` paste handler
+ * (`sanitizePastedHtml`) does before calling `generateJSON`:
+ *
+ *  1. Parse the raw string (handles `<!DOCTYPE>`, `<html>`, `<head>` scaffolding).
+ *  2. Drop forbidden/dangerous tags (script, iframe, style, …).
+ *  3. Strip email layout centering (<center>, align="center", text-align:center)
+ *     so that ProseMirror/TipTap doesn't inherit center-alignment from the
+ *     outer email scaffold tables and wrapper elements.
+ *  4. Return `body.innerHTML` so `generateJSON` receives clean inner HTML.
+ *
+ * We do NOT strip tables, divs, or any structural elements — the editor's
+ * own `parseHTML()` rules (container, section, button, image, link, …) are
+ * responsible for mapping them to the correct TipTap node types.
+ */
+function sanitizeEmailHtml(rawHtml: string): string {
 	const parser = new DOMParser();
-	const doc = parser.parseFromString(html, "text/html");
+	const doc = parser.parseFromString(rawHtml, "text/html");
 
-	// 1. Identify and extract button tables (single cell table containing only a link)
-	const tables = Array.from(doc.querySelectorAll("table"));
-	for (const table of tables) {
-		const links = Array.from(table.querySelectorAll("a"));
-		if (links.length === 1 && links[0]) {
-			const link = links[0];
-			const td = table.querySelector("td");
-
-			const tableText = table.textContent?.trim() || "";
-			const linkText = link.textContent?.trim() || "";
-
-			if (tableText === linkText) {
-				// Convert to react-email button link
-				link.setAttribute("data-id", "react-email-button");
-
-				// Pull background color, padding, border-radius, color styles from table/td to link if available
-				const linkStyles: string[] = [];
-				if (link.getAttribute("style")) {
-					linkStyles.push(link.getAttribute("style") || "");
-				}
-
-				const bgColor =
-					td?.getAttribute("bgcolor") ||
-					td?.style.backgroundColor ||
-					table.getAttribute("bgcolor") ||
-					table.style.backgroundColor;
-
-				if (bgColor) {
-					linkStyles.push(`background-color: ${bgColor}`);
-				}
-
-				const color = link.style.color || td?.style.color;
-				if (color) {
-					linkStyles.push(`color: ${color}`);
-				}
-
-				const padding = td?.style.padding;
-				if (padding) {
-					linkStyles.push(`padding: ${padding}`);
-				}
-
-				const borderRadius = td?.style.borderRadius || table.style.borderRadius;
-				if (borderRadius) {
-					linkStyles.push(`border-radius: ${borderRadius}`);
-				}
-
-				const border = td?.style.border;
-				if (border) {
-					linkStyles.push(`border: ${border}`);
-				}
-
-				if (linkStyles.length > 0) {
-					link.setAttribute("style", linkStyles.join("; "));
-				}
-
-				table.parentNode?.replaceChild(link, table);
-			}
+	// Remove dangerous elements
+	for (const tag of FORBIDDEN_TAGS) {
+		for (const el of Array.from(doc.body.getElementsByTagName(tag))) {
+			el.remove();
 		}
 	}
 
-	// 2. Identify other links that look like buttons
-	const allLinks = Array.from(doc.querySelectorAll("a"));
-	for (const link of allLinks) {
-		const className = link.getAttribute("class") || "";
-		const style = link.getAttribute("style") || "";
-		if (
-			className.includes("button") ||
-			(style.includes("background-color") && style.includes("padding")) ||
-			link.getAttribute("data-id") === "react-email-button"
-		) {
-			link.setAttribute("data-id", "react-email-button");
+	// Strip email-layout centering so TipTap doesn't inherit center-alignment
+	// from the outer scaffold. Email HTML typically centers content via:
+	//   <center>…</center>
+	//   <table align="center">…</table>
+	//   style="text-align: center" on wrapper elements
+	stripEmailCentering(doc.body);
+
+	return doc.body.innerHTML;
+}
+
+/**
+ * Recursively walks the DOM and removes email-specific centering attributes/styles
+ * that would bleed into the TipTap document as textAlign marks.
+ */
+function stripEmailCentering(root: Element): void {
+	// Unwrap <center> → replace with its children in-place
+	for (const center of Array.from(root.getElementsByTagName("center"))) {
+		const parent = center.parentNode;
+		if (!parent) continue;
+		while (center.firstChild) {
+			parent.insertBefore(center.firstChild, center);
 		}
+		center.remove();
 	}
 
-	// 3. Helper to recursively extract semantic tags
-	function getSemanticHtml(node: Node): string {
-		if (node.nodeType === Node.TEXT_NODE) {
-			return node.textContent || "";
+	// Walk all remaining elements and strip centering attributes/styles
+	const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+	let node: Node | null = root;
+	while (node) {
+		const el = node as Element;
+
+		// Remove align="center" attribute (common on <table>, <td>, <div>)
+		if (el.getAttribute("align")?.toLowerCase() === "center") {
+			el.removeAttribute("align");
 		}
 
-		if (node.nodeType !== Node.ELEMENT_NODE) {
-			return "";
+		// Strip text-align: center from inline styles
+		const style = (el as HTMLElement).style;
+		if (style && style.textAlign?.toLowerCase() === "center") {
+			style.removeProperty("text-align");
 		}
 
-		const el = node as HTMLElement;
-		const tagName = el.tagName.toLowerCase();
-
-		// Supported semantic tags
-		if (
-			[
-				"p",
-				"h1",
-				"h2",
-				"h3",
-				"h4",
-				"h5",
-				"h6",
-				"ul",
-				"ol",
-				"li",
-				"blockquote",
-				"hr",
-				"br",
-				"img",
-			].includes(tagName)
-		) {
-			let innerHtml = "";
-			for (const child of Array.from(el.childNodes)) {
-				innerHtml += getSemanticHtml(child);
-			}
-
-			if (tagName === "img") {
-				const src = el.getAttribute("src") || "";
-				const alt = el.getAttribute("alt") || "";
-				const width = el.getAttribute("width") || "";
-				const height = el.getAttribute("height") || "";
-				return `<img src="${src}" alt="${alt}" ${width ? `width="${width}"` : ""} ${height ? `height="${height}"` : ""} />`;
-			}
-
-			if (tagName === "hr") return "<hr />";
-			if (tagName === "br") return "<br />";
-
-			const styleAttr = el.getAttribute("style") || "";
-			const styleString = styleAttr ? ` style="${styleAttr}"` : "";
-
-			return `<${tagName}${styleString}>${innerHtml}</${tagName}>`;
-		}
-
-		if (tagName === "a") {
-			const href = el.getAttribute("href") || "";
-			const style = el.getAttribute("style") || "";
-			const dataId = el.getAttribute("data-id") || "";
-			const dataIdString = dataId ? ` data-id="${dataId}"` : "";
-			const text = el.textContent || "";
-			return `<a href="${href}"${dataIdString} style="${style}">${text}</a>`;
-		}
-
-		if (
-			[
-				"strong",
-				"b",
-				"em",
-				"i",
-				"u",
-				"code",
-				"span",
-				"font",
-				"s",
-				"strike",
-			].includes(tagName)
-		) {
-			let innerHtml = "";
-			for (const child of Array.from(el.childNodes)) {
-				innerHtml += getSemanticHtml(child);
-			}
-			let targetTag = tagName;
-			if (tagName === "b") targetTag = "strong";
-			if (tagName === "i") targetTag = "em";
-			if (tagName === "strike") targetTag = "s";
-
-			const styleAttr = el.getAttribute("style") || "";
-			const styleString = styleAttr ? ` style="${styleAttr}"` : "";
-
-			return `<${targetTag}${styleString}>${innerHtml}</${targetTag}>`;
-		}
-
-		// Otherwise, unwrap the element
-		let childHtml = "";
-		for (const child of Array.from(el.childNodes)) {
-			childHtml += getSemanticHtml(child);
-		}
-		return childHtml;
+		node = walker.nextNode();
 	}
-
-	let resultHtml = "";
-	for (const child of Array.from(doc.body.childNodes)) {
-		resultHtml += getSemanticHtml(child);
-	}
-
-	return resultHtml;
 }
