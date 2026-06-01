@@ -2,9 +2,10 @@
 
 import { Inspector } from "@react-email/editor/ui";
 import { useCurrentEditor } from "@tiptap/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import useSWR from "swr";
+import { toast } from "sonner";
 import Breadcrumb from "./breadcrumb";
 import { ColorPicker } from "./color-picker";
 import { ImageSrcControl } from "./image-src-control";
@@ -42,53 +43,189 @@ function ColorRow({
 function VariableInspectorCard({ name }: { name: string }) {
 	const params = useParams<{ templateId: string }>();
 	const templateId = params?.templateId;
+	const { editor } = useCurrentEditor();
 
 	// Fetch variable meta config from DB to find type and default value
-	const { data: templateData } = useSWR(
+	const { data: templateData, mutate } = useSWR(
 		templateId ? `/api/template/v1/${templateId}` : null,
 		(url) => fetch(url, { credentials: "include" }).then((res) => res.json())
 	);
 
 	const variables = templateData?.variables ?? [];
 	const matchedVar = variables.find((v: any) => {
-		if (typeof v === "string") {
-			return v.replace(/^\{\{|\}\}$/g, "").trim() === name;
-		}
-		return v?.name === name;
+		const vName = typeof v === "string" ? v.replace(/^\{\{|\}\}$/g, "").trim() : v?.name;
+		return vName === name;
 	});
 
 	const varType = matchedVar?.type ?? "string";
 	const defaultValue = matchedVar?.defaultValue ?? "";
 
+	const [localType, setLocalType] = useState(varType);
+	const [localDefaultValue, setLocalDefaultValue] = useState(defaultValue);
+
+	// Synchronize local state when selection changes
+	useEffect(() => {
+		setLocalType(varType);
+		setLocalDefaultValue(defaultValue);
+	}, [name, varType, defaultValue]);
+
+	const handleSave = async (newType: string, newDefaultValue: string) => {
+		if (!templateId) return;
+		try {
+			const updatedVar = {
+				name,
+				type: newType,
+				defaultValue: newDefaultValue,
+			};
+			const updatedVariables = variables.map((v: any) => {
+				const vName = typeof v === "string" ? v.replace(/^\{\{|\}\}$/g, "").trim() : v?.name;
+				if (vName === name) {
+					return updatedVar;
+				}
+				return typeof v === "string" ? { name: vName, type: "string", defaultValue: "" } : v;
+			});
+
+			const response = await fetch(`/api/template/v1/${templateId}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					variables: updatedVariables,
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error("Failed to update variable properties");
+			}
+
+			// Trigger SWR mutation to update local caches and trigger visual cue removal instantly
+			mutate();
+		} catch (error) {
+			console.error("Error saving variable config:", error);
+		}
+	};
+
+	const handleDelete = async () => {
+		if (!templateId) return;
+		try {
+			const updatedVariables = variables.filter((v: any) => {
+				const vName = typeof v === "string" ? v.replace(/^\{\{|\}\}$/g, "").trim() : v?.name;
+				return vName !== name;
+			});
+
+			const response = await fetch(`/api/template/v1/${templateId}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					variables: updatedVariables,
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error("Failed to delete variable");
+			}
+
+			toast.success(`Deleted variable ${name}`);
+			
+			// Delete the active variable node in the editor
+			if (editor) {
+				editor.commands.deleteSelection();
+			}
+
+			mutate();
+		} catch (error: any) {
+			toast.error(error.message || "Failed to delete variable");
+		}
+	};
+
 	return (
 		<InspectorSection>
 			<SectionHeader label="Variable Properties" />
 			
-			<PropRow label="Name">
-				<div className="text-xs font-semibold text-text-strong-950 dark:text-zinc-300 bg-bg-soft-150 dark:bg-zinc-900 rounded px-2 py-1 font-mono select-all truncate border border-stroke-soft-200 dark:border-stroke-soft-100/10">
-					{name}
+			<div className="flex flex-col gap-4 px-4 py-2">
+				{/* ── Name (Read-only reference) ── */}
+				<div className="flex flex-col gap-1.5">
+					<label className="text-xs font-semibold text-text-sub-600 dark:text-zinc-400">Name</label>
+					<div className="text-xs font-semibold text-text-strong-950 dark:text-zinc-300 bg-bg-soft-150 dark:bg-zinc-900/60 rounded-lg px-3 py-2 font-mono select-all truncate border border-stroke-soft-200 dark:border-stroke-soft-100/10">
+						{name}
+					</div>
 				</div>
-			</PropRow>
 
-			<PropRow label="Type">
-				<div className="text-xs text-text-sub-600 dark:text-zinc-400 capitalize font-semibold bg-violet-50 dark:bg-violet-950/20 text-violet-600 dark:text-violet-400 rounded px-2 py-1 inline-block">
-					{varType}
+				{/* ── Fallback Value ── */}
+				<div className="flex flex-col gap-1.5">
+					<label className="text-xs font-semibold text-text-sub-600 dark:text-zinc-400">Fallback value</label>
+					<input
+						type="text"
+						value={localDefaultValue}
+						onChange={(e) => setLocalDefaultValue(e.target.value)}
+						onBlur={() => handleSave(localType, localDefaultValue)}
+						onKeyDown={(e) => {
+							if (e.key === "Enter") {
+								handleSave(localType, localDefaultValue);
+								(e.target as HTMLElement).blur();
+							}
+						}}
+						placeholder="Value if variable is empty"
+						className="w-full text-xs font-medium bg-bg-soft-150 dark:bg-zinc-900 border border-stroke-soft-200 dark:border-stroke-soft-100/10 text-text-strong-950 dark:text-zinc-200 placeholder-text-disabled-300 dark:placeholder-zinc-550 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-violet-500 transition-all duration-200"
+					/>
+					<span className="text-[11px] text-text-disabled-300 dark:text-zinc-500 leading-normal font-normal">
+						In case the variable is empty, this fallback value will be used.
+					</span>
 				</div>
-			</PropRow>
 
-			<PropRow label="Default Value">
-				<div className="text-xs text-text-sub-600 dark:text-zinc-400 italic">
-					{defaultValue !== null && defaultValue !== "" ? (
-						<code className="rounded bg-bg-soft-150 px-1 py-0.5 font-mono text-violet-600 dark:bg-zinc-800/80 dark:text-violet-400 font-semibold">
-							"{defaultValue}"
-						</code>
-					) : (
-						<span className="text-text-disabled-300 dark:text-zinc-500 font-medium">
-							No default value set
-						</span>
-					)}
+				{/* ── Type Dropdown ── */}
+				<div className="flex flex-col gap-1.5">
+					<label className="text-xs font-semibold text-text-sub-600 dark:text-zinc-400">Type</label>
+					<div className="relative">
+						<select
+							value={localType}
+							onChange={(e) => {
+								const val = e.target.value;
+								setLocalType(val);
+								handleSave(val, localDefaultValue);
+							}}
+							className="w-full text-xs bg-bg-soft-150 dark:bg-zinc-900 border border-stroke-soft-200 dark:border-stroke-soft-100/10 text-text-strong-950 dark:text-zinc-200 rounded-lg px-3 py-2 pr-8 appearance-none focus:outline-none focus:ring-1 focus:ring-violet-500 font-medium cursor-pointer transition-all duration-200"
+						>
+							<option value="string">String</option>
+							<option value="number">Number</option>
+							<option value="boolean">Boolean</option>
+							<option value="date">Date</option>
+							<option value="array">Array</option>
+							<option value="object">Object</option>
+						</select>
+						<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-text-sub-600 dark:text-zinc-400">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="12"
+								height="12"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							>
+								<polyline points="6 9 12 15 18 9" />
+							</svg>
+						</div>
+					</div>
 				</div>
-			</PropRow>
+
+				{/* ── Delete Action ── */}
+				<div className="flex flex-col gap-1.5 mt-2">
+					<label className="text-xs font-semibold text-text-sub-600 dark:text-zinc-400">Delete</label>
+					<button
+						type="button"
+						onClick={handleDelete}
+						className="w-full text-xs font-semibold bg-red-500/10 hover:bg-red-500/20 active:scale-98 text-red-500 dark:text-red-400 rounded-lg px-3 py-2.5 text-center transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-red-500 cursor-pointer"
+					>
+						Delete variable
+					</button>
+				</div>
+			</div>
 		</InspectorSection>
 	);
 }

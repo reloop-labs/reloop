@@ -32,7 +32,11 @@ const Page = () => {
 				<div className="flex h-full flex-1 overflow-hidden">
 					{/* Left panel (Code, history, or subpanels) - Only visible when split/non-visual */}
 					{viewMode !== "visual" && (
-						<div className="relative m-2 flex w-1/4 min-w-[320px] shrink-0 overflow-hidden rounded-[24px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#080808]">
+						<div
+							className={`relative m-2 flex shrink-0 overflow-hidden rounded-[24px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#080808] ${
+								viewMode === "code" ? "w-1/2" : "w-[356px]"
+							}`}
+						>
 							{viewMode === "code" && <CodeEditor />}
 							{viewMode === "history" && <VersionSidebar />}
 							{viewMode === "variables" && (
@@ -56,9 +60,11 @@ const Page = () => {
 								<FullEmailBuilder />
 							</div>
 						</main>
-						<div className="my-2 mr-2 h-[calc(100%-16px)] w-72 shrink-0 overflow-y-auto rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
-							<EmailInspector />
-						</div>
+						{viewMode === "visual" && (
+							<div className="my-2 mr-2 h-[calc(100%-16px)] w-72 shrink-0 overflow-y-auto rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+								<EmailInspector />
+							</div>
+						)}
 					</div>
 				</div>
 			</div>
