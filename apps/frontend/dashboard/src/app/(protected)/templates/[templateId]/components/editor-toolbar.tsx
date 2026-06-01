@@ -9,7 +9,7 @@ export function EditorToolbar() {
 	const { viewMode, setViewMode } = useEditorStore();
 
 	return (
-		<div className="flex flex-col gap-1.5 rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-1 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+		<div className="flex flex-col gap-1.5 p-1">
 			<Tooltip.Root>
 				<Tooltip.Trigger asChild>
 					<button

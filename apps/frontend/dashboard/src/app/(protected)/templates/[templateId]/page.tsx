@@ -23,9 +23,9 @@ const Page = () => {
 
 	return (
 		<EditorProvider key={templateId} roomId={templateId}>
-			<div className="flex h-[calc(100vh-45px)] items-center overflow-hidden pl-4 pr-2">
-				{/* Sidebar Editor Toolbar */}
-				<div className="flex flex-col justify-start py-4">
+			<div className="flex h-[calc(100vh-45px)] items-start overflow-hidden pl-4 pr-2 pt-2">
+				{/* Sidebar Editor Toolbar (Vertical, Left, Top-aligned) */}
+				<div className="flex flex-col justify-start py-2">
 					<EditorToolbar />
 				</div>
 
