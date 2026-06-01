@@ -251,13 +251,98 @@ function sanitizeEmailHtml(rawHtml: string): string {
 		useEditorStore.getState().setSubject(previewText);
 	}
 
-	// 4. Find content cell to strip outer structural delivery tables
-	const contentCell = findContentCell(doc.body);
-	if (contentCell) {
-		const contentNodes = Array.from(contentCell.childNodes);
-		doc.body.innerHTML = "";
-		for (const node of contentNodes) {
-			doc.body.appendChild(node);
+	// 4. Find container table and convert to a container div, preserving styles and attributes.
+	let containerTable: Element | null = doc.querySelector('table[data-type="container"]');
+	if (!containerTable) {
+		// Look for any table that has container indicators (like max-width or class name)
+		const tables = Array.from(doc.body.getElementsByTagName("table"));
+		for (const table of tables) {
+			const style = table.getAttribute("style") || "";
+			const hasIndicator =
+				table.className.includes("container") ||
+				style.includes("max-width") ||
+				style.includes("maxWidth") ||
+				(/^\d+$/.test(table.getAttribute("width") || "") && table.getAttribute("width") !== "100%");
+			if (hasIndicator) {
+				containerTable = table;
+				break;
+			}
+		}
+		// Fallback to the first table if none found
+		if (!containerTable && tables.length > 0) {
+			containerTable = tables[0] || null;
+		}
+	}
+
+	if (containerTable) {
+		// Find the innermost cell of this container table that holds the content
+		const contentCell =
+			containerTable.querySelector("tbody > tr > td") ||
+			containerTable.querySelector("tr > td") ||
+			containerTable.querySelector("td");
+
+		if (contentCell) {
+			// Create a standard container div that TipTap schema matches perfectly
+			const containerDiv = doc.createElement("div");
+			containerDiv.setAttribute("data-type", "container");
+			containerDiv.setAttribute("class", "node-container");
+
+			// Merge styles from containerTable and contentCell
+			const scratch = doc.createElement("div") as HTMLDivElement;
+			scratch.style.cssText = containerTable.getAttribute("style") || "";
+
+			// Copy standard attributes (id, class, align, width, height) if present
+			for (const attr of ["class", "id", "align", "width", "height"]) {
+				const val = containerTable.getAttribute(attr);
+				if (val) {
+					containerDiv.setAttribute(attr, val);
+				}
+			}
+
+			// Merge contentCell style (like padding)
+			const cellStyleText = contentCell.getAttribute("style") || "";
+			if (cellStyleText) {
+				const cellScratch = doc.createElement("div") as HTMLDivElement;
+				cellScratch.style.cssText = cellStyleText;
+				for (let i = 0; i < cellScratch.style.length; i++) {
+					const prop = cellScratch.style[i];
+					if (!prop) continue;
+					const val = cellScratch.style.getPropertyValue(prop);
+					if (val) {
+						scratch.style.setProperty(prop, val);
+					}
+				}
+			}
+
+			const mergedStyle = scratch.style.cssText;
+			if (mergedStyle) {
+				containerDiv.setAttribute("style", mergedStyle);
+			}
+
+			// Move all children from contentCell to containerDiv
+			const contentNodes = Array.from(contentCell.childNodes);
+			for (const node of contentNodes) {
+				containerDiv.appendChild(node);
+			}
+
+			// Replace the entire body contents with the containerDiv
+			doc.body.innerHTML = "";
+			doc.body.appendChild(containerDiv);
+		}
+	} else {
+		// If there are no tables at all, check if we need to wrap the body in a container div
+		const existingContainer = doc.querySelector('div[data-type="container"]');
+		if (!existingContainer) {
+			const containerDiv = doc.createElement("div");
+			containerDiv.setAttribute("data-type", "container");
+			containerDiv.setAttribute("class", "node-container");
+
+			// Move all body children to the container div
+			const bodyNodes = Array.from(doc.body.childNodes);
+			for (const node of bodyNodes) {
+				containerDiv.appendChild(node);
+			}
+			doc.body.appendChild(containerDiv);
 		}
 	}
 
@@ -284,77 +369,6 @@ function sanitizeEmailHtml(rawHtml: string): string {
 	expandShorthandStyles(doc.body);
 
 	return doc.body.innerHTML;
-}
-
-function findContentCell(root: HTMLElement): Element | null {
-	// Check for a column TD (standard react-email columns)
-	const columnTd = root.querySelector('td[data-id="__react-email-column"]');
-	if (columnTd) {
-		const innerTable = columnTd.querySelector("table");
-		if (innerTable) {
-			const cell =
-				innerTable.querySelector("tbody > tr > td") ||
-				innerTable.querySelector("tr > td") ||
-				innerTable.querySelector("td");
-			if (cell && isContentCell(cell)) {
-				return cell;
-			}
-		}
-		if (isContentCell(columnTd)) {
-			return columnTd;
-		}
-	}
-
-	// General structural table walker
-	let current: Element | null = root.querySelector("table");
-	while (current) {
-		const cell =
-			current.querySelector("tbody > tr > td") ||
-			current.querySelector("tr > td") ||
-			current.querySelector("td");
-
-		if (cell) {
-			if (isContentCell(cell)) {
-				return cell;
-			}
-			const nextTable = cell.querySelector("table");
-			if (nextTable && cell.children.length === 1) {
-				current = nextTable;
-			} else {
-				break;
-			}
-		} else {
-			break;
-		}
-	}
-
-	return null;
-}
-
-function isContentCell(el: Element): boolean {
-	const children = Array.from(el.children).filter((child) => {
-		const style = child.getAttribute("style") || "";
-		const isHiddenDiv =
-			child.tagName.toLowerCase() === "div" &&
-			(style.includes("display:none") ||
-				style.includes("display: none") ||
-				style.includes("opacity:0") ||
-				child.getAttribute("data-skip-in-text") === "true");
-		return !isHiddenDiv;
-	});
-
-	if (children.length > 1) {
-		return true;
-	}
-
-	if (children.length === 1 && children[0]) {
-		const tag = children[0].tagName.toLowerCase();
-		if (tag !== "table" && tag !== "tbody" && tag !== "tr" && tag !== "td") {
-			return true;
-		}
-	}
-
-	return false;
 }
 
 /**
