@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { KbdCommand } from "@reloop/ui/kbd-command";
@@ -12,7 +11,8 @@ import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import { cn } from "@reloop/ui/cn";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 type PropertyType = "string" | "number";
 
@@ -36,10 +36,18 @@ const TYPE_OPTIONS = [
 ];
 
 interface EditTemplateVariableModalProps {
-	property: { name: string; type: "string" | "number"; defaultValue: string | null } | null;
+	property: {
+		name: string;
+		type: "string" | "number";
+		defaultValue: string | null;
+	} | null;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onSave: (property: { name: string; type: "string" | "number"; defaultValue: string | null }) => Promise<void>;
+	onSave: (property: {
+		name: string;
+		type: "string" | "number";
+		defaultValue: string | null;
+	}) => Promise<void>;
 	isSubmitting: boolean;
 }
 
@@ -107,7 +115,7 @@ export const EditTemplateVariableModal = ({
 												size="small"
 												variant="lighter"
 												color={selectedType.badgeColor}
-												className="h-5 font-medium text-xs capitalize"
+												className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
 											>
 												{propertyType}
 											</Badge.Root>
@@ -149,7 +157,9 @@ export const EditTemplateVariableModal = ({
 														)}
 													>
 														<Icon
-															name={opt.icon as Parameters<typeof Icon>[0]["name"]}
+															name={
+																opt.icon as Parameters<typeof Icon>[0]["name"]
+															}
 															className={cn(
 																"h-3 w-3",
 																isSelected ? opt.color : "text-text-sub-600",
@@ -166,7 +176,7 @@ export const EditTemplateVariableModal = ({
 																	type: "spring",
 																	stiffness: 500,
 																	damping: 30,
-																	}}
+																}}
 																className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary-base"
 															>
 																<Icon
@@ -193,7 +203,9 @@ export const EditTemplateVariableModal = ({
 
 							{/* Fallback Value (Editable) */}
 							<div className="space-y-1.5">
-								<Label.Root htmlFor="edit-fallback-value">Default Value</Label.Root>
+								<Label.Root htmlFor="edit-fallback-value">
+									Default Value
+								</Label.Root>
 								<Input.Root size="small" className="rounded-xl">
 									<Input.Wrapper>
 										<Input.Input

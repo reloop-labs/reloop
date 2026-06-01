@@ -1,7 +1,18 @@
 "use client";
 
+import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
+import { KbdCommand } from "@reloop/ui/kbd-command";
+import { KbdEnter } from "@reloop/ui/kbd-enter";
+import { KbdEsc } from "@reloop/ui/kbd-esc";
+import * as Label from "@reloop/ui/label";
+import * as Modal from "@reloop/ui/modal";
+import Spinner from "@reloop/ui/spinner";
+import { useCurrentEditor } from "@tiptap/react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
 	Award,
 	Braces,
@@ -11,30 +22,19 @@ import {
 	Copy,
 	FileCode2,
 	Loader2,
+	Pencil,
 	Plus,
 	Send,
 	ShieldAlert,
 	Sparkles,
 	X,
-	Pencil,
 } from "lucide-react";
-import { useCurrentEditor } from "@tiptap/react";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { AddTemplateVariableModal } from "./add-template-variable-modal";
-import { EditTemplateVariableModal } from "./edit-template-variable-modal";
 import { toast } from "sonner";
 import useSWR from "swr";
-import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
-import * as Label from "@reloop/ui/label";
-import * as Badge from "@reloop/ui/badge";
-import Spinner from "@reloop/ui/spinner";
-import { KbdCommand } from "@reloop/ui/kbd-command";
-import { KbdEnter } from "@reloop/ui/kbd-enter";
-import { KbdEsc } from "@reloop/ui/kbd-esc";
-import * as Modal from "@reloop/ui/modal";
-import { AnimatePresence, motion } from "framer-motion";
+import { AddTemplateVariableModal } from "./add-template-variable-modal";
+import { EditTemplateVariableModal } from "./edit-template-variable-modal";
 
 interface PanelProps {
 	onOpenChange?: (open: boolean) => void;
@@ -117,10 +117,11 @@ export function VariablesPanel({ onClose }: PanelProps) {
 	const templateId = params?.templateId;
 
 	/* fetch template so we can read the auto-extracted variables */
-	const { data: templateData, isLoading, mutate } = useSWR(
-		templateId ? `/api/template/v1/${templateId}` : null,
-		fetcher,
-	);
+	const {
+		data: templateData,
+		isLoading,
+		mutate,
+	} = useSWR(templateId ? `/api/template/v1/${templateId}` : null, fetcher);
 
 	interface MappedVariable {
 		name: string;
@@ -129,20 +130,22 @@ export function VariablesPanel({ onClose }: PanelProps) {
 	}
 
 	const rawVars = templateData?.variables ?? [];
-	const detectedVars: MappedVariable[] = rawVars.map((v: any): MappedVariable => {
-		if (typeof v === "string") {
+	const detectedVars: MappedVariable[] = rawVars.map(
+		(v: any): MappedVariable => {
+			if (typeof v === "string") {
+				return {
+					name: v.replace(/^\{\{|\}\}$/g, "").trim(),
+					type: "string" as const,
+					defaultValue: null,
+				};
+			}
 			return {
-				name: v.replace(/^\{\{|\}\}$/g, "").trim(),
-				type: "string" as const,
-				defaultValue: null,
+				name: v?.name ?? "",
+				type: (v?.type ?? "string") as "string" | "number",
+				defaultValue: v?.defaultValue ?? null,
 			};
-		}
-		return {
-			name: v?.name ?? "",
-			type: (v?.type ?? "string") as "string" | "number",
-			defaultValue: v?.defaultValue ?? null,
-		};
-	});
+		},
+	);
 
 	const { editor } = useCurrentEditor();
 
@@ -158,7 +161,11 @@ export function VariablesPanel({ onClose }: PanelProps) {
 		setTimeout(() => setCopiedKey(null), 2000);
 	};
 
-	const handleCreateAndInsertVar = async (name: string, type: "string" | "number", defaultValue: string | null) => {
+	const handleCreateAndInsertVar = async (
+		name: string,
+		type: "string" | "number",
+		defaultValue: string | null,
+	) => {
 		if (!name.trim() || !templateId) return;
 
 		setIsSavingConfig(true);
@@ -259,13 +266,12 @@ export function VariablesPanel({ onClose }: PanelProps) {
 
 			{/* ── Scrollable Body ── */}
 			<div className="hide-scrollbar flex-1 overflow-y-auto">
-
 				{/* ── Insert/Create Variable Button ── */}
 				<div className="border-stroke-soft-200 border-b px-3 py-2.5 dark:border-stroke-soft-100/20">
 					<button
 						type="button"
 						onClick={() => setIsCreatingVar(true)}
-						className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-stroke-soft-200 py-2 font-semibold text-[11px] text-text-sub-600 transition-colors hover:border-violet-300 hover:bg-violet-50/30 hover:text-violet-600 dark:border-stroke-soft-100/20 dark:text-zinc-400 dark:hover:border-violet-700/40 dark:hover:bg-violet-950/10 dark:hover:text-violet-400"
+						className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-stroke-soft-200 border-dashed py-2 font-semibold text-[11px] text-text-sub-600 transition-colors hover:border-violet-300 hover:bg-violet-50/30 hover:text-violet-600 dark:border-stroke-soft-100/20 dark:text-zinc-400 dark:hover:border-violet-700/40 dark:hover:bg-violet-950/10 dark:hover:text-violet-400"
 					>
 						<Plus size={12} />
 						Create &amp; Insert Variable
@@ -330,15 +336,15 @@ export function VariablesPanel({ onClose }: PanelProps) {
 									>
 										{/* Top Row: Name and Type Badge */}
 										<div className="flex items-center justify-between">
-											<div className="flex items-center gap-1.5 min-w-0">
-												<span className="font-mono text-[10px] text-text-soft-400 dark:text-zinc-500 font-bold">
+											<div className="flex min-w-0 items-center gap-1.5">
+												<span className="font-bold font-mono text-[10px] text-text-soft-400 dark:text-zinc-500">
 													{"{"}
 													{"{"}
 												</span>
 												<span className="truncate font-semibold text-text-strong-950 text-xs dark:text-zinc-100">
 													{v.name}
 												</span>
-												<span className="font-mono text-[10px] text-text-soft-400 dark:text-zinc-500 font-bold">
+												<span className="font-bold font-mono text-[10px] text-text-soft-400 dark:text-zinc-500">
 													{"}"}
 													{"}"}
 												</span>
@@ -346,31 +352,31 @@ export function VariablesPanel({ onClose }: PanelProps) {
 
 											<Badge.Root
 												size="small"
-												variant="light"
+												variant="lighter"
 												color={v.type === "number" ? "purple" : "blue"}
-												className="capitalize font-semibold text-[9px]"
+												className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
 											>
 												{v.type}
 											</Badge.Root>
 										</div>
 
 										{/* Middle Row: Fallback/Default value if configured */}
-										<div className="flex items-center justify-between min-w-0">
+										<div className="flex min-w-0 items-center justify-between">
 											{v.defaultValue !== null && v.defaultValue !== "" ? (
 												<p className="truncate text-[10px] text-text-sub-600 dark:text-zinc-400">
 													Fallback:{" "}
-													<code className="rounded bg-bg-soft-150 px-1 font-mono dark:bg-zinc-800/80 text-violet-600 dark:text-violet-400">
+													<code className="rounded bg-bg-soft-150 px-1 font-mono text-violet-600 dark:bg-zinc-800/80 dark:text-violet-400">
 														"{v.defaultValue}"
 													</code>
 												</p>
 											) : (
-												<p className="text-[10px] italic text-text-soft-400 dark:text-zinc-500">
+												<p className="text-[10px] text-text-soft-400 italic dark:text-zinc-500">
 													No fallback default set
 												</p>
 											)}
 
 											{/* Action Buttons: Edit, Copy/Insert (Visible on hover, or compact) */}
-											<div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+											<div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
 												<button
 													type="button"
 													onClick={() => setEditingVar(v)}
@@ -388,7 +394,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 													{copiedKey === key ? (
 														<Check
 															size={11}
-															className="text-emerald-500 animate-in fade-in zoom-in-50 duration-200"
+															className="fade-in zoom-in-50 animate-in text-emerald-500 duration-200"
 														/>
 													) : (
 														<Copy size={11} />

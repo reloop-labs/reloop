@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { KbdCommand } from "@reloop/ui/kbd-command";
@@ -12,7 +11,8 @@ import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import { cn } from "@reloop/ui/cn";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 
 type PropertyType = "string" | "number";
 
@@ -57,9 +57,17 @@ const slugify = (text: string) => {
 interface AddTemplateVariableModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onAdd: (name: string, type: "string" | "number", defaultValue: string | null) => Promise<void>;
+	onAdd: (
+		name: string,
+		type: "string" | "number",
+		defaultValue: string | null,
+	) => Promise<void>;
 	isSubmitting: boolean;
-	detectedVars: { name: string; type: "string" | "number"; defaultValue: string | null }[];
+	detectedVars: {
+		name: string;
+		type: "string" | "number";
+		defaultValue: string | null;
+	}[];
 }
 
 export const AddTemplateVariableModal = ({
@@ -113,8 +121,6 @@ export const AddTemplateVariableModal = ({
 		handleOpenChange(false);
 	};
 
-
-
 	return (
 		<Modal.Root open={open} onOpenChange={handleOpenChange}>
 			<Modal.Content
@@ -130,7 +136,9 @@ export const AddTemplateVariableModal = ({
 							<Icon name="tag" className="h-4 w-4" />
 						</div>
 						<div className="flex-1">
-							<Modal.Title className="font-medium">Add Template Property</Modal.Title>
+							<Modal.Title className="font-medium">
+								Add Template Property
+							</Modal.Title>
 						</div>
 						<button
 							type="button"
@@ -201,8 +209,6 @@ export const AddTemplateVariableModal = ({
 									)}
 								</div>
 
-
-
 								{/* Type — card picker */}
 								<div className="flex flex-col gap-2">
 									<Label.Root>
@@ -236,7 +242,9 @@ export const AddTemplateVariableModal = ({
 															)}
 														>
 															<Icon
-																name={opt.icon as Parameters<typeof Icon>[0]["name"]}
+																name={
+																	opt.icon as Parameters<typeof Icon>[0]["name"]
+																}
 																className={cn(
 																	"h-3 w-3",
 																	isSelected ? opt.color : "text-text-sub-600",
@@ -323,9 +331,9 @@ export const AddTemplateVariableModal = ({
 												</p>
 												<Badge.Root
 													size="small"
-													variant="light"
+													variant="lighter"
 													color={selectedType.badgeColor}
-													className="mt-0.5 capitalize"
+													className="mt-0.5 h-5 rounded-md px-1.5 font-medium text-xs capitalize"
 												>
 													{selectedType.label}
 												</Badge.Root>
@@ -347,9 +355,9 @@ export const AddTemplateVariableModal = ({
 												</span>
 												<Badge.Root
 													size="small"
-													variant="light"
+													variant="lighter"
 													color={selectedType.badgeColor}
-													className="capitalize"
+													className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
 												>
 													{selectedType.label}
 												</Badge.Root>

@@ -156,7 +156,7 @@ export const EditPropertyModal = ({
 												size="small"
 												variant="lighter"
 												color={getBadgeColor(property.propertyType)}
-												className="h-5 font-medium text-xs capitalize"
+												className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
 											>
 												{property.propertyType}
 											</Badge.Root>

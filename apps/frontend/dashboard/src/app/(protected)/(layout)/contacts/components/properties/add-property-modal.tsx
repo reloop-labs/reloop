@@ -365,9 +365,9 @@ export const AddPropertyModal = ({
 												</p>
 												<Badge.Root
 													size="small"
-													variant="light"
+													variant="lighter"
 													color={selectedType.badgeColor}
-													className="mt-0.5 capitalize"
+													className="mt-0.5 h-5 rounded-md px-1.5 font-medium text-xs capitalize"
 												>
 													{selectedType.label}
 												</Badge.Root>
@@ -389,9 +389,9 @@ export const AddPropertyModal = ({
 												</span>
 												<Badge.Root
 													size="small"
-													variant="light"
+													variant="lighter"
 													color={selectedType.badgeColor}
-													className="capitalize"
+													className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
 												>
 													{selectedType.label}
 												</Badge.Root>
