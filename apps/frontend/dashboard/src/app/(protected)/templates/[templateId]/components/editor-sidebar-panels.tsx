@@ -24,9 +24,9 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import { AddTemplateVariableModal } from "./add-template-variable-modal";
 import { DeleteTemplateVariableModal } from "./delete-template-variable-modal";
 import { EditTemplateVariableModal } from "./edit-template-variable-modal";
+import { useEditorStore } from "./use-editor-store";
 
 interface PanelProps {
 	onOpenChange?: (open: boolean) => void;
@@ -87,7 +87,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 	const { editor } = useCurrentEditor();
 
 	const [copiedKey, setCopiedKey] = useState<string | null>(null);
-	const [isCreatingVar, setIsCreatingVar] = useState(false);
+	const setIsCreatingVar = useEditorStore((s) => s.setIsCreatingVar);
 	const [isSavingConfig, setIsSavingConfig] = useState(false);
 	const [editingVar, setEditingVar] = useState<MappedVariable | null>(null);
 	const [deletingVar, setDeletingVar] = useState<MappedVariable | null>(null);
@@ -97,56 +97,6 @@ export function VariablesPanel({ onClose }: PanelProps) {
 		setCopiedKey(key);
 		toast.success(`Copied ${key}`, { duration: 1800 });
 		setTimeout(() => setCopiedKey(null), 2000);
-	};
-
-	const handleCreateAndInsertVar = async (
-		name: string,
-		type: "string" | "number",
-		defaultValue: string | null,
-	) => {
-		if (!name.trim() || !templateId) return;
-
-		setIsSavingConfig(true);
-		try {
-			// 1. Insert into editor
-			const placeholder = `{{{${name}}}}`;
-			if (editor) {
-				editor.chain().focus().insertContent(placeholder).run();
-				toast.success(`Inserted ${placeholder}`);
-			} else {
-				navigator.clipboard.writeText(placeholder);
-				toast.success(`Copied ${placeholder} — paste into your email`);
-			}
-
-			// 2. Add to template variables list in DB
-			const newVar = { name, type, defaultValue };
-			const exists = detectedVars.some((v) => v.name === name);
-			const updatedVariables = exists
-				? detectedVars.map((v) => (v.name === name ? newVar : v))
-				: [...detectedVars, newVar];
-
-			const response = await fetch(`/api/template/v1/${templateId}`, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					variables: updatedVariables,
-				}),
-			});
-
-			if (!response.ok) {
-				const err = await response.json();
-				throw new Error(err.message || "Failed to save variable configuration");
-			}
-
-			toast.success(`Variable ${name} configured successfully`);
-			mutate();
-		} catch (error: any) {
-			toast.error(error.message || "Something went wrong");
-		} finally {
-			setIsSavingConfig(false);
-		}
 	};
 
 	const handleSaveVariableConfig = async (
@@ -346,6 +296,24 @@ export function VariablesPanel({ onClose }: PanelProps) {
 											<div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
 												<button
 													type="button"
+													onClick={() => {
+														if (editor) {
+															editor.chain().focus().insertContent({
+																type: "variable",
+																attrs: { name: v.name },
+															}).run();
+															toast.success(`Inserted variable ${v.name}`);
+														} else {
+															handleCopy(key);
+														}
+													}}
+													title="Insert variable"
+													className="rounded-lg p-1 text-text-soft-400 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-white"
+												>
+													<Plus size={11} />
+												</button>
+												<button
+													type="button"
 													onClick={() => setEditingVar(v)}
 													title="Configure variable"
 													className="rounded-lg p-1 text-text-soft-400 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-white"
@@ -384,13 +352,6 @@ export function VariablesPanel({ onClose }: PanelProps) {
 					)}
 				</div>
 			</div>
-
-			<AddTemplateVariableModal
-				open={isCreatingVar}
-				onOpenChange={setIsCreatingVar}
-				onAdd={handleCreateAndInsertVar}
-				isSubmitting={isSavingConfig}
-			/>
 
 			<EditTemplateVariableModal
 				variable={editingVar}

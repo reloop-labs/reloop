@@ -11,6 +11,9 @@ import {
 import { EditorContext } from "@tiptap/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import useSWR from "swr";
+import { toast } from "sonner";
+import { Braces } from "lucide-react";
+import { AddTemplateVariableModal } from "./add-template-variable-modal";
 import {
 	getRandomColor,
 	useCollaboration,
@@ -28,6 +31,22 @@ interface EditorProviderProps {
 	children: React.ReactNode;
 	roomId: string;
 }
+
+export const variableSlashCommand = {
+	title: "Variable",
+	description: "Create and insert a dynamic variable",
+	icon: <Braces size={20} />,
+	category: "Basic",
+	searchTerms: ["variable", "dynamic", "custom", "tag", "bracket"],
+	command: ({ editor, range }: { editor: any; range: any }) => {
+		editor
+			.chain()
+			.focus()
+			.deleteRange(range)
+			.insertContent("{{")
+			.run();
+	},
+};
 
 /**
  * Check if the Y.js-backed TipTap editor has real user content.
@@ -100,7 +119,7 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 	const remoteCursors = useRemoteCursors(provider);
 	const editor = useEditorHook({ ydoc, provider, user: collabUser });
 
-	const { data: templateData } = useSWR(
+	const { data: templateData, mutate } = useSWR(
 		roomId ? `/api/template/v1/${roomId}` : null,
 		(url) => fetch(url, { credentials: "include" }).then((res) => res.json()),
 	);
@@ -116,6 +135,79 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 	const setFromEmail = useEditorStore((s) => s.setFromEmail);
 	const setReplyTo = useEditorStore((s) => s.setReplyTo);
 	const setPreviewText = useEditorStore((s) => s.setPreviewText);
+
+	const isCreatingVar = useEditorStore((s) => s.isCreatingVar);
+	const setIsCreatingVar = useEditorStore((s) => s.setIsCreatingVar);
+	const [isSavingConfig, setIsSavingConfig] = useState(false);
+
+	const handleCreateAndInsertVar = async (
+		name: string,
+		type: "string" | "number",
+		defaultValue: string | null,
+	) => {
+		if (!name.trim() || !roomId) return;
+
+		setIsSavingConfig(true);
+		try {
+			// 1. Insert custom Variable node into editor
+			if (editor) {
+				editor.chain().focus().insertContent({
+					type: "variable",
+					attrs: { name },
+				}).run();
+				toast.success(`Inserted variable ${name}`);
+			} else {
+				const placeholder = `{{{${name}}}}`;
+				navigator.clipboard.writeText(placeholder);
+				toast.success(`Copied ${placeholder} — paste into your email`);
+			}
+
+			// 2. Add to template variables list in DB
+			const rawVars = templateData?.variables ?? [];
+			const detectedVars = rawVars.map((v: any) => {
+				if (typeof v === "string") {
+					return {
+						name: v.replace(/^\{\{|\}\}$/g, "").trim(),
+						type: "string" as const,
+						defaultValue: null,
+					};
+				}
+				return {
+					name: v?.name ?? "",
+					type: (v?.type ?? "string") as "string" | "number",
+					defaultValue: v?.defaultValue ?? null,
+				};
+			});
+
+			const newVar = { name, type, defaultValue };
+			const exists = detectedVars.some((v: any) => v.name === name);
+			const updatedVariables = exists
+				? detectedVars.map((v: any) => (v.name === name ? newVar : v))
+				: [...detectedVars, newVar];
+
+			const response = await fetch(`/api/template/v1/${roomId}`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					variables: updatedVariables,
+				}),
+			});
+
+			if (!response.ok) {
+				const err = await response.json();
+				throw new Error(err.message || "Failed to save variable configuration");
+			}
+
+			toast.success(`Variable ${name} configured successfully`);
+			mutate();
+		} catch (error: any) {
+			toast.error(error.message || "Something went wrong");
+		} finally {
+			setIsSavingConfig(false);
+		}
+	};
 
 	// Clear global Zustand state on mount to prevent leakage between templates
 	useEffect(() => {
@@ -354,8 +446,14 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 					<BubbleMenu.LinkDefault />
 					<BubbleMenu.ButtonDefault />
 					<BubbleMenu.ImageDefault />
-					<SlashCommand items={[...defaultSlashCommands, imageSlashCommand]} />
+					<SlashCommand items={[...defaultSlashCommands, imageSlashCommand, variableSlashCommand]} />
 				</div>
+				<AddTemplateVariableModal
+					open={isCreatingVar}
+					onOpenChange={setIsCreatingVar}
+					onAdd={handleCreateAndInsertVar}
+					isSubmitting={isSavingConfig}
+				/>
 			</EditorContext.Provider>
 		</PresenceProvider>
 	);

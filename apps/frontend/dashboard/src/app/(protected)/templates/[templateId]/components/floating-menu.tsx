@@ -8,6 +8,7 @@ import {
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCurrentEditor } from "@tiptap/react";
 import React from "react";
+import { variableSlashCommand } from "./editor-provider";
 import { useEditorStore } from "./use-editor-store";
 
 export function FloatingMenu() {
@@ -19,6 +20,7 @@ export function FloatingMenu() {
 	const floatingCommands = [
 		...defaultSlashCommands,
 		imageSlashCommand,
+		variableSlashCommand,
 	] as SlashCommandItem[];
 
 	return (

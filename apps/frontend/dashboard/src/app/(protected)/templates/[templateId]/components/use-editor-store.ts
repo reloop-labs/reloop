@@ -34,6 +34,10 @@ interface EditorState {
 	setViewMode: (
 		mode: "visual" | "code" | "history" | "variables" | "score" | "test",
 	) => void;
+
+	// Global Variable creation state
+	isCreatingVar: boolean;
+	setIsCreatingVar: (open: boolean) => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
@@ -73,4 +77,8 @@ export const useEditorStore = create<EditorState>((set) => ({
 	// View mode
 	viewMode: "visual",
 	setViewMode: (viewMode) => set({ viewMode }),
+
+	// Global Variable creation
+	isCreatingVar: false,
+	setIsCreatingVar: (isCreatingVar) => set({ isCreatingVar }),
 }));
