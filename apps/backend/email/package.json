@@ -47,7 +47,9 @@
 		"@react-email/ui": "catalog:ui",
 		"@reloop/tsconfig": "workspace:*",
 		"@types/bun": "catalog:backend",
+		"@types/jsdom": "^28.0.3",
 		"@types/ua-parser-js": "catalog:backend",
+		"jsdom": "^29.1.1",
 		"tsdown": "catalog:backend",
 		"typescript": "catalog:"
 	}

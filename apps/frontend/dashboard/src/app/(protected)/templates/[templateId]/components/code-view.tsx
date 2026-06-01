@@ -78,15 +78,30 @@ export function CodeEditor() {
 			if (editor) {
 				isSelfUpdatingRef.current = true;
 				try {
-					// Strip outer document scaffold (DOCTYPE / <html> / <head>) and
-					// remove dangerous tags before handing off to the schema parser.
+					// 1. Extract existing styles from the active editor state
+					let existingStyles: any = null;
+					editor.state.doc.descendants((node) => {
+						if (node.type.name === "globalContent") {
+							existingStyles = node.attrs.data?.styles;
+						}
+					});
+
+					// 2. Parse body and container theme styles from the raw HTML code
+					const parsedBodyAndContainer = extractThemingStylesFromHtml(newVal);
+
+					// 3. Merge the parsed styles with existing styles to retain other settings
+					const mergedStyles = mergeParsedStyles(existingStyles, parsedBodyAndContainer);
+
+					// 4. Sanitize and prepare the HTML block for TipTap schema ingestion
 					const safeHtml = sanitizeEmailHtml(newVal);
 
-					// generateJSON parses the HTML through the live schema — identical
-					// to how the editor processes clipboard paste events internally.
+					// 5. Convert compiled HTML to TipTap JSON and load into the editor
 					const extensions = editor.extensionManager.extensions;
 					const json = generateJSON(safeHtml, extensions);
 					editor.commands.setContent(json, { emitUpdate: false });
+
+					// 6. Push the updated style configurations into the editor globalContent node
+					editor.commands.setGlobalContent("styles", mergedStyles);
 				} catch (err) {
 					console.error("Failed to set content from HTML code editor:", err);
 				}
@@ -346,6 +361,9 @@ function sanitizeEmailHtml(rawHtml: string): string {
 		}
 	}
 
+	// NEW: Convert layout section tables to <section> tags
+	convertSectionTablesToSections(doc.body);
+
 	// 5. Remove dangerous elements
 	for (const tag of FORBIDDEN_TAGS) {
 		for (const el of Array.from(doc.body.getElementsByTagName(tag))) {
@@ -523,5 +541,442 @@ function expandShorthandStyles(root: Element): void {
 		}
 
 		node = walker.nextNode();
+	}
+}
+
+function parseCssUnit(val: string | null | undefined): number | undefined {
+	if (!val) return undefined;
+	const clean = val.trim().toLowerCase();
+	if (clean.endsWith("px")) {
+		return parseFloat(clean) || 0;
+	}
+	if (clean.endsWith("rem")) {
+		return (parseFloat(clean) || 0) * 16;
+	}
+	if (clean.endsWith("em")) {
+		return (parseFloat(clean) || 0) * 16;
+	}
+	const num = parseFloat(clean);
+	if (!isNaN(num)) return num;
+	return undefined;
+}
+
+function extractThemingStylesFromHtml(rawHtml: string): any[] {
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(rawHtml, "text/html");
+
+	// 1. Get body background color
+	const bodyEl = doc.querySelector("body");
+	let bodyBgColor = "#ffffff";
+	if (bodyEl) {
+		const style = bodyEl.getAttribute("style") || "";
+		const scratch = document.createElement("div");
+		scratch.style.cssText = style;
+		bodyBgColor = scratch.style.backgroundColor || bodyEl.getAttribute("bgcolor") || "#ffffff";
+	}
+
+	// 2. Find container table/div
+	let containerTable: Element | null = doc.querySelector('table[data-type="container"]');
+	if (!containerTable) {
+		const tables = Array.from(doc.getElementsByTagName("table"));
+		for (const table of tables) {
+			const style = table.getAttribute("style") || "";
+			const hasIndicator =
+				table.className.includes("container") ||
+				style.includes("max-width") ||
+				style.includes("maxWidth") ||
+				(/^\d+$/.test(table.getAttribute("width") || "") && table.getAttribute("width") !== "100%");
+			if (hasIndicator) {
+				containerTable = table;
+				break;
+			}
+		}
+		if (!containerTable && tables.length > 0) {
+			containerTable = tables[0] || null;
+		}
+	}
+
+	let containerBg = "#ffffff";
+	let containerWidth = 600;
+	let containerPaddingTop = 0;
+	let containerPaddingRight = 0;
+	let containerPaddingBottom = 0;
+	let containerPaddingLeft = 0;
+	let containerBorderRadius = 0;
+	let containerAlign = "center";
+
+	if (containerTable) {
+		const contentCell =
+			containerTable.querySelector("tbody > tr > td") ||
+			containerTable.querySelector("tr > td") ||
+			containerTable.querySelector("td");
+
+		const tableScratch = document.createElement("div");
+		tableScratch.style.cssText = containerTable.getAttribute("style") || "";
+
+		const alignAttr = containerTable.getAttribute("align");
+		if (alignAttr) {
+			containerAlign = alignAttr.toLowerCase();
+		}
+
+		// Width resolution prioritizing maxWidth/width style over width attribute = 100%
+		const styleMaxWidth = tableScratch.style.maxWidth;
+		const styleWidth = tableScratch.style.width;
+		const attrWidth = containerTable.getAttribute("width");
+
+		let widthVal: string | null = null;
+		if (styleMaxWidth && styleMaxWidth !== "100%") {
+			widthVal = styleMaxWidth;
+		} else if (styleWidth && styleWidth !== "100%") {
+			widthVal = styleWidth;
+		} else if (attrWidth && attrWidth !== "100%") {
+			widthVal = attrWidth;
+		}
+
+		if (widthVal) {
+			const parsedWidth = parseCssUnit(widthVal);
+			if (parsedWidth) containerWidth = parsedWidth;
+		}
+
+		containerBg = tableScratch.style.backgroundColor || containerTable.getAttribute("bgcolor") || "#ffffff";
+		
+		const radiusAttr = tableScratch.style.borderRadius;
+		if (radiusAttr) {
+			const parsedRadius = parseCssUnit(radiusAttr);
+			if (parsedRadius !== undefined) containerBorderRadius = parsedRadius;
+		}
+
+		// Read padding from container table style (some react-email/tailwind outputs put padding on the table)
+		const tpt = tableScratch.style.paddingTop || tableScratch.style.padding;
+		const tpr = tableScratch.style.paddingRight || tableScratch.style.padding;
+		const tpb = tableScratch.style.paddingBottom || tableScratch.style.padding;
+		const tpl = tableScratch.style.paddingLeft || tableScratch.style.padding;
+
+		if (tpt) {
+			const v = parseCssUnit(tpt);
+			if (v !== undefined) containerPaddingTop = v;
+		}
+		if (tpr) {
+			const v = parseCssUnit(tpr);
+			if (v !== undefined) containerPaddingRight = v;
+		}
+		if (tpb) {
+			const v = parseCssUnit(tpb);
+			if (v !== undefined) containerPaddingBottom = v;
+		}
+		if (tpl) {
+			const v = parseCssUnit(tpl);
+			if (v !== undefined) containerPaddingLeft = v;
+		}
+
+		// Read padding from container td (takes precedence)
+		if (contentCell) {
+			const cellScratch = document.createElement("div");
+			cellScratch.style.cssText = contentCell.getAttribute("style") || "";
+
+			const pt = cellScratch.style.paddingTop || cellScratch.style.padding;
+			const pr = cellScratch.style.paddingRight || cellScratch.style.padding;
+			const pb = cellScratch.style.paddingBottom || cellScratch.style.padding;
+			const pl = cellScratch.style.paddingLeft || cellScratch.style.padding;
+
+			if (pt) {
+				const v = parseCssUnit(pt);
+				if (v !== undefined) containerPaddingTop = v;
+			}
+			if (pr) {
+				const v = parseCssUnit(pr);
+				if (v !== undefined) containerPaddingRight = v;
+			}
+			if (pb) {
+				const v = parseCssUnit(pb);
+				if (v !== undefined) containerPaddingBottom = v;
+			}
+			if (pl) {
+				const v = parseCssUnit(pl);
+				if (v !== undefined) containerPaddingLeft = v;
+			}
+		}
+	} else {
+		const divContainer = doc.querySelector('div[data-type="container"]');
+		if (divContainer) {
+			const divScratch = document.createElement("div");
+			divScratch.style.cssText = divContainer.getAttribute("style") || "";
+
+			const widthAttr = divScratch.style.width || divScratch.style.maxWidth;
+			if (widthAttr) {
+				const parsedWidth = parseCssUnit(widthAttr);
+				if (parsedWidth) containerWidth = parsedWidth;
+			}
+
+			containerBg = divScratch.style.backgroundColor || "#ffffff";
+
+			const radiusAttr = divScratch.style.borderRadius;
+			if (radiusAttr) {
+				const parsedRadius = parseCssUnit(radiusAttr);
+				if (parsedRadius !== undefined) containerBorderRadius = parsedRadius;
+			}
+
+			const pt = divScratch.style.paddingTop || divScratch.style.padding;
+			const pr = divScratch.style.paddingRight || divScratch.style.padding;
+			const pb = divScratch.style.paddingBottom || divScratch.style.padding;
+			const pl = divScratch.style.paddingLeft || divScratch.style.padding;
+
+			if (pt) {
+				const v = parseCssUnit(pt);
+				if (v !== undefined) containerPaddingTop = v;
+			}
+			if (pr) {
+				const v = parseCssUnit(pr);
+				if (v !== undefined) containerPaddingRight = v;
+			}
+			if (pb) {
+				const v = parseCssUnit(pb);
+				if (v !== undefined) containerPaddingBottom = v;
+			}
+			if (pl) {
+				const v = parseCssUnit(pl);
+				if (v !== undefined) containerPaddingLeft = v;
+			}
+		}
+	}
+
+	return [
+		{
+			id: "body",
+			title: "Background",
+			classReference: "body",
+			inputs: [
+				{
+					label: "Background",
+					type: "color",
+					value: bodyBgColor,
+					prop: "backgroundColor",
+					classReference: "body"
+				},
+				{
+					label: "Padding Top",
+					type: "number",
+					value: undefined,
+					unit: "px",
+					prop: "paddingTop",
+					classReference: "body"
+				},
+				{
+					label: "Padding Right",
+					type: "number",
+					value: undefined,
+					unit: "px",
+					prop: "paddingRight",
+					classReference: "body"
+				},
+				{
+					label: "Padding Bottom",
+					type: "number",
+					value: undefined,
+					unit: "px",
+					prop: "paddingBottom",
+					classReference: "body"
+				},
+				{
+					label: "Padding Left",
+					type: "number",
+					value: undefined,
+					unit: "px",
+					prop: "paddingLeft",
+					classReference: "body"
+				}
+			]
+		},
+		{
+			id: "container",
+			title: "Content",
+			classReference: "container",
+			inputs: [
+				{
+					label: "Align",
+					type: "select",
+					value: containerAlign,
+					options: {
+						left: "Left",
+						center: "Center",
+						right: "Right"
+					},
+					prop: "align",
+					classReference: "container"
+				},
+				{
+					label: "Width",
+					type: "number",
+					value: containerWidth,
+					unit: "px",
+					prop: "width",
+					classReference: "container"
+				},
+				{
+					label: "Height",
+					type: "number",
+					unit: "px",
+					prop: "height",
+					classReference: "container"
+				},
+				{
+					label: "Text",
+					type: "color",
+					value: "#000000",
+					prop: "color",
+					classReference: "container"
+				},
+				{
+					label: "Background",
+					type: "color",
+					value: containerBg,
+					prop: "backgroundColor",
+					classReference: "container"
+				},
+				{
+					label: "Padding Top",
+					type: "number",
+					value: containerPaddingTop,
+					unit: "px",
+					prop: "paddingTop",
+					classReference: "container"
+				},
+				{
+					label: "Padding Right",
+					type: "number",
+					value: containerPaddingRight,
+					unit: "px",
+					prop: "paddingRight",
+					classReference: "container"
+				},
+				{
+					label: "Padding Bottom",
+					type: "number",
+					value: containerPaddingBottom,
+					unit: "px",
+					prop: "paddingBottom",
+					classReference: "container"
+				},
+				{
+					label: "Padding Left",
+					type: "number",
+					value: containerPaddingLeft,
+					unit: "px",
+					prop: "paddingLeft",
+					classReference: "container"
+				},
+				{
+					label: "Corner radius",
+					type: "number",
+					value: containerBorderRadius,
+					unit: "px",
+					prop: "borderRadius",
+					classReference: "container"
+				},
+				{
+					label: "Border color",
+					type: "color",
+					value: "#000000",
+					prop: "borderColor",
+					classReference: "container"
+				}
+			]
+		}
+	];
+}
+
+function mergeParsedStyles(existingStyles: any, parsedBodyAndContainer: any[]): any[] {
+	const baseGroups = Array.isArray(existingStyles) && existingStyles.length > 0
+		? existingStyles
+		: [
+			{ id: "body", title: "Background", classReference: "body", inputs: [] },
+			{ id: "container", title: "Content", classReference: "container", inputs: [] },
+			{ id: "typography", title: "Text", classReference: "body", inputs: [] },
+			{ id: "h1", title: "Title", classReference: "h1", inputs: [] },
+			{ id: "h2", title: "Subtitle", classReference: "h2", inputs: [] },
+			{ id: "h3", title: "Heading", classReference: "h3", inputs: [] },
+			{ id: "text", title: "Paragraph", classReference: "paragraph", inputs: [] },
+			{ id: "button", title: "Button", classReference: "button", inputs: [] },
+			{ id: "link", title: "Link", classReference: "link", inputs: [] },
+			{ id: "list", title: "List", classReference: "list", inputs: [] },
+			{ id: "nested-list", title: "Nested List", classReference: "nestedList", inputs: [] },
+			{ id: "list-item", title: "List Item", classReference: "listItem", inputs: [] },
+			{ id: "code-block", title: "Code Block", classReference: "codeBlock", inputs: [] },
+			{ id: "inline-code", title: "Inline Code", classReference: "inlineCode", inputs: [] },
+		];
+
+	const parsedMap = new Map(parsedBodyAndContainer.map(g => [g.id, g]));
+
+	return baseGroups.map(group => {
+		const parsedGroup = parsedMap.get(group.id);
+		if (parsedGroup) {
+			return parsedGroup;
+		}
+		return group;
+	});
+}
+
+function convertSectionTablesToSections(root: Element): void {
+	const tables = Array.from(root.getElementsByTagName("table"));
+	
+	for (const table of tables) {
+		if (table.getAttribute("data-type") === "container" || table.className.includes("node-container")) {
+			continue;
+		}
+
+		const rows = Array.from(table.querySelectorAll("tr")).filter(tr => tr.closest("table") === table);
+		if (rows.length !== 1) continue;
+
+		const row = rows[0];
+		if (!row) continue;
+
+		const cells = Array.from(row.querySelectorAll("td")).filter(td => td.closest("tr") === row);
+		if (cells.length !== 1) continue;
+
+		const cell = cells[0];
+		if (!cell) continue;
+
+		const section = root.ownerDocument.createElement("section");
+		section.setAttribute("data-type", "section");
+		
+		const tableClass = table.getAttribute("class");
+		if (tableClass) {
+			section.setAttribute("class", `${tableClass} node-section`);
+		} else {
+			section.setAttribute("class", "node-section");
+		}
+
+		const scratch = root.ownerDocument.createElement("div");
+		scratch.style.cssText = table.getAttribute("style") || "";
+
+		const cellStyle = cell.getAttribute("style");
+		if (cellStyle) {
+			const cellScratch = root.ownerDocument.createElement("div");
+			cellScratch.style.cssText = cellStyle;
+			for (let i = 0; i < cellScratch.style.length; i++) {
+				const prop = cellScratch.style[i];
+				if (!prop) continue;
+				const val = cellScratch.style.getPropertyValue(prop);
+				if (val) {
+					scratch.style.setProperty(prop, val);
+				}
+			}
+		}
+
+		const alignVal = table.getAttribute("align");
+		if (alignVal) {
+			scratch.style.textAlign = alignVal;
+		}
+
+		if (scratch.style.cssText) {
+			section.setAttribute("style", scratch.style.cssText);
+		}
+
+		const childNodes = Array.from(cell.childNodes);
+		for (const child of childNodes) {
+			section.appendChild(child);
+		}
+
+		table.parentNode?.replaceChild(section, table);
 	}
 }
