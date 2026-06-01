@@ -125,12 +125,11 @@ export const EditTemplateVariableModal = ({
 							{/* Property Info Card */}
 							<div className="rounded-xl border border-stroke-soft-100 bg-bg-soft-200/20 p-4 dark:border-stroke-soft-100/30 dark:bg-bg-soft-200/10">
 								<div className="flex items-center gap-3">
-									<div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-neutral-600 to-neutral-500 shadow-sm">
-										<Icon name="tag" className="h-4 w-4 text-white" />
-									</div>
 									<div className="flex flex-1 items-center justify-between gap-2">
 										<p className="font-semibold text-sm text-text-strong-950">
+											{"{{ "}
 											{property.name}
+											{" }}"}
 										</p>
 										<div className="flex items-center">
 											<Badge.Root

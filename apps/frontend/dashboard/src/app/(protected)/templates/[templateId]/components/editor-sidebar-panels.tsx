@@ -337,16 +337,8 @@ export function VariablesPanel({ onClose }: PanelProps) {
 										{/* Top Row: Name and Type Badge */}
 										<div className="flex items-center justify-between">
 											<div className="flex min-w-0 items-center gap-1.5">
-												<span className="font-bold font-mono text-[10px] text-text-soft-400 dark:text-zinc-500">
-													{"{"}
-													{"{"}
-												</span>
 												<span className="truncate font-semibold text-text-strong-950 text-xs dark:text-zinc-100">
-													{v.name}
-												</span>
-												<span className="font-bold font-mono text-[10px] text-text-soft-400 dark:text-zinc-500">
-													{"}"}
-													{"}"}
+													{"{{ "} {v.name} {" }}"}
 												</span>
 											</div>
 
@@ -354,24 +346,24 @@ export function VariablesPanel({ onClose }: PanelProps) {
 												size="small"
 												variant="lighter"
 												color={v.type === "number" ? "purple" : "blue"}
-												className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
+												className="h-[18px] rounded-full px-1.5 font-semibold text-[10px] capitalize"
 											>
 												{v.type}
 											</Badge.Root>
 										</div>
 
-										{/* Middle Row: Fallback/Default value if configured */}
+										{/* Middle Row: Default value if configured */}
 										<div className="flex min-w-0 items-center justify-between">
 											{v.defaultValue !== null && v.defaultValue !== "" ? (
 												<p className="truncate text-[10px] text-text-sub-600 dark:text-zinc-400">
-													Fallback:{" "}
+													Default:{" "}
 													<code className="rounded bg-bg-soft-150 px-1 font-mono text-violet-600 dark:bg-zinc-800/80 dark:text-violet-400">
 														"{v.defaultValue}"
 													</code>
 												</p>
 											) : (
 												<p className="text-[10px] text-text-soft-400 italic dark:text-zinc-500">
-													No fallback default set
+													No default value set
 												</p>
 											)}
 
