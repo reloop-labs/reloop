@@ -5,7 +5,7 @@ import { EditorView } from "@codemirror/view";
 import { composeReactEmail } from "@react-email/editor/core";
 import * as Button from "@reloop/ui/button";
 import { useCurrentEditor } from "@tiptap/react";
-import { tokyoNight } from "@uiw/codemirror-theme-tokyo-night";
+import { xcodeDark } from "@uiw/codemirror-theme-xcode";
 import CodeMirror from "@uiw/react-codemirror";
 import { Check, Code2, Copy, Loader2, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -146,7 +146,7 @@ export function CodeEditor() {
 				<CodeMirror
 					value={htmlCode}
 					height="100%"
-					theme={tokyoNight}
+					theme={xcodeDark}
 					extensions={[html(), EditorView.lineWrapping]}
 					onChange={handleCodeChange}
 					onFocus={() => setIsFocused(true)}

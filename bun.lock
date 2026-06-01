@@ -539,6 +539,7 @@
         "@tiptap/suggestion": "catalog:ui",
         "@uiw/codemirror-theme-dracula": "^4.25.10",
         "@uiw/codemirror-theme-tokyo-night": "^4.25.10",
+        "@uiw/codemirror-theme-xcode": "^4.25.10",
         "@uiw/react-codemirror": "^4.25.10",
         "ai": "^6.0.175",
         "axios": "catalog:",
@@ -2303,6 +2304,8 @@
     "@uiw/codemirror-theme-dracula": ["@uiw/codemirror-theme-dracula@4.25.10", "", { "dependencies": { "@uiw/codemirror-themes": "4.25.10" } }, "sha512-YW3tsKfNOAQix7mH72AVj3Sb2QBk3Js7j4B0NStJifq1uPsm3hGc1TJ9a7UAht+xf8TNrUc1vlecrkUlfsL7yQ=="],
 
     "@uiw/codemirror-theme-tokyo-night": ["@uiw/codemirror-theme-tokyo-night@4.25.10", "", { "dependencies": { "@uiw/codemirror-themes": "4.25.10" } }, "sha512-nbW1szmpdlGdm9Nf03j0IU+Ecd2h/qp3vkPiHMcfEHOl3KEPPqek5UhTfpemQgdSTmohGQcY1NfUlysXsQ5y7A=="],
+
+    "@uiw/codemirror-theme-xcode": ["@uiw/codemirror-theme-xcode@4.25.10", "", { "dependencies": { "@uiw/codemirror-themes": "4.25.10" } }, "sha512-wsvBm7t7DlCy0rDqgygxKg7CjtYmxJ+fAZ9IbJKY/RGce4/9F8vHeGBy1MRqNl//7PG1Y1txCIX77IaAQptjpg=="],
 
     "@uiw/codemirror-themes": ["@uiw/codemirror-themes@4.25.10", "", { "dependencies": { "@codemirror/language": "^6.0.0", "@codemirror/state": "^6.0.0", "@codemirror/view": "^6.0.0" } }, "sha512-Fqiz1HIuDlDftcL+/O53V333UOH6MqQ84VbiQB5egn6u+uDwAqACp1FrdAoi4wgpR3b3TGW4Gr0wIYcrJSSz1A=="],
 
