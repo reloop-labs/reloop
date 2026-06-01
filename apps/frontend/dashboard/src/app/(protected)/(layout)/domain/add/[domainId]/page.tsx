@@ -19,6 +19,7 @@ import { groupDomainDnsRecords } from "../../[domainId]/components/dns-record-gr
 import { useDomainActions } from "../../[domainId]/hooks/use-domain-actions";
 import { DomainNotFound } from "../../components/domain-not-found";
 import { DNSRecordSection } from "./components/dns-record-section";
+import { ForwardDNSRecordsButton } from "./components/forward-dns-records";
 
 const NewDomainPage = () => {
 	const [isVerifying, setIsVerifying] = React.useState(false);
@@ -102,6 +103,11 @@ const NewDomainPage = () => {
 						Successfully added and ready for DNS configuration
 					</p>
 				</div>
+				{domainId && (
+					<div className="flex items-center gap-2">
+						<ForwardDNSRecordsButton domainId={domainId as string} />
+					</div>
+				)}
 			</div>
 
 			<div className="relative mb-10 flex flex-col">
