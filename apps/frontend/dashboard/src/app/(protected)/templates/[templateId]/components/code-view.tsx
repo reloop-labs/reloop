@@ -936,47 +936,107 @@ function convertSectionTablesToSections(root: Element): void {
 		const cell = cells[0];
 		if (!cell) continue;
 
-		const section = root.ownerDocument.createElement("section");
-		section.setAttribute("data-type", "section");
-		
-		const tableClass = table.getAttribute("class");
-		if (tableClass) {
-			section.setAttribute("class", `${tableClass} node-section`);
-		} else {
-			section.setAttribute("class", "node-section");
-		}
+		const tableScratch = root.ownerDocument.createElement("div");
+		tableScratch.style.cssText = table.getAttribute("style") || "";
 
-		const scratch = root.ownerDocument.createElement("div");
-		scratch.style.cssText = table.getAttribute("style") || "";
+		const cellScratch = root.ownerDocument.createElement("div");
+		cellScratch.style.cssText = cell.getAttribute("style") || "";
 
-		const cellStyle = cell.getAttribute("style");
-		if (cellStyle) {
-			const cellScratch = root.ownerDocument.createElement("div");
-			cellScratch.style.cssText = cellStyle;
-			for (let i = 0; i < cellScratch.style.length; i++) {
-				const prop = cellScratch.style[i];
-				if (!prop) continue;
-				const val = cellScratch.style.getPropertyValue(prop);
-				if (val) {
-					scratch.style.setProperty(prop, val);
+		// Determine if this is a styled section (with background, borders, or padding)
+		const bg = tableScratch.style.backgroundColor;
+		const hasBg = bg && bg !== "transparent" && bg !== "rgba(0, 0, 0, 0)" && bg !== "rgb(0, 0, 0)";
+		const hasBorder = 
+			tableScratch.style.borderWidth || tableScratch.style.border || tableScratch.style.borderStyle ||
+			cellScratch.style.borderWidth || cellScratch.style.border || cellScratch.style.borderStyle;
+
+		const pt = cellScratch.style.paddingTop || cellScratch.style.padding || tableScratch.style.paddingTop || tableScratch.style.padding;
+		const pr = cellScratch.style.paddingRight || cellScratch.style.padding || tableScratch.style.paddingRight || tableScratch.style.padding;
+		const pb = cellScratch.style.paddingBottom || cellScratch.style.padding || tableScratch.style.paddingBottom || tableScratch.style.padding;
+		const pl = cellScratch.style.paddingLeft || cellScratch.style.padding || tableScratch.style.paddingLeft || tableScratch.style.padding;
+		const hasPadding = pt || pr || pb || pl;
+
+		const isStyledSection = hasBg || hasBorder || hasPadding;
+
+		if (isStyledSection) {
+			const section = root.ownerDocument.createElement("section");
+			section.setAttribute("data-type", "section");
+			
+			const tableClass = table.getAttribute("class");
+			if (tableClass) {
+				section.setAttribute("class", `${tableClass} node-section`);
+			} else {
+				section.setAttribute("class", "node-section");
+			}
+
+			const scratch = root.ownerDocument.createElement("div");
+			scratch.style.cssText = table.getAttribute("style") || "";
+
+			const cellStyle = cell.getAttribute("style");
+			if (cellStyle) {
+				const cellScratchEl = root.ownerDocument.createElement("div");
+				cellScratchEl.style.cssText = cellStyle;
+				for (let i = 0; i < cellScratchEl.style.length; i++) {
+					const prop = cellScratchEl.style[i];
+					if (!prop) continue;
+					const val = cellScratchEl.style.getPropertyValue(prop);
+					if (val) {
+						scratch.style.setProperty(prop, val);
+					}
 				}
 			}
-		}
 
-		const alignVal = table.getAttribute("align");
-		if (alignVal) {
-			scratch.style.textAlign = alignVal;
-		}
+			const alignVal = table.getAttribute("align");
+			if (alignVal) {
+				scratch.style.textAlign = alignVal;
+			}
 
-		if (scratch.style.cssText) {
-			section.setAttribute("style", scratch.style.cssText);
-		}
+			if (scratch.style.cssText) {
+				section.setAttribute("style", scratch.style.cssText);
+			}
 
-		const childNodes = Array.from(cell.childNodes);
-		for (const child of childNodes) {
-			section.appendChild(child);
-		}
+			const childNodes = Array.from(cell.childNodes);
+			for (const child of childNodes) {
+				section.appendChild(child);
+			}
 
-		table.parentNode?.replaceChild(section, table);
+			table.parentNode?.replaceChild(section, table);
+		} else {
+			// Un-styled spacer table -> unwrap it!
+			const childNodes = Array.from(cell.childNodes);
+			const parent = table.parentNode;
+			if (parent) {
+				// If there's a single child element, copy table-level margin styles to it
+				const elementChildren = childNodes.filter(n => n.nodeType === 1) as Element[];
+				if (elementChildren.length === 1) {
+					const singleChild = elementChildren[0];
+					const tableStyle = table.getAttribute("style");
+					if (tableStyle && singleChild) {
+						const childScratch = root.ownerDocument.createElement("div");
+						childScratch.style.cssText = singleChild.getAttribute("style") || "";
+						
+						const tableScratchEl = root.ownerDocument.createElement("div");
+						tableScratchEl.style.cssText = tableStyle;
+						
+						// Copy margin styles from table to child
+						for (let i = 0; i < tableScratchEl.style.length; i++) {
+							const prop = tableScratchEl.style[i];
+							if (prop && prop.startsWith("margin")) {
+								const val = tableScratchEl.style.getPropertyValue(prop);
+								if (val) childScratch.style.setProperty(prop, val);
+							}
+						}
+						
+						if (childScratch.style.cssText) {
+							singleChild.setAttribute("style", childScratch.style.cssText);
+						}
+					}
+				}
+
+				for (const child of childNodes) {
+					parent.insertBefore(child, table);
+				}
+				parent.removeChild(table);
+			}
+		}
 	}
 }
