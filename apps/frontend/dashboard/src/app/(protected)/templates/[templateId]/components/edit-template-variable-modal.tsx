@@ -1,5 +1,6 @@
 "use client";
 
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -12,9 +13,10 @@ import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { Braces } from "lucide-react";
-import { useEffect, useState } from "react";
-
-type VariableType = "string" | "number";
+import { useEffect } from "react";
+import type { Resolver } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import * as v from "valibot";
 
 const TYPE_OPTIONS = [
 	{
@@ -35,17 +37,6 @@ const TYPE_OPTIONS = [
 	},
 ];
 
-const validateVariableName = (name: string): string => {
-	if (!name) return "";
-	if (!/^[a-zA-Z0-9_]+$/.test(name)) {
-		return "Only letters, numbers, and underscores are allowed";
-	}
-	if (/^[0-9]/.test(name)) {
-		return "Variable name cannot start with a number";
-	}
-	return "";
-};
-
 const slugify = (text: string) => {
 	return text
 		.toLowerCase()
@@ -53,6 +44,33 @@ const slugify = (text: string) => {
 		.replace(/\s+/g, "_")
 		.replace(/[^a-z0-9_]/g, "");
 };
+
+const editVariableSchema = v.pipe(
+	v.object({
+		variableName: v.pipe(
+			v.string(),
+			v.minLength(1, "Name is required"),
+			v.regex(
+				/^[a-zA-Z0-9_]*$/,
+				"Only letters, numbers, and underscores are allowed",
+			),
+			v.regex(/^[^0-9]/, "Variable name cannot start with a number"),
+		),
+		variableType: v.union([v.literal("string"), v.literal("number")]),
+		defaultValue: v.string(),
+	}),
+	v.forward(
+		v.check((input) => {
+			if (input.variableType === "number" && input.defaultValue.trim() !== "") {
+				return /^-?\d+(?:\.\d+)?$/.test(input.defaultValue.trim());
+			}
+			return true;
+		}, "Must be a valid number"),
+		["defaultValue"],
+	),
+);
+
+type VariableFormValues = v.InferInput<typeof editVariableSchema>;
 
 interface EditTemplateVariableModalProps {
 	variable: {
@@ -80,76 +98,74 @@ export const EditTemplateVariableModal = ({
 	onSave,
 	isSubmitting,
 }: EditTemplateVariableModalProps) => {
-	const [variableName, setVariableName] = useState("");
-	const [nameError, setNameError] = useState("");
-	const [fallbackValue, setFallbackValue] = useState("");
-	const [variableType, setVariableType] = useState<VariableType>("string");
+	const {
+		register,
+		handleSubmit,
+		setValue,
+		watch,
+		reset,
+		getValues,
+		trigger,
+		formState: { errors, isValid },
+	} = useForm<VariableFormValues>({
+		resolver: valibotResolver(
+			editVariableSchema,
+		) as Resolver<VariableFormValues>,
+		defaultValues: {
+			variableName: "",
+			variableType: "string",
+			defaultValue: "",
+		},
+		mode: "onChange",
+	});
 
 	useEffect(() => {
 		if (open && variable) {
-			setVariableName(variable.name);
-			setNameError("");
-			setFallbackValue(variable.defaultValue || "");
-			setVariableType(variable.type);
+			reset({
+				variableName: variable.name,
+				variableType: variable.type,
+				defaultValue: variable.defaultValue || "",
+			});
 		}
-	}, [open, variable]);
+	}, [open, variable, reset]);
 
-	const fallbackValueError =
-		variableType === "number" &&
-		fallbackValue !== "" &&
-		!/^-?\d+(?:\.\d+)?$/.test(fallbackValue.trim())
-			? "Must be a valid number"
-			: "";
+	const watchVariableType = watch("variableType");
 
-	const canSubmit =
-		!!variableName && !nameError && !fallbackValueError && !isSubmitting;
-
-	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
-		setVariableName(value);
-		setNameError(validateVariableName(value));
-	};
-
-	const handleSlugify = () => {
-		const slugged = slugify(variableName);
-		setVariableName(slugged);
-		setNameError(validateVariableName(slugged));
-	};
-
-	const handleFallbackValueChange = (
-		e: React.ChangeEvent<HTMLInputElement>,
-	) => {
-		const val = e.target.value;
-		if (variableType === "number") {
-			if (val === "" || /^-?\d*\.?\d*$/.test(val)) {
-				setFallbackValue(val);
-			}
-		} else {
-			setFallbackValue(val);
+	const handleOpenChange = (isOpen: boolean) => {
+		if (!isOpen) {
+			reset({
+				variableName: "",
+				variableType: "string",
+				defaultValue: "",
+			});
 		}
+		onOpenChange(isOpen);
 	};
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!variable || !canSubmit) return;
+	const handleFormSubmit = handleSubmit(async (data) => {
+		if (!variable) return;
 		await onSave(variable.name, {
-			name: variableName,
-			type: variableType,
-			defaultValue: fallbackValue || null,
+			name: data.variableName,
+			type: data.variableType,
+			defaultValue: data.defaultValue.trim() || null,
 		});
-		onOpenChange(false);
-	};
+		handleOpenChange(false);
+	});
+
+	const variableNameRegister = register("variableName");
+
+	const canSubmit = isValid && !isSubmitting;
 
 	if (!variable) return null;
 
 	return (
-		<Modal.Root open={open} onOpenChange={onOpenChange}>
+		<Modal.Root open={open} onOpenChange={handleOpenChange}>
 			<Modal.Content
 				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[480px]"
 				showClose={true}
 			>
 				<div className="rounded-2xl border border-stroke-soft-100/50">
-					<form onSubmit={handleSubmit}>
+					<form onSubmit={handleFormSubmit}>
 						<Modal.Header className="before:border-stroke-soft-200/50">
 							<div className="flex items-center justify-center gap-1.5">
 								<Braces
@@ -170,21 +186,44 @@ export const EditTemplateVariableModal = ({
 									Name
 									<Label.Asterisk />
 								</Label.Root>
-								<Input.Root size="small" className="rounded-xl">
+								<Input.Root
+									size="small"
+									hasError={!!errors.variableName}
+									className="rounded-xl"
+								>
 									<Input.Wrapper>
 										<Input.InlineAffix className="font-semibold focus:text-text-strong-950!">
 											{"{{{"}
 										</Input.InlineAffix>
 										<Input.Input
 											id="variableName"
-											value={variable.name}
-											disabled={true}
+											placeholder="variable_name"
+											disabled={isSubmitting}
+											autoComplete="off"
+											spellCheck={false}
+											{...variableNameRegister}
+											onBlur={(e) => {
+												variableNameRegister.onBlur(e);
+												const slugged = slugify(e.target.value);
+												setValue("variableName", slugged, {
+													shouldValidate: true,
+												});
+											}}
 										/>
 										<Input.InlineAffix className="font-semibold focus:text-text-strong-950!">
 											{"}}}"}
 										</Input.InlineAffix>
 									</Input.Wrapper>
 								</Input.Root>
+								{errors.variableName ? (
+									<p className="text-error-base text-xs">
+										{errors.variableName.message}
+									</p>
+								) : (
+									<p className="text-text-sub-600 text-xs">
+										Letters, numbers &amp; underscores — spaces auto-convert
+									</p>
+								)}
 							</div>
 
 							{/* Type Card Picker */}
@@ -195,13 +234,18 @@ export const EditTemplateVariableModal = ({
 								</Label.Root>
 								<div className="grid grid-cols-2 gap-2">
 									{TYPE_OPTIONS.map((opt) => {
-										const isSelected = variableType === opt.value;
+										const isSelected = watchVariableType === opt.value;
 										return (
 											<motion.button
 												whileTap={{ scale: 0.98 }}
 												key={opt.value}
 												type="button"
-												onClick={() => setVariableType(opt.value)}
+												onClick={() => {
+													setValue("variableType", opt.value, {
+														shouldValidate: true,
+													});
+													trigger("defaultValue");
+												}}
 												disabled={isSubmitting}
 												className={cn(
 													"flex flex-col items-start gap-2 rounded-xl border-2 p-3 text-left transition-all duration-150",
@@ -272,24 +316,43 @@ export const EditTemplateVariableModal = ({
 								<Input.Root
 									size="small"
 									className="rounded-xl"
-									hasError={!!fallbackValueError}
+									hasError={!!errors.defaultValue}
 								>
 									<Input.Wrapper>
 										<Input.Input
 											id="edit-fallback-value"
 											placeholder={
-												variableType === "number" ? "e.g., 0" : "e.g., unknown"
+												watchVariableType === "number"
+													? "e.g., 0"
+													: "e.g., unknown"
 											}
-											value={fallbackValue}
-											onChange={handleFallbackValueChange}
 											disabled={isSubmitting}
-											inputMode={variableType === "number" ? "numeric" : "text"}
+											inputMode={
+												watchVariableType === "number" ? "numeric" : "text"
+											}
+											{...register("defaultValue")}
+											onChange={(e) => {
+												const val = e.target.value;
+												if (watchVariableType === "number") {
+													if (val === "" || /^-?\d*\.?\d*$/.test(val)) {
+														setValue("defaultValue", val, {
+															shouldValidate: true,
+														});
+													} else {
+														e.target.value = getValues("defaultValue") || "";
+													}
+												} else {
+													setValue("defaultValue", val, {
+														shouldValidate: true,
+													});
+												}
+											}}
 										/>
 									</Input.Wrapper>
 								</Input.Root>
-								{fallbackValueError ? (
+								{errors.defaultValue ? (
 									<p className="text-error-base text-xs">
-										{fallbackValueError}
+										{errors.defaultValue.message}
 									</p>
 								) : (
 									<p className="text-text-sub-600 text-xs leading-normal">
@@ -304,7 +367,7 @@ export const EditTemplateVariableModal = ({
 								variant="neutral"
 								mode="stroke"
 								size="xsmall"
-								onClick={() => onOpenChange(false)}
+								onClick={() => handleOpenChange(false)}
 								disabled={isSubmitting}
 							>
 								Cancel
