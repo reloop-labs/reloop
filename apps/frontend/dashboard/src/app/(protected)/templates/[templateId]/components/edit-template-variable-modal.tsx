@@ -1,6 +1,5 @@
 "use client";
 
-import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -12,6 +11,7 @@ import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
+import { Braces } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type VariableType = "string" | "number";
@@ -35,6 +35,25 @@ const TYPE_OPTIONS = [
 	},
 ];
 
+const validateVariableName = (name: string): string => {
+	if (!name) return "";
+	if (!/^[a-zA-Z0-9_]+$/.test(name)) {
+		return "Only letters, numbers, and underscores are allowed";
+	}
+	if (/^[0-9]/.test(name)) {
+		return "Variable name cannot start with a number";
+	}
+	return "";
+};
+
+const slugify = (text: string) => {
+	return text
+		.toLowerCase()
+		.trim()
+		.replace(/\s+/g, "_")
+		.replace(/[^a-z0-9_]/g, "");
+};
+
 interface EditTemplateVariableModalProps {
 	variable: {
 		name: string;
@@ -43,11 +62,14 @@ interface EditTemplateVariableModalProps {
 	} | null;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onSave: (variable: {
-		name: string;
-		type: "string" | "number";
-		defaultValue: string | null;
-	}) => Promise<void>;
+	onSave: (
+		originalName: string,
+		variable: {
+			name: string;
+			type: "string" | "number";
+			defaultValue: string | null;
+		},
+	) => Promise<void>;
 	isSubmitting: boolean;
 }
 
@@ -58,11 +80,15 @@ export const EditTemplateVariableModal = ({
 	onSave,
 	isSubmitting,
 }: EditTemplateVariableModalProps) => {
+	const [variableName, setVariableName] = useState("");
+	const [nameError, setNameError] = useState("");
 	const [fallbackValue, setFallbackValue] = useState("");
 	const [variableType, setVariableType] = useState<VariableType>("string");
 
 	useEffect(() => {
 		if (open && variable) {
+			setVariableName(variable.name);
+			setNameError("");
 			setFallbackValue(variable.defaultValue || "");
 			setVariableType(variable.type);
 		}
@@ -75,7 +101,19 @@ export const EditTemplateVariableModal = ({
 			? "Must be a valid number"
 			: "";
 
-	const canSubmit = !fallbackValueError && !isSubmitting;
+	const canSubmit = !!variableName && !nameError && !fallbackValueError && !isSubmitting;
+
+	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		setVariableName(value);
+		setNameError(validateVariableName(value));
+	};
+
+	const handleSlugify = () => {
+		const slugged = slugify(variableName);
+		setVariableName(slugged);
+		setNameError(validateVariableName(slugged));
+	};
 
 	const handleFallbackValueChange = (
 		e: React.ChangeEvent<HTMLInputElement>,
@@ -93,8 +131,8 @@ export const EditTemplateVariableModal = ({
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!variable || !canSubmit) return;
-		await onSave({
-			name: variable.name,
+		await onSave(variable.name, {
+			name: variableName,
 			type: variableType,
 			defaultValue: fallbackValue || null,
 		});
@@ -102,8 +140,6 @@ export const EditTemplateVariableModal = ({
 	};
 
 	if (!variable) return null;
-
-	const selectedType = TYPE_OPTIONS.find((t) => t.value === variableType)!;
 
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
@@ -114,35 +150,40 @@ export const EditTemplateVariableModal = ({
 				<div className="rounded-2xl border border-stroke-soft-100/50">
 					<form onSubmit={handleSubmit}>
 						<Modal.Header className="before:border-stroke-soft-200/50">
-							<div className="flex items-center justify-center">
-								<Icon name="edit-2" className="h-4 w-4" />
-							</div>
-							<div className="flex-1">
-								<Modal.Title className="font-medium">Edit Variable</Modal.Title>
+							<div className="flex items-center justify-center gap-1.5">
+								<Braces
+									size={15}
+									className="text-text-strong-950 dark:text-white"
+								/>
+								<div className="flex-1">
+									<Modal.Title className="font-medium">
+										Edit Variable
+									</Modal.Title>
+								</div>
 							</div>
 						</Modal.Header>
 						<Modal.Body className="space-y-6">
-							{/* Variable Info Card */}
-							<div className="rounded-xl border border-stroke-soft-100 bg-bg-soft-200/20 p-4 dark:border-stroke-soft-100/30 dark:bg-bg-soft-200/10">
-								<div className="flex items-center gap-3">
-									<div className="flex flex-1 items-center justify-between gap-2">
-										<p className="font-semibold text-sm text-text-strong-950">
-											{"{{{ "}
-											{variable.name}
-											{" }}}"}
-										</p>
-										<div className="flex items-center">
-											<Badge.Root
-												size="small"
-												variant="lighter"
-												color={selectedType.badgeColor}
-												className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
-											>
-												{variableType}
-											</Badge.Root>
-										</div>
-									</div>
-								</div>
+							{/* Variable Name */}
+							<div className="flex flex-col gap-1.5">
+								<Label.Root htmlFor="variableName">
+									Name
+									<Label.Asterisk />
+								</Label.Root>
+								<Input.Root size="small" className="rounded-xl">
+									<Input.Wrapper>
+										<Input.InlineAffix className="font-semibold focus:text-text-strong-950!">
+											{"{{{"}
+										</Input.InlineAffix>
+										<Input.Input
+											id="variableName"
+											value={variable.name}
+											disabled={true}
+										/>
+										<Input.InlineAffix className="font-semibold focus:text-text-strong-950!">
+											{"}}}"}
+										</Input.InlineAffix>
+									</Input.Wrapper>
+								</Input.Root>
 							</div>
 
 							{/* Type Card Picker */}
@@ -222,8 +263,8 @@ export const EditTemplateVariableModal = ({
 								</div>
 							</div>
 
-							{/* Fallback Value (Editable) */}
-							<div className="space-y-1.5">
+							{/* Default Value */}
+							<div className="flex flex-col gap-1.5">
 								<Label.Root htmlFor="edit-fallback-value">
 									Default Value
 								</Label.Root>
@@ -235,12 +276,13 @@ export const EditTemplateVariableModal = ({
 									<Input.Wrapper>
 										<Input.Input
 											id="edit-fallback-value"
-											type="text"
-											className="px-2"
+											placeholder={
+												variableType === "number" ? "e.g., 0" : "e.g., unknown"
+											}
 											value={fallbackValue}
 											onChange={handleFallbackValueChange}
-											placeholder="e.g. unknown"
 											disabled={isSubmitting}
+											inputMode={variableType === "number" ? "numeric" : "text"}
 										/>
 									</Input.Wrapper>
 								</Input.Root>
@@ -250,8 +292,7 @@ export const EditTemplateVariableModal = ({
 									</p>
 								) : (
 									<p className="text-text-sub-600 text-xs leading-normal">
-										This value will be used when a contact doesn't have this
-										variable set.
+										Used when a contact doesn&apos;t have this variable set
 									</p>
 								)}
 							</div>
