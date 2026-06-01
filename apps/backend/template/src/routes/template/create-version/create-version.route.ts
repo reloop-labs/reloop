@@ -20,6 +20,7 @@ export const createVersionRoute = new Elysia().use(authMiddleware).post(
 			name,
 			isMajor,
 			renderedHtml,
+			variables,
 		} = body;
 
 		const result = await createVersion({
@@ -35,6 +36,7 @@ export const createVersionRoute = new Elysia().use(authMiddleware).post(
 			name,
 			isMajor,
 			renderedHtml,
+			variables,
 		});
 
 		return result;
@@ -54,6 +56,7 @@ export const createVersionRoute = new Elysia().use(authMiddleware).post(
 			name: t.Optional(t.String({ maxLength: 255 })),
 			isMajor: t.Optional(t.Boolean()),
 			renderedHtml: t.Optional(t.String()),
+			variables: t.Optional(t.Array(t.String())),
 		}),
 		response: {
 			200: t.Composite([

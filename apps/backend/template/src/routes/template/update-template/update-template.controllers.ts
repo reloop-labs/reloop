@@ -1,5 +1,6 @@
 import { TemplateErrors } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
+import { extractVariablesFromContent } from "@be/template/utils/extract-variables";
 import type { TemplateBlock } from "@reloop/db/schema";
 import { log } from "evlog";
 
@@ -9,6 +10,9 @@ export async function updateTemplate(params: {
 	name?: string;
 	description?: string;
 	subject?: string;
+	fromEmail?: string;
+	replyTo?: string;
+	previewText?: string;
 	content?: TemplateBlock[];
 	variables?: string[];
 	status?: "draft" | "published" | "archived";
@@ -20,6 +24,12 @@ export async function updateTemplate(params: {
 		const existing = await templateModel.findByIdAndOrg(id, organizationId);
 		if (!existing) {
 			throw TemplateErrors.notFound(id);
+		}
+
+		// Auto-extract variables from content when content is updated and
+		// variables are not explicitly provided in the payload
+		if (updateData.content !== undefined && updateData.variables === undefined) {
+			updateData.variables = extractVariablesFromContent(updateData.content);
 		}
 
 		const result = await templateModel.update({

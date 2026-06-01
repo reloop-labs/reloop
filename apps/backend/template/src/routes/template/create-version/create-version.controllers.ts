@@ -1,6 +1,7 @@
 import { TemplateErrors } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
 import { templateVersionModel } from "@be/template/model/template-version.model";
+import { extractVariablesFromContent } from "@be/template/utils/extract-variables";
 import type { TemplateBlock } from "@reloop/db/schema";
 import { log } from "evlog";
 
@@ -17,6 +18,7 @@ export async function createVersion(params: {
 	name?: string;
 	isMajor?: boolean;
 	renderedHtml?: string;
+	variables?: string[];
 }) {
 	const {
 		templateId,
@@ -31,6 +33,7 @@ export async function createVersion(params: {
 		name,
 		isMajor,
 		renderedHtml,
+		variables: explicitVariables,
 	} = params;
 
 	log.info({
@@ -74,6 +77,10 @@ export async function createVersion(params: {
 			}
 		}
 
+		// Auto-extract variables from content if not explicitly provided
+		const variables =
+			explicitVariables ?? extractVariablesFromContent(content);
+
 		const result = await templateVersionModel.create({
 			templateId,
 			version: nextVersion,
@@ -87,23 +94,39 @@ export async function createVersion(params: {
 			name: versionName,
 			isMajor,
 			renderedHtml,
+			variables,
 		});
 
 		if (!result) {
 			throw TemplateErrors.createFailed("Failed to create template version");
 		}
 
-		// When publishing, update the parent template status and version
+		// Sync variables (and status/version for major) back to the parent template
+		const templateUpdatePayload: {
+			id: string;
+			variables: string[];
+			status?: "published";
+			currentVersion?: number;
+		} = {
+			id: templateId,
+			variables,
+		};
+
 		if (isMajor) {
-			await templateModel.update({
-				id: templateId,
-				status: "published",
-				currentVersion: nextVersion,
-			});
+			templateUpdatePayload.status = "published";
+			templateUpdatePayload.currentVersion = nextVersion;
 		}
 
+		await templateModel.update(templateUpdatePayload);
+
 		log.info({
-			...{ templateId, versionId: result.id, version: nextVersion, isMajor },
+			...{
+				templateId,
+				versionId: result.id,
+				version: nextVersion,
+				isMajor,
+				variableCount: variables.length,
+			},
 			message: "Template version created successfully",
 		});
 

@@ -1,5 +1,6 @@
 import { TemplateErrors } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
+import { extractVariablesFromContent } from "@be/template/utils/extract-variables";
 import type { TemplateBlock } from "@reloop/db/schema";
 import { log } from "evlog";
 
@@ -19,6 +20,12 @@ export async function createTemplate(params: {
 			throw TemplateErrors.nameRequired();
 		}
 
+		// Auto-extract variables from initial content if provided
+		const variables =
+			content && content.length > 0
+				? extractVariablesFromContent(content)
+				: [];
+
 		const result = await templateModel.create({
 			name: name.trim(),
 			description,
@@ -26,7 +33,7 @@ export async function createTemplate(params: {
 			organizationId,
 			createdByUserId: userId,
 			content: content || [],
-			variables: [],
+			variables,
 		});
 
 		if (!result) {
