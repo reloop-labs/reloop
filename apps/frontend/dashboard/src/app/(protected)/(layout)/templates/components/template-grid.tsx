@@ -160,7 +160,7 @@ const EMAIL_WIDTH = 600;
 const TemplatePreviewThumbnail = ({ template }: { template: Template }) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [scale, setScale] = useState(0.5);
-	const PAPER_INSET = 12;
+	const PAPER_INSET = 0;
 
 	const editor = useEditor(
 		{
@@ -201,10 +201,10 @@ const TemplatePreviewThumbnail = ({ template }: { template: Template }) => {
 	return (
 		<div
 			ref={containerRef}
-			className="pointer-events-none absolute inset-0 select-none overflow-hidden bg-zinc-100 dark:bg-zinc-800/50"
+			className="pointer-events-none absolute inset-0 select-none overflow-hidden"
 			style={{ padding: `${PAPER_INSET}px` }}
 		>
-			<div className="relative h-full w-full overflow-hidden rounded-md bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.05)] dark:bg-zinc-900 dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06)]">
+			<div className="relative h-full w-full overflow-hidden rounded-md">
 				<div
 					className="[&_img]:!max-w-full [&_.tiptap]:!p-0 [&_.tiptap]:!m-0 [&_.tiptap]:!min-h-0 [&_.tiptap]:!w-full [&_.tiptap]:!overflow-hidden [&_img]:h-auto"
 					style={{
@@ -314,7 +314,7 @@ export const TemplateGrid = ({
 												"relative aspect-[4/3] w-full overflow-hidden rounded-2xl border bg-bg-white-0 shadow-[0_1px_2px_rgba(0,0,0,0.02)] transition-all duration-200 dark:bg-zinc-900",
 												isCardActive
 													? "border-stroke-soft-200 shadow-[0_8px_24px_rgba(0,0,0,0.06)] dark:border-stroke-soft-100"
-													: "border-stroke-soft-100 hover:border-stroke-soft-200 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] dark:border-stroke-soft-100/40 dark:hover:border-stroke-soft-100",
+													: "border-stroke-soft-100 hover:border-stroke-soft-200",
 											)}
 										>
 											{/* Clean simulated email content directly on the canvas background */}
