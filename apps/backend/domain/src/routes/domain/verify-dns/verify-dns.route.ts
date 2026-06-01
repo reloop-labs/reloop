@@ -76,5 +76,6 @@ export const verifyDNSRecordRoute = new Elysia()
 				description:
 					"Forwards DNS configuration records of a domain to an email address",
 			},
+			afterResponse: auditLogHook({ action: "forwarded", successStatus: 200 }),
 		},
 	);
