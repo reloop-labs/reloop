@@ -20,14 +20,8 @@ export async function updateTemplate(params: {
 	const { id, organizationId, ...updateData } = params;
 
 	try {
-		// Verify template exists and belongs to org
 		const existing = await templateModel.findByIdAndOrg(id, organizationId);
-		if (!existing) {
-			throw TemplateErrors.notFound(id);
-		}
-
-		// Auto-extract variables from content when content is updated and
-		// variables are not explicitly provided in the payload
+		if (!existing) throw TemplateErrors.notFound(id);
 		if (
 			updateData.content !== undefined &&
 			updateData.variables === undefined
