@@ -146,12 +146,15 @@ export function VariablesPanel({ onClose }: PanelProps) {
 		}
 	};
 
-	const handleSaveVariableConfig = async (updatedVar: MappedVariable) => {
+	const handleSaveVariableConfig = async (
+		originalName: string,
+		updatedVar: MappedVariable,
+	) => {
 		if (!templateId) return;
 		setIsSavingConfig(true);
 		try {
 			const updatedVariables = detectedVars.map((v: MappedVariable) =>
-				v.name === updatedVar.name ? updatedVar : v,
+				v.name === originalName ? updatedVar : v,
 			);
 
 			const response = await fetch(`/api/template/v1/${templateId}`, {
