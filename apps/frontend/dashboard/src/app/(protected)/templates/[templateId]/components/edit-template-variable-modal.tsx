@@ -14,7 +14,7 @@ import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-type PropertyType = "string" | "number";
+type VariableType = "string" | "number";
 
 const TYPE_OPTIONS = [
 	{
@@ -36,14 +36,14 @@ const TYPE_OPTIONS = [
 ];
 
 interface EditTemplateVariableModalProps {
-	property: {
+	variable: {
 		name: string;
 		type: "string" | "number";
 		defaultValue: string | null;
 	} | null;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onSave: (property: {
+	onSave: (variable: {
 		name: string;
 		type: "string" | "number";
 		defaultValue: string | null;
@@ -52,24 +52,24 @@ interface EditTemplateVariableModalProps {
 }
 
 export const EditTemplateVariableModal = ({
-	property,
+	variable,
 	open,
 	onOpenChange,
 	onSave,
 	isSubmitting,
 }: EditTemplateVariableModalProps) => {
 	const [fallbackValue, setFallbackValue] = useState("");
-	const [propertyType, setPropertyType] = useState<PropertyType>("string");
+	const [variableType, setVariableType] = useState<VariableType>("string");
 
 	useEffect(() => {
-		if (open && property) {
-			setFallbackValue(property.defaultValue || "");
-			setPropertyType(property.type);
+		if (open && variable) {
+			setFallbackValue(variable.defaultValue || "");
+			setVariableType(variable.type);
 		}
-	}, [open, property]);
+	}, [open, variable]);
 
 	const fallbackValueError =
-		propertyType === "number" &&
+		variableType === "number" &&
 		fallbackValue !== "" &&
 		!/^-?\d+(?:\.\d+)?$/.test(fallbackValue.trim())
 			? "Must be a valid number"
@@ -81,7 +81,7 @@ export const EditTemplateVariableModal = ({
 		e: React.ChangeEvent<HTMLInputElement>,
 	) => {
 		const val = e.target.value;
-		if (propertyType === "number") {
+		if (variableType === "number") {
 			if (val === "" || /^-?\d*\.?\d*$/.test(val)) {
 				setFallbackValue(val);
 			}
@@ -92,18 +92,18 @@ export const EditTemplateVariableModal = ({
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!property || !canSubmit) return;
+		if (!variable || !canSubmit) return;
 		await onSave({
-			name: property.name,
-			type: propertyType,
+			name: variable.name,
+			type: variableType,
 			defaultValue: fallbackValue || null,
 		});
 		onOpenChange(false);
 	};
 
-	if (!property) return null;
+	if (!variable) return null;
 
-	const selectedType = TYPE_OPTIONS.find((t) => t.value === propertyType)!;
+	const selectedType = TYPE_OPTIONS.find((t) => t.value === variableType)!;
 
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
@@ -118,18 +118,18 @@ export const EditTemplateVariableModal = ({
 								<Icon name="edit-2" className="h-4 w-4" />
 							</div>
 							<div className="flex-1">
-								<Modal.Title className="font-medium">Edit Property</Modal.Title>
+								<Modal.Title className="font-medium">Edit Variable</Modal.Title>
 							</div>
 						</Modal.Header>
 						<Modal.Body className="space-y-6">
-							{/* Property Info Card */}
+							{/* Variable Info Card */}
 							<div className="rounded-xl border border-stroke-soft-100 bg-bg-soft-200/20 p-4 dark:border-stroke-soft-100/30 dark:bg-bg-soft-200/10">
 								<div className="flex items-center gap-3">
 									<div className="flex flex-1 items-center justify-between gap-2">
 										<p className="font-semibold text-sm text-text-strong-950">
-											{"{{ "}
-											{property.name}
-											{" }}"}
+											{"{{{ "}
+											{variable.name}
+											{" }}}"}
 										</p>
 										<div className="flex items-center">
 											<Badge.Root
@@ -138,7 +138,7 @@ export const EditTemplateVariableModal = ({
 												color={selectedType.badgeColor}
 												className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
 											>
-												{propertyType}
+												{variableType}
 											</Badge.Root>
 										</div>
 									</div>
@@ -153,13 +153,13 @@ export const EditTemplateVariableModal = ({
 								</Label.Root>
 								<div className="grid grid-cols-2 gap-2">
 									{TYPE_OPTIONS.map((opt) => {
-										const isSelected = propertyType === opt.value;
+										const isSelected = variableType === opt.value;
 										return (
 											<motion.button
 												whileTap={{ scale: 0.98 }}
 												key={opt.value}
 												type="button"
-												onClick={() => setPropertyType(opt.value)}
+												onClick={() => setVariableType(opt.value)}
 												disabled={isSubmitting}
 												className={cn(
 													"flex flex-col items-start gap-2 rounded-xl border-2 p-3 text-left transition-all duration-150",
@@ -251,7 +251,7 @@ export const EditTemplateVariableModal = ({
 								) : (
 									<p className="text-text-sub-600 text-xs leading-normal">
 										This value will be used when a contact doesn't have this
-										property set.
+										variable set.
 									</p>
 								)}
 							</div>
@@ -281,7 +281,7 @@ export const EditTemplateVariableModal = ({
 									</>
 								) : (
 									<>
-										Update Property
+										Update Variable
 										<span className="inline-flex items-center gap-0.5">
 											<KbdCommand />
 											<KbdEnter />

@@ -63,7 +63,7 @@ export async function resolveTemplate_step5({
 		const substitute = (str: string) => {
 			let substituted = str;
 			for (const [key, value] of Object.entries(finalVariables)) {
-				const regex = new RegExp(`{{\\s*${key}\\s*}}`, "g");
+				const regex = new RegExp(`{{{\\s*${key}\\s*}}}`, "g");
 				substituted = substituted.replace(regex, String(value));
 			}
 			return substituted;

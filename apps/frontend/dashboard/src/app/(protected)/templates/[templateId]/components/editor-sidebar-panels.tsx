@@ -3,16 +3,7 @@
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
-import { KbdCommand } from "@reloop/ui/kbd-command";
-import { KbdEnter } from "@reloop/ui/kbd-enter";
-import { KbdEsc } from "@reloop/ui/kbd-esc";
-import * as Label from "@reloop/ui/label";
-import * as Modal from "@reloop/ui/modal";
-import Spinner from "@reloop/ui/spinner";
 import { useCurrentEditor } from "@tiptap/react";
-import { AnimatePresence, motion } from "framer-motion";
 import {
 	Award,
 	Braces,
@@ -27,10 +18,9 @@ import {
 	Send,
 	ShieldAlert,
 	Sparkles,
-	X,
 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { AddTemplateVariableModal } from "./add-template-variable-modal";
@@ -45,7 +35,7 @@ const fetcher = (url: string) =>
 	fetch(url, { credentials: "include" }).then((r) => r.json());
 
 /* colour palette for variable chips */
-const CHIP_COLOURS = [
+const _CHIP_COLOURS = [
 	"bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-300 dark:border-violet-800/40",
 	"bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/30 dark:text-sky-300 dark:border-sky-800/40",
 	"bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800/40",
@@ -53,61 +43,6 @@ const CHIP_COLOURS = [
 	"bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-800/40",
 	"bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-300 dark:border-teal-800/40",
 ];
-
-function chipColour(key: string) {
-	let hash = 0;
-	for (let i = 0; i < key.length; i++)
-		hash = (hash * 31 + key.charCodeAt(i)) | 0;
-	return CHIP_COLOURS[Math.abs(hash) % CHIP_COLOURS.length];
-}
-
-/* strip {{ }} to get a readable label from the raw key */
-function toLabel(key: string) {
-	const inner = key.replace(/^\{\{|\}\}$/g, "").trim();
-	return inner.replace(/[._]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-type PropertyType = "string" | "number";
-
-const TYPE_OPTIONS: {
-	value: PropertyType;
-	label: string;
-	icon: string;
-	description: string;
-	color: string;
-	badgeColor: "blue" | "purple";
-}[] = [
-	{
-		value: "string",
-		label: "String",
-		icon: "type",
-		description: "Free-form text",
-		color: "text-primary-base",
-		badgeColor: "blue",
-	},
-	{
-		value: "number",
-		label: "Number",
-		icon: "hash",
-		description: "Integer or decimal",
-		color: "text-primary-base",
-		badgeColor: "purple",
-	},
-];
-
-const slugify = (value: string) =>
-	value
-		.toLowerCase()
-		.replace(/\s+/g, "_")
-		.replace(/[^a-z0-9_]/g, "");
-
-const validatePropertyName = (name: string): string => {
-	if (!name) return "";
-	if (!/^[a-zA-Z0-9_]*$/.test(name))
-		return "Only letters, numbers, and underscores";
-	if (!/^[a-zA-Z_]/.test(name)) return "Must start with a letter or underscore";
-	return "";
-};
 
 /* ------------------------------------------------------------------ */
 /* Variables Panel Component                                         */
@@ -171,7 +106,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 		setIsSavingConfig(true);
 		try {
 			// 1. Insert into editor
-			const placeholder = `{{${name}}}`;
+			const placeholder = `{{{${name}}}}`;
 			if (editor) {
 				editor.chain().focus().insertContent(placeholder).run();
 				toast.success(`Inserted ${placeholder}`);
@@ -320,7 +255,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 							<p className="mt-0.5 text-[11px] text-text-soft-400 leading-normal dark:text-zinc-500">
 								Type{" "}
 								<code className="rounded bg-bg-soft-200 px-1 font-mono dark:bg-zinc-800">
-									{"{{variable}}"}
+									{"{{{variable}}}"}
 								</code>{" "}
 								in your email and save a draft to see it here.
 							</p>
@@ -328,7 +263,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 					) : (
 						<div className="space-y-2">
 							{detectedVars.map((v) => {
-								const key = `{{${v.name}}}`;
+								const key = `{{{${v.name}}}}`;
 								return (
 									<div
 										key={v.name}
@@ -338,7 +273,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 										<div className="flex items-center justify-between">
 											<div className="flex min-w-0 items-center gap-1.5">
 												<span className="truncate font-semibold text-text-strong-950 text-xs dark:text-zinc-100">
-													{"{{ "} {v.name} {" }}"}
+													{"{{{ "} {v.name} {" }}}"}
 												</span>
 											</div>
 
@@ -372,7 +307,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 												<button
 													type="button"
 													onClick={() => setEditingVar(v)}
-													title="Configure property"
+													title="Configure variable"
 													className="rounded-lg p-1 text-text-soft-400 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-white"
 												>
 													<Pencil size={11} />
@@ -407,11 +342,10 @@ export function VariablesPanel({ onClose }: PanelProps) {
 				onOpenChange={setIsCreatingVar}
 				onAdd={handleCreateAndInsertVar}
 				isSubmitting={isSavingConfig}
-				detectedVars={detectedVars}
 			/>
 
 			<EditTemplateVariableModal
-				property={editingVar}
+				variable={editingVar}
 				open={!!editingVar}
 				onOpenChange={(isOpen) => {
 					if (!isOpen) setEditingVar(null);
@@ -425,7 +359,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 				<p className="text-[10px] text-text-soft-400 leading-normal dark:text-zinc-500">
 					Click copy icon to copy variable. Paste into your email using{" "}
 					<code className="rounded bg-bg-soft-200 px-1 font-mono dark:bg-zinc-800">
-						{"{{key}}"}
+						{"{{{key}}}"}
 					</code>
 				</p>
 			</div>

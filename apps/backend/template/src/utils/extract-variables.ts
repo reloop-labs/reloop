@@ -1,16 +1,16 @@
 import type { TemplateBlock } from "@reloop/db/schema";
 
-const VARIABLE_REGEX = /\{\{([^{}]+)\}\}/g;
+const VARIABLE_REGEX = /\{\{\{([^{}]+)\}\}\}/g;
 
 /**
- * Extract all unique {{variable}} placeholders from a TipTap JSON content tree.
+ * Extract all unique {{{variable}}} placeholders from a TipTap JSON content tree.
  *
  * Walks the content recursively, inspecting:
  *   - Text node content strings
  *   - Node attribute values (strings only — e.g. link hrefs, button labels)
  *
  * @param content - Array of TipTap/email-editor block nodes
- * @returns De-duplicated, sorted array of full placeholder strings, e.g. ["{{company.name}}", "{{user.firstName}}"]
+ * @returns De-duplicated, sorted array of full placeholder strings, e.g. ["{{{company.name}}}", "{{{user.firstName}}}"]
  */
 export function extractVariablesFromContent(
 	content: TemplateBlock[] | Record<string, unknown>[],
