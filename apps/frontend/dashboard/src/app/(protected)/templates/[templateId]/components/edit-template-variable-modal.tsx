@@ -101,7 +101,8 @@ export const EditTemplateVariableModal = ({
 			? "Must be a valid number"
 			: "";
 
-	const canSubmit = !!variableName && !nameError && !fallbackValueError && !isSubmitting;
+	const canSubmit =
+		!!variableName && !nameError && !fallbackValueError && !isSubmitting;
 
 	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;

@@ -28,7 +28,10 @@ export async function updateTemplate(params: {
 
 		// Auto-extract variables from content when content is updated and
 		// variables are not explicitly provided in the payload
-		if (updateData.content !== undefined && updateData.variables === undefined) {
+		if (
+			updateData.content !== undefined &&
+			updateData.variables === undefined
+		) {
 			const rawVariables = extractVariablesFromContent(updateData.content);
 			const existingVars = existing.variables ?? [];
 			updateData.variables = rawVariables.map((raw) => {

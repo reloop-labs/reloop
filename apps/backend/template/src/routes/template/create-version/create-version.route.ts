@@ -62,8 +62,8 @@ export const createVersionRoute = new Elysia().use(authMiddleware).post(
 						name: t.String(),
 						type: t.Union([t.Literal("string"), t.Literal("number")]),
 						defaultValue: t.Union([t.String(), t.Null()]),
-					})
-				)
+					}),
+				),
 			),
 		}),
 		response: {

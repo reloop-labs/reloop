@@ -60,7 +60,8 @@ export function VerifyOTP({
 				changeStatus("idle");
 				setError({
 					name: "email",
-					error: error?.message || "Invalid verification code. Please try again.",
+					error:
+						error?.message || "Invalid verification code. Please try again.",
 				});
 			}
 		} catch (e) {

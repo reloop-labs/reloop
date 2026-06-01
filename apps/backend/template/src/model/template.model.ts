@@ -179,7 +179,7 @@ export const templateResponseSchema = t.Object({
 				name: t.String(),
 				type: t.Union([t.Literal("string"), t.Literal("number")]),
 				defaultValue: t.Union([t.String(), t.Null()]),
-			})
+			}),
 		),
 		t.Null(),
 	]),
@@ -209,7 +209,7 @@ export const templateVersionResponseSchema = t.Object({
 				name: t.String(),
 				type: t.Union([t.Literal("string"), t.Literal("number")]),
 				defaultValue: t.Union([t.String(), t.Null()]),
-			})
+			}),
 		),
 		t.Null(),
 	]),

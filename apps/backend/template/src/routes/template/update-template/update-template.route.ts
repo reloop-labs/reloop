@@ -38,8 +38,8 @@ export const updateTemplateRoute = new Elysia().use(authMiddleware).put(
 						name: t.String(),
 						type: t.Union([t.Literal("string"), t.Literal("number")]),
 						defaultValue: t.Union([t.String(), t.Null()]),
-					})
-				)
+					}),
+				),
 			),
 			status: t.Optional(
 				t.Union([

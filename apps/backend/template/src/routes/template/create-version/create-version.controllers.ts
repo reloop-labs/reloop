@@ -2,7 +2,7 @@ import { TemplateErrors } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
 import { templateVersionModel } from "@be/template/model/template-version.model";
 import { extractVariablesFromContent } from "@be/template/utils/extract-variables";
-import * as schema from "@reloop/db/schema";
+import type * as schema from "@reloop/db/schema";
 import type { TemplateBlock } from "@reloop/db/schema";
 import { log } from "evlog";
 

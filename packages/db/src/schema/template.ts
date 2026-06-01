@@ -30,7 +30,6 @@ export interface TemplateVariable {
 	defaultValue: string | null;
 }
 
-
 // Block type enum for email components
 export const templateBlockTypeEnum = pgEnum("template_block_type", [
 	"heading",

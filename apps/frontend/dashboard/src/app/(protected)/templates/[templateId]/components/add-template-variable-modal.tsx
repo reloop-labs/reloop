@@ -1,5 +1,6 @@
 "use client";
 
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -12,9 +13,9 @@ import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { Braces } from "lucide-react";
-import { useRef, useState } from "react";
-
-type VariableType = "string" | "number";
+import type { Resolver } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import * as v from "valibot";
 
 const TYPE_OPTIONS = [
 	{
@@ -35,17 +36,6 @@ const TYPE_OPTIONS = [
 	},
 ];
 
-const validateVariableName = (name: string): string => {
-	if (!name) return "";
-	if (!/^[a-zA-Z0-9_]+$/.test(name)) {
-		return "Only letters, numbers, and underscores are allowed";
-	}
-	if (/^[0-9]/.test(name)) {
-		return "Variable name cannot start with a number";
-	}
-	return "";
-};
-
 const slugify = (text: string) => {
 	return text
 		.toLowerCase()
@@ -53,6 +43,33 @@ const slugify = (text: string) => {
 		.replace(/\s+/g, "_")
 		.replace(/[^a-z0-9_]/g, "");
 };
+
+const addVariableSchema = v.pipe(
+	v.object({
+		variableName: v.pipe(
+			v.string(),
+			v.minLength(1, "Name is required"),
+			v.regex(
+				/^[a-zA-Z0-9_]*$/,
+				"Only letters, numbers, and underscores are allowed",
+			),
+			v.regex(/^[^0-9]/, "Variable name cannot start with a number"),
+		),
+		variableType: v.union([v.literal("string"), v.literal("number")]),
+		defaultValue: v.string(),
+	}),
+	v.forward(
+		v.check((input) => {
+			if (input.variableType === "number" && input.defaultValue.trim() !== "") {
+				return /^-?\d+(?:\.\d+)?$/.test(input.defaultValue.trim());
+			}
+			return true;
+		}, "Must be a valid number"),
+		["defaultValue"],
+	),
+);
+
+type VariableFormValues = v.InferInput<typeof addVariableSchema>;
 
 interface AddTemplateVariableModalProps {
 	open: boolean;
@@ -71,62 +88,52 @@ export const AddTemplateVariableModal = ({
 	onAdd,
 	isSubmitting,
 }: AddTemplateVariableModalProps) => {
-	const [variableName, setVariableName] = useState("");
-	const [nameError, setNameError] = useState("");
-	const [variableType, setVariableType] = useState<VariableType>("string");
-	const [defaultValue, setDefaultValue] = useState("");
+	const {
+		register,
+		handleSubmit,
+		setValue,
+		watch,
+		reset,
+		getValues,
+		trigger,
+		formState: { errors, isValid },
+	} = useForm<VariableFormValues>({
+		resolver: valibotResolver(
+			addVariableSchema,
+		) as Resolver<VariableFormValues>,
+		defaultValues: {
+			variableName: "",
+			variableType: "string",
+			defaultValue: "",
+		},
+		mode: "onChange",
+	});
 
-	const nameInputRef = useRef<HTMLInputElement>(null);
+	const watchVariableType = watch("variableType");
 
 	const handleOpenChange = (isOpen: boolean) => {
 		if (!isOpen) {
-			setVariableName("");
-			setNameError("");
-			setVariableType("string");
-			setDefaultValue("");
+			reset({
+				variableName: "",
+				variableType: "string",
+				defaultValue: "",
+			});
 		}
 		onOpenChange(isOpen);
 	};
 
-	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
-		setVariableName(value);
-		setNameError(validateVariableName(value));
-	};
-
-	const handleSlugify = () => {
-		const slugged = slugify(variableName);
-		setVariableName(slugged);
-		setNameError(validateVariableName(slugged));
-	};
-
-	const defaultValueError =
-		variableType === "number" &&
-		defaultValue !== "" &&
-		!/^-?\d+(?:\.\d+)?$/.test(defaultValue.trim())
-			? "Must be a valid number"
-			: "";
-
-	const canSubmit =
-		!!variableName && !nameError && !defaultValueError && !isSubmitting;
-
-	const handleDefaultValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const val = e.target.value;
-		if (variableType === "number") {
-			if (val === "" || /^-?\d*\.?\d*$/.test(val)) {
-				setDefaultValue(val);
-			}
-		} else {
-			setDefaultValue(val);
-		}
-	};
-
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!canSubmit) return;
-		await onAdd(variableName, variableType, defaultValue || null);
+	const handleFormSubmit = handleSubmit(async (data) => {
+		await onAdd(
+			data.variableName,
+			data.variableType,
+			data.defaultValue.trim() || null,
+		);
 		handleOpenChange(false);
-	};
+	});
+
+	const variableNameRegister = register("variableName");
+
+	const canSubmit = isValid && !isSubmitting;
 
 	return (
 		<Modal.Root open={open} onOpenChange={handleOpenChange}>
@@ -149,7 +156,7 @@ export const AddTemplateVariableModal = ({
 						</div>
 					</Modal.Header>
 
-					<form onSubmit={handleSubmit}>
+					<form onSubmit={handleFormSubmit}>
 						<Modal.Body className="flex flex-col gap-5">
 							{/* Variable Name */}
 							<div className="flex flex-col gap-1.5">
@@ -159,7 +166,7 @@ export const AddTemplateVariableModal = ({
 								</Label.Root>
 								<Input.Root
 									size="small"
-									hasError={!!nameError}
+									hasError={!!errors.variableName}
 									className="rounded-xl"
 								>
 									<Input.Wrapper>
@@ -167,23 +174,29 @@ export const AddTemplateVariableModal = ({
 											{"{{{"}
 										</Input.InlineAffix>
 										<Input.Input
-											ref={nameInputRef}
 											id="variableName"
 											placeholder="variable_name"
-											value={variableName}
-											onChange={handleNameChange}
-											onBlur={handleSlugify}
 											disabled={isSubmitting}
 											autoComplete="off"
 											spellCheck={false}
+											{...variableNameRegister}
+											onBlur={(e) => {
+												variableNameRegister.onBlur(e);
+												const slugged = slugify(e.target.value);
+												setValue("variableName", slugged, {
+													shouldValidate: true,
+												});
+											}}
 										/>
 										<Input.InlineAffix className="font-semibold focus:text-text-strong-950!">
 											{"}}}"}
 										</Input.InlineAffix>
 									</Input.Wrapper>
 								</Input.Root>
-								{nameError ? (
-									<p className="text-error-base text-xs">{nameError}</p>
+								{errors.variableName ? (
+									<p className="text-error-base text-xs">
+										{errors.variableName.message}
+									</p>
 								) : (
 									<p className="text-text-sub-600 text-xs">
 										Letters, numbers &amp; underscores — spaces auto-convert
@@ -199,13 +212,18 @@ export const AddTemplateVariableModal = ({
 								</Label.Root>
 								<div className="grid grid-cols-2 gap-2">
 									{TYPE_OPTIONS.map((opt) => {
-										const isSelected = variableType === opt.value;
+										const isSelected = watchVariableType === opt.value;
 										return (
 											<motion.button
 												whileTap={{ scale: 0.98 }}
 												key={opt.value}
 												type="button"
-												onClick={() => setVariableType(opt.value)}
+												onClick={() => {
+													setValue("variableType", opt.value, {
+														shouldValidate: true,
+													});
+													trigger("defaultValue");
+												}}
 												disabled={isSubmitting}
 												className={cn(
 													"flex flex-col items-start gap-2 rounded-xl border-2 p-3 text-left transition-all duration-150",
@@ -274,23 +292,44 @@ export const AddTemplateVariableModal = ({
 								<Input.Root
 									size="small"
 									className="rounded-xl"
-									hasError={!!defaultValueError}
+									hasError={!!errors.defaultValue}
 								>
 									<Input.Wrapper>
 										<Input.Input
 											id="defaultValue"
 											placeholder={
-												variableType === "number" ? "e.g., 0" : "e.g., unknown"
+												watchVariableType === "number"
+													? "e.g., 0"
+													: "e.g., unknown"
 											}
-											value={defaultValue}
-											onChange={handleDefaultValueChange}
 											disabled={isSubmitting}
-											inputMode={variableType === "number" ? "numeric" : "text"}
+											inputMode={
+												watchVariableType === "number" ? "numeric" : "text"
+											}
+											{...register("defaultValue")}
+											onChange={(e) => {
+												const val = e.target.value;
+												if (watchVariableType === "number") {
+													if (val === "" || /^-?\d*\.?\d*$/.test(val)) {
+														setValue("defaultValue", val, {
+															shouldValidate: true,
+														});
+													} else {
+														e.target.value = getValues("defaultValue") || "";
+													}
+												} else {
+													setValue("defaultValue", val, {
+														shouldValidate: true,
+													});
+												}
+											}}
 										/>
 									</Input.Wrapper>
 								</Input.Root>
-								{defaultValueError ? (
-									<p className="text-error-base text-xs">{defaultValueError}</p>
+								{errors.defaultValue ? (
+									<p className="text-error-base text-xs">
+										{errors.defaultValue.message}
+									</p>
 								) : (
 									<p className="text-text-sub-600 text-xs leading-normal">
 										Used when a contact doesn&apos;t have this variable set
