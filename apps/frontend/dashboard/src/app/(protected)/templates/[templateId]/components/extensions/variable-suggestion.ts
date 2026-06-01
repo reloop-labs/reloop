@@ -10,7 +10,7 @@ export const VariableSuggestion = Extension.create({
 	addProseMirrorPlugins() {
 		return [
 			Suggestion({
-				editor: this.editor,
+				editor: this.editor as any,
 				char: "{{",
 				allowSpaces: false,
 				startOfLine: false,
@@ -39,7 +39,7 @@ export const VariableSuggestion = Extension.create({
 						onStart: (props) => {
 							component = new ReactRenderer(VariablesDropdown, {
 								props,
-								editor: props.editor,
+								editor: props.editor as any,
 							});
 
 							if (!props.clientRect) {

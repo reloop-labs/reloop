@@ -78,30 +78,74 @@ export function CodeEditor() {
 			if (editor) {
 				isSelfUpdatingRef.current = true;
 				try {
-					// 1. Extract existing styles from the active editor state
-					let existingStyles: any = null;
-					editor.state.doc.descendants((node) => {
-						if (node.type.name === "globalContent") {
-							existingStyles = node.attrs.data?.styles;
-						}
-					});
+					let contentToSet: any = newVal;
+					const lowerVal = newVal.toLowerCase();
+					const isFullHtml =
+						lowerVal.includes("<table") ||
+						lowerVal.includes("<html") ||
+						lowerVal.includes("<!doctype");
 
-					// 2. Parse body and container theme styles from the raw HTML code
-					const parsedBodyAndContainer = extractThemingStylesFromHtml(newVal);
+					// Capture the existing styles before content replacement
+					const existingStyles = getGlobalStylesArray(editor);
 
-					// 3. Merge the parsed styles with existing styles to retain other settings
-					const mergedStyles = mergeParsedStyles(existingStyles, parsedBodyAndContainer);
+					if (isFullHtml) {
+						const safeHtml = sanitizeEmailHtml(newVal);
+						const extensions = editor.extensionManager.extensions as any;
+						contentToSet = generateJSON(safeHtml, extensions);
+					}
+					editor.commands.setContent(contentToSet, { emitUpdate: false });
 
-					// 4. Sanitize and prepare the HTML block for TipTap schema ingestion
-					const safeHtml = sanitizeEmailHtml(newVal);
+					// Defer style extraction and settings application until the editor has settled
+					// and automatically seeded the globalContent node/styles array.
+					if (isFullHtml) {
+						setTimeout(() => {
+							if (!editor) return;
+							isSelfUpdatingRef.current = true;
+							try {
+								const parsed = parseGlobalStylesFromHtml(newVal);
 
-					// 5. Convert compiled HTML to TipTap JSON and load into the editor
-					const extensions = editor.extensionManager.extensions;
-					const json = generateJSON(safeHtml, extensions);
-					editor.commands.setContent(json, { emitUpdate: false });
+								// Update global CSS on the editor if found
+								if (parsed.css) {
+									editor.commands.setGlobalContent("css", parsed.css);
+								}
 
-					// 6. Push the updated style configurations into the editor globalContent node
-					editor.commands.setGlobalContent("styles", mergedStyles);
+								// Parse body and container theme styles from the HTML
+								const parsedBodyAndContainer = extractThemingStylesFromHtml(newVal);
+
+								// Merge with existing styles to retain inputs configuration, falling back to parsed
+								let mergedStyles = mergeParsedStyles(existingStyles, parsedBodyAndContainer);
+
+								// Update body/container backgroundColor and width in the editor theme styles
+								if (parsed.bodyBg) {
+									mergedStyles = updateGlobalStyleValue(
+										mergedStyles,
+										"body",
+										"backgroundColor",
+										parsed.bodyBg,
+									);
+									mergedStyles = updateGlobalStyleValue(
+										mergedStyles,
+										"container",
+										"backgroundColor",
+										parsed.bodyBg,
+									);
+								}
+								if (parsed.containerWidth !== null) {
+									mergedStyles = updateGlobalStyleValue(
+										mergedStyles,
+										"container",
+										"width",
+										parsed.containerWidth,
+									);
+								}
+								editor.commands.setGlobalContent("styles", mergedStyles);
+							} catch (err) {
+								console.error("Failed to apply global styles in timeout:", err);
+							} finally {
+								isSelfUpdatingRef.current = false;
+							}
+						}, 50);
+					}
 				} catch (err) {
 					console.error("Failed to set content from HTML code editor:", err);
 				}
@@ -1039,4 +1083,111 @@ function convertSectionTablesToSections(root: Element): void {
 			}
 		}
 	}
+}
+
+// Helper to extract global theme styling details from custom pasted HTML
+function parseGlobalStylesFromHtml(html: string) {
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(html, "text/html");
+
+	// 1. Extract style block contents
+	const styleTags = doc.querySelectorAll("style");
+	let cssString = "";
+	for (const tag of Array.from(styleTags)) {
+		cssString += tag.textContent + "\n";
+	}
+
+	// Rewrite body and html selectors to target the scoped visual editor container instead
+	cssString = cssString.replace(/(?<![\.#\-\w])body\b/g, "&");
+	cssString = cssString.replace(/(?<![\.#\-\w])html\b/g, "&");
+
+	// 2. Extract external stylesheet links (e.g. google fonts) so they can load in the head
+	const links = doc.querySelectorAll("link[rel='stylesheet'], link[href*='fonts.googleapis.com']");
+	let fontImports = "";
+	for (const link of Array.from(links)) {
+		const href = link.getAttribute("href");
+		if (href) {
+			fontImports += `@import url('${href}');\n`;
+		}
+	}
+	
+	if (fontImports) {
+		cssString = fontImports + cssString;
+	}
+
+	// 3. Find background colors
+	let bodyBg = "";
+	const tables = doc.querySelectorAll("table");
+	
+	// Check outer tables first: React Email templates usually wrapper the actual background color 
+	// on layout tables, leaving the <body> tag as a fallback or defaulting to white (#ffffff).
+	for (const table of Array.from(tables)) {
+		const bg = table.style.backgroundColor || table.getAttribute("bgcolor");
+		if (bg && bg !== "#ffffff" && bg !== "white" && bg !== "rgb(255, 255, 255)") {
+			bodyBg = bg;
+			break;
+		}
+	}
+
+	// If no table background was found, check the body tag
+	if (!bodyBg) {
+		const body = doc.body;
+		if (body) {
+			bodyBg = body.style.backgroundColor || body.getAttribute("bgcolor") || "";
+		}
+	}
+
+	// Fallback to the first table's background color even if it is white/default
+	if (!bodyBg) {
+		const firstTable = tables[0];
+		if (firstTable) {
+			bodyBg = firstTable.style.backgroundColor || firstTable.getAttribute("bgcolor") || "";
+		}
+	}
+
+	// 4. Find container width
+	let containerWidth: number | null = null;
+	const firstTable = doc.querySelector("table");
+	if (firstTable) {
+		const widthAttr = firstTable.getAttribute("width") || firstTable.style.width;
+		if (widthAttr) {
+			const parsedWidth = parseInt(widthAttr, 10);
+			if (!isNaN(parsedWidth)) {
+				containerWidth = parsedWidth;
+			}
+		}
+	}
+
+	return {
+		css: cssString.trim(),
+		bodyBg: bodyBg.trim(),
+		containerWidth,
+	};
+}
+
+// Helper to retrieve the current styles array from the Tiptap document
+function getGlobalStylesArray(editor: any): any[] {
+	let globalContentNode: any = null;
+	editor.state.doc.descendants((node: any) => {
+		if (node.type.name === "globalContent") {
+			globalContentNode = node;
+			return false;
+		}
+	});
+	return globalContentNode?.attrs?.data?.styles || [];
+}
+
+// Helper to update a specific property in the styles array
+function updateGlobalStyleValue(styles: any[], componentId: string, prop: string, value: any) {
+	if (!styles || !Array.isArray(styles)) return styles;
+	return styles.map((group) => {
+		if (group.id !== componentId) return group;
+		return {
+			...group,
+			inputs: group.inputs.map((input: any) => {
+				if (input.prop !== prop) return input;
+				return { ...input, value };
+			}),
+		};
+	});
 }

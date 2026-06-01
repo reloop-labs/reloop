@@ -95,7 +95,7 @@ export const useEditorHook = (collab: CollabOptions) => {
 				VariableSuggestion,
 				imageExtension,
 				...collabExtensions,
-			],
+			] as any[],
 			immediatelyRender: false,
 			onContentError(e) {
 				console.error("[editor] content error", e);
