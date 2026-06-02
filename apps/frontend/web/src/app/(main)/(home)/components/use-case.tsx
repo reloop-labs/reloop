@@ -56,20 +56,17 @@ const useCases = [
 
 const UseCase = () => {
 	return (
-		<section id="use-cases" className="min-h-screen bg-[#05070b] text-white">
+		<section id="use-cases" className="min-h-screen">
 			<div className="mx-auto max-w-[1320px] px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
-				<p className="font-semibold text-[11px] text-white/40 uppercase tracking-[0.16em]">
+				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
 					Use cases
 				</p>
-				<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
+				<h2 className="mt-4 font-serif text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 					Built for every Single Need
 				</h2>
-				<div className="mt-20 grid gap-px overflow-hidden rounded-2xl border border-white/5 bg-white/5 sm:grid-cols-2 lg:grid-cols-3">
+				<div className="mt-20 grid gap-px overflow-hidden rounded-2xl border border-white/5 sm:grid-cols-2 lg:grid-cols-3">
 					{useCases.map((useCase, i) => (
-						<div
-							key={useCase.title}
-							className="flex flex-col bg-[#05070b] p-8 lg:p-10"
-						>
+						<div key={useCase.title} className="flex flex-col p-8 lg:p-10">
 							<span className="font-semibold text-sm text-white/28 tabular-nums">
 								{String(i + 1).padStart(2, "0")}
 							</span>

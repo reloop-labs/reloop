@@ -6,6 +6,7 @@ import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const navItems = [
@@ -251,14 +252,29 @@ const slideVariants: Variants = {
 export const Header = () => {
 	const { useSession } = authClient;
 	const { data: session } = useSession();
-	const [scrolled, setScrolled] = useState(false);
 	const [activeMega, setActiveMega] = useState<string | null>(null);
 	const [direction, setDirection] = useState(0);
 	const pathname = usePathname();
 	const [mounted, setMounted] = useState(false);
+	const [stars, setStars] = useState<string>("GitHub");
 
 	useEffect(() => {
 		setMounted(true);
+
+		// Fetch GitHub star count dynamically
+		fetch("https://api.github.com/repos/reloop-labs/reloop")
+			.then((res) => res.json())
+			.then((data) => {
+				if (data && typeof data.stargazers_count === "number") {
+					const count = data.stargazers_count;
+					if (count >= 1000) {
+						setStars(`${(count / 1000).toFixed(1)}k stars`);
+					} else {
+						setStars(`${count} stars`);
+					}
+				}
+			})
+			.catch(() => {});
 	}, []);
 
 	const [contentHeight, setContentHeight] = useState<number | "auto">("auto");
@@ -296,17 +312,11 @@ export const Header = () => {
 		setActiveMega(title);
 	};
 
-	useEffect(() => {
-		const handleScroll = () => {
-			setScrolled(window.scrollY > 20);
-		};
-		window.addEventListener("scroll", handleScroll);
-		return () => window.removeEventListener("scroll", handleScroll);
-	}, []);
-
-	// Light mode for pages with white top fold
-	const isLight =
-		pathname.startsWith("/company") || pathname.startsWith("/philosophy");
+	const { resolvedTheme } = useTheme();
+	// Light mode based on theme toggle (with SSR page fallback)
+	const isLight = mounted
+		? resolvedTheme === "light"
+		: pathname.startsWith("/company") || pathname.startsWith("/philosophy");
 
 	const activeItem = navItems.find((item) => item.title === activeMega);
 
@@ -315,55 +325,51 @@ export const Header = () => {
 			<motion.div
 				onMouseLeave={() => setActiveMega(null)}
 				className={`flex flex-col overflow-hidden rounded-[24px] transition-all duration-500 ease-in-out ${
-					scrolled || activeMega
-						? isLight
-							? "w-full max-w-[1000px] border border-[#0a0d12]/10 bg-white shadow-[#0a0d12]/5 shadow-sm"
-							: "w-full max-w-[1000px] border border-white/10 bg-black/90 backdrop-blur-xl"
-						: "w-full max-w-[1100px] border-transparent bg-transparent shadow-none"
+					isLight
+						? "w-full max-w-[1000px] border border-[#0a0d12]/10 bg-white shadow-[#0a0d12]/5 shadow-sm"
+						: "w-full max-w-[1000px] border border-white/10 bg-black/90 backdrop-blur-xl"
 				}`}
 			>
-				<div
-					className={`flex w-full items-center justify-between pr-3 transition-all duration-500 ${
-						scrolled || activeMega ? "h-15" : "h-16"
-					}`}
-				>
-					<Link href="/" className="flex items-center pl-2">
-						<Logo
-							theme={isLight ? "light" : "dark"}
-							className={`transition-all duration-500 ${
-								scrolled || activeMega ? "w-12" : "w-14"
-							}`}
-						/>
-					</Link>
+				<div className="flex h-15 w-full items-center justify-between pr-3 transition-all duration-500">
+					<div className="flex items-center gap-6">
+						<Link href="/" className="flex items-center pl-2">
+							<Logo
+								theme={isLight ? "light" : "dark"}
+								className="w-12 transition-all duration-500"
+							/>
+						</Link>
 
-					<nav className="hidden items-center gap-0 lg:flex">
-						{navItems.map((item) => (
-							<motion.div
-								key={item.title}
-								className="relative flex h-full items-center"
-								onMouseEnter={() => item.mega && handleMouseEnter(item.title)}
-							>
-								<Link
-									href={item.href}
-									className={`flex items-center gap-1 px-2 py-2 font-semibold text-[13px] transition-colors ${
-										isLight
-											? "text-[#0a0d12]/60 hover:text-[#0a0d12]"
-											: "text-white/70 hover:text-white"
-									}`}
+						<nav className="hidden items-center gap-0 lg:flex">
+							{navItems.map((item) => (
+								<motion.div
+									key={item.title}
+									className="relative flex h-full items-center"
+									onMouseEnter={() => item.mega && handleMouseEnter(item.title)}
 								>
-									{item.title}
-									{item.hasDropdown && (
-										<Icon
-											name="chevron-down"
-											className={`size-3 transition-transform duration-300 ${
-												activeMega === item.title ? "rotate-180" : "opacity-50"
-											}`}
-										/>
-									)}
-								</Link>
-							</motion.div>
-						))}
-					</nav>
+									<Link
+										href={item.href}
+										className={`flex items-center gap-1 px-2 py-2 font-semibold text-[13px] transition-colors ${
+											isLight
+												? "text-[#0a0d12]/60 hover:text-[#0a0d12]"
+												: "text-white/70 hover:text-white"
+										}`}
+									>
+										{item.title}
+										{item.hasDropdown && (
+											<Icon
+												name="chevron-down"
+												className={`size-3 transition-transform duration-300 ${
+													activeMega === item.title
+														? "rotate-180"
+														: "opacity-50"
+												}`}
+											/>
+										)}
+									</Link>
+								</motion.div>
+							))}
+						</nav>
+					</div>
 
 					<div className="flex items-center gap-2.5 sm:gap-3">
 						<motion.a
@@ -378,7 +384,7 @@ export const Header = () => {
 							}`}
 						>
 							<Icon name="social-github" className="size-3.5" />
-							<span className="hidden sm:inline">GitHub</span>
+							<span className="hidden sm:inline">{stars}</span>
 						</motion.a>
 						<motion.a
 							href={mounted && session ? "/dashboard" : "/dashboard/login"}

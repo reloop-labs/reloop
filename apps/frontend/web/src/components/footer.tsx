@@ -1,6 +1,10 @@
+"use client";
+
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import Link from "next/link";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 const links = [
 	{
@@ -125,6 +129,13 @@ const githubUrl = "https://github.com/reloop-labs/reloop";
 const twitterUrl = "https://x.com/reloophq";
 
 export const Footer = () => {
+	const { theme, setTheme } = useTheme();
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
 	return (
 		<footer className="bg-black text-white">
 			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
@@ -186,10 +197,48 @@ export const Footer = () => {
 						))}
 					</div>
 				</div>
-				<div className="flex items-center justify-between py-6">
+				<div className="flex flex-col-reverse items-center justify-between gap-4 py-6 sm:flex-row">
 					<p className="text-[13px] text-white/36">
 						© {new Date().getFullYear()} Reloop. All rights reserved.
 					</p>
+					<div className="inline-flex items-center gap-1 rounded-full border border-white/5 bg-white/[0.03] p-0.5">
+						<button
+							type="button"
+							onClick={() => setTheme("light")}
+							className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
+								mounted && theme === "light"
+									? "bg-white text-black shadow-sm"
+									: "text-white/40 hover:text-white/80"
+							}`}
+						>
+							<Icon className="size-3.5" name="sun" />
+							<span>Light</span>
+						</button>
+						<button
+							type="button"
+							onClick={() => setTheme("dark")}
+							className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
+								mounted && theme === "dark"
+									? "bg-white text-black shadow-sm"
+									: "text-white/40 hover:text-white/80"
+							}`}
+						>
+							<Icon className="size-3.5" name="moon" />
+							<span>Dark</span>
+						</button>
+						<button
+							type="button"
+							onClick={() => setTheme("system")}
+							className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
+								mounted && theme === "system"
+									? "bg-white text-black shadow-sm"
+									: "text-white/40 hover:text-white/80"
+							}`}
+						>
+							<Icon className="size-3.5" name="laptop" />
+							<span>System</span>
+						</button>
+					</div>
 				</div>
 				<div className="relative overflow-hidden pb-10">
 					<span className="whitespace-nowrap font-black text-[220px] text-white leading-none tracking-normal [-webkit-text-stroke:2px_white] [text-shadow:6px_6px_0px_rgba(255,255,255,0.12),_0_0_80px_rgba(200,150,255,0.3)]">
