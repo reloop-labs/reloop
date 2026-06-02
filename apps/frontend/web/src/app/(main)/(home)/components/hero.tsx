@@ -16,15 +16,15 @@ export default function Hero() {
 						</div>
 						<h1 className="font-serif text-[2.8rem] leading-[1.05] tracking-tighter sm:text-[4.2rem]">
 							Email for{" "}
-							<span className="relative bg-[length:6px_3px] bg-[radial-gradient(circle,_#a3a3a3_1px,_transparent_1.5px)] bg-bottom bg-repeat-x dark:bg-[radial-gradient(circle,_#525252_1px,_transparent_1.5px)]">
+							<span className="relative bg-[length:6px_3px] bg-[radial-gradient(circle,_#a3a3a3_1px,_transparent_1.5px)] bg-bottom bg-repeat-x transition-all duration-300 hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)] hover:text-primary-base dark:bg-[radial-gradient(circle,_#525252_1px,_transparent_1.5px)] dark:hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)]">
 								AI Agents
 							</span>
 							,{" "}
-							<span className="relative bg-[length:6px_3px] bg-[radial-gradient(circle,_#a3a3a3_1px,_transparent_1.5px)] bg-bottom bg-repeat-x dark:bg-[radial-gradient(circle,_#525252_1px,_transparent_1.5px)]">
+							<span className="relative bg-[length:6px_3px] bg-[radial-gradient(circle,_#a3a3a3_1px,_transparent_1.5px)] bg-bottom bg-repeat-x transition-all duration-300 hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)] hover:text-primary-base dark:bg-[radial-gradient(circle,_#525252_1px,_transparent_1.5px)] dark:hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)]">
 								Developers
 							</span>{" "}
 							&{" "}
-							<span className="relative bg-[length:6px_3px] bg-[radial-gradient(circle,_#a3a3a3_1px,_transparent_1.5px)] bg-bottom bg-repeat-x dark:bg-[radial-gradient(circle,_#525252_1px,_transparent_1.5px)]">
+							<span className="relative bg-[length:6px_3px] bg-[radial-gradient(circle,_#a3a3a3_1px,_transparent_1.5px)] bg-bottom bg-repeat-x transition-all duration-300 hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)] hover:text-primary-base dark:bg-[radial-gradient(circle,_#525252_1px,_transparent_1.5px)] dark:hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)]">
 								Marketing teams
 							</span>
 							.
