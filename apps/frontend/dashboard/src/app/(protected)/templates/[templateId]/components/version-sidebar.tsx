@@ -486,7 +486,7 @@ export function VersionSidebar() {
 	};
 
 	return (
-		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 shadow-xl dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a]">
+		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a]">
 			{/* Header */}
 			<div className="flex shrink-0 items-center justify-between pt-3 pr-4 pb-4 pl-6">
 				<h2 className="font-semibold text-lg text-zinc-900 dark:text-zinc-50">

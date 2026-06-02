@@ -11,7 +11,6 @@ import {
 	CheckCircle2,
 	ChevronLeft,
 	Copy,
-	FileCode2,
 	Loader2,
 	Pencil,
 	Plus,
@@ -19,6 +18,7 @@ import {
 	ShieldAlert,
 	Sparkles,
 	Trash2,
+	X,
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -168,25 +168,19 @@ export function VariablesPanel({ onClose }: PanelProps) {
 	};
 
 	return (
-		<div className="relative flex h-full w-full flex-col overflow-hidden">
+		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a]">
 			{/* ── Header ── */}
-			<div className="flex h-10 shrink-0 items-center justify-between">
-				<div className="flex items-center gap-1.5">
-					<Braces size={13} className="text-text-strong-950 dark:text-white" />
-					<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
-						Variables
-					</span>
-				</div>
-				{/* ── Insert/Create Variable Button ── */}
-				<Button.Root
+			<div className="flex shrink-0 items-center justify-between pt-3 pr-4 pb-4 pl-6">
+				<h2 className="font-semibold text-lg text-zinc-900 dark:text-zinc-50">
+					Variable
+				</h2>
+				<button
 					type="button"
-					variant="neutral"
-					size="xxsmall"
-					onClick={() => setIsCreatingVar(true)}
+					onClick={() => onClose()}
+					className="rounded-lg p-1.5 text-zinc-400 transition-all hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-300"
 				>
-					<Plus size={12} />
-					Create Variable
-				</Button.Root>
+					<X size={18} />
+				</button>
 			</div>
 
 			{/* ── Scrollable Body ── */}
@@ -199,8 +193,8 @@ export function VariablesPanel({ onClose }: PanelProps) {
 						/>
 					</div>
 				) : detectedVars.length === 0 ? (
-					<div className="rounded-xl border border-stroke-soft-200 border-dashed bg-bg-weak-50/50 px-4 py-5 text-center dark:border-stroke-soft-100/20 dark:bg-zinc-900/20">
-						<div className="mx-auto mb-2.5 flex size-8 items-center justify-center rounded-lg bg-bg-soft-200 dark:bg-zinc-800">
+					<div className="rounded-xl px-4 py-5 text-center">
+						<div className="mx-auto mb-2.5 flex size-8 items-center justify-center rounded-lg bg-bg-soft-200">
 							<Braces
 								size={14}
 								className="text-text-disabled-300 dark:text-zinc-500"
@@ -209,13 +203,22 @@ export function VariablesPanel({ onClose }: PanelProps) {
 						<p className="font-medium text-text-strong-950 text-xs dark:text-zinc-300">
 							No variables yet
 						</p>
-						<p className="mt-0.5 text-[11px] text-text-soft-400 leading-normal dark:text-zinc-500">
+						<p className="my-2 text-[11px] text-text-soft-400 leading-normal dark:text-zinc-500">
 							Type{" "}
 							<code className="rounded bg-bg-soft-200 px-1 font-mono dark:bg-zinc-800">
 								{"{{{variable}}}"}
 							</code>{" "}
-							in your email and save a draft to see it here.
+							in your email
 						</p>
+						<Button.Root
+							type="button"
+							variant="neutral"
+							size="xxsmall"
+							onClick={() => setIsCreatingVar(true)}
+						>
+							<Plus size={12} />
+							Create Variable
+						</Button.Root>
 					</div>
 				) : (
 					<div className="space-y-2">
@@ -335,16 +338,6 @@ export function VariablesPanel({ onClose }: PanelProps) {
 				}}
 				isSubmitting={isSavingConfig}
 			/>
-
-			{/* ── Footer hint ── */}
-			<div className="shrink-0 border-stroke-soft-100 border-t bg-bg-weak-50 px-4 py-2 dark:border-stroke-soft-100/10 dark:bg-zinc-900/10">
-				<p className="text-[10px] text-text-soft-400 leading-normal dark:text-zinc-500">
-					Click copy icon to copy variable. Paste into your email using{" "}
-					<code className="rounded bg-bg-soft-200 px-1 font-mono dark:bg-zinc-800">
-						{"{{{key}}}"}
-					</code>
-				</p>
-			</div>
 		</div>
 	);
 }
@@ -666,7 +659,10 @@ export function TestPanel({ onClose }: PanelProps) {
 									{detectedVars.map((v) => (
 										<div key={v.name} className="space-y-1">
 											<div className="flex items-center justify-between">
-												<label className="font-semibold text-[10px] text-text-strong-950 dark:text-zinc-300">
+												<label
+													htmlFor={v.name}
+													className="font-semibold text-[10px] text-text-strong-950 dark:text-zinc-300"
+												>
 													{v.name}
 												</label>
 												<span className="text-[9px] text-text-soft-400 dark:text-zinc-500">
