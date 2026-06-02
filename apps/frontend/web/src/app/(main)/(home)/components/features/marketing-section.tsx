@@ -1,6 +1,4 @@
 import { FeatureRow, SectionBlock } from "./shared";
-import { AITemplateMockup } from "./mockups";
-import { TeamVisual } from "./visuals";
 
 export default function MarketingSection() {
 	return (
@@ -8,7 +6,7 @@ export default function MarketingSection() {
 			eyebrow="Visuals & Campaigns"
 			title="Empower Your Product & Marketing Teams"
 			subtitle="Design beautiful templates with AI assistance, broadcast layout campaigns safely, and collaborate on revisions in real-time."
-			className="bg-white dark:bg-black text-[#0a0d12] dark:text-white"
+			className="bg-white text-[#0a0d12] dark:bg-black dark:text-white"
 		>
 			{/* Subsection 1: AI Templates & Campaigns */}
 			<FeatureRow
@@ -18,18 +16,20 @@ export default function MarketingSection() {
 				cards={[
 					{
 						title: "AI-Powered Templates",
-						description: "Describe the campaign goal and let our AI compile optimized, responsive layout structures.",
+						description:
+							"Describe the campaign goal and let our AI compile optimized, responsive layout structures.",
 					},
 					{
 						title: "Dynamic variable tags",
-						description: "Safely inject names, purchase stats, and user accounts inside generated templates.",
+						description:
+							"Safely inject names, purchase stats, and user accounts inside generated templates.",
 					},
 					{
 						title: "Campaign Broadcasts",
-						description: "Broadcast campaign alerts to your entire mailing list with robust signature verification.",
+						description:
+							"Broadcast campaign alerts to your entire mailing list with robust signature verification.",
 					},
 				]}
-				visual={AITemplateMockup}
 			/>
 
 			{/* Subsection 2: Live Collaboration */}
@@ -41,18 +41,20 @@ export default function MarketingSection() {
 				cards={[
 					{
 						title: "Live Visual Previews",
-						description: "See your changes instantly across dozens of desktop and mobile devices while you build.",
+						description:
+							"See your changes instantly across dozens of desktop and mobile devices while you build.",
 					},
 					{
 						title: "Collaborate Without Friction",
-						description: "Bring designers and developers together in one workspace with shared styles and built-in feedback.",
+						description:
+							"Bring designers and developers together in one workspace with shared styles and built-in feedback.",
 					},
 					{
 						title: "Zero-Risk Deployments",
-						description: "Every change is versioned, so you can roll back instantly or review full diffs before going live.",
+						description:
+							"Every change is versioned, so you can roll back instantly or review full diffs before going live.",
 					},
 				]}
-				visual={TeamVisual}
 			/>
 		</SectionBlock>
 	);
