@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { IconsSprite } from "@reloop/ui/icon";
 import { ThemeProvider } from "@reloop/web/providers/theme-provider";
+import {
+	defaultOgImage,
+	getSiteUrl,
+	siteDescription,
+	siteName,
+} from "@reloop/web/lib/site";
 import localFont from "next/font/local";
 
 const openRunde = localFont({
@@ -32,9 +38,21 @@ const openRunde = localFont({
 });
 
 export const metadata: Metadata = {
-	title: "Reloop",
-	description:
-		"An open-source & self-hostable SendGrid / Mailchimp / Resend / Loops alternative.",
+	metadataBase: new URL(getSiteUrl()),
+	title: {
+		default: siteName,
+		template: `%s | ${siteName}`,
+	},
+	description: siteDescription,
+	openGraph: {
+		type: "website",
+		siteName,
+		images: [{ url: defaultOgImage, width: 512, height: 512, alt: siteName }],
+	},
+	twitter: {
+		card: "summary_large_image",
+		images: [defaultOgImage],
+	},
 };
 
 export default function RootLayout({

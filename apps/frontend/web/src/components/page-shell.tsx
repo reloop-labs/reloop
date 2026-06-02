@@ -10,12 +10,14 @@ export function MarketingPageShell({
 	description,
 	primaryCta,
 	secondaryCta,
+	compactHero = false,
 	children,
 }: {
 	titleLines: string[];
 	description: string;
 	primaryCta: FeatureCtaLink;
 	secondaryCta?: FeatureCtaLink;
+	compactHero?: boolean;
 	children: React.ReactNode;
 }) {
 	return (
@@ -25,6 +27,7 @@ export function MarketingPageShell({
 				description={description}
 				primaryCta={primaryCta}
 				secondaryCta={secondaryCta}
+				compact={compactHero}
 			/>
 			{children}
 		</div>
