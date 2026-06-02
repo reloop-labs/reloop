@@ -4,8 +4,17 @@ import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover
 import { cn } from "@reloop/ui/cn";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { Award, Braces, Brush, Code2, History, Send } from "lucide-react";
+import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useLayoutEffect, useRef, useState } from "react";
-import { useEditorStore } from "./use-editor-store";
+
+const viewModes = [
+	"visual",
+	"code",
+	"history",
+	"variables",
+	"score",
+	"test",
+] as const;
 
 const TOOLBAR_ITEMS = [
 	{ mode: "visual" as const, label: "Design mode", Icon: Brush },
@@ -17,7 +26,10 @@ const TOOLBAR_ITEMS = [
 ] as const;
 
 export function EditorToolbar() {
-	const { viewMode, setViewMode } = useEditorStore();
+	const [viewMode, setViewMode] = useQueryState(
+		"mode",
+		parseAsStringLiteral(viewModes).withDefault("visual"),
+	);
 
 	const [hoveredEl, setHoveredEl] = useState<HTMLButtonElement | undefined>(
 		undefined,

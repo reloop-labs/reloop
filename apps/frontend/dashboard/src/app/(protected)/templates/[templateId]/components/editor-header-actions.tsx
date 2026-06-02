@@ -11,6 +11,7 @@ import * as Textarea from "@reloop/ui/textarea";
 import { useCurrentEditor } from "@tiptap/react";
 import { ChevronDown, ChevronUp, Code, Layout, Save } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -18,6 +19,15 @@ import { CollabPresence } from "./collobration/Collabpresence";
 import type { ConnectionStatus as ConnectionStatusType } from "./collobration/hooks/useCollaboration";
 import { DiffViewer } from "./diff-viewer"; // Cache bust
 import { useEditorStore } from "./use-editor-store";
+
+const viewModes = [
+	"visual",
+	"code",
+	"history",
+	"variables",
+	"score",
+	"test",
+] as const;
 
 const fetcher = (url: string) =>
 	fetch(url, { credentials: "include" }).then((res) => res.json());
@@ -269,9 +279,12 @@ export const EditorHeaderActions = ({
 		fromEmail,
 		replyTo,
 		previewText,
-		viewMode,
-		setViewMode,
 	} = useEditorStore();
+
+	const [, setViewMode] = useQueryState(
+		"mode",
+		parseAsStringLiteral(viewModes).withDefault("visual"),
+	);
 
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);

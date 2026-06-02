@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useParams } from "next/navigation";
+import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { CodeEditor } from "./components/code-view";
 import { FullEmailBuilder } from "./components/editor";
 import { EditorProvider } from "./components/editor-provider";
@@ -14,13 +15,24 @@ import { EditorToolbar } from "./components/editor-toolbar";
 import { GeneratingOverlay } from "./components/generating-overlay";
 import { EmailInspector } from "./components/inspector";
 import { SendDetails } from "./components/send-details";
-import { useEditorStore } from "./components/use-editor-store";
 import { VersionSidebar } from "./components/version-sidebar";
+
+const viewModes = [
+	"visual",
+	"code",
+	"history",
+	"variables",
+	"score",
+	"test",
+] as const;
 
 const Page = () => {
 	const params = useParams<{ templateId: string }>();
 	const templateId = params.templateId;
-	const { viewMode, setViewMode } = useEditorStore();
+	const [viewMode, setViewMode] = useQueryState(
+		"mode",
+		parseAsStringLiteral(viewModes).withDefault("visual"),
+	);
 
 	return (
 		<EditorProvider key={templateId} roomId={templateId}>

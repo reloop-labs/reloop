@@ -29,12 +29,6 @@ interface EditorState {
 	setIsSavingDraft: (saving: boolean) => void;
 	setIsPublishing: (publishing: boolean) => void;
 
-	// View mode (visual editor or split screens)
-	viewMode: "visual" | "code" | "history" | "variables" | "score" | "test";
-	setViewMode: (
-		mode: "visual" | "code" | "history" | "variables" | "score" | "test",
-	) => void;
-
 	// Global Variable creation state
 	isCreatingVar: boolean;
 	setIsCreatingVar: (open: boolean) => void;
@@ -73,10 +67,6 @@ export const useEditorStore = create<EditorState>((set) => ({
 	setHasUnsavedChanges: (hasUnsavedChanges) => set({ hasUnsavedChanges }),
 	setIsSavingDraft: (isSavingDraft) => set({ isSavingDraft }),
 	setIsPublishing: (isPublishing) => set({ isPublishing }),
-
-	// View mode
-	viewMode: "visual",
-	setViewMode: (viewMode) => set({ viewMode }),
 
 	// Global Variable creation
 	isCreatingVar: false,
