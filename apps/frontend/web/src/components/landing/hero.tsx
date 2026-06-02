@@ -8,18 +8,38 @@ export function FeatureHero({
 	description,
 	primaryCta,
 	secondaryCta,
+	compact = false,
 }: {
 	titleLines: string[];
 	description: string;
 	primaryCta: FeatureCtaLink;
 	secondaryCta?: FeatureCtaLink;
+	compact?: boolean;
 }) {
 	return (
-		<div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-transparent pt-40 pb-28">
+		<div
+			className={
+				compact
+					? "relative overflow-hidden bg-transparent pt-28 pb-10 sm:pt-32 sm:pb-12"
+					: "relative flex min-h-dvh items-center justify-center overflow-hidden bg-transparent pt-40 pb-28"
+			}
+		>
 			<main className="relative z-10">
-				<section className="mx-auto flex max-w-4xl flex-col px-4 pb-16 sm:px-6 lg:px-8 lg:pb-24">
+				<section
+					className={
+						compact
+							? "mx-auto flex max-w-4xl flex-col px-4 sm:px-6 lg:px-8"
+							: "mx-auto flex max-w-4xl flex-col px-4 pb-16 sm:px-6 lg:px-8 lg:pb-24"
+					}
+				>
 					<div className="mx-auto max-w-[1020px] text-center">
-						<h1 className="font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[4.2rem] dark:text-white">
+						<h1
+							className={
+								compact
+									? "font-serif text-[2.2rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.8rem] dark:text-white"
+									: "font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[4.2rem] dark:text-white"
+							}
+						>
 							{titleLines.map((line, i) => (
 								<span key={line}>
 									{line}
@@ -28,11 +48,23 @@ export function FeatureHero({
 							))}
 						</h1>
 
-						<p className="mx-auto mt-8 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
+						<p
+							className={
+								compact
+									? "mx-auto mt-4 max-w-[560px] text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/50"
+									: "mx-auto mt-8 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50"
+							}
+						>
 							{description}
 						</p>
 
-						<div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+						<div
+							className={
+								compact
+									? "mt-6 flex flex-wrap items-center justify-center gap-3"
+									: "mt-10 flex flex-wrap items-center justify-center gap-4"
+							}
+						>
 							<a
 								href={primaryCta.href}
 								target={primaryCta.external ? "_blank" : undefined}

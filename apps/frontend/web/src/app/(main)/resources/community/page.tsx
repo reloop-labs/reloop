@@ -2,11 +2,9 @@ import {
 	FeatureCta,
 	MarketingPageShell,
 	PageSection,
-	SectionHeading,
 } from "@reloop/web/components/page-shell";
 import type { Metadata } from "next";
 import { CommunityPlatforms } from "./components/community-platforms";
-import { CommunityStats } from "./components/community-stats";
 
 export const metadata: Metadata = {
 	title: "Community | Reloop",
@@ -24,7 +22,7 @@ const CommunityPage = () => {
 	return (
 		<MarketingPageShell
 			titleLines={["Join the Reloop", "Community"]}
-			description="Connect with developers, share knowledge, and help shape the future of email infrastructure."
+			description="Help us build open-source email infrastructure from the ground up."
 			primaryCta={{
 				label: "Join Discord",
 				href: "https://discord.gg/bHnkBcp7xR",
@@ -38,18 +36,11 @@ const CommunityPage = () => {
 				<CommunityPlatforms />
 			</PageSection>
 
-			<PageSection alt>
-				<SectionHeading
-					title="A growing community"
-					description="Thousands of developers are already part of the Reloop ecosystem."
-				/>
-				<CommunityStats />
-			</PageSection>
-
 			<FeatureCta
 				title="Ready to join?"
 				titleMuted="We'd love to meet you."
-				description="Whether you need help, want to contribute code, or connect with peers—there's a place for you."
+				highlightTitleMuted
+				description="We're a small team in the early days—whether you want to contribute code, report issues, or simply follow along, you're welcome here."
 				primary={{
 					label: "Join Discord",
 					href: "https://discord.gg/bHnkBcp7xR",
