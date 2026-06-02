@@ -3,11 +3,12 @@ import PageLayout from "@reloop/web/components/page-layout";
 const TermsPage = () => {
 	return (
 		<PageLayout
+			eyebrow="Legal / Terms"
 			title="Terms of Service"
 			subtitle="Last update: August 4th, 2025"
 		>
 			<div>
-				<p className="mb-6 text-[20px]">
+				<p className="mb-6">
 					Welcome to <span className="font-bold">Reloop</span> ("Company", "we",
 					"our", or "us"). By using our platform — a service for transactional
 					and marketing email sending — you agree to the following terms and
@@ -105,8 +106,8 @@ const TermsPage = () => {
 						<p>
 							If you have any questions about these Terms, please contact us at{" "}
 							<a
-								href="mailto:support@example.com"
-								className="text-blue-600 underline"
+								href="mailto:support@reloop.dev"
+								className="text-primary-base underline"
 							>
 								support@example.com
 							</a>
