@@ -6,10 +6,10 @@ import MarketingSection from "./features/marketing-section";
 
 export default function Features() {
 	return (
-		<div id="features" className="divide-y divide-[#0a0d12]/5 dark:divide-white/5">
+		<>
 			<AgentSection />
 			<DeveloperSection />
 			<MarketingSection />
-		</div>
+		</>
 	);
 }
