@@ -24,7 +24,7 @@ export function AnimatedAlternative() {
 
 	return (
 		<span className="inline-flex items-center gap-1.5 text-sm">
-			<span className="font-medium text-white/40">
+			<span className="font-medium text-text-sub-600">
 				An open-source alternative to
 			</span>
 			<span className="inline-block text-left font-semibold">

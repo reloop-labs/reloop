@@ -1,10 +1,10 @@
 "use client";
-import Image from "next/image";
+import * as Button from "@reloop/ui/button";
 import { AnimatedAlternative } from "./animated-alternative";
+
 export default function Hero() {
 	return (
-		<div className="relative flex h-dvh items-center justify-center overflow-hidden bg-transparent text-white">
-			<LandingBackdrop />
+		<div className="relative flex h-dvh items-center justify-center overflow-hidden bg-transparent">
 			<main className="relative z-10">
 				<section
 					id="product"
@@ -14,16 +14,10 @@ export default function Hero() {
 						<div className="mb-10 flex items-center justify-center">
 							<AnimatedAlternative />
 						</div>
-						<h1 className="font-semibold text-[2.8rem] leading-[1.05] tracking-tighter drop-shadow-[0_10px_34px_rgba(0,0,0,0.32)] sm:text-[4.2rem]">
-							<span className="bg-gradient-to-b from-white via-white to-white/40 bg-clip-text text-transparent">
-								Email for AI Agents,
-							</span>
-							<br />
-							<span className="bg-gradient-to-b from-white via-white to-white/40 bg-clip-text text-transparent">
-								Developers & Marketing teams.
-							</span>
+						<h1 className="font-serif text-[2.8rem] leading-[1.05] tracking-tighter sm:text-[4.2rem]">
+							Email for AI Agents, Developers & Marketing teams.
 						</h1>
-						<p className="mx-auto mt-8 max-w-[620px] text-[15px] text-white/50 leading-relaxed sm:text-[17px]">
+						<p className="mx-auto mt-8 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px]">
 							High-performance, open-source email infrastructure for AI agents
 							and developers. Built for absolute control and scale.
 						</p>
@@ -31,13 +25,19 @@ export default function Hero() {
 						<div className="mt-10 flex flex-wrap items-center justify-center gap-4">
 							<a
 								href="/dashboard/login"
-								className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 font-semibold text-[#0a0d12] text-[14px] transition-colors hover:bg-white/92"
+								className={`${Button.buttonVariants({
+									variant: "neutral",
+									mode: "filled",
+								}).root()} h-11! rounded-2xl! px-8! font-semibold`}
 							>
 								Start for free
 							</a>
 							<a
 								href="/docs"
-								className="inline-flex h-12 items-center justify-center gap-2.5 rounded-2xl border border-white/18 bg-black/16 px-8 font-semibold text-[15px] text-white backdrop-blur-sm transition-colors hover:bg-black/24"
+								className={`${Button.buttonVariants({
+									variant: "neutral",
+									mode: "stroke",
+								}).root()} h-11! rounded-2xl! px-8! font-semibold`}
 							>
 								Documentation
 							</a>
@@ -45,19 +45,6 @@ export default function Hero() {
 					</div>
 				</section>
 			</main>
-		</div>
-	);
-}
-
-function LandingBackdrop() {
-	return (
-		<div className="pointer-events-none absolute inset-0">
-			<Image
-				src="/light-landing.jpg"
-				alt="bg image with nature seneary"
-				fill
-				className="object-cover object-center opacity-50"
-			/>
 		</div>
 	);
 }
