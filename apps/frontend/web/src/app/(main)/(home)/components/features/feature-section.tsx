@@ -16,16 +16,16 @@ export function FeatureSection({
 		<div
 			ref={forwardRef}
 			data-index={index}
-			className={cn("py-16 lg:py-20", !isLast && "border-[#0a0d12]/8 border-b")}
+			className={cn("py-16 lg:py-20", !isLast && "border-[#0a0d12]/8 dark:border-white/8 border-b")}
 		>
 			{/* Title + description */}
 			{feature.title && (
-				<h2 className="font-semibold text-[#0a0d12] text-[2.2rem] leading-[1.05] tracking-[-0.03em] sm:text-[3rem] lg:text-[3.5rem]">
+				<h2 className="font-semibold text-[#0a0d12] text-[2.2rem] leading-[1.05] tracking-[-0.03em] sm:text-[3rem] lg:text-[3.5rem] dark:text-white">
 					{feature.title}
 				</h2>
 			)}
 			{feature.description && (
-				<p className="mt-5 max-w-[640px] text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[18px]">
+				<p className="mt-5 max-w-[640px] text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[18px] dark:text-white/60">
 					{feature.description}
 				</p>
 			)}
@@ -68,10 +68,10 @@ export function FeatureSection({
 				<div className="mt-14 grid gap-8 sm:mt-18 md:grid-cols-3 md:gap-10">
 					{feature.cards.map((card) => (
 						<div key={card.title}>
-							<h3 className="font-semibold text-[#0a0d12] text-[15px] leading-snug sm:text-[16px]">
+							<h3 className="font-semibold text-[#0a0d12] text-[15px] leading-snug sm:text-[16px] dark:text-white">
 								{card.title}
 							</h3>
-							<p className="mt-2.5 text-[#0a0d12]/56 text-[14px] leading-[1.7] sm:text-[15px]">
+							<p className="mt-2.5 text-[#0a0d12]/56 text-[14px] leading-[1.7] sm:text-[15px] dark:text-white/56">
 								{card.description}
 							</p>
 						</div>
