@@ -6,7 +6,8 @@ type PageMetadataInput = {
 	description: string;
 	path: string;
 	keywords?: readonly string[];
-	ogImage?: string;
+	/** Set to false when the route provides opengraph-image.tsx */
+	ogImage?: string | false;
 };
 
 export function createPageMetadata({
@@ -16,14 +17,7 @@ export function createPageMetadata({
 	keywords,
 	ogImage = defaultOgImage,
 }: PageMetadataInput): Metadata {
-	const image = {
-		url: ogImage,
-		width: 512,
-		height: 512,
-		alt: `${title} | Reloop`,
-	};
-
-	return {
+	const metadata: Metadata = {
 		title,
 		description,
 		keywords: keywords ? [...keywords] : undefined,
@@ -35,13 +29,24 @@ export function createPageMetadata({
 			description,
 			type: "website",
 			url: path,
-			images: [image],
 		},
 		twitter: {
 			card: "summary_large_image",
 			title: `${title} | Reloop`,
 			description,
-			images: [ogImage],
 		},
 	};
+
+	if (ogImage !== false) {
+		const image = {
+			url: ogImage,
+			width: ogImage === defaultOgImage ? 512 : 1200,
+			height: ogImage === defaultOgImage ? 512 : 630,
+			alt: `${title} | Reloop`,
+		};
+		metadata.openGraph = { ...metadata.openGraph, images: [image] };
+		metadata.twitter = { ...metadata.twitter, images: [ogImage] };
+	}
+
+	return metadata;
 }
