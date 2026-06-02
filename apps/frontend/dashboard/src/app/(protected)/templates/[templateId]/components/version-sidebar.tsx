@@ -517,27 +517,27 @@ export function VersionSidebar() {
 
 									{/* Interactive Actions (shown on hover, no backgrounds/borders) */}
 									<div className="absolute top-[20px] right-2 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-										{/* Publish action (only for drafts) */}
-										{!version.isMajor && (
-											<Tooltip.Root>
-												<Tooltip.Trigger asChild>
-													<Button.Root
-														variant="neutral"
-														mode="ghost"
-														size="xxsmall"
-														onClick={(e) => {
-															e.stopPropagation();
-															setVersionToPublish(version);
-															setIsPublishModalOpen(true);
-														}}
-														className="size-6 rounded-md p-1 text-zinc-500 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-													>
-														<UploadCloud size={13} />
-													</Button.Root>
-												</Tooltip.Trigger>
-												<Tooltip.Content side="top">Publish Draft</Tooltip.Content>
-											</Tooltip.Root>
-										)}
+										{/* Publish action */}
+										<Tooltip.Root>
+											<Tooltip.Trigger asChild>
+												<Button.Root
+													variant="neutral"
+													mode="ghost"
+													size="xxsmall"
+													onClick={(e) => {
+														e.stopPropagation();
+														setVersionToPublish(version);
+														setIsPublishModalOpen(true);
+													}}
+													className="size-6 rounded-md p-1 text-zinc-500 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+												>
+													<UploadCloud size={13} />
+												</Button.Root>
+											</Tooltip.Trigger>
+											<Tooltip.Content side="top">
+												{version.isMajor ? "Republish Version" : "Publish Draft"}
+											</Tooltip.Content>
+										</Tooltip.Root>
 
 										{/* Preview action */}
 										<Tooltip.Root>
