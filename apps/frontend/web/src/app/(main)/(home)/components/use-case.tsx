@@ -2,6 +2,17 @@
 
 const useCases = [
 	{
+		title: "AI Agent Inbox",
+		description:
+			"A dedicated inbox for AI agents to manage and respond to emails like a human.",
+		items: [
+			"Native agent inbox",
+			"Autonomous drafting",
+			"Human-in-the-loop",
+			"Contextual memory",
+		],
+	},
+	{
 		title: "Transactional Email",
 		description: "Guarantee delivery for critical, real-time user updates.",
 		items: [
@@ -31,17 +42,7 @@ const useCases = [
 		description: "Zero-latency technical and admin communications.",
 		items: ["Error logs", "Downtime alerts", "Reports", "Approvals"],
 	},
-	{
-		title: "AI Agent Inbox",
-		description:
-			"A dedicated inbox for AI agents to manage and respond to emails like a human.",
-		items: [
-			"Native agent inbox",
-			"Autonomous drafting",
-			"Human-in-the-loop",
-			"Contextual memory",
-		],
-	},
+
 	{
 		title: "Receive Email",
 		description: "Seamlessly process and route inbound mail to your systems.",
