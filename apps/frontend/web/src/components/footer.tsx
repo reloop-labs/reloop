@@ -137,19 +137,19 @@ export const Footer = () => {
 	}, []);
 
 	return (
-		<footer className="bg-black text-white">
+		<footer className="bg-[#f8f8f8] text-[#0a0d12] transition-colors duration-300 dark:bg-black dark:text-white">
 			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
 				{/* Top: CTA + link columns */}
-				<div className="flex flex-col gap-12 border-white/5 border-b py-16 sm:py-20 lg:flex-row lg:gap-20">
+				<div className="flex flex-col gap-12 border-[#0a0d12]/10 border-b py-16 sm:py-20 lg:flex-row lg:gap-20 dark:border-white/5">
 					{/* Left — branding / CTA */}
 					<div className="lg:w-[340px] lg:shrink-0">
 						<Link href="/" className="flex items-center">
-							<Logo className="-ml-2 h-10 w-10 text-white" theme="dark" />
+							<Logo className="-ml-2 h-10 w-10 text-[#0a0d12] dark:text-white" />
 							<span className="font-semibold text-[18px] tracking-[0.04em]">
 								Reloop
 							</span>
 						</Link>
-						<p className="mt-2 max-w-[300px] font-medium text-sm text-white/50">
+						<p className="mt-2 max-w-[300px] font-medium text-[#0a0d12]/50 text-sm dark:text-white/50">
 							Open, self-hosted email infrastructure for modern applications. No
 							vendor lock-in. Just email that works.
 						</p>
@@ -158,7 +158,7 @@ export const Footer = () => {
 								href={twitterUrl}
 								target="_blank"
 								rel="noreferrer"
-								className="text-white/40 transition-colors hover:text-white"
+								className="text-[#0a0d12]/40 transition-colors hover:text-[#0a0d12] dark:text-white/40 dark:hover:text-white"
 							>
 								<Icon className="size-4.5" name="twitter" />
 							</Link>
@@ -166,7 +166,7 @@ export const Footer = () => {
 								href={githubUrl}
 								target="_blank"
 								rel="noreferrer"
-								className="text-white/40 transition-colors hover:text-white"
+								className="text-[#0a0d12]/40 transition-colors hover:text-[#0a0d12] dark:text-white/40 dark:hover:text-white"
 							>
 								<Icon className="size-4.5" name="social-github" />
 							</Link>
@@ -175,7 +175,7 @@ export const Footer = () => {
 					<div className="grid flex-1 grid-cols-2 gap-8 sm:grid-cols-4">
 						{links.map((group) => (
 							<div key={group.group}>
-								<h4 className="font-semibold text-sm text-white/40 uppercase">
+								<h4 className="font-semibold text-[#0a0d12]/40 text-sm uppercase dark:text-white/40">
 									{group.group}
 								</h4>
 								<ul className="mt-4 flex flex-col gap-2.5">
@@ -186,7 +186,7 @@ export const Footer = () => {
 												{...(link.href.startsWith("http")
 													? { target: "_blank", rel: "noreferrer" }
 													: {})}
-												className="font-medium text-sm text-white/50 hover:text-white"
+												className="font-medium text-[#0a0d12]/50 text-sm hover:text-[#0a0d12] dark:text-white/50 dark:hover:text-white"
 											>
 												{link.title}
 											</Link>
@@ -198,17 +198,17 @@ export const Footer = () => {
 					</div>
 				</div>
 				<div className="flex flex-col-reverse items-center justify-between gap-4 py-6 sm:flex-row">
-					<p className="text-[13px] text-white/36">
+					<p className="text-[#0a0d12]/36 text-[13px] dark:text-white/36">
 						© {new Date().getFullYear()} Reloop. All rights reserved.
 					</p>
-					<div className="inline-flex items-center gap-1 rounded-full border border-white/5 bg-white/[0.03] p-0.5">
+					<div className="inline-flex items-center gap-1 rounded-full border border-[#0a0d12]/10 bg-[#0a0d12]/5 p-0.5 dark:border-white/5 dark:bg-white/[0.03]">
 						<button
 							type="button"
 							onClick={() => setTheme("light")}
 							className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
 								mounted && theme === "light"
 									? "bg-white text-black shadow-sm"
-									: "text-white/40 hover:text-white/80"
+									: "text-[#0a0d12]/40 hover:text-[#0a0d12]/80 dark:text-white/40 dark:hover:text-white/80"
 							}`}
 						>
 							<Icon className="size-3.5" name="sun" />
@@ -220,7 +220,7 @@ export const Footer = () => {
 							className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
 								mounted && theme === "dark"
 									? "bg-white text-black shadow-sm"
-									: "text-white/40 hover:text-white/80"
+									: "text-[#0a0d12]/40 hover:text-[#0a0d12]/80 dark:text-white/40 dark:hover:text-white/80"
 							}`}
 						>
 							<Icon className="size-3.5" name="moon" />
@@ -232,7 +232,7 @@ export const Footer = () => {
 							className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
 								mounted && theme === "system"
 									? "bg-white text-black shadow-sm"
-									: "text-white/40 hover:text-white/80"
+									: "text-[#0a0d12]/40 hover:text-[#0a0d12]/80 dark:text-white/40 dark:hover:text-white/80"
 							}`}
 						>
 							<Icon className="size-3.5" name="laptop" />
@@ -241,7 +241,7 @@ export const Footer = () => {
 					</div>
 				</div>
 				<div className="relative overflow-hidden pb-10">
-					<span className="whitespace-nowrap font-black text-[220px] text-white leading-none tracking-normal [-webkit-text-stroke:2px_white] [text-shadow:6px_6px_0px_rgba(255,255,255,0.12),_0_0_80px_rgba(200,150,255,0.3)]">
+					<span className="whitespace-nowrap font-black text-[#0a0d12] text-[220px] leading-none tracking-normal [-webkit-text-stroke:2px_#0a0d12] [text-shadow:6px_6px_0px_rgba(10,13,18,0.06),_0_0_80px_rgba(200,150,255,0.15)] dark:text-white dark:[-webkit-text-stroke:2px_white] dark:[text-shadow:6px_6px_0px_rgba(255,255,255,0.12),_0_0_80px_rgba(200,150,255,0.3)]">
 						Reloop
 					</span>
 				</div>
