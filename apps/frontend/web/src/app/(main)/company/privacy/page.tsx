@@ -1,4 +1,5 @@
 import PageLayout from "@reloop/web/components/page-layout";
+import { contactEmail } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -15,7 +16,6 @@ export const metadata: Metadata = {
 };
 
 const LAST_UPDATED = "June 2, 2026";
-const CONTACT_EMAIL = "support@reloop.sh";
 
 const PrivacyPage = () => {
 	return (
@@ -172,7 +172,7 @@ const PrivacyPage = () => {
 					</p>
 					<p>
 						To exercise these rights, contact us at{" "}
-						<a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. We may need
+						<a href={`mailto:${contactEmail}`}>{contactEmail}</a>. We may need
 						to verify your identity before fulfilling a request.
 					</p>
 				</section>
@@ -200,7 +200,7 @@ const PrivacyPage = () => {
 					<h2>10. Contact</h2>
 					<p>
 						Questions about this Privacy Policy or your data may be sent to{" "}
-						<a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+						<a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
 					</p>
 				</section>
 			</div>

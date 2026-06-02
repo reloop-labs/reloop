@@ -1,3 +1,5 @@
+import { contactEmail } from "@reloop/web/lib/site";
+
 const terms = [
 	{
 		number: "01",
@@ -52,6 +54,15 @@ export function LicensePermissions() {
 						Self-host Reloop
 					</a>{" "}
 					on your own infrastructure.
+				</p>
+				<p className="mt-4 max-w-[420px] text-[14px] text-text-sub-600 leading-7 dark:text-white/40">
+					Questions?{" "}
+					<a
+						href={`mailto:${contactEmail}`}
+						className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4 transition-opacity hover:opacity-80"
+					>
+						{contactEmail}
+					</a>
 				</p>
 			</div>
 

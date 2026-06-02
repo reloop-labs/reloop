@@ -1,4 +1,5 @@
 import PageLayout from "@reloop/web/components/page-layout";
+import { contactEmail } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -15,7 +16,6 @@ export const metadata: Metadata = {
 };
 
 const LAST_UPDATED = "June 2, 2026";
-const CONTACT_EMAIL = "support@reloop.sh";
 
 const TermsPage = () => {
 	return (
@@ -221,7 +221,7 @@ const TermsPage = () => {
 					<h2>12. Contact</h2>
 					<p>
 						Questions about these Terms may be sent to{" "}
-						<a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+						<a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
 					</p>
 				</section>
 			</div>

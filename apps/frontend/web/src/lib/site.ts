@@ -2,6 +2,8 @@ import { LANGUAGE_SLUGS } from "../app/(main)/features/languages/languages";
 
 export const siteName = "Reloop";
 
+export const contactEmail = "reloop.sh@gmail.com";
+
 export const siteDescription =
 	"An open-source and self-hostable SendGrid, Mailchimp, Resend, and Loops alternative.";
 

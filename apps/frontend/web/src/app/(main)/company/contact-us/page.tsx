@@ -1,4 +1,5 @@
 import * as Button from "@reloop/ui/button";
+import { contactEmail } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -19,33 +20,33 @@ const ContactUsPage = () => {
 		{
 			title: "General Support",
 			description:
-				"Get help with technical issues, account questions, and general support.",
-			email: "support@reloop.sh",
+				"Get help with technical issues, self-hosting, and general questions about Reloop.",
+			email: contactEmail,
 			responseTime: "Within 24 hours",
 			icon: "💬",
 		},
 		{
-			title: "Sales & Partnerships",
+			title: "Partnerships",
 			description:
-				"Interested in our enterprise plans or partnership opportunities?",
-			email: "sales@reloop.sh",
-			responseTime: "Within 4 hours",
+				"Community collaborations, integrations, and open-source contributions.",
+			email: contactEmail,
+			responseTime: "Within 48 hours",
 			icon: "🤝",
 		},
 		{
-			title: "Technical Support",
+			title: "Technical Help",
 			description:
-				"Need help with API integration or technical implementation?",
-			email: "tech@reloop.sh",
-			responseTime: "Within 12 hours",
+				"Need help with deployment, API integration, or self-hosting setup?",
+			email: contactEmail,
+			responseTime: "Within 48 hours",
 			icon: "⚡",
 		},
 		{
 			title: "Press & Media",
 			description:
 				"Media inquiries, press releases, and partnership announcements.",
-			email: "press@reloop.sh",
-			responseTime: "Within 24 hours",
+			email: contactEmail,
+			responseTime: "Within 48 hours",
 			icon: "📰",
 		},
 	];
@@ -63,8 +64,7 @@ const ContactUsPage = () => {
 		},
 		{
 			question: "Can I schedule a demo or consultation?",
-			answer:
-				"Absolutely! Contact our sales team at sales@reloop.sh to schedule a personalized demo of our platform.",
+			answer: `Email us at ${contactEmail} with what you're building. We're a small open-source team and happy to help where we can.`,
 		},
 		{
 			question: "Do you have a community forum?",

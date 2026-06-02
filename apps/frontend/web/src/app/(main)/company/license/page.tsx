@@ -50,7 +50,10 @@ ADDITIONAL USE RESTRICTIONS (Custom Clause by Reloop Labs)
      compete with Reloop Labs.
 
 3. There is no commercial license. To use Reloop, self-host the
-   open-source version on your own infrastructure.`;
+   open-source version on your own infrastructure.
+
+   For questions about the license or project, contact:
+   reloop.sh@gmail.com`;
 
 const LicensePage = () => {
 	return (

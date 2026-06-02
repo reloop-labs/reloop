@@ -30,7 +30,7 @@ const defaultBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
 export const InviteEmail = ({
 	inviteeName,
 	inviterName = "Pranav Patel",
-	inviterEmail = "pranav@reloop.sh",
+	inviterEmail = "reloop.sh@gmail.com",
 	teamName = "Reloop",
 	inviteUrl = "https://reloop.sh/invite/abc123",
 	baseUrl = defaultBaseUrl,
