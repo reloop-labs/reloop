@@ -8,8 +8,8 @@ import { getTemplateRoute } from "@be/template/routes/template/get-template/get-
 import { listTemplatesRoute } from "@be/template/routes/template/list-templates/list-templates.route";
 import { listVersionsRoute } from "@be/template/routes/template/list-versions/list-versions.route";
 import { restoreVersionRoute } from "@be/template/routes/template/restore-version/restore-version.route";
-import { updateTemplateRoute } from "@be/template/routes/template/update-template/update-template.route";
 import { testTemplateRoute } from "@be/template/routes/template/test-template/test-template.route";
+import { updateTemplateRoute } from "@be/template/routes/template/update-template/update-template.route";
 import { Elysia } from "elysia";
 
 export const templateRoutes = new Elysia({

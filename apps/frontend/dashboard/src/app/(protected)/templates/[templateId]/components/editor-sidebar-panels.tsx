@@ -530,7 +530,9 @@ export function TestPanel({ onClose }: PanelProps) {
 	);
 
 	// State for variable values entered by the user
-	const [variableValues, setVariableValues] = useState<Record<string, string>>({});
+	const [variableValues, setVariableValues] = useState<Record<string, string>>(
+		{},
+	);
 
 	// Initialize variableValues with default values when templateData is fetched
 	useEffect(() => {
@@ -591,7 +593,9 @@ export function TestPanel({ onClose }: PanelProps) {
 			const result = await response.json();
 
 			if (!response.ok) {
-				throw new Error(result.why || result.message || "Failed to send test email");
+				throw new Error(
+					result.why || result.message || "Failed to send test email",
+				);
 			}
 
 			setLastSent(testEmail);
@@ -627,7 +631,7 @@ export function TestPanel({ onClose }: PanelProps) {
 				</Button.Root>
 			</div>
 
-			<div className="hide-scrollbar flex flex-1 flex-col justify-between p-4 overflow-y-auto">
+			<div className="hide-scrollbar flex flex-1 flex-col justify-between overflow-y-auto p-4">
 				<div className="space-y-4">
 					<p className="text-[11px] text-text-soft-400 leading-normal dark:text-zinc-400">
 						Verify exactly how this email template will render across different
@@ -654,14 +658,14 @@ export function TestPanel({ onClose }: PanelProps) {
 						</div>
 
 						{detectedVars.length > 0 && (
-							<div className="space-y-3 pt-3 border-t border-stroke-soft-200 dark:border-stroke-soft-100/10">
+							<div className="space-y-3 border-stroke-soft-200 border-t pt-3 dark:border-stroke-soft-100/10">
 								<span className="font-bold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-zinc-400">
 									Template Variables
 								</span>
-								<div className="space-y-3 max-h-[300px] overflow-y-auto pr-1 hide-scrollbar">
+								<div className="hide-scrollbar max-h-[300px] space-y-3 overflow-y-auto pr-1">
 									{detectedVars.map((v) => (
 										<div key={v.name} className="space-y-1">
-											<div className="flex justify-between items-center">
+											<div className="flex items-center justify-between">
 												<label className="font-semibold text-[10px] text-text-strong-950 dark:text-zinc-300">
 													{v.name}
 												</label>
@@ -671,9 +675,15 @@ export function TestPanel({ onClose }: PanelProps) {
 											</div>
 											<input
 												type={v.type === "number" ? "number" : "text"}
-												placeholder={v.defaultValue ? `Default: ${v.defaultValue}` : "Enter value..."}
+												placeholder={
+													v.defaultValue
+														? `Default: ${v.defaultValue}`
+														: "Enter value..."
+												}
 												value={variableValues[v.name] ?? ""}
-												onChange={(e) => handleVariableChange(v.name, e.target.value)}
+												onChange={(e) =>
+													handleVariableChange(v.name, e.target.value)
+												}
 												className="w-full rounded-lg border border-stroke-soft-200 bg-bg-weak-50 px-3 py-2 text-text-strong-950 text-xs focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:border-stroke-soft-100/30 dark:bg-zinc-900 dark:text-white"
 											/>
 										</div>

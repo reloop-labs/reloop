@@ -264,14 +264,14 @@ export function VersionSidebar() {
 	return (
 		<div className="flex h-full w-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-white shadow-xl dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a]">
 			{/* Header */}
-			<div className="flex shrink-0 items-center justify-between px-6 pt-6 pb-4">
-				<h2 className="font-bold text-lg text-text-strong-950 dark:text-white">
+			<div className="flex shrink-0 items-center justify-between pt-3 pr-4 pb-4 pl-6">
+				<h2 className="font-semibold text-lg text-zinc-900 dark:text-zinc-50">
 					Version History
 				</h2>
 				<button
 					type="button"
 					onClick={() => setViewMode("visual")}
-					className="rounded-lg p-1 text-zinc-400 transition-all hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-300"
+					className="rounded-lg p-1.5 text-zinc-400 transition-all hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-300"
 				>
 					<X size={18} />
 				</button>
@@ -318,54 +318,60 @@ export function VersionSidebar() {
 								<div
 									key={version.id}
 									onClick={() => handleRestore(version)}
-									className="group relative flex w-full cursor-pointer items-start rounded-xl px-2 py-3.5 transition-all hover:bg-zinc-50 dark:hover:bg-zinc-900/30"
+									className="group relative flex w-full cursor-pointer items-stretch rounded-xl px-2 transition-all hover:bg-zinc-50/80 dark:hover:bg-zinc-900/10"
 								>
 									{/* Timeline Left Column */}
-									<div className="relative flex w-12 shrink-0 flex-col items-center justify-start self-stretch pt-1.5">
+									<div className="relative flex w-[40px] shrink-0 flex-col items-center pt-4 pb-4">
 										{/* Line segment */}
-										<div
-											className={cn(
-												"-translate-x-1/2 absolute left-1/2 z-0 w-[1px] bg-zinc-200 dark:bg-zinc-800/80",
-												index === 0 ? "top-[16px] bottom-0" : "top-0 bottom-0",
-											)}
-										/>
+										{currentList.length > 1 && (
+											<div
+												className={cn(
+													"-translate-x-1/2 absolute left-1/2 w-[1px] bg-zinc-200 dark:bg-zinc-800",
+													index === 0
+														? "top-[26px] bottom-0"
+														: index === currentList.length - 1
+															? "top-0 h-[26px]"
+															: "top-0 bottom-0",
+												)}
+											/>
+										)}
 
 										{/* Badge / Dot container */}
 										{version.isMajor ? (
 											<span
 												className={cn(
-													"relative z-10 flex h-5 select-none items-center justify-center rounded-full px-2 font-bold font-mono text-[9px] leading-none transition-all",
+													"relative z-10 flex h-[20px] w-[40px] select-none items-center justify-center rounded-full font-semibold text-[10px] transition-all",
 													isFirstMajor
-														? "bg-black text-white dark:bg-white dark:text-black"
-														: "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400",
+														? "bg-black text-white dark:bg-zinc-100 dark:text-black"
+														: "bg-zinc-100 text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400",
 												)}
 											>
 												{displayLabel}
 											</span>
 										) : (
-											<div className="relative z-10 flex h-5 w-5 items-center justify-center">
-												<div className="size-2 rounded-full bg-zinc-300 dark:bg-zinc-500" />
+											<div className="relative z-10 flex h-[20px] w-[40px] items-center justify-center">
+												<div className="h-[6px] w-[6px] rounded-full bg-zinc-300 dark:bg-zinc-600" />
 											</div>
 										)}
 									</div>
 
 									{/* Content Column */}
-									<div className="flex min-w-0 flex-1 flex-col gap-1 pr-6 pl-4">
-										<h4 className="break-words pr-2 font-medium text-text-strong-950 text-xs leading-5 dark:text-zinc-100">
+									<div className="flex min-w-0 flex-1 flex-col justify-start pt-4 pr-6 pb-4 pl-4">
+										<h4 className="break-words font-medium text-sm text-zinc-900 leading-snug dark:text-zinc-100">
 											{version.description ||
 												version.name ||
 												(version.isMajor
 													? "Published version"
 													: "Draft version")}
 										</h4>
-										<span className="font-normal text-[10px] text-text-soft-400 dark:text-zinc-500">
+										<div className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
 											{version.createdBy?.name || "Developer"} •{" "}
 											{formatRelativeTime(version.createdAt)}
-										</span>
+										</div>
 									</div>
 
 									{/* Interactive Actions (shown on hover) */}
-									<div className="absolute top-3 right-2 flex items-center gap-1 rounded bg-zinc-50 p-0.5 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-zinc-900/55">
+									<div className="absolute top-[20px] right-2 flex items-center gap-1 rounded-lg border border-zinc-100 bg-white/95 p-0.5 opacity-0 shadow-sm transition-opacity group-hover:opacity-100 dark:border-zinc-800 dark:bg-[#0a0a0a]/95">
 										{/* Preview action */}
 										<Tooltip.Root>
 											<Tooltip.Trigger asChild>
@@ -378,7 +384,7 @@ export function VersionSidebar() {
 														setSelectedPreviewVersion(version);
 														setIsPreviewOpen(true);
 													}}
-													className="size-6 rounded p-1 text-text-sub-600 ring-0 transition-colors hover:bg-bg-soft-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
+													className="size-6 rounded-md p-1 text-zinc-500 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
 												>
 													<Eye size={13} />
 												</Button.Root>
@@ -404,7 +410,7 @@ export function VersionSidebar() {
 														setIsDeleteModalOpen(true);
 													}}
 													disabled={isDeleting}
-													className="size-6 rounded p-1 text-text-sub-600 ring-0 transition-colors hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-rose-950/40"
+													className="size-6 rounded-md p-1 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-red-950/40"
 												>
 													{isDeleting ? (
 														<Loader2 size={13} className="animate-spin" />
@@ -421,12 +427,6 @@ export function VersionSidebar() {
 						})}
 					</div>
 				)}
-			</div>
-
-			{/* Bottom status indicator */}
-			<div className="flex shrink-0 items-center gap-1.5 border-stroke-soft-100 border-t bg-bg-weak-50 px-4 py-2 font-medium text-[9px] text-text-soft-400 dark:border-stroke-soft-100/10 dark:bg-zinc-900/10">
-				<Clock size={10} className="text-text-disabled-300" />
-				<span>{getStatusText()}</span>
 			</div>
 
 			{isPreviewOpen && selectedPreviewVersion && (

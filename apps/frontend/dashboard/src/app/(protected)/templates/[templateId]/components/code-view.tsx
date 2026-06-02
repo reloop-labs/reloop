@@ -110,10 +110,14 @@ export function CodeEditor() {
 								}
 
 								// Parse body and container theme styles from the HTML
-								const parsedBodyAndContainer = extractThemingStylesFromHtml(newVal);
+								const parsedBodyAndContainer =
+									extractThemingStylesFromHtml(newVal);
 
 								// Merge with existing styles to retain inputs configuration, falling back to parsed
-								let mergedStyles = mergeParsedStyles(existingStyles, parsedBodyAndContainer);
+								let mergedStyles = mergeParsedStyles(
+									existingStyles,
+									parsedBodyAndContainer,
+								);
 
 								// Update body/container backgroundColor and width in the editor theme styles
 								if (parsed.bodyBg) {
@@ -311,7 +315,9 @@ function sanitizeEmailHtml(rawHtml: string): string {
 	}
 
 	// 4. Find container table and convert to a container div, preserving styles and attributes.
-	let containerTable: Element | null = doc.querySelector('table[data-type="container"]');
+	let containerTable: Element | null = doc.querySelector(
+		'table[data-type="container"]',
+	);
 	if (!containerTable) {
 		// Look for any table that has container indicators (like max-width or class name)
 		const tables = Array.from(doc.body.getElementsByTagName("table"));
@@ -321,7 +327,8 @@ function sanitizeEmailHtml(rawHtml: string): string {
 				table.className.includes("container") ||
 				style.includes("max-width") ||
 				style.includes("maxWidth") ||
-				(/^\d+$/.test(table.getAttribute("width") || "") && table.getAttribute("width") !== "100%");
+				(/^\d+$/.test(table.getAttribute("width") || "") &&
+					table.getAttribute("width") !== "100%");
 			if (hasIndicator) {
 				containerTable = table;
 				break;
@@ -565,7 +572,9 @@ function expandShorthandStyles(root: Element): void {
 				// Skip any property whose root is a shorthand we're expanding
 				const isShorthand =
 					SHORTHAND_ROOTS.has(prop) ||
-					SPACING_LONGHANDS.includes(prop as (typeof SPACING_LONGHANDS)[number]);
+					SPACING_LONGHANDS.includes(
+						prop as (typeof SPACING_LONGHANDS)[number],
+					);
 				if (!isShorthand) {
 					const val = scratch.style.getPropertyValue(prop);
 					if (val) kept.push(`${prop}:${val}`);
@@ -592,15 +601,15 @@ function parseCssUnit(val: string | null | undefined): number | undefined {
 	if (!val) return undefined;
 	const clean = val.trim().toLowerCase();
 	if (clean.endsWith("px")) {
-		return parseFloat(clean) || 0;
+		return Number.parseFloat(clean) || 0;
 	}
 	if (clean.endsWith("rem")) {
-		return (parseFloat(clean) || 0) * 16;
+		return (Number.parseFloat(clean) || 0) * 16;
 	}
 	if (clean.endsWith("em")) {
-		return (parseFloat(clean) || 0) * 16;
+		return (Number.parseFloat(clean) || 0) * 16;
 	}
-	const num = parseFloat(clean);
+	const num = Number.parseFloat(clean);
 	if (!isNaN(num)) return num;
 	return undefined;
 }
@@ -616,11 +625,16 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 		const style = bodyEl.getAttribute("style") || "";
 		const scratch = document.createElement("div");
 		scratch.style.cssText = style;
-		bodyBgColor = scratch.style.backgroundColor || bodyEl.getAttribute("bgcolor") || "#ffffff";
+		bodyBgColor =
+			scratch.style.backgroundColor ||
+			bodyEl.getAttribute("bgcolor") ||
+			"#ffffff";
 	}
 
 	// 2. Find container table/div
-	let containerTable: Element | null = doc.querySelector('table[data-type="container"]');
+	let containerTable: Element | null = doc.querySelector(
+		'table[data-type="container"]',
+	);
 	if (!containerTable) {
 		const tables = Array.from(doc.getElementsByTagName("table"));
 		for (const table of tables) {
@@ -629,7 +643,8 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 				table.className.includes("container") ||
 				style.includes("max-width") ||
 				style.includes("maxWidth") ||
-				(/^\d+$/.test(table.getAttribute("width") || "") && table.getAttribute("width") !== "100%");
+				(/^\d+$/.test(table.getAttribute("width") || "") &&
+					table.getAttribute("width") !== "100%");
 			if (hasIndicator) {
 				containerTable = table;
 				break;
@@ -682,8 +697,11 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 			if (parsedWidth) containerWidth = parsedWidth;
 		}
 
-		containerBg = tableScratch.style.backgroundColor || containerTable.getAttribute("bgcolor") || "#ffffff";
-		
+		containerBg =
+			tableScratch.style.backgroundColor ||
+			containerTable.getAttribute("bgcolor") ||
+			"#ffffff";
+
 		const radiusAttr = tableScratch.style.borderRadius;
 		if (radiusAttr) {
 			const parsedRadius = parseCssUnit(radiusAttr);
@@ -795,7 +813,7 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 					type: "color",
 					value: bodyBgColor,
 					prop: "backgroundColor",
-					classReference: "body"
+					classReference: "body",
 				},
 				{
 					label: "Padding Top",
@@ -803,7 +821,7 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 					value: undefined,
 					unit: "px",
 					prop: "paddingTop",
-					classReference: "body"
+					classReference: "body",
 				},
 				{
 					label: "Padding Right",
@@ -811,7 +829,7 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 					value: undefined,
 					unit: "px",
 					prop: "paddingRight",
-					classReference: "body"
+					classReference: "body",
 				},
 				{
 					label: "Padding Bottom",
@@ -819,7 +837,7 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 					value: undefined,
 					unit: "px",
 					prop: "paddingBottom",
-					classReference: "body"
+					classReference: "body",
 				},
 				{
 					label: "Padding Left",
@@ -827,9 +845,9 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 					value: undefined,
 					unit: "px",
 					prop: "paddingLeft",
-					classReference: "body"
-				}
-			]
+					classReference: "body",
+				},
+			],
 		},
 		{
 			id: "container",
@@ -843,10 +861,10 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 					options: {
 						left: "Left",
 						center: "Center",
-						right: "Right"
+						right: "Right",
 					},
 					prop: "align",
-					classReference: "container"
+					classReference: "container",
 				},
 				{
 					label: "Width",
@@ -854,28 +872,28 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 					value: containerWidth,
 					unit: "px",
 					prop: "width",
-					classReference: "container"
+					classReference: "container",
 				},
 				{
 					label: "Height",
 					type: "number",
 					unit: "px",
 					prop: "height",
-					classReference: "container"
+					classReference: "container",
 				},
 				{
 					label: "Text",
 					type: "color",
 					value: "#000000",
 					prop: "color",
-					classReference: "container"
+					classReference: "container",
 				},
 				{
 					label: "Background",
 					type: "color",
 					value: containerBg,
 					prop: "backgroundColor",
-					classReference: "container"
+					classReference: "container",
 				},
 				{
 					label: "Padding Top",
@@ -883,7 +901,7 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 					value: containerPaddingTop,
 					unit: "px",
 					prop: "paddingTop",
-					classReference: "container"
+					classReference: "container",
 				},
 				{
 					label: "Padding Right",
@@ -891,7 +909,7 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 					value: containerPaddingRight,
 					unit: "px",
 					prop: "paddingRight",
-					classReference: "container"
+					classReference: "container",
 				},
 				{
 					label: "Padding Bottom",
@@ -899,7 +917,7 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 					value: containerPaddingBottom,
 					unit: "px",
 					prop: "paddingBottom",
-					classReference: "container"
+					classReference: "container",
 				},
 				{
 					label: "Padding Left",
@@ -907,7 +925,7 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 					value: containerPaddingLeft,
 					unit: "px",
 					prop: "paddingLeft",
-					classReference: "container"
+					classReference: "container",
 				},
 				{
 					label: "Corner radius",
@@ -915,43 +933,92 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 					value: containerBorderRadius,
 					unit: "px",
 					prop: "borderRadius",
-					classReference: "container"
+					classReference: "container",
 				},
 				{
 					label: "Border color",
 					type: "color",
 					value: "#000000",
 					prop: "borderColor",
-					classReference: "container"
-				}
-			]
-		}
+					classReference: "container",
+				},
+			],
+		},
 	];
 }
 
-function mergeParsedStyles(existingStyles: any, parsedBodyAndContainer: any[]): any[] {
-	const baseGroups = Array.isArray(existingStyles) && existingStyles.length > 0
-		? existingStyles
-		: [
-			{ id: "body", title: "Background", classReference: "body", inputs: [] },
-			{ id: "container", title: "Content", classReference: "container", inputs: [] },
-			{ id: "typography", title: "Text", classReference: "body", inputs: [] },
-			{ id: "h1", title: "Title", classReference: "h1", inputs: [] },
-			{ id: "h2", title: "Subtitle", classReference: "h2", inputs: [] },
-			{ id: "h3", title: "Heading", classReference: "h3", inputs: [] },
-			{ id: "text", title: "Paragraph", classReference: "paragraph", inputs: [] },
-			{ id: "button", title: "Button", classReference: "button", inputs: [] },
-			{ id: "link", title: "Link", classReference: "link", inputs: [] },
-			{ id: "list", title: "List", classReference: "list", inputs: [] },
-			{ id: "nested-list", title: "Nested List", classReference: "nestedList", inputs: [] },
-			{ id: "list-item", title: "List Item", classReference: "listItem", inputs: [] },
-			{ id: "code-block", title: "Code Block", classReference: "codeBlock", inputs: [] },
-			{ id: "inline-code", title: "Inline Code", classReference: "inlineCode", inputs: [] },
-		];
+function mergeParsedStyles(
+	existingStyles: any,
+	parsedBodyAndContainer: any[],
+): any[] {
+	const baseGroups =
+		Array.isArray(existingStyles) && existingStyles.length > 0
+			? existingStyles
+			: [
+					{
+						id: "body",
+						title: "Background",
+						classReference: "body",
+						inputs: [],
+					},
+					{
+						id: "container",
+						title: "Content",
+						classReference: "container",
+						inputs: [],
+					},
+					{
+						id: "typography",
+						title: "Text",
+						classReference: "body",
+						inputs: [],
+					},
+					{ id: "h1", title: "Title", classReference: "h1", inputs: [] },
+					{ id: "h2", title: "Subtitle", classReference: "h2", inputs: [] },
+					{ id: "h3", title: "Heading", classReference: "h3", inputs: [] },
+					{
+						id: "text",
+						title: "Paragraph",
+						classReference: "paragraph",
+						inputs: [],
+					},
+					{
+						id: "button",
+						title: "Button",
+						classReference: "button",
+						inputs: [],
+					},
+					{ id: "link", title: "Link", classReference: "link", inputs: [] },
+					{ id: "list", title: "List", classReference: "list", inputs: [] },
+					{
+						id: "nested-list",
+						title: "Nested List",
+						classReference: "nestedList",
+						inputs: [],
+					},
+					{
+						id: "list-item",
+						title: "List Item",
+						classReference: "listItem",
+						inputs: [],
+					},
+					{
+						id: "code-block",
+						title: "Code Block",
+						classReference: "codeBlock",
+						inputs: [],
+					},
+					{
+						id: "inline-code",
+						title: "Inline Code",
+						classReference: "inlineCode",
+						inputs: [],
+					},
+				];
 
-	const parsedMap = new Map(parsedBodyAndContainer.map(g => [g.id, g]));
+	const parsedMap = new Map(parsedBodyAndContainer.map((g) => [g.id, g]));
 
-	return baseGroups.map(group => {
+	return baseGroups.map((group) => {
 		const parsedGroup = parsedMap.get(group.id);
 		if (parsedGroup) {
 			return parsedGroup;
@@ -962,19 +1029,26 @@ function mergeParsedStyles(existingStyles: any, parsedBodyAndContainer: any[]): 
 
 function convertSectionTablesToSections(root: Element): void {
 	const tables = Array.from(root.getElementsByTagName("table"));
-	
+
 	for (const table of tables) {
-		if (table.getAttribute("data-type") === "container" || table.className.includes("node-container")) {
+		if (
+			table.getAttribute("data-type") === "container" ||
+			table.className.includes("node-container")
+		) {
 			continue;
 		}
 
-		const rows = Array.from(table.querySelectorAll("tr")).filter(tr => tr.closest("table") === table);
+		const rows = Array.from(table.querySelectorAll("tr")).filter(
+			(tr) => tr.closest("table") === table,
+		);
 		if (rows.length !== 1) continue;
 
 		const row = rows[0];
 		if (!row) continue;
 
-		const cells = Array.from(row.querySelectorAll("td")).filter(td => td.closest("tr") === row);
+		const cells = Array.from(row.querySelectorAll("td")).filter(
+			(td) => td.closest("tr") === row,
+		);
 		if (cells.length !== 1) continue;
 
 		const cell = cells[0];
@@ -988,15 +1062,39 @@ function convertSectionTablesToSections(root: Element): void {
 
 		// Determine if this is a styled section (with background, borders, or padding)
 		const bg = tableScratch.style.backgroundColor;
-		const hasBg = bg && bg !== "transparent" && bg !== "rgba(0, 0, 0, 0)" && bg !== "rgb(0, 0, 0)";
-		const hasBorder = 
-			tableScratch.style.borderWidth || tableScratch.style.border || tableScratch.style.borderStyle ||
-			cellScratch.style.borderWidth || cellScratch.style.border || cellScratch.style.borderStyle;
+		const hasBg =
+			bg &&
+			bg !== "transparent" &&
+			bg !== "rgba(0, 0, 0, 0)" &&
+			bg !== "rgb(0, 0, 0)";
+		const hasBorder =
+			tableScratch.style.borderWidth ||
+			tableScratch.style.border ||
+			tableScratch.style.borderStyle ||
+			cellScratch.style.borderWidth ||
+			cellScratch.style.border ||
+			cellScratch.style.borderStyle;
 
-		const pt = cellScratch.style.paddingTop || cellScratch.style.padding || tableScratch.style.paddingTop || tableScratch.style.padding;
-		const pr = cellScratch.style.paddingRight || cellScratch.style.padding || tableScratch.style.paddingRight || tableScratch.style.padding;
-		const pb = cellScratch.style.paddingBottom || cellScratch.style.padding || tableScratch.style.paddingBottom || tableScratch.style.padding;
-		const pl = cellScratch.style.paddingLeft || cellScratch.style.padding || tableScratch.style.paddingLeft || tableScratch.style.padding;
+		const pt =
+			cellScratch.style.paddingTop ||
+			cellScratch.style.padding ||
+			tableScratch.style.paddingTop ||
+			tableScratch.style.padding;
+		const pr =
+			cellScratch.style.paddingRight ||
+			cellScratch.style.padding ||
+			tableScratch.style.paddingRight ||
+			tableScratch.style.padding;
+		const pb =
+			cellScratch.style.paddingBottom ||
+			cellScratch.style.padding ||
+			tableScratch.style.paddingBottom ||
+			tableScratch.style.padding;
+		const pl =
+			cellScratch.style.paddingLeft ||
+			cellScratch.style.padding ||
+			tableScratch.style.paddingLeft ||
+			tableScratch.style.padding;
 		const hasPadding = pt || pr || pb || pl;
 
 		const isStyledSection = hasBg || hasBorder || hasPadding;
@@ -1004,7 +1102,7 @@ function convertSectionTablesToSections(root: Element): void {
 		if (isStyledSection) {
 			const section = root.ownerDocument.createElement("section");
 			section.setAttribute("data-type", "section");
-			
+
 			const tableClass = table.getAttribute("class");
 			if (tableClass) {
 				section.setAttribute("class", `${tableClass} node-section`);
@@ -1050,17 +1148,20 @@ function convertSectionTablesToSections(root: Element): void {
 			const parent = table.parentNode;
 			if (parent) {
 				// If there's a single child element, copy table-level margin styles to it
-				const elementChildren = childNodes.filter(n => n.nodeType === 1) as Element[];
+				const elementChildren = childNodes.filter(
+					(n) => n.nodeType === 1,
+				) as Element[];
 				if (elementChildren.length === 1) {
 					const singleChild = elementChildren[0];
 					const tableStyle = table.getAttribute("style");
 					if (tableStyle && singleChild) {
 						const childScratch = root.ownerDocument.createElement("div");
-						childScratch.style.cssText = singleChild.getAttribute("style") || "";
-						
+						childScratch.style.cssText =
+							singleChild.getAttribute("style") || "";
+
 						const tableScratchEl = root.ownerDocument.createElement("div");
 						tableScratchEl.style.cssText = tableStyle;
-						
+
 						// Copy margin styles from table to child
 						for (let i = 0; i < tableScratchEl.style.length; i++) {
 							const prop = tableScratchEl.style[i];
@@ -1069,7 +1170,7 @@ function convertSectionTablesToSections(root: Element): void {
 								if (val) childScratch.style.setProperty(prop, val);
 							}
 						}
-						
+
 						if (childScratch.style.cssText) {
 							singleChild.setAttribute("style", childScratch.style.cssText);
 						}
@@ -1098,11 +1199,13 @@ function parseGlobalStylesFromHtml(html: string) {
 	}
 
 	// Rewrite body and html selectors to target the scoped visual editor container instead
-	cssString = cssString.replace(/(?<![\.#\-\w])body\b/g, "&");
-	cssString = cssString.replace(/(?<![\.#\-\w])html\b/g, "&");
+	cssString = cssString.replace(/(?<![.#\-\w])body\b/g, "&");
+	cssString = cssString.replace(/(?<![.#\-\w])html\b/g, "&");
 
 	// 2. Extract external stylesheet links (e.g. google fonts) so they can load in the head
-	const links = doc.querySelectorAll("link[rel='stylesheet'], link[href*='fonts.googleapis.com']");
+	const links = doc.querySelectorAll(
+		"link[rel='stylesheet'], link[href*='fonts.googleapis.com']",
+	);
 	let fontImports = "";
 	for (const link of Array.from(links)) {
 		const href = link.getAttribute("href");
@@ -1110,7 +1213,7 @@ function parseGlobalStylesFromHtml(html: string) {
 			fontImports += `@import url('${href}');\n`;
 		}
 	}
-	
+
 	if (fontImports) {
 		cssString = fontImports + cssString;
 	}
@@ -1118,12 +1221,17 @@ function parseGlobalStylesFromHtml(html: string) {
 	// 3. Find background colors
 	let bodyBg = "";
 	const tables = doc.querySelectorAll("table");
-	
-	// Check outer tables first: React Email templates usually wrapper the actual background color 
+
+	// Check outer tables first: React Email templates usually wrapper the actual background color
 	// on layout tables, leaving the <body> tag as a fallback or defaulting to white (#ffffff).
 	for (const table of Array.from(tables)) {
 		const bg = table.style.backgroundColor || table.getAttribute("bgcolor");
-		if (bg && bg !== "#ffffff" && bg !== "white" && bg !== "rgb(255, 255, 255)") {
+		if (
+			bg &&
+			bg !== "#ffffff" &&
+			bg !== "white" &&
+			bg !== "rgb(255, 255, 255)"
+		) {
 			bodyBg = bg;
 			break;
 		}
@@ -1141,7 +1249,10 @@ function parseGlobalStylesFromHtml(html: string) {
 	if (!bodyBg) {
 		const firstTable = tables[0];
 		if (firstTable) {
-			bodyBg = firstTable.style.backgroundColor || firstTable.getAttribute("bgcolor") || "";
+			bodyBg =
+				firstTable.style.backgroundColor ||
+				firstTable.getAttribute("bgcolor") ||
+				"";
 		}
 	}
 
@@ -1149,9 +1260,10 @@ function parseGlobalStylesFromHtml(html: string) {
 	let containerWidth: number | null = null;
 	const firstTable = doc.querySelector("table");
 	if (firstTable) {
-		const widthAttr = firstTable.getAttribute("width") || firstTable.style.width;
+		const widthAttr =
+			firstTable.getAttribute("width") || firstTable.style.width;
 		if (widthAttr) {
-			const parsedWidth = parseInt(widthAttr, 10);
+			const parsedWidth = Number.parseInt(widthAttr, 10);
 			if (!isNaN(parsedWidth)) {
 				containerWidth = parsedWidth;
 			}
@@ -1178,7 +1290,12 @@ function getGlobalStylesArray(editor: any): any[] {
 }
 
 // Helper to update a specific property in the styles array
-function updateGlobalStyleValue(styles: any[], componentId: string, prop: string, value: any) {
+function updateGlobalStyleValue(
+	styles: any[],
+	componentId: string,
+	prop: string,
+	value: any,
+) {
 	if (!styles || !Array.isArray(styles)) return styles;
 	return styles.map((group) => {
 		if (group.id !== componentId) return group;

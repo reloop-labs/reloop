@@ -251,7 +251,14 @@ export function useCollaboration({
 				email: activeUser.email,
 			});
 		}
-	}, [collab?.provider, user.name, user.color, user.avatar, user.email, serverUser]);
+	}, [
+		collab?.provider,
+		user.name,
+		user.color,
+		user.avatar,
+		user.email,
+		serverUser,
+	]);
 
 	return {
 		ydoc: collab?.ydoc ?? (null as any),

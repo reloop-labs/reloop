@@ -24,7 +24,10 @@ export async function sendTestEmail(params: {
 	} = params;
 
 	// 1. Verify template exists and belongs to the organization
-	const template = await templateModel.findByIdAndOrg(templateId, organizationId);
+	const template = await templateModel.findByIdAndOrg(
+		templateId,
+		organizationId,
+	);
 	if (!template) {
 		throw TemplateErrors.notFound(templateId);
 	}
@@ -34,7 +37,7 @@ export async function sendTestEmail(params: {
 	if (!resolvedFromEmail) {
 		throw TemplateErrors.testFailed(
 			"Sender email is required to send a test email. Configure it in template details.",
-			"Go to the template editor details and set a valid From Email."
+			"Go to the template editor details and set a valid From Email.",
 		);
 	}
 
@@ -44,14 +47,15 @@ export async function sendTestEmail(params: {
 	let resolvedHtml = html;
 	if (!resolvedHtml) {
 		// Fetch the latest version (draft or published)
-		const latestVersion = await templateVersionModel.getLatestVersion(templateId);
+		const latestVersion =
+			await templateVersionModel.getLatestVersion(templateId);
 		resolvedHtml = latestVersion?.renderedHtml || "";
 	}
 
 	if (!resolvedHtml) {
 		throw TemplateErrors.testFailed(
 			"Template HTML content is empty. Add content to the template before testing.",
-			"Add some content using the editor, or save a draft first."
+			"Add some content using the editor, or save a draft first.",
 		);
 	}
 
@@ -124,7 +128,7 @@ export async function sendTestEmail(params: {
 		});
 		throw TemplateErrors.testFailed(
 			"Failed to queue the test email via the message bus.",
-			"Verify that the NATS server is running."
+			"Verify that the NATS server is running.",
 		);
 	}
 

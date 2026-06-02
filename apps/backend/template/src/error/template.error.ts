@@ -94,7 +94,9 @@ export const TemplateErrors = {
 			status: 400,
 			message: "Failed to send test email",
 			why,
-			fix: fix ?? "Check your SMTP configuration, sender address, and recipient address.",
+			fix:
+				fix ??
+				"Check your SMTP configuration, sender address, and recipient address.",
 		}),
 	updateFailed: (id: string) =>
 		createError({
