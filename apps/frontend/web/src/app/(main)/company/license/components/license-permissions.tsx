@@ -1,84 +1,77 @@
-const permitted = [
+const terms = [
 	{
+		number: "01",
 		title: "Personal use",
 		description:
 			"Use, copy, modify, and distribute Reloop for personal projects.",
 	},
 	{
+		number: "02",
 		title: "Internal company use",
 		description:
 			"Deploy Reloop inside your organization for internal email infrastructure.",
 	},
-];
-
-const restricted = [
 	{
-		title: "Commercial redistribution",
+		number: "03",
+		title: "No commercial redistribution",
 		description:
-			"Sell, sublicense, or otherwise commercially redistribute the software.",
+			"You may not sell, sublicense, or commercially redistribute the software.",
 	},
 	{
-		title: "Competing hosted services",
+		number: "04",
+		title: "No competing hosted services",
 		description:
-			"Offer Reloop—or a modified version—as a commercial SaaS, PaaS, or similar hosted service.",
-	},
-	{
-		title: "Competing products",
-		description:
-			"Use Reloop in any product or service whose primary purpose is to compete with Reloop Labs.",
+			"You may not offer Reloop—or a modified version—as a commercial SaaS, PaaS, or similar hosted service, or to compete with Reloop Labs.",
 	},
 ];
 
-function PermissionList({
-	items,
-	variant,
-}: {
-	items: typeof permitted;
-	variant: "permitted" | "restricted";
-}) {
-	const isPermitted = variant === "permitted";
-
-	return (
-		<ul className="mt-6 space-y-6 sm:mt-8 sm:space-y-7">
-			{items.map((item) => (
-				<li key={item.title} className="flex items-start gap-3.5">
-					<span
-						className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md border font-semibold text-[10px] ${
-							isPermitted
-								? "border-emerald-500/25 bg-emerald-500/10 text-emerald-500"
-								: "border-red-400/20 bg-red-400/10 text-red-400/90"
-						}`}
-					>
-						{isPermitted ? "✓" : "✕"}
-					</span>
-					<div>
-						<p className="font-semibold text-[15px] text-text-strong-950 leading-snug sm:text-[16px] dark:text-white">
-							{item.title}
-						</p>
-						<p className="mt-1.5 text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/45">
-							{item.description}
-						</p>
-					</div>
-				</li>
-			))}
-		</ul>
-	);
-}
+const bentoCellClass =
+	"border-stroke-soft-200 border-t border-l-0 bg-transparent p-8 transition-colors duration-300 first:border-t-0 hover:bg-black/[0.01] sm:border-t sm:border-l lg:p-10 dark:border-white/10 dark:hover:bg-white/[0.02] sm:[&:nth-child(-n+2)]:border-t-0 sm:[&:nth-child(2n+1)]:border-l-0";
 
 export function LicensePermissions() {
 	return (
-		<div className="grid gap-px overflow-hidden rounded-2xl border border-stroke-soft-200 bg-stroke-soft-200 sm:grid-cols-2 dark:border-white/10 dark:bg-white/10">
-			<div className="bg-bg-weak-50 p-6 sm:p-8 dark:bg-[#0a0a0a]">
-				<p className="font-semibold text-[11px] text-emerald-600 uppercase tracking-[0.16em] dark:text-emerald-400/90">
-					Permitted
+		<div className="flex flex-col gap-16 lg:flex-row lg:items-start lg:gap-24">
+			<div className="lg:w-[480px] lg:shrink-0">
+				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
+					Usage terms
 				</p>
-				<PermissionList items={permitted} variant="permitted" />
+				<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
+					What you can
+					<br />
+					and cannot do.
+				</h2>
+				<p className="mt-6 max-w-[420px] text-[15px] text-text-sub-600 leading-7 sm:text-[16px] dark:text-white/50">
+					Apache 2.0 with additional terms defined by Reloop Labs. Free for
+					personal and internal use.
+				</p>
+				<p className="mt-6 max-w-[420px] text-[14px] text-text-sub-600 leading-7 dark:text-white/40">
+					Need a commercial license?{" "}
+					<a
+						href="mailto:reloop.sh@gmail.com"
+						className="font-semibold text-text-strong-950 underline decoration-stroke-soft-200 underline-offset-4 transition-colors hover:text-primary-base dark:text-white dark:decoration-white/20 dark:hover:text-primary-base"
+					>
+						Contact us
+					</a>
+					.
+				</p>
 			</div>
-			<div className="bg-bg-weak-50 p-6 sm:p-8 dark:bg-[#111]">
-				<p className="font-semibold text-[11px] text-red-600/80 uppercase tracking-[0.16em] dark:text-red-400/80">
-					Not permitted
-				</p>
-				<PermissionList items={restricted} variant="restricted" />
+
+			<div className="flex-1">
+				<div className="grid overflow-hidden rounded-2xl border border-stroke-soft-200 sm:grid-cols-2 dark:border-white/10">
+					{terms.map((item) => (
+						<div key={item.number} className={bentoCellClass}>
+							<span className="font-semibold text-sm text-text-soft-400 tabular-nums dark:text-white/28">
+								{item.number}
+							</span>
+							<h3 className="mt-3 font-semibold text-[17px] text-text-strong-950 leading-snug sm:text-[18px] dark:text-white">
+								{item.title}
+							</h3>
+							<p className="mt-3 text-[14px] text-text-sub-600 leading-[1.7] sm:text-[15px] dark:text-white/50">
+								{item.description}
+							</p>
+						</div>
+					))}
+				</div>
 			</div>
 		</div>
 	);

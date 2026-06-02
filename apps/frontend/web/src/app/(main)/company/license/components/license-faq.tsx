@@ -29,5 +29,5 @@ const licenseFaqItems = [
 ];
 
 export function LicenseFaq() {
-	return <FaqSection items={licenseFaqItems} id="license-faq" compact />;
+	return <FaqSection items={licenseFaqItems} id="license-faq" plain />;
 }

@@ -1,13 +1,12 @@
 import {
-	CodeBlock,
 	FeatureCta,
 	MarketingPageShell,
 	PageSection,
-	SectionHeading,
 } from "@reloop/web/components/page-shell";
 import type { Metadata } from "next";
 import { LicenseFaq } from "./components/license-faq";
 import { LicensePermissions } from "./components/license-permissions";
+import { LicenseText } from "./components/license-text";
 
 export const metadata: Metadata = {
 	title: "License | Reloop",
@@ -69,16 +68,11 @@ const LicensePage = () => {
 			compactHero
 		>
 			<PageSection narrow flushTop>
-				<CodeBlock>{LICENSE_TEXT}</CodeBlock>
+				<LicenseText>{LICENSE_TEXT}</LicenseText>
+			</PageSection>
 
-				<div className="mt-14 sm:mt-16">
-					<SectionHeading
-						title="What you can & cannot do"
-						description="Apache 2.0 with additional terms defined by Reloop Labs."
-						compact
-					/>
-					<LicensePermissions />
-				</div>
+			<PageSection>
+				<LicensePermissions />
 			</PageSection>
 
 			<LicenseFaq />
@@ -92,7 +86,6 @@ const LicensePage = () => {
 					label: "View source code",
 					href: "https://github.com/reloop-labs/reloop",
 				}}
-				compact
 			/>
 		</MarketingPageShell>
 	);
