@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 import { CodeEditor } from "./components/code-view";
 import { FullEmailBuilder } from "./components/editor";
 import { EditorProvider } from "./components/editor-provider";
@@ -31,25 +32,39 @@ const Page = () => {
 
 				<div className="flex h-full flex-1 overflow-hidden">
 					{/* Left panel (Code, history, or subpanels) - Only visible when split/non-visual */}
-					{viewMode !== "visual" && (
-						<div
-							className={`relative m-2 flex shrink-0 overflow-hidden ${
-								viewMode === "code" ? "w-1/2" : "w-[356px]"
-							}`}
-						>
-							{viewMode === "code" && <CodeEditor />}
-							{viewMode === "history" && <VersionSidebar />}
-							{viewMode === "variables" && (
-								<VariablesPanel onClose={() => setViewMode("visual")} />
-							)}
-							{viewMode === "score" && (
-								<ScorePanel onClose={() => setViewMode("visual")} />
-							)}
-							{viewMode === "test" && (
-								<TestPanel onClose={() => setViewMode("visual")} />
-							)}
-						</div>
-					)}
+					<AnimatePresence initial={false}>
+						{viewMode !== "visual" && (
+							<motion.div
+								initial={{ width: 0, opacity: 0 }}
+								animate={{
+									width: viewMode === "code" ? "50%" : "356px",
+									opacity: 1,
+								}}
+								exit={{ width: 0, opacity: 0 }}
+								transition={{
+									type: "spring",
+									stiffness: 320,
+									damping: 33,
+									opacity: { duration: 0.2 },
+								}}
+								className="relative flex shrink-0 overflow-hidden"
+							>
+								<div className="relative m-2 flex flex-1 overflow-hidden">
+									{viewMode === "code" && <CodeEditor />}
+									{viewMode === "history" && <VersionSidebar />}
+									{viewMode === "variables" && (
+										<VariablesPanel onClose={() => setViewMode("visual")} />
+									)}
+									{viewMode === "score" && (
+										<ScorePanel onClose={() => setViewMode("visual")} />
+									)}
+									{viewMode === "test" && (
+										<TestPanel onClose={() => setViewMode("visual")} />
+									)}
+								</div>
+							</motion.div>
+						)}
+					</AnimatePresence>
 
 					{/* Right panel (Visual builder + inspector) - Always visible */}
 					<div className="relative m-2 flex flex-1 overflow-hidden rounded-[24px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
