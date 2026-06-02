@@ -788,27 +788,40 @@ export function TestPanel({ onClose }: PanelProps) {
 					</p>
 
 					<form onSubmit={handleSendTest} className="space-y-5">
-						<div className="flex flex-col gap-1.5">
-							<Label.Root htmlFor="recipient-address">
-								Recipient Address
-								<Label.Asterisk />
-							</Label.Root>
-							<Input.Root size="small" className="rounded-xl">
-								<Input.Wrapper>
-									<Input.Icon>
-										<Send size={14} className="text-text-sub-600" />
-									</Input.Icon>
-									<Input.Input
-										id="recipient-address"
-										type="email"
-										required
-										placeholder="e.g. name@domain.com"
-										value={testEmail}
-										onChange={(e) => setTestEmail(e.target.value)}
-									/>
-								</Input.Wrapper>
-							</Input.Root>
-						</div>
+						{!fromEmail ? (
+							<div className="flex flex-col gap-2.5 rounded-2xl border border-rose-200/60 bg-rose-50/50 p-3.5 dark:border-rose-900/30 dark:bg-rose-950/10">
+								<div className="flex items-start gap-2.5">
+									<AlertCircle size={16} className="mt-0.5 shrink-0 text-rose-600 dark:text-rose-400" />
+									<div className="flex flex-col gap-1">
+										<span className="font-semibold text-rose-700 text-xs dark:text-rose-300">
+											Missing From Address
+										</span>
+										<p className="text-[11px] text-rose-600/90 leading-normal dark:text-rose-400/80">
+											You must configure a valid "From Email" in the Send Details panel before you can send a test email.
+										</p>
+									</div>
+								</div>
+							</div>
+						) : (
+							<div className="flex flex-col gap-1.5">
+								<Label.Root htmlFor="recipient-address">
+									Recipient Address
+									<Label.Asterisk />
+								</Label.Root>
+								<Input.Root size="small" className="rounded-xl">
+									<Input.Wrapper>
+										<Input.Input
+											id="recipient-address"
+											type="email"
+											required
+											placeholder="e.g. name@domain.com"
+											value={testEmail}
+											onChange={(e) => setTestEmail(e.target.value)}
+										/>
+									</Input.Wrapper>
+								</Input.Root>
+							</div>
+						)}
 
 						{detectedVars.length > 0 && (
 							<div className="space-y-4 border-stroke-soft-200 border-t pt-4 dark:border-stroke-soft-100/10">
@@ -862,7 +875,7 @@ export function TestPanel({ onClose }: PanelProps) {
 							variant="primary"
 							mode="filled"
 							size="small"
-							disabled={sending}
+							disabled={sending || !fromEmail}
 							className="w-full justify-center gap-1.5 rounded-xl py-2.5 font-medium"
 						>
 							{sending ? (
