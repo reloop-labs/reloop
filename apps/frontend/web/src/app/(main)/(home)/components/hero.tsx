@@ -1,5 +1,6 @@
 "use client";
 import * as Button from "@reloop/ui/button";
+import Link from "next/link";
 import { AnimatedAlternative } from "./animated-alternative";
 
 export default function Hero() {
@@ -16,17 +17,26 @@ export default function Hero() {
 						</div>
 						<h1 className="font-serif text-[2.8rem] leading-[1.05] tracking-tighter sm:text-[4.2rem]">
 							Email for{" "}
-							<span className="relative bg-[length:6px_3px] bg-[radial-gradient(circle,_#a3a3a3_1px,_transparent_1.5px)] bg-bottom bg-repeat-x transition-all duration-300 hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)] hover:text-primary-base dark:bg-[radial-gradient(circle,_#525252_1px,_transparent_1.5px)] dark:hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)]">
+							<Link
+								href="/product/ai-agents"
+								className="relative bg-[length:6px_3px] bg-[radial-gradient(circle,_#a3a3a3_1px,_transparent_1.5px)] bg-bottom bg-repeat-x transition-all duration-300 hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)] hover:text-primary-base dark:bg-[radial-gradient(circle,_#525252_1px,_transparent_1.5px)] dark:hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)]"
+							>
 								AI Agents
-							</span>
+							</Link>
 							,{" "}
-							<span className="relative bg-[length:6px_3px] bg-[radial-gradient(circle,_#a3a3a3_1px,_transparent_1.5px)] bg-bottom bg-repeat-x transition-all duration-300 hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)] hover:text-primary-base dark:bg-[radial-gradient(circle,_#525252_1px,_transparent_1.5px)] dark:hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)]">
+							<Link
+								href="/product/developers"
+								className="relative bg-[length:6px_3px] bg-[radial-gradient(circle,_#a3a3a3_1px,_transparent_1.5px)] bg-bottom bg-repeat-x transition-all duration-300 hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)] hover:text-primary-base dark:bg-[radial-gradient(circle,_#525252_1px,_transparent_1.5px)] dark:hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)]"
+							>
 								Developers
-							</span>{" "}
+							</Link>{" "}
 							&{" "}
-							<span className="relative bg-[length:6px_3px] bg-[radial-gradient(circle,_#a3a3a3_1px,_transparent_1.5px)] bg-bottom bg-repeat-x transition-all duration-300 hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)] hover:text-primary-base dark:bg-[radial-gradient(circle,_#525252_1px,_transparent_1.5px)] dark:hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)]">
+							<Link
+								href="/product/marketing-teams"
+								className="relative bg-[length:6px_3px] bg-[radial-gradient(circle,_#a3a3a3_1px,_transparent_1.5px)] bg-bottom bg-repeat-x transition-all duration-300 hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)] hover:text-primary-base dark:bg-[radial-gradient(circle,_#525252_1px,_transparent_1.5px)] dark:hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)]"
+							>
 								Marketing teams
-							</span>
+							</Link>
 							.
 						</h1>
 						<p className="mx-auto mt-8 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px]">
