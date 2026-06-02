@@ -37,22 +37,21 @@ export function LicensePermissions() {
 				</p>
 				<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
 					What you can
-					<br />
-					and cannot do.
+					<br />& cannot do.
 				</h2>
 				<p className="mt-6 max-w-[420px] text-[15px] text-text-sub-600 leading-7 sm:text-[16px] dark:text-white/50">
 					Apache 2.0 with additional terms defined by Reloop Labs. Free for
-					personal and internal use.
+					personal and internal use via self-hosting.
 				</p>
 				<p className="mt-6 max-w-[420px] text-[14px] text-text-sub-600 leading-7 dark:text-white/40">
-					Need a commercial license?{" "}
+					There is no commercial license.{" "}
 					<a
-						href="mailto:reloop.sh@gmail.com"
+						href="/resources/self-hosting-guide"
 						className="font-semibold text-text-strong-950 underline decoration-stroke-soft-200 underline-offset-4 transition-colors hover:text-primary-base dark:text-white dark:decoration-white/20 dark:hover:text-primary-base"
 					>
-						Contact us
-					</a>
-					.
+						Self-host Reloop
+					</a>{" "}
+					on your own infrastructure.
 				</p>
 			</div>
 

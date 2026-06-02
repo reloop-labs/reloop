@@ -11,7 +11,7 @@ import { LicenseText } from "./components/license-text";
 export const metadata: Metadata = {
 	title: "License | Reloop",
 	description:
-		"Reloop is licensed under Apache License 2.0 with additional use restrictions from Reloop Labs. Review permitted uses, restrictions, and commercial licensing.",
+		"Reloop is licensed under Apache License 2.0 with additional use restrictions from Reloop Labs. Review permitted uses, restrictions, and self-hosting requirements.",
 	openGraph: {
 		title: "License | Reloop",
 		description:
@@ -49,21 +49,21 @@ ADDITIONAL USE RESTRICTIONS (Custom Clause by Reloop Labs)
    - Use this software in any product or service whose primary purpose is to
      compete with Reloop Labs.
 
-3. For commercial licensing or partnerships, please contact:
-   reloop.sh@gmail.com`;
+3. There is no commercial license. To use Reloop, self-host the
+   open-source version on your own infrastructure.`;
 
 const LicensePage = () => {
 	return (
 		<MarketingPageShell
 			titleLines={["Apache 2.0 License"]}
-			description="Reloop is open source under Apache 2.0 with additional use restrictions from Reloop Labs—free for personal and internal use."
+			description="Reloop is open source under Apache 2.0 with additional use restrictions—free for personal and internal use via self-hosting."
 			primaryCta={{
 				label: "View on GitHub",
 				href: "https://github.com/reloop-labs/reloop",
 			}}
 			secondaryCta={{
-				label: "Contact for commercial use",
-				href: "mailto:reloop.sh@gmail.com",
+				label: "Self-hosting guide",
+				href: "/resources/self-hosting-guide",
 			}}
 			compactHero
 		>
@@ -79,11 +79,11 @@ const LicensePage = () => {
 
 			<FeatureCta
 				title="Ready to use Reloop?"
-				titleMuted="For personal and internal use."
-				description="Clone the repo and self-host—or reach out for commercial licensing."
-				primary={{ label: "Get started", href: "/dashboard/signup" }}
+				titleMuted="Self-host on your infrastructure."
+				description="Clone the repo and run Reloop on your own servers—that's the only way to use it."
+				primary={{ label: "Self-hosting guide", href: "/resources/self-hosting-guide" }}
 				secondary={{
-					label: "View source code",
+					label: "View on GitHub",
 					href: "https://github.com/reloop-labs/reloop",
 				}}
 			/>
