@@ -134,14 +134,8 @@ export function CodeEditor() {
 										parsed.bodyBg,
 									);
 								}
-								if (parsed.containerWidth !== null) {
-									mergedStyles = updateGlobalStyleValue(
-										mergedStyles,
-										"container",
-										"width",
-										parsed.containerWidth,
-									);
-								}
+								// Remove redundant containerWidth override here since extractThemingStylesFromHtml resolves it correctly
+
 								editor.commands.setGlobalContent("styles", mergedStyles);
 							} catch (err) {
 								console.error("Failed to apply global styles in timeout:", err);
@@ -412,6 +406,14 @@ function sanitizeEmailHtml(rawHtml: string): string {
 		}
 	}
 
+	// React Email uses `data-id="__react-email-column"` to mark responsive columns.
+	// The editor parses those into a Columns node. For icon-only rows (social footer),
+	// we want them to remain a tight, left-aligned table row, so strip the marker
+	// BEFORE we convert/unwrap tables below.
+	stripReactEmailColumnMarkersForIconRows(doc.body);
+	replaceSocialIconTablesWithInlineRow(doc.body);
+	normalizeSkinCtaCardAlignment(doc.body);
+
 	// NEW: Convert layout section tables to <section> tags
 	convertSectionTablesToSections(doc.body);
 
@@ -429,6 +431,16 @@ function sanitizeEmailHtml(rawHtml: string): string {
 	//   style="text-align: center" on wrapper elements
 	stripEmailCentering(doc.body);
 
+	// 6.75 Normalize link styling for the visual editor.
+	//
+	// Many React Email demos set `text-decoration: underline` inline for links to
+	// match email-client conventions. In the visual builder, that often looks
+	// heavier than the demo preview and conflicts with our canvas reset.
+	//
+	// Since we're editing content (not rendering in an email client), we remove
+	// inline underline styles so the link appearance matches the demo preview.
+	normalizeAnchorStyles(doc.body);
+
 	// 7. Expand CSS shorthand properties (padding, margin, border, border-radius)
 	// into their individual longhand equivalents. Email HTML often uses
 	// `padding: 10px 20px` etc., but the editor's inspector reads per-side
@@ -438,6 +450,201 @@ function sanitizeEmailHtml(rawHtml: string): string {
 	expandShorthandStyles(doc.body);
 
 	return doc.body.innerHTML;
+}
+
+function normalizeAnchorStyles(root: Element): void {
+	const anchors = Array.from(root.getElementsByTagName("a"));
+	for (const a of anchors) {
+		const el = a as HTMLAnchorElement;
+		const style = el.style;
+		if (!style) continue;
+
+		const td = style.textDecoration?.toLowerCase();
+		if (td && td.includes("underline")) {
+			style.removeProperty("text-decoration");
+			style.removeProperty("text-decoration-line");
+		}
+
+		// If the anchor explicitly sets a browser-blue-ish color, drop it so it
+		// inherits the email's intended text color in the builder.
+		if (style.color) {
+			// Keep explicit themed colors (rgb/hex) but remove named defaults.
+			const c = style.color.trim().toLowerCase();
+			if (c === "blue" || c === "#00f" || c === "#0000ff") {
+				style.removeProperty("color");
+			}
+		}
+	}
+}
+
+function stripReactEmailColumnMarkersForIconRows(root: Element): void {
+	const candidateTables = Array.from(
+		root.querySelectorAll('table td[data-id="__react-email-column"]'),
+	).map((td) => td.closest("table")).filter(Boolean) as HTMLTableElement[];
+
+	const uniqueTables = Array.from(new Set(candidateTables));
+
+	for (const table of uniqueTables) {
+		// Only consider "simple rows": exactly one row, and all direct cells are marked columns.
+		const directRow =
+			table.querySelector(":scope > tbody > tr") ||
+			table.querySelector(":scope > tr");
+		if (!directRow) continue;
+
+		const directCells = Array.from(directRow.querySelectorAll(":scope > td"));
+		if (directCells.length < 2) continue;
+		if (
+			!directCells.every(
+				(td) => td.getAttribute("data-id") === "__react-email-column",
+			)
+		) {
+			continue;
+		}
+
+		// Heuristic: icon rows are made of small cells containing a single <img>.
+		const looksLikeIconRow = directCells.every((td) => {
+			const imgs = td.querySelectorAll("img");
+			if (imgs.length !== 1) return false;
+			const hasOtherElements = Array.from(td.children).some(
+				(el) => el.tagName.toLowerCase() !== "img",
+			);
+			if (hasOtherElements) return false;
+
+			const widthAttr = td.getAttribute("width");
+			const widthNum = widthAttr ? Number.parseInt(widthAttr, 10) : undefined;
+			if (widthNum !== undefined && !Number.isNaN(widthNum) && widthNum > 48) {
+				return false;
+			}
+			return true;
+		});
+
+		if (!looksLikeIconRow) continue;
+
+		for (const td of directCells) {
+			td.removeAttribute("data-id");
+		}
+	}
+}
+
+/**
+ * TipTap's schema tends to treat "multiple <td> in one row" as Columns-like layout,
+ * which spreads icons across the whole width in the visual editor.
+ *
+ * For the common "social icons" footer pattern, replace the table with a simple
+ * inline row of images so the editor renders it tightly left-aligned.
+ */
+function replaceSocialIconTablesWithInlineRow(root: Element): void {
+	const tables = Array.from(root.querySelectorAll("table"));
+
+	for (const table of tables) {
+		const directRow =
+			table.querySelector(":scope > tbody > tr") || table.querySelector(":scope > tr");
+		if (!directRow) continue;
+
+		const directCells = Array.from(directRow.querySelectorAll(":scope > td"));
+		if (directCells.length < 2 || directCells.length > 8) continue;
+
+		const icons = directCells.map((td) => {
+			const imgs = td.querySelectorAll("img");
+			if (imgs.length !== 1) return null;
+			const img = imgs[0] as HTMLImageElement;
+			if (!img) return null;
+
+			// Heuristic: small square icons.
+			const wAttr = img.getAttribute("width");
+			const hAttr = img.getAttribute("height");
+			const w = wAttr ? Number.parseInt(wAttr, 10) : undefined;
+			const h = hAttr ? Number.parseInt(hAttr, 10) : undefined;
+			if (
+				(w !== undefined && !Number.isNaN(w) && w > 32) ||
+				(h !== undefined && !Number.isNaN(h) && h > 32)
+			) {
+				return null;
+			}
+
+			return img;
+		});
+
+		if (icons.some((x) => x === null)) continue;
+
+		// Another guard: icon tables typically have no nested tables inside cells.
+		const hasNestedTables = directCells.some((td) => td.querySelector("table"));
+		if (hasNestedTables) continue;
+
+		const doc = root.ownerDocument;
+		const p = doc.createElement("p");
+		p.setAttribute(
+			"style",
+			"margin:0;padding:0;margin-top:2rem;line-height:1",
+		);
+
+		icons.forEach((icon, idx) => {
+			if (!icon) return;
+			const cloned = icon.cloneNode(true) as HTMLImageElement;
+			// Inline row spacing similar to the email (1.5rem gap).
+			cloned.setAttribute(
+				"style",
+				`${icon.getAttribute("style") || ""};display:inline-block;vertical-align:middle;${
+					idx < icons.length - 1 ? "margin-right:1.5rem;" : ""
+				}`,
+			);
+			p.appendChild(cloned);
+		});
+
+		table.parentNode?.replaceChild(p, table);
+	}
+}
+
+/**
+ * The Skin welcome template includes a CTA card (light background) that is intended
+ * to be centered (heading, copy, and link). In real email HTML this is commonly
+ * achieved via table-cell alignment styles/attributes.
+ *
+ * When we transform the email into editor-friendly nodes, that alignment intent
+ * can be lost, leaving the card left-aligned (as in the mismatch screenshot).
+ *
+ * This normalizes the CTA card to be centered by applying `text-align:center`
+ * on the card container table/td when we detect the Skin CTA card pattern.
+ */
+function normalizeSkinCtaCardAlignment(root: Element): void {
+	const tables = Array.from(root.querySelectorAll("table"));
+	for (const table of tables) {
+		const style = table.getAttribute("style") || "";
+		const isSkinCardBg =
+			style.includes("background-color:rgb(249, 249, 237)") ||
+			style.includes("background-color: rgb(249, 249, 237)") ||
+			style.includes("background-color:rgb(249,249,237)") ||
+			style.includes("background-color: rgb(249,249,237)");
+		if (!isSkinCardBg) continue;
+
+		const text = table.textContent || "";
+		if (!text.includes("Start Exploring")) continue;
+		if (!text.includes("Join us on the journey")) continue;
+
+		const td =
+			table.querySelector("tbody > tr > td") ||
+			table.querySelector("tr > td") ||
+			table.querySelector("td");
+		if (!td) continue;
+
+		// Mark this subtree so `stripEmailCentering()` doesn't undo it.
+		table.setAttribute("data-preserve-center", "true");
+		td.setAttribute("data-preserve-center", "true");
+
+		const applyCenter = (el: Element) => {
+			const existing = el.getAttribute("style") || "";
+			if (existing.includes("text-align:center")) return;
+			el.setAttribute(
+				"style",
+				existing
+					? `${existing.replace(/;?\s*$/, ";")}text-align:center`
+					: "text-align:center",
+			);
+		};
+
+		applyCenter(table);
+		applyCenter(td);
+	}
 }
 
 /**
@@ -460,6 +667,13 @@ function stripEmailCentering(root: Element): void {
 	let node: Node | null = root;
 	while (node) {
 		const el = node as Element;
+
+		// Preserve intentional centering for specific components (e.g. Skin CTA card)
+		// that we mark during sanitization.
+		if (el.closest?.('[data-preserve-center="true"]')) {
+			node = walker.nextNode();
+			continue;
+		}
 
 		// Remove align="center" attribute (common on <table>, <td>, <div>)
 		if (el.getAttribute("align")?.toLowerCase() === "center") {
@@ -610,7 +824,7 @@ function parseCssUnit(val: string | null | undefined): number | undefined {
 		return (Number.parseFloat(clean) || 0) * 16;
 	}
 	const num = Number.parseFloat(clean);
-	if (!isNaN(num)) return num;
+	if (!Number.isNaN(num)) return num;
 	return undefined;
 }
 
@@ -1165,7 +1379,7 @@ function convertSectionTablesToSections(root: Element): void {
 						// Copy margin styles from table to child
 						for (let i = 0; i < tableScratchEl.style.length; i++) {
 							const prop = tableScratchEl.style[i];
-							if (prop && prop.startsWith("margin")) {
+							if (prop?.startsWith("margin")) {
 								const val = tableScratchEl.style.getPropertyValue(prop);
 								if (val) childScratch.style.setProperty(prop, val);
 							}
@@ -1198,9 +1412,16 @@ function parseGlobalStylesFromHtml(html: string) {
 		cssString += tag.textContent + "\n";
 	}
 
-	// Rewrite body and html selectors to target the scoped visual editor container instead
-	cssString = cssString.replace(/(?<![.#\-\w])body\b/g, "&");
-	cssString = cssString.replace(/(?<![.#\-\w])html\b/g, "&");
+	// Rewrite `body` / `html` selectors to target the TipTap root instead.
+	// The visual builder renders inside a `.ProseMirror` element (not an iframe),
+	// so keeping `body { ... }` rules would do nothing, and using `&` is not valid
+	// plain CSS. Scoping to `.ProseMirror` preserves the original intent (fonts,
+	// spacing, resets) without leaking styles across the app shell.
+	//
+	// We use `.ProseMirror.ProseMirror` (same element, higher specificity) to
+	// ensure these rules override the editor's default theme CSS.
+	cssString = cssString.replace(/(?<![.#\-\w])body\b/g, ".ProseMirror.ProseMirror");
+	cssString = cssString.replace(/(?<![.#\-\w])html\b/g, ".ProseMirror.ProseMirror");
 
 	// 2. Extract external stylesheet links (e.g. google fonts) so they can load in the head
 	const links = doc.querySelectorAll(
@@ -1216,6 +1437,55 @@ function parseGlobalStylesFromHtml(html: string) {
 
 	if (fontImports) {
 		cssString = fontImports + cssString;
+	}
+
+	// 2.5 Apply a strong "email base" reset to the editor canvas.
+	//
+	// The visual builder runs inside TipTap's `.ProseMirror`, which has its own
+	// default typography (margins, font sizing, colors). Email HTML assumes a
+	// mostly-neutral environment (like an iframe/email client), so we read the
+	// outer email wrapper `<td>` styles and apply them to `.ProseMirror` with
+	// higher specificity to match React Email's preview more closely.
+	const wrapperTd =
+		doc.querySelector('td[style*="min-height:100%"]') ||
+		doc.querySelector('td[style*="min-height: 100%"]') ||
+		doc.querySelector('td[style*="line-height"]') ||
+		doc.querySelector("td");
+	if (wrapperTd) {
+		const scratch = doc.createElement("div") as HTMLDivElement;
+		scratch.style.cssText = wrapperTd.getAttribute("style") || "";
+
+		const baseFontFamily = scratch.style.fontFamily;
+		const baseFontSize = scratch.style.fontSize;
+		const baseLineHeight = scratch.style.lineHeight;
+		const baseColor = scratch.style.color;
+		const baseBg = scratch.style.backgroundColor;
+
+		const proseMirrorBase = [
+			".ProseMirror.ProseMirror{",
+			baseFontFamily ? `font-family:${baseFontFamily}!important;` : "",
+			baseFontSize ? `font-size:${baseFontSize}!important;` : "",
+			baseLineHeight ? `line-height:${baseLineHeight}!important;` : "",
+			baseColor ? `color:${baseColor}!important;` : "",
+			baseBg ? `background-color:${baseBg}!important;` : "",
+			"}",
+			// Email HTML relies on inline spacing; editor defaults add extra margins.
+			".ProseMirror.ProseMirror p{margin:0 !important;padding:0 !important;}",
+			".ProseMirror.ProseMirror h1,.ProseMirror.ProseMirror h2,.ProseMirror.ProseMirror h3{margin:0 !important;}",
+			// Match email-client link presentation (no underline unless explicitly styled).
+			// React Email demo previews generally show links without browser-default underlines.
+			".ProseMirror.ProseMirror a{text-decoration:none !important;color:inherit;}",
+			".ProseMirror.ProseMirror a *{text-decoration:none !important;}",
+			// Ensure emphasis renders as intended.
+			".ProseMirror.ProseMirror strong,.ProseMirror.ProseMirror b{font-weight:600 !important;}",
+			".ProseMirror.ProseMirror table{border-collapse:separate !important;}",
+			".ProseMirror.ProseMirror img{display:block;}",
+			"",
+		]
+			.filter(Boolean)
+			.join("");
+
+		cssString = proseMirrorBase + cssString;
 	}
 
 	// 3. Find background colors
@@ -1260,11 +1530,10 @@ function parseGlobalStylesFromHtml(html: string) {
 	let containerWidth: number | null = null;
 	const firstTable = doc.querySelector("table");
 	if (firstTable) {
-		const widthAttr =
-			firstTable.getAttribute("width") || firstTable.style.width;
-		if (widthAttr) {
+		const widthAttr = firstTable.getAttribute("width") || firstTable.style.width;
+		if (widthAttr && widthAttr !== "100%") {
 			const parsedWidth = Number.parseInt(widthAttr, 10);
-			if (!isNaN(parsedWidth)) {
+			if (!Number.isNaN(parsedWidth)) {
 				containerWidth = parsedWidth;
 			}
 		}
