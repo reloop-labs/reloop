@@ -47,7 +47,7 @@ export function LicensePermissions() {
 					There is no commercial license.{" "}
 					<a
 						href="/resources/self-hosting-guide"
-						className="font-semibold text-text-strong-950 underline decoration-stroke-soft-200 underline-offset-4 transition-colors hover:text-primary-base dark:text-white dark:decoration-white/20 dark:hover:text-primary-base"
+						className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4 transition-opacity hover:opacity-80"
 					>
 						Self-host Reloop
 					</a>{" "}

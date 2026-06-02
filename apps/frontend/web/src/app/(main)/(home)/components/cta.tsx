@@ -13,7 +13,7 @@ const CTA = () => {
 					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 						3,000 emails for free
 						<br />
-						<span className="text-[#0a0d12]/40 dark:text-white/40">
+						<span className="text-primary-base">
 							per month.
 						</span>
 					</h2>

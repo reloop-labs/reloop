@@ -112,7 +112,7 @@ const WhyOpenSourcePage = () => {
 							<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem]">
 								Six reasons
 								<br />
-								<span className="text-white/30">that matter.</span>
+								<span className="text-primary-base">that matter.</span>
 							</h2>
 							<p className="mt-6 text-[15px] text-white/50 leading-7">
 								Open source isn't a development model — it's a philosophy that
@@ -155,7 +155,7 @@ const WhyOpenSourcePage = () => {
 					<h2 className="mt-4 max-w-[640px] font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem]">
 						Closed source asks you to trust.
 						<br />
-						<span className="text-[#0a0d12]/30">
+						<span className="text-primary-base">
 							Open source lets you verify.
 						</span>
 					</h2>
@@ -213,7 +213,7 @@ const WhyOpenSourcePage = () => {
 					<h2 className="mt-4 max-w-[640px] font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem]">
 						By the community,
 						<br />
-						<span className="text-white/30">for the community.</span>
+						<span className="text-primary-base">for the community.</span>
 					</h2>
 
 					<div className="mt-20 grid gap-px overflow-hidden rounded-2xl border border-white/5 bg-white/5 sm:grid-cols-3">
@@ -263,7 +263,7 @@ const WhyOpenSourcePage = () => {
 						<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 							Read the code.
 							<br />
-							<span className="text-[#0a0d12]/40">Own your stack.</span>
+							<span className="text-primary-base">Own your stack.</span>
 						</h2>
 						<p className="mx-auto mt-8 max-w-[560px] text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[17px]">
 							Contribute to Reloop, deploy your own instance, or star us on

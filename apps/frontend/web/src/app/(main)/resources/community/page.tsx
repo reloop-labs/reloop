@@ -33,7 +33,6 @@ const CommunityPage = () => {
 				<FeatureCta
 					title="Ready to join?"
 					titleMuted="We'd love to meet you."
-					highlightTitleMuted
 					description="We're a small team in the early days—whether you want to contribute code, report issues, or simply follow along, you're welcome here."
 					primary={{
 						label: "Join Discord",

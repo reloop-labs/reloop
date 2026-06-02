@@ -1,118 +1,228 @@
 import PageLayout from "@reloop/web/components/page-layout";
+import type { Metadata } from "next";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+	title: "Terms of Service | Reloop",
+	description:
+		"Terms governing use of reloop.sh and the open-source Reloop email infrastructure software from Reloop Labs.",
+	openGraph: {
+		title: "Terms of Service | Reloop",
+		description:
+			"Terms governing use of reloop.sh and the open-source Reloop email infrastructure software from Reloop Labs.",
+		type: "website",
+	},
+};
+
+const LAST_UPDATED = "June 2, 2026";
+const CONTACT_EMAIL = "support@reloop.sh";
 
 const TermsPage = () => {
 	return (
 		<PageLayout
 			title="Terms of Service"
-			subtitle="Last update: August 4th, 2025"
+			subtitle={`Last updated: ${LAST_UPDATED}`}
 		>
 			<div>
-				<p className="mb-6">
-					Welcome to <span className="font-bold">Reloop</span> ("Company", "we",
-					"our", or "us"). By using our platform — a service for transactional
-					and marketing email sending — you agree to the following terms and
-					conditions. Please read them carefully.
+				<p>
+					These Terms of Service (&ldquo;Terms&rdquo;) govern your access to{" "}
+					<strong>reloop.sh</strong> and your use of the open-source Reloop
+					software provided by <strong>Reloop Labs</strong> (&ldquo;Reloop&rdquo;,
+					&ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;). By using
+					our website or the software, you agree to these Terms. If you do not
+					agree, do not use our website or the software.
 				</p>
 
-				<section className="ml-3 space-y-6">
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">
-							1. Acceptance of Terms
-						</h2>
-						<p>
-							By accessing or using our services, you agree to be bound by these
-							Terms of Service. If you do not agree, do not use our platform.
-						</p>
-					</div>
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">
-							2. Description of Service
-						</h2>
-						<p>
-							We provide APIs and interfaces to send transactional and marketing
-							emails. We may modify or discontinue any part of our services at
-							any time.
-						</p>
-					</div>
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">
-							3. User Responsibilities
-						</h2>
-						<p>
-							You agree to use our services lawfully and not to abuse our
-							platform, send spam, or violate privacy laws. You are responsible
-							for the content you send and must obtain consent from your
-							recipients.
-						</p>
-					</div>
+				<section>
+					<h2>1. About Reloop</h2>
+					<p>
+						Reloop is an open-source email infrastructure platform for sending,
+						receiving, and managing email. It is designed to be self-hosted on
+						your own infrastructure. Reloop Labs maintains the project, website,
+						documentation, and community channels.
+					</p>
+					<p>
+						There is <strong>no commercial license</strong> and no hosted email
+						service offered by Reloop Labs. To use Reloop, you must self-host the
+						open-source version subject to our{" "}
+						<Link href="/company/license">license terms</Link>.
+					</p>
+				</section>
 
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">4. Account Security</h2>
-						<p>
-							You are responsible for maintaining the confidentiality of your
-							account and password and for all activities under your account.
-						</p>
-					</div>
+				<section>
+					<h2>2. Software license</h2>
+					<p>
+						The Reloop source code is licensed under the{" "}
+						<strong>Apache License, Version 2.0</strong>, with additional use
+						restrictions defined by Reloop Labs. The full license is available on
+						our <Link href="/company/license">License</Link> page and in the
+						repository.
+					</p>
+					<p>In summary, you may:</p>
+					<ul>
+						<li>
+							Use, copy, modify, and distribute Reloop for personal projects.
+						</li>
+						<li>
+							Deploy Reloop inside your organization for internal email
+							infrastructure.
+						</li>
+					</ul>
+					<p>You may not:</p>
+					<ul>
+						<li>
+							Sell, sublicense, or commercially redistribute the software.
+						</li>
+						<li>
+							Offer Reloop—or a modified version—as a commercial hosted service
+							(SaaS, PaaS, or similar).
+						</li>
+						<li>
+							Use Reloop in a product or service whose primary purpose is to
+							compete with Reloop Labs.
+						</li>
+					</ul>
+					<p>
+						Your use of the software is also governed by the Apache 2.0 license
+						text and any applicable open-source notices in the repository.
+					</p>
+				</section>
 
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">5. Fees and Payments</h2>
-						<p>
-							Paid plans are billed monthly or annually. All fees are
-							non-refundable except as required by law.
-						</p>
-					</div>
+				<section>
+					<h2>3. Website use</h2>
+					<p>
+						You may use reloop.sh for lawful purposes in accordance with these
+						Terms. You agree not to:
+					</p>
+					<ul>
+						<li>
+							Attempt to gain unauthorized access to our systems or interfere
+							with the operation of the website.
+						</li>
+						<li>
+							Use the website to distribute malware, spam, or unlawful content.
+						</li>
+						<li>
+							Scrape, crawl, or harvest data from the website in a way that
+							impairs its performance or violates applicable law.
+						</li>
+						<li>Misrepresent your affiliation with Reloop Labs.</li>
+					</ul>
+				</section>
 
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">6. Termination</h2>
-						<p>
-							We may suspend or terminate your access to the service at any time
-							if we believe you have violated these terms.
-						</p>
-					</div>
+				<section>
+					<h2>4. Self-hosting responsibilities</h2>
+					<p>
+						When you self-host Reloop, you are solely responsible for your
+						deployment, configuration, security, backups, compliance with email
+						and privacy laws, and all content sent or received through your
+						instance. This includes obtaining consent from recipients, honoring
+						opt-out requests, and maintaining acceptable sending practices.
+					</p>
+					<p>
+						Reloop Labs does not operate or monitor your self-hosted instance
+						unless you explicitly engage us for support. See our{" "}
+						<Link href="/resources/self-hosting-guide">self-hosting guide</Link>{" "}
+						for deployment documentation.
+					</p>
+				</section>
 
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">
-							7. Intellectual Property
-						</h2>
-						<p>
-							All content, trademarks, and branding on the platform are the
-							property of [Your Company Name]. You retain ownership of your
-							data.
-						</p>
-					</div>
+				<section>
+					<h2>5. Acceptable use of the software</h2>
+					<p>You agree not to use Reloop to:</p>
+					<ul>
+						<li>Send unsolicited or unlawful email (spam).</li>
+						<li>Phish, distribute malware, or engage in fraud.</li>
+						<li>Violate applicable export, sanctions, or anti-abuse laws.</li>
+						<li>Infringe intellectual property or privacy rights of others.</li>
+					</ul>
+					<p>
+						Reloop Labs may investigate and take action—including reporting to
+						authorities or restricting community access—if we become aware of
+						uses that violate these Terms or applicable law, even when such use
+						occurs on infrastructure not operated by us.
+					</p>
+				</section>
 
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">
-							8. Limitation of Liability
-						</h2>
-						<p>
-							To the fullest extent permitted by law, we are not liable for any
-							indirect, incidental, or consequential damages arising from your
-							use of the platform.
-						</p>
-					</div>
+				<section>
+					<h2>6. Intellectual property</h2>
+					<p>
+						The Reloop name, logo, and website content are owned by Reloop Labs
+						or its licensors, except where open-source license terms apply to
+						software source code. Contributions to the project may be subject to
+						contribution guidelines and license terms published in the repository.
+					</p>
+					<p>
+						Feedback you provide may be used by Reloop Labs to improve the
+						project without obligation to you, unless otherwise agreed in writing.
+					</p>
+				</section>
 
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">9. Changes to Terms</h2>
-						<p>
-							We may update these Terms from time to time. Continued use of the
-							service after changes constitutes acceptance of the new terms.
-						</p>
-					</div>
+				<section>
+					<h2>7. Disclaimers</h2>
+					<p>
+						The website and software are provided <strong>&ldquo;as is&rdquo;</strong>{" "}
+						and <strong>&ldquo;as available&rdquo;</strong>, without warranties
+						of any kind, whether express or implied, including merchantability,
+						fitness for a particular purpose, and non-infringement. Reloop Labs
+						does not warrant that the software or website will be uninterrupted,
+						error-free, or meet your requirements.
+					</p>
+				</section>
 
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">10. Contact</h2>
-						<p>
-							If you have any questions about these Terms, please contact us at{" "}
-							<a
-								href="mailto:support@reloop.dev"
-								className="text-primary-base underline"
-							>
-								support@example.com
-							</a>
-							.
-						</p>
-					</div>
+				<section>
+					<h2>8. Limitation of liability</h2>
+					<p>
+						To the fullest extent permitted by law, Reloop Labs and its
+						contributors will not be liable for any indirect, incidental,
+						special, consequential, or punitive damages, or for loss of profits,
+						data, goodwill, or business interruption, arising from your use of the
+						website or software—even if we have been advised of the possibility
+						of such damages.
+					</p>
+					<p>
+						Our total liability for any claim relating to the website or software
+						will not exceed one hundred U.S. dollars (USD $100), except where
+						liability cannot be excluded under applicable law.
+					</p>
+				</section>
+
+				<section>
+					<h2>9. Third-party services and links</h2>
+					<p>
+						The website may link to third-party sites and services (for example,
+						GitHub, Discord, and documentation hosts). Reloop Labs is not
+						responsible for third-party content, policies, or practices.
+					</p>
+				</section>
+
+				<section>
+					<h2>10. Changes to these terms</h2>
+					<p>
+						We may update these Terms from time to time. The updated version will
+						be posted on this page with a revised &ldquo;Last updated&rdquo; date.
+						Continued use of the website after changes become effective
+						constitutes acceptance of the revised Terms. Material changes to
+						software licensing are reflected in the{" "}
+						<Link href="/company/license">License</Link> page and repository.
+					</p>
+				</section>
+
+				<section>
+					<h2>11. Governing law</h2>
+					<p>
+						These Terms are governed by the laws applicable to Reloop Labs, without
+						regard to conflict-of-law principles, except where mandatory local
+						consumer protections apply.
+					</p>
+				</section>
+
+				<section>
+					<h2>12. Contact</h2>
+					<p>
+						Questions about these Terms may be sent to{" "}
+						<a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+					</p>
 				</section>
 			</div>
 		</PageLayout>

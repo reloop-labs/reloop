@@ -77,7 +77,7 @@ const AboutUsPage = () => {
 					</p>
 					<h1 className="mt-4 max-w-[820px] font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.8rem]">
 						Email infrastructure{" "}
-						<span className="text-[#0a0d12]/30">
+						<span className="text-primary-base">
 							that gets out of your way.
 						</span>
 					</h1>
@@ -157,7 +157,7 @@ const AboutUsPage = () => {
 					<h2 className="mt-4 max-w-[620px] font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem]">
 						Built out of frustration.
 						<br />
-						<span className="text-white/30">Refined with care.</span>
+						<span className="text-primary-base">Refined with care.</span>
 					</h2>
 
 					{/* Timeline */}
@@ -208,7 +208,7 @@ const AboutUsPage = () => {
 						<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 							There's a place
 							<br />
-							<span className="text-[#0a0d12]/40">for you here.</span>
+							<span className="text-primary-base">for you here.</span>
 						</h2>
 						<p className="mx-auto mt-8 max-w-[560px] text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[17px]">
 							Whether you want to contribute code, join our team, or simply be

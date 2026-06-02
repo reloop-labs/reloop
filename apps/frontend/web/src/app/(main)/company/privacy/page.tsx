@@ -1,210 +1,207 @@
 import PageLayout from "@reloop/web/components/page-layout";
+import type { Metadata } from "next";
+import Link from "next/link";
+
+export const metadata: Metadata = {
+	title: "Privacy Policy | Reloop",
+	description:
+		"How Reloop Labs collects and uses information on reloop.sh and in relation to the open-source Reloop email platform.",
+	openGraph: {
+		title: "Privacy Policy | Reloop",
+		description:
+			"How Reloop Labs collects and uses information on reloop.sh and in relation to the open-source Reloop email platform.",
+		type: "website",
+	},
+};
+
+const LAST_UPDATED = "June 2, 2026";
+const CONTACT_EMAIL = "support@reloop.sh";
 
 const PrivacyPage = () => {
 	return (
-		<PageLayout title="Privacy Policy" subtitle="Last update: August 4th, 2025">
+		<PageLayout title="Privacy Policy" subtitle={`Last updated: ${LAST_UPDATED}`}>
 			<div>
-				<p className="mb-6">
-					Welcome to <span className="font-bold">Reloop</span> ("Company", "we",
-					"our", or "us"). By using our platform — a service for transactional
-					and marketing email sending — you agree to the following terms and
-					conditions. Please read them carefully.
+				<p>
+					This Privacy Policy explains how <strong>Reloop Labs</strong>{" "}
+					(&ldquo;Reloop&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, or
+					&ldquo;our&rdquo;) handles information when you visit{" "}
+					<strong>reloop.sh</strong>, interact with us, or use the open-source
+					Reloop email infrastructure software.
 				</p>
 
-				<section className="ml-3 space-y-8">
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">
-							1. Who We Are & Scope
-						</h2>
-						<p>
-							For most data collected on our websites and for account
-							administration, Reloop acts as a
-							<span className="font-semibold"> data controller</span>. When
-							customers upload or send email content and contact data through
-							the Service, Reloop generally acts as a{" "}
-							<span className="font-semibold">data processor</span> on behalf of
-							the customer (who is the data controller). This Policy applies to
-							information we collect through the Service and does not cover
-							third-party sites linked from our Service.
-						</p>
-					</div>
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">
-							2. Information We Collect
-						</h2>
-						<ul className="list-disc space-y-2 pl-6">
-							<li>
-								<span className="font-semibold">
-									Account & Contact Information
-								</span>
-								: name, company, role, email address, password (hashed),
-								preferences, and billing contact details you provide when
-								creating or managing an account.
-							</li>
-							<li>
-								<span className="font-semibold">Service & Usage Data</span>: IP
-								address, device and browser type, pages viewed, referring URLs,
-								timestamps, product interactions, and diagnostics. When you log
-								in from multiple devices we may associate sessions to secure
-								your account.
-							</li>
-							<li>
-								<span className="font-semibold">Email Content & Metadata</span>:
-								content and metadata of emails you create, send, receive or
-								store via the Service (including recipients, subject lines,
-								headers, engagement events like opens and clicks). To prevent
-								abuse (e.g., spam, phishing, malware links) we may automatically
-								scan email content and, where flagged by automated systems,
-								perform limited manual review strictly to ensure compliance with
-								our policies and safety standards.
-							</li>
-							<li>
-								<span className="font-semibold">Support & Communications</span>:
-								messages you send to support, feedback, survey responses, and
-								other communications.
-							</li>
-							<li>
-								<span className="font-semibold">
-									Cookies & Similar Technologies
-								</span>
-								: small files and tracking technologies used to operate the
-								site, remember preferences, secure sessions, and understand
-								product usage. You can control cookies via your browser
-								settings; some features may not function without essential
-								cookies.
-							</li>
-							<li>
-								<span className="font-semibold">Payments</span>: if you purchase
-								a paid plan, we use third-party payment processors (e.g.,
-								Stripe) to process payments. We do not store full payment card
-								numbers; processors handle them under their own privacy policies
-								and PCI-DSS requirements.
-							</li>
-						</ul>
-					</div>
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">
-							3. How We Use Information
-						</h2>
-						<ul className="list-disc space-y-2 pl-6">
-							<li>
-								Provide, operate, secure, troubleshoot, and improve the Service.
-							</li>
-							<li>
-								Authenticate you, manage accounts, and provide customer support.
-							</li>
-							<li>
-								Monitor performance, detect/prevent abuse, fraud, and security
-								incidents.
-							</li>
-							<li>
-								Send transactional communications (e.g., account, security,
-								billing) and, with your consent where required, marketing
-								communications you can opt out of at any time.
-							</li>
-							<li>Comply with legal obligations and enforce our terms.</li>
-							<li>
-								Analyze aggregated or de-identified data to develop features and
-								insights.
-							</li>
-						</ul>
-					</div>
+				<section>
+					<h2>1. Two contexts: our website and your deployment</h2>
+					<p>
+						Reloop is an open-source, self-hostable email platform. There is an
+						important distinction:
+					</p>
+					<ul>
+						<li>
+							<strong>Our website and community channels</strong> (reloop.sh,
+							GitHub, Discord, and similar) are operated by Reloop Labs. This
+							Policy describes what we collect in those contexts.
+						</li>
+						<li>
+							<strong>Your self-hosted Reloop instance</strong> runs on
+							infrastructure you control. When you self-host, you decide what
+							data is collected, stored, and processed. Reloop Labs does not
+							receive your email content, contact lists, or delivery logs unless
+							you choose to share them with us (for example, in a support
+							request).
+						</li>
+					</ul>
+				</section>
 
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">
-							4. Sharing & Disclosures
-						</h2>
-						<p>
-							We do not sell personal information. We may share information with
-							trusted <span className="font-semibold">service providers</span>{" "}
-							(subprocessors) who help us operate the Service (e.g., cloud
-							hosting, email delivery, analytics, customer support, and payment
-							processing). These providers access information only to perform
-							services for us and are bound by confidentiality obligations. We
-							may also disclose information (i) to comply with law or valid
-							legal process; (ii) in connection with a merger, acquisition, or
-							asset sale; (iii) to protect Reloop, our customers, and the public
-							from harm; and (iv) with your consent or at your direction.
-						</p>
-					</div>
-					<div>
-						<p>
-							We implement technical and organizational measures designed to
-							protect personal data. However, no method of transmission over the
-							Internet or electronic storage is completely secure, and we cannot
-							guarantee absolute security.
-						</p>
-					</div>
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">
-							5. Your Privacy Choices & Rights
-						</h2>
-						<ul className="list-disc space-y-2 pl-6">
-							<li>
-								<span className="font-semibold">
-									Access, correction, deletion
-								</span>{" "}
-								(where applicable): you may request access to, rectification of,
-								or deletion of your personal data. We may ask you to verify your
-								identity before fulfilling requests.
-							</li>
-							<li>
-								<span className="font-semibold">Opt out of marketing</span>:
-								follow unsubscribe links in emails or adjust preferences in your
-								account. Transactional emails will still be sent.
-							</li>
-						</ul>
-					</div>
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">
-							6. Cookies & Tracking
-						</h2>
-						<p>
-							We use essential, performance/analytics, and preference cookies to
-							operate and improve the Service. You can control cookies through
-							your browser or device settings. Disabling certain cookies may
-							impact functionality.
-						</p>
-					</div>
+				<section>
+					<h2>2. Information we collect on reloop.sh</h2>
+					<p>
+						We collect only what is reasonably necessary to operate the site,
+						respond to inquiries, and improve our open-source project.
+					</p>
+					<ul>
+						<li>
+							<strong>Contact and account information</strong>: name, email
+							address, company, and any details you submit through contact
+							forms, support requests, or community sign-ups.
+						</li>
+						<li>
+							<strong>Website usage data</strong>: IP address, browser type,
+							device information, pages viewed, referring URLs, timestamps, and
+							similar diagnostic data collected through server logs or analytics
+							tools.
+						</li>
+						<li>
+							<strong>Cookies and similar technologies</strong>: essential
+							cookies for security and session management, and optional
+							analytics or preference cookies where enabled. You can control
+							cookies through your browser settings.
+						</li>
+						<li>
+							<strong>Community and repository activity</strong>: if you interact
+							with us on GitHub, Discord, or X, those platforms may share
+							profile and activity information with us according to their own
+							policies.
+						</li>
+						<li>
+							<strong>Communications</strong>: messages you send to us, feedback,
+							bug reports, and survey responses.
+						</li>
+					</ul>
+					<p>
+						We do <strong>not</strong> sell personal information. We do not
+						operate a commercial hosted email service. Reloop is provided for
+						self-hosting under our{" "}
+						<Link href="/company/license">Apache 2.0 license</Link> with
+						additional use restrictions.
+					</p>
+				</section>
 
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">
-							7. Changes to This Policy
-						</h2>
-						<p>
-							We may update this Policy from time to time. We will post the
-							updated version with a new "Last update" date. For material
-							changes, we may provide additional notice (e.g., email or in-app
-							notice) where required by law.
-						</p>
-					</div>
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">8. Contact</h2>
-						<p>
-							For questions or requests about this Policy or your data, contact
-							us at{" "}
-							<a
-								href="mailto:support@example.com"
-								className="text-blue-600 underline"
-							>
-								info@reloop.sh
-							</a>
-							.
-						</p>
-					</div>
-					<div>
-						<h2 className="mb-2 font-semibold text-lg">
-							9. Additional Information for Customers
-						</h2>
-						<p>
-							When you use Reloop to send emails to your own customers or
-							subscribers, you are the data controller of that personal data and
-							responsible for providing appropriate privacy notices and
-							obtaining any legally required consents. Upon request and where
-							applicable, we will execute a Data Processing Addendum (DPA) and
-							publish a list of our subprocessors.
-						</p>
-					</div>
+				<section>
+					<h2>3. How we use information</h2>
+					<ul>
+						<li>Operate, secure, and improve reloop.sh and related services.</li>
+						<li>
+							Respond to support, community, and press inquiries.
+						</li>
+						<li>
+							Send transactional messages related to your requests (for example,
+							replies to contact form submissions).
+						</li>
+						<li>
+							Monitor for abuse, fraud, and security incidents on our website
+							and infrastructure.
+						</li>
+						<li>
+							Analyze aggregated or de-identified usage to improve documentation
+							and the open-source project.
+						</li>
+						<li>Comply with legal obligations and enforce our terms.</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>4. Sharing and disclosures</h2>
+					<p>
+						We may share information with trusted service providers that help us
+						run our website (for example, hosting, analytics, email delivery for
+						outbound support replies, and error monitoring). These providers may
+						access information only to perform services for us and are bound by
+						confidentiality obligations.
+					</p>
+					<p>
+						We may also disclose information when required by law, to protect
+						Reloop Labs and our users, in connection with a merger or asset
+						sale, or with your consent.
+					</p>
+				</section>
+
+				<section>
+					<h2>5. Self-hosted deployments and your responsibilities</h2>
+					<p>
+						If you deploy Reloop on your own servers, you are responsible for
+						the personal data processed through your instance—including email
+						content, recipient addresses, logs, and analytics. You must provide
+						appropriate privacy notices to your own users and comply with
+						applicable data protection laws.
+					</p>
+					<p>
+						Reloop Labs is not the data controller or processor for data handled
+						solely within your self-hosted environment unless we agree otherwise
+						in writing.
+					</p>
+				</section>
+
+				<section>
+					<h2>6. Data retention and security</h2>
+					<p>
+						We retain personal information only as long as needed for the
+						purposes described in this Policy, unless a longer period is required
+						by law. We implement reasonable technical and organizational measures
+						to protect information we hold, but no method of transmission or
+						storage is completely secure.
+					</p>
+				</section>
+
+				<section>
+					<h2>7. Your choices and rights</h2>
+					<p>
+						Depending on where you live, you may have rights to access, correct,
+						delete, or restrict processing of your personal data, or to object
+						to certain processing. You may also opt out of non-essential
+						marketing communications at any time.
+					</p>
+					<p>
+						To exercise these rights, contact us at{" "}
+						<a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. We may need
+						to verify your identity before fulfilling a request.
+					</p>
+				</section>
+
+				<section>
+					<h2>8. International transfers</h2>
+					<p>
+						Reloop Labs may process information in countries other than where
+						you live. Where required, we use appropriate safeguards for
+						cross-border transfers.
+					</p>
+				</section>
+
+				<section>
+					<h2>9. Changes to this policy</h2>
+					<p>
+						We may update this Policy from time to time. We will post the revised
+						version on this page with an updated &ldquo;Last updated&rdquo; date.
+						Material changes may be communicated through the website or by email
+						where appropriate.
+					</p>
+				</section>
+
+				<section>
+					<h2>10. Contact</h2>
+					<p>
+						Questions about this Privacy Policy or your data may be sent to{" "}
+						<a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+					</p>
 				</section>
 			</div>
 		</PageLayout>

@@ -6,7 +6,6 @@ import type { FeatureCtaBand } from "./types";
 export function FeatureCta({
 	title,
 	titleMuted,
-	highlightTitleMuted = false,
 	description,
 	primary,
 	secondary,
@@ -23,15 +22,7 @@ export function FeatureCta({
 						{titleMuted && (
 							<>
 								<br />
-								<span
-									className={
-										highlightTitleMuted
-											? "text-primary-base"
-											: "text-[#0a0d12]/40 dark:text-white/40"
-									}
-								>
-									{titleMuted}
-								</span>
+								<span className="text-primary-base">{titleMuted}</span>
 							</>
 						)}
 					</h2>

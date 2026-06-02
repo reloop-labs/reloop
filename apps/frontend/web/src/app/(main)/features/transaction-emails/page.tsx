@@ -867,7 +867,7 @@ const TransactionEmailsPage = () => {
 					<h2 className="font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 						3,000 emails for free
 						<br />
-						<span className="text-[#0a0d12]/40">per month.</span>
+						<span className="text-primary-base">per month.</span>
 					</h2>
 					<p className="mx-auto mt-8 max-w-[550px] font-medium text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[17px]">
 						No credit card required. Connect your endpoints, optimize
