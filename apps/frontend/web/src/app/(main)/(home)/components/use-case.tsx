@@ -56,8 +56,8 @@ const useCases = [
 
 const UseCase = () => {
 	return (
-		<section id="use-cases" className="min-h-screen">
-			<div className="mx-auto max-w-[1320px] px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
+		<section id="use-cases">
+			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 sm:py-32 lg:px-8">
 				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
 					Use cases
 				</p>
@@ -68,7 +68,7 @@ const UseCase = () => {
 					{useCases.map((useCase, i) => (
 						<div
 							key={useCase.title}
-							className="flex flex-col border-stroke-soft-200 border-t border-l-0 bg-bg-weak-50 p-8 transition-colors duration-300 first:border-t-0 sm:border-t sm:border-l lg:border-t lg:border-l lg:p-10 dark:border-white/10 dark:bg-transparent dark:hover:bg-white/[0.02] sm:[&:nth-child(-n+2)]:border-t-0 lg:[&:nth-child(-n+3)]:border-t-0 sm:[&:nth-child(2n+1)]:border-l-0 lg:[&:nth-child(3n+1)]:border-l-0"
+							className="flex flex-col border-stroke-soft-200 border-t border-l-0 bg-bg-weak-50 p-8 transition-colors duration-300 first:border-t-0 sm:border-t sm:border-l lg:border-t lg:border-l lg:p-10 dark:border-white/10 dark:bg-transparent dark:hover:bg-white/[0.02] sm:[&:nth-child(-n+2)]:border-t-0 lg:[&:nth-child(-n+3)]:border-t-0 sm:[&:nth-child(2n+1)]:border-l-0 lg:[&:nth-child(3n)]:border-l lg:[&:nth-child(3n+1)]:border-l-0 lg:[&:nth-child(3n+2)]:border-l"
 						>
 							<span className="font-semibold text-sm text-text-soft-400 tabular-nums dark:text-white/28">
 								{String(i + 1).padStart(2, "0")}

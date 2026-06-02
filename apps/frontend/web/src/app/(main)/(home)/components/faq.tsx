@@ -51,17 +51,20 @@ const Faq = () => {
 	const [openIndex, setOpenIndex] = useState<number | null>(null);
 
 	return (
-		<section id="faq" className="bg-[#f8f8f8] text-[#0a0d12]">
+		<section
+			id="faq"
+			className="bg-[#f8f8f8] text-[#0a0d12] dark:bg-black dark:text-white"
+		>
 			<div className="mx-auto max-w-3xl px-4 py-24 sm:px-6 sm:py-32 lg:py-40">
 				<div className="text-center">
-					<p className="font-semibold text-black/40 text-sm uppercase tracking-wide">
+					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
 						FAQ
 					</p>
-					<h2 className="mt-4 font-medium text-4xl tracking-tighter sm:text-5xl lg:text-6xl">
+					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 						Question & Answer
 					</h2>
 				</div>
-				<div className="mt-14 divide-y divide-[#0a0d12]/10 sm:mt-16">
+				<div className="mt-14 divide-y divide-[#0a0d12]/10 sm:mt-16 dark:divide-white/10">
 					{faqItems.map((faq, i) => (
 						<div key={i}>
 							<button
@@ -69,12 +72,12 @@ const Faq = () => {
 								onClick={() => setOpenIndex(openIndex === i ? null : i)}
 								className="flex w-full items-start justify-between gap-4 py-6 text-left"
 							>
-								<span className="font-semibold text-[#0a0d12] text-[16px] leading-snug sm:text-[17px]">
+								<span className="font-semibold text-[16px] text-text-strong-950 leading-snug sm:text-[17px] dark:text-white">
 									{faq.question}
 								</span>
 								<span
 									className={cn(
-										"mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border border-[#0a0d12]/12 text-[#0a0d12]/40 transition-transform",
+										"mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border border-[#0a0d12]/12 text-[#0a0d12]/40 transition-transform dark:border-white/12 dark:text-white/40",
 										openIndex === i && "rotate-45",
 									)}
 								>
@@ -98,7 +101,7 @@ const Faq = () => {
 								)}
 							>
 								<div className="overflow-hidden">
-									<p className="pr-12 pb-6 text-[#0a0d12]/56 text-[14px] leading-[1.7] sm:text-[15px]">
+									<p className="pr-12 pb-6 text-[#0a0d12]/56 text-[14px] leading-[1.7] sm:text-[15px] dark:text-white/50">
 										{faq.answer}
 									</p>
 								</div>
