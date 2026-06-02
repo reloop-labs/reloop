@@ -21,6 +21,7 @@ const navItems = [
 				{ title: "Email Analytics", href: "/features/email-analytics" },
 				{ title: "Templates", href: "/features/email-templates" },
 				{ title: "SMTP", href: "/features/smtp" },
+				{ title: "Languages", href: "/features/languages" },
 				{ title: "Validation", href: "/features/email-validation" },
 				{ title: "Transaction", href: "/features/transaction-emails" },
 			],

@@ -35,6 +35,10 @@ const links = [
 				href: "/features/smtp",
 			},
 			{
+				title: "Languages",
+				href: "/features/languages",
+			},
+			{
 				title: "Deliverability",
 				href: "/features/deliverability",
 			},
