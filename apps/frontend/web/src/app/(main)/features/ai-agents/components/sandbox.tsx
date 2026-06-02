@@ -327,28 +327,28 @@ export default function Sandbox() {
 	}, [activeTemplate]);
 
 	return (
-		<section id="playground" className="scroll-mt-10 bg-white py-24 sm:py-32">
-			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
+		<section id="playground" className="scroll-mt-10">
+			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
 				<div className="mx-auto mb-16 max-w-3xl text-center">
-					<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
+					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
 						AI Agent Playground
 					</p>
-					<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
+					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 						Interactive Sandbox
 					</h2>
-					<p className="mx-auto mt-6 max-w-[620px] text-[#0a0d12]/60 text-[15px] leading-relaxed sm:text-[17px]">
+					<p className="mx-auto mt-6 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
 						Select a preset agent, inspect the setup code, and simulate how
 						Reloop parses incoming email into structured data to drive agent logic.
 					</p>
 				</div>
 
-				<div className="rounded-2xl border border-[#0a0d12]/8 bg-zinc-50/30 p-6 shadow-sm backdrop-blur-xl md:p-8">
+				<div className="rounded-4xl border border-stroke-soft-200 bg-bg-weak-50 p-6 shadow-sm md:p-8 dark:border-white/10">
 					<div className="flex flex-col gap-8 lg:flex-row">
 						{/* Sandbox Editor & Inputs (Left Side) */}
 						<div className="flex min-w-0 flex-1 flex-col">
-							<div className="flex flex-col gap-4 border-[#0a0d12]/5 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
+							<div className="flex flex-col gap-4 border-stroke-soft-200 border-b pb-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
 								{/* Agent Type Selector */}
-								<div className="flex gap-1 rounded-xl border border-[#0a0d12]/6 bg-[#0a0d12]/4 p-1">
+								<div className="flex gap-1 rounded-xl border border-stroke-soft-200 bg-bg-soft-50 p-1 dark:border-white/10">
 									{(["support", "sales", "ops"] as AgentTemplate[]).map(
 										(tpl) => {
 											const isSelected = activeTemplate === tpl;
@@ -359,8 +359,8 @@ export default function Sandbox() {
 													onClick={() => setActiveTemplate(tpl)}
 													className={`rounded-lg px-3 py-1.5 font-semibold text-xs transition-all ${
 														isSelected
-															? "bg-white text-[#0a0d12] shadow-sm"
-															: "text-[#0a0d12]/40 hover:text-[#0a0d12]/70"
+															? "bg-bg-white-0 text-text-strong-950 shadow-sm dark:bg-white dark:text-black"
+															: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
 													}`}
 												>
 													<span className="capitalize">
@@ -377,7 +377,7 @@ export default function Sandbox() {
 								</div>
 
 								{/* Language Selector */}
-								<div className="flex gap-1 rounded-xl border border-[#0a0d12]/6 bg-[#0a0d12]/4 p-1">
+								<div className="flex gap-1 rounded-xl border border-stroke-soft-200 bg-bg-soft-50 p-1 dark:border-white/10">
 									{(["node", "python"] as Language[]).map((lang) => {
 										const isSelected = activeLang === lang;
 										return (
@@ -387,8 +387,8 @@ export default function Sandbox() {
 												onClick={() => setActiveLang(lang)}
 												className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-semibold text-xs transition-all ${
 													isSelected
-														? "bg-[#0a0d12] text-white"
-														: "text-[#0a0d12]/40 hover:text-[#0a0d12]/70"
+														? "bg-[#0a0d12] text-white dark:bg-white dark:text-black"
+														: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
 												}`}
 											>
 												{lang === "node" && (
@@ -440,7 +440,7 @@ export default function Sandbox() {
 									type="button"
 									onClick={triggerSimulation}
 									disabled={simulationState === "thinking"}
-									className="inline-flex h-12 items-center justify-center rounded-2xl bg-[#0a0d12] px-8 font-semibold text-[14px] text-white transition-colors hover:bg-[#0a0d12]/90 active:scale-[0.98] disabled:pointer-events-none disabled:bg-[#0a0d12]/50"
+									className="inline-flex h-12 items-center justify-center rounded-2xl bg-[#0a0d12] px-8 font-semibold text-[14px] text-white transition-colors hover:bg-[#0a0d12]/90 active:scale-[0.98] disabled:pointer-events-none disabled:bg-[#0a0d12]/50 dark:bg-white dark:text-black dark:hover:bg-white/90 dark:disabled:bg-white/50"
 								>
 									<Icon name="send-2" className="mr-2 size-4" />
 									{simulationState === "thinking"
@@ -462,20 +462,20 @@ export default function Sandbox() {
 						{/* Simulated Inbox (Right Side) */}
 						<div className="flex w-full flex-col gap-4 lg:w-[460px]">
 							{/* Inbound / Outbound Simulator */}
-							<div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-								<div className="mb-3 flex items-center gap-2 border-zinc-100 border-b pb-3 font-mono text-[#0a0d12]/40 text-xs">
-									<span className="size-2.5 rounded-full bg-purple-500 animate-pulse" />
+							<div className="rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-4 shadow-sm dark:border-white/10">
+								<div className="mb-3 flex items-center gap-2 border-stroke-soft-200 border-b pb-3 font-mono text-text-soft-400 text-xs dark:border-white/10">
+									<span className="size-2.5 animate-pulse rounded-full bg-primary-base" />
 									<span>Live Inbox Simulator</span>
 								</div>
 
-								<div className="flex min-h-[220px] flex-col justify-between rounded-lg border border-zinc-100 p-4">
+								<div className="flex min-h-[220px] flex-col justify-between rounded-lg border border-stroke-soft-200 p-4 dark:border-white/10">
 									{/* Inbound email state */}
 									<div className="space-y-4">
-										<div className="rounded-lg bg-zinc-50 p-3 text-xs">
-											<div className="font-semibold text-[#0a0d12]/40">
+										<div className="rounded-lg bg-bg-weak-50 p-3 text-xs dark:bg-white/[0.02]">
+											<div className="font-semibold text-text-soft-400 dark:text-white/40">
 												INBOUND EMAIL
 											</div>
-											<div className="mt-1 font-semibold text-[#0a0d12]">
+											<div className="mt-1 font-semibold text-text-strong-950 dark:text-white">
 												From:{" "}
 												{activeTemplate === "support"
 													? "customer@gmail.com"
@@ -483,7 +483,7 @@ export default function Sandbox() {
 														? "mark@acme.co"
 														: "alerts@monitoring.net"}
 											</div>
-											<div className="font-semibold text-[#0a0d12]">
+											<div className="font-semibold text-text-strong-950 dark:text-white">
 												Subject:{" "}
 												{activeTemplate === "support"
 													? "Where is my order #28391?"
@@ -491,7 +491,7 @@ export default function Sandbox() {
 														? "Reloop Enterprise plans?"
 														: "CRITICAL: DB latency spike"}
 											</div>
-											<div className="mt-2 border-[#0a0d12]/5 border-t pt-2 text-[#0a0d12]/60">
+											<div className="mt-2 border-stroke-soft-200 border-t pt-2 text-text-sub-600 dark:border-white/10 dark:text-white/50">
 												{activeTemplate === "support" &&
 													"Hey, my order was supposed to arrive yesterday but it hasn't. Can I get a refund or tracking status?"}
 												{activeTemplate === "sales" &&
@@ -507,12 +507,12 @@ export default function Sandbox() {
 												<motion.div
 													initial={{ opacity: 0, y: 10 }}
 													animate={{ opacity: 1, y: 0 }}
-													className="rounded-lg border border-purple-100 bg-purple-50/30 p-3 text-xs"
+													className="rounded-lg border border-stroke-soft-200 bg-bg-soft-50 p-3 text-xs dark:border-white/10"
 												>
-													<div className="font-semibold text-purple-600/80">
+													<div className="font-semibold text-primary-base">
 														AGENT OUTBOUND REPLY
 													</div>
-													<div className="mt-1 font-semibold text-purple-950">
+													<div className="mt-1 font-semibold text-text-strong-950 dark:text-white">
 														From:{" "}
 														{activeTemplate === "support"
 															? "Support Agent <support-agent@yourdomain.com>"
@@ -520,7 +520,7 @@ export default function Sandbox() {
 																? "Sales Assistant <sales-agent@yourdomain.com>"
 																: "Ops Router <ops-agent@yourdomain.com>"}
 													</div>
-													<div className="mt-2 border-purple-100 border-t pt-2 text-purple-900/80">
+													<div className="mt-2 border-stroke-soft-200 border-t pt-2 text-text-sub-600 dark:border-white/10 dark:text-white/70">
 														{activeTemplate === "support" && (
 															<p>
 																Hi there, we verified order #28391. It is
@@ -552,11 +552,11 @@ export default function Sandbox() {
 							</div>
 
 							{/* Trace Logs Box */}
-							<div className="flex min-h-[160px] flex-1 flex-col justify-between rounded-xl border border-zinc-200 bg-[#0a0a0a] p-4 font-mono text-[11px] leading-relaxed shadow-sm">
+							<div className="flex min-h-[160px] flex-1 flex-col justify-between rounded-xl border border-stroke-soft-200 bg-[#0a0a0a] p-4 font-mono text-[11px] leading-relaxed shadow-sm dark:border-white/10">
 								<div>
 									<div className="mb-2 flex items-center justify-between border-white/5 border-b pb-2 text-white/40">
 										<span>Agent Execution Trace</span>
-										<span className="size-2 animate-pulse rounded-full bg-purple-500" />
+										<span className="size-2 animate-pulse rounded-full bg-primary-base" />
 									</div>
 									<div className="max-h-[140px] space-y-1 overflow-y-auto text-white/70">
 										{simulationLogs.length === 0 && (
@@ -573,7 +573,7 @@ export default function Sandbox() {
 													log.includes("200 OK")
 														? "font-semibold text-emerald-400"
 														: log.includes("Schema matches")
-															? "text-purple-300"
+															? "text-primary-base"
 															: ""
 												}
 											>

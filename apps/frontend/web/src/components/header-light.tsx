@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const navItems = [
-	{ title: "Features", href: "/product", hasDropdown: true },
+	{ title: "Features", href: "/features", hasDropdown: true },
 	{
 		title: "Company",
 		href: "/company",

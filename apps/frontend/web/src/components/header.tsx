@@ -12,34 +12,35 @@ import { useCallback, useEffect, useRef, useState } from "react";
 const navItems = [
 	{
 		title: "Features",
-		href: "/product",
+		href: "/features",
 		hasDropdown: true,
 		mega: {
 			links: [
-				{ title: "Campaigns", href: "/product/campaigns" },
-				{ title: "Deliverability", href: "/product/deliverability" },
-				{ title: "Email Analytics", href: "/product/email-analytics" },
-				{ title: "Templates", href: "/product/email-templates" },
-				{ title: "Validation", href: "/product/email-validation" },
-				{ title: "Transaction", href: "/product/transaction-emails" },
+				{ title: "Campaigns", href: "/features/campaigns" },
+				{ title: "Deliverability", href: "/features/deliverability" },
+				{ title: "Email Analytics", href: "/features/email-analytics" },
+				{ title: "Templates", href: "/features/email-templates" },
+				{ title: "SMTP", href: "/features/smtp" },
+				{ title: "Validation", href: "/features/email-validation" },
+				{ title: "Transaction", href: "/features/transaction-emails" },
 			],
 			featured: [
 				{
 					title: "Agent Inbox",
 					description: "Manage all your emails in one place",
-					href: "/product/agent-inbox",
+					href: "/features/ai-agents",
 					icon: "inbox",
 				},
 				{
 					title: "Transaction Email",
 					description: "Reliable email delivery for your app",
-					href: "/product/transaction-emails",
+					href: "/features/transaction-emails",
 					icon: "send-2",
 				},
 				{
 					title: "Marketing Email",
 					description: "Design and send beautiful campaigns",
-					href: "/product/campaigns",
+					href: "/features/campaigns",
 					icon: "mega-phone",
 				},
 			],

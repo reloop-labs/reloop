@@ -11,7 +11,7 @@ export default function Hero() {
 
 			<div className="relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
 				<p className="font-semibold text-[11px] text-white/40 uppercase tracking-[0.16em]">
-					Product / Marketing Teams
+					Features / Marketing Teams
 				</p>
 
 				<h1 className="mt-6 bg-gradient-to-b from-white via-white to-white/40 bg-clip-text font-semibold text-[2.8rem] text-transparent leading-[1.05] tracking-tighter drop-shadow-[0_10px_34px_rgba(0,0,0,0.32)] sm:text-[4.2rem]">

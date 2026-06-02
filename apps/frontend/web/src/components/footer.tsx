@@ -12,27 +12,31 @@ const links = [
 		items: [
 			{
 				title: "Campaigns",
-				href: "/product/campaigns",
+				href: "/features/campaigns",
 			},
 			{
 				title: "Email Analytics",
-				href: "/product/email-analytics",
+				href: "/features/email-analytics",
 			},
 			{
 				title: "Transaction Emails",
-				href: "/product/transaction-emails",
+				href: "/features/transaction-emails",
 			},
 			{
 				title: "Email Validation",
-				href: "/product/email-validation",
+				href: "/features/email-validation",
 			},
 			{
 				title: "Email Templates",
-				href: "/product/email-templates",
+				href: "/features/email-templates",
+			},
+			{
+				title: "SMTP Relay",
+				href: "/features/smtp",
 			},
 			{
 				title: "Deliverability",
-				href: "/product/deliverability",
+				href: "/features/deliverability",
 			},
 		],
 	},
