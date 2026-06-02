@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -9,7 +10,7 @@ import * as Tooltip from "@reloop/ui/tooltip";
 import { useCurrentEditor } from "@tiptap/react";
 import { Clock, Eye, Loader2, Trash2, UploadCloud, X } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { PreviewModal } from "./preview-modal"; // Cache bust
@@ -256,11 +257,17 @@ export function VersionSidebar() {
 	} | null>(null);
 
 	const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
-	const [versionToPublish, setVersionToPublish] = useState<TemplateVersion | null>(null);
+	const [versionToPublish, setVersionToPublish] =
+		useState<TemplateVersion | null>(null);
 	const [isPublishing, setIsPublishing] = useState(false);
 
 	const [restoringId, setRestoringId] = useState<string | null>(null);
 	const [deletingId, setDeletingId] = useState<string | null>(null);
+
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const itemRefs = useRef<HTMLDivElement[]>([]);
+	const currentItem = itemRefs.current[hoverIdx ?? -1];
+	const currentRect = currentItem?.getBoundingClientRect();
 
 	const {
 		data: versions,
@@ -379,7 +386,9 @@ export function VersionSidebar() {
 
 				const pubNum = getMajorVersionNumber(versionToPublish.id);
 				toast.success(
-					pubNum ? `v${pubNum}.0 set as the active published version!` : "Version published successfully!",
+					pubNum
+						? `v${pubNum}.0 set as the active published version!`
+						: "Version published successfully!",
 				);
 
 				setIsPublishModalOpen(false);
@@ -431,7 +440,9 @@ export function VersionSidebar() {
 			const pubNum = result.publishNumber ?? null;
 
 			toast.success(
-				pubNum ? `Published version as v${pubNum}` : "Version published successfully!",
+				pubNum
+					? `Published version as v${pubNum}`
+					: "Version published successfully!",
 			);
 
 			setIsPublishModalOpen(false);
@@ -513,7 +524,7 @@ export function VersionSidebar() {
 						</div>
 					</div>
 				) : (
-					<div className="flex flex-col">
+					<div className="relative flex flex-col">
 						{currentList.map((version, index) => {
 							const _isRestoring = restoringId === version.id;
 							const isDeleting = deletingId === version.id;
@@ -521,15 +532,20 @@ export function VersionSidebar() {
 							const isFirstMajor = majorVersions[0]?.id === version.id;
 							const isActive = template?.currentVersion
 								? version.version === template.currentVersion
-								: (version.isMajor && isFirstMajor);
+								: version.isMajor && isFirstMajor;
 							const majorNum = getMajorVersionNumber(version.id);
 							const displayLabel = version.isMajor ? `v${majorNum}.0` : "Draft";
 
 							return (
 								<div
+									ref={(el) => {
+										if (el) itemRefs.current[index] = el;
+									}}
 									key={version.id}
 									onClick={() => handleRestore(version)}
-									className="group relative flex w-full cursor-pointer items-stretch rounded-xl px-2 transition-all hover:bg-zinc-50/80 dark:hover:bg-zinc-900/10"
+									onPointerEnter={() => setHoverIdx(index)}
+									onPointerLeave={() => setHoverIdx(undefined)}
+									className="group relative flex w-full cursor-pointer items-stretch rounded-xl px-2 transition-all"
 								>
 									{/* Timeline Left Column */}
 									<div className="relative flex w-[40px] shrink-0 flex-col items-center pt-4 pb-4">
@@ -541,8 +557,8 @@ export function VersionSidebar() {
 													index === 0
 														? "top-[26px] bottom-0"
 														: index === currentList.length - 1
-														? "top-0 h-[26px]"
-														: "top-0 bottom-0",
+															? "top-0 h-[26px]"
+															: "top-0 bottom-0",
 												)}
 											/>
 										)}
@@ -601,7 +617,9 @@ export function VersionSidebar() {
 												</Button.Root>
 											</Tooltip.Trigger>
 											<Tooltip.Content side="top">
-												{version.isMajor ? "Republish Version" : "Publish Draft"}
+												{version.isMajor
+													? "Republish Version"
+													: "Publish Draft"}
 											</Tooltip.Content>
 										</Tooltip.Root>
 
@@ -658,6 +676,11 @@ export function VersionSidebar() {
 								</div>
 							);
 						})}
+						<AnimatedHoverBackground
+							rect={currentRect}
+							tabElement={currentItem}
+							className="rounded-2xl!"
+						/>
 					</div>
 				)}
 			</div>
@@ -701,7 +724,10 @@ export function VersionSidebar() {
 				isPublishing={isPublishing}
 				versionLabel={
 					versionToPublish
-						? versionToPublish.name || (versionToPublish.isMajor ? `v${getMajorVersionNumber(versionToPublish.id)}.0` : "Draft")
+						? versionToPublish.name ||
+							(versionToPublish.isMajor
+								? `v${getMajorVersionNumber(versionToPublish.id)}.0`
+								: "Draft")
 						: "Draft"
 				}
 				isAlreadyPublished={versionToPublish ? versionToPublish.isMajor : false}
