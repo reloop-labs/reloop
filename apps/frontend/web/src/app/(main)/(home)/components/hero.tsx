@@ -15,7 +15,19 @@ export default function Hero() {
 							<AnimatedAlternative />
 						</div>
 						<h1 className="font-serif text-[2.8rem] leading-[1.05] tracking-tighter sm:text-[4.2rem]">
-							Email for AI Agents, Developers & Marketing teams.
+							Email for{" "}
+							<span className="relative bg-[length:6px_3px] bg-[radial-gradient(circle,_#a3a3a3_1px,_transparent_1.5px)] bg-bottom bg-repeat-x dark:bg-[radial-gradient(circle,_#525252_1px,_transparent_1.5px)]">
+								AI Agents
+							</span>
+							,{" "}
+							<span className="relative bg-[length:6px_3px] bg-[radial-gradient(circle,_#a3a3a3_1px,_transparent_1.5px)] bg-bottom bg-repeat-x dark:bg-[radial-gradient(circle,_#525252_1px,_transparent_1.5px)]">
+								Developers
+							</span>{" "}
+							&{" "}
+							<span className="relative bg-[length:6px_3px] bg-[radial-gradient(circle,_#a3a3a3_1px,_transparent_1.5px)] bg-bottom bg-repeat-x dark:bg-[radial-gradient(circle,_#525252_1px,_transparent_1.5px)]">
+								Marketing teams
+							</span>
+							.
 						</h1>
 						<p className="mx-auto mt-8 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px]">
 							High-performance, open-source email infrastructure for AI agents
