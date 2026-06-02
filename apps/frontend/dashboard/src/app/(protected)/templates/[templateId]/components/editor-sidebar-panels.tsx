@@ -170,7 +170,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 	return (
 		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a]">
 			{/* ── Header ── */}
-			<div className="flex shrink-0 items-center justify-between pt-3 pr-4 pb-4 pl-6">
+			<div className="flex shrink-0 items-center justify-between pt-3 pr-4 pb-3 pl-6">
 				<h2 className="font-semibold text-lg text-zinc-900 dark:text-zinc-50">
 					Variable
 				</h2>
@@ -194,16 +194,13 @@ export function VariablesPanel({ onClose }: PanelProps) {
 					</div>
 				) : detectedVars.length === 0 ? (
 					<div className="rounded-xl px-4 py-5 text-center">
-						<div className="mx-auto mb-2.5 flex size-8 items-center justify-center rounded-lg bg-bg-soft-200">
-							<Braces
-								size={14}
-								className="text-text-disabled-300 dark:text-zinc-500"
-							/>
+						<div className="mx-auto flex size-8 items-center justify-center">
+							<Braces size={14} />
 						</div>
 						<p className="font-medium text-text-strong-950 text-xs dark:text-zinc-300">
 							No variables yet
 						</p>
-						<p className="my-2 text-[11px] text-text-soft-400 leading-normal dark:text-zinc-500">
+						<p className="mt-2 mb-4 text-[11px] text-text-soft-400 leading-normal dark:text-zinc-500">
 							Type{" "}
 							<code className="rounded bg-bg-soft-200 px-1 font-mono dark:bg-zinc-800">
 								{"{{{variable}}}"}
@@ -221,7 +218,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 						</Button.Root>
 					</div>
 				) : (
-					<div className="space-y-2">
+					<div className="space-y-2 px-5">
 						{detectedVars.map((v) => {
 							const key = `{{{${v.name}}}}`;
 							return (
