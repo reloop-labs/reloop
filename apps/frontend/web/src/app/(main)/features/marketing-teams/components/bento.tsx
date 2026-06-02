@@ -7,10 +7,7 @@ export default function Bento() {
 		<section className="border-[#0a0d12]/5 border-t bg-white py-24 sm:py-32">
 			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
 				<div className="mb-20 text-center">
-					<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
-						Everything Your Team Needs
-					</p>
-					<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
+					<h2 className="font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 						Built for Team Collaboration
 					</h2>
 					<p className="mx-auto mt-4 max-w-xl text-[#0a0d12]/50 text-base">

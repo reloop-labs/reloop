@@ -5,7 +5,6 @@ export type FeatureCtaLink = {
 };
 
 export type FeatureCtaBand = {
-	eyebrow: string;
 	title: string;
 	titleMuted?: string;
 	description: string;

@@ -44,7 +44,6 @@ const platformFeatures = [
 export default function FeaturesIndexPage() {
 	return (
 		<MarketingPageShell
-			eyebrow="Features"
 			titleLines={["Email infrastructure", "built for builders"]}
 			description="Campaigns, transactionals, SMTP, analytics, and developer tools—on one platform."
 			primaryCta={{ label: "Get started", href: "/dashboard/signup" }}
@@ -52,7 +51,6 @@ export default function FeaturesIndexPage() {
 		>
 			<PageSection>
 				<SectionHeading
-					eyebrow="Product"
 					title="Core capabilities"
 					description="Everything you need to send, measure, and improve email."
 				/>
@@ -76,7 +74,6 @@ export default function FeaturesIndexPage() {
 
 			<PageSection alt>
 				<SectionHeading
-					eyebrow="Platform"
 					title="Build & integrate"
 					description="APIs, SDKs, and workflows for engineering teams."
 				/>
@@ -99,7 +96,6 @@ export default function FeaturesIndexPage() {
 			</PageSection>
 
 			<FeatureCta
-				eyebrow="Deploy today"
 				title="Start sending with Reloop"
 				titleMuted="Free tier included."
 				description="Create an account and send your first email in minutes."

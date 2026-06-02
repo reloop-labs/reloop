@@ -279,10 +279,7 @@ export default function Sandbox() {
 		<section id="playground" className="scroll-mt-10 bg-white py-24 sm:py-32">
 			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
 				<div className="mx-auto mb-16 max-w-3xl text-center">
-					<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
-						Campaign Playground
-					</p>
-					<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
+					<h2 className="font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 						Interactive Creator Sandbox
 					</h2>
 					<p className="mx-auto mt-6 max-w-[620px] text-[#0a0d12]/60 text-[15px] leading-relaxed sm:text-[17px]">

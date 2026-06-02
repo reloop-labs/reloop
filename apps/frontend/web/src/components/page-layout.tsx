@@ -1,14 +1,12 @@
 import type React from "react";
 
 interface PageLayoutProps {
-	eyebrow?: string;
 	title: string;
 	subtitle?: string;
 	children: React.ReactNode;
 }
 
 const PageLayout: React.FC<PageLayoutProps> = ({
-	eyebrow = "Legal",
 	title,
 	subtitle,
 	children,
@@ -17,10 +15,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
 		<div>
 			<div className="relative flex items-center justify-center overflow-hidden bg-transparent pt-40 pb-12">
 				<div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-						{eyebrow}
-					</p>
-					<h1 className="mt-6 font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem]">
+					<h1 className="font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem]">
 						{title}
 					</h1>
 					{subtitle && (

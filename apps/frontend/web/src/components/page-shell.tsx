@@ -6,14 +6,12 @@ import type React from "react";
 export { FeatureHero, FeatureCta };
 
 export function MarketingPageShell({
-	eyebrow,
 	titleLines,
 	description,
 	primaryCta,
 	secondaryCta,
 	children,
 }: {
-	eyebrow: string;
 	titleLines: string[];
 	description: string;
 	primaryCta: FeatureCtaLink;
@@ -23,7 +21,6 @@ export function MarketingPageShell({
 	return (
 		<div>
 			<FeatureHero
-				eyebrow={eyebrow}
 				titleLines={titleLines}
 				description={description}
 				primaryCta={primaryCta}
@@ -61,26 +58,17 @@ export function PageSection({
 }
 
 export function SectionHeading({
-	eyebrow,
 	title,
 	description,
 	center = true,
 }: {
-	eyebrow?: string;
 	title: string;
 	description?: string;
 	center?: boolean;
 }) {
 	return (
 		<div className={center ? "mb-16 text-center" : "mb-12"}>
-			{eyebrow && (
-				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-					{eyebrow}
-				</p>
-			)}
-			<h2
-				className={`font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white ${eyebrow ? "mt-4" : ""}`}
-			>
+			<h2 className="font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
 				{title}
 			</h2>
 			{description && (

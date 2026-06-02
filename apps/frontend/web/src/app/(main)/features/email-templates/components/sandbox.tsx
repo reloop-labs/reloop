@@ -56,10 +56,7 @@ export default function Sandbox() {
 		<section id="editor" className="scroll-mt-10">
 			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
 				<div className="mx-auto mb-16 max-w-3xl text-center">
-					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-						Template editor
-					</p>
-					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
+					<h2 className="font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 						Variables meet design
 					</h2>
 					<p className="mx-auto mt-6 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">

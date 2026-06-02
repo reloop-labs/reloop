@@ -9,7 +9,6 @@ import type { FeatureCtaBand, FeatureCtaLink } from "@reloop/web/components/land
 import type { Metadata } from "next";
 
 export type FeatureMarketingSection = {
-	eyebrow?: string;
 	title: string;
 	description?: string;
 	alt?: boolean;
@@ -17,7 +16,6 @@ export type FeatureMarketingSection = {
 };
 
 export type FeatureMarketingPageConfig = {
-	eyebrow: string;
 	titleLines: string[];
 	description: string;
 	primaryCta: FeatureCtaLink;
@@ -33,7 +31,6 @@ export function FeatureMarketingPage({
 }) {
 	return (
 		<MarketingPageShell
-			eyebrow={config.eyebrow}
 			titleLines={config.titleLines}
 			description={config.description}
 			primaryCta={config.primaryCta}
@@ -42,7 +39,6 @@ export function FeatureMarketingPage({
 			{config.sections.map((section) => (
 				<PageSection key={section.title} alt={section.alt}>
 					<SectionHeading
-						eyebrow={section.eyebrow}
 						title={section.title}
 						description={section.description}
 					/>

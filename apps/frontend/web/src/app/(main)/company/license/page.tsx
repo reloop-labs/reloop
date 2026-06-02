@@ -45,7 +45,6 @@ SOFTWARE.`;
 const LicensePage = () => {
 	return (
 		<MarketingPageShell
-			eyebrow="Legal / License"
 			titleLines={["MIT License"]}
 			description="Reloop is open source under the MIT License—free to use in commercial and personal projects with minimal obligations."
 			primaryCta={{
@@ -56,7 +55,6 @@ const LicensePage = () => {
 		>
 			<PageSection>
 				<SectionHeading
-					eyebrow="Overview"
 					title="What the MIT License means"
 					description="Simple, permissive, and business-friendly."
 				/>
@@ -97,7 +95,6 @@ const LicensePage = () => {
 
 			<PageSection alt narrow>
 				<SectionHeading
-					eyebrow="Full text"
 					title="MIT License"
 					description="The complete license text that applies to Reloop."
 					center
@@ -135,7 +132,6 @@ const LicensePage = () => {
 			</PageSection>
 
 			<FeatureCta
-				eyebrow="Start building"
 				title="Ready to use Reloop?"
 				titleMuted="Under the MIT License."
 				description="Clone the repo, self-host, or use our cloud—same freedom to build."

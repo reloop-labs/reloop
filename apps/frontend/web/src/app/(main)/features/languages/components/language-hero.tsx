@@ -10,9 +10,6 @@ export default function LanguageHero({ language }: { language: LanguageDefinitio
 			<main className="relative z-10">
 				<section className="mx-auto flex max-w-4xl flex-col px-4 pb-16 sm:px-6 lg:px-8 lg:pb-24">
 					<div className="mx-auto max-w-[1020px] text-center">
-						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-							Features / Languages / {language.name}
-						</p>
 
 						<div
 							className="mx-auto mt-6 inline-flex size-14 items-center justify-center rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10"
@@ -21,7 +18,7 @@ export default function LanguageHero({ language }: { language: LanguageDefinitio
 							<LanguageIcon icon={language.icon} className="size-8" />
 						</div>
 
-						<h1 className="mt-6 font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[4.2rem]">
+						<h1 className="font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[4.2rem]">
 							Send Email with
 							<br />
 							{language.name}

@@ -6,10 +6,7 @@ export default function CTA() {
 	return (
 		<section className="border-[#0a0d12]/5 border-t bg-white py-24 text-[#0a0d12] sm:py-32">
 			<div className="mx-auto max-w-[920px] px-4 text-center">
-				<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
-					Start today
-				</p>
-				<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
+				<h2 className="font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 					Ready to launch your next campaign?
 					<br />
 					<span className="text-[#0a0d12]/40">Start for free.</span>

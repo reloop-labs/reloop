@@ -3,7 +3,6 @@ import PageLayout from "@reloop/web/components/page-layout";
 const PrivacyPage = () => {
 	return (
 		<PageLayout
-			eyebrow="Legal / Privacy"
 			title="Privacy Policy"
 			subtitle="Last update: August 4th, 2025"
 		>

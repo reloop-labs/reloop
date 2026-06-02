@@ -8,11 +8,8 @@ export default function Hero() {
 			<main className="relative z-10">
 				<section className="mx-auto flex max-w-4xl flex-col px-4 pb-16 sm:px-6 lg:px-8 lg:pb-24">
 					<div className="mx-auto max-w-[1020px] text-center">
-						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-							Features / Marketing Teams
-						</p>
 
-						<h1 className="mt-6 font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[4.2rem] dark:text-white">
+						<h1 className="font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[4.2rem] dark:text-white">
 							Collaborative Campaigns
 							<br />
 							At Low-Latency Scale

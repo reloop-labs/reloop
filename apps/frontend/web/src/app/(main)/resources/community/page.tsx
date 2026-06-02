@@ -25,7 +25,7 @@ const platforms = [
 		title: "Discord Community",
 		description:
 			"Real-time discussions, support, and community events. Get help from the team and fellow developers.",
-		href: "https://discord.gg/reloop",
+		href: "https://discord.gg/bHnkBcp7xR",
 		label: "Join Discord",
 	},
 	{
@@ -47,10 +47,9 @@ const platforms = [
 const CommunityPage = () => {
 	return (
 		<MarketingPageShell
-			eyebrow="Resources / Community"
 			titleLines={["Join the Reloop", "Community"]}
 			description="Connect with developers, share knowledge, and help shape the future of email infrastructure."
-			primaryCta={{ label: "Join Discord", href: "https://discord.gg/reloop" }}
+			primaryCta={{ label: "Join Discord", href: "https://discord.gg/bHnkBcp7xR" }}
 			secondaryCta={{
 				label: "Contribute on GitHub",
 				href: "https://github.com/reloop-labs/reloop",
@@ -58,7 +57,6 @@ const CommunityPage = () => {
 		>
 			<PageSection>
 				<SectionHeading
-					eyebrow="Connect"
 					title="Where our community meets"
 					description="Find us across platforms where developers collaborate on email infrastructure."
 				/>
@@ -89,7 +87,6 @@ const CommunityPage = () => {
 
 			<PageSection alt>
 				<SectionHeading
-					eyebrow="Growth"
 					title="A growing community"
 					description="Thousands of developers are already part of the Reloop ecosystem."
 				/>
@@ -115,11 +112,10 @@ const CommunityPage = () => {
 			</PageSection>
 
 			<FeatureCta
-				eyebrow="Get involved"
 				title="Ready to join?"
 				titleMuted="We'd love to meet you."
 				description="Whether you need help, want to contribute code, or connect with peers—there's a place for you."
-				primary={{ label: "Join Discord", href: "https://discord.gg/reloop" }}
+				primary={{ label: "Join Discord", href: "https://discord.gg/bHnkBcp7xR" }}
 				secondary={{
 					label: "Star on GitHub",
 					href: "https://github.com/reloop-labs/reloop",

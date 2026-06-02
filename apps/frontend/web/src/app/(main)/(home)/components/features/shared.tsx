@@ -25,13 +25,11 @@ export function SubFeature({
 }
 
 export function SectionBlock({
-	eyebrow,
 	title,
 	subtitle,
 	children,
 	className,
 }: {
-	eyebrow: string;
 	title: string;
 	subtitle: string;
 	children: React.ReactNode;
@@ -44,10 +42,7 @@ export function SectionBlock({
 			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
 				{/* Section Header */}
 				<div className="mx-auto mb-16 max-w-3xl text-center">
-					<p className="font-semibold text-[11px] text-emerald-500 uppercase tracking-[0.16em] dark:text-emerald-400">
-						{eyebrow}
-					</p>
-					<h2 className="mt-4 font-bold font-serif text-[#0a0d12] text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.2rem] lg:text-[3.8rem] dark:text-white">
+					<h2 className="font-bold font-serif text-[#0a0d12] text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.2rem] lg:text-[3.8rem] dark:text-white">
 						{title}
 					</h2>
 					<p className="mt-5 text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/60">

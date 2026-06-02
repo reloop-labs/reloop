@@ -29,7 +29,6 @@ const services = [
 const StatusPage = () => {
 	return (
 		<MarketingPageShell
-			eyebrow="Resources / Status"
 			titleLines={["System Status"]}
 			description="Real-time monitoring of our email infrastructure. Check service health, uptime, and incident history."
 			primaryCta={{ label: "Get started", href: "/dashboard/signup" }}
@@ -37,7 +36,6 @@ const StatusPage = () => {
 		>
 			<PageSection>
 				<SectionHeading
-					eyebrow="Live"
 					title="All systems operational"
 					description="We target 99.99% uptime with real-time monitoring and incident response."
 				/>
@@ -61,7 +59,6 @@ const StatusPage = () => {
 
 			<PageSection alt narrow>
 				<SectionHeading
-					eyebrow="Reliability"
 					title="Uptime commitment"
 					description="Production SLAs backed by edge routing and automated failover."
 				/>
@@ -94,13 +91,21 @@ const StatusPage = () => {
 						>
 							GitHub repository
 						</a>{" "}
-						or join Discord for maintenance announcements.
+						or{" "}
+						<a
+							href="https://discord.gg/bHnkBcp7xR"
+							className="text-primary-base hover:underline"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							join Discord
+						</a>{" "}
+						for maintenance announcements.
 					</p>
 				</ContentCard>
 			</PageSection>
 
 			<FeatureCta
-				eyebrow="Stay informed"
 				title="Build on reliable infrastructure"
 				description="Create an account to receive delivery webhooks and monitor sends from your dashboard."
 				primary={{ label: "Get started", href: "/dashboard/signup" }}

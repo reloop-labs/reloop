@@ -3,7 +3,6 @@ import PageLayout from "@reloop/web/components/page-layout";
 const TermsPage = () => {
 	return (
 		<PageLayout
-			eyebrow="Legal / Terms"
 			title="Terms of Service"
 			subtitle="Last update: August 4th, 2025"
 		>

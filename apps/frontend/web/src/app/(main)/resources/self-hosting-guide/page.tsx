@@ -39,7 +39,6 @@ helm install reloop reloop/reloop`;
 const SelfHostingGuidePage = () => {
 	return (
 		<MarketingPageShell
-			eyebrow="Resources / Self-hosting"
 			titleLines={["Self-Hosting Guide"]}
 			description="Deploy Reloop on your own infrastructure with Docker, Kubernetes, or bare metal—your data stays on your network."
 			primaryCta={{ label: "Get started", href: "/dashboard/signup" }}
@@ -50,7 +49,6 @@ const SelfHostingGuidePage = () => {
 		>
 			<PageSection>
 				<SectionHeading
-					eyebrow="Prerequisites"
 					title="Before you begin"
 					description="Ensure your environment meets minimum requirements."
 				/>
@@ -80,7 +78,6 @@ const SelfHostingGuidePage = () => {
 
 			<PageSection alt narrow>
 				<SectionHeading
-					eyebrow="Install"
 					title="Installation methods"
 					description="Choose the path that fits your deployment."
 				/>
@@ -111,7 +108,6 @@ const SelfHostingGuidePage = () => {
 
 			<PageSection narrow>
 				<SectionHeading
-					eyebrow="Configure"
 					title="Environment variables"
 					description="Essential settings for a production deployment."
 					center={false}
@@ -125,7 +121,6 @@ RELOOP_API_KEY=your-secret-key`}</CodeBlock>
 			</PageSection>
 
 			<FeatureCta
-				eyebrow="Deploy"
 				title="Ready to self-host?"
 				titleMuted="You're in control."
 				description="Fork the repository, follow the guide, and join the community if you need help."

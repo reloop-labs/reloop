@@ -4,7 +4,6 @@ const signup = { label: "Get started", href: "/dashboard/signup" };
 const docs = { label: "Read documentation", href: "/docs" };
 
 export const campaignsConfig: FeatureMarketingPageConfig = {
-	eyebrow: "Features / Campaigns",
 	titleLines: ["Email Campaigns"],
 	description:
 		"Create, send, and track powerful email campaigns that drive engagement and conversions—from newsletters to product announcements.",
@@ -12,7 +11,6 @@ export const campaignsConfig: FeatureMarketingPageConfig = {
 	secondaryCta: { label: "View docs", href: "/docs" },
 	sections: [
 		{
-			eyebrow: "Capabilities",
 			title: "Everything you need for successful campaigns",
 			description:
 				"From design to delivery to analytics, we provide the tools to create campaigns that perform.",
@@ -36,7 +34,6 @@ export const campaignsConfig: FeatureMarketingPageConfig = {
 		},
 	],
 	cta: {
-		eyebrow: "Get started",
 		title: "Ready to launch your first campaign?",
 		titleMuted: "Start free today.",
 		description:
@@ -47,7 +44,6 @@ export const campaignsConfig: FeatureMarketingPageConfig = {
 };
 
 export const deliverabilityConfig: FeatureMarketingPageConfig = {
-	eyebrow: "Features / Deliverability",
 	titleLines: ["Email Deliverability"],
 	description:
 		"Ensure your emails reach the inbox, not the spam folder. Maintain excellent sender reputation and maximize performance.",
@@ -55,7 +51,6 @@ export const deliverabilityConfig: FeatureMarketingPageConfig = {
 	secondaryCta: docs,
 	sections: [
 		{
-			eyebrow: "Tools",
 			title: "Built-in deliverability tools",
 			description:
 				"Every feature is designed to help your emails reach the inbox and maintain a strong sender reputation.",
@@ -78,7 +73,6 @@ export const deliverabilityConfig: FeatureMarketingPageConfig = {
 			],
 		},
 		{
-			eyebrow: "Performance",
 			title: "Industry-leading deliverability",
 			description:
 				"Our customers consistently achieve better deliverability rates compared to industry averages.",
@@ -100,7 +94,6 @@ export const deliverabilityConfig: FeatureMarketingPageConfig = {
 		},
 	],
 	cta: {
-		eyebrow: "Deploy today",
 		title: "Ready to improve your deliverability?",
 		titleMuted: "We can help.",
 		description:
@@ -111,7 +104,6 @@ export const deliverabilityConfig: FeatureMarketingPageConfig = {
 };
 
 export const developersConfig: FeatureMarketingPageConfig = {
-	eyebrow: "Features / Developers",
 	titleLines: ["Developer-First", "Email Infrastructure"],
 	description:
 		"Send transactionals and marketing broadcasts with clean APIs, robust SDKs, and fully-managed SMTP relay—built for reliability, speed, and DX.",
@@ -119,7 +111,6 @@ export const developersConfig: FeatureMarketingPageConfig = {
 	secondaryCta: docs,
 	sections: [
 		{
-			eyebrow: "Developer experience",
 			title: "Supercharged developer experience",
 			description: "Integrate in minutes using modern tooling and event pipelines.",
 			items: [
@@ -142,7 +133,6 @@ export const developersConfig: FeatureMarketingPageConfig = {
 		},
 	],
 	cta: {
-		eyebrow: "Build faster",
 		title: "Start building with Reloop",
 		titleMuted: "Free tier included.",
 		description:
@@ -153,7 +143,6 @@ export const developersConfig: FeatureMarketingPageConfig = {
 };
 
 export const emailAnalyticsConfig: FeatureMarketingPageConfig = {
-	eyebrow: "Features / Analytics",
 	titleLines: ["Email Analytics"],
 	description:
 		"Understand how your emails perform with detailed analytics, real-time reporting, and actionable insights.",
@@ -161,7 +150,6 @@ export const emailAnalyticsConfig: FeatureMarketingPageConfig = {
 	secondaryCta: docs,
 	sections: [
 		{
-			eyebrow: "Metrics",
 			title: "Track what matters",
 			description:
 				"Monitor engagement and conversion metrics across campaigns and transactional sends.",
@@ -184,7 +172,6 @@ export const emailAnalyticsConfig: FeatureMarketingPageConfig = {
 			],
 		},
 		{
-			eyebrow: "Insights",
 			title: "Reports that drive decisions",
 			description: "Visualize trends and compare performance over time.",
 			alt: true,
@@ -205,7 +192,6 @@ export const emailAnalyticsConfig: FeatureMarketingPageConfig = {
 		},
 	],
 	cta: {
-		eyebrow: "Measure more",
 		title: "Unlock email analytics",
 		titleMuted: "Start for free.",
 		description:
@@ -216,7 +202,6 @@ export const emailAnalyticsConfig: FeatureMarketingPageConfig = {
 };
 
 export const emailValidationConfig: FeatureMarketingPageConfig = {
-	eyebrow: "Features / Validation",
 	titleLines: ["Email Validation"],
 	description:
 		"Verify addresses before you send. Reduce bounces, protect reputation, and keep your lists clean.",
@@ -224,7 +209,6 @@ export const emailValidationConfig: FeatureMarketingPageConfig = {
 	secondaryCta: docs,
 	sections: [
 		{
-			eyebrow: "Verification",
 			title: "Multi-layer validation",
 			description:
 				"Catch invalid addresses at signup, import, and send time with fast, accurate checks.",
@@ -246,7 +230,6 @@ export const emailValidationConfig: FeatureMarketingPageConfig = {
 		},
 	],
 	cta: {
-		eyebrow: "Protect reputation",
 		title: "Clean lists, better delivery",
 		titleMuted: "Try validation free.",
 		description:
@@ -257,7 +240,6 @@ export const emailValidationConfig: FeatureMarketingPageConfig = {
 };
 
 export const gettingStartedConfig: FeatureMarketingPageConfig = {
-	eyebrow: "Platform / Getting Started",
 	titleLines: ["Getting Started", "with Reloop"],
 	description:
 		"Get your email infrastructure up and running in minutes—from signup to your first send.",
@@ -265,7 +247,6 @@ export const gettingStartedConfig: FeatureMarketingPageConfig = {
 	secondaryCta: { label: "Watch demo", href: "/docs" },
 	sections: [
 		{
-			eyebrow: "Quick start",
 			title: "Up and running in under 5 minutes",
 			description: "Follow these steps to start sending email with Reloop.",
 			items: [
@@ -288,7 +269,6 @@ export const gettingStartedConfig: FeatureMarketingPageConfig = {
 		},
 	],
 	cta: {
-		eyebrow: "Next step",
 		title: "Ready to get started?",
 		titleMuted: "We're here to help.",
 		description:
@@ -299,7 +279,6 @@ export const gettingStartedConfig: FeatureMarketingPageConfig = {
 };
 
 export const webhooksConfig: FeatureMarketingPageConfig = {
-	eyebrow: "Platform / Webhooks",
 	titleLines: ["Webhooks"],
 	description:
 		"Receive real-time notifications about email events, delivery status, and user interactions.",
@@ -307,7 +286,6 @@ export const webhooksConfig: FeatureMarketingPageConfig = {
 	secondaryCta: { label: "View examples", href: "/docs/webhooks" },
 	sections: [
 		{
-			eyebrow: "Events",
 			title: "Available webhook events",
 			description:
 				"Subscribe to specific events for delivery, engagement, and system notifications.",
@@ -330,7 +308,6 @@ export const webhooksConfig: FeatureMarketingPageConfig = {
 			],
 		},
 		{
-			eyebrow: "Security",
 			title: "Webhook security",
 			description: "Verify payloads and protect your endpoints in production.",
 			alt: true,
@@ -351,7 +328,6 @@ export const webhooksConfig: FeatureMarketingPageConfig = {
 		},
 	],
 	cta: {
-		eyebrow: "Integrate",
 		title: "Keep your app in sync",
 		titleMuted: "Configure webhooks today.",
 		description:
@@ -362,7 +338,6 @@ export const webhooksConfig: FeatureMarketingPageConfig = {
 };
 
 export const sdksConfig: FeatureMarketingPageConfig = {
-	eyebrow: "Platform / SDKs",
 	titleLines: ["Official SDKs"],
 	description:
 		"Client libraries for your favorite languages—type-safe, documented, and maintained by the Reloop team.",
@@ -370,7 +345,6 @@ export const sdksConfig: FeatureMarketingPageConfig = {
 	secondaryCta: { label: "Language guides", href: "/features/languages" },
 	sections: [
 		{
-			eyebrow: "Languages",
 			title: "Choose your language",
 			description: "Install from npm, PyPI, crates.io, Packagist, or Go modules.",
 			items: [
@@ -389,7 +363,6 @@ export const sdksConfig: FeatureMarketingPageConfig = {
 			],
 		},
 		{
-			eyebrow: "Features",
 			title: "SDK features",
 			description: "Production-ready defaults out of the box.",
 			alt: true,
@@ -410,7 +383,6 @@ export const sdksConfig: FeatureMarketingPageConfig = {
 		},
 	],
 	cta: {
-		eyebrow: "Install",
 		title: "Ready to integrate?",
 		titleMuted: "Pick your SDK.",
 		description: "Browse language-specific quickstarts and send your first email in minutes.",
@@ -420,7 +392,6 @@ export const sdksConfig: FeatureMarketingPageConfig = {
 };
 
 export const apiReferenceConfig: FeatureMarketingPageConfig = {
-	eyebrow: "Platform / API",
 	titleLines: ["API Reference"],
 	description:
 		"RESTful APIs for sending email, managing contacts, and tracking analytics—designed for simplicity and scale.",
@@ -428,7 +399,6 @@ export const apiReferenceConfig: FeatureMarketingPageConfig = {
 	secondaryCta: { label: "Open API docs", href: "/docs/api-reference" },
 	sections: [
 		{
-			eyebrow: "Endpoints",
 			title: "Core API endpoints",
 			description: "Everything you need to send and monitor email programmatically.",
 			items: [
@@ -447,7 +417,6 @@ export const apiReferenceConfig: FeatureMarketingPageConfig = {
 			],
 		},
 		{
-			eyebrow: "SDKs",
 			title: "Official SDKs",
 			description: "Prefer a client library? We maintain SDKs for every major stack.",
 			alt: true,
@@ -468,7 +437,6 @@ export const apiReferenceConfig: FeatureMarketingPageConfig = {
 		},
 	],
 	cta: {
-		eyebrow: "Build",
 		title: "Start with the API",
 		titleMuted: "Free tier available.",
 		description: "Create an API key and explore interactive docs with copy-paste examples.",
@@ -478,7 +446,6 @@ export const apiReferenceConfig: FeatureMarketingPageConfig = {
 };
 
 export const integrationConfig: FeatureMarketingPageConfig = {
-	eyebrow: "Platform / Integration",
 	titleLines: ["Integrations"],
 	description:
 		"Connect Reloop to your stack with REST APIs, webhooks, and official SDKs—built for any architecture.",
@@ -486,7 +453,6 @@ export const integrationConfig: FeatureMarketingPageConfig = {
 	secondaryCta: docs,
 	sections: [
 		{
-			eyebrow: "Connect",
 			title: "Multiple ways to integrate",
 			description: "Choose the approach that fits your application and team.",
 			items: [
@@ -509,7 +475,6 @@ export const integrationConfig: FeatureMarketingPageConfig = {
 		},
 	],
 	cta: {
-		eyebrow: "Ship faster",
 		title: "Ready to integrate?",
 		titleMuted: "We'll guide you.",
 		description:
@@ -520,7 +485,6 @@ export const integrationConfig: FeatureMarketingPageConfig = {
 };
 
 export const campaignBuilderConfig: FeatureMarketingPageConfig = {
-	eyebrow: "Platform / Campaign Builder",
 	titleLines: ["Campaign Builder"],
 	description:
 		"Design, preview, and send beautiful email campaigns with a visual editor and powerful automation.",
@@ -528,7 +492,6 @@ export const campaignBuilderConfig: FeatureMarketingPageConfig = {
 	secondaryCta: docs,
 	sections: [
 		{
-			eyebrow: "Design",
 			title: "Build campaigns visually",
 			description: "Everything you need to create on-brand emails without code.",
 			items: [
@@ -547,7 +510,6 @@ export const campaignBuilderConfig: FeatureMarketingPageConfig = {
 			],
 		},
 		{
-			eyebrow: "Workflow",
 			title: "From idea to inbox",
 			description: "A simple flow to launch campaigns with confidence.",
 			alt: true,
@@ -568,7 +530,6 @@ export const campaignBuilderConfig: FeatureMarketingPageConfig = {
 		},
 	],
 	cta: {
-		eyebrow: "Launch",
 		title: "Build your next campaign",
 		titleMuted: "Start for free.",
 		description:

@@ -25,7 +25,7 @@ export const landingRoute = new Elysia().get(
 ║ 📖 OpenAPI: https://reloop.sh/api/contacts/openapi                   ║
 ║ 🐙 GitHub: https://github.com/reloop-labs/reloop                     ║
 ║ 🆘 Support: https://reloop.sh/support                                ║
-║ 💬 Discord: https://discord.gg/reloop                                ║
+║ 💬 Discord: https://discord.gg/bHnkBcp7xR                                ║
 ║ 🐦 Twitter: https://x.com/reloophq                                   ║
 ║ 🛠️ Setup: https://reloop.sh/docs/setup/contacts                      ║
 ║                                                                      ║

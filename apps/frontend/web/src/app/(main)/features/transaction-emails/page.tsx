@@ -306,11 +306,8 @@ const TransactionEmailsPage = () => {
 		<div className="relative min-h-screen overflow-x-hidden bg-transparent font-sans text-text-strong-950 selection:bg-neutral-200 dark:text-white">
 			<section className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-transparent pt-40 pb-28">
 				<div className="relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-						Features / Transaction Emails
-					</p>
 
-					<h1 className="mt-6 font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[4.2rem] dark:text-white">
+					<h1 className="font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[4.2rem] dark:text-white">
 						Programmatic Email Delivery
 						<br />
 						For Developers
@@ -349,10 +346,7 @@ const TransactionEmailsPage = () => {
 			<section id="playground" className="scroll-mt-10 bg-white py-24 sm:py-32">
 				<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
 					<div className="mx-auto mb-16 max-w-3xl text-center">
-						<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
-							DevEx Playground
-						</p>
-						<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
+						<h2 className="font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 							Interactive Sandbox
 						</h2>
 						<p className="mx-auto mt-6 max-w-[620px] text-[#0a0d12]/60 text-[15px] leading-relaxed sm:text-[17px]">
@@ -648,10 +642,7 @@ const TransactionEmailsPage = () => {
 			<section className="border-[#0a0d12]/5 border-t bg-white py-24 sm:py-32">
 				<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
 					<div className="mb-20 text-center">
-						<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
-							Core Infrastructure
-						</p>
-						<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
+						<h2 className="font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 							SMTP Relay &amp; HTTP APIs
 						</h2>
 						<p className="mx-auto mt-4 max-w-xl text-[#0a0d12]/50 text-base">
@@ -810,10 +801,7 @@ const TransactionEmailsPage = () => {
 			<section className="border-[#0a0d12]/5 border-t bg-[#f8f8f8] py-24 text-[#0a0d12] sm:py-32">
 				<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
 					<div className="mb-20 text-center">
-						<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
-							Get Started
-						</p>
-						<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
+						<h2 className="font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 							Setup in 5 Minutes
 						</h2>
 						<p className="mx-auto mt-4 max-w-xl text-[#0a0d12]/50 text-base">
@@ -877,10 +865,7 @@ const TransactionEmailsPage = () => {
 			{/* CTA Banner Section (Light White bg-white) */}
 			<section className="border-[#0a0d12]/5 border-t bg-white py-24 text-[#0a0d12] sm:py-32">
 				<div className="mx-auto max-w-[920px] px-4 text-center">
-					<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
-						Start today
-					</p>
-					<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
+					<h2 className="font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 						3,000 emails for free
 						<br />
 						<span className="text-[#0a0d12]/40">per month.</span>

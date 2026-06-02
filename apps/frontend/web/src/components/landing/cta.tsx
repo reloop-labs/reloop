@@ -4,7 +4,6 @@ import Link from "next/link";
 import type { FeatureCtaBand } from "./types";
 
 export function FeatureCta({
-	eyebrow,
 	title,
 	titleMuted,
 	description,
@@ -15,10 +14,7 @@ export function FeatureCta({
 		<section id="cta">
 			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
 				<div className="mx-auto max-w-[920px] text-center">
-					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-						{eyebrow}
-					</p>
-					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
+					<h2 className="font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
 						{title}
 						{titleMuted && (
 							<>
