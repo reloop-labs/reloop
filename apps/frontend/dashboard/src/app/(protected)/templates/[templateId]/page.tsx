@@ -81,11 +81,26 @@ const Page = () => {
 								<FullEmailBuilder />
 							</div>
 						</main>
-						{viewMode === "visual" && (
-							<div className="my-2 mr-2 h-[calc(100%-16px)] w-72 shrink-0 overflow-y-auto rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
-								<EmailInspector />
-							</div>
-						)}
+						<AnimatePresence initial={false}>
+							{viewMode === "visual" && (
+								<motion.div
+									initial={{ width: 0, opacity: 0 }}
+									animate={{ width: "288px", opacity: 1 }}
+									exit={{ width: 0, opacity: 0 }}
+									transition={{
+										type: "spring",
+										stiffness: 320,
+										damping: 33,
+										opacity: { duration: 0.2 },
+									}}
+									className="my-2 mr-2 h-[calc(100%-16px)] shrink-0 overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]"
+								>
+									<div className="h-full w-72 overflow-y-auto">
+										<EmailInspector />
+									</div>
+								</motion.div>
+							)}
+						</AnimatePresence>
 					</div>
 				</div>
 			</div>
