@@ -374,6 +374,36 @@ function sanitizeEmailHtml(rawHtml: string): string {
 				}
 			}
 
+			// Carry wrapper TD typography styles onto the container div.
+			// React Email templates set base typography (font-family, font-size,
+			// line-height, letter-spacing, font-weight, color) on an outer <td>
+			// that wraps the container table. When we extract only the container,
+			// these inherited styles are lost. Merge them in so the editor canvas
+			// preserves the original typography context.
+			const wrapperTd =
+				containerTable.closest("td") ||
+				doc.querySelector('td[style*="font-family"]') ||
+				doc.querySelector('td[style*="font-size"]');
+			if (wrapperTd && wrapperTd !== contentCell) {
+				const wrapperScratch = doc.createElement("div") as HTMLDivElement;
+				wrapperScratch.style.cssText =
+					wrapperTd.getAttribute("style") || "";
+				const TYPOGRAPHY_PROPS = [
+					"font-family",
+					"font-size",
+					"line-height",
+					"letter-spacing",
+					"font-weight",
+					"color",
+				];
+				for (const prop of TYPOGRAPHY_PROPS) {
+					const val = wrapperScratch.style.getPropertyValue(prop);
+					if (val && !scratch.style.getPropertyValue(prop)) {
+						scratch.style.setProperty(prop, val);
+					}
+				}
+			}
+
 			const mergedStyle = scratch.style.cssText;
 			if (mergedStyle) {
 				containerDiv.setAttribute("style", mergedStyle);
@@ -459,10 +489,18 @@ function normalizeAnchorStyles(root: Element): void {
 		const style = el.style;
 		if (!style) continue;
 
-		const td = style.textDecoration?.toLowerCase();
-		if (td && td.includes("underline")) {
+		const td = (style.textDecoration || "").toLowerCase();
+		const tdl = (style.textDecorationLine || "").toLowerCase();
+
+		if (td.includes("underline") || tdl.includes("underline")) {
+			// Strip explicit underline – the editor canvas should match the demo
+			// preview which generally does not underline links.
 			style.removeProperty("text-decoration");
 			style.removeProperty("text-decoration-line");
+		} else if (tdl === "none" || td === "none" || td.includes("none")) {
+			// Preserve explicit "none" so browser-default underline stays suppressed.
+			style.setProperty("text-decoration-line", "none");
+			style.removeProperty("text-decoration");
 		}
 
 		// If the anchor explicitly sets a browser-blue-ish color, drop it so it
@@ -870,6 +908,7 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 	}
 
 	let containerBg = "#ffffff";
+	let containerTextColor = "#000000";
 	let containerWidth = 600;
 	let containerPaddingTop = 0;
 	let containerPaddingRight = 0;
@@ -920,6 +959,28 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 		if (radiusAttr) {
 			const parsedRadius = parseCssUnit(radiusAttr);
 			if (parsedRadius !== undefined) containerBorderRadius = parsedRadius;
+		}
+
+		// Read text color from the container's content cell or from the
+		// wrapper TD that provides base typography for the email.
+		if (contentCell) {
+			const colorCellScratch = document.createElement("div");
+			colorCellScratch.style.cssText =
+				contentCell.getAttribute("style") || "";
+			if (colorCellScratch.style.color) {
+				containerTextColor = colorCellScratch.style.color;
+			}
+		}
+		const outerTd = containerTable.closest?.("td");
+		if (
+			outerTd &&
+			outerTd !== contentCell
+		) {
+			const outerScratch = document.createElement("div");
+			outerScratch.style.cssText = outerTd.getAttribute("style") || "";
+			if (outerScratch.style.color) {
+				containerTextColor = outerScratch.style.color;
+			}
 		}
 
 		// Read padding from container table style (some react-email/tailwind outputs put padding on the table)
@@ -1098,7 +1159,7 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 				{
 					label: "Text",
 					type: "color",
-					value: "#000000",
+					value: containerTextColor,
 					prop: "color",
 					classReference: "container",
 				},
@@ -1460,6 +1521,8 @@ function parseGlobalStylesFromHtml(html: string) {
 		const baseLineHeight = scratch.style.lineHeight;
 		const baseColor = scratch.style.color;
 		const baseBg = scratch.style.backgroundColor;
+		const baseFontWeight = scratch.style.fontWeight;
+		const baseLetterSpacing = scratch.style.letterSpacing;
 
 		const proseMirrorBase = [
 			".ProseMirror.ProseMirror{",
@@ -1468,6 +1531,8 @@ function parseGlobalStylesFromHtml(html: string) {
 			baseLineHeight ? `line-height:${baseLineHeight}!important;` : "",
 			baseColor ? `color:${baseColor}!important;` : "",
 			baseBg ? `background-color:${baseBg}!important;` : "",
+			baseFontWeight ? `font-weight:${baseFontWeight}!important;` : "",
+			baseLetterSpacing ? `letter-spacing:${baseLetterSpacing}!important;` : "",
 			"}",
 			// Email HTML relies on inline spacing; editor defaults add extra margins.
 			".ProseMirror.ProseMirror p{margin:0 !important;padding:0 !important;}",
