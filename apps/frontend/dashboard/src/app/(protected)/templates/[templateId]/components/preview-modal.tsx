@@ -157,10 +157,13 @@ export function PreviewModal({
 
 	const handleCopyAllVariablesAsJSON = () => {
 		if (!version.variables || version.variables.length === 0) return;
-		const payload = version.variables.reduce((acc, cur) => {
-			acc[cur] = `[value_${cur}]`;
-			return acc;
-		}, {} as Record<string, string>);
+		const payload = version.variables.reduce(
+			(acc, cur) => {
+				acc[cur] = `[value_${cur}]`;
+				return acc;
+			},
+			{} as Record<string, string>,
+		);
 		navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
 		toast.success("Variables copied as mock JSON payload!");
 	};
@@ -178,30 +181,32 @@ export function PreviewModal({
 		setTimeout(() => setIsRefreshing(false), 600);
 	};
 
-	const width = viewport === "desktop" ? "100%" : viewportWidths[viewport][orientation];
-	const height = viewport === "desktop" ? "100%" : viewportHeights[viewport][orientation];
+	const width =
+		viewport === "desktop" ? "100%" : viewportWidths[viewport][orientation];
+	const height =
+		viewport === "desktop" ? "100%" : viewportHeights[viewport][orientation];
 
 	return (
 		<Modal.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
 			<Modal.Content
-				className="h-[92vh] max-w-[96vw] rounded-2xl border border-stroke-soft-100/50 p-0 font-sans transition-all overflow-hidden"
+				className="h-[92vh] max-w-[96vw] overflow-hidden rounded-2xl border border-stroke-soft-100/50 p-0 font-sans transition-all"
 				showClose={true}
 			>
-				<div className="flex h-full w-full flex-col md:flex-row overflow-hidden bg-bg-white-0 dark:bg-zinc-950">
+				<div className="flex h-full w-full flex-col overflow-hidden bg-bg-white-0 md:flex-row dark:bg-zinc-950">
 					{/* Left Sidebar: Version Details & Envelope Simulator */}
-					<div className="w-full md:w-[380px] shrink-0 border-b md:border-b-0 md:border-r border-stroke-soft-100/50 bg-zinc-50/30 dark:bg-zinc-900/10 flex flex-col overflow-y-auto">
+					<div className="flex w-full shrink-0 flex-col overflow-y-auto border-stroke-soft-100/50 border-b bg-zinc-50/30 md:w-[380px] md:border-r md:border-b-0 dark:bg-zinc-900/10">
 						{/* Header Metadata section */}
-						<div className="p-5 border-b border-stroke-soft-100/50 space-y-4">
+						<div className="space-y-4 border-stroke-soft-100/50 border-b p-5">
 							<div className="flex items-center justify-between">
-								<h3 className="font-bold text-base text-zinc-900 dark:text-zinc-50 tracking-tight">
+								<h3 className="font-bold text-base text-zinc-900 tracking-tight dark:text-zinc-50">
 									{displayLabel}
 								</h3>
 								{version.isMajor ? (
-									<span className="rounded-full bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-0.5 font-semibold text-[10px] text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30 shadow-sm">
+									<span className="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-0.5 font-semibold text-[10px] text-emerald-600 shadow-sm dark:border-emerald-900/30 dark:bg-emerald-950/30 dark:text-emerald-400">
 										Released
 									</span>
 								) : (
-									<span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 font-semibold text-[10px] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 shadow-sm">
+									<span className="rounded-full border border-zinc-200 bg-zinc-100 px-2.5 py-0.5 font-semibold text-[10px] text-zinc-600 shadow-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
 										Draft
 									</span>
 								)}
@@ -209,7 +214,11 @@ export function PreviewModal({
 
 							{/* Creator Info */}
 							<div className="flex items-center gap-2.5">
-								<Avatar.Root size="24" color="gray" className="shrink-0 ring-1 ring-zinc-200 dark:ring-zinc-800">
+								<Avatar.Root
+									size="24"
+									color="gray"
+									className="shrink-0 ring-1 ring-zinc-200 dark:ring-zinc-800"
+								>
 									{version.createdBy?.image && (
 										<Avatar.Image
 											src={version.createdBy.image}
@@ -232,8 +241,8 @@ export function PreviewModal({
 										</span>
 									</Avatar.Image>
 								</Avatar.Root>
-								<div className="flex flex-col min-w-0">
-									<span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate">
+								<div className="flex min-w-0 flex-col">
+									<span className="truncate font-semibold text-xs text-zinc-800 dark:text-zinc-200">
 										{version.createdBy?.name ||
 											version.createdBy?.email ||
 											"Developer"}
@@ -246,12 +255,12 @@ export function PreviewModal({
 
 							{/* Version Changelog / Description */}
 							{version.description && (
-								<div className="rounded-xl bg-zinc-50 dark:bg-zinc-900/50 p-3 border border-zinc-100 dark:border-zinc-800/40 shadow-inner">
-									<div className="text-[9px] uppercase tracking-wider font-bold text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5 mb-1 select-none">
+								<div className="rounded-xl border border-zinc-100 bg-zinc-50 p-3 shadow-inner dark:border-zinc-800/40 dark:bg-zinc-900/50">
+									<div className="mb-1 flex select-none items-center gap-1.5 font-bold text-[9px] text-zinc-400 uppercase tracking-wider dark:text-zinc-500">
 										<Info size={11} />
 										<span>Changelog / Details</span>
 									</div>
-									<p className="text-[11px] text-zinc-600 dark:text-zinc-300 leading-relaxed font-normal break-words">
+									<p className="break-words font-normal text-[11px] text-zinc-600 leading-relaxed dark:text-zinc-300">
 										{version.description}
 									</p>
 								</div>
@@ -259,20 +268,20 @@ export function PreviewModal({
 						</div>
 
 						{/* Envelope Simulator section */}
-						<div className="p-5 border-b border-stroke-soft-100/50 space-y-3">
-							<span className="text-[10px] uppercase tracking-wider font-bold text-zinc-400 dark:text-zinc-500 flex items-center gap-1.5 select-none">
+						<div className="space-y-3 border-stroke-soft-100/50 border-b p-5">
+							<span className="flex select-none items-center gap-1.5 font-bold text-[10px] text-zinc-400 uppercase tracking-wider dark:text-zinc-500">
 								<Mail size={11} />
 								<span>Envelope Headers</span>
 							</span>
 
-							<div className="rounded-xl border border-zinc-200/60 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3.5 shadow-sm space-y-2.5">
+							<div className="space-y-2.5 rounded-xl border border-zinc-200/60 bg-white p-3.5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
 								{/* From */}
 								<div className="flex items-start gap-2 text-[11px]">
-									<span className="font-semibold text-zinc-400 dark:text-zinc-500 w-11 shrink-0 pt-0.5">
+									<span className="w-11 shrink-0 pt-0.5 font-semibold text-zinc-400 dark:text-zinc-500">
 										From
 									</span>
 									<div className="min-w-0 flex-1">
-										<span className="font-medium text-zinc-800 dark:text-zinc-200 break-all">
+										<span className="break-all font-medium text-zinc-800 dark:text-zinc-200">
 											{version.fromEmail || "sender@reloop.co"}
 										</span>
 									</div>
@@ -280,12 +289,12 @@ export function PreviewModal({
 
 								{/* Reply-To */}
 								{version.replyTo && (
-									<div className="flex items-start gap-2 text-[11px] border-t border-zinc-100 dark:border-zinc-900/50 pt-2">
-										<span className="font-semibold text-zinc-400 dark:text-zinc-500 w-11 shrink-0 pt-0.5">
+									<div className="flex items-start gap-2 border-zinc-100 border-t pt-2 text-[11px] dark:border-zinc-900/50">
+										<span className="w-11 shrink-0 pt-0.5 font-semibold text-zinc-400 dark:text-zinc-500">
 											Reply
 										</span>
 										<div className="min-w-0 flex-1">
-											<span className="text-zinc-600 dark:text-zinc-400 break-all">
+											<span className="break-all text-zinc-600 dark:text-zinc-400">
 												{version.replyTo}
 											</span>
 										</div>
@@ -293,8 +302,8 @@ export function PreviewModal({
 								)}
 
 								{/* To */}
-								<div className="flex items-start gap-2 text-[11px] border-t border-zinc-100 dark:border-zinc-900/50 pt-2">
-									<span className="font-semibold text-zinc-400 dark:text-zinc-500 w-11 shrink-0 pt-0.5">
+								<div className="flex items-start gap-2 border-zinc-100 border-t pt-2 text-[11px] dark:border-zinc-900/50">
+									<span className="w-11 shrink-0 pt-0.5 font-semibold text-zinc-400 dark:text-zinc-500">
 										To
 									</span>
 									<div className="min-w-0 flex-1">
@@ -305,24 +314,24 @@ export function PreviewModal({
 								</div>
 
 								{/* Subject */}
-								<div className="flex items-start gap-2 text-[11px] border-t border-zinc-100 dark:border-zinc-900/50 pt-2">
-									<span className="font-semibold text-zinc-400 dark:text-zinc-500 w-11 shrink-0 pt-0.5">
+								<div className="flex items-start gap-2 border-zinc-100 border-t pt-2 text-[11px] dark:border-zinc-900/50">
+									<span className="w-11 shrink-0 pt-0.5 font-semibold text-zinc-400 dark:text-zinc-500">
 										Subject
 									</span>
 									<div className="min-w-0 flex-1">
-										<span className="font-bold text-zinc-900 dark:text-zinc-100 leading-snug break-words block">
+										<span className="block break-words font-bold text-zinc-900 leading-snug dark:text-zinc-100">
 											{displaySubject}
 										</span>
 									</div>
 								</div>
 
 								{/* Preview Text / Preheader */}
-								<div className="flex items-start gap-2 text-[11px] border-t border-zinc-100 dark:border-zinc-900/50 pt-2">
-									<span className="font-semibold text-zinc-400 dark:text-zinc-500 w-11 shrink-0 pt-0.5">
+								<div className="flex items-start gap-2 border-zinc-100 border-t pt-2 text-[11px] dark:border-zinc-900/50">
+									<span className="w-11 shrink-0 pt-0.5 font-semibold text-zinc-400 dark:text-zinc-500">
 										Preview
 									</span>
 									<div className="min-w-0 flex-1">
-										<span className="text-zinc-500 dark:text-zinc-400 italic break-words block leading-relaxed bg-zinc-50/50 dark:bg-zinc-900/20 px-1.5 py-0.5 rounded font-mono text-[10px]">
+										<span className="block break-words rounded bg-zinc-50/50 px-1.5 py-0.5 font-mono text-[10px] text-zinc-500 italic leading-relaxed dark:bg-zinc-900/20 dark:text-zinc-400">
 											{version.previewText || "(None set)"}
 										</span>
 									</div>
@@ -331,16 +340,16 @@ export function PreviewModal({
 						</div>
 
 						{/* Template Variables section */}
-						<div className="p-5 flex-1 space-y-3">
+						<div className="flex-1 space-y-3 p-5">
 							<div className="flex items-center justify-between">
-								<span className="text-[10px] uppercase tracking-wider font-bold text-zinc-400 dark:text-zinc-500 select-none">
+								<span className="select-none font-bold text-[10px] text-zinc-400 uppercase tracking-wider dark:text-zinc-500">
 									Template Variables ({version.variables?.length || 0})
 								</span>
 								{version.variables && version.variables.length > 0 && (
 									<button
 										type="button"
 										onClick={handleCopyAllVariablesAsJSON}
-										className="text-[10px] font-semibold text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors flex items-center gap-1"
+										className="flex items-center gap-1 font-semibold text-[10px] text-zinc-500 transition-colors hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
 									>
 										<Copy size={10} />
 										<span>Copy JSON</span>
@@ -353,13 +362,13 @@ export function PreviewModal({
 									{version.variables.map((variable) => (
 										<div
 											key={variable}
-											className="group/var relative flex items-center justify-between gap-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200/80 dark:bg-zinc-900 dark:hover:bg-zinc-850 px-2.5 py-1.5 border border-zinc-200/50 dark:border-zinc-800/80 text-[10px] text-zinc-700 dark:text-zinc-300 font-mono transition-all duration-150 shadow-sm"
+											className="group/var relative flex items-center justify-between gap-1.5 rounded-lg border border-zinc-200/50 bg-zinc-100 px-2.5 py-1.5 font-mono text-[10px] text-zinc-700 shadow-sm transition-all duration-150 hover:bg-zinc-200/80 dark:border-zinc-800/80 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-850"
 										>
 											<span>{`{{ ${variable} }}`}</span>
 											<button
 												type="button"
 												onClick={() => handleCopyVariable(variable)}
-												className="text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300 ml-1 transition-all active:scale-90"
+												className="ml-1 text-zinc-400 transition-all hover:text-zinc-700 active:scale-90 dark:text-zinc-500 dark:hover:text-zinc-300"
 												title="Copy variable syntax"
 											>
 												{copiedVar === variable ? (
@@ -372,20 +381,22 @@ export function PreviewModal({
 									))}
 								</div>
 							) : (
-								<div className="flex flex-col items-center justify-center p-6 text-center rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/20 text-zinc-400 dark:text-zinc-500">
+								<div className="flex flex-col items-center justify-center rounded-xl border border-zinc-200 border-dashed bg-zinc-50/50 p-6 text-center text-zinc-400 dark:border-zinc-800/60 dark:bg-zinc-900/20 dark:text-zinc-500">
 									<Info size={14} className="mb-1" />
-									<span className="text-[10px]">No template variables detected.</span>
+									<span className="text-[10px]">
+										No template variables detected.
+									</span>
 								</div>
 							)}
 						</div>
 					</div>
 
 					{/* Right Content Area: Device Simulator */}
-					<div className="flex-1 flex flex-col overflow-hidden bg-zinc-100/50 dark:bg-[#0c0c0e]">
+					<div className="flex flex-1 flex-col overflow-hidden bg-zinc-100/50 dark:bg-[#0c0c0e]">
 						{/* Simulator Header / Toolbar */}
-						<div className="shrink-0 h-16 border-b border-stroke-soft-100/50 px-6 flex items-center justify-between bg-white dark:bg-zinc-950 z-10 shadow-sm">
+						<div className="z-10 flex h-16 shrink-0 items-center justify-between border-stroke-soft-100/50 border-b bg-white px-6 shadow-sm dark:bg-zinc-950">
 							{/* Device Selectors */}
-							<div className="flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-900 p-0.5 border border-zinc-200/30 dark:border-zinc-800/50 shadow-inner">
+							<div className="flex items-center gap-1 rounded-xl border border-zinc-200/30 bg-zinc-100 p-0.5 shadow-inner dark:border-zinc-800/50 dark:bg-zinc-900">
 								{[
 									{ id: "desktop", label: "Desktop", icon: Laptop },
 									{ id: "tablet", label: "Tablet", icon: Tablet },
@@ -403,17 +414,17 @@ export function PreviewModal({
 												setOrientation("portrait");
 											}}
 											className={cn(
-												"flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-out select-none",
+												"flex select-none items-center gap-1.5 rounded-lg px-3 py-1.5 font-semibold text-xs transition-all duration-200 ease-out",
 												isSelected
-													? "bg-white text-zinc-900 shadow-md border border-zinc-200/10 dark:bg-zinc-800 dark:text-zinc-50"
-													: "text-zinc-500 hover:text-zinc-850 dark:text-zinc-400 dark:hover:text-zinc-200"
+													? "border border-zinc-200/10 bg-white text-zinc-900 shadow-md dark:bg-zinc-800 dark:text-zinc-50"
+													: "text-zinc-500 hover:text-zinc-850 dark:text-zinc-400 dark:hover:text-zinc-200",
 											)}
 										>
 											<IconComp
 												size={13}
 												className={cn(
 													"transition-transform duration-200",
-													isSelected && "scale-110"
+													isSelected && "scale-110",
 												)}
 											/>
 											<span className="hidden sm:inline">{device.label}</span>
@@ -423,7 +434,7 @@ export function PreviewModal({
 							</div>
 
 							{/* Center: Orientation Toggle (Only for mobile/tablet) */}
-							{(viewport === "mobile" || viewport === "tablet") ? (
+							{viewport === "mobile" || viewport === "tablet" ? (
 								<div className="flex items-center gap-2.5">
 									<button
 										type="button"
@@ -432,7 +443,7 @@ export function PreviewModal({
 												prev === "portrait" ? "landscape" : "portrait",
 											)
 										}
-										className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700 bg-white dark:bg-zinc-900 text-xs font-semibold text-zinc-700 dark:text-zinc-300 transition-all duration-150 active:scale-95 shadow-sm"
+										className="flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-1.5 font-semibold text-xs text-zinc-700 shadow-sm transition-all duration-150 hover:border-zinc-300 active:scale-95 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-700"
 									>
 										<RotateCcw
 											size={12}
@@ -446,19 +457,19 @@ export function PreviewModal({
 										</span>
 									</button>
 
-									<span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500">
+									<span className="font-mono text-[10px] text-zinc-400 dark:text-zinc-500">
 										{viewportWidths[viewport][orientation]} ×{" "}
 										{viewportHeights[viewport][orientation]}
 									</span>
 								</div>
 							) : (
-								<span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 hidden md:inline select-none">
+								<span className="hidden select-none font-mono text-[10px] text-zinc-400 md:inline dark:text-zinc-500">
 									Responsive Canvas
 								</span>
 							)}
 
 							{/* Right Actions */}
-							<div className="flex items-center gap-2 mr-12">
+							<div className="mr-12 flex items-center gap-2">
 								{/* Refresh */}
 								<Button.Root
 									type="button"
@@ -466,7 +477,7 @@ export function PreviewModal({
 									mode="ghost"
 									size="xxsmall"
 									onClick={handleRefresh}
-									className="size-8 rounded-lg p-0 text-zinc-500 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-900 border border-zinc-200/20 dark:border-zinc-800/60"
+									className="size-8 rounded-lg border border-zinc-200/20 p-0 text-zinc-500 hover:bg-zinc-50 dark:border-zinc-800/60 dark:text-zinc-400 dark:hover:bg-zinc-900"
 									title="Refresh Iframe"
 								>
 									<RotateCcw
@@ -485,7 +496,7 @@ export function PreviewModal({
 									mode="ghost"
 									size="xxsmall"
 									onClick={handleCopyHtml}
-									className="h-8 px-2.5 rounded-lg text-zinc-500 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-900 border border-zinc-200/20 dark:border-zinc-800/60 gap-1.5"
+									className="h-8 gap-1.5 rounded-lg border border-zinc-200/20 px-2.5 text-zinc-500 hover:bg-zinc-50 dark:border-zinc-800/60 dark:text-zinc-400 dark:hover:bg-zinc-900"
 									title="Copy Raw HTML"
 								>
 									{copiedHtml ? (
@@ -493,7 +504,9 @@ export function PreviewModal({
 									) : (
 										<Copy size={13} />
 									)}
-									<span className="text-xs font-semibold hidden md:inline">Copy HTML</span>
+									<span className="hidden font-semibold text-xs md:inline">
+										Copy HTML
+									</span>
 								</Button.Root>
 
 								{/* Open in New Tab */}
@@ -503,11 +516,13 @@ export function PreviewModal({
 									mode="ghost"
 									size="xxsmall"
 									onClick={handleOpenInNewTab}
-									className="h-8 px-2.5 rounded-lg text-zinc-500 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-900 border border-zinc-200/20 dark:border-zinc-800/60 gap-1.5"
+									className="h-8 gap-1.5 rounded-lg border border-zinc-200/20 px-2.5 text-zinc-500 hover:bg-zinc-50 dark:border-zinc-800/60 dark:text-zinc-400 dark:hover:bg-zinc-900"
 									title="Open in new browser tab"
 								>
 									<ExternalLink size={13} />
-									<span className="text-xs font-semibold hidden md:inline">Open Tab</span>
+									<span className="hidden font-semibold text-xs md:inline">
+										Open Tab
+									</span>
 								</Button.Root>
 
 								{/* Restore in Editor */}
@@ -519,7 +534,7 @@ export function PreviewModal({
 										onClose();
 									}}
 									disabled={isRestoring}
-									className="gap-1.5 ml-2 font-semibold shadow-sm text-xs py-1 px-3 h-8"
+									className="ml-2 h-8 gap-1.5 px-3 py-1 font-semibold text-xs shadow-sm"
 								>
 									<ArrowUpRight size={13} />
 									<span>Load Version</span>
@@ -528,7 +543,7 @@ export function PreviewModal({
 						</div>
 
 						{/* Mock Device Sandbox Area */}
-						<div className="flex-1 overflow-auto p-6 md:p-10 flex items-center justify-center relative">
+						<div className="relative flex flex-1 items-center justify-center overflow-auto p-6 md:p-10">
 							<motion.div
 								layout
 								initial={{ opacity: 0, scale: 0.98 }}
@@ -539,28 +554,29 @@ export function PreviewModal({
 									height: height,
 								}}
 								className={cn(
-									"relative transition-all duration-300 flex flex-col",
+									"relative flex flex-col transition-all duration-300",
 									viewport === "desktop"
-										? "w-full h-full rounded-2xl border border-zinc-200/80 bg-white dark:border-zinc-800 dark:bg-zinc-950 shadow-xl overflow-hidden"
+										? "h-full w-full overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-950"
 										: viewport === "tablet"
-											? "border-[12px] border-zinc-950 dark:border-zinc-800 bg-zinc-950 dark:bg-zinc-800 shadow-2xl overflow-hidden rounded-[32px] ring-1 ring-zinc-900/10 dark:ring-zinc-800/20"
-											: "border-[10px] border-zinc-950 dark:border-zinc-800 bg-zinc-950 dark:bg-zinc-800 shadow-2xl overflow-hidden rounded-[42px] ring-1 ring-zinc-900/10 dark:ring-zinc-800/20"
+											? "overflow-hidden rounded-[32px] border-[12px] border-zinc-950 bg-zinc-950 shadow-2xl ring-1 ring-zinc-900/10 dark:border-zinc-800 dark:bg-zinc-800 dark:ring-zinc-800/20"
+											: "overflow-hidden rounded-[42px] border-[10px] border-zinc-950 bg-zinc-950 shadow-2xl ring-1 ring-zinc-900/10 dark:border-zinc-800 dark:bg-zinc-800 dark:ring-zinc-800/20",
 								)}
 							>
 								{/* 1. Desktop Browser Chrome */}
 								{viewport === "desktop" && (
-									<div className="shrink-0 h-10 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200/80 dark:border-zinc-800/80 px-4 flex items-center gap-3 select-none">
+									<div className="flex h-10 shrink-0 select-none items-center gap-3 border-zinc-200/80 border-b bg-zinc-50 px-4 dark:border-zinc-800/80 dark:bg-zinc-900">
 										{/* Red/Yellow/Green Window Dots */}
-										<div className="flex gap-1.5 shrink-0">
+										<div className="flex shrink-0 gap-1.5">
 											<div className="size-2.5 rounded-full bg-[#ff5f56]" />
 											<div className="size-2.5 rounded-full bg-[#ffbd2e]" />
 											<div className="size-2.5 rounded-full bg-[#27c93f]" />
 										</div>
 										{/* address bar */}
-										<div className="flex-1 max-w-lg mx-auto h-6 rounded-md bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-850 flex items-center justify-center gap-1.5 px-3 text-[10px] text-zinc-400 dark:text-zinc-500 font-medium shadow-inner">
+										<div className="mx-auto flex h-6 max-w-lg flex-1 items-center justify-center gap-1.5 rounded-md border border-zinc-200 bg-white px-3 font-medium text-[10px] text-zinc-400 shadow-inner dark:border-zinc-850 dark:bg-zinc-950 dark:text-zinc-500">
 											<Lock size={9} className="text-zinc-400" />
 											<span className="truncate">
-												reloop.co/templates/{templateId || "builder"}/preview/{version.id}
+												reloop.co/templates/{templateId || "builder"}/preview/
+												{version.id}
 											</span>
 										</div>
 										{/* spacer */}
@@ -570,9 +586,9 @@ export function PreviewModal({
 
 								{/* 2. Mobile Dynamic Island / Notch */}
 								{viewport === "mobile" && orientation === "portrait" && (
-									<div className="absolute top-2 left-1/2 -translate-x-1/2 w-[100px] h-5 bg-zinc-950 rounded-full z-30 flex items-center justify-between px-2.5">
+									<div className="-translate-x-1/2 absolute top-2 left-1/2 z-30 flex h-5 w-[100px] items-center justify-between rounded-full bg-zinc-950 px-2.5">
 										<div className="size-1 rounded-full bg-zinc-900/80" />
-										<div className="size-1.5 rounded-full bg-blue-950/70 border border-blue-900/20" />
+										<div className="size-1.5 rounded-full border border-blue-900/20 bg-blue-950/70" />
 									</div>
 								)}
 
@@ -580,10 +596,10 @@ export function PreviewModal({
 								{viewport === "mobile" && (
 									<div
 										className={cn(
-											"absolute bg-zinc-850 dark:bg-zinc-450 rounded-full z-30",
+											"absolute z-30 rounded-full bg-zinc-850 dark:bg-zinc-450",
 											orientation === "portrait"
-												? "bottom-1.5 left-1/2 -translate-x-1/2 w-28 h-1"
-												: "bottom-1.5 left-1/2 -translate-x-1/2 w-28 h-1"
+												? "-translate-x-1/2 bottom-1.5 left-1/2 h-1 w-28"
+												: "-translate-x-1/2 bottom-1.5 left-1/2 h-1 w-28",
 										)}
 									/>
 								)}
@@ -591,14 +607,14 @@ export function PreviewModal({
 								{/* Core Frame Body */}
 								<div
 									className={cn(
-										"flex-1 relative bg-white dark:bg-zinc-950",
+										"relative flex-1 bg-white dark:bg-zinc-950",
 										viewport === "desktop"
 											? ""
 											: viewport === "tablet"
-												? "rounded-2xl overflow-hidden m-1"
+												? "m-1 overflow-hidden rounded-2xl"
 												: orientation === "portrait"
-													? "rounded-[32px] overflow-hidden mt-6 mb-4 mx-1"
-													: "rounded-[32px] overflow-hidden my-1 mx-6"
+													? "mx-1 mt-6 mb-4 overflow-hidden rounded-[32px]"
+													: "mx-6 my-1 overflow-hidden rounded-[32px]",
 									)}
 								>
 									{displayHtml ? (
@@ -610,8 +626,11 @@ export function PreviewModal({
 											sandbox="allow-popups-to-escape-sandbox allow-same-origin"
 										/>
 									) : (
-										<div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-400 dark:text-zinc-500 text-xs gap-2 select-none">
-											<ShieldAlert size={20} className="text-zinc-300 dark:text-zinc-700" />
+										<div className="absolute inset-0 flex select-none flex-col items-center justify-center gap-2 text-xs text-zinc-400 dark:text-zinc-500">
+											<ShieldAlert
+												size={20}
+												className="text-zinc-300 dark:text-zinc-700"
+											/>
 											<span>No rendered HTML available for this version.</span>
 										</div>
 									)}
@@ -624,4 +643,3 @@ export function PreviewModal({
 		</Modal.Root>
 	);
 }
-

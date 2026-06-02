@@ -3,8 +3,11 @@
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
 import { useCurrentEditor } from "@tiptap/react";
 import {
+	AlertCircle,
 	Award,
 	Braces,
 	Check,
@@ -475,6 +478,41 @@ export function ScorePanel({ onClose }: PanelProps) {
 	);
 }
 
+function formatRelativeTime(dateStr: string) {
+	const date = new Date(dateStr);
+	const now = new Date();
+	const diff = now.getTime() - date.getTime();
+
+	const seconds = Math.floor(diff / 1000);
+	const minutes = Math.floor(seconds / 60);
+	const hours = Math.floor(minutes / 60);
+	const days = Math.floor(hours / 24);
+
+	if (seconds < 60) return "just now";
+	if (minutes < 60) {
+		return minutes === 1 ? "1 minute ago" : `${minutes} minutes ago`;
+	}
+	if (hours < 24) {
+		return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+	}
+	if (days === 1) {
+		return "Yesterday";
+	}
+	if (days < 7) {
+		return `${days} days ago`;
+	}
+
+	const day = date.getDate();
+	const month = date.toLocaleDateString("en-US", { month: "short" });
+	const year = date.getFullYear();
+	const currentYear = now.getFullYear();
+
+	if (year === currentYear) {
+		return `${day} ${month}`;
+	}
+	return `${day} ${month}, ${year}`;
+}
+
 /* ------------------------------------------------------------------ */
 /* Testing Panel Component                                           */
 /* ------------------------------------------------------------------ */
@@ -487,7 +525,14 @@ export function TestPanel({ onClose }: PanelProps) {
 
 	const [testEmail, setTestEmail] = useState("");
 	const [sending, setSending] = useState(false);
-	const [lastSent, setLastSent] = useState<string | null>(null);
+
+	interface RecentSend {
+		email: string;
+		timestamp: Date;
+		status: "success" | "error";
+		error?: string;
+	}
+	const [recentSends, setRecentSends] = useState<RecentSend[]>([]);
 
 	// Fetch template data to read variables
 	const { data: templateData } = useSWR<any>(
@@ -588,97 +633,117 @@ export function TestPanel({ onClose }: PanelProps) {
 				);
 			}
 
-			setLastSent(testEmail);
+			setRecentSends((prev) => [
+				{ email: testEmail, timestamp: new Date(), status: "success" },
+				...prev.slice(0, 2),
+			]);
 			toast.success(`Test email sent successfully to ${testEmail}`);
 			setTestEmail("");
 		} catch (error: any) {
 			console.error("Error sending test email:", error);
-			toast.error(error.message || "Failed to send test email");
+			const errMsg = error.message || "Failed to send test email";
+			setRecentSends((prev) => [
+				{
+					email: testEmail,
+					timestamp: new Date(),
+					status: "error",
+					error: errMsg,
+				},
+				...prev.slice(0, 2),
+			]);
+			toast.error(errMsg);
 		} finally {
 			setSending(false);
 		}
 	};
 
 	return (
-		<div className="flex h-full w-full flex-col overflow-hidden bg-transparent">
-			{/* Header */}
-			<div className="flex h-10 shrink-0 items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-3 dark:bg-[#0a0a0a]">
-				<div className="flex items-center gap-1.5 p-0">
-					<Send size={14} className="text-text-strong-950 dark:text-white" />
-					<span className="font-semibold text-text-strong-950 text-xs dark:text-white">
-						Send Test Email
-					</span>
-				</div>
-				<Button.Root
+		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a]">
+			{/* ── Header ── */}
+			<div className="flex shrink-0 items-center justify-between pt-3 pr-4 pb-3 pl-6">
+				<h2 className="font-semibold text-lg text-zinc-900 dark:text-zinc-50">
+					Send Test Email
+				</h2>
+				<button
 					type="button"
-					variant="neutral"
-					mode="ghost"
-					size="xxsmall"
 					onClick={onClose}
-					className="size-7 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
+					className="rounded-lg p-1.5 text-zinc-400 transition-all hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-300"
 				>
-					<ChevronLeft size={24} />
-				</Button.Root>
+					<X size={18} />
+				</button>
 			</div>
 
-			<div className="hide-scrollbar flex flex-1 flex-col justify-between overflow-y-auto p-4">
-				<div className="space-y-4">
-					<p className="text-[11px] text-text-soft-400 leading-normal dark:text-zinc-400">
+			<div className="hide-scrollbar flex flex-1 flex-col justify-between overflow-y-auto px-5 pb-5">
+				<div className="space-y-5">
+					<p className="text-paragraph-sm text-text-sub-600 leading-normal dark:text-zinc-400">
 						Verify exactly how this email template will render across different
 						client mailboxes by sending a live test copy.
 					</p>
 
-					<form onSubmit={handleSendTest} className="space-y-4">
-						<div className="space-y-1">
-							<label
-								htmlFor="recipient-address"
-								className="font-bold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-zinc-400"
-							>
+					<form onSubmit={handleSendTest} className="space-y-5">
+						<div className="flex flex-col gap-1.5">
+							<Label.Root htmlFor="recipient-address">
 								Recipient Address
-							</label>
-							<input
-								id="recipient-address"
-								type="email"
-								required
-								placeholder="e.g. name@domain.com"
-								value={testEmail}
-								onChange={(e) => setTestEmail(e.target.value)}
-								className="w-full rounded-lg border border-stroke-soft-200 bg-bg-weak-50 px-3 py-2 text-text-strong-950 text-xs focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:border-stroke-soft-100/30 dark:bg-zinc-900 dark:text-white"
-							/>
+								<Label.Asterisk />
+							</Label.Root>
+							<Input.Root size="small" className="rounded-xl">
+								<Input.Wrapper>
+									<Input.Icon>
+										<Send size={14} className="text-text-sub-600" />
+									</Input.Icon>
+									<Input.Input
+										id="recipient-address"
+										type="email"
+										required
+										placeholder="e.g. name@domain.com"
+										value={testEmail}
+										onChange={(e) => setTestEmail(e.target.value)}
+									/>
+								</Input.Wrapper>
+							</Input.Root>
 						</div>
 
 						{detectedVars.length > 0 && (
-							<div className="space-y-3 border-stroke-soft-200 border-t pt-3 dark:border-stroke-soft-100/10">
-								<span className="font-bold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-zinc-400">
+							<div className="space-y-4 border-stroke-soft-200 border-t pt-4 dark:border-stroke-soft-100/10">
+								<span className="block font-bold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-zinc-400">
 									Template Variables
 								</span>
-								<div className="hide-scrollbar max-h-[300px] space-y-3 overflow-y-auto pr-1">
+								<div className="hide-scrollbar max-h-[250px] space-y-3.5 overflow-y-auto pr-1">
 									{detectedVars.map((v) => (
-										<div key={v.name} className="space-y-1">
+										<div key={v.name} className="flex flex-col gap-1.5">
 											<div className="flex items-center justify-between">
-												<label
+												<Label.Root
 													htmlFor={v.name}
-													className="font-semibold text-[10px] text-text-strong-950 dark:text-zinc-300"
+													className="font-semibold text-text-strong-950 text-xs dark:text-zinc-300"
 												>
 													{v.name}
-												</label>
-												<span className="text-[9px] text-text-soft-400 dark:text-zinc-500">
+												</Label.Root>
+												<Badge.Root
+													size="small"
+													variant="lighter"
+													color={v.type === "number" ? "purple" : "blue"}
+													className="h-[18px] rounded-full px-1.5 font-semibold text-[10px] capitalize"
+												>
 													{v.type}
-												</span>
+												</Badge.Root>
 											</div>
-											<input
-												type={v.type === "number" ? "number" : "text"}
-												placeholder={
-													v.defaultValue
-														? `Default: ${v.defaultValue}`
-														: "Enter value..."
-												}
-												value={variableValues[v.name] ?? ""}
-												onChange={(e) =>
-													handleVariableChange(v.name, e.target.value)
-												}
-												className="w-full rounded-lg border border-stroke-soft-200 bg-bg-weak-50 px-3 py-2 text-text-strong-950 text-xs focus:outline-none focus:ring-1 focus:ring-zinc-400 dark:border-stroke-soft-100/30 dark:bg-zinc-900 dark:text-white"
-											/>
+											<Input.Root size="small" className="rounded-xl">
+												<Input.Wrapper>
+													<Input.Input
+														id={v.name}
+														type={v.type === "number" ? "number" : "text"}
+														placeholder={
+															v.defaultValue
+																? `Default: ${v.defaultValue}`
+																: "Enter value..."
+														}
+														value={variableValues[v.name] ?? ""}
+														onChange={(e) =>
+															handleVariableChange(v.name, e.target.value)
+														}
+													/>
+												</Input.Wrapper>
+											</Input.Root>
 										</div>
 									))}
 								</div>
@@ -687,36 +752,69 @@ export function TestPanel({ onClose }: PanelProps) {
 
 						<Button.Root
 							type="submit"
-							variant="neutral"
+							variant="primary"
 							mode="filled"
-							size="xsmall"
+							size="small"
 							disabled={sending}
-							className="w-full justify-center gap-1.5 py-2"
+							className="w-full justify-center gap-1.5 rounded-xl py-2.5 font-medium"
 						>
-							<Send size={12} className={cn(sending && "animate-pulse")} />
-							{sending ? "Sending..." : "Send Test Email"}
+							{sending ? (
+								<>
+									<Loader2 size={13} className="animate-spin" />
+									Sending...
+								</>
+							) : (
+								<>
+									<Send size={13} />
+									Send Test Email
+								</>
+							)}
 						</Button.Root>
 					</form>
 				</div>
 
 				{/* Send Log History */}
-				{lastSent && (
+				{recentSends.length > 0 && (
 					<div className="mt-6 border-stroke-soft-200 border-t pt-4 dark:border-stroke-soft-100/20">
-						<span className="mb-2 block font-bold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-zinc-400">
+						<span className="mb-2.5 block font-bold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-zinc-400">
 							Recent Sends
 						</span>
-						<div className="flex items-center justify-between rounded-lg border border-stroke-soft-100 bg-bg-weak-50/50 p-2.5 dark:border-stroke-soft-100/10 dark:bg-zinc-900/20">
-							<div className="flex flex-col">
-								<span className="max-w-[150px] truncate font-medium text-text-strong-950 text-xs dark:text-zinc-200">
-									{lastSent}
-								</span>
-								<span className="text-[9px] text-emerald-500">
-									Delivered successfully
-								</span>
-							</div>
-							<span className="text-[9px] text-text-soft-400 dark:text-zinc-500">
-								Just now
-							</span>
+						<div className="space-y-2">
+							{recentSends.map((send, idx) => (
+								<div
+									key={idx}
+									className="flex items-center justify-between rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-2.5 dark:border-stroke-soft-100/10 dark:bg-zinc-900/20"
+								>
+									<div className="flex min-w-0 flex-col">
+										<span className="truncate font-medium text-text-strong-950 text-xs dark:text-zinc-200">
+											{send.email}
+										</span>
+										<span
+											className={cn(
+												"flex items-center gap-1 font-semibold text-[9px]",
+												send.status === "success"
+													? "text-emerald-500"
+													: "text-error-base",
+											)}
+										>
+											{send.status === "success" ? (
+												<>
+													<CheckCircle2 size={10} className="shrink-0" />
+													Delivered successfully
+												</>
+											) : (
+												<>
+													<AlertCircle size={10} className="shrink-0" />
+													{send.error || "Failed to send"}
+												</>
+											)}
+										</span>
+									</div>
+									<span className="shrink-0 text-[9px] text-text-soft-400 dark:text-zinc-500">
+										{formatRelativeTime(send.timestamp.toISOString())}
+									</span>
+								</div>
+							))}
 						</div>
 					</div>
 				)}

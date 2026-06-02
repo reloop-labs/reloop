@@ -1,7 +1,7 @@
 "use client";
 
-import { useParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import { useParams } from "next/navigation";
 import { CodeEditor } from "./components/code-view";
 import { FullEmailBuilder } from "./components/editor";
 import { EditorProvider } from "./components/editor-provider";
@@ -26,7 +26,7 @@ const Page = () => {
 		<EditorProvider key={templateId} roomId={templateId}>
 			<div className="flex h-full items-stretch overflow-hidden pt-2 pr-2 pl-4">
 				{/* Sidebar Editor Toolbar (Vertical, Left, Top-aligned) */}
-				<div className="flex flex-col justify-start py-2">
+				<div className="-ml-2 flex flex-col justify-start py-2">
 					<EditorToolbar />
 				</div>
 
@@ -52,7 +52,8 @@ const Page = () => {
 								<div
 									className="relative m-2 flex flex-1 overflow-hidden"
 									style={{
-										minWidth: viewMode === "code" ? "calc(50vw - 48px)" : "340px",
+										minWidth:
+											viewMode === "code" ? "calc(50vw - 48px)" : "340px",
 									}}
 								>
 									{viewMode === "code" && <CodeEditor />}
