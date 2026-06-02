@@ -55,7 +55,7 @@ const Faq = () => {
 			id="faq"
 			className="bg-[#f8f8f8] text-[#0a0d12] dark:bg-black dark:text-white"
 		>
-			<div className="mx-auto max-w-3xl px-4 py-24 sm:px-6 sm:py-32 lg:py-40">
+			<div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
 				<div className="text-center">
 					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
 						FAQ

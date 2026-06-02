@@ -16,7 +16,7 @@ export function FeatureSection({
 		<div
 			ref={forwardRef}
 			data-index={index}
-			className={cn("py-20 lg:py-28", !isLast && "border-[#0a0d12]/8 border-b")}
+			className={cn("py-16 lg:py-20", !isLast && "border-[#0a0d12]/8 border-b")}
 		>
 			{/* Title + description */}
 			{feature.title && (

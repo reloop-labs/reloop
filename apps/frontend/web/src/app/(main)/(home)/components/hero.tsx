@@ -4,7 +4,7 @@ import { AnimatedAlternative } from "./animated-alternative";
 
 export default function Hero() {
 	return (
-		<div className="relative flex h-dvh items-center justify-center overflow-hidden bg-transparent">
+		<div className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-transparent pt-40 pb-28">
 			<main className="relative z-10">
 				<section
 					id="product"

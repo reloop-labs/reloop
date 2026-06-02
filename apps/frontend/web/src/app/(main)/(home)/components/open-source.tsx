@@ -30,7 +30,7 @@ const githubUrl = "https://github.com/reloop-labs/reloop";
 const OpenSource = () => {
 	return (
 		<section id="open-source">
-			<div className="mx-auto max-w-[1320px] px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
+			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
 				<div className="flex flex-col gap-16 lg:flex-row lg:items-start lg:gap-24">
 					{/* Left column — heading + CTA */}
 					<div className="lg:w-[480px] lg:shrink-0">

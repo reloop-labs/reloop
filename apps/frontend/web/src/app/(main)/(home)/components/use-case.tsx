@@ -57,7 +57,7 @@ const useCases = [
 const UseCase = () => {
 	return (
 		<section id="use-cases">
-			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 sm:py-32 lg:px-8">
+			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
 				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
 					Use cases
 				</p>

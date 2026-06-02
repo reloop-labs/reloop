@@ -140,7 +140,7 @@ export const Footer = () => {
 		<footer className="bg-[#f8f8f8] text-[#0a0d12] transition-colors duration-300 dark:bg-black dark:text-white">
 			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
 				{/* Top: CTA + link columns */}
-				<div className="flex flex-col gap-12 border-[#0a0d12]/10 border-b py-16 sm:py-20 lg:flex-row lg:gap-20 dark:border-white/5">
+				<div className="flex flex-col gap-12 border-stroke-soft-200 border-b py-12 sm:py-16 lg:flex-row lg:gap-20 dark:border-stroke-soft-100">
 					{/* Left — branding / CTA */}
 					<div className="lg:w-[340px] lg:shrink-0">
 						<Link href="/" className="flex items-center">
@@ -201,42 +201,39 @@ export const Footer = () => {
 					<p className="text-[#0a0d12]/36 text-[13px] dark:text-white/36">
 						© {new Date().getFullYear()} Reloop. All rights reserved.
 					</p>
-					<div className="inline-flex items-center gap-1 rounded-full border border-[#0a0d12]/10 bg-[#0a0d12]/5 p-0.5 dark:border-white/5 dark:bg-white/[0.03]">
+					<div className="inline-flex items-center rounded-full border border-[#0a0d12]/10 bg-[#0a0d12]/5 p-0.5 dark:border-white/5 dark:bg-white/[0.03]">
 						<button
 							type="button"
 							onClick={() => setTheme("light")}
-							className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
+							className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
 								mounted && theme === "light"
 									? "bg-white text-black shadow-sm"
 									: "text-[#0a0d12]/40 hover:text-[#0a0d12]/80 dark:text-white/40 dark:hover:text-white/80"
 							}`}
 						>
 							<Icon className="size-3.5" name="sun" />
-							<span>Light</span>
 						</button>
 						<button
 							type="button"
 							onClick={() => setTheme("dark")}
-							className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
+							className={`flex items-center gap-1.5 rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
 								mounted && theme === "dark"
 									? "bg-white text-black shadow-sm"
 									: "text-[#0a0d12]/40 hover:text-[#0a0d12]/80 dark:text-white/40 dark:hover:text-white/80"
 							}`}
 						>
 							<Icon className="size-3.5" name="moon" />
-							<span>Dark</span>
 						</button>
 						<button
 							type="button"
 							onClick={() => setTheme("system")}
-							className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
+							className={`flex items-center gap-1.5 rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
 								mounted && theme === "system"
 									? "bg-white text-black shadow-sm"
 									: "text-[#0a0d12]/40 hover:text-[#0a0d12]/80 dark:text-white/40 dark:hover:text-white/80"
 							}`}
 						>
 							<Icon className="size-3.5" name="laptop" />
-							<span>System</span>
 						</button>
 					</div>
 				</div>

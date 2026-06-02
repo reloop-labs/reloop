@@ -46,7 +46,7 @@ export default function Features() {
 				<div className="relative lg:flex lg:gap-20">
 					{/* Sticky left nav */}
 					<nav className="hidden lg:block lg:w-[180px] lg:shrink-0">
-						<div className="sticky top-28 flex flex-col gap-0 py-28">
+						<div className="sticky top-28 flex flex-col gap-0 py-20">
 							{FEATURE_LABELS.map((label, i) => (
 								<button
 									type="button"
