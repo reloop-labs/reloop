@@ -15,11 +15,21 @@ import * as Tooltip from "@reloop/ui/tooltip";
 import { useCurrentEditor } from "@tiptap/react";
 import { Clock, Eye, Loader2, Trash2, UploadCloud, X } from "lucide-react";
 import { useParams } from "next/navigation";
+import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
 import { PreviewModal } from "./preview-modal"; // Cache bust
 import { useEditorStore } from "./use-editor-store";
+
+const viewModes = [
+	"visual",
+	"code",
+	"history",
+	"variables",
+	"score",
+	"test",
+] as const;
 
 interface TemplateVersion {
 	id: string;
@@ -245,10 +255,14 @@ export function VersionSidebar() {
 		setReplyTo,
 		setPreviewText,
 		subject,
-		setViewMode,
 		lastSavedAt,
 		lastSavedDraftNumber,
 	} = useEditorStore();
+
+	const [, setViewMode] = useQueryState(
+		"mode",
+		parseAsStringLiteral(viewModes).withDefault("visual"),
+	);
 
 	// Modals & Triggers
 	const [isPreviewOpen, setIsPreviewOpen] = useState(false);
