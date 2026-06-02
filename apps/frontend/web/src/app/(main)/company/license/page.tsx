@@ -1,6 +1,5 @@
 import {
 	CodeBlock,
-	ContentCard,
 	FeatureCta,
 	MarketingPageShell,
 	PageSection,
@@ -8,6 +7,7 @@ import {
 } from "@reloop/web/components/page-shell";
 import type { Metadata } from "next";
 import { LicenseFaq } from "./components/license-faq";
+import { LicensePermissions } from "./components/license-permissions";
 
 export const metadata: Metadata = {
 	title: "License | Reloop",
@@ -73,43 +73,11 @@ const LicensePage = () => {
 
 				<div className="mt-14 sm:mt-16">
 					<SectionHeading
-						title="What you can and cannot do"
+						title="What you can & cannot do"
 						description="Apache 2.0 with additional terms defined by Reloop Labs."
 						compact
 					/>
-					<div className="grid gap-4 sm:grid-cols-2">
-						{[
-							{
-								title: "Personal use",
-								description:
-									"Use, copy, modify, and distribute Reloop for personal projects.",
-							},
-							{
-								title: "Internal company use",
-								description:
-									"Deploy Reloop inside your organization for internal email infrastructure.",
-							},
-							{
-								title: "No commercial redistribution",
-								description:
-									"You may not sell, sublicense, or commercially redistribute the software.",
-							},
-							{
-								title: "No competing hosted services",
-								description:
-									"You may not offer Reloop—or a modified version—as a commercial SaaS, PaaS, or similar hosted service, or to compete with Reloop Labs.",
-							},
-						].map((item) => (
-							<ContentCard key={item.title} className="text-center">
-								<h3 className="mb-2 font-semibold text-text-strong-950 text-xl dark:text-white">
-									{item.title}
-								</h3>
-								<p className="text-[15px] text-text-sub-600 leading-7 sm:text-[16px] dark:text-white/50">
-									{item.description}
-								</p>
-							</ContentCard>
-						))}
-					</div>
+					<LicensePermissions />
 				</div>
 			</PageSection>
 

@@ -130,8 +130,8 @@ export const metricsGridClass = "grid gap-6 md:grid-cols-2 lg:grid-cols-4";
 
 export function CodeBlock({ children }: { children: string }) {
 	return (
-		<div className="overflow-hidden rounded-3xl border border-stroke-soft-200 bg-[#0a0a0a] font-mono text-[14px] leading-relaxed sm:text-[15px] dark:border-white/10">
-			<pre className="overflow-x-auto p-5 text-white/80 sm:p-6">{children}</pre>
+		<div className="overflow-hidden rounded-3xl border border-stroke-soft-200 font-mono text-[14px] leading-relaxed sm:text-[15px] dark:border-white/10">
+			<pre className="overflow-x-auto p-5 sm:p-6">{children}</pre>
 		</div>
 	);
 }
