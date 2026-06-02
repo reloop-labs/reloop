@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ChatwootLoader } from "@reloop/ui/chatwoot-loader";
 import { IconsSprite } from "@reloop/ui/icon";
 import { ThemeProvider } from "@reloop/web/providers/theme-provider";
 import {
@@ -74,6 +75,7 @@ export default function RootLayout({
 				>
 					{children}
 					<IconsSprite />
+					<ChatwootLoader />
 				</ThemeProvider>
 			</body>
 		</html>

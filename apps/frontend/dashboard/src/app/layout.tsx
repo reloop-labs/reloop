@@ -8,6 +8,7 @@ import * as Tooltip from "@reloop/ui/tooltip";
 import localFont from "next/font/local";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Suspense } from "react";
+import { ChatwootLoader } from "@reloop/ui/chatwoot-loader";
 import { CommandMenuGlobal } from "../components/command-menu";
 
 const openRunde = localFont({
@@ -64,6 +65,7 @@ export default function RootLayout({
 							<IconsSprite />
 							<Toaster />
 							<CommandMenuGlobal />
+							<ChatwootLoader />
 						</SWRProvider>
 					</ThemeProvider>
 				</NuqsAdapter>
