@@ -6,6 +6,7 @@ import { cn } from "@reloop/ui/cn";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import { useCurrentEditor } from "@tiptap/react";
+import { motion } from "framer-motion";
 import {
 	AlertCircle,
 	Award,
@@ -345,133 +346,239 @@ export function VariablesPanel({ onClose }: PanelProps) {
 /* ------------------------------------------------------------------ */
 /* Score Panel Component                                             */
 /* ------------------------------------------------------------------ */
+
+interface AuditItem {
+	id: string;
+	title: string;
+	description: string;
+	category: "deliverability" | "content" | "technical";
+	status: "passed" | "warning";
+}
+
+const AUDITS: AuditItem[] = [
+	{
+		id: "subject",
+		title: "Subject Line Length",
+		description:
+			"Subject length is 45 characters. (Optimal limit is 40-60 characters)",
+		category: "content",
+		status: "passed",
+	},
+	{
+		id: "spam",
+		title: "Spam Trigger Words",
+		description:
+			"Zero spam trigger words identified in content headers or body paragraphs.",
+		category: "deliverability",
+		status: "passed",
+	},
+	{
+		id: "size",
+		title: "HTML Size Audit",
+		description:
+			"Total template HTML weight is 18 KB. Safe from Gmail clipping (max 102 KB).",
+		category: "technical",
+		status: "passed",
+	},
+	{
+		id: "links",
+		title: "Link Verification",
+		description:
+			"All links resolved successfully and point to valid HTTPS destinations.",
+		category: "technical",
+		status: "passed",
+	},
+	{
+		id: "alt",
+		title: "Alt Text Missing",
+		description:
+			"One image is missing descriptive alt text. Consider adding it for screen readers.",
+		category: "content",
+		status: "warning",
+	},
+];
+
 export function ScorePanel({ onClose }: PanelProps) {
+	const [activeTab, setActiveTab] = useState<"all" | "passed" | "warning">(
+		"all",
+	);
+
+	const score = 98;
+	const radius = 34;
+	const strokeWidth = 5;
+	const circumference = 2 * Math.PI * radius;
+	const strokeDashoffset = circumference - (score / 100) * circumference;
+
+	const totalCount = AUDITS.length;
+	const passedCount = AUDITS.filter((a) => a.status === "passed").length;
+	const warningCount = AUDITS.filter((a) => a.status === "warning").length;
+
+	const filteredAudits = AUDITS.filter((audit) => {
+		if (activeTab === "passed") return audit.status === "passed";
+		if (activeTab === "warning") return audit.status === "warning";
+		return true;
+	});
+
 	return (
-		<div className="flex h-full w-full flex-col overflow-hidden bg-transparent">
+		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a]">
 			{/* Header */}
-			<div className="flex shrink-0 items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-3 dark:bg-[#0a0a0a]">
-				<div className="flex items-center gap-1.5 p-0">
-					<Award size={14} className="text-text-strong-950 dark:text-white" />
-					<span className="font-semibold text-text-strong-950 text-xs dark:text-white">
-						Template Score
-					</span>
-				</div>
-				<Button.Root
+			<div className="flex shrink-0 items-center justify-between pt-3 pr-4 pb-3 pl-6">
+				<h2 className="font-semibold text-lg text-zinc-900 dark:text-zinc-50">
+					Template Score
+				</h2>
+				<button
 					type="button"
-					variant="neutral"
-					mode="ghost"
-					size="xxsmall"
-					onClick={onClose}
-					className="size-7 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
+					onClick={() => onClose()}
+					className="rounded-lg p-1.5 text-zinc-400 transition-all hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-300"
 				>
-					<ChevronLeft size={24} />
-				</Button.Root>
+					<X size={18} />
+				</button>
 			</div>
 
-			{/* Score Circle Card */}
-			<div className="flex shrink-0 flex-col items-center border-stroke-soft-200 border-b bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/20 dark:bg-[#0c0c0c]">
-				<div className="relative flex size-24 items-center justify-center rounded-full border-4 border-emerald-500/20 bg-white shadow-inner dark:border-emerald-950 dark:bg-zinc-950">
-					<div className="absolute text-center">
-						<span className="font-extrabold text-3xl text-emerald-600 dark:text-emerald-400">
+			{/* Score Progress Area */}
+			<div className="flex shrink-0 flex-col items-center border-stroke-soft-200 border-b bg-bg-weak-50/50 p-5 dark:border-stroke-soft-100/10 dark:bg-[#0c0c0c]/30">
+				<div className="relative flex size-24 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-zinc-100 dark:bg-zinc-950 dark:ring-zinc-800/40">
+					{/* SVG progress ring */}
+					<svg className="-rotate-90 absolute inset-0 size-full">
+						{/* Background Track */}
+						<circle
+							cx="48"
+							cy="48"
+							r={radius}
+							fill="transparent"
+							stroke="currentColor"
+							strokeWidth={strokeWidth}
+							className="text-zinc-100 dark:text-zinc-800/50"
+						/>
+						{/* Active track with gradient */}
+						<motion.circle
+							cx="48"
+							cy="48"
+							r={radius}
+							fill="transparent"
+							stroke="url(#scoreGradient)"
+							strokeWidth={strokeWidth}
+							strokeDasharray={circumference}
+							initial={{ strokeDashoffset: circumference }}
+							animate={{ strokeDashoffset }}
+							transition={{ duration: 1.2, ease: "easeOut" }}
+							strokeLinecap="round"
+						/>
+						<defs>
+							<linearGradient
+								id="scoreGradient"
+								x1="0%"
+								y1="0%"
+								x2="100%"
+								y2="100%"
+							>
+								<stop offset="0%" stopColor="#10B981" />
+								<stop offset="100%" stopColor="#059669" />
+							</linearGradient>
+						</defs>
+					</svg>
+
+					{/* Inner Score Text */}
+					<div className="absolute flex flex-col items-center justify-center">
+						<span className="font-extrabold text-2xl text-emerald-600 leading-none dark:text-emerald-400">
 							98
 						</span>
-						<span className="text-text-soft-400 text-xs dark:text-zinc-500">
+						<span className="mt-0.5 text-[10px] text-text-soft-400 dark:text-zinc-500">
 							/100
 						</span>
 					</div>
 				</div>
-				<span className="mt-3 flex items-center gap-1.5 font-semibold text-sm text-text-strong-950 dark:text-white">
-					<Sparkles size={14} className="text-emerald-500" />
+
+				<span className="mt-3.5 flex items-center gap-1.5 font-semibold text-sm text-text-strong-950 dark:text-white">
+					<Sparkles size={14} className="animate-pulse text-emerald-500" />
 					Excellent Deliverability
 				</span>
-				<p className="mt-1 max-w-[200px] text-center text-[11px] text-text-soft-400 leading-normal dark:text-zinc-500">
+				<p className="mt-1 max-w-[220px] text-center text-[11px] text-text-soft-400 leading-normal dark:text-zinc-500">
 					Your HTML structure and text ratio look solid. Ready to send!
 				</p>
 			</div>
 
+			{/* Interactive Category Tabs */}
+			<div className="px-5 pt-4">
+				<div className="flex rounded-xl bg-bg-soft-100 p-1 dark:bg-zinc-900/60">
+					<button
+						type="button"
+						onClick={() => setActiveTab("all")}
+						className={cn(
+							"flex-grow rounded-lg py-1.5 text-center font-semibold text-[11px] transition-all",
+							activeTab === "all"
+								? "bg-white text-zinc-950 shadow-xs dark:bg-zinc-800 dark:text-white"
+								: "text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-200",
+						)}
+					>
+						All <span className="ml-0.5 opacity-60">({totalCount})</span>
+					</button>
+					<button
+						type="button"
+						onClick={() => setActiveTab("passed")}
+						className={cn(
+							"flex-grow rounded-lg py-1.5 text-center font-semibold text-[11px] transition-all",
+							activeTab === "passed"
+								? "bg-white text-emerald-600 shadow-xs dark:bg-zinc-800 dark:text-emerald-400"
+								: "text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-200",
+						)}
+					>
+						Passed <span className="ml-0.5 opacity-60">({passedCount})</span>
+					</button>
+					<button
+						type="button"
+						onClick={() => setActiveTab("warning")}
+						className={cn(
+							"flex-grow rounded-lg py-1.5 text-center font-semibold text-[11px] transition-all",
+							activeTab === "warning"
+								? "bg-white text-amber-600 shadow-xs dark:bg-zinc-800 dark:text-amber-400"
+								: "text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-200",
+						)}
+					>
+						Warnings <span className="ml-0.5 opacity-60">({warningCount})</span>
+					</button>
+				</div>
+			</div>
+
 			{/* Audits Checklist */}
-			<div className="hide-scrollbar flex-1 space-y-3.5 overflow-y-auto p-4">
-				<span className="font-bold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-zinc-400">
-					Optimization Audits
-				</span>
-
+			<div className="hide-scrollbar flex-1 overflow-y-auto px-5 py-4">
 				<div className="space-y-2.5">
-					<div className="flex items-start gap-3">
-						<CheckCircle2
-							size={16}
-							className="mt-0.5 shrink-0 text-emerald-500"
-						/>
-						<div>
-							<h4 className="font-semibold text-text-strong-950 text-xs dark:text-zinc-200">
-								Subject Line Length
-							</h4>
-							<p className="text-[11px] text-text-soft-400 dark:text-zinc-500">
-								Subject length is 45 characters. (Optimal limit is 40-60
-								characters)
-							</p>
+					{filteredAudits.map((audit) => (
+						<div
+							key={audit.id}
+							className="group flex items-start gap-3 rounded-2xl border border-stroke-soft-200 bg-white p-3.5 transition-all hover:border-stroke-soft-300 hover:shadow-xs dark:border-stroke-soft-100/10 dark:bg-zinc-900/30 dark:hover:border-stroke-soft-100/20"
+						>
+							{audit.status === "passed" ? (
+								<CheckCircle2
+									size={16}
+									className="mt-0.5 shrink-0 text-emerald-500"
+								/>
+							) : (
+								<ShieldAlert
+									size={16}
+									className="mt-0.5 shrink-0 text-amber-500"
+								/>
+							)}
+							<div className="min-w-0 flex-1">
+								<div className="flex items-center justify-between gap-2">
+									<h4 className="truncate font-semibold text-text-strong-950 text-xs dark:text-zinc-200">
+										{audit.title}
+									</h4>
+									<Badge.Root
+										size="small"
+										variant="lighter"
+										color={audit.status === "passed" ? "green" : "orange"}
+										className="h-[18px] shrink-0 rounded-full px-1.5 font-semibold text-[9px] capitalize"
+									>
+										{audit.status}
+									</Badge.Root>
+								</div>
+								<p className="mt-1 text-[11px] text-text-soft-400 leading-normal dark:text-zinc-500">
+									{audit.description}
+								</p>
+							</div>
 						</div>
-					</div>
-
-					<div className="flex items-start gap-3">
-						<CheckCircle2
-							size={16}
-							className="mt-0.5 shrink-0 text-emerald-500"
-						/>
-						<div>
-							<h4 className="font-semibold text-text-strong-950 text-xs dark:text-zinc-200">
-								Spam Trigger Words
-							</h4>
-							<p className="text-[11px] text-text-soft-400 dark:text-zinc-500">
-								Zero spam trigger words identified in content headers or body
-								paragraphs.
-							</p>
-						</div>
-					</div>
-
-					<div className="flex items-start gap-3">
-						<CheckCircle2
-							size={16}
-							className="mt-0.5 shrink-0 text-emerald-500"
-						/>
-						<div>
-							<h4 className="font-semibold text-text-strong-950 text-xs dark:text-zinc-200">
-								HTML Size Audit
-							</h4>
-							<p className="text-[11px] text-text-soft-400 dark:text-zinc-500">
-								Total template HTML weight is 18 KB. Safe from Gmail clipping
-								(max 102 KB).
-							</p>
-						</div>
-					</div>
-
-					<div className="flex items-start gap-3">
-						<CheckCircle2
-							size={16}
-							className="mt-0.5 shrink-0 text-emerald-500"
-						/>
-						<div>
-							<h4 className="font-semibold text-text-strong-950 text-xs dark:text-zinc-200">
-								Link Verification
-							</h4>
-							<p className="text-[11px] text-text-soft-400 dark:text-zinc-500">
-								All links resolved successfully and point to valid HTTPS
-								destinations.
-							</p>
-						</div>
-					</div>
-
-					<div className="flex items-start gap-3">
-						<ShieldAlert size={16} className="mt-0.5 shrink-0 text-amber-500" />
-						<div>
-							<h4 className="font-semibold text-text-strong-950 text-xs dark:text-zinc-200">
-								Alt Text Missing
-							</h4>
-							<p className="text-[11px] text-text-soft-400 dark:text-zinc-500">
-								One image is missing descriptive alt text. Consider adding it
-								for screen readers.
-							</p>
-						</div>
-					</div>
+					))}
 				</div>
 			</div>
 		</div>
