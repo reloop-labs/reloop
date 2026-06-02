@@ -1,7 +1,6 @@
 import { Extension } from "@tiptap/core";
 import { ReactRenderer } from "@tiptap/react";
 import Suggestion from "@tiptap/suggestion";
-import tippy, { type Instance as TippyInstance } from "tippy.js";
 import { VariablesDropdown } from "../variables-dropdown";
 
 export const VariableSuggestion = Extension.create({
@@ -33,7 +32,20 @@ export const VariableSuggestion = Extension.create({
 				},
 				render: () => {
 					let component: ReactRenderer<any>;
-					let popup: TippyInstance[];
+
+					const updatePosition = (props: any) => {
+						if (!component?.element) return;
+						const rect = typeof props.clientRect === "function"
+							? props.clientRect()
+							: props.clientRect;
+
+						if (rect) {
+							component.element.style.position = "fixed";
+							component.element.style.zIndex = "9999";
+							component.element.style.top = `${rect.bottom + 8}px`;
+							component.element.style.left = `${rect.left}px`;
+						}
+					};
 
 					return {
 						onStart: (props) => {
@@ -42,39 +54,20 @@ export const VariableSuggestion = Extension.create({
 								editor: props.editor as any,
 							});
 
-							if (!props.clientRect) {
-								return;
-							}
+							updatePosition(props);
 
-							popup = tippy("body", {
-								getReferenceClientRect: props.clientRect as any,
-								appendTo: () => document.body,
-								content: component.element,
-								showOnCreate: true,
-								interactive: true,
-								trigger: "manual",
-								placement: "bottom-start",
-							});
+							document.body.appendChild(component.element);
 						},
 
 						onUpdate(props) {
 							component.updateProps(props);
-
-							if (!props.clientRect) {
-								return;
-							}
-
-							if (popup && popup[0]) {
-								popup[0].setProps({
-									getReferenceClientRect: props.clientRect as any,
-								});
-							}
+							updatePosition(props);
 						},
 
 						onKeyDown(props) {
 							if (props.event.key === "Escape") {
-								if (popup && popup[0]) {
-									popup[0].hide();
+								if (component?.element) {
+									component.element.remove();
 								}
 								return true;
 							}
@@ -83,10 +76,10 @@ export const VariableSuggestion = Extension.create({
 						},
 
 						onExit() {
-							if (popup && popup[0]) {
-								popup[0].destroy();
-							}
 							if (component) {
+								if (component.element) {
+									component.element.remove();
+								}
 								component.destroy();
 							}
 						},
@@ -97,3 +90,4 @@ export const VariableSuggestion = Extension.create({
 	},
 });
 export default VariableSuggestion;
+
