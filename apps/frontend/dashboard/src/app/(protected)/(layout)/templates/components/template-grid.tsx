@@ -14,7 +14,6 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import { EditorContent, useEditor } from "@tiptap/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { DeleteTemplateModal } from "./delete-template-modal";
@@ -286,103 +285,96 @@ export const TemplateGrid = ({
 	return (
 		<div className="w-full">
 			<div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-				<AnimatePresence>
-					{isLoading ? (
-						Array.from({ length: loadingRows }).map((_, i) => (
-							<TemplateSkeleton key={`skeleton-${i}`} />
-						))
-					) : templates.length === 0 ? (
-						<div className="col-span-full flex flex-col items-center justify-center rounded-xl border border-stroke-soft-100 p-12 text-center dark:border-stroke-soft-100/40">
-							<p className="text-sm text-text-sub-600">No templates found</p>
-						</div>
-					) : (
-						templates.map((template, index) => {
-							const isCardActive = activeDropdownId === template.id;
+				{isLoading ? (
+					Array.from({ length: loadingRows }).map((_, i) => (
+						<TemplateSkeleton key={`skeleton-${i}`} />
+					))
+				) : templates.length === 0 ? (
+					<div className="col-span-full flex flex-col items-center justify-center rounded-xl border border-stroke-soft-100 p-12 text-center dark:border-stroke-soft-100/40">
+						<p className="text-sm text-text-sub-600">No templates found</p>
+					</div>
+				) : (
+					templates.map((template) => {
+						const isCardActive = activeDropdownId === template.id;
 
-							return (
-								<motion.div
-									key={template.id}
-									initial={{ opacity: 0, y: 15 }}
-									animate={{ opacity: 1, y: 0 }}
-									exit={{ opacity: 0, y: -15 }}
-									transition={{ delay: index * 0.05 }}
+						return (
+							<div
+								key={template.id}
+								className="group/card relative flex cursor-pointer flex-col gap-3 transition-all duration-200"
+							>
+								{/* Preview Canvas Container (The SINGLE border outline) */}
+								<div
+									className={cn(
+										"relative aspect-[4/3] w-full overflow-hidden rounded-2xl border bg-bg-white-0 shadow-[0_1px_2px_rgba(0,0,0,0.02)] transition-all duration-200 dark:bg-zinc-900",
+										isCardActive
+											? "border-stroke-soft-200 shadow-[0_8px_24px_rgba(0,0,0,0.06)] dark:border-stroke-soft-100"
+											: "border-stroke-soft-100 hover:border-stroke-soft-200",
+									)}
 								>
-									<div className="group/card relative flex cursor-pointer flex-col gap-3 transition-all duration-200">
-										{/* Preview Canvas Container (The SINGLE border outline) */}
-										<div
-											className={cn(
-												"relative aspect-[4/3] w-full overflow-hidden rounded-2xl border bg-bg-white-0 shadow-[0_1px_2px_rgba(0,0,0,0.02)] transition-all duration-200 dark:bg-zinc-900",
-												isCardActive
-													? "border-stroke-soft-200 shadow-[0_8px_24px_rgba(0,0,0,0.06)] dark:border-stroke-soft-100"
-													: "border-stroke-soft-100 hover:border-stroke-soft-200",
-											)}
-										>
-											{/* Clean simulated email content directly on the canvas background */}
-											<TemplatePreviewThumbnail template={template} />
+									{/* Clean simulated email content directly on the canvas background */}
+									<TemplatePreviewThumbnail template={template} />
 
-											{/* Floating actions menu wrapper (Higher z-index so click stops propagation correctly) */}
-											<div
-												className="absolute top-2.5 right-2.5 z-10 text-text-soft-400"
-												onClick={(e) => {
-													e.preventDefault();
-													e.stopPropagation();
-												}}
-											>
-												<TemplateDropdown
-													templateId={template.id}
-													templateName={template.name}
-													onDuplicate={handleDuplicate}
-													onDelete={handleDeleteClick}
-													onOpenChange={(open) =>
-														setActiveDropdownId(open ? template.id : null)
-													}
-												/>
-											</div>
-
-											{/* Clickable Overlay Link to Editor (Base z-index) */}
-											<Link
-												href={`/templates/${template.id}`}
-												className="absolute inset-0 z-0"
-												aria-label={`Edit ${template.name}`}
-											/>
-										</div>
-
-										{/* Bottom Info Row */}
-										<div className="flex items-start justify-between px-0.5">
-											<div className="mr-4 flex min-w-0 flex-1 flex-col gap-0.5">
-												<span
-													className="truncate font-semibold text-sm text-text-strong-950 dark:text-white"
-													title={template.name}
-												>
-													{template.name}
-												</span>
-												{template.description && (
-													<span className="truncate font-mono text-text-sub-600 text-xs leading-none dark:text-zinc-500">
-														{template.description}
-													</span>
-												)}
-											</div>
-
-											<span
-												className={cn(
-													"shrink-0 select-none rounded-md border px-1.5 py-0.5 font-semibold text-[10px] capitalize",
-													template.status === "published" &&
-														"border-success-base/20 bg-success-base/5 text-success-base",
-													template.status === "draft" &&
-														"border-amber-600/20 bg-amber-600/5 text-amber-600 dark:text-amber-500",
-													template.status === "archived" &&
-														"border-text-sub-600/20 bg-text-sub-600/5 text-text-sub-600",
-												)}
-											>
-												{template.status}
-											</span>
-										</div>
+									{/* Floating actions menu wrapper (Higher z-index so click stops propagation correctly) */}
+									<div
+										className="absolute top-2.5 right-2.5 z-10 text-text-soft-400"
+										onClick={(e) => {
+											e.preventDefault();
+											e.stopPropagation();
+										}}
+									>
+										<TemplateDropdown
+											templateId={template.id}
+											templateName={template.name}
+											onDuplicate={handleDuplicate}
+											onDelete={handleDeleteClick}
+											onOpenChange={(open) =>
+												setActiveDropdownId(open ? template.id : null)
+											}
+										/>
 									</div>
-								</motion.div>
-							);
-						})
-					)}
-				</AnimatePresence>
+
+									{/* Clickable Overlay Link to Editor (Base z-index) */}
+									<Link
+										href={`/templates/${template.id}`}
+										className="absolute inset-0 z-0"
+										aria-label={`Edit ${template.name}`}
+									/>
+								</div>
+
+								{/* Bottom Info Row */}
+								<div className="flex items-start justify-between px-0.5">
+									<div className="mr-4 flex min-w-0 flex-1 flex-col gap-0.5">
+										<span
+											className="truncate font-semibold text-sm text-text-strong-950 dark:text-white"
+											title={template.name}
+										>
+											{template.name}
+										</span>
+										{template.description && (
+											<span className="truncate font-mono text-text-sub-600 text-xs leading-none dark:text-zinc-500">
+												{template.description}
+											</span>
+										)}
+									</div>
+
+									<span
+										className={cn(
+											"shrink-0 select-none rounded-md border px-1.5 py-0.5 font-semibold text-[10px] capitalize",
+											template.status === "published" &&
+												"border-success-base/20 bg-success-base/5 text-success-base",
+											template.status === "draft" &&
+												"border-amber-600/20 bg-amber-600/5 text-amber-600 dark:text-amber-500",
+											template.status === "archived" &&
+												"border-text-sub-600/20 bg-text-sub-600/5 text-text-sub-600",
+										)}
+									>
+										{template.status}
+									</span>
+								</div>
+							</div>
+						);
+					})
+				)}
 			</div>
 
 			<DeleteTemplateModal
