@@ -15,7 +15,7 @@ import { DeleteTemplateVariableModal } from "../delete-template-variable-modal";
 import Breadcrumb from "./breadcrumb";
 import { ColorPicker } from "./color-picker";
 import { ImageSrcControl } from "./image-src-control";
-import { type NodeTypePill, NodeTypePills } from "./node-type-pills";
+import { NodeTypePills } from "./node-type-pills";
 import { NumInput } from "./num-input";
 import { PropRow } from "./prop-row";
 import { SectionHeader } from "./section-header";

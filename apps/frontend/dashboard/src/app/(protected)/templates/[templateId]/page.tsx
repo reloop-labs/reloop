@@ -49,7 +49,12 @@ const Page = () => {
 								}}
 								className="relative flex shrink-0 overflow-hidden"
 							>
-								<div className="relative m-2 flex flex-1 overflow-hidden">
+								<div
+									className="relative m-2 flex flex-1 overflow-hidden"
+									style={{
+										minWidth: viewMode === "code" ? "calc(50vw - 48px)" : "340px",
+									}}
+								>
 									{viewMode === "code" && <CodeEditor />}
 									{viewMode === "history" && <VersionSidebar />}
 									{viewMode === "variables" && (
