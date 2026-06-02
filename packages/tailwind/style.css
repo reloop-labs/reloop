@@ -240,6 +240,7 @@
 	--color-bg-surface-800: var(--bg-surface-800);
 	--color-bg-sub-300: var(--bg-sub-300);
 	--color-bg-soft-200: var(--bg-soft-200);
+	--color-bg-soft-50: var(--bg-soft-50);
 	--color-bg-weak-50: var(--bg-weak-50);
 	--color-bg-white-0: var(--bg-white-0);
 
@@ -902,6 +903,7 @@
 	--bg-surface-800: var(--neutral-800);
 	--bg-sub-300: var(--neutral-300);
 	--bg-soft-200: var(--neutral-200);
+	--bg-soft-50: var(--neutral-50);
 	--bg-weak-50: var(--neutral-50);
 	--bg-white-0: var(--neutral-0);
 
@@ -973,6 +975,7 @@
 	--bg-surface-800: var(--neutral-200);
 	--bg-sub-300: var(--neutral-600);
 	--bg-soft-200: var(--neutral-700);
+	--bg-soft-50: var(--neutral-900);
 	--bg-weak-50: var(--neutral-900);
 	--bg-white-0: #000;
 
