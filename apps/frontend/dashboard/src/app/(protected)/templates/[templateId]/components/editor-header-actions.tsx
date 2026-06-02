@@ -29,6 +29,9 @@ const viewModes = [
 	"test",
 ] as const;
 
+const isViewMode = (id: string): id is (typeof viewModes)[number] =>
+	(viewModes as readonly string[]).includes(id);
+
 const fetcher = (url: string) =>
 	fetch(url, { credentials: "include" }).then((res) => res.json());
 
@@ -39,9 +42,21 @@ interface EditorHeaderActionsProps {
 
 const menuItems = [
 	{
-		id: "test",
-		label: "Test email",
-		icon: "mail" as const,
+		id: "visual",
+		label: "Design mode",
+		icon: "brush" as const,
+		isDanger: false,
+	},
+	{
+		id: "code",
+		label: "Split view / Code",
+		icon: "code" as const,
+		isDanger: false,
+	},
+	{
+		id: "variables",
+		label: "Variables",
+		icon: "brackets" as const,
 		isDanger: false,
 	},
 	{
@@ -51,9 +66,15 @@ const menuItems = [
 		isDanger: false,
 	},
 	{
-		id: "details",
-		label: "View details",
-		icon: "info-outline" as const,
+		id: "test",
+		label: "Test email",
+		icon: "mail" as const,
+		isDanger: false,
+	},
+	{
+		id: "score",
+		label: "Template score",
+		icon: "award" as const,
 		isDanger: false,
 	},
 	{
@@ -467,8 +488,8 @@ export const EditorHeaderActions = ({
 			setIsDeleteModalOpen(true);
 		} else if (itemId === "duplicate") {
 			handleDuplicate();
-		} else if (itemId === "test") {
-			setViewMode("test");
+		} else if (isViewMode(itemId)) {
+			setViewMode(itemId);
 		}
 	};
 
