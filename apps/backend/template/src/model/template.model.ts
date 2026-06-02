@@ -215,5 +215,13 @@ export const templateVersionResponseSchema = t.Object({
 	]),
 	renderedHtml: t.Union([t.String(), t.Null()]),
 	createdByUserId: t.String(),
+	createdBy: t.Optional(
+		t.Object({
+			id: t.String(),
+			name: t.Union([t.String(), t.Null()]),
+			email: t.String(),
+			image: t.Union([t.String(), t.Null()]),
+		}),
+	),
 	createdAt: t.Date(),
 });

@@ -1,6 +1,11 @@
 "use client";
 
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
+import {
+	getAvatarGradient,
+	getAvatarInitial,
+} from "@fe/dashboard/utils/avatar";
+import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -481,7 +486,7 @@ export function VersionSidebar() {
 	};
 
 	return (
-		<div className="flex h-full w-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-white shadow-xl dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a]">
+		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 shadow-xl dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a]">
 			{/* Header */}
 			<div className="flex shrink-0 items-center justify-between pt-3 pr-4 pb-4 pl-6">
 				<h2 className="font-semibold text-lg text-zinc-900 dark:text-zinc-50">
@@ -583,7 +588,7 @@ export function VersionSidebar() {
 									</div>
 
 									{/* Content Column */}
-									<div className="flex min-w-0 flex-1 flex-col justify-start pt-4 pr-6 pb-4 pl-4">
+									<div className="flex min-w-0 flex-1 flex-col justify-start pt-4 pr-[92px] pb-4 pl-4">
 										<h4 className="break-words font-medium text-sm text-zinc-900 leading-snug dark:text-zinc-100">
 											{version.description ||
 												version.name ||
@@ -591,14 +596,99 @@ export function VersionSidebar() {
 													? "Published version"
 													: "Draft version")}
 										</h4>
-										<div className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
-											{version.createdBy?.name || "Developer"} •{" "}
-											{formatRelativeTime(version.createdAt)}
+										<div className="mt-1 flex items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500">
+											<Avatar.Root size="16" color="gray" className="shrink-0">
+												{version.createdBy?.image && (
+													<Avatar.Image
+														src={version.createdBy.image}
+														alt={
+															version.createdBy.name ||
+															version.createdBy.email ||
+															"Developer"
+														}
+													/>
+												)}
+												<Avatar.Image asChild>
+													<span
+														className={cn(
+															"flex h-full w-full items-center justify-center font-medium text-[8px] text-white",
+															getAvatarGradient(
+																version.createdBy?.email ||
+																	"developer@reloop.co",
+															),
+														)}
+													>
+														{getAvatarInitial(
+															version.createdBy?.name || null,
+															version.createdBy?.email || "developer@reloop.co",
+														)}
+													</span>
+												</Avatar.Image>
+											</Avatar.Root>
+											<Tooltip.Root>
+												<Tooltip.Trigger asChild>
+													<span className="truncate">
+														{version.createdBy?.name ||
+															version.createdBy?.email ||
+															"Developer"}
+													</span>
+												</Tooltip.Trigger>
+												{version.createdBy?.email && (
+													<Tooltip.Content
+														side="top"
+														variant="light"
+														className="flex items-center gap-2 rounded-2xl p-4"
+													>
+														<Avatar.Root
+															size="24"
+															color="gray"
+															className="shrink-0"
+														>
+															{version.createdBy?.image && (
+																<Avatar.Image
+																	src={version.createdBy.image}
+																	alt={
+																		version.createdBy.name ||
+																		version.createdBy.email ||
+																		"Developer"
+																	}
+																/>
+															)}
+															<Avatar.Image asChild>
+																<span
+																	className={cn(
+																		"flex h-full w-full items-center justify-center font-medium text-white",
+																		getAvatarGradient(
+																			version.createdBy?.email ||
+																				"developer@reloop.co",
+																		),
+																	)}
+																>
+																	{getAvatarInitial(
+																		version.createdBy?.name || null,
+																		version.createdBy?.email ||
+																			"developer@reloop.co",
+																	)}
+																</span>
+															</Avatar.Image>
+														</Avatar.Root>
+														<div className="flex min-w-0 flex-col gap-0.5">
+															<span className="break-all font-medium leading-tight">
+																{version.createdBy.email}
+															</span>
+														</div>
+													</Tooltip.Content>
+												)}
+											</Tooltip.Root>
+											<span className="shrink-0">•</span>
+											<span className="shrink-0">
+												{formatRelativeTime(version.createdAt)}
+											</span>
 										</div>
 									</div>
 
 									{/* Interactive Actions (shown on hover, no backgrounds/borders) */}
-									<div className="absolute top-[20px] right-2 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+									<div className="-translate-y-1/2 absolute top-[26px] right-4 flex translate-x-2 items-center gap-1 opacity-0 transition-all duration-200 ease-out group-hover:translate-x-0 group-hover:opacity-100">
 										{/* Publish action */}
 										<Tooltip.Root>
 											<Tooltip.Trigger asChild>
@@ -611,12 +701,12 @@ export function VersionSidebar() {
 														setVersionToPublish(version);
 														setIsPublishModalOpen(true);
 													}}
-													className="size-6 rounded-md p-1 text-zinc-500 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+													className="size-6 rounded-md p-1 text-zinc-500 transition-all duration-150 ease-out hover:scale-110 hover:bg-zinc-100 active:scale-90 dark:text-zinc-400 dark:hover:bg-zinc-800"
 												>
 													<UploadCloud size={13} />
 												</Button.Root>
 											</Tooltip.Trigger>
-											<Tooltip.Content side="top">
+											<Tooltip.Content side="top" variant="light">
 												{version.isMajor
 													? "Republish Version"
 													: "Publish Draft"}
@@ -635,12 +725,14 @@ export function VersionSidebar() {
 														setSelectedPreviewVersion(version);
 														setIsPreviewOpen(true);
 													}}
-													className="size-6 rounded-md p-1 text-zinc-500 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+													className="size-6 rounded-md p-1 text-zinc-500 transition-all duration-150 ease-out hover:scale-110 hover:bg-zinc-100 active:scale-90 dark:text-zinc-400 dark:hover:bg-zinc-800"
 												>
 													<Eye size={13} />
 												</Button.Root>
 											</Tooltip.Trigger>
-											<Tooltip.Content side="top">Preview</Tooltip.Content>
+											<Tooltip.Content side="top" variant="light">
+												Preview
+											</Tooltip.Content>
 										</Tooltip.Root>
 
 										{/* Delete action */}
@@ -661,7 +753,7 @@ export function VersionSidebar() {
 														setIsDeleteModalOpen(true);
 													}}
 													disabled={isDeleting}
-													className="size-6 rounded-md p-1 text-zinc-500 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-red-950/40"
+													className="size-6 rounded-md p-1 text-zinc-500 transition-all duration-150 ease-out hover:scale-110 hover:bg-red-50 hover:text-red-600 active:scale-90 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-red-950/40"
 												>
 													{isDeleting ? (
 														<Loader2 size={13} className="animate-spin" />
@@ -670,7 +762,9 @@ export function VersionSidebar() {
 													)}
 												</Button.Root>
 											</Tooltip.Trigger>
-											<Tooltip.Content side="top">Delete</Tooltip.Content>
+											<Tooltip.Content side="top" variant="light">
+												Delete
+											</Tooltip.Content>
 										</Tooltip.Root>
 									</div>
 								</div>
