@@ -115,6 +115,7 @@ interface PublishVersionModalProps {
 	onConfirm: (description: string) => Promise<void>;
 	isPublishing: boolean;
 	versionLabel: string;
+	isAlreadyPublished: boolean;
 }
 
 function PublishVersionModal({
@@ -123,6 +124,7 @@ function PublishVersionModal({
 	onConfirm,
 	isPublishing,
 	versionLabel,
+	isAlreadyPublished,
 }: PublishVersionModalProps) {
 	const [description, setDescription] = useState("");
 
@@ -143,19 +145,23 @@ function PublishVersionModal({
 					</Modal.Header>
 					<Modal.Body className="space-y-3">
 						<p className="text-paragraph-sm text-text-sub-600 leading-relaxed">
-							This will create a new major production version based on the content of this draft, making it the active version for sends.
+							{isAlreadyPublished
+								? "This will make this previously published version the active version for transactional sends."
+								: "This will create a new major production version based on the content of this draft, making it the active version for sends."}
 						</p>
-						<div className="space-y-1.5 pt-2">
-							<span className="block font-semibold text-text-strong-950 text-xs">
-								Release Description / Changelog (Optional)
-							</span>
-							<textarea
-								placeholder="Describe what changed in this version..."
-								value={description}
-								onChange={(e) => setDescription(e.target.value)}
-								className="h-20 w-full rounded-lg border border-stroke-soft-200 bg-white p-2 text-xs text-zinc-900 outline-none focus:border-zinc-500 dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a] dark:text-zinc-50"
-							/>
-						</div>
+						{!isAlreadyPublished && (
+							<div className="space-y-1.5 pt-2">
+								<span className="block font-semibold text-text-strong-950 text-xs">
+									Release Description / Changelog (Optional)
+								</span>
+								<textarea
+									placeholder="Describe what changed in this version..."
+									value={description}
+									onChange={(e) => setDescription(e.target.value)}
+									className="h-20 w-full rounded-lg border border-stroke-soft-200 bg-white p-2 text-xs text-zinc-900 outline-none focus:border-zinc-500 dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a] dark:text-zinc-50"
+								/>
+							</div>
+						)}
 					</Modal.Body>
 					<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
 						<Button.Root
@@ -265,6 +271,11 @@ export function VersionSidebar() {
 		fetcher,
 	);
 
+	const { data: template, mutate: mutateTemplate } = useSWR<any>(
+		templateId ? `/api/template/v1/${templateId}` : null,
+		fetcher,
+	);
+
 	const handleRestore = async (version: TemplateVersion) => {
 		if (!editor) return;
 		setRestoringId(version.id);
@@ -327,7 +338,58 @@ export function VersionSidebar() {
 		setIsPublishing(true);
 
 		try {
-			// 1. Create the published version snapshot
+			if (versionToPublish.isMajor) {
+				// 1. If it was already published (isMajor === true), make it the active version without creating a new record
+				const restoreResponse = await fetch(
+					`/api/template/v1/${templateId}/versions/${versionToPublish.id}/restore`,
+					{
+						method: "POST",
+						credentials: "include",
+					},
+				);
+
+				if (!restoreResponse.ok) {
+					const errData = await restoreResponse.json().catch(() => ({}));
+					throw new Error(errData.message || "Failed to make version active.");
+				}
+
+				// 2. Set status to published
+				await fetch(`/api/template/v1/${templateId}`, {
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						status: "published",
+					}),
+					credentials: "include",
+				}).catch((err) =>
+					console.warn("[republish] Failed to set template status:", err),
+				);
+
+				// 3. Update editor content to match the republished version
+				if (editor) {
+					editor.commands.setContent({
+						type: "doc",
+						content: versionToPublish.content as Record<string, unknown>[],
+					});
+					setSubject(versionToPublish.subject || "");
+					setFromEmail(versionToPublish.fromEmail || "");
+					setReplyTo(versionToPublish.replyTo || "");
+					setPreviewText(versionToPublish.previewText || "");
+				}
+
+				const pubNum = getMajorVersionNumber(versionToPublish.id);
+				toast.success(
+					pubNum ? `v${pubNum}.0 set as the active published version!` : "Version published successfully!",
+				);
+
+				setIsPublishModalOpen(false);
+				setVersionToPublish(null);
+				mutate();
+				mutateTemplate();
+				return;
+			}
+
+			// 1. Create the published version snapshot (for drafts)
 			const response = await fetch(`/api/template/v1/${templateId}/versions`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -375,6 +437,7 @@ export function VersionSidebar() {
 			setIsPublishModalOpen(false);
 			setVersionToPublish(null);
 			mutate();
+			mutateTemplate();
 		} catch (error) {
 			console.error("Failed to publish version from history:", error);
 			const err = error as Error;
@@ -456,6 +519,9 @@ export function VersionSidebar() {
 							const isDeleting = deletingId === version.id;
 
 							const isFirstMajor = majorVersions[0]?.id === version.id;
+							const isActive = template?.currentVersion
+								? version.version === template.currentVersion
+								: (version.isMajor && isFirstMajor);
 							const majorNum = getMajorVersionNumber(version.id);
 							const displayLabel = version.isMajor ? `v${majorNum}.0` : "Draft";
 
@@ -475,8 +541,8 @@ export function VersionSidebar() {
 													index === 0
 														? "top-[26px] bottom-0"
 														: index === currentList.length - 1
-															? "top-0 h-[26px]"
-															: "top-0 bottom-0",
+														? "top-0 h-[26px]"
+														: "top-0 bottom-0",
 												)}
 											/>
 										)}
@@ -486,7 +552,7 @@ export function VersionSidebar() {
 											<span
 												className={cn(
 													"relative z-10 flex h-[20px] w-[40px] select-none items-center justify-center rounded-full font-semibold text-[10px] transition-all",
-													isFirstMajor
+													isActive
 														? "bg-black text-white dark:bg-zinc-100 dark:text-black"
 														: "bg-zinc-100 text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400",
 												)}
@@ -638,6 +704,7 @@ export function VersionSidebar() {
 						? versionToPublish.name || (versionToPublish.isMajor ? `v${getMajorVersionNumber(versionToPublish.id)}.0` : "Draft")
 						: "Draft"
 				}
+				isAlreadyPublished={versionToPublish ? versionToPublish.isMajor : false}
 			/>
 		</div>
 	);
