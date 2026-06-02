@@ -38,11 +38,20 @@ export function PageSection({
 	children,
 	alt = false,
 	narrow = false,
+	flushTop = false,
 }: {
 	children: React.ReactNode;
 	alt?: boolean;
 	narrow?: boolean;
+	flushTop?: boolean;
 }) {
+	const width = narrow ? "max-w-3xl" : "max-w-[1320px]";
+	const padding = narrow
+		? flushTop
+			? "px-4 pt-4 pb-12 sm:px-6 sm:pt-6 sm:pb-14"
+			: "px-4 py-12 sm:px-6 sm:py-14 lg:py-16"
+		: "px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24";
+
 	return (
 		<section
 			className={
@@ -51,11 +60,7 @@ export function PageSection({
 					: undefined
 			}
 		>
-			<div
-				className={`mx-auto px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24 ${narrow ? "max-w-3xl" : "max-w-[1320px]"}`}
-			>
-				{children}
-			</div>
+			<div className={`mx-auto ${width} ${padding}`}>{children}</div>
 		</section>
 	);
 }
@@ -64,18 +69,32 @@ export function SectionHeading({
 	title,
 	description,
 	center = true,
+	compact = false,
 }: {
 	title: string;
 	description?: string;
 	center?: boolean;
+	compact?: boolean;
 }) {
 	return (
-		<div className={center ? "mb-16 text-center" : "mb-12"}>
+		<div
+			className={
+				center
+					? compact
+						? "mb-12 text-center"
+						: "mb-16 text-center"
+					: compact
+						? "mb-10"
+						: "mb-12"
+			}
+		>
 			<h2 className="font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
 				{title}
 			</h2>
 			{description && (
-				<p className="mx-auto mt-4 max-w-2xl text-base text-text-sub-600 leading-7 dark:text-white/50">
+				<p
+					className={`${compact ? "mt-3" : "mt-4"} max-w-2xl text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50 ${center ? "mx-auto" : ""}`}
+				>
 					{description}
 				</p>
 			)}
@@ -111,8 +130,8 @@ export const metricsGridClass = "grid gap-6 md:grid-cols-2 lg:grid-cols-4";
 
 export function CodeBlock({ children }: { children: string }) {
 	return (
-		<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-[#0a0a0a] font-mono text-[13px] leading-relaxed dark:border-white/10">
-			<pre className="overflow-x-auto p-4 text-white/80">{children}</pre>
+		<div className="overflow-hidden rounded-3xl border border-stroke-soft-200 bg-[#0a0a0a] font-mono text-[14px] leading-relaxed sm:text-[15px] dark:border-white/10">
+			<pre className="overflow-x-auto p-5 text-white/80 sm:p-6">{children}</pre>
 		</div>
 	);
 }

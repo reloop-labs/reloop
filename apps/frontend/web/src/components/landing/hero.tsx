@@ -20,7 +20,7 @@ export function FeatureHero({
 		<div
 			className={
 				compact
-					? "relative overflow-hidden bg-transparent pt-28 pb-10 sm:pt-32 sm:pb-12"
+					? "relative overflow-hidden bg-transparent pt-28 pb-8 sm:pt-32 sm:pb-10"
 					: "relative flex min-h-dvh items-center justify-center overflow-hidden bg-transparent pt-40 pb-28"
 			}
 		>
@@ -33,13 +33,7 @@ export function FeatureHero({
 					}
 				>
 					<div className="mx-auto max-w-[1020px] text-center">
-						<h1
-							className={
-								compact
-									? "font-serif text-[2.2rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.8rem] dark:text-white"
-									: "font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[4.2rem] dark:text-white"
-							}
-						>
+						<h1 className="font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[4.2rem] dark:text-white">
 							{titleLines.map((line, i) => (
 								<span key={line}>
 									{line}
@@ -48,20 +42,14 @@ export function FeatureHero({
 							))}
 						</h1>
 
-						<p
-							className={
-								compact
-									? "mx-auto mt-4 max-w-[560px] text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/50"
-									: "mx-auto mt-8 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50"
-							}
-						>
+						<p className="mx-auto mt-7 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
 							{description}
 						</p>
 
 						<div
 							className={
 								compact
-									? "mt-6 flex flex-wrap items-center justify-center gap-3"
+									? "mt-7 flex flex-wrap items-center justify-center gap-4"
 									: "mt-10 flex flex-wrap items-center justify-center gap-4"
 							}
 						>

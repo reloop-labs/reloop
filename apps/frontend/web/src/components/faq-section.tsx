@@ -13,11 +13,13 @@ export function FaqSection({
 	eyebrow = "FAQ",
 	title = "Question & Answer",
 	id = "faq",
+	compact = false,
 }: {
 	items: FaqItem[];
 	eyebrow?: string;
 	title?: string;
 	id?: string;
+	compact?: boolean;
 }) {
 	const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -26,22 +28,28 @@ export function FaqSection({
 			id={id}
 			className="bg-[#f8f8f8] text-[#0a0d12] dark:bg-black dark:text-white"
 		>
-			<div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
+			<div
+				className={`mx-auto max-w-3xl px-4 sm:px-6 ${compact ? "py-12 sm:py-14" : "py-16 sm:px-6 sm:py-20 lg:py-24"}`}
+			>
 				<div className="text-center">
 					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
 						{eyebrow}
 					</p>
-					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
+					<h2
+						className={`font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white ${compact ? "mt-3.5" : "mt-4"}`}
+					>
 						{title}
 					</h2>
 				</div>
-				<div className="mt-14 divide-y divide-[#0a0d12]/10 sm:mt-16 dark:divide-white/10">
+				<div
+					className={`divide-y divide-[#0a0d12]/10 dark:divide-white/10 ${compact ? "mt-10 sm:mt-12" : "mt-14 sm:mt-16"}`}
+				>
 					{items.map((faq, i) => (
 						<div key={faq.question}>
 							<button
 								type="button"
 								onClick={() => setOpenIndex(openIndex === i ? null : i)}
-								className="flex w-full items-start justify-between gap-4 py-6 text-left"
+								className={`flex w-full items-start justify-between gap-4 text-left ${compact ? "py-5" : "py-6"}`}
 							>
 								<span className="font-semibold text-[16px] text-text-strong-950 leading-snug sm:text-[17px] dark:text-white">
 									{faq.question}
@@ -73,7 +81,9 @@ export function FaqSection({
 								)}
 							>
 								<div className="overflow-hidden">
-									<p className="pr-12 pb-6 text-[#0a0d12]/56 text-[14px] leading-[1.7] sm:text-[15px] dark:text-white/50">
+									<p
+										className={`pr-12 text-[#0a0d12]/56 text-[14px] leading-[1.7] sm:text-[15px] dark:text-white/50 ${compact ? "pb-5" : "pb-6"}`}
+									>
 										{faq.answer}
 									</p>
 								</div>

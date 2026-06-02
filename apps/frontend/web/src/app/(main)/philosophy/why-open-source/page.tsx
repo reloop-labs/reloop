@@ -231,7 +231,7 @@ const WhyOpenSourcePage = () => {
 							{
 								stat: "100%",
 								label: "Open source",
-								sub: "MIT licensed, always",
+								sub: "Apache 2.0 licensed",
 							},
 						].map((item) => (
 							<div

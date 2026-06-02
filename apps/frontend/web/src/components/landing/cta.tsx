@@ -10,10 +10,13 @@ export function FeatureCta({
 	description,
 	primary,
 	secondary,
-}: FeatureCtaBand) {
+	compact = false,
+}: FeatureCtaBand & { compact?: boolean }) {
 	return (
 		<section id="cta">
-			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+			<div
+				className={`mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8 ${compact ? "py-14 sm:py-16" : "py-16 sm:py-20 lg:py-24"}`}
+			>
 				<div className="mx-auto max-w-[920px] text-center">
 					<h2 className="font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
 						{title}
@@ -32,11 +35,15 @@ export function FeatureCta({
 							</>
 						)}
 					</h2>
-					<p className="mx-auto mt-8 max-w-[550px] font-medium text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[17px] dark:text-white/60">
+					<p
+						className={`mx-auto max-w-[550px] font-medium text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[17px] dark:text-white/60 ${compact ? "mt-6" : "mt-8"}`}
+					>
 						{description}
 					</p>
 
-					<div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+					<div
+						className={`flex flex-wrap items-center justify-center gap-4 ${compact ? "mt-8" : "mt-10"}`}
+					>
 						<CtaLink {...primary} filled />
 						{secondary && <CtaLink {...secondary} />}
 					</div>
