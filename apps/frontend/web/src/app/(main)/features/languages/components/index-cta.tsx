@@ -15,8 +15,8 @@ export default function IndexCta() {
 						</span>
 					</h2>
 					<p className="mx-auto mt-8 max-w-[550px] font-medium text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[17px] dark:text-white/60">
-						Create your Reloop account, verify a domain, and send from any SDK—or use
-						our SMTP relay if you prefer standard mail protocols.
+						Create your Reloop account, verify a domain, and send from any
+						SDK—or use our SMTP relay if you prefer standard mail protocols.
 					</p>
 
 					<div className="mt-10 flex flex-wrap items-center justify-center gap-4">

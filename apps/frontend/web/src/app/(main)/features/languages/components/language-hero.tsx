@@ -4,13 +4,16 @@ import * as Button from "@reloop/ui/button";
 import type { LanguageDefinition } from "../languages";
 import { LanguageIcon } from "./language-icon";
 
-export default function LanguageHero({ language }: { language: LanguageDefinition }) {
+export default function LanguageHero({
+	language,
+}: {
+	language: LanguageDefinition;
+}) {
 	return (
 		<div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-transparent pt-40 pb-28">
 			<main className="relative z-10">
 				<section className="mx-auto flex max-w-4xl flex-col px-4 pb-16 sm:px-6 lg:px-8 lg:pb-24">
 					<div className="mx-auto max-w-[1020px] text-center">
-
 						<div
 							className="mx-auto mt-6 inline-flex size-14 items-center justify-center rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10"
 							style={{ color: `#${language.icon.hex}` }}

@@ -1,3 +1,7 @@
+import type {
+	FeatureCtaBand,
+	FeatureCtaLink,
+} from "@reloop/web/components/landing/types";
 import {
 	cardGridClass,
 	FeatureCta,
@@ -5,7 +9,6 @@ import {
 	PageSection,
 	SectionHeading,
 } from "@reloop/web/components/page-shell";
-import type { FeatureCtaBand, FeatureCtaLink } from "@reloop/web/components/landing/types";
 import type { Metadata } from "next";
 
 export type FeatureMarketingSection = {

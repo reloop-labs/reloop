@@ -15,7 +15,8 @@ export default function Guide() {
 						Setup in 3 Steps
 					</h2>
 					<p className="mx-auto mt-4 max-w-xl text-base text-text-sub-600 dark:text-white/50">
-						No complex integration pipelines. Connect your agent frameworks in minutes.
+						No complex integration pipelines. Connect your agent frameworks in
+						minutes.
 					</p>
 				</div>
 
@@ -29,7 +30,8 @@ export default function Guide() {
 								Configure Mailbox
 							</h3>
 							<p className="mt-4 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Create a dedicated agent inbox address (e.g. agent@yourdomain.com) and supply the validation JSON schemas.
+								Create a dedicated agent inbox address (e.g.
+								agent@yourdomain.com) and supply the validation JSON schemas.
 							</p>
 						</div>
 					</div>
@@ -43,7 +45,8 @@ export default function Guide() {
 								Import SDK Code
 							</h3>
 							<p className="mt-4 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Install the official Reloop Client SDK package for your language:
+								Install the official Reloop Client SDK package for your
+								language:
 								<code className="mt-4 block rounded border border-white/5 bg-[#0a0a0a] p-2 font-mono text-[11.5px] text-primary-base">
 									npm install @reloop/sdk
 								</code>
@@ -60,7 +63,8 @@ export default function Guide() {
 								Bind Callbacks
 							</h3>
 							<p className="mt-4 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Receive clean parsed JSON callbacks on incoming emails, let your agents process requests, and reply back programmatically.
+								Receive clean parsed JSON callbacks on incoming emails, let your
+								agents process requests, and reply back programmatically.
 							</p>
 						</div>
 					</div>

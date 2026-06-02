@@ -791,13 +791,17 @@ export function TestPanel({ onClose }: PanelProps) {
 						{!fromEmail ? (
 							<div className="flex flex-col gap-2.5 rounded-2xl border border-rose-200/60 bg-rose-50/50 p-3.5 dark:border-rose-900/30 dark:bg-rose-950/10">
 								<div className="flex items-start gap-2.5">
-									<AlertCircle size={16} className="mt-0.5 shrink-0 text-rose-600 dark:text-rose-400" />
+									<AlertCircle
+										size={16}
+										className="mt-0.5 shrink-0 text-rose-600 dark:text-rose-400"
+									/>
 									<div className="flex flex-col gap-1">
 										<span className="font-semibold text-rose-700 text-xs dark:text-rose-300">
 											Missing From Address
 										</span>
 										<p className="text-[11px] text-rose-600/90 leading-normal dark:text-rose-400/80">
-											You must configure a valid "From Email" in the Send Details panel before you can send a test email.
+											You must configure a valid "From Email" in the Send
+											Details panel before you can send a test email.
 										</p>
 									</div>
 								</div>

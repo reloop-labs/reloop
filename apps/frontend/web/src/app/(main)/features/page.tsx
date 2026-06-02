@@ -20,25 +20,89 @@ export const metadata: Metadata = {
 };
 
 const productFeatures = [
-	{ title: "AI Agents", href: "/features/ai-agents", description: "Email infrastructure for autonomous agents and LLMs." },
-	{ title: "Campaigns", href: "/features/campaigns", description: "Create and track marketing campaigns end to end." },
-	{ title: "Transaction Emails", href: "/features/transaction-emails", description: "Low-latency transactional delivery for developers." },
-	{ title: "Email Templates", href: "/features/email-templates", description: "Design and manage reusable email templates." },
-	{ title: "SMTP Relay", href: "/features/smtp", description: "Managed SMTP with TLS, auth, and fast delivery." },
-	{ title: "Email Analytics", href: "/features/email-analytics", description: "Opens, clicks, conversions, and real-time reports." },
-	{ title: "Email Validation", href: "/features/email-validation", description: "Verify addresses before send to protect reputation." },
-	{ title: "Deliverability", href: "/features/deliverability", description: "Spam testing, reputation monitoring, and auth setup." },
-	{ title: "Marketing Teams", href: "/features/marketing-teams", description: "Collaborative campaign workspace for teams." },
-	{ title: "Languages & SDKs", href: "/features/languages", description: "Quickstarts for every supported client library." },
+	{
+		title: "AI Agents",
+		href: "/features/ai-agents",
+		description: "Email infrastructure for autonomous agents and LLMs.",
+	},
+	{
+		title: "Campaigns",
+		href: "/features/campaigns",
+		description: "Create and track marketing campaigns end to end.",
+	},
+	{
+		title: "Transaction Emails",
+		href: "/features/transaction-emails",
+		description: "Low-latency transactional delivery for developers.",
+	},
+	{
+		title: "Email Templates",
+		href: "/features/email-templates",
+		description: "Design and manage reusable email templates.",
+	},
+	{
+		title: "SMTP Relay",
+		href: "/features/smtp",
+		description: "Managed SMTP with TLS, auth, and fast delivery.",
+	},
+	{
+		title: "Email Analytics",
+		href: "/features/email-analytics",
+		description: "Opens, clicks, conversions, and real-time reports.",
+	},
+	{
+		title: "Email Validation",
+		href: "/features/email-validation",
+		description: "Verify addresses before send to protect reputation.",
+	},
+	{
+		title: "Deliverability",
+		href: "/features/deliverability",
+		description: "Spam testing, reputation monitoring, and auth setup.",
+	},
+	{
+		title: "Marketing Teams",
+		href: "/features/marketing-teams",
+		description: "Collaborative campaign workspace for teams.",
+	},
+	{
+		title: "Languages & SDKs",
+		href: "/features/languages",
+		description: "Quickstarts for every supported client library.",
+	},
 ];
 
 const platformFeatures = [
-	{ title: "Developers", href: "/features/developers", description: "APIs, SDKs, and sandbox tooling built for DX." },
-	{ title: "Getting Started", href: "/features/getting-started", description: "From signup to first send in minutes." },
-	{ title: "API Reference", href: "/features/api-reference", description: "REST endpoints for send, list, and analytics." },
-	{ title: "Webhooks", href: "/features/webhooks", description: "Real-time events for delivery and engagement." },
-	{ title: "Integration", href: "/features/integration", description: "Connect Reloop to your stack." },
-	{ title: "Campaign Builder", href: "/features/campaign-builder", description: "Visual editor for on-brand campaigns." },
+	{
+		title: "Developers",
+		href: "/features/developers",
+		description: "APIs, SDKs, and sandbox tooling built for DX.",
+	},
+	{
+		title: "Getting Started",
+		href: "/features/getting-started",
+		description: "From signup to first send in minutes.",
+	},
+	{
+		title: "API Reference",
+		href: "/features/api-reference",
+		description: "REST endpoints for send, list, and analytics.",
+	},
+	{
+		title: "Webhooks",
+		href: "/features/webhooks",
+		description: "Real-time events for delivery and engagement.",
+	},
+	{
+		title: "Integration",
+		href: "/features/integration",
+		description: "Connect Reloop to your stack.",
+	},
+	{
+		title: "Campaign Builder",
+		href: "/features/campaign-builder",
+		description: "Visual editor for on-brand campaigns.",
+	},
 ];
 
 export default function FeaturesIndexPage() {

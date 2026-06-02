@@ -386,8 +386,7 @@ function sanitizeEmailHtml(rawHtml: string): string {
 				doc.querySelector('td[style*="font-size"]');
 			if (wrapperTd && wrapperTd !== contentCell) {
 				const wrapperScratch = doc.createElement("div") as HTMLDivElement;
-				wrapperScratch.style.cssText =
-					wrapperTd.getAttribute("style") || "";
+				wrapperScratch.style.cssText = wrapperTd.getAttribute("style") || "";
 				const TYPOGRAPHY_PROPS = [
 					"font-family",
 					"font-size",
@@ -518,7 +517,9 @@ function normalizeAnchorStyles(root: Element): void {
 function stripReactEmailColumnMarkersForIconRows(root: Element): void {
 	const candidateTables = Array.from(
 		root.querySelectorAll('table td[data-id="__react-email-column"]'),
-	).map((td) => td.closest("table")).filter(Boolean) as HTMLTableElement[];
+	)
+		.map((td) => td.closest("table"))
+		.filter(Boolean) as HTMLTableElement[];
 
 	const uniqueTables = Array.from(new Set(candidateTables));
 
@@ -576,7 +577,8 @@ function replaceSocialIconTablesWithInlineRow(root: Element): void {
 
 	for (const table of tables) {
 		const directRow =
-			table.querySelector(":scope > tbody > tr") || table.querySelector(":scope > tr");
+			table.querySelector(":scope > tbody > tr") ||
+			table.querySelector(":scope > tr");
 		if (!directRow) continue;
 
 		const directCells = Array.from(directRow.querySelectorAll(":scope > td"));
@@ -611,10 +613,7 @@ function replaceSocialIconTablesWithInlineRow(root: Element): void {
 
 		const doc = root.ownerDocument;
 		const p = doc.createElement("p");
-		p.setAttribute(
-			"style",
-			"margin:0;padding:0;margin-top:2rem;line-height:1",
-		);
+		p.setAttribute("style", "margin:0;padding:0;margin-top:2rem;line-height:1");
 
 		icons.forEach((icon, idx) => {
 			if (!icon) return;
@@ -965,17 +964,13 @@ function extractThemingStylesFromHtml(rawHtml: string): any[] {
 		// wrapper TD that provides base typography for the email.
 		if (contentCell) {
 			const colorCellScratch = document.createElement("div");
-			colorCellScratch.style.cssText =
-				contentCell.getAttribute("style") || "";
+			colorCellScratch.style.cssText = contentCell.getAttribute("style") || "";
 			if (colorCellScratch.style.color) {
 				containerTextColor = colorCellScratch.style.color;
 			}
 		}
 		const outerTd = containerTable.closest?.("td");
-		if (
-			outerTd &&
-			outerTd !== contentCell
-		) {
+		if (outerTd && outerTd !== contentCell) {
 			const outerScratch = document.createElement("div");
 			outerScratch.style.cssText = outerTd.getAttribute("style") || "";
 			if (outerScratch.style.color) {
@@ -1481,8 +1476,14 @@ function parseGlobalStylesFromHtml(html: string) {
 	//
 	// We use `.ProseMirror.ProseMirror` (same element, higher specificity) to
 	// ensure these rules override the editor's default theme CSS.
-	cssString = cssString.replace(/(?<![.#\-\w])body\b/g, ".ProseMirror.ProseMirror");
-	cssString = cssString.replace(/(?<![.#\-\w])html\b/g, ".ProseMirror.ProseMirror");
+	cssString = cssString.replace(
+		/(?<![.#\-\w])body\b/g,
+		".ProseMirror.ProseMirror",
+	);
+	cssString = cssString.replace(
+		/(?<![.#\-\w])html\b/g,
+		".ProseMirror.ProseMirror",
+	);
 
 	// 2. Extract external stylesheet links (e.g. google fonts) so they can load in the head
 	const links = doc.querySelectorAll(
@@ -1595,7 +1596,8 @@ function parseGlobalStylesFromHtml(html: string) {
 	let containerWidth: number | null = null;
 	const firstTable = doc.querySelector("table");
 	if (firstTable) {
-		const widthAttr = firstTable.getAttribute("width") || firstTable.style.width;
+		const widthAttr =
+			firstTable.getAttribute("width") || firstTable.style.width;
 		if (widthAttr && widthAttr !== "100%") {
 			const parsedWidth = Number.parseInt(widthAttr, 10);
 			if (!Number.isNaN(parsedWidth)) {

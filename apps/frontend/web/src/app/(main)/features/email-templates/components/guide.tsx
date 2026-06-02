@@ -29,7 +29,8 @@ export default function Guide() {
 								Choose a template
 							</h3>
 							<p className="mt-4 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Browse the library by category—newsletters, transactional, marketing—or start from a blank canvas.
+								Browse the library by category—newsletters, transactional,
+								marketing—or start from a blank canvas.
 							</p>
 						</div>
 					</div>
@@ -43,7 +44,8 @@ export default function Guide() {
 								Customize & preview
 							</h3>
 							<p className="mt-4 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Edit blocks in the visual editor, inject dynamic variables, and preview on desktop and mobile.
+								Edit blocks in the visual editor, inject dynamic variables, and
+								preview on desktop and mobile.
 							</p>
 						</div>
 					</div>
@@ -57,7 +59,8 @@ export default function Guide() {
 								Send via API or campaign
 							</h3>
 							<p className="mt-4 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Reference your template ID from the SDK or schedule a broadcast from the dashboard.
+								Reference your template ID from the SDK or schedule a broadcast
+								from the dashboard.
 							</p>
 						</div>
 					</div>

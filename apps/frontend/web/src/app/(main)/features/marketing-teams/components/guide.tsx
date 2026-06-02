@@ -23,7 +23,8 @@ export default function Guide() {
 								Design Templates
 							</h3>
 							<p className="mt-4 text-[#0a0d12]/56 text-[14px] leading-[1.7]">
-								Use our live collaborative canvas or write clean React code to build responsive templates in real-time.
+								Use our live collaborative canvas or write clean React code to
+								build responsive templates in real-time.
 							</p>
 						</div>
 					</div>
@@ -37,7 +38,8 @@ export default function Guide() {
 								Verify SPF / DKIM
 							</h3>
 							<p className="mt-4 text-[#0a0d12]/56 text-[14px] leading-[1.7]">
-								Configure domain records on the dashboard to automatically pass DMARC and ISP safety tests, ensuring inbox delivery.
+								Configure domain records on the dashboard to automatically pass
+								DMARC and ISP safety tests, ensuring inbox delivery.
 							</p>
 						</div>
 					</div>
@@ -51,7 +53,8 @@ export default function Guide() {
 								Broadcast at Scale
 							</h3>
 							<p className="mt-4 text-[#0a0d12]/56 text-[14px] leading-[1.7]">
-								Trigger newsletters to your segments via Reloop SDK or API endpoints and monitor clicks and conversions in real-time.
+								Trigger newsletters to your segments via Reloop SDK or API
+								endpoints and monitor clicks and conversions in real-time.
 							</p>
 						</div>
 					</div>

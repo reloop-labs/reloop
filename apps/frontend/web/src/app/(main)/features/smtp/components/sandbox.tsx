@@ -58,7 +58,8 @@ export default function Sandbox() {
 						Configure your mailer
 					</h2>
 					<p className="mx-auto mt-6 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
-						Copy a starter snippet for Node.js or Python and point it at Reloop's SMTP relay.
+						Copy a starter snippet for Node.js or Python and point it at
+						Reloop's SMTP relay.
 					</p>
 				</div>
 
@@ -79,12 +80,18 @@ export default function Sandbox() {
 										}`}
 									>
 										{key === "node" && (
-											<svg viewBox="0 0 24 24" className="size-3.5 fill-current">
+											<svg
+												viewBox="0 0 24 24"
+												className="size-3.5 fill-current"
+											>
 												<path d={siNodedotjs.path} />
 											</svg>
 										)}
 										{key === "python" && (
-											<svg viewBox="0 0 24 24" className="size-3.5 fill-current">
+											<svg
+												viewBox="0 0 24 24"
+												className="size-3.5 fill-current"
+											>
 												<path d={siPython.path} />
 											</svg>
 										)}
@@ -102,7 +109,10 @@ export default function Sandbox() {
 								</span>
 							</div>
 							<div className="text-text-soft-400 dark:text-white/40">
-								PORT <span className="text-text-strong-950 dark:text-white">587</span>{" "}
+								PORT{" "}
+								<span className="text-text-strong-950 dark:text-white">
+									587
+								</span>{" "}
 								· TLS STARTTLS
 							</div>
 						</div>

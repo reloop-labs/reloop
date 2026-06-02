@@ -1,5 +1,5 @@
-import { FeatureHero } from "@reloop/web/components/landing/hero";
 import { FeatureCta } from "@reloop/web/components/landing/cta";
+import { FeatureHero } from "@reloop/web/components/landing/hero";
 import type { FeatureCtaLink } from "@reloop/web/components/landing/types";
 import type React from "react";
 
@@ -102,11 +102,9 @@ export function InfoCard({
 	);
 }
 
-export const cardGridClass =
-	"grid gap-6 sm:grid-cols-2 lg:grid-cols-3";
+export const cardGridClass = "grid gap-6 sm:grid-cols-2 lg:grid-cols-3";
 
-export const metricsGridClass =
-	"grid gap-6 md:grid-cols-2 lg:grid-cols-4";
+export const metricsGridClass = "grid gap-6 md:grid-cols-2 lg:grid-cols-4";
 
 export function CodeBlock({ children }: { children: string }) {
 	return (

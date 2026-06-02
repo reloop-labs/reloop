@@ -197,9 +197,8 @@ const highlightCode = (code: string) => {
 
 export default function Sandbox() {
 	const [activeLang, setActiveLang] = useState<Language>("node");
-	const [activeCampaign, setActiveCampaign] = useState<CampaignType>(
-		"newsletter",
-	);
+	const [activeCampaign, setActiveCampaign] =
+		useState<CampaignType>("newsletter");
 	const [simulationState, setSimulationState] = useState<
 		"idle" | "broadcasting" | "success"
 	>("idle");
@@ -283,8 +282,8 @@ export default function Sandbox() {
 						Interactive Creator Sandbox
 					</h2>
 					<p className="mx-auto mt-6 max-w-[620px] text-[#0a0d12]/60 text-[15px] leading-relaxed sm:text-[17px]">
-						Choose a campaign type, edit SDK parameters, and simulate a high-volume
-						broadcast with real-time deliverability telemetry.
+						Choose a campaign type, edit SDK parameters, and simulate a
+						high-volume broadcast with real-time deliverability telemetry.
 					</p>
 				</div>
 
@@ -363,7 +362,9 @@ export default function Sandbox() {
 							{/* Code Snippet Box */}
 							<div className="mt-4 flex flex-1 flex-col overflow-hidden rounded-xl border border-zinc-200 bg-[#0a0a0a] font-mono text-[13px] leading-relaxed shadow-lg">
 								<div className="flex items-center justify-between border-white/5 border-b bg-white/[0.02] px-4 py-2 text-white/40 text-xs">
-									<span>campaign_broadcast.{activeLang === "node" ? "js" : "py"}</span>
+									<span>
+										campaign_broadcast.{activeLang === "node" ? "js" : "py"}
+									</span>
 									<button
 										type="button"
 										onClick={handleCopy}
@@ -409,18 +410,23 @@ export default function Sandbox() {
 						<div className="flex w-full flex-col gap-4 lg:w-[460px]">
 							<div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
 								<div className="mb-3 flex items-center gap-2 border-zinc-100 border-b pb-3 font-mono text-[#0a0d12]/40 text-xs">
-									<span className="size-2.5 rounded-full bg-teal-500 animate-pulse" />
+									<span className="size-2.5 animate-pulse rounded-full bg-teal-500" />
 									<span>Visual Email Preview</span>
 								</div>
 
 								<div className="flex min-h-[220px] flex-col justify-between rounded-lg border border-zinc-100 p-4">
 									<div className="space-y-4 text-xs">
 										<div className="border-[#0a0d12]/10 border-b pb-2">
-											<span className="font-semibold text-zinc-400">Subject: </span>
+											<span className="font-semibold text-zinc-400">
+												Subject:{" "}
+											</span>
 											<span className="font-semibold text-zinc-900">
-												{activeCampaign === "newsletter" && "Weekly Update: What's new in Reloop v2"}
-												{activeCampaign === "launch" && "Introducing Reloop Agent Mailboxes"}
-												{activeCampaign === "promo" && "Reloop Pro: Get 20% off annual plans"}
+												{activeCampaign === "newsletter" &&
+													"Weekly Update: What's new in Reloop v2"}
+												{activeCampaign === "launch" &&
+													"Introducing Reloop Agent Mailboxes"}
+												{activeCampaign === "promo" &&
+													"Reloop Pro: Get 20% off annual plans"}
 											</span>
 										</div>
 
@@ -428,13 +434,16 @@ export default function Sandbox() {
 											{/* Newsletter Preview */}
 											{activeCampaign === "newsletter" && (
 												<div>
-													<div className="font-bold text-teal-600 text-sm">RELOOP WEEKLY</div>
+													<div className="font-bold text-sm text-teal-600">
+														RELOOP WEEKLY
+													</div>
 													<h3 className="mt-2 font-semibold text-[#0a0d12] text-xs">
 														Version 2.0 is Live!
 													</h3>
-													<p className="mt-2 text-zinc-500 text-[10px] leading-relaxed">
-														Discover fully-managed SMTP relay configurations, enhanced SDK
-														types, and sub-12ms global latency profiles.
+													<p className="mt-2 text-[10px] text-zinc-500 leading-relaxed">
+														Discover fully-managed SMTP relay configurations,
+														enhanced SDK types, and sub-12ms global latency
+														profiles.
 													</p>
 													<div className="mt-3 inline-block rounded bg-[#0a0d12] px-3 py-1 font-semibold text-[9px] text-white">
 														Read Changelog
@@ -445,13 +454,16 @@ export default function Sandbox() {
 											{/* Launch Preview */}
 											{activeCampaign === "launch" && (
 												<div>
-													<div className="font-bold text-purple-600 text-sm">PRODUCT LAUNCH</div>
+													<div className="font-bold text-purple-600 text-sm">
+														PRODUCT LAUNCH
+													</div>
 													<h3 className="mt-2 font-semibold text-[#0a0d12] text-xs">
 														Inbox for AI Agents
 													</h3>
-													<p className="mt-2 text-zinc-500 text-[10px] leading-relaxed">
-														Build, test, and run autonomous agent email pipelines. Feed LLMs
-														perfect JSON schemas instead of raw MIME formats.
+													<p className="mt-2 text-[10px] text-zinc-500 leading-relaxed">
+														Build, test, and run autonomous agent email
+														pipelines. Feed LLMs perfect JSON schemas instead of
+														raw MIME formats.
 													</p>
 													<div className="mt-3 inline-block rounded bg-purple-600 px-3 py-1 font-semibold text-[9px] text-white">
 														Deploy Mailbox
@@ -462,13 +474,15 @@ export default function Sandbox() {
 											{/* Promo Preview */}
 											{activeCampaign === "promo" && (
 												<div>
-													<div className="font-bold text-amber-600 text-sm">LIMITED OFFER</div>
+													<div className="font-bold text-amber-600 text-sm">
+														LIMITED OFFER
+													</div>
 													<h3 className="mt-2 font-semibold text-[#0a0d12] text-xs">
 														Get 20% off Annual Plans
 													</h3>
-													<p className="mt-2 text-zinc-500 text-[10px] leading-relaxed">
-														Unlock unlimited custom domains, automated SPF/DKIM signing,
-														and priority MTA delivery queue access.
+													<p className="mt-2 text-[10px] text-zinc-500 leading-relaxed">
+														Unlock unlimited custom domains, automated SPF/DKIM
+														signing, and priority MTA delivery queue access.
 													</p>
 													<div className="mt-3 inline-block rounded bg-amber-600 px-3 py-1 font-semibold text-[9px] text-white">
 														Claim 20% Discount
@@ -490,7 +504,8 @@ export default function Sandbox() {
 									<div className="max-h-[140px] space-y-1 overflow-y-auto text-white/70">
 										{simulationLogs.length === 0 && (
 											<span className="text-white/20">
-												Click "Trigger Live Broadcast" to execute and trace the delivery.
+												Click "Trigger Live Broadcast" to execute and trace the
+												delivery.
 											</span>
 										)}
 										{simulationLogs.map((log, index) => (

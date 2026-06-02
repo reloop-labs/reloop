@@ -35,9 +35,10 @@ export const VariableSuggestion = Extension.create({
 
 					const updatePosition = (props: any) => {
 						if (!component?.element) return;
-						const rect = typeof props.clientRect === "function"
-							? props.clientRect()
-							: props.clientRect;
+						const rect =
+							typeof props.clientRect === "function"
+								? props.clientRect()
+								: props.clientRect;
 
 						if (rect) {
 							component.element.style.position = "fixed";
@@ -90,4 +91,3 @@ export const VariableSuggestion = Extension.create({
 	},
 });
 export default VariableSuggestion;
-

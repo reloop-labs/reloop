@@ -9,7 +9,8 @@ export default function Metrics() {
 						Built for design teams
 					</h2>
 					<p className="mx-auto mt-6 max-w-xl text-base text-text-sub-600 dark:text-white/50">
-						Professional templates and an editor that keeps marketers and developers in sync.
+						Professional templates and an editor that keeps marketers and
+						developers in sync.
 					</p>
 				</div>
 

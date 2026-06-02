@@ -32,9 +32,9 @@ export default function Bento() {
 								Structured Schema Validation
 							</h3>
 							<p className="max-w-md text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Map inbound messages to structured JSON objects instantly. Define
-								required properties, types, and constraints to filter and clean data
-								for LLM function calls.
+								Map inbound messages to structured JSON objects instantly.
+								Define required properties, types, and constraints to filter and
+								clean data for LLM function calls.
 							</p>
 						</div>
 
@@ -76,8 +76,9 @@ export default function Bento() {
 								Thread Context Sync
 							</h3>
 							<p className="text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Maintain autonomous agent memory. Automatically associate replies with
-								parent threads so your LLMs always have the full conversation context.
+								Maintain autonomous agent memory. Automatically associate
+								replies with parent threads so your LLMs always have the full
+								conversation context.
 							</p>
 						</div>
 						<div className="mt-12 flex items-end justify-between">
@@ -118,7 +119,9 @@ export default function Bento() {
 								AI-Native Guardrails
 							</h3>
 							<p className="text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Filter prompt injection vectors hiding inside incoming email bodies. Ensure outbound agent drafts are sanitized, legal, and hallucination-free.
+								Filter prompt injection vectors hiding inside incoming email
+								bodies. Ensure outbound agent drafts are sanitized, legal, and
+								hallucination-free.
 							</p>
 						</div>
 						<div className="mt-12 flex flex-wrap gap-2">
@@ -143,7 +146,9 @@ export default function Bento() {
 								Asynchronous Agent Webhooks
 							</h3>
 							<p className="max-w-md text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Automatically route parsed inbox messages straight to your agent's API endpoint. Perfect for LangChain, AutoGen, and custom LLM servers.
+								Automatically route parsed inbox messages straight to your
+								agent's API endpoint. Perfect for LangChain, AutoGen, and custom
+								LLM servers.
 							</p>
 						</div>
 
@@ -157,7 +162,8 @@ export default function Bento() {
 								<span className="text-emerald-400">200 OK</span>
 							</div>
 							<div className="text-white/40">
-								&#123; "status": "processed", "replied": true, "tokens_used": 420 &#125;
+								&#123; "status": "processed", "replied": true, "tokens_used":
+								420 &#125;
 							</div>
 						</div>
 					</div>

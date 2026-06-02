@@ -8,28 +8,21 @@ export default function Metrics() {
 					Drive Engagement and Growth
 				</h2>
 				<p className="mx-auto mt-6 max-w-xl text-[#0a0d12]/50 text-base">
-					Achieve high delivery rates and conversion scores across all global ISP routes.
+					Achieve high delivery rates and conversion scores across all global
+					ISP routes.
 				</p>
 
 				<div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
 					<div className="text-center">
-						<div className="mb-4 font-bold text-4xl text-teal-600">
-							99.8%
-						</div>
-						<div className="font-medium text-gray-900">
-							Inbox Placement
-						</div>
+						<div className="mb-4 font-bold text-4xl text-teal-600">99.8%</div>
+						<div className="font-medium text-gray-900">Inbox Placement</div>
 						<div className="text-sm text-text-sub-600">
 							Consistently avoid the spam folder
 						</div>
 					</div>
 					<div className="text-center">
-						<div className="mb-4 font-bold text-4xl text-blue-600">
-							3x
-						</div>
-						<div className="font-medium text-gray-900">
-							Faster Drafts
-						</div>
+						<div className="mb-4 font-bold text-4xl text-blue-600">3x</div>
+						<div className="font-medium text-gray-900">Faster Drafts</div>
 						<div className="text-sm text-text-sub-600">
 							Using AI template suggestions
 						</div>
@@ -38,20 +31,14 @@ export default function Metrics() {
 						<div className="mb-4 font-bold text-4xl text-purple-600">
 							&lt;0.05%
 						</div>
-						<div className="font-medium text-gray-900">
-							Bounce Score
-						</div>
+						<div className="font-medium text-gray-900">Bounce Score</div>
 						<div className="text-sm text-text-sub-600">
 							Aggressive automated list sanitation
 						</div>
 					</div>
 					<div className="text-center">
-						<div className="mb-4 font-bold text-4xl text-emerald-600">
-							24/7
-						</div>
-						<div className="font-medium text-gray-900">
-							Live Insights
-						</div>
+						<div className="mb-4 font-bold text-4xl text-emerald-600">24/7</div>
+						<div className="font-medium text-gray-900">Live Insights</div>
 						<div className="text-sm text-text-sub-600">
 							Track real-time click and conversion metrics
 						</div>

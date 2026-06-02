@@ -247,7 +247,8 @@ const highlightCode = (code: string) => {
 
 export default function Sandbox() {
 	const [activeLang, setActiveLang] = useState<Language>("node");
-	const [activeTemplate, setActiveTemplate] = useState<AgentTemplate>("support");
+	const [activeTemplate, setActiveTemplate] =
+		useState<AgentTemplate>("support");
 	const [simulationState, setSimulationState] = useState<
 		"idle" | "thinking" | "success"
 	>("idle");
@@ -335,7 +336,8 @@ export default function Sandbox() {
 					</h2>
 					<p className="mx-auto mt-6 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
 						Select a preset agent, inspect the setup code, and simulate how
-						Reloop parses incoming email into structured data to drive agent logic.
+						Reloop parses incoming email into structured data to drive agent
+						logic.
 					</p>
 				</div>
 
@@ -437,7 +439,7 @@ export default function Sandbox() {
 									type="button"
 									onClick={triggerSimulation}
 									disabled={simulationState === "thinking"}
-									className="inline-flex h-12 items-center justify-center rounded-2xl bg-[#0a0d12] px-8 font-semibold text-[14px] text-white transition-colors hover:bg-[#0a0d12]/90 active:scale-[0.98] disabled:pointer-events-none disabled:bg-[#0a0d12]/50 dark:bg-white dark:text-black dark:hover:bg-white/90 dark:disabled:bg-white/50"
+									className="inline-flex h-12 items-center justify-center rounded-2xl bg-[#0a0d12] px-8 font-semibold text-[14px] text-white transition-colors hover:bg-[#0a0d12]/90 active:scale-[0.98] disabled:pointer-events-none disabled:bg-[#0a0d12]/50 dark:bg-white dark:text-black dark:disabled:bg-white/50 dark:hover:bg-white/90"
 								>
 									<Icon name="send-2" className="mr-2 size-4" />
 									{simulationState === "thinking"
@@ -527,17 +529,17 @@ export default function Sandbox() {
 														)}
 														{activeTemplate === "sales" && (
 															<p>
-																Hi Mark, thanks for reaching out! Since you
-																are sending 2M emails/month, I have paged
-																the Enterprise team. Please confirm our invite
-																for tomorrow.
+																Hi Mark, thanks for reaching out! Since you are
+																sending 2M emails/month, I have paged the
+																Enterprise team. Please confirm our invite for
+																tomorrow.
 															</p>
 														)}
 														{activeTemplate === "ops" && (
 															<p>
-																Incident logged. The operations team has
-																been paged for pg-main-0 read latency.
-																Tracking ID: inc_93817.
+																Incident logged. The operations team has been
+																paged for pg-main-0 read latency. Tracking ID:
+																inc_93817.
 															</p>
 														)}
 													</div>

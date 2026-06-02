@@ -1,10 +1,10 @@
+import type { Metadata } from "next";
 import Bento from "./components/bento";
 import CTA from "./components/cta";
 import Guide from "./components/guide";
 import Hero from "./components/hero";
 import Metrics from "./components/metrics";
 import Sandbox from "./components/sandbox";
-import type { Metadata } from "next";
 
 export const metadata: Metadata = {
 	title: "Email Templates | Reloop",

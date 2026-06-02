@@ -1,7 +1,7 @@
 import {
-	cardGridClass,
 	CodeBlock,
 	ContentCard,
+	cardGridClass,
 	FeatureCta,
 	MarketingPageShell,
 	PageSection,

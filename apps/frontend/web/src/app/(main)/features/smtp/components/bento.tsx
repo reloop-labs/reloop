@@ -14,7 +14,8 @@ export default function Bento() {
 						SMTP relay &amp; HTTP APIs
 					</h2>
 					<p className="mx-auto mt-4 max-w-xl text-base text-text-sub-600 dark:text-white/50">
-						Connect using standard protocols on a zero-latency, failover edge mesh network.
+						Connect using standard protocols on a zero-latency, failover edge
+						mesh network.
 					</p>
 				</div>
 
@@ -31,8 +32,9 @@ export default function Bento() {
 								Managed SMTP relay
 							</h3>
 							<p className="max-w-md text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Point your existing mailers straight to Reloop. Zero-configuration migration from
-								other SMTP providers with full TLS support.
+								Point your existing mailers straight to Reloop.
+								Zero-configuration migration from other SMTP providers with full
+								TLS support.
 							</p>
 						</div>
 						<div className="mt-12 grid grid-cols-2 gap-4">
@@ -73,7 +75,8 @@ export default function Bento() {
 								TLS &amp; authentication
 							</h3>
 							<p className="text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Enforce encrypted transport and API-key or SMTP credential auth. Rotate keys without downtime.
+								Enforce encrypted transport and API-key or SMTP credential auth.
+								Rotate keys without downtime.
 							</p>
 						</div>
 					</div>
@@ -90,7 +93,8 @@ export default function Bento() {
 								Global edge network
 							</h3>
 							<p className="text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								14 relay regions route mail closer to recipients for faster handoffs and better deliverability.
+								14 relay regions route mail closer to recipients for faster
+								handoffs and better deliverability.
 							</p>
 						</div>
 						<div className="mt-12">
@@ -115,8 +119,8 @@ export default function Bento() {
 								Delivery event webhooks
 							</h3>
 							<p className="max-w-md text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Receive real-time callbacks for delivered, bounced, and deferred events. Debug SMTP
-								handshakes with full message traces.
+								Receive real-time callbacks for delivered, bounced, and deferred
+								events. Debug SMTP handshakes with full message traces.
 							</p>
 						</div>
 						<div className="mt-12 space-y-1 rounded-xl bg-[#0a0a0a] p-4 font-mono text-[11px] shadow-inner">
@@ -124,9 +128,7 @@ export default function Bento() {
 								<span>SMTP TRACE</span>
 								<span className="text-primary-base">250 OK</span>
 							</div>
-							<div className="text-white/50">
-								&gt; EHLO client.example.com
-							</div>
+							<div className="text-white/50">&gt; EHLO client.example.com</div>
 							<div className="text-white/50">
 								&gt; MAIL FROM:&lt;noreply@yourdomain.com&gt;
 							</div>

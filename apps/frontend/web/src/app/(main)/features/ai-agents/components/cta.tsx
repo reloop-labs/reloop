@@ -15,7 +15,9 @@ export default function CTA() {
 						</span>
 					</h2>
 					<p className="mx-auto mt-8 max-w-[550px] font-medium text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[17px] dark:text-white/60">
-						Connect your LLMs, LangChain, or Autogen framework to Reloop today and empower your autonomous workforce with real-time email operations.
+						Connect your LLMs, LangChain, or Autogen framework to Reloop today
+						and empower your autonomous workforce with real-time email
+						operations.
 					</p>
 
 					<div className="mt-10 flex flex-wrap items-center justify-center gap-4">

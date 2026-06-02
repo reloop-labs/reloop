@@ -23,7 +23,8 @@ export default function Bento() {
 						Templates for every need
 					</h2>
 					<p className="mx-auto mt-4 max-w-xl text-base text-text-sub-600 dark:text-white/50">
-						From newsletters to password resets—curated designs you can ship in minutes.
+						From newsletters to password resets—curated designs you can ship in
+						minutes.
 					</p>
 				</div>
 
@@ -31,13 +32,17 @@ export default function Bento() {
 					<div className={`col-span-1 lg:col-span-2 ${cardClassName}`}>
 						<div>
 							<div className="mb-6 inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-soft-50 dark:border-white/10">
-								<Icon name="brush" className="size-5 text-text-sub-600 dark:text-white/60" />
+								<Icon
+									name="brush"
+									className="size-5 text-text-sub-600 dark:text-white/60"
+								/>
 							</div>
 							<h3 className="mb-3 font-semibold text-[18px] text-text-strong-950 leading-snug sm:text-[20px] dark:text-white">
 								Curated template library
 							</h3>
 							<p className="max-w-md text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Professional layouts for every use case. Duplicate, customize, and publish without starting from a blank page.
+								Professional layouts for every use case. Duplicate, customize,
+								and publish without starting from a blank page.
 							</p>
 						</div>
 						<div className="mt-12 flex flex-wrap gap-2">
@@ -55,13 +60,17 @@ export default function Bento() {
 					<div className={cardClassName}>
 						<div>
 							<div className="mb-6 inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-soft-50 dark:border-white/10">
-								<Icon name="edit" className="size-5 text-text-sub-600 dark:text-white/60" />
+								<Icon
+									name="edit"
+									className="size-5 text-text-sub-600 dark:text-white/60"
+								/>
 							</div>
 							<h3 className="mb-3 font-semibold text-[18px] text-text-strong-950 leading-snug sm:text-[20px] dark:text-white">
 								Drag & drop editor
 							</h3>
 							<p className="text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Add text, images, buttons, and dividers visually. No HTML required for day-to-day edits.
+								Add text, images, buttons, and dividers visually. No HTML
+								required for day-to-day edits.
 							</p>
 						</div>
 					</div>
@@ -69,13 +78,17 @@ export default function Bento() {
 					<div className={cardClassName}>
 						<div>
 							<div className="mb-6 inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-soft-50 dark:border-white/10">
-								<Icon name="code" className="size-5 text-text-sub-600 dark:text-white/60" />
+								<Icon
+									name="code"
+									className="size-5 text-text-sub-600 dark:text-white/60"
+								/>
 							</div>
 							<h3 className="mb-3 font-semibold text-[18px] text-text-strong-950 leading-snug sm:text-[20px] dark:text-white">
 								Dynamic variables
 							</h3>
 							<p className="text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Inject user names, order IDs, and custom fields at send time from your API or campaign payload.
+								Inject user names, order IDs, and custom fields at send time
+								from your API or campaign payload.
 							</p>
 						</div>
 					</div>
@@ -83,13 +96,17 @@ export default function Bento() {
 					<div className={`col-span-1 lg:col-span-2 ${cardClassName}`}>
 						<div>
 							<div className="mb-6 inline-flex size-10 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-soft-50 dark:border-white/10">
-								<Icon name="brush" className="size-5 text-text-sub-600 dark:text-white/60" />
+								<Icon
+									name="brush"
+									className="size-5 text-text-sub-600 dark:text-white/60"
+								/>
 							</div>
 							<h3 className="mb-3 font-semibold text-[18px] text-text-strong-950 leading-snug sm:text-[20px] dark:text-white">
 								Brand customization
 							</h3>
 							<p className="max-w-md text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Save brand presets—colors, fonts, logos—and apply them across every template in your workspace.
+								Save brand presets—colors, fonts, logos—and apply them across
+								every template in your workspace.
 							</p>
 						</div>
 						<div className="mt-12 space-y-1 rounded-xl bg-[#0a0a0a] p-4 font-mono text-[11px] shadow-inner">

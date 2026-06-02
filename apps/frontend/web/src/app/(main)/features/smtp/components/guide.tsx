@@ -15,7 +15,8 @@ export default function Guide() {
 						Connect in 3 steps
 					</h2>
 					<p className="mx-auto mt-4 max-w-xl text-base text-text-sub-600 dark:text-white/50">
-						Migrate from any SMTP provider with standard configuration—no proprietary lock-in.
+						Migrate from any SMTP provider with standard configuration—no
+						proprietary lock-in.
 					</p>
 				</div>
 
@@ -29,7 +30,8 @@ export default function Guide() {
 								Generate credentials
 							</h3>
 							<p className="mt-4 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Create an SMTP user and password in the dashboard. Copy host, port, and auth settings.
+								Create an SMTP user and password in the dashboard. Copy host,
+								port, and auth settings.
 							</p>
 						</div>
 					</div>
@@ -44,7 +46,10 @@ export default function Guide() {
 							</h3>
 							<p className="mt-4 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
 								Point Nodemailer, Postfix, Laravel Mail, or any SMTP client at{" "}
-								<code className="font-mono text-primary-base">smtp.reloop.dev</code> on port 587 with STARTTLS.
+								<code className="font-mono text-primary-base">
+									smtp.reloop.dev
+								</code>{" "}
+								on port 587 with STARTTLS.
 							</p>
 						</div>
 					</div>
@@ -58,7 +63,8 @@ export default function Guide() {
 								Send & monitor
 							</h3>
 							<p className="mt-4 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Dispatch your first message and trace delivery, bounces, and opens via webhooks and the dashboard.
+								Dispatch your first message and trace delivery, bounces, and
+								opens via webhooks and the dashboard.
 							</p>
 						</div>
 					</div>

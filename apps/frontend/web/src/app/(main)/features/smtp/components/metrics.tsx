@@ -9,7 +9,8 @@ export default function Metrics() {
 						Built for production traffic
 					</h2>
 					<p className="mx-auto mt-6 max-w-xl text-base text-text-sub-600 dark:text-white/50">
-						Reliable SMTP relay infrastructure with the speed and uptime your app demands.
+						Reliable SMTP relay infrastructure with the speed and uptime your
+						app demands.
 					</p>
 				</div>
 

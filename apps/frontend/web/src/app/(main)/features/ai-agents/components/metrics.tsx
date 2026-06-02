@@ -9,7 +9,8 @@ export default function Metrics() {
 						Built for Automated Scale
 					</h2>
 					<p className="mx-auto mt-6 max-w-xl text-base text-text-sub-600 dark:text-white/50">
-						Supercharge your AI workflows with mailboxes engineered for sub-second speeds.
+						Supercharge your AI workflows with mailboxes engineered for
+						sub-second speeds.
 					</p>
 				</div>
 
@@ -37,9 +38,7 @@ export default function Metrics() {
 						</div>
 					</div>
 					<div className="text-center">
-						<div className="mb-4 font-bold text-4xl text-primary-base">
-							0%
-						</div>
+						<div className="mb-4 font-bold text-4xl text-primary-base">0%</div>
 						<div className="font-medium text-text-strong-950 dark:text-white">
 							Injection Leaks
 						</div>

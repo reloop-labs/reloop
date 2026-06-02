@@ -83,7 +83,7 @@ const SelfHostingGuidePage = () => {
 				/>
 				<div className="space-y-8">
 					<div>
-						<h3 className="mb-2 font-semibold text-xl text-text-strong-950 dark:text-white">
+						<h3 className="mb-2 font-semibold text-text-strong-950 text-xl dark:text-white">
 							Docker Compose{" "}
 							<span className="font-normal text-primary-base text-sm">
 								(Recommended)
@@ -95,7 +95,7 @@ const SelfHostingGuidePage = () => {
 						<CodeBlock>{dockerSteps}</CodeBlock>
 					</div>
 					<div>
-						<h3 className="mb-2 font-semibold text-xl text-text-strong-950 dark:text-white">
+						<h3 className="mb-2 font-semibold text-text-strong-950 text-xl dark:text-white">
 							Kubernetes
 						</h3>
 						<p className="mb-4 text-sm text-text-sub-600 dark:text-white/50">

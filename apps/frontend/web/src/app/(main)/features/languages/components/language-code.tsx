@@ -4,7 +4,11 @@ import { Icon } from "@reloop/ui/icon";
 import { useState } from "react";
 import type { LanguageDefinition } from "../languages";
 
-export default function LanguageCode({ language }: { language: LanguageDefinition }) {
+export default function LanguageCode({
+	language,
+}: {
+	language: LanguageDefinition;
+}) {
 	const [copied, setCopied] = useState(false);
 
 	const handleCopy = async () => {
@@ -35,7 +39,9 @@ export default function LanguageCode({ language }: { language: LanguageDefinitio
 
 					<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-[#0a0a0a] font-mono text-[13px] leading-relaxed dark:border-white/10">
 						<div className="flex items-center justify-between border-white/5 border-b px-4 py-2 text-white/40 text-xs">
-							<span>send_email.{language.slug === "dotnet" ? "cs" : language.slug}</span>
+							<span>
+								send_email.{language.slug === "dotnet" ? "cs" : language.slug}
+							</span>
 							<button
 								type="button"
 								onClick={handleCopy}

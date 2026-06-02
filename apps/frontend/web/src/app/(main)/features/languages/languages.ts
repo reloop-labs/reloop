@@ -127,7 +127,7 @@ func main() {
 		name: "Rust",
 		shortDescription:
 			"Send email from Rust with an async-first crate built for performance-critical applications.",
-		installCommand: 'cargo add reloop tokio --features full',
+		installCommand: "cargo add reloop tokio --features full",
 		docsPath: "/docs/quickstart/rust",
 		icon: siRust,
 		highlights: ["Tokio", "Axum", "Type-safe"],

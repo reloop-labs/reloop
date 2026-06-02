@@ -11,7 +11,8 @@ export default function LanguagesGrid() {
 						Choose your stack
 					</h2>
 					<p className="mx-auto mt-4 max-w-xl text-base text-text-sub-600 dark:text-white/50">
-						Each SDK includes install guides, code samples, and links to framework-specific docs.
+						Each SDK includes install guides, code samples, and links to
+						framework-specific docs.
 					</p>
 				</div>
 

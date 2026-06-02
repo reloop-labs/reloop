@@ -1,7 +1,7 @@
+import type { Metadata } from "next";
 import IndexCta from "./components/index-cta";
 import IndexHero from "./components/index-hero";
 import LanguagesGrid from "./components/languages-grid";
-import type { Metadata } from "next";
 
 export const metadata: Metadata = {
 	title: "Send Email in Your Language | Reloop",

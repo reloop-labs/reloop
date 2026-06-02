@@ -1,7 +1,11 @@
 import Link from "next/link";
 import type { LanguageDefinition } from "../languages";
 
-export default function LanguageCta({ language }: { language: LanguageDefinition }) {
+export default function LanguageCta({
+	language,
+}: {
+	language: LanguageDefinition;
+}) {
 	return (
 		<section id="cta">
 			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
@@ -10,7 +14,8 @@ export default function LanguageCta({ language }: { language: LanguageDefinition
 						Start sending with {language.name}
 					</h2>
 					<p className="mx-auto mt-8 max-w-[550px] font-medium text-[#0a0d12]/60 text-[15px] leading-7 dark:text-white/60">
-						Get your API key and explore framework-specific tutorials in our documentation.
+						Get your API key and explore framework-specific tutorials in our
+						documentation.
 					</p>
 
 					<div className="mt-10 flex flex-wrap items-center justify-center gap-4">
@@ -29,7 +34,10 @@ export default function LanguageCta({ language }: { language: LanguageDefinition
 					</div>
 
 					<p className="mt-8 text-sm text-text-sub-600 dark:text-white/50">
-						<Link href="/features/languages" className="text-primary-base hover:underline">
+						<Link
+							href="/features/languages"
+							className="text-primary-base hover:underline"
+						>
 							← All languages
 						</Link>
 					</p>

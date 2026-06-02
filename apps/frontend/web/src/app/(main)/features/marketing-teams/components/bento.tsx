@@ -11,8 +11,9 @@ export default function Bento() {
 						Built for Team Collaboration
 					</h2>
 					<p className="mx-auto mt-4 max-w-xl text-[#0a0d12]/50 text-base">
-						Stop editing campaign code in isolation. Build templates, verify SPF/DKIM
-						records, and broadcast together with complete deliverability control.
+						Stop editing campaign code in isolation. Build templates, verify
+						SPF/DKIM records, and broadcast together with complete
+						deliverability control.
 					</p>
 				</div>
 
@@ -27,8 +28,9 @@ export default function Bento() {
 								AI-Powered Email Templates
 							</h3>
 							<p className="max-w-md text-[#0a0d12]/56 text-[14px] leading-[1.7]">
-								Generate highly engaging layout designs, subject lines, and marketing copy
-								from natural language prompts. Customize with safe dynamic tags to run personalized workflows.
+								Generate highly engaging layout designs, subject lines, and
+								marketing copy from natural language prompts. Customize with
+								safe dynamic tags to run personalized workflows.
 							</p>
 						</div>
 
@@ -68,7 +70,9 @@ export default function Bento() {
 								Live Collaborative Editor
 							</h3>
 							<p className="text-[#0a0d12]/56 text-[14px] leading-[1.7]">
-								Work seamlessly in real-time. Designers, copywriters, and developers can refine email drafts, see responsive rendering instantly, and sign off together.
+								Work seamlessly in real-time. Designers, copywriters, and
+								developers can refine email drafts, see responsive rendering
+								instantly, and sign off together.
 							</p>
 						</div>
 						<div className="mt-12 flex items-end justify-between">
@@ -107,7 +111,9 @@ export default function Bento() {
 								Broadcast Analytics
 							</h3>
 							<p className="text-[#0a0d12]/56 text-[14px] leading-[1.7]">
-								Scale campaigns with audience segmentation, visual performance logs, open-rate optimization suggestions, and deliverability health monitors.
+								Scale campaigns with audience segmentation, visual performance
+								logs, open-rate optimization suggestions, and deliverability
+								health monitors.
 							</p>
 						</div>
 						<div className="mt-12 flex flex-wrap gap-2">
@@ -130,7 +136,9 @@ export default function Bento() {
 								MTA Spam &amp; Reputation Alerts
 							</h3>
 							<p className="max-w-md text-[#0a0d12]/56 text-[14px] leading-[1.7]">
-								Protect your sending domain scores. Instantly intercept broken links, invalid email addresses, and spam triggers to safeguard campaign deliverability.
+								Protect your sending domain scores. Instantly intercept broken
+								links, invalid email addresses, and spam triggers to safeguard
+								campaign deliverability.
 							</p>
 						</div>
 
@@ -140,11 +148,14 @@ export default function Bento() {
 								<span className="text-teal-400">EXCELLENT</span>
 							</div>
 							<div className="flex justify-between text-teal-400">
-								<span>POST https://api.yourdomain.com/webhooks/deliverability</span>
+								<span>
+									POST https://api.yourdomain.com/webhooks/deliverability
+								</span>
 								<span className="text-emerald-400">200 OK</span>
 							</div>
 							<div className="text-white/40">
-								&#123; "type": "campaign.sent", "delivered": 4518, "bounce_score": "0.04%" &#125;
+								&#123; "type": "campaign.sent", "delivered": 4518,
+								"bounce_score": "0.04%" &#125;
 							</div>
 						</div>
 					</div>

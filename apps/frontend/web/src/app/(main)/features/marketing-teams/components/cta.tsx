@@ -12,7 +12,8 @@ export default function CTA() {
 					<span className="text-[#0a0d12]/40">Start for free.</span>
 				</h2>
 				<p className="mx-auto mt-8 max-w-[550px] font-medium text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[17px]">
-					Bring designers, copywriters, and developers together on Reloop today. Start sending your first campaign in minutes.
+					Bring designers, copywriters, and developers together on Reloop today.
+					Start sending your first campaign in minutes.
 				</p>
 
 				<div className="mt-10 flex flex-wrap items-center justify-center gap-4">

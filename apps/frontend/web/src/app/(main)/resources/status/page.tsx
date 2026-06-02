@@ -69,7 +69,9 @@ const StatusPage = () => {
 						{ value: "24/7", label: "Monitoring" },
 					].map((stat) => (
 						<div key={stat.label} className="text-center">
-							<div className="font-bold text-3xl text-primary-base">{stat.value}</div>
+							<div className="font-bold text-3xl text-primary-base">
+								{stat.value}
+							</div>
 							<div className="mt-1 text-sm text-text-sub-600 dark:text-white/50">
 								{stat.label}
 							</div>

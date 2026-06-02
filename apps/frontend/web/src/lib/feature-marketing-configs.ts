@@ -112,7 +112,8 @@ export const developersConfig: FeatureMarketingPageConfig = {
 	sections: [
 		{
 			title: "Supercharged developer experience",
-			description: "Integrate in minutes using modern tooling and event pipelines.",
+			description:
+				"Integrate in minutes using modern tooling and event pipelines.",
 			items: [
 				{
 					title: "Type-Safe Client SDKs",
@@ -215,11 +216,13 @@ export const emailValidationConfig: FeatureMarketingPageConfig = {
 			items: [
 				{
 					title: "Syntax Validation",
-					description: "RFC-compliant format checks catch typos and malformed addresses.",
+					description:
+						"RFC-compliant format checks catch typos and malformed addresses.",
 				},
 				{
 					title: "Domain Validation",
-					description: "Verify MX records and domain existence before you send.",
+					description:
+						"Verify MX records and domain existence before you send.",
 				},
 				{
 					title: "Deliverability Check",
@@ -314,15 +317,18 @@ export const webhooksConfig: FeatureMarketingPageConfig = {
 			items: [
 				{
 					title: "Signed payloads",
-					description: "HMAC signatures let you verify every request came from Reloop.",
+					description:
+						"HMAC signatures let you verify every request came from Reloop.",
 				},
 				{
 					title: "Retry logic",
-					description: "Automatic retries with exponential backoff for failed deliveries.",
+					description:
+						"Automatic retries with exponential backoff for failed deliveries.",
 				},
 				{
 					title: "Event logs",
-					description: "Debug delivery issues with a full history in the dashboard.",
+					description:
+						"Debug delivery issues with a full history in the dashboard.",
 				},
 			],
 		},
@@ -346,7 +352,8 @@ export const sdksConfig: FeatureMarketingPageConfig = {
 	sections: [
 		{
 			title: "Choose your language",
-			description: "Install from npm, PyPI, crates.io, Packagist, or Go modules.",
+			description:
+				"Install from npm, PyPI, crates.io, Packagist, or Go modules.",
 			items: [
 				{
 					title: "Node.js & TypeScript",
@@ -385,7 +392,8 @@ export const sdksConfig: FeatureMarketingPageConfig = {
 	cta: {
 		title: "Ready to integrate?",
 		titleMuted: "Pick your SDK.",
-		description: "Browse language-specific quickstarts and send your first email in minutes.",
+		description:
+			"Browse language-specific quickstarts and send your first email in minutes.",
 		primary: signup,
 		secondary: { label: "All languages", href: "/features/languages" },
 	},
@@ -400,25 +408,30 @@ export const apiReferenceConfig: FeatureMarketingPageConfig = {
 	sections: [
 		{
 			title: "Core API endpoints",
-			description: "Everything you need to send and monitor email programmatically.",
+			description:
+				"Everything you need to send and monitor email programmatically.",
 			items: [
 				{
 					title: "Send Email",
-					description: "POST transactional and marketing messages with HTML and text bodies.",
+					description:
+						"POST transactional and marketing messages with HTML and text bodies.",
 				},
 				{
 					title: "List Emails",
-					description: "Query sent messages with filters, pagination, and status.",
+					description:
+						"Query sent messages with filters, pagination, and status.",
 				},
 				{
 					title: "Analytics",
-					description: "Aggregate opens, clicks, and bounces for campaigns and domains.",
+					description:
+						"Aggregate opens, clicks, and bounces for campaigns and domains.",
 				},
 			],
 		},
 		{
 			title: "Official SDKs",
-			description: "Prefer a client library? We maintain SDKs for every major stack.",
+			description:
+				"Prefer a client library? We maintain SDKs for every major stack.",
 			alt: true,
 			items: [
 				{
@@ -439,7 +452,8 @@ export const apiReferenceConfig: FeatureMarketingPageConfig = {
 	cta: {
 		title: "Start with the API",
 		titleMuted: "Free tier available.",
-		description: "Create an API key and explore interactive docs with copy-paste examples.",
+		description:
+			"Create an API key and explore interactive docs with copy-paste examples.",
 		primary: signup,
 		secondary: { label: "API documentation", href: "/docs/api-reference" },
 	},
@@ -493,19 +507,23 @@ export const campaignBuilderConfig: FeatureMarketingPageConfig = {
 	sections: [
 		{
 			title: "Build campaigns visually",
-			description: "Everything you need to create on-brand emails without code.",
+			description:
+				"Everything you need to create on-brand emails without code.",
 			items: [
 				{
 					title: "Drag & Drop Editor",
-					description: "Compose layouts with blocks, images, and buttons in minutes.",
+					description:
+						"Compose layouts with blocks, images, and buttons in minutes.",
 				},
 				{
 					title: "Template Library",
-					description: "Start from proven templates and customize for your brand.",
+					description:
+						"Start from proven templates and customize for your brand.",
 				},
 				{
 					title: "Mobile Responsive",
-					description: "Emails look great on every device with responsive previews.",
+					description:
+						"Emails look great on every device with responsive previews.",
 				},
 			],
 		},
@@ -516,7 +534,8 @@ export const campaignBuilderConfig: FeatureMarketingPageConfig = {
 			items: [
 				{
 					title: "Choose Template",
-					description: "Pick a starting point from the library or your saved designs.",
+					description:
+						"Pick a starting point from the library or your saved designs.",
 				},
 				{
 					title: "Customize Design",
@@ -524,7 +543,8 @@ export const campaignBuilderConfig: FeatureMarketingPageConfig = {
 				},
 				{
 					title: "Schedule & Send",
-					description: "Target segments and schedule sends or trigger automations.",
+					description:
+						"Target segments and schedule sends or trigger automations.",
 				},
 			],
 		},

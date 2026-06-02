@@ -60,7 +60,8 @@ export default function Sandbox() {
 						Variables meet design
 					</h2>
 					<p className="mx-auto mt-6 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
-						Select a preset, edit the template markup, and pass JSON variables at send time.
+						Select a preset, edit the template markup, and pass JSON variables
+						at send time.
 					</p>
 				</div>
 

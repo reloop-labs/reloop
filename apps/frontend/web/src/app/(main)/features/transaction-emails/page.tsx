@@ -306,7 +306,6 @@ const TransactionEmailsPage = () => {
 		<div className="relative min-h-screen overflow-x-hidden bg-transparent font-sans text-text-strong-950 selection:bg-neutral-200 dark:text-white">
 			<section className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-transparent pt-40 pb-28">
 				<div className="relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-
 					<h1 className="font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[4.2rem] dark:text-white">
 						Programmatic Email Delivery
 						<br />

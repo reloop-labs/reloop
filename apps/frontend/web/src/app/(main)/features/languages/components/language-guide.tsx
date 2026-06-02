@@ -4,7 +4,11 @@ import type { LanguageDefinition } from "../languages";
 const stepCardClassName =
 	"flex flex-col justify-between border-stroke-soft-200 border-t border-l-0 bg-bg-weak-50 p-8 transition-colors duration-300 first:border-t-0 md:border-t md:border-l md:p-10 dark:border-white/10 dark:bg-transparent dark:hover:bg-white/[0.02] md:[&:nth-child(-n+3)]:border-t-0 md:[&:nth-child(3n+1)]:border-l-0";
 
-export default function LanguageGuide({ language }: { language: LanguageDefinition }) {
+export default function LanguageGuide({
+	language,
+}: {
+	language: LanguageDefinition;
+}) {
 	return (
 		<section
 			id="guide"
@@ -23,10 +27,14 @@ export default function LanguageGuide({ language }: { language: LanguageDefiniti
 							<div className="flex size-8 items-center justify-center rounded-lg bg-[#0a0d12] font-bold font-mono text-white text-xs dark:bg-white dark:text-black">
 								1
 							</div>
-							<h3 className="mt-4 font-semibold text-lg leading-snug">Install</h3>
+							<h3 className="mt-4 font-semibold text-lg leading-snug">
+								Install
+							</h3>
 							<p className="mt-4 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
 								Run{" "}
-								<code className="font-mono text-primary-base">{language.installCommand}</code>{" "}
+								<code className="font-mono text-primary-base">
+									{language.installCommand}
+								</code>{" "}
 								in your project.
 							</p>
 						</div>
@@ -36,9 +44,12 @@ export default function LanguageGuide({ language }: { language: LanguageDefiniti
 							<div className="flex size-8 items-center justify-center rounded-lg bg-[#0a0d12] font-bold font-mono text-white text-xs dark:bg-white dark:text-black">
 								2
 							</div>
-							<h3 className="mt-4 font-semibold text-lg leading-snug">Authenticate</h3>
+							<h3 className="mt-4 font-semibold text-lg leading-snug">
+								Authenticate
+							</h3>
 							<p className="mt-4 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Add your Reloop API key from the dashboard and verify a sending domain.
+								Add your Reloop API key from the dashboard and verify a sending
+								domain.
 							</p>
 						</div>
 					</div>
@@ -50,7 +61,10 @@ export default function LanguageGuide({ language }: { language: LanguageDefiniti
 							<h3 className="mt-4 font-semibold text-lg leading-snug">Send</h3>
 							<p className="mt-4 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
 								Copy the sample above or follow the{" "}
-								<Link href={language.docsPath} className="text-primary-base hover:underline">
+								<Link
+									href={language.docsPath}
+									className="text-primary-base hover:underline"
+								>
 									full {language.name} guide
 								</Link>
 								.
