@@ -96,7 +96,7 @@ export const useEditorHook = (collab: CollabOptions) => {
 				StarterKit.configure({ UndoRedo: false }),
 				...baseExtensions,
 				Variable,
-				VariableSuggestion,
+				VariableSuggestion as any,
 				imageExtension,
 				...collabExtensions,
 			] as any[],
