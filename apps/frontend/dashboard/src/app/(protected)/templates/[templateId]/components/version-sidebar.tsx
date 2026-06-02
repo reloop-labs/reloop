@@ -7,7 +7,7 @@ import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCurrentEditor } from "@tiptap/react";
-import { Clock, Eye, Loader2, Trash2, X } from "lucide-react";
+import { Clock, Eye, Loader2, Trash2, UploadCloud, X } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -106,6 +106,85 @@ function DeleteVersionModal({
 	);
 }
 
+/* ------------------------------------------------------------------ */
+/* Publish Version/Draft Confirmation Modal                          */
+/* ------------------------------------------------------------------ */
+interface PublishVersionModalProps {
+	isOpen: boolean;
+	onClose: () => void;
+	onConfirm: (description: string) => Promise<void>;
+	isPublishing: boolean;
+	versionLabel: string;
+}
+
+function PublishVersionModal({
+	isOpen,
+	onClose,
+	onConfirm,
+	isPublishing,
+	versionLabel,
+}: PublishVersionModalProps) {
+	const [description, setDescription] = useState("");
+
+	return (
+		<Modal.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+			<Modal.Content
+				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 font-sans sm:max-w-[400px]"
+				showClose={true}
+			>
+				<div className="rounded-2xl border border-stroke-soft-100/50">
+					<Modal.Header className="before:border-stroke-soft-200/50">
+						<div className="flex items-center justify-center">
+							<Icon name="info-outline" className="h-4 w-4" />
+						</div>
+						<div className="flex-1">
+							<Modal.Title>Publish {versionLabel}</Modal.Title>
+						</div>
+					</Modal.Header>
+					<Modal.Body className="space-y-3">
+						<p className="text-paragraph-sm text-text-sub-600 leading-relaxed">
+							This will create a new major production version based on the content of this draft, making it the active version for sends.
+						</p>
+						<div className="space-y-1.5 pt-2">
+							<span className="block font-semibold text-text-strong-950 text-xs">
+								Release Description / Changelog (Optional)
+							</span>
+							<textarea
+								placeholder="Describe what changed in this version..."
+								value={description}
+								onChange={(e) => setDescription(e.target.value)}
+								className="h-20 w-full rounded-lg border border-stroke-soft-200 bg-white p-2 text-xs text-zinc-900 outline-none focus:border-zinc-500 dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a] dark:text-zinc-50"
+							/>
+						</div>
+					</Modal.Body>
+					<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="stroke"
+							size="xsmall"
+							onClick={onClose}
+							disabled={isPublishing}
+						>
+							Cancel
+							<KbdEsc />
+						</Button.Root>
+						<Button.Root
+							type="button"
+							variant="primary"
+							size="xsmall"
+							onClick={() => onConfirm(description)}
+							disabled={isPublishing}
+						>
+							{isPublishing ? "Publishing..." : "Confirm & Publish"}
+						</Button.Root>
+					</Modal.Footer>
+				</div>
+			</Modal.Content>
+		</Modal.Root>
+	);
+}
+
 const fetcher = (url: string) =>
 	fetch(url, { credentials: "include" }).then((res) => res.json());
 
@@ -169,6 +248,10 @@ export function VersionSidebar() {
 		id: string;
 		label: string;
 	} | null>(null);
+
+	const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+	const [versionToPublish, setVersionToPublish] = useState<TemplateVersion | null>(null);
+	const [isPublishing, setIsPublishing] = useState(false);
 
 	const [restoringId, setRestoringId] = useState<string | null>(null);
 	const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -236,6 +319,68 @@ export function VersionSidebar() {
 			toast.error(err.message || "Cannot delete the active template version.");
 		} finally {
 			setDeletingId(null);
+		}
+	};
+
+	const handlePublishVersion = async (description: string) => {
+		if (!versionToPublish || !templateId || isPublishing) return;
+		setIsPublishing(true);
+
+		try {
+			// 1. Create the published version snapshot
+			const response = await fetch(`/api/template/v1/${templateId}/versions`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					content: versionToPublish.content,
+					renderedHtml: versionToPublish.renderedHtml,
+					isMajor: true,
+					description,
+					subject: versionToPublish.subject,
+					fromEmail: versionToPublish.fromEmail,
+					replyTo: versionToPublish.replyTo,
+					previewText: versionToPublish.previewText,
+				}),
+				credentials: "include",
+			});
+
+			if (!response.ok) {
+				const errData = await response.json().catch(() => ({}));
+				throw new Error(errData.message || "Failed to publish version.");
+			}
+
+			// 2. Sync the template baseline so reopening always finds the published content
+			await fetch(`/api/template/v1/${templateId}`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					content: versionToPublish.content,
+					subject: versionToPublish.subject,
+					fromEmail: versionToPublish.fromEmail,
+					replyTo: versionToPublish.replyTo,
+					previewText: versionToPublish.previewText,
+				}),
+				credentials: "include",
+			}).catch((err) =>
+				console.warn("[publish] Failed to sync template baseline:", err),
+			);
+
+			const result = await response.json();
+			const pubNum = result.publishNumber ?? null;
+
+			toast.success(
+				pubNum ? `Published version as v${pubNum}` : "Version published successfully!",
+			);
+
+			setIsPublishModalOpen(false);
+			setVersionToPublish(null);
+			mutate();
+		} catch (error) {
+			console.error("Failed to publish version from history:", error);
+			const err = error as Error;
+			toast.error(err.message || "Failed to publish version.");
+		} finally {
+			setIsPublishing(false);
 		}
 	};
 
@@ -370,8 +515,30 @@ export function VersionSidebar() {
 										</div>
 									</div>
 
-									{/* Interactive Actions (shown on hover) */}
-									<div className="absolute top-[20px] right-2 flex items-center gap-1 rounded-lg border border-zinc-100 bg-white/95 p-0.5 opacity-0 shadow-sm transition-opacity group-hover:opacity-100 dark:border-zinc-800 dark:bg-[#0a0a0a]/95">
+									{/* Interactive Actions (shown on hover, no backgrounds/borders) */}
+									<div className="absolute top-[20px] right-2 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+										{/* Publish action (only for drafts) */}
+										{!version.isMajor && (
+											<Tooltip.Root>
+												<Tooltip.Trigger asChild>
+													<Button.Root
+														variant="neutral"
+														mode="ghost"
+														size="xxsmall"
+														onClick={(e) => {
+															e.stopPropagation();
+															setVersionToPublish(version);
+															setIsPublishModalOpen(true);
+														}}
+														className="size-6 rounded-md p-1 text-zinc-500 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+													>
+														<UploadCloud size={13} />
+													</Button.Root>
+												</Tooltip.Trigger>
+												<Tooltip.Content side="top">Publish Draft</Tooltip.Content>
+											</Tooltip.Root>
+										)}
+
 										{/* Preview action */}
 										<Tooltip.Root>
 											<Tooltip.Trigger asChild>
@@ -456,6 +623,21 @@ export function VersionSidebar() {
 					}
 				}}
 				versionLabel={versionToDelete?.label || "Version"}
+			/>
+
+			<PublishVersionModal
+				isOpen={isPublishModalOpen}
+				onClose={() => {
+					setIsPublishModalOpen(false);
+					setVersionToPublish(null);
+				}}
+				onConfirm={handlePublishVersion}
+				isPublishing={isPublishing}
+				versionLabel={
+					versionToPublish
+						? versionToPublish.name || (versionToPublish.isMajor ? `v${getMajorVersionNumber(versionToPublish.id)}.0` : "Draft")
+						: "Draft"
+				}
 			/>
 		</div>
 	);
