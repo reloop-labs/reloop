@@ -9,9 +9,6 @@
 		"lint": "next lint"
 	},
 	"dependencies": {
-		"@ai-sdk/google": "^3.0.67",
-		"@ai-sdk/openai": "^3.0.60",
-		"@ai-sdk/react": "^3.0.177",
 		"@better-auth/api-key": "catalog:",
 		"@codemirror/lang-html": "^6.4.11",
 		"@dnd-kit/core": "catalog:ui",
@@ -33,7 +30,6 @@
 		"@uiw/codemirror-theme-tokyo-night": "^4.25.10",
 		"@uiw/codemirror-theme-xcode": "^4.25.10",
 		"@uiw/react-codemirror": "^4.25.10",
-		"ai": "^6.0.175",
 		"axios": "catalog:",
 		"babel-plugin-react-compiler": "catalog:ui",
 		"better-auth": "catalog:",
