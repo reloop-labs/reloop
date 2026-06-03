@@ -1,5 +1,6 @@
 "use client";
 
+import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { useState } from "react";
@@ -8,12 +9,13 @@ import { siNodedotjs, siPython } from "simple-icons";
 type Language = "node" | "python";
 
 const SMTP_HOST = "smtp.reloop.sh";
-const SMTP_PORT = "587/2587/2465";
+const SMTP_PORTS = "587/2587/2465";
 const SMTP_USER = "reloop";
+const DEFAULT_SMTP_PORT = 587;
 
 const copySettings = [
 	{ label: "Host", value: SMTP_HOST },
-	{ label: "Port", value: SMTP_PORT },
+	{ label: "Port", value: SMTP_PORTS },
 	{ label: "Username", value: SMTP_USER },
 ];
 
@@ -22,7 +24,7 @@ const snippets: Record<Language, string> = {
 
 const transporter = nodemailer.createTransport({
   host: '${SMTP_HOST}',
-  port: ${SMTP_PORT},
+  port: ${DEFAULT_SMTP_PORT},
   secure: false, // use STARTTLS
   auth: {
     user: '${SMTP_USER}',
@@ -46,11 +48,91 @@ msg["To"] = "user@example.com"
 msg["Subject"] = "Hello from Reloop"
 msg.set_content("Sent via SMTP relay.")
 
-with smtplib.SMTP("${SMTP_HOST}", ${SMTP_PORT}) as server:
+with smtplib.SMTP("${SMTP_HOST}", ${DEFAULT_SMTP_PORT}) as server:
     server.starttls()
     server.login("${SMTP_USER}", os.environ["RELOOP_API_KEY"])
     server.send_message(msg)`,
 };
+
+const languageTabs = [
+	{ id: "node", label: "Node.js", si: siNodedotjs },
+	{ id: "python", label: "Python", si: siPython },
+] as const;
+
+const codeGuide: Record<
+	Language,
+	{ eyebrow: string; title: string; description: string; points: string[] }
+> = {
+	node: {
+		eyebrow: "Example",
+		title: "Connect with Nodemailer",
+		description:
+			"Drop this into your backend. Your API key goes in RELOOP_API_KEY — the same value you use as the SMTP password.",
+		points: [
+			"Port 587 with STARTTLS",
+			"Works with Express, Next.js, and any Node mailer",
+		],
+	},
+	python: {
+		eyebrow: "Example",
+		title: "Connect with smtplib",
+		description:
+			"Python's standard library is enough. Set RELOOP_API_KEY in your environment and run the script.",
+		points: [
+			"Port 587 with STARTTLS",
+			"No extra packages — smtplib ships with Python",
+		],
+	},
+};
+
+function CodeGuidePanel({ lang }: { lang: Language }) {
+	const guide = codeGuide[lang];
+
+	return (
+		<div className="flex flex-col lg:pr-4">
+			<p className="font-semibold text-[11px] text-primary-base uppercase tracking-[0.16em]">
+				{guide.eyebrow}
+			</p>
+			<h3 className="mt-3 font-serif text-[1.75rem] text-text-strong-950 leading-[1.1] tracking-tighter sm:text-[2rem] dark:text-white">
+				{guide.title}
+			</h3>
+			<p className="mt-4 text-[15px] text-text-sub-600 leading-7 dark:text-white/50">
+				{guide.description}
+			</p>
+			<ul className="mt-6 space-y-3">
+				{guide.points.map((point) => (
+					<li
+						key={point}
+						className="flex items-start gap-2.5 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50"
+					>
+						<span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary-base" />
+						{point}
+					</li>
+				))}
+			</ul>
+			<Link
+				href="/docs/quickstart/smtp"
+				className="mt-8 inline-flex items-center gap-1.5 font-semibold text-primary-base text-sm transition-colors hover:text-primary-dark"
+			>
+				View SMTP docs
+				<svg
+					viewBox="0 0 24 24"
+					className="size-4"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="2"
+					aria-hidden
+				>
+					<path
+						d="M5 12h14M13 6l6 6-6 6"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+					/>
+				</svg>
+			</Link>
+		</div>
+	);
+}
 
 function CopySetting({ label, value }: { label: string; value: string }) {
 	const [copied, setCopied] = useState(false);
@@ -65,7 +147,7 @@ function CopySetting({ label, value }: { label: string; value: string }) {
 		<button
 			type="button"
 			onClick={handleCopy}
-			className="group flex w-full flex-col rounded-xl border border-stroke-soft-200 px-4 py-3 text-left transition-colors hover:border-primary-base/40 hover:bg-primary-base/[0.03] dark:border-white/10 dark:hover:border-primary-base/30"
+			className="group flex w-full flex-col rounded-xl border border-stroke-soft-100 px-4 py-3 text-left transition-colors hover:border-primary-base/40 hover:bg-primary-base/[0.03] dark:border-stroke-soft-100/40 dark:hover:border-primary-base/30"
 		>
 			<div className="flex items-center justify-between gap-2">
 				<span className="font-semibold text-[11px] text-primary-base uppercase tracking-[0.12em]">
@@ -87,7 +169,7 @@ function PasswordSetting() {
 	return (
 		<Link
 			href="/dashboard/signup"
-			className="group flex w-full flex-col rounded-xl border border-stroke-soft-200 px-4 py-3 transition-colors hover:border-primary-base/40 hover:bg-primary-base/[0.03] dark:border-white/10 dark:hover:border-primary-base/30"
+			className="group flex w-full flex-col rounded-xl border border-stroke-soft-100 px-4 py-3 transition-colors hover:border-primary-base/40 hover:bg-primary-base/[0.03] dark:border-stroke-soft-100/40 dark:hover:border-primary-base/30"
 		>
 			<span className="font-semibold text-[11px] text-primary-base uppercase tracking-[0.12em]">
 				Password
@@ -115,13 +197,6 @@ function PasswordSetting() {
 
 export default function Sandbox() {
 	const [lang, setLang] = useState<Language>("node");
-	const [copied, setCopied] = useState(false);
-
-	const handleCopy = async () => {
-		await navigator.clipboard.writeText(snippets[lang]);
-		setCopied(true);
-		setTimeout(() => setCopied(false), 2000);
-	};
 
 	return (
 		<section id="setup" className="scroll-mt-24">
@@ -135,12 +210,12 @@ export default function Sandbox() {
 						<span className="text-primary-base">paste into your app.</span>
 					</h2>
 					<p className="mt-4 text-[15px] text-text-sub-600 leading-7 dark:text-white/50">
-						Same host and port everywhere. Grab an API key from the dashboard
-						for the password.
+						Same host and port everywhere. Grab an API key from the dashboard for
+						the password.
 					</p>
 				</div>
 
-				<div className="mx-auto max-w-3xl space-y-4">
+				<div className="mx-auto max-w-5xl space-y-8">
 					<div className="grid gap-3 sm:grid-cols-2">
 						{copySettings.map((setting) => (
 							<CopySetting key={setting.label} {...setting} />
@@ -148,50 +223,16 @@ export default function Sandbox() {
 						<PasswordSetting />
 					</div>
 
-					<div className="rounded-2xl border border-stroke-soft-200 p-5 md:p-6 dark:border-white/10">
-						<div className="flex flex-col gap-4 border-stroke-soft-200 border-b pb-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
-							<div className="flex gap-1 rounded-xl border border-stroke-soft-200 bg-bg-soft-50 p-1 dark:border-white/10">
-								{(["node", "python"] as Language[]).map((key) => (
-									<button
-										key={key}
-										type="button"
-										onClick={() => setLang(key)}
-										className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-semibold text-xs transition-colors ${
-											lang === key
-												? "bg-[#0a0d12] text-white dark:bg-white dark:text-black"
-												: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50"
-										}`}
-									>
-										<svg viewBox="0 0 24 24" className="size-3.5 fill-current">
-											<path
-												d={key === "node" ? siNodedotjs.path : siPython.path}
-											/>
-										</svg>
-										{key === "node" ? "Node.js" : "Python"}
-									</button>
-								))}
-							</div>
-							<p className="font-mono text-[12px] text-text-sub-600 dark:text-white/50">
-								Or paste into any SMTP mailer
-							</p>
-						</div>
-
-						<div className="mt-4 overflow-hidden rounded-xl border border-stroke-soft-200 bg-[#0a0a0a] font-mono text-[13px] leading-relaxed dark:border-white/10">
-							<div className="flex items-center justify-between border-white/5 border-b px-4 py-2 text-white/40 text-xs">
-								<span>smtp.{lang === "node" ? "js" : "py"}</span>
-								<button
-									type="button"
-									onClick={handleCopy}
-									className="flex items-center gap-1.5 rounded-md px-2 py-1 transition-colors hover:bg-white/5 hover:text-white"
-								>
-									<Icon name="copy" className="size-3.5" />
-									{copied ? "Copied" : "Copy"}
-								</button>
-							</div>
-							<pre className="max-h-[320px] overflow-auto p-4 text-white/80">
-								{snippets[lang]}
-							</pre>
-						</div>
+					<div className="grid items-start gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-10">
+						<CodeGuidePanel lang={lang} />
+						<CopyCodeBlock
+							code={snippets[lang]}
+							lang={lang === "node" ? "javascript" : "python"}
+							windowTitle={lang === "node" ? "smtp.js" : "smtp.py"}
+							tabs={[...languageTabs]}
+							activeTab={lang}
+							onTabChange={(id) => setLang(id as Language)}
+						/>
 					</div>
 				</div>
 			</div>

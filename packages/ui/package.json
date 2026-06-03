@@ -21,6 +21,7 @@
 		"./tab-menu-horizontal": "./src/components/tab-menu-horizontal.tsx",
 		"./use-tab-observer": "./src/hooks/use-tab-observer.ts",
 		"./code-block": "./src/components/code-block.tsx",
+		"./copy-code-block": "./src/components/copy-code-block.tsx",
 		"./button": "./src/components/button.tsx",
 		"./button-group": "./src/components/button-group.tsx",
 		"./calendar": "./src/components/datepicker.tsx",
