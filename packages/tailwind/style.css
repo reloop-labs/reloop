@@ -1090,11 +1090,12 @@
 		overscroll-behavior-y: none;
 	}
 
-	@media (prefers-reduced-motion: no-preference) {
-		html:focus-within {
-			scroll-behavior: smooth;
-		}
-	}
+	/*
+	 * Removed scroll-behavior: smooth from html:focus-within.
+	 * On Windows, CSS smooth-scroll makes wheel/trackpad scrolling feel
+	 * delayed and "heavy" because the browser interpolates every frame.
+	 * For anchor-link smooth scrolling, use element.scrollIntoView({ behavior: 'smooth' }) in JS instead.
+	 */
 }
 
 @layer utilities {

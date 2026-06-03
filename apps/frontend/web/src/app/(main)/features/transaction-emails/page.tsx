@@ -354,7 +354,7 @@ const TransactionEmailsPage = () => {
 						</p>
 					</div>
 
-					<div className="rounded-2xl border border-[#0a0d12]/8 bg-zinc-50/30 p-6 shadow-sm backdrop-blur-xl md:p-8">
+					<div className="rounded-2xl border border-[#0a0d12]/8 bg-zinc-50/80 p-6 shadow-sm md:p-8">
 						<div className="flex flex-col gap-8 lg:flex-row">
 							{/* Sandbox Editor (Left Side) */}
 							<div className="flex min-w-0 flex-1 flex-col">

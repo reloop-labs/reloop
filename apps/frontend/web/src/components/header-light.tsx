@@ -56,18 +56,25 @@ export const HeaderLight = () => {
 	}, []);
 
 	useEffect(() => {
+		let ticking = false;
 		const handleScroll = () => {
-			setScrolled(window.scrollY > 20);
+			if (!ticking) {
+				requestAnimationFrame(() => {
+					setScrolled(window.scrollY > 20);
+					ticking = false;
+				});
+				ticking = true;
+			}
 		};
-		window.addEventListener("scroll", handleScroll);
+		window.addEventListener("scroll", handleScroll, { passive: true });
 		return () => window.removeEventListener("scroll", handleScroll);
 	}, []);
 
 	return (
-		<header className="fixed top-0 right-0 left-0 z-50 flex justify-center p-4 transition-all duration-500">
+		<header className="fixed top-0 right-0 left-0 z-50 flex justify-center p-4">
 			<div
 				onMouseLeave={() => setActiveMega(null)}
-				className={`flex items-center justify-between rounded-[20px] pr-3 transition-all duration-500 ease-in-out ${
+				className={`flex items-center justify-between rounded-[20px] pr-3 transition-[border-color,background-color,box-shadow,height,max-width] duration-500 ease-in-out ${
 					scrolled
 						? "h-15 w-full max-w-[1000px] border border-[#0a0d12]/10 bg-white shadow-[#0a0d12]/5 shadow-sm"
 						: "h-16 w-full max-w-[1100px] border-transparent bg-transparent shadow-none"
@@ -76,7 +83,7 @@ export const HeaderLight = () => {
 				<Link href="/" className="flex items-center pl-2">
 					<Logo
 						theme="light"
-						className={`transition-all duration-500 ${
+						className={`transition-[width] duration-500 ${
 							scrolled ? "w-12" : "w-14"
 						}`}
 					/>
