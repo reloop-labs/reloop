@@ -323,13 +323,13 @@ export const Header = () => {
 	const activeItem = navItems.find((item) => item.title === activeMega);
 
 	return (
-		<header className="fixed top-0 right-0 left-0 z-50 flex justify-center p-4 transition-all duration-500">
+		<header className="gpu-promote fixed top-0 right-0 left-0 z-50 flex justify-center p-4">
 			<motion.div
 				onMouseLeave={() => setActiveMega(null)}
-				className={`flex flex-col overflow-hidden rounded-[24px] transition-all duration-500 ease-in-out ${
+				className={`flex flex-col overflow-hidden rounded-[24px] transition-[border-color,box-shadow,background-color] duration-300 ease-out ${
 					isLight
 						? "w-full max-w-[1000px] border border-[#0a0d12]/10 bg-white shadow-[#0a0d12]/5 shadow-sm"
-						: "w-full max-w-[1000px] border border-white/10 bg-black/90 backdrop-blur-xl"
+						: "w-full max-w-[1000px] border border-white/10 bg-[#0a0a0a]/95"
 				}`}
 			>
 				<div className="flex h-15 w-full items-center justify-between pr-3 transition-all duration-500">
@@ -382,7 +382,7 @@ export const Header = () => {
 							className={`inline-flex items-center justify-center gap-2 rounded-[12px] border px-4 py-2 font-semibold text-[13px] transition-all ${
 								isLight
 									? "border-[#0a0d12]/10 bg-[#0a0d12]/4 text-[#0a0d12] hover:border-[#0a0d12]/20 hover:bg-[#0a0d12]/8"
-									: "border-white/10 bg-white/5 text-white backdrop-blur-sm hover:border-white/20 hover:bg-white/10"
+									: "border-white/10 bg-white/10 text-white hover:border-white/20 hover:bg-white/15"
 							}`}
 						>
 							<Icon name="social-github" className="size-3.5" />

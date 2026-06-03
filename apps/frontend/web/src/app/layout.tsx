@@ -61,9 +61,13 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" suppressHydrationWarning className={openRunde.variable}>
+		<html
+			lang="en"
+			suppressHydrationWarning
+			className={`${openRunde.variable} scroll-auto overscroll-y-none`}
+		>
 			<body
-				className="bg-bg-white-0 antialiased"
+				className="min-h-full overscroll-y-none bg-bg-white-0 antialiased"
 				style={{ fontFamily: "var(--font-open-runde)" }}
 			>
 				<ThemeProvider

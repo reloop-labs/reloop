@@ -1074,6 +1074,42 @@
 	animation: spinnerFade 1.2s linear infinite;
 }
 
+/*
+ * Native scroll tuning — keeps wheel/trackpad scrolling crisp on Windows.
+ * Avoid scroll-smooth on html; it makes wheel scrolling feel laggy on Windows
+ * while macOS trackpads already have momentum scrolling built in.
+ */
+@layer base {
+	html {
+		scroll-behavior: auto;
+		scrollbar-gutter: stable;
+		overscroll-behavior-y: none;
+	}
+
+	body {
+		overscroll-behavior-y: none;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		html:focus-within {
+			scroll-behavior: smooth;
+		}
+	}
+}
+
+@layer utilities {
+	.scroll-native {
+		scroll-behavior: auto;
+		overscroll-behavior-y: none;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.gpu-promote {
+		transform: translateZ(0);
+		backface-visibility: hidden;
+	}
+}
+
 .hide-scrollbar {
 	-ms-overflow-style: none;
 	scrollbar-width: none;
