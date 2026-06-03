@@ -53,7 +53,9 @@ export const ThreadDetail = ({
 		if (!thread) return;
 		try {
 			await markMessageRead(thread.id, thread.unread);
-			toast.success(thread.unread ? "Message marked as handled" : "Message marked as new");
+			toast.success(
+				thread.unread ? "Message marked as handled" : "Message marked as new",
+			);
 		} catch (err: any) {
 			toast.error(err.message || "Failed to update message status");
 		}

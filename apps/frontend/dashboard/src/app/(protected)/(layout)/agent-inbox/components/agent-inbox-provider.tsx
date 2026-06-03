@@ -1,7 +1,6 @@
 "use client";
 
 import type { DomainListResponse } from "@fe/dashboard/types/api.types";
-import useSWR, { useSWRConfig } from "swr";
 import {
 	createContext,
 	type ReactNode,
@@ -9,10 +8,8 @@ import {
 	useContext,
 	useMemo,
 } from "react";
-import {
-	type AgentMailbox,
-	type InboundThread,
-} from "../mock-data";
+import useSWR, { useSWRConfig } from "swr";
+import type { AgentMailbox, InboundThread } from "../mock-data";
 
 export type NewAgentAddressInput = {
 	label: string;
@@ -62,7 +59,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			email: mb.email,
 			label: mb.email.split("@")[0] || "Agent",
 			description: `Quota: ${mb.quota || "5 GB"}`,
-			status: mb.status === "active" ? ("active" as const) : ("disabled" as const),
+			status:
+				mb.status === "active" ? ("active" as const) : ("disabled" as const),
 			securityLevel: 5 as const,
 			createdAt: mb.createdAt || new Date().toISOString(),
 		}));
@@ -77,7 +75,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			from: { email: msg.fromEmail },
 			subject: msg.subject || "(No Subject)",
 			preview: msg.textBody
-				? msg.textBody.substring(0, 120) + (msg.textBody.length > 120 ? "..." : "")
+				? msg.textBody.substring(0, 120) +
+					(msg.textBody.length > 120 ? "..." : "")
 				: "",
 			bodyText: msg.textBody || "",
 			bodyHtml: msg.htmlBody || undefined,
@@ -85,14 +84,23 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			status: msg.isRead ? ("handled" as const) : ("new" as const),
 			securityLevel: 5 as const,
 			unread: !msg.isRead,
-			attachments: msg.attachments?.map((att: any) => ({
-				name: att.filename,
-				size: `${(att.size / 1024).toFixed(1)} KB`,
-			})) || [],
+			attachments:
+				msg.attachments?.map((att: any) => ({
+					name: att.filename,
+					size: `${(att.size / 1024).toFixed(1)} KB`,
+				})) || [],
 			timeline: [
 				{ label: "Email received", at: msg.createdAt, state: "done" as const },
-				{ label: "Delivered to NATS", at: msg.createdAt, state: "done" as const },
-				{ label: "Inbox storage complete", at: msg.createdAt, state: "done" as const },
+				{
+					label: "Delivered to NATS",
+					at: msg.createdAt,
+					state: "done" as const,
+				},
+				{
+					label: "Inbox storage complete",
+					at: msg.createdAt,
+					state: "done" as const,
+				},
 			],
 		}));
 	}, [messagesData]);
@@ -148,7 +156,9 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 			if (!res.ok) {
 				const body = await res.text();
-				throw new Error(body || `Failed to mark message as ${isRead ? "read" : "unread"}`);
+				throw new Error(
+					body || `Failed to mark message as ${isRead ? "read" : "unread"}`,
+				);
 			}
 
 			await mutateMessages();

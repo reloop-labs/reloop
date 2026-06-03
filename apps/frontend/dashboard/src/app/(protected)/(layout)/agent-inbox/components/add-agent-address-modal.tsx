@@ -3,11 +3,12 @@
 import type { DomainListResponse } from "@fe/dashboard/types/api.types";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import * as Select from "@reloop/ui/select";
+import Spinner from "@reloop/ui/spinner";
 import * as Textarea from "@reloop/ui/textarea";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -107,7 +108,10 @@ export const AddAgentAddressModal = ({
 			onCreated?.(mailbox);
 			router.push(`/agent-inbox/${mailbox.id}`);
 		} catch (error) {
-			const errMsg = error instanceof Error ? error.message : "Failed to create agent address";
+			const errMsg =
+				error instanceof Error
+					? error.message
+					: "Failed to create agent address";
 			toast.error(errMsg);
 		} finally {
 			setIsSubmitting(false);
@@ -116,52 +120,94 @@ export const AddAgentAddressModal = ({
 
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
-			<Modal.Content className="max-w-[440px]">
+			<Modal.Content
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 p-0 sm:max-w-[440px] dark:border-stroke-soft-100/40"
+				showClose={false}
+			>
 				<form onSubmit={form.handleSubmit(onSubmit)}>
-					<Modal.Header>
-						<Modal.Title>Add agent address</Modal.Title>
-						<Modal.Description>
-							Create a dedicated inbound email for an AI agent. Messages to this
-							address appear in Agent Inbox.
-						</Modal.Description>
-					</Modal.Header>
-					<Modal.Body className="flex flex-col gap-4">
-						<div className="space-y-1.5">
-							<Label.Root htmlFor="agent-label">Agent name</Label.Root>
-							<Input.Root>
+					<div className="flex flex-col border-stroke-soft-100 border-b dark:border-stroke-soft-100/40">
+						<div className="flex items-start justify-between px-5 pt-5 pb-4">
+							<div className="flex flex-col gap-1">
+								<div className="flex items-center gap-2.5">
+									<Icon name="mail-single" className="h-4 w-4 text-text-strong-950" />
+									<Modal.Title asChild>
+										<h2 className="font-semibold text-label-md text-text-strong-950">
+											Add agent address
+										</h2>
+									</Modal.Title>
+								</div>
+								<p className="text-paragraph-xs text-text-sub-600">
+									Create a dedicated inbound email for an AI agent. Messages to this
+									address appear in Agent Inbox.
+								</p>
+							</div>
+							<button
+								type="button"
+								onClick={() => onOpenChange(false)}
+								className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50"
+							>
+								<Icon name="cross" className="h-3.5 w-3.5" />
+							</button>
+						</div>
+					</div>
+
+					<Modal.Body className="space-y-4 px-5 py-4 pb-5">
+						<div className="flex flex-col gap-1.5">
+							<label
+								htmlFor="agent-label"
+								className="font-medium text-label-sm text-text-strong-950"
+							>
+								Agent name
+								<span className="ml-0.5 text-error-base">*</span>
+							</label>
+							<Input.Root size="xsmall" hasError={!!form.formState.errors.label}>
 								<Input.Wrapper>
 									<Input.Input
 										id="agent-label"
 										placeholder="e.g. Support Agent"
 										{...form.register("label")}
+										disabled={isSubmitting}
 									/>
 								</Input.Wrapper>
 							</Input.Root>
 							{form.formState.errors.label && (
-								<p className="text-paragraph-xs text-red-600">
+								<p className="text-error-base text-paragraph-xs">
 									{form.formState.errors.label.message}
 								</p>
 							)}
 						</div>
 
-						<div className="space-y-1.5">
-							<Label.Root>Email address</Label.Root>
+						<div className="flex flex-col gap-1.5">
+							<label
+								htmlFor="agent-email"
+								className="font-medium text-label-sm text-text-strong-950"
+							>
+								Email address
+								<span className="ml-0.5 text-error-base">*</span>
+							</label>
 							<div className="flex items-center gap-2">
-								<Input.Root className="flex-1">
+								<Input.Root
+									size="xsmall"
+									className="flex-1"
+									hasError={!!form.formState.errors.localPart}
+								>
 									<Input.Wrapper>
 										<Input.Input
+											id="agent-email"
 											placeholder="support-agent"
 											{...form.register("localPart")}
+											disabled={isSubmitting}
 										/>
 									</Input.Wrapper>
 								</Input.Root>
-								<span className="text-text-sub-600">@</span>
+								<span className="font-medium text-label-sm text-text-sub-600">@</span>
 								<Select.Root
 									value={form.watch("domain")}
 									onValueChange={(v) => form.setValue("domain", v)}
 									size="small"
+									disabled={isSubmitting}
 								>
-									<Select.Trigger className="w-[140px]">
+									<Select.Trigger className="h-[32px] w-[160px] rounded-[10px]">
 										<Select.Value />
 									</Select.Trigger>
 									<Select.Content>
@@ -175,31 +221,44 @@ export const AddAgentAddressModal = ({
 							</div>
 							{(form.formState.errors.localPart ||
 								form.formState.errors.domain) && (
-								<p className="text-paragraph-xs text-red-600">
+								<p className="text-error-base text-paragraph-xs">
 									{form.formState.errors.localPart?.message ??
 										form.formState.errors.domain?.message}
 								</p>
 							)}
 						</div>
 
-						<div className="space-y-1.5">
-							<Label.Root htmlFor="agent-description">Purpose</Label.Root>
+						<div className="flex flex-col gap-1.5">
+							<label
+								htmlFor="agent-description"
+								className="font-medium text-label-sm text-text-strong-950"
+							>
+								Purpose
+								<span className="ml-0.5 text-error-base">*</span>
+							</label>
 							<Textarea.Root
 								simple
 								id="agent-description"
 								placeholder="What this agent handles..."
-								rows={2}
+								rows={3}
+								className="rounded-[10px] text-label-sm"
 								{...form.register("description")}
+								disabled={isSubmitting}
 							/>
 							{form.formState.errors.description && (
-								<p className="text-paragraph-xs text-red-600">
+								<p className="text-error-base text-paragraph-xs">
 									{form.formState.errors.description.message}
 								</p>
 							)}
 						</div>
 
-						<div className="space-y-1.5">
-							<Label.Root>Security level</Label.Root>
+						<div className="flex flex-col gap-1.5">
+							<label
+								htmlFor="agent-security"
+								className="font-medium text-label-sm text-text-strong-950"
+							>
+								Security level
+							</label>
 							<Select.Root
 								value={form.watch("securityLevel")}
 								onValueChange={(v) =>
@@ -209,8 +268,9 @@ export const AddAgentAddressModal = ({
 									)
 								}
 								size="small"
+								disabled={isSubmitting}
 							>
-								<Select.Trigger>
+								<Select.Trigger id="agent-security" className="h-[32px] rounded-[10px]">
 									<Select.Value />
 								</Select.Trigger>
 								<Select.Content>
@@ -236,25 +296,54 @@ export const AddAgentAddressModal = ({
 							.
 						</p>
 					</Modal.Body>
-					<Modal.Footer>
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="stroke"
-							onClick={() => onOpenChange(false)}
-						>
-							Cancel
-						</Button.Root>
-						<Button.Root
-							type="submit"
-							variant="primary"
-							disabled={isSubmitting}
-						>
-							{isSubmitting ? "Creating…" : "Create address"}
-						</Button.Root>
-					</Modal.Footer>
+
+					<div className="flex items-center justify-end border-stroke-soft-100 border-t px-5 py-3.5 dark:border-stroke-soft-100/50">
+						<div className="flex items-center gap-2">
+							<Button.Root
+								type="button"
+								variant="neutral"
+								mode="stroke"
+								size="xsmall"
+								onClick={() => onOpenChange(false)}
+								disabled={isSubmitting}
+							>
+								Cancel
+								<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
+									Esc
+								</span>
+							</Button.Root>
+							<Button.Root
+								type="submit"
+								variant="neutral"
+								size="xsmall"
+								disabled={isSubmitting}
+							>
+								{isSubmitting ? (
+									<>
+										<Spinner size={12} color="currentColor" />
+										Creating...
+									</>
+								) : (
+									<>
+										Create address
+										<span className="inline-flex items-center gap-0.5">
+											<Icon
+												name="command"
+												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+											/>
+											<Icon
+												name="enter"
+												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+											/>
+										</span>
+									</>
+								)}
+							</Button.Root>
+						</div>
+					</div>
 				</form>
 			</Modal.Content>
 		</Modal.Root>
 	);
 };
+
