@@ -8,15 +8,15 @@ import {
 	siLaravel,
 	siMetabase,
 	siNestjs,
-	siNextdotjs,
 	siNodedotjs,
 	siPhp,
-	siRetool,
 	siRubyonrails,
 	siShopify,
 	siSpring,
 	siSupabase,
 	siWordpress,
+	siZapier,
+	siN8n,
 } from "simple-icons";
 
 type Integration = {
@@ -32,7 +32,7 @@ const columns: Integration[][] = [
 	[{ label: "WordPress", href: `${smtpDocs}/wordpress`, icon: siWordpress }],
 	[
 		{ label: "Laravel", href: `${smtpDocs}/laravel`, icon: siLaravel },
-		{ label: "Retool", href: `${smtpDocs}/retool`, icon: siRetool },
+		{ label: "n8n", href: smtpDocs, icon: siN8n },
 	],
 	[
 		{ label: "Nodemailer", href: `${smtpDocs}/nodemailer`, icon: siNodedotjs },
@@ -45,7 +45,7 @@ const columns: Integration[][] = [
 	],
 	[
 		{ label: "Supabase", href: `${smtpDocs}/supabase`, icon: siSupabase },
-		{ label: "NextAuth", href: `${smtpDocs}/nextauth`, icon: siNextdotjs },
+		{ label: "Zapier", href: smtpDocs, icon: siZapier },
 		{ label: "NestJS", href: smtpDocs, icon: siNestjs },
 	],
 	[

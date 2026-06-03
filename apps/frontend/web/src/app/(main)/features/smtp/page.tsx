@@ -20,8 +20,8 @@ const SmtpPage = () => {
 	return (
 		<div>
 			<Hero />
-			<Sandbox />
 			<WorksWith />
+			<Sandbox />
 			<CTA />
 		</div>
 	);
