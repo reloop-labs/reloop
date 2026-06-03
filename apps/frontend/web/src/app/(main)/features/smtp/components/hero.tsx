@@ -4,45 +4,44 @@ import * as Button from "@reloop/ui/button";
 
 export default function Hero() {
 	return (
-		<div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-transparent pt-40 pb-28">
-			<main className="relative z-10">
-				<section className="mx-auto flex max-w-4xl flex-col px-4 pb-16 sm:px-6 lg:px-8 lg:pb-24">
-					<div className="mx-auto max-w-[1020px] text-center">
-						<h1 className="font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[4.2rem]">
-							High-Performance
-							<br />
-							SMTP Relay
-						</h1>
-
-						<p className="mx-auto mt-8 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px]">
-							Send email through a managed SMTP relay built for developers.
-							Point your existing mailers at Reloop with TLS, authentication,
-							and sub-second delivery—no infrastructure to maintain.
-						</p>
-
-						<div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-							<a
-								href="/dashboard/signup"
-								className={`${Button.buttonVariants({
-									variant: "neutral",
-									mode: "filled",
-								}).root()} h-11! rounded-2xl! px-8! font-semibold`}
-							>
-								Get SMTP credentials
-							</a>
-							<a
-								href="#playground"
-								className={`${Button.buttonVariants({
-									variant: "neutral",
-									mode: "stroke",
-								}).root()} h-11! rounded-2xl! px-8! font-semibold`}
-							>
-								View connection setup
-							</a>
-						</div>
+		<div className="relative flex min-h-[70dvh] items-center justify-center overflow-hidden bg-transparent pt-40 pb-20">
+			<section className="mx-auto max-w-4xl px-4 pb-8 sm:px-6 lg:px-8">
+				<div className="mx-auto max-w-[920px] text-center">
+					<p className="font-semibold text-[11px] text-primary-base uppercase tracking-[0.16em]">
+						SMTP relay
+					</p>
+					<h1 className="mt-4 font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[4rem] dark:text-white">
+						Send email from apps
+						<br />
+						that already use{" "}
+						<span className="text-primary-base">SMTP.</span>
+					</h1>
+					<p className="mx-auto mt-6 max-w-[560px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
+						No new SDK required. Point your mailer at Reloop—same host, port, and
+						username/password pattern you already know.
+					</p>
+					<div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+						<a
+							href="/dashboard/signup"
+							className={`${Button.buttonVariants({
+								variant: "neutral",
+								mode: "filled",
+							}).root()} h-11! rounded-2xl! px-8! font-semibold`}
+						>
+							Get SMTP credentials
+						</a>
+						<a
+							href="#setup"
+							className={`${Button.buttonVariants({
+								variant: "neutral",
+								mode: "stroke",
+							}).root()} h-11! rounded-2xl! px-8! font-semibold`}
+						>
+							See how to connect
+						</a>
 					</div>
-				</section>
-			</main>
+				</div>
+			</section>
 		</div>
 	);
 }
