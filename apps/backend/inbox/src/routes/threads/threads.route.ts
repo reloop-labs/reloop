@@ -3,10 +3,13 @@ import { Elysia, t } from "elysia";
 import { evlog } from "evlog/elysia";
 import {
 	archiveThreadController,
+	deleteThreadController,
+	getThreadAttachmentController,
 	getThreadController,
 	getThreadsController,
 	markThreadReadController,
 	toggleThreadStarController,
+	updateThreadController,
 } from "./threads.controllers";
 
 export const threadsRoute = new Elysia({ prefix: "/v1/threads" })
@@ -40,6 +43,46 @@ export const threadsRoute = new Elysia({ prefix: "/v1/threads" })
 			auth: true,
 			params: t.Object({
 				id: t.String(),
+			}),
+		},
+	)
+	.get(
+		"/:threadId/attachments/:attachmentId",
+		async ({ params: { threadId, attachmentId }, organizationId }) => {
+			return getThreadAttachmentController(
+				threadId,
+				attachmentId,
+				organizationId,
+			);
+		},
+		{
+			auth: true,
+			params: t.Object({
+				threadId: t.String(),
+				attachmentId: t.String(),
+			}),
+		},
+	)
+	.patch(
+		"/:id",
+		async ({ params: { id }, body, organizationId }) => {
+			return updateThreadController(id, organizationId, body);
+		},
+		{
+			auth: true,
+			params: t.Object({
+				id: t.String(),
+			}),
+			body: t.Object({
+				isRead: t.Optional(t.Boolean()),
+				isStarred: t.Optional(t.Boolean()),
+				status: t.Optional(
+					t.Union([
+						t.Literal("active"),
+						t.Literal("archived"),
+						t.Literal("closed"),
+					]),
+				),
 			}),
 		},
 	)
@@ -77,6 +120,18 @@ export const threadsRoute = new Elysia({ prefix: "/v1/threads" })
 		"/:id/archive",
 		async ({ params: { id }, organizationId }) => {
 			return archiveThreadController(id, organizationId);
+		},
+		{
+			auth: true,
+			params: t.Object({
+				id: t.String(),
+			}),
+		},
+	)
+	.delete(
+		"/:id",
+		async ({ params: { id }, organizationId }) => {
+			return deleteThreadController(id, organizationId);
 		},
 		{
 			auth: true,

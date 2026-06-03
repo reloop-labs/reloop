@@ -4,7 +4,9 @@ import { evlog } from "evlog/elysia";
 import {
 	createMailboxController,
 	deleteMailboxController,
+	getMailboxController,
 	getMailboxesController,
+	updateMailboxController,
 } from "./mailbox.controllers";
 
 export const mailboxRoute = new Elysia({ prefix: "/v1/mailboxes" })
@@ -17,6 +19,18 @@ export const mailboxRoute = new Elysia({ prefix: "/v1/mailboxes" })
 		},
 		{
 			auth: true,
+		},
+	)
+	.get(
+		"/:id",
+		async ({ params: { id }, organizationId }) => {
+			return getMailboxController(id, organizationId);
+		},
+		{
+			auth: true,
+			params: t.Object({
+				id: t.String(),
+			}),
 		},
 	)
 	.post(
@@ -36,6 +50,24 @@ export const mailboxRoute = new Elysia({ prefix: "/v1/mailboxes" })
 				quota: t.Optional(t.String()),
 				displayName: t.Optional(t.String()),
 				description: t.Optional(t.String()),
+			}),
+		},
+	)
+	.patch(
+		"/:id",
+		async ({ params: { id }, body, organizationId }) => {
+			return updateMailboxController(id, organizationId, body);
+		},
+		{
+			auth: true,
+			params: t.Object({
+				id: t.String(),
+			}),
+			body: t.Object({
+				displayName: t.Optional(t.String()),
+				description: t.Optional(t.String()),
+				status: t.Optional(t.Union([t.Literal("active"), t.Literal("disabled")])),
+				quota: t.Optional(t.String()),
 			}),
 		},
 	)

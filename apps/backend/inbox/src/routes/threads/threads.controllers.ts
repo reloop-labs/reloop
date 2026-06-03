@@ -2,6 +2,7 @@ import { db } from "@reloop/db/client";
 import {
 	emailLog,
 	emailThread,
+	inboundAttachment,
 	inboundEmail,
 	threadMessage,
 } from "@reloop/db/schema";
@@ -204,3 +205,123 @@ export async function archiveThreadController(
 	log.info(`[THREAD] Archived thread ${id}`);
 	return { success: true, id, status: "archived" };
 }
+
+export async function updateThreadController(
+	id: string,
+	organizationId: string,
+	updates: {
+		isRead?: boolean;
+		isStarred?: boolean;
+		status?: "active" | "archived" | "closed";
+	},
+) {
+	const log = useLogger();
+
+	const thread = await db.query.emailThread.findFirst({
+		where: and(
+			eq(emailThread.id, id),
+			eq(emailThread.organizationId, organizationId),
+		),
+	});
+
+	if (!thread) {
+		throw createError({
+			status: 404,
+			message: "Thread not found",
+			why: `Thread ${id} was not found in your organization`,
+			fix: "Verify the thread ID and ensure it belongs to your organization",
+		});
+	}
+
+	const updateData: Record<string, any> = {};
+	if (updates.isRead !== undefined) updateData.isRead = updates.isRead;
+	if (updates.isStarred !== undefined) updateData.isStarred = updates.isStarred;
+	if (updates.status !== undefined) updateData.status = updates.status;
+
+	if (Object.keys(updateData).length === 0) {
+		return { success: true, id, message: "No changes" };
+	}
+
+	await db.update(emailThread).set(updateData).where(eq(emailThread.id, id));
+
+	log.info(`[THREAD] Updated thread ${id}: ${JSON.stringify(updateData)}`);
+	return { success: true, id, ...updateData };
+}
+
+export async function deleteThreadController(
+	id: string,
+	organizationId: string,
+) {
+	const log = useLogger();
+
+	const thread = await db.query.emailThread.findFirst({
+		where: and(
+			eq(emailThread.id, id),
+			eq(emailThread.organizationId, organizationId),
+		),
+	});
+
+	if (!thread) {
+		throw createError({
+			status: 404,
+			message: "Thread not found",
+			why: `Thread ${id} was not found in your organization`,
+			fix: "Verify the thread ID and ensure it belongs to your organization",
+		});
+	}
+
+	// Cascade will handle thread_message deletion
+	await db.delete(emailThread).where(eq(emailThread.id, id));
+
+	log.info(`[THREAD] Deleted thread ${id} (Org: ${organizationId})`);
+	return { success: true };
+}
+
+export async function getThreadAttachmentController(
+	threadId: string,
+	attachmentId: string,
+	organizationId: string,
+) {
+	// Verify thread access
+	const thread = await db.query.emailThread.findFirst({
+		where: and(
+			eq(emailThread.id, threadId),
+			eq(emailThread.organizationId, organizationId),
+		),
+	});
+
+	if (!thread) {
+		throw createError({
+			status: 404,
+			message: "Thread not found",
+			why: `Thread ${threadId} was not found in your organization`,
+			fix: "Verify the thread ID and ensure it belongs to your organization",
+		});
+	}
+
+	// Find the attachment
+	const attachment = await db.query.inboundAttachment.findFirst({
+		where: eq(inboundAttachment.id, attachmentId),
+	});
+
+	if (!attachment) {
+		throw createError({
+			status: 404,
+			message: "Attachment not found",
+			why: `Attachment ${attachmentId} was not found`,
+			fix: "Verify the attachment ID",
+		});
+	}
+
+	return {
+		id: attachment.id,
+		filename: attachment.filename,
+		contentType: attachment.contentType,
+		size: attachment.size,
+		storagePath: attachment.storagePath,
+		contentDisposition: attachment.contentDisposition,
+		contentId: attachment.contentId,
+		createdAt: attachment.createdAt,
+	};
+}
+

@@ -26,7 +26,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
 				</div>
 			</div>
 
-			<section className="border-stroke-soft-200 border-t dark:border-white/10">
+			<section>
 				<div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
 					<div className="text-[15px] text-text-strong-950 leading-relaxed sm:text-[17px] dark:text-white/80 [&_a]:text-primary-base [&_a]:underline [&_h2]:mt-10 [&_h2]:mb-3 [&_h2]:font-semibold [&_h2]:text-lg [&_h2]:text-text-strong-950 [&_h2]:dark:text-white [&_li]:text-text-sub-600 [&_p]:text-text-sub-600 [&_p]:dark:text-white/60 [&_section]:space-y-6 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6">
 						{children}
