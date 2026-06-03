@@ -69,12 +69,12 @@ export function CopyCodeBlock({
 			{/* Browser chrome */}
 			<div className="flex items-center gap-3 border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/40">
 				<div className="flex shrink-0 gap-1.5">
-					<div className="size-3 rounded-full bg-error-base/80" />
-					<div className="size-3 rounded-full bg-warning-base/80" />
-					<div className="size-3 rounded-full bg-success-base/80" />
+					<div className="size-3 rounded-full bg-bg-weak-50" />
+					<div className="size-3 rounded-full bg-bg-weak-50" />
+					<div className="size-3 rounded-full bg-bg-weak-50" />
 				</div>
 
-				<div className="mx-auto flex h-7 min-w-0 max-w-md flex-1 items-center justify-center gap-1.5 rounded-lg border border-stroke-soft-100 bg-bg-white-0/50 px-3 font-medium text-text-sub-600 text-xs dark:border-stroke-soft-100/30 dark:bg-white/[0.03] dark:text-white/45">
+				<div className="mx-auto flex h-4 min-w-0 max-w-md flex-1 items-center justify-center gap-1.5 rounded-lg px-3 font-medium text-text-sub-600 text-xs">
 					<Icon name="lock" className="size-3 shrink-0 opacity-60" />
 					<span className="truncate font-mono">{addressBarTitle}</span>
 				</div>
@@ -85,10 +85,7 @@ export function CopyCodeBlock({
 					aria-label={copied ? "Copied" : "Copy code"}
 					className="shrink-0 cursor-pointer text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white"
 				>
-					<Icon
-						name={copied ? "check" : "copy"}
-						className="size-4 stroke-3"
-					/>
+					<Icon name={copied ? "check" : "copy"} className="size-4 stroke-3" />
 				</button>
 			</div>
 
