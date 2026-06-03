@@ -36,20 +36,6 @@ kumo.on('init', function()
     hostname = constants.hostname,
   }
 
-  -- Port 465: SMTPS with implicit TLS
-  kumo.start_esmtp_listener {
-    listen = '0.0.0.0:465',
-    hostname = constants.hostname,
-    implicit_tls = true,
-  }
-
-  -- Port 2465: Alternative SMTPS with implicit TLS (for networks blocking 465)
-  kumo.start_esmtp_listener {
-    listen = '0.0.0.0:2465',
-    hostname = constants.hostname,
-    implicit_tls = true,
-  }
-
   kumo.start_http_listener {
     listen = '0.0.0.0:8000',
     trusted_hosts = constants.trusted_hosts,
