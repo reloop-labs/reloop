@@ -1,0 +1,89 @@
+import { db } from "@reloop/db/client";
+import { mailbox } from "@reloop/db/schema";
+import { error } from "elysia";
+import { eq, and } from "drizzle-orm";
+import { useLogger } from "evlog/elysia";
+import { bus, BusEvent } from "@reloop/bus";
+
+export async function createMailboxController({
+	organizationId,
+	domainId,
+	email,
+	password,
+	quota,
+}: {
+	organizationId: string;
+	domainId: string;
+	email: string;
+	password?: string;
+	quota?: string;
+}) {
+	const log = useLogger();
+
+	const existing = await db.query.mailbox.findFirst({
+		where: eq(mailbox.email, email),
+	});
+
+	if (existing) {
+		return error(409, "Mailbox already exists");
+	}
+
+	const inserted = await db
+		.insert(mailbox)
+		.values({
+			organizationId,
+			domainId,
+			email,
+			password: password || "placeholder", // In a real app, hash this
+			quota: quota || "5 GB",
+		})
+		.returning({ id: mailbox.id });
+
+	const id = inserted[0]?.id;
+	if (!id) return error(500, "Failed to create mailbox");
+
+	await bus.publish(BusEvent.MAILBOX_CREATED, {
+		mailboxId: id,
+		organizationId,
+		email,
+	});
+
+	log.info(`[MAILBOX] Created mailbox ${email} (Org: ${organizationId})`);
+	return { id, email, status: "active" };
+}
+
+export async function getMailboxesController(organizationId: string) {
+	const mailboxes = await db.query.mailbox.findMany({
+		where: eq(mailbox.organizationId, organizationId),
+		orderBy: (m, { desc }) => [desc(m.createdAt)],
+	});
+
+	return mailboxes.map(m => ({
+		id: m.id,
+		email: m.email,
+		quota: m.quota,
+		status: m.status,
+		createdAt: m.createdAt,
+	}));
+}
+
+export async function deleteMailboxController(id: string, organizationId: string) {
+	const log = useLogger();
+	
+	const mbx = await db.query.mailbox.findFirst({
+		where: and(eq(mailbox.id, id), eq(mailbox.organizationId, organizationId)),
+	});
+
+	if (!mbx) return error(404, "Mailbox not found");
+
+	await db.delete(mailbox).where(eq(mailbox.id, id));
+
+	await bus.publish(BusEvent.MAILBOX_DELETED, {
+		mailboxId: id,
+		organizationId,
+		email: mbx.email,
+	});
+
+	log.info(`[MAILBOX] Deleted mailbox ${mbx.email} (Org: ${organizationId})`);
+	return { success: true };
+}

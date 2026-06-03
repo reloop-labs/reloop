@@ -51,4 +51,9 @@ export enum BusEvent {
 	// Contact Auto-Capture Events
 	CONTACT_AUTO_CREATED = "contact.auto_created",
 	CONTACT_DELIVERABILITY_UPDATED = "contact.deliverability_updated",
+
+	// Inbox Events
+	INBOUND_EMAIL_RECEIVED = "inbox.inbound_received",
+	MAILBOX_CREATED = "mailbox.created",
+	MAILBOX_DELETED = "mailbox.deleted",
 }

@@ -23,6 +23,14 @@ else
 end
 constants.kumomta_url = os.getenv("KUMOMTA_WEBHOOK_URL") or default_webhook_url
 
+local default_inbox_url
+if constants.env == "development" then
+  default_inbox_url = "http://host.docker.internal:8017/api/inbox"
+else
+  default_inbox_url = constants.base_url .. "/api/inbox"
+end
+constants.inbox_url = os.getenv("KUMOMTA_INBOX_URL") or default_inbox_url
+
 -- 3. NATS connection URL
 constants.nats_url = os.getenv("NATS_URL") or "reloop-nats:4222"
 

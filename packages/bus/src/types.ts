@@ -288,6 +288,28 @@ export interface SendTestEmailPayload {
 	html: string;
 }
 
+export interface InboundEmailReceivedPayload {
+	inboundEmailId: string;
+	mailboxId: string;
+	organizationId: string;
+	messageId?: string;
+	fromEmail: string;
+	toEmails: string[];
+	subject: string;
+}
+
+export interface MailboxCreatedPayload {
+	mailboxId: string;
+	organizationId: string;
+	email: string;
+}
+
+export interface MailboxDeletedPayload {
+	mailboxId: string;
+	organizationId: string;
+	email: string;
+}
+
 export interface EventPayloads {
 	[BusEvent.USER_CREATED]: UserCreatedPayload;
 	[BusEvent.USER_UPDATED]: UserUpdatedPayload;
@@ -323,4 +345,7 @@ export interface EventPayloads {
 	[BusEvent.KUMOMTA_EVENT]: KumomtaLogRecordPayload;
 	[BusEvent.CONTACT_AUTO_CREATED]: ContactAutoCreatedPayload;
 	[BusEvent.CONTACT_DELIVERABILITY_UPDATED]: ContactDeliverabilityUpdatedPayload;
+	[BusEvent.INBOUND_EMAIL_RECEIVED]: InboundEmailReceivedPayload;
+	[BusEvent.MAILBOX_CREATED]: MailboxCreatedPayload;
+	[BusEvent.MAILBOX_DELETED]: MailboxDeletedPayload;
 }

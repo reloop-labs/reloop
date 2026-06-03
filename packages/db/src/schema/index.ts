@@ -9,3 +9,4 @@ export * from "./group";
 export * from "./template";
 export * from "./upload";
 export * from "./webhook";
+export * from "./inbox";

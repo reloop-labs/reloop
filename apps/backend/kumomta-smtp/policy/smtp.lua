@@ -227,11 +227,41 @@ kumo.on('get_listener_domain', function(domain, listener, conn_meta)
       relay_to = true,
     }
   end
+  
+  -- For unauthenticated sender, allow receiving for our hosted domains.
+  -- We'll accept all and filter in smtp_server_message_received.
+  return kumo.make_listener_domain {
+    relay_to = false,
+  }
 end)
 
 -- Enforce API Key + Domain Verification on Receipt
 kumo.on('smtp_server_message_received', function(msg)
   local api_key = msg:get_meta('api_key') or ""
+  
+  if api_key == "" then
+    -- This is an inbound email
+    local msg_id = msg:id()
+    local client = kumo.http.build_client({
+      danger_accept_invalid_certs = true
+    })
+    
+    local target_url = constants.inbox_url .. "/v1/receive"
+    local req = client:post(target_url)
+    
+    local status, response = pcall(function()
+      return req
+        :header("Content-Type", "message/rfc822")
+        :body(msg:get_data())
+        :send()
+    end)
+    
+    if not status or response:status_code() ~= 200 then
+      kumo.reject(550, "5.7.1 User unknown or mailbox disabled")
+    end
+    return
+  end
+  
   apply_reloop_logic(msg, api_key)
 end)
 
