@@ -22,18 +22,21 @@ kumo.on('init', function()
   kumo.start_esmtp_listener {
     listen = '0.0.0.0:25',
     hostname = constants.hostname,
+    relay_hosts = constants.trusted_hosts,
   }
 
   -- Port 587: Submission with STARTTLS (explicit TLS)
   kumo.start_esmtp_listener {
     listen = '0.0.0.0:587',
     hostname = constants.hostname,
+    relay_hosts = constants.trusted_hosts,
   }
 
   -- Port 2025: Alternate SMTP submission (for networks blocking 25/587)
   kumo.start_esmtp_listener {
     listen = '0.0.0.0:2025',
     hostname = constants.hostname,
+    relay_hosts = constants.trusted_hosts,
   }
 
   kumo.start_http_listener {
