@@ -34,7 +34,7 @@ const features = [
 		description: "Built on the same events that power Reloop webhooks.",
 	},
 	{
-		icon: "zap" as const,
+		icon: "route" as const,
 		title: "Automatic sends",
 		description: "Emails fire when your trigger conditions match (coming soon).",
 	},
