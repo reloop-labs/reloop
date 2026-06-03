@@ -91,7 +91,7 @@ services:
     ports:
       - "25:25"      # ESMTP injection (STARTTLS)
       - "587:587"    # Submission (STARTTLS)
-      - "2587:2587"  # Alt submission (STARTTLS)
+      - "2025:2025"  # Alt SMTP submission (STARTTLS)
       - "8020:8000"  # HTTP API
     volumes:
       - ../docker-data/kumomta/data:/var/spool/kumomta/data

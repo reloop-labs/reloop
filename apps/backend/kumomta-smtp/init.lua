@@ -30,9 +30,9 @@ kumo.on('init', function()
     hostname = constants.hostname,
   }
 
-  -- Port 2587: Alternative submission with STARTTLS (for networks blocking 587)
+  -- Port 2025: Alternate SMTP submission (for networks blocking 25/587)
   kumo.start_esmtp_listener {
-    listen = '0.0.0.0:2587',
+    listen = '0.0.0.0:2025',
     hostname = constants.hostname,
   }
 
