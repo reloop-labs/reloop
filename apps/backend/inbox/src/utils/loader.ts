@@ -17,6 +17,9 @@ export async function loader() {
 		await bus.connect(inboxConfig.NATS_URL);
 		log.info("nats", "NATS connected");
 
+		await bus.ensureStream("kumomta-inbound", ["kumomta.inbound_received"]);
+		log.info("nats", "kumomta-inbound JetStream ready");
+
 		await initInboundSubscriber();
 
 		log.info("loader", "Inbox service loader initialized");
