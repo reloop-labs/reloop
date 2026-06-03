@@ -4,6 +4,7 @@ import { inboundEmail, mailbox } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 import { simpleParser } from "mailparser";
+import { correlateInboundThread } from "../../lib/thread-correlation";
 
 export async function receiveInboundEmailController(rawMessage: string) {
 	const log = useLogger();
@@ -12,6 +13,7 @@ export async function receiveInboundEmailController(rawMessage: string) {
 	try {
 		const parsed = await simpleParser(rawMessage);
 		const fromEmail = parsed.from?.value[0]?.address || "unknown";
+		const fromName = parsed.from?.value[0]?.name || undefined;
 		let toEmails: string[] = [];
 		if (Array.isArray(parsed.to)) {
 			toEmails = parsed.to.flatMap((t) => t.value.map((v) => v.address || ""));
@@ -31,7 +33,12 @@ export async function receiveInboundEmailController(rawMessage: string) {
 		const textBody = parsed.text || "";
 		const htmlBody = (parsed.html as string) || "";
 		const messageId = parsed.messageId || "";
-		const threadId = parsed.inReplyTo || parsed.references?.[0] || "";
+		const inReplyTo = parsed.inReplyTo || "";
+		const references: string[] = Array.isArray(parsed.references)
+			? parsed.references
+			: parsed.references
+				? [parsed.references]
+				: [];
 
 		const mailboxRecord = await db.query.mailbox.findFirst({
 			where: and(
@@ -58,7 +65,7 @@ export async function receiveInboundEmailController(rawMessage: string) {
 				htmlBody: htmlBody,
 				rawMessage: rawMessage, // Optional, might want to store in S3 if large
 				messageId: messageId,
-				threadId: threadId,
+				threadId: inReplyTo || references[0] || "",
 			})
 			.returning({ id: inboundEmail.id });
 
@@ -66,6 +73,22 @@ export async function receiveInboundEmailController(rawMessage: string) {
 		if (!insertedId) {
 			return new Response("Failed to insert email", { status: 500 });
 		}
+
+		// ── Thread correlation ─────────────────────────────────────
+		// Find existing thread (via In-Reply-To / References) or create new one
+		const threadResult = await correlateInboundThread({
+			mailboxId: mailboxRecord.id,
+			organizationId: mailboxRecord.organizationId,
+			inboundEmailId: insertedId,
+			fromEmail,
+			fromName,
+			subject,
+			textBody,
+			messageId,
+			inReplyTo,
+			references,
+			receivedAt: new Date(),
+		});
 
 		// Handle attachments (TODO: S3 upload)
 
@@ -77,12 +100,13 @@ export async function receiveInboundEmailController(rawMessage: string) {
 			fromEmail: fromEmail,
 			toEmails: toEmails,
 			subject: subject,
+			threadId: threadResult.threadId,
 		});
 
 		log.info(
-			`[INBOX] Successfully saved email for ${recipientEmail} with id ${insertedId}`,
+			`[INBOX] Successfully saved email for ${recipientEmail} with id ${insertedId} (thread: ${threadResult.threadId}, new: ${threadResult.isNew})`,
 		);
-		return { success: true, id: insertedId };
+		return { success: true, id: insertedId, threadId: threadResult.threadId };
 	} catch (err) {
 		log.error(
 			`[INBOX] Error processing inbound email: ${err instanceof Error ? err.message : String(err)}`,
@@ -90,3 +114,4 @@ export async function receiveInboundEmailController(rawMessage: string) {
 		return new Response("Internal error processing email", { status: 500 });
 	}
 }
+

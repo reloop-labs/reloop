@@ -8,5 +8,6 @@ export * from "./email";
 export * from "./group";
 export * from "./inbox";
 export * from "./template";
+export * from "./thread";
 export * from "./upload";
 export * from "./webhook";

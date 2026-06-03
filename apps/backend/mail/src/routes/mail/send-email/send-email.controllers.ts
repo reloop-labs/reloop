@@ -1,5 +1,8 @@
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import type { MailModel } from "@reloop/be-mail/model/mail.model";
+import { db } from "@reloop/db/client";
+import { emailThread, threadMessage } from "@reloop/db/schema";
+import { eq, sql } from "drizzle-orm";
 import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 import {
@@ -13,6 +16,14 @@ import {
 	sendEmail_step6,
 	verifyDomainAuth_step2,
 } from "./steps";
+
+function parseFromName(from: string): string {
+	const displayNameMatch = from.match(/^(.+?)\s*<[^>]+>$/);
+	if (displayNameMatch?.[1]) {
+		return displayNameMatch[1].trim();
+	}
+	return from.split("@")[0] ?? from;
+}
 
 export async function sendEmailController({
 	organizationId,
@@ -50,6 +61,27 @@ export async function sendEmailController({
 
 	if (!dnsHealthCheck.isHealthy) {
 		throw MailErrors.dnsHealthError(domainName, dnsHealthCheck.missingRecords);
+	}
+
+	// ── Resolve In-Reply-To header if replying to a thread ────────
+	let threadHeaders: Record<string, string> = {};
+	if (body.thread_id) {
+		// Look up the most recent message in the thread to get its Message-ID
+		const lastMsg = await db.query.threadMessage.findFirst({
+			where: eq(threadMessage.threadId, body.thread_id),
+			orderBy: (m, { desc }) => [desc(m.messageAt)],
+			columns: { rfc822MessageId: true },
+		});
+
+		if (lastMsg?.rfc822MessageId) {
+			threadHeaders["In-Reply-To"] = lastMsg.rfc822MessageId;
+			threadHeaders["References"] = lastMsg.rfc822MessageId;
+		}
+	}
+
+	// Merge thread headers into body headers
+	if (Object.keys(threadHeaders).length > 0) {
+		body.headers = { ...threadHeaders, ...(body.headers || {}) };
 	}
 
 	const { emailLogId } = await createEmailLog_step4({
@@ -115,6 +147,69 @@ export async function sendEmailController({
 		body,
 	});
 
+	// ── Thread linking ────────────────────────────────────────────
+	// If a thread_id was provided, append this outbound email to the thread
+	if (body.thread_id) {
+		try {
+			const thread = await db.query.emailThread.findFirst({
+				where: eq(emailThread.id, body.thread_id),
+				columns: { id: true, organizationId: true },
+			});
+
+			if (thread && thread.organizationId === organizationId) {
+				const preview = (body.text || body.subject || "").substring(0, 200);
+				const fromName = parseFromName(body.from);
+
+				await db.insert(threadMessage).values({
+					threadId: body.thread_id,
+					direction: "outbound",
+					emailLogId,
+					fromEmail: body.from,
+					fromName,
+					subject: body.subject,
+					preview,
+					messageAt: new Date(),
+					rfc822MessageId: response.messageId || undefined,
+					inReplyTo: threadHeaders["In-Reply-To"] || undefined,
+				});
+
+				await db
+					.update(emailThread)
+					.set({
+						lastMessagePreview: preview,
+						lastMessageAt: new Date(),
+						messageCount: sql`${emailThread.messageCount} + 1`,
+						participants: sql`
+							CASE
+								WHEN ${emailThread.participants}::jsonb ? ${body.from}
+								THEN ${emailThread.participants}
+								ELSE ${emailThread.participants}::jsonb || to_jsonb(${body.from}::text)
+							END
+						`,
+					})
+					.where(eq(emailThread.id, body.thread_id));
+
+				log.info({
+					message: `Appended outbound email to thread ${body.thread_id}`,
+					emailLogId,
+					threadId: body.thread_id,
+				});
+			} else {
+				log.warn({
+					message: `Thread ${body.thread_id} not found or org mismatch, skipping thread link`,
+					emailLogId,
+				});
+			}
+		} catch (err) {
+			// Don't fail the send if threading fails
+			log.error({
+				message: `Failed to link email to thread: ${err instanceof Error ? err.message : String(err)}`,
+				emailLogId,
+				threadId: body.thread_id,
+			});
+		}
+	}
+
 	log.info({
 		...{
 			emailLogId,
@@ -126,3 +221,4 @@ export async function sendEmailController({
 
 	return response;
 }
+

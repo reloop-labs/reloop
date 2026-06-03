@@ -147,6 +147,13 @@ export namespace MailModel {
 				{ description: "Email template to use" },
 			),
 		),
+		thread_id: t.Optional(
+			t.String({
+				description:
+					"Thread ID to link this email to an existing conversation thread",
+				examples: ["thr_abc123xyz"],
+			}),
+		),
 	});
 
 	export type SendEmailBody = typeof sendEmailBody.static;

@@ -12,6 +12,7 @@ import { landingRoute } from "./routes/landing/landing.route";
 import { mailboxRoute } from "./routes/mailbox/mailbox.route";
 import { messagesRoute } from "./routes/messages/messages.route";
 import { receiveRoute } from "./routes/receive/receive.route";
+import { threadsRoute } from "./routes/threads/threads.route";
 import { loader } from "./utils/loader";
 
 const parseOtlpHeaders = (
@@ -86,6 +87,7 @@ const inboxService = new Elysia({
 	.use(receiveRoute)
 	.use(mailboxRoute)
 	.use(messagesRoute)
+	.use(threadsRoute)
 	.listen(port, () => {
 		log.info(
 			"Inbox Service",
