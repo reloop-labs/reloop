@@ -51,6 +51,8 @@ populate_env "apps/backend/mail"
 populate_env "apps/backend/template"
 populate_env "apps/backend/upload"
 populate_env "apps/backend/webhook"
+populate_env "apps/backend/inbox"
+populate_env "apps/backend/workflow"
 
 
 echo "--------------------------------------------------"
