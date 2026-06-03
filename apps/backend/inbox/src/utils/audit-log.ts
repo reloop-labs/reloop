@@ -1,7 +1,7 @@
 import { BusEvent, bus } from "@reloop/bus";
 
 interface AuditLogHookOptions {
-	resourceType: "email";
+	resourceType: "mailbox" | "inbound_email";
 	action: string;
 	successStatus?: number;
 }
@@ -76,9 +76,6 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 				metadata = {
 					...result,
 				};
-				if (resourceId && resourceType === "email") {
-					metadata.email_log_id = resourceId;
-				}
 			} else {
 				metadata = {
 					status,
@@ -106,7 +103,7 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 
 		// Try to parse resourceId from URL parameter if not in response body
 		if (!resourceId) {
-			const idMatch = request.url.match(/\/email_[a-zA-Z0-9]+/);
+			const idMatch = request.url.match(/\/(mbx_|inb_)[a-zA-Z0-9]+/);
 			if (idMatch) {
 				resourceId = idMatch[0].replace("/", "");
 			}
@@ -127,7 +124,7 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 				user_id: userId,
 				resource_type: resourceType,
 				resource_id: resourceId,
-				service: "mail",
+				service: "inbox",
 				action,
 				ip_address: ipAddress,
 				user_agent: userAgent,

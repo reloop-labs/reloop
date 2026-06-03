@@ -2,19 +2,23 @@ import { Elysia, t } from "elysia";
 import {
 	getMessagesController,
 	getMessageController,
+	markMessageReadController,
+	toggleStarController,
 	deleteMessageController,
 } from "./messages.controllers";
 import { evlog } from "evlog/elysia";
+import { authMiddleware } from "../../middleware/auth";
 
 export const messagesRoute = new Elysia({ prefix: "/v1/messages" })
 	.use(evlog())
+	.use(authMiddleware)
 	.get(
 		"/",
-		async ({ query, headers }) => {
-			const orgId = headers["x-organization-id"] || "org_123";
-			return getMessagesController(orgId, query.mailboxId);
+		async ({ query, activeOrganizationId }) => {
+			return getMessagesController(activeOrganizationId, query.mailboxId);
 		},
 		{
+			auth: true,
 			query: t.Object({
 				mailboxId: t.Optional(t.String()),
 			}),
@@ -22,23 +26,53 @@ export const messagesRoute = new Elysia({ prefix: "/v1/messages" })
 	)
 	.get(
 		"/:id",
-		async ({ params: { id }, headers }) => {
-			const orgId = headers["x-organization-id"] || "org_123";
-			return getMessageController(id, orgId);
+		async ({ params: { id }, activeOrganizationId }) => {
+			return getMessageController(id, activeOrganizationId);
 		},
 		{
+			auth: true,
 			params: t.Object({
 				id: t.String(),
 			}),
 		}
 	)
-	.delete(
-		"/:id",
-		async ({ params: { id }, headers }) => {
-			const orgId = headers["x-organization-id"] || "org_123";
-			return deleteMessageController(id, orgId);
+	.patch(
+		"/:id/read",
+		async ({ params: { id }, body, activeOrganizationId }) => {
+			return markMessageReadController(id, activeOrganizationId, body.isRead);
 		},
 		{
+			auth: true,
+			params: t.Object({
+				id: t.String(),
+			}),
+			body: t.Object({
+				isRead: t.Boolean(),
+			}),
+		}
+	)
+	.patch(
+		"/:id/star",
+		async ({ params: { id }, body, activeOrganizationId }) => {
+			return toggleStarController(id, activeOrganizationId, body.isStarred);
+		},
+		{
+			auth: true,
+			params: t.Object({
+				id: t.String(),
+			}),
+			body: t.Object({
+				isStarred: t.Boolean(),
+			}),
+		}
+	)
+	.delete(
+		"/:id",
+		async ({ params: { id }, activeOrganizationId }) => {
+			return deleteMessageController(id, activeOrganizationId);
+		},
+		{
+			auth: true,
 			params: t.Object({
 				id: t.String(),
 			}),

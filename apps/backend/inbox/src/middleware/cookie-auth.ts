@@ -1,8 +1,8 @@
-import { mailConfig } from "@reloop/be-mail/mail.config";
+import { inboxConfig } from "../inbox.config";
 
 export async function validateSession(cookie: string | null) {
 	const response = await fetch(
-		`${mailConfig.BASE_URL}/api/auth/v1/get-session`,
+		`${inboxConfig.BASE_URL}/api/auth/v1/get-session`,
 		{
 			method: "GET",
 			headers: new Headers({

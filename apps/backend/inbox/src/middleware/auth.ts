@@ -1,12 +1,12 @@
 import { createId } from "@paralleldrive/cuid2";
-import { AuthErrors, MailError } from "@reloop/be-mail/lib/errors";
+import { AuthErrors, InboxError } from "../lib/errors";
 import { Elysia } from "elysia";
 import { evlog } from "evlog/elysia";
-import { mailConfig } from "../mail.config";
+import { inboxConfig } from "../inbox.config";
 import { validateApiKey } from "./api-key-auth";
 import { validateSession } from "./cookie-auth";
 
-if (mailConfig.NODE_ENV !== "production") {
+if (inboxConfig.NODE_ENV !== "production") {
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
@@ -24,7 +24,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 					if (sessionResult) {
 						log.set({
 							traceId,
-							service: "mail",
+							service: "inbox",
 							authType: "session",
 							activeOrganizationId: sessionResult.activeOrganizationId,
 							userId: sessionResult.userId,
@@ -32,10 +32,10 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						return { ...sessionResult, traceId };
 					}
 				} catch (e) {
-					if (e instanceof MailError) {
+					if (e instanceof InboxError) {
 						throw AuthErrors.authenticationFailed(
 							e.message,
-							"Authentication failed due to a mail service error",
+							"Authentication failed due to an inbox service error",
 						);
 					}
 					log.error("Authentication error", {
@@ -55,7 +55,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 		apiKeyAuth: {
 			async resolve({ request: { headers }, log }) {
 				const traceId = `req_${createId()}`;
-				log.set({ traceId, service: "mail" });
+				log.set({ traceId, service: "inbox" });
 
 				try {
 					const apiKey = headers.get("x-api-key");
@@ -76,10 +76,10 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						};
 					}
 				} catch (e) {
-					if (e instanceof MailError) {
+					if (e instanceof InboxError) {
 						throw AuthErrors.authenticationFailed(
 							e.message,
-							"API key validation failed due to a mail service error",
+							"API key validation failed due to an inbox service error",
 						);
 					}
 					log.error("Authentication error", {
@@ -104,7 +104,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 		auth: {
 			async resolve({ request: { headers }, log }) {
 				const traceId = `req_${createId()}`;
-				log.set({ traceId, service: "mail" });
+				log.set({ traceId, service: "inbox" });
 
 				try {
 					const apiKey = headers.get("x-api-key");
@@ -136,10 +136,10 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						return { ...sessionResult, traceId };
 					}
 				} catch (e) {
-					if (e instanceof MailError) {
+					if (e instanceof InboxError) {
 						throw AuthErrors.authenticationFailed(
 							e.message,
-							"Authentication failed due to a mail service error",
+							"Authentication failed due to an inbox service error",
 						);
 					}
 					log.error("Authentication error", {

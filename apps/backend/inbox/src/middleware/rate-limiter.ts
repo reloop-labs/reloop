@@ -1,6 +1,6 @@
-import { RateLimitErrors } from "@reloop/be-mail/lib/errors";
-import { mailConfig } from "@reloop/be-mail/mail.config";
-import { redis } from "@reloop/be-mail/utils/loader";
+import { RateLimitErrors } from "../lib/errors";
+import { inboxConfig } from "../inbox.config";
+import { redis } from "../utils/loader";
 
 // ── Types ──────────────────────────────────────────────────────────
 interface RateLimitLayer {
@@ -73,7 +73,7 @@ async function checkLayer(
 // ── Exported function ──────────────────────────────────────────────
 
 /**
- * Multi-layer rate limiter for the send-email endpoint.
+ * Multi-layer rate limiter for inbox endpoints.
  *
  * Call this inside a `beforeHandle` hook after auth has resolved
  * `activeOrganizationId` and `userId`.
@@ -81,7 +81,7 @@ async function checkLayer(
  * Checks 5 layers in parallel and fails fast on the first exceeded layer.
  *
  * **Fail-open**: If Redis is unreachable, the request is allowed through
- * so email sending isn't blocked by a cache outage.
+ * so the inbox service isn't blocked by a cache outage.
  *
  * @returns Headers to set on the response (always includes rate limit info).
  */
@@ -108,33 +108,33 @@ export async function checkRateLimit({
 		const layers: RateLimitLayer[] = [
 			{
 				name: "IP",
-				key: `rl:send:ip:${ip}`,
-				max: mailConfig.RATE_LIMIT_IP_MAX,
-				windowSeconds: mailConfig.RATE_LIMIT_IP_WINDOW_SECONDS,
+				key: `rl:inbox:ip:${ip}`,
+				max: inboxConfig.RATE_LIMIT_IP_MAX,
+				windowSeconds: inboxConfig.RATE_LIMIT_IP_WINDOW_SECONDS,
 			},
 			{
 				name: "organization",
-				key: `rl:send:org:${activeOrganizationId}`,
-				max: mailConfig.RATE_LIMIT_ORG_MAX,
-				windowSeconds: mailConfig.RATE_LIMIT_ORG_WINDOW_SECONDS,
+				key: `rl:inbox:org:${activeOrganizationId}`,
+				max: inboxConfig.RATE_LIMIT_ORG_MAX,
+				windowSeconds: inboxConfig.RATE_LIMIT_ORG_WINDOW_SECONDS,
 			},
 			{
 				name: "organization-daily",
-				key: `rl:send:org-day:${activeOrganizationId}`,
-				max: mailConfig.RATE_LIMIT_ORG_DAILY_MAX,
+				key: `rl:inbox:org-day:${activeOrganizationId}`,
+				max: inboxConfig.RATE_LIMIT_ORG_DAILY_MAX,
 				windowSeconds: 86400, // 24 hours
 			},
 			{
 				name: "user",
-				key: `rl:send:user:${userId}`,
-				max: mailConfig.RATE_LIMIT_USER_MAX,
-				windowSeconds: mailConfig.RATE_LIMIT_USER_WINDOW_SECONDS,
+				key: `rl:inbox:user:${userId}`,
+				max: inboxConfig.RATE_LIMIT_USER_MAX,
+				windowSeconds: inboxConfig.RATE_LIMIT_USER_WINDOW_SECONDS,
 			},
 			{
 				name: "global",
-				key: "rl:send:global",
-				max: mailConfig.RATE_LIMIT_GLOBAL_MAX,
-				windowSeconds: mailConfig.RATE_LIMIT_GLOBAL_WINDOW_SECONDS,
+				key: "rl:inbox:global",
+				max: inboxConfig.RATE_LIMIT_GLOBAL_MAX,
+				windowSeconds: inboxConfig.RATE_LIMIT_GLOBAL_WINDOW_SECONDS,
 			},
 		];
 
@@ -205,7 +205,7 @@ export async function checkRateLimit({
 			throw error;
 		}
 
-		// Redis failure — fail open so email sending isn't blocked
+		// Redis failure — fail open so inbox service isn't blocked
 		log.error("Rate limiter Redis error — failing open", {
 			error: error instanceof Error ? error.message : String(error),
 			stack: error instanceof Error ? error.stack : undefined,

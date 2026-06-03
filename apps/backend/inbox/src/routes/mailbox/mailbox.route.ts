@@ -5,24 +5,26 @@ import {
 	deleteMailboxController,
 } from "./mailbox.controllers";
 import { evlog } from "evlog/elysia";
+import { authMiddleware } from "../../middleware/auth";
 
 export const mailboxRoute = new Elysia({ prefix: "/v1/mailboxes" })
 	.use(evlog())
-	.get("/", async ({ headers }) => {
-		// Mock auth for now, normally use auth middleware
-		const orgId = headers["x-organization-id"] || "org_123";
-		return getMailboxesController(orgId);
+	.use(authMiddleware)
+	.get("/", async ({ activeOrganizationId }) => {
+		return getMailboxesController(activeOrganizationId);
+	}, {
+		auth: true,
 	})
 	.post(
 		"/",
-		async ({ body, headers }) => {
-			const orgId = headers["x-organization-id"] || "org_123";
+		async ({ body, activeOrganizationId }) => {
 			return createMailboxController({
 				...body,
-				organizationId: orgId,
+				organizationId: activeOrganizationId,
 			});
 		},
 		{
+			auth: true,
 			body: t.Object({
 				domainId: t.String(),
 				email: t.String(),
@@ -33,11 +35,11 @@ export const mailboxRoute = new Elysia({ prefix: "/v1/mailboxes" })
 	)
 	.delete(
 		"/:id",
-		async ({ params: { id }, headers }) => {
-			const orgId = headers["x-organization-id"] || "org_123";
-			return deleteMailboxController(id, orgId);
+		async ({ params: { id }, activeOrganizationId }) => {
+			return deleteMailboxController(id, activeOrganizationId);
 		},
 		{
+			auth: true,
 			params: t.Object({
 				id: t.String(),
 			}),

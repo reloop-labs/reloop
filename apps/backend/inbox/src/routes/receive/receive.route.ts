@@ -1,4 +1,4 @@
-import { Elysia } from "elysia";
+import { Elysia, t } from "elysia";
 import { receiveInboundEmailController } from "./receive.controllers";
 import { evlog } from "evlog/elysia";
 
@@ -10,7 +10,7 @@ export const receiveRoute = new Elysia({ prefix: "/v1" })
 			return receiveInboundEmailController(body as string);
 		},
 		{
-			// KumoMTA will send raw RFC822 message as text
-			type: "text",
+			// KumoMTA sends raw RFC822 message as text/plain
+			parse: "text",
 		}
 	);

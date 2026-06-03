@@ -8,7 +8,7 @@ WORKDIR /app
 RUN apk add --no-cache python3 make g++
 
 COPY . .
-RUN bun --filter=mail install
+RUN bun --filter=inbox-service install
 
 # Stage 2: Build the application
 FROM base AS builder
@@ -18,7 +18,7 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN bun run --filter=mail build
+RUN bun run --filter=inbox-service build
 
 # Stage 3: Production server
 FROM base AS runner
@@ -28,11 +28,11 @@ ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 
 # Copy standalone build
-COPY --from=builder /app/apps/backend/mail/dist ./dist
+COPY --from=builder /app/apps/backend/inbox/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/package.json ./package.json
 
-EXPOSE 8015
+EXPOSE 8017
 
 CMD ["bun", "run", "dist/index.js"]

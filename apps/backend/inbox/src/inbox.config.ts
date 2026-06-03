@@ -16,4 +16,25 @@ export const inboxConfig = {
 	S3_ACCESS_KEY: process.env.S3_ACCESS_KEY || "reloop",
 	S3_SECRET_KEY: process.env.S3_SECRET_KEY || "reloop123",
 	S3_BUCKET_NAME: process.env.S3_BUCKET_NAME || "reloop-attachments",
+
+	// Rate limits for inbound
+	RATE_LIMIT_IP_MAX: Number(process.env.RATE_LIMIT_IP_MAX || "100"),
+	RATE_LIMIT_IP_WINDOW_SECONDS: Number(
+		process.env.RATE_LIMIT_IP_WINDOW_SECONDS || "60",
+	),
+	RATE_LIMIT_ORG_MAX: Number(process.env.RATE_LIMIT_ORG_MAX || "500"),
+	RATE_LIMIT_ORG_WINDOW_SECONDS: Number(
+		process.env.RATE_LIMIT_ORG_WINDOW_SECONDS || "60",
+	),
+	RATE_LIMIT_ORG_DAILY_MAX: Number(
+		process.env.RATE_LIMIT_ORG_DAILY_MAX || "10000",
+	),
+	RATE_LIMIT_USER_MAX: Number(process.env.RATE_LIMIT_USER_MAX || "200"),
+	RATE_LIMIT_USER_WINDOW_SECONDS: Number(
+		process.env.RATE_LIMIT_USER_WINDOW_SECONDS || "60",
+	),
+	RATE_LIMIT_GLOBAL_MAX: Number(process.env.RATE_LIMIT_GLOBAL_MAX || "5000"),
+	RATE_LIMIT_GLOBAL_WINDOW_SECONDS: Number(
+		process.env.RATE_LIMIT_GLOBAL_WINDOW_SECONDS || "60",
+	),
 };

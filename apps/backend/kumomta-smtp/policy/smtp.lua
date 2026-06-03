@@ -223,15 +223,18 @@ end)
 -- 🔥 THIS is the REAL relay control (docs way)
 kumo.on('get_listener_domain', function(domain, listener, conn_meta)
   if conn_meta:get_meta('authz_id') then
+    -- Authenticated sender = outbound relay
     return kumo.make_listener_domain {
       relay_to = true,
     }
   end
   
-  -- For unauthenticated sender, allow receiving for our hosted domains.
-  -- We'll accept all and filter in smtp_server_message_received.
+  -- Unauthenticated sender = potential inbound email.
+  -- Accept the message so smtp_server_message_received can route it
+  -- to the inbox service. The inbox service validates the recipient
+  -- mailbox and rejects unknown addresses.
   return kumo.make_listener_domain {
-    relay_to = false,
+    relay_to = true,
   }
 end)
 
@@ -240,26 +243,50 @@ kumo.on('smtp_server_message_received', function(msg)
   local api_key = msg:get_meta('api_key') or ""
   
   if api_key == "" then
-    -- This is an inbound email
+    -- Unauthenticated sender → treat as inbound email
     local msg_id = msg:id()
+    print("[INBOUND] [" .. msg_id .. "] Processing inbound email")
+
     local client = kumo.http.build_client({
       danger_accept_invalid_certs = true
     })
     
     local target_url = constants.inbox_url .. "/v1/receive"
-    local req = client:post(target_url)
-    
+    print("[INBOUND] [" .. msg_id .. "] Forwarding to inbox service: " .. target_url)
+
     local status, response = pcall(function()
+      local req = client:post(target_url)
       return req
         :header("Content-Type", "message/rfc822")
         :body(msg:get_data())
         :send()
     end)
     
-    if not status or response:status_code() ~= 200 then
-      kumo.reject(550, "5.7.1 User unknown or mailbox disabled")
+    if not status then
+      print("[INBOUND] [" .. msg_id .. "] FAILED to reach inbox service: " .. tostring(response))
+      kumo.reject(451, "4.3.0 Temporary failure processing inbound email")
+      return
     end
-    return
+
+    local code = response:status_code()
+    local body_text = response:text()
+    print("[INBOUND] [" .. msg_id .. "] Inbox service response: status=" .. tostring(code) .. " body=" .. tostring(body_text))
+
+    if code == 200 then
+      print("[INBOUND] [" .. msg_id .. "] Successfully stored inbound email")
+      return
+    elseif code == 404 then
+      -- Mailbox not found → reject with user unknown
+      kumo.reject(550, "5.1.1 User unknown or mailbox disabled")
+      return
+    elseif code == 400 then
+      kumo.reject(550, "5.1.3 Invalid recipient address")
+      return
+    else
+      -- Unexpected error → temp failure so remote MTA retries
+      kumo.reject(451, "4.3.0 Temporary failure processing inbound email")
+      return
+    end
   end
   
   apply_reloop_logic(msg, api_key)

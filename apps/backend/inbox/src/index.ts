@@ -12,6 +12,7 @@ import { landingRoute } from "./routes/landing/landing.route";
 import { receiveRoute } from "./routes/receive/receive.route";
 import { mailboxRoute } from "./routes/mailbox/mailbox.route";
 import { messagesRoute } from "./routes/messages/messages.route";
+import { loader } from "./utils/loader";
 
 const parseOtlpHeaders = (
 	headersStr?: string,
@@ -39,6 +40,9 @@ initLogger({
 			})
 		: undefined,
 });
+
+// Initialize connections (Redis, Postgres, NATS)
+await loader();
 
 const port = inboxConfig.port;
 const inboxService = new Elysia({

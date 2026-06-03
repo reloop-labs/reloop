@@ -4,7 +4,6 @@ import { inboundEmail, mailbox } from "@reloop/db/schema";
 import { eq, and } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 import { simpleParser } from "mailparser";
-import { error } from "elysia";
 
 export async function receiveInboundEmailController(rawMessage: string) {
 	const log = useLogger();
@@ -24,7 +23,7 @@ export async function receiveInboundEmailController(rawMessage: string) {
 
 		if (toEmails.length === 0) {
 			log.warn("[INBOX] No valid recipient found in email");
-			return error(400, "No valid recipient");
+			return new Response("No valid recipient", { status: 400 });
 		}
 
 		const subject = parsed.subject || "";
@@ -33,9 +32,8 @@ export async function receiveInboundEmailController(rawMessage: string) {
 		const messageId = parsed.messageId || "";
 		const threadId = parsed.inReplyTo || parsed.references?.[0] || "";
 
-		// Find the mailbox
-		// Assuming we handle the first matching 'to' email
-		const recipientEmail = toEmails[0];
+		// Find the mailbox for the first matching 'to' email
+		const recipientEmail = toEmails[0]!;
 		
 		const mailboxRecord = await db.query.mailbox.findFirst({
 			where: and(
@@ -46,8 +44,7 @@ export async function receiveInboundEmailController(rawMessage: string) {
 
 		if (!mailboxRecord) {
 			log.warn(`[INBOX] Mailbox not found or inactive for: ${recipientEmail}`);
-			// Depending on requirements, we can return 200 to drop it or 404 to bounce
-			return error(404, "Mailbox not found");
+			return new Response("Mailbox not found", { status: 404 });
 		}
 
 		// Store email
@@ -69,7 +66,7 @@ export async function receiveInboundEmailController(rawMessage: string) {
 
 		const insertedId = inserted?.[0]?.id;
 		if (!insertedId) {
-			return error(500, "Failed to insert email");
+			return new Response("Failed to insert email", { status: 500 });
 		}
 
 		// Handle attachments (TODO: S3 upload)
@@ -90,6 +87,6 @@ export async function receiveInboundEmailController(rawMessage: string) {
 		log.error(
 			`[INBOX] Error processing inbound email: ${err instanceof Error ? err.message : String(err)}`
 		);
-		return error(500, "Internal error processing email");
+		return new Response("Internal error processing email", { status: 500 });
 	}
 }
