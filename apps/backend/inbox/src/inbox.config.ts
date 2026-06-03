@@ -19,25 +19,4 @@ export const inboxConfig = {
 		REGION: process.env.S3_REGION || "us-east-1",
 		FORCE_PATH_STYLE: process.env.S3_FORCE_PATH_STYLE || "true",
 	},
-
-	// Rate limits for inbound
-	RATE_LIMIT_IP_MAX: Number(process.env.RATE_LIMIT_IP_MAX || "100"),
-	RATE_LIMIT_IP_WINDOW_SECONDS: Number(
-		process.env.RATE_LIMIT_IP_WINDOW_SECONDS || "60",
-	),
-	RATE_LIMIT_ORG_MAX: Number(process.env.RATE_LIMIT_ORG_MAX || "500"),
-	RATE_LIMIT_ORG_WINDOW_SECONDS: Number(
-		process.env.RATE_LIMIT_ORG_WINDOW_SECONDS || "60",
-	),
-	RATE_LIMIT_ORG_DAILY_MAX: Number(
-		process.env.RATE_LIMIT_ORG_DAILY_MAX || "10000",
-	),
-	RATE_LIMIT_USER_MAX: Number(process.env.RATE_LIMIT_USER_MAX || "200"),
-	RATE_LIMIT_USER_WINDOW_SECONDS: Number(
-		process.env.RATE_LIMIT_USER_WINDOW_SECONDS || "60",
-	),
-	RATE_LIMIT_GLOBAL_MAX: Number(process.env.RATE_LIMIT_GLOBAL_MAX || "5000"),
-	RATE_LIMIT_GLOBAL_WINDOW_SECONDS: Number(
-		process.env.RATE_LIMIT_GLOBAL_WINDOW_SECONDS || "60",
-	),
 };

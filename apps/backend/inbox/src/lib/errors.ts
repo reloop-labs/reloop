@@ -83,13 +83,3 @@ export const InboxErrors = {
 			fix: "Please try again later or contact support if the issue persists",
 		}),
 };
-
-export const RateLimitErrors = {
-	rateLimitExceeded: (layer: string, retryAfter: number) =>
-		createError({
-			status: 429,
-			message: "Too Many Requests",
-			why: `Rate limit exceeded on the ${layer} layer. You have sent too many requests in the current time window.`,
-			fix: `Please wait ${retryAfter} seconds before retrying, or contact support to increase your limits.`,
-		}),
-};
