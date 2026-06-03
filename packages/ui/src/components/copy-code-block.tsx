@@ -79,7 +79,9 @@ export function CopyCodeBlock({
 			? `#${tabs[highlightedTabIndex]?.si.hex}`
 			: undefined;
 	const activeTabBrandColor =
-		activeTabIndex >= 0 && tabs ? `#${tabs[activeTabIndex]?.si.hex}` : undefined;
+		activeTabIndex >= 0 && tabs
+			? `#${tabs[activeTabIndex]?.si.hex}`
+			: undefined;
 
 	const getTabPosition = (button: HTMLButtonElement | null | undefined) => {
 		if (!button) return null;
@@ -125,7 +127,7 @@ export function CopyCodeBlock({
 	return (
 		<div
 			className={cn(
-				"group relative overflow-hidden rounded-2xl border border-stroke-soft-100 bg-transparent dark:border-stroke-soft-100/40",
+				"group relative overflow-hidden rounded-[18px] border border-stroke-soft-100 bg-transparent dark:border-stroke-soft-100/40",
 				className,
 			)}
 		>
@@ -264,7 +266,7 @@ export function CopyCodeBlock({
 				<CodeBlock
 					code={code}
 					lang={lang}
-					className="text-[13px] leading-5 sm:text-sm sm:leading-[1.375rem] [&>pre]:!p-3 [&_.line]:!pl-[2.75rem] [&_.line::before]:!w-9 [&_.line::before]:!pr-2 [&_.line::before]:text-[11px]"
+					className="[&>pre]:!p-3 [&_.line]:!pl-[2.75rem] [&_.line::before]:!w-9 [&_.line::before]:!pr-2 text-[13px] leading-5 sm:text-sm sm:leading-[1.375rem] [&_.line::before]:text-[11px]"
 					hideLineNumbers={hideLineNumbers}
 					noScroll={noScroll}
 				/>
