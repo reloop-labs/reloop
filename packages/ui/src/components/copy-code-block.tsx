@@ -264,7 +264,7 @@ export function CopyCodeBlock({
 				<CodeBlock
 					code={code}
 					lang={lang}
-					className="text-sm leading-7 sm:text-base sm:leading-8 [&_.line::before]:text-sm"
+					className="text-[13px] leading-5 sm:text-sm sm:leading-[1.375rem] [&>pre]:!p-3 [&_.line]:!pl-[2.75rem] [&_.line::before]:!w-9 [&_.line::before]:!pr-2 [&_.line::before]:text-[11px]"
 					hideLineNumbers={hideLineNumbers}
 					noScroll={noScroll}
 				/>

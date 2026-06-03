@@ -2,9 +2,9 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { useTheme } from "next-themes";
 import { useEffect, useRef, useState } from "react";
 import { codeToHtml } from "shiki";
+import { reloopShikiTheme } from "../themes/reloop-shiki-theme";
 
 interface Props {
 	code: string;
@@ -25,7 +25,6 @@ export const CodeBlock = ({
 	noScroll = false,
 	defaultHtml,
 }: Props) => {
-	const { resolvedTheme, systemTheme, theme: currentTheme } = useTheme();
 	const [html, setHtml] = useState<string>(defaultHtml || "");
 	const [mounted, setMounted] = useState(false);
 	const isFirstRun = useRef(true);
@@ -35,17 +34,10 @@ export const CodeBlock = ({
 		setMounted(true);
 	}, []);
 
-	// Determine the effective theme (user preference or system)
-	// Use resolvedTheme which handles system theme resolution
-	const effectiveTheme = resolvedTheme || systemTheme || currentTheme;
-
-	// Map design system theme to Shiki theme
-	// Using themes that match the slate/gray color palette:
-	// - Dark: "one-dark-pro" (matches slate-950 dark blue-gray background)
-	// - Light: "github-light" (clean, minimal, matches white/gray palette)
-	const shikiTheme =
-		themeOverride ||
-		(effectiveTheme === "dark" ? "one-dark-pro" : "github-light");
+	// Default to the Reloop CSS-variables theme so highlighting follows design tokens.
+	// Pass `theme` to opt into a bundled Shiki theme instead.
+	const shikiTheme = themeOverride ?? reloopShikiTheme;
+	const usesReloopTheme = !themeOverride;
 
 	useEffect(() => {
 		// Don't run on the server or before mount
@@ -97,6 +89,7 @@ export const CodeBlock = ({
 
 	// ── Shared wrapper classes ──────────────────────────────────────────
 	const wrapperClassName = cn(
+		usesReloopTheme && "reloop-code-block",
 		"[&>pre]:!bg-transparent text-sm leading-6 [&>pre]:p-4",
 		className,
 	);
@@ -108,6 +101,20 @@ export const CodeBlock = ({
 	return (
 		<>
 			<style>{`
+				.reloop-code-block {
+					--shiki-background: transparent;
+					--shiki-foreground: var(--color-text-strong-950, #171717);
+					--shiki-token-keyword: var(--color-text-strong-950, #171717);
+					--shiki-token-string: var(--color-primary-base, #d97757);
+					--shiki-token-string-expression: var(--color-primary-base, #d97757);
+					--shiki-token-comment: var(--color-text-soft-400, #a3a3a3);
+					--shiki-token-function: var(--color-text-strong-950, #171717);
+					--shiki-token-constant: var(--color-text-sub-600, #5c5c5c);
+					--shiki-token-parameter: var(--color-text-sub-600, #5c5c5c);
+					--shiki-token-punctuation: var(--color-text-soft-400, #a3a3a3);
+					--shiki-token-link: var(--color-primary-base, #d97757);
+				}
+
 				.line-numbers {
 					counter-reset: line;
 				}
