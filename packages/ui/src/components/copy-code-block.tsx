@@ -3,7 +3,8 @@
 import { cn } from "@reloop/ui/cn";
 import { CodeBlock } from "@reloop/ui/code-block";
 import { Icon } from "@reloop/ui/icon";
-import { useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { useRef, useState } from "react";
 
 export type CopyCodeBlockIcon = {
 	path: string;
@@ -44,6 +45,10 @@ export function CopyCodeBlock({
 	noScroll?: boolean;
 }) {
 	const [copied, setCopied] = useState(false);
+	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(
+		undefined,
+	);
+	const tabButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
 	const handleCopy = async () => {
 		try {
@@ -61,6 +66,50 @@ export function CopyCodeBlock({
 	const addressBarIcon = hasTabs
 		? tabs.find((tab) => tab.id === activeTab)?.si
 		: si;
+
+	const activeTabIndex = hasTabs
+		? tabs.findIndex((tab) => tab.id === activeTab)
+		: -1;
+	const highlightedTabIndex =
+		hoveredTabIdx !== undefined ? hoveredTabIdx : activeTabIndex;
+	const highlightedTab = tabButtonRefs.current[highlightedTabIndex];
+	const activeTabButton = tabButtonRefs.current[activeTabIndex];
+	const highlightedBrandColor =
+		highlightedTabIndex >= 0 && tabs
+			? `#${tabs[highlightedTabIndex]?.si.hex}`
+			: undefined;
+	const activeTabBrandColor =
+		activeTabIndex >= 0 && tabs ? `#${tabs[activeTabIndex]?.si.hex}` : undefined;
+
+	const getTabPosition = (button: HTMLButtonElement | null | undefined) => {
+		if (!button) return null;
+		const rect = button.getBoundingClientRect();
+		const parent = button.offsetParent?.getBoundingClientRect();
+		if (!parent) return null;
+
+		return {
+			width: rect.width,
+			height: rect.height,
+			left: rect.left - parent.left,
+			top: rect.top - parent.top,
+		};
+	};
+
+	const pillInset = { x: 6, y: 6 };
+	const getPillPosition = (position: ReturnType<typeof getTabPosition>) => {
+		if (!position) return null;
+
+		return {
+			width: position.width - pillInset.x * 2,
+			height: position.height - pillInset.y * 2 - 2,
+			left: position.left + pillInset.x,
+			top: position.top + pillInset.y,
+		};
+	};
+
+	const highlightedTabPosition = getTabPosition(highlightedTab);
+	const activeTabPosition = getTabPosition(activeTabButton);
+	const highlightedPillPosition = getPillPosition(highlightedTabPosition);
 
 	const copyButton = (
 		<button
@@ -110,20 +159,25 @@ export function CopyCodeBlock({
 
 			{hasTabs ? (
 				<div className="flex items-center gap-3 border-stroke-soft-100 border-b px-4 dark:border-stroke-soft-100/40">
-					<div className="flex min-w-0 flex-1 items-center">
-						{tabs.map((tab) => {
+					<div className="relative flex min-w-0 flex-1 items-center">
+						{tabs.map((tab, index) => {
 							const isActive = tab.id === activeTab;
 							const brandColor = `#${tab.si.hex}`;
 							return (
 								<button
 									key={tab.id}
+									ref={(el) => {
+										tabButtonRefs.current[index] = el;
+									}}
 									type="button"
 									onClick={() => onTabChange?.(tab.id)}
+									onPointerEnter={() => setHoveredTabIdx(index)}
+									onPointerLeave={() => setHoveredTabIdx(undefined)}
 									className={cn(
-										"relative flex items-center gap-2 py-3 pr-5 font-medium text-sm transition-colors",
+										"relative z-10 flex items-center gap-2 px-4 py-3 font-medium text-sm transition-colors",
 										isActive
 											? "text-text-strong-950 dark:text-white"
-											: "text-text-soft-400 hover:text-text-sub-600 dark:hover:text-white/60",
+											: "text-text-sub-600 dark:text-white/70",
 									)}
 								>
 									<svg
@@ -132,21 +186,53 @@ export function CopyCodeBlock({
 										className="size-4 shrink-0"
 										fill="currentColor"
 										xmlns="http://www.w3.org/2000/svg"
-										style={isActive ? { color: brandColor } : undefined}
+										style={{ color: brandColor }}
 										aria-hidden
 									>
 										<path d={tab.si.path} />
 									</svg>
 									{tab.label}
-									{isActive ? (
-										<span
-											className="absolute right-5 bottom-0 left-0 h-[2px] rounded-full"
-											style={{ backgroundColor: brandColor }}
-										/>
-									) : null}
 								</button>
 							);
 						})}
+						<AnimatePresence>
+							{highlightedPillPosition && highlightedTabIndex !== -1 ? (
+								<motion.div
+									className="pointer-events-none absolute top-0 left-0 rounded-lg"
+									style={{
+										backgroundColor: highlightedBrandColor
+											? `color-mix(in srgb, ${highlightedBrandColor} 14%, transparent)`
+											: undefined,
+									}}
+									initial={{
+										...highlightedPillPosition,
+										opacity: 0,
+									}}
+									animate={{
+										...highlightedPillPosition,
+										opacity: 1,
+									}}
+									exit={{
+										...highlightedPillPosition,
+										opacity: 0,
+									}}
+									transition={{ duration: 0.14 }}
+								/>
+							) : null}
+						</AnimatePresence>
+						{activeTabPosition && activeTabIndex !== -1 ? (
+							<motion.div
+								className="pointer-events-none absolute bottom-0 left-0 h-[2px] rounded-full"
+								style={{ backgroundColor: activeTabBrandColor }}
+								initial={false}
+								animate={{
+									width: activeTabPosition.width,
+									left: activeTabPosition.left,
+									opacity: 1,
+								}}
+								transition={{ duration: 0.14 }}
+							/>
+						) : null}
 					</div>
 					{copyButton}
 				</div>
@@ -178,7 +264,7 @@ export function CopyCodeBlock({
 				<CodeBlock
 					code={code}
 					lang={lang}
-					className="text-[15px] leading-7 sm:text-base sm:leading-8 [&_.line::before]:text-sm"
+					className="text-sm leading-7 sm:text-base sm:leading-8 [&_.line::before]:text-sm"
 					hideLineNumbers={hideLineNumbers}
 					noScroll={noScroll}
 				/>
