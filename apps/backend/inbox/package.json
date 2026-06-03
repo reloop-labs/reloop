@@ -22,6 +22,7 @@
 		"@opentelemetry/exporter-trace-otlp-proto": "catalog:backend",
 		"@opentelemetry/instrumentation-express": "catalog:backend",
 		"@opentelemetry/instrumentation-http": "catalog:backend",
+		"@elysia/opentelemetry": "catalog:backend",
 		"@opentelemetry/resources": "catalog:backend",
 		"@opentelemetry/sdk-trace-node": "catalog:backend",
 		"@opentelemetry/semantic-conventions": "catalog:backend",
