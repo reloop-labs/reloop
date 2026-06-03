@@ -1,20 +1,24 @@
 import { Elysia, t } from "elysia";
-import {
-	createMailboxController,
-	getMailboxesController,
-	deleteMailboxController,
-} from "./mailbox.controllers";
 import { evlog } from "evlog/elysia";
 import { authMiddleware } from "../../middleware/auth";
+import {
+	createMailboxController,
+	deleteMailboxController,
+	getMailboxesController,
+} from "./mailbox.controllers";
 
 export const mailboxRoute = new Elysia({ prefix: "/v1/mailboxes" })
 	.use(evlog())
 	.use(authMiddleware)
-	.get("/", async ({ activeOrganizationId }) => {
-		return getMailboxesController(activeOrganizationId);
-	}, {
-		auth: true,
-	})
+	.get(
+		"/",
+		async ({ activeOrganizationId }) => {
+			return getMailboxesController(activeOrganizationId);
+		},
+		{
+			auth: true,
+		},
+	)
 	.post(
 		"/",
 		async ({ body, activeOrganizationId }) => {
@@ -31,7 +35,7 @@ export const mailboxRoute = new Elysia({ prefix: "/v1/mailboxes" })
 				password: t.Optional(t.String()),
 				quota: t.Optional(t.String()),
 			}),
-		}
+		},
 	)
 	.delete(
 		"/:id",
@@ -43,5 +47,5 @@ export const mailboxRoute = new Elysia({ prefix: "/v1/mailboxes" })
 			params: t.Object({
 				id: t.String(),
 			}),
-		}
+		},
 	);

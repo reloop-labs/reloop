@@ -1,13 +1,13 @@
 import { Elysia, t } from "elysia";
-import {
-	getMessagesController,
-	getMessageController,
-	markMessageReadController,
-	toggleStarController,
-	deleteMessageController,
-} from "./messages.controllers";
 import { evlog } from "evlog/elysia";
 import { authMiddleware } from "../../middleware/auth";
+import {
+	deleteMessageController,
+	getMessageController,
+	getMessagesController,
+	markMessageReadController,
+	toggleStarController,
+} from "./messages.controllers";
 
 export const messagesRoute = new Elysia({ prefix: "/v1/messages" })
 	.use(evlog())
@@ -22,7 +22,7 @@ export const messagesRoute = new Elysia({ prefix: "/v1/messages" })
 			query: t.Object({
 				mailboxId: t.Optional(t.String()),
 			}),
-		}
+		},
 	)
 	.get(
 		"/:id",
@@ -34,7 +34,7 @@ export const messagesRoute = new Elysia({ prefix: "/v1/messages" })
 			params: t.Object({
 				id: t.String(),
 			}),
-		}
+		},
 	)
 	.patch(
 		"/:id/read",
@@ -49,7 +49,7 @@ export const messagesRoute = new Elysia({ prefix: "/v1/messages" })
 			body: t.Object({
 				isRead: t.Boolean(),
 			}),
-		}
+		},
 	)
 	.patch(
 		"/:id/star",
@@ -64,7 +64,7 @@ export const messagesRoute = new Elysia({ prefix: "/v1/messages" })
 			body: t.Object({
 				isStarred: t.Boolean(),
 			}),
-		}
+		},
 	)
 	.delete(
 		"/:id",
@@ -76,5 +76,5 @@ export const messagesRoute = new Elysia({ prefix: "/v1/messages" })
 			params: t.Object({
 				id: t.String(),
 			}),
-		}
+		},
 	);

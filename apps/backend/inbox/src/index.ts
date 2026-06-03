@@ -1,17 +1,17 @@
 import "dotenv/config";
+import { opentelemetry } from "@elysia/opentelemetry";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
 import { Elysia } from "elysia";
-import { opentelemetry } from "@elysia/opentelemetry";
 import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
 import { createOTLPDrain } from "evlog/otlp";
 import { inboxConfig } from "./inbox.config";
 import { healthRoute } from "./routes/landing/health.route";
 import { landingRoute } from "./routes/landing/landing.route";
-import { receiveRoute } from "./routes/receive/receive.route";
 import { mailboxRoute } from "./routes/mailbox/mailbox.route";
 import { messagesRoute } from "./routes/messages/messages.route";
+import { receiveRoute } from "./routes/receive/receive.route";
 import { loader } from "./utils/loader";
 
 const parseOtlpHeaders = (

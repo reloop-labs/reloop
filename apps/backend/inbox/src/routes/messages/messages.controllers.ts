@@ -1,15 +1,20 @@
 import { db } from "@reloop/db/client";
 import { inboundEmail } from "@reloop/db/schema";
-import { eq, and } from "drizzle-orm";
-import { useLogger } from "evlog/elysia";
+import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
+import { useLogger } from "evlog/elysia";
 
-export async function getMessagesController(organizationId: string, mailboxId?: string) {
-	let whereClause = eq(inboundEmail.organizationId, organizationId);
-	
+export async function getMessagesController(
+	organizationId: string,
+	mailboxId?: string,
+) {
+	const conditions = [eq(inboundEmail.organizationId, organizationId)];
+
 	if (mailboxId) {
-		whereClause = and(whereClause, eq(inboundEmail.mailboxId, mailboxId)) as any;
+		conditions.push(eq(inboundEmail.mailboxId, mailboxId));
 	}
+
+	const whereClause = and(...conditions);
 
 	const messages = await db.query.inboundEmail.findMany({
 		where: whereClause,
@@ -22,7 +27,10 @@ export async function getMessagesController(organizationId: string, mailboxId?: 
 
 export async function getMessageController(id: string, organizationId: string) {
 	const message = await db.query.inboundEmail.findFirst({
-		where: and(eq(inboundEmail.id, id), eq(inboundEmail.organizationId, organizationId)),
+		where: and(
+			eq(inboundEmail.id, id),
+			eq(inboundEmail.organizationId, organizationId),
+		),
 		with: {
 			attachments: true,
 		},
@@ -47,7 +55,10 @@ export async function markMessageReadController(
 	const log = useLogger();
 
 	const msg = await db.query.inboundEmail.findFirst({
-		where: and(eq(inboundEmail.id, id), eq(inboundEmail.organizationId, organizationId)),
+		where: and(
+			eq(inboundEmail.id, id),
+			eq(inboundEmail.organizationId, organizationId),
+		),
 	});
 
 	if (!msg) {
@@ -59,10 +70,7 @@ export async function markMessageReadController(
 		});
 	}
 
-	await db
-		.update(inboundEmail)
-		.set({ isRead })
-		.where(eq(inboundEmail.id, id));
+	await db.update(inboundEmail).set({ isRead }).where(eq(inboundEmail.id, id));
 
 	log.info(`[INBOX] Marked message ${id} as ${isRead ? "read" : "unread"}`);
 	return { success: true, id, isRead };
@@ -76,7 +84,10 @@ export async function toggleStarController(
 	const log = useLogger();
 
 	const msg = await db.query.inboundEmail.findFirst({
-		where: and(eq(inboundEmail.id, id), eq(inboundEmail.organizationId, organizationId)),
+		where: and(
+			eq(inboundEmail.id, id),
+			eq(inboundEmail.organizationId, organizationId),
+		),
 	});
 
 	if (!msg) {
@@ -97,11 +108,17 @@ export async function toggleStarController(
 	return { success: true, id, isStarred };
 }
 
-export async function deleteMessageController(id: string, organizationId: string) {
+export async function deleteMessageController(
+	id: string,
+	organizationId: string,
+) {
 	const log = useLogger();
-	
+
 	const msg = await db.query.inboundEmail.findFirst({
-		where: and(eq(inboundEmail.id, id), eq(inboundEmail.organizationId, organizationId)),
+		where: and(
+			eq(inboundEmail.id, id),
+			eq(inboundEmail.organizationId, organizationId),
+		),
 	});
 
 	if (!msg) {

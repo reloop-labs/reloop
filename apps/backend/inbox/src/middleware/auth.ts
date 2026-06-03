@@ -1,8 +1,8 @@
 import { createId } from "@paralleldrive/cuid2";
-import { AuthErrors, InboxError } from "../lib/errors";
 import { Elysia } from "elysia";
 import { evlog } from "evlog/elysia";
 import { inboxConfig } from "../inbox.config";
+import { AuthErrors, InboxError } from "../lib/errors";
 import { validateApiKey } from "./api-key-auth";
 import { validateSession } from "./cookie-auth";
 

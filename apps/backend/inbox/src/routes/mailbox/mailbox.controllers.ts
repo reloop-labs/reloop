@@ -1,9 +1,9 @@
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { mailbox } from "@reloop/db/schema";
-import { eq, and } from "drizzle-orm";
-import { useLogger } from "evlog/elysia";
-import { bus, BusEvent } from "@reloop/bus";
+import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
+import { useLogger } from "evlog/elysia";
 
 export async function createMailboxController({
 	organizationId,
@@ -70,7 +70,7 @@ export async function getMailboxesController(organizationId: string) {
 		orderBy: (m, { desc }) => [desc(m.createdAt)],
 	});
 
-	return mailboxes.map(m => ({
+	return mailboxes.map((m) => ({
 		id: m.id,
 		email: m.email,
 		quota: m.quota,
@@ -79,9 +79,12 @@ export async function getMailboxesController(organizationId: string) {
 	}));
 }
 
-export async function deleteMailboxController(id: string, organizationId: string) {
+export async function deleteMailboxController(
+	id: string,
+	organizationId: string,
+) {
 	const log = useLogger();
-	
+
 	const mbx = await db.query.mailbox.findFirst({
 		where: and(eq(mailbox.id, id), eq(mailbox.organizationId, organizationId)),
 	});
