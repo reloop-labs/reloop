@@ -27,6 +27,7 @@
 		"calligraph": "catalog:ui",
 		"react-hook-form": "catalog:ui",
 		"sonner": "catalog:ui",
+		"valibot": "catalog:db",
 		"tailwindcss": "catalog:ui"
 	},
 	"devDependencies": {
