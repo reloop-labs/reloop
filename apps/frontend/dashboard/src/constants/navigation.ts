@@ -16,6 +16,11 @@ export const mainNavigation: MainNavigationItem[] = [
 		isSpecial: true,
 	},
 	{
+		label: "Agent Inbox",
+		path: "/agent-inbox",
+		iconName: "inbox",
+	},
+	{
 		label: "Emails",
 		path: "/emails",
 		iconName: "mail-single",
@@ -63,6 +68,11 @@ export const mainNavigation: MainNavigationItem[] = [
 		label: "Webhooks",
 		path: "/webhooks",
 		iconName: "webhook",
+	},
+	{
+		label: "Workflows",
+		path: "/workflows",
+		iconName: "modules",
 	},
 	{
 		label: "Settings",

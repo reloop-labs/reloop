@@ -1,0 +1,158 @@
+"use client";
+
+import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
+
+interface WorkflowEmptyStateProps {
+	onCreate: () => void;
+}
+
+const steps = [
+	{
+		title: "Pick a trigger",
+		description: "Start when an email event happens — sent, opened, bounced, and more.",
+	},
+	{
+		title: "Add send steps",
+		description: "Chain one or more Send email actions on the canvas.",
+	},
+	{
+		title: "Activate",
+		description: "Turn the workflow on when every step is connected and configured.",
+	},
+];
+
+const features = [
+	{
+		icon: "route" as const,
+		title: "Visual builder",
+		description: "Connect triggers to actions with a drag-and-drop canvas.",
+	},
+	{
+		icon: "mail-single" as const,
+		title: "Email-native",
+		description: "Built on the same events that power Reloop webhooks.",
+	},
+	{
+		icon: "zap" as const,
+		title: "Automatic sends",
+		description: "Emails fire when your trigger conditions match (coming soon).",
+	},
+];
+
+export const WorkflowEmptyState = ({ onCreate }: WorkflowEmptyStateProps) => {
+	return (
+		<div className="w-full">
+			<div className="flex flex-col items-center border-stroke-soft-100 border-b bg-bg-soft-200/10 px-6 py-12 text-center dark:border-stroke-soft-100/50 dark:bg-bg-soft-200/15">
+				<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
+					<Icon name="modules" className="h-5 w-5 text-text-sub-600" />
+				</div>
+				<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
+					No workflows yet
+				</h3>
+				<p className="mx-auto mb-6 max-w-[300px] text-balance font-medium text-[12px] text-text-sub-600">
+					Automate email sends when events occur — like Zapier, but built for
+					your Reloop stack.
+				</p>
+				<div className="flex items-center gap-3">
+					<Button.Root
+						variant="neutral"
+						mode="stroke"
+						size="xsmall"
+						onClick={onCreate}
+						className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
+					>
+						<Icon name="plus" className="h-4 w-4" />
+						Create workflow
+						<span className="inline-flex items-center gap-0.5">
+							<Icon
+								name="command"
+								className="h-4 w-4 rounded-sm border border-stroke-soft-100 p-px"
+							/>
+							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100 p-px font-medium text-[10px] uppercase">
+								A
+							</span>
+						</span>
+					</Button.Root>
+					<Button.Root
+						variant="neutral"
+						mode="stroke"
+						size="xsmall"
+						asChild
+						className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
+					>
+						<a
+							href="https://reloop.sh/docs/learn/automations"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							<Icon name="book-open" className="h-3.5 w-3.5" />
+							Read the docs
+						</a>
+					</Button.Root>
+				</div>
+			</div>
+
+			<div className="grid grid-cols-1 md:grid-cols-2">
+				<div className="border-stroke-soft-100 border-r p-6 dark:border-stroke-soft-100/50">
+					<h4 className="mb-3 font-medium text-sm text-text-strong-950">
+						How it works
+					</h4>
+					<div className="flex flex-col gap-6">
+						{steps.map((step, i) => (
+							<div key={step.title} className="relative flex gap-4">
+								{i < steps.length - 1 && (
+									<div className="absolute top-10 bottom-[-4px] left-[13px] w-px bg-stroke-soft-100 dark:bg-stroke-soft-100/50" />
+								)}
+								<div className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-surface-0 font-medium text-text-sub-600 text-xs dark:border-stroke-soft-100/50">
+									{i + 1}
+								</div>
+								<div>
+									<h5 className="font-medium text-sm text-text-strong-950">
+										{step.title}
+									</h5>
+									<p className="mt-0.5 text-balance font-medium text-[12px] text-text-sub-600">
+										{step.description}
+									</p>
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
+
+				<div className="p-6">
+					<h4 className="mb-3 font-medium text-sm text-text-strong-950">
+						What you can do
+					</h4>
+					<div className="flex flex-col">
+						{features.map((feature, i) => (
+							<div
+								key={feature.title}
+								className={
+									i < features.length - 1
+										? "mb-3 flex gap-4 border-stroke-soft-100 border-b pb-3 dark:border-stroke-soft-100/50"
+										: "flex gap-4"
+								}
+							>
+								<div className="mt-0.5 shrink-0">
+									<Icon
+										name={feature.icon}
+										className="h-4 w-4 text-text-sub-600"
+									/>
+								</div>
+								<div>
+									<h5 className="font-medium text-sm text-text-strong-950">
+										{feature.title}
+									</h5>
+									<p className="mt-0.5 text-balance font-medium text-[12px] text-text-sub-600">
+										{feature.description}
+									</p>
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};

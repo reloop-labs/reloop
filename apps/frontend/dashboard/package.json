@@ -30,6 +30,7 @@
 		"@uiw/codemirror-theme-tokyo-night": "^4.25.10",
 		"@uiw/codemirror-theme-xcode": "^4.25.10",
 		"@uiw/react-codemirror": "^4.25.10",
+		"@xyflow/react": "^12.6.0",
 		"axios": "catalog:",
 		"babel-plugin-react-compiler": "catalog:ui",
 		"better-auth": "catalog:",
