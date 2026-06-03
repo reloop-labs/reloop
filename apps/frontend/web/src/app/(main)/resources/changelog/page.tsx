@@ -5,143 +5,99 @@ import {
 } from "@reloop/web/components/page-shell";
 import { socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
+import {
+	ChangelogTimeline,
+	type ChangelogRelease,
+} from "./changelog-timeline";
 
 export const metadata: Metadata = {
 	title: "Changelog | Reloop",
-	description:
-		"Recent updates to the open-source Reloop email platform. Follow full release history on GitHub.",
+	description: "What's new in Reloop — releases and updates.",
 	openGraph: {
 		title: "Changelog | Reloop",
-		description:
-			"Recent updates to the open-source Reloop email platform.",
+		description: "What's new in Reloop — releases and updates.",
 		type: "website",
 	},
 };
 
-const releases = [
+const releases: ChangelogRelease[] = [
 	{
-		version: "Early access",
-		date: "2025 — ongoing",
-		title: "Open-source platform",
-		summary:
-			"Core email infrastructure: sending API, SMTP relay, templates, webhooks, contacts, campaigns, and dashboard—available to self-host.",
+		date: "July 2026",
+		version: "1.0",
+		title: "Public launch",
+		tags: ["Launch", "Hosted", "Self-host", "Dashboard"],
 		items: [
-			"Multi-language SDKs and API reference",
-			"Agent inbox primitives and structured email parsing",
-			"Self-hosting docs for Docker and Kubernetes",
-			"Apache 2.0 license with Reloop Labs use restrictions",
+			{
+				label: "Hosted service",
+				description: "Reloop as a managed email platform from Reloop Labs.",
+			},
+			{
+				label: "Self-hosting",
+				description: "Docker and Kubernetes paths for your own infrastructure.",
+			},
+			{
+				label: "Full email stack",
+				description: "API, SMTP, templates, webhooks, contacts, and campaigns.",
+			},
+			{
+				label: "Agent inbox",
+				description: "Structured parsing and webhooks for AI workflows.",
+			},
 		],
+		code: `import { Reloop } from '@reloop/sdk';
+
+const reloop = new Reloop('rl_live_7x893k02j');
+
+await reloop.emails.send({
+  to: 'user@example.com',
+  subject: 'Welcome',
+  html: '<p>Hello from Reloop.</p>',
+});`,
 	},
 	{
-		version: "2024",
-		date: "Initial public release",
-		title: "Reloop goes open source",
-		summary:
-			"Reloop Labs published the codebase on GitHub—the start of transparent, self-hostable email infrastructure.",
+		date: "Sep 2025",
+		version: "0.1",
+		title: "Open source",
+		tags: ["GitHub", "API", "Apache 2.0"],
 		items: [
-			"Public repository at github.com/reloop-labs/reloop",
-			"Transactional email API and basic analytics",
-			"Developer documentation and getting-started guides",
+			{
+				label: "Public codebase",
+				description: "Reloop published on GitHub under Apache 2.0.",
+			},
+			{
+				label: "Transactional API",
+				description: "Send email with a developer-first REST API.",
+			},
+			{
+				label: "Documentation",
+				description: "Getting started guides and API reference.",
+			},
 		],
 	},
 ];
 
-const roadmap = [
-	{
-		title: "Self-hosting polish",
-		description:
-			"Smoother deploy paths, clearer upgrade docs, and hardened defaults for production self-hosters.",
-	},
-	{
-		title: "Deliverability tooling",
-		description:
-			"More visibility into bounces, complaints, and domain reputation inside your own deployment.",
-	},
-	{
-		title: "Community integrations",
-		description:
-			"More SDK examples, webhook recipes, and contributions from the GitHub community.",
-	},
-];
+const comingNext = ["Deliverability", "SDK polish", "Community integrations"];
 
 const ChangelogPage = () => {
 	return (
-		<MarketingPageShell
-			titleLines={["Changelog"]}
-			description="What's new in Reloop. For every tagged release and commit detail, follow the repository on GitHub."
-			primaryCta={{
-				label: "GitHub Releases",
-				href: `${socialProfiles.github}/releases`,
-				external: true,
-			}}
-			secondaryCta={{
-				label: "View on GitHub",
-				href: socialProfiles.github,
-				external: true,
-			}}
-			compactHero
-		>
+		<MarketingPageShell titleLines={["Changelog"]} compactHero>
 			<PageSection narrow flushTop>
-				<div className="space-y-10">
-					{releases.map((release) => (
-						<article
-							key={release.version + release.title}
-							className="rounded-2xl border border-stroke-soft-200 p-6 sm:p-8 dark:border-white/10"
-						>
-							<div className="flex flex-wrap items-center gap-3">
-								<span className="rounded-lg border border-stroke-soft-200 bg-bg-weak-50 px-3 py-1 font-semibold text-primary-base text-sm dark:border-white/10">
-									{release.version}
-								</span>
-								<span className="text-[14px] text-text-sub-600 dark:text-white/40">
-									{release.date}
-								</span>
-							</div>
-							<h2 className="mt-4 font-semibold text-xl text-text-strong-950 dark:text-white">
-								{release.title}
-							</h2>
-							<p className="mt-2 text-[15px] text-text-sub-600 leading-7 dark:text-white/50">
-								{release.summary}
-							</p>
-							<ul className="mt-4 space-y-2 pl-5 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								{release.items.map((item) => (
-									<li key={item} className="list-disc">
-										{item}
-									</li>
-								))}
-							</ul>
-						</article>
-					))}
-				</div>
+				<ChangelogTimeline releases={releases} />
 			</PageSection>
 
-			<PageSection>
-				<div className="text-center">
-					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-						Roadmap
-					</p>
-					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] dark:text-white">
-						What's coming
-						<br />
-						<span className="text-primary-base">next.</span>
-					</h2>
-					<p className="mx-auto mt-6 max-w-2xl text-[15px] text-text-sub-600 leading-7 dark:text-white/50">
-						Priorities shift based on community feedback. Vote and discuss on
-						GitHub Discussions.
-					</p>
-				</div>
-				<div className="mx-auto mt-14 grid max-w-4xl gap-4 sm:grid-cols-3">
-					{roadmap.map((item) => (
-						<div
-							key={item.title}
-							className="rounded-2xl border border-stroke-soft-200 p-6 dark:border-white/10"
+			<PageSection narrow>
+				<p className="text-center font-serif text-[1.35rem] text-text-strong-950 leading-snug sm:text-[1.6rem] dark:text-white">
+					Coming{" "}
+					<span className="text-primary-base">next.</span>
+				</p>
+				<div className="mx-auto mt-6 flex max-w-xl flex-wrap justify-center gap-2">
+					{comingNext.map((item) => (
+						<span
+							key={item}
+							className="rounded-full border border-stroke-soft-200 px-4 py-2 font-medium text-[13px] text-text-strong-950 dark:border-white/10 dark:text-white"
 						>
-							<h3 className="font-semibold text-[17px] text-text-strong-950 dark:text-white">
-								{item.title}
-							</h3>
-							<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								{item.description}
-							</p>
-						</div>
+							{item}
+						</span>
 					))}
 				</div>
 			</PageSection>
@@ -149,10 +105,10 @@ const ChangelogPage = () => {
 			<FeatureCta
 				title="Stay updated"
 				titleMuted="Watch the repo."
-				description="Star Reloop on GitHub to follow releases, or join Discord for day-to-day updates."
+				description="Full release history lives on GitHub."
 				primary={{
-					label: "Star on GitHub",
-					href: socialProfiles.github,
+					label: "GitHub Releases",
+					href: `${socialProfiles.github}/releases`,
 					external: true,
 				}}
 				secondary={{
@@ -160,6 +116,7 @@ const ChangelogPage = () => {
 					href: socialProfiles.discord,
 					external: true,
 				}}
+				compact
 			/>
 		</MarketingPageShell>
 	);
