@@ -59,48 +59,31 @@ const languageTabs = [
 	{ id: "python", label: "Python", si: siPython },
 ] as const;
 
-const codeGuide: Record<
-	Language,
-	{ eyebrow: string; title: string; description: string; points: string[] }
-> = {
-	node: {
-		eyebrow: "Example",
-		title: "Connect with Nodemailer",
-		description:
-			"Drop this into your backend. Your API key goes in RELOOP_API_KEY — the same value you use as the SMTP password.",
-		points: [
-			"Port 587 with STARTTLS",
-			"Works with Express, Next.js, and any Node mailer",
-		],
-	},
-	python: {
-		eyebrow: "Example",
-		title: "Connect with smtplib",
-		description:
-			"Python's standard library is enough. Set RELOOP_API_KEY in your environment and run the script.",
-		points: [
-			"Port 587 with STARTTLS",
-			"No extra packages — smtplib ships with Python",
-		],
-	},
+const codeGuide = {
+	eyebrow: "Example",
+	title: "Send your first email",
+	description:
+		"Use the settings above with your API key as the password. Pick a language — the snippet updates, this guide stays the same.",
+	points: [
+		"Port 587 with STARTTLS (or 2465 / 2587)",
+		"Same host, user, and key for every mailer",
+	],
 };
 
-function CodeGuidePanel({ lang }: { lang: Language }) {
-	const guide = codeGuide[lang];
-
+function CodeGuidePanel() {
 	return (
 		<div className="flex flex-col lg:pr-4">
 			<p className="font-semibold text-[11px] text-primary-base uppercase tracking-[0.16em]">
-				{guide.eyebrow}
+				{codeGuide.eyebrow}
 			</p>
 			<h3 className="mt-3 font-serif text-[1.75rem] text-text-strong-950 leading-[1.1] tracking-tighter sm:text-[2rem] dark:text-white">
-				{guide.title}
+				{codeGuide.title}
 			</h3>
 			<p className="mt-4 text-[15px] text-text-sub-600 leading-7 dark:text-white/50">
-				{guide.description}
+				{codeGuide.description}
 			</p>
 			<ul className="mt-6 space-y-3">
-				{guide.points.map((point) => (
+				{codeGuide.points.map((point) => (
 					<li
 						key={point}
 						className="flex items-start gap-2.5 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50"
@@ -210,12 +193,12 @@ export default function Sandbox() {
 						<span className="text-primary-base">paste into your app.</span>
 					</h2>
 					<p className="mt-4 text-[15px] text-text-sub-600 leading-7 dark:text-white/50">
-						Same host and port everywhere. Grab an API key from the dashboard for
-						the password.
+						Same host and port everywhere. Grab an API key from the dashboard
+						for the password.
 					</p>
 				</div>
 
-				<div className="mx-auto max-w-5xl space-y-8">
+				<div className="mx-auto max-w-5xl space-y-24 lg:space-y-32">
 					<div className="grid gap-3 sm:grid-cols-2">
 						{copySettings.map((setting) => (
 							<CopySetting key={setting.label} {...setting} />
@@ -224,7 +207,7 @@ export default function Sandbox() {
 					</div>
 
 					<div className="grid items-start gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-10">
-						<CodeGuidePanel lang={lang} />
+						<CodeGuidePanel />
 						<CopyCodeBlock
 							code={snippets[lang]}
 							lang={lang === "node" ? "javascript" : "python"}
