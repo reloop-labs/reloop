@@ -14,24 +14,26 @@ export function ChatwootUserSync() {
 	const isConfigured = Boolean(baseUrl && websiteToken);
 
 	useEffect(() => {
-		if (!isConfigured || !user?.email) return;
+		if (!isConfigured) return;
+
+		// Reset Chatwoot session when user logs out
+		if (!user?.email) {
+			window.$chatwoot?.reset();
+			return;
+		}
 
 		const identify = () => {
 			if (!window.$chatwoot?.setUser) return;
 
-			const identifier =
-				(user as { id?: string | null }).id?.toString() || user.email;
+			const identifier = user.id?.toString() || user.email;
 
 			window.$chatwoot.setUser(identifier, {
 				email: user.email,
-				name: (user as { name?: string | null }).name ?? undefined,
+				name: user.name ?? undefined,
 				custom_attributes: {
-					activeOrganizationId:
-						(activeOrganization as { id?: string | null })?.id ?? undefined,
-					activeOrganizationSlug:
-						(activeOrganization as { slug?: string | null })?.slug ?? undefined,
-					activeOrganizationName:
-						(activeOrganization as { name?: string | null })?.name ?? undefined,
+					activeOrganizationId: activeOrganization?.id ?? undefined,
+					activeOrganizationSlug: activeOrganization?.slug ?? undefined,
+					activeOrganizationName: activeOrganization?.name ?? undefined,
 				},
 			});
 		};

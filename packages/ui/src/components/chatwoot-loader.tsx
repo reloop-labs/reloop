@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 declare global {
 	interface Window {
@@ -18,19 +18,14 @@ declare global {
 					custom_attributes?: Record<string, unknown>;
 				},
 			) => void;
+			reset: () => void;
 		};
 	}
 }
 
 function useChatwootConfig() {
-	const baseUrlRaw = process.env.NEXT_PUBLIC_CHATWOOT_BASE_URL;
-	const websiteTokenRaw = process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN;
-
-	const baseUrl = useMemo(() => baseUrlRaw?.replace(/\/+$/, ""), [baseUrlRaw]);
-	const websiteToken = useMemo(
-		() => websiteTokenRaw?.trim(),
-		[websiteTokenRaw],
-	);
+	const baseUrl = process.env.NEXT_PUBLIC_CHATWOOT_BASE_URL?.replace(/\/+$/, "");
+	const websiteToken = process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN?.trim();
 
 	return { baseUrl, websiteToken, isConfigured: Boolean(baseUrl && websiteToken) };
 }
