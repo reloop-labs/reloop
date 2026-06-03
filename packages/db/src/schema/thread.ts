@@ -65,10 +65,7 @@ export const emailThread = pgTable(
 		index("email_thread_idx_organization_id").on(table.organizationId),
 		index("email_thread_idx_last_message_at").on(table.lastMessageAt),
 		index("email_thread_idx_status").on(table.status),
-		index("email_thread_idx_org_status").on(
-			table.organizationId,
-			table.status,
-		),
+		index("email_thread_idx_org_status").on(table.organizationId, table.status),
 		index("email_thread_idx_mailbox_last_msg").on(
 			table.mailboxId,
 			table.lastMessageAt,
@@ -89,10 +86,9 @@ export const threadMessage = pgTable(
 			.notNull()
 			.references(() => emailThread.id, { onDelete: "cascade" }),
 		direction: messageDirectionEnum("direction").notNull(),
-		inboundEmailId: text("inbound_email_id").references(
-			() => inboundEmail.id,
-			{ onDelete: "cascade" },
-		),
+		inboundEmailId: text("inbound_email_id").references(() => inboundEmail.id, {
+			onDelete: "cascade",
+		}),
 		emailLogId: text("email_log_id").references(() => emailLog.id, {
 			onDelete: "cascade",
 		}),
@@ -119,38 +115,32 @@ export const threadMessage = pgTable(
 
 // ─── Relations ───────────────────────────────────────────────────────
 
-export const emailThreadRelations = relations(
-	emailThread,
-	({ one, many }) => ({
-		mailbox: one(mailbox, {
-			fields: [emailThread.mailboxId],
-			references: [mailbox.id],
-		}),
-		organization: one(organization, {
-			fields: [emailThread.organizationId],
-			references: [organization.id],
-		}),
-		messages: many(threadMessage),
+export const emailThreadRelations = relations(emailThread, ({ one, many }) => ({
+	mailbox: one(mailbox, {
+		fields: [emailThread.mailboxId],
+		references: [mailbox.id],
 	}),
-);
+	organization: one(organization, {
+		fields: [emailThread.organizationId],
+		references: [organization.id],
+	}),
+	messages: many(threadMessage),
+}));
 
-export const threadMessageRelations = relations(
-	threadMessage,
-	({ one }) => ({
-		thread: one(emailThread, {
-			fields: [threadMessage.threadId],
-			references: [emailThread.id],
-		}),
-		inboundEmail: one(inboundEmail, {
-			fields: [threadMessage.inboundEmailId],
-			references: [inboundEmail.id],
-		}),
-		emailLog: one(emailLog, {
-			fields: [threadMessage.emailLogId],
-			references: [emailLog.id],
-		}),
+export const threadMessageRelations = relations(threadMessage, ({ one }) => ({
+	thread: one(emailThread, {
+		fields: [threadMessage.threadId],
+		references: [emailThread.id],
 	}),
-);
+	inboundEmail: one(inboundEmail, {
+		fields: [threadMessage.inboundEmailId],
+		references: [inboundEmail.id],
+	}),
+	emailLog: one(emailLog, {
+		fields: [threadMessage.emailLogId],
+		references: [emailLog.id],
+	}),
+}));
 
 // ─── Exports ─────────────────────────────────────────────────────────
 

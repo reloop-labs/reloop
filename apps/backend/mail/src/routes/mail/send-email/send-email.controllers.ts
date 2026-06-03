@@ -64,7 +64,7 @@ export async function sendEmailController({
 	}
 
 	// ── Resolve In-Reply-To header if replying to a thread ────────
-	let threadHeaders: Record<string, string> = {};
+	const threadHeaders: Record<string, string> = {};
 	if (body.thread_id) {
 		// Look up the most recent message in the thread to get its Message-ID
 		const lastMsg = await db.query.threadMessage.findFirst({
@@ -221,4 +221,3 @@ export async function sendEmailController({
 
 	return response;
 }
-

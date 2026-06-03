@@ -129,7 +129,10 @@ export const AddAgentAddressModal = ({
 						<div className="flex items-start justify-between px-5 pt-5 pb-4">
 							<div className="flex flex-col gap-1">
 								<div className="flex items-center gap-2.5">
-									<Icon name="mail-single" className="h-4 w-4 text-text-strong-950" />
+									<Icon
+										name="mail-single"
+										className="h-4 w-4 text-text-strong-950"
+									/>
 									<Modal.Title asChild>
 										<h2 className="font-semibold text-label-md text-text-strong-950">
 											Add agent address
@@ -137,8 +140,8 @@ export const AddAgentAddressModal = ({
 									</Modal.Title>
 								</div>
 								<p className="text-paragraph-xs text-text-sub-600">
-									Create a dedicated inbound email for an AI agent. Messages to this
-									address appear in Agent Inbox.
+									Create a dedicated inbound email for an AI agent. Messages to
+									this address appear in Agent Inbox.
 								</p>
 							</div>
 							<button
@@ -160,7 +163,10 @@ export const AddAgentAddressModal = ({
 								Agent name
 								<span className="ml-0.5 text-error-base">*</span>
 							</label>
-							<Input.Root size="xsmall" hasError={!!form.formState.errors.label}>
+							<Input.Root
+								size="xsmall"
+								hasError={!!form.formState.errors.label}
+							>
 								<Input.Wrapper>
 									<Input.Input
 										id="agent-label"
@@ -200,7 +206,9 @@ export const AddAgentAddressModal = ({
 										/>
 									</Input.Wrapper>
 								</Input.Root>
-								<span className="font-medium text-label-sm text-text-sub-600">@</span>
+								<span className="font-medium text-label-sm text-text-sub-600">
+									@
+								</span>
 								<Select.Root
 									value={form.watch("domain")}
 									onValueChange={(v) => form.setValue("domain", v)}
@@ -270,7 +278,10 @@ export const AddAgentAddressModal = ({
 								size="small"
 								disabled={isSubmitting}
 							>
-								<Select.Trigger id="agent-security" className="h-[32px] rounded-[10px]">
+								<Select.Trigger
+									id="agent-security"
+									className="h-[32px] rounded-[10px]"
+								>
 									<Select.Value />
 								</Select.Trigger>
 								<Select.Content>
@@ -346,4 +357,3 @@ export const AddAgentAddressModal = ({
 		</Modal.Root>
 	);
 };
-

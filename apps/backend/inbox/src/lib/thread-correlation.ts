@@ -50,9 +50,7 @@ export async function correlateInboundThread({
 		});
 		if (match) {
 			existingThreadId = match.threadId;
-			log.info(
-				`[THREAD] Matched thread via In-Reply-To: ${existingThreadId}`,
-			);
+			log.info(`[THREAD] Matched thread via In-Reply-To: ${existingThreadId}`);
 		}
 	}
 
@@ -65,9 +63,7 @@ export async function correlateInboundThread({
 			});
 			if (match) {
 				existingThreadId = match.threadId;
-				log.info(
-					`[THREAD] Matched thread via References: ${existingThreadId}`,
-				);
+				log.info(`[THREAD] Matched thread via References: ${existingThreadId}`);
 				break;
 			}
 		}
@@ -106,9 +102,7 @@ export async function correlateInboundThread({
 			})
 			.where(eq(emailThread.id, existingThreadId));
 
-		log.info(
-			`[THREAD] Appended inbound message to thread ${existingThreadId}`,
-		);
+		log.info(`[THREAD] Appended inbound message to thread ${existingThreadId}`);
 		return { threadId: existingThreadId, isNew: false };
 	}
 

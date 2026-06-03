@@ -137,7 +137,8 @@ export async function receiveInboundEmailController(rawMessage: string) {
 		const subject = parsed.subject || "";
 		const textBody = parsed.text || "";
 		const htmlBody = (parsed.html as string) || "";
-		const snippet = textBody.substring(0, 300).replace(/\s+/g, " ").trim() || undefined;
+		const snippet =
+			textBody.substring(0, 300).replace(/\s+/g, " ").trim() || undefined;
 
 		// ── Threading headers ───────────────────────────────────
 		const messageId = parsed.messageId || "";
@@ -149,9 +150,7 @@ export async function receiveInboundEmailController(rawMessage: string) {
 				: [];
 
 		// ── Headers & spam ──────────────────────────────────────
-		const headers = parsed.headers
-			? extractHeaders(parsed.headers)
-			: undefined;
+		const headers = parsed.headers ? extractHeaders(parsed.headers) : undefined;
 		const { spamScore, isSpam } = parsed.headers
 			? extractSpamInfo(parsed.headers)
 			: { spamScore: null, isSpam: false };
@@ -216,8 +215,7 @@ export async function receiveInboundEmailController(rawMessage: string) {
 				contentType: att.contentType || "application/octet-stream",
 				size: att.size || 0,
 				storagePath: "", // TODO: Upload to S3 and store path
-				contentDisposition:
-					(att.contentDisposition as string) || "attachment",
+				contentDisposition: (att.contentDisposition as string) || "attachment",
 				contentId: att.contentId || undefined,
 				checksum: att.checksum || undefined,
 			}));

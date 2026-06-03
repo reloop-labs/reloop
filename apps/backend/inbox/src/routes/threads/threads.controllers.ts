@@ -1,5 +1,10 @@
 import { db } from "@reloop/db/client";
-import { emailThread, threadMessage, inboundEmail, emailLog } from "@reloop/db/schema";
+import {
+	emailLog,
+	emailThread,
+	inboundEmail,
+	threadMessage,
+} from "@reloop/db/schema";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
@@ -26,10 +31,7 @@ export async function getThreadsController(
 	return threads;
 }
 
-export async function getThreadController(
-	id: string,
-	organizationId: string,
-) {
+export async function getThreadController(id: string, organizationId: string) {
 	const log = useLogger();
 
 	const thread = await db.query.emailThread.findFirst({
@@ -137,10 +139,7 @@ export async function markThreadReadController(
 		});
 	}
 
-	await db
-		.update(emailThread)
-		.set({ isRead })
-		.where(eq(emailThread.id, id));
+	await db.update(emailThread).set({ isRead }).where(eq(emailThread.id, id));
 
 	log.info(`[THREAD] Marked thread ${id} as ${isRead ? "read" : "unread"}`);
 	return { success: true, id, isRead };
@@ -169,10 +168,7 @@ export async function toggleThreadStarController(
 		});
 	}
 
-	await db
-		.update(emailThread)
-		.set({ isStarred })
-		.where(eq(emailThread.id, id));
+	await db.update(emailThread).set({ isStarred }).where(eq(emailThread.id, id));
 
 	log.info(`[THREAD] ${isStarred ? "Starred" : "Unstarred"} thread ${id}`);
 	return { success: true, id, isStarred };

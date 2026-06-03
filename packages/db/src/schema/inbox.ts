@@ -102,9 +102,7 @@ export const inboundEmail = pgTable(
 		size: bigint("size", { mode: "number" }).notNull().default(0),
 
 		// ── State ───────────────────────────────────────────────
-		status: inboundEmailStatusEnum("status")
-			.notNull()
-			.default("received"),
+		status: inboundEmailStatusEnum("status").notNull().default("received"),
 		isRead: boolean("is_read").notNull().default(false),
 		isStarred: boolean("is_starred").notNull().default(false),
 		isSpam: boolean("is_spam").notNull().default(false),

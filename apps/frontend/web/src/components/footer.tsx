@@ -123,7 +123,7 @@ const links = [
 			},
 			{
 				title: "Status",
-				href: "/resources/status",
+				href: "https://status.reloop.sh/status/live",
 			},
 			{
 				title: "Community",
