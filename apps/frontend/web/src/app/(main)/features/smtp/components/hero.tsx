@@ -4,7 +4,7 @@ import * as Button from "@reloop/ui/button";
 
 export default function Hero() {
 	return (
-		<div className="relative flex min-h-[70dvh] items-center justify-center overflow-hidden bg-transparent pt-40 pb-20">
+		<div className="relative flex min-h-[70dvh] items-center justify-center overflow-hidden bg-transparent pt-48 pb-20 sm:pt-52">
 			<section className="mx-auto max-w-4xl px-4 pb-8 sm:px-6 lg:px-8">
 				<div className="mx-auto max-w-[920px] text-center">
 					<p className="font-semibold text-[11px] text-primary-base uppercase tracking-[0.16em]">

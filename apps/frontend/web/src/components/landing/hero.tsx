@@ -20,8 +20,8 @@ export function FeatureHero({
 		<div
 			className={
 				compact
-					? "relative overflow-hidden bg-transparent pt-28 pb-8 sm:pt-32 sm:pb-10"
-					: "relative flex min-h-dvh items-center justify-center overflow-hidden bg-transparent pt-40 pb-28"
+					? "relative overflow-hidden bg-transparent pt-40 pb-8 sm:pt-44 sm:pb-10"
+					: "relative flex min-h-dvh items-center justify-center overflow-hidden bg-transparent pt-48 pb-28 sm:pt-52"
 			}
 		>
 			<main className="relative z-10">
