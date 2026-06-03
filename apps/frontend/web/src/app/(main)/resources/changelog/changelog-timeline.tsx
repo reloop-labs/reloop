@@ -1,9 +1,21 @@
 import { CodeBlock } from "@reloop/web/components/page-shell";
-import { socialProfiles } from "@reloop/web/lib/site";
+
+export type ChangelogCategory =
+	| "Planning"
+	| "Design"
+	| "Frontend"
+	| "Backend"
+	| "DevOps"
+	| "Testing";
 
 type ChangelogItem = {
 	label: string;
 	description: string;
+};
+
+export type ChangelogSection = {
+	category: ChangelogCategory;
+	items: ChangelogItem[];
 };
 
 export type ChangelogRelease = {
@@ -11,9 +23,57 @@ export type ChangelogRelease = {
 	version: string;
 	title: string;
 	tags: string[];
-	items: ChangelogItem[];
+	/** Legacy flat list; use `sections` for categorized entries. */
+	items?: ChangelogItem[];
+	sections?: ChangelogSection[];
 	code?: string;
 };
+
+const categoryOrder: ChangelogCategory[] = [
+	"Planning",
+	"Design",
+	"Frontend",
+	"Backend",
+	"DevOps",
+	"Testing",
+];
+
+function ReleaseSections({ release }: { release: ChangelogRelease }) {
+	const sections =
+		release.sections ??
+		(release.items
+			? [{ category: "Frontend" as const, items: release.items }]
+			: []);
+
+	const sorted = [...sections].sort(
+		(a, b) => categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category),
+	);
+
+	return (
+		<div className="mt-6 space-y-8">
+			{sorted.map((section) => (
+				<div key={section.category}>
+					<h3 className="font-semibold text-[12px] text-text-soft-400 uppercase tracking-wider dark:text-white/35">
+						{section.category}
+					</h3>
+					<ul className="mt-3 space-y-3">
+						{section.items.map((item) => (
+							<li
+								key={`${section.category}-${item.label}`}
+								className="text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/50"
+							>
+								<span className="font-semibold text-text-strong-950 dark:text-white">
+									{item.label}
+								</span>{" "}
+								{item.description}
+							</li>
+						))}
+					</ul>
+				</div>
+			))}
+		</div>
+	);
+}
 
 export function ChangelogTimeline({
 	releases,
@@ -67,19 +127,7 @@ export function ChangelogTimeline({
 							</div>
 						</div>
 
-						<ul className="mt-6 space-y-3">
-							{release.items.map((item) => (
-								<li
-									key={item.label}
-									className="text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/50"
-								>
-									<span className="font-semibold text-text-strong-950 dark:text-white">
-										{item.label}
-									</span>{" "}
-									{item.description}
-								</li>
-							))}
-						</ul>
+						<ReleaseSections release={release} />
 
 						{release.code && (
 							<div className="mt-6">
