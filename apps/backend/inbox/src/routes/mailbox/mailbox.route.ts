@@ -34,6 +34,8 @@ export const mailboxRoute = new Elysia({ prefix: "/v1/mailboxes" })
 				email: t.String(),
 				password: t.Optional(t.String()),
 				quota: t.Optional(t.String()),
+				displayName: t.Optional(t.String()),
+				description: t.Optional(t.String()),
 			}),
 		},
 	)

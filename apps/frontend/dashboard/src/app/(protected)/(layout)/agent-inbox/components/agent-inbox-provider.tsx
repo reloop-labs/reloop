@@ -57,8 +57,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		return mailboxesData.map((mb) => ({
 			id: mb.id,
 			email: mb.email,
-			label: mb.email.split("@")[0] || "Agent",
-			description: `Quota: ${mb.quota || "5 GB"}`,
+			label: mb.displayName || mb.email.split("@")[0] || "Agent",
+			description: mb.description,
 			status:
 				mb.status === "active" ? ("active" as const) : ("disabled" as const),
 			securityLevel: 5 as const,
@@ -72,22 +72,34 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		return messagesData.map((msg) => ({
 			id: msg.id,
 			mailboxId: msg.mailboxId,
-			from: { email: msg.fromEmail },
+			from: { name: msg.fromName || undefined, email: msg.fromEmail },
 			subject: msg.subject || "(No Subject)",
-			preview: msg.textBody
-				? msg.textBody.substring(0, 120) +
-					(msg.textBody.length > 120 ? "..." : "")
-				: "",
+			preview:
+				msg.snippet ||
+				(msg.textBody
+					? msg.textBody.substring(0, 120) +
+						(msg.textBody.length > 120 ? "..." : "")
+					: ""),
 			bodyText: msg.textBody || "",
 			bodyHtml: msg.htmlBody || undefined,
-			receivedAt: msg.createdAt,
-			status: msg.isRead ? ("handled" as const) : ("new" as const),
+			receivedAt: msg.date || msg.createdAt,
+			status: msg.isSpam
+				? ("blocked" as const)
+				: msg.status === "processing"
+					? ("parsing" as const)
+					: msg.isRead
+						? ("handled" as const)
+						: ("new" as const),
 			securityLevel: 5 as const,
 			unread: !msg.isRead,
+			cc: msg.ccEmails || undefined,
+			replyTo: msg.replyTo || undefined,
 			attachments:
 				msg.attachments?.map((att: any) => ({
 					name: att.filename,
 					size: `${(att.size / 1024).toFixed(1)} KB`,
+					contentType: att.contentType,
+					isInline: att.contentDisposition === "inline",
 				})) || [],
 			timeline: [
 				{ label: "Email received", at: msg.createdAt, state: "done" as const },
