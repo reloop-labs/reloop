@@ -2,11 +2,11 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { inboxConfig } from "@reloop/be-inbox/inbox.config";
 
 export const s3Client = new S3Client({
-	region: inboxConfig.S3_REGION,
-	endpoint: inboxConfig.S3_ENDPOINT,
+	region: inboxConfig.S3.REGION,
+	endpoint: inboxConfig.S3.ENDPOINT,
 	credentials: {
-		accessKeyId: inboxConfig.S3_ACCESS_KEY || "",
-		secretAccessKey: inboxConfig.S3_SECRET_KEY || "",
+		accessKeyId: inboxConfig.S3.ACCESS_KEY || "",
+		secretAccessKey: inboxConfig.S3.SECRET_KEY || "",
 	},
-	forcePathStyle: true,
+	forcePathStyle: inboxConfig.S3.FORCE_PATH_STYLE === "true",
 });

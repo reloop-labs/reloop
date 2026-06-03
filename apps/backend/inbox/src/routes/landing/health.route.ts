@@ -16,7 +16,7 @@ export const healthRoute = new Elysia().get(
 			await bus.healthCheck();
 			await s3Client.send(
 				new HeadBucketCommand({
-					Bucket: inboxConfig.S3_BUCKET_NAME,
+					Bucket: inboxConfig.S3.BUCKET,
 				}),
 			);
 			const responseTime = Date.now() - startTime;

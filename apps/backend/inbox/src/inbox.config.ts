@@ -11,11 +11,14 @@ export const inboxConfig = {
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
 
 	// S3 Configuration for attachments
-	S3_ENDPOINT: process.env.S3_ENDPOINT || "http://localhost:9010", // MinIO default
-	S3_REGION: process.env.S3_REGION || "us-east-1",
-	S3_ACCESS_KEY: process.env.S3_ACCESS_KEY || "reloop",
-	S3_SECRET_KEY: process.env.S3_SECRET_KEY || "reloop123",
-	S3_BUCKET_NAME: process.env.S3_BUCKET_NAME || "reloop-attachments",
+	S3: {
+		ENDPOINT: process.env.S3_ENDPOINT || "http://localhost:9010",
+		ACCESS_KEY: process.env.S3_ACCESS_KEY || "reloop",
+		SECRET_KEY: process.env.S3_SECRET_KEY || "reloop123",
+		BUCKET: process.env.S3_BUCKET || "reloop-attachments",
+		REGION: process.env.S3_REGION || "us-east-1",
+		FORCE_PATH_STYLE: process.env.S3_FORCE_PATH_STYLE || "true",
+	},
 
 	// Rate limits for inbound
 	RATE_LIMIT_IP_MAX: Number(process.env.RATE_LIMIT_IP_MAX || "100"),
