@@ -26,10 +26,14 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 							traceId,
 							service: "inbox",
 							authType: "session",
-							activeOrganizationId: sessionResult.activeOrganizationId,
+							organizationId: sessionResult.activeOrganizationId,
 							userId: sessionResult.userId,
 						});
-						return { ...sessionResult, traceId };
+						return {
+							...sessionResult,
+							organizationId: sessionResult.activeOrganizationId,
+							traceId,
+						};
 					}
 				} catch (e) {
 					if (e instanceof InboxError) {
@@ -63,13 +67,13 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 					if (apiKeyResult) {
 						log.set({
 							authType: "apiKey",
-							activeOrganizationId: apiKeyResult.organizationId,
+							organizationId: apiKeyResult.organizationId,
 							userId: apiKeyResult.userId,
 						});
 						log.info("API key authentication successful");
 						return {
 							userId: apiKeyResult.userId,
-							activeOrganizationId: apiKeyResult.organizationId,
+							organizationId: apiKeyResult.organizationId,
 							authType: apiKeyResult.authType,
 							apiKeyId: apiKeyResult.apiKeyId,
 							traceId,
@@ -113,13 +117,13 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 					if (apiKeyResult) {
 						log.set({
 							authType: "apiKey",
-							activeOrganizationId: apiKeyResult.organizationId,
+							organizationId: apiKeyResult.organizationId,
 							userId: apiKeyResult.userId,
 						});
 						log.info("API key authentication successful");
 						return {
 							userId: apiKeyResult.userId,
-							activeOrganizationId: apiKeyResult.organizationId,
+							organizationId: apiKeyResult.organizationId,
 							authType: apiKeyResult.authType,
 							apiKeyId: apiKeyResult.apiKeyId,
 							traceId,
@@ -129,11 +133,15 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 					if (sessionResult) {
 						log.set({
 							authType: "session",
-							activeOrganizationId: sessionResult.activeOrganizationId,
+							organizationId: sessionResult.activeOrganizationId,
 							userId: sessionResult.userId,
 						});
 						log.info("Session authentication successful");
-						return { ...sessionResult, traceId };
+						return {
+							...sessionResult,
+							organizationId: sessionResult.activeOrganizationId,
+							traceId,
+						};
 					}
 				} catch (e) {
 					if (e instanceof InboxError) {

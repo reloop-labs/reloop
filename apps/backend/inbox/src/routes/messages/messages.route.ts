@@ -1,6 +1,6 @@
+import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { Elysia, t } from "elysia";
 import { evlog } from "evlog/elysia";
-import { authMiddleware } from "../../middleware/auth";
 import {
 	deleteMessageController,
 	getMessageController,
@@ -14,8 +14,8 @@ export const messagesRoute = new Elysia({ prefix: "/v1/messages" })
 	.use(authMiddleware)
 	.get(
 		"/",
-		async ({ query, activeOrganizationId }) => {
-			return getMessagesController(activeOrganizationId, query.mailboxId);
+		async ({ query, organizationId }) => {
+			return getMessagesController(organizationId, query.mailboxId);
 		},
 		{
 			auth: true,
@@ -26,8 +26,8 @@ export const messagesRoute = new Elysia({ prefix: "/v1/messages" })
 	)
 	.get(
 		"/:id",
-		async ({ params: { id }, activeOrganizationId }) => {
-			return getMessageController(id, activeOrganizationId);
+		async ({ params: { id }, organizationId }) => {
+			return getMessageController(id, organizationId);
 		},
 		{
 			auth: true,
@@ -38,8 +38,8 @@ export const messagesRoute = new Elysia({ prefix: "/v1/messages" })
 	)
 	.patch(
 		"/:id/read",
-		async ({ params: { id }, body, activeOrganizationId }) => {
-			return markMessageReadController(id, activeOrganizationId, body.isRead);
+		async ({ params: { id }, body, organizationId }) => {
+			return markMessageReadController(id, organizationId, body.isRead);
 		},
 		{
 			auth: true,
@@ -53,8 +53,8 @@ export const messagesRoute = new Elysia({ prefix: "/v1/messages" })
 	)
 	.patch(
 		"/:id/star",
-		async ({ params: { id }, body, activeOrganizationId }) => {
-			return toggleStarController(id, activeOrganizationId, body.isStarred);
+		async ({ params: { id }, body, organizationId }) => {
+			return toggleStarController(id, organizationId, body.isStarred);
 		},
 		{
 			auth: true,
@@ -68,8 +68,8 @@ export const messagesRoute = new Elysia({ prefix: "/v1/messages" })
 	)
 	.delete(
 		"/:id",
-		async ({ params: { id }, activeOrganizationId }) => {
-			return deleteMessageController(id, activeOrganizationId);
+		async ({ params: { id }, organizationId }) => {
+			return deleteMessageController(id, organizationId);
 		},
 		{
 			auth: true,

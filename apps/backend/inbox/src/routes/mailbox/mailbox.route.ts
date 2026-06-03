@@ -1,6 +1,6 @@
+import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { Elysia, t } from "elysia";
 import { evlog } from "evlog/elysia";
-import { authMiddleware } from "../../middleware/auth";
 import {
 	createMailboxController,
 	deleteMailboxController,
@@ -11,20 +11,20 @@ export const mailboxRoute = new Elysia({ prefix: "/v1/mailboxes" })
 	.use(evlog())
 	.use(authMiddleware)
 	.get(
-		"/",
-		async ({ activeOrganizationId }) => {
-			return getMailboxesController(activeOrganizationId);
+		"/list",
+		async ({ organizationId }) => {
+			return getMailboxesController(organizationId);
 		},
 		{
 			auth: true,
 		},
 	)
 	.post(
-		"/",
-		async ({ body, activeOrganizationId }) => {
+		"/create",
+		async ({ body, organizationId }) => {
 			return createMailboxController({
 				...body,
-				organizationId: activeOrganizationId,
+				organizationId,
 			});
 		},
 		{
@@ -39,8 +39,8 @@ export const mailboxRoute = new Elysia({ prefix: "/v1/mailboxes" })
 	)
 	.delete(
 		"/:id",
-		async ({ params: { id }, activeOrganizationId }) => {
-			return deleteMailboxController(id, activeOrganizationId);
+		async ({ params: { id }, organizationId }) => {
+			return deleteMailboxController(id, organizationId);
 		},
 		{
 			auth: true,
