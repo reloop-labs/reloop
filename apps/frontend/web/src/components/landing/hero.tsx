@@ -11,8 +11,8 @@ export function FeatureHero({
 	compact = false,
 }: {
 	titleLines: string[];
-	description: string;
-	primaryCta: FeatureCtaLink;
+	description?: string;
+	primaryCta?: FeatureCtaLink;
 	secondaryCta?: FeatureCtaLink;
 	compact?: boolean;
 }) {
@@ -42,44 +42,52 @@ export function FeatureHero({
 							))}
 						</h1>
 
-						<p className="mx-auto mt-7 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
-							{description}
-						</p>
+						{description && (
+							<p className="mx-auto mt-7 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
+								{description}
+							</p>
+						)}
 
-						<div
-							className={
-								compact
-									? "mt-7 flex flex-wrap items-center justify-center gap-4"
-									: "mt-10 flex flex-wrap items-center justify-center gap-4"
-							}
-						>
-							<a
-								href={primaryCta.href}
-								target={primaryCta.external ? "_blank" : undefined}
-								rel={primaryCta.external ? "noopener noreferrer" : undefined}
-								className={`${Button.buttonVariants({
-									variant: "neutral",
-									mode: "filled",
-								}).root()} h-11! rounded-2xl! px-8! font-semibold`}
+						{primaryCta && (
+							<div
+								className={
+									compact
+										? "mt-7 flex flex-wrap items-center justify-center gap-4"
+										: "mt-10 flex flex-wrap items-center justify-center gap-4"
+								}
 							>
-								{primaryCta.label}
-							</a>
-							{secondaryCta && (
 								<a
-									href={secondaryCta.href}
-									target={secondaryCta.external ? "_blank" : undefined}
+									href={primaryCta.href}
+									target={primaryCta.external ? "_blank" : undefined}
 									rel={
-										secondaryCta.external ? "noopener noreferrer" : undefined
+										primaryCta.external ? "noopener noreferrer" : undefined
 									}
 									className={`${Button.buttonVariants({
 										variant: "neutral",
-										mode: "stroke",
+										mode: "filled",
 									}).root()} h-11! rounded-2xl! px-8! font-semibold`}
 								>
-									{secondaryCta.label}
+									{primaryCta.label}
 								</a>
-							)}
-						</div>
+								{secondaryCta && (
+									<a
+										href={secondaryCta.href}
+										target={secondaryCta.external ? "_blank" : undefined}
+										rel={
+											secondaryCta.external
+												? "noopener noreferrer"
+												: undefined
+										}
+										className={`${Button.buttonVariants({
+											variant: "neutral",
+											mode: "stroke",
+										}).root()} h-11! rounded-2xl! px-8! font-semibold`}
+									>
+										{secondaryCta.label}
+									</a>
+								)}
+							</div>
+						)}
 					</div>
 				</section>
 			</main>

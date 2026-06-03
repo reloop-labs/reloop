@@ -14,8 +14,8 @@ export function MarketingPageShell({
 	children,
 }: {
 	titleLines: string[];
-	description: string;
-	primaryCta: FeatureCtaLink;
+	description?: string;
+	primaryCta?: FeatureCtaLink;
 	secondaryCta?: FeatureCtaLink;
 	compactHero?: boolean;
 	children: React.ReactNode;

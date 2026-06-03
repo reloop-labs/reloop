@@ -109,15 +109,15 @@ export function ContactForm() {
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 0.3 }}
 					>
-						Message sent!
+						Message sent
 					</motion.h3>
 					<motion.p
-						className="mt-2 text-text-sub-600 dark:text-white/50"
+						className="mt-2 text-sm text-text-sub-600 dark:text-white/50"
 						initial={{ opacity: 0, y: 10 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 0.4 }}
 					>
-						We&apos;ll get back to you within a few business days.
+						We&apos;ll reply within a few business days.
 					</motion.p>
 				</motion.div>
 			) : (
@@ -127,10 +127,14 @@ export function ContactForm() {
 							htmlFor="email"
 							className="block font-medium text-sm text-text-strong-950 dark:text-white"
 						>
-							Email address
+							Email
 						</label>
 						<div className="mt-2">
-							<Input.Root size="medium" hasError={!!errors.email}>
+							<Input.Root
+								size="medium"
+								hasError={!!errors.email}
+								className="rounded-xl!"
+							>
 								<Input.Wrapper>
 									<Input.Input
 										id="email"
@@ -154,14 +158,14 @@ export function ContactForm() {
 							htmlFor="message"
 							className="block font-medium text-sm text-text-strong-950 dark:text-white"
 						>
-							How can we help?
+							Message
 						</label>
 						<div className="mt-2">
 							<Textarea.Root
 								simple
 								id="message"
-								className="text-base"
-								placeholder="Hosted service, self-hosting, licensing, or anything else…"
+								className="rounded-2xl! text-base"
+								placeholder="Your message…"
 								hasError={!!errors.message}
 								{...register("message")}
 							/>
@@ -182,7 +186,7 @@ export function ContactForm() {
 								mode: "filled",
 							}).root()} h-11! w-full rounded-2xl! px-8! font-semibold disabled:opacity-60`}
 						>
-							{isSubmitting ? <Spinner size={16} /> : "Send message"}
+							{isSubmitting ? <Spinner size={16} /> : "Send"}
 						</button>
 					</div>
 				</form>
