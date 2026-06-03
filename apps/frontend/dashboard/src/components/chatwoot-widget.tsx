@@ -15,23 +15,36 @@ export function ChatwootUserSync() {
 
 	useEffect(() => {
 		if (!isConfigured || !user?.email) return;
-		if (!window.$chatwoot?.setUser) return;
 
-		const identifier =
-			(user as { id?: string | null }).id?.toString() || user.email;
+		const identify = () => {
+			if (!window.$chatwoot?.setUser) return;
 
-		window.$chatwoot.setUser(identifier, {
-			email: user.email,
-			name: (user as { name?: string | null }).name ?? undefined,
-			custom_attributes: {
-				activeOrganizationId:
-					(activeOrganization as { id?: string | null })?.id ?? undefined,
-				activeOrganizationSlug:
-					(activeOrganization as { slug?: string | null })?.slug ?? undefined,
-				activeOrganizationName:
-					(activeOrganization as { name?: string | null })?.name ?? undefined,
-			},
-		});
+			const identifier =
+				(user as { id?: string | null }).id?.toString() || user.email;
+
+			window.$chatwoot.setUser(identifier, {
+				email: user.email,
+				name: (user as { name?: string | null }).name ?? undefined,
+				custom_attributes: {
+					activeOrganizationId:
+						(activeOrganization as { id?: string | null })?.id ?? undefined,
+					activeOrganizationSlug:
+						(activeOrganization as { slug?: string | null })?.slug ?? undefined,
+					activeOrganizationName:
+						(activeOrganization as { name?: string | null })?.name ?? undefined,
+				},
+			});
+		};
+
+		// Try immediately in case the SDK is already ready
+		identify();
+
+		// Also listen for the SDK ready event in case it loads later
+		window.addEventListener("chatwoot:ready", identify);
+
+		return () => {
+			window.removeEventListener("chatwoot:ready", identify);
+		};
 	}, [isConfigured, user, activeOrganization]);
 
 	return null;
