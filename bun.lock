@@ -248,7 +248,7 @@
       },
     },
     "apps/backend/inbox": {
-      "name": "inbox-service",
+      "name": "inbox",
       "dependencies": {
         "@aws-sdk/client-s3": "catalog:backend",
         "@aws-sdk/s3-request-presigner": "catalog:backend",
@@ -2952,7 +2952,7 @@
 
     "import-meta-resolve": ["import-meta-resolve@4.2.0", "", {}, "sha512-Iqv2fzaTQN28s/FwZAoFq0ZSs/7hMAHJVX+w8PZl3cY19Pxk6jFFalxQoIfW2826i/fDLXv8IiEZRIT0lDuWcg=="],
 
-    "inbox-service": ["inbox-service@workspace:apps/backend/inbox"],
+    "inbox": ["inbox@workspace:apps/backend/inbox"],
 
     "inherits": ["inherits@2.0.4", "", {}, "sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ=="],
 

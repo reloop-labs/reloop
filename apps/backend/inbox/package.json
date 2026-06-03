@@ -1,5 +1,5 @@
 {
-	"name": "inbox-service",
+	"name": "inbox",
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {

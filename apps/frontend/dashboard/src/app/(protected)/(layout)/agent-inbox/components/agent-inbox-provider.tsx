@@ -31,6 +31,8 @@ interface AgentInboxContextValue {
 	getMailbox: (id: string) => AgentMailbox | undefined;
 	addMailbox: (input: NewAgentAddressInput) => Promise<AgentMailbox>;
 	refresh: () => Promise<void>;
+	markMessageRead: (id: string, isRead: boolean) => Promise<void>;
+	deleteMessage: (id: string) => Promise<void>;
 }
 
 const AgentInboxContext = createContext<AgentInboxContextValue | null>(null);
@@ -43,7 +45,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		data: mailboxesData,
 		isLoading: isLoadingMailboxes,
 		mutate: mutateMailboxes,
-	} = useSWR<any[]>("/api/inbox/v1/mailboxes");
+	} = useSWR<any[]>("/api/inbox/v1/mailboxes/list");
 
 	// Fetch messages from actual endpoint
 	const {
@@ -83,6 +85,10 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			status: msg.isRead ? ("handled" as const) : ("new" as const),
 			securityLevel: 5 as const,
 			unread: !msg.isRead,
+			attachments: msg.attachments?.map((att: any) => ({
+				name: att.filename,
+				size: `${(att.size / 1024).toFixed(1)} KB`,
+			})) || [],
 			timeline: [
 				{ label: "Email received", at: msg.createdAt, state: "done" as const },
 				{ label: "Delivered to NATS", at: msg.createdAt, state: "done" as const },
@@ -99,7 +105,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 	const addMailbox = useCallback(
 		async (input: NewAgentAddressInput) => {
 			const email = `${input.localPart}@${input.domain}`;
-			const res = await fetch("/api/inbox/v1/mailboxes", {
+			const res = await fetch("/api/inbox/v1/mailboxes/create", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
@@ -132,6 +138,40 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		[mutateMailboxes],
 	);
 
+	const markMessageRead = useCallback(
+		async (id: string, isRead: boolean) => {
+			const res = await fetch(`/api/inbox/v1/messages/${id}/read`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ isRead }),
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || `Failed to mark message as ${isRead ? "read" : "unread"}`);
+			}
+
+			await mutateMessages();
+		},
+		[mutateMessages],
+	);
+
+	const deleteMessage = useCallback(
+		async (id: string) => {
+			const res = await fetch(`/api/inbox/v1/messages/${id}`, {
+				method: "DELETE",
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to delete message");
+			}
+
+			await mutateMessages();
+		},
+		[mutateMessages],
+	);
+
 	const refresh = useCallback(async () => {
 		await Promise.all([mutateMailboxes(), mutateMessages()]);
 	}, [mutateMailboxes, mutateMessages]);
@@ -145,6 +185,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			getMailbox,
 			addMailbox,
 			refresh,
+			markMessageRead,
+			deleteMessage,
 		}),
 		[
 			mailboxes,
@@ -154,6 +196,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			getMailbox,
 			addMailbox,
 			refresh,
+			markMessageRead,
+			deleteMessage,
 		],
 	);
 

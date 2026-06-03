@@ -10,6 +10,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import type { AgentMailbox, InboundThread } from "../mock-data";
 import { SECURITY_LEVEL_LABELS } from "../mock-data";
+import { useAgentInbox } from "./agent-inbox-provider";
 
 dayjs.extend(relativeTime);
 
@@ -46,6 +47,29 @@ export const ThreadDetail = ({
 	showBack,
 }: ThreadDetailProps) => {
 	const [parsedExpanded, setParsedExpanded] = useState(true);
+	const { markMessageRead, deleteMessage } = useAgentInbox();
+
+	const handleToggleRead = async () => {
+		if (!thread) return;
+		try {
+			await markMessageRead(thread.id, thread.unread);
+			toast.success(thread.unread ? "Message marked as handled" : "Message marked as new");
+		} catch (err: any) {
+			toast.error(err.message || "Failed to update message status");
+		}
+	};
+
+	const handleDelete = async () => {
+		if (!thread) return;
+		if (!confirm("Are you sure you want to delete this message?")) return;
+		try {
+			await deleteMessage(thread.id);
+			toast.success("Message deleted");
+			if (onBack) onBack();
+		} catch (err: any) {
+			toast.error(err.message || "Failed to delete message");
+		}
+	};
 
 	if (!thread) {
 		return (
@@ -270,9 +294,9 @@ export const ThreadDetail = ({
 						variant="neutral"
 						mode="stroke"
 						size="xsmall"
-						onClick={() => handlePrototypeAction("Mark handled")}
+						onClick={handleToggleRead}
 					>
-						Mark handled
+						{thread.unread ? "Mark handled" : "Mark new"}
 					</Button.Root>
 					<Button.Root
 						variant="neutral"
@@ -289,6 +313,15 @@ export const ThreadDetail = ({
 						onClick={() => handlePrototypeAction("View raw webhook")}
 					>
 						View raw webhook
+					</Button.Root>
+					<Button.Root
+						variant="neutral"
+						mode="ghost"
+						size="xsmall"
+						onClick={handleDelete}
+						className="hover:bg-red-500/10 hover:text-red-500"
+					>
+						Delete
 					</Button.Root>
 				</div>
 			</div>

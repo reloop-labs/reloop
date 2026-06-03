@@ -8,7 +8,7 @@ WORKDIR /app
 RUN apk add --no-cache python3 make g++
 
 COPY . .
-RUN bun --filter=inbox-service install
+RUN bun --filter=inbox install
 
 # Stage 2: Build the application
 FROM base AS builder
@@ -18,7 +18,7 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN bun run --filter=inbox-service build
+RUN bun run --filter=inbox build
 
 # Stage 3: Production server
 FROM base AS runner

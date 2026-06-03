@@ -20,6 +20,9 @@ export async function getMessagesController(
 		where: whereClause,
 		orderBy: (m, { desc }) => [desc(m.createdAt)],
 		limit: 50,
+		with: {
+			attachments: true,
+		},
 	});
 
 	return messages;
