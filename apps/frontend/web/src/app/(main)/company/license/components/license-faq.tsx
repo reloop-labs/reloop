@@ -2,14 +2,19 @@ import { FaqSection } from "@reloop/web/components/faq-section";
 
 const licenseFaqItems = [
 	{
-		question: "Can I use Reloop in my company internally?",
+		question: "Can I use Reloop without self-hosting?",
 		answer:
-			"Yes. Personal use and internal company use are permitted under the license when you self-host the open-source version.",
+			"Yes. Reloop Labs offers a hosted email service with the same capabilities as the self-hosted platform—transactional email, campaigns, SMTP, templates, webhooks, and more.",
 	},
 	{
-		question: "Can I offer Reloop as a hosted email service?",
+		question: "Can I use Reloop in my company internally?",
 		answer:
-			"No. You may not offer Reloop or a modified version as a hosted email service (SaaS, PaaS, or similar). There is no commercial license—self-hosting is the only permitted way to use Reloop.",
+			"Yes. Use our hosted service or deploy Reloop on your own infrastructure for internal company email—both are permitted under the license for personal and internal use.",
+	},
+	{
+		question: "Can I offer Reloop as a hosted email service to others?",
+		answer:
+			"Not as a third-party commercial SaaS. Reloop Labs operates the official hosted service. You may not sell, sublicense, or offer Reloop—or a modified version—as a competing commercial hosted email service (SaaS, PaaS, or similar).",
 	},
 	{
 		question: "Can I sell or sublicense Reloop?",
@@ -24,7 +29,7 @@ const licenseFaqItems = [
 	{
 		question: "How do I run Reloop for my business?",
 		answer:
-			"Self-host the open-source version on your own infrastructure. See our self-hosting guide for setup instructions.",
+			"Sign up for our hosted service, or deploy the open-source platform on your own infrastructure—see our self-hosting guide for setup instructions.",
 	},
 ];
 

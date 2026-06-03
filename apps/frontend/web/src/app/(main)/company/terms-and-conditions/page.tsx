@@ -36,16 +36,16 @@ const TermsPage = () => {
 				<section>
 					<h2>1. About Reloop</h2>
 					<p>
-						Reloop is an open-source email infrastructure platform for sending,
-						receiving, and managing email. It is designed to be self-hosted on
-						your own infrastructure. Reloop Labs maintains the project, website,
-						documentation, and community channels.
+						Reloop is email infrastructure for sending, receiving, and managing
+						email—the same class of service as proprietary platforms. Reloop
+						Labs offers Reloop as a hosted service and maintains the open-source
+						project, website, documentation, and community channels.
 					</p>
 					<p>
-						There is <strong>no commercial license</strong> and no hosted email
-						service offered by Reloop Labs. To use Reloop, you must self-host the
-						open-source version subject to our{" "}
-						<Link href="/company/license">license terms</Link>.
+						You can use Reloop in two ways: sign up for our hosted email service,
+						or self-host the open-source platform on your own infrastructure.
+						Third parties may not resell or offer competing hosted services;
+						see our <Link href="/company/license">license terms</Link>.
 					</p>
 				</section>
 
@@ -111,17 +111,20 @@ const TermsPage = () => {
 				</section>
 
 				<section>
-					<h2>4. Self-hosting responsibilities</h2>
+					<h2>4. Hosted service and self-hosting</h2>
+					<p>
+						When you use Reloop as a hosted service, Reloop Labs operates the
+						platform and processes data as described in our{" "}
+						<Link href="/company/privacy">Privacy Policy</Link>. You are
+						responsible for lawful use, recipient consent, and acceptable
+						sending practices.
+					</p>
 					<p>
 						When you self-host Reloop, you are solely responsible for your
 						deployment, configuration, security, backups, compliance with email
 						and privacy laws, and all content sent or received through your
-						instance. This includes obtaining consent from recipients, honoring
-						opt-out requests, and maintaining acceptable sending practices.
-					</p>
-					<p>
-						Reloop Labs does not operate or monitor your self-hosted instance
-						unless you explicitly engage us for support. See our{" "}
+						instance. Reloop Labs does not operate or monitor your self-hosted
+						instance unless you explicitly engage us for support. See our{" "}
 						<Link href="/resources/self-hosting-guide">self-hosting guide</Link>{" "}
 						for deployment documentation.
 					</p>

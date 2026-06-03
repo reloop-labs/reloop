@@ -4,9 +4,9 @@ import { Icon } from "@reloop/ui/icon";
 
 const highlights = [
 	{
-		title: "Self-host anywhere",
+		title: "Hosted or self-hosted",
 		description:
-			"Run Reloop on your own infrastructure. Docker Compose, single binary, or Kubernetes — your data never leaves your network.",
+			"Use Reloop as a service from Reloop Labs, or run it on your own infrastructure. Docker Compose, Kubernetes, or bare metal.",
 	},
 	{
 		title: "No vendor lock-in",
@@ -43,8 +43,8 @@ const OpenSource = () => {
 							for all.
 						</h2>
 						<p className="mt-6 max-w-[420px] text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[16px] dark:text-white/60">
-							Reloop is fully open source. Inspect every line, self-host on your
-							own terms, and shape the future of email infrastructure.
+							Reloop is fully open source—the same platform we run as a hosted
+							service. Use ours or self-host on your own terms.
 						</p>
 						<div className="mt-8 flex flex-wrap items-center gap-3">
 							<a

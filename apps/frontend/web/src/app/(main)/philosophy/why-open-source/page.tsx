@@ -1,294 +1,206 @@
+import {
+	FeatureCta,
+	MarketingPageShell,
+	PageSection,
+} from "@reloop/web/components/page-shell";
+import { socialProfiles } from "@reloop/web/lib/site";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+	title: "Why Open Source | Reloop",
+	description:
+		"Reloop is Apache 2.0 open source. Transparency, security through visibility, and community-driven development.",
+	openGraph: {
+		title: "Why Open Source | Reloop",
+		description:
+			"Reloop is Apache 2.0 open source. Transparency, security through visibility, and community-driven development.",
+		type: "website",
+	},
+};
 
 const benefits = [
 	{
 		number: "01",
-		title: "Complete Transparency",
+		title: "Complete transparency",
 		description:
-			"Every line of code is visible. You know exactly how your email infrastructure works — no hidden algorithms, no black boxes, no surprises.",
+			"Every line of code is visible. You know exactly how email is routed, stored, and delivered—no hidden algorithms.",
 	},
 	{
 		number: "02",
-		title: "No Vendor Lock-in",
+		title: "No vendor lock-in",
 		description:
-			"You own your infrastructure. Self-host on your servers, modify the code, or migrate whenever you want. Your data stays yours — always.",
+			"Use our hosted service, self-host on your servers, modify the code, or migrate whenever you want.",
 	},
 	{
 		number: "03",
-		title: "Security Through Visibility",
+		title: "Security through visibility",
 		description:
-			"Open source means thousands of engineers reviewing the code. Vulnerabilities are found and patched faster than in any proprietary system.",
+			"Public code means more eyes on security. Issues get found and fixed in the open—not buried in a ticket queue.",
 	},
 	{
 		number: "04",
-		title: "Community Innovation",
+		title: "Community innovation",
 		description:
-			"Features, fixes, and integrations contributed by real developers solving real problems. Innovation happens faster when we build together.",
+			"Features and fixes from developers solving real problems. The roadmap is shaped by contributors, not a sales team.",
 	},
 	{
 		number: "05",
-		title: "Runs Anywhere",
+		title: "Runs anywhere",
 		description:
-			"Docker Compose, Kubernetes, bare metal, or a single binary. Your infrastructure, your rules — no calls home, no telemetry you didn't opt into.",
+			"Docker Compose, Kubernetes, or bare metal—or use Reloop hosted. Your infrastructure, your rules.",
 	},
 	{
 		number: "06",
-		title: "Accessible to Everyone",
+		title: "Accessible to everyone",
 		description:
-			"A solo founder, a Y Combinator startup, or a Fortune 500 engineering team — open source removes the barriers that proprietary pricing creates.",
+			"Apache 2.0 with Reloop Labs use restrictions: free for personal and internal use, hosted or self-hosted.",
 	},
 ];
 
-const contrast = [
-	{
-		label: "Proprietary providers",
-		points: [
-			"Opaque pricing that grows with you",
-			"Black-box deliverability decisions",
-			"Locked into their roadmap",
-			"Data leaves your control",
-			"Support tickets instead of source code",
-		],
-		dark: true,
-	},
-	{
-		label: "Reloop open source",
-		points: [
-			"Predictable, self-hosted or cloud pricing",
-			"Every routing decision is auditable",
-			"Contribute to the roadmap directly",
-			"Data stays in your network",
-			"Read the code, fix the bug, ship the PR",
-		],
-		dark: false,
-	},
-];
+const bentoCellClass =
+	"border-stroke-soft-200 border-t border-l-0 bg-transparent p-8 transition-colors duration-300 first:border-t-0 hover:bg-black/[0.01] sm:border-t sm:border-l lg:p-10 dark:border-white/10 dark:hover:bg-white/[0.02] sm:[&:nth-child(-n+2)]:border-t-0 sm:[&:nth-child(2n+1)]:border-l-0";
 
 const WhyOpenSourcePage = () => {
 	return (
-		<div>
-			{/* ── Hero ─────────────────────────────────────────── */}
-			<section className="bg-white text-[#0a0d12]">
-				<div className="mx-auto max-w-[1320px] px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
-					<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
-						Philosophy
-					</p>
-					<h1 className="mt-4 max-w-[860px] font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.8rem]">
-						Why chose open source.
-					</h1>
-					<p className="mt-8 max-w-[580px] text-[#0a0d12]/60 text-[15px] leading-relaxed sm:text-[17px]">
-						Transparency, security, and community-driven innovation aren't
-						marketing words — they're the exact reasons we made Reloop fully
-						open source from day one.
-					</p>
-					<div className="mt-10 flex flex-wrap items-center gap-4">
-						<a
-							href="https://github.com/reloop-labs/reloop"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="inline-flex h-12 items-center justify-center rounded-2xl bg-[#0a0d12] px-8 font-semibold text-[15px] text-white transition-colors hover:bg-[#0a0d12]/90"
-						>
-							View on GitHub
-						</a>
-						<Link
-							href="/resources/self-hosting-guide"
-							className="inline-flex h-12 items-center justify-center gap-2.5 rounded-2xl border border-[#0a0d12]/10 px-8 font-semibold text-[#0a0d12] text-[15px] transition-colors hover:bg-[#0a0d12]/6"
-						>
-							Self-hosting guide
-						</Link>
+		<MarketingPageShell
+			titleLines={["Why open source"]}
+			description="Transparency, security, and community-driven development aren't marketing words—they're why Reloop is open source from day one."
+			primaryCta={{
+				label: "View on GitHub",
+				href: socialProfiles.github,
+				external: true,
+			}}
+			secondaryCta={{
+				label: "License",
+				href: "/company/license",
+			}}
+			compactHero
+		>
+			<PageSection>
+				<div className="flex flex-col gap-16 lg:flex-row lg:items-start lg:gap-24">
+					<div className="lg:w-[480px] lg:shrink-0">
+						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
+							The open source advantage
+						</p>
+						<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
+							Six reasons
+							<br />
+							<span className="text-primary-base">that matter.</span>
+						</h2>
+						<p className="mt-6 max-w-[420px] text-[15px] text-text-sub-600 leading-7 dark:text-white/50">
+							Open source isn't just a license—it's how we build trust with
+							developers who depend on email infrastructure every day.
+						</p>
 					</div>
-				</div>
-			</section>
-
-			{/* ── The Six Reasons ──────────────────────────────── */}
-			<section className="bg-[#05070b] text-white">
-				<div className="mx-auto max-w-[1320px] px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
-					<div className="flex flex-col gap-16 lg:flex-row lg:items-start lg:gap-24">
-						{/* Left */}
-						<div className="lg:w-[340px] lg:shrink-0">
-							<p className="font-semibold text-[11px] text-white/40 uppercase tracking-[0.16em]">
-								The open source advantage
-							</p>
-							<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem]">
-								Six reasons
-								<br />
-								<span className="text-primary-base">that matter.</span>
-							</h2>
-							<p className="mt-6 text-[15px] text-white/50 leading-7">
-								Open source isn't a development model — it's a philosophy that
-								produces better software, builds deeper trust, and creates
-								stronger communities.
-							</p>
-						</div>
-
-						{/* Right grid */}
-						<div className="flex-1">
-							<div className="grid gap-px overflow-hidden rounded-2xl border border-white/5 bg-white/5 sm:grid-cols-2">
-								{benefits.map((b) => (
-									<div
-										key={b.number}
-										className="flex flex-col bg-[#05070b] p-8 lg:p-10"
-									>
-										<span className="font-semibold text-sm text-white/28 tabular-nums">
-											{b.number}
-										</span>
-										<h3 className="mt-4 font-semibold text-lg text-white leading-snug">
-											{b.title}
-										</h3>
-										<p className="mt-3 text-[15px] text-white/50 leading-relaxed">
-											{b.description}
-										</p>
-									</div>
-								))}
-							</div>
+					<div className="flex-1">
+						<div className="grid overflow-hidden rounded-2xl border border-stroke-soft-200 sm:grid-cols-2 dark:border-white/10">
+							{benefits.map((item) => (
+								<div key={item.number} className={bentoCellClass}>
+									<span className="font-semibold text-sm text-text-soft-400 tabular-nums dark:text-white/28">
+										{item.number}
+									</span>
+									<h3 className="mt-3 font-semibold text-[17px] text-text-strong-950 leading-snug dark:text-white">
+										{item.title}
+									</h3>
+									<p className="mt-3 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
+										{item.description}
+									</p>
+								</div>
+							))}
 						</div>
 					</div>
 				</div>
-			</section>
+			</PageSection>
 
-			{/* ── Contrast Section ─────────────────────────────── */}
-			<section className="bg-white text-[#0a0d12]">
-				<div className="mx-auto max-w-[1320px] px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
-					<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
+			<PageSection narrow>
+				<div className="text-center">
+					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
 						The difference
 					</p>
-					<h2 className="mt-4 max-w-[640px] font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem]">
+					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] dark:text-white">
 						Closed source asks you to trust.
 						<br />
-						<span className="text-primary-base">
-							Open source lets you verify.
-						</span>
+						<span className="text-primary-base">Open source lets you verify.</span>
 					</h2>
-
-					<div className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-[#0a0d12]/8 bg-[#0a0d12]/8 sm:grid-cols-2">
-						{/* Proprietary column */}
-						<div className="bg-[#0a0d12] p-8 text-white lg:p-12">
-							<p className="font-semibold text-[11px] text-white/40 uppercase tracking-[0.16em]">
-								Proprietary providers
-							</p>
-							<ul className="mt-8 space-y-5">
-								{contrast[0]?.points.map((pt) => (
-									<li
-										key={pt}
-										className="flex items-start gap-3 text-[15px] text-white/60"
-									>
-										<span className="mt-[3px] shrink-0 font-semibold text-white/24">
-											✕
-										</span>
-										{pt}
-									</li>
-								))}
-							</ul>
-						</div>
-
-						{/* Reloop column */}
-						<div className="bg-white p-8 lg:p-12">
-							<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
-								Reloop open source
-							</p>
-							<ul className="mt-8 space-y-5">
-								{contrast[1]?.points.map((pt) => (
-									<li
-										key={pt}
-										className="flex items-start gap-3 text-[#0a0d12]/70 text-[15px]"
-									>
-										<span className="mt-[3px] shrink-0 font-semibold text-emerald-500">
-											✓
-										</span>
-										{pt}
-									</li>
-								))}
-							</ul>
-						</div>
-					</div>
 				</div>
-			</section>
-
-			{/* ── Community Numbers ────────────────────────────── */}
-			<section className="bg-[#05070b] text-white">
-				<div className="mx-auto max-w-[1320px] px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
-					<p className="font-semibold text-[11px] text-white/40 uppercase tracking-[0.16em]">
-						Built in public
-					</p>
-					<h2 className="mt-4 max-w-[640px] font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem]">
-						By the community,
-						<br />
-						<span className="text-primary-base">for the community.</span>
-					</h2>
-
-					<div className="mt-20 grid gap-px overflow-hidden rounded-2xl border border-white/5 bg-white/5 sm:grid-cols-3">
-						{[
-							{
-								stat: "1,000+",
-								label: "GitHub Stars",
-								sub: "And growing every day",
-							},
-							{
-								stat: "50+",
-								label: "Contributors",
-								sub: "From around the world",
-							},
-							{
-								stat: "100%",
-								label: "Open source",
-								sub: "Apache 2.0 licensed",
-							},
-						].map((item) => (
-							<div
-								key={item.label}
-								className="flex flex-col bg-[#05070b] p-8 lg:p-12"
-							>
-								<span className="font-semibold text-[3rem] text-white leading-none tracking-tighter sm:text-[3.6rem]">
-									{item.stat}
-								</span>
-								<span className="mt-4 font-semibold text-[17px] text-white">
-									{item.label}
-								</span>
-								<span className="mt-2 text-[14px] text-white/40">
-									{item.sub}
-								</span>
-							</div>
-						))}
-					</div>
-				</div>
-			</section>
-
-			{/* ── CTA ──────────────────────────────────────────── */}
-			<section className="bg-white text-[#0a0d12]">
-				<div className="mx-auto max-w-[1320px] px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
-					<div className="mx-auto max-w-[920px] text-center">
-						<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
-							Join the movement
+				<div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-stroke-soft-200 sm:grid-cols-2 dark:border-white/10">
+					<div className="p-8 lg:p-10">
+						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
+							Proprietary providers
 						</p>
-						<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
-							Read the code.
-							<br />
-							<span className="text-primary-base">Own your stack.</span>
-						</h2>
-						<p className="mx-auto mt-8 max-w-[560px] text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[17px]">
-							Contribute to Reloop, deploy your own instance, or star us on
-							GitHub to show your support for open source email infrastructure.
+						<ul className="mt-6 space-y-4">
+							{[
+								"Opaque pricing that grows with you",
+								"Black-box deliverability decisions",
+								"Locked into their roadmap",
+								"Data leaves your control",
+								"Support tickets instead of source code",
+							].map((pt) => (
+								<li
+									key={pt}
+									className="flex items-start gap-3 text-[15px] text-text-sub-600 dark:text-white/50"
+								>
+									<span className="mt-0.5 shrink-0 font-semibold text-text-soft-400">
+										✕
+									</span>
+									{pt}
+								</li>
+							))}
+						</ul>
+					</div>
+					<div className="border-stroke-soft-200 border-t p-8 sm:border-t-0 sm:border-l lg:p-10 dark:border-white/10">
+						<p className="font-semibold text-[11px] text-primary-base uppercase tracking-[0.16em]">
+							Reloop open source
 						</p>
-						<div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-							<a
-								href="https://github.com/reloop-labs/reloop"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-[#0a0d12] px-8 font-semibold text-[15px] text-white transition-colors hover:bg-[#0a0d12]/90"
-							>
-								⭐ Star on GitHub
-							</a>
-							<Link
-								href="/resources/self-hosting-guide"
-								className="inline-flex h-12 items-center justify-center gap-2.5 rounded-2xl border border-[#0a0d12]/10 px-8 font-semibold text-[#0a0d12] text-[15px] transition-colors hover:bg-[#0a0d12]/6"
-							>
-								Start self-hosting
-							</Link>
-						</div>
+						<ul className="mt-6 space-y-4">
+							{[
+								"Hosted service or self-host on your infrastructure",
+								"Every routing decision is auditable",
+								"Contribute to the roadmap on GitHub",
+								"Same open-source codebase either way",
+								"Read the code, fix the bug, ship the PR",
+							].map((pt) => (
+								<li
+									key={pt}
+									className="flex items-start gap-3 text-[15px] text-text-sub-600 dark:text-white/50"
+								>
+									<span className="mt-0.5 shrink-0 font-semibold text-primary-base">
+										✓
+									</span>
+									{pt}
+								</li>
+							))}
+						</ul>
 					</div>
 				</div>
-			</section>
-		</div>
+				<p className="mx-auto mt-10 max-w-xl text-center text-[14px] text-text-sub-600 dark:text-white/40">
+					Reloop is licensed under{" "}
+					<Link
+						href="/company/license"
+						className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
+					>
+						Apache 2.0 with additional use restrictions
+					</Link>
+					. Use Reloop as a hosted service from Reloop Labs, or self-host the
+					open-source platform on your own infrastructure.
+				</p>
+			</PageSection>
+
+			<FeatureCta
+				title="Get started with Reloop"
+				titleMuted="Hosted or self-hosted."
+				description="Sign up for our email service, or clone the repo and run Reloop on infrastructure you control."
+				primary={{
+					label: "Get started",
+					href: "/dashboard/signup",
+				}}
+				secondary={{
+					label: "Self-hosting guide",
+					href: "/resources/self-hosting-guide",
+				}}
+			/>
+		</MarketingPageShell>
 	);
 };
 

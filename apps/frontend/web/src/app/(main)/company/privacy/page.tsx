@@ -30,10 +30,11 @@ const PrivacyPage = () => {
 				</p>
 
 				<section>
-					<h2>1. Two contexts: our website and your deployment</h2>
+					<h2>1. Three contexts: our website, hosted service, and self-hosting</h2>
 					<p>
-						Reloop is an open-source, self-hostable email platform. There is an
-						important distinction:
+						Reloop is open-source email infrastructure offered as a hosted service
+						from Reloop Labs or as software you deploy yourself. There are three
+						distinct contexts:
 					</p>
 					<ul>
 						<li>
@@ -42,12 +43,18 @@ const PrivacyPage = () => {
 							Policy describes what we collect in those contexts.
 						</li>
 						<li>
+							<strong>Reloop hosted service</strong> is email infrastructure
+							operated by Reloop Labs. When you use our hosted product, we
+							process account, email, and usage data as described in this Policy
+							to provide and secure the service.
+						</li>
+						<li>
 							<strong>Your self-hosted Reloop instance</strong> runs on
 							infrastructure you control. When you self-host, you decide what
 							data is collected, stored, and processed. Reloop Labs does not
-							receive your email content, contact lists, or delivery logs unless
-							you choose to share them with us (for example, in a support
-							request).
+							receive your email content, contact lists, or delivery logs from
+							your deployment unless you choose to share them with us (for
+							example, in a support request).
 						</li>
 					</ul>
 				</section>
@@ -88,9 +95,11 @@ const PrivacyPage = () => {
 						</li>
 					</ul>
 					<p>
-						We do <strong>not</strong> sell personal information. We do not
-						operate a commercial hosted email service. Reloop is provided for
-						self-hosting under our{" "}
+						We do <strong>not</strong> sell personal information. When you use
+						Reloop as a hosted service, email and account data is processed on
+						Reloop Labs&apos; infrastructure to operate the product. When you
+						self-host, that data stays on servers you control. The open-source
+						software is available under our{" "}
 						<Link href="/company/license">Apache 2.0 license</Link> with
 						additional use restrictions.
 					</p>

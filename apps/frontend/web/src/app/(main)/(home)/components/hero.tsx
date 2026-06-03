@@ -40,8 +40,8 @@ export default function Hero() {
 							.
 						</h1>
 						<p className="mx-auto mt-8 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px]">
-							High-performance, open-source email infrastructure for AI agents
-							and developers. Built for absolute control and scale.
+							High-performance, open-source email infrastructure—the same service
+							as proprietary platforms. Use Reloop hosted or deploy it yourself.
 						</p>
 
 						<div className="mt-10 flex flex-wrap items-center justify-center gap-4">

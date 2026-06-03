@@ -1,240 +1,206 @@
-import Link from "next/link";
+import {
+	FeatureCta,
+	MarketingPageShell,
+	PageSection,
+} from "@reloop/web/components/page-shell";
+import { contactEmail, socialProfiles } from "@reloop/web/lib/site";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+	title: "About Us | Reloop",
+	description:
+		"Reloop Labs builds open-source email infrastructure—hosted service or self-host—for developers who want transparency and control.",
+	openGraph: {
+		title: "About Us | Reloop",
+		description:
+			"Reloop Labs builds open-source email infrastructure—hosted service or self-host—for developers who want transparency and control.",
+		type: "website",
+	},
+};
 
 const pillars = [
 	{
 		number: "01",
-		title: "Radical Simplicity",
+		title: "Radical simplicity",
 		description:
-			"Email infrastructure that just works. No convoluted setup, no hidden complexity — one API, one SDK, one source of truth.",
+			"Email infrastructure that just works. One API, clear SDKs, and a stack you can understand—not a maze of opaque services.",
 	},
 	{
 		number: "02",
-		title: "Open by Default",
+		title: "Open by default",
 		description:
-			"Every line of code is public. Audit it, fork it, self-host it. We believe transparency builds better software and deeper trust.",
+			"Every line of code is public under Apache 2.0. Audit it, fork it, use our hosted service, or self-host on your servers.",
 	},
 	{
 		number: "03",
-		title: "Built for Scale",
+		title: "Your choice of deployment",
 		description:
-			"From a weekend side-project to millions of emails a month. Reloop grows with you without changing its interface.",
+			"Use Reloop hosted by us or run it on your network. No vendor lock-in—same open-source platform either way.",
 	},
 	{
 		number: "04",
-		title: "Developer-First",
+		title: "Developer-first",
 		description:
-			"Type-safe SDKs, clear error messages, predictable APIs. We sweat the details so you can focus on shipping.",
+			"Type-safe SDKs, predictable APIs, and documentation written for engineers shipping real products.",
 	},
 	{
 		number: "05",
-		title: "AI-Ready",
+		title: "AI-ready",
 		description:
-			"Dedicated agent inboxes, structured parsing, and webhook hooks built for the agentic era — not bolted on as an afterthought.",
+			"Agent inboxes, structured parsing, and webhooks built for autonomous workflows—not bolted on later.",
 	},
 	{
 		number: "06",
-		title: "Community-Driven",
+		title: "Community-driven",
 		description:
-			"Shaped by real feedback from real teams. Open issues, open roadmap, open conversation — always.",
+			"We're in the early days, building in public. Issues, discussions, and contributions shape what comes next.",
 	},
 ];
 
 const timeline = [
 	{
-		year: "2024",
-		event: "Founded",
+		year: "Sep 2025",
+		event: "We started",
 		detail:
-			"A small team of engineers, tired of fighting unreliable email vendors, started Reloop in a single weekend.",
+			"Reloop Labs began in September 2025 with one goal: open-source email infrastructure that's transparent and self-hostable.",
 	},
 	{
-		year: "2024",
-		event: "Open Sourced",
+		year: "2025–2026",
+		event: "Building in the open",
 		detail:
-			"Reloop went fully public on GitHub. The community immediately started contributing drivers, fixes, and ideas.",
-	},
-	{
-		year: "2025",
-		event: "Agent Inbox",
-		detail:
-			"Launched the first AI-native email inbox — letting autonomous agents read, draft, and reply to email like a human.",
+			"We've been heads-down on the codebase—APIs, self-hosting, agent inboxes—and sharing progress on GitHub and Discord.",
 	},
 	{
 		year: "Now",
-		event: "Growing",
+		event: "Still shipping",
 		detail:
-			"Thousands of AI agents and developers send and receive email on Reloop every day. The best is still ahead.",
+			"We're not done yet. The product is actively in development, and we're polishing everything for launch.",
+	},
+	{
+		year: "Jul 2026",
+		event: "Launching next month",
+		detail:
+			"Public launch is planned for July 2026. Follow along on GitHub—or get started with hosted or self-hosted builds today.",
 	},
 ];
 
+const bentoCellClass =
+	"border-stroke-soft-200 border-t border-l-0 bg-transparent p-8 transition-colors duration-300 first:border-t-0 hover:bg-black/[0.01] sm:border-t sm:border-l lg:p-10 dark:border-white/10 dark:hover:bg-white/[0.02] sm:[&:nth-child(-n+2)]:border-t-0 sm:[&:nth-child(2n+1)]:border-l-0";
+
 const AboutUsPage = () => {
 	return (
-		<div>
-			{/* ── Hero ─────────────────────────────────────────── */}
-			<section className="bg-white text-[#0a0d12]">
-				<div className="mx-auto max-w-[1320px] px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
-					<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
-						Our company
-					</p>
-					<h1 className="mt-4 max-w-[820px] font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.8rem]">
-						Email infrastructure{" "}
-						<span className="text-primary-base">
-							that gets out of your way.
-						</span>
-					</h1>
-					<p className="mt-8 max-w-[560px] text-[#0a0d12]/60 text-[15px] leading-relaxed sm:text-[17px]">
-						Reloop is an open-source email platform built by developers who were
-						fed up with every alternative. Simple to integrate, transparent by
-						design, ready for the agentic era.
-					</p>
-					<div className="mt-10 flex flex-wrap items-center gap-4">
-						<Link
-							href="/careers"
-							className="inline-flex h-12 items-center justify-center rounded-2xl bg-[#0a0d12] px-8 font-semibold text-[15px] text-white transition-colors hover:bg-[#0a0d12]/90"
-						>
-							Join our team
-						</Link>
-						<a
-							href="https://github.com/reloop-labs/reloop"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="inline-flex h-12 items-center justify-center gap-2.5 rounded-2xl border border-[#0a0d12]/10 px-8 font-semibold text-[#0a0d12] text-[15px] transition-colors hover:bg-[#0a0d12]/6"
-						>
-							View on GitHub
-						</a>
+		<MarketingPageShell
+			titleLines={["About Reloop Labs"]}
+			description="We build open-source email infrastructure—use our hosted service or self-host. Transparent, developer-first, free from vendor lock-in."
+			primaryCta={{
+				label: "Get started",
+				href: "/dashboard/signup",
+			}}
+			secondaryCta={{
+				label: "Self-hosting guide",
+				href: "/resources/self-hosting-guide",
+			}}
+			compactHero
+		>
+			<PageSection>
+				<div className="flex flex-col gap-16 lg:flex-row lg:items-start lg:gap-24">
+					<div className="lg:w-[480px] lg:shrink-0">
+						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
+							What we stand for
+						</p>
+						<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
+							Six pillars
+							<br />
+							<span className="text-primary-base">we live by.</span>
+						</h2>
+						<p className="mt-6 max-w-[420px] text-[15px] text-text-sub-600 leading-7 sm:text-[16px] dark:text-white/50">
+							These aren't slogans—they're the decisions we make when we write
+							code, review PRs, and design APIs.
+						</p>
 					</div>
-				</div>
-			</section>
-
-			{/* ── What We Stand For ─────────────────────────────── */}
-			<section className="bg-white text-[#0a0d12]">
-				<div className="mx-auto max-w-[1320px] px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
-					<div className="flex flex-col gap-16 lg:flex-row lg:items-start lg:gap-24">
-						{/* Left label */}
-						<div className="lg:w-[340px] lg:shrink-0">
-							<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
-								What we stand for
-							</p>
-							<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem]">
-								Six pillars
-								<br />
-								we live by.
-							</h2>
-							<p className="mt-6 text-[#0a0d12]/60 text-[15px] leading-7">
-								These aren't slogans. They're the decisions we make every time
-								we write a line of code, answer a support ticket, or ship a new
-								feature.
-							</p>
-						</div>
-
-						{/* Right grid */}
-						<div className="flex-1">
-							<div className="grid gap-px overflow-hidden rounded-2xl border border-[#0a0d12]/8 bg-[#0a0d12]/8 sm:grid-cols-2">
-								{pillars.map((pillar) => (
-									<div key={pillar.number} className="bg-white p-8 lg:p-10">
-										<span className="font-semibold text-[#0a0d12]/24 text-sm tabular-nums">
-											{pillar.number}
-										</span>
-										<h3 className="mt-3 font-semibold text-[#0a0d12] text-[17px] leading-snug">
-											{pillar.title}
-										</h3>
-										<p className="mt-3 text-[#0a0d12]/56 text-[14px] leading-[1.7]">
-											{pillar.description}
-										</p>
-									</div>
-								))}
-							</div>
+					<div className="flex-1">
+						<div className="grid overflow-hidden rounded-2xl border border-stroke-soft-200 sm:grid-cols-2 dark:border-white/10">
+							{pillars.map((pillar) => (
+								<div key={pillar.number} className={bentoCellClass}>
+									<span className="font-semibold text-sm text-text-soft-400 tabular-nums dark:text-white/28">
+										{pillar.number}
+									</span>
+									<h3 className="mt-3 font-semibold text-[17px] text-text-strong-950 leading-snug sm:text-[18px] dark:text-white">
+										{pillar.title}
+									</h3>
+									<p className="mt-3 text-[14px] text-text-sub-600 leading-[1.7] sm:text-[15px] dark:text-white/50">
+										{pillar.description}
+									</p>
+								</div>
+							))}
 						</div>
 					</div>
 				</div>
-			</section>
+			</PageSection>
 
-			{/* ── Our Story ─────────────────────────────────────── */}
-			<section className="bg-[#05070b] text-white">
-				<div className="mx-auto max-w-[1320px] px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
-					<p className="font-semibold text-[11px] text-white/40 uppercase tracking-[0.16em]">
+			<PageSection>
+				<div className="text-center">
+					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
 						Our story
 					</p>
-					<h2 className="mt-4 max-w-[620px] font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem]">
+					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
 						Built out of frustration.
 						<br />
-						<span className="text-primary-base">Refined with care.</span>
+						<span className="text-primary-base">Refined in the open.</span>
 					</h2>
-
-					{/* Timeline */}
-					<div className="mt-20 grid gap-px overflow-hidden rounded-2xl border border-white/5 bg-white/5 sm:grid-cols-2 lg:grid-cols-4">
-						{timeline.map((item) => (
-							<div
-								key={item.year + item.event}
-								className="flex flex-col bg-[#05070b] p-8 lg:p-10"
-							>
-								<span className="font-semibold text-sm text-white/28 tabular-nums">
-									{item.year}
-								</span>
-								<h3 className="mt-4 font-semibold text-lg text-white leading-snug">
-									{item.event}
-								</h3>
-								<p className="mt-3 text-[15px] text-white/50 leading-relaxed">
-									{item.detail}
-								</p>
-							</div>
-						))}
-					</div>
-
-					{/* Story prose below timeline */}
-					<div className="mt-20 grid gap-8 lg:grid-cols-2 lg:gap-16">
-						<p className="text-[#ffffff]/60 text-[16px] leading-[1.8]">
-							Email infrastructure shouldn't be a barrier to innovation. Yet for
-							years, developers have been forced to choose between expensive
-							proprietary solutions, opaque self-hosted setups, or unreliable
-							free services. We knew there had to be a better way.
-						</p>
-						<p className="text-[#ffffff]/60 text-[16px] leading-[1.8]">
-							Founded in 2024, Reloop was built to solve real problems with
-							elegant solutions. We believe powerful tools should be simple to
-							use, transparent in their operation, and accessible to teams of
-							every size — from solo founders to enterprise engineering orgs.
-						</p>
-					</div>
+					<p className="mx-auto mt-6 max-w-2xl text-[15px] text-text-sub-600 leading-7 sm:text-[16px] dark:text-white/50">
+						Developers shouldn't have to choose between expensive proprietary
+						vendors and opaque self-hosted setups. Reloop is our answer—the same
+						service as proprietary platforms, with an open-source codebase you
+						can use hosted or self-host.
+					</p>
 				</div>
-			</section>
-
-			{/* ── CTA ──────────────────────────────────────────── */}
-			<section className="bg-white text-[#0a0d12]">
-				<div className="mx-auto max-w-[1320px] px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
-					<div className="mx-auto max-w-[920px] text-center">
-						<p className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-[0.16em]">
-							Join our journey
-						</p>
-						<h2 className="mt-4 font-semibold text-[2.6rem] leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
-							There's a place
-							<br />
-							<span className="text-primary-base">for you here.</span>
-						</h2>
-						<p className="mx-auto mt-8 max-w-[560px] text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[17px]">
-							Whether you want to contribute code, join our team, or simply be
-							part of our community — we're always looking for passionate people
-							to help shape the future of email.
-						</p>
-						<div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-							<Link
-								href="/careers"
-								className="inline-flex h-12 items-center justify-center rounded-2xl bg-[#0a0d12] px-8 font-semibold text-[15px] text-white transition-colors hover:bg-[#0a0d12]/90"
-							>
-								View open positions
-							</Link>
-							<a
-								href="https://github.com/reloop-labs/reloop"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="inline-flex h-12 items-center justify-center gap-2.5 rounded-2xl border border-[#0a0d12]/10 px-8 font-semibold text-[#0a0d12] text-[15px] transition-colors hover:bg-[#0a0d12]/6"
-							>
-								Contribute on GitHub
-							</a>
+				<div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-stroke-soft-200 sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
+					{timeline.map((item) => (
+						<div
+							key={item.year + item.event}
+							className="bg-transparent p-8 lg:p-10"
+						>
+							<span className="font-semibold text-sm text-text-soft-400 tabular-nums dark:text-white/28">
+								{item.year}
+							</span>
+							<h3 className="mt-4 font-semibold text-lg text-text-strong-950 leading-snug dark:text-white">
+								{item.event}
+							</h3>
+							<p className="mt-3 text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/50">
+								{item.detail}
+							</p>
 						</div>
-					</div>
+					))}
 				</div>
-			</section>
-		</div>
+				<p className="mx-auto mt-10 max-w-2xl text-center text-[14px] text-text-sub-600 leading-7 dark:text-white/40">
+					Questions? Reach us at{" "}
+					<a
+						href={`mailto:${contactEmail}`}
+						className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
+					>
+						{contactEmail}
+					</a>
+					.
+				</p>
+			</PageSection>
+
+			<FeatureCta
+				title="Join us in the open"
+				titleMuted="Contribute on GitHub."
+				description="Star the repo, open an issue, or join our Discord community—we're building Reloop together."
+				primary={{
+					label: "Join Discord",
+					href: socialProfiles.discord,
+					external: true,
+				}}
+				secondary={{
+					label: "View on GitHub",
+					href: socialProfiles.github,
+					external: true,
+				}}
+			/>
+		</MarketingPageShell>
 	);
 };
 

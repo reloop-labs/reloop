@@ -158,8 +158,8 @@ export const Footer = () => {
 							</span>
 						</Link>
 						<p className="mt-2 max-w-[300px] font-medium text-[#0a0d12]/50 text-sm dark:text-white/50">
-							Open, self-hosted email infrastructure for modern applications. No
-							vendor lock-in. Just email that works.
+							Open-source email infrastructure for modern applications. Use
+							Reloop hosted or self-host—no vendor lock-in.
 						</p>
 						<div className="mt-4 flex items-center gap-2">
 							<Link

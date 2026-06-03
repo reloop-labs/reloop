@@ -4,7 +4,7 @@ const faqItems = [
 	{
 		question: "What is Reloop?",
 		answer:
-			"Reloop is a secure, reliable, and scalable email infrastructure platform designed for developers and marketing teams. We provide 99.9% inbox placement with sub-900ms latency and complete transparency through our open-source platform.",
+			"Reloop is open-source email infrastructure—the same capabilities as proprietary platforms (transactional email, campaigns, SMTP, webhooks, analytics). Use it as a hosted service from Reloop Labs, or self-host the codebase on your own servers.",
 	},
 	{
 		question: "What email providers are supported?",
@@ -24,13 +24,12 @@ const faqItems = [
 	{
 		question: "What is the difference between Reloop and other email services?",
 		answer:
-			"Reloop offers several key advantages: open-source architecture for complete transparency, sub-900ms delivery latency, 99.9% inbox placement rates, no vendor lock-in, and end-to-end encryption. Unlike proprietary solutions, you maintain full control over your email infrastructure.",
+			"Reloop offers the same email infrastructure as proprietary vendors—but our codebase is open source and self-hostable. Use our hosted service or deploy on your own servers. No vendor lock-in, full transparency, and sub-900ms delivery latency.",
 	},
 	{
-		question:
-			"What is the difference between the open-source version and the hosted version?",
+		question: "How do I use Reloop?",
 		answer:
-			"The open-source version gives you complete control to self-host and customize Reloop to your needs. The hosted version provides managed infrastructure with automatic updates, scaling, and support, while maintaining the same open-source codebase and transparency.",
+			"Two ways: sign up for Reloop as a hosted service from Reloop Labs, or self-host the open-source platform on your infrastructure (Docker, Kubernetes, bare metal). Same APIs, SMTP relay, campaigns, templates, and webhooks either way.",
 	},
 	{
 		question: "How does Reloop handle email delivery?",

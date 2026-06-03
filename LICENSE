@@ -27,8 +27,10 @@ ADDITIONAL USE RESTRICTIONS (Custom Clause by Reloop Labs)
    - Use this software in any product or service whose primary purpose is to
      compete with Reloop Labs.
 
-3. There is no commercial license. To use Reloop, self-host the
-   open-source version on your own infrastructure.
+3. Reloop Labs offers Reloop as a hosted email service, or you may
+   self-host the open-source software on your own infrastructure.
+   There is no commercial license for third parties to resell or
+   offer competing hosted services using this software.
 
    For questions about the license or project, contact:
    reloop.sh@gmail.com

@@ -4,8 +4,18 @@ export const siteName = "Reloop";
 
 export const contactEmail = "reloop.sh@gmail.com";
 
+/** Reloop hosted product signup */
+export const hostedSignupHref = "/dashboard/signup";
+
+/**
+ * Core product positioning: proprietary-grade email infra, open-source codebase,
+ * hosted by Reloop Labs or self-hosted by the user.
+ */
+export const productOffering =
+	"Reloop delivers the same email infrastructure as proprietary platforms—transactional email, campaigns, SMTP relay, templates, webhooks, analytics, and more. Our codebase is open source and self-hostable: use Reloop as a hosted service from Reloop Labs, or deploy it on your own infrastructure.";
+
 export const siteDescription =
-	"An open-source and self-hostable SendGrid, Mailchimp, Resend, and Loops alternative.";
+	"Open-source, self-hostable email infrastructure—with a hosted service from Reloop Labs or deploy it yourself.";
 
 export const defaultOgImage = "/web-app-manifest-512x512.png";
 
@@ -49,6 +59,7 @@ export const sitemapRoutes = [
 	"/resources/status",
 	"/resources/tools",
 	"/company/about-us",
+	"/company/blog",
 	"/company/contact-us",
 	"/company/license",
 	"/company/privacy",

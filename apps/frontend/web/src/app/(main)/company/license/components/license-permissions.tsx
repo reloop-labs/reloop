@@ -42,16 +42,24 @@ export function LicensePermissions() {
 					<br />& cannot do.
 				</h2>
 				<p className="mt-6 max-w-[420px] text-[15px] text-text-sub-600 leading-7 sm:text-[16px] dark:text-white/50">
-					Apache 2.0 with additional terms defined by Reloop Labs. Free for
-					personal and internal use via self-hosting.
+					Apache 2.0 with additional terms from Reloop Labs. Use our hosted
+					email service or self-host the open-source platform—free for personal
+					and internal use under the license.
 				</p>
 				<p className="mt-6 max-w-[420px] text-[14px] text-text-sub-600 leading-7 dark:text-white/40">
-					There is no commercial license.{" "}
+					Third parties may not resell or offer competing hosted services.{" "}
+					<a
+						href="/dashboard/signup"
+						className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4 transition-opacity hover:opacity-80"
+					>
+						Use Reloop hosted
+					</a>{" "}
+					or{" "}
 					<a
 						href="/resources/self-hosting-guide"
 						className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4 transition-opacity hover:opacity-80"
 					>
-						Self-host Reloop
+						self-host
 					</a>{" "}
 					on your own infrastructure.
 				</p>
