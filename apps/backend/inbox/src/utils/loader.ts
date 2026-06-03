@@ -3,6 +3,7 @@ import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
 import { log } from "evlog";
 import { inboxConfig } from "../inbox.config";
+import { initInboundSubscriber } from "../subscribers/inbound.subscriber";
 
 export const redis = new RedisCache("inbox");
 
@@ -15,6 +16,8 @@ export async function loader() {
 
 		await bus.connect(inboxConfig.NATS_URL);
 		log.info("nats", "NATS connected");
+
+		await initInboundSubscriber();
 
 		log.info("loader", "Inbox service loader initialized");
 	} catch (e) {

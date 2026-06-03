@@ -47,6 +47,7 @@ export enum BusEvent {
 
 	// KumoMTA Events
 	KUMOMTA_EVENT = "kumomta.event",
+	KUMOMTA_INBOUND_RECEIVED = "kumomta.inbound_received",
 
 	// Contact Auto-Capture Events
 	CONTACT_AUTO_CREATED = "contact.auto_created",

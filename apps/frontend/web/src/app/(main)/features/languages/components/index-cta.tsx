@@ -10,9 +10,7 @@ export default function IndexCta() {
 					<h2 className="font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 						One API key.
 						<br />
-						<span className="text-primary-base">
-							Every language.
-						</span>
+						<span className="text-primary-base">Every language.</span>
 					</h2>
 					<p className="mx-auto mt-8 max-w-[550px] font-medium text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[17px] dark:text-white/60">
 						Create your Reloop account, verify a domain, and send from any

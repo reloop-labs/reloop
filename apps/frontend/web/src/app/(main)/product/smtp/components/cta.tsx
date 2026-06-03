@@ -13,13 +13,11 @@ export default function CTA() {
 					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem]">
 						Plug in SMTP in minutes.
 						<br />
-						<span className="text-primary-base">
-							Start for free.
-						</span>
+						<span className="text-primary-base">Start for free.</span>
 					</h2>
 					<p className="mx-auto mt-8 max-w-[550px] font-medium text-[#0a0d12]/60 text-[15px] leading-7 sm:text-[17px] dark:text-white/60">
-						Generate credentials, configure your mailer, and send your first message
-						through Reloop's global relay network.
+						Generate credentials, configure your mailer, and send your first
+						message through Reloop's global relay network.
 					</p>
 
 					<div className="mt-10 flex flex-wrap items-center justify-center gap-4">

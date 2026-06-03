@@ -1,4 +1,8 @@
-import type { CreateWorkflowInput, Workflow, WorkflowNode } from "./workflow-types";
+import type {
+	CreateWorkflowInput,
+	Workflow,
+	WorkflowNode,
+} from "./workflow-types";
 import { TRIGGER_NODE_ID } from "./workflow-types";
 
 const now = () => new Date().toISOString();
@@ -10,7 +14,10 @@ export const createTriggerNode = (): WorkflowNode => ({
 	data: {},
 });
 
-export const createSendEmailNode = (index: number, yOffset = 0): WorkflowNode => ({
+export const createSendEmailNode = (
+	index: number,
+	yOffset = 0,
+): WorkflowNode => ({
 	id: `send_email_${Date.now()}_${index}`,
 	type: "send_email",
 	position: { x: 380, y: 120 + yOffset * 140 },

@@ -63,7 +63,7 @@ const WorkflowEditorPage = () => {
 	}
 
 	return (
-		<div className="-mx-2 flex h-[calc(100vh-7rem)] min-h-[480px] flex-col sm:-mx-0">
+		<div className="-mx-2 sm:-mx-0 flex h-[calc(100vh-7rem)] min-h-[480px] flex-col">
 			<WorkflowEditor
 				workflow={{ ...workflow, name: localName }}
 				onNameChange={handleNameChange}

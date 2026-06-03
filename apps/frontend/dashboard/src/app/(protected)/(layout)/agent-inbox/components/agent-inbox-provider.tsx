@@ -2,15 +2,15 @@
 
 import {
 	createContext,
+	type ReactNode,
 	useCallback,
 	useContext,
 	useMemo,
 	useState,
-	type ReactNode,
 } from "react";
 import {
-	agentMailboxes as initialMailboxes,
 	type AgentMailbox,
+	agentMailboxes as initialMailboxes,
 } from "../mock-data";
 
 export type NewAgentAddressInput = {
@@ -30,8 +30,7 @@ interface AgentInboxContextValue {
 const AgentInboxContext = createContext<AgentInboxContextValue | null>(null);
 
 export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
-	const [mailboxes, setMailboxes] =
-		useState<AgentMailbox[]>(initialMailboxes);
+	const [mailboxes, setMailboxes] = useState<AgentMailbox[]>(initialMailboxes);
 
 	const getMailbox = useCallback(
 		(id: string) => mailboxes.find((m) => m.id === id),

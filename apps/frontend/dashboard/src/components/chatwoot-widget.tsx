@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect } from "react";
-
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { ChatwootLoader } from "@reloop/ui/chatwoot-loader";
+import { useEffect } from "react";
 
 /** Identifies the logged-in Reloop user in Chatwoot (requires UserOrganizationProvider). */
 export function ChatwootUserSync() {
 	const { user, activeOrganization } = useUserOrganization();
 
-	const baseUrl = process.env.NEXT_PUBLIC_CHATWOOT_BASE_URL?.replace(/\/+$/, "");
+	const baseUrl = process.env.NEXT_PUBLIC_CHATWOOT_BASE_URL?.replace(
+		/\/+$/,
+		"",
+	);
 	const websiteToken = process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN?.trim();
 	const isConfigured = Boolean(baseUrl && websiteToken);
 

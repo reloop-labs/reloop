@@ -27,10 +27,11 @@ const TermsPage = () => {
 				<p>
 					These Terms of Service (&ldquo;Terms&rdquo;) govern your access to{" "}
 					<strong>reloop.sh</strong> and your use of the open-source Reloop
-					software provided by <strong>Reloop Labs</strong> (&ldquo;Reloop&rdquo;,
-					&ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;). By using
-					our website or the software, you agree to these Terms. If you do not
-					agree, do not use our website or the software.
+					software provided by <strong>Reloop Labs</strong>{" "}
+					(&ldquo;Reloop&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, or
+					&ldquo;our&rdquo;). By using our website or the software, you agree to
+					these Terms. If you do not agree, do not use our website or the
+					software.
 				</p>
 
 				<section>
@@ -42,10 +43,11 @@ const TermsPage = () => {
 						project, website, documentation, and community channels.
 					</p>
 					<p>
-						You can use Reloop in two ways: sign up for our hosted email service,
-						or self-host the open-source platform on your own infrastructure.
-						Third parties may not resell or offer competing hosted services;
-						see our <Link href="/company/license">license terms</Link>.
+						You can use Reloop in two ways: sign up for our hosted email
+						service, or self-host the open-source platform on your own
+						infrastructure. Third parties may not resell or offer competing
+						hosted services; see our{" "}
+						<Link href="/company/license">license terms</Link>.
 					</p>
 				</section>
 
@@ -54,8 +56,8 @@ const TermsPage = () => {
 					<p>
 						The Reloop source code is licensed under the{" "}
 						<strong>Apache License, Version 2.0</strong>, with additional use
-						restrictions defined by Reloop Labs. The full license is available on
-						our <Link href="/company/license">License</Link> page and in the
+						restrictions defined by Reloop Labs. The full license is available
+						on our <Link href="/company/license">License</Link> page and in the
 						repository.
 					</p>
 					<p>In summary, you may:</p>
@@ -153,20 +155,23 @@ const TermsPage = () => {
 						The Reloop name, logo, and website content are owned by Reloop Labs
 						or its licensors, except where open-source license terms apply to
 						software source code. Contributions to the project may be subject to
-						contribution guidelines and license terms published in the repository.
+						contribution guidelines and license terms published in the
+						repository.
 					</p>
 					<p>
 						Feedback you provide may be used by Reloop Labs to improve the
-						project without obligation to you, unless otherwise agreed in writing.
+						project without obligation to you, unless otherwise agreed in
+						writing.
 					</p>
 				</section>
 
 				<section>
 					<h2>7. Disclaimers</h2>
 					<p>
-						The website and software are provided <strong>&ldquo;as is&rdquo;</strong>{" "}
-						and <strong>&ldquo;as available&rdquo;</strong>, without warranties
-						of any kind, whether express or implied, including merchantability,
+						The website and software are provided{" "}
+						<strong>&ldquo;as is&rdquo;</strong> and{" "}
+						<strong>&ldquo;as available&rdquo;</strong>, without warranties of
+						any kind, whether express or implied, including merchantability,
 						fitness for a particular purpose, and non-infringement. Reloop Labs
 						does not warrant that the software or website will be uninterrupted,
 						error-free, or meet your requirements.
@@ -179,14 +184,14 @@ const TermsPage = () => {
 						To the fullest extent permitted by law, Reloop Labs and its
 						contributors will not be liable for any indirect, incidental,
 						special, consequential, or punitive damages, or for loss of profits,
-						data, goodwill, or business interruption, arising from your use of the
-						website or software—even if we have been advised of the possibility
-						of such damages.
+						data, goodwill, or business interruption, arising from your use of
+						the website or software—even if we have been advised of the
+						possibility of such damages.
 					</p>
 					<p>
-						Our total liability for any claim relating to the website or software
-						will not exceed one hundred U.S. dollars (USD $100), except where
-						liability cannot be excluded under applicable law.
+						Our total liability for any claim relating to the website or
+						software will not exceed one hundred U.S. dollars (USD $100), except
+						where liability cannot be excluded under applicable law.
 					</p>
 				</section>
 
@@ -202,11 +207,11 @@ const TermsPage = () => {
 				<section>
 					<h2>10. Changes to these terms</h2>
 					<p>
-						We may update these Terms from time to time. The updated version will
-						be posted on this page with a revised &ldquo;Last updated&rdquo; date.
-						Continued use of the website after changes become effective
-						constitutes acceptance of the revised Terms. Material changes to
-						software licensing are reflected in the{" "}
+						We may update these Terms from time to time. The updated version
+						will be posted on this page with a revised &ldquo;Last
+						updated&rdquo; date. Continued use of the website after changes
+						become effective constitutes acceptance of the revised Terms.
+						Material changes to software licensing are reflected in the{" "}
 						<Link href="/company/license">License</Link> page and repository.
 					</p>
 				</section>
@@ -214,9 +219,9 @@ const TermsPage = () => {
 				<section>
 					<h2>11. Governing law</h2>
 					<p>
-						These Terms are governed by the laws applicable to Reloop Labs, without
-						regard to conflict-of-law principles, except where mandatory local
-						consumer protections apply.
+						These Terms are governed by the laws applicable to Reloop Labs,
+						without regard to conflict-of-law principles, except where mandatory
+						local consumer protections apply.
 					</p>
 				</section>
 

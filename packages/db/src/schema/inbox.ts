@@ -119,24 +119,30 @@ export const mailboxRelations = relations(mailbox, ({ one, many }) => ({
 	emails: many(inboundEmail),
 }));
 
-export const inboundEmailRelations = relations(inboundEmail, ({ one, many }) => ({
-	mailbox: one(mailbox, {
-		fields: [inboundEmail.mailboxId],
-		references: [mailbox.id],
+export const inboundEmailRelations = relations(
+	inboundEmail,
+	({ one, many }) => ({
+		mailbox: one(mailbox, {
+			fields: [inboundEmail.mailboxId],
+			references: [mailbox.id],
+		}),
+		organization: one(organization, {
+			fields: [inboundEmail.organizationId],
+			references: [organization.id],
+		}),
+		attachments: many(inboundAttachment),
 	}),
-	organization: one(organization, {
-		fields: [inboundEmail.organizationId],
-		references: [organization.id],
-	}),
-	attachments: many(inboundAttachment),
-}));
+);
 
-export const inboundAttachmentRelations = relations(inboundAttachment, ({ one }) => ({
-	email: one(inboundEmail, {
-		fields: [inboundAttachment.inboundEmailId],
-		references: [inboundEmail.id],
+export const inboundAttachmentRelations = relations(
+	inboundAttachment,
+	({ one }) => ({
+		email: one(inboundEmail, {
+			fields: [inboundAttachment.inboundEmailId],
+			references: [inboundEmail.id],
+		}),
 	}),
-}));
+);
 
 export const inboxTables = {
 	mailbox,

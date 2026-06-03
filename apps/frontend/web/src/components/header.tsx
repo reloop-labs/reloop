@@ -323,7 +323,10 @@ export const Header = () => {
 	const activeItem = navItems.find((item) => item.title === activeMega);
 
 	return (
-		<header className="gpu-promote fixed top-0 right-0 left-0 z-50 flex justify-center p-4" style={{ contain: "layout style" }}>
+		<header
+			className="gpu-promote fixed top-0 right-0 left-0 z-50 flex justify-center p-4"
+			style={{ contain: "layout style" }}
+		>
 			<motion.div
 				onMouseLeave={() => setActiveMega(null)}
 				className={`flex flex-col overflow-hidden rounded-[24px] transition-[border-color,box-shadow,background-color] duration-300 ease-out ${

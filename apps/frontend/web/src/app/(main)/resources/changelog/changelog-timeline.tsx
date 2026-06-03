@@ -15,7 +15,11 @@ export type ChangelogRelease = {
 	code?: string;
 };
 
-export function ChangelogTimeline({ releases }: { releases: ChangelogRelease[] }) {
+export function ChangelogTimeline({
+	releases,
+}: {
+	releases: ChangelogRelease[];
+}) {
 	return (
 		<div className="space-y-16 sm:space-y-20">
 			{releases.map((release, index) => (
@@ -36,7 +40,7 @@ export function ChangelogTimeline({ releases }: { releases: ChangelogRelease[] }
 						className={`relative sm:border-stroke-soft-200 sm:border-l sm:pl-10 dark:sm:border-white/10 ${index < releases.length - 1 ? "sm:pb-2" : ""}`}
 					>
 						<div
-							className="absolute top-2 left-0 hidden size-2.5 -translate-x-1/2 rounded-full bg-text-strong-950 sm:block dark:bg-white"
+							className="-translate-x-1/2 absolute top-2 left-0 hidden size-2.5 rounded-full bg-text-strong-950 sm:block dark:bg-white"
 							aria-hidden="true"
 						/>
 
@@ -55,7 +59,7 @@ export function ChangelogTimeline({ releases }: { releases: ChangelogRelease[] }
 							))}
 						</div>
 
-						<div className="mt-6 overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50 aspect-[16/9] dark:border-white/10 dark:bg-white/[0.02]">
+						<div className="mt-6 aspect-[16/9] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02]">
 							<div className="flex h-full items-center justify-center px-6">
 								<p className="text-center text-[13px] text-text-soft-400 dark:text-white/25">
 									Release preview

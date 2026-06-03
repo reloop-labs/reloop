@@ -10,7 +10,8 @@ interface WorkflowEmptyStateProps {
 const steps = [
 	{
 		title: "Pick a trigger",
-		description: "Start when an email event happens — sent, opened, bounced, and more.",
+		description:
+			"Start when an email event happens — sent, opened, bounced, and more.",
 	},
 	{
 		title: "Add send steps",
@@ -18,7 +19,8 @@ const steps = [
 	},
 	{
 		title: "Activate",
-		description: "Turn the workflow on when every step is connected and configured.",
+		description:
+			"Turn the workflow on when every step is connected and configured.",
 	},
 ];
 
@@ -36,7 +38,8 @@ const features = [
 	{
 		icon: "route" as const,
 		title: "Automatic sends",
-		description: "Emails fire when your trigger conditions match (coming soon).",
+		description:
+			"Emails fire when your trigger conditions match (coming soon).",
 	},
 ];
 

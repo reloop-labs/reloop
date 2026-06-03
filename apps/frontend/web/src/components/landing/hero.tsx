@@ -59,9 +59,7 @@ export function FeatureHero({
 								<a
 									href={primaryCta.href}
 									target={primaryCta.external ? "_blank" : undefined}
-									rel={
-										primaryCta.external ? "noopener noreferrer" : undefined
-									}
+									rel={primaryCta.external ? "noopener noreferrer" : undefined}
 									className={`${Button.buttonVariants({
 										variant: "neutral",
 										mode: "filled",
@@ -74,9 +72,7 @@ export function FeatureHero({
 										href={secondaryCta.href}
 										target={secondaryCta.external ? "_blank" : undefined}
 										rel={
-											secondaryCta.external
-												? "noopener noreferrer"
-												: undefined
+											secondaryCta.external ? "noopener noreferrer" : undefined
 										}
 										className={`${Button.buttonVariants({
 											variant: "neutral",

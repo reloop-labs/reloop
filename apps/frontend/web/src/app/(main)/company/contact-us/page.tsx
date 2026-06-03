@@ -3,7 +3,12 @@ import {
 	MarketingPageShell,
 	PageSection,
 } from "@reloop/web/components/page-shell";
-import { contactEmail, getSiteUrl, hostedSignupHref, socialProfiles } from "@reloop/web/lib/site";
+import {
+	contactEmail,
+	getSiteUrl,
+	hostedSignupHref,
+	socialProfiles,
+} from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Script from "next/script";
 import { ContactForm } from "./contact-form";

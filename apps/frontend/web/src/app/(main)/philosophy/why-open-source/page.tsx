@@ -121,7 +121,9 @@ const WhyOpenSourcePage = () => {
 					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] dark:text-white">
 						Closed source asks you to trust.
 						<br />
-						<span className="text-primary-base">Open source lets you verify.</span>
+						<span className="text-primary-base">
+							Open source lets you verify.
+						</span>
 					</h2>
 				</div>
 				<div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-stroke-soft-200 sm:grid-cols-2 dark:border-white/10">

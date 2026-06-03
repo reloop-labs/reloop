@@ -414,8 +414,7 @@ export function getMailboxStats(mailboxId: string): AgentMailboxStats {
 	return {
 		total: threads.length,
 		unread: threads.filter((t) => t.unread).length,
-		needsApproval: threads.filter((t) => t.status === "needs_approval")
-			.length,
+		needsApproval: threads.filter((t) => t.status === "needs_approval").length,
 		processing: threads.filter(
 			(t) => t.status === "parsing" || t.status === "new",
 		).length,

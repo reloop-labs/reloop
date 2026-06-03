@@ -1,7 +1,7 @@
 "use client";
 
-import * as Button from "@reloop/ui/button";
 import * as Badge from "@reloop/ui/badge";
+import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as StatusBadge from "@reloop/ui/status-badge";
 import * as Table from "@reloop/ui/table";
@@ -58,8 +58,8 @@ export const AgentMailboxList = () => {
 						No agent addresses yet
 					</h3>
 					<p className="mx-auto mb-6 max-w-[300px] text-balance font-medium text-[12px] text-text-sub-600">
-						Create a dedicated inbox address for each AI agent so inbound mail is
-						easy to find and route.
+						Create a dedicated inbox address for each AI agent so inbound mail
+						is easy to find and route.
 					</p>
 					<div className="flex items-center gap-3">
 						<Button.Root
@@ -71,7 +71,11 @@ export const AgentMailboxList = () => {
 							<Icon name="webhook" className="h-4 w-4" />
 							Setup webhook
 						</Button.Root>
-						<Button.Root variant="neutral" size="xsmall" onClick={() => setAddOpen(true)}>
+						<Button.Root
+							variant="neutral"
+							size="xsmall"
+							onClick={() => setAddOpen(true)}
+						>
 							<Icon name="plus" className="h-4 w-4" />
 							Add agent address
 						</Button.Root>
@@ -109,9 +113,7 @@ export const AgentMailboxList = () => {
 								<React.Fragment key={mailbox.id}>
 									<Table.Row
 										className="cursor-pointer [&>td]:group-hover/row:bg-transparent"
-										onClick={() =>
-											router.push(`/agent-inbox/${mailbox.id}`)
-										}
+										onClick={() => router.push(`/agent-inbox/${mailbox.id}`)}
 									>
 										<Table.Cell className="h-10">
 											<div className="flex items-center gap-2">
@@ -183,9 +185,7 @@ export const AgentMailboxList = () => {
 										<Table.Cell className="h-10">
 											<StatusBadge.Root
 												status={
-													mailbox.status === "active"
-														? "completed"
-														: "disabled"
+													mailbox.status === "active" ? "completed" : "disabled"
 												}
 											>
 												<StatusBadge.Icon

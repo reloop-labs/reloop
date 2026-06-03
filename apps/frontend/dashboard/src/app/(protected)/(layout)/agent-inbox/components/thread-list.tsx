@@ -98,7 +98,7 @@ export const ThreadList = ({
 							>
 								<div
 									className={cn(
-										"flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-label-xs font-medium",
+										"flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-medium text-label-xs",
 										thread.unread
 											? "bg-primary-base text-static-white"
 											: "bg-bg-weak-50 text-text-sub-600 dark:bg-white/10",
@@ -144,11 +144,7 @@ export const ThreadList = ({
 											{status.label}
 										</Badge.Root>
 										{thread.entityTag && (
-											<Badge.Root
-												size="small"
-												variant="lighter"
-												color="gray"
-											>
+											<Badge.Root size="small" variant="lighter" color="gray">
 												{thread.entityTag}
 											</Badge.Root>
 										)}

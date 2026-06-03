@@ -24,10 +24,17 @@ declare global {
 }
 
 function useChatwootConfig() {
-	const baseUrl = process.env.NEXT_PUBLIC_CHATWOOT_BASE_URL?.replace(/\/+$/, "");
+	const baseUrl = process.env.NEXT_PUBLIC_CHATWOOT_BASE_URL?.replace(
+		/\/+$/,
+		"",
+	);
 	const websiteToken = process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN?.trim();
 
-	return { baseUrl, websiteToken, isConfigured: Boolean(baseUrl && websiteToken) };
+	return {
+		baseUrl,
+		websiteToken,
+		isConfigured: Boolean(baseUrl && websiteToken),
+	};
 }
 
 export function ChatwootLoader() {

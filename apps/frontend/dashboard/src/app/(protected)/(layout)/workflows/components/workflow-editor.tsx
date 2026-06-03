@@ -3,8 +3,8 @@
 import {
 	addEdge,
 	Background,
-	Controls,
 	type Connection,
+	Controls,
 	ReactFlow,
 	ReactFlowProvider,
 	useEdgesState,
@@ -22,9 +22,9 @@ import {
 	type WorkflowEdge,
 	type WorkflowNode,
 } from "../workflow-types";
+import { NodeConfigPanel } from "./node-config-panel";
 import { SendEmailNode } from "./nodes/send-email-node";
 import { TriggerNode } from "./nodes/trigger-node";
-import { NodeConfigPanel } from "./node-config-panel";
 import { WorkflowEditorToolbar } from "./workflow-editor-toolbar";
 import { WorkflowNodePalette } from "./workflow-node-palette";
 
@@ -125,21 +125,17 @@ const WorkflowEditorInner = ({
 		[setNodes, setEdges, selectedNodeId],
 	);
 
-	useHotkeys(
-		"backspace",
-		() => {
-			if (!selectedNodeId || selectedNodeId === TRIGGER_NODE_ID) return;
-			const active = document.activeElement;
-			if (
-				active instanceof HTMLInputElement ||
-				active instanceof HTMLTextAreaElement
-			) {
-				return;
-			}
-			handleDeleteNode(selectedNodeId);
-		},
-		[selectedNodeId, handleDeleteNode],
-	);
+	useHotkeys("backspace", () => {
+		if (!selectedNodeId || selectedNodeId === TRIGGER_NODE_ID) return;
+		const active = document.activeElement;
+		if (
+			active instanceof HTMLInputElement ||
+			active instanceof HTMLTextAreaElement
+		) {
+			return;
+		}
+		handleDeleteNode(selectedNodeId);
+	}, [selectedNodeId, handleDeleteNode]);
 
 	const handleSave = () => {
 		onGraphChange(nodes, edges);

@@ -3,12 +3,12 @@
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import {
 	createContext,
+	type ReactNode,
 	useCallback,
 	useContext,
 	useEffect,
 	useMemo,
 	useState,
-	type ReactNode,
 } from "react";
 import {
 	createEmptyWorkflow,
@@ -27,7 +27,9 @@ interface WorkflowsContextValue {
 	workflows: Workflow[];
 	isHydrated: boolean;
 	getWorkflow: (id: string) => Workflow | undefined;
-	createWorkflow: (input: Omit<CreateWorkflowInput, "organizationId">) => Workflow;
+	createWorkflow: (
+		input: Omit<CreateWorkflowInput, "organizationId">,
+	) => Workflow;
 	updateWorkflow: (
 		id: string,
 		patch: Partial<

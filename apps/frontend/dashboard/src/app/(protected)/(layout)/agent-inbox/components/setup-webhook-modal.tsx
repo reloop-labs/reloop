@@ -30,8 +30,7 @@ const STEPS = [
 	},
 	{
 		title: "Subscribe to email.received",
-		description:
-			"Register the endpoint and subscribe to inbound email events.",
+		description: "Register the endpoint and subscribe to inbound email events.",
 		href: "/webhooks",
 		internal: true,
 	},
@@ -75,7 +74,8 @@ export const SetupWebhookModal = ({
 									<p className="mt-0.5 text-paragraph-sm text-text-sub-600">
 										{step.description}
 									</p>
-									{"inAppOnly" in step && step.inAppOnly ? null : step.internal ? (
+									{"inAppOnly" in step &&
+									step.inAppOnly ? null : step.internal ? (
 										<Link
 											href={step.href}
 											onClick={() => onOpenChange(false)}
@@ -101,7 +101,11 @@ export const SetupWebhookModal = ({
 					</ol>
 				</Modal.Body>
 				<Modal.Footer>
-					<Button.Root variant="neutral" mode="stroke" onClick={() => onOpenChange(false)}>
+					<Button.Root
+						variant="neutral"
+						mode="stroke"
+						onClick={() => onOpenChange(false)}
+					>
 						Close
 					</Button.Root>
 				</Modal.Footer>

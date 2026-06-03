@@ -1,11 +1,11 @@
 "use client";
 
-import type { ReactNode } from "react";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { AgentMailbox, InboundThread } from "../mock-data";
@@ -228,7 +228,7 @@ export const ThreadDetail = ({
 									)}
 								</div>
 								<div className="pb-3">
-									<p className="text-label-sm font-medium text-text-strong-950">
+									<p className="font-medium text-label-sm text-text-strong-950">
 										{step.label}
 									</p>
 									{step.at && (

@@ -57,7 +57,11 @@ export const WorkflowEditorToolbar = ({
 				<div className="flex items-center gap-3">
 					<div className="flex items-center gap-2">
 						<span className="text-text-sub-600 text-xs">
-							{isActive ? "Active" : workflow.status === "paused" ? "Paused" : "Draft"}
+							{isActive
+								? "Active"
+								: workflow.status === "paused"
+									? "Paused"
+									: "Draft"}
 						</span>
 						<Switch.Root
 							checked={isActive}

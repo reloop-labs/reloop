@@ -71,7 +71,7 @@ export const InboxFilterTabs = ({
 						<span className="truncate">{filter.label}</span>
 						<span
 							className={cn(
-								"shrink-0 tabular-nums text-label-xs",
+								"shrink-0 text-label-xs tabular-nums",
 								isActive ? "text-text-sub-600" : "text-text-soft-400",
 							)}
 						>

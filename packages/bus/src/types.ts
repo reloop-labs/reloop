@@ -288,6 +288,10 @@ export interface SendTestEmailPayload {
 	html: string;
 }
 
+export interface KumomtaInboundReceivedPayload {
+	rawMessage: string;
+}
+
 export interface InboundEmailReceivedPayload {
 	inboundEmailId: string;
 	mailboxId: string;
@@ -343,6 +347,7 @@ export interface EventPayloads {
 	[BusEvent.USAGE_UPDATED]: UsageUpdatedPayload;
 	[BusEvent.QUOTA_EXCEEDED]: QuotaExceededPayload;
 	[BusEvent.KUMOMTA_EVENT]: KumomtaLogRecordPayload;
+	[BusEvent.KUMOMTA_INBOUND_RECEIVED]: KumomtaInboundReceivedPayload;
 	[BusEvent.CONTACT_AUTO_CREATED]: ContactAutoCreatedPayload;
 	[BusEvent.CONTACT_DELIVERABILITY_UPDATED]: ContactDeliverabilityUpdatedPayload;
 	[BusEvent.INBOUND_EMAIL_RECEIVED]: InboundEmailReceivedPayload;

@@ -1,8 +1,8 @@
+import { ChatwootUserSync } from "@fe/dashboard/components/chatwoot-widget";
 import { PageHeader } from "@fe/dashboard/components/layout/page-header";
 import { MainSidebar } from "@fe/dashboard/components/layout/sidebar";
 import { SidebarToggle } from "@fe/dashboard/components/layout/sidebar-toggel";
 import { UserOrganizationProvider } from "@fe/dashboard/providers/org-provider";
-import { ChatwootUserSync } from "@fe/dashboard/components/chatwoot-widget";
 
 const OrgLayout = ({ children }: { children: React.ReactNode }) => {
 	return (

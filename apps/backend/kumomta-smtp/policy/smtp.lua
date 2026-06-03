@@ -3,6 +3,16 @@ local constants = require 'policy.constants'
 local utils = require 'policy.utils'
 utils.init(kumo)
 
+local nats_client
+local function get_nats_client()
+  if not nats_client then
+    nats_client = kumo.nats.connect {
+      servers = { constants.nats_url },
+    }
+  end
+  return nats_client
+end
+
 -- Helper function to apply business logic to both SMTP and HTTP generated messages
 local function apply_reloop_logic(msg, api_key)
   local msg_id = msg:id()
@@ -247,44 +257,24 @@ kumo.on('smtp_server_message_received', function(msg)
     local msg_id = msg:id()
     print("[INBOUND] [" .. msg_id .. "] Processing inbound email")
 
-    local client = kumo.http.build_client({
-      danger_accept_invalid_certs = true
-    })
-    
-    local target_url = constants.inbox_url .. "/v1/receive"
-    print("[INBOUND] [" .. msg_id .. "] Forwarding to inbox service: " .. target_url)
-
-    local status, response = pcall(function()
-      local req = client:post(target_url)
-      return req
-        :header("Content-Type", "message/rfc822")
-        :body(msg:get_data())
-        :send()
+    local nc = get_nats_client()
+    local ok, err = pcall(function()
+      local payload = {
+        rawMessage = msg:get_data()
+      }
+      nc:publish {
+        subject = 'kumomta.inbound_received',
+        payload = kumo.serde.json_encode(payload),
+      }
     end)
-    
-    if not status then
-      print("[INBOUND] [" .. msg_id .. "] FAILED to reach inbox service: " .. tostring(response))
+
+    if not ok then
+      print("[INBOUND] [" .. msg_id .. "] FAILED to publish to NATS: " .. tostring(err))
+      nats_client = nil
       kumo.reject(451, "4.3.0 Temporary failure processing inbound email")
-      return
-    end
-
-    local code = response:status_code()
-    local body_text = response:text()
-    print("[INBOUND] [" .. msg_id .. "] Inbox service response: status=" .. tostring(code) .. " body=" .. tostring(body_text))
-
-    if code == 200 then
-      print("[INBOUND] [" .. msg_id .. "] Successfully stored inbound email")
-      return
-    elseif code == 404 then
-      -- Mailbox not found → reject with user unknown
-      kumo.reject(550, "5.1.1 User unknown or mailbox disabled")
-      return
-    elseif code == 400 then
-      kumo.reject(550, "5.1.3 Invalid recipient address")
       return
     else
-      -- Unexpected error → temp failure so remote MTA retries
-      kumo.reject(451, "4.3.0 Temporary failure processing inbound email")
+      print("[INBOUND] [" .. msg_id .. "] Successfully published inbound email to NATS")
       return
     end
   end

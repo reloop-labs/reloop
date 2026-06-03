@@ -2,7 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, type NodeProps, Position } from "@xyflow/react";
 import type { SendEmailNodeData, WorkflowNode } from "../../workflow-types";
 
 type SendEmailFlowNode = WorkflowNode & {

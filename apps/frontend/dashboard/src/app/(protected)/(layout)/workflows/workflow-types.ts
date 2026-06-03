@@ -1,5 +1,5 @@
-import type { Edge, Node } from "@xyflow/react";
 import type { WebhookEventName } from "@reloop/webhook-events";
+import type { Edge, Node } from "@xyflow/react";
 
 export type WorkflowStatus = "draft" | "active" | "paused";
 

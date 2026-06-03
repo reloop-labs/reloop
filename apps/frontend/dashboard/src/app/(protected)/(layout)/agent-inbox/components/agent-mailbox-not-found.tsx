@@ -17,7 +17,10 @@ export const AgentMailboxNotFound = () => (
 		</p>
 		<Link
 			href="/agent-inbox"
-			className={Button.buttonVariants({ variant: "neutral", size: "xsmall" }).root()}
+			className={Button.buttonVariants({
+				variant: "neutral",
+				size: "xsmall",
+			}).root()}
 		>
 			<Icon name="arrow-left" className="h-4 w-4" />
 			Back to all addresses

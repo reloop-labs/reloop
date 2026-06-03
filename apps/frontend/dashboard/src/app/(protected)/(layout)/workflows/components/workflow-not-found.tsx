@@ -15,7 +15,7 @@ export const WorkflowNotFound = () => {
 			<h2 className="mb-2 font-semibold text-text-strong-950 text-xl">
 				Workflow not found
 			</h2>
-			<p className="mb-6 text-text-sub-600 text-sm">
+			<p className="mb-6 text-sm text-text-sub-600">
 				This workflow may have been deleted or the link is incorrect.
 			</p>
 			<AnimatedBackButton onClick={() => router.push("/workflows")} />

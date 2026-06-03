@@ -7,6 +7,7 @@ import {
 	siDjango,
 	siLaravel,
 	siMetabase,
+	siN8n,
 	siNestjs,
 	siNodedotjs,
 	siPhp,
@@ -16,7 +17,6 @@ import {
 	siSupabase,
 	siWordpress,
 	siZapier,
-	siN8n,
 } from "simple-icons";
 
 type Integration = {

@@ -6,8 +6,8 @@ import { Icon } from "@reloop/ui/icon";
 import { useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { CreateWorkflowModal } from "./components/create-workflow-modal";
-import { useWorkflows } from "./components/workflows-provider";
 import { WorkflowTable } from "./components/workflow-table";
+import { useWorkflows } from "./components/workflows-provider";
 
 const WorkflowsPage = () => {
 	const { activeOrganization } = useUserOrganization();
@@ -88,7 +88,7 @@ const WorkflowsPage = () => {
 					<div className="relative">
 						<Icon
 							name="search"
-							className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-text-sub-600"
+							className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 h-4 w-4 text-text-sub-600"
 						/>
 						<input
 							type="search"

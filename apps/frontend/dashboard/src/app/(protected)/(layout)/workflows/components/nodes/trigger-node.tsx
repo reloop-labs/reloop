@@ -3,15 +3,15 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { WEBHOOK_EVENTS_BY_ID } from "@reloop/webhook-events";
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, type NodeProps, Position } from "@xyflow/react";
 import type { TriggerNodeData, WorkflowNode } from "../../workflow-types";
 
-type TriggerFlowNode = WorkflowNode & { type: "trigger"; data: TriggerNodeData };
+type TriggerFlowNode = WorkflowNode & {
+	type: "trigger";
+	data: TriggerNodeData;
+};
 
-export const TriggerNode = ({
-	data,
-	selected,
-}: NodeProps<TriggerFlowNode>) => {
+export const TriggerNode = ({ data, selected }: NodeProps<TriggerFlowNode>) => {
 	const event = data.eventId
 		? WEBHOOK_EVENTS_BY_ID.get(data.eventId)
 		: undefined;

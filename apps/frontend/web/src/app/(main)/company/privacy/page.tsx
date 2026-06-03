@@ -19,7 +19,10 @@ const LAST_UPDATED = "June 2, 2026";
 
 const PrivacyPage = () => {
 	return (
-		<PageLayout title="Privacy Policy" subtitle={`Last updated: ${LAST_UPDATED}`}>
+		<PageLayout
+			title="Privacy Policy"
+			subtitle={`Last updated: ${LAST_UPDATED}`}
+		>
 			<div>
 				<p>
 					This Privacy Policy explains how <strong>Reloop Labs</strong>{" "}
@@ -30,11 +33,13 @@ const PrivacyPage = () => {
 				</p>
 
 				<section>
-					<h2>1. Three contexts: our website, hosted service, and self-hosting</h2>
+					<h2>
+						1. Three contexts: our website, hosted service, and self-hosting
+					</h2>
 					<p>
-						Reloop is open-source email infrastructure offered as a hosted service
-						from Reloop Labs or as software you deploy yourself. There are three
-						distinct contexts:
+						Reloop is open-source email infrastructure offered as a hosted
+						service from Reloop Labs or as software you deploy yourself. There
+						are three distinct contexts:
 					</p>
 					<ul>
 						<li>
@@ -84,14 +89,14 @@ const PrivacyPage = () => {
 							cookies through your browser settings.
 						</li>
 						<li>
-							<strong>Community and repository activity</strong>: if you interact
-							with us on GitHub, Discord, or X, those platforms may share
-							profile and activity information with us according to their own
-							policies.
+							<strong>Community and repository activity</strong>: if you
+							interact with us on GitHub, Discord, or X, those platforms may
+							share profile and activity information with us according to their
+							own policies.
 						</li>
 						<li>
-							<strong>Communications</strong>: messages you send to us, feedback,
-							bug reports, and survey responses.
+							<strong>Communications</strong>: messages you send to us,
+							feedback, bug reports, and survey responses.
 						</li>
 					</ul>
 					<p>
@@ -108,10 +113,10 @@ const PrivacyPage = () => {
 				<section>
 					<h2>3. How we use information</h2>
 					<ul>
-						<li>Operate, secure, and improve reloop.sh and related services.</li>
 						<li>
-							Respond to support, community, and press inquiries.
+							Operate, secure, and improve reloop.sh and related services.
 						</li>
+						<li>Respond to support, community, and press inquiries.</li>
 						<li>
 							Send transactional messages related to your requests (for example,
 							replies to contact form submissions).
@@ -164,10 +169,10 @@ const PrivacyPage = () => {
 					<h2>6. Data retention and security</h2>
 					<p>
 						We retain personal information only as long as needed for the
-						purposes described in this Policy, unless a longer period is required
-						by law. We implement reasonable technical and organizational measures
-						to protect information we hold, but no method of transmission or
-						storage is completely secure.
+						purposes described in this Policy, unless a longer period is
+						required by law. We implement reasonable technical and
+						organizational measures to protect information we hold, but no
+						method of transmission or storage is completely secure.
 					</p>
 				</section>
 
@@ -198,10 +203,10 @@ const PrivacyPage = () => {
 				<section>
 					<h2>9. Changes to this policy</h2>
 					<p>
-						We may update this Policy from time to time. We will post the revised
-						version on this page with an updated &ldquo;Last updated&rdquo; date.
-						Material changes may be communicated through the website or by email
-						where appropriate.
+						We may update this Policy from time to time. We will post the
+						revised version on this page with an updated &ldquo;Last
+						updated&rdquo; date. Material changes may be communicated through
+						the website or by email where appropriate.
 					</p>
 				</section>
 

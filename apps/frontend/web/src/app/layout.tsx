@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ChatwootLoader } from "@reloop/ui/chatwoot-loader";
 import { IconsSprite } from "@reloop/ui/icon";
-import { ThemeProvider } from "@reloop/web/providers/theme-provider";
 import {
 	defaultOgImage,
 	getSiteUrl,
 	siteDescription,
 	siteName,
 } from "@reloop/web/lib/site";
+import { ThemeProvider } from "@reloop/web/providers/theme-provider";
 import localFont from "next/font/local";
 
 const openRunde = localFont({
@@ -65,7 +65,7 @@ export default function RootLayout({
 		<html
 			lang="en"
 			suppressHydrationWarning
-			className={`${openRunde.variable} scroll-auto overscroll-y-none`}
+			className={`${openRunde.variable} overscroll-y-none scroll-auto`}
 		>
 			<body
 				className="min-h-full overscroll-y-none bg-bg-white-0 antialiased"

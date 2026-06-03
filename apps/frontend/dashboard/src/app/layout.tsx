@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 import SWRProvider from "@fe/dashboard/providers/swr.config";
 import { ThemeProvider } from "@fe/dashboard/providers/theme-provider";
+import { ChatwootLoader } from "@reloop/ui/chatwoot-loader";
 import { IconsSprite } from "@reloop/ui/icon";
 import { Toaster } from "@reloop/ui/toast";
 import * as Tooltip from "@reloop/ui/tooltip";
 import localFont from "next/font/local";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Suspense } from "react";
-import { ChatwootLoader } from "@reloop/ui/chatwoot-loader";
 import { CommandMenuGlobal } from "../components/command-menu";
 
 const openRunde = localFont({

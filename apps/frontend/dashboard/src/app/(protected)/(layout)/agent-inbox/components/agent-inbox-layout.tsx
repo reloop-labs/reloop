@@ -10,8 +10,8 @@ import { toast } from "sonner";
 import type { AgentMailbox } from "../mock-data";
 import {
 	countThreadsForFilter,
-	inboundThreads,
 	type InboxFilter,
+	inboundThreads,
 	threadMatchesFilter,
 } from "../mock-data";
 import { AddAgentAddressModal } from "./add-agent-address-modal";

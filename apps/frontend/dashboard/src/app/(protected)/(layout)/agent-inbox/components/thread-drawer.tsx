@@ -21,9 +21,7 @@ export const ThreadDrawer = ({
 		<Drawer.Root open={isOpen} onOpenChange={onOpenChange}>
 			<Drawer.Content className="max-w-full sm:max-w-[480px]">
 				<Drawer.Header className="border-stroke-soft-200 border-b">
-					<Drawer.Title>
-						{thread?.subject ?? "Message"}
-					</Drawer.Title>
+					<Drawer.Title>{thread?.subject ?? "Message"}</Drawer.Title>
 				</Drawer.Header>
 				<Drawer.Body className="flex min-h-0 flex-1 flex-col overflow-hidden p-0">
 					<ThreadDetail

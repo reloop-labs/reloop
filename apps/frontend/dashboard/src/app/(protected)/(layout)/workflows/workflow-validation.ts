@@ -39,7 +39,9 @@ const getReachableNodeIds = (
 	return visited;
 };
 
-export const validateWorkflow = (workflow: Workflow): WorkflowValidationResult => {
+export const validateWorkflow = (
+	workflow: Workflow,
+): WorkflowValidationResult => {
 	const warnings: string[] = [];
 	const trigger = workflow.nodes.find((n) => n.id === TRIGGER_NODE_ID);
 

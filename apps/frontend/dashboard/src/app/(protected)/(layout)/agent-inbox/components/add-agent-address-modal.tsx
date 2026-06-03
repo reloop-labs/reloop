@@ -83,7 +83,9 @@ export const AddAgentAddressModal = ({
 				localPart: data.localPart,
 				domain: data.domain,
 				description: data.description,
-				securityLevel: Number(data.securityLevel) as AgentMailbox["securityLevel"],
+				securityLevel: Number(
+					data.securityLevel,
+				) as AgentMailbox["securityLevel"],
 			});
 			toast.success(`Agent address ${mailbox.email} created`);
 			form.reset();
@@ -186,7 +188,10 @@ export const AddAgentAddressModal = ({
 							<Select.Root
 								value={form.watch("securityLevel")}
 								onValueChange={(v) =>
-									form.setValue("securityLevel", v as AgentAddressFormValues["securityLevel"])
+									form.setValue(
+										"securityLevel",
+										v as AgentAddressFormValues["securityLevel"],
+									)
 								}
 								size="small"
 							>
