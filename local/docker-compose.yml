@@ -89,7 +89,11 @@ services:
       dockerfile: Dockerfile
     container_name: kumomta-smtp
     ports:
-      - "25:25"      # ESMTP injection
+      - "25:25"      # ESMTP injection (STARTTLS)
+      - "587:587"    # Submission (STARTTLS)
+      - "465:465"    # SMTPS (implicit TLS)
+      - "2587:2587"  # Alt submission (STARTTLS)
+      - "2465:2465"  # Alt SMTPS (implicit TLS)
       - "8020:8000"  # HTTP API
     volumes:
       - ../docker-data/kumomta/data:/var/spool/kumomta/data
