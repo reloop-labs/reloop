@@ -18,8 +18,6 @@
 		"@elysiajs/cron": "catalog:backend",
 		"@elysiajs/opentelemetry": "catalog:backend",
 		"@elysiajs/server-timing": "catalog:backend",
-		"@bull-board/api": "catalog:backend",
-		"@bull-board/elysia": "catalog:backend",
 		"@elysiajs/swagger": "catalog:backend",
 		"@elysiajs/openapi": "catalog:backend",
 		"@opentelemetry/exporter-trace-otlp-http": "catalog:backend",
