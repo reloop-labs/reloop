@@ -11,10 +11,10 @@ import type { AgentMailbox } from "../mock-data";
 import {
 	countThreadsForFilter,
 	type InboxFilter,
-	inboundThreads,
 	threadMatchesFilter,
 } from "../mock-data";
 import { AddAgentAddressModal } from "./add-agent-address-modal";
+import { useAgentInbox } from "./agent-inbox-provider";
 import { InboxFilterTabs } from "./inbox-filter-tabs";
 import { SetupWebhookModal } from "./setup-webhook-modal";
 import { ThreadDetail } from "./thread-detail";
@@ -46,11 +46,12 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 	const [addOpen, setAddOpen] = useState(false);
 	const [drawerOpen, setDrawerOpen] = useState(false);
 
+	const { threads, refresh } = useAgentInbox();
 	const isDesktop = useMediaQuery("(min-width: 1024px)");
 
 	const mailboxThreads = useMemo(
-		() => inboundThreads.filter((t) => t.mailboxId === mailboxId),
-		[mailboxId],
+		() => threads.filter((t) => t.mailboxId === mailboxId),
+		[mailboxId, threads],
 	);
 
 	const filteredThreads = useMemo(() => {
@@ -66,12 +67,9 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 			"handled",
 		];
 		return Object.fromEntries(
-			filters.map((f) => [
-				f,
-				countThreadsForFilter(inboundThreads, f, mailboxId),
-			]),
+			filters.map((f) => [f, countThreadsForFilter(threads, f, mailboxId)]),
 		) as Record<InboxFilter, number>;
-	}, [mailboxId]);
+	}, [mailboxId, threads]);
 
 	const selectedThread = useMemo(
 		() =>
@@ -105,8 +103,13 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 		}
 	};
 
-	const handleRefresh = () => {
-		toast.success("Inbox refreshed");
+	const handleRefresh = async () => {
+		try {
+			await refresh();
+			toast.success("Inbox refreshed");
+		} catch {
+			toast.error("Failed to refresh inbox");
+		}
 	};
 
 	const emptyMessage =

@@ -1,5 +1,6 @@
 "use client";
 
+import type { DomainListResponse } from "@fe/dashboard/types/api.types";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
@@ -9,19 +10,15 @@ import * as Modal from "@reloop/ui/modal";
 import * as Select from "@reloop/ui/select";
 import * as Textarea from "@reloop/ui/textarea";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import useSWR from "swr";
 import * as v from "valibot";
 import type { AgentMailbox } from "../mock-data";
 import { SECURITY_LEVEL_LABELS } from "../mock-data";
 import { useAgentInbox } from "./agent-inbox-provider";
-
-const MOCK_DOMAINS = [
-	{ value: "acme.dev", label: "acme.dev" },
-	{ value: "local.reloop.sh", label: "local.reloop.sh" },
-];
 
 const agentAddressSchema = v.object({
 	label: v.pipe(v.string(), v.minLength(1, "Agent name is required")),
@@ -53,6 +50,11 @@ export const AddAgentAddressModal = ({
 	const { addMailbox, mailboxes } = useAgentInbox();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
+	const { data: domainsData } = useSWR<DomainListResponse>(
+		"/api/domain/v1/list",
+	);
+	const domainsList = domainsData?.domains ?? [];
+
 	const form = useForm<AgentAddressFormValues>({
 		resolver: valibotResolver(
 			agentAddressSchema,
@@ -60,11 +62,17 @@ export const AddAgentAddressModal = ({
 		defaultValues: {
 			label: "",
 			localPart: "",
-			domain: MOCK_DOMAINS[0]?.value ?? "",
+			domain: "",
 			description: "",
 			securityLevel: "5",
 		},
 	});
+
+	useEffect(() => {
+		if (domainsList.length > 0 && !form.getValues("domain")) {
+			form.setValue("domain", domainsList[0]?.domain ?? "");
+		}
+	}, [domainsList, form]);
 
 	const onSubmit = async (data: AgentAddressFormValues) => {
 		const email = `${data.localPart}@${data.domain}`;
@@ -75,13 +83,19 @@ export const AddAgentAddressModal = ({
 			return;
 		}
 
+		const selectedDomainObj = domainsList.find((d) => d.domain === data.domain);
+		if (!selectedDomainObj) {
+			toast.error("Please select a valid domain");
+			return;
+		}
+
 		setIsSubmitting(true);
 		try {
-			await new Promise((resolve) => setTimeout(resolve, 400));
-			const mailbox = addMailbox({
+			const mailbox = await addMailbox({
 				label: data.label,
 				localPart: data.localPart,
 				domain: data.domain,
+				domainId: selectedDomainObj.id,
 				description: data.description,
 				securityLevel: Number(
 					data.securityLevel,
@@ -92,8 +106,9 @@ export const AddAgentAddressModal = ({
 			onOpenChange(false);
 			onCreated?.(mailbox);
 			router.push(`/agent-inbox/${mailbox.id}`);
-		} catch {
-			toast.error("Failed to create agent address");
+		} catch (error) {
+			const errMsg = error instanceof Error ? error.message : "Failed to create agent address";
+			toast.error(errMsg);
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -150,9 +165,9 @@ export const AddAgentAddressModal = ({
 										<Select.Value />
 									</Select.Trigger>
 									<Select.Content>
-										{MOCK_DOMAINS.map((d) => (
-											<Select.Item key={d.value} value={d.value}>
-												{d.label}
+										{domainsList.map((d) => (
+											<Select.Item key={d.id} value={d.domain}>
+												{d.domain}
 											</Select.Item>
 										))}
 									</Select.Content>

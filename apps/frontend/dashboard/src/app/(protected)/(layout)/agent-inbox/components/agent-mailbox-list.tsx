@@ -10,7 +10,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { useState } from "react";
-import { getMailboxStats, SECURITY_LEVEL_LABELS } from "../mock-data";
+import { SECURITY_LEVEL_LABELS } from "../mock-data";
 import { AddAgentAddressModal } from "./add-agent-address-modal";
 import { useAgentInbox } from "./agent-inbox-provider";
 import { SetupWebhookModal } from "./setup-webhook-modal";
@@ -19,7 +19,7 @@ dayjs.extend(relativeTime);
 
 export const AgentMailboxList = () => {
 	const router = useRouter();
-	const { mailboxes } = useAgentInbox();
+	const { mailboxes, threads } = useAgentInbox();
 	const [setupOpen, setSetupOpen] = useState(false);
 	const [addOpen, setAddOpen] = useState(false);
 
@@ -108,7 +108,27 @@ export const AgentMailboxList = () => {
 					</Table.Header>
 					<Table.Body>
 						{mailboxes.map((mailbox, index) => {
-							const stats = getMailboxStats(mailbox.id);
+							const mThreads = threads.filter(
+								(t) => t.mailboxId === mailbox.id,
+							);
+							const stats = {
+								total: mThreads.length,
+								unread: mThreads.filter((t) => t.unread).length,
+								needsApproval: mThreads.filter(
+									(t) => t.status === "needs_approval",
+								).length,
+								processing: mThreads.filter(
+									(t) => t.status === "parsing" || t.status === "new",
+								).length,
+								lastActivityAt:
+									mThreads.length > 0
+										? mThreads.reduce(
+												(latest, t) =>
+													t.receivedAt > latest ? t.receivedAt : latest,
+												mThreads[0]!.receivedAt,
+											)
+										: null,
+							};
 							return (
 								<React.Fragment key={mailbox.id}>
 									<Table.Row
