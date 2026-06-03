@@ -1,8 +1,9 @@
 import {
+	FeatureCta,
 	MarketingPageShell,
 	PageSection,
 } from "@reloop/web/components/page-shell";
-import { contactEmail, getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
+import { contactEmail, getSiteUrl, hostedSignupHref, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Script from "next/script";
 import { ContactForm } from "./contact-form";
@@ -118,6 +119,21 @@ const ContactUsPage = () => {
 						))}
 					</div>
 				</PageSection>
+
+				<FeatureCta
+					title="Ready to get started?"
+					titleMuted="Hosted or self-hosted."
+					description="Sign up for Reloop or deploy the open-source platform yourself."
+					primary={{
+						label: "Get started",
+						href: hostedSignupHref,
+					}}
+					secondary={{
+						label: "Self-hosting guide",
+						href: "/resources/self-hosting-guide",
+					}}
+					compact
+				/>
 			</MarketingPageShell>
 		</>
 	);
