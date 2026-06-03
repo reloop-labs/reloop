@@ -55,9 +55,11 @@ const columns: Integration[][] = [
 	[{ label: "Shopify", href: smtpDocs, icon: siShopify }],
 ];
 
+const integrations = columns.flat();
+
 const columnOffsetClass: Record<number, string> = {
-	1: "mt-[4.75rem] sm:mt-[5.5rem] lg:mt-[7.25rem]",
-	2: "mt-[2.375rem] sm:mt-[2.75rem] lg:mt-[3.625rem]",
+	1: "mt-[7.25rem]",
+	2: "mt-[3.625rem]",
 	3: "",
 };
 
@@ -65,7 +67,7 @@ function IntegrationIcon({ icon }: { icon: SimpleIcon }) {
 	return (
 		<svg
 			viewBox="0 0 24 24"
-			className="size-10 sm:size-11 lg:size-12"
+			className="size-8 sm:size-9 lg:size-12"
 			aria-hidden
 		>
 			<path d={icon.path} fill={`#${icon.hex}`} />
@@ -84,12 +86,12 @@ function IntegrationCard({ item }: { item: Integration }) {
 		>
 			<div
 				aria-hidden
-				className="pointer-events-none absolute inset-x-3 bottom-1 z-0 h-10 opacity-50 blur-xl transition-opacity duration-300 group-hover:opacity-75 sm:inset-x-4 sm:h-12 lg:h-14"
+				className="pointer-events-none absolute inset-x-2 bottom-0.5 z-0 h-8 opacity-50 blur-lg transition-opacity duration-300 group-hover:opacity-75 sm:inset-x-3 sm:h-10 lg:inset-x-4 lg:h-14 lg:blur-xl"
 				style={{
 					background: `radial-gradient(ellipse at center, color-mix(in srgb, ${glow} 55%, transparent) 0%, color-mix(in srgb, ${glow} 20%, transparent) 45%, transparent 75%)`,
 				}}
 			/>
-			<div className="relative z-10 flex size-[5.5rem] items-center justify-center rounded-[22px] border border-stroke-soft-200/80 bg-transparent transition-colors duration-300 group-hover:border-stroke-soft-300 sm:size-24 lg:size-[6.75rem] lg:rounded-[26px] dark:border-white/[0.08] dark:group-hover:border-white/15">
+			<div className="relative z-10 flex size-[4.5rem] items-center justify-center rounded-[18px] border border-stroke-soft-200/80 bg-transparent transition-colors duration-300 group-hover:border-stroke-soft-300 sm:size-20 lg:size-[6.75rem] lg:rounded-[26px] dark:border-white/[0.08] dark:group-hover:border-white/15">
 				<IntegrationIcon icon={item.icon} />
 			</div>
 		</Link>
@@ -101,17 +103,25 @@ export default function WorksWith() {
 		<section id="works-with">
 			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-28">
 				<div className="text-center">
-					<h2 className="font-serif text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3rem] lg:text-[3.6rem] dark:text-white">
+					<h2 className="text-balance font-serif text-[1.9rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.75rem] lg:text-[3.6rem] dark:text-white">
 						Works with your stack
 					</h2>
 				</div>
 
-				<div className="-mx-4 mt-14 overflow-x-auto px-4 sm:mx-0 sm:mt-16 sm:overflow-visible sm:px-0 lg:mt-20">
-					<div className="mx-auto flex min-w-max items-start justify-center gap-3 sm:min-w-0 sm:gap-4 lg:gap-5">
+				{/* Mobile & tablet — centered wrap grid */}
+				<div className="mx-auto mt-10 flex max-w-[20rem] flex-wrap justify-center gap-2.5 sm:mt-14 sm:max-w-md sm:gap-3 md:max-w-xl lg:hidden">
+					{integrations.map((item) => (
+						<IntegrationCard key={item.label} item={item} />
+					))}
+				</div>
+
+				{/* Desktop — diamond honeycomb */}
+				<div className="mt-14 hidden lg:mt-20 lg:block">
+					<div className="mx-auto flex items-start justify-center gap-5">
 						{columns.map((column) => (
 							<div
 								key={column.map((item) => item.label).join("-")}
-								className={`flex flex-col gap-3 sm:gap-4 lg:gap-5 ${columnOffsetClass[column.length]}`}
+								className={`flex flex-col gap-5 ${columnOffsetClass[column.length]}`}
 							>
 								{column.map((item) => (
 									<IntegrationCard key={item.label} item={item} />
@@ -121,7 +131,7 @@ export default function WorksWith() {
 					</div>
 				</div>
 
-				<p className="mx-auto mt-14 max-w-xl text-center text-[15px] text-text-sub-600 leading-7 sm:mt-16 lg:mt-20 dark:text-white/50">
+				<p className="mx-auto mt-10 max-w-xl text-center text-[15px] text-text-sub-600 leading-7 sm:mt-14 lg:mt-20 dark:text-white/50">
 					No extra setup — plug Reloop into the mailer or platform you already
 					use.
 				</p>

@@ -245,8 +245,8 @@ export const Footer = () => {
 						</button>
 					</div>
 				</div>
-				<div className="relative overflow-hidden pb-10">
-					<span className="whitespace-nowrap font-black text-[#0a0d12] text-[220px] leading-none tracking-normal [-webkit-text-stroke:2px_#0a0d12] [text-shadow:6px_6px_0px_rgba(10,13,18,0.06),_0_0_80px_rgba(200,150,255,0.15)] dark:text-white dark:[-webkit-text-stroke:2px_white] dark:[text-shadow:6px_6px_0px_rgba(255,255,255,0.12),_0_0_80px_rgba(200,150,255,0.3)]">
+				<div className="relative overflow-hidden pb-6 sm:pb-10">
+					<span className="block w-full max-w-full font-black text-[clamp(3.5rem,calc((100vw-2rem)/3.6),13.75rem)] text-[#0a0d12] leading-[0.85] tracking-normal [-webkit-text-stroke:1px_#0a0d12] [text-shadow:3px_3px_0px_rgba(10,13,18,0.06),_0_0_60px_rgba(200,150,255,0.12)] sm:[-webkit-text-stroke:2px_#0a0d12] sm:[text-shadow:6px_6px_0px_rgba(10,13,18,0.06),_0_0_80px_rgba(200,150,255,0.15)] dark:text-white dark:[-webkit-text-stroke:1px_white] dark:[text-shadow:3px_3px_0px_rgba(255,255,255,0.12),_0_0_60px_rgba(200,150,255,0.25)] dark:sm:[-webkit-text-stroke:2px_white] dark:sm:[text-shadow:6px_6px_0px_rgba(255,255,255,0.12),_0_0_80px_rgba(200,150,255,0.3)]">
 						Reloop
 					</span>
 				</div>
