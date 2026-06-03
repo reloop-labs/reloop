@@ -13,12 +13,11 @@ export default function Hero() {
 					<h1 className="mt-4 font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[4rem] dark:text-white">
 						Send email from apps
 						<br />
-						that already use{" "}
-						<span className="text-primary-base">SMTP.</span>
+						that already use <span className="text-primary-base">SMTP.</span>
 					</h1>
 					<p className="mx-auto mt-6 max-w-[560px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
-						No new SDK required. Point your mailer at Reloop—same host, port, and
-						username/password pattern you already know.
+						No new SDK required. Point your mailer at Reloop—same host, port,
+						and username/password pattern you already know.
 					</p>
 					<div className="mt-10 flex flex-wrap items-center justify-center gap-4">
 						<a

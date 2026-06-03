@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import Connection from "./components/connection";
 import CTA from "./components/cta";
-import Guide from "./components/guide";
 import Hero from "./components/hero";
 import Sandbox from "./components/sandbox";
 import WorksWith from "./components/works-with";
@@ -22,10 +20,8 @@ const SmtpPage = () => {
 	return (
 		<div>
 			<Hero />
-			<Connection />
-			<WorksWith />
 			<Sandbox />
-			<Guide />
+			<WorksWith />
 			<CTA />
 		</div>
 	);

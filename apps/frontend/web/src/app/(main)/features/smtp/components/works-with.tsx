@@ -4,13 +4,9 @@ import Link from "next/link";
 import type { SimpleIcon } from "simple-icons";
 import {
 	siAuth0,
-	siClerk,
 	siDjango,
-	siGhost,
-	siKeycloak,
 	siLaravel,
 	siMetabase,
-	siN8n,
 	siNestjs,
 	siNextdotjs,
 	siNodedotjs,
@@ -19,11 +15,8 @@ import {
 	siRubyonrails,
 	siShopify,
 	siSpring,
-	siStrapi,
 	siSupabase,
-	siSymfony,
 	siWordpress,
-	siZapier,
 } from "simple-icons";
 
 type Integration = {
@@ -34,6 +27,7 @@ type Integration = {
 
 const smtpDocs = "/docs/quickstart/smtp";
 
+/** Diamond layout: 1 · 2 · 3 · 2 · 3 · 2 · 1 (14 icons) */
 const columns: Integration[][] = [
 	[{ label: "WordPress", href: `${smtpDocs}/wordpress`, icon: siWordpress }],
 	[
@@ -48,7 +42,6 @@ const columns: Integration[][] = [
 	[
 		{ label: "Rails", href: `${smtpDocs}/rails`, icon: siRubyonrails },
 		{ label: "Auth0", href: `${smtpDocs}/auth0`, icon: siAuth0 },
-		{ label: "Symfony", href: smtpDocs, icon: siSymfony },
 	],
 	[
 		{ label: "Supabase", href: `${smtpDocs}/supabase`, icon: siSupabase },
@@ -58,19 +51,15 @@ const columns: Integration[][] = [
 	[
 		{ label: "PHPMailer", href: `${smtpDocs}/phpmailer`, icon: siPhp },
 		{ label: "Spring", href: smtpDocs, icon: siSpring },
-		{ label: "Keycloak", href: smtpDocs, icon: siKeycloak },
 	],
-	[
-		{ label: "Strapi", href: smtpDocs, icon: siStrapi },
-		{ label: "Clerk", href: smtpDocs, icon: siClerk },
-		{ label: "Ghost", href: smtpDocs, icon: siGhost },
-	],
-	[
-		{ label: "Shopify", href: smtpDocs, icon: siShopify },
-		{ label: "Zapier", href: smtpDocs, icon: siZapier },
-		{ label: "n8n", href: smtpDocs, icon: siN8n },
-	],
+	[{ label: "Shopify", href: smtpDocs, icon: siShopify }],
 ];
+
+const columnOffsetClass: Record<number, string> = {
+	1: "mt-[4.75rem] sm:mt-[5.5rem] lg:mt-[7.25rem]",
+	2: "mt-[2.375rem] sm:mt-[2.75rem] lg:mt-[3.625rem]",
+	3: "",
+};
 
 function IntegrationIcon({ icon }: { icon: SimpleIcon }) {
 	return (
@@ -85,13 +74,22 @@ function IntegrationIcon({ icon }: { icon: SimpleIcon }) {
 }
 
 function IntegrationCard({ item }: { item: Integration }) {
+	const glow = `#${item.icon.hex}`;
+
 	return (
 		<Link
 			href={item.href}
 			aria-label={`${item.label} SMTP guide`}
-			className="group flex flex-col items-center transition-transform duration-300 hover:scale-[1.04]"
+			className="group relative flex flex-col items-center transition-transform duration-300 hover:scale-[1.04]"
 		>
-			<div className="flex size-[5.5rem] items-center justify-center rounded-[22px] border border-stroke-soft-200 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.05)] transition-colors duration-300 group-hover:border-stroke-soft-300 group-hover:shadow-[0_6px_20px_rgba(0,0,0,0.08)] sm:size-24 lg:size-[6.75rem] lg:rounded-[26px] dark:border-white/[0.08] dark:bg-[#141414] dark:shadow-none dark:group-hover:border-white/15 dark:group-hover:bg-[#1a1a1a]">
+			<div
+				aria-hidden
+				className="pointer-events-none absolute inset-x-3 bottom-1 z-0 h-10 opacity-50 blur-xl transition-opacity duration-300 group-hover:opacity-75 sm:inset-x-4 sm:h-12 lg:h-14"
+				style={{
+					background: `radial-gradient(ellipse at center, color-mix(in srgb, ${glow} 55%, transparent) 0%, color-mix(in srgb, ${glow} 20%, transparent) 45%, transparent 75%)`,
+				}}
+			/>
+			<div className="relative z-10 flex size-[5.5rem] items-center justify-center rounded-[22px] border border-stroke-soft-200/80 bg-transparent transition-colors duration-300 group-hover:border-stroke-soft-300 sm:size-24 lg:size-[6.75rem] lg:rounded-[26px] dark:border-white/[0.08] dark:group-hover:border-white/15">
 				<IntegrationIcon icon={item.icon} />
 			</div>
 		</Link>
@@ -109,11 +107,11 @@ export default function WorksWith() {
 				</div>
 
 				<div className="-mx-4 mt-14 overflow-x-auto px-4 sm:mx-0 sm:mt-16 sm:overflow-visible sm:px-0 lg:mt-20">
-					<div className="mx-auto flex min-w-max max-w-6xl items-center justify-center gap-4 sm:min-w-0 sm:gap-5 lg:max-w-7xl lg:gap-6">
-						{columns.map((column, columnIndex) => (
+					<div className="mx-auto flex min-w-max items-start justify-center gap-3 sm:min-w-0 sm:gap-4 lg:gap-5">
+						{columns.map((column) => (
 							<div
 								key={column.map((item) => item.label).join("-")}
-								className={`flex flex-col gap-4 sm:gap-5 lg:gap-6 ${columnIndex % 2 === 1 ? "mt-10 sm:mt-14 lg:mt-16" : ""}`}
+								className={`flex flex-col gap-3 sm:gap-4 lg:gap-5 ${columnOffsetClass[column.length]}`}
 							>
 								{column.map((item) => (
 									<IntegrationCard key={item.label} item={item} />
