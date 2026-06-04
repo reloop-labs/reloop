@@ -1,7 +1,11 @@
 "use client";
 
 import Script from "next/script";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+
+// TODO: temporary — restore env-based config once CI build-args are wired up
+export const CHATWOOT_BASE_URL = "https://chatwoot.reloop.sh";
+export const CHATWOOT_WEBSITE_TOKEN = "WsUSVMPZG5goFYPcJQLQVAjD";
 
 declare global {
 	interface Window {
@@ -23,32 +27,10 @@ declare global {
 	}
 }
 
-function useChatwootConfig() {
-	const baseUrl = process.env.NEXT_PUBLIC_CHATWOOT_BASE_URL?.replace(
-		/\/+$/,
-		"",
-	);
-	const websiteToken = process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN?.trim();
-
-	return {
-		baseUrl,
-		websiteToken,
-		isConfigured: Boolean(baseUrl && websiteToken),
-	};
-}
-
 export function ChatwootLoader() {
-	const { baseUrl, websiteToken, isConfigured } = useChatwootConfig();
+	const baseUrl = CHATWOOT_BASE_URL.replace(/\/+$/, "");
+	const websiteToken = CHATWOOT_WEBSITE_TOKEN.trim();
 	const didInit = useRef(false);
-
-	useEffect(() => {
-		if (process.env.NODE_ENV !== "development" || isConfigured) return;
-		console.warn(
-			"[Chatwoot] Widget disabled: set NEXT_PUBLIC_CHATWOOT_BASE_URL and NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN, then restart the dev server.",
-		);
-	}, [isConfigured]);
-
-	if (!isConfigured || !baseUrl || !websiteToken) return null;
 
 	return (
 		<Script
