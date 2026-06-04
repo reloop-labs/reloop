@@ -47,10 +47,10 @@ export const threadsRoute = new Elysia({ prefix: "/v1/threads" })
 		},
 	)
 	.get(
-		"/:threadId/attachments/:attachmentId",
-		async ({ params: { threadId, attachmentId }, organizationId }) => {
+		"/:id/attachments/:attachmentId",
+		async ({ params: { id, attachmentId }, organizationId }) => {
 			return getThreadAttachmentController(
-				threadId,
+				id,
 				attachmentId,
 				organizationId,
 			);
@@ -58,7 +58,7 @@ export const threadsRoute = new Elysia({ prefix: "/v1/threads" })
 		{
 			auth: true,
 			params: t.Object({
-				threadId: t.String(),
+				id: t.String(),
 				attachmentId: t.String(),
 			}),
 		},

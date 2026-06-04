@@ -65,10 +65,10 @@ export const messagesRoute = new Elysia({ prefix: "/v1/messages" })
 
 	// ── Get attachment ───────────────────────────────────────────
 	.get(
-		"/:messageId/attachments/:attachmentId",
-		async ({ params: { messageId, attachmentId }, organizationId }) => {
+		"/:id/attachments/:attachmentId",
+		async ({ params: { id, attachmentId }, organizationId }) => {
 			return getMessageAttachmentController(
-				messageId,
+				id,
 				attachmentId,
 				organizationId,
 			);
@@ -76,7 +76,7 @@ export const messagesRoute = new Elysia({ prefix: "/v1/messages" })
 		{
 			auth: true,
 			params: t.Object({
-				messageId: t.String(),
+				id: t.String(),
 				attachmentId: t.String(),
 			}),
 		},
