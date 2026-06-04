@@ -11,7 +11,6 @@ import { healthRoute } from "./routes/landing/health.route";
 import { landingRoute } from "./routes/landing/landing.route";
 import { mailboxRoutes } from "./routes/mailbox/mailbox.routes";
 import { messagesRoutes } from "./routes/messages/messages.routes";
-import { receiveRoutes } from "./routes/receive/receive.routes";
 import { threadsRoutes } from "./routes/threads/threads.routes";
 import { loader } from "./utils/loader";
 
@@ -84,7 +83,6 @@ const inboxService = new Elysia({
 	})
 	.use(landingRoute)
 	.use(healthRoute)
-	.use(receiveRoutes)
 	.use(mailboxRoutes)
 	.use(messagesRoutes)
 	.use(threadsRoutes)

@@ -5,7 +5,7 @@ import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
 import { simpleParser } from "mailparser";
-import { correlateInboundThread } from "../../../lib/thread-correlation";
+import { correlateInboundThread } from "./thread-correlation";
 
 function extractAddresses(
 	field:

@@ -1,6 +1,6 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { log } from "evlog";
-import { receiveInboundEmailController } from "../routes/receive/receive-inbound-email/receive-inbound-email.controllers";
+import { receiveInboundEmailController } from "../lib/receive-inbound-email";
 
 export async function initInboundSubscriber() {
 	log.info("subscribers", "Initializing KumoMTA inbound email subscriber");
