@@ -300,6 +300,35 @@ end)
 
 -- Enforce API Key + Domain Verification on Receipt
 kumo.on('smtp_server_message_received', function(msg)
+  local msg_id = msg:id()
+
+  -- Evaluate with RSpamD
+  local client = kumo.http.build_client({
+    danger_accept_invalid_certs = true
+  })
+  local ok_rspamd, resp_rspamd = pcall(function()
+    local req = client:post(constants.rspamd_url)
+    return req:body(msg:get_data()):send()
+  end)
+
+  if ok_rspamd then
+    local code = resp_rspamd:status_code()
+    if code == 200 then
+      local data = kumo.serde.json_parse(resp_rspamd:text())
+      if data and data['score'] and data['score'] >= 15 then
+        print("[RSPAMD] [" .. msg_id .. "] Rejected spam message (score: " .. tostring(data['score']) .. ")")
+        kumo.reject(550, 'We do not send spam')
+        return
+      else
+        print("[RSPAMD] [" .. msg_id .. "] Passed (score: " .. tostring(data and data['score'] or "unknown") .. ")")
+      end
+    else
+      print("[RSPAMD] [" .. msg_id .. "] Warning: check returned HTTP status " .. tostring(code))
+    end
+  else
+    print("[RSPAMD] [" .. msg_id .. "] Warning: failed to connect: " .. tostring(resp_rspamd))
+  end
+
   local api_key = msg:get_meta('api_key') or ""
   
   if api_key == "" then

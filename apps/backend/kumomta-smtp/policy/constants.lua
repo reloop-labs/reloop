@@ -31,6 +31,14 @@ else
 end
 constants.inbox_url = os.getenv("KUMOMTA_INBOX_URL") or default_inbox_url
 
+local default_rspamd_url
+if constants.env == "development" then
+  default_rspamd_url = "http://reloop-rspamd:11333/checkv2"
+else
+  default_rspamd_url = "http://localhost:11333/checkv2"
+end
+constants.rspamd_url = os.getenv("KUMOMTA_RSPAMD_URL") or default_rspamd_url
+
 -- 3. NATS connection URL
 constants.nats_url = os.getenv("NATS_URL") or "reloop-nats:4222"
 
@@ -59,6 +67,7 @@ print("[DEBUG] constants.env = " .. constants.env)
 print("[DEBUG] constants.hostname = " .. constants.hostname)
 print("[DEBUG] constants.base_url = " .. constants.base_url)
 print("[DEBUG] constants.kumomta_url = " .. constants.kumomta_url)
+print("[DEBUG] constants.rspamd_url = " .. constants.rspamd_url)
 print("[DEBUG] constants.nats_url = " .. constants.nats_url)
 print("[DEBUG] constants.trusted_hosts = " .. table.concat(constants.trusted_hosts, ", "))
 

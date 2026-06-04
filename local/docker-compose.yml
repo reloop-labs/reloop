@@ -105,6 +105,7 @@ services:
       - KUMOMTA_TRUSTED_HOSTS=${KUMOMTA_TRUSTED_HOSTS:-127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}
       - TRACKING_SECRET=${TRACKING_SECRET:-reloop_tracking_secret_default_123}
       - KUMOMTA_INBOX_URL=${KUMOMTA_INBOX_URL:-http://host.docker.internal:8021/api/inbox}
+      - KUMOMTA_RSPAMD_URL=${KUMOMTA_RSPAMD_URL:-http://reloop-rspamd:11333/checkv2}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -143,6 +144,7 @@ services:
     container_name: reloop-rspamd
     ports:
       - "11332:11332" # Scan port (normal worker)
+      - "11333:11333" # Scan / Controller port
       - "11334:11334" # Web UI / Controller
     volumes:
       - ../docker-data/rspamd/lib:/var/lib/rspamd
