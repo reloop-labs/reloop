@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'apps/frontend/dashboard/**'
+      - 'packages/ui/**'
+      - '.github/workflows/fe-dashboard.yml'
   workflow_dispatch:
 
 permissions:

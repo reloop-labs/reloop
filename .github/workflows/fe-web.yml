@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'apps/frontend/web/**'
+      - 'packages/ui/**'
+      - '.github/workflows/fe-web.yml'
   workflow_dispatch:
 
 permissions:
