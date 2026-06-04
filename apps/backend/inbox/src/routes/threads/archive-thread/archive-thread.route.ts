@@ -1,17 +1,17 @@
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
-import { deleteMessageController } from "./delete-message.controllers";
+import { archiveThreadController } from "./archive-thread.controllers";
 
-export const deleteMessageRoute = new Elysia().use(authMiddleware).delete(
-	"/:id",
+export const archiveThreadRoute = new Elysia().use(authMiddleware).post(
+	"/:id/archive",
 	async ({ params: { id }, organizationId }) => {
-		return deleteMessageController(id, organizationId);
+		return archiveThreadController(id, organizationId);
 	},
 	{
 		auth: true,
 		params: t.Object({
-			id: t.String({ description: "Message ID" }),
+			id: t.String({ description: "Thread ID" }),
 		}),
 		response: {
 			200: MailModel.successResponse,
@@ -21,9 +21,9 @@ export const deleteMessageRoute = new Elysia().use(authMiddleware).delete(
 			500: MailModel.ErrorResponseSchema,
 		},
 		detail: {
-			tags: ["Messages"],
-			summary: "Delete Message",
-			description: "Permanently delete an email message",
+			tags: ["Threads"],
+			summary: "Archive Thread",
+			description: "Archive a thread to hide it from active list",
 		},
 	},
 );

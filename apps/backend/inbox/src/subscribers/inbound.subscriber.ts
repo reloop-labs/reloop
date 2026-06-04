@@ -1,6 +1,6 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { log } from "evlog";
-import { receiveInboundEmailController } from "../routes/receive/receive.controllers";
+import { receiveInboundEmailController } from "../routes/receive/receive-inbound-email/receive-inbound-email.controllers";
 
 export async function initInboundSubscriber() {
 	log.info("subscribers", "Initializing KumoMTA inbound email subscriber");
@@ -13,19 +13,10 @@ export async function initInboundSubscriber() {
 
 		try {
 			const result = await receiveInboundEmailController(payload.rawMessage);
-			if (result instanceof Response) {
-				const body = await result.text();
-				log.warn({
-					message: "Inbound email processing failed or returned response",
-					status: result.status,
-					body,
-				});
-			} else {
-				log.info({
-					message: "Successfully processed inbound email via NATS subscriber",
-					result,
-				});
-			}
+			log.info({
+				message: "Successfully processed inbound email via NATS subscriber",
+				result,
+			});
 		} catch (err) {
 			log.error({
 				message: "Error processing inbound email in NATS subscriber",

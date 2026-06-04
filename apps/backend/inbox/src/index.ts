@@ -9,10 +9,10 @@ import { createOTLPDrain } from "evlog/otlp";
 import { inboxConfig } from "./inbox.config";
 import { healthRoute } from "./routes/landing/health.route";
 import { landingRoute } from "./routes/landing/landing.route";
-import { mailboxRoute } from "./routes/mailbox/mailbox.route";
-import { messagesRoute } from "./routes/messages/messages.route";
-import { receiveRoute } from "./routes/receive/receive.route";
-import { threadsRoute } from "./routes/threads/threads.route";
+import { mailboxRoutes } from "./routes/mailbox/mailbox.routes";
+import { messagesRoutes } from "./routes/messages/messages.routes";
+import { receiveRoutes } from "./routes/receive/receive.routes";
+import { threadsRoutes } from "./routes/threads/threads.routes";
 import { loader } from "./utils/loader";
 
 const parseOtlpHeaders = (
@@ -84,10 +84,10 @@ const inboxService = new Elysia({
 	})
 	.use(landingRoute)
 	.use(healthRoute)
-	.use(receiveRoute)
-	.use(mailboxRoute)
-	.use(messagesRoute)
-	.use(threadsRoute)
+	.use(receiveRoutes)
+	.use(mailboxRoutes)
+	.use(messagesRoutes)
+	.use(threadsRoutes)
 	.listen(port, () => {
 		log.info(
 			"Inbox Service",

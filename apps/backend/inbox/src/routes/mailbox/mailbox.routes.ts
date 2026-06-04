@@ -5,7 +5,10 @@ import { getMailboxRoute } from "./get-mailbox/get-mailbox.route";
 import { listMailboxesRoute } from "./list-mailboxes/list-mailboxes.route";
 import { updateMailboxRoute } from "./update-mailbox/update-mailbox.route";
 
-export const mailboxRoutes = new Elysia({ prefix: "/v1/mailboxes", name: "MailboxRoutes" })
+export const mailboxRoutes = new Elysia({
+	prefix: "/v1/mailboxes",
+	name: "MailboxRoutes",
+})
 	.use(listMailboxesRoute)
 	.use(getMailboxRoute)
 	.use(createMailboxRoute)

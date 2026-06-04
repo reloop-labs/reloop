@@ -1,17 +1,17 @@
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
-import { getMessageAttachmentController } from "./get-message-attachment.controllers";
+import { getThreadAttachmentController } from "./get-thread-attachment.controllers";
 
-export const getMessageAttachmentRoute = new Elysia().use(authMiddleware).get(
+export const getThreadAttachmentRoute = new Elysia().use(authMiddleware).get(
 	"/:id/attachments/:attachmentId",
 	async ({ params: { id, attachmentId }, organizationId }) => {
-		return getMessageAttachmentController(id, attachmentId, organizationId);
+		return getThreadAttachmentController(id, attachmentId, organizationId);
 	},
 	{
 		auth: true,
 		params: t.Object({
-			id: t.String({ description: "Message ID" }),
+			id: t.String({ description: "Thread ID" }),
 			attachmentId: t.String({ description: "Attachment ID" }),
 		}),
 		response: {
@@ -22,9 +22,10 @@ export const getMessageAttachmentRoute = new Elysia().use(authMiddleware).get(
 			500: MailModel.ErrorResponseSchema,
 		},
 		detail: {
-			tags: ["Messages"],
-			summary: "Get Message Attachment",
-			description: "Retrieve attachment details of a message",
+			tags: ["Threads"],
+			summary: "Get Thread Attachment",
+			description:
+				"Retrieve an attachment within a specific thread conversation",
 		},
 	},
 );

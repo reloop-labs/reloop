@@ -298,8 +298,13 @@ export interface InboundEmailReceivedPayload {
 	organizationId: string;
 	messageId?: string;
 	fromEmail: string;
+	fromName?: string;
 	toEmails: string[];
+	ccEmails?: string[];
 	subject: string;
+	threadId?: string;
+	hasAttachments?: boolean;
+	isSpam?: boolean;
 }
 
 export interface MailboxCreatedPayload {

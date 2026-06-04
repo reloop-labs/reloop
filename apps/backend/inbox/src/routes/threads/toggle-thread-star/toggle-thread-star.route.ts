@@ -1,20 +1,20 @@
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
-import { toggleStarController } from "./toggle-message-star.controllers";
+import { toggleThreadStarController } from "./toggle-thread-star.controllers";
 
-export const toggleMessageStarRoute = new Elysia().use(authMiddleware).patch(
+export const toggleThreadStarRoute = new Elysia().use(authMiddleware).patch(
 	"/:id/star",
 	async ({ params: { id }, body, organizationId }) => {
-		return toggleStarController(id, organizationId, body.isStarred);
+		return toggleThreadStarController(id, organizationId, body.isStarred);
 	},
 	{
 		auth: true,
 		params: t.Object({
-			id: t.String({ description: "Message ID" }),
+			id: t.String({ description: "Thread ID" }),
 		}),
 		body: t.Object({
-			isStarred: t.Boolean({ description: "Whether to star the message" }),
+			isStarred: t.Boolean({ description: "Whether to star the thread" }),
 		}),
 		response: {
 			200: MailModel.successResponse,
@@ -25,9 +25,9 @@ export const toggleMessageStarRoute = new Elysia().use(authMiddleware).patch(
 			500: MailModel.ErrorResponseSchema,
 		},
 		detail: {
-			tags: ["Messages"],
-			summary: "Toggle Message Star",
-			description: "Direct endpoint to toggle starred status of a message",
+			tags: ["Threads"],
+			summary: "Toggle Thread Star",
+			description: "Direct endpoint to toggle starred status of a thread",
 		},
 	},
 );

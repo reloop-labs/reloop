@@ -1,0 +1,50 @@
+import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
+import { MailModel } from "@reloop/be-inbox/model/mail.model";
+import { Elysia, t } from "elysia";
+import { replyToMessageController } from "./reply-to-message.controllers";
+
+export const replyToMessageRoute = new Elysia().use(authMiddleware).post(
+	"/:id/reply",
+	async ({ params: { id }, body, organizationId, request }) => {
+		return replyToMessageController(
+			id,
+			organizationId,
+			body,
+			request.headers.get("x-api-key") ?? "",
+		);
+	},
+	{
+		auth: true,
+		params: t.Object({
+			id: t.String({ description: "Message ID to reply to" }),
+		}),
+		body: t.Object({
+			text: t.Optional(t.String({ description: "Plain text body content" })),
+			html: t.Optional(t.String({ description: "HTML body content" })),
+			cc: t.Optional(
+				t.Union([t.String(), t.Array(t.String())], {
+					description: "CC recipient address(es)",
+				}),
+			),
+			bcc: t.Optional(
+				t.Union([t.String(), t.Array(t.String())], {
+					description: "BCC recipient address(es)",
+				}),
+			),
+		}),
+		response: {
+			200: MailModel.sendEmailResponse,
+			400: MailModel.ErrorResponseSchema,
+			401: MailModel.ErrorResponseSchema,
+			403: MailModel.ErrorResponseSchema,
+			404: MailModel.ErrorResponseSchema,
+			500: MailModel.ErrorResponseSchema,
+		},
+		detail: {
+			tags: ["Messages"],
+			summary: "Reply to Message",
+			description:
+				"Reply to an email message, preserving thread context and header references",
+		},
+	},
+);

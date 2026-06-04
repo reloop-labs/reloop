@@ -349,7 +349,11 @@ export namespace MailModel {
 		threadId: t.Union([t.String(), t.Null()]),
 		inReplyTo: t.Union([t.String(), t.Null()]),
 		references: t.Union([t.Array(t.String()), t.Null(), t.Undefined()]),
-		headers: t.Union([t.Record(t.String(), t.String()), t.Null(), t.Undefined()]),
+		headers: t.Union([
+			t.Record(t.String(), t.String()),
+			t.Null(),
+			t.Undefined(),
+		]),
 		date: t.Union([t.Date(), t.String(), t.Null()]),
 		createdAt: t.Union([t.Date(), t.String()]),
 		attachments: t.Optional(t.Array(attachmentItem)),
@@ -422,7 +426,11 @@ export namespace MailModel {
 		rfc822MessageId: t.Union([t.String(), t.Null()]),
 		inReplyTo: t.Union([t.String(), t.Null()]),
 		createdAt: t.Union([t.Date(), t.String()]),
-		email: t.Union([threadMessageEmailInbound, threadMessageEmailOutbound, t.Null()]),
+		email: t.Union([
+			threadMessageEmailInbound,
+			threadMessageEmailOutbound,
+			t.Null(),
+		]),
 	});
 
 	export const threadDetailResponse = t.Object({

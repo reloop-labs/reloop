@@ -29,7 +29,7 @@ export async function updateMailboxController(
 		});
 	}
 
-	const updateData: Record<string, any> = {};
+	const updateData: Partial<typeof mailbox.$inferInsert> = {};
 	if (updates.displayName !== undefined)
 		updateData.displayName = updates.displayName;
 	if (updates.description !== undefined)

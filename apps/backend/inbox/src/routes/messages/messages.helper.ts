@@ -45,7 +45,7 @@ export async function proxySendToMailService(
 		? `${mbx.displayName} <${mbx.email}>`
 		: mbx.email;
 
-	const sendBody: Record<string, any> = {
+	const sendBody: Record<string, unknown> = {
 		from: fromAddress,
 		to: params.to,
 		subject: params.subject,
@@ -79,7 +79,7 @@ export async function proxySendToMailService(
 		const errorBody = await response.text();
 		log.error(`[INBOX] Mail service error: ${response.status} ${errorBody}`);
 		throw createError({
-			status: response.status as any,
+			status: response.status as 500,
 			message: "Failed to send email",
 			why: `Mail service returned ${response.status}`,
 			fix: "Check mail service logs for details",
