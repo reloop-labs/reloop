@@ -87,10 +87,7 @@ export async function getMailboxesController(organizationId: string) {
 	}));
 }
 
-export async function getMailboxController(
-	id: string,
-	organizationId: string,
-) {
+export async function getMailboxController(id: string, organizationId: string) {
 	const mbx = await db.query.mailbox.findFirst({
 		where: and(eq(mailbox.id, id), eq(mailbox.organizationId, organizationId)),
 	});
@@ -143,8 +140,10 @@ export async function updateMailboxController(
 	}
 
 	const updateData: Record<string, any> = {};
-	if (updates.displayName !== undefined) updateData.displayName = updates.displayName;
-	if (updates.description !== undefined) updateData.description = updates.description;
+	if (updates.displayName !== undefined)
+		updateData.displayName = updates.displayName;
+	if (updates.description !== undefined)
+		updateData.description = updates.description;
 	if (updates.status !== undefined) updateData.status = updates.status;
 	if (updates.quota !== undefined) updateData.quota = updates.quota;
 
@@ -188,4 +187,3 @@ export async function deleteMailboxController(
 	log.info(`[MAILBOX] Deleted mailbox ${mbx.email} (Org: ${organizationId})`);
 	return { success: true };
 }
-

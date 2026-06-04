@@ -1,4 +1,5 @@
 import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
+import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { evlog } from "evlog/elysia";
 import {
@@ -12,7 +13,7 @@ import {
 	updateThreadController,
 } from "./threads.controllers";
 
-export const threadsRoute = new Elysia({ prefix: "/v1/threads" })
+export const threadsRoute = new Elysia({ prefix: "/v1/threads", name: "ThreadsRoute" })
 	.use(evlog())
 	.use(authMiddleware)
 	.get(
@@ -28,10 +29,21 @@ export const threadsRoute = new Elysia({ prefix: "/v1/threads" })
 		{
 			auth: true,
 			query: t.Object({
-				mailboxId: t.Optional(t.String()),
-				limit: t.Optional(t.String()),
-				offset: t.Optional(t.String()),
+				mailboxId: t.Optional(t.String({ description: "Filter threads by mailbox ID" })),
+				limit: t.Optional(t.String({ description: "Number of threads to retrieve (default: 50)" })),
+				offset: t.Optional(t.String({ description: "Pagination offset" })),
 			}),
+			response: {
+				200: MailModel.threadListResponse,
+				401: MailModel.ErrorResponseSchema,
+				403: MailModel.ErrorResponseSchema,
+				500: MailModel.ErrorResponseSchema,
+			},
+			detail: {
+				tags: ["Threads"],
+				summary: "List Threads",
+				description: "Retrieve email conversation threads for the organization",
+			},
 		},
 	)
 	.get(
@@ -42,8 +54,20 @@ export const threadsRoute = new Elysia({ prefix: "/v1/threads" })
 		{
 			auth: true,
 			params: t.Object({
-				id: t.String(),
+				id: t.String({ description: "Thread ID" }),
 			}),
+			response: {
+				200: MailModel.threadDetailResponse,
+				401: MailModel.ErrorResponseSchema,
+				403: MailModel.ErrorResponseSchema,
+				404: MailModel.ErrorResponseSchema,
+				500: MailModel.ErrorResponseSchema,
+			},
+			detail: {
+				tags: ["Threads"],
+				summary: "Get Thread",
+				description: "Retrieve a single thread with all its conversation messages",
+			},
 		},
 	)
 	.get(
@@ -58,9 +82,21 @@ export const threadsRoute = new Elysia({ prefix: "/v1/threads" })
 		{
 			auth: true,
 			params: t.Object({
-				id: t.String(),
-				attachmentId: t.String(),
+				id: t.String({ description: "Thread ID" }),
+				attachmentId: t.String({ description: "Attachment ID" }),
 			}),
+			response: {
+				200: MailModel.messageAttachmentResponse,
+				401: MailModel.ErrorResponseSchema,
+				403: MailModel.ErrorResponseSchema,
+				404: MailModel.ErrorResponseSchema,
+				500: MailModel.ErrorResponseSchema,
+			},
+			detail: {
+				tags: ["Threads"],
+				summary: "Get Thread Attachment",
+				description: "Retrieve attachment details from a thread conversation",
+			},
 		},
 	)
 	.patch(
@@ -71,19 +107,32 @@ export const threadsRoute = new Elysia({ prefix: "/v1/threads" })
 		{
 			auth: true,
 			params: t.Object({
-				id: t.String(),
+				id: t.String({ description: "Thread ID" }),
 			}),
 			body: t.Object({
-				isRead: t.Optional(t.Boolean()),
-				isStarred: t.Optional(t.Boolean()),
+				isRead: t.Optional(t.Boolean({ description: "Read status of the thread" })),
+				isStarred: t.Optional(t.Boolean({ description: "Starred status of the thread" })),
 				status: t.Optional(
 					t.Union([
 						t.Literal("active"),
 						t.Literal("archived"),
 						t.Literal("closed"),
-					]),
+					], { description: "State status of the thread" }),
 				),
 			}),
+			response: {
+				200: MailModel.successResponse,
+				400: MailModel.ErrorResponseSchema,
+				401: MailModel.ErrorResponseSchema,
+				403: MailModel.ErrorResponseSchema,
+				404: MailModel.ErrorResponseSchema,
+				500: MailModel.ErrorResponseSchema,
+			},
+			detail: {
+				tags: ["Threads"],
+				summary: "Update Thread",
+				description: "Update status, read, or starred properties of a thread",
+			},
 		},
 	)
 	.patch(
@@ -94,11 +143,24 @@ export const threadsRoute = new Elysia({ prefix: "/v1/threads" })
 		{
 			auth: true,
 			params: t.Object({
-				id: t.String(),
+				id: t.String({ description: "Thread ID" }),
 			}),
 			body: t.Object({
-				isRead: t.Boolean(),
+				isRead: t.Boolean({ description: "Whether to mark the thread as read" }),
 			}),
+			response: {
+				200: MailModel.successResponse,
+				400: MailModel.ErrorResponseSchema,
+				401: MailModel.ErrorResponseSchema,
+				403: MailModel.ErrorResponseSchema,
+				404: MailModel.ErrorResponseSchema,
+				500: MailModel.ErrorResponseSchema,
+			},
+			detail: {
+				tags: ["Threads"],
+				summary: "Mark Thread Read",
+				description: "Direct endpoint to mark a conversation thread as read or unread",
+			},
 		},
 	)
 	.patch(
@@ -109,11 +171,24 @@ export const threadsRoute = new Elysia({ prefix: "/v1/threads" })
 		{
 			auth: true,
 			params: t.Object({
-				id: t.String(),
+				id: t.String({ description: "Thread ID" }),
 			}),
 			body: t.Object({
-				isStarred: t.Boolean(),
+				isStarred: t.Boolean({ description: "Whether to star the thread" }),
 			}),
+			response: {
+				200: MailModel.successResponse,
+				400: MailModel.ErrorResponseSchema,
+				401: MailModel.ErrorResponseSchema,
+				403: MailModel.ErrorResponseSchema,
+				404: MailModel.ErrorResponseSchema,
+				500: MailModel.ErrorResponseSchema,
+			},
+			detail: {
+				tags: ["Threads"],
+				summary: "Toggle Thread Star",
+				description: "Direct endpoint to star or unstar a conversation thread",
+			},
 		},
 	)
 	.patch(
@@ -124,8 +199,20 @@ export const threadsRoute = new Elysia({ prefix: "/v1/threads" })
 		{
 			auth: true,
 			params: t.Object({
-				id: t.String(),
+				id: t.String({ description: "Thread ID" }),
 			}),
+			response: {
+				200: MailModel.successResponse,
+				401: MailModel.ErrorResponseSchema,
+				403: MailModel.ErrorResponseSchema,
+				404: MailModel.ErrorResponseSchema,
+				500: MailModel.ErrorResponseSchema,
+			},
+			detail: {
+				tags: ["Threads"],
+				summary: "Archive Thread",
+				description: "Direct endpoint to archive a conversation thread",
+			},
 		},
 	)
 	.delete(
@@ -136,7 +223,19 @@ export const threadsRoute = new Elysia({ prefix: "/v1/threads" })
 		{
 			auth: true,
 			params: t.Object({
-				id: t.String(),
+				id: t.String({ description: "Thread ID" }),
 			}),
+			response: {
+				200: MailModel.successResponse,
+				401: MailModel.ErrorResponseSchema,
+				403: MailModel.ErrorResponseSchema,
+				404: MailModel.ErrorResponseSchema,
+				500: MailModel.ErrorResponseSchema,
+			},
+			detail: {
+				tags: ["Threads"],
+				summary: "Delete Thread",
+				description: "Permanently delete a thread and all associated messages",
+			},
 		},
 	);

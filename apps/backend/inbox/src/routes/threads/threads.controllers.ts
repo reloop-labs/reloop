@@ -324,4 +324,3 @@ export async function getThreadAttachmentController(
 		createdAt: attachment.createdAt,
 	};
 }
-

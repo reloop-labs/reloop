@@ -254,4 +254,191 @@ export namespace MailModel {
 		),
 	});
 	export type TooManyRequests = typeof tooManyRequests.static;
+
+	// --- Standard response types ---
+	export const successResponse = t.Object({
+		success: t.Boolean(),
+		id: t.Optional(t.String()),
+		message: t.Optional(t.String()),
+		isRead: t.Optional(t.Boolean()),
+		isStarred: t.Optional(t.Boolean()),
+		status: t.Optional(t.String()),
+	});
+
+	export const ErrorResponseSchema = t.Object({
+		message: t.String(),
+		why: t.Optional(t.String()),
+		fix: t.Optional(t.String()),
+		link: t.Optional(t.String()),
+	});
+
+	export const createMailboxResponse = t.Object({
+		id: t.String(),
+		email: t.String(),
+		status: t.String(),
+	});
+
+	export const mailboxListItem = t.Object({
+		id: t.String(),
+		email: t.String(),
+		quota: t.String(),
+		status: t.String(),
+		displayName: t.Union([t.String(), t.Null()]),
+		description: t.Union([t.String(), t.Null()]),
+		createdAt: t.Union([t.Date(), t.String()]),
+	});
+
+	export const mailboxListResponse = t.Array(mailboxListItem);
+
+	export const mailboxDetailResponse = t.Object({
+		id: t.String(),
+		email: t.String(),
+		quota: t.String(),
+		status: t.String(),
+		displayName: t.Union([t.String(), t.Null()]),
+		description: t.Union([t.String(), t.Null()]),
+		domainId: t.String(),
+		createdAt: t.Union([t.Date(), t.String()]),
+		updatedAt: t.Union([t.Date(), t.String()]),
+	});
+
+	export const messageAttachmentResponse = t.Object({
+		id: t.String(),
+		filename: t.String(),
+		contentType: t.String(),
+		size: t.Number(),
+		storagePath: t.String(),
+		contentDisposition: t.Union([t.String(), t.Null()]),
+		contentId: t.Union([t.String(), t.Null()]),
+		createdAt: t.Union([t.Date(), t.String()]),
+	});
+
+	export const attachmentItem = t.Object({
+		id: t.String(),
+		inboundEmailId: t.String(),
+		filename: t.String(),
+		contentType: t.String(),
+		size: t.Number(),
+		storagePath: t.String(),
+		contentDisposition: t.Union([t.String(), t.Null()]),
+		contentId: t.Union([t.String(), t.Null()]),
+		createdAt: t.Union([t.Date(), t.String()]),
+	});
+
+	export const messageItem = t.Object({
+		id: t.String(),
+		mailboxId: t.String(),
+		organizationId: t.String(),
+		fromEmail: t.String(),
+		fromName: t.Union([t.String(), t.Null()]),
+		toEmails: t.Array(t.String()),
+		ccEmails: t.Union([t.Array(t.String()), t.Null(), t.Undefined()]),
+		bccEmails: t.Union([t.Array(t.String()), t.Null(), t.Undefined()]),
+		replyTo: t.Union([t.String(), t.Null()]),
+		subject: t.Union([t.String(), t.Null()]),
+		textBody: t.Union([t.String(), t.Null()]),
+		htmlBody: t.Union([t.String(), t.Null()]),
+		snippet: t.Union([t.String(), t.Null()]),
+		size: t.Number(),
+		status: t.String(),
+		isRead: t.Boolean(),
+		isStarred: t.Boolean(),
+		isSpam: t.Boolean(),
+		spamScore: t.Union([t.Number(), t.Null()]),
+		messageId: t.Union([t.String(), t.Null()]),
+		threadId: t.Union([t.String(), t.Null()]),
+		inReplyTo: t.Union([t.String(), t.Null()]),
+		references: t.Union([t.Array(t.String()), t.Null(), t.Undefined()]),
+		headers: t.Union([t.Record(t.String(), t.String()), t.Null(), t.Undefined()]),
+		date: t.Union([t.Date(), t.String(), t.Null()]),
+		createdAt: t.Union([t.Date(), t.String()]),
+		attachments: t.Optional(t.Array(attachmentItem)),
+	});
+
+	export const messageListResponse = t.Array(messageItem);
+
+	export const messageRawResponse = t.Object({
+		id: t.String(),
+		messageId: t.Union([t.String(), t.Null()]),
+		raw: t.String(),
+	});
+
+	export const threadItem = t.Object({
+		id: t.String(),
+		mailboxId: t.Union([t.String(), t.Null()]),
+		organizationId: t.String(),
+		subject: t.Union([t.String(), t.Null()]),
+		lastMessagePreview: t.Union([t.String(), t.Null()]),
+		lastMessageAt: t.Union([t.Date(), t.String()]),
+		status: t.String(),
+		messageCount: t.Number(),
+		participants: t.Array(t.String()),
+		isRead: t.Boolean(),
+		isStarred: t.Boolean(),
+		createdAt: t.Union([t.Date(), t.String()]),
+		updatedAt: t.Union([t.Date(), t.String()]),
+	});
+
+	export const threadListResponse = t.Array(threadItem);
+
+	export const threadMessageEmailInbound = t.Object({
+		id: t.String(),
+		fromEmail: t.String(),
+		toEmails: t.Array(t.String()),
+		subject: t.Union([t.String(), t.Null()]),
+		textBody: t.Union([t.String(), t.Null()]),
+		htmlBody: t.Union([t.String(), t.Null()]),
+		isRead: t.Boolean(),
+		isStarred: t.Boolean(),
+		attachments: t.Array(attachmentItem),
+		createdAt: t.Union([t.Date(), t.String()]),
+	});
+
+	export const threadMessageEmailOutbound = t.Object({
+		id: t.String(),
+		fromEmail: t.String(),
+		fromName: t.Union([t.String(), t.Null()]),
+		toEmails: t.Array(t.String()),
+		ccEmails: t.Union([t.Array(t.String()), t.Null(), t.Undefined()]),
+		subject: t.Union([t.String(), t.Null()]),
+		textBody: t.Union([t.String(), t.Null()]),
+		htmlBody: t.Union([t.String(), t.Null()]),
+		status: t.String(),
+		sentAt: t.Union([t.Date(), t.String(), t.Null()]),
+		createdAt: t.Union([t.Date(), t.String()]),
+	});
+
+	export const threadMessageItem = t.Object({
+		id: t.String(),
+		threadId: t.String(),
+		direction: t.String(),
+		inboundEmailId: t.Union([t.String(), t.Null()]),
+		emailLogId: t.Union([t.String(), t.Null()]),
+		fromEmail: t.String(),
+		fromName: t.Union([t.String(), t.Null()]),
+		subject: t.Union([t.String(), t.Null()]),
+		preview: t.Union([t.String(), t.Null()]),
+		messageAt: t.Union([t.Date(), t.String()]),
+		rfc822MessageId: t.Union([t.String(), t.Null()]),
+		inReplyTo: t.Union([t.String(), t.Null()]),
+		createdAt: t.Union([t.Date(), t.String()]),
+		email: t.Union([threadMessageEmailInbound, threadMessageEmailOutbound, t.Null()]),
+	});
+
+	export const threadDetailResponse = t.Object({
+		id: t.String(),
+		mailboxId: t.Union([t.String(), t.Null()]),
+		organizationId: t.String(),
+		subject: t.Union([t.String(), t.Null()]),
+		lastMessagePreview: t.Union([t.String(), t.Null()]),
+		lastMessageAt: t.Union([t.Date(), t.String()]),
+		status: t.String(),
+		messageCount: t.Number(),
+		participants: t.Array(t.String()),
+		isRead: t.Boolean(),
+		isStarred: t.Boolean(),
+		createdAt: t.Union([t.Date(), t.String()]),
+		updatedAt: t.Union([t.Date(), t.String()]),
+		messages: t.Array(threadMessageItem),
+	});
 }
