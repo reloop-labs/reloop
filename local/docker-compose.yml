@@ -138,4 +138,18 @@ services:
     command: "-js" # Enable JetStream for persistence
     restart: unless-stopped
 
+  reloop-rspamd:
+    image: rspamd/rspamd:latest
+    container_name: reloop-rspamd
+    ports:
+      - "11332:11332" # Scan port (normal worker)
+      - "11334:11334" # Web UI / Controller
+    volumes:
+      - ../docker-data/rspamd/lib:/var/lib/rspamd
+      - ./rspamd/local.d:/etc/rspamd/local.d
+    restart: unless-stopped
+    depends_on:
+      reloop-redis:
+        condition: service_started
+
 
