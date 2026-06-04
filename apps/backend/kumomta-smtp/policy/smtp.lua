@@ -248,6 +248,56 @@ kumo.on('get_listener_domain', function(domain, listener, conn_meta)
   }
 end)
 
+-- Enforce recipient validation for unauthenticated inbound emails
+kumo.on('smtp_server_rcpt_to', function(recipient, conn_meta)
+  local api_key = conn_meta:get_meta('api_key') or ""
+  
+  if api_key == "" then
+    local recipient_str = recipient.email or tostring(recipient)
+    print("[RCPT TO] Inbound recipient check: " .. tostring(recipient_str))
+    
+    local client = kumo.http.build_client({
+      danger_accept_invalid_certs = true
+    })
+    
+    local target_url = constants.kumomta_url .. "/v1/check-recipient"
+    local payload = {
+      email = recipient_str
+    }
+    local payload_str = kumo.serde.json_encode(payload)
+    
+    local ok, resp = pcall(function()
+      local req = client:post(target_url)
+      return req
+        :header("Content-Type", "application/json")
+        :body(payload_str)
+        :send()
+    end)
+    
+    if not ok then
+      print("[RCPT TO] Error contacting check-recipient endpoint: " .. tostring(resp))
+      kumo.reject(451, "4.3.0 Temporary failure validating recipient")
+      return
+    end
+    
+    local code = resp:status_code()
+    local body_text = resp:text()
+    
+    if code == 200 then
+      local data = kumo.serde.json_parse(body_text)
+      if data and data.allowed then
+        print("[RCPT TO] Allowed inbound recipient: " .. recipient_str)
+      else
+        print("[RCPT TO] Rejected inbound recipient (not allowed): " .. recipient_str)
+        kumo.reject(550, "5.1.1 User unknown")
+      end
+    else
+      print("[RCPT TO] Rejected inbound recipient (status " .. tostring(code) .. "): " .. recipient_str)
+      kumo.reject(550, "5.1.1 User unknown")
+    end
+  end
+end)
+
 -- Enforce API Key + Domain Verification on Receipt
 kumo.on('smtp_server_message_received', function(msg)
   local api_key = msg:get_meta('api_key') or ""
