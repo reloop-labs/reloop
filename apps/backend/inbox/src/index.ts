@@ -45,7 +45,7 @@ const port = inboxConfig.port;
 const inboxService = new Elysia({
 	prefix: "/api/inbox",
 	name: "Inbox Service",
-})
+}).use(evlog())
 	.use(opentelemetry())
 	.use(
 		openapi({
@@ -66,7 +66,6 @@ const inboxService = new Elysia({
 			},
 		}),
 	)
-	.use(evlog())
 	.use(serverTiming())
 	.onError(({ error, set }) => {
 		const parsed = parseError(error);

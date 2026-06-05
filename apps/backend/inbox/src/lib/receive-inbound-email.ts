@@ -2,8 +2,13 @@ import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import { inboundAttachment, inboundEmail, mailbox } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
-import { createError } from "evlog";
-import { useLogger } from "evlog/elysia";
+import { createError, log as evlog } from "evlog";
+
+const log = {
+	info: (msg: string) => evlog.info("inbox", msg),
+	warn: (msg: string) => evlog.warn("inbox", msg),
+	error: (msg: string) => evlog.error("inbox", msg),
+};
 import { simpleParser } from "mailparser";
 import { correlateInboundThread } from "./thread-correlation";
 
@@ -94,7 +99,7 @@ function extractSpamInfo(headers: Map<string, unknown>): {
 }
 
 export async function receiveInboundEmailController(rawMessage: string) {
-	const log = useLogger();
+
 	log.info(`[INBOX] Received raw email (length: ${rawMessage.length})`);
 
 	try {
