@@ -1,7 +1,13 @@
 import { db } from "@reloop/db/client";
 import { emailThread, threadMessage } from "@reloop/db/schema";
 import { eq, sql } from "drizzle-orm";
-import { useLogger } from "evlog/elysia";
+import { log as evlog } from "evlog";
+
+const log = {
+	info: (msg: string) => evlog.info("thread", msg),
+	warn: (msg: string) => evlog.warn("thread", msg),
+	error: (msg: string) => evlog.error("thread", msg),
+};
 
 /**
  * Finds or creates a thread for an inbound email.
@@ -36,7 +42,7 @@ export async function correlateInboundThread({
 	references: string[];
 	receivedAt: Date;
 }) {
-	const log = useLogger();
+
 	const preview = textBody.substring(0, 200);
 
 	// ─── Try to find an existing thread ──────────────────────────────
@@ -170,7 +176,7 @@ export async function appendOutboundToThread({
 	inReplyTo?: string;
 	sentAt: Date;
 }) {
-	const log = useLogger();
+
 	const preview = textBody.substring(0, 200);
 
 	// Verify thread exists and belongs to the same org
