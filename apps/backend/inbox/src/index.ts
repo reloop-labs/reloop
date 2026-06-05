@@ -35,14 +35,11 @@ initLogger({
 	env: { service: "inbox" },
 	drain: inboxConfig.OTEL_EXPORTER_OTLP_ENDPOINT
 		? createOTLPDrain({
-				endpoint: inboxConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
-				headers: parseOtlpHeaders(inboxConfig.OTEL_EXPORTER_OTLP_HEADERS),
-			})
+			endpoint: inboxConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
+			headers: parseOtlpHeaders(inboxConfig.OTEL_EXPORTER_OTLP_HEADERS),
+		})
 		: undefined,
 });
-
-// Initialize connections (Redis, Postgres, NATS)
-await loader();
 
 const port = inboxConfig.port;
 const inboxService = new Elysia({
@@ -86,6 +83,9 @@ const inboxService = new Elysia({
 	.use(mailboxRoutes)
 	.use(messagesRoutes)
 	.use(threadsRoutes)
+	.onStart(async () => {
+		await loader();
+	})
 	.listen(port, () => {
 		log.info(
 			"Inbox Service",
