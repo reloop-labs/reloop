@@ -50,7 +50,7 @@ function setupDevWatcher() {
 
 	const triggerFile = path.join(process.cwd(), "src/lib/watcher-trigger.ts");
 
-	let timeout: NodeJS.Timeout | null = null;
+	let timeout: ReturnType<typeof setTimeout> | null = null;
 	try {
 		fs.watch(docsDir, { recursive: true }, (eventType, filename) => {
 			if (
