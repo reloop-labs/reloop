@@ -9,7 +9,6 @@ import type { ReactNode } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { AgentMailbox, InboundThread } from "../mock-data";
-import { SECURITY_LEVEL_LABELS } from "../mock-data";
 import { useAgentInbox } from "./agent-inbox-provider";
 
 dayjs.extend(relativeTime);
@@ -101,15 +100,15 @@ export const ThreadDetail = ({
 	return (
 		<div className="flex min-h-[500px] flex-col">
 			<div className="flex-1 overflow-y-auto">
-				{showBack && onBack && (
-					<div className="border-stroke-soft-100 border-b px-4 py-2 lg:hidden dark:border-stroke-soft-100/40">
+				{onBack && (
+					<div className="border-stroke-soft-100 border-b px-4 py-2.5 dark:border-stroke-soft-100/40">
 						<button
 							type="button"
 							onClick={onBack}
-							className="flex items-center gap-1 text-label-sm text-text-sub-600 hover:text-text-strong-950"
+							className="flex items-center gap-1.5 text-label-sm font-semibold text-text-sub-600 hover:text-text-strong-950 transition-colors"
 						>
 							<Icon name="arrow-left" className="h-4 w-4" />
-							Back to list
+							Back to messages
 						</button>
 					</div>
 				)}
@@ -135,9 +134,6 @@ export const ThreadDetail = ({
 						<MetaRow label="Received">
 							{dayjs(thread.receivedAt).format("MMM D, YYYY h:mm A")} (
 							{dayjs(thread.receivedAt).fromNow()})
-						</MetaRow>
-						<MetaRow label="Security">
-							{SECURITY_LEVEL_LABELS[thread.securityLevel]}
 						</MetaRow>
 					</div>
 				</div>

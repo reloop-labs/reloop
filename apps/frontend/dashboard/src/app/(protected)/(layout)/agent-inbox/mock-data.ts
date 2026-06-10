@@ -7,10 +7,7 @@ export type InboundThreadStatus =
 
 export type InboxFilter =
 	| "all"
-	| "needs_approval"
-	| "processing"
-	| "blocked"
-	| "handled";
+	| "spam";
 
 export type TimelineStepState = "done" | "active" | "pending";
 
@@ -38,9 +35,6 @@ export interface AgentMailbox {
 export interface AgentMailboxStats {
 	total: number;
 	unread: number;
-	needsApproval: number;
-	processing: number;
-	lastActivityAt: string | null;
 }
 
 export interface InboundThread {
@@ -348,10 +342,7 @@ export const inboundThreads: InboundThread[] = [
 
 export const INBOX_FILTERS: { id: InboxFilter; label: string }[] = [
 	{ id: "all", label: "All" },
-	{ id: "needs_approval", label: "Needs approval" },
-	{ id: "processing", label: "Processing" },
-	{ id: "blocked", label: "Blocked" },
-	{ id: "handled", label: "Handled" },
+	{ id: "spam", label: "Spam" },
 ];
 
 export function threadMatchesFilter(
@@ -361,14 +352,8 @@ export function threadMatchesFilter(
 	switch (filter) {
 		case "all":
 			return true;
-		case "needs_approval":
-			return thread.status === "needs_approval";
-		case "processing":
-			return thread.status === "parsing" || thread.status === "new";
-		case "blocked":
+		case "spam":
 			return thread.status === "blocked";
-		case "handled":
-			return thread.status === "handled";
 		default:
 			return true;
 	}
@@ -403,21 +388,9 @@ export function getAgentMailbox(id: string): AgentMailbox | undefined {
 
 export function getMailboxStats(mailboxId: string): AgentMailboxStats {
 	const threads = inboundThreads.filter((t) => t.mailboxId === mailboxId);
-	const lastActivityAt =
-		threads.length > 0
-			? threads.reduce(
-					(latest, t) => (t.receivedAt > latest ? t.receivedAt : latest),
-					threads[0]!.receivedAt,
-				)
-			: null;
 
 	return {
 		total: threads.length,
 		unread: threads.filter((t) => t.unread).length,
-		needsApproval: threads.filter((t) => t.status === "needs_approval").length,
-		processing: threads.filter(
-			(t) => t.status === "parsing" || t.status === "new",
-		).length,
-		lastActivityAt,
 	};
 }

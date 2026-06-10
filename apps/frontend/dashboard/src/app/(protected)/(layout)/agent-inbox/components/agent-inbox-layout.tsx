@@ -18,22 +18,7 @@ import { useAgentInbox } from "./agent-inbox-provider";
 import { InboxFilterTabs } from "./inbox-filter-tabs";
 import { SetupWebhookModal } from "./setup-webhook-modal";
 import { ThreadDetail } from "./thread-detail";
-import { ThreadDrawer } from "./thread-drawer";
 import { ThreadList } from "./thread-list";
-
-const useMediaQuery = (query: string) => {
-	const [matches, setMatches] = useState(false);
-
-	useEffect(() => {
-		const media = window.matchMedia(query);
-		setMatches(media.matches);
-		const listener = () => setMatches(media.matches);
-		media.addEventListener("change", listener);
-		return () => media.removeEventListener("change", listener);
-	}, [query]);
-
-	return matches;
-};
 
 export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 	const mailboxId = mailbox.id;
@@ -44,10 +29,8 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 	);
 	const [setupOpen, setSetupOpen] = useState(false);
 	const [addOpen, setAddOpen] = useState(false);
-	const [drawerOpen, setDrawerOpen] = useState(false);
 
 	const { threads, refresh } = useAgentInbox();
-	const isDesktop = useMediaQuery("(min-width: 1024px)");
 
 	const mailboxThreads = useMemo(
 		() => threads.filter((t) => t.mailboxId === mailboxId),
@@ -61,10 +44,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 	const filterCounts = useMemo(() => {
 		const filters: InboxFilter[] = [
 			"all",
-			"needs_approval",
-			"processing",
-			"blocked",
-			"handled",
+			"spam",
 		];
 		return Object.fromEntries(
 			filters.map((f) => [f, countThreadsForFilter(threads, f, mailboxId)]),
@@ -79,28 +59,8 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 		[filteredThreads, mailboxThreads, selectedThreadId],
 	);
 
-	useEffect(() => {
-		if (!isDesktop && selectedThreadId) {
-			setDrawerOpen(true);
-		}
-	}, [isDesktop, selectedThreadId]);
-
-	useEffect(() => {
-		if (!isDesktop || filteredThreads.length === 0) return;
-
-		const selectedVisible = filteredThreads.some(
-			(t) => t.id === selectedThreadId,
-		);
-		if (!selectedThreadId || !selectedVisible) {
-			setSelectedThreadId(filteredThreads[0]?.id ?? "");
-		}
-	}, [filteredThreads, selectedThreadId, setSelectedThreadId, isDesktop]);
-
 	const handleSelectThread = (id: string) => {
-		setSelectedThreadId(id);
-		if (!isDesktop) {
-			setDrawerOpen(true);
-		}
+		setSelectedThreadId(id || null);
 	};
 
 	const handleRefresh = async () => {
@@ -115,13 +75,14 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 	const emptyMessage =
 		mailboxThreads.length === 0
 			? "No inbound messages yet. Set up a webhook to receive email."
-			: activeFilter === "needs_approval"
-				? "No messages waiting for approval"
+			: activeFilter === "spam"
+				? "No spam messages"
 				: "No messages in this filter";
 
 	return (
 		<div className="flex min-h-0 flex-col pb-8">
-			<div className="flex flex-wrap items-center justify-between gap-4 pt-6 pb-2 sm:px-2">
+			{/* Header */}
+			<div className="flex flex-wrap items-center justify-between gap-4 pt-6 pb-4 sm:px-2">
 				<div className="flex min-w-0 items-center gap-3">
 					<Link
 						href="/agent-inbox"
@@ -170,19 +131,19 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 				</div>
 			</div>
 
-			<div className="mt-3 flex min-h-0 flex-1 flex-col gap-4 sm:px-2 lg:flex-row lg:items-stretch">
-				<aside className="hidden w-[176px] shrink-0 border-stroke-soft-100 border-r pr-3 lg:block dark:border-stroke-soft-100/40">
-					<InboxFilterTabs
-						orientation="vertical"
-						activeFilter={activeFilter}
-						onFilterChange={setActiveFilter}
-						counts={filterCounts}
-						className="sticky top-4"
-					/>
-				</aside>
-
-				<div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
-					<div className="lg:hidden">
+			{/* Content Panel */}
+			<div className="mt-3 flex min-h-0 flex-1 flex-col gap-4 sm:px-2">
+				{selectedThread ? (
+					<div className="min-w-0 flex-1 rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+						<ThreadDetail
+							thread={selectedThread}
+							mailbox={mailbox}
+							showBack
+							onBack={() => handleSelectThread("")}
+						/>
+					</div>
+				) : (
+					<div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
 						<InboxFilterTabs
 							orientation="horizontal"
 							activeFilter={activeFilter}
@@ -190,43 +151,18 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 							counts={filterCounts}
 							className="py-0"
 						/>
-					</div>
 
-					<div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:items-start">
-						<div
-							className={cn(
-								"w-full text-paragraph-sm lg:w-[360px] lg:shrink-0 lg:self-start",
-								isDesktop && "lg:sticky lg:top-4",
-							)}
-						>
-							<ThreadList
-								threads={filteredThreads}
-								selectedId={selectedThreadId || null}
-								onSelect={handleSelectThread}
-								emptyMessage={emptyMessage}
-								hasFilters={activeFilter !== "all"}
-								onClearFilters={() => setActiveFilter("all")}
-							/>
-						</div>
-
-						{isDesktop && (
-							<div className="min-w-0 flex-1 rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
-								<ThreadDetail thread={selectedThread} mailbox={mailbox} />
-							</div>
-						)}
+						<ThreadList
+							threads={filteredThreads}
+							selectedId={null}
+							onSelect={handleSelectThread}
+							emptyMessage={emptyMessage}
+							hasFilters={activeFilter !== "all"}
+							onClearFilters={() => setActiveFilter("all")}
+						/>
 					</div>
-				</div>
+				)}
 			</div>
-
-			<ThreadDrawer
-				thread={selectedThread}
-				mailbox={mailbox}
-				isOpen={!isDesktop && drawerOpen}
-				onOpenChange={(open) => {
-					setDrawerOpen(open);
-					if (!open) setSelectedThreadId("");
-				}}
-			/>
 
 			<SetupWebhookModal open={setupOpen} onOpenChange={setSetupOpen} />
 			<AddAgentAddressModal open={addOpen} onOpenChange={setAddOpen} />

@@ -18,7 +18,6 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import * as v from "valibot";
 import type { AgentMailbox } from "../mock-data";
-import { SECURITY_LEVEL_LABELS } from "../mock-data";
 import { useAgentInbox } from "./agent-inbox-provider";
 
 const agentAddressSchema = v.object({
@@ -33,7 +32,6 @@ const agentAddressSchema = v.object({
 	),
 	domain: v.pipe(v.string(), v.minLength(1, "Select a domain")),
 	description: v.pipe(v.string(), v.minLength(1, "Description is required")),
-	securityLevel: v.picklist(["1", "2", "3", "4", "5"]),
 });
 
 type AgentAddressFormValues = v.InferInput<typeof agentAddressSchema>;
@@ -65,7 +63,6 @@ export const AddAgentAddressModal = ({
 			localPart: "",
 			domain: "",
 			description: "",
-			securityLevel: "5",
 		},
 	});
 
@@ -98,9 +95,7 @@ export const AddAgentAddressModal = ({
 				domain: data.domain,
 				domainId: selectedDomainObj.id,
 				description: data.description,
-				securityLevel: Number(
-					data.securityLevel,
-				) as AgentMailbox["securityLevel"],
+				securityLevel: 5,
 			});
 			toast.success(`Agent address ${mailbox.email} created`);
 			form.reset();
@@ -258,40 +253,6 @@ export const AddAgentAddressModal = ({
 									{form.formState.errors.description.message}
 								</p>
 							)}
-						</div>
-
-						<div className="flex flex-col gap-1.5">
-							<label
-								htmlFor="agent-security"
-								className="font-medium text-label-sm text-text-strong-950"
-							>
-								Security level
-							</label>
-							<Select.Root
-								value={form.watch("securityLevel")}
-								onValueChange={(v) =>
-									form.setValue(
-										"securityLevel",
-										v as AgentAddressFormValues["securityLevel"],
-									)
-								}
-								size="small"
-								disabled={isSubmitting}
-							>
-								<Select.Trigger
-									id="agent-security"
-									className="h-[32px] rounded-[10px]"
-								>
-									<Select.Value />
-								</Select.Trigger>
-								<Select.Content>
-									{([1, 2, 3, 4, 5] as const).map((level) => (
-										<Select.Item key={level} value={String(level)}>
-											{SECURITY_LEVEL_LABELS[level]}
-										</Select.Item>
-									))}
-								</Select.Content>
-							</Select.Root>
 						</div>
 
 						<p className="rounded-lg bg-bg-weak-50 px-3 py-2 font-medium text-[12px] text-text-sub-600 dark:bg-white/5">

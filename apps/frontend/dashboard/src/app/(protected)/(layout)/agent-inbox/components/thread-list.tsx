@@ -31,6 +31,34 @@ function senderInitials(thread: InboundThread): string {
 	return thread.from.email[0]?.toUpperCase() ?? "?";
 }
 
+const StarIcon = ({ className }: { className?: string }) => (
+	<svg
+		className={className}
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="1.5"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+	>
+		<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+	</svg>
+);
+
+const CheckboxIcon = ({ className }: { className?: string }) => (
+	<svg
+		className={className}
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="1.5"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+	>
+		<rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+	</svg>
+);
+
 interface ThreadListProps {
 	threads: InboundThread[];
 	selectedId: string | null;
@@ -49,11 +77,8 @@ export const ThreadList = ({
 	onClearFilters,
 }: ThreadListProps) => {
 	return (
-		<div
-			className="w-full overflow-hidden rounded-[14px] border border-stroke-soft-100 bg-bg-white-0 text-paragraph-sm dark:border-stroke-soft-100/40"
-			style={{ maxHeight: "calc(100vh - 220px)" }}
-		>
-			<div className="divide-y divide-stroke-soft-100 overflow-y-auto dark:divide-stroke-soft-100/50">
+		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-paragraph-sm dark:border-stroke-soft-100/40">
+			<div className="divide-y divide-stroke-soft-100/60 overflow-y-auto dark:divide-stroke-soft-100/30">
 				{threads.length === 0 ? (
 					<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
 						<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
@@ -85,62 +110,93 @@ export const ThreadList = ({
 						const isSelected = selectedId === thread.id;
 						const status = statusBadge[thread.status];
 						return (
-							<button
+							<div
 								key={thread.id}
-								type="button"
 								onClick={() => onSelect(thread.id)}
 								className={cn(
-									"flex w-full gap-3 border-l-2 px-4 py-2.5 text-left transition-colors",
-									isSelected
-										? "border-l-primary-base bg-bg-weak-50 dark:bg-bg-weak-50/30"
-										: "border-l-transparent hover:bg-bg-weak-50/60 dark:hover:bg-white/[0.03]",
+									"flex w-full items-center gap-4 border-b last:border-b-0 border-stroke-soft-100/60 dark:border-stroke-soft-100/30 px-4 py-3.5 hover:bg-bg-weak-50/50 transition-all cursor-pointer text-left",
+									thread.unread
+										? "bg-bg-white-0 dark:bg-bg-white-0/5"
+										: "bg-bg-weak-50/10 dark:bg-bg-weak-50/5",
+									isSelected && "bg-bg-weak-50/80 dark:bg-bg-weak-50/20",
 								)}
 							>
-								<div
-									className={cn(
-										"flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-medium text-label-xs",
-										thread.unread
-											? "bg-primary-base text-static-white"
-											: "bg-bg-weak-50 text-text-sub-600 dark:bg-white/10",
-									)}
-								>
-									{senderInitials(thread)}
-								</div>
-								<div className="min-w-0 flex-1">
-									<div className="flex items-start justify-between gap-2">
-										<span
-											className={cn(
-												"truncate text-label-sm",
-												thread.unread
-													? "font-semibold text-text-strong-950"
-													: "text-text-strong-950",
-											)}
-										>
-											{thread.from.name ?? thread.from.email}
-										</span>
-										<span className="shrink-0 text-label-xs text-text-soft-400 tabular-nums">
-											{dayjs(thread.receivedAt).fromNow()}
-										</span>
+								{/* Left Icons */}
+								<div className="flex items-center gap-3 shrink-0">
+									<div className="hidden lg:flex items-center gap-2">
+										<CheckboxIcon className="h-4 w-4 text-text-soft-400 hover:text-text-sub-600 transition-colors" />
+										<StarIcon className="h-4 w-4 text-text-soft-400 hover:text-yellow-500 transition-colors" />
 									</div>
-									<p
+									<div
 										className={cn(
-											"truncate text-label-sm",
+											"flex h-7 w-7 lg:hidden shrink-0 items-center justify-center rounded-full font-medium text-[10px]",
 											thread.unread
-												? "font-medium text-text-strong-950"
-												: "text-text-sub-600",
+												? "bg-primary-base text-static-white"
+												: "bg-bg-weak-50 text-text-sub-600 dark:bg-white/10",
 										)}
 									>
-										{thread.subject}
-									</p>
-									<p className="mt-0.5 truncate text-label-xs text-text-soft-400">
-										{thread.preview}
-									</p>
-									<div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-										<Badge.Root
-											size="small"
-											variant="lighter"
-											color={status.color}
+										{senderInitials(thread)}
+									</div>
+								</div>
+
+								{/* Sender Name */}
+								<span
+									className={cn(
+										"w-28 md:w-36 lg:w-44 shrink-0 truncate text-label-sm",
+										thread.unread
+											? "font-semibold text-text-strong-950"
+											: "text-text-sub-600",
+									)}
+								>
+									{thread.from.name ?? thread.from.email}
+								</span>
+
+								{/* Subject & Preview & Attachment badges */}
+								<div className="flex-1 min-w-0">
+									<div className="flex items-center gap-2">
+										<span
+											className={cn(
+												"text-label-sm truncate max-w-[200px] sm:max-w-[300px] md:max-w-none",
+												thread.unread
+													? "font-semibold text-text-strong-950"
+													: "text-text-sub-600",
+											)}
 										>
+											{thread.subject}
+										</span>
+										<span className="hidden md:inline text-text-soft-400/80 font-normal">—</span>
+										<span className="hidden md:inline text-text-soft-400 dark:text-text-soft-400/80 text-label-xs truncate font-normal">
+											{thread.preview}
+										</span>
+									</div>
+									{/* Attachment badges */}
+									{thread.attachments && thread.attachments.length > 0 && (
+										<div className="mt-1 flex items-center gap-1.5 shrink-0 flex-wrap">
+											{thread.attachments.slice(0, 2).map((att) => (
+												<div
+													key={att.name}
+													className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-bg-weak-50 ring-1 ring-stroke-soft-100 text-[10px] text-text-sub-600 max-w-[120px] truncate"
+												>
+													<Icon
+														name="file-text"
+														className="h-3 w-3 shrink-0 text-text-soft-400"
+													/>
+													<span className="truncate">{att.name}</span>
+												</div>
+											))}
+											{thread.attachments.length > 2 && (
+												<span className="text-[10px] text-text-soft-400">
+													+{thread.attachments.length - 2}
+												</span>
+											)}
+										</div>
+									)}
+								</div>
+
+								{/* Right Section: Badges & Date */}
+								<div className="flex items-center gap-4 shrink-0">
+									<div className="hidden sm:flex items-center gap-1.5">
+										<Badge.Root size="small" variant="lighter" color={status.color}>
 											{status.label}
 										</Badge.Root>
 										{thread.entityTag && (
@@ -148,15 +204,12 @@ export const ThreadList = ({
 												{thread.entityTag}
 											</Badge.Root>
 										)}
-										{thread.attachments && thread.attachments.length > 0 && (
-											<Icon
-												name="link"
-												className="h-3.5 w-3.5 text-text-soft-400"
-											/>
-										)}
 									</div>
+									<span className="text-label-xs text-text-soft-400 tabular-nums w-16 text-right">
+										{dayjs(thread.receivedAt).format("MMM D")}
+									</span>
 								</div>
-							</button>
+							</div>
 						);
 					})
 				)}

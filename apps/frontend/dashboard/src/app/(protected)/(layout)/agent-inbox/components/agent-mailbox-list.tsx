@@ -1,12 +1,20 @@
 "use client";
 
+import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import {
+	Content as PopoverContent,
+	Root as PopoverRoot,
+	Trigger as PopoverTrigger,
+} from "@reloop/ui/popover";
+import axios from "axios";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 import { AddAgentAddressModal } from "./add-agent-address-modal";
 import { useAgentInbox } from "./agent-inbox-provider";
 import { SetupWebhookModal } from "./setup-webhook-modal";
@@ -15,11 +23,185 @@ dayjs.extend(relativeTime);
 
 const gridClass = "grid grid-cols-[1fr_120px_32px] items-center px-4";
 
+const AgentMailboxActionsDropdown = ({
+	mailbox,
+	onToggleEnabled,
+	onDelete,
+	isToggling,
+	isDeleting,
+	onOpenChange,
+}: {
+	mailbox: any;
+	onToggleEnabled: (mailbox: any) => void;
+	onDelete: (id: string) => void;
+	isToggling: boolean;
+	isDeleting: boolean;
+	onOpenChange?: (open: boolean) => void;
+}) => {
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const [popoverOpen, setPopoverOpen] = useState(false);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+	const handlePopoverOpenChange = (open: boolean) => {
+		setPopoverOpen(open);
+		onOpenChange?.(open);
+	};
+
+	const toggleIcon =
+		mailbox.status === "active" ? ("pause" as const) : ("play" as const);
+	const menuItems = [
+		{
+			id: "toggle",
+			label: mailbox.status === "active" ? "Disable" : "Enable",
+			icon: toggleIcon,
+			isDanger: false,
+		},
+		{
+			id: "delete",
+			label: "Delete Address",
+			icon: "trash" as const,
+			isDanger: true,
+		},
+	];
+
+	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const currentRect = currentTab?.getBoundingClientRect();
+	const hoveredItem = menuItems[hoverIdx ?? -1];
+	const isDanger = hoveredItem?.isDanger ?? false;
+
+	const handleItemClick = (itemId: string) => {
+		if (itemId === "toggle") {
+			onToggleEnabled(mailbox);
+			setPopoverOpen(false);
+		} else if (itemId === "delete") {
+			onDelete(mailbox.id);
+			setPopoverOpen(false);
+		}
+	};
+
+	return (
+		<div
+			className="flex items-center justify-end"
+			onClick={(e) => e.stopPropagation()}
+		>
+			<PopoverRoot open={popoverOpen} onOpenChange={handlePopoverOpenChange}>
+				<PopoverTrigger asChild>
+					<Button.Root variant="neutral" mode="ghost" size="xxsmall">
+						<Icon name="more-horizontal" className="h-3 w-3" />
+					</Button.Root>
+				</PopoverTrigger>
+				<PopoverContent
+					align="end"
+					sideOffset={-10}
+					className="w-40 rounded-xl p-1.5"
+				>
+					<div className="relative">
+						{menuItems.map((item, idx) => (
+							<button
+								key={item.id}
+								ref={(el) => {
+									if (el) buttonRefs.current[idx] = el;
+								}}
+								type="button"
+								onPointerEnter={() => setHoverIdx(idx)}
+								onPointerLeave={() => setHoverIdx(undefined)}
+								onClick={() => handleItemClick(item.id)}
+								disabled={
+									(item.id === "toggle" && isToggling) ||
+									(item.id === "delete" && isDeleting)
+								}
+								className={cn(
+									"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
+									item.isDanger ? "text-error-base" : "text-text-strong-950",
+									!currentRect &&
+										hoverIdx === idx &&
+										(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
+									((isToggling && item.id === "toggle") ||
+										(isDeleting && item.id === "delete")) &&
+										"cursor-not-allowed opacity-50",
+								)}
+							>
+								{item.id === "toggle" && isToggling ? (
+									<Icon
+										name="loader-2"
+										className="h-3.5 w-3.5 animate-spin text-text-sub-600"
+									/>
+								) : item.id === "delete" && isDeleting ? (
+									<Icon
+										name="loader-2"
+										className="h-3.5 w-3.5 animate-spin text-error-base"
+									/>
+								) : (
+									<Icon
+										name={item.icon}
+										className={cn(
+											"h-3.5 w-3.5",
+											item.isDanger ? "" : "text-text-sub-600",
+										)}
+									/>
+								)}
+								<span>{item.label}</span>
+							</button>
+						))}
+						<AnimatedHoverBackground
+							rect={currentRect}
+							tabElement={currentTab}
+							isDanger={isDanger}
+						/>
+					</div>
+				</PopoverContent>
+			</PopoverRoot>
+		</div>
+	);
+};
+
 export const AgentMailboxList = () => {
 	const router = useRouter();
-	const { mailboxes, threads } = useAgentInbox();
+	const { mailboxes, threads, refresh } = useAgentInbox();
 	const [setupOpen, setSetupOpen] = useState(false);
 	const [addOpen, setAddOpen] = useState(false);
+
+	const [togglingId, setTogglingId] = useState<string | null>(null);
+	const [deletingId, setDeletingId] = useState<string | null>(null);
+	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
+
+	const handleToggleEnabled = async (mailbox: any) => {
+		const newStatus = mailbox.status === "active" ? "disabled" : "active";
+		try {
+			setTogglingId(mailbox.id);
+			await axios.patch(`/api/inbox/v1/mailboxes/${mailbox.id}`, {
+				status: newStatus,
+			});
+			toast.success(
+				`Inbox address ${newStatus === "active" ? "enabled" : "disabled"} successfully`,
+			);
+			await refresh();
+		} catch (error) {
+			toast.error("Failed to update inbox status");
+		} finally {
+			setTogglingId(null);
+		}
+	};
+
+	const handleDeleteMailbox = async (id: string) => {
+		if (
+			!confirm(
+				"Are you sure you want to permanently delete this inbox address and all its messages?",
+			)
+		) {
+			return;
+		}
+		try {
+			setDeletingId(id);
+			await axios.delete(`/api/inbox/v1/mailboxes/${id}`);
+			toast.success("Inbox address deleted successfully");
+			await refresh();
+		} catch (error) {
+			toast.error("Failed to delete inbox address");
+		} finally {
+			setDeletingId(null);
+		}
+	};
 
 	return (
 		<div className="mx-auto max-w-3xl sm:px-8">
@@ -109,22 +291,9 @@ export const AgentMailboxList = () => {
 							);
 							const stats = {
 								total: mThreads.length,
-								unread: mThreads.filter((t) => t.unread).length,
-								needsApproval: mThreads.filter(
-									(t) => t.status === "needs_approval",
-								).length,
-								processing: mThreads.filter(
-									(t) => t.status === "parsing" || t.status === "new",
-								).length,
-								lastActivityAt:
-									mThreads.length > 0
-										? mThreads.reduce(
-												(latest, t) =>
-													t.receivedAt > latest ? t.receivedAt : latest,
-												mThreads[0]!.receivedAt,
-											)
-										: null,
+								spam: mThreads.filter((t) => t.status === "blocked").length,
 							};
+							const isRowActive = activeDropdownId === mailbox.id;
 							return (
 								<div
 									key={mailbox.id}
@@ -133,6 +302,7 @@ export const AgentMailboxList = () => {
 										gridClass,
 										"group/row cursor-pointer py-4 text-left transition-all duration-200",
 										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base",
+										isRowActive && "bg-bg-weak-50/50",
 									)}
 								>
 									{/* Agent & Info */}
@@ -143,21 +313,20 @@ export const AgentMailboxList = () => {
 										/>
 										<div className="min-w-0 flex-1">
 											<div className="flex items-center gap-2">
-												<span className="max-w-[160px] truncate font-semibold text-label-sm text-text-strong-950 sm:max-w-none">
-													{mailbox.label}
+												<span className="max-w-[240px] truncate font-semibold text-label-sm text-text-strong-950 sm:max-w-none">
+													{mailbox.email}
 												</span>
-												{stats.unread > 0 && (
-													<span className="shrink-0 rounded-full bg-[#0A438A] px-1.5 py-0.5 font-semibold text-[10px] text-white uppercase dark:bg-[#1E57A8]">
-														{stats.unread} new
+												{stats.spam > 0 && (
+													<span className="shrink-0 rounded-full bg-error-base/10 px-1.5 py-0.5 font-semibold text-[8px] text-error-base uppercase dark:bg-error-base/20">
+														{stats.spam} spam
 													</span>
 												)}
 											</div>
-											<div className="mt-0.5 truncate font-mono text-label-xs text-text-sub-600">
-												{mailbox.email}
-											</div>
-											<div className="mt-1 truncate text-label-xs text-text-soft-400 dark:text-text-soft-400/80">
-												{mailbox.description}
-											</div>
+											{mailbox.description && (
+												<div className="mt-1 truncate text-label-xs text-text-soft-400 dark:text-text-soft-400/80">
+													{mailbox.description}
+												</div>
+											)}
 										</div>
 									</div>
 
@@ -183,11 +352,17 @@ export const AgentMailboxList = () => {
 										</div>
 									</div>
 
-									{/* Chevron */}
-									<div className="flex items-center justify-center text-text-soft-400">
-										<Icon
-											name="chevron-right"
-											className="h-4 w-4 text-text-sub-600 transition-transform group-hover/row:translate-x-0.5"
+									{/* Actions */}
+									<div className="flex items-center justify-end">
+										<AgentMailboxActionsDropdown
+											mailbox={mailbox}
+											onToggleEnabled={handleToggleEnabled}
+											onDelete={handleDeleteMailbox}
+											isToggling={togglingId === mailbox.id}
+											isDeleting={deletingId === mailbox.id}
+											onOpenChange={(open) =>
+												setActiveDropdownId(open ? mailbox.id : null)
+											}
 										/>
 									</div>
 								</div>
