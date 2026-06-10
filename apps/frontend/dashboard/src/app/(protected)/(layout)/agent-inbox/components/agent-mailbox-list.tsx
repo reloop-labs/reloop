@@ -202,10 +202,9 @@ export const AgentMailboxList = () => {
 			setDeletingId(null);
 		}
 	};
-
 	return (
 		<div className="mx-auto max-w-3xl sm:px-8">
-			<div className="flex items-center justify-between pt-10 pb-6">
+			<div className="flex items-center justify-between pt-6 pb-4">
 				<h1 className="font-medium text-2xl">Agent Inbox</h1>
 				<div className="flex items-center gap-2">
 					<Button.Root
@@ -234,7 +233,7 @@ export const AgentMailboxList = () => {
 				<div
 					className={cn(
 						gridClass,
-						"rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40",
+						"rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 pt-2.5 pb-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40",
 					)}
 				>
 					<div className="flex items-center gap-1">
@@ -249,7 +248,7 @@ export const AgentMailboxList = () => {
 				</div>
 
 				{/* Table Body */}
-				<div className="-mt-2.5 mb-16 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+				<div className="mb-16 divide-y divide-stroke-soft-100 overflow-hidden rounded-b-xl border-r border-l border-b border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
 					{mailboxes.length === 0 ? (
 						<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
 							<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
@@ -300,7 +299,7 @@ export const AgentMailboxList = () => {
 									onClick={() => router.push(`/agent-inbox/${mailbox.id}`)}
 									className={cn(
 										gridClass,
-										"group/row cursor-pointer py-4 text-left transition-all duration-200",
+										"group/row cursor-pointer py-2.5 text-left transition-all duration-200",
 										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base",
 										isRowActive && "bg-bg-weak-50/50",
 									)}

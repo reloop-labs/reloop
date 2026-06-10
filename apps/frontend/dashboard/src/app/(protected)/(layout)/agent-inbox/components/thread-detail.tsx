@@ -72,8 +72,8 @@ export const ThreadDetail = ({
 	};
 
 	return (
-		<div className="flex min-h-[500px] flex-col">
-			<div className="flex-1 overflow-y-auto">
+		<div className="flex h-full flex-col min-h-0">
+			<div className="flex-1 overflow-y-auto min-h-0">
 
 
 				{/* Subject Header */}
