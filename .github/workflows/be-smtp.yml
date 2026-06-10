@@ -1,21 +1,21 @@
-name: BE KumoMTA SMTP Docker
+name: BE SMTP Docker
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'apps/backend/kumomta-smtp/**'
-      - '.github/workflows/be-kumomta-smtp.yml'
+      - 'apps/backend/smtp/**'
+      - '.github/workflows/be-smtp.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - 'apps/backend/kumomta-smtp/**'
-      - '.github/workflows/be-kumomta-smtp.yml'
+      - 'apps/backend/smtp/**'
+      - '.github/workflows/be-smtp.yml'
   workflow_dispatch:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-kumomta-smtp
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/be-smtp
 
 jobs:
   build-and-push:
@@ -51,8 +51,8 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          context: ./apps/backend/kumomta-smtp
-          file: ./apps/backend/kumomta-smtp/Dockerfile
+          context: ./apps/backend/smtp
+          file: ./apps/backend/smtp/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -62,4 +62,3 @@ jobs:
 
       - name: Image digest
         run: echo ${{ steps.build.outputs.digest }}
-

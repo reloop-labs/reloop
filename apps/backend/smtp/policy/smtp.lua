@@ -3,15 +3,7 @@ local constants = require 'policy.constants'
 local utils = require 'policy.utils'
 utils.init(kumo)
 
-local nats_client
-local function get_nats_client()
-  if not nats_client then
-    nats_client = kumo.nats.connect {
-      servers = { constants.nats_url },
-    }
-  end
-  return nats_client
-end
+
 
 -- Helper function to apply business logic to both SMTP and HTTP generated messages
 local function apply_reloop_logic(msg, api_key)
@@ -230,134 +222,33 @@ kumo.on('http_server_validate_auth_basic', function(user, password)
   }
 end)
 
--- 🔥 THIS is the REAL relay control (docs way)
+-- Relay control: only authenticated senders can relay
 kumo.on('get_listener_domain', function(domain, listener, conn_meta)
   if conn_meta:get_meta('authz_id') then
-    -- Authenticated sender = outbound relay
     return kumo.make_listener_domain {
       relay_to = true,
     }
   end
-  
-  -- Unauthenticated sender = potential inbound email.
-  -- Accept the message so smtp_server_message_received can route it
-  -- to the inbox service. The inbox service validates the recipient
-  -- mailbox and rejects unknown addresses.
+
+  -- Reject unauthenticated senders — inbound mail is handled by the
+  -- dedicated inbound MTA service, not this outbound relay.
   return kumo.make_listener_domain {
-    relay_to = true,
+    relay_to = false,
   }
 end)
 
--- Enforce recipient validation for unauthenticated inbound emails
-kumo.on('smtp_server_rcpt_to', function(recipient, conn_meta)
-  local api_key = conn_meta:get_meta('api_key') or ""
-  
-  if api_key == "" then
-    local recipient_str = recipient.email or tostring(recipient)
-    print("[RCPT TO] Inbound recipient check: " .. tostring(recipient_str))
-    
-    local client = kumo.http.build_client({
-      danger_accept_invalid_certs = true
-    })
-    
-    local target_url = constants.kumomta_url .. "/v1/check-recipient"
-    local payload = {
-      email = recipient_str
-    }
-    local payload_str = kumo.serde.json_encode(payload)
-    
-    local ok, resp = pcall(function()
-      local req = client:post(target_url)
-      return req
-        :header("Content-Type", "application/json")
-        :body(payload_str)
-        :send()
-    end)
-    
-    if not ok then
-      print("[RCPT TO] Error contacting check-recipient endpoint: " .. tostring(resp))
-      kumo.reject(451, "4.3.0 Temporary failure validating recipient")
-      return
-    end
-    
-    local code = resp:status_code()
-    local body_text = resp:text()
-    
-    if code == 200 then
-      local data = kumo.serde.json_parse(body_text)
-      if data and data.allowed then
-        print("[RCPT TO] Allowed inbound recipient: " .. recipient_str)
-      else
-        print("[RCPT TO] Rejected inbound recipient (not allowed): " .. recipient_str)
-        kumo.reject(550, "5.1.1 User unknown")
-      end
-    else
-      print("[RCPT TO] Rejected inbound recipient (status " .. tostring(code) .. "): " .. recipient_str)
-      kumo.reject(550, "5.1.1 User unknown")
-    end
-  end
-end)
 
--- Enforce API Key + Domain Verification on Receipt
+
+-- Outbound: API Key + Domain Verification on Receipt
 kumo.on('smtp_server_message_received', function(msg)
-  local msg_id = msg:id()
-
-  -- Evaluate with RSpamD
-  local client = kumo.http.build_client({
-    danger_accept_invalid_certs = true
-  })
-  local ok_rspamd, resp_rspamd = pcall(function()
-    local req = client:post(constants.rspamd_url)
-    return req:body(msg:get_data()):send()
-  end)
-
-  if ok_rspamd then
-    local code = resp_rspamd:status_code()
-    if code == 200 then
-      local data = kumo.serde.json_parse(resp_rspamd:text())
-      if data and data['score'] and data['score'] >= 15 then
-        print("[RSPAMD] [" .. msg_id .. "] Rejected spam message (score: " .. tostring(data['score']) .. ")")
-        kumo.reject(550, 'We do not send spam')
-        return
-      else
-        print("[RSPAMD] [" .. msg_id .. "] Passed (score: " .. tostring(data and data['score'] or "unknown") .. ")")
-      end
-    else
-      print("[RSPAMD] [" .. msg_id .. "] Warning: check returned HTTP status " .. tostring(code))
-    end
-  else
-    print("[RSPAMD] [" .. msg_id .. "] Warning: failed to connect: " .. tostring(resp_rspamd))
-  end
-
   local api_key = msg:get_meta('api_key') or ""
-  
+
   if api_key == "" then
-    -- Unauthenticated sender → treat as inbound email
-    local msg_id = msg:id()
-    print("[INBOUND] [" .. msg_id .. "] Processing inbound email")
-
-    local nc = get_nats_client()
-    local ok, err = pcall(function()
-      local payload = {
-        rawMessage = msg:get_data()
-      }
-      nc:publish {
-        subject = 'kumomta.inbound_received',
-        payload = kumo.serde.json_encode(payload),
-      }
-    end)
-
-    if not ok then
-      print("[INBOUND] [" .. msg_id .. "] FAILED to publish to NATS: " .. tostring(err))
-      nats_client = nil
-      kumo.reject(451, "4.3.0 Temporary failure processing inbound email")
-      return
-    else
-      print("[INBOUND] [" .. msg_id .. "] Successfully published inbound email to NATS")
-      return
-    end
+    print("[SMTP] [" .. msg:id() .. "] Rejected: no API key (unauthenticated)")
+    kumo.reject(550, "5.7.1 Authentication required")
+    return
   end
-  
+
   apply_reloop_logic(msg, api_key)
 end)
 

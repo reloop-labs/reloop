@@ -83,33 +83,58 @@ services:
       MP_ENABLE_CHAOS: "true"
     restart: unless-stopped
 
-  kumomta-smtp:
+  smtp:
     build:
-      context: ../apps/backend/kumomta-smtp
+      context: ../apps/backend/smtp
       dockerfile: Dockerfile
-    container_name: kumomta-smtp
+    container_name: reloop-smtp
     ports:
-      - "25:25"      # ESMTP injection (STARTTLS)
       - "587:587"    # Submission (STARTTLS)
       - "2025:2025"  # Alt SMTP submission (STARTTLS)
       - "8020:8000"  # HTTP API
     volumes:
       - ../docker-data/kumomta/data:/var/spool/kumomta/data
       - ../docker-data/kumomta/meta:/var/spool/kumomta/meta
-      - ../apps/backend/kumomta-smtp/init.lua:/opt/kumomta/etc/policy/init.lua
-      - ../apps/backend/kumomta-smtp/policy:/opt/kumomta/etc/policy/policy
+      - ../apps/backend/smtp/init.lua:/opt/kumomta/etc/policy/init.lua
+      - ../apps/backend/smtp/policy:/opt/kumomta/etc/policy/policy
     environment:
       - BASE_URL=${BASE_URL:-https://local.reloop.sh}
       - NATS_URL=${NATS_URL:-reloop-nats:4222}
       - NODE_ENV=development
       - KUMOMTA_TRUSTED_HOSTS=${KUMOMTA_TRUSTED_HOSTS:-127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}
       - TRACKING_SECRET=${TRACKING_SECRET:-reloop_tracking_secret_default_123}
-      - KUMOMTA_INBOX_URL=${KUMOMTA_INBOX_URL:-http://host.docker.internal:8021/api/inbox}
-      - KUMOMTA_RSPAMD_URL=${KUMOMTA_RSPAMD_URL:-http://reloop-rspamd:11333/checkv2}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
       reloop-mailpit:
+        condition: service_started
+    restart: unless-stopped
+
+  inbound:
+    build:
+      context: ../apps/backend/inbound
+      dockerfile: Dockerfile
+    container_name: reloop-inbound
+    ports:
+      - "25:25"      # SMTP inbound (open MX)
+      - "8030:8000"  # HTTP health check
+    volumes:
+      - ../docker-data/kumomta-inbound/data:/var/spool/kumomta/data
+      - ../docker-data/kumomta-inbound/meta:/var/spool/kumomta/meta
+      - ../apps/backend/inbound/init.lua:/opt/kumomta/etc/policy/init.lua
+      - ../apps/backend/inbound/policy:/opt/kumomta/etc/policy/policy
+    environment:
+      - INBOUND_HOSTNAME=${INBOUND_HOSTNAME:-inbound.reloop.sh}
+      - NATS_URL=${NATS_URL:-reloop-nats:4222}
+      - NODE_ENV=development
+      - KUMOMTA_RSPAMD_URL=${KUMOMTA_RSPAMD_URL:-http://reloop-rspamd:11333/checkv2}
+      - KUMOMTA_CHECK_RECIPIENT_URL=${KUMOMTA_CHECK_RECIPIENT_URL:-http://host.docker.internal:8011/api/domain}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      reloop-nats:
+        condition: service_started
+      reloop-rspamd:
         condition: service_started
     restart: unless-stopped
 

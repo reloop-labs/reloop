@@ -18,13 +18,6 @@ kumo.on('init', function()
     path = '/var/spool/kumomta/meta',
   }
 
-  -- Port 25: Standard SMTP with STARTTLS
-  kumo.start_esmtp_listener {
-    listen = '0.0.0.0:25',
-    hostname = constants.hostname,
-    relay_hosts = constants.trusted_hosts,
-  }
-
   -- Port 587: Submission with STARTTLS (explicit TLS)
   kumo.start_esmtp_listener {
     listen = '0.0.0.0:587',

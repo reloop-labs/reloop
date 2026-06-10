@@ -6,4 +6,4 @@ COPY policy /opt/kumomta/etc/policy/policy
 RUN mkdir -p /var/spool/kumomta/data /var/spool/kumomta/meta \
     && chown kumod:kumod /var/spool/kumomta/data /var/spool/kumomta/meta
 
-EXPOSE 25 587 2025 8000
+EXPOSE 25 8000
