@@ -68,7 +68,7 @@ kumo.on('smtp_server_message_received', function(msg)
   local msg_id = msg:id()
   print("[INBOUND] [" .. msg_id .. "] Processing inbound email")
 
-  -- 1. RSpamD spam check
+  -- 1. RSpamD spam check + header injection
   local client = kumo.http.build_client({
     danger_accept_invalid_certs = true
   })
@@ -77,16 +77,45 @@ kumo.on('smtp_server_message_received', function(msg)
     return req:body(msg:get_data()):send()
   end)
 
+  local rspamd_score = nil
+  local rspamd_action = nil
+  local rspamd_symbols = {}
+
   if ok_rspamd then
     local code = resp_rspamd:status_code()
     if code == 200 then
       local data = kumo.serde.json_parse(resp_rspamd:text())
-      if data and data['score'] and data['score'] >= 15 then
-        print("[INBOUND RSPAMD] [" .. msg_id .. "] Rejected spam (score: " .. tostring(data['score']) .. ")")
-        kumo.reject(550, 'Message rejected as spam')
-        return
-      else
-        print("[INBOUND RSPAMD] [" .. msg_id .. "] Passed (score: " .. tostring(data and data['score'] or "unknown") .. ")")
+      if data then
+        rspamd_score = data['score']
+        rspamd_action = data['action']
+
+        -- Collect top symbol names for X-Spam-Status
+        if data['symbols'] then
+          for name, _ in pairs(data['symbols']) do
+            table.insert(rspamd_symbols, name)
+          end
+        end
+
+        -- Hard reject high-confidence spam at SMTP level
+        if rspamd_score and rspamd_score >= 15 then
+          print("[INBOUND RSPAMD] [" .. msg_id .. "] Rejected spam (score: " .. tostring(rspamd_score) .. ")")
+          kumo.reject(550, 'Message rejected as spam')
+          return
+        end
+
+        -- Inject X-Spam-* headers into the message for downstream processing
+        local is_spam = rspamd_action == "reject" or rspamd_action == "add header" or (rspamd_score and rspamd_score >= 5)
+        local flag_value = is_spam and "YES" or "NO"
+        local status_prefix = is_spam and "Yes" or "No"
+        local symbols_str = table.concat(rspamd_symbols, ",")
+        local status_value = status_prefix .. ", score=" .. tostring(rspamd_score or 0) .. " required=5 tests=" .. symbols_str
+        
+        msg:append_header('X-Spam-Score', tostring(rspamd_score or 0))
+        msg:append_header('X-Spam-Flag', flag_value)
+        msg:append_header('X-Spam-Status', status_value)
+        msg:append_header('X-Spam-Action', rspamd_action or "no action")
+
+        print("[INBOUND RSPAMD] [" .. msg_id .. "] Passed (score: " .. tostring(rspamd_score) .. ", action: " .. tostring(rspamd_action) .. ", flag: " .. flag_value .. ")")
       end
     else
       print("[INBOUND RSPAMD] [" .. msg_id .. "] Warning: check returned HTTP " .. tostring(code))
