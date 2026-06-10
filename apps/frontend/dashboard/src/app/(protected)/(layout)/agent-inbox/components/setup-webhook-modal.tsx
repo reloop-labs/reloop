@@ -53,57 +53,71 @@ export const SetupWebhookModal = ({
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
 			<Modal.Content className="max-w-lg">
-				<Modal.Header>
-					<Modal.Title>Set up agent inbox</Modal.Title>
-					<Modal.Description>
-						Connect inbound email to your AI agents via webhooks. This guide
-						matches the Agent Email Inbox skill flow.
-					</Modal.Description>
-				</Modal.Header>
-				<Modal.Body>
-					<ol className="flex flex-col gap-4">
+				<Modal.Header
+					iconName="webhook"
+					title="Set up agent inbox"
+					description="Connect inbound email to your AI agents via webhooks. This guide matches the Agent Email Inbox skill flow."
+				/>
+				<Modal.Body className="py-6 px-6">
+					<ol className="relative flex flex-col gap-6 pl-1">
 						{STEPS.map((step, index) => (
-							<li key={step.title} className="flex gap-3">
-								<span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-bg-weak-50 font-medium text-paragraph-sm dark:bg-white/10">
+							<li key={step.title} className="relative flex gap-4">
+								{/* Connector Line */}
+								{index < STEPS.length - 1 && (
+									<span
+										className="absolute left-[15px] top-[32px] bottom-[-24px] w-[1.5px] bg-stroke-soft-100 dark:bg-white/10"
+										aria-hidden="true"
+									/>
+								)}
+								{/* Step Number Circle */}
+								<span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-weak-50/50 font-semibold text-label-xs text-text-sub-600 shadow-sm transition-all dark:border-white/10 dark:bg-white/5 dark:text-text-sub-400">
 									{index + 1}
 								</span>
-								<div className="min-w-0 flex-1">
-									<p className="font-medium text-paragraph-sm text-text-strong-950 dark:text-white">
+								{/* Content */}
+								<div className="min-w-0 flex-1 pt-0.5">
+									<p className="font-semibold text-label-sm text-text-strong-950 dark:text-white">
 										{step.title}
 									</p>
-									<p className="mt-0.5 text-paragraph-sm text-text-sub-600">
+									<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-text-sub-600/95 leading-relaxed">
 										{step.description}
 									</p>
-									{"inAppOnly" in step &&
-									step.inAppOnly ? null : step.internal ? (
-										<Link
-											href={step.href}
-											onClick={() => onOpenChange(false)}
-											className="mt-2 inline-flex items-center gap-1 text-paragraph-sm text-primary-base hover:underline"
+									{"inAppOnly" in step && step.inAppOnly ? null : step.internal ? (
+										<Button.Root
+											asChild
+											variant="neutral"
+											mode="stroke"
+											size="xxsmall"
+											className="mt-2.5 inline-flex border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 										>
-											Open in dashboard
-											<Icon name="arrow-right" className="h-3.5 w-3.5" />
-										</Link>
+											<Link href={step.href} onClick={() => onOpenChange(false)}>
+												<span>Open in dashboard</span>
+												<Icon name="arrow-right" className="h-3 w-3" />
+											</Link>
+										</Button.Root>
 									) : (
-										<a
-											href={step.href}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="mt-2 inline-flex items-center gap-1 text-paragraph-sm text-primary-base hover:underline"
+										<Button.Root
+											asChild
+											variant="neutral"
+											mode="stroke"
+											size="xxsmall"
+											className="mt-2.5 inline-flex border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 										>
-											View documentation
-											<Icon name="arrow-right" className="h-3.5 w-3.5" />
-										</a>
+											<a href={step.href} target="_blank" rel="noopener noreferrer">
+												<span>View documentation</span>
+												<Icon name="arrow-right" className="h-3 w-3" />
+											</a>
+										</Button.Root>
 									)}
 								</div>
 							</li>
 						))}
 					</ol>
 				</Modal.Body>
-				<Modal.Footer>
+				<Modal.Footer className="justify-end py-3 px-5">
 					<Button.Root
 						variant="neutral"
 						mode="stroke"
+						size="xsmall"
 						onClick={() => onOpenChange(false)}
 					>
 						Close

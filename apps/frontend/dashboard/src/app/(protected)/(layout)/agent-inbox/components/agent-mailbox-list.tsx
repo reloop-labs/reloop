@@ -1,24 +1,19 @@
 "use client";
 
-import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as StatusBadge from "@reloop/ui/status-badge";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useRouter } from "next/navigation";
-import * as React from "react";
 import { useState } from "react";
-import { SECURITY_LEVEL_LABELS } from "../mock-data";
 import { AddAgentAddressModal } from "./add-agent-address-modal";
 import { useAgentInbox } from "./agent-inbox-provider";
 import { SetupWebhookModal } from "./setup-webhook-modal";
 
 dayjs.extend(relativeTime);
 
-const gridClass =
-	"grid grid-cols-[1.4fr_1.6fr_90px_110px_110px_90px_32px] items-center px-4";
+const gridClass = "grid grid-cols-[1fr_120px_32px] items-center px-4";
 
 export const AgentMailboxList = () => {
 	const router = useRouter();
@@ -61,24 +56,8 @@ export const AgentMailboxList = () => {
 					)}
 				>
 					<div className="flex items-center gap-1">
-						<Icon name="mail-single" className="h-3 w-3" />
-						<span className="text-xs">Agent address</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<Icon name="file-text" className="h-3 w-3" />
-						<span className="text-xs">Purpose</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<Icon name="message-square" className="h-3 w-3" />
-						<span className="text-xs">Messages</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<Icon name="alert-circle" className="h-3 w-3" />
-						<span className="text-xs">Needs approval</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<Icon name="clock" className="h-3 w-3" />
-						<span className="text-xs">Last activity</span>
+						<Icon name="inbox" className="h-3 w-3" />
+						<span className="text-xs">Agent Inbox</span>
 					</div>
 					<div className="flex items-center gap-1">
 						<Icon name="activity" className="h-3 w-3" />
@@ -152,99 +131,56 @@ export const AgentMailboxList = () => {
 									onClick={() => router.push(`/agent-inbox/${mailbox.id}`)}
 									className={cn(
 										gridClass,
-										"group/row cursor-pointer py-3.5 text-left transition-colors",
+										"group/row cursor-pointer py-4 text-left transition-all duration-200",
 										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base",
 									)}
 								>
-									{/* Agent address */}
-									<div className="flex min-w-0 items-center gap-2.5 pr-4">
-										<div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 shadow-xs dark:border-stroke-soft-100/50">
-											<Icon
-												name="mail-single"
-												className="h-4 w-4 text-text-sub-600"
-											/>
-										</div>
-										<div className="min-w-0">
+									{/* Agent & Info */}
+									<div className="flex min-w-0 items-start gap-3.5 pr-4">
+										<Icon
+											name="inbox"
+											className="h-5 w-5 text-text-sub-600 transition-transform group-hover/row:scale-105"
+										/>
+										<div className="min-w-0 flex-1">
 											<div className="flex items-center gap-2">
-												<span className="truncate font-medium text-label-sm text-text-strong-950">
+												<span className="max-w-[160px] truncate font-semibold text-label-sm text-text-strong-950 sm:max-w-none">
 													{mailbox.label}
 												</span>
 												{stats.unread > 0 && (
-													<Badge.Root
-														size="small"
-														variant="filled"
-														color="blue"
-													>
+													<span className="shrink-0 rounded-full bg-[#0A438A] px-1.5 py-0.5 font-medium text-[10px] text-white uppercase dark:bg-[#1E57A8]">
 														{stats.unread} new
-													</Badge.Root>
+													</span>
 												)}
 											</div>
-											<div className="truncate text-label-xs text-text-sub-600">
+											<div className="mt-0.5 truncate font-mono text-label-xs text-text-sub-600">
 												{mailbox.email}
 											</div>
+											<div className="mt-1 truncate text-label-xs text-text-soft-400 dark:text-text-soft-400/80">
+												{mailbox.description}
+											</div>
 										</div>
-									</div>
-
-									{/* Purpose */}
-									<div className="min-w-0 pr-4">
-										<p className="truncate text-label-sm text-text-strong-950">
-											{mailbox.description}
-										</p>
-										<p className="truncate text-label-xs text-text-soft-400">
-											{SECURITY_LEVEL_LABELS[mailbox.securityLevel]}
-										</p>
-									</div>
-
-									{/* Messages */}
-									<div>
-										<span className="font-medium text-[13px] text-text-strong-950 tabular-nums">
-											{stats.total}
-										</span>
-										{stats.processing > 0 && (
-											<p className="text-label-xs text-text-soft-400">
-												{stats.processing} processing
-											</p>
-										)}
-									</div>
-
-									{/* Needs approval */}
-									<div>
-										{stats.needsApproval > 0 ? (
-											<Badge.Root size="small" variant="lighter" color="purple">
-												{stats.needsApproval}
-											</Badge.Root>
-										) : (
-											<span className="text-[13px] text-text-soft-400">—</span>
-										)}
-									</div>
-
-									{/* Last activity */}
-									<div>
-										<span className="whitespace-nowrap font-medium text-[13px] text-text-strong-950">
-											{stats.lastActivityAt
-												? dayjs(stats.lastActivityAt).fromNow()
-												: "No messages"}
-										</span>
 									</div>
 
 									{/* Status */}
 									<div className="flex items-center">
-										<StatusBadge.Root
-											status={
-												mailbox.status === "active" ? "completed" : "disabled"
-											}
+										<div
+											className={cn(
+												"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
+												mailbox.status === "active"
+													? "text-success-base"
+													: "text-error-base",
+											)}
 										>
-											<StatusBadge.Icon
-												as={Icon}
+											<Icon
 												name={
 													mailbox.status === "active"
-														? "checkbox-circle"
-														: "slash"
+														? "check-circle"
+														: "cross-circle"
 												}
-												className="h-3 w-3"
+												className="h-3.5 w-3.5"
 											/>
-											{mailbox.status}
-										</StatusBadge.Root>
+											{mailbox.status === "active" ? "Active" : "Disabled"}
+										</div>
 									</div>
 
 									{/* Chevron */}
