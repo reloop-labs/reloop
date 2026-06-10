@@ -30,6 +30,7 @@ interface AgentInboxContextValue {
 	refresh: () => Promise<void>;
 	markMessageRead: (id: string, isRead: boolean) => Promise<void>;
 	deleteMessage: (id: string) => Promise<void>;
+	markMessageSpam: (id: string, isSpam: boolean) => Promise<void>;
 }
 
 const AgentInboxContext = createContext<AgentInboxContextValue | null>(null);
@@ -194,6 +195,23 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		[mutateMessages],
 	);
 
+	const markMessageSpam = useCallback(
+		async (id: string, isSpam: boolean) => {
+			await mutateMessages(
+				(current) => {
+					if (!current) return current;
+					return current.map((msg) =>
+						msg.id === id
+							? { ...msg, isSpam, status: isSpam ? "spam" : "received" }
+							: msg,
+					);
+				},
+				{ revalidate: false },
+			);
+		},
+		[mutateMessages],
+	);
+
 	const refresh = useCallback(async () => {
 		await Promise.all([mutateMailboxes(), mutateMessages()]);
 	}, [mutateMailboxes, mutateMessages]);
@@ -209,6 +227,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			refresh,
 			markMessageRead,
 			deleteMessage,
+			markMessageSpam,
 		}),
 		[
 			mailboxes,
@@ -220,6 +239,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			refresh,
 			markMessageRead,
 			deleteMessage,
+			markMessageSpam,
 		],
 	);
 

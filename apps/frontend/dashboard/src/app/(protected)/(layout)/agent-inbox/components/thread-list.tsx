@@ -6,20 +6,11 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import type { InboundThread, InboundThreadStatus } from "../mock-data";
+import type { InboundThread } from "../mock-data";
+import { useAgentInbox } from "./agent-inbox-provider";
+import { toast } from "sonner";
 
 dayjs.extend(relativeTime);
-
-const statusBadge: Record<
-	InboundThreadStatus,
-	{ label: string; color: "blue" | "yellow" | "purple" | "green" | "red" }
-> = {
-	new: { label: "New", color: "blue" },
-	parsing: { label: "Parsing", color: "yellow" },
-	needs_approval: { label: "Needs approval", color: "purple" },
-	handled: { label: "Handled", color: "green" },
-	blocked: { label: "Blocked", color: "red" },
-};
 
 function senderInitials(thread: InboundThread): string {
 	if (thread.from.name) {
@@ -76,6 +67,37 @@ export const ThreadList = ({
 	hasFilters = false,
 	onClearFilters,
 }: ThreadListProps) => {
+	const { markMessageRead, deleteMessage, markMessageSpam } = useAgentInbox();
+
+	const handleToggleRead = async (id: string, currentlyUnread: boolean) => {
+		try {
+			await markMessageRead(id, currentlyUnread);
+			toast.success(currentlyUnread ? "Marked as Handled" : "Marked as Active");
+		} catch (err: any) {
+			toast.error(err.message || "Failed to update status");
+		}
+	};
+
+	const handleMarkSpam = async (id: string) => {
+		try {
+			await markMessageSpam(id, true);
+			toast.success("Marked as Spam");
+		} catch (err: any) {
+			toast.error(err.message || "Failed to mark as spam");
+		}
+	};
+
+	const handleDelete = async (id: string) => {
+		if (confirm("Are you sure you want to delete this message?")) {
+			try {
+				await deleteMessage(id);
+				toast.success("Message deleted");
+			} catch (err: any) {
+				toast.error(err.message || "Failed to delete message");
+			}
+		}
+	};
+
 	return (
 		<div className="w-full overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-paragraph-sm dark:border-stroke-soft-100/40">
 			<div className="divide-y divide-stroke-soft-100/60 overflow-y-auto dark:divide-stroke-soft-100/30">
@@ -108,13 +130,12 @@ export const ThreadList = ({
 				) : (
 					threads.map((thread) => {
 						const isSelected = selectedId === thread.id;
-						const status = statusBadge[thread.status];
 						return (
 							<div
 								key={thread.id}
 								onClick={() => onSelect(thread.id)}
 								className={cn(
-									"flex w-full items-center gap-4 border-b last:border-b-0 border-stroke-soft-100/60 dark:border-stroke-soft-100/30 px-4 py-3.5 hover:bg-bg-weak-50/50 transition-all cursor-pointer text-left",
+									"group flex w-full items-center gap-4 border-b last:border-b-0 border-stroke-soft-100/60 dark:border-stroke-soft-100/30 px-4 py-3.5 hover:bg-bg-weak-50/50 transition-all cursor-pointer text-left",
 									thread.unread
 										? "bg-bg-white-0 dark:bg-bg-white-0/5"
 										: "bg-bg-weak-50/10 dark:bg-bg-weak-50/5",
@@ -193,21 +214,53 @@ export const ThreadList = ({
 									)}
 								</div>
 
-								{/* Right Section: Badges & Date */}
-								<div className="flex items-center gap-4 shrink-0">
-									<div className="hidden sm:flex items-center gap-1.5">
-										<Badge.Root size="small" variant="lighter" color={status.color}>
-											{status.label}
-										</Badge.Root>
+								{/* Right Section: Actions & Date */}
+								<div className="relative flex items-center justify-end shrink-0 w-28 md:w-36 h-6">
+									{/* Default Content (Date & Tag) - hidden visually but keeps size for grid alignment */}
+									<div className="flex items-center gap-2 transition-all duration-150 group-hover:invisible group-hover:opacity-0">
 										{thread.entityTag && (
 											<Badge.Root size="small" variant="lighter" color="gray">
 												{thread.entityTag}
 											</Badge.Root>
 										)}
+										<span className="text-label-xs text-text-soft-400 tabular-nums w-16 text-right">
+											{dayjs(thread.receivedAt).format("MMM D")}
+										</span>
 									</div>
-									<span className="text-label-xs text-text-soft-400 tabular-nums w-16 text-right">
-										{dayjs(thread.receivedAt).format("MMM D")}
-									</span>
+
+									{/* Hover Actions - absolute overlay */}
+									<div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all duration-150 flex items-center gap-1.5 bg-transparent">
+										<button
+											title={thread.unread ? "Mark as Handled" : "Mark as Active"}
+											onClick={(e) => {
+												e.stopPropagation();
+												handleToggleRead(thread.id, thread.unread);
+											}}
+											className="p-1 rounded hover:bg-bg-weak-100 dark:hover:bg-white/10 text-text-sub-600 hover:text-text-strong-950 transition-colors"
+										>
+											<Icon name="check-circle" className="h-4 w-4" />
+										</button>
+										<button
+											title="Mark as Spam"
+											onClick={(e) => {
+												e.stopPropagation();
+												handleMarkSpam(thread.id);
+											}}
+											className="p-1 rounded hover:bg-bg-weak-100 dark:hover:bg-white/10 text-text-sub-600 hover:text-error-base transition-colors"
+										>
+											<Icon name="cross-circle" className="h-4 w-4" />
+										</button>
+										<button
+											title="Delete Message"
+											onClick={(e) => {
+												e.stopPropagation();
+												handleDelete(thread.id);
+											}}
+											className="p-1 rounded hover:bg-bg-weak-100 dark:hover:bg-white/10 text-text-sub-600 hover:text-error-base transition-colors"
+										>
+											<Icon name="trash" className="h-4 w-4" />
+										</button>
+									</div>
 								</div>
 							</div>
 						);

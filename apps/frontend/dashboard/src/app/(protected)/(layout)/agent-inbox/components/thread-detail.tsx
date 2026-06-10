@@ -9,7 +9,6 @@ import type { ReactNode } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { AgentMailbox, InboundThread } from "../mock-data";
-import { useAgentInbox } from "./agent-inbox-provider";
 
 dayjs.extend(relativeTime);
 
@@ -46,31 +45,6 @@ export const ThreadDetail = ({
 	showBack,
 }: ThreadDetailProps) => {
 	const [parsedExpanded, setParsedExpanded] = useState(true);
-	const { markMessageRead, deleteMessage } = useAgentInbox();
-
-	const handleToggleRead = async () => {
-		if (!thread) return;
-		try {
-			await markMessageRead(thread.id, thread.unread);
-			toast.success(
-				thread.unread ? "Message marked as handled" : "Message marked as new",
-			);
-		} catch (err: any) {
-			toast.error(err.message || "Failed to update message status");
-		}
-	};
-
-	const handleDelete = async () => {
-		if (!thread) return;
-		if (!confirm("Are you sure you want to delete this message?")) return;
-		try {
-			await deleteMessage(thread.id);
-			toast.success("Message deleted");
-			if (onBack) onBack();
-		} catch (err: any) {
-			toast.error(err.message || "Failed to delete message");
-		}
-	};
 
 	if (!thread) {
 		return (
@@ -100,41 +74,100 @@ export const ThreadDetail = ({
 	return (
 		<div className="flex min-h-[500px] flex-col">
 			<div className="flex-1 overflow-y-auto">
-				{onBack && (
-					<div className="border-stroke-soft-100 border-b px-4 py-2.5 dark:border-stroke-soft-100/40">
-						<button
-							type="button"
-							onClick={onBack}
-							className="flex items-center gap-1.5 text-label-sm font-semibold text-text-sub-600 hover:text-text-strong-950 transition-colors"
-						>
-							<Icon name="arrow-left" className="h-4 w-4" />
-							Back to messages
-						</button>
-					</div>
-				)}
 
-				<div className="border-stroke-soft-100 border-b px-5 py-4 dark:border-stroke-soft-100/40">
-					<h2 className="font-semibold text-base text-text-strong-950">
+
+				{/* Subject Header */}
+				<div className="border-stroke-soft-100 border-b px-6 py-5 dark:border-stroke-soft-100/40">
+					<h1 className="text-xl font-medium text-text-strong-950 flex items-center gap-2">
 						{thread.subject}
-					</h2>
-					<div className="mt-3 flex flex-col gap-1.5">
-						<MetaRow label="From">
-							{thread.from.name ? (
-								<>
-									{thread.from.name}{" "}
-									<span className="text-text-soft-400">
-										&lt;{thread.from.email}&gt;
-									</span>
-								</>
-							) : (
-								thread.from.email
-							)}
-						</MetaRow>
-						<MetaRow label="To">{mailbox?.email ?? "—"}</MetaRow>
-						<MetaRow label="Received">
-							{dayjs(thread.receivedAt).format("MMM D, YYYY h:mm A")} (
-							{dayjs(thread.receivedAt).fromNow()})
-						</MetaRow>
+						<span className="px-1.5 py-0.5 rounded text-[10px] bg-bg-weak-100 text-text-sub-600 dark:bg-white/10 font-normal">Inbox x</span>
+					</h1>
+				</div>
+
+				{/* Sender Meta Row */}
+				<div className="px-6 py-4 flex items-start justify-between gap-4">
+					{/* Left side: Avatar + Sender Info */}
+					<div className="flex items-start gap-3 min-w-0">
+						{/* Avatar Circle */}
+						<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-base/10 text-primary-base font-semibold text-sm border border-primary-base/20">
+							{thread.from.name ? thread.from.name.charAt(0).toUpperCase() : (thread.from.email.charAt(0).toUpperCase() || "?")}
+						</div>
+
+						<div className="flex flex-col min-w-0">
+							{/* Name <email> and Unsubscribe */}
+							<div className="flex items-baseline gap-1.5 flex-wrap">
+								<span className="font-semibold text-text-strong-950 text-label-sm">
+									{thread.from.name || thread.from.email.split("@")[0]}
+								</span>
+								<span className="text-text-soft-400 text-xs font-normal">
+									&lt;{thread.from.email}&gt;
+								</span>
+								<button
+									onClick={() => handlePrototypeAction("Unsubscribe")}
+									className="text-xs text-primary-base hover:underline font-medium ml-1"
+								>
+									Unsubscribe
+								</button>
+							</div>
+
+							{/* To block */}
+							<div className="flex items-center gap-1 text-text-soft-400 text-xs mt-0.5">
+								<span>to me</span>
+								<Icon name="chevron-down" className="h-3 w-3" />
+							</div>
+						</div>
+					</div>
+
+					{/* Right side: Date + Action Icons */}
+					<div className="flex items-center gap-2 shrink-0">
+						<span className="text-xs text-text-soft-400">
+							{dayjs(thread.receivedAt).format("ddd, MMM D, h:mm A")} ({dayjs(thread.receivedAt).fromNow()})
+						</span>
+
+						<div className="flex items-center gap-0.5 text-text-soft-400">
+							<button
+								onClick={() => handlePrototypeAction("Star message")}
+								className="p-1.5 rounded-lg hover:bg-bg-weak-50 dark:hover:bg-white/10 hover:text-text-strong-950 transition-colors"
+								title="Star message"
+							>
+								<svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+									<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+								</svg>
+							</button>
+							<button
+								onClick={() => handlePrototypeAction("Add reaction")}
+								className="p-1.5 rounded-lg hover:bg-bg-weak-50 dark:hover:bg-white/10 hover:text-text-strong-950 transition-colors"
+								title="Add reaction"
+							>
+								<svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+									<circle cx="12" cy="12" r="10" />
+									<path d="M8 14s1.5 2 4 2 4-2 4-2" />
+									<line x1="9" y1="9" x2="9.01" y2="9" />
+									<line x1="15" y1="9" x2="15.01" y2="9" />
+								</svg>
+							</button>
+							<button
+								onClick={() => handlePrototypeAction("Reply")}
+								className="p-1.5 rounded-lg hover:bg-bg-weak-50 dark:hover:bg-white/10 hover:text-text-strong-950 transition-colors"
+								title="Reply"
+							>
+								<svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+									<polyline points="9 17 4 12 9 7" />
+									<path d="M20 18v-2a4 4 0 0 0-4-4H4" />
+								</svg>
+							</button>
+							<button
+								onClick={() => handlePrototypeAction("More actions")}
+								className="p-1.5 rounded-lg hover:bg-bg-weak-50 dark:hover:bg-white/10 hover:text-text-strong-950 transition-colors"
+								title="More actions"
+							>
+								<svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+									<circle cx="12" cy="12" r="1" />
+									<circle cx="12" cy="5" r="1" />
+									<circle cx="12" cy="19" r="1" />
+								</svg>
+							</button>
+						</div>
 					</div>
 				</div>
 
@@ -221,108 +254,9 @@ export const ThreadDetail = ({
 					</div>
 				)}
 
-				<div className="border-stroke-soft-100 border-t px-5 py-4 dark:border-stroke-soft-100/40">
-					<SectionTitle>Processing timeline</SectionTitle>
-					<ol className="flex flex-col">
-						{thread.timeline.map((step, index) => (
-							<li key={step.label} className="flex gap-3">
-								<div className="flex flex-col items-center">
-									<div
-										className={cn(
-											"flex h-5 w-5 shrink-0 items-center justify-center rounded-full",
-											step.state === "done" &&
-												"bg-success-light text-success-dark",
-											step.state === "active" &&
-												"bg-primary-alpha-10 text-primary-base ring-1 ring-primary-base/30",
-											step.state === "pending" &&
-												"border border-stroke-soft-200 bg-bg-white-0",
-										)}
-									>
-										{step.state === "done" && (
-											<Icon name="check" className="h-3 w-3" />
-										)}
-										{step.state === "active" && (
-											<span className="h-1.5 w-1.5 rounded-full bg-primary-base" />
-										)}
-									</div>
-									{index < thread.timeline.length - 1 && (
-										<div className="my-0.5 min-h-[16px] w-px flex-1 bg-stroke-soft-200" />
-									)}
-								</div>
-								<div className="pb-3">
-									<p className="font-medium text-label-sm text-text-strong-950">
-										{step.label}
-									</p>
-									{step.at && (
-										<p className="text-label-xs text-text-soft-400">
-											{dayjs(step.at).format("MMM D, h:mm A")}
-										</p>
-									)}
-								</div>
-							</li>
-						))}
-					</ol>
-				</div>
+
 			</div>
 
-			<div className="shrink-0 border-stroke-soft-100 border-t px-4 py-3 dark:border-stroke-soft-100/40">
-				<div className="flex flex-wrap items-center gap-2">
-					{thread.status === "needs_approval" ? (
-						<Button.Root
-							variant="primary"
-							size="xsmall"
-							onClick={() => handlePrototypeAction("Approve & send")}
-							className="gap-1.5"
-						>
-							<Icon name="check-circle" className="h-4 w-4" />
-							Approve & send
-						</Button.Root>
-					) : (
-						<Button.Root
-							variant="primary"
-							size="xsmall"
-							onClick={() => handlePrototypeAction("Run agent")}
-							className="gap-1.5"
-						>
-							<Icon name="sparkling" className="h-4 w-4" />
-							Run agent
-						</Button.Root>
-					)}
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						onClick={handleToggleRead}
-					>
-						{thread.unread ? "Mark handled" : "Mark new"}
-					</Button.Root>
-					<Button.Root
-						variant="neutral"
-						mode="ghost"
-						size="xsmall"
-						onClick={() => handlePrototypeAction("Block sender")}
-					>
-						Block sender
-					</Button.Root>
-					<Button.Root
-						variant="neutral"
-						mode="ghost"
-						size="xsmall"
-						onClick={() => handlePrototypeAction("View raw webhook")}
-					>
-						View raw webhook
-					</Button.Root>
-					<Button.Root
-						variant="neutral"
-						mode="ghost"
-						size="xsmall"
-						onClick={handleDelete}
-						className="hover:bg-red-500/10 hover:text-red-500"
-					>
-						Delete
-					</Button.Root>
-				</div>
-			</div>
 		</div>
 	);
 };
