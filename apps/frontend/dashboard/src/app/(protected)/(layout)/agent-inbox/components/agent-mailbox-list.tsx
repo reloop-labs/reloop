@@ -136,10 +136,10 @@ export const AgentMailboxList = () => {
 									)}
 								>
 									{/* Agent & Info */}
-									<div className="flex min-w-0 items-start gap-3.5 pr-4">
+									<div className="flex min-w-0 items-start gap-2 pr-4">
 										<Icon
 											name="inbox"
-											className="h-5 w-5 text-text-sub-600 transition-transform group-hover/row:scale-105"
+											className="mt-0.5 h-5 w-5 text-text-sub-600 transition-transform group-hover/row:scale-105"
 										/>
 										<div className="min-w-0 flex-1">
 											<div className="flex items-center gap-2">
@@ -147,7 +147,7 @@ export const AgentMailboxList = () => {
 													{mailbox.label}
 												</span>
 												{stats.unread > 0 && (
-													<span className="shrink-0 rounded-full bg-[#0A438A] px-1.5 py-0.5 font-medium text-[10px] text-white uppercase dark:bg-[#1E57A8]">
+													<span className="shrink-0 rounded-full bg-[#0A438A] px-1.5 py-0.5 font-semibold text-[10px] text-white uppercase dark:bg-[#1E57A8]">
 														{stats.unread} new
 													</span>
 												)}
