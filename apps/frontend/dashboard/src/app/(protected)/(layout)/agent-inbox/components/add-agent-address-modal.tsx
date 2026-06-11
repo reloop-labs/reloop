@@ -10,7 +10,6 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import * as Textarea from "@reloop/ui/textarea";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Resolver } from "react-hook-form";
@@ -32,7 +31,6 @@ const agentAddressSchema = v.object({
 		),
 	),
 	domain: v.pipe(v.string(), v.minLength(1, "Select a domain")),
-	description: v.pipe(v.string(), v.minLength(1, "Description is required")),
 });
 
 type AgentAddressFormValues = v.InferInput<typeof agentAddressSchema>;
@@ -70,7 +68,6 @@ export const AddAgentAddressModal = ({
 			label: "",
 			localPart: "",
 			domain: "",
-			description: "",
 		},
 	});
 
@@ -102,7 +99,6 @@ export const AddAgentAddressModal = ({
 				localPart: data.localPart,
 				domain: data.domain,
 				domainId: selectedDomainObj.id,
-				description: data.description,
 				securityLevel: 5,
 			});
 			toast.success(`Agent address ${mailbox.email} created`);
@@ -277,30 +273,6 @@ export const AddAgentAddressModal = ({
 								<p className="text-error-base text-paragraph-xs">
 									{form.formState.errors.localPart?.message ??
 										form.formState.errors.domain?.message}
-								</p>
-							)}
-						</div>
-
-						<div className="flex flex-col gap-1.5">
-							<label
-								htmlFor="agent-description"
-								className="font-medium text-label-sm text-text-strong-950"
-							>
-								Purpose
-								<span className="ml-0.5 text-error-base">*</span>
-							</label>
-							<Textarea.Root
-								simple
-								id="agent-description"
-								placeholder="What this agent handles..."
-								rows={3}
-								className="rounded-[10px] text-label-sm"
-								{...form.register("description")}
-								disabled={isSubmitting}
-							/>
-							{form.formState.errors.description && (
-								<p className="text-error-base text-paragraph-xs">
-									{form.formState.errors.description.message}
 								</p>
 							)}
 						</div>

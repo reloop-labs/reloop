@@ -14,7 +14,7 @@ import {
 	unique,
 	varchar,
 } from "drizzle-orm/pg-core";
-import { organization, user } from "./auth";
+import { organization } from "./auth";
 import { domain } from "./domain";
 
 // Custom ID generation functions with prefixes
@@ -49,7 +49,6 @@ export const mailbox = pgTable(
 		quota: text("quota").notNull().default("5 GB"),
 		status: mailboxStatusEnum("status").notNull().default("active"),
 		displayName: varchar("display_name", { length: 255 }),
-		description: text("description"),
 		organizationId: text("organization_id")
 			.notNull()
 			.references(() => organization.id, { onDelete: "cascade" }),

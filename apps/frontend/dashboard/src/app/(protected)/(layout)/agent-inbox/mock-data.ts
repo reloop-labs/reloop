@@ -24,7 +24,6 @@ export interface AgentMailbox {
 	id: string;
 	email: string;
 	label: string;
-	description: string;
 	status: "active" | "disabled";
 	securityLevel: 1 | 2 | 3 | 4 | 5;
 	createdAt: string;
@@ -58,7 +57,6 @@ export const agentMailboxes: AgentMailbox[] = [
 		id: "mb-1",
 		email: "support-agent@acme.dev",
 		label: "Support Agent",
-		description: "Customer support and API escalations",
 		status: "active",
 		securityLevel: 5,
 		createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
@@ -67,7 +65,6 @@ export const agentMailboxes: AgentMailbox[] = [
 		id: "mb-2",
 		email: "billing-bot@acme.dev",
 		label: "Billing Bot",
-		description: "Invoices, receipts, and payment notifications",
 		status: "active",
 		securityLevel: 5,
 		createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
@@ -76,7 +73,6 @@ export const agentMailboxes: AgentMailbox[] = [
 		id: "mb-3",
 		email: "onboarding@acme.dev",
 		label: "Onboarding",
-		description: "Welcome flows and new customer intake",
 		status: "active",
 		securityLevel: 1,
 		createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),

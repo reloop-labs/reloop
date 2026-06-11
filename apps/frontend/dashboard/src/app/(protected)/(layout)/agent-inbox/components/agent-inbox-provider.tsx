@@ -7,7 +7,7 @@ import {
 	useContext,
 	useMemo,
 } from "react";
-import useSWR, { useSWRConfig } from "swr";
+import useSWR from "swr";
 import type { AgentMailbox, InboundThread } from "../mock-data";
 
 export type NewAgentAddressInput = {
@@ -15,7 +15,6 @@ export type NewAgentAddressInput = {
 	localPart: string;
 	domain: string;
 	domainId: string;
-	description: string;
 	securityLevel: AgentMailbox["securityLevel"];
 };
 
@@ -25,7 +24,6 @@ interface BackendMailbox {
 	quota: string;
 	status: string;
 	displayName: string | null;
-	description: string | null;
 	createdAt: string | Date;
 }
 
@@ -87,7 +85,6 @@ interface AgentInboxContextValue {
 const AgentInboxContext = createContext<AgentInboxContextValue | null>(null);
 
 export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
-	const { mutate } = useSWRConfig();
 
 	// Fetch mailboxes from actual endpoint
 	const {
@@ -110,7 +107,6 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			id: mb.id,
 			email: mb.email,
 			label: mb.displayName || mb.email.split("@")[0] || "Agent",
-			description: mb.description || "",
 			status:
 				mb.status === "active" ? ("active" as const) : ("disabled" as const),
 			securityLevel: 5 as const,
@@ -220,7 +216,6 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				id: data.id,
 				email: data.email,
 				label: input.label,
-				description: input.description,
 				status: "active" as const,
 				securityLevel: input.securityLevel,
 				createdAt: new Date().toISOString(),

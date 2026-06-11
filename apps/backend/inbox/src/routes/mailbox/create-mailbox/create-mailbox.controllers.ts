@@ -12,7 +12,6 @@ export async function createMailboxController({
 	password,
 	quota,
 	displayName,
-	description,
 }: {
 	organizationId: string;
 	domainId: string;
@@ -20,7 +19,6 @@ export async function createMailboxController({
 	password?: string;
 	quota?: string;
 	displayName?: string;
-	description?: string;
 }) {
 	const log = useLogger();
 
@@ -46,7 +44,6 @@ export async function createMailboxController({
 			password: password || "placeholder", // In a real app, hash this
 			quota: quota || "5 GB",
 			displayName,
-			description,
 		})
 		.returning({ id: mailbox.id });
 

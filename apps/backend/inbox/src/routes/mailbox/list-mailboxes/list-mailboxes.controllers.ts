@@ -14,7 +14,6 @@ export async function getMailboxesController(organizationId: string) {
 		quota: m.quota,
 		status: m.status,
 		displayName: m.displayName,
-		description: m.description,
 		createdAt: m.createdAt,
 	}));
 }

@@ -9,7 +9,6 @@ export async function updateMailboxController(
 	organizationId: string,
 	updates: {
 		displayName?: string;
-		description?: string;
 		status?: "active" | "disabled";
 		quota?: string;
 	},
@@ -32,8 +31,7 @@ export async function updateMailboxController(
 	const updateData: Partial<typeof mailbox.$inferInsert> = {};
 	if (updates.displayName !== undefined)
 		updateData.displayName = updates.displayName;
-	if (updates.description !== undefined)
-		updateData.description = updates.description;
+
 	if (updates.status !== undefined) updateData.status = updates.status;
 	if (updates.quota !== undefined) updateData.quota = updates.quota;
 

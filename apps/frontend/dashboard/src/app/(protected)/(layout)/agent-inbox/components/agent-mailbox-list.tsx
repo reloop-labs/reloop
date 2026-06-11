@@ -296,11 +296,6 @@ export const AgentMailboxList = () => {
 													</span>
 												)}
 											</div>
-											{mailbox.description && (
-												<div className="mt-1 truncate text-label-xs text-text-soft-400 dark:text-text-soft-400/80">
-													{mailbox.description}
-												</div>
-											)}
 										</div>
 									</div>
 

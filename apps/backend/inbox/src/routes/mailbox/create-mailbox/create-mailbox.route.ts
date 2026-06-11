@@ -23,9 +23,6 @@ export const createMailboxRoute = new Elysia().use(authMiddleware).post(
 			displayName: t.Optional(
 				t.String({ description: "Friendly name of the mailbox sender" }),
 			),
-			description: t.Optional(
-				t.String({ description: "Description of the mailbox" }),
-			),
 		}),
 		response: {
 			200: MailModel.createMailboxResponse,

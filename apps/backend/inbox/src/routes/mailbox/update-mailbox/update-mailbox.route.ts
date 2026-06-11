@@ -17,9 +17,6 @@ export const updateMailboxRoute = new Elysia().use(authMiddleware).patch(
 			displayName: t.Optional(
 				t.String({ description: "Friendly name of the mailbox sender" }),
 			),
-			description: t.Optional(
-				t.String({ description: "Description of the mailbox" }),
-			),
 			status: t.Optional(
 				t.Union([t.Literal("active"), t.Literal("disabled")], {
 					description: "Mailbox status",

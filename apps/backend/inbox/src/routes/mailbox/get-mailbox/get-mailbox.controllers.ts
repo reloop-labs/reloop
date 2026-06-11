@@ -23,7 +23,6 @@ export async function getMailboxController(id: string, organizationId: string) {
 		quota: mbx.quota,
 		status: mbx.status,
 		displayName: mbx.displayName,
-		description: mbx.description,
 		domainId: mbx.domainId,
 		createdAt: mbx.createdAt,
 		updatedAt: mbx.updatedAt,

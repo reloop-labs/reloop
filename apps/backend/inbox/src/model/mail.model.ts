@@ -284,7 +284,6 @@ export namespace MailModel {
 		quota: t.String(),
 		status: t.String(),
 		displayName: t.Union([t.String(), t.Null()]),
-		description: t.Union([t.String(), t.Null()]),
 		createdAt: t.Union([t.Date(), t.String()]),
 	});
 
@@ -296,7 +295,6 @@ export namespace MailModel {
 		quota: t.String(),
 		status: t.String(),
 		displayName: t.Union([t.String(), t.Null()]),
-		description: t.Union([t.String(), t.Null()]),
 		domainId: t.String(),
 		createdAt: t.Union([t.Date(), t.String()]),
 		updatedAt: t.Union([t.Date(), t.String()]),
