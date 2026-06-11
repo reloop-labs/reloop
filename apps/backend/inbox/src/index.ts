@@ -35,9 +35,9 @@ initLogger({
 	env: { service: "inbox" },
 	drain: inboxConfig.OTEL_EXPORTER_OTLP_ENDPOINT
 		? createOTLPDrain({
-			endpoint: inboxConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
-			headers: parseOtlpHeaders(inboxConfig.OTEL_EXPORTER_OTLP_HEADERS),
-		})
+				endpoint: inboxConfig.OTEL_EXPORTER_OTLP_ENDPOINT,
+				headers: parseOtlpHeaders(inboxConfig.OTEL_EXPORTER_OTLP_HEADERS),
+			})
 		: undefined,
 });
 
@@ -45,7 +45,8 @@ const port = inboxConfig.port;
 const inboxService = new Elysia({
 	prefix: "/api/inbox",
 	name: "Inbox Service",
-}).use(evlog())
+})
+	.use(evlog())
 	.use(opentelemetry())
 	.use(
 		openapi({

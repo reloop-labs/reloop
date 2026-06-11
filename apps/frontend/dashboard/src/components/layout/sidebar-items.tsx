@@ -79,7 +79,9 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 	}, [currentEl, isCollapsed, pathname, expandedItems]);
 
 	return (
-		<div className={cn("relative flex flex-col", isCollapsed && "items-center")}>
+		<div
+			className={cn("relative flex flex-col", isCollapsed && "items-center")}
+		>
 			{mainNavigation.map(
 				({ path, label, iconName, isSpecial, items }, index) => {
 					const hasSubNav = items && items.length > 0;

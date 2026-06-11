@@ -46,7 +46,8 @@ function ReleaseSections({ release }: { release: ChangelogRelease }) {
 			: []);
 
 	const sorted = [...sections].sort(
-		(a, b) => categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category),
+		(a, b) =>
+			categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category),
 	);
 
 	return (

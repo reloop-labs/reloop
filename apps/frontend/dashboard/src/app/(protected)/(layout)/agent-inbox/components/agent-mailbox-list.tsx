@@ -248,7 +248,7 @@ export const AgentMailboxList = () => {
 				</div>
 
 				{/* Table Body */}
-				<div className="mb-16 divide-y divide-stroke-soft-100 overflow-hidden rounded-b-xl border-r border-l border-b border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+				<div className="mb-16 divide-y divide-stroke-soft-100 overflow-hidden rounded-b-xl border-stroke-soft-100 border-r border-b border-l bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
 					{mailboxes.length === 0 ? (
 						<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
 							<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">

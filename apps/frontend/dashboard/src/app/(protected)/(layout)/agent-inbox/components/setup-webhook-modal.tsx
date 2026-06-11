@@ -58,14 +58,14 @@ export const SetupWebhookModal = ({
 					title="Set up agent inbox"
 					description="Connect inbound email to your AI agents via webhooks. This guide matches the Agent Email Inbox skill flow."
 				/>
-				<Modal.Body className="py-6 px-6">
+				<Modal.Body className="px-6 py-6">
 					<ol className="relative flex flex-col gap-6 pl-1">
 						{STEPS.map((step, index) => (
 							<li key={step.title} className="relative flex gap-4">
 								{/* Connector Line */}
 								{index < STEPS.length - 1 && (
 									<span
-										className="absolute left-[15px] top-[32px] bottom-[-24px] w-[1.5px] bg-stroke-soft-100 dark:bg-white/10"
+										className="absolute top-[32px] bottom-[-24px] left-[15px] w-[1.5px] bg-stroke-soft-100 dark:bg-white/10"
 										aria-hidden="true"
 									/>
 								)}
@@ -78,10 +78,11 @@ export const SetupWebhookModal = ({
 									<p className="font-semibold text-label-sm text-text-strong-950 dark:text-white">
 										{step.title}
 									</p>
-									<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-text-sub-600/95 leading-relaxed">
+									<p className="mt-1 text-paragraph-sm text-text-sub-600 leading-relaxed dark:text-text-sub-600/95">
 										{step.description}
 									</p>
-									{"inAppOnly" in step && step.inAppOnly ? null : step.internal ? (
+									{"inAppOnly" in step &&
+									step.inAppOnly ? null : step.internal ? (
 										<Button.Root
 											asChild
 											variant="neutral"
@@ -89,7 +90,10 @@ export const SetupWebhookModal = ({
 											size="xxsmall"
 											className="mt-2.5 inline-flex border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 										>
-											<Link href={step.href} onClick={() => onOpenChange(false)}>
+											<Link
+												href={step.href}
+												onClick={() => onOpenChange(false)}
+											>
 												<span>Open in dashboard</span>
 												<Icon name="arrow-right" className="h-3 w-3" />
 											</Link>
@@ -102,7 +106,11 @@ export const SetupWebhookModal = ({
 											size="xxsmall"
 											className="mt-2.5 inline-flex border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 										>
-											<a href={step.href} target="_blank" rel="noopener noreferrer">
+											<a
+												href={step.href}
+												target="_blank"
+												rel="noopener noreferrer"
+											>
 												<span>View documentation</span>
 												<Icon name="arrow-right" className="h-3 w-3" />
 											</a>
@@ -113,7 +121,7 @@ export const SetupWebhookModal = ({
 						))}
 					</ol>
 				</Modal.Body>
-				<Modal.Footer className="justify-end py-3 px-5">
+				<Modal.Footer className="justify-end px-5 py-3">
 					<Button.Root
 						variant="neutral"
 						mode="stroke"

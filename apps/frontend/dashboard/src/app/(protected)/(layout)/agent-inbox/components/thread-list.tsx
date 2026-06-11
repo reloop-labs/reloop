@@ -218,7 +218,7 @@ export const ThreadList = ({
 													</div>
 
 													{/* Details Column */}
-													<div className="flex-1 min-w-0 flex flex-col gap-1">
+													<div className="flex min-w-0 flex-1 flex-col gap-1">
 														{/* Sender & Time row */}
 														<div className="flex items-center justify-between gap-2">
 															<span
@@ -316,10 +316,7 @@ export const ThreadList = ({
 																	}
 																	onClick={(e) => {
 																		e.stopPropagation();
-																		handleToggleRead(
-																			thread.id,
-																			thread.unread,
-																		);
+																		handleToggleRead(thread.id, thread.unread);
 																	}}
 																	className="rounded p-1 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-800 dark:hover:bg-white/10"
 																>
@@ -349,10 +346,7 @@ export const ThreadList = ({
 																	}}
 																	className="rounded p-1 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-error-base dark:hover:bg-white/10"
 																>
-																	<Icon
-																		name="trash"
-																		className="h-3.5 w-3.5"
-																	/>
+																	<Icon name="trash" className="h-3.5 w-3.5" />
 																</button>
 															</div>
 														</div>

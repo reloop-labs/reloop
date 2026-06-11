@@ -74,7 +74,9 @@ export const MainSidebar: React.FC = () => {
 				onMouseLeave={() => setIsHeaderHovered(false)}
 				className={cn(
 					"flex items-center transition-all",
-					isSidebarCollapsed ? "h-14 px-0 justify-center" : "h-12 pr-3 pl-1 justify-between"
+					isSidebarCollapsed
+						? "h-14 justify-center px-0"
+						: "h-12 justify-between pr-3 pl-1",
 				)}
 			>
 				{isSidebarCollapsed ? (
@@ -132,16 +134,16 @@ export const MainSidebar: React.FC = () => {
 			</div>
 			<div
 				className={cn(
-					"flex-1 overflow-y-auto transition-all py-2",
-					isSidebarCollapsed ? "px-0" : "px-2"
+					"flex-1 overflow-y-auto py-2 transition-all",
+					isSidebarCollapsed ? "px-0" : "px-2",
 				)}
 			>
 				<SidebarItems isCollapsed={isSidebarCollapsed} />
 			</div>
 			<div
 				className={cn(
-					"my-3 transition-all flex justify-center w-full",
-					isSidebarCollapsed ? "px-0" : "px-3"
+					"my-3 flex w-full justify-center transition-all",
+					isSidebarCollapsed ? "px-0" : "px-3",
 				)}
 			>
 				<UserMenuDropdown user={user} isCollapsed={isSidebarCollapsed} />

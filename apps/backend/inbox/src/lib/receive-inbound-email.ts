@@ -9,6 +9,7 @@ const log = {
 	warn: (msg: string) => evlog.warn("inbox", msg),
 	error: (msg: string) => evlog.error("inbox", msg),
 };
+
 import { simpleParser } from "mailparser";
 import { correlateInboundThread } from "./thread-correlation";
 
@@ -99,7 +100,6 @@ function extractSpamInfo(headers: Map<string, unknown>): {
 }
 
 export async function receiveInboundEmailController(rawMessage: string) {
-
 	log.info(`[INBOX] Received raw email (length: ${rawMessage.length})`);
 
 	try {

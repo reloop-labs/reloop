@@ -47,7 +47,7 @@ export const AnimatedBackButton = ({
 			whileTap={{ scale: 0.96 }}
 			className={cn(
 				"flex cursor-pointer items-center gap-1 py-1.5 font-medium text-text-sub-600 text-xs transition-colors duration-200 hover:text-text-strong-950",
-				showText ? "pr-2" : "pr-1"
+				showText ? "pr-2" : "pr-1",
 			)}
 		>
 			{/* Icon track */}

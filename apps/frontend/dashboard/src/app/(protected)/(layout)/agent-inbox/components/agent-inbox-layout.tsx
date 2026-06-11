@@ -1,9 +1,11 @@
 "use client";
 
+import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -13,8 +15,6 @@ import {
 	type InboxFilter,
 	threadMatchesFilter,
 } from "../mock-data";
-import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
-import { useRouter } from "next/navigation";
 import { useAgentInbox } from "./agent-inbox-provider";
 import { InboxFilterTabs } from "./inbox-filter-tabs";
 import { ThreadDetail } from "./thread-detail";
@@ -194,8 +194,16 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 				</div>
 			</div>
 
+			<InboxFilterTabs
+				orientation="horizontal"
+				activeFilter={activeFilter}
+				onFilterChange={setActiveFilter}
+				counts={filterCounts}
+				className="px-4 pt-2"
+			/>
+
 			{/* Multi-pane side-by-side Split Layout */}
-			<div className="mt-2 flex min-h-0 flex-1 gap-6">
+			<div className="mt-2 flex min-h-0 flex-1 gap-6 px-4">
 				{/* Left Pane: Thread List */}
 				<div
 					className={cn(
@@ -204,7 +212,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 					)}
 				>
 					{/* List Header */}
-					<div className="flex items-center gap-3 pt-2 pb-2 sm:px-2">
+					<div className="flex items-center gap-3 pt-2 pb-2">
 						<div className="flex-1">
 							<Input.Root size="xsmall" className="rounded-[10px]">
 								<Input.Wrapper>
@@ -219,29 +227,19 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 						</div>
 					</div>
 
-					{/* Filters & Thread List Container */}
-					<div className="flex min-h-0 flex-1 flex-col gap-4">
-						<InboxFilterTabs
-							orientation="horizontal"
-							activeFilter={activeFilter}
-							onFilterChange={setActiveFilter}
-							counts={filterCounts}
-							className="py-0"
+					{/* Thread List Container */}
+					<div className="min-h-0 flex-1">
+						<ThreadList
+							threads={filteredThreads}
+							selectedId={selectedThreadId}
+							onSelect={handleSelectThread}
+							emptyMessage={emptyMessage}
+							hasFilters={activeFilter !== "all" || searchQuery !== ""}
+							onClearFilters={() => {
+								setActiveFilter("all");
+								setSearchQuery("");
+							}}
 						/>
-
-						<div className="min-h-0 flex-1">
-							<ThreadList
-								threads={filteredThreads}
-								selectedId={selectedThreadId}
-								onSelect={handleSelectThread}
-								emptyMessage={emptyMessage}
-								hasFilters={activeFilter !== "all" || searchQuery !== ""}
-								onClearFilters={() => {
-									setActiveFilter("all");
-									setSearchQuery("");
-								}}
-							/>
-						</div>
 					</div>
 				</div>
 

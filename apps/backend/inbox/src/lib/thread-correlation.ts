@@ -42,7 +42,6 @@ export async function correlateInboundThread({
 	references: string[];
 	receivedAt: Date;
 }) {
-
 	const preview = textBody.substring(0, 200);
 
 	// ─── Try to find an existing thread ──────────────────────────────
@@ -176,7 +175,6 @@ export async function appendOutboundToThread({
 	inReplyTo?: string;
 	sentAt: Date;
 }) {
-
 	const preview = textBody.substring(0, 200);
 
 	// Verify thread exists and belongs to the same org

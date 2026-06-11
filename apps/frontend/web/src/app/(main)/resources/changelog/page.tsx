@@ -5,10 +5,7 @@ import {
 } from "@reloop/web/components/page-shell";
 import { socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import {
-	changelogComingNext,
-	changelogReleases,
-} from "./changelog-releases";
+import { changelogComingNext, changelogReleases } from "./changelog-releases";
 import { ChangelogTimeline } from "./changelog-timeline";
 
 export const metadata: Metadata = {
@@ -32,8 +29,8 @@ const ChangelogPage = () => {
 					<span className="font-semibold text-text-strong-950 dark:text-white">
 						September 2025
 					</span>
-					. Each version lists planning, design, frontend, backend, DevOps,
-					and testing work in the order teams typically ship it.
+					. Each version lists planning, design, frontend, backend, DevOps, and
+					testing work in the order teams typically ship it.
 				</p>
 				<ChangelogTimeline releases={changelogReleases} />
 			</PageSection>

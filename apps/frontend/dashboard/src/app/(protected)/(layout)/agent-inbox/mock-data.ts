@@ -5,9 +5,7 @@ export type InboundThreadStatus =
 	| "handled"
 	| "blocked";
 
-export type InboxFilter =
-	| "all"
-	| "spam";
+export type InboxFilter = "all" | "spam";
 
 export type TimelineStepState = "done" | "active" | "pending";
 

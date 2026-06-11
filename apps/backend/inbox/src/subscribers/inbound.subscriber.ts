@@ -26,12 +26,9 @@ export async function initInboundSubscriber() {
 			msgLogger.info("Received inbound email from KumoMTA via NATS");
 
 			try {
-				const result = await receiveInboundEmailController(
-					payload.rawMessage,
-				);
+				const result = await receiveInboundEmailController(payload.rawMessage);
 				log.info({
-					message:
-						"Successfully processed inbound email via NATS subscriber",
+					message: "Successfully processed inbound email via NATS subscriber",
 					result,
 				});
 			} catch (err) {
