@@ -1,27 +1,17 @@
 "use client";
 
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
-import { SetupWizard } from "./components/setup-wizard";
-import { Icon } from "@reloop/ui/icon";
 import {
-	Activity,
 	ArrowRight,
-	Check,
 	ChevronRight,
 	Code,
 	Copy,
-	Cpu,
-	ExternalLink,
 	Eye,
 	EyeOff,
 	Globe,
 	Inbox,
-	Layers,
 	Mail,
 	Plus,
-	Sparkles,
-	Terminal,
-	Users,
 	Zap,
 } from "lucide-react";
 import Link from "next/link";
@@ -35,7 +25,6 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
-import { toast } from "sonner";
 import {
 	siDotnet,
 	siElixir,
@@ -50,16 +39,26 @@ import {
 	siRust,
 	siSpringboot,
 } from "simple-icons";
+import { toast } from "sonner";
 import useSWR from "swr";
+import { SetupWizard } from "./components/setup-wizard";
 
 const sdkLanguages = [
 	{ name: "Node / TS", command: "npm install @reloop/node", icon: siNodedotjs },
 	{ name: "Python", command: "pip install reloop-python", icon: siPython },
 	{ name: "PHP", command: "composer require reloop/reloop-php", icon: siPhp },
-	{ name: "Go", command: "go get github.com/reloop-labs/reloop-go", icon: siGo },
+	{
+		name: "Go",
+		command: "go get github.com/reloop-labs/reloop-go",
+		icon: siGo,
+	},
 	{ name: "Rust", command: "cargo add reloop", icon: siRust },
 	{ name: "Ruby", command: "gem install reloop", icon: siRuby },
-	{ name: "Java", command: "implementation 'com.reloop:reloop-java'", icon: siSpringboot },
+	{
+		name: "Java",
+		command: "implementation 'com.reloop:reloop-java'",
+		icon: siSpringboot,
+	},
 	{ name: ".NET (C#)", command: "dotnet add package Reloop", icon: siDotnet },
 	{ name: "Elixir", command: '{:reloop, "~> 0.1.0"}', icon: siElixir },
 ];
@@ -127,7 +126,9 @@ export default function Home() {
 
 	// State for API key visibility and agent integration tabs
 	const [showApiKey, setShowApiKey] = useState(false);
-	const [activeAgentTab, setActiveAgentTab] = useState<"skill" | "cli" | "mcp">("skill");
+	const [activeAgentTab, setActiveAgentTab] = useState<"skill" | "cli" | "mcp">(
+		"skill",
+	);
 
 	// Date range for the 7-day activity graph
 	const { start_date, end_date } = useMemo(() => {
@@ -145,11 +146,11 @@ export default function Home() {
 
 	// SWR fetches
 	const { data: apiKeysData } = useSWR<ApiKeyListResponse>(
-		activeOrganization?.id ? `/api/api-key/v1/?limit=10&page=1` : null,
+		activeOrganization?.id ? "/api/api-key/v1/?limit=10&page=1" : null,
 	);
 
 	const { data: domainData } = useSWR<DomainListResponse>(
-		activeOrganization?.id ? `/api/domain/v1/list?limit=50&page=1` : null,
+		activeOrganization?.id ? "/api/domain/v1/list?limit=50&page=1" : null,
 	);
 
 	const { data: emailStatsData } = useSWR<EmailStatsResponse>(
@@ -178,8 +179,12 @@ export default function Home() {
 	const radius = 30;
 	const strokeWidth = 5;
 	const circumference = 2 * Math.PI * radius;
-	const progressPercentage = displayTotalDomains > 0 ? (displayVerifiedDomains / displayTotalDomains) * 100 : 0;
-	const strokeDashoffset = circumference - (progressPercentage / 100) * circumference;
+	const progressPercentage =
+		displayTotalDomains > 0
+			? (displayVerifiedDomains / displayTotalDomains) * 100
+			: 0;
+	const strokeDashoffset =
+		circumference - (progressPercentage / 100) * circumference;
 
 	// Calculate chart data from API stats or fallback to high-fidelity mock data
 	const chartData = useMemo(() => {
@@ -260,6 +265,7 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 				firstName={firstName || "there"}
 				domains={domains}
 				primaryApiKey={primaryApiKey}
+				userEmail={user?.email}
 			/>
 		);
 	}
@@ -291,11 +297,11 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 									Emails
 								</span>
 							</div>
-							<p className="text-xs text-text-sub-600 dark:text-white/50 leading-relaxed">
+							<p className="text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
 								Send transactional & marketing emails with high deliverability.
 							</p>
 						</div>
-						<div className="mt-3 flex items-center gap-1 text-[11px] font-medium text-orange-600 dark:text-orange-400 opacity-0 group-hover:opacity-100 transition-opacity">
+						<div className="mt-3 flex items-center gap-1 font-medium text-[11px] text-orange-600 opacity-0 transition-opacity group-hover:opacity-100 dark:text-orange-400">
 							<span>Send email</span>
 							<ArrowRight className="h-3 w-3" />
 						</div>
@@ -315,11 +321,12 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 									Inbox Triage
 								</span>
 							</div>
-							<p className="text-xs text-text-sub-600 dark:text-white/50 leading-relaxed">
-								Interact with incoming messages using AI prompts or human routing.
+							<p className="text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
+								Interact with incoming messages using AI prompts or human
+								routing.
 							</p>
 						</div>
-						<div className="mt-3 flex items-center gap-1 text-[11px] font-medium text-blue-600 dark:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
+						<div className="mt-3 flex items-center gap-1 font-medium text-[11px] text-blue-600 opacity-0 transition-opacity group-hover:opacity-100 dark:text-blue-400">
 							<span>Open inbox</span>
 							<ArrowRight className="h-3 w-3" />
 						</div>
@@ -335,18 +342,19 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 								<div className="rounded-lg bg-purple-50 p-1.5 text-purple-500 dark:bg-purple-500/10 dark:text-purple-400">
 									<Zap className="h-4 w-4" />
 								</div>
-								<span className="font-semibold text-[13px] text-text-strong-950 dark:text-white flex items-center gap-1.5">
+								<span className="flex items-center gap-1.5 font-semibold text-[13px] text-text-strong-950 dark:text-white">
 									Workflows
-									<span className="rounded bg-purple-100 px-1 py-0.2 text-[8px] font-semibold text-purple-800 uppercase dark:bg-purple-500/25 dark:text-purple-300">
+									<span className="rounded bg-purple-100 px-1 py-0.2 font-semibold text-[8px] text-purple-800 uppercase dark:bg-purple-500/25 dark:text-purple-300">
 										New
 									</span>
 								</span>
 							</div>
-							<p className="text-xs text-text-sub-600 dark:text-white/50 leading-relaxed">
-								Create automated rules and trigger flows on custom communication events.
+							<p className="text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
+								Create automated rules and trigger flows on custom communication
+								events.
 							</p>
 						</div>
-						<div className="mt-3 flex items-center gap-1 text-[11px] font-medium text-purple-600 dark:text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity">
+						<div className="mt-3 flex items-center gap-1 font-medium text-[11px] text-purple-600 opacity-0 transition-opacity group-hover:opacity-100 dark:text-purple-400">
 							<span>Build automation</span>
 							<ArrowRight className="h-3 w-3" />
 						</div>
@@ -366,11 +374,11 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 									Domains
 								</span>
 							</div>
-							<p className="text-xs text-text-sub-600 dark:text-white/50 leading-relaxed">
+							<p className="text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
 								Manage custom sending domains, SPF/DKIM verification, and DNS.
 							</p>
 						</div>
-						<div className="mt-3 flex items-center gap-1 text-[11px] font-medium text-teal-600 dark:text-teal-400 opacity-0 group-hover:opacity-100 transition-opacity">
+						<div className="mt-3 flex items-center gap-1 font-medium text-[11px] text-teal-600 opacity-0 transition-opacity group-hover:opacity-100 dark:text-teal-400">
 							<span>Configure domain</span>
 							<ArrowRight className="h-3 w-3" />
 						</div>
@@ -389,15 +397,15 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 								<h3 className="font-semibold text-sm text-text-strong-950 dark:text-white">
 									Emails Sent - Last 7 Days
 								</h3>
-								<p className="text-xs text-text-sub-600 dark:text-white/50">
+								<p className="text-text-sub-600 text-xs dark:text-white/50">
 									Total emails sent by this organization
 								</p>
 							</div>
 							<div className="text-right">
-								<span className="font-bold text-xl text-text-strong-950 dark:text-white">
+								<span className="font-bold text-text-strong-950 text-xl dark:text-white">
 									{totalActivityCount}
 								</span>
-								<p className="text-[10px] text-text-soft-400 dark:text-white/40 uppercase font-medium">
+								<p className="font-medium text-[10px] text-text-soft-400 uppercase dark:text-white/40">
 									Total Sent
 								</p>
 							</div>
@@ -411,9 +419,23 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 									margin={{ top: 5, right: 5, left: -25, bottom: 0 }}
 								>
 									<defs>
-										<linearGradient id="activityGradient" x1="0" y1="0" x2="0" y2="1">
-											<stop offset="5%" stopColor="#F97316" stopOpacity={0.25} />
-											<stop offset="95%" stopColor="#F97316" stopOpacity={0.0} />
+										<linearGradient
+											id="activityGradient"
+											x1="0"
+											y1="0"
+											x2="0"
+											y2="1"
+										>
+											<stop
+												offset="5%"
+												stopColor="#F97316"
+												stopOpacity={0.25}
+											/>
+											<stop
+												offset="95%"
+												stopColor="#F97316"
+												stopOpacity={0.0}
+											/>
 										</linearGradient>
 									</defs>
 									<CartesianGrid
@@ -461,17 +483,17 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 					<div className="rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.01]">
 						<div className="flex items-center justify-between">
 							<div className="space-y-1">
-								<h3 className="font-semibold text-sm text-text-strong-950 dark:text-white flex items-center gap-2">
+								<h3 className="flex items-center gap-2 font-semibold text-sm text-text-strong-950 dark:text-white">
 									Verified Domains
 									<span className="relative flex h-2 w-2">
-										<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-										<span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+										<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+										<span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
 									</span>
-									<span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 tracking-wider uppercase">
+									<span className="font-semibold text-[10px] text-emerald-600 uppercase tracking-wider dark:text-emerald-400">
 										Live
 									</span>
 								</h3>
-								<p className="text-xs text-text-sub-600 dark:text-white/50">
+								<p className="text-text-sub-600 text-xs dark:text-white/50">
 									Active domain records verified for outbound relay dispatching.
 								</p>
 							</div>
@@ -502,17 +524,17 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 											className="transition-all duration-500 ease-in-out"
 										/>
 									</svg>
-									<span className="absolute text-xs font-bold text-text-strong-950 dark:text-white">
+									<span className="absolute font-bold text-text-strong-950 text-xs dark:text-white">
 										{displayVerifiedDomains}/{displayTotalDomains}
 									</span>
 								</div>
 								<div className="text-left">
-									<p className="text-xs font-medium text-text-strong-950 dark:text-white">
+									<p className="font-medium text-text-strong-950 text-xs dark:text-white">
 										{displayVerifiedDomains} verified domains
 									</p>
 									<Link
 										href="/domain/add"
-										className="text-[11px] font-medium text-orange-600 hover:underline dark:text-orange-400 flex items-center gap-0.5 mt-0.5"
+										className="mt-0.5 flex items-center gap-0.5 font-medium text-[11px] text-orange-600 hover:underline dark:text-orange-400"
 									>
 										Add new domain
 										<Plus className="h-3 w-3" />
@@ -526,25 +548,25 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 				{/* Right Column: API Keys and Agent Integrations */}
 				<div className="space-y-6">
 					{/* API Keys Card */}
-					<div className="rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.01] space-y-4">
+					<div className="space-y-4 rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.01]">
 						<div className="flex items-center justify-between">
 							<h3 className="font-semibold text-sm text-text-strong-950 dark:text-white">
 								API Key
 							</h3>
 							<Link
 								href="/api-keys"
-								className="text-xs font-medium text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white flex items-center gap-0.5"
+								className="flex items-center gap-0.5 font-medium text-text-sub-600 text-xs hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 							>
 								Manage keys
 								<ChevronRight className="h-3 w-3" />
 							</Link>
 						</div>
-						<p className="text-xs text-text-sub-600 dark:text-white/50">
+						<p className="text-text-sub-600 text-xs dark:text-white/50">
 							Start sending emails programmatically right away.
 						</p>
 
-						<div className="flex items-center justify-between gap-2 rounded-xl bg-bg-weak-50 px-3 py-2.5 dark:bg-white/[0.02] border border-stroke-soft-100/50 dark:border-white/5">
-							<code className="font-mono text-xs text-text-strong-950 dark:text-white/80 select-all truncate max-w-[200px]">
+						<div className="flex items-center justify-between gap-2 rounded-xl border border-stroke-soft-100/50 bg-bg-weak-50 px-3 py-2.5 dark:border-white/5 dark:bg-white/[0.02]">
+							<code className="max-w-[200px] select-all truncate font-mono text-text-strong-950 text-xs dark:text-white/80">
 								{showApiKey ? unmaskedKey : maskedKey}
 							</code>
 							<div className="flex items-center gap-1.5">
@@ -552,15 +574,26 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 									type="button"
 									onClick={() => setShowApiKey(!showApiKey)}
 									title={showApiKey ? "Hide Key" : "Show Key"}
-									className="flex h-7 w-7 items-center justify-center rounded-lg text-text-sub-600 hover:bg-bg-weak-100 hover:text-text-strong-950 dark:hover:bg-white/5 dark:text-white/60"
+									className="flex h-7 w-7 items-center justify-center rounded-lg text-text-sub-600 hover:bg-bg-weak-100 hover:text-text-strong-950 dark:text-white/60 dark:hover:bg-white/5"
 								>
-									{showApiKey ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+									{showApiKey ? (
+										<EyeOff className="h-3.5 w-3.5" />
+									) : (
+										<Eye className="h-3.5 w-3.5" />
+									)}
 								</button>
 								<button
 									type="button"
-									onClick={() => handleCopy(primaryApiKey ? unmaskedKey : "rl_live_mock_secret_key_reloop_01", "API Key")}
+									onClick={() =>
+										handleCopy(
+											primaryApiKey
+												? unmaskedKey
+												: "rl_live_mock_secret_key_reloop_01",
+											"API Key",
+										)
+									}
 									title="Copy Key"
-									className="flex h-7 w-7 items-center justify-center rounded-lg text-text-sub-600 hover:bg-bg-weak-100 hover:text-text-strong-950 dark:hover:bg-white/5 dark:text-white/60"
+									className="flex h-7 w-7 items-center justify-center rounded-lg text-text-sub-600 hover:bg-bg-weak-100 hover:text-text-strong-950 dark:text-white/60 dark:hover:bg-white/5"
 								>
 									<Copy className="h-3.5 w-3.5" />
 								</button>
@@ -569,12 +602,12 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 					</div>
 
 					{/* Agent Integrations Card */}
-					<div className="rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.01] space-y-4">
+					<div className="space-y-4 rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.01]">
 						<div>
 							<h3 className="font-semibold text-sm text-text-strong-950 dark:text-white">
 								Agent Integrations
 							</h3>
-							<p className="text-xs text-text-sub-600 dark:text-white/50 mt-1">
+							<p className="mt-1 text-text-sub-600 text-xs dark:text-white/50">
 								Give your AI agents secure communication capabilities.
 							</p>
 						</div>
@@ -584,7 +617,7 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 							<button
 								type="button"
 								onClick={() => setActiveAgentTab("skill")}
-								className={`flex-1 rounded-md py-1.5 text-center text-xs font-semibold transition-all ${
+								className={`flex-1 rounded-md py-1.5 text-center font-semibold text-xs transition-all ${
 									activeAgentTab === "skill"
 										? "bg-white text-text-strong-950 shadow-sm dark:bg-white/10 dark:text-white"
 										: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
@@ -595,7 +628,7 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 							<button
 								type="button"
 								onClick={() => setActiveAgentTab("cli")}
-								className={`flex-1 rounded-md py-1.5 text-center text-xs font-semibold transition-all ${
+								className={`flex-1 rounded-md py-1.5 text-center font-semibold text-xs transition-all ${
 									activeAgentTab === "cli"
 										? "bg-white text-text-strong-950 shadow-sm dark:bg-white/10 dark:text-white"
 										: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
@@ -606,7 +639,7 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 							<button
 								type="button"
 								onClick={() => setActiveAgentTab("mcp")}
-								className={`flex-1 rounded-md py-1.5 text-center text-xs font-semibold transition-all ${
+								className={`flex-1 rounded-md py-1.5 text-center font-semibold text-xs transition-all ${
 									activeAgentTab === "mcp"
 										? "bg-white text-text-strong-950 shadow-sm dark:bg-white/10 dark:text-white"
 										: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
@@ -620,23 +653,25 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 						{activeAgentTab === "skill" && (
 							<div className="space-y-3">
 								<div className="flex items-center justify-between rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-3 dark:border-white/5 dark:bg-white/[0.01]">
-									<div className="flex items-center gap-2.5 min-w-0">
+									<div className="flex min-w-0 items-center gap-2.5">
 										<div className="rounded-lg bg-orange-100 p-1.5 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
 											<Code className="h-4 w-4" />
 										</div>
 										<div className="min-w-0">
-											<p className="font-semibold text-xs text-text-strong-950 dark:text-white">
+											<p className="font-semibold text-text-strong-950 text-xs dark:text-white">
 												SKILL.md
 											</p>
-											<p className="text-[10px] text-text-sub-600 dark:text-white/50 truncate">
+											<p className="truncate text-[10px] text-text-sub-600 dark:text-white/50">
 												Instruction file for AI agents context
 											</p>
 										</div>
 									</div>
 									<button
 										type="button"
-										onClick={() => handleCopy(skillMarkdown, "SKILL.md content")}
-										className="rounded-lg border border-stroke-soft-100 bg-white px-3 py-1.5 text-xs font-semibold text-text-strong-950 shadow-sm hover:bg-bg-weak-50 dark:border-white/5 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5 flex items-center gap-1 shrink-0"
+										onClick={() =>
+											handleCopy(skillMarkdown, "SKILL.md content")
+										}
+										className="flex shrink-0 items-center gap-1 rounded-lg border border-stroke-soft-100 bg-white px-3 py-1.5 font-semibold text-text-strong-950 text-xs shadow-sm hover:bg-bg-weak-50 dark:border-white/5 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
 									>
 										<Copy className="h-3 w-3" />
 										Copy
@@ -648,19 +683,24 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 						{activeAgentTab === "cli" && (
 							<div className="relative rounded-xl border border-stroke-soft-100 bg-zinc-950 p-3.5 dark:border-white/5">
 								<div className="flex items-center justify-between pb-1.5">
-									<span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
+									<span className="font-mono text-[10px] text-zinc-500 uppercase tracking-wider">
 										Terminal Command
 									</span>
 									<button
 										type="button"
-										onClick={() => handleCopy("npx -y reloop-cli init --all --browser", "CLI command")}
+										onClick={() =>
+											handleCopy(
+												"npx -y reloop-cli init --all --browser",
+												"CLI command",
+											)
+										}
 										className="text-zinc-400 hover:text-white"
 										title="Copy command"
 									>
 										<Copy className="h-3.5 w-3.5" />
 									</button>
 								</div>
-								<code className="font-mono text-xs text-zinc-300 block select-all break-all pr-6">
+								<code className="block select-all break-all pr-6 font-mono text-xs text-zinc-300">
 									$ npx -y reloop-cli init --all --browser
 								</code>
 							</div>
@@ -669,19 +709,21 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 						{activeAgentTab === "mcp" && (
 							<div className="relative rounded-xl border border-stroke-soft-100 bg-zinc-950 p-3.5 dark:border-white/5">
 								<div className="flex items-center justify-between pb-1.5">
-									<span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
+									<span className="font-mono text-[10px] text-zinc-500 uppercase tracking-wider">
 										Claude Desktop Config
 									</span>
 									<button
 										type="button"
-										onClick={() => handleCopy(mcpConfigText, "MCP configuration")}
+										onClick={() =>
+											handleCopy(mcpConfigText, "MCP configuration")
+										}
 										className="text-zinc-400 hover:text-white"
 										title="Copy config JSON"
 									>
 										<Copy className="h-3.5 w-3.5" />
 									</button>
 								</div>
-								<pre className="font-mono text-[10px] text-zinc-300 block select-all overflow-x-auto scrollbar-hide max-h-[120px]">
+								<pre className="scrollbar-hide block max-h-[120px] select-all overflow-x-auto font-mono text-[10px] text-zinc-300">
 									{mcpConfigText}
 								</pre>
 							</div>
@@ -693,22 +735,24 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 			{/* Bottom Grid: SDKs/Integrations and Example Projects */}
 			<div className="grid gap-6 md:grid-cols-2">
 				{/* Supported SDKs */}
-				<div className="rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.01] space-y-4">
+				<div className="space-y-4 rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.01]">
 					<div>
 						<h3 className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							SDKs & Libraries
 						</h3>
-						<p className="text-xs text-text-sub-600 dark:text-white/50 mt-0.5">
+						<p className="mt-0.5 text-text-sub-600 text-xs dark:text-white/50">
 							Click any language to copy its package installation command
 						</p>
 					</div>
 
-					<div className="grid gap-2 grid-cols-2 sm:grid-cols-3">
+					<div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
 						{sdkLanguages.map((lang) => (
 							<button
 								key={lang.name}
 								type="button"
-								onClick={() => handleCopy(lang.command, `${lang.name} SDK install command`)}
+								onClick={() =>
+									handleCopy(lang.command, `${lang.name} SDK install command`)
+								}
 								className="flex items-center gap-2 rounded-lg border border-stroke-soft-100 bg-white/40 p-2.5 text-left transition-colors hover:bg-bg-weak-50 dark:border-white/5 dark:bg-white/[0.01] dark:hover:bg-white/5"
 							>
 								<div
@@ -726,7 +770,7 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 										<path d={lang.icon.path} />
 									</svg>
 								</div>
-								<span className="text-xs font-semibold text-text-strong-950 dark:text-white truncate">
+								<span className="truncate font-semibold text-text-strong-950 text-xs dark:text-white">
 									{lang.name}
 								</span>
 							</button>
@@ -735,12 +779,12 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 				</div>
 
 				{/* Framework Integrations */}
-				<div className="rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.01] space-y-4">
+				<div className="space-y-4 rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.01]">
 					<div>
 						<h3 className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							Framework Integrations
 						</h3>
-						<p className="text-xs text-text-sub-600 dark:text-white/50 mt-0.5">
+						<p className="mt-0.5 text-text-sub-600 text-xs dark:text-white/50">
 							Boilerplates and integration templates for Node.js
 						</p>
 					</div>
@@ -749,7 +793,7 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 						{frameworkIntegrations.map((item) => (
 							<div
 								key={item.name}
-								className="group flex items-start gap-3 rounded-lg border border-stroke-soft-100 bg-white/40 p-3 transition-colors hover:bg-bg-weak-50 dark:border-white/5 dark:bg-white/[0.01] dark:hover:bg-white/5 cursor-pointer"
+								className="group flex cursor-pointer items-start gap-3 rounded-lg border border-stroke-soft-100 bg-white/40 p-3 transition-colors hover:bg-bg-weak-50 dark:border-white/5 dark:bg-white/[0.01] dark:hover:bg-white/5"
 							>
 								<div
 									className="flex h-8 w-8 shrink-0 items-center justify-center rounded transition-colors"
@@ -766,15 +810,15 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 										<path d={item.icon.path} />
 									</svg>
 								</div>
-								
-								<div className="flex-1 min-w-0 space-y-0.5">
+
+								<div className="min-w-0 flex-1 space-y-0.5">
 									<div className="flex items-center justify-between gap-2">
-										<span className="text-xs font-semibold text-text-strong-950 dark:text-white group-hover:underline">
+										<span className="font-semibold text-text-strong-950 text-xs group-hover:underline dark:text-white">
 											{item.name}
 										</span>
-										<ArrowRight className="h-3 w-3 text-text-sub-400 group-hover:text-text-strong-950 transition-colors opacity-0 group-hover:opacity-100" />
+										<ArrowRight className="h-3 w-3 text-text-sub-400 opacity-0 transition-colors group-hover:text-text-strong-950 group-hover:opacity-100" />
 									</div>
-									<p className="text-[11px] text-text-sub-600 dark:text-white/50 leading-relaxed">
+									<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/50">
 										{item.desc}
 									</p>
 								</div>

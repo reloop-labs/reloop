@@ -9,10 +9,12 @@ import {
 	Globe,
 	KeyRound,
 	Lightbulb,
+	Send,
 	Sparkles,
 	Terminal,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import type { SimpleIcon } from "simple-icons";
 import { siGo, siNodedotjs, siPhp, siPython, siRuby } from "simple-icons";
@@ -46,6 +48,7 @@ export interface SetupWizardProps {
 	firstName: string;
 	domains: DomainData[];
 	primaryApiKey: ApiKeyData | undefined;
+	userEmail?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -305,13 +308,19 @@ export function SetupWizard({
 	firstName,
 	domains,
 	primaryApiKey,
+	userEmail = "",
 }: SetupWizardProps) {
+	const router = useRouter();
+	const testRecipient = userEmail;
+	const [isSendingTest, setIsSendingTest] = useState(false);
+	const [step4Done, setStep4Done] = useState(false);
+
 	const [activeLang, setActiveLang] = useState<LangId>("nodejs");
 	const [activeTab, setActiveTab] = useState<"prompt" | "code">("prompt");
 
 	// Derived state
-	const hasDomain = domains.length > 0;
-	const primaryDomainName = domains[0]?.domainName || "mycompany.com";
+	const primaryDomain = domains[0];
+	const primaryDomainName = primaryDomain?.domainName || "mycompany.com";
 	const hasApiKey = !!primaryApiKey;
 
 	const displayPrefix = primaryApiKey?.start || "rl_live";
@@ -319,14 +328,59 @@ export function SetupWizard({
 
 	// Steps completion
 	const step1Done = true; // account always created if on dashboard
-	const step2Done = hasDomain;
+	const step2Done = primaryDomain?.status === "active";
 	const step3Done = hasApiKey;
-	const completedCount = [step1Done, step2Done, step3Done].filter(
+	const completedCount = [step1Done, step2Done, step3Done, step4Done].filter(
 		Boolean,
 	).length;
-	const stepsLeft = 3 - completedCount;
+	const stepsLeft = 4 - completedCount;
 
 	const greeting = useMemo(() => getGreeting(), []);
+
+	const handleSendTestEmail = async () => {
+		if (!testRecipient) {
+			toast.error("Please enter a recipient email address");
+			return;
+		}
+
+		setIsSendingTest(true);
+
+		try {
+			const response = await fetch("/api/mail/v1/send", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					from: `test@${primaryDomainName}`,
+					to: testRecipient,
+					subject: "Reloop Integration Test Email",
+					html: "<p>Hello from Reloop! If you are reading this email, your domain integration is working perfectly.</p>",
+				}),
+				credentials: "include",
+			});
+
+			if (!response.ok) {
+				const result = await response.json().catch(() => ({}));
+				throw new Error(result.why || result.message || "Failed to send email");
+			}
+
+			toast.success("Test email sent successfully!");
+			setStep4Done(true);
+
+			// Refresh page after a brief delay so the operational dashboard loads
+			setTimeout(() => {
+				router.refresh();
+			}, 1500);
+		} catch (error: unknown) {
+			console.error("Error sending test email:", error);
+			const message =
+				error instanceof Error ? error.message : "Failed to send test email";
+			toast.error(message);
+		} finally {
+			setIsSendingTest(false);
+		}
+	};
 
 	// Build playground contents
 	const aiPrompt = useMemo(
@@ -411,27 +465,27 @@ export function SetupWizard({
 										fill="transparent"
 										strokeDasharray={2 * Math.PI * 22}
 										strokeDashoffset={
-											2 * Math.PI * 22 * (1 - completedCount / 3)
+											2 * Math.PI * 22 * (1 - completedCount / 4)
 										}
 										strokeLinecap="round"
 										className="transition-all duration-700 ease-out"
 									/>
 								</svg>
 								<span className="absolute font-bold text-[11px] text-text-strong-950 dark:text-white">
-									{completedCount}/3
+									{completedCount}/4
 								</span>
 							</div>
 						</div>
 
 						{/* Checklist Rows with custom interactive states */}
-						<div className="relative mt-8 space-y-6 pl-6 before:absolute before:top-2 before:bottom-2 before:left-[11px] before:w-[2px] before:bg-stroke-soft-100 dark:before:bg-white/[0.04]">
+						<div className="relative mt-8 space-y-8 pl-6 before:absolute before:top-2 before:bottom-2 before:left-[11px] before:w-[2px] before:bg-stroke-soft-100 dark:before:bg-white/[0.04]">
 							{/* Step 1: Account (Always done) */}
 							<div className="group relative">
 								<div className="-left-[21px] absolute top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-white">
 									<Check className="h-2.5 w-2.5" strokeWidth={4} />
 								</div>
 
-								<div className="flex flex-col">
+								<div className="flex flex-col pl-3.5">
 									<span className="font-semibold text-sm text-text-strong-950/50 line-through decoration-text-sub-600/20 dark:text-white/40">
 										Create your account
 									</span>
@@ -458,10 +512,10 @@ export function SetupWizard({
 								</div>
 
 								<div
-									className={`flex flex-col rounded-xl border p-3.5 transition-all ${
+									className={`flex flex-col transition-all duration-300 ${
 										step2Done
-											? "border-transparent bg-transparent"
-											: "border-[#d97757]/20 bg-[#d97757]/[0.02] dark:bg-[#d97757]/[0.01]"
+											? "pl-3.5"
+											: "rounded-xl border border-[#d97757]/20 bg-[#d97757]/[0.02] p-3.5 dark:bg-[#d97757]/[0.01]"
 									}`}
 								>
 									<div className="flex items-center justify-between gap-2">
@@ -474,7 +528,13 @@ export function SetupWizard({
 										>
 											Add sending domain
 										</span>
-										{!step2Done && (
+										{primaryDomain ? (
+											!step2Done && (
+												<span className="shrink-0 rounded-full border border-amber-200/50 bg-amber-500/10 px-2 py-0.5 font-semibold text-[10px] text-amber-600 capitalize dark:text-amber-400">
+													{primaryDomain.status}
+												</span>
+											)
+										) : (
 											<span className="shrink-0 rounded-full border border-red-200/50 bg-red-500/10 px-2 py-0.5 font-semibold text-[10px] text-red-600 dark:text-red-400">
 												Required
 											</span>
@@ -489,15 +549,21 @@ export function SetupWizard({
 									>
 										{step2Done
 											? `${primaryDomainName} verified`
-											: "Verify a domain to send emails from your own address"}
+											: primaryDomain
+												? `Configure DNS settings to verify ${primaryDomainName}`
+												: "Verify a domain to send emails from your own address"}
 									</span>
 
 									{!step2Done && (
 										<Link
-											href="/domain/add"
+											href={
+												primaryDomain
+													? `/domain/${primaryDomain.id}`
+													: "/domain/add"
+											}
 											className="mt-3.5 inline-flex items-center justify-center gap-1.5 self-start rounded-lg bg-text-strong-950 px-4.5 py-2 font-semibold text-white text-xs transition-all hover:opacity-90 active:scale-95 dark:bg-white dark:text-black"
 										>
-											Add domain
+											{primaryDomain ? "Verify domain" : "Add domain"}
 											<ArrowRight className="h-3 w-3" />
 										</Link>
 									)}
@@ -523,12 +589,12 @@ export function SetupWizard({
 								</div>
 
 								<div
-									className={`flex flex-col rounded-xl border p-3.5 transition-all ${
+									className={`flex flex-col transition-all duration-300 ${
 										step3Done
-											? "border-transparent bg-transparent"
-											: !step2Done
-												? "pointer-events-none border-transparent opacity-50"
-												: "border-[#d97757]/20 bg-[#d97757]/[0.02] dark:bg-[#d97757]/[0.01]"
+											? "pl-3.5"
+											: step2Done
+												? "rounded-xl border border-[#d97757]/20 bg-[#d97757]/[0.02] p-3.5 dark:bg-[#d97757]/[0.01]"
+												: "pointer-events-none pl-3.5 opacity-50"
 									}`}
 								>
 									<div className="flex items-center justify-between gap-2">
@@ -579,6 +645,81 @@ export function SetupWizard({
 											Generate API Key
 											<ArrowRight className="h-3 w-3" />
 										</Link>
+									)}
+								</div>
+							</div>
+
+							{/* Step 4: Send test email */}
+							<div className="group relative">
+								<div
+									className={`-left-[21px] absolute top-1.5 flex h-4 w-4 items-center justify-center rounded-full transition-all duration-300 ${
+										step4Done
+											? "bg-emerald-500 text-white"
+											: step3Done && step2Done
+												? "bg-[#d97757] text-white ring-4 ring-[#d97757]/20"
+												: "bg-stroke-soft-100 text-text-disabled-300 dark:bg-white/[0.04]"
+									}`}
+								>
+									{step4Done ? (
+										<Check className="h-2.5 w-2.5" strokeWidth={4} />
+									) : (
+										<Send className="h-2 w-2" />
+									)}
+								</div>
+
+								<div
+									className={`flex flex-col transition-all duration-300 ${
+										step4Done
+											? "pl-3.5"
+											: (step3Done && step2Done)
+												? "rounded-xl border border-[#d97757]/20 bg-[#d97757]/[0.02] p-3.5 dark:bg-[#d97757]/[0.01]"
+												: "pointer-events-none pl-3.5 opacity-50"
+									}`}
+								>
+									<div className="flex items-center justify-between gap-2">
+										<span
+											className={`font-semibold text-sm ${
+												step4Done
+													? "text-text-strong-950/50 line-through decoration-text-sub-600/20 dark:text-white/40"
+													: "text-text-strong-950 dark:text-white"
+											}`}
+										>
+											Send your first email
+										</span>
+									</div>
+									<span
+										className={`mt-1 text-xs ${
+											step4Done
+												? "text-text-sub-600/60 dark:text-white/30"
+												: "text-text-sub-600 dark:text-white/50"
+										}`}
+									>
+										{step4Done
+											? "First email sent successfully!"
+											: "Verify sending works by sending a test email"}
+									</span>
+
+									{!step4Done && step3Done && step2Done && (
+										<div className="mt-3.5 flex flex-col gap-2">
+											<div className="flex gap-2">
+												<input
+													type="email"
+													disabled
+													placeholder="recipient@example.com"
+													value={testRecipient}
+													className="flex-1 cursor-not-allowed rounded-lg border border-stroke-soft-100 bg-bg-weak-50/50 px-3 py-1.5 text-text-sub-600 text-xs focus:outline-none dark:border-white/[0.06] dark:bg-zinc-900/50 dark:text-white/60"
+												/>
+												<button
+													type="button"
+													disabled={isSendingTest || !testRecipient}
+													onClick={handleSendTestEmail}
+													className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-text-strong-950 px-4 py-2 font-semibold text-white text-xs transition-all hover:opacity-90 active:scale-95 disabled:opacity-50 dark:bg-white dark:text-black"
+												>
+													{isSendingTest ? "Sending..." : "Send Email"}
+													<ArrowRight className="h-3 w-3" />
+												</button>
+											</div>
+										</div>
 									)}
 								</div>
 							</div>
