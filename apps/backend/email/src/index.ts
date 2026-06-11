@@ -32,9 +32,14 @@ initLogger({
 		: undefined,
 });
 
+if (emailConfig.NODE_ENV !== "production") {
+	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
+
 import { agentCardRoute } from "@reloop/email/routes/landing/agent-card.route";
 import { healthRoute } from "@reloop/email/routes/landing/health.route";
 import { landingRoute } from "@reloop/email/routes/landing/landing.route";
+import { onboardingRoute } from "@reloop/email/routes/onboarding/onboarding.route";
 import { loader } from "@reloop/email/utils/loader";
 import { Elysia } from "elysia";
 
@@ -55,6 +60,7 @@ const app = new Elysia({ prefix: "/api/email", name: "Email Service" })
 	.use(landingRoute)
 	.use(healthRoute)
 	.use(agentCardRoute)
+	.use(onboardingRoute)
 	.onStart(async () => {
 		await loader();
 	})

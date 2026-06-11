@@ -417,7 +417,7 @@ export function SetupWizard({
 			}
 
 			// 2. Use the API key to send the test email
-			const response = await fetch("/api/mail/v1/send", {
+			const response = await fetch("/api/email/v1/onboarding/send-test-email", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -426,8 +426,6 @@ export function SetupWizard({
 				body: JSON.stringify({
 					from: `test@${primaryDomainName}`,
 					to: testRecipient,
-					subject: "Reloop Integration Test Email",
-					html: "<p>Hello from Reloop! If you are reading this email, your domain integration is working perfectly.</p>",
 				}),
 				credentials: "include",
 			});
