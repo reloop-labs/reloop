@@ -157,7 +157,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 				: "No messages in this filter";
 
 	return (
-		<div className="flex h-[calc(100vh-80px)] flex-col overflow-hidden pb-6">
+		<div className="flex h-[calc(100vh-54px)] flex-col overflow-hidden pb-0">
 			{/* Page Top Bar */}
 			<div className="flex shrink-0 items-center justify-between border-stroke-soft-100 border-b px-4 pt-2 pb-2 dark:border-stroke-soft-100/40">
 				<div className="flex items-center gap-3">
@@ -205,20 +205,20 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 				activeFilter={activeFilter}
 				onFilterChange={setActiveFilter}
 				counts={filterCounts}
-				className="px-4 pt-2"
+				className="pt-2"
 			/>
 
 			{/* Multi-pane side-by-side Split Layout */}
-			<div className="mt-2 flex min-h-0 flex-1 gap-6 px-4">
+			<div className="flex min-h-0 flex-1 gap-0">
 				{/* Left Pane: Thread List */}
 				<div
 					className={cn(
-						"min-h-0 min-w-0 shrink-0 flex-col gap-4 md:flex md:w-[380px] lg:w-[440px]",
+						"min-h-0 min-w-0 shrink-0 flex-col pr-4 pl-4 md:flex md:w-[380px] lg:w-[440px]",
 						selectedThreadId ? "hidden md:flex" : "flex flex-1",
 					)}
 				>
 					{/* List Header */}
-					<div className="flex items-center gap-3 pt-2 pb-2">
+					<div className="flex items-center gap-3 pt-4 pb-4">
 						<div className="flex-1">
 							<Input.Root size="xsmall" className="rounded-[10px]">
 								<Input.Wrapper>
@@ -234,7 +234,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 					</div>
 
 					{/* Thread List Container */}
-					<div className="min-h-0 flex-1">
+					<div className="scrollbar-hide min-h-0 flex-1">
 						<ThreadList
 							threads={filteredThreads}
 							selectedId={selectedThreadId}
@@ -252,7 +252,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 				{/* Right Pane: Thread Detail View */}
 				<div
 					className={cn(
-						"min-w-0 flex-1 rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5",
+						"min-w-0 flex-1 border-stroke-soft-100 border-l bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5",
 						selectedThreadId ? "flex flex-col" : "hidden md:flex md:flex-col",
 					)}
 				>

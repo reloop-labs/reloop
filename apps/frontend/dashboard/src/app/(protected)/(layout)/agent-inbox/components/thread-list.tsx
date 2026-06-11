@@ -140,7 +140,7 @@ export const ThreadList = ({
 
 	if (threads.length === 0) {
 		return (
-			<div className="min-h-0 flex-1 overflow-y-auto">
+			<div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
 				<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
 					<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
 						<Icon
@@ -171,8 +171,8 @@ export const ThreadList = ({
 	}
 
 	return (
-		<div className="flex h-full w-full flex-col overflow-hidden text-paragraph-sm">
-			<div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
+		<div className="scrollbar-hide flex h-full w-full flex-col overflow-hidden text-paragraph-sm">
+			<div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-4">
 				{groups.map((group) => {
 					const isCollapsed = collapsedGroups[group.key];
 					return (
