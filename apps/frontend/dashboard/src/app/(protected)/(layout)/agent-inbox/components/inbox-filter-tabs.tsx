@@ -105,7 +105,7 @@ export const InboxFilterTabs = ({
 		>
 			<TabMenuHorizontal.List
 				className={cn(
-					"relative h-10 gap-0 border-b! py-0 px-4",
+					"relative h-10 gap-0 border-b! px-4 py-0",
 					activeFilter === "primary"
 						? "[&>div:last-child]:bg-blue-600 dark:[&>div:last-child]:bg-blue-500"
 						: "[&>div:last-child]:bg-error-base dark:[&>div:last-child]:bg-red-500",

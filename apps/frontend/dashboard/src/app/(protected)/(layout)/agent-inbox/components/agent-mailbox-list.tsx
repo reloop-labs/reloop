@@ -9,6 +9,7 @@ import {
 	Root as PopoverRoot,
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
+import { Skeleton } from "@reloop/ui/skeleton";
 import axios from "axios";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -157,7 +158,7 @@ const AgentMailboxActionsDropdown = ({
 
 export const AgentMailboxList = () => {
 	const router = useRouter();
-	const { mailboxes, threads, refresh } = useAgentInbox();
+	const { mailboxes, threads, refresh, isLoadingMailboxes } = useAgentInbox();
 	const [setupOpen, setSetupOpen] = useState(false);
 	const [addOpen, setAddOpen] = useState(false);
 
@@ -249,7 +250,25 @@ export const AgentMailboxList = () => {
 
 				{/* Table Body */}
 				<div className="mb-16 divide-y divide-stroke-soft-100 overflow-hidden rounded-b-xl border-stroke-soft-100 border-r border-b border-l bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
-					{mailboxes.length === 0 ? (
+					{isLoadingMailboxes ? (
+						[1, 2, 3].map((i) => (
+							<div key={i} className={cn(gridClass, "animate-pulse py-3.5")}>
+								<div className="flex items-start gap-2">
+									<div className="mt-0.5 h-5 w-5 shrink-0 rounded bg-bg-weak-50/50 dark:bg-white/5" />
+									<div className="flex flex-col gap-1.5">
+										<Skeleton className="h-4 w-48 rounded" />
+										<Skeleton className="h-3 w-32 rounded" />
+									</div>
+								</div>
+								<div className="flex items-center">
+									<Skeleton className="h-4 w-16 rounded" />
+								</div>
+								<div className="flex items-center justify-end">
+									<Skeleton className="h-4 w-4 rounded" />
+								</div>
+							</div>
+						))
+					) : mailboxes.length === 0 ? (
 						<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
 							<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
 								<Icon name="inbox" className="h-5 w-5 text-text-sub-600" />
