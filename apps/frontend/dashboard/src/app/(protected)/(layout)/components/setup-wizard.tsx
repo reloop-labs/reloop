@@ -318,13 +318,55 @@ export function SetupWizard({
 	const [activeLang, setActiveLang] = useState<LangId>("nodejs");
 	const [activeTab, setActiveTab] = useState<"prompt" | "code">("prompt");
 
+	const [generatedApiKey, setGeneratedApiKey] = useState<string | null>(null);
+	const [isGeneratingKey, setIsGeneratingKey] = useState(false);
+
+	const handleGenerateApiKey = async () => {
+		if (isGeneratingKey) return;
+		setIsGeneratingKey(true);
+
+		try {
+			const response = await fetch("/api/api-key/v1/", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					name: "Setup Wizard Key",
+				}),
+				credentials: "include",
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json().catch(() => ({}));
+				throw new Error(
+					errorData.why || errorData.message || "Failed to generate API key.",
+				);
+			}
+
+			const data = await response.json();
+			setGeneratedApiKey(data.key);
+			toast.success("API key generated successfully!");
+			router.refresh();
+		} catch (error: unknown) {
+			console.error("Error generating API key:", error);
+			const message =
+				error instanceof Error ? error.message : "Failed to generate API key";
+			toast.error(message);
+		} finally {
+			setIsGeneratingKey(false);
+		}
+	};
+
 	// Derived state
 	const primaryDomain = domains[0];
 	const primaryDomainName = primaryDomain?.domain || "mycompany.com";
-	const hasApiKey = !!primaryApiKey;
+	const hasApiKey = !!primaryApiKey || !!generatedApiKey;
 
-	const displayPrefix = primaryApiKey?.start || "rl_live";
-	const maskedKey = `${displayPrefix}_••••••••••`;
+	const displayPrefix = generatedApiKey
+		? generatedApiKey.split("_").slice(0, 2).join("_")
+		: primaryApiKey?.start || "rl_live";
+	const maskedKey = generatedApiKey || `${displayPrefix}_••••••••••`;
 
 	// Steps completion
 	const step1Done = true; // account always created if on dashboard
@@ -346,36 +388,40 @@ export function SetupWizard({
 		setIsSendingTest(true);
 
 		try {
-			// 1. Generate a new API key on the fly for sending the email
-			const apiKeyRes = await fetch("/api/api-key/v1/", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					name: "Setup Wizard Test Key",
-				}),
-				credentials: "include",
-			});
+			let cleartextApiKey = generatedApiKey;
 
-			if (!apiKeyRes.ok) {
-				const errorData = await apiKeyRes.json().catch(() => ({}));
-				throw new Error(
-					errorData.why ||
-						errorData.message ||
-						"Failed to generate API key for sending.",
-				);
+			if (!cleartextApiKey) {
+				// 1. Generate a new API key on the fly for sending the email
+				const apiKeyRes = await fetch("/api/api-key/v1/", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						name: "Setup Wizard Test Key",
+					}),
+					credentials: "include",
+				});
+
+				if (!apiKeyRes.ok) {
+					const errorData = await apiKeyRes.json().catch(() => ({}));
+					throw new Error(
+						errorData.why ||
+							errorData.message ||
+							"Failed to generate API key for sending.",
+					);
+				}
+
+				const apiKeyData = await apiKeyRes.json();
+				cleartextApiKey = apiKeyData.key;
 			}
 
-			const apiKeyData = await apiKeyRes.json();
-			const cleartextApiKey = apiKeyData.key;
-
-			// 2. Use the newly generated API key to send the test email
+			// 2. Use the API key to send the test email
 			const response = await fetch("/api/mail/v1/send", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					"x-api-key": cleartextApiKey,
+					...(cleartextApiKey ? { "x-api-key": cleartextApiKey } : {}),
 				},
 				body: JSON.stringify({
 					from: `test@${primaryDomainName}`,
@@ -664,13 +710,15 @@ export function SetupWizard({
 									)}
 
 									{!step3Done && step2Done && (
-										<Link
-											href="/api-keys"
-											className="mt-3.5 inline-flex items-center justify-center gap-1.5 self-start rounded-lg bg-text-strong-950 px-4.5 py-2 font-semibold text-white text-xs transition-all hover:opacity-90 active:scale-95 dark:bg-white dark:text-black"
+										<button
+											type="button"
+											onClick={handleGenerateApiKey}
+											disabled={isGeneratingKey}
+											className="mt-3.5 inline-flex items-center justify-center gap-1.5 self-start rounded-lg bg-text-strong-950 px-4.5 py-2 font-semibold text-white text-xs transition-all hover:opacity-90 active:scale-95 disabled:pointer-events-none disabled:opacity-50 dark:bg-white dark:text-black"
 										>
-											Generate API Key
+											{isGeneratingKey ? "Generating..." : "Generate API Key"}
 											<ArrowRight className="h-3 w-3" />
-										</Link>
+										</button>
 									)}
 								</div>
 							</div>
