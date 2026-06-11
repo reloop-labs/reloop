@@ -146,6 +146,7 @@ const EyeDropperButton = React.forwardRef<
 
 	return (
 		<button
+			type="button"
 			ref={forwardedRef}
 			aria-label="Eye dropper"
 			onClick={() => {

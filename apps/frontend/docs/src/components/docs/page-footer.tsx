@@ -24,6 +24,7 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 				</p>
 				<div className="flex items-center gap-3">
 					<button
+						type="button"
 						onClick={() => setFeedback("yes")}
 						className={cn(
 							"flex items-center gap-2 rounded-full border border-stroke-soft-100 px-5 py-2 font-medium text-[14px] transition-all hover:bg-bg-weak-50/50",
@@ -35,6 +36,7 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 						Yes
 					</button>
 					<button
+						type="button"
 						onClick={() => setFeedback("no")}
 						className={cn(
 							"flex items-center gap-2 rounded-full border border-stroke-soft-100 px-5 py-2 font-medium text-[14px] transition-all hover:bg-bg-weak-50/50",

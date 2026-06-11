@@ -193,13 +193,6 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 					>
 						<Icon name="notification-indicator" className="h-4 w-4" />
 					</button>
-					<button
-						type="button"
-						title="More options"
-						className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
-					>
-						<Icon name="dots" className="h-4 w-4" />
-					</button>
 				</div>
 			</div>
 
