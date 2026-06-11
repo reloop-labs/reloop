@@ -18,7 +18,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { AddAgentAddressModal } from "./add-agent-address-modal";
 import { useAgentInbox } from "./agent-inbox-provider";
-import { SetupWebhookModal } from "./setup-webhook-modal";
+import { AgentInboxEmptyState } from "./empty-state";
 
 dayjs.extend(relativeTime);
 
@@ -159,7 +159,6 @@ const AgentMailboxActionsDropdown = ({
 export const AgentMailboxList = () => {
 	const router = useRouter();
 	const { mailboxes, threads, refresh, isLoadingMailboxes } = useAgentInbox();
-	const [setupOpen, setSetupOpen] = useState(false);
 	const [addOpen, setAddOpen] = useState(false);
 
 	const [togglingId, setTogglingId] = useState<string | null>(null);
@@ -207,26 +206,15 @@ export const AgentMailboxList = () => {
 		<div className="mx-auto max-w-3xl sm:px-8">
 			<div className="flex items-center justify-between pt-6 pb-4">
 				<h1 className="font-medium text-2xl">Agent Inbox</h1>
-				<div className="flex items-center gap-2">
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						onClick={() => setSetupOpen(true)}
-					>
-						<Icon name="webhook" className="h-4 w-4" />
-						Setup webhook
-					</Button.Root>
-					<Button.Root
-						variant="neutral"
-						size="xsmall"
-						onClick={() => setAddOpen(true)}
-						className="gap-1.5"
-					>
-						<Icon name="plus" className="h-4 w-4" />
-						Add agent address
-					</Button.Root>
-				</div>
+				<Button.Root
+					variant="neutral"
+					size="xsmall"
+					onClick={() => setAddOpen(true)}
+					className="gap-1.5"
+				>
+					<Icon name="plus" className="h-4 w-4" />
+					Add agent address
+				</Button.Root>
 			</div>
 
 			<div className="w-full text-paragraph-sm">
@@ -269,39 +257,7 @@ export const AgentMailboxList = () => {
 							</div>
 						))
 					) : mailboxes.length === 0 ? (
-						<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
-							<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
-								<Icon name="inbox" className="h-5 w-5 text-text-sub-600" />
-							</div>
-							<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
-								No agent addresses yet
-							</h3>
-							<p className="mx-auto mb-6 max-w-[300px] text-balance font-medium text-[12px] text-text-sub-600">
-								Create a dedicated inbox address for each AI agent so inbound
-								mail is easy to find and route.
-							</p>
-							<div className="flex items-center gap-3">
-								<Button.Root
-									variant="neutral"
-									mode="stroke"
-									size="xsmall"
-									onClick={() => setSetupOpen(true)}
-									className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
-								>
-									<Icon name="webhook" className="h-4 w-4" />
-									Setup webhook
-								</Button.Root>
-								<Button.Root
-									variant="neutral"
-									size="xsmall"
-									onClick={() => setAddOpen(true)}
-									className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
-								>
-									<Icon name="plus" className="h-4 w-4" />
-									Add agent address
-								</Button.Root>
-							</div>
-						</div>
+						<AgentInboxEmptyState onAddClick={() => setAddOpen(true)} />
 					) : (
 						mailboxes.map((mailbox) => {
 							const mThreads = threads.filter(
@@ -390,7 +346,6 @@ export const AgentMailboxList = () => {
 				</div>
 			</div>
 
-			<SetupWebhookModal open={setupOpen} onOpenChange={setSetupOpen} />
 			<AddAgentAddressModal open={addOpen} onOpenChange={setAddOpen} />
 		</div>
 	);
