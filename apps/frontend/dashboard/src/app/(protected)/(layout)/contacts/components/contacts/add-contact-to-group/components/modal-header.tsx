@@ -1,6 +1,5 @@
 "use client";
 
-import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 
 export const ModalHeader = ({ groupName }: { groupName: string }) => (

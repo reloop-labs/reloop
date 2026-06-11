@@ -1,6 +1,5 @@
 import { EmailNode } from "@react-email/editor/core";
 import { mergeAttributes, nodeInputRule, nodePasteRule } from "@tiptap/core";
-import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
 import { AlertTriangle } from "lucide-react";
 import { useParams } from "next/navigation";

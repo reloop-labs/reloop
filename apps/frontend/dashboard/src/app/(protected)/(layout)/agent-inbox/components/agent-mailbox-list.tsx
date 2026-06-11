@@ -177,7 +177,7 @@ export const AgentMailboxList = () => {
 				`Inbox address ${newStatus === "active" ? "enabled" : "disabled"} successfully`,
 			);
 			await refresh();
-		} catch (error) {
+		} catch (_error) {
 			toast.error("Failed to update inbox status");
 		} finally {
 			setTogglingId(null);
@@ -197,7 +197,7 @@ export const AgentMailboxList = () => {
 			await axios.delete(`/api/inbox/v1/mailboxes/${id}`);
 			toast.success("Inbox address deleted successfully");
 			await refresh();
-		} catch (error) {
+		} catch (_error) {
 			toast.error("Failed to delete inbox address");
 		} finally {
 			setDeletingId(null);

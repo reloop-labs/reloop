@@ -13,7 +13,6 @@ import { DateRangeFilter } from "./date-range-filter";
 import { LogDetailPanel } from "./log-detail-panel";
 import { LogDrawer } from "./log-drawer";
 import { LogTable } from "./log-table";
-import { LogsApiDetails } from "./logs-api-details";
 import { StatusFilterDropdown } from "./status-filter-dropdown";
 
 interface LogData {

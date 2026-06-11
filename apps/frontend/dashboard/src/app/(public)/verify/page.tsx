@@ -42,7 +42,7 @@ const AutoLoginPage = () => {
 					setError(error?.message || "Failed to sign in. Please try manually.");
 					setIsVerifying(false);
 				}
-			} catch (err) {
+			} catch (_err) {
 				setError("An unexpected error occurred. Please try again.");
 				setIsVerifying(false);
 			}

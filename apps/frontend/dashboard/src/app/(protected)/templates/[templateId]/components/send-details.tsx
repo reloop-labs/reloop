@@ -128,7 +128,7 @@ export const SendDetails = () => {
 	const parseFromEmail = (input: string | null | undefined) => {
 		if (!input) return "";
 		const match = input.match(/<([^>]+)>/);
-		if (match && match[1]) return match[1].trim();
+		if (match?.[1]) return match[1].trim();
 		return input.trim();
 	};
 

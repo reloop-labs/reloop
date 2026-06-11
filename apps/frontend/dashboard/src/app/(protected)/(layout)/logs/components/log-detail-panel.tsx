@@ -228,7 +228,7 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 		{ revalidateOnFocus: false },
 	);
 
-	const levelConfig = log ? getLevelConfig(log.level) : null;
+	const _levelConfig = log ? getLevelConfig(log.level) : null;
 	const statusProps = log ? getStatusProps(log.status_code) : null;
 	const metadataEntries = log ? Object.entries(log.metadata || {}) : [];
 	const hasRequestDetails =

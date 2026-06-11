@@ -97,7 +97,7 @@ function VariableInspectorCard({ name }: { name: string }) {
 	useEffect(() => {
 		setLocalType(varType);
 		setLocalDefaultValue(defaultValue);
-	}, [name, varType, defaultValue]);
+	}, [varType, defaultValue]);
 
 	const handleSave = async () => {
 		if (!templateId) return;

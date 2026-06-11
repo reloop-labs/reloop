@@ -1,6 +1,5 @@
 "use client";
 
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
@@ -19,7 +18,7 @@ interface ThreadDetailProps {
 	showBack?: boolean;
 }
 
-const MetaRow = ({
+const _MetaRow = ({
 	label,
 	children,
 }: {
@@ -102,6 +101,7 @@ export const ThreadDetail = ({
 									&lt;{thread.from.email}&gt;
 								</span>
 								<button
+									type="button"
 									onClick={() => handlePrototypeAction("Unsubscribe")}
 									className="ml-1 font-medium text-primary-base text-xs hover:underline"
 								>
@@ -126,6 +126,7 @@ export const ThreadDetail = ({
 
 						<div className="flex items-center gap-0.5 text-text-soft-400">
 							<button
+								type="button"
 								onClick={() => handlePrototypeAction("Star message")}
 								className="rounded-lg p-1.5 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/10"
 								title="Star message"
@@ -141,6 +142,7 @@ export const ThreadDetail = ({
 								</svg>
 							</button>
 							<button
+								type="button"
 								onClick={() => handlePrototypeAction("Add reaction")}
 								className="rounded-lg p-1.5 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/10"
 								title="Add reaction"
@@ -161,6 +163,7 @@ export const ThreadDetail = ({
 								</svg>
 							</button>
 							<button
+								type="button"
 								onClick={() => handlePrototypeAction("Reply")}
 								className="rounded-lg p-1.5 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/10"
 								title="Reply"
@@ -179,6 +182,7 @@ export const ThreadDetail = ({
 								</svg>
 							</button>
 							<button
+								type="button"
 								onClick={() => handlePrototypeAction("More actions")}
 								className="rounded-lg p-1.5 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/10"
 								title="More actions"

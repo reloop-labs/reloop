@@ -19,7 +19,7 @@ const WorkflowEditorPage = () => {
 		if (workflow) {
 			setLocalName(workflow.name);
 		}
-	}, [workflow?.id, workflow?.name]);
+	}, [workflow?.id, workflow?.name, workflow]);
 
 	const handleNameChange = useCallback(
 		(name: string) => {

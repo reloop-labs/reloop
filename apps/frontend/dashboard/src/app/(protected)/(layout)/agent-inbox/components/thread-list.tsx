@@ -1,6 +1,5 @@
 "use client";
 
-import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -68,7 +67,7 @@ export const ThreadList = ({
 		Older: false,
 	});
 
-	const toggleGroup = (key: string) => {
+	const _toggleGroup = (key: string) => {
 		setCollapsedGroups((prev) => ({
 			...prev,
 			[key]: !prev[key],
@@ -172,7 +171,7 @@ export const ThreadList = ({
 
 	return (
 		<div className="scrollbar-hide flex h-full w-full flex-col overflow-hidden text-paragraph-sm">
-			<div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-4">
+			<div className="scrollbar-hide flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pb-4">
 				{groups.map((group) => {
 					const isCollapsed = collapsedGroups[group.key];
 					return (
@@ -309,6 +308,7 @@ export const ThreadList = ({
 															{/* Quick actions (visible on hover) */}
 															<div className="invisible flex shrink-0 items-center gap-1 bg-transparent opacity-0 transition-all duration-150 group-hover/card:visible group-hover/card:opacity-100">
 																<button
+																	type="button"
 																	title={
 																		thread.unread
 																			? "Mark as Handled"
@@ -326,6 +326,7 @@ export const ThreadList = ({
 																	/>
 																</button>
 																<button
+																	type="button"
 																	title="Mark as Spam"
 																	onClick={(e) => {
 																		e.stopPropagation();
@@ -339,6 +340,7 @@ export const ThreadList = ({
 																	/>
 																</button>
 																<button
+																	type="button"
 																	title="Delete Message"
 																	onClick={(e) => {
 																		e.stopPropagation();

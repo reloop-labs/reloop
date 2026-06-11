@@ -73,7 +73,7 @@ export function SubscriberBrowserPreview({
 		setChecked(buildInitialStates());
 		setSaved(false);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [publicChannels.map((t) => t.id).join(","), channel.defaultSubscription]);
+	}, [buildInitialStates]);
 
 	const handleUpdate = () => {
 		setSaved(true);

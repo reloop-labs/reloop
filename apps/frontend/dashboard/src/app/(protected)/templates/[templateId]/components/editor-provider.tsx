@@ -215,7 +215,7 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 		setFromEmail("");
 		setReplyTo("");
 		setPreviewText("");
-	}, [roomId, setSubject, setFromEmail, setReplyTo, setPreviewText]);
+	}, [setSubject, setFromEmail, setReplyTo, setPreviewText]);
 
 	/**
 	 * Determine the best source for the subject line.

@@ -52,7 +52,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 	});
 
 	const activeSubInfo = mainNavigation
-		.map((item, mainIndex) => {
+		.map((item, _mainIndex) => {
 			const subIndex = item.items?.findIndex((sub) =>
 				pathWithoutSlug.startsWith(sub.path),
 			);
@@ -76,7 +76,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 		} else {
 			setRect(undefined);
 		}
-	}, [currentEl, isCollapsed, pathname, expandedItems]);
+	}, [currentEl]);
 
 	return (
 		<div

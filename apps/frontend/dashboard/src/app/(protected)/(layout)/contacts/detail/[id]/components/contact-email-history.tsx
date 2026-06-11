@@ -315,7 +315,7 @@ function AvatarNode({ iconKey, isLast }: { iconKey: string; isLast: boolean }) {
 
 // ─── Status pill ─────────────────────────────────────────────────────────────
 
-function StatusPill({ status }: { status: string }) {
+function _StatusPill({ status }: { status: string }) {
 	const pill = STATUS_PILL[status as EmailStatus] ?? STATUS_PILL.pending;
 	return (
 		<span

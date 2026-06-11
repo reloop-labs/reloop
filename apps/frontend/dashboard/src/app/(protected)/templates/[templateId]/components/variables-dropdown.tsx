@@ -1,13 +1,8 @@
 "use client";
 
-import { Braces, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useParams } from "next/navigation";
-import React, {
-	forwardRef,
-	useEffect,
-	useImperativeHandle,
-	useState,
-} from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import useSWR from "swr";
 import { useEditorStore } from "./use-editor-store";
 
@@ -75,7 +70,7 @@ export const VariablesDropdown = forwardRef(
 
 		useEffect(() => {
 			setSelectedIndex(0);
-		}, [props.query, filtered.length]);
+		}, []);
 
 		const selectItem = (index: number) => {
 			if (index < filtered.length) {

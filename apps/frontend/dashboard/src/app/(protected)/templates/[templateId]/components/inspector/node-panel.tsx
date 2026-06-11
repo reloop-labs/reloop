@@ -1,5 +1,4 @@
 import { Inspector } from "@react-email/editor/ui";
-import { Move } from "lucide-react";
 import { ColorRow } from "./color-row";
 import { ImageSrcControl } from "./image-src-control";
 import { PropRow } from "./prop-row";

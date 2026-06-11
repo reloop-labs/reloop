@@ -104,7 +104,7 @@ export const InviteList = () => {
 			}
 			toast.success("Invitation cancelled");
 			mutate();
-		} catch (err) {
+		} catch (_err) {
 			toast.error("Failed to cancel invitation");
 		} finally {
 			setCancellingInvite(null);

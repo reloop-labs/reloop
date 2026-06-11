@@ -23,7 +23,7 @@ export const PageSizeDropdown = ({
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
 	// Use hoverIdx if hovering, otherwise use the selected item's index
-	const selectedIdx = options.findIndex((size) => size === value);
+	const selectedIdx = options.indexOf(value);
 	const activeIdx = hoverIdx !== undefined ? hoverIdx : selectedIdx;
 
 	const currentTab = buttonRefs.current[activeIdx];

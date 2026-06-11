@@ -1,6 +1,5 @@
 "use client";
 
-import type { DomainListResponse } from "@fe/dashboard/types/api.types";
 import {
 	createContext,
 	type ReactNode,

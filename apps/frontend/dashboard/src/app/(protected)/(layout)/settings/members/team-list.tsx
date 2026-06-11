@@ -162,7 +162,7 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 			filteredMembers = filteredMembers.filter(
 				(m) =>
 					m.user.email.toLowerCase().includes(query) ||
-					(m.user.name && m.user.name.toLowerCase().includes(query)),
+					m.user.name?.toLowerCase().includes(query),
 			);
 			filteredInvites = filteredInvites.filter((i) =>
 				i.email.toLowerCase().includes(query),
@@ -212,7 +212,7 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 			}
 			toast.success("Member removed successfully");
 			mutateMembers();
-		} catch (err) {
+		} catch (_err) {
 			toast.error("Failed to remove member");
 		} finally {
 			setRemovingMember(null);
@@ -247,7 +247,7 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 			}
 			toast.success("Invitation cancelled");
 			mutateInvites();
-		} catch (err) {
+		} catch (_err) {
 			toast.error("Failed to cancel invitation");
 		} finally {
 			setCancellingInvite(null);
@@ -272,7 +272,7 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 			}
 			toast.success("Invitation resent successfully");
 			mutateInvites();
-		} catch (err) {
+		} catch (_err) {
 			toast.error("Failed to resend invitation");
 		} finally {
 			setResendingInvite(null);

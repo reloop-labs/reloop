@@ -1,16 +1,5 @@
 import { Inspector } from "@react-email/editor/ui";
-import {
-	AlignCenter,
-	AlignLeft,
-	AlignRight,
-	Bold,
-	Italic,
-	Strikethrough,
-	Type,
-	Underline,
-} from "lucide-react";
 import { ColorRow } from "./color-row";
-import { MarkButton } from "./mark-button";
 import { NumInput } from "./num-input";
 import { PropRow } from "./prop-row";
 import { SectionHeader } from "./section-header";

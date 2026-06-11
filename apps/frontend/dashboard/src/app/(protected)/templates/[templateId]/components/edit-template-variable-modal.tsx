@@ -154,7 +154,7 @@ export const EditTemplateVariableModal = ({
 		handleOpenChange(false);
 	});
 
-	const handleDelete = async () => {
+	const _handleDelete = async () => {
 		if (!variable || !onDelete) return;
 		await onDelete(variable.name);
 		handleOpenChange(false);

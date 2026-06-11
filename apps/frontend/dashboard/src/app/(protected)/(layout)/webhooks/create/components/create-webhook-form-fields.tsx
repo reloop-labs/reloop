@@ -1,7 +1,6 @@
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
-import { AnimatePresence, motion } from "motion/react";
 import type { useCreateWebhookForm } from "./use-create-webhook-form";
 import { WebhookEventInlineSelector } from "./webhook-event-inline-selector";
 

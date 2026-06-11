@@ -1465,7 +1465,7 @@ function parseGlobalStylesFromHtml(html: string) {
 	const styleTags = doc.querySelectorAll("style");
 	let cssString = "";
 	for (const tag of Array.from(styleTags)) {
-		cssString += tag.textContent + "\n";
+		cssString += `${tag.textContent}\n`;
 	}
 
 	// Rewrite `body` / `html` selectors to target the TipTap root instead.

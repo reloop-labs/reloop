@@ -3,8 +3,6 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import * as Switch from "@reloop/ui/switch";
-import { useRouter } from "next/navigation";
 import { EmptyState } from "../shared/empty-state";
 import { ChannelDropdown } from "./channel-dropdown";
 

@@ -186,7 +186,7 @@ export const PropertyTable = ({
 	onAddProperty,
 }: PropertyTableProps) => {
 	const [, setModal] = useQueryState("modal");
-	const [id, setId] = useQueryState("id");
+	const [_id, setId] = useQueryState("id");
 	const [openPropertyId, setOpenPropertyId] = useState<string | null>(null);
 
 	const handleEdit = (property: Property) => {

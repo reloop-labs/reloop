@@ -1,6 +1,5 @@
 "use client";
 
-import * as Button from "@reloop/ui/button";
 import type { SimpleIcon } from "simple-icons";
 import * as Icons from "simple-icons";
 

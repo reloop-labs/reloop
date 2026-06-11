@@ -117,6 +117,7 @@ export const UserOrganizationProvider = ({
 		invitationsLoading,
 		router,
 		pathname,
+		sessionPending,
 	]);
 
 	useEffect(() => {
@@ -172,6 +173,8 @@ export const UserOrganizationProvider = ({
 		isSettingDefaultOrg,
 		hasInitialized,
 		session?.user?.activeOrganizationId,
+		organizations,
+		activeOrganization,
 	]);
 
 	const contextValue: UserOrganizationContextType = {

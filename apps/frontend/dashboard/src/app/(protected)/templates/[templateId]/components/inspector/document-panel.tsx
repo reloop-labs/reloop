@@ -1,5 +1,4 @@
 import { Inspector } from "@react-email/editor/ui";
-import { FileText } from "lucide-react";
 import { ColorRow } from "./color-row";
 import { NumInput } from "./num-input";
 import { PropRow } from "./prop-row";

@@ -489,7 +489,7 @@ export function VersionSidebar() {
 	};
 
 	// Build last saved status text
-	const getStatusText = () => {
+	const _getStatusText = () => {
 		if (lastSavedAt) {
 			const label = lastSavedDraftNumber
 				? `Draft ${lastSavedDraftNumber}`

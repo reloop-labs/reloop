@@ -3,7 +3,6 @@
 import { FeedbackPopover } from "@fe/dashboard/components/feedback-popover";
 import { mainNavigation, userNavigation } from "@fe/dashboard/constants";
 import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserDropdown } from "./user-dropdown";

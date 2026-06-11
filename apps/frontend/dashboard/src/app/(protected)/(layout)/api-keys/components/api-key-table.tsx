@@ -3,7 +3,6 @@ import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
-import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -13,7 +12,6 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-import * as Tooltip from "@reloop/ui/tooltip";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

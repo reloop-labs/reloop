@@ -13,7 +13,7 @@ export interface WorkflowValidationResult {
 }
 
 const getReachableNodeIds = (
-	nodes: WorkflowNode[],
+	_nodes: WorkflowNode[],
 	edges: Workflow["edges"],
 ): Set<string> => {
 	const adjacency = new Map<string, string[]>();

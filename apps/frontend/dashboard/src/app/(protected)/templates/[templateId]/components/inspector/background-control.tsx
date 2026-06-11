@@ -1,5 +1,4 @@
 import { ColorPicker } from "./color-picker";
-import { TextInput } from "./text-input";
 import { UrlInput } from "./url-input";
 
 export interface BackgroundValue {
@@ -12,7 +11,7 @@ export interface BackgroundValue {
 
 const BG_SIZES = ["auto", "cover", "contain"];
 const BG_REPEATS = ["no-repeat", "repeat", "repeat-x", "repeat-y"];
-const BG_POSITIONS = [
+const _BG_POSITIONS = [
 	"center",
 	"top",
 	"bottom",

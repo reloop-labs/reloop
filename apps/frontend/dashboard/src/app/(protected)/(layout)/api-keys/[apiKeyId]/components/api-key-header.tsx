@@ -62,11 +62,11 @@ interface ApiKeyHeaderProps {
 	onDeleteApiKey?: () => void;
 }
 
-const getStatusColor = (enabled: boolean) => {
+const _getStatusColor = (enabled: boolean) => {
 	return enabled ? "text-success-base" : "text-error-base";
 };
 
-const getStatusIcon = (enabled: boolean) => {
+const _getStatusIcon = (enabled: boolean) => {
 	return enabled ? "check-circle" : "cross-circle";
 };
 

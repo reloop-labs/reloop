@@ -168,7 +168,7 @@ const MetricsPage = () => {
 			chunks.push(datesList.slice(i, i + bucketSize));
 		}
 
-		const chartData = chunks.map((chunk, index) => {
+		const chartData = chunks.map((chunk, _index) => {
 			const startDate = chunk[0];
 			const endDate = chunk[chunk.length - 1];
 

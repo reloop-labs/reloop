@@ -93,7 +93,7 @@ export const InviteForm = () => {
 					`${failCount} invitation${failCount > 1 ? "s" : ""} failed`,
 				);
 			}
-		} catch (error) {
+		} catch (_error) {
 			toast.error("Failed to invite team members");
 		} finally {
 			setLoading(false);

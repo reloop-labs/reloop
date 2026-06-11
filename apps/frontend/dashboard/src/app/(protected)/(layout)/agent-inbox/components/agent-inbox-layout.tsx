@@ -4,10 +4,9 @@ import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-butto
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 import type { AgentMailbox } from "../mock-data";
 import {
@@ -55,7 +54,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 					t.subject.toLowerCase().includes(q) ||
 					t.preview.toLowerCase().includes(q) ||
 					t.from.email.toLowerCase().includes(q) ||
-					(t.from.name && t.from.name.toLowerCase().includes(q)),
+					t.from.name?.toLowerCase().includes(q),
 			);
 		}
 		return result;
@@ -173,6 +172,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 
 				<div className="flex items-center gap-1">
 					<button
+						type="button"
 						onClick={handleRefresh}
 						title="Refresh"
 						className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
@@ -180,18 +180,21 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 						<Icon name="refresh-cw" className="h-4 w-4" />
 					</button>
 					<button
+						type="button"
 						title="Mark all as read"
 						className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
 					>
 						<Icon name="check-circle" className="h-4 w-4" />
 					</button>
 					<button
+						type="button"
 						title="Notifications"
 						className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
 					>
 						<Icon name="notification-indicator" className="h-4 w-4" />
 					</button>
 					<button
+						type="button"
 						title="More options"
 						className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
 					>
@@ -213,7 +216,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 				{/* Left Pane: Thread List */}
 				<div
 					className={cn(
-						"min-h-0 min-w-0 shrink-0 flex-col pr-4 pl-4 md:flex md:w-[380px] lg:w-[440px]",
+						"min-h-0 min-w-0 shrink-0 flex-col pr-4 pl-4 md:flex md:w-[380px] md:flex-none lg:w-[440px]",
 						selectedThreadId ? "hidden md:flex" : "flex flex-1",
 					)}
 				>
@@ -263,6 +266,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 								{/* Left Side Actions */}
 								<div className="flex items-center gap-1 sm:gap-2">
 									<button
+										type="button"
 										onClick={() => setSelectedThreadId("")}
 										className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 md:hidden dark:hover:bg-white/5"
 										title="Back to messages"
@@ -273,6 +277,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 									<div className="mx-1 h-4 w-px bg-stroke-soft-100 md:hidden dark:bg-stroke-soft-100/40" />
 
 									<button
+										type="button"
 										title={
 											selectedThread.unread
 												? "Mark as Handled"
@@ -286,6 +291,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 										<Icon name="check-circle" className="h-4 w-4" />
 									</button>
 									<button
+										type="button"
 										title="Mark as Spam"
 										onClick={() => handleMarkSpam(selectedThread.id)}
 										className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-error-base dark:hover:bg-white/5"
@@ -293,6 +299,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 										<Icon name="cross-circle" className="h-4 w-4" />
 									</button>
 									<button
+										type="button"
 										title="Delete Message"
 										onClick={() => handleDelete(selectedThread.id)}
 										className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-error-base dark:hover:bg-white/5"
@@ -309,6 +316,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 										</span>
 										<div className="flex items-center gap-0.5">
 											<button
+												type="button"
 												disabled={currentIndex === 0}
 												onClick={() =>
 													setSelectedThreadId(
@@ -321,6 +329,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 												<Icon name="chevron-left" className="h-4 w-4" />
 											</button>
 											<button
+												type="button"
 												disabled={
 													currentIndex === threadsForNavigation.length - 1
 												}

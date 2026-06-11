@@ -145,7 +145,7 @@ export function useSelf<T = PresenceUser | null>(
 			return selector ? selector(self) : (self as unknown as T);
 		},
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[awareness?.clientID, selector],
+		[awareness?.clientID, selector, awareness],
 	);
 
 	return useSyncedState(awareness, mapSelector, equalityFn) as

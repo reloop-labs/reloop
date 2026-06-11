@@ -108,7 +108,7 @@ export default function InvitePage() {
 
 			// Force a full page reload to ensure the session and cookies are fresh
 			window.location.href = "/dashboard";
-		} catch (err) {
+		} catch (_err) {
 			toast.error("An unexpected error occurred");
 		} finally {
 			setIsAccepting(false);

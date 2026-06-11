@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
 import type { Contact } from "../types";
 import { getDisplayName, getInitial } from "./utils";
 

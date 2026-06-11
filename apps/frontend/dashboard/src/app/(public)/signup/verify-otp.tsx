@@ -64,7 +64,7 @@ export function VerifyOTP({
 						error?.message || "Invalid verification code. Please try again.",
 				});
 			}
-		} catch (e) {
+		} catch (_e) {
 			changeStatus("idle");
 			setError({
 				name: "email",

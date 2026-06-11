@@ -1,6 +1,6 @@
 "use client";
 import { toast } from "@reloop/ui/toast";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { useState } from "react";
 import { ComposeForm } from "./components/compose-form";

@@ -258,6 +258,7 @@ export function useCollaboration({
 		user.avatar,
 		user.email,
 		serverUser,
+		user,
 	]);
 
 	return {

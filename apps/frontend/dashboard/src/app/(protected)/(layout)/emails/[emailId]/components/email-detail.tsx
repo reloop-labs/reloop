@@ -355,7 +355,7 @@ function IframePreview({ html }: { html: string }) {
 				observer.disconnect();
 			}
 		};
-	}, [html]);
+	}, []);
 
 	return (
 		<iframe

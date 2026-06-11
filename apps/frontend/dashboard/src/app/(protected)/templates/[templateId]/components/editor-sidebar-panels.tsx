@@ -9,11 +9,9 @@ import { useCurrentEditor } from "@tiptap/react";
 import { motion } from "framer-motion";
 import {
 	AlertCircle,
-	Award,
 	Braces,
 	Check,
 	CheckCircle2,
-	ChevronLeft,
 	Copy,
 	Loader2,
 	Pencil,
@@ -689,7 +687,7 @@ export function TestPanel({ onClose }: PanelProps) {
 			}
 			setVariableValues(initialValues);
 		}
-	}, [templateData]);
+	}, [detectedVars, variableValues[v.name]]);
 
 	const handleVariableChange = (name: string, value: string) => {
 		setVariableValues((prev) => ({

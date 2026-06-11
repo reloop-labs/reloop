@@ -1,10 +1,6 @@
 "use client";
 
-import {
-	type MainNavigationItem,
-	mainNavigation,
-	userNavigation,
-} from "@fe/dashboard/constants";
+import { mainNavigation, userNavigation } from "@fe/dashboard/constants";
 import { authClient } from "@reloop/auth/client";
 import { cn } from "@reloop/ui/cn";
 import * as CommandMenu from "@reloop/ui/command";
@@ -311,7 +307,7 @@ export function CommandMenuGlobal() {
 								/>
 								<span className="flex-1 truncate">{item.label}</span>
 								{PAGE_SHORTCUTS[item.path] && (
-									<KbdBadge label={PAGE_SHORTCUTS[item.path]!.label} />
+									<KbdBadge label={PAGE_SHORTCUTS[item.path]?.label} />
 								)}
 							</CommandMenu.Item>
 						))}
@@ -333,7 +329,7 @@ export function CommandMenuGlobal() {
 							/>
 							<span className="flex-1 truncate">{item.label}</span>
 							{PAGE_SHORTCUTS[item.path] && (
-								<KbdBadge label={PAGE_SHORTCUTS[item.path]!.label} />
+								<KbdBadge label={PAGE_SHORTCUTS[item.path]?.label} />
 							)}
 						</CommandMenu.Item>
 					))}

@@ -3,7 +3,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
-import { Skeleton } from "@reloop/ui/skeleton";
 import { useEffect, useState } from "react";
 
 interface Channel {
@@ -85,7 +84,7 @@ export function SubscriberPreview({
 		setChecked(buildInitialStates());
 		setSaved(false);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [channels.map((t) => t.id).join(",")]);
+	}, [buildInitialStates]);
 
 	const handleUpdate = () => {
 		setSaved(true);

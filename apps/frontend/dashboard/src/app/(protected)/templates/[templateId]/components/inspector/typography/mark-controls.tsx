@@ -1,11 +1,9 @@
 import * as ButtonGroup from "@reloop/ui/button-group";
 import {
 	Bold,
-	CaseLower,
 	CaseUpper,
 	Italic,
 	Strikethrough,
-	Type,
 	Underline,
 } from "lucide-react";
 

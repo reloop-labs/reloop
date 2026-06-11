@@ -99,7 +99,7 @@ export function CreateChannelPreview({
 		setChecked(buildInitialStates());
 		setSaved(false);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [previewChannels.map((t) => t.id).join(","), channel.defaultSubscription]);
+	}, [buildInitialStates]);
 
 	const handleUpdate = () => {
 		setSaved(true);

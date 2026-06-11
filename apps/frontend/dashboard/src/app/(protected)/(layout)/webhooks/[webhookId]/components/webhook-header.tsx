@@ -151,7 +151,7 @@ export const WebhookHeader = ({
 			);
 			toast.success("Webhook secret rotated successfully");
 			setIsRotateModalOpen(false);
-		} catch (error) {
+		} catch (_error) {
 			toast.error("Failed to rotate webhook secret");
 		} finally {
 			setIsRotatingSecret(false);
@@ -179,7 +179,7 @@ export const WebhookHeader = ({
 			toast.success(
 				`Webhook ${nextStatus === "active" ? "enabled" : "disabled"} successfully`,
 			);
-		} catch (error) {
+		} catch (_error) {
 			toast.error(
 				`Failed to ${nextStatus === "active" ? "enable" : "disable"} webhook`,
 			);

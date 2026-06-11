@@ -146,7 +146,7 @@ export const EditContactModal = ({
 		if (enrolledChannelIds.length > 0) {
 			setSelectedChannelIds(enrolledChannelIds);
 		}
-	}, [enrolledChannelIds.join(",")]);
+	}, [enrolledChannelIds]);
 
 	// Cmd/Ctrl + Enter to submit
 	useHotkeys(

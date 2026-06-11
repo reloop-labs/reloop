@@ -2,8 +2,8 @@
 
 import type { DNSRecord } from "@fe/dashboard/types/api.types";
 
-const normalizeLabel = (value: string) => value.trim().toLowerCase();
-const RECEIVING_MX_VALUE = "inbound.reloop.sh";
+const _normalizeLabel = (value: string) => value.trim().toLowerCase();
+const _RECEIVING_MX_VALUE = "inbound.reloop.sh";
 
 const isDmarcRecord = (record: DNSRecord) =>
 	record.purpose === "sending" && record.recordTypeName === "DMARC";
