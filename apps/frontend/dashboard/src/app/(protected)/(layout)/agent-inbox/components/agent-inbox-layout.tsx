@@ -6,7 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { parseAsString, useQueryState } from "nuqs";
+import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import type { AgentMailbox } from "../mock-data";
@@ -23,8 +23,14 @@ import { ThreadList } from "./thread-list";
 export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 	const router = useRouter();
 	const mailboxId = mailbox.id;
-	const [activeFilter, setActiveFilter] = useState<InboxFilter>("all");
-	const [searchQuery, setSearchQuery] = useState("");
+	const [activeFilter, setActiveFilter] = useQueryState(
+		"filter",
+		parseAsStringLiteral(["primary", "spam"] as const).withDefault("primary"),
+	);
+	const [searchQuery, setSearchQuery] = useQueryState(
+		"q",
+		parseAsString.withDefault(""),
+	);
 	const [selectedThreadId, setSelectedThreadId] = useQueryState(
 		"thread",
 		parseAsString.withDefault(""),
@@ -56,7 +62,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 	}, [mailboxThreads, activeFilter, searchQuery]);
 
 	const filterCounts = useMemo(() => {
-		const filters: InboxFilter[] = ["all", "spam"];
+		const filters: InboxFilter[] = ["primary", "spam"];
 		return Object.fromEntries(
 			filters.map((f) => [f, countThreadsForFilter(threads, f, mailboxId)]),
 		) as Record<InboxFilter, number>;
@@ -234,9 +240,9 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 							selectedId={selectedThreadId}
 							onSelect={handleSelectThread}
 							emptyMessage={emptyMessage}
-							hasFilters={activeFilter !== "all" || searchQuery !== ""}
+							hasFilters={activeFilter !== "primary" || searchQuery !== ""}
 							onClearFilters={() => {
-								setActiveFilter("all");
+								setActiveFilter("primary");
 								setSearchQuery("");
 							}}
 						/>

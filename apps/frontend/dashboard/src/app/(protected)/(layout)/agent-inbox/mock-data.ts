@@ -5,7 +5,7 @@ export type InboundThreadStatus =
 	| "handled"
 	| "blocked";
 
-export type InboxFilter = "all" | "spam";
+export type InboxFilter = "primary" | "spam";
 
 export type TimelineStepState = "done" | "active" | "pending";
 
@@ -339,7 +339,7 @@ export const inboundThreads: InboundThread[] = [
 ];
 
 export const INBOX_FILTERS: { id: InboxFilter; label: string }[] = [
-	{ id: "all", label: "All" },
+	{ id: "primary", label: "Primary" },
 	{ id: "spam", label: "Spam" },
 ];
 
@@ -348,8 +348,8 @@ export function threadMatchesFilter(
 	filter: InboxFilter,
 ): boolean {
 	switch (filter) {
-		case "all":
-			return true;
+		case "primary":
+			return thread.status !== "blocked";
 		case "spam":
 			return thread.status === "blocked";
 		default:

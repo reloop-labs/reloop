@@ -3,6 +3,8 @@
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
+import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
 import type { InboxFilter } from "../mock-data";
 import { INBOX_FILTERS } from "../mock-data";
@@ -16,7 +18,7 @@ interface InboxFilterTabsProps {
 }
 
 const filterIcons: Record<InboxFilter, string> = {
-	all: "inbox",
+	primary: "inbox",
 	spam: "cross-circle",
 };
 
@@ -28,12 +30,15 @@ export const InboxFilterTabs = ({
 	className,
 }: InboxFilterTabsProps) => {
 	const isVertical = orientation === "vertical";
+	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+	const activeIdx = INBOX_FILTERS.findIndex((f) => f.id === activeFilter);
+	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIdx;
+	const tab = buttonRefs.current[currentIdx];
+	const rect = tab?.getBoundingClientRect();
 
 	if (isVertical) {
-		const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
-		const buttonRefs = useRef<HTMLButtonElement[]>([]);
-
-		const activeIdx = INBOX_FILTERS.findIndex((f) => f.id === activeFilter);
 		const activeEl = buttonRefs.current[activeIdx];
 		const currentEl =
 			hoveredIdx !== undefined ? buttonRefs.current[hoveredIdx] : activeEl;
@@ -65,7 +70,9 @@ export const InboxFilterTabs = ({
 							className={cn(
 								"relative z-10 flex items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-left font-medium text-sm transition-all",
 								isActive
-									? "text-text-strong-950"
+									? filter.id === "primary"
+										? "text-primary-base dark:text-[#5293eb]"
+										: "text-error-base dark:text-red-500"
 									: "text-text-sub-600 hover:text-text-strong-950",
 							)}
 						>
@@ -91,46 +98,123 @@ export const InboxFilterTabs = ({
 	}
 
 	return (
-		<nav
-			className={cn(
-				"flex w-full items-center gap-6 border-stroke-soft-100 border-b dark:border-stroke-soft-100/40",
-				className,
-			)}
-			aria-label="Inbox filters"
+		<TabMenuHorizontal.Root
+			value={activeFilter}
+			onValueChange={(val) => onFilterChange(val as InboxFilter)}
+			className={className}
 		>
-			{INBOX_FILTERS.map((filter) => {
-				const isActive = activeFilter === filter.id;
-				const iconName = filterIcons[filter.id];
-				const count = counts[filter.id];
-				return (
-					<button
-						key={filter.id}
-						type="button"
-						onClick={() => onFilterChange(filter.id)}
-						className={cn(
-							"-mb-[1px] relative flex items-center gap-2 border-b-2 px-1 pt-2 pb-3 font-semibold text-xs transition-colors focus:outline-none",
-							isActive
-								? "border-primary-base text-primary-base dark:text-[#5293eb]"
-								: "border-transparent text-text-sub-600 hover:text-text-strong-950",
-						)}
-					>
-						<Icon name={iconName} className="h-4 w-4" />
-						<span className="capitalize">{filter.label.replace("_", " ")}</span>
-						{count > 0 && (
-							<span
+			<TabMenuHorizontal.List
+				className={cn(
+					"relative h-10 gap-0 border-b! py-0",
+					activeFilter === "primary"
+						? "[&>div:last-child]:bg-primary-base dark:[&>div:last-child]:bg-[#5293eb]"
+						: "[&>div:last-child]:bg-error-base dark:[&>div:last-child]:bg-red-500",
+				)}
+			>
+				{INBOX_FILTERS.map((filter, index) => {
+					const isActive = activeFilter === filter.id;
+					const iconName = filterIcons[filter.id];
+					const count = counts[filter.id];
+					return (
+						<TabMenuHorizontal.Trigger
+							ref={(el) => {
+								if (el) {
+									buttonRefs.current[index] = el;
+								}
+							}}
+							onPointerEnter={() => setHoveredIdx(index)}
+							onPointerLeave={() => setHoveredIdx(undefined)}
+							className={cn(
+								"flex cursor-pointer items-center gap-2 px-2.5 py-0! font-medium text-sm transition-colors",
+								isActive
+									? filter.id === "primary"
+										? "text-primary-base! dark:text-[#5293eb]!"
+										: "text-error-base! dark:text-red-500!"
+									: "text-text-sub-600 hover:text-text-strong-950",
+							)}
+							key={filter.id}
+							value={filter.id}
+							onClick={() => onFilterChange(filter.id)}
+						>
+							<Icon
+								name={iconName}
 								className={cn(
-									"shrink-0 rounded-full px-1.5 py-0.5 font-semibold text-[10px] transition-colors",
+									"h-4 w-4 transition-colors",
 									isActive
-										? "bg-primary-base/10 text-primary-base dark:bg-[#5293eb]/10 dark:text-[#5293eb]"
-										: "bg-bg-weak-50 text-text-soft-400 dark:bg-white/10",
+										? filter.id === "primary"
+											? "text-primary-base dark:text-[#5293eb]"
+											: "text-error-base dark:text-red-500"
+										: "text-text-sub-600",
 								)}
-							>
-								{count}
+							/>
+							<span className="capitalize">
+								{filter.label.replace("_", " ")}
 							</span>
-						)}
-					</button>
-				);
-			})}
-		</nav>
+							{count > 0 && (
+								<span
+									className={cn(
+										"shrink-0 rounded-full px-1.5 py-0.5 font-semibold text-[10px] transition-colors",
+										isActive
+											? filter.id === "primary"
+												? "bg-primary-base/10 text-primary-base dark:bg-[#5293eb]/10 dark:text-[#5293eb]"
+												: "bg-error-base/10 text-error-base dark:bg-red-500/10 dark:text-red-500"
+											: "bg-bg-weak-50 text-text-soft-400 dark:bg-white/10",
+									)}
+								>
+									{count}
+								</span>
+							)}
+						</TabMenuHorizontal.Trigger>
+					);
+				})}
+				<AnimatePresence>
+					{rect && activeIdx !== -1 ? (
+						<motion.div
+							className="absolute top-0 left-0 rounded-lg bg-neutral-alpha-10"
+							initial={{
+								pointerEvents: "none",
+								width: rect.width,
+								height: rect.height - 20,
+								left:
+									rect.left -
+									(tab?.offsetParent?.getBoundingClientRect().left || 0),
+								top:
+									rect.top -
+									(tab?.offsetParent?.getBoundingClientRect().top || 0) +
+									10,
+								opacity: 0,
+							}}
+							animate={{
+								pointerEvents: "none",
+								width: rect.width,
+								height: rect.height - 20,
+								left:
+									rect.left -
+									(tab?.offsetParent?.getBoundingClientRect().left || 0),
+								top:
+									rect.top -
+									(tab?.offsetParent?.getBoundingClientRect().top || 0) +
+									10,
+								opacity: 1,
+							}}
+							exit={{
+								pointerEvents: "none",
+								opacity: 0,
+								width: rect.width,
+								height: rect.height - 20,
+								left:
+									rect.left -
+									(tab?.offsetParent?.getBoundingClientRect().left || 0),
+								top:
+									rect.top -
+									(tab?.offsetParent?.getBoundingClientRect().top || 0) +
+									10,
+							}}
+							transition={{ duration: 0.14 }}
+						/>
+					) : null}
+				</AnimatePresence>
+			</TabMenuHorizontal.List>
+		</TabMenuHorizontal.Root>
 	);
 };
