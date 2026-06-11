@@ -308,9 +308,7 @@ export function CommandMenuGlobal() {
 										className="size-4 text-text-soft-400"
 									/>
 									<span className="flex-1 truncate">{item.label}</span>
-									{shortcut && (
-										<KbdBadge label={shortcut.label} />
-									)}
+									{shortcut && <KbdBadge label={shortcut.label} />}
 								</CommandMenu.Item>
 							);
 						})}
@@ -333,9 +331,7 @@ export function CommandMenuGlobal() {
 									className="size-4"
 								/>
 								<span className="flex-1 truncate">{item.label}</span>
-								{shortcut && (
-									<KbdBadge label={shortcut.label} />
-								)}
+								{shortcut && <KbdBadge label={shortcut.label} />}
 							</CommandMenu.Item>
 						);
 					})}

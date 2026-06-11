@@ -1,16 +1,18 @@
 "use client";
 
+import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import type { DomainListResponse } from "@fe/dashboard/types/api.types";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Modal from "@reloop/ui/modal";
-import * as Select from "@reloop/ui/select";
 import Spinner from "@reloop/ui/spinner";
 import * as Textarea from "@reloop/ui/textarea";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -47,6 +49,13 @@ export const AddAgentAddressModal = ({
 	const router = useRouter();
 	const { addMailbox, mailboxes } = useAgentInbox();
 	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const [isOpen, setIsOpen] = useState(false);
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const currentRect = currentTab?.getBoundingClientRect();
 
 	const { data: domainsData } = useSWR<DomainListResponse>(
 		"/api/domain/v1/list",
@@ -129,7 +138,7 @@ export const AddAgentAddressModal = ({
 									/>
 									<Modal.Title asChild>
 										<h2 className="font-semibold text-label-md text-text-strong-950">
-											Creat Inbox for AI agent
+											Create Inbox for AI agent
 										</h2>
 									</Modal.Title>
 								</div>
@@ -195,29 +204,72 @@ export const AddAgentAddressModal = ({
 										{...form.register("localPart")}
 										disabled={isSubmitting}
 									/>
-									<Select.Root
-										value={form.watch("domain")}
-										onValueChange={(v) => form.setValue("domain", v)}
-										size="xsmall"
-										variant="inline"
-										disabled={isSubmitting}
-									>
-										<Select.Trigger className="font-medium text-text-strong-950">
-											<Select.TriggerIcon
-												as={Icon}
-												name="at-sign"
-												className="h-4 w-4"
-											/>
-											<Select.Value />
-										</Select.Trigger>
-										<Select.Content>
-											{domainsList.map((d) => (
-												<Select.Item key={d.id} value={d.domain}>
-													{d.domain}
-												</Select.Item>
-											))}
-										</Select.Content>
-									</Select.Root>
+									<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
+										<Dropdown.Trigger asChild>
+											<button
+												type="button"
+												disabled={isSubmitting}
+												className="group/trigger flex h-5 min-h-5 w-auto items-center gap-0 rounded-none bg-transparent p-0 font-medium text-text-sub-600 shadow-none outline-none ring-0 hover:bg-transparent hover:text-text-strong-950 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:text-text-strong-950"
+											>
+												<Icon
+													name="at-sign"
+													className="mr-1.5 h-4 w-4 shrink-0 text-text-soft-400 transition duration-200 ease-out group-hover/trigger:text-text-sub-600 group-data-[state=open]/trigger:text-text-sub-600"
+												/>
+												<span className="font-medium text-text-strong-950">
+													{form.watch("domain") || "domain"}
+												</span>
+												<Icon
+													name="chevron-down"
+													className={cn(
+														"ml-0.5 size-5 shrink-0 text-text-sub-600 transition duration-200 ease-out group-hover/trigger:text-text-strong-950 group-data-[state=open]/trigger:rotate-180 group-data-[state=open]/trigger:text-text-strong-950",
+														isOpen && "rotate-180 text-text-strong-950",
+													)}
+												/>
+											</button>
+										</Dropdown.Trigger>
+										<Dropdown.Content align="end" className="w-56 p-2">
+											<div className="relative max-h-80 overflow-y-auto">
+												{domainsList.map((d, idx) => {
+													const isSelected = d.domain === form.watch("domain");
+													return (
+														<button
+															key={d.id}
+															ref={(el) => {
+																if (el) buttonRefs.current[idx] = el;
+															}}
+															type="button"
+															onPointerEnter={() => setHoverIdx(idx)}
+															onPointerLeave={() => setHoverIdx(undefined)}
+															onClick={() => {
+																form.setValue("domain", d.domain);
+																setIsOpen(false);
+															}}
+															className={cn(
+																"flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-colors",
+																"text-text-strong-950",
+																isSelected && "bg-neutral-alpha-10",
+																!currentRect &&
+																	hoverIdx === idx &&
+																	"bg-neutral-alpha-10",
+															)}
+														>
+															<span className="truncate">{d.domain}</span>
+															{isSelected && (
+																<Icon
+																	name="check"
+																	className="h-3.5 w-3.5 text-text-strong-950"
+																/>
+															)}
+														</button>
+													);
+												})}
+												<AnimatedHoverBackground
+													rect={currentRect}
+													tabElement={currentTab}
+												/>
+											</div>
+										</Dropdown.Content>
+									</Dropdown.Root>
 								</Input.Wrapper>
 							</Input.Root>
 							{(form.formState.errors.localPart ||

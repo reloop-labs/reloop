@@ -1,18 +1,19 @@
 "use client";
 
+import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
-import * as Select from "@reloop/ui/select";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -47,6 +48,13 @@ export const AddNewMailboxModal = ({
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [showDetails, setShowDetails] = useState(true);
 	const [showServerDetails, setShowServerDetails] = useState(false);
+	const [isOpen, setIsOpen] = useState(false);
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const currentRect = currentTab?.getBoundingClientRect();
+
 	const form = useForm<MailboxFormValues>({
 		resolver: valibotResolver(mailboxSchema) as Resolver<MailboxFormValues>,
 		defaultValues: {
@@ -64,24 +72,11 @@ export const AddNewMailboxModal = ({
 		{ value: "local.reloop.sh", label: "local.reloop.sh" },
 	];
 
-	// Inline select component for domain dropdown
-	const DomainSelect = () => {
-		return (
-			<Select.Root variant="inline" defaultValue="example.com">
-				<Select.Trigger>
-					<Select.TriggerIcon as={Icon} name="at-sign" className="h-4 w-4" />
-					<Select.Value />
-				</Select.Trigger>
-				<Select.Content>
-					{availableDomains.map((item) => (
-						<Select.Item key={item.value} value={item.value}>
-							{item.label}
-						</Select.Item>
-					))}
-				</Select.Content>
-			</Select.Root>
-		);
-	};
+	useEffect(() => {
+		if (availableDomains.length > 0 && !form.getValues("selectedDomain")) {
+			form.setValue("selectedDomain", availableDomains[0]?.value ?? "");
+		}
+	}, [form]);
 
 	const onSubmit = async (_data: MailboxFormValues) => {
 		setIsSubmitting(true);
@@ -282,7 +277,73 @@ export const AddNewMailboxModal = ({
 												placeholder="Mailbox name..."
 												{...form.register("emailName")}
 											/>
-											<DomainSelect />
+											<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
+												<Dropdown.Trigger asChild>
+													<button
+														type="button"
+														disabled={isSubmitting}
+														className="group/trigger flex h-5 min-h-5 w-auto items-center gap-0 rounded-none bg-transparent p-0 font-medium text-text-sub-600 shadow-none outline-none ring-0 hover:bg-transparent hover:text-text-strong-950 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:text-text-strong-950"
+													>
+														<Icon
+															name="at-sign"
+															className="mr-1.5 h-4 w-4 shrink-0 text-text-soft-400 transition duration-200 ease-out group-hover/trigger:text-text-sub-600 group-data-[state=open]/trigger:text-text-sub-600"
+														/>
+														<span className="font-medium text-text-strong-950">
+															{form.watch("selectedDomain") || "domain"}
+														</span>
+														<Icon
+															name="chevron-down"
+															className={cn(
+																"ml-0.5 size-5 shrink-0 text-text-sub-600 transition duration-200 ease-out group-hover/trigger:text-text-strong-950 group-data-[state=open]/trigger:rotate-180 group-data-[state=open]/trigger:text-text-strong-950",
+																isOpen && "rotate-180 text-text-strong-950",
+															)}
+														/>
+													</button>
+												</Dropdown.Trigger>
+												<Dropdown.Content align="end" className="w-56 p-2">
+													<div className="relative max-h-80 overflow-y-auto">
+														{availableDomains.map((d, idx) => {
+															const isSelected =
+																d.value === form.watch("selectedDomain");
+															return (
+																<button
+																	key={d.value}
+																	ref={(el) => {
+																		if (el) buttonRefs.current[idx] = el;
+																	}}
+																	type="button"
+																	onPointerEnter={() => setHoverIdx(idx)}
+																	onPointerLeave={() => setHoverIdx(undefined)}
+																	onClick={() => {
+																		form.setValue("selectedDomain", d.value);
+																		setIsOpen(false);
+																	}}
+																	className={cn(
+																		"flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-colors",
+																		"text-text-strong-950",
+																		isSelected && "bg-neutral-alpha-10",
+																		!currentRect &&
+																			hoverIdx === idx &&
+																			"bg-neutral-alpha-10",
+																	)}
+																>
+																	<span className="truncate">{d.label}</span>
+																	{isSelected && (
+																		<Icon
+																			name="check"
+																			className="h-3.5 w-3.5 text-text-strong-950"
+																		/>
+																	)}
+																</button>
+															);
+														})}
+														<AnimatedHoverBackground
+															rect={currentRect}
+															tabElement={currentTab}
+														/>
+													</div>
+												</Dropdown.Content>
+											</Dropdown.Root>
 										</Input.Wrapper>
 									</Input.Root>
 									{form.formState.errors.emailName && (
