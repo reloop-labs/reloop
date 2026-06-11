@@ -101,7 +101,7 @@ interface ApiKeyListResponse {
 
 interface DomainData {
 	id: string;
-	domainName: string;
+	domain: string;
 	status: "pending" | "verifying" | "active" | "suspended" | "failed";
 	createdAt: string;
 }

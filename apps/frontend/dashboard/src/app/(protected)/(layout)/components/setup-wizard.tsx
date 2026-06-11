@@ -39,7 +39,7 @@ interface ApiKeyData {
 
 interface DomainData {
 	id: string;
-	domainName: string;
+	domain: string;
 	status: "pending" | "verifying" | "active" | "suspended" | "failed";
 	createdAt: string;
 }
@@ -320,7 +320,7 @@ export function SetupWizard({
 
 	// Derived state
 	const primaryDomain = domains[0];
-	const primaryDomainName = primaryDomain?.domainName || "mycompany.com";
+	const primaryDomainName = primaryDomain?.domain || "mycompany.com";
 	const hasApiKey = !!primaryApiKey;
 
 	const displayPrefix = primaryApiKey?.start || "rl_live";
@@ -478,7 +478,7 @@ export function SetupWizard({
 						</div>
 
 						{/* Checklist Rows with custom interactive states */}
-						<div className="relative mt-8 space-y-8 pl-6 before:absolute before:top-2 before:bottom-2 before:left-[11px] before:w-[2px] before:bg-stroke-soft-100 dark:before:bg-white/[0.04]">
+						<div className="relative mt-8 space-y-6 pl-6 before:absolute before:top-2 before:bottom-2 before:left-[11px] before:w-[2px] before:bg-stroke-soft-100 dark:before:bg-white/[0.04]">
 							{/* Step 1: Account (Always done) */}
 							<div className="group relative">
 								<div className="-left-[21px] absolute top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-white">
