@@ -20,6 +20,58 @@ export type NewAgentAddressInput = {
 	securityLevel: AgentMailbox["securityLevel"];
 };
 
+interface BackendMailbox {
+	id: string;
+	email: string;
+	quota: string;
+	status: string;
+	displayName: string | null;
+	description: string | null;
+	createdAt: string | Date;
+}
+
+interface BackendAttachment {
+	id: string;
+	inboundEmailId: string;
+	filename: string;
+	contentType: string;
+	size: number;
+	storagePath: string;
+	contentDisposition: string | null;
+	contentId: string | null;
+	createdAt: string | Date;
+}
+
+interface BackendMessage {
+	id: string;
+	mailboxId: string;
+	organizationId: string;
+	fromEmail: string;
+	fromName: string | null;
+	toEmails: string[];
+	ccEmails?: string[] | null;
+	bccEmails?: string[] | null;
+	replyTo: string | null;
+	subject: string | null;
+	textBody: string | null;
+	htmlBody: string | null;
+	snippet: string | null;
+	size: number;
+	status: string;
+	isRead: boolean;
+	isStarred: boolean;
+	isSpam: boolean;
+	spamScore: number | null;
+	messageId: string | null;
+	threadId: string | null;
+	inReplyTo: string | null;
+	references?: string[] | null;
+	headers?: Record<string, string> | null;
+	date: string | Date | null;
+	createdAt: string | Date;
+	attachments?: BackendAttachment[];
+}
+
 interface AgentInboxContextValue {
 	mailboxes: AgentMailbox[];
 	threads: InboundThread[];
@@ -43,14 +95,14 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		data: mailboxesData,
 		isLoading: isLoadingMailboxes,
 		mutate: mutateMailboxes,
-	} = useSWR<any[]>("/api/inbox/v1/mailboxes/list");
+	} = useSWR<BackendMailbox[]>("/api/inbox/v1/mailboxes/list");
 
 	// Fetch messages from actual endpoint
 	const {
 		data: messagesData,
 		isLoading: isLoadingThreads,
 		mutate: mutateMessages,
-	} = useSWR<any[]>("/api/inbox/v1/messages");
+	} = useSWR<BackendMessage[]>("/api/inbox/v1/messages");
 
 	// Map backend mailboxes to UI structures
 	const mailboxes = useMemo(() => {
@@ -59,63 +111,81 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			id: mb.id,
 			email: mb.email,
 			label: mb.displayName || mb.email.split("@")[0] || "Agent",
-			description: mb.description,
+			description: mb.description || "",
 			status:
 				mb.status === "active" ? ("active" as const) : ("disabled" as const),
 			securityLevel: 5 as const,
-			createdAt: mb.createdAt || new Date().toISOString(),
+			createdAt:
+				typeof mb.createdAt === "string"
+					? mb.createdAt
+					: mb.createdAt.toISOString(),
 		}));
 	}, [mailboxesData]);
 
 	// Map backend messages to UI threads
 	const threads = useMemo(() => {
 		if (!messagesData) return [];
-		return messagesData.map((msg) => ({
-			id: msg.id,
-			mailboxId: msg.mailboxId,
-			from: { name: msg.fromName || undefined, email: msg.fromEmail },
-			subject: msg.subject || "(No Subject)",
-			preview:
-				msg.snippet ||
-				(msg.textBody
-					? msg.textBody.substring(0, 120) +
-						(msg.textBody.length > 120 ? "..." : "")
-					: ""),
-			bodyText: msg.textBody || "",
-			bodyHtml: msg.htmlBody || undefined,
-			receivedAt: msg.date || msg.createdAt,
-			status: msg.isSpam
-				? ("blocked" as const)
-				: msg.status === "processing"
-					? ("parsing" as const)
-					: msg.isRead
-						? ("handled" as const)
-						: ("new" as const),
-			securityLevel: 5 as const,
-			unread: !msg.isRead,
-			cc: msg.ccEmails || undefined,
-			replyTo: msg.replyTo || undefined,
-			attachments:
-				msg.attachments?.map((att: any) => ({
-					name: att.filename,
-					size: `${(att.size / 1024).toFixed(1)} KB`,
-					contentType: att.contentType,
-					isInline: att.contentDisposition === "inline",
-				})) || [],
-			timeline: [
-				{ label: "Email received", at: msg.createdAt, state: "done" as const },
-				{
-					label: "Delivered to NATS",
-					at: msg.createdAt,
-					state: "done" as const,
-				},
-				{
-					label: "Inbox storage complete",
-					at: msg.createdAt,
-					state: "done" as const,
-				},
-			],
-		}));
+		return messagesData.map((msg) => {
+			const receivedAtDate = msg.date || msg.createdAt;
+			const receivedAt =
+				typeof receivedAtDate === "string"
+					? receivedAtDate
+					: receivedAtDate
+						? receivedAtDate.toISOString()
+						: new Date().toISOString();
+
+			const createdAtStr =
+				typeof msg.createdAt === "string"
+					? msg.createdAt
+					: msg.createdAt.toISOString();
+
+			return {
+				id: msg.id,
+				mailboxId: msg.mailboxId,
+				from: { name: msg.fromName || undefined, email: msg.fromEmail },
+				subject: msg.subject || "(No Subject)",
+				preview:
+					msg.snippet ||
+					(msg.textBody
+						? msg.textBody.substring(0, 120) +
+							(msg.textBody.length > 120 ? "..." : "")
+						: ""),
+				bodyText: msg.textBody || "",
+				bodyHtml: msg.htmlBody || undefined,
+				receivedAt,
+				status: msg.isSpam
+					? ("blocked" as const)
+					: msg.status === "processing"
+						? ("parsing" as const)
+						: msg.isRead
+							? ("handled" as const)
+							: ("new" as const),
+				securityLevel: 5 as const,
+				unread: !msg.isRead,
+				cc: msg.ccEmails || undefined,
+				replyTo: msg.replyTo || undefined,
+				attachments:
+					msg.attachments?.map((att) => ({
+						name: att.filename,
+						size: `${(att.size / 1024).toFixed(1)} KB`,
+						contentType: att.contentType,
+						isInline: att.contentDisposition === "inline",
+					})) || [],
+				timeline: [
+					{ label: "Email received", at: createdAtStr, state: "done" as const },
+					{
+						label: "Delivered to NATS",
+						at: createdAtStr,
+						state: "done" as const,
+					},
+					{
+						label: "Inbox storage complete",
+						at: createdAtStr,
+						state: "done" as const,
+					},
+				],
+			};
+		});
 	}, [messagesData]);
 
 	const getMailbox = useCallback(
@@ -141,7 +211,11 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				throw new Error(body || "Failed to create mailbox");
 			}
 
-			const data = await res.json();
+			const data = (await res.json()) as {
+				id: string;
+				email: string;
+				status: string;
+			};
 
 			const newMailbox: AgentMailbox = {
 				id: data.id,
