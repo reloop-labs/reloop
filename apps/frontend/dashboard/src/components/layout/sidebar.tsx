@@ -4,9 +4,10 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import { authClient } from "@reloop/auth/client";
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import useSWR, { useSWRConfig } from "swr";
 import { OrganizationSwitcher } from "./organization-switcher";
@@ -20,6 +21,7 @@ export const MainSidebar: React.FC = () => {
 	const { isSidebarCollapsed, setIsSidebarCollapsed, toggleSidebarCollapse } =
 		useUIStore();
 	const { refetch } = authClient.useSession();
+	const [isHeaderHovered, setIsHeaderHovered] = useState(false);
 
 	useEffect(() => {
 		try {
@@ -68,18 +70,65 @@ export const MainSidebar: React.FC = () => {
 			)}
 		>
 			<div
+				onMouseEnter={() => setIsHeaderHovered(true)}
+				onMouseLeave={() => setIsHeaderHovered(false)}
 				className={cn(
-					"flex items-center justify-between transition-all",
-					isSidebarCollapsed ? "h-14 px-0 justify-center" : "h-12 pr-3 pl-1"
+					"flex items-center transition-all",
+					isSidebarCollapsed ? "h-14 px-0 justify-center" : "h-12 pr-3 pl-1 justify-between"
 				)}
 			>
-				<OrganizationSwitcher
-					organizations={organizations}
-					activeOrganization={activeOrganization}
-					onOrganizationChange={handleOrganizationChange}
-					isCollapsed={isSidebarCollapsed}
-					side="bottom"
-				/>
+				{isSidebarCollapsed ? (
+					isHeaderHovered ? (
+						<button
+							type="button"
+							onClick={toggleSidebarCollapse}
+							title="Toggle Sidebar (Cmd+B)"
+							className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+						>
+							<Icon
+								name="sidebar-left"
+								className="h-4 w-4 transition-transform duration-200"
+								style={{
+									transform: "rotate(180deg)",
+								}}
+							/>
+						</button>
+					) : (
+						<OrganizationSwitcher
+							organizations={organizations}
+							activeOrganization={activeOrganization}
+							onOrganizationChange={handleOrganizationChange}
+							isCollapsed={isSidebarCollapsed}
+							side="bottom"
+						/>
+					)
+				) : (
+					<>
+						<OrganizationSwitcher
+							organizations={organizations}
+							activeOrganization={activeOrganization}
+							onOrganizationChange={handleOrganizationChange}
+							isCollapsed={isSidebarCollapsed}
+							side="bottom"
+						/>
+						{isHeaderHovered && (
+							<button
+								type="button"
+								onClick={toggleSidebarCollapse}
+								title="Toggle Sidebar (Cmd+B)"
+								className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+							>
+								<Icon
+									name="sidebar-left"
+									className="h-4 w-4 transition-transform duration-200"
+									style={{
+										transform: "rotate(0deg)",
+									}}
+								/>
+							</button>
+						)}
+					</>
+				)}
 			</div>
 			<div
 				className={cn(

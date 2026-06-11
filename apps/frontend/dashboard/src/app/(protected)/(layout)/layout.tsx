@@ -8,7 +8,7 @@ const OrgLayout = ({ children }: { children: React.ReactNode }) => {
 		<UserOrganizationProvider>
 			<div className="flex h-screen overflow-hidden bg-bg-weak-50 dark:bg-black">
 				<MainSidebar />
-				<main className="relative m-2 flex flex-1 flex-col overflow-y-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+				<main className="relative mt-2 mr-2 mb-2 flex flex-1 flex-col overflow-y-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
 					<PageHeader />
 					<div className="flex-1 overflow-y-auto">{children}</div>
 				</main>

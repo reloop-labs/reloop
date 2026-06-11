@@ -148,9 +148,53 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 				: "No messages in this filter";
 
 	return (
-		<div className="flex h-[calc(100vh-80px)] flex-col overflow-hidden px-4 pb-6 md:px-6">
+		<div className="flex h-[calc(100vh-80px)] flex-col overflow-hidden pb-6">
+			{/* Page Top Bar */}
+			<div className="flex shrink-0 items-center justify-between border-stroke-soft-100 border-b px-4 pt-2 pb-2 dark:border-stroke-soft-100/40">
+				<div className="flex items-center gap-3">
+					<Link
+						href="/agent-inbox"
+						className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+						aria-label="Back to agent addresses"
+					>
+						<Icon name="arrow-left" className="h-4 w-4" />
+					</Link>
+					<h1 className="font-semibold text-text-strong-950">
+						{mailbox.email}
+					</h1>
+				</div>
+
+				<div className="flex items-center gap-1">
+					<button
+						onClick={handleRefresh}
+						title="Refresh"
+						className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+					>
+						<Icon name="refresh-cw" className="h-4 w-4" />
+					</button>
+					<button
+						title="Mark all as read"
+						className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+					>
+						<Icon name="check-circle" className="h-4 w-4" />
+					</button>
+					<button
+						title="Notifications"
+						className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+					>
+						<Icon name="notification-indicator" className="h-4 w-4" />
+					</button>
+					<button
+						title="More options"
+						className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+					>
+						<Icon name="dots" className="h-4 w-4" />
+					</button>
+				</div>
+			</div>
+
 			{/* Multi-pane side-by-side Split Layout */}
-			<div className="flex min-h-0 flex-1 gap-6">
+			<div className="mt-2 flex min-h-0 flex-1 gap-6">
 				{/* Left Pane: Thread List */}
 				<div
 					className={cn(
@@ -159,14 +203,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 					)}
 				>
 					{/* List Header */}
-					<div className="flex items-center gap-3 pt-6 pb-4 sm:px-2">
-						<Link
-							href="/agent-inbox"
-							className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
-							aria-label="Back to agent addresses"
-						>
-							<Icon name="arrow-left" className="h-4 w-4" />
-						</Link>
+					<div className="flex items-center gap-3 pt-2 pb-2 sm:px-2">
 						<div className="flex-1">
 							<Input.Root size="xsmall" className="rounded-[10px]">
 								<Input.Wrapper>

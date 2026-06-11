@@ -2,7 +2,6 @@
 
 import { FeedbackPopover } from "@fe/dashboard/components/feedback-popover";
 import { mainNavigation, userNavigation } from "@fe/dashboard/constants";
-import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Link from "next/link";
@@ -11,7 +10,6 @@ import { UserDropdown } from "./user-dropdown";
 
 export const PageHeader = () => {
 	const pathname = usePathname();
-	const { isSidebarCollapsed, toggleSidebarCollapse } = useUIStore();
 
 	const activeItem = [...mainNavigation, ...userNavigation].find((item) => {
 		if (item.path === "/") return pathname === "/";
@@ -26,24 +24,9 @@ export const PageHeader = () => {
 	const displayIcon = activeItem?.iconName || "inbox";
 
 	return (
-		<div className="sticky top-0 z-10 flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b pr-3 pl-2.5 dark:border-stroke-soft-100/40">
-			{/* Left Side: Inline Sidebar Toggle & Page Title */}
+		<div className="sticky top-0 z-10 flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b pr-3 pl-3 dark:border-stroke-soft-100/40">
+			{/* Left Side: Page Title */}
 			<div className="flex items-center gap-3">
-				<button
-					type="button"
-					onClick={toggleSidebarCollapse}
-					title="Toggle Sidebar (Cmd+B)"
-					className="flex h-7 w-7 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
-				>
-					<Icon
-						name="sidebar-left"
-						className="h-4 w-4 transition-transform duration-200"
-						style={{
-							transform: isSidebarCollapsed ? "rotate(180deg)" : "rotate(0deg)",
-						}}
-					/>
-				</button>
-
 				<div className="flex items-center gap-2">
 					<Icon name={displayIcon} className="h-4 w-4 text-text-sub-600" />
 					<span className="font-semibold text-[13px] text-text-strong-950 capitalize">
