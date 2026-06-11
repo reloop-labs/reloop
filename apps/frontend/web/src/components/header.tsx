@@ -331,7 +331,7 @@ export const Header = () => {
 				onMouseLeave={() => setActiveMega(null)}
 				className={`flex flex-col overflow-hidden rounded-[24px] transition-[border-color,box-shadow,background-color] duration-300 ease-out ${
 					isLight
-						? "w-full max-w-[1000px] border border-[#0a0d12]/10 bg-white shadow-[#0a0d12]/5 shadow-sm"
+						? "w-full max-w-[1000px] border border-[#0a0d12]/10 bg-white"
 						: "w-full max-w-[1000px] border border-white/10 bg-[#0a0a0a]/95"
 				}`}
 			>

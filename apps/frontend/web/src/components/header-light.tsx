@@ -76,7 +76,7 @@ export const HeaderLight = () => {
 				onMouseLeave={() => setActiveMega(null)}
 				className={`flex items-center justify-between rounded-[20px] pr-3 transition-[border-color,background-color,box-shadow,height,max-width] duration-500 ease-in-out ${
 					scrolled
-						? "h-15 w-full max-w-[1000px] border border-[#0a0d12]/10 bg-white shadow-[#0a0d12]/5 shadow-sm"
+						? "h-15 w-full max-w-[1000px] border border-[#0a0d12]/10 bg-white"
 						: "h-16 w-full max-w-[1100px] border-transparent bg-transparent shadow-none"
 				}`}
 			>
