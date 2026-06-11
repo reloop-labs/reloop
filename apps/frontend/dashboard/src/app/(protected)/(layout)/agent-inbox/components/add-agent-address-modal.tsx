@@ -129,14 +129,10 @@ export const AddAgentAddressModal = ({
 									/>
 									<Modal.Title asChild>
 										<h2 className="font-semibold text-label-md text-text-strong-950">
-											Add agent address
+											Creat Inbox for AI agent
 										</h2>
 									</Modal.Title>
 								</div>
-								<p className="text-paragraph-xs text-text-sub-600">
-									Create a dedicated inbound email for an AI agent. Messages to
-									this address appear in Agent Inbox.
-								</p>
 							</div>
 							<button
 								type="button"
@@ -185,42 +181,45 @@ export const AddAgentAddressModal = ({
 								Email address
 								<span className="ml-0.5 text-error-base">*</span>
 							</label>
-							<div className="flex items-center gap-2">
-								<Input.Root
-									size="xsmall"
-									className="flex-1"
-									hasError={!!form.formState.errors.localPart}
-								>
-									<Input.Wrapper>
-										<Input.Input
-											id="agent-email"
-											placeholder="support-agent"
-											{...form.register("localPart")}
-											disabled={isSubmitting}
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-								<span className="font-medium text-label-sm text-text-sub-600">
-									@
-								</span>
-								<Select.Root
-									value={form.watch("domain")}
-									onValueChange={(v) => form.setValue("domain", v)}
-									size="small"
-									disabled={isSubmitting}
-								>
-									<Select.Trigger className="h-[32px] w-[160px] rounded-[10px]">
-										<Select.Value />
-									</Select.Trigger>
-									<Select.Content>
-										{domainsList.map((d) => (
-											<Select.Item key={d.id} value={d.domain}>
-												{d.domain}
-											</Select.Item>
-										))}
-									</Select.Content>
-								</Select.Root>
-							</div>
+							<Input.Root
+								size="xsmall"
+								hasError={
+									!!form.formState.errors.localPart ||
+									!!form.formState.errors.domain
+								}
+							>
+								<Input.Wrapper>
+									<Input.Input
+										id="agent-email"
+										placeholder="support-agent"
+										{...form.register("localPart")}
+										disabled={isSubmitting}
+									/>
+									<Select.Root
+										value={form.watch("domain")}
+										onValueChange={(v) => form.setValue("domain", v)}
+										size="xsmall"
+										variant="inline"
+										disabled={isSubmitting}
+									>
+										<Select.Trigger className="font-medium text-text-strong-950">
+											<Select.TriggerIcon
+												as={Icon}
+												name="at-sign"
+												className="h-4 w-4"
+											/>
+											<Select.Value />
+										</Select.Trigger>
+										<Select.Content>
+											{domainsList.map((d) => (
+												<Select.Item key={d.id} value={d.domain}>
+													{d.domain}
+												</Select.Item>
+											))}
+										</Select.Content>
+									</Select.Root>
+								</Input.Wrapper>
+							</Input.Root>
 							{(form.formState.errors.localPart ||
 								form.formState.errors.domain) && (
 								<p className="text-error-base text-paragraph-xs">
