@@ -346,10 +346,36 @@ export function SetupWizard({
 		setIsSendingTest(true);
 
 		try {
+			// 1. Generate a new API key on the fly for sending the email
+			const apiKeyRes = await fetch("/api/api-key/v1/", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					name: "Setup Wizard Test Key",
+				}),
+				credentials: "include",
+			});
+
+			if (!apiKeyRes.ok) {
+				const errorData = await apiKeyRes.json().catch(() => ({}));
+				throw new Error(
+					errorData.why ||
+						errorData.message ||
+						"Failed to generate API key for sending.",
+				);
+			}
+
+			const apiKeyData = await apiKeyRes.json();
+			const cleartextApiKey = apiKeyData.key;
+
+			// 2. Use the newly generated API key to send the test email
 			const response = await fetch("/api/mail/v1/send", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
+					"x-api-key": cleartextApiKey,
 				},
 				body: JSON.stringify({
 					from: `test@${primaryDomainName}`,
