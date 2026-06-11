@@ -204,22 +204,24 @@ export const ThreadList = ({
 															: "border-neutral-200 bg-white hover:bg-neutral-50 dark:border-neutral-850 dark:bg-transparent dark:hover:bg-neutral-900/20",
 												)}
 											>
-												{/* Sender, dot & date row */}
-												<div className="flex justify-between">
-													<div className="flex min-w-0 gap-3">
-														{/* Gradient Avatar */}
-														<div
-															className={cn(
-																"flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr font-medium text-white text-xs shadow-sm",
-																getSenderGradient(
-																	thread.from.name ?? thread.from.email,
-																),
-															)}
-														>
-															{senderInitials(thread)}
-														</div>
-														<div>
-															<div
+												<div className="flex items-start gap-3">
+													{/* Gradient Avatar */}
+													<div
+														className={cn(
+															"flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr font-medium text-white text-xs shadow-sm",
+															getSenderGradient(
+																thread.from.name ?? thread.from.email,
+															),
+														)}
+													>
+														{senderInitials(thread)}
+													</div>
+
+													{/* Details Column */}
+													<div className="flex-1 min-w-0 flex flex-col gap-1">
+														{/* Sender & Time row */}
+														<div className="flex items-center justify-between gap-2">
+															<span
 																className={cn(
 																	"truncate text-neutral-850 text-sm tracking-tight dark:text-neutral-200",
 																	isUnread
@@ -228,135 +230,134 @@ export const ThreadList = ({
 																)}
 															>
 																{thread.from.name ?? thread.from.email}
-															</div>
-															<div
-																className={cn(
-																	"truncate text-neutral-900 text-sm dark:text-neutral-100",
-																	isUnread ? "font-semibold" : "font-medium",
+															</span>
+															<div className="flex shrink-0 items-center gap-2">
+																{isUnread && (
+																	<span className="h-2 w-2 rounded-full bg-blue-600" />
 																)}
-															>
-																{thread.subject}
+																<span className="font-medium text-[11px] text-neutral-400 tabular-nums dark:text-neutral-500">
+																	{dayjs(thread.receivedAt).format("HH:mm")}
+																</span>
 															</div>
-															<div className="truncate text-neutral-500 text-xs leading-relaxed dark:text-neutral-400">
-																{thread.preview}
-															</div>
-															<div className="mt-0.5 flex min-h-[22px] items-center justify-between">
-																{thread.attachments &&
-																thread.attachments.length > 0 ? (
-																	<div className="flex min-w-0 shrink-0 flex-wrap items-center gap-1.5">
-																		{thread.attachments
-																			.slice(0, 2)
-																			.map((att, idx) => (
-																				<div
-																					key={att.name + idx}
-																					className="flex items-center gap-1 rounded-[8px] border border-neutral-200 bg-white px-2.5 py-1 font-medium text-[10px] text-neutral-600 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400"
-																				>
-																					<Icon
-																						name="file-text"
-																						className="h-3.5 w-3.5 shrink-0 text-neutral-400"
-																					/>
-																					<span className="max-w-[100px] truncate">
-																						{att.name}
-																					</span>
-																				</div>
-																			))}
-																		{thread.attachments.length > 2 && (
-																			<span className="rounded-[8px] border border-neutral-200 bg-white px-2 py-1 font-medium text-[10px] text-neutral-500 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-																				+{thread.attachments.length - 2}
-																			</span>
-																		)}
-																	</div>
-																) : (
-																	<div className="flex min-w-0 shrink-0 flex-wrap items-center gap-1.5">
-																		{["TAG #1", "TAG #2", "TAG #3"]
-																			.slice(
-																				0,
-																				thread.id === "in-005" ||
-																					thread.id === "in-011"
-																					? 1
-																					: thread.id === "in-003"
-																						? 2
-																						: 3,
-																			)
-																			.map((tag) => (
-																				<span
-																					key={tag}
-																					className="rounded-[4px] bg-neutral-100 px-1.5 py-0.5 font-bold text-[9px] text-neutral-400 tracking-wider dark:bg-neutral-900"
-																				>
-																					{tag}
-																				</span>
-																			))}
-																	</div>
-																)}
+														</div>
 
-																{/* Quick actions (visible on hover) */}
-																<div className="invisible flex shrink-0 items-center gap-1 bg-transparent opacity-0 transition-all duration-150 group-hover/card:visible group-hover/card:opacity-100">
-																	<button
-																		title={
-																			thread.unread
-																				? "Mark as Handled"
-																				: "Mark as Active"
-																		}
-																		onClick={(e) => {
-																			e.stopPropagation();
-																			handleToggleRead(
-																				thread.id,
-																				thread.unread,
-																			);
-																		}}
-																		className="rounded p-1 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-800 dark:hover:bg-white/10"
-																	>
-																		<Icon
-																			name="check-circle"
-																			className="h-3.5 w-3.5"
-																		/>
-																	</button>
-																	<button
-																		title="Mark as Spam"
-																		onClick={(e) => {
-																			e.stopPropagation();
-																			handleMarkSpam(thread.id);
-																		}}
-																		className="rounded p-1 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-error-base dark:hover:bg-white/10"
-																	>
-																		<Icon
-																			name="cross-circle"
-																			className="h-3.5 w-3.5"
-																		/>
-																	</button>
-																	<button
-																		title="Delete Message"
-																		onClick={(e) => {
-																			e.stopPropagation();
-																			handleDelete(thread.id);
-																		}}
-																		className="rounded p-1 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-error-base dark:hover:bg-white/10"
-																	>
-																		<Icon
-																			name="trash"
-																			className="h-3.5 w-3.5"
-																		/>
-																	</button>
+														{/* Subject */}
+														<div
+															className={cn(
+																"truncate text-neutral-900 text-sm dark:text-neutral-100",
+																isUnread ? "font-semibold" : "font-medium",
+															)}
+														>
+															{thread.subject}
+														</div>
+
+														{/* Snippet */}
+														<div className="truncate text-neutral-500 text-xs leading-relaxed dark:text-neutral-400">
+															{thread.preview}
+														</div>
+
+														{/* Badges and Actions Row */}
+														<div className="mt-1 flex min-h-[22px] items-center justify-between gap-2">
+															{thread.attachments &&
+															thread.attachments.length > 0 ? (
+																<div className="flex min-w-0 shrink-0 flex-wrap items-center gap-1.5">
+																	{thread.attachments
+																		.slice(0, 2)
+																		.map((att, idx) => (
+																			<div
+																				key={att.name + idx}
+																				className="flex items-center gap-1 rounded-[8px] border border-neutral-200 bg-white px-2.5 py-1 font-medium text-[10px] text-neutral-600 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400"
+																			>
+																				<Icon
+																					name="file-text"
+																					className="h-3.5 w-3.5 shrink-0 text-neutral-400"
+																				/>
+																				<span className="max-w-[100px] truncate">
+																					{att.name}
+																				</span>
+																			</div>
+																		))}
+																	{thread.attachments.length > 2 && (
+																		<span className="rounded-[8px] border border-neutral-200 bg-white px-2 py-1 font-medium text-[10px] text-neutral-500 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+																			+{thread.attachments.length - 2}
+																		</span>
+																	)}
 																</div>
+															) : (
+																<div className="flex min-w-0 shrink-0 flex-wrap items-center gap-1.5">
+																	{["TAG #1", "TAG #2", "TAG #3"]
+																		.slice(
+																			0,
+																			thread.id === "in-005" ||
+																				thread.id === "in-011"
+																				? 1
+																				: thread.id === "in-003"
+																					? 2
+																					: 3,
+																		)
+																		.map((tag) => (
+																			<span
+																				key={tag}
+																				className="rounded-[4px] bg-neutral-100 px-1.5 py-0.5 font-bold text-[9px] text-neutral-400 tracking-wider dark:bg-neutral-900"
+																			>
+																				{tag}
+																			</span>
+																		))}
+																</div>
+															)}
+
+															{/* Quick actions (visible on hover) */}
+															<div className="invisible flex shrink-0 items-center gap-1 bg-transparent opacity-0 transition-all duration-150 group-hover/card:visible group-hover/card:opacity-100">
+																<button
+																	title={
+																		thread.unread
+																			? "Mark as Handled"
+																			: "Mark as Active"
+																	}
+																	onClick={(e) => {
+																		e.stopPropagation();
+																		handleToggleRead(
+																			thread.id,
+																			thread.unread,
+																		);
+																	}}
+																	className="rounded p-1 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-800 dark:hover:bg-white/10"
+																>
+																	<Icon
+																		name="check-circle"
+																		className="h-3.5 w-3.5"
+																	/>
+																</button>
+																<button
+																	title="Mark as Spam"
+																	onClick={(e) => {
+																		e.stopPropagation();
+																		handleMarkSpam(thread.id);
+																	}}
+																	className="rounded p-1 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-error-base dark:hover:bg-white/10"
+																>
+																	<Icon
+																		name="cross-circle"
+																		className="h-3.5 w-3.5"
+																	/>
+																</button>
+																<button
+																	title="Delete Message"
+																	onClick={(e) => {
+																		e.stopPropagation();
+																		handleDelete(thread.id);
+																	}}
+																	className="rounded p-1 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-error-base dark:hover:bg-white/10"
+																>
+																	<Icon
+																		name="trash"
+																		className="h-3.5 w-3.5"
+																	/>
+																</button>
 															</div>
 														</div>
 													</div>
-
-													<div className="flex shrink-0 gap-2">
-														{isUnread && (
-															<span className="h-2 w-2 rounded-full bg-blue-600" />
-														)}
-														<span className="font-medium text-[11px] text-neutral-400 tabular-nums dark:text-neutral-500">
-															{dayjs(thread.receivedAt).format("HH:mm")}
-														</span>
-													</div>
 												</div>
-
-												{/* Subject */}
-
-												{/* Snippet */}
-
-												{/* Badges/Pills Row */}
 											</div>
 										);
 									})}

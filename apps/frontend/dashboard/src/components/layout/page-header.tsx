@@ -20,12 +20,13 @@ export const PageHeader = () => {
 
 	const displayLabel = activeItem
 		? activeItem.label
-		: pathname.split("/").filter(Boolean).pop()?.replace(/-/g, " ") || "Dashboard";
+		: pathname.split("/").filter(Boolean).pop()?.replace(/-/g, " ") ||
+			"Dashboard";
 
 	const displayIcon = activeItem?.iconName || "inbox";
 
 	return (
-		<div className="sticky top-0 z-10 flex h-11 items-center justify-between border-stroke-soft-100 border-b pr-3 pl-2.5 dark:border-stroke-soft-100/40 shrink-0">
+		<div className="sticky top-0 z-10 flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b pr-3 pl-2.5 dark:border-stroke-soft-100/40">
 			{/* Left Side: Inline Sidebar Toggle & Page Title */}
 			<div className="flex items-center gap-3">
 				<button
@@ -54,17 +55,6 @@ export const PageHeader = () => {
 			{/* Right Side: Global Search, Settings Gear & Dropdowns */}
 			<div className="flex items-center gap-2">
 				{/* Search Input */}
-				<div className="relative w-44 sm:w-56 md:w-64">
-					<Input.Root size="xsmall" className="rounded-lg bg-bg-weak-50/50 border-none dark:bg-white/5">
-						<Input.Wrapper>
-							<Input.Icon as={Icon} name="search" size="xsmall" className="text-text-soft-400" />
-							<Input.Input
-								placeholder="Search..."
-								className="bg-transparent border-none placeholder-text-soft-400 text-xs py-0.5"
-							/>
-						</Input.Wrapper>
-					</Input.Root>
-				</div>
 
 				{/* Settings Button */}
 				<Link
@@ -75,7 +65,7 @@ export const PageHeader = () => {
 					<Icon name="settings" className="h-4 w-4" />
 				</Link>
 
-				<div className="h-4 w-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40 mx-0.5" />
+				<div className="mx-0.5 h-4 w-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 
 				<FeedbackPopover />
 				<UserDropdown />
