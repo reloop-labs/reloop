@@ -35,7 +35,51 @@ import {
 	YAxis,
 } from "recharts";
 import { toast } from "sonner";
+import {
+	siDotnet,
+	siElixir,
+	siExpress,
+	siGo,
+	siNestjs,
+	siNextdotjs,
+	siNodedotjs,
+	siPhp,
+	siPython,
+	siRuby,
+	siRust,
+	siSpringboot,
+} from "simple-icons";
 import useSWR from "swr";
+
+const sdkLanguages = [
+	{ name: "Node / TS", command: "npm install @reloop/node", icon: siNodedotjs },
+	{ name: "Python", command: "pip install reloop-python", icon: siPython },
+	{ name: "PHP", command: "composer require reloop/reloop-php", icon: siPhp },
+	{ name: "Go", command: "go get github.com/reloop-labs/reloop-go", icon: siGo },
+	{ name: "Rust", command: "cargo add reloop", icon: siRust },
+	{ name: "Ruby", command: "gem install reloop", icon: siRuby },
+	{ name: "Java", command: "implementation 'com.reloop:reloop-java'", icon: siSpringboot },
+	{ name: ".NET (C#)", command: "dotnet add package Reloop", icon: siDotnet },
+	{ name: "Elixir", command: '{:reloop, "~> 0.1.0"}', icon: siElixir },
+];
+
+const frameworkIntegrations = [
+	{
+		name: "Next.js App Router",
+		desc: "Send transactional emails inside server actions and verify DKIM using API routes.",
+		icon: siNextdotjs,
+	},
+	{
+		name: "Express REST API",
+		desc: "Integrate outbound email delivery and incoming webhook logs with Express middleware.",
+		icon: siExpress,
+	},
+	{
+		name: "NestJS Module",
+		desc: "Inject a global Reloop client provider module into asynchronous worker queues.",
+		icon: siNestjs,
+	},
+];
 
 interface ApiKeyData {
 	id: string;
@@ -621,126 +665,94 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 
 			{/* Bottom Grid: SDKs/Integrations and Example Projects */}
 			<div className="grid gap-6 md:grid-cols-2">
-				{/* Integrations */}
+				{/* Supported SDKs */}
 				<div className="rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.01] space-y-4">
-					<h3 className="font-semibold text-sm text-text-strong-950 dark:text-white">
-						Integrations
-					</h3>
-					<div className="grid gap-2 grid-cols-2">
-						{/* Python SDK */}
-						<div className="flex items-center gap-2 rounded-lg border border-stroke-soft-100 bg-white/40 p-2.5 dark:border-white/5 dark:bg-white/[0.01]">
-							<div className="flex h-7 w-7 items-center justify-center rounded bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400">
-								<svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
-									<path d="M11.9 0C5.3 0 0 5.3 0 11.9s5.3 11.9 11.9 11.9 11.9-5.3 11.9-11.9S18.5 0 11.9 0zm0 1.2c.4 0 .7.1 1 .2.7.2 1.3.6 1.8 1.1s.8 1.1 1 1.8c.2.6.2 1.3.2 2h-4v.4h4c0 .8-.2 1.5-.6 2.1-.4.6-1 1.1-1.7 1.4-.7.3-1.4.4-2.2.4v-4h-4c-.7 0-1.4.1-2 .3-.6.2-1.1.6-1.5 1.1s-.6 1.1-.8 1.8c-.2.6-.2 1.3-.2 2v-4c0-.7.1-1.3.2-2s.6-1.3 1.1-1.8c.5-.5 1.1-.8 1.8-1 1-.4 2.2-.4 3.2-.4zm0 21.6c-.4 0-.7-.1-1-.2-.7-.2-1.3-.6-1.8-1.1s-.8-1.1-1-1.8c-.2-.6-.2-1.3-.2-2h4v-.4h-4c0-.8.2-1.5.6-2.1.4-.6 1-1.1 1.7-1.4.7-.3 1.4-.4 2.2-.4v4h4c.7 0 1.4-.1 2-.3.6-.2 1.1-.6 1.5-1.1s.6-1.1.8-1.8c.2-.6.2-1.3.2-2v4c0 .7-.1 1.3-.2 2s-.6 1.3-1.1 1.8c-.5.5-1.1.8-1.8 1-1 .4-2.2.4-3.2.4z" />
-								</svg>
-							</div>
-							<span className="text-xs font-semibold text-text-strong-950 dark:text-white">
-								Python SDK
-							</span>
-						</div>
+					<div>
+						<h3 className="font-semibold text-sm text-text-strong-950 dark:text-white">
+							SDKs & Libraries
+						</h3>
+						<p className="text-xs text-text-sub-600 dark:text-white/50 mt-0.5">
+							Click any language to copy its package installation command
+						</p>
+					</div>
 
-						{/* JS/TS SDK */}
-						<div className="flex items-center gap-2 rounded-lg border border-stroke-soft-100 bg-white/40 p-2.5 dark:border-white/5 dark:bg-white/[0.01]">
-							<div className="flex h-7 w-7 items-center justify-center rounded bg-yellow-50 dark:bg-yellow-500/10 text-yellow-600 dark:text-yellow-400">
-								<span className="font-bold text-[9px]">JS/TS</span>
-							</div>
-							<span className="text-xs font-semibold text-text-strong-950 dark:text-white">
-								JS/TS SDK
-							</span>
-						</div>
-
-						{/* Lovable */}
-						<div className="flex items-center gap-2 rounded-lg border border-stroke-soft-100 bg-white/40 p-2.5 dark:border-white/5 dark:bg-white/[0.01]">
-							<div className="flex h-7 w-7 items-center justify-center rounded bg-pink-50 dark:bg-pink-500/10 text-pink-600 dark:text-pink-400">
-								<Cpu className="h-3.5 w-3.5" />
-							</div>
-							<span className="text-xs font-semibold text-text-strong-950 dark:text-white">
-								Lovable
-							</span>
-						</div>
-
-						{/* Zapier */}
-						<div className="flex items-center gap-2 rounded-lg border border-stroke-soft-100 bg-white/40 p-2.5 dark:border-white/5 dark:bg-white/[0.01]">
-							<div className="flex h-7 w-7 items-center justify-center rounded bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400">
-								<svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
-									<path d="M12 0L2.4 9.6h7.2v14.4l9.6-9.6h-7.2V0z" />
-								</svg>
-							</div>
-							<span className="text-xs font-semibold text-text-strong-950 dark:text-white">
-								Zapier
-							</span>
-						</div>
-
-						{/* Make */}
-						<div className="flex items-center gap-2 rounded-lg border border-stroke-soft-100 bg-white/40 p-2.5 dark:border-white/5 dark:bg-white/[0.01]">
-							<div className="flex h-7 w-7 items-center justify-center rounded bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-								<Layers className="h-3.5 w-3.5" />
-							</div>
-							<span className="text-xs font-semibold text-text-strong-950 dark:text-white">
-								Make
-							</span>
-						</div>
-
-						{/* n8n */}
-						<div className="flex items-center gap-2 rounded-lg border border-stroke-soft-100 bg-white/40 p-2.5 dark:border-white/5 dark:bg-white/[0.01]">
-							<div className="flex h-7 w-7 items-center justify-center rounded bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400">
-								<span className="font-bold text-[9px]">n8n</span>
-							</div>
-							<span className="text-xs font-semibold text-text-strong-950 dark:text-white">
-								n8n
-							</span>
-						</div>
+					<div className="grid gap-2 grid-cols-2 sm:grid-cols-3">
+						{sdkLanguages.map((lang) => (
+							<button
+								key={lang.name}
+								type="button"
+								onClick={() => handleCopy(lang.command, `${lang.name} SDK install command`)}
+								className="flex items-center gap-2 rounded-lg border border-stroke-soft-100 bg-white/40 p-2.5 text-left transition-colors hover:bg-bg-weak-50 dark:border-white/5 dark:bg-white/[0.01] dark:hover:bg-white/5"
+							>
+								<div
+									className="flex h-7 w-7 shrink-0 items-center justify-center rounded transition-colors"
+									style={{ backgroundColor: `#${lang.icon.hex}15` }}
+								>
+									<svg
+										role="img"
+										viewBox="0 0 24 24"
+										className="h-3.5 w-3.5 shrink-0"
+										fill="currentColor"
+										xmlns="http://www.w3.org/2000/svg"
+										style={{ color: `#${lang.icon.hex}` }}
+									>
+										<path d={lang.icon.path} />
+									</svg>
+								</div>
+								<span className="text-xs font-semibold text-text-strong-950 dark:text-white truncate">
+									{lang.name}
+								</span>
+							</button>
+						))}
 					</div>
 				</div>
 
-				{/* Example Projects */}
+				{/* Framework Integrations */}
 				<div className="rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.01] space-y-4">
-					<h3 className="font-semibold text-sm text-text-strong-950 dark:text-white">
-						Example Projects
-					</h3>
+					<div>
+						<h3 className="font-semibold text-sm text-text-strong-950 dark:text-white">
+							Framework Integrations
+						</h3>
+						<p className="text-xs text-text-sub-600 dark:text-white/50 mt-0.5">
+							Boilerplates and integration templates for Node.js
+						</p>
+					</div>
 
-					<div className="space-y-3">
-						{/* Deep Research */}
-						<div className="space-y-1">
-							<div className="flex items-center justify-between">
-								<span className="text-xs font-semibold text-text-strong-950 dark:text-white hover:underline cursor-pointer">
-									Open Deep Research
-								</span>
-								<div className="flex items-center gap-1">
-									<span className="rounded bg-orange-100 px-1 py-0.2 text-[8px] font-semibold text-orange-800 uppercase dark:bg-orange-500/25 dark:text-orange-300">
-										Next.js
-									</span>
-									<span className="rounded bg-purple-100 px-1 py-0.2 text-[8px] font-semibold text-purple-800 uppercase dark:bg-purple-500/25 dark:text-purple-300">
-										AI SDK
-									</span>
+					<div className="space-y-2.5">
+						{frameworkIntegrations.map((item) => (
+							<div
+								key={item.name}
+								className="group flex items-start gap-3 rounded-lg border border-stroke-soft-100 bg-white/40 p-3 transition-colors hover:bg-bg-weak-50 dark:border-white/5 dark:bg-white/[0.01] dark:hover:bg-white/5 cursor-pointer"
+							>
+								<div
+									className="flex h-8 w-8 shrink-0 items-center justify-center rounded transition-colors"
+									style={{ backgroundColor: `#${item.icon.hex}15` }}
+								>
+									<svg
+										role="img"
+										viewBox="0 0 24 24"
+										className="h-4 w-4 shrink-0"
+										fill="currentColor"
+										xmlns="http://www.w3.org/2000/svg"
+										style={{ color: `#${item.icon.hex}` }}
+									>
+										<path d={item.icon.path} />
+									</svg>
+								</div>
+								
+								<div className="flex-1 min-w-0 space-y-0.5">
+									<div className="flex items-center justify-between gap-2">
+										<span className="text-xs font-semibold text-text-strong-950 dark:text-white group-hover:underline">
+											{item.name}
+										</span>
+										<ArrowRight className="h-3 w-3 text-text-sub-400 group-hover:text-text-strong-950 transition-colors opacity-0 group-hover:opacity-100" />
+									</div>
+									<p className="text-[11px] text-text-sub-600 dark:text-white/50 leading-relaxed">
+										{item.desc}
+									</p>
 								</div>
 							</div>
-							<p className="text-[11px] text-text-sub-600 dark:text-white/50 leading-relaxed">
-								Open-source research clone that gathers, digests, and sends structured email summaries via Reloop.
-							</p>
-						</div>
-
-						<div className="h-px bg-stroke-soft-100 dark:bg-white/5" />
-
-						{/* Inbox Router */}
-						<div className="space-y-1">
-							<div className="flex items-center justify-between">
-								<span className="text-xs font-semibold text-text-strong-950 dark:text-white hover:underline cursor-pointer">
-									Trend Finder
-								</span>
-								<div className="flex items-center gap-1">
-									<span className="rounded bg-sky-100 px-1 py-0.2 text-[8px] font-semibold text-sky-800 uppercase dark:bg-sky-500/25 dark:text-sky-300">
-										Python
-									</span>
-									<span className="rounded bg-emerald-100 px-1 py-0.2 text-[8px] font-semibold text-emerald-800 uppercase dark:bg-emerald-500/25 dark:text-emerald-300">
-										Reloop SDK
-									</span>
-								</div>
-							</div>
-							<p className="text-[11px] text-text-sub-600 dark:text-white/50 leading-relaxed">
-								Monitor web products and send formatted daily briefs with charts straight to your inbox.
-							</p>
-						</div>
+						))}
 					</div>
 				</div>
 			</div>
