@@ -10,15 +10,9 @@ export interface MainNavigationItem {
 
 export const mainNavigation: MainNavigationItem[] = [
 	{
-		label: "Home",
+		label: "Overview",
 		path: "/",
 		iconName: "home",
-	},
-	{
-		label: "Ask AI",
-		path: "/ai",
-		iconName: "sparkling",
-		isSpecial: true,
 	},
 	{
 		label: "Agent Inbox",
