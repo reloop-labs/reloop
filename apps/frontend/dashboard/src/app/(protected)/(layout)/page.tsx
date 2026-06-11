@@ -143,10 +143,9 @@ export default function Home() {
 				const date = new Date(dateStr);
 				const formattedDate = `${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}`;
 				const sent = emailStatsData.sent[idx] || 0;
-				const delivered = emailStatsData.delivered[idx] || 0;
 				return {
 					date: formattedDate,
-					count: sent + delivered,
+					count: sent,
 				};
 			});
 		}
@@ -165,9 +164,7 @@ export default function Home() {
 
 	const totalActivityCount = useMemo(() => {
 		if (emailStatsData && emailStatsData.dates.length > 0) {
-			const sentSum = emailStatsData.sent.reduce((a, b) => a + b, 0);
-			const delivSum = emailStatsData.delivered.reduce((a, b) => a + b, 0);
-			return sentSum + delivSum;
+			return emailStatsData.sent.reduce((a, b) => a + b, 0);
 		}
 		return 158; // beautiful mock number
 	}, [emailStatsData]);
@@ -319,10 +316,10 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 						<div className="flex items-center justify-between pb-6">
 							<div>
 								<h3 className="font-semibold text-sm text-text-strong-950 dark:text-white">
-									Email Activity - Last 7 Days
+									Emails Sent - Last 7 Days
 								</h3>
 								<p className="text-xs text-text-sub-600 dark:text-white/50">
-									Emails dispatched and routed in this organization
+									Total emails sent by this organization
 								</p>
 							</div>
 							<div className="text-right">
@@ -330,7 +327,7 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 									{totalActivityCount}
 								</span>
 								<p className="text-[10px] text-text-soft-400 dark:text-white/40 uppercase font-medium">
-									Total Logs
+									Total Sent
 								</p>
 							</div>
 						</div>
@@ -377,7 +374,7 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 									<Area
 										type="monotone"
 										dataKey="count"
-										name="Activity"
+										name="Emails Sent"
 										stroke="#F97316"
 										strokeWidth={2}
 										fillOpacity={1}
