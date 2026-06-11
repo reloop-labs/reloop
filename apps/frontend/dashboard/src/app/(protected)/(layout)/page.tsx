@@ -1,6 +1,7 @@
 "use client";
 
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { SetupWizard } from "./components/setup-wizard";
 import { Icon } from "@reloop/ui/icon";
 import {
 	Activity,
@@ -210,8 +211,22 @@ export default function Home() {
 		if (emailStatsData && emailStatsData.dates.length > 0) {
 			return emailStatsData.sent.reduce((a, b) => a + b, 0);
 		}
-		return 158; // beautiful mock number
+		return 0;
 	}, [emailStatsData]);
+
+	// Detect if user is new (has never sent emails)
+	// Use both email stats and API key request count as signals
+	const hasEverSentEmails = useMemo(() => {
+		if (emailStatsData && emailStatsData.dates.length > 0) {
+			const totalSent = emailStatsData.sent.reduce((a, b) => a + b, 0);
+			if (totalSent > 0) return true;
+		}
+		// Fallback: check if the API key has been used
+		if (primaryApiKey && primaryApiKey.requestCount > 0) return true;
+		return false;
+	}, [emailStatsData, primaryApiKey]);
+
+	const isNewUser = !hasEverSentEmails;
 
 	// Clipboard copy helper
 	const handleCopy = (text: string, label: string) => {
@@ -238,6 +253,18 @@ This context file guides your AI agent on integrating with Reloop's developer AP
   }
 }`;
 
+	// ── State A: New User → Setup Wizard ──────────────────────────────
+	if (isNewUser) {
+		return (
+			<SetupWizard
+				firstName={firstName || "there"}
+				domains={domains}
+				primaryApiKey={primaryApiKey}
+			/>
+		);
+	}
+
+	// ── State B: Active User → Operational Dashboard ─────────────────
 	return (
 		<div className="mx-auto max-w-7xl space-y-8 p-6 lg:p-8">
 			{/* Explore our modules / endpoints */}
