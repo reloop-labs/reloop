@@ -286,7 +286,7 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 					{/* Emails Card */}
 					<Link
 						href="/emails"
-						className="group flex flex-col justify-between rounded-xl border border-stroke-soft-100 bg-white/40 p-4 transition-all duration-200 hover:border-stroke-soft-200 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-white/10 dark:hover:bg-white/[0.02]"
+						className="group flex flex-col justify-between rounded-xl border border-stroke-soft-100 bg-white/40 p-4 transition-all duration-200 hover:border-orange-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-orange-500/20 dark:hover:bg-white/[0.02]"
 					>
 						<div className="space-y-1.5">
 							<div className="flex items-center gap-2">
@@ -301,16 +301,16 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 								Send transactional & marketing emails with high deliverability.
 							</p>
 						</div>
-						<div className="mt-3 flex items-center gap-1 font-medium text-[11px] text-orange-600 opacity-0 transition-opacity group-hover:opacity-100 dark:text-orange-400">
+						<div className="mt-3 flex items-center gap-1 font-medium text-[11px] text-orange-600 dark:text-orange-400">
 							<span>Send email</span>
-							<ArrowRight className="h-3 w-3" />
+							<ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
 						</div>
 					</Link>
 
 					{/* Agent Inbox Card */}
 					<Link
 						href="/agent-inbox"
-						className="group flex flex-col justify-between rounded-xl border border-stroke-soft-100 bg-white/40 p-4 transition-all duration-200 hover:border-stroke-soft-200 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-white/10 dark:hover:bg-white/[0.02]"
+						className="group flex flex-col justify-between rounded-xl border border-stroke-soft-100 bg-white/40 p-4 transition-all duration-200 hover:border-blue-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-blue-500/20 dark:hover:bg-white/[0.02]"
 					>
 						<div className="space-y-1.5">
 							<div className="flex items-center gap-2">
@@ -326,16 +326,16 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 								routing.
 							</p>
 						</div>
-						<div className="mt-3 flex items-center gap-1 font-medium text-[11px] text-blue-600 opacity-0 transition-opacity group-hover:opacity-100 dark:text-blue-400">
+						<div className="mt-3 flex items-center gap-1 font-medium text-[11px] text-blue-600 dark:text-blue-400">
 							<span>Open inbox</span>
-							<ArrowRight className="h-3 w-3" />
+							<ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
 						</div>
 					</Link>
 
 					{/* Workflows Card */}
 					<Link
 						href="/workflows"
-						className="group flex flex-col justify-between rounded-xl border border-stroke-soft-100 bg-white/40 p-4 transition-all duration-200 hover:border-stroke-soft-200 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-white/10 dark:hover:bg-white/[0.02]"
+						className="group flex flex-col justify-between rounded-xl border border-stroke-soft-100 bg-white/40 p-4 transition-all duration-200 hover:border-purple-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-purple-500/20 dark:hover:bg-white/[0.02]"
 					>
 						<div className="space-y-1.5">
 							<div className="flex items-center gap-2">
@@ -354,16 +354,16 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 								events.
 							</p>
 						</div>
-						<div className="mt-3 flex items-center gap-1 font-medium text-[11px] text-purple-600 opacity-0 transition-opacity group-hover:opacity-100 dark:text-purple-400">
+						<div className="mt-3 flex items-center gap-1 font-medium text-[11px] text-purple-600 dark:text-purple-400">
 							<span>Build automation</span>
-							<ArrowRight className="h-3 w-3" />
+							<ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
 						</div>
 					</Link>
 
 					{/* Domain Card */}
 					<Link
 						href="/domain"
-						className="group flex flex-col justify-between rounded-xl border border-stroke-soft-100 bg-white/40 p-4 transition-all duration-200 hover:border-stroke-soft-200 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-white/10 dark:hover:bg-white/[0.02]"
+						className="group flex flex-col justify-between rounded-xl border border-stroke-soft-100 bg-white/40 p-4 transition-all duration-200 hover:border-teal-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-teal-500/20 dark:hover:bg-white/[0.02]"
 					>
 						<div className="space-y-1.5">
 							<div className="flex items-center gap-2">
@@ -378,9 +378,9 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 								Manage custom sending domains, SPF/DKIM verification, and DNS.
 							</p>
 						</div>
-						<div className="mt-3 flex items-center gap-1 font-medium text-[11px] text-teal-600 opacity-0 transition-opacity group-hover:opacity-100 dark:text-teal-400">
+						<div className="mt-3 flex items-center gap-1 font-medium text-[11px] text-teal-600 dark:text-teal-400">
 							<span>Configure domain</span>
-							<ArrowRight className="h-3 w-3" />
+							<ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
 						</div>
 					</Link>
 				</div>
