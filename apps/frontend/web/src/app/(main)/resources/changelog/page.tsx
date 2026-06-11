@@ -5,8 +5,8 @@ import {
 } from "@reloop/web/components/page-shell";
 import { socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import { changelogComingNext, changelogReleases } from "./changelog-releases";
 import { ChangelogTimeline } from "./changelog-timeline";
+import { changelogComingNext, changelogReleases } from "./changelog-utils";
 
 export const metadata: Metadata = {
 	title: "Changelog | Reloop",

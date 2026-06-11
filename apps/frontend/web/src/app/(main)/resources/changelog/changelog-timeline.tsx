@@ -1,4 +1,5 @@
 import { CodeBlock } from "@reloop/web/components/page-shell";
+import Image from "next/image";
 
 export type ChangelogCategory =
 	| "Planning"
@@ -27,6 +28,10 @@ export type ChangelogRelease = {
 	items?: ChangelogItem[];
 	sections?: ChangelogSection[];
 	code?: string;
+	preview?: {
+		src: string;
+		alt: string;
+	};
 };
 
 const categoryOrder: ChangelogCategory[] = [
@@ -120,12 +125,23 @@ export function ChangelogTimeline({
 							))}
 						</div>
 
-						<div className="mt-6 aspect-[16/9] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02]">
-							<div className="flex h-full items-center justify-center px-6">
-								<p className="text-center text-[13px] text-text-soft-400 dark:text-white/25">
-									Release preview
-								</p>
-							</div>
+						<div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02]">
+							{release.preview ? (
+								<Image
+									src={release.preview.src}
+									alt={release.preview.alt}
+									fill
+									className="object-cover"
+									sizes="(max-width: 1320px) 100vw, 1320px"
+									priority={index === 0}
+								/>
+							) : (
+								<div className="flex h-full items-center justify-center px-6">
+									<p className="text-center text-[13px] text-text-soft-400 dark:text-white/25">
+										Release preview
+									</p>
+								</div>
+							)}
 						</div>
 
 						<ReleaseSections release={release} />
