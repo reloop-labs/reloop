@@ -98,9 +98,9 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 								onPointerEnter={() => setHoveredEl(mainNavRefs.current[index])}
 								onPointerLeave={() => setHoveredEl(undefined)}
 								className={cn(
-									"relative z-10 flex h-9 items-center rounded-lg transition-all",
+									"relative z-10 flex h-8 items-center rounded-lg transition-all",
 									isCollapsed
-										? "h-9 w-9 justify-center px-0"
+										? "h-8 w-8 justify-center px-0"
 										: cn(
 												"w-full gap-2.5 px-2.5",
 												hasSubNav ? "justify-between" : "justify-start",
@@ -117,21 +117,23 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 									<Icon
 										name={iconName}
 										className={cn(
-											"h-4 w-4 shrink-0 transition-transform duration-200",
-											!isSpecial && activeMainIndex !== index
-												? "text-text-sub-600 opacity-70"
-												: "",
+											"h-3.5 w-3.5 shrink-0 transition-all duration-200",
+											isSpecial
+												? ""
+												: activeMainIndex === index
+													? "text-primary-base"
+													: "text-text-sub-600 opacity-70",
 										)}
 									/>
 									{!isCollapsed && (
 										<span
 											className={cn(
-												"font-medium text-sm transition-colors",
+												"font-medium text-[13px] transition-colors",
 												isSpecial
 													? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
-													: activeMainIndex !== index
-														? "text-text-sub-600"
-														: "text-foreground",
+													: activeMainIndex === index
+														? "text-primary-base"
+														: "text-text-sub-600",
 											)}
 										>
 											{label}
@@ -206,17 +208,17 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 																}
 																onPointerLeave={() => setHoveredEl(undefined)}
 																className={cn(
-																	"relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-[13px]",
+																	"relative z-10 flex h-6 items-center gap-1.5 rounded-md px-2 font-medium text-[12px]",
 																	isSubActive
-																		? "text-foreground"
+																		? "text-primary-base"
 																		: "text-text-sub-600",
 																)}
 															>
 																<Icon
 																	name={subIcon}
 																	className={cn(
-																		"h-3.5 w-3.5 shrink-0",
-																		!isSubActive && "opacity-70",
+																		"h-3 w-3 shrink-0",
+																		isSubActive ? "text-primary-base" : "opacity-70",
 																	)}
 																/>
 																{subLabel}
@@ -235,7 +237,15 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 			)}
 
 			{/* The ONE shared animated hover/active background for everything */}
-			<AnimatedHoverBackground rect={rect} tabElement={currentEl} />
+			<AnimatedHoverBackground
+				rect={rect}
+				tabElement={currentEl}
+				className={
+					!hoveredEl && (activeMainIndex !== -1 || activeSubInfo)
+						? "!bg-primary-base/10"
+						: undefined
+				}
+			/>
 		</div>
 	);
 };
