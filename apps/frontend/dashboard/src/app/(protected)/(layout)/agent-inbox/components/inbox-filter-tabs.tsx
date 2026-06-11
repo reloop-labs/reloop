@@ -71,7 +71,7 @@ export const InboxFilterTabs = ({
 								"relative z-10 flex items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-left font-medium text-sm transition-all",
 								isActive
 									? filter.id === "primary"
-										? "text-primary-base dark:text-[#5293eb]"
+										? "text-blue-600 dark:text-blue-400"
 										: "text-error-base dark:text-red-500"
 									: "text-text-sub-600 hover:text-text-strong-950",
 							)}
@@ -107,7 +107,7 @@ export const InboxFilterTabs = ({
 				className={cn(
 					"relative h-10 gap-0 border-b! py-0",
 					activeFilter === "primary"
-						? "[&>div:last-child]:bg-primary-base dark:[&>div:last-child]:bg-[#5293eb]"
+						? "[&>div:last-child]:bg-blue-600 dark:[&>div:last-child]:bg-blue-500"
 						: "[&>div:last-child]:bg-error-base dark:[&>div:last-child]:bg-red-500",
 				)}
 			>
@@ -128,7 +128,7 @@ export const InboxFilterTabs = ({
 								"flex cursor-pointer items-center gap-2 px-2.5 py-0! font-medium text-sm transition-colors",
 								isActive
 									? filter.id === "primary"
-										? "text-primary-base! dark:text-[#5293eb]!"
+										? "text-blue-600! dark:text-blue-400!"
 										: "text-error-base! dark:text-red-500!"
 									: "text-text-sub-600 hover:text-text-strong-950",
 							)}
@@ -142,7 +142,7 @@ export const InboxFilterTabs = ({
 									"h-4 w-4 transition-colors",
 									isActive
 										? filter.id === "primary"
-											? "text-primary-base dark:text-[#5293eb]"
+											? "text-blue-600 dark:text-blue-400"
 											: "text-error-base dark:text-red-500"
 										: "text-text-sub-600",
 								)}
@@ -156,7 +156,7 @@ export const InboxFilterTabs = ({
 										"shrink-0 rounded-full px-1.5 py-0.5 font-semibold text-[10px] transition-colors",
 										isActive
 											? filter.id === "primary"
-												? "bg-primary-base/10 text-primary-base dark:bg-[#5293eb]/10 dark:text-[#5293eb]"
+												? "bg-blue-500/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400"
 												: "bg-error-base/10 text-error-base dark:bg-red-500/10 dark:text-red-500"
 											: "bg-bg-weak-50 text-text-soft-400 dark:bg-white/10",
 									)}
