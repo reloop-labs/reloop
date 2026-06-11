@@ -13,12 +13,15 @@ import {
 	type InboxFilter,
 	threadMatchesFilter,
 } from "../mock-data";
+import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
+import { useRouter } from "next/navigation";
 import { useAgentInbox } from "./agent-inbox-provider";
 import { InboxFilterTabs } from "./inbox-filter-tabs";
 import { ThreadDetail } from "./thread-detail";
 import { ThreadList } from "./thread-list";
 
 export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
+	const router = useRouter();
 	const mailboxId = mailbox.id;
 	const [activeFilter, setActiveFilter] = useState<InboxFilter>("all");
 	const [searchQuery, setSearchQuery] = useState("");
@@ -152,13 +155,11 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 			{/* Page Top Bar */}
 			<div className="flex shrink-0 items-center justify-between border-stroke-soft-100 border-b px-4 pt-2 pb-2 dark:border-stroke-soft-100/40">
 				<div className="flex items-center gap-3">
-					<Link
-						href="/agent-inbox"
-						className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
-						aria-label="Back to agent addresses"
-					>
-						<Icon name="arrow-left" className="h-4 w-4" />
-					</Link>
+					<AnimatedBackButton
+						showEscKey={true}
+						showText={false}
+						onClick={() => router.push("/agent-inbox")}
+					/>
 					<h1 className="font-semibold text-text-strong-950">
 						{mailbox.email}
 					</h1>

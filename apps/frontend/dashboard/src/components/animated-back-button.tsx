@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -9,6 +10,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 interface AnimatedBackButtonProps {
 	showEscKey?: boolean;
 	onClick?: () => void;
+	showText?: boolean;
 }
 
 const easing = [0.4, 0, 0.2, 1] as const;
@@ -17,6 +19,7 @@ const transition = { duration: 0.22, ease: easing };
 export const AnimatedBackButton = ({
 	showEscKey = true,
 	onClick,
+	showText = true,
 }: AnimatedBackButtonProps) => {
 	const { back } = useRouter();
 	const [hovered, setHovered] = useState(false);
@@ -42,7 +45,10 @@ export const AnimatedBackButton = ({
 			onHoverStart={() => setHovered(true)}
 			onHoverEnd={() => setHovered(false)}
 			whileTap={{ scale: 0.96 }}
-			className="flex cursor-pointer items-center gap-1 py-1.5 pr-2 font-medium text-text-sub-600 text-xs transition-colors duration-200 hover:text-text-strong-950"
+			className={cn(
+				"flex cursor-pointer items-center gap-1 py-1.5 font-medium text-text-sub-600 text-xs transition-colors duration-200 hover:text-text-strong-950",
+				showText ? "pr-2" : "pr-1"
+			)}
 		>
 			{/* Icon track */}
 			<div className="relative flex h-3.5 w-3.5 items-center">
@@ -76,14 +82,16 @@ export const AnimatedBackButton = ({
 			</div>
 			<motion.div className="flex items-center gap-1.5" transition={transition}>
 				{/* Label */}
-				<motion.span
-					animate={{
-						letterSpacing: hovered ? "0.02em" : "0em",
-					}}
-					transition={transition}
-				>
-					Back
-				</motion.span>
+				{showText && (
+					<motion.span
+						animate={{
+							letterSpacing: hovered ? "0.02em" : "0em",
+						}}
+						transition={transition}
+					>
+						Back
+					</motion.span>
+				)}
 
 				{showEscKey && <KbdEsc />}
 			</motion.div>
