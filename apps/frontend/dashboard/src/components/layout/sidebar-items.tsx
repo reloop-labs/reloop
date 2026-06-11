@@ -84,6 +84,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 		>
 			{mainNavigation.map(
 				({ path, label, iconName, isSpecial, items }, index) => {
+					if (path === "/ai") return null;
 					const hasSubNav = items && items.length > 0;
 					const isExpanded = expandedItems[path] && !isCollapsed;
 

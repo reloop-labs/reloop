@@ -2,6 +2,8 @@
 
 import { FeedbackPopover } from "@fe/dashboard/components/feedback-popover";
 import { mainNavigation, userNavigation } from "@fe/dashboard/constants";
+import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -48,6 +50,27 @@ export const PageHeader = () => {
 				</Link>
 
 				<div className="mx-0.5 h-4 w-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+
+				<Button.Root
+					variant="neutral"
+					mode="ghost"
+					size="xxsmall"
+					className={cn(
+						"gap-1.5 text-text-sub-600 hover:text-text-strong-950",
+						pathname === "/ai" && "bg-bg-weak-50 text-text-strong-950",
+					)}
+					asChild
+				>
+					<Link href="/ai">
+						<Icon
+							name="sparkling"
+							className="h-4 w-4 text-purple-600 dark:text-purple-400"
+						/>
+						<span className="bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text font-medium text-transparent">
+							Ask AI
+						</span>
+					</Link>
+				</Button.Root>
 
 				<FeedbackPopover />
 				<UserDropdown />
