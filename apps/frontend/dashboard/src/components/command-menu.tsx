@@ -289,50 +289,56 @@ export function CommandMenuGlobal() {
 				{/* ── Recent ── */}
 				{!hasSearch && recents.length > 0 && (
 					<CommandMenu.Group heading="Recent">
-						{recents.map((item) => (
-							<CommandMenu.Item
-								key={`recent-${item.path}`}
-								value={`recent ${item.label}`}
-								onSelect={() =>
-									navigateTo({
-										path: item.path,
-										label: item.label,
-										iconName: item.iconName,
-									})
-								}
-							>
-								<CommandMenu.ItemIcon
-									as={Clock}
-									className="size-4 text-text-soft-400"
-								/>
-								<span className="flex-1 truncate">{item.label}</span>
-								{PAGE_SHORTCUTS[item.path] && (
-									<KbdBadge label={PAGE_SHORTCUTS[item.path]?.label} />
-								)}
-							</CommandMenu.Item>
-						))}
+						{recents.map((item) => {
+							const shortcut = PAGE_SHORTCUTS[item.path];
+							return (
+								<CommandMenu.Item
+									key={`recent-${item.path}`}
+									value={`recent ${item.label}`}
+									onSelect={() =>
+										navigateTo({
+											path: item.path,
+											label: item.label,
+											iconName: item.iconName,
+										})
+									}
+								>
+									<CommandMenu.ItemIcon
+										as={Clock}
+										className="size-4 text-text-soft-400"
+									/>
+									<span className="flex-1 truncate">{item.label}</span>
+									{shortcut && (
+										<KbdBadge label={shortcut.label} />
+									)}
+								</CommandMenu.Item>
+							);
+						})}
 					</CommandMenu.Group>
 				)}
 
 				{/* ── Pages ── */}
 				<CommandMenu.Group heading="Pages">
-					{mainNavigation.map((item) => (
-						<CommandMenu.Item
-							key={item.path}
-							value={item.label}
-							onSelect={() => navigateTo(item)}
-						>
-							<CommandMenu.ItemIcon
-								as={Icon}
-								name={item.iconName}
-								className="size-4"
-							/>
-							<span className="flex-1 truncate">{item.label}</span>
-							{PAGE_SHORTCUTS[item.path] && (
-								<KbdBadge label={PAGE_SHORTCUTS[item.path]?.label} />
-							)}
-						</CommandMenu.Item>
-					))}
+					{mainNavigation.map((item) => {
+						const shortcut = PAGE_SHORTCUTS[item.path];
+						return (
+							<CommandMenu.Item
+								key={item.path}
+								value={item.label}
+								onSelect={() => navigateTo(item)}
+							>
+								<CommandMenu.ItemIcon
+									as={Icon}
+									name={item.iconName}
+									className="size-4"
+								/>
+								<span className="flex-1 truncate">{item.label}</span>
+								{shortcut && (
+									<KbdBadge label={shortcut.label} />
+								)}
+							</CommandMenu.Item>
+						);
+					})}
 				</CommandMenu.Group>
 
 				{/* ── Settings ── */}

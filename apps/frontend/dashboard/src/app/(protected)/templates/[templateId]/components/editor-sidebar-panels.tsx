@@ -687,7 +687,7 @@ export function TestPanel({ onClose }: PanelProps) {
 			}
 			setVariableValues(initialValues);
 		}
-	}, [detectedVars, variableValues[v.name]]);
+	}, [templateData]);
 
 	const handleVariableChange = (name: string, value: string) => {
 		setVariableValues((prev) => ({
