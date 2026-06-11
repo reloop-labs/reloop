@@ -9,6 +9,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import type { InboundThread } from "../mock-data";
 import { useAgentInbox } from "./agent-inbox-provider";
 import { toast } from "sonner";
+import { useState } from "react";
 
 dayjs.extend(relativeTime);
 
@@ -22,33 +23,24 @@ function senderInitials(thread: InboundThread): string {
 	return thread.from.email[0]?.toUpperCase() ?? "?";
 }
 
-const StarIcon = ({ className }: { className?: string }) => (
-	<svg
-		className={className}
-		viewBox="0 0 24 24"
-		fill="none"
-		stroke="currentColor"
-		strokeWidth="1.5"
-		strokeLinecap="round"
-		strokeLinejoin="round"
-	>
-		<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-	</svg>
-);
-
-const CheckboxIcon = ({ className }: { className?: string }) => (
-	<svg
-		className={className}
-		viewBox="0 0 24 24"
-		fill="none"
-		stroke="currentColor"
-		strokeWidth="1.5"
-		strokeLinecap="round"
-		strokeLinejoin="round"
-	>
-		<rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-	</svg>
-);
+function getSenderGradient(name: string): string {
+	const gradients = [
+		"from-[#ff416c] to-[#ff4b2b]", // Unity Collective: vibrant red-orange
+		"from-[#f37335] to-[#fdbb2d]", // Synergy Squad: orange-yellow
+		"from-[#e100ff] to-[#7f00ff]", // Collaborative Crew: pink-purple
+		"from-[#11998e] to-[#38ef7d]", // Innovative Minds: teal-green
+		"from-[#fc466b] to-[#3f5efb]", // Empowerment Team: purple-pink
+		"from-[#00c6ff] to-[#0072ff]", // Inspiration Hub: blue-cyan
+		"from-[#3a7bd5] to-[#3a6073]", // Dynamic Teamwork: deep blue
+		"from-[#ff9966] to-[#ff5e62]", // Creative Collaborators: peach-rose
+	];
+	let hash = 0;
+	for (let i = 0; i < name.length; i++) {
+		hash = name.charCodeAt(i) + ((hash << 5) - hash);
+	}
+	const index = Math.abs(hash) % gradients.length;
+	return gradients[index] || "from-[#ff416c] to-[#ff4b2b]";
+}
 
 interface ThreadListProps {
 	threads: InboundThread[];
@@ -68,6 +60,18 @@ export const ThreadList = ({
 	onClearFilters,
 }: ThreadListProps) => {
 	const { markMessageRead, deleteMessage, markMessageSpam } = useAgentInbox();
+	const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({
+		Today: false,
+		Yesterday: false,
+		Older: false,
+	});
+
+	const toggleGroup = (key: string) => {
+		setCollapsedGroups((prev) => ({
+			...prev,
+			[key]: !prev[key],
+		}));
+	};
 
 	const handleToggleRead = async (id: string, currentlyUnread: boolean) => {
 		try {
@@ -98,156 +102,256 @@ export const ThreadList = ({
 		}
 	};
 
-	return (
-		<div className="w-full h-full overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-paragraph-sm dark:border-stroke-soft-100/40 flex flex-col">
-			<div className="divide-y divide-stroke-soft-100/60 overflow-y-auto dark:divide-stroke-soft-100/30 flex-1 min-h-0">
-				{threads.length === 0 ? (
-					<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
-						<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
-							<Icon
-								name={hasFilters ? "search" : "inbox"}
-								className="h-5 w-5 text-text-sub-600"
-							/>
-						</div>
-						<h3 className="mb-2 font-semibold text-lg text-text-strong-950">
-							{hasFilters ? "No results found" : "No messages yet"}
-						</h3>
-						<p className="mx-auto mb-5 max-w-sm text-balance font-medium text-[12px] text-text-sub-600">
-							{emptyMessage}
-						</p>
-						{hasFilters && onClearFilters && (
-							<Button.Root
-								variant="neutral"
-								mode="stroke"
-								size="xsmall"
-								onClick={onClearFilters}
-							>
-								<Icon name="minus-circle" className="h-4 w-4" />
-								Clear filters
-							</Button.Root>
-						)}
-					</div>
-				) : (
-					threads.map((thread) => {
-						const isSelected = selectedId === thread.id;
-						return (
-							<div
-								key={thread.id}
-								onClick={() => onSelect(thread.id)}
-								className={cn(
-									"group flex w-full items-start gap-3 border-b last:border-b-0 border-stroke-soft-100/60 dark:border-stroke-soft-100/30 px-4 py-3 hover:bg-bg-weak-50/50 transition-all cursor-pointer text-left relative",
-									thread.unread
-										? "bg-bg-white-0 dark:bg-bg-white-0/5"
-										: "bg-bg-weak-50/10 dark:bg-bg-weak-50/5",
-									isSelected && "bg-bg-weak-50/80 dark:bg-bg-weak-50/20",
-								)}
-							>
-								{/* Left selection helper (Star/Checkbox) */}
-								<div className="flex flex-col items-center gap-2 mt-0.5 shrink-0">
-									<CheckboxIcon className="h-4 w-4 text-text-soft-400 hover:text-text-sub-600 transition-colors" />
-									<StarIcon className="h-4 w-4 text-text-soft-400 hover:text-yellow-500 transition-colors" />
-								</div>
+	// Group threads by Today, Yesterday, and Older
+	const grouped = threads.reduce(
+		(acc, thread) => {
+			const date = dayjs(thread.receivedAt);
+			const today = dayjs();
+			let groupKey: "Today" | "Yesterday" | "Older" = "Older";
 
-								{/* Main Content Area */}
-								<div className="flex-1 min-w-0 flex flex-col gap-1">
-									{/* Sender + Date */}
-									<div className="flex items-center justify-between gap-2">
-										<span
+			if (date.isSame(today, "day")) {
+				groupKey = "Today";
+			} else if (date.isSame(today.subtract(1, "day"), "day")) {
+				groupKey = "Yesterday";
+			}
+
+			if (!acc[groupKey]) acc[groupKey] = [];
+			acc[groupKey].push(thread);
+			return acc;
+		},
+		{} as Record<"Today" | "Yesterday" | "Older", InboundThread[]>,
+	);
+
+	const groups: {
+		key: "Today" | "Yesterday" | "Older";
+		title: string;
+		threads: InboundThread[];
+	}[] = [
+		{ key: "Today" as const, title: "Today", threads: grouped.Today || [] },
+		{ key: "Yesterday" as const, title: "Yesterday", threads: grouped.Yesterday || [] },
+		{ key: "Older" as const, title: "Older", threads: grouped.Older || [] },
+	].filter((g) => g.threads.length > 0);
+
+	if (threads.length === 0) {
+		return (
+			<div className="flex-1 overflow-y-auto min-h-0">
+				<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
+					<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
+						<Icon
+							name={hasFilters ? "search" : "inbox"}
+							className="h-5 w-5 text-text-sub-600"
+						/>
+					</div>
+					<h3 className="mb-2 font-semibold text-lg text-text-strong-950">
+						{hasFilters ? "No results found" : "No messages yet"}
+					</h3>
+					<p className="mx-auto mb-5 max-w-sm text-balance font-medium text-[12px] text-text-sub-600">
+						{emptyMessage}
+					</p>
+					{hasFilters && onClearFilters && (
+						<Button.Root
+							variant="neutral"
+							mode="stroke"
+							size="xsmall"
+							onClick={onClearFilters}
+						>
+							<Icon name="minus-circle" className="h-4 w-4" />
+							Clear filters
+						</Button.Root>
+					)}
+				</div>
+			</div>
+		);
+	}
+
+	return (
+		<div className="flex-1 overflow-y-auto min-h-0 pr-1.5 flex flex-col gap-4 text-paragraph-sm">
+			{groups.map((group) => {
+				const isCollapsed = collapsedGroups[group.key];
+				return (
+					<div key={group.key} className="flex flex-col gap-2.5">
+						{/* Collapsible Group Header */}
+						<div
+							onClick={() => toggleGroup(group.key)}
+							className="flex items-center justify-between px-1 py-1 cursor-pointer select-none text-text-sub-500 hover:text-text-strong-950 transition-colors"
+						>
+							<span className="font-bold text-[11px] tracking-wider uppercase text-neutral-500 dark:text-neutral-400">
+								{group.title.toUpperCase()}
+							</span>
+							<div className="flex items-center gap-1.5 text-neutral-400 dark:text-neutral-500">
+								<Icon name="mail" className="h-3.5 w-3.5" />
+								<span className="text-xs font-semibold tabular-nums">
+									{group.threads.length}
+								</span>
+								<Icon
+									name="chevron-down"
+									className={cn(
+										"h-4 w-4 transition-transform duration-200",
+										!isCollapsed && "rotate-180",
+									)}
+								/>
+							</div>
+						</div>
+
+						{/* Group Threads List */}
+						{!isCollapsed && (
+							<div className="flex flex-col gap-2.5">
+								{group.threads.map((thread) => {
+									const isSelected = selectedId === thread.id;
+									const isUnread = thread.unread;
+
+									return (
+										<div
+											key={thread.id}
+											onClick={() => onSelect(thread.id)}
 											className={cn(
-												"truncate text-label-sm",
-												thread.unread
-													? "font-semibold text-text-strong-950"
-													: "text-text-sub-600",
+												"group/card flex flex-col gap-2 rounded-2xl border p-4 transition-all duration-200 cursor-pointer text-left relative bg-white dark:bg-neutral-900 shadow-sm",
+												isSelected
+													? "border-neutral-900 dark:border-white shadow-md"
+													: "border-neutral-200/65 dark:border-neutral-800/80 hover:border-neutral-300 dark:hover:border-neutral-700",
 											)}
 										>
-											{thread.from.name ?? thread.from.email}
-										</span>
-										<span className="text-[11px] text-text-soft-400 shrink-0 tabular-nums">
-											{dayjs(thread.receivedAt).format("h:mm A")}
-										</span>
-									</div>
+											{/* Sender, dot & date row */}
+											<div className="flex items-center justify-between">
+												<div className="flex items-center gap-3 min-w-0">
+													{/* Solid Indigo/Blue Avatar */}
+													<div
+														className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1e40af] text-white font-semibold text-xs shadow-sm"
+													>
+														{senderInitials(thread)}
+													</div>
+													{/* Sender name */}
+													<span
+														className="truncate text-sm font-semibold tracking-tight text-neutral-800 dark:text-neutral-200"
+													>
+														{thread.from.name ?? thread.from.email}
+													</span>
+												</div>
 
-									{/* Subject */}
-									<div className="truncate text-label-sm font-medium text-text-strong-950">
-										{thread.subject}
-									</div>
-
-									{/* Snippet */}
-									<div className="truncate text-label-xs text-text-soft-400 max-h-4">
-										{thread.preview}
-									</div>
-
-									{/* Bottom Meta & Hover Actions Row */}
-									<div className="flex items-center justify-between mt-1 min-h-[20px]">
-										{/* Attachments Pills */}
-										<div className="flex items-center gap-1.5 shrink-0 flex-wrap min-w-0 flex-1 mr-2">
-											{thread.attachments && thread.attachments.length > 0 ? (
-												<>
-													{thread.attachments.slice(0, 1).map((att) => (
-														<div
-															key={att.name}
-															className="flex items-center gap-1 px-1 py-0.5 rounded bg-bg-weak-50 ring-1 ring-stroke-soft-100 text-[9px] text-text-sub-600 max-w-[100px] truncate"
-														>
-															<Icon
-																name="file-text"
-																className="h-2.5 w-2.5 shrink-0 text-text-soft-400"
-															/>
-															<span className="truncate">{att.name}</span>
-														</div>
-													))}
-													{thread.attachments.length > 1 && (
-														<span className="text-[9px] text-text-soft-400">
-															+{thread.attachments.length - 1}
-														</span>
+												<div className="flex items-center gap-2 shrink-0">
+													{isUnread && (
+														<span className="h-2 w-2 rounded-full bg-blue-600 shrink-0" />
 													)}
-												</>
-											) : thread.entityTag ? (
-												<Badge.Root size="small" variant="lighter" color="gray">
-													{thread.entityTag}
-												</Badge.Root>
-											) : null}
-										</div>
+													<span className="text-[11px] text-neutral-400 dark:text-neutral-500 font-medium tabular-nums">
+														{dayjs(thread.receivedAt).format("HH:mm")}
+													</span>
+												</div>
+											</div>
 
-										{/* Triage Actions (visible on hover) */}
-										<div className="opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all duration-150 flex items-center gap-1 shrink-0 bg-transparent">
-											<button
-												title={thread.unread ? "Mark as Handled" : "Mark as Active"}
-												onClick={(e) => {
-													e.stopPropagation();
-													handleToggleRead(thread.id, thread.unread);
-												}}
-												className="p-1 rounded hover:bg-bg-weak-100 dark:hover:bg-white/10 text-text-sub-600 hover:text-text-strong-950 transition-colors"
+											{/* Subject */}
+											<div
+												className="truncate text-sm font-bold text-neutral-900 dark:text-neutral-100"
 											>
-												<Icon name="check-circle" className="h-3.5 w-3.5" />
-											</button>
-											<button
-												title="Mark as Spam"
-												onClick={(e) => {
-													e.stopPropagation();
-													handleMarkSpam(thread.id);
-												}}
-												className="p-1 rounded hover:bg-bg-weak-100 dark:hover:bg-white/10 text-text-sub-600 hover:text-error-base transition-colors"
-											>
-												<Icon name="cross-circle" className="h-3.5 w-3.5" />
-											</button>
-											<button
-												title="Delete Message"
-												onClick={(e) => {
-													e.stopPropagation();
-													handleDelete(thread.id);
-												}}
-												className="p-1 rounded hover:bg-bg-weak-100 dark:hover:bg-white/10 text-text-sub-600 hover:text-error-base transition-colors"
-											>
-												<Icon name="trash" className="h-3.5 w-3.5" />
-											</button>
+												{thread.subject}
+											</div>
+
+											{/* Snippet */}
+											<div className="truncate text-xs text-neutral-400 dark:text-neutral-450 leading-relaxed">
+												{thread.preview}
+											</div>
+
+											{/* Badges/Pills Row */}
+											<div className="flex items-center justify-between mt-0.5 min-h-[22px]">
+												{thread.attachments &&
+												thread.attachments.length > 0 ? (
+													<div className="flex items-center gap-1.5 shrink-0 flex-wrap min-w-0">
+														{thread.attachments
+															.slice(0, 2)
+															.map((att, idx) => (
+																<div
+																	key={att.name + idx}
+																	className="flex items-center gap-1 px-2.5 py-1 rounded-[8px] border border-neutral-200 bg-white text-[10px] font-medium text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400 shadow-sm"
+																>
+																	<Icon
+																		name="file-text"
+																		className="h-3.5 w-3.5 shrink-0 text-neutral-400"
+																	/>
+																	<span className="truncate max-w-[100px]">
+																		{att.name}
+																	</span>
+																</div>
+															))}
+														{thread.attachments.length > 2 && (
+															<span className="px-2 py-1 rounded-[8px] border border-neutral-200 bg-white text-[10px] font-medium text-neutral-500 dark:border-neutral-800 dark:bg-neutral-900 shadow-sm">
+																+{thread.attachments.length - 2}
+															</span>
+														)}
+													</div>
+												) : (
+													<div className="flex items-center gap-1.5 shrink-0 flex-wrap min-w-0">
+														{["TAG #1", "TAG #2", "TAG #3"]
+															.slice(
+																0,
+																thread.id === "in-005" ||
+																	thread.id === "in-011"
+																	? 1
+																	: thread.id === "in-003"
+																		? 2
+																		: 3,
+															)
+															.map((tag) => (
+																<span
+																	key={tag}
+																	className="px-1.5 py-0.5 rounded-[4px] bg-neutral-100 dark:bg-neutral-800 text-[9px] font-bold text-neutral-400 dark:text-neutral-500 tracking-wider"
+																>
+																	{tag}
+																</span>
+															))}
+													</div>
+												)}
+
+												{/* Quick actions (visible on hover) */}
+												<div className="opacity-0 invisible group-hover/card:visible group-hover/card:opacity-100 transition-all duration-150 flex items-center gap-1 shrink-0 bg-transparent">
+													<button
+														title={
+															thread.unread
+																? "Mark as Handled"
+																: "Mark as Active"
+														}
+														onClick={(e) => {
+															e.stopPropagation();
+															handleToggleRead(thread.id, thread.unread);
+														}}
+														className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-500 hover:text-neutral-800 transition-colors"
+													>
+														<Icon
+															name="check-circle"
+															className="h-3.5 w-3.5"
+														/>
+													</button>
+													<button
+														title="Mark as Spam"
+														onClick={(e) => {
+															e.stopPropagation();
+															handleMarkSpam(thread.id);
+														}}
+														className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-500 hover:text-error-base transition-colors"
+													>
+														<Icon
+															name="cross-circle"
+															className="h-3.5 w-3.5"
+														/>
+													</button>
+													<button
+														title="Delete Message"
+														onClick={(e) => {
+															e.stopPropagation();
+															handleDelete(thread.id);
+														}}
+														className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-white/10 text-neutral-500 hover:text-error-base transition-colors"
+													>
+														<Icon name="trash" className="h-3.5 w-3.5" />
+													</button>
+												</div>
+											</div>
 										</div>
-									</div>
-								</div>
+									);
+								})}
 							</div>
-						);
-					})
-				)}
-			</div>
+						)}
+					</div>
+				);
+			})}
 		</div>
 	);
 };

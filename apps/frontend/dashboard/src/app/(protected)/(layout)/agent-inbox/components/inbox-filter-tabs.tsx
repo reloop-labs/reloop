@@ -110,7 +110,7 @@ export const InboxFilterTabs = ({
 						className={cn(
 							"relative -mb-[1px] flex items-center gap-2 border-b-2 px-1 pt-2 pb-3 font-semibold text-xs transition-colors focus:outline-none",
 							isActive
-								? "border-primary-base text-primary-base dark:text-[#5293eb]"
+								? "border-orange-500 text-orange-500"
 								: "border-transparent text-text-sub-600 hover:text-text-strong-950",
 						)}
 					>
@@ -119,10 +119,10 @@ export const InboxFilterTabs = ({
 						{count > 0 && (
 							<span
 								className={cn(
-									"shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold transition-colors",
+									"shrink-0 ml-1 text-[11px] font-semibold transition-colors",
 									isActive
-										? "bg-primary-base/10 text-primary-base dark:bg-[#5293eb]/10 dark:text-[#5293eb]"
-										: "bg-bg-weak-50 text-text-soft-400 dark:bg-white/10",
+										? "text-orange-500"
+										: "text-text-soft-400",
 								)}
 							>
 								{count}

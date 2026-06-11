@@ -72,46 +72,45 @@ export const ThreadDetail = ({
 	};
 
 	return (
-		<div className="flex h-full flex-col min-h-0">
-			<div className="flex-1 overflow-y-auto min-h-0">
-
-
+		<div className="flex h-full min-h-0 flex-col">
+			<div className="min-h-0 flex-1 overflow-y-auto">
 				{/* Subject Header */}
 				<div className="border-stroke-soft-100 border-b px-6 py-5 dark:border-stroke-soft-100/40">
-					<h1 className="text-xl font-medium text-text-strong-950 flex items-center gap-2">
+					<h1 className="flex items-center gap-2 font-medium text-text-strong-950 text-xl">
 						{thread.subject}
-						<span className="px-1.5 py-0.5 rounded text-[10px] bg-bg-weak-100 text-text-sub-600 dark:bg-white/10 font-normal">Inbox x</span>
 					</h1>
 				</div>
 
 				{/* Sender Meta Row */}
-				<div className="px-6 py-4 flex items-start justify-between gap-4">
+				<div className="flex items-start justify-between gap-4 px-6 py-4">
 					{/* Left side: Avatar + Sender Info */}
-					<div className="flex items-start gap-3 min-w-0">
+					<div className="flex min-w-0 items-start gap-3">
 						{/* Avatar Circle */}
-						<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-base/10 text-primary-base font-semibold text-sm border border-primary-base/20">
-							{thread.from.name ? thread.from.name.charAt(0).toUpperCase() : (thread.from.email.charAt(0).toUpperCase() || "?")}
+						<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary-base/20 bg-primary-base/10 font-semibold text-primary-base text-sm">
+							{thread.from.name
+								? thread.from.name.charAt(0).toUpperCase()
+								: thread.from.email.charAt(0).toUpperCase() || "?"}
 						</div>
 
-						<div className="flex flex-col min-w-0">
+						<div className="flex min-w-0 flex-col">
 							{/* Name <email> and Unsubscribe */}
-							<div className="flex items-baseline gap-1.5 flex-wrap">
-								<span className="font-semibold text-text-strong-950 text-label-sm">
+							<div className="flex flex-wrap items-baseline gap-1.5">
+								<span className="font-semibold text-label-sm text-text-strong-950">
 									{thread.from.name || thread.from.email.split("@")[0]}
 								</span>
-								<span className="text-text-soft-400 text-xs font-normal">
+								<span className="font-normal text-text-soft-400 text-xs">
 									&lt;{thread.from.email}&gt;
 								</span>
 								<button
 									onClick={() => handlePrototypeAction("Unsubscribe")}
-									className="text-xs text-primary-base hover:underline font-medium ml-1"
+									className="ml-1 font-medium text-primary-base text-xs hover:underline"
 								>
 									Unsubscribe
 								</button>
 							</div>
 
 							{/* To block */}
-							<div className="flex items-center gap-1 text-text-soft-400 text-xs mt-0.5">
+							<div className="mt-0.5 flex items-center gap-1 text-text-soft-400 text-xs">
 								<span>to me</span>
 								<Icon name="chevron-down" className="h-3 w-3" />
 							</div>
@@ -119,27 +118,42 @@ export const ThreadDetail = ({
 					</div>
 
 					{/* Right side: Date + Action Icons */}
-					<div className="flex items-center gap-2 shrink-0">
-						<span className="text-xs text-text-soft-400">
-							{dayjs(thread.receivedAt).format("ddd, MMM D, h:mm A")} ({dayjs(thread.receivedAt).fromNow()})
+					<div className="flex shrink-0 items-center gap-2">
+						<span className="text-text-soft-400 text-xs">
+							{dayjs(thread.receivedAt).format("ddd, MMM D, h:mm A")} (
+							{dayjs(thread.receivedAt).fromNow()})
 						</span>
 
 						<div className="flex items-center gap-0.5 text-text-soft-400">
 							<button
 								onClick={() => handlePrototypeAction("Star message")}
-								className="p-1.5 rounded-lg hover:bg-bg-weak-50 dark:hover:bg-white/10 hover:text-text-strong-950 transition-colors"
+								className="rounded-lg p-1.5 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/10"
 								title="Star message"
 							>
-								<svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+								<svg
+									className="h-4 w-4"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="1.5"
+								>
 									<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
 								</svg>
 							</button>
 							<button
 								onClick={() => handlePrototypeAction("Add reaction")}
-								className="p-1.5 rounded-lg hover:bg-bg-weak-50 dark:hover:bg-white/10 hover:text-text-strong-950 transition-colors"
+								className="rounded-lg p-1.5 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/10"
 								title="Add reaction"
 							>
-								<svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+								<svg
+									className="h-4 w-4"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="1.5"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								>
 									<circle cx="12" cy="12" r="10" />
 									<path d="M8 14s1.5 2 4 2 4-2 4-2" />
 									<line x1="9" y1="9" x2="9.01" y2="9" />
@@ -148,20 +162,36 @@ export const ThreadDetail = ({
 							</button>
 							<button
 								onClick={() => handlePrototypeAction("Reply")}
-								className="p-1.5 rounded-lg hover:bg-bg-weak-50 dark:hover:bg-white/10 hover:text-text-strong-950 transition-colors"
+								className="rounded-lg p-1.5 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/10"
 								title="Reply"
 							>
-								<svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+								<svg
+									className="h-4 w-4"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="1.5"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								>
 									<polyline points="9 17 4 12 9 7" />
 									<path d="M20 18v-2a4 4 0 0 0-4-4H4" />
 								</svg>
 							</button>
 							<button
 								onClick={() => handlePrototypeAction("More actions")}
-								className="p-1.5 rounded-lg hover:bg-bg-weak-50 dark:hover:bg-white/10 hover:text-text-strong-950 transition-colors"
+								className="rounded-lg p-1.5 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/10"
 								title="More actions"
 							>
-								<svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+								<svg
+									className="h-4 w-4"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="1.5"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								>
 									<circle cx="12" cy="12" r="1" />
 									<circle cx="12" cy="5" r="1" />
 									<circle cx="12" cy="19" r="1" />
@@ -253,10 +283,7 @@ export const ThreadDetail = ({
 						)}
 					</div>
 				)}
-
-
 			</div>
-
 		</div>
 	);
 };

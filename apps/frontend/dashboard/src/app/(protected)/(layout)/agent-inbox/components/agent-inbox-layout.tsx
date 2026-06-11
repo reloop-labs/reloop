@@ -168,11 +168,11 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 							<Icon name="arrow-left" className="h-4 w-4" />
 						</Link>
 						<div className="flex-1">
-							<Input.Root size="xsmall" className="rounded-[10px]">
+							<Input.Root size="xsmall" className="rounded-full">
 								<Input.Wrapper>
 									<Input.Icon as={Icon} name="search" size="xsmall" />
 									<Input.Input
-										placeholder="Search subject, sender, preview..."
+										placeholder="Search from mails"
 										value={searchQuery}
 										onChange={(e) => setSearchQuery(e.target.value)}
 									/>

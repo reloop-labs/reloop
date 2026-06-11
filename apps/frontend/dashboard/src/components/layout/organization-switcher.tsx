@@ -80,7 +80,7 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 					<button
 						type="button"
 						title={activeOrganization.name}
-						className="flex w-full items-center justify-center outline-none transition-colors hover:bg-bg-weak-50"
+						className="flex h-9 w-9 items-center justify-center rounded-lg outline-none transition-all hover:bg-bg-weak-50 dark:hover:bg-white/5"
 					>
 						{activeOrganization.logo ? (
 							<Avatar.Root

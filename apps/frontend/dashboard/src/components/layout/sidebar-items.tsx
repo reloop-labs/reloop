@@ -80,7 +80,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 
 	return (
 		// Single relative container — the animated pill lives here and nowhere else
-		<div className="relative">
+		<div className="relative flex flex-col">
 			{mainNavigation.map(
 				({ path, label, iconName, isSpecial, items }, index) => {
 					const hasSubNav = items && items.length > 0;
@@ -96,20 +96,26 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 								onPointerEnter={() => setHoveredEl(mainNavRefs.current[index])}
 								onPointerLeave={() => setHoveredEl(undefined)}
 								className={cn(
-									"relative z-10 flex h-8 items-center gap-2 rounded-lg px-2 text-left",
-									hasSubNav && !isCollapsed
-										? "justify-between"
-										: isCollapsed
-											? "justify-center"
-											: "justify-start",
+									"relative z-10 flex h-9 items-center rounded-lg transition-all",
+									isCollapsed
+										? "h-9 w-9 justify-center px-0"
+										: cn(
+												"w-full gap-2.5 px-2.5",
+												hasSubNav ? "justify-between" : "justify-start",
+											),
 								)}
 								title={isCollapsed ? label : undefined}
 							>
-								<span className="flex min-w-0 items-center gap-2">
+								<span
+									className={cn(
+										"flex min-w-0 items-center",
+										isCollapsed ? "" : "gap-2.5",
+									)}
+								>
 									<Icon
 										name={iconName}
 										className={cn(
-											"h-3.5 w-3.5 shrink-0",
+											"h-4 w-4 shrink-0 transition-transform duration-200",
 											!isSpecial && activeMainIndex !== index
 												? "text-text-sub-600 opacity-70"
 												: "",

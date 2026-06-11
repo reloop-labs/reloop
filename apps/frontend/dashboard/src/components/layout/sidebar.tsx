@@ -67,7 +67,12 @@ export const MainSidebar: React.FC = () => {
 				isSidebarCollapsed ? "w-14" : "w-60",
 			)}
 		>
-			<div className="flex h-12 items-center justify-between pr-3 pl-1">
+			<div
+				className={cn(
+					"flex items-center justify-between transition-all",
+					isSidebarCollapsed ? "h-14 px-0 justify-center" : "h-12 pr-3 pl-1"
+				)}
+			>
 				<OrganizationSwitcher
 					organizations={organizations}
 					activeOrganization={activeOrganization}
@@ -76,10 +81,20 @@ export const MainSidebar: React.FC = () => {
 					side="bottom"
 				/>
 			</div>
-			<div className="flex-1 overflow-y-auto p-2">
+			<div
+				className={cn(
+					"flex-1 overflow-y-auto transition-all py-2",
+					isSidebarCollapsed ? "px-0" : "px-2"
+				)}
+			>
 				<SidebarItems isCollapsed={isSidebarCollapsed} />
 			</div>
-			<div className="mx-3 my-3">
+			<div
+				className={cn(
+					"my-3 transition-all flex justify-center w-full",
+					isSidebarCollapsed ? "px-0" : "px-3"
+				)}
+			>
 				<UserMenuDropdown user={user} isCollapsed={isSidebarCollapsed} />
 			</div>
 		</div>

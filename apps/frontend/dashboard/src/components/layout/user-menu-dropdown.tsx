@@ -76,8 +76,10 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 					variant="neutral"
 					mode="ghost"
 					className={cn(
-						"flex h-auto w-full cursor-pointer items-center gap-2.5 rounded-2xl! px-2 py-2",
-						isCollapsed ? "justify-center" : "justify-start",
+						"flex cursor-pointer items-center transition-all",
+						isCollapsed
+							? "h-9 w-9 justify-center p-0 rounded-lg"
+							: "h-auto w-full gap-2.5 rounded-2xl! px-2 py-2 justify-start",
 						isOpen && "bg-bg-weak-50",
 					)}
 				>
