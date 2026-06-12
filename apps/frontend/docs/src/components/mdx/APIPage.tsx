@@ -268,7 +268,7 @@ export function APIPage(props: APIPageProps) {
 			{/* ─── Left: endpoint + parameters ─── */}
 			<div className="min-w-0">
 				{/* Method + Path */}
-				<div className="api-endpoint-bar mb-8 flex items-center gap-3 rounded-xl border px-4 py-3">
+				<div className="api-endpoint-bar mb-8 flex items-center gap-3 rounded-xl border border-stroke-soft-100 bg-[#fafafa] px-4 py-3 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0e]">
 					<span
 						className={cn(
 							"shrink-0 rounded-md px-2 py-0.5 font-bold text-[11px] uppercase tracking-wider",
