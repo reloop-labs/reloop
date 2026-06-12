@@ -1,7 +1,8 @@
 "use client";
 
+import { CodePortal } from "@reloop/fe-docs/components/docs/code-column-context";
 import { cn } from "@reloop/ui/cn";
-import { Check, ChevronDown, ChevronRight, Copy } from "lucide-react";
+import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import { CodeGroup, CodeBlock as MintlifyCodeBlock } from "./mintlify-client";
 
@@ -43,9 +44,11 @@ interface APIPageProps {
 
 /** Shorten the internal API path to a clean public-style route. */
 function shortenPath(fullPath: string): string {
-	// /api/domain/v1/create → /domains
-	// /api/domain/v1/{domain_id} → /domains/:domain_id
-	return fullPath.replace(/\{([^}]+)\}/g, ":$1");
+	// /api/domain/v1/create → /domain/v1/create
+	// /api/domain/v1/{domain_id} → /domain/v1/:domain_id
+	const clean = fullPath.replace(/\{([^}]+)\}/g, ":$1");
+	// Remove the leading /api prefix for cleaner display
+	return clean.replace(/^\/api/, "");
 }
 
 const METHOD_STYLES: Record<string, string> = {
@@ -88,21 +91,33 @@ export function APIPage(props: APIPageProps) {
 	const queryParams = parameterList.filter((p) => p.location === "query");
 	const bodyParams = parameterList.filter((p) => p.location === "body");
 
+	const codeColumn = (
+		<div className="api-code-panel space-y-6">
+			<CodeExamples
+				method={method}
+				path={path}
+				parameters={parameterList}
+				codeSamples={codeSamples}
+			/>
+			<ResponseCard responses={responseMap} />
+		</div>
+	);
+
 	return (
-		<div className="relative mt-6 grid grid-cols-1 gap-x-10 lg:grid-cols-[minmax(0,1fr)_minmax(400px,1fr)]">
-			{/* ─── Left: content ─── */}
-			<div className="row-start-1 min-w-0">
+		<>
+			{/* ─── Left: endpoint + parameters ─── */}
+			<div className="min-w-0">
 				{/* Method + Path */}
-				<div className="mb-8 flex items-center gap-2.5">
+				<div className="api-endpoint-bar mb-8 flex items-center gap-3 rounded-xl border px-4 py-3">
 					<span
 						className={cn(
-							"rounded-md px-2.5 py-1 font-bold text-[11px] uppercase tracking-wider",
+							"shrink-0 rounded-md px-2 py-0.5 font-bold text-[11px] uppercase tracking-wider",
 							METHOD_STYLES[method] || METHOD_STYLES.GET,
 						)}
 					>
 						{method}
 					</span>
-					<code className="font-mono text-[13px] text-text-sub-600">
+					<code className="min-w-0 break-all font-mono text-[13px] text-fd-foreground">
 						{shortenPath(path)}
 					</code>
 				</div>
@@ -119,30 +134,12 @@ export function APIPage(props: APIPageProps) {
 				)}
 			</div>
 
-			{/* ─── Right: sticky code + response ─── */}
-			<div className="row-start-1 hidden lg:block">
-				<div className="sticky top-24 space-y-6">
-					<CodeExamples
-						method={method}
-						path={path}
-						parameters={parameterList}
-						codeSamples={codeSamples}
-					/>
-					<ResponseCard responses={responseMap} />
-				</div>
-			</div>
+			{/* ─── Desktop: teleport to page-level sticky column ─── */}
+			<CodePortal>{codeColumn}</CodePortal>
 
 			{/* ─── Mobile: code + response below content ─── */}
-			<div className="mt-10 space-y-6 lg:hidden">
-				<CodeExamples
-					method={method}
-					path={path}
-					parameters={parameterList}
-					codeSamples={codeSamples}
-				/>
-				<ResponseCard responses={responseMap} />
-			</div>
-		</div>
+			<div className="mt-10 lg:hidden">{codeColumn}</div>
+		</>
 	);
 }
 
@@ -157,10 +154,10 @@ function ParameterSection({
 }) {
 	return (
 		<section className="mb-10">
-			<h2 className="mb-1 font-semibold text-fd-foreground text-lg tracking-tight">
+			<h2 className="mb-4 flex items-center gap-2 font-semibold text-fd-foreground text-base tracking-tight">
 				{title}
 			</h2>
-			<div className="divide-y divide-fd-border">
+			<div className="api-parameter-list divide-y">
 				{params.map((param) => (
 					<ParameterRow key={`${param.location}-${param.name}`} param={param} />
 				))}
@@ -171,30 +168,30 @@ function ParameterSection({
 
 function ParameterRow({ param }: { param: Parameter }) {
 	return (
-		<div className="py-4 first:pt-3">
+		<div className="py-4 first:pt-2">
 			{/* Name + type + required */}
-			<div className="flex flex-wrap items-baseline gap-2">
-				<span className="font-mono font-semibold text-[14px] text-fd-foreground">
+			<div className="flex flex-wrap items-center gap-2">
+				<span className="font-mono font-semibold text-[13.5px] text-fd-foreground">
 					{param.name}
 				</span>
-				<span className="font-mono text-[12px] text-text-sub-600/70">
+				<span className="rounded bg-bg-weak-50 px-1.5 py-0.5 font-mono text-[11px] text-text-sub-600/60 dark:bg-white/5">
 					{param.type}
 				</span>
 				{param.defaultValue !== undefined && (
-					<span className="font-mono text-[12px] text-text-sub-600/50">
+					<span className="rounded bg-bg-weak-50 px-1.5 py-0.5 font-mono text-[11px] text-text-sub-600/50 dark:bg-white/5">
 						default: {JSON.stringify(param.defaultValue)}
 					</span>
 				)}
 				{param.required && (
-					<span className="font-semibold text-[11px] text-red-500 uppercase dark:text-red-400">
-						Required
+					<span className="rounded-sm bg-red-500/10 px-1.5 py-0.5 font-semibold text-[10px] text-red-500 uppercase tracking-wide dark:text-red-400">
+						required
 					</span>
 				)}
 			</div>
 
 			{/* Description */}
 			{param.description && (
-				<p className="mt-1.5 text-[14px] text-text-sub-600 leading-relaxed">
+				<p className="mt-2 text-[13.5px] text-text-sub-600 leading-relaxed">
 					{param.description}
 					{/* Append possible values inline like Resend */}
 					{param.enumValues && param.enumValues.length > 0 && (
@@ -203,7 +200,7 @@ function ParameterRow({ param }: { param: Parameter }) {
 							Possible values:{" "}
 							{param.enumValues.map((v, i) => (
 								<span key={v}>
-									<code className="rounded bg-fd-muted px-1 py-0.5 text-[12px]">
+									<code className="rounded bg-bg-weak-50 px-1 py-0.5 text-[11px] dark:bg-white/5">
 										{v}
 									</code>
 									{i < (param.enumValues?.length ?? 0) - 1 && (
@@ -224,7 +221,7 @@ function ParameterRow({ param }: { param: Parameter }) {
 						Possible values:{" "}
 						{param.enumValues.map((v, i) => (
 							<span key={v}>
-								<code className="rounded bg-fd-muted px-1 py-0.5 text-[12px]">
+								<code className="rounded bg-bg-weak-50 px-1 py-0.5 text-[12px] dark:bg-white/5">
 									{v}
 								</code>
 								{i < (param.enumValues?.length ?? 0) - 1 && (
@@ -297,12 +294,12 @@ function ResponseCard({ responses }: { responses: Record<string, any> }) {
 	return (
 		<div>
 			{/* Status tabs + label */}
-			<div className="mb-2 flex items-center gap-2">
+			<div className="mb-2 flex items-center gap-3">
 				<span className="font-semibold text-[13px] text-fd-foreground">
 					Response
 				</span>
 				{statusCodes.length > 1 && (
-					<div className="flex items-center gap-0.5">
+					<div className="api-status-tabs flex items-center gap-1 rounded-lg border p-0.5">
 						{statusCodes.map((code) => (
 							<button
 								key={code}
@@ -311,7 +308,7 @@ function ResponseCard({ responses }: { responses: Record<string, any> }) {
 								className={cn(
 									"rounded-md px-2 py-1 font-mono text-[11px] transition-colors",
 									activeStatus === code
-										? "bg-fd-muted font-semibold text-fd-foreground"
+										? "bg-bg-white-0 font-semibold text-fd-foreground shadow-sm dark:bg-white/10"
 										: "text-text-sub-600/50 hover:text-text-sub-600",
 								)}
 							>
@@ -320,7 +317,7 @@ function ResponseCard({ responses }: { responses: Record<string, any> }) {
 						))}
 					</div>
 				)}
-				<div className="ml-auto">
+				<div className="ml-auto flex items-center gap-1">
 					<CopyButton content={jsonStr} />
 				</div>
 			</div>

@@ -106,3 +106,46 @@ aside::-webkit-scrollbar-thumb {
 aside::-webkit-scrollbar-thumb:hover {
 	background: var(--color-text-sub-600);
 }
+
+/* API reference surface borders — match docs design tokens */
+.api-endpoint-bar,
+.api-status-tabs {
+	border-color: var(--color-stroke-soft-200);
+	background: var(--color-bg-weak-50);
+}
+
+.dark .api-endpoint-bar,
+.dark .api-status-tabs {
+	border-color: rgb(255 255 255 / 0.08);
+	background: rgb(255 255 255 / 0.03);
+}
+
+.api-parameter-list.divide-y > :not([hidden]) ~ :not([hidden]) {
+	border-top-color: var(--color-stroke-soft-200);
+}
+
+.dark .api-parameter-list.divide-y > :not([hidden]) ~ :not([hidden]) {
+	border-top-color: rgb(255 255 255 / 0.06);
+}
+
+/* API reference: code panel styling */
+.api-code-panel .code-group {
+	border-radius: 0.75rem;
+	border: 1px solid var(--color-stroke-soft-200) !important;
+	overflow: hidden;
+}
+
+.dark .api-code-panel .code-group {
+	border-color: rgb(255 255 255 / 0.08) !important;
+}
+
+/* Soften Mintlify internal dividers inside code blocks */
+.api-code-panel .code-group [class*="border-b"],
+.api-code-panel [class*="code-block"] [class*="border-b"] {
+	border-color: var(--color-stroke-soft-200) !important;
+}
+
+.dark .api-code-panel .code-group [class*="border-b"],
+.dark .api-code-panel [class*="code-block"] [class*="border-b"] {
+	border-color: rgb(255 255 255 / 0.06) !important;
+}

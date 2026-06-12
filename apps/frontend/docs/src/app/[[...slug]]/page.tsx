@@ -93,6 +93,7 @@ export default async function Page(props: {
 	if (!page) notFound();
 	const MDXContent = page.data.body;
 	const isFullWidth = page.data.full === true;
+	const isApiPage = !!page.data._apiData;
 
 	const slugPath = params.slug?.join("/") || "index";
 
@@ -103,7 +104,7 @@ export default async function Page(props: {
 		params.slug?.[0] === "webhooks" && params.slug?.length > 2;
 
 	const hideToc = isFullWidth || isWebhookEvent;
-	const useFullWidth = isFullWidth || isWebhookEvent;
+	const useSplitLayout = isWebhookEvent || isApiPage;
 
 	const breadcrumbs = getBreadcrumbs(
 		source.pageTree.children as PageTreeItem[],
@@ -126,9 +127,17 @@ export default async function Page(props: {
 				>
 					{/* Main content area */}
 					<div
-						className={`min-w-0 px-6 py-8 md:px-10 ${isWebhookEvent ? "lg:grid lg:grid-cols-[1fr_400px] lg:gap-16" : ""}`}
+						className={`min-w-0 px-6 py-8 md:px-10 ${useSplitLayout ? "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(360px,440px)] lg:gap-x-12 xl:gap-x-16" : ""} ${isApiPage ? "lg:px-12 xl:px-16" : ""}`}
 					>
-						<div className={hideToc ? "" : "mx-auto max-w-[680px] xl:mx-0"}>
+						<div
+							className={
+								hideToc
+									? isApiPage
+										? "min-w-0 max-w-[720px]"
+										: ""
+									: "mx-auto max-w-[680px] xl:mx-0"
+							}
+						>
 							{/* Breadcrumb */}
 							{breadcrumbs.length > 0 ? (
 								<div className="mb-4 flex items-center gap-2 text-[13px] text-text-sub-600">
@@ -172,7 +181,13 @@ export default async function Page(props: {
 							</div>
 
 							{/* Content */}
-							<DocsBody>
+							<DocsBody
+								className={
+									isApiPage
+										? "[&>p:first-child]:mt-0 [&>p:first-child]:mb-8 [&>p:first-child]:text-[16px] [&>p:first-child]:leading-relaxed [&>p:first-child]:text-text-sub-600/90"
+										: ""
+								}
+							>
 								<MDXContent
 									components={getMDXComponents({
 										Icon: Icon,
@@ -184,10 +199,10 @@ export default async function Page(props: {
 							<PageFooter previous={previous} next={next} />
 						</div>
 
-						{/* Right Column for Code (Visible only for Webhook Events) */}
-						{isWebhookEvent && (
+						{/* Right column: sticky code + response (API reference & webhook events) */}
+						{useSplitLayout && (
 							<div className="hidden lg:block">
-								<div className="sticky top-24 px-2 pt-4 pb-12">
+								<div className="sticky top-24 space-y-6 pb-12 pl-2">
 									<CodeDisplay />
 								</div>
 							</div>
