@@ -12,9 +12,9 @@
 		"---Actions---",
 		"domain",
 		"api-key",
-		"mail",
-		"contacts",
 		"webhook",
+		"contacts",
+		"mail",
 		"logs",
 		"upload",
 		"template"

@@ -38,24 +38,18 @@ interface Parameter {
 const PARAM_SUB_PROPERTIES: Record<string, Parameter[]> = {
 	channels: [
 		{
-			name: "id",
+			name: "channelId",
 			type: "string",
-			required: false,
-			description: "The unique identifier of the channel.",
-			location: "body",
-		},
-		{
-			name: "name",
-			type: "string",
-			required: false,
-			description: "The name of the channel.",
+			required: true,
+			description: "The unique identifier of the channel to enroll the contact in.",
 			location: "body",
 		},
 		{
 			name: "subscription",
 			type: '"opt_in" | "opt_out"',
-			required: false,
-			description: "The subscription status for this channel.",
+			required: true,
+			description:
+				"The subscription status for this channel. 'opt_in' enrolls the contact, 'opt_out' opts them out.",
 			location: "body",
 			enumValues: ["opt_in", "opt_out"],
 		},

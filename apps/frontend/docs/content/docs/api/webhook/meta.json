@@ -1,12 +1,13 @@
 {
 	"title": "Webhooks",
 	"pages": [
-		"post-api-webhook-v1",
+		"delete-api-webhook-v1by-id",
 		"get-api-webhook-v1",
 		"get-api-webhook-v1by-webhook_id",
 		"get-api-webhook-v1by-webhook_id-deliveries",
 		"patch-api-webhook-v1by-webhook_id",
-		"post-api-webhook-v1trigger",
-		"delete-api-webhook-v1by-id"
+		"post-api-webhook-deliveries-by-delivery_id-retry",
+		"post-api-webhook-v1",
+		"post-api-webhook-v1trigger"
 	]
 }

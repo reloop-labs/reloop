@@ -4,7 +4,7 @@
  *
  * Fetches OpenAPI specs from running backend services and generates
  * MDX doc pages for each endpoint with embedded parameters, responses,
- * code samples, and rich metadata matching Resend's documentation quality.
+ * and code samples sourced directly from the backend OpenAPI spec.
  *
  * Usage:
  *   bun run generate:api-docs
@@ -201,6 +201,28 @@ function getTypeString(schema: any): string {
 	return schema.type || "any";
 }
 
+function getEnumValues(schema: any, spec: any): string[] | undefined {
+	const resolved = resolveSchema(schema, spec);
+
+	if (resolved.enum) {
+		return resolved.enum;
+	}
+
+	if (resolved.anyOf || resolved.oneOf) {
+		const variants = resolved.anyOf || resolved.oneOf;
+		const constValues = variants
+			.map((variant: any) => resolveSchema(variant, spec))
+			.filter((variant: any) => variant.const !== undefined)
+			.map((variant: any) => String(variant.const));
+
+		if (constValues.length > 0) {
+			return constValues;
+		}
+	}
+
+	return undefined;
+}
+
 function parseParameter(
 	name: string,
 	propSchema: any,
@@ -257,7 +279,7 @@ function parseParameter(
 		maximum: prop.maximum,
 		minLength: prop.minLength,
 		maxLength: prop.maxLength,
-		enumValues: prop.enum,
+		enumValues: getEnumValues(prop, spec),
 		pattern: prop.pattern,
 		example: prop.example || prop.examples?.[0],
 		properties: subProperties,
@@ -285,7 +307,7 @@ function extractParameters(operation: any, spec: any): ParameterInfo[] {
 				maximum: schema.maximum,
 				minLength: schema.minLength,
 				maxLength: schema.maxLength,
-				enumValues: schema.enum,
+				enumValues: getEnumValues(schema, spec),
 				pattern: schema.pattern,
 				example: schema.example || schema.examples?.[0],
 			});
@@ -349,51 +371,180 @@ function extractCodeSamples(operation: any): CodeSample[] {
 	}));
 }
 
-function buildResponseExample(schema: any, spec: any, depth = 0): any {
-	if (!schema || depth > 4) return null;
+function exampleStringForField(
+	fieldName: string,
+	schema: any,
+	path: string[],
+): string {
+	const name = fieldName.toLowerCase();
+	const parent = path.length >= 2 ? path[path.length - 2].toLowerCase() : "";
+
+	if (
+		schema.format === "date-time" ||
+		name.endsWith("at") ||
+		name.endsWith("_at")
+	) {
+		return "2026-03-23T10:00:00.000Z";
+	}
+
+	if (name === "id") {
+		if (parent === "groups") return "grp_123456789";
+		if (parent === "channels") return "channel_123456789";
+		if (parent === "properties") return "prop_123456789";
+		return "con_123456789";
+	}
+
+	const examples: Record<string, string> = {
+		email: "john.doe@example.com",
+		firstname: "John",
+		lastname: "Doe",
+		name:
+			parent === "groups"
+				? "Beta Testers"
+				: parent === "channels"
+					? "Newsletter"
+					: "Newsletter",
+		event: "evt_123456789",
+		message: "Contact already exists",
+		why: "A contact with this email already exists in your organization.",
+		fix: "Use a different email address or update the existing contact instead.",
+		link: "https://reloop.sh/docs/api/contacts",
+		domain: "send.example.com",
+		subject: "Welcome to Reloop",
+		endpointurl: "https://example.com/webhooks/reloop",
+		propertyname: "company",
+	};
+
+	return examples[name] || `example_${fieldName}`;
+}
+
+function buildResponseExample(
+	schema: any,
+	spec: any,
+	depth = 0,
+	path: string[] = [],
+): any {
+	if (!schema || depth > 6) return null;
 
 	const resolved = schema.$ref ? resolveSchema(schema, spec) : schema;
 
-	// Use examples if available
-	if (resolved.examples && resolved.examples.length > 0) {
+	if (resolved.examples?.length > 0) {
 		return resolved.examples[0];
 	}
 	if (resolved.example !== undefined) {
 		return resolved.example;
 	}
-
 	if (resolved.const !== undefined) {
 		return resolved.const;
 	}
 
-	if (resolved.type === "object" && resolved.properties) {
-		const obj: Record<string, any> = {};
-		for (const [key, propSchema] of Object.entries(resolved.properties)) {
-			const val = buildResponseExample(propSchema as any, spec, depth + 1);
-			if (val !== null) obj[key] = val;
+	if (resolved.anyOf || resolved.oneOf) {
+		const variants = resolved.anyOf || resolved.oneOf;
+		const fieldName = path[path.length - 1]?.toLowerCase() || "";
+		const flatVariants = variants.flatMap((v: any) =>
+			v.anyOf ? v.anyOf : [v],
+		);
+		const nullableFields = new Set([
+			"suppressionreason",
+			"suppressedat",
+			"defaultvalue",
+			"deletedat",
+		]);
+
+		if (
+			flatVariants.some((v: any) => v.type === "null") &&
+			nullableFields.has(fieldName)
+		) {
+			return null;
 		}
-		return obj;
+
+		const dateVariant = flatVariants.find(
+			(v: any) =>
+				v.format === "date-time" ||
+				v.type === "Date" ||
+				(fieldName.endsWith("at") && !nullableFields.has(fieldName)),
+		);
+		if (dateVariant) {
+			return "2026-03-23T10:00:00.000Z";
+		}
+
+		const preferred = flatVariants.find(
+			(v: any) =>
+				v.type &&
+				v.type !== "null" &&
+				v.type !== "undefined" &&
+				v.type !== "Date",
+		);
+		if (preferred) {
+			return buildResponseExample(preferred, spec, depth, path);
+		}
+
+		if (flatVariants.some((v: any) => v.type === "Date")) {
+			return "2026-03-23T10:00:00.000Z";
+		}
+
+		return null;
+	}
+
+	if (resolved.type === "object") {
+		if (resolved.properties) {
+			const obj: Record<string, any> = {};
+			for (const [key, propSchema] of Object.entries(resolved.properties)) {
+				const val = buildResponseExample(
+					propSchema as any,
+					spec,
+					depth + 1,
+					[...path, key],
+				);
+				if (val !== undefined) obj[key] = val;
+			}
+			return obj;
+		}
+
+		if (resolved.patternProperties) {
+			return {
+				company: "Reloop",
+				role: "Developer",
+			};
+		}
+
+		if (resolved.additionalProperties) {
+			return {
+				company: "Reloop",
+				role: "Developer",
+			};
+		}
+
+		return {};
 	}
 
 	if (resolved.type === "array" && resolved.items) {
-		const itemExample = buildResponseExample(resolved.items, spec, depth + 1);
+		const itemExample = buildResponseExample(
+			resolved.items,
+			spec,
+			depth + 1,
+			path,
+		);
 		return itemExample !== null ? [itemExample] : [];
 	}
 
 	if (resolved.enum) return resolved.enum[0];
 	if (resolved.default !== undefined) return resolved.default;
 
-	// Generate sensible defaults
 	switch (resolved.type) {
 		case "string":
-			return resolved.format === "date-time"
-				? "2024-01-01T00:00:00.000Z"
-				: "string";
+			return exampleStringForField(
+				path[path.length - 1] || "value",
+				resolved,
+				path,
+			);
 		case "number":
 		case "integer":
-			return 0;
+			return path[path.length - 1] === "total" ? 1 : 0;
 		case "boolean":
 			return true;
+		case "null":
+			return null;
 		default:
 			return null;
 	}
@@ -412,7 +563,12 @@ function extractResponses(operation: any, spec: any): Record<string, any> {
 			const content = resolved.content?.["application/json"];
 			let exampleData = null;
 
-			if (content?.schema) {
+			if (content?.example !== undefined) {
+				exampleData = content.example;
+			} else if (content?.examples) {
+				const firstExample = Object.values(content.examples)[0] as any;
+				exampleData = firstExample?.value ?? firstExample;
+			} else if (content?.schema) {
 				const schema = resolveSchema(content.schema, spec);
 				exampleData = buildResponseExample(schema, spec);
 			}
@@ -431,205 +587,6 @@ function escapeForMDX(str: string): string {
 	return str.replace(/"/g, '\\"').replace(/\n/g, " ");
 }
 
-/* ─── Content Enrichment ──────────────────────────────────── */
-
-const PARAM_DESCRIPTIONS: Record<string, Record<string, string>> = {
-	// Common across all services
-	_common: {
-		page: "The page number to retrieve. Use this for paginating through large result sets. The first page is 1.",
-		limit:
-			"Number of items to return per page. If you do not provide a limit, all items will be returned in a single response.",
-		q: "Search query to filter results by name or other searchable fields. The search is case-insensitive and supports partial matching.",
-		status:
-			"Filter results by their current status. Only items matching the specified status will be returned.",
-		id: "The unique identifier of the resource.",
-	},
-	domain: {
-		domain:
-			"The name of the domain you want to register (e.g., send.example.com). This should be a valid domain name that you own and can configure DNS records for.",
-		domain_id:
-			"The unique identifier of the domain. You can find this in the domain list or in the response when creating a domain.",
-		customReturnPath:
-			"For advanced use cases, choose a subdomain for the Return-Path address. The custom return path is used for SPF authentication, DMARC alignment, and handling bounced emails. Defaults to 'inbound'. Avoid setting values that could undermine credibility (e.g., 'testing'), as they may be exposed to recipients.",
-		clickTracking:
-			"Track clicks within the body of each HTML email. When enabled, all links in your emails will be wrapped with tracking URLs. This setting is only applied if a tracking_subdomain is configured and verified.",
-		openTracking:
-			"Track the open rate of each email. When enabled, a transparent tracking pixel is inserted into each email. This setting is only applied if a tracking_subdomain is configured and verified.",
-		tls: "The TLS security level for email delivery. 'opportunistic' attempts a secure connection but falls back to unencrypted if unavailable. 'enforced' requires TLS — if the receiving server does not support TLS, the email will not be sent.",
-		sendingEmail:
-			"Whether this domain is enabled for sending emails. When disabled, no emails can be sent from this domain.",
-		receivingEmail:
-			"Whether this domain is enabled for receiving emails. When enabled, you can receive inbound emails on this domain.",
-		trackingDomain:
-			"Whether this domain is used as a custom tracking subdomain for click and open tracking.",
-	},
-	contacts: {
-		email:
-			"The email address of the contact. Must be a valid email format (e.g., john@example.com). This is the primary identifier for the contact.",
-		firstName:
-			"The first name of the contact. Used for personalization in email templates.",
-		lastName:
-			"The last name of the contact. Used for personalization in email templates.",
-		status:
-			"The subscription status of the contact. 'subscribed' contacts will receive emails, 'unsubscribed' contacts have opted out, and 'blocked' contacts are prevented from receiving any emails.",
-		properties:
-			"Custom key-value properties to store additional metadata about the contact. These can be used for segmentation and personalization in email templates.",
-		audienceId:
-			"The unique identifier of the audience this contact belongs to.",
-		contact_id: "The unique identifier of the contact.",
-	},
-	mail: {
-		from: "The sender email address. Must be a verified domain in your account. Format: 'Name <email@domain.com>' or just 'email@domain.com'.",
-		to: "The recipient email address or an array of email addresses. Each address can be in the format 'Name <email>' or just 'email'.",
-		subject:
-			"The subject line of the email. Keep it concise and descriptive for better open rates.",
-		html: "The HTML content of the email body. Supports standard HTML and inline CSS for styling.",
-		text: "The plain text version of the email body. This is shown to recipients whose email clients do not support HTML.",
-		replyTo:
-			"The email address that recipients should reply to. If not specified, replies will go to the 'from' address.",
-		cc: "Carbon copy recipients. These addresses will be visible to all recipients.",
-		bcc: "Blind carbon copy recipients. These addresses will be hidden from other recipients.",
-		scheduledAt:
-			"Schedule the email to be sent at a specific time in the future. Must be an ISO 8601 date string. The email will be queued and sent at the specified time.",
-		tags: "Custom tags to categorize and track this email. Tags can be used for filtering in the dashboard and webhooks.",
-		email_id: "The unique identifier of the email.",
-	},
-	webhook: {
-		endpointUrl:
-			"The URL where webhook events will be delivered via HTTP POST. Must be a publicly accessible HTTPS endpoint that returns a 2xx status code.",
-		events:
-			"The list of event types to subscribe to. Only events matching these types will be delivered to your endpoint.",
-		webhook_id: "The unique identifier of the webhook endpoint.",
-		name: "A human-readable name for the webhook endpoint, for your reference in the dashboard.",
-		active:
-			"Whether the webhook endpoint is currently active and receiving events.",
-	},
-	"api-key": {
-		name: "A descriptive name for the API key, to help you identify it later (e.g., 'Production Server', 'CI/CD Pipeline').",
-		permission:
-			"The permission level for this API key. 'full_access' grants read and write access to all resources. 'sending_access' only allows sending emails.",
-		key_id: "The unique identifier of the API key.",
-	},
-	template: {
-		name: "The name of the email template, for your reference in the dashboard.",
-		subject:
-			"The default subject line for emails sent using this template. Can be overridden when sending.",
-		html: "The HTML content of the template. Supports Handlebars-style variables for dynamic content (e.g., {{name}}).",
-		id: "The unique identifier of the template.",
-	},
-	logs: {
-		logId: "The unique identifier of the log entry.",
-	},
-	upload: {
-		file: "The file to upload. Must be a valid file under the maximum size limit.",
-	},
-};
-
-const ENDPOINT_DESCRIPTIONS: Record<string, Record<string, string>> = {
-	domain: {
-		create:
-			"Create a new domain for sending and receiving emails through the Reloop Email API. After creating a domain, you'll need to configure DNS records and verify the domain before you can start sending emails.",
-		list: "Retrieve a paginated list of domains registered in your account. Use the optional filters to narrow down results by status or search by domain name.",
-		get: "Retrieve detailed information about a specific domain, including its current verification status, DNS records, and tracking configuration.",
-		delete:
-			"Permanently delete a domain from your account. This action cannot be undone. Any emails currently in transit for this domain will still be delivered.",
-		update:
-			"Update the configuration of an existing domain. You can modify tracking settings, TLS enforcement, and other domain properties.",
-		verify:
-			"Trigger the domain verification process. The domain will be temporarily marked as 'pending' regardless of its current status while the verification is in progress. This will trigger 'domain.updated' webhook events as the domain status changes during the verification process.",
-		nameservers:
-			"Retrieve the required DNS nameserver records for a domain. These records must be configured at your DNS provider to verify domain ownership.",
-	},
-	contacts: {
-		create:
-			"Add a new contact to your audience. The contact will be created with the specified email address and optional metadata. Duplicate emails within the same audience will return an error.",
-		list: "Retrieve a paginated list of contacts in your audience. Use filters to search by email, name, or subscription status.",
-		get: "Retrieve detailed information about a specific contact, including their subscription status, custom properties, and activity history.",
-		delete:
-			"Permanently remove a contact from your audience. This action cannot be undone and will delete all associated data.",
-		update:
-			"Update a contact's information, including their name, subscription status, and custom properties.",
-	},
-	mail: {
-		send: "Send a single email to one or more recipients. The email will be queued for delivery immediately unless a scheduledAt time is specified.",
-		batch:
-			"Send multiple emails in a single API call. Each email in the batch can have different recipients, content, and settings. This is more efficient than making individual send requests.",
-		get: "Retrieve the details of a previously sent email, including its delivery status, timestamps, and content.",
-		list: "Retrieve a paginated list of sent emails. Use filters to narrow down results by recipient, status, or date range.",
-		cancel:
-			"Cancel a scheduled email that has not yet been sent. Only emails with a future scheduledAt time can be cancelled.",
-		update:
-			"Update a scheduled email that has not yet been sent. You can modify the content, recipients, and scheduled time.",
-	},
-	webhook: {
-		create:
-			"Create a new webhook endpoint to receive real-time notifications about email events. Your endpoint must be publicly accessible and respond with a 2xx status code.",
-		list: "Retrieve a list of all webhook endpoints configured in your account.",
-		get: "Retrieve detailed information about a specific webhook endpoint, including its event subscriptions and delivery history.",
-		delete:
-			"Permanently delete a webhook endpoint. Events will no longer be delivered to this URL.",
-		update:
-			"Update a webhook endpoint's configuration, including its URL, event subscriptions, and active status.",
-		trigger:
-			"Manually trigger a test event delivery to a webhook endpoint. Useful for testing your endpoint's implementation.",
-	},
-	"api-key": {
-		create:
-			"Create a new API key for authenticating API requests. The full API key value is only shown once upon creation — store it securely.",
-		list: "Retrieve a list of all API keys in your account. For security, the full key values are not included in the response.",
-		get: "Retrieve information about a specific API key, including its name, permissions, and creation date.",
-		delete:
-			"Permanently revoke an API key. Any requests using this key will immediately receive authentication errors.",
-		update: "Update an API key's name or permissions.",
-		rotate:
-			"Generate a new secret for an existing API key. The old key will be immediately invalidated.",
-		enable: "Re-enable a previously disabled API key.",
-		disable:
-			"Temporarily disable an API key without deleting it. The key can be re-enabled later.",
-	},
-	template: {
-		create:
-			"Create a new email template. Templates allow you to define reusable email layouts with dynamic variables.",
-		list: "Retrieve a list of all email templates in your account.",
-		get: "Retrieve the full content and metadata of a specific email template.",
-		delete:
-			"Permanently delete an email template. Emails referencing this template will no longer be sendable.",
-		update:
-			"Update an existing email template's content, subject line, or metadata.",
-		duplicate:
-			"Create a copy of an existing template with a new name. The duplicate will have all the same content and settings.",
-	},
-	logs: {
-		get: "Retrieve a specific log entry with full details about the email event.",
-		list: "Retrieve a paginated list of email activity logs. Logs include delivery attempts, bounces, opens, clicks, and other events.",
-	},
-};
-
-function enrichDescription(
-	service: string,
-	paramName: string,
-	existingDesc: string,
-): string {
-	if (existingDesc && existingDesc.length > 40) return existingDesc;
-	const serviceDescs = PARAM_DESCRIPTIONS[service] || {};
-	const commonDescs = PARAM_DESCRIPTIONS._common || {};
-	return serviceDescs[paramName] || commonDescs[paramName] || existingDesc;
-}
-
-function getEndpointDescription(
-	service: string,
-	summary: string,
-	existingDesc: string,
-): string {
-	if (existingDesc && existingDesc.length > 60) return existingDesc;
-	const serviceDescs = ENDPOINT_DESCRIPTIONS[service] || {};
-	const summaryLower = (summary || "").toLowerCase();
-	for (const [key, desc] of Object.entries(serviceDescs)) {
-		if (summaryLower.includes(key)) return desc;
-	}
-	return existingDesc || summary;
-}
-
 function generateMDX(
 	service: ServiceConfig,
 	routePath: string,
@@ -640,14 +597,7 @@ function generateMDX(
 	codeSamples: CodeSample[],
 ): string {
 	const title = operation.summary || `${method.toUpperCase()} ${routePath}`;
-	const rawDesc = operation.description || title;
-	const description = getEndpointDescription(service.name, title, rawDesc);
-
-	// Enrich parameter descriptions
-	const enrichedParams = params.map((p) => ({
-		...p,
-		description: enrichDescription(service.name, p.name, p.description),
-	}));
+	const description = operation.description || title;
 
 	return `---
 title: "${escapeForMDX(title)}"
@@ -662,7 +612,7 @@ _openapi:
 _apiData:
   document: "${service.prodUrl}"
   operationData: ${JSON.stringify([{ path: routePath, method }])}
-  parameterList: ${JSON.stringify(enrichedParams)}
+  parameterList: ${JSON.stringify(params)}
   responseMap: ${JSON.stringify(responses)}
   codeSamples: ${JSON.stringify(codeSamples)}
 ---
