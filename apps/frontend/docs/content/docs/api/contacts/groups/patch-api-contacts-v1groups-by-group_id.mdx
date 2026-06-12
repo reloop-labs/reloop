@@ -100,18 +100,12 @@ _apiData:
       lang: python
       label: Python
       source: |-
-        import requests
+        reloop = Reloop(api_key="re_123456789")
 
-        response = requests.patch(
-            'https://reloop.sh/api/contacts/v1/groups/grp_123456789',
-            headers={
-                'x-api-key': 're_123456789',
-                'Content-Type': 'application/json',
-            },
-            json={'name': 'Early Access'},
+        reloop.contacts.update_group(
+            "grp_123456789",
+            name="Early Access"
         )
-
-        group = response.json()
     - id: ruby
       lang: ruby
       label: Ruby

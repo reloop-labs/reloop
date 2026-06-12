@@ -45,18 +45,12 @@ $reloop->contacts->updateGroup(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="re_123456789")
 
-response = requests.patch(
-    'https://reloop.sh/api/contacts/v1/groups/grp_123456789',
-    headers={
-        'x-api-key': 're_123456789',
-        'Content-Type': 'application/json',
-    },
-    json={'name': 'Early Access'},
-)
-
-group = response.json()`,
+reloop.contacts.update_group(
+    "grp_123456789",
+    name="Early Access"
+)`,
 	},
 	{
 		id: "ruby",

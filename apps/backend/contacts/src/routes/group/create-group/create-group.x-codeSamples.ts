@@ -44,18 +44,11 @@ $reloop->contacts->createGroup(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="re_123456789")
 
-response = requests.post(
-    'https://reloop.sh/api/contacts/v1/groups/create',
-    headers={
-        'x-api-key': 're_123456789',
-        'Content-Type': 'application/json',
-    },
-    json={'name': 'Beta Testers'},
-)
-
-group = response.json()`,
+reloop.contacts.create_group(
+    name="Beta Testers"
+)`,
 	},
 	{
 		id: "ruby",

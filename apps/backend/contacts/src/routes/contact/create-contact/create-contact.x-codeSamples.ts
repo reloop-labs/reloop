@@ -85,34 +85,25 @@ $reloop->contacts->create(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="re_123456789")
 
-response = requests.post(
-    'https://reloop.sh/api/contacts/create',
-    headers={
-        'x-api-key': 're_123456789',
-        'Content-Type': 'application/json',
+reloop.contacts.create(
+    email="john.doe@example.com",
+    first_name="John",
+    last_name="Doe",
+    unsubscribed=False,
+    properties={
+        "company": "Reloop",
+        "role": "Developer",
     },
-    json={
-        'email': 'john.doe@example.com',
-        'firstName': 'John',
-        'lastName': 'Doe',
-        'status': 'subscribed',
-        'properties': {
-            'company': 'Reloop',
-            'role': 'Developer',
+    group_ids=["grp_123456789"],
+    channels=[
+        {
+            "channel_id": "channel_123456789",
+            "subscription": "opt_in",
         },
-        'groupIds': ['grp_123456789'],
-        'channels': [
-            {
-                'channelId': 'channel_123456789',
-                'subscription': 'opt_in',
-            },
-        ],
-    },
-)
-
-contact = response.json()`,
+    ],
+)`,
 	},
 	{
 		id: "ruby",

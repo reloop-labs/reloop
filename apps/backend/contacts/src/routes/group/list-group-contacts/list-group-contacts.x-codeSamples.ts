@@ -41,15 +41,15 @@ $reloop->contacts->groups->listContacts(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="re_123456789")
 
-response = requests.get(
-    'https://reloop.sh/api/contacts/v1/groups/grp_123456789/contacts',
-    headers={'x-api-key': 're_123456789'},
-    params={'page': 1, 'limit': 10},
-)
-
-contacts = response.json()`,
+reloop.contacts.groups.list_contacts(
+  'grp_123456789',
+  options: [
+      'page' => 1,
+      'limit' => 10,
+  ],
+);`,
 	},
 	{
 		id: "ruby",

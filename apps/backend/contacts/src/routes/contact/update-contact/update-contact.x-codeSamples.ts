@@ -63,26 +63,18 @@ $reloop->contacts->update(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="re_123456789")
 
-response = requests.patch(
-    'https://reloop.sh/api/contacts/cont_123456789',
-    headers={
-        'x-api-key': 're_123456789',
-        'Content-Type': 'application/json',
+reloop.contacts.update(
+    "cont_123456789",
+    first_name="Jane",
+    last_name="Smith",
+    unsubscribed=False,
+    properties={
+        "company": "Reloop",
+        "role": "Designer",
     },
-    json={
-        'firstName': 'Jane',
-        'lastName': 'Smith',
-        'status': 'subscribed',
-        'properties': {
-            'company': 'Reloop',
-            'role': 'Designer',
-        },
-    },
-)
-
-contact = response.json()`,
+)`,
 	},
 	{
 		id: "ruby",

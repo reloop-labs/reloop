@@ -33,7 +33,7 @@ const apiKey = await reloop.apiKey.update("key_123456789", {
 reloop.api_keys.update(
     "key_123456789",
     name="Updated production key",
-    enabled=True,
+    enabled=True
 )`,
 	},
 	{

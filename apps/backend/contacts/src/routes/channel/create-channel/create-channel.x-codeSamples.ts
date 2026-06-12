@@ -53,23 +53,14 @@ $reloop->contacts->channels->create(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="re_123456789")
 
-response = requests.post(
-    'https://reloop.sh/api/contacts/v1/channels/create',
-    headers={
-        'x-api-key': 're_123456789',
-        'Content-Type': 'application/json',
-    },
-    json={
-        'name': 'Product Updates',
-        'description': 'Get the latest news about our products',
-        'defaultSubscription': 'opt_in',
-        'visibility': 'public',
-    },
-)
-
-channel = response.json()`,
+reloop.contacts.channels.create(
+    name="Product Updates",
+    description="Get the latest news about our products",
+    default_subscription="opt_in",
+    visibility="public"
+)`,
 	},
 	{
 		id: "ruby",

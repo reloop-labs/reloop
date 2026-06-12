@@ -40,15 +40,12 @@ $reloop->contacts->list(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="re_123456789")
 
-response = requests.get(
-    'https://reloop.sh/api/contacts/list',
-    headers={'x-api-key': 're_123456789'},
-    params={'limit': 10, 'page': 1},
-)
-
-contacts = response.json()`,
+reloop.contacts.list(
+    page=1,
+    limit=10
+)`,
 	},
 	{
 		id: "ruby",

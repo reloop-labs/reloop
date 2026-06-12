@@ -40,15 +40,12 @@ $reloop->contacts->listProperties(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="re_123456789")
 
-response = requests.get(
-    'https://reloop.sh/api/contacts/v1/properties/list',
-    headers={'x-api-key': 're_123456789'},
-    params={'page': 1, 'limit': 10},
-)
-
-properties = response.json()`,
+reloop.contacts.list_properties(
+    page=1,
+    limit=10
+)`,
 	},
 	{
 		id: "ruby",

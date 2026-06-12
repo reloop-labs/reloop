@@ -35,7 +35,7 @@ const apiKey = await reloop.apiKey.create({
 reloop.api_keys.create(
     name="Production key",
     enabled=True,
-    rate_limit_enabled=True,
+    rate_limit_enabled=True
 )`,
 	},
 	{

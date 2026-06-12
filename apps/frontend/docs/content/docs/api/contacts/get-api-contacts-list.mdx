@@ -123,15 +123,12 @@ _apiData:
       lang: python
       label: Python
       source: |-
-        import requests
+        reloop = Reloop(api_key="re_123456789")
 
-        response = requests.get(
-            'https://reloop.sh/api/contacts/list',
-            headers={'x-api-key': 're_123456789'},
-            params={'limit': 10, 'page': 1},
+        reloop.contacts.list(
+            page=1,
+            limit=10
         )
-
-        contacts = response.json()
     - id: ruby
       lang: ruby
       label: Ruby

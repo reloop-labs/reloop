@@ -50,22 +50,13 @@ $reloop->contacts->createProperty(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="re_123456789")
 
-response = requests.post(
-    'https://reloop.sh/api/contacts/v1/properties/create',
-    headers={
-        'x-api-key': 're_123456789',
-        'Content-Type': 'application/json',
-    },
-    json={
-        'name': 'company_name',
-        'type': 'string',
-        'fallbackValue': 'Unknown',
-    },
-)
-
-property = response.json()`,
+reloop.contacts.create_property(
+    name="company_name",
+    type="string",
+    fallback_value="Unknown"
+)`,
 	},
 	{
 		id: "ruby",

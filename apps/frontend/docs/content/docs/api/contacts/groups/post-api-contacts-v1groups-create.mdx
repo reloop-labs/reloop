@@ -84,18 +84,11 @@ _apiData:
       lang: python
       label: Python
       source: |-
-        import requests
+        reloop = Reloop(api_key="re_123456789")
 
-        response = requests.post(
-            'https://reloop.sh/api/contacts/v1/groups/create',
-            headers={
-                'x-api-key': 're_123456789',
-                'Content-Type': 'application/json',
-            },
-            json={'name': 'Beta Testers'},
+        reloop.contacts.create_group(
+            name="Beta Testers"
         )
-
-        group = response.json()
     - id: ruby
       lang: ruby
       label: Ruby

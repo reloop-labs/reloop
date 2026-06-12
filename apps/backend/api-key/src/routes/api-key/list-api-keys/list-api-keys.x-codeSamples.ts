@@ -27,7 +27,7 @@ const apiKeys = await reloop.apiKey.list({
 
 reloop.api_keys.list(
     page=1,
-    limit=10,
+    limit=10
 )`,
 	},
 	{

@@ -45,18 +45,12 @@ $reloop->contacts->updateProperty(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="re_123456789")
 
-response = requests.patch(
-    'https://reloop.sh/api/contacts/v1/properties/prop_123456789',
-    headers={
-        'x-api-key': 're_123456789',
-        'Content-Type': 'application/json',
-    },
-    json={'fallbackValue': 'N/A'},
-)
-
-property = response.json()`,
+reloop.contacts.update_property(
+    "prop_123456789",
+    fallback_value="N/A"
+)`,
 	},
 	{
 		id: "ruby",

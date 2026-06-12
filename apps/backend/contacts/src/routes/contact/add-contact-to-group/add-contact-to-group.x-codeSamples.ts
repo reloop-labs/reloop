@@ -45,18 +45,12 @@ $reloop->contacts->groups->addContact(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="re_123456789")
 
-response = requests.post(
-    'https://reloop.sh/api/contacts/group/grp_123456789',
-    headers={
-        'x-api-key': 're_123456789',
-        'Content-Type': 'application/json',
-    },
-    json={'contact_id': 'cont_123456789'},
-)
-
-result = response.json()`,
+reloop.contacts.groups.add_contact(
+    "grp_123456789",
+    contact_id="cont_123456789"
+)`,
 	},
 	{
 		id: "ruby",

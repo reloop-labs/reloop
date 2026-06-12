@@ -48,21 +48,13 @@ $reloop->contacts->channels->updateSubscription(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="re_123456789")
 
-response = requests.patch(
-    'https://reloop.sh/api/contacts/channel/channel_123456789',
-    headers={
-        'x-api-key': 're_123456789',
-        'Content-Type': 'application/json',
-    },
-    json={
-        'contact_id': 'cont_123456789',
-        'subscription': 'opt_in',
-    },
-)
-
-result = response.json()`,
+reloop.contacts.channels.update_subscription(
+    "channel_123456789",
+    contact_id="cont_123456789",
+    subscription="opt_in"
+)`,
 	},
 	{
 		id: "ruby",

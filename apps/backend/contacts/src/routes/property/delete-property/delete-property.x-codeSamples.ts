@@ -32,14 +32,9 @@ $reloop->contacts->deleteProperty('prop_123456789');`,
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="re_123456789")
 
-response = requests.delete(
-    'https://reloop.sh/api/contacts/v1/properties/prop_123456789',
-    headers={'x-api-key': 're_123456789'},
-)
-
-result = response.json()`,
+reloop.contacts.delete_property("prop_123456789")`,
 	},
 	{
 		id: "ruby",
