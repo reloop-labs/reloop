@@ -26,14 +26,3 @@ export function withChangelogPreviews(
 }
 
 export const changelogReleases = withChangelogPreviews(changelogReleasesData);
-
-export const changelogComingNext = [
-	"Campaigns builder",
-	"Broadcast email sending",
-	"SDK GA across all languages",
-	"Expanded deliverability tooling",
-	"Community integrations marketplace",
-	"Advanced analytics dashboard",
-	"Custom SMTP relay configuration",
-	"A/B testing for email templates",
-];

@@ -6,7 +6,7 @@ import {
 import { socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { ChangelogTimeline } from "./changelog-timeline";
-import { changelogComingNext, changelogReleases } from "./changelog-utils";
+import { changelogReleases } from "./changelog-utils";
 
 export const metadata: Metadata = {
 	title: "Changelog | Reloop",
@@ -32,22 +32,6 @@ const ChangelogPage = () => {
 					. Select a release to read the full notes.
 				</p>
 				<ChangelogTimeline releases={changelogReleases} />
-			</PageSection>
-
-			<PageSection narrow>
-				<p className="text-center font-serif text-[1.35rem] text-text-strong-950 leading-snug sm:text-[1.6rem] dark:text-white">
-					Coming <span className="text-primary-base">next.</span>
-				</p>
-				<div className="mx-auto mt-6 flex max-w-xl flex-wrap justify-center gap-2">
-					{changelogComingNext.map((item) => (
-						<span
-							key={item}
-							className="rounded-full border border-stroke-soft-200 px-4 py-2 font-medium text-[13px] text-text-strong-950 dark:border-white/10 dark:text-white"
-						>
-							{item}
-						</span>
-					))}
-				</div>
 			</PageSection>
 
 			<FeatureCta
