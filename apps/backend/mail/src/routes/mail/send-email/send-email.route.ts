@@ -59,6 +59,7 @@ export const sendEmailRoute = new Elysia()
 			detail: {
 				summary: "Send email",
 				description: "Send an email through the KumoMTA mail server",
+				tags: ["Mail"],
 			},
 		},
 	);

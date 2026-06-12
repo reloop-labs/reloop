@@ -724,7 +724,8 @@ function buildServiceStructure(
 	}
 
 	const folders = new Map<string, { title: string; pages: string[] }>();
-	const pages: string[] = [];
+	const rootPages: string[] = [];
+	const folderSlugs: string[] = [];
 
 	for (const tag of tagOrder) {
 		const folderSlug = tagToFolderSlug(tag);
@@ -732,7 +733,7 @@ function buildServiceStructure(
 		const slugs = tagPages.map((entry) => entry.slug);
 
 		if (shouldFlattenTagToRoot(serviceName, tag)) {
-			pages.push(...slugs);
+			rootPages.push(...slugs);
 			continue;
 		}
 
@@ -740,10 +741,10 @@ function buildServiceStructure(
 			title: tag,
 			pages: slugs,
 		});
-		pages.push(folderSlug);
+		folderSlugs.push(folderSlug);
 	}
 
-	return { useFolders: true, pages, folders };
+	return { useFolders: true, pages: [...rootPages, ...folderSlugs], folders };
 }
 
 async function generateForService(
