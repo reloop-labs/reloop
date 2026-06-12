@@ -35,7 +35,14 @@ COPY --from=builder /app/apps/frontend/docs/.next/standalone ./
 COPY --from=builder /app/apps/frontend/docs/.next/standalone/apps/frontend/docs ./
 COPY --from=builder /app/apps/frontend/docs/.next/static ./.next/static
 
-RUN rm -rf apps
+# Re-link external modules dynamically and clean up
+RUN rm -rf apps && \
+    for link in $(find .next/node_modules -type l); do \
+        target=$(readlink "$link"); \
+        new_target=$(echo "$target" | sed 's|\.\./\.\./\.\./\.\./\.\./|../../|'); \
+        ln -sf "$new_target" "$link"; \
+    done
+
 EXPOSE 3000
 
 CMD ["bun", "run", "server.js"]
