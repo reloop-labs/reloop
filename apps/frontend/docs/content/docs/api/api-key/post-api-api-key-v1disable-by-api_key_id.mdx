@@ -64,16 +64,9 @@ _apiData:
       lang: python
       label: Python
       source: |-
-        import requests
+        reloop = Reloop(api_key="rl_123456789")
 
-        response = requests.post(
-            "https://api.reloop.sh/api-key/v1/disable/key_123456789",
-            headers={
-                "Authorization": "Bearer rl_123456789",
-            },
-        )
-
-        api_key = response.json()
+        reloop.api_keys.disable("key_123456789")
     - id: php
       lang: php
       label: PHP

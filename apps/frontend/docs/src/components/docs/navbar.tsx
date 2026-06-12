@@ -28,9 +28,12 @@ export function Navbar({
 	const [hoveredTab, setHoveredTab] = useState<string | null>(null);
 
 	const activeTab =
-		tabs.find((tab) =>
-			tab.url === "/" ? pathname === "/" : pathname.startsWith(tab.url),
-		)?.title || null;
+		tabs.find((tab) => {
+			if (tab.url === "/") {
+				return !tabs.filter((t) => t.url !== "/").some((t) => pathname.startsWith(t.url));
+			}
+			return pathname.startsWith(tab.url);
+		})?.title || "Documentation";
 
 	const currentHighlighted = hoveredTab || activeTab;
 

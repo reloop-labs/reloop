@@ -20,16 +20,9 @@ const apiKey = await reloop.apiKey.get("key_123456789");`,
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="rl_123456789")
 
-response = requests.get(
-    "https://api.reloop.sh/api-key/v1/key_123456789",
-    headers={
-        "Authorization": "Bearer rl_123456789",
-    },
-)
-
-api_key = response.json()`,
+reloop.api_keys.get("key_123456789")`,
 	},
 	{
 		id: "php",

@@ -66,14 +66,13 @@ export function Sidebar({
 }: SidebarProps) {
 	const clientPathname = usePathname();
 	const pathname = propPathname || clientPathname || "";
-	const activeTab = navigationTabs.find((tab) =>
-		tab.url === "/" ? pathname === "/" : pathname.startsWith(tab.url),
-	) ||
-		navigationTabs[0] || {
-			title: "Documentation",
-			url: "/",
-			iconName: "file-text",
-		};
+	const activeTab =
+		navigationTabs.find((tab) => {
+			if (tab.url === "/") {
+				return !navigationTabs.filter((t) => t.url !== "/").some((t) => pathname.startsWith(t.url));
+			}
+			return pathname.startsWith(tab.url);
+		}) || navigationTabs[0];
 
 	// Filter tree based on active section
 	const filteredTree = useMemo(() => {
@@ -144,21 +143,35 @@ export function Sidebar({
 		[pathname],
 	);
 
+	// Collect URLs of all folders in the tree
+	const getAllFolderUrls = useCallback(
+		(nodes: PageTreeItem[]): string[] => {
+			const result: string[] = [];
+			for (const node of nodes) {
+				if (node.type !== "folder") continue;
+				result.push(node.url);
+				result.push(...getAllFolderUrls(node.children));
+			}
+			return result;
+		},
+		[],
+	);
+
 	// Folder open state lives here — only ever grows, never shrinks automatically
 	const [openFolders, setOpenFolders] = useState<Set<string>>(() => {
-		const activeUrls = getActiveFolderUrls(filteredTree);
+		const allUrls = getAllFolderUrls(filteredTree);
 		if (typeof window !== "undefined") {
 			try {
 				const saved = sessionStorage.getItem("reloop-sidebar-open");
 				if (saved) {
 					const parsed = JSON.parse(saved);
-					return new Set([...parsed, ...activeUrls]);
+					return new Set([...parsed, ...allUrls]);
 				}
 			} catch (e) {
 				// Ignore parse errors
 			}
 		}
-		return new Set(activeUrls);
+		return new Set(allUrls);
 	});
 
 	// Persist to sessionStorage
@@ -181,6 +194,19 @@ export function Sidebar({
 			}
 		}
 	}, []);
+
+	const prevTabUrl = useRef(activeTab?.url);
+
+	// On tab/section change: make sure all folders in the new section are open by default
+	useEffect(() => {
+		if (prevTabUrl.current !== activeTab?.url) {
+			prevTabUrl.current = activeTab?.url;
+			const allUrls = getAllFolderUrls(filteredTree);
+			setOpenFolders((prev) => {
+				return new Set([...prev, ...allUrls]);
+			});
+		}
+	}, [activeTab?.url, filteredTree, getAllFolderUrls]);
 
 	// On navigation: add newly-active folders but never remove any
 	useEffect(() => {
@@ -446,9 +472,11 @@ function ThemeToggle() {
 function SidebarSection({
 	node,
 	onLinkClick,
+	depth = 0,
 }: {
 	node: PageTreeItem;
 	onLinkClick?: () => void;
+	depth?: number;
 }) {
 	if (node.type === "separator") {
 		return (
@@ -461,10 +489,10 @@ function SidebarSection({
 	}
 
 	if (node.type === "folder") {
-		return <SidebarFolder node={node} onLinkClick={onLinkClick} />;
+		return <SidebarFolder node={node} onLinkClick={onLinkClick} depth={depth} />;
 	}
 
-	return <SidebarLink node={node} onLinkClick={onLinkClick} />;
+	return <SidebarLink node={node} onLinkClick={onLinkClick} depth={depth} />;
 }
 
 function findFirstPage(node: PageTreeItem): string | null {
@@ -482,9 +510,11 @@ function findFirstPage(node: PageTreeItem): string | null {
 function SidebarFolder({
 	node,
 	onLinkClick,
+	depth = 0,
 }: {
 	node: FolderNode;
 	onLinkClick?: () => void;
+	depth?: number;
 }) {
 	const ref = useRef<HTMLButtonElement>(null);
 	const { setHoveredEl, pathname, openFolders, toggleFolder } =
@@ -522,7 +552,8 @@ function SidebarFolder({
 				}}
 				data-sidebar-active={isDirectlyActive || undefined}
 				className={cn(
-					"group relative z-10 flex h-9 w-full items-center justify-between rounded-lg px-2 font-medium text-[15px] transition-all",
+					"group relative z-10 flex w-full items-center justify-between rounded-lg px-2 font-medium transition-all",
+					depth === 0 ? "h-9 text-[15px]" : "h-8 text-[14px]",
 					isDirectlyActive
 						? "text-[#171717] dark:text-white"
 						: isParentActive
@@ -565,12 +596,13 @@ function SidebarFolder({
 						transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
 						style={{ overflow: "hidden" }}
 					>
-						<div className="mt-px flex flex-col space-y-px pb-0.5">
+						<div className="mt-px flex flex-col space-y-px pb-0.5 pl-4 border-l border-stroke-soft-100/30 ml-4">
 							{node.children.map((child: PageTreeItem, index: number) => (
-								<SidebarLink
+								<SidebarSection
 									key={index}
 									node={child}
 									onLinkClick={onLinkClick}
+									depth={depth + 1}
 								/>
 							))}
 						</div>
@@ -584,16 +616,18 @@ function SidebarFolder({
 function SidebarLink({
 	node,
 	onLinkClick,
+	depth = 0,
 }: {
 	node: PageTreeItem;
 	onLinkClick?: () => void;
+	depth?: number;
 }) {
 	const ref = useRef<HTMLAnchorElement>(null);
 	const { setHoveredEl, pathname } = useSidebarContext();
 
 	if (node.type === "separator") return null;
 	if (node.type === "folder") {
-		return <SidebarFolder node={node} onLinkClick={onLinkClick} />;
+		return <SidebarFolder node={node} onLinkClick={onLinkClick} depth={depth} />;
 	}
 
 	const linkId = node.url;
@@ -611,13 +645,21 @@ function SidebarLink({
 			}}
 			data-sidebar-active={isActive || undefined}
 			className={cn(
-				"group relative z-10 flex h-8 items-center gap-2 rounded-lg px-2 text-[14px] transition-colors",
+				"group relative z-10 flex items-center gap-2 rounded-lg px-2 transition-colors",
+				depth === 0 ? "h-9 text-[15px]" : "h-8 text-[14px]",
 				isActive
 					? "text-[#171717] dark:text-white"
 					: "text-text-sub-600 hover:text-[#171717] dark:hover:text-white",
 			)}
 		>
-			<div className="relative z-10 grid w-full grid-cols-[40px_1fr] items-center gap-4 text-left">
+			<div
+				className={cn(
+					"relative z-10 w-full items-center text-left",
+					node.method || node.icon
+						? "grid grid-cols-[40px_1fr] gap-4"
+						: "flex gap-2",
+				)}
+			>
 				{node.method ? (
 					<p
 						className={cn(
@@ -647,9 +689,7 @@ function SidebarLink({
 					>
 						{node.icon}
 					</span>
-				) : (
-					<div />
-				)}
+				) : null}
 				<span className="truncate font-medium">{node.name as string}</span>
 			</div>
 		</Link>

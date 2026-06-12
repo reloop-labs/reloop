@@ -20,16 +20,9 @@ const result = await reloop.apiKey.delete("key_123456789");`,
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="rl_123456789")
 
-response = requests.delete(
-    "https://api.reloop.sh/api-key/v1/key_123456789",
-    headers={
-        "Authorization": "Bearer rl_123456789",
-    },
-)
-
-result = response.json()`,
+reloop.api_keys.delete("key_123456789")`,
 	},
 	{
 		id: "php",

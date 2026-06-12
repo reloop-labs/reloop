@@ -30,22 +30,13 @@ const apiKey = await reloop.apiKey.create({
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="rl_123456789")
 
-response = requests.post(
-    "https://api.reloop.sh/api-key/v1/",
-    headers={
-        "Authorization": "Bearer rl_123456789",
-        "Content-Type": "application/json",
-    },
-    json={
-        "name": "Production key",
-        "enabled": True,
-        "rateLimitEnabled": True,
-    },
-)
-
-api_key = response.json()`,
+reloop.api_keys.create(
+    name="Production key",
+    enabled=True,
+    rate_limit_enabled=True,
+)`,
 	},
 	{
 		id: "php",

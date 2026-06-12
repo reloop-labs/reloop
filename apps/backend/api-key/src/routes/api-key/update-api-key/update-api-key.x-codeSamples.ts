@@ -28,21 +28,13 @@ const apiKey = await reloop.apiKey.update("key_123456789", {
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `reloop = Reloop(api_key="rl_123456789")
 
-response = requests.patch(
-    "https://api.reloop.sh/api-key/v1/key_123456789",
-    headers={
-        "Authorization": "Bearer rl_123456789",
-        "Content-Type": "application/json",
-    },
-    json={
-        "name": "Updated production key",
-        "enabled": True,
-    },
-)
-
-api_key = response.json()`,
+reloop.api_keys.update(
+    "key_123456789",
+    name="Updated production key",
+    enabled=True,
+)`,
 	},
 	{
 		id: "php",
