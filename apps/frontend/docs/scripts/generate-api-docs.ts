@@ -357,15 +357,15 @@ function extractParameters(operation: any, spec: any): ParameterInfo[] {
 					location: "body",
 					properties: itemsSchema.properties
 						? Object.entries(itemsSchema.properties).map(
-								([subName, subPropSchema]) =>
-									parseParameter(
-										subName,
-										subPropSchema,
-										(itemsSchema.required || []).includes(subName),
-										"body",
-										spec,
-									),
-							)
+							([subName, subPropSchema]) =>
+								parseParameter(
+									subName,
+									subPropSchema,
+									(itemsSchema.required || []).includes(subName),
+									"body",
+									spec,
+								),
+						)
 						: undefined,
 				});
 			}
@@ -911,13 +911,13 @@ function generateMetaJson(allGenerated: Record<string, GeneratedPage[]>) {
 	// Preserve services that weren't regenerated in this run but still have docs on disk.
 	const existingServices = fs.existsSync(DOCS_DIR)
 		? fs
-				.readdirSync(DOCS_DIR, { withFileTypes: true })
-				.filter(
-					(entry) =>
-						entry.isDirectory() &&
-						fs.existsSync(path.join(DOCS_DIR, entry.name, "meta.json")),
-				)
-				.map((entry) => entry.name)
+			.readdirSync(DOCS_DIR, { withFileTypes: true })
+			.filter(
+				(entry) =>
+					entry.isDirectory() &&
+					fs.existsSync(path.join(DOCS_DIR, entry.name, "meta.json")),
+			)
+			.map((entry) => entry.name)
 		: [];
 
 	const serviceOrder = SERVICES.map((service) => service.name);
@@ -937,7 +937,6 @@ function generateMetaJson(allGenerated: Record<string, GeneratedPage[]>) {
 		"pagination",
 		"usage-limits",
 		"errors",
-		"---Actions---",
 		...mergedServices,
 	];
 

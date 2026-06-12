@@ -213,7 +213,24 @@ export function ApiSidebarSection({
 	}
 
 	if (node.type === "folder") {
-		return <ApiSidebarFolder node={node} onLinkClick={onLinkClick} depth={depth} />;
+		// Render all folders flat: a label followed by direct children, no collapsible nesting.
+		return (
+			<>
+				<div className="mt-4 mb-1.5 px-2">
+					<h4 className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-[0.05em] opacity-60">
+						{node.name as string}
+					</h4>
+				</div>
+				{node.children.map((child: PageTreeItem, index: number) => (
+					<ApiSidebarSection
+						key={index}
+						node={child}
+						onLinkClick={onLinkClick}
+						depth={0}
+					/>
+				))}
+			</>
+		);
 	}
 
 	return <ApiSidebarLink node={node} onLinkClick={onLinkClick} depth={depth} />;
