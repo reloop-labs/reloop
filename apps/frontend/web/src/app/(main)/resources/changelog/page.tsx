@@ -11,7 +11,7 @@ import { changelogComingNext, changelogReleases } from "./changelog-utils";
 export const metadata: Metadata = {
 	title: "Changelog | Reloop",
 	description:
-		"What's new in Reloop — product releases from September 2025 onward, organized by planning, design, frontend, backend, DevOps, and testing.",
+		"What's new in Reloop — product releases from September 2025 onward, organized by planning, design, frontend, backend, and DevOps.",
 	openGraph: {
 		title: "Changelog | Reloop",
 		description:
@@ -29,8 +29,8 @@ const ChangelogPage = () => {
 					<span className="font-semibold text-text-strong-950 dark:text-white">
 						September 2025
 					</span>
-					. Each version lists planning, design, frontend, backend, DevOps, and
-					testing work in the order teams typically ship it.
+					. Each version lists planning, design, frontend, backend, and DevOps
+					work in the order teams typically ship it.
 				</p>
 				<ChangelogTimeline releases={changelogReleases} />
 			</PageSection>
