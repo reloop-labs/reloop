@@ -4,7 +4,6 @@ const config = {
 	basePath: "/docs",
 	output: "standalone",
 	allowedDevOrigins: ["local.reloop.sh", "*.local.reloop.sh"],
-	serverExternalPackages: ["next-mdx-remote", "next-mdx-remote/rsc"],
 	async rewrites() {
 		return [
 			{
