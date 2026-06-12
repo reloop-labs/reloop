@@ -73,7 +73,7 @@ request.body = { contact_id: 'cont_123456789' }.to_json
 response = http.request(request)
 result = JSON.parse(response.body)`,
 	},
-		{
+	{
 		id: "go",
 		lang: "go",
 		label: "Go",
@@ -89,7 +89,7 @@ func main() {
     })
 }`,
 	},
-		{
+	{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
@@ -107,7 +107,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }`,
 	},
-		{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",
@@ -118,7 +118,7 @@ ReloopEmail reloop = ReloopEmail.client("re_123456789");
 
 reloop.contacts().groups().removeContact("grp_123456789", Map.of("contact_id", "cont_123456789"));`,
 	},
-		{
+	{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",

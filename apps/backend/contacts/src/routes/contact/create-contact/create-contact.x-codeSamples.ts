@@ -142,7 +142,7 @@ request.body = {
 response = http.request(request)
 contact = JSON.parse(response.body)`,
 	},
-			{
+	{
 		id: "go",
 		lang: "go",
 		label: "Go",
@@ -164,7 +164,7 @@ func main() {
     })
 }`,
 	},
-		{
+	{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
@@ -198,7 +198,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }`,
 	},
-		{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",
@@ -217,7 +217,7 @@ params.put("group_ids", List.of("grp_123456789"));
 params.put("channels", List.of(Map.of("channel_id", "channel_123456789", "subscription", "opt_in")));
 reloop.contacts().create(params);`,
 	},
-		{
+	{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",

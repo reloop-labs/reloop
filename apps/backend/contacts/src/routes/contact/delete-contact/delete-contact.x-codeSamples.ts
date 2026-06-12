@@ -55,7 +55,7 @@ request['x-api-key'] = 're_123456789'
 response = http.request(request)
 result = JSON.parse(response.body)`,
 	},
-			{
+	{
 		id: "go",
 		lang: "go",
 		label: "Go",
@@ -69,7 +69,7 @@ func main() {
     _, _ = reloop.Contacts().Delete("cont_123456789")
 }`,
 	},
-		{
+	{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
@@ -85,7 +85,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }`,
 	},
-		{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",
@@ -95,7 +95,7 @@ ReloopEmail reloop = ReloopEmail.client("re_123456789");
 
 reloop.contacts().delete("cont_123456789");`,
 	},
-		{
+	{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",

@@ -53,7 +53,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }`,
 	},
-			{
+	{
 		id: "go",
 		lang: "go",
 		label: "Go",
@@ -83,7 +83,7 @@ $reloop->apiKeys->list(
   ],
 );`,
 	},
-		{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",
@@ -94,7 +94,7 @@ ReloopEmail reloop = ReloopEmail.client("rl_123456789");
 
 reloop.apiKeys().list(new ApiKeyListParams(1, 10, null, null, null));`,
 	},
-		{
+	{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",

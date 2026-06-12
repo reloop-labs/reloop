@@ -67,7 +67,7 @@ request['x-api-key'] = 're_123456789'
 response = http.request(request)
 channels = JSON.parse(response.body)`,
 	},
-			{
+	{
 		id: "go",
 		lang: "go",
 		label: "Go",
@@ -84,7 +84,7 @@ func main() {
     })
 }`,
 	},
-		{
+	{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
@@ -103,7 +103,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }`,
 	},
-		{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",
@@ -114,7 +114,7 @@ ReloopEmail reloop = ReloopEmail.client("re_123456789");
 
 reloop.contacts().channels().list(Map.of("page", 1, "limit", 10));`,
 	},
-		{
+	{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",

@@ -8,7 +8,10 @@ import path from "node:path";
 
 const REPO_ROOT = path.resolve(__dirname, "../../../..");
 const BACKEND_ROOT = path.join(REPO_ROOT, "apps/backend");
-const DOCS_API_DIR = path.join(REPO_ROOT, "apps/frontend/docs/content/docs/api");
+const DOCS_API_DIR = path.join(
+	REPO_ROOT,
+	"apps/frontend/docs/content/docs/api",
+);
 const WATCHER_TRIGGER = path.join(
 	REPO_ROOT,
 	"apps/frontend/docs/src/lib/watcher-trigger.ts",
@@ -118,7 +121,9 @@ function findMdxFiles(dir: string): string[] {
 	return files;
 }
 
-function parseFrontmatter(content: string): { frontmatter: string; body: string } | null {
+function parseFrontmatter(
+	content: string,
+): { frontmatter: string; body: string } | null {
 	const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
 	if (!match) {
 		return null;
@@ -126,7 +131,9 @@ function parseFrontmatter(content: string): { frontmatter: string; body: string 
 	return { frontmatter: match[1]!, body: match[2]! };
 }
 
-function getOperation(content: string): { path: string; method: string } | null {
+function getOperation(
+	content: string,
+): { path: string; method: string } | null {
 	const yamlPathMatch = content.match(/^\s*-\s*path:\s*(.+)$/m);
 	const yamlMethodMatch = content.match(/^\s*method:\s*(.+)$/m);
 	if (yamlPathMatch && yamlMethodMatch) {
@@ -163,16 +170,25 @@ function renderCodeSamples(samples: CodeSample[]): string {
 	return lines.join("\n");
 }
 
-function replaceCodeSamples(frontmatter: string, samples: CodeSample[]): string {
+function replaceCodeSamples(
+	frontmatter: string,
+	samples: CodeSample[],
+): string {
 	const rendered = renderCodeSamples(samples);
 	if (/^\s*codeSamples:/m.test(frontmatter)) {
 		return frontmatter.replace(/^\s*codeSamples:[\s\S]*$/m, rendered);
 	}
-	return frontmatter.replace(/(_apiData:[\s\S]*?)(^\S|\s*$)/m, `$1${rendered}\n`);
+	return frontmatter.replace(
+		/(_apiData:[\s\S]*?)(^\S|\s*$)/m,
+		`$1${rendered}\n`,
+	);
 }
 
 function bumpWatcherTrigger(): void {
-	fs.writeFileSync(WATCHER_TRIGGER, `export const watcherTrigger = ${Date.now()};\n`);
+	fs.writeFileSync(
+		WATCHER_TRIGGER,
+		`export const watcherTrigger = ${Date.now()};\n`,
+	);
 }
 
 const services = [
@@ -206,11 +222,16 @@ for (const mdxPath of findMdxFiles(DOCS_API_DIR)) {
 	if (!operation) {
 		continue;
 	}
-	const source = sampleIndex.get(normalizeRouteKey(operation.path, operation.method));
+	const source = sampleIndex.get(
+		normalizeRouteKey(operation.path, operation.method),
+	);
 	if (!source) {
 		continue;
 	}
-	const nextFrontmatter = replaceCodeSamples(parsed.frontmatter, source.samples);
+	const nextFrontmatter = replaceCodeSamples(
+		parsed.frontmatter,
+		source.samples,
+	);
 	if (nextFrontmatter === parsed.frontmatter) {
 		continue;
 	}

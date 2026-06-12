@@ -26,7 +26,10 @@ export function findSampleFiles(dir: string): string[] {
 	return files;
 }
 
-export function extractSampleSource(content: string, id: string): string | null {
+export function extractSampleSource(
+	content: string,
+	id: string,
+): string | null {
 	const pattern = new RegExp(
 		`\\{\\s*id:\\s*"${id}"[\\s\\S]*?source:\\s*\`([\\s\\S]*?)\`,\\s*\\}`,
 		"m",
@@ -88,10 +91,15 @@ export function splitTopLevel(input: string, delimiter: string): string[] {
 	return parts;
 }
 
-export function parsePythonCall(python: string): { apiKey: string; call: string } {
+export function parsePythonCall(python: string): {
+	apiKey: string;
+	call: string;
+} {
 	const apiKeyMatch = python.match(/api_key="([^"]+)"/);
 	const apiKey = apiKeyMatch?.[1] ?? "re_123456789";
-	const call = python.replace(/^reloop = Reloop\(api_key="[^"]+"\)\n\n?/, "").trim();
+	const call = python
+		.replace(/^reloop = Reloop\(api_key="[^"]+"\)\n\n?/, "")
+		.trim();
 	return { apiKey, call };
 }
 
@@ -103,7 +111,9 @@ export function snakeToPascal(key: string): string {
 		.join("");
 }
 
-export function parseKwargs(block: string): Array<{ key: string; value: string }> {
+export function parseKwargs(
+	block: string,
+): Array<{ key: string; value: string }> {
 	return splitTopLevel(block, ",")
 		.map((entry) => entry.trim())
 		.filter(Boolean)
@@ -130,12 +140,17 @@ export function upsertSample(
 
 	if (content.includes(`id: "${languageId}"`)) {
 		return content.replace(
-			new RegExp(`\\{\\s*id:\\s*"${languageId}"[\\s\\S]*?source:\\s*\`[\\s\\S]*?\`,\\s*\\}`, "m"),
+			new RegExp(
+				`\\{\\s*id:\\s*"${languageId}"[\\s\\S]*?source:\\s*\`[\\s\\S]*?\`,\\s*\\}`,
+				"m",
+			),
 			block,
 		);
 	}
 
-	const pythonMatch = content.match(/\{\s*id:\s*"python"[\s\S]*?source:\s*`[\s\S]*?`,\s*\}/m);
+	const pythonMatch = content.match(
+		/\{\s*id:\s*"python"[\s\S]*?source:\s*`[\s\S]*?`,\s*\}/m,
+	);
 	if (!pythonMatch || pythonMatch.index === undefined) {
 		throw new Error("Could not find python sample block");
 	}
@@ -170,8 +185,13 @@ export function convertPythonValueToJsonMacro(value: string): string {
 			if (colonIndex === -1) {
 				return entry.trim();
 			}
-			const key = entry.slice(0, colonIndex).trim().replace(/^["']|["']$/g, "");
-			const entryValue = convertPythonValueToJsonMacro(entry.slice(colonIndex + 1));
+			const key = entry
+				.slice(0, colonIndex)
+				.trim()
+				.replace(/^["']|["']$/g, "");
+			const entryValue = convertPythonValueToJsonMacro(
+				entry.slice(colonIndex + 1),
+			);
 			return `"${key}": ${entryValue}`;
 		});
 
@@ -184,7 +204,9 @@ export function convertPythonValueToJsonMacro(value: string): string {
 			return "json!([])";
 		}
 
-		const items = splitTopLevel(inner, ",").map((item) => convertPythonValueToJsonMacro(item));
+		const items = splitTopLevel(inner, ",").map((item) =>
+			convertPythonValueToJsonMacro(item),
+		);
 		return `json!([\n        ${items.join(",\n        ")},\n    ])`;
 	}
 
@@ -214,8 +236,13 @@ export function convertPythonValueToJsonLiteral(value: string): string {
 
 		const entries = splitTopLevel(inner, ",").map((entry) => {
 			const colonIndex = entry.indexOf(":");
-			const key = entry.slice(0, colonIndex).trim().replace(/^["']|["']$/g, "");
-			const entryValue = convertPythonValueToJsonLiteral(entry.slice(colonIndex + 1));
+			const key = entry
+				.slice(0, colonIndex)
+				.trim()
+				.replace(/^["']|["']$/g, "");
+			const entryValue = convertPythonValueToJsonLiteral(
+				entry.slice(colonIndex + 1),
+			);
 			return `"${key}": ${entryValue}`;
 		});
 
@@ -228,7 +255,9 @@ export function convertPythonValueToJsonLiteral(value: string): string {
 			return "[]";
 		}
 
-		const items = splitTopLevel(inner, ",").map((item) => convertPythonValueToJsonLiteral(item));
+		const items = splitTopLevel(inner, ",").map((item) =>
+			convertPythonValueToJsonLiteral(item),
+		);
 		return `[\n        ${items.join(",\n        ")},\n    ]`;
 	}
 
@@ -265,8 +294,13 @@ export function convertPythonValueToCSharp(value: string): string {
 
 		const entries = splitTopLevel(inner, ",").map((entry) => {
 			const colonIndex = entry.indexOf(":");
-			const key = entry.slice(0, colonIndex).trim().replace(/^["']|["']$/g, "");
-			const entryValue = convertPythonValueToCSharp(entry.slice(colonIndex + 1));
+			const key = entry
+				.slice(0, colonIndex)
+				.trim()
+				.replace(/^["']|["']$/g, "");
+			const entryValue = convertPythonValueToCSharp(
+				entry.slice(colonIndex + 1),
+			);
 			return `["${key}"] = ${entryValue}`;
 		});
 
@@ -279,21 +313,27 @@ export function convertPythonValueToCSharp(value: string): string {
 			return "Array.Empty<object?>()";
 		}
 
-		const items = splitTopLevel(inner, ",").map((item) => convertPythonValueToCSharp(item));
+		const items = splitTopLevel(inner, ",").map((item) =>
+			convertPythonValueToCSharp(item),
+		);
 		return `new object?[] { ${items.join(", ")} }`;
 	}
 
 	return trimmed;
 }
 
-export function buildCSharpDictionaryArgument(block: string): { setupLines: string[]; expression: string } {
+export function buildCSharpDictionaryArgument(block: string): {
+	setupLines: string[];
+	expression: string;
+} {
 	const entries = parseKwargs(block).map(({ key, value }) => ({
 		key,
 		value: convertPythonValueToCSharp(value),
 	}));
 
 	const hasNested = entries.some(
-		({ value }) => value.startsWith("new Dictionary") || value.startsWith("new object?[]"),
+		({ value }) =>
+			value.startsWith("new Dictionary") || value.startsWith("new object?[]"),
 	);
 
 	if (!hasNested && entries.length <= 4) {

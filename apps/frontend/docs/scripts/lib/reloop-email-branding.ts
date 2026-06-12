@@ -19,15 +19,16 @@ export const RELOOP_EMAIL = {
 		install: "go get github.com/reloop-labs/reloop-email",
 		client: (apiKey: string) =>
 			[
-				`reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{`,
+				"reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{",
 				`    APIKey: "${apiKey}",`,
-				`})`,
+				"})",
 			].join("\n"),
 	},
 	java: {
 		imports: ["import sh.reloop.email.ReloopEmail;", "import java.util.*;"],
 		install: "sh.reloop:reloop-email",
-		client: (apiKey: string) => `ReloopEmail reloop = ReloopEmail.client("${apiKey}");`,
+		client: (apiKey: string) =>
+			`ReloopEmail reloop = ReloopEmail.client("${apiKey}");`,
 	},
 	rust: {
 		imports: ["use reloop_email::ReloopEmail;", "use serde_json::json;"],

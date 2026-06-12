@@ -32,62 +32,122 @@ function standardize(content: string): string {
 	);
 
 	// Python
-	next = next.replace(/from reloop import Reloop/g, "from reloop_email import Reloop");
-	next = next.replace(/from reloop import ReloopClient/g, "from reloop_email import Reloop");
+	next = next.replace(
+		/from reloop import Reloop/g,
+		"from reloop_email import Reloop",
+	);
+	next = next.replace(
+		/from reloop import ReloopClient/g,
+		"from reloop_email import Reloop",
+	);
 	next = next.replace(
 		/source: `reloop = Reloop\(api_key=/g,
-		'source: `from reloop_email import Reloop\n\nreloop = Reloop(api_key=',
+		"source: `from reloop_email import Reloop\n\nreloop = Reloop(api_key=",
 	);
 
 	// Go
-	next = next.replace(/github\.com\/reloop\/reloop-go/g, "github.com/reloop-labs/reloop-email");
-	next = next.replace(/github\.com\/reloop-labs\/reloop-go/g, "github.com/reloop-labs/reloop-email");
-	next = next.replace(/import reloop\n\nfunc main\(\) \{/g, 'import reloopemail "github.com/reloop-labs/reloop-email"\n\nfunc main() {');
+	next = next.replace(
+		/github\.com\/reloop\/reloop-go/g,
+		"github.com/reloop-labs/reloop-email",
+	);
+	next = next.replace(
+		/github\.com\/reloop-labs\/reloop-go/g,
+		"github.com/reloop-labs/reloop-email",
+	);
+	next = next.replace(
+		/import reloop\n\nfunc main\(\) \{/g,
+		'import reloopemail "github.com/reloop-labs/reloop-email"\n\nfunc main() {',
+	);
 	next = next.replace(
 		/client, _ := reloop\.NewClient\(reloop\.ClientOptions\{/g,
 		"reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{",
 	);
 	next = next.replace(/_, _ = client\./g, "_, _ = reloop.");
 	next = next.replace(/_, _ = reloop\.ApiKeys\./g, "_, _ = reloop.ApiKeys().");
-	next = next.replace(/_, _ = reloop\.Contacts\./g, "_, _ = reloop.Contacts().");
-	next = next.replace(/reloop\.Contacts\(\)\.Groups\(\)\./g, "reloop.Contacts().Groups().");
-	next = next.replace(/reloop\.Contacts\(\)\.Channels\(\)\./g, "reloop.Contacts().Channels().");
+	next = next.replace(
+		/_, _ = reloop\.Contacts\./g,
+		"_, _ = reloop.Contacts().",
+	);
+	next = next.replace(
+		/reloop\.Contacts\(\)\.Groups\(\)\./g,
+		"reloop.Contacts().Groups().",
+	);
+	next = next.replace(
+		/reloop\.Contacts\(\)\.Channels\(\)\./g,
+		"reloop.Contacts().Channels().",
+	);
 
 	// Java
-	next = next.replace(/import sh\.reloop\.ReloopClient;\nimport sh\.reloop\.models\.Models\.\*;\n\nReloopClient reloop = new ReloopClient\(/g,
-		'import sh.reloop.email.ReloopEmail;\nimport sh.reloop.email.Models.*;\n\nReloopEmail reloop = ReloopEmail.client(');
-	next = next.replace(/import sh\.reloop\.ReloopClient;\nimport java\.util\.\*;\n\nReloopClient reloop = new ReloopClient\(/g,
-		'import sh.reloop.email.ReloopEmail;\nimport java.util.*;\n\nReloopEmail reloop = ReloopEmail.client(');
-	next = next.replace(/import sh\.reloop\.ReloopClient;\n\nReloopClient reloop = new ReloopClient\(/g,
-		'import sh.reloop.email.ReloopEmail;\n\nReloopEmail reloop = ReloopEmail.client(');
-	next = next.replace(/ReloopClient reloop = new ReloopClient\("([^"]+)"\);/g,
-		'ReloopEmail reloop = ReloopEmail.client("$1");');
+	next = next.replace(
+		/import sh\.reloop\.ReloopClient;\nimport sh\.reloop\.models\.Models\.\*;\n\nReloopClient reloop = new ReloopClient\(/g,
+		"import sh.reloop.email.ReloopEmail;\nimport sh.reloop.email.Models.*;\n\nReloopEmail reloop = ReloopEmail.client(",
+	);
+	next = next.replace(
+		/import sh\.reloop\.ReloopClient;\nimport java\.util\.\*;\n\nReloopClient reloop = new ReloopClient\(/g,
+		"import sh.reloop.email.ReloopEmail;\nimport java.util.*;\n\nReloopEmail reloop = ReloopEmail.client(",
+	);
+	next = next.replace(
+		/import sh\.reloop\.ReloopClient;\n\nReloopClient reloop = new ReloopClient\(/g,
+		"import sh.reloop.email.ReloopEmail;\n\nReloopEmail reloop = ReloopEmail.client(",
+	);
+	next = next.replace(
+		/ReloopClient reloop = new ReloopClient\("([^"]+)"\);/g,
+		'ReloopEmail reloop = ReloopEmail.client("$1");',
+	);
 	next = next.replace(/reloop\.apiKeys\./g, "reloop.apiKeys().");
 	next = next.replace(/reloop\.contacts\./g, "reloop.contacts().");
-	next = next.replace(/reloop\.contacts\(\)\.groups\./g, "reloop.contacts().groups().");
-	next = next.replace(/reloop\.contacts\(\)\.channels\./g, "reloop.contacts().channels().");
+	next = next.replace(
+		/reloop\.contacts\(\)\.groups\./g,
+		"reloop.contacts().groups().",
+	);
+	next = next.replace(
+		/reloop\.contacts\(\)\.channels\./g,
+		"reloop.contacts().channels().",
+	);
 
 	// Rust
-	next = next.replace(/use reloop::ReloopClient;\nuse serde_json::json;/g,
-		"use reloop_email::ReloopEmail;\nuse serde_json::json;");
-	next = next.replace(/use reloop::\{CreateApiKeyParams, UpdateApiKeyParams, ApiKeyListParams\};/g,
-		"use reloop_email::{CreateApiKeyParams, UpdateApiKeyParams, ApiKeyListParams};");
-	next = next.replace(/let reloop = ReloopClient::new\(/g, "let reloop = ReloopEmail::new(");
+	next = next.replace(
+		/use reloop::ReloopClient;\nuse serde_json::json;/g,
+		"use reloop_email::ReloopEmail;\nuse serde_json::json;",
+	);
+	next = next.replace(
+		/use reloop::\{CreateApiKeyParams, UpdateApiKeyParams, ApiKeyListParams\};/g,
+		"use reloop_email::{CreateApiKeyParams, UpdateApiKeyParams, ApiKeyListParams};",
+	);
+	next = next.replace(
+		/let reloop = ReloopClient::new\(/g,
+		"let reloop = ReloopEmail::new(",
+	);
 	next = next.replace(/reloop\.api_keys\(\)/g, "reloop.api_keys()");
 	next = next.replace(/reloop\.contacts\(\)/g, "reloop.contacts()");
 
 	// .NET
-	next = next.replace(/using Reloop;\nusing Reloop\.Models;/g, "using Reloop.Email;\nusing Reloop.Email.Models;");
-	next = next.replace(/using Reloop;\nusing System\.Collections\.Generic;/g,
-		"using Reloop.Email;\nusing System.Collections.Generic;");
-	next = next.replace(/using Reloop;\n\nvar reloop = new ReloopClient\(/g,
-		"using Reloop.Email;\n\nvar reloop = ReloopEmail.Client(");
-	next = next.replace(/var reloop = new ReloopClient\("([^"]+)"\);/g,
-		'var reloop = ReloopEmail.Client("$1");');
+	next = next.replace(
+		/using Reloop;\nusing Reloop\.Models;/g,
+		"using Reloop.Email;\nusing Reloop.Email.Models;",
+	);
+	next = next.replace(
+		/using Reloop;\nusing System\.Collections\.Generic;/g,
+		"using Reloop.Email;\nusing System.Collections.Generic;",
+	);
+	next = next.replace(
+		/using Reloop;\n\nvar reloop = new ReloopClient\(/g,
+		"using Reloop.Email;\n\nvar reloop = ReloopEmail.Client(",
+	);
+	next = next.replace(
+		/var reloop = new ReloopClient\("([^"]+)"\);/g,
+		'var reloop = ReloopEmail.Client("$1");',
+	);
 	next = next.replace(/await reloop\.ApiKeys\./g, "await reloop.ApiKeys().");
 	next = next.replace(/await reloop\.Contacts\./g, "await reloop.Contacts().");
-	next = next.replace(/await reloop\.Contacts\.Groups\./g, "await reloop.Contacts().Groups().");
-	next = next.replace(/await reloop\.Contacts\.Channels\./g, "await reloop.Contacts().Channels().");
+	next = next.replace(
+		/await reloop\.Contacts\.Groups\./g,
+		"await reloop.Contacts().Groups().",
+	);
+	next = next.replace(
+		/await reloop\.Contacts\.Channels\./g,
+		"await reloop.Contacts().Channels().",
+	);
 
 	return next;
 }

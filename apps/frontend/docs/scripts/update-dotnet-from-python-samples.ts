@@ -6,17 +6,17 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-	SERVICE_DIRS,
 	buildCSharpDictionaryArgument,
 	convertPythonValueToCSharp,
 	extractSampleSource,
 	findSampleFiles,
 	parseKwargs,
 	parsePythonCall,
+	REPO_ROOT,
+	SERVICE_DIRS,
 	snakeToPascal,
 	splitTopLevel,
 	upsertSample,
-	REPO_ROOT,
 } from "./lib/python-sample-utils";
 import { RELOOP_EMAIL } from "./lib/reloop-email-branding";
 
@@ -61,7 +61,10 @@ function convertPythonToDotnet(python: string): string {
 
 		if (method === "list") {
 			const fields = parseKwargs(args)
-				.map(({ key, value }) => `${snakeToPascal(key)} = ${convertPythonValueToCSharp(value)}`)
+				.map(
+					({ key, value }) =>
+						`${snakeToPascal(key)} = ${convertPythonValueToCSharp(value)}`,
+				)
 				.join(",\n    ");
 
 			lines.push("await reloop.ApiKeys.ListAsync(new ApiKeyListParams");
@@ -75,10 +78,15 @@ function convertPythonToDotnet(python: string): string {
 			const parts = splitTopLevel(args, ",");
 			const id = parts[0]?.trim().replace(/^"|"$/g, "") ?? "";
 			const fields = parseKwargs(parts.slice(1).join(","))
-				.map(({ key, value }) => `${snakeToPascal(key)} = ${convertPythonValueToCSharp(value)}`)
+				.map(
+					({ key, value }) =>
+						`${snakeToPascal(key)} = ${convertPythonValueToCSharp(value)}`,
+				)
 				.join(",\n    ");
 
-			lines.push(`await reloop.ApiKeys.UpdateAsync("${id}", new UpdateApiKeyParams`);
+			lines.push(
+				`await reloop.ApiKeys.UpdateAsync("${id}", new UpdateApiKeyParams`,
+			);
 			lines.push("{");
 			lines.push(`    ${fields},`);
 			lines.push("});");
@@ -86,16 +94,24 @@ function convertPythonToDotnet(python: string): string {
 		}
 
 		const id = args.replace(/^"|"$/g, "");
-		lines.push(`await reloop.ApiKeys.${method!.charAt(0).toUpperCase()}${method!.slice(1)}Async("${id}");`);
+		lines.push(
+			`await reloop.ApiKeys.${method!.charAt(0).toUpperCase()}${method!.slice(1)}Async("${id}");`,
+		);
 		return wrapCSharpSample(lines, true);
 	}
 
-	const methodPatterns: Array<{ pattern: RegExp; build: (match: string[]) => string[] }> = [
+	const methodPatterns: Array<{
+		pattern: RegExp;
+		build: (match: string[]) => string[];
+	}> = [
 		{
 			pattern: /^reloop\.contacts\.create\(([\s\S]*)\)$/,
 			build: ([, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
-				return [...map.setupLines, `await reloop.Contacts.CreateAsync(${map.expression});`];
+				return [
+					...map.setupLines,
+					`await reloop.Contacts.CreateAsync(${map.expression});`,
+				];
 			},
 		},
 		{
@@ -110,28 +126,40 @@ function convertPythonToDotnet(python: string): string {
 			pattern: /^reloop\.contacts\.list\(([\s\S]*)\)$/,
 			build: ([, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
-				return [...map.setupLines, `await reloop.Contacts.ListAsync(${map.expression});`];
+				return [
+					...map.setupLines,
+					`await reloop.Contacts.ListAsync(${map.expression});`,
+				];
 			},
 		},
 		{
 			pattern: /^reloop\.contacts\.update\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
 			build: ([, id, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
-				return [...map.setupLines, `await reloop.Contacts.UpdateAsync("${id}", ${map.expression});`];
+				return [
+					...map.setupLines,
+					`await reloop.Contacts.UpdateAsync("${id}", ${map.expression});`,
+				];
 			},
 		},
 		{
 			pattern: /^reloop\.contacts\.create_group\(([\s\S]*)\)$/,
 			build: ([, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
-				return [...map.setupLines, `await reloop.Contacts.CreateGroupAsync(${map.expression});`];
+				return [
+					...map.setupLines,
+					`await reloop.Contacts.CreateGroupAsync(${map.expression});`,
+				];
 			},
 		},
 		{
 			pattern: /^reloop\.contacts\.list_groups\(([\s\S]*)\)$/,
 			build: ([, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
-				return [...map.setupLines, `await reloop.Contacts.ListGroupsAsync(${map.expression});`];
+				return [
+					...map.setupLines,
+					`await reloop.Contacts.ListGroupsAsync(${map.expression});`,
+				];
 			},
 		},
 		{
@@ -146,67 +174,100 @@ function convertPythonToDotnet(python: string): string {
 			pattern: /^reloop\.contacts\.update_group\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
 			build: ([, id, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
-				return [...map.setupLines, `await reloop.Contacts.UpdateGroupAsync("${id}", ${map.expression});`];
+				return [
+					...map.setupLines,
+					`await reloop.Contacts.UpdateGroupAsync("${id}", ${map.expression});`,
+				];
 			},
 		},
 		{
 			pattern: /^reloop\.contacts\.create_property\(([\s\S]*)\)$/,
 			build: ([, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
-				return [...map.setupLines, `await reloop.Contacts.CreatePropertyAsync(${map.expression});`];
+				return [
+					...map.setupLines,
+					`await reloop.Contacts.CreatePropertyAsync(${map.expression});`,
+				];
 			},
 		},
 		{
 			pattern: /^reloop\.contacts\.list_properties\(([\s\S]*)\)$/,
 			build: ([, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
-				return [...map.setupLines, `await reloop.Contacts.ListPropertiesAsync(${map.expression});`];
+				return [
+					...map.setupLines,
+					`await reloop.Contacts.ListPropertiesAsync(${map.expression});`,
+				];
 			},
 		},
 		{
-			pattern: /^reloop\.contacts\.update_property\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
+			pattern:
+				/^reloop\.contacts\.update_property\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
 			build: ([, id, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
-				return [...map.setupLines, `await reloop.Contacts.UpdatePropertyAsync("${id}", ${map.expression});`];
+				return [
+					...map.setupLines,
+					`await reloop.Contacts.UpdatePropertyAsync("${id}", ${map.expression});`,
+				];
 			},
 		},
 		{
 			pattern: /^reloop\.contacts\.delete_property\("([^"]+)"\)$/,
-			build: ([, id]) => [`await reloop.Contacts.DeletePropertyAsync("${id}");`],
+			build: ([, id]) => [
+				`await reloop.Contacts.DeletePropertyAsync("${id}");`,
+			],
 		},
 		{
-			pattern: /^reloop\.contacts\.groups\.add_contact\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
+			pattern:
+				/^reloop\.contacts\.groups\.add_contact\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
 			build: ([, id, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
-				return [...map.setupLines, `await reloop.Contacts.Groups.AddContactAsync("${id}", ${map.expression});`];
+				return [
+					...map.setupLines,
+					`await reloop.Contacts.Groups.AddContactAsync("${id}", ${map.expression});`,
+				];
 			},
 		},
 		{
-			pattern: /^reloop\.contacts\.groups\.remove_contact\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
+			pattern:
+				/^reloop\.contacts\.groups\.remove_contact\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
 			build: ([, id, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
-				return [...map.setupLines, `await reloop.Contacts.Groups.RemoveContactAsync("${id}", ${map.expression});`];
+				return [
+					...map.setupLines,
+					`await reloop.Contacts.Groups.RemoveContactAsync("${id}", ${map.expression});`,
+				];
 			},
 		},
 		{
-			pattern: /^reloop\.contacts\.groups\.list_contacts\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
+			pattern:
+				/^reloop\.contacts\.groups\.list_contacts\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
 			build: ([, id, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
-				return [...map.setupLines, `await reloop.Contacts.Groups.ListContactsAsync("${id}", ${map.expression});`];
+				return [
+					...map.setupLines,
+					`await reloop.Contacts.Groups.ListContactsAsync("${id}", ${map.expression});`,
+				];
 			},
 		},
 		{
 			pattern: /^reloop\.contacts\.channels\.create\(([\s\S]*)\)$/,
 			build: ([, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
-				return [...map.setupLines, `await reloop.Contacts.Channels.CreateAsync(${map.expression});`];
+				return [
+					...map.setupLines,
+					`await reloop.Contacts.Channels.CreateAsync(${map.expression});`,
+				];
 			},
 		},
 		{
 			pattern: /^reloop\.contacts\.channels\.list\(([\s\S]*)\)$/,
 			build: ([, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
-				return [...map.setupLines, `await reloop.Contacts.Channels.ListAsync(${map.expression});`];
+				return [
+					...map.setupLines,
+					`await reloop.Contacts.Channels.ListAsync(${map.expression});`,
+				];
 			},
 		},
 		{
@@ -215,24 +276,35 @@ function convertPythonToDotnet(python: string): string {
 		},
 		{
 			pattern: /^reloop\.contacts\.channels\.delete\("([^"]+)"\)$/,
-			build: ([, id]) => [`await reloop.Contacts.Channels.DeleteAsync("${id}");`],
+			build: ([, id]) => [
+				`await reloop.Contacts.Channels.DeleteAsync("${id}");`,
+			],
 		},
 		{
-			pattern: /^reloop\.contacts\.channels\.update\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
+			pattern:
+				/^reloop\.contacts\.channels\.update\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
 			build: ([, id, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
-				return [...map.setupLines, `await reloop.Contacts.Channels.UpdateAsync("${id}", ${map.expression});`];
+				return [
+					...map.setupLines,
+					`await reloop.Contacts.Channels.UpdateAsync("${id}", ${map.expression});`,
+				];
 			},
 		},
 		{
-			pattern: /^reloop\.contacts\.channels\.add_contact\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
+			pattern:
+				/^reloop\.contacts\.channels\.add_contact\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
 			build: ([, id, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
-				return [...map.setupLines, `await reloop.Contacts.Channels.AddContactAsync("${id}", ${map.expression});`];
+				return [
+					...map.setupLines,
+					`await reloop.Contacts.Channels.AddContactAsync("${id}", ${map.expression});`,
+				];
 			},
 		},
 		{
-			pattern: /^reloop\.contacts\.channels\.update_subscription\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
+			pattern:
+				/^reloop\.contacts\.channels\.update_subscription\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
 			build: ([, id, kwargs]) => {
 				const map = buildCSharpDictionaryArgument(kwargs);
 				return [
@@ -271,7 +343,13 @@ for (const service of SERVICE_DIRS) {
 
 		try {
 			const dotnetSource = convertPythonToDotnet(python);
-			const nextContent = upsertSample(content, "dotnet", "csharp", ".NET", dotnetSource);
+			const nextContent = upsertSample(
+				content,
+				"dotnet",
+				"csharp",
+				".NET",
+				dotnetSource,
+			);
 			if (nextContent !== content) {
 				fs.writeFileSync(filePath, nextContent);
 				updated++;

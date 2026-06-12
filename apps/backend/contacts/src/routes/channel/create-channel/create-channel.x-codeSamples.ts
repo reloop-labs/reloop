@@ -88,7 +88,7 @@ request.body = {
 response = http.request(request)
 channel = JSON.parse(response.body)`,
 	},
-			{
+	{
 		id: "go",
 		lang: "go",
 		label: "Go",
@@ -107,7 +107,7 @@ func main() {
     })
 }`,
 	},
-		{
+	{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
@@ -128,7 +128,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }`,
 	},
-		{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",
@@ -139,7 +139,7 @@ ReloopEmail reloop = ReloopEmail.client("re_123456789");
 
 reloop.contacts().channels().create(Map.of("name", "Product Updates", "description", "Get the latest news about our products", "default_subscription", "opt_in", "visibility", "public"));`,
 	},
-		{
+	{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",

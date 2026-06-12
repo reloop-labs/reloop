@@ -17,9 +17,6 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { DefaultSidebarSection } from "./sidebar-default";
-import { ApiSidebarSection } from "./sidebar-api";
-import { WebhookSidebarSection } from "./sidebar-webhook";
 import {
 	createContext,
 	useCallback,
@@ -33,6 +30,9 @@ import {
 import { isActive as checkIsActive } from "../../lib/is-active";
 import { AnimatedHoverBackground } from "./animated-hover-background";
 import { SearchDialog } from "./search-dialog";
+import { ApiSidebarSection } from "./sidebar-api";
+import { DefaultSidebarSection } from "./sidebar-default";
+import { WebhookSidebarSection } from "./sidebar-webhook";
 
 export interface SidebarContextType {
 	hoveredEl: HTMLElement | null;
@@ -72,7 +72,9 @@ export function Sidebar({
 	const activeTab =
 		navigationTabs.find((tab) => {
 			if (tab.url === "/") {
-				return !navigationTabs.filter((t) => t.url !== "/").some((t) => pathname.startsWith(t.url));
+				return !navigationTabs
+					.filter((t) => t.url !== "/")
+					.some((t) => pathname.startsWith(t.url));
 			}
 			return pathname.startsWith(tab.url);
 		}) || navigationTabs[0];
@@ -147,18 +149,15 @@ export function Sidebar({
 	);
 
 	// Collect URLs of all folders in the tree
-	const getAllFolderUrls = useCallback(
-		(nodes: PageTreeItem[]): string[] => {
-			const result: string[] = [];
-			for (const node of nodes) {
-				if (node.type !== "folder") continue;
-				result.push(node.url);
-				result.push(...getAllFolderUrls(node.children));
-			}
-			return result;
-		},
-		[],
-	);
+	const getAllFolderUrls = useCallback((nodes: PageTreeItem[]): string[] => {
+		const result: string[] = [];
+		for (const node of nodes) {
+			if (node.type !== "folder") continue;
+			result.push(node.url);
+			result.push(...getAllFolderUrls(node.children));
+		}
+		return result;
+	}, []);
 
 	// Folder open state lives here — only ever grows, never shrinks automatically
 	// Initialize with all folders open — must match on server and client to avoid hydration mismatch.
@@ -490,5 +489,3 @@ function ThemeToggle() {
 		</div>
 	);
 }
-
-

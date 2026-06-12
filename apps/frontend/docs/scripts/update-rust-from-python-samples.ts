@@ -6,16 +6,16 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-	SERVICE_DIRS,
 	extractSampleSource,
 	findSampleFiles,
 	parseKwargs,
 	parsePythonCall,
 	pythonKwargsToJsonMacro,
+	REPO_ROOT,
+	SERVICE_DIRS,
 	snakeToPascal,
 	splitTopLevel,
 	upsertSample,
-	REPO_ROOT,
 } from "./lib/python-sample-utils";
 import { RELOOP_EMAIL } from "./lib/reloop-email-branding";
 
@@ -24,7 +24,9 @@ const TARGETS = process.argv.slice(2);
 function wrapRustSample(lines: string[], needsModels = false): string {
 	const imports: string[] = [...RELOOP_EMAIL.rust.imports];
 	if (needsModels) {
-		imports.push("use reloop_email::{CreateApiKeyParams, UpdateApiKeyParams, ApiKeyListParams};");
+		imports.push(
+			"use reloop_email::{CreateApiKeyParams, UpdateApiKeyParams, ApiKeyListParams};",
+		);
 	}
 
 	return [
@@ -105,10 +107,15 @@ function convertPythonToRust(python: string): string {
 		return wrapRustSample(lines);
 	}
 
-	const methodPatterns: Array<{ pattern: RegExp; build: (match: string[]) => string[] }> = [
+	const methodPatterns: Array<{
+		pattern: RegExp;
+		build: (match: string[]) => string[];
+	}> = [
 		{
 			pattern: /^reloop\.contacts\.create\(([\s\S]*)\)$/,
-			build: ([, kwargs]) => [`reloop.contacts().create(${pythonKwargsToJsonMacro(kwargs)}).await?;`],
+			build: ([, kwargs]) => [
+				`reloop.contacts().create(${pythonKwargsToJsonMacro(kwargs)}).await?;`,
+			],
 		},
 		{
 			pattern: /^reloop\.contacts\.get\("([^"]+)"\)$/,
@@ -120,7 +127,9 @@ function convertPythonToRust(python: string): string {
 		},
 		{
 			pattern: /^reloop\.contacts\.list\(([\s\S]*)\)$/,
-			build: ([, kwargs]) => [`reloop.contacts().list(${pythonKwargsToJsonMacro(kwargs)}).await?;`],
+			build: ([, kwargs]) => [
+				`reloop.contacts().list(${pythonKwargsToJsonMacro(kwargs)}).await?;`,
+			],
 		},
 		{
 			pattern: /^reloop\.contacts\.update\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
@@ -130,11 +139,15 @@ function convertPythonToRust(python: string): string {
 		},
 		{
 			pattern: /^reloop\.contacts\.create_group\(([\s\S]*)\)$/,
-			build: ([, kwargs]) => [`reloop.contacts().create_group(${pythonKwargsToJsonMacro(kwargs)}).await?;`],
+			build: ([, kwargs]) => [
+				`reloop.contacts().create_group(${pythonKwargsToJsonMacro(kwargs)}).await?;`,
+			],
 		},
 		{
 			pattern: /^reloop\.contacts\.list_groups\(([\s\S]*)\)$/,
-			build: ([, kwargs]) => [`reloop.contacts().list_groups(${pythonKwargsToJsonMacro(kwargs)}).await?;`],
+			build: ([, kwargs]) => [
+				`reloop.contacts().list_groups(${pythonKwargsToJsonMacro(kwargs)}).await?;`,
+			],
 		},
 		{
 			pattern: /^reloop\.contacts\.get_group\("([^"]+)"\)$/,
@@ -163,7 +176,8 @@ function convertPythonToRust(python: string): string {
 			],
 		},
 		{
-			pattern: /^reloop\.contacts\.update_property\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
+			pattern:
+				/^reloop\.contacts\.update_property\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
 			build: ([, id, kwargs]) => [
 				`reloop.contacts().update_property("${id}", ${pythonKwargsToJsonMacro(kwargs)}).await?;`,
 			],
@@ -173,19 +187,22 @@ function convertPythonToRust(python: string): string {
 			build: ([, id]) => [`reloop.contacts().delete_property("${id}").await?;`],
 		},
 		{
-			pattern: /^reloop\.contacts\.groups\.add_contact\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
+			pattern:
+				/^reloop\.contacts\.groups\.add_contact\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
 			build: ([, id, kwargs]) => [
 				`reloop.contacts().groups().add_contact("${id}", ${pythonKwargsToJsonMacro(kwargs)}).await?;`,
 			],
 		},
 		{
-			pattern: /^reloop\.contacts\.groups\.remove_contact\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
+			pattern:
+				/^reloop\.contacts\.groups\.remove_contact\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
 			build: ([, id, kwargs]) => [
 				`reloop.contacts().groups().remove_contact("${id}", ${pythonKwargsToJsonMacro(kwargs)}).await?;`,
 			],
 		},
 		{
-			pattern: /^reloop\.contacts\.groups\.list_contacts\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
+			pattern:
+				/^reloop\.contacts\.groups\.list_contacts\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
 			build: ([, id, kwargs]) => [
 				`reloop.contacts().groups().list_contacts("${id}", ${pythonKwargsToJsonMacro(kwargs)}).await?;`,
 			],
@@ -208,22 +225,27 @@ function convertPythonToRust(python: string): string {
 		},
 		{
 			pattern: /^reloop\.contacts\.channels\.delete\("([^"]+)"\)$/,
-			build: ([, id]) => [`reloop.contacts().channels().delete("${id}").await?;`],
+			build: ([, id]) => [
+				`reloop.contacts().channels().delete("${id}").await?;`,
+			],
 		},
 		{
-			pattern: /^reloop\.contacts\.channels\.update\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
+			pattern:
+				/^reloop\.contacts\.channels\.update\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
 			build: ([, id, kwargs]) => [
 				`reloop.contacts().channels().update("${id}", ${pythonKwargsToJsonMacro(kwargs)}).await?;`,
 			],
 		},
 		{
-			pattern: /^reloop\.contacts\.channels\.add_contact\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
+			pattern:
+				/^reloop\.contacts\.channels\.add_contact\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
 			build: ([, id, kwargs]) => [
 				`reloop.contacts().channels().add_contact("${id}", ${pythonKwargsToJsonMacro(kwargs)}).await?;`,
 			],
 		},
 		{
-			pattern: /^reloop\.contacts\.channels\.update_subscription\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
+			pattern:
+				/^reloop\.contacts\.channels\.update_subscription\(\s*"([^"]+)",\s*([\s\S]*)\)$/,
 			build: ([, id, kwargs]) => [
 				`reloop.contacts().channels().update_subscription("${id}", ${pythonKwargsToJsonMacro(kwargs)}).await?;`,
 			],
@@ -257,7 +279,13 @@ for (const service of SERVICE_DIRS) {
 
 		try {
 			const rustSource = convertPythonToRust(python);
-			const nextContent = upsertSample(content, "rust", "rust", "Rust", rustSource);
+			const nextContent = upsertSample(
+				content,
+				"rust",
+				"rust",
+				"Rust",
+				rustSource,
+			);
 			if (nextContent !== content) {
 				fs.writeFileSync(filePath, nextContent);
 				updated++;

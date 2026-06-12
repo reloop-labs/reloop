@@ -42,7 +42,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }`,
 	},
-			{
+	{
 		id: "go",
 		lang: "go",
 		label: "Go",
@@ -64,7 +64,7 @@ func main() {
 
 $reloop->apiKeys->disable('key_123456789');`,
 	},
-		{
+	{
 		id: "java",
 		lang: "java",
 		label: "Java",
@@ -74,7 +74,7 @@ ReloopEmail reloop = ReloopEmail.client("rl_123456789");
 
 reloop.apiKeys().disable("key_123456789");`,
 	},
-		{
+	{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",

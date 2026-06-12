@@ -30,7 +30,9 @@ export function Navbar({
 	const activeTab =
 		tabs.find((tab) => {
 			if (tab.url === "/") {
-				return !tabs.filter((t) => t.url !== "/").some((t) => pathname.startsWith(t.url));
+				return !tabs
+					.filter((t) => t.url !== "/")
+					.some((t) => pathname.startsWith(t.url));
 			}
 			return pathname.startsWith(tab.url);
 		})?.title || "Documentation";

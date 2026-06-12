@@ -1,14 +1,14 @@
 "use client";
 
-import * as React from "react";
-import { useRef } from "react";
-import Link from "next/link";
+import type { FolderNode, PageTreeItem } from "@reloop/fe-docs/lib/types";
+import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
-import { cn } from "@reloop/ui/cn";
-import type { FolderNode, PageTreeItem } from "@reloop/fe-docs/lib/types";
-import { useSidebarContext } from "./sidebar";
+import Link from "next/link";
+import * as React from "react";
+import { useRef } from "react";
 import { isActive as checkIsActive } from "../../lib/is-active";
+import { useSidebarContext } from "./sidebar";
 
 export function DefaultSidebarFolder({
 	node,
@@ -98,7 +98,7 @@ export function DefaultSidebarFolder({
 						transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
 						style={{ overflow: "hidden" }}
 					>
-						<div className="mt-px flex flex-col space-y-px pb-0.5 pl-4 border-l border-stroke-soft-100/30 ml-4">
+						<div className="mt-px ml-4 flex flex-col space-y-px border-stroke-soft-100/30 border-l pb-0.5 pl-4">
 							{node.children.map((child: PageTreeItem, index: number) => (
 								<DefaultSidebarSection
 									key={index}
@@ -129,7 +129,13 @@ export function DefaultSidebarLink({
 
 	if (node.type === "separator") return null;
 	if (node.type === "folder") {
-		return <DefaultSidebarFolder node={node} onLinkClick={onLinkClick} depth={depth} />;
+		return (
+			<DefaultSidebarFolder
+				node={node}
+				onLinkClick={onLinkClick}
+				depth={depth}
+			/>
+		);
 	}
 
 	const linkId = node.url;
@@ -193,8 +199,16 @@ export function DefaultSidebarSection({
 	}
 
 	if (node.type === "folder") {
-		return <DefaultSidebarFolder node={node} onLinkClick={onLinkClick} depth={depth} />;
+		return (
+			<DefaultSidebarFolder
+				node={node}
+				onLinkClick={onLinkClick}
+				depth={depth}
+			/>
+		);
 	}
 
-	return <DefaultSidebarLink node={node} onLinkClick={onLinkClick} depth={depth} />;
+	return (
+		<DefaultSidebarLink node={node} onLinkClick={onLinkClick} depth={depth} />
+	);
 }
