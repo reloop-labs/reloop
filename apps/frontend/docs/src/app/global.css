@@ -108,13 +108,11 @@ aside::-webkit-scrollbar-thumb:hover {
 }
 
 /* API reference surface borders — match docs design tokens */
-.api-endpoint-bar,
 .api-status-tabs {
 	border-color: var(--color-stroke-soft-200);
 	background: var(--color-bg-weak-50);
 }
 
-.dark .api-endpoint-bar,
 .dark .api-status-tabs {
 	border-color: rgb(255 255 255 / 0.08);
 	background: rgb(255 255 255 / 0.03);

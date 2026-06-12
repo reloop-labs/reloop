@@ -247,6 +247,19 @@ export function APIPage(props: APIPageProps) {
 	const path = operation?.path || "";
 	const method = (operation?.method || "GET").toUpperCase();
 
+	const [copiedEndpoint, setCopiedEndpoint] = useState(false);
+
+	const handleCopyEndpoint = async () => {
+		const fullUrl = `https://api.reloop.sh${path.replace(/\{([^}]+)\}/g, ":$1")}`;
+		try {
+			await navigator.clipboard.writeText(fullUrl);
+			setCopiedEndpoint(true);
+			setTimeout(() => setCopiedEndpoint(false), 2000);
+		} catch {
+			// Clipboard unavailable
+		}
+	};
+
 	const pathParams = parameterList.filter((p) => p.location === "path");
 	const queryParams = parameterList.filter((p) => p.location === "query");
 	const bodyParams = parameterList.filter((p) => p.location === "body");
@@ -268,18 +281,34 @@ export function APIPage(props: APIPageProps) {
 			{/* ─── Left: endpoint + parameters ─── */}
 			<div className="min-w-0">
 				{/* Method + Path */}
-				<div className="api-endpoint-bar mb-8 flex items-center gap-3 rounded-xl border border-stroke-soft-100 bg-[#fafafa] px-4 py-3 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0e]">
-					<span
-						className={cn(
-							"shrink-0 rounded-md px-2 py-0.5 font-bold text-[11px] uppercase tracking-wider",
-							METHOD_STYLES[method] || METHOD_STYLES.GET,
-						)}
-					>
-						{method}
-					</span>
-					<code className="min-w-0 break-all font-mono text-[13px] text-fd-foreground">
-						https://api.reloop.sh{path.replace(/\{([^}]+)\}/g, ":$1")}
-					</code>
+				<div className="api-endpoint-bar mb-8 flex items-center rounded-[18px] border border-stroke-soft-100 bg-[#fafafa] p-0.5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0e]">
+					<div className="flex w-full items-center justify-between gap-3 rounded-[16px] border border-stroke-soft-100/70 bg-white px-3 py-2.5 dark:border-stroke-soft-100/15 dark:bg-zinc-950">
+						<div className="flex min-w-0 items-center gap-3">
+							<span
+								className={cn(
+									"shrink-0 rounded-md px-2 py-0.5 font-bold text-[11px] uppercase tracking-wider",
+									METHOD_STYLES[method] || METHOD_STYLES.GET,
+								)}
+							>
+								{method}
+							</span>
+							<div className="min-w-0 font-medium text-[13px]">
+								https://reloop.sh{path.replace(/\{([^}]+)\}/g, ":$1")}
+							</div>
+						</div>
+						<button
+							type="button"
+							onClick={handleCopyEndpoint}
+							aria-label={copiedEndpoint ? "Copied" : "Copy endpoint URL"}
+							className="shrink-0 cursor-pointer text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white"
+						>
+							{copiedEndpoint ? (
+								<Check className="size-4 stroke-[3px]" />
+							) : (
+								<Copy className="size-4 stroke-[3px]" />
+							)}
+						</button>
+					</div>
 				</div>
 
 				{/* Parameter sections */}
@@ -371,7 +400,7 @@ function ParameterRow({
 					</span>
 				)}
 				{param.defaultValue !== undefined && (
-					<span className="rounded-lg px-1.5 font-semibold text-[11px] tracking-tight border border-primary-base/20 bg-primary-alpha-10 text-primary-base">
+					<span className="rounded-lg border border-primary-base/20 bg-primary-alpha-10 px-1.5 font-semibold text-[11px] text-primary-base tracking-tight">
 						default: {JSON.stringify(param.defaultValue)}
 					</span>
 				)}
@@ -468,24 +497,16 @@ function ParameterRow({
 
 			{/* Recursive sub-properties */}
 			{hasProperties && (
-				<div className="mt-3 mb-6 overflow-hidden rounded-xl border border-stroke-soft-200 bg-neutral-50/30 shadow-none dark:border-stroke-soft-100/40 dark:bg-white/[0.01]">
-					<div className="select-none px-4 py-2.5 font-semibold text-[13px] text-text-sub-600">
+				<div className="mt-3 mb-6 overflow-hidden rounded-[18px] border border-stroke-soft-100 bg-[#fafafa] dark:border-stroke-soft-100/40 dark:bg-[#0c0c0e]">
+					<div className="select-none px-4 py-2.5 font-semibold text-[13px] text-text-sub-600 dark:text-white/50">
 						{param.name === "properties"
 							? "Custom properties"
 							: `${param.name} properties`}
 					</div>
 
-					<div className="border-stroke-soft-200 border-t px-4 dark:border-stroke-soft-100/40">
-						{resolvedProperties.map((child, index) => (
-							<div
-								key={child.name}
-								className={cn(
-									index > 0 &&
-										"border-stroke-soft-200/50 border-t dark:border-stroke-soft-100/10",
-								)}
-							>
-								<ParameterRow param={child} depth={depth + 1} />
-							</div>
+					<div className="mx-0.5 mb-0.5 divide-y divide-stroke-soft-200/50 rounded-[16px] border border-stroke-soft-100/70 bg-white px-4 dark:divide-stroke-soft-100/10 dark:border-stroke-soft-100/15 dark:bg-zinc-950">
+						{resolvedProperties.map((child) => (
+							<ParameterRow key={child.name} param={child} depth={depth + 1} />
 						))}
 					</div>
 				</div>
