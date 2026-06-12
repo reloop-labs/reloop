@@ -131,6 +131,11 @@ export function CopyCodeBlock({
 				className,
 			)}
 		>
+			<style>{`
+				.scrollbar-none::-webkit-scrollbar {
+					display: none;
+				}
+			`}</style>
 			{/* Browser chrome */}
 			<div className="flex items-center gap-3 border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/40">
 				<div className="flex shrink-0 gap-1.5">
@@ -161,7 +166,13 @@ export function CopyCodeBlock({
 
 			{hasTabs ? (
 				<div className="flex items-center gap-3 border-stroke-soft-100 border-b px-4 dark:border-stroke-soft-100/40">
-					<div className="relative flex min-w-0 flex-1 items-center">
+					<div
+						className="relative flex min-w-0 flex-1 items-center overflow-x-auto scrollbar-none"
+						style={{
+							scrollbarWidth: "none",
+							msOverflowStyle: "none",
+						}}
+					>
 						{tabs.map((tab, index) => {
 							const isActive = tab.id === activeTab;
 							const brandColor = `#${tab.si.hex}`;
@@ -176,7 +187,7 @@ export function CopyCodeBlock({
 									onPointerEnter={() => setHoveredTabIdx(index)}
 									onPointerLeave={() => setHoveredTabIdx(undefined)}
 									className={cn(
-										"relative z-10 flex items-center gap-2 px-4 py-3 font-medium text-sm transition-colors",
+										"relative z-10 flex shrink-0 items-center gap-2 px-4 py-3 font-medium text-sm transition-colors",
 										isActive
 											? "text-text-strong-950 dark:text-white"
 											: "text-text-sub-600 dark:text-white/70",

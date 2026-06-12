@@ -37,6 +37,7 @@ interface ParameterInfo {
 	enumValues?: string[];
 	pattern?: string;
 	example?: any;
+	properties?: ParameterInfo[];
 }
 
 interface CodeSample {
@@ -200,6 +201,67 @@ function getTypeString(schema: any): string {
 	return schema.type || "any";
 }
 
+function parseParameter(
+	name: string,
+	propSchema: any,
+	required: boolean,
+	location: string,
+	spec: any,
+): ParameterInfo {
+	const prop = resolveSchema(propSchema, spec);
+
+	let subProperties: ParameterInfo[] | undefined;
+	if (prop.type === "object" && prop.properties) {
+		subProperties = [];
+		const subRequired = prop.required || [];
+		for (const [subName, subPropSchema] of Object.entries(prop.properties)) {
+			subProperties.push(
+				parseParameter(
+					subName,
+					subPropSchema,
+					subRequired.includes(subName),
+					location,
+					spec,
+				),
+			);
+		}
+	} else if (prop.type === "array" && prop.items) {
+		const itemsSchema = resolveSchema(prop.items, spec);
+		if (itemsSchema.type === "object" && itemsSchema.properties) {
+			subProperties = [];
+			const subRequired = itemsSchema.required || [];
+			for (const [subName, subPropSchema] of Object.entries(itemsSchema.properties)) {
+				subProperties.push(
+					parseParameter(
+						subName,
+						subPropSchema,
+						subRequired.includes(subName),
+						location,
+						spec,
+					),
+				);
+			}
+		}
+	}
+
+	return {
+		name,
+		type: getTypeString(prop),
+		required,
+		description: prop.description || prop.title || "",
+		location,
+		defaultValue: prop.default,
+		minimum: prop.minimum,
+		maximum: prop.maximum,
+		minLength: prop.minLength,
+		maxLength: prop.maxLength,
+		enumValues: prop.enum,
+		pattern: prop.pattern,
+		example: prop.example || prop.examples?.[0],
+		properties: subProperties,
+	};
+}
+
 function extractParameters(operation: any, spec: any): ParameterInfo[] {
 	const params: ParameterInfo[] = [];
 
@@ -238,30 +300,35 @@ function extractParameters(operation: any, spec: any): ParameterInfo[] {
 			if (schema.properties) {
 				const required = schema.required || [];
 				for (const [name, propSchema] of Object.entries(schema.properties)) {
-					const prop = resolveSchema(propSchema as any, spec);
-					params.push({
-						name,
-						type: getTypeString(prop),
-						required: required.includes(name),
-						description: (prop as any).description || (prop as any).title || "",
-						location: "body",
-						defaultValue: (prop as any).default,
-						minimum: (prop as any).minimum,
-						maximum: (prop as any).maximum,
-						minLength: (prop as any).minLength,
-						maxLength: (prop as any).maxLength,
-						enumValues: (prop as any).enum,
-						pattern: (prop as any).pattern,
-						example: (prop as any).example || (prop as any).examples?.[0],
-					});
+					params.push(
+						parseParameter(
+							name,
+							propSchema,
+							required.includes(name),
+							"body",
+							spec,
+						),
+					);
 				}
 			} else if (schema.type === "array" && schema.items) {
+				const itemsSchema = resolveSchema(schema.items, spec);
 				params.push({
 					name: "body",
-					type: `${getTypeString(schema.items)}[]`,
+					type: `${getTypeString(itemsSchema)}[]`,
 					required: true,
 					description: schema.description || "Array of items",
 					location: "body",
+					properties: itemsSchema.properties
+						? Object.entries(itemsSchema.properties).map(([subName, subPropSchema]) =>
+								parseParameter(
+									subName,
+									subPropSchema,
+									(itemsSchema.required || []).includes(subName),
+									"body",
+									spec,
+								),
+							)
+						: undefined,
 				});
 			}
 		}

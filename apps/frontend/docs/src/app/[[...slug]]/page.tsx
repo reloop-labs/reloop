@@ -125,7 +125,9 @@ export default async function Page(props: {
 				<div
 					className={`mx-auto flex w-full flex-col ${
 						hideToc
-							? "max-w-none"
+							? isApiPage
+								? "max-w-7xl"
+								: "max-w-none"
 							: "max-w-[1040px] xl:grid xl:grid-cols-[1fr_240px] xl:gap-8"
 					}`}
 				>
