@@ -346,7 +346,7 @@ function ParameterSection({
 			<h2 className="mb-4 flex items-center gap-2 font-semibold text-base text-fd-foreground tracking-tight">
 				{title}
 			</h2>
-			<div className="api-parameter-list divide-y divide-stroke-soft-200">
+			<div className="api-parameter-list divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
 				{params.map((param) => (
 					<ParameterRow key={`${param.location}-${param.name}`} param={param} />
 				))}
@@ -504,7 +504,7 @@ function ParameterRow({
 							: `${param.name} properties`}
 					</div>
 
-					<div className="mx-0.5 mb-0.5 divide-y divide-stroke-soft-200/50 rounded-[16px] border border-stroke-soft-100/70 bg-white px-4 dark:divide-stroke-soft-100/10 dark:border-stroke-soft-100/15 dark:bg-zinc-950">
+					<div className="mx-0.5 mb-0.5 divide-y divide-stroke-soft-100/70 rounded-[16px] border border-stroke-soft-100/70 bg-white px-4 dark:divide-stroke-soft-100/15 dark:border-stroke-soft-100/15 dark:bg-zinc-950">
 						{resolvedProperties.map((child) => (
 							<ParameterRow key={child.name} param={child} depth={depth + 1} />
 						))}
