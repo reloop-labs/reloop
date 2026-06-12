@@ -67,31 +67,16 @@ $reloop->apiKeys->update(
   ],
 );`,
 	},
-	{
+		{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import java.net.URI;
-import java.net.http.*;
-import java.net.http.HttpRequest.BodyPublishers;
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.Models.*;
 
-HttpClient client = HttpClient.newHttpClient();
+ReloopClient reloop = new ReloopClient("rl_123456789");
 
-String body = """
-    {
-      "name": "Updated production key",
-      "enabled": true
-    }
-    """;
-
-HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://api.reloop.sh/api-key/v1/key_123456789"))
-    .header("Authorization", "Bearer rl_123456789")
-    .header("Content-Type", "application/json")
-    .method("PATCH", BodyPublishers.ofString(body))
-    .build();
-
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
+reloop.apiKeys.update("key_123456789", new UpdateApiKeyParams("Updated production key", true));`,
 	},
 	{
 		id: "dotnet",

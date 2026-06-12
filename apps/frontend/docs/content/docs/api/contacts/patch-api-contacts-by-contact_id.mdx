@@ -234,22 +234,12 @@ _apiData:
       lang: java
       label: Java
       source: |-
-        import java.net.URI;
-        import java.net.http.*;
-        import java.net.http.HttpRequest.BodyPublishers;
+        import sh.reloop.ReloopClient;
+        import java.util.*;
         
-        HttpClient client = HttpClient.newHttpClient();
+        ReloopClient reloop = new ReloopClient("re_123456789");
         
-        String body = "{\\"firstName\\": \\"Jane\\", \\"lastName\\": \\"Smith\\", \\"status\\": \\"subscribed\\", \\"properties\\": {\\"company\\": \\"Reloop\\", \\"role\\": \\"Designer\\"}}";
-        
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://reloop.sh/api/contacts/cont_123456789"))
-            .header("x-api-key", "re_123456789")
-            .header("Content-Type", "application/json")
-            .method("PATCH", BodyPublishers.ofString(body))
-            .build();
-        
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        reloop.contacts.update("cont_123456789", Map.of("first_name", "Jane", "last_name", "Smith", "unsubscribed", false, "properties", Map.of("company", "Reloop", "role", "Designer")));
     - id: dotnet
       lang: csharp
       label: .NET

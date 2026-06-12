@@ -70,32 +70,16 @@ $reloop->apiKeys->create(
   ],
 );`,
 	},
-	{
+		{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import java.net.URI;
-import java.net.http.*;
-import java.net.http.HttpRequest.BodyPublishers;
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.Models.*;
 
-HttpClient client = HttpClient.newHttpClient();
+ReloopClient reloop = new ReloopClient("rl_123456789");
 
-String body = """
-    {
-      "name": "Production key",
-      "enabled": true,
-      "rateLimitEnabled": true
-    }
-    """;
-
-HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://api.reloop.sh/api-key/v1/"))
-    .header("Authorization", "Bearer rl_123456789")
-    .header("Content-Type", "application/json")
-    .POST(BodyPublishers.ofString(body))
-    .build();
-
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
+reloop.apiKeys.create(new CreateApiKeyParams("Production key", true, true));`,
 	},
 	{
 		id: "dotnet",

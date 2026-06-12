@@ -102,22 +102,16 @@ async fn main() -> Result<(), reqwest::Error> {
     Ok(())
 }`,
 	},
-	{
+		{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import java.net.URI;
-import java.net.http.*;
+		source: `import sh.reloop.ReloopClient;
+import java.util.*;
 
-HttpClient client = HttpClient.newHttpClient();
+ReloopClient reloop = new ReloopClient("re_123456789");
 
-HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://reloop.sh/api/contacts/list?limit=10&page=1"))
-    .header("x-api-key", "re_123456789")
-    .GET()
-    .build();
-
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
+reloop.contacts.list(Map.of("page", 1, "limit", 10));`,
 	},
 	{
 		id: "dotnet",

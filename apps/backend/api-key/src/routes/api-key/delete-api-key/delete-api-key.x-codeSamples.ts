@@ -46,22 +46,15 @@ func main() {
 
 $reloop->apiKeys->delete('key_123456789');`,
 	},
-	{
+		{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import java.net.URI;
-import java.net.http.*;
+		source: `import sh.reloop.ReloopClient;
 
-HttpClient client = HttpClient.newHttpClient();
+ReloopClient reloop = new ReloopClient("rl_123456789");
 
-HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://api.reloop.sh/api-key/v1/key_123456789"))
-    .header("Authorization", "Bearer rl_123456789")
-    .DELETE()
-    .build();
-
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
+reloop.apiKeys.delete("key_123456789");`,
 	},
 	{
 		id: "dotnet",

@@ -86,22 +86,15 @@ async fn main() -> Result<(), reqwest::Error> {
     Ok(())
 }`,
 	},
-	{
+		{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import java.net.URI;
-import java.net.http.*;
+		source: `import sh.reloop.ReloopClient;
 
-HttpClient client = HttpClient.newHttpClient();
+ReloopClient reloop = new ReloopClient("re_123456789");
 
-HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://reloop.sh/api/contacts/retrieve/cont_123456789"))
-    .header("x-api-key", "re_123456789")
-    .GET()
-    .build();
-
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
+reloop.contacts.get("cont_123456789");`,
 	},
 	{
 		id: "dotnet",

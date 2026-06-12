@@ -126,26 +126,16 @@ async fn main() -> Result<(), reqwest::Error> {
     Ok(())
 }`,
 	},
-	{
+		{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import java.net.URI;
-import java.net.http.*;
-import java.net.http.HttpRequest.BodyPublishers;
+		source: `import sh.reloop.ReloopClient;
+import java.util.*;
 
-HttpClient client = HttpClient.newHttpClient();
+ReloopClient reloop = new ReloopClient("re_123456789");
 
-String body = "{\\"name\\": \\"Marketing News\\", \\"description\\": \\"Internal marketing updates\\", \\"visibility\\": \\"private\\"}";
-
-HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://reloop.sh/api/contacts/v1/channels/chn_123456789"))
-    .header("x-api-key", "re_123456789")
-    .header("Content-Type", "application/json")
-    .method("PATCH", BodyPublishers.ofString(body))
-    .build();
-
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
+reloop.contacts.channels.update("chn_123456789", Map.of("name", "Marketing News", "description", "Internal marketing updates", "visibility", "private"));`,
 	},
 	{
 		id: "dotnet",

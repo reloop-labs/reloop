@@ -46,23 +46,15 @@ func main() {
 
 $reloop->apiKeys->rotate('key_123456789');`,
 	},
-	{
+		{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import java.net.URI;
-import java.net.http.*;
-import java.net.http.HttpRequest.BodyPublishers;
+		source: `import sh.reloop.ReloopClient;
 
-HttpClient client = HttpClient.newHttpClient();
+ReloopClient reloop = new ReloopClient("rl_123456789");
 
-HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://api.reloop.sh/api-key/v1/rotate/key_123456789"))
-    .header("Authorization", "Bearer rl_123456789")
-    .POST(BodyPublishers.noBody())
-    .build();
-
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
+reloop.apiKeys.rotate("key_123456789");`,
 	},
 	{
 		id: "dotnet",

@@ -197,28 +197,24 @@ async fn main() -> Result<(), reqwest::Error> {
     Ok(())
 }`,
 	},
-	{
+		{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import java.net.URI;
-import java.net.http.*;
-import java.net.http.HttpRequest.BodyPublishers;
+		source: `import sh.reloop.ReloopClient;
+import java.util.*;
 
-HttpClient client = HttpClient.newHttpClient();
+ReloopClient reloop = new ReloopClient("re_123456789");
 
-String body = """
-    ${createContactBody.replace(/\n/g, "\n    ")}
-    """;
-
-HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://reloop.sh/api/contacts/create"))
-    .header("x-api-key", "re_123456789")
-    .header("Content-Type", "application/json")
-    .POST(BodyPublishers.ofString(body))
-    .build();
-
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
+Map<String, Object> params = new HashMap<>();
+params.put("email", "john.doe@example.com");
+params.put("first_name", "John");
+params.put("last_name", "Doe");
+params.put("unsubscribed", false);
+params.put("properties", Map.of("company", "Reloop", "role", "Developer"));
+params.put("group_ids", List.of("grp_123456789"));
+params.put("channels", List.of(Map.of("channel_id", "channel_123456789", "subscription", "opt_in")));
+reloop.contacts.create(params);`,
 	},
 	{
 		id: "dotnet",

@@ -144,20 +144,12 @@ _apiData:
       lang: java
       label: Java
       source: |-
-        import java.net.URI;
-        import java.net.http.*;
-        import java.net.http.HttpRequest.BodyPublishers;
+        import sh.reloop.ReloopClient;
+        import java.util.*;
         
-        HttpClient client = HttpClient.newHttpClient();
+        ReloopClient reloop = new ReloopClient("re_123456789");
         
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://reloop.sh/api/contacts/v1/groups/create"))
-            .header("x-api-key", "re_123456789")
-            .header("Content-Type", "application/json")
-            .POST(BodyPublishers.ofString("{\\"name\\": \\"Beta Testers\\"}"))
-            .build();
-        
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        reloop.contacts.createGroup(Map.of("name", "Beta Testers"));
     - id: dotnet
       lang: csharp
       label: .NET

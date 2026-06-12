@@ -60,22 +60,16 @@ $reloop->apiKeys->list(
   ],
 );`,
 	},
-	{
+		{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import java.net.URI;
-import java.net.http.*;
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.Models.*;
 
-HttpClient client = HttpClient.newHttpClient();
+ReloopClient reloop = new ReloopClient("rl_123456789");
 
-HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://api.reloop.sh/api-key/v1/?page=1&limit=10"))
-    .header("Authorization", "Bearer rl_123456789")
-    .GET()
-    .build();
-
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
+reloop.apiKeys.list(new ApiKeyListParams(1, 10, null, null, null));`,
 	},
 	{
 		id: "dotnet",
