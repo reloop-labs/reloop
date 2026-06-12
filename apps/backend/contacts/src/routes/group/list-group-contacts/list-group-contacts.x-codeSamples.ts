@@ -27,19 +27,15 @@ if (error) throw error;`,
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `<?php
-// composer require reloop/reloop-email
-require_once 'vendor/autoload.php';
+		source: `$reloop = Reloop::client('re_123456789');
 
-use Reloop\\Reloop;
-use Reloop\\Dto\\Request\\ListContactsParams;
-
-$reloop = new Reloop('re_123456789');
-
-$contacts = $reloop->contacts->groups->listContacts('grp_123456789', new ListContactsParams(
-    page: 1,
-    limit: 10,
-));`,
+$reloop->contacts->groups->listContacts(
+  'grp_123456789',
+  options: [
+      'page' => 1,
+      'limit' => 10,
+  ],
+);`,
 	},
 	{
 		id: "python",

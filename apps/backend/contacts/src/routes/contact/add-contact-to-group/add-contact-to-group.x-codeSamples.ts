@@ -32,18 +32,14 @@ if (error) throw error;`,
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `<?php
-// composer require reloop/reloop-email
-require_once 'vendor/autoload.php';
+		source: `$reloop = Reloop::client('re_123456789');
 
-use Reloop\\Reloop;
-use Reloop\\Dto\\Request\\AddContactToGroupParams;
-
-$reloop = new Reloop('re_123456789');
-
-$result = $reloop->contacts->groups->addContact('grp_123456789', new AddContactToGroupParams(
-    contact_id: 'cont_123456789',
-));`,
+$reloop->contacts->groups->addContact(
+  'grp_123456789',
+  parameters: [
+      'contact_id' => 'cont_123456789',
+  ],
+);`,
 	},
 	{
 		id: "python",

@@ -44,25 +44,20 @@ if (error) throw error;`,
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `<?php
-// composer require reloop/reloop-email
-require_once 'vendor/autoload.php';
+		source: `$reloop = Reloop::client('re_123456789');
 
-use Reloop\\Reloop;
-use Reloop\\Dto\\Request\\UpdateContactParams;
-use Reloop\\Dto\\Enum\\ContactStatus;
-
-$reloop = new Reloop('re_123456789');
-
-$contact = $reloop->contacts->update('cont_123456789', new UpdateContactParams(
-    firstName: 'Jane',
-    lastName: 'Smith',
-    status: ContactStatus::Subscribed,
-    properties: [
-        'company' => 'Reloop',
-        'role'    => 'Designer',
-    ],
-));`,
+$reloop->contacts->update(
+  'cont_123456789',
+  parameters: [
+      'first_name' => 'Jane',
+      'last_name' => 'Smith',
+      'unsubscribed' => false,
+      'properties' => [
+          'company' => 'Reloop',
+          'role' => 'Designer',
+      ],
+  ],
+);`,
 	},
 	{
 		id: "python",

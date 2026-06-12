@@ -27,19 +27,14 @@ if (error) throw error;`,
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `<?php
-// composer require reloop/reloop-email
-require_once 'vendor/autoload.php';
+		source: `$reloop = Reloop::client('re_123456789');
 
-use Reloop\\Reloop;
-use Reloop\\Dto\\Request\\ListChannelsParams;
-
-$reloop = new Reloop('re_123456789');
-
-$channels = $reloop->contacts->channels->list(new ListChannelsParams(
-    page: 1,
-    limit: 10,
-));`,
+$reloop->contacts->channels->list(
+  options: [
+      'page' => 1,
+      'limit' => 10,
+  ],
+);`,
 	},
 	{
 		id: "python",

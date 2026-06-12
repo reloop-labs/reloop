@@ -59,35 +59,27 @@ const { data: contact, error } = await reloop.contacts.create({
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `<?php
-// composer require reloop/reloop-email
-require_once 'vendor/autoload.php';
+		source: `$reloop = Reloop::client('re_123456789');
 
-use Reloop\\Reloop;
-use Reloop\\Dto\\Request\\CreateContactParams;
-use Reloop\\Dto\\Request\\ContactChannelInput;
-use Reloop\\Dto\\Enum\\ContactStatus;
-use Reloop\\Dto\\Enum\\SubscriptionStatus;
-
-$reloop = new Reloop('re_123456789');
-
-$contact = $reloop->contacts->create(new CreateContactParams(
-    email: 'john.doe@example.com',
-    firstName: 'John',
-    lastName: 'Doe',
-    status: ContactStatus::Subscribed,
-    properties: [
-        'company' => 'Reloop',
-        'role'    => 'Developer',
-    ],
-    groupIds: ['grp_123456789'],
-    channels: [
-        new ContactChannelInput(
-            channelId: 'channel_123456789',
-            subscription: SubscriptionStatus::OptIn,
-        ),
-    ],
-));`,
+$reloop->contacts->create(
+  parameters: [
+      'email' => 'john.doe@example.com',
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'unsubscribed' => false,
+      'properties' => [
+          'company' => 'Reloop',
+          'role' => 'Developer',
+      ],
+      'group_ids' => ['grp_123456789'],
+      'channels' => [
+          [
+              'channel_id' => 'channel_123456789',
+              'subscription' => 'opt_in',
+          ],
+      ],
+  ],
+);`,
 	},
 	{
 		id: "python",

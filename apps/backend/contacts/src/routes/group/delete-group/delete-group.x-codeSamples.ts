@@ -24,16 +24,9 @@ if (error) throw error;`,
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `<?php
-// composer require reloop/reloop-email
-require_once 'vendor/autoload.php';
+		source: `$reloop = Reloop::client('re_123456789');
 
-use Reloop\\Reloop;
-
-$reloop = new Reloop('re_123456789');
-
-$result = $reloop->contacts->deleteGroup('grp_123456789');
-echo $result->success;`,
+$reloop->contacts->deleteGroup('grp_123456789');`,
 	},
 	{
 		id: "python",

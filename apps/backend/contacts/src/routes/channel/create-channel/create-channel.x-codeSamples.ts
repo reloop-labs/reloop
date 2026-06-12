@@ -38,23 +38,16 @@ if (error) throw error;`,
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `<?php
-// composer require reloop/reloop-email
-require_once 'vendor/autoload.php';
+		source: `$reloop = Reloop::client('re_123456789');
 
-use Reloop\\Reloop;
-use Reloop\\Dto\\Request\\CreateChannelParams;
-use Reloop\\Dto\\Enum\\SubscriptionStatus;
-use Reloop\\Dto\\Enum\\ChannelVisibility;
-
-$reloop = new Reloop('re_123456789');
-
-$channel = $reloop->contacts->channels->create(new CreateChannelParams(
-    name: 'Product Updates',
-    description: 'Get the latest news about our products',
-    defaultSubscription: SubscriptionStatus::OptIn,
-    visibility: ChannelVisibility::Public,
-));`,
+$reloop->contacts->channels->create(
+  parameters: [
+      'name' => 'Product Updates',
+      'description' => 'Get the latest news about our products',
+      'default_subscription' => 'opt_in',
+      'visibility' => 'public',
+  ],
+);`,
 	},
 	{
 		id: "python",

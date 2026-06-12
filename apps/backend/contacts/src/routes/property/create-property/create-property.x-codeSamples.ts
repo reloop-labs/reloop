@@ -36,21 +36,15 @@ if (error) throw error;`,
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `<?php
-// composer require reloop/reloop-email
-require_once 'vendor/autoload.php';
+		source: `$reloop = Reloop::client('re_123456789');
 
-use Reloop\\Reloop;
-use Reloop\\Dto\\Request\\CreatePropertyParams;
-use Reloop\\Dto\\Enum\\PropertyType;
-
-$reloop = new Reloop('re_123456789');
-
-$property = $reloop->contacts->createProperty(new CreatePropertyParams(
-    name: 'company_name',
-    type: PropertyType::String,
-    fallbackValue: 'Unknown',
-));`,
+$reloop->contacts->createProperty(
+  parameters: [
+      'name' => 'company_name',
+      'type' => 'string',
+      'fallback_value' => 'Unknown',
+  ],
+);`,
 	},
 	{
 		id: "python",
