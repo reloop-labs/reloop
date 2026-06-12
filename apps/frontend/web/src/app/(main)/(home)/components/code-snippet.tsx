@@ -28,7 +28,7 @@ const sdks: SdkOption[] = [
 		name: "Node.js",
 		icon: siNodedotjs,
 		color: "#F5CE4D",
-		install: "npm install reloop-email
+		install: "npm install reloop-email",
 		subTabs: [
 			{
 				id: "node",

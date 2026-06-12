@@ -132,7 +132,7 @@ const sdks: SdkType[] = [
 		id: "node",
 		name: "Node.js",
 		icon: "⚡",
-		install: "npm install reloop-email
+		install: "npm install reloop-email",
 		code: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop({
