@@ -1,6 +1,14 @@
 import { changelogCodeByVersion } from "./changelog-code-samples";
 import { changelogReleasesData } from "./changelog-releases";
-import type { ChangelogRelease } from "./changelog-timeline";
+import type { ChangelogRelease } from "./changelog-types";
+
+export function getChangelogReleasePath(version: string) {
+	return `/resources/changelog/${version}`;
+}
+
+export function getChangelogReleaseByVersion(version: string) {
+	return changelogReleases.find((release) => release.version === version);
+}
 
 export function withChangelogPreviews(
 	releases: Omit<ChangelogRelease, "preview" | "code">[],

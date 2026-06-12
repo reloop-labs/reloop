@@ -1,4 +1,4 @@
-import type { ChangelogRelease } from "./changelog-timeline";
+import type { ChangelogRelease } from "./changelog-types";
 
 /**
  * Product changelog — newest first. Each release groups work by engineering area
@@ -12,6 +12,8 @@ export const changelogReleasesData: Omit<
 		date: "June 2026",
 		version: "0.9.0",
 		title: "Agent inbox, workflows & marketing site",
+		description:
+			"Inbound agent inbox APIs, a workflow editor prototype, Chatwoot live chat, and a redesigned marketing site with SEO and licensing pages.",
 		tags: [
 			"Inbox",
 			"Workflows",
@@ -193,6 +195,8 @@ export const changelogReleasesData: Omit<
 		date: "May 2026",
 		version: "0.8.0",
 		title: "Templates, webhooks & deliverability",
+		description:
+			"Collaborative template editing, webhook delivery and retries, custom tracking domains, and deliverability charts in the dashboard.",
 		tags: [
 			"Templates",
 			"Webhooks",
@@ -399,6 +403,8 @@ export const changelogReleasesData: Omit<
 		date: "April 2026",
 		version: "0.7.0",
 		title: "Contacts, topics & API platform",
+		description:
+			"Contacts, groups, topics, and API keys as first-class primitives with expanded OpenAPI coverage and public documentation.",
 		tags: [
 			"Contacts",
 			"Topics",
@@ -575,6 +581,8 @@ export const changelogReleasesData: Omit<
 		date: "March 2026",
 		version: "0.6.0",
 		title: "Template editor & observability",
+		description:
+			"A visual template editor, ClickHouse-backed logs, domain settings improvements, and editor observability tooling.",
 		tags: ["Templates", "Logs", "Domains", "Editor", "Contacts", "ClickHouse"],
 		sections: [
 			{
@@ -698,6 +706,8 @@ export const changelogReleasesData: Omit<
 		date: "January 2026",
 		version: "0.5.5",
 		title: "API key polish, contacts migration & topic management",
+		description:
+			"API key UX refinements, migration to the contacts service, and topic enrollment management across the dashboard.",
 		tags: [
 			"API Keys",
 			"Contacts",
@@ -843,6 +853,8 @@ export const changelogReleasesData: Omit<
 		date: "December 2025",
 		version: "0.5.0",
 		title: "Onboarding, dashboard home & contact-topic model",
+		description:
+			"A guided onboarding flow, a new dashboard home, and the contact-topic subscription model for audience management.",
 		tags: [
 			"Onboarding",
 			"Dashboard",
@@ -973,6 +985,8 @@ export const changelogReleasesData: Omit<
 		date: "November 2025",
 		version: "0.4.0",
 		title: "SDK, DNS automation & marketing site",
+		description:
+			"The Reloop Node.js SDK, automated DNS verification, scheduled workflow jobs, and the first marketing homepage.",
 		tags: ["SDK", "DNS", "Workflow", "Homepage", "Docker", "Cron"],
 		sections: [
 			{
@@ -1116,6 +1130,8 @@ export const changelogReleasesData: Omit<
 		date: "October 2025",
 		version: "0.3.0",
 		title: "Domains, webhooks & audience",
+		description:
+			"Domain verification, webhook delivery, audience groups, and the first wave of backend microservices.",
 		tags: ["Domains", "Webhooks", "Audience", "API", "DNS", "Microservices"],
 		sections: [
 			{
@@ -1274,6 +1290,8 @@ export const changelogReleasesData: Omit<
 		date: "September 2025",
 		version: "0.2.0",
 		title: "Settings, appearance & security",
+		description:
+			"Workspace settings, light and dark themes, session management, and security improvements across the dashboard.",
 		tags: ["Settings", "Appearance", "Security", "Auth", "Theme"],
 		sections: [
 			{
@@ -1397,6 +1415,8 @@ export const changelogReleasesData: Omit<
 		date: "September 2025",
 		version: "0.1.0",
 		title: "Open source foundation",
+		description:
+			"The open-source monorepo launch with authentication, API keys, contacts, and Docker-based local development.",
 		tags: [
 			"GitHub",
 			"Auth",

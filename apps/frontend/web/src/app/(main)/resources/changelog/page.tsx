@@ -25,12 +25,11 @@ const ChangelogPage = () => {
 		<MarketingPageShell titleLines={["Changelog"]} compactHero>
 			<PageSection narrow flushTop>
 				<p className="mb-10 text-center text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/50">
-					Release notes from{" "}
+					Product updates from{" "}
 					<span className="font-semibold text-text-strong-950 dark:text-white">
 						September 2025
 					</span>
-					. Each version lists planning, design, frontend, backend, and DevOps
-					work in the order teams typically ship it.
+					. Select a release to read the full notes.
 				</p>
 				<ChangelogTimeline releases={changelogReleases} />
 			</PageSection>
