@@ -643,6 +643,34 @@ function tagToFolderSlug(tag: string): string {
 		.replace(/^-|-$/g, "");
 }
 
+function shouldFlattenTagToRoot(serviceName: string, tag: string): boolean {
+	const tagSlug = tagToFolderSlug(tag);
+	const serviceSlug = tagToFolderSlug(serviceName);
+
+	if (tagSlug === serviceSlug) return true;
+	if (`${tagSlug}s` === serviceSlug) return true;
+	if (tagSlug === serviceSlug.replace(/s$/, "")) return true;
+
+	return false;
+}
+
+function cleanupStaleFolders(
+	serviceDir: string,
+	activeFolderSlugs: Set<string>,
+): void {
+	if (!fs.existsSync(serviceDir)) return;
+
+	for (const entry of fs.readdirSync(serviceDir, { withFileTypes: true })) {
+		if (!entry.isDirectory()) continue;
+		if (activeFolderSlugs.has(entry.name)) continue;
+
+		fs.rmSync(path.join(serviceDir, entry.name), {
+			recursive: true,
+			force: true,
+		});
+	}
+}
+
 function cleanupStaleMdxFiles(
 	serviceDir: string,
 	writtenFiles: Set<string>,
@@ -670,7 +698,10 @@ function cleanupStaleMdxFiles(
 	}
 }
 
-function buildServiceStructure(entries: GeneratedPage[]): ServiceStructure {
+function buildServiceStructure(
+	serviceName: string,
+	entries: GeneratedPage[],
+): ServiceStructure {
 	const sorted = [...entries].sort((a, b) => a.order - b.order);
 	const tagOrder: string[] = [];
 	const pagesByTag = new Map<string, GeneratedPage[]>();
@@ -697,9 +728,16 @@ function buildServiceStructure(entries: GeneratedPage[]): ServiceStructure {
 	for (const tag of tagOrder) {
 		const folderSlug = tagToFolderSlug(tag);
 		const tagPages = pagesByTag.get(tag) || [];
+		const slugs = tagPages.map((entry) => entry.slug);
+
+		if (shouldFlattenTagToRoot(serviceName, tag)) {
+			pages.push(...slugs);
+			continue;
+		}
+
 		folders.set(folderSlug, {
 			title: tag,
-			pages: tagPages.map((entry) => entry.slug),
+			pages: slugs,
 		});
 		pages.push(folderSlug);
 	}
@@ -764,14 +802,22 @@ async function generateForService(
 
 		const useFolders = new Set(pendingOps.map((op) => op.tag)).size > 1;
 		const writtenFiles = new Set<string>();
+		const activeFolderSlugs = new Set<string>();
 		const generated: GeneratedPage[] = [];
 
 		for (const op of pendingOps) {
 			const folderSlug = tagToFolderSlug(op.tag);
-			const targetDir = useFolders
-				? path.join(serviceDir, folderSlug)
-				: serviceDir;
+			const flattenTag =
+				useFolders && shouldFlattenTagToRoot(service.name, op.tag);
+			const targetDir =
+				useFolders && !flattenTag
+					? path.join(serviceDir, folderSlug)
+					: serviceDir;
 			fs.mkdirSync(targetDir, { recursive: true });
+
+			if (useFolders && !flattenTag) {
+				activeFolderSlugs.add(folderSlug);
+			}
 
 			const filename = `${op.operationId}.mdx`;
 			const filePath = path.join(targetDir, filename);
@@ -790,17 +836,21 @@ async function generateForService(
 			generated.push({
 				slug: op.operationId,
 				tag: op.tag,
-				folderSlug: useFolders ? folderSlug : "",
+				folderSlug: useFolders && !flattenTag ? folderSlug : "",
 				order: op.order,
 			});
 
-			const location = useFolders ? `${folderSlug}/${filename}` : filename;
+			const location =
+				useFolders && !flattenTag ? `${folderSlug}/${filename}` : filename;
 			console.log(
 				`  ✅ ${op.method.toUpperCase().padEnd(6)} ${op.routePath} → ${location}  (${op.codeSamples.length} code samples, ${op.params.length} params)`,
 			);
 		}
 
 		cleanupStaleMdxFiles(serviceDir, writtenFiles);
+		if (useFolders) {
+			cleanupStaleFolders(serviceDir, activeFolderSlugs);
+		}
 
 		return generated;
 	} catch (error) {
@@ -828,7 +878,7 @@ function generateMetaJson(allGenerated: Record<string, GeneratedPage[]>) {
 		const sectionName = sectionNames[service] || service;
 		const serviceDir = path.join(DOCS_DIR, service);
 		const serviceMetaPath = path.join(serviceDir, "meta.json");
-		const structure = buildServiceStructure(entries);
+		const structure = buildServiceStructure(service, entries);
 
 		if (structure.useFolders) {
 			for (const [folderSlug, folderMeta] of structure.folders) {
