@@ -618,7 +618,26 @@ function SidebarLink({
 			)}
 		>
 			<div className="relative z-10 flex w-full items-center gap-2 text-left">
-				{node.icon && (
+				{node.method && (
+					<span
+						className={cn(
+							"inline-flex shrink-0 items-center justify-center rounded-[4px] px-1.5 py-[1px] font-semibold text-[9px] uppercase leading-tight tracking-wide",
+							node.method === "GET" &&
+								"bg-green-500/15 text-green-600 dark:bg-green-500/20 dark:text-green-400",
+							node.method === "POST" &&
+								"bg-blue-500/15 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400",
+							node.method === "DELETE" &&
+								"bg-red-500/15 text-red-500 dark:bg-red-500/20 dark:text-red-400",
+							node.method === "PATCH" &&
+								"bg-orange-500/15 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400",
+							node.method === "PUT" &&
+								"bg-purple-500/15 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400",
+						)}
+					>
+						{node.method === "DELETE" ? "DEL" : node.method}
+					</span>
+				)}
+				{!node.method && node.icon && (
 					<span
 						className={cn(
 							"flex h-3.5 w-3.5 shrink-0 items-center justify-center transition-colors",
@@ -630,27 +649,8 @@ function SidebarLink({
 						{node.icon}
 					</span>
 				)}
-				<span className="truncate">{node.name as string}</span>
+					<span className="truncate font-medium">{node.name as string}</span>
 			</div>
-			{node.method && (
-				<span
-					className={cn(
-						"relative z-10 ml-auto shrink-0 font-semibold text-[10px] uppercase leading-none tracking-wide",
-						node.method === "GET" &&
-							"text-green-600 dark:text-green-400",
-						node.method === "POST" &&
-							"text-blue-600 dark:text-blue-400",
-						node.method === "DELETE" &&
-							"text-red-500 dark:text-red-400",
-						node.method === "PATCH" &&
-							"text-orange-500 dark:text-orange-400",
-						node.method === "PUT" &&
-							"text-purple-600 dark:text-purple-400",
-					)}
-				>
-					{node.method}
-				</span>
-			)}
 		</Link>
 	);
 }
