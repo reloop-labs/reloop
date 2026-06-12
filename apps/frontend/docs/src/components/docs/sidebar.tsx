@@ -161,40 +161,39 @@ export function Sidebar({
 	);
 
 	// Folder open state lives here — only ever grows, never shrinks automatically
-	const [openFolders, setOpenFolders] = useState<Set<string>>(() => {
-		const allUrls = getAllFolderUrls(filteredTree);
-		if (typeof window !== "undefined") {
-			try {
-				const saved = sessionStorage.getItem("reloop-sidebar-open");
-				if (saved) {
-					const parsed = JSON.parse(saved);
-					return new Set([...parsed, ...allUrls]);
-				}
-			} catch (e) {
-				// Ignore parse errors
+	// Initialize with all folders open — must match on server and client to avoid hydration mismatch.
+	// sessionStorage restoration happens in the useEffect below, after hydration.
+	const [openFolders, setOpenFolders] = useState<Set<string>>(
+		() => new Set(getAllFolderUrls(filteredTree)),
+	);
+
+	// Restore persisted open-folder state from sessionStorage after mount (client-only)
+	useEffect(() => {
+		try {
+			const saved = sessionStorage.getItem("reloop-sidebar-open");
+			if (saved) {
+				const parsed: string[] = JSON.parse(saved);
+				setOpenFolders((prev) => new Set([...prev, ...parsed]));
 			}
+		} catch {
+			// Ignore parse errors
 		}
-		return new Set(allUrls);
-	});
+	}, []);
 
 	// Persist to sessionStorage
 	useEffect(() => {
-		if (typeof window !== "undefined") {
-			sessionStorage.setItem(
-				"reloop-sidebar-open",
-				JSON.stringify(Array.from(openFolders)),
-			);
-		}
+		sessionStorage.setItem(
+			"reloop-sidebar-open",
+			JSON.stringify(Array.from(openFolders)),
+		);
 	}, [openFolders]);
 
 	// Restore scroll position on mount
 	useLayoutEffect(() => {
 		if (!navRef.current) return;
-		if (typeof window !== "undefined") {
-			const savedScroll = sessionStorage.getItem("reloop-sidebar-scroll");
-			if (savedScroll) {
-				navRef.current.scrollTop = Number.parseInt(savedScroll, 10);
-			}
+		const savedScroll = sessionStorage.getItem("reloop-sidebar-scroll");
+		if (savedScroll) {
+			navRef.current.scrollTop = Number.parseInt(savedScroll, 10);
 		}
 	}, []);
 
@@ -306,7 +305,7 @@ export function Sidebar({
 				className="relative flex-1 overflow-y-auto p-2 pt-1"
 				onPointerLeave={() => setHoveredEl(null)}
 				onScroll={() => {
-					if (navRef.current && typeof window !== "undefined") {
+					if (navRef.current) {
 						sessionStorage.setItem(
 							"reloop-sidebar-scroll",
 							navRef.current.scrollTop.toString(),

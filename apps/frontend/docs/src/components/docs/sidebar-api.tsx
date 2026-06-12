@@ -1,14 +1,14 @@
 "use client";
 
-import * as React from "react";
-import { useRef } from "react";
-import Link from "next/link";
+import type { FolderNode, PageTreeItem } from "@reloop/fe-docs/lib/types";
+import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
-import { cn } from "@reloop/ui/cn";
-import type { FolderNode, PageTreeItem } from "@reloop/fe-docs/lib/types";
-import { useSidebarContext } from "./sidebar";
+import Link from "next/link";
+import * as React from "react";
+import { useRef } from "react";
 import { isActive as checkIsActive } from "../../lib/is-active";
+import { useSidebarContext } from "./sidebar";
 
 export function ApiSidebarFolder({
 	node,
@@ -98,7 +98,7 @@ export function ApiSidebarFolder({
 						transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
 						style={{ overflow: "hidden" }}
 					>
-						<div className="mt-px flex flex-col space-y-px pb-0.5 pl-4 border-l border-stroke-soft-100/30 ml-4">
+						<div className="mt-px ml-4 flex flex-col space-y-px border-stroke-soft-100/30 border-l pb-0.5 pl-4">
 							{node.children.map((child: PageTreeItem, index: number) => (
 								<ApiSidebarSection
 									key={index}
@@ -129,7 +129,9 @@ export function ApiSidebarLink({
 
 	if (node.type === "separator") return null;
 	if (node.type === "folder") {
-		return <ApiSidebarFolder node={node} onLinkClick={onLinkClick} depth={depth} />;
+		return (
+			<ApiSidebarFolder node={node} onLinkClick={onLinkClick} depth={depth} />
+		);
 	}
 
 	const linkId = node.url;
@@ -154,7 +156,7 @@ export function ApiSidebarLink({
 					: "text-text-sub-600 hover:text-[#171717] dark:hover:text-white",
 			)}
 		>
-			<div className="relative z-10 grid grid-cols-[40px_1fr] gap-4 w-full items-center text-left">
+			<div className="relative z-10 grid w-full grid-cols-[40px_1fr] items-center gap-4 text-left">
 				{node.method ? (
 					<p
 						className={cn(
@@ -205,7 +207,7 @@ export function ApiSidebarSection({
 	if (node.type === "separator") {
 		return (
 			<div className="mt-4 mb-1.5 px-2">
-				<h4 className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-[0.05em] opacity-60">
+				<h4 className="font-medium text-[11px] uppercase tracking-[0.05em] dark:text-white/50">
 					{node.name as string}
 				</h4>
 			</div>
@@ -217,7 +219,7 @@ export function ApiSidebarSection({
 		return (
 			<>
 				<div className="mt-4 mb-1.5 px-2">
-					<h4 className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-[0.05em] opacity-60">
+					<h4 className="font-semibold text-sm uppercase">
 						{node.name as string}
 					</h4>
 				</div>
