@@ -43,7 +43,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
-								className="fixed inset-0 z-50 bg-fd-background/60 backdrop-blur-sm"
+								className="fixed inset-0 z-50 bg-black/15 backdrop-blur-[2px] dark:bg-black/40"
 							/>
 						</Dialog.Overlay>
 						<Dialog.Content asChild>
@@ -52,12 +52,12 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 								animate={{ x: 0 }}
 								exit={{ x: "-100%" }}
 								transition={{ type: "spring", damping: 25, stiffness: 200 }}
-								className="fixed inset-y-0 left-0 z-50 w-72 border-fd-border border-r bg-fd-background p-0 focus:outline-none"
+								className="fixed inset-y-0 left-0 z-50 w-72 border-stroke-soft-100 border-r bg-bg-white-0 p-0 focus:outline-none dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]"
 							>
 								<Dialog.Title className="sr-only">
 									Documentation Navigation
 								</Dialog.Title>
-								<div className="flex h-12 items-center border-fd-border border-b px-4">
+								<div className="flex h-12 items-center border-stroke-soft-100 border-b px-4 dark:border-stroke-soft-100/40">
 									<Link
 										href="/"
 										className="flex items-center"

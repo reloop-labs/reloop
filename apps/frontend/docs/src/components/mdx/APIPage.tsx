@@ -41,7 +41,8 @@ const PARAM_SUB_PROPERTIES: Record<string, Parameter[]> = {
 			name: "channelId",
 			type: "string",
 			required: true,
-			description: "The unique identifier of the channel to enroll the contact in.",
+			description:
+				"The unique identifier of the channel to enroll the contact in.",
 			location: "body",
 		},
 		{

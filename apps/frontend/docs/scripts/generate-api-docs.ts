@@ -390,7 +390,7 @@ function exampleStringForField(
 	path: string[],
 ): string {
 	const name = fieldName.toLowerCase();
-	const parent = path.length >= 2 ? path[path.length - 2].toLowerCase() : "";
+	const parent = path.length >= 2 ? (path[path.length - 2]?.toLowerCase() ?? "") : "";
 
 	if (
 		schema.format === "date-time" ||
@@ -503,12 +503,10 @@ function buildResponseExample(
 		if (resolved.properties) {
 			const obj: Record<string, any> = {};
 			for (const [key, propSchema] of Object.entries(resolved.properties)) {
-				const val = buildResponseExample(
-					propSchema as any,
-					spec,
-					depth + 1,
-					[...path, key],
-				);
+				const val = buildResponseExample(propSchema as any, spec, depth + 1, [
+					...path,
+					key,
+				]);
 				if (val !== undefined) obj[key] = val;
 			}
 			return obj;
@@ -684,10 +682,7 @@ function cleanupStaleMdxFiles(
 		if (entry.isDirectory()) {
 			cleanupStaleMdxFiles(fullPath, writtenFiles);
 
-			if (
-				fs.readdirSync(fullPath).length === 0 &&
-				!fullPath.endsWith(".git")
-			) {
+			if (fs.readdirSync(fullPath).length === 0 && !fullPath.endsWith(".git")) {
 				fs.rmdirSync(fullPath);
 			}
 			continue;

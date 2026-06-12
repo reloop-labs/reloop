@@ -94,6 +94,28 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 		setQuery("");
 	};
 
+	const groupedResults = React.useMemo(() => {
+		const groups: Array<{
+			name: string;
+			items: Array<{ result: SearchResult; originalIndex: number }>;
+		}> = [];
+
+		for (let i = 0; i < results.length; i++) {
+			const res = results[i];
+			if (!res) continue;
+			const groupName =
+				res.path.length > 0 ? res.path.join(" › ") : "Documentation";
+
+			let group = groups.find((g) => g.name === groupName);
+			if (!group) {
+				group = { name: groupName, items: [] };
+				groups.push(group);
+			}
+			group.items.push({ result: res, originalIndex: i });
+		}
+		return groups;
+	}, [results]);
+
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
 			<AnimatePresence>
@@ -104,7 +126,7 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
-								className="fixed inset-0 z-50 bg-fd-background/80 backdrop-blur-sm"
+								className="fixed inset-0 z-50 bg-black/15 backdrop-blur-[2px] dark:bg-black/40"
 							/>
 						</Dialog.Overlay>
 						<Dialog.Content asChild>
@@ -114,7 +136,7 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 									animate={{ opacity: 1, scale: 1, y: 0 }}
 									exit={{ opacity: 0, scale: 0.95, y: -20 }}
 									transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-									className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-fd-border bg-fd-popover"
+									className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]"
 								>
 									<Dialog.Title className="sr-only">
 										Search Documentation
@@ -124,15 +146,15 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 									</Dialog.Description>
 
 									{/* Search Input Area */}
-									<div className="flex items-center border-fd-border border-b px-4 py-3">
+									<div className="flex items-center border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/40">
 										<Search className="mr-3 h-5 w-5 text-text-sub-600" />
 										<input
-											className="flex-1 bg-transparent text-fd-foreground placeholder:text-text-sub-600 focus:outline-none sm:text-sm"
+											className="flex-1 bg-transparent text-[#171717] placeholder:text-text-sub-600 focus:outline-none sm:text-sm dark:text-white"
 											placeholder="Search documentation..."
 											value={query}
 											onChange={(e) => setQuery(e.target.value)}
 										/>
-										<div className="flex items-center gap-1.5 rounded-md border border-fd-border bg-fd-muted px-1.5 py-0.5 font-medium text-[10px] text-text-sub-600">
+										<div className="flex items-center gap-1.5 rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[10px] text-text-sub-600 dark:border-stroke-soft-100/30 dark:bg-white/5">
 											<kbd>ESC</kbd>
 										</div>
 									</div>
@@ -141,10 +163,10 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 									<div className="max-h-[60vh] overflow-y-auto p-2">
 										{query === "" ? (
 											<div className="px-4 py-12 text-center">
-												<div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-fd-muted">
+												<div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50 dark:bg-white/5">
 													<Search className="h-6 w-6 text-text-sub-600" />
 												</div>
-												<h3 className="mt-4 font-semibold text-fd-foreground">
+												<h3 className="mt-4 font-semibold text-[#171717] dark:text-white">
 													Search Reloop Docs
 												</h3>
 												<p className="mt-1 text-sm text-text-sub-600">
@@ -155,70 +177,75 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 											<div className="px-4 py-12 text-center">
 												<p className="text-sm text-text-sub-600">
 													No results found for "
-													<span className="font-medium text-fd-foreground">
+													<span className="font-medium text-[#171717] dark:text-white">
 														{query}
 													</span>
 													"
 												</p>
 											</div>
 										) : (
-											<div className="space-y-1">
-												{results.map((result, index) => (
-													<button
-														type="button"
-														key={result.url}
-														onClick={() => handleSelect(result.url)}
-														onPointerEnter={() => setSelectedIndex(index)}
+											<div className="space-y-4">
+												{groupedResults.map((group, groupIdx) => (
+													<div
+														key={group.name}
 														className={cn(
-															"group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors",
-															index === selectedIndex
-																? "bg-fd-accent"
-																: "hover:bg-fd-accent/50",
+															"space-y-0.5",
+															groupIdx > 0 && "mt-3",
 														)}
 													>
-														<div
-															className={cn(
-																"flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-fd-border bg-fd-background transition-colors",
-																index === selectedIndex
-																	? "border-fd-foreground/10 bg-fd-background"
-																	: "",
-															)}
-														>
-															<FileText
+														<div className="px-3 py-1 font-bold text-[10px] text-text-sub-600/60 uppercase tracking-wider">
+															{group.name}
+														</div>
+														{group.items.map(({ result, originalIndex }) => (
+															<button
+																type="button"
+																key={result.url}
+																onClick={() => handleSelect(result.url)}
+																onPointerEnter={() =>
+																	setSelectedIndex(originalIndex)
+																}
 																className={cn(
-																	"h-4 w-4 transition-colors",
-																	index === selectedIndex
-																		? "text-fd-foreground"
-																		: "text-text-sub-600",
+																	"group flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors",
+																	originalIndex === selectedIndex
+																		? "bg-black/5 dark:bg-white/5"
+																		: "hover:bg-black/[0.03] dark:hover:bg-white/[0.03]",
 																)}
-															/>
-														</div>
-														<div className="flex-1 overflow-hidden">
-															<div className="flex items-center gap-1.5">
-																{result.path.map((p, i) => (
-																	<React.Fragment key={i}>
-																		<span className="font-medium text-[11px] text-text-sub-600/60 uppercase tracking-wider">
-																			{p}
-																		</span>
-																		<ChevronRight className="h-3 w-3 text-text-sub-600/30" />
-																	</React.Fragment>
-																))}
-															</div>
-															<div className="font-medium text-fd-foreground">
-																{result.title}
-															</div>
-														</div>
-														<div className="flex h-5 w-5 items-center justify-center rounded border border-fd-border bg-fd-muted font-medium text-[10px] text-text-sub-600 opacity-0 transition-opacity group-hover:opacity-100">
-															↵
-														</div>
-													</button>
+															>
+																<div
+																	className={cn(
+																		"flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 transition-colors dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]",
+																		originalIndex === selectedIndex
+																			? "border-[#171717]/10 dark:border-white/10"
+																			: "",
+																	)}
+																>
+																	<FileText
+																		className={cn(
+																			"h-3.5 w-3.5 transition-colors",
+																			originalIndex === selectedIndex
+																				? "text-[#171717] dark:text-white"
+																				: "text-text-sub-600",
+																		)}
+																	/>
+																</div>
+																<div className="flex-1 overflow-hidden">
+																	<div className="truncate font-medium text-[#171717] text-sm dark:text-white">
+																		{result.title}
+																	</div>
+																</div>
+																<div className="flex h-5 w-5 items-center justify-center rounded border border-stroke-soft-200 bg-bg-weak-50 font-medium text-[10px] text-text-sub-600 opacity-0 transition-opacity group-hover:opacity-100 dark:border-stroke-soft-100/40 dark:bg-white/5">
+																	↵
+																</div>
+															</button>
+														))}
+													</div>
 												))}
 											</div>
 										)}
 									</div>
 
 									{/* Footer */}
-									<div className="flex items-center justify-between border-fd-border border-t bg-fd-muted/30 px-4 py-2 font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider">
+									<div className="flex items-center justify-between border-stroke-soft-100 border-t bg-bg-weak-50/50 px-4 py-2 font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
 										<div className="flex gap-4">
 											<span className="flex items-center gap-1">
 												<kbd className="font-sans">↑↓</kbd> Navigate
@@ -229,7 +256,9 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 										</div>
 										<div className="flex items-center gap-1">
 											Search by{" "}
-											<span className="text-fd-foreground">Reloop</span>
+											<span className="text-[#171717] dark:text-white">
+												Reloop
+											</span>
 										</div>
 									</div>
 								</motion.div>
