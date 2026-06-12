@@ -47,6 +47,12 @@ interface CodeSample {
 	source: string;
 }
 
+interface GeneratedPage {
+	slug: string;
+	tag: string;
+	order: number;
+}
+
 const SERVICES: ServiceConfig[] = [
 	{
 		name: "domain",
@@ -623,7 +629,9 @@ _apiData:
 `;
 }
 
-async function generateForService(service: ServiceConfig): Promise<string[]> {
+async function generateForService(
+	service: ServiceConfig,
+): Promise<GeneratedPage[]> {
 	console.log(`\n📡 Fetching spec from ${service.specUrl}...`);
 
 	try {
@@ -632,7 +640,8 @@ async function generateForService(service: ServiceConfig): Promise<string[]> {
 
 		const spec = await response.json();
 		const paths = spec.paths || {};
-		const generated: string[] = [];
+		const generated: GeneratedPage[] = [];
+		let order = 0;
 
 		const serviceDir = path.join(DOCS_DIR, service.name);
 		if (!fs.existsSync(serviceDir))
@@ -669,7 +678,11 @@ async function generateForService(service: ServiceConfig): Promise<string[]> {
 					codeSamples,
 				);
 				fs.writeFileSync(filePath, content);
-				generated.push(`${service.name}/${operationId}`);
+				generated.push({
+					slug: operationId,
+					tag: operation.tags?.[0] || "Other",
+					order: order++,
+				});
 				console.log(
 					`  ✅ ${method.toUpperCase().padEnd(6)} ${routePath} → ${filename}  (${codeSamples.length} code samples, ${params.length} params)`,
 				);
@@ -683,7 +696,33 @@ async function generateForService(service: ServiceConfig): Promise<string[]> {
 	}
 }
 
-function generateMetaJson(allGenerated: Record<string, string[]>) {
+function buildOrderedPages(entries: GeneratedPage[]): string[] {
+	const sorted = [...entries].sort((a, b) => a.order - b.order);
+	const tagOrder: string[] = [];
+	const pagesByTag = new Map<string, string[]>();
+
+	for (const entry of sorted) {
+		if (!pagesByTag.has(entry.tag)) {
+			tagOrder.push(entry.tag);
+			pagesByTag.set(entry.tag, []);
+		}
+		pagesByTag.get(entry.tag)?.push(entry.slug);
+	}
+
+	if (tagOrder.length <= 1) {
+		return sorted.map((entry) => entry.slug);
+	}
+
+	const pages: string[] = [];
+	for (const tag of tagOrder) {
+		pages.push(`---${tag}---`);
+		pages.push(...(pagesByTag.get(tag) || []));
+	}
+
+	return pages;
+}
+
+function generateMetaJson(allGenerated: Record<string, GeneratedPage[]>) {
 	const metaPath = path.join(DOCS_DIR, "meta.json");
 
 	const sectionNames: Record<string, string> = {
@@ -701,19 +740,16 @@ function generateMetaJson(allGenerated: Record<string, string[]>) {
 	for (const [service, entries] of Object.entries(allGenerated)) {
 		const sectionName = sectionNames[service] || service;
 		const serviceMetaPath = path.join(DOCS_DIR, service, "meta.json");
-		// Strip the service prefix from entries (e.g., "domain/create-domain" → "create-domain")
-		const pageNames = entries
-			.sort()
-			.map((entry) => entry.replace(`${service}/`, ""));
+		const pages = buildOrderedPages(entries);
 		const serviceMeta = {
 			title: sectionName,
-			pages: pageNames,
+			pages,
 		};
 		fs.writeFileSync(
 			serviceMetaPath,
 			JSON.stringify(serviceMeta, null, "\t") + "\n",
 		);
-		console.log(`  📂 ${service}/meta.json (${pageNames.length} pages)`);
+		console.log(`  📂 ${service}/meta.json (${pages.length} entries)`);
 	}
 
 	// Generate parent meta.json with folder references
@@ -742,7 +778,7 @@ function generateMetaJson(allGenerated: Record<string, string[]>) {
 async function main() {
 	console.log("🔧 OpenAPI → MDX Doc Generator");
 
-	const allGenerated: Record<string, string[]> = {};
+	const allGenerated: Record<string, GeneratedPage[]> = {};
 
 	for (const service of SERVICES) {
 		const generated = await generateForService(service);

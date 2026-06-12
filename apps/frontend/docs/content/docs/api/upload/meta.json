@@ -1,7 +1,7 @@
 {
 	"title": "Upload",
 	"pages": [
-		"delete-api-upload-v1files-by-file-id",
-		"post-api-upload-v1upload"
+		"post-api-upload-v1upload",
+		"delete-api-upload-v1files-by-file-id"
 	]
 }

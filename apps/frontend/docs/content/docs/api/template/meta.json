@@ -1,22 +1,24 @@
 {
 	"title": "Templates",
 	"pages": [
-		"delete-api-template-docs-by-room-name",
-		"delete-api-template-v1by-id",
-		"delete-api-template-v1by-id-versions-by-version-id",
-		"get-api-template-docs",
-		"get-api-template-rooms",
-		"get-api-template-rooms-by-room-name",
-		"get-api-template-rooms-by-room-name-export",
-		"get-api-template-v1by-id",
+		"---Templates---",
+		"post-api-template-v1create",
+		"post-api-template-v1by-id-versions",
 		"get-api-template-v1by-id-versions",
+		"delete-api-template-v1by-id-versions-by-version-id",
+		"post-api-template-v1by-id-versions-by-version-id-restore",
+		"get-api-template-v1by-id",
+		"put-api-template-v1by-id",
+		"delete-api-template-v1by-id",
 		"get-api-template-v1list",
-		"post-api-template-rooms-by-room-name-save",
 		"post-api-template-v1by-id-duplicate",
 		"post-api-template-v1by-id-test",
-		"post-api-template-v1by-id-versions",
-		"post-api-template-v1by-id-versions-by-version-id-restore",
-		"post-api-template-v1create",
-		"put-api-template-v1by-id"
+		"---Rooms---",
+		"get-api-template-rooms",
+		"get-api-template-rooms-by-room-name",
+		"post-api-template-rooms-by-room-name-save",
+		"get-api-template-rooms-by-room-name-export",
+		"get-api-template-docs",
+		"delete-api-template-docs-by-room-name"
 	]
 }
