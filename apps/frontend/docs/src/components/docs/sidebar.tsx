@@ -617,11 +617,11 @@ function SidebarLink({
 					: "text-text-sub-600 hover:text-[#171717] dark:hover:text-white",
 			)}
 		>
-			<div className="relative z-10 grid w-full grid-cols-[40px_1fr] items-center gap-2 text-left">
+			<div className="relative z-10 grid w-full grid-cols-[40px_1fr] items-center gap-4 text-left">
 				{node.method ? (
 					<p
 						className={cn(
-							"inline-flex w-fit shrink-0 items-center justify-self-center rounded-[4px] px-1.5 py-[1.5px] font-semibold text-[10px] uppercase leading-tight tracking-wide",
+							"inline-flex w-fit shrink-0 items-center justify-self-start rounded-[4px] px-1.5 py-[1.5px] font-semibold text-[10px] uppercase leading-tight tracking-wide",
 							node.method === "GET" &&
 								"bg-green-500/15 text-green-600 dark:bg-green-500/20 dark:text-green-400",
 							node.method === "POST" &&
@@ -639,7 +639,7 @@ function SidebarLink({
 				) : node.icon ? (
 					<span
 						className={cn(
-							"flex h-3.5 w-3.5 shrink-0 items-center justify-center justify-self-center transition-colors",
+							"flex h-3.5 w-3.5 shrink-0 items-center justify-center justify-self-start transition-colors",
 							isActive
 								? "text-[#171717] dark:text-white"
 								: "text-text-sub-600 opacity-70",
