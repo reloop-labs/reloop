@@ -120,7 +120,7 @@ export function CopyCodeBlock({
 	return (
 		<div
 			className={cn(
-				"group relative overflow-hidden rounded-[18px] border border-stroke-soft-100 dark:border-stroke-soft-100/40",
+				"group relative overflow-hidden rounded-[18px] border border-stroke-soft-100 bg-[#fafafa] dark:border-stroke-soft-100/40 dark:bg-[#0c0c0e]",
 				className,
 			)}
 		>
@@ -131,7 +131,7 @@ export function CopyCodeBlock({
 			`}</style>
 
 			{hasTabs ? (
-				<div className="flex items-center gap-3 border-stroke-soft-100 border-b pr-4 pl-1 dark:border-stroke-soft-100/40">
+				<div className="flex items-center gap-3 pr-4 pl-1">
 					<div
 						className="scrollbar-none relative flex min-w-0 flex-1 items-center overflow-x-auto"
 						style={{
@@ -216,7 +216,7 @@ export function CopyCodeBlock({
 					{copyButton}
 				</div>
 			) : (
-				<div className="flex items-center gap-3 border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/40">
+				<div className="flex items-center gap-3 px-4 py-2.5">
 					<div className="flex min-w-0 flex-1 items-center gap-2">
 						{si ? (
 							<svg
@@ -239,7 +239,7 @@ export function CopyCodeBlock({
 				</div>
 			)}
 
-			<div className="bg-transparent">
+			<div className="mx-0.5 mb-0.5 rounded-2xl border border-stroke-soft-100/70 bg-white dark:border-stroke-soft-100/15 dark:bg-zinc-950">
 				<CodeBlock
 					code={code}
 					lang={lang}
