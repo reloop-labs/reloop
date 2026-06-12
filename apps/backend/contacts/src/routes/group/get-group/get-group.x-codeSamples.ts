@@ -10,7 +10,7 @@ const reloop = new Reloop({
   key: 're_123456789'
 });
 
-const { response: group, error } = await reloop.contacts.getGroup('grp_123456789');
+const { response: group, error } = await reloop.contacts().getGroup('grp_123456789');
 if (error) throw error;`,
 	},
 	{
@@ -32,9 +32,11 @@ $reloop->contacts->getGroup('grp_123456789');`,
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `reloop = Reloop(api_key="re_123456789")
+		source: `from reloop_email import Reloop
 
-reloop.contacts.get_group("grp_123456789")`,
+reloop = Reloop(api_key="re_123456789")
+
+reloop.contacts().get_group("grp_123456789")`,
 	},
 	{
 		id: "ruby",
@@ -57,31 +59,28 @@ group = JSON.parse(response.body)`,
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `import reloop
+		source: `import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
-    client, _ := reloop.NewClient(reloop.ClientOptions{
+    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
         APIKey: "re_123456789",
     })
     
-    _, _ = client.Contacts.GetGroup("grp_123456789")
+    _, _ = reloop.Contacts().GetGroup("grp_123456789")
 }`,
 	},
-	{
+		{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
-		source: `use reqwest::Client;
+		source: `use reloop_email::ReloopEmail;
+use serde_json::json;
 
 #[tokio::main]
-async fn main() -> Result<(), reqwest::Error> {
-    let client = Client::new();
-
-    let response = client
-        .get("https://reloop.sh/api/contacts/v1/groups/grp_123456789")
-        .header("x-api-key", "re_123456789")
-        .send()
-        .await?;
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopEmail::new("re_123456789".to_string(), None);
+    
+    reloop.contacts().get_group("grp_123456789").await?;
 
     Ok(())
 }`,
@@ -90,23 +89,20 @@ async fn main() -> Result<(), reqwest::Error> {
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import sh.reloop.ReloopClient;
+		source: `import sh.reloop.email.ReloopEmail;
 
-ReloopClient reloop = new ReloopClient("re_123456789");
+ReloopEmail reloop = ReloopEmail.client("re_123456789");
 
-reloop.contacts.getGroup("grp_123456789");`,
+reloop.contacts().getGroup("grp_123456789");`,
 	},
-	{
+		{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",
-		source: `using System.Net.Http;
+		source: `using Reloop.Email;
 
-var client = new HttpClient();
-client.DefaultRequestHeaders.Add("x-api-key", "re_123456789");
+var reloop = ReloopEmail.Client("re_123456789");
 
-var response = await client.GetAsync(
-    "https://reloop.sh/api/contacts/v1/groups/grp_123456789"
-);`,
+await reloop.Contacts().GetGroupAsync("grp_123456789");`,
 	},
 ];

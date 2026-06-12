@@ -23,16 +23,16 @@ Install the Reloop Node.js SDK in your Next.js project:
 
 <CodeGroup>
   ```bash npm
-  npm install @reloop/node
+  npm install reloop-email
   ```
   ```bash yarn
-  yarn add @reloop/node
+  yarn add reloop-email
   ```
   ```bash pnpm
-  pnpm add @reloop/node
+  pnpm add reloop-email
   ```
   ```bash bun
-  bun add @reloop/node
+  bun add reloop-email
   ```
 </CodeGroup>
 
@@ -56,10 +56,10 @@ Create a new API route in `app/api/send/route.ts` to handle email sending reques
 
 <CodeGroup>
 ```typescript app/api/send/route.ts
-import { Reloop } from '@reloop/node';
+import Reloop from 'reloop-email';
 import { NextResponse } from 'next/server';
 
-const reloop = new Reloop(process.env.RELOOP_API_KEY);
+const reloop = ReloopEmail.client(process.env.RELOOP_API_KEY);
 
 export async function POST() {
   try {
@@ -90,9 +90,9 @@ For a more seamless integration with your UI, you can use Server Actions:
 ```typescript app/actions.ts
 'use server';
 
-import { Reloop } from '@reloop/node';
+import Reloop from 'reloop-email';
 
-const reloop = new Reloop(process.env.RELOOP_API_KEY);
+const reloop = ReloopEmail.client(process.env.RELOOP_API_KEY);
 
 export async function sendEmail(email: string) {
   const { data, error } = await reloop.emails.send({

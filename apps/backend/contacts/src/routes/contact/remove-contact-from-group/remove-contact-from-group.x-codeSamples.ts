@@ -14,7 +14,7 @@ const reloop = new Reloop({
   key: 're_123456789'
 });
 
-const { response, error } = await reloop.contacts.groups.removeContact('grp_123456789', {
+const { response, error } = await reloop.contacts().groups().removeContact('grp_123456789', {
   contact_id: 'cont_123456789',
 });
 if (error) throw error;`,
@@ -45,9 +45,11 @@ $reloop->contacts->groups->removeContact(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `reloop = Reloop(api_key="re_123456789")
+		source: `from reloop_email import Reloop
 
-reloop.contacts.groups.remove_contact(
+reloop = Reloop(api_key="re_123456789")
+
+reloop.contacts().groups().remove_contact(
     "grp_123456789",
     contact_id="cont_123456789"
 )`,
@@ -75,35 +77,32 @@ result = JSON.parse(response.body)`,
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `import reloop
+		source: `import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
-    client, _ := reloop.NewClient(reloop.ClientOptions{
+    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
         APIKey: "re_123456789",
     })
     
-    _, _ = client.Contacts.Groups.RemoveContact("grp_123456789", map[string]interface{}{
+    _, _ = reloop.Contacts().Groups.RemoveContact("grp_123456789", map[string]interface{}{
         "contact_id": "cont_123456789"
     })
 }`,
 	},
-	{
+		{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
-		source: `use reqwest::Client;
+		source: `use reloop_email::ReloopEmail;
 use serde_json::json;
 
 #[tokio::main]
-async fn main() -> Result<(), reqwest::Error> {
-    let client = Client::new();
-
-    let response = client
-        .delete("https://reloop.sh/api/contacts/group/grp_123456789")
-        .header("x-api-key", "re_123456789")
-        .json(&json!({ "contact_id": "cont_123456789" }))
-        .send()
-        .await?;
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopEmail::new("re_123456789".to_string(), None);
+    
+    reloop.contacts().groups().remove_contact("grp_123456789", json!({
+        "contact_id": "cont_123456789",
+    })).await?;
 
     Ok(())
 }`,
@@ -112,28 +111,25 @@ async fn main() -> Result<(), reqwest::Error> {
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import sh.reloop.ReloopClient;
+		source: `import sh.reloop.email.ReloopEmail;
 import java.util.*;
 
-ReloopClient reloop = new ReloopClient("re_123456789");
+ReloopEmail reloop = ReloopEmail.client("re_123456789");
 
-reloop.contacts.groups.removeContact("grp_123456789", Map.of("contact_id", "cont_123456789"));`,
+reloop.contacts().groups().removeContact("grp_123456789", Map.of("contact_id", "cont_123456789"));`,
 	},
-	{
+		{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",
-		source: `using System.Net.Http;
-using System.Net.Http.Json;
+		source: `using Reloop.Email;
+using System.Collections.Generic;
 
-var client = new HttpClient();
-client.DefaultRequestHeaders.Add("x-api-key", "re_123456789");
+var reloop = ReloopEmail.Client("re_123456789");
 
-var payload = new { contact_id = "cont_123456789" };
-
-var request = new HttpRequestMessage(HttpMethod.Delete, "https://reloop.sh/api/contacts/group/grp_123456789");
-request.Content = JsonContent.Create(payload);
-
-var response = await client.SendAsync(request);`,
+await reloop.Contacts().Groups.RemoveContactAsync("grp_123456789", new Dictionary<string, object?>
+{
+    ["contact_id"] = "cont_123456789",
+});`,
 	},
 ];

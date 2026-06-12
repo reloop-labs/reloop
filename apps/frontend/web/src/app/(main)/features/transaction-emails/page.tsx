@@ -20,7 +20,7 @@ interface CodeTemplates {
 
 const templates: Record<EmailEvent, CodeTemplates> = {
 	welcome: {
-		node: `import { Reloop } from '@reloop/sdk';
+		node: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop('rl_live_7x893k02j');
 
@@ -31,7 +31,7 @@ const { data, error } = await reloop.emails.send({
   html: '<h1>Welcome aboard, Jane!</h1>',
   tags: { category: 'welcome_series' }
 });`,
-		python: `from reloop import Reloop
+		python: `from reloop_email import Reloop
 
 reloop = Reloop("rl_live_7x893k02j")
 
@@ -46,7 +46,7 @@ response = reloop.emails.send(
 
 import (
 	"fmt"
-	"github.com/reloop/reloop-go"
+	"github.com/reloop-labs/reloop-email"
 )
 
 func main() {
@@ -73,7 +73,7 @@ func main() {
   }'`,
 	},
 	reset: {
-		node: `import { Reloop } from '@reloop/sdk';
+		node: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop('rl_live_7x893k02j');
 
@@ -84,7 +84,7 @@ const { data, error } = await reloop.emails.send({
   html: '<p>Click <a href="...">here</a> to reset password</p>',
   headers: { 'X-Entity-ID': 'user_8391' }
 });`,
-		python: `from reloop import Reloop
+		python: `from reloop_email import Reloop
 
 reloop = Reloop("rl_live_7x893k02j")
 
@@ -99,7 +99,7 @@ response = reloop.emails.send(
 
 import (
 	"fmt"
-	"github.com/reloop/reloop-go"
+	"github.com/reloop-labs/reloop-email"
 )
 
 func main() {
@@ -126,7 +126,7 @@ func main() {
   }'`,
 	},
 	receipt: {
-		node: `import { Reloop } from '@reloop/sdk';
+		node: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop('rl_live_7x893k02j');
 
@@ -136,7 +136,7 @@ const { data, error } = await reloop.emails.send({
   subject: 'Your receipt for Order #39281',
   html: '<strong>Thanks for your purchase!</strong>'
 });`,
-		python: `from reloop import Reloop
+		python: `from reloop_email import Reloop
 
 reloop = Reloop("rl_live_7x893k02j")
 
@@ -150,7 +150,7 @@ response = reloop.emails.send(
 
 import (
 	"fmt"
-	"github.com/reloop/reloop-go"
+	"github.com/reloop-labs/reloop-email"
 )
 
 func main() {
@@ -837,7 +837,7 @@ const TransactionEmailsPage = () => {
 									Install our client library package into your local codebase
 									dependencies:
 									<code className="mt-4 block rounded border border-white/5 bg-[#0a0a0a] p-2 font-mono text-[11.5px] text-violet-300">
-										npm install @reloop/sdk
+										npm install reloop-email
 									</code>
 								</p>
 							</div>

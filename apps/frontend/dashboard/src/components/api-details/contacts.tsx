@@ -39,11 +39,11 @@ const codeExamples = {
 	nodejs: {
 		add: {
 			filename: "add_contact.js",
-			code: `import { ReloopClient } from 'reloop';
+			code: `import Reloop from 'reloop-email';
 
-const client = new ReloopClient('re_xxxxxxxx');
+const reloop = new Reloop({ key: 're_xxxxxxxx' });
 
-const { data, error } = await client.contacts.create({
+const { data, error } = await reloop.contacts.create({
   email:      'john@example.com',
   firstName:  'John',
   lastName:   'Doe',
@@ -53,34 +53,34 @@ const { data, error } = await client.contacts.create({
 		},
 		get: {
 			filename: "get_contact.js",
-			code: `import { ReloopClient } from 'reloop';
+			code: `import Reloop from 'reloop-email';
 
-const client = new ReloopClient('re_xxxxxxxx');
+const reloop = new Reloop({ key: 're_xxxxxxxx' });
 
 // Get by contact id
-await client.contacts.get('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d');
+await reloop.contacts.get('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d');
 
 // Get by email
-await client.contacts.get({ email: 'john@example.com' });`,
+await reloop.contacts.get({ email: 'john@example.com' });`,
 		},
 		list: {
 			filename: "list_contacts.js",
-			code: `import { ReloopClient } from 'reloop';
+			code: `import Reloop from 'reloop-email';
 
-const client = new ReloopClient('re_xxxxxxxx');
+const reloop = new Reloop({ key: 're_xxxxxxxx' });
 
-const { data } = await client.contacts.list({
+const { data } = await reloop.contacts.list({
   page: 1,
   limit: undefined,
 });`,
 		},
 		update: {
 			filename: "update_contact.js",
-			code: `import { ReloopClient } from 'reloop';
+			code: `import Reloop from 'reloop-email';
 
-const client = new ReloopClient('re_xxxxxxxx');
+const reloop = new Reloop({ key: 're_xxxxxxxx' });
 
-const { data, error } = await client.contacts.update(
+const { data, error } = await reloop.contacts.update(
   '5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d',
   {
     firstName:  'Steve',
@@ -90,21 +90,21 @@ const { data, error } = await client.contacts.update(
 		},
 		delete: {
 			filename: "delete_contact.js",
-			code: `import { ReloopClient } from 'reloop';
+			code: `import Reloop from 'reloop-email';
 
-const client = new ReloopClient('re_xxxxxxxx');
+const reloop = new Reloop({ key: 're_xxxxxxxx' });
 
-await client.contacts.delete('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d');`,
+await reloop.contacts.delete('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d');`,
 		},
 	},
 	python: {
 		add: {
 			filename: "add_contact.py",
-			code: `from reloop import ReloopClient
+			code: `from reloop_email import Reloop
 
-client = ReloopClient('re_xxxxxxxx')
+reloop = Reloop('re_xxxxxxxx')
 
-data, error = client.contacts.create(
+data, error = reloop.contacts.create(
     email='john@example.com',
     first_name='John',
     last_name='Doe',
@@ -114,34 +114,34 @@ data, error = client.contacts.create(
 		},
 		get: {
 			filename: "get_contact.py",
-			code: `from reloop import ReloopClient
+			code: `from reloop_email import Reloop
 
-client = ReloopClient('re_xxxxxxxx')
+reloop = Reloop('re_xxxxxxxx')
 
 # Get by contact id
-client.contacts.get('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d')
+reloop.contacts.get('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d')
 
 # Get by email
-client.contacts.get(email='john@example.com')`,
+reloop.contacts.get(email='john@example.com')`,
 		},
 		list: {
 			filename: "list_contacts.py",
-			code: `from reloop import ReloopClient
+			code: `from reloop_email import Reloop
 
-client = ReloopClient('re_xxxxxxxx')
+reloop = Reloop('re_xxxxxxxx')
 
-data = client.contacts.list(
+data = reloop.contacts.list(
     page=1,
     limit=None,
 )`,
 		},
 		update: {
 			filename: "update_contact.py",
-			code: `from reloop import ReloopClient
+			code: `from reloop_email import Reloop
 
-client = ReloopClient('re_xxxxxxxx')
+reloop = Reloop('re_xxxxxxxx')
 
-data, error = client.contacts.update(
+data, error = reloop.contacts.update(
     '5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d',
     first_name='Steve',
     subscribed=True,
@@ -149,11 +149,11 @@ data, error = client.contacts.update(
 		},
 		delete: {
 			filename: "delete_contact.py",
-			code: `from reloop import ReloopClient
+			code: `from reloop_email import Reloop
 
-client = ReloopClient('re_xxxxxxxx')
+reloop = Reloop('re_xxxxxxxx')
 
-client.contacts.delete('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d')`,
+reloop.contacts.delete('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d')`,
 		},
 	},
 	php: {
@@ -211,12 +211,14 @@ $reloop->contacts->delete('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d');`,
 			filename: "add_contact.go",
 			code: `package main
 
-import "github.com/reloop-labs/reloop-go"
+import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
-    client := reloop.NewClient("re_xxxxxxxx")
+    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
+        APIKey: "re_xxxxxxxx",
+    })
 
-    result, err := client.Contacts.Create(&reloop.CreateContactParams{
+    result, err := reloop.Contacts().Create(&reloopemail.CreateContactParams{
         Email:      "john@example.com",
         FirstName:  "John",
         LastName:   "Doe",
@@ -229,28 +231,32 @@ func main() {
 			filename: "get_contact.go",
 			code: `package main
 
-import "github.com/reloop-labs/reloop-go"
+import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
-    client := reloop.NewClient("re_xxxxxxxx")
+    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
+        APIKey: "re_xxxxxxxx",
+    })
 
     // Get by contact id
-    client.Contacts.Get("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d")
+    reloop.Contacts().Get("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d")
 
     // Get by email
-    client.Contacts.GetByEmail("john@example.com")
+    reloop.Contacts().GetByEmail("john@example.com")
 }`,
 		},
 		list: {
 			filename: "list_contacts.go",
 			code: `package main
 
-import "github.com/reloop-labs/reloop-go"
+import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
-    client := reloop.NewClient("re_xxxxxxxx")
+    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
+        APIKey: "re_xxxxxxxx",
+    })
 
-    data, err := client.Contacts.List(&reloop.ListParams{
+    data, err := reloop.Contacts().List(&reloopemail.ListParams{
         Page:  1,
         Limit: nil,
     })
@@ -260,14 +266,16 @@ func main() {
 			filename: "update_contact.go",
 			code: `package main
 
-import "github.com/reloop-labs/reloop-go"
+import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
-    client := reloop.NewClient("re_xxxxxxxx")
+    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
+        APIKey: "re_xxxxxxxx",
+    })
 
-    result, err := client.Contacts.Update(
+    result, err := reloop.Contacts().Update(
         "5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d",
-        &reloop.UpdateContactParams{
+        &reloopemail.UpdateContactParams{
             FirstName:  "Steve",
             Subscribed: true,
         },
@@ -278,23 +286,25 @@ func main() {
 			filename: "delete_contact.go",
 			code: `package main
 
-import "github.com/reloop-labs/reloop-go"
+import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
-    client := reloop.NewClient("re_xxxxxxxx")
+    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
+        APIKey: "re_xxxxxxxx",
+    })
 
-    client.Contacts.Delete("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d")
+    reloop.Contacts().Delete("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d")
 }`,
 		},
 	},
 	ruby: {
 		add: {
 			filename: "add_contact.rb",
-			code: `require 'reloop'
+			code: `require 'reloop-email'
 
-client = Reloop::Client.new('re_xxxxxxxx')
+reloop = Reloop::Client.new('re_xxxxxxxx')
 
-result = client.contacts.create(
+result = reloop.contacts.create(
   email:      'john@example.com',
   first_name: 'John',
   last_name:  'Doe',
@@ -304,34 +314,34 @@ result = client.contacts.create(
 		},
 		get: {
 			filename: "get_contact.rb",
-			code: `require 'reloop'
+			code: `require 'reloop-email'
 
-client = Reloop::Client.new('re_xxxxxxxx')
+reloop = Reloop::Client.new('re_xxxxxxxx')
 
 # Get by contact id
-client.contacts.get('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d')
+reloop.contacts.get('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d')
 
 # Get by email
-client.contacts.get(email: 'john@example.com')`,
+reloop.contacts.get(email: 'john@example.com')`,
 		},
 		list: {
 			filename: "list_contacts.rb",
-			code: `require 'reloop'
+			code: `require 'reloop-email'
 
-client = Reloop::Client.new('re_xxxxxxxx')
+reloop = Reloop::Client.new('re_xxxxxxxx')
 
-data = client.contacts.list(
+data = reloop.contacts.list(
   page:  1,
   limit: nil
 )`,
 		},
 		update: {
 			filename: "update_contact.rb",
-			code: `require 'reloop'
+			code: `require 'reloop-email'
 
-client = Reloop::Client.new('re_xxxxxxxx')
+reloop = Reloop::Client.new('re_xxxxxxxx')
 
-result = client.contacts.update(
+result = reloop.contacts.update(
   '5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d',
   first_name: 'Steve',
   subscribed: true
@@ -339,21 +349,21 @@ result = client.contacts.update(
 		},
 		delete: {
 			filename: "delete_contact.rb",
-			code: `require 'reloop'
+			code: `require 'reloop-email'
 
-client = Reloop::Client.new('re_xxxxxxxx')
+reloop = Reloop::Client.new('re_xxxxxxxx')
 
-client.contacts.delete('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d')`,
+reloop.contacts.delete('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d')`,
 		},
 	},
 	rust: {
 		add: {
 			filename: "add_contact.rs",
-			code: `use reloop::ReloopClient;
+			code: `use reloop_email::ReloopEmail;
 
-let client = ReloopClient::new("re_xxxxxxxx");
+let reloop = ReloopEmail::new("re_xxxxxxxx".to_string(), None);
 
-let result = client.contacts().create(
+let result = reloop.contacts().create(
     CreateContactParams::builder()
         .email("john@example.com")
         .first_name("John")
@@ -365,23 +375,23 @@ let result = client.contacts().create(
 		},
 		get: {
 			filename: "get_contact.rs",
-			code: `use reloop::ReloopClient;
+			code: `use reloop_email::ReloopEmail;
 
-let client = ReloopClient::new("re_xxxxxxxx");
+let reloop = ReloopEmail::new("re_xxxxxxxx".to_string(), None);
 
 // Get by contact id
-client.contacts().get("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d").await?;
+reloop.contacts().get("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d").await?;
 
 // Get by email
-client.contacts().get_by_email("john@example.com").await?;`,
+reloop.contacts().get_by_email("john@example.com").await?;`,
 		},
 		list: {
 			filename: "list_contacts.rs",
-			code: `use reloop::ReloopClient;
+			code: `use reloop_email::ReloopEmail;
 
-let client = ReloopClient::new("re_xxxxxxxx");
+let reloop = ReloopEmail::new("re_xxxxxxxx".to_string(), None);
 
-let data = client.contacts().list(
+let data = reloop.contacts().list(
     ListParams::builder()
         .page(1)
         .build(),
@@ -389,11 +399,11 @@ let data = client.contacts().list(
 		},
 		update: {
 			filename: "update_contact.rs",
-			code: `use reloop::ReloopClient;
+			code: `use reloop_email::ReloopEmail;
 
-let client = ReloopClient::new("re_xxxxxxxx");
+let reloop = ReloopEmail::new("re_xxxxxxxx".to_string(), None);
 
-let result = client.contacts().update(
+let result = reloop.contacts().update(
     "5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d",
     UpdateContactParams::builder()
         .first_name("Steve")
@@ -403,22 +413,22 @@ let result = client.contacts().update(
 		},
 		delete: {
 			filename: "delete_contact.rs",
-			code: `use reloop::ReloopClient;
+			code: `use reloop_email::ReloopEmail;
 
-let client = ReloopClient::new("re_xxxxxxxx");
+let reloop = ReloopEmail::new("re_xxxxxxxx".to_string(), None);
 
-client.contacts().delete("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d").await?;`,
+reloop.contacts().delete("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d").await?;`,
 		},
 	},
 	java: {
 		add: {
 			filename: "AddContact.java",
-			code: `import com.reloop.ReloopClient;
-import com.reloop.models.Contact;
+			code: `import sh.reloop.email.ReloopEmail;
+import sh.reloop.email.models.Contact;
 
-ReloopClient client = new ReloopClient("re_xxxxxxxx");
+ReloopEmail reloop = ReloopEmail.client("re_xxxxxxxx");
 
-Contact contact = client.contacts().create(
+Contact contact = reloop.contacts().create(
     CreateContactParams.builder()
         .email("john@example.com")
         .firstName("John")
@@ -430,24 +440,24 @@ Contact contact = client.contacts().create(
 		},
 		get: {
 			filename: "GetContact.java",
-			code: `import com.reloop.ReloopClient;
+			code: `import sh.reloop.email.ReloopEmail;
 
-ReloopClient client = new ReloopClient("re_xxxxxxxx");
+ReloopEmail reloop = ReloopEmail.client("re_xxxxxxxx");
 
 // Get by contact id
-client.contacts().get("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d");
+reloop.contacts().get("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d");
 
 // Get by email
-client.contacts().getByEmail("john@example.com");`,
+reloop.contacts().getByEmail("john@example.com");`,
 		},
 		list: {
 			filename: "ListContacts.java",
-			code: `import com.reloop.ReloopClient;
-import com.reloop.models.ContactList;
+			code: `import sh.reloop.email.ReloopEmail;
+import sh.reloop.email.models.ContactList;
 
-ReloopClient client = new ReloopClient("re_xxxxxxxx");
+ReloopEmail reloop = ReloopEmail.client("re_xxxxxxxx");
 
-ContactList data = client.contacts().list(
+ContactList data = reloop.contacts().list(
     ListParams.builder()
         .page(1)
         .build()
@@ -455,11 +465,11 @@ ContactList data = client.contacts().list(
 		},
 		update: {
 			filename: "UpdateContact.java",
-			code: `import com.reloop.ReloopClient;
+			code: `import sh.reloop.email.ReloopEmail;
 
-ReloopClient client = new ReloopClient("re_xxxxxxxx");
+ReloopEmail reloop = ReloopEmail.client("re_xxxxxxxx");
 
-client.contacts().update(
+reloop.contacts().update(
     "5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d",
     UpdateContactParams.builder()
         .firstName("Steve")
@@ -469,21 +479,21 @@ client.contacts().update(
 		},
 		delete: {
 			filename: "DeleteContact.java",
-			code: `import com.reloop.ReloopClient;
+			code: `import sh.reloop.email.ReloopEmail;
 
-ReloopClient client = new ReloopClient("re_xxxxxxxx");
+ReloopEmail reloop = ReloopEmail.client("re_xxxxxxxx");
 
-client.contacts().delete("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d");`,
+reloop.contacts().delete("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d");`,
 		},
 	},
 	dotnet: {
 		add: {
 			filename: "AddContact.cs",
-			code: `using Reloop;
+			code: `using Reloop.Email;
 
-var client = new ReloopClient("re_xxxxxxxx");
+var reloop = ReloopEmail.Client("re_xxxxxxxx");
 
-var contact = await client.Contacts.CreateAsync(new CreateContactParams
+var contact = await reloop.Contacts.CreateAsync(new CreateContactParams
 {
     Email      = "john@example.com",
     FirstName  = "John",
@@ -494,23 +504,23 @@ var contact = await client.Contacts.CreateAsync(new CreateContactParams
 		},
 		get: {
 			filename: "GetContact.cs",
-			code: `using Reloop;
+			code: `using Reloop.Email;
 
-var client = new ReloopClient("re_xxxxxxxx");
+var reloop = ReloopEmail.Client("re_xxxxxxxx");
 
 // Get by contact id
-await client.Contacts.GetAsync("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d");
+await reloop.Contacts.GetAsync("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d");
 
 // Get by email
-await client.Contacts.GetByEmailAsync("john@example.com");`,
+await reloop.Contacts.GetByEmailAsync("john@example.com");`,
 		},
 		list: {
 			filename: "ListContacts.cs",
-			code: `using Reloop;
+			code: `using Reloop.Email;
 
-var client = new ReloopClient("re_xxxxxxxx");
+var reloop = ReloopEmail.Client("re_xxxxxxxx");
 
-var data = await client.Contacts.ListAsync(new ListParams
+var data = await reloop.Contacts.ListAsync(new ListParams
 {
     Page  = 1,
     Limit = null
@@ -518,11 +528,11 @@ var data = await client.Contacts.ListAsync(new ListParams
 		},
 		update: {
 			filename: "UpdateContact.cs",
-			code: `using Reloop;
+			code: `using Reloop.Email;
 
-var client = new ReloopClient("re_xxxxxxxx");
+var reloop = ReloopEmail.Client("re_xxxxxxxx");
 
-await client.Contacts.UpdateAsync(
+await reloop.Contacts.UpdateAsync(
     "5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d",
     new UpdateContactParams
     {
@@ -533,11 +543,11 @@ await client.Contacts.UpdateAsync(
 		},
 		delete: {
 			filename: "DeleteContact.cs",
-			code: `using Reloop;
+			code: `using Reloop.Email;
 
-var client = new ReloopClient("re_xxxxxxxx");
+var reloop = ReloopEmail.Client("re_xxxxxxxx");
 
-await client.Contacts.DeleteAsync("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d");`,
+await reloop.Contacts.DeleteAsync("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d");`,
 		},
 	},
 	curl: {

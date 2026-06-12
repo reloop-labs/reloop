@@ -8,8 +8,11 @@
 		"start": "next start",
 		"generate:api-docs": "bun run scripts/generate-api-docs.ts",
 		"sync:code-samples": "bun run scripts/sync-code-samples-from-source.ts",
+		"standardize:reloop-email": "bun run scripts/standardize-reloop-email-samples.ts",
 		"update:go-samples": "bun run scripts/update-go-from-python-samples.ts",
-		"update:java-samples": "bun run scripts/update-java-from-python-samples.ts"
+		"update:java-samples": "bun run scripts/update-java-from-python-samples.ts",
+		"update:rust-samples": "bun run scripts/update-rust-from-python-samples.ts",
+		"update:dotnet-samples": "bun run scripts/update-dotnet-from-python-samples.ts"
 	},
 	"dependencies": {
 		"@mintlify/components": "catalog:ui",

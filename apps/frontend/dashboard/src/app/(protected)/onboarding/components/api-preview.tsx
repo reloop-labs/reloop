@@ -35,12 +35,12 @@ console.log(result);`,
 		},
 		python: {
 			code: `import os
-from reloop import Reloop
+from reloop_email import Reloop
 
 # RELOOP_API_KEY=${keyDisplay}
-client = Reloop(os.environ["RELOOP_API_KEY"])
+reloop = Reloop(api_key=os.environ["RELOOP_API_KEY"])
 
-result = client.mail.send(
+result = reloop.mail.send(
     from_email="sender@example.com",
     to="recipient@example.com",
     subject="Hello from Reloop!",
@@ -56,14 +56,16 @@ print(result)`,
 import (
   "fmt"
   "os"
-  "github.com/reloop/reloop-go"
+  reloopemail "github.com/reloop-labs/reloop-email"
 )
 
 // RELOOP_API_KEY=${keyDisplay}
 func main() {
-  client := reloop.NewClient(os.Getenv("RELOOP_API_KEY"))
+  reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
+    APIKey: os.Getenv("RELOOP_API_KEY"),
+  })
 
-  result, err := client.Mail.Send(&reloop.MailRequest{
+  result, err := reloop.Mail().Send(&reloopemail.MailRequest{
     From:    "sender@example.com",
     To:      "recipient@example.com",
     Subject: "Hello from Reloop!",

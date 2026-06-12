@@ -3,7 +3,7 @@ export const createApiKeyXCodeSamples = [
 		id: "node",
 		lang: "javascript",
 		label: "Node.js",
-		source: `import { Reloop } from "@reloop/node";
+		source: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop({ key: "rl_123456789" });
 
@@ -30,7 +30,9 @@ const apiKey = await reloop.apiKey.create({
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `reloop = Reloop(api_key="rl_123456789")
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
 
 reloop.api_keys.create(
     name="Production key",
@@ -38,18 +40,39 @@ reloop.api_keys.create(
     rate_limit_enabled=True
 )`,
 	},
+	{
+		id: "rust",
+		lang: "rust",
+		label: "Rust",
+		source: `use reloop_email::ReloopEmail;
+use serde_json::json;
+use reloop_email::{CreateApiKeyParams, UpdateApiKeyParams, ApiKeyListParams};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopEmail::new("rl_123456789".to_string(), None);
+    
+    reloop.api_keys().create(CreateApiKeyParams {
+            name: "Production key".to_string(),
+        enabled: Some(true),
+        rate_limit_enabled: Some(true),
+        }).await?;
+
+    Ok(())
+}`,
+	},
 			{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `import reloop
+		source: `import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
-    client, _ := reloop.NewClient(reloop.ClientOptions{
+    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
         APIKey: "rl_123456789",
     })
     
-    _, _ = client.ApiKeys.Create(reloop.CreateApiKeyParams{
+    _, _ = reloop.ApiKeys().Create(reloop.CreateApiKeyParams{
         Name: "Production key",
         Enabled: reloop.Bool(true),
         RateLimitEnabled: reloop.Bool(true)
@@ -74,32 +97,27 @@ $reloop->apiKeys->create(
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+		source: `import sh.reloop.email.ReloopEmail;
+import sh.reloop.email.Models.*;
 
-ReloopClient reloop = new ReloopClient("rl_123456789");
+ReloopEmail reloop = ReloopEmail.client("rl_123456789");
 
-reloop.apiKeys.create(new CreateApiKeyParams("Production key", true, true));`,
+reloop.apiKeys().create(new CreateApiKeyParams("Production key", true, true));`,
 	},
-	{
+		{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",
-		source: `using System.Net.Http;
-using System.Net.Http.Json;
+		source: `using Reloop.Email;
+using Reloop.Email.Models;
 
-var client = new HttpClient();
-client.DefaultRequestHeaders.Add("Authorization", "Bearer rl_123456789");
+var reloop = ReloopEmail.Client("rl_123456789");
 
-var payload = new {
-    name = "Production key",
-    enabled = true,
-    rateLimitEnabled = true
-};
-
-var response = await client.PostAsJsonAsync(
-    "https://api.reloop.sh/api-key/v1/",
-    payload
-);`,
+await reloop.ApiKeys().CreateAsync(new CreateApiKeyParams
+{
+    Name = "Production key",
+    Enabled = true,
+    RateLimitEnabled = true,
+});`,
 	},
 ];

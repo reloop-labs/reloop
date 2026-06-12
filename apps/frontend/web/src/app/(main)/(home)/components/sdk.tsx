@@ -132,8 +132,8 @@ const sdks: SdkType[] = [
 		id: "node",
 		name: "Node.js",
 		icon: "⚡",
-		install: "npm install @reloop/sdk",
-		code: `import Reloop from '@reloop/sdk';
+		install: "npm install reloop-email
+		code: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop({
   url: 'https://api.reloop.sh',
@@ -152,18 +152,20 @@ const result = await reloop.mail.send({
 		id: "go",
 		name: "Go",
 		icon: "🐹",
-		install: "go get github.com/reloop/sdk-go",
+		install: "go get github.com/reloop-labs/reloop-email",
 		code: `package main
 
 import (
   "fmt"
-  "github.com/reloop/sdk-go"
+  reloopemail "github.com/reloop-labs/reloop-email"
 )
 
 func main() {
-  client := reloop.NewClient("your-api-key")
+  reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
+    APIKey: "your-api-key",
+  })
 
-  result, err := client.Mail.Send(&reloop.MailRequest{
+  result, err := reloop.Mail().Send(&reloopemail.MailRequest{
     From:    "sender@example.com",
     To:      "recipient@example.com",
     Subject: "Hello",
@@ -182,7 +184,7 @@ func main() {
 		id: "php",
 		name: "PHP",
 		icon: "🐘",
-		install: "composer require reloop/sdk",
+		install: "composer require reloop/reloop-email",
 		code: `$reloop = Reloop::client('your-api-key');
 
 $reloop->emails->send([
@@ -196,13 +198,12 @@ $reloop->emails->send([
 		id: "python",
 		name: "Python",
 		icon: "🐍",
-		install: "pip install reloop-sdk",
-		code: `from reloop import Reloop
+		install: "pip install reloop-email",
+		code: `from reloop_email import Reloop
 
 # Initialize the client
 reloop = Reloop(
-    url='https://api.reloop.sh',
-    key='your-api-key'
+    api_key='your-api-key'
 )
 
 # Send an email

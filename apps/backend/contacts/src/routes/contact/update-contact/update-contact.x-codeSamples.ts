@@ -20,7 +20,7 @@ const reloop = new Reloop({
   key: 're_123456789'
 });
 
-const { response: contact, error } = await reloop.contacts.update('cont_123456789', {
+const { response: contact, error } = await reloop.contacts().update('cont_123456789', {
   firstName: 'Jane',
   lastName: 'Smith',
   status: 'subscribed',
@@ -63,9 +63,11 @@ $reloop->contacts->update(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `reloop = Reloop(api_key="re_123456789")
+		source: `from reloop_email import Reloop
 
-reloop.contacts.update(
+reloop = Reloop(api_key="re_123456789")
+
+reloop.contacts().update(
     "cont_123456789",
     first_name="Jane",
     last_name="Smith",
@@ -107,14 +109,14 @@ contact = JSON.parse(response.body)`,
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `import reloop
+		source: `import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
-    client, _ := reloop.NewClient(reloop.ClientOptions{
+    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
         APIKey: "re_123456789",
     })
     
-    _, _ = client.Contacts.Update("cont_123456789", map[string]interface{}{
+    _, _ = reloop.Contacts().Update("cont_123456789", map[string]interface{}{
         "first_name": "Jane",
         "last_name": "Smith",
         "unsubscribed": false,
@@ -122,31 +124,26 @@ func main() {
     })
 }`,
 	},
-	{
+		{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
-		source: `use reqwest::Client;
+		source: `use reloop_email::ReloopEmail;
 use serde_json::json;
 
 #[tokio::main]
-async fn main() -> Result<(), reqwest::Error> {
-    let client = Client::new();
-
-    let response = client
-        .patch("https://reloop.sh/api/contacts/cont_123456789")
-        .header("x-api-key", "re_123456789")
-        .json(&json!({
-            "firstName": "Jane",
-            "lastName": "Smith",
-            "status": "subscribed",
-            "properties": {
-                "company": "Reloop",
-                "role": "Designer"
-            }
-        }))
-        .send()
-        .await?;
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopEmail::new("re_123456789".to_string(), None);
+    
+    reloop.contacts().update("cont_123456789", json!({
+        "first_name": "Jane",
+        "last_name": "Smith",
+        "unsubscribed": false,
+        "properties": {
+        "company": "Reloop",
+        "role": "Designer",
+    },
+    })).await?;
 
     Ok(())
 }`,
@@ -155,33 +152,31 @@ async fn main() -> Result<(), reqwest::Error> {
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import sh.reloop.ReloopClient;
+		source: `import sh.reloop.email.ReloopEmail;
 import java.util.*;
 
-ReloopClient reloop = new ReloopClient("re_123456789");
+ReloopEmail reloop = ReloopEmail.client("re_123456789");
 
-reloop.contacts.update("cont_123456789", Map.of("first_name", "Jane", "last_name", "Smith", "unsubscribed", false, "properties", Map.of("company", "Reloop", "role", "Designer")));`,
+reloop.contacts().update("cont_123456789", Map.of("first_name", "Jane", "last_name", "Smith", "unsubscribed", false, "properties", Map.of("company", "Reloop", "role", "Designer")));`,
 	},
-	{
+		{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",
-		source: `using System.Net.Http;
-using System.Net.Http.Json;
+		source: `using Reloop.Email;
+using System.Collections.Generic;
 
-var client = new HttpClient();
-client.DefaultRequestHeaders.Add("x-api-key", "re_123456789");
+var reloop = ReloopEmail.Client("re_123456789");
 
-var update = new {
-    firstName = "Jane",
-    lastName = "Smith",
-    status = "subscribed",
-    properties = new { company = "Reloop", role = "Designer" },
+var parameters = new Dictionary<string, object?>();
+parameters["first_name"] = "Jane";
+parameters["last_name"] = "Smith";
+parameters["unsubscribed"] = false;
+parameters["properties"] = new Dictionary<string, object?>
+{
+    ["company"] = "Reloop",
+    ["role"] = "Designer",
 };
-
-var response = await client.PatchAsJsonAsync(
-    "https://reloop.sh/api/contacts/cont_123456789",
-    update
-);`,
+await reloop.Contacts().UpdateAsync("cont_123456789", parameters);`,
 	},
 ];

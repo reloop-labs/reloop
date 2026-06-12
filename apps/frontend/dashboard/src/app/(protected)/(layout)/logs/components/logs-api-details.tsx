@@ -36,11 +36,11 @@ const codeExamples = {
 	nodejs: {
 		list: {
 			filename: "list_logs.js",
-			code: `import { ReloopClient } from 'reloop';
+			code: `import Reloop from 'reloop-email';
 
-const client = new ReloopClient('re_xxxxxxxx');
+const reloop = new Reloop({ key: 're_xxxxxxxx' });
 
-const { data } = await client.logs.list({
+const { data } = await reloop.logs.list({
   page: 1,
   limit: 25,
   service: 'api-gateway'
@@ -48,21 +48,21 @@ const { data } = await client.logs.list({
 		},
 		get: {
 			filename: "get_log.js",
-			code: `import { ReloopClient } from 'reloop';
+			code: `import Reloop from 'reloop-email';
 
-const client = new ReloopClient('re_xxxxxxxx');
+const reloop = new Reloop({ key: 're_xxxxxxxx' });
 
-const { data } = await client.logs.get('log_xxxxxxxx');`,
+const { data } = await reloop.logs.get('log_xxxxxxxx');`,
 		},
 	},
 	python: {
 		list: {
 			filename: "list_logs.py",
-			code: `from reloop import ReloopClient
+			code: `from reloop_email import Reloop
 
-client = ReloopClient('re_xxxxxxxx')
+reloop = Reloop(api_key='re_xxxxxxxx')
 
-data = client.logs.list(
+data = reloop.logs.list(
     page=1,
     limit=25,
     service='api-gateway'
@@ -70,11 +70,11 @@ data = client.logs.list(
 		},
 		get: {
 			filename: "get_log.py",
-			code: `from reloop import ReloopClient
+			code: `from reloop_email import Reloop
 
-client = ReloopClient('re_xxxxxxxx')
+reloop = Reloop(api_key='re_xxxxxxxx')
 
-data = client.logs.get('log_xxxxxxxx')`,
+data = reloop.logs.get('log_xxxxxxxx')`,
 		},
 	},
 	curl: {

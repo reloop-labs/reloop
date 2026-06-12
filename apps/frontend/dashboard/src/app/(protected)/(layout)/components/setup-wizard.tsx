@@ -66,19 +66,19 @@ const languages: { id: LangId; label: string }[] = [
 ];
 
 const sdkNames: Record<LangId, string> = {
-	nodejs: "@reloop/node",
-	python: "reloop-python",
+	nodejs: "reloop-email",
+	python: "reloop-email",
 	php: "reloop/reloop-email",
-	ruby: "reloop",
-	go: "github.com/reloop-labs/reloop-go",
+	ruby: "reloop-email",
+	go: "github.com/reloop-labs/reloop-email",
 };
 
 const installCommands: Record<LangId, string> = {
-	nodejs: "npm install @reloop/node",
-	python: "pip install reloop-python",
+	nodejs: "npm install reloop-email",
+	python: "pip install reloop-email",
 	php: "composer require reloop/reloop-email",
-	ruby: "gem install reloop",
-	go: "go get github.com/reloop-labs/reloop-go",
+	ruby: "gem install reloop-email",
+	go: "go get github.com/reloop-labs/reloop-email",
 };
 
 const shikiLang: Record<LangId, string> = {
@@ -152,7 +152,7 @@ function buildCodeSnippet(
 	const fromAddr = `hello@${domain}`;
 	switch (lang) {
 		case "nodejs":
-			return `import { Reloop } from "@reloop/node";
+			return `import Reloop from 'reloop-email';
 
 const reloop = new Reloop({
   apiKey: "${apiKeyDisplay}"
@@ -175,7 +175,7 @@ try {
   console.error("Error sending email:", err);
 }`;
 		case "python":
-			return `from reloop import Reloop
+			return `from reloop_email import Reloop
 
 reloop = Reloop(api_key="${apiKeyDisplay}")
 
@@ -204,7 +204,7 @@ try {
     echo 'Failed to send: ' . $e->getMessage();
 }`;
 		case "ruby":
-			return `require 'reloop'
+			return `require 'reloop-email'
 
 reloop = Reloop::Client.new(api_key: '${apiKeyDisplay}')
 
@@ -227,13 +227,15 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/reloop-labs/reloop-go"
+	reloopemail "github.com/reloop-labs/reloop-email"
 )
 
 func main() {
-	client := reloop.NewClient("${apiKeyDisplay}")
+	reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
+		APIKey: "${apiKeyDisplay}",
+	})
 
-	resp, err := client.Emails.Send(context.Background(), &reloop.SendEmailRequest{
+	resp, err := reloop.Emails().Send(context.Background(), &reloopemail.SendEmailRequest{
 		From:    "${fromAddr}",
 		To:      "user@example.com",
 		Subject: "Welcome aboard",

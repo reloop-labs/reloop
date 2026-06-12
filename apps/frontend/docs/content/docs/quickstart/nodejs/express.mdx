@@ -23,16 +23,16 @@ Install the Reloop Node.js SDK:
 
 <CodeGroup>
   ```bash npm
-  npm install @reloop/node
+  npm install reloop-email
   ```
   ```bash yarn
-  yarn add @reloop/node
+  yarn add reloop-email
   ```
   ```bash pnpm
-  pnpm add @reloop/node
+  pnpm add reloop-email
   ```
   ```bash bun
-  bun add @reloop/node
+  bun add reloop-email
   ```
 </CodeGroup>
 
@@ -43,12 +43,12 @@ Set up a simple Express route to send an email:
 <CodeGroup>
 ```javascript app.js
 import express from 'express';
-import { Reloop } from '@reloop/node';
+import Reloop from 'reloop-email';
 
 const app = express();
-const reloop = new Reloop('re_123456789');
+const reloop = ReloopEmail.client('re_123456789');
 
-app.post('/send-email', async (req, res) => {
+app.post('/sendreloop-email', async (req, res) => {
   const { data, error } = await reloop.emails.send({
     from: 'Acme <onboarding@reloop.dev>',
     to: ['delivered@reloop.dev'],

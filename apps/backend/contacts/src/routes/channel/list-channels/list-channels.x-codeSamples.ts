@@ -10,7 +10,7 @@ const reloop = new Reloop({
   key: 're_123456789'
 });
 
-const { response: channels, error } = await reloop.contacts.channels.list({
+const { response: channels, error } = await reloop.contacts().channels().list({
   page: 1,
   limit: 10,
 });
@@ -40,9 +40,11 @@ $reloop->contacts->channels->list(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `reloop = Reloop(api_key="re_123456789")
+		source: `from reloop_email import Reloop
 
-reloop.contacts.channels.list(
+reloop = Reloop(api_key="re_123456789")
+
+reloop.contacts().channels().list(
     page=1,
     limit=10
 )`,
@@ -69,35 +71,34 @@ channels = JSON.parse(response.body)`,
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `import reloop
+		source: `import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
-    client, _ := reloop.NewClient(reloop.ClientOptions{
+    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
         APIKey: "re_123456789",
     })
     
-    _, _ = client.Contacts.Channels.List(map[string]interface{}{
+    _, _ = reloop.Contacts().Channels.List(map[string]interface{}{
         "page": 1,
         "limit": 10
     })
 }`,
 	},
-	{
+		{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
-		source: `use reqwest::Client;
+		source: `use reloop_email::ReloopEmail;
+use serde_json::json;
 
 #[tokio::main]
-async fn main() -> Result<(), reqwest::Error> {
-    let client = Client::new();
-
-    let response = client
-        .get("https://reloop.sh/api/contacts/v1/channels/list")
-        .header("x-api-key", "re_123456789")
-        .query(&[("page", "1"), ("limit", "10")])
-        .send()
-        .await?;
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopEmail::new("re_123456789".to_string(), None);
+    
+    reloop.contacts().channels().list(json!({
+        "page": 1,
+        "limit": 10,
+    })).await?;
 
     Ok(())
 }`,
@@ -106,24 +107,26 @@ async fn main() -> Result<(), reqwest::Error> {
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import sh.reloop.ReloopClient;
+		source: `import sh.reloop.email.ReloopEmail;
 import java.util.*;
 
-ReloopClient reloop = new ReloopClient("re_123456789");
+ReloopEmail reloop = ReloopEmail.client("re_123456789");
 
-reloop.contacts.channels.list(Map.of("page", 1, "limit", 10));`,
+reloop.contacts().channels().list(Map.of("page", 1, "limit", 10));`,
 	},
-	{
+		{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",
-		source: `using System.Net.Http;
+		source: `using Reloop.Email;
+using System.Collections.Generic;
 
-var client = new HttpClient();
-client.DefaultRequestHeaders.Add("x-api-key", "re_123456789");
+var reloop = ReloopEmail.Client("re_123456789");
 
-var response = await client.GetAsync(
-    "https://reloop.sh/api/contacts/v1/channels/list?page=1&limit=10"
-);`,
+await reloop.Contacts().Channels.ListAsync(new Dictionary<string, object?>
+{
+    ["page"] = 1,
+    ["limit"] = 10,
+});`,
 	},
 ];

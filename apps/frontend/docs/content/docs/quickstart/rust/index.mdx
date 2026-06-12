@@ -35,7 +35,8 @@ Create a `main.rs` file and add the following code:
 
 <CodeGroup>
 ```rust main.rs
-use reloop::{Client, SendEmailParams};
+use reloop_email::ReloopEmail;
+use reloop_email::SendEmailParams;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

@@ -48,7 +48,7 @@ export default function Guide() {
 								Install the official Reloop Client SDK package for your
 								language:
 								<code className="mt-4 block rounded border border-white/5 bg-[#0a0a0a] p-2 font-mono text-[11.5px] text-primary-base">
-									npm install @reloop/sdk
+									npm install reloop-email
 								</code>
 							</p>
 						</div>

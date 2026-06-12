@@ -22,7 +22,7 @@ To get the most out of this guide, you'll need to:
 Install the Reloop Node.js SDK using Bun:
 
 ```bash
-bun add @reloop/node
+bun add reloop-email
 ```
 
 ## 2. Usage
@@ -30,9 +30,9 @@ bun add @reloop/node
 Use the native `Bun.serve` to send an email:
 
 ```typescript
-import { Reloop } from '@reloop/node';
+import Reloop from 'reloop-email';
 
-const reloop = new Reloop('re_123456789');
+const reloop = ReloopEmail.client('re_123456789');
 
 Bun.serve({
   async fetch(req) {

@@ -16,7 +16,7 @@ const reloop = new Reloop({
   key: 're_123456789'
 });
 
-const { response: channel, error } = await reloop.contacts.channels.update('chn_123456789', {
+const { response: channel, error } = await reloop.contacts().channels().update('chn_123456789', {
   name: 'Marketing News',
   description: 'Internal marketing updates',
   visibility: 'private',
@@ -51,9 +51,11 @@ $reloop->contacts->channels->update(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `reloop = Reloop(api_key="re_123456789")
+		source: `from reloop_email import Reloop
 
-reloop.contacts.channels.update(
+reloop = Reloop(api_key="re_123456789")
+
+reloop.contacts().channels().update(
     "chn_123456789",
     name="Marketing News",
     description="Internal marketing updates",
@@ -87,41 +89,36 @@ channel = JSON.parse(response.body)`,
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `import reloop
+		source: `import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
-    client, _ := reloop.NewClient(reloop.ClientOptions{
+    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
         APIKey: "re_123456789",
     })
     
-    _, _ = client.Contacts.Channels.Update("chn_123456789", map[string]interface{}{
+    _, _ = reloop.Contacts().Channels.Update("chn_123456789", map[string]interface{}{
         "name": "Marketing News",
         "description": "Internal marketing updates",
         "visibility": "private"
     })
 }`,
 	},
-	{
+		{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
-		source: `use reqwest::Client;
+		source: `use reloop_email::ReloopEmail;
 use serde_json::json;
 
 #[tokio::main]
-async fn main() -> Result<(), reqwest::Error> {
-    let client = Client::new();
-
-    let response = client
-        .patch("https://reloop.sh/api/contacts/v1/channels/chn_123456789")
-        .header("x-api-key", "re_123456789")
-        .json(&json!({
-            "name": "Marketing News",
-            "description": "Internal marketing updates",
-            "visibility": "private"
-        }))
-        .send()
-        .await?;
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopEmail::new("re_123456789".to_string(), None);
+    
+    reloop.contacts().channels().update("chn_123456789", json!({
+        "name": "Marketing News",
+        "description": "Internal marketing updates",
+        "visibility": "private",
+    })).await?;
 
     Ok(())
 }`,
@@ -130,32 +127,27 @@ async fn main() -> Result<(), reqwest::Error> {
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import sh.reloop.ReloopClient;
+		source: `import sh.reloop.email.ReloopEmail;
 import java.util.*;
 
-ReloopClient reloop = new ReloopClient("re_123456789");
+ReloopEmail reloop = ReloopEmail.client("re_123456789");
 
-reloop.contacts.channels.update("chn_123456789", Map.of("name", "Marketing News", "description", "Internal marketing updates", "visibility", "private"));`,
+reloop.contacts().channels().update("chn_123456789", Map.of("name", "Marketing News", "description", "Internal marketing updates", "visibility", "private"));`,
 	},
-	{
+		{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",
-		source: `using System.Net.Http;
-using System.Net.Http.Json;
+		source: `using Reloop.Email;
+using System.Collections.Generic;
 
-var client = new HttpClient();
-client.DefaultRequestHeaders.Add("x-api-key", "re_123456789");
+var reloop = ReloopEmail.Client("re_123456789");
 
-var update = new {
-    name = "Marketing News",
-    description = "Internal marketing updates",
-    visibility = "private",
-};
-
-var response = await client.PatchAsJsonAsync(
-    "https://reloop.sh/api/contacts/v1/channels/chn_123456789",
-    update
-);`,
+await reloop.Contacts().Channels.UpdateAsync("chn_123456789", new Dictionary<string, object?>
+{
+    ["name"] = "Marketing News",
+    ["description"] = "Internal marketing updates",
+    ["visibility"] = "private",
+});`,
 	},
 ];

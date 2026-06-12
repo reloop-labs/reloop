@@ -13,7 +13,118 @@ _apiData:
   operationData: [{"path":"/api/template/v1/{id}/versions","method":"post"}]
   parameterList: [{"name":"id","type":"string","required":true,"description":"","location":"path"},{"name":"content","type":"any[]","required":true,"description":"","location":"body"},{"name":"subject","type":"string","required":false,"description":"","location":"body","maxLength":500},{"name":"fromEmail","type":"string","required":false,"description":"","location":"body","maxLength":255},{"name":"replyTo","type":"string","required":false,"description":"","location":"body","maxLength":255},{"name":"previewText","type":"string","required":false,"description":"","location":"body"},{"name":"description","type":"string","required":false,"description":"","location":"body","maxLength":500},{"name":"name","type":"string","required":false,"description":"","location":"body","maxLength":255},{"name":"isMajor","type":"boolean","required":false,"description":"","location":"body"},{"name":"renderedHtml","type":"string","required":false,"description":"","location":"body"},{"name":"variables","type":"object[]","required":false,"description":"","location":"body","properties":[{"name":"name","type":"string","required":true,"description":"","location":"body"},{"name":"type","type":"\"string\" | \"number\"","required":true,"description":"","location":"body","enumValues":["string","number"]},{"name":"defaultValue","type":"string | null","required":true,"description":"","location":"body"}]}]
   responseMap: {"200":{"description":"Response for status 200","schema":{"id":"con_123456789","templateId":"example_templateId","version":0,"name":"Newsletter","isMajor":true,"subject":"Welcome to Reloop","fromEmail":"example_fromEmail","replyTo":"example_replyTo","previewText":"example_previewText","description":"example_description","content":[],"variables":[{"name":"Newsletter","type":"string","defaultValue":null}],"renderedHtml":"example_renderedHtml","createdByUserId":"example_createdByUserId","createdBy":{"id":"con_123456789","name":"Newsletter","email":"john.doe@example.com","image":"example_image"},"createdAt":"2026-03-23T10:00:00.000Z","draftNumber":0,"publishNumber":0}},"400":{"description":"Standard error response format","schema":{"message":"Contact already exists","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead.","link":"https://reloop.sh/docs/api/contacts"}},"401":{"description":"Standard error response format","schema":{"message":"Contact already exists","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead.","link":"https://reloop.sh/docs/api/contacts"}},"403":{"description":"Standard error response format","schema":{"message":"Contact already exists","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead.","link":"https://reloop.sh/docs/api/contacts"}},"404":{"description":"Standard error response format","schema":{"message":"Contact already exists","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead.","link":"https://reloop.sh/docs/api/contacts"}},"500":{"description":"Standard error response format","schema":{"message":"Contact already exists","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead.","link":"https://reloop.sh/docs/api/contacts"}}}
-  codeSamples: [{"id":"node","lang":"javascript","label":"Node.js","source":"import { Reloop } from \"@reloop/node\";\n\nconst reloop = new Reloop({ key: \"rl_123456789\" });\n\nconst version = await reloop.template.createVersion(\"tpl_123456789\", {\n  content: [],\n  isMajor: true,\n  name: \"v1.0.0\"\n});"},{"id":"curl","lang":"bash","label":"cURL","source":"curl -X POST https://api.reloop.sh/template/v1/tpl_123456789/versions \\\n  -H \"Authorization: Bearer rl_123456789\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"content\": [],\n    \"isMajor\": true,\n    \"name\": \"v1.0.0\"\n  }'"},{"id":"python","lang":"python","label":"Python","source":"import requests\n\nresponse = requests.post(\n    \"https://api.reloop.sh/template/v1/tpl_123456789/versions\",\n    headers={\n        \"Authorization\": \"Bearer rl_123456789\",\n        \"Content-Type\": \"application/json\",\n    },\n    json={\n        \"content\": [],\n        \"isMajor\": True,\n        \"name\": \"v1.0.0\",\n    },\n)\n\nversion = response.json()"},{"id":"php","lang":"php","label":"PHP","source":"<?php\n$client = new \\GuzzleHttp\\Client();\n\n$response = $client->post('https://api.reloop.sh/template/v1/tpl_123456789/versions', [\n    'headers' => [\n        'Authorization' => 'Bearer rl_123456789',\n        'Content-Type'  => 'application/json',\n    ],\n    'json' => [\n        'content' => [],\n        'isMajor' => true,\n        'name' => 'v1.0.0',\n    ],\n]);\n\n$version = json_decode($response->getBody(), true);"},{"id":"java","lang":"java","label":"Java","source":"import java.net.URI;\nimport java.net.http.*;\nimport java.net.http.HttpRequest.BodyPublishers;\n\nHttpClient client = HttpClient.newHttpClient();\n\nString body = \"\"\"\n    {\n      \"content\": [],\n      \"isMajor\": true,\n      \"name\": \"v1.0.0\"\n    }\n    \"\"\";\n\nHttpRequest request = HttpRequest.newBuilder()\n    .uri(URI.create(\"https://api.reloop.sh/template/v1/tpl_123456789/versions\"))\n    .header(\"Authorization\", \"Bearer rl_123456789\")\n    .header(\"Content-Type\", \"application/json\")\n    .POST(BodyPublishers.ofString(body))\n    .build();\n\nHttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());"},{"id":"dotnet","lang":"csharp","label":".NET","source":"using System.Net.Http;\nusing System.Net.Http.Json;\n\nvar client = new HttpClient();\nclient.DefaultRequestHeaders.Add(\"Authorization\", \"Bearer rl_123456789\");\n\nvar payload = new {\n    content = new object[] {},\n    isMajor = true,\n    name = \"v1.0.0\"\n};\n\nvar response = await client.PostAsJsonAsync(\n    \"https://api.reloop.sh/template/v1/tpl_123456789/versions\",\n    payload\n);"}]
+  codeSamples:
+    - id: node
+      lang: javascript
+      label: Node.js
+      source: |-
+        import Reloop from 'reloop-email';
+        
+        const reloop = new Reloop({ key: "rl_123456789" });
+        
+        const version = await reloop.template.createVersion("tpl_123456789", {
+          content: [],
+          isMajor: true,
+          name: "v1.0.0"
+        });
+    - id: curl
+      lang: bash
+      label: cURL
+      source: |-
+        curl -X POST https://api.reloop.sh/template/v1/tpl_123456789/versions \\
+          -H "Authorization: Bearer rl_123456789" \\
+          -H "Content-Type: application/json" \\
+          -d '{
+            "content": [],
+            "isMajor": true,
+            "name": "v1.0.0"
+          }'
+    - id: python
+      lang: python
+      label: Python
+      source: |-
+        import requests
+        
+        response = requests.post(
+            "https://api.reloop.sh/template/v1/tpl_123456789/versions",
+            headers={
+                "Authorization": "Bearer rl_123456789",
+                "Content-Type": "application/json",
+            },
+            json={
+                "content": [],
+                "isMajor": True,
+                "name": "v1.0.0",
+            },
+        )
+        
+        version = response.json()
+    - id: php
+      lang: php
+      label: PHP
+      source: |-
+        <?php
+        $client = new \\GuzzleHttp\\Client();
+        
+        $response = $client->post('https://api.reloop.sh/template/v1/tpl_123456789/versions', [
+            'headers' => [
+                'Authorization' => 'Bearer rl_123456789',
+                'Content-Type'  => 'application/json',
+            ],
+            'json' => [
+                'content' => [],
+                'isMajor' => true,
+                'name' => 'v1.0.0',
+            ],
+        ]);
+        
+        $version = json_decode($response->getBody(), true);
+    - id: java
+      lang: java
+      label: Java
+      source: |-
+        import java.net.URI;
+        import java.net.http.*;
+        import java.net.http.HttpRequest.BodyPublishers;
+        
+        HttpClient client = HttpClient.newHttpClient();
+        
+        String body = """
+            {
+              "content": [],
+              "isMajor": true,
+              "name": "v1.0.0"
+            }
+            """;
+        
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("https://api.reloop.sh/template/v1/tpl_123456789/versions"))
+            .header("Authorization", "Bearer rl_123456789")
+            .header("Content-Type", "application/json")
+            .POST(BodyPublishers.ofString(body))
+            .build();
+        
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+    - id: dotnet
+      lang: csharp
+      label: .NET
+      source: |-
+        using System.Net.Http;
+        using System.Net.Http.Json;
+        
+        var client = new HttpClient();
+        client.DefaultRequestHeaders.Add("Authorization", "Bearer rl_123456789");
+        
+        var payload = new {
+            content = new object[] {},
+            isMajor = true,
+            name = "v1.0.0"
+        };
+        
+        var response = await client.PostAsJsonAsync(
+            "https://api.reloop.sh/template/v1/tpl_123456789/versions",
+            payload
+        );
 ---
 
 {/* This file was generated by the OpenAPI doc generator. Do not edit this file directly. Run `bun run generate:api-docs` to regenerate. */}

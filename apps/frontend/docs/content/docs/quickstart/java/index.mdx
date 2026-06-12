@@ -37,13 +37,13 @@ Create a `Main.java` file and add the following code:
 
 <CodeGroup>
 ```java Main.java
-import sh.reloop.Reloop;
+import sh.reloop.email.ReloopEmail;
 import sh.reloop.models.Email;
 import sh.reloop.models.SendEmailResponse;
 
 public class Main {
     public static void main(String[] args) {
-        Reloop reloop = new Reloop("re_123456789");
+        Reloop reloop = ReloopEmail.client("re_123456789");
 
         Email email = Email.builder()
             .from("Acme <onboarding@reloop.dev>")

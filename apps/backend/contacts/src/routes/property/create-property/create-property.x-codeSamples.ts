@@ -16,7 +16,7 @@ const reloop = new Reloop({
   key: 're_123456789'
 });
 
-const { response: property, error } = await reloop.contacts.createProperty({
+const { response: property, error } = await reloop.contacts().createProperty({
   name: 'company_name',
   type: 'string',
   fallbackValue: 'Unknown',
@@ -50,9 +50,11 @@ $reloop->contacts->createProperty(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `reloop = Reloop(api_key="re_123456789")
+		source: `from reloop_email import Reloop
 
-reloop.contacts.create_property(
+reloop = Reloop(api_key="re_123456789")
+
+reloop.contacts().create_property(
     name="company_name",
     type="string",
     fallback_value="Unknown"
@@ -85,41 +87,36 @@ property = JSON.parse(response.body)`,
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `import reloop
+		source: `import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
-    client, _ := reloop.NewClient(reloop.ClientOptions{
+    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
         APIKey: "re_123456789",
     })
     
-    _, _ = client.Contacts.CreateProperty(map[string]interface{}{
+    _, _ = reloop.Contacts().CreateProperty(map[string]interface{}{
         "name": "company_name",
         "type": "string",
         "fallback_value": "Unknown"
     })
 }`,
 	},
-	{
+		{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
-		source: `use reqwest::Client;
+		source: `use reloop_email::ReloopEmail;
 use serde_json::json;
 
 #[tokio::main]
-async fn main() -> Result<(), reqwest::Error> {
-    let client = Client::new();
-
-    let response = client
-        .post("https://reloop.sh/api/contacts/v1/properties/create")
-        .header("x-api-key", "re_123456789")
-        .json(&json!({
-            "name": "company_name",
-            "type": "string",
-            "fallbackValue": "Unknown"
-        }))
-        .send()
-        .await?;
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopEmail::new("re_123456789".to_string(), None);
+    
+    reloop.contacts().create_property(json!({
+        "name": "company_name",
+        "type": "string",
+        "fallback_value": "Unknown",
+    })).await?;
 
     Ok(())
 }`,
@@ -128,32 +125,27 @@ async fn main() -> Result<(), reqwest::Error> {
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import sh.reloop.ReloopClient;
+		source: `import sh.reloop.email.ReloopEmail;
 import java.util.*;
 
-ReloopClient reloop = new ReloopClient("re_123456789");
+ReloopEmail reloop = ReloopEmail.client("re_123456789");
 
-reloop.contacts.createProperty(Map.of("name", "company_name", "type", "string", "fallback_value", "Unknown"));`,
+reloop.contacts().createProperty(Map.of("name", "company_name", "type", "string", "fallback_value", "Unknown"));`,
 	},
-	{
+		{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",
-		source: `using System.Net.Http;
-using System.Net.Http.Json;
+		source: `using Reloop.Email;
+using System.Collections.Generic;
 
-var client = new HttpClient();
-client.DefaultRequestHeaders.Add("x-api-key", "re_123456789");
+var reloop = ReloopEmail.Client("re_123456789");
 
-var property = new {
-    name = "company_name",
-    type = "string",
-    fallbackValue = "Unknown",
-};
-
-var response = await client.PostAsJsonAsync(
-    "https://reloop.sh/api/contacts/v1/properties/create",
-    property
-);`,
+await reloop.Contacts().CreatePropertyAsync(new Dictionary<string, object?>
+{
+    ["name"] = "company_name",
+    ["type"] = "string",
+    ["fallback_value"] = "Unknown",
+});`,
 	},
 ];

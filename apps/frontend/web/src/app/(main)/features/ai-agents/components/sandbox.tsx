@@ -15,7 +15,7 @@ interface CodeTemplates {
 
 const templates: Record<AgentTemplate, CodeTemplates> = {
 	support: {
-		node: `import { Reloop } from '@reloop/sdk';
+		node: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop('rl_live_agent_key');
 
@@ -39,7 +39,7 @@ await reloop.webhooks.register({
   mailboxId: mailbox.id,
   url: 'https://api.yourdomain.com/agents/support'
 });`,
-		python: `from reloop import Reloop
+		python: `from reloop_email import Reloop
 
 reloop = Reloop("rl_live_agent_key")
 
@@ -65,7 +65,7 @@ reloop.webhooks.register(
 )`,
 	},
 	sales: {
-		node: `import { Reloop } from '@reloop/sdk';
+		node: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop('rl_live_agent_key');
 
@@ -89,7 +89,7 @@ await reloop.webhooks.register({
   mailboxId: mailbox.id,
   url: 'https://api.yourdomain.com/agents/sales-qualifier'
 });`,
-		python: `from reloop import Reloop
+		python: `from reloop_email import Reloop
 
 reloop = Reloop("rl_live_agent_key")
 
@@ -115,7 +115,7 @@ reloop.webhooks.register(
 )`,
 	},
 	ops: {
-		node: `import { Reloop } from '@reloop/sdk';
+		node: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop('rl_live_agent_key');
 
@@ -139,7 +139,7 @@ await reloop.webhooks.register({
   mailboxId: mailbox.id,
   url: 'https://api.yourdomain.com/agents/incident-routing'
 });`,
-		python: `from reloop import Reloop
+		python: `from reloop_email import Reloop
 
 reloop = Reloop("rl_live_agent_key")
 

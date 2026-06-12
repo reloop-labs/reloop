@@ -3,7 +3,7 @@ export const listApiKeysXCodeSamples = [
 		id: "node",
 		lang: "javascript",
 		label: "Node.js",
-		source: `import { Reloop } from "@reloop/node";
+		source: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop({ key: "rl_123456789" });
 
@@ -23,25 +23,48 @@ const apiKeys = await reloop.apiKey.list({
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `reloop = Reloop(api_key="rl_123456789")
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
 
 reloop.api_keys.list(
     page=1,
     limit=10
 )`,
 	},
+	{
+		id: "rust",
+		lang: "rust",
+		label: "Rust",
+		source: `use reloop_email::ReloopEmail;
+use serde_json::json;
+use reloop_email::{CreateApiKeyParams, UpdateApiKeyParams, ApiKeyListParams};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopEmail::new("rl_123456789".to_string(), None);
+    
+    reloop.api_keys().list(Some(ApiKeyListParams {
+            page: Some(1),
+        limit: Some(10),
+            ..Default::default()
+        })).await?;
+
+    Ok(())
+}`,
+	},
 			{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `import reloop
+		source: `import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
-    client, _ := reloop.NewClient(reloop.ClientOptions{
+    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
         APIKey: "rl_123456789",
     })
     
-    _, _ = client.ApiKeys.List(&reloop.ApiKeyListParams{
+    _, _ = reloop.ApiKeys().List(&reloop.ApiKeyListParams{
         Page: reloop.Int(1),
     Limit: reloop.Int(10),
     })
@@ -64,24 +87,26 @@ $reloop->apiKeys->list(
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+		source: `import sh.reloop.email.ReloopEmail;
+import sh.reloop.email.Models.*;
 
-ReloopClient reloop = new ReloopClient("rl_123456789");
+ReloopEmail reloop = ReloopEmail.client("rl_123456789");
 
-reloop.apiKeys.list(new ApiKeyListParams(1, 10, null, null, null));`,
+reloop.apiKeys().list(new ApiKeyListParams(1, 10, null, null, null));`,
 	},
-	{
+		{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",
-		source: `using System.Net.Http;
+		source: `using Reloop.Email;
+using Reloop.Email.Models;
 
-var client = new HttpClient();
-client.DefaultRequestHeaders.Add("Authorization", "Bearer rl_123456789");
+var reloop = ReloopEmail.Client("rl_123456789");
 
-var response = await client.GetAsync(
-    "https://api.reloop.sh/api-key/v1/?page=1&limit=10"
-);`,
+await reloop.ApiKeys().ListAsync(new ApiKeyListParams
+{
+    Page = 1,
+    Limit = 10,
+});`,
 	},
 ];

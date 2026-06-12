@@ -14,7 +14,7 @@ const reloop = new Reloop({
   key: 're_123456789'
 });
 
-const { response: group, error } = await reloop.contacts.createGroup({
+const { response: group, error } = await reloop.contacts().createGroup({
   name: 'Beta Testers',
 });
 if (error) throw error;`,
@@ -44,9 +44,11 @@ $reloop->contacts->createGroup(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `reloop = Reloop(api_key="re_123456789")
+		source: `from reloop_email import Reloop
 
-reloop.contacts.create_group(
+reloop = Reloop(api_key="re_123456789")
+
+reloop.contacts().create_group(
     name="Beta Testers"
 )`,
 	},
@@ -73,35 +75,32 @@ group = JSON.parse(response.body)`,
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `import reloop
+		source: `import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
-    client, _ := reloop.NewClient(reloop.ClientOptions{
+    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
         APIKey: "re_123456789",
     })
     
-    _, _ = client.Contacts.CreateGroup(map[string]interface{}{
+    _, _ = reloop.Contacts().CreateGroup(map[string]interface{}{
         "name": "Beta Testers"
     })
 }`,
 	},
-	{
+		{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
-		source: `use reqwest::Client;
+		source: `use reloop_email::ReloopEmail;
 use serde_json::json;
 
 #[tokio::main]
-async fn main() -> Result<(), reqwest::Error> {
-    let client = Client::new();
-
-    let response = client
-        .post("https://reloop.sh/api/contacts/v1/groups/create")
-        .header("x-api-key", "re_123456789")
-        .json(&json!({ "name": "Beta Testers" }))
-        .send()
-        .await?;
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopEmail::new("re_123456789".to_string(), None);
+    
+    reloop.contacts().create_group(json!({
+        "name": "Beta Testers",
+    })).await?;
 
     Ok(())
 }`,
@@ -110,28 +109,25 @@ async fn main() -> Result<(), reqwest::Error> {
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import sh.reloop.ReloopClient;
+		source: `import sh.reloop.email.ReloopEmail;
 import java.util.*;
 
-ReloopClient reloop = new ReloopClient("re_123456789");
+ReloopEmail reloop = ReloopEmail.client("re_123456789");
 
-reloop.contacts.createGroup(Map.of("name", "Beta Testers"));`,
+reloop.contacts().createGroup(Map.of("name", "Beta Testers"));`,
 	},
-	{
+		{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",
-		source: `using System.Net.Http;
-using System.Net.Http.Json;
+		source: `using Reloop.Email;
+using System.Collections.Generic;
 
-var client = new HttpClient();
-client.DefaultRequestHeaders.Add("x-api-key", "re_123456789");
+var reloop = ReloopEmail.Client("re_123456789");
 
-var group = new { name = "Beta Testers" };
-
-var response = await client.PostAsJsonAsync(
-    "https://reloop.sh/api/contacts/v1/groups/create",
-    group
-);`,
+await reloop.Contacts().CreateGroupAsync(new Dictionary<string, object?>
+{
+    ["name"] = "Beta Testers",
+});`,
 	},
 ];

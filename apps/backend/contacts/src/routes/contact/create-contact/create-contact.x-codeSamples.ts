@@ -28,7 +28,7 @@ const reloop = new Reloop({
   key: 're_123456789'
 });
 
-const { data: contact, error } = await reloop.contacts.create({
+const { data: contact, error } = await reloop.contacts().create({
   email: 'john.doe@example.com',
   firstName: 'John',
   lastName: 'Doe',
@@ -85,9 +85,11 @@ $reloop->contacts->create(
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `reloop = Reloop(api_key="re_123456789")
+		source: `from reloop_email import Reloop
 
-reloop.contacts.create(
+reloop = Reloop(api_key="re_123456789")
+
+reloop.contacts().create(
     email="john.doe@example.com",
     first_name="John",
     last_name="Doe",
@@ -144,14 +146,14 @@ contact = JSON.parse(response.body)`,
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `import reloop
+		source: `import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
-    client, _ := reloop.NewClient(reloop.ClientOptions{
+    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
         APIKey: "re_123456789",
     })
     
-    _, _ = client.Contacts.Create(map[string]interface{}{
+    _, _ = reloop.Contacts().Create(map[string]interface{}{
         "email": "john.doe@example.com",
         "first_name": "John",
         "last_name": "Doe",
@@ -162,37 +164,36 @@ func main() {
     })
 }`,
 	},
-	{
+		{
 		id: "rust",
 		lang: "rust",
 		label: "Rust",
-		source: `use reqwest::Client;
+		source: `use reloop_email::ReloopEmail;
 use serde_json::json;
 
 #[tokio::main]
-async fn main() -> Result<(), reqwest::Error> {
-    let client = Client::new();
-
-    let response = client
-        .post("https://reloop.sh/api/contacts/create")
-        .header("x-api-key", "re_123456789")
-        .json(&json!({
-            "email": "john.doe@example.com",
-            "firstName": "John",
-            "lastName": "Doe",
-            "status": "subscribed",
-            "properties": {
-                "company": "Reloop",
-                "role": "Developer"
-            },
-            "groupIds": ["grp_123456789"],
-            "channels": [{
-                "channelId": "channel_123456789",
-                "subscription": "opt_in"
-            }]
-        }))
-        .send()
-        .await?;
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopEmail::new("re_123456789".to_string(), None);
+    
+    reloop.contacts().create(json!({
+        "email": "john.doe@example.com",
+        "first_name": "John",
+        "last_name": "Doe",
+        "unsubscribed": false,
+        "properties": {
+        "company": "Reloop",
+        "role": "Developer",
+    },
+        "group_ids": [
+        "grp_123456789",
+    ],
+        "channels": [
+        {
+        "channel_id": "channel_123456789",
+        "subscription": "opt_in",
+    },
+    ],
+    })).await?;
 
     Ok(())
 }`,
@@ -201,10 +202,10 @@ async fn main() -> Result<(), reqwest::Error> {
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `import sh.reloop.ReloopClient;
+		source: `import sh.reloop.email.ReloopEmail;
 import java.util.*;
 
-ReloopClient reloop = new ReloopClient("re_123456789");
+ReloopEmail reloop = ReloopEmail.client("re_123456789");
 
 Map<String, Object> params = new HashMap<>();
 params.put("email", "john.doe@example.com");
@@ -214,39 +215,33 @@ params.put("unsubscribed", false);
 params.put("properties", Map.of("company", "Reloop", "role", "Developer"));
 params.put("group_ids", List.of("grp_123456789"));
 params.put("channels", List.of(Map.of("channel_id", "channel_123456789", "subscription", "opt_in")));
-reloop.contacts.create(params);`,
+reloop.contacts().create(params);`,
 	},
-	{
+		{
 		id: "dotnet",
 		lang: "csharp",
 		label: ".NET",
-		source: `using System.Net.Http;
-using System.Net.Http.Json;
+		source: `using Reloop.Email;
+using System.Collections.Generic;
 
-var client = new HttpClient();
-client.DefaultRequestHeaders.Add("x-api-key", "re_123456789");
+var reloop = ReloopEmail.Client("re_123456789");
 
-var contact = new {
-    email = "john.doe@example.com",
-    firstName = "John",
-    lastName = "Doe",
-    status = "subscribed",
-    properties = new Dictionary<string, string> {
-        ["company"] = "Reloop",
-        ["role"] = "Developer",
-    },
-    groupIds = new[] { "grp_123456789" },
-    channels = new[] {
-        new {
-            channelId = "channel_123456789",
-            subscription = "opt_in",
-        },
-    },
+var parameters = new Dictionary<string, object?>();
+parameters["email"] = "john.doe@example.com";
+parameters["first_name"] = "John";
+parameters["last_name"] = "Doe";
+parameters["unsubscribed"] = false;
+parameters["properties"] = new Dictionary<string, object?>
+{
+    ["company"] = "Reloop",
+    ["role"] = "Developer",
 };
-
-var response = await client.PostAsJsonAsync(
-    "https://reloop.sh/api/contacts/create",
-    contact
-);`,
+parameters["group_ids"] = new object?[] { "grp_123456789" };
+parameters["channels"] = new object?[] { new Dictionary<string, object?>
+{
+    ["channel_id"] = "channel_123456789",
+    ["subscription"] = "opt_in",
+} };
+await reloop.Contacts().CreateAsync(parameters);`,
 	},
 ];

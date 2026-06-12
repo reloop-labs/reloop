@@ -23,16 +23,16 @@ Install the Reloop Node.js SDK:
 
 <CodeGroup>
   ```bash npm
-  npm install @reloop/node
+  npm install reloop-email
   ```
   ```bash yarn
-  yarn add @reloop/node
+  yarn add reloop-email
   ```
   ```bash pnpm
-  pnpm add @reloop/node
+  pnpm add reloop-email
   ```
   ```bash bun
-  bun add @reloop/node
+  bun add reloop-email
   ```
 </CodeGroup>
 
@@ -64,11 +64,11 @@ Create a server route in `server/api/send.ts`:
 
 <CodeGroup>
 ```typescript server/api/send.ts
-import { Reloop } from '@reloop/node';
+import Reloop from 'reloop-email';
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
-  const reloop = new Reloop(config.reloopApiKey);
+  const reloop = ReloopEmail.client(config.reloopApiKey);
 
   try {
     const { data, error } = await reloop.emails.send({

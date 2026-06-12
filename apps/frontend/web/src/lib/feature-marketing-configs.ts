@@ -436,15 +436,15 @@ export const apiReferenceConfig: FeatureMarketingPageConfig = {
 			items: [
 				{
 					title: "Node.js",
-					description: "npm install @reloop/sdk",
+					description: "npm install reloop-email
 				},
 				{
 					title: "Python",
-					description: "pip install reloop",
+					description: "pip install reloop-email",
 				},
 				{
 					title: "Go",
-					description: "go get github.com/reloop/reloop-go",
+					description: "go get github.com/reloop-labs/reloop-email",
 				},
 			],
 		},

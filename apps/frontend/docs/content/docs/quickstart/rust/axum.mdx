@@ -37,7 +37,8 @@ Set up an Axum route to send an email:
 <CodeGroup>
 ```rust main.rs
 use axum::{routing::post, Json, Router};
-use reloop::{Client, SendEmailParams};
+use reloop_email::ReloopEmail;
+use reloop_email::SendEmailParams;
 use std::sync::Arc;
 
 struct AppState {

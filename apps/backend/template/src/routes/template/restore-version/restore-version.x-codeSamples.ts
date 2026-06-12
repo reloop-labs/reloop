@@ -3,7 +3,7 @@ export const restoreVersionXCodeSamples = [
 		id: "node",
 		lang: "javascript",
 		label: "Node.js",
-		source: `import { Reloop } from "@reloop/node";
+		source: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop({ key: "rl_123456789" });
 

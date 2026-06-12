@@ -33,10 +33,10 @@ Create a new function and use the Reloop SDK via an import from an npm specifier
 
 <CodeGroup>
 ```typescript supabase/functions/send/index.ts
-import { Reloop } from 'npm:@reloop/node';
+import Reloop from 'reloop-email';
 
 Deno.serve(async (req) => {
-  const reloop = new Reloop(Deno.env.get('RELOOP_API_KEY'));
+  const reloop = ReloopEmail.client(Deno.env.get('RELOOP_API_KEY'));
 
   const { data, error } = await reloop.emails.send({
     from: 'Acme <onboarding@reloop.dev>',

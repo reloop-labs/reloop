@@ -42,11 +42,11 @@ export const languages: LanguageDefinition[] = [
 		name: "Node.js",
 		shortDescription:
 			"Send email from Node.js and TypeScript with the official SDK—async/await, full types, and framework guides for Next.js, Express, and more.",
-		installCommand: "npm install @reloop/node",
+		installCommand: "npm install reloop-email",
 		docsPath: "/docs/quickstart/nodejs",
 		icon: siNodedotjs,
 		highlights: ["TypeScript", "Next.js", "Serverless"],
-		sendCode: `import { Reloop } from '@reloop/node';
+		sendCode: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop(process.env.RELOOP_API_KEY);
 
@@ -69,14 +69,14 @@ console.log('Email sent:', data.id);`,
 		name: "Python",
 		shortDescription:
 			"Integrate Reloop with Flask, FastAPI, or any Python app using a clean client with type hints and straightforward error handling.",
-		installCommand: "pip install reloop",
+		installCommand: "pip install reloop-email",
 		docsPath: "/docs/quickstart/python",
 		icon: siPython,
 		highlights: ["Flask", "FastAPI", "Django SMTP"],
 		sendCode: `import os
-from reloop import Reloop
+from reloop_email import Reloop
 
-client = Reloop(api_key=os.environ["RELOOP_API_KEY"])
+reloop = Reloop(api_key=os.environ["RELOOP_API_KEY"])
 
 params = {
     "from": "Acme <onboarding@yourdomain.com>",
@@ -85,7 +85,7 @@ params = {
     "html": "<strong>It works!</strong>",
 }
 
-email = client.emails.send(params)
+email = reloop.emails.send(params)
 print(f"Email sent: {email['id']}")`,
 	},
 	{
@@ -93,7 +93,7 @@ print(f"Email sent: {email['id']}")`,
 		name: "Go",
 		shortDescription:
 			"Use the Go SDK for high-throughput services with context-aware requests and minimal dependencies.",
-		installCommand: "go get github.com/reloop/reloop-go",
+		installCommand: "go get github.com/reloop-labs/reloop-email",
 		docsPath: "/docs/quickstart/go",
 		icon: siGo,
 		highlights: ["Context", "Goroutines", "Microservices"],
@@ -104,13 +104,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/reloop/reloop-go"
+	reloopemail "github.com/reloop-labs/reloop-email"
 )
 
 func main() {
-	client := reloop.NewClient(os.Getenv("RELOOP_API_KEY"))
+	reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
+		APIKey: os.Getenv("RELOOP_API_KEY"),
+	})
 
-	email, err := client.Emails.Send(context.Background(), &reloop.SendEmailParams{
+	email, err := reloop.Emails().Send(context.Background(), &reloopemail.SendEmailParams{
 		From:    "Acme <onboarding@yourdomain.com>",
 		To:      []string{"delivered@yourdomain.com"},
 		Subject: "Hello from Go",
@@ -127,19 +129,19 @@ func main() {
 		name: "Rust",
 		shortDescription:
 			"Send email from Rust with an async-first crate built for performance-critical applications.",
-		installCommand: "cargo add reloop tokio --features full",
+		installCommand: "cargo add reloop-email",
 		docsPath: "/docs/quickstart/rust",
 		icon: siRust,
 		highlights: ["Tokio", "Axum", "Type-safe"],
-		sendCode: `use reloop::{Client, SendEmailParams};
+		sendCode: `use reloop_email::ReloopEmail;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::new(std::env::var("RELOOP_API_KEY")?);
+    let reloop = ReloopEmail::new(std::env::var("RELOOP_API_KEY")?, None);
 
-    let email = client
+    let email = reloop
         .emails()
-        .send(SendEmailParams {
+        .send(reloop_email::SendEmailParams {
             from: "Acme <onboarding@yourdomain.com>".into(),
             to: vec!["delivered@yourdomain.com".into()],
             subject: "Hello from Rust".into(),
@@ -175,7 +177,7 @@ $reloop->emails->send([
 		name: "Ruby",
 		shortDescription:
 			"Ship email from Rails, Sinatra, or any Ruby app with a gem that follows familiar conventions.",
-		installCommand: "gem install reloop",
+		installCommand: "gem install reloop-email",
 		docsPath: "/docs/quickstart/ruby",
 		icon: siRuby,
 		highlights: ["Rails", "Sinatra", "Bundler"],
@@ -220,16 +222,16 @@ end`,
 		name: "Java",
 		shortDescription:
 			"Use the Java SDK in Spring Boot or plain JVM apps with Maven or Gradle dependencies.",
-		installCommand: "sh.reloop:reloop-java:0.1.0",
+		installCommand: "sh.reloop:reloop-email",
 		docsPath: "/docs/quickstart/java",
 		icon: siSpringboot,
 		highlights: ["Spring Boot", "Maven", "Gradle"],
-		sendCode: `import sh.reloop.Reloop;
-import sh.reloop.model.SendEmailRequest;
+		sendCode: `import sh.reloop.email.ReloopEmail;
+import sh.reloop.email.model.SendEmailRequest;
 
 public class Main {
   public static void main(String[] args) throws Exception {
-    Reloop client = new Reloop(System.getenv("RELOOP_API_KEY"));
+    ReloopEmail reloop = ReloopEmail.client(System.getenv("RELOOP_API_KEY"));
 
     SendEmailRequest request = SendEmailRequest.builder()
         .from("Acme <onboarding@yourdomain.com>")
@@ -238,7 +240,7 @@ public class Main {
         .html("<strong>It works!</strong>")
         .build();
 
-    var email = client.emails().send(request);
+    var email = reloop.emails().send(request);
     System.out.println("Email sent: " + email.getId());
   }
 }`,
@@ -248,15 +250,15 @@ public class Main {
 		name: ".NET",
 		shortDescription:
 			"Send email from C# and .NET 6+ with a NuGet package designed for modern async applications.",
-		installCommand: "dotnet add package Reloop",
+		installCommand: "dotnet add package Reloop.Email",
 		docsPath: "/docs/quickstart/dotnet",
 		icon: siDotnet,
 		highlights: ["C#", "ASP.NET", "NuGet"],
-		sendCode: `using Reloop;
+		sendCode: `using Reloop.Email;
 
-var client = new ReloopClient(Environment.GetEnvironmentVariable("RELOOP_API_KEY"));
+var reloop = ReloopEmail.Client(Environment.GetEnvironmentVariable("RELOOP_API_KEY"));
 
-var email = await client.Emails.SendAsync(new SendEmailRequest
+var email = await reloop.Emails.SendAsync(new SendEmailRequest
 {
     From = "Acme <onboarding@yourdomain.com>",
     To = new[] { "delivered@yourdomain.com" },

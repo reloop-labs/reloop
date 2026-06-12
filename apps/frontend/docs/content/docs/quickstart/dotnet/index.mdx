@@ -23,7 +23,7 @@ Install the Reloop NuGet package:
 
 <CodeGroup>
 ```bash
-dotnet add package Reloop
+dotnet add package Reloop.Email
 ```
 </CodeGroup>
 
@@ -35,7 +35,7 @@ Create a `Program.cs` file and add the following code:
 ```csharp Program.cs
 using Reloop;
 
-var client = new ReloopClient("re_123456789");
+var client = ReloopEmail.Client("re_123456789");
 
 var email = new SendEmailRequest
 {

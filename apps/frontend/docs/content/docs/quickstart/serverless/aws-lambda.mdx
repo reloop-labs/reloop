@@ -23,16 +23,16 @@ Install the Reloop Node.js SDK in your Lambda project:
 
 <CodeGroup>
   ```bash npm
-  npm install @reloop/node
+  npm install reloop-email
   ```
   ```bash yarn
-  yarn add @reloop/node
+  yarn add reloop-email
   ```
   ```bash pnpm
-  pnpm add @reloop/node
+  pnpm add reloop-email
   ```
   ```bash bun
-  bun add @reloop/node
+  bun add reloop-email
   ```
 </CodeGroup>
 
@@ -50,10 +50,10 @@ RELOOP_API_KEY=re_123456789
 
 <CodeGroup>
 ```typescript index.ts
-import { Reloop } from '@reloop/node';
+import Reloop from 'reloop-email';
 import { Handler } from 'aws-lambda';
 
-const reloop = new Reloop(process.env.RELOOP_API_KEY);
+const reloop = ReloopEmail.client(process.env.RELOOP_API_KEY);
 
 export const handler: Handler = async (event) => {
   try {

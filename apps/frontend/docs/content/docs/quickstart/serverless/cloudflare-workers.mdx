@@ -23,16 +23,16 @@ Install the Reloop Node.js SDK:
 
 <CodeGroup>
   ```bash npm
-  npm install @reloop/node
+  npm install reloop-email
   ```
   ```bash yarn
-  yarn add @reloop/node
+  yarn add reloop-email
   ```
   ```bash pnpm
-  pnpm add @reloop/node
+  pnpm add reloop-email
   ```
   ```bash bun
-  bun add @reloop/node
+  bun add reloop-email
   ```
 </CodeGroup>
 
@@ -51,7 +51,7 @@ RELOOP_API_KEY = "re_123456789"
 
 <CodeGroup>
 ```typescript src/index.ts
-import { Reloop } from '@reloop/node';
+import Reloop from 'reloop-email';
 
 export interface Env {
   RELOOP_API_KEY: string;
@@ -59,7 +59,7 @@ export interface Env {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const reloop = new Reloop(env.RELOOP_API_KEY);
+    const reloop = ReloopEmail.client(env.RELOOP_API_KEY);
 
     const { data, error } = await reloop.emails.send({
       from: 'Acme <onboarding@reloop.dev>',

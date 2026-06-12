@@ -15,7 +15,7 @@ interface CodeTemplates {
 
 const templates: Record<CampaignType, CodeTemplates> = {
 	newsletter: {
-		node: `import { Reloop } from '@reloop/sdk';
+		node: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop('rl_live_marketing_key');
 
@@ -32,7 +32,7 @@ const campaign = await reloop.campaigns.create({
 reloop.campaigns.onDeliveryUpdate(campaign.id, (stats) => {
   console.log(\`Delivered: \${stats.deliveredCount} | Bounces: \${stats.bounceCount}\`);
 });`,
-		python: `from reloop import Reloop
+		python: `from reloop_email import Reloop
 
 reloop = Reloop("rl_live_marketing_key")
 
@@ -51,7 +51,7 @@ def handle_update(stats):
     print(f"Delivered: {stats['delivered_count']} | Bounces: {stats['bounce_count']}")`,
 	},
 	launch: {
-		node: `import { Reloop } from '@reloop/sdk';
+		node: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop('rl_live_marketing_key');
 
@@ -69,7 +69,7 @@ await reloop.webhooks.register({
   url: 'https://api.yourdomain.com/campaigns/bounces',
   events: ['campaign.email_bounced']
 });`,
-		python: `from reloop import Reloop
+		python: `from reloop_email import Reloop
 
 reloop = Reloop("rl_live_marketing_key")
 
@@ -89,7 +89,7 @@ reloop.webhooks.register(
 )`,
 	},
 	promo: {
-		node: `import { Reloop } from '@reloop/sdk';
+		node: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop('rl_live_marketing_key');
 
@@ -101,7 +101,7 @@ const campaign = await reloop.campaigns.create({
   templateId: 'tpl_promo_broadcast',
   deliverySchedule: { type: 'immediate' }
 });`,
-		python: `from reloop import Reloop
+		python: `from reloop_email import Reloop
 
 reloop = Reloop("rl_live_marketing_key")
 

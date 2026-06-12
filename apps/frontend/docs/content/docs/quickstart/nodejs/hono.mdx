@@ -23,16 +23,16 @@ Install the Reloop Node.js SDK:
 
 <CodeGroup>
   ```bash npm
-  npm install @reloop/node
+  npm install reloop-email
   ```
   ```bash yarn
-  yarn add @reloop/node
+  yarn add reloop-email
   ```
   ```bash pnpm
-  pnpm add @reloop/node
+  pnpm add reloop-email
   ```
   ```bash bun
-  bun add @reloop/node
+  bun add reloop-email
   ```
 </CodeGroup>
 
@@ -43,10 +43,10 @@ Set up a Hono route to send an email:
 <CodeGroup>
 ```typescript index.ts
 import { Hono } from 'hono'
-import { Reloop } from '@reloop/node'
+import Reloop from 'reloop-email'
 
 const app = new Hono()
-const reloop = new Reloop('re_123456789')
+const reloop = ReloopEmail.client('re_123456789')
 
 app.post('/send', async (c) => {
   const { data, error } = await reloop.emails.send({

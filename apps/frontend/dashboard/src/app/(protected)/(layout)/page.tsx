@@ -44,12 +44,12 @@ import useSWR from "swr";
 import { SetupWizard } from "./components/setup-wizard";
 
 const sdkLanguages = [
-	{ name: "Node / TS", command: "npm install @reloop/node", icon: siNodedotjs },
+	{ name: "Node / TS", command: "npm install reloop-email", icon: siNodedotjs },
 	{ name: "Python", command: "pip install reloop-python", icon: siPython },
 	{ name: "PHP", command: "composer require reloop/reloop-email", icon: siPhp },
 	{
 		name: "Go",
-		command: "go get github.com/reloop-labs/reloop-go",
+		command: "go get github.com/reloop-labs/reloop-email",
 		icon: siGo,
 	},
 	{ name: "Rust", command: "cargo add reloop", icon: siRust },
