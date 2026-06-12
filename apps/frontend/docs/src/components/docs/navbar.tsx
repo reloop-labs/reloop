@@ -27,6 +27,13 @@ export function Navbar({
 	const tabs = navigationTabs;
 	const [hoveredTab, setHoveredTab] = useState<string | null>(null);
 
+	const activeTab =
+		tabs.find((tab) =>
+			tab.url === "/" ? pathname === "/" : pathname.startsWith(tab.url),
+		)?.title || null;
+
+	const currentHighlighted = hoveredTab || activeTab;
+
 	return (
 		<div className="flex h-full w-full items-center justify-between pr-3">
 			{/* Mobile Menu Placeholder / Logo on Mobile */}
@@ -44,9 +51,9 @@ export function Navbar({
 			</div>
 
 			{/* Nav tabs */}
-			<div className="flex flex-1 items-center">
+			<div className="flex flex-1 h-full items-center">
 				<nav
-					className="hidden h-full items-center gap-1 lg:flex"
+					className="hidden h-full items-center gap-0 lg:flex"
 					onPointerLeave={() => setHoveredTab(null)}
 				>
 					{tabs.map((tab) => {
@@ -59,59 +66,47 @@ export function Navbar({
 								key={tab.title}
 								href={tab.url}
 								className={cn(
-									"relative flex h-9 items-center gap-1.5 whitespace-nowrap rounded-lg px-2 font-medium text-[13px] transition-colors duration-200 md:px-4",
-									active
-										? "text-[#171717] dark:text-white"
-										: "text-text-sub-600 hover:text-[#171717] dark:hover:text-white",
+									"relative flex h-full items-center gap-1.5 whitespace-nowrap px-4 font-semibold text-[13px] transition-colors duration-200",
+									active || hoveredTab === tab.title
+										? ""
+										: "text-text-sub-600 dark:text-white/60",
 								)}
+								style={{
+									color: (active || hoveredTab === tab.title) ? color : undefined,
+								}}
 								onPointerEnter={() => setHoveredTab(tab.title)}
 							>
-								{/* Hover background pill */}
-								<AnimatePresence>
-									{hoveredTab === tab.title && !active && (
-										<motion.div
-											layoutId="nav-hover-pill"
-											className="absolute inset-0 -z-10 rounded-lg"
-											style={{
-												backgroundColor: `color-mix(in srgb, ${color} 8%, transparent)`,
-											}}
-											initial={{ opacity: 0 }}
-											animate={{ opacity: 1 }}
-											exit={{ opacity: 0 }}
-											transition={{ type: "spring", stiffness: 380, damping: 30 }}
-										/>
-									)}
-								</AnimatePresence>
+								{/* Shared sliding hover/active pill background */}
+								{currentHighlighted === tab.title && (
+									<motion.div
+										layoutId="nav-pill"
+										className="absolute inset-y-2 inset-x-1 -z-10 rounded-lg"
+										style={{
+											backgroundColor: active
+												? `color-mix(in srgb, ${color} 12%, transparent)`
+												: `color-mix(in srgb, ${color} 8%, transparent)`,
+										}}
+										transition={{ type: "spring", stiffness: 350, damping: 30 }}
+									/>
+								)}
 
-								{/* Active state indicators */}
+								{/* Active bottom underline */}
 								{active && (
-									<>
-										{/* Active pill background */}
-										<motion.div
-											layoutId="nav-active-pill"
-											className="absolute inset-0 -z-10 rounded-lg"
-											style={{
-												backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)`,
-											}}
-											transition={{ type: "spring", stiffness: 380, damping: 30 }}
-										/>
-										{/* Active bottom underline */}
-										<motion.div
-											layoutId="nav-active-underline"
-											className="absolute right-2 bottom-0 left-2 h-[2px] rounded-full"
-											style={{ backgroundColor: color }}
-											transition={{ type: "spring", stiffness: 380, damping: 30 }}
-										/>
-									</>
+									<motion.div
+										layoutId="nav-active-underline"
+										className="absolute bottom-0 left-1 right-1 h-[2px] rounded-full"
+										style={{ backgroundColor: color }}
+										transition={{ type: "spring", stiffness: 350, damping: 30 }}
+									/>
 								)}
 
 								<Icon
 									name={tab.iconName}
 									className={cn(
 										"h-4 w-4 shrink-0 transition-colors duration-200",
-										active ? "opacity-100" : "opacity-60",
+										active || hoveredTab === tab.title ? "opacity-100" : "opacity-60",
 									)}
-									style={{ color: active ? color : undefined }}
+									style={{ color: (active || hoveredTab === tab.title) ? color : undefined }}
 								/>
 								<span className="relative z-10">{tab.title}</span>
 							</Link>

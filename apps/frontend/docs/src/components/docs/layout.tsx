@@ -29,7 +29,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 					</Link>
 				</div>
 				{/* Navigation Row - Fluid on all screens */}
-				<div className="flex-1">
+				<div className="flex-1 h-full">
 					<Navbar onMobileMenuClick={() => setOpen(true)} />
 				</div>
 			</header>
