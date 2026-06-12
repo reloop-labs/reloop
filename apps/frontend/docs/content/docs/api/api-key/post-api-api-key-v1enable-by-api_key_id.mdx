@@ -1,5 +1,5 @@
 ---
-title: "Enable API key"
+title: Enable API key
 full: true
 _openapi:
   method: POST
@@ -7,13 +7,119 @@ _openapi:
   structuredData:
     headings: []
     contents:
-      - content: "Enables a previously disabled API key"
+      - content: Enables a previously disabled API key
 _apiData:
-  document: "https://reloop.sh/api/api-key/openapi/json"
-  operationData: [{"path":"/api/api-key/v1/enable/{api_key_id}","method":"post"}]
-  parameterList: [{"name":"api_key_id","type":"string","required":true,"description":"API Key identifier","location":"path"}]
-  responseMap: {"200":{"description":"Response for status 200","schema":{"id":"key_123456789","name":"Production API Key","start":"rl_live","prefix":"rl","enabled":true,"requestCount":150,"createdAt":"2026-03-29T10:00:00Z","updatedAt":"2026-03-29T10:00:00Z","permissions":"read,write","createdBy":{"id":"user_123","name":"John Doe","email":"john@example.com"}}},"403":{"description":"Response for status 403","schema":{"message":"Unauthorized access"}},"404":{"description":"Response for status 404","schema":{"message":"API key not found"}}}
-  codeSamples: [{"id":"node","lang":"javascript","label":"Node.js","source":"import { Reloop } from \"@reloop/node\";\n\nconst reloop = new Reloop({ key: \"rl_123456789\" });\n\nconst apiKey = await reloop.apiKey.enable(\"key_123456789\");"},{"id":"curl","lang":"bash","label":"cURL","source":"curl -X POST https://api.reloop.sh/api-key/v1/enable/key_123456789 \\\n  -H \"Authorization: Bearer rl_123456789\""},{"id":"python","lang":"python","label":"Python","source":"import requests\n\nresponse = requests.post(\n    \"https://api.reloop.sh/api-key/v1/enable/key_123456789\",\n    headers={\n        \"Authorization\": \"Bearer rl_123456789\",\n    },\n)\n\napi_key = response.json()"},{"id":"php","lang":"php","label":"PHP","source":"<?php\n$client = new \\GuzzleHttp\\Client();\n\n$response = $client->post('https://api.reloop.sh/api-key/v1/enable/key_123456789', [\n    'headers' => [\n        'Authorization' => 'Bearer rl_123456789',\n    ],\n]);\n\n$apiKey = json_decode($response->getBody(), true);"},{"id":"java","lang":"java","label":"Java","source":"import java.net.URI;\nimport java.net.http.*;\nimport java.net.http.HttpRequest.BodyPublishers;\n\nHttpClient client = HttpClient.newHttpClient();\n\nHttpRequest request = HttpRequest.newBuilder()\n    .uri(URI.create(\"https://api.reloop.sh/api-key/v1/enable/key_123456789\"))\n    .header(\"Authorization\", \"Bearer rl_123456789\")\n    .POST(BodyPublishers.noBody())\n    .build();\n\nHttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());"},{"id":"dotnet","lang":"csharp","label":".NET","source":"using System.Net.Http;\n\nvar client = new HttpClient();\nclient.DefaultRequestHeaders.Add(\"Authorization\", \"Bearer rl_123456789\");\n\nvar response = await client.PostAsync(\n    \"https://api.reloop.sh/api-key/v1/enable/key_123456789\",\n    null\n);"}]
+  document: 'https://reloop.sh/api/api-key/openapi/json'
+  operationData:
+    - path: '/api/api-key/v1/enable/{api_key_id}'
+      method: post
+  parameterList:
+    - name: api_key_id
+      type: string
+      required: true
+      description: API Key identifier
+      location: path
+  responseMap:
+    '200':
+      description: Response for status 200
+      schema:
+        id: key_123456789
+        name: Production API Key
+        start: rl_live
+        prefix: rl
+        enabled: true
+        requestCount: 150
+        createdAt: '2026-03-29T10:00:00Z'
+        updatedAt: '2026-03-29T10:00:00Z'
+        permissions: 'read,write'
+        createdBy:
+          id: user_123
+          name: John Doe
+          email: john@example.com
+    '403':
+      description: Response for status 403
+      schema:
+        message: Unauthorized access
+    '404':
+      description: Response for status 404
+      schema:
+        message: API key not found
+  codeSamples:
+    - id: node
+      lang: javascript
+      label: Node.js
+      source: |-
+        import { Reloop } from "@reloop/node";
+
+        const reloop = new Reloop({ key: "rl_123456789" });
+
+        const apiKey = await reloop.apiKey.enable("key_123456789");
+    - id: curl
+      lang: bash
+      label: cURL
+      source: |-
+        curl -X POST https://api.reloop.sh/api-key/v1/enable/key_123456789 \
+          -H "Authorization: Bearer rl_123456789"
+    - id: python
+      lang: python
+      label: Python
+      source: |-
+        import requests
+
+        response = requests.post(
+            "https://api.reloop.sh/api-key/v1/enable/key_123456789",
+            headers={
+                "Authorization": "Bearer rl_123456789",
+            },
+        )
+
+        api_key = response.json()
+    - id: php
+      lang: php
+      label: PHP
+      source: |-
+        $reloop = Reloop::client('rl_123456789');
+
+        $reloop->apiKeys->enable('key_123456789');
+    - id: java
+      lang: java
+      label: Java
+      source: >-
+        import java.net.URI;
+
+        import java.net.http.*;
+
+        import java.net.http.HttpRequest.BodyPublishers;
+
+
+        HttpClient client = HttpClient.newHttpClient();
+
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("https://api.reloop.sh/api-key/v1/enable/key_123456789"))
+            .header("Authorization", "Bearer rl_123456789")
+            .POST(BodyPublishers.noBody())
+            .build();
+
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+    - id: dotnet
+      lang: csharp
+      label: .NET
+      source: >-
+        using System.Net.Http;
+
+
+        var client = new HttpClient();
+
+        client.DefaultRequestHeaders.Add("Authorization", "Bearer
+        rl_123456789");
+
+
+        var response = await client.PostAsync(
+            "https://api.reloop.sh/api-key/v1/enable/key_123456789",
+            null
+        );
 ---
 
 {/* This file was generated by the OpenAPI doc generator. Do not edit this file directly. Run `bun run generate:api-docs` to regenerate. */}

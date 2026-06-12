@@ -51,7 +51,7 @@ export function Navbar({
 			</div>
 
 			{/* Nav tabs */}
-			<div className="flex flex-1 h-full items-center">
+			<div className="flex h-full flex-1 items-center">
 				<nav
 					className="hidden h-full items-center gap-0 lg:flex"
 					onPointerLeave={() => setHoveredTab(null)}
@@ -72,7 +72,7 @@ export function Navbar({
 										: "text-text-sub-600 dark:text-white/60",
 								)}
 								style={{
-									color: (active || hoveredTab === tab.title) ? color : undefined,
+									color: active || hoveredTab === tab.title ? color : undefined,
 								}}
 								onPointerEnter={() => setHoveredTab(tab.title)}
 							>
@@ -80,7 +80,7 @@ export function Navbar({
 								{currentHighlighted === tab.title && (
 									<motion.div
 										layoutId="nav-pill"
-										className="absolute inset-y-2 inset-x-1 -z-10 rounded-lg"
+										className="-z-10 absolute inset-x-1 inset-y-2 rounded-lg"
 										style={{
 											backgroundColor: active
 												? `color-mix(in srgb, ${color} 12%, transparent)`
@@ -94,7 +94,7 @@ export function Navbar({
 								{active && (
 									<motion.div
 										layoutId="nav-active-underline"
-										className="absolute bottom-0 left-1 right-1 h-[2px] rounded-full"
+										className="absolute right-1 bottom-0 left-1 h-[2px] rounded-full"
 										style={{ backgroundColor: color }}
 										transition={{ type: "spring", stiffness: 350, damping: 30 }}
 									/>
@@ -104,9 +104,14 @@ export function Navbar({
 									name={tab.iconName}
 									className={cn(
 										"h-4 w-4 shrink-0 transition-colors duration-200",
-										active || hoveredTab === tab.title ? "opacity-100" : "opacity-60",
+										active || hoveredTab === tab.title
+											? "opacity-100"
+											: "opacity-60",
 									)}
-									style={{ color: (active || hoveredTab === tab.title) ? color : undefined }}
+									style={{
+										color:
+											active || hoveredTab === tab.title ? color : undefined,
+									}}
 								/>
 								<span className="relative z-10">{tab.title}</span>
 							</Link>

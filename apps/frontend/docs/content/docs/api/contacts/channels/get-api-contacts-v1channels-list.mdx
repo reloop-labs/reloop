@@ -1,5 +1,5 @@
 ---
-title: "List Channels"
+title: List Channels
 full: true
 _openapi:
   method: GET
@@ -7,13 +7,188 @@ _openapi:
   structuredData:
     headings: []
     contents:
-      - content: "Retrieves a paginated list of channels"
+      - content: Retrieves a paginated list of channels
 _apiData:
-  document: "https://reloop.sh/api/contacts/openapi/json"
-  operationData: [{"path":"/api/contacts/v1/channels/list","method":"get"}]
-  parameterList: [{"name":"page","type":"number","required":false,"description":"","location":"query","defaultValue":1,"minimum":1},{"name":"limit","type":"number","required":false,"description":"","location":"query","defaultValue":100,"minimum":1,"maximum":100}]
-  responseMap: {"200":{"description":"Response for status 200","schema":{"object":"channel","channels":[{"id":"channel_123456789","name":"Newsletter","description":"example_description","defaultSubscription":"opt_in","visibility":"private","createdAt":"2026-03-23T10:00:00.000Z","updatedAt":"2026-03-23T10:00:00.000Z","subscriberCount":0}],"total":1,"page":0,"limit":0,"event":"evt_123456789"}},"403":{"description":"Response for status 403","schema":{"message":"Unauthorized access","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead."}}}
-  codeSamples: [{"id":"node","lang":"js","label":"Node.js","source":"import Reloop from 'reloop-email';\n\nconst reloop = new Reloop({\n  url: 'https://reloop.sh',\n  key: 're_123456789'\n});\n\nconst { response: channels, error } = await reloop.contacts.channels.list({\n  page: 1,\n  limit: 10,\n});\nif (error) throw error;"},{"id":"curl","lang":"bash","label":"cURL","source":"curl \"https://reloop.sh/api/contacts/v1/channels/list?page=1&limit=10\" \\\n  -H \"x-api-key: re_123456789\""},{"id":"php","lang":"php","label":"PHP","source":"$reloop = Reloop::client('re_123456789');\n\n$reloop->contacts->channels->list([\n    'page'  => 1,\n    'limit' => 10,\n]);"},{"id":"python","lang":"python","label":"Python","source":"import requests\n\nresponse = requests.get(\n    'https://reloop.sh/api/contacts/v1/channels/list',\n    headers={'x-api-key': 're_123456789'},\n    params={'page': 1, 'limit': 10},\n)\n\nchannels = response.json()"},{"id":"ruby","lang":"ruby","label":"Ruby","source":"require 'net/http'\nrequire 'json'\n\nuri = URI('https://reloop.sh/api/contacts/v1/channels/list')\nuri.query = URI.encode_www_form(page: 1, limit: 10)\nhttp = Net::HTTP.new(uri.host, uri.port)\nhttp.use_ssl = true\n\nrequest = Net::HTTP::Get.new(uri)\nrequest['x-api-key'] = 're_123456789'\n\nresponse = http.request(request)\nchannels = JSON.parse(response.body)"},{"id":"go","lang":"go","label":"Go","source":"package main\n\nimport \"net/http\"\n\nfunc main() {\n  req, _ := http.NewRequest(\"GET\", \"https://reloop.sh/api/contacts/v1/channels/list?page=1&limit=10\", nil)\n  req.Header.Set(\"x-api-key\", \"re_123456789\")\n\n  client := &http.Client{}\n  resp, _ := client.Do(req)\n  defer resp.Body.Close()\n}"},{"id":"rust","lang":"rust","label":"Rust","source":"use reqwest::Client;\n\n#[tokio::main]\nasync fn main() -> Result<(), reqwest::Error> {\n    let client = Client::new();\n\n    let response = client\n        .get(\"https://reloop.sh/api/contacts/v1/channels/list\")\n        .header(\"x-api-key\", \"re_123456789\")\n        .query(&[(\"page\", \"1\"), (\"limit\", \"10\")])\n        .send()\n        .await?;\n\n    Ok(())\n}"},{"id":"java","lang":"java","label":"Java","source":"import java.net.URI;\nimport java.net.http.*;\n\nHttpClient client = HttpClient.newHttpClient();\n\nHttpRequest request = HttpRequest.newBuilder()\n    .uri(URI.create(\"https://reloop.sh/api/contacts/v1/channels/list?page=1&limit=10\"))\n    .header(\"x-api-key\", \"re_123456789\")\n    .GET()\n    .build();\n\nHttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());"},{"id":"dotnet","lang":"csharp","label":".NET","source":"using System.Net.Http;\n\nvar client = new HttpClient();\nclient.DefaultRequestHeaders.Add(\"x-api-key\", \"re_123456789\");\n\nvar response = await client.GetAsync(\n    \"https://reloop.sh/api/contacts/v1/channels/list?page=1&limit=10\"\n);"}]
+  document: 'https://reloop.sh/api/contacts/openapi/json'
+  operationData:
+    - path: /api/contacts/v1/channels/list
+      method: get
+  parameterList:
+    - name: page
+      type: number
+      required: false
+      description: ''
+      location: query
+      defaultValue: 1
+      minimum: 1
+    - name: limit
+      type: number
+      required: false
+      description: ''
+      location: query
+      defaultValue: 100
+      minimum: 1
+      maximum: 100
+  responseMap:
+    '200':
+      description: Response for status 200
+      schema:
+        object: channel
+        channels:
+          - id: channel_123456789
+            name: Newsletter
+            description: example_description
+            defaultSubscription: opt_in
+            visibility: private
+            createdAt: '2026-03-23T10:00:00.000Z'
+            updatedAt: '2026-03-23T10:00:00.000Z'
+            subscriberCount: 0
+        total: 1
+        page: 0
+        limit: 0
+        event: evt_123456789
+    '403':
+      description: Response for status 403
+      schema:
+        message: Unauthorized access
+        why: A contact with this email already exists in your organization.
+        fix: Use a different email address or update the existing contact instead.
+  codeSamples:
+    - id: node
+      lang: js
+      label: Node.js
+      source: >-
+        import Reloop from 'reloop-email';
+
+
+        const reloop = new Reloop({
+          url: 'https://reloop.sh',
+          key: 're_123456789'
+        });
+
+
+        const { response: channels, error } = await
+        reloop.contacts.channels.list({
+          page: 1,
+          limit: 10,
+        });
+
+        if (error) throw error;
+    - id: curl
+      lang: bash
+      label: cURL
+      source: |-
+        curl "https://reloop.sh/api/contacts/v1/channels/list?page=1&limit=10" \
+          -H "x-api-key: re_123456789"
+    - id: php
+      lang: php
+      label: PHP
+      source: |-
+        $reloop = Reloop::client('re_123456789');
+
+        $reloop->contacts->channels->list(
+          options: [
+              'page' => 1,
+              'limit' => 10,
+          ],
+        );
+    - id: python
+      lang: python
+      label: Python
+      source: |-
+        import requests
+
+        response = requests.get(
+            'https://reloop.sh/api/contacts/v1/channels/list',
+            headers={'x-api-key': 're_123456789'},
+            params={'page': 1, 'limit': 10},
+        )
+
+        channels = response.json()
+    - id: ruby
+      lang: ruby
+      label: Ruby
+      source: |-
+        require 'net/http'
+        require 'json'
+
+        uri = URI('https://reloop.sh/api/contacts/v1/channels/list')
+        uri.query = URI.encode_www_form(page: 1, limit: 10)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+
+        request = Net::HTTP::Get.new(uri)
+        request['x-api-key'] = 're_123456789'
+
+        response = http.request(request)
+        channels = JSON.parse(response.body)
+    - id: go
+      lang: go
+      label: Go
+      source: |-
+        package main
+
+        import "net/http"
+
+        func main() {
+          req, _ := http.NewRequest("GET", "https://reloop.sh/api/contacts/v1/channels/list?page=1&limit=10", nil)
+          req.Header.Set("x-api-key", "re_123456789")
+
+          client := &http.Client{}
+          resp, _ := client.Do(req)
+          defer resp.Body.Close()
+        }
+    - id: rust
+      lang: rust
+      label: Rust
+      source: |-
+        use reqwest::Client;
+
+        #[tokio::main]
+        async fn main() -> Result<(), reqwest::Error> {
+            let client = Client::new();
+
+            let response = client
+                .get("https://reloop.sh/api/contacts/v1/channels/list")
+                .header("x-api-key", "re_123456789")
+                .query(&[("page", "1"), ("limit", "10")])
+                .send()
+                .await?;
+
+            Ok(())
+        }
+    - id: java
+      lang: java
+      label: Java
+      source: >-
+        import java.net.URI;
+
+        import java.net.http.*;
+
+
+        HttpClient client = HttpClient.newHttpClient();
+
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("https://reloop.sh/api/contacts/v1/channels/list?page=1&limit=10"))
+            .header("x-api-key", "re_123456789")
+            .GET()
+            .build();
+
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+    - id: dotnet
+      lang: csharp
+      label: .NET
+      source: |-
+        using System.Net.Http;
+
+        var client = new HttpClient();
+        client.DefaultRequestHeaders.Add("x-api-key", "re_123456789");
+
+        var response = await client.GetAsync(
+            "https://reloop.sh/api/contacts/v1/channels/list?page=1&limit=10"
+        );
 ---
 
 {/* This file was generated by the OpenAPI doc generator. Do not edit this file directly. Run `bun run generate:api-docs` to regenerate. */}
