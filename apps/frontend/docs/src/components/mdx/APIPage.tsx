@@ -572,7 +572,6 @@ function ResponseCard({ responses }: { responses: Record<string, any> }) {
 			onTabChange={setActiveStatus}
 			windowTitle="Response"
 			noScroll={false}
-			hideLineNumbers
 		/>
 	);
 }

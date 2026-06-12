@@ -126,14 +126,14 @@ export default async function Page(props: {
 					className={`mx-auto flex w-full flex-col ${
 						hideToc
 							? isApiPage
-								? "max-w-5xl"
+								? "max-w-6xl"
 								: "max-w-none"
 							: "max-w-[1040px] xl:grid xl:grid-cols-[1fr_240px] xl:gap-8"
 					}`}
 				>
 					{/* Main content area */}
 					<div
-						className={`min-w-0 px-6 py-8 md:px-10 ${useSplitLayout ? "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(320px,400px)] lg:gap-x-10 xl:gap-x-12" : ""}`}
+						className={`min-w-0 px-6 py-8 md:px-10 ${useSplitLayout ? "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(380px,480px)] lg:gap-x-10 xl:gap-x-12" : ""}`}
 					>
 						<div
 							className={

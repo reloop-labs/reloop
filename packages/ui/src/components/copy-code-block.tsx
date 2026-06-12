@@ -62,10 +62,6 @@ export function CopyCodeBlock({
 
 	const displayLabel = label ?? lang;
 	const hasTabs = tabs && tabs.length > 0;
-	const addressBarTitle = windowTitle ?? displayLabel;
-	const addressBarIcon = hasTabs
-		? tabs.find((tab) => tab.id === activeTab)?.si
-		: si;
 
 	const activeTabIndex = hasTabs
 		? tabs.findIndex((tab) => tab.id === activeTab)
@@ -85,15 +81,12 @@ export function CopyCodeBlock({
 
 	const getTabPosition = (button: HTMLButtonElement | null | undefined) => {
 		if (!button) return null;
-		const rect = button.getBoundingClientRect();
-		const parent = button.offsetParent?.getBoundingClientRect();
-		if (!parent) return null;
 
 		return {
-			width: rect.width,
-			height: rect.height,
-			left: rect.left - parent.left,
-			top: rect.top - parent.top,
+			width: button.offsetWidth,
+			height: button.offsetHeight,
+			left: button.offsetLeft,
+			top: button.offsetTop,
 		};
 	};
 
@@ -127,7 +120,7 @@ export function CopyCodeBlock({
 	return (
 		<div
 			className={cn(
-				"group relative overflow-hidden rounded-[18px] border border-stroke-soft-100 bg-transparent dark:border-stroke-soft-100/40",
+				"group relative overflow-hidden rounded-[18px] border border-stroke-soft-100 dark:border-stroke-soft-100/40",
 				className,
 			)}
 		>
@@ -136,38 +129,11 @@ export function CopyCodeBlock({
 					display: none;
 				}
 			`}</style>
-			{/* Browser chrome */}
-			<div className="flex items-center gap-3 border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/40">
-				<div className="flex shrink-0 gap-1.5">
-					<div className="size-3 rounded-full bg-bg-weak-50" />
-					<div className="size-3 rounded-full bg-bg-weak-50" />
-					<div className="size-3 rounded-full bg-bg-weak-50" />
-				</div>
-
-				<div className="mx-auto flex min-w-0 max-w-md flex-1 items-center justify-center gap-1.5 font-medium text-text-sub-600 text-xs dark:text-white/45">
-					{addressBarIcon ? (
-						<svg
-							role="img"
-							viewBox="0 0 24 24"
-							className="size-3.5 shrink-0"
-							fill="currentColor"
-							xmlns="http://www.w3.org/2000/svg"
-							style={{ color: `#${addressBarIcon.hex}` }}
-							aria-hidden
-						>
-							<path d={addressBarIcon.path} />
-						</svg>
-					) : null}
-					<span className="truncate font-mono">{addressBarTitle}</span>
-				</div>
-
-				<div className="size-4 shrink-0" aria-hidden />
-			</div>
 
 			{hasTabs ? (
-				<div className="flex items-center gap-3 border-stroke-soft-100 border-b px-4 dark:border-stroke-soft-100/40">
+				<div className="flex items-center gap-3 border-stroke-soft-100 border-b pr-4 pl-1 dark:border-stroke-soft-100/40">
 					<div
-						className="relative flex min-w-0 flex-1 items-center overflow-x-auto scrollbar-none"
+						className="scrollbar-none relative flex min-w-0 flex-1 items-center overflow-x-auto"
 						style={{
 							scrollbarWidth: "none",
 							msOverflowStyle: "none",
@@ -187,7 +153,7 @@ export function CopyCodeBlock({
 									onPointerEnter={() => setHoveredTabIdx(index)}
 									onPointerLeave={() => setHoveredTabIdx(undefined)}
 									className={cn(
-										"relative z-10 flex shrink-0 items-center gap-2 px-4 py-3 font-medium text-sm transition-colors",
+										"relative z-10 flex shrink-0 items-center gap-2 px-4 py-3 font-medium text-[13px] transition-colors",
 										isActive
 											? "text-text-strong-950 dark:text-white"
 											: "text-text-sub-600 dark:text-white/70",
@@ -196,7 +162,7 @@ export function CopyCodeBlock({
 									<svg
 										role="img"
 										viewBox="0 0 24 24"
-										className="size-4 shrink-0"
+										className="size-3.5 shrink-0"
 										fill="currentColor"
 										xmlns="http://www.w3.org/2000/svg"
 										style={{ color: brandColor }}
@@ -256,7 +222,7 @@ export function CopyCodeBlock({
 							<svg
 								role="img"
 								viewBox="0 0 24 24"
-								className="size-4 shrink-0"
+								className="size-3.5 shrink-0"
 								fill="currentColor"
 								xmlns="http://www.w3.org/2000/svg"
 								style={{ color: `#${si.hex}` }}
@@ -265,7 +231,7 @@ export function CopyCodeBlock({
 								<path d={si.path} />
 							</svg>
 						) : null}
-						<span className="font-medium text-sm text-text-sub-600 dark:text-white/50">
+						<span className="font-medium text-[13px] text-text-sub-600 dark:text-white/50">
 							{displayLabel}
 						</span>
 					</div>
@@ -277,7 +243,7 @@ export function CopyCodeBlock({
 				<CodeBlock
 					code={code}
 					lang={lang}
-					className="[&>pre]:!p-3 [&_.line]:!pl-[2.75rem] [&_.line::before]:!w-9 [&_.line::before]:!pr-2 text-[13px] leading-5 sm:text-sm sm:leading-[1.375rem] [&_.line::before]:text-[11px]"
+					className="[&>pre]:!p-3 [&_.line]:!pl-[2.75rem] [&_.line::before]:!w-9 [&_.line::before]:!pr-2 text-[12.5px] leading-5 sm:text-[13px] sm:leading-[1.3125rem] [&_.line::before]:text-[10.5px]"
 					hideLineNumbers={hideLineNumbers}
 					noScroll={noScroll}
 				/>
