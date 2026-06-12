@@ -41,7 +41,7 @@ function convertPythonToDotnet(python: string): string {
 	const apiKeysMatch = call.match(/^reloop\.api_keys\.(\w+)\(([\s\S]*)\)$/);
 	if (apiKeysMatch) {
 		const [, method, argsRaw] = apiKeysMatch;
-		const args = argsRaw.trim();
+		const args = argsRaw!.trim();
 
 		if (method === "create") {
 			const fields = parseKwargs(args)
@@ -86,11 +86,11 @@ function convertPythonToDotnet(python: string): string {
 		}
 
 		const id = args.replace(/^"|"$/g, "");
-		lines.push(`await reloop.ApiKeys.${method.charAt(0).toUpperCase()}${method.slice(1)}Async("${id}");`);
+		lines.push(`await reloop.ApiKeys.${method!.charAt(0).toUpperCase()}${method!.slice(1)}Async("${id}");`);
 		return wrapCSharpSample(lines, true);
 	}
 
-	const methodPatterns: Array<{ pattern: RegExp; build: (match: RegExpMatchArray) => string[] }> = [
+	const methodPatterns: Array<{ pattern: RegExp; build: (match: string[]) => string[] }> = [
 		{
 			pattern: /^reloop\.contacts\.create\(([\s\S]*)\)$/,
 			build: ([, kwargs]) => {
