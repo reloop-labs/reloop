@@ -1,0 +1,13 @@
+{
+	"title": "Domains",
+	"pages": [
+		"post-api-domain-v1create",
+		"get-api-domain-v1nameservers-by-domain_id",
+		"get-api-domain-v1by-domain_id",
+		"patch-api-domain-v1by-domain_id",
+		"delete-api-domain-v1by-domain_id",
+		"get-api-domain-v1list",
+		"post-api-domain-v1verify-by-domain_id",
+		"post-api-domain-v1verify-by-domain_id-forward-dns"
+	]
+}

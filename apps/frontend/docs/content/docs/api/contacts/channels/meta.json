@@ -1,0 +1,10 @@
+{
+	"title": "Channels",
+	"pages": [
+		"post-api-contacts-v1channels-create",
+		"get-api-contacts-v1channels-by-channel_id",
+		"patch-api-contacts-v1channels-by-channel_id",
+		"delete-api-contacts-v1channels-by-channel_id",
+		"get-api-contacts-v1channels-list"
+	]
+}

@@ -1,0 +1,9 @@
+{
+	"title": "Preferences",
+	"pages": [
+		"get-api-contacts-v1preferences-generate",
+		"get-api-contacts-v1preferences-data",
+		"post-api-contacts-v1preferences-update",
+		"post-api-contacts-v1preferences-unsubscribe-all"
+	]
+}

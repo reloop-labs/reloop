@@ -1,0 +1,11 @@
+{
+	"title": "Groups",
+	"pages": [
+		"post-api-contacts-v1groups-create",
+		"get-api-contacts-v1groups-by-group_id",
+		"patch-api-contacts-v1groups-by-group_id",
+		"delete-api-contacts-v1groups-by-group_id",
+		"get-api-contacts-v1groups-list",
+		"get-api-contacts-v1groups-by-group_id-contacts"
+	]
+}

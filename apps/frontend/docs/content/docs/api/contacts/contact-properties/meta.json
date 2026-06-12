@@ -1,0 +1,9 @@
+{
+	"title": "Contact Properties",
+	"pages": [
+		"post-api-contacts-v1properties-create",
+		"get-api-contacts-v1properties-list",
+		"patch-api-contacts-v1properties-by-contact_property_id",
+		"delete-api-contacts-v1properties-by-contact_property_id"
+	]
+}

@@ -1,10 +1,7 @@
 {
 	"title": "Mail",
 	"pages": [
-		"---Tracking---",
-		"get-api-mail-v1track-open-by-token",
-		"get-api-mail-v1track-click-by-token",
-		"---Other---",
-		"post-api-mail-v1send"
+		"tracking",
+		"other"
 	]
 }
