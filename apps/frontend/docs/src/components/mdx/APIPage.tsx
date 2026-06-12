@@ -4,7 +4,19 @@ import { CodePortal } from "@reloop/fe-docs/components/docs/code-column-context"
 import { cn } from "@reloop/ui/cn";
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
-import { CodeGroup, CodeBlock as MintlifyCodeBlock } from "./mintlify-client";
+import { CodeBlock } from "@reloop/ui/code-block";
+import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
+import {
+	siNodedotjs,
+	siPhp,
+	siPython,
+	siRuby,
+	siGo,
+	siRust,
+	siOpenjdk,
+	siDotnet,
+	siGnubash,
+} from "simple-icons";
 
 interface Parameter {
 	name: string;
@@ -278,6 +290,37 @@ function ParameterRow({ param }: { param: Parameter }) {
 
 /* ─── Response Card ─────────────────────────────────────── */
 
+const LANGUAGE_ICONS: Record<string, any> = {
+	node: siNodedotjs,
+	nodejs: siNodedotjs,
+	javascript: siNodedotjs,
+	js: siNodedotjs,
+	typescript: siNodedotjs,
+	ts: siNodedotjs,
+	php: siPhp,
+	python: siPython,
+	ruby: siRuby,
+	go: siGo,
+	rust: siRust,
+	java: siOpenjdk,
+	dotnet: siDotnet,
+	csharp: siDotnet,
+	curl: siGnubash,
+	bash: siGnubash,
+	shell: siGnubash,
+};
+
+function getIconForSample(sampleId: string, lang: string) {
+	const icon =
+		LANGUAGE_ICONS[sampleId.toLowerCase()] ||
+		LANGUAGE_ICONS[lang.toLowerCase()] ||
+		siGnubash;
+	return {
+		path: icon.path,
+		hex: icon.hex,
+	};
+}
+
 function ResponseCard({ responses }: { responses: Record<string, any> }) {
 	const statusCodes = Object.keys(responses);
 	const [activeStatus, setActiveStatus] = useState(statusCodes[0] || "200");
@@ -322,9 +365,9 @@ function ResponseCard({ responses }: { responses: Record<string, any> }) {
 				</div>
 			</div>
 
-			{/* JSON response body — using Mintlify CodeBlock for syntax highlighting */}
-			<div className="[&_.code-group]:!my-0 [&_.code-group]:!mt-0 [&_.code-group]:!mb-0 [&_.mintlify-code-block]:!my-0">
-				<MintlifyCodeBlock language="json">{jsonStr}</MintlifyCodeBlock>
+			{/* JSON response body — using CodeBlock from @reloop/ui/code-block */}
+			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-100 bg-transparent dark:border-stroke-soft-100/40">
+				<CodeBlock lang="json" code={jsonStr} hideLineNumbers />
 			</div>
 		</div>
 	);
@@ -343,63 +386,49 @@ function CodeExamples({
 	parameters: Parameter[];
 	codeSamples: CodeSample[];
 }) {
-	if (codeSamples && codeSamples.length > 0) {
-		return (
-			<div className="[&_.code-group]:!my-0 [&_.code-group]:!mt-0 [&_.code-group]:!mb-0">
-				<CodeGroup isSmallText>
-					{codeSamples.map((sample) => (
-						<MintlifyCodeBlock
-							key={sample.id}
-							filename={sample.label}
-							language={sample.lang}
-						>
-							{sample.source}
-						</MintlifyCodeBlock>
-					))}
-				</CodeGroup>
-			</div>
-		);
-	}
+	const [activeTab, setActiveTab] = useState("");
 
-	// Fallback: generate basic samples
-	const bodyParams = parameters.filter((p) => p.location === "body");
-	const queryParams = parameters.filter((p) => p.location === "query");
+	// Fallback generated samples if codeSamples is empty
+	let samples = codeSamples;
+	if (!samples || samples.length === 0) {
+		const bodyParams = parameters.filter((p) => p.location === "body");
+		const queryParams = parameters.filter((p) => p.location === "query");
 
-	const bodyJSON = bodyParams.length
-		? JSON.stringify(
-				bodyParams.reduce(
-					(acc, p) => ({
-						...acc,
-						[p.name]:
-							p.example ??
-							(p.type === "number"
-								? 0
-								: p.type === "boolean"
-									? true
-									: `${p.name}_value`),
-					}),
-					{},
-				),
-				null,
-				2,
-			)
-		: "";
+		const bodyJSON = bodyParams.length
+			? JSON.stringify(
+					bodyParams.reduce(
+						(acc, p) => ({
+							...acc,
+							[p.name]:
+								p.example ??
+								(p.type === "number"
+									? 0
+									: p.type === "boolean"
+										? true
+										: `${p.name}_value`),
+						}),
+						{},
+					),
+					null,
+					2,
+				)
+			: "";
 
-	const qs = queryParams.length
-		? `?${queryParams.map((p) => `${p.name}=${p.example || "value"}`).join("&")}`
-		: "";
+		const qs = queryParams.length
+			? `?${queryParams.map((p) => `${p.name}=${p.example || "value"}`).join("&")}`
+			: "";
 
-	const curl = `curl -X ${method} \\
+		const curl = `curl -X ${method} \\
   https://api.reloop.sh${path}${qs} \\
   -H "Authorization: Bearer re_123456789"${
-		bodyJSON
-			? ` \\
+			bodyJSON
+				? ` \\
   -H "Content-Type: application/json" \\
   -d '${bodyJSON}'`
-			: ""
-	}`;
+				: ""
+		}`;
 
-	const nodejs = `const response = await fetch("https://api.reloop.sh${path}${qs}", {
+		const nodejs = `const response = await fetch("https://api.reloop.sh${path}${qs}", {
   method: "${method}",
   headers: {
     "Authorization": "Bearer re_123456789",${
@@ -418,7 +447,7 @@ function CodeExamples({
 
 const data = await response.json();`;
 
-	const python = `import requests
+		const python = `import requests
 
 response = requests.${method.toLowerCase()}(
     "https://api.reloop.sh${path}${qs}",
@@ -432,20 +461,36 @@ response = requests.${method.toLowerCase()}(
 
 print(response.json())`;
 
+		samples = [
+			{ id: "node", lang: "javascript", label: "Node.js", source: nodejs },
+			{ id: "curl", lang: "bash", label: "cURL", source: curl },
+			{ id: "python", lang: "python", label: "Python", source: python },
+		];
+	}
+
+	const resolvedActiveTab = activeTab && samples.some((s) => s.id === activeTab)
+		? activeTab
+		: samples[0]?.id || "";
+
+	const activeSample = samples.find((s) => s.id === resolvedActiveTab) || samples[0];
+
+	if (!activeSample) return null;
+
+	const tabs = samples.map((sample) => ({
+		id: sample.id,
+		label: sample.label,
+		si: getIconForSample(sample.id, sample.lang),
+	}));
+
 	return (
-		<div className="[&_.code-group]:!my-0 [&_.code-group]:!mt-0 [&_.code-group]:!mb-0">
-			<CodeGroup isSmallText>
-				<MintlifyCodeBlock filename="Node.js" language="javascript">
-					{nodejs}
-				</MintlifyCodeBlock>
-				<MintlifyCodeBlock filename="cURL" language="bash">
-					{curl}
-				</MintlifyCodeBlock>
-				<MintlifyCodeBlock filename="Python" language="python">
-					{python}
-				</MintlifyCodeBlock>
-			</CodeGroup>
-		</div>
+		<CopyCodeBlock
+			code={activeSample.source}
+			lang={activeSample.lang}
+			tabs={tabs}
+			activeTab={resolvedActiveTab}
+			onTabChange={setActiveTab}
+			noScroll={false}
+		/>
 	);
 }
 

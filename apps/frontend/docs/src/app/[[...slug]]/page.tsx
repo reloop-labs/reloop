@@ -124,11 +124,9 @@ export default async function Page(props: {
 			>
 				<div
 					className={`mx-auto flex w-full flex-col ${
-						isApiPage
-							? "max-w-[1080px]"
-							: hideToc
-								? "max-w-none"
-								: "max-w-[1040px] xl:grid xl:grid-cols-[1fr_240px] xl:gap-8"
+						hideToc
+							? "max-w-none"
+							: "max-w-[1040px] xl:grid xl:grid-cols-[1fr_240px] xl:gap-8"
 					}`}
 				>
 					{/* Main content area */}
@@ -190,7 +188,9 @@ export default async function Page(props: {
 							{/* Content */}
 							<DocsBody
 								className={
-									isApiPage ? "[&>p:first-child]:hidden [&>p:first-child]:m-0" : ""
+									isApiPage
+										? "[&>p:first-child]:m-0 [&>p:first-child]:hidden"
+										: ""
 								}
 							>
 								<MDXContent
