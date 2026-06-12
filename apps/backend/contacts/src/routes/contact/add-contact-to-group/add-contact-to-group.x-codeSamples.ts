@@ -71,28 +71,20 @@ request.body = { contact_id: 'cont_123456789' }.to_json
 response = http.request(request)
 result = JSON.parse(response.body)`,
 	},
-	{
+		{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `package main
-
-import (
-  "bytes"
-  "encoding/json"
-  "net/http"
-)
+		source: `import reloop
 
 func main() {
-  body, _ := json.Marshal(map[string]string{"contact_id": "cont_123456789"})
-
-  req, _ := http.NewRequest("POST", "https://reloop.sh/api/contacts/group/grp_123456789", bytes.NewBuffer(body))
-  req.Header.Set("x-api-key", "re_123456789")
-  req.Header.Set("Content-Type", "application/json")
-
-  client := &http.Client{}
-  resp, _ := client.Do(req)
-  defer resp.Body.Close()
+    client, _ := reloop.NewClient(reloop.ClientOptions{
+        APIKey: "re_123456789",
+    })
+    
+    _, _ = client.Contacts.Groups.AddContact("grp_123456789", map[string]interface{}{
+        "contact_id": "cont_123456789"
+    })
 }`,
 	},
 	{

@@ -69,28 +69,20 @@ request.body = { name: 'Beta Testers' }.to_json
 response = http.request(request)
 group = JSON.parse(response.body)`,
 	},
-	{
+			{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `package main
-
-import (
-  "bytes"
-  "encoding/json"
-  "net/http"
-)
+		source: `import reloop
 
 func main() {
-  body, _ := json.Marshal(map[string]string{"name": "Beta Testers"})
-
-  req, _ := http.NewRequest("POST", "https://reloop.sh/api/contacts/v1/groups/create", bytes.NewBuffer(body))
-  req.Header.Set("x-api-key", "re_123456789")
-  req.Header.Set("Content-Type", "application/json")
-
-  client := &http.Client{}
-  resp, _ := client.Do(req)
-  defer resp.Body.Close()
+    client, _ := reloop.NewClient(reloop.ClientOptions{
+        APIKey: "re_123456789",
+    })
+    
+    _, _ = client.Contacts.CreateGroup(map[string]interface{}{
+        "name": "Beta Testers"
+    })
 }`,
 	},
 	{

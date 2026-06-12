@@ -51,38 +51,32 @@ _apiData:
     - id: node
       lang: js
       label: Node.js
-      source: >-
+      source: |-
         import Reloop from 'reloop-email';
-
-
+        
         const reloop = new Reloop({
           url: 'https://reloop.sh',
           key: 're_123456789'
         });
-
-
-        const { response, error } = await
-        reloop.contacts.groups.removeContact('grp_123456789', {
+        
+        const { response, error } = await reloop.contacts.groups.removeContact('grp_123456789', {
           contact_id: 'cont_123456789',
         });
-
         if (error) throw error;
     - id: curl
       lang: bash
       label: cURL
       source: |-
-        curl -X DELETE https://reloop.sh/api/contacts/group/grp_123456789 \
-          -H "x-api-key: re_123456789" \
-          -H "Content-Type: application/json" \
-          -d '{
-          "contact_id": "cont_123456789"
-        }'
+        curl -X DELETE https://reloop.sh/api/contacts/group/grp_123456789 \\
+          -H "x-api-key: re_123456789" \\
+          -H "Content-Type: application/json" \\
+          -d '${removeContactFromGroupBody}'
     - id: php
       lang: php
       label: PHP
       source: |-
         $reloop = Reloop::client('re_123456789');
-
+        
         $reloop->contacts->groups->removeContact(
           'grp_123456789',
           parameters: [
@@ -94,7 +88,7 @@ _apiData:
       label: Python
       source: |-
         reloop = Reloop(api_key="re_123456789")
-
+        
         reloop.contacts.groups.remove_contact(
             "grp_123456789",
             contact_id="cont_123456789"
@@ -105,40 +99,32 @@ _apiData:
       source: |-
         require 'net/http'
         require 'json'
-
+        
         uri = URI('https://reloop.sh/api/contacts/group/grp_123456789')
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
-
+        
         request = Net::HTTP::Delete.new(uri)
         request['x-api-key'] = 're_123456789'
         request['Content-Type'] = 'application/json'
         request.body = { contact_id: 'cont_123456789' }.to_json
-
+        
         response = http.request(request)
         result = JSON.parse(response.body)
     - id: go
       lang: go
       label: Go
       source: |-
-        package main
-
-        import (
-          "bytes"
-          "encoding/json"
-          "net/http"
-        )
-
+        import reloop
+        
         func main() {
-          body, _ := json.Marshal(map[string]string{"contact_id": "cont_123456789"})
-
-          req, _ := http.NewRequest("DELETE", "https://reloop.sh/api/contacts/group/grp_123456789", bytes.NewBuffer(body))
-          req.Header.Set("x-api-key", "re_123456789")
-          req.Header.Set("Content-Type", "application/json")
-
-          client := &http.Client{}
-          resp, _ := client.Do(req)
-          defer resp.Body.Close()
+            client, _ := reloop.NewClient(reloop.ClientOptions{
+                APIKey: "re_123456789",
+            })
+            
+            _, _ = client.Contacts.Groups.RemoveContact("grp_123456789", map[string]interface{}{
+                "contact_id": "cont_123456789"
+            })
         }
     - id: rust
       lang: rust
@@ -146,66 +132,53 @@ _apiData:
       source: |-
         use reqwest::Client;
         use serde_json::json;
-
+        
         #[tokio::main]
         async fn main() -> Result<(), reqwest::Error> {
             let client = Client::new();
-
+        
             let response = client
                 .delete("https://reloop.sh/api/contacts/group/grp_123456789")
                 .header("x-api-key", "re_123456789")
                 .json(&json!({ "contact_id": "cont_123456789" }))
                 .send()
                 .await?;
-
+        
             Ok(())
         }
     - id: java
       lang: java
       label: Java
-      source: >-
+      source: |-
         import java.net.URI;
-
         import java.net.http.*;
-
         import java.net.http.HttpRequest.BodyPublishers;
-
-
+        
         HttpClient client = HttpClient.newHttpClient();
-
-
+        
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("https://reloop.sh/api/contacts/group/grp_123456789"))
             .header("x-api-key", "re_123456789")
             .header("Content-Type", "application/json")
-            .method("DELETE", BodyPublishers.ofString("{\"contact_id\": \"cont_123456789\"}"))
+            .method("DELETE", BodyPublishers.ofString("{\\"contact_id\\": \\"cont_123456789\\"}"))
             .build();
-
-        HttpResponse<String> response = client.send(request,
-        HttpResponse.BodyHandlers.ofString());
+        
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
     - id: dotnet
       lang: csharp
       label: .NET
-      source: >-
+      source: |-
         using System.Net.Http;
-
         using System.Net.Http.Json;
-
-
+        
         var client = new HttpClient();
-
         client.DefaultRequestHeaders.Add("x-api-key", "re_123456789");
-
-
+        
         var payload = new { contact_id = "cont_123456789" };
-
-
-        var request = new HttpRequestMessage(HttpMethod.Delete,
-        "https://reloop.sh/api/contacts/group/grp_123456789");
-
+        
+        var request = new HttpRequestMessage(HttpMethod.Delete, "https://reloop.sh/api/contacts/group/grp_123456789");
         request.Content = JsonContent.Create(payload);
-
-
+        
         var response = await client.SendAsync(request);
 ---
 

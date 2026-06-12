@@ -103,36 +103,23 @@ request.body = {
 response = http.request(request)
 contact = JSON.parse(response.body)`,
 	},
-	{
+		{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `package main
-
-import (
-  "bytes"
-  "encoding/json"
-  "net/http"
-)
+		source: `import reloop
 
 func main() {
-  body, _ := json.Marshal(map[string]any{
-    "firstName": "Jane",
-    "lastName":  "Smith",
-    "status":    "subscribed",
-    "properties": map[string]string{
-      "company": "Reloop",
-      "role":    "Designer",
-    },
-  })
-
-  req, _ := http.NewRequest("PATCH", "https://reloop.sh/api/contacts/cont_123456789", bytes.NewBuffer(body))
-  req.Header.Set("x-api-key", "re_123456789")
-  req.Header.Set("Content-Type", "application/json")
-
-  client := &http.Client{}
-  resp, _ := client.Do(req)
-  defer resp.Body.Close()
+    client, _ := reloop.NewClient(reloop.ClientOptions{
+        APIKey: "re_123456789",
+    })
+    
+    _, _ = client.Contacts.Update("cont_123456789", map[string]interface{}{
+        "first_name": "Jane",
+        "last_name": "Smith",
+        "unsubscribed": false,
+        "properties": map[string]interface{}{"company": "Reloop", "role": "Designer"}
+    })
 }`,
 	},
 	{

@@ -44,12 +44,10 @@ $reloop->contacts->groups->listContacts(
 		source: `reloop = Reloop(api_key="re_123456789")
 
 reloop.contacts.groups.list_contacts(
-  'grp_123456789',
-  options: [
-      'page' => 1,
-      'limit' => 10,
-  ],
-);`,
+    "grp_123456789",
+    page=1,
+    limit=10,
+)`,
 	},
 	{
 		id: "ruby",
@@ -69,21 +67,21 @@ request['x-api-key'] = 're_123456789'
 response = http.request(request)
 contacts = JSON.parse(response.body)`,
 	},
-	{
+		{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `package main
-
-import "net/http"
+		source: `import reloop
 
 func main() {
-  req, _ := http.NewRequest("GET", "https://reloop.sh/api/contacts/v1/groups/grp_123456789/contacts?page=1&limit=10", nil)
-  req.Header.Set("x-api-key", "re_123456789")
-
-  client := &http.Client{}
-  resp, _ := client.Do(req)
-  defer resp.Body.Close()
+    client, _ := reloop.NewClient(reloop.ClientOptions{
+        APIKey: "re_123456789",
+    })
+    
+    _, _ = client.Contacts.Groups.ListContacts("grp_123456789", map[string]interface{}{
+        "page": 1,
+        "limit": 10
+    })
 }`,
 	},
 	{

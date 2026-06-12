@@ -38,6 +38,24 @@ reloop.api_keys.create(
     rate_limit_enabled=True
 )`,
 	},
+			{
+		id: "go",
+		lang: "go",
+		label: "Go",
+		source: `import reloop
+
+func main() {
+    client, _ := reloop.NewClient(reloop.ClientOptions{
+        APIKey: "rl_123456789",
+    })
+    
+    _, _ = client.ApiKeys.Create(reloop.CreateApiKeyParams{
+        Name: "Production key",
+        Enabled: reloop.Bool(true),
+        RateLimitEnabled: reloop.Bool(true)
+    })
+}`,
+	},
 	{
 		id: "php",
 		lang: "php",

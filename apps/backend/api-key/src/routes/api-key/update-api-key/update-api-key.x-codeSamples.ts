@@ -36,6 +36,23 @@ reloop.api_keys.update(
     enabled=True
 )`,
 	},
+			{
+		id: "go",
+		lang: "go",
+		label: "Go",
+		source: `import reloop
+
+func main() {
+    client, _ := reloop.NewClient(reloop.ClientOptions{
+        APIKey: "rl_123456789",
+    })
+    
+    _, _ = client.ApiKeys.Update("key_123456789", reloop.UpdateApiKeyParams{
+        Name: "Updated production key",
+        Enabled: reloop.Bool(true)
+    })
+}`,
+	},
 	{
 		id: "php",
 		lang: "php",

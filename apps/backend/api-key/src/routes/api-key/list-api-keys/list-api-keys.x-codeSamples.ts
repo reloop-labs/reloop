@@ -30,6 +30,23 @@ reloop.api_keys.list(
     limit=10
 )`,
 	},
+			{
+		id: "go",
+		lang: "go",
+		label: "Go",
+		source: `import reloop
+
+func main() {
+    client, _ := reloop.NewClient(reloop.ClientOptions{
+        APIKey: "rl_123456789",
+    })
+    
+    _, _ = client.ApiKeys.List(&reloop.ApiKeyListParams{
+        Page: reloop.Int(1),
+    Limit: reloop.Int(10),
+    })
+}`,
+	},
 	{
 		id: "php",
 		lang: "php",

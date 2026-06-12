@@ -81,32 +81,22 @@ request.body = {
 response = http.request(request)
 property = JSON.parse(response.body)`,
 	},
-	{
+			{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `package main
-
-import (
-  "bytes"
-  "encoding/json"
-  "net/http"
-)
+		source: `import reloop
 
 func main() {
-  body, _ := json.Marshal(map[string]string{
-    "name":          "company_name",
-    "type":          "string",
-    "fallbackValue": "Unknown",
-  })
-
-  req, _ := http.NewRequest("POST", "https://reloop.sh/api/contacts/v1/properties/create", bytes.NewBuffer(body))
-  req.Header.Set("x-api-key", "re_123456789")
-  req.Header.Set("Content-Type", "application/json")
-
-  client := &http.Client{}
-  resp, _ := client.Do(req)
-  defer resp.Body.Close()
+    client, _ := reloop.NewClient(reloop.ClientOptions{
+        APIKey: "re_123456789",
+    })
+    
+    _, _ = client.Contacts.CreateProperty(map[string]interface{}{
+        "name": "company_name",
+        "type": "string",
+        "fallback_value": "Unknown"
+    })
 }`,
 	},
 	{

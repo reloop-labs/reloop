@@ -24,6 +24,20 @@ const apiKey = await reloop.apiKey.disable("key_123456789");`,
 
 reloop.api_keys.disable("key_123456789")`,
 	},
+			{
+		id: "go",
+		lang: "go",
+		label: "Go",
+		source: `import reloop
+
+func main() {
+    client, _ := reloop.NewClient(reloop.ClientOptions{
+        APIKey: "rl_123456789",
+    })
+    
+    _, _ = client.ApiKeys.Disable("key_123456789")
+}`,
+	},
 	{
 		id: "php",
 		lang: "php",

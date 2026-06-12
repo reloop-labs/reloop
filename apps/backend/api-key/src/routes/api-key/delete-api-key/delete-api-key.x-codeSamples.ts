@@ -24,6 +24,20 @@ const result = await reloop.apiKey.delete("key_123456789");`,
 
 reloop.api_keys.delete("key_123456789")`,
 	},
+			{
+		id: "go",
+		lang: "go",
+		label: "Go",
+		source: `import reloop
+
+func main() {
+    client, _ := reloop.NewClient(reloop.ClientOptions{
+        APIKey: "rl_123456789",
+    })
+    
+    _, _ = client.ApiKeys.Delete("key_123456789")
+}`,
+	},
 	{
 		id: "php",
 		lang: "php",

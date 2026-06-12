@@ -24,6 +24,20 @@ const apiKey = await reloop.apiKey.rotate("key_123456789");`,
 
 reloop.api_keys.rotate("key_123456789")`,
 	},
+			{
+		id: "go",
+		lang: "go",
+		label: "Go",
+		source: `import reloop
+
+func main() {
+    client, _ := reloop.NewClient(reloop.ClientOptions{
+        APIKey: "rl_123456789",
+    })
+    
+    _, _ = client.ApiKeys.Rotate("key_123456789")
+}`,
+	},
 	{
 		id: "php",
 		lang: "php",

@@ -65,21 +65,21 @@ request['x-api-key'] = 're_123456789'
 response = http.request(request)
 groups = JSON.parse(response.body)`,
 	},
-	{
+			{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `package main
-
-import "net/http"
+		source: `import reloop
 
 func main() {
-  req, _ := http.NewRequest("GET", "https://reloop.sh/api/contacts/v1/groups/list?page=1&limit=10", nil)
-  req.Header.Set("x-api-key", "re_123456789")
-
-  client := &http.Client{}
-  resp, _ := client.Do(req)
-  defer resp.Body.Close()
+    client, _ := reloop.NewClient(reloop.ClientOptions{
+        APIKey: "re_123456789",
+    })
+    
+    _, _ = client.Contacts.ListGroups(map[string]interface{}{
+        "page": 1,
+        "limit": 10
+    })
 }`,
 	},
 	{

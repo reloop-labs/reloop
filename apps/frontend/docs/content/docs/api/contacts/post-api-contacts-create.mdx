@@ -117,12 +117,12 @@ _apiData:
       label: Node.js
       source: |-
         import Reloop from 'reloop-email';
-
+        
         const reloop = new Reloop({
           url: 'https://reloop.sh',
           key: 're_123456789'
         });
-
+        
         const { data: contact, error } = await reloop.contacts.create({
           email: 'john.doe@example.com',
           firstName: 'John',
@@ -144,32 +144,16 @@ _apiData:
       lang: bash
       label: cURL
       source: |-
-        curl -X POST https://reloop.sh/api/contacts/create \
-          -H "x-api-key: re_123456789" \
-          -H "Content-Type: application/json" \
-          -d '{
-          "email": "john.doe@example.com",
-          "firstName": "John",
-          "lastName": "Doe",
-          "status": "subscribed",
-          "properties": {
-            "company": "Reloop",
-            "role": "Developer"
-          },
-          "groupIds": ["grp_123456789"],
-          "channels": [
-            {
-              "channelId": "channel_123456789",
-              "subscription": "opt_in"
-            }
-          ]
-        }'
+        curl -X POST https://reloop.sh/api/contacts/create \\
+          -H "x-api-key: re_123456789" \\
+          -H "Content-Type: application/json" \\
+          -d '${createContactBody}'
     - id: php
       lang: php
       label: PHP
       source: |-
         $reloop = Reloop::client('re_123456789');
-
+        
         $reloop->contacts->create(
           parameters: [
               'email' => 'john.doe@example.com',
@@ -194,7 +178,7 @@ _apiData:
       label: Python
       source: |-
         reloop = Reloop(api_key="re_123456789")
-
+        
         reloop.contacts.create(
             email="john.doe@example.com",
             first_name="John",
@@ -218,11 +202,11 @@ _apiData:
       source: |-
         require 'net/http'
         require 'json'
-
+        
         uri = URI('https://reloop.sh/api/contacts/create')
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
-
+        
         request = Net::HTTP::Post.new(uri)
         request['x-api-key'] = 're_123456789'
         request['Content-Type'] = 'application/json'
@@ -243,47 +227,29 @@ _apiData:
             },
           ],
         }.to_json
-
+        
         response = http.request(request)
         contact = JSON.parse(response.body)
     - id: go
       lang: go
       label: Go
       source: |-
-        package main
-
-        import (
-          "bytes"
-          "encoding/json"
-          "net/http"
-        )
-
+        import reloop
+        
         func main() {
-          body, _ := json.Marshal(map[string]any{
-            "email":     "john.doe@example.com",
-            "firstName": "John",
-            "lastName":  "Doe",
-            "status":    "subscribed",
-            "properties": map[string]string{
-              "company": "Reloop",
-              "role":    "Developer",
-            },
-            "groupIds": []string{"grp_123456789"},
-            "channels": []map[string]string{
-              {
-                "channelId":    "channel_123456789",
-                "subscription": "opt_in",
-              },
-            },
-          })
-
-          req, _ := http.NewRequest("POST", "https://reloop.sh/api/contacts/create", bytes.NewBuffer(body))
-          req.Header.Set("x-api-key", "re_123456789")
-          req.Header.Set("Content-Type", "application/json")
-
-          client := &http.Client{}
-          resp, _ := client.Do(req)
-          defer resp.Body.Close()
+            client, _ := reloop.NewClient(reloop.ClientOptions{
+                APIKey: "re_123456789",
+            })
+            
+            _, _ = client.Contacts.Create(map[string]interface{}{
+                "email": "john.doe@example.com",
+                "first_name": "John",
+                "last_name": "Doe",
+                "unsubscribed": false,
+                "properties": map[string]interface{}{"company": "Reloop", "role": "Developer"},
+                "group_ids": []interface{}{"grp_123456789"},
+                "channels": []interface{}{map[string]interface{}{"channel_id": "channel_123456789", "subscription": "opt_in"}}
+            })
         }
     - id: rust
       lang: rust
@@ -291,11 +257,11 @@ _apiData:
       source: |-
         use reqwest::Client;
         use serde_json::json;
-
+        
         #[tokio::main]
         async fn main() -> Result<(), reqwest::Error> {
             let client = Client::new();
-
+        
             let response = client
                 .post("https://reloop.sh/api/contacts/create")
                 .header("x-api-key", "re_123456789")
@@ -316,62 +282,41 @@ _apiData:
                 }))
                 .send()
                 .await?;
-
+        
             Ok(())
         }
     - id: java
       lang: java
       label: Java
-      source: >-
+      source: |-
         import java.net.URI;
-
         import java.net.http.*;
-
         import java.net.http.HttpRequest.BodyPublishers;
-
-
+        
         HttpClient client = HttpClient.newHttpClient();
-
-
+        
         String body = """
-            {
-              "email": "john.doe@example.com",
-              "firstName": "John",
-              "lastName": "Doe",
-              "status": "subscribed",
-              "properties": {
-                "company": "Reloop",
-                "role": "Developer"
-              },
-              "groupIds": ["grp_123456789"],
-              "channels": [
-                {
-                  "channelId": "channel_123456789",
-                  "subscription": "opt_in"
-                }
-              ]
-            }
+            ${createContactBody.replace(/\n/g, "\n    ")}
             """;
-
+        
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("https://reloop.sh/api/contacts/create"))
             .header("x-api-key", "re_123456789")
             .header("Content-Type", "application/json")
             .POST(BodyPublishers.ofString(body))
             .build();
-
-        HttpResponse<String> response = client.send(request,
-        HttpResponse.BodyHandlers.ofString());
+        
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
     - id: dotnet
       lang: csharp
       label: .NET
       source: |-
         using System.Net.Http;
         using System.Net.Http.Json;
-
+        
         var client = new HttpClient();
         client.DefaultRequestHeaders.Add("x-api-key", "re_123456789");
-
+        
         var contact = new {
             email = "john.doe@example.com",
             firstName = "John",
@@ -389,7 +334,7 @@ _apiData:
                 },
             },
         };
-
+        
         var response = await client.PostAsJsonAsync(
             "https://reloop.sh/api/contacts/create",
             contact

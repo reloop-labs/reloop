@@ -71,28 +71,20 @@ request.body = { name: 'Early Access' }.to_json
 response = http.request(request)
 group = JSON.parse(response.body)`,
 	},
-	{
+		{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `package main
-
-import (
-  "bytes"
-  "encoding/json"
-  "net/http"
-)
+		source: `import reloop
 
 func main() {
-  body, _ := json.Marshal(map[string]string{"name": "Early Access"})
-
-  req, _ := http.NewRequest("PATCH", "https://reloop.sh/api/contacts/v1/groups/grp_123456789", bytes.NewBuffer(body))
-  req.Header.Set("x-api-key", "re_123456789")
-  req.Header.Set("Content-Type", "application/json")
-
-  client := &http.Client{}
-  resp, _ := client.Do(req)
-  defer resp.Body.Close()
+    client, _ := reloop.NewClient(reloop.ClientOptions{
+        APIKey: "re_123456789",
+    })
+    
+    _, _ = client.Contacts.UpdateGroup("grp_123456789", map[string]interface{}{
+        "name": "Early Access"
+    })
 }`,
 	},
 	{

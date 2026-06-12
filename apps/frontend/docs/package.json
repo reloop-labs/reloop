@@ -7,7 +7,8 @@
 		"dev": "next dev --turbo --port=3003",
 		"start": "next start",
 		"generate:api-docs": "bun run scripts/generate-api-docs.ts",
-		"sync:code-samples": "bun run scripts/sync-code-samples-from-source.ts"
+		"sync:code-samples": "bun run scripts/sync-code-samples-from-source.ts",
+		"update:go-samples": "bun run scripts/update-go-from-python-samples.ts"
 	},
 	"dependencies": {
 		"@mintlify/components": "catalog:ui",

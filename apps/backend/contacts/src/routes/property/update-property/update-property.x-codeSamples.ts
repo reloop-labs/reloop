@@ -71,28 +71,20 @@ request.body = { fallbackValue: 'N/A' }.to_json
 response = http.request(request)
 property = JSON.parse(response.body)`,
 	},
-	{
+		{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `package main
-
-import (
-  "bytes"
-  "encoding/json"
-  "net/http"
-)
+		source: `import reloop
 
 func main() {
-  body, _ := json.Marshal(map[string]string{"fallbackValue": "N/A"})
-
-  req, _ := http.NewRequest("PATCH", "https://reloop.sh/api/contacts/v1/properties/prop_123456789", bytes.NewBuffer(body))
-  req.Header.Set("x-api-key", "re_123456789")
-  req.Header.Set("Content-Type", "application/json")
-
-  client := &http.Client{}
-  resp, _ := client.Do(req)
-  defer resp.Body.Close()
+    client, _ := reloop.NewClient(reloop.ClientOptions{
+        APIKey: "re_123456789",
+    })
+    
+    _, _ = client.Contacts.UpdateProperty("prop_123456789", map[string]interface{}{
+        "fallback_value": "N/A"
+    })
 }`,
 	},
 	{

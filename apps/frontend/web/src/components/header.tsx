@@ -6,7 +6,6 @@ import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const navItems = [
@@ -314,12 +313,6 @@ export const Header = () => {
 		setActiveMega(title);
 	};
 
-	const { resolvedTheme } = useTheme();
-	// Light mode based on theme toggle (with SSR page fallback)
-	const isLight = mounted
-		? resolvedTheme === "light"
-		: pathname.startsWith("/company") || pathname.startsWith("/philosophy");
-
 	const activeItem = navItems.find((item) => item.title === activeMega);
 
 	return (
@@ -329,17 +322,12 @@ export const Header = () => {
 		>
 			<motion.div
 				onMouseLeave={() => setActiveMega(null)}
-				className={`flex flex-col overflow-hidden rounded-[24px] transition-[border-color,box-shadow,background-color] duration-300 ease-out ${
-					isLight
-						? "w-full max-w-[1000px] border border-[#0a0d12]/10 bg-white"
-						: "w-full max-w-[1000px] border border-white/10 bg-[#0a0a0a]/95"
-				}`}
+				className="flex w-full max-w-[1000px] flex-col overflow-hidden rounded-[24px] border transition-[border-color,box-shadow,background-color] duration-300 ease-out border-[#0a0d12]/10 bg-white dark:border-white/10 dark:bg-[#0a0a0a]/95"
 			>
 				<div className="flex h-15 w-full items-center justify-between pr-3 transition-all duration-500">
 					<div className="flex items-center gap-6">
 						<Link href="/" className="flex items-center pl-2">
 							<Logo
-								theme={isLight ? "light" : "dark"}
 								className="w-12 transition-all duration-500"
 							/>
 						</Link>
@@ -353,11 +341,7 @@ export const Header = () => {
 								>
 									<Link
 										href={item.href}
-										className={`flex items-center gap-1 px-2 py-2 font-semibold text-[13px] transition-colors ${
-											isLight
-												? "text-[#0a0d12]/60 hover:text-[#0a0d12]"
-												: "text-white/70 hover:text-white"
-										}`}
+										className={`flex items-center gap-1 px-2 py-2 font-semibold text-[13px] transition-colors text-[#0a0d12]/60 hover:text-[#0a0d12] dark:text-white/70 dark:hover:text-white`}
 									>
 										{item.title}
 										{item.hasDropdown && (
@@ -382,11 +366,7 @@ export const Header = () => {
 							target="_blank"
 							rel="noreferrer"
 							whileTap={{ scale: 0.97 }}
-							className={`inline-flex items-center justify-center gap-2 rounded-[12px] border px-4 py-2 font-semibold text-[13px] transition-all ${
-								isLight
-									? "border-[#0a0d12]/10 bg-[#0a0d12]/4 text-[#0a0d12] hover:border-[#0a0d12]/20 hover:bg-[#0a0d12]/8"
-									: "border-white/10 bg-white/10 text-white hover:border-white/20 hover:bg-white/15"
-							}`}
+							className="inline-flex items-center justify-center gap-2 rounded-[12px] border px-4 py-2 font-semibold text-[13px] transition-all border-[#0a0d12]/10 bg-[#0a0d12]/4 text-[#0a0d12] hover:border-[#0a0d12]/20 hover:bg-[#0a0d12]/8 dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:border-white/20 dark:hover:bg-white/15"
 						>
 							<Icon name="social-github" className="size-3.5" />
 							<span className="hidden sm:inline">{stars}</span>
@@ -394,9 +374,7 @@ export const Header = () => {
 						<motion.a
 							href={mounted && session ? "/dashboard" : "/dashboard/login"}
 							whileTap={{ scale: 0.97 }}
-							className={`inline-flex items-center justify-center gap-2 rounded-[12px] px-4 py-2 font-semibold text-[13px] transition-all hover:scale-[1.02] active:scale-[0.98] ${
-								isLight ? "bg-[#0a0d12] text-white" : "bg-white text-[#0a0d12]"
-							}`}
+							className="inline-flex items-center justify-center gap-2 rounded-[12px] px-4 py-2 font-semibold text-[13px] transition-all hover:scale-[1.02] active:scale-[0.98] bg-[#0a0d12] text-white dark:bg-white dark:text-[#0a0d12]"
 						>
 							{mounted && session ? "Dashboard" : "Login"}
 						</motion.a>
@@ -414,11 +392,7 @@ export const Header = () => {
 							className="w-full"
 						>
 							<div
-								className={`flex w-full p-4 pt-0 ${
-									isLight
-										? "border-[#0a0d12]/5 border-t"
-										: "border-white/5 border-t"
-								}`}
+								className="flex w-full p-4 pt-0 border-t border-[#0a0d12]/5 dark:border-white/5"
 							>
 								<motion.div
 									animate={{ height: contentHeight }}
@@ -436,111 +410,57 @@ export const Header = () => {
 												exit="exit"
 												className="w-full"
 											>
-												{isLight ? (
-													<div className="flex w-full gap-4 pt-4">
-														<div className="flex w-1/4 flex-col gap-1 border-[#0a0d12]/5 border-r pr-4">
-															{activeItem.mega.links.map((link) => (
-																<motion.div
-																	key={link.title}
-																	variants={itemVariants}
+												<div className="flex w-full gap-4 pt-4">
+													<div className="flex w-1/4 flex-col gap-1 border-r pr-4 border-[#0a0d12]/5 dark:border-white/5">
+														{activeItem.mega.links.map((link) => (
+															<motion.div
+																key={link.title}
+																variants={itemVariants}
+															>
+																<Link
+																	href={link.href}
+																	className="block rounded-lg px-3 py-2 font-semibold text-[14px] transition-colors text-[#0a0d12]/50 hover:bg-[#0a0d12]/4 hover:text-[#0a0d12] dark:text-white/50 dark:hover:bg-white/5 dark:hover:text-white"
 																>
-																	<Link
-																		href={link.href}
-																		className="block rounded-lg px-3 py-2 font-semibold text-[#0a0d12]/50 text-[14px] transition-colors hover:bg-[#0a0d12]/4 hover:text-[#0a0d12]"
-																	>
-																		{link.title}
-																	</Link>
-																</motion.div>
-															))}
-														</div>
-														<div className="grid flex-1 grid-cols-2 gap-3">
-															{activeItem.mega.featured.map((feat) => (
-																<motion.div
-																	key={feat.title}
-																	variants={itemVariants}
-																	whileHover={{
-																		scale: 1.02,
-																	}}
-																	whileTap={{
-																		scale: 0.98,
-																	}}
-																>
-																	<Link
-																		href={feat.href}
-																		className="group flex items-center gap-4 rounded-xl border border-[#0a0d12]/5 bg-[#0a0d12]/[0.02] p-4 transition-all hover:border-[#0a0d12]/10 hover:bg-[#0a0d12]/[0.04]"
-																	>
-																		<div className="flex size-12 items-center justify-center rounded-lg border border-[#0a0d12]/8 bg-[#0a0d12]/4">
-																			<Icon
-																				name={feat.icon as any}
-																				className="size-6 text-[#0a0d12]/60 transition-transform group-hover:scale-110"
-																			/>
-																		</div>
-																		<div>
-																			<div className="font-semibold text-[#0a0d12] text-[14px]">
-																				{feat.title}
-																			</div>
-																			<div className="text-[#0a0d12]/40 text-[12px]">
-																				{feat.description}
-																			</div>
-																		</div>
-																	</Link>
-																</motion.div>
-															))}
-														</div>
+																	{link.title}
+																</Link>
+															</motion.div>
+														))}
 													</div>
-												) : (
-													<div className="flex w-full gap-4 pt-4">
-														<div className="flex w-1/4 flex-col gap-1 border-white/5 border-r pr-4">
-															{activeItem.mega.links.map((link) => (
-																<motion.div
-																	key={link.title}
-																	variants={itemVariants}
+													<div className="grid flex-1 grid-cols-2 gap-3">
+														{activeItem.mega.featured.map((feat) => (
+															<motion.div
+																key={feat.title}
+																variants={itemVariants}
+																whileHover={{
+																	scale: 1.02,
+																}}
+																whileTap={{
+																	scale: 0.98,
+																}}
+															>
+																<Link
+																	href={feat.href}
+																	className="group flex items-center gap-4 rounded-xl border p-4 transition-all border-[#0a0d12]/5 bg-[#0a0d12]/[0.02] hover:border-[#0a0d12]/10 hover:bg-[#0a0d12]/[0.04] dark:border-white/5 dark:bg-white/[0.03] dark:hover:border-white/10 dark:hover:bg-white/[0.06]"
 																>
-																	<Link
-																		href={link.href}
-																		className="block rounded-lg px-3 py-2 font-semibold text-[14px] text-white/50 transition-colors hover:bg-white/5 hover:text-white"
-																	>
-																		{link.title}
-																	</Link>
-																</motion.div>
-															))}
-														</div>
-														<div className="grid flex-1 grid-cols-2 gap-3">
-															{activeItem.mega.featured.map((feat) => (
-																<motion.div
-																	key={feat.title}
-																	variants={itemVariants}
-																	whileHover={{
-																		scale: 1.02,
-																	}}
-																	whileTap={{
-																		scale: 0.98,
-																	}}
-																>
-																	<Link
-																		href={feat.href}
-																		className="group flex items-center gap-4 rounded-xl border border-white/5 bg-white/[0.03] p-4 transition-all hover:border-white/10 hover:bg-white/[0.06]"
-																	>
-																		<div className="flex size-12 items-center justify-center rounded-lg bg-black shadow-inner">
-																			<Icon
-																				name={feat.icon as any}
-																				className="size-6 text-white/70 transition-transform group-hover:scale-110"
-																			/>
+																	<div className="flex size-12 items-center justify-center rounded-lg border border-[#0a0d12]/8 bg-[#0a0d12]/4 dark:border-transparent dark:bg-black dark:shadow-inner">
+																		<Icon
+																			name={feat.icon as any}
+																			className="size-6 transition-transform group-hover:scale-110 text-[#0a0d12]/60 dark:text-white/70"
+																		/>
+																	</div>
+																	<div>
+																		<div className="font-semibold text-[14px] text-[#0a0d12] dark:text-white">
+																			{feat.title}
 																		</div>
-																		<div>
-																			<div className="font-semibold text-[14px] text-white">
-																				{feat.title}
-																			</div>
-																			<div className="text-[12px] text-white/40">
-																				{feat.description}
-																			</div>
+																		<div className="text-[12px] text-[#0a0d12]/40 dark:text-white/40">
+																			{feat.description}
 																		</div>
-																	</Link>
-																</motion.div>
-															))}
-														</div>
+																	</div>
+																</Link>
+															</motion.div>
+														))}
 													</div>
-												)}
+												</div>
 											</motion.div>
 										</AnimatePresence>
 									</div>

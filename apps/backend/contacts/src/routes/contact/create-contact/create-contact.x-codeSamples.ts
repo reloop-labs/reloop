@@ -140,44 +140,26 @@ request.body = {
 response = http.request(request)
 contact = JSON.parse(response.body)`,
 	},
-	{
+			{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `package main
-
-import (
-  "bytes"
-  "encoding/json"
-  "net/http"
-)
+		source: `import reloop
 
 func main() {
-  body, _ := json.Marshal(map[string]any{
-    "email":     "john.doe@example.com",
-    "firstName": "John",
-    "lastName":  "Doe",
-    "status":    "subscribed",
-    "properties": map[string]string{
-      "company": "Reloop",
-      "role":    "Developer",
-    },
-    "groupIds": []string{"grp_123456789"},
-    "channels": []map[string]string{
-      {
-        "channelId":    "channel_123456789",
-        "subscription": "opt_in",
-      },
-    },
-  })
-
-  req, _ := http.NewRequest("POST", "https://reloop.sh/api/contacts/create", bytes.NewBuffer(body))
-  req.Header.Set("x-api-key", "re_123456789")
-  req.Header.Set("Content-Type", "application/json")
-
-  client := &http.Client{}
-  resp, _ := client.Do(req)
-  defer resp.Body.Close()
+    client, _ := reloop.NewClient(reloop.ClientOptions{
+        APIKey: "re_123456789",
+    })
+    
+    _, _ = client.Contacts.Create(map[string]interface{}{
+        "email": "john.doe@example.com",
+        "first_name": "John",
+        "last_name": "Doe",
+        "unsubscribed": false,
+        "properties": map[string]interface{}{"company": "Reloop", "role": "Developer"},
+        "group_ids": []interface{}{"grp_123456789"},
+        "channels": []interface{}{map[string]interface{}{"channel_id": "channel_123456789", "subscription": "opt_in"}}
+    })
 }`,
 	},
 	{
