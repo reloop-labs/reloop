@@ -649,6 +649,7 @@ function shouldFlattenTagToRoot(serviceName: string, tag: string): boolean {
 
 	if (tagSlug === serviceSlug) return true;
 	if (`${tagSlug}s` === serviceSlug) return true;
+	if (`${serviceSlug}s` === tagSlug) return true;
 	if (tagSlug === serviceSlug.replace(/s$/, "")) return true;
 
 	return false;
