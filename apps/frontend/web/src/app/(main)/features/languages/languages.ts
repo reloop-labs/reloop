@@ -161,20 +161,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		docsPath: "/docs/quickstart/php",
 		icon: siPhp,
 		highlights: ["Laravel", "Symfony", "WordPress"],
-		sendCode: `<?php
+		sendCode: `$reloop = Reloop::client(getenv('RELOOP_API_KEY'));
 
-require 'vendor/autoload.php';
-
-$reloop = new \\Reloop\\Client(getenv('RELOOP_API_KEY'));
-
-$result = $reloop->emails->send([
-    'from' => 'Acme <onboarding@yourdomain.com>',
-    'to' => ['delivered@yourdomain.com'],
-    'subject' => 'Hello from PHP',
-    'html' => '<strong>It works!</strong>',
-]);
-
-echo 'Email sent: ' . $result->id;`,
+$reloop->emails->send([
+  'from' => 'Acme <onboarding@yourdomain.com>',
+  'to' => ['delivered@yourdomain.com'],
+  'subject' => 'Hello from PHP',
+  'html' => '<strong>It works!</strong>',
+]);`,
 	},
 	{
 		slug: "ruby",

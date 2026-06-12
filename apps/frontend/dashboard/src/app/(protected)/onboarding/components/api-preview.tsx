@@ -78,23 +78,14 @@ func main() {
 			lang: "go",
 		},
 		php: {
-			code: `<?php
+			code: `$reloop = Reloop::client(getenv('RELOOP_API_KEY'));
 
-require_once 'vendor/autoload.php';
-
-use Reloop\\ReloopClient;
-
-// RELOOP_API_KEY=${keyDisplay}
-$client = new ReloopClient(getenv('RELOOP_API_KEY'));
-
-$result = $client->mail->send([
-  'from'    => 'sender@example.com',
-  'to'      => 'recipient@example.com',
+$reloop->emails->send([
+  'from' => 'sender@example.com',
+  'to' => 'recipient@example.com',
   'subject' => 'Hello from Reloop!',
-  'text'    => 'Hello World!',
-]);
-
-echo json_encode($result, JSON_PRETTY_PRINT);`,
+  'text' => 'Hello World!',
+]);`,
 			lang: "php",
 		},
 	};

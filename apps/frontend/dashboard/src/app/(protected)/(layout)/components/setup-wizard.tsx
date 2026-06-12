@@ -190,12 +190,7 @@ try:
 except Exception as e:
     print(f"Failed to send email: {e}")`;
 		case "php":
-			return `<?php
-require 'vendor/autoload.php';
-
-use Reloop\\Reloop;
-
-$reloop = new Reloop("${apiKeyDisplay}");
+			return `$reloop = Reloop::client('${apiKeyDisplay}');
 
 try {
     $response = $reloop->emails->send([

@@ -37,7 +37,7 @@ Create an `index.php` file and add the following code:
 
 require 'vendor/autoload.php';
 
-$reloop = new \Reloop\Client('re_123456789');
+$reloop = Reloop::client('re_123456789');
 
 try {
     $result = $reloop->emails->send([

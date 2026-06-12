@@ -159,67 +159,51 @@ client.contacts.delete('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d')`,
 	php: {
 		add: {
 			filename: "add_contact.php",
-			code: `<?php
-use Reloop\\ReloopClient;
+			code: `$reloop = Reloop::client('re_xxxxxxxx');
 
-$client = new ReloopClient('re_xxxxxxxx');
-
-$result = $client->contacts->create([
-    'email'      => 'john@example.com',
-    'firstName'  => 'John',
-    'lastName'   => 'Doe',
-    'subscribed' => false,
-    'metadata'   => ['source' => 'website'],
-]);`,
+$reloop->contacts->create(
+  parameters: [
+    'email' => 'john@example.com',
+    'first_name' => 'John',
+    'last_name' => 'Doe',
+    'unsubscribed' => false,
+  ],
+);`,
 		},
 		get: {
 			filename: "get_contact.php",
-			code: `<?php
-use Reloop\\ReloopClient;
+			code: `$reloop = Reloop::client('re_xxxxxxxx');
 
-$client = new ReloopClient('re_xxxxxxxx');
-
-// Get by contact id
-$client->contacts->get('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d');
-
-// Get by email
-$client->contacts->get(['email' => 'john@example.com']);`,
+$reloop->contacts->get('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d');`,
 		},
 		list: {
 			filename: "list_contacts.php",
-			code: `<?php
-use Reloop\\ReloopClient;
+			code: `$reloop = Reloop::client('re_xxxxxxxx');
 
-$client = new ReloopClient('re_xxxxxxxx');
-
-$data = $client->contacts->list([
-    'page'  => 1,
-    'limit' => null,
-]);`,
+$reloop->contacts->list(
+  options: [
+    'page' => 1,
+    'limit' => 10,
+  ],
+);`,
 		},
 		update: {
 			filename: "update_contact.php",
-			code: `<?php
-use Reloop\\ReloopClient;
+			code: `$reloop = Reloop::client('re_xxxxxxxx');
 
-$client = new ReloopClient('re_xxxxxxxx');
-
-$result = $client->contacts->update(
-    '5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d',
-    [
-        'firstName'  => 'Steve',
-        'subscribed' => true,
-    ]
+$reloop->contacts->update(
+  '5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d',
+  parameters: [
+    'first_name' => 'Steve',
+    'unsubscribed' => false,
+  ],
 );`,
 		},
 		delete: {
 			filename: "delete_contact.php",
-			code: `<?php
-use Reloop\\ReloopClient;
+			code: `$reloop = Reloop::client('re_xxxxxxxx');
 
-$client = new ReloopClient('re_xxxxxxxx');
-
-$client->contacts->delete('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d');`,
+$reloop->contacts->delete('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d');`,
 		},
 	},
 	go: {

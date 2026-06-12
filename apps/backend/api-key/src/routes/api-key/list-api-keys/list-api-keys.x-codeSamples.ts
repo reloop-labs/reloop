@@ -42,20 +42,14 @@ api_keys = response.json()`,
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `<?php
-$client = new \\GuzzleHttp\\Client();
+		source: `$reloop = Reloop::client('rl_123456789');
 
-$response = $client->get('https://api.reloop.sh/api-key/v1/', [
-    'headers' => [
-        'Authorization' => 'Bearer rl_123456789',
-    ],
-    'query' => [
-        'page' => 1,
-        'limit' => 10,
-    ],
-]);
-
-$apiKeys = json_decode($response->getBody(), true);`,
+$reloop->apiKeys->list(
+  options: [
+    'page' => 1,
+    'limit' => 10,
+  ],
+);`,
 	},
 	{
 		id: "java",

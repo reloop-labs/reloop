@@ -41,7 +41,7 @@ Register the Reloop client as a service in your `services.yaml` and use it in yo
 // src/Controller/EmailController.php
 namespace App\Controller;
 
-use Reloop\Client;
+use Reloop\Reloop;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -52,7 +52,7 @@ class EmailController extends AbstractController
 
     public function __construct(string $reloopApiKey)
     {
-        $this->reloop = new Client($reloopApiKey);
+        $this->reloop = Reloop::client($reloopApiKey);
     }
 
     #[Route('/send-email', name: 'app_send_email')]

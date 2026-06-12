@@ -48,21 +48,15 @@ api_key = response.json()`,
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `<?php
-$client = new \\GuzzleHttp\\Client();
+		source: `$reloop = Reloop::client('rl_123456789');
 
-$response = $client->patch('https://api.reloop.sh/api-key/v1/key_123456789', [
-    'headers' => [
-        'Authorization' => 'Bearer rl_123456789',
-        'Content-Type'  => 'application/json',
-    ],
-    'json' => [
-        'name' => 'Updated production key',
-        'enabled' => true,
-    ],
-]);
-
-$apiKey = json_decode($response->getBody(), true);`,
+$reloop->apiKeys->update(
+  'key_123456789',
+  parameters: [
+    'name' => 'Updated production key',
+    'enabled' => true,
+  ],
+);`,
 	},
 	{
 		id: "java",

@@ -183,19 +183,9 @@ func main() {
 		name: "PHP",
 		icon: "🐘",
 		install: "composer require reloop/sdk",
-		code: `<?php
+		code: `$reloop = Reloop::client('your-api-key');
 
-require 'vendor/autoload.php';
-
-use Reloop\\Reloop;
-
-$reloop = new Reloop([
-  'url' => 'https://api.reloop.sh',
-  'key' => 'your-api-key'
-]);
-
-// Send an email
-$result = $reloop->mail->send([
+$reloop->emails->send([
   'from' => 'sender@example.com',
   'to' => 'recipient@example.com',
   'subject' => 'Hello',

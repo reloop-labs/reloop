@@ -35,16 +35,9 @@ api_key = response.json()`,
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `<?php
-$client = new \\GuzzleHttp\\Client();
+		source: `$reloop = Reloop::client('rl_123456789');
 
-$response = $client->post('https://api.reloop.sh/api-key/v1/rotate/key_123456789', [
-    'headers' => [
-        'Authorization' => 'Bearer rl_123456789',
-    ],
-]);
-
-$apiKey = json_decode($response->getBody(), true);`,
+$reloop->apiKeys->rotate('key_123456789');`,
 	},
 	{
 		id: "java",

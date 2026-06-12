@@ -35,16 +35,9 @@ result = response.json()`,
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `<?php
-$client = new \\GuzzleHttp\\Client();
+		source: `$reloop = Reloop::client('rl_123456789');
 
-$response = $client->delete('https://api.reloop.sh/api-key/v1/key_123456789', [
-    'headers' => [
-        'Authorization' => 'Bearer rl_123456789',
-    ],
-]);
-
-$result = json_decode($response->getBody(), true);`,
+$reloop->apiKeys->delete('key_123456789');`,
 	},
 	{
 		id: "java",
