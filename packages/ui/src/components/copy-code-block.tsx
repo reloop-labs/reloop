@@ -30,6 +30,7 @@ export function CopyCodeBlock({
 	className,
 	hideLineNumbers = false,
 	noScroll = true,
+	maxHeight,
 }: {
 	code: string;
 	lang: string;
@@ -43,6 +44,7 @@ export function CopyCodeBlock({
 	className?: string;
 	hideLineNumbers?: boolean;
 	noScroll?: boolean;
+	maxHeight?: string;
 }) {
 	const [copied, setCopied] = useState(false);
 	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(
@@ -239,11 +241,17 @@ export function CopyCodeBlock({
 				</div>
 			)}
 
-			<div className="mx-0.5 mb-0.5 rounded-2xl border border-stroke-soft-100/70 bg-white dark:border-stroke-soft-100/15 dark:bg-zinc-950">
+			<div 
+				className="mx-0.5 mb-0.5 rounded-2xl border border-stroke-soft-100/70 bg-white dark:border-stroke-soft-100/15 dark:bg-zinc-950 overflow-hidden"
+				style={maxHeight ? { "--code-max-height": maxHeight } as React.CSSProperties : undefined}
+			>
 				<CodeBlock
 					code={code}
 					lang={lang}
-					className="[&>pre]:!p-3 [&_.line]:!pl-[2.75rem] [&_.line::before]:!w-9 [&_.line::before]:!pr-2 text-[12.5px] leading-5 sm:text-[13px] sm:leading-[1.3125rem] [&_.line::before]:text-[10.5px]"
+					className={cn(
+						"[&>pre]:!p-3 [&_.line]:!pl-[2.75rem] [&_.line::before]:!w-9 [&_.line::before]:!pr-2 text-[12.5px] leading-5 sm:text-[13px] sm:leading-[1.3125rem] [&_.line::before]:text-[10.5px]",
+						maxHeight && "[&>pre]:!max-h-[var(--code-max-height)] [&>pre]:!overflow-y-auto"
+					)}
 					hideLineNumbers={hideLineNumbers}
 					noScroll={noScroll}
 				/>
