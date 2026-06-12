@@ -1,0 +1,29 @@
+{
+	"title": "Contacts",
+	"pages": [
+		"post-api-contacts-create",
+		"get-api-contacts-list",
+		"get-api-contacts-retrieve-by-contact_id",
+		"patch-api-contacts-by-contact_id",
+		"delete-api-contacts-by-contact_id",
+		"post-api-contacts-group-by-group_id",
+		"delete-api-contacts-group-by-group_id",
+		"post-api-contacts-channel-by-channel_id",
+		"patch-api-contacts-channel-by-channel_id",
+		"post-api-contacts-v1groups-create",
+		"get-api-contacts-v1groups-list",
+		"get-api-contacts-v1groups-by-group_id",
+		"get-api-contacts-v1groups-by-group_id-contacts",
+		"patch-api-contacts-v1groups-by-group_id",
+		"delete-api-contacts-v1groups-by-group_id",
+		"post-api-contacts-v1properties-create",
+		"get-api-contacts-v1properties-list",
+		"patch-api-contacts-v1properties-by-contact_property_id",
+		"delete-api-contacts-v1properties-by-contact_property_id",
+		"post-api-contacts-v1channels-create",
+		"get-api-contacts-v1channels-list",
+		"get-api-contacts-v1channels-by-channel_id",
+		"patch-api-contacts-v1channels-by-channel_id",
+		"delete-api-contacts-v1channels-by-channel_id"
+	]
+}

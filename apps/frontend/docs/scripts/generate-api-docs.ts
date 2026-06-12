@@ -668,14 +668,6 @@ async function generateForService(service: ServiceConfig): Promise<string[]> {
 function generateMetaJson(allGenerated: Record<string, string[]>) {
 	const metaPath = path.join(DOCS_DIR, "meta.json");
 
-	const pages: string[] = [
-		"---API Reference---",
-		"index",
-		"pagination",
-		"usage-limits",
-		"errors",
-	];
-
 	const sectionNames: Record<string, string> = {
 		domain: "Domain",
 		mail: "Mail",
@@ -685,14 +677,37 @@ function generateMetaJson(allGenerated: Record<string, string[]>) {
 		template: "Templates",
 		upload: "Upload",
 		logs: "Logs",
-
 	};
 
+	// Generate subdirectory meta.json for each service
 	for (const [service, entries] of Object.entries(allGenerated)) {
 		const sectionName = sectionNames[service] || service;
-		pages.push(`---${sectionName}---`);
-		pages.push(...entries.sort());
+		const serviceMetaPath = path.join(DOCS_DIR, service, "meta.json");
+		// Strip the service prefix from entries (e.g., "domain/create-domain" → "create-domain")
+		const pageNames = entries
+			.sort()
+			.map((entry) => entry.replace(`${service}/`, ""));
+		const serviceMeta = {
+			title: sectionName,
+			pages: pageNames,
+		};
+		fs.writeFileSync(
+			serviceMetaPath,
+			JSON.stringify(serviceMeta, null, "\t") + "\n",
+		);
+		console.log(`  📂 ${service}/meta.json (${pageNames.length} pages)`);
 	}
+
+	// Generate parent meta.json with folder references
+	const pages: string[] = [
+		"---Overview---",
+		"index",
+		"pagination",
+		"usage-limits",
+		"errors",
+		"---Actions---",
+		...Object.keys(allGenerated),
+	];
 
 	const meta = {
 		title: "API Reference",

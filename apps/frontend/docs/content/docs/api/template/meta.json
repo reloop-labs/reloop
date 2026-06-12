@@ -1,0 +1,12 @@
+{
+	"title": "Templates",
+	"pages": [
+		"post-api-template-v1create",
+		"get-api-template-v1list",
+		"get-api-template",
+		"get-api-template-v1by-id",
+		"put-api-template-v1by-id",
+		"post-api-template-v1by-id-duplicate",
+		"delete-api-template-v1by-id"
+	]
+}

@@ -565,7 +565,7 @@ function SidebarFolder({
 						transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
 						style={{ overflow: "hidden" }}
 					>
-						<div className="mt-px ml-3.5 flex flex-col space-y-px border-stroke-soft-100/40 border-l pb-0.5 pl-2.5">
+						<div className="mt-px ml-2.5 flex flex-col space-y-px border-stroke-soft-100/40 border-l pb-0.5 pl-2">
 							{node.children.map((child: PageTreeItem, index: number) => (
 								<SidebarLink
 									key={index}
@@ -611,7 +611,7 @@ function SidebarLink({
 			}}
 			data-sidebar-active={isActive || undefined}
 			className={cn(
-				"group relative z-10 flex h-8 items-center gap-2 rounded-lg px-2 font-medium text-sm transition-colors",
+				"group relative z-10 flex h-7 items-center gap-2 rounded-lg px-2 text-[13px] transition-colors",
 				isActive
 					? "text-[#171717] dark:text-white"
 					: "text-text-sub-600 hover:text-[#171717] dark:hover:text-white",
@@ -635,17 +635,17 @@ function SidebarLink({
 			{node.method && (
 				<span
 					className={cn(
-						"relative z-10 ml-auto rounded px-1.5 py-0.5 font-bold text-[9px] uppercase tracking-wider",
+						"relative z-10 ml-auto shrink-0 font-semibold text-[10px] uppercase leading-none tracking-wide",
 						node.method === "GET" &&
-							"bg-green-500/10 text-green-600 dark:text-green-400",
+							"text-green-600 dark:text-green-400",
 						node.method === "POST" &&
-							"bg-blue-500/10 text-blue-600 dark:text-blue-400",
+							"text-blue-600 dark:text-blue-400",
 						node.method === "DELETE" &&
-							"bg-red-500/10 text-red-600 dark:text-red-400",
+							"text-red-500 dark:text-red-400",
 						node.method === "PATCH" &&
-							"bg-orange-500/10 text-orange-600 dark:text-orange-400",
+							"text-orange-500 dark:text-orange-400",
 						node.method === "PUT" &&
-							"bg-yellow-500/10 text-yellow-600 dark:text-yellow-400",
+							"text-purple-600 dark:text-purple-400",
 					)}
 				>
 					{node.method}

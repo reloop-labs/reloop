@@ -1,0 +1,9 @@
+{
+	"title": "Mail",
+	"pages": [
+		"post-api-mail-v1send",
+		"get-api-mail-v1by-email-id-attachments-by-id",
+		"get-api-mail-v1track-open-by-email-log-id",
+		"get-api-mail-v1track-click-by-email-log-id"
+	]
+}

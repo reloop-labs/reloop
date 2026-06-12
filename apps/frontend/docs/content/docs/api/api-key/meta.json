@@ -1,0 +1,13 @@
+{
+	"title": "API Key",
+	"pages": [
+		"post-api-api-key-v1",
+		"get-api-api-key-v1",
+		"get-api-api-key-v1by-api_key_id",
+		"patch-api-api-key-v1by-api_key_id",
+		"post-api-api-key-v1rotate-by-api_key_id",
+		"post-api-api-key-v1enable-by-api_key_id",
+		"post-api-api-key-v1disable-by-api_key_id",
+		"delete-api-api-key-v1by-api_key_id"
+	]
+}
