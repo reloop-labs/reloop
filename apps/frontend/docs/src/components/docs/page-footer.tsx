@@ -16,7 +16,7 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 	const [feedback, setFeedback] = useState<"yes" | "no" | null>(null);
 
 	return (
-		<footer className="mt-16 space-y-12">
+		<footer className="mt-6 space-y-12">
 			{/* Feedback Section */}
 			<div className="flex flex-col items-center justify-between gap-4 border-stroke-soft-100 border-t pt-12 sm:flex-row">
 				<p className="font-medium text-[15px] text-text-sub-600">

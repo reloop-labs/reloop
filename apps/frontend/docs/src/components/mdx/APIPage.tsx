@@ -313,7 +313,7 @@ function ParameterSection({
 	params: Parameter[];
 }) {
 	return (
-		<section className="mb-10">
+		<section>
 			<h2 className="mb-4 flex items-center gap-2 font-semibold text-base text-fd-foreground tracking-tight">
 				{title}
 			</h2>
@@ -338,27 +338,27 @@ function ParameterRow({
 	const hasProperties = resolvedProperties && resolvedProperties.length > 0;
 
 	return (
-		<div className="py-4 first:pt-2">
+		<div className={cn(depth === 0 ? "pt-3.5 pb-0.5" : "py-2.5")}>
 			{/* Name + type + required */}
 			<div className="flex flex-wrap items-center gap-2">
-				<span className="font-mono font-semibold text-[13.5px] text-fd-foreground">
+				<span className="font-mono font-semibold text-[13.5px] text-fd-foreground tracking-tight">
 					{param.name}
 				</span>
 				<span
 					className={cn(
-						"rounded-lg px-1.5 font-semibold text-[11px]",
+						"rounded-lg px-1.5 font-semibold text-[11px] tracking-tight",
 						getTypeBadgeStyles(param.type),
 					)}
 				>
 					{param.type}
 				</span>
 				{param.defaultValue !== undefined && (
-					<span className="rounded bg-bg-weak-50 px-1.5 py-0.5 font-mono text-[11px] text-text-sub-600/50 dark:bg-white/5">
+					<span className="rounded bg-bg-weak-50 px-1.5 py-0.5 font-mono text-[11px] text-text-sub-600/50 tracking-tight dark:bg-white/5">
 						default: {JSON.stringify(param.defaultValue)}
 					</span>
 				)}
 				{param.required && (
-					<span className="rounded-md bg-red-500/10 px-1.5 py-0.5 font-semibold text-[10px] text-red-500 uppercase tracking-wide dark:text-red-400">
+					<span className="rounded-md bg-red-500/10 px-1.5 py-0.5 font-semibold text-[10px] text-red-500 uppercase tracking-wider dark:text-red-400">
 						required
 					</span>
 				)}
@@ -450,14 +450,14 @@ function ParameterRow({
 
 			{/* Recursive sub-properties */}
 			{hasProperties && (
-				<div className="mt-3 overflow-hidden rounded-xl border border-stroke-soft-200 bg-neutral-50/30 shadow-none dark:border-stroke-soft-100/40 dark:bg-white/[0.01]">
+				<div className="mt-3 mb-6 overflow-hidden rounded-xl border border-stroke-soft-200 bg-neutral-50/30 shadow-none dark:border-stroke-soft-100/40 dark:bg-white/[0.01]">
 					<div className="select-none px-4 py-2.5 font-semibold text-[13px] text-text-sub-600">
 						{param.name === "properties"
 							? "Custom properties"
 							: `${param.name} properties`}
 					</div>
 
-					<div className="border-stroke-soft-200 border-t px-4 pb-1 dark:border-stroke-soft-100/40">
+					<div className="border-stroke-soft-200 border-t px-4 dark:border-stroke-soft-100/40">
 						{resolvedProperties.map((child, index) => (
 							<div
 								key={child.name}

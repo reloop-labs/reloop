@@ -41,7 +41,7 @@ html {
 }
 
 body {
-	@apply bg-bg-white-0 text-[#171717] dark:text-white font-sans antialiased;
+	@apply bg-bg-white-0 text-[#171717] dark:text-white font-sans antialiased tracking-[-0.015em];
 }
 
 /* Logo sizing fallback */

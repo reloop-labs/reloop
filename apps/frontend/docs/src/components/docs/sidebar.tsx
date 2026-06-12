@@ -621,7 +621,7 @@ function SidebarLink({
 				{node.method && (
 					<span
 						className={cn(
-							"inline-flex shrink-0 items-center justify-center rounded-[4px] px-1.5 py-[1px] font-semibold text-[9px] uppercase leading-tight tracking-wide",
+							"inline-flex w-11 shrink-0 items-center justify-center rounded-[4px] py-[1px] font-semibold text-[9px] uppercase leading-tight tracking-wide",
 							node.method === "GET" &&
 								"bg-green-500/15 text-green-600 dark:bg-green-500/20 dark:text-green-400",
 							node.method === "POST" &&
