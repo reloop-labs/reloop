@@ -32,7 +32,8 @@ use Reloop\\Reloop;
 
 $reloop = new Reloop('re_123456789');
 
-$group = $reloop->contacts->getGroup('grp_123456789');`,
+$group = $reloop->contacts->getGroup('grp_123456789');
+echo $group->name;`,
 	},
 	{
 		id: "python",

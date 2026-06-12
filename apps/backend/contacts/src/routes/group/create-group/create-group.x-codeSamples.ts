@@ -37,12 +37,13 @@ if (error) throw error;`,
 require_once 'vendor/autoload.php';
 
 use Reloop\\Reloop;
+use Reloop\\Dto\\Request\\CreateGroupParams;
 
 $reloop = new Reloop('re_123456789');
 
-$group = $reloop->contacts->createGroup([
-    'name' => 'Beta Testers',
-]);`,
+$group = $reloop->contacts->createGroup(new CreateGroupParams(
+    name: 'Beta Testers',
+));`,
 	},
 	{
 		id: "python",

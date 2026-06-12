@@ -49,18 +49,20 @@ if (error) throw error;`,
 require_once 'vendor/autoload.php';
 
 use Reloop\\Reloop;
+use Reloop\\Dto\\Request\\UpdateContactParams;
+use Reloop\\Dto\\Enum\\ContactStatus;
 
 $reloop = new Reloop('re_123456789');
 
-$contact = $reloop->contacts->update('cont_123456789', [
-    'firstName'  => 'Jane',
-    'lastName'   => 'Smith',
-    'status'     => 'subscribed',
-    'properties' => [
+$contact = $reloop->contacts->update('cont_123456789', new UpdateContactParams(
+    firstName: 'Jane',
+    lastName: 'Smith',
+    status: ContactStatus::Subscribed,
+    properties: [
         'company' => 'Reloop',
         'role'    => 'Designer',
     ],
-]);`,
+));`,
 	},
 	{
 		id: "python",

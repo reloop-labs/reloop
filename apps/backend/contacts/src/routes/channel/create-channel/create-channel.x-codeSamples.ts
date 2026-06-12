@@ -43,15 +43,18 @@ if (error) throw error;`,
 require_once 'vendor/autoload.php';
 
 use Reloop\\Reloop;
+use Reloop\\Dto\\Request\\CreateChannelParams;
+use Reloop\\Dto\\Enum\\SubscriptionStatus;
+use Reloop\\Dto\\Enum\\ChannelVisibility;
 
 $reloop = new Reloop('re_123456789');
 
-$channel = $reloop->contacts->channels->create([
-    'name'                => 'Product Updates',
-    'description'         => 'Get the latest news about our products',
-    'defaultSubscription' => 'opt_in',
-    'visibility'          => 'public',
-]);`,
+$channel = $reloop->contacts->channels->create(new CreateChannelParams(
+    name: 'Product Updates',
+    description: 'Get the latest news about our products',
+    defaultSubscription: SubscriptionStatus::OptIn,
+    visibility: ChannelVisibility::Public,
+));`,
 	},
 	{
 		id: "python",

@@ -64,26 +64,30 @@ const { data: contact, error } = await reloop.contacts.create({
 require_once 'vendor/autoload.php';
 
 use Reloop\\Reloop;
+use Reloop\\Dto\\Request\\CreateContactParams;
+use Reloop\\Dto\\Request\\ContactChannelInput;
+use Reloop\\Dto\\Enum\\ContactStatus;
+use Reloop\\Dto\\Enum\\SubscriptionStatus;
 
 $reloop = new Reloop('re_123456789');
 
-$contact = $reloop->contacts->create([
-    'email'      => 'john.doe@example.com',
-    'firstName'  => 'John',
-    'lastName'   => 'Doe',
-    'status'     => 'subscribed',
-    'properties' => [
+$contact = $reloop->contacts->create(new CreateContactParams(
+    email: 'john.doe@example.com',
+    firstName: 'John',
+    lastName: 'Doe',
+    status: ContactStatus::Subscribed,
+    properties: [
         'company' => 'Reloop',
         'role'    => 'Developer',
     ],
-    'groupIds'   => ['grp_123456789'],
-    'channels'   => [
-        [
-            'channelId'    => 'channel_123456789',
-            'subscription' => 'opt_in',
-        ],
+    groupIds: ['grp_123456789'],
+    channels: [
+        new ContactChannelInput(
+            channelId: 'channel_123456789',
+            subscription: SubscriptionStatus::OptIn,
+        ),
     ],
-]);`,
+));`,
 	},
 	{
 		id: "python",

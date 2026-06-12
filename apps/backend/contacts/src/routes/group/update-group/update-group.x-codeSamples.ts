@@ -37,12 +37,13 @@ if (error) throw error;`,
 require_once 'vendor/autoload.php';
 
 use Reloop\\Reloop;
+use Reloop\\Dto\\Request\\UpdateGroupParams;
 
 $reloop = new Reloop('re_123456789');
 
-$group = $reloop->contacts->updateGroup('grp_123456789', [
-    'name' => 'Early Access',
-]);`,
+$group = $reloop->contacts->updateGroup('grp_123456789', new UpdateGroupParams(
+    name: 'Early Access',
+));`,
 	},
 	{
 		id: "python",

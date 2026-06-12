@@ -37,12 +37,13 @@ if (error) throw error;`,
 require_once 'vendor/autoload.php';
 
 use Reloop\\Reloop;
+use Reloop\\Dto\\Request\\AddContactToGroupParams;
 
 $reloop = new Reloop('re_123456789');
 
-$result = $reloop->contacts->groups->addContact('grp_123456789', [
-    'contact_id' => 'cont_123456789',
-]);`,
+$result = $reloop->contacts->groups->addContact('grp_123456789', new AddContactToGroupParams(
+    contact_id: 'cont_123456789',
+));`,
 	},
 	{
 		id: "python",

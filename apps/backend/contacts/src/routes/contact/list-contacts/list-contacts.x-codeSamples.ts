@@ -32,13 +32,14 @@ if (error) throw error;`,
 require_once 'vendor/autoload.php';
 
 use Reloop\\Reloop;
+use Reloop\\Dto\\Request\\ListContactsParams;
 
 $reloop = new Reloop('re_123456789');
 
-$contacts = $reloop->contacts->list([
-    'page'  => 1,
-    'limit' => 10,
-]);`,
+$contacts = $reloop->contacts->list(new ListContactsParams(
+    page: 1,
+    limit: 10,
+));`,
 	},
 	{
 		id: "python",

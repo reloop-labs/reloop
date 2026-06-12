@@ -41,14 +41,16 @@ if (error) throw error;`,
 require_once 'vendor/autoload.php';
 
 use Reloop\\Reloop;
+use Reloop\\Dto\\Request\\CreatePropertyParams;
+use Reloop\\Dto\\Enum\\PropertyType;
 
 $reloop = new Reloop('re_123456789');
 
-$property = $reloop->contacts->createProperty([
-    'name'          => 'company_name',
-    'type'          => 'string',
-    'fallbackValue' => 'Unknown',
-]);`,
+$property = $reloop->contacts->createProperty(new CreatePropertyParams(
+    name: 'company_name',
+    type: PropertyType::String,
+    fallbackValue: 'Unknown',
+));`,
 	},
 	{
 		id: "python",

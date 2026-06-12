@@ -32,7 +32,8 @@ use Reloop\\Reloop;
 
 $reloop = new Reloop('re_123456789');
 
-$contact = $reloop->contacts->get('cont_123456789');`,
+$contact = $reloop->contacts->get('cont_123456789');
+echo $contact->email;`,
 	},
 	{
 		id: "python",

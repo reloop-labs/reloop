@@ -32,13 +32,14 @@ if (error) throw error;`,
 require_once 'vendor/autoload.php';
 
 use Reloop\\Reloop;
+use Reloop\\Dto\\Request\\ListPropertiesParams;
 
 $reloop = new Reloop('re_123456789');
 
-$properties = $reloop->contacts->listProperties([
-    'page'  => 1,
-    'limit' => 10,
-]);`,
+$properties = $reloop->contacts->listProperties(new ListPropertiesParams(
+    page: 1,
+    limit: 10,
+));`,
 	},
 	{
 		id: "python",

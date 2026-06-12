@@ -32,7 +32,8 @@ use Reloop\\Reloop;
 
 $reloop = new Reloop('re_123456789');
 
-$channel = $reloop->contacts->channels->get('chn_123456789');`,
+$channel = $reloop->contacts->channels->get('chn_123456789');
+echo $channel->name;`,
 	},
 	{
 		id: "python",

@@ -37,12 +37,13 @@ if (error) throw error;`,
 require_once 'vendor/autoload.php';
 
 use Reloop\\Reloop;
+use Reloop\\Dto\\Request\\RemoveContactFromGroupParams;
 
 $reloop = new Reloop('re_123456789');
 
-$result = $reloop->contacts->groups->removeContact('grp_123456789', [
-    'contact_id' => 'cont_123456789',
-]);`,
+$result = $reloop->contacts->groups->removeContact('grp_123456789', new RemoveContactFromGroupParams(
+    contact_id: 'cont_123456789',
+));`,
 	},
 	{
 		id: "python",

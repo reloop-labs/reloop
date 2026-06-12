@@ -39,13 +39,15 @@ if (error) throw error;`,
 require_once 'vendor/autoload.php';
 
 use Reloop\\Reloop;
+use Reloop\\Dto\\Request\\AddContactToChannelParams;
+use Reloop\\Dto\\Enum\\SubscriptionStatus;
 
 $reloop = new Reloop('re_123456789');
 
-$result = $reloop->contacts->channels->addContact('channel_123456789', [
-    'contact_id'   => 'cont_123456789',
-    'subscription' => 'opt_in',
-]);`,
+$result = $reloop->contacts->channels->addContact('channel_123456789', new AddContactToChannelParams(
+    contact_id: 'cont_123456789',
+    subscription: SubscriptionStatus::OptIn,
+));`,
 	},
 	{
 		id: "python",

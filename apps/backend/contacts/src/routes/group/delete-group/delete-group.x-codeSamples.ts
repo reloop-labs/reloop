@@ -32,7 +32,8 @@ use Reloop\\Reloop;
 
 $reloop = new Reloop('re_123456789');
 
-$result = $reloop->contacts->deleteGroup('grp_123456789');`,
+$result = $reloop->contacts->deleteGroup('grp_123456789');
+echo $result->success;`,
 	},
 	{
 		id: "python",

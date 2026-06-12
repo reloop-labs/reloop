@@ -37,12 +37,13 @@ if (error) throw error;`,
 require_once 'vendor/autoload.php';
 
 use Reloop\\Reloop;
+use Reloop\\Dto\\Request\\UpdatePropertyParams;
 
 $reloop = new Reloop('re_123456789');
 
-$property = $reloop->contacts->updateProperty('prop_123456789', [
-    'fallbackValue' => 'N/A',
-]);`,
+$property = $reloop->contacts->updateProperty('prop_123456789', new UpdatePropertyParams(
+    fallbackValue: 'N/A',
+));`,
 	},
 	{
 		id: "python",

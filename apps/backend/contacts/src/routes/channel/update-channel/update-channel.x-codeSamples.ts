@@ -41,14 +41,16 @@ if (error) throw error;`,
 require_once 'vendor/autoload.php';
 
 use Reloop\\Reloop;
+use Reloop\\Dto\\Request\\UpdateChannelParams;
+use Reloop\\Dto\\Enum\\ChannelVisibility;
 
 $reloop = new Reloop('re_123456789');
 
-$channel = $reloop->contacts->channels->update('chn_123456789', [
-    'name'        => 'Marketing News',
-    'description' => 'Internal marketing updates',
-    'visibility'  => 'private',
-]);`,
+$channel = $reloop->contacts->channels->update('chn_123456789', new UpdateChannelParams(
+    name: 'Marketing News',
+    description: 'Internal marketing updates',
+    visibility: ChannelVisibility::Private,
+));`,
 	},
 	{
 		id: "python",

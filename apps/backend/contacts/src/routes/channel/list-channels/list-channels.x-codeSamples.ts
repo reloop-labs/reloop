@@ -32,13 +32,14 @@ if (error) throw error;`,
 require_once 'vendor/autoload.php';
 
 use Reloop\\Reloop;
+use Reloop\\Dto\\Request\\ListChannelsParams;
 
 $reloop = new Reloop('re_123456789');
 
-$channels = $reloop->contacts->channels->list([
-    'page'  => 1,
-    'limit' => 10,
-]);`,
+$channels = $reloop->contacts->channels->list(new ListChannelsParams(
+    page: 1,
+    limit: 10,
+));`,
 	},
 	{
 		id: "python",
