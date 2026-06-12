@@ -908,6 +908,28 @@ function generateMetaJson(allGenerated: Record<string, GeneratedPage[]>) {
 		);
 	}
 
+	// Preserve services that weren't regenerated in this run but still have docs on disk.
+	const existingServices = fs.existsSync(DOCS_DIR)
+		? fs
+				.readdirSync(DOCS_DIR, { withFileTypes: true })
+				.filter(
+					(entry) =>
+						entry.isDirectory() &&
+						fs.existsSync(path.join(DOCS_DIR, entry.name, "meta.json")),
+				)
+				.map((entry) => entry.name)
+		: [];
+
+	const serviceOrder = SERVICES.map((service) => service.name);
+	const mergedServices = [
+		...new Set([
+			...serviceOrder.filter(
+				(name) => name in allGenerated || existingServices.includes(name),
+			),
+			...existingServices,
+		]),
+	];
+
 	// Generate parent meta.json with folder references
 	const pages: string[] = [
 		"---Overview---",
@@ -916,7 +938,7 @@ function generateMetaJson(allGenerated: Record<string, GeneratedPage[]>) {
 		"usage-limits",
 		"errors",
 		"---Actions---",
-		...Object.keys(allGenerated),
+		...mergedServices,
 	];
 
 	const meta = {
