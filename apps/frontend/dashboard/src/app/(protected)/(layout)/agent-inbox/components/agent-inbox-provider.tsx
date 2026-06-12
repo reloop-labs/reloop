@@ -85,7 +85,6 @@ interface AgentInboxContextValue {
 const AgentInboxContext = createContext<AgentInboxContextValue | null>(null);
 
 export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
-
 	// Fetch mailboxes from actual endpoint
 	const {
 		data: mailboxesData,

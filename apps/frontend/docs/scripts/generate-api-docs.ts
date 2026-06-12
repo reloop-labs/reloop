@@ -230,7 +230,9 @@ function parseParameter(
 		if (itemsSchema.type === "object" && itemsSchema.properties) {
 			subProperties = [];
 			const subRequired = itemsSchema.required || [];
-			for (const [subName, subPropSchema] of Object.entries(itemsSchema.properties)) {
+			for (const [subName, subPropSchema] of Object.entries(
+				itemsSchema.properties,
+			)) {
 				subProperties.push(
 					parseParameter(
 						subName,
@@ -319,14 +321,15 @@ function extractParameters(operation: any, spec: any): ParameterInfo[] {
 					description: schema.description || "Array of items",
 					location: "body",
 					properties: itemsSchema.properties
-						? Object.entries(itemsSchema.properties).map(([subName, subPropSchema]) =>
-								parseParameter(
-									subName,
-									subPropSchema,
-									(itemsSchema.required || []).includes(subName),
-									"body",
-									spec,
-								),
+						? Object.entries(itemsSchema.properties).map(
+								([subName, subPropSchema]) =>
+									parseParameter(
+										subName,
+										subPropSchema,
+										(itemsSchema.required || []).includes(subName),
+										"body",
+										spec,
+									),
 							)
 						: undefined,
 				});

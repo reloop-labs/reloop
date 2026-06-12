@@ -522,7 +522,7 @@ function SidebarFolder({
 				}}
 				data-sidebar-active={isDirectlyActive || undefined}
 				className={cn(
-					"group relative z-10 flex h-9 w-full items-center justify-between rounded-lg px-2 font-medium text-sm transition-all",
+					"group relative z-10 flex h-9 w-full items-center justify-between rounded-lg px-2 font-medium text-[15px] transition-all",
 					isDirectlyActive
 						? "text-[#171717] dark:text-white"
 						: isParentActive
@@ -565,7 +565,7 @@ function SidebarFolder({
 						transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
 						style={{ overflow: "hidden" }}
 					>
-						<div className="mt-px ml-2.5 flex flex-col space-y-px border-stroke-soft-100/40 border-l pb-0.5 pl-2">
+						<div className="mt-px flex flex-col space-y-px pb-0.5">
 							{node.children.map((child: PageTreeItem, index: number) => (
 								<SidebarLink
 									key={index}
@@ -611,7 +611,7 @@ function SidebarLink({
 			}}
 			data-sidebar-active={isActive || undefined}
 			className={cn(
-				"group relative z-10 flex h-7 items-center gap-2 rounded-lg px-2 text-[13px] transition-colors",
+				"group relative z-10 flex h-8 items-center gap-2 rounded-lg px-2 text-[14px] transition-colors",
 				isActive
 					? "text-[#171717] dark:text-white"
 					: "text-text-sub-600 hover:text-[#171717] dark:hover:text-white",
