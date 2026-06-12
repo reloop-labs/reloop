@@ -617,11 +617,11 @@ function SidebarLink({
 					: "text-text-sub-600 hover:text-[#171717] dark:hover:text-white",
 			)}
 		>
-			<div className="relative z-10 flex w-full items-center gap-2 text-left">
-				{node.method && (
-					<span
+			<div className="relative z-10 grid w-full grid-cols-[40px_1fr] items-center gap-2 text-left">
+				{node.method ? (
+					<p
 						className={cn(
-							"inline-flex w-11 shrink-0 items-center justify-center rounded-[4px] py-[1px] font-semibold text-[9px] uppercase leading-tight tracking-wide",
+							"inline-flex w-fit shrink-0 items-center justify-self-center rounded-[4px] px-1.5 py-[1.5px] font-semibold text-[10px] uppercase leading-tight tracking-wide",
 							node.method === "GET" &&
 								"bg-green-500/15 text-green-600 dark:bg-green-500/20 dark:text-green-400",
 							node.method === "POST" &&
@@ -635,12 +635,11 @@ function SidebarLink({
 						)}
 					>
 						{node.method === "DELETE" ? "DEL" : node.method}
-					</span>
-				)}
-				{!node.method && node.icon && (
+					</p>
+				) : node.icon ? (
 					<span
 						className={cn(
-							"flex h-3.5 w-3.5 shrink-0 items-center justify-center transition-colors",
+							"flex h-3.5 w-3.5 shrink-0 items-center justify-center justify-self-center transition-colors",
 							isActive
 								? "text-[#171717] dark:text-white"
 								: "text-text-sub-600 opacity-70",
@@ -648,8 +647,10 @@ function SidebarLink({
 					>
 						{node.icon}
 					</span>
+				) : (
+					<div />
 				)}
-					<span className="truncate font-medium">{node.name as string}</span>
+				<span className="truncate font-medium">{node.name as string}</span>
 			</div>
 		</Link>
 	);
