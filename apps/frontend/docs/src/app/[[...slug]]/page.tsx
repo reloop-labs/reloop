@@ -123,45 +123,52 @@ export default async function Page(props: {
 				pathname={pathname}
 			>
 				<div
-					className={`mx-auto flex w-full flex-col ${hideToc ? "max-w-none" : "max-w-[1040px] xl:grid xl:grid-cols-[1fr_240px] xl:gap-8"}`}
+					className={`mx-auto flex w-full flex-col ${
+						isApiPage
+							? "max-w-[1080px]"
+							: hideToc
+								? "max-w-none"
+								: "max-w-[1040px] xl:grid xl:grid-cols-[1fr_240px] xl:gap-8"
+					}`}
 				>
 					{/* Main content area */}
 					<div
-						className={`min-w-0 px-6 py-8 md:px-10 ${useSplitLayout ? "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(360px,440px)] lg:gap-x-12 xl:gap-x-16" : ""} ${isApiPage ? "lg:px-12 xl:px-16" : ""}`}
+						className={`min-w-0 px-6 py-8 md:px-10 ${useSplitLayout ? "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(320px,400px)] lg:gap-x-10 xl:gap-x-12" : ""}`}
 					>
 						<div
 							className={
 								hideToc
 									? isApiPage
-										? "min-w-0 max-w-[720px]"
+										? "min-w-0"
 										: ""
 									: "mx-auto max-w-[680px] xl:mx-0"
 							}
 						>
-							{/* Breadcrumb */}
-							{breadcrumbs.length > 0 ? (
-								<div className="mb-4 flex items-center gap-2 text-[13px] text-text-sub-600">
-									<Home className="h-3.5 w-3.5 opacity-70" />
-									{breadcrumbs.map((crumb, i) => (
-										<div key={i} className="flex items-center gap-2">
-											<span className="opacity-40">/</span>
-											<span
-												className={
-													i === breadcrumbs.length - 1
-														? "font-medium text-[#171717] dark:text-white"
-														: "text-text-sub-600"
-												}
-											>
-												{crumb}
-											</span>
-										</div>
-									))}
-								</div>
-							) : (
-								<div className="mb-3 font-medium text-[12px] text-text-sub-600/60 uppercase tracking-wider">
-									Documentation
-								</div>
-							)}
+							{/* Breadcrumb — hidden on API pages (sidebar already shows location) */}
+							{!isApiPage &&
+								(breadcrumbs.length > 0 ? (
+									<div className="mb-4 flex items-center gap-2 text-[13px] text-text-sub-600">
+										<Home className="h-3.5 w-3.5 opacity-70" />
+										{breadcrumbs.map((crumb, i) => (
+											<div key={i} className="flex items-center gap-2">
+												<span className="opacity-40">/</span>
+												<span
+													className={
+														i === breadcrumbs.length - 1
+															? "font-medium text-[#171717] dark:text-white"
+															: "text-text-sub-600"
+													}
+												>
+													{crumb}
+												</span>
+											</div>
+										))}
+									</div>
+								) : (
+									<div className="mb-3 font-medium text-[12px] text-text-sub-600/60 uppercase tracking-wider">
+										Documentation
+									</div>
+								))}
 
 							{/* Title row */}
 							<div className="mb-8 flex items-start justify-between gap-4">
@@ -169,7 +176,7 @@ export default async function Page(props: {
 									<h1 className="font-semibold text-3xl text-fd-foreground tracking-[-0.03em]">
 										{page.data.title}
 									</h1>
-									{page.data.description && (
+									{page.data.description && !isApiPage && (
 										<p className="mt-3.5 text-[16px] text-text-sub-600/90 leading-relaxed tracking-[-0.01em]">
 											{page.data.description}
 										</p>
@@ -183,9 +190,7 @@ export default async function Page(props: {
 							{/* Content */}
 							<DocsBody
 								className={
-									isApiPage
-										? "[&>p:first-child]:mt-0 [&>p:first-child]:mb-8 [&>p:first-child]:text-[16px] [&>p:first-child]:leading-relaxed [&>p:first-child]:text-text-sub-600/90"
-										: ""
+									isApiPage ? "[&>p:first-child]:hidden [&>p:first-child]:m-0" : ""
 								}
 							>
 								<MDXContent

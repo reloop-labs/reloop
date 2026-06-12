@@ -128,6 +128,30 @@ aside::-webkit-scrollbar-thumb:hover {
 	border-top-color: rgb(255 255 255 / 0.06);
 }
 
+/* Fallback: soften Mintlify fd-border tokens inside API docs content */
+#nd-page .prose .border-fd-border {
+	border-color: var(--color-stroke-soft-200) !important;
+}
+
+.dark #nd-page .prose .border-fd-border {
+	border-color: rgb(255 255 255 / 0.08) !important;
+}
+
+#nd-page .prose .divide-fd-border > :not([hidden]) ~ :not([hidden]),
+.dark .divide-fd-border > :not([hidden]) ~ :not([hidden]) {
+	border-top-color: var(--color-stroke-soft-200) !important;
+}
+
+.dark #nd-page .prose .divide-fd-border > :not([hidden]) ~ :not([hidden]),
+.dark .divide-fd-border > :not([hidden]) ~ :not([hidden]) {
+	border-top-color: rgb(255 255 255 / 0.06) !important;
+}
+
+.dark #nd-page .prose [class*="bg-fd-muted"],
+.dark .prose [class*="bg-fd-muted"] {
+	background-color: rgb(255 255 255 / 0.03) !important;
+}
+
 /* API reference: code panel styling */
 .api-code-panel .code-group {
 	border-radius: 0.75rem;
