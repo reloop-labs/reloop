@@ -103,14 +103,6 @@ const SERVICES: ServiceConfig[] = [
 		specUrl: "http://localhost:8019/api/template/openapi/json",
 		prodUrl: "https://reloop.sh/api/template/openapi/json",
 	},
-
-	{
-		name: "auth",
-		prefix: "/api/auth",
-		port: 8000,
-		specUrl: "http://localhost:8000/api/auth/openapi/json",
-		prodUrl: "https://reloop.sh/api/auth/openapi/json",
-	},
 ];
 
 function sanitizeOperationId(
@@ -693,7 +685,7 @@ function generateMetaJson(allGenerated: Record<string, string[]>) {
 		template: "Templates",
 		upload: "Upload",
 		logs: "Logs",
-		auth: "Auth",
+
 	};
 
 	for (const [service, entries] of Object.entries(allGenerated)) {
