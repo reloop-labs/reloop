@@ -1,0 +1,168 @@
+---
+title: Channels
+description: Define message categories and manage per-contact subscription preferences.
+---
+
+**Channels** are categories of email — Product Updates, Security Alerts, Marketing, and so on. Each contact has a separate **opt_in** or **opt_out** choice per channel, so they can stop marketing without missing account alerts.
+
+Related: [Subscriptions](/docs/learn/contacts/subscriptions) (preference center) · [Contact records](/docs/learn/contacts/contacts)
+
+## Channel schema
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | string | Unique ID (e.g. `ch_abc123`) |
+| `name` | string | Display name in dashboard and preference center |
+| `description` | string | Optional; shown on preference page |
+| `defaultSubscription` | enum | `opt_in` or `opt_out` for new enrollments |
+| `visibility` | enum | `public` (on preference page) or `private` (team-only) |
+| `createdAt` / `updatedAt` | string | Timestamps |
+
+## Subscription values (per contact)
+
+| Value | Contact receives this channel? |
+| --- | --- |
+| `opt_in` | Yes |
+| `opt_out` | No |
+
+When you enroll a contact without specifying subscription, Reloop uses the channel's `defaultSubscription`.
+
+## Example channel setup
+
+| Name | defaultSubscription | visibility | Use for |
+| --- | --- | --- | --- |
+| Product Updates | opt_in | public | Release notes |
+| Security Alerts | opt_in | public | Password reset, login alerts |
+| Marketing | opt_out | public | Promotions — consent-based |
+| Internal Ops | opt_in | private | Staff notifications via API only |
+
+<Callout type="tip" title="Public vs. private">
+  **Public** channels appear on the [preference center](/docs/learn/contacts/subscriptions). **Private** channels are managed only in the dashboard or via API.
+</Callout>
+
+## Dashboard
+
+### Channels tab
+
+**Path:** Dashboard → **Contacts** → **Channels**
+
+View all channels, defaults, and visibility. Click a row to edit.
+
+### Create a channel
+
+1. Click **Create Channel**.
+2. Enter **name** and **description**.
+3. Set **default subscription** — opt_in or opt_out for new members.
+4. Set **visibility** — public or private.
+5. Review the **Subscriber preview** (preference page mock).
+6. Save.
+
+### Manage subscriptions on a contact
+
+Open a [contact detail page](/docs/learn/contacts/contacts) → **Channels** section → toggle opt_in / opt_out per channel.
+
+## API reference summary
+
+| Operation | Method | Endpoint |
+| --- | --- | --- |
+| Create | `POST` | `/api/contacts/v1/channels/create` |
+| List | `GET` | `/api/contacts/v1/channels/list` |
+| Get | `GET` | `/api/contacts/v1/channels/:channel_id` |
+| Update | `PATCH` | `/api/contacts/v1/channels/:channel_id` |
+| Delete | `DELETE` | `/api/contacts/v1/channels/:channel_id` |
+| Enroll contact | `POST` | `/api/contacts/channel/:channel_id` |
+| Update enrollment | `PATCH` | `/api/contacts/channel/:channel_id` |
+
+## SDK examples
+
+<Callout type="info" title="Node.js SDK">
+  Channel methods ship in the next `reloop-email` release. REST examples work today; swap in SDK calls when published.
+</Callout>
+
+### Create a channel
+
+<CodeGroup>
+```typescript Node.js SDK (coming soon)
+const { response, error } = await reloop.contacts.createChannel({
+  name: "Product Updates",
+  description: "New features and improvements",
+  defaultSubscription: "opt_in",
+  visibility: "public",
+});
+
+if (error) throw error;
+console.log(response.id, response.name);
+```
+
+```bash cURL
+curl -X POST https://reloop.sh/api/contacts/v1/channels/create \
+  -H "x-api-key: re_your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Product Updates",
+    "description": "New features and improvements",
+    "defaultSubscription": "opt_in",
+    "visibility": "public"
+  }'
+```
+
+```json Request body
+{
+  "name": "Product Updates",
+  "description": "New features and improvements",
+  "defaultSubscription": "opt_in",
+  "visibility": "public"
+}
+```
+</CodeGroup>
+
+### List channels
+
+```typescript
+// SDK (coming soon)
+const { response, error } = await reloop.contacts.listChannels({
+  page: 1,
+  limit: 100,
+});
+if (error) throw error;
+```
+
+```bash
+curl "https://reloop.sh/api/contacts/v1/channels/list?page=1&limit=100" \
+  -H "x-api-key: re_your_api_key"
+```
+
+### Enroll contact at create time
+
+```typescript
+const { response, error } = await reloop.contacts.create({
+  email: "user@example.com",
+  channels: [
+    { channelId: "ch_product", subscription: "opt_in" },
+    { channelId: "ch_marketing", subscription: "opt_out" },
+  ],
+});
+if (error) throw error;
+```
+
+### Enroll existing contact
+
+```bash
+curl -X POST "https://reloop.sh/api/contacts/channel/ch_product" \
+  -H "x-api-key: re_your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{"contact_id": "cont_123", "subscription": "opt_in"}'
+```
+
+### Update subscription
+
+```bash
+curl -X PATCH "https://reloop.sh/api/contacts/channel/ch_marketing" \
+  -H "x-api-key: re_your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{"contact_id": "cont_123", "subscription": "opt_out"}'
+```
+
+<Card title="Create Channel API" icon="brackets" href="/api/contacts/post-api-contacts-v1channels-create">
+  Full request and response schema
+</Card>

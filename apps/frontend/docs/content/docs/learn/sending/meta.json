@@ -2,7 +2,6 @@
 	"title": "Sending",
 	"icon": "Send",
 	"pages": [
-		"index",
 		"batch-sending",
 		"attachments",
 		"embed-images",

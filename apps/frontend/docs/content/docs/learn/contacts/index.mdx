@@ -1,41 +1,135 @@
 ---
 title: Introduction
-description: Learn how to manage your Contacts, understand their relationships, and send personalized communications to them.
+description: Manage contacts, custom properties, groups, and channel subscriptions in Reloop.
+sidebarTitle: Introduction
 ---
 
-Welcome to the **Contacts** documentation. Contacts are the core entity in Reloop, representing the individuals you communicate with. Understanding how to manage contacts effectively is essential for driving successful campaigns and personalizing your messaging.
+Reloop **Contacts** is where you store everyone you email. Each person is a **contact** — a record keyed by email address with profile data, [properties](/docs/learn/contacts/properties), [group](/docs/learn/contacts/groups) memberships, [channel](/docs/learn/contacts/channels) subscriptions, and a full **email activity** timeline.
 
-## What is a Contact?
+This section covers everything in the Contacts area of the dashboard, plus matching API and SDK examples.
 
-A Contact in Reloop represents a single person or entity in your audience, identified fundamentally by their email address. It acts as the central hub where all interactions, preferences, and custom data (properties) are tied together.
+## Documentation map
 
-## How Contacts Relate to Other Entities
+| Page | What you will learn |
+| --- | --- |
+| [Contact records](/docs/learn/contacts/contacts) | Create, list, edit, delete contacts; contact detail page; email activity |
+| [Properties](/docs/learn/contacts/properties) | Custom fields for personalization |
+| [Groups](/docs/learn/contacts/groups) | Static lists for targeting sends |
+| [Channels](/docs/learn/contacts/channels) | Message categories and opt-in / opt-out |
+| [Subscriptions](/docs/learn/contacts/subscriptions) | Preference center — let contacts choose what they receive |
+| [Suppression](/docs/learn/contacts/suppression) | Hard bounces and spam complaints — why sending stops |
+| [Migration guide](/docs/learn/contacts/migration-guide) | Import contacts via API (CSV import coming soon) |
 
-Contacts do not exist in isolation. They are deeply integrated with three other powerful features in Reloop:
+## Dashboard layout
 
-- **[Groups](/docs/learn/contacts/groups):** Contacts can be organized into static or dynamic groups (e.g., "Active Users," "Beta Testers"). Groups are primarily used for broad segmentation.
-- **[Properties](/docs/learn/contacts/properties):** Custom data fields attached to a contact. Properties provide the granular details (e.g., `first_name`, `company_size`) needed for high-quality personalization within your communications.
-- **[Channels](/docs/learn/contacts/channels):** Channels govern subscriber preferences. Instead of an all-or-nothing subscription model, contacts can opt in or opt out of specific channels (e.g., "Product Updates," "Marketing").
+Open **Contacts** in the Reloop dashboard. Four tabs organize the workspace:
 
-## Key Features
+| Tab | Purpose |
+| --- | --- |
+| **Contacts** | Searchable list of all subscribers; add and import contacts |
+| **Properties** | Define custom fields used across all contacts |
+| **Groups** | Named collections of contacts for broadcasts and reporting |
+| **Channels** | Communication categories (Marketing, Product Updates, etc.) |
 
-- **Centralized Audience Management:** View, search, and manage your entire subscriber base from a single dashboard.
-- **Rich User Profiles:** Deeply understand your users by viewing their properties, group memberships, and channel subscriptions in one unified profile.
-- **Advanced Filtering:** Create segmented lists based on custom attributes and engagement metrics.
-- **Self-Serve Preferences:** Contacts manage their own channel subscriptions, drastically reducing hard unsubscribe rates.
+Click any contact row to open the **contact detail page** — profile fields, properties, groups, channels, and **email activity** in one view.
 
-## How to Use Contacts
+## Typical workflows
 
-The Contacts dashboard provides a robust interface for audience management.
+### 1. Add a contact manually
 
-### 1. The Contacts List
-Navigate to the **Contacts** tab in the dashboard. Here you will see a searchable, paginated list of all your contacts.
-![Contacts List View Placeholder](/images/docs/contacts/list-view.png)
+1. Go to **Contacts** tab.
+2. Click **Add Contact**.
+3. Enter **email** (required), **first name**, **last name** (optional).
+4. Assign **groups** and **channels** if needed.
+5. Set **custom property** values.
+6. Save.
 
-### 2. Adding a Contact
-You can manually add a contact by clicking the **"Add Contact"** button on the top right. Fill out their basic information and assign them to initial groups or channels.
-![Add New Contact View Placeholder](/images/docs/contacts/add-contact.png)
+### 2. Create a group and add members
 
-### 3. Viewing a Contact Profile
-Clicking on any contact in the list will open their detailed profile. From here, you can individually manage their custom properties, adjust their group memberships, or manually update their channel subscriptions.
-![Detailed Contact Profile Placeholder](/images/docs/contacts/contact-profile.png)
+1. Go to **Groups** tab → **Create Group**.
+2. Open the group → add contacts by search.
+3. Or add from a contact detail page under **Groups**.
+
+See [Groups](/docs/learn/contacts/groups).
+
+### 3. Personalize email content
+
+1. Define properties under **Properties** tab (e.g. `first_name`, `plan_type`).
+2. Set values on each contact (detail page or API).
+3. Use merge variables in templates: `{{ contact.first_name }}`.
+
+See [Properties](/docs/learn/contacts/properties).
+
+### 4. Let contacts manage what they receive
+
+1. Create **public** [channels](/docs/learn/contacts/channels) for each message type.
+2. Add a **preference center** link to email footers.
+
+See [Subscriptions](/docs/learn/contacts/subscriptions) — this is the hosted page where subscribers toggle channels without logging in.
+
+### 5. Import a list (API today; CSV soon)
+
+Bulk CSV import from the dashboard is **coming soon**. Today, import programmatically with the API — see [Migration guide](/docs/learn/contacts/migration-guide).
+
+## Product docs + API / SDK
+
+Each feature page follows the same structure:
+
+1. **Concept** — what it is and when to use it
+2. **Dashboard** — step-by-step UI instructions
+3. **API & SDK** — copy-paste examples with typed `{ response, error }` results
+4. **API reference link** — full schema on the generated reference pages
+
+Install the Node.js SDK:
+
+```bash
+npm install reloop-email
+```
+
+<CodeGroup>
+```typescript Node.js SDK
+import Reloop from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+const { response, error } = await reloop.contacts.create({
+  email: "jane@example.com",
+  firstName: "Jane",
+  properties: { company_name: "Acme" },
+  groupIds: ["grp_123"],
+});
+
+if (error) {
+  console.error(error.status, error.message, error.body);
+  return;
+}
+
+console.log(response.id, response.email);
+```
+
+```bash cURL
+curl -X POST https://reloop.sh/api/contacts/create \
+  -H "x-api-key: re_your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"jane@example.com","firstName":"Jane"}'
+```
+</CodeGroup>
+
+Every SDK method returns `{ response, error }`. Check `error` before using `response`. HTTP failures do not throw.
+
+<Card title="Contacts API reference" icon="brackets" href="/api/contacts/post-api-contacts-create">
+  All Contacts, Groups, Properties, and Channels endpoints
+</Card>
+
+## Terminology
+
+| Term | Meaning |
+| --- | --- |
+| **Contact** | One subscriber, identified by email |
+| **Property** | Custom field on a contact (string or number) |
+| **Group** | Static named list of contacts |
+| **Channel** | Category of mail with its own opt-in / opt-out |
+| **Subscription** | A contact's opt-in or opt-out for a specific channel |
+| **Suppression** | Automatic block after hard bounce or spam complaint |
+
+We use **Groups**, not "segments" or "audience," in Reloop Contacts.

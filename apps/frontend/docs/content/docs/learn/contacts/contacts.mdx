@@ -1,0 +1,236 @@
+---
+title: Contact records
+description: Create, update, and manage individual subscribers in Reloop.
+sidebarTitle: Contact records
+---
+
+A **contact** is one subscriber, identified by **email address**. Every property, group, channel subscription, and email log in Reloop attaches to a contact record.
+
+## Contact data model
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | string | Unique ID (e.g. `cont_abc123`) |
+| `email` | string | Primary identifier; unique per organization |
+| `firstName` | string \| null | Given name |
+| `lastName` | string \| null | Family name |
+| `status` | enum | `subscribed`, `unsubscribed`, or `blocked` |
+| `properties` | object | Custom key-value fields — see [Properties](/docs/learn/contacts/properties) |
+| `groups` | array | `{ id, name }` memberships — see [Groups](/docs/learn/contacts/groups) |
+| `channels` | array | `{ id, name, subscription }` enrollments — see [Channels](/docs/learn/contacts/channels) |
+| `suppressionReason` | enum \| null | `hard_bounce`, `spam_complaint`, or null |
+| `suppressedAt` | string \| null | ISO timestamp when suppression was applied |
+| `createdAt` | string | When the contact was created |
+| `updatedAt` | string | Last profile update |
+
+<Callout type="info" title="Status vs. channel subscription vs. suppression">
+  - **Status** (`subscribed` / `unsubscribed` / `blocked`) — global send permission you or the contact control.
+  - **Channel subscription** (`opt_in` / `opt_out`) — per message category. See [Subscriptions](/docs/learn/contacts/subscriptions).
+  - **Suppression** — automatic block after delivery failure. See [Suppression](/docs/learn/contacts/suppression).
+</Callout>
+
+## Contact statuses
+
+### `subscribed`
+
+Default for new contacts. They can receive email unless a channel opt-out or [suppression](/docs/learn/contacts/suppression) applies.
+
+### `unsubscribed`
+
+Global opt-out. The contact should not receive mail that honors unsubscribe state.
+
+### `blocked`
+
+Manual block — use for compliance holds or abusive addresses. Set from the dashboard or API.
+
+## Dashboard: Contacts list
+
+**Path:** Dashboard → **Contacts** → **Contacts** tab
+
+| Action | How |
+| --- | --- |
+| Search | Type in the search box — matches email and name |
+| Filter by status | Use the status filter for subscribed / unsubscribed / blocked |
+| Paginate | Scroll or use pagination controls for large lists |
+| Open detail | Click any row |
+| Add contact | **Add Contact** button (top right) |
+| Edit contact | Open detail page, or use row actions where available |
+| Delete contact | From detail page or list actions — permanent |
+
+## Dashboard: Add a contact
+
+1. Click **Add Contact**.
+2. Fill in **email** (required).
+3. Optionally add **first name**, **last name**.
+4. Assign **groups** — search and select existing groups.
+5. Assign **channels** — pick channels and set opt-in / opt-out.
+6. Fill **custom properties** — fields appear for every property defined under the Properties tab.
+7. Click save.
+
+## Dashboard: Contact detail page
+
+**Path:** Contacts list → click a row
+
+The detail page is the single place to manage one contact and review their email history.
+
+### Profile section
+
+- Edit **email**, **first name**, **last name**
+- Change **status** (subscribed / unsubscribed / blocked)
+- View **suppression** banner if `suppressionReason` is set — see [Suppression](/docs/learn/contacts/suppression) for why and what to do
+
+### Custom properties
+
+All workspace [properties](/docs/learn/contacts/properties) appear with their values. Empty fields show the property fallback or `-`.
+
+### Groups
+
+Add or remove [group](/docs/learn/contacts/groups) memberships without leaving the page.
+
+### Channels
+
+Toggle **opt_in** / **opt_out** per [channel](/docs/learn/contacts/channels).
+
+### Email activity
+
+The **Email activity** section lists every message sent to this contact, newest first.
+
+Each entry includes:
+
+| Field | Description |
+| --- | --- |
+| Subject | Email subject line |
+| From | Sender address used |
+| Status | Delivery state (see below) |
+| Timeline | Events for that message (sent, delivered, failed, etc.) |
+| Timestamps | When the message was sent, delivered, or failed |
+
+**Common activity statuses:**
+
+| Status | Meaning |
+| --- | --- |
+| `pending` | Queued, not yet sent |
+| `sent` | Accepted by Reloop for delivery |
+| `delivered` | Recipient server accepted the message |
+| `failed` | Send or delivery failed |
+| `bounced` | Message bounced (may trigger [suppression](/docs/learn/contacts/suppression)) |
+| `spam` | Spam complaint recorded (may trigger suppression) |
+
+Use activity to debug deliverability issues before changing contact status manually.
+
+### Delete contact
+
+Removes the contact and associations. Cannot be undone.
+
+## API reference summary
+
+| Operation | Method | Endpoint |
+| --- | --- | --- |
+| Create | `POST` | `/api/contacts/create` |
+| List | `GET` | `/api/contacts/list` |
+| Retrieve | `GET` | `/api/contacts/retrieve/:contact_id` |
+| Update | `PATCH` | `/api/contacts/:contact_id` |
+| Delete | `DELETE` | `/api/contacts/:contact_id` |
+
+Query params for **list**: `page`, `limit`, `search`, `status`. Pass `groupId` via [Groups list API](/docs/learn/contacts/groups) or `reloop.contacts.list({ groupId })`.
+
+## SDK examples
+
+### Create a contact
+
+<CodeGroup>
+```typescript Node.js SDK
+const { response, error } = await reloop.contacts.create({
+  email: "john.doe@example.com",
+  firstName: "John",
+  lastName: "Doe",
+  status: "subscribed",
+  properties: {
+    company_name: "Acme Corp",
+    seats: 12,
+  },
+  groupIds: ["grp_beta_testers"],
+  channels: [
+    { channelId: "ch_product_updates", subscription: "opt_in" },
+    { channelId: "ch_marketing", subscription: "opt_out" },
+  ],
+});
+
+if (error) throw error;
+console.log(response.id);
+```
+
+```json POST /api/contacts/create
+{
+  "email": "john.doe@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "status": "subscribed",
+  "properties": {
+    "company_name": "Acme Corp",
+    "seats": 12
+  },
+  "groupIds": ["grp_beta_testers"],
+  "channels": [
+    { "channelId": "ch_product_updates", "subscription": "opt_in" },
+    { "channelId": "ch_marketing", "subscription": "opt_out" }
+  ]
+}
+```
+</CodeGroup>
+
+### Retrieve a contact (includes suppression + activity fields)
+
+```typescript
+const { response, error } = await reloop.contacts.get("cont_123456789");
+if (error) throw error;
+
+console.log(response.email, response.status);
+console.log(response.groups, response.channels, response.properties);
+
+if (response.suppressionReason) {
+  // See /docs/learn/contacts/suppression
+  console.log(response.suppressionReason, response.suppressedAt);
+}
+```
+
+### List and search
+
+```typescript
+const { response, error } = await reloop.contacts.list({
+  page: 1,
+  limit: 50,
+  search: "acme",
+  status: "subscribed",
+});
+if (error) throw error;
+
+console.log(response.contacts, response.total);
+```
+
+### Update a contact
+
+```typescript
+const { response, error } = await reloop.contacts.update("cont_123456789", {
+  firstName: "Jane",
+  properties: { company_name: "Acme International" },
+});
+if (error) throw error;
+```
+
+Property keys must use `snake_case` and match defined property names.
+
+### Delete a contact
+
+```typescript
+const { error } = await reloop.contacts.delete("cont_123456789");
+if (error) throw error;
+```
+
+<Card title="Create Contact API" icon="brackets" href="/api/contacts/post-api-contacts-create">
+  Full request and response schema
+</Card>
+
+## Suppression
+
+If a contact stops receiving mail after a bounce or spam report, read [Suppression](/docs/learn/contacts/suppression) — it explains each reason and the recommended response.

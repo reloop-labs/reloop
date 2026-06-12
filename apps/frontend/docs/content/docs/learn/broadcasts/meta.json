@@ -1,5 +1,7 @@
 {
 	"title": "Broadcasts",
 	"icon": "Radio",
-	"pages": ["index", "performance-tracking"]
+	"pages": [
+		"performance-tracking"
+	]
 }

@@ -1,0 +1,127 @@
+---
+title: Migration Guide
+description: Import contacts into Reloop using the API. Dashboard CSV import coming soon.
+---
+
+Use this guide to move subscribers from another ESP or spreadsheet into Reloop **Contacts**.
+
+<Callout type="info" title="CSV import coming soon">
+  Bulk **CSV import from the dashboard** is not available yet. Use the **API import** flow below today. When CSV import launches, it will appear on the Contacts tab with column mapping — this page will be updated.
+</Callout>
+
+## Before you import
+
+| Step | Why |
+| --- | --- |
+| [Verify your domain](/docs/learn/domains) | Required before sending to imported contacts |
+| Create [properties](/docs/learn/contacts/properties) | Map custom fields before you import data |
+| Create [groups](/docs/learn/contacts/groups) | One group per list you are migrating (e.g. `Newsletter`, `Customers`) |
+| Configure [channels](/docs/learn/contacts/channels) | Decide default opt-in / opt-out for imported contacts |
+| Plan for [suppression](/docs/learn/contacts/suppression) | Do not import known hard bounces or complainers as `subscribed` |
+
+## API import (available now)
+
+Loop through your source data and call **create contact** for each row.
+
+### Install SDK
+
+```bash
+npm install reloop-email
+```
+
+### Example import script
+
+```typescript
+import Reloop from "reloop-email";
+
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
+
+type Row = {
+  email: string;
+  first_name?: string;
+  last_name?: string;
+  company_name?: string;
+  plan_type?: string;
+};
+
+async function importRows(rows: Row[]) {
+  for (const row of rows) {
+    const { response, error } = await reloop.contacts.create({
+      email: row.email,
+      firstName: row.first_name,
+      lastName: row.last_name,
+      status: "subscribed",
+      properties: {
+        company_name: row.company_name ?? "",
+        plan_type: row.plan_type ?? "",
+      },
+      groupIds: ["grp_migrated_newsletter"],
+    });
+
+    if (error) {
+      if (error.status === 409) {
+        // Already exists — skip or call update instead
+        continue;
+      }
+      console.error(row.email, error.status, error.message);
+      continue;
+    }
+
+    console.log("Imported", response.id, response.email);
+  }
+}
+```
+
+<Callout type="warning" title="Rate limits">
+  Create contact is rate-limited. On `429`, back off using guidance in `error.body` before retrying.
+</Callout>
+
+### Recommended source CSV shape (for your script)
+
+When CSV import launches, this format will map cleanly:
+
+```csv
+email,first_name,last_name,company_name,plan_type
+jane@example.com,Jane,Doe,Acme Corp,pro
+john@example.com,John,Smith,Startup Inc,free
+```
+
+Use `snake_case` headers matching [property](/docs/learn/contacts/properties) names.
+
+## Field mapping from other ESPs
+
+| Source (typical ESP) | Reloop |
+| --- | --- |
+| Email address | `email` |
+| First name | `firstName` or property `first_name` |
+| Last name | `lastName` or property `last_name` |
+| Tags / lists | [Groups](/docs/learn/contacts/groups) |
+| Custom fields | [Properties](/docs/learn/contacts/properties) |
+| Subscribed / unsubscribed | Contact `status` |
+| Interest categories | [Channels](/docs/learn/contacts/channels) + subscription |
+
+### Unsubscribed rows
+
+Import with `status: "unsubscribed"` so Reloop never sends to them:
+
+```typescript
+await reloop.contacts.create({
+  email: row.email,
+  status: "unsubscribed",
+});
+```
+
+### Bounced or complaint addresses
+
+**Do not** import as `subscribed`. Skip them or import as `blocked`. Reloop will [suppress](/docs/learn/contacts/suppression) on new bounces, but cleaning at import protects deliverability.
+
+## After import
+
+1. Compare **total contact count** in the dashboard to your source file.
+2. Open random **contact detail** pages — verify properties and groups.
+3. Send a **test broadcast** to a small group before a full send.
+4. Monitor **email activity** on detail pages for delivery issues.
+
+<Card title="Create Contact API" icon="brackets" href="/api/contacts/post-api-contacts-create">
+  Full request and response schema
+</Card>

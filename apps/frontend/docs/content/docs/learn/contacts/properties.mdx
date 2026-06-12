@@ -1,45 +1,153 @@
 ---
 title: Properties
-description: Using custom data to personalize your communications.
+description: Define custom contact fields for personalization, filtering, and segmentation.
 ---
 
-Properties allow you to store additional information about your contacts. These can be used for personalization in emails or for advanced filtering and segmentation.
+**Properties** are custom fields on contacts. Define each property once for your workspace, then set a value per contact. Use them in email templates, API payloads, and the contact detail page.
 
-## Default Properties
+Built-in fields (`email`, `firstName`, `lastName`, `status`) live on the contact record itself — not as properties.
 
-Every contact in Reloop has certain default properties:
-- `email`: The contact's email address.
-- `created_at`: When the contact was first added.
-- `updated_at`: When the contact was last modified.
+Related: [Contact records](/docs/learn/contacts/contacts)
 
-## Custom Properties
+## Property schema
 
-You can define custom properties to suit your business needs. Examples include:
-- `first_name`
-- `last_name`
-- `company_name`
-- `plan_type` (e.g., Free, Pro, Enterprise)
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | string | Unique ID (e.g. `prop_abc123`) |
+| `propertyName` | string | Key used in API and templates (snake_case) |
+| `propertyType` | enum | `string` or `number` |
+| `defaultValue` | string \| null | Fallback when contact has no value |
+| `createdAt` / `updatedAt` | string | Timestamps |
 
-## Using Properties in Emails
+<Callout type="tip" title="Naming">
+  Use lowercase `snake_case`: `first_name`, `company_name`, `mrr`. Keys must match `^[a-z0-9_]+$`.
+</Callout>
 
-You can use variables to inject contact properties into your email templates:
+## Property types
+
+| Type | Store | Example values |
+| --- | --- | --- |
+| `string` | Text | `"Acme Corp"`, `"pro"` |
+| `number` | Numeric | `12`, `99.5` |
+
+## Using properties in email templates
 
 ```html
-Hello {{ contact.first_name }},
-
-Thank you for joining {{ contact.company_name }}!
+<p>Hi {{ contact.first_name }},</p>
+<p>Your plan: {{ contact.plan_type }}</p>
+<p>Seats: {{ contact.seats }}</p>
 ```
 
-## How to Manage Properties
+If a contact has no value and the property defines `fallbackValue`, Reloop uses the fallback at send time.
 
-### 1. View Available Properties
-In your dashboard, navigate to the **Properties** section to view a list of all custom properties defined across your workspace.
-![Properties List Placeholder](/images/docs/contacts/properties-list.png)
+## Dashboard
 
-### 2. Define a New Property
-Click **"Add Property"** to define a new schema key. You will need to specify a unique variable name (e.g., `favorite_color`) and its expected data type (Text, Number, Date, etc.).
-![Create Property Placeholder](/images/docs/contacts/create-property.png)
+### Properties tab
 
-### 3. Assigning Values to Contacts
-Once a property is defined globally, you can assign an individual value to a contact through their detailed profile page, or programmatically via the API.
-![Edit Contact Property Placeholder](/images/docs/contacts/edit-property.png)
+**Path:** Dashboard → **Contacts** → **Properties**
+
+Lists every custom field in the workspace.
+
+### Create a property
+
+1. Click **Add Property**.
+2. **Name** — e.g. `company_name` (becomes the merge key).
+3. **Type** — String or Number.
+4. **Fallback value** (optional) — e.g. `Unknown` or `0`.
+5. Save.
+
+### Set values on contacts
+
+**Contact detail page** → **Custom Properties** section → edit each field.
+
+Values can also be set when creating/updating via API. CSV import will support property columns when dashboard import launches — see [Migration guide](/docs/learn/contacts/migration-guide).
+
+## API reference summary
+
+| Operation | Method | Endpoint |
+| --- | --- | --- |
+| Create | `POST` | `/api/contacts/v1/properties/create` |
+| List | `GET` | `/api/contacts/v1/properties/list` |
+| Update | `PATCH` | `/api/contacts/v1/properties/:property_id` |
+| Delete | `DELETE` | `/api/contacts/v1/properties/:property_id` |
+
+Property **values** are set on the contact (`PATCH /api/contacts/:id`), not on the property definition.
+
+## SDK examples
+
+### Create a property
+
+<CodeGroup>
+```typescript Node.js SDK
+const { response, error } = await reloop.contacts.createProperty({
+  name: "company_name",
+  type: "string",
+  fallbackValue: "Unknown",
+});
+
+if (error) throw error;
+console.log(response.id, response.propertyName);
+```
+
+```json POST /api/contacts/v1/properties/create
+{
+  "name": "company_name",
+  "type": "string",
+  "fallbackValue": "Unknown"
+}
+```
+</CodeGroup>
+
+### List properties
+
+```typescript
+const { response, error } = await reloop.contacts.listProperties({
+  page: 1,
+  limit: 100,
+  search: "company",
+  type: "string",
+});
+if (error) throw error;
+```
+
+### Update property definition (fallback / name)
+
+```typescript
+const { error } = await reloop.contacts.updateProperty("prop_123", {
+  fallbackValue: "N/A",
+});
+if (error) throw error;
+```
+
+### Set values on a contact
+
+```typescript
+const { error } = await reloop.contacts.update("cont_123", {
+  properties: {
+    company_name: "Reloop",
+    seats: 5,
+  },
+});
+if (error) throw error;
+```
+
+### Set values at create time
+
+```typescript
+const { response, error } = await reloop.contacts.create({
+  email: "user@example.com",
+  properties: {
+    company_name: "Acme",
+    plan_type: "enterprise",
+  },
+});
+if (error) throw error;
+```
+
+<Callout type="warning" title="Deleting a property">
+  Deleting a definition removes the schema from the workspace. Values on contacts may no longer display until the property is re-created.
+</Callout>
+
+<Card title="Create Property API" icon="brackets" href="/api/contacts/post-api-contacts-v1properties-create">
+  Full request and response schema
+</Card>

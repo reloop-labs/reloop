@@ -2,7 +2,6 @@
 	"title": "Receiving",
 	"icon": "Inbox",
 	"pages": [
-		"index",
 		"custom-domains",
 		"attachments",
 		"email-content",
