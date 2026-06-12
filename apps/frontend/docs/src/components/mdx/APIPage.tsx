@@ -344,16 +344,34 @@ function ParameterRow({
 				<span className="font-mono font-semibold text-[13.5px] text-fd-foreground tracking-tight">
 					{param.name}
 				</span>
-				<span
-					className={cn(
-						"rounded-lg px-1.5 font-semibold text-[11px] tracking-tight",
-						getTypeBadgeStyles(param.type),
-					)}
-				>
-					{param.type}
-				</span>
+				{param.type.includes("|") ? (
+					param.type
+						.split("|")
+						.map((t) => t.trim())
+						.filter(Boolean)
+						.map((t, idx) => (
+							<span
+								key={idx}
+								className={cn(
+									"rounded-lg px-1.5 font-semibold text-[11px] tracking-tight",
+									getTypeBadgeStyles(t),
+								)}
+							>
+								{t}
+							</span>
+						))
+				) : (
+					<span
+						className={cn(
+							"rounded-lg px-1.5 font-semibold text-[11px] tracking-tight",
+							getTypeBadgeStyles(param.type),
+						)}
+					>
+						{param.type}
+					</span>
+				)}
 				{param.defaultValue !== undefined && (
-					<span className="rounded bg-bg-weak-50 px-1.5 py-0.5 font-mono text-[11px] text-text-sub-600/50 tracking-tight dark:bg-white/5">
+					<span className="rounded-lg px-1.5 font-semibold text-[11px] tracking-tight border border-primary-base/20 bg-primary-alpha-10 text-primary-base">
 						default: {JSON.stringify(param.defaultValue)}
 					</span>
 				)}
