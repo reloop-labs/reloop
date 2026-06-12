@@ -24,7 +24,12 @@ export const removeContactFromGroupRoute = new Elysia()
 		{
 			auth: true,
 			rateLimit: true,
-			params: t.Object({ group_id: t.String() }),
+			params: t.Object({
+				group_id: t.String({
+					description: "Group ID",
+					examples: ["grp_123456789"],
+				}),
+			}),
 			body: ContactModel.removeContactFromGroupBody,
 			response: {
 				200: ContactModel.removeContactFromGroupResponse,

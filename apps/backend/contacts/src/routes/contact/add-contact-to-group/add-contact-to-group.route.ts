@@ -22,7 +22,12 @@ export const addContactToGroupRoute = new Elysia()
 		{
 			auth: true,
 			rateLimit: true,
-			params: t.Object({ group_id: t.String() }),
+			params: t.Object({
+				group_id: t.String({
+					description: "Group ID",
+					examples: ["grp_123456789"],
+				}),
+			}),
 			body: ContactModel.addContactToGroupBody,
 			response: {
 				200: ContactModel.addContactToGroupResponse,

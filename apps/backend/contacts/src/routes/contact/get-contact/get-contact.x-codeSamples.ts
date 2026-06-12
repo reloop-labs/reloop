@@ -10,14 +10,15 @@ const reloop = new Reloop({
   key: 're_123456789'
 });
 
-const contact = await reloop.audience.get('cont_123456789');`,
+const { response: contact, error } = await reloop.contacts.get('cont_123456789');
+if (error) throw error;`,
 	},
 	{
 		id: "curl",
 		lang: "bash",
 		label: "cURL",
-		source: `curl https://reloop.sh/api/contacts/v1/retrieve/cont_123456789 \\
-  -H "Authorization: Bearer re_123456789"`,
+		source: `curl https://reloop.sh/api/contacts/retrieve/cont_123456789 \\
+  -H "x-api-key: re_123456789"`,
 	},
 	{
 		id: "php",
@@ -26,8 +27,8 @@ const contact = await reloop.audience.get('cont_123456789');`,
 		source: `<?php
 $client = new \\GuzzleHttp\\Client();
 
-$response = $client->get('https://reloop.sh/api/contacts/v1/retrieve/cont_123456789', [
-    'headers' => ['Authorization' => 'Bearer re_123456789'],
+$response = $client->get('https://reloop.sh/api/contacts/retrieve/cont_123456789', [
+    'headers' => ['x-api-key' => 're_123456789'],
 ]);
 
 $contact = json_decode($response->getBody(), true);`,
@@ -39,8 +40,8 @@ $contact = json_decode($response->getBody(), true);`,
 		source: `import requests
 
 response = requests.get(
-    'https://reloop.sh/api/contacts/v1/retrieve/cont_123456789',
-    headers={'Authorization': 'Bearer re_123456789'}
+    'https://reloop.sh/api/contacts/retrieve/cont_123456789',
+    headers={'x-api-key': 're_123456789'},
 )
 
 contact = response.json()`,
@@ -52,12 +53,12 @@ contact = response.json()`,
 		source: `require 'net/http'
 require 'json'
 
-uri = URI('https://reloop.sh/api/contacts/v1/retrieve/cont_123456789')
+uri = URI('https://reloop.sh/api/contacts/retrieve/cont_123456789')
 http = Net::HTTP.new(uri.host, uri.port)
 http.use_ssl = true
 
 request = Net::HTTP::Get.new(uri)
-request['Authorization'] = 'Bearer re_123456789'
+request['x-api-key'] = 're_123456789'
 
 response = http.request(request)
 contact = JSON.parse(response.body)`,
@@ -71,8 +72,8 @@ contact = JSON.parse(response.body)`,
 import "net/http"
 
 func main() {
-  req, _ := http.NewRequest("GET", "https://reloop.sh/api/contacts/v1/retrieve/cont_123456789", nil)
-  req.Header.Set("Authorization", "Bearer re_123456789")
+  req, _ := http.NewRequest("GET", "https://reloop.sh/api/contacts/retrieve/cont_123456789", nil)
+  req.Header.Set("x-api-key", "re_123456789")
 
   client := &http.Client{}
   resp, _ := client.Do(req)
@@ -90,8 +91,8 @@ async fn main() -> Result<(), reqwest::Error> {
     let client = Client::new();
 
     let response = client
-        .get("https://reloop.sh/api/contacts/v1/retrieve/cont_123456789")
-        .header("Authorization", "Bearer re_123456789")
+        .get("https://reloop.sh/api/contacts/retrieve/cont_123456789")
+        .header("x-api-key", "re_123456789")
         .send()
         .await?;
 
@@ -108,8 +109,8 @@ import java.net.http.*;
 HttpClient client = HttpClient.newHttpClient();
 
 HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://reloop.sh/api/contacts/v1/retrieve/cont_123456789"))
-    .header("Authorization", "Bearer re_123456789")
+    .uri(URI.create("https://reloop.sh/api/contacts/retrieve/cont_123456789"))
+    .header("x-api-key", "re_123456789")
     .GET()
     .build();
 
@@ -122,10 +123,10 @@ HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.o
 		source: `using System.Net.Http;
 
 var client = new HttpClient();
-client.DefaultRequestHeaders.Add("Authorization", "Bearer re_123456789");
+client.DefaultRequestHeaders.Add("x-api-key", "re_123456789");
 
 var response = await client.GetAsync(
-    "https://reloop.sh/api/contacts/v1/retrieve/cont_123456789"
+    "https://reloop.sh/api/contacts/retrieve/cont_123456789"
 );`,
 	},
 ];

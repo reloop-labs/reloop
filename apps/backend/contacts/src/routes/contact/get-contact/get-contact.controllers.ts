@@ -5,7 +5,6 @@ import {
 import type { ContactTypes } from "@be/contacts/types/contact.type";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import { CONTACT_GET_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { and, eq, isNull } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
@@ -15,7 +14,7 @@ export async function getContactController({
 }: {
 	contactId: string;
 	organizationId: string;
-}): Promise<ContactTypes.ContactResponse> {
+}): Promise<ContactTypes.ContactBaseResponse> {
 	const log = useLogger();
 	log.info("Getting contact", { contactId, organizationId });
 
@@ -112,7 +111,6 @@ export async function getContactController({
 			suppressedAt,
 			createdAt: contact.createdAt,
 			updatedAt: contact.updatedAt,
-			event: CONTACT_GET_WEBHOOK_EVENT.id,
 		};
 	} catch (error) {
 		log.error("Error getting contact", {

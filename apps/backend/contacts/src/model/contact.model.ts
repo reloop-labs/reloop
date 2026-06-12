@@ -228,7 +228,8 @@ export namespace ContactModel {
 					channels: [
 						{ id: "tpc_123", name: "Newsletter", subscription: "opt_in" },
 					],
-					suppression: null,
+					suppressionReason: null,
+					suppressedAt: null,
 					createdAt: "2026-03-23T10:00:00Z",
 					updatedAt: "2026-03-23T10:00:00Z",
 				},
@@ -363,7 +364,8 @@ export namespace ContactModel {
 				{
 					success: true,
 					object: "contact",
-					id: "con_123456789",
+					id: "cont_123456789",
+					event: "contact.delete",
 				},
 			],
 		},
@@ -513,7 +515,8 @@ export namespace ContactModel {
 				{
 					success: true,
 					object: "contact",
-					id: "con_123456789",
+					id: "cont_123456789",
+					event: "contact.update",
 				},
 			],
 		},
@@ -547,7 +550,8 @@ export namespace ContactModel {
 				{
 					success: true,
 					object: "contact",
-					id: "con_123456789",
+					id: "cont_123456789",
+					event: "contact.update",
 				},
 			],
 		},
@@ -572,11 +576,24 @@ export namespace ContactModel {
 
 	export type UpdateContactChannelBody = typeof updateContactChannelBody.static;
 
-	export const updateContactChannelResponse = t.Object({
-		success: t.Boolean({ default: true }),
-		status: t.String(),
-		event: t.String({ description: "Event ID for the mutation" }),
-	});
+	export const updateContactChannelResponse = t.Object(
+		{
+			success: t.Boolean({ default: true }),
+			status: t.Union([t.Literal("enrolled"), t.Literal("unenrolled")], {
+				description: "Updated channel enrollment status",
+			}),
+			event: t.String({ description: "Event ID for the mutation" }),
+		},
+		{
+			examples: [
+				{
+					success: true,
+					status: "enrolled",
+					event: "contact.update",
+				},
+			],
+		},
+	);
 
 	export type UpdateContactChannelResponse =
 		typeof updateContactChannelResponse.static;

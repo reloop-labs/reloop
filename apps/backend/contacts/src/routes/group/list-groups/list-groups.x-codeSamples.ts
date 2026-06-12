@@ -10,14 +10,18 @@ const reloop = new Reloop({
   key: 're_123456789'
 });
 
-const groups = await reloop.audience.listGroups({ limit: 10, page: 1 });`,
+const { response: groups, error } = await reloop.contacts.listGroups({
+  page: 1,
+  limit: 10,
+});
+if (error) throw error;`,
 	},
 	{
 		id: "curl",
 		lang: "bash",
 		label: "cURL",
-		source: `curl "https://reloop.sh/api/groups/v1/list?limit=10&page=1" \\
-  -H "Authorization: Bearer re_123456789"`,
+		source: `curl "https://reloop.sh/api/contacts/v1/groups/list?page=1&limit=10" \\
+  -H "x-api-key: re_123456789"`,
 	},
 	{
 		id: "php",
@@ -26,9 +30,9 @@ const groups = await reloop.audience.listGroups({ limit: 10, page: 1 });`,
 		source: `<?php
 $client = new \\GuzzleHttp\\Client();
 
-$response = $client->get('https://reloop.sh/api/groups/v1/list', [
-    'headers' => ['Authorization' => 'Bearer re_123456789'],
-    'query'   => ['limit' => 10, 'page' => 1],
+$response = $client->get('https://reloop.sh/api/contacts/v1/groups/list', [
+    'headers' => ['x-api-key' => 're_123456789'],
+    'query'   => ['page' => 1, 'limit' => 10],
 ]);
 
 $groups = json_decode($response->getBody(), true);`,
@@ -40,9 +44,9 @@ $groups = json_decode($response->getBody(), true);`,
 		source: `import requests
 
 response = requests.get(
-    'https://reloop.sh/api/groups/v1/list',
-    headers={'Authorization': 'Bearer re_123456789'},
-    params={'limit': 10, 'page': 1}
+    'https://reloop.sh/api/contacts/v1/groups/list',
+    headers={'x-api-key': 're_123456789'},
+    params={'page': 1, 'limit': 10},
 )
 
 groups = response.json()`,
@@ -54,13 +58,13 @@ groups = response.json()`,
 		source: `require 'net/http'
 require 'json'
 
-uri = URI('https://reloop.sh/api/groups/v1/list')
-uri.query = URI.encode_www_form(limit: 10, page: 1)
+uri = URI('https://reloop.sh/api/contacts/v1/groups/list')
+uri.query = URI.encode_www_form(page: 1, limit: 10)
 http = Net::HTTP.new(uri.host, uri.port)
 http.use_ssl = true
 
 request = Net::HTTP::Get.new(uri)
-request['Authorization'] = 'Bearer re_123456789'
+request['x-api-key'] = 're_123456789'
 
 response = http.request(request)
 groups = JSON.parse(response.body)`,
@@ -74,8 +78,8 @@ groups = JSON.parse(response.body)`,
 import "net/http"
 
 func main() {
-  req, _ := http.NewRequest("GET", "https://reloop.sh/api/groups/v1/list?limit=10&page=1", nil)
-  req.Header.Set("Authorization", "Bearer re_123456789")
+  req, _ := http.NewRequest("GET", "https://reloop.sh/api/contacts/v1/groups/list?page=1&limit=10", nil)
+  req.Header.Set("x-api-key", "re_123456789")
 
   client := &http.Client{}
   resp, _ := client.Do(req)
@@ -93,9 +97,9 @@ async fn main() -> Result<(), reqwest::Error> {
     let client = Client::new();
 
     let response = client
-        .get("https://reloop.sh/api/groups/v1/list")
-        .header("Authorization", "Bearer re_123456789")
-        .query(&[("limit", "10"), ("page", "1")])
+        .get("https://reloop.sh/api/contacts/v1/groups/list")
+        .header("x-api-key", "re_123456789")
+        .query(&[("page", "1"), ("limit", "10")])
         .send()
         .await?;
 
@@ -112,8 +116,8 @@ import java.net.http.*;
 HttpClient client = HttpClient.newHttpClient();
 
 HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://reloop.sh/api/groups/v1/list?limit=10&page=1"))
-    .header("Authorization", "Bearer re_123456789")
+    .uri(URI.create("https://reloop.sh/api/contacts/v1/groups/list?page=1&limit=10"))
+    .header("x-api-key", "re_123456789")
     .GET()
     .build();
 
@@ -126,10 +130,10 @@ HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.o
 		source: `using System.Net.Http;
 
 var client = new HttpClient();
-client.DefaultRequestHeaders.Add("Authorization", "Bearer re_123456789");
+client.DefaultRequestHeaders.Add("x-api-key", "re_123456789");
 
 var response = await client.GetAsync(
-    "https://reloop.sh/api/groups/v1/list?limit=10&page=1"
+    "https://reloop.sh/api/contacts/v1/groups/list?page=1&limit=10"
 );`,
 	},
 ];

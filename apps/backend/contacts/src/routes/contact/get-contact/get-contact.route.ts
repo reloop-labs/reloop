@@ -21,7 +21,12 @@ export const getContactRoute = new Elysia()
 		{
 			auth: true,
 			rateLimit: true,
-			params: t.Object({ contact_id: t.String() }),
+			params: t.Object({
+				contact_id: t.String({
+					description: "Unique contact identifier",
+					examples: ["cont_123456789"],
+				}),
+			}),
 			response: {
 				200: ContactModel.contactBaseResponse,
 				404: ContactModel.contactNotFound,

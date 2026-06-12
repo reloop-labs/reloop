@@ -2,6 +2,8 @@ import type { ContactModel } from "@be/contacts/model/contact.model";
 
 export namespace ContactTypes {
 	// Contact Types
+	export type ContactBaseResponse =
+		typeof ContactModel.contactBaseResponse.static;
 	export type ContactResponse = typeof ContactModel.contactResponse.static;
 	export type ContactListResponse =
 		typeof ContactModel.contactListResponse.static;

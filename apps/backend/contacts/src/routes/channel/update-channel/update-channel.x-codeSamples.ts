@@ -1,3 +1,9 @@
+const updateChannelBody = `{
+  "name": "Marketing News",
+  "description": "Internal marketing updates",
+  "visibility": "private"
+}`;
+
 export const updateChannelXCodeSamples = [
 	{
 		id: "node",
@@ -10,20 +16,21 @@ const reloop = new Reloop({
   key: 're_123456789'
 });
 
-const channel = await reloop.audience.updateChannel('channel_123456789', {
-  name: 'Updated Newsletter'
-});`,
+const { response: channel, error } = await reloop.contacts.channels.update('chn_123456789', {
+  name: 'Marketing News',
+  description: 'Internal marketing updates',
+  visibility: 'private',
+});
+if (error) throw error;`,
 	},
 	{
 		id: "curl",
 		lang: "bash",
 		label: "cURL",
-		source: `curl -X PATCH https://reloop.sh/api/channels/v1/channel_123456789 \\
-  -H "Authorization: Bearer re_123456789" \\
+		source: `curl -X PATCH https://reloop.sh/api/contacts/v1/channels/chn_123456789 \\
+  -H "x-api-key: re_123456789" \\
   -H "Content-Type: application/json" \\
-  -d '{
-    "name": "Updated Newsletter"
-  }'`,
+  -d '${updateChannelBody}'`,
 	},
 	{
 		id: "php",
@@ -32,13 +39,15 @@ const channel = await reloop.audience.updateChannel('channel_123456789', {
 		source: `<?php
 $client = new \\GuzzleHttp\\Client();
 
-$response = $client->patch('https://reloop.sh/api/channels/v1/channel_123456789', [
+$response = $client->patch('https://reloop.sh/api/contacts/v1/channels/chn_123456789', [
     'headers' => [
-        'Authorization' => 'Bearer re_123456789',
-        'Content-Type'  => 'application/json',
+        'x-api-key'    => 're_123456789',
+        'Content-Type' => 'application/json',
     ],
     'json' => [
-        'name' => 'Updated Newsletter',
+        'name'        => 'Marketing News',
+        'description' => 'Internal marketing updates',
+        'visibility'  => 'private',
     ],
 ]);
 
@@ -51,14 +60,16 @@ $channel = json_decode($response->getBody(), true);`,
 		source: `import requests
 
 response = requests.patch(
-    'https://reloop.sh/api/channels/v1/channel_123456789',
+    'https://reloop.sh/api/contacts/v1/channels/chn_123456789',
     headers={
-        'Authorization': 'Bearer re_123456789',
+        'x-api-key': 're_123456789',
         'Content-Type': 'application/json',
     },
     json={
-        'name': 'Updated Newsletter',
-    }
+        'name': 'Marketing News',
+        'description': 'Internal marketing updates',
+        'visibility': 'private',
+    },
 )
 
 channel = response.json()`,
@@ -70,15 +81,17 @@ channel = response.json()`,
 		source: `require 'net/http'
 require 'json'
 
-uri = URI('https://reloop.sh/api/channels/v1/channel_123456789')
+uri = URI('https://reloop.sh/api/contacts/v1/channels/chn_123456789')
 http = Net::HTTP.new(uri.host, uri.port)
 http.use_ssl = true
 
 request = Net::HTTP::Patch.new(uri)
-request['Authorization'] = 'Bearer re_123456789'
+request['x-api-key'] = 're_123456789'
 request['Content-Type'] = 'application/json'
 request.body = {
-  name: 'Updated Newsletter'
+  name: 'Marketing News',
+  description: 'Internal marketing updates',
+  visibility: 'private',
 }.to_json
 
 response = http.request(request)
@@ -98,11 +111,13 @@ import (
 
 func main() {
   body, _ := json.Marshal(map[string]string{
-    "name": "Updated Newsletter",
+    "name":        "Marketing News",
+    "description": "Internal marketing updates",
+    "visibility":  "private",
   })
 
-  req, _ := http.NewRequest("PATCH", "https://reloop.sh/api/channels/v1/channel_123456789", bytes.NewBuffer(body))
-  req.Header.Set("Authorization", "Bearer re_123456789")
+  req, _ := http.NewRequest("PATCH", "https://reloop.sh/api/contacts/v1/channels/chn_123456789", bytes.NewBuffer(body))
+  req.Header.Set("x-api-key", "re_123456789")
   req.Header.Set("Content-Type", "application/json")
 
   client := &http.Client{}
@@ -122,10 +137,12 @@ async fn main() -> Result<(), reqwest::Error> {
     let client = Client::new();
 
     let response = client
-        .patch("https://reloop.sh/api/channels/v1/channel_123456789")
-        .header("Authorization", "Bearer re_123456789")
+        .patch("https://reloop.sh/api/contacts/v1/channels/chn_123456789")
+        .header("x-api-key", "re_123456789")
         .json(&json!({
-            "name": "Updated Newsletter"
+            "name": "Marketing News",
+            "description": "Internal marketing updates",
+            "visibility": "private"
         }))
         .send()
         .await?;
@@ -143,15 +160,11 @@ import java.net.http.HttpRequest.BodyPublishers;
 
 HttpClient client = HttpClient.newHttpClient();
 
-String body = """
-    {
-      "name": "Updated Newsletter"
-    }
-    """;
+String body = "{\\"name\\": \\"Marketing News\\", \\"description\\": \\"Internal marketing updates\\", \\"visibility\\": \\"private\\"}";
 
 HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://reloop.sh/api/channels/v1/channel_123456789"))
-    .header("Authorization", "Bearer re_123456789")
+    .uri(URI.create("https://reloop.sh/api/contacts/v1/channels/chn_123456789"))
+    .header("x-api-key", "re_123456789")
     .header("Content-Type", "application/json")
     .method("PATCH", BodyPublishers.ofString(body))
     .build();
@@ -166,15 +179,17 @@ HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.o
 using System.Net.Http.Json;
 
 var client = new HttpClient();
-client.DefaultRequestHeaders.Add("Authorization", "Bearer re_123456789");
+client.DefaultRequestHeaders.Add("x-api-key", "re_123456789");
 
-var updateData = new {
-    name = "Updated Newsletter"
+var update = new {
+    name = "Marketing News",
+    description = "Internal marketing updates",
+    visibility = "private",
 };
 
 var response = await client.PatchAsJsonAsync(
-    "https://reloop.sh/api/channels/v1/channel_123456789",
-    updateData
+    "https://reloop.sh/api/contacts/v1/channels/chn_123456789",
+    update
 );`,
 	},
 ];

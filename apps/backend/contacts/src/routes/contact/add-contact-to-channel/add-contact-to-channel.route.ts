@@ -26,7 +26,12 @@ export const addContactToChannelRoute = new Elysia()
 		{
 			auth: true,
 			rateLimit: true,
-			params: t.Object({ channel_id: t.String() }),
+			params: t.Object({
+				channel_id: t.String({
+					description: "Channel ID",
+					examples: ["channel_123456789"],
+				}),
+			}),
 			body: ContactModel.addContactToChannelBody,
 			response: {
 				201: ContactModel.addContactToChannelResponse,

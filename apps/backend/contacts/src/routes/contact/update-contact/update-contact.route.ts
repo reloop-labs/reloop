@@ -32,7 +32,10 @@ export const updateContactRoute = new Elysia()
 			auth: true,
 			rateLimit: true,
 			params: t.Object({
-				contact_id: t.String(),
+				contact_id: t.String({
+					description: "Unique contact identifier",
+					examples: ["cont_123456789"],
+				}),
 			}),
 			body: ContactModel.updateContactBody,
 			response: {
