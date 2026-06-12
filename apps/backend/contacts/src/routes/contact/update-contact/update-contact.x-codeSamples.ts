@@ -45,25 +45,22 @@ if (error) throw error;`,
 		lang: "php",
 		label: "PHP",
 		source: `<?php
-$client = new \\GuzzleHttp\\Client();
+// composer require reloop/reloop-email
+require_once 'vendor/autoload.php';
 
-$response = $client->patch('https://reloop.sh/api/contacts/cont_123456789', [
-    'headers' => [
-        'x-api-key'    => 're_123456789',
-        'Content-Type' => 'application/json',
-    ],
-    'json' => [
-        'firstName'  => 'Jane',
-        'lastName'   => 'Smith',
-        'status'     => 'subscribed',
-        'properties' => [
-            'company' => 'Reloop',
-            'role'    => 'Designer',
-        ],
-    ],
-]);
+use Reloop\\Reloop;
 
-$contact = json_decode($response->getBody(), true);`,
+$reloop = new Reloop('re_123456789');
+
+$contact = $reloop->contacts->update('cont_123456789', [
+    'firstName'  => 'Jane',
+    'lastName'   => 'Smith',
+    'status'     => 'subscribed',
+    'properties' => [
+        'company' => 'Reloop',
+        'role'    => 'Designer',
+    ],
+]);`,
 	},
 	{
 		id: "python",

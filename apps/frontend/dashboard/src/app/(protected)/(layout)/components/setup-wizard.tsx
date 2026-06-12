@@ -68,7 +68,7 @@ const languages: { id: LangId; label: string }[] = [
 const sdkNames: Record<LangId, string> = {
 	nodejs: "@reloop/node",
 	python: "reloop-python",
-	php: "reloop/reloop-php",
+	php: "reloop/reloop-email",
 	ruby: "reloop",
 	go: "github.com/reloop-labs/reloop-go",
 };
@@ -76,7 +76,7 @@ const sdkNames: Record<LangId, string> = {
 const installCommands: Record<LangId, string> = {
 	nodejs: "npm install @reloop/node",
 	python: "pip install reloop-python",
-	php: "composer require reloop/reloop-php",
+	php: "composer require reloop/reloop-email",
 	ruby: "gem install reloop",
 	go: "go get github.com/reloop-labs/reloop-go",
 };

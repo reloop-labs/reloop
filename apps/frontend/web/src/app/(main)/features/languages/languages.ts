@@ -157,7 +157,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 		name: "PHP",
 		shortDescription:
 			"Composer-ready PHP SDK with Laravel and Symfony guides for transactional and marketing email.",
-		installCommand: "composer require reloop/reloop-php",
+		installCommand: "composer require reloop/reloop-email",
 		docsPath: "/docs/quickstart/php",
 		icon: siPhp,
 		highlights: ["Laravel", "Symfony", "WordPress"],

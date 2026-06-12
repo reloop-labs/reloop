@@ -12,7 +12,7 @@ export const installCommands: Record<LanguageCode, string> = {
 	nodejs: nodeInstallCommands.npm,
 	python: "pip install reloop",
 	go: "go get github.com/reloop/reloop-go",
-	php: "composer require reloop/reloop-php",
+	php: "composer require reloop/reloop-email",
 };
 
 export const sendEmailCode: Record<

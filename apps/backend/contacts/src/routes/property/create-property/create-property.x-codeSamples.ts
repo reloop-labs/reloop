@@ -37,21 +37,18 @@ if (error) throw error;`,
 		lang: "php",
 		label: "PHP",
 		source: `<?php
-$client = new \\GuzzleHttp\\Client();
+// composer require reloop/reloop-email
+require_once 'vendor/autoload.php';
 
-$response = $client->post('https://reloop.sh/api/contacts/v1/properties/create', [
-    'headers' => [
-        'x-api-key'    => 're_123456789',
-        'Content-Type' => 'application/json',
-    ],
-    'json' => [
-        'name'          => 'company_name',
-        'type'          => 'string',
-        'fallbackValue' => 'Unknown',
-    ],
-]);
+use Reloop\\Reloop;
 
-$property = json_decode($response->getBody(), true);`,
+$reloop = new Reloop('re_123456789');
+
+$property = $reloop->contacts->createProperty([
+    'name'          => 'company_name',
+    'type'          => 'string',
+    'fallbackValue' => 'Unknown',
+]);`,
 	},
 	{
 		id: "python",

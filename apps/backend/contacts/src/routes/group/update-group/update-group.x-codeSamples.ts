@@ -33,17 +33,16 @@ if (error) throw error;`,
 		lang: "php",
 		label: "PHP",
 		source: `<?php
-$client = new \\GuzzleHttp\\Client();
+// composer require reloop/reloop-email
+require_once 'vendor/autoload.php';
 
-$response = $client->patch('https://reloop.sh/api/contacts/v1/groups/grp_123456789', [
-    'headers' => [
-        'x-api-key'    => 're_123456789',
-        'Content-Type' => 'application/json',
-    ],
-    'json' => ['name' => 'Early Access'],
-]);
+use Reloop\\Reloop;
 
-$group = json_decode($response->getBody(), true);`,
+$reloop = new Reloop('re_123456789');
+
+$group = $reloop->contacts->updateGroup('grp_123456789', [
+    'name' => 'Early Access',
+]);`,
 	},
 	{
 		id: "python",

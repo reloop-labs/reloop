@@ -28,14 +28,17 @@ if (error) throw error;`,
 		lang: "php",
 		label: "PHP",
 		source: `<?php
-$client = new \\GuzzleHttp\\Client();
+// composer require reloop/reloop-email
+require_once 'vendor/autoload.php';
 
-$response = $client->get('https://reloop.sh/api/contacts/list', [
-    'headers' => ['x-api-key' => 're_123456789'],
-    'query'   => ['limit' => 10, 'page' => 1],
-]);
+use Reloop\\Reloop;
 
-$contacts = json_decode($response->getBody(), true);`,
+$reloop = new Reloop('re_123456789');
+
+$contacts = $reloop->contacts->list([
+    'page'  => 1,
+    'limit' => 10,
+]);`,
 	},
 	{
 		id: "python",

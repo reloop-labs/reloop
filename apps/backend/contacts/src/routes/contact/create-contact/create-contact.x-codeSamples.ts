@@ -60,33 +60,30 @@ const { data: contact, error } = await reloop.contacts.create({
 		lang: "php",
 		label: "PHP",
 		source: `<?php
-$client = new \\GuzzleHttp\\Client();
+// composer require reloop/reloop-email
+require_once 'vendor/autoload.php';
 
-$response = $client->post('https://reloop.sh/api/contacts/create', [
-    'headers' => [
-        'x-api-key'     => 're_123456789',
-        'Content-Type'  => 'application/json',
-    ],
-    'json' => [
-        'email'      => 'john.doe@example.com',
-        'firstName'  => 'John',
-        'lastName'   => 'Doe',
-        'status'     => 'subscribed',
-        'properties' => [
-            'company' => 'Reloop',
-            'role'    => 'Developer',
-        ],
-        'groupIds'   => ['grp_123456789'],
-        'channels'   => [
-            [
-                'channelId'    => 'channel_123456789',
-                'subscription' => 'opt_in',
-            ],
-        ],
-    ],
-]);
+use Reloop\\Reloop;
 
-$contact = json_decode($response->getBody(), true);`,
+$reloop = new Reloop('re_123456789');
+
+$contact = $reloop->contacts->create([
+    'email'      => 'john.doe@example.com',
+    'firstName'  => 'John',
+    'lastName'   => 'Doe',
+    'status'     => 'subscribed',
+    'properties' => [
+        'company' => 'Reloop',
+        'role'    => 'Developer',
+    ],
+    'groupIds'   => ['grp_123456789'],
+    'channels'   => [
+        [
+            'channelId'    => 'channel_123456789',
+            'subscription' => 'opt_in',
+        ],
+    ],
+]);`,
 	},
 	{
 		id: "python",
