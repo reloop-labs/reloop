@@ -29,14 +29,11 @@ ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
 # Copy standalone build
-COPY --from=builder /app/apps/frontend/docs/content ./content
-COPY --from=builder /app/apps/frontend/docs/public ./public
+COPY --from=builder /app/apps/frontend/docs/content ./apps/frontend/docs/content
+COPY --from=builder /app/apps/frontend/docs/public ./apps/frontend/docs/public
 COPY --from=builder /app/apps/frontend/docs/.next/standalone ./
-COPY --from=builder /app/apps/frontend/docs/.next/standalone/apps/frontend/docs ./
-COPY --from=builder /app/apps/frontend/docs/.next/static ./.next/static
-
-RUN rm -rf apps
+COPY --from=builder /app/apps/frontend/docs/.next/static ./apps/frontend/docs/.next/static
 
 EXPOSE 3000
 
-CMD ["bun", "run", "server.js"]
+CMD ["bun", "run", "apps/frontend/docs/server.js"]
