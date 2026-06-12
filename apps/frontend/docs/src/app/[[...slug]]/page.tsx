@@ -126,7 +126,7 @@ export default async function Page(props: {
 					className={`mx-auto flex w-full flex-col ${
 						hideToc
 							? isApiPage
-								? "max-w-7xl"
+								? "max-w-5xl"
 								: "max-w-none"
 							: "max-w-[1040px] xl:grid xl:grid-cols-[1fr_240px] xl:gap-8"
 					}`}
@@ -209,7 +209,7 @@ export default async function Page(props: {
 						{/* Right column: sticky code + response (API reference & webhook events) */}
 						{useSplitLayout && (
 							<div className="hidden lg:block">
-								<div className="sticky top-24 space-y-6 pb-12 pl-2">
+								<div className="sticky top-10 space-y-6 pb-12 pl-2">
 									<CodeDisplay />
 								</div>
 							</div>
