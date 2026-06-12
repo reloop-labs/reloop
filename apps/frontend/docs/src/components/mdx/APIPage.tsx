@@ -358,7 +358,7 @@ function ParameterRow({
 					</span>
 				)}
 				{param.required && (
-					<span className="rounded-sm bg-red-500/10 px-1.5 py-0.5 font-semibold text-[10px] text-red-500 uppercase tracking-wide dark:text-red-400">
+					<span className="rounded-md bg-red-500/10 px-1.5 py-0.5 font-semibold text-[10px] text-red-500 uppercase tracking-wide dark:text-red-400">
 						required
 					</span>
 				)}
@@ -509,6 +509,41 @@ function getIconForSample(sampleId: string, lang: string) {
 	};
 }
 
+const STATUS_LABELS: Record<string, string> = {
+	"200": "200 OK",
+	"201": "201 Created",
+	"202": "202 Accepted",
+	"204": "204 No Content",
+	"400": "400 Bad Request",
+	"401": "401 Unauthorized",
+	"403": "403 Forbidden",
+	"404": "404 Not Found",
+	"409": "409 Conflict",
+	"422": "422 Unprocessable Entity",
+	"429": "429 Too Many Requests",
+	"500": "500 Internal Error",
+};
+
+function getStatusIcon(statusCode: string) {
+	const code = Number.parseInt(statusCode, 10);
+	if (code >= 200 && code < 300) {
+		return {
+			path: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z",
+			hex: "10b981", // emerald
+		};
+	}
+	if (code >= 400 && code < 500) {
+		return {
+			path: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z",
+			hex: "ef4444", // red
+		};
+	}
+	return {
+		path: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z",
+		hex: "f59e0b", // amber
+	};
+}
+
 function ResponseCard({ responses }: { responses: Record<string, any> }) {
 	const statusCodes = Object.keys(responses);
 	const [activeStatus, setActiveStatus] = useState(statusCodes[0] || "200");
@@ -522,42 +557,23 @@ function ResponseCard({ responses }: { responses: Record<string, any> }) {
 		2,
 	);
 
-	return (
-		<div>
-			{/* Status tabs + label */}
-			<div className="mb-2 flex items-center gap-3">
-				<span className="font-semibold text-[13px] text-fd-foreground">
-					Response
-				</span>
-				{statusCodes.length > 1 && (
-					<div className="api-status-tabs flex items-center gap-1 rounded-lg border p-0.5">
-						{statusCodes.map((code) => (
-							<button
-								key={code}
-								type="button"
-								onClick={() => setActiveStatus(code)}
-								className={cn(
-									"rounded-md px-2 py-1 font-mono text-[11px] transition-colors",
-									activeStatus === code
-										? "bg-bg-white-0 font-semibold text-fd-foreground shadow-sm dark:bg-white/10"
-										: "text-text-sub-600/50 hover:text-text-sub-600",
-								)}
-							>
-								{code}
-							</button>
-						))}
-					</div>
-				)}
-				<div className="ml-auto flex items-center gap-1">
-					<CopyButton content={jsonStr} />
-				</div>
-			</div>
+	const tabs = statusCodes.map((code) => ({
+		id: code,
+		label: STATUS_LABELS[code] || code,
+		si: getStatusIcon(code),
+	}));
 
-			{/* JSON response body — using CodeBlock from @reloop/ui/code-block */}
-			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-100 bg-transparent dark:border-stroke-soft-100/40">
-				<CodeBlock lang="json" code={jsonStr} hideLineNumbers />
-			</div>
-		</div>
+	return (
+		<CopyCodeBlock
+			code={jsonStr}
+			lang="json"
+			tabs={tabs}
+			activeTab={activeStatus}
+			onTabChange={setActiveStatus}
+			windowTitle="Response"
+			noScroll={false}
+			hideLineNumbers
+		/>
 	);
 }
 
