@@ -18,6 +18,7 @@ interface SearchResult {
 	title: string;
 	url: string;
 	path: string[];
+	method?: string;
 }
 
 export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
@@ -36,6 +37,7 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 						title: item.name as string,
 						url: item.url,
 						path: path,
+						method: item.method,
 					});
 				} else if (item.type === "folder") {
 					traverse(item.children, [...path, item.name as string]);
@@ -219,14 +221,36 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 																			: "",
 																	)}
 																>
-																	<FileText
-																		className={cn(
-																			"h-3.5 w-3.5 transition-colors",
-																			originalIndex === selectedIndex
-																				? "text-[#171717] dark:text-white"
-																				: "text-text-sub-600",
-																		)}
-																	/>
+																	{result.method ? (
+																		<span
+																			className={cn(
+																				"rounded px-1 py-0.5 font-bold text-[8px] uppercase leading-none tracking-wide",
+																				result.method === "GET" &&
+																					"bg-green-500/15 text-green-600 dark:bg-green-500/20 dark:text-green-400",
+																				result.method === "POST" &&
+																					"bg-blue-500/15 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400",
+																				result.method === "DELETE" &&
+																					"bg-red-500/15 text-red-500 dark:bg-red-500/20 dark:text-red-400",
+																				result.method === "PATCH" &&
+																					"bg-orange-500/15 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400",
+																				result.method === "PUT" &&
+																					"bg-purple-500/15 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400",
+																			)}
+																		>
+																			{result.method === "DELETE"
+																				? "DEL"
+																				: result.method}
+																		</span>
+																	) : (
+																		<FileText
+																			className={cn(
+																				"h-3.5 w-3.5 transition-colors",
+																				originalIndex === selectedIndex
+																					? "text-[#171717] dark:text-white"
+																					: "text-text-sub-600",
+																			)}
+																		/>
+																	)}
 																</div>
 																<div className="flex-1 overflow-hidden">
 																	<div className="truncate font-medium text-[#171717] text-sm dark:text-white">
