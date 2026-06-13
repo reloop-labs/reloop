@@ -45,7 +45,11 @@ export async function generateMetadata(props: {
 			method: method,
 			path: path,
 		});
-		ogImage = `${appUrl}/docs/api/og?${searchParams.toString()}`;
+		const isApiKeyPage =
+			page.data.title.toLowerCase().includes("api key") ||
+			path.toLowerCase().includes("api-key");
+		const ogPath = isApiKeyPage ? "api/og/api-key" : "api/og";
+		ogImage = `${appUrl}/docs/${ogPath}?${searchParams.toString()}`;
 	}
 
 	return {

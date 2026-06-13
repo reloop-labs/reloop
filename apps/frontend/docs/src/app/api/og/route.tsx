@@ -442,22 +442,13 @@ export async function GET(request: NextRequest) {
 					<div
 						style={{
 							display: "flex",
-							justifyContent: "space-between",
+							justifyContent: "flex-end",
 							alignItems: "center",
 							width: "100%",
 							borderTop: "1px solid rgba(255, 255, 255, 0.05)",
 							paddingTop: "24px",
 						}}
 					>
-						<div
-							style={{
-								display: "flex",
-								fontSize: "18px",
-								color: "rgba(255, 255, 255, 0.45)",
-							}}
-						>
-							Authentication: <span style={{ color: "rgba(255, 255, 255, 0.75)", marginLeft: "6px" }}>API Key</span>
-						</div>
 						<div
 							style={{
 								fontSize: "18px",
