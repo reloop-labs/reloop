@@ -41,6 +41,7 @@ export const exportRoomRoute = new Elysia()
 				summary: "Export room content",
 				description:
 					"Exports the content/state of a specific collaboration room",
+				hide: true,
 			},
 		},
 	);

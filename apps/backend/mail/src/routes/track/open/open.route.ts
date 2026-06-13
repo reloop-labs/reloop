@@ -16,6 +16,7 @@ export const openRoute = new Elysia()
 				description:
 					"Serves a transparent pixel to track when an email is opened",
 				tags: ["Tracking"],
+				hide: true,
 			},
 		},
 	);

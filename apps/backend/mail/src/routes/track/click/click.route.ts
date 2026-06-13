@@ -14,6 +14,7 @@ export const clickRoute = new Elysia()
 				description:
 					"Tracks when a recipient clicks a link in an email and redirects them to the destination",
 				tags: ["Tracking"],
+				hide: true,
 			},
 		},
 	);

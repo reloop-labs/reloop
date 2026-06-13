@@ -46,6 +46,7 @@ export const saveRoomRoute = new Elysia()
 				summary: "Save room state",
 				description:
 					"Saves the current state of a collaboration room to persistent storage",
+				hide: true,
 			},
 		},
 	);

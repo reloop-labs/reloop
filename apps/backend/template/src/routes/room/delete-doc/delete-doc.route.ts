@@ -36,6 +36,7 @@ export const deleteDocRoute = new Elysia()
 				tags: ["Rooms"],
 				summary: "Delete document room",
 				description: "Deletes the persistent document for a specific room",
+				hide: true,
 			},
 		},
 	);

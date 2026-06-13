@@ -33,6 +33,7 @@ export const generateTokenRoute = new Elysia()
 				summary: "Generate preference token",
 				description:
 					"Generate a signed preference management token for a contact. Embed the returned URL in email footers.",
+				hide: true,
 			},
 		},
 	);

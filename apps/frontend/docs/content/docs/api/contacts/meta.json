@@ -12,7 +12,6 @@
 		"delete-api-contacts-group-by-group_id",
 		"contact-properties",
 		"channels",
-		"groups",
-		"preferences"
+		"groups"
 	]
 }

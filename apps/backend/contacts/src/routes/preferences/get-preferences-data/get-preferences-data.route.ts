@@ -29,6 +29,7 @@ export const getPreferencesDataRoute = new Elysia()
 				summary: "Get preference page data",
 				description:
 					"Returns public channels and contact enrollment status for the preference management page. No auth required — token is self-contained.",
+				hide: true,
 			},
 		},
 	);

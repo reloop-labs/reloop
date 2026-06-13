@@ -34,6 +34,7 @@ export const updatePreferenceRoute = new Elysia()
 				summary: "Update channel preference",
 				description:
 					"Toggle a contact's subscription to a public channel. No auth required — token is self-contained.",
+				hide: true,
 			},
 		},
 	);

@@ -30,6 +30,7 @@ export const getRoomRoute = new Elysia().use(authMiddleware).get(
 			summary: "Get room details",
 			description:
 				"Retrieves details/metadata for a specific collaboration room",
+			hide: true,
 		},
 	},
 );
