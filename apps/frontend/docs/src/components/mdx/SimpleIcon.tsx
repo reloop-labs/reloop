@@ -3,6 +3,7 @@
 import type { SVGProps } from "react";
 import type { SimpleIcon as SimpleIconType } from "simple-icons";
 import {
+	siCloudflare,
 	siCoolify,
 	siCursor,
 	siDocker,
@@ -11,6 +12,7 @@ import {
 	siExpress,
 	siGo,
 	siLaravel,
+	siNetlify,
 	siNextdotjs,
 	siNodedotjs,
 	siOpenjdk,
@@ -22,8 +24,6 @@ import {
 	siRubyonrails,
 	siRust,
 	siVercel,
-	siCloudflare,
-	siNetlify,
 } from "simple-icons";
 
 const Icons: Record<string, SimpleIconType> = {

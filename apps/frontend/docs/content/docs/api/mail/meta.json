@@ -1,6 +1,4 @@
 {
 	"title": "Sending",
-	"pages": [
-		"post-api-mail-v1send"
-	]
+	"pages": ["post-api-mail-v1send"]
 }

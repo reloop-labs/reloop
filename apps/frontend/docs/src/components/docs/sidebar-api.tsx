@@ -232,7 +232,9 @@ export function ApiSidebarSection({
 
 	if (node.type === "folder") {
 		// Render all folders flat: a label followed by direct children, no collapsible nesting.
-		const hasDirectPages = node.children.some((child) => child.type !== "folder");
+		const hasDirectPages = node.children.some(
+			(child) => child.type !== "folder",
+		);
 		return (
 			<>
 				{hasDirectPages && (

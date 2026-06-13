@@ -160,7 +160,9 @@ export async function generateMetadata(props: {
 		const ogPath = isApiKeyPage ? "api/og/api-key" : "api/og";
 		ogImage = `${appUrl}/docs/${ogPath}?${searchParams.toString()}`;
 	} else {
-		const rawCategory = (params.slug && params.slug.length > 0 && params.slug[0]) || "Documentation";
+		const rawCategory =
+			(params.slug && params.slug.length > 0 && params.slug[0]) ||
+			"Documentation";
 		const category = rawCategory
 			.split("-")
 			.map((word) => word.charAt(0).toUpperCase() + word.slice(1))

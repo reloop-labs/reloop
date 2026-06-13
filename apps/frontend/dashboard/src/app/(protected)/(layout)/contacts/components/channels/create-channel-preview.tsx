@@ -5,7 +5,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface Channel {
 	id: string;
@@ -78,28 +78,32 @@ export function CreateChannelPreview({
 
 	// For the creation preview, we ALWAYS show the channel being created at the top,
 	// even if it is currently set to 'private'.
-	const publicSiblings = siblingChannels.filter(
-		(t) => t.id !== channel.id && t.visibility === "public",
-	);
-
-	const previewChannels = [channel, ...publicSiblings].slice(0, 5);
-
-	const buildInitialStates = () =>
-		Object.fromEntries(
-			previewChannels.map((t) => [t.id, t.defaultSubscription === "opt_in"]),
+	const previewChannels = useMemo(() => {
+		const publicSiblings = siblingChannels.filter(
+			(t) => t.id !== channel.id && t.visibility === "public",
 		);
+		return [channel, ...publicSiblings].slice(0, 5);
+	}, [channel, siblingChannels]);
 
-	const [checked, setChecked] = useState<Record<string, boolean>>(
-		buildInitialStates(),
+	const previewChannelsKey = JSON.stringify(
+		previewChannels.map((t) => ({
+			id: t.id,
+			defaultSubscription: t.defaultSubscription,
+		})),
 	);
+
+	const [checked, setChecked] = useState<Record<string, boolean>>({});
 	const [saved, setSaved] = useState(false);
 
 	// Reset when channels change
+	// biome-ignore lint/correctness/useExhaustiveDependencies: only run when serialized key changes
 	useEffect(() => {
-		setChecked(buildInitialStates());
+		const initialStates = Object.fromEntries(
+			previewChannels.map((t) => [t.id, t.defaultSubscription === "opt_in"]),
+		);
+		setChecked(initialStates);
 		setSaved(false);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [buildInitialStates]);
+	}, [previewChannelsKey]);
 
 	const handleUpdate = () => {
 		setSaved(true);

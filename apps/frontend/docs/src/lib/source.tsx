@@ -1,12 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
+import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import matter from "gray-matter";
 import * as LucideIcons from "lucide-react";
 import type { MDXComponents } from "mdx/types";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import type React from "react";
 import remarkGfm from "remark-gfm";
-import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import type { PageNode, PageTreeItem, TOCItem } from "./types";
 import { timestamp } from "./watcher-trigger";
 
@@ -136,8 +136,8 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 			if (fs.existsSync(mdxPath)) {
 				const { data } = matter(fs.readFileSync(mdxPath, "utf8"));
 				const iconName = data.icon || (item === "index" && meta.icon);
-				
-				let sidebarIcon: React.ReactNode = undefined;
+
+				let sidebarIcon: React.ReactNode;
 				if (iconName) {
 					if (iconName.startsWith("si") || iconName.startsWith("Si")) {
 						sidebarIcon = (

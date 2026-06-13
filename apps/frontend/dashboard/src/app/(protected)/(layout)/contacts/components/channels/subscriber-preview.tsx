@@ -3,7 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface Channel {
 	id: string;
@@ -68,23 +68,29 @@ export function SubscriberPreview({
 	const [isDarkMode, setIsDarkMode] = useState(true);
 
 	// Only show public channels in the preview
-	const publicChannels = channels.filter((t) => t.visibility === "public");
+	const publicChannels = useMemo(() => {
+		return channels.filter((t) => t.visibility === "public");
+	}, [channels]);
 
-	const buildInitialStates = () =>
-		Object.fromEntries(
-			publicChannels.map((t) => [t.id, t.defaultSubscription === "opt_in"]),
-		);
+	const publicChannelsKey = JSON.stringify(
+		publicChannels.map((t) => ({
+			id: t.id,
+			defaultSubscription: t.defaultSubscription,
+		})),
+	);
 
-	const [checked, setChecked] =
-		useState<Record<string, boolean>>(buildInitialStates);
+	const [checked, setChecked] = useState<Record<string, boolean>>({});
 	const [saved, setSaved] = useState(false);
 
 	// Reset when channels change
+	// biome-ignore lint/correctness/useExhaustiveDependencies: only run when serialized key changes
 	useEffect(() => {
-		setChecked(buildInitialStates());
+		const initialStates = Object.fromEntries(
+			publicChannels.map((t) => [t.id, t.defaultSubscription === "opt_in"]),
+		);
+		setChecked(initialStates);
 		setSaved(false);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [buildInitialStates]);
+	}, [publicChannelsKey]);
 
 	const handleUpdate = () => {
 		setSaved(true);

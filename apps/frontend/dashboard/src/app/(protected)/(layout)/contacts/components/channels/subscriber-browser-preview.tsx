@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface Channel {
 	id: string;
@@ -51,29 +51,34 @@ export function SubscriberBrowserPreview({
 	orgName = "Your Organization",
 }: SubscriberBrowserPreviewProps) {
 	// Build the list of channels to show in the preview: current channel + siblings (public only)
-	const publicChannels = [
-		channel,
-		...siblingChannels.filter(
-			(t) => t.id !== channel.id && t.visibility === "public",
-		),
-	].filter((t) => t.visibility === "public");
+	const publicChannels = useMemo(() => {
+		return [
+			channel,
+			...siblingChannels.filter(
+				(t) => t.id !== channel.id && t.visibility === "public",
+			),
+		].filter((t) => t.visibility === "public");
+	}, [channel, siblingChannels]);
 
-	const buildInitialStates = () =>
-		Object.fromEntries(
-			publicChannels.map((t) => [t.id, t.defaultSubscription === "opt_in"]),
-		);
-
-	const [checked, setChecked] = useState<Record<string, boolean>>(
-		buildInitialStates(),
+	const publicChannelsKey = JSON.stringify(
+		publicChannels.map((t) => ({
+			id: t.id,
+			defaultSubscription: t.defaultSubscription,
+		})),
 	);
+
+	const [checked, setChecked] = useState<Record<string, boolean>>({});
 	const [saved, setSaved] = useState(false);
 
 	// Reset when channels change
+	// biome-ignore lint/correctness/useExhaustiveDependencies: only run when serialized key changes
 	useEffect(() => {
-		setChecked(buildInitialStates());
+		const initialStates = Object.fromEntries(
+			publicChannels.map((t) => [t.id, t.defaultSubscription === "opt_in"]),
+		);
+		setChecked(initialStates);
 		setSaved(false);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [buildInitialStates]);
+	}, [publicChannelsKey]);
 
 	const handleUpdate = () => {
 		setSaved(true);

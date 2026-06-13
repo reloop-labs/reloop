@@ -1,8 +1,4 @@
 {
 	"title": "Receiving",
-	"pages": [
-		"mailboxes",
-		"messages",
-		"threads"
-	]
+	"pages": ["mailboxes", "messages", "threads"]
 }
