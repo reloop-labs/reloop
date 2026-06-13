@@ -39,7 +39,6 @@
 		"api-keys",
 		"api",
 		"webhooks",
-		"setup",
 		"self-host"
 	]
 }
