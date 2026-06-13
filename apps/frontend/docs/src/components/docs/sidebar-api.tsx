@@ -232,13 +232,16 @@ export function ApiSidebarSection({
 
 	if (node.type === "folder") {
 		// Render all folders flat: a label followed by direct children, no collapsible nesting.
+		const hasDirectPages = node.children.some((child) => child.type !== "folder");
 		return (
 			<>
-				<div className="mt-4 mb-1.5 px-2">
-					<h4 className="font-semibold text-sm uppercase">
-						{node.name as string}
-					</h4>
-				</div>
+				{hasDirectPages && (
+					<div className="mt-4 mb-1.5 px-2">
+						<h4 className="font-semibold text-sm uppercase">
+							{node.name as string}
+						</h4>
+					</div>
+				)}
 				{node.children.map((child: PageTreeItem, index: number) => (
 					<ApiSidebarSection
 						key={index}
