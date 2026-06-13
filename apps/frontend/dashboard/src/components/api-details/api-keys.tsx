@@ -6,6 +6,7 @@ import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCallback, useState } from "react";
+import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
 import { useHotkeys } from "react-hotkeys-hook";
 
 const codeExamples = {
@@ -217,8 +218,10 @@ export const ApiKeysApiDetails = (props: ButtonProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedOperation, setSelectedOperation] =
 		useState<Operation>("create");
-	const [selectedLanguage, setSelectedLanguage] =
-		useState<Language>("javascript");
+	const [selectedLanguage, setSelectedLanguage] = useApiLanguage<Language>(
+		languages.map((l) => l.id),
+		"javascript",
+	);
 	const [copied, setCopied] = useState(false);
 	const [baseCopied, setBaseCopied] = useState(false);
 

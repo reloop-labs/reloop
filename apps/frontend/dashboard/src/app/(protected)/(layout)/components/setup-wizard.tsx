@@ -16,6 +16,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
 import type { SimpleIcon } from "simple-icons";
 import { siGo, siNodedotjs, siPhp, siPython, siRuby } from "simple-icons";
 import { toast } from "sonner";
@@ -312,7 +313,10 @@ export function SetupWizard({
 	const [isSendingTest, setIsSendingTest] = useState(false);
 	const [step4Done, setStep4Done] = useState(false);
 
-	const [activeLang, setActiveLang] = useState<LangId>("nodejs");
+	const [activeLang, setActiveLang] = useApiLanguage<LangId>(
+		languages.map((l) => l.id),
+		"nodejs",
+	);
 	const [activeTab, setActiveTab] = useState<"prompt" | "code">("prompt");
 
 	const [generatedApiKey, setGeneratedApiKey] = useState<string | null>(null);

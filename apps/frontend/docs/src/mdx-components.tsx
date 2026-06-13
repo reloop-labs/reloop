@@ -18,8 +18,8 @@ import { PromptActions } from "@reloop/fe-docs/components/mdx/PromptActions";
 import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import type { MDXComponents } from "mdx/types";
 import React from "react";
-import { APIPage } from "./components/mdx/APIPage";
-import { Side, SideBySide } from "./components/mdx/SideBySide";
+import { APIPage } from "@reloop/fe-docs/components/mdx/APIPage";
+import { Side, SideBySide } from "@reloop/fe-docs/components/mdx/SideBySide";
 
 const getSlug = (children: React.ReactNode): string => {
 	if (typeof children === "string")

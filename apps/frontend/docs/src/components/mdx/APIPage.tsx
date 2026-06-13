@@ -1,6 +1,7 @@
 "use client";
 
 import { CodePortal } from "@reloop/fe-docs/components/docs/code-column-context";
+import { useApiLanguage } from "@reloop/fe-docs/lib/use-api-language";
 import { cn } from "@reloop/ui/cn";
 import { CodeBlock } from "@reloop/ui/code-block";
 import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
@@ -624,8 +625,6 @@ function CodeExamples({
 	parameters: Parameter[];
 	codeSamples: CodeSample[];
 }) {
-	const [activeTab, setActiveTab] = useState("");
-
 	// Fallback generated samples if codeSamples is empty
 	let samples = codeSamples;
 	if (!samples || samples.length === 0) {
@@ -649,7 +648,7 @@ function CodeExamples({
 					),
 					null,
 					2,
-				)
+					)
 			: "";
 
 		const qs = queryParams.length
@@ -705,6 +704,10 @@ print(response.json())`;
 			{ id: "python", lang: "python", label: "Python", source: python },
 		];
 	}
+
+	const availableIds = samples.map((s) => s.id);
+	const defaultLangId = availableIds.find((id) => ["node", "nodejs", "javascript", "js"].includes(id)) || availableIds[0] || "";
+	const [activeTab, setActiveTab] = useApiLanguage(availableIds, defaultLangId);
 
 	const resolvedActiveTab =
 		activeTab && samples.some((s) => s.id === activeTab)

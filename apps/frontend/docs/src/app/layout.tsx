@@ -2,8 +2,8 @@ import "./global.css";
 import { IconsSprite } from "@reloop/ui/icon";
 import localFont from "next/font/local";
 import type { ReactNode } from "react";
-import { ThemeProvider } from "../components/theme-provider";
-import { cn } from "../lib/cn";
+import { ThemeProvider } from "@reloop/fe-docs/components/theme-provider";
+import { cn } from "@reloop/fe-docs/lib/cn";
 
 const openRunde = localFont({
 	src: [

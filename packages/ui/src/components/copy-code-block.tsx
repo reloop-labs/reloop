@@ -4,7 +4,8 @@ import { cn } from "@reloop/ui/cn";
 import { CodeBlock } from "@reloop/ui/code-block";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "motion/react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useId } from "react"; // (Not used here but keeping the import format clean)
 
 export type CopyCodeBlockIcon = {
 	path: string;
@@ -50,7 +51,12 @@ export function CopyCodeBlock({
 	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(
 		undefined,
 	);
+	const [mounted, setMounted] = useState(false);
 	const tabButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
 
 	const handleCopy = async () => {
 		try {
@@ -104,8 +110,8 @@ export function CopyCodeBlock({
 		};
 	};
 
-	const highlightedTabPosition = getTabPosition(highlightedTab);
-	const activeTabPosition = getTabPosition(activeTabButton);
+	const highlightedTabPosition = mounted ? getTabPosition(highlightedTab) : null;
+	const activeTabPosition = mounted ? getTabPosition(activeTabButton) : null;
 	const highlightedPillPosition = getPillPosition(highlightedTabPosition);
 
 	const copyButton = (

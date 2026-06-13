@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { cn } from "../../lib/cn";
+import { cn } from "@reloop/fe-docs/lib/cn";
 
 interface CardGroupProps {
 	cols?: 2 | 3 | 4;

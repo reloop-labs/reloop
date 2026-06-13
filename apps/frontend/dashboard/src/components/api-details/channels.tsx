@@ -7,6 +7,7 @@ import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCallback, useState } from "react";
+import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
 
 const codeExamples = {
 	javascript: {
@@ -225,8 +226,10 @@ const getMethodColor = (method: string): "green" | "blue" | "red" => {
 export const ChannelsApiDetails = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedOperation, setSelectedOperation] = useState<Operation>("add");
-	const [selectedLanguage, setSelectedLanguage] =
-		useState<Language>("javascript");
+	const [selectedLanguage, setSelectedLanguage] = useApiLanguage<Language>(
+		languages.map((l) => l.id),
+		"javascript",
+	);
 	const [copied, setCopied] = useState(false);
 	const [baseCopied, setBaseCopied] = useState(false);
 

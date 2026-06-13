@@ -6,6 +6,7 @@ import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCallback, useState } from "react";
+import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
 	siCurl,
@@ -108,7 +109,10 @@ export const LogsApiDetails = (
 	props: React.ComponentPropsWithoutRef<typeof Button.Root>,
 ) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [selectedLanguage, setSelectedLanguage] = useState<Language>("nodejs");
+	const [selectedLanguage, setSelectedLanguage] = useApiLanguage<Language>(
+		languages.map((l) => l.id),
+		"nodejs",
+	);
 	const [baseCopied, setBaseCopied] = useState(false);
 	const [copiedOp, setCopiedOp] = useState<string | null>(null);
 

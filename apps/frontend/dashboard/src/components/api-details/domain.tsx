@@ -6,11 +6,12 @@ import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCallback, useState } from "react";
+import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
 
 const codeExamples = {
 	javascript: {
 		add: `// Add a new domain
-const response = await fetch('/api/v1/add', {
+const response = await fetch('https://api.reloop.sh/api/v1/add', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -31,7 +32,7 @@ const response = await fetch('/api/v1/add', {
 
 const result = await response.json();`,
 		list: `// List all domains
-const response = await fetch('/api/v1/list?page=1&limit=10', {
+const response = await fetch('https://api.reloop.sh/api/v1/list?page=1&limit=10', {
   headers: {
     'Authorization': 'Bearer YOUR_API_KEY'
   }
@@ -39,7 +40,7 @@ const response = await fetch('/api/v1/list?page=1&limit=10', {
 
 const domains = await response.json();`,
 		delete: `// Delete a domain
-const response = await fetch('/api/v1/delete', {
+const response = await fetch('https://api.reloop.sh/api/v1/delete', {
   method: 'DELETE',
   headers: {
     'Content-Type': 'application/json',
@@ -52,7 +53,7 @@ const response = await fetch('/api/v1/delete', {
 
 const result = await response.json();`,
 		details: `// Get domain details
-const response = await fetch('/api/v1/details?domain=example.com', {
+const response = await fetch('https://api.reloop.sh/api/v1/details?domain=example.com', {
   headers: {
     'Authorization': 'Bearer YOUR_API_KEY'
   }
@@ -64,7 +65,7 @@ const domainDetails = await response.json();`,
 		add: `# Add a new domain
 import requests
 
-response = requests.post('/api/v1/add',
+response = requests.post('https://api.reloop.sh/api/v1/add',
   headers={
     'Content-Type': 'application/json',
     'Authorization': 'Bearer YOUR_API_KEY'
@@ -86,7 +87,7 @@ result = response.json()`,
 		list: `# List all domains
 import requests
 
-response = requests.get('/api/v1/list?page=1&limit=10',
+response = requests.get('https://api.reloop.sh/api/v1/list?page=1&limit=10',
   headers={'Authorization': 'Bearer YOUR_API_KEY'}
 )
 
@@ -94,7 +95,7 @@ domains = response.json()`,
 		delete: `# Delete a domain
 import requests
 
-response = requests.delete('/api/v1/delete',
+response = requests.delete('https://api.reloop.sh/api/v1/delete',
   headers={
     'Content-Type': 'application/json',
     'Authorization': 'Bearer YOUR_API_KEY'
@@ -106,7 +107,7 @@ result = response.json()`,
 		details: `# Get domain details
 import requests
 
-response = requests.get('/api/v1/details?domain=example.com',
+response = requests.get('https://api.reloop.sh/api/v1/details?domain=example.com',
   headers={'Authorization': 'Bearer YOUR_API_KEY'}
 )
 
@@ -128,7 +129,7 @@ $data = [
 ];
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, '/api/v1/add');
+curl_setopt($ch, CURLOPT_URL, 'https://api.reloop.sh/api/v1/add');
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -143,7 +144,7 @@ curl_close($ch);
 		list: `<?php
 // List all domains
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, '/api/v1/list?page=1&limit=10');
+curl_setopt($ch, CURLOPT_URL, 'https://api.reloop.sh/api/v1/list?page=1&limit=10');
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Authorization: Bearer YOUR_API_KEY'
 ]);
@@ -157,7 +158,7 @@ curl_close($ch);
 $data = ['domain' => 'example.com'];
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, '/api/v1/delete');
+curl_setopt($ch, CURLOPT_URL, 'https://api.reloop.sh/api/v1/delete');
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -172,7 +173,7 @@ curl_close($ch);
 		details: `<?php
 // Get domain details
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, '/api/v1/details?domain=example.com');
+curl_setopt($ch, CURLOPT_URL, 'https://api.reloop.sh/api/v1/details?domain=example.com');
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Authorization: Bearer YOUR_API_KEY'
 ]);
@@ -234,8 +235,10 @@ const getMethodColor = (method: string): "green" | "blue" | "red" => {
 export const DomainApiDetails = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedOperation, setSelectedOperation] = useState<Operation>("add");
-	const [selectedLanguage, setSelectedLanguage] =
-		useState<Language>("javascript");
+	const [selectedLanguage, setSelectedLanguage] = useApiLanguage<Language>(
+		languages.map((l) => l.id),
+		"javascript",
+	);
 	const [copied, setCopied] = useState(false);
 	const [baseCopied, setBaseCopied] = useState(false);
 
