@@ -156,7 +156,14 @@ export function ApiSidebarLink({
 					: "text-text-sub-600 hover:text-[#171717] dark:hover:text-white",
 			)}
 		>
-			<div className="relative z-10 grid w-full grid-cols-[40px_1fr] items-center gap-4 text-left">
+			<div
+				className={cn(
+					"relative z-10 w-full items-center text-left",
+					node.method || node.icon
+						? "grid grid-cols-[40px_1fr] gap-4"
+						: "flex gap-2",
+				)}
+			>
 				{node.method ? (
 					<p
 						className={cn(
@@ -186,9 +193,7 @@ export function ApiSidebarLink({
 					>
 						{node.icon}
 					</span>
-				) : (
-					<div className="w-10 shrink-0" />
-				)}
+				) : null}
 				<span className="truncate font-medium">{node.name as string}</span>
 			</div>
 		</Link>
