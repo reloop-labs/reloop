@@ -172,11 +172,11 @@ function getTypeBadgeStyles(_type: string): string {
 }
 
 const METHOD_STYLES: Record<string, string> = {
-	GET: "bg-green-500/15 text-green-700 dark:text-green-400",
-	POST: "bg-blue-500/15 text-blue-700 dark:text-blue-400",
-	DELETE: "bg-red-500/15 text-red-700 dark:text-red-400",
-	PATCH: "bg-orange-500/15 text-orange-700 dark:text-orange-400",
-	PUT: "bg-yellow-500/15 text-yellow-700 dark:text-yellow-400",
+	GET: "bg-green-500 text-white dark:bg-green-500 dark:text-white",
+	POST: "bg-blue-500 text-white dark:bg-blue-500 dark:text-white",
+	DELETE: "bg-red-500 text-white dark:bg-red-500 dark:text-white",
+	PATCH: "bg-orange-500 text-white dark:bg-orange-500 dark:text-white",
+	PUT: "bg-purple-500 text-white dark:bg-purple-500 dark:text-white",
 };
 
 /* ─── Main Component ────────────────────────────────────── */
@@ -246,7 +246,7 @@ export function APIPage(props: APIPageProps) {
 						<div className="flex min-w-0 items-center gap-3">
 							<span
 								className={cn(
-									"shrink-0 rounded-md px-2 py-0.5 font-bold text-[11px] uppercase tracking-wider",
+									"shrink-0 rounded-[10px] px-2 py-0.5 font-bold text-[11px] uppercase tracking-wider",
 									METHOD_STYLES[method] || METHOD_STYLES.GET,
 								)}
 							>
@@ -365,7 +365,7 @@ function ParameterRow({
 					</span>
 				)}
 				{param.required && (
-					<span className="rounded-md bg-red-500/6 px-1.5 py-0.5 font-semibold text-[10px] text-red-400/60 uppercase tracking-wider dark:text-red-400/50">
+					<span className="rounded-lg bg-red-500/10 px-1.5 py-0.5 font-semibold text-[10px] text-red-500 uppercase tracking-wider dark:text-red-400">
 						required
 					</span>
 				)}
@@ -416,16 +416,18 @@ function ParameterRow({
 
 			{/* Inline example for array types without sub-properties */}
 			{!hasProperties &&
-				(param.type.includes("[]") || param.type.toLowerCase().startsWith("array")) && (
+				(param.type.includes("[]") ||
+					param.type.toLowerCase().startsWith("array")) && (
 					<p className="mt-2 text-[13.5px] text-text-sub-600 leading-relaxed">
 						Example:{" "}
 						<code className="rounded bg-bg-weak-50 px-1.5 py-0.5 text-[12px] dark:bg-white/5">
 							{param.type.startsWith("string")
 								? '["value1", "value2"]'
-								: param.type.startsWith("number") || param.type.startsWith("integer")
+								: param.type.startsWith("number") ||
+										param.type.startsWith("integer")
 									? "[1, 2, 3]"
 									: param.type.startsWith("object")
-										? '[{ ... }]'
+										? "[{ ... }]"
 										: '["value1", "value2"]'}
 						</code>
 					</p>
