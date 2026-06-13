@@ -3,26 +3,145 @@ title: Errors
 description: A guide to error codes and troubleshooting API requests.
 ---
 
-Reloop uses standard HTTP response codes to indicate the success or failure of an API request.
+Reloop uses standard HTTP response codes to indicate the success or failure of an API request. Every error response includes structured fields so you can programmatically handle failures without parsing human-readable messages.
 
-## Error Format
+## Error Response Format
 
-All error responses return a JSON object with a `message` field describing the error.
+All error responses return a JSON object with four fields:
 
 ```json
 {
-  "message": "The provided API key is invalid."
+  "message": "Invalid sender address",
+  "why": "The address 'not-an-email' is not a valid email format",
+  "fix": "Provide a valid email address in the 'from' field (e.g., user@example.com)",
+  "link": "https://reloop.sh/docs/api/errors"
 }
 ```
 
-## Common Error Codes
+| Field | Type | Description |
+|-------|------|-------------|
+| `message` | `string` | A short summary of what went wrong (e.g., `"Domain not found"`). |
+| `why` | `string` | A detailed explanation of what triggered the error, often including the offending value. |
+| `fix` | `string` | Actionable steps to resolve the issue. |
+| `link` | `string` | A URL to the relevant documentation page. |
 
-| Code | Type | Description |
-|------|------|-------------|
-| `400` | Bad Request | The request was unacceptable, often due to missing a required parameter. |
-| `401` | Unauthorized | No valid API key provided. |
-| `403` | Forbidden | The API key does not have permissions to perform the request. |
-| `404` | Not Found | The requested resource doesn't exist. |
-| `409` | Conflict | The request conflicts with another resource (e.g., duplicate domain). |
-| `429` | Too Many Requests | Too many requests hit the API too quickly. |
-| `500` | Server Error | Something went wrong on Reloop's end. |
+## Error Codes Reference
+
+### 400 — Bad Request
+
+The request was invalid. This usually means a required parameter is missing, a value is the wrong type, or an input failed validation.
+
+**Common causes:**
+- Missing required fields in the request body.
+- A DNS health check failed because records are not configured correctly.
+- An email body was missing both `html` and `text` content, and the referenced template had no rendered HTML.
+
+```json
+{
+  "message": "DNS health check failed",
+  "why": "Domain acme.com is missing required DNS records: SPF, DKIM",
+  "fix": "Update your DNS configuration with the required SPF, DKIM, and DMARC records"
+}
+```
+
+---
+
+### 401 — Unauthorized
+
+The API key is missing, invalid, or has been revoked.
+
+**Common causes:**
+- The `x-api-key` header was not included in the request.
+- The API key has been disabled or rotated.
+- The key format is incorrect (valid keys start with `rl_prod_`).
+
+```json
+{
+  "message": "Unauthorized",
+  "why": "No valid API key was provided in the x-api-key header",
+  "fix": "Please provide valid credentials"
+}
+```
+
+---
+
+### 403 — Forbidden
+
+The API key is valid, but it doesn't have permission to access the requested resource.
+
+**Common causes:**
+- Attempting to access a resource that belongs to a different organization.
+- The authenticated user is not a member of the organization tied to the API key.
+
+```json
+{
+  "message": "Forbidden",
+  "why": "User is not a member of an organization",
+  "fix": "Ensure your API key is associated with the correct organization"
+}
+```
+
+---
+
+### 404 — Not Found
+
+The requested resource doesn't exist or isn't accessible to your organization.
+
+**Common causes:**
+- The resource ID is incorrect or was deleted.
+- The resource belongs to a different organization than your API key.
+
+```json
+{
+  "message": "Domain not found",
+  "why": "The domain acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard"
+}
+```
+
+---
+
+### 409 — Conflict
+
+The request conflicts with an existing resource.
+
+**Common causes:**
+- Creating a domain that is already registered.
+- Creating a channel or contact property with a name that already exists in your organization.
+
+```json
+{
+  "message": "Channel already exists",
+  "why": "A channel with the name 'Weekly Newsletter' already exists in your organization",
+  "fix": "Use a unique channel name or update the existing channel"
+}
+```
+
+---
+
+### 429 — Too Many Requests
+
+You've exceeded a rate limit. The response includes additional fields and headers to help you retry.
+
+```json
+{
+  "message": "Too many requests",
+  "why": "You have exceeded the limit of 10 requests per 60s window for this operation.",
+  "fix": "Wait 42 second(s) before retrying.",
+  "retryAfter": 42
+}
+```
+
+Check the `Retry-After` response header for the number of seconds to wait, or use the `retryAfter` field in the body. See [Usage Limits](/docs/api/usage-limits) for per-endpoint limits.
+
+---
+
+### 500 — Internal Server Error
+
+Something went wrong on Reloop's end. These errors are automatically logged and investigated.
+
+**What to do:**
+- Retry the request after a short delay.
+- If the issue persists, contact [support@reloop.sh](mailto:support@reloop.sh) with the request details and timestamp.
+
+

@@ -3,53 +3,134 @@ title: Usage Limits
 description: Understand rate limits and quotas for the Reloop API.
 ---
 
-Reloop enforces rate limits on API requests to ensure stability and fair usage.
+Reloop enforces rate limits on API requests to ensure stability and fair usage across all organizations. Limits are applied per **organization** and tracked using a sliding window counter backed by Redis.
 
-For management endpoints (e.g., domain verification, contact management, configuration), rate limits are scoped and applied per **organization**.
+If a limit is exceeded, the API returns a `429 Too Many Requests` response with a `Retry-After` header indicating how many seconds to wait.
 
-### Default Endpoint Limits
+## Management Endpoint Limits
 
-| Endpoint / Operation | Limit | Window |
-|----------------------|-------|--------|
-| Domain Operations (create, delete, verify) | 10 requests | 60s |
+Management endpoints cover everything outside of email sending — domains, contacts, channels, groups, properties, API keys, and templates. Each endpoint category has its own independent limit.
+
+### Domain Service
+
+| Operation | Limit | Window |
+|-----------|-------|--------|
+| Create Domain | 10 requests | 60s |
+| Update Domain | 10 requests | 60s |
+| Delete Domain | 10 requests | 60s |
+| Verify DNS | 10 requests | 60s |
+
+### Contacts Service
+
+| Operation | Limit | Window |
+|-----------|-------|--------|
 | List Contacts | 60 requests | 60s |
+| Get Contact | 60 requests | 60s |
+| Create Contact | 200 requests | 60s |
+| Update Contact | 30 requests | 60s |
+| Delete Contact | 30 requests | 60s |
+
+### Channels Service
+
+| Operation | Limit | Window |
+|-----------|-------|--------|
+| List Channels | 60 requests | 60s |
+| Get Channel | 60 requests | 60s |
 | Create Channel | 30 requests | 60s |
-| Update Preferences | 10 requests | 60s |
-| Generate Token | 5 requests | 60s |
+| Update Channel | 30 requests | 60s |
+| Delete Channel | 30 requests | 60s |
+
+### Groups Service
+
+| Operation | Limit | Window |
+|-----------|-------|--------|
+| List Groups | 60 requests | 60s |
+| Get Group | 60 requests | 60s |
+| Create Group | 30 requests | 60s |
+| Update Group | 30 requests | 60s |
+| Delete Group | 30 requests | 60s |
+| Add Contact to Group | 30 requests | 60s |
+| Remove Contact from Group | 30 requests | 60s |
+
+### Contact Properties Service
+
+| Operation | Limit | Window |
+|-----------|-------|--------|
+| List Properties | 60 requests | 60s |
+| Create Property | 30 requests | 60s |
+| Update Property | 30 requests | 60s |
+| Delete Property | 30 requests | 60s |
+
+### API Keys Service
+
+| Operation | Limit | Window |
+|-----------|-------|--------|
+| Create API Key | 10 requests | 60s |
+| Update API Key | 30 requests | 60s |
+| Delete API Key | 20 requests | 60s |
+| Rotate API Key | 20 requests | 60s |
+| Enable / Disable API Key | 30 requests | 60s |
+
+### Preferences Service
+
+| Operation | Limit | Window |
+|-----------|-------|--------|
+| Generate Token | 30 requests | 60s |
+| Update Preference | 30 requests | 60s |
 
 ---
 
 ## Email Sending Limits
 
-Email sending endpoints use a multi-layer rate limiting strategy:
+The email sending endpoint (`/api/mail/v1/send`) uses a **multi-layer** rate limiting strategy. All five layers are checked in parallel — if any single layer is exceeded, the request is rejected.
 
-| Layer | Limit | Window | Scope |
-|-------|-------|--------|-------|
-| IP | 20 requests | 60s | Client IP |
-| User | 50 requests | 60s | Authenticated User |
-| Organization | 100 requests | 60s | Organization |
-| Organization Daily | 5,000 requests | 24h | Organization |
-| Global | 500 requests | 60s | Infrastructure-wide |
+| Layer | Limit | Window | What It Protects |
+|-------|-------|--------|-----------------|
+| IP | 20 requests | 60s | Prevents brute-force from a single source. |
+| User | 50 requests | 60s | Stops abuse from a single user within an organization. |
+| Organization | 100 requests | 60s | Prevents runaway integrations per tenant. |
+| Organization Daily | 5,000 requests | 24h | Hard daily cap per organization. |
+| Global | 500 requests | 60s | Protects infrastructure from DDoS. |
+
+When a sending request is rate limited, the error response tells you which layer was exceeded:
+
+```json
+{
+  "message": "Too Many Requests",
+  "why": "Rate limit exceeded on the organization layer. You have sent too many requests in the current time window.",
+  "fix": "Please wait 42 seconds before retrying, or contact support to increase your limits."
+}
+```
 
 ---
 
 ## Rate Limit Headers
 
-Every API response includes headers indicating your current rate limit status:
+Every API response includes headers indicating your current rate limit status. The specific headers vary slightly between management and sending endpoints.
 
-- `X-RateLimit-Limit` — Maximum requests allowed in the window.
-- `X-RateLimit-Remaining` — Requests remaining in the current window.
-- `X-RateLimit-Window` — Size of the window in seconds (management endpoints).
-- `X-RateLimit-Reset` — Unix epoch timestamp when the window resets (email endpoints).
-- `Retry-After` — Seconds to wait before retrying (returned with `429` responses).
+### Management Endpoints
 
-### Example 429 Response
+| Header | Description | Example |
+|--------|-------------|---------|
+| `X-RateLimit-Limit` | Maximum requests allowed in the window. | `60` |
+| `X-RateLimit-Remaining` | Requests remaining in the current window. | `48` |
+| `X-RateLimit-Window` | Window size in seconds. | `60` |
+| `Retry-After` | Seconds to wait before retrying (only on `429`). | `12` |
 
-```json
-{
-  "message": "Too many requests",
-  "why": "You have exceeded the limit of 10 requests per 60s window for this operation.",
-  "fix": "Wait 42 second(s) before retrying.",
-  "retryAfter": 42
-}
-```
+### Email Sending Endpoints
+
+| Header | Description | Example |
+|--------|-------------|---------|
+| `X-RateLimit-Limit` | Maximum requests for the tightest active layer. | `100` |
+| `X-RateLimit-Remaining` | Requests remaining for the tightest active layer. | `73` |
+| `X-RateLimit-Reset` | Unix epoch timestamp (seconds) when the window resets. | `1718284800` |
+| `Retry-After` | Seconds to wait before retrying (only on `429`). | `42` |
+
+---
+
+## Best Practices
+
+- **Monitor headers proactively.** Check `X-RateLimit-Remaining` before it reaches zero to avoid disruptions.
+- **Implement exponential backoff.** When you receive a `429`, wait for the duration specified in `Retry-After`, then retry with increasing delays if the limit is still exceeded.
+- **Batch where possible.** Use list endpoints with pagination instead of fetching resources one at a time.
+- **Separate read and write traffic.** Read operations (list, get) generally have higher limits than write operations (create, update, delete).

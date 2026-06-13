@@ -3,27 +3,31 @@ title: Pagination
 description: Handle paginated list responses from the Reloop API.
 ---
 
-List endpoints use offset-based pagination. Use the `page` and `limit` query parameters to paginate results.
+All list endpoints in the Reloop API use **offset-based pagination**. You control the page size and page number using query parameters, and the response includes metadata so you can calculate total pages and build navigation.
 
 ## Query Parameters
 
 | Parameter | Type | Default | Max | Description |
 |-----------|------|---------|-----|-------------|
-| `page` | `number` | `1` | — | The page number to retrieve. |
+| `page` | `number` | `1` | — | The page number to retrieve (1-indexed). |
 | `limit` | `number` | `20` | `100` | The number of records to return per page. |
+
+**Example request:**
+
+```bash
+curl "https://api.reloop.sh/api/contacts/v1/list?page=2&limit=50" \
+  -H "x-api-key: rl_prod_YOUR_API_KEY"
+```
 
 ## Response Structure
 
-Pagination metadata is returned directly at the root of the JSON response:
+Pagination metadata is returned at the **root** of the JSON response alongside the data array. The exact field names vary by endpoint, but every paginated response includes `total`, `page`, and `limit`.
 
-- `total` — The total number of items matching the query.
-- `page` — The current page number.
-- `limit` — The page limit.
+### Contacts
 
-### Example Responses
+The contacts list endpoint includes additional aggregate counts:
 
 ```json
-// GET /api/contacts/list
 {
   "object": "contact",
   "contacts": [...],
@@ -37,13 +41,69 @@ Pagination metadata is returned directly at the root of the JSON response:
 }
 ```
 
+| Field | Type | Description |
+|-------|------|-------------|
+| `contacts` | `array` | The list of contact objects for the current page. |
+| `total` | `number` | Total number of contacts matching the query. |
+| `page` | `number` | The current page number. |
+| `limit` | `number` | The page size used for this request. |
+| `totalContacts` | `number` | Total contacts in the organization. |
+| `subscribedContacts` | `number` | Number of contacts with an active subscription. |
+| `unsubscribedContacts` | `number` | Number of contacts who have unsubscribed. |
+
+### Templates
+
 ```json
-// GET /api/template/list
 {
   "templates": [...],
   "total": 45,
   "page": 1,
   "limit": 20,
   "event": "template.list"
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `templates` | `array` | The list of template objects for the current page. |
+| `total` | `number` | Total number of templates matching the query. |
+| `page` | `number` | The current page number. |
+| `limit` | `number` | The page size used for this request. |
+
+## Calculating Total Pages
+
+Use the `total` and `limit` fields to calculate the number of pages:
+
+```javascript
+const totalPages = Math.ceil(response.total / response.limit);
+const hasNextPage = response.page < totalPages;
+```
+
+## Iterating Through All Pages
+
+Here's a complete example for fetching all contacts across multiple pages:
+
+```javascript
+async function fetchAllContacts(apiKey) {
+  const contacts = [];
+  let page = 1;
+  const limit = 100; // Use max page size for fewer requests
+
+  while (true) {
+    const res = await fetch(
+      `https://api.reloop.sh/api/contacts/v1/list?page=${page}&limit=${limit}`,
+      { headers: { "x-api-key": apiKey } }
+    );
+
+    const data = await res.json();
+    contacts.push(...data.contacts);
+
+    const totalPages = Math.ceil(data.total / data.limit);
+    if (page >= totalPages) break;
+
+    page++;
+  }
+
+  return contacts;
 }
 ```

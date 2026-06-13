@@ -7,67 +7,81 @@ Welcome to the Reloop API Reference. The Reloop API is built on **REST** princip
 
 ## Authentication
 
-To authenticate, you need to add an `x-api-key` header with your API key:
+Every request must include your API key in the `x-api-key` header. API keys are scoped to a single **organization** — all resources you create, read, or modify are automatically associated with that organization.
 
 ```bash
 curl -X GET "https://api.reloop.sh/api/domain/v1/list" \
-  -H "x-api-key: rl_YOUR_API_KEY"
+  -H "x-api-key: rl_prod_YOUR_API_KEY"
 ```
 
-You can generate API keys from the [Reloop Dashboard](https://reloop.sh/dashboard/api-keys). Each API key is scoped to an organization and can be rotated or revoked at any time.
+You can create, rotate, and revoke API keys from the [Reloop Dashboard](https://reloop.sh/dashboard/api-keys).
 
-| Header | Value | Required |
-|--------|-------|----------|
-| `x-api-key` | Your Reloop API key (starts with `rl_prod_`) | Yes |
-| `Content-Type` | `application/json` | For POST/PUT/PATCH requests |
+### Required Headers
 
-## Response Codes
+| Header | Value | When |
+|--------|-------|------|
+| `x-api-key` | Your Reloop API key (prefixed `rl_prod_`) | Every request |
+| `Content-Type` | `application/json` | Requests with a body (`POST`, `PUT`, `PATCH`) |
 
-The API uses standard HTTP status codes to indicate success or failure:
+## Response Format
 
-| Code | Description |
-|------|-------------|
-| `200` | OK — Request succeeded |
-| `201` | Created — Resource was created |
-| `400` | Bad Request — Invalid parameters |
-| `401` | Unauthorized — Missing or invalid API key |
-| `403` | Forbidden — Not allowed to access this resource |
-| `404` | Not Found — Resource doesn't exist |
-| `409` | Conflict — Resource already exists |
-| `429` | Too Many Requests — Rate limit exceeded |
-| `500` | Internal Server Error |
-
-## Rate Limits
-
-The API enforces rate limits to ensure fair usage. If you exceed the limit, you'll receive a `429` response. 
-
-Rate limits are applied per **organization**.
-
-### Rate Limit Headers
-
-Every response from the Reloop API includes headers indicating your current rate limit status:
-
-| Header | Description |
-|--------|-------------|
-| `X-RateLimit-Limit` | The maximum number of requests allowed within the rate limit window. |
-| `X-RateLimit-Remaining` | The number of requests remaining in the current window. |
-| `X-RateLimit-Window` | The size of the rate limit window in seconds (returned by management endpoints). |
-| `X-RateLimit-Reset` | The Unix epoch timestamp (in seconds) when the rate limit resets (returned by email sending endpoints). |
-| `Retry-After` | The number of seconds you must wait before making another request (returned with `429` status codes). |
-
-## Content Type
-
-All request and response bodies are encoded as JSON. Make sure to set the `Content-Type: application/json` header for requests with a body.
-
-## Errors
-
-All error responses follow a consistent format:
+All responses — including errors — are returned as JSON. Successful responses typically include an `event` field describing the action performed:
 
 ```json
 {
-  "message": "A human-readable description of the error",
-  "why": "Detailed explanation of why the error occurred",
-  "fix": "Suggested steps to resolve the issue",
+  "event": "contact.created",
+  ...
+}
+```
+
+## Response Codes
+
+The API uses standard HTTP status codes to indicate the outcome of a request:
+
+| Code | Meaning | When You'll See It |
+|------|---------|-------------------|
+| `200` | OK | Request succeeded. |
+| `201` | Created | A new resource was created successfully. |
+| `400` | Bad Request | Missing or invalid parameters — check the `why` field for details. |
+| `401` | Unauthorized | The `x-api-key` header is missing, invalid, or the key has been revoked. |
+| `403` | Forbidden | The API key doesn't have permission to access the requested resource. |
+| `404` | Not Found | The resource doesn't exist, or it belongs to a different organization. |
+| `409` | Conflict | A resource with the same unique identifier already exists (e.g., duplicate domain or channel name). |
+| `429` | Too Many Requests | You've exceeded a [rate limit](/docs/api/usage-limits). Retry after the `Retry-After` header value. |
+| `500` | Internal Server Error | Something went wrong on our end. If the issue persists, contact [support](mailto:support@reloop.sh). |
+
+## Errors
+
+When a request fails, the response body always contains four fields to help you diagnose and fix the issue:
+
+```json
+{
+  "message": "Domain not found",
+  "why": "The domain acme.com was not found or is not authorized for your organization",
+  "fix": "Ensure the domain is registered and verified in your dashboard",
   "link": "https://reloop.sh/docs/api/errors"
 }
 ```
+
+| Field | Description |
+|-------|-------------|
+| `message` | A short, human-readable summary of the error. |
+| `why` | A detailed explanation of what went wrong and what triggered the error. |
+| `fix` | Actionable steps you can take to resolve the issue. |
+| `link` | A URL to the relevant documentation page for more context. |
+
+See the [Errors](/docs/api/errors) page for a full reference of common error codes and troubleshooting tips.
+
+## Rate Limits
+
+Rate limits are applied per **organization** and vary by endpoint. Every API response includes headers so you can monitor your usage:
+
+| Header | Description |
+|--------|-------------|
+| `X-RateLimit-Limit` | Maximum requests allowed in the current window. |
+| `X-RateLimit-Remaining` | Requests remaining before the limit is reached. |
+| `X-RateLimit-Window` | Window size in seconds (management endpoints like domains, contacts, and channels). |
+| `X-RateLimit-Reset` | Unix epoch timestamp when the window resets (email sending endpoints). |
+| `Retry-After` | Seconds to wait before retrying (only returned with `429` responses). |
+
+For the full breakdown of per-endpoint limits and the multi-layer email sending strategy, see [Usage Limits](/docs/api/usage-limits).
