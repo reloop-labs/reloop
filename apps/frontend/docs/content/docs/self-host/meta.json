@@ -2,9 +2,12 @@
 	"title": "Self-Hosted",
 	"description": "Guides and references on how to self-host Reloop.",
 	"root": true,
-	"icon": "server",
 	"pages": [
+		"---Overview---",
 		"index",
+		"requirements",
+		"services",
+		"---Cloud Providers---",
 		"coolify",
 		"dokploy",
 		"vps",

@@ -1,0 +1,30 @@
+---
+title: Requirements
+description: Hardware and software specifications required to host the Reloop stack.
+---
+
+Before deploying the Reloop stack, ensure your server environment meets the hardware and software specifications outlined below.
+
+## Hardware Requirements
+
+Reloop's performance is highly dependent on database throughput and the speed of processing background queues.
+
+| Resource | Minimum Requirement | Recommended (Production) |
+| :--- | :--- | :--- |
+| **CPU** | 2 vCPUs | 4+ vCPUs |
+| **RAM** | 4 GB | 8 GB+ |
+| **Storage** | 20 GB SSD | 50 GB+ NVMe SSD |
+
+> [!NOTE]
+> SSD/NVMe storage is highly recommended. ClickHouse and PostgreSQL write extensive analytical telemetry logs, which require fast disk I/O speeds to prevent latency.
+
+---
+
+## Software Requirements
+
+Verify the following software and runtimes are installed on your hosting server:
+
+* **Docker**: Version `24.0.0+`
+* **Docker Compose**: Version `2.20.0+`
+* **Bun**: Version `1.3.0+` (Only required if you run the microservices natively outside of Docker containers, or during the initial environment variables setup).
+* **Git**: For cloning the repository and checking out configurations.

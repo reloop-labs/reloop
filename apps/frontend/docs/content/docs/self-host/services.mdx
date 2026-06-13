@@ -1,0 +1,43 @@
+---
+title: Services
+description: Detailed architecture flow and internal/external services breakdown.
+---
+
+Reloop is built using a highly modular microservice architecture. This separation allows you to scale specific components (such as mail queues or logs processing) depending on your server workload.
+
+
+## Component Breakdown
+
+The Reloop stack consists of **18 application services** (3 frontends, 15 backends) and **10 external backing systems**.
+
+### 1. Frontend Services (3)
+* **`web`**: The main public landing page and landing website.
+* **`dashboard`**: The developer console where users manage domains, write templates, view delivery metrics, configure webhooks, and generate API keys.
+* **`docs`**: The documentation portal you are viewing right now.
+
+### 2. Backend Services (15)
+* **`auth`**: Handles user registrations, authentications, and organization-scoped permission checks.
+* **`api-key`**: Validates developer API tokens for programmatic integrations.
+* **`domain`**: Verifies and manages domain records configurations (SPF, DKIM, MX, DMARC).
+* **`mail`**: Manages template assembly, parsing, queuing, and delivery job dispatching.
+* **`webhook`**: Dispatches delivery events (delivered, bounced, opened, clicked) to external webhooks.
+* **`contacts`**: Handles subscriber lists, contact profiles, segments, and unsubscribe requests.
+* **`logs`**: Centralizes activity streams and debug logs.
+* **`workflow`**: Manages campaign automation workflows, timing wait steps, and drip actions.
+* **`upload`**: Manages file storage attachments and static image uploads.
+* **`template`**: Compiles dynamic template variables before mailing dispatch.
+* **`credits`**: Tracks account credit balances, billing cycles, and quotas.
+* **`email`**: The core API service mapping outbound HTTP sending requests to the queue processor.
+* **`inbox`**: Manages receiving inbox threads and incoming messages.
+* **`smtp`**: Outbound SMTP submission server using KumoMTA.
+* **`inbound`**: Inbound MX SMTP processing receiver using KumoMTA.
+
+### 3. Supporting Infrastructure (10)
+* **PostgreSQL**: Stores persistent relational data.
+* **Redis**: Coordinates task queues for BullMQ worker threads.
+* **ClickHouse**: Optimized column database for rapid analytics queries.
+* **MinIO**: S3-compliant file storage.
+* **NATS JetStream**: Real-time event broker.
+* **Rspamd**: Anti-spam scoring system.
+* **Mailpit**: SMTP sandbox mail catcher.
+* **Caddy**: High-performance reverse proxy and automatic SSL manager.
