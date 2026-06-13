@@ -2,6 +2,17 @@ import fs from "node:fs";
 import path from "node:path";
 import { ImageResponse } from "next/og";
 import type { NextRequest } from "next/server";
+import {
+	siGo,
+	siNodedotjs,
+	siPython,
+	siRuby,
+	siCurl,
+	siPhp,
+	siRust,
+	siOpenjdk,
+	siDotnet,
+} from "simple-icons";
 
 export const dynamic = "force-dynamic";
 
@@ -630,12 +641,122 @@ export async function GET(request: NextRequest) {
 				<div
 					style={{
 						display: "flex",
-						justifyContent: "flex-end",
+						justifyContent: "space-between",
 						alignItems: "center",
 						width: "100%",
 						paddingTop: "24px",
 					}}
 				>
+					{/* SDK Logos */}
+					<div
+						style={{
+							display: "flex",
+							alignItems: "center",
+							gap: "20px",
+						}}
+					>
+						<span
+							style={{
+								fontSize: "22px",
+								fontWeight: 600,
+								color: "#ffffff",
+								marginRight: "6px",
+							}}
+						>
+							SDKs:
+						</span>
+						{/* Node.js */}
+						<svg
+							width="34"
+							height="34"
+							viewBox="0 0 24 24"
+							fill="#5FA04E"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path d={siNodedotjs.path} />
+						</svg>
+						{/* cURL */}
+						<svg
+							width="34"
+							height="34"
+							viewBox="0 0 24 24"
+							fill="#3186c6"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path d={siCurl.path} />
+						</svg>
+						{/* PHP */}
+						<svg
+							width="34"
+							height="34"
+							viewBox="0 0 24 24"
+							fill="#777BB4"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path d={siPhp.path} />
+						</svg>
+						{/* Python */}
+						<svg
+							width="34"
+							height="34"
+							viewBox="0 0 24 24"
+							fill="#3776AB"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path d={siPython.path} />
+						</svg>
+						{/* Ruby */}
+						<svg
+							width="34"
+							height="34"
+							viewBox="0 0 24 24"
+							fill="#CC342D"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path d={siRuby.path} />
+						</svg>
+						{/* Go */}
+						<svg
+							width="34"
+							height="34"
+							viewBox="0 0 24 24"
+							fill="#00ADD8"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path d={siGo.path} />
+						</svg>
+						{/* Rust */}
+						<svg
+							width="34"
+							height="34"
+							viewBox="0 0 24 24"
+							fill="#e24d2b"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path d={siRust.path} />
+						</svg>
+						{/* Java */}
+						<svg
+							width="34"
+							height="34"
+							viewBox="0 0 24 24"
+							fill="#ED8B00"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path d={siOpenjdk.path} />
+						</svg>
+						{/* .NET */}
+						<svg
+							width="34"
+							height="34"
+							viewBox="0 0 24 24"
+							fill="#7057ff"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path d={siDotnet.path} />
+						</svg>
+					</div>
+
 					<div
 						style={{
 							fontSize: "18px",
