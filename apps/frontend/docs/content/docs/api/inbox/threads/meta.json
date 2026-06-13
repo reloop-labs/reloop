@@ -1,0 +1,13 @@
+{
+	"title": "Threads",
+	"pages": [
+		"get-api-inbox-v1threads",
+		"get-api-inbox-v1threads-by-id",
+		"patch-api-inbox-v1threads-by-id",
+		"delete-api-inbox-v1threads-by-id",
+		"get-api-inbox-v1threads-by-id-attachments-by-attachment-id",
+		"patch-api-inbox-v1threads-by-id-read",
+		"patch-api-inbox-v1threads-by-id-star",
+		"post-api-inbox-v1threads-by-id-archive"
+	]
+}

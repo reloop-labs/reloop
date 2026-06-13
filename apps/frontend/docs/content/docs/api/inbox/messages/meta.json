@@ -1,0 +1,18 @@
+{
+	"title": "Messages",
+	"pages": [
+		"get-api-inbox-v1messages",
+		"get-api-inbox-v1messages-by-id",
+		"patch-api-inbox-v1messages-by-id",
+		"delete-api-inbox-v1messages-by-id",
+		"post-api-inbox-v1messages-batch",
+		"get-api-inbox-v1messages-by-id-attachments-by-attachment-id",
+		"get-api-inbox-v1messages-by-id-raw",
+		"patch-api-inbox-v1messages-by-id-read",
+		"patch-api-inbox-v1messages-by-id-star",
+		"post-api-inbox-v1messages-send",
+		"post-api-inbox-v1messages-by-id-reply",
+		"post-api-inbox-v1messages-by-id-reply-all",
+		"post-api-inbox-v1messages-by-id-forward"
+	]
+}

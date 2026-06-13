@@ -10,6 +10,7 @@
 		"usage-limits",
 		"errors",
 		"mail",
+		"inbox",
 		"domain",
 		"api-key",
 		"webhook",

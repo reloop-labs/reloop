@@ -1,0 +1,10 @@
+{
+	"title": "Mailboxes",
+	"pages": [
+		"get-api-inbox-v1mailboxes-list",
+		"get-api-inbox-v1mailboxes-by-id",
+		"patch-api-inbox-v1mailboxes-by-id",
+		"delete-api-inbox-v1mailboxes-by-id",
+		"post-api-inbox-v1mailboxes-create"
+	]
+}

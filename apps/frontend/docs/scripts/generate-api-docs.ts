@@ -69,6 +69,13 @@ const SERVICES: ServiceConfig[] = [
 		prodUrl: "https://reloop.sh/api/mail/openapi/json",
 	},
 	{
+		name: "inbox",
+		prefix: "/api/inbox",
+		port: 8021,
+		specUrl: "http://localhost:8021/api/inbox/openapi/json",
+		prodUrl: "https://reloop.sh/api/inbox/openapi/json",
+	},
+	{
 		name: "domain",
 		prefix: "/api/domain",
 		port: 8011,
@@ -874,6 +881,7 @@ function generateMetaJson(allGenerated: Record<string, GeneratedPage[]>) {
 	const sectionNames: Record<string, string> = {
 		domain: "Domain",
 		mail: "Sending",
+		inbox: "Receiving",
 		"api-key": "API Key",
 		contacts: "Contacts",
 		webhook: "Webhooks",
