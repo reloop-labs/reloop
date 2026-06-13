@@ -18,7 +18,7 @@ You can generate API keys from the [Reloop Dashboard](https://reloop.sh/dashboar
 
 | Header | Value | Required |
 |--------|-------|----------|
-| `x-api-key` | Your Reloop API key (starts with `rl_`) | Yes |
+| `x-api-key` | Your Reloop API key (starts with `rl_prod_`) | Yes |
 | `Content-Type` | `application/json` | For POST/PUT/PATCH requests |
 
 ## Response Codes
@@ -39,7 +39,23 @@ The API uses standard HTTP status codes to indicate success or failure:
 
 ## Rate Limits
 
-The API enforces rate limits to ensure fair usage. If you exceed the limit, you'll receive a `429` response. Rate limits are applied per API key.
+The API enforces rate limits to ensure fair usage. If you exceed the limit, you'll receive a `429` response. 
+
+Rate limits are scoped as follows:
+- **Authenticated Requests**: Applied per **organization**.
+- **Unauthenticated Requests** (e.g., public preferences endpoints): Applied per client **IP address**.
+
+### Rate Limit Headers
+
+Every response from the Reloop API includes headers indicating your current rate limit status:
+
+| Header | Description |
+|--------|-------------|
+| `X-RateLimit-Limit` | The maximum number of requests allowed within the rate limit window. |
+| `X-RateLimit-Remaining` | The number of requests remaining in the current window. |
+| `X-RateLimit-Window` | The size of the rate limit window in seconds (returned by management endpoints). |
+| `X-RateLimit-Reset` | The Unix epoch timestamp (in seconds) when the rate limit resets (returned by email sending endpoints). |
+| `Retry-After` | The number of seconds you must wait before making another request (returned with `429` status codes). |
 
 ## Content Type
 
@@ -51,6 +67,9 @@ All error responses follow a consistent format:
 
 ```json
 {
-  "message": "A human-readable description of the error"
+  "message": "A human-readable description of the error",
+  "why": "Detailed explanation of why the error occurred",
+  "fix": "Suggested steps to resolve the issue",
+  "link": "https://reloop.sh/docs/api/errors"
 }
 ```
