@@ -13,7 +13,163 @@ _apiData:
   operationData: [{"path":"/api/contacts/create","method":"post"}]
   parameterList: [{"name":"email","type":"string","required":true,"description":"Contact email address","location":"body","pattern":"^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"},{"name":"firstName","type":"string","required":false,"description":"Contact first name","location":"body"},{"name":"lastName","type":"string","required":false,"description":"Contact last name","location":"body"},{"name":"status","type":"\"subscribed\" | \"unsubscribed\" | \"blocked\"","required":false,"description":"","location":"body","enumValues":["subscribed","unsubscribed","blocked"]},{"name":"properties","type":"object","required":false,"description":"Contact properties as key-value pairs","location":"body"},{"name":"groupIds","type":"string[]","required":false,"description":"Array of group IDs to add the contact to","location":"body"},{"name":"channels","type":"object[]","required":false,"description":"Array of channels to enroll the contact in","location":"body","properties":[{"name":"channelId","type":"string","required":true,"description":"Channel identifier","location":"body"},{"name":"subscription","type":"\"opt_in\" | \"opt_out\"","required":true,"description":"","location":"body","enumValues":["opt_in","opt_out"]}]}]
   responseMap: {"201":{"description":"Response for status 201","schema":{"object":"contact","id":"con_123456789","email":"john.doe@example.com","firstName":"John","lastName":"Doe","status":"subscribed","properties":{"company":"Reloop","role":"Developer"},"groups":[{"id":"grp_123456789","name":"Beta Testers"}],"channels":[{"id":"channel_123456789","name":"Newsletter","subscription":"opt_in"}],"suppressionReason":null,"suppressedAt":null,"createdAt":"2026-03-23T10:00:00.000Z","updatedAt":"2026-03-23T10:00:00.000Z","event":"evt_123456789"}},"400":{"description":"Response for status 400","schema":{"message":"Invalid email format","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead."}},"403":{"description":"Response for status 403","schema":{"message":"Unauthorized access","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead."}},"409":{"description":"Response for status 409","schema":{"message":"Contact already exists","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead."}}}
-  codeSamples: [{"id":"node","lang":"js","label":"Node.js","source":"import Reloop from 'reloop-email';\n\nconst reloop = new Reloop('re_123456789');\n\nconst { data: contact, error } = await reloop.contacts().create({\n  email: 'john.doe@example.com',\n  firstName: 'John',\n  lastName: 'Doe',\n  status: 'subscribed',\n  properties: {\n    company: 'Reloop',\n    role: 'Developer',\n  },\n  groupIds: ['grp_123456789'],\n  channels: [\n    {\n      channelId: 'channel_123456789',\n      subscription: 'opt_in',\n    },\n  ],\n});"},{"id":"curl","lang":"bash","label":"cURL","source":"curl -X POST https://reloop.sh/api/contacts/create \\\n  -H \"x-api-key: re_123456789\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n  \"email\": \"john.doe@example.com\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"status\": \"subscribed\",\n  \"properties\": {\n    \"company\": \"Reloop\",\n    \"role\": \"Developer\"\n  },\n  \"groupIds\": [\"grp_123456789\"],\n  \"channels\": [\n    {\n      \"channelId\": \"channel_123456789\",\n      \"subscription\": \"opt_in\"\n    }\n  ]\n}'"},{"id":"php","lang":"php","label":"PHP","source":"$reloop = Reloop::client('re_123456789');\n\n$reloop->contacts->create(\n  parameters: [\n      'email' => 'john.doe@example.com',\n      'first_name' => 'John',\n      'last_name' => 'Doe',\n      'unsubscribed' => false,\n      'properties' => [\n          'company' => 'Reloop',\n          'role' => 'Developer',\n      ],\n      'group_ids' => ['grp_123456789'],\n      'channels' => [\n          [\n              'channel_id' => 'channel_123456789',\n              'subscription' => 'opt_in',\n          ],\n      ],\n  ],\n);"},{"id":"python","lang":"python","label":"Python","source":"from reloop_email import Reloop\n\nreloop = Reloop(api_key=\"re_123456789\")\n\nreloop.contacts().create(\n    email=\"john.doe@example.com\",\n    first_name=\"John\",\n    last_name=\"Doe\",\n    unsubscribed=False,\n    properties={\n        \"company\": \"Reloop\",\n        \"role\": \"Developer\",\n    },\n    group_ids=[\"grp_123456789\"],\n    channels=[\n        {\n            \"channel_id\": \"channel_123456789\",\n            \"subscription\": \"opt_in\",\n        },\n    ],\n)"},{"id":"ruby","lang":"ruby","label":"Ruby","source":"require 'net/http'\nrequire 'json'\n\nuri = URI('https://reloop.sh/api/contacts/create')\nhttp = Net::HTTP.new(uri.host, uri.port)\nhttp.use_ssl = true\n\nrequest = Net::HTTP::Post.new(uri)\nrequest['x-api-key'] = 're_123456789'\nrequest['Content-Type'] = 'application/json'\nrequest.body = {\n  email: 'john.doe@example.com',\n  firstName: 'John',\n  lastName: 'Doe',\n  status: 'subscribed',\n  properties: {\n    company: 'Reloop',\n    role: 'Developer',\n  },\n  groupIds: ['grp_123456789'],\n  channels: [\n    {\n      channelId: 'channel_123456789',\n      subscription: 'opt_in',\n    },\n  ],\n}.to_json\n\nresponse = http.request(request)\ncontact = JSON.parse(response.body)"},{"id":"go","lang":"go","label":"Go","source":"import reloopemail \"github.com/reloop-labs/reloop-email\"\n\nfunc main() {\n    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{\n        APIKey: \"re_123456789\",\n    })\n    \n    _, _ = reloop.Contacts().Create(map[string]interface{}{\n        \"email\": \"john.doe@example.com\",\n        \"first_name\": \"John\",\n        \"last_name\": \"Doe\",\n        \"unsubscribed\": false,\n        \"properties\": map[string]interface{}{\"company\": \"Reloop\", \"role\": \"Developer\"},\n        \"group_ids\": []interface{}{\"grp_123456789\"},\n        \"channels\": []interface{}{map[string]interface{}{\"channel_id\": \"channel_123456789\", \"subscription\": \"opt_in\"}}\n    })\n}"},{"id":"rust","lang":"rust","label":"Rust","source":"use reloop_email::ReloopEmail;\nuse serde_json::json;\n\n#[tokio::main]\nasync fn main() -> Result<(), Box<dyn std::error::Error>> {\n    let reloop = ReloopEmail::new(\"re_123456789\".to_string(), None);\n    \n    reloop.contacts().create(json!({\n        \"email\": \"john.doe@example.com\",\n        \"first_name\": \"John\",\n        \"last_name\": \"Doe\",\n        \"unsubscribed\": false,\n        \"properties\": {\n        \"company\": \"Reloop\",\n        \"role\": \"Developer\",\n    },\n        \"group_ids\": [\n        \"grp_123456789\",\n    ],\n        \"channels\": [\n        {\n        \"channel_id\": \"channel_123456789\",\n        \"subscription\": \"opt_in\",\n    },\n    ],\n    })).await?;\n\n    Ok(())\n}"},{"id":"java","lang":"java","label":"Java","source":"import sh.reloop.email.ReloopEmail;\nimport java.util.*;\n\nReloopEmail reloop = ReloopEmail.client(\"re_123456789\");\n\nMap<String, Object> params = new HashMap<>();\nparams.put(\"email\", \"john.doe@example.com\");\nparams.put(\"first_name\", \"John\");\nparams.put(\"last_name\", \"Doe\");\nparams.put(\"unsubscribed\", false);\nparams.put(\"properties\", Map.of(\"company\", \"Reloop\", \"role\", \"Developer\"));\nparams.put(\"group_ids\", List.of(\"grp_123456789\"));\nparams.put(\"channels\", List.of(Map.of(\"channel_id\", \"channel_123456789\", \"subscription\", \"opt_in\")));\nreloop.contacts().create(params);"},{"id":"dotnet","lang":"csharp","label":".NET","source":"using Reloop.Email;\nusing System.Collections.Generic;\n\nvar reloop = ReloopEmail.Client(\"re_123456789\");\n\nvar parameters = new Dictionary<string, object?>();\nparameters[\"email\"] = \"john.doe@example.com\";\nparameters[\"first_name\"] = \"John\";\nparameters[\"last_name\"] = \"Doe\";\nparameters[\"unsubscribed\"] = false;\nparameters[\"properties\"] = new Dictionary<string, object?>\n{\n    [\"company\"] = \"Reloop\",\n    [\"role\"] = \"Developer\",\n};\nparameters[\"group_ids\"] = new object?[] { \"grp_123456789\" };\nparameters[\"channels\"] = new object?[] { new Dictionary<string, object?>\n{\n    [\"channel_id\"] = \"channel_123456789\",\n    [\"subscription\"] = \"opt_in\",\n} };\nawait reloop.Contacts().CreateAsync(parameters);"}]
+  codeSamples:
+    - id: node
+      lang: javascript
+      label: Node.js
+      source: |-
+        import { Reloop } from "reloop-email";
+        
+        const reloop = new Reloop({ apiKey: "rl_123456789" });
+        
+        const { response: contact, error } = await reloop.contacts.create({
+          email: "john.doe@example.com",
+          firstName: "John",
+          lastName: "Doe",
+          status: "subscribed",
+          properties: { company: "Reloop", role: "Developer" },
+          groupIds: ["grp_123456789"],
+          channels: [{ channelId: "chn_123456789", subscription: "opt_in" }],
+        });
+        if (error) throw error;
+    - id: curl
+      lang: bash
+      label: cURL
+      source: |-
+        curl -X POST https://reloop.sh/api/contacts/create \\
+          -H "x-api-key: rl_123456789" \\
+          -H "Content-Type: application/json" \\
+          -d '{"email": "john.doe@example.com","firstName": "John","lastName": "Doe","status": "subscribed","properties": {"company": "Reloop","role": "Developer"},"groupIds": ["grp_123456789"],"channels": [{"channelId": "chn_123456789","subscription": "opt_in"}]}'
+    - id: python
+      lang: python
+      label: Python
+      source: |-
+        from reloop import Reloop
+        
+        reloop = Reloop(api_key="rl_123456789")
+        
+        contact = reloop.contacts.create(
+            email="john.doe@example.com",
+            first_name="John",
+            last_name="Doe",
+            status="subscribed",
+            properties={"company": "Reloop", "role": "Developer"},
+            group_ids=["grp_123456789"],
+            channels=[{"channel_id": "chn_123456789", "subscription": "opt_in"}],
+        )
+    - id: php
+      lang: php
+      label: PHP
+      source: |-
+        $reloop = Reloop::client('rl_123456789');
+        
+        $contact = $reloop->contacts->create([
+            'email' => 'john.doe@example.com',
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'status' => 'subscribed',
+            'properties' => ['company' => 'Reloop', 'role' => 'Developer'],
+            'group_ids' => ['grp_123456789'],
+            'channels' => [['channel_id' => 'chn_123456789', 'subscription' => 'opt_in']],
+        ]);
+    - id: java
+      lang: java
+      label: Java
+      source: |-
+        import sh.reloop.ReloopClient;
+        import sh.reloop.models.Models.*;
+        
+        ReloopClient reloop = new ReloopClient("rl_123456789");
+        
+        Contact contact = reloop.contacts.create(Map.of(
+            "email", "john.doe@example.com",
+            "firstName", "John",
+            "lastName", "Doe",
+            "status", "subscribed"
+        ));
+    - id: dotnet
+      lang: csharp
+      label: .NET
+      source: |-
+        using Reloop;
+        using Reloop.Models;
+        
+        var reloop = new ReloopClient("rl_123456789");
+        
+        var contact = await reloop.Contacts.CreateAsync(new Dictionary<string, object?>
+        {
+            ["email"] = "john.doe@example.com",
+            ["firstName"] = "John",
+            ["lastName"] = "Doe",
+            ["status"] = "subscribed",
+        });
+    - id: go
+      lang: go
+      label: Go
+      source: |-
+        import reloop "github.com/reloop-labs/reloop-go"
+        
+        client, _ := reloop.NewClient(reloop.ClientOptions{
+            APIKey: "rl_123456789",
+        })
+        
+        contact, _ := client.Contacts.Create(map[string]interface{}{
+            "email": "john.doe@example.com",
+            "firstName": "John",
+            "lastName": "Doe",
+            "status": "subscribed",
+        })
+    - id: rust
+      lang: rust
+      label: Rust
+      source: |-
+        use reloop::ReloopClient;
+        #[tokio::main]
+        async fn main() -> Result<(), Box<dyn std::error::Error>> {
+            let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+        
+            reloop.contacts().create(CreateContactParams {
+                email: "john.doe@example.com".to_string(),
+                first_name: Some("John".to_string()),
+                last_name: Some("Doe".to_string()),
+                status: Some(ContactStatus::Subscribed),
+                ..Default::default()
+            }).await?;
+        
+            Ok(())
+        }
+    - id: ruby
+      lang: ruby
+      label: Ruby
+      source: |-
+        require "reloop"
+        
+        reloop = Reloop::Client.new(api_key: "rl_123456789")
+        
+        contact = reloop.contacts.create(
+          email: "john.doe@example.com",
+          first_name: "John",
+          last_name: "Doe",
+          status: "subscribed",
+          properties: { company: "Reloop", role: "Developer" },
+          group_ids: ["grp_123456789"],
+          channels: [{ channel_id: "chn_123456789", subscription: "opt_in" }],
+        )
+    - id: elixir
+      lang: elixir
+      label: Elixir
+      source: |-
+        client = Reloop.client("rl_123456789")
+        
+        {:ok, contact} = Reloop.Services.Contacts.create(client, %{
+          email: "john.doe@example.com",
+          first_name: "John",
+          last_name: "Doe",
+          status: "subscribed",
+          properties: %{company: "Reloop", role: "Developer"},
+          group_ids: ["grp_123456789"],
+          channels: [%{channel_id: "chn_123456789", subscription: "opt_in"}]
+        })
 ---
 
 {/* This file was generated by the OpenAPI doc generator. Do not edit this file directly. Run `bun run generate:api-docs` to regenerate. */}

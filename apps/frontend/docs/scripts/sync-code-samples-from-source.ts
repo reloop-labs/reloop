@@ -58,6 +58,7 @@ function normalizeRouteKey(pathValue: string, method: string): string {
 	const cleaned = pathValue.replace(/^['"]|['"]$/g, "");
 	const templated = cleaned
 		.replace(/\/cont_[^/\s?]+/g, "/{contact_id}")
+		.replace(/\/dom_[^/\s?]+/g, "/{domain_id}")
 		.replace(/\/grp_[^/\s?]+/g, "/{group_id}")
 		.replace(/\/chn_[^/\s?]+/g, "/{channel_id}")
 		.replace(/\/channel_[^/\s?]+/g, "/{channel_id}")
@@ -194,6 +195,7 @@ function bumpWatcherTrigger(): void {
 const services = [
 	{ name: "contacts", dir: path.join(BACKEND_ROOT, "contacts/src/routes") },
 	{ name: "api-key", dir: path.join(BACKEND_ROOT, "api-key/src/routes") },
+	{ name: "domain", dir: path.join(BACKEND_ROOT, "domain/src/routes") },
 	{ name: "template", dir: path.join(BACKEND_ROOT, "template/src/routes") },
 ];
 

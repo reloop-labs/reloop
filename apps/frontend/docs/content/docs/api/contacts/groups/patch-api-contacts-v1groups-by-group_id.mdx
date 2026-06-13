@@ -13,7 +13,101 @@ _apiData:
   operationData: [{"path":"/api/contacts/v1/groups/{group_id}","method":"patch"}]
   parameterList: [{"name":"group_id","type":"string","required":true,"description":"","location":"path"},{"name":"name","type":"string","required":true,"description":"Group name","location":"body","minLength":1,"maxLength":255}]
   responseMap: {"200":{"description":"Response for status 200","schema":{"object":"contact_group","id":"con_123456789","name":"Newsletter","createdAt":"2026-03-23T10:00:00.000Z","updatedAt":"2026-03-23T10:00:00.000Z","event":"evt_123456789"}},"403":{"description":"Response for status 403","schema":{"message":"Unauthorized access","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead."}},"404":{"description":"Response for status 404","schema":{"message":"Group not found","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead."}},"409":{"description":"Response for status 409","schema":{"message":"Group already exists","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead."}}}
-  codeSamples: [{"id":"node","lang":"js","label":"Node.js","source":"import Reloop from 'reloop-email';\n\nconst reloop = new Reloop('re_123456789');\n\nconst { response: group, error } = await reloop.contacts().updateGroup('grp_123456789', {\n  name: 'Early Access',\n});\nif (error) throw error;"},{"id":"curl","lang":"bash","label":"cURL","source":"curl -X PATCH https://reloop.sh/api/contacts/v1/groups/grp_123456789 \\\n  -H \"x-api-key: re_123456789\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n  \"name\": \"Early Access\"\n}'"},{"id":"php","lang":"php","label":"PHP","source":"$reloop = Reloop::client('re_123456789');\n\n$reloop->contacts->updateGroup(\n  'grp_123456789',\n  parameters: [\n      'name' => 'Early Access',\n  ],\n);"},{"id":"python","lang":"python","label":"Python","source":"from reloop_email import Reloop\n\nreloop = Reloop(api_key=\"re_123456789\")\n\nreloop.contacts().update_group(\n    \"grp_123456789\",\n    name=\"Early Access\"\n)"},{"id":"ruby","lang":"ruby","label":"Ruby","source":"require 'net/http'\nrequire 'json'\n\nuri = URI('https://reloop.sh/api/contacts/v1/groups/grp_123456789')\nhttp = Net::HTTP.new(uri.host, uri.port)\nhttp.use_ssl = true\n\nrequest = Net::HTTP::Patch.new(uri)\nrequest['x-api-key'] = 're_123456789'\nrequest['Content-Type'] = 'application/json'\nrequest.body = { name: 'Early Access' }.to_json\n\nresponse = http.request(request)\ngroup = JSON.parse(response.body)"},{"id":"go","lang":"go","label":"Go","source":"import reloopemail \"github.com/reloop-labs/reloop-email\"\n\nfunc main() {\n    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{\n        APIKey: \"re_123456789\",\n    })\n    \n    _, _ = reloop.Contacts().UpdateGroup(\"grp_123456789\", map[string]interface{}{\n        \"name\": \"Early Access\"\n    })\n}"},{"id":"rust","lang":"rust","label":"Rust","source":"use reloop_email::ReloopEmail;\nuse serde_json::json;\n\n#[tokio::main]\nasync fn main() -> Result<(), Box<dyn std::error::Error>> {\n    let reloop = ReloopEmail::new(\"re_123456789\".to_string(), None);\n    \n    reloop.contacts().update_group(\"grp_123456789\", json!({\n        \"name\": \"Early Access\",\n    })).await?;\n\n    Ok(())\n}"},{"id":"java","lang":"java","label":"Java","source":"import sh.reloop.email.ReloopEmail;\nimport java.util.*;\n\nReloopEmail reloop = ReloopEmail.client(\"re_123456789\");\n\nreloop.contacts().updateGroup(\"grp_123456789\", Map.of(\"name\", \"Early Access\"));"},{"id":"dotnet","lang":"csharp","label":".NET","source":"using Reloop.Email;\nusing System.Collections.Generic;\n\nvar reloop = ReloopEmail.Client(\"re_123456789\");\n\nawait reloop.Contacts().UpdateGroupAsync(\"grp_123456789\", new Dictionary<string, object?>\n{\n    [\"name\"] = \"Early Access\",\n});"}]
+  codeSamples:
+    - id: node
+      lang: javascript
+      label: Node.js
+      source: |-
+        import { Reloop } from "reloop-email";
+        
+        const reloop = new Reloop({ apiKey: "rl_123456789" });
+        
+        const { response: group, error } = await reloop.contacts.updateGroup("grp_123456789", { name: "Loyal Customers" });
+        if (error) throw error;
+    - id: curl
+      lang: bash
+      label: cURL
+      source: |-
+        curl -X PATCH https://reloop.sh/api/contacts/v1/groups/grp_123456789 \\
+          -H "x-api-key: rl_123456789" \\
+          -H "Content-Type: application/json" \\
+          -d '{"name": "Loyal Customers"}'
+    - id: python
+      lang: python
+      label: Python
+      source: |-
+        from reloop import Reloop
+        
+        reloop = Reloop(api_key="rl_123456789")
+        
+        group = reloop.contacts.update_group("grp_123456789", name="Loyal Customers")
+    - id: php
+      lang: php
+      label: PHP
+      source: |-
+        $reloop = Reloop::client('rl_123456789');
+        
+        $group = $reloop->contacts->updateGroup('grp_123456789', ['name' => 'Loyal Customers']);
+    - id: java
+      lang: java
+      label: Java
+      source: |-
+        import sh.reloop.ReloopClient;
+        import sh.reloop.models.Models.*;
+        
+        ReloopClient reloop = new ReloopClient("rl_123456789");
+        
+        reloop.contacts.updateGroup("grp_123456789", Map.of("name", "Loyal Customers"));
+    - id: dotnet
+      lang: csharp
+      label: .NET
+      source: |-
+        using Reloop;
+        using Reloop.Models;
+        
+        var reloop = new ReloopClient("rl_123456789");
+        
+        await reloop.Contacts.UpdateGroupAsync("grp_123456789", new Dictionary<string, object?> { ["name"] = "Loyal Customers" });
+    - id: go
+      lang: go
+      label: Go
+      source: |-
+        import reloop "github.com/reloop-labs/reloop-go"
+        
+        client, _ := reloop.NewClient(reloop.ClientOptions{
+            APIKey: "rl_123456789",
+        })
+        
+        group, _ := client.Contacts.UpdateGroup("grp_123456789", map[string]interface{"name": "Loyal Customers"})
+    - id: rust
+      lang: rust
+      label: Rust
+      source: |-
+        use reloop::ReloopClient;
+        #[tokio::main]
+        async fn main() -> Result<(), Box<dyn std::error::Error>> {
+            let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+        
+            reloop.contacts().update_group("grp_123456789", UpdateGroupParams { name: "Loyal Customers".to_string() }).await?;
+        
+            Ok(())
+        }
+    - id: ruby
+      lang: ruby
+      label: Ruby
+      source: |-
+        require "reloop"
+        
+        reloop = Reloop::Client.new(api_key: "rl_123456789")
+        
+        group = reloop.contacts.update_group("grp_123456789", name: "Loyal Customers")
+    - id: elixir
+      lang: elixir
+      label: Elixir
+      source: |-
+        client = Reloop.client("rl_123456789")
+        
+        {:ok, group} = Reloop.Services.Contacts.update_group(client, "grp_123456789", %{name: "Loyal Customers"})
 ---
 
 {/* This file was generated by the OpenAPI doc generator. Do not edit this file directly. Run `bun run generate:api-docs` to regenerate. */}

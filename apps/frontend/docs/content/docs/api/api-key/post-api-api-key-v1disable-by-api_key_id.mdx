@@ -13,7 +13,99 @@ _apiData:
   operationData: [{"path":"/api/api-key/v1/disable/{api_key_id}","method":"post"}]
   parameterList: [{"name":"api_key_id","type":"string","required":true,"description":"API Key identifier","location":"path"}]
   responseMap: {"200":{"description":"Response for status 200","schema":{"id":"key_123456789","name":"Production API Key","start":"rl_live","prefix":"rl","enabled":true,"requestCount":150,"createdAt":"2026-03-29T10:00:00Z","updatedAt":"2026-03-29T10:00:00Z","permissions":"read,write","createdBy":{"id":"user_123","name":"John Doe","email":"john@example.com"}}},"403":{"description":"Response for status 403","schema":{"message":"Unauthorized access"}},"404":{"description":"Response for status 404","schema":{"message":"API key not found"}}}
-  codeSamples: [{"id":"node","lang":"javascript","label":"Node.js","source":"import Reloop from 'reloop-email';\n\nconst reloop = new Reloop(\"rl_123456789\");\n\nconst apiKey = await reloop.apiKey.disable(\"key_123456789\");"},{"id":"curl","lang":"bash","label":"cURL","source":"curl -X POST https://api.reloop.sh/api-key/v1/disable/key_123456789 \\\n  -H \"Authorization: Bearer rl_123456789\""},{"id":"python","lang":"python","label":"Python","source":"from reloop_email import Reloop\n\nreloop = Reloop(api_key=\"rl_123456789\")\n\nreloop.api_keys.disable(\"key_123456789\")"},{"id":"rust","lang":"rust","label":"Rust","source":"use reloop_email::ReloopEmail;\nuse serde_json::json;\n\n#[tokio::main]\nasync fn main() -> Result<(), Box<dyn std::error::Error>> {\n    let reloop = ReloopEmail::new(\"rl_123456789\".to_string(), None);\n    \n    reloop.api_keys().disable(\"key_123456789\").await?;\n\n    Ok(())\n}"},{"id":"go","lang":"go","label":"Go","source":"import reloopemail \"github.com/reloop-labs/reloop-email\"\n\nfunc main() {\n    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{\n        APIKey: \"rl_123456789\",\n    })\n    \n    _, _ = reloop.ApiKeys().Disable(\"key_123456789\")\n}"},{"id":"php","lang":"php","label":"PHP","source":"$reloop = Reloop::client('rl_123456789');\n\n$reloop->apiKeys->disable('key_123456789');"},{"id":"java","lang":"java","label":"Java","source":"import sh.reloop.email.ReloopEmail;\n\nReloopEmail reloop = ReloopEmail.client(\"rl_123456789\");\n\nreloop.apiKeys().disable(\"key_123456789\");"},{"id":"dotnet","lang":"csharp","label":".NET","source":"using Reloop.Email;\nusing Reloop.Email.Models;\n\nvar reloop = ReloopEmail.Client(\"rl_123456789\");\n\nawait reloop.ApiKeys().DisableAsync(\"key_123456789\");"}]
+  codeSamples:
+    - id: node
+      lang: javascript
+      label: Node.js
+      source: |-
+        import { Reloop } from "reloop-email";
+        
+        const reloop = new Reloop({ apiKey: "rl_123456789" });
+        
+        const { response, error } = await reloop.apiKey.disable("key_123456789");
+        if (error) throw error;
+    - id: curl
+      lang: bash
+      label: cURL
+      source: |-
+        curl -X POST https://reloop.sh/api/api-key/v1/disable/key_123456789 \\
+          -H "x-api-key: rl_123456789"
+    - id: python
+      lang: python
+      label: Python
+      source: |-
+        from reloop import Reloop
+        
+        reloop = Reloop(api_key="rl_123456789")
+        
+        reloop.api_keys.disable("key_123456789")
+    - id: php
+      lang: php
+      label: PHP
+      source: |-
+        $reloop = Reloop::client('rl_123456789');
+        
+        $reloop->apiKeys->disable('key_123456789');
+    - id: java
+      lang: java
+      label: Java
+      source: |-
+        import sh.reloop.ReloopClient;
+        import sh.reloop.models.Models.*;
+        
+        ReloopClient reloop = new ReloopClient("rl_123456789");
+        
+        reloop.apiKeys.disable("key_123456789");
+    - id: dotnet
+      lang: csharp
+      label: .NET
+      source: |-
+        using Reloop;
+        using Reloop.Models;
+        
+        var reloop = new ReloopClient("rl_123456789");
+        
+        await reloop.ApiKeys.DisableAsync("key_123456789");
+    - id: go
+      lang: go
+      label: Go
+      source: |-
+        import reloop "github.com/reloop-labs/reloop-go"
+        
+        client, _ := reloop.NewClient(reloop.ClientOptions{
+            APIKey: "rl_123456789",
+        })
+        
+        _, _ = client.ApiKeys.Disable("key_123456789")
+    - id: rust
+      lang: rust
+      label: Rust
+      source: |-
+        use reloop::ReloopClient;
+        #[tokio::main]
+        async fn main() -> Result<(), Box<dyn std::error::Error>> {
+            let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+        
+            reloop.api_keys().disable("key_123456789").await?;
+        
+            Ok(())
+        }
+    - id: ruby
+      lang: ruby
+      label: Ruby
+      source: |-
+        require "reloop"
+        
+        reloop = Reloop::Client.new(api_key: "rl_123456789")
+        
+        reloop.api_keys.disable("key_123456789")
+    - id: elixir
+      lang: elixir
+      label: Elixir
+      source: |-
+        client = Reloop.client("rl_123456789")
+        
+        {:ok, result} = Reloop.Services.ApiKey.disable(client, "key_123456789")
 ---
 
 {/* This file was generated by the OpenAPI doc generator. Do not edit this file directly. Run `bun run generate:api-docs` to regenerate. */}

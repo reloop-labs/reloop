@@ -13,7 +13,105 @@ _apiData:
   operationData: [{"path":"/api/api-key/v1/{api_key_id}","method":"patch"}]
   parameterList: [{"name":"api_key_id","type":"string","required":true,"description":"API Key identifier","location":"path"},{"name":"name","type":"string","required":true,"description":"Name for the API key","location":"body","minLength":1,"maxLength":255}]
   responseMap: {"200":{"description":"Response for status 200","schema":{"id":"key_123456789","name":"Production API Key","start":"rl_live","prefix":"rl","enabled":true,"requestCount":150,"createdAt":"2026-03-29T10:00:00Z","updatedAt":"2026-03-29T10:00:00Z","permissions":"read,write","createdBy":{"id":"user_123","name":"John Doe","email":"john@example.com"}}},"403":{"description":"Response for status 403","schema":{"message":"Unauthorized access"}},"404":{"description":"Response for status 404","schema":{"message":"API key not found"}}}
-  codeSamples: [{"id":"node","lang":"javascript","label":"Node.js","source":"import Reloop from 'reloop-email';\n\nconst reloop = new Reloop(\"rl_123456789\");\n\nconst apiKey = await reloop.apiKey.update(\"key_123456789\", {\n  name: \"Updated production key\",\n  enabled: true\n});"},{"id":"curl","lang":"bash","label":"cURL","source":"curl -X PATCH https://api.reloop.sh/api-key/v1/key_123456789 \\\n  -H \"Authorization: Bearer rl_123456789\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"name\": \"Updated production key\",\n    \"enabled\": true\n  }'"},{"id":"python","lang":"python","label":"Python","source":"from reloop_email import Reloop\n\nreloop = Reloop(api_key=\"rl_123456789\")\n\nreloop.api_keys.update(\n    \"key_123456789\",\n    name=\"Updated production key\",\n    enabled=True\n)"},{"id":"rust","lang":"rust","label":"Rust","source":"use reloop_email::ReloopEmail;\nuse serde_json::json;\nuse reloop_email::{CreateApiKeyParams, UpdateApiKeyParams, ApiKeyListParams};\n\n#[tokio::main]\nasync fn main() -> Result<(), Box<dyn std::error::Error>> {\n    let reloop = ReloopEmail::new(\"rl_123456789\".to_string(), None);\n    \n    reloop.api_keys().update(\"key_123456789\", UpdateApiKeyParams {\n            name: Some(\"Updated production key\".to_string()),\n        enabled: Some(true),\n        }).await?;\n\n    Ok(())\n}"},{"id":"go","lang":"go","label":"Go","source":"import reloopemail \"github.com/reloop-labs/reloop-email\"\n\nfunc main() {\n    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{\n        APIKey: \"rl_123456789\",\n    })\n    \n    _, _ = reloop.ApiKeys().Update(\"key_123456789\", reloop.UpdateApiKeyParams{\n        Name: \"Updated production key\",\n        Enabled: reloop.Bool(true)\n    })\n}"},{"id":"php","lang":"php","label":"PHP","source":"$reloop = Reloop::client('rl_123456789');\n\n$reloop->apiKeys->update(\n  'key_123456789',\n  parameters: [\n    'name' => 'Updated production key',\n    'enabled' => true,\n  ],\n);"},{"id":"java","lang":"java","label":"Java","source":"import sh.reloop.email.ReloopEmail;\nimport sh.reloop.email.Models.*;\n\nReloopEmail reloop = ReloopEmail.client(\"rl_123456789\");\n\nreloop.apiKeys().update(\"key_123456789\", new UpdateApiKeyParams(\"Updated production key\", true));"},{"id":"dotnet","lang":"csharp","label":".NET","source":"using Reloop.Email;\nusing Reloop.Email.Models;\n\nvar reloop = ReloopEmail.Client(\"rl_123456789\");\n\nawait reloop.ApiKeys().UpdateAsync(\"key_123456789\", new UpdateApiKeyParams\n{\n    Name = \"Updated production key\",\n    Enabled = true,\n});"}]
+  codeSamples:
+    - id: node
+      lang: javascript
+      label: Node.js
+      source: |-
+        import { Reloop } from "reloop-email";
+        
+        const reloop = new Reloop({ apiKey: "rl_123456789" });
+        
+        const { response: apiKey, error } = await reloop.apiKey.update("key_123456789", { name: "Updated Key Name" });
+        if (error) throw error;
+    - id: curl
+      lang: bash
+      label: cURL
+      source: |-
+        curl -X PATCH https://reloop.sh/api/api-key/v1/key_123456789 \\
+          -H "x-api-key: rl_123456789" \\
+          -H "Content-Type: application/json" \\
+          -d '{"name": "Updated Key Name"}'
+    - id: python
+      lang: python
+      label: Python
+      source: |-
+        from reloop import Reloop
+        
+        reloop = Reloop(api_key="rl_123456789")
+        
+        api_key = reloop.api_keys.update("key_123456789", name="Updated Key Name")
+    - id: php
+      lang: php
+      label: PHP
+      source: |-
+        $reloop = Reloop::client('rl_123456789');
+        
+        $apiKey = $reloop->apiKeys->update('key_123456789', ['name' => 'Updated Key Name']);
+    - id: java
+      lang: java
+      label: Java
+      source: |-
+        import sh.reloop.ReloopClient;
+        import sh.reloop.models.Models.*;
+        
+        ReloopClient reloop = new ReloopClient("rl_123456789");
+        
+        ApiKey apiKey = reloop.apiKeys.update("key_123456789", new UpdateApiKeyParams("Updated Key Name"));
+    - id: dotnet
+      lang: csharp
+      label: .NET
+      source: |-
+        using Reloop;
+        using Reloop.Models;
+        
+        var reloop = new ReloopClient("rl_123456789");
+        
+        var apiKey = await reloop.ApiKeys.UpdateAsync("key_123456789", new UpdateApiKeyParams(Name: "Updated Key Name"));
+    - id: go
+      lang: go
+      label: Go
+      source: |-
+        import reloop "github.com/reloop-labs/reloop-go"
+        
+        client, _ := reloop.NewClient(reloop.ClientOptions{
+            APIKey: "rl_123456789",
+        })
+        
+        apiKey, _ := client.ApiKeys.Update("key_123456789", reloop.UpdateApiKeyParams{
+            Name: "Updated Key Name",
+        })
+    - id: rust
+      lang: rust
+      label: Rust
+      source: |-
+        use reloop::ReloopClient;
+        #[tokio::main]
+        async fn main() -> Result<(), Box<dyn std::error::Error>> {
+            let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+        
+            reloop.api_keys().update("key_123456789", UpdateApiKeyParams {
+                name: "Updated Key Name".to_string(),
+            }).await?;
+        
+            Ok(())
+        }
+    - id: ruby
+      lang: ruby
+      label: Ruby
+      source: |-
+        require "reloop"
+        
+        reloop = Reloop::Client.new(api_key: "rl_123456789")
+        
+        api_key = reloop.api_keys.update("key_123456789", name: "Updated Key Name")
+    - id: elixir
+      lang: elixir
+      label: Elixir
+      source: |-
+        client = Reloop.client("rl_123456789")
+        
+        {:ok, api_key} = Reloop.Services.ApiKey.update(client, "key_123456789", %{name: "Updated Key Name"})
 ---
 
 {/* This file was generated by the OpenAPI doc generator. Do not edit this file directly. Run `bun run generate:api-docs` to regenerate. */}

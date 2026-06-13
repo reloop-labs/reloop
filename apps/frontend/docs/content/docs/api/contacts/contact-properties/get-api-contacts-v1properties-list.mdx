@@ -13,7 +13,99 @@ _apiData:
   operationData: [{"path":"/api/contacts/v1/properties/list","method":"get"}]
   parameterList: [{"name":"page","type":"number","required":false,"description":"","location":"query","defaultValue":1,"minimum":1},{"name":"limit","type":"number","required":false,"description":"","location":"query","defaultValue":10,"minimum":1,"maximum":100},{"name":"search","type":"string","required":false,"description":"Search by name","location":"query"},{"name":"type","type":"\"string\" | \"number\"","required":false,"description":"","location":"query","enumValues":["string","number"]},{"name":"organizationId","type":"string","required":false,"description":"","location":"query"}]
   responseMap: {"200":{"description":"Response for status 200","schema":{"object":"contact_property","properties":[{"object":"contact_property","id":"prop_123456789","propertyName":"company_name","propertyType":"string","defaultValue":"Unknown","createdAt":"2026-03-27T10:00:00Z","updatedAt":"2026-03-27T10:00:00Z"}],"total":1,"page":0,"limit":0,"event":"evt_123456789"}},"401":{"description":"Response for status 401","schema":{"message":"Unauthorized access","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead."}}}
-  codeSamples: [{"id":"node","lang":"js","label":"Node.js","source":"import Reloop from 'reloop-email';\n\nconst reloop = new Reloop('re_123456789');\n\nconst { response: properties, error } = await reloop.contacts().listProperties({\n  page: 1,\n  limit: 10,\n});\nif (error) throw error;"},{"id":"curl","lang":"bash","label":"cURL","source":"curl \"https://reloop.sh/api/contacts/v1/properties/list?page=1&limit=10\" \\\n  -H \"x-api-key: re_123456789\""},{"id":"php","lang":"php","label":"PHP","source":"$reloop = Reloop::client('re_123456789');\n\n$reloop->contacts->listProperties(\n  options: [\n      'page' => 1,\n      'limit' => 10,\n  ],\n);"},{"id":"python","lang":"python","label":"Python","source":"from reloop_email import Reloop\n\nreloop = Reloop(api_key=\"re_123456789\")\n\nreloop.contacts().list_properties(\n    page=1,\n    limit=10\n)"},{"id":"ruby","lang":"ruby","label":"Ruby","source":"require 'net/http'\nrequire 'json'\n\nuri = URI('https://reloop.sh/api/contacts/v1/properties/list')\nuri.query = URI.encode_www_form(page: 1, limit: 10)\nhttp = Net::HTTP.new(uri.host, uri.port)\nhttp.use_ssl = true\n\nrequest = Net::HTTP::Get.new(uri)\nrequest['x-api-key'] = 're_123456789'\n\nresponse = http.request(request)\nproperties = JSON.parse(response.body)"},{"id":"go","lang":"go","label":"Go","source":"import reloopemail \"github.com/reloop-labs/reloop-email\"\n\nfunc main() {\n    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{\n        APIKey: \"re_123456789\",\n    })\n    \n    _, _ = reloop.Contacts().ListProperties(map[string]interface{}{\n        \"page\": 1,\n        \"limit\": 10\n    })\n}"},{"id":"rust","lang":"rust","label":"Rust","source":"use reloop_email::ReloopEmail;\nuse serde_json::json;\n\n#[tokio::main]\nasync fn main() -> Result<(), Box<dyn std::error::Error>> {\n    let reloop = ReloopEmail::new(\"re_123456789\".to_string(), None);\n    \n    reloop.contacts().list_properties(json!({\n        \"page\": 1,\n        \"limit\": 10,\n    })).await?;\n\n    Ok(())\n}"},{"id":"java","lang":"java","label":"Java","source":"import sh.reloop.email.ReloopEmail;\nimport java.util.*;\n\nReloopEmail reloop = ReloopEmail.client(\"re_123456789\");\n\nreloop.contacts().listProperties(Map.of(\"page\", 1, \"limit\", 10));"},{"id":"dotnet","lang":"csharp","label":".NET","source":"using Reloop.Email;\nusing System.Collections.Generic;\n\nvar reloop = ReloopEmail.Client(\"re_123456789\");\n\nawait reloop.Contacts().ListPropertiesAsync(new Dictionary<string, object?>\n{\n    [\"page\"] = 1,\n    [\"limit\"] = 10,\n});"}]
+  codeSamples:
+    - id: node
+      lang: javascript
+      label: Node.js
+      source: |-
+        import { Reloop } from "reloop-email";
+        
+        const reloop = new Reloop({ apiKey: "rl_123456789" });
+        
+        const { response: properties, error } = await reloop.contacts.listProperties({ page: 1, limit: 10 });
+        if (error) throw error;
+    - id: curl
+      lang: bash
+      label: cURL
+      source: |-
+        curl "https://reloop.sh/api/contacts/v1/properties/list?page=1&limit=10" \\
+          -H "x-api-key: rl_123456789"
+    - id: python
+      lang: python
+      label: Python
+      source: |-
+        from reloop import Reloop
+        
+        reloop = Reloop(api_key="rl_123456789")
+        
+        properties = reloop.contacts.list_properties(page=1, limit=10)
+    - id: php
+      lang: php
+      label: PHP
+      source: |-
+        $reloop = Reloop::client('rl_123456789');
+        
+        $properties = $reloop->contacts->listProperties(['page' => 1, 'limit' => 10]);
+    - id: java
+      lang: java
+      label: Java
+      source: |-
+        import sh.reloop.ReloopClient;
+        import sh.reloop.models.Models.*;
+        
+        ReloopClient reloop = new ReloopClient("rl_123456789");
+        
+        reloop.contacts.listProperties(Map.of("page", 1, "limit", 10));
+    - id: dotnet
+      lang: csharp
+      label: .NET
+      source: |-
+        using Reloop;
+        using Reloop.Models;
+        
+        var reloop = new ReloopClient("rl_123456789");
+        
+        await reloop.Contacts.ListPropertiesAsync(new Dictionary<string, object?> { ["page"] = 1, ["limit"] = 10 });
+    - id: go
+      lang: go
+      label: Go
+      source: |-
+        import reloop "github.com/reloop-labs/reloop-go"
+        
+        client, _ := reloop.NewClient(reloop.ClientOptions{
+            APIKey: "rl_123456789",
+        })
+        
+        properties, _ := client.Contacts.ListProperties(map[string]interface{}{"page": 1, "limit": 10})
+    - id: rust
+      lang: rust
+      label: Rust
+      source: |-
+        use reloop::ReloopClient;
+        #[tokio::main]
+        async fn main() -> Result<(), Box<dyn std::error::Error>> {
+            let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+        
+            reloop.contacts().list_properties(Some(ListPropertiesParams { page: Some(1), limit: Some(10), ..Default::default() })).await?;
+        
+            Ok(())
+        }
+    - id: ruby
+      lang: ruby
+      label: Ruby
+      source: |-
+        require "reloop"
+        
+        reloop = Reloop::Client.new(api_key: "rl_123456789")
+        
+        properties = reloop.contacts.list_properties(page: 1, limit: 10)
+    - id: elixir
+      lang: elixir
+      label: Elixir
+      source: |-
+        client = Reloop.client("rl_123456789")
+        
+        {:ok, properties} = Reloop.Services.Contacts.list_properties(client, %{page: 1, limit: 10})
 ---
 
 {/* This file was generated by the OpenAPI doc generator. Do not edit this file directly. Run `bun run generate:api-docs` to regenerate. */}

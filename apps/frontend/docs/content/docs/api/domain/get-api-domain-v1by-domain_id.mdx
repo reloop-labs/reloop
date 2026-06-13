@@ -13,7 +13,99 @@ _apiData:
   operationData: [{"path":"/api/domain/v1/{domain_id}","method":"get"}]
   parameterList: [{"name":"domain_id","type":"string","required":true,"description":"","location":"path"}]
   responseMap: {"200":{"description":"Response for status 200","schema":{"object":"domain","id":"con_123456789","domain":"send.example.com","status":"pending","userVerifiedDomain":true,"systemVerified":true,"customReturnPath":"inbound","trackingSubdomain":"tracking","isClickTrackingEnabled":true,"isOpenTrackingEnabled":true,"tls":"opportunistic","isTrackingDomain":true,"isSendingEmailEnabled":true,"isReceivingEmailEnabled":true,"verificationFailedReason":"example_verificationFailedReason","dnsRecords":[{"id":"dns_123456789","recordType":"MX","recordTypeName":"MX","domain":"example.com","name":"@","value":"feedback-smtp.us-east-1.amazonses.com","ttl":"Auto","priority":10,"status":"active","createdAt":"2026-03-30T10:00:00.000Z","updatedAt":"2026-03-30T10:00:00.000Z"}],"lastVerifiedAt":"2026-03-23T10:00:00.000Z","createdAt":"2026-03-23T10:00:00.000Z","updatedAt":"2026-03-23T10:00:00.000Z","event":"evt_123456789"}},"400":{"description":"Response for status 400","schema":{"message":"Invalid domain format"}},"403":{"description":"Response for status 403","schema":{"message":"Unauthorized access"}},"404":{"description":"Response for status 404","schema":{"message":"Domain not found"}}}
-  codeSamples: [{"id":"node","lang":"js","label":"Node.js","source":"const response = await fetch(\"https://api.reloop.sh/api/domain/v1/send.example.com\", {\n  method: \"GET\",\n  headers: {\n    \"x-api-key\": \"rl_123456789\"\n  }\n});\n\nconst domain = await response.json();"},{"id":"curl","lang":"bash","label":"cURL","source":"curl -X GET https://api.reloop.sh/api/domain/v1/send.example.com \\\n  -H \"x-api-key: rl_123456789\""},{"id":"python","lang":"python","label":"Python","source":"import requests\n\nresponse = requests.get(\n    \"https://api.reloop.sh/api/domain/v1/send.example.com\",\n    headers={\n        \"x-api-key\": \"rl_123456789\"\n    }\n)\n\ndomain = response.json()"},{"id":"php","lang":"php","label":"PHP","source":"<?php\n$client = new \\GuzzleHttp\\Client();\n\n$response = $client->get('https://api.reloop.sh/api/domain/v1/send.example.com', [\n    'headers' => [\n        'x-api-key' => 'rl_123456789'\n    ]\n]);\n\n$domain = json_decode($response->getBody(), true);"},{"id":"java","lang":"java","label":"Java","source":"import java.net.URI;\nimport java.net.http.*;\n\nHttpClient client = HttpClient.newHttpClient();\n\nHttpRequest request = HttpRequest.newBuilder()\n    .uri(URI.create(\"https://api.reloop.sh/api/domain/v1/send.example.com\"))\n    .header(\"x-api-key\", \"rl_123456789\")\n    .GET()\n    .build();\n\nHttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());"},{"id":"dotnet","lang":"csharp","label":".NET","source":"using System.Net.Http;\n\nvar client = new HttpClient();\nclient.DefaultRequestHeaders.Add(\"x-api-key\", \"rl_123456789\");\n\nvar response = await client.GetAsync(\n    \"https://api.reloop.sh/api/domain/v1/send.example.com\"\n);"}]
+  codeSamples:
+    - id: node
+      lang: javascript
+      label: Node.js
+      source: |-
+        import { Reloop } from "reloop-email";
+        
+        const reloop = new Reloop({ apiKey: "rl_123456789" });
+        
+        const { response, error } = await reloop.domain.get("dom_123456789");
+        if (error) throw error;
+    - id: curl
+      lang: bash
+      label: cURL
+      source: |-
+        curl "https://reloop.sh/api/domain/v1/dom_123456789" \\
+          -H "x-api-key: rl_123456789"
+    - id: python
+      lang: python
+      label: Python
+      source: |-
+        from reloop import Reloop
+        
+        reloop = Reloop(api_key="rl_123456789")
+        
+        result = reloop.domain.get("dom_123456789")
+    - id: php
+      lang: php
+      label: PHP
+      source: |-
+        $reloop = Reloop::client('rl_123456789');
+        
+        $result = $reloop->domain->get('dom_123456789');
+    - id: java
+      lang: java
+      label: Java
+      source: |-
+        import sh.reloop.ReloopClient;
+        import sh.reloop.models.Models.*;
+        
+        ReloopClient reloop = new ReloopClient("rl_123456789");
+        
+        var result = reloop.domain.get("dom_123456789");
+    - id: dotnet
+      lang: csharp
+      label: .NET
+      source: |-
+        using Reloop;
+        using Reloop.Models;
+        
+        var reloop = new ReloopClient("rl_123456789");
+        
+        var result = await reloop.Domain.GetAsync("dom_123456789");
+    - id: go
+      lang: go
+      label: Go
+      source: |-
+        import reloop "github.com/reloop-labs/reloop-go"
+        
+        client, _ := reloop.NewClient(reloop.ClientOptions{
+            APIKey: "rl_123456789",
+        })
+        
+        result, _ := client.Domain.Get("dom_123456789")
+    - id: rust
+      lang: rust
+      label: Rust
+      source: |-
+        use reloop::ReloopClient;
+        #[tokio::main]
+        async fn main() -> Result<(), Box<dyn std::error::Error>> {
+            let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+        
+            reloop.domain().get("dom_123456789").await?;
+        
+            Ok(())
+        }
+    - id: ruby
+      lang: ruby
+      label: Ruby
+      source: |-
+        require "reloop"
+        
+        reloop = Reloop::Client.new(api_key: "rl_123456789")
+        
+        result = reloop.domain.get("dom_123456789")
+    - id: elixir
+      lang: elixir
+      label: Elixir
+      source: |-
+        client = Reloop.client("rl_123456789")
+        
+        {:ok, result} = Reloop.Services.Domain.get(client, "dom_123456789")
 ---
 
 {/* This file was generated by the OpenAPI doc generator. Do not edit this file directly. Run `bun run generate:api-docs` to regenerate. */}
