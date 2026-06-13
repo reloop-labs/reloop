@@ -4,8 +4,7 @@ import { cn } from "@reloop/ui/cn";
 import { CodeBlock } from "@reloop/ui/code-block";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "motion/react";
-import { useRef, useState, useEffect } from "react";
-import { useId } from "react"; // (Not used here but keeping the import format clean)
+import { useEffect, useId, useRef, useState } from "react"; // (Not used here but keeping the import format clean)
 
 export type CopyCodeBlockIcon = {
 	path: string;
@@ -110,7 +109,9 @@ export function CopyCodeBlock({
 		};
 	};
 
-	const highlightedTabPosition = mounted ? getTabPosition(highlightedTab) : null;
+	const highlightedTabPosition = mounted
+		? getTabPosition(highlightedTab)
+		: null;
 	const activeTabPosition = mounted ? getTabPosition(activeTabButton) : null;
 	const highlightedPillPosition = getPillPosition(highlightedTabPosition);
 
@@ -259,7 +260,7 @@ export function CopyCodeBlock({
 					code={code}
 					lang={lang}
 					className={cn(
-						"[&>pre]:!p-3 [&_.line]:!pl-[2.75rem] [&_.line::before]:!w-9 [&_.line::before]:!pr-2 text-[12.5px] leading-5 sm:text-[13px] sm:leading-[1.3125rem] [&_.line::before]:text-[10.5px]",
+						"[&>pre]:!pt-1 [&>pre]:!pb-1.5 [&>pre]:!px-2 [&_.line]:!pl-8 [&_.line::before]:!w-6 [&_.line::before]:!pr-1.5 text-[12.5px] leading-5 sm:text-[13px] sm:leading-[1.3125rem] [&_.line::before]:text-[10.5px]",
 						maxHeight &&
 							"[&>pre]:!max-h-[var(--code-max-height)] [&>pre]:!overflow-y-auto",
 					)}

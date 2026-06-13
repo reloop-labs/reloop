@@ -11,6 +11,7 @@ import {
 	siDotnet,
 	siGnubash,
 	siGo,
+	siJson,
 	siNodedotjs,
 	siOpenjdk,
 	siPhp,
@@ -514,6 +515,7 @@ function ParameterRow({
 /* ─── Response Card ─────────────────────────────────────── */
 
 const LANGUAGE_ICONS: Record<string, any> = {
+	json: siJson,
 	node: siNodedotjs,
 	nodejs: siNodedotjs,
 	javascript: siNodedotjs,
@@ -538,9 +540,15 @@ function getIconForSample(sampleId: string, lang: string) {
 		LANGUAGE_ICONS[sampleId.toLowerCase()] ||
 		LANGUAGE_ICONS[lang.toLowerCase()] ||
 		siGnubash;
+	
+	let hex = icon.hex;
+	if (sampleId.toLowerCase() === "json" || lang.toLowerCase() === "json") {
+		hex = "f59e0b"; // Use amber gold for JSON for readability
+	}
+
 	return {
 		path: icon.path,
-		hex: icon.hex,
+		hex: hex,
 	};
 }
 
