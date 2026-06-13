@@ -48,25 +48,25 @@ export async function GET(request: NextRequest) {
 	let methodText = "#9ca3af";
 
 	if (method === "GET") {
-		methodBg = "rgba(59, 130, 246, 0.12)";
-		methodBorder = "rgba(59, 130, 246, 0.3)";
-		methodText = "#60a5fa";
-	} else if (method === "POST") {
 		methodBg = "rgba(16, 185, 129, 0.12)";
 		methodBorder = "rgba(16, 185, 129, 0.3)";
 		methodText = "#34d399";
+	} else if (method === "POST") {
+		methodBg = "rgba(99, 102, 241, 0.12)";
+		methodBorder = "rgba(99, 102, 241, 0.3)";
+		methodText = "#818cf8";
 	} else if (method === "PUT") {
 		methodBg = "rgba(245, 158, 11, 0.12)";
 		methodBorder = "rgba(245, 158, 11, 0.3)";
 		methodText = "#fbbf24";
-	} else if (method === "DELETE") {
+	} else if (method === "DELETE" || method === "DEL") {
 		methodBg = "rgba(239, 68, 68, 0.12)";
 		methodBorder = "rgba(239, 68, 68, 0.3)";
 		methodText = "#f87171";
 	} else if (method === "PATCH") {
-		methodBg = "rgba(139, 92, 246, 0.12)";
-		methodBorder = "rgba(139, 92, 246, 0.3)";
-		methodText = "#c084fc";
+		methodBg = "rgba(249, 115, 22, 0.12)";
+		methodBorder = "rgba(249, 115, 22, 0.3)";
+		methodText = "#fb923c";
 	}
 
 	// Prepare fonts
