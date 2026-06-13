@@ -1,148 +1,182 @@
 export const createDomainXCodeSamples = [
-	{
-		id: "node",
-		lang: "js",
-		label: "Node.js",
-		source: `const response = await fetch("https://api.reloop.sh/api/domain/v1/create", {
-  method: "POST",
-  headers: {
-    "x-api-key": "rl_123456789",
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    domain: "send.example.com",
-    customReturnPath: "send",
-    clickTracking: true,
-    openTracking: true,
-    tls: "opportunistic",
-    sendingEmail: true,
-    receivingEmail: true
-  })
-});
+  {
+    id: "node",
+    lang: "javascript",
+    label: "Node.js",
+    source: `import { Reloop } from "reloop-email";
 
-const domain = await response.json();`,
-	},
-	{
-		id: "curl",
-		lang: "bash",
-		label: "cURL",
-		source: `curl -X POST https://api.reloop.sh/api/domain/v1/create \\
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { response: domain, error } = await reloop.domain.create({
+  domain: "send.example.com",
+  custom_return_path: "inbound",
+  click_tracking: true,
+  open_tracking: true,
+  tls: "opportunistic",
+  sending_email: true,
+  receiving_email: true,
+});
+if (error) throw error;`,
+  },
+  {
+    id: "curl",
+    lang: "bash",
+    label: "cURL",
+    source: `curl -X POST https://reloop.sh/api/domain/v1/create \\
   -H "x-api-key: rl_123456789" \\
   -H "Content-Type: application/json" \\
-  -d '{
-    "domain": "send.example.com",
-    "customReturnPath": "send",
-    "clickTracking": true,
-    "openTracking": true,
-    "tls": "opportunistic",
-    "sendingEmail": true,
-    "receivingEmail": true
-  }'`,
-	},
-	{
-		id: "python",
-		lang: "python",
-		label: "Python",
-		source: `import requests
+  -d '{"domain": "send.example.com","custom_return_path": "inbound","click_tracking": true,"open_tracking": true,"tls": "opportunistic","sending_email": true,"receiving_email": true}'`,
+  },
+  {
+    id: "python",
+    lang: "python",
+    label: "Python",
+    source: `from reloop import Reloop
 
-response = requests.post(
-    "https://api.reloop.sh/api/domain/v1/create",
-    headers={
-        "x-api-key": "rl_123456789",
-        "Content-Type": "application/json",
-    },
-    json={
-        "domain": "send.example.com",
-        "customReturnPath": "send",
-        "clickTracking": True,
-        "openTracking": True,
-        "tls": "opportunistic",
-        "sendingEmail": True,
-        "receivingEmail": True,
-    },
-)
+reloop = Reloop(api_key="rl_123456789")
 
-domain = response.json()`,
-	},
-	{
-		id: "php",
-		lang: "php",
-		label: "PHP",
-		source: `<?php
-$client = new \\GuzzleHttp\\Client();
+domain = reloop.domain.create(
+    domain="send.example.com",
+    custom_return_path="inbound",
+    click_tracking=True,
+    open_tracking=True,
+    tls="opportunistic",
+    sending_email=True,
+    receiving_email=True,
+)`,
+  },
+  {
+    id: "php",
+    lang: "php",
+    label: "PHP",
+    source: `$reloop = Reloop::client('rl_123456789');
 
-$response = $client->post('https://api.reloop.sh/api/domain/v1/create', [
-    'headers' => [
-        'x-api-key' => 'rl_123456789',
-        'Content-Type'  => 'application/json',
-    ],
-    'json' => [
-        'domain' => 'send.example.com',
-        'customReturnPath' => 'send',
-        'clickTracking' => true,
-        'openTracking' => true,
-        'tls' => 'opportunistic',
-        'sendingEmail' => true,
-        'receivingEmail' => true,
-    ],
-]);
+$domain = $reloop->domain->create([
+    'domain' => 'send.example.com',
+    'custom_return_path' => 'inbound',
+    'click_tracking' => true,
+    'open_tracking' => true,
+    'tls' => 'opportunistic',
+    'sending_email' => true,
+    'receiving_email' => true,
+]);`,
+  },
+  {
+    id: "java",
+    lang: "java",
+    label: "Java",
+    source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.Models.*;
 
-$domain = json_decode($response->getBody(), true);`,
-	},
-	{
-		id: "java",
-		lang: "java",
-		label: "Java",
-		source: `import java.net.URI;
-import java.net.http.*;
-import java.net.http.HttpRequest.BodyPublishers;
+ReloopClient reloop = new ReloopClient("rl_123456789");
 
-HttpClient client = HttpClient.newHttpClient();
-
-String body = """
-    {
-      "domain": "send.example.com",
-      "customReturnPath": "send",
-      "clickTracking": true,
-      "openTracking": true,
-      "tls": "opportunistic",
-      "sendingEmail": true,
-      "receivingEmail": true
-    }
-    """;
-
-HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://api.reloop.sh/api/domain/v1/create"))
-    .header("x-api-key", "rl_123456789")
-    .header("Content-Type", "application/json")
-    .POST(BodyPublishers.ofString(body))
-    .build();
-
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
-	},
-	{
-		id: "dotnet",
-		lang: "csharp",
-		label: ".NET",
-		source: `using System.Net.Http;
-using System.Net.Http.Json;
-
-var client = new HttpClient();
-client.DefaultRequestHeaders.Add("x-api-key", "rl_123456789");
-
-var payload = new {
-    domain = "send.example.com",
-    customReturnPath = "send",
-    clickTracking = true,
-    openTracking = true,
-    tls = "opportunistic",
-    sendingEmail = true,
-    receivingEmail = true
-};
-
-var response = await client.PostAsJsonAsync(
-    "https://api.reloop.sh/api/domain/v1/create",
-    payload
+Domain domain = reloop.domain.create(
+    new CreateDomainParams(
+        "send.example.com",
+        "inbound",
+        null,
+        true,
+        null,
+        "opportunistic",
+        true,
+        true
+    )
 );`,
-	},
+  },
+  {
+    id: "dotnet",
+    lang: "csharp",
+    label: ".NET",
+    source: `using Reloop;
+using Reloop.Models;
+
+var reloop = new ReloopClient("rl_123456789");
+
+var domain = await reloop.Domain.CreateAsync(new CreateDomainParams(
+    Domain: "send.example.com",
+    CustomReturnPath: "inbound",
+    ClickTracking: true,
+    OpenTracking: true,
+    Tls: "opportunistic",
+    SendingEmail: true,
+    ReceivingEmail: true
+));`,
+  },
+  {
+    id: "go",
+    lang: "go",
+    label: "Go",
+    source: `import reloop "github.com/reloop-labs/reloop-go"
+
+client, _ := reloop.NewClient(reloop.ClientOptions{
+    APIKey: "rl_123456789",
+})
+
+domain, _ := client.Domain.Create(reloop.CreateDomainParams{
+    Domain: "send.example.com",
+    CustomReturnPath: reloop.String("inbound"),
+    ClickTracking: reloop.Bool(true),
+    OpenTracking: reloop.Bool(true),
+    Tls: reloop.String("opportunistic"),
+    SendingEmail: reloop.Bool(true),
+    ReceivingEmail: reloop.Bool(true),
+})`,
+  },
+  {
+    id: "rust",
+    lang: "rust",
+    label: "Rust",
+    source: `use reloop::ReloopClient;
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+
+    reloop.domain().create(CreateDomainParams {
+        domain: "send.example.com".to_string(),
+        custom_return_path: Some("inbound".to_string()),
+        click_tracking: Some(true),
+        open_tracking: Some(true),
+        tls: Some("opportunistic".to_string()),
+        sending_email: Some(true),
+        receiving_email: Some(true),
+        ..Default::default()
+    }).await?;
+
+    Ok(())
+}`,
+  },
+  {
+    id: "ruby",
+    lang: "ruby",
+    label: "Ruby",
+    source: `require "reloop"
+
+reloop = Reloop::Client.new(api_key: "rl_123456789")
+
+domain = reloop.domain.create(
+  domain: "send.example.com",
+  custom_return_path: "inbound",
+  click_tracking: true,
+  open_tracking: true,
+  tls: "opportunistic",
+  sending_email: true,
+  receiving_email: true,
+)`,
+  },
+  {
+    id: "elixir",
+    lang: "elixir",
+    label: "Elixir",
+    source: `client = Reloop.client("rl_123456789")
+
+{:ok, domain} = Reloop.Services.Domain.create(client, %{
+  domain: "send.example.com",
+  custom_return_path: "inbound",
+  click_tracking: true,
+  open_tracking: true,
+  tls: "opportunistic",
+  sending_email: true,
+  receiving_email: true
+})`,
+  }
 ];

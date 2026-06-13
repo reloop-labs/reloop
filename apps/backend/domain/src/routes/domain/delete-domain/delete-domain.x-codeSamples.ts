@@ -1,82 +1,104 @@
 export const deleteDomainXCodeSamples = [
-	{
-		id: "node",
-		lang: "js",
-		label: "Node.js",
-		source: `const response = await fetch("https://api.reloop.sh/api/domain/v1/send.example.com", {
-  method: "DELETE",
-  headers: {
-    "x-api-key": "rl_123456789"
-  }
-});
+  {
+    id: "node",
+    lang: "javascript",
+    label: "Node.js",
+    source: `import { Reloop } from "reloop-email";
 
-const result = await response.json();`,
-	},
-	{
-		id: "curl",
-		lang: "bash",
-		label: "cURL",
-		source: `curl -X DELETE https://api.reloop.sh/api/domain/v1/send.example.com \\
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { response, error } = await reloop.domain.delete("dom_123456789");
+if (error) throw error;`,
+  },
+  {
+    id: "curl",
+    lang: "bash",
+    label: "cURL",
+    source: `curl -X DELETE https://reloop.sh/api/domain/v1/dom_123456789 \\
   -H "x-api-key: rl_123456789"`,
-	},
-	{
-		id: "python",
-		lang: "python",
-		label: "Python",
-		source: `import requests
+  },
+  {
+    id: "python",
+    lang: "python",
+    label: "Python",
+    source: `from reloop import Reloop
 
-response = requests.delete(
-    "https://api.reloop.sh/api/domain/v1/send.example.com",
-    headers={
-        "x-api-key": "rl_123456789"
-    }
-)
+reloop = Reloop(api_key="rl_123456789")
 
-result = response.json()`,
-	},
-	{
-		id: "php",
-		lang: "php",
-		label: "PHP",
-		source: `<?php
-$client = new \\GuzzleHttp\\Client();
+result = reloop.domain.delete("dom_123456789")`,
+  },
+  {
+    id: "php",
+    lang: "php",
+    label: "PHP",
+    source: `$reloop = Reloop::client('rl_123456789');
 
-$response = $client->delete('https://api.reloop.sh/api/domain/v1/send.example.com', [
-    'headers' => [
-        'x-api-key' => 'rl_123456789'
-    ]
-]);
+$result = $reloop->domain->delete('dom_123456789');`,
+  },
+  {
+    id: "java",
+    lang: "java",
+    label: "Java",
+    source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.Models.*;
 
-$result = json_decode($response->getBody(), true);`,
-	},
-	{
-		id: "java",
-		lang: "java",
-		label: "Java",
-		source: `import java.net.URI;
-import java.net.http.*;
+ReloopClient reloop = new ReloopClient("rl_123456789");
 
-HttpClient client = HttpClient.newHttpClient();
+var result = reloop.domain.delete("dom_123456789");`,
+  },
+  {
+    id: "dotnet",
+    lang: "csharp",
+    label: ".NET",
+    source: `using Reloop;
+using Reloop.Models;
 
-HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://api.reloop.sh/api/domain/v1/send.example.com"))
-    .header("x-api-key", "rl_123456789")
-    .DELETE()
-    .build();
+var reloop = new ReloopClient("rl_123456789");
 
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
-	},
-	{
-		id: "dotnet",
-		lang: "csharp",
-		label: ".NET",
-		source: `using System.Net.Http;
+var result = await reloop.Domain.DeleteAsync("dom_123456789");`,
+  },
+  {
+    id: "go",
+    lang: "go",
+    label: "Go",
+    source: `import reloop "github.com/reloop-labs/reloop-go"
 
-var client = new HttpClient();
-client.DefaultRequestHeaders.Add("x-api-key", "rl_123456789");
+client, _ := reloop.NewClient(reloop.ClientOptions{
+    APIKey: "rl_123456789",
+})
 
-var response = await client.DeleteAsync(
-    "https://api.reloop.sh/api/domain/v1/send.example.com"
-);`,
-	},
+result, _ := client.Domain.Delete("dom_123456789")`,
+  },
+  {
+    id: "rust",
+    lang: "rust",
+    label: "Rust",
+    source: `use reloop::ReloopClient;
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+
+    reloop.domain().delete("dom_123456789").await?;
+
+    Ok(())
+}`,
+  },
+  {
+    id: "ruby",
+    lang: "ruby",
+    label: "Ruby",
+    source: `require "reloop"
+
+reloop = Reloop::Client.new(api_key: "rl_123456789")
+
+result = reloop.domain.delete("dom_123456789")`,
+  },
+  {
+    id: "elixir",
+    lang: "elixir",
+    label: "Elixir",
+    source: `client = Reloop.client("rl_123456789")
+
+{:ok, result} = Reloop.Services.Domain.delete(client, "dom_123456789")`,
+  }
 ];

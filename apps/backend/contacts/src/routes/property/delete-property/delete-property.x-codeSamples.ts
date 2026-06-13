@@ -1,105 +1,104 @@
 export const deletePropertyXCodeSamples = [
-	{
-		id: "node",
-		lang: "js",
-		label: "Node.js",
-		source: `import Reloop from 'reloop-email';
+  {
+    id: "node",
+    lang: "javascript",
+    label: "Node.js",
+    source: `import { Reloop } from "reloop-email";
 
-const reloop = new Reloop('re_123456789');
+const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.contacts().deleteProperty('prop_123456789');
+const { response, error } = await reloop.contacts.deleteProperty("prop_123456789");
 if (error) throw error;`,
-	},
-	{
-		id: "curl",
-		lang: "bash",
-		label: "cURL",
-		source: `curl -X DELETE https://reloop.sh/api/contacts/v1/properties/prop_123456789 \\
-  -H "x-api-key: re_123456789"`,
-	},
-	{
-		id: "php",
-		lang: "php",
-		label: "PHP",
-		source: `$reloop = Reloop::client('re_123456789');
+  },
+  {
+    id: "curl",
+    lang: "bash",
+    label: "cURL",
+    source: `curl -X DELETE https://reloop.sh/api/contacts/v1/properties/prop_123456789 \\
+  -H "x-api-key: rl_123456789"`,
+  },
+  {
+    id: "python",
+    lang: "python",
+    label: "Python",
+    source: `from reloop import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+reloop.contacts.delete_property("prop_123456789")`,
+  },
+  {
+    id: "php",
+    lang: "php",
+    label: "PHP",
+    source: `$reloop = Reloop::client('rl_123456789');
 
 $reloop->contacts->deleteProperty('prop_123456789');`,
-	},
-	{
-		id: "python",
-		lang: "python",
-		label: "Python",
-		source: `from reloop_email import Reloop
+  },
+  {
+    id: "java",
+    lang: "java",
+    label: "Java",
+    source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.Models.*;
 
-reloop = Reloop(api_key="re_123456789")
+ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.contacts().delete_property("prop_123456789")`,
-	},
-	{
-		id: "ruby",
-		lang: "ruby",
-		label: "Ruby",
-		source: `require 'net/http'
-require 'json'
+reloop.contacts.deleteProperty("prop_123456789");`,
+  },
+  {
+    id: "dotnet",
+    lang: "csharp",
+    label: ".NET",
+    source: `using Reloop;
+using Reloop.Models;
 
-uri = URI('https://reloop.sh/api/contacts/v1/properties/prop_123456789')
-http = Net::HTTP.new(uri.host, uri.port)
-http.use_ssl = true
+var reloop = new ReloopClient("rl_123456789");
 
-request = Net::HTTP::Delete.new(uri)
-request['x-api-key'] = 're_123456789'
+await reloop.Contacts.DeletePropertyAsync("prop_123456789");`,
+  },
+  {
+    id: "go",
+    lang: "go",
+    label: "Go",
+    source: `import reloop "github.com/reloop-labs/reloop-go"
 
-response = http.request(request)
-result = JSON.parse(response.body)`,
-	},
-	{
-		id: "go",
-		lang: "go",
-		label: "Go",
-		source: `import reloopemail "github.com/reloop-labs/reloop-email"
+client, _ := reloop.NewClient(reloop.ClientOptions{
+    APIKey: "rl_123456789",
+})
 
-func main() {
-    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
-        APIKey: "re_123456789",
-    })
-    
-    _, _ = reloop.Contacts().DeleteProperty("prop_123456789")
-}`,
-	},
-	{
-		id: "rust",
-		lang: "rust",
-		label: "Rust",
-		source: `use reloop_email::ReloopEmail;
-use serde_json::json;
-
+_, _ = client.Contacts.DeleteProperty("prop_123456789")`,
+  },
+  {
+    id: "rust",
+    lang: "rust",
+    label: "Rust",
+    source: `use reloop::ReloopClient;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let reloop = ReloopEmail::new("re_123456789".to_string(), None);
-    
+    let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+
     reloop.contacts().delete_property("prop_123456789").await?;
 
     Ok(())
 }`,
-	},
-	{
-		id: "java",
-		lang: "java",
-		label: "Java",
-		source: `import sh.reloop.email.ReloopEmail;
+  },
+  {
+    id: "ruby",
+    lang: "ruby",
+    label: "Ruby",
+    source: `require "reloop"
 
-ReloopEmail reloop = ReloopEmail.client("re_123456789");
+reloop = Reloop::Client.new(api_key: "rl_123456789")
 
-reloop.contacts().deleteProperty("prop_123456789");`,
-	},
-	{
-		id: "dotnet",
-		lang: "csharp",
-		label: ".NET",
-		source: `using Reloop.Email;
+reloop.contacts.delete_property("prop_123456789")`,
+  },
+  {
+    id: "elixir",
+    lang: "elixir",
+    label: "Elixir",
+    source: `client = Reloop.client("rl_123456789")
 
-var reloop = ReloopEmail.Client("re_123456789");
-
-await reloop.Contacts().DeletePropertyAsync("prop_123456789");`,
-	},
+{:ok, result} = Reloop.Services.Contacts.delete_property(client, "prop_123456789")`,
+  }
 ];

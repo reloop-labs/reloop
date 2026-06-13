@@ -1,112 +1,104 @@
 export const verifyDNSXCodeSamples = [
-	{
-		id: "node",
-		lang: "js",
-		label: "Node.js",
-		source: `const response = await fetch("https://api.reloop.sh/api/domain/v1/verify", {
-  method: "POST",
-  headers: {
-    "x-api-key": "rl_123456789",
-    "Content-Type": "application/json"
+  {
+    id: "node",
+    lang: "javascript",
+    label: "Node.js",
+    source: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { response, error } = await reloop.domain.verify("dom_123456789");
+if (error) throw error;`,
   },
-  body: JSON.stringify({
-    domain: "send.example.com"
-  })
-});
+  {
+    id: "curl",
+    lang: "bash",
+    label: "cURL",
+    source: `curl -X POST https://reloop.sh/api/domain/v1/verify/dom_123456789 \\
+  -H "x-api-key: rl_123456789"`,
+  },
+  {
+    id: "python",
+    lang: "python",
+    label: "Python",
+    source: `from reloop import Reloop
 
-const result = await response.json();`,
-	},
-	{
-		id: "curl",
-		lang: "bash",
-		label: "cURL",
-		source: `curl -X POST https://api.reloop.sh/api/domain/v1/verify \\
-  -H "x-api-key: rl_123456789" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "domain": "send.example.com"
-  }'`,
-	},
-	{
-		id: "python",
-		lang: "python",
-		label: "Python",
-		source: `import requests
+reloop = Reloop(api_key="rl_123456789")
 
-response = requests.post(
-    "https://api.reloop.sh/api/domain/v1/verify",
-    headers={
-        "x-api-key": "rl_123456789",
-        "Content-Type": "application/json",
-    },
-    json={
-        "domain": "send.example.com"
-    },
-)
+result = reloop.domain.verify("dom_123456789")`,
+  },
+  {
+    id: "php",
+    lang: "php",
+    label: "PHP",
+    source: `$reloop = Reloop::client('rl_123456789');
 
-result = response.json()`,
-	},
-	{
-		id: "php",
-		lang: "php",
-		label: "PHP",
-		source: `<?php
-$client = new \\GuzzleHttp\\Client();
+$result = $reloop->domain->verify('dom_123456789');`,
+  },
+  {
+    id: "java",
+    lang: "java",
+    label: "Java",
+    source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.Models.*;
 
-$response = $client->post('https://api.reloop.sh/api/domain/v1/verify', [
-    'headers' => [
-        'x-api-key' => 'rl_123456789',
-        'Content-Type'  => 'application/json',
-    ],
-    'json' => [
-        'domain' => 'send.example.com'
-    ],
-]);
+ReloopClient reloop = new ReloopClient("rl_123456789");
 
-$result = json_decode($response->getBody(), true);`,
-	},
-	{
-		id: "java",
-		lang: "java",
-		label: "Java",
-		source: `import java.net.URI;
-import java.net.http.*;
-import java.net.http.HttpRequest.BodyPublishers;
+var result = reloop.domain.verify("dom_123456789");`,
+  },
+  {
+    id: "dotnet",
+    lang: "csharp",
+    label: ".NET",
+    source: `using Reloop;
+using Reloop.Models;
 
-HttpClient client = HttpClient.newHttpClient();
+var reloop = new ReloopClient("rl_123456789");
 
-String body = """
-    {
-      "domain": "send.example.com"
-    }
-    """;
+var result = await reloop.Domain.VerifyAsync("dom_123456789");`,
+  },
+  {
+    id: "go",
+    lang: "go",
+    label: "Go",
+    source: `import reloop "github.com/reloop-labs/reloop-go"
 
-HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://api.reloop.sh/api/domain/v1/verify"))
-    .header("x-api-key", "rl_123456789")
-    .header("Content-Type", "application/json")
-    .POST(BodyPublishers.ofString(body))
-    .build();
+client, _ := reloop.NewClient(reloop.ClientOptions{
+    APIKey: "rl_123456789",
+})
 
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());`,
-	},
-	{
-		id: "dotnet",
-		lang: "csharp",
-		label: ".NET",
-		source: `using System.Net.Http;
-using System.Net.Http.Json;
+result, _ := client.Domain.Verify("dom_123456789")`,
+  },
+  {
+    id: "rust",
+    lang: "rust",
+    label: "Rust",
+    source: `use reloop::ReloopClient;
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopClient::new("rl_123456789".to_string(), None);
 
-var client = new HttpClient();
-client.DefaultRequestHeaders.Add("x-api-key", "rl_123456789");
+    reloop.domain().verify("dom_123456789").await?;
 
-var payload = new {
-    domain = "send.example.com"
-};
+    Ok(())
+}`,
+  },
+  {
+    id: "ruby",
+    lang: "ruby",
+    label: "Ruby",
+    source: `require "reloop"
 
-var response = await client.PostAsJsonAsync(
-    "https://api.reloop.sh/api/domain/v1/verify",
-    payload
-);`,
-	},
+reloop = Reloop::Client.new(api_key: "rl_123456789")
+
+result = reloop.domain.verify("dom_123456789")`,
+  },
+  {
+    id: "elixir",
+    lang: "elixir",
+    label: "Elixir",
+    source: `client = Reloop.client("rl_123456789")
+
+{:ok, result} = Reloop.Services.Domain.verify(client, "dom_123456789")`,
+  }
 ];

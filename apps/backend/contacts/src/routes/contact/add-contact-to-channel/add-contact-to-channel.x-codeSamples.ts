@@ -1,142 +1,109 @@
-const addContactToChannelBody = `{
-  "contact_id": "cont_123456789",
-  "subscription": "opt_in"
-}`;
-
 export const addContactToChannelXCodeSamples = [
-	{
-		id: "node",
-		lang: "js",
-		label: "Node.js",
-		source: `import Reloop from 'reloop-email';
+  {
+    id: "node",
+    lang: "javascript",
+    label: "Node.js",
+    source: `import { Reloop } from "reloop-email";
 
-const reloop = new Reloop('re_123456789');
+const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.contacts().channels().addContact('channel_123456789', {
-  contact_id: 'cont_123456789',
-  subscription: 'opt_in',
+const { response, error } = await reloop.contacts.channels.addContact("chn_123456789", {
+  contact_id: "con_123456789",
+  subscription: "opt_in",
 });
 if (error) throw error;`,
-	},
-	{
-		id: "curl",
-		lang: "bash",
-		label: "cURL",
-		source: `curl -X POST https://reloop.sh/api/contacts/channel/channel_123456789 \\
-  -H "x-api-key: re_123456789" \\
+  },
+  {
+    id: "curl",
+    lang: "bash",
+    label: "cURL",
+    source: `curl -X POST https://reloop.sh/api/contacts/channel/chn_123456789 \\
+  -H "x-api-key: rl_123456789" \\
   -H "Content-Type: application/json" \\
-  -d '${addContactToChannelBody}'`,
-	},
-	{
-		id: "php",
-		lang: "php",
-		label: "PHP",
-		source: `$reloop = Reloop::client('re_123456789');
+  -d '{"contact_id": "con_123456789","subscription": "opt_in"}'`,
+  },
+  {
+    id: "python",
+    lang: "python",
+    label: "Python",
+    source: `from reloop import Reloop
 
-$reloop->contacts->channels->addContact(
-  'channel_123456789',
-  parameters: [
-      'contact_id' => 'cont_123456789',
-      'subscription' => 'opt_in',
-  ],
-);`,
-	},
-	{
-		id: "python",
-		lang: "python",
-		label: "Python",
-		source: `from reloop_email import Reloop
+reloop = Reloop(api_key="rl_123456789")
 
-reloop = Reloop(api_key="re_123456789")
+reloop.contacts.channels.add_contact("chn_123456789", contact_id="con_123456789", subscription="opt_in")`,
+  },
+  {
+    id: "php",
+    lang: "php",
+    label: "PHP",
+    source: `$reloop = Reloop::client('rl_123456789');
 
-reloop.contacts().channels().add_contact(
-    "channel_123456789",
-    contact_id="cont_123456789",
-    subscription="opt_in"
-)`,
-	},
-	{
-		id: "ruby",
-		lang: "ruby",
-		label: "Ruby",
-		source: `require 'net/http'
-require 'json'
+$reloop->contacts->channels->addContact('chn_123456789', ['contact_id' => 'con_123456789', 'subscription' => 'opt_in']);`,
+  },
+  {
+    id: "java",
+    lang: "java",
+    label: "Java",
+    source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.Models.*;
 
-uri = URI('https://reloop.sh/api/contacts/channel/channel_123456789')
-http = Net::HTTP.new(uri.host, uri.port)
-http.use_ssl = true
+ReloopClient reloop = new ReloopClient("rl_123456789");
 
-request = Net::HTTP::Post.new(uri)
-request['x-api-key'] = 're_123456789'
-request['Content-Type'] = 'application/json'
-request.body = {
-  contact_id: 'cont_123456789',
-  subscription: 'opt_in',
-}.to_json
+reloop.contacts.channels.addContact("chn_123456789", Map.of("contact_id", "con_123456789", "subscription", "opt_in"));`,
+  },
+  {
+    id: "dotnet",
+    lang: "csharp",
+    label: ".NET",
+    source: `using Reloop;
+using Reloop.Models;
 
-response = http.request(request)
-result = JSON.parse(response.body)`,
-	},
-	{
-		id: "go",
-		lang: "go",
-		label: "Go",
-		source: `import reloopemail "github.com/reloop-labs/reloop-email"
+var reloop = new ReloopClient("rl_123456789");
 
-func main() {
-    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
-        APIKey: "re_123456789",
-    })
-    
-    _, _ = reloop.Contacts().Channels.AddContact("channel_123456789", map[string]interface{}{
-        "contact_id": "cont_123456789",
-        "subscription": "opt_in"
-    })
-}`,
-	},
-	{
-		id: "rust",
-		lang: "rust",
-		label: "Rust",
-		source: `use reloop_email::ReloopEmail;
-use serde_json::json;
+await reloop.Contacts.Channels.AddContactAsync("chn_123456789", new Dictionary<string, object?> { ["contact_id"] = "con_123456789", ["subscription"] = "opt_in" });`,
+  },
+  {
+    id: "go",
+    lang: "go",
+    label: "Go",
+    source: `import reloop "github.com/reloop-labs/reloop-go"
 
+client, _ := reloop.NewClient(reloop.ClientOptions{
+    APIKey: "rl_123456789",
+})
+
+_, _ = client.Contacts.Channels.AddContact("chn_123456789", map[string]interface{"contact_id": "con_123456789", "subscription": "opt_in"})`,
+  },
+  {
+    id: "rust",
+    lang: "rust",
+    label: "Rust",
+    source: `use reloop::ReloopClient;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let reloop = ReloopEmail::new("re_123456789".to_string(), None);
-    
-    reloop.contacts().channels().add_contact("channel_123456789", json!({
-        "contact_id": "cont_123456789",
-        "subscription": "opt_in",
-    })).await?;
+    let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+
+    reloop.contacts().channels().add_contact("chn_123456789", AddContactToChannelParams { contact_id: Some("con_123456789".to_string()), subscription: Some("opt_in".to_string()), ..Default::default() }).await?;
 
     Ok(())
 }`,
-	},
-	{
-		id: "java",
-		lang: "java",
-		label: "Java",
-		source: `import sh.reloop.email.ReloopEmail;
-import java.util.*;
+  },
+  {
+    id: "ruby",
+    lang: "ruby",
+    label: "Ruby",
+    source: `require "reloop"
 
-ReloopEmail reloop = ReloopEmail.client("re_123456789");
+reloop = Reloop::Client.new(api_key: "rl_123456789")
 
-reloop.contacts().channels().addContact("channel_123456789", Map.of("contact_id", "cont_123456789", "subscription", "opt_in"));`,
-	},
-	{
-		id: "dotnet",
-		lang: "csharp",
-		label: ".NET",
-		source: `using Reloop.Email;
-using System.Collections.Generic;
+reloop.contacts.channels.add_contact("chn_123456789", contact_id: "con_123456789", subscription: "opt_in")`,
+  },
+  {
+    id: "elixir",
+    lang: "elixir",
+    label: "Elixir",
+    source: `client = Reloop.client("rl_123456789")
 
-var reloop = ReloopEmail.Client("re_123456789");
-
-await reloop.Contacts().Channels.AddContactAsync("channel_123456789", new Dictionary<string, object?>
-{
-    ["contact_id"] = "cont_123456789",
-    ["subscription"] = "opt_in",
-});`,
-	},
+{:ok, result} = Reloop.Services.ContactChannels.add_contact(client, "chn_123456789", %{contact_id: "con_123456789", subscription: "opt_in"})`,
+  }
 ];
