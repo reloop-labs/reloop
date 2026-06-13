@@ -252,7 +252,7 @@ export function APIPage(props: APIPageProps) {
 							>
 								{method}
 							</span>
-							<div className="min-w-0 font-medium text-[13px]">
+							<div className="min-w-0 font-medium">
 								https://reloop.sh{path.replace(/\{([^}]+)\}/g, ":$1")}
 							</div>
 						</div>
