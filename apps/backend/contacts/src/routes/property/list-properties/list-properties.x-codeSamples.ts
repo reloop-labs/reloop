@@ -5,9 +5,7 @@ export const listPropertiesXCodeSamples = [
 		label: "Node.js",
 		source: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({
-  key: 're_123456789'
-});
+const reloop = new Reloop('re_123456789');
 
 const { response: properties, error } = await reloop.contacts().listProperties({
   page: 1,

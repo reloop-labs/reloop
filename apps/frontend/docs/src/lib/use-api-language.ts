@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const LANGUAGE_ALIASES: Record<string, string[]> = {
 	nodejs: ["node", "nodejs", "javascript", "js"],
@@ -25,9 +25,9 @@ function getSavedLanguage(availableIds: string[], defaultId: string): string {
 			}
 			return defaultId;
 		}
-		
+
 		if (availableIds.includes(saved)) return saved;
-		
+
 		let group: string[] = [saved];
 		for (const key in LANGUAGE_ALIASES) {
 			const groupList = LANGUAGE_ALIASES[key];
@@ -36,7 +36,7 @@ function getSavedLanguage(availableIds: string[], defaultId: string): string {
 				break;
 			}
 		}
-		
+
 		for (const alias of group) {
 			if (availableIds.includes(alias)) {
 				return alias;
@@ -46,7 +46,10 @@ function getSavedLanguage(availableIds: string[], defaultId: string): string {
 	return defaultId;
 }
 
-export function useApiLanguage<T extends string>(availableIds: string[], defaultId: T): [T, (lang: T) => void] {
+export function useApiLanguage<T extends string>(
+	availableIds: string[],
+	defaultId: T,
+): [T, (lang: T) => void] {
 	const [selectedLanguage, setSelectedLanguage] = useState<T>(defaultId);
 
 	const availableIdsStr = availableIds.join(",");
@@ -56,9 +59,9 @@ export function useApiLanguage<T extends string>(availableIds: string[], default
 			const saved = getSavedLanguage(availableIds, defaultId) as T;
 			setSelectedLanguage(saved);
 		};
-		
+
 		syncLang();
-		
+
 		window.addEventListener("reloop-lang-change", syncLang);
 		return () => {
 			window.removeEventListener("reloop-lang-change", syncLang);
@@ -69,7 +72,9 @@ export function useApiLanguage<T extends string>(availableIds: string[], default
 		setSelectedLanguage(lang);
 		try {
 			localStorage.setItem("reloop-api-lang", lang);
-			window.dispatchEvent(new CustomEvent("reloop-lang-change", { detail: lang }));
+			window.dispatchEvent(
+				new CustomEvent("reloop-lang-change", { detail: lang }),
+			);
 		} catch {}
 	}, []);
 

@@ -1,0 +1,7 @@
+{
+	"title": "Self-Hosted",
+	"description": "Guides and references on how to self-host Reloop.",
+	"root": true,
+	"icon": "server",
+	"pages": ["index"]
+}

@@ -1,0 +1,75 @@
+---
+title: Self-Hosting Reloop
+description: Deploy and run the complete Reloop suite on your own infrastructure.
+---
+
+Reloop is fully open-source and designed to be easily self-hosted on your own servers or cloud providers. By hosting Reloop yourself, you maintain complete ownership of your email data, templates, and analytics logs.
+
+---
+
+## Deployment Options
+
+You can self-host Reloop in production using several approaches:
+
+- **Docker Compose**: Recommended for small to medium deployments, staging environments, and single-instance setups.
+- **Kubernetes**: Recommended for high-availability, auto-scaling production deployments.
+- **Bare Metal / Virtual Machines**: For running the services directly using Bun/Node.js.
+
+---
+
+## Quick Start with Docker Compose
+
+Reloop provides a pre-configured `docker-compose.yml` to spin up all backend systems, databases, and microservices in one command.
+
+### Prerequisites
+
+Ensure you have the following installed on your host machine:
+
+- **Docker** (v24.0.0+)
+- **Docker Compose** (v2.20.0+)
+- **Git**
+
+### Step 1: Clone the Repository
+
+Clone the official Reloop monorepo:
+
+```bash
+git clone https://github.com/reloop-labs/reloop.git
+cd reloop
+```
+
+### Step 2: Configure Environment Variables
+
+Create the production environment configurations for the core backend services. Refer to the `.env.dev` templates inside each service directory:
+
+- `apps/backend/auth/.env`
+- `apps/backend/mail/.env`
+- `apps/backend/webhook/.env`
+- `apps/backend/domain/.env`
+
+### Step 3: Run docker-compose
+
+Start all backing databases, queues, and APIs in detached mode:
+
+```bash
+docker compose -f local/docker-compose.yml up -d
+```
+
+This will run the following services:
+- **PostgreSQL**: Transactional database.
+- **Redis**: BullMQ background workers and caching.
+- **ClickHouse**: Analytics storage.
+- **NATS**: Real-time event bus.
+- **Rspamd**: Anti-spam processing.
+- **Caddy**: Reverse proxy with automatic SSL.
+
+---
+
+## Production Checklist
+
+Before running Reloop in production, ensure you have configured:
+
+1. **SMTP Gateway**: Connect to an external SMTP service (like AWS SES, Postmark, or a self-hosted Kumomta instance) for reliable email routing.
+2. **Persistence**: Ensure Docker volumes for PostgreSQL, Redis, and ClickHouse are mapped to persistent storage.
+3. **Security**: Change all default passwords (e.g., PostgreSQL credentials, Redis password) in your environment configuration.
+4. **SSL / HTTPS**: Configure a reverse proxy like Caddy or Nginx to handle SSL certificates.

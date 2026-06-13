@@ -5,9 +5,7 @@ export const deletePropertyXCodeSamples = [
 		label: "Node.js",
 		source: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({
-  key: 're_123456789'
-});
+const reloop = new Reloop('re_123456789');
 
 const { response, error } = await reloop.contacts().deleteProperty('prop_123456789');
 if (error) throw error;`,

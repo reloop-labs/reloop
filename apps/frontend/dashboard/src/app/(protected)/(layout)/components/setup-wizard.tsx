@@ -1,5 +1,6 @@
 "use client";
 
+import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
 import { CodeBlock } from "@reloop/ui/code-block";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -16,7 +17,6 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
 import type { SimpleIcon } from "simple-icons";
 import { siGo, siNodedotjs, siPhp, siPython, siRuby } from "simple-icons";
 import { toast } from "sonner";

@@ -5,7 +5,7 @@ export const listVersionsXCodeSamples = [
 		label: "Node.js",
 		source: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({ key: "rl_123456789" });
+const reloop = new Reloop("rl_123456789");
 
 const versions = await reloop.template.listVersions("tpl_123456789", { page: 1, limit: 10 });`,
 	},

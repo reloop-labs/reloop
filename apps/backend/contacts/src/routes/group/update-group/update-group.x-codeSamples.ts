@@ -9,9 +9,7 @@ export const updateGroupXCodeSamples = [
 		label: "Node.js",
 		source: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({
-  key: 're_123456789'
-});
+const reloop = new Reloop('re_123456789');
 
 const { response: group, error } = await reloop.contacts().updateGroup('grp_123456789', {
   name: 'Early Access',

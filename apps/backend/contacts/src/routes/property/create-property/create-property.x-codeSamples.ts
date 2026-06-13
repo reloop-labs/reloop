@@ -11,9 +11,7 @@ export const createPropertyXCodeSamples = [
 		label: "Node.js",
 		source: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({
-  key: 're_123456789'
-});
+const reloop = new Reloop('re_123456789');
 
 const { response: property, error } = await reloop.contacts().createProperty({
   name: 'company_name',

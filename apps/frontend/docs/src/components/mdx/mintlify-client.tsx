@@ -12,8 +12,8 @@ import {
 	Tip,
 	Warning,
 } from "@mintlify/components";
-import React from "react";
 import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
+import React from "react";
 import {
 	siDotnet,
 	siGnubash,
@@ -53,7 +53,7 @@ function getIconForSample(label: string, lang: string) {
 		LANGUAGE_ICONS[label.toLowerCase()] ||
 		LANGUAGE_ICONS[lang.toLowerCase()] ||
 		siGnubash;
-	
+
 	let hex = icon.hex;
 	if (label.toLowerCase() === "json" || lang.toLowerCase() === "json") {
 		hex = "f59e0b"; // Use amber gold for JSON for readability
@@ -65,7 +65,9 @@ function getIconForSample(label: string, lang: string) {
 	};
 }
 
-function extractCodeAndLanguage(children: React.ReactNode): { code: string; language: string; title?: string } | null {
+function extractCodeAndLanguage(
+	children: React.ReactNode,
+): { code: string; language: string; title?: string } | null {
 	let code = "";
 	let language = "";
 	let title: string | undefined;
@@ -146,15 +148,26 @@ const CodeGroup = React.forwardRef<
 		setMounted(true);
 	}, []);
 
-	const childrenArray = React.Children.toArray(props.children).filter(React.isValidElement);
+	const childrenArray = React.Children.toArray(props.children).filter(
+		React.isValidElement,
+	);
 
 	const tabs = childrenArray.map((child: any, index) => {
 		const childProps = child.props as any;
-		
+
 		const parsed = extractCodeAndLanguage(childProps.children);
-		const code = childProps.code || parsed?.code || (typeof childProps.children === "string" ? childProps.children : "");
-		const lang = childProps.language || childProps.lang || parsed?.language || "json";
-		const title = childProps.title || childProps.filename || childProps.label || parsed?.title || lang;
+		const code =
+			childProps.code ||
+			parsed?.code ||
+			(typeof childProps.children === "string" ? childProps.children : "");
+		const lang =
+			childProps.language || childProps.lang || parsed?.language || "json";
+		const title =
+			childProps.title ||
+			childProps.filename ||
+			childProps.label ||
+			parsed?.title ||
+			lang;
 
 		return {
 			id: String(index),
@@ -210,9 +223,13 @@ const CodeBlock = React.forwardRef<
 	}, []);
 
 	const parsed = extractCodeAndLanguage(props.children);
-	const code = props.code || parsed?.code || (typeof props.children === "string" ? props.children : "");
+	const code =
+		props.code ||
+		parsed?.code ||
+		(typeof props.children === "string" ? props.children : "");
 	const lang = props.language || props.lang || parsed?.language || "json";
-	const title = props.title || props.filename || props.label || parsed?.title || lang;
+	const title =
+		props.title || props.filename || props.label || parsed?.title || lang;
 
 	if (!mounted) {
 		return (

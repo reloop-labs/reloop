@@ -1,4 +1,5 @@
 "use client";
+import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { CodeBlock } from "@reloop/ui/code-block";
@@ -6,7 +7,6 @@ import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCallback, useState } from "react";
-import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
 	siCurl,
@@ -39,7 +39,7 @@ const codeExamples = {
 			filename: "list_logs.js",
 			code: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({ key: 're_xxxxxxxx' });
+const reloop = new Reloop('re_xxxxxxxx');
 
 const { data } = await reloop.logs.list({
   page: 1,
@@ -51,7 +51,7 @@ const { data } = await reloop.logs.list({
 			filename: "get_log.js",
 			code: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({ key: 're_xxxxxxxx' });
+const reloop = new Reloop('re_xxxxxxxx');
 
 const { data } = await reloop.logs.get('log_xxxxxxxx');`,
 		},
@@ -128,8 +128,6 @@ export const LogsApiDetails = (
 		...rest
 	} = props;
 
-
-
 	const copySnippet = useCallback(
 		async (operationId: string) => {
 			try {
@@ -200,8 +198,6 @@ export const LogsApiDetails = (
 				</Drawer.Header>
 
 				<Drawer.Body className="flex flex-col gap-8 p-6">
-
-
 					<div className="flex gap-2 overflow-x-auto">
 						{languages.map((lang) => {
 							const icon = langIcons[lang.id];

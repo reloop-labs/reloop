@@ -1,3 +1,4 @@
+import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { CodeBlock } from "@reloop/ui/code-block";
@@ -5,7 +6,6 @@ import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCallback, useState } from "react";
-import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
 	siCurl,
@@ -42,7 +42,7 @@ const codeExamples = {
 			filename: "add_contact.js",
 			code: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({ key: 're_xxxxxxxx' });
+const reloop = new Reloop('re_xxxxxxxx');
 
 const { data, error } = await reloop.contacts.create({
   email:      'john@example.com',
@@ -56,7 +56,7 @@ const { data, error } = await reloop.contacts.create({
 			filename: "get_contact.js",
 			code: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({ key: 're_xxxxxxxx' });
+const reloop = new Reloop('re_xxxxxxxx');
 
 // Get by contact id
 await reloop.contacts.get('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d');
@@ -68,7 +68,7 @@ await reloop.contacts.get({ email: 'john@example.com' });`,
 			filename: "list_contacts.js",
 			code: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({ key: 're_xxxxxxxx' });
+const reloop = new Reloop('re_xxxxxxxx');
 
 const { data } = await reloop.contacts.list({
   page: 1,
@@ -79,7 +79,7 @@ const { data } = await reloop.contacts.list({
 			filename: "update_contact.js",
 			code: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({ key: 're_xxxxxxxx' });
+const reloop = new Reloop('re_xxxxxxxx');
 
 const { data, error } = await reloop.contacts.update(
   '5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d',
@@ -93,7 +93,7 @@ const { data, error } = await reloop.contacts.update(
 			filename: "delete_contact.js",
 			code: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({ key: 're_xxxxxxxx' });
+const reloop = new Reloop('re_xxxxxxxx');
 
 await reloop.contacts.delete('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d');`,
 		},
@@ -658,8 +658,6 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 		(l) => l.id === selectedLanguage,
 	);
 
-
-
 	const copySnippet = useCallback(
 		async (operationId: string) => {
 			try {
@@ -731,8 +729,6 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 
 				{/* ── Body ────────────────────────────────────────────── */}
 				<Drawer.Body className="flex flex-col gap-8 p-6">
-
-
 					{/* Language Pills */}
 					<div
 						className="scrollbar-hide flex gap-2 overflow-x-auto"

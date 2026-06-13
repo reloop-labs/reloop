@@ -19,16 +19,16 @@ function standardize(content: string): string {
 	// Node.js
 	next = next.replace(/@reloop\/node/g, "reloop-email");
 	next = next.replace(
-		/import \{ Reloop \} from ['"]reloop-email['"];\n\nconst reloop = new Reloop\(\{ key: /g,
-		"import Reloop from 'reloop-email';\n\nconst reloop = new Reloop({ key: ",
+		/import \{ Reloop \} from ['"]reloop-email['"];\n\nconst reloop = new Reloop\(\{\s*key:\s*(['"])(.*?)\1\s*\}\)/g,
+		"import Reloop from 'reloop-email';\n\nconst reloop = new Reloop($1$2$1)",
 	);
 	next = next.replace(
-		/import \{ Reloop \} from "@reloop\/node";\n\nconst reloop = new Reloop\(\{ key: /g,
-		"import Reloop from 'reloop-email';\n\nconst reloop = new Reloop({ key: ",
+		/import \{ Reloop \} from "@reloop\/node";\n\nconst reloop = new Reloop\(\{\s*key:\s*(['"])(.*?)\1\s*\}\)/g,
+		"import Reloop from 'reloop-email';\n\nconst reloop = new Reloop($1$2$1)",
 	);
 	next = next.replace(
-		/import \{ Reloop \} from '@reloop\/node';\n\nconst reloop = new Reloop\(\{ key: /g,
-		"import Reloop from 'reloop-email';\n\nconst reloop = new Reloop({ key: ",
+		/import \{ Reloop \} from '@reloop\/node';\n\nconst reloop = new Reloop\(\{\s*key:\s*(['"])(.*?)\1\s*\}\)/g,
+		"import Reloop from 'reloop-email';\n\nconst reloop = new Reloop($1$2$1)",
 	);
 
 	// Python

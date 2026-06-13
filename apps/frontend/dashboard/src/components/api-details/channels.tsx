@@ -1,3 +1,4 @@
+import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -7,7 +8,6 @@ import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCallback, useState } from "react";
-import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
 
 const codeExamples = {
 	javascript: {
@@ -247,8 +247,6 @@ export const ChannelsApiDetails = () => {
 		} catch {}
 	}, [selectedLanguage, selectedOperation]);
 
-
-
 	return (
 		<Drawer.Root open={isOpen} onOpenChange={setIsOpen}>
 			<Drawer.Trigger asChild>
@@ -273,8 +271,6 @@ export const ChannelsApiDetails = () => {
 					</div>
 				</Drawer.Header>
 				<Drawer.Body className="flex flex-col gap-5 p-5">
-
-
 					{/* Language Selector */}
 					<div className="space-y-2.5">
 						<h3 className="text-label-sm text-text-sub-600">Language</h3>

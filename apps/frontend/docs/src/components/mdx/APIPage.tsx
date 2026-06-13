@@ -540,7 +540,7 @@ function getIconForSample(sampleId: string, lang: string) {
 		LANGUAGE_ICONS[sampleId.toLowerCase()] ||
 		LANGUAGE_ICONS[lang.toLowerCase()] ||
 		siGnubash;
-	
+
 	let hex = icon.hex;
 	if (sampleId.toLowerCase() === "json" || lang.toLowerCase() === "json") {
 		hex = "f59e0b"; // Use amber gold for JSON for readability
@@ -656,7 +656,7 @@ function CodeExamples({
 					),
 					null,
 					2,
-					)
+				)
 			: "";
 
 		const qs = queryParams.length
@@ -714,7 +714,12 @@ print(response.json())`;
 	}
 
 	const availableIds = samples.map((s) => s.id);
-	const defaultLangId = availableIds.find((id) => ["node", "nodejs", "javascript", "js"].includes(id)) || availableIds[0] || "";
+	const defaultLangId =
+		availableIds.find((id) =>
+			["node", "nodejs", "javascript", "js"].includes(id),
+		) ||
+		availableIds[0] ||
+		"";
 	const [activeTab, setActiveTab] = useApiLanguage(availableIds, defaultLangId);
 
 	const resolvedActiveTab =

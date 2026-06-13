@@ -1,6 +1,6 @@
+import { CodePortal } from "@reloop/fe-docs/components/docs/code-column-context";
 import { cn } from "@reloop/ui/cn";
 import React from "react";
-import { CodePortal } from "@reloop/fe-docs/components/docs/code-column-context";
 
 interface SideBySideProps {
 	children: React.ReactNode;

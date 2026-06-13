@@ -5,9 +5,7 @@ export const getGroupXCodeSamples = [
 		label: "Node.js",
 		source: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({
-  key: 're_123456789'
-});
+const reloop = new Reloop('re_123456789');
 
 const { response: group, error } = await reloop.contacts().getGroup('grp_123456789');
 if (error) throw error;`,

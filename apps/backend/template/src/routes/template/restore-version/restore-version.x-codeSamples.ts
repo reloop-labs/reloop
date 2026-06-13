@@ -5,7 +5,7 @@ export const restoreVersionXCodeSamples = [
 		label: "Node.js",
 		source: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({ key: "rl_123456789" });
+const reloop = new Reloop("rl_123456789");
 
 const template = await reloop.template.restoreVersion("tpl_123456789", "ver_123456789");`,
 	},

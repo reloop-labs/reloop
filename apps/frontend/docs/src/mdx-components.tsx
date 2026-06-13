@@ -1,3 +1,4 @@
+import { APIPage } from "@reloop/fe-docs/components/mdx/APIPage";
 import { CardGroup } from "@reloop/fe-docs/components/mdx/CardGroup";
 import {
 	Accordion,
@@ -15,11 +16,10 @@ import {
 	Warning,
 } from "@reloop/fe-docs/components/mdx/mintlify-client";
 import { PromptActions } from "@reloop/fe-docs/components/mdx/PromptActions";
+import { Side, SideBySide } from "@reloop/fe-docs/components/mdx/SideBySide";
 import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import type { MDXComponents } from "mdx/types";
 import React from "react";
-import { APIPage } from "@reloop/fe-docs/components/mdx/APIPage";
-import { Side, SideBySide } from "@reloop/fe-docs/components/mdx/SideBySide";
 
 const getSlug = (children: React.ReactNode): string => {
 	if (typeof children === "string")

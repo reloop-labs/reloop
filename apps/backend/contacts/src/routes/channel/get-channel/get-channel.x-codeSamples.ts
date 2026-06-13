@@ -5,9 +5,7 @@ export const getChannelXCodeSamples = [
 		label: "Node.js",
 		source: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({
-  key: 're_123456789'
-});
+const reloop = new Reloop('re_123456789');
 
 const { response: channel, error } = await reloop.contacts().channels().get('chn_123456789');
 if (error) throw error;`,

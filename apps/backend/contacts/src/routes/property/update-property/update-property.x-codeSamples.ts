@@ -9,9 +9,7 @@ export const updatePropertyXCodeSamples = [
 		label: "Node.js",
 		source: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({
-  key: 're_123456789'
-});
+const reloop = new Reloop('re_123456789');
 
 const { response: property, error } = await reloop.contacts().updateProperty('prop_123456789', {
   fallbackValue: 'N/A',

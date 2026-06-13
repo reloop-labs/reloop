@@ -11,11 +11,10 @@ import { useState } from "react";
 
 const tabColors: Record<string, string> = {
 	Documentation: "#3b82f6",
-	"API Reference": "#10b981",
-	"Build with AI": "#8b5cf6",
-	"Knowledge Base": "#f59e0b",
+	"API Reference": "#f59e0b",
 	Webhooks: "#ec4899",
 	Setup: "#14b8a6",
+	"Self-Hosted": "#10b981",
 };
 
 export function Navbar({

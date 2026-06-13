@@ -135,10 +135,7 @@ const sdks: SdkType[] = [
 		install: "npm install reloop-email",
 		code: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop({
-  url: 'https://api.reloop.sh',
-  key: 'your-api-key'
-});
+const reloop = new Reloop('your-api-key');
 
 // Send an email
 const result = await reloop.mail.send({

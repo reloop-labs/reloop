@@ -35,12 +35,11 @@
 		"quickstart/cli",
 		"resources/mcp-server",
 		"resources/security",
-		"integrations",
 		"resources/storing-webhooks-data",
 		"api-keys",
 		"api",
 		"webhooks",
-		"knowledge-base",
-		"setup"
+		"setup",
+		"self-host"
 	]
 }
