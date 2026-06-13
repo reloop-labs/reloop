@@ -79,31 +79,4 @@ const totalPages = Math.ceil(response.total / response.limit);
 const hasNextPage = response.page < totalPages;
 ```
 
-## Iterating Through All Pages
 
-Here's a complete example for fetching all contacts across multiple pages:
-
-```javascript
-async function fetchAllContacts(apiKey) {
-  const contacts = [];
-  let page = 1;
-  const limit = 100; // Use max page size for fewer requests
-
-  while (true) {
-    const res = await fetch(
-      `https://api.reloop.sh/api/contacts/v1/list?page=${page}&limit=${limit}`,
-      { headers: { "x-api-key": apiKey } }
-    );
-
-    const data = await res.json();
-    contacts.push(...data.contacts);
-
-    const totalPages = Math.ceil(data.total / data.limit);
-    if (page >= totalPages) break;
-
-    page++;
-  }
-
-  return contacts;
-}
-```
