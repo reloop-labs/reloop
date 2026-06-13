@@ -13,7 +13,6 @@ export const createChannelXCodeSamples = [
 		source: `import Reloop from 'reloop-email';
 
 const reloop = new Reloop({
-  url: 'https://reloop.sh',
   key: 're_123456789'
 });
 
