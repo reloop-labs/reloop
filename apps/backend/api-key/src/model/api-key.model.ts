@@ -165,8 +165,12 @@ export namespace ApiKeyModel {
 	export type ApiKeyWithKeyResponse = typeof apiKeyWithKeyResponse.static;
 
 	export const apiKeyListResponse = t.Object({
-		object: t.Literal("api_key", { description: "Object type, always 'api_key'" }),
-		apiKeys: t.Array(apiKeyResponse, { description: "List of API keys matching the query" }),
+		object: t.Literal("api_key", {
+			description: "Object type, always 'api_key'",
+		}),
+		apiKeys: t.Array(apiKeyResponse, {
+			description: "List of API keys matching the query",
+		}),
 		total: t.Number({ description: "Total count of API keys" }),
 		page: t.Number({ description: "Current page index" }),
 		limit: t.Number({ description: "Maximum number of keys returned" }),

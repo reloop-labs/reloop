@@ -1,7 +1,4 @@
 {
 	"title": "Mail",
-	"pages": [
-		"tracking",
-		"other"
-	]
+	"pages": ["tracking", "other"]
 }

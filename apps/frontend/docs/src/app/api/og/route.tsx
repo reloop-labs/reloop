@@ -3,15 +3,15 @@ import path from "node:path";
 import { ImageResponse } from "next/og";
 import type { NextRequest } from "next/server";
 import {
+	siCurl,
+	siDotnet,
 	siGo,
 	siNodedotjs,
+	siOpenjdk,
+	siPhp,
 	siPython,
 	siRuby,
-	siCurl,
-	siPhp,
 	siRust,
-	siOpenjdk,
-	siDotnet,
 } from "simple-icons";
 
 export const dynamic = "force-dynamic";

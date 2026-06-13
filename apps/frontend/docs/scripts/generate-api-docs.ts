@@ -756,7 +756,9 @@ async function generateForService(
 				throw new Error(`Local status ${response.status}`);
 			}
 		} catch (err) {
-			console.log(`⚠️  Failed to fetch from local specUrl (${service.specUrl}). Falling back to prodUrl (${service.prodUrl})...`);
+			console.log(
+				`⚠️  Failed to fetch from local specUrl (${service.specUrl}). Falling back to prodUrl (${service.prodUrl})...`,
+			);
 			response = await fetch(service.prodUrl);
 		}
 		if (!response.ok) return [];

@@ -52,10 +52,46 @@ export function CopyCodeBlock({
 	);
 	const [mounted, setMounted] = useState(false);
 	const tabButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const isFirstScrollRef = useRef(true);
 
 	useEffect(() => {
 		setMounted(true);
 	}, []);
+
+	const hasTabs = tabs && tabs.length > 0;
+
+	const activeTabIndex = hasTabs
+		? tabs.findIndex((tab) => tab.id === activeTab)
+		: -1;
+
+	useEffect(() => {
+		if (!mounted) return;
+		const activeBtn = tabButtonRefs.current[activeTabIndex];
+		const container = containerRef.current;
+		if (activeBtn && container) {
+			const containerLeft = container.scrollLeft;
+			const containerWidth = container.clientWidth;
+			const containerRight = containerLeft + containerWidth;
+
+			const btnLeft = activeBtn.offsetLeft;
+			const btnWidth = activeBtn.offsetWidth;
+			const btnRight = btnLeft + btnWidth;
+
+			if (btnLeft < containerLeft || btnRight > containerRight) {
+				const targetScrollLeft =
+					btnLeft < containerLeft
+						? btnLeft - 16
+						: btnRight - containerWidth + 16;
+
+				container.scrollTo({
+					left: Math.max(0, targetScrollLeft),
+					behavior: isFirstScrollRef.current ? "auto" : "smooth",
+				});
+			}
+			isFirstScrollRef.current = false;
+		}
+	}, [activeTabIndex, mounted]);
 
 	const handleCopy = async () => {
 		try {
@@ -68,11 +104,7 @@ export function CopyCodeBlock({
 	};
 
 	const displayLabel = label ?? lang;
-	const hasTabs = tabs && tabs.length > 0;
 
-	const activeTabIndex = hasTabs
-		? tabs.findIndex((tab) => tab.id === activeTab)
-		: -1;
 	const highlightedTabIndex =
 		hoveredTabIdx !== undefined ? hoveredTabIdx : activeTabIndex;
 	const highlightedTab = tabButtonRefs.current[highlightedTabIndex];
@@ -142,6 +174,7 @@ export function CopyCodeBlock({
 			{hasTabs ? (
 				<div className="flex items-center gap-3 pr-4 pl-1">
 					<div
+						ref={containerRef}
 						className="scrollbar-none relative flex min-w-0 flex-1 items-center overflow-x-auto"
 						style={{
 							scrollbarWidth: "none",
