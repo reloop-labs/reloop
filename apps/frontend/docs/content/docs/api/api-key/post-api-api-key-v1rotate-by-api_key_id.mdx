@@ -1,5 +1,5 @@
 ---
-title: Rotate API key
+title: "Rotate API key"
 full: true
 _openapi:
   method: POST
@@ -7,116 +7,13 @@ _openapi:
   structuredData:
     headings: []
     contents:
-      - content: Generates a new secret for the API key while keeping the same ID
+      - content: "Generates a new secret for the API key while keeping the same ID"
 _apiData:
-  document: 'https://reloop.sh/api/api-key/openapi/json'
-  operationData:
-    - path: '/api/api-key/v1/rotate/{api_key_id}'
-      method: post
-  parameterList:
-    - name: api_key_id
-      type: string
-      required: true
-      description: API Key identifier
-      location: path
-  responseMap:
-    '200':
-      description: Response for status 200
-      schema:
-        id: key_123456789
-        name: Production API Key
-        key: rl_live_abc123def456ghi789
-        enabled: true
-        createdAt: '2026-03-29T10:00:00Z'
-        updatedAt: '2026-03-29T10:00:00Z'
-        permissions: 'read,write'
-    '403':
-      description: Response for status 403
-      schema:
-        message: Unauthorized access
-    '404':
-      description: Response for status 404
-      schema:
-        message: API key not found
-  codeSamples:
-    - id: node
-      lang: javascript
-      label: Node.js
-      source: |-
-        import Reloop from 'reloop-email';
-        
-        const reloop = new Reloop("rl_123456789");
-        
-        const apiKey = await reloop.apiKey.rotate("key_123456789");
-    - id: curl
-      lang: bash
-      label: cURL
-      source: |-
-        curl -X POST https://api.reloop.sh/api-key/v1/rotate/key_123456789 \\
-          -H "Authorization: Bearer rl_123456789"
-    - id: python
-      lang: python
-      label: Python
-      source: |-
-        from reloop_email import Reloop
-        
-        reloop = Reloop(api_key="rl_123456789")
-        
-        reloop.api_keys.rotate("key_123456789")
-    - id: rust
-      lang: rust
-      label: Rust
-      source: |-
-        use reloop_email::ReloopEmail;
-        use serde_json::json;
-        
-        #[tokio::main]
-        async fn main() -> Result<(), Box<dyn std::error::Error>> {
-            let reloop = ReloopEmail::new("rl_123456789".to_string(), None);
-            
-            reloop.api_keys().rotate("key_123456789").await?;
-        
-            Ok(())
-        }
-    - id: go
-      lang: go
-      label: Go
-      source: |-
-        import reloopemail "github.com/reloop-labs/reloop-email"
-        
-        func main() {
-            reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
-                APIKey: "rl_123456789",
-            })
-            
-            _, _ = reloop.ApiKeys().Rotate("key_123456789")
-        }
-    - id: php
-      lang: php
-      label: PHP
-      source: |-
-        $reloop = Reloop::client('rl_123456789');
-        
-        $reloop->apiKeys->rotate('key_123456789');
-    - id: java
-      lang: java
-      label: Java
-      source: |-
-        import sh.reloop.email.ReloopEmail;
-        
-        ReloopEmail reloop = ReloopEmail.client("rl_123456789");
-        
-        reloop.apiKeys().rotate("key_123456789");
-    - id: dotnet
-      lang: csharp
-      label: .NET
-      source: |-
-        using Reloop.Email;
-        using Reloop.Email.Models;
-        
-        var reloop = ReloopEmail.Client("rl_123456789");
-        
-        await reloop.ApiKeys().RotateAsync("key_123456789");
+  document: "https://reloop.sh/api/api-key/openapi/json"
+  operationData: [{"path":"/api/api-key/v1/rotate/{api_key_id}","method":"post"}]
+  parameterList: [{"name":"api_key_id","type":"string","required":true,"description":"API Key identifier","location":"path"}]
+  responseMap: {"200":{"description":"Response for status 200","schema":{"id":"key_123456789","name":"Production API Key","key":"rl_live_abc123def456ghi789","enabled":true,"createdAt":"2026-03-29T10:00:00Z","updatedAt":"2026-03-29T10:00:00Z","permissions":"read,write"}},"403":{"description":"Response for status 403","schema":{"message":"Unauthorized access"}},"404":{"description":"Response for status 404","schema":{"message":"API key not found"}}}
+  codeSamples: [{"id":"node","lang":"javascript","label":"Node.js","source":"import { Reloop } from \"@reloop/node\";\n\nconst reloop = new Reloop({ key: \"rl_123456789\" });\n\nconst apiKey = await reloop.apiKey.rotate(\"key_123456789\");"},{"id":"curl","lang":"bash","label":"cURL","source":"curl -X POST https://api.reloop.sh/api-key/v1/rotate/key_123456789 \\\n  -H \"Authorization: Bearer rl_123456789\""},{"id":"python","lang":"python","label":"Python","source":"reloop = Reloop(api_key=\"rl_123456789\")\n\nreloop.api_keys.rotate(\"key_123456789\")"},{"id":"php","lang":"php","label":"PHP","source":"$reloop = Reloop::client('rl_123456789');\n\n$reloop->apiKeys->rotate('key_123456789');"},{"id":"java","lang":"java","label":"Java","source":"import java.net.URI;\nimport java.net.http.*;\nimport java.net.http.HttpRequest.BodyPublishers;\n\nHttpClient client = HttpClient.newHttpClient();\n\nHttpRequest request = HttpRequest.newBuilder()\n    .uri(URI.create(\"https://api.reloop.sh/api-key/v1/rotate/key_123456789\"))\n    .header(\"Authorization\", \"Bearer rl_123456789\")\n    .POST(BodyPublishers.noBody())\n    .build();\n\nHttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());"},{"id":"dotnet","lang":"csharp","label":".NET","source":"using System.Net.Http;\n\nvar client = new HttpClient();\nclient.DefaultRequestHeaders.Add(\"Authorization\", \"Bearer rl_123456789\");\n\nvar response = await client.PostAsync(\n    \"https://api.reloop.sh/api-key/v1/rotate/key_123456789\",\n    null\n);"}]
 ---
 
 {/* This file was generated by the OpenAPI doc generator. Do not edit this file directly. Run `bun run generate:api-docs` to regenerate. */}

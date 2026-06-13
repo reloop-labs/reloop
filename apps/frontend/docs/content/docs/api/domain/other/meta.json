@@ -3,7 +3,6 @@
 	"pages": [
 		"post-api-domain-v1verify",
 		"post-api-domain-v1dkim-key",
-		"post-api-domain-v1log-incoming",
-		"post-api-domain-v1check-recipient"
+		"post-api-domain-v1log-incoming"
 	]
 }

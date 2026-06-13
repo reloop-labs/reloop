@@ -749,7 +749,16 @@ async function generateForService(
 	console.log(`\n📡 Fetching spec from ${service.specUrl}...`);
 
 	try {
-		const response = await fetch(service.specUrl);
+		let response;
+		try {
+			response = await fetch(service.specUrl);
+			if (!response.ok) {
+				throw new Error(`Local status ${response.status}`);
+			}
+		} catch (err) {
+			console.log(`⚠️  Failed to fetch from local specUrl (${service.specUrl}). Falling back to prodUrl (${service.prodUrl})...`);
+			response = await fetch(service.prodUrl);
+		}
 		if (!response.ok) return [];
 
 		const spec = await response.json();

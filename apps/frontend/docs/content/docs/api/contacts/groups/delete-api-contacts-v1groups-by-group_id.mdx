@@ -1,5 +1,5 @@
 ---
-title: Delete Group
+title: "Delete Group"
 full: true
 _openapi:
   method: DELETE
@@ -7,134 +7,13 @@ _openapi:
   structuredData:
     headings: []
     contents:
-      - content: Delete group based on group id
+      - content: "Delete group based on group id"
 _apiData:
-  document: 'https://reloop.sh/api/contacts/openapi/json'
-  operationData:
-    - path: '/api/contacts/v1/groups/{group_id}'
-      method: delete
-  parameterList:
-    - name: group_id
-      type: string
-      required: true
-      description: ''
-      location: path
-  responseMap:
-    '200':
-      description: Response for status 200
-      schema:
-        object: contact_group
-        success: true
-        id: con_123456789
-        name: Newsletter
-        event: evt_123456789
-    '403':
-      description: Response for status 403
-      schema:
-        message: Unauthorized access
-        why: A contact with this email already exists in your organization.
-        fix: Use a different email address or update the existing contact instead.
-    '404':
-      description: Response for status 404
-      schema:
-        message: Group not found
-        why: A contact with this email already exists in your organization.
-        fix: Use a different email address or update the existing contact instead.
-  codeSamples:
-    - id: node
-      lang: js
-      label: Node.js
-      source: |-
-        import Reloop from 'reloop-email';
-        
-        const reloop = new Reloop('re_123456789');
-        
-        const { response, error } = await reloop.contacts().deleteGroup('grp_123456789');
-        if (error) throw error;
-    - id: curl
-      lang: bash
-      label: cURL
-      source: |-
-        curl -X DELETE https://reloop.sh/api/contacts/v1/groups/grp_123456789 \\
-          -H "x-api-key: re_123456789"
-    - id: php
-      lang: php
-      label: PHP
-      source: |-
-        $reloop = Reloop::client('re_123456789');
-        
-        $reloop->contacts->deleteGroup('grp_123456789');
-    - id: python
-      lang: python
-      label: Python
-      source: |-
-        from reloop_email import Reloop
-        
-        reloop = Reloop(api_key="re_123456789")
-        
-        reloop.contacts().delete_group("grp_123456789")
-    - id: ruby
-      lang: ruby
-      label: Ruby
-      source: |-
-        require 'net/http'
-        require 'json'
-        
-        uri = URI('https://reloop.sh/api/contacts/v1/groups/grp_123456789')
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.use_ssl = true
-        
-        request = Net::HTTP::Delete.new(uri)
-        request['x-api-key'] = 're_123456789'
-        
-        response = http.request(request)
-        result = JSON.parse(response.body)
-    - id: go
-      lang: go
-      label: Go
-      source: |-
-        import reloopemail "github.com/reloop-labs/reloop-email"
-        
-        func main() {
-            reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
-                APIKey: "re_123456789",
-            })
-            
-            _, _ = reloop.Contacts().DeleteGroup("grp_123456789")
-        }
-    - id: rust
-      lang: rust
-      label: Rust
-      source: |-
-        use reloop_email::ReloopEmail;
-        use serde_json::json;
-        
-        #[tokio::main]
-        async fn main() -> Result<(), Box<dyn std::error::Error>> {
-            let reloop = ReloopEmail::new("re_123456789".to_string(), None);
-            
-            reloop.contacts().delete_group("grp_123456789").await?;
-        
-            Ok(())
-        }
-    - id: java
-      lang: java
-      label: Java
-      source: |-
-        import sh.reloop.email.ReloopEmail;
-        
-        ReloopEmail reloop = ReloopEmail.client("re_123456789");
-        
-        reloop.contacts().deleteGroup("grp_123456789");
-    - id: dotnet
-      lang: csharp
-      label: .NET
-      source: |-
-        using Reloop.Email;
-        
-        var reloop = ReloopEmail.Client("re_123456789");
-        
-        await reloop.Contacts().DeleteGroupAsync("grp_123456789");
+  document: "https://reloop.sh/api/contacts/openapi/json"
+  operationData: [{"path":"/api/contacts/v1/groups/{group_id}","method":"delete"}]
+  parameterList: [{"name":"group_id","type":"string","required":true,"description":"","location":"path"}]
+  responseMap: {"200":{"description":"Response for status 200","schema":{"object":"contact_group","success":true,"id":"con_123456789","name":"Newsletter","event":"evt_123456789"}},"403":{"description":"Response for status 403","schema":{"message":"Unauthorized access","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead."}},"404":{"description":"Response for status 404","schema":{"message":"Group not found","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead."}}}
+  codeSamples: [{"id":"node","lang":"js","label":"Node.js","source":"import Reloop from 'reloop-email';\n\nconst reloop = new Reloop({\n  url: 'https://reloop.sh',\n  key: 're_123456789'\n});\n\nconst { response, error } = await reloop.contacts.deleteGroup('grp_123456789');\nif (error) throw error;"},{"id":"curl","lang":"bash","label":"cURL","source":"curl -X DELETE https://reloop.sh/api/contacts/v1/groups/grp_123456789 \\\n  -H \"x-api-key: re_123456789\""},{"id":"php","lang":"php","label":"PHP","source":"$reloop = Reloop::client('re_123456789');\n\n$reloop->contacts->deleteGroup('grp_123456789');"},{"id":"python","lang":"python","label":"Python","source":"reloop = Reloop(api_key=\"re_123456789\")\n\nreloop.contacts.delete_group(\"grp_123456789\")"},{"id":"ruby","lang":"ruby","label":"Ruby","source":"require 'net/http'\nrequire 'json'\n\nuri = URI('https://reloop.sh/api/contacts/v1/groups/grp_123456789')\nhttp = Net::HTTP.new(uri.host, uri.port)\nhttp.use_ssl = true\n\nrequest = Net::HTTP::Delete.new(uri)\nrequest['x-api-key'] = 're_123456789'\n\nresponse = http.request(request)\nresult = JSON.parse(response.body)"},{"id":"go","lang":"go","label":"Go","source":"package main\n\nimport \"net/http\"\n\nfunc main() {\n  req, _ := http.NewRequest(\"DELETE\", \"https://reloop.sh/api/contacts/v1/groups/grp_123456789\", nil)\n  req.Header.Set(\"x-api-key\", \"re_123456789\")\n\n  client := &http.Client{}\n  resp, _ := client.Do(req)\n  defer resp.Body.Close()\n}"},{"id":"rust","lang":"rust","label":"Rust","source":"use reqwest::Client;\n\n#[tokio::main]\nasync fn main() -> Result<(), reqwest::Error> {\n    let client = Client::new();\n\n    let response = client\n        .delete(\"https://reloop.sh/api/contacts/v1/groups/grp_123456789\")\n        .header(\"x-api-key\", \"re_123456789\")\n        .send()\n        .await?;\n\n    Ok(())\n}"},{"id":"java","lang":"java","label":"Java","source":"import java.net.URI;\nimport java.net.http.*;\n\nHttpClient client = HttpClient.newHttpClient();\n\nHttpRequest request = HttpRequest.newBuilder()\n    .uri(URI.create(\"https://reloop.sh/api/contacts/v1/groups/grp_123456789\"))\n    .header(\"x-api-key\", \"re_123456789\")\n    .DELETE()\n    .build();\n\nHttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());"},{"id":"dotnet","lang":"csharp","label":".NET","source":"using System.Net.Http;\n\nvar client = new HttpClient();\nclient.DefaultRequestHeaders.Add(\"x-api-key\", \"re_123456789\");\n\nvar response = await client.DeleteAsync(\n    \"https://reloop.sh/api/contacts/v1/groups/grp_123456789\"\n);"}]
 ---
 
 {/* This file was generated by the OpenAPI doc generator. Do not edit this file directly. Run `bun run generate:api-docs` to regenerate. */}

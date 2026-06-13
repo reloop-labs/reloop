@@ -165,22 +165,47 @@ export namespace ApiKeyModel {
 	export type ApiKeyWithKeyResponse = typeof apiKeyWithKeyResponse.static;
 
 	export const apiKeyListResponse = t.Object({
-		object: t.Literal("api_key"),
-		apiKeys: t.Array(apiKeyResponse),
-		total: t.Number(),
-		page: t.Number(),
-		limit: t.Number(),
+		object: t.Literal("api_key", { description: "Object type, always 'api_key'" }),
+		apiKeys: t.Array(apiKeyResponse, { description: "List of API keys matching the query" }),
+		total: t.Number({ description: "Total count of API keys" }),
+		page: t.Number({ description: "Current page index" }),
+		limit: t.Number({ description: "Maximum number of keys returned" }),
 		event: t.String({ description: "Event ID for the list operation" }),
 	});
 
 	export type ApiKeyListResponse = typeof apiKeyListResponse.static;
 
 	export const apiKeyQuery = t.Object({
-		page: t.Optional(t.Number({ minimum: 1, default: 1 })),
-		limit: t.Optional(t.Number({ minimum: 1, maximum: 100, default: 10 })),
-		enabled: t.Optional(t.Boolean()),
-		userId: t.Optional(t.String()),
-		q: t.Optional(t.String()),
+		page: t.Optional(
+			t.Number({
+				minimum: 1,
+				default: 1,
+				description: "Page number for pagination",
+			}),
+		),
+		limit: t.Optional(
+			t.Number({
+				minimum: 1,
+				maximum: 100,
+				default: 10,
+				description: "Number of keys to return per page",
+			}),
+		),
+		enabled: t.Optional(
+			t.Boolean({
+				description: "Filter keys by their enabled status",
+			}),
+		),
+		userId: t.Optional(
+			t.String({
+				description: "Filter keys created by a specific user ID",
+			}),
+		),
+		q: t.Optional(
+			t.String({
+				description: "Search query to filter keys by name",
+			}),
+		),
 	});
 
 	export type ApiKeyQuery = typeof apiKeyQuery.static;
