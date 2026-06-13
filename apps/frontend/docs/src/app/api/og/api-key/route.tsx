@@ -327,10 +327,9 @@ export async function GET(request: NextRequest) {
 							gap: "14px",
 						}}
 					>
-						<div style={{ display: "flex" }}>
 							<svg
-								width="36"
-								height="36"
+								width="58"
+								height="58"
 								viewBox="0 0 200 200"
 								fill="none"
 								xmlns="http://www.w3.org/2000/svg"
@@ -499,7 +498,6 @@ export async function GET(request: NextRequest) {
 								<rect x="55" y="134" width="83" height="8" fill="#ffffff" />
 								<rect x="63" y="142" width="83" height="8" fill="#ffffff" />
 							</svg>
-						</div>
 						<span
 							style={{
 								fontSize: "24px",
