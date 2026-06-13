@@ -35,17 +35,19 @@ function getJsonLd(page: any, canonicalUrl: string) {
 			"@id": `${siteUrl}/#organization`,
 			name: siteName,
 			url: siteUrl,
-			sameAs: [
-				socialProfiles.github,
-				socialProfiles.discord,
-				socialProfiles.x,
-			],
+			sameAs: [socialProfiles.github, socialProfiles.discord, socialProfiles.x],
 		},
 	];
 
 	const isApiPage = !!page.data._apiData;
-	const openapiDescription = page.data._openapi?.structuredData?.contents?.[0]?.content || "";
-	const description = page.data.description || openapiDescription || (isApiPage ? "Explore the Reloop API endpoints and schemas." : "Reloop developer documentation and integration guides.");
+	const openapiDescription =
+		page.data._openapi?.structuredData?.contents?.[0]?.content || "";
+	const description =
+		page.data.description ||
+		openapiDescription ||
+		(isApiPage
+			? "Explore the Reloop API endpoints and schemas."
+			: "Reloop developer documentation and integration guides.");
 
 	if (isApiPage) {
 		baseGraph.push({
@@ -105,10 +107,16 @@ export async function generateMetadata(props: {
 	}
 
 	const isApiPage = !!page.data._apiData;
-	let ogImage: string | undefined = undefined;
+	let ogImage: string | undefined;
 
-	const openapiDescription = (page.data as any)._openapi?.structuredData?.contents?.[0]?.content || "";
-	const description = page.data.description || openapiDescription || (isApiPage ? "Explore the Reloop API endpoints and schemas." : "Reloop developer documentation and integration guides.");
+	const openapiDescription =
+		(page.data as any)._openapi?.structuredData?.contents?.[0]?.content || "";
+	const description =
+		page.data.description ||
+		openapiDescription ||
+		(isApiPage
+			? "Explore the Reloop API endpoints and schemas."
+			: "Reloop developer documentation and integration guides.");
 
 	if (isApiPage) {
 		const operation = page.data._apiData?.operationData?.[0];
@@ -145,7 +153,16 @@ export async function generateMetadata(props: {
 			title: `${page.data.title} | Reloop Docs`,
 			description: description,
 			url: canonicalUrl,
-			images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: `${page.data.title} | Reloop Docs` }] : undefined,
+			images: ogImage
+				? [
+						{
+							url: ogImage,
+							width: 1200,
+							height: 630,
+							alt: `${page.data.title} | Reloop Docs`,
+						},
+					]
+				: undefined,
 		},
 		twitter: {
 			card: "summary_large_image",
@@ -201,8 +218,9 @@ export default async function Page(props: {
 
 	return (
 		<CodeColumnProvider>
+			{/* biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD requires dangerouslySetInnerHTML to prevent React from escaping JSON characters */}
 			<script
-				type="application/ld+json"
+				type="application/ld+json; charset=utf-8"
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
 			/>
 			<DocsLayout
