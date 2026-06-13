@@ -414,6 +414,23 @@ function ParameterRow({
 					</p>
 				)}
 
+			{/* Inline example for array types without sub-properties */}
+			{!hasProperties &&
+				(param.type.includes("[]") || param.type.toLowerCase().startsWith("array")) && (
+					<p className="mt-2 text-[13.5px] text-text-sub-600 leading-relaxed">
+						Example:{" "}
+						<code className="rounded bg-bg-weak-50 px-1.5 py-0.5 text-[12px] dark:bg-white/5">
+							{param.type.startsWith("string")
+								? '["value1", "value2"]'
+								: param.type.startsWith("number") || param.type.startsWith("integer")
+									? "[1, 2, 3]"
+									: param.type.startsWith("object")
+										? '[{ ... }]'
+										: '["value1", "value2"]'}
+						</code>
+					</p>
+				)}
+
 			{/* Constraints — shown as bullet points like Resend */}
 			{(param.minimum !== undefined ||
 				param.maximum !== undefined ||

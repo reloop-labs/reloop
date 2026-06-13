@@ -167,7 +167,7 @@ export function ApiSidebarLink({
 				{node.method ? (
 					<p
 						className={cn(
-							"inline-flex w-fit shrink-0 items-center justify-self-start rounded-md px-1.5 py-[3.5px] font-semibold text-[10px] uppercase leading-tight tracking-wide",
+							"inline-flex w-fit shrink-0 items-center justify-self-start rounded-lg px-1.5 py-[3.5px] font-semibold text-[10px] uppercase leading-tight tracking-wide",
 							!isActive && "opacity-90",
 							node.method === "GET" &&
 								(isActive
