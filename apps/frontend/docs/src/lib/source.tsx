@@ -252,6 +252,7 @@ export const source = {
 					),
 					toc,
 					_apiData: frontmatter._apiData || null,
+					_openapi: frontmatter._openapi || null,
 					raw: fileContent,
 				},
 				url: `/${slugPath === "index" ? "introduction" : slugPath}`,

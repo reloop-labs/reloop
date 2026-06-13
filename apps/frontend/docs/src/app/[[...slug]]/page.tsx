@@ -13,17 +13,92 @@ import { getMDXComponents } from "@reloop/fe-docs/mdx-components";
 import { Icon } from "@reloop/ui/icon";
 import { notFound } from "next/navigation";
 
+function getJsonLd(page: any, canonicalUrl: string) {
+	const siteUrl = "https://reloop.sh";
+	const siteName = "Reloop";
+	const socialProfiles = {
+		github: "https://github.com/reloop-labs/reloop",
+		discord: "https://discord.gg/bHnkBcp7xR",
+		x: "https://x.com/reloophq",
+	};
+
+	const baseGraph = [
+		{
+			"@type": "WebSite",
+			"@id": `${siteUrl}/#website`,
+			url: siteUrl,
+			name: siteName,
+			publisher: { "@id": `${siteUrl}/#organization` },
+		},
+		{
+			"@type": "Organization",
+			"@id": `${siteUrl}/#organization`,
+			name: siteName,
+			url: siteUrl,
+			sameAs: [
+				socialProfiles.github,
+				socialProfiles.discord,
+				socialProfiles.x,
+			],
+		},
+	];
+
+	const isApiPage = !!page.data._apiData;
+	const openapiDescription = page.data._openapi?.structuredData?.contents?.[0]?.content || "";
+	const description = page.data.description || openapiDescription || (isApiPage ? "Explore the Reloop API endpoints and schemas." : "Reloop developer documentation and integration guides.");
+
+	if (isApiPage) {
+		baseGraph.push({
+			"@type": "APIReference",
+			"@id": `${canonicalUrl}#webpage`,
+			url: canonicalUrl,
+			name: `${page.data.title} API | Reloop Docs`,
+			description: description,
+			isPartOf: { "@id": `${siteUrl}/#website` },
+			about: { "@id": `${siteUrl}/#organization` },
+			targetPlatform: "REST API",
+			programmingModel: "REST",
+		} as any);
+	} else {
+		baseGraph.push({
+			"@type": "TechArticle",
+			"@id": `${canonicalUrl}#webpage`,
+			url: canonicalUrl,
+			name: `${page.data.title} | Reloop Docs`,
+			description: description,
+			isPartOf: { "@id": `${siteUrl}/#website` },
+			about: { "@id": `${siteUrl}/#organization` },
+			headline: page.data.title,
+			inLanguage: "en-US",
+		} as any);
+	}
+
+	return {
+		"@context": "https://schema.org",
+		"@graph": baseGraph,
+	};
+}
+
 export async function generateMetadata(props: {
 	params: Promise<{ slug?: string[] }>;
 }) {
 	const params = await props.params;
+	const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://reloop.sh";
 
 	const page = source.getPage(params.slug);
 	if (!page) {
 		if (!params.slug || params.slug.length === 0) {
 			return {
-				title: "Reloop - Modern Email Infrastructure",
+				title: "Reloop Docs - Modern Email Infrastructure",
 				description: "The modern email infrastructure for developers.",
+				metadataBase: new URL(appUrl),
+				alternates: {
+					canonical: `${appUrl}/docs`,
+				},
+				robots: {
+					index: true,
+					follow: true,
+				},
 			};
 		}
 		notFound();
@@ -32,13 +107,14 @@ export async function generateMetadata(props: {
 	const isApiPage = !!page.data._apiData;
 	let ogImage: string | undefined = undefined;
 
+	const openapiDescription = (page.data as any)._openapi?.structuredData?.contents?.[0]?.content || "";
+	const description = page.data.description || openapiDescription || (isApiPage ? "Explore the Reloop API endpoints and schemas." : "Reloop developer documentation and integration guides.");
+
 	if (isApiPage) {
 		const operation = page.data._apiData?.operationData?.[0];
 		const method = operation?.method || "GET";
 		const path = operation?.path || "";
-		const description = page.data.description || "";
 
-		const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://reloop.sh";
 		const searchParams = new URLSearchParams({
 			title: page.data.title,
 			description: description,
@@ -52,18 +128,29 @@ export async function generateMetadata(props: {
 		ogImage = `${appUrl}/docs/${ogPath}?${searchParams.toString()}`;
 	}
 
+	const canonicalUrl = `${appUrl}/docs${page.url === "/introduction" ? "" : page.url}`;
+
 	return {
-		title: page.data.title,
-		description: page.data.description,
+		title: `${page.data.title} | Reloop Docs`,
+		description: description,
+		metadataBase: new URL(appUrl),
+		alternates: {
+			canonical: canonicalUrl,
+		},
+		robots: {
+			index: true,
+			follow: true,
+		},
 		openGraph: {
-			title: page.data.title,
-			description: page.data.description,
-			images: ogImage ? [{ url: ogImage, width: 1200, height: 630 }] : undefined,
+			title: `${page.data.title} | Reloop Docs`,
+			description: description,
+			url: canonicalUrl,
+			images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: `${page.data.title} | Reloop Docs` }] : undefined,
 		},
 		twitter: {
 			card: "summary_large_image",
-			title: page.data.title,
-			description: page.data.description,
+			title: `${page.data.title} | Reloop Docs`,
+			description: description,
 			images: ogImage ? [ogImage] : undefined,
 		},
 	};
@@ -108,8 +195,16 @@ export default async function Page(props: {
 	// Force RSC cache bust: 2026-05-17T03:30:00Z
 	const pathname = page.url;
 
+	const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://reloop.sh";
+	const canonicalUrl = `${appUrl}/docs${page.url === "/introduction" ? "" : page.url}`;
+	const jsonLdData = getJsonLd(page, canonicalUrl);
+
 	return (
 		<CodeColumnProvider>
+			<script
+				type="application/ld+json"
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
+			/>
 			<DocsLayout
 				tree={source.pageTree.children as PageTreeItem[]}
 				pathname={pathname}
