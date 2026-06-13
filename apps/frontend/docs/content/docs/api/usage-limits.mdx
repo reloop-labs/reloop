@@ -1,30 +1,55 @@
 ---
 title: Usage Limits
-description: Understand the rate limits and usage quotas for your Reloop account.
+description: Understand rate limits and quotas for the Reloop API.
 ---
 
-To ensure high availability and performance for all users, Reloop enforces rate limits on API requests.
+Reloop enforces rate limits on API requests to ensure stability and fair usage.
 
-## Rate Limits
+For management endpoints (e.g., domain verification, contact management, configuration), rate limits are scoped and applied per **organization**.
 
-Rate limits are applied per API key. The default limits are:
+### Default Endpoint Limits
 
-| Plan | Rate Limit |
-|------|------------|
-| Free | 10 requests per second |
-| Pro | 100 requests per second |
-| Enterprise | Custom |
+| Endpoint / Operation | Limit | Window |
+|----------------------|-------|--------|
+| Domain Operations (create, delete, verify) | 10 requests | 60s |
+| List Contacts | 60 requests | 60s |
+| Create Channel | 30 requests | 60s |
+| Update Preferences | 10 requests | 60s |
+| Generate Token | 5 requests | 60s |
 
-## Limit Headers
+---
 
-Every API response includes headers that indicate your current rate limit status:
+## Email Sending Limits
 
-| Header | Description |
-|--------|-------------|
-| `X-RateLimit-Limit` | The maximum number of requests allowed per window. |
-| `X-RateLimit-Remaining` | The number of requests remaining in the current window. |
-| `X-RateLimit-Reset` | The time at which the current rate limit window resets (in UTC seconds). |
+Email sending endpoints use a multi-layer rate limiting strategy:
 
-## Handling Rate Limits
+| Layer | Limit | Window | Scope |
+|-------|-------|--------|-------|
+| IP | 20 requests | 60s | Client IP |
+| User | 50 requests | 60s | Authenticated User |
+| Organization | 100 requests | 60s | Organization |
+| Organization Daily | 5,000 requests | 24h | Organization |
+| Global | 500 requests | 60s | Infrastructure-wide |
 
-When a rate limit is exceeded, the API returns a `429 Too Many Requests` status code. We recommend implementing an exponential backoff strategy for retrying failed requests.
+---
+
+## Rate Limit Headers
+
+Every API response includes headers indicating your current rate limit status:
+
+- `X-RateLimit-Limit` — Maximum requests allowed in the window.
+- `X-RateLimit-Remaining` — Requests remaining in the current window.
+- `X-RateLimit-Window` — Size of the window in seconds (management endpoints).
+- `X-RateLimit-Reset` — Unix epoch timestamp when the window resets (email endpoints).
+- `Retry-After` — Seconds to wait before retrying (returned with `429` responses).
+
+### Example 429 Response
+
+```json
+{
+  "message": "Too many requests",
+  "why": "You have exceeded the limit of 10 requests per 60s window for this operation.",
+  "fix": "Wait 42 second(s) before retrying.",
+  "retryAfter": 42
+}
+```

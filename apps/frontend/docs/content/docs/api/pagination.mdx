@@ -1,29 +1,49 @@
 ---
 title: Pagination
-description: Learn how to handle paginated responses from the Reloop API.
+description: Handle paginated list responses from the Reloop API.
 ---
 
-Reloop uses offset-based pagination for list endpoints. You can control the number of results returned using the `limit` and `page` query parameters.
+List endpoints use offset-based pagination. Use the `page` and `limit` query parameters to paginate results.
 
-## Parameters
+## Query Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `limit` | `number` | `20` | The number of records to return (max 100). |
-| `page` | `number` | `1` | The page number to retrieve. |
+| Parameter | Type | Default | Max | Description |
+|-----------|------|---------|-----|-------------|
+| `page` | `number` | `1` | — | The page number to retrieve. |
+| `limit` | `number` | `20` | `100` | The number of records to return per page. |
 
-## Response
+## Response Structure
 
-Paginated responses include a `meta` object with the following fields:
+Pagination metadata is returned directly at the root of the JSON response:
+
+- `total` — The total number of items matching the query.
+- `page` — The current page number.
+- `limit` — The page limit.
+
+### Example Responses
 
 ```json
+// GET /api/contacts/list
 {
-  "data": [...],
-  "meta": {
-    "total": 150,
-    "page": 1,
-    "limit": 20,
-    "totalPages": 8
-  }
+  "object": "contact",
+  "contacts": [...],
+  "total": 120,
+  "page": 1,
+  "limit": 20,
+  "totalContacts": 120,
+  "subscribedContacts": 100,
+  "unsubscribedContacts": 20,
+  "event": "contact.list"
+}
+```
+
+```json
+// GET /api/template/list
+{
+  "templates": [...],
+  "total": 45,
+  "page": 1,
+  "limit": 20,
+  "event": "template.list"
 }
 ```

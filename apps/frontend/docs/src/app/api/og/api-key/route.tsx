@@ -647,7 +647,7 @@ export async function GET(request: NextRequest) {
 							color: primaryColor,
 						}}
 					>
-						docs.reloop.sh
+						reloop.sh/docs
 					</div>
 				</div>
 			</div>

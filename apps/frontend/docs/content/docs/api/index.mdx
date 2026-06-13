@@ -41,9 +41,7 @@ The API uses standard HTTP status codes to indicate success or failure:
 
 The API enforces rate limits to ensure fair usage. If you exceed the limit, you'll receive a `429` response. 
 
-Rate limits are scoped as follows:
-- **Authenticated Requests**: Applied per **organization**.
-- **Unauthenticated Requests** (e.g., public preferences endpoints): Applied per client **IP address**.
+Rate limits are applied per **organization**.
 
 ### Rate Limit Headers
 
