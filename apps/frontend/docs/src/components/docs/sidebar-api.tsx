@@ -167,17 +167,28 @@ export function ApiSidebarLink({
 				{node.method ? (
 					<p
 						className={cn(
-							"inline-flex w-fit shrink-0 items-center justify-self-start rounded-[4px] px-1.5 py-[1.5px] font-semibold text-[10px] uppercase leading-tight tracking-wide",
+							"inline-flex w-fit shrink-0 items-center justify-self-start rounded-md px-1.5 py-[3.5px] font-semibold text-[10px] uppercase leading-tight tracking-wide",
+							!isActive && "opacity-90",
 							node.method === "GET" &&
-								"bg-green-500/15 text-green-600 dark:bg-green-500/20 dark:text-green-400",
+								(isActive
+									? "bg-green-500 text-white dark:bg-green-500 dark:text-white"
+									: "bg-green-500/15 text-green-600 dark:bg-green-500/20 dark:text-green-400"),
 							node.method === "POST" &&
-								"bg-blue-500/15 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400",
+								(isActive
+									? "bg-blue-500 text-white dark:bg-blue-500 dark:text-white"
+									: "bg-blue-500/15 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400"),
 							node.method === "DELETE" &&
-								"bg-red-500/15 text-red-500 dark:bg-red-500/20 dark:text-red-400",
+								(isActive
+									? "bg-red-500 text-white dark:bg-red-500 dark:text-white"
+									: "bg-red-500/15 text-red-500 dark:bg-red-500/20 dark:text-red-400"),
 							node.method === "PATCH" &&
-								"bg-orange-500/15 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400",
+								(isActive
+									? "bg-orange-500 text-white dark:bg-orange-500 dark:text-white"
+									: "bg-orange-500/15 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400"),
 							node.method === "PUT" &&
-								"bg-purple-500/15 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400",
+								(isActive
+									? "bg-purple-500 text-white dark:bg-purple-500 dark:text-white"
+									: "bg-purple-500/15 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400"),
 						)}
 					>
 						{node.method === "DELETE" ? "DEL" : node.method}
