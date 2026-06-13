@@ -29,9 +29,39 @@ export async function generateMetadata(props: {
 		notFound();
 	}
 
+	const isApiPage = !!page.data._apiData;
+	let ogImage: string | undefined = undefined;
+
+	if (isApiPage) {
+		const operation = page.data._apiData?.operationData?.[0];
+		const method = operation?.method || "GET";
+		const path = operation?.path || "";
+		const description = page.data.description || "";
+
+		const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://reloop.sh";
+		const searchParams = new URLSearchParams({
+			title: page.data.title,
+			description: description,
+			method: method,
+			path: path,
+		});
+		ogImage = `${appUrl}/docs/api/og?${searchParams.toString()}`;
+	}
+
 	return {
 		title: page.data.title,
 		description: page.data.description,
+		openGraph: {
+			title: page.data.title,
+			description: page.data.description,
+			images: ogImage ? [{ url: ogImage, width: 1200, height: 630 }] : undefined,
+		},
+		twitter: {
+			card: "summary_large_image",
+			title: page.data.title,
+			description: page.data.description,
+			images: ogImage ? [ogImage] : undefined,
+		},
 	};
 }
 
