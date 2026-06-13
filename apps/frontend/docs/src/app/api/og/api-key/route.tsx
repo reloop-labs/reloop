@@ -366,7 +366,7 @@ export async function GET(request: NextRequest) {
 									width="46"
 									height="8"
 									transform="rotate(90 138 59)"
-									fill="#8b5cf6"
+									fill="#878787"
 								/>
 								<rect
 									x="130"
@@ -374,7 +374,7 @@ export async function GET(request: NextRequest) {
 									width="46"
 									height="8"
 									transform="rotate(90 130 59)"
-									fill="#8b5cf6"
+									fill="#878787"
 								/>
 								<rect
 									x="90"
@@ -382,7 +382,7 @@ export async function GET(request: NextRequest) {
 									width="29"
 									height="8"
 									transform="rotate(90 90 105)"
-									fill="#8b5cf6"
+									fill="#878787"
 								/>
 								<rect
 									x="82"
@@ -390,7 +390,7 @@ export async function GET(request: NextRequest) {
 									width="29"
 									height="8"
 									transform="rotate(90 82 105)"
-									fill="#8b5cf6"
+									fill="#878787"
 								/>
 								<rect
 									x="138"
@@ -422,7 +422,7 @@ export async function GET(request: NextRequest) {
 									width="8"
 									height="8"
 									transform="rotate(90 130 105)"
-									fill="#8b5cf6"
+									fill="#878787"
 								/>
 								<rect
 									x="122"
@@ -430,7 +430,7 @@ export async function GET(request: NextRequest) {
 									width="8"
 									height="8"
 									transform="rotate(90 122 105)"
-									fill="#8b5cf6"
+									fill="#878787"
 								/>
 								<rect
 									x="98"
@@ -446,7 +446,7 @@ export async function GET(request: NextRequest) {
 									width="10"
 									height="8"
 									transform="rotate(90 90 77)"
-									fill="#8b5cf6"
+									fill="#878787"
 								/>
 								<rect
 									x="82"
@@ -454,7 +454,7 @@ export async function GET(request: NextRequest) {
 									width="10"
 									height="8"
 									transform="rotate(90 82 77)"
-									fill="#8b5cf6"
+									fill="#878787"
 								/>
 								<rect
 									x="146"
@@ -478,7 +478,7 @@ export async function GET(request: NextRequest) {
 									width="21"
 									height="8"
 									transform="rotate(90 138 113)"
-									fill="#8b5cf6"
+									fill="#878787"
 								/>
 								<rect
 									x="130"
@@ -486,7 +486,7 @@ export async function GET(request: NextRequest) {
 									width="21"
 									height="8"
 									transform="rotate(90 130 113)"
-									fill="#8b5cf6"
+									fill="#878787"
 								/>
 								<rect
 									x="98"
@@ -536,6 +536,7 @@ export async function GET(request: NextRequest) {
 					</div>
 					<div
 						style={{
+							display: "flex",
 							fontSize: "18px",
 							fontWeight: 600,
 							color: "rgba(255, 255, 255, 0.35)",
@@ -604,6 +605,7 @@ export async function GET(request: NextRequest) {
 					{/* Title */}
 					<div
 						style={{
+							display: "flex",
 							fontSize: "52px",
 							fontWeight: 700,
 							color: "#ffffff",
@@ -617,6 +619,7 @@ export async function GET(request: NextRequest) {
 					{/* Description */}
 					<div
 						style={{
+							display: "flex",
 							fontSize: "22px",
 							fontWeight: 400,
 							color: "rgba(255, 255, 255, 0.5)",
