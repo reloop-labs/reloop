@@ -142,11 +142,14 @@ export const MainSidebar: React.FC = () => {
 			</div>
 			<div
 				className={cn(
-					"my-3 flex w-full justify-center transition-all",
+					"mt-1 mb-3 flex w-full flex-col items-center justify-center gap-1.5 transition-all",
 					isSidebarCollapsed ? "px-0" : "px-3",
 				)}
 			>
 				<UserMenuDropdown user={user} isCollapsed={isSidebarCollapsed} />
+				<span className="select-none font-medium text-[10px] text-text-soft-400 tracking-wider opacity-50">
+					v0.1.0
+				</span>
 			</div>
 		</div>
 	);
