@@ -100,7 +100,8 @@ export async function GET(request: NextRequest) {
 					display: "flex",
 					flexDirection: "column",
 					backgroundColor: "#070709",
-					backgroundImage: "radial-gradient(circle at 95% 10%, rgba(139, 92, 246, 0.15) 0%, transparent 60%), radial-gradient(circle at 5% 90%, rgba(16, 185, 129, 0.08) 0%, transparent 60%)",
+					backgroundImage:
+						"radial-gradient(circle at 95% 10%, rgba(217, 119, 87, 0.12) 0%, transparent 60%), radial-gradient(circle at 5% 90%, rgba(217, 119, 87, 0.1) 0%, transparent 60%)",
 					padding: "48px",
 					fontFamily: fonts.length > 0 ? "OpenRunde" : "sans-serif",
 					position: "relative",
@@ -114,12 +115,194 @@ export async function GET(request: NextRequest) {
 						display: "flex",
 						flexDirection: "column",
 						justifyContent: "space-between",
-						backgroundColor: "rgba(255, 255, 255, 0.015)",
-						border: "1px solid rgba(255, 255, 255, 0.06)",
+						backgroundImage:
+							"linear-gradient(135deg, rgba(18, 16, 15, 0.9) 0%, rgba(10, 9, 8, 0.95) 100%)",
+						border: "1px solid rgba(217, 119, 87, 0.1)",
 						borderRadius: "24px",
 						padding: "48px 56px",
+						position: "relative",
+						overflow: "hidden",
 					}}
 				>
+					{/* Watermark Logo */}
+					<svg
+						width="240"
+						height="240"
+						viewBox="0 0 200 200"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						style={{
+							position: "absolute",
+							right: "-20px",
+							bottom: "-30px",
+							opacity: 0.05,
+						}}
+					>
+						<rect x="55" y="51" width="83" height="8" fill="#d97757" />
+						<rect
+							x="55"
+							y="59"
+							width="75"
+							height="8"
+							transform="rotate(90 55 59)"
+							fill="#d97757"
+						/>
+						<rect
+							x="146"
+							y="59"
+							width="46"
+							height="8"
+							transform="rotate(90 146 59)"
+							fill="#d97757"
+						/>
+						<rect
+							x="154"
+							y="69"
+							width="44"
+							height="8"
+							transform="rotate(90 154 69)"
+							fill="#d97757"
+						/>
+						<rect
+							x="138"
+							y="59"
+							width="46"
+							height="8"
+							transform="rotate(90 138 59)"
+							fill="#d97757"
+						/>
+						<rect
+							x="130"
+							y="59"
+							width="46"
+							height="8"
+							transform="rotate(90 130 59)"
+							fill="#d97757"
+						/>
+						<rect
+							x="90"
+							y="105"
+							width="29"
+							height="8"
+							transform="rotate(90 90 105)"
+							fill="#d97757"
+						/>
+						<rect
+							x="82"
+							y="105"
+							width="29"
+							height="8"
+							transform="rotate(90 82 105)"
+							fill="#d97757"
+						/>
+						<rect
+							x="138"
+							y="105"
+							width="8"
+							height="8"
+							transform="rotate(90 138 105)"
+							fill="#d97757"
+						/>
+						<rect
+							x="146"
+							y="105"
+							width="8"
+							height="8"
+							transform="rotate(90 146 105)"
+							fill="#d97757"
+						/>
+						<rect
+							x="146"
+							y="134"
+							width="8"
+							height="8"
+							transform="rotate(90 146 134)"
+							fill="#d97757"
+						/>
+						<rect
+							x="130"
+							y="105"
+							width="8"
+							height="8"
+							transform="rotate(90 130 105)"
+							fill="#d97757"
+						/>
+						<rect
+							x="122"
+							y="105"
+							width="8"
+							height="8"
+							transform="rotate(90 122 105)"
+							fill="#d97757"
+						/>
+						<rect
+							x="98"
+							y="77"
+							width="10"
+							height="8"
+							transform="rotate(90 98 77)"
+							fill="#d97757"
+						/>
+						<rect
+							x="90"
+							y="77"
+							width="10"
+							height="8"
+							transform="rotate(90 90 77)"
+							fill="#d97757"
+						/>
+						<rect
+							x="82"
+							y="77"
+							width="10"
+							height="8"
+							transform="rotate(90 82 77)"
+							fill="#d97757"
+						/>
+						<rect
+							x="146"
+							y="113"
+							width="21"
+							height="8"
+							transform="rotate(90 146 113)"
+							fill="#d97757"
+						/>
+						<rect
+							x="154"
+							y="122"
+							width="20"
+							height="8"
+							transform="rotate(90 154 122)"
+							fill="#d97757"
+						/>
+						<rect
+							x="138"
+							y="113"
+							width="21"
+							height="8"
+							transform="rotate(90 138 113)"
+							fill="#d97757"
+						/>
+						<rect
+							x="130"
+							y="113"
+							width="21"
+							height="8"
+							transform="rotate(90 130 113)"
+							fill="#d97757"
+						/>
+						<rect
+							x="98"
+							y="113"
+							width="21"
+							height="8"
+							transform="rotate(90 98 113)"
+							fill="#d97757"
+						/>
+						<rect x="55" y="134" width="83" height="8" fill="#d97757" />
+						<rect x="63" y="142" width="83" height="8" fill="#d97757" />
+					</svg>
+
 					{/* Header */}
 					<div
 						style={{
@@ -136,10 +319,21 @@ export async function GET(request: NextRequest) {
 								gap: "14px",
 							}}
 						>
-							<div style={{ display: "flex" }}>
+							<div
+								style={{
+									display: "flex",
+									alignItems: "center",
+									justifyContent: "center",
+									width: "36px",
+									height: "36px",
+									backgroundColor: "#0d0d11",
+									border: "1px solid rgba(255, 255, 255, 0.15)",
+									borderRadius: "8px",
+								}}
+							>
 								<svg
-									width="36"
-									height="36"
+									width="22"
+									height="22"
 									viewBox="0 0 200 200"
 									fill="none"
 									xmlns="http://www.w3.org/2000/svg"
@@ -453,7 +647,7 @@ export async function GET(request: NextRequest) {
 							style={{
 								fontSize: "18px",
 								fontWeight: 600,
-								color: "#a78bfa",
+								color: "#d97757",
 							}}
 						>
 							docs.reloop.sh
