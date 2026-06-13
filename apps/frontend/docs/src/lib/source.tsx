@@ -6,6 +6,7 @@ import type { MDXComponents } from "mdx/types";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import type React from "react";
 import remarkGfm from "remark-gfm";
+import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import type { PageNode, PageTreeItem, TOCItem } from "./types";
 import { timestamp } from "./watcher-trigger";
 
@@ -135,14 +136,31 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 			if (fs.existsSync(mdxPath)) {
 				const { data } = matter(fs.readFileSync(mdxPath, "utf8"));
 				const iconName = data.icon || (item === "index" && meta.icon);
-				const Icon = iconName ? (LucideIcons as any)[iconName] : null;
+				
+				let sidebarIcon: React.ReactNode = undefined;
+				if (iconName) {
+					if (iconName.startsWith("si") || iconName.startsWith("Si")) {
+						sidebarIcon = (
+							<SimpleIcon
+								name={iconName}
+								className="h-3.5 w-3.5 shrink-0"
+								color="currentColor"
+							/>
+						);
+					} else {
+						const Icon = (LucideIcons as any)[iconName];
+						if (Icon) {
+							sidebarIcon = <Icon className="h-4 w-4" />;
+						}
+					}
+				}
 
 				return {
 					type: "page",
 					name:
 						data.sidebarTitle || data.title || path.basename(mdxPath, ".mdx"),
 					url: url || "/introduction",
-					icon: Icon ? <Icon className="h-4 w-4" /> : undefined,
+					icon: sidebarIcon,
 					method: (data._openapi as any)?.method,
 				} as PageTreeItem;
 			}

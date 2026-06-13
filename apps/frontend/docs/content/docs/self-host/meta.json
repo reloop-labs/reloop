@@ -3,5 +3,15 @@
 	"description": "Guides and references on how to self-host Reloop.",
 	"root": true,
 	"icon": "server",
-	"pages": ["index"]
+	"pages": [
+		"index",
+		"coolify",
+		"dokploy",
+		"vps",
+		"vercel",
+		"railway",
+		"azure",
+		"cloudflare",
+		"netlify"
+	]
 }

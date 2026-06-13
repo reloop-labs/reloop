@@ -3,7 +3,9 @@
 import type { SVGProps } from "react";
 import type { SimpleIcon as SimpleIconType } from "simple-icons";
 import {
+	siCoolify,
 	siCursor,
+	siDocker,
 	siDotnet,
 	siElixir,
 	siExpress,
@@ -14,10 +16,14 @@ import {
 	siOpenjdk,
 	siPhp,
 	siPython,
+	siRailway,
 	siReadthedocs,
 	siRuby,
 	siRubyonrails,
 	siRust,
+	siVercel,
+	siCloudflare,
+	siNetlify,
 } from "simple-icons";
 
 const Icons: Record<string, SimpleIconType> = {
@@ -36,6 +42,12 @@ const Icons: Record<string, SimpleIconType> = {
 	siDotnet,
 	siCursor,
 	siReadthedocs,
+	siCoolify,
+	siVercel,
+	siRailway,
+	siCloudflare,
+	siNetlify,
+	siDocker,
 };
 
 interface SimpleIconProps extends Omit<SVGProps<SVGSVGElement>, "ref"> {
