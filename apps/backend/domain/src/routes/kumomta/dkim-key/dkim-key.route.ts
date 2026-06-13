@@ -30,6 +30,7 @@ export const dkimKeyRoute = new Elysia().use(authMiddleware).post(
 			summary: "Get DKIM Key",
 			description:
 				"Internal endpoint for KumoMTA to fetch the DKIM private key and selector for a given domain, used to sign outgoing emails.",
+			hide: true,
 		},
 	},
 );

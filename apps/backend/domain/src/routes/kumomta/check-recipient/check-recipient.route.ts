@@ -22,6 +22,7 @@ export const checkRecipientRoute = new Elysia().post(
 			summary: "Check Inbound Recipient Mailbox",
 			description:
 				"Check if the recipient email has an active mailbox in the database.",
+			hide: true,
 		},
 	},
 );

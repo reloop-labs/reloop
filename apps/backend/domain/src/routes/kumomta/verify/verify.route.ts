@@ -31,6 +31,7 @@ export const verifyRoute = new Elysia().use(authMiddleware).post(
 			summary: "Verify",
 			description:
 				"Internal verification endpoint mapping POST API keys to their owner and checking domain verification status.",
+			hide: true,
 		},
 	},
 );

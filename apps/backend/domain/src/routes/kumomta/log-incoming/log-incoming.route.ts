@@ -42,6 +42,7 @@ export const logIncomingRoute = new Elysia().use(authMiddleware).post(
 			summary: "Log Incoming Email",
 			description:
 				"Log incoming SMTP email into the DB, returning the new email log ID.",
+			hide: true,
 		},
 	},
 );

@@ -8,7 +8,6 @@
 		"delete-api-domain-v1by-domain_id",
 		"get-api-domain-v1list",
 		"post-api-domain-v1verify-by-domain_id",
-		"post-api-domain-v1verify-by-domain_id-forward-dns",
-		"other"
+		"post-api-domain-v1verify-by-domain_id-forward-dns"
 	]
 }
