@@ -240,7 +240,6 @@ export const DomainApiDetails = () => {
 		"javascript",
 	);
 	const [copied, setCopied] = useState(false);
-	const [baseCopied, setBaseCopied] = useState(false);
 
 	const currentLanguageConfig = languages.find(
 		(l) => l.id === selectedLanguage,
@@ -257,13 +256,7 @@ export const DomainApiDetails = () => {
 		} catch {}
 	}, [selectedLanguage, selectedOperation]);
 
-	const copyBaseUrl = useCallback(async () => {
-		try {
-			await navigator.clipboard.writeText("https://api.reloop.sh");
-			setBaseCopied(true);
-			setTimeout(() => setBaseCopied(false), 2000);
-		} catch {}
-	}, []);
+
 
 	return (
 		<Drawer.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -287,38 +280,7 @@ export const DomainApiDetails = () => {
 					</div>
 				</Drawer.Header>
 				<Drawer.Body className="flex flex-col gap-5 p-5">
-					{/* Base URL Card */}
-					<div className="flex items-center justify-between rounded-lg bg-bg-weak-50 px-3 py-2.5">
-						<div className="flex items-center gap-2">
-							<Icon name="link-02" className="h-4 w-4 text-text-sub-600" />
-							<code className="font-mono text-label-sm text-text-strong-950">
-								https://api.reloop.sh
-							</code>
-						</div>
-						<Tooltip.Provider>
-							<Tooltip.Root>
-								<Tooltip.Trigger asChild>
-									<Button.Root
-										variant="neutral"
-										size="xxsmall"
-										mode="ghost"
-										onClick={copyBaseUrl}
-									>
-										<Icon
-											name={baseCopied ? "check" : "clipboard-copy"}
-											className={cn(
-												"h-3.5 w-3.5",
-												baseCopied && "text-success-base",
-											)}
-										/>
-									</Button.Root>
-								</Tooltip.Trigger>
-								<Tooltip.Content size="xsmall">
-									{baseCopied ? "Copied!" : "Copy base URL"}
-								</Tooltip.Content>
-							</Tooltip.Root>
-						</Tooltip.Provider>
-					</div>
+
 
 					{/* Language Selector */}
 					<div className="space-y-2.5">

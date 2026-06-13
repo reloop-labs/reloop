@@ -241,7 +241,6 @@ export default function Home() {
 
 	const skillMarkdown = `# Reloop AI Agent Skill
 This context file guides your AI agent on integrating with Reloop's developer APIs.
-- API Base URL: https://api.reloop.sh
 - Send transactional emails via SMTP relays or REST API
 - Triage inbox notifications and route conversation logs
 - Automate multi-step conditional workflows`;

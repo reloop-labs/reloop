@@ -4,7 +4,6 @@
 
 Important notes:
 
-- The Reloop API base URL is `https://api.reloop.sh`
 - Authentication uses the `x-api-key` header with API keys prefixed with `rl_`
 - All request and response bodies are JSON encoded
 - Reloop supports both transactional and marketing (broadcast) emails
@@ -79,7 +78,7 @@ Important notes:
 
 ## API Reference
 
-- [Introduction](https://docs.reloop.dev/docs/api): API overview, base URL, authentication, and response codes
+- [Introduction](https://docs.reloop.dev/docs/api): API overview, authentication, and response codes
 - [Pagination](https://docs.reloop.dev/docs/api/pagination): How pagination works in the API
 - [Usage Limits](https://docs.reloop.dev/docs/api/usage-limits): API rate limits and usage quotas
 - [Errors](https://docs.reloop.dev/docs/api/errors): Error response format and common error codes

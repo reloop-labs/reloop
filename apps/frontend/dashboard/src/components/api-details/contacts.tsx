@@ -639,7 +639,6 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 		languages.map((l) => l.id),
 		"nodejs",
 	);
-	const [baseCopied, setBaseCopied] = useState(false);
 	const [copiedOp, setCopiedOp] = useState<string | null>(null);
 
 	useHotkeys("a", (e) => {
@@ -659,15 +658,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 		(l) => l.id === selectedLanguage,
 	);
 
-	const copyBaseUrl = useCallback(async () => {
-		try {
-			await navigator.clipboard.writeText("https://api.reloop.sh");
-			setBaseCopied(true);
-			setTimeout(() => setBaseCopied(false), 2000);
-		} catch {
-			toast.error("Failed to copy Base URL");
-		}
-	}, []);
+
 
 	const copySnippet = useCallback(
 		async (operationId: string) => {
@@ -740,26 +731,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 
 				{/* ── Body ────────────────────────────────────────────── */}
 				<Drawer.Body className="flex flex-col gap-8 p-6">
-					{/* Base URL */}
-					<div className="flex items-center gap-3">
-						<span className="flex-shrink-0 font-medium text-[11px] text-text-sub-400 uppercase tracking-wider">
-							Base URL
-						</span>
-						<code className="font-mono text-[13px] text-text-strong-950">
-							https://api.reloop.sh
-						</code>
-						<button
-							type="button"
-							onClick={copyBaseUrl}
-							className="rounded-md p-1 text-text-sub-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
-							aria-label="Copy base URL"
-						>
-							<Icon
-								name={baseCopied ? "check" : "copy"}
-								className={cn("h-3.5 w-3.5", baseCopied && "text-success-base")}
-							/>
-						</button>
-					</div>
+
 
 					{/* Language Pills */}
 					<div
