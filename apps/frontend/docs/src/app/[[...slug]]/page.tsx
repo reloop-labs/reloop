@@ -90,6 +90,12 @@ export async function generateMetadata(props: {
 	const page = source.getPage(params.slug);
 	if (!page) {
 		if (!params.slug || params.slug.length === 0) {
+			const searchParams = new URLSearchParams({
+				title: "Documentation",
+				description: "The modern email infrastructure for developers.",
+				category: "Documentation",
+			});
+			const ogImage = `${appUrl}/docs/api/og/general?${searchParams.toString()}`;
 			return {
 				title: "Reloop Docs - Modern Email Infrastructure",
 				description: "The modern email infrastructure for developers.",
@@ -100,6 +106,25 @@ export async function generateMetadata(props: {
 				robots: {
 					index: true,
 					follow: true,
+				},
+				openGraph: {
+					title: "Reloop Docs - Modern Email Infrastructure",
+					description: "The modern email infrastructure for developers.",
+					url: `${appUrl}/docs`,
+					images: [
+						{
+							url: ogImage,
+							width: 1200,
+							height: 630,
+							alt: "Reloop Docs - Modern Email Infrastructure",
+						},
+					],
+				},
+				twitter: {
+					card: "summary_large_image",
+					title: "Reloop Docs - Modern Email Infrastructure",
+					description: "The modern email infrastructure for developers.",
+					images: [ogImage],
 				},
 			};
 		}
@@ -134,6 +159,19 @@ export async function generateMetadata(props: {
 			path.toLowerCase().includes("api-key");
 		const ogPath = isApiKeyPage ? "api/og/api-key" : "api/og";
 		ogImage = `${appUrl}/docs/${ogPath}?${searchParams.toString()}`;
+	} else {
+		const rawCategory = (params.slug && params.slug.length > 0 && params.slug[0]) || "Documentation";
+		const category = rawCategory
+			.split("-")
+			.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+			.join(" ");
+
+		const searchParams = new URLSearchParams({
+			title: page.data.title,
+			description: description,
+			category: category,
+		});
+		ogImage = `${appUrl}/docs/api/og/general?${searchParams.toString()}`;
 	}
 
 	const canonicalUrl = `${appUrl}/docs${page.url === "/introduction" ? "" : page.url}`;
