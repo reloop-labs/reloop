@@ -167,45 +167,8 @@ function shortenPath(fullPath: string): string {
 	return clean.replace(/^\/api/, "");
 }
 
-function getTypeBadgeStyles(type: string): string {
-	const lower = type.toLowerCase().trim();
-
-	// Check for string literal unions/enums (starts with quotes or contains pipes)
-	if (lower.startsWith('"') || lower.startsWith("'") || lower.includes("|")) {
-		return "bg-amber-500/10 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400 border border-amber-500/15";
-	}
-
-	if (lower.startsWith("string")) {
-		return "bg-blue-500/10 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400 border border-blue-500/15";
-	}
-
-	if (
-		lower.startsWith("number") ||
-		lower.startsWith("integer") ||
-		lower.startsWith("float") ||
-		lower.startsWith("double")
-	) {
-		return "bg-purple-500/10 text-purple-700 dark:bg-purple-500/15 dark:text-purple-400 border border-purple-500/15";
-	}
-
-	if (lower.startsWith("boolean")) {
-		return "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400 border border-emerald-500/15";
-	}
-
-	if (
-		lower.includes("object") ||
-		lower.includes("record") ||
-		lower.startsWith("map")
-	) {
-		return "bg-indigo-500/10 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-400 border border-indigo-500/15";
-	}
-
-	if (lower.includes("[]") || lower.startsWith("array")) {
-		return "bg-rose-500/10 text-rose-700 dark:bg-rose-500/15 dark:text-rose-400 border border-rose-500/15";
-	}
-
-	// Default fallback
-	return "bg-neutral-500/10 text-neutral-700 dark:bg-neutral-500/15 dark:text-neutral-400 border border-neutral-500/15";
+function getTypeBadgeStyles(_type: string): string {
+	return "bg-neutral-400/10 text-neutral-500 dark:bg-neutral-500/10 dark:text-neutral-400/80 border border-neutral-400/10";
 }
 
 const METHOD_STYLES: Record<string, string> = {
@@ -402,7 +365,7 @@ function ParameterRow({
 					</span>
 				)}
 				{param.required && (
-					<span className="rounded-md bg-red-500/10 px-1.5 py-0.5 font-semibold text-[10px] text-red-500 uppercase tracking-wider dark:text-red-400">
+					<span className="rounded-md bg-red-500/6 px-1.5 py-0.5 font-semibold text-[10px] text-red-400/60 uppercase tracking-wider dark:text-red-400/50">
 						required
 					</span>
 				)}
