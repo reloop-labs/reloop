@@ -67,30 +67,45 @@ export function CopyCodeBlock({
 
 	useEffect(() => {
 		if (!mounted) return;
-		const activeBtn = tabButtonRefs.current[activeTabIndex];
 		const container = containerRef.current;
-		if (activeBtn && container) {
-			const containerLeft = container.scrollLeft;
-			const containerWidth = container.clientWidth;
-			const containerRight = containerLeft + containerWidth;
+		if (!container) return;
 
-			const btnLeft = activeBtn.offsetLeft;
-			const btnWidth = activeBtn.offsetWidth;
-			const btnRight = btnLeft + btnWidth;
+		const handleScroll = () => {
+			const activeBtn = tabButtonRefs.current[activeTabIndex];
+			if (activeBtn && container.clientWidth > 0) {
+				const containerLeft = container.scrollLeft;
+				const containerWidth = container.clientWidth;
+				const containerRight = containerLeft + containerWidth;
 
-			if (btnLeft < containerLeft || btnRight > containerRight) {
-				const targetScrollLeft =
-					btnLeft < containerLeft
-						? btnLeft - 16
-						: btnRight - containerWidth + 16;
+				const btnLeft = activeBtn.offsetLeft;
+				const btnWidth = activeBtn.offsetWidth;
+				const btnRight = btnLeft + btnWidth;
 
-				container.scrollTo({
-					left: Math.max(0, targetScrollLeft),
-					behavior: isFirstScrollRef.current ? "auto" : "smooth",
-				});
+				if (btnLeft < containerLeft || btnRight > containerRight) {
+					const targetScrollLeft =
+						btnLeft < containerLeft
+							? btnLeft - 16
+							: btnRight - containerWidth + 16;
+
+					container.scrollTo({
+						left: Math.max(0, targetScrollLeft),
+						behavior: isFirstScrollRef.current ? "auto" : "smooth",
+					});
+				}
+				isFirstScrollRef.current = false;
 			}
-			isFirstScrollRef.current = false;
-		}
+		};
+
+		handleScroll();
+
+		const observer = new ResizeObserver(() => {
+			handleScroll();
+		});
+		observer.observe(container);
+
+		return () => {
+			observer.disconnect();
+		};
 	}, [activeTabIndex, mounted]);
 
 	const handleCopy = async () => {
