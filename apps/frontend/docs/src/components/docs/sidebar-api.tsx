@@ -212,7 +212,7 @@ export function ApiSidebarSection({
 	if (node.type === "separator") {
 		return (
 			<div className="mt-4 mb-1.5 px-2">
-				<h4 className="font-medium text-[11px] uppercase tracking-[0.05em] dark:text-white/50">
+				<h4 className="font-semibold text-sm uppercase">
 					{node.name as string}
 				</h4>
 			</div>

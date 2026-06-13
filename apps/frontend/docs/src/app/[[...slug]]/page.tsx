@@ -11,46 +11,7 @@ import { source } from "@reloop/fe-docs/lib/source";
 import type { PageTreeItem, TOCItem } from "@reloop/fe-docs/lib/types";
 import { getMDXComponents } from "@reloop/fe-docs/mdx-components";
 import { Icon } from "@reloop/ui/icon";
-import { ChevronRight, Home } from "lucide-react";
-import { notFound, redirect } from "next/navigation";
-
-function getBreadcrumbs(
-	tree: PageTreeItem[],
-	slugPath: string,
-	parentPath: string[] = [],
-): string[] {
-	let currentSection = "";
-	const targetUrl =
-		slugPath === "index" ? "/" : `/${slugPath.replace(/\/index$/, "")}`;
-
-	for (const item of tree) {
-		if (item.type === "separator") {
-			currentSection = (item.name as string) || "";
-			continue;
-		}
-
-		if (
-			item.type === "page" &&
-			(item.url === targetUrl ||
-				(item.url === "/introduction" && targetUrl === "/"))
-		) {
-			return currentSection
-				? [currentSection, ...parentPath, item.name as string]
-				: [...parentPath, item.name as string];
-		}
-
-		if (item.type === "folder") {
-			const found = getBreadcrumbs(item.children, slugPath, [
-				...parentPath,
-				item.name as string,
-			]);
-			if (found.length) {
-				return currentSection ? [currentSection, ...found] : found;
-			}
-		}
-	}
-	return [];
-}
+import { notFound } from "next/navigation";
 
 export async function generateMetadata(props: {
 	params: Promise<{ slug?: string[] }>;
@@ -97,7 +58,7 @@ export default async function Page(props: {
 	const isFullWidth = page.data.full === true;
 	const isApiPage = !!page.data._apiData;
 
-	const slugPath = params.slug?.join("/") || "index";
+	const _slugPath = params.slug?.join("/") || "index";
 
 	// Resend Logic:
 	// 1. General guides (slug depth <= 2) like /webhooks/introduction show TOC and use standard width.
@@ -107,11 +68,6 @@ export default async function Page(props: {
 
 	const hideToc = isFullWidth || isWebhookEvent;
 	const useSplitLayout = isWebhookEvent || isApiPage;
-
-	const breadcrumbs = getBreadcrumbs(
-		source.pageTree.children as PageTreeItem[],
-		slugPath,
-	);
 
 	const { previous, next } = source.findNeighbor(page.url);
 
@@ -146,32 +102,6 @@ export default async function Page(props: {
 									: "mx-auto max-w-[680px] xl:mx-0"
 							}
 						>
-							{/* Breadcrumb — hidden on API pages (sidebar already shows location) */}
-							{!isApiPage &&
-								(breadcrumbs.length > 0 ? (
-									<div className="mb-4 flex items-center gap-2 text-[13px] text-text-sub-600">
-										<Home className="h-3.5 w-3.5 opacity-70" />
-										{breadcrumbs.map((crumb, i) => (
-											<div key={i} className="flex items-center gap-2">
-												<span className="opacity-40">/</span>
-												<span
-													className={
-														i === breadcrumbs.length - 1
-															? "font-medium text-[#171717] dark:text-white"
-															: "text-text-sub-600"
-													}
-												>
-													{crumb}
-												</span>
-											</div>
-										))}
-									</div>
-								) : (
-									<div className="mb-3 font-medium text-[12px] text-text-sub-600/60 uppercase tracking-wider">
-										Documentation
-									</div>
-								))}
-
 							{/* Title row */}
 							<div className="mb-8 flex items-start justify-between gap-4">
 								<div className="flex-1">
