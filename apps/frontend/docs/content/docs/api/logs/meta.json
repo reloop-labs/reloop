@@ -4,6 +4,7 @@
 		"get-api-logs-v1list",
 		"get-api-logs-v1by-log_id",
 		"get-api-logs-v1emails",
+		"get-api-logs-v1emails-contact-activity",
 		"get-api-logs-v1emails-by-id",
 		"get-api-logs-v1emails-stats"
 	]

@@ -9,12 +9,13 @@
 		"pagination",
 		"usage-limits",
 		"errors",
+		"mail",
 		"domain",
 		"api-key",
 		"webhook",
 		"contacts",
-		"mail",
 		"logs",
+		"upload",
 		"template"
 	]
 }

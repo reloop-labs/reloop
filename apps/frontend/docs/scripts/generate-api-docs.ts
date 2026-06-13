@@ -62,6 +62,13 @@ interface ServiceStructure {
 
 const SERVICES: ServiceConfig[] = [
 	{
+		name: "mail",
+		prefix: "/api/mail",
+		port: 8015,
+		specUrl: "http://localhost:8015/api/mail/openapi/json",
+		prodUrl: "https://reloop.sh/api/mail/openapi/json",
+	},
+	{
 		name: "domain",
 		prefix: "/api/domain",
 		port: 8011,
@@ -88,13 +95,6 @@ const SERVICES: ServiceConfig[] = [
 		port: 8014,
 		specUrl: "http://localhost:8014/api/contacts/openapi/json",
 		prodUrl: "https://reloop.sh/api/contacts/openapi/json",
-	},
-	{
-		name: "mail",
-		prefix: "/api/mail",
-		port: 8015,
-		specUrl: "http://localhost:8015/api/mail/openapi/json",
-		prodUrl: "https://reloop.sh/api/mail/openapi/json",
 	},
 	{
 		name: "logs",
@@ -873,7 +873,7 @@ function generateMetaJson(allGenerated: Record<string, GeneratedPage[]>) {
 
 	const sectionNames: Record<string, string> = {
 		domain: "Domain",
-		mail: "Mail",
+		mail: "Sending",
 		"api-key": "API Key",
 		contacts: "Contacts",
 		webhook: "Webhooks",

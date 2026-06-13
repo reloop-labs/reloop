@@ -7,6 +7,7 @@
 		"patch-api-webhook-v1by-webhook_id",
 		"delete-api-webhook-v1by-id",
 		"post-api-webhook-v1trigger",
-		"get-api-webhook-v1by-webhook_id-deliveries"
+		"get-api-webhook-v1by-webhook_id-deliveries",
+		"post-api-webhook-deliveries-by-delivery_id-retry"
 	]
 }
