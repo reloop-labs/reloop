@@ -1,11 +1,12 @@
 import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
-import { CodeBlock } from "@reloop/ui/code-block";
+import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
 import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { useCallback, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
 	siCurl,
@@ -20,7 +21,7 @@ import {
 } from "simple-icons";
 import { toast } from "sonner";
 
-const langIcons: Record<string, { svg: string }> = {
+const langIcons: Record<string, { path: string; hex: string }> = {
 	nodejs: siNodedotjs,
 	ruby: siRuby,
 	php: siPhp,
@@ -639,7 +640,99 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 		languages.map((l) => l.id),
 		"nodejs",
 	);
-	const [copiedOp, setCopiedOp] = useState<string | null>(null);
+
+	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(
+		undefined,
+	);
+	const [mounted, setMounted] = useState(false);
+	const tabButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const isFirstScrollRef = useRef(true);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	const activeTabIndex = languages.findIndex((l) => l.id === selectedLanguage);
+
+	useEffect(() => {
+		if (!mounted) return;
+		const container = containerRef.current;
+		if (!container) return;
+
+		const handleScroll = () => {
+			const activeBtn = tabButtonRefs.current[activeTabIndex];
+			if (activeBtn && container.clientWidth > 0) {
+				const containerLeft = container.scrollLeft;
+				const containerWidth = container.clientWidth;
+				const containerRight = containerLeft + containerWidth;
+
+				const btnLeft = activeBtn.offsetLeft;
+				const btnWidth = activeBtn.offsetWidth;
+				const btnRight = btnLeft + btnWidth;
+
+				if (btnLeft < containerLeft || btnRight > containerRight) {
+					const targetScrollLeft =
+						btnLeft < containerLeft
+							? btnLeft - 16
+							: btnRight - containerWidth + 16;
+
+					container.scrollTo({
+						left: Math.max(0, targetScrollLeft),
+						behavior: isFirstScrollRef.current ? "auto" : "smooth",
+					});
+				}
+				isFirstScrollRef.current = false;
+			}
+		};
+
+		handleScroll();
+
+		const observer = new ResizeObserver(() => {
+			handleScroll();
+		});
+		observer.observe(container);
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [activeTabIndex, mounted]);
+
+	const highlightedTabIndex =
+		hoveredTabIdx !== undefined ? hoveredTabIdx : activeTabIndex;
+	const highlightedTab = tabButtonRefs.current[highlightedTabIndex];
+	const highlightedBrandColor =
+		highlightedTabIndex >= 0 && languages[highlightedTabIndex]?.id
+			? `#${langIcons[languages[highlightedTabIndex].id]?.hex}`
+			: undefined;
+
+	const getTabPosition = (button: HTMLButtonElement | null | undefined) => {
+		if (!button) return null;
+
+		return {
+			width: button.offsetWidth,
+			height: button.offsetHeight,
+			left: button.offsetLeft,
+			top: button.offsetTop,
+		};
+	};
+
+	const pillInset = { x: 6, y: 6 };
+	const getPillPosition = (position: ReturnType<typeof getTabPosition>) => {
+		if (!position) return null;
+
+		return {
+			width: position.width - pillInset.x * 2,
+			height: position.height - pillInset.y * 2 - 2,
+			left: position.left + pillInset.x,
+			top: position.top + pillInset.y,
+		};
+	};
+
+	const highlightedTabPosition = mounted
+		? getTabPosition(highlightedTab)
+		: null;
+	const highlightedPillPosition = getPillPosition(highlightedTabPosition);
 
 	useHotkeys("a", (e) => {
 		e.preventDefault();
@@ -656,23 +749,6 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 
 	const currentLanguageConfig = languages.find(
 		(l) => l.id === selectedLanguage,
-	);
-
-	const copySnippet = useCallback(
-		async (operationId: string) => {
-			try {
-				const example =
-					codeExamples[selectedLanguage][
-						operationId as keyof (typeof codeExamples)[Language]
-					];
-				await navigator.clipboard.writeText(example.code);
-				setCopiedOp(operationId);
-				setTimeout(() => setCopiedOp(null), 2000);
-			} catch {
-				toast.error("Failed to copy code snippet");
-			}
-		},
-		[selectedLanguage],
 	);
 
 	return (
@@ -713,7 +789,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 					<div className="flex flex-1 flex-col gap-1">
 						<Drawer.Title>Contacts API</Drawer.Title>
 						<p className="text-paragraph-xs text-text-sub-600">
-							Manage contacts programmatically with our REST API.
+							Create, retrieve, update, and delete contacts programmatically.
 						</p>
 					</div>
 					<Drawer.Close asChild>
@@ -728,105 +804,110 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 				</Drawer.Header>
 
 				{/* ── Body ────────────────────────────────────────────── */}
-				<Drawer.Body className="flex flex-col gap-8 p-6">
-					{/* Language Pills */}
+				<Drawer.Body className="flex flex-col gap-8">
+					<style>{`
+						.scrollbar-none::-webkit-scrollbar {
+							display: none;
+						}
+					`}</style>
+
+					{/* Language Tabs */}
 					<div
-						className="scrollbar-hide flex gap-2 overflow-x-auto"
-						style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+						ref={containerRef}
+						className="scrollbar-none relative flex min-w-0 items-center overflow-x-auto px-6"
+						style={{
+							scrollbarWidth: "none",
+							msOverflowStyle: "none",
+						}}
 					>
-						{languages.map((lang) => {
+						{languages.map((lang, index) => {
 							const icon = langIcons[lang.id];
+							const isActive = selectedLanguage === lang.id;
+							const brandColor = icon ? `#${icon.hex}` : undefined;
+							const isHighlighted = index === highlightedTabIndex;
+
+							let textColorStyle: React.CSSProperties | undefined = undefined;
+							if (isHighlighted) {
+								textColorStyle = { color: "#ffffff" };
+							} else if (isActive && brandColor) {
+								textColorStyle = { color: brandColor };
+							}
+
 							return (
 								<button
-									type="button"
 									key={lang.id}
+									ref={(el) => {
+										tabButtonRefs.current[index] = el;
+									}}
+									type="button"
 									onClick={() => setSelectedLanguage(lang.id)}
+									onPointerEnter={() => setHoveredTabIdx(index)}
+									onPointerLeave={() => setHoveredTabIdx(undefined)}
 									className={cn(
-										"flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 font-medium text-[13px] transition-all duration-200",
-										selectedLanguage === lang.id
-											? "border-text-strong-950 bg-text-strong-950 text-static-white shadow-sm"
-											: "border-stroke-soft-200 text-text-sub-600 hover:border-stroke-strong-950 hover:text-text-strong-950",
+										"relative z-10 flex shrink-0 items-center gap-2 px-4 py-3 font-medium text-[17px] transition-colors duration-150",
+										isActive
+											? "text-text-strong-950 dark:text-white"
+											: "text-text-sub-600 dark:text-white/70",
 									)}
+									style={textColorStyle}
 								>
 									{icon && (
-										<span
-											className="flex h-4 w-4 items-center justify-center [&>svg]:h-3.5 [&>svg]:w-3.5"
-											dangerouslySetInnerHTML={{
-												__html: icon.svg.replace(
-													"<svg",
-													'<svg fill="currentColor"',
-												),
-											}}
-										/>
+										<svg
+											role="img"
+											viewBox="0 0 24 24"
+											className="size-3.5 shrink-0 transition-colors duration-150"
+											fill="currentColor"
+											xmlns="http://www.w3.org/2000/svg"
+											style={{ color: isHighlighted ? "#ffffff" : brandColor }}
+											aria-hidden
+										>
+											<path d={icon.path} />
+										</svg>
 									)}
 									{lang.label}
 								</button>
 							);
 						})}
+						<AnimatePresence>
+							{highlightedPillPosition && highlightedTabIndex !== -1 ? (
+								<motion.div
+									className="pointer-events-none absolute top-0 left-0 rounded-full"
+									style={{
+										backgroundColor: highlightedBrandColor || undefined,
+									}}
+									initial={{
+										...highlightedPillPosition,
+										opacity: 0,
+									}}
+									animate={{
+										...highlightedPillPosition,
+										opacity: 1,
+									}}
+									exit={{
+										...highlightedPillPosition,
+										opacity: 0,
+									}}
+									transition={{ duration: 0.14 }}
+								/>
+							) : null}
+						</AnimatePresence>
 					</div>
 
-					{/* ── Endpoint Sections ──────────────────────────── */}
 					{operations.map((op) => {
 						const example =
 							codeExamples[selectedLanguage][
 								op.id as keyof (typeof codeExamples)[Language]
 							];
-						const isCopied = copiedOp === op.id;
 
 						return (
-							<section key={op.id} className="flex flex-col gap-3">
-								{/* Section title */}
-								<div className="flex items-center gap-2">
-									<h3 className="font-semibold text-[15px] text-text-strong-950">
-										{op.label}
-									</h3>
-									<button
-										type="button"
-										onClick={() =>
-											window.open(
-												`https://docs.reloop.sh/api-reference/contacts#${op.id}`,
-												"_blank",
-											)
-										}
-										className="rounded p-0.5 text-text-sub-400 transition-colors hover:text-text-strong-950"
-										aria-label="View documentation"
-									>
-										<Icon name="external-link" className="h-3.5 w-3.5" />
-									</button>
-								</div>
-
-								{/* Code card */}
-								<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50">
-									{/* Filename + copy */}
-									<div className="flex items-center justify-between border-stroke-soft-200 border-b px-4 py-2">
-										<span className="font-mono text-[11px] text-text-sub-600">
-											{example.filename}
-										</span>
-										<button
-											type="button"
-											onClick={() => copySnippet(op.id)}
-											className={cn(
-												"rounded-md p-1 transition-colors",
-												isCopied
-													? "text-success-base"
-													: "text-text-sub-400 hover:text-text-strong-950",
-											)}
-											aria-label="Copy snippet"
-										>
-											<Icon
-												name={isCopied ? "check" : "copy"}
-												className="h-3.5 w-3.5"
-											/>
-										</button>
-									</div>
-
-									{/* Code block */}
-									<CodeBlock
-										code={example.code}
-										lang={currentLanguageConfig?.shikiLang || "javascript"}
-										className="[&>pre]:!bg-transparent [&>pre]:!m-0 [&>pre]:!p-3 [&_.line]:!pl-0 [&_.line::before]:!hidden text-[11px] leading-relaxed"
-									/>
-								</div>
+							<section key={op.id} className="px-6">
+								<CopyCodeBlock
+									code={example.code}
+									lang={currentLanguageConfig?.shikiLang || "javascript"}
+									label={example.filename}
+									title={op.label}
+									titleHref={`https://docs.reloop.sh/api-reference/contacts#${op.id}`}
+								/>
 							</section>
 						);
 					})}

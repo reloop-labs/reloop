@@ -31,6 +31,8 @@ export function CopyCodeBlock({
 	hideLineNumbers = false,
 	noScroll = true,
 	maxHeight,
+	title,
+	titleHref,
 }: {
 	code: string;
 	lang: string;
@@ -45,6 +47,8 @@ export function CopyCodeBlock({
 	hideLineNumbers?: boolean;
 	noScroll?: boolean;
 	maxHeight?: string;
+	title?: string;
+	titleHref?: string;
 }) {
 	const [copied, setCopied] = useState(false);
 	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(
@@ -188,6 +192,26 @@ export function CopyCodeBlock({
 
 			{hasTabs ? (
 				<div className="flex items-center gap-3 pr-4 pl-1">
+					{title ? (
+						<div className="flex items-center gap-1 pl-3.5">
+							{titleHref ? (
+								<a
+									href={titleHref}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="flex items-center gap-1 font-semibold text-[13px] text-text-strong-950 hover:underline dark:text-white shrink-0"
+								>
+									{title}
+									<Icon name="arrow-top-right" className="size-3 text-text-sub-400 stroke-[2.5]" />
+								</a>
+							) : (
+								<span className="font-semibold text-[13px] text-text-strong-950 dark:text-white shrink-0">
+									{title}
+								</span>
+							)}
+							<span className="ml-2.5 text-text-sub-300 dark:text-white/20">|</span>
+						</div>
+					) : null}
 					<div
 						ref={containerRef}
 						className="scrollbar-none relative flex min-w-0 flex-1 items-center overflow-x-auto"
@@ -274,23 +298,45 @@ export function CopyCodeBlock({
 				</div>
 			) : (
 				<div className="flex items-center gap-3 px-4 py-2.5">
-					<div className="flex min-w-0 flex-1 items-center gap-2">
-						{si ? (
-							<svg
-								role="img"
-								viewBox="0 0 24 24"
-								className="size-3.5 shrink-0"
-								fill="currentColor"
-								xmlns="http://www.w3.org/2000/svg"
-								style={{ color: `#${si.hex}` }}
-								aria-hidden
-							>
-								<path d={si.path} />
-							</svg>
-						) : null}
-						<span className="font-medium text-[13px] text-text-sub-600 dark:text-white/50">
-							{displayLabel}
-						</span>
+					<div className="flex min-w-0 flex-1 items-center gap-2.5">
+						{title ? (
+							<div className="flex items-center gap-1 shrink-0">
+								{titleHref ? (
+									<a
+										href={titleHref}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="flex items-center gap-1 font-semibold text-[13px] text-text-strong-950 hover:underline dark:text-white"
+									>
+										{title}
+										<Icon name="arrow-top-right" className="size-3 text-text-sub-400 stroke-[2.5]" />
+									</a>
+								) : (
+									<span className="font-semibold text-[13px] text-text-strong-950 dark:text-white">
+										{title}
+									</span>
+								)}
+							</div>
+						) : (
+							<>
+								{si ? (
+									<svg
+										role="img"
+										viewBox="0 0 24 24"
+										className="size-3.5 shrink-0"
+										fill="currentColor"
+										xmlns="http://www.w3.org/2000/svg"
+										style={{ color: `#${si.hex}` }}
+										aria-hidden
+									>
+										<path d={si.path} />
+									</svg>
+								) : null}
+								<span className="font-mono text-[11px] text-text-sub-500 dark:text-white/40">
+									{displayLabel}
+								</span>
+							</>
+						)}
 					</div>
 					{copyButton}
 				</div>

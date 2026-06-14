@@ -168,7 +168,7 @@ function shortenPath(fullPath: string): string {
 }
 
 function getTypeBadgeStyles(_type: string): string {
-	return "bg-neutral-400/10 text-neutral-500 dark:bg-neutral-500/10 dark:text-neutral-400/80 border border-neutral-400/10";
+	return "bg-neutral-100 text-neutral-500 dark:bg-zinc-800 dark:text-zinc-400";
 }
 
 const METHOD_STYLES: Record<string, string> = {
@@ -327,10 +327,10 @@ function ParameterRow({
 	const hasProperties = resolvedProperties && resolvedProperties.length > 0;
 
 	return (
-		<div className={cn(depth === 0 ? "pt-3.5 pb-0.5" : "py-2.5")}>
+		<div className={cn(depth === 0 ? "pt-3.5 pb-0.5" : "py-4")}>
 			{/* Name + type + required */}
 			<div className="flex flex-wrap items-center gap-2">
-				<span className="font-mono font-semibold text-[13.5px] text-fd-foreground tracking-tight">
+				<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 					{param.name}
 				</span>
 				{param.type.includes("|") ? (
@@ -342,7 +342,7 @@ function ParameterRow({
 							<span
 								key={idx}
 								className={cn(
-									"rounded-lg px-1.5 font-semibold text-[11px] tracking-tight",
+									"rounded px-1.5 py-0.5 font-medium text-[11px] tracking-tight",
 									getTypeBadgeStyles(t),
 								)}
 							>
@@ -352,7 +352,7 @@ function ParameterRow({
 				) : (
 					<span
 						className={cn(
-							"rounded-lg px-1.5 font-semibold text-[11px] tracking-tight",
+							"rounded px-1.5 py-0.5 font-medium text-[11px] tracking-tight",
 							getTypeBadgeStyles(param.type),
 						)}
 					>
@@ -360,13 +360,13 @@ function ParameterRow({
 					</span>
 				)}
 				{param.defaultValue !== undefined && (
-					<span className="rounded-lg border border-primary-base/20 bg-primary-alpha-10 px-1.5 font-semibold text-[11px] text-primary-base tracking-tight">
+					<span className="rounded border border-primary-base/20 bg-primary-alpha-10 px-1.5 py-0.5 font-medium text-[11px] text-primary-base tracking-tight">
 						default: {JSON.stringify(param.defaultValue)}
 					</span>
 				)}
 				{param.required && (
-					<span className="rounded-lg bg-red-500/10 px-1.5 py-0.5 font-semibold text-[10px] text-red-500 uppercase tracking-wider dark:text-red-400">
-						required
+					<span className="rounded bg-red-500/10 px-1.5 py-0.5 font-bold text-[10px] text-red-500 uppercase tracking-wider dark:bg-red-500/20 dark:text-red-400">
+						Required
 					</span>
 				)}
 			</div>
@@ -476,14 +476,14 @@ function ParameterRow({
 
 			{/* Recursive sub-properties */}
 			{hasProperties && (
-				<div className="mt-3 mb-6 overflow-hidden rounded-[18px] border border-stroke-soft-100 bg-[#fafafa] dark:border-stroke-soft-100/40 dark:bg-[#0c0c0e]">
-					<div className="select-none px-4 py-2.5 font-semibold text-[13px] text-text-sub-600 dark:text-white/50">
+				<div className="mt-3 mb-6 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white dark:border-stroke-soft-100/40 dark:bg-zinc-950">
+					<div className="select-none px-4 py-2.5 border-b border-stroke-soft-100/70 bg-[#fafafa] font-semibold text-[13px] text-text-sub-600 dark:border-stroke-soft-100/15 dark:bg-[#0c0c0e] dark:text-white/50">
 						{param.name === "properties"
 							? "Custom properties"
 							: `${param.name} properties`}
 					</div>
 
-					<div className="mx-0.5 mb-0.5 divide-y divide-stroke-soft-100/70 rounded-[16px] border border-stroke-soft-100/70 bg-white px-4 dark:divide-stroke-soft-100/15 dark:border-stroke-soft-100/15 dark:bg-zinc-950">
+					<div className="divide-y divide-stroke-soft-100/70 px-4 dark:divide-stroke-soft-100/15">
 						{resolvedProperties.map((child) => (
 							<ParameterRow key={child.name} param={child} depth={depth + 1} />
 						))}
