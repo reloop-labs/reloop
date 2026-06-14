@@ -908,6 +908,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 									label={example.filename}
 									title={op.label}
 									titleHref={`${docBaseUrl}/docs/api/contacts/${op.docSlug}`}
+									noScroll={false}
 								/>
 							</section>
 						);

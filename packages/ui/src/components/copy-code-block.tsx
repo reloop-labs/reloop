@@ -22,14 +22,13 @@ export function CopyCodeBlock({
 	lang,
 	copyValue,
 	label,
-	windowTitle,
 	si,
 	tabs,
 	activeTab,
 	onTabChange,
 	className,
 	hideLineNumbers = false,
-	noScroll = true,
+	noScroll = false,
 	maxHeight,
 	title,
 	titleHref,
@@ -38,7 +37,6 @@ export function CopyCodeBlock({
 	lang: string;
 	copyValue?: string;
 	label?: string;
-	windowTitle?: string;
 	si?: CopyCodeBlockIcon;
 	tabs?: CopyCodeBlockTab[];
 	activeTab?: string;
@@ -199,17 +197,22 @@ export function CopyCodeBlock({
 									href={titleHref}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="flex items-center gap-1 font-semibold text-[13px] text-text-strong-950 hover:underline dark:text-white shrink-0"
+									className="flex shrink-0 items-center gap-1 font-semibold text-[13px] text-text-strong-950 hover:underline dark:text-white"
 								>
 									{title}
-									<Icon name="arrow-top-right" className="h-2.5 w-2.5 text-text-sub-400 stroke-[2.5]" />
+									<Icon
+										name="arrow-top-right"
+										className="h-2.5 w-2.5 stroke-[2.5] text-text-sub-400"
+									/>
 								</a>
 							) : (
-								<span className="font-semibold text-[13px] text-text-strong-950 dark:text-white shrink-0">
+								<span className="shrink-0 font-semibold text-[13px] text-text-strong-950 dark:text-white">
 									{title}
 								</span>
 							)}
-							<span className="ml-2.5 text-text-sub-300 dark:text-white/20">|</span>
+							<span className="ml-2.5 text-text-sub-300 dark:text-white/20">
+								|
+							</span>
 						</div>
 					) : null}
 					<div
@@ -300,7 +303,7 @@ export function CopyCodeBlock({
 				<div className="flex items-center gap-3 px-4 py-2.5">
 					<div className="flex min-w-0 flex-1 items-center gap-2.5">
 						{title ? (
-							<div className="flex items-center gap-1 shrink-0">
+							<div className="flex shrink-0 items-center gap-1">
 								{titleHref ? (
 									<a
 										href={titleHref}
@@ -309,7 +312,10 @@ export function CopyCodeBlock({
 										className="flex items-center gap-1 font-semibold text-[13px] text-text-strong-950 hover:underline dark:text-white"
 									>
 										{title}
-										<Icon name="arrow-top-right" className="h-2.5 w-2.5 text-text-sub-400 stroke-[2.5]" />
+										<Icon
+											name="arrow-top-right"
+											className="h-2.5 w-2.5 stroke-[2.5] text-text-sub-400"
+										/>
 									</a>
 								) : (
 									<span className="font-semibold text-[13px] text-text-strong-950 dark:text-white">
