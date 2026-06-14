@@ -149,12 +149,20 @@ export function Navbar({
 						<motion.button
 							type="button"
 							onClick={onSearchClick}
-							className="flex h-9 w-9 items-center justify-center rounded-full border border-stroke-soft-100 hover:text-[#171717] dark:hover:bg-white/5 dark:hover:text-white"
+							className="flex h-9 w-9 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 text-xs transition-all hover:border-black/15 hover:text-[#171717] sm:w-48 sm:justify-between sm:px-3 dark:hover:border-white/15 dark:hover:text-white"
 							title="Search (⌘K)"
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
+							whileHover={{ scale: 1.02 }}
+							whileTap={{ scale: 0.98 }}
 						>
-							<Icon name="search" className="h-4 w-4" />
+							<div className="flex items-center gap-1.5">
+								<Icon name="search" className="h-4 w-4 shrink-0" />
+								<span className="hidden text-left sm:inline-block">
+									Search...
+								</span>
+							</div>
+							<kbd className="pointer-events-none hidden h-5 select-none items-center gap-0.5 rounded border border-stroke-soft-100 bg-bg-weak-50 px-1.5 font-medium font-mono text-[9px] leading-none sm:inline-flex">
+								<span className="text-[10px]">⌘</span>K
+							</kbd>
 						</motion.button>
 					)}
 					<Link
