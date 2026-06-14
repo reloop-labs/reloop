@@ -6,6 +6,7 @@ import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { AnimatePresence, motion } from "motion/react";
+import { parseAsBoolean, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
@@ -74,7 +75,10 @@ export const ApiDetailsDrawer = ({
 	buttonProps = {},
 	codeExtraPadding = false,
 }: ApiDetailsDrawerProps) => {
-	const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setIsOpen] = useQueryState(
+		"api-details",
+		parseAsBoolean.withDefault(false),
+	);
 	const [selectedLanguage, setSelectedLanguage] = useApiLanguage<string>(
 		languages.map((l) => l.id),
 		languages[0]?.id || "javascript",
@@ -150,39 +154,67 @@ export const ApiDetailsDrawer = ({
 
 	const highlightedTabIndex =
 		hoveredTabIdx !== undefined ? hoveredTabIdx : activeTabIndex;
-	const highlightedTab = tabButtonRefs.current[highlightedTabIndex];
 	const highlightedBrandColor =
 		highlightedTabIndex >= 0 && languages[highlightedTabIndex]?.id
 			? `#${langIcons[languages[highlightedTabIndex].id]?.hex}`
 			: undefined;
 
-	const getTabPosition = (button: HTMLButtonElement | null | undefined) => {
-		if (!button) return null;
+	const [pillPosition, setPillPosition] = useState<{
+		width: number;
+		height: number;
+		left: number;
+		top: number;
+	} | null>(null);
 
-		return {
-			width: button.offsetWidth,
-			height: button.offsetHeight,
-			left: button.offsetLeft,
-			top: button.offsetTop,
+	useEffect(() => {
+		if (!mounted) {
+			setPillPosition(null);
+			return;
+		}
+
+		const updatePosition = () => {
+			const button = tabButtonRefs.current[highlightedTabIndex];
+			if (!button) {
+				setPillPosition(null);
+				return;
+			}
+
+			const position = {
+				width: button.offsetWidth,
+				height: button.offsetHeight,
+				left: button.offsetLeft,
+				top: button.offsetTop,
+			};
+
+			const pillInset = { x: 6, y: 6 };
+			setPillPosition({
+				width: position.width - pillInset.x * 2,
+				height: position.height - pillInset.y * 2 - 2,
+				left: position.left + pillInset.x,
+				top: position.top + pillInset.y,
+			});
 		};
-	};
 
-	const pillInset = { x: 6, y: 6 };
-	const getPillPosition = (position: ReturnType<typeof getTabPosition>) => {
-		if (!position) return null;
+		const handle = requestAnimationFrame(updatePosition);
 
-		return {
-			width: position.width - pillInset.x * 2,
-			height: position.height - pillInset.y * 2 - 2,
-			left: position.left + pillInset.x,
-			top: position.top + pillInset.y,
+		const container = containerRef.current;
+		let observer: ResizeObserver | null = null;
+		if (container) {
+			observer = new ResizeObserver(() => {
+				updatePosition();
+			});
+			observer.observe(container);
+		}
+
+		return () => {
+			cancelAnimationFrame(handle);
+			if (observer) {
+				observer.disconnect();
+			}
 		};
-	};
+	}, [highlightedTabIndex, mounted]);
 
-	const highlightedTabPosition = mounted
-		? getTabPosition(highlightedTab)
-		: null;
-	const highlightedPillPosition = getPillPosition(highlightedTabPosition);
+	const highlightedPillPosition = pillPosition;
 
 	const {
 		variant = "neutral",

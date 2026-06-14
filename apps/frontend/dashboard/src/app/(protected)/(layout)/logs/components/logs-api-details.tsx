@@ -7,6 +7,7 @@ import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { AnimatePresence, motion } from "motion/react";
+import { parseAsBoolean, useQueryState } from "nuqs";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
@@ -265,7 +266,10 @@ type Language = keyof typeof codeExamples;
 export const LogsApiDetails = (
 	props: React.ComponentPropsWithoutRef<typeof Button.Root>,
 ) => {
-	const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setIsOpen] = useQueryState(
+		"api-details",
+		parseAsBoolean.withDefault(false),
+	);
 	const [selectedLanguage, setSelectedLanguage] = useApiLanguage<Language>(
 		languages.map((l) => l.id),
 		"nodejs",
@@ -280,8 +284,12 @@ export const LogsApiDetails = (
 	const isFirstScrollRef = useRef(true);
 
 	useEffect(() => {
-		setMounted(true);
-	}, []);
+		if (isOpen) {
+			setMounted(true);
+		} else {
+			setMounted(false);
+		}
+	}, [isOpen]);
 
 	const activeTabIndex = languages.findIndex((l) => l.id === selectedLanguage);
 
@@ -330,39 +338,67 @@ export const LogsApiDetails = (
 
 	const highlightedTabIndex =
 		hoveredTabIdx !== undefined ? hoveredTabIdx : activeTabIndex;
-	const highlightedTab = tabButtonRefs.current[highlightedTabIndex];
 	const highlightedBrandColor =
 		highlightedTabIndex >= 0 && languages[highlightedTabIndex]?.id
 			? `#${langIcons[languages[highlightedTabIndex].id]?.hex}`
 			: undefined;
 
-	const getTabPosition = (button: HTMLButtonElement | null | undefined) => {
-		if (!button) return null;
+	const [pillPosition, setPillPosition] = useState<{
+		width: number;
+		height: number;
+		left: number;
+		top: number;
+	} | null>(null);
 
-		return {
-			width: button.offsetWidth,
-			height: button.offsetHeight,
-			left: button.offsetLeft,
-			top: button.offsetTop,
+	useEffect(() => {
+		if (!mounted) {
+			setPillPosition(null);
+			return;
+		}
+
+		const updatePosition = () => {
+			const button = tabButtonRefs.current[highlightedTabIndex];
+			if (!button) {
+				setPillPosition(null);
+				return;
+			}
+
+			const position = {
+				width: button.offsetWidth,
+				height: button.offsetHeight,
+				left: button.offsetLeft,
+				top: button.offsetTop,
+			};
+
+			const pillInset = { x: 6, y: 6 };
+			setPillPosition({
+				width: position.width - pillInset.x * 2,
+				height: position.height - pillInset.y * 2 - 2,
+				left: position.left + pillInset.x,
+				top: position.top + pillInset.y,
+			});
 		};
-	};
 
-	const pillInset = { x: 6, y: 6 };
-	const getPillPosition = (position: ReturnType<typeof getTabPosition>) => {
-		if (!position) return null;
+		const handle = requestAnimationFrame(updatePosition);
 
-		return {
-			width: position.width - pillInset.x * 2,
-			height: position.height - pillInset.y * 2 - 2,
-			left: position.left + pillInset.x,
-			top: position.top + pillInset.y,
+		const container = containerRef.current;
+		let observer: ResizeObserver | null = null;
+		if (container) {
+			observer = new ResizeObserver(() => {
+				updatePosition();
+			});
+			observer.observe(container);
+		}
+
+		return () => {
+			cancelAnimationFrame(handle);
+			if (observer) {
+				observer.disconnect();
+			}
 		};
-	};
+	}, [highlightedTabIndex, mounted]);
 
-	const highlightedTabPosition = mounted
-		? getTabPosition(highlightedTab)
-		: null;
-	const highlightedPillPosition = getPillPosition(highlightedTabPosition);
+	const highlightedPillPosition = pillPosition;
 
 	useHotkeys("a", (e) => {
 		e.preventDefault();
