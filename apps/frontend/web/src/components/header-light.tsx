@@ -82,7 +82,6 @@ export const HeaderLight = () => {
 			>
 				<Link href="/" className="flex items-center pl-2">
 					<Logo
-						theme="light"
 						className={`transition-[width] duration-500 ${
 							scrolled ? "w-12" : "w-14"
 						}`}
