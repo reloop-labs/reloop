@@ -7,6 +7,7 @@ import { Logo } from "@reloop/ui/logo";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 const tabColors: Record<string, string> = {
@@ -141,7 +142,7 @@ export function Navbar({
 			</div>
 
 			<div className="flex shrink-0 items-center gap-2">
-				<div className="flex items-center gap-4">
+				<div className="flex items-center gap-2">
 					<Link
 						href="https://github.com/reloop-labs/reloop"
 						target="_blank"
@@ -153,12 +154,41 @@ export function Navbar({
 					</Link>
 					<a
 						href="/dashboard"
-						className="inline-flex h-9 items-center justify-center rounded-full bg-[#171717] px-5 font-semibold text-sm text-white transition-all hover:opacity-90 active:scale-[0.98] dark:bg-white dark:text-black"
+						className="ml-2 inline-flex h-9 items-center justify-center rounded-full bg-[#171717] px-5 font-semibold text-sm text-white transition-all hover:opacity-90 active:scale-[0.98] dark:bg-white dark:text-black"
 					>
 						Get Started
 					</a>
+					<ThemeToggle />
 				</div>
 			</div>
 		</div>
+	);
+}
+
+function ThemeToggle() {
+	const { setTheme, resolvedTheme } = useTheme();
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => setMounted(true), []);
+
+	if (!mounted) {
+		return (
+			<div className="h-9 w-9 animate-pulse rounded-full border border-stroke-soft-100 bg-bg-white-0/50 dark:bg-white/5" />
+		);
+	}
+
+	const isDark = resolvedTheme === "dark";
+
+	return (
+		<motion.button
+			type="button"
+			onClick={() => setTheme(isDark ? "light" : "dark")}
+			className="flex h-9 w-9 items-center justify-center rounded-full border border-stroke-soft-100 hover:text-[#171717] dark:hover:bg-white/5 dark:hover:text-white"
+			title={isDark ? "Switch to light theme" : "Switch to dark theme"}
+			whileHover={{ scale: 1.05 }}
+			whileTap={{ scale: 0.95 }}
+		>
+			<Icon name={isDark ? "sun" : "moon"} className="h-4 w-4" />
+		</motion.button>
 	);
 }

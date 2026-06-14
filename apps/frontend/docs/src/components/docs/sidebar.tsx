@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
 import {
 	createContext,
 	useCallback,
@@ -357,11 +356,6 @@ export function Sidebar({
 				</SidebarContext.Provider>
 			</nav>
 
-			{/* Footer area with Theme Toggle */}
-			<div className="p-3">
-				<ThemeToggle />
-			</div>
-
 			<SearchDialog
 				open={isSearchOpen}
 				onOpenChange={setIsSearchOpen}
@@ -445,47 +439,5 @@ function ProductSwitcher({ pathname: propPathname }: { pathname?: string }) {
 				</Popover.Content>
 			</Popover.Portal>
 		</Popover.Root>
-	);
-}
-
-function ThemeToggle() {
-	const { theme, setTheme } = useTheme();
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => setMounted(true), []);
-
-	if (!mounted)
-		return (
-			<div className="h-7 w-20 animate-pulse rounded-full bg-bg-white-0/50" />
-		);
-
-	const themes = [
-		{ value: "system", icon: "monitor", label: "System theme" },
-		{ value: "light", icon: "sun", label: "Light theme" },
-		{ value: "dark", icon: "moon", label: "Dark theme" },
-	];
-
-	return (
-		<div className="flex w-fit items-center rounded-full border border-stroke-soft-100 bg-bg-white-0 p-0.5">
-			{themes.map((themeOption) => {
-				const isSelected = theme === themeOption.value;
-				return (
-					<motion.button
-						key={themeOption.value}
-						onClick={() => setTheme(themeOption.value)}
-						className={cn(
-							"flex h-6 w-6 items-center justify-center rounded-full text-text-sub-600 transition-all duration-200 hover:text-[#171717] dark:hover:text-white",
-							isSelected &&
-								"border border-stroke-soft-100 bg-bg-weak-50 text-[#171717] dark:text-white",
-						)}
-						title={themeOption.label}
-						whileHover={{ scale: 1.05 }}
-						whileTap={{ scale: 0.95 }}
-					>
-						<Icon name={themeOption.icon} className="h-3.5 w-3.5" />
-					</motion.button>
-				);
-			})}
-		</div>
 	);
 }
