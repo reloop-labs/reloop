@@ -65,9 +65,9 @@ export function Navbar({
 				>
 					<Icon name="menu-2" className="h-5 w-5" />
 				</button>
-				<Link href="/" className="flex items-center lg:hidden">
-					<Logo theme="light" className="w-10" />
-				</Link>
+				<a href="/" className="flex items-center lg:hidden">
+					<Logo className="w-10" />
+				</a>
 			</div>
 
 			{/* Nav tabs */}

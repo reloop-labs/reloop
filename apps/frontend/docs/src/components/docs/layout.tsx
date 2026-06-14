@@ -3,7 +3,6 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { Logo } from "@reloop/ui/logo";
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { type ReactNode, useState } from "react";
 import type { PageTreeItem } from "../../lib/types";
 import { Navbar } from "./navbar";
@@ -24,9 +23,9 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 			<header className="z-50 flex h-12 w-full shrink-0 bg-bg-weak-50/80 backdrop-blur-md dark:bg-black/80">
 				{/* Desktop Logo Area - Only visible on LG+ */}
 				<div className="hidden shrink-0 items-center px-4 pt-1 lg:flex lg:w-74">
-					<Link href="/" className="flex items-center">
+					<a href="/" className="flex items-center">
 						<Logo theme="light" className="w-12" />
-					</Link>
+					</a>
 				</div>
 				{/* Navigation Row - Fluid on all screens */}
 				<div className="h-full flex-1">
@@ -58,13 +57,13 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 									Documentation Navigation
 								</Dialog.Title>
 								<div className="flex h-12 items-center border-stroke-soft-100 border-b px-4 dark:border-stroke-soft-100/40">
-									<Link
+									<a
 										href="/"
 										className="flex items-center"
 										onClick={() => setOpen(false)}
 									>
-										<Logo theme="light" className="w-10" />
-									</Link>
+										<Logo className="w-10" />
+									</a>
 								</div>
 								<div className="h-[calc(100vh-3rem)] overflow-y-auto">
 									<Sidebar
