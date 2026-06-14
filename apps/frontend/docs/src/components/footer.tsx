@@ -184,7 +184,7 @@ export function Footer() {
 							<ul className="space-y-2.5">
 								{group.items.map((link) => (
 									<li key={link.title}>
-										<Link
+										<a
 											href={link.href}
 											{...(link.href.startsWith("http")
 												? { target: "_blank", rel: "noreferrer" }
@@ -192,7 +192,7 @@ export function Footer() {
 											className="font-medium text-[#0a0d12]/70 text-[13.5px] transition-colors hover:text-[#0a0d12] dark:text-white/60 dark:hover:text-white"
 										>
 											{link.title}
-										</Link>
+										</a>
 									</li>
 								))}
 							</ul>
