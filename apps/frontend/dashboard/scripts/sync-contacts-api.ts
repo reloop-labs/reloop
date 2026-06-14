@@ -1,13 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const DOCS_DIR = path.resolve(
+const DOCS_BASE_DIR = path.resolve(__dirname, "../../docs/content/docs/api");
+const DASHBOARD_BASE_DIR = path.resolve(
 	__dirname,
-	"../../docs/content/docs/api/contacts",
-);
-const DASHBOARD_FILE = path.resolve(
-	__dirname,
-	"../src/components/api-details/contacts-code-examples.ts",
+	"../src/components/api-details",
 );
 
 interface CodeSample {
@@ -16,18 +13,6 @@ interface CodeSample {
 	label: string;
 	source: string;
 }
-
-const OP_FILES = {
-	add: "post-api-contacts-create.mdx",
-	get: "get-api-contacts-retrieve-by-contact_id.mdx",
-	list: "get-api-contacts-list.mdx",
-	update: "patch-api-contacts-by-contact_id.mdx",
-	delete: "delete-api-contacts-by-contact_id.mdx",
-	addChannel: "post-api-contacts-channel-by-channel_id.mdx",
-	updateChannel: "patch-api-contacts-channel-by-channel_id.mdx",
-	addGroup: "post-api-contacts-group-by-group_id.mdx",
-	deleteGroup: "delete-api-contacts-group-by-group_id.mdx",
-};
 
 const LANG_MAP: Record<string, string> = {
 	node: "nodejs",
@@ -157,18 +142,7 @@ function parseCodeSamples(content: string, filePath: string): CodeSample[] {
 	return samples;
 }
 
-function getFilename(lang: string, op: string): string {
-	let baseName = op;
-	if (op === "add") baseName = "add_contact";
-	else if (op === "get") baseName = "get_contact";
-	else if (op === "list") baseName = "list_contact";
-	else if (op === "update") baseName = "update_contact";
-	else if (op === "delete") baseName = "delete_contact";
-	else if (op === "addChannel") baseName = "add_contact_channel";
-	else if (op === "updateChannel") baseName = "update_contact_channel";
-	else if (op === "addGroup") baseName = "add_contact_group";
-	else if (op === "deleteGroup") baseName = "delete_contact_group";
-
+function getExtFilename(lang: string, baseName: string): string {
 	if (lang === "java") {
 		const caps = baseName
 			.split("_")
@@ -198,6 +172,7 @@ function getFilename(lang: string, op: string): string {
 
 function formatCodeExamples(
 	examples: Record<string, Record<string, { filename: string; code: string }>>,
+	sortedOps: readonly string[],
 ): string {
 	// Keep the sort order consistent: nodejs, python, php, go, ruby, rust, java, dotnet, curl
 	const sortedLangs = [
@@ -210,17 +185,6 @@ function formatCodeExamples(
 		"java",
 		"dotnet",
 		"curl",
-	];
-	const sortedOps = [
-		"add",
-		"get",
-		"list",
-		"update",
-		"delete",
-		"addChannel",
-		"updateChannel",
-		"addGroup",
-		"deleteGroup",
 	];
 
 	let out = "export const codeExamples = {\n";
@@ -248,52 +212,169 @@ function formatCodeExamples(
 	return out;
 }
 
+const CONFIGS = [
+	{
+		docsSubDir: "contacts",
+		dashboardFile: "contacts-code-examples.ts",
+		opFiles: {
+			add: "post-api-contacts-create.mdx",
+			get: "get-api-contacts-retrieve-by-contact_id.mdx",
+			list: "get-api-contacts-list.mdx",
+			update: "patch-api-contacts-by-contact_id.mdx",
+			delete: "delete-api-contacts-by-contact_id.mdx",
+			addChannel: "post-api-contacts-channel-by-channel_id.mdx",
+			updateChannel: "patch-api-contacts-channel-by-channel_id.mdx",
+			addGroup: "post-api-contacts-group-by-group_id.mdx",
+			deleteGroup: "delete-api-contacts-group-by-group_id.mdx",
+		},
+		getFilename: (lang: string, op: string) => {
+			let baseName = op;
+			if (op === "add") baseName = "add_contact";
+			else if (op === "get") baseName = "get_contact";
+			else if (op === "list") baseName = "list_contact";
+			else if (op === "update") baseName = "update_contact";
+			else if (op === "delete") baseName = "delete_contact";
+			else if (op === "addChannel") baseName = "add_contact_channel";
+			else if (op === "updateChannel") baseName = "update_contact_channel";
+			else if (op === "addGroup") baseName = "add_contact_group";
+			else if (op === "deleteGroup") baseName = "delete_contact_group";
+			return getExtFilename(lang, baseName);
+		},
+		sortedOps: [
+			"add",
+			"get",
+			"list",
+			"update",
+			"delete",
+			"addChannel",
+			"updateChannel",
+			"addGroup",
+			"deleteGroup",
+		] as const,
+	},
+	{
+		docsSubDir: "contacts/contact-properties",
+		dashboardFile: "properties-code-examples.ts",
+		opFiles: {
+			add: "post-api-contacts-v1properties-create.mdx",
+			list: "get-api-contacts-v1properties-list.mdx",
+			update: "patch-api-contacts-v1properties-by-contact_property_id.mdx",
+			delete: "delete-api-contacts-v1properties-by-contact_property_id.mdx",
+		},
+		getFilename: (lang: string, op: string) => {
+			let baseName = op;
+			if (op === "add") baseName = "create_property";
+			else if (op === "list") baseName = "list_properties";
+			else if (op === "update") baseName = "update_property";
+			else if (op === "delete") baseName = "delete_property";
+			return getExtFilename(lang, baseName);
+		},
+		sortedOps: ["add", "list", "update", "delete"] as const,
+	},
+	{
+		docsSubDir: "contacts/groups",
+		dashboardFile: "groups-code-examples.ts",
+		opFiles: {
+			add: "post-api-contacts-v1groups-create.mdx",
+			get: "get-api-contacts-v1groups-by-group_id.mdx",
+			list: "get-api-contacts-v1groups-list.mdx",
+			update: "patch-api-contacts-v1groups-by-group_id.mdx",
+			delete: "delete-api-contacts-v1groups-by-group_id.mdx",
+			getContacts: "get-api-contacts-v1groups-by-group_id-contacts.mdx",
+		},
+		getFilename: (lang: string, op: string) => {
+			let baseName = op;
+			if (op === "add") baseName = "create_group";
+			else if (op === "get") baseName = "get_group";
+			else if (op === "list") baseName = "list_groups";
+			else if (op === "update") baseName = "update_group";
+			else if (op === "delete") baseName = "delete_group";
+			else if (op === "getContacts") baseName = "get_group_contacts";
+			return getExtFilename(lang, baseName);
+		},
+		sortedOps: [
+			"add",
+			"get",
+			"list",
+			"update",
+			"delete",
+			"getContacts",
+		] as const,
+	},
+	{
+		docsSubDir: "contacts/channels",
+		dashboardFile: "channels-code-examples.ts",
+		opFiles: {
+			add: "post-api-contacts-v1channels-create.mdx",
+			get: "get-api-contacts-v1channels-by-channel_id.mdx",
+			list: "get-api-contacts-v1channels-list.mdx",
+			update: "patch-api-contacts-v1channels-by-channel_id.mdx",
+			delete: "delete-api-contacts-v1channels-by-channel_id.mdx",
+		},
+		getFilename: (lang: string, op: string) => {
+			let baseName = op;
+			if (op === "add") baseName = "create_channel";
+			else if (op === "get") baseName = "get_channel";
+			else if (op === "list") baseName = "list_channels";
+			else if (op === "update") baseName = "update_channel";
+			else if (op === "delete") baseName = "delete_channel";
+			return getExtFilename(lang, baseName);
+		},
+		sortedOps: ["add", "get", "list", "update", "delete"] as const,
+	},
+];
+
 function sync() {
 	console.log("Starting Contacts API sync...");
 
-	// Initialize structured examples object
-	// Format: { langId: { opId: { filename, code } } }
-	const examples: Record<
-		string,
-		Record<string, { filename: string; code: string }>
-	> = {};
+	for (const config of CONFIGS) {
+		const docsDir = path.join(DOCS_BASE_DIR, config.docsSubDir);
+		const dashboardFile = path.join(DASHBOARD_BASE_DIR, config.dashboardFile);
 
-	// Populate structure for all languages
-	for (const dashboardLang of Object.values(LANG_MAP)) {
-		examples[dashboardLang] = {};
-	}
+		// Initialize structured examples object
+		// Format: { langId: { opId: { filename, code } } }
+		const examples: Record<
+			string,
+			Record<string, { filename: string; code: string }>
+		> = {};
 
-	for (const [op, fileName] of Object.entries(OP_FILES)) {
-		const filePath = path.join(DOCS_DIR, fileName);
-		if (!fs.existsSync(filePath)) {
-			console.error(`MDX file does not exist: ${filePath}`);
-			process.exit(1);
+		// Populate structure for all languages
+		for (const dashboardLang of Object.values(LANG_MAP)) {
+			examples[dashboardLang] = {};
 		}
 
-		console.log(`Parsing ${fileName}...`);
-		const content = fs.readFileSync(filePath, "utf-8");
-		const samples = parseCodeSamples(content, filePath);
-
-		for (const sample of samples) {
-			const dashboardLang = LANG_MAP[sample.id];
-			if (!dashboardLang) {
-				// Skip languages like elixir that are not supported in the dashboard contacts component
-				continue;
+		for (const [op, fileName] of Object.entries(config.opFiles)) {
+			const filePath = path.join(docsDir, fileName);
+			if (!fs.existsSync(filePath)) {
+				console.error(`MDX file does not exist: ${filePath}`);
+				process.exit(1);
 			}
 
-			const target = examples[dashboardLang];
-			if (target) {
-				target[op] = {
-					filename: getFilename(dashboardLang, op),
-					code: sample.source.trim(),
-				};
+			console.log(`Parsing ${config.docsSubDir}/${fileName}...`);
+			const content = fs.readFileSync(filePath, "utf-8");
+			const samples = parseCodeSamples(content, filePath);
+
+			for (const sample of samples) {
+				const dashboardLang = LANG_MAP[sample.id];
+				if (!dashboardLang) {
+					// Skip languages not supported in dashboard components
+					continue;
+				}
+
+				const target = examples[dashboardLang];
+				if (target) {
+					target[op] = {
+						filename: config.getFilename(dashboardLang, op),
+						code: sample.source.trim(),
+					};
+				}
 			}
 		}
-	}
 
-	const formattedBlock = formatCodeExamples(examples);
-	fs.writeFileSync(DASHBOARD_FILE, `${formattedBlock}\n`, "utf-8");
-	console.log(`Successfully synced and updated ${DASHBOARD_FILE}!`);
+		const formattedBlock = formatCodeExamples(examples, config.sortedOps);
+		fs.writeFileSync(dashboardFile, `${formattedBlock}\n`, "utf-8");
+		console.log(`Successfully synced and updated ${dashboardFile}!`);
+	}
 }
 
 sync();

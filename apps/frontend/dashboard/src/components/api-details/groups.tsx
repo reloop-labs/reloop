@@ -1,32 +1,37 @@
 import type * as Button from "@reloop/ui/button";
 import { ApiDetailsDrawer } from "./api-details-drawer";
-import { codeExamples } from "./channels-code-examples";
+import { codeExamples } from "./groups-code-examples";
 
 const operations = [
 	{
 		id: "add",
-		label: "Create Channel",
-		docSlug: "post-api-contacts-v1channels-create",
+		label: "Create Group",
+		docSlug: "post-api-contacts-v1groups-create",
 	},
 	{
 		id: "get",
-		label: "Retrieve Channel",
-		docSlug: "get-api-contacts-v1channels-by-channel_id",
+		label: "Retrieve Group",
+		docSlug: "get-api-contacts-v1groups-by-group_id",
 	},
 	{
 		id: "list",
-		label: "List Channels",
-		docSlug: "get-api-contacts-v1channels-list",
+		label: "List Groups",
+		docSlug: "get-api-contacts-v1groups-list",
 	},
 	{
 		id: "update",
-		label: "Update Channel",
-		docSlug: "patch-api-contacts-v1channels-by-channel_id",
+		label: "Update Group",
+		docSlug: "patch-api-contacts-v1groups-by-group_id",
 	},
 	{
 		id: "delete",
-		label: "Delete Channel",
-		docSlug: "delete-api-contacts-v1channels-by-channel_id",
+		label: "Delete Group",
+		docSlug: "delete-api-contacts-v1groups-by-group_id",
+	},
+	{
+		id: "getContacts",
+		label: "Get Group Contacts",
+		docSlug: "get-api-contacts-v1groups-by-group_id-contacts",
 	},
 ] as const;
 
@@ -44,14 +49,14 @@ const languages = [
 
 type ButtonProps = React.ComponentPropsWithoutRef<typeof Button.Root>;
 
-export const ChannelsApiDetails = (props: ButtonProps) => {
+export const GroupsApiDetails = (props: ButtonProps) => {
 	return (
 		<ApiDetailsDrawer
-			title="Channels API"
+			title="Groups API"
 			languages={languages}
 			operations={operations}
 			codeExamples={codeExamples}
-			docSection="contacts/channels"
+			docSection="contacts/groups"
 			buttonProps={props}
 			codeExtraPadding={true}
 		/>

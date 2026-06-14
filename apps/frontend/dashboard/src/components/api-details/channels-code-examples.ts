@@ -1,166 +1,446 @@
 export const codeExamples = {
-	javascript: {
-		add: `// Create a new channel
-const response = await fetch('/api/contacts/v1/channels/create', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer YOUR_API_KEY'
-  },
-  body: JSON.stringify({
-    name: 'Newsletter',
-    description: 'Weekly newsletter subscribers'
-  })
-});
+	nodejs: {
+		add: {
+			filename: "create_channel.js",
+			code: `import { Reloop } from "reloop-email";
 
-const result = await response.json();`,
-		list: `// List all channels
-const response = await fetch('/api/contacts/v1/channels/list?page=1&limit=10', {
-  headers: {
-    'Authorization': 'Bearer YOUR_API_KEY'
-  }
-});
+const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const channels = await response.json();`,
-		delete: `// Delete a channel
-const response = await fetch('/api/contacts/v1/channels/channel_123', {
-  method: 'DELETE',
-  headers: {
-    'Authorization': 'Bearer YOUR_API_KEY'
-  }
+const { response: channel, error } = await reloop.contacts.channels.create({
+  name: "Product Updates",
+  description: "Get the latest news about our products",
+  defaultSubscription: "opt_in",
+  visibility: "public",
 });
+if (error) throw error;`,
+		},
+		get: {
+			filename: "get_channel.js",
+			code: `import { Reloop } from "reloop-email";
 
-const result = await response.json();`,
-		subscribe: `// Subscribe contact to channel
-const response = await fetch('/api/contacts/v1/subscriptions/subscribe', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer YOUR_API_KEY'
-  },
-  body: JSON.stringify({
-    contactId: 'contact_123',
-    channelId: 'channel_123'
-  })
-});
+const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const result = await response.json();`,
+const { response: channel, error } = await reloop.contacts.channels.get("chn_123456789");
+if (error) throw error;`,
+		},
+		list: {
+			filename: "list_channels.js",
+			code: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { response: channels, error } = await reloop.contacts.channels.list({ page: 1, limit: 10 });
+if (error) throw error;`,
+		},
+		update: {
+			filename: "update_channel.js",
+			code: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { response: channel, error } = await reloop.contacts.channels.update("chn_123456789", { name: "Marketing News" });
+if (error) throw error;`,
+		},
+		delete: {
+			filename: "delete_channel.js",
+			code: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { response, error } = await reloop.contacts.channels.delete("chn_123456789");
+if (error) throw error;`,
+		},
 	},
 	python: {
-		add: `# Create a new channel
-import requests
+		add: {
+			filename: "create_channel.py",
+			code: `from reloop import Reloop
 
-response = requests.post('/api/contacts/v1/channels/create',
-  headers={
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer YOUR_API_KEY'
-  },
-  json={
-    'name': 'Newsletter',
-    'description': 'Weekly newsletter subscribers'
-  }
-)
+reloop = Reloop(api_key="rl_123456789")
 
-result = response.json()`,
-		list: `# List all channels
-import requests
+channel = reloop.contacts.channels.create(
+    name="Product Updates",
+    description="Get the latest news about our products",
+    default_subscription="opt_in",
+    visibility="public",
+)`,
+		},
+		get: {
+			filename: "get_channel.py",
+			code: `from reloop import Reloop
 
-response = requests.get('/api/contacts/v1/channels/list?page=1&limit=10',
-  headers={'Authorization': 'Bearer YOUR_API_KEY'}
-)
+reloop = Reloop(api_key="rl_123456789")
 
-channels = response.json()`,
-		delete: `# Delete a channel
-import requests
+channel = reloop.contacts.channels.get("chn_123456789")`,
+		},
+		list: {
+			filename: "list_channels.py",
+			code: `from reloop import Reloop
 
-response = requests.delete('/api/contacts/v1/channels/channel_123',
-  headers={
-    'Authorization': 'Bearer YOUR_API_KEY'
-  }
-)
+reloop = Reloop(api_key="rl_123456789")
 
-result = response.json()`,
-		subscribe: `# Subscribe contact to channel
-import requests
+channels = reloop.contacts.channels.list(page=1, limit=10)`,
+		},
+		update: {
+			filename: "update_channel.py",
+			code: `from reloop import Reloop
 
-response = requests.post('/api/contacts/v1/subscriptions/subscribe',
-  headers={
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer YOUR_API_KEY'
-  },
-  json={
-    'contactId': 'contact_123',
-    'channelId': 'channel_123'
-  }
-)
+reloop = Reloop(api_key="rl_123456789")
 
-result = response.json()`,
+channel = reloop.contacts.channels.update("chn_123456789", name="Marketing News")`,
+		},
+		delete: {
+			filename: "delete_channel.py",
+			code: `from reloop import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+reloop.contacts.channels.delete("chn_123456789")`,
+		},
 	},
 	php: {
-		add: `<?php
-// Create a new channel
-$data = [
-    'name' => 'Newsletter',
-    'description' => 'Weekly newsletter subscribers'
-];
+		add: {
+			filename: "create_channel.php",
+			code: `$reloop = Reloop::client('rl_123456789');
 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, '/api/contacts/v1/channels/create');
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Content-Type: application/json',
-    'Authorization: Bearer YOUR_API_KEY'
-]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$channel = $reloop->contacts->channels->create([
+    'name' => 'Product Updates',
+    'description' => 'Get the latest news about our products',
+    'default_subscription' => 'opt_in',
+    'visibility' => 'public',
+]);`,
+		},
+		get: {
+			filename: "get_channel.php",
+			code: `$reloop = Reloop::client('rl_123456789');
 
-$result = curl_exec($ch);
-curl_close($ch);
-?>`,
-		list: `<?php
-// List all channels
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, '/api/contacts/v1/channels/list?page=1&limit=10');
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Authorization: Bearer YOUR_API_KEY'
-]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$channel = $reloop->contacts->channels->get('chn_123456789');`,
+		},
+		list: {
+			filename: "list_channels.php",
+			code: `$reloop = Reloop::client('rl_123456789');
 
-$channels = curl_exec($ch);
-curl_close($ch);
-?>`,
-		delete: `<?php
-// Delete a channel
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, '/api/contacts/v1/channels/channel_123');
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Authorization: Bearer YOUR_API_KEY'
-]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$channels = $reloop->contacts->channels->list(['page' => 1, 'limit' => 10]);`,
+		},
+		update: {
+			filename: "update_channel.php",
+			code: `$reloop = Reloop::client('rl_123456789');
 
-$result = curl_exec($ch);
-curl_close($ch);
-?>`,
-		subscribe: `<?php
-// Subscribe contact to channel
-$data = [
-    'contactId' => 'contact_123',
-    'channelId' => 'channel_123'
-];
+$channel = $reloop->contacts->channels->update('chn_123456789', ['name' => 'Marketing News']);`,
+		},
+		delete: {
+			filename: "delete_channel.php",
+			code: `$reloop = Reloop::client('rl_123456789');
 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, '/api/contacts/v1/subscriptions/subscribe');
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Content-Type: application/json',
-    'Authorization: Bearer YOUR_API_KEY'
-]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$reloop->contacts->channels->delete('chn_123456789');`,
+		},
+	},
+	go: {
+		add: {
+			filename: "create_channel.go",
+			code: `import reloop "github.com/reloop-labs/reloop-go"
 
-$result = curl_exec($ch);
-curl_close($ch);
-?>`,
+client, _ := reloop.NewClient(reloop.ClientOptions{
+    APIKey: "rl_123456789",
+})
+
+channel, _ := client.Contacts.Channels.Create(map[string]interface{}{
+    "name": "Product Updates",
+    "description": "Get the latest news about our products",
+    "defaultSubscription": "opt_in",
+    "visibility": "public",
+})`,
+		},
+		get: {
+			filename: "get_channel.go",
+			code: `import reloop "github.com/reloop-labs/reloop-go"
+
+client, _ := reloop.NewClient(reloop.ClientOptions{
+    APIKey: "rl_123456789",
+})
+
+channel, _ := client.Contacts.Channels.Get("chn_123456789")`,
+		},
+		list: {
+			filename: "list_channels.go",
+			code: `import reloop "github.com/reloop-labs/reloop-go"
+
+client, _ := reloop.NewClient(reloop.ClientOptions{
+    APIKey: "rl_123456789",
+})
+
+channels, _ := client.Contacts.Channels.List(map[string]interface{}{"page": 1, "limit": 10})`,
+		},
+		update: {
+			filename: "update_channel.go",
+			code: `import reloop "github.com/reloop-labs/reloop-go"
+
+client, _ := reloop.NewClient(reloop.ClientOptions{
+    APIKey: "rl_123456789",
+})
+
+channel, _ := client.Contacts.Channels.Update("chn_123456789", map[string]interface{"name": "Marketing News"})`,
+		},
+		delete: {
+			filename: "delete_channel.go",
+			code: `import reloop "github.com/reloop-labs/reloop-go"
+
+client, _ := reloop.NewClient(reloop.ClientOptions{
+    APIKey: "rl_123456789",
+})
+
+_, _ = client.Contacts.Channels.Delete("chn_123456789")`,
+		},
+	},
+	ruby: {
+		add: {
+			filename: "create_channel.rb",
+			code: `require "reloop"
+
+reloop = Reloop::Client.new(api_key: "rl_123456789")
+
+channel = reloop.contacts.channels.create(
+  name: "Product Updates",
+  description: "Get the latest news about our products",
+  default_subscription: "opt_in",
+  visibility: "public",
+)`,
+		},
+		get: {
+			filename: "get_channel.rb",
+			code: `require "reloop"
+
+reloop = Reloop::Client.new(api_key: "rl_123456789")
+
+channel = reloop.contacts.channels.get("chn_123456789")`,
+		},
+		list: {
+			filename: "list_channels.rb",
+			code: `require "reloop"
+
+reloop = Reloop::Client.new(api_key: "rl_123456789")
+
+channels = reloop.contacts.channels.list(page: 1, limit: 10)`,
+		},
+		update: {
+			filename: "update_channel.rb",
+			code: `require "reloop"
+
+reloop = Reloop::Client.new(api_key: "rl_123456789")
+
+channel = reloop.contacts.channels.update("chn_123456789", name: "Marketing News")`,
+		},
+		delete: {
+			filename: "delete_channel.rb",
+			code: `require "reloop"
+
+reloop = Reloop::Client.new(api_key: "rl_123456789")
+
+reloop.contacts.channels.delete("chn_123456789")`,
+		},
+	},
+	rust: {
+		add: {
+			filename: "create_channel.rs",
+			code: `use reloop::ReloopClient;
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+
+    reloop.contacts().channels().create(CreateChannelParams {
+        name: "Product Updates".to_string(),
+        description: Some("Get the latest news about our products".to_string()),
+        default_subscription: Some("opt_in".to_string()),
+        visibility: Some(ChannelVisibility::Public),
+        ..Default::default()
+    }).await?;
+
+    Ok(())
+}`,
+		},
+		get: {
+			filename: "get_channel.rs",
+			code: `use reloop::ReloopClient;
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+
+    reloop.contacts().channels().get("chn_123456789").await?;
+
+    Ok(())
+}`,
+		},
+		list: {
+			filename: "list_channels.rs",
+			code: `use reloop::ReloopClient;
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+
+    reloop.contacts().channels().list(Some(ListChannelsParams { page: Some(1), limit: Some(10), ..Default::default() })).await?;
+
+    Ok(())
+}`,
+		},
+		update: {
+			filename: "update_channel.rs",
+			code: `use reloop::ReloopClient;
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+
+    reloop.contacts().channels().update("chn_123456789", UpdateChannelParams { name: Some("Marketing News".to_string()), ..Default::default() }).await?;
+
+    Ok(())
+}`,
+		},
+		delete: {
+			filename: "delete_channel.rs",
+			code: `use reloop::ReloopClient;
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+
+    reloop.contacts().channels().delete("chn_123456789").await?;
+
+    Ok(())
+}`,
+		},
+	},
+	java: {
+		add: {
+			filename: "CreateChannel.java",
+			code: `import sh.reloop.ReloopClient;
+import sh.reloop.models.Models.*;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+reloop.contacts.channels.create(Map.of(
+    "name", "Product Updates",
+    "description", "Get the latest news about our products",
+    "defaultSubscription", "opt_in",
+    "visibility", "public"
+));`,
+		},
+		get: {
+			filename: "GetChannel.java",
+			code: `import sh.reloop.ReloopClient;
+import sh.reloop.models.Models.*;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+reloop.contacts.channels.get("chn_123456789");`,
+		},
+		list: {
+			filename: "ListChannels.java",
+			code: `import sh.reloop.ReloopClient;
+import sh.reloop.models.Models.*;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+reloop.contacts.channels.list(Map.of("page", 1, "limit", 10));`,
+		},
+		update: {
+			filename: "UpdateChannel.java",
+			code: `import sh.reloop.ReloopClient;
+import sh.reloop.models.Models.*;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+reloop.contacts.channels.update("chn_123456789", Map.of("name", "Marketing News"));`,
+		},
+		delete: {
+			filename: "DeleteChannel.java",
+			code: `import sh.reloop.ReloopClient;
+import sh.reloop.models.Models.*;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+reloop.contacts.channels.delete("chn_123456789");`,
+		},
+	},
+	dotnet: {
+		add: {
+			filename: "CreateChannel.cs",
+			code: `using Reloop;
+using Reloop.Models;
+
+var reloop = new ReloopClient("rl_123456789");
+
+await reloop.Contacts.Channels.CreateAsync(new Dictionary<string, object?>
+{
+    ["name"] = "Product Updates",
+    ["description"] = "Get the latest news about our products",
+    ["defaultSubscription"] = "opt_in",
+    ["visibility"] = "public",
+});`,
+		},
+		get: {
+			filename: "GetChannel.cs",
+			code: `using Reloop;
+using Reloop.Models;
+
+var reloop = new ReloopClient("rl_123456789");
+
+await reloop.Contacts.Channels.GetAsync("chn_123456789");`,
+		},
+		list: {
+			filename: "ListChannels.cs",
+			code: `using Reloop;
+using Reloop.Models;
+
+var reloop = new ReloopClient("rl_123456789");
+
+await reloop.Contacts.Channels.ListAsync(new Dictionary<string, object?> { ["page"] = 1, ["limit"] = 10 });`,
+		},
+		update: {
+			filename: "UpdateChannel.cs",
+			code: `using Reloop;
+using Reloop.Models;
+
+var reloop = new ReloopClient("rl_123456789");
+
+await reloop.Contacts.Channels.UpdateAsync("chn_123456789", new Dictionary<string, object?> { ["name"] = "Marketing News" });`,
+		},
+		delete: {
+			filename: "DeleteChannel.cs",
+			code: `using Reloop;
+using Reloop.Models;
+
+var reloop = new ReloopClient("rl_123456789");
+
+await reloop.Contacts.Channels.DeleteAsync("chn_123456789");`,
+		},
+	},
+	curl: {
+		add: {
+			filename: "create_channel.sh",
+			code: `curl -X POST https://reloop.sh/api/contacts/v1/channels/create \\\\
+  -H "x-api-key: rl_123456789" \\\\
+  -H "Content-Type: application/json" \\\\
+  -d '{"name": "Product Updates","description": "Get the latest news about our products","defaultSubscription": "opt_in","visibility": "public"}'`,
+		},
+		get: {
+			filename: "get_channel.sh",
+			code: `curl "https://reloop.sh/api/contacts/v1/channels/chn_123456789" \\\\
+  -H "x-api-key: rl_123456789"`,
+		},
+		list: {
+			filename: "list_channels.sh",
+			code: `curl "https://reloop.sh/api/contacts/v1/channels/list?page=1&limit=10" \\\\
+  -H "x-api-key: rl_123456789"`,
+		},
+		update: {
+			filename: "update_channel.sh",
+			code: `curl -X PATCH https://reloop.sh/api/contacts/v1/channels/chn_123456789 \\\\
+  -H "x-api-key: rl_123456789" \\\\
+  -H "Content-Type: application/json" \\\\
+  -d '{"name": "Marketing News"}'`,
+		},
+		delete: {
+			filename: "delete_channel.sh",
+			code: `curl -X DELETE https://reloop.sh/api/contacts/v1/channels/chn_123456789 \\\\
+  -H "x-api-key: rl_123456789"`,
+		},
 	},
 };

@@ -1,32 +1,27 @@
 import type * as Button from "@reloop/ui/button";
 import { ApiDetailsDrawer } from "./api-details-drawer";
-import { codeExamples } from "./channels-code-examples";
+import { codeExamples } from "./properties-code-examples";
 
 const operations = [
 	{
 		id: "add",
-		label: "Create Channel",
-		docSlug: "post-api-contacts-v1channels-create",
-	},
-	{
-		id: "get",
-		label: "Retrieve Channel",
-		docSlug: "get-api-contacts-v1channels-by-channel_id",
+		label: "Create Property",
+		docSlug: "post-api-contacts-v1properties-create",
 	},
 	{
 		id: "list",
-		label: "List Channels",
-		docSlug: "get-api-contacts-v1channels-list",
+		label: "List Properties",
+		docSlug: "get-api-contacts-v1properties-list",
 	},
 	{
 		id: "update",
-		label: "Update Channel",
-		docSlug: "patch-api-contacts-v1channels-by-channel_id",
+		label: "Update Property",
+		docSlug: "patch-api-contacts-v1properties-by-contact_property_id",
 	},
 	{
 		id: "delete",
-		label: "Delete Channel",
-		docSlug: "delete-api-contacts-v1channels-by-channel_id",
+		label: "Delete Property",
+		docSlug: "delete-api-contacts-v1properties-by-contact_property_id",
 	},
 ] as const;
 
@@ -44,14 +39,14 @@ const languages = [
 
 type ButtonProps = React.ComponentPropsWithoutRef<typeof Button.Root>;
 
-export const ChannelsApiDetails = (props: ButtonProps) => {
+export const PropertiesApiDetails = (props: ButtonProps) => {
 	return (
 		<ApiDetailsDrawer
-			title="Channels API"
+			title="Properties API"
 			languages={languages}
 			operations={operations}
 			codeExamples={codeExamples}
-			docSection="contacts/channels"
+			docSection="contacts/contact-properties"
 			buttonProps={props}
 			codeExtraPadding={true}
 		/>

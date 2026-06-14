@@ -1,5 +1,8 @@
 "use client";
+import { ChannelsApiDetails } from "@fe/dashboard/components/api-details/channels";
 import { ContactsApiDetails } from "@fe/dashboard/components/api-details/contacts";
+import { GroupsApiDetails } from "@fe/dashboard/components/api-details/groups";
+import { PropertiesApiDetails } from "@fe/dashboard/components/api-details/properties";
 import { DocsButton } from "@fe/dashboard/components/docs-button";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
@@ -140,7 +143,15 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 										</span>
 									)}
 								</Button.Root>
-								<ContactsApiDetails size="xsmall" mode="ghost" />
+								{isPropertiesPage ? (
+									<PropertiesApiDetails size="xsmall" mode="ghost" />
+								) : isChannelsPage ? (
+									<ChannelsApiDetails size="xsmall" mode="ghost" />
+								) : isGroupsPage ? (
+									<GroupsApiDetails size="xsmall" mode="ghost" />
+								) : (
+									<ContactsApiDetails size="xsmall" mode="ghost" />
+								)}
 							</div>
 						)}
 					</div>
