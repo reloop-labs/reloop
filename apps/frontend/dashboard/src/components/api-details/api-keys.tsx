@@ -52,6 +52,7 @@ export const ApiKeysApiDetails = (props: ButtonProps) => {
 			codeExamples={codeExamples}
 			docSection="api-keys"
 			buttonProps={props}
+			codeExtraPadding={true}
 		/>
 	);
 };

@@ -211,7 +211,6 @@ export default function Sandbox() {
 						<CopyCodeBlock
 							code={snippets[lang]}
 							lang={lang === "node" ? "javascript" : "python"}
-							windowTitle={lang === "node" ? "smtp.js" : "smtp.py"}
 							tabs={[...languageTabs]}
 							activeTab={lang}
 							onTabChange={(id) => setLang(id as Language)}

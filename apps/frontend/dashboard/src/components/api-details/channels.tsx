@@ -51,6 +51,7 @@ export const ChannelsApiDetails = (props: ButtonProps) => {
 			codeExamples={codeExamples}
 			docSection="channels"
 			buttonProps={props}
+			codeExtraPadding={true}
 		/>
 	);
 };

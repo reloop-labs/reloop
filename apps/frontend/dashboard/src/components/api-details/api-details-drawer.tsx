@@ -62,6 +62,7 @@ export interface ApiDetailsDrawerProps {
 	>;
 	docSection: string;
 	buttonProps?: React.ComponentPropsWithoutRef<typeof Button.Root>;
+	codeExtraPadding?: boolean;
 }
 
 export const ApiDetailsDrawer = ({
@@ -73,6 +74,7 @@ export const ApiDetailsDrawer = ({
 	codeExamples,
 	docSection,
 	buttonProps = {},
+	codeExtraPadding = false,
 }: ApiDetailsDrawerProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedLanguage, setSelectedLanguage] = useApiLanguage<string>(
@@ -376,6 +378,7 @@ export const ApiDetailsDrawer = ({
 									title={op.label}
 									titleHref={`${docBaseUrl}/docs/api/${docSection}/${docSlug}`}
 									noScroll={false}
+									codeExtraPadding
 								/>
 							</section>
 						);

@@ -51,6 +51,7 @@ export const DomainApiDetails = (props: ButtonProps) => {
 			codeExamples={codeExamples}
 			docSection="domain"
 			buttonProps={props}
+			codeExtraPadding={true}
 		/>
 	);
 };

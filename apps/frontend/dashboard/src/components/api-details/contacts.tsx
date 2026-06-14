@@ -67,6 +67,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 			codeExamples={codeExamples}
 			docSection="contacts"
 			buttonProps={props}
+			codeExtraPadding={true}
 		/>
 	);
 };

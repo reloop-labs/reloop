@@ -45,6 +45,7 @@ export const WebhooksApiDetails = (props: ButtonProps) => {
 			codeExamples={codeExamples}
 			docSection="webhooks"
 			buttonProps={props}
+			codeExtraPadding={true}
 		/>
 	);
 };

@@ -62,7 +62,9 @@ const DrawerContent = React.forwardRef<
 					)}
 					{...rest}
 				>
-					<div className="relative flex size-full flex-col">{children}</div>
+					<div className="relative flex min-h-full w-full flex-col">
+						{children}
+					</div>
 				</DialogPrimitive.Content>
 			</DrawerOverlay>
 		</DrawerPortal>

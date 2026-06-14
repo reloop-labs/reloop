@@ -477,7 +477,7 @@ function ParameterRow({
 			{/* Recursive sub-properties */}
 			{hasProperties && (
 				<div className="mt-3 mb-6 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white dark:border-stroke-soft-100/40 dark:bg-zinc-950">
-					<div className="select-none px-4 py-2.5 border-b border-stroke-soft-100/70 bg-[#fafafa] font-semibold text-[13px] text-text-sub-600 dark:border-stroke-soft-100/15 dark:bg-[#0c0c0e] dark:text-white/50">
+					<div className="select-none border-stroke-soft-100/70 border-b bg-[#fafafa] px-4 py-2.5 font-semibold text-[13px] text-text-sub-600 dark:border-stroke-soft-100/15 dark:bg-[#0c0c0e] dark:text-white/50">
 						{param.name === "properties"
 							? "Custom properties"
 							: `${param.name} properties`}
@@ -595,9 +595,9 @@ function ResponseCard({ responses }: { responses: Record<string, any> }) {
 			tabs={tabs}
 			activeTab={activeStatus}
 			onTabChange={setActiveStatus}
-			windowTitle="Response"
 			noScroll={false}
 			maxHeight="340px"
+			codeExtraPadding
 		/>
 	);
 }
@@ -728,33 +728,7 @@ print(response.json())`;
 			activeTab={resolvedActiveTab}
 			onTabChange={setActiveTab}
 			noScroll={false}
+			codeExtraPadding
 		/>
-	);
-}
-
-/* ─── Copy Button ───────────────────────────────────────── */
-
-function CopyButton({ content }: { content: string }) {
-	const [copied, setCopied] = useState(false);
-
-	const handleCopy = () => {
-		navigator.clipboard.writeText(content);
-		setCopied(true);
-		setTimeout(() => setCopied(false), 2000);
-	};
-
-	return (
-		<button
-			type="button"
-			onClick={handleCopy}
-			className="flex h-6 w-6 items-center justify-center rounded text-text-sub-600/50 transition hover:text-fd-foreground"
-			aria-label="Copy to clipboard"
-		>
-			{copied ? (
-				<Check className="h-3.5 w-3.5 text-green-500" />
-			) : (
-				<Copy className="h-3.5 w-3.5" />
-			)}
-		</button>
 	);
 }
