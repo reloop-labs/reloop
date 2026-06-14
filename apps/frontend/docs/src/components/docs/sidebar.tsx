@@ -244,7 +244,7 @@ export function Sidebar({
 		return () => cancelAnimationFrame(id);
 	}, [skipTransition]);
 
-	// Compute rect from hovered element, falling back to active element
+	// Compute rect and method color from hovered element, falling back to active element
 	useLayoutEffect(() => {
 		const target = hoveredEl || activeEl;
 		if (target && navRef.current) {
@@ -260,6 +260,10 @@ export function Sidebar({
 			setRect(null);
 		}
 	}, [hoveredEl, activeEl]);
+
+	// Read the HTTP method from the currently targeted element (set via data-method attribute)
+	const currentMethod =
+		(hoveredEl || activeEl)?.dataset?.method ?? null;
 
 	return (
 		<aside
@@ -304,7 +308,7 @@ export function Sidebar({
 						pathname,
 					}}
 				>
-					<AnimatedHoverBackground rect={rect} skipTransition={skipTransition} />
+					<AnimatedHoverBackground rect={rect} skipTransition={skipTransition} method={currentMethod} />
 
 					<div className="z-10 flex flex-col gap-px">
 						{filteredTree.map((node, index) => {
