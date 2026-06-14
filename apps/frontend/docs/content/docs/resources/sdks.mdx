@@ -1,8 +1,86 @@
 ---
 title: SDKs
-description: Official and community SDKs for Reloop.
+description: Official SDKs for integrating Reloop into your application.
 ---
 
 # SDKs
 
-Coming soon.
+Official Reloop SDKs are available for the most popular languages and frameworks. Each SDK wraps the Reloop REST API with idiomatic, type-safe interfaces so you can send emails, manage contacts, and trigger workflows without writing raw HTTP calls.
+
+## Official SDKs
+
+### Node.js / TypeScript
+
+The official JavaScript SDK works in Node.js, Bun, Deno, and edge runtimes.
+
+```bash
+npm install @reloop/node
+# or
+yarn add @reloop/node
+# or
+pnpm add @reloop/node
+```
+
+**GitHub:** [github.com/reloop-labs/reloop-node](https://github.com/reloop-labs/reloop-node)
+
+---
+
+### Python
+
+```bash
+pip install reloop
+```
+
+**GitHub:** [github.com/reloop-labs/reloop-python](https://github.com/reloop-labs/reloop-python)
+
+---
+
+### Go
+
+```bash
+go get github.com/reloop-labs/reloop-go
+```
+
+**GitHub:** [github.com/reloop-labs/reloop-go](https://github.com/reloop-labs/reloop-go)
+
+---
+
+### Java
+
+```xml
+<dependency>
+  <groupId>sh.reloop</groupId>
+  <artifactId>reloop-java</artifactId>
+  <version>LATEST</version>
+</dependency>
+```
+
+**GitHub:** [github.com/reloop-labs/reloop-java](https://github.com/reloop-labs/reloop-java)
+
+---
+
+### PHP
+
+```bash
+composer require reloop/reloop-php
+```
+
+**GitHub:** [github.com/reloop-labs/reloop-php](https://github.com/reloop-labs/reloop-php)
+
+---
+
+## Examples
+
+Looking for end-to-end usage examples across frameworks? Check out the examples repository:
+
+**GitHub:** [github.com/reloop-labs/reloop-examples](https://github.com/reloop-labs/reloop-examples)
+
+---
+
+## Missing your language?
+
+We're actively expanding our SDK coverage. If your language or framework isn't listed above, you can:
+
+- **Use the REST API directly** — see [API Reference](/api)
+- **Open a request** on [GitHub](https://github.com/reloop-labs/reloop/issues) to upvote or propose a new SDK
+- **Contribute** — all SDKs are open-source and PRs are welcome
