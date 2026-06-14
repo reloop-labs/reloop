@@ -13,7 +13,7 @@ const versions = await reloop.template.listVersions("tpl_123456789", { page: 1, 
 		id: "curl",
 		lang: "bash",
 		label: "cURL",
-		source: `curl "https://api.reloop.sh/template/v1/tpl_123456789/versions?page=1&limit=10" \\
+		source: `curl "https://reloop.sh/template/v1/tpl_123456789/versions?page=1&limit=10" \\
   -H "Authorization: Bearer rl_123456789"`,
 	},
 	{
@@ -23,7 +23,7 @@ const versions = await reloop.template.listVersions("tpl_123456789", { page: 1, 
 		source: `import requests
 
 response = requests.get(
-    "https://api.reloop.sh/template/v1/tpl_123456789/versions",
+    "https://reloop.sh/template/v1/tpl_123456789/versions",
     headers={
         "Authorization": "Bearer rl_123456789",
     },
@@ -42,7 +42,7 @@ versions = response.json()`,
 		source: `<?php
 $client = new \\GuzzleHttp\\Client();
 
-$response = $client->get('https://api.reloop.sh/template/v1/tpl_123456789/versions', [
+$response = $client->get('https://reloop.sh/template/v1/tpl_123456789/versions', [
     'headers' => [
         'Authorization' => 'Bearer rl_123456789',
     ],
@@ -64,7 +64,7 @@ import java.net.http.*;
 HttpClient client = HttpClient.newHttpClient();
 
 HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://api.reloop.sh/template/v1/tpl_123456789/versions?page=1&limit=10"))
+    .uri(URI.create("https://reloop.sh/template/v1/tpl_123456789/versions?page=1&limit=10"))
     .header("Authorization", "Bearer rl_123456789")
     .GET()
     .build();
@@ -81,7 +81,7 @@ var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Authorization", "Bearer rl_123456789");
 
 var response = await client.GetAsync(
-    "https://api.reloop.sh/template/v1/tpl_123456789/versions?page=1&limit=10"
+    "https://reloop.sh/template/v1/tpl_123456789/versions?page=1&limit=10"
 );`,
 	},
 ];

@@ -210,7 +210,7 @@ export function APIPage(props: APIPageProps) {
 	const [copiedEndpoint, setCopiedEndpoint] = useState(false);
 
 	const handleCopyEndpoint = async () => {
-		const fullUrl = `https://api.reloop.sh${path.replace(/\{([^}]+)\}/g, ":$1")}`;
+		const fullUrl = `https://reloop.sh${path.replace(/\{([^}]+)\}/g, ":$1")}`;
 		try {
 			await navigator.clipboard.writeText(fullUrl);
 			setCopiedEndpoint(true);
@@ -646,7 +646,7 @@ function CodeExamples({
 			: "";
 
 		const curl = `curl -X ${method} \\
-  https://api.reloop.sh${path}${qs} \\
+  https://reloop.sh${path}${qs} \\
   -H "Authorization: Bearer re_123456789"${
 		bodyJSON
 			? ` \\
@@ -655,7 +655,7 @@ function CodeExamples({
 			: ""
 	}`;
 
-		const nodejs = `const response = await fetch("https://api.reloop.sh${path}${qs}", {
+		const nodejs = `const response = await fetch("https://reloop.sh${path}${qs}", {
   method: "${method}",
   headers: {
     "Authorization": "Bearer re_123456789",${
@@ -677,7 +677,7 @@ const data = await response.json();`;
 		const python = `import requests
 
 response = requests.${method.toLowerCase()}(
-    "https://api.reloop.sh${path}${qs}",
+    "https://reloop.sh${path}${qs}",
     headers={"Authorization": "Bearer re_123456789"}${
 			bodyJSON
 				? `,

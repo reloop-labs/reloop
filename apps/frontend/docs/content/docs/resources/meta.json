@@ -1,0 +1,11 @@
+{
+	"title": "Resources",
+	"description": "Developer resources, examples, and integrations.",
+	"pages": [
+		"index",
+		"sdks",
+		"cli",
+		"security",
+		"integrations"
+	]
+}

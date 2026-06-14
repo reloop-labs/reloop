@@ -13,7 +13,7 @@ await reloop.template.delete("tpl_123456789");`,
 		id: "curl",
 		lang: "bash",
 		label: "cURL",
-		source: `curl -X DELETE https://api.reloop.sh/template/v1/tpl_123456789 \\
+		source: `curl -X DELETE https://reloop.sh/template/v1/tpl_123456789 \\
   -H "Authorization: Bearer rl_123456789"`,
 	},
 	{
@@ -23,7 +23,7 @@ await reloop.template.delete("tpl_123456789");`,
 		source: `import requests
 
 response = requests.delete(
-    "https://api.reloop.sh/template/v1/tpl_123456789",
+    "https://reloop.sh/template/v1/tpl_123456789",
     headers={
         "Authorization": "Bearer rl_123456789",
     },
@@ -36,7 +36,7 @@ response = requests.delete(
 		source: `<?php
 $client = new \\GuzzleHttp\\Client();
 
-$client->delete('https://api.reloop.sh/template/v1/tpl_123456789', [
+$client->delete('https://reloop.sh/template/v1/tpl_123456789', [
     'headers' => [
         'Authorization' => 'Bearer rl_123456789',
     ],
@@ -52,7 +52,7 @@ import java.net.http.*;
 HttpClient client = HttpClient.newHttpClient();
 
 HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://api.reloop.sh/template/v1/tpl_123456789"))
+    .uri(URI.create("https://reloop.sh/template/v1/tpl_123456789"))
     .header("Authorization", "Bearer rl_123456789")
     .DELETE()
     .build();
@@ -69,7 +69,7 @@ var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Authorization", "Bearer rl_123456789");
 
 var response = await client.DeleteAsync(
-    "https://api.reloop.sh/template/v1/tpl_123456789"
+    "https://reloop.sh/template/v1/tpl_123456789"
 );`,
 	},
 ];

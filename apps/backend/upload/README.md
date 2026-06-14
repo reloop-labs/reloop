@@ -5,7 +5,7 @@
 ## 🔗 Quick Links
 
 - 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/upload-service)
-- 🌐 **Production API**: [API Base](https://api.reloop.sh/api/upload)
+- 🌐 **Production API**: [API Base](https://reloop.sh/api/upload)
 - 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/upload/openapi)
 
 ## 🚀 Setup

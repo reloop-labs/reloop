@@ -1,6 +1,6 @@
 export const codeExamples = {
-	javascript: {
-		create: `const response = await fetch("https://api.reloop.sh/webhook/v1/", {
+  javascript: {
+    create: `const response = await fetch("https://reloop.sh/webhook/v1/", {
   method: "POST",
   credentials: "include",
   headers: {
@@ -14,8 +14,8 @@ export const codeExamples = {
 });
 
 const webhook = await response.json();`,
-		list: `const response = await fetch(
-  "https://api.reloop.sh/webhook/v1/?page=1&limit=10",
+    list: `const response = await fetch(
+  "https://reloop.sh/webhook/v1/?page=1&limit=10",
   {
     credentials: "include",
     headers: {
@@ -25,8 +25,8 @@ const webhook = await response.json();`,
 );
 
 const webhooks = await response.json();`,
-		delete: `const response = await fetch(
-  "https://api.reloop.sh/webhook/v1/webhook_id",
+    delete: `const response = await fetch(
+  "https://reloop.sh/webhook/v1/webhook_id",
   {
     method: "DELETE",
     credentials: "include",
@@ -37,12 +37,12 @@ const webhooks = await response.json();`,
 );
 
 const result = await response.json();`,
-	},
-	python: {
-		create: `import requests
+  },
+  python: {
+    create: `import requests
 
 response = requests.post(
-    "https://api.reloop.sh/webhook/v1/",
+    "https://reloop.sh/webhook/v1/",
     headers={
         "Content-Type": "application/json",
         "Authorization": "Bearer YOUR_API_KEY",
@@ -54,35 +54,35 @@ response = requests.post(
 )
 
 webhook = response.json()`,
-		list: `import requests
+    list: `import requests
 
 response = requests.get(
-    "https://api.reloop.sh/webhook/v1/?page=1&limit=10",
+    "https://reloop.sh/webhook/v1/?page=1&limit=10",
     headers={
         "Authorization": "Bearer YOUR_API_KEY",
     },
 )
 
 webhooks = response.json()`,
-		delete: `import requests
+    delete: `import requests
 
 response = requests.delete(
-    "https://api.reloop.sh/webhook/v1/webhook_id",
+    "https://reloop.sh/webhook/v1/webhook_id",
     headers={
         "Authorization": "Bearer YOUR_API_KEY",
     },
 )
 
 result = response.json()`,
-	},
-	php: {
-		create: `<?php
+  },
+  php: {
+    create: `<?php
 $payload = [
     "url" => "https://example.com/webhook",
     "events" => ["contact.created", "contact.updated"],
 ];
 
-$ch = curl_init("https://api.reloop.sh/webhook/v1/");
+$ch = curl_init("https://reloop.sh/webhook/v1/");
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -94,8 +94,8 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $webhook = curl_exec($ch);
 curl_close($ch);
 ?>`,
-		list: `<?php
-$ch = curl_init("https://api.reloop.sh/webhook/v1/?page=1&limit=10");
+    list: `<?php
+$ch = curl_init("https://reloop.sh/webhook/v1/?page=1&limit=10");
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     "Authorization: Bearer YOUR_API_KEY",
 ]);
@@ -104,8 +104,8 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $webhooks = curl_exec($ch);
 curl_close($ch);
 ?>`,
-		delete: `<?php
-$ch = curl_init("https://api.reloop.sh/webhook/v1/webhook_id");
+    delete: `<?php
+$ch = curl_init("https://reloop.sh/webhook/v1/webhook_id");
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     "Authorization: Bearer YOUR_API_KEY",
@@ -115,5 +115,5 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $result = curl_exec($ch);
 curl_close($ch);
 ?>`,
-	},
+  },
 };

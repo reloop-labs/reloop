@@ -13,7 +13,7 @@ const newTemplate = await reloop.template.duplicate("tpl_123456789");`,
 		id: "curl",
 		lang: "bash",
 		label: "cURL",
-		source: `curl -X POST https://api.reloop.sh/template/v1/tpl_123456789/duplicate \\
+		source: `curl -X POST https://reloop.sh/template/v1/tpl_123456789/duplicate \\
   -H "Authorization: Bearer rl_123456789"`,
 	},
 	{
@@ -23,7 +23,7 @@ const newTemplate = await reloop.template.duplicate("tpl_123456789");`,
 		source: `import requests
 
 response = requests.post(
-    "https://api.reloop.sh/template/v1/tpl_123456789/duplicate",
+    "https://reloop.sh/template/v1/tpl_123456789/duplicate",
     headers={
         "Authorization": "Bearer rl_123456789",
     },
@@ -38,7 +38,7 @@ new_template = response.json()`,
 		source: `<?php
 $client = new \\GuzzleHttp\\Client();
 
-$response = $client->post('https://api.reloop.sh/template/v1/tpl_123456789/duplicate', [
+$response = $client->post('https://reloop.sh/template/v1/tpl_123456789/duplicate', [
     'headers' => [
         'Authorization' => 'Bearer rl_123456789',
     ],
@@ -56,7 +56,7 @@ import java.net.http.*;
 HttpClient client = HttpClient.newHttpClient();
 
 HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://api.reloop.sh/template/v1/tpl_123456789/duplicate"))
+    .uri(URI.create("https://reloop.sh/template/v1/tpl_123456789/duplicate"))
     .header("Authorization", "Bearer rl_123456789")
     .POST(HttpRequest.BodyPublishers.noBody())
     .build();
@@ -73,7 +73,7 @@ var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Authorization", "Bearer rl_123456789");
 
 var response = await client.PostAsync(
-    "https://api.reloop.sh/template/v1/tpl_123456789/duplicate",
+    "https://reloop.sh/template/v1/tpl_123456789/duplicate",
     null
 );`,
 	},

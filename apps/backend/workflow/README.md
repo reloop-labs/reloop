@@ -5,7 +5,7 @@
 ## 🔗 Quick Links
 
 - 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/workflow-service)
-- 🌐 **Production API**: [API Base](https://api.reloop.sh/api/workflow)
+- 🌐 **Production API**: [API Base](https://reloop.sh/api/workflow)
 - 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/workflow/openapi)
 
 ## 🚀 Setup

@@ -5,7 +5,7 @@
 ## 🔗 Quick Links
 
 - 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/auth-service)
-- 🌐 **Production API**: [API Base](https://api.reloop.sh/api/auth)
+- 🌐 **Production API**: [API Base](https://reloop.sh/api/auth)
 - 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/auth/openapi)
 
 ## 🚀 Setup

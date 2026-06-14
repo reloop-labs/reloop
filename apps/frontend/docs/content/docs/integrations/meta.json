@@ -6,26 +6,9 @@
 	"pages": [
 		"---Getting Started---",
 		"index",
-		"---AI Tools---",
-		"mcp-server",
-		"cli-agents",
-		"openclaw-guide",
-		"---Agent Skills---",
-		"react-email-skill",
-		"reloop-skill",
-		"agent-email-inbox",
-		"email-best-practices",
-		"---Chat SDK---",
+		"ai-tools",
+		"agent-skills",
 		"chat-sdk",
-		"chat-sdk-card-emails",
-		"chat-sdk-attachments",
-		"chat-sdk-proactive-outreach",
-		"---AI Integrations---",
-		"lovable-integration",
-		"v0-integration",
-		"bolt-new-integration",
-		"replit-integration",
-		"base44-integration",
-		"leap-integration"
+		"ai-builder-guides"
 	]
 }

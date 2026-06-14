@@ -5,7 +5,7 @@ The **Domain Service** is a core backend component of the Reloop ecosystem respo
 ## 🔗 Quick Links
 
 - 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/domain-service)
-- 🌐 **Production API**: [API Base](https://api.reloop.sh/api/domain)
+- 🌐 **Production API**: [API Base](https://reloop.sh/api/domain)
 - 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/domain/openapi)
 
 ## 🚀 Setup

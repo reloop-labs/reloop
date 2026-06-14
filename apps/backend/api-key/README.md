@@ -5,7 +5,7 @@
 ## 🔗 Quick Links
 
 - 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/api-key-service)
-- 🌐 **Production API**: [API Base](https://api.reloop.sh/api/api-key)
+- 🌐 **Production API**: [API Base](https://reloop.sh/api/api-key)
 - 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/api-key/openapi)
 
 ## 🚀 Setup

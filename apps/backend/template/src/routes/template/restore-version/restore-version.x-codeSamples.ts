@@ -13,7 +13,7 @@ const template = await reloop.template.restoreVersion("tpl_123456789", "ver_1234
 		id: "curl",
 		lang: "bash",
 		label: "cURL",
-		source: `curl -X POST https://api.reloop.sh/template/v1/tpl_123456789/versions/ver_123456789/restore \\
+		source: `curl -X POST https://reloop.sh/template/v1/tpl_123456789/versions/ver_123456789/restore \\
   -H "Authorization: Bearer rl_123456789"`,
 	},
 	{
@@ -23,7 +23,7 @@ const template = await reloop.template.restoreVersion("tpl_123456789", "ver_1234
 		source: `import requests
 
 response = requests.post(
-    "https://api.reloop.sh/template/v1/tpl_123456789/versions/ver_123456789/restore",
+    "https://reloop.sh/template/v1/tpl_123456789/versions/ver_123456789/restore",
     headers={
         "Authorization": "Bearer rl_123456789",
     },
@@ -38,7 +38,7 @@ template = response.json()`,
 		source: `<?php
 $client = new \\GuzzleHttp\\Client();
 
-$response = $client->post('https://api.reloop.sh/template/v1/tpl_123456789/versions/ver_123456789/restore', [
+$response = $client->post('https://reloop.sh/template/v1/tpl_123456789/versions/ver_123456789/restore', [
     'headers' => [
         'Authorization' => 'Bearer rl_123456789',
     ],
@@ -56,7 +56,7 @@ import java.net.http.*;
 HttpClient client = HttpClient.newHttpClient();
 
 HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://api.reloop.sh/template/v1/tpl_123456789/versions/ver_123456789/restore"))
+    .uri(URI.create("https://reloop.sh/template/v1/tpl_123456789/versions/ver_123456789/restore"))
     .header("Authorization", "Bearer rl_123456789")
     .POST(HttpRequest.BodyPublishers.noBody())
     .build();
@@ -73,7 +73,7 @@ var client = new HttpClient();
 client.DefaultRequestHeaders.Add("Authorization", "Bearer rl_123456789");
 
 var response = await client.PostAsync(
-    "https://api.reloop.sh/template/v1/tpl_123456789/versions/ver_123456789/restore",
+    "https://reloop.sh/template/v1/tpl_123456789/versions/ver_123456789/restore",
     null
 );`,
 	},

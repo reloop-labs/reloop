@@ -162,7 +162,7 @@ export function Sidebar({
 	// Restore persisted open-folder state from sessionStorage after mount (client-only)
 	useEffect(() => {
 		try {
-			const saved = sessionStorage.getItem("reloop-sidebar-open");
+			const saved = sessionStorage.getItem("reloop-sidebar-open-v2");
 			if (saved) {
 				const parsed: string[] = JSON.parse(saved);
 				setOpenFolders((prev) => new Set([...prev, ...parsed]));
@@ -175,7 +175,7 @@ export function Sidebar({
 	// Persist to sessionStorage
 	useEffect(() => {
 		sessionStorage.setItem(
-			"reloop-sidebar-open",
+			"reloop-sidebar-open-v2",
 			JSON.stringify(Array.from(openFolders)),
 		);
 	}, [openFolders]);

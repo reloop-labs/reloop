@@ -5,7 +5,7 @@
 ## 🔗 Quick Links
 
 - 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/mailing-service)
-- 🌐 **Production API**: [API Base](https://api.reloop.sh/api/mail)
+- 🌐 **Production API**: [API Base](https://reloop.sh/api/mail)
 - 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/mail/openapi)
 
 ## 🚀 Setup

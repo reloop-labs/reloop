@@ -1,0 +1,9 @@
+{
+	"title": "Agent Skills",
+	"pages": [
+		"react-email-skill",
+		"reloop-skill",
+		"agent-email-inbox",
+		"email-best-practices"
+	]
+}

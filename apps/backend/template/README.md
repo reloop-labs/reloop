@@ -5,7 +5,7 @@ Backend service for managing email templates with drag-and-drop builder support.
 ## 🔗 Quick Links
 
 - 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/template-service)
-- 🌐 **Production API**: [API Base](https://api.reloop.sh/api/template)
+- 🌐 **Production API**: [API Base](https://reloop.sh/api/template)
 - 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/template/openapi)
 
 ## API Endpoints

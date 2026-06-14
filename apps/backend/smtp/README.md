@@ -5,7 +5,7 @@
 ## 🔗 Quick Links
 
 - 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/kumomta-smtp-service)
-- 🌐 **Production API**: [API Base](https://api.reloop.sh/api/kumomta-smtp)
+- 🌐 **Production API**: [API Base](https://reloop.sh/api/kumomta-smtp)
 - 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/kumomta-smtp/openapi)
 
 ## 🚀 Setup

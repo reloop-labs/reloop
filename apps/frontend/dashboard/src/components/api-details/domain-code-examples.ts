@@ -1,7 +1,7 @@
 export const codeExamples = {
-	javascript: {
-		add: `// Add a new domain
-const response = await fetch('https://api.reloop.sh/api/v1/add', {
+  javascript: {
+    add: `// Add a new domain
+const response = await fetch('https://reloop.sh/api/v1/add', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -21,16 +21,16 @@ const response = await fetch('https://api.reloop.sh/api/v1/add', {
 });
 
 const result = await response.json();`,
-		list: `// List all domains
-const response = await fetch('https://api.reloop.sh/api/v1/list?page=1&limit=10', {
+    list: `// List all domains
+const response = await fetch('https://reloop.sh/api/v1/list?page=1&limit=10', {
   headers: {
     'Authorization': 'Bearer YOUR_API_KEY'
   }
 });
 
 const domains = await response.json();`,
-		delete: `// Delete a domain
-const response = await fetch('https://api.reloop.sh/api/v1/delete', {
+    delete: `// Delete a domain
+const response = await fetch('https://reloop.sh/api/v1/delete', {
   method: 'DELETE',
   headers: {
     'Content-Type': 'application/json',
@@ -42,20 +42,20 @@ const response = await fetch('https://api.reloop.sh/api/v1/delete', {
 });
 
 const result = await response.json();`,
-		details: `// Get domain details
-const response = await fetch('https://api.reloop.sh/api/v1/details?domain=example.com', {
+    details: `// Get domain details
+const response = await fetch('https://reloop.sh/api/v1/details?domain=example.com', {
   headers: {
     'Authorization': 'Bearer YOUR_API_KEY'
   }
 });
 
 const domainDetails = await response.json();`,
-	},
-	python: {
-		add: `# Add a new domain
+  },
+  python: {
+    add: `# Add a new domain
 import requests
 
-response = requests.post('https://api.reloop.sh/api/v1/add',
+response = requests.post('https://reloop.sh/api/v1/add',
   headers={
     'Content-Type': 'application/json',
     'Authorization': 'Bearer YOUR_API_KEY'
@@ -74,18 +74,18 @@ response = requests.post('https://api.reloop.sh/api/v1/add',
 )
 
 result = response.json()`,
-		list: `# List all domains
+    list: `# List all domains
 import requests
 
-response = requests.get('https://api.reloop.sh/api/v1/list?page=1&limit=10',
+response = requests.get('https://reloop.sh/api/v1/list?page=1&limit=10',
   headers={'Authorization': 'Bearer YOUR_API_KEY'}
 )
 
 domains = response.json()`,
-		delete: `# Delete a domain
+    delete: `# Delete a domain
 import requests
 
-response = requests.delete('https://api.reloop.sh/api/v1/delete',
+response = requests.delete('https://reloop.sh/api/v1/delete',
   headers={
     'Content-Type': 'application/json',
     'Authorization': 'Bearer YOUR_API_KEY'
@@ -94,17 +94,17 @@ response = requests.delete('https://api.reloop.sh/api/v1/delete',
 )
 
 result = response.json()`,
-		details: `# Get domain details
+    details: `# Get domain details
 import requests
 
-response = requests.get('https://api.reloop.sh/api/v1/details?domain=example.com',
+response = requests.get('https://reloop.sh/api/v1/details?domain=example.com',
   headers={'Authorization': 'Bearer YOUR_API_KEY'}
 )
 
 domain_details = response.json()`,
-	},
-	php: {
-		add: `<?php
+  },
+  php: {
+    add: `<?php
 // Add a new domain
 $data = [
     'domain' => 'example.com',
@@ -119,7 +119,7 @@ $data = [
 ];
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://api.reloop.sh/api/v1/add');
+curl_setopt($ch, CURLOPT_URL, 'https://reloop.sh/api/v1/add');
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -131,10 +131,10 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $result = curl_exec($ch);
 curl_close($ch);
 ?>`,
-		list: `<?php
+    list: `<?php
 // List all domains
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://api.reloop.sh/api/v1/list?page=1&limit=10');
+curl_setopt($ch, CURLOPT_URL, 'https://reloop.sh/api/v1/list?page=1&limit=10');
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Authorization: Bearer YOUR_API_KEY'
 ]);
@@ -143,12 +143,12 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $domains = curl_exec($ch);
 curl_close($ch);
 ?>`,
-		delete: `<?php
+    delete: `<?php
 // Delete a domain
 $data = ['domain' => 'example.com'];
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://api.reloop.sh/api/v1/delete');
+curl_setopt($ch, CURLOPT_URL, 'https://reloop.sh/api/v1/delete');
 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -160,10 +160,10 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $result = curl_exec($ch);
 curl_close($ch);
 ?>`,
-		details: `<?php
+    details: `<?php
 // Get domain details
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://api.reloop.sh/api/v1/details?domain=example.com');
+curl_setopt($ch, CURLOPT_URL, 'https://reloop.sh/api/v1/details?domain=example.com');
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Authorization: Bearer YOUR_API_KEY'
 ]);
@@ -172,5 +172,5 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $domainDetails = curl_exec($ch);
 curl_close($ch);
 ?>`,
-	},
+  },
 };

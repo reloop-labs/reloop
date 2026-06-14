@@ -5,7 +5,7 @@
 ## 🔗 Quick Links
 
 - 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/billing-service)
-- 🌐 **Production API**: [API Base](https://api.reloop.sh/api/billing)
+- 🌐 **Production API**: [API Base](https://reloop.sh/api/billing)
 - 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/billing/openapi)
 
 ## 🚀 Setup

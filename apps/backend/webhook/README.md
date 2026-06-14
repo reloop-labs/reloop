@@ -5,7 +5,7 @@
 ## 🔗 Quick Links
 
 - 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/webhook-service)
-- 🌐 **Production API**: [API Base](https://api.reloop.sh/api/webhook)
+- 🌐 **Production API**: [API Base](https://reloop.sh/api/webhook)
 - 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/webhook/openapi)
 
 ## 🚀 Setup
