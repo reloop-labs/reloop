@@ -24,7 +24,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 				{/* Desktop Logo Area - Only visible on LG+ */}
 				<div className="hidden shrink-0 items-center px-4 pt-1 lg:flex lg:w-74">
 					<a href="/" className="flex items-center">
-						<Logo theme="light" className="w-12" />
+						<Logo className="w-12" />
 					</a>
 				</div>
 				{/* Navigation Row - Fluid on all screens */}
