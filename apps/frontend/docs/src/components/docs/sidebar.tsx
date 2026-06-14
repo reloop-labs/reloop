@@ -153,10 +153,10 @@ export function Sidebar({
 	}, []);
 
 	// Folder open state lives here — only ever grows, never shrinks automatically
-	// Initialize with all folders open — must match on server and client to avoid hydration mismatch.
+	// Initialize with only active folders open — must match on server and client to avoid hydration mismatch.
 	// sessionStorage restoration happens in the useEffect below, after hydration.
 	const [openFolders, setOpenFolders] = useState<Set<string>>(
-		() => new Set(getAllFolderUrls(filteredTree)),
+		() => new Set(getActiveFolderUrls(filteredTree)),
 	);
 
 	// Restore persisted open-folder state from sessionStorage after mount (client-only)
@@ -191,16 +191,16 @@ export function Sidebar({
 
 	const prevTabUrl = useRef(activeTab?.url);
 
-	// On tab/section change: make sure all folders in the new section are open by default
+	// On tab/section change: make sure active folders in the new section are open by default
 	useEffect(() => {
 		if (prevTabUrl.current !== activeTab?.url) {
 			prevTabUrl.current = activeTab?.url;
-			const allUrls = getAllFolderUrls(filteredTree);
+			const urls = getActiveFolderUrls(filteredTree);
 			setOpenFolders((prev) => {
-				return new Set([...prev, ...allUrls]);
+				return new Set([...prev, ...urls]);
 			});
 		}
-	}, [activeTab?.url, filteredTree, getAllFolderUrls]);
+	}, [activeTab?.url, filteredTree, getActiveFolderUrls]);
 
 	// On navigation: add newly-active folders but never remove any
 	useEffect(() => {
