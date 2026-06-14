@@ -1,10 +1,6 @@
 "use client";
 
-export const Logo = ({
-	className,
-}: {
-	className?: string;
-}) => {
+export const Logo = ({ className }: { className?: string }) => {
 	const fillClassName = "fill-[#2C2C2C] dark:fill-[#D2D2D2]";
 	const strokeClassName = "fill-[#4D4D4D] dark:fill-[#878787]";
 

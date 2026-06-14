@@ -14,7 +14,7 @@ export const AnimatedHoverBackground: React.FC<
 	return (
 		<div
 			className={cn(
-				"pointer-events-none absolute left-0 top-0 z-0 rounded-lg bg-neutral-alpha-10 transition-all duration-200 ease-out",
+				"pointer-events-none absolute top-0 left-0 z-0 rounded-lg bg-neutral-alpha-10 transition-all duration-200 ease-out",
 				className,
 			)}
 			style={{
@@ -29,4 +29,3 @@ export const AnimatedHoverBackground: React.FC<
 		/>
 	);
 };
-

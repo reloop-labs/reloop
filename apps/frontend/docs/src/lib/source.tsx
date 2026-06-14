@@ -9,6 +9,7 @@ import {
 	Key,
 	Layout,
 	List,
+	type LucideIcon,
 	Radio,
 	Send,
 	Server,
@@ -16,7 +17,6 @@ import {
 	Users,
 	Webhook,
 	Zap,
-	type LucideIcon,
 } from "lucide-react";
 import type { MDXComponents } from "mdx/types";
 import { MDXRemote } from "next-mdx-remote/rsc";

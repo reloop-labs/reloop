@@ -3,18 +3,22 @@
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import type { ReactNode } from "react";
 
-/**
- * Client-only wrapper around next-themes ThemeProvider.
- *
- * next-themes@0.4.x injects a raw <script> tag into the React tree
- * to prevent theme flash. React 19 (Next.js 16+) rejects <script>
- * inside components, producing a console error.
- *
- * By isolating ThemeProvider in a "use client" component, the script
- * tag is only rendered during SSR (where it works fine) and the
- * console error is suppressed because suppressHydrationWarning
- * propagates from the parent <html> element.
- */
+// React 19 introduced stricter warnings for rendering inline script tags.
+// next-themes uses a script tag to prevent FOUC, which triggers this warning during development.
+// This intercepts and suppresses that specific development warning so the Next.js overlay doesn't block the screen.
+if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
+	const origError = console.error;
+	console.error = (...args: unknown[]) => {
+		if (
+			typeof args[0] === "string" &&
+			args[0].includes("Encountered a script tag")
+		) {
+			return;
+		}
+		origError.apply(console, args);
+	};
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
 	return (
 		<NextThemesProvider
