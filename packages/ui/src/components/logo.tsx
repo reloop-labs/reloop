@@ -2,22 +2,11 @@
 
 export const Logo = ({
 	className,
-	theme: forcedTheme,
 }: {
 	className?: string;
-	theme?: "light" | "dark";
 }) => {
-	const fillClassName = forcedTheme
-		? forcedTheme === "dark"
-			? "fill-[#D2D2D2]"
-			: "fill-[#2C2C2C]"
-		: "fill-[#2C2C2C] dark:fill-[#D2D2D2]";
-
-	const strokeClassName = forcedTheme
-		? forcedTheme === "dark"
-			? "fill-[#878787]"
-			: "fill-[#4D4D4D]"
-		: "fill-[#4D4D4D] dark:fill-[#878787]";
+	const fillClassName = "fill-[#2C2C2C] dark:fill-[#D2D2D2]";
+	const strokeClassName = "fill-[#4D4D4D] dark:fill-[#878787]";
 
 	return (
 		<svg

@@ -181,7 +181,7 @@ export function PreferencesContent({
 				<div className="relative overflow-hidden">
 					{/* Logo Section */}
 					<div className="mb-8 flex justify-center">
-						<Logo theme="dark" className="h-20" />
+						<Logo className="h-20" />
 					</div>
 					{/* Heading */}
 					<div className="mb-8 text-center">
@@ -296,7 +296,7 @@ export function PreferencesContent({
 						<div className="flex items-center justify-center gap-2">
 							<span className="text-[11px] text-white/25">Powered by</span>
 							<div className="flex h-5 w-5 items-center justify-center rounded-lg bg-white/5 shadow-inner">
-								<Logo theme="dark" className="h-3 w-3" />
+								<Logo className="h-3 w-3" />
 							</div>
 							<span className="font-semibold text-[11px] text-white/40 tracking-tight">
 								Reloop

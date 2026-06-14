@@ -144,7 +144,7 @@ export function CreateChannelPreview({
 							"border-black/10 dark:border-white/15",
 						)}
 					>
-						<Logo theme={isDarkMode ? "dark" : "light"} />
+						<Logo />
 					</div>
 				</div>
 
@@ -331,7 +331,7 @@ export function CreateChannelPreview({
 							"bg-black/5 dark:bg-white/10",
 						)}
 					>
-						<Logo theme={isDarkMode ? "dark" : "light"} />
+						<Logo />
 					</div>
 					<span
 						className={cn(

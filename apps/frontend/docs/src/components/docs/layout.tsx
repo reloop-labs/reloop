@@ -47,11 +47,11 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 	return (
 		<div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
 			{/* Unified Header - Borderless */}
-			<header className="z-50 flex h-12 w-full shrink-0 bg-bg-weak-50/80 backdrop-blur-md dark:bg-black/80">
+			<header className="z-50 flex h-12 w-full shrink-0 bg-bg-weak-50/80 dark:bg-black/80">
 				{/* Desktop Logo Area - Only visible on LG+ */}
-				<div className="hidden shrink-0 items-center px-4 pt-1 lg:flex lg:w-74">
+				<div className="hidden shrink-0 items-center px-4 pt-1 lg:flex lg:w-72">
 					<a href="/" className="flex items-center">
-						<Logo className="w-12" />
+						<Logo className="h-12 w-12" />
 					</a>
 				</div>
 				{/* Navigation Row - Fluid on all screens */}
@@ -90,7 +90,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 							className="flex items-center"
 							onClick={() => setOpen(false)}
 						>
-							<Logo className="w-10" />
+							<Logo className="h-10 w-10" />
 						</a>
 					</div>
 					<div className="h-[calc(100vh-3rem)] overflow-y-auto">
@@ -133,4 +133,3 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 		</div>
 	);
 }
-
