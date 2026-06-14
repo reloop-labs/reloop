@@ -100,13 +100,14 @@ export function Sidebar({
 			.filter((tab) => tab.url !== "/")
 			.map((tab) => tab.url.toLowerCase());
 
-		return tree.filter((node) => {
+		const result = tree.filter((node) => {
 			if (node.type !== "folder") return true;
 			const nodeUrl = (node.url || "").toLowerCase();
 			return !allSectionUrls.some(
 				(url) => nodeUrl === url || nodeUrl.startsWith(`${url}/`),
 			);
 		});
+		return result;
 	}, [tree, activeTab]);
 
 	const [hoveredEl, setHoveredEl] = useState<HTMLElement | null>(null);

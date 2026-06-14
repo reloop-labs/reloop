@@ -1,0 +1,8 @@
+{
+	"title": "Contacts",
+	"icon": "Users",
+	"pages": [
+		"index",
+		"details"
+	]
+}

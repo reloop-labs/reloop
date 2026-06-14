@@ -1,0 +1,19 @@
+{
+	"title": "Features",
+	"description": "Explore the powerful features of Reloop.",
+	"root": true,
+	"pages": [
+		"index",
+		"agent-inbox",
+		"emails",
+		"metrics",
+		"contacts",
+		"templates",
+		"api-keys",
+		"logs",
+		"domain",
+		"webhooks",
+		"workflows",
+		"settings"
+	]
+}

@@ -1,0 +1,8 @@
+{
+	"title": "Metrics",
+	"icon": "Activity",
+	"pages": [
+		"index",
+		"details"
+	]
+}

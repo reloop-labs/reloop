@@ -1,0 +1,8 @@
+{
+	"title": "Settings",
+	"icon": "Settings",
+	"pages": [
+		"index",
+		"details"
+	]
+}

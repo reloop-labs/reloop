@@ -1,0 +1,8 @@
+{
+	"title": "Logs",
+	"icon": "FileText",
+	"pages": [
+		"index",
+		"details"
+	]
+}

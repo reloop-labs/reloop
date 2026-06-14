@@ -1,0 +1,8 @@
+{
+	"title": "Workflows",
+	"icon": "Zap",
+	"pages": [
+		"index",
+		"details"
+	]
+}

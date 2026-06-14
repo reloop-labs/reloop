@@ -103,7 +103,7 @@ export function Navbar({
 										<DynamicActivePill color={color} active={active} />
 									) : (
 										<div
-											className="-z-10 absolute inset-x-1 inset-y-2 rounded-lg"
+											className="-z-10 absolute inset-x-1 inset-y-2 rounded-lg transition-all duration-200"
 											style={{
 												backgroundColor: active
 													? `color-mix(in srgb, ${color} 12%, transparent)`

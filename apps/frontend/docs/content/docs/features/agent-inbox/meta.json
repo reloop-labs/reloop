@@ -1,0 +1,8 @@
+{
+	"title": "Agent Inbox",
+	"icon": "Inbox",
+	"pages": [
+		"index",
+		"details"
+	]
+}

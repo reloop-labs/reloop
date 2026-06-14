@@ -3,13 +3,17 @@ import path from "node:path";
 import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import matter from "gray-matter";
 import {
+	Activity,
 	Cloud,
+	Database,
+	FileText,
 	Globe,
 	Inbox,
 	Key,
 	Layout,
 	List,
 	type LucideIcon,
+	Mail,
 	Radio,
 	Send,
 	Server,
@@ -28,12 +32,16 @@ import { timestamp } from "./watcher-trigger";
 // Whitelist of Lucide icons used in docs meta.json / MDX frontmatter.
 // Add new entries here when adding icons to content.
 const LUCIDE_ICON_MAP: Record<string, LucideIcon> = {
+	Activity,
 	Cloud,
+	Database,
+	FileText,
 	Globe,
 	Inbox,
 	Key,
 	Layout,
 	List,
+	Mail,
 	Radio,
 	Send,
 	Server,

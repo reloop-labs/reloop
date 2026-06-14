@@ -1,0 +1,8 @@
+{
+	"title": "API Keys",
+	"icon": "Key",
+	"pages": [
+		"index",
+		"details"
+	]
+}

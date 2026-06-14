@@ -199,6 +199,28 @@ export function DefaultSidebarSection({
 	}
 
 	if (node.type === "folder") {
+		if (depth === 0) {
+			return (
+				<div className="space-y-px">
+					<div className="mt-4 mb-1.5 px-2">
+						<h4 className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-[0.05em] opacity-60">
+							{node.name as string}
+						</h4>
+					</div>
+					<div className="mt-px flex flex-col space-y-px border-stroke-soft-100/30 pb-0.5">
+						{node.children.map((child: PageTreeItem, index: number) => (
+							<DefaultSidebarSection
+								key={index}
+								node={child}
+								onLinkClick={onLinkClick}
+								depth={depth + 1}
+							/>
+						))}
+					</div>
+				</div>
+			);
+		}
+
 		return (
 			<DefaultSidebarFolder
 				node={node}

@@ -2,5 +2,5 @@
 	"title": "Introduction",
 	"description": "Introduction to Reloop",
 	"root": true,
-	"pages": ["---Documentation---", "index", "api", "webhooks", "self-host"]
+	"pages": ["---Documentation---", "index", "features", "api", "webhooks", "self-host"]
 }

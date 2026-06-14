@@ -1,0 +1,8 @@
+{
+	"title": "Emails",
+	"icon": "Mail",
+	"pages": [
+		"index",
+		"details"
+	]
+}
