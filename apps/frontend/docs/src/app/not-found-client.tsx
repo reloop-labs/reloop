@@ -65,11 +65,11 @@ export function NotFoundClient({ tree }: NotFoundClientProps) {
 			description:
 				"Manage your API keys, email templates, and view system logs.",
 			icon: ExternalLink,
-			url: "https://dashboard.reloop.sh",
+			url: "/dashboard",
 			color: "text-violet-500",
 			hoverBorder: "hover:border-violet-500/30 dark:hover:border-violet-500/20",
 			hoverBg: "hover:bg-violet-500/[0.01]",
-			external: true,
+			external: false,
 		},
 	];
 

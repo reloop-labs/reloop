@@ -151,12 +151,12 @@ export function Navbar({
 						<Icon name="social-github" className="h-4 w-4 shrink-0" />
 						{stars}
 					</Link>
-					<Link
-						href="https://dashboard.reloop.sh/signup"
+					<a
+						href="/dashboard"
 						className="inline-flex h-9 items-center justify-center rounded-full bg-[#171717] px-5 font-semibold text-sm text-white transition-all hover:opacity-90 active:scale-[0.98] dark:bg-white dark:text-black"
 					>
 						Get Started
-					</Link>
+					</a>
 				</div>
 			</div>
 		</div>
