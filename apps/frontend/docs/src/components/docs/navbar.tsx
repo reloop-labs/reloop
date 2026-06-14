@@ -4,10 +4,21 @@ import { navigationTabs } from "@reloop/fe-docs/lib/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+
+const DynamicActivePill = dynamic(
+	() => import("./navbar-animations").then((mod) => mod.ActivePill),
+	{ ssr: false },
+);
+
+const DynamicActiveUnderline = dynamic(
+	() => import("./navbar-animations").then((mod) => mod.ActiveUnderline),
+	{ ssr: false },
+);
 
 const tabColors: Record<string, string> = {
 	Documentation: "#3b82f6",
@@ -26,6 +37,11 @@ export function Navbar({
 	const pathname = usePathname();
 	const tabs = navigationTabs;
 	const [hoveredTab, setHoveredTab] = useState<string | null>(null);
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
 
 	const activeTab =
 		tabs.find((tab) => {
@@ -81,25 +97,31 @@ export function Navbar({
 								}}
 								onPointerEnter={() => setHoveredTab(tab.title)}
 							>
-								{/* Pill background — CSS only */}
-								{currentHighlighted === tab.title && (
-									<div
-										className="-z-10 absolute inset-x-1 inset-y-2 rounded-lg transition-all duration-200"
-										style={{
-											backgroundColor: active
-												? `color-mix(in srgb, ${color} 12%, transparent)`
-												: `color-mix(in srgb, ${color} 8%, transparent)`,
-										}}
-									/>
-								)}
+								{/* Pill background */}
+								{currentHighlighted === tab.title &&
+									(mounted ? (
+										<DynamicActivePill color={color} active={active} />
+									) : (
+										<div
+											className="-z-10 absolute inset-x-1 inset-y-2 rounded-lg"
+											style={{
+												backgroundColor: active
+													? `color-mix(in srgb, ${color} 12%, transparent)`
+													: `color-mix(in srgb, ${color} 8%, transparent)`,
+											}}
+										/>
+									))}
 
 								{/* Active bottom underline */}
-								{active && (
-									<div
-										className="absolute right-1 bottom-0 left-1 h-[2px] rounded-full"
-										style={{ backgroundColor: color }}
-									/>
-								)}
+								{active &&
+									(mounted ? (
+										<DynamicActiveUnderline color={color} />
+									) : (
+										<div
+											className="absolute right-1 bottom-0 left-1 h-[2px] rounded-full"
+											style={{ backgroundColor: color }}
+										/>
+									))}
 
 								<Icon
 									name={tab.iconName}
