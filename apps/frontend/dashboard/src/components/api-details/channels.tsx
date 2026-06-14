@@ -45,7 +45,6 @@ export const ChannelsApiDetails = (props: ButtonProps) => {
 	return (
 		<ApiDetailsDrawer
 			title="Channels API"
-			description="Manage channels programmatically with our REST API"
 			languages={languages}
 			operations={operations}
 			codeExamples={codeExamples}

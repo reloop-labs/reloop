@@ -45,7 +45,6 @@ export const ApiKeysApiDetails = (props: ButtonProps) => {
 	return (
 		<ApiDetailsDrawer
 			title="API Keys API"
-			description="Create and manage API keys programmatically with the REST API"
 			hotkey="a"
 			languages={languages}
 			operations={operations}

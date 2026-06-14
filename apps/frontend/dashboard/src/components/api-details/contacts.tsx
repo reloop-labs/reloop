@@ -60,7 +60,6 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 	return (
 		<ApiDetailsDrawer
 			title="Contacts API"
-			description="Manage contacts programmatically with our REST API"
 			hotkey="a"
 			languages={languages}
 			operations={operations}

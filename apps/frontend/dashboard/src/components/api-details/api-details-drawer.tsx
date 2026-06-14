@@ -52,7 +52,6 @@ export interface OperationConfig {
 
 export interface ApiDetailsDrawerProps {
 	title: string;
-	description?: string;
 	hotkey?: string;
 	languages: readonly LanguageConfig[];
 	operations: readonly OperationConfig[];
@@ -67,7 +66,6 @@ export interface ApiDetailsDrawerProps {
 
 export const ApiDetailsDrawer = ({
 	title,
-	description,
 	hotkey,
 	languages,
 	operations,
@@ -260,11 +258,6 @@ export const ApiDetailsDrawer = ({
 							<Drawer.Title className="font-semibold text-2xl">
 								{title}
 							</Drawer.Title>
-							{description && (
-								<p className="text-paragraph-xs text-text-sub-600">
-									{description}
-								</p>
-							)}
 						</div>
 					</Drawer.Header>
 
@@ -378,7 +371,7 @@ export const ApiDetailsDrawer = ({
 									title={op.label}
 									titleHref={`${docBaseUrl}/docs/api/${docSection}/${docSlug}`}
 									noScroll={false}
-									codeExtraPadding
+									codeExtraPadding={codeExtraPadding}
 								/>
 							</section>
 						);

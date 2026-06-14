@@ -38,7 +38,6 @@ export const WebhooksApiDetails = (props: ButtonProps) => {
 	return (
 		<ApiDetailsDrawer
 			title="Webhooks API"
-			description="Create and manage webhooks programmatically with the REST API"
 			hotkey="c"
 			languages={languages}
 			operations={operations}

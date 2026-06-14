@@ -45,7 +45,6 @@ export const DomainApiDetails = (props: ButtonProps) => {
 	return (
 		<ApiDetailsDrawer
 			title="Domain API"
-			description="Manage domains programmatically with our REST API"
 			languages={languages}
 			operations={operations}
 			codeExamples={codeExamples}
