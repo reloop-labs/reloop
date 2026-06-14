@@ -31,6 +31,7 @@ const openRunde = localFont({
 	],
 	variable: "--font-open-runde",
 	display: "swap",
+	adjustFontFallback: "Arial",
 });
 
 export default function Layout({ children }: { children: ReactNode }) {

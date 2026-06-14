@@ -27,23 +27,6 @@ export function Navbar({
 	const pathname = usePathname();
 	const tabs = navigationTabs;
 	const [hoveredTab, setHoveredTab] = useState<string | null>(null);
-	const [stars, setStars] = useState<string>("GitHub");
-
-	useEffect(() => {
-		fetch("https://api.github.com/repos/reloop-labs/reloop")
-			.then((res) => res.json())
-			.then((data) => {
-				if (data && typeof data.stargazers_count === "number") {
-					const count = data.stargazers_count;
-					if (count >= 1000) {
-						setStars(`${(count / 1000).toFixed(1)}k`);
-					} else {
-						setStars(`${count}`);
-					}
-				}
-			})
-			.catch(() => {});
-	}, []);
 
 	const activeTab =
 		tabs.find((tab) => {
@@ -172,7 +155,7 @@ export function Navbar({
 						className="hidden items-center gap-1.5 font-medium text-sm text-text-sub-600 transition-colors hover:text-[#171717] sm:flex dark:hover:text-white"
 					>
 						<Icon name="social-github" className="h-4 w-4 shrink-0" />
-						{stars}
+						GitHub
 					</Link>
 					<a
 						href="/dashboard"

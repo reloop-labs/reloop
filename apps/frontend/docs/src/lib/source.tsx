@@ -2,13 +2,46 @@ import fs from "node:fs";
 import path from "node:path";
 import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import matter from "gray-matter";
-import * as LucideIcons from "lucide-react";
+import {
+	Cloud,
+	Globe,
+	Inbox,
+	Key,
+	Layout,
+	List,
+	Radio,
+	Send,
+	Server,
+	Settings,
+	Users,
+	Webhook,
+	Zap,
+	type LucideIcon,
+} from "lucide-react";
 import type { MDXComponents } from "mdx/types";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import type React from "react";
 import remarkGfm from "remark-gfm";
 import type { PageNode, PageTreeItem, TOCItem } from "./types";
 import { timestamp } from "./watcher-trigger";
+
+// Whitelist of Lucide icons used in docs meta.json / MDX frontmatter.
+// Add new entries here when adding icons to content.
+const LUCIDE_ICON_MAP: Record<string, LucideIcon> = {
+	Cloud,
+	Globe,
+	Inbox,
+	Key,
+	Layout,
+	List,
+	Radio,
+	Send,
+	Server,
+	Settings,
+	Users,
+	Webhook,
+	Zap,
+};
 
 // Log timestamp load to satisfy webpack/turbopack dependency tracing
 if (process.env.NODE_ENV === "development") {
@@ -148,7 +181,7 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 							/>
 						);
 					} else {
-						const Icon = (LucideIcons as any)[iconName];
+						const Icon = LUCIDE_ICON_MAP[iconName];
 						if (Icon) {
 							sidebarIcon = <Icon className="h-4 w-4" />;
 						}
@@ -185,7 +218,7 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 						);
 						if (childMeta.title) folderName = childMeta.title;
 						if (childMeta.icon) {
-							const Icon = (LucideIcons as any)[childMeta.icon];
+							const Icon = LUCIDE_ICON_MAP[childMeta.icon];
 							if (Icon) folderIcon = <Icon className="h-4 w-4" />;
 						}
 					} catch (e) {}

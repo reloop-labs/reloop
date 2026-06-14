@@ -17,29 +17,28 @@ export const AnimatedHoverBackground: React.FC<
 			{rect && (
 				<motion.div
 					className={cn(
-						"pointer-events-none absolute z-0 rounded-lg bg-neutral-alpha-10",
+						"pointer-events-none absolute left-0 top-0 z-0 rounded-lg bg-neutral-alpha-10",
 						className,
 					)}
-					initial={{
+					style={{
 						width: rect.width,
 						height: rect.height,
-						left: rect.left,
-						top: rect.top,
+						willChange: "transform, opacity",
+					}}
+					initial={{
+						x: rect.left,
+						y: rect.top,
 						opacity: 0,
 					}}
 					animate={{
-						width: rect.width,
-						height: rect.height,
-						left: rect.left,
-						top: rect.top,
+						x: rect.left,
+						y: rect.top,
 						opacity: 1,
 					}}
 					exit={{
+						x: rect.left,
+						y: rect.top,
 						opacity: 0,
-						width: rect.width,
-						height: rect.height,
-						left: rect.left,
-						top: rect.top,
 					}}
 					transition={{
 						type: "spring",
@@ -51,3 +50,4 @@ export const AnimatedHoverBackground: React.FC<
 		</AnimatePresence>
 	);
 };
+

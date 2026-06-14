@@ -3,11 +3,16 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { Logo } from "@reloop/ui/logo";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
 import { type ReactNode, Suspense, useEffect, useState } from "react";
 import type { PageTreeItem } from "../../lib/types";
 import { Navbar } from "./navbar";
-import { SearchDialog } from "./search-dialog";
 import { Sidebar } from "./sidebar";
+
+const SearchDialog = dynamic(
+	() => import("./search-dialog").then((mod) => mod.SearchDialog),
+	{ ssr: false },
+);
 
 interface DocsLayoutProps {
 	children: ReactNode;
@@ -113,13 +118,16 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 				</main>
 			</div>
 
-			<Suspense fallback={null}>
-				<SearchDialog
-					open={isSearchOpen}
-					onOpenChange={setIsSearchOpen}
-					tree={tree}
-				/>
-			</Suspense>
+			{isSearchOpen && (
+				<Suspense fallback={null}>
+					<SearchDialog
+						open={isSearchOpen}
+						onOpenChange={setIsSearchOpen}
+						tree={tree}
+					/>
+				</Suspense>
+			)}
 		</div>
 	);
 }
+
