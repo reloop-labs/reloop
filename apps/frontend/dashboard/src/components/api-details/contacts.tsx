@@ -6,7 +6,7 @@ import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { AnimatePresence, motion } from "motion/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
 	siCurl,
@@ -19,7 +19,6 @@ import {
 	siRuby,
 	siRust,
 } from "simple-icons";
-import { toast } from "sonner";
 
 const langIcons: Record<string, { path: string; hex: string }> = {
 	nodejs: siNodedotjs,
@@ -239,7 +238,7 @@ func main() {
     reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
         APIKey: "re_123456789",
     })
-    
+
     _, _ = reloop.Contacts().Get("cont_123456789")
 }`,
 		},
@@ -265,7 +264,7 @@ func main() {
     reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
         APIKey: "re_123456789",
     })
-    
+
     _, _ = reloop.Contacts().Update("cont_123456789", map[string]interface{}{
         "first_name": "Jane",
         "last_name": "Smith",
@@ -282,7 +281,7 @@ func main() {
     reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
         APIKey: "re_123456789",
     })
-    
+
     _, _ = reloop.Contacts().Delete("cont_123456789")
 }`,
 		},
@@ -395,7 +394,7 @@ use serde_json::json;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let reloop = ReloopEmail::new("re_123456789".to_string(), None);
-    
+
     reloop.contacts().get("cont_123456789").await?;
 
     Ok(())
@@ -426,7 +425,7 @@ use serde_json::json;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let reloop = ReloopEmail::new("re_123456789".to_string(), None);
-    
+
     reloop.contacts().update("cont_123456789", json!({
         "first_name": "Jane",
         "last_name": "Smith",
@@ -448,7 +447,7 @@ use serde_json::json;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let reloop = ReloopEmail::new("re_123456789".to_string(), None);
-    
+
     reloop.contacts().delete("cont_123456789").await?;
 
     Ok(())
@@ -617,10 +616,22 @@ await reloop.Contacts().DeleteAsync("cont_123456789");`,
 
 const operations = [
 	{ id: "add", label: "Add Contact", docSlug: "post-api-contacts-create" },
-	{ id: "get", label: "Get Contact", docSlug: "get-api-contacts-retrieve-by-contact_id" },
+	{
+		id: "get",
+		label: "Get Contact",
+		docSlug: "get-api-contacts-retrieve-by-contact_id",
+	},
 	{ id: "list", label: "List Contacts", docSlug: "get-api-contacts-list" },
-	{ id: "update", label: "Update Contact", docSlug: "patch-api-contacts-by-contact_id" },
-	{ id: "delete", label: "Delete Contact", docSlug: "delete-api-contacts-by-contact_id" },
+	{
+		id: "update",
+		label: "Update Contact",
+		docSlug: "patch-api-contacts-by-contact_id",
+	},
+	{
+		id: "delete",
+		label: "Delete Contact",
+		docSlug: "delete-api-contacts-by-contact_id",
+	},
 ] as const;
 
 const languages = [
@@ -795,27 +806,20 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 				</Tooltip.Root>
 			</Tooltip.Provider>
 
-			<Drawer.Content className="max-w-[560px]">
-				<Drawer.Header className="pb-5!">
-					<div className="flex flex-1 flex-col gap-1">
-						<Drawer.Title className="font-semibold text-2xl">
-							Contacts API
-						</Drawer.Title>
-					</div>
-				</Drawer.Header>
-
-				{/* ── Body ────────────────────────────────────────────── */}
-				<Drawer.Body className="flex flex-col gap-8">
-					<style>{`
-						.scrollbar-none::-webkit-scrollbar {
-							display: none;
-						}
-					`}</style>
+			<Drawer.Content className="w-[560px] max-w-[90vw]">
+				<div className="sticky top-0 z-30 border-stroke-soft-100/40 border-b bg-bg-white-0">
+					<Drawer.Header className="pb-3!">
+						<div className="flex flex-1 flex-col gap-1">
+							<Drawer.Title className="font-semibold text-2xl">
+								Contacts API
+							</Drawer.Title>
+						</div>
+					</Drawer.Header>
 
 					{/* Language Tabs */}
 					<div
 						ref={containerRef}
-						className="scrollbar-none relative flex min-w-0 items-center overflow-x-auto px-4"
+						className="scrollbar-none relative flex min-w-0 items-center overflow-x-auto px-4 pb-0"
 						style={{
 							scrollbarWidth: "none",
 							msOverflowStyle: "none",
@@ -893,6 +897,14 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 							) : null}
 						</AnimatePresence>
 					</div>
+				</div>
+
+				<Drawer.Body className="flex flex-col gap-8 pt-6 pb-10">
+					<style>{`
+						.scrollbar-none::-webkit-scrollbar {
+							display: none;
+						}
+					`}</style>
 
 					{operations.map((op) => {
 						const example =
