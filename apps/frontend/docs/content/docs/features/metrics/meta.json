@@ -1,6 +1,6 @@
 {
 	"title": "Metrics",
-	"icon": "Activity",
+	"icon": "fat-row",
 	"pages": [
 		"index",
 		"details"

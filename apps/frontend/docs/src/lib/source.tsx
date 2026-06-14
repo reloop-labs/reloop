@@ -2,54 +2,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
 import matter from "gray-matter";
-import {
-	Activity,
-	Cloud,
-	Database,
-	FileText,
-	Globe,
-	Inbox,
-	Key,
-	Layout,
-	List,
-	type LucideIcon,
-	Mail,
-	Radio,
-	Send,
-	Server,
-	Settings,
-	Users,
-	Webhook,
-	Zap,
-} from "lucide-react";
+import { Icon } from "@reloop/ui/icon";
 import type { MDXComponents } from "mdx/types";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import type React from "react";
 import remarkGfm from "remark-gfm";
 import type { PageNode, PageTreeItem, TOCItem } from "./types";
 import { timestamp } from "./watcher-trigger";
-
-// Whitelist of Lucide icons used in docs meta.json / MDX frontmatter.
-// Add new entries here when adding icons to content.
-const LUCIDE_ICON_MAP: Record<string, LucideIcon> = {
-	Activity,
-	Cloud,
-	Database,
-	FileText,
-	Globe,
-	Inbox,
-	Key,
-	Layout,
-	List,
-	Mail,
-	Radio,
-	Send,
-	Server,
-	Settings,
-	Users,
-	Webhook,
-	Zap,
-};
 
 // Log timestamp load to satisfy webpack/turbopack dependency tracing
 if (process.env.NODE_ENV === "development") {
@@ -176,7 +135,7 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 
 			if (fs.existsSync(mdxPath)) {
 				const { data } = matter(fs.readFileSync(mdxPath, "utf8"));
-				const iconName = data.icon || (item === "index" && meta.icon);
+				const iconName = data.icon;
 
 				let sidebarIcon: React.ReactNode;
 				if (iconName) {
@@ -189,10 +148,7 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 							/>
 						);
 					} else {
-						const Icon = LUCIDE_ICON_MAP[iconName];
-						if (Icon) {
-							sidebarIcon = <Icon className="h-4 w-4" />;
-						}
+						sidebarIcon = <Icon name={iconName} className="h-4 w-4" />;
 					}
 				}
 
@@ -226,8 +182,17 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 						);
 						if (childMeta.title) folderName = childMeta.title;
 						if (childMeta.icon) {
-							const Icon = LUCIDE_ICON_MAP[childMeta.icon];
-							if (Icon) folderIcon = <Icon className="h-4 w-4" />;
+							if (childMeta.icon.startsWith("si") || childMeta.icon.startsWith("Si")) {
+								folderIcon = (
+									<SimpleIcon
+										name={childMeta.icon}
+										className="h-3.5 w-3.5 shrink-0"
+										color="currentColor"
+									/>
+								);
+							} else {
+								folderIcon = <Icon name={childMeta.icon} className="h-4 w-4" />;
+							}
 						}
 					} catch (e) {}
 				} else {

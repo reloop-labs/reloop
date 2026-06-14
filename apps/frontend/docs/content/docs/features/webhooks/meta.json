@@ -1,6 +1,6 @@
 {
 	"title": "Webhooks",
-	"icon": "Webhook",
+	"icon": "webhook",
 	"pages": [
 		"index",
 		"details"

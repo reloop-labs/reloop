@@ -1,6 +1,6 @@
 {
 	"title": "Templates",
-	"icon": "Layout",
+	"icon": "layout",
 	"pages": [
 		"index",
 		"details"

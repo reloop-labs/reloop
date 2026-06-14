@@ -1,6 +1,6 @@
 {
 	"title": "Logs",
-	"icon": "FileText",
+	"icon": "file-text",
 	"pages": [
 		"index",
 		"details"

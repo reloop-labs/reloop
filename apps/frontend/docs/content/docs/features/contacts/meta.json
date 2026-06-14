@@ -1,6 +1,6 @@
 {
 	"title": "Contacts",
-	"icon": "Users",
+	"icon": "users",
 	"pages": [
 		"index",
 		"details"

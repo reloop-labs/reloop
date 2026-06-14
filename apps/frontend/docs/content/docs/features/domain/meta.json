@@ -1,6 +1,6 @@
 {
 	"title": "Domain",
-	"icon": "Globe",
+	"icon": "globe",
 	"pages": [
 		"index",
 		"details"

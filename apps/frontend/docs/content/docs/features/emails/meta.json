@@ -1,6 +1,6 @@
 {
 	"title": "Emails",
-	"icon": "Mail",
+	"icon": "mail-single",
 	"pages": [
 		"index",
 		"details"

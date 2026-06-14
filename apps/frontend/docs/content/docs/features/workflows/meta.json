@@ -1,6 +1,6 @@
 {
 	"title": "Workflows",
-	"icon": "Zap",
+	"icon": "modules",
 	"pages": [
 		"index",
 		"details"

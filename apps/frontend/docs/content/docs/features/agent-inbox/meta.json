@@ -1,6 +1,6 @@
 {
 	"title": "Agent Inbox",
-	"icon": "Inbox",
+	"icon": "inbox",
 	"pages": [
 		"index",
 		"details"

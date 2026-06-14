@@ -1,6 +1,6 @@
 {
 	"title": "Settings",
-	"icon": "Settings",
+	"icon": "gear",
 	"pages": [
 		"index",
 		"details"

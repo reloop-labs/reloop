@@ -1,6 +1,6 @@
 {
 	"title": "API Keys",
-	"icon": "Key",
+	"icon": "key-new",
 	"pages": [
 		"index",
 		"details"
