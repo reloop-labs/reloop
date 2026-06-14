@@ -7,7 +7,7 @@ const DOCS_DIR = path.resolve(
 );
 const DASHBOARD_FILE = path.resolve(
 	__dirname,
-	"../src/components/api-details/contacts.tsx",
+	"../src/components/api-details/contacts-code-examples.ts",
 );
 
 interface CodeSample {
@@ -23,6 +23,10 @@ const OP_FILES = {
 	list: "get-api-contacts-list.mdx",
 	update: "patch-api-contacts-by-contact_id.mdx",
 	delete: "delete-api-contacts-by-contact_id.mdx",
+	addChannel: "post-api-contacts-channel-by-channel_id.mdx",
+	updateChannel: "patch-api-contacts-channel-by-channel_id.mdx",
+	addGroup: "post-api-contacts-group-by-group_id.mdx",
+	deleteGroup: "delete-api-contacts-group-by-group_id.mdx",
 };
 
 const LANG_MAP: Record<string, string> = {
@@ -75,7 +79,7 @@ function parseCodeSamples(content: string, filePath: string): CodeSample[] {
 			// If we exit codeSamples (any line with less than 4 spaces indent, except empty lines)
 			if (line.trim() !== "" && indent < 4 && !line.startsWith("    ")) {
 				inCodeSamples = false;
-				if (currentSample && currentSample.id) {
+				if (currentSample?.id) {
 					currentSample.source = sourceLines.join("\n");
 					samples.push(currentSample as CodeSample);
 				}
@@ -84,7 +88,7 @@ function parseCodeSamples(content: string, filePath: string): CodeSample[] {
 			}
 
 			if (line.startsWith("    - id:") || line.trim() === "    -") {
-				if (currentSample && currentSample.id) {
+				if (currentSample?.id) {
 					currentSample.source = sourceLines.join("\n");
 					samples.push(currentSample as CodeSample);
 				}
@@ -145,7 +149,7 @@ function parseCodeSamples(content: string, filePath: string): CodeSample[] {
 		}
 	}
 
-	if (currentSample && currentSample.id) {
+	if (currentSample?.id) {
 		currentSample.source = sourceLines.join("\n");
 		samples.push(currentSample as CodeSample);
 	}
@@ -154,13 +158,30 @@ function parseCodeSamples(content: string, filePath: string): CodeSample[] {
 }
 
 function getFilename(lang: string, op: string): string {
+	let baseName = op;
+	if (op === "add") baseName = "add_contact";
+	else if (op === "get") baseName = "get_contact";
+	else if (op === "list") baseName = "list_contact";
+	else if (op === "update") baseName = "update_contact";
+	else if (op === "delete") baseName = "delete_contact";
+	else if (op === "addChannel") baseName = "add_contact_channel";
+	else if (op === "updateChannel") baseName = "update_contact_channel";
+	else if (op === "addGroup") baseName = "add_contact_group";
+	else if (op === "deleteGroup") baseName = "delete_contact_group";
+
 	if (lang === "java") {
-		const caps = op.charAt(0).toUpperCase() + op.slice(1);
-		return `${caps}Contact.java`;
+		const caps = baseName
+			.split("_")
+			.map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+			.join("");
+		return `${caps}.java`;
 	}
 	if (lang === "dotnet") {
-		const caps = op.charAt(0).toUpperCase() + op.slice(1);
-		return `${caps}Contact.cs`;
+		const caps = baseName
+			.split("_")
+			.map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+			.join("");
+		return `${caps}.cs`;
 	}
 	const extMap: Record<string, string> = {
 		nodejs: "js",
@@ -172,7 +193,7 @@ function getFilename(lang: string, op: string): string {
 		curl: "sh",
 	};
 	const ext = extMap[lang] || "js";
-	return `${op}_contact.${ext}`;
+	return `${baseName}.${ext}`;
 }
 
 function formatCodeExamples(
@@ -190,9 +211,19 @@ function formatCodeExamples(
 		"dotnet",
 		"curl",
 	];
-	const sortedOps = ["add", "get", "list", "update", "delete"];
+	const sortedOps = [
+		"add",
+		"get",
+		"list",
+		"update",
+		"delete",
+		"addChannel",
+		"updateChannel",
+		"addGroup",
+		"deleteGroup",
+	];
 
-	let out = "const codeExamples = {\n";
+	let out = "export const codeExamples = {\n";
 	for (const lang of sortedLangs) {
 		const ops = examples[lang];
 		if (!ops) continue;
@@ -260,28 +291,8 @@ function sync() {
 		}
 	}
 
-	// Read dashboard file
-	if (!fs.existsSync(DASHBOARD_FILE)) {
-		console.error(`Dashboard file does not exist: ${DASHBOARD_FILE}`);
-		process.exit(1);
-	}
-
-	let dashboardContent = fs.readFileSync(DASHBOARD_FILE, "utf-8");
-
-	const codeExamplesRegex =
-		/const codeExamples = \{[\s\S]*?\r?\n\};?(?=\s*\/\/ -{10,})/;
-	if (!codeExamplesRegex.test(dashboardContent)) {
-		console.error("Could not find const codeExamples block in dashboard file!");
-		process.exit(1);
-	}
-
 	const formattedBlock = formatCodeExamples(examples);
-	dashboardContent = dashboardContent.replace(
-		codeExamplesRegex,
-		formattedBlock,
-	);
-
-	fs.writeFileSync(DASHBOARD_FILE, dashboardContent, "utf-8");
+	fs.writeFileSync(DASHBOARD_FILE, `${formattedBlock}\n`, "utf-8");
 	console.log(`Successfully synced and updated ${DASHBOARD_FILE}!`);
 }
 

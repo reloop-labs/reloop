@@ -1,0 +1,387 @@
+import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
+import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
+import * as Drawer from "@reloop/ui/drawer";
+import { Icon } from "@reloop/ui/icon";
+import * as Tooltip from "@reloop/ui/tooltip";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import {
+	siCurl,
+	siDotnet,
+	siGo,
+	siNodedotjs,
+	siOpenjdk,
+	siPhp,
+	siPython,
+	siRuby,
+	siRust,
+} from "simple-icons";
+
+const langIcons: Record<string, { path: string; hex: string }> = {
+	nodejs: siNodedotjs,
+	javascript: siNodedotjs,
+	python: siPython,
+	php: siPhp,
+	go: siGo,
+	ruby: siRuby,
+	rust: siRust,
+	java: siOpenjdk,
+	dotnet: siDotnet,
+	curl: siCurl,
+};
+
+const docBaseUrl =
+	process.env.NEXT_PUBLIC_APP_URL ||
+	process.env.NEXT_PUBLIC_URL ||
+	"https://local.reloop.sh";
+
+export interface LanguageConfig {
+	id: string;
+	label: string;
+	shikiLang: string;
+}
+
+export interface OperationConfig {
+	id: string;
+	label: string;
+	docSlug?: string;
+}
+
+export interface ApiDetailsDrawerProps {
+	title: string;
+	description?: string;
+	hotkey?: string;
+	languages: readonly LanguageConfig[];
+	operations: readonly OperationConfig[];
+	codeExamples: Record<
+		string,
+		Record<string, string | { filename: string; code: string }>
+	>;
+	docSection: string;
+	buttonProps?: React.ComponentPropsWithoutRef<typeof Button.Root>;
+}
+
+export const ApiDetailsDrawer = ({
+	title,
+	description,
+	hotkey,
+	languages,
+	operations,
+	codeExamples,
+	docSection,
+	buttonProps = {},
+}: ApiDetailsDrawerProps) => {
+	const [isOpen, setIsOpen] = useState(false);
+	const [selectedLanguage, setSelectedLanguage] = useApiLanguage<string>(
+		languages.map((l) => l.id),
+		languages[0]?.id || "javascript",
+	);
+
+	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(
+		undefined,
+	);
+	const [mounted, setMounted] = useState(false);
+	const tabButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const isFirstScrollRef = useRef(true);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	const activeTabIndex = languages.findIndex((l) => l.id === selectedLanguage);
+
+	useEffect(() => {
+		if (!mounted) return;
+		const container = containerRef.current;
+		if (!container) return;
+
+		const handleScroll = () => {
+			const activeBtn = tabButtonRefs.current[activeTabIndex];
+			if (activeBtn && container.clientWidth > 0) {
+				const containerLeft = container.scrollLeft;
+				const containerWidth = container.clientWidth;
+				const containerRight = containerLeft + containerWidth;
+
+				const btnLeft = activeBtn.offsetLeft;
+				const btnWidth = activeBtn.offsetWidth;
+				const btnRight = btnLeft + btnWidth;
+
+				if (btnLeft < containerLeft || btnRight > containerRight) {
+					const targetScrollLeft =
+						btnLeft < containerLeft
+							? btnLeft - 16
+							: btnRight - containerWidth + 16;
+
+					container.scrollTo({
+						left: Math.max(0, targetScrollLeft),
+						behavior: isFirstScrollRef.current ? "auto" : "smooth",
+					});
+				}
+				isFirstScrollRef.current = false;
+			}
+		};
+
+		handleScroll();
+
+		const observer = new ResizeObserver(() => {
+			handleScroll();
+		});
+		observer.observe(container);
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [activeTabIndex, mounted]);
+
+	if (hotkey) {
+		useHotkeys(hotkey, (e) => {
+			e.preventDefault();
+			setIsOpen(true);
+		});
+	}
+
+	const highlightedTabIndex =
+		hoveredTabIdx !== undefined ? hoveredTabIdx : activeTabIndex;
+	const highlightedTab = tabButtonRefs.current[highlightedTabIndex];
+	const highlightedBrandColor =
+		highlightedTabIndex >= 0 && languages[highlightedTabIndex]?.id
+			? `#${langIcons[languages[highlightedTabIndex].id]?.hex}`
+			: undefined;
+
+	const getTabPosition = (button: HTMLButtonElement | null | undefined) => {
+		if (!button) return null;
+
+		return {
+			width: button.offsetWidth,
+			height: button.offsetHeight,
+			left: button.offsetLeft,
+			top: button.offsetTop,
+		};
+	};
+
+	const pillInset = { x: 6, y: 6 };
+	const getPillPosition = (position: ReturnType<typeof getTabPosition>) => {
+		if (!position) return null;
+
+		return {
+			width: position.width - pillInset.x * 2,
+			height: position.height - pillInset.y * 2 - 2,
+			left: position.left + pillInset.x,
+			top: position.top + pillInset.y,
+		};
+	};
+
+	const highlightedTabPosition = mounted
+		? getTabPosition(highlightedTab)
+		: null;
+	const highlightedPillPosition = getPillPosition(highlightedTabPosition);
+
+	const {
+		variant = "neutral",
+		mode = "ghost",
+		size = "xxsmall",
+		className,
+		...rest
+	} = buttonProps;
+
+	const currentLanguageConfig = languages.find(
+		(l) => l.id === selectedLanguage,
+	);
+
+	const getFilename = (lang: string, opId: string) => {
+		const ext =
+			lang === "nodejs" || lang === "javascript"
+				? "js"
+				: lang === "python"
+					? "py"
+					: lang === "php"
+						? "php"
+						: lang === "go"
+							? "go"
+							: lang === "ruby"
+								? "rb"
+								: lang === "rust"
+									? "rs"
+									: lang === "java"
+										? "java"
+										: lang === "dotnet"
+											? "cs"
+											: "sh";
+
+		const snakeOp = opId.replace(
+			/[A-Z]/g,
+			(letter) => `_${letter.toLowerCase()}`,
+		);
+		return `${snakeOp}.${ext}`;
+	};
+
+	return (
+		<Drawer.Root open={isOpen} onOpenChange={setIsOpen}>
+			<Tooltip.Provider>
+				<Tooltip.Root>
+					<Tooltip.Trigger asChild>
+						<Drawer.Trigger asChild>
+							<Button.Root
+								variant={variant}
+								size={size}
+								mode={mode}
+								className={cn(
+									"aspect-square p-0",
+									isOpen && "bg-bg-weak-50",
+									className,
+								)}
+								{...rest}
+							>
+								<Icon name="code" className="h-4 w-4" />
+							</Button.Root>
+						</Drawer.Trigger>
+					</Tooltip.Trigger>
+					<Tooltip.Content className="flex items-center gap-2 rounded-lg">
+						<p className="font-medium text-label-sm">{title}</p>
+						{hotkey && (
+							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
+								{hotkey}
+							</span>
+						)}
+					</Tooltip.Content>
+				</Tooltip.Root>
+			</Tooltip.Provider>
+
+			<Drawer.Content className="w-[560px] max-w-[90vw]">
+				<div className="sticky top-0 z-30 border-stroke-soft-100/40 border-b bg-bg-white-0">
+					<Drawer.Header className="pb-3!">
+						<div className="flex flex-1 flex-col gap-1">
+							<Drawer.Title className="font-semibold text-2xl">
+								{title}
+							</Drawer.Title>
+							{description && (
+								<p className="text-paragraph-xs text-text-sub-600">
+									{description}
+								</p>
+							)}
+						</div>
+					</Drawer.Header>
+
+					{/* Language Tabs */}
+					<div
+						ref={containerRef}
+						className="scrollbar-none relative flex min-w-0 items-center overflow-x-auto px-4 pb-0"
+						style={{
+							scrollbarWidth: "none",
+							msOverflowStyle: "none",
+						}}
+					>
+						{languages.map((lang, index) => {
+							const icon = langIcons[lang.id];
+							const isActive = selectedLanguage === lang.id;
+							const brandColor = icon ? `#${icon.hex}` : undefined;
+							const isHighlighted = index === highlightedTabIndex;
+
+							let textColorStyle: React.CSSProperties | undefined;
+							if (isHighlighted) {
+								textColorStyle = { color: "#ffffff" };
+							} else if (isActive && brandColor) {
+								textColorStyle = { color: brandColor };
+							}
+
+							return (
+								<button
+									key={lang.id}
+									ref={(el) => {
+										tabButtonRefs.current[index] = el;
+									}}
+									type="button"
+									onClick={() => setSelectedLanguage(lang.id)}
+									onPointerEnter={() => setHoveredTabIdx(index)}
+									onPointerLeave={() => setHoveredTabIdx(undefined)}
+									className={cn(
+										"relative z-10 flex shrink-0 items-center gap-2 px-4 py-3 font-medium text-[17px] transition-colors duration-150",
+										isActive
+											? "text-text-strong-950 dark:text-white"
+											: "text-text-sub-600 dark:text-white/70",
+									)}
+									style={textColorStyle}
+								>
+									{icon && (
+										<svg
+											role="img"
+											viewBox="0 0 24 24"
+											className="size-3.5 shrink-0 transition-colors duration-150"
+											fill="currentColor"
+											xmlns="http://www.w3.org/2000/svg"
+											style={{ color: isHighlighted ? "#ffffff" : brandColor }}
+											aria-hidden
+										>
+											<path d={icon.path} />
+										</svg>
+									)}
+									{lang.label}
+								</button>
+							);
+						})}
+						<AnimatePresence>
+							{highlightedPillPosition && highlightedTabIndex !== -1 ? (
+								<motion.div
+									className="pointer-events-none absolute top-0 left-0 rounded-full"
+									style={{
+										backgroundColor: highlightedBrandColor || undefined,
+									}}
+									initial={{
+										...highlightedPillPosition,
+										opacity: 0,
+									}}
+									animate={{
+										...highlightedPillPosition,
+										opacity: 1,
+									}}
+									exit={{
+										...highlightedPillPosition,
+										opacity: 0,
+									}}
+									transition={{ duration: 0.14 }}
+								/>
+							) : null}
+						</AnimatePresence>
+					</div>
+				</div>
+
+				<Drawer.Body className="flex flex-col gap-8 pt-6 pb-10">
+					<style>{`
+						.scrollbar-none::-webkit-scrollbar {
+							display: none;
+						}
+					`}</style>
+
+					{operations.map((op) => {
+						const example = codeExamples[selectedLanguage]?.[op.id];
+						const code =
+							typeof example === "string" ? example : example?.code || "";
+						const filename =
+							typeof example === "string" || !example?.filename
+								? getFilename(selectedLanguage, op.id)
+								: example.filename;
+
+						const docSlug = op.docSlug || op.id;
+
+						return (
+							<section key={op.id} className="px-6">
+								<CopyCodeBlock
+									code={code}
+									lang={currentLanguageConfig?.shikiLang || "javascript"}
+									label={filename}
+									title={op.label}
+									titleHref={`${docBaseUrl}/docs/api/${docSection}/${docSlug}`}
+									noScroll={false}
+								/>
+							</section>
+						);
+					})}
+				</Drawer.Body>
+			</Drawer.Content>
+		</Drawer.Root>
+	);
+};
