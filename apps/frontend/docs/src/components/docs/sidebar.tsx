@@ -59,6 +59,9 @@ export function Sidebar({
 }: SidebarProps) {
 	const clientPathname = usePathname();
 	const pathname = propPathname || clientPathname || "";
+	const gradientFromClass = isMobile
+		? "from-bg-white-0 dark:from-[#0a0a0a]"
+		: "from-bg-weak-50 dark:from-black";
 	const activeTab =
 		navigationTabs.find((tab) => {
 			if (tab.url === "/") {
@@ -257,7 +260,7 @@ export function Sidebar({
 			{/* Navigation tree */}
 			<nav
 				ref={navRef}
-				className="relative flex-1 overflow-y-auto p-2 pt-1"
+				className="relative flex-1 overflow-y-auto px-2 pt-0 pb-0"
 				onPointerLeave={() => setHoveredEl(null)}
 				onScroll={() => {
 					if (navRef.current) {
@@ -268,6 +271,13 @@ export function Sidebar({
 					}
 				}}
 			>
+				{/* Top Fade Gradient Overlay */}
+				<div
+					className={cn(
+						"-mb-6 pointer-events-none sticky top-0 right-0 left-0 z-20 h-6 bg-gradient-to-b to-transparent",
+						gradientFromClass,
+					)}
+				/>
 				<SidebarContext.Provider
 					value={{
 						hoveredEl,
@@ -311,6 +321,13 @@ export function Sidebar({
 						})}
 					</div>
 				</SidebarContext.Provider>
+				{/* Bottom Fade Gradient Overlay */}
+				<div
+					className={cn(
+						"-mt-6 pointer-events-none sticky right-0 bottom-0 left-0 z-20 h-6 bg-gradient-to-t to-transparent",
+						gradientFromClass,
+					)}
+				/>
 			</nav>
 		</aside>
 	);
