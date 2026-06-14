@@ -84,7 +84,10 @@ export function TableOfContents({ items }: TOCProps) {
 	if (items.length === 0) return null;
 
 	return (
-		<div id="docs-toc" className="hidden text-sm xl:block">
+		<div
+			id="docs-toc"
+			className="ml-auto hidden w-fit max-w-[240px] text-sm xl:block"
+		>
 			<div className="sticky top-0">
 				<div
 					id="docs-toc-title"
