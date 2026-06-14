@@ -13,7 +13,171 @@ _apiData:
   operationData: [{"path":"/api/mail/v1/send","method":"post"}]
   parameterList: [{"name":"from","type":"string","required":true,"description":"Sender email address","location":"body","pattern":"^(?:.*<[^\\s@]+@[^\\s@]+\\.[^\\s@]+>|[^\\s@]+@[^\\s@]+\\.[^\\s@]+)$","example":"user@example.com"},{"name":"to","type":"string | string[]","required":true,"description":"Recipient email address(es) (max 50)","location":"body","example":"recipient@example.com"},{"name":"subject","type":"string","required":true,"description":"Email subject","location":"body","minLength":1,"maxLength":255,"example":"Test Email"},{"name":"cc","type":"string | string[]","required":false,"description":"CC email address(es) (max 50)","location":"body","example":"cc@example.com"},{"name":"bcc","type":"string | string[]","required":false,"description":"BCC email address(es) (max 50)","location":"body","example":"bcc@example.com"},{"name":"text","type":"string","required":false,"description":"Plain text content","location":"body","example":"This is a test email"},{"name":"html","type":"string","required":false,"description":"HTML content","location":"body","example":"<h1>Test Email</h1><p>This is a test email</p>"},{"name":"reply_to","type":"string | string[]","required":false,"description":"Reply-to email address","location":"body","example":"noreply@example.com"},{"name":"scheduled_at","type":"string","required":false,"description":"Schedule email to be sent later (ISO 8601)","location":"body","example":"2026-08-05T11:52:01.858Z"},{"name":"headers","type":"object","required":false,"description":"Custom headers to add to the email","location":"body"},{"name":"channel_id","type":"string","required":false,"description":"The channel ID to receive the email","location":"body"},{"name":"attachments","type":"object[]","required":false,"description":"Email attachments","location":"body","properties":[{"name":"content","type":"string | any","required":false,"description":"","location":"body"},{"name":"filename","type":"string","required":false,"description":"","location":"body"},{"name":"path","type":"string","required":false,"description":"","location":"body"},{"name":"content_type","type":"string","required":false,"description":"","location":"body"},{"name":"content_id","type":"string","required":false,"description":"","location":"body"}]},{"name":"tags","type":"object[]","required":false,"description":"Custom tags passed in key/value pairs","location":"body","properties":[{"name":"name","type":"string","required":true,"description":"The name of the email tag.","location":"body","maxLength":256,"pattern":"^[a-zA-Z0-9_-]+$"},{"name":"value","type":"string","required":true,"description":"The value of the email tag.","location":"body","maxLength":256,"pattern":"^[a-zA-Z0-9_-]+$"}]},{"name":"template","type":"object","required":false,"description":"Email template to use","location":"body","properties":[{"name":"id","type":"string","required":true,"description":"Template ID","location":"body"},{"name":"variables","type":"object","required":false,"description":"Variables to replace in the template","location":"body"}]},{"name":"thread_id","type":"string","required":false,"description":"Thread ID to link this email to an existing conversation thread","location":"body","example":"thr_abc123xyz"}]
   responseMap: {"200":{"description":"Response for status 200","schema":{"success":true,"messageId":"example_messageId","status":"example_status","timestamp":"example_timestamp","id":"con_123456789"}},"400":{"description":"Response for status 400","schema":{"message":"Contact already exists"}},"401":{"description":"Response for status 401","schema":{"message":"Authentication required"}},"403":{"description":"Response for status 403","schema":{"message":"User is not a member of an organization"}},"429":{"description":"Response for status 429","schema":{"message":"Contact already exists","why":"A contact with this email already exists in your organization.","fix":"Use a different email address or update the existing contact instead."}},"500":{"description":"Response for status 500","schema":{"message":"Contact already exists"}}}
-  codeSamples: []
+  codeSamples:
+    - id: node
+      lang: javascript
+      label: Node.js
+      source: |-
+        import { Reloop } from "reloop-email";
+        
+        const reloop = new Reloop({ apiKey: "rl_123456789" });
+        
+        const { response, error } = await reloop.mail.send({
+          from: "Reloop <hello@send.example.com>",
+          to: "user@example.com",
+          subject: "Welcome to Reloop",
+          html: "<p>Thanks for signing up.</p>",
+          text: "Thanks for signing up.",
+          reply_to: "support@example.com",
+          tags: [{ name: "campaign", value: "welcome" }],
+        });
+        if (error) throw error;
+    - id: curl
+      lang: bash
+      label: cURL
+      source: |-
+        curl -X POST https://reloop.sh/api/mail/v1/send \\
+          -H "x-api-key: rl_123456789" \\
+          -H "Content-Type: application/json" \\
+          -d '{"from":"Reloop <hello@send.example.com>","to":"user@example.com","subject":"Welcome to Reloop","html":"<p>Thanks for signing up.</p>","text":"Thanks for signing up.","reply_to":"support@example.com","tags":[{"name":"campaign","value":"welcome"}]}'
+    - id: python
+      lang: python
+      label: Python
+      source: |-
+        from reloop import Reloop
+        
+        reloop = Reloop(api_key="rl_123456789")
+        
+        result = reloop.mail.send(
+            from_="Reloop <hello@send.example.com>",
+            to="user@example.com",
+            subject="Welcome to Reloop",
+            html="<p>Thanks for signing up.</p>",
+            text="Thanks for signing up.",
+            reply_to="support@example.com",
+            tags=[{"name": "campaign", "value": "welcome"}],
+        )
+    - id: php
+      lang: php
+      label: PHP
+      source: |-
+        $reloop = Reloop::client('rl_123456789');
+        
+        $result = $reloop->mail->send([
+            'from' => 'Reloop <hello@send.example.com>',
+            'to' => 'user@example.com',
+            'subject' => 'Welcome to Reloop',
+            'html' => '<p>Thanks for signing up.</p>',
+            'text' => 'Thanks for signing up.',
+            'reply_to' => 'support@example.com',
+            'tags' => [['name' => 'campaign', 'value' => 'welcome']],
+        ]);
+    - id: java
+      lang: java
+      label: Java
+      source: |-
+        import sh.reloop.ReloopClient;
+        import java.util.*;
+        
+        ReloopClient reloop = new ReloopClient("rl_123456789");
+        
+        Map<String, Object> params = new HashMap<>();
+        params.put("from", "Reloop <hello@send.example.com>");
+        params.put("to", "user@example.com");
+        params.put("subject", "Welcome to Reloop");
+        params.put("html", "<p>Thanks for signing up.</p>");
+        params.put("text", "Thanks for signing up.");
+        params.put("reply_to", "support@example.com");
+        SendMailResponse result = reloop.mail.send(params);
+    - id: dotnet
+      lang: csharp
+      label: .NET
+      source: |-
+        using Reloop;
+        
+        var reloop = new ReloopClient("rl_123456789");
+        
+        var result = await reloop.Mail.SendAsync(new Dictionary<string, object?>
+        {
+            ["from"] = "Reloop <hello@send.example.com>",
+            ["to"] = "user@example.com",
+            ["subject"] = "Welcome to Reloop",
+            ["html"] = "<p>Thanks for signing up.</p>",
+            ["text"] = "Thanks for signing up.",
+            ["reply_to"] = "support@example.com",
+        });
+    - id: go
+      lang: go
+      label: Go
+      source: |-
+        import reloop "github.com/reloop-labs/reloop-go"
+        
+        client, _ := reloop.NewClient(reloop.ClientOptions{
+            APIKey: "rl_123456789",
+        })
+        
+        result, _ := client.Mail.Send(reloop.SendMailParams{
+            From:    "Reloop <hello@send.example.com>",
+            To:      reloop.StringSlice("user@example.com"),
+            Subject: "Welcome to Reloop",
+            HTML:    reloop.String("<p>Thanks for signing up.</p>"),
+            Text:    reloop.String("Thanks for signing up."),
+            ReplyTo: reloop.String("support@example.com"),
+        })
+    - id: rust
+      lang: rust
+      label: Rust
+      source: |-
+        use reloop::ReloopClient;
+        use serde_json::json;
+        
+        #[tokio::main]
+        async fn main() -> Result<(), Box<dyn std::error::Error>> {
+            let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+        
+            reloop.mail().send(json!({
+                "from": "Reloop <hello@send.example.com>",
+                "to": "user@example.com",
+                "subject": "Welcome to Reloop",
+                "html": "<p>Thanks for signing up.</p>",
+                "text": "Thanks for signing up.",
+                "reply_to": "support@example.com",
+            })).await?;
+        
+            Ok(())
+        }
+    - id: ruby
+      lang: ruby
+      label: Ruby
+      source: |-
+        require "reloop"
+        
+        reloop = Reloop::Client.new(api_key: "rl_123456789")
+        
+        result = reloop.mail.send(
+          from: "Reloop <hello@send.example.com>",
+          to: "user@example.com",
+          subject: "Welcome to Reloop",
+          html: "<p>Thanks for signing up.</p>",
+          text: "Thanks for signing up.",
+          reply_to: "support@example.com",
+          tags: [{ name: "campaign", value: "welcome" }],
+        )
+    - id: elixir
+      lang: elixir
+      label: Elixir
+      source: |-
+        client = Reloop.client("rl_123456789")
+        
+        {:ok, result} = Reloop.Services.Mail.send(client, %{
+          from: "Reloop <hello@send.example.com>",
+          to: "user@example.com",
+          subject: "Welcome to Reloop",
+          html: "<p>Thanks for signing up.</p>",
+          text: "Thanks for signing up.",
+          reply_to: "support@example.com",
+          tags: [%{name: "campaign", value: "welcome"}]
+        })
 ---
 
 {/* This file was generated by the OpenAPI doc generator. Do not edit this file directly. Run `bun run generate:api-docs` to regenerate. */}

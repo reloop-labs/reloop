@@ -196,6 +196,7 @@ const services = [
 	{ name: "contacts", dir: path.join(BACKEND_ROOT, "contacts/src/routes") },
 	{ name: "api-key", dir: path.join(BACKEND_ROOT, "api-key/src/routes") },
 	{ name: "domain", dir: path.join(BACKEND_ROOT, "domain/src/routes") },
+	{ name: "mail", dir: path.join(BACKEND_ROOT, "mail/src/routes") },
 	{ name: "template", dir: path.join(BACKEND_ROOT, "template/src/routes") },
 ];
 
