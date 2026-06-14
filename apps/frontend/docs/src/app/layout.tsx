@@ -3,6 +3,7 @@ import { ThemeProvider } from "@reloop/fe-docs/components/theme-provider";
 import { cn } from "@reloop/fe-docs/lib/cn";
 import { IconsSprite } from "@reloop/ui/icon";
 import localFont from "next/font/local";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { ReactNode } from "react";
 
 const openRunde = localFont({
@@ -47,7 +48,9 @@ export default function Layout({ children }: { children: ReactNode }) {
 				className="flex min-h-screen flex-col overflow-x-hidden bg-bg-weak-50 text-fd-foreground dark:bg-black"
 				suppressHydrationWarning
 			>
-				<ThemeProvider>{children}</ThemeProvider>
+				<ThemeProvider>
+					<NuqsAdapter>{children}</NuqsAdapter>
+				</ThemeProvider>
 				<IconsSprite />
 			</body>
 		</html>

@@ -2,18 +2,10 @@
 
 import * as Popover from "@radix-ui/react-popover";
 import { navigationTabs } from "@reloop/fe-docs/lib/navigation";
-import type { FolderNode, PageTreeItem } from "@reloop/fe-docs/lib/types";
+import type { PageTreeItem } from "@reloop/fe-docs/lib/types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Logo } from "@reloop/ui/logo";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-	Check,
-	ChevronDown,
-	ChevronRight,
-	Search,
-	Sparkles,
-} from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -28,7 +20,6 @@ import {
 } from "react";
 import { isActive as checkIsActive } from "../../lib/is-active";
 import { AnimatedHoverBackground } from "./animated-hover-background";
-import { SearchDialog } from "./search-dialog";
 import { ApiSidebarSection } from "./sidebar-api";
 import { DefaultSidebarSection } from "./sidebar-default";
 import { WebhookSidebarSection } from "./sidebar-webhook";
@@ -123,7 +114,6 @@ export function Sidebar({
 		top: number;
 		left: number;
 	} | null>(null);
-	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	const navRef = useRef<HTMLElement>(null);
 
 	// Collect URLs of all folders that contain the active page (at any depth)
@@ -216,7 +206,7 @@ export function Sidebar({
 			if (urls.every((u) => prev.has(u))) return prev;
 			return new Set([...prev, ...urls]);
 		});
-	}, [pathname, filteredTree, getActiveFolderUrls]);
+	}, [filteredTree, getActiveFolderUrls]);
 
 	const toggleFolder = useCallback((url: string) => {
 		setOpenFolders((prev) => {
@@ -227,18 +217,6 @@ export function Sidebar({
 		});
 	}, []);
 
-	// Keyboard shortcuts
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-				e.preventDefault();
-				setIsSearchOpen(true);
-			}
-		};
-		window.addEventListener("keydown", handleKeyDown);
-		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, []);
-
 	// Find the active element by DOM query after each navigation
 	useLayoutEffect(() => {
 		if (!navRef.current) return;
@@ -246,7 +224,7 @@ export function Sidebar({
 			'[data-sidebar-active="true"]',
 		);
 		setActiveEl(el ?? null);
-	}, [pathname, filteredTree]);
+	}, []);
 
 	// Compute rect from hovered element, falling back to active element
 	useLayoutEffect(() => {
@@ -274,27 +252,6 @@ export function Sidebar({
 		>
 			<div className="border-stroke-soft-100 border-b px-3 py-3 pb-1 lg:hidden">
 				<ProductSwitcher pathname={pathname} />
-			</div>
-
-			{/* Search button area */}
-			<div className="flex items-center gap-2 px-3 py-2">
-				<button
-					type="button"
-					onClick={() => setIsSearchOpen(true)}
-					className="flex h-8.5 flex-1 items-center gap-2 rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-2.5 text-text-sub-600 text-xs transition-all hover:border-black/10 dark:hover:border-white/10"
-				>
-					<Search className="h-3.5 w-3.5" />
-					<span className="flex-1 text-left">Search...</span>
-					<kbd className="pointer-events-none hidden h-5 select-none items-center gap-0.5 rounded border border-stroke-soft-100 bg-bg-weak-50 px-1.5 font-medium font-mono text-[10px] sm:inline-flex">
-						<span className="text-xs">⌘</span>K
-					</kbd>
-				</button>
-				<button
-					type="button"
-					className="flex h-8.5 w-8.5 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-all hover:border-black/10 hover:text-[#171717] dark:hover:border-white/10 dark:hover:text-white"
-				>
-					<Sparkles className="h-3.5 w-3.5" />
-				</button>
 			</div>
 
 			{/* Navigation tree */}
@@ -355,12 +312,6 @@ export function Sidebar({
 					</div>
 				</SidebarContext.Provider>
 			</nav>
-
-			<SearchDialog
-				open={isSearchOpen}
-				onOpenChange={setIsSearchOpen}
-				tree={filteredTree}
-			/>
 		</aside>
 	);
 }

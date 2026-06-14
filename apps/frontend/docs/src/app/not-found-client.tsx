@@ -12,7 +12,7 @@ import {
 	Webhook,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
 interface NotFoundClientProps {
 	tree: PageTreeItem[];
@@ -159,11 +159,13 @@ export function NotFoundClient({ tree }: NotFoundClientProps) {
 			</div>
 
 			{/* Search Dialog portal instance for immediate click trigger */}
-			<SearchDialog
-				open={isSearchOpen}
-				onOpenChange={setIsSearchOpen}
-				tree={tree}
-			/>
+			<Suspense fallback={null}>
+				<SearchDialog
+					open={isSearchOpen}
+					onOpenChange={setIsSearchOpen}
+					tree={tree}
+				/>
+			</Suspense>
 		</div>
 	);
 }

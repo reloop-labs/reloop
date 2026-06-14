@@ -33,6 +33,7 @@
 		"@reloop/tailwind": "workspace:*",
 		"next-mdx-remote": "catalog:ui",
 		"next-themes": "catalog:ui",
+		"nuqs": "catalog:ui",
 		"react": "catalog:ui",
 		"react-dom": "catalog:ui",
 		"remark-gfm": "^4.0.1",

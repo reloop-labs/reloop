@@ -2,8 +2,9 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronRight, FileText, Search } from "lucide-react";
+import { FileText, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import * as React from "react";
 import { cn } from "../../lib/cn";
 import type { PageTreeItem } from "../../lib/types";
@@ -22,7 +23,7 @@ interface SearchResult {
 }
 
 export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
-	const [query, setQuery] = React.useState("");
+	const [query, setQuery] = useQueryState("q", { defaultValue: "" });
 	const [results, setResults] = React.useState<SearchResult[]>([]);
 	const [selectedIndex, setSelectedIndex] = React.useState(0);
 	const router = useRouter();
@@ -67,6 +68,15 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 		setSelectedIndex(0);
 	}, [query, allPages]);
 
+	const handleSelect = React.useCallback(
+		(url: string) => {
+			router.push(url);
+			onOpenChange(false);
+			setQuery("");
+		},
+		[router, onOpenChange, setQuery],
+	);
+
 	// Keyboard navigation
 	React.useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -88,13 +98,7 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 			window.addEventListener("keydown", handleKeyDown);
 		}
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [open, results, selectedIndex]);
-
-	const handleSelect = (url: string) => {
-		router.push(url);
-		onOpenChange(false);
-		setQuery("");
-	};
+	}, [open, results, selectedIndex, handleSelect]);
 
 	const groupedResults = React.useMemo(() => {
 		const groups: Array<{
@@ -132,12 +136,19 @@ export function SearchDialog({ open, onOpenChange, tree }: SearchDialogProps) {
 							/>
 						</Dialog.Overlay>
 						<Dialog.Content asChild>
-							<div className="fixed inset-0 z-50 flex items-start justify-center px-4 pt-[15vh]">
+							<div
+								className="fixed inset-0 z-50 flex items-start justify-center px-4 pt-[15vh]"
+								onClick={(e) => {
+									if (e.target === e.currentTarget) {
+										onOpenChange(false);
+									}
+								}}
+							>
 								<motion.div
-									initial={{ opacity: 0, scale: 0.95, y: -20 }}
+									initial={{ opacity: 0, scale: 0.97, y: 24 }}
 									animate={{ opacity: 1, scale: 1, y: 0 }}
-									exit={{ opacity: 0, scale: 0.95, y: -20 }}
-									transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+									exit={{ opacity: 0, scale: 0.97, y: 24 }}
+									transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
 									className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-2xl dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]"
 								>
 									<Dialog.Title className="sr-only">

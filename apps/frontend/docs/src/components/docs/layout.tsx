@@ -3,9 +3,10 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { Logo } from "@reloop/ui/logo";
 import { motion } from "framer-motion";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, Suspense, useEffect, useState } from "react";
 import type { PageTreeItem } from "../../lib/types";
 import { Navbar } from "./navbar";
+import { SearchDialog } from "./search-dialog";
 import { Sidebar } from "./sidebar";
 
 interface DocsLayoutProps {
@@ -16,6 +17,19 @@ interface DocsLayoutProps {
 
 export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 	const [open, setOpen] = useState(false);
+	const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+	// Keyboard shortcuts
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+				e.preventDefault();
+				setIsSearchOpen(true);
+			}
+		};
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, []);
 
 	return (
 		<div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
@@ -29,7 +43,10 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 				</div>
 				{/* Navigation Row - Fluid on all screens */}
 				<div className="h-full flex-1">
-					<Navbar onMobileMenuClick={() => setOpen(true)} />
+					<Navbar
+						onMobileMenuClick={() => setOpen(true)}
+						onSearchClick={() => setIsSearchOpen(true)}
+					/>
 				</div>
 			</header>
 
@@ -95,6 +112,14 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 					</div>
 				</main>
 			</div>
+
+			<Suspense fallback={null}>
+				<SearchDialog
+					open={isSearchOpen}
+					onOpenChange={setIsSearchOpen}
+					tree={tree}
+				/>
+			</Suspense>
 		</div>
 	);
 }

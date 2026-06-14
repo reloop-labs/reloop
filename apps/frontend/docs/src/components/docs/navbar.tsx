@@ -19,8 +19,10 @@ const tabColors: Record<string, string> = {
 
 export function Navbar({
 	onMobileMenuClick,
+	onSearchClick,
 }: {
 	onMobileMenuClick: () => void;
+	onSearchClick?: () => void;
 }) {
 	const pathname = usePathname();
 	const tabs = navigationTabs;
@@ -143,6 +145,18 @@ export function Navbar({
 
 			<div className="flex shrink-0 items-center gap-2">
 				<div className="flex items-center gap-2">
+					{onSearchClick && (
+						<motion.button
+							type="button"
+							onClick={onSearchClick}
+							className="flex h-9 w-9 items-center justify-center rounded-full border border-stroke-soft-100 hover:text-[#171717] dark:hover:bg-white/5 dark:hover:text-white"
+							title="Search (⌘K)"
+							whileHover={{ scale: 1.05 }}
+							whileTap={{ scale: 0.95 }}
+						>
+							<Icon name="search" className="h-4 w-4" />
+						</motion.button>
+					)}
 					<Link
 						href="https://github.com/reloop-labs/reloop"
 						target="_blank"
