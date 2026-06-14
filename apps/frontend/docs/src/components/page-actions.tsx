@@ -1,6 +1,5 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
 import {
 	Box,
 	Check,
@@ -120,42 +119,17 @@ export function PageActions({
 							onClick={() => setOpen(false)}
 						/>
 						<div className="absolute top-full right-0 z-50 mt-1 w-[340px] rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-1.5 shadow-lg dark:bg-[#0a0a0a]">
-							<AnimatePresence>
-								{hoverIdx !== undefined && activeItem && (
-									<motion.div
-										className="absolute rounded-xl bg-bg-soft-100 dark:bg-white/5"
-										initial={{
-											pointerEvents: "none",
-											width,
-											height,
-											left,
-											top,
-											opacity: 0,
-										}}
-										animate={{
-											pointerEvents: "none",
-											width,
-											height,
-											left,
-											top,
-											opacity: 1,
-										}}
-										exit={{
-											pointerEvents: "none",
-											opacity: 0,
-											width,
-											height,
-											left,
-											top,
-										}}
-										transition={{
-											type: "spring",
-											bounce: 0,
-											duration: 0.2,
-										}}
-									/>
-								)}
-							</AnimatePresence>
+							{hoverIdx !== undefined && activeItem && (
+								<div
+									className="pointer-events-none absolute rounded-xl bg-bg-soft-100 transition-all duration-200 ease-out dark:bg-white/5"
+									style={{
+										width,
+										height,
+										transform: `translate3d(${left}px, ${top}px, 0)`,
+										opacity: 1,
+									}}
+								/>
+							)}
 
 							<button
 								type="button"

@@ -1,8 +1,6 @@
 "use client";
 
-import * as Dialog from "@radix-ui/react-dialog";
 import { Logo } from "@reloop/ui/logo";
-import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { type ReactNode, Suspense, useEffect, useState } from "react";
 import type { PageTreeItem } from "../../lib/types";
@@ -36,6 +34,16 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, []);
 
+	// Close mobile drawer on Escape
+	useEffect(() => {
+		if (!open) return;
+		const handleKey = (e: KeyboardEvent) => {
+			if (e.key === "Escape") setOpen(false);
+		};
+		window.addEventListener("keydown", handleKey);
+		return () => window.removeEventListener("keydown", handleKey);
+	}, [open]);
+
 	return (
 		<div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
 			{/* Unified Header - Borderless */}
@@ -56,49 +64,44 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 			</header>
 
 			<div className="flex flex-1 flex-row overflow-hidden bg-bg-weak-50 dark:bg-black">
-				{/* Mobile Drawer */}
-				<Dialog.Root open={open} onOpenChange={setOpen}>
-					<Dialog.Portal>
-						<Dialog.Overlay asChild>
-							<motion.div
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								className="fixed inset-0 z-50 bg-black/15 backdrop-blur-[2px] dark:bg-black/40"
-							/>
-						</Dialog.Overlay>
-						<Dialog.Content asChild>
-							<motion.div
-								initial={{ x: "-100%" }}
-								animate={{ x: 0 }}
-								exit={{ x: "-100%" }}
-								transition={{ type: "spring", damping: 25, stiffness: 200 }}
-								className="fixed inset-y-0 left-0 z-50 w-72 border-stroke-soft-100 border-r bg-bg-white-0 p-0 focus:outline-none dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]"
-							>
-								<Dialog.Title className="sr-only">
-									Documentation Navigation
-								</Dialog.Title>
-								<div className="flex h-12 items-center border-stroke-soft-100 border-b px-4 dark:border-stroke-soft-100/40">
-									<a
-										href="/"
-										className="flex items-center"
-										onClick={() => setOpen(false)}
-									>
-										<Logo className="w-10" />
-									</a>
-								</div>
-								<div className="h-[calc(100vh-3rem)] overflow-y-auto">
-									<Sidebar
-										tree={tree}
-										isMobile
-										onLinkClick={() => setOpen(false)}
-										pathname={pathname}
-									/>
-								</div>
-							</motion.div>
-						</Dialog.Content>
-					</Dialog.Portal>
-				</Dialog.Root>
+				{/* Mobile Drawer — CSS transitions only, no framer-motion */}
+				{/* Overlay */}
+				<div
+					className={`fixed inset-0 z-50 bg-black/15 backdrop-blur-[2px] transition-opacity duration-300 dark:bg-black/40 ${
+						open
+							? "pointer-events-auto opacity-100"
+							: "pointer-events-none opacity-0"
+					}`}
+					onClick={() => setOpen(false)}
+					aria-hidden={!open}
+				/>
+				{/* Drawer panel */}
+				<div
+					role="dialog"
+					aria-modal={open}
+					aria-label="Documentation Navigation"
+					className={`fixed inset-y-0 left-0 z-50 w-72 border-stroke-soft-100 border-r bg-bg-white-0 p-0 transition-transform duration-300 ease-out focus:outline-none dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a] ${
+						open ? "translate-x-0" : "-translate-x-full"
+					}`}
+				>
+					<div className="flex h-12 items-center border-stroke-soft-100 border-b px-4 dark:border-stroke-soft-100/40">
+						<a
+							href="/"
+							className="flex items-center"
+							onClick={() => setOpen(false)}
+						>
+							<Logo className="w-10" />
+						</a>
+					</div>
+					<div className="h-[calc(100vh-3rem)] overflow-y-auto">
+						<Sidebar
+							tree={tree}
+							isMobile
+							onLinkClick={() => setOpen(false)}
+							pathname={pathname}
+						/>
+					</div>
+				</div>
 
 				{/* Desktop Sidebar - Only visible on LG+ */}
 				<div className="hidden shrink-0 lg:flex lg:w-72">

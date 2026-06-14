@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { AnimatePresence, motion } from "framer-motion";
 import type React from "react";
 
 interface AnimatedHoverBackgroundProps {
@@ -13,41 +12,21 @@ export const AnimatedHoverBackground: React.FC<
 	AnimatedHoverBackgroundProps
 > = ({ rect, className }) => {
 	return (
-		<AnimatePresence>
-			{rect && (
-				<motion.div
-					className={cn(
-						"pointer-events-none absolute left-0 top-0 z-0 rounded-lg bg-neutral-alpha-10",
-						className,
-					)}
-					style={{
-						width: rect.width,
-						height: rect.height,
-						willChange: "transform, opacity",
-					}}
-					initial={{
-						x: rect.left,
-						y: rect.top,
-						opacity: 0,
-					}}
-					animate={{
-						x: rect.left,
-						y: rect.top,
-						opacity: 1,
-					}}
-					exit={{
-						x: rect.left,
-						y: rect.top,
-						opacity: 0,
-					}}
-					transition={{
-						type: "spring",
-						bounce: 0,
-						duration: 0.2,
-					}}
-				/>
+		<div
+			className={cn(
+				"pointer-events-none absolute left-0 top-0 z-0 rounded-lg bg-neutral-alpha-10 transition-all duration-200 ease-out",
+				className,
 			)}
-		</AnimatePresence>
+			style={{
+				width: rect ? rect.width : 0,
+				height: rect ? rect.height : 0,
+				transform: rect
+					? `translate3d(${rect.left}px, ${rect.top}px, 0)`
+					: undefined,
+				opacity: rect ? 1 : 0,
+				willChange: "transform, opacity",
+			}}
+		/>
 	);
 };
 

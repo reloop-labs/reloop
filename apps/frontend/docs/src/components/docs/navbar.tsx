@@ -4,7 +4,6 @@ import { navigationTabs } from "@reloop/fe-docs/lib/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -82,27 +81,23 @@ export function Navbar({
 								}}
 								onPointerEnter={() => setHoveredTab(tab.title)}
 							>
-								{/* Shared sliding hover/active pill background */}
+								{/* Pill background — CSS only */}
 								{currentHighlighted === tab.title && (
-									<motion.div
-										layoutId="nav-pill"
-										className="-z-10 absolute inset-x-1 inset-y-2 rounded-lg"
+									<div
+										className="-z-10 absolute inset-x-1 inset-y-2 rounded-lg transition-all duration-200"
 										style={{
 											backgroundColor: active
 												? `color-mix(in srgb, ${color} 12%, transparent)`
 												: `color-mix(in srgb, ${color} 8%, transparent)`,
 										}}
-										transition={{ type: "spring", stiffness: 350, damping: 30 }}
 									/>
 								)}
 
 								{/* Active bottom underline */}
 								{active && (
-									<motion.div
-										layoutId="nav-active-underline"
+									<div
 										className="absolute right-1 bottom-0 left-1 h-[2px] rounded-full"
 										style={{ backgroundColor: color }}
-										transition={{ type: "spring", stiffness: 350, damping: 30 }}
 									/>
 								)}
 
@@ -129,13 +124,11 @@ export function Navbar({
 			<div className="flex shrink-0 items-center gap-2">
 				<div className="flex items-center gap-2">
 					{onSearchClick && (
-						<motion.button
+						<button
 							type="button"
 							onClick={onSearchClick}
-							className="flex h-9 w-9 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 text-xs transition-all hover:border-black/15 hover:text-[#171717] sm:w-48 sm:justify-between sm:px-3 dark:hover:border-white/15 dark:hover:text-white"
+							className="flex h-9 w-9 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 text-xs transition-all hover:scale-[1.02] hover:border-black/15 hover:text-[#171717] active:scale-[0.98] sm:w-48 sm:justify-between sm:px-3 dark:hover:border-white/15 dark:hover:text-white"
 							title="Search (⌘K)"
-							whileHover={{ scale: 1.02 }}
-							whileTap={{ scale: 0.98 }}
 						>
 							<div className="flex items-center gap-1.5">
 								<Icon name="search" className="h-4 w-4 shrink-0" />
@@ -146,7 +139,7 @@ export function Navbar({
 							<kbd className="pointer-events-none hidden h-5 select-none items-center gap-0.5 rounded border border-stroke-soft-100 bg-bg-weak-50 px-1.5 font-medium font-mono text-[9px] leading-none sm:inline-flex">
 								<span className="text-[10px]">⌘</span>K
 							</kbd>
-						</motion.button>
+						</button>
 					)}
 					<Link
 						href="https://github.com/reloop-labs/reloop"
@@ -185,15 +178,14 @@ function ThemeToggle() {
 	const isDark = resolvedTheme === "dark";
 
 	return (
-		<motion.button
+		<button
 			type="button"
 			onClick={() => setTheme(isDark ? "light" : "dark")}
-			className="flex h-9 w-9 items-center justify-center rounded-full border border-stroke-soft-100 hover:text-[#171717] dark:hover:bg-white/5 dark:hover:text-white"
+			className="flex h-9 w-9 items-center justify-center rounded-full border border-stroke-soft-100 transition-transform hover:scale-105 hover:text-[#171717] active:scale-95 dark:hover:bg-white/5 dark:hover:text-white"
 			title={isDark ? "Switch to light theme" : "Switch to dark theme"}
-			whileHover={{ scale: 1.05 }}
-			whileTap={{ scale: 0.95 }}
 		>
 			<Icon name={isDark ? "sun" : "moon"} className="h-4 w-4" />
-		</motion.button>
+		</button>
 	);
 }
+
