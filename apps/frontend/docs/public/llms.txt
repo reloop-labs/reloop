@@ -19,48 +19,6 @@ Important notes:
 ## Quickstart Guides
 
 - [Node.js](https://docs.reloop.dev/docs/quickstart/nodejs): Get started with Reloop using Node.js
-  - [Next.js](https://docs.reloop.dev/docs/quickstart/nodejs/nextjs): Next.js integration guide
-  - [Remix](https://docs.reloop.dev/docs/quickstart/nodejs/remix): Remix integration guide
-  - [Nuxt](https://docs.reloop.dev/docs/quickstart/nodejs/nuxt): Nuxt integration guide
-  - [Express](https://docs.reloop.dev/docs/quickstart/nodejs/express): Express.js integration guide
-  - [RedwoodJS](https://docs.reloop.dev/docs/quickstart/nodejs/redwoodjs): RedwoodJS integration guide
-  - [Hono](https://docs.reloop.dev/docs/quickstart/nodejs/hono): Hono integration guide
-  - [Bun](https://docs.reloop.dev/docs/quickstart/nodejs/bun): Bun integration guide
-  - [Astro](https://docs.reloop.dev/docs/quickstart/nodejs/astro): Astro integration guide
-- [Serverless](https://docs.reloop.dev/docs/quickstart/serverless): Deploy Reloop on serverless platforms
-  - [Vercel Functions](https://docs.reloop.dev/docs/quickstart/serverless/vercel-functions): Vercel Functions integration
-  - [Supabase Edge Functions](https://docs.reloop.dev/docs/quickstart/serverless/supabase-edge-functions): Supabase Edge Functions integration
-  - [Cloudflare Workers](https://docs.reloop.dev/docs/quickstart/serverless/cloudflare-workers): Cloudflare Workers integration
-  - [Deno Deploy](https://docs.reloop.dev/docs/quickstart/serverless/deno-deploy): Deno Deploy integration
-  - [AWS Lambda](https://docs.reloop.dev/docs/quickstart/serverless/aws-lambda): AWS Lambda integration
-- [PHP](https://docs.reloop.dev/docs/quickstart/php): PHP SDK quickstart
-  - [Symphony](https://docs.reloop.dev/docs/quickstart/php/symphony): Symphony framework integration
-  - [Laravel](https://docs.reloop.dev/docs/quickstart/php/laravel): Laravel integration guide
-- [Ruby](https://docs.reloop.dev/docs/quickstart/ruby): Ruby SDK quickstart
-  - [Rails](https://docs.reloop.dev/docs/quickstart/ruby/rails): Ruby on Rails integration
-  - [Sinatra](https://docs.reloop.dev/docs/quickstart/ruby/sinatra): Sinatra integration
-- [Python](https://docs.reloop.dev/docs/quickstart/python): Python SDK quickstart
-  - [Flask](https://docs.reloop.dev/docs/quickstart/python/flask): Flask integration guide
-  - [FastAPI](https://docs.reloop.dev/docs/quickstart/python/fastapi): FastAPI integration guide
-- [Go](https://docs.reloop.dev/docs/quickstart/go): Go SDK quickstart
-- [Rust](https://docs.reloop.dev/docs/quickstart/rust): Rust SDK quickstart
-  - [Axum](https://docs.reloop.dev/docs/quickstart/rust/axum): Axum framework integration
-- [Elixir](https://docs.reloop.dev/docs/quickstart/elixir): Elixir SDK quickstart
-  - [Phoenix](https://docs.reloop.dev/docs/quickstart/elixir/phoenix): Phoenix framework integration
-- [Java](https://docs.reloop.dev/docs/quickstart/java): Java SDK quickstart
-- [.NET](https://docs.reloop.dev/docs/quickstart/dotnet): .NET SDK quickstart
-- [CLI](https://docs.reloop.dev/docs/quickstart/cli): Command-line tool quickstart
-- [SMTP](https://docs.reloop.dev/docs/quickstart/smtp): Send emails via SMTP relay
-  - [Auth0](https://docs.reloop.dev/docs/quickstart/smtp/auth0): Auth0 SMTP integration
-  - [Customer.io](https://docs.reloop.dev/docs/quickstart/smtp/customer-io): Customer.io SMTP integration
-  - [Django](https://docs.reloop.dev/docs/quickstart/smtp/django): Django SMTP integration
-  - [Laravel](https://docs.reloop.dev/docs/quickstart/smtp/laravel): Laravel SMTP integration
-  - [Nodemailer](https://docs.reloop.dev/docs/quickstart/smtp/nodemailer): Nodemailer SMTP integration
-  - [PHPMailer](https://docs.reloop.dev/docs/quickstart/smtp/phpmailer): PHPMailer SMTP integration
-  - [Rails](https://docs.reloop.dev/docs/quickstart/smtp/rails): Rails SMTP integration
-  - [Supabase](https://docs.reloop.dev/docs/quickstart/smtp/supabase): Supabase SMTP integration
-  - [WordPress](https://docs.reloop.dev/docs/quickstart/smtp/wordpress): WordPress SMTP integration
-  - [NextAuth](https://docs.reloop.dev/docs/quickstart/smtp/nextauth): NextAuth SMTP integration
 
 ## Learn
 
