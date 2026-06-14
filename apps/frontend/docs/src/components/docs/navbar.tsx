@@ -4,10 +4,10 @@ import { navigationTabs } from "@reloop/fe-docs/lib/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const tabColors: Record<string, string> = {
 	Documentation: "#3b82f6",
@@ -24,6 +24,23 @@ export function Navbar({
 	const pathname = usePathname();
 	const tabs = navigationTabs;
 	const [hoveredTab, setHoveredTab] = useState<string | null>(null);
+	const [stars, setStars] = useState<string>("GitHub");
+
+	useEffect(() => {
+		fetch("https://api.github.com/repos/reloop-labs/reloop")
+			.then((res) => res.json())
+			.then((data) => {
+				if (data && typeof data.stargazers_count === "number") {
+					const count = data.stargazers_count;
+					if (count >= 1000) {
+						setStars(`${(count / 1000).toFixed(1)}k`);
+					} else {
+						setStars(`${count}`);
+					}
+				}
+			})
+			.catch(() => {});
+	}, []);
 
 	const activeTab =
 		tabs.find((tab) => {
@@ -124,20 +141,21 @@ export function Navbar({
 			</div>
 
 			<div className="flex shrink-0 items-center gap-2">
-				<div className="flex items-center gap-3">
+				<div className="flex items-center gap-4">
 					<Link
-						href="https://dashboard.reloop.sh/login"
-						className="hidden font-medium text-sm text-text-sub-600 transition-colors hover:text-[#171717] sm:block dark:hover:text-white"
+						href="https://github.com/reloop-labs/reloop"
+						target="_blank"
+						rel="noreferrer"
+						className="hidden items-center gap-1.5 font-medium text-sm text-text-sub-600 transition-colors hover:text-[#171717] sm:flex dark:hover:text-white"
 					>
-						Sign In
+						<Icon name="social-github" className="h-4 w-4 shrink-0" />
+						{stars}
 					</Link>
 					<Link
 						href="https://dashboard.reloop.sh/signup"
 						className="inline-flex h-9 items-center justify-center rounded-full bg-[#171717] px-5 font-semibold text-sm text-white transition-all hover:opacity-90 active:scale-[0.98] dark:bg-white dark:text-black"
 					>
-						{/* Shorten text on very small screens */}
-						<span className="xs:inline hidden">Get Started</span>
-						<span className="xs:hidden">Start</span>
+						Get Started
 					</Link>
 				</div>
 			</div>

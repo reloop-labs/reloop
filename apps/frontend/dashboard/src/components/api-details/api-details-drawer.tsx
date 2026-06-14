@@ -344,7 +344,12 @@ export const ApiDetailsDrawer = ({
 											className="size-3.5 shrink-0 transition-colors duration-150"
 											fill="currentColor"
 											xmlns="http://www.w3.org/2000/svg"
-											style={{ color: isHighlighted && highlightedPillPosition ? "#ffffff" : brandColor }}
+											style={{
+												color:
+													isHighlighted && highlightedPillPosition
+														? "#ffffff"
+														: brandColor,
+											}}
 											aria-hidden
 										>
 											<path d={icon.path} />
