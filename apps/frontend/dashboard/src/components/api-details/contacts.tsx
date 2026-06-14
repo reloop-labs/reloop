@@ -782,25 +782,12 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 			</Tooltip.Provider>
 
 			<Drawer.Content className="max-w-[560px]">
-				<Drawer.Header
-					className="border-stroke-soft-200 border-b"
-					showCloseButton={false}
-				>
+				<Drawer.Header className="pb-5!">
 					<div className="flex flex-1 flex-col gap-1">
-						<Drawer.Title>Contacts API</Drawer.Title>
-						<p className="text-paragraph-xs text-text-sub-600">
-							Create, retrieve, update, and delete contacts programmatically.
-						</p>
+						<Drawer.Title className="font-semibold text-2xl">
+							Contacts API
+						</Drawer.Title>
 					</div>
-					<Drawer.Close asChild>
-						<button
-							type="button"
-							className="self-start rounded-lg border border-stroke-soft-200 p-1.5 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
-							aria-label="Close"
-						>
-							<Icon name="cross" className="h-4 w-4" />
-						</button>
-					</Drawer.Close>
 				</Drawer.Header>
 
 				{/* ── Body ────────────────────────────────────────────── */}
@@ -814,7 +801,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 					{/* Language Tabs */}
 					<div
 						ref={containerRef}
-						className="scrollbar-none relative flex min-w-0 items-center overflow-x-auto px-6"
+						className="scrollbar-none relative flex min-w-0 items-center overflow-x-auto px-4"
 						style={{
 							scrollbarWidth: "none",
 							msOverflowStyle: "none",
@@ -826,7 +813,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 							const brandColor = icon ? `#${icon.hex}` : undefined;
 							const isHighlighted = index === highlightedTabIndex;
 
-							let textColorStyle: React.CSSProperties | undefined = undefined;
+							let textColorStyle: React.CSSProperties | undefined;
 							if (isHighlighted) {
 								textColorStyle = { color: "#ffffff" };
 							} else if (isActive && brandColor) {

@@ -202,7 +202,7 @@ export function CopyCodeBlock({
 									className="flex items-center gap-1 font-semibold text-[13px] text-text-strong-950 hover:underline dark:text-white shrink-0"
 								>
 									{title}
-									<Icon name="arrow-top-right" className="size-3 text-text-sub-400 stroke-[2.5]" />
+									<Icon name="arrow-top-right" className="h-2.5 w-2.5 text-text-sub-400 stroke-[2.5]" />
 								</a>
 							) : (
 								<span className="font-semibold text-[13px] text-text-strong-950 dark:text-white shrink-0">
@@ -309,7 +309,7 @@ export function CopyCodeBlock({
 										className="flex items-center gap-1 font-semibold text-[13px] text-text-strong-950 hover:underline dark:text-white"
 									>
 										{title}
-										<Icon name="arrow-top-right" className="size-3 text-text-sub-400 stroke-[2.5]" />
+										<Icon name="arrow-top-right" className="h-2.5 w-2.5 text-text-sub-400 stroke-[2.5]" />
 									</a>
 								) : (
 									<span className="font-semibold text-[13px] text-text-strong-950 dark:text-white">
