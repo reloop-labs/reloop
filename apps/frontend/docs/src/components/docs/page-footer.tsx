@@ -5,7 +5,7 @@ import { cn } from "@reloop/ui/cn";
 import { ChevronLeft, ChevronRight, ThumbsDown, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { siGithub, siX, siYoutube } from "simple-icons";
+import { Footer } from "../footer";
 
 interface PageFooterProps {
 	previous?: PageNode;
@@ -16,9 +16,9 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 	const [feedback, setFeedback] = useState<"yes" | "no" | null>(null);
 
 	return (
-		<footer className="mt-6 space-y-12">
+		<section className="mt-6 space-y-12">
 			{/* Feedback Section */}
-			<div className="flex flex-col items-center justify-between gap-4 border-stroke-soft-100 border-t pt-12 sm:flex-row">
+			<div className="flex flex-col items-center justify-between gap-4 pt-6 sm:flex-row">
 				<p className="font-medium text-[15px] text-text-sub-600">
 					Was this page helpful?
 				</p>
@@ -87,56 +87,7 @@ export function PageFooter({ previous, next }: PageFooterProps) {
 				)}
 			</div>
 
-			{/* Social Footer */}
-			<div className="flex items-center gap-6 border-stroke-soft-100 border-t pt-12 pb-16">
-				<Link
-					href="https://x.com/reloop"
-					className="text-text-sub-600 transition-colors hover:text-[#171717] dark:hover:text-white"
-				>
-					<svg
-						role="img"
-						viewBox="0 0 24 24"
-						className="h-5 w-5 fill-current"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path d={siX.path} />
-					</svg>
-				</Link>
-				<Link
-					href="https://github.com/reloop"
-					className="text-text-sub-600 transition-colors hover:text-[#171717] dark:hover:text-white"
-				>
-					<svg
-						role="img"
-						viewBox="0 0 24 24"
-						className="h-5 w-5 fill-current"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path d={siGithub.path} />
-					</svg>
-				</Link>
-				<Link
-					href="https://youtube.com/@reloop"
-					className="text-text-sub-600 transition-colors hover:text-[#171717] dark:hover:text-white"
-				>
-					<svg
-						role="img"
-						viewBox="0 0 24 24"
-						className="h-5 w-5 fill-current"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path d={siYoutube.path} />
-					</svg>
-				</Link>
-				<Link
-					href="https://reloop.dev"
-					className="text-text-sub-600 transition-colors hover:text-[#171717] dark:hover:text-white"
-				>
-					<div className="rounded-full border border-current p-0.5">
-						<div className="h-3.5 w-3.5 rounded-full border border-current" />
-					</div>
-				</Link>
-			</div>
-		</footer>
+			<Footer />
+		</section>
 	);
 }
