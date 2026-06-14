@@ -2,6 +2,7 @@
 
 import type { PageNode } from "@reloop/fe-docs/lib/types";
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { ChevronLeft, ChevronRight, ThumbsDown, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -10,44 +11,59 @@ import { Footer } from "../footer";
 interface PageFooterProps {
 	previous?: PageNode;
 	next?: PageNode;
+	editUrl?: string;
 }
 
-export function PageFooter({ previous, next }: PageFooterProps) {
+export function PageFooter({ previous, next, editUrl }: PageFooterProps) {
 	const [feedback, setFeedback] = useState<"yes" | "no" | null>(null);
 
 	return (
 		<section className="mt-6 space-y-12">
-			{/* Feedback Section */}
-			<div className="flex flex-col items-center justify-between gap-4 pt-6 sm:flex-row">
-				<p className="font-medium text-[15px] text-text-sub-600">
-					Was this page helpful?
-				</p>
-				<div className="flex items-center gap-3">
-					<button
-						type="button"
-						onClick={() => setFeedback("yes")}
-						className={cn(
-							"flex items-center gap-2 rounded-full border border-stroke-soft-100 px-5 py-2 font-medium text-[14px] transition-all hover:bg-bg-weak-50/50",
-							feedback === "yes" &&
-								"border-[#171717] bg-black/5 text-[#171717] dark:border-white dark:bg-white/5 dark:text-white",
-						)}
-					>
-						<ThumbsUp className="h-4 w-4" />
-						Yes
-					</button>
-					<button
-						type="button"
-						onClick={() => setFeedback("no")}
-						className={cn(
-							"flex items-center gap-2 rounded-full border border-stroke-soft-100 px-5 py-2 font-medium text-[14px] transition-all hover:bg-bg-weak-50/50",
-							feedback === "no" &&
-								"border-[#171717] bg-black/5 text-[#171717] dark:border-white dark:bg-white/5 dark:text-white",
-						)}
-					>
-						<ThumbsDown className="h-4 w-4" />
-						No
-					</button>
+			{/* Feedback & Edit Section */}
+			<div className="flex flex-col gap-4 pt-6 sm:flex-row sm:items-center sm:justify-between">
+				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+					<p className="font-medium text-[15px] text-text-sub-600">
+						Was this page helpful?
+					</p>
+					<div className="flex items-center gap-2.5">
+						<button
+							type="button"
+							onClick={() => setFeedback("yes")}
+							className={cn(
+								"flex items-center gap-1.5 rounded-full border border-stroke-soft-100 px-4 py-1.5 font-medium text-[13.5px] transition-all hover:bg-bg-weak-50/50",
+								feedback === "yes" &&
+									"border-[#171717] bg-black/5 text-[#171717] dark:border-white dark:bg-white/5 dark:text-white",
+							)}
+						>
+							<ThumbsUp className="h-3.5 w-3.5" />
+							Yes
+						</button>
+						<button
+							type="button"
+							onClick={() => setFeedback("no")}
+							className={cn(
+								"flex items-center gap-1.5 rounded-full border border-stroke-soft-100 px-4 py-1.5 font-medium text-[13.5px] transition-all hover:bg-bg-weak-50/50",
+								feedback === "no" &&
+									"border-[#171717] bg-black/5 text-[#171717] dark:border-white dark:bg-white/5 dark:text-white",
+							)}
+						>
+							<ThumbsDown className="h-3.5 w-3.5" />
+							No
+						</button>
+					</div>
 				</div>
+
+				{editUrl && (
+					<a
+						href={editUrl}
+						target="_blank"
+						rel="noreferrer"
+						className="inline-flex items-center gap-1.5 font-medium text-[14px] text-text-sub-600 transition-colors hover:text-black dark:hover:text-white"
+					>
+						<Icon className="h-3.5 w-3.5" name="edit" />
+						Edit this page
+					</a>
+				)}
 			</div>
 
 			{/* Navigation Cards */}

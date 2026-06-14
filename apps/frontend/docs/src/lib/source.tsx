@@ -274,6 +274,9 @@ export const source = {
 					raw: fileContent,
 				},
 				url: `/${slugPath === "index" ? "introduction" : slugPath}`,
+				filePath: filePath.includes("content/docs")
+					? `apps/frontend/docs/content/docs${filePath.split("content/docs")[1]}`
+					: `apps/frontend/docs/content/docs/${slugPath}.mdx`,
 			};
 		} catch (error: any) {
 			console.error(
@@ -296,6 +299,7 @@ export const source = {
 					_apiData: null,
 				},
 				url: "#",
+				filePath: "",
 			};
 		}
 	},

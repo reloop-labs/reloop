@@ -178,7 +178,7 @@ export function Footer() {
 				<div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4">
 					{links.map((group) => (
 						<div key={group.group} className="space-y-3.5">
-							<h4 className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-wider dark:text-white/40">
+							<h4 className="font-semibold text-[12px] uppercase tracking-wider">
 								{group.group}
 							</h4>
 							<ul className="space-y-2.5">
@@ -189,7 +189,7 @@ export function Footer() {
 											{...(link.href.startsWith("http")
 												? { target: "_blank", rel: "noreferrer" }
 												: {})}
-											className="font-medium text-[#0a0d12]/65 text-[13.5px] transition-colors hover:text-[#0a0d12] dark:text-white/60 dark:hover:text-white"
+											className="font-medium text-[#0a0d12]/70 text-[13.5px] transition-colors hover:text-[#0a0d12] dark:text-white/60 dark:hover:text-white"
 										>
 											{link.title}
 										</Link>

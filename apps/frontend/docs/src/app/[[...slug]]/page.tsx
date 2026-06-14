@@ -322,7 +322,15 @@ export default async function Page(props: {
 								/>
 							</DocsBody>
 
-							<PageFooter previous={previous} next={next} />
+							<PageFooter
+								previous={previous}
+								next={next}
+								editUrl={
+									page.filePath
+										? `https://github.com/reloop-labs/reloop/edit/main/${page.filePath}`
+										: undefined
+								}
+							/>
 						</div>
 
 						{/* Right column: sticky code + response (API reference & webhook events) */}
