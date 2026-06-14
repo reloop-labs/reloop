@@ -98,7 +98,7 @@ export function DefaultSidebarFolder({
 						transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
 						style={{ overflow: "hidden" }}
 					>
-						<div className="mt-px ml-4 flex flex-col space-y-px border-stroke-soft-100/30 border-l pb-0.5 pl-4">
+						<div className="mt-px flex flex-col space-y-px border-stroke-soft-100/30 border-l pb-0.5 pl-3">
 							{node.children.map((child: PageTreeItem, index: number) => (
 								<DefaultSidebarSection
 									key={index}
