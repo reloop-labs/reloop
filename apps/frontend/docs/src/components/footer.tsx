@@ -134,45 +134,54 @@ const twitterUrl = "https://x.com/reloophq";
 
 export function Footer() {
 	return (
-		<footer>
-			{/* Top: CTA + link columns */}
-			<div className="flex flex-col gap-12 pt-5 pb-12 lg:flex-row lg:gap-20">
-				{/* Left — branding / CTA */}
-				<div className="lg:w-[300px] lg:shrink-0">
-					<Link href="/" className="flex items-center">
-						<Logo className="-ml-2 h-10 w-10 text-[#0a0d12] dark:text-white" />
-						<span className="font-semibold text-[18px] tracking-[0.04em]">
-							Reloop
-						</span>
-					</Link>
-					<p className="mt-2 max-w-[280px] font-medium text-[#0a0d12]/65 text-[15px] dark:text-white/60">
-						Open-source email infrastructure for modern applications. Use Reloop
-						hosted or self-host—no vendor lock-in.
-					</p>
-					<div className="mt-4 flex items-center gap-2">
+		<footer className="border-stroke-soft-100/60 border-t pt-10 pb-8 dark:border-white/5">
+			<div className="flex flex-col gap-10">
+				{/* Top Area: Logo, tagline, and socials */}
+				<div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-start">
+					<div className="space-y-2.5">
+						<Link href="/" className="flex items-center gap-1.5">
+							<Logo className="-ml-1 h-7 w-7 text-[#0a0d12] dark:text-white" />
+							<span className="font-semibold text-[#0a0d12] text-[17px] tracking-tight dark:text-white">
+								Reloop
+							</span>
+						</Link>
+						<p className="max-w-[420px] font-medium text-[#0a0d12]/65 text-[14px] leading-relaxed dark:text-white/60">
+							Open-source email infrastructure for modern applications. Use
+							Reloop hosted or self-host—no vendor lock-in.
+						</p>
+					</div>
+
+					<div className="flex items-center gap-2 pt-1">
 						<Link
 							href={twitterUrl}
 							target="_blank"
 							rel="noreferrer"
-							className="text-[#0a0d12]/40 transition-colors hover:text-[#0a0d12] dark:text-white/40 dark:hover:text-white"
+							className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-100/60 text-[#0a0d12]/40 transition-colors hover:bg-bg-weak-50/50 hover:text-[#0a0d12] dark:border-white/5 dark:text-white/40 dark:hover:bg-white/[0.02] dark:hover:text-white"
 						>
-							<Icon className="size-4.5" name="twitter" />
+							<Icon className="size-4" name="twitter" />
 						</Link>
 						<Link
 							href={githubUrl}
 							target="_blank"
 							rel="noreferrer"
-							className="text-[#0a0d12]/40 transition-colors hover:text-[#0a0d12] dark:text-white/40 dark:hover:text-white"
+							className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-100/60 text-[#0a0d12]/40 transition-colors hover:bg-bg-weak-50/50 hover:text-[#0a0d12] dark:border-white/5 dark:text-white/40 dark:hover:bg-white/[0.02] dark:hover:text-white"
 						>
-							<Icon className="size-4.5" name="social-github" />
+							<Icon className="size-4" name="social-github" />
 						</Link>
 					</div>
 				</div>
-				<div className="grid flex-1 grid-cols-2 gap-8 sm:grid-cols-4">
+
+				{/* Divider */}
+				<div className="h-px w-full bg-stroke-soft-100/60 dark:bg-white/5" />
+
+				{/* Middle Area: 4-Column Links Grid */}
+				<div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4">
 					{links.map((group) => (
-						<div key={group.group}>
-							<h4 className="font-semibold text-sm uppercase">{group.group}</h4>
-							<ul className="mt-4 flex flex-col gap-3.5">
+						<div key={group.group} className="space-y-3.5">
+							<h4 className="font-semibold text-[#0a0d12]/40 text-[11px] uppercase tracking-wider dark:text-white/40">
+								{group.group}
+							</h4>
+							<ul className="space-y-2.5">
 								{group.items.map((link) => (
 									<li key={link.title}>
 										<Link
@@ -180,7 +189,7 @@ export function Footer() {
 											{...(link.href.startsWith("http")
 												? { target: "_blank", rel: "noreferrer" }
 												: {})}
-											className="font-medium text-[#0a0d12]/65 text-[15px] hover:text-[#0a0d12] dark:text-white/60 dark:hover:text-white"
+											className="font-medium text-[#0a0d12]/65 text-[13.5px] transition-colors hover:text-[#0a0d12] dark:text-white/60 dark:hover:text-white"
 										>
 											{link.title}
 										</Link>
