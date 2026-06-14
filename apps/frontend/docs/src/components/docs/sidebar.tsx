@@ -325,7 +325,7 @@ export function Sidebar({
 				{/* Bottom Fade Gradient Overlay */}
 				<div
 					className={cn(
-						"-mt-6 pointer-events-none sticky right-0 bottom-0 left-0 z-20 h-6 bg-gradient-to-t to-transparent",
+						"pointer-events-none sticky right-0 bottom-0 left-0 z-20 mt-6 h-6 bg-gradient-to-t to-transparent",
 						gradientFromClass,
 					)}
 				/>
