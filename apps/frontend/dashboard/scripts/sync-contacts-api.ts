@@ -1,0 +1,288 @@
+import fs from "node:fs";
+import path from "node:path";
+
+const DOCS_DIR = path.resolve(
+	__dirname,
+	"../../docs/content/docs/api/contacts",
+);
+const DASHBOARD_FILE = path.resolve(
+	__dirname,
+	"../src/components/api-details/contacts.tsx",
+);
+
+interface CodeSample {
+	id: string;
+	lang: string;
+	label: string;
+	source: string;
+}
+
+const OP_FILES = {
+	add: "post-api-contacts-create.mdx",
+	get: "get-api-contacts-retrieve-by-contact_id.mdx",
+	list: "get-api-contacts-list.mdx",
+	update: "patch-api-contacts-by-contact_id.mdx",
+	delete: "delete-api-contacts-by-contact_id.mdx",
+};
+
+const LANG_MAP: Record<string, string> = {
+	node: "nodejs",
+	python: "python",
+	php: "php",
+	go: "go",
+	ruby: "ruby",
+	rust: "rust",
+	java: "java",
+	dotnet: "dotnet",
+	curl: "curl",
+};
+
+function parseCodeSamples(content: string, filePath: string): CodeSample[] {
+	const match = content.match(/^---\r?\n([\s\S]+?)\r?\n---/);
+	const fm = match?.[1];
+	if (!fm) {
+		console.warn(`No frontmatter found in ${filePath}`);
+		return [];
+	}
+
+	// Try JSON format first
+	const jsonMatch = fm.match(/codeSamples:\s*(\[[\s\S]*?\])(?:\r?\n|$)/);
+	const jsonStr = jsonMatch?.[1];
+	if (jsonStr) {
+		try {
+			return JSON.parse(jsonStr);
+		} catch (e) {
+			console.error(`Failed to parse JSON codeSamples in ${filePath}:`, e);
+		}
+	}
+
+	// Fallback to YAML line-by-line parsing
+	const samples: CodeSample[] = [];
+	const lines = fm.split(/\r?\n/);
+	let inCodeSamples = false;
+	let currentSample: Partial<CodeSample> | null = null;
+	let inSource = false;
+	let sourceLines: string[] = [];
+
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i];
+		if (line === undefined) continue;
+
+		if (inCodeSamples) {
+			const indentMatch = line.match(/^(\s*)/);
+			const indent = indentMatch ? indentMatch[0].length : 0;
+
+			// If we exit codeSamples (any line with less than 4 spaces indent, except empty lines)
+			if (line.trim() !== "" && indent < 4 && !line.startsWith("    ")) {
+				inCodeSamples = false;
+				if (currentSample && currentSample.id) {
+					currentSample.source = sourceLines.join("\n");
+					samples.push(currentSample as CodeSample);
+				}
+				currentSample = null;
+				continue;
+			}
+
+			if (line.startsWith("    - id:") || line.trim() === "    -") {
+				if (currentSample && currentSample.id) {
+					currentSample.source = sourceLines.join("\n");
+					samples.push(currentSample as CodeSample);
+				}
+				currentSample = {};
+				sourceLines = [];
+				inSource = false;
+
+				const idMatch = line.match(/- id:\s*(\S+)/);
+				const matchedId = idMatch?.[1];
+				if (matchedId) {
+					currentSample.id = matchedId;
+				}
+				continue;
+			}
+
+			if (currentSample) {
+				const idPropMatch = line.match(/^\s+id:\s*(\S+)/);
+				const matchedIdProp = idPropMatch?.[1];
+				if (matchedIdProp) {
+					currentSample.id = matchedIdProp;
+					continue;
+				}
+
+				const langMatch = line.match(/^\s+lang:\s*(\S+)/);
+				const matchedLang = langMatch?.[1];
+				if (matchedLang) {
+					currentSample.lang = matchedLang;
+					continue;
+				}
+
+				const labelMatch = line.match(/^\s+label:\s*(.+)/);
+				const matchedLabel = labelMatch?.[1];
+				if (matchedLabel) {
+					currentSample.label = matchedLabel.replace(/^['"]|['"]$/g, "");
+					continue;
+				}
+
+				if (line.match(/^\s+source:\s*\|-/)) {
+					inSource = true;
+					sourceLines = [];
+					continue;
+				}
+
+				if (inSource) {
+					const sourceIndent = indent;
+					if (line.trim() === "") {
+						sourceLines.push("");
+					} else if (sourceIndent >= 8) {
+						sourceLines.push(line.slice(8));
+					} else {
+						inSource = false;
+						i--; // reprocess line
+					}
+				}
+			}
+		} else if (line.startsWith("  codeSamples:")) {
+			inCodeSamples = true;
+		}
+	}
+
+	if (currentSample && currentSample.id) {
+		currentSample.source = sourceLines.join("\n");
+		samples.push(currentSample as CodeSample);
+	}
+
+	return samples;
+}
+
+function getFilename(lang: string, op: string): string {
+	if (lang === "java") {
+		const caps = op.charAt(0).toUpperCase() + op.slice(1);
+		return `${caps}Contact.java`;
+	}
+	if (lang === "dotnet") {
+		const caps = op.charAt(0).toUpperCase() + op.slice(1);
+		return `${caps}Contact.cs`;
+	}
+	const extMap: Record<string, string> = {
+		nodejs: "js",
+		python: "py",
+		php: "php",
+		go: "go",
+		ruby: "rb",
+		rust: "rs",
+		curl: "sh",
+	};
+	const ext = extMap[lang] || "js";
+	return `${op}_contact.${ext}`;
+}
+
+function formatCodeExamples(
+	examples: Record<string, Record<string, { filename: string; code: string }>>,
+): string {
+	// Keep the sort order consistent: nodejs, python, php, go, ruby, rust, java, dotnet, curl
+	const sortedLangs = [
+		"nodejs",
+		"python",
+		"php",
+		"go",
+		"ruby",
+		"rust",
+		"java",
+		"dotnet",
+		"curl",
+	];
+	const sortedOps = ["add", "get", "list", "update", "delete"];
+
+	let out = "const codeExamples = {\n";
+	for (const lang of sortedLangs) {
+		const ops = examples[lang];
+		if (!ops) continue;
+
+		out += `\t${lang}: {\n`;
+		for (const op of sortedOps) {
+			const data = ops[op];
+			if (!data) continue;
+
+			out += `\t\t${op}: {\n`;
+			out += `\t\t\tfilename: ${JSON.stringify(data.filename)},\n`;
+			const escapedCode = data.code
+				.replace(/\\/g, "\\\\")
+				.replace(/`/g, "\\`")
+				.replace(/\${/g, "\\${");
+			out += `\t\t\tcode: \`${escapedCode}\`,\n`;
+			out += "\t\t},\n";
+		}
+		out += "\t},\n";
+	}
+	out += "};";
+	return out;
+}
+
+function sync() {
+	console.log("Starting Contacts API sync...");
+
+	// Initialize structured examples object
+	// Format: { langId: { opId: { filename, code } } }
+	const examples: Record<
+		string,
+		Record<string, { filename: string; code: string }>
+	> = {};
+
+	// Populate structure for all languages
+	for (const dashboardLang of Object.values(LANG_MAP)) {
+		examples[dashboardLang] = {};
+	}
+
+	for (const [op, fileName] of Object.entries(OP_FILES)) {
+		const filePath = path.join(DOCS_DIR, fileName);
+		if (!fs.existsSync(filePath)) {
+			console.error(`MDX file does not exist: ${filePath}`);
+			process.exit(1);
+		}
+
+		console.log(`Parsing ${fileName}...`);
+		const content = fs.readFileSync(filePath, "utf-8");
+		const samples = parseCodeSamples(content, filePath);
+
+		for (const sample of samples) {
+			const dashboardLang = LANG_MAP[sample.id];
+			if (!dashboardLang) {
+				// Skip languages like elixir that are not supported in the dashboard contacts component
+				continue;
+			}
+
+			const target = examples[dashboardLang];
+			if (target) {
+				target[op] = {
+					filename: getFilename(dashboardLang, op),
+					code: sample.source.trim(),
+				};
+			}
+		}
+	}
+
+	// Read dashboard file
+	if (!fs.existsSync(DASHBOARD_FILE)) {
+		console.error(`Dashboard file does not exist: ${DASHBOARD_FILE}`);
+		process.exit(1);
+	}
+
+	let dashboardContent = fs.readFileSync(DASHBOARD_FILE, "utf-8");
+
+	const codeExamplesRegex =
+		/const codeExamples = \{[\s\S]*?\r?\n\};?(?=\s*\/\/ -{10,})/;
+	if (!codeExamplesRegex.test(dashboardContent)) {
+		console.error("Could not find const codeExamples block in dashboard file!");
+		process.exit(1);
+	}
+
+	const formattedBlock = formatCodeExamples(examples);
+	dashboardContent = dashboardContent.replace(
+		codeExamplesRegex,
+		formattedBlock,
+	);
+
+	fs.writeFileSync(DASHBOARD_FILE, dashboardContent, "utf-8");
+	console.log(`Successfully synced and updated ${DASHBOARD_FILE}!`);
+}
+
+sync();

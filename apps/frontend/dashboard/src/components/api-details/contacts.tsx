@@ -41,563 +41,572 @@ const codeExamples = {
 	nodejs: {
 		add: {
 			filename: "add_contact.js",
-			code: `import Reloop from 'reloop-email';
+			code: `import { Reloop } from "reloop-email";
 
-const reloop = new Reloop('re_xxxxxxxx');
+const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { data, error } = await reloop.contacts.create({
-  email:      'john@example.com',
-  firstName:  'John',
-  lastName:   'Doe',
-  subscribed: false,
-  metadata:   { source: 'website' },
-});`,
+const { response: contact, error } = await reloop.contacts.create({
+  email: "john.doe@example.com",
+  firstName: "John",
+  lastName: "Doe",
+  status: "subscribed",
+  properties: { company: "Reloop", role: "Developer" },
+  groupIds: ["grp_123456789"],
+  channels: [{ channelId: "chn_123456789", subscription: "opt_in" }],
+});
+if (error) throw error;`,
 		},
 		get: {
 			filename: "get_contact.js",
 			code: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop('re_xxxxxxxx');
+const reloop = new Reloop('re_123456789');
 
-// Get by contact id
-await reloop.contacts.get('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d');
-
-// Get by email
-await reloop.contacts.get({ email: 'john@example.com' });`,
+const { response: contact, error } = await reloop.contacts().get('cont_123456789');
+if (error) throw error;`,
 		},
 		list: {
-			filename: "list_contacts.js",
-			code: `import Reloop from 'reloop-email';
+			filename: "list_contact.js",
+			code: `import { Reloop } from "reloop-email";
 
-const reloop = new Reloop('re_xxxxxxxx');
+const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { data } = await reloop.contacts.list({
+const { response: contacts, error } = await reloop.contacts.list({
   page: 1,
-  limit: undefined,
-});`,
+  limit: 10,
+  status: "subscribed",
+});
+if (error) throw error;`,
 		},
 		update: {
 			filename: "update_contact.js",
 			code: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop('re_xxxxxxxx');
+const reloop = new Reloop('re_123456789');
 
-const { data, error } = await reloop.contacts.update(
-  '5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d',
-  {
-    firstName:  'Steve',
-    subscribed: true,
-  }
-);`,
+const { response: contact, error } = await reloop.contacts().update('cont_123456789', {
+  firstName: 'Jane',
+  lastName: 'Smith',
+  status: 'subscribed',
+  properties: {
+    company: 'Reloop',
+    role: 'Designer',
+  },
+});
+if (error) throw error;`,
 		},
 		delete: {
 			filename: "delete_contact.js",
 			code: `import Reloop from 'reloop-email';
 
-const reloop = new Reloop('re_xxxxxxxx');
+const reloop = new Reloop('re_123456789');
 
-await reloop.contacts.delete('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d');`,
+const { response, error } = await reloop.contacts().delete('cont_123456789');
+if (error) throw error;`,
 		},
 	},
 	python: {
 		add: {
 			filename: "add_contact.py",
-			code: `from reloop_email import Reloop
+			code: `from reloop import Reloop
 
-reloop = Reloop('re_xxxxxxxx')
+reloop = Reloop(api_key="rl_123456789")
 
-data, error = reloop.contacts.create(
-    email='john@example.com',
-    first_name='John',
-    last_name='Doe',
-    subscribed=False,
-    metadata={'source': 'website'},
+contact = reloop.contacts.create(
+    email="john.doe@example.com",
+    first_name="John",
+    last_name="Doe",
+    status="subscribed",
+    properties={"company": "Reloop", "role": "Developer"},
+    group_ids=["grp_123456789"],
+    channels=[{"channel_id": "chn_123456789", "subscription": "opt_in"}],
 )`,
 		},
 		get: {
 			filename: "get_contact.py",
 			code: `from reloop_email import Reloop
 
-reloop = Reloop('re_xxxxxxxx')
+reloop = Reloop(api_key="re_123456789")
 
-# Get by contact id
-reloop.contacts.get('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d')
-
-# Get by email
-reloop.contacts.get(email='john@example.com')`,
+reloop.contacts().get("cont_123456789")`,
 		},
 		list: {
-			filename: "list_contacts.py",
-			code: `from reloop_email import Reloop
+			filename: "list_contact.py",
+			code: `from reloop import Reloop
 
-reloop = Reloop('re_xxxxxxxx')
+reloop = Reloop(api_key="rl_123456789")
 
-data = reloop.contacts.list(
-    page=1,
-    limit=None,
-)`,
+contacts = reloop.contacts.list(page=1, limit=10, status="subscribed")`,
 		},
 		update: {
 			filename: "update_contact.py",
 			code: `from reloop_email import Reloop
 
-reloop = Reloop('re_xxxxxxxx')
+reloop = Reloop(api_key="re_123456789")
 
-data, error = reloop.contacts.update(
-    '5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d',
-    first_name='Steve',
-    subscribed=True,
+reloop.contacts().update(
+    "cont_123456789",
+    first_name="Jane",
+    last_name="Smith",
+    unsubscribed=False,
+    properties={
+        "company": "Reloop",
+        "role": "Designer",
+    },
 )`,
 		},
 		delete: {
 			filename: "delete_contact.py",
 			code: `from reloop_email import Reloop
 
-reloop = Reloop('re_xxxxxxxx')
+reloop = Reloop(api_key="re_123456789")
 
-reloop.contacts.delete('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d')`,
+reloop.contacts().delete("cont_123456789")`,
 		},
 	},
 	php: {
 		add: {
 			filename: "add_contact.php",
-			code: `$reloop = Reloop::client('re_xxxxxxxx');
+			code: `$reloop = Reloop::client('rl_123456789');
 
-$reloop->contacts->create(
-  parameters: [
-    'email' => 'john@example.com',
+$contact = $reloop->contacts->create([
+    'email' => 'john.doe@example.com',
     'first_name' => 'John',
     'last_name' => 'Doe',
-    'unsubscribed' => false,
-  ],
-);`,
+    'status' => 'subscribed',
+    'properties' => ['company' => 'Reloop', 'role' => 'Developer'],
+    'group_ids' => ['grp_123456789'],
+    'channels' => [['channel_id' => 'chn_123456789', 'subscription' => 'opt_in']],
+]);`,
 		},
 		get: {
 			filename: "get_contact.php",
-			code: `$reloop = Reloop::client('re_xxxxxxxx');
+			code: `$reloop = Reloop::client('re_123456789');
 
-$reloop->contacts->get('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d');`,
+$reloop->contacts->get('cont_123456789');`,
 		},
 		list: {
-			filename: "list_contacts.php",
-			code: `$reloop = Reloop::client('re_xxxxxxxx');
+			filename: "list_contact.php",
+			code: `$reloop = Reloop::client('rl_123456789');
 
-$reloop->contacts->list(
-  options: [
-    'page' => 1,
-    'limit' => 10,
-  ],
-);`,
+$contacts = $reloop->contacts->list(['page' => 1, 'limit' => 10, 'status' => 'subscribed']);`,
 		},
 		update: {
 			filename: "update_contact.php",
-			code: `$reloop = Reloop::client('re_xxxxxxxx');
+			code: `$reloop = Reloop::client('re_123456789');
 
 $reloop->contacts->update(
-  '5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d',
+  'cont_123456789',
   parameters: [
-    'first_name' => 'Steve',
-    'unsubscribed' => false,
+      'first_name' => 'Jane',
+      'last_name' => 'Smith',
+      'unsubscribed' => false,
+      'properties' => [
+          'company' => 'Reloop',
+          'role' => 'Designer',
+      ],
   ],
 );`,
 		},
 		delete: {
 			filename: "delete_contact.php",
-			code: `$reloop = Reloop::client('re_xxxxxxxx');
+			code: `$reloop = Reloop::client('re_123456789');
 
-$reloop->contacts->delete('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d');`,
+$reloop->contacts->delete('cont_123456789');`,
 		},
 	},
 	go: {
 		add: {
 			filename: "add_contact.go",
-			code: `package main
+			code: `import reloop "github.com/reloop-labs/reloop-go"
 
-import reloopemail "github.com/reloop-labs/reloop-email"
+client, _ := reloop.NewClient(reloop.ClientOptions{
+    APIKey: "rl_123456789",
+})
 
-func main() {
-    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
-        APIKey: "re_xxxxxxxx",
-    })
-
-    result, err := reloop.Contacts().Create(&reloopemail.CreateContactParams{
-        Email:      "john@example.com",
-        FirstName:  "John",
-        LastName:   "Doe",
-        Subscribed: false,
-        Metadata:   map[string]string{"source": "website"},
-    })
-}`,
+contact, _ := client.Contacts.Create(map[string]interface{}{
+    "email": "john.doe@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "status": "subscribed",
+})`,
 		},
 		get: {
 			filename: "get_contact.go",
-			code: `package main
-
-import reloopemail "github.com/reloop-labs/reloop-email"
+			code: `import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
     reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
-        APIKey: "re_xxxxxxxx",
+        APIKey: "re_123456789",
     })
-
-    // Get by contact id
-    reloop.Contacts().Get("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d")
-
-    // Get by email
-    reloop.Contacts().GetByEmail("john@example.com")
+    
+    _, _ = reloop.Contacts().Get("cont_123456789")
 }`,
 		},
 		list: {
-			filename: "list_contacts.go",
-			code: `package main
+			filename: "list_contact.go",
+			code: `import reloop "github.com/reloop-labs/reloop-go"
 
-import reloopemail "github.com/reloop-labs/reloop-email"
+client, _ := reloop.NewClient(reloop.ClientOptions{
+    APIKey: "rl_123456789",
+})
 
-func main() {
-    reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
-        APIKey: "re_xxxxxxxx",
-    })
-
-    data, err := reloop.Contacts().List(&reloopemail.ListParams{
-        Page:  1,
-        Limit: nil,
-    })
-}`,
+contacts, _ := client.Contacts.List(map[string]interface{}{
+    "page": 1,
+    "limit": 10,
+    "status": "subscribed",
+})`,
 		},
 		update: {
 			filename: "update_contact.go",
-			code: `package main
-
-import reloopemail "github.com/reloop-labs/reloop-email"
+			code: `import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
     reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
-        APIKey: "re_xxxxxxxx",
+        APIKey: "re_123456789",
     })
-
-    result, err := reloop.Contacts().Update(
-        "5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d",
-        &reloopemail.UpdateContactParams{
-            FirstName:  "Steve",
-            Subscribed: true,
-        },
-    )
+    
+    _, _ = reloop.Contacts().Update("cont_123456789", map[string]interface{}{
+        "first_name": "Jane",
+        "last_name": "Smith",
+        "unsubscribed": false,
+        "properties": map[string]interface{}{"company": "Reloop", "role": "Designer"}
+    })
 }`,
 		},
 		delete: {
 			filename: "delete_contact.go",
-			code: `package main
-
-import reloopemail "github.com/reloop-labs/reloop-email"
+			code: `import reloopemail "github.com/reloop-labs/reloop-email"
 
 func main() {
     reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
-        APIKey: "re_xxxxxxxx",
+        APIKey: "re_123456789",
     })
-
-    reloop.Contacts().Delete("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d")
+    
+    _, _ = reloop.Contacts().Delete("cont_123456789")
 }`,
 		},
 	},
 	ruby: {
 		add: {
 			filename: "add_contact.rb",
-			code: `require 'reloop-email'
+			code: `require "reloop"
 
-reloop = Reloop::Client.new('re_xxxxxxxx')
+reloop = Reloop::Client.new(api_key: "rl_123456789")
 
-result = reloop.contacts.create(
-  email:      'john@example.com',
-  first_name: 'John',
-  last_name:  'Doe',
-  subscribed: false,
-  metadata:   { source: 'website' }
+contact = reloop.contacts.create(
+  email: "john.doe@example.com",
+  first_name: "John",
+  last_name: "Doe",
+  status: "subscribed",
+  properties: { company: "Reloop", role: "Developer" },
+  group_ids: ["grp_123456789"],
+  channels: [{ channel_id: "chn_123456789", subscription: "opt_in" }],
 )`,
 		},
 		get: {
 			filename: "get_contact.rb",
-			code: `require 'reloop-email'
+			code: `require 'net/http'
+require 'json'
 
-reloop = Reloop::Client.new('re_xxxxxxxx')
+uri = URI('https://reloop.sh/api/contacts/retrieve/cont_123456789')
+http = Net::HTTP.new(uri.host, uri.port)
+http.use_ssl = true
 
-# Get by contact id
-reloop.contacts.get('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d')
+request = Net::HTTP::Get.new(uri)
+request['x-api-key'] = 're_123456789'
 
-# Get by email
-reloop.contacts.get(email: 'john@example.com')`,
+response = http.request(request)
+contact = JSON.parse(response.body)`,
 		},
 		list: {
-			filename: "list_contacts.rb",
-			code: `require 'reloop-email'
+			filename: "list_contact.rb",
+			code: `require "reloop"
 
-reloop = Reloop::Client.new('re_xxxxxxxx')
+reloop = Reloop::Client.new(api_key: "rl_123456789")
 
-data = reloop.contacts.list(
-  page:  1,
-  limit: nil
-)`,
+contacts = reloop.contacts.list(page: 1, limit: 10, status: "subscribed")`,
 		},
 		update: {
 			filename: "update_contact.rb",
-			code: `require 'reloop-email'
+			code: `require 'net/http'
+require 'json'
 
-reloop = Reloop::Client.new('re_xxxxxxxx')
+uri = URI('https://reloop.sh/api/contacts/cont_123456789')
+http = Net::HTTP.new(uri.host, uri.port)
+http.use_ssl = true
 
-result = reloop.contacts.update(
-  '5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d',
-  first_name: 'Steve',
-  subscribed: true
-)`,
+request = Net::HTTP::Patch.new(uri)
+request['x-api-key'] = 're_123456789'
+request['Content-Type'] = 'application/json'
+request.body = {
+  firstName: 'Jane',
+  lastName: 'Smith',
+  status: 'subscribed',
+  properties: {
+    company: 'Reloop',
+    role: 'Designer',
+  },
+}.to_json
+
+response = http.request(request)
+contact = JSON.parse(response.body)`,
 		},
 		delete: {
 			filename: "delete_contact.rb",
-			code: `require 'reloop-email'
+			code: `require 'net/http'
+require 'json'
 
-reloop = Reloop::Client.new('re_xxxxxxxx')
+uri = URI('https://reloop.sh/api/contacts/cont_123456789')
+http = Net::HTTP.new(uri.host, uri.port)
+http.use_ssl = true
 
-reloop.contacts.delete('5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d')`,
+request = Net::HTTP::Delete.new(uri)
+request['x-api-key'] = 're_123456789'
+
+response = http.request(request)
+result = JSON.parse(response.body)`,
 		},
 	},
 	rust: {
 		add: {
 			filename: "add_contact.rs",
-			code: `use reloop_email::ReloopEmail;
+			code: `use reloop::ReloopClient;
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopClient::new("rl_123456789".to_string(), None);
 
-let reloop = ReloopEmail::new("re_xxxxxxxx".to_string(), None);
+    reloop.contacts().create(CreateContactParams {
+        email: "john.doe@example.com".to_string(),
+        first_name: Some("John".to_string()),
+        last_name: Some("Doe".to_string()),
+        status: Some(ContactStatus::Subscribed),
+        ..Default::default()
+    }).await?;
 
-let result = reloop.contacts().create(
-    CreateContactParams::builder()
-        .email("john@example.com")
-        .first_name("John")
-        .last_name("Doe")
-        .subscribed(false)
-        .metadata(json!({ "source": "website" }))
-        .build(),
-).await?;`,
+    Ok(())
+}`,
 		},
 		get: {
 			filename: "get_contact.rs",
 			code: `use reloop_email::ReloopEmail;
+use serde_json::json;
 
-let reloop = ReloopEmail::new("re_xxxxxxxx".to_string(), None);
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopEmail::new("re_123456789".to_string(), None);
+    
+    reloop.contacts().get("cont_123456789").await?;
 
-// Get by contact id
-reloop.contacts().get("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d").await?;
-
-// Get by email
-reloop.contacts().get_by_email("john@example.com").await?;`,
+    Ok(())
+}`,
 		},
 		list: {
-			filename: "list_contacts.rs",
-			code: `use reloop_email::ReloopEmail;
+			filename: "list_contact.rs",
+			code: `use reloop::ReloopClient;
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopClient::new("rl_123456789".to_string(), None);
 
-let reloop = ReloopEmail::new("re_xxxxxxxx".to_string(), None);
+    reloop.contacts().list(Some(ListContactsParams {
+        page: Some(1),
+        limit: Some(10),
+        status: Some(ContactStatus::Subscribed),
+        ..Default::default()
+    })).await?;
 
-let data = reloop.contacts().list(
-    ListParams::builder()
-        .page(1)
-        .build(),
-).await?;`,
+    Ok(())
+}`,
 		},
 		update: {
 			filename: "update_contact.rs",
 			code: `use reloop_email::ReloopEmail;
+use serde_json::json;
 
-let reloop = ReloopEmail::new("re_xxxxxxxx".to_string(), None);
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopEmail::new("re_123456789".to_string(), None);
+    
+    reloop.contacts().update("cont_123456789", json!({
+        "first_name": "Jane",
+        "last_name": "Smith",
+        "unsubscribed": false,
+        "properties": {
+        "company": "Reloop",
+        "role": "Designer",
+    },
+    })).await?;
 
-let result = reloop.contacts().update(
-    "5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d",
-    UpdateContactParams::builder()
-        .first_name("Steve")
-        .subscribed(true)
-        .build(),
-).await?;`,
+    Ok(())
+}`,
 		},
 		delete: {
 			filename: "delete_contact.rs",
 			code: `use reloop_email::ReloopEmail;
+use serde_json::json;
 
-let reloop = ReloopEmail::new("re_xxxxxxxx".to_string(), None);
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopEmail::new("re_123456789".to_string(), None);
+    
+    reloop.contacts().delete("cont_123456789").await?;
 
-reloop.contacts().delete("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d").await?;`,
+    Ok(())
+}`,
 		},
 	},
 	java: {
 		add: {
 			filename: "AddContact.java",
-			code: `import sh.reloop.email.ReloopEmail;
-import sh.reloop.email.models.Contact;
+			code: `import sh.reloop.ReloopClient;
+import sh.reloop.models.Models.*;
 
-ReloopEmail reloop = ReloopEmail.client("re_xxxxxxxx");
+ReloopClient reloop = new ReloopClient("rl_123456789");
 
-Contact contact = reloop.contacts().create(
-    CreateContactParams.builder()
-        .email("john@example.com")
-        .firstName("John")
-        .lastName("Doe")
-        .subscribed(false)
-        .metadata(Map.of("source", "website"))
-        .build()
-);`,
+Contact contact = reloop.contacts.create(Map.of(
+    "email", "john.doe@example.com",
+    "firstName", "John",
+    "lastName", "Doe",
+    "status", "subscribed"
+));`,
 		},
 		get: {
 			filename: "GetContact.java",
 			code: `import sh.reloop.email.ReloopEmail;
 
-ReloopEmail reloop = ReloopEmail.client("re_xxxxxxxx");
+ReloopEmail reloop = ReloopEmail.client("re_123456789");
 
-// Get by contact id
-reloop.contacts().get("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d");
-
-// Get by email
-reloop.contacts().getByEmail("john@example.com");`,
+reloop.contacts().get("cont_123456789");`,
 		},
 		list: {
-			filename: "ListContacts.java",
-			code: `import sh.reloop.email.ReloopEmail;
-import sh.reloop.email.models.ContactList;
+			filename: "ListContact.java",
+			code: `import sh.reloop.ReloopClient;
+import sh.reloop.models.Models.*;
 
-ReloopEmail reloop = ReloopEmail.client("re_xxxxxxxx");
+ReloopClient reloop = new ReloopClient("rl_123456789");
 
-ContactList data = reloop.contacts().list(
-    ListParams.builder()
-        .page(1)
-        .build()
-);`,
+ContactListResponse contacts = reloop.contacts.list(Map.of("page", 1, "limit", 10, "status", "subscribed"));`,
 		},
 		update: {
 			filename: "UpdateContact.java",
 			code: `import sh.reloop.email.ReloopEmail;
+import java.util.*;
 
-ReloopEmail reloop = ReloopEmail.client("re_xxxxxxxx");
+ReloopEmail reloop = ReloopEmail.client("re_123456789");
 
-reloop.contacts().update(
-    "5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d",
-    UpdateContactParams.builder()
-        .firstName("Steve")
-        .subscribed(true)
-        .build()
-);`,
+reloop.contacts().update("cont_123456789", Map.of("first_name", "Jane", "last_name", "Smith", "unsubscribed", false, "properties", Map.of("company", "Reloop", "role", "Designer")));`,
 		},
 		delete: {
 			filename: "DeleteContact.java",
 			code: `import sh.reloop.email.ReloopEmail;
 
-ReloopEmail reloop = ReloopEmail.client("re_xxxxxxxx");
+ReloopEmail reloop = ReloopEmail.client("re_123456789");
 
-reloop.contacts().delete("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d");`,
+reloop.contacts().delete("cont_123456789");`,
 		},
 	},
 	dotnet: {
 		add: {
 			filename: "AddContact.cs",
-			code: `using Reloop.Email;
+			code: `using Reloop;
+using Reloop.Models;
 
-var reloop = ReloopEmail.Client("re_xxxxxxxx");
+var reloop = new ReloopClient("rl_123456789");
 
-var contact = await reloop.Contacts.CreateAsync(new CreateContactParams
+var contact = await reloop.Contacts.CreateAsync(new Dictionary<string, object?>
 {
-    Email      = "john@example.com",
-    FirstName  = "John",
-    LastName   = "Doe",
-    Subscribed = false,
-    Metadata   = new Dictionary<string, string> { ["source"] = "website" }
+    ["email"] = "john.doe@example.com",
+    ["firstName"] = "John",
+    ["lastName"] = "Doe",
+    ["status"] = "subscribed",
 });`,
 		},
 		get: {
 			filename: "GetContact.cs",
 			code: `using Reloop.Email;
 
-var reloop = ReloopEmail.Client("re_xxxxxxxx");
+var reloop = ReloopEmail.Client("re_123456789");
 
-// Get by contact id
-await reloop.Contacts.GetAsync("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d");
-
-// Get by email
-await reloop.Contacts.GetByEmailAsync("john@example.com");`,
+await reloop.Contacts().GetAsync("cont_123456789");`,
 		},
 		list: {
-			filename: "ListContacts.cs",
-			code: `using Reloop.Email;
+			filename: "ListContact.cs",
+			code: `using Reloop;
+using Reloop.Models;
 
-var reloop = ReloopEmail.Client("re_xxxxxxxx");
+var reloop = new ReloopClient("rl_123456789");
 
-var data = await reloop.Contacts.ListAsync(new ListParams
+var contacts = await reloop.Contacts.ListAsync(new Dictionary<string, object?>
 {
-    Page  = 1,
-    Limit = null
+    ["page"] = 1,
+    ["limit"] = 10,
+    ["status"] = "subscribed",
 });`,
 		},
 		update: {
 			filename: "UpdateContact.cs",
 			code: `using Reloop.Email;
+using System.Collections.Generic;
 
-var reloop = ReloopEmail.Client("re_xxxxxxxx");
+var reloop = ReloopEmail.Client("re_123456789");
 
-await reloop.Contacts.UpdateAsync(
-    "5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d",
-    new UpdateContactParams
-    {
-        FirstName  = "Steve",
-        Subscribed = true
-    }
-);`,
+var parameters = new Dictionary<string, object?>();
+parameters["first_name"] = "Jane";
+parameters["last_name"] = "Smith";
+parameters["unsubscribed"] = false;
+parameters["properties"] = new Dictionary<string, object?>
+{
+    ["company"] = "Reloop",
+    ["role"] = "Designer",
+};
+await reloop.Contacts().UpdateAsync("cont_123456789", parameters);`,
 		},
 		delete: {
 			filename: "DeleteContact.cs",
 			code: `using Reloop.Email;
 
-var reloop = ReloopEmail.Client("re_xxxxxxxx");
+var reloop = ReloopEmail.Client("re_123456789");
 
-await reloop.Contacts.DeleteAsync("5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d");`,
+await reloop.Contacts().DeleteAsync("cont_123456789");`,
 		},
 	},
 	curl: {
 		add: {
 			filename: "add_contact.sh",
-			code: `curl -X POST https://api.reloop.sh/api/contacts/v1/contacts/add \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer re_xxxxxxxx" \\
-  -d '{
-    "email": "john@example.com",
-    "firstName": "John",
-    "lastName": "Doe",
-    "subscribed": false,
-    "metadata": { "source": "website" }
-  }'`,
+			code: `curl -X POST https://reloop.sh/api/contacts/create \\\\
+  -H "x-api-key: rl_123456789" \\\\
+  -H "Content-Type: application/json" \\\\
+  -d '{"email": "john.doe@example.com","firstName": "John","lastName": "Doe","status": "subscribed","properties": {"company": "Reloop","role": "Developer"},"groupIds": ["grp_123456789"],"channels": [{"channelId": "chn_123456789","subscription": "opt_in"}]}'`,
 		},
 		get: {
 			filename: "get_contact.sh",
-			code: `# Get by contact id
-curl https://api.reloop.sh/api/contacts/v1/contacts/5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d \\
-  -H "Authorization: Bearer re_xxxxxxxx"
-
-# Get by email
-curl "https://api.reloop.sh/api/contacts/v1/contacts?email=john@example.com" \\
-  -H "Authorization: Bearer re_xxxxxxxx"`,
+			code: `curl https://reloop.sh/api/contacts/retrieve/cont_123456789 \\
+  -H "x-api-key: re_123456789"`,
 		},
 		list: {
-			filename: "list_contacts.sh",
-			code: `curl "https://api.reloop.sh/api/contacts/v1/contacts/list?page=1&limit=10" \\
-  -H "Authorization: Bearer re_xxxxxxxx"`,
+			filename: "list_contact.sh",
+			code: `curl "https://reloop.sh/api/contacts/list?page=1&limit=10&status=subscribed" \\\\
+  -H "x-api-key: rl_123456789"`,
 		},
 		update: {
 			filename: "update_contact.sh",
-			code: `curl -X PATCH https://api.reloop.sh/api/contacts/v1/contacts/update \\
+			code: `curl -X PATCH https://reloop.sh/api/contacts/cont_123456789 \\
+  -H "x-api-key: re_123456789" \\
   -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer re_xxxxxxxx" \\
   -d '{
-    "id": "5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d",
-    "firstName": "Steve",
-    "subscribed": true
-  }'`,
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "status": "subscribed",
+  "properties": {
+    "company": "Reloop",
+    "role": "Designer"
+  }
+}'`,
 		},
 		delete: {
 			filename: "delete_contact.sh",
-			code: `curl -X DELETE https://api.reloop.sh/api/contacts/v1/contacts/delete \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer re_xxxxxxxx" \\
-  -d '{ "id": "5e4d5e4d-5e4d-5e4d-5e4d-5e4d5e4d5e4d" }'`,
+			code: `curl -X DELETE https://reloop.sh/api/contacts/cont_123456789 \\
+  -H "x-api-key: re_123456789"`,
 		},
 	},
 };
@@ -607,11 +616,11 @@ curl "https://api.reloop.sh/api/contacts/v1/contacts?email=john@example.com" \\
 // ---------------------------------------------------------------------------
 
 const operations = [
-	{ id: "add", label: "Add Contact" },
-	{ id: "get", label: "Get Contact" },
-	{ id: "list", label: "List Contacts" },
-	{ id: "update", label: "Update Contact" },
-	{ id: "delete", label: "Delete Contact" },
+	{ id: "add", label: "Add Contact", docSlug: "post-api-contacts-create" },
+	{ id: "get", label: "Get Contact", docSlug: "get-api-contacts-retrieve-by-contact_id" },
+	{ id: "list", label: "List Contacts", docSlug: "get-api-contacts-list" },
+	{ id: "update", label: "Update Contact", docSlug: "patch-api-contacts-by-contact_id" },
+	{ id: "delete", label: "Delete Contact", docSlug: "delete-api-contacts-by-contact_id" },
 ] as const;
 
 const languages = [
@@ -633,6 +642,11 @@ type Language = keyof typeof codeExamples;
 // ---------------------------------------------------------------------------
 
 type ButtonProps = React.ComponentPropsWithoutRef<typeof Button.Root>;
+
+const docBaseUrl =
+	process.env.NEXT_PUBLIC_APP_URL ||
+	process.env.NEXT_PUBLIC_URL ||
+	"https://local.reloop.sh";
 
 export const ContactsApiDetails = (props: ButtonProps) => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -893,7 +907,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 									lang={currentLanguageConfig?.shikiLang || "javascript"}
 									label={example.filename}
 									title={op.label}
-									titleHref={`https://docs.reloop.sh/api-reference/contacts#${op.id}`}
+									titleHref={`${docBaseUrl}/docs/api/contacts/${op.docSlug}`}
 								/>
 							</section>
 						);

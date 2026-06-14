@@ -6,7 +6,8 @@
 		"dev": "next dev --turbopack --port=3001",
 		"build": "next build",
 		"start": "next start",
-		"lint": "next lint"
+		"lint": "next lint",
+		"sync:contacts": "bun run scripts/sync-contacts-api.ts"
 	},
 	"dependencies": {
 		"@better-auth/api-key": "catalog:",
