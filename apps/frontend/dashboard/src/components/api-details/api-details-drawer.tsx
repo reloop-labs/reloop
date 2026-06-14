@@ -89,8 +89,12 @@ export const ApiDetailsDrawer = ({
 	const isFirstScrollRef = useRef(true);
 
 	useEffect(() => {
-		setMounted(true);
-	}, []);
+		if (isOpen) {
+			setMounted(true);
+		} else {
+			setMounted(false);
+		}
+	}, [isOpen]);
 
 	const activeTabIndex = languages.findIndex((l) => l.id === selectedLanguage);
 
@@ -277,7 +281,7 @@ export const ApiDetailsDrawer = ({
 							const isHighlighted = index === highlightedTabIndex;
 
 							let textColorStyle: React.CSSProperties | undefined;
-							if (isHighlighted) {
+							if (isHighlighted && highlightedPillPosition) {
 								textColorStyle = { color: "#ffffff" };
 							} else if (isActive && brandColor) {
 								textColorStyle = { color: brandColor };
@@ -308,7 +312,7 @@ export const ApiDetailsDrawer = ({
 											className="size-3.5 shrink-0 transition-colors duration-150"
 											fill="currentColor"
 											xmlns="http://www.w3.org/2000/svg"
-											style={{ color: isHighlighted ? "#ffffff" : brandColor }}
+											style={{ color: isHighlighted && highlightedPillPosition ? "#ffffff" : brandColor }}
 											aria-hidden
 										>
 											<path d={icon.path} />
