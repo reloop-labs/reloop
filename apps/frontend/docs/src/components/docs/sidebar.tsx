@@ -118,6 +118,10 @@ export function Sidebar({
 		top: number;
 		left: number;
 	} | null>(null);
+	// When true, the hover background snaps instantly (no transition) to the active item.
+	// This prevents the glitch where clicking B while hovering B causes the background
+	// to slide from the old active A → B again after hover ends.
+	const [skipTransition, setSkipTransition] = useState(false);
 	const navRef = useRef<HTMLElement>(null);
 
 	// Collect URLs of all folders that contain the active page (at any depth)
@@ -221,14 +225,24 @@ export function Sidebar({
 		});
 	}, []);
 
-	// Find the active element by DOM query after each navigation
+	// Find the active element by DOM query after each navigation.
+	// Re-runs on pathname changes so activeEl always reflects the current page.
 	useLayoutEffect(() => {
 		if (!navRef.current) return;
 		const el = navRef.current.querySelector<HTMLElement>(
 			'[data-sidebar-active="true"]',
 		);
+		// Snap instantly when the active item changes so there's no slide-from-old-position glitch.
+		setSkipTransition(true);
 		setActiveEl(el ?? null);
-	}, []);
+	}, [pathname]);
+
+	// Re-enable the transition on the next frame after a snap so hover animations still work.
+	useEffect(() => {
+		if (!skipTransition) return;
+		const id = requestAnimationFrame(() => setSkipTransition(false));
+		return () => cancelAnimationFrame(id);
+	}, [skipTransition]);
 
 	// Compute rect from hovered element, falling back to active element
 	useLayoutEffect(() => {
@@ -290,7 +304,7 @@ export function Sidebar({
 						pathname,
 					}}
 				>
-					<AnimatedHoverBackground rect={rect} />
+					<AnimatedHoverBackground rect={rect} skipTransition={skipTransition} />
 
 					<div className="z-10 flex flex-col gap-px">
 						{filteredTree.map((node, index) => {

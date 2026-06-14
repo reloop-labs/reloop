@@ -46,6 +46,7 @@ export function Navbar({
 	const activeTab =
 		tabs.find((tab) => {
 			if (tab.url === "/") {
+				// Documentation is active when no other tab matches
 				return !tabs
 					.filter((t) => t.url !== "/")
 					.some((t) => pathname.startsWith(t.url));
@@ -79,7 +80,11 @@ export function Navbar({
 				>
 					{tabs.map((tab) => {
 						const active =
-							tab.url === "/" ? pathname === "/" : pathname.startsWith(tab.url);
+							tab.url === "/"
+								? !tabs
+										.filter((t) => t.url !== "/")
+										.some((t) => pathname.startsWith(t.url))
+								: pathname.startsWith(tab.url);
 						const color = tabColors[tab.title] || "#d97757";
 
 						return (

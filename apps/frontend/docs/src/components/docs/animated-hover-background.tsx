@@ -6,15 +6,18 @@ import type React from "react";
 interface AnimatedHoverBackgroundProps {
 	rect: { width: number; height: number; top: number; left: number } | null;
 	className?: string;
+	/** When true, disables the CSS transition so the background snaps instantly. */
+	skipTransition?: boolean;
 }
 
 export const AnimatedHoverBackground: React.FC<
 	AnimatedHoverBackgroundProps
-> = ({ rect, className }) => {
+> = ({ rect, className, skipTransition }) => {
 	return (
 		<div
 			className={cn(
-				"pointer-events-none absolute top-0 left-0 z-0 rounded-lg bg-neutral-alpha-10 transition-all duration-200 ease-out",
+				"pointer-events-none absolute top-0 left-0 z-0 rounded-lg bg-neutral-alpha-10 ease-out",
+				!skipTransition && "transition-all duration-200",
 				className,
 			)}
 			style={{
