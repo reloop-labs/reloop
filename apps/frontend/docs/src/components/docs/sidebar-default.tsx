@@ -191,7 +191,7 @@ export function DefaultSidebarSection({
 	if (node.type === "separator") {
 		return (
 			<div className="mt-4 mb-1.5 px-2">
-				<h4 className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-[0.05em] opacity-60">
+				<h4 className="font-semibold text-sm uppercase">
 					{node.name as string}
 				</h4>
 			</div>
@@ -203,7 +203,7 @@ export function DefaultSidebarSection({
 			return (
 				<div className="space-y-px">
 					<div className="mt-4 mb-1.5 px-2">
-						<h4 className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-[0.05em] opacity-60">
+						<h4 className="font-semibold text-sm uppercase">
 							{node.name as string}
 						</h4>
 					</div>

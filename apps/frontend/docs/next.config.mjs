@@ -28,7 +28,9 @@ const config = {
 		];
 	},
 	async headers() {
-		return [
+		const isDev = process.env.NODE_ENV === "development";
+
+		const list = [
 			{
 				source: "/:path*",
 				headers: [
@@ -38,27 +40,34 @@ const config = {
 					},
 				],
 			},
-			// Cache static assets aggressively (JS/CSS chunks are content-hashed)
-			{
-				source: "/_next/static/:path*",
-				headers: [
-					{
-						key: "Cache-Control",
-						value: "public, max-age=31536000, immutable",
-					},
-				],
-			},
-			// Cache font files
-			{
-				source: "/docs/font/:path*",
-				headers: [
-					{
-						key: "Cache-Control",
-						value: "public, max-age=31536000, immutable",
-					},
-				],
-			},
 		];
+
+		if (!isDev) {
+			list.push(
+				// Cache static assets aggressively (JS/CSS chunks are content-hashed)
+				{
+					source: "/_next/static/:path*",
+					headers: [
+						{
+							key: "Cache-Control",
+							value: "public, max-age=31536000, immutable",
+						},
+					],
+				},
+				// Cache font files
+				{
+					source: "/docs/font/:path*",
+					headers: [
+						{
+							key: "Cache-Control",
+							value: "public, max-age=31536000, immutable",
+						},
+					],
+				},
+			);
+		}
+
+		return list;
 	},
 };
 
