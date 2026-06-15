@@ -192,10 +192,8 @@ export function WebhookSidebarSection({
 		const name = node.name as string;
 		const id = name.toLowerCase().replace(/\s+/g, "-");
 		return (
-			<div id={id} className="scroll-mt-8 mt-4 mb-1.5 px-2">
-				<h4 className="font-semibold text-sm uppercase">
-					{name}
-				</h4>
+			<div id={id} className="mt-4 mb-1.5 scroll-mt-8 px-2">
+				<h4 className="font-semibold text-sm uppercase">{name}</h4>
 			</div>
 		);
 	}

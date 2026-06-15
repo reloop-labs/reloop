@@ -2,6 +2,7 @@ import "./global.css";
 import { ThemeProvider } from "@reloop/fe-docs/components/theme-provider";
 import { cn } from "@reloop/fe-docs/lib/cn";
 import { IconsSprite } from "@reloop/ui/icon";
+import { RybbitLoader } from "@reloop/ui/rybbit-loader";
 import localFont from "next/font/local";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { ReactNode } from "react";
@@ -53,6 +54,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 					<NuqsAdapter>{children}</NuqsAdapter>
 				</ThemeProvider>
 				<IconsSprite />
+				<RybbitLoader />
 			</body>
 		</html>
 	);

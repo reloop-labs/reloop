@@ -4,6 +4,7 @@ import SWRProvider from "@fe/dashboard/providers/swr.config";
 import { ThemeProvider } from "@fe/dashboard/providers/theme-provider";
 import { ChatwootLoader } from "@reloop/ui/chatwoot-loader";
 import { IconsSprite } from "@reloop/ui/icon";
+import { RybbitLoader } from "@reloop/ui/rybbit-loader";
 import { Toaster } from "@reloop/ui/toast";
 import * as Tooltip from "@reloop/ui/tooltip";
 import localFont from "next/font/local";
@@ -66,6 +67,7 @@ export default function RootLayout({
 							<Toaster />
 							<CommandMenuGlobal />
 							<ChatwootLoader />
+							<RybbitLoader />
 						</SWRProvider>
 					</ThemeProvider>
 				</NuqsAdapter>

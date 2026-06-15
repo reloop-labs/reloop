@@ -1,6 +1,6 @@
 export const codeExamples = {
-  javascript: {
-    add: `// Add a new domain
+	javascript: {
+		add: `// Add a new domain
 const response = await fetch('https://reloop.sh/api/v1/add', {
   method: 'POST',
   headers: {
@@ -21,7 +21,7 @@ const response = await fetch('https://reloop.sh/api/v1/add', {
 });
 
 const result = await response.json();`,
-    list: `// List all domains
+		list: `// List all domains
 const response = await fetch('https://reloop.sh/api/v1/list?page=1&limit=10', {
   headers: {
     'Authorization': 'Bearer YOUR_API_KEY'
@@ -29,7 +29,7 @@ const response = await fetch('https://reloop.sh/api/v1/list?page=1&limit=10', {
 });
 
 const domains = await response.json();`,
-    delete: `// Delete a domain
+		delete: `// Delete a domain
 const response = await fetch('https://reloop.sh/api/v1/delete', {
   method: 'DELETE',
   headers: {
@@ -42,7 +42,7 @@ const response = await fetch('https://reloop.sh/api/v1/delete', {
 });
 
 const result = await response.json();`,
-    details: `// Get domain details
+		details: `// Get domain details
 const response = await fetch('https://reloop.sh/api/v1/details?domain=example.com', {
   headers: {
     'Authorization': 'Bearer YOUR_API_KEY'
@@ -50,9 +50,9 @@ const response = await fetch('https://reloop.sh/api/v1/details?domain=example.co
 });
 
 const domainDetails = await response.json();`,
-  },
-  python: {
-    add: `# Add a new domain
+	},
+	python: {
+		add: `# Add a new domain
 import requests
 
 response = requests.post('https://reloop.sh/api/v1/add',
@@ -74,7 +74,7 @@ response = requests.post('https://reloop.sh/api/v1/add',
 )
 
 result = response.json()`,
-    list: `# List all domains
+		list: `# List all domains
 import requests
 
 response = requests.get('https://reloop.sh/api/v1/list?page=1&limit=10',
@@ -82,7 +82,7 @@ response = requests.get('https://reloop.sh/api/v1/list?page=1&limit=10',
 )
 
 domains = response.json()`,
-    delete: `# Delete a domain
+		delete: `# Delete a domain
 import requests
 
 response = requests.delete('https://reloop.sh/api/v1/delete',
@@ -94,7 +94,7 @@ response = requests.delete('https://reloop.sh/api/v1/delete',
 )
 
 result = response.json()`,
-    details: `# Get domain details
+		details: `# Get domain details
 import requests
 
 response = requests.get('https://reloop.sh/api/v1/details?domain=example.com',
@@ -102,9 +102,9 @@ response = requests.get('https://reloop.sh/api/v1/details?domain=example.com',
 )
 
 domain_details = response.json()`,
-  },
-  php: {
-    add: `<?php
+	},
+	php: {
+		add: `<?php
 // Add a new domain
 $data = [
     'domain' => 'example.com',
@@ -131,7 +131,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $result = curl_exec($ch);
 curl_close($ch);
 ?>`,
-    list: `<?php
+		list: `<?php
 // List all domains
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, 'https://reloop.sh/api/v1/list?page=1&limit=10');
@@ -143,7 +143,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $domains = curl_exec($ch);
 curl_close($ch);
 ?>`,
-    delete: `<?php
+		delete: `<?php
 // Delete a domain
 $data = ['domain' => 'example.com'];
 
@@ -160,7 +160,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $result = curl_exec($ch);
 curl_close($ch);
 ?>`,
-    details: `<?php
+		details: `<?php
 // Get domain details
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, 'https://reloop.sh/api/v1/details?domain=example.com');
@@ -172,5 +172,5 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $domainDetails = curl_exec($ch);
 curl_close($ch);
 ?>`,
-  },
+	},
 };

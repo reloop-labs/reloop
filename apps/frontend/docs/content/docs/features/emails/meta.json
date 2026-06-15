@@ -1,8 +1,5 @@
 {
 	"title": "Emails",
 	"icon": "mail-single",
-	"pages": [
-		"index",
-		"details"
-	]
+	"pages": ["index", "details"]
 }

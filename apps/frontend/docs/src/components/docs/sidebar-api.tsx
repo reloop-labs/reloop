@@ -70,7 +70,7 @@ export function ApiSidebarFolder({
 								"flex h-4 w-4 shrink-0 items-center justify-center transition-colors",
 								isActive
 									? "text-[#171717] dark:text-white"
-									: "text-text-sub-600 opacity-70 group-hover:text-[#171717] dark:group-hover:text-white group-hover:opacity-100",
+									: "text-text-sub-600 opacity-70 group-hover:text-[#171717] group-hover:opacity-100 dark:group-hover:text-white",
 							)}
 						>
 							{node.icon}
@@ -221,7 +221,7 @@ export function ApiSidebarLink({
 							"flex h-3.5 w-3.5 shrink-0 items-center justify-center justify-self-start transition-colors",
 							isActive
 								? "text-[#171717] dark:text-white"
-								: "text-text-sub-600 opacity-70 group-hover:text-[#171717] dark:group-hover:text-white group-hover:opacity-100",
+								: "text-text-sub-600 opacity-70 group-hover:text-[#171717] group-hover:opacity-100 dark:group-hover:text-white",
 						)}
 					>
 						{node.icon}
@@ -257,10 +257,8 @@ export function ApiSidebarSection({
 		const name = node.name as string;
 		const id = name.toLowerCase().replace(/\s+/g, "-");
 		return (
-			<div id={id} className="scroll-mt-8 mt-4 mb-1.5 px-2">
-				<h4 className="font-semibold text-sm uppercase">
-					{name}
-				</h4>
+			<div id={id} className="mt-4 mb-1.5 scroll-mt-8 px-2">
+				<h4 className="font-semibold text-sm uppercase">{name}</h4>
 			</div>
 		);
 	}
@@ -275,10 +273,8 @@ export function ApiSidebarSection({
 		return (
 			<>
 				{hasDirectPages && (
-					<div id={id} className="scroll-mt-8 mt-4 mb-1.5 px-2">
-						<h4 className="font-semibold text-sm uppercase">
-							{name}
-						</h4>
+					<div id={id} className="mt-4 mb-1.5 scroll-mt-8 px-2">
+						<h4 className="font-semibold text-sm uppercase">{name}</h4>
 					</div>
 				)}
 				{node.children.map((child: PageTreeItem, index: number) => (

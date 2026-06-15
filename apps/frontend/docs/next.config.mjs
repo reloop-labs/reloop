@@ -25,6 +25,14 @@ const config = {
 				source: "/:path*.md",
 				destination: "/api/markdown/:path*",
 			},
+			{
+				source: "/api/script.js",
+				destination: "https://rybbit.reloop.sh/api/script.js",
+			},
+			{
+				source: "/api/track",
+				destination: "https://rybbit.reloop.sh/api/track",
+			},
 		];
 	},
 	async headers() {

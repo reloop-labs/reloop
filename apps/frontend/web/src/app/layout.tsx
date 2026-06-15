@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ChatwootLoader } from "@reloop/ui/chatwoot-loader";
 import { IconsSprite } from "@reloop/ui/icon";
+import { RybbitLoader } from "@reloop/ui/rybbit-loader";
 import {
 	defaultOgImage,
 	getSiteUrl,
@@ -80,6 +81,7 @@ export default function RootLayout({
 					{children}
 					<IconsSprite />
 					<ChatwootLoader />
+					<RybbitLoader />
 				</ThemeProvider>
 			</body>
 		</html>

@@ -1,6 +1,6 @@
 export const codeExamples = {
-  javascript: {
-    create: `const response = await fetch("https://reloop.sh/api-key/v1/", {
+	javascript: {
+		create: `const response = await fetch("https://reloop.sh/api-key/v1/", {
   method: "POST",
   credentials: "include",
   headers: {
@@ -14,7 +14,7 @@ export const codeExamples = {
 });
 
 const apiKey = await response.json();`,
-    list: `const response = await fetch(
+		list: `const response = await fetch(
   "https://reloop.sh/api-key/v1/?page=1&limit=10",
   {
     credentials: "include",
@@ -25,7 +25,7 @@ const apiKey = await response.json();`,
 );
 
 const apiKeys = await response.json();`,
-    rotate: `const response = await fetch(
+		rotate: `const response = await fetch(
   "https://reloop.sh/api-key/v1/api_key_id/rotate",
   {
     method: "POST",
@@ -37,7 +37,7 @@ const apiKeys = await response.json();`,
 );
 
 const rotatedKey = await response.json();`,
-    disable: `const response = await fetch(
+		disable: `const response = await fetch(
   "https://reloop.sh/api-key/v1/api_key_id/disable",
   {
     method: "POST",
@@ -49,9 +49,9 @@ const rotatedKey = await response.json();`,
 );
 
 const result = await response.json();`,
-  },
-  python: {
-    create: `import requests
+	},
+	python: {
+		create: `import requests
 
 response = requests.post(
     "https://reloop.sh/api-key/v1/",
@@ -66,7 +66,7 @@ response = requests.post(
 )
 
 api_key = response.json()`,
-    list: `import requests
+		list: `import requests
 
 response = requests.get(
     "https://reloop.sh/api-key/v1/?page=1&limit=10",
@@ -76,7 +76,7 @@ response = requests.get(
 )
 
 api_keys = response.json()`,
-    rotate: `import requests
+		rotate: `import requests
 
 response = requests.post(
     "https://reloop.sh/api-key/v1/api_key_id/rotate",
@@ -86,7 +86,7 @@ response = requests.post(
 )
 
 rotated_key = response.json()`,
-    disable: `import requests
+		disable: `import requests
 
 response = requests.post(
     "https://reloop.sh/api-key/v1/api_key_id/disable",
@@ -96,9 +96,9 @@ response = requests.post(
 )
 
 result = response.json()`,
-  },
-  php: {
-    create: `<?php
+	},
+	php: {
+		create: `<?php
 $payload = [
     "name" => "Production key",
     "enabled" => true,
@@ -116,7 +116,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $apiKey = curl_exec($ch);
 curl_close($ch);
 ?>`,
-    list: `<?php
+		list: `<?php
 $ch = curl_init("https://reloop.sh/api-key/v1/?page=1&limit=10");
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     "Authorization: Bearer YOUR_API_KEY",
@@ -126,7 +126,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $apiKeys = curl_exec($ch);
 curl_close($ch);
 ?>`,
-    rotate: `<?php
+		rotate: `<?php
 $ch = curl_init("https://reloop.sh/api-key/v1/api_key_id/rotate");
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -137,7 +137,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $rotatedKey = curl_exec($ch);
 curl_close($ch);
 ?>`,
-    disable: `<?php
+		disable: `<?php
 $ch = curl_init("https://reloop.sh/api-key/v1/api_key_id/disable");
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -148,5 +148,5 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $result = curl_exec($ch);
 curl_close($ch);
 ?>`,
-  },
+	},
 };

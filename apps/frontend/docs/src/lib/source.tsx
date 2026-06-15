@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
-import matter from "gray-matter";
 import { Icon } from "@reloop/ui/icon";
+import matter from "gray-matter";
 import type { MDXComponents } from "mdx/types";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import type React from "react";
@@ -182,7 +182,10 @@ function buildTree(dir: string, base = ""): PageTreeItem[] {
 						);
 						if (childMeta.title) folderName = childMeta.title;
 						if (childMeta.icon) {
-							if (childMeta.icon.startsWith("si") || childMeta.icon.startsWith("Si")) {
+							if (
+								childMeta.icon.startsWith("si") ||
+								childMeta.icon.startsWith("Si")
+							) {
 								folderIcon = (
 									<SimpleIcon
 										name={childMeta.icon}

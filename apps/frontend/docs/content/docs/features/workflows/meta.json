@@ -1,8 +1,5 @@
 {
 	"title": "Workflows",
 	"icon": "modules",
-	"pages": [
-		"index",
-		"details"
-	]
+	"pages": ["index", "details"]
 }

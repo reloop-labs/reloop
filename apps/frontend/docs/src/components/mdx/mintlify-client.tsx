@@ -3,9 +3,9 @@
 import {
 	Accordion,
 	Callout,
-	Card as MintlifyCard,
 	Icon,
 	Info,
+	Card as MintlifyCard,
 	Steps as MintlifySteps,
 	Tabs as MintlifyTabs,
 	Note,
@@ -317,11 +317,7 @@ const Card = React.forwardRef<
 
 	return (
 		<div onClick={handleClick} className="contents">
-			<MintlifyCard
-				ref={ref}
-				href={href}
-				{...(props as any)}
-			/>
+			<MintlifyCard ref={ref} href={href} {...(props as any)} />
 		</div>
 	);
 });
