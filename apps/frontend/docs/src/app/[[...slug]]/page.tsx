@@ -290,20 +290,20 @@ export default async function Page(props: {
 							}
 						>
 							{/* Title row */}
-							<div className="mb-8 flex items-start justify-between gap-4">
-								<div className="flex-1">
-									<h1 className="font-semibold text-3xl text-fd-foreground tracking-[-0.03em]">
+							<div className="mb-8">
+								<div className="flex items-start justify-between gap-4">
+									<h1 className="flex-1 font-semibold text-3xl text-fd-foreground tracking-[-0.03em]">
 										{page.data.title}
 									</h1>
-									{page.data.description && !isApiPage && (
-										<p className="mt-3.5 text-[16px] text-text-sub-600/90 leading-relaxed tracking-[-0.01em]">
-											{page.data.description}
-										</p>
-									)}
+									<div className="mt-2 shrink-0">
+										<PageActions rawContent={(page.data as any).raw} />
+									</div>
 								</div>
-								<div className="mt-2 shrink-0">
-									<PageActions rawContent={(page.data as any).raw} />
-								</div>
+								{page.data.description && !isApiPage && (
+									<p className="mt-3.5 text-[16px] text-text-sub-600 leading-relaxed tracking-[-0.01em]">
+										{page.data.description}
+									</p>
+								)}
 							</div>
 
 							{/* Content */}
