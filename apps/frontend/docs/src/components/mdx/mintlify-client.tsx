@@ -3,7 +3,7 @@
 import {
 	Accordion,
 	Callout,
-	Card,
+	Card as MintlifyCard,
 	Icon,
 	Info,
 	Steps as MintlifySteps,
@@ -13,6 +13,7 @@ import {
 	Warning,
 } from "@mintlify/components";
 import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
+import { useRouter } from "next/navigation";
 import React from "react";
 import {
 	siDotnet,
@@ -276,6 +277,55 @@ const Steps = React.forwardRef<
 Steps.displayName = "Steps";
 
 const Step = (MintlifySteps as any).Item;
+
+const Card = React.forwardRef<
+	HTMLAnchorElement,
+	React.ComponentProps<typeof MintlifyCard> & {
+		onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+	}
+>(({ href, onClick, ...props }, ref) => {
+	const router = useRouter();
+
+	const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+		const anchor = (e.target as HTMLElement).closest("a");
+		if (!anchor) return;
+
+		if (onClick) {
+			onClick(e as any);
+		}
+
+		let targetHref = anchor.getAttribute("href");
+		if (
+			targetHref &&
+			(targetHref.startsWith("/") || targetHref.startsWith(".")) &&
+			!targetHref.startsWith("//") &&
+			e.button === 0 &&
+			!e.ctrlKey &&
+			!e.metaKey &&
+			!e.shiftKey &&
+			!e.altKey
+		) {
+			e.preventDefault();
+			if (targetHref.startsWith("/docs/")) {
+				targetHref = targetHref.slice(5);
+			} else if (targetHref === "/docs") {
+				targetHref = "/";
+			}
+			router.push(targetHref);
+		}
+	};
+
+	return (
+		<div onClick={handleClick} className="contents">
+			<MintlifyCard
+				ref={ref}
+				href={href}
+				{...(props as any)}
+			/>
+		</div>
+	);
+});
+Card.displayName = "Card";
 
 export {
 	Accordion,

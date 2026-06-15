@@ -262,8 +262,7 @@ export function Sidebar({
 	}, [hoveredEl, activeEl]);
 
 	// Read the HTTP method from the currently targeted element (set via data-method attribute)
-	const currentMethod =
-		(hoveredEl || activeEl)?.dataset?.method ?? null;
+	const currentMethod = (hoveredEl || activeEl)?.dataset?.method ?? null;
 
 	return (
 		<aside
@@ -308,7 +307,11 @@ export function Sidebar({
 						pathname,
 					}}
 				>
-					<AnimatedHoverBackground rect={rect} skipTransition={skipTransition} method={currentMethod} />
+					<AnimatedHoverBackground
+						rect={rect}
+						skipTransition={skipTransition}
+						method={currentMethod}
+					/>
 
 					<div className="z-10 flex flex-col gap-px">
 						{filteredTree.map((node, index) => {

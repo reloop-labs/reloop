@@ -189,10 +189,12 @@ export function WebhookSidebarSection({
 	depth?: number;
 }) {
 	if (node.type === "separator") {
+		const name = node.name as string;
+		const id = name.toLowerCase().replace(/\s+/g, "-");
 		return (
-			<div className="mt-4 mb-1.5 px-2">
+			<div id={id} className="scroll-mt-8 mt-4 mb-1.5 px-2">
 				<h4 className="font-semibold text-sm uppercase">
-					{node.name as string}
+					{name}
 				</h4>
 			</div>
 		);
