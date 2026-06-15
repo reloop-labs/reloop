@@ -157,12 +157,6 @@ Important notes:
 - [Reloop Skill](https://docs.reloop.dev/docs/integrations/reloop-skill): Agent skill for sending emails through Reloop
 - [Email Best Practices Skill](https://docs.reloop.dev/docs/integrations/email-best-practices): Agent skill for production-ready email guidelines
 - [Agent Email Inbox](https://docs.reloop.dev/docs/integrations/agent-email-inbox): Give your AI agent its own email inbox
-- [Lovable Integration](https://docs.reloop.dev/docs/integrations/lovable-integration): Use Reloop with Lovable
-- [v0 Integration](https://docs.reloop.dev/docs/integrations/v0-integration): Use Reloop with v0
-- [Bolt.new Integration](https://docs.reloop.dev/docs/integrations/bolt-new-integration): Use Reloop with Bolt.new
-- [Replit Integration](https://docs.reloop.dev/docs/integrations/replit-integration): Use Reloop with Replit
-- [Base44 Integration](https://docs.reloop.dev/docs/integrations/base44-integration): Use Reloop with Base44
-- [Leap.new Integration](https://docs.reloop.dev/docs/integrations/leap-integration): Use Reloop with Leap.new
 
 ## Resources
 
