@@ -48,7 +48,7 @@ const templateService = new Elysia({
 	prefix: "/api/template",
 	name: "Template Service",
 })
-	.use(evlog())
+	.use(evlog({ exclude: ["**/health"] }))
 	.use(
 		openapi({
 			documentation: {

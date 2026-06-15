@@ -47,7 +47,7 @@ const webhookService = new Elysia({
 	prefix: "/api/webhook",
 	name: "Webhook Service",
 })
-	.use(evlog())
+	.use(evlog({ exclude: ["**/health"] }))
 	.use(
 		openapi({
 			documentation: {

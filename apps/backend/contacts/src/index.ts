@@ -83,7 +83,7 @@ const contactsService = new Elysia({
 			},
 		}),
 	)
-	.use(evlog())
+	.use(evlog({ exclude: ["**/health"] }))
 	.use(serverTiming())
 	.use(landingRoute)
 	.use(healthRoute)

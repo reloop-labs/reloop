@@ -44,7 +44,7 @@ const uploadService = new Elysia({
 	prefix: "/api/upload",
 	name: "Upload Service",
 })
-	.use(evlog())
+	.use(evlog({ exclude: ["**/health"] }))
 	.use(
 		openapi({
 			documentation: {

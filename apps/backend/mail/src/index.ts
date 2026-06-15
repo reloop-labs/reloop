@@ -43,7 +43,7 @@ const mailService = new Elysia({
 	prefix: "/api/mail",
 	name: "Mail Service",
 })
-	.use(evlog())
+	.use(evlog({ exclude: ["**/health"] }))
 	.use(
 		openapi({
 			documentation: {

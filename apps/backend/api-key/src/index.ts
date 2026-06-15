@@ -59,7 +59,7 @@ const apiKeyService = new Elysia({
 			},
 		}),
 	)
-	.use(evlog())
+	.use(evlog({ exclude: ["**/health"] }))
 	.use(serverTiming())
 	.onError(({ error, set }) => {
 		const parsed = parseError(error);

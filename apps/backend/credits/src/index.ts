@@ -62,7 +62,7 @@ const app = new Elysia({ prefix: "/api/credits", name: "Credits Service" })
 			},
 		}),
 	)
-	.use(evlog())
+	.use(evlog({ exclude: ["**/health"] }))
 	.use(landingRoute)
 	.use(healthRoute)
 	.use(agentCardRoute)
