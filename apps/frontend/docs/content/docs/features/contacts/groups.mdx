@@ -34,85 +34,33 @@ Once a group is created:
 
 ---
 
-## Technical Reference
+## API Reference
 
-### API Endpoints
+Use the Groups API to create segments, list group members, and enroll contacts.
 
-#### 1. Create a Group
-
-```http
-POST /api/contacts/v1/groups/create
-Content-Type: application/json
-```
-
-**Request Payload:**
-
-```json
-{
-  "name": "Beta Testers"
-}
-```
-
-**Response (200 OK):**
-
-```json
-{
-  "id": "grp_384729104",
-  "name": "Beta Testers",
-  "createdAt": "2026-06-15T12:00:00.000Z"
-}
-```
-
----
-
-#### 2. Add Contact to a Group
-
-Add a contact to a group using their email address.
-
-```http
-POST /api/contacts/group/{groupId}
-Content-Type: application/json
-```
-
-**Request Payload:**
-
-```json
-{
-  "email": "user@example.com"
-}
-```
-
-**Response (200 OK):**
-
-```json
-{
-  "success": true
-}
-```
-
----
-
-#### 3. Remove Contact from a Group
-
-Remove a contact from a group using their email address.
-
-```http
-DELETE /api/contacts/group/{groupId}
-Content-Type: application/json
-```
-
-**Request Payload:**
-
-```json
-{
-  "email": "user@example.com"
-}
-```
-
-**Response (200 OK):**
-
-```json
-{
-  "success": true
-}
-```
+<CardGroup cols={2}>
+  <Card icon="plus" title="Create Group" href="/api/contacts/groups/post-api-contacts-v1groups-create">
+    Create a new contact group.
+  </Card>
+  <Card icon="list" title="List Groups" href="/api/contacts/groups/get-api-contacts-v1groups-list">
+    Retrieve all contact groups.
+  </Card>
+  <Card icon="eye" title="Get Group Details" href="/api/contacts/groups/get-api-contacts-v1groups-by-group_id">
+    Retrieve details for a single group.
+  </Card>
+  <Card icon="users" title="Get Group Contacts" href="/api/contacts/groups/get-api-contacts-v1groups-by-group_id-contacts">
+    List all contacts enrolled in a specific group.
+  </Card>
+  <Card icon="pen" title="Update Group" href="/api/contacts/groups/patch-api-contacts-v1groups-by-group_id">
+    Rename or update a contact group.
+  </Card>
+  <Card icon="trash" title="Delete Group" href="/api/contacts/groups/delete-api-contacts-v1groups-by-group_id">
+    Delete a contact group.
+  </Card>
+  <Card icon="user-plus" title="Add Group Member" href="/api/post-api-contacts-group-by-group_id">
+    Add a contact to a group by email address.
+  </Card>
+  <Card icon="user-minus" title="Remove Group Member" href="/api/delete-api-contacts-group-by-group_id">
+    Remove a contact from a group by email address.
+  </Card>
+</CardGroup>

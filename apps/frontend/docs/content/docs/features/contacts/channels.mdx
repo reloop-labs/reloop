@@ -44,37 +44,24 @@ You can create, edit, and configure your messaging channels in the dashboard.
 
 ---
 
-## Technical Reference
+## API Reference
 
-### API Endpoint
+Use the Channels API to manage subscription channels and user preference topics programmatically.
 
-#### Create a Channel
-
-```http
-POST /api/contacts/v1/channels/create
-Content-Type: application/json
-```
-
-**Request Payload:**
-
-```json
-{
-  "name": "Product Updates",
-  "description": "Stay up to date with our latest features and releases.",
-  "defaultSubscription": "opt_in",
-  "visibility": "public"
-}
-```
-
-**Response (200 OK):**
-
-```json
-{
-  "id": "chan_298471029",
-  "name": "Product Updates",
-  "description": "Stay up to date with our latest features and releases.",
-  "defaultSubscription": "opt_in",
-  "visibility": "public",
-  "createdAt": "2026-06-15T12:00:00.000Z"
-}
-```
+<CardGroup cols={2}>
+  <Card icon="plus" title="Create Channel" href="/api/contacts/channels/post-api-contacts-v1channels-create">
+    Create a new subscription channel.
+  </Card>
+  <Card icon="list" title="List Channels" href="/api/contacts/channels/get-api-contacts-v1channels-list">
+    Retrieve all subscription channels.
+  </Card>
+  <Card icon="eye" title="Get Channel Details" href="/api/contacts/channels/get-api-contacts-v1channels-by-channel_id">
+    Retrieve details for a single channel.
+  </Card>
+  <Card icon="pen" title="Update Channel" href="/api/contacts/channels/patch-api-contacts-v1channels-by-channel_id">
+    Update settings of an existing channel.
+  </Card>
+  <Card icon="trash" title="Delete Channel" href="/api/contacts/channels/delete-api-contacts-v1channels-by-channel_id">
+    Delete a channel and clear enrollment data.
+  </Card>
+</CardGroup>
