@@ -3,6 +3,8 @@
 	"icon": "users",
 	"pages": [
 		"index",
-		"details"
+		"properties",
+		"groups",
+		"channels"
 	]
 }

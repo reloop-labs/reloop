@@ -49,7 +49,7 @@ export const PropertiesEmptyState = ({
 					className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 				>
 					<a
-						href="https://reloop.sh/docs/properties"
+						href="https://reloop.sh/docs/features/contacts/properties"
 						target="_blank"
 						rel="noopener noreferrer"
 					>

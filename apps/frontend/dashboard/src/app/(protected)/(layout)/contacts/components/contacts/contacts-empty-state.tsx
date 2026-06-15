@@ -30,7 +30,7 @@ export const ContactsEmptyState = ({
 		</span>
 	),
 	docsText = "Learn about contacts",
-	docsLink = "https://reloop.sh/docs/contacts",
+	docsLink = "https://reloop.sh/docs/features/contacts",
 }: ContactsEmptyStateProps) => {
 	useUserOrganization();
 

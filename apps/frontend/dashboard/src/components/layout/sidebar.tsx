@@ -147,9 +147,6 @@ export const MainSidebar: React.FC = () => {
 				)}
 			>
 				<UserMenuDropdown user={user} isCollapsed={isSidebarCollapsed} />
-				<span className="select-none font-medium text-[10px] text-text-soft-400 tracking-wider opacity-50">
-					v0.1.0
-				</span>
 			</div>
 		</div>
 	);

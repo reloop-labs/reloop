@@ -170,6 +170,7 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 					</span>
 				}
 				emptyStateDocsText="Learn about groups"
+				emptyStateDocsLink="https://reloop.sh/docs/features/contacts/groups"
 			/>
 		</div>
 	);

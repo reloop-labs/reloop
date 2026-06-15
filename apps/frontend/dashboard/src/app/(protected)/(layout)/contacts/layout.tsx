@@ -122,7 +122,18 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 						</div>
 						{!isBulkImportPage && (
 							<div className="flex items-center gap-2 self-end">
-								<DocsButton slug="contacts" size="xsmall" />
+								<DocsButton
+									slug={
+										isPropertiesPage
+											? "features/contacts/properties"
+											: isChannelsPage
+												? "features/contacts/channels"
+												: isGroupsPage
+													? "features/contacts/groups"
+													: "features/contacts"
+									}
+									size="xsmall"
+								/>
 								<Button.Root
 									variant="neutral"
 									size="xsmall"

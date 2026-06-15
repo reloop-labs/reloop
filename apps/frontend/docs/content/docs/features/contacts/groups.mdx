@@ -1,0 +1,116 @@
+---
+title: Groups
+description: Segment your contacts into target groups for focused messaging campaigns.
+---
+
+**Groups** allow you to bundle subscribers into lists or segments (e.g., "VIP Customers", "Beta Testers", "New Registrants"). Grouping contacts makes it easy to target specific subsets of your list when sending emails.
+
+---
+
+## Dashboard Usage
+
+Managing contact groups is fully supported in the dashboard.
+
+### 1. Creating a Group
+1. Navigate to **Contacts** in the sidebar and select the **Groups** tab.
+2. Click the **Create Group** button.
+3. Enter a friendly **Group Name** (e.g., `VIP Customers`).
+4. Click **Create Group** to save.
+
+### 2. Adding Contacts to a Group
+Once a group is created:
+1. Click on the group name in the Groups list to open the group detail view.
+2. Click **Add Contacts to Group** (or similar member add action).
+3. Use the search input to filter contacts in your organization.
+4. Select the check boxes next to the contacts you wish to add (or toggle **Select All** matching search).
+5. Click **Add Contacts** to bulk-add them to the group.
+
+### 3. Removing Contacts from a Group
+1. In the group detail page, locate the contact in the member list.
+2. Click the options menu next to the contact.
+3. Click **Remove from Group** and confirm.
+
+---
+
+## Technical Reference
+
+### API Endpoints
+
+#### 1. Create a Group
+
+```http
+POST /api/contacts/v1/groups/create
+Content-Type: application/json
+```
+
+**Request Payload:**
+
+```json
+{
+  "name": "Beta Testers"
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "id": "grp_384729104",
+  "name": "Beta Testers",
+  "createdAt": "2026-06-15T12:00:00.000Z"
+}
+```
+
+---
+
+#### 2. Add Contact to a Group
+
+Add a contact to a group using their email address.
+
+```http
+POST /api/contacts/group/{groupId}
+Content-Type: application/json
+```
+
+**Request Payload:**
+
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true
+}
+```
+
+---
+
+#### 3. Remove Contact from a Group
+
+Remove a contact from a group using their email address.
+
+```http
+DELETE /api/contacts/group/{groupId}
+Content-Type: application/json
+```
+
+**Request Payload:**
+
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "success": true
+}
+```

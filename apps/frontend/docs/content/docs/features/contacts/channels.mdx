@@ -1,0 +1,78 @@
+---
+title: Channels
+description: Configure subscription channels to manage customer preferences and message routing rules.
+---
+
+**Channels** represent subscription categories or topics (e.g., "Product Updates", "Monthly Newsletter", or "System Alerts"). Using channels allows you to manage subscriber consent granularly, preventing spam complaints by letting contacts opt out of specific types of content rather than unsubscribing globally.
+
+---
+
+## Channel Settings
+
+Every subscription channel is defined by two key settings:
+
+* **Default Subscription**:
+  * **Opt-In** (`opt_in`): New contacts added to the workspace are automatically enrolled in this channel.
+  * **Opt-Out** (`opt_out`): Contacts must be manually enrolled in this channel, or opt in themselves.
+* **Visibility**:
+  * **Public** (`public`): The channel is visible to subscribers, allowing them to opt in or out of it on their preferences management page.
+  * **Private** (`private`): The channel is only visible to your internal team inside the Reloop dashboard.
+
+---
+
+## Dashboard Usage
+
+You can create, edit, and configure your messaging channels in the dashboard.
+
+### 1. Creating a Channel
+1. Navigate to **Contacts** in the sidebar and click on the **Channels** tab.
+2. Click the **Create Channel** button.
+3. Configure the fields:
+   * **Channel Name**: A descriptive name (e.g., `Product Updates`).
+   * **Description** (Optional): A description explaining what kind of messages are sent on this channel (maximum 500 characters).
+   * **Default Subscription**: Toggle to automatically enroll new contacts.
+   * **Public Channel**: Toggle to make the channel visible on public subscription preference pages.
+4. Review the preview pane on the right of the modal to see how it will render for subscribers.
+5. Click **Create Channel** to save.
+
+### 2. Editing or Deleting a Channel
+1. Find the target channel in the channels list table.
+2. Click the options menu at the end of the row.
+3. Choose **Edit** to modify its settings, or **Delete** to permanently remove the channel. Note: Deleting a channel will remove all enrollment records associated with it.
+
+---
+
+## Technical Reference
+
+### API Endpoint
+
+#### Create a Channel
+
+```http
+POST /api/contacts/v1/channels/create
+Content-Type: application/json
+```
+
+**Request Payload:**
+
+```json
+{
+  "name": "Product Updates",
+  "description": "Stay up to date with our latest features and releases.",
+  "defaultSubscription": "opt_in",
+  "visibility": "public"
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "id": "chan_298471029",
+  "name": "Product Updates",
+  "description": "Stay up to date with our latest features and releases.",
+  "defaultSubscription": "opt_in",
+  "visibility": "public",
+  "createdAt": "2026-06-15T12:00:00.000Z"
+}
+```
