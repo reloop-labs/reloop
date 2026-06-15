@@ -187,11 +187,30 @@ export function Sidebar({
 	// Restore scroll position on mount
 	useLayoutEffect(() => {
 		if (!navRef.current) return;
+		if (typeof window !== "undefined" && window.location.hash) return;
 		const savedScroll = sessionStorage.getItem("reloop-sidebar-scroll");
 		if (savedScroll) {
 			navRef.current.scrollTop = Number.parseInt(savedScroll, 10);
 		}
 	}, []);
+
+	// Scroll to hash element in sidebar on navigation/mount
+	useEffect(() => {
+		const handleScrollToHash = () => {
+			if (typeof window === "undefined" || !navRef.current) return;
+			const hash = window.location.hash;
+			if (!hash) return;
+			const id = hash.replace("#", "");
+			if (!id) return;
+			const targetEl = navRef.current.querySelector(`#${id}`);
+			if (targetEl) {
+				targetEl.scrollIntoView({ block: "start" });
+			}
+		};
+
+		const timeoutId = setTimeout(handleScrollToHash, 100);
+		return () => clearTimeout(timeoutId);
+	}, [pathname]);
 
 	const prevTabUrl = useRef(activeTab?.url);
 
