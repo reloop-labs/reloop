@@ -1,3 +1,4 @@
+import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { useLogger } from "evlog/elysia";
 import {
@@ -26,6 +27,13 @@ export async function createDomainController({
 } & DomainTypes.CreateDomainRequest): Promise<DomainTypes.DomainResponse> {
 	const log = useLogger();
 	try {
+		if (/^www\./i.test(domain)) {
+			throw DomainErrors.invalidDomain(
+				domain,
+				"Domains starting with 'www.' are not supported. Please use a root domain or a non-www subdomain.",
+			);
+		}
+
 		// Step 1: Check if domain already exists
 		const { deletedDomain } = await checkExistingDomain_step1({
 			domain,

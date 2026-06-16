@@ -43,7 +43,7 @@ export const DomainErrors = {
 	invalidDomain: (domain: string, reason?: string) =>
 		createError({
 			status: 400,
-			message: "Invalid domain",
+			message: reason ?? "Invalid domain",
 			why: reason ?? `The domain ${domain} is invalid or cannot be processed.`,
 			fix: "Ensure you are providing a valid FQDN (e.g., example.com).",
 		}),

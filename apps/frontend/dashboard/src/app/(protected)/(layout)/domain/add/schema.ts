@@ -8,6 +8,10 @@ export const domainSchema = v.object({
 			/^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/,
 			"Please enter a valid domain name",
 		),
+		v.check(
+			(val) => !val.toLowerCase().startsWith("www."),
+			"Domains starting with 'www.' are not supported. Please use a root domain or a non-www subdomain.",
+		),
 	),
 	clickTracking: v.boolean(),
 	openTracking: v.boolean(),
