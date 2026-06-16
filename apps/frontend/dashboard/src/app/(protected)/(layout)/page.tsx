@@ -220,77 +220,125 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 
 				<div className="grid gap-6 pt-2 md:grid-cols-2 lg:grid-cols-3">
 					{/* Emails Card */}
-					<Link
-						href="/emails"
-						className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 p-5 transition-all duration-200 hover:border-orange-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-orange-500/20 dark:hover:bg-white/[0.02]"
-					>
-						<div className="space-y-4">
-							<div className="flex items-center gap-3">
-								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-400">
-									<Mail className="h-5 w-5" />
-								</div>
-								<span className="font-semibold text-base text-text-strong-950 dark:text-white">
-									Emails
-								</span>
+					<div className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 transition-all duration-200 hover:border-orange-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-orange-500/20 dark:hover:bg-white/[0.02]">
+						{/* Header */}
+						<Link
+							href="/emails"
+							className="flex items-center justify-between border-stroke-soft-100/50 border-b px-5 py-4 dark:border-white/5"
+						>
+							<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
+								Emails
+							</span>
+							<ArrowRight className="h-4 w-4 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/60" />
+						</Link>
+
+						{/* Inner Box */}
+						<div className="m-4 flex flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center dark:border-white/5 dark:bg-white/[0.02]">
+							{/* Icon */}
+							<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-400">
+								<Mail className="h-6 w-6" />
 							</div>
-							<p className="text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
+
+							{/* Heading */}
+							<h4 className="mt-4 font-semibold text-sm text-text-strong-950 tracking-tight dark:text-white">
+								Send emails without the overhead
+							</h4>
+
+							{/* Description */}
+							<p className="mt-2 max-w-[220px] text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50">
 								Send transactional & marketing emails with high deliverability.
 							</p>
+
+							{/* Button */}
+							<Link
+								href="/emails"
+								className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-semibold text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
+							>
+								Send email
+							</Link>
 						</div>
-						<div className="mt-4 flex items-center gap-1 font-semibold text-[13px] text-orange-600 dark:text-orange-400">
-							<span>Send email</span>
-							<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-						</div>
-					</Link>
+					</div>
 
 					{/* Agent Inbox Card */}
-					<Link
-						href="/agent-inbox"
-						className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 p-5 transition-all duration-200 hover:border-blue-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-blue-500/20 dark:hover:bg-white/[0.02]"
-					>
-						<div className="space-y-4">
-							<div className="flex items-center gap-3">
-								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400">
-									<Inbox className="h-5 w-5" />
-								</div>
-								<span className="font-semibold text-base text-text-strong-950 dark:text-white">
-									Inbox Triage
-								</span>
+					<div className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 transition-all duration-200 hover:border-blue-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-blue-500/20 dark:hover:bg-white/[0.02]">
+						{/* Header */}
+						<Link
+							href="/agent-inbox"
+							className="flex items-center justify-between border-stroke-soft-100/50 border-b px-5 py-4 dark:border-white/5"
+						>
+							<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
+								Inbox Triage
+							</span>
+							<ArrowRight className="h-4 w-4 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/60" />
+						</Link>
+
+						{/* Inner Box */}
+						<div className="m-4 flex flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center dark:border-white/5 dark:bg-white/[0.02]">
+							{/* Icon */}
+							<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400">
+								<Inbox className="h-6 w-6" />
 							</div>
-							<p className="text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
+
+							{/* Heading */}
+							<h4 className="mt-4 font-semibold text-sm text-text-strong-950 tracking-tight dark:text-white">
+								Triage messages without the overhead
+							</h4>
+
+							{/* Description */}
+							<p className="mt-2 max-w-[220px] text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50">
 								Interact with incoming messages using AI prompts or human
 								routing.
 							</p>
+
+							{/* Button */}
+							<Link
+								href="/agent-inbox"
+								className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-semibold text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
+							>
+								Open inbox
+							</Link>
 						</div>
-						<div className="mt-4 flex items-center gap-1 font-semibold text-[13px] text-blue-600 dark:text-blue-400">
-							<span>Open inbox</span>
-							<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-						</div>
-					</Link>
+					</div>
 
 					{/* Audit Logs Card */}
-					<Link
-						href="/logs"
-						className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 p-5 transition-all duration-200 hover:border-slate-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-slate-500/20 dark:hover:bg-white/[0.02]"
-					>
-						<div className="space-y-4">
-							<div className="flex items-center gap-3">
-								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-500 dark:bg-slate-500/10 dark:text-slate-400">
-									<Shield className="h-5 w-5" />
-								</div>
-								<span className="font-semibold text-base text-text-strong-950 dark:text-white">
-									Audit Logs
-								</span>
+					<div className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 transition-all duration-200 hover:border-slate-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-slate-500/20 dark:hover:bg-white/[0.02]">
+						{/* Header */}
+						<Link
+							href="/logs"
+							className="flex items-center justify-between border-stroke-soft-100/50 border-b px-5 py-4 dark:border-white/5"
+						>
+							<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
+								Audit Logs
+							</span>
+							<ArrowRight className="h-4 w-4 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/60" />
+						</Link>
+
+						{/* Inner Box */}
+						<div className="m-4 flex flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center dark:border-white/5 dark:bg-white/[0.02]">
+							{/* Icon */}
+							<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-slate-500 dark:bg-slate-500/10 dark:text-slate-400">
+								<Shield className="h-6 w-6" />
 							</div>
-							<p className="text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
+
+							{/* Heading */}
+							<h4 className="mt-4 font-semibold text-sm text-text-strong-950 tracking-tight dark:text-white">
+								Track activity without the overhead
+							</h4>
+
+							{/* Description */}
+							<p className="mt-2 max-w-[220px] text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50">
 								Track security events, API key access, and team actions.
 							</p>
+
+							{/* Button */}
+							<Link
+								href="/logs"
+								className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-semibold text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
+							>
+								View audit logs
+							</Link>
 						</div>
-						<div className="mt-4 flex items-center gap-1 font-semibold text-[13px] text-slate-600 dark:text-slate-400">
-							<span>View audit logs</span>
-							<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-						</div>
-					</Link>
+					</div>
 
 					{/* Docs Card (Premium style) */}
 					<div className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 transition-all duration-200 hover:border-indigo-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-indigo-500/20 dark:hover:bg-white/[0.02]">
