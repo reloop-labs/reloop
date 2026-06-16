@@ -46,7 +46,7 @@ export default function CommunityOpenGraphImage() {
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: "space-between",
-				background: "#0a0a0a",
+				backgroundColor: "#000000",
 				padding: "56px 72px",
 			}}
 		>
