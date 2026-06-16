@@ -1,6 +1,7 @@
 "use client";
 
 import type { DNSRecord } from "@fe/dashboard/types/api.types";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { DNSRecordTableMinimal } from "./dns-table-minimal";
@@ -18,6 +19,7 @@ interface DNSRecordSectionProps {
 		disabled: boolean;
 	};
 	loadingRows?: number;
+	className?: string;
 }
 
 export function DNSRecordSection({
@@ -28,9 +30,10 @@ export function DNSRecordSection({
 	isLoading,
 	docsUrl,
 	loadingRows = 1,
+	className,
 }: DNSRecordSectionProps) {
 	return (
-		<div className="relative mt-7">
+		<div className={cn("relative", className)}>
 			<div className="mb-3 flex items-start justify-between gap-4">
 				<Link
 					href={docsUrl || "#"}

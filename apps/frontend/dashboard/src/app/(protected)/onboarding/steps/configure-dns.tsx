@@ -169,6 +169,7 @@ export const ConfigureDnsStep = () => {
 											onCopyToClipboard={copyToClipboard}
 											isLoading={isLoading}
 											docsUrl="https://reloop.sh/docs/dns/dmarc"
+											className="mt-7"
 										/>
 									)}
 								</div>
