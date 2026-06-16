@@ -3,6 +3,7 @@
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import * as DigitInput from "@reloop/ui/digit-input";
+import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import { AnimatePresence, motion } from "framer-motion";
@@ -122,10 +123,11 @@ export function VerifyOTP({
 
 			<Button.Root
 				type="button"
-				variant="neutral"
-				className={`h-11 w-full rounded-2xl! ${isSuccess ? "border-success-base bg-success-base text-white hover:bg-success-base" : ""}`}
+				variant={isSuccess ? "success" : "neutral"}
+				className="h-11 w-full rounded-2xl!"
 				mode={!enterCode ? "lighter" : undefined}
 				onClick={() => {
+					if (isSuccess || status === "loading") return;
 					if (!enterCode) {
 						setEnterCode(true);
 					} else {
@@ -134,10 +136,12 @@ export function VerifyOTP({
 				}}
 				disabled={
 					enterCode &&
-					(otpValue.length !== 6 || status === "loading" || isSuccess)
+					(otpValue.length !== 6 || status === "loading") &&
+					!isSuccess
 				}
 			>
 				{status === "loading" && <Spinner color="var(--text-strong-950)" />}
+				{isSuccess && <Icon name="check-circle" className="mr-2 h-4 w-4" />}
 				{!enterCode
 					? "Enter code manually"
 					: isSuccess

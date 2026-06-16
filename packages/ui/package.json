@@ -61,6 +61,8 @@
 		"./popover": "./src/components/popover.tsx",
 		"./postcss": "./postcss.config.js",
 		"./progress": "./src/components/progress.tsx",
+		"./progress-bar": "./src/components/progress-bar.tsx",
+		"./progress-circle": "./src/components/progress-circle.tsx",
 		"./radio-group": "./src/components/radio-group.tsx",
 		"./radio": "./src/components/radio.tsx",
 		"./scroll-area": "./src/components/scroll-area.tsx",
@@ -91,6 +93,7 @@
 		"./divider": "./src/components/divider.tsx",
 		"./use-loading": "./src/hooks/use-loading.ts",
 		"./horizontal-stepper": "./src/components/horizontal-stepper.tsx",
+		"./vertical-stepper": "./src/components/vertical-stepper.tsx",
 		"./digit-input": "./src/components/digit-input.tsx",
 		"./chatwoot-loader": "./src/components/chatwoot-loader.tsx",
 		"./rybbit-loader": "./src/components/rybbit-loader.tsx"

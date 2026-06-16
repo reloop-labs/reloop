@@ -30,6 +30,7 @@ export const buttonVariants = tv({
 			primary: {},
 			neutral: {},
 			error: {},
+			success: {},
 		},
 		mode: {
 			filled: {},
@@ -235,6 +236,65 @@ export const buttonVariants = tv({
 					"hover:bg-red-alpha-10",
 					// focus
 					"focus-visible:bg-bg-white-0 focus-visible:shadow-button-error-focus focus-visible:ring-error-base",
+				],
+			},
+		},
+		//#endregion
+
+		//#region variant=success
+		{
+			variant: "success",
+			mode: "filled",
+			class: {
+				root: [
+					// base
+					"bg-success-base text-static-white",
+					// hover
+					"hover:bg-green-600 dark:hover:bg-green-700",
+					// focus
+					"focus-visible:shadow-button-primary-focus",
+				],
+			},
+		},
+		{
+			variant: "success",
+			mode: "stroke",
+			class: {
+				root: [
+					// base
+					"bg-bg-white-0 text-success-base ring-success-base",
+					// hover
+					"hover:bg-green-alpha-10 hover:ring-transparent",
+					// focus
+					"focus-visible:shadow-button-primary-focus",
+				],
+			},
+		},
+		{
+			variant: "success",
+			mode: "lighter",
+			class: {
+				root: [
+					// base
+					"bg-green-alpha-10 text-success-base ring-transparent",
+					// hover
+					"hover:bg-bg-white-0 hover:ring-success-base",
+					// focus
+					"focus-visible:bg-bg-white-0 focus-visible:shadow-button-primary-focus focus-visible:ring-success-base",
+				],
+			},
+		},
+		{
+			variant: "success",
+			mode: "ghost",
+			class: {
+				root: [
+					// base
+					"bg-transparent text-success-base ring-transparent",
+					// hover
+					"hover:bg-green-alpha-10",
+					// focus
+					"focus-visible:bg-bg-white-0 focus-visible:shadow-button-primary-focus focus-visible:ring-success-base",
 				],
 			},
 		},
