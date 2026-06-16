@@ -1,6 +1,5 @@
 "use client";
 
-import { FeedbackPopover } from "@fe/dashboard/components/feedback-popover";
 import { mainNavigation, userNavigation } from "@fe/dashboard/constants";
 import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import * as Button from "@reloop/ui/button";
@@ -12,7 +11,12 @@ import { UserDropdown } from "./user-dropdown";
 
 export const PageHeader = () => {
 	const pathname = usePathname();
-	const { isAiPanelOpen, toggleAiPanel } = useUIStore();
+	const {
+		isAiPanelOpen,
+		setIsAiPanelOpen,
+		aiPanelActiveTab,
+		setAiPanelActiveTab,
+	} = useUIStore();
 
 	const activeItem = [...mainNavigation, ...userNavigation].find((item) => {
 		if (item.path === "/") return pathname === "/";
@@ -59,9 +63,18 @@ export const PageHeader = () => {
 					size="xxsmall"
 					className={cn(
 						"gap-1.5 text-text-sub-600 hover:text-text-strong-950",
-						isAiPanelOpen && "bg-bg-weak-50 text-text-strong-950",
+						isAiPanelOpen && aiPanelActiveTab === "ai" && "bg-bg-weak-50 text-text-strong-950",
 					)}
-					onClick={toggleAiPanel}
+					onClick={() => {
+						if (!isAiPanelOpen) {
+							setAiPanelActiveTab("ai");
+							setIsAiPanelOpen(true);
+						} else if (aiPanelActiveTab === "ai") {
+							setIsAiPanelOpen(false);
+						} else {
+							setAiPanelActiveTab("ai");
+						}
+					}}
 				>
 					<Icon
 						name="sparkling"
@@ -72,7 +85,29 @@ export const PageHeader = () => {
 					</span>
 				</Button.Root>
 
-				<FeedbackPopover />
+				<Button.Root
+					variant="neutral"
+					mode="ghost"
+					size="xxsmall"
+					className={cn(
+						"gap-1.5 text-text-sub-600 hover:text-text-strong-950",
+						isAiPanelOpen && aiPanelActiveTab === "support" && "bg-bg-weak-50 text-text-strong-950",
+					)}
+					onClick={() => {
+						if (!isAiPanelOpen) {
+							setAiPanelActiveTab("support");
+							setIsAiPanelOpen(true);
+						} else if (aiPanelActiveTab === "support") {
+							setIsAiPanelOpen(false);
+						} else {
+							setAiPanelActiveTab("support");
+						}
+					}}
+				>
+					<Icon name="question" className="h-4 w-4 text-text-sub-600" />
+					<span>Support</span>
+				</Button.Root>
+
 				<UserDropdown />
 			</div>
 		</div>

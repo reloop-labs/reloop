@@ -3,7 +3,7 @@
 import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
 	ArrowUp,
 	Bot,
@@ -143,6 +143,8 @@ export const AiPanel = () => {
 		setIsAiPanelOpen,
 		isAiPanelExpanded,
 		setIsAiPanelExpanded,
+		aiPanelActiveTab,
+		setAiPanelActiveTab,
 	} = useUIStore();
 
 	const [messages, setMessages] = useState<Message[]>([]);
@@ -224,28 +226,46 @@ export const AiPanel = () => {
 			>
 				{/* Panel Header */}
 				<div className="flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b px-4 dark:border-white/5">
-					{/* Left side dropdown selector */}
-					<button
-						type="button"
-						className="flex items-center gap-1.5 font-semibold text-[13px] text-text-strong-950 hover:text-text-strong-950/80 dark:text-white"
-					>
-						New conversation
-						<Icon
-							name="chevron-right"
-							className="h-3 w-3 rotate-90 opacity-60"
-						/>
-					</button>
+					{/* Tab switcher */}
+					<div className="flex items-center gap-0.5 rounded-lg bg-bg-weak-50/80 p-0.5 dark:bg-white/5">
+						<button
+							type="button"
+							onClick={() => setAiPanelActiveTab("ai")}
+							className={cn(
+								"rounded-md px-2.5 py-1 text-[11px] font-medium transition-all duration-150",
+								aiPanelActiveTab === "ai"
+									? "bg-white text-text-strong-950 shadow-sm dark:bg-white/10 dark:text-white"
+									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+							)}
+						>
+							Ask AI
+						</button>
+						<button
+							type="button"
+							onClick={() => setAiPanelActiveTab("support")}
+							className={cn(
+								"rounded-md px-2.5 py-1 text-[11px] font-medium transition-all duration-150",
+								aiPanelActiveTab === "support"
+									? "bg-white text-text-strong-950 shadow-sm dark:bg-white/10 dark:text-white"
+									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+							)}
+						>
+							Support
+						</button>
+					</div>
 
 					{/* Right side controls */}
 					<div className="flex items-center gap-1">
-						<button
-							type="button"
-							onClick={clearChat}
-							title="New Chat"
-							className="flex h-7 w-7 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/60 dark:hover:bg-white/5"
-						>
-							<Plus className="h-4 w-4" />
-						</button>
+						{aiPanelActiveTab === "ai" && (
+							<button
+								type="button"
+								onClick={clearChat}
+								title="New Chat"
+								className="flex h-7 w-7 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/60 dark:hover:bg-white/5"
+							>
+								<Plus className="h-4 w-4" />
+							</button>
+						)}
 						<button
 							type="button"
 							onClick={() => setIsAiPanelExpanded(!isAiPanelExpanded)}
@@ -269,192 +289,220 @@ export const AiPanel = () => {
 					</div>
 				</div>
 
-				{/* Support Banner Row */}
-				<div className="flex items-center justify-between border-stroke-soft-100/50 border-b bg-bg-weak-50/20 px-4 py-2 dark:border-white/5 dark:bg-white/[0.01]">
-					<span className="text-text-sub-600 text-xs dark:text-white/50">
-						Need more help?
-					</span>
-					<a
-						href="mailto:support@reloop.sh"
-						className="rounded-md border border-stroke-soft-100 bg-white px-2.5 py-1 text-center font-medium text-[11px] text-text-strong-950 shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.03] dark:text-white dark:hover:bg-white/10"
-					>
-						Support
-					</a>
-				</div>
-
-				{/* Main Scrollable Chat Area */}
-				<div className="scrollbar-thin flex-1 overflow-y-auto px-4 py-6">
-					{messages.length === 0 ? (
-						// Welcome/Greeting view
-						<div className="flex flex-col items-center pt-8 pb-4">
-							{/* Glow custom illustration */}
-							<div className="relative mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-orange-500/10 to-purple-500/10 dark:from-orange-500/20 dark:to-purple-500/20">
-								<div className="absolute inset-0 animate-pulse rounded-2xl bg-gradient-to-tr from-orange-500/5 to-purple-500/5 blur-lg" />
-								<Bot className="h-8 w-8 text-orange-500 dark:text-orange-400" />
-							</div>
-
-							<h2 className="font-semibold text-2xl text-text-strong-950 dark:text-white">
-								{greeting}.
-							</h2>
-							<p className="mt-1 text-[13px] text-text-sub-600 dark:text-white/50">
-								What are we doing today?
-							</p>
-
-							{/* Suggestion Cards */}
-							<div className="mt-8 w-full space-y-2.5">
-								{SUGGESTIONS.map((item) => {
-									const ItemIcon = item.icon;
-									return (
-										<button
-											key={item.id}
-											type="button"
-											onClick={() => handleSuggestionClick(item)}
-											className="group flex w-full items-center gap-3.5 rounded-xl border border-stroke-soft-100 bg-white/40 p-3.5 text-left transition-all duration-200 hover:border-orange-500/30 hover:bg-white hover:shadow-sm dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-orange-500/20 dark:hover:bg-white/[0.03]"
-										>
-											<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-bg-weak-50 text-text-sub-600 transition-colors group-hover:bg-orange-500/10 group-hover:text-orange-500 dark:bg-white/5 dark:text-white/40 dark:group-hover:text-orange-400">
-												<ItemIcon className="h-4 w-4" />
-											</div>
-											<div className="min-w-0 flex-1">
-												<p className="font-semibold text-text-strong-950 text-xs dark:text-white">
-													{item.title}
-												</p>
-												<p className="mt-0.5 truncate text-[11px] text-text-sub-600 dark:text-white/40">
-													{item.desc}
-												</p>
-											</div>
-										</button>
-									);
-								})}
-							</div>
-
-							{/* Privacy Banner */}
-							{showPrivacyNotice && (
-								<div className="relative mt-8 flex w-full items-start gap-2.5 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/30 p-3.5 dark:border-white/5 dark:bg-white/[0.01]">
-									<div className="min-w-0 flex-1">
-										<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/40">
-											Chats are recorded to improve the service and are
-											processed in accordance with our{" "}
-											<a
-												href="/privacy"
-												className="underline hover:text-text-strong-950 dark:hover:text-white"
-											>
-												Privacy Policy
-											</a>
-											.
-										</p>
-									</div>
-									<button
-										type="button"
-										onClick={() => setShowPrivacyNotice(false)}
-										className="text-text-sub-400 hover:text-text-strong-950 dark:text-white/30 dark:hover:text-white"
-									>
-										<X className="h-3.5 w-3.5" />
-									</button>
-								</div>
-							)}
-						</div>
-					) : (
-						// Message Thread view
-						<div className="space-y-6">
-							{messages.map((msg) => (
-								<div
-									key={msg.id}
-									className={cn(
-										"flex w-full gap-3",
-										msg.role === "user" ? "flex-row-reverse" : "flex-row",
-									)}
+				<AnimatePresence mode="wait">
+					{aiPanelActiveTab === "ai" ? (
+						<motion.div
+							key="ai-tab"
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -10 }}
+							transition={{ duration: 0.15 }}
+							className="flex flex-1 flex-col overflow-hidden"
+						>
+							{/* Support Banner Row */}
+							<div className="flex items-center justify-between border-stroke-soft-100/50 border-b bg-bg-weak-50/20 px-4 py-2 dark:border-white/5 dark:bg-white/[0.01]">
+								<span className="text-text-sub-600 text-xs dark:text-white/50">
+									Need more help?
+								</span>
+								<a
+									href="mailto:support@reloop.sh"
+									className="rounded-md border border-stroke-soft-100 bg-white px-2.5 py-1 text-center font-medium text-[11px] text-text-strong-950 shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.03] dark:text-white dark:hover:bg-white/10"
 								>
-									{/* Avatar */}
-									<div
-										className={cn(
-											"flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border font-semibold text-xs shadow-sm",
-											msg.role === "user"
-												? "border-orange-500/20 bg-orange-500 text-white dark:border-orange-500/10"
-												: "border-stroke-soft-100 bg-bg-weak-50 text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/70",
-										)}
-									>
-										{msg.role === "user" ? (
-											"U"
-										) : (
-											<Bot className="h-3.5 w-3.5" />
-										)}
-									</div>
+									Support
+								</a>
+							</div>
 
-									{/* Bubble */}
-									<div
-										className={cn(
-											"max-w-[82%] rounded-xl px-3.5 py-2.5 text-[13px] leading-relaxed shadow-sm",
-											msg.role === "user"
-												? "bg-orange-500 text-white"
-												: "border border-stroke-soft-100 bg-white text-text-strong-950 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/90",
-										)}
-									>
-										<p className="whitespace-pre-wrap font-sans">
-											{msg.content}
+							{/* Main Scrollable Chat Area */}
+							<div className="scrollbar-thin flex-1 overflow-y-auto px-4 py-6">
+								{messages.length === 0 ? (
+									// Welcome/Greeting view
+									<div className="flex flex-col items-center pt-8 pb-4">
+										{/* Glow custom illustration */}
+										<div className="relative mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-orange-500/10 to-purple-500/10 dark:from-orange-500/20 dark:to-purple-500/20">
+											<div className="absolute inset-0 animate-pulse rounded-2xl bg-gradient-to-tr from-orange-500/5 to-purple-500/5 blur-lg" />
+											<Bot className="h-8 w-8 text-orange-500 dark:text-orange-400" />
+										</div>
+
+										<h2 className="font-semibold text-2xl text-text-strong-950 dark:text-white">
+											{greeting}.
+										</h2>
+										<p className="mt-1 text-[13px] text-text-sub-600 dark:text-white/50">
+											What are we doing today?
 										</p>
-									</div>
-								</div>
-							))}
 
-							{/* Typing/Loading indicator */}
-							{isTyping && (
-								<div className="flex w-full gap-3">
-									<div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50 text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/70">
-										<Bot className="h-3.5 w-3.5 animate-pulse" />
-									</div>
-									<div className="flex items-center gap-1 rounded-xl border border-stroke-soft-100 bg-white px-4 py-3 dark:border-white/5 dark:bg-white/[0.02]">
-										<span className="h-1.5 w-1.5 animate-bounce rounded-full bg-orange-500 delay-0" />
-										<span className="h-1.5 w-1.5 animate-bounce rounded-full bg-orange-500 delay-150" />
-										<span className="h-1.5 w-1.5 animate-bounce rounded-full bg-orange-500 delay-300" />
-									</div>
-								</div>
-							)}
-							<div ref={chatEndRef} />
-						</div>
-					)}
-				</div>
+										{/* Suggestion Cards */}
+										<div className="mt-8 w-full space-y-2.5">
+											{SUGGESTIONS.map((item) => {
+												const ItemIcon = item.icon;
+												return (
+													<button
+														key={item.id}
+														type="button"
+														onClick={() => handleSuggestionClick(item)}
+														className="group flex w-full items-center gap-3.5 rounded-xl border border-stroke-soft-100 bg-white/40 p-3.5 text-left transition-all duration-200 hover:border-orange-500/30 hover:bg-white hover:shadow-sm dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-orange-500/20 dark:hover:bg-white/[0.03]"
+													>
+														<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-bg-weak-50 text-text-sub-600 transition-colors group-hover:bg-orange-500/10 group-hover:text-orange-500 dark:bg-white/5 dark:text-white/40 dark:group-hover:text-orange-400">
+															<ItemIcon className="h-4 w-4" />
+														</div>
+														<div className="min-w-0 flex-1">
+															<p className="font-semibold text-text-strong-950 text-xs dark:text-white">
+																{item.title}
+															</p>
+															<p className="mt-0.5 truncate text-[11px] text-text-sub-600 dark:text-white/40">
+																{item.desc}
+															</p>
+														</div>
+													</button>
+												);
+											})}
+										</div>
 
-				{/* Chat Input Container */}
-				<div className="shrink-0 border-stroke-soft-100 border-t bg-white px-4 py-4 dark:border-white/5 dark:bg-[#0c0c0c]/80">
-					<div className="flex flex-col rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-2.5 focus-within:border-orange-500/40 focus-within:ring-2 focus-within:ring-orange-500/10 dark:border-white/10 dark:bg-white/[0.02]">
-						<textarea
-							value={input}
-							onChange={(e) => setInput(e.target.value)}
-							onKeyDown={(e) => {
-								if (e.key === "Enter" && !e.shiftKey) {
-									e.preventDefault();
-									handleSend(input);
-								}
-							}}
-							placeholder="What can we help you with?"
-							rows={2}
-							className="scrollbar-none w-full resize-none bg-transparent px-2.5 py-1 text-text-strong-950 text-xs placeholder-text-soft-400 outline-none dark:text-white/90 dark:placeholder-white/20"
-						/>
-						<div className="mt-2.5 flex items-center justify-between border-stroke-soft-100/50 border-t pt-2 dark:border-white/5">
-							<button
-								type="button"
-								className="rounded-lg p-1.5 text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/40 dark:hover:bg-white/5"
-								title="Attach context"
-							>
-								<Paperclip className="h-3.5 w-3.5" />
-							</button>
-							<button
-								type="button"
-								onClick={() => handleSend(input)}
-								disabled={!input.trim()}
-								className={cn(
-									"flex h-7 items-center gap-1 rounded-lg px-3 font-semibold text-xs transition-all",
-									input.trim()
-										? "bg-orange-500 text-white shadow-sm hover:bg-orange-600"
-										: "bg-bg-weak-100 text-text-sub-400 dark:bg-white/5 dark:text-white/20",
+										{/* Privacy Banner */}
+										{showPrivacyNotice && (
+											<div className="relative mt-8 flex w-full items-start gap-2.5 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/30 p-3.5 dark:border-white/5 dark:bg-white/[0.01]">
+												<div className="min-w-0 flex-1">
+													<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/40">
+														Chats are recorded to improve the service and are
+														processed in accordance with our{" "}
+														<a
+															href="/privacy"
+															className="underline hover:text-text-strong-950 dark:hover:text-white"
+														>
+															Privacy Policy
+														</a>
+														.
+													</p>
+												</div>
+												<button
+													type="button"
+													onClick={() => setShowPrivacyNotice(false)}
+													className="text-text-sub-400 hover:text-text-strong-950 dark:text-white/30 dark:hover:text-white"
+												>
+													<X className="h-3.5 w-3.5" />
+												</button>
+											</div>
+										)}
+									</div>
+								) : (
+									// Message Thread view
+									<div className="space-y-6">
+										{messages.map((msg) => (
+											<div
+												key={msg.id}
+												className={cn(
+													"flex w-full gap-3",
+													msg.role === "user" ? "flex-row-reverse" : "flex-row",
+												)}
+											>
+												{/* Avatar */}
+												<div
+													className={cn(
+														"flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border font-semibold text-xs shadow-sm",
+														msg.role === "user"
+															? "border-orange-500/20 bg-orange-500 text-white dark:border-orange-500/10"
+															: "border-stroke-soft-100 bg-bg-weak-50 text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/70",
+													)}
+												>
+													{msg.role === "user" ? (
+														"U"
+													) : (
+														<Bot className="h-3.5 w-3.5" />
+													)}
+												</div>
+
+												{/* Bubble */}
+												<div
+													className={cn(
+														"max-w-[82%] rounded-xl px-3.5 py-2.5 text-[13px] leading-relaxed shadow-sm",
+														msg.role === "user"
+															? "bg-orange-500 text-white"
+															: "border border-stroke-soft-100 bg-white text-text-strong-950 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/90",
+													)}
+												>
+													<p className="whitespace-pre-wrap font-sans">
+														{msg.content}
+													</p>
+												</div>
+											</div>
+										))}
+
+										{/* Typing/Loading indicator */}
+										{isTyping && (
+											<div className="flex w-full gap-3">
+												<div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50 text-text-sub-600 dark:border-white/10 dark:bg-white/5 dark:text-white/70">
+													<Bot className="h-3.5 w-3.5 animate-pulse" />
+												</div>
+												<div className="flex items-center gap-1 rounded-xl border border-stroke-soft-100 bg-white px-4 py-3 dark:border-white/5 dark:bg-white/[0.02]">
+													<span className="h-1.5 w-1.5 animate-bounce rounded-full bg-orange-500 delay-0" />
+													<span className="h-1.5 w-1.5 animate-bounce rounded-full bg-orange-500 delay-150" />
+													<span className="h-1.5 w-1.5 animate-bounce rounded-full bg-orange-500 delay-300" />
+												</div>
+											</div>
+										)}
+										<div ref={chatEndRef} />
+									</div>
 								)}
-							>
-								Ask
-								<ArrowUp className="h-3.5 w-3.5" />
-							</button>
-						</div>
-					</div>
-				</div>
+							</div>
+
+							{/* Chat Input Container */}
+							<div className="shrink-0 border-stroke-soft-100 border-t bg-white px-4 py-4 dark:border-white/5 dark:bg-[#0c0c0c]/80">
+								<div className="flex flex-col rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-2.5 focus-within:border-orange-500/40 focus-within:ring-2 focus-within:ring-orange-500/10 dark:border-white/10 dark:bg-white/[0.02]">
+									<textarea
+										value={input}
+										onChange={(e) => setInput(e.target.value)}
+										onKeyDown={(e) => {
+											if (e.key === "Enter" && !e.shiftKey) {
+												e.preventDefault();
+												handleSend(input);
+											}
+										}}
+										placeholder="What can we help you with?"
+										rows={2}
+										className="scrollbar-none w-full resize-none bg-transparent px-2.5 py-1 text-text-strong-950 text-xs placeholder-text-soft-400 outline-none dark:text-white/90 dark:placeholder-white/20"
+									/>
+									<div className="mt-2.5 flex items-center justify-between border-stroke-soft-100/50 border-t pt-2 dark:border-white/5">
+										<button
+											type="button"
+											className="rounded-lg p-1.5 text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-white/40 dark:hover:bg-white/5"
+											title="Attach context"
+										>
+											<Paperclip className="h-3.5 w-3.5" />
+										</button>
+										<button
+											type="button"
+											onClick={() => handleSend(input)}
+											disabled={!input.trim()}
+											className={cn(
+												"flex h-7 items-center gap-1 rounded-lg px-3 font-semibold text-xs transition-all",
+												input.trim()
+													? "bg-orange-500 text-white shadow-sm hover:bg-orange-600"
+													: "bg-bg-weak-100 text-text-sub-400 dark:bg-white/5 dark:text-white/20",
+											)}
+										>
+											Ask
+											<ArrowUp className="h-3.5 w-3.5" />
+										</button>
+									</div>
+								</div>
+							</div>
+						</motion.div>
+					) : (
+						<motion.div
+							key="support-tab"
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -10 }}
+							transition={{ duration: 0.15 }}
+							className="flex flex-1 flex-col overflow-hidden bg-white dark:bg-[#0c0c0c]"
+						>
+							<iframe
+								src="https://chatwoot.reloop.sh/widget?website_token=WsUSVMPZG5goFYPcJQLQVAjD&locale=en"
+								className="w-full h-full border-none bg-white dark:bg-[#0c0c0c]"
+								title="Support Live Chat"
+							/>
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</div>
 		</motion.aside>
 	);

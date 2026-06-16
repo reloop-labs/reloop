@@ -10,6 +10,8 @@ interface UIState {
 	isAiPanelExpanded: boolean;
 	setIsAiPanelExpanded: (value: boolean) => void;
 	toggleAiPanelExpand: () => void;
+	aiPanelActiveTab: "ai" | "support";
+	setAiPanelActiveTab: (tab: "ai" | "support") => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -36,4 +38,6 @@ export const useUIStore = create<UIState>((set) => ({
 	setIsAiPanelExpanded: (value) => set({ isAiPanelExpanded: value }),
 	toggleAiPanelExpand: () =>
 		set((state) => ({ isAiPanelExpanded: !state.isAiPanelExpanded })),
+	aiPanelActiveTab: "ai",
+	setAiPanelActiveTab: (tab) => set({ aiPanelActiveTab: tab }),
 }));

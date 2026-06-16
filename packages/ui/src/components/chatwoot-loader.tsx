@@ -23,6 +23,10 @@ declare global {
 				},
 			) => void;
 			reset: () => void;
+			toggle: (action?: "open" | "close") => void;
+		};
+		chatwootSettings?: {
+			launcherNeed?: boolean;
 		};
 	}
 }
@@ -31,6 +35,12 @@ export function ChatwootLoader() {
 	const baseUrl = CHATWOOT_BASE_URL.replace(/\/+$/, "");
 	const websiteToken = CHATWOOT_WEBSITE_TOKEN.trim();
 	const didInit = useRef(false);
+
+	if (typeof window !== "undefined") {
+		window.chatwootSettings = {
+			launcherNeed: false,
+		};
+	}
 
 	return (
 		<Script
