@@ -14,9 +14,8 @@ export const DomainPreview = ({
 	variant = "onboarding",
 }: DomainPreviewProps) => {
 	const domainName = domain ? domain.split(".")[0] || "Sender" : "Sender";
-	const domainHost = domain ? domain.split(".").slice(-2).join(".") || "" : "";
 	const displayDomain = domain || "";
-	const senderEmail = domain ? `hello@${domainHost}` : "";
+	const senderEmail = domain ? `hello@${domain}` : "";
 	const toEmail = "sundar@google.com";
 	const avatarInitial = domainName[0]?.toUpperCase() || "S";
 	const isDomainVariant = variant === "domain";
