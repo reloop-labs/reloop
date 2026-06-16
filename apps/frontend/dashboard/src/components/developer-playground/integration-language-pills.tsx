@@ -1,11 +1,11 @@
 "use client";
 
+import type { LanguageCode } from "@fe/dashboard/lib/integration/types";
 import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion } from "motion/react";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { siGo, siNodedotjs, siPhp, siPython } from "simple-icons";
-import type { LanguageCode } from "@fe/dashboard/lib/integration/types";
 
 const languages = [
 	{ id: "nodejs" as LanguageCode, label: "Node.js", icon: siNodedotjs },
@@ -145,8 +145,7 @@ export function IntegrationLanguagePills({
 							fill="currentColor"
 							xmlns="http://www.w3.org/2000/svg"
 							style={{
-								color:
-									isHighlighted && pillPosition ? "#ffffff" : brandColor,
+								color: isHighlighted && pillPosition ? "#ffffff" : brandColor,
 							}}
 							aria-hidden
 						>

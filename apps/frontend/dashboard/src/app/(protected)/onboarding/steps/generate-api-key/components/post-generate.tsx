@@ -1,11 +1,11 @@
 "use client";
 
+import { DeveloperPlayground } from "@fe/dashboard/components/developer-playground/developer-playground";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdCommand } from "@reloop/ui/kbd-command";
 import { KbdEnter } from "@reloop/ui/kbd-enter";
 import { useHotkeys } from "react-hotkeys-hook";
-import { DeveloperPlayground } from "@fe/dashboard/components/developer-playground/developer-playground";
 import type { IntegrationMode, LanguageCode } from "../data";
 import { CopyCodeBlock } from "./copy-code-block";
 

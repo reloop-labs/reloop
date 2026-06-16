@@ -3,11 +3,11 @@
 import {
 	buildSetupCodeSnippet,
 	buildSetupPrompt,
+	type IntegrationMode,
+	type SetupLanguageCode,
 	setupFileLabels,
 	setupInstallCommands,
 	setupShikiLang,
-	type IntegrationMode,
-	type SetupLanguageCode,
 } from "@fe/dashboard/lib/integration/snippets";
 import { CodeBlock } from "@reloop/ui/code-block";
 import { AnimatePresence, motion } from "framer-motion";

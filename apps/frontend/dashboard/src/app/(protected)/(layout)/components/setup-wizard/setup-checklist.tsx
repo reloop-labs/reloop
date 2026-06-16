@@ -146,19 +146,17 @@ export function SetupChecklist({
 							>
 								Add sending domain
 							</span>
-							{primaryDomain ? (
-								!step2Done && (
-									<span className="shrink-0 rounded-full border border-amber-200/50 bg-amber-500/10 px-2 py-0.5 font-semibold text-[10px] text-amber-600 capitalize dark:text-amber-400">
-										{primaryDomain.status}
-									</span>
-								)
-							) : (
-								!step2Done && (
-									<span className="shrink-0 rounded-full border border-red-200/50 bg-red-500/10 px-2 py-0.5 font-semibold text-[10px] text-red-600 dark:text-red-400">
-										Required
-									</span>
-								)
-							)}
+							{primaryDomain
+								? !step2Done && (
+										<span className="shrink-0 rounded-full border border-amber-200/50 bg-amber-500/10 px-2 py-0.5 font-semibold text-[10px] text-amber-600 capitalize dark:text-amber-400">
+											{primaryDomain.status}
+										</span>
+									)
+								: !step2Done && (
+										<span className="shrink-0 rounded-full border border-red-200/50 bg-red-500/10 px-2 py-0.5 font-semibold text-[10px] text-red-600 dark:text-red-400">
+											Required
+										</span>
+									)}
 						</div>
 						{step2Done ? (
 							<span className="mt-1 text-text-sub-600/60 text-xs dark:text-white/30">

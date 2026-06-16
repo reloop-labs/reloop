@@ -29,8 +29,7 @@ function parseIntegrationState(
 	}
 
 	const lang = parseLanguage(langParam);
-	const mode: IntegrationMode =
-		modeParam === "manual" ? "manual" : "ai";
+	const mode: IntegrationMode = modeParam === "manual" ? "manual" : "ai";
 
 	return { mode, lang };
 }

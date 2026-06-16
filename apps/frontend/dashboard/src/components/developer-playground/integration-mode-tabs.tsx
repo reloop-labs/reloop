@@ -1,15 +1,23 @@
 "use client";
 
+import type { IntegrationMode } from "@fe/dashboard/lib/integration/types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
-import type { IntegrationMode } from "@fe/dashboard/lib/integration/types";
 
 const modes = [
-	{ id: "ai" as IntegrationMode, label: "AI", icon: "sparkling" },
-	{ id: "manual" as IntegrationMode, label: "Code", icon: "code" },
+	{
+		id: "ai" as IntegrationMode,
+		label: "AI",
+		icon: "sparkling",
+	},
+	{
+		id: "manual" as IntegrationMode,
+		label: "Code",
+		icon: "code",
+	},
 ] as const;
 
 export function IntegrationModeTabs({
@@ -42,7 +50,7 @@ export function IntegrationModeTabs({
 						onPointerEnter={() => setHoveredIdx(index)}
 						onPointerLeave={() => setHoveredIdx(undefined)}
 						className={cn(
-							"flex w-20 cursor-pointer items-center justify-center gap-2 px-2.5 py-0! font-medium text-sm",
+							"flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-0! font-medium text-sm",
 							hoveredIdx === undefined &&
 								activeIndex === index &&
 								"text-text-strong-950",

@@ -9,10 +9,10 @@ import {
 	type IntegrationMode,
 	nodeInstallCommands,
 	type PackageManager,
+	type SetupLanguageCode,
 	setupFileLabels,
 	setupInstallCommands,
 	setupShikiLang,
-	type SetupLanguageCode,
 } from "@fe/dashboard/lib/integration/snippets";
 import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
 import { Icon } from "@reloop/ui/icon";
@@ -116,9 +116,7 @@ export function SetupFullPlayground({
 							tabs={isNode ? pkgManagerTabs : undefined}
 							activeTab={isNode ? pkgManager : undefined}
 							onTabChange={
-								isNode
-									? (id) => setPkgManager(id as PackageManager)
-									: undefined
+								isNode ? (id) => setPkgManager(id as PackageManager) : undefined
 							}
 						/>
 					</StepCard>

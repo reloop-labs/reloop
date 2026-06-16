@@ -1,10 +1,11 @@
-import type {
+import type { LanguageCode, PackageManager, SetupLanguageCode } from "./types";
+
+export type {
+	IntegrationMode,
 	LanguageCode,
 	PackageManager,
 	SetupLanguageCode,
 } from "./types";
-
-export type { LanguageCode, IntegrationMode, PackageManager, SetupLanguageCode } from "./types";
 
 export const languageLabels: Record<LanguageCode, string> = {
 	nodejs: "Node.js",

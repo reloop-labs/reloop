@@ -148,9 +148,7 @@ export function DeveloperPlayground({
 							tabs={isNode ? pkgManagerTabs : undefined}
 							activeTab={isNode ? pkgManager : undefined}
 							onTabChange={
-								isNode
-									? (id) => setPkgManager(id as PackageManager)
-									: undefined
+								isNode ? (id) => setPkgManager(id as PackageManager) : undefined
 							}
 						/>
 					</StepCard>

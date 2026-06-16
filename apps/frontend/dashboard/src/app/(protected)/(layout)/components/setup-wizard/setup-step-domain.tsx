@@ -1,8 +1,8 @@
 "use client";
 
-import type { DomainData } from "./use-setup-progress";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import type { DomainData } from "./use-setup-progress";
 
 export function SetupStepDomain({
 	primaryDomain,

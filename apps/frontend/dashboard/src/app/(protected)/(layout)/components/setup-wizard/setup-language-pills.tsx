@@ -1,17 +1,11 @@
 "use client";
 
+import type { SetupLanguageCode } from "@fe/dashboard/lib/integration/types";
 import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion } from "motion/react";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
-import {
-	siGo,
-	siNodedotjs,
-	siPhp,
-	siPython,
-	siRuby,
-} from "simple-icons";
-import type { SetupLanguageCode } from "@fe/dashboard/lib/integration/types";
+import { siGo, siNodedotjs, siPhp, siPython, siRuby } from "simple-icons";
 
 const languages = [
 	{ id: "nodejs" as SetupLanguageCode, label: "Node.js", icon: siNodedotjs },
@@ -103,7 +97,7 @@ export function SetupLanguagePills({
 			className="scrollbar-none relative flex min-w-0 items-center overflow-x-auto"
 			style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
 		>
-			<style>{`.scrollbar-none::-webkit-scrollbar { display: none; }`}</style>
+			<style>{".scrollbar-none::-webkit-scrollbar { display: none; }"}</style>
 			{languages.map((lang, index) => {
 				const isActive = value === lang.id;
 				const brandColor = `#${lang.icon.hex}`;
@@ -141,8 +135,7 @@ export function SetupLanguagePills({
 							fill="currentColor"
 							xmlns="http://www.w3.org/2000/svg"
 							style={{
-								color:
-									isHighlighted && pillPosition ? "#ffffff" : brandColor,
+								color: isHighlighted && pillPosition ? "#ffffff" : brandColor,
 							}}
 							aria-hidden
 						>
