@@ -230,7 +230,13 @@ export default function OpenGraphImage() {
 					</span>
 				</div>
 
-				<div style={{ display: "flex", flexDirection: "column", marginTop: "24px" }}>
+				<div
+					style={{
+						display: "flex",
+						flexDirection: "column",
+						marginTop: "24px",
+					}}
+				>
 					<span
 						style={{
 							fontSize: "52px",
@@ -291,7 +297,9 @@ export default function OpenGraphImage() {
 							height: "150px",
 						}}
 					>
-						<span style={{ fontSize: "16px", fontWeight: 600, color: "#ffffff" }}>
+						<span
+							style={{ fontSize: "16px", fontWeight: 600, color: "#ffffff" }}
+						>
 							{item.title}
 						</span>
 						<span
@@ -321,7 +329,9 @@ export default function OpenGraphImage() {
 				<span style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.3)" }}>
 					Modern email infrastructure for developers
 				</span>
-				<span style={{ fontSize: "14px", fontWeight: 600, color: primaryColor }}>
+				<span
+					style={{ fontSize: "14px", fontWeight: 600, color: primaryColor }}
+				>
 					reloop.sh
 				</span>
 			</div>

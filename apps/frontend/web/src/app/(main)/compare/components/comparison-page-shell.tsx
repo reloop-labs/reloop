@@ -21,9 +21,7 @@ export function ComparisonPageShell({
 			titleLines={titleLines}
 			description={description}
 			compactHero
-			heroLeading={
-				brand ? <CompareHeroIcons icon={brand.icon} /> : undefined
-			}
+			heroLeading={brand ? <CompareHeroIcons icon={brand.icon} /> : undefined}
 		>
 			{children}
 		</MarketingPageShell>

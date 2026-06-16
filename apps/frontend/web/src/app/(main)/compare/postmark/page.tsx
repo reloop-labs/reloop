@@ -15,7 +15,8 @@ export const metadata: Metadata = {
 		"Reloop vs Postmark for transactional email speed, deliverability reporting, campaigns, and open-source infrastructure.",
 	openGraph: {
 		title: "Reloop vs Postmark",
-		description: "Transactional email specialists—hosted proprietary vs open platform.",
+		description:
+			"Transactional email specialists—hosted proprietary vs open platform.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -65,13 +66,13 @@ const PostmarkComparisonPage = () => {
 							Reloop&apos;s edge
 						</p>
 						<h2 className="mt-3 font-serif text-[2rem] tracking-tighter sm:text-[2.4rem] dark:text-white">
-							Platform{" "}
-							<span className="text-primary-base">breadth.</span>
+							Platform <span className="text-primary-base">breadth.</span>
 						</h2>
 						<p className="mt-4 text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
 							When product-led growth teams need onboarding campaigns, SMTP for
 							legacy services, and agent inbox triage on the same domains you
-							use for transactional mail, Reloop keeps it in one auditable stack.
+							use for transactional mail, Reloop keeps it in one auditable
+							stack.
 						</p>
 					</div>
 				</div>
@@ -88,10 +89,22 @@ const PostmarkComparisonPage = () => {
 						},
 						{ label: "Self-hostable", reloop: "Yes", competitor: "No" },
 						{ label: "Transactional API", reloop: "Yes", competitor: "Yes" },
-						{ label: "Delivery analytics", reloop: "Yes", competitor: "Yes (detailed)" },
-						{ label: "Marketing campaigns", reloop: "Yes", competitor: "Limited" },
+						{
+							label: "Delivery analytics",
+							reloop: "Yes",
+							competitor: "Yes (detailed)",
+						},
+						{
+							label: "Marketing campaigns",
+							reloop: "Yes",
+							competitor: "Limited",
+						},
 						{ label: "SMTP relay", reloop: "Yes", competitor: "Yes" },
-						{ label: "Message streams / separation", reloop: "Domain + campaign types", competitor: "Streams" },
+						{
+							label: "Message streams / separation",
+							reloop: "Domain + campaign types",
+							competitor: "Streams",
+						},
 						{ label: "Agent inbox", reloop: "Yes", competitor: "No" },
 						{
 							label: "Free tier",

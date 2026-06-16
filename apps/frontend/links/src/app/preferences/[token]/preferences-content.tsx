@@ -3,7 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 interface ChannelData {
 	id: string;
@@ -123,7 +123,7 @@ export function PreferencesContent({
 						}),
 					},
 				);
-				if (!res.ok) throw new Error("Failed to update " + channel.name);
+				if (!res.ok) throw new Error(`Failed to update ${channel.name}`);
 			});
 
 			await Promise.all(updates);
@@ -169,10 +169,6 @@ export function PreferencesContent({
 			}, 4000);
 		}
 	}, [token, unsubscribeAllState, channels]);
-
-	const displayName = contact.firstName
-		? `${contact.firstName}${contact.lastName ? ` ${contact.lastName}` : ""}`
-		: contact.email;
 
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-[#0d0f14] px-4 py-12">

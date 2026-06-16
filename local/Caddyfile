@@ -124,6 +124,22 @@ local.reloop.sh, *.local.reloop.sh {
             header_up X-Forwarded-For {remote}
         }
     }
+    # Preferences and Redirect service
+    handle /preferences* {
+        reverse_proxy host.docker.internal:3005 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /redirect* {
+        reverse_proxy host.docker.internal:3005 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+
     # Main app (catch-all - everything else)
     handle {
         reverse_proxy host.docker.internal:3000 {

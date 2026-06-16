@@ -2,16 +2,16 @@
 
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import Link from "next/link";
-import { useState } from "react";
 import {
 	ANNUAL_DISCOUNT_LABEL,
+	type BillingCycle,
 	comparisonRows,
 	formatPrice,
 	getPlanPrice,
-	type BillingCycle,
 	pricingPlans,
 } from "@reloop/web/lib/pricing";
+import Link from "next/link";
+import { useState } from "react";
 
 function BillingToggle({
 	billingCycle,
@@ -59,7 +59,7 @@ function PlanCard({
 	plan,
 	billingCycle,
 }: {
-	plan: typeof pricingPlans[number];
+	plan: (typeof pricingPlans)[number];
 	billingCycle: BillingCycle;
 }) {
 	const price = getPlanPrice(plan, billingCycle);
@@ -75,7 +75,7 @@ function PlanCard({
 			)}
 		>
 			{plan.highlighted && (
-				<span className="absolute top-0 right-6 -translate-y-1/2 rounded-full bg-primary-base px-3 py-1 font-semibold text-[11px] text-white uppercase tracking-[0.12em]">
+				<span className="-translate-y-1/2 absolute top-0 right-6 rounded-full bg-primary-base px-3 py-1 font-semibold text-[11px] text-white uppercase tracking-[0.12em]">
 					Most popular
 				</span>
 			)}
@@ -84,7 +84,9 @@ function PlanCard({
 				<h3
 					className={cn(
 						"font-semibold text-lg",
-						plan.highlighted ? "text-white" : "text-text-strong-950 dark:text-white",
+						plan.highlighted
+							? "text-white"
+							: "text-text-strong-950 dark:text-white",
 					)}
 				>
 					{plan.name}
@@ -92,7 +94,9 @@ function PlanCard({
 				<p
 					className={cn(
 						"mt-2 text-[14px] leading-relaxed",
-						plan.highlighted ? "text-white/60" : "text-text-sub-600 dark:text-white/50",
+						plan.highlighted
+							? "text-white/60"
+							: "text-text-sub-600 dark:text-white/50",
 					)}
 				>
 					{plan.description}
@@ -104,7 +108,9 @@ function PlanCard({
 					<p
 						className={cn(
 							"font-serif text-[2.4rem] leading-none tracking-tighter",
-							plan.highlighted ? "text-white" : "text-text-strong-950 dark:text-white",
+							plan.highlighted
+								? "text-white"
+								: "text-text-strong-950 dark:text-white",
 						)}
 					>
 						Custom
@@ -114,7 +120,9 @@ function PlanCard({
 						<span
 							className={cn(
 								"font-serif text-[2.8rem] leading-none tracking-tighter",
-								plan.highlighted ? "text-white" : "text-text-strong-950 dark:text-white",
+								plan.highlighted
+									? "text-white"
+									: "text-text-strong-950 dark:text-white",
 							)}
 						>
 							{formatPrice(price)}
@@ -122,7 +130,9 @@ function PlanCard({
 						<span
 							className={cn(
 								"mb-1 text-[14px]",
-								plan.highlighted ? "text-white/50" : "text-text-sub-600 dark:text-white/50",
+								plan.highlighted
+									? "text-white/50"
+									: "text-text-sub-600 dark:text-white/50",
 							)}
 						>
 							/ month
@@ -141,7 +151,9 @@ function PlanCard({
 					<p
 						className={cn(
 							"mt-1 text-[13px]",
-							plan.highlighted ? "text-white/40" : "text-text-sub-600 dark:text-white/40",
+							plan.highlighted
+								? "text-white/40"
+								: "text-text-sub-600 dark:text-white/40",
 						)}
 					>
 						Billed annually
@@ -151,7 +163,10 @@ function PlanCard({
 
 			<ul className="mt-8 space-y-3">
 				{plan.features.map((feature) => (
-					<li key={feature} className="flex items-start gap-3 text-[14px] leading-snug">
+					<li
+						key={feature}
+						className="flex items-start gap-3 text-[14px] leading-snug"
+					>
 						<Icon
 							name="check"
 							className={cn(
@@ -161,7 +176,9 @@ function PlanCard({
 						/>
 						<span
 							className={
-								plan.highlighted ? "text-white/80" : "text-text-sub-600 dark:text-white/70"
+								plan.highlighted
+									? "text-white/80"
+									: "text-text-sub-600 dark:text-white/70"
 							}
 						>
 							{feature}

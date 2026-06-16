@@ -16,7 +16,8 @@ export const metadata: Metadata = {
 		"Reloop vs Amazon SES: raw cloud email delivery vs a complete platform—TCO, campaigns, dashboards, and self-hosting on AWS.",
 	openGraph: {
 		title: "Reloop vs AWS SES",
-		description: "When SES per-email pricing meets the cost of assembling your own email stack.",
+		description:
+			"When SES per-email pricing meets the cost of assembling your own email stack.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -44,8 +45,8 @@ const AwsSesComparisonPage = () => {
 						<strong className="text-text-strong-950 dark:text-white">
 							complete email product
 						</strong>{" "}
-						with APIs, campaigns, analytics, and webhooks—hosted by Reloop Labs or
-						self-hosted on your AWS account if you want SES-adjacent control
+						with APIs, campaigns, analytics, and webhooks—hosted by Reloop Labs
+						or self-hosted on your AWS account if you want SES-adjacent control
 						without assembling fifteen services.
 					</p>
 				</div>
@@ -97,12 +98,32 @@ const AwsSesComparisonPage = () => {
 							reloop: "Yes (Apache 2.0)",
 							competitor: "No",
 						},
-						{ label: "Self-host on your AWS account", reloop: "Yes", competitor: "SES only" },
-						{ label: "Marketing campaigns UI", reloop: "Yes", competitor: "No (DIY)" },
+						{
+							label: "Self-host on your AWS account",
+							reloop: "Yes",
+							competitor: "SES only",
+						},
+						{
+							label: "Marketing campaigns UI",
+							reloop: "Yes",
+							competitor: "No (DIY)",
+						},
 						{ label: "Transactional API", reloop: "Yes", competitor: "Yes" },
-						{ label: "Built-in delivery dashboard", reloop: "Yes", competitor: "CloudWatch / DIY" },
-						{ label: "Webhooks", reloop: "Native", competitor: "SNS configuration" },
-						{ label: "Template management", reloop: "Yes", competitor: "Limited" },
+						{
+							label: "Built-in delivery dashboard",
+							reloop: "Yes",
+							competitor: "CloudWatch / DIY",
+						},
+						{
+							label: "Webhooks",
+							reloop: "Native",
+							competitor: "SNS configuration",
+						},
+						{
+							label: "Template management",
+							reloop: "Yes",
+							competitor: "Limited",
+						},
 						{ label: "Agent inbox", reloop: "Yes", competitor: "No" },
 						{
 							label: "Per-email list price",

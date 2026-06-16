@@ -19,15 +19,32 @@ export default function OpenGraphImage() {
 			}}
 		>
 			<div style={{ display: "flex", flexDirection: "column" }}>
-				<span style={{ fontSize: "22px", color: "rgba(255,255,255,0.5)" }}>Reloop / Compare</span>
-				<div style={{ fontSize: "52px", fontWeight: 700, color: "#fff", marginTop: "20px" }}>
+				<span style={{ fontSize: "22px", color: "rgba(255,255,255,0.5)" }}>
+					Reloop / Compare
+				</span>
+				<div
+					style={{
+						fontSize: "52px",
+						fontWeight: 700,
+						color: "#fff",
+						marginTop: "20px",
+					}}
+				>
 					Reloop vs SendGrid
 				</div>
-				<div style={{ fontSize: "18px", color: "rgba(255,255,255,0.5)", marginTop: "12px" }}>
+				<div
+					style={{
+						fontSize: "18px",
+						color: "rgba(255,255,255,0.5)",
+						marginTop: "12px",
+					}}
+				>
 					Enterprise email without Twilio lock-in.
 				</div>
 			</div>
-			<span style={{ fontSize: "14px", fontWeight: 600, color: "#d97757" }}>reloop.sh</span>
+			<span style={{ fontSize: "14px", fontWeight: 600, color: "#d97757" }}>
+				reloop.sh
+			</span>
 		</div>,
 		{ ...size },
 	);

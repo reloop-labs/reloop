@@ -1,8 +1,8 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
-import type { FeatureCtaLink } from "./types";
 import type React from "react";
+import type { FeatureCtaLink } from "./types";
 
 export function FeatureHero({
 	titleLines,

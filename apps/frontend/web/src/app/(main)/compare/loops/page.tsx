@@ -34,8 +34,8 @@ const LoopsComparisonPage = () => {
 				<div className="mx-auto max-w-3xl space-y-6 text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
 					<p>
 						Loops found a niche: founders and growth teams at SaaS companies who
-						want beautiful product email without learning Mailchimp. The editor is
-						fast, the brand is modern, and the mental model is{" "}
+						want beautiful product email without learning Mailchimp. The editor
+						is fast, the brand is modern, and the mental model is{" "}
 						<em>audience → loop → send</em>.
 					</p>
 					<p>
@@ -62,7 +62,9 @@ const LoopsComparisonPage = () => {
 					<p className="mt-3">Loops → onboarding &amp; newsletters</p>
 					<p>Resend / Postmark → auth emails &amp; receipts</p>
 					<p>Stripe → billing events → second API client</p>
-					<p className="mt-3 text-primary-base">Reloop → all of the above, one API key</p>
+					<p className="mt-3 text-primary-base">
+						Reloop → all of the above, one API key
+					</p>
 				</div>
 			</PageSection>
 
@@ -76,8 +78,16 @@ const LoopsComparisonPage = () => {
 							competitor: "No",
 						},
 						{ label: "Self-hostable", reloop: "Yes", competitor: "No" },
-						{ label: "SaaS lifecycle / product email", reloop: "Yes", competitor: "Yes (core)" },
-						{ label: "Transactional REST API", reloop: "Yes", competitor: "Limited" },
+						{
+							label: "SaaS lifecycle / product email",
+							reloop: "Yes",
+							competitor: "Yes (core)",
+						},
+						{
+							label: "Transactional REST API",
+							reloop: "Yes",
+							competitor: "Limited",
+						},
 						{ label: "SMTP relay", reloop: "Yes", competitor: "No" },
 						{ label: "Marketing campaigns", reloop: "Yes", competitor: "Yes" },
 						{ label: "Webhooks", reloop: "Yes", competitor: "Yes" },

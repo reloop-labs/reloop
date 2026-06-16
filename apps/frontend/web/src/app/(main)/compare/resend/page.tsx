@@ -121,11 +121,27 @@ const ResendComparisonPage = () => {
 						},
 						{ label: "Self-hostable", reloop: "Yes", competitor: "No" },
 						{ label: "Hosted SaaS", reloop: "Yes", competitor: "Yes" },
-						{ label: "Transactional REST API", reloop: "Yes", competitor: "Yes" },
-						{ label: "Marketing campaigns", reloop: "Yes", competitor: "Limited" },
+						{
+							label: "Transactional REST API",
+							reloop: "Yes",
+							competitor: "Yes",
+						},
+						{
+							label: "Marketing campaigns",
+							reloop: "Yes",
+							competitor: "Limited",
+						},
 						{ label: "SMTP relay", reloop: "Yes", competitor: "Yes" },
-						{ label: "Webhooks & delivery events", reloop: "Yes", competitor: "Yes" },
-						{ label: "Agent inbox / AI workflows", reloop: "Yes", competitor: "No" },
+						{
+							label: "Webhooks & delivery events",
+							reloop: "Yes",
+							competitor: "Yes",
+						},
+						{
+							label: "Agent inbox / AI workflows",
+							reloop: "Yes",
+							competitor: "No",
+						},
 						{
 							label: "Free tier (monthly)",
 							reloop: "3,000 emails",

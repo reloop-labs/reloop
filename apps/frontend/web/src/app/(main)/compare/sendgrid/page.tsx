@@ -15,7 +15,8 @@ export const metadata: Metadata = {
 		"Reloop vs SendGrid for transactional email, marketing campaigns, enterprise scale, and escaping Twilio vendor lock-in.",
 	openGraph: {
 		title: "Reloop vs SendGrid",
-		description: "Enterprise email platform comparison—hosted, self-hosted, and open source.",
+		description:
+			"Enterprise email platform comparison—hosted, self-hosted, and open source.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -37,8 +38,10 @@ const SendGridComparisonPage = () => {
 					annual commits and sales-assisted upgrades. It works at scale, but
 					many teams inherit it through acquisition rather than active choice.
 					Reloop offers a modern, API-first platform you can{" "}
-					<strong className="text-text-strong-950 dark:text-white">host or run hosted</strong>,
-					with campaigns and transactional sends in one codebase.
+					<strong className="text-text-strong-950 dark:text-white">
+						host or run hosted
+					</strong>
+					, with campaigns and transactional sends in one codebase.
 				</p>
 			</PageSection>
 
@@ -105,7 +108,11 @@ const SendGridComparisonPage = () => {
 						{ label: "Template editor", reloop: "Yes", competitor: "Yes" },
 						{ label: "SMTP relay", reloop: "Yes", competitor: "Yes" },
 						{ label: "Webhooks", reloop: "Yes", competitor: "Yes" },
-						{ label: "Agent inbox", reloop: "Built-in", competitor: "Not included" },
+						{
+							label: "Agent inbox",
+							reloop: "Built-in",
+							competitor: "Not included",
+						},
 						{
 							label: "Contract flexibility",
 							reloop: "Monthly tiers + self-host",
@@ -129,8 +136,8 @@ const SendGridComparisonPage = () => {
 					</li>
 					<li className="flex gap-3">
 						<span className="text-primary-base">▸</span>
-						Export dynamic templates and contact segments; rebuild automations in
-						Reloop campaigns or via API triggers.
+						Export dynamic templates and contact segments; rebuild automations
+						in Reloop campaigns or via API triggers.
 					</li>
 					<li className="flex gap-3">
 						<span className="text-primary-base">▸</span>

@@ -34,7 +34,13 @@ export default function OpenGraphImage() {
 						Compare
 					</span>
 				</div>
-				<div style={{ display: "flex", flexDirection: "column", marginTop: "24px" }}>
+				<div
+					style={{
+						display: "flex",
+						flexDirection: "column",
+						marginTop: "24px",
+					}}
+				>
 					<span
 						style={{
 							fontSize: "52px",
@@ -53,8 +59,8 @@ export default function OpenGraphImage() {
 							maxWidth: "900px",
 						}}
 					>
-						Open-source email infrastructure compared to Resend, SendGrid, Mailgun,
-						and more.
+						Open-source email infrastructure compared to Resend, SendGrid,
+						Mailgun, and more.
 					</span>
 				</div>
 			</div>
@@ -73,7 +79,9 @@ export default function OpenGraphImage() {
 							backgroundColor: "rgba(255, 255, 255, 0.02)",
 						}}
 					>
-						<span style={{ fontSize: "14px", fontWeight: 600, color: "#ffffff" }}>
+						<span
+							style={{ fontSize: "14px", fontWeight: 600, color: "#ffffff" }}
+						>
 							vs {name}
 						</span>
 					</div>
@@ -92,7 +100,9 @@ export default function OpenGraphImage() {
 				<span style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.3)" }}>
 					Modern email infrastructure for developers
 				</span>
-				<span style={{ fontSize: "14px", fontWeight: 600, color: primaryColor }}>
+				<span
+					style={{ fontSize: "14px", fontWeight: 600, color: primaryColor }}
+				>
 					reloop.sh
 				</span>
 			</div>

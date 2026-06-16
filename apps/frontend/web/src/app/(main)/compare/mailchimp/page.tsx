@@ -16,7 +16,8 @@ export const metadata: Metadata = {
 		"Reloop vs Mailchimp for newsletters, audience pricing, transactional email, and developer-first campaign APIs.",
 	openGraph: {
 		title: "Reloop vs Mailchimp",
-		description: "Marketing automation vs API-first email platform with send-based pricing.",
+		description:
+			"Marketing automation vs API-first email platform with send-based pricing.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -73,9 +74,9 @@ const MailchimpComparisonPage = () => {
 							Reloop model
 						</h3>
 						<p className="mt-3 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/60">
-							3,000 emails free, then tiers by monthly sends (50k, 250k, custom).
-							Store contacts for segmentation without audience-based surcharges.
-							See{" "}
+							3,000 emails free, then tiers by monthly sends (50k, 250k,
+							custom). Store contacts for segmentation without audience-based
+							surcharges. See{" "}
 							<Link href="/pricing" className="font-semibold text-primary-base">
 								pricing details
 							</Link>
@@ -95,11 +96,27 @@ const MailchimpComparisonPage = () => {
 							competitor: "No",
 						},
 						{ label: "Self-hostable", reloop: "Yes", competitor: "No" },
-						{ label: "Newsletter / campaigns", reloop: "Yes", competitor: "Yes (primary)" },
-						{ label: "Transactional API", reloop: "Yes", competitor: "Separate product path" },
+						{
+							label: "Newsletter / campaigns",
+							reloop: "Yes",
+							competitor: "Yes (primary)",
+						},
+						{
+							label: "Transactional API",
+							reloop: "Yes",
+							competitor: "Separate product path",
+						},
 						{ label: "SMTP relay", reloop: "Yes", competitor: "Limited" },
-						{ label: "Developer API focus", reloop: "Primary", competitor: "Secondary" },
-						{ label: "Visual drag-and-drop editor", reloop: "Yes", competitor: "Yes (advanced)" },
+						{
+							label: "Developer API focus",
+							reloop: "Primary",
+							competitor: "Secondary",
+						},
+						{
+							label: "Visual drag-and-drop editor",
+							reloop: "Yes",
+							competitor: "Yes (advanced)",
+						},
 						{ label: "Agent inbox", reloop: "Yes", competitor: "No" },
 						{
 							label: "Pricing basis",
@@ -118,17 +135,23 @@ const MailchimpComparisonPage = () => {
 				/>
 				<ol className="mx-auto max-w-2xl list-none space-y-3 text-[15px] text-text-sub-600 dark:text-white/60">
 					<li>
-						<strong className="text-text-strong-950 dark:text-white">Marketing:</strong>{" "}
+						<strong className="text-text-strong-950 dark:text-white">
+							Marketing:
+						</strong>{" "}
 						Export templates and audiences; rebuild segments from your CRM or
 						product DB in Reloop.
 					</li>
 					<li>
-						<strong className="text-text-strong-950 dark:text-white">Engineering:</strong>{" "}
+						<strong className="text-text-strong-950 dark:text-white">
+							Engineering:
+						</strong>{" "}
 						Replace Mandrill or SMTP plugins with Reloop API sends for auth and
 						billing events.
 					</li>
 					<li>
-						<strong className="text-text-strong-950 dark:text-white">Ops:</strong>{" "}
+						<strong className="text-text-strong-950 dark:text-white">
+							Ops:
+						</strong>{" "}
 						Consolidate DNS to one provider; monitor one webhook stream for
 						campaign and transactional events.
 					</li>

@@ -185,6 +185,6 @@ export function formatPrice(amount: number) {
 export function getPlanPrice(plan: PricingPlan, billingCycle: BillingCycle) {
 	if (plan.monthlyPrice === null) return null;
 	return billingCycle === "annual"
-		? plan.annualMonthlyPrice ?? plan.monthlyPrice
+		? (plan.annualMonthlyPrice ?? plan.monthlyPrice)
 		: plan.monthlyPrice;
 }

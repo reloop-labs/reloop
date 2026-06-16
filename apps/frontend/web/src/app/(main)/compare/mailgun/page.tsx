@@ -16,7 +16,8 @@ export const metadata: Metadata = {
 		"How Reloop compares to Mailgun for transactional email, SMTP, inbound parsing, self-hosting, and long-term vendor control.",
 	openGraph: {
 		title: "Reloop vs Mailgun",
-		description: "Transactional email APIs, SMTP, and infrastructure ownership.",
+		description:
+			"Transactional email APIs, SMTP, and infrastructure ownership.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -38,7 +39,9 @@ const MailgunComparisonPage = () => {
 						domain-level configuration, and inbound parsing. Under Twilio, the
 						product also carries enterprise packaging, usage-based billing, and
 						the usual question:{" "}
-						<em>what happens to our sending reputation and data if we leave?</em>
+						<em>
+							what happens to our sending reputation and data if we leave?
+						</em>
 					</p>
 					<p>
 						Reloop is built for teams that want Mailgun-class capabilities—API,
@@ -63,8 +66,8 @@ const MailgunComparisonPage = () => {
 							Legacy SMTP apps
 						</p>
 						<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
-							Cron jobs and services still send via SMTP credentials—not the REST
-							API. Mailgun supports both; so does Reloop.
+							Cron jobs and services still send via SMTP credentials—not the
+							REST API. Mailgun supports both; so does Reloop.
 						</p>
 					</div>
 					<div className="rounded-2xl border border-stroke-soft-200 p-5 dark:border-white/10">
@@ -103,9 +106,17 @@ const MailgunComparisonPage = () => {
 						{ label: "Self-hostable", reloop: "Yes", competitor: "No" },
 						{ label: "REST API", reloop: "Yes", competitor: "Yes" },
 						{ label: "SMTP relay", reloop: "Yes", competitor: "Yes" },
-						{ label: "Inbound / reply handling", reloop: "Agent inbox", competitor: "Inbound routes" },
+						{
+							label: "Inbound / reply handling",
+							reloop: "Agent inbox",
+							competitor: "Inbound routes",
+						},
 						{ label: "Email validation API", reloop: "Yes", competitor: "Yes" },
-						{ label: "Marketing campaigns", reloop: "Yes", competitor: "Limited" },
+						{
+							label: "Marketing campaigns",
+							reloop: "Yes",
+							competitor: "Limited",
+						},
 						{ label: "Agent / AI workflows", reloop: "Yes", competitor: "No" },
 						{
 							label: "Free tier",
@@ -151,13 +162,16 @@ const MailgunComparisonPage = () => {
 						<span className="font-semibold text-primary-base">Step 4 —</span>
 						<span className="text-[15px] text-text-sub-600 dark:text-white/60">
 							{" "}
-							For API workloads, swap endpoints and map Mailgun event webhooks to
-							Reloop delivery events.
+							For API workloads, swap endpoints and map Mailgun event webhooks
+							to Reloop delivery events.
 						</span>
 					</li>
 				</ol>
 				<p className="mx-auto mt-6 max-w-2xl text-center text-[14px] text-text-sub-600 dark:text-white/50">
-					<Link href="/features/smtp" className="font-semibold text-primary-base">
+					<Link
+						href="/features/smtp"
+						className="font-semibold text-primary-base"
+					>
 						Reloop SMTP docs
 					</Link>{" "}
 					cover credential rotation without downtime.

@@ -6,7 +6,13 @@ export interface ComparisonFeatureRow {
 	competitor: string;
 }
 
-function CellValue({ value, highlight }: { value: string; highlight?: boolean }) {
+function CellValue({
+	value,
+	highlight,
+}: {
+	value: string;
+	highlight?: boolean;
+}) {
 	const normalized = value.toLowerCase();
 	const isPositive =
 		normalized === "yes" ||
@@ -59,7 +65,9 @@ export function ComparisonTable({
 							<th className="px-5 py-4 font-semibold text-text-strong-950 dark:text-white">
 								Feature
 							</th>
-							<th className="px-5 py-4 font-semibold text-primary-base">Reloop</th>
+							<th className="px-5 py-4 font-semibold text-primary-base">
+								Reloop
+							</th>
 							<th className="px-5 py-4 font-semibold text-text-strong-950 dark:text-white">
 								{competitorName}
 							</th>

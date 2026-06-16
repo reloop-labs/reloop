@@ -1,10 +1,5 @@
 import type { SimpleIcon } from "simple-icons";
-import {
-	siLoops,
-	siMailchimp,
-	siMailgun,
-	siResend,
-} from "simple-icons";
+import { siLoops, siMailchimp, siMailgun, siResend } from "simple-icons";
 
 type BrandIconData = Pick<SimpleIcon, "title" | "slug" | "hex" | "path">;
 
