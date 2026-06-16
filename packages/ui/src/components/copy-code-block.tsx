@@ -335,21 +335,20 @@ export function CopyCodeBlock({
 							</div>
 						) : (
 							<>
-								{icon ? (
-									icon
-								) : si ? (
-									<svg
-										role="img"
-										viewBox="0 0 24 24"
-										className="size-3.5 shrink-0"
-										fill="currentColor"
-										xmlns="http://www.w3.org/2000/svg"
-										style={{ color: `#${si.hex}` }}
-										aria-hidden
-									>
-										<path d={si.path} />
-									</svg>
-								) : null}
+								{icon ||
+									(si && (
+										<svg
+											role="img"
+											viewBox="0 0 24 24"
+											className="size-3.5 shrink-0"
+											fill="currentColor"
+											xmlns="http://www.w3.org/2000/svg"
+											style={{ color: `#${si.hex}` }}
+											aria-hidden
+										>
+											<path d={si.path} />
+										</svg>
+									))}
 								<span className="font-mono text-[11px] text-text-sub-500 dark:text-white/40">
 									{displayLabel}
 								</span>
