@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { getLanguage } from "../languages";
 
+export const alt = "Send Email | Reloop";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

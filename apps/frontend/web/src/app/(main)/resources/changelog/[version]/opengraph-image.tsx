@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { getChangelogReleaseByVersion } from "../changelog-utils";
 
+export const alt = "Changelog | Reloop";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -81,7 +82,7 @@ export default async function Image({ params }: { params: Promise<{ version: str
 						height: "150px",
 					}}
 				>
-					<span style={{ fontSize: "14px", fontWeight: 600, color: primaryColor, uppercase: true }}>RELEASE DATE</span>
+					<span style={{ fontSize: "14px", fontWeight: 600, color: primaryColor }}>RELEASE DATE</span>
 					<span style={{ fontSize: "22px", fontWeight: 700, color: "#ffffff", marginTop: "8px" }}>{releaseDate}</span>
 				</div>
 				<div
