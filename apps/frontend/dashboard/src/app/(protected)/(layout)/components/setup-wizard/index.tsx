@@ -1,7 +1,10 @@
 "use client";
 
-import type { IntegrationMode, SetupLanguageCode } from "@fe/dashboard/lib/integration/types";
 import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
+import type {
+	IntegrationMode,
+	SetupLanguageCode,
+} from "@fe/dashboard/lib/integration/types";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -155,11 +158,7 @@ export function SetupWizard({
 			<div className="-top-24 -left-20 -z-10 pointer-events-none absolute h-72 w-72 rounded-full bg-primary-base/5 blur-[100px]" />
 			<div className="-right-20 -z-10 pointer-events-none absolute top-1/3 h-96 w-96 rounded-full bg-blue-500/5 blur-[120px]" />
 
-			<SetupHeader
-				firstName={firstName}
-				stepsLeft={stepsLeft}
-				completedCount={completedCount}
-			/>
+			<SetupHeader firstName={firstName} />
 
 			<div className="mt-8 grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
 				<div className="space-y-6 lg:col-span-5">
