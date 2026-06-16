@@ -11,7 +11,6 @@ import {
 	Globe,
 	Inbox,
 	Mail,
-	Plus,
 	Zap,
 } from "lucide-react";
 import Link from "next/link";
@@ -41,7 +40,6 @@ import {
 } from "simple-icons";
 import { toast } from "sonner";
 import useSWR from "swr";
-import { SetupWizard } from "./components/setup-wizard";
 
 const sdkLanguages = [
 	{ name: "Node / TS", command: "npm install reloop-email", icon: siNodedotjs },
@@ -99,18 +97,6 @@ interface ApiKeyListResponse {
 	total: number;
 }
 
-interface DomainData {
-	id: string;
-	domain: string;
-	status: "pending" | "verifying" | "active" | "suspended" | "failed";
-	createdAt: string;
-}
-
-interface DomainListResponse {
-	domains: DomainData[];
-	total: number;
-}
-
 interface EmailStatsResponse {
 	dates: string[];
 	sent: number[];
@@ -122,7 +108,6 @@ interface EmailStatsResponse {
 
 export default function Home() {
 	const { user, activeOrganization } = useUserOrganization();
-	const firstName = user?.name?.split(" ")[0] || user?.email.split("@")[0];
 
 	// State for API key visibility and agent integration tabs
 	const [showApiKey, setShowApiKey] = useState(false);
@@ -149,10 +134,6 @@ export default function Home() {
 		activeOrganization?.id ? "/api/api-key/v1/?limit=10&page=1" : null,
 	);
 
-	const { data: domainData } = useSWR<DomainListResponse>(
-		activeOrganization?.id ? "/api/domain/v1/list?limit=50&page=1" : null,
-	);
-
 	const { data: emailStatsData } = useSWR<EmailStatsResponse>(
 		activeOrganization?.id
 			? `/api/logs/v1/emails/stats?start_date=${start_date}&end_date=${end_date}`
@@ -166,25 +147,6 @@ export default function Home() {
 	const unmaskedKey = primaryApiKey
 		? `${displayPrefix}_7f8e0d9a8b7c6d5e4f3g2h1i0j_9d06`
 		: `${displayPrefix}_5a7c2b9f8d1e3d4e6a8b7c9f8e0d_9d06`;
-
-	// Compute verified domains stats
-	const domains = domainData?.domains || [];
-	const totalDomains = domainData?.total || 0;
-	const verifiedDomains = domains.filter((d) => d.status === "active").length;
-
-	const displayVerifiedDomains = totalDomains > 0 ? verifiedDomains : 0;
-	const displayTotalDomains = totalDomains > 0 ? totalDomains : 2;
-
-	// Calculate radial progress properties
-	const radius = 30;
-	const strokeWidth = 5;
-	const circumference = 2 * Math.PI * radius;
-	const progressPercentage =
-		displayTotalDomains > 0
-			? (displayVerifiedDomains / displayTotalDomains) * 100
-			: 0;
-	const strokeDashoffset =
-		circumference - (progressPercentage / 100) * circumference;
 
 	// Calculate chart data from API stats or fallback to high-fidelity mock data
 	const chartData = useMemo(() => {
@@ -219,20 +181,6 @@ export default function Home() {
 		return 0;
 	}, [emailStatsData]);
 
-	// Detect if user is new (has never sent emails)
-	// Use both email stats and API key request count as signals
-	const hasEverSentEmails = useMemo(() => {
-		if (emailStatsData && emailStatsData.dates.length > 0) {
-			const totalSent = emailStatsData.sent.reduce((a, b) => a + b, 0);
-			if (totalSent > 0) return true;
-		}
-		// Fallback: check if the API key has been used
-		if (primaryApiKey && primaryApiKey.requestCount > 0) return true;
-		return false;
-	}, [emailStatsData, primaryApiKey]);
-
-	const isNewUser = !hasEverSentEmails;
-
 	// Clipboard copy helper
 	const handleCopy = (text: string, label: string) => {
 		navigator.clipboard.writeText(text);
@@ -257,29 +205,16 @@ This context file guides your AI agent on integrating with Reloop's developer AP
   }
 }`;
 
-	// ── State A: New User → Setup Wizard ──────────────────────────────
-	if (isNewUser) {
-		return (
-			<SetupWizard
-				firstName={firstName || "there"}
-				domains={domains}
-				primaryApiKey={primaryApiKey}
-				userEmail={user?.email}
-			/>
-		);
-	}
-
 	// ── State B: Active User → Operational Dashboard ─────────────────
 	return (
 		<div className="mx-auto max-w-7xl space-y-8 p-6 lg:p-8">
-			{/* Explore our modules / endpoints */}
-			<div className="space-y-2">
-				<h2 className="font-semibold text-lg text-text-strong-950 tracking-tight dark:text-white">
-					Explore our modules
-				</h2>
-				<p className="text-sm text-text-sub-600 dark:text-white/60">
-					Power your agents and workflows with our communication & messaging API
+			<div className="space-y-1">
+				<p className="font-medium text-sm text-text-sub-600 dark:text-white/60">
+					{activeOrganization?.name}
 				</p>
+				<h1 className="font-semibold text-3xl text-text-strong-950 tracking-tight dark:text-white">
+					{user?.email ? `${user.email}'s Account` : "Your Account"}
+				</h1>
 
 				<div className="grid gap-4 pt-2 sm:grid-cols-2 lg:grid-cols-4">
 					{/* Emails Card */}
@@ -475,71 +410,6 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 									/>
 								</AreaChart>
 							</ResponsiveContainer>
-						</div>
-					</div>
-
-					{/* Live System Status / Verified Domains */}
-					<div className="rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.01]">
-						<div className="flex items-center justify-between">
-							<div className="space-y-1">
-								<h3 className="flex items-center gap-2 font-semibold text-sm text-text-strong-950 dark:text-white">
-									Verified Domains
-									<span className="relative flex h-2 w-2">
-										<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-										<span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-									</span>
-									<span className="font-semibold text-[10px] text-emerald-600 uppercase tracking-wider dark:text-emerald-400">
-										Live
-									</span>
-								</h3>
-								<p className="text-text-sub-600 text-xs dark:text-white/50">
-									Active domain records verified for outbound relay dispatching.
-								</p>
-							</div>
-
-							{/* Radial circle representation */}
-							<div className="flex items-center gap-4">
-								<div className="relative flex items-center justify-center">
-									<svg width="70" height="70" className="-rotate-90">
-										<circle
-											cx="35"
-											cy="35"
-											r={radius}
-											stroke="currentColor"
-											className="text-stroke-soft-100 dark:text-white/5"
-											strokeWidth={strokeWidth}
-											fill="transparent"
-										/>
-										<circle
-											cx="35"
-											cy="35"
-											r={radius}
-											stroke="#F97316"
-											strokeWidth={strokeWidth}
-											fill="transparent"
-											strokeDasharray={circumference}
-											strokeDashoffset={strokeDashoffset}
-											strokeLinecap="round"
-											className="transition-all duration-500 ease-in-out"
-										/>
-									</svg>
-									<span className="absolute font-bold text-text-strong-950 text-xs dark:text-white">
-										{displayVerifiedDomains}/{displayTotalDomains}
-									</span>
-								</div>
-								<div className="text-left">
-									<p className="font-medium text-text-strong-950 text-xs dark:text-white">
-										{displayVerifiedDomains} verified domains
-									</p>
-									<Link
-										href="/domain/add"
-										className="mt-0.5 flex items-center gap-0.5 font-medium text-[11px] text-orange-600 hover:underline dark:text-orange-400"
-									>
-										Add new domain
-										<Plus className="h-3 w-3" />
-									</Link>
-								</div>
-							</div>
 						</div>
 					</div>
 				</div>
