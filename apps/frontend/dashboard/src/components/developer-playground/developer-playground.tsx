@@ -10,7 +10,6 @@ import {
 	sendEmailCode,
 } from "@fe/dashboard/lib/integration/snippets";
 import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
-import { Icon } from "@reloop/ui/icon";
 import { useState } from "react";
 import {
 	siBun,
@@ -113,66 +112,68 @@ export function DeveloperPlayground({
 	}
 
 	return (
-		<div className="ml-0.5 flex flex-col">
-			<div className="flex gap-3">
-				<div className="flex flex-col items-center">
-					<div className="mt-2.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-bg-weak-50 ring-1 ring-stroke-soft-200 dark:bg-bg-weak-50/70 dark:ring-stroke-soft-100/40">
-						<Icon
-							name={mode === "ai" ? "sparkling" : "code"}
-							className="h-3 w-3 text-text-sub-600"
-						/>
-					</div>
-					<div className="mt-1.5 w-px flex-1 bg-stroke-soft-200 dark:bg-stroke-soft-100/40" />
-				</div>
-				<div className="flex min-w-0 flex-1 flex-col pb-6">
-					<IntegrationModeTabs value={mode} onChange={onModeChange} />
-				</div>
+		<div className="flex flex-col">
+			{/* Header — mirrors the left panel's Setup Checklist heading */}
+			<div className="mb-6">
+				<h2 className="font-bold text-lg text-text-strong-950 dark:text-white">
+					Developer Playground
+				</h2>
+				<p className="mt-1 text-text-sub-600 text-xs dark:text-white/40">
+					Choose how to integrate Reloop — let AI do the work or follow the
+					step-by-step SDK guide.
+				</p>
 			</div>
 
-			{isAi ? (
-				<StepCard number={1} title="Copy the AI prompt" isLast>
-					<AiPromptBlock prompt={aiPrompt} />
-				</StepCard>
-			) : (
-				<>
-					<StepCard number={1} title="Choose your language">
-						<IntegrationLanguagePills value={lang} onChange={onLangChange} />
-					</StepCard>
+			{/* Mode tabs */}
+			<IntegrationModeTabs value={mode} onChange={onModeChange} className="mb-5" />
 
-					<StepCard number={2} title="Install the Reloop SDK">
-						<CopyCodeBlock
-							code={installCode}
-							lang="bash"
-							label={installLabel}
-							si={installIcon}
-							tabs={isNode ? pkgManagerTabs : undefined}
-							activeTab={isNode ? pkgManager : undefined}
-							onTabChange={
-								isNode ? (id) => setPkgManager(id as PackageManager) : undefined
-							}
-						/>
+			{/* Step content */}
+			<div className="ml-0.5 flex flex-col">
+				{isAi ? (
+					<StepCard number={1} title="Copy the AI prompt" isLast>
+						<AiPromptBlock prompt={aiPrompt} />
 					</StepCard>
+				) : (
+					<>
+						<StepCard number={1} title="Choose your language">
+							<IntegrationLanguagePills value={lang} onChange={onLangChange} />
+						</StepCard>
 
-					<StepCard number={3} title="Add your API key to .env">
-						<CopyCodeBlock
-							code={`RELOOP_API_KEY=${apiKey}`}
-							lang="bash"
-							copyValue={`RELOOP_API_KEY=${apiKey}`}
-							label=".env"
-							si={siDotenv}
-						/>
-					</StepCard>
+						<StepCard number={2} title="Install the Reloop SDK">
+							<CopyCodeBlock
+								code={installCode}
+								lang="bash"
+								label={installLabel}
+								si={installIcon}
+								tabs={isNode ? pkgManagerTabs : undefined}
+								activeTab={isNode ? pkgManager : undefined}
+								onTabChange={
+									isNode ? (id) => setPkgManager(id as PackageManager) : undefined
+								}
+							/>
+						</StepCard>
 
-					<StepCard number={4} title="Send your first email" isLast>
-						<CopyCodeBlock
-							code={sendEmailCode[lang].code}
-							lang={sendEmailCode[lang].lang}
-							label={langFileLabels[lang]}
-							si={langIcons[lang]}
-						/>
-					</StepCard>
-				</>
-			)}
+						<StepCard number={3} title="Add your API key to .env">
+							<CopyCodeBlock
+								code={`RELOOP_API_KEY=${apiKey}`}
+								lang="bash"
+								copyValue={`RELOOP_API_KEY=${apiKey}`}
+								label=".env"
+								si={siDotenv}
+							/>
+						</StepCard>
+
+						<StepCard number={4} title="Send your first email" isLast>
+							<CopyCodeBlock
+								code={sendEmailCode[lang].code}
+								lang={sendEmailCode[lang].lang}
+								label={langFileLabels[lang]}
+								si={langIcons[lang]}
+							/>
+						</StepCard>
+					</>
+				)}
+			</div>
 		</div>
 	);
 }
