@@ -1,6 +1,9 @@
 "use client";
 
-import type { DomainResponse } from "@fe/dashboard/types/api.types";
+import type {
+	DomainListResponse,
+	DomainResponse,
+} from "@fe/dashboard/types/api.types";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -73,6 +76,30 @@ export const AddDomainStep = () => {
 			setDomainId(data.id);
 			setStep(step + 1);
 		} catch (error) {
+			const isAlreadyExists =
+				axios.isAxiosError(error) &&
+				(error.response?.status === 409 ||
+					error.response?.data?.message === "Domain already exists");
+
+			if (isAlreadyExists) {
+				try {
+					const { data: listData } = await axios.get<DomainListResponse>(
+						"/api/domain/v1/list?limit=100",
+						{ headers: { credentials: "include" } },
+					);
+					const existingDomain = listData.domains?.find(
+						(d) => d.domain.toLowerCase() === values.domain.toLowerCase(),
+					);
+					if (existingDomain) {
+						setDomainId(existingDomain.id);
+						setStep(step + 1);
+						return;
+					}
+				} catch (listError) {
+					console.error("Failed to fetch existing domain ID:", listError);
+				}
+			}
+
 			setStatus("idle");
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "An unexpected error occurred"
