@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 import {
 	changelogReleases,
 	getChangelogReleasePath,
-} from "./(main)/resources/changelog/changelog-utils";
+} from "./resources/changelog/changelog-utils";
 
 export default function sitemap(): MetadataRoute.Sitemap {
 	const siteUrl = getSiteUrl();

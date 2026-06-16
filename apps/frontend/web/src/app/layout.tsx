@@ -9,6 +9,8 @@ import {
 	siteDescription,
 	siteName,
 } from "@reloop/web/lib/site";
+import { Footer } from "@reloop/web/components/footer";
+import { Header } from "@reloop/web/components/header";
 import { ThemeProvider } from "@reloop/web/providers/theme-provider";
 import localFont from "next/font/local";
 
@@ -78,7 +80,11 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					{children}
+					<div>
+						<Header />
+						<main>{children}</main>
+						<Footer />
+					</div>
 					<IconsSprite />
 					<ChatwootLoader />
 					<RybbitLoader />

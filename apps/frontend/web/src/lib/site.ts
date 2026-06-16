@@ -1,4 +1,4 @@
-import { LANGUAGE_SLUGS } from "../app/(main)/features/languages/languages";
+import { LANGUAGE_SLUGS } from "../app/features/languages/languages";
 
 export const siteName = "Reloop";
 
