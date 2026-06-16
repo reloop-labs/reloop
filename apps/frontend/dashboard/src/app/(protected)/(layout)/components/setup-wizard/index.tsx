@@ -1,15 +1,15 @@
 "use client";
 
 import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
+import { DeveloperPlayground } from "@fe/dashboard/components/developer-playground/developer-playground";
 import type {
 	IntegrationMode,
-	SetupLanguageCode,
+	LanguageCode,
 } from "@fe/dashboard/lib/integration/types";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { SetupChecklist } from "./setup-checklist";
-import { SetupContextPanel } from "./setup-context-panel";
 import { SetupHeader } from "./setup-header";
 import {
 	type ApiKeyData,
@@ -37,8 +37,8 @@ export function SetupWizard({
 	const [generatedApiKey, setGeneratedApiKey] = useState<string | null>(null);
 	const [isGeneratingKey, setIsGeneratingKey] = useState(false);
 	const [mode, setMode] = useState<IntegrationMode>("ai");
-	const [setupLang, setSetupLang] = useApiLanguage<SetupLanguageCode>(
-		["nodejs", "python", "php", "ruby", "go"],
+	const [lang, setLang] = useApiLanguage<LanguageCode>(
+		["nodejs", "python", "php", "go"],
 		"nodejs",
 	);
 
@@ -176,13 +176,13 @@ export function SetupWizard({
 				</div>
 
 				<div className="lg:col-span-7 lg:pl-8">
-					<SetupContextPanel
-						apiKeyDisplay={playgroundKey}
-						domain={progress.primaryDomainName}
+					<DeveloperPlayground
+						apiKey={playgroundKey}
 						mode={mode}
-						setupLang={setupLang}
+						lang={lang}
 						onModeChange={setMode}
-						onSetupLangChange={setSetupLang}
+						onLangChange={setLang}
+						variant="full"
 					/>
 				</div>
 			</div>
