@@ -36,7 +36,7 @@ const AddDomain = () => {
 				clickTracking: false,
 				openTracking: false,
 				customReturnPath: "receive",
-				trackingSubdomain: "links",
+				trackingSubdomain: "link",
 			},
 		});
 
@@ -60,7 +60,7 @@ const AddDomain = () => {
 					click_tracking: clickTracking,
 					open_tracking: openTracking,
 					custom_return_path: customReturnPath || "receive",
-					tracking: trackingSubdomain || "links",
+					tracking: trackingSubdomain || "link",
 					tls: "opportunistic",
 				},
 				{ headers: { credentials: "include" } },

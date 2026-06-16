@@ -44,7 +44,7 @@ export const AddDomainStep = () => {
 				clickTracking: false,
 				openTracking: false,
 				customReturnPath: "receive",
-				trackingSubdomain: "links",
+				trackingSubdomain: "link.mail",
 			},
 		});
 
@@ -65,7 +65,7 @@ export const AddDomainStep = () => {
 					click_tracking: values.clickTracking,
 					open_tracking: values.openTracking,
 					custom_return_path: values.customReturnPath || "receive",
-					tracking: values.trackingSubdomain || "links",
+					tracking: values.trackingSubdomain || "link.mail",
 					tls: "opportunistic",
 				},
 				{ headers: { credentials: "include" } },

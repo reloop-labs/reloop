@@ -74,7 +74,7 @@ export const AdvancedOptions = ({
 					<Input.Wrapper>
 						<Input.Input
 							id="trackingSubdomain"
-							placeholder="links"
+							placeholder="link"
 							{...register("trackingSubdomain")}
 							disabled={isLoading}
 						/>
