@@ -158,7 +158,24 @@ export const AddDomainStep = () => {
 					</AnimatePresence>
 				</div>
 
-				<div className="mt-3 flex items-center gap-3">
+				<div className="mt-3 flex items-center justify-end gap-3">
+					<Button.Root
+						type="button"
+						variant="neutral"
+						mode="stroke"
+						size="xsmall"
+						onClick={() => {
+							setSkippedDns("true");
+							setStep(4);
+						}}
+						disabled={status === "loading"}
+					>
+						Skip
+						<span className="inline-flex items-center gap-0.5">
+							<KbdKeyOutline>⌥</KbdKeyOutline>
+							<KbdKeyOutline>S</KbdKeyOutline>
+						</span>
+					</Button.Root>
 					<Button.Root
 						type="submit"
 						variant="neutral"
@@ -186,23 +203,6 @@ export const AddDomainStep = () => {
 								</span>
 							</>
 						)}
-					</Button.Root>
-					<Button.Root
-						type="button"
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						onClick={() => {
-							setSkippedDns("true");
-							setStep(4);
-						}}
-						disabled={status === "loading"}
-					>
-						Skip
-						<span className="inline-flex items-center gap-0.5">
-							<KbdKeyOutline>⌥</KbdKeyOutline>
-							<KbdKeyOutline>S</KbdKeyOutline>
-						</span>
 					</Button.Root>
 				</div>
 			</form>

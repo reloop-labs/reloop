@@ -272,6 +272,19 @@ export const ConfigureDnsStep = () => {
 				)}
 				<div className="mt-8 flex items-center justify-end gap-3">
 					<Button.Root
+						variant="neutral"
+						mode="stroke"
+						size="xsmall"
+						onClick={() => setStep(4)}
+						className="gap-1.5"
+					>
+						Skip
+						<span className="inline-flex items-center gap-0.5">
+							<KbdKeyOutline>⌥</KbdKeyOutline>
+							<KbdKeyOutline>S</KbdKeyOutline>
+						</span>
+					</Button.Root>
+					<Button.Root
 						onClick={handleVerifyDNS}
 						size="xsmall"
 						variant="neutral"
@@ -297,19 +310,6 @@ export const ConfigureDnsStep = () => {
 								</span>
 							</>
 						)}
-					</Button.Root>
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						onClick={() => setStep(4)}
-						className="gap-1.5"
-					>
-						Skip
-						<span className="inline-flex items-center gap-0.5">
-							<KbdKeyOutline>⌥</KbdKeyOutline>
-							<KbdKeyOutline>S</KbdKeyOutline>
-						</span>
 					</Button.Root>
 				</div>
 			</div>
