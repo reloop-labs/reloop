@@ -211,7 +211,11 @@ export function SetupChecklist({
 								</p>
 								<div className="mt-1 flex flex-col gap-2">
 									<Link
-										href={primaryDomain ? `/domain/${primaryDomain.id}` : "/domain/add"}
+										href={
+											primaryDomain
+												? `/domain/${primaryDomain.id}`
+												: "/domain/add"
+										}
 										className="inline-flex w-fit items-center gap-2 rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-4 py-2 font-semibold text-sm text-text-strong-950 transition-all hover:bg-bg-weak-50 active:scale-[0.98] dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-white dark:hover:bg-white/[0.08]"
 									>
 										<Globe className="h-4 w-4 text-text-sub-600 dark:text-white/40" />
@@ -229,7 +233,8 @@ export function SetupChecklist({
 								<div className="mt-1 flex items-start gap-2 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-3 text-text-sub-600 text-xs leading-relaxed dark:border-white/[0.06] dark:bg-white/[0.02] dark:text-white/40">
 									<Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
 									<span>
-										Don&apos;t manage DNS? Share the verification steps with your IT team.
+										Don&apos;t manage DNS? Share the verification steps with
+										your IT team.
 									</span>
 								</div>
 							</>

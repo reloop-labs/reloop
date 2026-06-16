@@ -125,7 +125,11 @@ export function DeveloperPlayground({
 			</div>
 
 			{/* Mode tabs */}
-			<IntegrationModeTabs value={mode} onChange={onModeChange} className="mb-5" />
+			<IntegrationModeTabs
+				value={mode}
+				onChange={onModeChange}
+				className="mb-5"
+			/>
 
 			{/* Step content */}
 			<div className="ml-0.5 flex flex-col">
@@ -148,7 +152,9 @@ export function DeveloperPlayground({
 								tabs={isNode ? pkgManagerTabs : undefined}
 								activeTab={isNode ? pkgManager : undefined}
 								onTabChange={
-									isNode ? (id) => setPkgManager(id as PackageManager) : undefined
+									isNode
+										? (id) => setPkgManager(id as PackageManager)
+										: undefined
 								}
 							/>
 						</StepCard>

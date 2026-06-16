@@ -5,7 +5,12 @@ import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { useEffect, useState } from "react";
-import { siCursor, siVscodium, siWindsurf, siZedindustries } from "simple-icons";
+import {
+	siCursor,
+	siVscodium,
+	siWindsurf,
+	siZedindustries,
+} from "simple-icons";
 
 interface Editor {
 	id: string;
@@ -72,8 +77,8 @@ export function AiPromptBlock({
 		}
 	};
 
-	const activeEditor =
-		(EDITORS.find((e) => e.id === activeEditorId) || EDITORS[0]) as Editor;
+	const activeEditor = (EDITORS.find((e) => e.id === activeEditorId) ||
+		EDITORS[0]) as Editor;
 
 	const handleOpen = () => {
 		window.open(activeEditor.getUrl(prompt), "_blank");
