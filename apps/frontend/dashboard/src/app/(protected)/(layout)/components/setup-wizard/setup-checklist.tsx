@@ -100,7 +100,7 @@ export function SetupChecklist({
 	const step4State = getStepState(step4Complete, step3Done && step2Done);
 
 	return (
-		<div className="rounded-2xl border border-stroke-soft-100 bg-white/60 p-6 backdrop-blur-xl dark:border-white/[0.04] dark:bg-white/[0.01]">
+		<div>
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>

@@ -75,7 +75,7 @@ export function SetupContextPanel({
 	);
 
 	return (
-		<div className="rounded-2xl border border-stroke-soft-100 bg-white/60 p-6 backdrop-blur-xl dark:border-white/[0.04] dark:bg-white/[0.01]">
+		<div>
 			<div>
 				<h2 className="font-bold text-lg text-text-strong-950 dark:text-white">
 					Developer Playground

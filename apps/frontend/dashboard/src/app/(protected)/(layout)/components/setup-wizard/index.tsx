@@ -160,8 +160,8 @@ export function SetupWizard({
 
 			<SetupHeader firstName={firstName} />
 
-			<div className="mt-8 grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
-				<div className="space-y-6 lg:col-span-5">
+			<div className="mt-8 grid grid-cols-1 items-start divide-stroke-soft-100 lg:grid-cols-12 lg:divide-x dark:divide-white/[0.04]">
+				<div className="lg:col-span-5 lg:pr-8">
 					<SetupChecklist
 						domains={domains}
 						primaryApiKey={primaryApiKey}
@@ -175,7 +175,7 @@ export function SetupWizard({
 					/>
 				</div>
 
-				<div className="space-y-6 lg:col-span-7">
+				<div className="lg:col-span-7 lg:pl-8">
 					<SetupContextPanel
 						apiKeyDisplay={playgroundKey}
 						domain={progress.primaryDomainName}
