@@ -7,10 +7,12 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import { UserDropdown } from "./user-dropdown";
 
 export const PageHeader = () => {
 	const pathname = usePathname();
+	const { isAiPanelOpen, toggleAiPanel } = useUIStore();
 
 	const activeItem = [...mainNavigation, ...userNavigation].find((item) => {
 		if (item.path === "/") return pathname === "/";
@@ -57,19 +59,17 @@ export const PageHeader = () => {
 					size="xxsmall"
 					className={cn(
 						"gap-1.5 text-text-sub-600 hover:text-text-strong-950",
-						pathname === "/ai" && "bg-bg-weak-50 text-text-strong-950",
+						isAiPanelOpen && "bg-bg-weak-50 text-text-strong-950",
 					)}
-					asChild
+					onClick={toggleAiPanel}
 				>
-					<Link href="/ai">
-						<Icon
-							name="sparkling"
-							className="h-4 w-4 text-purple-600 dark:text-purple-400"
-						/>
-						<span className="bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text font-medium text-transparent">
-							Ask AI
-						</span>
-					</Link>
+					<Icon
+						name="sparkling"
+						className="h-4 w-4 text-purple-600 dark:text-purple-400"
+					/>
+					<span className="bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text font-medium text-transparent">
+						Ask AI
+					</span>
 				</Button.Root>
 
 				<FeedbackPopover />

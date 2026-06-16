@@ -4,6 +4,12 @@ interface UIState {
 	isSidebarCollapsed: boolean;
 	setIsSidebarCollapsed: (value: boolean) => void;
 	toggleSidebarCollapse: () => void;
+	isAiPanelOpen: boolean;
+	setIsAiPanelOpen: (value: boolean) => void;
+	toggleAiPanel: () => void;
+	isAiPanelExpanded: boolean;
+	setIsAiPanelExpanded: (value: boolean) => void;
+	toggleAiPanelExpand: () => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -22,4 +28,11 @@ export const useUIStore = create<UIState>((set) => ({
 			} catch {}
 			return { isSidebarCollapsed: next };
 		}),
+	isAiPanelOpen: false,
+	setIsAiPanelOpen: (value) => set({ isAiPanelOpen: value }),
+	toggleAiPanel: () => set((state) => ({ isAiPanelOpen: !state.isAiPanelOpen })),
+	isAiPanelExpanded: false,
+	setIsAiPanelExpanded: (value) => set({ isAiPanelExpanded: value }),
+	toggleAiPanelExpand: () =>
+		set((state) => ({ isAiPanelExpanded: !state.isAiPanelExpanded })),
 }));
