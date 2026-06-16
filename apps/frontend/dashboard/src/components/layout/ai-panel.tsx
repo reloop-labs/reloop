@@ -232,10 +232,10 @@ export const AiPanel = () => {
 							type="button"
 							onClick={() => setAiPanelActiveTab("ai")}
 							className={cn(
-								"rounded-md px-2.5 py-1 text-[11px] font-medium transition-all duration-150",
+								"rounded-md px-2.5 py-1 font-medium text-[11px] transition-all duration-150",
 								aiPanelActiveTab === "ai"
 									? "bg-white text-text-strong-950 shadow-sm dark:bg-white/10 dark:text-white"
-									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white",
 							)}
 						>
 							Ask AI
@@ -244,10 +244,10 @@ export const AiPanel = () => {
 							type="button"
 							onClick={() => setAiPanelActiveTab("support")}
 							className={cn(
-								"rounded-md px-2.5 py-1 text-[11px] font-medium transition-all duration-150",
+								"rounded-md px-2.5 py-1 font-medium text-[11px] transition-all duration-150",
 								aiPanelActiveTab === "support"
 									? "bg-white text-text-strong-950 shadow-sm dark:bg-white/10 dark:text-white"
-									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white",
 							)}
 						>
 							Support
@@ -497,7 +497,7 @@ export const AiPanel = () => {
 						>
 							<iframe
 								src="https://chatwoot.reloop.sh/widget?website_token=WsUSVMPZG5goFYPcJQLQVAjD&locale=en"
-								className="w-full h-full border-none bg-white dark:bg-[#0c0c0c]"
+								className="h-full w-full border-none bg-white dark:bg-[#0c0c0c]"
 								title="Support Live Chat"
 							/>
 						</motion.div>

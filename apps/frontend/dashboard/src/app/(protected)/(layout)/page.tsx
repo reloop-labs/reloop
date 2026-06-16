@@ -3,6 +3,7 @@
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import {
 	ArrowRight,
+	BookOpen,
 	ChevronRight,
 	Code,
 	Copy,
@@ -11,6 +12,7 @@ import {
 	Globe,
 	Inbox,
 	Mail,
+	Shield,
 	Zap,
 } from "lucide-react";
 import Link from "next/link";
@@ -216,7 +218,7 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 					{user?.email ? `${user.email}'s Account` : "Your Account"}
 				</h1>
 
-				<div className="grid gap-6 pt-2 sm:grid-cols-2 lg:grid-cols-4">
+				<div className="grid gap-6 pt-2 md:grid-cols-2 lg:grid-cols-3">
 					{/* Emails Card */}
 					<Link
 						href="/emails"
@@ -231,7 +233,7 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 									Emails
 								</span>
 							</div>
-							<p className="text-text-sub-600 text-[13px] leading-relaxed dark:text-white/50">
+							<p className="text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
 								Send transactional & marketing emails with high deliverability.
 							</p>
 						</div>
@@ -255,8 +257,9 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 									Inbox Triage
 								</span>
 							</div>
-							<p className="text-text-sub-600 text-[13px] leading-relaxed dark:text-white/50">
-								Interact with incoming messages using AI prompts or human routing.
+							<p className="text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
+								Interact with incoming messages using AI prompts or human
+								routing.
 							</p>
 						</div>
 						<div className="mt-4 flex items-center gap-1 font-semibold text-[13px] text-blue-600 dark:text-blue-400">
@@ -265,56 +268,155 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 						</div>
 					</Link>
 
-					{/* Workflows Card */}
+					{/* Audit Logs Card */}
 					<Link
-						href="/workflows"
-						className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 p-5 transition-all duration-200 hover:border-purple-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-purple-500/20 dark:hover:bg-white/[0.02]"
+						href="/logs"
+						className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 p-5 transition-all duration-200 hover:border-slate-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-slate-500/20 dark:hover:bg-white/[0.02]"
 					>
 						<div className="space-y-4">
 							<div className="flex items-center gap-3">
-								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-500 dark:bg-purple-500/10 dark:text-purple-400">
-									<Zap className="h-5 w-5" />
+								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-500 dark:bg-slate-500/10 dark:text-slate-400">
+									<Shield className="h-5 w-5" />
 								</div>
-								<span className="flex items-center gap-1.5 font-semibold text-base text-text-strong-950 dark:text-white">
-									Workflows
-									<span className="rounded bg-purple-100 px-1 py-0.2 font-semibold text-[8px] text-purple-800 uppercase dark:bg-purple-500/25 dark:text-purple-300">
-										New
-									</span>
+								<span className="font-semibold text-base text-text-strong-950 dark:text-white">
+									Audit Logs
 								</span>
 							</div>
-							<p className="text-text-sub-600 text-[13px] leading-relaxed dark:text-white/50">
-								Create automated rules and trigger flows on custom communication events.
+							<p className="text-[13px] text-text-sub-600 leading-relaxed dark:text-white/50">
+								Track security events, API key access, and team actions.
 							</p>
 						</div>
-						<div className="mt-4 flex items-center gap-1 font-semibold text-[13px] text-purple-600 dark:text-purple-400">
-							<span>Build automation</span>
+						<div className="mt-4 flex items-center gap-1 font-semibold text-[13px] text-slate-600 dark:text-slate-400">
+							<span>View audit logs</span>
 							<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
 						</div>
 					</Link>
 
-					{/* Domain Card */}
-					<Link
-						href="/domain"
-						className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 p-5 transition-all duration-200 hover:border-teal-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-teal-500/20 dark:hover:bg-white/[0.02]"
-					>
-						<div className="space-y-4">
-							<div className="flex items-center gap-3">
-								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-400">
-									<Globe className="h-5 w-5" />
-								</div>
-								<span className="font-semibold text-base text-text-strong-950 dark:text-white">
-									Domains
-								</span>
+					{/* Docs Card (Premium style) */}
+					<div className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 transition-all duration-200 hover:border-indigo-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-indigo-500/20 dark:hover:bg-white/[0.02]">
+						{/* Header */}
+						<Link
+							href="https://reloop.sh/docs"
+							className="flex items-center justify-between border-stroke-soft-100/50 border-b px-5 py-4 dark:border-white/5"
+						>
+							<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
+								Docs
+							</span>
+							<ArrowRight className="h-4 w-4 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/60" />
+						</Link>
+
+						{/* Inner Box */}
+						<div className="m-4 flex flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center dark:border-white/5 dark:bg-white/[0.02]">
+							{/* Icon */}
+							<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-500 dark:bg-indigo-500/10 dark:text-indigo-400">
+								<BookOpen className="h-6 w-6" />
 							</div>
-							<p className="text-text-sub-600 text-[13px] leading-relaxed dark:text-white/50">
-								Manage custom sending domains, SPF/DKIM verification, and DNS.
+
+							{/* Heading */}
+							<h4 className="mt-4 font-semibold text-sm text-text-strong-950 tracking-tight dark:text-white">
+								Learn integration without the overhead
+							</h4>
+
+							{/* Description */}
+							<p className="mt-2 max-w-[220px] text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50">
+								Explore tutorials, SDK documentation, and API guides to build
+								faster.
 							</p>
+
+							{/* Button */}
+							<Link
+								href="https://reloop.sh/docs"
+								className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-semibold text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
+							>
+								Read documentation
+							</Link>
 						</div>
-						<div className="mt-4 flex items-center gap-1 font-semibold text-[13px] text-teal-600 dark:text-teal-400">
-							<span>Configure domain</span>
-							<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+					</div>
+
+					{/* Workflows Card */}
+					<div className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 transition-all duration-200 hover:border-purple-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-purple-500/20 dark:hover:bg-white/[0.02]">
+						{/* Header */}
+						<Link
+							href="/workflows"
+							className="flex items-center justify-between border-stroke-soft-100/50 border-b px-5 py-4 dark:border-white/5"
+						>
+							<span className="flex items-center gap-1.5 font-semibold text-sm text-text-strong-950 dark:text-white">
+								Workflows
+								<span className="rounded bg-purple-100 px-1 py-0.2 font-semibold text-[8px] text-purple-800 uppercase dark:bg-purple-500/25 dark:text-purple-300">
+									New
+								</span>
+							</span>
+							<ArrowRight className="h-4 w-4 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/60" />
+						</Link>
+
+						{/* Inner Box */}
+						<div className="m-4 flex flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center dark:border-white/5 dark:bg-white/[0.02]">
+							{/* Icon */}
+							<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-50 text-purple-500 dark:bg-purple-500/10 dark:text-purple-400">
+								<Zap className="h-6 w-6" />
+							</div>
+
+							{/* Heading */}
+							<h4 className="mt-4 font-semibold text-sm text-text-strong-950 tracking-tight dark:text-white">
+								Build automations without the overhead
+							</h4>
+
+							{/* Description */}
+							<p className="mt-2 max-w-[220px] text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50">
+								From triggers to multi-step AI actions — automate your flows in
+								minutes.
+							</p>
+
+							{/* Button */}
+							<Link
+								href="/workflows"
+								className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-semibold text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
+							>
+								Start building
+							</Link>
 						</div>
-					</Link>
+					</div>
+
+					{/* Domain Card */}
+					<div className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 transition-all duration-200 hover:border-teal-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-teal-500/20 dark:hover:bg-white/[0.02]">
+						{/* Header */}
+						<Link
+							href="/domain"
+							className="flex items-center justify-between border-stroke-soft-100/50 border-b px-5 py-4 dark:border-white/5"
+						>
+							<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
+								Domains
+							</span>
+							<ArrowRight className="h-4 w-4 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/60" />
+						</Link>
+
+						{/* Inner Box */}
+						<div className="m-4 flex flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center dark:border-white/5 dark:bg-white/[0.02]">
+							{/* Icon */}
+							<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-400">
+								<Globe className="h-6 w-6" />
+							</div>
+
+							{/* Heading */}
+							<h4 className="mt-4 font-semibold text-sm text-text-strong-950 tracking-tight dark:text-white">
+								Verify sending domains without the overhead
+							</h4>
+
+							{/* Description */}
+							<p className="mt-2 max-w-[220px] text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50">
+								Set up SPF, DKIM, and DMARC verification to scale globally in
+								minutes.
+							</p>
+
+							{/* Button */}
+							<Link
+								href="/domain"
+								className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-semibold text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
+							>
+								Configure domain
+							</Link>
+						</div>
+					</div>
 				</div>
 			</div>
 

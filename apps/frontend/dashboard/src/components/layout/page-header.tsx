@@ -63,7 +63,9 @@ export const PageHeader = () => {
 					size="xxsmall"
 					className={cn(
 						"gap-1.5 text-text-sub-600 hover:text-text-strong-950",
-						isAiPanelOpen && aiPanelActiveTab === "ai" && "bg-bg-weak-50 text-text-strong-950",
+						isAiPanelOpen &&
+							aiPanelActiveTab === "ai" &&
+							"bg-bg-weak-50 text-text-strong-950",
 					)}
 					onClick={() => {
 						if (!isAiPanelOpen) {
@@ -91,7 +93,9 @@ export const PageHeader = () => {
 					size="xxsmall"
 					className={cn(
 						"gap-1.5 text-text-sub-600 hover:text-text-strong-950",
-						isAiPanelOpen && aiPanelActiveTab === "support" && "bg-bg-weak-50 text-text-strong-950",
+						isAiPanelOpen &&
+							aiPanelActiveTab === "support" &&
+							"bg-bg-weak-50 text-text-strong-950",
 					)}
 					onClick={() => {
 						if (!isAiPanelOpen) {
