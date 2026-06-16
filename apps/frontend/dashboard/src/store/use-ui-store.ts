@@ -30,7 +30,8 @@ export const useUIStore = create<UIState>((set) => ({
 		}),
 	isAiPanelOpen: false,
 	setIsAiPanelOpen: (value) => set({ isAiPanelOpen: value }),
-	toggleAiPanel: () => set((state) => ({ isAiPanelOpen: !state.isAiPanelOpen })),
+	toggleAiPanel: () =>
+		set((state) => ({ isAiPanelOpen: !state.isAiPanelOpen })),
 	isAiPanelExpanded: false,
 	setIsAiPanelExpanded: (value) => set({ isAiPanelExpanded: value }),
 	toggleAiPanelExpand: () =>

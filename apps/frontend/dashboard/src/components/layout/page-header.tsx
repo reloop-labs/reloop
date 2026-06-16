@@ -2,12 +2,12 @@
 
 import { FeedbackPopover } from "@fe/dashboard/components/feedback-popover";
 import { mainNavigation, userNavigation } from "@fe/dashboard/constants";
+import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import { UserDropdown } from "./user-dropdown";
 
 export const PageHeader = () => {
