@@ -171,7 +171,7 @@ export function PreferencesContent({
 	}, [token, unsubscribeAllState, channels]);
 
 	return (
-		<div className="flex min-h-screen items-center justify-center bg-[#0d0f14] px-4 py-12">
+		<div className="flex min-h-screen items-center justify-center bg-black px-4 py-12">
 			<div className="w-full max-w-[450px]">
 				{/* Phone-style dark card */}
 				<div className="relative overflow-hidden">
