@@ -18,7 +18,7 @@ export default function OpenGraphImage() {
 				fontFamily: "sans-serif",
 			}}
 		>
-			<div>
+			<div style={{ display: "flex", flexDirection: "column" }}>
 				<span style={{ fontSize: "22px", color: "rgba(255,255,255,0.5)" }}>Reloop / Compare</span>
 				<div style={{ fontSize: "52px", fontWeight: 700, color: "#fff", marginTop: "20px" }}>
 					Reloop vs Mailchimp

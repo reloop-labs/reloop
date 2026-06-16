@@ -34,7 +34,7 @@ export default function OpenGraphImage() {
 						Compare
 					</span>
 				</div>
-				<div style={{ marginTop: "24px" }}>
+				<div style={{ display: "flex", flexDirection: "column", marginTop: "24px" }}>
 					<span
 						style={{
 							fontSize: "52px",
@@ -64,6 +64,8 @@ export default function OpenGraphImage() {
 					<div
 						key={name}
 						style={{
+							display: "flex",
+							flexDirection: "column",
 							flex: 1,
 							border: "1px solid rgba(255, 255, 255, 0.08)",
 							borderRadius: "12px",
