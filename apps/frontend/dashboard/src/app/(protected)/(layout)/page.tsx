@@ -216,105 +216,103 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 					{user?.email ? `${user.email}'s Account` : "Your Account"}
 				</h1>
 
-				<div className="grid gap-4 pt-2 sm:grid-cols-2 lg:grid-cols-4">
+				<div className="grid gap-6 pt-2 sm:grid-cols-2 lg:grid-cols-4">
 					{/* Emails Card */}
 					<Link
 						href="/emails"
-						className="group flex flex-col justify-between rounded-xl border border-stroke-soft-100 bg-white/40 p-4 transition-all duration-200 hover:border-orange-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-orange-500/20 dark:hover:bg-white/[0.02]"
+						className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 p-5 transition-all duration-200 hover:border-orange-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-orange-500/20 dark:hover:bg-white/[0.02]"
 					>
-						<div className="space-y-1.5">
-							<div className="flex items-center gap-2">
-								<div className="rounded-lg bg-orange-50 p-1.5 text-orange-500 dark:bg-orange-500/10 dark:text-orange-400">
-									<Mail className="h-4 w-4" />
+						<div className="space-y-4">
+							<div className="flex items-center gap-3">
+								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-400">
+									<Mail className="h-5 w-5" />
 								</div>
-								<span className="font-semibold text-[13px] text-text-strong-950 dark:text-white">
+								<span className="font-semibold text-base text-text-strong-950 dark:text-white">
 									Emails
 								</span>
 							</div>
-							<p className="text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
+							<p className="text-text-sub-600 text-[13px] leading-relaxed dark:text-white/50">
 								Send transactional & marketing emails with high deliverability.
 							</p>
 						</div>
-						<div className="mt-3 flex items-center gap-1 font-medium text-[11px] text-orange-600 dark:text-orange-400">
+						<div className="mt-4 flex items-center gap-1 font-semibold text-[13px] text-orange-600 dark:text-orange-400">
 							<span>Send email</span>
-							<ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+							<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
 						</div>
 					</Link>
 
 					{/* Agent Inbox Card */}
 					<Link
 						href="/agent-inbox"
-						className="group flex flex-col justify-between rounded-xl border border-stroke-soft-100 bg-white/40 p-4 transition-all duration-200 hover:border-blue-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-blue-500/20 dark:hover:bg-white/[0.02]"
+						className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 p-5 transition-all duration-200 hover:border-blue-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-blue-500/20 dark:hover:bg-white/[0.02]"
 					>
-						<div className="space-y-1.5">
-							<div className="flex items-center gap-2">
-								<div className="rounded-lg bg-blue-50 p-1.5 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400">
-									<Inbox className="h-4 w-4" />
+						<div className="space-y-4">
+							<div className="flex items-center gap-3">
+								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400">
+									<Inbox className="h-5 w-5" />
 								</div>
-								<span className="font-semibold text-[13px] text-text-strong-950 dark:text-white">
+								<span className="font-semibold text-base text-text-strong-950 dark:text-white">
 									Inbox Triage
 								</span>
 							</div>
-							<p className="text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
-								Interact with incoming messages using AI prompts or human
-								routing.
+							<p className="text-text-sub-600 text-[13px] leading-relaxed dark:text-white/50">
+								Interact with incoming messages using AI prompts or human routing.
 							</p>
 						</div>
-						<div className="mt-3 flex items-center gap-1 font-medium text-[11px] text-blue-600 dark:text-blue-400">
+						<div className="mt-4 flex items-center gap-1 font-semibold text-[13px] text-blue-600 dark:text-blue-400">
 							<span>Open inbox</span>
-							<ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+							<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
 						</div>
 					</Link>
 
 					{/* Workflows Card */}
 					<Link
 						href="/workflows"
-						className="group flex flex-col justify-between rounded-xl border border-stroke-soft-100 bg-white/40 p-4 transition-all duration-200 hover:border-purple-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-purple-500/20 dark:hover:bg-white/[0.02]"
+						className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 p-5 transition-all duration-200 hover:border-purple-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-purple-500/20 dark:hover:bg-white/[0.02]"
 					>
-						<div className="space-y-1.5">
-							<div className="flex items-center gap-2">
-								<div className="rounded-lg bg-purple-50 p-1.5 text-purple-500 dark:bg-purple-500/10 dark:text-purple-400">
-									<Zap className="h-4 w-4" />
+						<div className="space-y-4">
+							<div className="flex items-center gap-3">
+								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-500 dark:bg-purple-500/10 dark:text-purple-400">
+									<Zap className="h-5 w-5" />
 								</div>
-								<span className="flex items-center gap-1.5 font-semibold text-[13px] text-text-strong-950 dark:text-white">
+								<span className="flex items-center gap-1.5 font-semibold text-base text-text-strong-950 dark:text-white">
 									Workflows
 									<span className="rounded bg-purple-100 px-1 py-0.2 font-semibold text-[8px] text-purple-800 uppercase dark:bg-purple-500/25 dark:text-purple-300">
 										New
 									</span>
 								</span>
 							</div>
-							<p className="text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
-								Create automated rules and trigger flows on custom communication
-								events.
+							<p className="text-text-sub-600 text-[13px] leading-relaxed dark:text-white/50">
+								Create automated rules and trigger flows on custom communication events.
 							</p>
 						</div>
-						<div className="mt-3 flex items-center gap-1 font-medium text-[11px] text-purple-600 dark:text-purple-400">
+						<div className="mt-4 flex items-center gap-1 font-semibold text-[13px] text-purple-600 dark:text-purple-400">
 							<span>Build automation</span>
-							<ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+							<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
 						</div>
 					</Link>
 
 					{/* Domain Card */}
 					<Link
 						href="/domain"
-						className="group flex flex-col justify-between rounded-xl border border-stroke-soft-100 bg-white/40 p-4 transition-all duration-200 hover:border-teal-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-teal-500/20 dark:hover:bg-white/[0.02]"
+						className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 p-5 transition-all duration-200 hover:border-teal-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-teal-500/20 dark:hover:bg-white/[0.02]"
 					>
-						<div className="space-y-1.5">
-							<div className="flex items-center gap-2">
-								<div className="rounded-lg bg-teal-50 p-1.5 text-teal-600 dark:bg-teal-500/10 dark:text-teal-400">
-									<Globe className="h-4 w-4" />
+						<div className="space-y-4">
+							<div className="flex items-center gap-3">
+								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-400">
+									<Globe className="h-5 w-5" />
 								</div>
-								<span className="font-semibold text-[13px] text-text-strong-950 dark:text-white">
+								<span className="font-semibold text-base text-text-strong-950 dark:text-white">
 									Domains
 								</span>
 							</div>
-							<p className="text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
+							<p className="text-text-sub-600 text-[13px] leading-relaxed dark:text-white/50">
 								Manage custom sending domains, SPF/DKIM verification, and DNS.
 							</p>
 						</div>
-						<div className="mt-3 flex items-center gap-1 font-medium text-[11px] text-teal-600 dark:text-teal-400">
+						<div className="mt-4 flex items-center gap-1 font-semibold text-[13px] text-teal-600 dark:text-teal-400">
 							<span>Configure domain</span>
-							<ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+							<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
 						</div>
 					</Link>
 				</div>

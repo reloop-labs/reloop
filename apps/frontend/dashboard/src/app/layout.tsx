@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import SWRProvider from "@fe/dashboard/providers/swr.config";
 import { ThemeProvider } from "@fe/dashboard/providers/theme-provider";
-import { ChatwootLoader } from "@reloop/ui/chatwoot-loader";
 import { IconsSprite } from "@reloop/ui/icon";
 import { RybbitLoader } from "@reloop/ui/rybbit-loader";
 import { Toaster } from "@reloop/ui/toast";
@@ -66,7 +65,6 @@ export default function RootLayout({
 							<IconsSprite />
 							<Toaster />
 							<CommandMenuGlobal />
-							<ChatwootLoader />
 							<RybbitLoader />
 						</SWRProvider>
 					</ThemeProvider>
