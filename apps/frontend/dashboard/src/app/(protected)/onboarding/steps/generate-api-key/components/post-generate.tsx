@@ -21,8 +21,8 @@ import {
 } from "simple-icons";
 import {
 	buildAiPrompt,
-	installCommands,
 	type IntegrationMode,
+	installCommands,
 	type LanguageCode,
 	nodeInstallCommands,
 	type PackageManager,
@@ -120,11 +120,23 @@ export function PostGenerate({
 				/>
 			</div>
 
-			<div className="ml-8">
-				<IntegrationModeTabs value={mode} onChange={onModeChange} />
-			</div>
+			<div className="ml-0.5 flex flex-col">
+				{/* Mode Tabs Step Card */}
+				<div className="flex gap-3">
+					<div className="flex flex-col items-center">
+						<div className="mt-2.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-bg-weak-50 ring-1 ring-stroke-soft-200 dark:bg-bg-weak-50/70 dark:ring-stroke-soft-100/40">
+							<Icon
+								name={mode === "ai" ? "sparkling" : "code"}
+								className="h-3 w-3 text-text-sub-600"
+							/>
+						</div>
+						<div className="mt-1.5 w-px flex-1 bg-stroke-soft-200 dark:bg-stroke-soft-100/40" />
+					</div>
+					<div className="flex min-w-0 flex-1 flex-col pb-6">
+						<IntegrationModeTabs value={mode} onChange={onModeChange} />
+					</div>
+				</div>
 
-			<div className="ml-0.5 flex flex-col gap-5">
 				{isAi ? (
 					<StepCard number={1} title="Copy the AI prompt" isLast>
 						<AiPromptBlock prompt={aiPrompt} />
@@ -132,10 +144,7 @@ export function PostGenerate({
 				) : (
 					<>
 						<StepCard number={1} title="Choose your language">
-							<IntegrationLanguagePills
-								value={lang}
-								onChange={onLangChange}
-							/>
+							<IntegrationLanguagePills value={lang} onChange={onLangChange} />
 						</StepCard>
 
 						<StepCard number={2} title="Install the Reloop SDK">
