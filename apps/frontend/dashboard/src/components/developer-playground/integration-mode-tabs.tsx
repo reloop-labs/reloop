@@ -10,12 +10,12 @@ import { useRef, useState } from "react";
 const modes = [
 	{
 		id: "ai" as IntegrationMode,
-		label: "AI",
+		label: "Prompt AI",
 		icon: "sparkling",
 	},
 	{
 		id: "manual" as IntegrationMode,
-		label: "Code",
+		label: "Direct SDK",
 		icon: "code",
 	},
 ] as const;

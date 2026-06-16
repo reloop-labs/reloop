@@ -45,6 +45,7 @@ export function PostGenerate({
 					lang="bash"
 					copyValue={apiKey}
 					label="secret key"
+					codeExtraPadding
 				/>
 			</div>
 

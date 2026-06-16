@@ -118,6 +118,7 @@ export function SetupFullPlayground({
 							onTabChange={
 								isNode ? (id) => setPkgManager(id as PackageManager) : undefined
 							}
+							codeExtraPadding={true}
 						/>
 					</StepCard>
 
@@ -127,6 +128,7 @@ export function SetupFullPlayground({
 							lang={setupShikiLang[lang]}
 							label={setupFileLabels[lang]}
 							si={langIcons[lang]}
+							codeExtraPadding={true}
 						/>
 					</StepCard>
 				</>
