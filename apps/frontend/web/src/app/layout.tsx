@@ -3,14 +3,14 @@ import "./globals.css";
 import { ChatwootLoader } from "@reloop/ui/chatwoot-loader";
 import { IconsSprite } from "@reloop/ui/icon";
 import { RybbitLoader } from "@reloop/ui/rybbit-loader";
+import { Footer } from "@reloop/web/components/footer";
+import { Header } from "@reloop/web/components/header";
 import {
 	defaultOgImage,
 	getSiteUrl,
 	siteDescription,
 	siteName,
 } from "@reloop/web/lib/site";
-import { Footer } from "@reloop/web/components/footer";
-import { Header } from "@reloop/web/components/header";
 import { ThemeProvider } from "@reloop/web/providers/theme-provider";
 import localFont from "next/font/local";
 
