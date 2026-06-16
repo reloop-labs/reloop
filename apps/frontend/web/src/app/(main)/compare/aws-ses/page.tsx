@@ -1,13 +1,10 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
-import {
-	MarketingPageShell,
-	PageSection,
-	SectionHeading,
-} from "@reloop/web/components/page-shell";
+import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CompareOtherLinks } from "../components/compare-other-links";
+import { ComparisonPageShell } from "../components/comparison-page-shell";
 import { ComparisonTable } from "../components/comparison-table";
 
 const pagePath = "/compare/aws-ses";
@@ -29,10 +26,10 @@ export const metadata: Metadata = {
 
 const AwsSesComparisonPage = () => {
 	return (
-		<MarketingPageShell
+		<ComparisonPageShell
+			pagePath={pagePath}
 			titleLines={["Reloop vs AWS SES"]}
 			description="Amazon SES is cheap per email—but rarely cheap in total. This page compares raw SES delivery to Reloop as a full email platform."
-			compactHero
 		>
 			<PageSection flushTop narrow>
 				<div className="mx-auto max-w-3xl space-y-6 text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
@@ -162,7 +159,7 @@ const AwsSesComparisonPage = () => {
 			<PageSection narrow>
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
-		</MarketingPageShell>
+		</ComparisonPageShell>
 	);
 };
 

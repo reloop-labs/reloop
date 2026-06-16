@@ -1,12 +1,9 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
-import {
-	MarketingPageShell,
-	PageSection,
-	SectionHeading,
-} from "@reloop/web/components/page-shell";
+import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { CompareOtherLinks } from "../components/compare-other-links";
+import { ComparisonPageShell } from "../components/comparison-page-shell";
 import { ComparisonTable } from "../components/comparison-table";
 
 const pagePath = "/compare/sendgrid";
@@ -28,10 +25,10 @@ export const metadata: Metadata = {
 
 const SendGridComparisonPage = () => {
 	return (
-		<MarketingPageShell
+		<ComparisonPageShell
+			pagePath={pagePath}
 			titleLines={["Reloop vs SendGrid"]}
 			description="SendGrid is the incumbent for high-volume email inside Twilio. This comparison is for teams auditing contracts, UI complexity, and whether they need the full proprietary stack."
-			compactHero
 		>
 			<PageSection flushTop narrow>
 				<p className="mx-auto max-w-3xl text-center text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
@@ -169,7 +166,7 @@ const SendGridComparisonPage = () => {
 			<PageSection narrow>
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
-		</MarketingPageShell>
+		</ComparisonPageShell>
 	);
 };
 

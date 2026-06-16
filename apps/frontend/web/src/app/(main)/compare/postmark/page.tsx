@@ -1,12 +1,9 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
-import {
-	MarketingPageShell,
-	PageSection,
-	SectionHeading,
-} from "@reloop/web/components/page-shell";
+import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { CompareOtherLinks } from "../components/compare-other-links";
+import { ComparisonPageShell } from "../components/comparison-page-shell";
 import { ComparisonTable } from "../components/comparison-table";
 
 const pagePath = "/compare/postmark";
@@ -28,10 +25,10 @@ export const metadata: Metadata = {
 
 const PostmarkComparisonPage = () => {
 	return (
-		<MarketingPageShell
+		<ComparisonPageShell
+			pagePath={pagePath}
 			titleLines={["Reloop vs Postmark"]}
 			description="Postmark optimizes for fast transactional delivery and clear telemetry. Reloop matches that core job—and adds campaigns, self-hosting, and source-level transparency."
-			compactHero
 		>
 			<PageSection flushTop narrow>
 				<p className="mx-auto max-w-3xl text-center text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
@@ -142,7 +139,7 @@ const PostmarkComparisonPage = () => {
 			<PageSection narrow>
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
-		</MarketingPageShell>
+		</ComparisonPageShell>
 	);
 };
 

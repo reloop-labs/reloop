@@ -39,3 +39,7 @@ export const competitorBrands = [
 	{ href: "/compare/loops", name: "Loops", icon: siLoops },
 	{ href: "/compare/mailchimp", name: "Mailchimp", icon: siMailchimp },
 ] as const;
+
+export function getCompetitorByHref(href: string) {
+	return competitorBrands.find((brand) => brand.href === href);
+}

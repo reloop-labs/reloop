@@ -1,12 +1,9 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
-import {
-	MarketingPageShell,
-	PageSection,
-	SectionHeading,
-} from "@reloop/web/components/page-shell";
+import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { CompareOtherLinks } from "../components/compare-other-links";
+import { ComparisonPageShell } from "../components/comparison-page-shell";
 import { ComparisonTable } from "../components/comparison-table";
 
 const pagePath = "/compare/loops";
@@ -28,10 +25,10 @@ export const metadata: Metadata = {
 
 const LoopsComparisonPage = () => {
 	return (
-		<MarketingPageShell
+		<ComparisonPageShell
+			pagePath={pagePath}
 			titleLines={["Reloop vs Loops"]}
 			description="Loops is built for SaaS lifecycle email—onboarding, updates, and newsletters with a polished marketer UI. Reloop covers that surface plus transactional API, SMTP, and self-hosting."
-			compactHero
 		>
 			<PageSection flushTop narrow>
 				<div className="mx-auto max-w-3xl space-y-6 text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
@@ -141,7 +138,7 @@ const LoopsComparisonPage = () => {
 			<PageSection narrow>
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
-		</MarketingPageShell>
+		</ComparisonPageShell>
 	);
 };
 

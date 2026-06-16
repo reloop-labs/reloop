@@ -2,6 +2,7 @@
 
 import * as Button from "@reloop/ui/button";
 import type { FeatureCtaLink } from "./types";
+import type React from "react";
 
 export function FeatureHero({
 	titleLines,
@@ -9,12 +10,14 @@ export function FeatureHero({
 	primaryCta,
 	secondaryCta,
 	compact = false,
+	leading,
 }: {
 	titleLines: string[];
 	description?: string;
 	primaryCta?: FeatureCtaLink;
 	secondaryCta?: FeatureCtaLink;
 	compact?: boolean;
+	leading?: React.ReactNode;
 }) {
 	return (
 		<div
@@ -33,6 +36,7 @@ export function FeatureHero({
 					}
 				>
 					<div className="mx-auto max-w-[1020px] text-center">
+						{leading}
 						<h1 className="font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[4.2rem] dark:text-white">
 							{titleLines.map((line, i) => (
 								<span key={line}>

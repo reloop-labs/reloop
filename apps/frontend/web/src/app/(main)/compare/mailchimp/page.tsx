@@ -1,13 +1,10 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
-import {
-	MarketingPageShell,
-	PageSection,
-	SectionHeading,
-} from "@reloop/web/components/page-shell";
+import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CompareOtherLinks } from "../components/compare-other-links";
+import { ComparisonPageShell } from "../components/comparison-page-shell";
 import { ComparisonTable } from "../components/comparison-table";
 
 const pagePath = "/compare/mailchimp";
@@ -29,10 +26,10 @@ export const metadata: Metadata = {
 
 const MailchimpComparisonPage = () => {
 	return (
-		<MarketingPageShell
+		<ComparisonPageShell
+			pagePath={pagePath}
 			titleLines={["Reloop vs Mailchimp"]}
 			description="Mailchimp owns small-business marketing email. Reloop is for product teams that need campaigns and transactional sends with APIs—not audience-based bills."
-			compactHero
 		>
 			<PageSection flushTop narrow>
 				<div className="mx-auto max-w-3xl space-y-6 text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
@@ -159,7 +156,7 @@ const MailchimpComparisonPage = () => {
 			<PageSection narrow>
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
-		</MarketingPageShell>
+		</ComparisonPageShell>
 	);
 };
 
