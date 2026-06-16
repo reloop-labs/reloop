@@ -161,7 +161,7 @@ export const SplitLayout = ({
 	};
 
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center">
+		<div className="flex min-h-screen flex-col items-center justify-start pt-24 pb-20">
 			<div className="-translate-x-1/2 absolute top-5 left-1/2 flex items-center space-x-2">
 				<Logo className="h-10 w-10 lg:h-11 lg:w-11" />
 				<span
@@ -172,7 +172,7 @@ export const SplitLayout = ({
 				</span>
 			</div>
 			<div
-				className="flex w-full flex-1 flex-col items-center justify-center border-stroke-soft-100 border-r border-l dark:border-stroke-soft-100/40"
+				className="flex w-full flex-1 flex-col items-center justify-start border-stroke-soft-100 border-r border-l dark:border-stroke-soft-100/40"
 				style={{
 					maxWidth:
 						maxWidth === "3xl"
