@@ -7,10 +7,10 @@
 		"index",
 		"features",
 		"integrations",
-		"guides",
 		"resources",
 		"api",
 		"webhooks",
-		"self-host"
+		"self-host",
+		"setup"
 	]
 }
