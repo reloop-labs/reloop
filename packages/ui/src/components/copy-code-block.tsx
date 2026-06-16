@@ -33,6 +33,8 @@ export function CopyCodeBlock({
 	title,
 	titleHref,
 	codeExtraPadding = false,
+	action,
+	icon,
 }: {
 	code: string;
 	lang: string;
@@ -49,6 +51,8 @@ export function CopyCodeBlock({
 	title?: string;
 	titleHref?: string;
 	codeExtraPadding?: boolean;
+	action?: React.ReactNode;
+	icon?: React.ReactNode;
 }) {
 	const [copied, setCopied] = useState(false);
 	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(
@@ -167,14 +171,17 @@ export function CopyCodeBlock({
 	const highlightedPillPosition = getPillPosition(highlightedTabPosition);
 
 	const copyButton = (
-		<button
-			type="button"
-			onClick={handleCopy}
-			aria-label={copied ? "Copied" : "Copy code"}
-			className="shrink-0 cursor-pointer text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white"
-		>
-			<Icon name={copied ? "check" : "copy"} className="size-4 stroke-3" />
-		</button>
+		<div className="flex items-center gap-2">
+			{action}
+			<button
+				type="button"
+				onClick={handleCopy}
+				aria-label={copied ? "Copied" : "Copy code"}
+				className="shrink-0 cursor-pointer text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white"
+			>
+				<Icon name={copied ? "check" : "copy"} className="size-4 stroke-3" />
+			</button>
+		</div>
 	);
 
 	return (
@@ -305,7 +312,8 @@ export function CopyCodeBlock({
 				<div className="flex items-center gap-3 px-4 py-2.5">
 					<div className="flex min-w-0 flex-1 items-center gap-2.5">
 						{title ? (
-							<div className="flex shrink-0 items-center gap-1">
+							<div className="flex shrink-0 items-center gap-1.5">
+								{icon}
 								{titleHref ? (
 									<a
 										href={titleHref}
@@ -327,7 +335,9 @@ export function CopyCodeBlock({
 							</div>
 						) : (
 							<>
-								{si ? (
+								{icon ? (
+									icon
+								) : si ? (
 									<svg
 										role="img"
 										viewBox="0 0 24 24"
