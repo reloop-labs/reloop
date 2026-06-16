@@ -57,7 +57,7 @@ export function PostGenerate({
 				variant="full"
 			/>
 
-			<div className="ml-8 flex items-center gap-3 pb-4">
+			<div className="flex items-center justify-end gap-3 pb-4">
 				<Button.Root
 					variant="neutral"
 					mode="filled"
