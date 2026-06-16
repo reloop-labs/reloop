@@ -63,7 +63,7 @@ export const DomainInputField = ({
 					<Input.Wrapper>
 						<Input.Input
 							id="domain"
-							placeholder="www.example.com"
+							placeholder="send.example.com"
 							{...register("domain")}
 							disabled={isLoading}
 						/>

@@ -33,7 +33,7 @@ export const AddDomainStep = () => {
 		parseAsString.withDefault(""),
 	);
 	const [status, setStatus] = React.useState<"idle" | "loading">("idle");
-	const [isAdvancedOpen, setIsAdvancedOpen] = React.useState(false);
+	const [isAdvancedOpen, setIsAdvancedOpen] = React.useState(true);
 
 	const { register, handleSubmit, formState, setError, watch, control } =
 		useForm<DomainFormValues>({

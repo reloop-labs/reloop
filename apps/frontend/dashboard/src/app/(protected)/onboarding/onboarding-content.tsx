@@ -119,6 +119,7 @@ export const OnBoardingContent = () => {
 			preview: React.ReactNode;
 			fullWidth: boolean;
 			maxWidth?: "3xl" | "4xl" | "5xl";
+			verticalAlign?: "center" | "start";
 		}
 	> = {
 		1: {
@@ -151,6 +152,7 @@ export const OnBoardingContent = () => {
 			preview: null,
 			fullWidth: true,
 			maxWidth: "3xl",
+			verticalAlign: "start",
 		},
 	};
 
@@ -170,6 +172,7 @@ export const OnBoardingContent = () => {
 			maxWidth={currentConfig.maxWidth}
 			onBack={stepCleanup[step]}
 			backStep={backStep}
+			verticalAlign={currentConfig.verticalAlign}
 		>
 			{currentConfig.component}
 		</SplitLayout>

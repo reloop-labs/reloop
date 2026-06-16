@@ -69,6 +69,8 @@ interface SplitLayoutProps {
 	onBack?: () => void;
 	/** Override the target step when going back (defaults to step - 1) */
 	backStep?: number;
+	/** Whether to vertically center the content (default) or align to the top */
+	verticalAlign?: "center" | "start";
 }
 
 export const SplitLayout = ({
@@ -81,6 +83,7 @@ export const SplitLayout = ({
 	maxWidth = "5xl",
 	onBack: onBackCleanup,
 	backStep,
+	verticalAlign = "center",
 }: SplitLayoutProps) => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [hovered, setHovered] = useState(false);
@@ -161,7 +164,12 @@ export const SplitLayout = ({
 	};
 
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-start pt-24 pb-20">
+		<div
+			className={cn(
+				"flex min-h-screen flex-col items-center pb-20",
+				verticalAlign === "center" ? "justify-center" : "justify-start pt-24",
+			)}
+		>
 			<div className="-translate-x-1/2 absolute top-5 left-1/2 flex items-center space-x-2">
 				<Logo className="h-10 w-10 lg:h-11 lg:w-11" />
 				<span
@@ -172,7 +180,7 @@ export const SplitLayout = ({
 				</span>
 			</div>
 			<div
-				className="flex w-full flex-1 flex-col items-center justify-start border-stroke-soft-100 border-r border-l dark:border-stroke-soft-100/40"
+				className="flex w-full flex-col items-center justify-start border-stroke-soft-100 border-r border-l dark:border-stroke-soft-100/40"
 				style={{
 					maxWidth:
 						maxWidth === "3xl"
