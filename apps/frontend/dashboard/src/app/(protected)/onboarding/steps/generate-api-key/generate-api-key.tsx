@@ -9,7 +9,31 @@ import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 import { PostGenerate } from "./components/post-generate";
 import { PreGenerate } from "./components/pre-generate";
-import type { LanguageCode } from "./data";
+import type { IntegrationMode, LanguageCode } from "./data";
+
+const languageCodes: LanguageCode[] = ["nodejs", "python", "go", "php"];
+
+function parseLanguage(value: string): LanguageCode {
+	if (languageCodes.includes(value as LanguageCode)) {
+		return value as LanguageCode;
+	}
+	return "nodejs";
+}
+
+function parseIntegrationState(
+	langParam: string,
+	modeParam: string,
+): { mode: IntegrationMode; lang: LanguageCode } {
+	if (langParam === "ai") {
+		return { mode: "ai", lang: "nodejs" };
+	}
+
+	const lang = parseLanguage(langParam);
+	const mode: IntegrationMode =
+		modeParam === "manual" ? "manual" : "ai";
+
+	return { mode, lang };
+}
 
 export const GenerateApiKeyStep = () => {
 	const { mutate } = useSWRConfig();
@@ -19,13 +43,17 @@ export const GenerateApiKeyStep = () => {
 		"apiKey",
 		parseAsString.withDefault(""),
 	);
-	const [selectedLang, setSelectedLang] = useQueryState(
+	const [modeParam, setModeParam] = useQueryState(
+		"mode",
+		parseAsString.withDefault("ai"),
+	);
+	const [langParam, setLangParam] = useQueryState(
 		"lang",
 		parseAsString.withDefault("nodejs"),
 	);
 	const [loading, setLoading] = useState(false);
 
-	const lang = (selectedLang as LanguageCode) || "nodejs";
+	const { mode, lang } = parseIntegrationState(langParam, modeParam);
 
 	const generateKey = async () => {
 		setLoading(true);
@@ -51,8 +79,10 @@ export const GenerateApiKeyStep = () => {
 			) : (
 				<PostGenerate
 					apiKey={apiKey}
+					mode={mode}
 					lang={lang}
-					onLanguageChange={(l) => setSelectedLang(l)}
+					onModeChange={setModeParam}
+					onLangChange={(l) => setLangParam(l)}
 					onDone={async () => {
 						await authClient.getSession();
 						try {

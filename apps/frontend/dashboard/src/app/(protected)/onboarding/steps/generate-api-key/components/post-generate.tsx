@@ -20,14 +20,18 @@ import {
 	siYarn,
 } from "simple-icons";
 import {
+	buildAiPrompt,
 	installCommands,
+	type IntegrationMode,
 	type LanguageCode,
 	nodeInstallCommands,
 	type PackageManager,
 	sendEmailCode,
 } from "../data";
+import { AiPromptBlock } from "./ai-prompt-block";
 import { CopyCodeBlock } from "./copy-code-block";
-import { LanguageBadges } from "./language-badges";
+import { IntegrationLanguagePills } from "./integration-language-pills";
+import { IntegrationModeTabs } from "./integration-mode-tabs";
 import { StepCard } from "./step-card";
 
 const langIcons = {
@@ -66,13 +70,17 @@ const pkgManagerTabs = [
 
 export function PostGenerate({
 	apiKey,
+	mode,
 	lang,
-	onLanguageChange,
+	onModeChange,
+	onLangChange,
 	onDone,
 }: {
 	apiKey: string;
+	mode: IntegrationMode;
 	lang: LanguageCode;
-	onLanguageChange: (lang: LanguageCode) => void;
+	onModeChange: (mode: IntegrationMode) => void;
+	onLangChange: (lang: LanguageCode) => void;
 	onDone: () => void;
 }) {
 	const [pkgManager, setPkgManager] = useState<PackageManager>("npm");
@@ -87,6 +95,7 @@ export function PostGenerate({
 		[onDone],
 	);
 
+	const isAi = mode === "ai";
 	const isNode = lang === "nodejs";
 	const installCode = isNode
 		? nodeInstallCommands[pkgManager]
@@ -95,10 +104,10 @@ export function PostGenerate({
 		? undefined
 		: nonNodeInstallIcons[lang as keyof typeof nonNodeInstallIcons];
 	const installLabel = isNode ? undefined : langLabels[lang];
+	const aiPrompt = buildAiPrompt(apiKey);
 
 	return (
 		<div className="flex flex-col gap-6">
-			{/* API Key display */}
 			<div className="flex flex-col gap-1.5">
 				<p className="text-paragraph-xs text-text-sub-600">
 					Your API key — copy it now, you won't see it again.
@@ -111,46 +120,60 @@ export function PostGenerate({
 				/>
 			</div>
 
-			{/* Language selector */}
-			<LanguageBadges value={lang} onChange={onLanguageChange} />
+			<IntegrationModeTabs value={mode} onChange={onModeChange} />
 
-			{/* 3-step integration guide */}
 			<div className="ml-0.5 flex flex-col gap-5">
-				<StepCard number={1} title="Install the Reloop SDK">
-					<CopyCodeBlock
-						code={installCode}
-						lang="bash"
-						label={installLabel}
-						si={installIcon}
-						tabs={isNode ? pkgManagerTabs : undefined}
-						activeTab={isNode ? pkgManager : undefined}
-						onTabChange={
-							isNode ? (id) => setPkgManager(id as PackageManager) : undefined
-						}
-					/>
-				</StepCard>
+				{isAi ? (
+					<StepCard number={1} title="Copy the AI prompt" isLast>
+						<AiPromptBlock prompt={aiPrompt} />
+					</StepCard>
+				) : (
+					<>
+						<StepCard number={1} title="Choose your language">
+							<IntegrationLanguagePills
+								value={lang}
+								onChange={onLangChange}
+							/>
+						</StepCard>
 
-				<StepCard number={2} title="Add your API key to .env">
-					<CopyCodeBlock
-						code={`RELOOP_API_KEY=${apiKey}`}
-						lang="bash"
-						copyValue={`RELOOP_API_KEY=${apiKey}`}
-						label=".env"
-						si={siDotenv}
-					/>
-				</StepCard>
+						<StepCard number={2} title="Install the Reloop SDK">
+							<CopyCodeBlock
+								code={installCode}
+								lang="bash"
+								label={installLabel}
+								si={installIcon}
+								tabs={isNode ? pkgManagerTabs : undefined}
+								activeTab={isNode ? pkgManager : undefined}
+								onTabChange={
+									isNode
+										? (id) => setPkgManager(id as PackageManager)
+										: undefined
+								}
+							/>
+						</StepCard>
 
-				<StepCard number={3} title="Send your first email" isLast>
-					<CopyCodeBlock
-						code={sendEmailCode[lang].code}
-						lang={sendEmailCode[lang].lang}
-						label={langFileLabels[lang]}
-						si={langIcons[lang]}
-					/>
-				</StepCard>
+						<StepCard number={3} title="Add your API key to .env">
+							<CopyCodeBlock
+								code={`RELOOP_API_KEY=${apiKey}`}
+								lang="bash"
+								copyValue={`RELOOP_API_KEY=${apiKey}`}
+								label=".env"
+								si={siDotenv}
+							/>
+						</StepCard>
+
+						<StepCard number={4} title="Send your first email" isLast>
+							<CopyCodeBlock
+								code={sendEmailCode[lang].code}
+								lang={sendEmailCode[lang].lang}
+								label={langFileLabels[lang]}
+								si={langIcons[lang]}
+							/>
+						</StepCard>
+					</>
+				)}
 			</div>
 
-			{/* CTA */}
 			<div className="ml-8 flex items-center gap-3 pb-4">
 				<Button.Root
 					variant="neutral"

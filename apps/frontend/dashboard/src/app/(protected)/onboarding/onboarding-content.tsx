@@ -36,6 +36,7 @@ export const OnBoardingContent = () => {
 	);
 	const [, setApiKey] = useQueryState("apiKey", parseAsString.withDefault(""));
 	const [, setLang] = useQueryState("lang", parseAsString.withDefault(""));
+	const [, setMode] = useQueryState("mode", parseAsString.withDefault(""));
 	const [skippedDns, setSkippedDns] = useQueryState(
 		"skippedDns",
 		parseAsString.withDefault(""),
@@ -101,6 +102,7 @@ export const OnBoardingContent = () => {
 		4: () => {
 			setApiKey(null);
 			setLang(null);
+			setMode(null);
 			setSkippedDns(null);
 		},
 	};

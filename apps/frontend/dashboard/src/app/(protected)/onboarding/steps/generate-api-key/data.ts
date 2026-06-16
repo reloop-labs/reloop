@@ -1,5 +1,13 @@
 export type LanguageCode = "nodejs" | "go" | "php" | "python";
+export type IntegrationMode = "ai" | "manual";
 export type PackageManager = "npm" | "pnpm" | "yarn" | "bun";
+
+export const languageLabels: Record<LanguageCode, string> = {
+	nodejs: "Node.js",
+	python: "Python",
+	go: "Go",
+	php: "PHP",
+};
 
 export const nodeInstallCommands: Record<PackageManager, string> = {
 	npm: "npm install reloop-email",
@@ -90,3 +98,22 @@ $reloop->emails->send([
 		lang: "php",
 	},
 };
+
+export function buildAiPrompt(apiKey: string): string {
+	return `Integrate Reloop email sending into this project.
+
+My API key: ${apiKey}
+
+Requirements:
+1. Detect this project's language/framework and install the correct Reloop SDK
+2. Add RELOOP_API_KEY=${apiKey} to my .env file
+3. Send a transactional email from sender@example.com to recipient@example.com with subject "Hello from Reloop!" and plain-text body "Hello World!"
+4. Follow this project's existing conventions and handle errors properly
+
+Supported SDKs:
+- Node.js / Python: reloop-email
+- Go: github.com/reloop-labs/reloop-email
+- PHP: reloop/reloop-email
+
+Show me only the integration code I need to add to my project.`;
+}
