@@ -111,7 +111,7 @@ export function generateTrackingCNAMERecord(
 		type: DNSTypes.DNSRecordType.CNAME,
 		name: trackingSubdomain,
 		fqdn: `${trackingSubdomain}.${rootDomain}`,
-		value: domainConfig.HOST_DOMAIN,
+		value: domainConfig.TRACKING_DOMAIN,
 		ttl: "Auto",
 	};
 }
