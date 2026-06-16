@@ -89,6 +89,14 @@ const links = [
 				href: "/company/contact-us",
 			},
 			{
+				title: "Pricing",
+				href: "/pricing",
+			},
+			{
+				title: "Compare",
+				href: "/compare",
+			},
+			{
 				title: "Why Reloop",
 				href: "/philosophy/why-reloop",
 			},

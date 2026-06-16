@@ -882,7 +882,7 @@ const TransactionEmailsPage = () => {
 							Get started
 						</Link>
 						<Link
-							href="/docs"
+							href="/pricing"
 							className="inline-flex h-12 items-center justify-center gap-2.5 rounded-2xl border border-[#0a0d12]/10 px-8 font-semibold text-[#0a0d12] text-[15px] transition-colors hover:bg-[#0a0d12]/10"
 						>
 							See pricing

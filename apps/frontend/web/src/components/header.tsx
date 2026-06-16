@@ -81,6 +81,7 @@ const navItems = [
 		mega: {
 			links: [
 				{ title: "Changelog", href: "/resources/changelog" },
+				{ title: "Compare", href: "/compare" },
 				{ title: "Community", href: "/resources/community" },
 				{ title: "Glossary", href: "/resources/glossary" },
 				{ title: "Self Hosting", href: "/resources/self-hosting-guide" },

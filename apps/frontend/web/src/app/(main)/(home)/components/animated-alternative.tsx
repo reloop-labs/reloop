@@ -10,6 +10,7 @@ const alternatives = [
 	"AWS SES",
 	"Postmark",
 	"Loops",
+	"Mailchimp",
 ];
 
 export function AnimatedAlternative() {
