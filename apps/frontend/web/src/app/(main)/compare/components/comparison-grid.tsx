@@ -1,76 +1,36 @@
 import Link from "next/link";
-
-const comparisons = [
-	{
-		href: "/compare/resend",
-		category: "Transactional API",
-		title: "Reloop vs Resend",
-		tagline: "Modern developer APIs—and an open-source path beyond hosted-only.",
-	},
-	{
-		href: "/compare/mailgun",
-		category: "Transactional API",
-		title: "Reloop vs Mailgun",
-		tagline: "SMTP, inbound parsing, and a stack you can actually inspect.",
-	},
-	{
-		href: "/compare/sendgrid",
-		category: "Transactional + marketing",
-		title: "Reloop vs SendGrid",
-		tagline: "Enterprise email without Twilio lock-in or legacy UI baggage.",
-	},
-	{
-		href: "/compare/aws-ses",
-		category: "Cloud SMTP / API",
-		title: "Reloop vs AWS SES",
-		tagline: "When raw SES isn't enough—and when a full platform wins.",
-	},
-	{
-		href: "/compare/postmark",
-		category: "Transactional API",
-		title: "Reloop vs Postmark",
-		tagline: "Transactional speed plus campaigns, self-hosting, and source access.",
-	},
-	{
-		href: "/compare/loops",
-		category: "Product + marketing email",
-		title: "Reloop vs Loops",
-		tagline: "SaaS lifecycle email without bolting on a second transactional vendor.",
-	},
-	{
-		href: "/compare/mailchimp",
-		category: "Marketing + audiences",
-		title: "Reloop vs Mailchimp",
-		tagline: "Newsletters and API-first sends—priced by volume, not list size.",
-	},
-];
+import { competitorBrands } from "../competitor-brands";
+import { BrandIcon } from "./brand-icon";
 
 export function ComparisonGrid() {
 	return (
-		<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-			{comparisons.map((item) => (
-				<Link
-					key={item.href}
-					href={item.href}
-					className="group flex flex-col rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-6 transition-colors hover:border-primary-base/40 hover:bg-bg-soft-50 dark:border-white/10 dark:hover:border-primary-base/40 dark:hover:bg-white/[0.02]"
-				>
-					<span className="font-semibold text-[11px] text-primary-base uppercase tracking-[0.14em]">
-						{item.category}
-					</span>
-					<h3 className="mt-2 font-semibold text-lg text-text-strong-950 group-hover:text-primary-base dark:text-white">
-						{item.title}
-					</h3>
-					<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
-						{item.tagline}
-					</p>
-					<span
-						className="mt-4 font-semibold text-[14px] text-primary-base"
-						aria-hidden="true"
+		<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
+			{competitorBrands.map((brand) => {
+				const glow = `#${brand.icon.hex}`;
+
+				return (
+					<Link
+						key={brand.href}
+						href={brand.href}
+						aria-label={`Reloop vs ${brand.name}`}
+						className="group relative flex flex-col items-center gap-3 rounded-2xl border border-stroke-soft-200/80 bg-bg-weak-50/50 px-4 py-6 transition-all duration-300 hover:border-stroke-soft-300 hover:bg-bg-soft-50 sm:py-8 dark:border-white/[0.08] dark:bg-white/[0.02] dark:hover:border-white/15 dark:hover:bg-white/[0.04]"
 					>
-						Read comparison →
-					</span>
-				</Link>
-			))}
+						<div
+							aria-hidden
+							className="pointer-events-none absolute inset-x-6 bottom-3 h-10 opacity-40 blur-xl transition-opacity duration-300 group-hover:opacity-70"
+							style={{
+								background: `radial-gradient(ellipse at center, color-mix(in srgb, ${glow} 50%, transparent) 0%, transparent 75%)`,
+							}}
+						/>
+						<div className="relative flex size-16 items-center justify-center rounded-[20px] border border-stroke-soft-200/80 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] transition-transform duration-300 group-hover:scale-[1.04] sm:size-[4.5rem] dark:border-white/10 dark:shadow-none">
+							<BrandIcon icon={brand.icon} className="size-8 sm:size-9" />
+						</div>
+						<span className="font-semibold text-[13px] text-text-strong-950 tracking-tight sm:text-[14px] dark:text-white">
+							{brand.name}
+						</span>
+					</Link>
+				);
+			})}
 		</div>
 	);
 }

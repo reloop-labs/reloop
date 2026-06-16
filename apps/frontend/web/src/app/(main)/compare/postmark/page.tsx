@@ -1,11 +1,10 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
 import {
-	FeatureCta,
 	MarketingPageShell,
 	PageSection,
 	SectionHeading,
 } from "@reloop/web/components/page-shell";
-import { getSiteUrl, hostedSignupHref } from "@reloop/web/lib/site";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { CompareOtherLinks } from "../components/compare-other-links";
 import { ComparisonTable } from "../components/comparison-table";
@@ -32,8 +31,6 @@ const PostmarkComparisonPage = () => {
 		<MarketingPageShell
 			titleLines={["Reloop vs Postmark"]}
 			description="Postmark optimizes for fast transactional delivery and clear telemetry. Reloop matches that core job—and adds campaigns, self-hosting, and source-level transparency."
-			primaryCta={{ label: "Try Reloop free", href: hostedSignupHref }}
-			secondaryCta={{ label: "All comparisons", href: "/compare" }}
 			compactHero
 		>
 			<PageSection flushTop narrow>
@@ -142,18 +139,9 @@ const PostmarkComparisonPage = () => {
 				compact
 			/>
 
-			<PageSection narrow flushTop>
+			<PageSection narrow>
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
-
-			<FeatureCta
-				title="Transactional + campaigns"
-				titleMuted="One vendor."
-				description="Keep Postmark-level care for receipts while your team runs newsletters on the same platform."
-				primary={{ label: "Start free", href: hostedSignupHref }}
-				secondary={{ label: "All comparisons", href: "/compare" }}
-				compact
-			/>
 		</MarketingPageShell>
 	);
 };

@@ -1,10 +1,9 @@
 import {
-	FeatureCta,
 	MarketingPageShell,
 	PageSection,
 	SectionHeading,
 } from "@reloop/web/components/page-shell";
-import { getSiteUrl, hostedSignupHref } from "@reloop/web/lib/site";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { ComparisonGrid } from "./components/comparison-grid";
 
@@ -32,9 +31,7 @@ const CompareIndexPage = () => {
 	return (
 		<MarketingPageShell
 			titleLines={["Reloop vs", "the competition."]}
-			description="Open-source email infrastructure you can self-host or run hosted. See how Reloop compares to the providers teams switch from most often."
-			primaryCta={{ label: "Get started", href: hostedSignupHref }}
-			secondaryCta={{ label: "View pricing", href: "/pricing" }}
+			description="Pick a provider to see how Reloop compares."
 			compactHero
 		>
 			<PageSection flushTop>
@@ -79,18 +76,6 @@ const CompareIndexPage = () => {
 					))}
 				</div>
 			</PageSection>
-
-			<FeatureCta
-				title="Ready to switch?"
-				titleMuted="Start free today."
-				description="3,000 emails per month on the Free plan. Migrate from any provider with our docs and community support."
-				primary={{ label: "Get started", href: hostedSignupHref }}
-				secondary={{
-					label: "Self-hosting guide",
-					href: "/resources/self-hosting-guide",
-				}}
-				compact
-			/>
 		</MarketingPageShell>
 	);
 };

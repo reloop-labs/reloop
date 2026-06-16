@@ -1,11 +1,10 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
 import {
-	FeatureCta,
 	MarketingPageShell,
 	PageSection,
 	SectionHeading,
 } from "@reloop/web/components/page-shell";
-import { getSiteUrl, hostedSignupHref } from "@reloop/web/lib/site";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CompareOtherLinks } from "../components/compare-other-links";
@@ -33,8 +32,6 @@ const MailgunComparisonPage = () => {
 		<MarketingPageShell
 			titleLines={["Reloop vs Mailgun"]}
 			description="Mailgun pioneered developer email APIs for a generation of backends. Here is how Reloop compares for teams re-evaluating Twilio-era contracts and ops complexity."
-			primaryCta={{ label: "Try Reloop free", href: hostedSignupHref }}
-			secondaryCta={{ label: "All comparisons", href: "/compare" }}
 			compactHero
 		>
 			<PageSection flushTop narrow>
@@ -188,18 +185,9 @@ const MailgunComparisonPage = () => {
 				compact
 			/>
 
-			<PageSection narrow flushTop>
+			<PageSection narrow>
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
-
-			<FeatureCta
-				title="Evaluate Reloop on your Mailgun domains"
-				titleMuted="Start with staging."
-				description="Mirror production domains in a free Reloop workspace and compare delivery telemetry before you commit."
-				primary={{ label: "Create free account", href: hostedSignupHref }}
-				secondary={{ label: "Self-hosting guide", href: "/resources/self-hosting-guide" }}
-				compact
-			/>
 		</MarketingPageShell>
 	);
 };

@@ -1,11 +1,10 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
 import {
-	FeatureCta,
 	MarketingPageShell,
 	PageSection,
 	SectionHeading,
 } from "@reloop/web/components/page-shell";
-import { getSiteUrl, hostedSignupHref } from "@reloop/web/lib/site";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CompareOtherLinks } from "../components/compare-other-links";
@@ -33,8 +32,6 @@ const MailchimpComparisonPage = () => {
 		<MarketingPageShell
 			titleLines={["Reloop vs Mailchimp"]}
 			description="Mailchimp owns small-business marketing email. Reloop is for product teams that need campaigns and transactional sends with APIs—not audience-based bills."
-			primaryCta={{ label: "Try Reloop free", href: hostedSignupHref }}
-			secondaryCta={{ label: "All comparisons", href: "/compare" }}
 			compactHero
 		>
 			<PageSection flushTop narrow>
@@ -159,18 +156,9 @@ const MailchimpComparisonPage = () => {
 				compact
 			/>
 
-			<PageSection narrow flushTop>
+			<PageSection narrow>
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
-
-			<FeatureCta
-				title="Pay for sends, not shelfware contacts"
-				titleMuted="Try Reloop free."
-				description="3,000 emails per month—campaigns and transactional included."
-				primary={{ label: "Get started", href: hostedSignupHref }}
-				secondary={{ label: "Compare pricing", href: "/pricing" }}
-				compact
-			/>
 		</MarketingPageShell>
 	);
 };

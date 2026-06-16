@@ -1,11 +1,10 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
 import {
-	FeatureCta,
 	MarketingPageShell,
 	PageSection,
 	SectionHeading,
 } from "@reloop/web/components/page-shell";
-import { getSiteUrl, hostedSignupHref } from "@reloop/web/lib/site";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { CompareOtherLinks } from "../components/compare-other-links";
 import { ComparisonTable } from "../components/comparison-table";
@@ -32,8 +31,6 @@ const LoopsComparisonPage = () => {
 		<MarketingPageShell
 			titleLines={["Reloop vs Loops"]}
 			description="Loops is built for SaaS lifecycle email—onboarding, updates, and newsletters with a polished marketer UI. Reloop covers that surface plus transactional API, SMTP, and self-hosting."
-			primaryCta={{ label: "Try Reloop free", href: hostedSignupHref }}
-			secondaryCta={{ label: "All comparisons", href: "/compare" }}
 			compactHero
 		>
 			<PageSection flushTop narrow>
@@ -141,18 +138,9 @@ const LoopsComparisonPage = () => {
 				compact
 			/>
 
-			<PageSection narrow flushTop>
+			<PageSection narrow>
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
-
-			<FeatureCta
-				title="One stack for SaaS email"
-				titleMuted="Product + transactional."
-				description="Stop paying for two email vendors when one open platform can do both."
-				primary={{ label: "Start free", href: hostedSignupHref }}
-				secondary={{ label: "View pricing", href: "/pricing" }}
-				compact
-			/>
 		</MarketingPageShell>
 	);
 };

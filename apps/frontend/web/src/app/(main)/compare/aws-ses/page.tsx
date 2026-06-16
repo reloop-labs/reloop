@@ -1,11 +1,10 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
 import {
-	FeatureCta,
 	MarketingPageShell,
 	PageSection,
 	SectionHeading,
 } from "@reloop/web/components/page-shell";
-import { getSiteUrl, hostedSignupHref } from "@reloop/web/lib/site";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CompareOtherLinks } from "../components/compare-other-links";
@@ -33,8 +32,6 @@ const AwsSesComparisonPage = () => {
 		<MarketingPageShell
 			titleLines={["Reloop vs AWS SES"]}
 			description="Amazon SES is cheap per email—but rarely cheap in total. This page compares raw SES delivery to Reloop as a full email platform."
-			primaryCta={{ label: "Try Reloop free", href: hostedSignupHref }}
-			secondaryCta={{ label: "All comparisons", href: "/compare" }}
 			compactHero
 		>
 			<PageSection flushTop narrow>
@@ -162,18 +159,9 @@ const AwsSesComparisonPage = () => {
 				compact
 			/>
 
-			<PageSection narrow flushTop>
+			<PageSection narrow>
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
-
-			<FeatureCta
-				title="Stop gluing SES together"
-				titleMuted="Use one platform."
-				description="Start on hosted Reloop or deploy on AWS—3,000 emails free every month."
-				primary={{ label: "Get started", href: hostedSignupHref }}
-				secondary={{ label: "Self-host on AWS", href: "/resources/self-hosting-guide" }}
-				compact
-			/>
 		</MarketingPageShell>
 	);
 };

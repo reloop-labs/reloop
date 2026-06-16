@@ -1,11 +1,10 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
 import {
-	FeatureCta,
 	MarketingPageShell,
 	PageSection,
 	SectionHeading,
 } from "@reloop/web/components/page-shell";
-import { getSiteUrl, hostedSignupHref } from "@reloop/web/lib/site";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CompareOtherLinks } from "../components/compare-other-links";
@@ -35,8 +34,6 @@ const ResendComparisonPage = () => {
 		<MarketingPageShell
 			titleLines={["Reloop vs Resend"]}
 			description="Resend set a new bar for developer email APIs. This page explains where the products overlap—and where Reloop offers a different path."
-			primaryCta={{ label: "Try Reloop free", href: hostedSignupHref }}
-			secondaryCta={{ label: "All comparisons", href: "/compare" }}
 			compactHero
 		>
 			<PageSection flushTop narrow>
@@ -242,18 +239,9 @@ const ResendComparisonPage = () => {
 				compact
 			/>
 
-			<PageSection narrow flushTop>
+			<PageSection narrow>
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
-
-			<FeatureCta
-				title="Try Reloop alongside Resend"
-				titleMuted="3,000 emails free."
-				description="Run both in staging, compare delivery logs, and switch when you are confident. No credit card required."
-				primary={{ label: "Create free account", href: hostedSignupHref }}
-				secondary={{ label: "View all comparisons", href: "/compare" }}
-				compact
-			/>
 		</MarketingPageShell>
 	);
 };

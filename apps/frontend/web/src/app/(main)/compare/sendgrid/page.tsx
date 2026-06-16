@@ -1,11 +1,10 @@
 import { FaqSection } from "@reloop/web/components/faq-section";
 import {
-	FeatureCta,
 	MarketingPageShell,
 	PageSection,
 	SectionHeading,
 } from "@reloop/web/components/page-shell";
-import { getSiteUrl, hostedSignupHref } from "@reloop/web/lib/site";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { CompareOtherLinks } from "../components/compare-other-links";
 import { ComparisonTable } from "../components/comparison-table";
@@ -32,8 +31,6 @@ const SendGridComparisonPage = () => {
 		<MarketingPageShell
 			titleLines={["Reloop vs SendGrid"]}
 			description="SendGrid is the incumbent for high-volume email inside Twilio. This comparison is for teams auditing contracts, UI complexity, and whether they need the full proprietary stack."
-			primaryCta={{ label: "Try Reloop free", href: hostedSignupHref }}
-			secondaryCta={{ label: "All comparisons", href: "/compare" }}
 			compactHero
 		>
 			<PageSection flushTop narrow>
@@ -169,18 +166,9 @@ const SendGridComparisonPage = () => {
 				compact
 			/>
 
-			<PageSection narrow flushTop>
+			<PageSection narrow>
 				<CompareOtherLinks currentHref={pagePath} />
 			</PageSection>
-
-			<FeatureCta
-				title="RFP season?"
-				titleMuted="Run Reloop in parallel."
-				description="Benchmark delivery, support response, and engineering velocity against your current SendGrid contract."
-				primary={{ label: "Start free trial", href: hostedSignupHref }}
-				secondary={{ label: "Contact sales", href: "/company/contact-us" }}
-				compact
-			/>
 		</MarketingPageShell>
 	);
 };
