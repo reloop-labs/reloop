@@ -107,7 +107,7 @@ export const ConfigureDnsStep = () => {
 				</div>
 
 				{/* Domain Verification Group */}
-				<div className="mt-6">
+				<div className="mt-6 rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 					<div className="mb-4 flex items-center gap-2 text-base text-text-strong-950">
 						<Icon name="shield" className="h-4 w-4 text-text-sub-600" />
 						<h3 className="font-semibold">Domain Verification</h3>
@@ -125,7 +125,7 @@ export const ConfigureDnsStep = () => {
 				</div>
 
 				{/* Enable Sending Group */}
-				<div className="mt-6 border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/10">
+				<div className="mt-6 rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-2 text-base text-text-strong-950">
 							<Icon name="mail-single" className="h-4 w-4 text-text-sub-600" />
@@ -179,7 +179,7 @@ export const ConfigureDnsStep = () => {
 
 				{/* Enable Receiving Group */}
 				{receivingRecords.length > 0 && (
-					<div className="mt-6 border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/10">
+					<div className="mt-6 rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-2 text-base text-text-strong-950">
 								<Icon name="inbox" className="h-4 w-4 text-text-sub-600" />
@@ -222,7 +222,7 @@ export const ConfigureDnsStep = () => {
 
 				{/* Tracking Group */}
 				{trackingRecords.length > 0 && (
-					<div className="mt-6 border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/10">
+					<div className="mt-6 rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-2 text-base text-text-strong-950">
 								<Icon name="graph-up" className="h-4 w-4 text-text-sub-600" />
