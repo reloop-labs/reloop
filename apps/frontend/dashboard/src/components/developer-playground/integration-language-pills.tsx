@@ -174,7 +174,7 @@ export function IntegrationLanguagePills({
 							...pillPosition,
 							opacity: 0,
 						}}
-						transition={{ duration: 0.14 }}
+						transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
 					/>
 				) : null}
 			</AnimatePresence>

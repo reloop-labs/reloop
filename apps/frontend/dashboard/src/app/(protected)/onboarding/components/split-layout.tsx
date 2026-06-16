@@ -6,7 +6,7 @@ import { KbdEsc } from "@reloop/ui/kbd-esc";
 import { Logo } from "@reloop/ui/logo";
 import { Calligraph } from "calligraph";
 import type { Variants } from "motion/react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
@@ -14,7 +14,13 @@ import { useHotkeys } from "react-hotkeys-hook";
 
 // Smoothly animates height changes using a ResizeObserver + CSS transition.
 // Deliberately avoids Framer Motion layout so it can't conflict with slide animations.
-const AnimatedHeight = ({ children }: { children: React.ReactNode }) => {
+const AnimatedHeight = ({
+	children,
+	skipAnimation,
+}: {
+	children: React.ReactNode;
+	skipAnimation: boolean;
+}) => {
 	const innerRef = useRef<HTMLDivElement>(null);
 	const [height, setHeight] = useState<number | undefined>(undefined);
 
@@ -33,7 +39,9 @@ const AnimatedHeight = ({ children }: { children: React.ReactNode }) => {
 		<div
 			style={{
 				height: height === undefined ? "auto" : height,
-				transition: "height 0.28s cubic-bezier(0.23, 1, 0.32, 1)",
+				transition: skipAnimation
+					? "none"
+					: "height 0.28s cubic-bezier(0.23, 1, 0.32, 1)",
 				overflow: "hidden",
 			}}
 		>
@@ -44,18 +52,29 @@ const AnimatedHeight = ({ children }: { children: React.ReactNode }) => {
 
 // Title that fluidly transitions its characters when the text changes between steps.
 // Calligraph uses LCS diffing: shared chars slide to new positions, new chars fade in.
-const ScrambleTitle = ({ text }: { text: string }) => (
-	<Calligraph
-		as="h1"
-		className="font-semibold text-title-h5"
-		animation="snappy"
-		trend={-1}
-		drift={{ x: 4, y: 0 }}
-		stagger={0.015}
-	>
-		{text}
-	</Calligraph>
-);
+const ScrambleTitle = ({
+	text,
+	skipAnimation,
+}: {
+	text: string;
+	skipAnimation: boolean;
+}) => {
+	if (skipAnimation) {
+		return <h1 className="font-semibold text-title-h5">{text}</h1>;
+	}
+	return (
+		<Calligraph
+			as="h1"
+			className="font-semibold text-title-h5"
+			animation="snappy"
+			trend={-1}
+			drift={{ x: 4, y: 0 }}
+			stagger={0.015}
+		>
+			{text}
+		</Calligraph>
+	);
+};
 
 interface SplitLayoutProps {
 	stepIndicator: string;
@@ -87,6 +106,36 @@ export const SplitLayout = ({
 }: SplitLayoutProps) => {
 	const [step, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [hovered, setHovered] = useState(false);
+	const prefersReducedMotion = useReducedMotion();
+	const isKeyboardRef = useRef(false);
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (
+				e.key === "Escape" ||
+				(e.key === "Enter" && (e.metaKey || e.ctrlKey)) ||
+				(e.key === "s" && e.altKey) ||
+				e.key === "Enter"
+			) {
+				isKeyboardRef.current = true;
+			}
+		};
+		const handlePointerDown = () => {
+			isKeyboardRef.current = false;
+		};
+
+		window.addEventListener("keydown", handleKeyDown, { capture: true });
+		window.addEventListener("pointerdown", handlePointerDown, {
+			capture: true,
+		});
+
+		return () => {
+			window.removeEventListener("keydown", handleKeyDown, { capture: true });
+			window.removeEventListener("pointerdown", handlePointerDown, {
+				capture: true,
+			});
+		};
+	}, []);
 
 	// Compute direction synchronously during render.
 	// prevStepRef starts at 0 (sentinel) so the first render just initialises it.
@@ -122,7 +171,10 @@ export const SplitLayout = ({
 	const currentStep = stepMatch ? Number(stepMatch[1]) : null;
 	const totalSteps = stepMatch ? Number(stepMatch[2]) : null;
 
-	const slideDistance = 14;
+	const isKeyboard = isKeyboardRef.current;
+	const shouldSkipMotion = !!prefersReducedMotion || isKeyboard;
+
+	const slideDistance = shouldSkipMotion ? 0 : 14;
 	// Left panel: enters from right (forward) / left (back); exits left/right
 	const contentVariants: Variants = {
 		initial: (dir: number) => ({
@@ -132,12 +184,18 @@ export const SplitLayout = ({
 		animate: {
 			opacity: 1,
 			transform: "translateX(0px)",
-			transition: { duration: 0.25, ease: [0.23, 1, 0.32, 1] as const },
+			transition: {
+				duration: shouldSkipMotion ? 0 : 0.25,
+				ease: [0.23, 1, 0.32, 1] as const,
+			},
 		},
 		exit: (dir: number) => ({
 			opacity: 0,
 			transform: `translateX(${dir * -slideDistance}px)`,
-			transition: { duration: 0.15, ease: [0.4, 0, 1, 1] as const },
+			transition: {
+				duration: shouldSkipMotion ? 0 : 0.15,
+				ease: [0.23, 1, 0.32, 1] as const,
+			},
 		}),
 	};
 
@@ -145,21 +203,24 @@ export const SplitLayout = ({
 	const previewVariants: Variants = {
 		initial: (dir: number) => ({
 			opacity: 0,
-			transform: `translateY(${dir * 12}px)`,
+			transform: `translateY(${dir * (shouldSkipMotion ? 0 : 12)}px)`,
 		}),
 		animate: {
 			opacity: 1,
 			transform: "translateY(0px)",
 			transition: {
-				duration: 0.28,
+				duration: shouldSkipMotion ? 0 : 0.28,
 				ease: [0.23, 1, 0.32, 1] as const,
-				delay: 0.05,
+				delay: shouldSkipMotion ? 0 : 0.05,
 			},
 		},
 		exit: (dir: number) => ({
 			opacity: 0,
-			transform: `translateY(${dir * -12}px)`,
-			transition: { duration: 0.15, ease: [0.4, 0, 1, 1] as const },
+			transform: `translateY(${dir * -(shouldSkipMotion ? 0 : 12)}px)`,
+			transition: {
+				duration: shouldSkipMotion ? 0 : 0.15,
+				ease: [0.23, 1, 0.32, 1] as const,
+			},
 		}),
 	};
 
@@ -266,7 +327,7 @@ export const SplitLayout = ({
 													value={currentStep}
 													className="tabular-nums"
 													transformTiming={{
-														duration: 400,
+														duration: shouldSkipMotion ? 0 : 400,
 														easing: "ease-out",
 													}}
 												/>
@@ -275,7 +336,7 @@ export const SplitLayout = ({
 													value={totalSteps}
 													className="tabular-nums"
 													transformTiming={{
-														duration: 400,
+														duration: shouldSkipMotion ? 0 : 400,
 														easing: "ease-out",
 													}}
 												/>
@@ -288,10 +349,15 @@ export const SplitLayout = ({
 								</motion.button>
 
 								{/* Title stays fixed; only the text scrambles when step changes */}
-								{title && <ScrambleTitle text={title} />}
+								{title && (
+									<ScrambleTitle
+										text={title}
+										skipAnimation={shouldSkipMotion}
+									/>
+								)}
 
 								{/* Animated step content */}
-								<AnimatedHeight>
+								<AnimatedHeight skipAnimation={shouldSkipMotion}>
 									<AnimatePresence
 										mode="wait"
 										initial={true}

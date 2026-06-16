@@ -149,7 +149,7 @@ export const ConfigureDnsStep = () => {
 								initial={{ height: 0, opacity: 0 }}
 								animate={{ height: "auto", opacity: 1 }}
 								exit={{ height: 0, opacity: 0 }}
-								transition={{ duration: 0.2, ease: "easeInOut" }}
+								transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
 								className="mt-4 overflow-hidden"
 							>
 								<div className="space-y-6">
@@ -203,7 +203,7 @@ export const ConfigureDnsStep = () => {
 									initial={{ height: 0, opacity: 0 }}
 									animate={{ height: "auto", opacity: 1 }}
 									exit={{ height: 0, opacity: 0 }}
-									transition={{ duration: 0.2, ease: "easeInOut" }}
+									transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
 									className="mt-4 overflow-hidden"
 								>
 									<DNSRecordSection
@@ -253,7 +253,7 @@ export const ConfigureDnsStep = () => {
 									initial={{ height: 0, opacity: 0 }}
 									animate={{ height: "auto", opacity: 1 }}
 									exit={{ height: 0, opacity: 0 }}
-									transition={{ duration: 0.2, ease: "easeInOut" }}
+									transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
 									className="mt-4 overflow-hidden"
 								>
 									<DNSRecordSection

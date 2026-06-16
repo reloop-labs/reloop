@@ -141,7 +141,7 @@ export const AddDomainStep = () => {
 								initial={{ height: 0, opacity: 0 }}
 								animate={{ height: "auto", opacity: 1 }}
 								exit={{ height: 0, opacity: 0 }}
-								transition={{ duration: 0.2, ease: "easeInOut" }}
+								transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
 								className="overflow-hidden"
 							>
 								<div className="my-2 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4">

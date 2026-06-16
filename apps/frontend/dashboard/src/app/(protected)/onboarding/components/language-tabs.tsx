@@ -135,7 +135,7 @@ export const LanguageTabs = ({
 									(tab?.offsetParent?.getBoundingClientRect().top || 0) +
 									10,
 							}}
-							transition={{ duration: 0.14 }}
+							transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
 						/>
 					) : null}
 				</AnimatePresence>
