@@ -66,7 +66,7 @@ export function IntegrationLanguagePills({
 				top: button.offsetTop,
 			};
 
-			const pillInset = { x: 6, y: 6 };
+			const pillInset = { x: 6, y: 3 };
 			setPillPosition({
 				width: position.width - pillInset.x * 2,
 				height: position.height - pillInset.y * 2 - 2,
@@ -131,7 +131,7 @@ export function IntegrationLanguagePills({
 						onPointerEnter={() => setHoveredTabIdx(index)}
 						onPointerLeave={() => setHoveredTabIdx(undefined)}
 						className={cn(
-							"relative z-10 flex shrink-0 items-center gap-2 px-4 py-3 font-medium text-[17px] transition-colors duration-150",
+							"relative z-10 flex shrink-0 items-center gap-2 px-4 py-2.5 font-medium text-sm transition-colors duration-150",
 							isActive
 								? "text-text-strong-950 dark:text-white"
 								: "text-text-sub-600 dark:text-white/70",

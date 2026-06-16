@@ -15,9 +15,11 @@ const modes = [
 export function IntegrationModeTabs({
 	value,
 	onChange,
+	className,
 }: {
 	value: IntegrationMode;
 	onChange: (mode: IntegrationMode) => void;
+	className?: string;
 }) {
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -28,7 +30,7 @@ export function IntegrationModeTabs({
 	const rect = tab?.getBoundingClientRect();
 
 	return (
-		<TabMenuHorizontal.Root value={value}>
+		<TabMenuHorizontal.Root value={value} className={className}>
 			<TabMenuHorizontal.List className="relative h-10 gap-0 border-b! py-0">
 				{modes.map((mode, index) => (
 					<TabMenuHorizontal.Trigger
@@ -40,7 +42,7 @@ export function IntegrationModeTabs({
 						onPointerEnter={() => setHoveredIdx(index)}
 						onPointerLeave={() => setHoveredIdx(undefined)}
 						className={cn(
-							"flex cursor-pointer items-center gap-2 px-2.5 py-0! font-medium text-sm",
+							"flex w-20 cursor-pointer items-center justify-center gap-2 px-2.5 py-0! font-medium text-sm",
 							hoveredIdx === undefined &&
 								activeIndex === index &&
 								"text-text-strong-950",

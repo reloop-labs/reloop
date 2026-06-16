@@ -120,7 +120,9 @@ export function PostGenerate({
 				/>
 			</div>
 
-			<IntegrationModeTabs value={mode} onChange={onModeChange} />
+			<div className="ml-8">
+				<IntegrationModeTabs value={mode} onChange={onModeChange} />
+			</div>
 
 			<div className="ml-0.5 flex flex-col gap-5">
 				{isAi ? (
