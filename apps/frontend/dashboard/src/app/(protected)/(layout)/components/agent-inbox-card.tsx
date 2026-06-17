@@ -177,13 +177,16 @@ export function AgentInboxCard() {
 						const hasReceived = (mb.receivedCount ?? 0) > 0;
 						const hasActivity = hasSent || hasReceived;
 						return (
-							<Link
+							// Outer row is a plain div — not a link, so 3-dots won't navigate
+							<div
 								key={mb.id}
-								href={`/agent-inbox/${mb.id}`}
-								className="group/row flex items-center gap-2 border-stroke-soft-100 border-b py-2.5 no-underline dark:border-white/5"
+								className="group/row flex items-center gap-2 border-stroke-soft-100 border-b py-2.5 dark:border-white/5"
 							>
-								{/* Left: status dot + label */}
-								<div className="flex min-w-0 flex-1 items-center gap-2">
+								{/* Left: status dot + label (only this navigates) */}
+								<Link
+									href={`/agent-inbox/${mb.id}`}
+									className="flex min-w-0 flex-1 items-center gap-2 no-underline"
+								>
 									<span
 										className={cn(
 											"h-1.5 w-1.5 shrink-0 rounded-full",
@@ -200,11 +203,11 @@ export function AgentInboxCard() {
 											{mb.email}
 										</span>
 									)}
-								</div>
+								</Link>
 
-								{/* Right: activity arrows OR 3-dots on hover */}
+								{/* Right: activity indicators OR 3-dots on hover */}
 								<div className="relative flex h-5 w-14 shrink-0 items-center justify-end">
-									{/* Activity indicators — hidden on hover / when dropdown open */}
+									{/* Activity — hidden on hover / when dropdown open */}
 									<div
 										className={cn(
 											"flex items-center gap-1",
@@ -232,14 +235,13 @@ export function AgentInboxCard() {
 										)}
 									</div>
 
-									{/* 3-dots — shown on hover OR when dropdown is open */}
+									{/* 3-dots — shown on hover OR when dropdown open */}
 									<div
 										className={cn(
 											activeDropdownId === mb.id
 												? "flex"
 												: "hidden group-hover/row:flex",
 										)}
-										onClick={(e) => e.preventDefault()}
 									>
 										<MailboxActionsDropdown
 											mailbox={mb}
@@ -257,7 +259,7 @@ export function AgentInboxCard() {
 										/>
 									</div>
 								</div>
-							</Link>
+							</div>
 						);
 					})}
 				</div>
