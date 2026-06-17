@@ -162,7 +162,7 @@ export function AgentIntegrationsCard() {
 					</TabMenuHorizontal.Root>
 				</div>
 
-				<div className="flex-1 flex flex-col justify-center p-4">
+				<div className="flex flex-1 flex-col justify-center p-4">
 					{activeTab === "skill" && (
 						<div className="flex items-center justify-between rounded-lg border border-stroke-soft-100 bg-bg-weak-50/50 p-3 dark:border-white/5 dark:bg-white/[0.01]">
 							<div className="flex min-w-0 items-center gap-2.5">

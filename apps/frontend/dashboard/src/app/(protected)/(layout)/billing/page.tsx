@@ -78,7 +78,7 @@ function UsageBar({ used, total }: { used: number; total: number }) {
 		<div className="space-y-1.5">
 			<div className="flex items-center justify-between text-sm">
 				<span className="text-text-sub-600">Credits remaining</span>
-				<span className="font-medium tabular-nums text-text-strong-950">
+				<span className="font-medium text-text-strong-950 tabular-nums">
 					{formatCredits(used)}{" "}
 					<span className="text-text-sub-600">/ {formatCredits(total)}</span>
 				</span>
@@ -132,7 +132,11 @@ export default function BillingPage() {
 			if (subRes.ok) setBilling(await subRes.json());
 			if (plansRes.ok) {
 				const raw: Plan[] = await plansRes.json();
-				setPlans(raw.sort((a, b) => PLAN_ORDER.indexOf(a.code) - PLAN_ORDER.indexOf(b.code)));
+				setPlans(
+					raw.sort(
+						(a, b) => PLAN_ORDER.indexOf(a.code) - PLAN_ORDER.indexOf(b.code),
+					),
+				);
 			}
 			if (invRes.ok) setInvoices(await invRes.json());
 		} finally {
@@ -186,7 +190,7 @@ export default function BillingPage() {
 			{billing?.subscription.status === "past_due" && (
 				<div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-800/40 dark:bg-amber-900/20">
 					<Icon name="warning" className="h-4 w-4 shrink-0 text-amber-600" />
-					<p className="text-sm text-amber-700 dark:text-amber-400">
+					<p className="text-amber-700 text-sm dark:text-amber-400">
 						Your last payment failed. Please update your payment method to avoid
 						service interruption.
 					</p>
@@ -215,7 +219,7 @@ export default function BillingPage() {
 						</p>
 					</div>
 					{billing?.subscription.currentPeriodEnd && (
-						<p className="text-right text-xs text-text-sub-600">
+						<p className="text-right text-text-sub-600 text-xs">
 							Renews{" "}
 							{new Date(
 								billing.subscription.currentPeriodEnd,
@@ -272,13 +276,13 @@ export default function BillingPage() {
 								<span className="font-semibold text-sm text-text-strong-950">
 									{plan.name}
 								</span>
-								<span className="mt-1 text-[22px] font-bold tabular-nums text-text-strong-950">
+								<span className="mt-1 font-bold text-[22px] text-text-strong-950 tabular-nums">
 									${plan.priceUsd}
-									<span className="text-sm font-normal text-text-sub-600">
+									<span className="font-normal text-sm text-text-sub-600">
 										/mo
 									</span>
 								</span>
-								<span className="mt-2 text-xs text-text-sub-600">
+								<span className="mt-2 text-text-sub-600 text-xs">
 									{formatCredits(plan.monthlyCredits)} emails
 								</span>
 								{isUpgrade && !isCurrent && (
@@ -337,7 +341,7 @@ export default function BillingPage() {
 												"border-stroke-soft-100 border-b dark:border-stroke-soft-100/40",
 										)}
 									>
-										<td className="px-4 py-3 font-mono text-xs text-text-strong-950">
+										<td className="px-4 py-3 font-mono text-text-strong-950 text-xs">
 											{inv.number}
 										</td>
 										<td className="px-4 py-3 text-text-sub-600">
@@ -365,7 +369,7 @@ export default function BillingPage() {
 														: "Pending"}
 											</span>
 										</td>
-										<td className="px-4 py-3 text-right font-medium tabular-nums text-text-strong-950">
+										<td className="px-4 py-3 text-right font-medium text-text-strong-950 tabular-nums">
 											{formatAmount(inv.total_amount_cents, inv.currency)}
 										</td>
 										<td className="px-4 py-3 text-right">
@@ -374,7 +378,7 @@ export default function BillingPage() {
 													href={inv.file_url}
 													target="_blank"
 													rel="noreferrer"
-													className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+													className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-text-sub-600 text-xs hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
 												>
 													<Icon name="download" className="h-3 w-3" />
 													PDF
@@ -391,7 +395,7 @@ export default function BillingPage() {
 
 			{/* Empty invoice state */}
 			{invoices.length === 0 && (
-				<section className="flex flex-col items-center justify-center rounded-xl border border-dashed border-stroke-soft-100 py-12 text-center dark:border-stroke-soft-100/40">
+				<section className="flex flex-col items-center justify-center rounded-xl border border-stroke-soft-100 border-dashed py-12 text-center dark:border-stroke-soft-100/40">
 					<Icon
 						name="invoice"
 						className="mb-3 h-8 w-8 text-text-sub-600 opacity-40"
@@ -399,7 +403,7 @@ export default function BillingPage() {
 					<p className="font-medium text-sm text-text-strong-950">
 						No invoices yet
 					</p>
-					<p className="mt-1 text-xs text-text-sub-600">
+					<p className="mt-1 text-text-sub-600 text-xs">
 						Your invoices will appear here after your first billing cycle.
 					</p>
 				</section>

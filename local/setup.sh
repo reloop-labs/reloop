@@ -42,7 +42,6 @@ cd "$(dirname "$0")/.." || exit
 # List of services to populate
 populate_env "apps/backend/api-key"
 populate_env "apps/backend/auth"
-populate_env "apps/backend/credits"
 populate_env "apps/backend/contacts"
 populate_env "apps/backend/domain"
 populate_env "apps/backend/email"

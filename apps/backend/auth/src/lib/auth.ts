@@ -18,9 +18,9 @@ import { eq } from "drizzle-orm";
 import { log } from "evlog";
 import { authConfig } from "../auth.config";
 import {
-	PLAN_CREDITS,
 	lagoCreateCustomer,
 	lagoCreateSubscription,
+	PLAN_CREDITS,
 } from "./lago";
 import { redis } from "./redis";
 
@@ -268,7 +268,10 @@ export const auth = betterAuth({
 							billingName: (org as any).billingName,
 						});
 
-						const sub = await lagoCreateSubscription(customer.external_id, "starter");
+						const sub = await lagoCreateSubscription(
+							customer.external_id,
+							"starter",
+						);
 
 						await db
 							.update(schema.organization)

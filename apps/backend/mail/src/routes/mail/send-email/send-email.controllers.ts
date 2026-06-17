@@ -50,11 +50,7 @@ export async function sendEmailController({
 	// ── Step 0: Atomic quota check + deduction ─────────────────────────────────
 	// Count recipients across to/cc/bcc
 	const toList = Array.isArray(body.to) ? body.to : [body.to];
-	const ccList = body.cc
-		? Array.isArray(body.cc)
-			? body.cc
-			: [body.cc]
-		: [];
+	const ccList = body.cc ? (Array.isArray(body.cc) ? body.cc : [body.cc]) : [];
 	const bccList = body.bcc
 		? Array.isArray(body.bcc)
 			? body.bcc

@@ -1,11 +1,11 @@
 "use client";
 
-import { useWebhooks } from "../webhooks/components/use-webhooks";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { ArrowRight, Plus } from "lucide-react";
 import Link from "next/link";
+import { useWebhooks } from "../webhooks/components/use-webhooks";
 
 export function WebhooksCard() {
 	const { webhooks, isTotalEmpty } = useWebhooks();
@@ -95,7 +95,8 @@ export function WebhooksCard() {
 
 					{/* Description */}
 					<p className="mt-2 max-w-[240px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
-						Deliver instant updates about emails, deliveries, or events to your server.
+						Deliver instant updates about emails, deliveries, or events to your
+						server.
 					</p>
 
 					{/* Button */}
