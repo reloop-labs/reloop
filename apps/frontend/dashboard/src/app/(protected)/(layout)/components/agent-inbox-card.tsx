@@ -1,26 +1,33 @@
 "use client";
 
+import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { ArrowRight, MoreHorizontal, Plus } from "lucide-react";
+import * as Popover from "@reloop/ui/popover";
+import {
+	ArrowDown,
+	ArrowRight,
+	ArrowUp,
+	MoreHorizontal,
+	Plus,
+} from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 import useSWR from "swr";
 
-interface BackendMessage {
+interface BackendMailbox {
 	id: string;
-	mailboxId: string;
-	organizationId: string;
-	fromEmail: string;
-	fromName: string | null;
-	toEmails: string[];
-	subject: string | null;
-	snippet: string | null;
+	email: string;
+	quota: string;
 	status: string;
-	isRead: boolean;
-	isSpam: boolean;
+	displayName: string | null;
 	createdAt: string | Date;
+	sentCount?: number;
+	receivedCount?: number;
 }
 
 const formatRelativeTime = (date: string | Date): string => {
@@ -35,21 +42,105 @@ const formatRelativeTime = (date: string | Date): string => {
 	return `${Math.floor(diffHr / 24)}d ago`;
 };
 
-const getStatusColor = (status: string) => {
-	if (status === "received" || status === "active")
-		return "bg-success-base/10 text-success-base";
-	if (status === "processing") return "bg-warning-base/10 text-warning-base";
-	return "bg-bg-weak-50 text-text-sub-600 dark:bg-white/[0.06] dark:text-white/40";
+// ── Row actions dropdown ─────────────────────────────────────────────────────
+
+interface MailboxActionsDropdownProps {
+	mailbox: BackendMailbox;
+	onOpenChange?: (open: boolean) => void;
+}
+
+const MailboxActionsDropdown = ({
+	mailbox,
+	onOpenChange,
+}: MailboxActionsDropdownProps) => {
+	const [open, setOpen] = useState(false);
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const router = useRouter();
+
+	const menuItems = [
+		{ id: "view", label: "View inbox", icon: "inbox" },
+		{ id: "copy-email", label: "Copy email address", icon: "copy" },
+		{ id: "copy-id", label: "Copy mailbox ID", icon: "copy" },
+	] as const;
+
+	const currentBtn = buttonRefs.current[hoverIdx ?? -1];
+	const currentRect = currentBtn?.getBoundingClientRect();
+
+	const handleOpenChange = (val: boolean) => {
+		setOpen(val);
+		onOpenChange?.(val);
+	};
+
+	const handleClick = (itemId: string, e: React.MouseEvent) => {
+		e.stopPropagation();
+		handleOpenChange(false);
+		if (itemId === "view") router.push(`/agent-inbox/${mailbox.id}`);
+		else if (itemId === "copy-email") {
+			navigator.clipboard.writeText(mailbox.email);
+			toast.success("Email address copied");
+		} else if (itemId === "copy-id") {
+			navigator.clipboard.writeText(mailbox.id);
+			toast.success("Mailbox ID copied");
+		}
+	};
+
+	return (
+		<Popover.Root open={open} onOpenChange={handleOpenChange}>
+			<Popover.Trigger asChild>
+				<button
+					type="button"
+					onClick={(e) => e.stopPropagation()}
+					className="flex h-5 w-5 items-center justify-center rounded text-text-sub-600 hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white"
+				>
+					<MoreHorizontal className="h-3.5 w-3.5" />
+				</button>
+			</Popover.Trigger>
+			<Popover.Content
+				align="end"
+				sideOffset={-1}
+				className="w-44 p-2"
+				showArrow={true}
+			>
+				<div className="relative">
+					{menuItems.map((item, idx) => (
+						<button
+							key={item.id}
+							ref={(el) => {
+								if (el) buttonRefs.current[idx] = el;
+							}}
+							type="button"
+							onPointerEnter={() => setHoverIdx(idx)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+							onClick={(e) => handleClick(item.id, e)}
+							className="relative z-10 flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+						>
+							<Icon name={item.icon as any} className="h-3.5 w-3.5 shrink-0" />
+							{item.label}
+						</button>
+					))}
+					<AnimatedHoverBackground
+						rect={currentRect}
+						tabElement={currentBtn}
+						className="bg-bg-weak-50 dark:bg-white/[0.04]"
+					/>
+				</div>
+			</Popover.Content>
+		</Popover.Root>
+	);
 };
+
+// ── Main card ────────────────────────────────────────────────────────────────
 
 export function AgentInboxCard() {
 	const { activeOrganization } = useUserOrganization();
+	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
-	const { data: inboxMessagesData } = useSWR<BackendMessage[]>(
-		activeOrganization?.id ? "/api/inbox/v1/messages" : null,
+	const { data: mailboxesData } = useSWR<BackendMailbox[]>(
+		activeOrganization?.id ? "/api/inbox/v1/mailboxes/list" : null,
 	);
 
-	const messages = inboxMessagesData ?? [];
+	const mailboxes = mailboxesData ?? [];
 
 	return (
 		<div className="group flex w-full flex-col">
@@ -60,7 +151,7 @@ export function AgentInboxCard() {
 					className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 				>
 					<Icon name="inbox" className="h-4 w-4 shrink-0" />
-					Email Inbox
+					Email Inboxes
 				</Link>
 				<div className="flex items-center gap-1.5">
 					<Link
@@ -69,15 +160,9 @@ export function AgentInboxCard() {
 					>
 						<Plus className="h-3.5 w-3.5" />
 					</Link>
-					<button
-						type="button"
-						className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 transition-colors hover:bg-bg-weak-50/50 hover:text-text-strong-950 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/60"
-					>
-						<MoreHorizontal className="h-3.5 w-3.5" />
-					</button>
 					<Link
 						href="/agent-inbox"
-						className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 transition-colors hover:bg-bg-weak-50/50 hover:text-text-strong-950 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/60"
+						className="flex h-7 w-7 shrink-0 items-center justify-center text-text-sub-600 transition-transform hover:translate-x-0.5 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 					>
 						<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
 					</Link>
@@ -85,38 +170,96 @@ export function AgentInboxCard() {
 			</div>
 
 			{/* Body */}
-			{messages.length > 0 ? (
-				<div className="-mt-1.5 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white px-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
-					{messages.slice(0, 5).map((msg) => (
-						<Link
-							key={msg.id}
-							href={`/agent-inbox?message=${msg.id}`}
-							className="group/row flex items-center gap-2 border-stroke-soft-100 border-b py-2.5 no-underline last:border-b-0 dark:border-white/5"
-						>
-							{/* Left: unread indicator + sender */}
-							<div className="flex min-w-0 items-center gap-2">
-								<span
-									className={cn(
-										"h-1.5 w-1.5 shrink-0 rounded-full",
-										!msg.isRead ? "bg-primary-base" : "bg-transparent",
+			{mailboxes.length > 0 ? (
+				<div className="-mt-1.5 h-[250px] overflow-hidden rounded-xl border border-stroke-soft-100 bg-white px-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+					{mailboxes.slice(0, 5).map((mb) => {
+						const hasSent = (mb.sentCount ?? 0) > 0;
+						const hasReceived = (mb.receivedCount ?? 0) > 0;
+						const hasActivity = hasSent || hasReceived;
+						return (
+							<Link
+								key={mb.id}
+								href={`/agent-inbox/${mb.id}`}
+								className="group/row flex items-center gap-2 border-stroke-soft-100 border-b py-2.5 no-underline dark:border-white/5"
+							>
+								{/* Left: status dot + label */}
+								<div className="flex min-w-0 flex-1 items-center gap-2">
+									<span
+										className={cn(
+											"h-1.5 w-1.5 shrink-0 rounded-full",
+											mb.status === "active"
+												? "bg-success-base"
+												: "bg-text-sub-600/40",
+										)}
+									/>
+									<span className="truncate font-semibold text-text-strong-950 text-xs group-hover/row:underline dark:text-white">
+										{mb.displayName || mb.email}
+									</span>
+									{mb.displayName && (
+										<span className="hidden truncate text-text-sub-600 text-xs sm:block dark:text-white/40">
+											{mb.email}
+										</span>
 									)}
-								/>
-								<span className="truncate font-semibold text-text-strong-950 text-xs group-hover/row:underline dark:text-white">
-									{msg.fromName || msg.fromEmail || "(Unknown)"}
-								</span>
-							</div>
+								</div>
 
-							{/* Middle: subject */}
-							<span className="hidden flex-1 truncate text-text-sub-600 text-xs sm:block dark:text-white/40">
-								{msg.subject || "(No Subject)"}
-							</span>
+								{/* Right: activity arrows OR 3-dots on hover */}
+								<div className="relative flex h-5 w-14 shrink-0 items-center justify-end">
+									{/* Activity indicators — hidden on hover / when dropdown open */}
+									<div
+										className={cn(
+											"flex items-center gap-1",
+											activeDropdownId === mb.id
+												? "hidden"
+												: "flex group-hover/row:hidden",
+										)}
+									>
+										{hasSent && (
+											<span className="flex items-center gap-0.5 font-medium text-[10px] text-success-base">
+												<ArrowUp className="h-2.5 w-2.5" />
+												{mb.sentCount}
+											</span>
+										)}
+										{hasReceived && (
+											<span className="flex items-center gap-0.5 font-medium text-[10px] text-primary-base">
+												<ArrowDown className="h-2.5 w-2.5" />
+												{mb.receivedCount}
+											</span>
+										)}
+										{!hasActivity && (
+											<span className="text-[10px] text-text-sub-600 tabular-nums underline decoration-dotted underline-offset-2 dark:text-white/40">
+												{formatRelativeTime(mb.createdAt)}
+											</span>
+										)}
+									</div>
 
-							{/* Right: relative time */}
-							<span className="shrink-0 text-text-sub-600 text-xs tabular-nums underline decoration-dotted underline-offset-2 dark:text-white/40">
-								{formatRelativeTime(msg.createdAt)}
-							</span>
-						</Link>
-					))}
+									{/* 3-dots — shown on hover OR when dropdown is open */}
+									<div
+										className={cn(
+											activeDropdownId === mb.id
+												? "flex"
+												: "hidden group-hover/row:flex",
+										)}
+										onClick={(e) => e.preventDefault()}
+									>
+										<MailboxActionsDropdown
+											mailbox={mb}
+											onOpenChange={(val) => {
+												if (val) {
+													setActiveDropdownId(mb.id);
+												} else {
+													setTimeout(() => {
+														setActiveDropdownId((curr) =>
+															curr === mb.id ? null : curr,
+														);
+													}, 150);
+												}
+											}}
+										/>
+									</div>
+								</div>
+							</Link>
+						);
+					})}
 				</div>
 			) : (
 				<div className="-mt-1.5 flex h-[250px] flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
