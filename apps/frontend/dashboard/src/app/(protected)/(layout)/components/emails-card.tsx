@@ -4,9 +4,11 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { ArrowRight, Plus } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import useSWR from "swr";
 
 interface EmailLogData {
@@ -39,6 +41,18 @@ interface BackendMessage {
 export function EmailsCard() {
 	const { activeOrganization } = useUserOrganization();
 	const [activeTab, setActiveTab] = useState<"sent" | "received">("sent");
+	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+	const tabItems = [
+		{ title: "Sent", value: "sent" as const, iconName: "send" },
+		{ title: "Received", value: "received" as const, iconName: "inbox" },
+	];
+
+	const activeIndex = tabItems.findIndex((item) => item.value === activeTab);
+	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
+	const tab = buttonRefs.current[currentIdx];
+	const rect = tab?.getBoundingClientRect();
 
 	// Fetch Sent logs
 	const { data: emailLogsData } = useSWR<EmailListResponse>(
@@ -88,33 +102,85 @@ export function EmailsCard() {
 			{/* Body Container */}
 			<div className="-mt-1.5 flex h-[250px] flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-white px-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
 				{/* Tab Selector */}
-				<div className="flex shrink-0 border-stroke-soft-100/50 border-b pt-3 pb-2 dark:border-white/5">
-					<div className="flex w-full rounded-lg bg-bg-weak-50 p-1 dark:bg-white/[0.02]">
-						<button
-							type="button"
-							onClick={() => setActiveTab("sent")}
-							className={cn(
-								"flex-1 rounded-md py-1 text-center font-semibold text-xs transition-all",
-								activeTab === "sent"
-									? "bg-white text-text-strong-950 shadow-sm dark:bg-white/10 dark:text-white"
-									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white",
-							)}
-						>
-							Sent
-						</button>
-						<button
-							type="button"
-							onClick={() => setActiveTab("received")}
-							className={cn(
-								"flex-1 rounded-md py-1 text-center font-semibold text-xs transition-all",
-								activeTab === "received"
-									? "bg-white text-text-strong-950 shadow-sm dark:bg-white/10 dark:text-white"
-									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white",
-							)}
-						>
-							Received
-						</button>
-					</div>
+				<div className="flex shrink-0 border-stroke-soft-100/50 border-b dark:border-white/5">
+					<TabMenuHorizontal.Root
+						defaultValue="sent"
+						value={activeTab}
+						className="w-full"
+					>
+						<TabMenuHorizontal.List className="relative h-10 w-full justify-start gap-0 border-b-0 py-0">
+							{tabItems.map(({ value, title, iconName }, index) => (
+								<TabMenuHorizontal.Trigger
+									ref={(el) => {
+										if (el) {
+											buttonRefs.current[index] = el;
+										}
+									}}
+									onPointerEnter={() => setHoveredIdx(index)}
+									onPointerLeave={() => setHoveredIdx(undefined)}
+									className={cn(
+										"flex h-12 cursor-pointer items-center gap-2 px-3.5 py-0! font-medium text-xs",
+										hoveredIdx === undefined &&
+											activeIndex === index &&
+											"text-text-strong-950 dark:text-white",
+									)}
+									key={value}
+									value={value}
+									onClick={() => setActiveTab(value)}
+								>
+									<Icon name={iconName} className="h-3.5 w-3.5" />
+									{title}
+								</TabMenuHorizontal.Trigger>
+							))}
+							<AnimatePresence>
+								{rect && activeIndex !== -1 ? (
+									<motion.div
+										className="absolute top-0 left-0 rounded-lg bg-neutral-alpha-10 dark:bg-white/10"
+										initial={{
+											pointerEvents: "none",
+											width: rect.width,
+											height: rect.height - 20,
+											left:
+												rect.left -
+												(tab?.offsetParent?.getBoundingClientRect().left || 0),
+											top:
+												rect.top -
+												(tab?.offsetParent?.getBoundingClientRect().top || 0) +
+												10,
+											opacity: 0,
+										}}
+										animate={{
+											pointerEvents: "none",
+											width: rect.width,
+											height: rect.height - 20,
+											left:
+												rect.left -
+												(tab?.offsetParent?.getBoundingClientRect().left || 0),
+											top:
+												rect.top -
+												(tab?.offsetParent?.getBoundingClientRect().top || 0) +
+												10,
+											opacity: 1,
+										}}
+										exit={{
+											pointerEvents: "none",
+											opacity: 0,
+											width: rect.width,
+											height: rect.height - 20,
+											left:
+												rect.left -
+												(tab?.offsetParent?.getBoundingClientRect().left || 0),
+											top:
+												rect.top -
+												(tab?.offsetParent?.getBoundingClientRect().top || 0) +
+												10,
+										}}
+										transition={{ duration: 0.14 }}
+									/>
+								) : null}
+							</AnimatePresence>
+						</TabMenuHorizontal.List>
+					</TabMenuHorizontal.Root>
 				</div>
 
 				{/* List or Empty State */}
