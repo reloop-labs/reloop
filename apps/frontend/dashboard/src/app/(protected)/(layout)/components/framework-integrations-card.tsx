@@ -38,20 +38,13 @@ export function FrameworkIntegrationsCard() {
 			</div>
 
 			<div className="-mt-1.5 rounded-xl border border-stroke-soft-100 bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
-				<p className="text-text-sub-600 text-xs dark:text-white/50">
-					Boilerplates and integration templates for Node.js
-				</p>
-
-				<div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+				<div className="grid grid-cols-1 gap-x-4 gap-y-0 sm:grid-cols-2 lg:grid-cols-1">
 					{frameworkIntegrations.map((item) => (
 						<div
 							key={item.name}
-							className="group/tile flex cursor-pointer items-start gap-2.5 rounded-lg border border-stroke-soft-100/50 p-3 transition-colors hover:bg-bg-weak-50/50 dark:border-white/5 dark:hover:bg-white/[0.04]"
+							className="group/tile flex cursor-pointer items-center gap-2.5 border-stroke-soft-100/50 border-b py-2.5 transition-colors last:border-b-0 dark:border-white/5"
 						>
-							<div
-								className="flex h-8 w-8 shrink-0 items-center justify-center rounded"
-								style={{ backgroundColor: `#${item.icon.hex}15` }}
-							>
+							<div className="flex h-6 w-6 shrink-0 items-center justify-center rounded">
 								<svg
 									role="img"
 									viewBox="0 0 24 24"
@@ -64,16 +57,13 @@ export function FrameworkIntegrationsCard() {
 								</svg>
 							</div>
 
-							<div className="min-w-0 flex-1 space-y-0.5">
+							<div className="min-w-0 flex-1">
 								<div className="flex items-center justify-between gap-1">
 									<span className="font-semibold text-text-strong-950 text-xs group-hover/tile:underline dark:text-white">
 										{item.name}
 									</span>
 									<ArrowRight className="h-3 w-3 shrink-0 text-text-sub-400 opacity-0 transition-all group-hover/tile:text-text-strong-950 group-hover/tile:opacity-100" />
 								</div>
-								<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/50">
-									{item.desc}
-								</p>
 							</div>
 						</div>
 					))}
