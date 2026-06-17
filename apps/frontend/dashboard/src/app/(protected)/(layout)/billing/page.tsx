@@ -1,6 +1,5 @@
 "use client";
 
-import { useBetterAuth } from "@fe/dashboard/providers/org-provider";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";

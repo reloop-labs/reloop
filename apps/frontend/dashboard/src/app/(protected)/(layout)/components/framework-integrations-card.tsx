@@ -4,6 +4,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
 import {
@@ -77,10 +78,20 @@ export function FrameworkIntegrationsCard() {
 	return (
 		<div className="group flex w-full flex-col">
 			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-1.5 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
-				<span className="flex items-center gap-2 font-medium text-sm text-text-sub-600 dark:text-white/60">
+				<Link
+					href="https://reloop.sh/docs"
+					className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+				>
 					<Icon name="modules" className="h-4 w-4 shrink-0" />
 					<span>Framework Integrations</span>
-				</span>
+				</Link>
+
+				<Link
+					href="https://reloop.sh/docs"
+					className="flex h-7 w-7 shrink-0 items-center justify-center text-text-sub-600 transition-transform hover:translate-x-0.5 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+				>
+					<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+				</Link>
 			</div>
 
 			<div className="-mt-1.5 rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
