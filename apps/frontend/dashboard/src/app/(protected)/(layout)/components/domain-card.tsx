@@ -501,7 +501,46 @@ export function DomainCard() {
 							</AnimatePresence>
 						</div>
 					</motion.div>
+				) : statusFilter ? (
+					/* Filtered empty state — domains exist but none match the chosen filter */
+					<motion.div
+						key="filtered-empty"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.15 }}
+						className="-mt-1.5 flex h-[250px] flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]"
+					>
+						<Icon
+							name={getStatusIcon(statusFilter)}
+							className={cn("h-6 w-6", getStatusColorClass(statusFilter))}
+						/>
+						<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
+							No {filterOptions.find((o) => o.id === statusFilter)?.label} domains
+						</h4>
+						<p className="mt-2 mb-4 max-w-[280px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
+							{statusFilter === "active" && "You don't have any verified domains yet."}
+							{statusFilter === "verifying" && "No domains are currently being verified."}
+							{statusFilter === "pending" && "No domains are waiting for DNS setup."}
+							{(statusFilter === "failed" || statusFilter === "suspended") &&
+								"No domains have a verification error right now."}
+						</p>
+						<button
+							type="button"
+							onClick={() => setStatusFilter(null)}
+							className={cn(
+								Button.buttonVariants({
+									variant: "neutral",
+									mode: "stroke",
+									size: "small",
+								}).root(),
+							)}
+						>
+							Clear filter
+						</button>
+					</motion.div>
 				) : (
+					/* Truly empty — no domains at all */
 					<motion.div
 						key="empty-state"
 						initial={{ opacity: 0 }}
@@ -510,23 +549,17 @@ export function DomainCard() {
 						transition={{ duration: 0.15 }}
 						className="-mt-1.5 flex h-[250px] flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]"
 					>
-						{/* Icon outline without pill wrapper */}
 						<Icon
 							name="globe"
 							className="h-6 w-6 text-text-sub-600 dark:text-white/40"
 						/>
-
-						{/* Heading */}
 						<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
 							Send emails from your own domain
 						</h4>
-
-						{/* Description */}
 						<p className="mt-2 mb-4 max-w-[340px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
 							Configure SPF, DKIM, and DMARC to protect deliverability and your
 							domain reputation.
 						</p>
-
 						<Link
 							href="/domain/add"
 							className={cn(
