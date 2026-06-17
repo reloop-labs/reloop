@@ -160,9 +160,9 @@ const RowActionsDropdown = ({ domain, onDelete }: RowActionsDropdownProps) => {
 				<Popover.Trigger asChild>
 					<button
 						type="button"
-						className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 transition-colors hover:bg-bg-weak-50/50 hover:text-text-strong-950 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/60"
+						className="flex h-5 w-5 shrink-0 items-center justify-end text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white focus:outline-none"
 					>
-						<MoreHorizontal className="h-3.5 w-3.5" />
+						<MoreHorizontal className="h-4 w-4" />
 					</button>
 				</Popover.Trigger>
 				<Popover.Content
