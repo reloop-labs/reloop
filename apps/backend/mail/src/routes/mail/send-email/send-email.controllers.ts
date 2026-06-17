@@ -1,4 +1,5 @@
 import { MailErrors } from "@reloop/be-mail/lib/errors";
+import { mailConfig } from "@reloop/be-mail/mail.config";
 import type { MailModel } from "@reloop/be-mail/model/mail.model";
 import { db } from "@reloop/db/client";
 import { emailThread, organization, threadMessage } from "@reloop/db/schema";
@@ -258,14 +259,12 @@ export async function sendEmailController({
 	});
 
 	// ── Fire-and-forget: ingest usage event into Lago ───────────────────────────
-	const lagoUrl = process.env.LAGO_API_URL || "http://localhost:3000";
-	const lagoKey = process.env.LAGO_API_KEY || "";
-	if (lagoKey) {
-		fetch(`${lagoUrl}/api/v1/events`, {
+	if (mailConfig.LAGO_API_KEY) {
+		fetch(`${mailConfig.LAGO_API_URL}/api/v1/events`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: `Bearer ${lagoKey}`,
+				Authorization: `Bearer ${mailConfig.LAGO_API_KEY}`,
 			},
 			body: JSON.stringify({
 				event: {
