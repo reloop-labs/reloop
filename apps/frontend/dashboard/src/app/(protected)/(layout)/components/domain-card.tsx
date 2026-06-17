@@ -420,7 +420,7 @@ export function DomainCard() {
 											</Tooltip.Provider>
 
 											<Link
-												href="/domain"
+												href={`/domain/${d.id}`}
 												className="truncate font-semibold text-text-strong-950 text-xs group-hover/row:underline dark:text-white"
 											>
 												{d.domain}
