@@ -99,7 +99,7 @@ export function DomainCard() {
 	return (
 		<div className="group flex w-full flex-col">
 			{/* Header */}
-			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-3 pb-5 dark:border-white/5 dark:bg-white/[0.02]">
+			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-1.5 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
 				{/* Title and Count Badge */}
 				<Link
 					href="/domain"
@@ -211,7 +211,7 @@ export function DomainCard() {
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
 						transition={{ duration: 0.15 }}
-						className="-mt-2.5 h-[200px] overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]"
+						className="-mt-1.5 h-[250px] overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]"
 					>
 						<div className="divide-y divide-stroke-soft-100/10 dark:divide-white/5">
 							<AnimatePresence initial={false}>
@@ -230,7 +230,10 @@ export function DomainCard() {
 											<Tooltip.Provider delayDuration={0}>
 												<Tooltip.Root>
 													<Tooltip.Trigger asChild>
-														<button className="flex shrink-0 cursor-help items-center">
+														<button
+															type="button"
+															className="flex shrink-0 cursor-help items-center"
+														>
 															{d.status === "active" ? (
 																<Icon
 																	name="check-circle"
@@ -279,7 +282,10 @@ export function DomainCard() {
 										{/* Right column: Metric value or simple ellipsis icon */}
 										<div className="flex w-12 shrink-0 items-center justify-end text-right">
 											{index >= 3 ? (
-												<button className="text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white">
+												<button
+													type="button"
+													className="text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white"
+												>
 													<MoreHorizontal className="h-4 w-4" />
 												</button>
 											) : (
@@ -300,12 +306,12 @@ export function DomainCard() {
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
 						transition={{ duration: 0.15 }}
-						className="-mt-2.5 flex flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]"
+						className="-mt-1.5 flex h-[250px] flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]"
 					>
 						{/* Icon outline without pill wrapper */}
 						<Icon
 							name="globe"
-							className="h-5 w-5 text-text-sub-600 dark:text-white/40"
+							className="h-6 w-6 text-text-sub-600 dark:text-white/40"
 						/>
 
 						{/* Heading */}
@@ -314,21 +320,23 @@ export function DomainCard() {
 						</h4>
 
 						{/* Description */}
-						<p className="mt-2 max-w-[340px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
+						<p className="mt-2 mb-4 max-w-[340px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
 							Configure SPF, DKIM, and DMARC to protect deliverability and your
 							domain reputation.
 						</p>
 
-						{/* Button */}
-						<Button.Root
-							variant="neutral"
-							mode="stroke"
-							size="xsmall"
-							asChild
-							className="mt-3 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
+						<Link
+							href="/domain/add"
+							className={cn(
+								Button.buttonVariants({
+									variant: "neutral",
+									mode: "stroke",
+									size: "small",
+								}).root(),
+							)}
 						>
-							<Link href="/domain">Add your domain</Link>
-						</Button.Root>
+							Add your domain
+						</Link>
 					</motion.div>
 				)}
 			</AnimatePresence>
