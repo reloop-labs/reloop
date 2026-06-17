@@ -44,9 +44,23 @@ export async function listDomainsController({
 			},
 		});
 
+		const domainsWithCounts = await Promise.all(
+			domains.map(async (d) => {
+				const [sentCountResult] = await db
+					.select({ count: count() })
+					.from(schema.emailLog)
+					.where(eq(schema.emailLog.domainId, d.id));
+				return {
+					...d,
+					sentCount: Number(sentCountResult?.count || 0),
+					object: "domain" as const,
+				};
+			})
+		);
+
 		const finalResponse = {
 			object: "domain" as const,
-			domains: domains.map((d) => ({ ...d, object: "domain" as const })),
+			domains: domainsWithCounts,
 			total,
 			page,
 			limit,

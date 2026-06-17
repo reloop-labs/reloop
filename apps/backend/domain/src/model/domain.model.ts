@@ -201,6 +201,9 @@ export namespace DomainModel {
 			verificationFailedReason: t.Union([t.String(), t.Null()], {
 				description: "Reason for verification failure",
 			}),
+			sentCount: t.Optional(t.Number({
+				description: "Number of emails sent using this domain",
+			})),
 			dnsRecords: t.Array(dnsRecordResponse, {
 				description: "DNS records for the domain",
 			}),
