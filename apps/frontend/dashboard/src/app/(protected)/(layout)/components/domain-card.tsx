@@ -34,11 +34,8 @@ export function DomainCard() {
 				href="/domain"
 				className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-3 pb-5 dark:border-white/5 dark:bg-white/[0.02]"
 			>
-				<span className="flex items-center gap-2 font-medium text-sm text-text-strong-950 dark:text-white">
-					<Icon
-						name="globe"
-						className="h-4 w-4 text-text-sub-600 dark:text-white/60"
-					/>
+				<span className="flex items-center gap-2 font-medium text-sm text-text-sub-600 dark:text-white/60">
+					<Icon name="globe" className="h-4 w-4 shrink-0" />
 					<span>Domains</span>
 				</span>
 				<ArrowRight className="h-4 w-4 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/60" />
@@ -46,7 +43,7 @@ export function DomainCard() {
 
 			{/* Body */}
 			{domainData?.domains && domainData.domains.length > 0 ? (
-				<div className="-mt-2.5 min-h-[175px] divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+				<div className="-mt-2.5 h-[200px] divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
 					<div className="divide-y divide-stroke-soft-100/10 dark:divide-white/5">
 						{domainData.domains.slice(0, 3).map((d) => (
 							<div
@@ -87,7 +84,7 @@ export function DomainCard() {
 					</div>
 				</div>
 			) : (
-				<div className="-mt-2.5 flex min-h-[175px] flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+				<div className="-mt-2.5 flex h-[200px] flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
 					{/* Icon outline without pill wrapper */}
 					<Icon
 						name="globe"
