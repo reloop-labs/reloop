@@ -208,7 +208,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 																}
 																onPointerLeave={() => setHoveredEl(undefined)}
 																className={cn(
-																	"relative z-10 flex h-6 items-center gap-1.5 rounded-md px-2 font-medium text-[12px]",
+																	"relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-[12px]",
 																	isSubActive
 																		? "text-primary-base"
 																		: "text-text-sub-600",
