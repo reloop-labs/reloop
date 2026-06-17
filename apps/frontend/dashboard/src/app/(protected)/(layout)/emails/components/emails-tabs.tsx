@@ -11,12 +11,12 @@ const items = [
 	{
 		title: "Sent",
 		value: "sent",
-		iconName: "send",
+		iconName: "mail-send",
 	},
 	{
 		title: "Received",
 		value: "received",
-		iconName: "inbox",
+		iconName: "mail-receive",
 	},
 ];
 

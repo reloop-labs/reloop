@@ -24,8 +24,8 @@ export const mainNavigation: MainNavigationItem[] = [
 		path: "/emails",
 		iconName: "mail-single",
 		items: [
-			{ label: "Sent", path: "/emails/sent", iconName: "send" },
-			{ label: "Received", path: "/emails/received", iconName: "inbox" },
+			{ label: "Sent", path: "/emails/sent", iconName: "mail-send" },
+			{ label: "Received", path: "/emails/received", iconName: "mail-receive" },
 		],
 	},
 	{

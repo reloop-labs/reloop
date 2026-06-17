@@ -45,8 +45,8 @@ export function EmailsCard() {
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
 	const tabItems = [
-		{ title: "Sent", value: "sent" as const, iconName: "send" },
-		{ title: "Received", value: "received" as const, iconName: "inbox" },
+		{ title: "Sent", value: "sent" as const, iconName: "mail-send" },
+		{ title: "Received", value: "received" as const, iconName: "mail-receive" },
 	];
 
 	const activeIndex = tabItems.findIndex((item) => item.value === activeTab);
@@ -228,7 +228,7 @@ export function EmailsCard() {
 						) : (
 							<div className="flex h-full flex-col items-center justify-center p-6 text-center">
 								<Icon
-									name="mail-single"
+									name="mail-send"
 									className="h-6 w-6 text-text-sub-600 dark:text-white/40"
 								/>
 								<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
@@ -291,7 +291,7 @@ export function EmailsCard() {
 					) : (
 						<div className="flex h-full flex-col items-center justify-center p-6 text-center">
 							<Icon
-								name="inbox"
+								name="mail-receive"
 								className="h-6 w-6 text-text-sub-600 dark:text-white/40"
 							/>
 							<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
