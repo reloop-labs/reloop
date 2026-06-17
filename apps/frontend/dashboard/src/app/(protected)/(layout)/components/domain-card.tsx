@@ -13,6 +13,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, MoreHorizontal, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
+import { DeleteDomainModal } from "../domain/components/delete-domain";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -102,7 +104,7 @@ const getTooltipText = (
 
 interface RowActionsDropdownProps {
 	domain: DomainData;
-	onDelete: (id: string) => Promise<void>;
+	onDelete: (id: string) => void;
 	onOpenChange?: (open: boolean) => void;
 }
 
@@ -162,7 +164,7 @@ const RowActionsDropdown = ({
 			navigator.clipboard.writeText(domain.domain);
 			toast.success("Domain name copied to clipboard");
 		} else if (itemId === "delete") {
-			await onDelete(domain.id);
+			onDelete(domain.id);
 		}
 	};
 
@@ -250,14 +252,10 @@ export function DomainCard() {
 			: null,
 	);
 
-	const handleDeleteDomain = async (id: string) => {
-		try {
-			await axios.delete(`/api/domain/v1/${id}`);
-			toast.success("Domain deleted successfully");
-			mutate();
-		} catch (error) {
-			toast.error("Failed to delete domain");
-		}
+	const [_, setDeleteId] = useQueryState("delete");
+
+	const handleDeleteDomain = (id: string) => {
+		setDeleteId(id);
 	};
 
 	return (
@@ -377,7 +375,7 @@ export function DomainCard() {
 						transition={{ duration: 0.15 }}
 						className="-mt-1.5 h-[250px] overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]"
 					>
-						<div className="divide-y divide-stroke-soft-100 px-4 dark:divide-white/5">
+						<div className="px-4">
 							<AnimatePresence initial={false}>
 								{domainData.domains.slice(0, 5).map((d, index) => (
 									<motion.div
@@ -387,7 +385,7 @@ export function DomainCard() {
 										animate={{ opacity: 1, y: 0 }}
 										exit={{ opacity: 0, y: -6 }}
 										transition={{ duration: 0.2 }}
-										className="group/row flex items-center justify-between py-2.5"
+										className="group/row flex items-center justify-between border-b border-stroke-soft-100 py-2.5 dark:border-white/5"
 									>
 										{/* Left column: Status indicator + Domain name */}
 										<div className="flex min-w-0 items-center gap-2">
@@ -431,7 +429,7 @@ export function DomainCard() {
 
 										{/* Middle column: Custom charts depending on index */}
 										<div className="hidden flex-1 items-center justify-center px-8 sm:flex">
-											{d.status === "active" && (
+											{d.status === "active" && (d.sentCount || 0) > 0 && (
 												<>
 													{index === 0 && <FadingGradientBar />}
 													{index === 1 && <WaveSparkline />}
@@ -443,7 +441,7 @@ export function DomainCard() {
 										{/* Right column: Metric value or simple ellipsis icon */}
 										<div className="flex w-12 shrink-0 items-center justify-end text-right">
 											{d.status === "active" ? (
-												<div className="relative flex h-7 w-12 items-center justify-end">
+												<div className="relative flex h-5 w-12 items-center justify-end">
 													<span
 														className={cn(
 															"font-semibold text-text-strong-950 text-xs dark:text-white",
@@ -479,21 +477,23 @@ export function DomainCard() {
 													</div>
 												</div>
 											) : (
-												<RowActionsDropdown
-													domain={d}
-													onDelete={handleDeleteDomain}
-													onOpenChange={(open) => {
-														if (open) {
-															setActiveDropdownId(d.id);
-														} else {
-															setTimeout(() => {
-																setActiveDropdownId((curr) =>
-																	curr === d.id ? null : curr,
-																);
-															}, 150);
-														}
-													}}
-												/>
+												<div className="relative flex h-5 w-12 items-center justify-end">
+													<RowActionsDropdown
+														domain={d}
+														onDelete={handleDeleteDomain}
+														onOpenChange={(open) => {
+															if (open) {
+																setActiveDropdownId(d.id);
+															} else {
+																setTimeout(() => {
+																	setActiveDropdownId((curr) =>
+																		curr === d.id ? null : curr,
+																	);
+																}, 150);
+															}
+														}}
+													/>
+												</div>
 											)}
 										</div>
 									</motion.div>
@@ -542,6 +542,11 @@ export function DomainCard() {
 					</motion.div>
 				)}
 			</AnimatePresence>
+
+			<DeleteDomainModal
+				domains={(domainData?.domains as any) || []}
+				mutate={mutate}
+			/>
 		</div>
 	);
 }
