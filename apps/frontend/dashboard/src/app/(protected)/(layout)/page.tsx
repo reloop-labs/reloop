@@ -1,6 +1,7 @@
 "use client";
 
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { cn } from "@reloop/ui/cn";
 import {
 	ArrowRight,
 	BookOpen,
@@ -16,7 +17,7 @@ import {
 	Zap,
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
 	Area,
 	AreaChart,
@@ -108,6 +109,71 @@ interface EmailStatsResponse {
 	rate: number[];
 }
 
+interface DomainData {
+	id: string;
+	domain: string;
+	status: "pending" | "verifying" | "active" | "suspended" | "failed";
+	createdAt: string;
+}
+
+interface DomainListResponse {
+	domains: DomainData[];
+	total: number;
+}
+
+interface EmailLogData {
+	id: string;
+	subject: string;
+	fromEmail: string;
+	toEmails: string[];
+	status: string;
+	createdAt: string;
+}
+
+interface EmailListResponse {
+	object: "list";
+	data: EmailLogData[];
+	total: number;
+	page: number;
+	limit: number;
+}
+
+interface BackendMessage {
+	id: string;
+	mailboxId: string;
+	organizationId: string;
+	fromEmail: string;
+	fromName: string | null;
+	toEmails: string[];
+	subject: string | null;
+	snippet: string | null;
+	status: string;
+	isRead: boolean;
+	isSpam: boolean;
+	createdAt: string | Date;
+}
+
+interface LogData {
+	uuid: string;
+	event: string;
+	level: string;
+	status_code?: number | null;
+	created_at: string;
+}
+
+interface LogListResponse {
+	logs: LogData[];
+	count: number;
+}
+
+interface Workflow {
+	id: string;
+	name: string;
+	description?: string;
+	status: "draft" | "active";
+	updatedAt: string;
+}
+
 export default function Home() {
 	const { user, activeOrganization } = useUserOrganization();
 
@@ -141,6 +207,62 @@ export default function Home() {
 			? `/api/logs/v1/emails/stats?start_date=${start_date}&end_date=${end_date}`
 			: null,
 	);
+
+	const { data: domainData } = useSWR<DomainListResponse>(
+		activeOrganization?.id ? "/api/domain/v1/list?limit=5&page=1" : null,
+	);
+
+	const { data: emailLogsData } = useSWR<EmailListResponse>(
+		activeOrganization?.id ? "/api/logs/v1/emails?limit=5&page=1" : null,
+	);
+
+	const { data: inboxMessagesData } = useSWR<BackendMessage[]>(
+		activeOrganization?.id ? "/api/inbox/v1/messages" : null,
+	);
+
+	const { data: auditLogsData } = useSWR<LogListResponse>(
+		activeOrganization?.id ? "/api/logs/v1/list?limit=5" : null,
+	);
+
+	// Workflows state loading / seeding
+	const [workflows, setWorkflows] = useState<Workflow[]>([]);
+	const orgSlug = activeOrganization?.slug ?? "";
+	const orgId = activeOrganization?.id ?? "";
+
+	useEffect(() => {
+		if (orgSlug && orgId) {
+			const storageKey = `workflows:${orgSlug}`;
+			const stored = localStorage.getItem(storageKey);
+			if (stored) {
+				try {
+					setWorkflows(JSON.parse(stored));
+				} catch (_e) {
+					// ignore
+				}
+			} else {
+				const seeds: Workflow[] = [
+					{
+						id: "wf_mock_welcome",
+						name: "Welcome on delivery",
+						description: "Send a follow-up when an email is delivered",
+						status: "active",
+						updatedAt: new Date().toISOString(),
+					},
+					{
+						id: "wf_mock_bounce",
+						name: "Bounce alert",
+						description: "Notify your team when delivery fails",
+						status: "draft",
+						updatedAt: new Date().toISOString(),
+					},
+				];
+				localStorage.setItem(storageKey, JSON.stringify(seeds));
+				setWorkflows(seeds);
+			}
+		} else {
+			setWorkflows([]);
+		}
+	}, [orgSlug, orgId]);
 
 	// Process primary API key
 	const primaryApiKey = apiKeysData?.apiKeys?.[0];
@@ -220,153 +342,275 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 
 				<div className="grid gap-6 pt-2 md:grid-cols-2 lg:grid-cols-3">
 					{/* Emails Card */}
-					<div className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 transition-all duration-200 hover:border-orange-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-orange-500/20 dark:hover:bg-white/[0.02]">
+					<div className="group flex w-full flex-col">
 						{/* Header */}
 						<Link
 							href="/emails"
-							className="flex items-center justify-between border-stroke-soft-100/50 border-b px-5 py-4 dark:border-white/5"
+							className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-4 pb-6 dark:border-white/5 dark:bg-white/[0.02]"
 						>
-							<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
+							<span className="flex items-center gap-2 font-medium text-sm text-text-strong-950 dark:text-white">
+								<Mail className="h-4 w-4 text-orange-500" />
 								Emails
 							</span>
 							<ArrowRight className="h-4 w-4 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/60" />
 						</Link>
 
-						{/* Inner Box */}
-						<div className="m-4 flex flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center dark:border-white/5 dark:bg-white/[0.02]">
-							{/* Icon */}
-							<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-500 dark:bg-orange-500/10 dark:text-orange-400">
-								<Mail className="h-6 w-6" />
+						{/* Body */}
+						{emailLogsData?.data && emailLogsData.data.length > 0 ? (
+							<div className="-mt-2.5 min-h-[175px] divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+								<div className="divide-y divide-stroke-soft-100/10 dark:divide-white/5">
+									{emailLogsData.data.slice(0, 3).map((d) => (
+										<div
+											key={d.id}
+											className="grid grid-cols-3 items-center px-4 py-2.5 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.01]"
+										>
+											<div className="flex min-w-0 flex-col pr-2">
+												<span className="truncate font-semibold text-text-strong-950 text-xs dark:text-white">
+													{d.toEmails?.[0] || d.fromEmail || "(No Recipient)"}
+												</span>
+												<span className="truncate text-[10px] text-text-sub-600 dark:text-white/40">
+													{d.subject || "(No Subject)"}
+												</span>
+											</div>
+											<div className="flex items-center justify-center">
+												<span
+													className={cn(
+														"inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 font-semibold text-[9px] uppercase tracking-wider",
+														d.status === "delivered"
+															? "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400"
+															: d.status === "sent"
+																? "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400"
+																: "bg-zinc-50 text-zinc-600 dark:bg-zinc-500/10 dark:text-zinc-400",
+													)}
+												>
+													{d.status}
+												</span>
+											</div>
+											<div className="flex shrink-0 items-center justify-end whitespace-nowrap text-[10px] text-text-sub-600 dark:text-white/40">
+												{new Date(d.createdAt).toLocaleDateString([], {
+													month: "short",
+													day: "numeric",
+												})}
+											</div>
+										</div>
+									))}
+								</div>
 							</div>
+						) : (
+							<div className="-mt-2.5 flex min-h-[175px] flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+								{/* Icon outline without pill wrapper */}
+								<Mail className="h-6 w-6 text-text-sub-600 dark:text-white/40" />
 
-							{/* Heading */}
-							<h4 className="mt-4 font-semibold text-sm text-text-strong-950 tracking-tight dark:text-white">
-								Send emails without the overhead
-							</h4>
+								{/* Heading */}
+								<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
+									Send emails without the overhead
+								</h4>
 
-							{/* Description */}
-							<p className="mt-2 max-w-[220px] text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								Send transactional & marketing emails with high deliverability.
-							</p>
+								{/* Description */}
+								<p className="mt-2 max-w-[240px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
+									Send transactional & marketing emails with high
+									deliverability.
+								</p>
 
-							{/* Button */}
-							<Link
-								href="/emails"
-								className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-semibold text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
-							>
-								Send email
-							</Link>
-						</div>
+								{/* Button */}
+								<Link
+									href="/emails"
+									className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-medium text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
+								>
+									Send email
+								</Link>
+							</div>
+						)}
 					</div>
 
 					{/* Agent Inbox Card */}
-					<div className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 transition-all duration-200 hover:border-blue-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-blue-500/20 dark:hover:bg-white/[0.02]">
+					<div className="group flex w-full flex-col">
 						{/* Header */}
 						<Link
 							href="/agent-inbox"
-							className="flex items-center justify-between border-stroke-soft-100/50 border-b px-5 py-4 dark:border-white/5"
+							className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-4 pb-6 dark:border-white/5 dark:bg-white/[0.02]"
 						>
-							<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
+							<span className="flex items-center gap-2 font-medium text-sm text-text-strong-950 dark:text-white">
+								<Inbox className="h-4 w-4 text-blue-500" />
 								Inbox Triage
 							</span>
 							<ArrowRight className="h-4 w-4 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/60" />
 						</Link>
 
-						{/* Inner Box */}
-						<div className="m-4 flex flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center dark:border-white/5 dark:bg-white/[0.02]">
-							{/* Icon */}
-							<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400">
-								<Inbox className="h-6 w-6" />
+						{/* Body */}
+						{inboxMessagesData && inboxMessagesData.length > 0 ? (
+							<div className="-mt-2.5 min-h-[175px] divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+								<div className="divide-y divide-stroke-soft-100/10 dark:divide-white/5">
+									{inboxMessagesData.slice(0, 3).map((d) => (
+										<div
+											key={d.id}
+											className="grid grid-cols-3 items-center px-4 py-2.5 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.01]"
+										>
+											<div className="flex min-w-0 flex-col pr-2">
+												<span className="truncate font-semibold text-text-strong-950 text-xs dark:text-white">
+													{d.fromName || d.fromEmail || "(Unknown)"}
+												</span>
+												<span className="truncate text-[10px] text-text-sub-600 dark:text-white/40">
+													{d.subject || "(No Subject)"}
+												</span>
+											</div>
+											<div className="flex items-center justify-center">
+												<span
+													className={cn(
+														"inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 font-semibold text-[9px] uppercase tracking-wider",
+														d.status === "received" || d.status === "active"
+															? "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400"
+															: d.status === "processing"
+																? "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"
+																: "bg-zinc-50 text-zinc-600 dark:bg-zinc-500/10 dark:text-zinc-400",
+													)}
+												>
+													{d.status}
+												</span>
+											</div>
+											<div className="flex shrink-0 items-center justify-end whitespace-nowrap text-[10px] text-text-sub-600 dark:text-white/40">
+												{new Date(d.createdAt).toLocaleDateString([], {
+													month: "short",
+													day: "numeric",
+												})}
+											</div>
+										</div>
+									))}
+								</div>
 							</div>
+						) : (
+							<div className="-mt-2.5 flex min-h-[175px] flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+								{/* Icon outline without pill wrapper */}
+								<Inbox className="h-6 w-6 text-text-sub-600 dark:text-white/40" />
 
-							{/* Heading */}
-							<h4 className="mt-4 font-semibold text-sm text-text-strong-950 tracking-tight dark:text-white">
-								Triage messages without the overhead
-							</h4>
+								{/* Heading */}
+								<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
+									Triage messages without the overhead
+								</h4>
 
-							{/* Description */}
-							<p className="mt-2 max-w-[220px] text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								Interact with incoming messages using AI prompts or human
-								routing.
-							</p>
+								{/* Description */}
+								<p className="mt-2 max-w-[240px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
+									Interact with incoming messages using AI prompts or human
+									routing.
+								</p>
 
-							{/* Button */}
-							<Link
-								href="/agent-inbox"
-								className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-semibold text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
-							>
-								Open inbox
-							</Link>
-						</div>
+								{/* Button */}
+								<Link
+									href="/agent-inbox"
+									className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-medium text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
+								>
+									Open inbox
+								</Link>
+							</div>
+						)}
 					</div>
 
 					{/* Audit Logs Card */}
-					<div className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 transition-all duration-200 hover:border-slate-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-slate-500/20 dark:hover:bg-white/[0.02]">
+					<div className="group flex w-full flex-col">
 						{/* Header */}
 						<Link
 							href="/logs"
-							className="flex items-center justify-between border-stroke-soft-100/50 border-b px-5 py-4 dark:border-white/5"
+							className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-4 pb-6 dark:border-white/5 dark:bg-white/[0.02]"
 						>
-							<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
+							<span className="flex items-center gap-2 font-medium text-sm text-text-strong-950 dark:text-white">
+								<Shield className="h-4 w-4 text-slate-500" />
 								Audit Logs
 							</span>
 							<ArrowRight className="h-4 w-4 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/60" />
 						</Link>
 
-						{/* Inner Box */}
-						<div className="m-4 flex flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center dark:border-white/5 dark:bg-white/[0.02]">
-							{/* Icon */}
-							<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-slate-500 dark:bg-slate-500/10 dark:text-slate-400">
-								<Shield className="h-6 w-6" />
+						{/* Body */}
+						{auditLogsData?.logs && auditLogsData.logs.length > 0 ? (
+							<div className="-mt-2.5 min-h-[175px] divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+								<div className="divide-y divide-stroke-soft-100/10 dark:divide-white/5">
+									{auditLogsData.logs.slice(0, 3).map((d) => (
+										<div
+											key={d.uuid}
+											className="grid grid-cols-3 items-center px-4 py-2.5 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.01]"
+										>
+											<div className="flex min-w-0 flex-col pr-2">
+												<span className="truncate font-semibold text-text-strong-950 text-xs dark:text-white">
+													{d.event}
+												</span>
+												<span className="truncate text-[10px] text-text-sub-600 dark:text-white/40">
+													{d.uuid}
+												</span>
+											</div>
+											<div className="flex items-center justify-center">
+												<span
+													className={cn(
+														"inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 font-semibold text-[9px] uppercase tracking-wider",
+														d.level === "error" ||
+															(d.status_code && d.status_code >= 400)
+															? "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400"
+															: "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400",
+													)}
+												>
+													{d.level || "info"}
+												</span>
+											</div>
+											<div className="flex shrink-0 items-center justify-end whitespace-nowrap text-[10px] text-text-sub-600 dark:text-white/40">
+												{new Date(d.created_at).toLocaleTimeString([], {
+													hour: "2-digit",
+													minute: "2-digit",
+												})}
+											</div>
+										</div>
+									))}
+								</div>
 							</div>
+						) : (
+							<div className="-mt-2.5 flex min-h-[175px] flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+								{/* Icon outline without pill wrapper */}
+								<Shield className="h-6 w-6 text-text-sub-600 dark:text-white/40" />
 
-							{/* Heading */}
-							<h4 className="mt-4 font-semibold text-sm text-text-strong-950 tracking-tight dark:text-white">
-								Track activity without the overhead
-							</h4>
+								{/* Heading */}
+								<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
+									Track activity without the overhead
+								</h4>
 
-							{/* Description */}
-							<p className="mt-2 max-w-[220px] text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								Track security events, API key access, and team actions.
-							</p>
+								{/* Description */}
+								<p className="mt-2 max-w-[240px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
+									Track security events, API key access, and team actions.
+								</p>
 
-							{/* Button */}
-							<Link
-								href="/logs"
-								className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-semibold text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
-							>
-								View audit logs
-							</Link>
-						</div>
+								{/* Button */}
+								<Link
+									href="/logs"
+									className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-medium text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
+								>
+									View audit logs
+								</Link>
+							</div>
+						)}
 					</div>
 
 					{/* Docs Card (Premium style) */}
-					<div className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 transition-all duration-200 hover:border-indigo-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-indigo-500/20 dark:hover:bg-white/[0.02]">
+					<div className="group flex w-full flex-col">
 						{/* Header */}
 						<Link
 							href="https://reloop.sh/docs"
-							className="flex items-center justify-between border-stroke-soft-100/50 border-b px-5 py-4 dark:border-white/5"
+							className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 py-4 pb-6 dark:border-white/5 dark:bg-white/[0.02]"
 						>
-							<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
+							<span className="flex items-center gap-2 font-medium text-sm text-text-strong-950 dark:text-white">
+								<BookOpen className="h-4 w-4 text-indigo-500" />
 								Docs
 							</span>
 							<ArrowRight className="h-4 w-4 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/60" />
 						</Link>
 
-						{/* Inner Box */}
-						<div className="m-4 flex flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center dark:border-white/5 dark:bg-white/[0.02]">
-							{/* Icon */}
-							<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-500 dark:bg-indigo-500/10 dark:text-indigo-400">
-								<BookOpen className="h-6 w-6" />
-							</div>
+						{/* Body */}
+						<div className="-mt-2.5 flex min-h-[175px] flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+							{/* Icon outline without pill wrapper */}
+							<BookOpen className="h-6 w-6 text-text-sub-600 dark:text-white/40" />
 
 							{/* Heading */}
-							<h4 className="mt-4 font-semibold text-sm text-text-strong-950 tracking-tight dark:text-white">
+							<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
 								Learn integration without the overhead
 							</h4>
 
 							{/* Description */}
-							<p className="mt-2 max-w-[220px] text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50">
+							<p className="mt-2 max-w-[240px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
 								Explore tutorials, SDK documentation, and API guides to build
 								faster.
 							</p>
@@ -374,7 +618,7 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 							{/* Button */}
 							<Link
 								href="https://reloop.sh/docs"
-								className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-semibold text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
+								className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-medium text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
 							>
 								Read documentation
 							</Link>
@@ -382,13 +626,14 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 					</div>
 
 					{/* Workflows Card */}
-					<div className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 transition-all duration-200 hover:border-purple-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-purple-500/20 dark:hover:bg-white/[0.02]">
+					<div className="group flex w-full flex-col">
 						{/* Header */}
 						<Link
 							href="/workflows"
-							className="flex items-center justify-between border-stroke-soft-100/50 border-b px-5 py-4 dark:border-white/5"
+							className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 py-4 pb-6 dark:border-white/5 dark:bg-white/[0.02]"
 						>
-							<span className="flex items-center gap-1.5 font-semibold text-sm text-text-strong-950 dark:text-white">
+							<span className="flex items-center gap-2 font-medium text-sm text-text-strong-950 dark:text-white">
+								<Zap className="h-4 w-4 text-purple-500" />
 								Workflows
 								<span className="rounded bg-purple-100 px-1 py-0.2 font-semibold text-[8px] text-purple-800 uppercase dark:bg-purple-500/25 dark:text-purple-300">
 									New
@@ -397,73 +642,165 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 							<ArrowRight className="h-4 w-4 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/60" />
 						</Link>
 
-						{/* Inner Box */}
-						<div className="m-4 flex flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center dark:border-white/5 dark:bg-white/[0.02]">
-							{/* Icon */}
-							<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-50 text-purple-500 dark:bg-purple-500/10 dark:text-purple-400">
-								<Zap className="h-6 w-6" />
+						{/* Body */}
+						{workflows && workflows.length > 0 ? (
+							<div className="-mt-2.5 min-h-[175px] divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+								<div className="divide-y divide-stroke-soft-100/10 dark:divide-white/5">
+									{workflows.slice(0, 3).map((d) => (
+										<div
+											key={d.id}
+											className="grid grid-cols-3 items-center px-4 py-2.5 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.01]"
+										>
+											<div className="flex min-w-0 flex-col pr-2">
+												<span className="truncate font-semibold text-text-strong-950 text-xs dark:text-white">
+													{d.name}
+												</span>
+												<span className="truncate text-[10px] text-text-sub-600 dark:text-white/40">
+													{d.description || "No description"}
+												</span>
+											</div>
+											<div className="flex items-center justify-center">
+												<span
+													className={cn(
+														"inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 font-semibold text-[9px] uppercase tracking-wider",
+														d.status === "active"
+															? "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400"
+															: "bg-zinc-50 text-zinc-600 dark:bg-zinc-500/10 dark:text-zinc-400",
+													)}
+												>
+													{d.status}
+												</span>
+											</div>
+											<div className="flex shrink-0 items-center justify-end whitespace-nowrap text-[10px] text-text-sub-600 dark:text-white/40">
+												{new Date(d.updatedAt).toLocaleDateString([], {
+													month: "short",
+													day: "numeric",
+												})}
+											</div>
+										</div>
+									))}
+								</div>
 							</div>
+						) : (
+							<div className="-mt-2.5 flex min-h-[175px] flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+								{/* Icon outline without pill wrapper */}
+								<Zap className="h-6 w-6 text-text-sub-600 dark:text-white/40" />
 
-							{/* Heading */}
-							<h4 className="mt-4 font-semibold text-sm text-text-strong-950 tracking-tight dark:text-white">
-								Build automations without the overhead
-							</h4>
+								{/* Heading */}
+								<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
+									Build automations without the overhead
+								</h4>
 
-							{/* Description */}
-							<p className="mt-2 max-w-[220px] text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								From triggers to multi-step AI actions — automate your flows in
-								minutes.
-							</p>
+								{/* Description */}
+								<p className="mt-2 max-w-[240px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
+									From triggers to multi-step AI actions — automate your flows
+									in minutes.
+								</p>
 
-							{/* Button */}
-							<Link
-								href="/workflows"
-								className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-semibold text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
-							>
-								Start building
-							</Link>
-						</div>
+								{/* Button */}
+								<Link
+									href="/workflows"
+									className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-medium text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
+								>
+									Start building
+								</Link>
+							</div>
+						)}
 					</div>
 
 					{/* Domain Card */}
-					<div className="group flex flex-col justify-between rounded-2xl border border-stroke-soft-100 bg-white/40 transition-all duration-200 hover:border-teal-500/30 hover:bg-white dark:border-white/5 dark:bg-white/[0.01] dark:hover:border-teal-500/20 dark:hover:bg-white/[0.02]">
+					<div className="group flex w-full flex-col">
 						{/* Header */}
 						<Link
 							href="/domain"
-							className="flex items-center justify-between border-stroke-soft-100/50 border-b px-5 py-4 dark:border-white/5"
+							className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 py-4 pb-6 dark:border-white/5 dark:bg-white/[0.02]"
 						>
-							<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
-								Domains
+							<span className="flex items-center gap-2 font-medium text-sm text-text-strong-950 dark:text-white">
+								<Globe
+									className={cn(
+										"h-4 w-4",
+										domainData?.domains && domainData.domains.length > 0
+											? "text-orange-500 dark:text-orange-400"
+											: "text-teal-600 dark:text-teal-400",
+									)}
+								/>
+								<span
+									className={cn(
+										domainData?.domains && domainData.domains.length > 0
+											? "text-orange-500 dark:text-orange-400"
+											: "",
+									)}
+								>
+									Domains
+								</span>
 							</span>
 							<ArrowRight className="h-4 w-4 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/60" />
 						</Link>
 
-						{/* Inner Box */}
-						<div className="m-4 flex flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center dark:border-white/5 dark:bg-white/[0.02]">
-							{/* Icon */}
-							<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-400">
-								<Globe className="h-6 w-6" />
+						{/* Body */}
+						{domainData?.domains && domainData.domains.length > 0 ? (
+							<div className="-mt-2.5 min-h-[175px] divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+								<div className="divide-y divide-stroke-soft-100/10 dark:divide-white/5">
+									{domainData.domains.slice(0, 3).map((d) => (
+										<div
+											key={d.id}
+											className="grid grid-cols-3 items-center px-4 py-2.5 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.01]"
+										>
+											<div className="flex min-w-0 items-center gap-1.5 pr-2">
+												<Globe className="h-3.5 w-3.5 shrink-0 text-orange-500" />
+												<span className="truncate font-semibold text-orange-500 text-xs hover:underline dark:text-orange-400">
+													{d.domain}
+												</span>
+											</div>
+											<div className="flex items-center justify-center">
+												<span
+													className={cn(
+														"inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 font-semibold text-[9px] uppercase tracking-wider",
+														d.status === "active"
+															? "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400"
+															: d.status === "verifying"
+																? "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"
+																: "bg-zinc-50 text-zinc-600 dark:bg-zinc-500/10 dark:text-zinc-400",
+													)}
+												>
+													{d.status}
+												</span>
+											</div>
+											<div className="flex shrink-0 items-center justify-end whitespace-nowrap text-[10px] text-text-sub-600 dark:text-white/40">
+												{new Date(d.createdAt).toLocaleDateString([], {
+													month: "short",
+													day: "numeric",
+												})}
+											</div>
+										</div>
+									))}
+								</div>
 							</div>
+						) : (
+							<div className="-mt-2.5 flex min-h-[175px] flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+								{/* Icon outline without pill wrapper */}
+								<Globe className="h-6 w-6 text-text-sub-600 dark:text-white/40" />
 
-							{/* Heading */}
-							<h4 className="mt-4 font-semibold text-sm text-text-strong-950 tracking-tight dark:text-white">
-								Verify sending domains without the overhead
-							</h4>
+								{/* Heading */}
+								<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
+									Verify sending domains without the overhead
+								</h4>
 
-							{/* Description */}
-							<p className="mt-2 max-w-[220px] text-[12px] text-text-sub-600 leading-relaxed dark:text-white/50">
-								Set up SPF, DKIM, and DMARC verification to scale globally in
-								minutes.
-							</p>
+								{/* Description */}
+								<p className="mt-2 max-w-[240px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
+									Set up SPF, DKIM, and DMARC verification to scale globally in
+									minutes.
+								</p>
 
-							{/* Button */}
-							<Link
-								href="/domain"
-								className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-semibold text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
-							>
-								Configure domain
-							</Link>
-						</div>
+								{/* Button */}
+								<Link
+									href="/domain"
+									className="mt-6 inline-flex items-center justify-center rounded-lg border border-stroke-soft-100 bg-white px-4 py-2 font-medium text-text-strong-950 text-xs shadow-sm transition-colors hover:bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02] dark:text-white dark:hover:bg-white/5"
+								>
+									Configure domain
+								</Link>
+							</div>
+						)}
 					</div>
 				</div>
 			</div>
