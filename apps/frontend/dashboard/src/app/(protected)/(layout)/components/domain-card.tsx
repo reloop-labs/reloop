@@ -8,10 +8,13 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Popover from "@reloop/ui/popover";
 import * as Tooltip from "@reloop/ui/tooltip";
+import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, MoreHorizontal, Plus } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 import useSWR from "swr";
 
 interface DomainData {
@@ -91,6 +94,124 @@ const getTooltipText = (status: DomainData["status"], reason?: string | null) =>
 	}
 };
 
+interface RowActionsDropdownProps {
+	domain: DomainData;
+	onDelete: (id: string) => Promise<void>;
+}
+
+const RowActionsDropdown = ({ domain, onDelete }: RowActionsDropdownProps) => {
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const [popoverOpen, setPopoverOpen] = useState(false);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const router = useRouter();
+
+	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const currentRect = currentTab?.getBoundingClientRect();
+
+	const menuItems = [
+		{
+			id: "configure",
+			label: domain.status === "active" ? "View Details" : "Configure DNS",
+			icon: "globe" as const,
+			isDanger: false,
+		},
+		{
+			id: "copy-id",
+			label: "Copy Domain ID",
+			icon: "copy" as const,
+			isDanger: false,
+		},
+		{
+			id: "copy-domain",
+			label: "Copy Domain Name",
+			icon: "copy" as const,
+			isDanger: false,
+		},
+		{
+			id: "delete",
+			label: "Delete Domain",
+			icon: "trash" as const,
+			isDanger: true,
+		},
+	];
+
+	const hoveredItem = menuItems[hoverIdx ?? -1];
+	const isDanger = hoveredItem?.isDanger ?? false;
+
+	const handleItemClick = async (itemId: string, e: React.MouseEvent) => {
+		e.stopPropagation();
+		setPopoverOpen(false);
+		if (itemId === "configure") {
+			router.push(`/domain/${domain.id}`);
+		} else if (itemId === "copy-id") {
+			navigator.clipboard.writeText(domain.id);
+			toast.success("Domain ID copied to clipboard");
+		} else if (itemId === "copy-domain") {
+			navigator.clipboard.writeText(domain.domain);
+			toast.success("Domain name copied to clipboard");
+		} else if (itemId === "delete") {
+			await onDelete(domain.id);
+		}
+	};
+
+	return (
+		<div onClick={(e) => e.stopPropagation()}>
+			<Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
+				<Popover.Trigger asChild>
+					<button
+						type="button"
+						className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 transition-colors hover:bg-bg-weak-50/50 hover:text-text-strong-950 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/60"
+					>
+						<MoreHorizontal className="h-3.5 w-3.5" />
+					</button>
+				</Popover.Trigger>
+				<Popover.Content
+					align="end"
+					sideOffset={4}
+					className="w-48 p-2"
+					showArrow={true}
+				>
+					<div className="relative">
+						{menuItems.map((item, idx) => (
+							<button
+								key={item.id}
+								ref={(el) => {
+									if (el) buttonRefs.current[idx] = el;
+								}}
+								type="button"
+								onPointerEnter={() => setHoverIdx(idx)}
+								onPointerLeave={() => setHoverIdx(undefined)}
+								onClick={(e) => handleItemClick(item.id, e)}
+								className={cn(
+									"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
+									item.isDanger ? "text-error-base" : "text-text-strong-950",
+									!currentRect &&
+										hoverIdx === idx &&
+										(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
+								)}
+							>
+								<Icon
+									name={item.icon}
+									className={cn(
+										"h-3.5 w-3.5",
+										item.isDanger ? "" : "text-text-sub-600",
+									)}
+								/>
+								<span>{item.label}</span>
+							</button>
+						))}
+						<AnimatedHoverBackground
+							rect={currentRect}
+							tabElement={currentTab}
+							isDanger={isDanger}
+						/>
+					</div>
+				</Popover.Content>
+			</Popover.Root>
+		</div>
+	);
+};
+
 export function DomainCard() {
 	const { activeOrganization } = useUserOrganization();
 	const [statusFilter, setStatusFilter] = useState<DomainData["status"] | null>(
@@ -105,12 +226,21 @@ export function DomainCard() {
 
 	const currentTab = buttonRefs.current[activeIdx];
 	const currentRect = currentTab?.getBoundingClientRect();
-
-	const { data: domainData } = useSWR<DomainListResponse>(
+	const { data: domainData, mutate } = useSWR<DomainListResponse>(
 		activeOrganization?.id
 			? `/api/domain/v1/list?limit=5&page=1${statusFilter ? `&status=${statusFilter}` : ""}`
 			: null,
 	);
+
+	const handleDeleteDomain = async (id: string) => {
+		try {
+			await axios.delete(`/api/domain/v1/${id}`);
+			toast.success("Domain deleted successfully");
+			mutate();
+		} catch (error) {
+			toast.error("Failed to delete domain");
+		}
+	};
 
 	return (
 		<div className="group flex w-full flex-col">
@@ -279,24 +409,34 @@ export function DomainCard() {
 
 										{/* Middle column: Custom charts depending on index */}
 										<div className="hidden flex-1 items-center justify-center px-8 sm:flex">
-											{index === 0 && <FadingGradientBar />}
-											{index === 1 && <WaveSparkline />}
-											{index === 2 && <FadingGradientBar />}
+											{d.status === "active" && (
+												<>
+													{index === 0 && <FadingGradientBar />}
+													{index === 1 && <WaveSparkline />}
+													{index === 2 && <FadingGradientBar />}
+												</>
+											)}
 										</div>
 
 										{/* Right column: Metric value or simple ellipsis icon */}
 										<div className="flex w-12 shrink-0 items-center justify-end text-right">
-											{index >= 3 ? (
-												<button
-													type="button"
-													className="text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white"
-												>
-													<MoreHorizontal className="h-4 w-4" />
-												</button>
+											{d.status === "active" ? (
+												<div className="relative flex h-7 w-12 items-center justify-end">
+													<span className="block group-hover/row:hidden font-semibold text-text-strong-950 text-xs dark:text-white">
+														{formatCount(d.sentCount || 0)}
+													</span>
+													<div className="hidden group-hover/row:block">
+														<RowActionsDropdown
+															domain={d}
+															onDelete={handleDeleteDomain}
+														/>
+													</div>
+												</div>
 											) : (
-												<span className="font-semibold text-text-strong-950 text-xs dark:text-white">
-													{formatCount(d.sentCount || 0)}
-												</span>
+												<RowActionsDropdown
+													domain={d}
+													onDelete={handleDeleteDomain}
+												/>
 											)}
 										</div>
 									</motion.div>
