@@ -89,7 +89,7 @@ export function SetupLanguagePills({
 			cancelAnimationFrame(handle);
 			observer?.disconnect();
 		};
-	}, [highlightedTabIndex, mounted, value]);
+	}, [highlightedTabIndex, mounted]);
 
 	return (
 		<div
