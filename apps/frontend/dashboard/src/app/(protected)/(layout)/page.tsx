@@ -146,7 +146,7 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 					{user?.email ? `${user.email}'s Account` : "Your Account"}
 				</h1>
 
-				<div className="grid gap-6 pt-2 md:grid-cols-2 lg:grid-cols-3">
+				<div className="grid gap-6 pt-6 md:grid-cols-2 lg:grid-cols-3">
 					<div className="md:col-span-2 lg:col-span-2">
 						<ActivityChartCard />
 					</div>
