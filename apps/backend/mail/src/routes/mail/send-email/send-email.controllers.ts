@@ -1,8 +1,8 @@
 import { MailErrors } from "@reloop/be-mail/lib/errors";
 import type { MailModel } from "@reloop/be-mail/model/mail.model";
 import { db } from "@reloop/db/client";
-import { emailThread, threadMessage } from "@reloop/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { emailThread, organization, threadMessage } from "@reloop/db/schema";
+import { and, eq, gte, sql } from "drizzle-orm";
 import { log } from "evlog";
 import { useLogger } from "evlog/elysia";
 import {
@@ -45,6 +45,44 @@ export async function sendEmailController({
 		to: body.to,
 	});
 	log.info("server", "Initiating email send process");
+
+	// ── Step 0: Atomic quota check + deduction ─────────────────────────────────
+	// Count recipients across to/cc/bcc
+	const toList = Array.isArray(body.to) ? body.to : [body.to];
+	const ccList = body.cc
+		? Array.isArray(body.cc)
+			? body.cc
+			: [body.cc]
+		: [];
+	const bccList = body.bcc
+		? Array.isArray(body.bcc)
+			? body.bcc
+			: [body.bcc]
+		: [];
+	const recipientCount = toList.length + ccList.length + bccList.length;
+
+	// Atomically deduct credits — only succeeds if sufficient credits remain
+	const [updatedOrg] = await db
+		.update(organization)
+		.set({
+			creditsRemaining: sql`${organization.creditsRemaining} - ${recipientCount}`,
+		})
+		.where(
+			and(
+				eq(organization.id, organizationId),
+				gte(organization.creditsRemaining, recipientCount),
+			),
+		)
+		.returning({ creditsRemaining: organization.creditsRemaining });
+
+	if (!updatedOrg) {
+		// Fetch current balance for the error message
+		const current = await db.query.organization.findFirst({
+			where: (o, { eq }) => eq(o.id, organizationId),
+			columns: { creditsRemaining: true },
+		});
+		throw MailErrors.quotaExceeded(current?.creditsRemaining ?? 0);
+	}
 
 	const { domainName } = parseFromAddress_step1(body.from);
 
@@ -218,6 +256,30 @@ export async function sendEmailController({
 		},
 		message: "Email process completed successfully",
 	});
+
+	// ── Fire-and-forget: ingest usage event into Lago ───────────────────────────
+	const lagoUrl = process.env.LAGO_API_URL || "http://localhost:3000";
+	const lagoKey = process.env.LAGO_API_KEY || "";
+	if (lagoKey) {
+		fetch(`${lagoUrl}/api/v1/events`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${lagoKey}`,
+			},
+			body: JSON.stringify({
+				event: {
+					transaction_id: emailLogId,
+					external_customer_id: organizationId,
+					code: "emails_sent",
+					timestamp: Math.floor(Date.now() / 1000),
+					properties: { recipient_count: recipientCount },
+				},
+			}),
+		}).catch(() => {
+			// Non-fatal — Lago usage event failure never blocks sending
+		});
+	}
 
 	return response;
 }

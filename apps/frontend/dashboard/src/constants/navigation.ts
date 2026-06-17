@@ -89,8 +89,7 @@ export const mainNavigation: MainNavigationItem[] = [
 				path: "/settings/integrations",
 				iconName: "webhook",
 			},
-			{ label: "Credits", path: "/settings/credits", iconName: "invoice" },
-			{ label: "Usage", path: "/settings/usage", iconName: "barchart" },
+			{ label: "Billing", path: "/billing", iconName: "invoice" },
 		],
 	},
 ];

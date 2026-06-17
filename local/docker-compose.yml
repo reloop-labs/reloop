@@ -179,4 +179,99 @@ services:
       reloop-redis:
         condition: service_started
 
+  # ─── Lago Billing ────────────────────────────────────────────────────────────
+
+  lago-postgres:
+    image: postgres:14-alpine
+    container_name: lago-postgres
+    environment:
+      POSTGRES_DB: lago
+      POSTGRES_USER: lago
+      POSTGRES_PASSWORD: lago123
+    volumes:
+      - ../docker-data/lago-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "lago", "-d", "lago"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  lago-api:
+    image: getlago/api:v1.22.1
+    container_name: lago-api
+    depends_on:
+      lago-postgres:
+        condition: service_healthy
+      reloop-redis:
+        condition: service_started
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://lago:lago123@lago-postgres:5432/lago
+      - REDIS_URL=redis://:reloop123@reloop-redis:6379/1
+      - LAGO_API_URL=http://localhost:3000
+      - LAGO_FRONT_URL=http://localhost:8080
+      - SECRET_KEY_BASE=reloop_lago_secret_key_base_change_in_production_min_32chars
+      - ENCRYPTION_PRIMARY_KEY=reloop_lago_encryption_primary_key_32
+      - ENCRYPTION_DETERMINISTIC_KEY=reloop_lago_encryption_deterministic
+      - ENCRYPTION_KEY_DERIVATION_SALT=reloop_lago_key_derivation_salt_val
+      - RAILS_LOG_TO_STDOUT=true
+      - RAILS_ENV=production
+      - SENTRY_DSN=
+    restart: unless-stopped
+
+  lago-worker:
+    image: getlago/api:v1.22.1
+    container_name: lago-worker
+    depends_on:
+      lago-postgres:
+        condition: service_healthy
+      reloop-redis:
+        condition: service_started
+    environment:
+      - DATABASE_URL=postgresql://lago:lago123@lago-postgres:5432/lago
+      - REDIS_URL=redis://:reloop123@reloop-redis:6379/1
+      - LAGO_API_URL=http://localhost:3000
+      - SECRET_KEY_BASE=reloop_lago_secret_key_base_change_in_production_min_32chars
+      - ENCRYPTION_PRIMARY_KEY=reloop_lago_encryption_primary_key_32
+      - ENCRYPTION_DETERMINISTIC_KEY=reloop_lago_encryption_deterministic
+      - ENCRYPTION_KEY_DERIVATION_SALT=reloop_lago_key_derivation_salt_val
+      - RAILS_ENV=production
+      - SENTRY_DSN=
+    command: ["bundle", "exec", "sidekiq"]
+    restart: unless-stopped
+
+  lago-clock:
+    image: getlago/api:v1.22.1
+    container_name: lago-clock
+    depends_on:
+      lago-postgres:
+        condition: service_healthy
+      reloop-redis:
+        condition: service_started
+    environment:
+      - DATABASE_URL=postgresql://lago:lago123@lago-postgres:5432/lago
+      - REDIS_URL=redis://:reloop123@reloop-redis:6379/1
+      - SECRET_KEY_BASE=reloop_lago_secret_key_base_change_in_production_min_32chars
+      - ENCRYPTION_PRIMARY_KEY=reloop_lago_encryption_primary_key_32
+      - ENCRYPTION_DETERMINISTIC_KEY=reloop_lago_encryption_deterministic
+      - ENCRYPTION_KEY_DERIVATION_SALT=reloop_lago_key_derivation_salt_val
+      - RAILS_ENV=production
+      - SENTRY_DSN=
+    command: ["bundle", "exec", "clockwork", "clock.rb"]
+    restart: unless-stopped
+
+  lago-front:
+    image: getlago/front:v1.22.1
+    container_name: lago-front
+    depends_on:
+      - lago-api
+    ports:
+      - "8080:80"
+    environment:
+      - API_URL=http://localhost:3000
+      - APP_ENV=production
+    restart: unless-stopped
+
 

@@ -17,6 +17,11 @@ import {
 import { eq } from "drizzle-orm";
 import { log } from "evlog";
 import { authConfig } from "../auth.config";
+import {
+	PLAN_CREDITS,
+	lagoCreateCustomer,
+	lagoCreateSubscription,
+} from "./lago";
 import { redis } from "./redis";
 
 export const auth = betterAuth({
@@ -253,6 +258,41 @@ export const auth = betterAuth({
 				}
 			},
 			organizationHooks: {
+				afterCreate: async ({ organization: org }) => {
+					try {
+						// Create Lago customer & starter subscription
+						const customer = await lagoCreateCustomer({
+							id: org.id,
+							name: org.name,
+							billingEmail: (org as any).billingEmail,
+							billingName: (org as any).billingName,
+						});
+
+						const sub = await lagoCreateSubscription(customer.external_id, "starter");
+
+						await db
+							.update(schema.organization)
+							.set({
+								externalCustomerId: customer.external_id,
+								lagoSubscriptionId: sub.external_id,
+								creditsRemaining: PLAN_CREDITS.starter,
+								monthlyCredits: PLAN_CREDITS.starter,
+								planCode: "starter",
+								subscriptionStatus: "active",
+							})
+							.where(eq(schema.organization.id, org.id));
+
+						log.info({
+							message: `Billing initialized for org ${org.id} (${customer.external_id})`,
+						});
+					} catch (err) {
+						// Non-fatal: org is created, billing can be set up manually
+						log.error({
+							message: `Failed to initialize billing for org ${org.id}`,
+							error: err,
+						});
+					}
+				},
 				afterAcceptInvitation: async ({ member, user, organization }) => {
 					try {
 						await bus.publish(

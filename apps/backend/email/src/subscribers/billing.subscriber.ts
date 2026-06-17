@@ -1,7 +1,6 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { emailConfig } from "@reloop/email/email.config";
 import PaymentFailedEmail from "@reloop/email/emails/payment-failed";
-import QuotaWarningEmail from "@reloop/email/emails/quota-warning";
 import TrialEndingEmail from "@reloop/email/emails/trial-ending";
 import { render, toPlainText } from "@reloop/email/render";
 import { sendEmail } from "@reloop/email/utils/email";
@@ -40,42 +39,6 @@ export async function initBillingSubscribers() {
 				log.error({
 					...{ error, payload },
 					message: "Failed to send payment failed email",
-				});
-			}
-		},
-		{ queue: "billing-email-worker" },
-	);
-
-	// Quota Warning
-	await bus.subscribe(
-		BusEvent.QUOTA_WARNING,
-		async (payload) => {
-			try {
-				const html = await render(
-					React.createElement(QuotaWarningEmail, {
-						fullName: "User",
-						percentUsed: payload.percentage,
-						emailsSent: 8000,
-						emailsLimit: 10000,
-						resetDate: "Next Month",
-						upgradeUrl: `${emailConfig.BASE_URL}/dashboard/billing/upgrade`,
-						dashboardUrl: `${emailConfig.BASE_URL}/dashboard`,
-					}),
-				);
-
-				const text = toPlainText(html);
-
-				await sendEmail({
-					from: `Reloop Support <support@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
-					to: payload.email,
-					subject: `Usage Alert: ${payload.percentage}% of your ${payload.resourceType} quota used`,
-					html,
-					text,
-				});
-			} catch (error) {
-				log.error({
-					...{ error, payload },
-					message: "Failed to send quota warning email",
 				});
 			}
 		},

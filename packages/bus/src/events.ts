@@ -33,9 +33,10 @@ export enum BusEvent {
 	// Log Events
 	LOG_CREATED = "log.created",
 
-	// Billing / Usage Events
-	USAGE_UPDATED = "usage.updated",
-	QUOTA_EXCEEDED = "quota.exceeded",
+	// Billing Events
+	CREDITS_RENEWED = "credits.renewed",
+	PLAN_CHANGED = "plan.changed",
+	SUBSCRIPTION_CANCELLED = "subscription.cancelled",
 
 	// API Key Events
 	API_KEY_CREATED = "api_key.created",

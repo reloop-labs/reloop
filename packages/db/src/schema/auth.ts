@@ -91,8 +91,15 @@ export const organization = pgTable("organization", {
 	metadata: text("metadata"),
 	billingEmail: text("billing_email"),
 	billingName: text("billing_name"),
-	externalCustomerId: text("external_customer_id").unique(),
+	externalCustomerId: text("external_customer_id").unique(), // Lago customer external_id
 	status: organizationStatusEnum("status").notNull().default("active"),
+	// ─── Billing / Credits ────────────────────────────────────────────────────
+	creditsRemaining: integer("credits_remaining").notNull().default(0),
+	monthlyCredits: integer("monthly_credits").notNull().default(0),
+	planCode: text("plan_code").default("free"), // "free" | "starter" | "growth" | "scale"
+	subscriptionStatus: text("subscription_status").default("trialing"), // "active" | "past_due" | "cancelled" | "trialing"
+	currentPeriodEnd: timestamp("current_period_end"),
+	lagoSubscriptionId: text("lago_subscription_id"),
 });
 
 export const member = pgTable(

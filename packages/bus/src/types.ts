@@ -202,20 +202,20 @@ export interface DomainDnsReverificationRequestedPayload {
 	triggeredAt: string;
 }
 
-export interface UsageUpdatedPayload {
+export interface CreditsRenewedPayload {
 	organizationId: string;
-	creditsUsed: number;
-	creditsRemaining: number;
-	monthlyCredits: number;
-	periodStart: string; // ISO
-	periodEnd: string; // ISO
-	emailsSentToday: number;
+	planCode: string;
+	creditsRenewed: number;
 }
 
-export interface QuotaExceededPayload {
+export interface PlanChangedPayload {
 	organizationId: string;
-	creditsUsed: number;
-	monthlyCredits: number;
+	oldPlanCode: string;
+	newPlanCode: string;
+}
+
+export interface SubscriptionCancelledPayload {
+	organizationId: string;
 }
 
 export interface KumomtaLogRecordPayload {
@@ -349,8 +349,9 @@ export interface EventPayloads {
 	[BusEvent.TRIAL_ENDING]: TrialEndingPayload;
 	[BusEvent.DNS_CONFIG_REQUESTED]: DnsConfigRequestedPayload;
 	[BusEvent.DOMAIN_DNS_REVERIFICATION_REQUESTED]: DomainDnsReverificationRequestedPayload;
-	[BusEvent.USAGE_UPDATED]: UsageUpdatedPayload;
-	[BusEvent.QUOTA_EXCEEDED]: QuotaExceededPayload;
+	[BusEvent.CREDITS_RENEWED]: CreditsRenewedPayload;
+	[BusEvent.PLAN_CHANGED]: PlanChangedPayload;
+	[BusEvent.SUBSCRIPTION_CANCELLED]: SubscriptionCancelledPayload;
 	[BusEvent.KUMOMTA_EVENT]: KumomtaLogRecordPayload;
 	[BusEvent.KUMOMTA_INBOUND_RECEIVED]: KumomtaInboundReceivedPayload;
 	[BusEvent.CONTACT_AUTO_CREATED]: ContactAutoCreatedPayload;
