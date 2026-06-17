@@ -78,16 +78,16 @@ const filterOptions: { id: DomainData["status"] | null; label: string }[] = [
 const getTooltipText = (status: DomainData["status"], reason?: string | null) => {
 	switch (status) {
 		case "active":
-			return "Verified";
+			return "You're all set! Your domain is ready to send emails.";
 		case "verifying":
-			return "Verifying";
+			return "Your domain is being verified — this can take a few hours depending on your DNS provider.";
 		case "pending":
-			return "Not started";
+			return "Almost there! Add the DNS records shown below, then click Verify — and you'll be ready to send.";
 		case "failed":
 		case "suspended":
-			return reason || "Error";
+			return reason || "We couldn't verify your domain. Double-check your DNS records and try again.";
 		default:
-			return "Unknown status";
+			return "Checking your domain authentication — this will just take a moment…";
 	}
 };
 
