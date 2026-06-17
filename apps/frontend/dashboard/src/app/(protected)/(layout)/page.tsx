@@ -12,15 +12,6 @@ import {
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
-	Area,
-	AreaChart,
-	CartesianGrid,
-	ResponsiveContainer,
-	Tooltip,
-	XAxis,
-	YAxis,
-} from "recharts";
-import {
 	siDotnet,
 	siElixir,
 	siExpress,
@@ -36,12 +27,11 @@ import {
 } from "simple-icons";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { ActivityChartCard } from "./components/activity-chart-card";
 import { AgentInboxCard } from "./components/agent-inbox-card";
 import { AuditLogsCard } from "./components/audit-logs-card";
-import { DocsCard } from "./components/docs-card";
 import { DomainCard } from "./components/domain-card";
 import { EmailsCard } from "./components/emails-card";
-import { WorkflowsCard } from "./components/workflows-card";
 
 const sdkLanguages = [
 	{ name: "Node / TS", command: "npm install reloop-email", icon: siNodedotjs },
@@ -99,14 +89,6 @@ interface ApiKeyListResponse {
 	total: number;
 }
 
-interface EmailStatsResponse {
-	dates: string[];
-	sent: number[];
-	delivered: number[];
-	bounced: number[];
-	complaint: number[];
-	rate: number[];
-}
 export default function Home() {
 	const { user, activeOrganization } = useUserOrganization();
 
@@ -116,29 +98,9 @@ export default function Home() {
 		"skill",
 	);
 
-	// Date range for the 7-day activity graph
-	const { start_date, end_date } = useMemo(() => {
-		const now = new Date();
-		const toDate = new Date(now);
-		toDate.setHours(23, 59, 59, 999);
-		const fromDate = new Date(now);
-		fromDate.setDate(now.getDate() - 6); // 7 days inclusive
-		fromDate.setHours(0, 0, 0, 0);
-		return {
-			start_date: fromDate.toISOString(),
-			end_date: toDate.toISOString(),
-		};
-	}, []);
-
 	// SWR fetches
 	const { data: apiKeysData } = useSWR<ApiKeyListResponse>(
 		activeOrganization?.id ? "/api/api-key/v1/?limit=10&page=1" : null,
-	);
-
-	const { data: emailStatsData } = useSWR<EmailStatsResponse>(
-		activeOrganization?.id
-			? `/api/logs/v1/emails/stats?start_date=${start_date}&end_date=${end_date}`
-			: null,
 	);
 
 	// Process primary API key
@@ -148,39 +110,6 @@ export default function Home() {
 	const unmaskedKey = primaryApiKey
 		? `${displayPrefix}_7f8e0d9a8b7c6d5e4f3g2h1i0j_9d06`
 		: `${displayPrefix}_5a7c2b9f8d1e3d4e6a8b7c9f8e0d_9d06`;
-
-	// Calculate chart data from API stats or fallback to high-fidelity mock data
-	const chartData = useMemo(() => {
-		if (emailStatsData && emailStatsData.dates.length > 0) {
-			return emailStatsData.dates.map((dateStr, idx) => {
-				const date = new Date(dateStr);
-				const formattedDate = `${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}`;
-				const sent = emailStatsData.sent[idx] || 0;
-				return {
-					date: formattedDate,
-					count: sent,
-				};
-			});
-		}
-		// Gorgeous mock curve resembling the reference screenshot (a smooth Gaussian wave)
-		return [
-			{ date: "06/05", count: 0 },
-			{ date: "06/06", count: 0 },
-			{ date: "06/07", count: 0 },
-			{ date: "06/08", count: 0 },
-			{ date: "06/09", count: 2 },
-			{ date: "06/10", count: 48 },
-			{ date: "06/11", count: 98 },
-			{ date: "06/12", count: 8 },
-		];
-	}, [emailStatsData]);
-
-	const totalActivityCount = useMemo(() => {
-		if (emailStatsData && emailStatsData.dates.length > 0) {
-			return emailStatsData.sent.reduce((a, b) => a + b, 0);
-		}
-		return 0;
-	}, [emailStatsData]);
 
 	// Clipboard copy helper
 	const handleCopy = (text: string, label: string) => {
@@ -218,111 +147,19 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 				</h1>
 
 				<div className="grid gap-6 pt-2 md:grid-cols-2 lg:grid-cols-3">
+					<div className="md:col-span-2 lg:col-span-2">
+						<ActivityChartCard />
+					</div>
 					<EmailsCard />
 					<AgentInboxCard />
-					<AuditLogsCard />
-					<DocsCard />
-					<WorkflowsCard />
 					<DomainCard />
+					<AuditLogsCard />
 				</div>
 			</div>
 
-			{/* Main Grid: Left Wide, Right Narrow */}
+			{/* Main Grid: API Keys and Agent Integrations */}
 			<div className="grid gap-6 lg:grid-cols-3">
-				{/* Left Column: Chart and System Live Status */}
-				<div className="space-y-6 lg:col-span-2">
-					{/* Activity Chart */}
-					<div className="rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.01]">
-						<div className="flex items-center justify-between pb-6">
-							<div>
-								<h3 className="font-semibold text-sm text-text-strong-950 dark:text-white">
-									Emails Sent - Last 7 Days
-								</h3>
-								<p className="text-text-sub-600 text-xs dark:text-white/50">
-									Total emails sent by this organization
-								</p>
-							</div>
-							<div className="text-right">
-								<span className="font-bold text-text-strong-950 text-xl dark:text-white">
-									{totalActivityCount}
-								</span>
-								<p className="font-medium text-[10px] text-text-soft-400 uppercase dark:text-white/40">
-									Total Sent
-								</p>
-							</div>
-						</div>
-
-						{/* Area Chart Container */}
-						<div className="h-[200px] w-full">
-							<ResponsiveContainer width="100%" height="100%">
-								<AreaChart
-									data={chartData}
-									margin={{ top: 5, right: 5, left: -25, bottom: 0 }}
-								>
-									<defs>
-										<linearGradient
-											id="activityGradient"
-											x1="0"
-											y1="0"
-											x2="0"
-											y2="1"
-										>
-											<stop
-												offset="5%"
-												stopColor="#F97316"
-												stopOpacity={0.25}
-											/>
-											<stop
-												offset="95%"
-												stopColor="#F97316"
-												stopOpacity={0.0}
-											/>
-										</linearGradient>
-									</defs>
-									<CartesianGrid
-										strokeDasharray="3 3"
-										stroke="currentColor"
-										strokeOpacity={0.04}
-										vertical={false}
-									/>
-									<XAxis
-										dataKey="date"
-										axisLine={false}
-										tickLine={false}
-										tick={{ fill: "#888888", opacity: 0.6, fontSize: 10 }}
-									/>
-									<YAxis
-										axisLine={false}
-										tickLine={false}
-										tick={{ fill: "#888888", opacity: 0.6, fontSize: 10 }}
-									/>
-									<Tooltip
-										contentStyle={{
-											background: "#18181b",
-											borderColor: "#27272a",
-											borderRadius: "8px",
-											color: "#ffffff",
-											fontSize: "12px",
-										}}
-									/>
-									<Area
-										type="monotone"
-										dataKey="count"
-										name="Emails Sent"
-										stroke="#F97316"
-										strokeWidth={2}
-										fillOpacity={1}
-										fill="url(#activityGradient)"
-										isAnimationActive={true}
-									/>
-								</AreaChart>
-							</ResponsiveContainer>
-						</div>
-					</div>
-				</div>
-
-				{/* Right Column: API Keys and Agent Integrations */}
-				<div className="space-y-6">
+				<div className="lg:col-span-1">
 					{/* API Keys Card */}
 					<div className="space-y-4 rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.01]">
 						<div className="flex items-center justify-between">
@@ -376,7 +213,9 @@ This context file guides your AI agent on integrating with Reloop's developer AP
 							</div>
 						</div>
 					</div>
+				</div>
 
+				<div className="lg:col-span-2">
 					{/* Agent Integrations Card */}
 					<div className="space-y-4 rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.01]">
 						<div>
