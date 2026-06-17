@@ -39,10 +39,10 @@ export function EmailsCard() {
 				href="/emails"
 				className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-3 pb-5 dark:border-white/5 dark:bg-white/[0.02]"
 			>
-				<span className="flex items-center gap-2 font-medium text-sm text-text-strong-950 dark:text-white">
+				<span className="flex items-center gap-2 font-medium text-sm text-text-sub-600 dark:text-white/60">
 					<Icon
 						name="mail-single"
-						className="h-4 w-4 text-text-sub-600 dark:text-white/60"
+						className="h-4 w-4 shrink-0"
 					/>
 					Emails
 				</span>
