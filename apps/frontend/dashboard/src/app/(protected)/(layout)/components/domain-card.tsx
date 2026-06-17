@@ -3,7 +3,8 @@
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
-import { ArrowRight, Globe } from "lucide-react";
+import { Icon } from "@reloop/ui/icon";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import useSWR from "swr";
 
@@ -34,23 +35,11 @@ export function DomainCard() {
 				className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 py-4 pb-6 dark:border-white/5 dark:bg-white/[0.02]"
 			>
 				<span className="flex items-center gap-2 font-medium text-sm text-text-strong-950 dark:text-white">
-					<Globe
-						className={cn(
-							"h-4 w-4",
-							domainData?.domains && domainData.domains.length > 0
-								? "text-orange-500 dark:text-orange-400"
-								: "text-teal-600 dark:text-teal-400",
-						)}
+					<Icon
+						name="globe"
+						className="h-4 w-4 text-text-sub-600 dark:text-white/60"
 					/>
-					<span
-						className={cn(
-							domainData?.domains && domainData.domains.length > 0
-								? "text-orange-500 dark:text-orange-400"
-								: "",
-						)}
-					>
-						Domains
-					</span>
+					<span>Domains</span>
 				</span>
 				<ArrowRight className="h-4 w-4 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/60" />
 			</Link>
@@ -65,7 +54,10 @@ export function DomainCard() {
 								className="grid grid-cols-3 items-center px-4 py-2.5 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.01]"
 							>
 								<div className="flex min-w-0 items-center gap-1.5 pr-2">
-									<Globe className="h-3.5 w-3.5 shrink-0 text-orange-500" />
+									<Icon
+										name="globe"
+										className="h-3.5 w-3.5 shrink-0 text-text-sub-600 dark:text-white/60"
+									/>
 									<span className="truncate font-semibold text-orange-500 text-xs hover:underline dark:text-orange-400">
 										{d.domain}
 									</span>
@@ -97,7 +89,10 @@ export function DomainCard() {
 			) : (
 				<div className="-mt-2.5 flex min-h-[175px] flex-1 flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
 					{/* Icon outline without pill wrapper */}
-					<Globe className="h-6 w-6 text-text-sub-600 dark:text-white/40" />
+					<Icon
+						name="globe"
+						className="h-6 w-6 text-text-sub-600 dark:text-white/40"
+					/>
 
 					{/* Heading */}
 					<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
