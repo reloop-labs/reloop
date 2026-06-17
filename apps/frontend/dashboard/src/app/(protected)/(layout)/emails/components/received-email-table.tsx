@@ -292,7 +292,8 @@ export const ReceivedEmailTable = ({
 				) : (
 					logs.map((log) => {
 						const isRowActive = activeDropdownId === log.id;
-						const senderName = log.fromName || log.fromEmail.split("@")[0] || "";
+						const senderName =
+							log.fromName || log.fromEmail.split("@")[0] || "";
 						return (
 							<div
 								key={log.id}

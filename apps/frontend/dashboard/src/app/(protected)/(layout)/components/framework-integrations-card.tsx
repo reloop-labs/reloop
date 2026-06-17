@@ -2,12 +2,7 @@
 
 import { Icon } from "@reloop/ui/icon";
 import { ArrowRight } from "lucide-react";
-import {
-	siExpress,
-	siHono,
-	siNestjs,
-	siNextdotjs,
-} from "simple-icons";
+import { siExpress, siHono, siNestjs, siNextdotjs } from "simple-icons";
 
 const frameworkIntegrations = [
 	{
@@ -47,7 +42,7 @@ export function FrameworkIntegrationsCard() {
 					Boilerplates and integration templates for Node.js
 				</p>
 
-				<div className="mt-3 grid grid-cols-2 gap-2">
+				<div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
 					{frameworkIntegrations.map((item) => (
 						<div
 							key={item.name}
@@ -74,9 +69,7 @@ export function FrameworkIntegrationsCard() {
 									<span className="font-semibold text-text-strong-950 text-xs group-hover/tile:underline dark:text-white">
 										{item.name}
 									</span>
-									<ArrowRight
-										className="h-3 w-3 shrink-0 text-text-sub-400 opacity-0 transition-all group-hover/tile:text-text-strong-950 group-hover/tile:opacity-100"
-									/>
+									<ArrowRight className="h-3 w-3 shrink-0 text-text-sub-400 opacity-0 transition-all group-hover/tile:text-text-strong-950 group-hover/tile:opacity-100" />
 								</div>
 								<p className="text-[11px] text-text-sub-600 leading-relaxed dark:text-white/50">
 									{item.desc}

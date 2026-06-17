@@ -4,12 +4,11 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { ActivityChartCard } from "./components/activity-chart-card";
 import { AgentInboxCard } from "./components/agent-inbox-card";
 import { AgentIntegrationsCard } from "./components/agent-integrations-card";
-import { ApiKeyCard } from "./components/api-key-card";
 import { AuditLogsCard } from "./components/audit-logs-card";
 import { DomainCard } from "./components/domain-card";
 import { EmailsCard } from "./components/emails-card";
 import { FrameworkIntegrationsCard } from "./components/framework-integrations-card";
-import { SdksCard } from "./components/sdks-card";
+import { WebhooksCard } from "./components/webhooks-card";
 
 export default function Home() {
 	const { user, activeOrganization } = useUserOrganization();
@@ -36,17 +35,13 @@ export default function Home() {
 			</div>
 
 			<div className="grid gap-6 lg:grid-cols-3">
-				<div className="lg:col-span-1">
-					<ApiKeyCard />
+				<div className="flex flex-col gap-6 lg:col-span-1">
+					<WebhooksCard />
+					<FrameworkIntegrationsCard />
 				</div>
 				<div className="lg:col-span-2">
 					<AgentIntegrationsCard />
 				</div>
-			</div>
-
-			<div className="grid gap-6 md:grid-cols-2">
-				<SdksCard />
-				<FrameworkIntegrationsCard />
 			</div>
 		</div>
 	);

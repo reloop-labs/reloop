@@ -77,7 +77,7 @@ export function AgentIntegrationsCard() {
 	};
 
 	return (
-		<div className="group flex w-full flex-col">
+		<div className="group flex h-full w-full flex-col">
 			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-1.5 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
 				<span className="flex items-center gap-2 font-medium text-sm text-text-sub-600 dark:text-white/60">
 					<Icon name="sparkling" className="h-4 w-4 shrink-0" />
@@ -85,18 +85,9 @@ export function AgentIntegrationsCard() {
 				</span>
 			</div>
 
-			<div className="-mt-1.5 flex flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
-				<div className="px-4 pt-4">
-					<p className="text-text-sub-600 text-xs dark:text-white/50">
-						Give your AI agents secure communication capabilities.
-					</p>
-				</div>
-
+			<div className="-mt-1.5 flex flex-1 flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
 				<div className="flex shrink-0 border-stroke-soft-100/50 border-b px-4 dark:border-white/5">
-					<TabMenuHorizontal.Root
-						value={activeTab}
-						className="w-full"
-					>
+					<TabMenuHorizontal.Root value={activeTab} className="w-full">
 						<TabMenuHorizontal.List className="relative h-10 w-full justify-start gap-0 border-b-0 py-0">
 							{tabItems.map(({ value, title }, index) => (
 								<TabMenuHorizontal.Trigger
@@ -171,7 +162,7 @@ export function AgentIntegrationsCard() {
 					</TabMenuHorizontal.Root>
 				</div>
 
-				<div className="p-4">
+				<div className="flex-1 flex flex-col justify-center p-4">
 					{activeTab === "skill" && (
 						<div className="flex items-center justify-between rounded-lg border border-stroke-soft-100 bg-bg-weak-50/50 p-3 dark:border-white/5 dark:bg-white/[0.01]">
 							<div className="flex min-w-0 items-center gap-2.5">
