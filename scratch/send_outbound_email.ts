@@ -1,5 +1,5 @@
-import nodemailer from "nodemailer";
 import axios from "axios";
+import nodemailer from "nodemailer";
 
 async function main() {
 	// 1. Create nodemailer transporter pointing to the outbound SMTP server (port 587)
@@ -21,7 +21,7 @@ async function main() {
 	const subject = `Test Outbound Email [${new Date().toISOString()}]`;
 
 	console.log(`Sending outbound email from ${fromEmail} to ${toEmail}...`);
-	
+
 	try {
 		const info = await transporter.sendMail({
 			from: `"Reloop Tester" <${fromEmail}>`,
@@ -39,9 +39,11 @@ async function main() {
 		await new Promise((resolve) => setTimeout(resolve, 3000));
 
 		console.log("Querying Mailpit API...");
-		const mailpitResp = await axios.get("http://localhost:8025/api/v1/messages");
+		const mailpitResp = await axios.get(
+			"http://localhost:8025/api/v1/messages",
+		);
 		const messages = mailpitResp.data.messages || [];
-		
+
 		const found = messages.find((msg: any) => msg.Subject === subject);
 
 		if (found) {
@@ -51,7 +53,9 @@ async function main() {
 			console.log(`- Subject: ${found.Subject}`);
 			console.log(`- Date: ${found.Created}`);
 		} else {
-			console.log("❌ Email was not found in Mailpit. Here are the recent subjects in Mailpit:");
+			console.log(
+				"❌ Email was not found in Mailpit. Here are the recent subjects in Mailpit:",
+			);
 			messages.slice(0, 5).forEach((msg: any) => {
 				console.log(`  * ${msg.Subject}`);
 			});

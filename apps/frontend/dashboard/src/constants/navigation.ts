@@ -23,6 +23,10 @@ export const mainNavigation: MainNavigationItem[] = [
 		label: "Emails",
 		path: "/emails",
 		iconName: "mail-single",
+		items: [
+			{ label: "Sent", path: "/emails/sent", iconName: "send" },
+			{ label: "Received", path: "/emails/received", iconName: "inbox" },
+		],
 	},
 	{
 		label: "Metrics",

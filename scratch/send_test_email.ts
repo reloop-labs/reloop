@@ -27,7 +27,9 @@ async function main() {
 				text: `Hello, this is a test email sent from Antigravity to verify if your agent inbox (${recipient}) works!`,
 				html: `<p>Hello,</p><p>This is a test email sent from <strong>Antigravity</strong> to verify if your agent inbox (<strong>${recipient}</strong>) works!</p>`,
 			});
-			console.log(`✅ Email sent successfully to ${recipient}! Message ID: ${info.messageId}`);
+			console.log(
+				`✅ Email sent successfully to ${recipient}! Message ID: ${info.messageId}`,
+			);
 		} catch (err) {
 			console.error(`❌ Failed to send email to ${recipient}:`, err);
 		}
