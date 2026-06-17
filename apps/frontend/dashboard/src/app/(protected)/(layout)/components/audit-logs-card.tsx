@@ -14,12 +14,95 @@ interface LogData {
 	level: string;
 	status_code?: number | null;
 	created_at: string;
+	metadata?: Record<string, unknown>;
 }
 
 interface LogListResponse {
 	logs: LogData[];
 	count: number;
 }
+
+// Map event namespace → sidebar icon name (same icons as the nav)
+const EVENT_ICONS: Record<string, string> = {
+	domain: "globe",
+	email: "mail-single",
+	contact: "users",
+	api_key: "key-new",
+	member: "users",
+	webhook: "webhook",
+	workflow: "modules",
+	template: "layout",
+	log: "file-text",
+	settings: "gear",
+};
+
+const getEventIcon = (event: string): string => {
+	const ns = event.split(".")[0] ?? "log";
+	return EVENT_ICONS[ns] ?? "file-text";
+};
+const EVENT_LABELS: Record<string, string> = {
+	"domain.created": "Create Domain",
+	"domain.deleted": "Delete Domain",
+	"domain.verified": "Verify Domain",
+	"domain.verification_failed": "Verification Failed",
+	"domain.dns_updated": "Update DNS Record",
+	"domain.dns_created": "Create DNS Record",
+	"email.sent": "Send Email",
+	"email.bounced": "Email Bounced",
+	"email.opened": "Email Opened",
+	"email.clicked": "Email Clicked",
+	"email.unsubscribed": "Unsubscribe",
+	"contact.created": "Create Contact",
+	"contact.updated": "Update Contact",
+	"contact.deleted": "Delete Contact",
+	"api_key.created": "Create API Key",
+	"api_key.deleted": "Delete API Key",
+	"member.invited": "Invite Member",
+	"member.removed": "Remove Member",
+	"webhook.created": "Create Webhook",
+	"webhook.deleted": "Delete Webhook",
+};
+
+const formatEventLabel = (event: string): string => {
+	if (EVENT_LABELS[event]) return EVENT_LABELS[event];
+	// Fallback: split on dots and title-case
+	return event
+		.split(".")
+		.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+		.join(" ");
+};
+
+// Extract a readable resource name from the event or metadata
+const getResource = (log: LogData): string | null => {
+	const meta = log.metadata as Record<string, unknown> | undefined;
+	if (meta?.domain && typeof meta.domain === "string") return meta.domain;
+	if (meta?.email && typeof meta.email === "string") return meta.email;
+	if (meta?.name && typeof meta.name === "string") return meta.name as string;
+	// Derive from event namespace
+	const ns = log.event.split(".")[0];
+	if (ns && ns !== log.event) return ns;
+	return null;
+};
+
+// Relative time — "2m ago", "17h ago", "3d ago"
+const formatRelativeTime = (isoDate: string): string => {
+	const now = Date.now();
+	const then = new Date(isoDate).getTime();
+	const diffSec = Math.floor((now - then) / 1000);
+
+	if (diffSec < 60) return `${diffSec}s ago`;
+	const diffMin = Math.floor(diffSec / 60);
+	if (diffMin < 60) return `${diffMin}m ago`;
+	const diffHr = Math.floor(diffMin / 60);
+	if (diffHr < 24) return `${diffHr}h ago`;
+	const diffDay = Math.floor(diffHr / 24);
+	return `${diffDay}d ago`;
+};
+
+const isError = (log: LogData) =>
+	log.level === "error" ||
+	log.level === "fatal" ||
+	(log.status_code != null && log.status_code >= 400);
 
 export function AuditLogsCard() {
 	const { activeOrganization } = useUserOrganization();
@@ -31,76 +114,78 @@ export function AuditLogsCard() {
 	return (
 		<div className="group flex w-full flex-col">
 			{/* Header */}
-			<Link
-				href="/logs"
-				className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-3 pb-5 dark:border-white/5 dark:bg-white/[0.02]"
-			>
-				<span className="flex items-center gap-2 font-medium text-sm text-text-sub-600 dark:text-white/60">
+			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-1.5 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
+				<Link
+					href="/logs"
+					className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+				>
 					<Icon name="file-text" className="h-4 w-4 shrink-0" />
 					Audit Logs
-				</span>
-				<ArrowRight className="h-4 w-4 text-text-sub-600 transition-transform group-hover:translate-x-0.5 dark:text-white/60" />
-			</Link>
+				</Link>
+				<Link
+					href="/logs"
+					className="flex h-7 w-7 shrink-0 items-center justify-center text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60"
+				>
+					<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+				</Link>
+			</div>
 
 			{/* Body */}
 			{auditLogsData?.logs && auditLogsData.logs.length > 0 ? (
-				<div className="-mt-2.5 h-[200px] divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
-					<div className="divide-y divide-stroke-soft-100/10 dark:divide-white/5">
-						{auditLogsData.logs.slice(0, 3).map((d) => (
-							<div
-								key={d.uuid}
-								className="grid grid-cols-3 items-center px-4 py-2.5 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.01]"
+				<div className="-mt-1.5 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white px-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+					{auditLogsData.logs.slice(0, 5).map((log) => {
+						const resource = getResource(log);
+						const error = isError(log);
+						const iconName = getEventIcon(log.event);
+						return (
+							<Link
+								key={log.uuid}
+								href={`/logs?log=${log.uuid}`}
+								className="group/row flex items-center gap-3 border-stroke-soft-100 border-b py-3 no-underline last:border-b-0 dark:border-white/5"
 							>
-								<div className="flex min-w-0 flex-col pr-2">
-									<span className="truncate font-semibold text-text-strong-950 text-xs dark:text-white">
-										{d.event}
+								{/* Icon */}
+								<Icon
+									name={iconName as any}
+									className={cn(
+										"h-3.5 w-3.5 shrink-0",
+										error
+											? "text-error-base"
+											: "text-text-sub-600 dark:text-white/40",
+									)}
+								/>
+
+								{/* Action label */}
+								<span className="min-w-0 flex-1 truncate font-semibold text-text-strong-950 text-xs group-hover/row:underline dark:text-white">
+									{formatEventLabel(log.event)}
+								</span>
+
+								{/* Resource */}
+								{resource && (
+									<span className="shrink-0 truncate text-text-sub-600 text-xs dark:text-white/40">
+										{resource}
 									</span>
-									<span className="truncate text-[10px] text-text-sub-600 dark:text-white/40">
-										{d.uuid}
-									</span>
-								</div>
-								<div className="flex items-center justify-center">
-									<span
-										className={cn(
-											"inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 font-semibold text-[9px] uppercase tracking-wider",
-											d.level === "error" ||
-												(d.status_code && d.status_code >= 400)
-												? "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400"
-												: "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400",
-										)}
-									>
-										{d.level || "info"}
-									</span>
-								</div>
-								<div className="flex shrink-0 items-center justify-end whitespace-nowrap text-[10px] text-text-sub-600 dark:text-white/40">
-									{new Date(d.created_at).toLocaleTimeString([], {
-										hour: "2-digit",
-										minute: "2-digit",
-									})}
-								</div>
-							</div>
-						))}
-					</div>
+								)}
+
+								{/* Relative time */}
+								<span className="shrink-0 text-text-sub-600 text-xs tabular-nums underline decoration-dotted underline-offset-2 dark:text-white/40">
+									{formatRelativeTime(log.created_at)}
+								</span>
+							</Link>
+						);
+					})}
 				</div>
 			) : (
-				<div className="-mt-2.5 flex h-[200px] flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
-					{/* Icon outline without pill wrapper */}
+				<div className="-mt-1.5 flex h-[250px] flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
 					<Icon
 						name="file-text"
 						className="h-6 w-6 text-text-sub-600 dark:text-white/40"
 					/>
-
-					{/* Heading */}
 					<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
 						Track activity without the overhead
 					</h4>
-
-					{/* Description */}
 					<p className="mt-2 max-w-[240px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
 						Track security events, API key access, and team actions.
 					</p>
-
-					{/* Button */}
 					<Button.Root
 						variant="neutral"
 						mode="stroke"
