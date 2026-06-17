@@ -78,7 +78,10 @@ const filterOptions: { id: DomainData["status"] | null; label: string }[] = [
 	{ id: "failed", label: "Failed" },
 ];
 
-const getTooltipText = (status: DomainData["status"], reason?: string | null) => {
+const getTooltipText = (
+	status: DomainData["status"],
+	reason?: string | null,
+) => {
 	switch (status) {
 		case "active":
 			return "You're all set! Your domain is ready to send emails.";
@@ -88,7 +91,10 @@ const getTooltipText = (status: DomainData["status"], reason?: string | null) =>
 			return "Almost there! Add the DNS records shown below, then click Verify — and you'll be ready to send.";
 		case "failed":
 		case "suspended":
-			return reason || "We couldn't verify your domain. Double-check your DNS records and try again.";
+			return (
+				reason ||
+				"We couldn't verify your domain. Double-check your DNS records and try again."
+			);
 		default:
 			return "Checking your domain authentication — this will just take a moment…";
 	}
@@ -97,9 +103,14 @@ const getTooltipText = (status: DomainData["status"], reason?: string | null) =>
 interface RowActionsDropdownProps {
 	domain: DomainData;
 	onDelete: (id: string) => Promise<void>;
+	onOpenChange?: (open: boolean) => void;
 }
 
-const RowActionsDropdown = ({ domain, onDelete }: RowActionsDropdownProps) => {
+const RowActionsDropdown = ({
+	domain,
+	onDelete,
+	onOpenChange,
+}: RowActionsDropdownProps) => {
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -111,7 +122,8 @@ const RowActionsDropdown = ({ domain, onDelete }: RowActionsDropdownProps) => {
 	const menuItems = [
 		{
 			id: "configure",
-			label: domain.status === "active" ? "View Details" : "Configure DNS",
+			label:
+				domain.status === "active" ? "View Configure DNS" : "Configure DNS",
 			icon: "globe" as const,
 			isDanger: false,
 		},
@@ -154,20 +166,25 @@ const RowActionsDropdown = ({ domain, onDelete }: RowActionsDropdownProps) => {
 		}
 	};
 
+	const handleOpenChange = (open: boolean) => {
+		setPopoverOpen(open);
+		onOpenChange?.(open);
+	};
+
 	return (
 		<div onClick={(e) => e.stopPropagation()}>
-			<Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
+			<Popover.Root open={popoverOpen} onOpenChange={handleOpenChange}>
 				<Popover.Trigger asChild>
 					<button
 						type="button"
-						className="flex h-5 w-5 shrink-0 items-center justify-end text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white focus:outline-none"
+						className="flex h-5 w-5 shrink-0 items-center justify-end text-text-sub-600 transition-colors hover:text-text-strong-950 focus:outline-none dark:text-white/40 dark:hover:text-white"
 					>
 						<MoreHorizontal className="h-4 w-4" />
 					</button>
 				</Popover.Trigger>
 				<Popover.Content
 					align="end"
-					sideOffset={4}
+					sideOffset={-7}
 					className="w-48 p-2"
 					showArrow={true}
 				>
@@ -220,6 +237,7 @@ export function DomainCard() {
 	const [filterOpen, setFilterOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	const selectedIdx = filterOptions.findIndex((o) => o.id === statusFilter);
 	const activeIdx = hoverIdx !== undefined ? hoverIdx : selectedIdx;
@@ -278,7 +296,7 @@ export function DomainCard() {
 						</Popover.Trigger>
 						<Popover.Content
 							align="end"
-							sideOffset={4}
+							sideOffset={-1}
 							className="w-48 p-2"
 							showArrow={true}
 						>
@@ -391,17 +409,21 @@ export function DomainCard() {
 													</Tooltip.Trigger>
 													<Tooltip.Content
 														side="top"
+														sideOffset={-5}
 														variant="light"
 														className="max-w-[220px] text-xs"
 													>
-														{getTooltipText(d.status, d.verificationFailedReason)}
+														{getTooltipText(
+															d.status,
+															d.verificationFailedReason,
+														)}
 													</Tooltip.Content>
 												</Tooltip.Root>
 											</Tooltip.Provider>
 
 											<Link
 												href="/domain"
-												className="truncate font-semibold text-text-strong-950 text-xs hover:underline dark:text-white"
+												className="truncate font-semibold text-text-strong-950 text-xs group-hover/row:underline dark:text-white"
 											>
 												{d.domain}
 											</Link>
@@ -422,13 +444,37 @@ export function DomainCard() {
 										<div className="flex w-12 shrink-0 items-center justify-end text-right">
 											{d.status === "active" ? (
 												<div className="relative flex h-7 w-12 items-center justify-end">
-													<span className="block group-hover/row:hidden font-semibold text-text-strong-950 text-xs dark:text-white">
+													<span
+														className={cn(
+															"font-semibold text-text-strong-950 text-xs dark:text-white",
+															activeDropdownId === d.id
+																? "hidden"
+																: "block group-hover/row:hidden",
+														)}
+													>
 														{formatCount(d.sentCount || 0)}
 													</span>
-													<div className="hidden group-hover/row:block">
+													<div
+														className={cn(
+															activeDropdownId === d.id
+																? "block"
+																: "hidden group-hover/row:block",
+														)}
+													>
 														<RowActionsDropdown
 															domain={d}
 															onDelete={handleDeleteDomain}
+															onOpenChange={(open) => {
+																if (open) {
+																	setActiveDropdownId(d.id);
+																} else {
+																	setTimeout(() => {
+																		setActiveDropdownId((curr) =>
+																			curr === d.id ? null : curr,
+																		);
+																	}, 150);
+																}
+															}}
 														/>
 													</div>
 												</div>
@@ -436,6 +482,17 @@ export function DomainCard() {
 												<RowActionsDropdown
 													domain={d}
 													onDelete={handleDeleteDomain}
+													onOpenChange={(open) => {
+														if (open) {
+															setActiveDropdownId(d.id);
+														} else {
+															setTimeout(() => {
+																setActiveDropdownId((curr) =>
+																	curr === d.id ? null : curr,
+																);
+															}, 150);
+														}
+													}}
 												/>
 											)}
 										</div>
