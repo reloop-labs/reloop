@@ -181,10 +181,11 @@ export function AuditLogsCard() {
 						className="h-6 w-6 text-text-sub-600 dark:text-white/40"
 					/>
 					<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
-						Track activity without the overhead
+						Track Workspace Activity
 					</h4>
 					<p className="mt-2 max-w-[240px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
-						Track security events, API key access, and team actions.
+						See a complete history of account activity for security and
+						compliance.
 					</p>
 					<Button.Root
 						variant="neutral"
