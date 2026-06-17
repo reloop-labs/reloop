@@ -104,7 +104,7 @@ export function ActivityChartCard() {
 			</div>
 
 			{/* Body Container */}
-			<div className="-mt-1.5 flex h-[250px] flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.01]">
+			<div className="-mt-1.5 flex h-[250px] flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.01]">
 				<div className="flex items-center justify-between pb-4">
 					<div>
 						<h3 className="font-semibold text-sm text-text-strong-950 dark:text-white">
