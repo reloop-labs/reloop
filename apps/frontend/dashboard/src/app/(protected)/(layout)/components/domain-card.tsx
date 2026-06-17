@@ -14,10 +14,10 @@ import { ArrowRight, MoreHorizontal, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { DeleteDomainModal } from "../domain/components/delete-domain";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { DeleteDomainModal } from "../domain/components/delete-domain";
 
 interface DomainData {
 	id: string;
@@ -385,7 +385,7 @@ export function DomainCard() {
 										animate={{ opacity: 1, y: 0 }}
 										exit={{ opacity: 0, y: -6 }}
 										transition={{ duration: 0.2 }}
-										className="group/row flex items-center justify-between border-b border-stroke-soft-100 py-2.5 dark:border-white/5"
+										className="group/row flex items-center justify-between border-stroke-soft-100 border-b py-2.5 dark:border-white/5"
 									>
 										{/* Left column: Status indicator + Domain name */}
 										<div className="flex min-w-0 items-center gap-2">
@@ -516,12 +516,16 @@ export function DomainCard() {
 							className={cn("h-6 w-6", getStatusColorClass(statusFilter))}
 						/>
 						<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
-							No {filterOptions.find((o) => o.id === statusFilter)?.label} domains
+							No {filterOptions.find((o) => o.id === statusFilter)?.label}{" "}
+							domains
 						</h4>
 						<p className="mt-2 mb-4 max-w-[280px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
-							{statusFilter === "active" && "You don't have any verified domains yet."}
-							{statusFilter === "verifying" && "No domains are currently being verified."}
-							{statusFilter === "pending" && "No domains are waiting for DNS setup."}
+							{statusFilter === "active" &&
+								"You don't have any verified domains yet."}
+							{statusFilter === "verifying" &&
+								"No domains are currently being verified."}
+							{statusFilter === "pending" &&
+								"No domains are waiting for DNS setup."}
 							{(statusFilter === "failed" || statusFilter === "suspended") &&
 								"No domains have a verification error right now."}
 						</p>

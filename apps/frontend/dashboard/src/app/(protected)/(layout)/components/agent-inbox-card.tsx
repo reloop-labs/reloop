@@ -151,7 +151,10 @@ export function AgentInboxCard() {
 					className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 				>
 					<Icon name="inbox" className="h-4 w-4 shrink-0" />
-					Email Inboxes
+					<span>Email Inboxes</span>
+					<span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-zinc-100 px-1.5 font-semibold text-[11px] text-text-sub-600 dark:bg-white/10 dark:text-white/40">
+						{mailboxesData?.length ?? 0}
+					</span>
 				</Link>
 				<div className="flex items-center gap-1.5">
 					<Link

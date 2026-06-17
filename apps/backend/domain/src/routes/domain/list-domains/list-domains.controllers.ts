@@ -55,7 +55,7 @@ export async function listDomainsController({
 					sentCount: Number(sentCountResult?.count || 0),
 					object: "domain" as const,
 				};
-			})
+			}),
 		);
 
 		const finalResponse = {
