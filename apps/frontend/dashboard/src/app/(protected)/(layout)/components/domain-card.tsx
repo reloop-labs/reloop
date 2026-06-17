@@ -75,6 +75,22 @@ const filterOptions: { id: DomainData["status"] | null; label: string }[] = [
 	{ id: "failed", label: "Failed" },
 ];
 
+const getTooltipText = (status: DomainData["status"], reason?: string | null) => {
+	switch (status) {
+		case "active":
+			return "Verified";
+		case "verifying":
+			return "Verifying";
+		case "pending":
+			return "Not started";
+		case "failed":
+		case "suspended":
+			return reason || "Error";
+		default:
+			return "Unknown status";
+	}
+};
+
 export function DomainCard() {
 	const { activeOrganization } = useUserOrganization();
 	const [statusFilter, setStatusFilter] = useState<DomainData["status"] | null>(
@@ -213,7 +229,7 @@ export function DomainCard() {
 						transition={{ duration: 0.15 }}
 						className="-mt-1.5 h-[250px] overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]"
 					>
-						<div className="divide-y divide-stroke-soft-100/10 dark:divide-white/5">
+						<div className="divide-y divide-stroke-soft-100 px-4 dark:divide-white/5">
 							<AnimatePresence initial={false}>
 								{domainData.domains.slice(0, 5).map((d, index) => (
 									<motion.div
@@ -223,7 +239,7 @@ export function DomainCard() {
 										animate={{ opacity: 1, y: 0 }}
 										exit={{ opacity: 0, y: -6 }}
 										transition={{ duration: 0.2 }}
-										className="flex items-center justify-between px-4 py-2.5 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.01]"
+										className="group/row flex items-center justify-between py-2.5"
 									>
 										{/* Left column: Status indicator + Domain name */}
 										<div className="flex min-w-0 items-center gap-2">
@@ -234,22 +250,13 @@ export function DomainCard() {
 															type="button"
 															className="flex shrink-0 cursor-help items-center"
 														>
-															{d.status === "active" ? (
-																<Icon
-																	name="check-circle"
-																	className="h-4.5 w-4.5 text-green-600 dark:text-green-500"
-																/>
-															) : d.status === "failed" ? (
-																<Icon
-																	name="cross-circle"
-																	className="h-4.5 w-4.5 text-red-500 dark:text-red-400"
-																/>
-															) : (
-																<Icon
-																	name="hourglass"
-																	className="h-4.5 w-4.5 text-amber-500 dark:text-amber-400"
-																/>
-															)}
+															<Icon
+																name={getStatusIcon(d.status)}
+																className={cn(
+																	"h-4.5 w-4.5",
+																	getStatusColorClass(d.status),
+																)}
+															/>
 														</button>
 													</Tooltip.Trigger>
 													<Tooltip.Content
@@ -257,19 +264,17 @@ export function DomainCard() {
 														variant="light"
 														className="max-w-[220px] text-xs"
 													>
-														{d.status === "failed"
-															? d.verificationFailedReason ||
-																"Verification failed"
-															: d.status === "active"
-																? "Domain verified and active"
-																: "Verification pending"}
+														{getTooltipText(d.status, d.verificationFailedReason)}
 													</Tooltip.Content>
 												</Tooltip.Root>
 											</Tooltip.Provider>
 
-											<span className="truncate font-semibold text-text-strong-950 text-xs dark:text-white">
+											<Link
+												href="/domain"
+												className="truncate font-semibold text-text-strong-950 text-xs hover:underline dark:text-white"
+											>
 												{d.domain}
-											</span>
+											</Link>
 										</div>
 
 										{/* Middle column: Custom charts depending on index */}
