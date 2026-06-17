@@ -11,7 +11,7 @@ export const mailConfig = {
 		process.env.TRACKING_SECRET || "reloop_tracking_secret_default_123",
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
-	LAGO_API_URL: process.env.LAGO_API_URL || "http://localhost:9000",
+	LAGO_API_URL: process.env.LAGO_API_URL || "http://localhost:3100",
 	LAGO_API_KEY: process.env.LAGO_API_KEY || "",
 
 	// ── Rate Limiting ──────────────────────────────────────────────
