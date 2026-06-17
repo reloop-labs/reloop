@@ -206,11 +206,11 @@ services:
       reloop-redis:
         condition: service_started
     ports:
-      - "3000:3000"
+      - "9000:3000"                  # host:9000 → container:3000
     environment:
       - DATABASE_URL=postgresql://lago:lago123@lago-postgres:5432/lago
       - REDIS_URL=redis://:reloop123@reloop-redis:6379/1
-      - LAGO_API_URL=http://localhost:3000
+      - LAGO_API_URL=http://localhost:9000
       - LAGO_FRONT_URL=http://localhost:8080
       - SECRET_KEY_BASE=reloop_lago_secret_key_base_change_in_production_min_32chars
       - ENCRYPTION_PRIMARY_KEY=reloop_lago_encryption_primary_key_32
@@ -232,7 +232,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://lago:lago123@lago-postgres:5432/lago
       - REDIS_URL=redis://:reloop123@reloop-redis:6379/1
-      - LAGO_API_URL=http://localhost:3000
+      - LAGO_API_URL=http://lago-api:3000  # internal Docker network
       - SECRET_KEY_BASE=reloop_lago_secret_key_base_change_in_production_min_32chars
       - ENCRYPTION_PRIMARY_KEY=reloop_lago_encryption_primary_key_32
       - ENCRYPTION_DETERMINISTIC_KEY=reloop_lago_encryption_deterministic
@@ -253,6 +253,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://lago:lago123@lago-postgres:5432/lago
       - REDIS_URL=redis://:reloop123@reloop-redis:6379/1
+      - LAGO_API_URL=http://lago-api:3000  # internal Docker network
       - SECRET_KEY_BASE=reloop_lago_secret_key_base_change_in_production_min_32chars
       - ENCRYPTION_PRIMARY_KEY=reloop_lago_encryption_primary_key_32
       - ENCRYPTION_DETERMINISTIC_KEY=reloop_lago_encryption_deterministic
@@ -270,7 +271,7 @@ services:
     ports:
       - "8080:80"
     environment:
-      - API_URL=http://localhost:3000
+      - API_URL=http://localhost:9000
       - APP_ENV=production
     restart: unless-stopped
 

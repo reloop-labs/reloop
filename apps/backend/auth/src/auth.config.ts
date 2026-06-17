@@ -17,6 +17,6 @@ export const authConfig = {
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
-	LAGO_API_URL: process.env.LAGO_API_URL || "http://localhost:3000",
+	LAGO_API_URL: process.env.LAGO_API_URL || "http://localhost:9000",
 	LAGO_API_KEY: process.env.LAGO_API_KEY || "",
 };
