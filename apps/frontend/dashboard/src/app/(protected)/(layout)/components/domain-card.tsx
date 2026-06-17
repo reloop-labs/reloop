@@ -267,7 +267,8 @@ export function DomainCard() {
 					href="/domain"
 					className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 				>
-					<span>Domains</span>
+					<Icon name="globe" className="h-4 w-4 shrink-0" />
+					Domains
 					<span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-zinc-100 px-1.5 font-semibold text-[11px] text-text-sub-600 dark:bg-white/10 dark:text-white/40">
 						{domainData?.total ?? 0}
 					</span>
