@@ -114,7 +114,7 @@ export async function sendEmailController({
 
 			if (lastMsg?.rfc822MessageId) {
 				threadHeaders["In-Reply-To"] = lastMsg.rfc822MessageId;
-				threadHeaders["References"] = lastMsg.rfc822MessageId;
+				threadHeaders.References = lastMsg.rfc822MessageId;
 			}
 		}
 
