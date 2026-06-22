@@ -4,8 +4,8 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { ArrowRight } from "lucide-react";
-import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
+import Link from "next/link";
 import { useRef, useState } from "react";
 import {
 	siDjango,

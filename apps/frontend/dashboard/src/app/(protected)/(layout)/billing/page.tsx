@@ -78,7 +78,7 @@ function UsageBar({ used, total }: { used: number; total: number }) {
 			<div className="flex items-center justify-between text-sm">
 				<span className="text-text-sub-600">Credits remaining</span>
 				<span className="font-medium text-text-strong-950 tabular-nums">
-					{formatCredits(used)}{" "}
+					{formatCredits(total - used)}{" "}
 					<span className="text-text-sub-600">/ {formatCredits(total)}</span>
 				</span>
 			</div>
@@ -233,7 +233,7 @@ export default function BillingPage() {
 
 				<div className="mt-6">
 					<UsageBar
-						used={billing?.subscription.creditsRemaining ?? 0}
+						used={creditsUsed}
 						total={billing?.subscription.monthlyCredits ?? 1}
 					/>
 				</div>
