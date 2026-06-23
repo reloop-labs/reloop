@@ -38,6 +38,63 @@ interface BackendMessage {
 	createdAt: string | Date;
 }
 
+const getEmailIcon = (status: string) => {
+	switch (status?.toLowerCase()) {
+		case "sent":
+			return "send";
+		case "delivered":
+			return "check-circle";
+		case "opened":
+			return "eye-outline";
+		case "clicked":
+			return "cursor-click";
+		case "received":
+			return "mail-receive";
+		case "spam":
+			return "alert-triangle";
+		default:
+			return "mail-send";
+	}
+};
+
+const getEmailIconColorClass = (status: string) => {
+	switch (status?.toLowerCase()) {
+		case "sent":
+			return "text-blue-500 dark:text-blue-400";
+		case "delivered":
+			return "text-green-500 dark:text-green-400";
+		case "opened":
+		case "clicked":
+			return "text-text-sub-600 dark:text-white/40";
+		case "received":
+			return "text-blue-500 dark:text-blue-400";
+		case "spam":
+			return "text-error-base";
+		default:
+			return "text-text-sub-600 dark:text-white/40";
+	}
+};
+
+const formatShortRelativeTime = (date: string | Date) => {
+	const now = new Date();
+	const diffMs = now.getTime() - new Date(date).getTime();
+	const diffSec = Math.max(0, Math.floor(diffMs / 1000));
+	const diffMin = Math.floor(diffSec / 60);
+	const diffHr = Math.floor(diffMin / 60);
+	const diffDay = Math.floor(diffHr / 24);
+
+	if (diffSec < 30) {
+		return "just now";
+	}
+	if (diffMin < 60) {
+		return `${diffMin}m ago`;
+	}
+	if (diffHr < 24) {
+		return `${diffHr}h ago`;
+	}
+	return `${diffDay}d ago`;
+};
+
 export function EmailsCard() {
 	const { activeOrganization } = useUserOrganization();
 	const [activeTab, setActiveTab] = useState<"sent" | "received">("sent");
@@ -56,7 +113,7 @@ export function EmailsCard() {
 
 	// Fetch Sent logs
 	const { data: emailLogsData } = useSWR<EmailListResponse>(
-		activeOrganization?.id ? "/api/logs/v1/emails?limit=5&page=1" : null,
+		activeOrganization?.id ? "/api/logs/v1/emails?limit=10&page=1" : null,
 	);
 
 	// Fetch Received logs
@@ -184,44 +241,33 @@ export function EmailsCard() {
 				</div>
 
 				{/* List or Empty State */}
-				<div className="min-h-0 flex-1 overflow-y-auto">
+				<div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
 					{activeTab === "sent" ? (
 						hasSentLogs ? (
-							<div className="divide-y divide-stroke-soft-100/10 dark:divide-white/5">
-								{emailLogsData.data.slice(0, 4).map((d) => (
+							<div>
+								{emailLogsData.data.slice(0, 6).map((d) => (
 									<Link
 										key={d.id}
 										href={`/emails/${d.id}`}
-										className="grid grid-cols-3 items-center py-2.5 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.01]"
+										className="group/row flex items-center justify-between border-stroke-soft-100 border-b py-2.5 transition-colors last:border-b-0 hover:bg-bg-weak-50/50 dark:border-white/5 dark:hover:bg-white/[0.01]"
 									>
-										<div className="flex min-w-0 flex-col pr-2">
-											<span className="truncate font-semibold text-text-strong-950 text-xs dark:text-white">
+										<div className="flex min-w-0 flex-1 items-center gap-3">
+											<span title={d.status} className="shrink-0">
+												<Icon
+													name={getEmailIcon(d.status)}
+													className={cn(
+														"h-4 w-4",
+														getEmailIconColorClass(d.status),
+													)}
+												/>
+											</span>
+											<span className="truncate font-semibold text-text-strong-950 text-xs group-hover/row:underline dark:text-white">
 												{d.toEmails?.[0] || d.fromEmail || "(No Recipient)"}
 											</span>
-											<span className="truncate text-[10px] text-text-sub-600 dark:text-white/40">
-												{d.subject || "(No Subject)"}
-											</span>
 										</div>
-										<div className="flex items-center justify-center">
-											<span
-												className={cn(
-													"inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 font-semibold text-[9px] uppercase tracking-wider",
-													d.status === "delivered"
-														? "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400"
-														: d.status === "sent"
-															? "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400"
-															: "bg-zinc-50 text-zinc-600 dark:bg-zinc-500/10 dark:text-zinc-400",
-												)}
-											>
-												{d.status}
-											</span>
-										</div>
-										<div className="flex shrink-0 items-center justify-end whitespace-nowrap text-[10px] text-text-sub-600 dark:text-white/40">
-											{new Date(d.createdAt).toLocaleDateString([], {
-												month: "short",
-												day: "numeric",
-											})}
-										</div>
+										<span className="flex shrink-0 items-center justify-end whitespace-nowrap text-[10px] text-text-sub-600 dark:text-white/40">
+											{formatShortRelativeTime(d.createdAt)}
+										</span>
 									</Link>
 								))}
 							</div>
@@ -250,41 +296,30 @@ export function EmailsCard() {
 							</div>
 						)
 					) : hasReceivedMessages ? (
-						<div className="divide-y divide-stroke-soft-100/10 dark:divide-white/5">
-							{messagesData.slice(0, 4).map((d) => (
+						<div>
+							{messagesData.slice(0, 6).map((d) => (
 								<Link
 									key={d.id}
 									href={`/agent-inbox/${d.mailboxId}`}
-									className="grid grid-cols-3 items-center py-2.5 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.01]"
+									className="group/row flex items-center justify-between border-stroke-soft-100 border-b py-2.5 transition-colors last:border-b-0 hover:bg-bg-weak-50/50 dark:border-white/5 dark:hover:bg-white/[0.01]"
 								>
-									<div className="flex min-w-0 flex-col pr-2">
-										<span className="truncate font-semibold text-text-strong-950 text-xs dark:text-white">
-											{d.fromName || d.fromEmail || "(Unknown)"}
+									<div className="flex min-w-0 flex-1 items-center gap-3">
+										<span title={d.status} className="shrink-0">
+											<Icon
+												name={getEmailIcon(d.status)}
+												className={cn(
+													"h-4 w-4",
+													getEmailIconColorClass(d.status),
+												)}
+											/>
 										</span>
-										<span className="truncate text-[10px] text-text-sub-600 dark:text-white/40">
-											{d.subject || "(No Subject)"}
-										</span>
-									</div>
-									<div className="flex items-center justify-center">
-										<span
-											className={cn(
-												"inline-flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 font-semibold text-[9px] uppercase tracking-wider",
-												d.status === "received"
-													? "bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-green-400"
-													: d.status === "spam"
-														? "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400"
-														: "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400",
-											)}
-										>
-											{d.status}
+										<span className="truncate font-semibold text-text-strong-950 text-xs group-hover/row:underline dark:text-white">
+											{d.fromEmail || d.fromName || "(Unknown)"}
 										</span>
 									</div>
-									<div className="flex shrink-0 items-center justify-end whitespace-nowrap text-[10px] text-text-sub-600 dark:text-white/40">
-										{new Date(d.createdAt).toLocaleDateString([], {
-											month: "short",
-											day: "numeric",
-										})}
-									</div>
+									<span className="flex shrink-0 items-center justify-end whitespace-nowrap text-[10px] text-text-sub-600 dark:text-white/40">
+										{formatShortRelativeTime(d.createdAt)}
+									</span>
 								</Link>
 							))}
 						</div>

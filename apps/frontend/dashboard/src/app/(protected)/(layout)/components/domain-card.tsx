@@ -8,7 +8,6 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Popover from "@reloop/ui/popover";
 import * as Tooltip from "@reloop/ui/tooltip";
-import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, MoreHorizontal, Plus } from "lucide-react";
 import Link from "next/link";
@@ -59,10 +58,6 @@ const WaveSparkline = () => (
 			fill="url(#sparkline-grad)"
 		/>
 	</svg>
-);
-
-const FadingGradientBar = () => (
-	<div className="h-4.5 w-24 rounded bg-gradient-to-r from-blue-500/0 via-blue-500/10 to-blue-500/30 dark:from-blue-500/0 dark:via-blue-500/5 dark:to-blue-500/20" />
 );
 
 const formatCount = (count: number) => {
@@ -378,7 +373,7 @@ export function DomainCard() {
 					>
 						<div className="px-4">
 							<AnimatePresence initial={false}>
-								{domainData.domains.slice(0, 5).map((d, index) => (
+								{domainData.domains.slice(0, 5).map((d, _index) => (
 									<motion.div
 										key={d.id}
 										layout
@@ -431,11 +426,7 @@ export function DomainCard() {
 										{/* Middle column: Custom charts depending on index */}
 										<div className="hidden flex-1 items-center justify-center px-8 sm:flex">
 											{d.status === "active" && (d.sentCount || 0) > 0 && (
-												<>
-													{index === 0 && <FadingGradientBar />}
-													{index === 1 && <WaveSparkline />}
-													{index === 2 && <FadingGradientBar />}
-												</>
+												<WaveSparkline />
 											)}
 										</div>
 
