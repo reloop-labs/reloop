@@ -14,34 +14,32 @@ const navItems = [
 		href: "/features",
 		hasDropdown: true,
 		mega: {
-			links: [
-				{ title: "Campaigns", href: "/features/campaigns" },
-				{ title: "Deliverability", href: "/features/deliverability" },
-				{ title: "Email Analytics", href: "/features/email-analytics" },
-				{ title: "Templates", href: "/features/email-templates" },
-				{ title: "SMTP", href: "/features/smtp" },
-				{ title: "Languages", href: "/features/languages" },
-				{ title: "Validation", href: "/features/email-validation" },
-				{ title: "Transaction", href: "/features/transaction-emails" },
-			],
-			featured: [
+			categories: [
 				{
-					title: "Agent Inbox",
-					description: "Manage all your emails in one place",
-					href: "/features/ai-agents",
-					icon: "inbox",
+					title: "Core Features",
+					links: [
+						{ title: "Campaigns", href: "/features/campaigns" },
+						{ title: "Deliverability", href: "/features/deliverability" },
+						{ title: "Email Analytics", href: "/features/email-analytics" },
+						{ title: "Templates", href: "/features/email-templates" },
+					],
 				},
 				{
-					title: "Transaction Email",
-					description: "Reliable email delivery for your app",
-					href: "/features/transaction-emails",
-					icon: "send-2",
+					title: "Infrastructure",
+					links: [
+						{ title: "SMTP", href: "/features/smtp" },
+						{ title: "Languages", href: "/features/languages" },
+						{ title: "Validation", href: "/features/email-validation" },
+						{ title: "Transaction", href: "/features/transaction-emails" },
+					],
 				},
 				{
-					title: "Marketing Email",
-					description: "Design and send beautiful campaigns",
-					href: "/features/campaigns",
-					icon: "mega-phone",
+					title: "Featured",
+					links: [
+						{ title: "Agent Inbox", href: "/features/ai-agents" },
+						{ title: "Transaction Email", href: "/features/transaction-emails" },
+						{ title: "Marketing Email", href: "/features/campaigns" },
+					],
 				},
 			],
 		},
@@ -51,25 +49,23 @@ const navItems = [
 		href: "/company",
 		hasDropdown: true,
 		mega: {
-			links: [
-				{ title: "About", href: "/company/about-us" },
-				{ title: "Blog", href: "/company/blog" },
-				{ title: "Careers", href: "/company/careers" },
-				{ title: "Customers", href: "/company/customers" },
-				{ title: "Humans", href: "/company/humans" },
-			],
-			featured: [
+			categories: [
 				{
-					title: "Handbook",
-					description: "How we work",
-					href: "/company/handbook",
-					icon: "file-text",
+					title: "Company",
+					links: [
+						{ title: "About Us", href: "/company/about-us" },
+						{ title: "Blog", href: "/company/blog" },
+						{ title: "Careers", href: "/company/careers" },
+						{ title: "Customers", href: "/company/customers" },
+						{ title: "Humans", href: "/company/humans" },
+					],
 				},
 				{
-					title: "Philosophy",
-					description: "What we value",
-					href: "/philosophy/why-reloop",
-					icon: "bulb",
+					title: "Culture",
+					links: [
+						{ title: "Handbook", href: "/company/handbook" },
+						{ title: "Philosophy", href: "/philosophy/why-reloop" },
+					],
 				},
 			],
 		},
@@ -79,27 +75,23 @@ const navItems = [
 		href: "/resources",
 		hasDropdown: true,
 		mega: {
-			links: [
-				{ title: "Changelog", href: "/resources/changelog" },
-				{ title: "Compare", href: "/compare" },
-				{ title: "Community", href: "/resources/community" },
-				{ title: "Glossary", href: "/resources/glossary" },
-				{ title: "Self Hosting", href: "/resources/self-hosting-guide" },
-				{ title: "Status", href: "/resources/status" },
-				{ title: "Tools", href: "/resources/tools" },
-			],
-			featured: [
+			categories: [
 				{
-					title: "Changelog",
-					description: "Stay updated with latest releases",
-					href: "/resources/changelog",
-					icon: "refresh-cw",
+					title: "Resources",
+					links: [
+						{ title: "Changelog", href: "/resources/changelog" },
+						{ title: "Compare", href: "/compare" },
+						{ title: "Community", href: "/resources/community" },
+						{ title: "Glossary", href: "/resources/glossary" },
+					],
 				},
 				{
-					title: "Community",
-					description: "Join our open-source community",
-					href: "/resources/community",
-					icon: "users",
+					title: "Developers",
+					links: [
+						{ title: "Self Hosting", href: "/resources/self-hosting-guide" },
+						{ title: "Status", href: "/resources/status" },
+						{ title: "Tools", href: "/resources/tools" },
+					],
 				},
 			],
 		},
@@ -109,24 +101,22 @@ const navItems = [
 		href: "/help",
 		hasDropdown: true,
 		mega: {
-			links: [
-				{ title: "Contact Us", href: "/company/contact-us" },
-				{ title: "Support", href: "/help/support" },
-				{ title: "FAQ", href: "/help/faq" },
-				{ title: "Community", href: "/resources/community" },
-			],
-			featured: [
-				{
-					title: "Contact Us",
-					description: "Talk to our team of experts",
-					href: "/company/contact-us",
-					icon: "mega-phone",
-				},
+			categories: [
 				{
 					title: "Support",
-					description: "Get help with your implementation",
-					href: "/help/support",
-					icon: "heart",
+					links: [
+						{ title: "Contact Us", href: "/company/contact-us" },
+						{ title: "Support", href: "/help/support" },
+						{ title: "FAQ", href: "/help/faq" },
+						{ title: "Community", href: "/resources/community" },
+					],
+				},
+				{
+					title: "Featured",
+					links: [
+						{ title: "Contact Us", href: "/company/contact-us" },
+						{ title: "Support", href: "/help/support" },
+					],
 				},
 			],
 		},
@@ -136,25 +126,23 @@ const navItems = [
 		href: "/docs",
 		hasDropdown: true,
 		mega: {
-			links: [
-				{ title: "Getting Started", href: "/features/getting-started" },
-				{ title: "API Reference", href: "/features/api-reference" },
-				{ title: "SDKs", href: "/features/SDKs" },
-				{ title: "Webhooks", href: "/features/webhooks" },
-				{ title: "Integration", href: "/features/integration" },
-			],
-			featured: [
+			categories: [
 				{
-					title: "Documentation",
-					description: "Everything you need to build",
-					href: "/features/getting-started",
-					icon: "file-text",
+					title: "Getting Started",
+					links: [
+						{ title: "Getting Started", href: "/features/getting-started" },
+						{ title: "API Reference", href: "/features/api-reference" },
+						{ title: "SDKs", href: "/features/SDKs" },
+						{ title: "Webhooks", href: "/features/webhooks" },
+						{ title: "Integration", href: "/features/integration" },
+					],
 				},
 				{
-					title: "API Reference",
-					description: "Complete API specification",
-					href: "/features/api-reference",
-					icon: "brackets",
+					title: "Docs & References",
+					links: [
+						{ title: "Documentation", href: "/features/getting-started" },
+						{ title: "API Reference", href: "/features/api-reference" },
+					],
 				},
 			],
 		},
@@ -164,24 +152,22 @@ const navItems = [
 		href: "/ai",
 		hasDropdown: true,
 		mega: {
-			links: [
-				{ title: "AI Inbox", href: "/ai/inbox" },
-				{ title: "Agent Integration", href: "/ai/agents" },
-				{ title: "LLM Tools", href: "/ai/tools" },
-				{ title: "Webhooks", href: "/features/webhooks" },
-			],
-			featured: [
+			categories: [
 				{
-					title: "AI-Native Inbox",
-					description: "Automate your email workflow",
-					href: "/ai/inbox",
-					icon: "sparkling",
+					title: "AI Services",
+					links: [
+						{ title: "AI Inbox", href: "/ai/inbox" },
+						{ title: "Agent Integration", href: "/ai/agents" },
+						{ title: "LLM Tools", href: "/ai/tools" },
+						{ title: "Webhooks", href: "/features/webhooks" },
+					],
 				},
 				{
-					title: "Agent SDK",
-					description: "Build smarter autonomous agents",
-					href: "/ai/agents",
-					icon: "modules",
+					title: "AI Development",
+					links: [
+						{ title: "AI-Native Inbox", href: "/ai/inbox" },
+						{ title: "Agent SDK", href: "/ai/agents" },
+					],
 				},
 			],
 		},
@@ -409,56 +395,36 @@ export const Header = () => {
 												exit="exit"
 												className="w-full"
 											>
-												<div className="flex w-full gap-4 pt-4">
-													<div className="flex w-1/4 flex-col gap-1 border-[#0a0d12]/5 border-r pr-4 dark:border-white/5">
-														{activeItem.mega.links.map((link) => (
-															<motion.div
-																key={link.title}
-																variants={itemVariants}
-															>
-																<Link
-																	href={link.href}
-																	className="block rounded-lg px-3 py-2 font-semibold text-[#0a0d12]/50 text-[14px] transition-colors hover:bg-[#0a0d12]/4 hover:text-[#0a0d12] dark:text-white/50 dark:hover:bg-white/5 dark:hover:text-white"
-																>
-																	{link.title}
-																</Link>
-															</motion.div>
-														))}
-													</div>
-													<div className="grid flex-1 grid-cols-2 gap-3">
-														{activeItem.mega.featured.map((feat) => (
-															<motion.div
-																key={feat.title}
-																variants={itemVariants}
-																whileHover={{
-																	scale: 1.02,
-																}}
-																whileTap={{
-																	scale: 0.98,
-																}}
-															>
-																<Link
-																	href={feat.href}
-																	className="group flex items-center gap-4 rounded-xl border border-[#0a0d12]/5 bg-[#0a0d12]/[0.02] p-4 transition-all hover:border-[#0a0d12]/10 hover:bg-[#0a0d12]/[0.04] dark:border-white/5 dark:bg-white/[0.03] dark:hover:border-white/10 dark:hover:bg-white/[0.06]"
-																>
-																	<div className="flex size-12 items-center justify-center rounded-lg border border-[#0a0d12]/8 bg-[#0a0d12]/4 dark:border-transparent dark:bg-black dark:shadow-inner">
-																		<Icon
-																			name={feat.icon as any}
-																			className="size-6 text-[#0a0d12]/60 transition-transform group-hover:scale-110 dark:text-white/70"
-																		/>
-																	</div>
-																	<div>
-																		<div className="font-semibold text-[#0a0d12] text-[14px] dark:text-white">
-																			{feat.title}
-																		</div>
-																		<div className="text-[#0a0d12]/40 text-[12px] dark:text-white/40">
-																			{feat.description}
-																		</div>
-																	</div>
-																</Link>
-															</motion.div>
-														))}
-													</div>
+												<div className="flex w-full gap-20 pt-6 pb-8 px-8">
+													{activeItem?.mega?.categories?.map((category) => (
+														<div key={category.title} className="flex min-w-[160px] flex-col gap-3">
+															<span className="text-[11px] font-bold tracking-wider text-[#0a0d12]/40 dark:text-white/40 uppercase mb-1">
+																{category.title}
+															</span>
+															<div className="flex flex-col gap-2">
+																{category.links.map((link: any) => (
+																	<motion.div
+																		key={link.title}
+																		variants={itemVariants}
+																	>
+																		<Link
+																			href={link.href}
+																			target={link.isExternal ? "_blank" : undefined}
+																			rel={link.isExternal ? "noopener noreferrer" : undefined}
+																			className="group inline-flex items-center gap-0.5 font-semibold text-[#0a0d12]/60 text-[14px] transition-colors hover:text-[#0a0d12] dark:text-white/60 dark:hover:text-white"
+																		>
+																			{link.title}
+																			{link.hasArrow && (
+																				<span className="inline-block transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 text-[10px] text-[#0a0d12]/40 dark:text-white/40 ml-0.5">
+																					↗
+																				</span>
+																			)}
+																		</Link>
+																	</motion.div>
+																))}
+															</div>
+														</div>
+													))}
 												</div>
 											</motion.div>
 										</AnimatePresence>
