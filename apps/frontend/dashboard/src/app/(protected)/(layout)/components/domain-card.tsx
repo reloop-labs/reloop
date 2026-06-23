@@ -530,19 +530,15 @@ export function DomainCard() {
 							{(statusFilter === "failed" || statusFilter === "suspended") &&
 								"No domains have a verification error right now."}
 						</p>
-						<button
-							type="button"
+						<Button.Root
+							variant="neutral"
+							mode="stroke"
+							size="xsmall"
 							onClick={() => setStatusFilter(null)}
-							className={cn(
-								Button.buttonVariants({
-									variant: "neutral",
-									mode: "stroke",
-									size: "small",
-								}).root(),
-							)}
+							className="mt-6 shrink-0 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 						>
 							Clear filter
-						</button>
+						</Button.Root>
 					</motion.div>
 				) : (
 					/* Truly empty — no domains at all */
@@ -561,22 +557,19 @@ export function DomainCard() {
 						<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
 							Send emails from your own domain
 						</h4>
-						<p className="mt-2 mb-4 max-w-[340px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
+						<p className="mt-2 max-w-[340px] text-text-sub-600 text-xs leading-relaxed dark:text-white/50">
 							Configure SPF, DKIM, and DMARC to protect deliverability and your
 							domain reputation.
 						</p>
-						<Link
-							href="/domain/add"
-							className={cn(
-								Button.buttonVariants({
-									variant: "neutral",
-									mode: "stroke",
-									size: "small",
-								}).root(),
-							)}
+						<Button.Root
+							variant="neutral"
+							mode="stroke"
+							size="xsmall"
+							asChild
+							className="mt-6 shrink-0 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 						>
-							Add your domain
-						</Link>
+							<Link href="/domain/add">Add your domain</Link>
+						</Button.Root>
 					</motion.div>
 				)}
 			</AnimatePresence>

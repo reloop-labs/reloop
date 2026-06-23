@@ -162,7 +162,7 @@ export function FrameworkIntegrationsCard() {
 										<span className="font-semibold text-text-strong-950 text-xs group-hover/tile:underline dark:text-white">
 											{item.name}
 										</span>
-										<ArrowRight className="h-3 w-3 shrink-0 text-text-sub-400 opacity-0 transition-all group-hover/tile:text-text-strong-950 group-hover/tile:opacity-100" />
+										<ArrowRight className="h-3 w-3 shrink-0 text-text-sub-400 transition-colors group-hover/tile:text-text-strong-950 dark:text-white/40 dark:group-hover/tile:text-white" />
 									</div>
 								</div>
 							</div>
