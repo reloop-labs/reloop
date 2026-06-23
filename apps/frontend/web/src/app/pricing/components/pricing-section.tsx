@@ -10,11 +10,7 @@ import {
 } from "@reloop/web/lib/pricing";
 import Link from "next/link";
 
-function PlanCard({
-	plan,
-}: {
-	plan: (typeof pricingPlans)[number];
-}) {
+function PlanCard({ plan }: { plan: (typeof pricingPlans)[number] }) {
 	const price = getPlanPrice(plan);
 	const isCustom = price === null;
 
