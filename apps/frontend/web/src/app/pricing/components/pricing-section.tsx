@@ -3,66 +3,19 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import {
-	ANNUAL_DISCOUNT_LABEL,
-	type BillingCycle,
 	comparisonRows,
 	formatPrice,
 	getPlanPrice,
 	pricingPlans,
 } from "@reloop/web/lib/pricing";
 import Link from "next/link";
-import { useState } from "react";
-
-function BillingToggle({
-	billingCycle,
-	onChange,
-}: {
-	billingCycle: BillingCycle;
-	onChange: (cycle: BillingCycle) => void;
-}) {
-	return (
-		<div className="flex flex-col items-center gap-3">
-			<div className="inline-flex items-center rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-1 dark:border-white/10 dark:bg-white/[0.03]">
-				<button
-					type="button"
-					onClick={() => onChange("monthly")}
-					className={cn(
-						"rounded-xl px-5 py-2 font-semibold text-[14px] transition-colors",
-						billingCycle === "monthly"
-							? "bg-[#0a0d12] text-white dark:bg-white dark:text-black"
-							: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
-					)}
-				>
-					Monthly
-				</button>
-				<button
-					type="button"
-					onClick={() => onChange("annual")}
-					className={cn(
-						"rounded-xl px-5 py-2 font-semibold text-[14px] transition-colors",
-						billingCycle === "annual"
-							? "bg-[#0a0d12] text-white dark:bg-white dark:text-black"
-							: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white",
-					)}
-				>
-					Annual
-				</button>
-			</div>
-			<p className="font-semibold text-[11px] text-primary-base uppercase tracking-[0.14em]">
-				{ANNUAL_DISCOUNT_LABEL} on annual billing
-			</p>
-		</div>
-	);
-}
 
 function PlanCard({
 	plan,
-	billingCycle,
 }: {
 	plan: (typeof pricingPlans)[number];
-	billingCycle: BillingCycle;
 }) {
-	const price = getPlanPrice(plan, billingCycle);
+	const price = getPlanPrice(plan);
 	const isCustom = price === null;
 
 	return (
@@ -147,18 +100,6 @@ function PlanCard({
 				>
 					{plan.emailsLabel}
 				</p>
-				{billingCycle === "annual" && !isCustom && price > 0 && (
-					<p
-						className={cn(
-							"mt-1 text-[13px]",
-							plan.highlighted
-								? "text-white/40"
-								: "text-text-sub-600 dark:text-white/40",
-						)}
-					>
-						Billed annually
-					</p>
-				)}
 			</div>
 
 			<ul className="mt-8 space-y-3">
@@ -206,7 +147,7 @@ function PlanCard({
 	);
 }
 
-function ComparisonTable({ billingCycle }: { billingCycle: BillingCycle }) {
+function ComparisonTable() {
 	return (
 		<div className="overflow-hidden rounded-3xl border border-stroke-soft-200 dark:border-white/10">
 			<div className="overflow-x-auto">
@@ -232,7 +173,7 @@ function ComparisonTable({ billingCycle }: { billingCycle: BillingCycle }) {
 								Price
 							</td>
 							{pricingPlans.map((plan) => {
-								const price = getPlanPrice(plan, billingCycle);
+								const price = getPlanPrice(plan);
 								return (
 									<td
 										key={plan.id}
@@ -285,22 +226,16 @@ function ComparisonTable({ billingCycle }: { billingCycle: BillingCycle }) {
 }
 
 export function PricingSection() {
-	const [billingCycle, setBillingCycle] = useState<BillingCycle>("monthly");
-
 	return (
 		<>
-			<div className="mb-12">
-				<BillingToggle billingCycle={billingCycle} onChange={setBillingCycle} />
-			</div>
-
-			<div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-4">
+			<div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
 				{pricingPlans.map((plan) => (
-					<PlanCard key={plan.id} plan={plan} billingCycle={billingCycle} />
+					<PlanCard key={plan.id} plan={plan} />
 				))}
 			</div>
 
 			<div className="mt-16">
-				<ComparisonTable billingCycle={billingCycle} />
+				<ComparisonTable />
 			</div>
 		</>
 	);

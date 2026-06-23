@@ -31,11 +31,6 @@ const pricingFaqItems = [
 		answer:
 			"Yes. Upgrade or downgrade from your dashboard. Plan changes apply to the current billing period according to your subscription settings.",
 	},
-	{
-		question: "Do annual plans include a discount?",
-		answer:
-			"Yes. Annual billing saves 20% compared to paying monthly on Pro and Scale plans.",
-	},
 ];
 
 export function PricingFaq() {

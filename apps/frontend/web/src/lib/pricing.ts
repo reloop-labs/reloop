@@ -1,13 +1,10 @@
-export type BillingCycle = "monthly" | "annual";
-
-export type PlanId = "free" | "pro" | "scale" | "enterprise";
+export type PlanId = "free" | "essentials" | "enterprise";
 
 export interface PricingPlan {
 	id: PlanId;
 	name: string;
 	description: string;
 	monthlyPrice: number | null;
-	annualMonthlyPrice: number | null;
 	emailsLabel: string;
 	ctaLabel: string;
 	ctaHref: string;
@@ -29,15 +26,12 @@ export interface PricingPlan {
 	};
 }
 
-export const ANNUAL_DISCOUNT_LABEL = "Save 20%";
-
 export const pricingPlans: PricingPlan[] = [
 	{
 		id: "free",
 		name: "Free",
 		description: "For side projects and getting started with Reloop.",
 		monthlyPrice: 0,
-		annualMonthlyPrice: 0,
 		emailsLabel: "3,000 emails / month",
 		ctaLabel: "Get started",
 		ctaHref: "/dashboard/signup",
@@ -63,24 +57,23 @@ export const pricingPlans: PricingPlan[] = [
 		},
 	},
 	{
-		id: "pro",
-		name: "Pro",
-		description: "For production apps shipping email at scale.",
-		monthlyPrice: 19,
-		annualMonthlyPrice: 15,
-		emailsLabel: "50,000 emails / month",
-		ctaLabel: "Start Pro trial",
+		id: "essentials",
+		name: "Essentials",
+		description: "For startup founders & growing companies.",
+		monthlyPrice: 9,
+		emailsLabel: "25,000 emails / month",
+		ctaLabel: "Start Essentials trial",
 		ctaHref: "/dashboard/signup",
 		highlighted: true,
 		features: [
-			"50,000 emails per month",
+			"25,000 emails per month",
 			"Overage at $0.80 / 1,000 emails",
 			"50 emails / second throughput",
 			"25 MB attachments",
 			"Email support",
 		],
 		comparison: {
-			monthlyEmails: "50,000",
+			monthlyEmails: "25,000",
 			overage: "$0.80 / 1k",
 			ratePerSecond: "50 / sec",
 			attachmentSize: "25 MB",
@@ -94,41 +87,10 @@ export const pricingPlans: PricingPlan[] = [
 		},
 	},
 	{
-		id: "scale",
-		name: "Scale",
-		description: "For teams with high-volume sending and advanced needs.",
-		monthlyPrice: 79,
-		annualMonthlyPrice: 63,
-		emailsLabel: "250,000 emails / month",
-		ctaLabel: "Start Scale trial",
-		ctaHref: "/dashboard/signup",
-		features: [
-			"250,000 emails per month",
-			"Overage at $0.60 / 1,000 emails",
-			"200 emails / second throughput",
-			"50 MB attachments",
-			"Priority support & SLA",
-		],
-		comparison: {
-			monthlyEmails: "250,000",
-			overage: "$0.60 / 1k",
-			ratePerSecond: "200 / sec",
-			attachmentSize: "50 MB",
-			campaigns: true,
-			smtpRelay: true,
-			webhooks: true,
-			analytics: true,
-			agentInbox: true,
-			customDomains: "25",
-			support: "Priority",
-		},
-	},
-	{
 		id: "enterprise",
 		name: "Enterprise",
 		description: "Custom volume, security reviews, and dedicated support.",
 		monthlyPrice: null,
-		annualMonthlyPrice: null,
 		emailsLabel: "Custom volume",
 		ctaLabel: "Contact sales",
 		ctaHref: "/company/contact-us",
@@ -182,9 +144,6 @@ export function formatPrice(amount: number) {
 	}).format(amount);
 }
 
-export function getPlanPrice(plan: PricingPlan, billingCycle: BillingCycle) {
-	if (plan.monthlyPrice === null) return null;
-	return billingCycle === "annual"
-		? (plan.annualMonthlyPrice ?? plan.monthlyPrice)
-		: plan.monthlyPrice;
+export function getPlanPrice(plan: PricingPlan) {
+	return plan.monthlyPrice;
 }

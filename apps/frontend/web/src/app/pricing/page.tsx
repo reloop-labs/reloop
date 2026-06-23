@@ -16,7 +16,7 @@ const pricingPageUrl = `${siteUrl}/pricing`;
 export const metadata: Metadata = {
 	title: "Pricing | Reloop",
 	description:
-		"Simple, transparent email pricing. Start free with 3,000 emails per month. Scale on Pro, Scale, or Enterprise—hosted or self-hosted.",
+		"Simple, transparent email pricing. Start free with 3,000 emails per month. Upgrade to Essentials or Enterprise—hosted or self-hosted.",
 	openGraph: {
 		title: "Pricing | Reloop",
 		description:
@@ -34,12 +34,6 @@ const PricingPage = () => {
 	return (
 		<MarketingPageShell
 			titleLines={["Simple, transparent", "pricing."]}
-			description="Start free with 3,000 emails per month. Scale when you need to—same fair pricing whether Reloop hosts your stack or you self-host."
-			primaryCta={{ label: "Get started", href: hostedSignupHref }}
-			secondaryCta={{
-				label: "Self-hosting guide",
-				href: "/resources/self-hosting-guide",
-			}}
 			compactHero
 		>
 			<PageSection flushTop>
