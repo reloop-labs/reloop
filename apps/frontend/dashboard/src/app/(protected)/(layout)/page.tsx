@@ -39,7 +39,7 @@ export default function Home() {
 					<WebhooksCard />
 					<FrameworkIntegrationsCard />
 				</div>
-				<div className="lg:col-span-2">
+				<div className="h-fit lg:col-span-2">
 					<AgentIntegrationsCard />
 				</div>
 			</div>
