@@ -158,7 +158,7 @@ export function AgentInboxCard() {
 				</Link>
 				<div className="flex items-center gap-1.5">
 					<Link
-						href="/agent-inbox/create"
+						href="/agent-inbox?modal=create-agent-mailbox"
 						className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 transition-colors hover:bg-bg-weak-50/50 hover:text-text-strong-950 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/60"
 					>
 						<Plus className="h-3.5 w-3.5" />
@@ -286,7 +286,7 @@ export function AgentInboxCard() {
 						asChild
 						className="mt-6 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 					>
-						<Link href="/agent-inbox/create">Create email inbox</Link>
+						<Link href="/agent-inbox?modal=create-agent-mailbox">Create email inbox</Link>
 					</Button.Root>
 				</div>
 			)}

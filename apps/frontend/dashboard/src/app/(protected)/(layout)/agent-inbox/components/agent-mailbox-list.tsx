@@ -14,6 +14,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useRouter } from "next/navigation";
+import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { AddAgentAddressModal } from "./add-agent-address-modal";
@@ -159,7 +160,11 @@ const AgentMailboxActionsDropdown = ({
 export const AgentMailboxList = () => {
 	const router = useRouter();
 	const { mailboxes, threads, refresh, isLoadingMailboxes } = useAgentInbox();
-	const [addOpen, setAddOpen] = useState(false);
+	const [modal, setModal] = useQueryState("modal");
+	const addOpen = modal === "create-agent-mailbox";
+	const setAddOpen = (open: boolean) => {
+		setModal(open ? "create-agent-mailbox" : null);
+	};
 
 	const [togglingId, setTogglingId] = useState<string | null>(null);
 	const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -341,7 +346,10 @@ export const AgentMailboxList = () => {
 				</div>
 			</div>
 
-			<AddAgentAddressModal open={addOpen} onOpenChange={setAddOpen} />
+			<AddAgentAddressModal
+				isOpen={addOpen}
+				onClose={() => setAddOpen(false)}
+			/>
 		</div>
 	);
 };

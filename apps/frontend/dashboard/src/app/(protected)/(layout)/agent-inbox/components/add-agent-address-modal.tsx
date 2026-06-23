@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import useSWR from "swr";
 import * as v from "valibot";
@@ -36,19 +37,19 @@ const agentAddressSchema = v.object({
 type AgentAddressFormValues = v.InferInput<typeof agentAddressSchema>;
 
 export const AddAgentAddressModal = ({
-	open,
-	onOpenChange,
+	isOpen,
+	onClose,
 	onCreated,
 }: {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
+	isOpen: boolean;
+	onClose: () => void;
 	onCreated?: (mailbox: AgentMailbox) => void;
 }) => {
 	const router = useRouter();
 	const { addMailbox, mailboxes } = useAgentInbox();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const [isOpen, setIsOpen] = useState(false);
+	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
@@ -71,11 +72,34 @@ export const AddAgentAddressModal = ({
 		},
 	});
 
+	// Command/Ctrl + Enter to submit form
+	useHotkeys(
+		"mod+enter",
+		(e) => {
+			e.preventDefault();
+			form.handleSubmit(onSubmit)();
+		},
+		{ enableOnFormTags: ["INPUT"] },
+	);
+
 	useEffect(() => {
 		if (domainsList.length > 0 && !form.getValues("domain")) {
 			form.setValue("domain", domainsList[0]?.domain ?? "");
 		}
 	}, [domainsList, form]);
+
+	// Reset state when modal is closed
+	useEffect(() => {
+		if (!isOpen) {
+			const timer = setTimeout(() => {
+				form.reset();
+				if (domainsList.length > 0) {
+					form.setValue("domain", domainsList[0]?.domain ?? "");
+				}
+			}, 300); // Wait for transition
+			return () => clearTimeout(timer);
+		}
+	}, [isOpen, form, domainsList]);
 
 	const onSubmit = async (data: AgentAddressFormValues) => {
 		const email = `${data.localPart}@${data.domain}`;
@@ -103,7 +127,7 @@ export const AddAgentAddressModal = ({
 			});
 			toast.success(`Agent address ${mailbox.email} created`);
 			form.reset();
-			onOpenChange(false);
+			onClose();
 			onCreated?.(mailbox);
 			router.push(`/agent-inbox/${mailbox.id}`);
 		} catch (error) {
@@ -118,10 +142,16 @@ export const AddAgentAddressModal = ({
 	};
 
 	return (
-		<Modal.Root open={open} onOpenChange={onOpenChange}>
+		<Modal.Root open={isOpen} onOpenChange={onClose}>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-stroke-soft-100 p-0 sm:max-w-[440px] dark:border-stroke-soft-100/40"
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 p-0 sm:max-w-[480px] dark:border-stroke-soft-100/40"
 				showClose={false}
+				onEscapeKeyDown={(e) => {
+					if (isSubmitting) e.preventDefault();
+				}}
+				onPointerDownOutside={(e) => {
+					if (isSubmitting) e.preventDefault();
+				}}
 			>
 				<form onSubmit={form.handleSubmit(onSubmit)}>
 					<div className="flex flex-col border-stroke-soft-100 border-b dark:border-stroke-soft-100/40">
@@ -138,10 +168,14 @@ export const AddAgentAddressModal = ({
 										</h2>
 									</Modal.Title>
 								</div>
+								<p className="text-paragraph-xs text-text-sub-600">
+									Configure a new email inbox for your AI agents to send and
+									receive emails.
+								</p>
 							</div>
 							<button
 								type="button"
-								onClick={() => onOpenChange(false)}
+								onClick={onClose}
 								className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50"
 							>
 								<Icon name="cross" className="h-3.5 w-3.5" />
@@ -166,6 +200,7 @@ export const AddAgentAddressModal = ({
 									<Input.Input
 										id="agent-label"
 										placeholder="e.g. Support Agent"
+										autoFocus
 										{...form.register("label")}
 										disabled={isSubmitting}
 									/>
@@ -200,7 +235,10 @@ export const AddAgentAddressModal = ({
 										{...form.register("localPart")}
 										disabled={isSubmitting}
 									/>
-									<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
+									<Dropdown.Root
+										open={isDropdownOpen}
+										onOpenChange={setIsDropdownOpen}
+									>
 										<Dropdown.Trigger asChild>
 											<button
 												type="button"
@@ -218,7 +256,7 @@ export const AddAgentAddressModal = ({
 													name="chevron-down"
 													className={cn(
 														"ml-0.5 size-5 shrink-0 text-text-sub-600 transition duration-200 ease-out group-hover/trigger:text-text-strong-950 group-data-[state=open]/trigger:rotate-180 group-data-[state=open]/trigger:text-text-strong-950",
-														isOpen && "rotate-180 text-text-strong-950",
+														isDropdownOpen && "rotate-180 text-text-strong-950",
 													)}
 												/>
 											</button>
@@ -238,7 +276,7 @@ export const AddAgentAddressModal = ({
 															onPointerLeave={() => setHoverIdx(undefined)}
 															onClick={() => {
 																form.setValue("domain", d.domain);
-																setIsOpen(false);
+																setIsDropdownOpen(false);
 															}}
 															className={cn(
 																"flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-colors",
@@ -283,7 +321,7 @@ export const AddAgentAddressModal = ({
 							<a
 								href="/domain"
 								className="text-primary-base hover:underline"
-								onClick={() => onOpenChange(false)}
+								onClick={onClose}
 							>
 								Domain settings
 							</a>
@@ -298,7 +336,7 @@ export const AddAgentAddressModal = ({
 								variant="neutral"
 								mode="stroke"
 								size="xsmall"
-								onClick={() => onOpenChange(false)}
+								onClick={onClose}
 								disabled={isSubmitting}
 							>
 								Cancel
