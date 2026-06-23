@@ -22,9 +22,13 @@ export type LogIncomingParams = {
 export async function logIncomingController({
 	body,
 	organizationId,
+	userId,
+	apikeyId,
 }: {
 	body: LogIncomingParams;
 	organizationId: string;
+	userId?: string | null;
+	apikeyId?: string | null;
 }): Promise<{
 	id: string;
 	trackingDomain: string | null;
@@ -114,6 +118,8 @@ export async function logIncomingController({
 				`msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
 			organizationId: finalOrgId,
 			domainId: domainRecord.id,
+			userId: userId || null,
+			apikeyId: apikeyId || null,
 			fromEmail: body.fromEmail,
 			toEmails: body.toEmails,
 			subject: subject,

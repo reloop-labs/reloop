@@ -5,10 +5,12 @@ import { logIncomingController } from "./log-incoming.controllers";
 
 export const logIncomingRoute = new Elysia().use(authMiddleware).post(
 	"/log-incoming",
-	async ({ body, organizationId }) => {
+	async ({ body, organizationId, userId, apiKeyId }) => {
 		return await logIncomingController({
 			body,
 			organizationId,
+			userId,
+			apikeyId: apiKeyId,
 		});
 	},
 	{
