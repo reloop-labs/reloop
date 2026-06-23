@@ -342,7 +342,9 @@ export function EmailsCard() {
 								asChild
 								className="mt-6 shrink-0 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 							>
-								<Link href="/agent-inbox?modal=create-agent-mailbox">Set up inbox</Link>
+								<Link href="/agent-inbox?modal=create-agent-mailbox">
+									Set up inbox
+								</Link>
 							</Button.Root>
 						</div>
 					)}

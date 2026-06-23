@@ -115,11 +115,16 @@ const DomainSparkline = ({ domainId }: { domainId: string }) => {
 			return { x, y };
 		});
 
+		if (coords.length === 0 || !coords[0]) {
+			return { line: "", fill: "" };
+		}
+
 		// Build a smooth cubic bezier line using coordinate interpolation
 		let linePath = `M ${coords[0].x.toFixed(1)} ${coords[0].y.toFixed(1)}`;
 		for (let i = 0; i < coords.length - 1; i++) {
 			const p0 = coords[i];
 			const p1 = coords[i + 1];
+			if (!p0 || !p1) continue;
 			// Control points in the middle
 			const cp1x = p0.x + (p1.x - p0.x) / 3;
 			const cp1y = p0.y;

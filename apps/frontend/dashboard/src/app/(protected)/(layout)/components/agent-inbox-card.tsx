@@ -286,7 +286,9 @@ export function AgentInboxCard() {
 						asChild
 						className="mt-6 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 					>
-						<Link href="/agent-inbox?modal=create-agent-mailbox">Create email inbox</Link>
+						<Link href="/agent-inbox?modal=create-agent-mailbox">
+							Create email inbox
+						</Link>
 					</Button.Root>
 				</div>
 			)}
