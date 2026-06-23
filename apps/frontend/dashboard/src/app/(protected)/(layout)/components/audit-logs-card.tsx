@@ -108,7 +108,7 @@ export function AuditLogsCard() {
 	const { activeOrganization } = useUserOrganization();
 
 	const { data: auditLogsData } = useSWR<LogListResponse>(
-		activeOrganization?.id ? "/api/logs/v1/list?limit=5" : null,
+		activeOrganization?.id ? "/api/logs/v1/list?limit=6" : null,
 	);
 
 	return (
@@ -133,7 +133,7 @@ export function AuditLogsCard() {
 			{/* Body */}
 			{auditLogsData?.logs && auditLogsData.logs.length > 0 ? (
 				<div className="-mt-1.5 h-[250px] overflow-hidden rounded-xl border border-stroke-soft-100 bg-white px-4 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
-					{auditLogsData.logs.slice(0, 5).map((log) => {
+					{auditLogsData.logs.slice(0, 6).map((log) => {
 						const resource = getResource(log);
 						const error = isError(log);
 						const iconName = getEventIcon(log.event);
