@@ -3,12 +3,13 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import {
-	comparisonRows,
+	comparisonSections,
 	formatPrice,
 	getPlanPrice,
 	pricingPlans,
 } from "@reloop/web/lib/pricing";
 import Link from "next/link";
+import { Fragment } from "react";
 
 function PlanCard({ plan }: { plan: (typeof pricingPlans)[number] }) {
 	const price = getPlanPrice(plan);
@@ -145,27 +146,27 @@ function PlanCard({ plan }: { plan: (typeof pricingPlans)[number] }) {
 
 function ComparisonTable() {
 	return (
-		<div className="overflow-hidden rounded-3xl border border-stroke-soft-200 dark:border-white/10">
+		<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
 			<div className="overflow-x-auto">
-				<table className="w-full min-w-[720px] text-left text-[14px]">
+				<table className="w-full min-w-[720px] text-left">
 					<thead>
-						<tr className="border-stroke-soft-200 border-b bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.03]">
-							<th className="px-5 py-4 font-semibold text-text-strong-950 dark:text-white">
+						<tr className="border-stroke-soft-100 border-b bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]">
+							<th className="px-5 py-3 font-medium text-xs text-text-sub-600 dark:text-white/50 uppercase tracking-wider">
 								Compare plans
 							</th>
 							{pricingPlans.map((plan) => (
 								<th
 									key={plan.id}
-									className="px-5 py-4 font-semibold text-text-strong-950 dark:text-white"
+									className="px-5 py-3 font-medium text-xs text-text-sub-600 dark:text-white/50 uppercase tracking-wider"
 								>
 									{plan.name}
 								</th>
 							))}
 						</tr>
 					</thead>
-					<tbody className="divide-y divide-stroke-soft-200 dark:divide-white/10">
-						<tr className="bg-bg-weak-50/50 dark:bg-white/[0.02]">
-							<td className="px-5 py-4 font-medium text-text-sub-600 dark:text-white/50">
+					<tbody className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
+						<tr className="bg-bg-weak-50/30 dark:bg-white/[0.015] hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.025] transition-colors">
+							<td className="px-5 py-3.5 font-medium text-[13px] text-text-sub-600 dark:text-white/60">
 								Price
 							</td>
 							{pricingPlans.map((plan) => {
@@ -173,7 +174,7 @@ function ComparisonTable() {
 								return (
 									<td
 										key={plan.id}
-										className="px-5 py-4 font-semibold text-text-strong-950 dark:text-white"
+										className="px-5 py-3.5 font-bold text-[13px] text-text-strong-950 dark:text-white"
 									>
 										{price === null
 											? "Custom"
@@ -184,35 +185,47 @@ function ComparisonTable() {
 								);
 							})}
 						</tr>
-						{comparisonRows.map((row) => (
-							<tr key={row.key}>
-								<td className="px-5 py-4 text-text-sub-600 dark:text-white/50">
-									{row.label}
-								</td>
-								{pricingPlans.map((plan) => {
-									const value = plan.comparison[row.key];
-									return (
-										<td key={plan.id} className="px-5 py-4">
-											{row.type === "boolean" ? (
-												value ? (
-													<Icon
-														name="check"
-														className="size-4 text-primary-base"
-													/>
-												) : (
-													<span className="text-text-sub-600 dark:text-white/30">
-														—
-													</span>
-												)
-											) : (
-												<span className="font-medium text-text-strong-950 dark:text-white">
-													{value as string}
-												</span>
-											)}
+						{comparisonSections.map((section) => (
+							<Fragment key={section.title}>
+								<tr className="bg-bg-weak-50/50 dark:bg-white/[0.02]">
+									<td
+										colSpan={4}
+										className="px-5 py-2.5 text-[11px] font-bold uppercase tracking-wider text-text-sub-600 dark:text-white/40"
+									>
+										{section.title}
+									</td>
+								</tr>
+								{section.rows.map((row) => (
+									<tr key={row.key} className="hover:bg-bg-weak-50/30 dark:hover:bg-white/[0.01] transition-colors">
+										<td className="px-5 py-3 text-[13px] text-text-sub-600 dark:text-white/60">
+											{row.label}
 										</td>
-									);
-								})}
-							</tr>
+										{pricingPlans.map((plan) => {
+											const value = plan.comparison[row.key];
+											return (
+												<td key={plan.id} className="px-5 py-3">
+													{row.type === "boolean" ? (
+														value ? (
+															<Icon
+																name="check"
+																className="size-4 text-primary-base"
+															/>
+														) : (
+															<span className="text-text-sub-600 dark:text-white/30 text-[13px]">
+																—
+															</span>
+														)
+													) : (
+														<span className="font-semibold text-[13px] text-text-strong-950 dark:text-white">
+															{value as string}
+														</span>
+													)}
+												</td>
+											);
+										})}
+									</tr>
+								))}
+							</Fragment>
 						))}
 					</tbody>
 				</table>

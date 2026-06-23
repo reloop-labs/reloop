@@ -23,6 +23,10 @@ export interface PricingPlan {
 		agentInbox: boolean;
 		customDomains: string;
 		support: string;
+		emailValidation: string;
+		dedicatedIp: string;
+		sso: boolean;
+		sla: string;
 	};
 }
 
@@ -54,6 +58,10 @@ export const pricingPlans: PricingPlan[] = [
 			agentInbox: true,
 			customDomains: "1",
 			support: "Community",
+			emailValidation: "100 / mo",
+			dedicatedIp: "—",
+			sso: false,
+			sla: "—",
 		},
 	},
 	{
@@ -84,6 +92,10 @@ export const pricingPlans: PricingPlan[] = [
 			agentInbox: true,
 			customDomains: "5",
 			support: "Email",
+			emailValidation: "1,000 / mo",
+			dedicatedIp: "—",
+			sso: false,
+			sla: "—",
 		},
 	},
 	{
@@ -113,26 +125,64 @@ export const pricingPlans: PricingPlan[] = [
 			agentInbox: true,
 			customDomains: "Unlimited",
 			support: "Dedicated",
+			emailValidation: "Custom",
+			dedicatedIp: "Optional / custom",
+			sso: true,
+			sla: "99.99% / custom",
 		},
 	},
 ];
 
-export const comparisonRows: Array<{
-	label: string;
-	key: keyof PricingPlan["comparison"];
-	type: "text" | "boolean";
-}> = [
-	{ label: "Monthly emails", key: "monthlyEmails", type: "text" },
-	{ label: "Overage", key: "overage", type: "text" },
-	{ label: "Throughput", key: "ratePerSecond", type: "text" },
-	{ label: "Max attachment", key: "attachmentSize", type: "text" },
-	{ label: "Campaigns", key: "campaigns", type: "boolean" },
-	{ label: "SMTP relay", key: "smtpRelay", type: "boolean" },
-	{ label: "Webhooks", key: "webhooks", type: "boolean" },
-	{ label: "Analytics", key: "analytics", type: "boolean" },
-	{ label: "Agent inbox", key: "agentInbox", type: "boolean" },
-	{ label: "Custom domains", key: "customDomains", type: "text" },
-	{ label: "Support", key: "support", type: "text" },
+export interface ComparisonSection {
+	title: string;
+	rows: Array<{
+		label: string;
+		key: keyof PricingPlan["comparison"];
+		type: "text" | "boolean";
+	}>;
+}
+
+export const comparisonSections: ComparisonSection[] = [
+	{
+		title: "Volume & Pricing",
+		rows: [
+			{ label: "Monthly emails", key: "monthlyEmails", type: "text" },
+			{ label: "Overage", key: "overage", type: "text" },
+		],
+	},
+	{
+		title: "Sending Infrastructure",
+		rows: [
+			{ label: "Throughput", key: "ratePerSecond", type: "text" },
+			{ label: "SMTP relay", key: "smtpRelay", type: "boolean" },
+			{ label: "Max attachment", key: "attachmentSize", type: "text" },
+			{ label: "Campaigns", key: "campaigns", type: "boolean" },
+		],
+	},
+	{
+		title: "Inbound & Receiving",
+		rows: [
+			{ label: "Agent inbox", key: "agentInbox", type: "boolean" },
+			{ label: "Webhooks", key: "webhooks", type: "boolean" },
+		],
+	},
+	{
+		title: "Deliverability & Compliance",
+		rows: [
+			{ label: "Custom domains", key: "customDomains", type: "text" },
+			{ label: "Email validation", key: "emailValidation", type: "text" },
+			{ label: "SAML SSO", key: "sso", type: "boolean" },
+			{ label: "Dedicated IP", key: "dedicatedIp", type: "text" },
+		],
+	},
+	{
+		title: "Operations & Support",
+		rows: [
+			{ label: "Analytics", key: "analytics", type: "boolean" },
+			{ label: "Support", key: "support", type: "text" },
+			{ label: "SLA", key: "sla", type: "text" },
+		],
+	},
 ];
 
 export function formatPrice(amount: number) {
