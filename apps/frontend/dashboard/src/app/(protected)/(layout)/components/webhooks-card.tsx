@@ -81,11 +81,11 @@ export function WebhooksCard() {
 					</div>
 				</div>
 			) : (
-				<div className="-mt-1.5 flex h-[200px] flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+				<div className="-mt-1.5 flex h-[200px] flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white px-6 py-3 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
 					{/* Icon outline without pill wrapper */}
 					<Icon
 						name="webhook"
-						className="h-6 w-6 text-text-sub-600 dark:text-white/40"
+						className="h-6 w-6 shrink-0 text-text-sub-600 dark:text-white/40"
 					/>
 
 					{/* Heading */}
@@ -105,7 +105,7 @@ export function WebhooksCard() {
 						mode="stroke"
 						size="xsmall"
 						asChild
-						className="mt-6 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
+						className="mt-6 shrink-0 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 					>
 						<Link href="/webhooks/create">Create webhook</Link>
 					</Button.Root>

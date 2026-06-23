@@ -226,10 +226,10 @@ export function EmailsCard() {
 								))}
 							</div>
 						) : (
-							<div className="flex h-full flex-col items-center justify-center p-6 text-center">
+							<div className="flex h-full flex-col items-center justify-center px-6 py-4 text-center">
 								<Icon
 									name="mail-send"
-									className="h-6 w-6 text-text-sub-600 dark:text-white/40"
+									className="h-6 w-6 shrink-0 text-text-sub-600 dark:text-white/40"
 								/>
 								<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
 									Send emails without the overhead
@@ -243,7 +243,7 @@ export function EmailsCard() {
 									mode="stroke"
 									size="xsmall"
 									asChild
-									className="mt-6 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
+									className="mt-6 shrink-0 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 								>
 									<Link href="/emails/send">Send email</Link>
 								</Button.Root>
@@ -289,10 +289,10 @@ export function EmailsCard() {
 							))}
 						</div>
 					) : (
-						<div className="flex h-full flex-col items-center justify-center p-6 text-center">
+						<div className="flex h-full flex-col items-center justify-center px-6 py-4 text-center">
 							<Icon
 								name="mail-receive"
-								className="h-6 w-6 text-text-sub-600 dark:text-white/40"
+								className="h-6 w-6 shrink-0 text-text-sub-600 dark:text-white/40"
 							/>
 							<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">
 								No emails received yet
@@ -305,7 +305,7 @@ export function EmailsCard() {
 								mode="stroke"
 								size="xsmall"
 								asChild
-								className="mt-6 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
+								className="mt-6 shrink-0 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 							>
 								<Link href="/agent-inbox/create">Set up inbox</Link>
 							</Button.Root>
