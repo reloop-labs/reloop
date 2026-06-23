@@ -37,7 +37,10 @@ const navItems = [
 					title: "Featured",
 					links: [
 						{ title: "Agent Inbox", href: "/features/ai-agents" },
-						{ title: "Transaction Email", href: "/features/transaction-emails" },
+						{
+							title: "Transaction Email",
+							href: "/features/transaction-emails",
+						},
 						{ title: "Marketing Email", href: "/features/campaigns" },
 					],
 				},
@@ -395,10 +398,13 @@ export const Header = () => {
 												exit="exit"
 												className="w-full"
 											>
-												<div className="flex w-full gap-20 pt-6 pb-8 px-8">
+												<div className="flex w-full gap-20 px-8 pt-6 pb-8">
 													{activeItem?.mega?.categories?.map((category) => (
-														<div key={category.title} className="flex min-w-[160px] flex-col gap-3">
-															<span className="text-[11px] font-bold tracking-wider text-[#0a0d12]/40 dark:text-white/40 uppercase mb-1">
+														<div
+															key={category.title}
+															className="flex min-w-[160px] flex-col gap-3"
+														>
+															<span className="mb-1 font-bold text-[#0a0d12]/40 text-[11px] uppercase tracking-wider dark:text-white/40">
 																{category.title}
 															</span>
 															<div className="flex flex-col gap-2">
@@ -409,13 +415,19 @@ export const Header = () => {
 																	>
 																		<Link
 																			href={link.href}
-																			target={link.isExternal ? "_blank" : undefined}
-																			rel={link.isExternal ? "noopener noreferrer" : undefined}
+																			target={
+																				link.isExternal ? "_blank" : undefined
+																			}
+																			rel={
+																				link.isExternal
+																					? "noopener noreferrer"
+																					: undefined
+																			}
 																			className="group inline-flex items-center gap-0.5 font-semibold text-[#0a0d12]/60 text-[14px] transition-colors hover:text-[#0a0d12] dark:text-white/60 dark:hover:text-white"
 																		>
 																			{link.title}
 																			{link.hasArrow && (
-																				<span className="inline-block transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 text-[10px] text-[#0a0d12]/40 dark:text-white/40 ml-0.5">
+																				<span className="group-hover:-translate-y-0.5 ml-0.5 inline-block text-[#0a0d12]/40 text-[10px] transition-transform duration-200 group-hover:translate-x-0.5 dark:text-white/40">
 																					↗
 																				</span>
 																			)}

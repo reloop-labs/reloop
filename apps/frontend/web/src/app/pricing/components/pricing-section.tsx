@@ -151,13 +151,13 @@ function ComparisonTable() {
 				<table className="w-full min-w-[720px] text-left">
 					<thead>
 						<tr className="border-stroke-soft-100 border-b bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]">
-							<th className="px-5 py-3 font-medium text-xs text-text-sub-600 dark:text-white/50 uppercase tracking-wider">
+							<th className="px-5 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wider dark:text-white/50">
 								Compare plans
 							</th>
 							{pricingPlans.map((plan) => (
 								<th
 									key={plan.id}
-									className="px-5 py-3 font-medium text-xs text-text-sub-600 dark:text-white/50 uppercase tracking-wider"
+									className="px-5 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wider dark:text-white/50"
 								>
 									{plan.name}
 								</th>
@@ -165,7 +165,7 @@ function ComparisonTable() {
 						</tr>
 					</thead>
 					<tbody className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
-						<tr className="bg-bg-weak-50/30 dark:bg-white/[0.015] hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.025] transition-colors">
+						<tr className="bg-bg-weak-50/30 transition-colors hover:bg-bg-weak-50/50 dark:bg-white/[0.015] dark:hover:bg-white/[0.025]">
 							<td className="px-5 py-3.5 font-medium text-[13px] text-text-sub-600 dark:text-white/60">
 								Price
 							</td>
@@ -190,13 +190,16 @@ function ComparisonTable() {
 								<tr className="bg-bg-weak-50/50 dark:bg-white/[0.02]">
 									<td
 										colSpan={4}
-										className="px-5 py-2.5 text-[11px] font-bold uppercase tracking-wider text-text-sub-600 dark:text-white/40"
+										className="px-5 py-2.5 font-bold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40"
 									>
 										{section.title}
 									</td>
 								</tr>
 								{section.rows.map((row) => (
-									<tr key={row.key} className="hover:bg-bg-weak-50/30 dark:hover:bg-white/[0.01] transition-colors">
+									<tr
+										key={row.key}
+										className="transition-colors hover:bg-bg-weak-50/30 dark:hover:bg-white/[0.01]"
+									>
 										<td className="px-5 py-3 text-[13px] text-text-sub-600 dark:text-white/60">
 											{row.label}
 										</td>
@@ -211,7 +214,7 @@ function ComparisonTable() {
 																className="size-4 text-primary-base"
 															/>
 														) : (
-															<span className="text-text-sub-600 dark:text-white/30 text-[13px]">
+															<span className="text-[13px] text-text-sub-600 dark:text-white/30">
 																—
 															</span>
 														)

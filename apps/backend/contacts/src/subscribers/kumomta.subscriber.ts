@@ -260,8 +260,19 @@ export async function initKumomtaContactSubscriber() {
 				}
 
 				// ── Resolve emailLogId ─────────────────────────────────────────────
-				const emailLogId =
+				let emailLogId =
 					event.headers?.["X-Email-Log-ID"] ?? event.meta?.["X-Email-Log-ID"];
+
+				if (!emailLogId) {
+					// Fallback: look up by providerMessageId which corresponds to event.id (msg:id())
+					const logEntry = await db.query.emailLog.findFirst({
+						where: eq(schema.emailLog.providerMessageId, event.id),
+						columns: { id: true },
+					});
+					if (logEntry) {
+						emailLogId = logEntry.id;
+					}
+				}
 
 				if (!emailLogId) {
 					log.warn({

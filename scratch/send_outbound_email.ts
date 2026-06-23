@@ -9,7 +9,7 @@ async function main() {
 		secure: false,
 		auth: {
 			user: "reloop",
-			pass: "rl_prod_WoG-bCrNELR71Q_-NrCGxvouruA", // User provided local API key
+			pass: "rl_prod_3EAlofW-vn36xk1_2uYCJZ41kQs", // User provided local API key
 		},
 		tls: {
 			rejectUnauthorized: false,
