@@ -3,12 +3,15 @@ import { BusEvent, bus } from "@reloop/bus";
 interface AuditLogHookOptions {
 	action: string;
 	successStatus?: number;
+	resourceType?: string;
+	method?: string;
+	endpoint?: string;
 }
 
 export function auditLogHook(opts: AuditLogHookOptions) {
 	const successStatus = opts.successStatus ?? 200;
 	const action = opts.action;
-	const resourceType = "domain";
+	const resourceType = opts.resourceType ?? "domain";
 
 	return async ({
 		response,
@@ -71,6 +74,9 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 				metadata = {
 					...result,
 				};
+				if (resourceId && resourceType === "email") {
+					metadata.email_log_id = resourceId;
+				}
 			} else {
 				metadata = {
 					status,
@@ -128,8 +134,8 @@ export function auditLogHook(opts: AuditLogHookOptions) {
 					process.env.NODE_ENV === "production" ? "production" : "development",
 				metadata,
 				requestDetails: {
-					endpoint: request.url,
-					method: request.method,
+					endpoint: opts.endpoint ?? request.url,
+					method: opts.method ?? request.method,
 					userAgent,
 					ipAddress,
 					statusCode: Number(status),

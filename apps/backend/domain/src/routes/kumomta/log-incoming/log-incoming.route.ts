@@ -1,5 +1,6 @@
 import { ErrorResponseSchema } from "@reloop/domain/error/domain.error-response";
 import { authMiddleware } from "@reloop/domain/middleware/auth";
+import { auditLogHook } from "@reloop/domain/utils/audit-log";
 import { Elysia, t } from "elysia";
 import { logIncomingController } from "./log-incoming.controllers";
 
@@ -15,6 +16,12 @@ export const logIncomingRoute = new Elysia().use(authMiddleware).post(
 	},
 	{
 		apiKeyAuth: true,
+		afterResponse: auditLogHook({
+			resourceType: "email",
+			action: "sent",
+			method: "SMTP",
+			endpoint: "smtp",
+		}),
 		response: {
 			200: t.Object({
 				id: t.String(),

@@ -78,6 +78,8 @@ const getMethodBadgeClass = (method: string) => {
 			return "text-amber-700 dark:text-amber-400";
 		case "DELETE":
 			return "text-rose-700 dark:text-rose-400";
+		case "SMTP":
+			return "text-purple-700 dark:text-purple-400";
 		default:
 			return "text-text-sub-600";
 	}
