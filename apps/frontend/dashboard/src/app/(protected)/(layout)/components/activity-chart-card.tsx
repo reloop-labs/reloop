@@ -48,38 +48,44 @@ export function ActivityChartCard() {
 			: null,
 	);
 
-	// Calculate chart data from API stats or fallback to high-fidelity mock data
+	// Calculate chart data from API stats, aligning to a continuous 7-day timeline in UTC
 	const chartData = useMemo(() => {
-		if (emailStatsData && emailStatsData.dates.length > 0) {
-			return emailStatsData.dates.map((dateStr, idx) => {
-				const date = new Date(dateStr);
-				const formattedDate = `${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}`;
-				const sent = emailStatsData.sent[idx] || 0;
-				return {
-					date: formattedDate,
-					count: sent,
-				};
+		const days: { key: string; label: string }[] = [];
+		for (let i = 6; i >= 0; i--) {
+			const d = new Date();
+			d.setUTCDate(d.getUTCDate() - i);
+			const year = d.getUTCFullYear();
+			const monthStr = String(d.getUTCMonth() + 1).padStart(2, "0");
+			const dayStr = String(d.getUTCDate()).padStart(2, "0");
+			days.push({
+				key: `${year}-${monthStr}-${dayStr}`,
+				label: `${monthStr}/${dayStr}`,
 			});
 		}
-		// Gorgeous mock curve resembling the reference screenshot (a smooth Gaussian wave)
-		return [
-			{ date: "06/05", count: 0 },
-			{ date: "06/06", count: 0 },
-			{ date: "06/07", count: 0 },
-			{ date: "06/08", count: 0 },
-			{ date: "06/09", count: 2 },
-			{ date: "06/10", count: 48 },
-			{ date: "06/11", count: 98 },
-			{ date: "06/12", count: 8 },
-		];
+
+		// Map API dates/values to a lookup map of YYYY-MM-DD -> sent count
+		const statsMap = new Map<string, number>();
+		if (emailStatsData?.dates && emailStatsData?.sent) {
+			emailStatsData.dates.forEach((dateStr, idx) => {
+				const date = new Date(dateStr);
+				const year = date.getUTCFullYear();
+				const monthStr = String(date.getUTCMonth() + 1).padStart(2, "0");
+				const dayStr = String(date.getUTCDate()).padStart(2, "0");
+				const key = `${year}-${monthStr}-${dayStr}`;
+				statsMap.set(key, emailStatsData.sent[idx] || 0);
+			});
+		}
+
+		// Reconstruct the 7 points, filling with 0 if no data exists
+		return days.map((day) => ({
+			date: day.label,
+			count: statsMap.get(day.key) || 0,
+		}));
 	}, [emailStatsData]);
 
 	const totalActivityCount = useMemo(() => {
-		if (emailStatsData && emailStatsData.dates.length > 0) {
-			return emailStatsData.sent.reduce((a, b) => a + b, 0);
-		}
-		return 0;
-	}, [emailStatsData]);
+		return chartData.reduce((sum, item) => sum + item.count, 0);
+	}, [chartData]);
 
 	return (
 		<div className="group flex w-full flex-col">
