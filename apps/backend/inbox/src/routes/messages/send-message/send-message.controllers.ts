@@ -12,7 +12,7 @@ export async function sendMessageController(
 		cc?: string | string[];
 		bcc?: string | string[];
 		attachments?: Array<{
-			content?: unknown;
+			content?: string;
 			filename?: string;
 			path?: string;
 			content_type?: string;

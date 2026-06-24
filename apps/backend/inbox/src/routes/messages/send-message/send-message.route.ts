@@ -36,7 +36,7 @@ export const sendMessageRoute = new Elysia().use(authMiddleware).post(
 			attachments: t.Optional(
 				t.Array(
 					t.Object({
-						content: t.Optional(t.Union([t.String(), t.Unknown()])),
+						content: t.Optional(t.String()),
 						filename: t.Optional(t.String()),
 						path: t.Optional(t.String()),
 						content_type: t.Optional(t.String()),

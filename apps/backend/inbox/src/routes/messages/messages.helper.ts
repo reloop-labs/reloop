@@ -17,7 +17,7 @@ export interface SendFromInboxParams {
 	threadId?: string;
 	headers?: Record<string, string>;
 	attachments?: Array<{
-		content?: unknown;
+		content?: string;
 		filename?: string;
 		path?: string;
 		content_type?: string;
