@@ -11,7 +11,7 @@ import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useEffect, useRef, useState } from "react";
-import type { AgentMailbox } from "../../mock-data";
+import type { AgentMailbox } from "../../types";
 
 dayjs.extend(relativeTime);
 

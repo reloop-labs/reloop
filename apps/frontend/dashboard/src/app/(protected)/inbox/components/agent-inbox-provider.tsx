@@ -8,7 +8,7 @@ import {
 	useMemo,
 } from "react";
 import useSWR from "swr";
-import type { AgentMailbox, InboundThread } from "../mock-data";
+import type { AgentMailbox, InboundThread } from "../types";
 
 export type NewAgentAddressInput = {
 	label: string;
@@ -69,6 +69,23 @@ interface BackendMessage {
 	attachments?: BackendAttachment[];
 }
 
+interface BackendSentMessage {
+	id: string;
+	messageId: string;
+	organizationId: string;
+	domainId: string;
+	fromEmail: string;
+	fromName: string | null;
+	toEmails: string[];
+	ccEmails?: string[] | null;
+	bccEmails?: string[] | null;
+	subject: string;
+	textBody: string | null;
+	htmlBody: string | null;
+	status: string;
+	createdAt: string | Date;
+}
+
 interface AgentInboxContextValue {
 	mailboxes: AgentMailbox[];
 	threads: InboundThread[];
@@ -120,9 +137,18 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 	// Fetch messages from actual endpoint
 	const {
 		data: messagesData,
-		isLoading: isLoadingThreads,
+		isLoading: isLoadingInboundThreads,
 		mutate: mutateMessages,
 	} = useSWR<BackendMessage[]>("/api/inbox/v1/messages");
+
+	// Fetch sent messages from actual endpoint
+	const {
+		data: sentMessagesData,
+		isLoading: isLoadingSentMessages,
+		mutate: mutateSentMessages,
+	} = useSWR<BackendSentMessage[]>("/api/inbox/v1/messages/sent");
+
+	const isLoadingThreads = isLoadingInboundThreads || isLoadingSentMessages;
 
 	// Map backend mailboxes to UI structures
 	const mailboxes = useMemo(() => {
@@ -143,72 +169,137 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 	// Map backend messages to UI threads
 	const threads = useMemo(() => {
-		if (!messagesData) return [];
-		return messagesData.map((msg) => {
-			const receivedAtDate = msg.date || msg.createdAt;
-			const receivedAt =
-				typeof receivedAtDate === "string"
-					? receivedAtDate
-					: receivedAtDate
-						? receivedAtDate.toISOString()
-						: new Date().toISOString();
+		const mappedInbound = messagesData
+			? messagesData.map((msg) => {
+					const receivedAtDate = msg.date || msg.createdAt;
+					const receivedAt =
+						typeof receivedAtDate === "string"
+							? receivedAtDate
+							: receivedAtDate
+								? receivedAtDate.toISOString()
+								: new Date().toISOString();
 
-			const createdAtStr =
-				typeof msg.createdAt === "string"
-					? msg.createdAt
-					: msg.createdAt.toISOString();
+					const createdAtStr =
+						typeof msg.createdAt === "string"
+							? msg.createdAt
+							: msg.createdAt.toISOString();
 
-			return {
-				id: msg.id,
-				mailboxId: msg.mailboxId,
-				threadId: msg.threadId || undefined,
-				from: { name: msg.fromName || undefined, email: msg.fromEmail },
-				subject: msg.subject || "(No Subject)",
-				preview:
-					msg.snippet ||
-					(msg.textBody
-						? msg.textBody.substring(0, 120) +
-							(msg.textBody.length > 120 ? "..." : "")
-						: ""),
-				bodyText: msg.textBody || "",
-				bodyHtml: msg.htmlBody || undefined,
-				receivedAt,
-				status: msg.isSpam
-					? ("blocked" as const)
-					: msg.status === "processing"
-						? ("parsing" as const)
-						: msg.status === "needs_approval"
-							? ("needs_approval" as const)
-							: msg.isRead
-								? ("handled" as const)
-								: ("new" as const),
-				securityLevel: 5 as const,
-				unread: !msg.isRead,
-				cc: msg.ccEmails || undefined,
-				replyTo: msg.replyTo || undefined,
-				attachments:
-					msg.attachments?.map((att) => ({
-						name: att.filename,
-						size: `${(att.size / 1024).toFixed(1)} KB`,
-						contentType: att.contentType,
-						isInline: att.contentDisposition === "inline",
-					})) || [],
-				timeline: [
-					{ label: "Email received", at: createdAtStr, state: "done" as const },
-					{
-						label: "Delivered to NATS",
-						at: createdAtStr,
-						state: "done" as const,
-					},
-					{
-						label: "Inbox storage complete",
-						at: createdAtStr,
-						state: "done" as const,
-					},
-				],
-			};
-		});
-	}, [messagesData]);
+					return {
+						id: msg.id,
+						mailboxId: msg.mailboxId,
+						threadId: msg.threadId || undefined,
+						from: { name: msg.fromName || undefined, email: msg.fromEmail },
+						subject: msg.subject || "(No Subject)",
+						preview:
+							msg.snippet ||
+							(msg.textBody
+								? msg.textBody.substring(0, 120) +
+									(msg.textBody.length > 120 ? "..." : "")
+								: ""),
+						bodyText: msg.textBody || "",
+						bodyHtml: msg.htmlBody || undefined,
+						receivedAt,
+						status: msg.isSpam
+							? ("blocked" as const)
+							: msg.status === "processing"
+								? ("parsing" as const)
+								: msg.status === "needs_approval"
+									? ("needs_approval" as const)
+									: msg.isRead
+										? ("handled" as const)
+										: ("new" as const),
+						securityLevel: 5 as const,
+						unread: !msg.isRead,
+						cc: msg.ccEmails || undefined,
+						replyTo: msg.replyTo || undefined,
+						direction: "inbound" as const,
+						toEmails: msg.toEmails,
+						attachments:
+							msg.attachments?.map((att) => ({
+								name: att.filename,
+								size: `${(att.size / 1024).toFixed(1)} KB`,
+								contentType: att.contentType,
+								isInline: att.contentDisposition === "inline",
+							})) || [],
+						timeline: [
+							{ label: "Email received", at: createdAtStr, state: "done" as const },
+							{
+								label: "Delivered to NATS",
+								at: createdAtStr,
+								state: "done" as const,
+							},
+							{
+								label: "Inbox storage complete",
+								at: createdAtStr,
+								state: "done" as const,
+							},
+						],
+					};
+				})
+			: [];
+
+		const parseEmail = (emailStr: string) => {
+			const match = emailStr.match(/<([^>]+)>/);
+			return (match?.[1] ?? emailStr).trim().toLowerCase();
+		};
+
+		const mappedSent = sentMessagesData
+			? sentMessagesData.map((msg) => {
+					const receivedAtDate = msg.createdAt;
+					const receivedAt =
+						typeof receivedAtDate === "string"
+							? receivedAtDate
+							: receivedAtDate.toISOString();
+
+					// Find the mailbox by comparing fromEmail
+					const fromEmailParsed = parseEmail(msg.fromEmail);
+					const mailbox = mailboxes.find(
+						(mb) => parseEmail(mb.email) === fromEmailParsed,
+					);
+
+					return {
+						id: msg.id,
+						mailboxId: mailbox?.id ?? "",
+						threadId: undefined,
+						from: { name: msg.fromName || undefined, email: msg.fromEmail },
+						subject: msg.subject || "(No Subject)",
+						preview:
+							msg.textBody
+								? msg.textBody.substring(0, 120) +
+									(msg.textBody.length > 120 ? "..." : "")
+								: "",
+						bodyText: msg.textBody || "",
+						bodyHtml: msg.htmlBody || undefined,
+						receivedAt,
+						status: "handled" as const,
+						securityLevel: 5 as const,
+						unread: false,
+						cc: msg.ccEmails || undefined,
+						replyTo: undefined,
+						direction: "outbound" as const,
+						toEmails: msg.toEmails,
+						attachments: [],
+						timeline: [
+							{ label: "Email composed", at: receivedAt, state: "done" as const },
+							{
+								label: "Sent to KumoMTA",
+								at: receivedAt,
+								state: "done" as const,
+							},
+							{
+								label: "Delivered",
+								at: receivedAt,
+								state: "done" as const,
+							},
+						],
+					};
+				})
+			: [];
+
+		return [...mappedInbound, ...mappedSent].sort(
+			(a, b) => new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime()
+		);
+	}, [messagesData, sentMessagesData, mailboxes]);
 
 	const getMailbox = useCallback(
 		(id: string) => mailboxes.find((m) => m.id === id),
@@ -320,9 +411,9 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				throw new Error(body || "Failed to send reply");
 			}
 
-			await mutateMessages();
+			await Promise.all([mutateMessages(), mutateSentMessages()]);
 		},
-		[mutateMessages],
+		[mutateMessages, mutateSentMessages],
 	);
 
 	const sendForward = useCallback(
@@ -347,9 +438,9 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				throw new Error(body || "Failed to forward message");
 			}
 
-			await mutateMessages();
+			await Promise.all([mutateMessages(), mutateSentMessages()]);
 		},
-		[mutateMessages],
+		[mutateMessages, mutateSentMessages],
 	);
 
 	const sendMessage = useCallback(
@@ -378,14 +469,18 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				throw new Error(body || "Failed to send message");
 			}
 
-			await mutateMessages();
+			await Promise.all([mutateMessages(), mutateSentMessages()]);
 		},
-		[mutateMessages],
+		[mutateMessages, mutateSentMessages],
 	);
 
 	const refresh = useCallback(async () => {
-		await Promise.all([mutateMailboxes(), mutateMessages()]);
-	}, [mutateMailboxes, mutateMessages]);
+		await Promise.all([
+			mutateMailboxes(),
+			mutateMessages(),
+			mutateSentMessages(),
+		]);
+	}, [mutateMailboxes, mutateMessages, mutateSentMessages]);
 
 	const value = useMemo(
 		() => ({

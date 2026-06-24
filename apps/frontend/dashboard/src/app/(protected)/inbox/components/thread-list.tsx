@@ -12,7 +12,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useState } from "react";
 import { toast } from "sonner";
-import type { InboundThread } from "../mock-data";
+import type { InboundThread } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
 
 dayjs.extend(relativeTime);
@@ -21,6 +21,14 @@ dayjs.extend(relativeTime);
 const getActorInfo = (
 	thread: InboundThread,
 ): { gutterColor: string; tag: string | null; tagStyle: string } => {
+	if (thread.direction === "outbound") {
+		return {
+			gutterColor: "bg-emerald-500 dark:bg-emerald-600",
+			tag: "sent by you",
+			tagStyle:
+				"bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800/40",
+		};
+	}
 	switch (thread.status) {
 		case "needs_approval":
 			return {
@@ -32,7 +40,7 @@ const getActorInfo = (
 		case "handled":
 			return {
 				gutterColor: "bg-emerald-500 dark:bg-emerald-600",
-				tag: "sent by you",
+				tag: "via agent",
 				tagStyle:
 					"bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800/40",
 			};

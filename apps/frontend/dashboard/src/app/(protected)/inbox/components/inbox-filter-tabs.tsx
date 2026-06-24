@@ -6,8 +6,8 @@ import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
-import type { InboxFilter } from "../mock-data";
-import { INBOX_FILTERS } from "../mock-data";
+import type { InboxFilter } from "../types";
+import { INBOX_FILTERS } from "../types";
 
 interface InboxFilterTabsProps {
 	activeFilter: InboxFilter;

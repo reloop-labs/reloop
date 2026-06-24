@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
-import type { AgentMailbox } from "../mock-data";
+import type { AgentMailbox } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
 
 interface ComposeModalProps {

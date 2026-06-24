@@ -18,7 +18,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import useSWR from "swr";
 import * as v from "valibot";
-import type { AgentMailbox } from "../mock-data";
+import type { AgentMailbox } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
 
 const agentAddressSchema = v.object({

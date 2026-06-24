@@ -48,6 +48,8 @@ export interface InboundThread {
 	securityLevel: 1 | 2 | 3 | 4 | 5;
 	unread: boolean;
 	entityTag?: "invoice" | "support" | "order" | "security";
+	direction?: "inbound" | "outbound";
+	toEmails?: string[];
 	attachments?: InboundAttachment[];
 	parsed?: Record<string, unknown>;
 	timeline: InboundTimelineStep[];

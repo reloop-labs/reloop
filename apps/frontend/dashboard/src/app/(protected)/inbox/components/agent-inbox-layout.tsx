@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import type { AgentMailbox } from "../mock-data";
+import type { AgentMailbox } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
 import { ComposeModal } from "./compose-modal";
 import { ThreadDetail } from "./thread-detail";
@@ -47,38 +47,34 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 
 	// Dynamic folder counts
 	const inboxCount = useMemo(
-		() => mailboxThreads.filter((t) => t.status !== "blocked").length,
+		() => mailboxThreads.filter((t) => t.direction === "inbound" && t.status !== "blocked").length,
 		[mailboxThreads],
 	);
 	const sentCount = useMemo(
-		() => mailboxThreads.filter((t) => t.status === "handled").length,
+		() => mailboxThreads.filter((t) => t.direction === "outbound").length,
 		[mailboxThreads],
 	);
 	const draftsCount = useMemo(
 		() =>
 			mailboxThreads.filter(
-				(t) => t.status === "needs_approval" || t.status === "parsing",
+				(t) => t.direction === "inbound" && (t.status === "needs_approval" || t.status === "parsing"),
 			).length,
 		[mailboxThreads],
 	);
 	const spamCount = useMemo(
-		() => mailboxThreads.filter((t) => t.status === "blocked").length,
+		() => mailboxThreads.filter((t) => t.direction === "inbound" && t.status === "blocked").length,
 		[mailboxThreads],
 	);
 	const agentCount = useMemo(
-		() => mailboxThreads.filter((t) => t.status === "handled").length,
+		() => mailboxThreads.filter((t) => t.direction === "inbound" && t.status === "handled").length,
 		[mailboxThreads],
 	);
 	const youCount = useMemo(
-		() =>
-			Math.max(
-				0,
-				mailboxThreads.filter((t) => t.status === "handled").length - 1,
-			),
+		() => mailboxThreads.filter((t) => t.direction === "outbound").length,
 		[mailboxThreads],
 	);
 	const needsApprovalCount = useMemo(
-		() => mailboxThreads.filter((t) => t.status === "needs_approval").length,
+		() => mailboxThreads.filter((t) => t.direction === "inbound" && t.status === "needs_approval").length,
 		[mailboxThreads],
 	);
 
@@ -87,23 +83,23 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 
 		// Apply folder / rail filters
 		if (folder === "inbox") {
-			result = result.filter((t) => t.status !== "blocked");
+			result = result.filter((t) => t.direction === "inbound" && t.status !== "blocked");
 		} else if (folder === "sent") {
-			result = result.filter((t) => t.status === "handled");
+			result = result.filter((t) => t.direction === "outbound");
 		} else if (folder === "drafts") {
 			result = result.filter(
-				(t) => t.status === "needs_approval" || t.status === "parsing",
+				(t) => t.direction === "inbound" && (t.status === "needs_approval" || t.status === "parsing"),
 			);
 		} else if (folder === "spam") {
-			result = result.filter((t) => t.status === "blocked");
+			result = result.filter((t) => t.direction === "inbound" && t.status === "blocked");
 		} else if (folder === "trash") {
 			result = [];
 		} else if (folder === "agent") {
-			result = result.filter((t) => t.status === "handled");
+			result = result.filter((t) => t.direction === "inbound" && t.status === "handled");
 		} else if (folder === "you") {
-			result = result.filter((t) => t.status === "handled");
+			result = result.filter((t) => t.direction === "outbound");
 		} else if (folder === "needs_approval") {
-			result = result.filter((t) => t.status === "needs_approval");
+			result = result.filter((t) => t.direction === "inbound" && t.status === "needs_approval");
 		}
 
 		// Apply search
