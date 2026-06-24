@@ -6,6 +6,7 @@ import { getMessageRoute } from "./get-message/get-message.route";
 import { getMessageAttachmentRoute } from "./get-message-attachment/get-message-attachment.route";
 import { getRawMessageRoute } from "./get-raw-message/get-raw-message.route";
 import { listMessagesRoute } from "./list-messages/list-messages.route";
+import { listSentMessagesRoute } from "./list-sent-messages/list-sent-messages.route";
 import { markMessageReadRoute } from "./mark-message-read/mark-message-read.route";
 import { replyAllToMessageRoute } from "./reply-all-to-message/reply-all-to-message.route";
 import { replyToMessageRoute } from "./reply-to-message/reply-to-message.route";
@@ -18,6 +19,7 @@ export const messagesRoutes = new Elysia({
 	name: "MessagesRoutes",
 })
 	.use(listMessagesRoute)
+	.use(listSentMessagesRoute)
 	.use(getMessageRoute)
 	.use(batchGetMessagesRoute)
 	.use(getMessageAttachmentRoute)
