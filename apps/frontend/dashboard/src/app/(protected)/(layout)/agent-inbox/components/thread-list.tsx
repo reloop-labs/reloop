@@ -175,17 +175,17 @@ export const ThreadList = ({
 				{groups.map((group) => {
 					const isCollapsed = collapsedGroups[group.key];
 					return (
-						<div key={group.key} className="flex flex-col gap-2.5">
+						<div key={group.key} className="flex flex-col gap-1.5 pt-3 pb-1">
 							{/* Group Header */}
-							<div className="flex select-none items-center justify-between px-1 py-1 text-text-sub-500">
-								<span className="font-semibold text-[13px] text-neutral-500 uppercase tracking-wide dark:text-neutral-400">
+							<div className="flex select-none items-center justify-between px-1 text-text-soft-400">
+								<span className="font-semibold text-[10px] uppercase tracking-wider">
 									{group.title}
 								</span>
 							</div>
 
 							{/* Group Threads List */}
 							{!isCollapsed && (
-								<div className="flex flex-col gap-2.5">
+								<div className="divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/30 dark:border-stroke-soft-100/30">
 									{group.threads.map((thread) => {
 										const isSelected = selectedId === thread.id;
 										const isUnread = thread.unread;
@@ -195,25 +195,60 @@ export const ThreadList = ({
 												key={thread.id}
 												onClick={() => onSelect(thread.id)}
 												className={cn(
-													"group/card relative flex cursor-pointer flex-col gap-2 rounded-2xl border p-4 text-left transition-all duration-200",
+													"group/card relative flex cursor-pointer flex-col gap-1.5 px-4 py-3.5 text-left transition-all duration-200",
 													isSelected
-														? "border-neutral-900 bg-white shadow-sm dark:border-white dark:bg-neutral-900"
-														: isUnread
-															? "border-neutral-200 bg-neutral-100/50 hover:bg-neutral-100/80 dark:border-neutral-800 dark:bg-neutral-900/50 dark:hover:bg-neutral-900"
-															: "border-neutral-200 bg-white hover:bg-neutral-50 dark:border-neutral-850 dark:bg-transparent dark:hover:bg-neutral-900/20",
+														? "bg-bg-weak-50/70 dark:bg-white/[0.04]"
+														: "bg-bg-white-0 dark:bg-transparent hover:bg-bg-weak-50/40 dark:hover:bg-white/[0.01]",
 												)}
 											>
+												{isSelected && (
+													<div className="absolute top-0 bottom-0 left-0 w-[3px] bg-primary-base" />
+												)}
 												<div className="flex items-start gap-3">
-													{/* Gradient Avatar */}
-													<div
-														className={cn(
-															"flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr font-medium text-white text-xs shadow-sm",
-															getSenderGradient(
-																thread.from.name ?? thread.from.email,
-															),
-														)}
-													>
-														{senderInitials(thread)}
+													{/* Gradient Avatar & Checkbox State */}
+													<div className="relative h-9 w-9 shrink-0">
+														{/* Avatar (visible normally, hidden on hover/selection) */}
+														<div
+															className={cn(
+																"absolute inset-0 flex items-center justify-center rounded-full bg-gradient-to-tr font-semibold text-white text-xs shadow-sm transition-all duration-150",
+																isSelected
+																	? "scale-0 opacity-0 pointer-events-none"
+																	: "scale-100 opacity-100 group-hover/card:scale-0 group-hover/card:opacity-0 group-hover/card:pointer-events-none",
+																getSenderGradient(
+																	thread.from.name ?? thread.from.email,
+																),
+															)}
+														>
+															{senderInitials(thread)}
+														</div>
+
+														{/* Checkbox (visible on hover/selection) */}
+														<div
+															className={cn(
+																"absolute inset-0 flex items-center justify-center transition-all duration-150",
+																isSelected
+																	? "scale-100 opacity-100"
+																	: "scale-0 opacity-0 group-hover/card:scale-100 group-hover/card:opacity-100",
+															)}
+														>
+															<div
+																className={cn(
+																	"flex h-5 w-5 items-center justify-center rounded border transition-all duration-150",
+																	isSelected
+																		? "border-primary-base bg-primary-base text-white"
+																		: "border-stroke-soft-200 bg-bg-white-0 text-transparent hover:border-text-soft-400 dark:border-stroke-soft-100/30 dark:bg-neutral-900",
+																)}
+															>
+																{isSelected && (
+																	<svg
+																		className="h-3.5 w-3.5 fill-current"
+																		viewBox="0 0 24 24"
+																	>
+																		<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+																	</svg>
+																)}
+															</div>
+														</div>
 													</div>
 
 													{/* Details Column */}
@@ -222,54 +257,106 @@ export const ThreadList = ({
 														<div className="flex items-center justify-between gap-2">
 															<span
 																className={cn(
-																	"truncate text-neutral-850 text-sm tracking-tight dark:text-neutral-200",
+																	"truncate text-sm tracking-tight",
 																	isUnread
-																		? "font-semibold"
-																		: "font-medium text-neutral-600 dark:text-neutral-400",
+																		? "font-semibold text-text-strong-950"
+																		: "font-medium text-text-sub-600 dark:text-neutral-400",
 																)}
 															>
 																{thread.from.name ?? thread.from.email}
 															</span>
-															<div className="flex shrink-0 items-center gap-2">
-																{isUnread && (
-																	<span className="h-2 w-2 rounded-full bg-blue-600" />
-																)}
-																<span className="font-medium text-[11px] text-neutral-400 tabular-nums dark:text-neutral-500">
-																	{dayjs(thread.receivedAt).format("HH:mm")}
-																</span>
+															<div className="relative flex shrink-0 items-center">
+																{/* Time & Unread dot */}
+																<div className="flex items-center gap-2 transition-opacity duration-150 group-hover/card:pointer-events-none group-hover/card:opacity-0">
+																	{isUnread && (
+																		<span className="h-2 w-2 rounded-full bg-primary-base" />
+																	)}
+																	<span className="font-medium text-[11px] text-text-soft-400 tabular-nums">
+																		{dayjs(thread.receivedAt).format("HH:mm")}
+																	</span>
+																</div>
+
+																{/* Quick actions (visible on hover) */}
+																<div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 pointer-events-none transition-all duration-150 group-hover/card:opacity-100 group-hover/card:pointer-events-auto">
+																	<button
+																		type="button"
+																		title={
+																			thread.unread
+																				? "Mark as Handled"
+																				: "Mark as Active"
+																		}
+																		onClick={(e) => {
+																			e.stopPropagation();
+																			handleToggleRead(thread.id, thread.unread);
+																		}}
+																		className="rounded p-0.5 text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/10"
+																	>
+																		<Icon
+																			name="check-circle"
+																			className="h-3.5 w-3.5"
+																		/>
+																	</button>
+																	<button
+																		type="button"
+																		title="Mark as Spam"
+																		onClick={(e) => {
+																			e.stopPropagation();
+																			handleMarkSpam(thread.id);
+																		}}
+																		className="rounded p-0.5 text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-error-base dark:hover:bg-white/10"
+																	>
+																		<Icon
+																			name="cross-circle"
+																			className="h-3.5 w-3.5"
+																		/>
+																	</button>
+																	<button
+																		type="button"
+																		title="Delete Message"
+																		onClick={(e) => {
+																			e.stopPropagation();
+																			handleDelete(thread.id);
+																		}}
+																		className="rounded p-0.5 text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-error-base dark:hover:bg-white/10"
+																	>
+																		<Icon name="trash" className="h-3.5 w-3.5" />
+																	</button>
+																</div>
 															</div>
 														</div>
 
 														{/* Subject */}
 														<div
 															className={cn(
-																"truncate text-neutral-900 text-sm dark:text-neutral-100",
-																isUnread ? "font-semibold" : "font-medium",
+																"truncate text-sm",
+																isUnread
+																	? "font-semibold text-text-strong-950"
+																	: "font-medium text-text-sub-600 dark:text-neutral-350",
 															)}
 														>
 															{thread.subject}
 														</div>
 
 														{/* Snippet */}
-														<div className="truncate text-neutral-500 text-xs leading-relaxed dark:text-neutral-400">
+														<div className="truncate text-text-soft-400 text-xs leading-relaxed">
 															{thread.preview}
 														</div>
 
-														{/* Badges and Actions Row */}
-														<div className="mt-1 flex min-h-[22px] items-center justify-between gap-2">
-															{thread.attachments &&
-															thread.attachments.length > 0 ? (
+														{/* Attachments Row */}
+														{thread.attachments &&
+														thread.attachments.length > 0 && (
+															<div className="mt-1 flex min-h-[22px] items-center gap-1.5">
 																<div className="flex min-w-0 shrink-0 flex-wrap items-center gap-1.5">
 																	{thread.attachments
 																		.slice(0, 2)
 																		.map((att, idx) => (
 																			<div
 																				key={att.name + idx}
-																				className="flex items-center gap-1 rounded-[8px] border border-neutral-200 bg-white px-2.5 py-1 font-medium text-[10px] text-neutral-600 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400"
+																				className="flex items-center gap-1 rounded-[6px] border border-stroke-soft-100 bg-bg-white-0 px-2 py-0.5 font-medium text-[10px] text-text-sub-600 shadow-sm dark:border-stroke-soft-100/30 dark:bg-bg-weak-50/20"
 																			>
 																				<Icon
 																					name="file-text"
-																					className="h-3.5 w-3.5 shrink-0 text-neutral-400"
+																					className="h-3.5 w-3.5 shrink-0 text-text-soft-400"
 																				/>
 																				<span className="max-w-[100px] truncate">
 																					{att.name}
@@ -277,81 +364,13 @@ export const ThreadList = ({
 																			</div>
 																		))}
 																	{thread.attachments.length > 2 && (
-																		<span className="rounded-[8px] border border-neutral-200 bg-white px-2 py-1 font-medium text-[10px] text-neutral-500 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+																		<span className="rounded-[6px] border border-stroke-soft-100 bg-bg-white-0 px-2 py-0.5 font-medium text-[10px] text-text-soft-400 shadow-sm dark:border-stroke-soft-100/30 dark:bg-bg-weak-50/20">
 																			+{thread.attachments.length - 2}
 																		</span>
 																	)}
 																</div>
-															) : (
-																<div className="flex min-w-0 shrink-0 flex-wrap items-center gap-1.5">
-																	{["TAG #1", "TAG #2", "TAG #3"]
-																		.slice(
-																			0,
-																			thread.id === "in-005" ||
-																				thread.id === "in-011"
-																				? 1
-																				: thread.id === "in-003"
-																					? 2
-																					: 3,
-																		)
-																		.map((tag) => (
-																			<span
-																				key={tag}
-																				className="rounded-[4px] bg-neutral-100 px-1.5 py-0.5 font-bold text-[9px] text-neutral-400 tracking-wider dark:bg-neutral-900"
-																			>
-																				{tag}
-																			</span>
-																		))}
-																</div>
-															)}
-
-															{/* Quick actions (visible on hover) */}
-															<div className="invisible flex shrink-0 items-center gap-1 bg-transparent opacity-0 transition-all duration-150 group-hover/card:visible group-hover/card:opacity-100">
-																<button
-																	type="button"
-																	title={
-																		thread.unread
-																			? "Mark as Handled"
-																			: "Mark as Active"
-																	}
-																	onClick={(e) => {
-																		e.stopPropagation();
-																		handleToggleRead(thread.id, thread.unread);
-																	}}
-																	className="rounded p-1 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-800 dark:hover:bg-white/10"
-																>
-																	<Icon
-																		name="check-circle"
-																		className="h-3.5 w-3.5"
-																	/>
-																</button>
-																<button
-																	type="button"
-																	title="Mark as Spam"
-																	onClick={(e) => {
-																		e.stopPropagation();
-																		handleMarkSpam(thread.id);
-																	}}
-																	className="rounded p-1 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-error-base dark:hover:bg-white/10"
-																>
-																	<Icon
-																		name="cross-circle"
-																		className="h-3.5 w-3.5"
-																	/>
-																</button>
-																<button
-																	type="button"
-																	title="Delete Message"
-																	onClick={(e) => {
-																		e.stopPropagation();
-																		handleDelete(thread.id);
-																	}}
-																	className="rounded p-1 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-error-base dark:hover:bg-white/10"
-																>
-																	<Icon name="trash" className="h-3.5 w-3.5" />
-																</button>
 															</div>
-														</div>
+														)}
 													</div>
 												</div>
 											</div>

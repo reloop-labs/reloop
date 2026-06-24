@@ -214,7 +214,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 					)}
 				>
 					{/* List Header */}
-					<div className="flex items-center gap-3 pt-4 pb-4">
+					<div className="flex items-center gap-3 pt-3 pb-3">
 						<div className="flex-1">
 							<Input.Root size="xsmall" className="rounded-[10px]">
 								<Input.Wrapper>
@@ -224,6 +224,16 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 										value={searchQuery}
 										onChange={(e) => setSearchQuery(e.target.value)}
 									/>
+									{searchQuery && (
+										<button
+											type="button"
+											onMouseDown={(e) => e.preventDefault()}
+											onClick={() => setSearchQuery("")}
+											className="mr-1 rounded p-0.5 text-text-soft-400 transition-colors hover:bg-neutral-alpha-10 hover:text-text-strong-950"
+										>
+											<Icon name="cross" className="h-3 w-3" />
+										</button>
+									)}
 								</Input.Wrapper>
 							</Input.Root>
 						</div>
