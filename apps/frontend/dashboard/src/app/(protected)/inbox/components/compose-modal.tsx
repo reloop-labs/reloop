@@ -184,7 +184,9 @@ export const ComposeModal = ({
 								className="flex-1 bg-transparent text-text-strong-950 placeholder-text-soft-400/80 outline-none dark:text-white"
 							/>
 							<div className="flex select-none items-center gap-2.5 pl-2 font-mono text-text-soft-400 text-xs">
-								<button
+								<motion.button
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.95 }}
 									type="button"
 									onClick={() => setShowCc(!showCc)}
 									className={`rounded px-1 py-0.5 transition-colors hover:text-text-strong-950 dark:hover:text-white ${
@@ -194,8 +196,10 @@ export const ComposeModal = ({
 									}`}
 								>
 									Cc
-								</button>
-								<button
+								</motion.button>
+								<motion.button
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.95 }}
 									type="button"
 									onClick={() => setShowBcc(!showBcc)}
 									className={`rounded px-1 py-0.5 transition-colors hover:text-text-strong-950 dark:hover:text-white ${
@@ -205,39 +209,63 @@ export const ComposeModal = ({
 									}`}
 								>
 									Bcc
-								</button>
+								</motion.button>
 							</div>
 						</div>
 
 						{/* Cc Row (Conditional) */}
-						{showCc && (
-							<div className="flex items-center border-stroke-soft-100/50 border-b px-5 py-2.5 transition-all dark:border-neutral-800/60">
-								<span className="w-16 select-none text-text-soft-400">Cc</span>
-								<input
-									type="text"
-									value={cc}
-									onChange={(e) => setCc(e.target.value)}
-									placeholder="cc@example.com"
-									disabled={isSending}
-									className="flex-1 bg-transparent text-text-strong-950 placeholder-text-soft-400/80 outline-none dark:text-white"
-								/>
-							</div>
-						)}
+						<AnimatePresence initial={false}>
+							{showCc && (
+								<motion.div
+									initial={{ height: 0, opacity: 0 }}
+									animate={{ height: "auto", opacity: 1 }}
+									exit={{ height: 0, opacity: 0 }}
+									transition={{ duration: 0.2, ease: "easeInOut" }}
+									className="overflow-hidden"
+								>
+									<div className="flex items-center border-stroke-soft-100/50 border-b px-5 py-2.5 dark:border-neutral-800/60">
+										<span className="w-16 select-none text-text-soft-400">
+											Cc
+										</span>
+										<input
+											type="text"
+											value={cc}
+											onChange={(e) => setCc(e.target.value)}
+											placeholder="cc@example.com"
+											disabled={isSending}
+											className="flex-1 bg-transparent text-text-strong-950 placeholder-text-soft-400/80 outline-none dark:text-white"
+										/>
+									</div>
+								</motion.div>
+							)}
+						</AnimatePresence>
 
 						{/* Bcc Row (Conditional) */}
-						{showBcc && (
-							<div className="flex items-center border-stroke-soft-100/50 border-b px-5 py-2.5 transition-all dark:border-neutral-800/60">
-								<span className="w-16 select-none text-text-soft-400">Bcc</span>
-								<input
-									type="text"
-									value={bcc}
-									onChange={(e) => setBcc(e.target.value)}
-									placeholder="bcc@example.com"
-									disabled={isSending}
-									className="flex-1 bg-transparent text-text-strong-950 placeholder-text-soft-400/80 outline-none dark:text-white"
-								/>
-							</div>
-						)}
+						<AnimatePresence initial={false}>
+							{showBcc && (
+								<motion.div
+									initial={{ height: 0, opacity: 0 }}
+									animate={{ height: "auto", opacity: 1 }}
+									exit={{ height: 0, opacity: 0 }}
+									transition={{ duration: 0.2, ease: "easeInOut" }}
+									className="overflow-hidden"
+								>
+									<div className="flex items-center border-stroke-soft-100/50 border-b px-5 py-2.5 dark:border-neutral-800/60">
+										<span className="w-16 select-none text-text-soft-400">
+											Bcc
+										</span>
+										<input
+											type="text"
+											value={bcc}
+											onChange={(e) => setBcc(e.target.value)}
+											placeholder="bcc@example.com"
+											disabled={isSending}
+											className="flex-1 bg-transparent text-text-strong-950 placeholder-text-soft-400/80 outline-none dark:text-white"
+										/>
+									</div>
+								</motion.div>
+							)}
+						</AnimatePresence>
 
 						{/* Subject Row */}
 						<div className="flex items-center border-stroke-soft-100/50 border-b px-5 py-2.5 dark:border-neutral-800/60">
