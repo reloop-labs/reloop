@@ -1,5 +1,5 @@
 import { db } from "@reloop/db/client";
-import { inboundEmail } from "@reloop/db/schema";
+import { inboundEmail, threadMessage } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 
 export async function getMessagesController(
@@ -23,5 +23,18 @@ export async function getMessagesController(
 		},
 	});
 
-	return messages;
+	// Enrich each message with the real thr_xxx thread ID from the
+	// threadMessage join table (inboundEmail.threadId holds the raw
+	// RFC822 In-Reply-To string, not the DB thread ID).
+	const enriched = await Promise.all(
+		messages.map(async (msg) => {
+			const tm = await db.query.threadMessage.findFirst({
+				where: eq(threadMessage.inboundEmailId, msg.id),
+				columns: { threadId: true },
+			});
+			return { ...msg, threadId: tm?.threadId ?? null };
+		}),
+	);
+
+	return enriched;
 }
