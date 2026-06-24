@@ -1,0 +1,399 @@
+"use client";
+
+import { Icon } from "@reloop/ui/icon";
+import * as Modal from "@reloop/ui/modal";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import type { AgentMailbox } from "../mock-data";
+import { useAgentInbox } from "./agent-inbox-provider";
+
+interface ComposeModalProps {
+	isOpen: boolean;
+	onClose: () => void;
+	mailbox: AgentMailbox;
+}
+
+export const ComposeModal = ({
+	isOpen,
+	onClose,
+	mailbox,
+}: ComposeModalProps) => {
+	const { sendMessage } = useAgentInbox();
+
+	// Form State
+	const [to, setTo] = useState("");
+	const [subject, setSubject] = useState("");
+	const [body, setBody] = useState("");
+	const [cc, setCc] = useState("");
+	const [bcc, setBcc] = useState("");
+
+	// UI controls
+	const [showCc, setShowCc] = useState(false);
+	const [showBcc, setShowBcc] = useState(false);
+	const [isSending, setIsSending] = useState(false);
+
+	// Pre-populated attachment matching mockup
+	const [attachments, setAttachments] = useState<
+		Array<{ name: string; size: string }>
+	>([{ name: "agent-inbox-compose.html", size: "1.2 KB" }]);
+
+	// Reset form when modal opens/closes
+	useEffect(() => {
+		if (isOpen) {
+			setTo("");
+			setSubject("");
+			setBody("");
+			setCc("");
+			setBcc("");
+			setShowCc(false);
+			setShowBcc(false);
+			setAttachments([{ name: "agent-inbox-compose.html", size: "1.2 KB" }]);
+		}
+	}, [isOpen]);
+
+	const handleSend = async () => {
+		if (!to.trim()) {
+			toast.error("Please specify at least one recipient in the 'To' field.");
+			return;
+		}
+
+		setIsSending(true);
+		try {
+			// Convert comma separated lists to arrays if multiple
+			const toEmails = to
+				.split(",")
+				.map((e) => e.trim())
+				.filter(Boolean);
+			const ccEmails = cc
+				? cc
+						.split(",")
+						.map((e) => e.trim())
+						.filter(Boolean)
+				: undefined;
+			const bccEmails = bcc
+				? bcc
+						.split(",")
+						.map((e) => e.trim())
+						.filter(Boolean)
+				: undefined;
+
+			await sendMessage({
+				mailboxId: mailbox.id,
+				to: toEmails,
+				subject: subject || "(No Subject)",
+				text: body,
+				cc: ccEmails,
+				bcc: bccEmails,
+			});
+
+			toast.success("Email sent successfully!");
+			onClose();
+		} catch (err: any) {
+			toast.error(err.message || "Failed to send email");
+		} finally {
+			setIsSending(false);
+		}
+	};
+
+	const removeAttachment = (indexToRemove: number) => {
+		setAttachments((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+	};
+
+	const addAttachmentPlaceholder = () => {
+		const newFile = {
+			name: `attachment-${Date.now().toString().slice(-4)}.txt`,
+			size: "0.8 KB",
+		};
+		setAttachments((prev) => [...prev, newFile]);
+		toast.success(`Attached ${newFile.name}`);
+	};
+
+	return (
+		<Modal.Root open={isOpen} onOpenChange={onClose}>
+			<Modal.Content
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-white p-0 shadow-2xl sm:max-w-[620px] dark:border-stroke-soft-100/40 dark:bg-neutral-900"
+				showClose={false}
+				onEscapeKeyDown={(e) => {
+					if (isSending) e.preventDefault();
+				}}
+				onPointerDownOutside={(e) => {
+					if (isSending) e.preventDefault();
+				}}
+			>
+				<motion.div
+					initial={{ opacity: 0, scale: 0.96, y: 12 }}
+					animate={{ opacity: 1, scale: 1, y: 0 }}
+					transition={{ type: "spring", duration: 0.35, bounce: 0.1 }}
+					className="flex flex-col"
+				>
+					{/* Top bar Header */}
+					<div className="flex items-center justify-between border-stroke-soft-100/60 border-b px-5 py-4 dark:border-neutral-800">
+						<h2 className="font-semibold text-sm text-text-strong-950 dark:text-white">
+							New email
+						</h2>
+						<div className="flex items-center gap-1">
+							{/* Close Button */}
+							<motion.button
+								whileHover={{ scale: 1.08 }}
+								whileTap={{ scale: 0.92 }}
+								type="button"
+								onClick={onClose}
+								title="Close"
+								className="flex h-7 w-7 items-center justify-center rounded-lg text-text-soft-400 transition-colors hover:bg-bg-weak-50 dark:hover:bg-neutral-800"
+							>
+								<Icon name="cross" className="h-3.5 w-3.5" />
+							</motion.button>
+						</div>
+					</div>
+
+					{/* Agent Provenance Row */}
+					<div className="flex items-center border-stroke-soft-100/40 border-b bg-[#f4f6f0] px-5 py-2.5 dark:border-neutral-800/40 dark:bg-[#171b13]">
+						<div className="flex items-center gap-2 font-medium text-[#727d6d] text-xs dark:text-[#9ea899]">
+							<svg
+								className="h-4 w-4 text-[#727d6d] dark:text-[#9ea899]"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+								strokeWidth="2"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+								/>
+							</svg>
+							<span>
+								Sending as <strong className="font-semibold">you</strong> ·
+								won't pass through the agent
+							</span>
+						</div>
+					</div>
+
+					{/* Field Inputs */}
+					<div className="flex flex-col text-sm">
+						{/* To Row */}
+						<div className="flex items-center border-stroke-soft-100/50 border-b px-5 py-2.5 dark:border-neutral-800/60">
+							<span className="w-16 select-none text-text-soft-400">To</span>
+							<input
+								type="text"
+								value={to}
+								onChange={(e) => setTo(e.target.value)}
+								placeholder="Recipient email address"
+								disabled={isSending}
+								className="flex-1 bg-transparent text-text-strong-950 placeholder-text-soft-400/80 outline-none dark:text-white"
+							/>
+							<div className="flex select-none items-center gap-2.5 pl-2 font-mono text-text-soft-400 text-xs">
+								<button
+									type="button"
+									onClick={() => setShowCc(!showCc)}
+									className={`rounded px-1 py-0.5 transition-colors hover:text-text-strong-950 dark:hover:text-white ${
+										showCc
+											? "font-semibold text-text-strong-950 dark:text-white"
+											: ""
+									}`}
+								>
+									Cc
+								</button>
+								<button
+									type="button"
+									onClick={() => setShowBcc(!showBcc)}
+									className={`rounded px-1 py-0.5 transition-colors hover:text-text-strong-950 dark:hover:text-white ${
+										showBcc
+											? "font-semibold text-text-strong-950 dark:text-white"
+											: ""
+									}`}
+								>
+									Bcc
+								</button>
+							</div>
+						</div>
+
+						{/* Cc Row (Conditional) */}
+						{showCc && (
+							<div className="flex items-center border-stroke-soft-100/50 border-b px-5 py-2.5 transition-all dark:border-neutral-800/60">
+								<span className="w-16 select-none text-text-soft-400">Cc</span>
+								<input
+									type="text"
+									value={cc}
+									onChange={(e) => setCc(e.target.value)}
+									placeholder="cc@example.com"
+									disabled={isSending}
+									className="flex-1 bg-transparent text-text-strong-950 placeholder-text-soft-400/80 outline-none dark:text-white"
+								/>
+							</div>
+						)}
+
+						{/* Bcc Row (Conditional) */}
+						{showBcc && (
+							<div className="flex items-center border-stroke-soft-100/50 border-b px-5 py-2.5 transition-all dark:border-neutral-800/60">
+								<span className="w-16 select-none text-text-soft-400">Bcc</span>
+								<input
+									type="text"
+									value={bcc}
+									onChange={(e) => setBcc(e.target.value)}
+									placeholder="bcc@example.com"
+									disabled={isSending}
+									className="flex-1 bg-transparent text-text-strong-950 placeholder-text-soft-400/80 outline-none dark:text-white"
+								/>
+							</div>
+						)}
+
+						{/* Subject Row */}
+						<div className="flex items-center border-stroke-soft-100/50 border-b px-5 py-2.5 dark:border-neutral-800/60">
+							<span className="w-16 select-none text-text-soft-400">
+								Subject
+							</span>
+							<input
+								type="text"
+								value={subject}
+								onChange={(e) => setSubject(e.target.value)}
+								placeholder="Add a subject"
+								disabled={isSending}
+								className="flex-1 bg-transparent text-text-strong-950 placeholder-text-soft-400/80 outline-none dark:text-white"
+							/>
+						</div>
+					</div>
+
+					{/* Textarea Body Editor Area */}
+					<div className="flex min-h-[220px] flex-col px-5 py-4">
+						<textarea
+							value={body}
+							onChange={(e) => setBody(e.target.value)}
+							placeholder="Write your message..."
+							disabled={isSending}
+							rows={8}
+							className="w-full flex-1 resize-none border-0 bg-transparent p-0 text-sm text-text-strong-950 leading-relaxed placeholder-text-soft-400/80 outline-none dark:text-neutral-200"
+						/>
+
+						{/* Attachments Section */}
+						{attachments.length > 0 && (
+							<div className="mt-4 flex flex-wrap gap-2 border-stroke-soft-100/30 border-t pt-3 dark:border-neutral-800/40">
+								<AnimatePresence>
+									{attachments.map((file, idx) => (
+										<motion.div
+											key={file.name}
+											initial={{ opacity: 0, scale: 0.9, y: 5 }}
+											animate={{ opacity: 1, scale: 1, y: 0 }}
+											exit={{ opacity: 0, scale: 0.9 }}
+											transition={{ duration: 0.2 }}
+											className="inline-flex items-center gap-2 rounded border border-zinc-700/50 bg-zinc-800 px-2.5 py-1 font-mono text-xs text-zinc-100 shadow-sm dark:bg-zinc-950"
+										>
+											<svg
+												className="h-3.5 w-3.5 text-zinc-400"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth="2"
+											>
+												<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+												<polyline points="14 2 14 8 20 8" />
+											</svg>
+											<span className="max-w-[180px] truncate">
+												{file.name}
+											</span>
+											<span className="text-[10px] text-zinc-400/80">
+												({file.size})
+											</span>
+											<button
+												type="button"
+												onClick={() => removeAttachment(idx)}
+												title="Remove file"
+												className="ml-1 flex h-4.5 w-4.5 items-center justify-center rounded-full text-zinc-500 hover:bg-zinc-700/40 hover:text-zinc-300"
+											>
+												&times;
+											</button>
+										</motion.div>
+									))}
+								</AnimatePresence>
+							</div>
+						)}
+					</div>
+
+					{/* Footer Actions */}
+					<div className="flex items-center justify-between border-stroke-soft-100/60 border-t bg-bg-white-0 px-5 py-4 dark:border-neutral-800 dark:bg-neutral-900">
+						<div className="flex items-center gap-3">
+							{/* Send Button */}
+							<motion.button
+								whileHover={{ scale: 1.02 }}
+								whileTap={{ scale: 0.98 }}
+								type="button"
+								onClick={handleSend}
+								disabled={isSending || !to.trim()}
+								className="flex items-center gap-2 rounded-xl bg-[#18181b] px-6 py-2.5 font-semibold text-sm text-white shadow-sm transition-all duration-200 hover:bg-neutral-800 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100"
+							>
+								<svg
+									className="mr-0.5 h-3.5 w-3.5 rotate-45 fill-current text-white dark:text-neutral-950"
+									viewBox="0 0 24 24"
+								>
+									<line
+										x1="22"
+										y1="2"
+										x2="11"
+										y2="13"
+										stroke="currentColor"
+										strokeWidth="2.5"
+									/>
+									<polygon
+										points="22 2 15 22 11 13 2 9 22 2"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinejoin="round"
+									/>
+								</svg>
+								<span>{isSending ? "Sending..." : "Send"}</span>
+							</motion.button>
+
+							{/* Attach File Button */}
+							<motion.button
+								whileHover={{ scale: 1.05 }}
+								whileTap={{ scale: 0.95 }}
+								type="button"
+								onClick={addAttachmentPlaceholder}
+								title="Attach files"
+								disabled={isSending}
+								className="flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-200 text-text-sub-600 transition-colors hover:bg-bg-weak-50 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800"
+							>
+								<svg
+									className="h-4.5 w-4.5"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								>
+									<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+								</svg>
+							</motion.button>
+						</div>
+
+						{/* Discard Button */}
+						<motion.button
+							whileHover={{ scale: 1.05 }}
+							whileTap={{ scale: 0.95 }}
+							type="button"
+							onClick={onClose}
+							disabled={isSending}
+							className="flex items-center gap-1.5 font-medium text-sm text-text-sub-600 transition-colors hover:text-red-600 disabled:opacity-40 dark:text-neutral-400 dark:hover:text-red-400"
+						>
+							<svg
+								className="h-4.5 w-4.5"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="1.8"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							>
+								<polyline points="3 6 5 6 21 6" />
+								<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+							</svg>
+							<span>Discard</span>
+						</motion.button>
+					</div>
+				</motion.div>
+			</Modal.Content>
+		</Modal.Root>
+	);
+};

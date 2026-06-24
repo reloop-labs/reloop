@@ -84,8 +84,22 @@ interface AgentInboxContextValue {
 	sendForward: (
 		id: string,
 		to: string | string[],
-		options?: { text?: string; html?: string; cc?: string | string[]; bcc?: string | string[] },
+		options?: {
+			text?: string;
+			html?: string;
+			cc?: string | string[];
+			bcc?: string | string[];
+		},
 	) => Promise<void>;
+	sendMessage: (input: {
+		mailboxId: string;
+		to: string | string[];
+		subject: string;
+		text?: string;
+		html?: string;
+		cc?: string | string[];
+		bcc?: string | string[];
+	}) => Promise<void>;
 }
 
 const AgentInboxContext = createContext<AgentInboxContextValue | null>(null);
@@ -310,7 +324,12 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		async (
 			id: string,
 			to: string | string[],
-			options?: { text?: string; html?: string; cc?: string | string[]; bcc?: string | string[] },
+			options?: {
+				text?: string;
+				html?: string;
+				cc?: string | string[];
+				bcc?: string | string[];
+			},
 		) => {
 			const res = await fetch(`/api/inbox/v1/messages/${id}/forward`, {
 				method: "POST",
@@ -321,6 +340,32 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			if (!res.ok) {
 				const body = await res.text();
 				throw new Error(body || "Failed to forward message");
+			}
+
+			await mutateMessages();
+		},
+		[mutateMessages],
+	);
+
+	const sendMessage = useCallback(
+		async (input: {
+			mailboxId: string;
+			to: string | string[];
+			subject: string;
+			text?: string;
+			html?: string;
+			cc?: string | string[];
+			bcc?: string | string[];
+		}) => {
+			const res = await fetch("/api/inbox/v1/messages/send", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(input),
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to send message");
 			}
 
 			await mutateMessages();
@@ -346,6 +391,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			markMessageSpam,
 			sendReply,
 			sendForward,
+			sendMessage,
 		}),
 		[
 			mailboxes,
@@ -360,6 +406,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			markMessageSpam,
 			sendReply,
 			sendForward,
+			sendMessage,
 		],
 	);
 
