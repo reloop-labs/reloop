@@ -115,7 +115,7 @@ export const ThreadMessageItem = ({
 				e.data?.type === "iframe-height" &&
 				typeof e.data.height === "number" &&
 				iframeRef.current &&
-				(e.source === iframeRef.current.contentWindow)
+				e.source === iframeRef.current.contentWindow
 			) {
 				setIframeHeight(Math.max(e.data.height, 120));
 			}
@@ -125,14 +125,9 @@ export const ThreadMessageItem = ({
 	}, []);
 
 	return (
-		<div
-			className={cn(
-				"flex flex-col border-stroke-soft-100/50 border-b pb-6 dark:border-stroke-soft-100/10",
-				index > 0 && "pt-6",
-			)}
-		>
+		<div className="flex flex-col border-stroke-soft-100/50 border-b pb-6 dark:border-stroke-soft-100/10">
 			{/* Sender Meta Row */}
-			<div className="flex items-start justify-between gap-4 px-6 pb-2">
+			<div className="flex items-start justify-between gap-4 px-6 pt-5 pb-4">
 				{/* Left: Avatar + Info */}
 				<div className="flex min-w-0 items-start gap-3">
 					<div
@@ -158,9 +153,7 @@ export const ThreadMessageItem = ({
 								{isOutbound
 									? "You"
 									: msg.fromName ||
-										(msg.fromEmail
-											? msg.fromEmail.split("@")[0]
-											: "Unknown")}
+										(msg.fromEmail ? msg.fromEmail.split("@")[0] : "Unknown")}
 							</span>
 							{msg.fromEmail && (
 								<span className="font-normal text-text-soft-400 text-xs">
@@ -185,9 +178,7 @@ export const ThreadMessageItem = ({
 
 						{/* To block with hover detail card */}
 						<div className="group/tome relative mt-0.5 inline-flex cursor-pointer items-center gap-1 text-text-soft-400 text-xs">
-							<span>
-								to {isOutbound ? email?.toEmails?.join(", ") : "me"}
-							</span>
+							<span>to {isOutbound ? email?.toEmails?.join(", ") : "me"}</span>
 							<Icon name="chevron-down" className="h-3 w-3" />
 
 							<div className="pointer-events-none absolute top-full left-0 z-30 mt-1.5 flex w-80 origin-top-left scale-95 flex-col gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-3 text-text-sub-600 opacity-0 shadow-xl transition-all duration-150 group-hover/tome:pointer-events-auto group-hover/tome:scale-100 group-hover/tome:opacity-100 dark:border-stroke-soft-100/30 dark:bg-neutral-900 dark:text-text-sub-400">
@@ -205,9 +196,7 @@ export const ThreadMessageItem = ({
 										to:
 									</span>
 									<span className="truncate font-semibold text-text-strong-950 dark:text-white">
-										{email?.toEmails?.join(", ") ||
-											mailbox?.email ||
-											"me"}
+										{email?.toEmails?.join(", ") || mailbox?.email || "me"}
 									</span>
 
 									{email?.ccEmails && email.ccEmails.length > 0 && (
@@ -318,7 +307,15 @@ export const ThreadMessageItem = ({
 										onClick={onReply}
 										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 text-xs transition-colors hover:bg-bg-weak-50 dark:text-white dark:hover:bg-zinc-800"
 									>
-										<svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+										<svg
+											className="h-3.5 w-3.5"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="1.5"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										>
 											<polyline points="9 17 4 12 9 7" />
 											<path d="M20 18v-2a4 4 0 0 0-4-4H4" />
 										</svg>
@@ -329,7 +326,15 @@ export const ThreadMessageItem = ({
 										onClick={onForward}
 										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 text-xs transition-colors hover:bg-bg-weak-50 dark:text-white dark:hover:bg-zinc-800"
 									>
-										<svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+										<svg
+											className="h-3.5 w-3.5"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="1.5"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										>
 											<polyline points="15 17 20 12 15 7" />
 											<path d="M4 18v-2a4 4 0 0 1 4-4h12" />
 										</svg>
@@ -342,7 +347,15 @@ export const ThreadMessageItem = ({
 										onClick={onDelete}
 										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-error-base text-xs transition-colors hover:bg-red-50/50 dark:hover:bg-red-950/20"
 									>
-										<svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+										<svg
+											className="h-3.5 w-3.5"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="1.5"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										>
 											<polyline points="3 6 5 6 21 6" />
 											<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
 											<line x1="10" y1="11" x2="10" y2="17" />
@@ -355,7 +368,15 @@ export const ThreadMessageItem = ({
 										onClick={() => onToggleRead(false)}
 										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 text-xs transition-colors hover:bg-bg-weak-50 dark:text-white dark:hover:bg-zinc-800"
 									>
-										<svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+										<svg
+											className="h-3.5 w-3.5"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="1.5"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										>
 											<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
 											<polyline points="22,6 12,13 2,6" />
 										</svg>
@@ -368,7 +389,15 @@ export const ThreadMessageItem = ({
 										onClick={() => onMarkSpam(true)}
 										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 text-xs transition-colors hover:bg-bg-weak-50 dark:text-white dark:hover:bg-zinc-800"
 									>
-										<svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+										<svg
+											className="h-3.5 w-3.5"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="1.5"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										>
 											<polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2" />
 											<line x1="12" y1="8" x2="12" y2="12" />
 											<line x1="12" y1="16" x2="12.01" y2="16" />
@@ -382,7 +411,15 @@ export const ThreadMessageItem = ({
 										onClick={onTranslate}
 										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 text-xs transition-colors hover:bg-bg-weak-50 dark:text-white dark:hover:bg-zinc-800"
 									>
-										<svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+										<svg
+											className="h-3.5 w-3.5"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="1.5"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										>
 											<circle cx="12" cy="12" r="10" />
 											<line x1="2" y1="12" x2="22" y2="12" />
 											<path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
@@ -394,7 +431,15 @@ export const ThreadMessageItem = ({
 										onClick={onPrint}
 										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 text-xs transition-colors hover:bg-bg-weak-50 dark:text-white dark:hover:bg-zinc-800"
 									>
-										<svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+										<svg
+											className="h-3.5 w-3.5"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="1.5"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										>
 											<polyline points="6 9 6 2 18 2 18 9" />
 											<path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
 											<rect x="6" y="14" width="12" height="8" />
@@ -406,7 +451,15 @@ export const ThreadMessageItem = ({
 										onClick={onDownload}
 										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 text-xs transition-colors hover:bg-bg-weak-50 dark:text-white dark:hover:bg-zinc-800"
 									>
-										<svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+										<svg
+											className="h-3.5 w-3.5"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="1.5"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										>
 											<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
 											<polyline points="7 10 12 15 17 10" />
 											<line x1="12" y1="15" x2="12" y2="3" />
@@ -418,7 +471,15 @@ export const ThreadMessageItem = ({
 										onClick={onShowOriginal}
 										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 text-xs transition-colors hover:bg-bg-weak-50 dark:text-white dark:hover:bg-zinc-800"
 									>
-										<svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+										<svg
+											className="h-3.5 w-3.5"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="1.5"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										>
 											<polyline points="16 18 22 12 16 6" />
 											<polyline points="8 6 2 12 8 18" />
 										</svg>
@@ -478,7 +539,7 @@ export const ThreadMessageItem = ({
 												new ResizeObserver(sendHeight).observe(document.body);
 											}
 										})();
-									<\/script>
+									</script>
 								</body>
 								</html>
 							`}
@@ -492,7 +553,8 @@ export const ThreadMessageItem = ({
 					<div className="flex flex-col gap-3">
 						{isTranslated && (
 							<div className="rounded-lg bg-yellow-50 px-3 py-2 font-medium text-[12px] text-yellow-800 dark:bg-yellow-950/20 dark:text-yellow-200">
-								Dynamic {LANGUAGE_NAMES[targetLanguage] || targetLanguage} Translation
+								Dynamic {LANGUAGE_NAMES[targetLanguage] || targetLanguage}{" "}
+								Translation
 							</div>
 						)}
 						<p className="whitespace-pre-wrap text-label-sm text-text-strong-950 leading-relaxed dark:text-neutral-300">
@@ -513,9 +575,7 @@ export const ThreadMessageItem = ({
 							<li key={file.name}>
 								<button
 									type="button"
-									onClick={() =>
-										onPrototypeAction(`Download ${file.name}`)
-									}
+									onClick={() => onPrototypeAction(`Download ${file.name}`)}
 									className="flex w-full items-center gap-3 rounded-lg border border-stroke-soft-100 px-3 py-2 text-left transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/10"
 								>
 									<Icon
