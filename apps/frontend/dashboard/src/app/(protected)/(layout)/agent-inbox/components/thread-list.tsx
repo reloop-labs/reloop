@@ -17,6 +17,42 @@ import { useAgentInbox } from "./agent-inbox-provider";
 
 dayjs.extend(relativeTime);
 
+// Derive the left gutter color and actor pill from thread status
+const getActorInfo = (
+	thread: InboundThread,
+): { gutterColor: string; tag: string | null; tagStyle: string } => {
+	switch (thread.status) {
+		case "needs_approval":
+			return {
+				gutterColor: "bg-amber-500",
+				tag: "needs you",
+				tagStyle:
+					"bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800/40",
+			};
+		case "handled":
+			return {
+				gutterColor: "bg-blue-500",
+				tag: "via agent",
+				tagStyle:
+					"bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/40",
+			};
+		case "parsing":
+		case "new":
+			return {
+				gutterColor: "bg-blue-400",
+				tag: "via agent",
+				tagStyle:
+					"bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/40",
+			};
+		default:
+			return {
+				gutterColor: "bg-neutral-300 dark:bg-neutral-600",
+				tag: null,
+				tagStyle: "",
+			};
+	}
+};
+
 interface ThreadListProps {
 	threads: InboundThread[];
 	selectedId: string | null;
@@ -165,6 +201,7 @@ export const ThreadList = ({
 									{group.threads.map((thread) => {
 										const isSelected = selectedId === thread.id;
 										const isUnread = thread.unread;
+										const actorInfo = getActorInfo(thread);
 
 										return (
 											<div
@@ -177,9 +214,13 @@ export const ThreadList = ({
 														: "bg-bg-white-0 hover:bg-bg-weak-50/40 dark:bg-transparent dark:hover:bg-white/[0.01]",
 												)}
 											>
-												{isSelected && (
-													<div className="absolute top-0 bottom-0 left-0 w-[3px] bg-primary-base" />
-												)}
+												{/* Actor gutter — always visible, color reflects last actor */}
+												<div
+													className={cn(
+														"absolute top-0 bottom-0 left-0 w-[3px]",
+														actorInfo.gutterColor,
+													)}
+												/>
 												<div className="flex items-start gap-3">
 													{/* Gradient Avatar & Checkbox State */}
 													<div className="relative flex h-9 w-9 shrink-0 items-center justify-center">
@@ -318,6 +359,20 @@ export const ThreadList = ({
 														<div className="truncate text-text-soft-400 text-xs leading-relaxed">
 															{thread.preview}
 														</div>
+
+														{/* Actor tag pill */}
+														{actorInfo.tag && (
+															<div className="mt-0.5 flex items-center gap-1.5">
+																<span
+																	className={cn(
+																		"inline-flex items-center rounded-md px-1.5 py-0.5 font-medium font-mono text-[10px] leading-none tracking-wide",
+																		actorInfo.tagStyle,
+																	)}
+																>
+																	{actorInfo.tag}
+																</span>
+															</div>
+														)}
 
 														{/* Attachments Row */}
 														{thread.attachments &&

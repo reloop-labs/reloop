@@ -218,8 +218,9 @@ export const ThreadDetail = ({
 		}
 	};
 
-	const handleSendReply = async () => {
-		if (!thread || !replyBody.trim()) return;
+	const handleSendReply = async (bodyOverride?: string) => {
+		const body = (bodyOverride ?? replyBody).trim();
+		if (!thread || !body) return;
 
 		// Optimistically add the reply bubble immediately
 		const optimisticMsg = {
@@ -234,7 +235,7 @@ export const ThreadDetail = ({
 				fromEmail: mailbox?.email || "me",
 				toEmails: [thread.from.email],
 				subject: `Re: ${thread.subject}`,
-				textBody: replyBody.trim(),
+				textBody: body,
 				htmlBody: null,
 				attachments: [],
 				createdAt: new Date().toISOString(),
@@ -473,6 +474,28 @@ export const ThreadDetail = ({
 					</h1>
 				</div>
 
+				{/* Provenance strip — shown when agent has drafted a reply awaiting approval */}
+				{thread.status === "needs_approval" && (
+					<div className="mx-6 mt-4 flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2.5 font-medium text-xs text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-blue-400">
+						<svg
+							className="h-3.5 w-3.5 shrink-0"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+						>
+							<rect x="3" y="11" width="18" height="10" rx="2" />
+							<circle cx="12" cy="5" r="2" />
+							<path d="M12 7v4" />
+						</svg>
+						<span>
+							Draft prepared by agent
+							<span className="mx-1.5 opacity-50">·</span>
+							held for your approval before sending
+						</span>
+					</div>
+				)}
+
 				{/* Translation banner */}
 				{isTranslated && (
 					<div className="mx-5 my-4 flex items-center justify-between gap-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50 p-3 font-medium text-label-sm dark:border-stroke-soft-100/30 dark:bg-neutral-800/40">
@@ -580,48 +603,128 @@ export const ThreadDetail = ({
 					isSending={isForwarding}
 				/>
 			) : (
-				<div className="mx-5 my-4 flex items-center gap-3">
-					<button
-						type="button"
-						onClick={() => {
-							setShowForwardComposer(false);
-							setShowReplyComposer(true);
-						}}
-						className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2 font-semibold text-label-sm text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
-					>
-						<svg
-							className="h-3.5 w-3.5"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="1.5"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-						>
-							<polyline points="9 17 4 12 9 7" />
-							<path d="M20 18v-2a4 4 0 0 0-4-4H4" />
-						</svg>
-						<span>Reply</span>
-					</button>
-					<button
-						type="button"
-						onClick={handleForward}
-						className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2 font-semibold text-label-sm text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
-					>
-						<svg
-							className="h-3.5 w-3.5"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="1.5"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-						>
-							<polyline points="15 17 20 12 15 7" />
-							<path d="M4 18v-2a4 4 0 0 1 4-4h12" />
-						</svg>
-						<span>Forward</span>
-					</button>
+				<div className="border-stroke-soft-100 border-t bg-bg-white-0 px-5 py-4 dark:border-stroke-soft-100/30 dark:bg-transparent">
+					{thread.status === "needs_approval" ? (
+						<div className="flex items-center gap-2.5">
+							{/* Approve & send */}
+							<button
+								type="button"
+								onClick={() => {
+									const suggested =
+										(thread.parsed?.suggestedReply as string) ||
+										"";
+									handleSendReply(suggested || undefined);
+								}}
+								className="flex items-center gap-2 rounded-xl bg-text-strong-950 px-4 py-2.5 font-semibold text-label-sm text-white transition-all hover:opacity-85 dark:bg-white dark:text-neutral-900"
+							>
+								<svg
+									className="h-3.5 w-3.5"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								>
+									<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+								</svg>
+								<span>Approve &amp; send</span>
+							</button>
+
+							{/* Edit reply */}
+							<button
+								type="button"
+								onClick={() => {
+									const suggested =
+										(thread.parsed?.suggestedReply as string) ||
+										"";
+									setReplyBody(suggested);
+									setShowForwardComposer(false);
+									setShowReplyComposer(true);
+								}}
+								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-label-sm text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+							>
+								<svg
+									className="h-3.5 w-3.5"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="1.5"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								>
+									<path d="M3 10h10a4 4 0 014 4v4M3 10l6-6M3 10l6 6" />
+								</svg>
+								<span>Edit reply</span>
+							</button>
+
+							{/* Forward */}
+							<button
+								type="button"
+								onClick={() => handleForward()}
+								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-label-sm text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+							>
+								<svg
+									className="h-3.5 w-3.5"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="1.5"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								>
+									<path d="M17 1l4 4-4 4M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 01-4 4H3" />
+								</svg>
+								<span>Forward</span>
+							</button>
+						</div>
+					) : (
+						<div className="flex items-center gap-2.5">
+							{/* Reply */}
+							<button
+								type="button"
+								onClick={() => {
+									setShowForwardComposer(false);
+									setShowReplyComposer(true);
+								}}
+								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-label-sm text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+							>
+								<svg
+									className="h-3.5 w-3.5"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="1.5"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								>
+									<polyline points="9 17 4 12 9 7" />
+									<path d="M20 18v-2a4 4 0 0 0-4-4H4" />
+								</svg>
+								<span>Reply</span>
+							</button>
+							{/* Forward */}
+							<button
+								type="button"
+								onClick={() => handleForward()}
+								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-label-sm text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+							>
+								<svg
+									className="h-3.5 w-3.5"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="1.5"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								>
+									<polyline points="15 17 20 12 15 7" />
+									<path d="M4 18v-2a4 4 0 0 1 4-4h12" />
+								</svg>
+								<span>Forward</span>
+							</button>
+						</div>
+					)}
 				</div>
 			)}
 
