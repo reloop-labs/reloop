@@ -7,6 +7,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
+import * as Dropdown from "@reloop/ui/dropdown";
 import type { AgentMailbox, InboundThread } from "../mock-data";
 
 dayjs.extend(relativeTime);
@@ -186,26 +187,182 @@ export const ThreadDetail = ({
 									<path d="M20 18v-2a4 4 0 0 0-4-4H4" />
 								</svg>
 							</button>
-							<button
-								type="button"
-								onClick={() => handlePrototypeAction("More actions")}
-								className="rounded-lg p-1.5 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/10"
-								title="More actions"
-							>
-								<svg
-									className="h-4 w-4"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="1.5"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<circle cx="12" cy="12" r="1" />
-									<circle cx="12" cy="5" r="1" />
-									<circle cx="12" cy="19" r="1" />
-								</svg>
-							</button>
+							<Dropdown.Root>
+								<Dropdown.Trigger asChild>
+									<button
+										type="button"
+										className="rounded-lg p-1.5 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/10"
+										title="More actions"
+									>
+										<svg
+											className="h-4 w-4"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="1.5"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										>
+											<circle cx="12" cy="12" r="1" />
+											<circle cx="12" cy="5" r="1" />
+											<circle cx="12" cy="19" r="1" />
+										</svg>
+									</button>
+								</Dropdown.Trigger>
+								<Dropdown.Content align="end" className="w-56 rounded-xl p-1.5 bg-bg-white-0 dark:bg-neutral-900 border border-stroke-soft-100 dark:border-stroke-soft-100/30 shadow-lg">
+									<Dropdown.Item
+										onClick={() => handlePrototypeAction("Reply")}
+										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 hover:bg-bg-weak-50 dark:hover:bg-zinc-800 text-xs transition-colors dark:text-white"
+									>
+										<svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+											<polyline points="9 17 4 12 9 7" />
+											<path d="M20 18v-2a4 4 0 0 0-4-4H4" />
+										</svg>
+										<span>Reply</span>
+									</Dropdown.Item>
+
+									<Dropdown.Item
+										onClick={() => handlePrototypeAction("Forward")}
+										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 hover:bg-bg-weak-50 dark:hover:bg-zinc-800 text-xs transition-colors dark:text-white"
+									>
+										<svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+											<polyline points="15 17 20 12 15 7" />
+											<path d="M4 18v-2a4 4 0 0 1 4-4h12" />
+										</svg>
+										<span>Forward</span>
+									</Dropdown.Item>
+
+									<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+
+									<Dropdown.Item
+										onClick={() => handlePrototypeAction("Delete")}
+										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-error-base hover:bg-red-50/50 dark:hover:bg-red-950/20 text-xs transition-colors"
+									>
+										<svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+											<polyline points="3 6 5 6 21 6" />
+											<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+											<line x1="10" y1="11" x2="10" y2="17" />
+											<line x1="14" y1="11" x2="14" y2="17" />
+										</svg>
+										<span>Delete</span>
+									</Dropdown.Item>
+
+									<Dropdown.Item
+										onClick={() => handlePrototypeAction("Mark as unread")}
+										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 hover:bg-bg-weak-50 dark:hover:bg-zinc-800 text-xs transition-colors dark:text-white"
+									>
+										<svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+											<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+											<polyline points="22,6 12,13 2,6" />
+										</svg>
+										<span>Mark as unread</span>
+									</Dropdown.Item>
+
+									<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+
+									<Dropdown.Item
+										onClick={() => handlePrototypeAction(`Block "${thread.from.name || thread.from.email.split("@")[0]}"`)}
+										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 hover:bg-bg-weak-50 dark:hover:bg-zinc-800 text-xs transition-colors dark:text-white"
+									>
+										<svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+											<circle cx="12" cy="12" r="10" />
+											<line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+										</svg>
+										<span className="truncate">Block "{thread.from.name || thread.from.email.split("@")[0]}"</span>
+									</Dropdown.Item>
+
+									<Dropdown.Item
+										onClick={() => handlePrototypeAction("Report spam")}
+										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 hover:bg-bg-weak-50 dark:hover:bg-zinc-800 text-xs transition-colors dark:text-white"
+									>
+										<svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+											<polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2" />
+											<line x1="12" y1="8" x2="12" y2="12" />
+											<line x1="12" y1="16" x2="12.01" y2="16" />
+										</svg>
+										<span>Report spam</span>
+									</Dropdown.Item>
+
+									<Dropdown.Item
+										onClick={() => handlePrototypeAction("Report phishing")}
+										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 hover:bg-bg-weak-50 dark:hover:bg-zinc-800 text-xs transition-colors dark:text-white"
+									>
+										<svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+											<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+											<line x1="12" y1="8" x2="12" y2="12" />
+											<line x1="12" y1="16" x2="12.01" y2="16" />
+										</svg>
+										<span>Report phishing</span>
+									</Dropdown.Item>
+
+									<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+
+									<Dropdown.Item
+										onClick={() => handlePrototypeAction("Filter messages like this")}
+										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 hover:bg-bg-weak-50 dark:hover:bg-zinc-800 text-xs transition-colors dark:text-white"
+									>
+										<svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+											<line x1="4" y1="21" x2="4" y2="14" />
+											<line x1="4" y1="10" x2="4" y2="3" />
+											<line x1="12" y1="21" x2="12" y2="12" />
+											<line x1="12" y1="8" x2="12" y2="3" />
+											<line x1="20" y1="21" x2="20" y2="16" />
+											<line x1="20" y1="12" x2="20" y2="3" />
+											<line x1="1" y1="14" x2="7" y2="14" />
+											<line x1="9" y1="8" x2="15" y2="8" />
+											<line x1="17" y1="16" x2="23" y2="16" />
+										</svg>
+										<span>Filter messages</span>
+									</Dropdown.Item>
+
+									<Dropdown.Item
+										onClick={() => handlePrototypeAction("Translate")}
+										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 hover:bg-bg-weak-50 dark:hover:bg-zinc-800 text-xs transition-colors dark:text-white"
+									>
+										<svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+											<circle cx="12" cy="12" r="10" />
+											<line x1="2" y1="12" x2="22" y2="12" />
+											<path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+										</svg>
+										<span>Translate message</span>
+									</Dropdown.Item>
+
+									<Dropdown.Item
+										onClick={() => handlePrototypeAction("Print")}
+										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 hover:bg-bg-weak-50 dark:hover:bg-zinc-800 text-xs transition-colors dark:text-white"
+									>
+										<svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+											<polyline points="6 9 6 2 18 2 18 9" />
+											<path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+											<rect x="6" y="14" width="12" height="8" />
+										</svg>
+										<span>Print</span>
+									</Dropdown.Item>
+
+									<Dropdown.Item
+										onClick={() => handlePrototypeAction("Download")}
+										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 hover:bg-bg-weak-50 dark:hover:bg-zinc-800 text-xs transition-colors dark:text-white"
+									>
+										<svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+											<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+											<polyline points="7 10 12 15 17 10" />
+											<line x1="12" y1="15" x2="12" y2="3" />
+										</svg>
+										<span>Download message</span>
+									</Dropdown.Item>
+
+									<Dropdown.Item
+										onClick={() => handlePrototypeAction("Show original")}
+										className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 hover:bg-bg-weak-50 dark:hover:bg-zinc-800 text-xs transition-colors dark:text-white"
+									>
+										<svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+											<polyline points="16 18 22 12 16 6" />
+											<polyline points="8 6 2 12 8 18" />
+										</svg>
+										<span>Show original</span>
+									</Dropdown.Item>
+								</Dropdown.Content>
+							</Dropdown.Root>
 						</div>
 					</div>
 				</div>
