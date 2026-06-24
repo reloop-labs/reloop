@@ -109,10 +109,35 @@ export const ThreadDetail = ({
 								</button>
 							</div>
 
-							{/* To block */}
-							<div className="mt-0.5 flex items-center gap-1 text-text-soft-400 text-xs">
+							{/* To block with hover details */}
+							<div className="group/tome relative mt-0.5 inline-flex items-center gap-1 text-text-soft-400 text-xs cursor-pointer">
 								<span>to me</span>
 								<Icon name="chevron-down" className="h-3 w-3" />
+
+								{/* Hover Detail Card */}
+								<div className="absolute top-full left-0 mt-1.5 z-30 w-80 rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/30 bg-bg-white-0 dark:bg-neutral-900 p-3 shadow-xl opacity-0 scale-95 pointer-events-none group-hover/tome:opacity-100 group-hover/tome:scale-100 group-hover/tome:pointer-events-auto transition-all duration-150 origin-top-left text-text-sub-600 dark:text-text-sub-400 flex flex-col gap-2">
+									<div className="grid grid-cols-[50px_minmax(0,1fr)] gap-x-2 gap-y-1.5 font-normal text-xs leading-relaxed">
+										<span className="text-text-soft-400 text-right">from:</span>
+										<span className="truncate text-text-strong-950 font-medium dark:text-white">
+											{thread.from.name ? `${thread.from.name} <${thread.from.email}>` : thread.from.email}
+										</span>
+
+										<span className="text-text-soft-400 text-right">to:</span>
+										<span className="truncate text-text-strong-950 font-medium dark:text-white">
+											{mailbox?.email || "me"}
+										</span>
+
+										<span className="text-text-soft-400 text-right">date:</span>
+										<span className="text-text-strong-950 font-medium dark:text-white">
+											{dayjs(thread.receivedAt).format("ddd, MMM D, YYYY [at] h:mm A")}
+										</span>
+
+										<span className="text-text-soft-400 text-right">subject:</span>
+										<span className="text-text-strong-950 font-medium dark:text-white break-words">
+											{thread.subject}
+										</span>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -141,27 +166,7 @@ export const ThreadDetail = ({
 									<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
 								</svg>
 							</button>
-							<button
-								type="button"
-								onClick={() => handlePrototypeAction("Add reaction")}
-								className="rounded-lg p-1.5 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/10"
-								title="Add reaction"
-							>
-								<svg
-									className="h-4 w-4"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="1.5"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<circle cx="12" cy="12" r="10" />
-									<path d="M8 14s1.5 2 4 2 4-2 4-2" />
-									<line x1="9" y1="9" x2="9.01" y2="9" />
-									<line x1="15" y1="9" x2="15.01" y2="9" />
-								</svg>
-							</button>
+
 							<button
 								type="button"
 								onClick={() => handlePrototypeAction("Reply")}
