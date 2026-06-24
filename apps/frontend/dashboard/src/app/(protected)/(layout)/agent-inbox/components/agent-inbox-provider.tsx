@@ -137,6 +137,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			return {
 				id: msg.id,
 				mailboxId: msg.mailboxId,
+				threadId: msg.threadId || undefined,
 				from: { name: msg.fromName || undefined, email: msg.fromEmail },
 				subject: msg.subject || "(No Subject)",
 				preview:

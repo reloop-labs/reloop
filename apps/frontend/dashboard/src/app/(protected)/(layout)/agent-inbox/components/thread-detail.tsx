@@ -6,8 +6,9 @@ import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import useSWR from "swr";
 import type { AgentMailbox, InboundThread } from "../mock-data";
 import { useAgentInbox } from "./agent-inbox-provider";
 
@@ -91,6 +92,10 @@ export const ThreadDetail = ({
 	const [showReplyComposer, setShowReplyComposer] = useState(false);
 	const [replyBody, setReplyBody] = useState("");
 
+	const { data: threadData, mutate: mutateThread } = useSWR<any>(
+		thread?.threadId ? `/api/inbox/v1/threads/${thread.threadId}` : null,
+	);
+
 	useEffect(() => {
 		setIsTranslated(false);
 		setTranslatedHtmlMap({});
@@ -155,12 +160,80 @@ export const ThreadDetail = ({
 		}
 	};
 
+	const displayMessages = useMemo(() => {
+		if (!thread) return [];
+		if (!threadData?.messages || threadData.messages.length === 0) {
+			return [
+				{
+					id: thread.id,
+					direction: "inbound",
+					fromEmail: thread.from.email,
+					fromName: thread.from.name || null,
+					messageAt: thread.receivedAt,
+					subject: thread.subject,
+					email: {
+						id: thread.id,
+						fromEmail: thread.from.email,
+						toEmails: [mailbox?.email || ""],
+						subject: thread.subject,
+						textBody: thread.bodyText,
+						htmlBody: thread.bodyHtml,
+						attachments: thread.attachments || [],
+						createdAt: thread.receivedAt,
+					},
+					parsed: thread.parsed,
+				},
+			];
+		}
+
+		const sorted = [...threadData.messages].sort(
+			(a, b) =>
+				new Date(a.messageAt).getTime() - new Date(b.messageAt).getTime(),
+		);
+
+		return sorted.map((msg) => {
+			if (msg.inboundEmailId === thread.id || msg.id === thread.id) {
+				return {
+					...msg,
+					parsed: thread.parsed || msg.parsed,
+				};
+			}
+			return msg;
+		});
+	}, [threadData, thread, mailbox]);
+
 	const handleDownload = () => {
 		try {
 			const element = document.createElement("a");
-			const file = new Blob([thread.bodyHtml || thread.bodyText], {
-				type: "text/html",
-			});
+			const messagesHtml = displayMessages
+				.map((msg) => {
+					const body = msg.email?.htmlBody || msg.email?.textBody || "";
+					return `
+					<div style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+						<strong>From:</strong> ${msg.fromName ? `${msg.fromName} <${msg.fromEmail}>` : msg.fromEmail}<br>
+						<strong>Date:</strong> ${msg.messageAt}<br><br>
+						${body}
+					</div>
+				`;
+				})
+				.join("");
+
+			const file = new Blob(
+				[
+					`
+				<html>
+				<head><title>${thread.subject}</title></head>
+				<body style="font-family: sans-serif; padding: 20px;">
+					<h2>${thread.subject}</h2>
+					${messagesHtml}
+				</body>
+				</html>
+			`,
+				],
+				{
+					type: "text/html",
+				},
+			);
 			element.href = URL.createObjectURL(file);
 			element.download = `${thread.subject.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.html`;
 			document.body.appendChild(element);
@@ -176,6 +249,28 @@ export const ThreadDetail = ({
 		try {
 			const printWindow = window.open("", "_blank");
 			if (printWindow) {
+				const messagesHtml = displayMessages
+					.map((msg) => {
+						const msgKey = `${msg.id}-${targetLanguage}`;
+						const body = isTranslated
+							? translatedHtmlMap[msgKey] || translatedTextMap[msgKey] || ""
+							: msg.email?.htmlBody || msg.email?.textBody || "";
+						const formattedBody =
+							body.includes("<body") || body.includes("<html")
+								? body
+								: `<pre style="white-space: pre-wrap;">${body}</pre>`;
+						return `
+						<div style="margin-bottom: 30px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px;">
+							<div style="font-weight: bold; font-size: 14px;">${msg.fromName ? `${msg.fromName} &lt;${msg.fromEmail}&gt;` : msg.fromEmail}</div>
+							<div style="font-size: 12px; color: #4b5563; margin-bottom: 10px;">
+								Date: ${dayjs(msg.messageAt).format("ddd, MMM D, YYYY [at] h:mm A")}
+							</div>
+							<div>${formattedBody}</div>
+						</div>
+					`;
+					})
+					.join("");
+
 				printWindow.document.write(`
 					<!DOCTYPE html>
 					<html>
@@ -197,12 +292,8 @@ export const ThreadDetail = ({
 						</style>
 					</head>
 					<body>
-						<h1 style="font-size: 20px; margin-bottom: 5px;">${thread.subject}</h1>
-						<div style="font-size: 12px; color: #4b5563; margin-bottom: 10px;">
-							From: ${thread.from.name ? `${thread.from.name} <${thread.from.email}>` : thread.from.email}
-						</div>
-						<hr />
-						${translatedHtmlMap[targetLanguage] || thread.bodyHtml || `<pre style="white-space: pre-wrap;">${translatedTextMap[targetLanguage] || thread.bodyText}</pre>`}
+						<h1 style="font-size: 20px; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">${thread.subject}</h1>
+						${messagesHtml}
 						<script>
 							window.onload = function() {
 								setTimeout(function() {
@@ -235,6 +326,9 @@ export const ThreadDetail = ({
 			success: () => {
 				setReplyBody("");
 				setShowReplyComposer(false);
+				if (thread.threadId) {
+					mutateThread();
+				}
 				return `Reply sent to ${thread.from.email} successfully`;
 			},
 			error: (err) => {
@@ -251,12 +345,18 @@ export const ThreadDetail = ({
 		toast.success(`Blocked sender ${thread.from.email}`);
 	};
 
-	const performTranslation = async (lang: string) => {
-		if (thread.bodyHtml && !translatedHtmlMap[lang]) {
+	const performTranslation = async (
+		msgId: string,
+		textBody: string,
+		htmlBody: string | undefined,
+		lang: string,
+	) => {
+		const key = `${msgId}-${lang}`;
+		if (htmlBody && !translatedHtmlMap[key]) {
 			setIsTranslating(true);
 			try {
 				const parser = new DOMParser();
-				const doc = parser.parseFromString(thread.bodyHtml, "text/html");
+				const doc = parser.parseFromString(htmlBody, "text/html");
 
 				const textNodes: Node[] = [];
 				const walk = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, null);
@@ -274,7 +374,7 @@ export const ThreadDetail = ({
 								const t = await translateText(n.nodeValue.trim(), lang);
 								n.nodeValue = t;
 							} catch {
-								// ignore individual failure
+								// ignore
 							}
 						}
 					}),
@@ -282,7 +382,7 @@ export const ThreadDetail = ({
 
 				setTranslatedHtmlMap((prev) => ({
 					...prev,
-					[lang]: doc.body.innerHTML,
+					[key]: doc.body.innerHTML,
 				}));
 				toast.success("Translated email dynamically");
 			} catch (err) {
@@ -292,13 +392,13 @@ export const ThreadDetail = ({
 			}
 		}
 
-		if (thread.bodyText && !translatedTextMap[lang]) {
+		if (textBody && !translatedTextMap[key]) {
 			setIsTranslating(true);
 			try {
-				const t = await translateText(thread.bodyText, lang);
+				const t = await translateText(textBody, lang);
 				setTranslatedTextMap((prev) => ({
 					...prev,
-					[lang]: t,
+					[key]: t,
 				}));
 				toast.success("Translated email dynamically");
 			} catch (err) {
@@ -316,12 +416,30 @@ export const ThreadDetail = ({
 		}
 
 		setIsTranslated(true);
-		await performTranslation(targetLanguage);
+		await Promise.all(
+			displayMessages.map((msg) =>
+				performTranslation(
+					msg.id,
+					msg.email?.textBody || "",
+					msg.email?.htmlBody,
+					targetLanguage,
+				),
+			),
+		);
 	};
 
 	const handleLanguageChange = async (lang: string) => {
 		setTargetLanguage(lang);
-		await performTranslation(lang);
+		await Promise.all(
+			displayMessages.map((msg) =>
+				performTranslation(
+					msg.id,
+					msg.email?.textBody || "",
+					msg.email?.htmlBody,
+					lang,
+				),
+			),
+		);
 	};
 
 	const LANGUAGE_NAMES: Record<string, string> = {

@@ -3,7 +3,12 @@
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { PageSizeDropdown } from "@fe/dashboard/components/page-size-dropdown";
 import { PaginationControls } from "@fe/dashboard/components/pagination-controls";
+import {
+	getAvatarGradient,
+	getAvatarInitial,
+} from "@fe/dashboard/utils/avatar";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
+import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -304,9 +309,18 @@ export const EmailTable = ({
 							>
 								{/* To */}
 								<div className="flex min-w-0 items-center gap-2 pr-4">
-									<div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-[10px] text-white uppercase tracking-wide shadow-sm">
-										{log.toEmails[0]?.charAt(0).toUpperCase() || "E"}
-									</div>
+									<Avatar.Root size="24" color="gray" className="flex-shrink-0">
+										<Avatar.Image asChild>
+											<div
+												className={cn(
+													"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
+													getAvatarGradient(log.toEmails[0] || ""),
+												)}
+											>
+												{getAvatarInitial(null, log.toEmails[0] || "")}
+											</div>
+										</Avatar.Image>
+									</Avatar.Root>
 									<span className="truncate font-medium text-label-sm text-text-strong-950">
 										{log.toEmails.join(", ")}
 									</span>

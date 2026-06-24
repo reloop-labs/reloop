@@ -37,6 +37,7 @@ export interface AgentMailboxStats {
 export interface InboundThread {
 	id: string;
 	mailboxId: string;
+	threadId?: string;
 	from: { name?: string; email: string };
 	subject: string;
 	preview: string;

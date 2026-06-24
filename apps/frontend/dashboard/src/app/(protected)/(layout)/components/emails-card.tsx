@@ -1,6 +1,11 @@
 "use client";
 
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import {
+	getAvatarGradient,
+	getAvatarInitial,
+} from "@fe/dashboard/utils/avatar";
+import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -304,15 +309,18 @@ export function EmailsCard() {
 									className="group/row flex items-center justify-between border-stroke-soft-100 border-b py-2.5 transition-colors last:border-b-0 hover:bg-bg-weak-50/50 dark:border-white/5 dark:hover:bg-white/[0.01]"
 								>
 									<div className="flex min-w-0 flex-1 items-center gap-3">
-										<span title={d.status} className="shrink-0">
-											<Icon
-												name={getEmailIcon(d.status)}
-												className={cn(
-													"h-4 w-4",
-													getEmailIconColorClass(d.status),
-												)}
-											/>
-										</span>
+										<Avatar.Root size="20" color="gray" className="shrink-0">
+											<Avatar.Image asChild>
+												<div
+													className={cn(
+														"flex h-full w-full items-center justify-center rounded-full font-semibold text-[9px] text-white uppercase tracking-wide shadow-sm",
+														getAvatarGradient(d.fromEmail),
+													)}
+												>
+													{getAvatarInitial(d.fromName, d.fromEmail)}
+												</div>
+											</Avatar.Image>
+										</Avatar.Root>
 										<span className="truncate font-semibold text-text-strong-950 text-xs group-hover/row:underline dark:text-white">
 											{d.fromEmail || d.fromName || "(Unknown)"}
 										</span>
