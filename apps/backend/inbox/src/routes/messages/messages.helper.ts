@@ -16,6 +16,13 @@ export interface SendFromInboxParams {
 	bcc?: string | string[];
 	threadId?: string;
 	headers?: Record<string, string>;
+	attachments?: Array<{
+		content?: unknown;
+		filename?: string;
+		path?: string;
+		content_type?: string;
+		content_id?: string;
+	}>;
 }
 
 export async function proxySendToMailService(
@@ -69,6 +76,7 @@ export async function proxySendToMailService(
 		bcc: params.bcc,
 		thread_id: params.threadId,
 		headers: params.headers,
+		attachments: params.attachments,
 	};
 
 	// Remove undefined values

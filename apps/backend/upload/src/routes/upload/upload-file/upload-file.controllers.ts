@@ -57,7 +57,11 @@ export async function uploadFile(params: {
 
 		// Generate unique filename
 		const fileId = createId();
-		const extension = getFileExtension(file.type);
+		const originalParts = file.name.split(".");
+		const extension =
+			originalParts.length > 1
+				? originalParts.pop()?.toLowerCase() || "bin"
+				: "bin";
 		const sanitizedOriginalName = sanitizeFilename(file.name);
 		const filename = `${fileId}.${extension}`;
 

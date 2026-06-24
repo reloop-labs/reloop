@@ -3,7 +3,8 @@
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import type { AgentMailbox } from "../mock-data";
 import { useAgentInbox } from "./agent-inbox-provider";
@@ -13,6 +14,15 @@ interface ComposeModalProps {
 	onClose: () => void;
 	mailbox: AgentMailbox;
 }
+
+const formatBytes = (bytes: number, decimals = 1) => {
+	if (!bytes) return "0 Bytes";
+	const k = 1024;
+	const dm = decimals < 0 ? 0 : decimals;
+	const sizes = ["Bytes", "KB", "MB", "GB"];
+	const i = Math.floor(Math.log(bytes) / Math.log(k));
+	return `${Number.parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`;
+};
 
 export const ComposeModal = ({
 	isOpen,
@@ -33,9 +43,17 @@ export const ComposeModal = ({
 	const [showBcc, setShowBcc] = useState(false);
 	const [isSending, setIsSending] = useState(false);
 
-	// Pre-populated attachment matching mockup
+	// Real attachment state tracking upload progress and URL/path metadata
 	const [attachments, setAttachments] = useState<
-		Array<{ name: string; size: string }>
+		Array<{
+			id: string;
+			name: string;
+			size: string;
+			url: string;
+			path: string;
+			content_type: string;
+			isUploading?: boolean;
+		}>
 	>([]);
 
 	// Reset form when modal opens/closes
@@ -52,9 +70,78 @@ export const ComposeModal = ({
 		}
 	}, [isOpen]);
 
+	const uploadFile = useCallback(async (file: File) => {
+		const tempId = Math.random().toString();
+		const newAttachment = {
+			id: tempId,
+			name: file.name,
+			size: formatBytes(file.size),
+			url: "",
+			path: "",
+			content_type: file.type || "application/octet-stream",
+			isUploading: true,
+		};
+		setAttachments((prev) => [...prev, newAttachment]);
+
+		try {
+			const formData = new FormData();
+			formData.append("file", file);
+
+			const res = await fetch("/api/upload/v1/upload", {
+				method: "POST",
+				body: formData,
+			});
+
+			if (!res.ok) {
+				throw new Error("Upload failed");
+			}
+
+			const data = await res.json();
+			setAttachments((prev) =>
+				prev.map((att) =>
+					att.id === tempId
+						? {
+								...att,
+								url: data.url,
+								path: data.path,
+								isUploading: false,
+							}
+						: att,
+				),
+			);
+		} catch (_error) {
+			toast.error(`Failed to upload ${file.name}`);
+			setAttachments((prev) => prev.filter((att) => att.id !== tempId));
+		}
+	}, []);
+
+	const onDrop = useCallback(
+		async (acceptedFiles: File[]) => {
+			for (const file of acceptedFiles) {
+				if (file.size > 10 * 1024 * 1024) {
+					toast.error(`${file.name} is too large. Max size is 10MB.`);
+					continue;
+				}
+				uploadFile(file);
+			}
+		},
+		[uploadFile],
+	);
+
+	const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
+		onDrop,
+		noClick: true,
+		noKeyboard: true,
+	});
+
 	const handleSend = async () => {
 		if (!to.trim()) {
 			toast.error("Please specify at least one recipient in the 'To' field.");
+			return;
+		}
+
+		if (attachments.some((att) => att.isUploading)) {
+			toast.error("Please wait for all attachments to finish uploading.");
 			return;
 		}
 
@@ -78,6 +165,15 @@ export const ComposeModal = ({
 						.filter(Boolean)
 				: undefined;
 
+			// Map attachments payload
+			const attachmentsPayload = attachments
+				.filter((att) => !att.isUploading && att.url)
+				.map((att) => ({
+					filename: att.name,
+					path: att.path,
+					content_type: att.content_type,
+				}));
+
 			await sendMessage({
 				mailboxId: mailbox.id,
 				to: toEmails,
@@ -85,12 +181,13 @@ export const ComposeModal = ({
 				text: body,
 				cc: ccEmails,
 				bcc: bccEmails,
+				attachments: attachmentsPayload,
 			});
 
 			toast.success("Email sent successfully!");
 			onClose();
-		} catch (err: any) {
-			toast.error(err.message || "Failed to send email");
+		} catch (err) {
+			toast.error(err instanceof Error ? err.message : "Failed to send email");
 		} finally {
 			setIsSending(false);
 		}
@@ -98,15 +195,6 @@ export const ComposeModal = ({
 
 	const removeAttachment = (indexToRemove: number) => {
 		setAttachments((prev) => prev.filter((_, idx) => idx !== indexToRemove));
-	};
-
-	const addAttachmentPlaceholder = () => {
-		const newFile = {
-			name: `attachment-${Date.now().toString().slice(-4)}.txt`,
-			size: "0.8 KB",
-		};
-		setAttachments((prev) => [...prev, newFile]);
-		toast.success(`Attached ${newFile.name}`);
 	};
 
 	return (
@@ -121,7 +209,35 @@ export const ComposeModal = ({
 					if (isSending) e.preventDefault();
 				}}
 			>
-				<div className="flex flex-col">
+				<div {...getRootProps()} className="relative flex flex-col">
+					<input {...getInputProps()} />
+					<AnimatePresence>
+						{isDragActive && (
+							<motion.div
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-white/85 backdrop-blur-sm dark:bg-neutral-900/85"
+							>
+								<div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-2xl border-2 border-[#18181b] border-dashed dark:border-white">
+									<svg
+										className="h-7 w-7 text-text-strong-950 dark:text-white"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									>
+										<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+									</svg>
+								</div>
+								<p className="font-semibold text-base text-text-strong-950 dark:text-white">
+									Drop files here to attach
+								</p>
+							</motion.div>
+						)}
+					</AnimatePresence>
 					{/* Top bar Header */}
 					<div className="flex items-center justify-between border-stroke-soft-100/60 border-b px-5 py-4 dark:border-neutral-800">
 						<h2 className="font-semibold text-sm text-text-strong-950 dark:text-white">
@@ -306,23 +422,46 @@ export const ComposeModal = ({
 								<AnimatePresence>
 									{attachments.map((file, idx) => (
 										<motion.div
-											key={file.name}
+											key={file.id || file.name}
 											initial={{ opacity: 0, scale: 0.9, y: 5 }}
 											animate={{ opacity: 1, scale: 1, y: 0 }}
 											exit={{ opacity: 0, scale: 0.9 }}
 											transition={{ duration: 0.2 }}
-											className="inline-flex items-center gap-2 rounded border border-zinc-700/50 bg-zinc-800 px-2.5 py-1 font-mono text-xs text-zinc-100 shadow-sm dark:bg-zinc-950"
+											className={`inline-flex items-center gap-2 rounded border border-zinc-700/50 bg-zinc-800 px-2.5 py-1 font-mono text-xs text-zinc-100 shadow-sm dark:bg-zinc-950 ${file.isUploading ? "opacity-60" : ""}`}
 										>
-											<svg
-												className="h-3.5 w-3.5 text-zinc-400"
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												strokeWidth="2"
-											>
-												<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-												<polyline points="14 2 14 8 20 8" />
-											</svg>
+											{file.isUploading ? (
+												<svg
+													className="h-3.5 w-3.5 animate-spin text-zinc-400"
+													xmlns="http://www.w3.org/2000/svg"
+													fill="none"
+													viewBox="0 0 24 24"
+												>
+													<circle
+														className="opacity-25"
+														cx="12"
+														cy="12"
+														r="10"
+														stroke="currentColor"
+														strokeWidth="3"
+													/>
+													<path
+														className="opacity-75"
+														fill="currentColor"
+														d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+													/>
+												</svg>
+											) : (
+												<svg
+													className="h-3.5 w-3.5 text-zinc-400"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													strokeWidth="2"
+												>
+													<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+													<polyline points="14 2 14 8 20 8" />
+												</svg>
+											)}
 											<span className="max-w-[180px] truncate">
 												{file.name}
 											</span>
@@ -353,7 +492,11 @@ export const ComposeModal = ({
 								whileTap={{ scale: 0.98 }}
 								type="button"
 								onClick={handleSend}
-								disabled={isSending || !to.trim()}
+								disabled={
+									isSending ||
+									!to.trim() ||
+									attachments.some((att) => att.isUploading)
+								}
 								className="flex items-center gap-2 rounded-xl bg-[#18181b] px-6 py-2.5 font-semibold text-sm text-white shadow-sm transition-all duration-200 hover:bg-neutral-800 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100"
 							>
 								<svg
@@ -383,7 +526,7 @@ export const ComposeModal = ({
 								whileHover={{ scale: 1.05 }}
 								whileTap={{ scale: 0.95 }}
 								type="button"
-								onClick={addAttachmentPlaceholder}
+								onClick={open}
 								title="Attach files"
 								disabled={isSending}
 								className="flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-200 text-text-sub-600 transition-colors hover:bg-bg-weak-50 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800"

@@ -99,6 +99,11 @@ interface AgentInboxContextValue {
 		html?: string;
 		cc?: string | string[];
 		bcc?: string | string[];
+		attachments?: Array<{
+			filename?: string;
+			path?: string;
+			content_type?: string;
+		}>;
 	}) => Promise<void>;
 }
 
@@ -356,6 +361,11 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			html?: string;
 			cc?: string | string[];
 			bcc?: string | string[];
+			attachments?: Array<{
+				filename?: string;
+				path?: string;
+				content_type?: string;
+			}>;
 		}) => {
 			const res = await fetch("/api/inbox/v1/messages/send", {
 				method: "POST",

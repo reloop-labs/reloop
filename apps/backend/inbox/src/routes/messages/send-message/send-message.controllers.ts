@@ -11,6 +11,13 @@ export async function sendMessageController(
 		html?: string;
 		cc?: string | string[];
 		bcc?: string | string[];
+		attachments?: Array<{
+			content?: unknown;
+			filename?: string;
+			path?: string;
+			content_type?: string;
+			content_id?: string;
+		}>;
 	},
 	apiKey: string,
 	cookie?: string,
@@ -28,6 +35,7 @@ export async function sendMessageController(
 			html: body.html,
 			cc: body.cc,
 			bcc: body.bcc,
+			attachments: body.attachments,
 		},
 		apiKey,
 		cookie,
