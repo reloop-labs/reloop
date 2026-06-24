@@ -11,6 +11,7 @@ export const replyToMessageRoute = new Elysia().use(authMiddleware).post(
 			organizationId,
 			body,
 			request.headers.get("x-api-key") ?? "",
+			request.headers.get("cookie") ?? undefined,
 		);
 	},
 	{

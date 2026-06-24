@@ -80,6 +80,7 @@ interface AgentInboxContextValue {
 	markMessageRead: (id: string, isRead: boolean) => Promise<void>;
 	deleteMessage: (id: string) => Promise<void>;
 	markMessageSpam: (id: string, isSpam: boolean) => Promise<void>;
+	sendReply: (id: string, text: string, html?: string) => Promise<void>;
 }
 
 const AgentInboxContext = createContext<AgentInboxContextValue | null>(null);
@@ -279,6 +280,24 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		[mutateMessages],
 	);
 
+	const sendReply = useCallback(
+		async (id: string, text: string, html?: string) => {
+			const res = await fetch(`/api/inbox/v1/messages/${id}/reply`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ text, html }),
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to send reply");
+			}
+
+			await mutateMessages();
+		},
+		[mutateMessages],
+	);
+
 	const refresh = useCallback(async () => {
 		await Promise.all([mutateMailboxes(), mutateMessages()]);
 	}, [mutateMailboxes, mutateMessages]);
@@ -295,6 +314,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			markMessageRead,
 			deleteMessage,
 			markMessageSpam,
+			sendReply,
 		}),
 		[
 			mailboxes,
@@ -307,6 +327,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			markMessageRead,
 			deleteMessage,
 			markMessageSpam,
+			sendReply,
 		],
 	);
 

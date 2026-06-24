@@ -198,7 +198,7 @@ export const ThreadList = ({
 													"group/card relative flex cursor-pointer flex-col gap-1.5 px-4 py-3.5 text-left transition-all duration-200",
 													isSelected
 														? "bg-bg-weak-50/70 dark:bg-white/[0.04]"
-														: "bg-bg-white-0 dark:bg-transparent hover:bg-bg-weak-50/40 dark:hover:bg-white/[0.01]",
+														: "bg-bg-white-0 hover:bg-bg-weak-50/40 dark:bg-transparent dark:hover:bg-white/[0.01]",
 												)}
 											>
 												{isSelected && (
@@ -212,8 +212,8 @@ export const ThreadList = ({
 															className={cn(
 																"absolute inset-0 flex items-center justify-center rounded-full bg-gradient-to-tr font-semibold text-white text-xs shadow-sm transition-all duration-150",
 																isSelected
-																	? "scale-0 opacity-0 pointer-events-none"
-																	: "scale-100 opacity-100 group-hover/card:scale-0 group-hover/card:opacity-0 group-hover/card:pointer-events-none",
+																	? "pointer-events-none scale-0 opacity-0"
+																	: "scale-100 opacity-100 group-hover/card:pointer-events-none group-hover/card:scale-0 group-hover/card:opacity-0",
 																getSenderGradient(
 																	thread.from.name ?? thread.from.email,
 																),
@@ -231,7 +231,7 @@ export const ThreadList = ({
 																	: "scale-0 opacity-0 group-hover/card:scale-100 group-hover/card:opacity-100",
 															)}
 														>
-															<div className="flex h-5 w-5 items-center justify-center rounded border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 transition-all duration-150 text-transparent hover:border-neutral-400" />
+															<div className="flex h-5 w-5 items-center justify-center rounded border border-neutral-300 bg-white text-transparent transition-all duration-150 hover:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900" />
 														</div>
 													</div>
 
@@ -261,7 +261,7 @@ export const ThreadList = ({
 																</div>
 
 																{/* Quick actions (visible on hover) */}
-																<div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 pointer-events-none transition-all duration-150 group-hover/card:opacity-100 group-hover/card:pointer-events-auto">
+																<div className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-0 flex items-center gap-1 opacity-0 transition-all duration-150 group-hover/card:pointer-events-auto group-hover/card:opacity-100">
 																	<button
 																		type="button"
 																		title={
@@ -271,7 +271,10 @@ export const ThreadList = ({
 																		}
 																		onClick={(e) => {
 																			e.stopPropagation();
-																			handleToggleRead(thread.id, thread.unread);
+																			handleToggleRead(
+																				thread.id,
+																				thread.unread,
+																			);
 																		}}
 																		className="rounded p-0.5 text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/10"
 																	>
@@ -303,7 +306,10 @@ export const ThreadList = ({
 																		}}
 																		className="rounded p-0.5 text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-error-base dark:hover:bg-white/10"
 																	>
-																		<Icon name="trash" className="h-3.5 w-3.5" />
+																		<Icon
+																			name="trash"
+																			className="h-3.5 w-3.5"
+																		/>
 																	</button>
 																</div>
 															</div>
@@ -328,33 +334,33 @@ export const ThreadList = ({
 
 														{/* Attachments Row */}
 														{thread.attachments &&
-														thread.attachments.length > 0 && (
-															<div className="mt-1 flex min-h-[22px] items-center gap-1.5">
-																<div className="flex min-w-0 shrink-0 flex-wrap items-center gap-1.5">
-																	{thread.attachments
-																		.slice(0, 2)
-																		.map((att, idx) => (
-																			<div
-																				key={att.name + idx}
-																				className="flex items-center gap-1 rounded-[6px] border border-stroke-soft-100 bg-bg-white-0 px-2 py-0.5 font-medium text-[10px] text-text-sub-600 shadow-sm dark:border-stroke-soft-100/30 dark:bg-bg-weak-50/20"
-																			>
-																				<Icon
-																					name="file-text"
-																					className="h-3.5 w-3.5 shrink-0 text-text-soft-400"
-																				/>
-																				<span className="max-w-[100px] truncate">
-																					{att.name}
-																				</span>
-																			</div>
-																		))}
-																	{thread.attachments.length > 2 && (
-																		<span className="rounded-[6px] border border-stroke-soft-100 bg-bg-white-0 px-2 py-0.5 font-medium text-[10px] text-text-soft-400 shadow-sm dark:border-stroke-soft-100/30 dark:bg-bg-weak-50/20">
-																			+{thread.attachments.length - 2}
-																		</span>
-																	)}
+															thread.attachments.length > 0 && (
+																<div className="mt-1 flex min-h-[22px] items-center gap-1.5">
+																	<div className="flex min-w-0 shrink-0 flex-wrap items-center gap-1.5">
+																		{thread.attachments
+																			.slice(0, 2)
+																			.map((att, idx) => (
+																				<div
+																					key={att.name + idx}
+																					className="flex items-center gap-1 rounded-[6px] border border-stroke-soft-100 bg-bg-white-0 px-2 py-0.5 font-medium text-[10px] text-text-sub-600 shadow-sm dark:border-stroke-soft-100/30 dark:bg-bg-weak-50/20"
+																				>
+																					<Icon
+																						name="file-text"
+																						className="h-3.5 w-3.5 shrink-0 text-text-soft-400"
+																					/>
+																					<span className="max-w-[100px] truncate">
+																						{att.name}
+																					</span>
+																				</div>
+																			))}
+																		{thread.attachments.length > 2 && (
+																			<span className="rounded-[6px] border border-stroke-soft-100 bg-bg-white-0 px-2 py-0.5 font-medium text-[10px] text-text-soft-400 shadow-sm dark:border-stroke-soft-100/30 dark:bg-bg-weak-50/20">
+																				+{thread.attachments.length - 2}
+																			</span>
+																		)}
+																	</div>
 																</div>
-															</div>
-														)}
+															)}
 													</div>
 												</div>
 											</div>

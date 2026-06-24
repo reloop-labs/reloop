@@ -14,6 +14,7 @@ export async function replyAllToMessageController(
 		bcc?: string | string[];
 	},
 	apiKey: string,
+	cookie?: string,
 ) {
 	const log = useLogger();
 
@@ -81,5 +82,6 @@ export async function replyAllToMessageController(
 				: undefined,
 		},
 		apiKey,
+		cookie,
 	);
 }

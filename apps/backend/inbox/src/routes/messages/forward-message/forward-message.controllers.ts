@@ -16,6 +16,7 @@ export async function forwardMessageController(
 		bcc?: string | string[];
 	},
 	apiKey: string,
+	cookie?: string,
 ) {
 	const log = useLogger();
 
@@ -82,5 +83,6 @@ export async function forwardMessageController(
 			bcc: body.bcc,
 		},
 		apiKey,
+		cookie,
 	);
 }

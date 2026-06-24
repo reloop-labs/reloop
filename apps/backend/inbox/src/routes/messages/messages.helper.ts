@@ -1,5 +1,5 @@
 import { db } from "@reloop/db/client";
-import { mailbox } from "@reloop/db/schema";
+import { apikey, mailbox } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
@@ -21,8 +21,22 @@ export interface SendFromInboxParams {
 export async function proxySendToMailService(
 	params: SendFromInboxParams,
 	apiKey: string,
+	cookie?: string,
 ) {
 	const log = useLogger();
+
+	let resolvedApiKey = apiKey;
+	if (!resolvedApiKey) {
+		const keyRecord = await db.query.apikey.findFirst({
+			where: and(
+				eq(apikey.organizationId, params.organizationId),
+				eq(apikey.enabled, true),
+			),
+		});
+		if (keyRecord) {
+			resolvedApiKey = keyRecord.key;
+		}
+	}
 
 	// Resolve the mailbox to get the from address
 	const mbx = await db.query.mailbox.findFirst({
@@ -66,12 +80,21 @@ export async function proxySendToMailService(
 	const mailServiceUrl = `${inboxConfig.BASE_URL}/api/mail/v1/send`;
 	log.info(`[INBOX] Proxying send to mail service: ${mailServiceUrl}`);
 
+	const headers: Record<string, string> = {
+		"Content-Type": "application/json",
+	};
+
+	if (resolvedApiKey) {
+		headers["x-api-key"] = resolvedApiKey;
+	}
+
+	if (cookie) {
+		headers["cookie"] = cookie;
+	}
+
 	const response = await fetch(mailServiceUrl, {
 		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-			"x-api-key": apiKey,
-		},
+		headers,
 		body: JSON.stringify(sendBody),
 	});
 
