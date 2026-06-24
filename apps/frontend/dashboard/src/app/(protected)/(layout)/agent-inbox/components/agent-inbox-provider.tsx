@@ -81,6 +81,11 @@ interface AgentInboxContextValue {
 	deleteMessage: (id: string) => Promise<void>;
 	markMessageSpam: (id: string, isSpam: boolean) => Promise<void>;
 	sendReply: (id: string, text: string, html?: string) => Promise<void>;
+	sendForward: (
+		id: string,
+		to: string | string[],
+		options?: { text?: string; html?: string; cc?: string | string[]; bcc?: string | string[] },
+	) => Promise<void>;
 }
 
 const AgentInboxContext = createContext<AgentInboxContextValue | null>(null);
@@ -299,6 +304,28 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		[mutateMessages],
 	);
 
+	const sendForward = useCallback(
+		async (
+			id: string,
+			to: string | string[],
+			options?: { text?: string; html?: string; cc?: string | string[]; bcc?: string | string[] },
+		) => {
+			const res = await fetch(`/api/inbox/v1/messages/${id}/forward`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ to, ...options }),
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to forward message");
+			}
+
+			await mutateMessages();
+		},
+		[mutateMessages],
+	);
+
 	const refresh = useCallback(async () => {
 		await Promise.all([mutateMailboxes(), mutateMessages()]);
 	}, [mutateMailboxes, mutateMessages]);
@@ -316,6 +343,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			deleteMessage,
 			markMessageSpam,
 			sendReply,
+			sendForward,
 		}),
 		[
 			mailboxes,
@@ -329,6 +357,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			deleteMessage,
 			markMessageSpam,
 			sendReply,
+			sendForward,
 		],
 	);
 

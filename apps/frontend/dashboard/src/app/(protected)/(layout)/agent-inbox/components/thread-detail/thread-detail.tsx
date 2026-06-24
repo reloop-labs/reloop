@@ -9,6 +9,7 @@ import useSWR from "swr";
 import type { AgentMailbox, InboundThread } from "../../mock-data";
 import { useAgentInbox } from "../agent-inbox-provider";
 import { RawHeadersModal } from "./raw-headers-modal";
+import { ForwardComposer } from "./forward-composer";
 import { ReplyComposer } from "./reply-composer";
 import { ThreadMessageItem } from "./thread-message-item";
 
@@ -83,7 +84,7 @@ export const ThreadDetail = ({
 	mailbox,
 	onBack,
 }: ThreadDetailProps) => {
-	const { deleteMessage, markMessageRead, markMessageSpam, sendReply, refresh } =
+	const { deleteMessage, markMessageRead, markMessageSpam, sendReply, sendForward, refresh } =
 		useAgentInbox();
 
 	// ── UI state ──────────────────────────────────────────────────────────────
@@ -91,6 +92,11 @@ export const ThreadDetail = ({
 	const [rawHeadersExpanded, setRawHeadersExpanded] = useState(false);
 	const [showReplyComposer, setShowReplyComposer] = useState(false);
 	const [replyBody, setReplyBody] = useState("");
+	const [showForwardComposer, setShowForwardComposer] = useState(false);
+	const [forwardTo, setForwardTo] = useState("");
+	const [forwardCc, setForwardCc] = useState("");
+	const [forwardBody, setForwardBody] = useState("");
+	const [isForwarding, setIsForwarding] = useState(false);
 
 	// ── Translation state ─────────────────────────────────────────────────────
 	const [isTranslated, setIsTranslated] = useState(false);
@@ -121,6 +127,10 @@ export const ThreadDetail = ({
 		setShowReplyComposer(false);
 		setReplyBody("");
 		setOptimisticReplies([]);
+		setShowForwardComposer(false);
+		setForwardTo("");
+		setForwardCc("");
+		setForwardBody("");
 	}, [thread?.id]);
 
 	// ── Build display messages list ───────────────────────────────────────────
@@ -258,8 +268,41 @@ export const ThreadDetail = ({
 		});
 	};
 
-	const handleForward = () => {
-		toast.info("Forward message — Composer prototype only");
+	const handleForward = (msgId?: string) => {
+		setShowReplyComposer(false);
+		setShowForwardComposer(true);
+	};
+
+	const handleSendForward = async () => {
+		if (!thread || !forwardTo.trim()) return;
+
+		// Always use thread.id (the original inbound email ID) — thread message
+		// IDs (tmsg_*) are not valid for the forward endpoint which queries
+		// the inboundEmail table directly.
+		setIsForwarding(true);
+		const toList = forwardTo.split(",").map((s) => s.trim()).filter(Boolean);
+		const ccList = forwardCc.split(",").map((s) => s.trim()).filter(Boolean);
+
+		const fwdPromise = sendForward(thread.id, toList, {
+			text: forwardBody.trim() || undefined,
+			cc: ccList.length ? ccList : undefined,
+		});
+
+		toast.promise(fwdPromise, {
+			loading: "Forwarding message…",
+			success: () => {
+				setShowForwardComposer(false);
+				setForwardTo("");
+				setForwardCc("");
+				setForwardBody("");
+				setIsForwarding(false);
+				return `Forwarded to ${toList.join(", ")} successfully`;
+			},
+			error: (err) => {
+				setIsForwarding(false);
+				return err instanceof Error ? err.message : "Failed to forward message";
+			},
+		});
 	};
 
 	// ── Translation handlers ──────────────────────────────────────────────────
@@ -496,7 +539,7 @@ export const ThreadDetail = ({
 				</div>
 			</div>
 
-			{/* Reply composer / action buttons — pinned outside scroll area */}
+			{/* Reply / forward composer / action buttons — pinned outside scroll area */}
 			{showReplyComposer ? (
 				<ReplyComposer
 					replyBody={replyBody}
@@ -510,11 +553,40 @@ export const ThreadDetail = ({
 						setShowReplyComposer(false);
 					}}
 				/>
+			) : showForwardComposer ? (
+				<ForwardComposer
+					originalFrom={
+						thread.from.name
+							? `${thread.from.name} <${thread.from.email}>`
+							: thread.from.email
+					}
+					originalDate={dayjs(thread.receivedAt).format("ddd, MMM D, YYYY [at] h:mm A")}
+					originalSubject={thread.subject}
+					originalBodyText={thread.bodyText?.substring(0, 300)}
+					fromEmail={mailbox?.email || "agent@local.reloop.sh"}
+					toValue={forwardTo}
+					ccValue={forwardCc}
+					bodyValue={forwardBody}
+					onToChange={setForwardTo}
+					onCcChange={setForwardCc}
+					onBodyChange={setForwardBody}
+					onSend={handleSendForward}
+					onClose={() => {
+						setForwardTo("");
+						setForwardCc("");
+						setForwardBody("");
+						setShowForwardComposer(false);
+					}}
+					isSending={isForwarding}
+				/>
 			) : (
 				<div className="mx-5 my-4 flex items-center gap-3">
 					<button
 						type="button"
-						onClick={() => setShowReplyComposer(true)}
+						onClick={() => {
+							setShowForwardComposer(false);
+							setShowReplyComposer(true);
+						}}
 						className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2 font-semibold text-label-sm text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
 					>
 						<svg
