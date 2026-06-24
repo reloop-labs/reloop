@@ -434,7 +434,7 @@ export const ThreadMessageItem = ({
 			{/* Message Body */}
 			<div className="relative px-6 pt-0 pb-4">
 				{bodyHtml ? (
-					<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/30">
+					<div className="overflow-hidden rounded-xl">
 						<iframe
 							ref={iframeRef}
 							onLoad={handleIframeLoad}
