@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { AgentInboxProvider } from "../../inbox/components/agent-inbox-provider";
+import { AgentInboxProvider } from "./components/agent-inbox-provider";
 
 export default function AgentInboxSectionLayout({
 	children,

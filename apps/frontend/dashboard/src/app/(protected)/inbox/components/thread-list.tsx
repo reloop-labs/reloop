@@ -24,31 +24,26 @@ const getActorInfo = (
 	switch (thread.status) {
 		case "needs_approval":
 			return {
-				gutterColor: "bg-amber-500",
+				gutterColor: "bg-amber-500 dark:bg-amber-600",
 				tag: "needs you",
 				tagStyle:
-					"bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800/40",
+					"bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800/40",
 			};
 		case "handled":
 			return {
-				gutterColor: "bg-blue-500",
-				tag: "via agent",
+				gutterColor: "bg-emerald-500 dark:bg-emerald-600",
+				tag: "sent by you",
 				tagStyle:
-					"bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/40",
+					"bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800/40",
 			};
 		case "parsing":
 		case "new":
-			return {
-				gutterColor: "bg-blue-400",
-				tag: "via agent",
-				tagStyle:
-					"bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-800/40",
-			};
 		default:
 			return {
-				gutterColor: "bg-neutral-300 dark:bg-neutral-600",
-				tag: null,
-				tagStyle: "",
+				gutterColor: "bg-blue-500 dark:bg-blue-600",
+				tag: "via agent",
+				tagStyle:
+					"bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-800/40",
 			};
 	}
 };
@@ -78,13 +73,6 @@ export const ThreadList = ({
 		Yesterday: false,
 		Older: false,
 	});
-
-	const _toggleGroup = (key: string) => {
-		setCollapsedGroups((prev) => ({
-			...prev,
-			[key]: !prev[key],
-		}));
-	};
 
 	const handleToggleRead = async (id: string, currentlyUnread: boolean) => {
 		try {
@@ -159,10 +147,10 @@ export const ThreadList = ({
 							className="h-5 w-5 text-text-sub-600"
 						/>
 					</div>
-					<h3 className="mb-2 font-semibold text-lg text-text-strong-950">
+					<h3 className="mb-2 font-semibold text-base text-text-strong-950 dark:text-white">
 						{hasFilters ? "No results found" : "No messages yet"}
 					</h3>
-					<p className="mx-auto mb-5 max-w-sm text-balance font-medium text-[12px] text-text-sub-600">
+					<p className="mx-auto mb-5 max-w-sm text-balance text-xs text-text-sub-600 dark:text-neutral-400">
 						{emptyMessage}
 					</p>
 					{hasFilters && onClearFilters && (
@@ -187,7 +175,7 @@ export const ThreadList = ({
 				{groups.map((group) => {
 					const isCollapsed = collapsedGroups[group.key];
 					return (
-						<div key={group.key} className="flex flex-col gap-1.5 pt-3 pb-1">
+						<div key={group.key} className="flex flex-col gap-1.5 pt-3 pb-1 px-4">
 							{/* Group Header */}
 							<div className="flex select-none items-center justify-between px-1 text-text-soft-400">
 								<span className="font-semibold text-[10px] uppercase tracking-wider">
@@ -217,13 +205,13 @@ export const ThreadList = ({
 												{/* Actor gutter — always visible, color reflects last actor */}
 												<div
 													className={cn(
-														"absolute top-0 bottom-0 left-0 w-[3px]",
+														"absolute top-0 bottom-0 left-0 w-[4px]",
 														actorInfo.gutterColor,
 													)}
 												/>
 												<div className="flex items-start gap-3">
 													{/* Gradient Avatar & Checkbox State */}
-													<div className="relative flex h-9 w-9 shrink-0 items-center justify-center">
+													<div className="relative flex h-8 w-8 shrink-0 items-center justify-center">
 														{/* Avatar (visible normally, hidden on hover/selection) */}
 														<div
 															className={cn(
@@ -237,7 +225,7 @@ export const ThreadList = ({
 																<Avatar.Image asChild>
 																	<div
 																		className={cn(
-																			"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
+																			"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-[11px] uppercase tracking-wide shadow-sm",
 																			getAvatarGradient(thread.from.email),
 																		)}
 																	>
@@ -264,14 +252,14 @@ export const ThreadList = ({
 													</div>
 
 													{/* Details Column */}
-													<div className="flex min-w-0 flex-1 flex-col gap-1">
+													<div className="flex min-w-0 flex-1 flex-col gap-0.5">
 														{/* Sender & Time row */}
 														<div className="flex items-center justify-between gap-2">
 															<span
 																className={cn(
-																	"truncate text-sm tracking-tight",
+																	"truncate text-xs tracking-tight",
 																	isUnread
-																		? "font-semibold text-text-strong-950"
+																		? "font-semibold text-text-strong-950 dark:text-white"
 																		: "font-medium text-text-sub-600 dark:text-neutral-400",
 																)}
 															>
@@ -281,9 +269,9 @@ export const ThreadList = ({
 																{/* Time & Unread dot */}
 																<div className="flex items-center gap-2 transition-opacity duration-150 group-hover/card:pointer-events-none group-hover/card:opacity-0">
 																	{isUnread && (
-																		<span className="h-2 w-2 rounded-full bg-primary-base" />
+																		<span className="h-1.5 w-1.5 rounded-full bg-primary-base animate-pulse" />
 																	)}
-																	<span className="font-medium text-[11px] text-text-soft-400 tabular-nums">
+																	<span className="font-medium text-[10px] text-text-soft-400 tabular-nums">
 																		{dayjs(thread.receivedAt).format("HH:mm")}
 																	</span>
 																</div>
@@ -346,26 +334,26 @@ export const ThreadList = ({
 														{/* Subject */}
 														<div
 															className={cn(
-																"truncate text-sm",
+																"truncate text-xs",
 																isUnread
-																	? "font-semibold text-text-strong-950"
-																	: "font-medium text-text-sub-600 dark:text-neutral-350",
+																	? "font-semibold text-text-strong-950 dark:text-white"
+																	: "font-medium text-text-sub-600 dark:text-neutral-300",
 															)}
 														>
 															{thread.subject}
 														</div>
 
 														{/* Snippet */}
-														<div className="truncate text-text-soft-400 text-xs leading-relaxed">
+														<div className="truncate text-text-soft-400 text-[11px] leading-relaxed dark:text-neutral-400">
 															{thread.preview}
 														</div>
 
 														{/* Actor tag pill */}
 														{actorInfo.tag && (
-															<div className="mt-0.5 flex items-center gap-1.5">
+															<div className="mt-1 flex items-center gap-1.5">
 																<span
 																	className={cn(
-																		"inline-flex items-center rounded-md px-1.5 py-0.5 font-medium font-mono text-[10px] leading-none tracking-wide",
+																		"inline-flex items-center rounded px-1.5 py-0.5 font-medium font-mono text-[9px] leading-none tracking-wide",
 																		actorInfo.tagStyle,
 																	)}
 																>
@@ -377,26 +365,26 @@ export const ThreadList = ({
 														{/* Attachments Row */}
 														{thread.attachments &&
 															thread.attachments.length > 0 && (
-																<div className="mt-1 flex min-h-[22px] items-center gap-1.5">
+																<div className="mt-1 flex min-h-[20px] items-center gap-1.5">
 																	<div className="flex min-w-0 shrink-0 flex-wrap items-center gap-1.5">
 																		{thread.attachments
 																			.slice(0, 2)
 																			.map((att, idx) => (
 																				<div
 																					key={att.name + idx}
-																					className="flex items-center gap-1 rounded-[6px] border border-stroke-soft-100 bg-bg-white-0 px-2 py-0.5 font-medium text-[10px] text-text-sub-600 shadow-sm dark:border-stroke-soft-100/30 dark:bg-bg-weak-50/20"
+																					className="flex items-center gap-1 rounded border border-stroke-soft-100 bg-bg-white-0 px-1.5 py-0.5 font-medium text-[9px] text-text-sub-600 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-800 dark:text-neutral-300"
 																				>
 																					<Icon
 																						name="file-text"
-																						className="h-3.5 w-3.5 shrink-0 text-text-soft-400"
+																						className="h-3 w-3 shrink-0 text-text-soft-400"
 																					/>
-																					<span className="max-w-[100px] truncate">
+																					<span className="max-w-[80px] truncate">
 																						{att.name}
 																					</span>
 																				</div>
 																			))}
 																		{thread.attachments.length > 2 && (
-																			<span className="rounded-[6px] border border-stroke-soft-100 bg-bg-white-0 px-2 py-0.5 font-medium text-[10px] text-text-soft-400 shadow-sm dark:border-stroke-soft-100/30 dark:bg-bg-weak-50/20">
+																			<span className="rounded border border-stroke-soft-100 bg-bg-white-0 px-1.5 py-0.5 font-medium text-[9px] text-text-soft-400 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-800 dark:text-neutral-400">
 																				+{thread.attachments.length - 2}
 																			</span>
 																		)}

@@ -99,7 +99,7 @@ const AgentMailboxActionsDropdown = ({
 			onDelete(mailbox.id);
 			setPopoverOpen(false);
 		} else if (itemId === "view") {
-			router.push(`/agent-inbox/${mailbox.id}`);
+			router.push(`/inbox/${mailbox.id}`);
 			setPopoverOpen(false);
 		} else if (itemId === "copy") {
 			navigator.clipboard.writeText(mailbox.email);
@@ -314,7 +314,7 @@ export const AgentMailboxList = () => {
 							return (
 								<div
 									key={mailbox.id}
-									onClick={() => router.push(`/agent-inbox/${mailbox.id}`)}
+									onClick={() => router.push(`/inbox/${mailbox.id}`)}
 									className={cn(
 										gridClass,
 										"group/row cursor-pointer py-2 text-left transition-all duration-200",

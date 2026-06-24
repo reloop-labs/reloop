@@ -57,19 +57,19 @@ interface ThreadDetailProps {
 // ---------------------------------------------------------------------------
 
 const EmptyState = () => (
-	<div className="flex min-h-[500px] flex-col items-center justify-center gap-1 p-8 text-center">
-		<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
-			<Icon name="inbox" className="h-5 w-5 text-text-sub-600" />
+	<div className="flex min-h-[400px] flex-col items-center justify-center gap-1.5 p-8 text-center bg-bg-weak-50/10 dark:bg-transparent">
+		<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm dark:border-neutral-850 dark:bg-neutral-900">
+			<Icon name="inbox" className="h-5 w-5 text-text-sub-600 dark:text-neutral-450" />
 		</div>
-		<h3 className="font-semibold text-base text-text-strong-950">
+		<h3 className="font-semibold text-base text-text-strong-950 dark:text-white">
 			Select a message to inspect
 		</h3>
-		<p className="mx-auto max-w-sm text-balance font-medium text-[12px] text-text-sub-600">
+		<p className="mx-auto max-w-sm text-xs text-text-sub-600 dark:text-neutral-400">
 			Click any message on the left to review parsing, timeline, and approval
 			actions.
 		</p>
-		<div className="mt-4 flex items-center gap-1.5 text-text-soft-400 text-xs">
-			<Icon name="arrow-left" className="h-3.5 w-3.5" />
+		<div className="mt-4 flex items-center gap-1.5 text-text-soft-400 text-xs dark:text-neutral-500">
+			<Icon name="arrow-left" className="h-3.5 w-3.5 animate-pulse" />
 			<span className="font-medium">Pick a message to get started</span>
 		</div>
 	</div>
@@ -277,9 +277,6 @@ export const ThreadDetail = ({
 	const handleSendForward = async () => {
 		if (!thread || !forwardTo.trim()) return;
 
-		// Always use thread.id (the original inbound email ID) — thread message
-		// IDs (tmsg_*) are not valid for the forward endpoint which queries
-		// the inboundEmail table directly.
 		setIsForwarding(true);
 		const toList = forwardTo.split(",").map((s) => s.trim()).filter(Boolean);
 		const ccList = forwardCc.split(",").map((s) => s.trim()).filter(Boolean);
@@ -468,29 +465,21 @@ export const ThreadDetail = ({
 			{/* Scrollable message area */}
 			<div className="min-h-0 flex-1 overflow-y-auto">
 				{/* Subject header */}
-				<div className="border-stroke-soft-100 border-b px-6 py-5 dark:border-stroke-soft-100/40">
-					<h1 className="flex items-center gap-2 font-medium text-text-strong-950 text-xl dark:text-white">
+				<div className="border-b border-stroke-soft-100/60 px-6 py-5 dark:border-stroke-soft-100/20">
+					<h1 className="font-semibold text-text-strong-950 text-lg dark:text-white">
 						{thread.subject}
 					</h1>
 				</div>
 
-				{/* Provenance strip — shown when agent has drafted a reply awaiting approval */}
+				{/* High-fidelity Provenance strip */}
 				{thread.status === "needs_approval" && (
-					<div className="mx-6 mt-4 flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2.5 font-medium text-xs text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-blue-400">
-						<svg
-							className="h-3.5 w-3.5 shrink-0"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-						>
-							<rect x="3" y="11" width="18" height="10" rx="2" />
-							<circle cx="12" cy="5" r="2" />
-							<path d="M12 7v4" />
+					<div className="mx-6 mt-4 flex items-center gap-2.5 rounded-xl border border-amber-250 bg-amber-50/70 px-4 py-3 text-xs font-semibold text-amber-800 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
+						<svg className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
+							<path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
 						</svg>
 						<span>
 							Draft prepared by agent
-							<span className="mx-1.5 opacity-50">·</span>
+							<span className="mx-1.5 opacity-50 font-normal">·</span>
 							held for your approval before sending
 						</span>
 					</div>
@@ -603,9 +592,9 @@ export const ThreadDetail = ({
 					isSending={isForwarding}
 				/>
 			) : (
-				<div className="border-stroke-soft-100 border-t bg-bg-white-0 px-5 py-4 dark:border-stroke-soft-100/30 dark:bg-transparent">
+				<div className="border-t border-stroke-soft-100 bg-bg-white-0 px-6 py-4 dark:border-stroke-soft-100/30 dark:bg-neutral-900 flex shrink-0">
 					{thread.status === "needs_approval" ? (
-						<div className="flex items-center gap-2.5">
+						<div className="flex items-center gap-3">
 							{/* Approve & send */}
 							<button
 								type="button"
@@ -615,14 +604,14 @@ export const ThreadDetail = ({
 										"";
 									handleSendReply(suggested || undefined);
 								}}
-								className="flex items-center gap-2 rounded-xl bg-text-strong-950 px-4 py-2.5 font-semibold text-label-sm text-white transition-all hover:opacity-85 dark:bg-white dark:text-neutral-900"
+								className="flex items-center gap-2 rounded-xl bg-text-strong-950 px-4 py-2.5 font-semibold text-xs text-white transition-all hover:opacity-85 dark:bg-white dark:text-neutral-900 shadow-sm"
 							>
 								<svg
 									className="h-3.5 w-3.5"
 									viewBox="0 0 24 24"
 									fill="none"
 									stroke="currentColor"
-									strokeWidth="2"
+									strokeWidth="2.2"
 									strokeLinecap="round"
 									strokeLinejoin="round"
 								>
@@ -642,7 +631,7 @@ export const ThreadDetail = ({
 									setShowForwardComposer(false);
 									setShowReplyComposer(true);
 								}}
-								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-label-sm text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-xs text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
 							>
 								<svg
 									className="h-3.5 w-3.5"
@@ -662,7 +651,7 @@ export const ThreadDetail = ({
 							<button
 								type="button"
 								onClick={() => handleForward()}
-								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-label-sm text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-xs text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
 							>
 								<svg
 									className="h-3.5 w-3.5"
@@ -679,7 +668,7 @@ export const ThreadDetail = ({
 							</button>
 						</div>
 					) : (
-						<div className="flex items-center gap-2.5">
+						<div className="flex items-center gap-3">
 							{/* Reply */}
 							<button
 								type="button"
@@ -687,7 +676,7 @@ export const ThreadDetail = ({
 									setShowForwardComposer(false);
 									setShowReplyComposer(true);
 								}}
-								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-label-sm text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-xs text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
 							>
 								<svg
 									className="h-3.5 w-3.5"
@@ -707,7 +696,7 @@ export const ThreadDetail = ({
 							<button
 								type="button"
 								onClick={() => handleForward()}
-								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-label-sm text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-xs text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
 							>
 								<svg
 									className="h-3.5 w-3.5"

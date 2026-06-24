@@ -249,7 +249,7 @@ export const ReceivedEmailTable = ({
 	const endIndex = Math.min(currentPage * pageSize, totalLogs);
 
 	const handleRowClick = (log: ReceivedEmailData) => {
-		const targetUrl = `/agent-inbox/${log.mailboxId}${
+		const targetUrl = `/inbox/${log.mailboxId}${
 			log.threadId || log.id ? `?thread=${log.threadId || log.id}` : ""
 		}`;
 		router.push(targetUrl);
@@ -381,7 +381,7 @@ export const ReceivedEmailTable = ({
 									<ReceivedActionsDropdown
 										log={log}
 										onViewDetails={(mailboxId, threadId, id) => {
-											const targetUrl = `/agent-inbox/${mailboxId}${
+											const targetUrl = `/inbox/${mailboxId}${
 												threadId || id ? `?thread=${threadId || id}` : ""
 											}`;
 											router.push(targetUrl);

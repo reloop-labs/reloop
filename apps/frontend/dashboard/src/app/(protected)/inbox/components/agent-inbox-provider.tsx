@@ -158,9 +158,11 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 					? ("blocked" as const)
 					: msg.status === "processing"
 						? ("parsing" as const)
-						: msg.isRead
-							? ("handled" as const)
-							: ("new" as const),
+						: msg.status === "needs_approval"
+							? ("needs_approval" as const)
+							: msg.isRead
+								? ("handled" as const)
+								: ("new" as const),
 				securityLevel: 5 as const,
 				unread: !msg.isRead,
 				cc: msg.ccEmails || undefined,

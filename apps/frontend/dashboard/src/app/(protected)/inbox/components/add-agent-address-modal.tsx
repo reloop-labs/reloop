@@ -129,7 +129,7 @@ export const AddAgentAddressModal = ({
 			form.reset();
 			onClose();
 			onCreated?.(mailbox);
-			router.push(`/agent-inbox/${mailbox.id}`);
+			router.push(`/inbox/${mailbox.id}`);
 		} catch (error) {
 			const errMsg =
 				error instanceof Error

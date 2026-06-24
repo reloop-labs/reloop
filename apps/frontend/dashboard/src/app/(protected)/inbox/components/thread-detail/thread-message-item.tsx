@@ -2,6 +2,11 @@
 
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
+import * as Avatar from "@reloop/ui/avatar";
+import {
+	getAvatarGradient,
+	getAvatarInitial,
+} from "@fe/dashboard/utils/avatar";
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -108,7 +113,6 @@ export const ThreadMessageItem = ({
 	};
 
 	// Listen for height updates posted by the ResizeObserver inside the iframe
-	// (covers images / fonts loading after the initial onLoad)
 	useEffect(() => {
 		const handler = (e: MessageEvent) => {
 			if (
@@ -130,21 +134,23 @@ export const ThreadMessageItem = ({
 			<div className="flex items-start justify-between gap-4 px-6 pt-5 pb-4">
 				{/* Left: Avatar + Info */}
 				<div className="flex min-w-0 items-start gap-3">
-					<div
-						className={cn(
-							"flex h-10 w-10 shrink-0 items-center justify-center rounded-full border font-semibold text-sm transition-all duration-300",
-							isOutbound
-								? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-								: "border-primary-base/20 bg-primary-base/10 text-primary-base",
-						)}
-					>
-						{isOutbound
-							? "Me"
-							: msg.fromName
-								? msg.fromName.charAt(0).toUpperCase()
-								: msg.fromEmail
-									? msg.fromEmail.charAt(0).toUpperCase()
-									: "?"}
+					<div className="relative flex h-8 w-8 shrink-0 items-center justify-center">
+						<Avatar.Root size="32" color="gray">
+							<Avatar.Image asChild>
+								<div
+									className={cn(
+										"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-[11px] uppercase tracking-wide shadow-sm",
+										isOutbound 
+											? "bg-emerald-600" 
+											: getAvatarGradient(msg.fromEmail || "default")
+									)}
+								>
+									{isOutbound
+										? "ME"
+										: getAvatarInitial(msg.fromName ?? null, msg.fromEmail || "U")}
+								</div>
+							</Avatar.Image>
+						</Avatar.Root>
 					</div>
 
 					<div className="flex min-w-0 flex-col">
@@ -161,7 +167,7 @@ export const ThreadMessageItem = ({
 								</span>
 							)}
 							{isOutbound && (
-								<span className="rounded-md bg-emerald-500/10 px-1.5 py-0.5 font-medium text-[10px] text-emerald-600 dark:text-emerald-400">
+								<span className="rounded bg-emerald-500/10 px-1.5 py-0.5 font-medium text-[9px] text-emerald-600 dark:text-emerald-400">
 									Sent
 								</span>
 							)}
@@ -557,7 +563,7 @@ export const ThreadMessageItem = ({
 								Translation
 							</div>
 						)}
-						<p className="whitespace-pre-wrap text-label-sm text-text-strong-950 leading-relaxed dark:text-neutral-300">
+						<p className="whitespace-pre-wrap text-label-sm text-text-strong-950 leading-relaxed dark:text-neutral-350">
 							{bodyText}
 						</p>
 					</div>
@@ -630,7 +636,7 @@ export const ThreadMessageItem = ({
 									<span className="font-medium text-text-soft-400 capitalize">
 										{k.replace(/([A-Z])/g, " $1").trim()}
 									</span>
-									<span className="break-words text-text-strong-950 dark:text-neutral-300">
+									<span className="break-words text-text-strong-950 dark:text-neutral-350">
 										{typeof v === "object" ? JSON.stringify(v) : String(v)}
 									</span>
 								</div>
