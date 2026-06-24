@@ -309,11 +309,11 @@ export function EmailsCard() {
 									className="group/row flex items-center justify-between border-stroke-soft-100 border-b py-2.5 transition-colors last:border-b-0 hover:bg-bg-weak-50/50 dark:border-white/5 dark:hover:bg-white/[0.01]"
 								>
 									<div className="flex min-w-0 flex-1 items-center gap-3">
-										<Avatar.Root size="20" color="gray" className="shrink-0">
+										<Avatar.Root size="16" color="gray" className="shrink-0">
 											<Avatar.Image asChild>
 												<div
 													className={cn(
-														"flex h-full w-full items-center justify-center rounded-full font-semibold text-[9px] text-white uppercase tracking-wide shadow-sm",
+														"flex h-full w-full items-center justify-center rounded-full font-semibold text-[8px] text-white uppercase tracking-wide shadow-sm",
 														getAvatarGradient(d.fromEmail),
 													)}
 												>

@@ -1,5 +1,10 @@
 "use client";
 
+import {
+	getAvatarGradient,
+	getAvatarInitial,
+} from "@fe/dashboard/utils/avatar";
+import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -11,35 +16,6 @@ import type { InboundThread } from "../mock-data";
 import { useAgentInbox } from "./agent-inbox-provider";
 
 dayjs.extend(relativeTime);
-
-function senderInitials(thread: InboundThread): string {
-	if (thread.from.name) {
-		const parts = thread.from.name.split(" ");
-		return (
-			(parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? parts[0]?.[1] ?? "")
-		).toUpperCase();
-	}
-	return thread.from.email[0]?.toUpperCase() ?? "?";
-}
-
-function getSenderGradient(name: string): string {
-	const gradients = [
-		"from-[#ff416c] to-[#ff4b2b]", // Unity Collective: vibrant red-orange
-		"from-[#f37335] to-[#fdbb2d]", // Synergy Squad: orange-yellow
-		"from-[#e100ff] to-[#7f00ff]", // Collaborative Crew: pink-purple
-		"from-[#11998e] to-[#38ef7d]", // Innovative Minds: teal-green
-		"from-[#fc466b] to-[#3f5efb]", // Empowerment Team: purple-pink
-		"from-[#00c6ff] to-[#0072ff]", // Inspiration Hub: blue-cyan
-		"from-[#3a7bd5] to-[#3a6073]", // Dynamic Teamwork: deep blue
-		"from-[#ff9966] to-[#ff5e62]", // Creative Collaborators: peach-rose
-	];
-	let hash = 0;
-	for (let i = 0; i < name.length; i++) {
-		hash = name.charCodeAt(i) + ((hash << 5) - hash);
-	}
-	const index = Math.abs(hash) % gradients.length;
-	return gradients[index] || "from-[#ff416c] to-[#ff4b2b]";
-}
 
 interface ThreadListProps {
 	threads: InboundThread[];
@@ -206,20 +182,31 @@ export const ThreadList = ({
 												)}
 												<div className="flex items-start gap-3">
 													{/* Gradient Avatar & Checkbox State */}
-													<div className="relative h-9 w-9 shrink-0">
+													<div className="relative flex h-9 w-9 shrink-0 items-center justify-center">
 														{/* Avatar (visible normally, hidden on hover/selection) */}
 														<div
 															className={cn(
-																"absolute inset-0 flex items-center justify-center rounded-full bg-gradient-to-tr font-semibold text-white text-xs shadow-sm transition-all duration-150",
+																"absolute inset-0 flex items-center justify-center transition-all duration-150",
 																isSelected
 																	? "pointer-events-none scale-0 opacity-0"
 																	: "scale-100 opacity-100 group-hover/card:pointer-events-none group-hover/card:scale-0 group-hover/card:opacity-0",
-																getSenderGradient(
-																	thread.from.name ?? thread.from.email,
-																),
 															)}
 														>
-															{senderInitials(thread)}
+															<Avatar.Root size="32" color="gray">
+																<Avatar.Image asChild>
+																	<div
+																		className={cn(
+																			"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
+																			getAvatarGradient(thread.from.email),
+																		)}
+																	>
+																		{getAvatarInitial(
+																			thread.from.name ?? null,
+																			thread.from.email,
+																		)}
+																	</div>
+																</Avatar.Image>
+															</Avatar.Root>
 														</div>
 
 														{/* Checkbox (visible on hover/selection) */}
