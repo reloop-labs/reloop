@@ -42,6 +42,7 @@ const AgentMailboxActionsDropdown = ({
 	isDeleting: boolean;
 	onOpenChange?: (open: boolean) => void;
 }) => {
+	const router = useRouter();
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -54,6 +55,18 @@ const AgentMailboxActionsDropdown = ({
 	const toggleIcon =
 		mailbox.status === "active" ? ("pause" as const) : ("play" as const);
 	const menuItems = [
+		{
+			id: "view",
+			label: "View Inbox",
+			icon: "inbox" as const,
+			isDanger: false,
+		},
+		{
+			id: "copy",
+			label: "Copy Email",
+			icon: "copy" as const,
+			isDanger: false,
+		},
 		{
 			id: "toggle",
 			label: mailbox.status === "active" ? "Disable" : "Enable",
@@ -79,6 +92,13 @@ const AgentMailboxActionsDropdown = ({
 			setPopoverOpen(false);
 		} else if (itemId === "delete") {
 			onDelete(mailbox.id);
+			setPopoverOpen(false);
+		} else if (itemId === "view") {
+			router.push(`/agent-inbox/${mailbox.id}`);
+			setPopoverOpen(false);
+		} else if (itemId === "copy") {
+			navigator.clipboard.writeText(mailbox.email);
+			toast.success("Email copied to clipboard");
 			setPopoverOpen(false);
 		}
 	};
