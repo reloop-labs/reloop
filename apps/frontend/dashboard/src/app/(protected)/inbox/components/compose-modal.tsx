@@ -36,7 +36,7 @@ export const ComposeModal = ({
 	// Pre-populated attachment matching mockup
 	const [attachments, setAttachments] = useState<
 		Array<{ name: string; size: string }>
-	>([{ name: "agent-inbox-compose.html", size: "1.2 KB" }]);
+	>([]);
 
 	// Reset form when modal opens/closes
 	useEffect(() => {
@@ -48,7 +48,7 @@ export const ComposeModal = ({
 			setBcc("");
 			setShowCc(false);
 			setShowBcc(false);
-			setAttachments([{ name: "agent-inbox-compose.html", size: "1.2 KB" }]);
+			setAttachments([]);
 		}
 	}, [isOpen]);
 
@@ -121,12 +121,7 @@ export const ComposeModal = ({
 					if (isSending) e.preventDefault();
 				}}
 			>
-				<motion.div
-					initial={{ opacity: 0, scale: 0.96, y: 12 }}
-					animate={{ opacity: 1, scale: 1, y: 0 }}
-					transition={{ type: "spring", duration: 0.35, bounce: 0.1 }}
-					className="flex flex-col"
-				>
+				<div className="flex flex-col">
 					{/* Top bar Header */}
 					<div className="flex items-center justify-between border-stroke-soft-100/60 border-b px-5 py-4 dark:border-neutral-800">
 						<h2 className="font-semibold text-sm text-text-strong-950 dark:text-white">
@@ -164,7 +159,7 @@ export const ComposeModal = ({
 								/>
 							</svg>
 							<span>
-								Sending as <strong className="font-semibold">you</strong> ·
+								Sending as <strong className="font-semibold">human</strong> ·
 								won't pass through the agent
 							</span>
 						</div>
@@ -172,6 +167,17 @@ export const ComposeModal = ({
 
 					{/* Field Inputs */}
 					<div className="flex flex-col text-sm">
+						{/* From Row */}
+						<div className="flex items-center border-stroke-soft-100/50 border-b px-5 py-2.5 dark:border-neutral-800/60">
+							<span className="w-16 select-none text-text-soft-400">From</span>
+							<input
+								type="text"
+								value={mailbox.email}
+								readOnly
+								className="flex-1 cursor-default select-none bg-transparent text-text-strong-950 outline-none dark:text-white"
+							/>
+						</div>
+
 						{/* To Row */}
 						<div className="flex items-center border-stroke-soft-100/50 border-b px-5 py-2.5 dark:border-neutral-800/60">
 							<span className="w-16 select-none text-text-soft-400">To</span>
@@ -420,7 +426,7 @@ export const ComposeModal = ({
 							<span>Discard</span>
 						</motion.button>
 					</div>
-				</motion.div>
+				</div>
 			</Modal.Content>
 		</Modal.Root>
 	);
