@@ -231,23 +231,7 @@ export const ThreadList = ({
 																	: "scale-0 opacity-0 group-hover/card:scale-100 group-hover/card:opacity-100",
 															)}
 														>
-															<div
-																className={cn(
-																	"flex h-5 w-5 items-center justify-center rounded border transition-all duration-150",
-																	isSelected
-																		? "border-primary-base bg-primary-base text-white"
-																		: "border-stroke-soft-200 bg-bg-white-0 text-transparent hover:border-text-soft-400 dark:border-stroke-soft-100/30 dark:bg-neutral-900",
-																)}
-															>
-																{isSelected && (
-																	<svg
-																		className="h-3.5 w-3.5 fill-current"
-																		viewBox="0 0 24 24"
-																	>
-																		<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-																	</svg>
-																)}
-															</div>
+															<div className="flex h-5 w-5 items-center justify-center rounded border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 transition-all duration-150 text-transparent hover:border-neutral-400" />
 														</div>
 													</div>
 

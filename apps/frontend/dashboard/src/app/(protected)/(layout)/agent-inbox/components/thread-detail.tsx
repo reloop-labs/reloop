@@ -81,7 +81,7 @@ export const ThreadDetail = ({
 				</div>
 
 				{/* Sender Meta Row */}
-				<div className="flex items-start justify-between gap-4 px-6 py-4">
+				<div className="flex items-start justify-between gap-4 px-6 pt-4 pb-2">
 					{/* Left side: Avatar + Sender Info */}
 					<div className="flex min-w-0 items-start gap-3">
 						{/* Avatar Circle */}
@@ -205,11 +205,46 @@ export const ThreadDetail = ({
 					</div>
 				</div>
 
-				<div className="px-5 py-4">
-					<SectionTitle>Message</SectionTitle>
-					<p className="whitespace-pre-wrap text-label-sm text-text-strong-950 leading-relaxed">
-						{thread.bodyText}
-					</p>
+				<div className="px-5 pt-0 pb-4">
+					{thread.bodyHtml ? (
+						<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/30">
+							<iframe
+								srcDoc={`
+									<!DOCTYPE html>
+									<html>
+									<head>
+										<meta charset="utf-8">
+										<style>
+											body {
+												font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+												font-size: 14px;
+												line-height: 1.5;
+												color: #1c1917;
+												margin: 0;
+												padding: 16px;
+												background-color: #ffffff;
+											}
+											img {
+												max-width: 100%;
+												height: auto;
+											}
+										</style>
+									</head>
+									<body>
+										${thread.bodyHtml}
+									</body>
+									</html>
+								`}
+								sandbox="allow-popups allow-popups-to-escape-sandbox"
+								className="w-full min-h-[450px] border-0 bg-white"
+								title="Email HTML body"
+							/>
+						</div>
+					) : (
+						<p className="whitespace-pre-wrap text-label-sm text-text-strong-950 leading-relaxed">
+							{thread.bodyText}
+						</p>
+					)}
 				</div>
 
 				{thread.attachments && thread.attachments.length > 0 && (
