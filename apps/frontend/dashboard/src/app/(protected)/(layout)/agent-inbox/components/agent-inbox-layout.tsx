@@ -156,7 +156,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 				: "No messages in this filter";
 
 	return (
-		<div className="flex h-[calc(100vh-54px)] flex-col overflow-hidden pb-0">
+		<div className="flex h-[calc(100vh-58px)] flex-col overflow-hidden pb-0">
 			{/* Page Top Bar */}
 			<div className="flex shrink-0 items-center justify-between border-stroke-soft-100 border-b px-4 pt-2 pb-2 dark:border-stroke-soft-100/40">
 				<div className="flex items-center gap-3">

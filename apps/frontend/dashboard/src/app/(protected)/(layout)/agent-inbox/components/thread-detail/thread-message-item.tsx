@@ -5,6 +5,7 @@ import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { useEffect, useRef, useState } from "react";
 import type { AgentMailbox } from "../../mock-data";
 
 dayjs.extend(relativeTime);
@@ -87,6 +88,41 @@ export const ThreadMessageItem = ({
 				: att.size || "Unknown size";
 		return { name, size, ...att };
 	});
+
+	// Auto-size iframe to its content
+	const [iframeHeight, setIframeHeight] = useState(350);
+	const iframeRef = useRef<HTMLIFrameElement>(null);
+
+	const handleIframeLoad = () => {
+		const iframe = iframeRef.current;
+		if (!iframe) return;
+		try {
+			const doc = iframe.contentDocument || iframe.contentWindow?.document;
+			if (doc?.body) {
+				const h = doc.documentElement.scrollHeight || doc.body.scrollHeight;
+				setIframeHeight(Math.max(h, 120));
+			}
+		} catch {
+			// sandboxed — rely on postMessage from the inline script instead
+		}
+	};
+
+	// Listen for height updates posted by the ResizeObserver inside the iframe
+	// (covers images / fonts loading after the initial onLoad)
+	useEffect(() => {
+		const handler = (e: MessageEvent) => {
+			if (
+				e.data?.type === "iframe-height" &&
+				typeof e.data.height === "number" &&
+				iframeRef.current &&
+				(e.source === iframeRef.current.contentWindow)
+			) {
+				setIframeHeight(Math.max(e.data.height, 120));
+			}
+		};
+		window.addEventListener("message", handler);
+		return () => window.removeEventListener("message", handler);
+	}, []);
 
 	return (
 		<div
@@ -400,12 +436,18 @@ export const ThreadMessageItem = ({
 				{bodyHtml ? (
 					<div className="overflow-hidden rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/30">
 						<iframe
+							ref={iframeRef}
+							onLoad={handleIframeLoad}
 							srcDoc={`
 								<!DOCTYPE html>
 								<html>
 								<head>
 									<meta charset="utf-8">
 									<style>
+										* { box-sizing: border-box; }
+										html, body {
+											overflow: hidden;
+										}
 										body {
 											font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 											font-size: 14px;
@@ -425,11 +467,24 @@ export const ThreadMessageItem = ({
 											: ""
 									}
 									${bodyHtml}
+									<script>
+										(function() {
+											function sendHeight() {
+												var h = document.documentElement.scrollHeight || document.body.scrollHeight;
+												window.parent.postMessage({ type: 'iframe-height', height: h }, '*');
+											}
+											window.addEventListener('load', sendHeight);
+											if (typeof ResizeObserver !== 'undefined') {
+												new ResizeObserver(sendHeight).observe(document.body);
+											}
+										})();
+									<\/script>
 								</body>
 								</html>
 							`}
-							sandbox="allow-popups allow-popups-to-escape-sandbox"
-							className="min-h-[350px] w-full border-0 bg-white"
+							sandbox="allow-popups allow-popups-to-escape-sandbox allow-scripts"
+							style={{ height: iframeHeight }}
+							className="w-full border-0 bg-white transition-[height] duration-150"
 							title="Email HTML body"
 						/>
 					</div>
