@@ -37,6 +37,13 @@ export async function sendEmail_step6({
 			channel_id: body.channel_id,
 			tags: body.tags,
 			template: body.template,
+			attachments: body.attachments?.map((att) => ({
+				filename: att.filename,
+				content: typeof att.content === "string" ? att.content : undefined,
+				path: att.path,
+				content_type: att.content_type,
+				content_id: att.content_id,
+			})),
 			apiKey,
 			customHeaders: {
 				"X-Org-ID": organizationId,

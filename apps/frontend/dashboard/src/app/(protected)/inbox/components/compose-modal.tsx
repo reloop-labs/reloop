@@ -170,7 +170,7 @@ export const ComposeModal = ({
 				.filter((att) => !att.isUploading && att.url)
 				.map((att) => ({
 					filename: att.name,
-					path: att.path,
+					path: att.url,
 					content_type: att.content_type,
 				}));
 
