@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
+import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -23,7 +24,8 @@ import { AgentInboxEmptyState } from "./empty-state";
 
 dayjs.extend(relativeTime);
 
-const gridClass = "grid grid-cols-[1fr_120px_32px] items-center px-4";
+const gridClass =
+	"grid grid-cols-[minmax(0,1fr)_120px_140px_32px] items-center px-4";
 
 const AgentMailboxActionsDropdown = ({
 	mailbox,
@@ -209,7 +211,7 @@ export const AgentMailboxList = () => {
 	};
 	return (
 		<div className="mx-auto max-w-3xl sm:px-8">
-			<div className="flex items-center justify-between pt-6 pb-4">
+			<div className="flex items-center justify-between pt-10 pb-6">
 				<h1 className="font-medium text-2xl">Agent Inbox</h1>
 				<Button.Root
 					variant="neutral"
@@ -227,7 +229,7 @@ export const AgentMailboxList = () => {
 				<div
 					className={cn(
 						gridClass,
-						"rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 pt-2.5 pb-2.5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40",
+						"rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-white/[0.03]",
 					)}
 				>
 					<div className="flex items-center gap-1">
@@ -238,25 +240,36 @@ export const AgentMailboxList = () => {
 						<Icon name="activity" className="h-3 w-3" />
 						<span className="text-xs">Status</span>
 					</div>
+					<div className="flex items-center gap-1">
+						<Icon name="clock" className="h-3 w-3" />
+						<span className="text-xs">Created At</span>
+					</div>
 					<div />
 				</div>
 
 				{/* Table Body */}
-				<div className="mb-16 divide-y divide-stroke-soft-100 overflow-hidden rounded-b-xl border-stroke-soft-100 border-r border-b border-l bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+				<div className="-mt-2.5 mb-16 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
 					{isLoadingMailboxes ? (
 						[1, 2, 3].map((i) => (
-							<div key={i} className={cn(gridClass, "animate-pulse py-3.5")}>
-								<div className="flex items-start gap-2">
-									<div className="mt-0.5 h-5 w-5 shrink-0 rounded bg-bg-weak-50/50 dark:bg-white/5" />
-									<div className="flex flex-col gap-1.5">
-										<Skeleton className="h-4 w-48 rounded" />
-										<Skeleton className="h-3 w-32 rounded" />
-									</div>
+							<div
+								key={i}
+								className={cn(
+									gridClass,
+									"animate-pulse py-2 text-left transition-colors",
+								)}
+							>
+								<div className="flex items-center gap-2">
+									<div className="h-4 w-4 shrink-0 rounded bg-bg-weak-50/50 dark:bg-white/5" />
+									<Skeleton className="h-4 w-48 rounded" />
 								</div>
-								<div className="flex items-center">
+								<div className="flex items-center gap-2">
+									<Skeleton className="h-2 w-2 rounded-full" />
 									<Skeleton className="h-4 w-16 rounded" />
 								</div>
-								<div className="flex items-center justify-end">
+								<div className="flex items-center">
+									<Skeleton className="h-4 w-20 rounded" />
+								</div>
+								<div className="flex items-center justify-center">
 									<Skeleton className="h-4 w-4 rounded" />
 								</div>
 							</div>
@@ -279,29 +292,24 @@ export const AgentMailboxList = () => {
 									onClick={() => router.push(`/agent-inbox/${mailbox.id}`)}
 									className={cn(
 										gridClass,
-										"group/row cursor-pointer py-2.5 text-left transition-all duration-200",
-										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base",
+										"group/row cursor-pointer py-2 text-left transition-all duration-200",
+										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base",
 										isRowActive && "bg-bg-weak-50/50",
 									)}
 								>
 									{/* Agent & Info */}
-									<div className="flex min-w-0 items-start gap-2 pr-4">
-										<Icon
-											name="inbox"
-											className="mt-0.5 h-5 w-5 text-text-sub-600 transition-transform group-hover/row:scale-105"
-										/>
-										<div className="min-w-0 flex-1">
-											<div className="flex items-center gap-2">
-												<span className="max-w-[240px] truncate font-semibold text-label-sm text-text-strong-950 sm:max-w-none">
-													{mailbox.email}
-												</span>
-												{stats.spam > 0 && (
-													<span className="shrink-0 rounded-full bg-error-base/10 px-1.5 py-0.5 font-semibold text-[8px] text-error-base uppercase dark:bg-error-base/20">
-														{stats.spam} spam
-													</span>
-												)}
-											</div>
+									<div className="flex min-w-0 items-center gap-2 pr-4">
+										<div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-[10px] text-white uppercase tracking-wide shadow-sm">
+											{(mailbox.label || mailbox.email || "A").charAt(0).toUpperCase()}
 										</div>
+										<span className="truncate font-medium text-label-sm text-text-strong-950">
+											{mailbox.email}
+										</span>
+										{stats.spam > 0 && (
+											<span className="shrink-0 rounded-full bg-error-base/10 px-1.5 py-0.5 font-semibold text-[8px] text-error-base uppercase dark:bg-error-base/20">
+												{stats.spam} spam
+											</span>
+										)}
 									</div>
 
 									{/* Status */}
@@ -326,8 +334,18 @@ export const AgentMailboxList = () => {
 										</div>
 									</div>
 
+									{/* Created Column */}
+									<div>
+										<span className="whitespace-nowrap font-medium text-[13px]">
+											{formatRelativeTime(mailbox.createdAt)}
+										</span>
+									</div>
+
 									{/* Actions */}
-									<div className="flex items-center justify-end">
+									<div
+										className="flex items-center justify-center text-text-soft-400"
+										onClick={(e) => e.stopPropagation()}
+									>
 										<AgentMailboxActionsDropdown
 											mailbox={mailbox}
 											onToggleEnabled={handleToggleEnabled}
