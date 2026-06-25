@@ -1,8 +1,14 @@
 "use client";
 
+import {
+	getAvatarGradient,
+	getAvatarInitial,
+} from "@fe/dashboard/utils/avatar";
+import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import { Logo } from "@reloop/ui/logo";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
@@ -31,14 +37,8 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 		parseAsString.withDefault(""),
 	);
 
-	const {
-		mailboxes,
-		threads,
-		refresh,
-		markMessageRead,
-		markMessageSpam,
-		deleteMessage,
-	} = useAgentInbox();
+	const { threads, markMessageRead, markMessageSpam, deleteMessage } =
+		useAgentInbox();
 
 	const mailboxThreads = useMemo(
 		() => threads.filter((t) => t.mailboxId === mailboxId),
@@ -211,15 +211,6 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 		setSelectedThreadId(id || null);
 	};
 
-	const handleRefresh = async () => {
-		try {
-			await refresh();
-			toast.success("Inbox refreshed");
-		} catch {
-			toast.error("Failed to refresh inbox");
-		}
-	};
-
 	const emptyMessage =
 		mailboxThreads.length === 0
 			? "No inbound messages yet. Set up a webhook to receive email."
@@ -233,93 +224,32 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 			<header className="flex h-14 shrink-0 items-center justify-between border-stroke-soft-100 border-b bg-bg-white-0 px-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">
 				<div className="flex items-center gap-3">
 					{/* Logo brand mark */}
-					<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-text-strong-950 text-white shadow-sm dark:bg-white dark:text-neutral-950">
-						<svg
-							className="h-4.5 w-4.5"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M3 8l9 6 9-6M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"
-							/>
-						</svg>
-					</div>
-					<span className="font-semibold text-sm tracking-tight">
-						Agent Inbox
-					</span>
+					<Logo className="h-11 w-11" />
+					<span className="-ml-3 font-semibold">Agent Inbox</span>
 					<div className="h-4 w-px bg-stroke-strong-200 dark:bg-neutral-800" />
-					<div className="flex items-center gap-1.5">
-						<span className="relative flex h-2 w-2">
-							<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-							<span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-						</span>
-						<span className="font-mono text-[11px] text-text-soft-400">
-							agent.connected · last sync 12s ago
-						</span>
-					</div>
-
-					{/* Mailbox Selector */}
-					<select
-						value={mailbox.id}
-						onChange={(e) => router.push(`/inbox/${e.target.value}`)}
-						className="ml-2 cursor-pointer rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-2.5 py-1 font-medium text-text-strong-950 text-xs shadow-sm outline-none transition-colors hover:bg-bg-weak-50 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-200"
-					>
-						{mailboxes.map((mb) => (
-							<option key={mb.id} value={mb.id}>
-								{mb.email}
-							</option>
-						))}
-					</select>
 				</div>
 
 				<div className="flex items-center gap-2">
-					<button
-						type="button"
-						onClick={handleRefresh}
-						title="Refresh"
-						className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-neutral-400 dark:hover:bg-neutral-800"
-					>
-						<Icon name="refresh-cw" className="h-4 w-4" />
-					</button>
-					<button
-						type="button"
-						title="Settings"
-						onClick={() => toast.info("Settings — prototype only")}
-						className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-neutral-400 dark:hover:bg-neutral-800"
-					>
-						<svg
-							className="h-4 w-4"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							strokeWidth="1.5"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-							/>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-							/>
-						</svg>
-					</button>
-					<div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white text-xs shadow-sm">
-						PV
-					</div>
+					<p className="ml-2 font-semibold text-base">{mailbox.email}</p>
+					<Avatar.Root size="24" color="gray" className="shrink-0">
+						<Avatar.Image asChild>
+							<div
+								className={cn(
+									"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
+									getAvatarGradient(mailbox.email),
+								)}
+							>
+								{getAvatarInitial(mailbox.label, mailbox.email)}
+							</div>
+						</Avatar.Image>
+					</Avatar.Root>
 				</div>
 			</header>
 
 			{/* Column Wrapper */}
 			<div className="flex min-h-0 flex-1">
 				{/* Left Folder Rail */}
-				<aside className="flex w-56 shrink-0 flex-col justify-between border-stroke-soft-100 border-r bg-bg-white-0 p-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">
+				<aside className="flex w-60 shrink-0 flex-col justify-between border-stroke-soft-100 border-r bg-bg-white-0 p-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">
 					<div className="flex flex-col gap-5">
 						<button
 							type="button"
