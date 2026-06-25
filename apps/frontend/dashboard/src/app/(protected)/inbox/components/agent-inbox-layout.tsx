@@ -5,6 +5,7 @@ import {
 	getAvatarInitial,
 } from "@fe/dashboard/utils/avatar";
 import * as Avatar from "@reloop/ui/avatar";
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -251,26 +252,16 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 				{/* Left Folder Rail */}
 				<aside className="flex w-60 shrink-0 flex-col justify-between border-stroke-soft-100 border-r bg-bg-white-0 p-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">
 					<div className="flex flex-col gap-5">
-						<button
-							type="button"
+						<Button.Root
+							variant="neutral"
+							mode="filled"
+							size="medium"
 							onClick={() => setIsComposeOpen(true)}
-							className="flex w-full items-center justify-center gap-2 rounded-xl bg-text-strong-950 px-4 py-2.5 font-semibold text-sm text-white transition-colors hover:opacity-90 dark:bg-white dark:text-neutral-950"
+							className="w-full"
 						>
-							<svg
-								className="h-4 w-4"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								strokeWidth="2.2"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									d="M12 4v16m8-8H4"
-								/>
-							</svg>
-							<span>Compose</span>
-						</button>
+							<Button.Icon as={Icon} name="edit" />
+							Compose
+						</Button.Root>
 
 						{/* Folders List */}
 						<div className="flex flex-col gap-0.5">
