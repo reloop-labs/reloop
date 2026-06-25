@@ -1,12 +1,12 @@
 "use client";
 
-import { cn } from "@reloop/ui/cn";
-import * as Dropdown from "@reloop/ui/dropdown";
-import * as Avatar from "@reloop/ui/avatar";
 import {
 	getAvatarGradient,
 	getAvatarInitial,
 } from "@fe/dashboard/utils/avatar";
+import * as Avatar from "@reloop/ui/avatar";
+import { cn } from "@reloop/ui/cn";
+import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -139,7 +139,7 @@ export const ThreadMessageItem = ({
 							<Avatar.Image asChild>
 								<div
 									className={cn(
-										"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-[11px] uppercase tracking-wide shadow-sm",
+										"flex h-full w-full items-center justify-center rounded-full font-semibold text-[11px] text-white uppercase tracking-wide shadow-sm",
 										isOutbound
 											? "bg-emerald-600"
 											: getAvatarGradient(msg.fromEmail || "default"),

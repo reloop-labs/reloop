@@ -158,7 +158,7 @@ export const ThreadList = ({
 					<h3 className="mb-2 font-semibold text-base text-text-strong-950 dark:text-white">
 						{hasFilters ? "No results found" : "No messages yet"}
 					</h3>
-					<p className="mx-auto mb-5 max-w-sm text-balance text-xs text-text-sub-600 dark:text-neutral-400">
+					<p className="mx-auto mb-5 max-w-sm text-balance text-text-sub-600 text-xs dark:text-neutral-400">
 						{emptyMessage}
 					</p>
 					{hasFilters && onClearFilters && (
@@ -185,7 +185,7 @@ export const ThreadList = ({
 					return (
 						<div
 							key={group.key}
-							className="flex flex-col gap-1.5 pt-3 pb-1 px-4"
+							className="flex flex-col gap-1.5 px-4 pt-3 pb-1"
 						>
 							{/* Group Header */}
 							<div className="flex select-none items-center justify-between px-1 text-text-soft-400">
@@ -236,7 +236,7 @@ export const ThreadList = ({
 																<Avatar.Image asChild>
 																	<div
 																		className={cn(
-																			"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-[11px] uppercase tracking-wide shadow-sm",
+																			"flex h-full w-full items-center justify-center rounded-full font-semibold text-[11px] text-white uppercase tracking-wide shadow-sm",
 																			getAvatarGradient(thread.from.email),
 																		)}
 																	>
@@ -280,7 +280,7 @@ export const ThreadList = ({
 																{/* Time & Unread dot */}
 																<div className="flex items-center gap-2 transition-opacity duration-150 group-hover/card:pointer-events-none group-hover/card:opacity-0">
 																	{isUnread && (
-																		<span className="h-1.5 w-1.5 rounded-full bg-primary-base animate-pulse" />
+																		<span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-base" />
 																	)}
 																	<span className="font-medium text-[10px] text-text-soft-400 tabular-nums">
 																		{dayjs(thread.receivedAt).format("HH:mm")}
@@ -355,7 +355,7 @@ export const ThreadList = ({
 														</div>
 
 														{/* Snippet */}
-														<div className="truncate text-text-soft-400 text-[11px] leading-relaxed dark:text-neutral-400">
+														<div className="truncate text-[11px] text-text-soft-400 leading-relaxed dark:text-neutral-400">
 															{thread.preview}
 														</div>
 

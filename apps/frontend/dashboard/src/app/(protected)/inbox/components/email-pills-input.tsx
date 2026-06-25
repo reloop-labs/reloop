@@ -2,7 +2,12 @@
 
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
-import { type KeyboardEvent, type ClipboardEvent, useRef, useState } from "react";
+import {
+	type ClipboardEvent,
+	type KeyboardEvent,
+	useRef,
+	useState,
+} from "react";
 
 interface EmailPillsInputProps {
 	emails: string[];
@@ -66,7 +71,7 @@ export const EmailPillsInput = ({
 
 		// Filter out duplicates in current list
 		const updated = [...emails, ...parsed].filter(
-			(val, idx, self) => self.indexOf(val) === idx
+			(val, idx, self) => self.indexOf(val) === idx,
 		);
 		onChange(updated);
 		setInputValue("");
@@ -114,7 +119,7 @@ export const EmailPillsInput = ({
 	return (
 		<div
 			onClick={() => inputRef.current?.focus()}
-			className="flex flex-1 flex-wrap items-center gap-1.5 min-h-[32px] cursor-text py-0.5"
+			className="flex min-h-[32px] flex-1 cursor-text flex-wrap items-center gap-1.5 py-0.5"
 		>
 			<AnimatePresence initial={false}>
 				{emails.map((emailStr, idx) => {
@@ -128,15 +133,15 @@ export const EmailPillsInput = ({
 							animate={{ opacity: 1, scale: 1 }}
 							exit={{ opacity: 0, scale: 0.8 }}
 							transition={{ duration: 0.15 }}
-							className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-0.5 text-xs font-medium border shadow-xs transition-colors ${
+							className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-0.5 font-medium text-xs shadow-xs transition-colors ${
 								isValid
-									? "bg-bg-weak-50 text-text-sub-600 border-stroke-soft-100 dark:bg-neutral-800/40 dark:text-neutral-300 dark:border-neutral-700/60"
-									: "bg-red-50 text-red-600 border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/50"
+									? "border-stroke-soft-100 bg-bg-weak-50 text-text-sub-600 dark:border-neutral-700/60 dark:bg-neutral-800/40 dark:text-neutral-300"
+									: "border-red-200 bg-red-50 text-red-600 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400"
 							}`}
 						>
 							{!isValid && (
 								<svg
-									className="h-3.5 w-3.5 text-red-500 shrink-0"
+									className="h-3.5 w-3.5 shrink-0 text-red-500"
 									viewBox="0 0 24 24"
 									fill="none"
 									stroke="currentColor"
@@ -148,16 +153,16 @@ export const EmailPillsInput = ({
 								</svg>
 							)}
 							{name ? (
-								<span className="truncate max-w-[280px]">
-									<span className="font-semibold text-text-strong-950 dark:text-white mr-1">
+								<span className="max-w-[280px] truncate">
+									<span className="mr-1 font-semibold text-text-strong-950 dark:text-white">
 										{name}
 									</span>
-									<span className="text-text-soft-400 dark:text-neutral-500 font-normal">
+									<span className="font-normal text-text-soft-400 dark:text-neutral-500">
 										&lt;{email}&gt;
 									</span>
 								</span>
 							) : (
-								<span className="truncate max-w-[200px]">{email}</span>
+								<span className="max-w-[200px] truncate">{email}</span>
 							)}
 							<button
 								type="button"
@@ -166,7 +171,7 @@ export const EmailPillsInput = ({
 									removeEmail(idx);
 								}}
 								disabled={disabled}
-								className={`hover:bg-black/5 dark:hover:bg-white/10 rounded-full p-0.5 -mr-1 transition-colors shrink-0 ${
+								className={`-mr-1 shrink-0 rounded-full p-0.5 transition-colors hover:bg-black/5 dark:hover:bg-white/10 ${
 									isValid
 										? "text-text-soft-400 hover:text-text-strong-950 dark:hover:text-white"
 										: "text-red-400 hover:text-red-700 dark:hover:text-red-300"
@@ -188,7 +193,7 @@ export const EmailPillsInput = ({
 				onPaste={handlePaste}
 				disabled={disabled}
 				placeholder={emails.length === 0 ? placeholder : ""}
-				className="min-w-[120px] flex-1 bg-transparent text-text-strong-950 placeholder-text-soft-400 outline-none dark:text-white py-1"
+				className="min-w-[120px] flex-1 bg-transparent py-1 text-text-strong-950 placeholder-text-soft-400 outline-none dark:text-white"
 			/>
 		</div>
 	);

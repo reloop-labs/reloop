@@ -48,8 +48,7 @@ interface ReceivedEmailTableProps {
 	onClearFilters?: () => void;
 }
 
-const gridClass =
-	"grid grid-cols-[1.2fr_1.8fr_110px_100px_32px] items-center px-4";
+const gridClass = "grid grid-cols-[1.2fr_1.8fr_100px_32px] items-center px-4";
 
 const getInboundStatusColorClass = (status: string): string => {
 	switch (status.toLowerCase()) {
@@ -216,10 +215,6 @@ const EmailSkeleton = () => (
 		<div className="flex items-center">
 			<Skeleton className="h-4 w-48" />
 		</div>
-		<div className="flex items-center gap-2">
-			<Skeleton className="h-2 w-2 rounded-full" />
-			<Skeleton className="h-4 w-16" />
-		</div>
 		<div className="flex items-center">
 			<Skeleton className="h-4 w-20" />
 		</div>
@@ -271,10 +266,6 @@ export const ReceivedEmailTable = ({
 				<div className="flex items-center gap-1">
 					<Icon name="file-text" className="h-3 w-3" />
 					<span className="text-xs">Subject</span>
-				</div>
-				<div className="flex items-center gap-1">
-					<Icon name="check-circle" className="h-3 w-3" />
-					<span className="text-xs">Status</span>
 				</div>
 				<div className="flex items-center gap-1">
 					<Icon name="clock" className="h-3 w-3" />
@@ -346,22 +337,6 @@ export const ReceivedEmailTable = ({
 											{log.snippet}
 										</span>
 									)}
-								</div>
-
-								{/* Status */}
-								<div className="flex items-center">
-									<div
-										className={cn(
-											"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
-											getInboundStatusColorClass(log.status),
-										)}
-									>
-										<Icon
-											name={getInboundStatusIcon(log.status)}
-											className="h-3.5 w-3.5"
-										/>
-										{getInboundStatusLabel(log.status)}
-									</div>
 								</div>
 
 								{/* Time */}

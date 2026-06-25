@@ -8,8 +8,8 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import type { AgentMailbox, InboundThread } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
-import { RawHeadersModal } from "./raw-headers-modal";
 import { ForwardComposer } from "./forward-composer";
+import { RawHeadersModal } from "./raw-headers-modal";
 import { ReplyComposer } from "./reply-composer";
 import { ThreadMessageItem } from "./thread-message-item";
 
@@ -57,7 +57,7 @@ interface ThreadDetailProps {
 // ---------------------------------------------------------------------------
 
 const EmptyState = () => (
-	<div className="flex min-h-[400px] flex-col items-center justify-center gap-1.5 p-8 text-center bg-bg-weak-50/10 dark:bg-transparent">
+	<div className="flex min-h-[400px] flex-col items-center justify-center gap-1.5 bg-bg-weak-50/10 p-8 text-center dark:bg-transparent">
 		<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm dark:border-neutral-850 dark:bg-neutral-900">
 			<Icon
 				name="inbox"
@@ -67,7 +67,7 @@ const EmptyState = () => (
 		<h3 className="font-semibold text-base text-text-strong-950 dark:text-white">
 			Select a message to inspect
 		</h3>
-		<p className="mx-auto max-w-sm text-xs text-text-sub-600 dark:text-neutral-400">
+		<p className="mx-auto max-w-sm text-text-sub-600 text-xs dark:text-neutral-400">
 			Click any message on the left to review parsing, timeline, and approval
 			actions.
 		</p>
@@ -274,7 +274,11 @@ export const ThreadDetail = ({
 		setShowForwardComposer(true);
 	};
 
-	const handleSendForward = async (data: { to: string[]; cc: string[]; body: string }) => {
+	const handleSendForward = async (data: {
+		to: string[];
+		cc: string[];
+		body: string;
+	}) => {
 		if (!thread || data.to.length === 0) return;
 
 		setIsForwarding(true);
@@ -448,7 +452,7 @@ export const ThreadDetail = ({
 			pw.document.write(`<!DOCTYPE html><html><head><title>${thread?.subject}</title>
 				<style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;color:#1c1917;padding:20px;}</style>
 				</head><body><h1 style="font-size:20px;margin-bottom:20px;border-bottom:2px solid #e5e7eb;padding-bottom:10px;">${thread?.subject}</h1>
-				${messagesHtml}<script>window.onload=function(){setTimeout(function(){window.print();window.close();},300);}<\/script></body></html>`);
+				${messagesHtml}<script>window.onload=function(){setTimeout(function(){window.print();window.close();},300);}</script></body></html>`);
 			pw.document.close();
 		} catch {
 			window.print();
@@ -464,15 +468,15 @@ export const ThreadDetail = ({
 			{/* Scrollable message area */}
 			<div className="min-h-0 flex-1 overflow-y-auto">
 				{/* Subject header */}
-				<div className="border-b border-stroke-soft-100/60 px-6 py-5 dark:border-stroke-soft-100/20">
-					<h1 className="font-semibold text-text-strong-950 text-lg dark:text-white">
+				<div className="border-stroke-soft-100/60 border-b px-6 py-5 dark:border-stroke-soft-100/20">
+					<h1 className="font-semibold text-lg text-text-strong-950 dark:text-white">
 						{thread.subject}
 					</h1>
 				</div>
 
 				{/* High-fidelity Provenance strip */}
 				{thread.status === "needs_approval" && (
-					<div className="mx-6 mt-4 flex items-center gap-2.5 rounded-xl border border-amber-250 bg-amber-50/70 px-4 py-3 text-xs font-semibold text-amber-800 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
+					<div className="mx-6 mt-4 flex items-center gap-2.5 rounded-xl border border-amber-250 bg-amber-50/70 px-4 py-3 font-semibold text-amber-800 text-xs dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
 						<svg
 							className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-500"
 							fill="none"
@@ -488,7 +492,7 @@ export const ThreadDetail = ({
 						</svg>
 						<span>
 							Draft prepared by agent
-							<span className="mx-1.5 opacity-50 font-normal">·</span>
+							<span className="mx-1.5 font-normal opacity-50">·</span>
 							held for your approval before sending
 						</span>
 					</div>
@@ -591,7 +595,7 @@ export const ThreadDetail = ({
 					isSending={isForwarding}
 				/>
 			) : (
-				<div className="border-t border-stroke-soft-100 bg-bg-white-0 px-6 py-4 dark:border-stroke-soft-100/30 dark:bg-neutral-900 flex shrink-0">
+				<div className="flex shrink-0 border-stroke-soft-100 border-t bg-bg-white-0 px-6 py-4 dark:border-stroke-soft-100/30 dark:bg-neutral-900">
 					{thread.status === "needs_approval" ? (
 						<div className="flex items-center gap-3">
 							{/* Approve & send */}
@@ -602,7 +606,7 @@ export const ThreadDetail = ({
 										(thread.parsed?.suggestedReply as string) || "";
 									handleSendReply(suggested || undefined);
 								}}
-								className="flex items-center gap-2 rounded-xl bg-text-strong-950 px-4 py-2.5 font-semibold text-xs text-white transition-all hover:opacity-85 dark:bg-white dark:text-neutral-900 shadow-sm"
+								className="flex items-center gap-2 rounded-xl bg-text-strong-950 px-4 py-2.5 font-semibold text-white text-xs shadow-sm transition-all hover:opacity-85 dark:bg-white dark:text-neutral-900"
 							>
 								<svg
 									className="h-3.5 w-3.5"
@@ -628,7 +632,7 @@ export const ThreadDetail = ({
 									setShowForwardComposer(false);
 									setShowReplyComposer(true);
 								}}
-								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-xs text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
 							>
 								<svg
 									className="h-3.5 w-3.5"
@@ -648,7 +652,7 @@ export const ThreadDetail = ({
 							<button
 								type="button"
 								onClick={() => handleForward()}
-								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-xs text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
 							>
 								<svg
 									className="h-3.5 w-3.5"
@@ -673,7 +677,7 @@ export const ThreadDetail = ({
 									setShowForwardComposer(false);
 									setShowReplyComposer(true);
 								}}
-								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-xs text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
 							>
 								<svg
 									className="h-3.5 w-3.5"
@@ -693,7 +697,7 @@ export const ThreadDetail = ({
 							<button
 								type="button"
 								onClick={() => handleForward()}
-								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-xs text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
 							>
 								<svg
 									className="h-3.5 w-3.5"

@@ -1,8 +1,8 @@
 "use client";
 
 import { Icon } from "@reloop/ui/icon";
-import { toast } from "sonner";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { EmailPillsInput, validateEmail } from "../email-pills-input";
 
 export interface ForwardFormValues {
@@ -35,13 +35,15 @@ export const ForwardComposer = ({
 	onClose,
 	isSending,
 }: ForwardComposerProps) => {
-	const { control, handleSubmit, register, watch } = useForm<ForwardFormValues>({
-		defaultValues: {
-			to: [],
-			cc: [],
-			body: "",
+	const { control, handleSubmit, register, watch } = useForm<ForwardFormValues>(
+		{
+			defaultValues: {
+				to: [],
+				cc: [],
+				body: "",
+			},
 		},
-	});
+	);
 
 	const toValue = watch("to") || [];
 	const ccValue = watch("cc") || [];
@@ -101,7 +103,7 @@ export const ForwardComposer = ({
 
 				{/* To */}
 				<div className="flex items-start gap-2 px-4 py-1 text-label-sm">
-					<span className="w-12 shrink-0 text-text-soft-400 py-2">To:</span>
+					<span className="w-12 shrink-0 py-2 text-text-soft-400">To:</span>
 					<Controller
 						name="to"
 						control={control}
@@ -118,7 +120,7 @@ export const ForwardComposer = ({
 
 				{/* CC */}
 				<div className="flex items-start gap-2 px-4 py-1 text-label-sm">
-					<span className="w-12 shrink-0 text-text-soft-400 py-2">Cc:</span>
+					<span className="w-12 shrink-0 py-2 text-text-soft-400">Cc:</span>
 					<Controller
 						name="cc"
 						control={control}

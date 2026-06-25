@@ -41,15 +41,16 @@ export const ComposeModal = ({
 }: ComposeModalProps) => {
 	const { sendMessage } = useAgentInbox();
 
-	const { control, handleSubmit, register, reset, watch } = useForm<ComposeFormValues>({
-		defaultValues: {
-			to: [],
-			subject: "",
-			body: "",
-			cc: [],
-			bcc: [],
-		},
-	});
+	const { control, handleSubmit, register, reset, watch } =
+		useForm<ComposeFormValues>({
+			defaultValues: {
+				to: [],
+				subject: "",
+				body: "",
+				cc: [],
+				bcc: [],
+			},
+		});
 
 	const to = watch("to") || [];
 
@@ -222,7 +223,11 @@ export const ComposeModal = ({
 					if (isSending) e.preventDefault();
 				}}
 			>
-				<form onSubmit={handleSubmit(onSubmit)} {...getRootProps()} className="relative flex flex-col">
+				<form
+					onSubmit={handleSubmit(onSubmit)}
+					{...getRootProps()}
+					className="relative flex flex-col"
+				>
 					<input {...getInputProps()} />
 					<AnimatePresence>
 						{isDragActive && (
@@ -309,7 +314,9 @@ export const ComposeModal = ({
 
 						{/* To Row */}
 						<div className="flex items-start border-stroke-soft-100/50 border-b px-5 py-1.5 dark:border-neutral-800/60">
-							<span className="w-16 select-none text-text-soft-400 py-2">To</span>
+							<span className="w-16 select-none py-2 text-text-soft-400">
+								To
+							</span>
 							<Controller
 								name="to"
 								control={control}
@@ -322,7 +329,7 @@ export const ComposeModal = ({
 									/>
 								)}
 							/>
-							<div className="flex select-none items-center gap-2.5 pl-2 py-2 font-mono text-text-soft-400 text-xs">
+							<div className="flex select-none items-center gap-2.5 py-2 pl-2 font-mono text-text-soft-400 text-xs">
 								<motion.button
 									whileHover={{ scale: 1.05 }}
 									whileTap={{ scale: 0.95 }}
@@ -363,7 +370,7 @@ export const ComposeModal = ({
 									className="overflow-hidden"
 								>
 									<div className="flex items-start border-stroke-soft-100/50 border-b px-5 py-1.5 dark:border-neutral-800/60">
-										<span className="w-16 select-none text-text-soft-400 py-2">
+										<span className="w-16 select-none py-2 text-text-soft-400">
 											Cc
 										</span>
 										<Controller
@@ -394,7 +401,7 @@ export const ComposeModal = ({
 									className="overflow-hidden"
 								>
 									<div className="flex items-start border-stroke-soft-100/50 border-b px-5 py-1.5 dark:border-neutral-800/60">
-										<span className="w-16 select-none text-text-soft-400 py-2">
+										<span className="w-16 select-none py-2 text-text-soft-400">
 											Bcc
 										</span>
 										<Controller
