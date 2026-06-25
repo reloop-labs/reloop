@@ -297,19 +297,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 								)}
 							>
 								<div className="flex items-center gap-2.5">
-									<svg
-										className="h-3.5 w-3.5"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-										strokeWidth="2"
-									>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-										/>
-									</svg>
+									<Icon name="send-1" className="h-3.5 w-3.5" />
 									<span>Sent</span>
 								</div>
 								{sentCount > 0 && (
@@ -330,19 +318,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 								)}
 							>
 								<div className="flex items-center gap-2.5">
-									<svg
-										className="h-3.5 w-3.5"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-										strokeWidth="2"
-									>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-										/>
-									</svg>
+									<Icon name="file" className="h-3.5 w-3.5" />
 									<span>Drafts</span>
 								</div>
 								{draftsCount > 0 && (
@@ -407,19 +383,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 									)}
 								>
 									<div className="flex items-center gap-2.5">
-										<svg
-											className="h-3.5 w-3.5"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-											strokeWidth="2"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-											/>
-										</svg>
+										<Icon name="monitor" className="h-3.5 w-3.5" />
 										<span>Handled by agent</span>
 									</div>
 									{agentCount > 0 && (
@@ -440,19 +404,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 									)}
 								>
 									<div className="flex items-center gap-2.5">
-										<svg
-											className="h-3.5 w-3.5"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-											strokeWidth="2"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-											/>
-										</svg>
+										<Icon name="user" className="h-3.5 w-3.5" />
 										<span>Sent by you</span>
 									</div>
 									{youCount > 0 && (
@@ -473,19 +425,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 									)}
 								>
 									<div className="flex items-center gap-2.5">
-										<svg
-											className="h-3.5 w-3.5 text-amber-500"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-											strokeWidth="2.2"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-											/>
-										</svg>
+										<Icon name="alert-triangle" className="h-3.5 w-3.5 text-amber-500" />
 										<span>Needs your okay</span>
 									</div>
 									{needsApprovalCount > 0 && (
@@ -504,19 +444,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 						onClick={() => router.push("/agent-inbox")}
 						className="flex w-full items-center gap-2 rounded-lg px-3 py-2 font-medium text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-neutral-400 dark:hover:bg-neutral-800"
 					>
-						<svg
-							className="h-3.5 w-3.5"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							strokeWidth="2"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M10 19l-7-7m0 0l7-7m-7 7h18"
-							/>
-						</svg>
+						<Icon name="arrow-left" className="h-3.5 w-3.5" />
 						<span>Exit to dashboard</span>
 					</button>
 				</aside>
