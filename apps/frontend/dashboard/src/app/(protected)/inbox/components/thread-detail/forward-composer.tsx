@@ -2,6 +2,14 @@
 
 import { Icon } from "@reloop/ui/icon";
 import { toast } from "sonner";
+import { Controller, useForm } from "react-hook-form";
+import { EmailPillsInput, validateEmail } from "../email-pills-input";
+
+export interface ForwardFormValues {
+	to: string[];
+	cc: string[];
+	body: string;
+}
 
 interface ForwardComposerProps {
 	/** Original message to forward */
@@ -11,14 +19,8 @@ interface ForwardComposerProps {
 	originalBodyText?: string;
 	/** Mailbox this message belongs to */
 	fromEmail: string;
-	/** Controlled field values */
-	toValue: string;
-	ccValue: string;
-	bodyValue: string;
-	onToChange: (val: string) => void;
-	onCcChange: (val: string) => void;
-	onBodyChange: (val: string) => void;
-	onSend: () => void;
+	/** Callback when Send clicked */
+	onSend: (data: ForwardFormValues) => void;
 	onClose: () => void;
 	isSending?: boolean;
 }
@@ -29,20 +31,35 @@ export const ForwardComposer = ({
 	originalSubject,
 	originalBodyText,
 	fromEmail,
-	toValue,
-	ccValue,
-	bodyValue,
-	onToChange,
-	onCcChange,
-	onBodyChange,
 	onSend,
 	onClose,
 	isSending,
 }: ForwardComposerProps) => {
-	const canSend = toValue.trim().length > 0 && !isSending;
+	const { control, handleSubmit, register, watch } = useForm<ForwardFormValues>({
+		defaultValues: {
+			to: [],
+			cc: [],
+			body: "",
+		},
+	});
+
+	const toValue = watch("to") || [];
+	const ccValue = watch("cc") || [];
+
+	const hasInvalidTo = toValue.some((email) => !validateEmail(email));
+	const hasInvalidCc = ccValue.some((email) => !validateEmail(email));
+	const canSend =
+		toValue.length > 0 && !hasInvalidTo && !hasInvalidCc && !isSending;
+
+	const onSubmit = (data: ForwardFormValues) => {
+		onSend(data);
+	};
 
 	return (
-		<div className="mx-5 my-4 rounded-xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-900/40">
+		<form
+			onSubmit={handleSubmit(onSubmit)}
+			className="mx-5 my-4 rounded-xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-900/40"
+		>
 			{/* Header */}
 			<div className="flex items-center justify-between border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/30">
 				<div className="flex items-center gap-2">
@@ -83,26 +100,36 @@ export const ForwardComposer = ({
 				</div>
 
 				{/* To */}
-				<div className="flex items-center gap-2 px-4 py-2.5 text-label-sm">
-					<span className="w-12 shrink-0 text-text-soft-400">To:</span>
-					<input
-						type="text"
-						value={toValue}
-						onChange={(e) => onToChange(e.target.value)}
-						placeholder="recipient@example.com, …"
-						className="min-w-0 flex-1 bg-transparent text-text-strong-950 placeholder-text-soft-400 outline-none dark:text-white"
+				<div className="flex items-start gap-2 px-4 py-1 text-label-sm">
+					<span className="w-12 shrink-0 text-text-soft-400 py-2">To:</span>
+					<Controller
+						name="to"
+						control={control}
+						render={({ field }) => (
+							<EmailPillsInput
+								emails={field.value}
+								onChange={field.onChange}
+								placeholder="recipient@example.com"
+								disabled={isSending}
+							/>
+						)}
 					/>
 				</div>
 
 				{/* CC */}
-				<div className="flex items-center gap-2 px-4 py-2.5 text-label-sm">
-					<span className="w-12 shrink-0 text-text-soft-400">Cc:</span>
-					<input
-						type="text"
-						value={ccValue}
-						onChange={(e) => onCcChange(e.target.value)}
-						placeholder="cc@example.com, …"
-						className="min-w-0 flex-1 bg-transparent text-text-sub-600 placeholder-text-soft-400 outline-none dark:text-neutral-400"
+				<div className="flex items-start gap-2 px-4 py-1 text-label-sm">
+					<span className="w-12 shrink-0 text-text-soft-400 py-2">Cc:</span>
+					<Controller
+						name="cc"
+						control={control}
+						render={({ field }) => (
+							<EmailPillsInput
+								emails={field.value}
+								onChange={field.onChange}
+								placeholder="cc@example.com"
+								disabled={isSending}
+							/>
+						)}
 					/>
 				</div>
 			</div>
@@ -110,8 +137,7 @@ export const ForwardComposer = ({
 			{/* Body — optional note + quoted original */}
 			<div className="px-4 py-3">
 				<textarea
-					value={bodyValue}
-					onChange={(e) => onBodyChange(e.target.value)}
+					{...register("body")}
 					placeholder="Add a note (optional)…"
 					rows={3}
 					className="w-full resize-none bg-transparent text-label-sm text-text-strong-950 placeholder-text-soft-400 outline-none dark:text-white"
@@ -148,8 +174,7 @@ export const ForwardComposer = ({
 			<div className="flex items-center justify-between rounded-b-xl border-stroke-soft-100 border-t bg-bg-weak-50/30 px-4 py-2.5 dark:border-stroke-soft-100/30 dark:bg-neutral-900/20">
 				<div className="flex items-center gap-2">
 					<button
-						type="button"
-						onClick={onSend}
+						type="submit"
 						disabled={!canSend}
 						className="flex items-center gap-1.5 rounded-lg bg-primary-base px-4 py-1.5 font-semibold text-label-sm text-white transition-all hover:bg-primary-hover active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
 					>
@@ -214,6 +239,6 @@ export const ForwardComposer = ({
 					</svg>
 				</button>
 			</div>
-		</div>
+		</form>
 	);
 };

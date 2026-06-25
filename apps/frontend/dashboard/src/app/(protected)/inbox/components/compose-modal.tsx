@@ -5,14 +5,24 @@ import * as Modal from "@reloop/ui/modal";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { AgentMailbox } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
+import { EmailPillsInput, validateEmail } from "./email-pills-input";
 
 interface ComposeModalProps {
 	isOpen: boolean;
 	onClose: () => void;
 	mailbox: AgentMailbox;
+}
+
+interface ComposeFormValues {
+	to: string[];
+	subject: string;
+	body: string;
+	cc: string[];
+	bcc: string[];
 }
 
 const formatBytes = (bytes: number, decimals = 1) => {
@@ -31,12 +41,17 @@ export const ComposeModal = ({
 }: ComposeModalProps) => {
 	const { sendMessage } = useAgentInbox();
 
-	// Form State
-	const [to, setTo] = useState("");
-	const [subject, setSubject] = useState("");
-	const [body, setBody] = useState("");
-	const [cc, setCc] = useState("");
-	const [bcc, setBcc] = useState("");
+	const { control, handleSubmit, register, reset, watch } = useForm<ComposeFormValues>({
+		defaultValues: {
+			to: [],
+			subject: "",
+			body: "",
+			cc: [],
+			bcc: [],
+		},
+	});
+
+	const to = watch("to") || [];
 
 	// UI controls
 	const [showCc, setShowCc] = useState(false);
@@ -59,16 +74,18 @@ export const ComposeModal = ({
 	// Reset form when modal opens/closes
 	useEffect(() => {
 		if (isOpen) {
-			setTo("");
-			setSubject("");
-			setBody("");
-			setCc("");
-			setBcc("");
+			reset({
+				to: [],
+				subject: "",
+				body: "",
+				cc: [],
+				bcc: [],
+			});
 			setShowCc(false);
 			setShowBcc(false);
 			setAttachments([]);
 		}
-	}, [isOpen]);
+	}, [isOpen, reset]);
 
 	const uploadFile = useCallback(async (file: File) => {
 		const tempId = Math.random().toString();
@@ -134,9 +151,19 @@ export const ComposeModal = ({
 		noKeyboard: true,
 	});
 
-	const handleSend = async () => {
-		if (!to.trim()) {
+	const onSubmit = async (data: ComposeFormValues) => {
+		if (data.to.length === 0) {
 			toast.error("Please specify at least one recipient in the 'To' field.");
+			return;
+		}
+
+		// Validation of all emails
+		const hasInvalidTo = data.to.some((email) => !validateEmail(email));
+		const hasInvalidCc = data.cc.some((email) => !validateEmail(email));
+		const hasInvalidBcc = data.bcc.some((email) => !validateEmail(email));
+
+		if (hasInvalidTo || hasInvalidCc || hasInvalidBcc) {
+			toast.error("Please fix invalid email addresses before sending.");
 			return;
 		}
 
@@ -147,23 +174,9 @@ export const ComposeModal = ({
 
 		setIsSending(true);
 		try {
-			// Convert comma separated lists to arrays if multiple
-			const toEmails = to
-				.split(",")
-				.map((e) => e.trim())
-				.filter(Boolean);
-			const ccEmails = cc
-				? cc
-						.split(",")
-						.map((e) => e.trim())
-						.filter(Boolean)
-				: undefined;
-			const bccEmails = bcc
-				? bcc
-						.split(",")
-						.map((e) => e.trim())
-						.filter(Boolean)
-				: undefined;
+			const toEmails = data.to;
+			const ccEmails = data.cc.length > 0 ? data.cc : undefined;
+			const bccEmails = data.bcc.length > 0 ? data.bcc : undefined;
 
 			// Map attachments payload
 			const attachmentsPayload = attachments
@@ -177,8 +190,8 @@ export const ComposeModal = ({
 			await sendMessage({
 				mailboxId: mailbox.id,
 				to: toEmails,
-				subject: subject || "(No Subject)",
-				text: body,
+				subject: data.subject || "(No Subject)",
+				text: data.body,
 				cc: ccEmails,
 				bcc: bccEmails,
 				attachments: attachmentsPayload,
@@ -209,7 +222,7 @@ export const ComposeModal = ({
 					if (isSending) e.preventDefault();
 				}}
 			>
-				<div {...getRootProps()} className="relative flex flex-col">
+				<form onSubmit={handleSubmit(onSubmit)} {...getRootProps()} className="relative flex flex-col">
 					<input {...getInputProps()} />
 					<AnimatePresence>
 						{isDragActive && (
@@ -295,17 +308,21 @@ export const ComposeModal = ({
 						</div>
 
 						{/* To Row */}
-						<div className="flex items-center border-stroke-soft-100/50 border-b px-5 py-2.5 dark:border-neutral-800/60">
-							<span className="w-16 select-none text-text-soft-400">To</span>
-							<input
-								type="text"
-								value={to}
-								onChange={(e) => setTo(e.target.value)}
-								placeholder="Recipient email address"
-								disabled={isSending}
-								className="flex-1 bg-transparent text-text-strong-950 placeholder-text-soft-400/80 outline-none dark:text-white"
+						<div className="flex items-start border-stroke-soft-100/50 border-b px-5 py-1.5 dark:border-neutral-800/60">
+							<span className="w-16 select-none text-text-soft-400 py-2">To</span>
+							<Controller
+								name="to"
+								control={control}
+								render={({ field }) => (
+									<EmailPillsInput
+										emails={field.value}
+										onChange={field.onChange}
+										placeholder="Recipient email address"
+										disabled={isSending}
+									/>
+								)}
 							/>
-							<div className="flex select-none items-center gap-2.5 pl-2 font-mono text-text-soft-400 text-xs">
+							<div className="flex select-none items-center gap-2.5 pl-2 py-2 font-mono text-text-soft-400 text-xs">
 								<motion.button
 									whileHover={{ scale: 1.05 }}
 									whileTap={{ scale: 0.95 }}
@@ -345,17 +362,21 @@ export const ComposeModal = ({
 									transition={{ duration: 0.2, ease: "easeInOut" }}
 									className="overflow-hidden"
 								>
-									<div className="flex items-center border-stroke-soft-100/50 border-b px-5 py-2.5 dark:border-neutral-800/60">
-										<span className="w-16 select-none text-text-soft-400">
+									<div className="flex items-start border-stroke-soft-100/50 border-b px-5 py-1.5 dark:border-neutral-800/60">
+										<span className="w-16 select-none text-text-soft-400 py-2">
 											Cc
 										</span>
-										<input
-											type="text"
-											value={cc}
-											onChange={(e) => setCc(e.target.value)}
-											placeholder="cc@example.com"
-											disabled={isSending}
-											className="flex-1 bg-transparent text-text-strong-950 placeholder-text-soft-400/80 outline-none dark:text-white"
+										<Controller
+											name="cc"
+											control={control}
+											render={({ field }) => (
+												<EmailPillsInput
+													emails={field.value}
+													onChange={field.onChange}
+													placeholder="cc@example.com"
+													disabled={isSending}
+												/>
+											)}
 										/>
 									</div>
 								</motion.div>
@@ -372,17 +393,21 @@ export const ComposeModal = ({
 									transition={{ duration: 0.2, ease: "easeInOut" }}
 									className="overflow-hidden"
 								>
-									<div className="flex items-center border-stroke-soft-100/50 border-b px-5 py-2.5 dark:border-neutral-800/60">
-										<span className="w-16 select-none text-text-soft-400">
+									<div className="flex items-start border-stroke-soft-100/50 border-b px-5 py-1.5 dark:border-neutral-800/60">
+										<span className="w-16 select-none text-text-soft-400 py-2">
 											Bcc
 										</span>
-										<input
-											type="text"
-											value={bcc}
-											onChange={(e) => setBcc(e.target.value)}
-											placeholder="bcc@example.com"
-											disabled={isSending}
-											className="flex-1 bg-transparent text-text-strong-950 placeholder-text-soft-400/80 outline-none dark:text-white"
+										<Controller
+											name="bcc"
+											control={control}
+											render={({ field }) => (
+												<EmailPillsInput
+													emails={field.value}
+													onChange={field.onChange}
+													placeholder="bcc@example.com"
+													disabled={isSending}
+												/>
+											)}
 										/>
 									</div>
 								</motion.div>
@@ -396,10 +421,9 @@ export const ComposeModal = ({
 							</span>
 							<input
 								type="text"
-								value={subject}
-								onChange={(e) => setSubject(e.target.value)}
 								placeholder="Add a subject"
 								disabled={isSending}
+								{...register("subject")}
 								className="flex-1 bg-transparent text-text-strong-950 placeholder-text-soft-400/80 outline-none dark:text-white"
 							/>
 						</div>
@@ -408,11 +432,10 @@ export const ComposeModal = ({
 					{/* Textarea Body Editor Area */}
 					<div className="flex min-h-[220px] flex-col px-5 py-4">
 						<textarea
-							value={body}
-							onChange={(e) => setBody(e.target.value)}
 							placeholder="Write your message..."
 							disabled={isSending}
 							rows={8}
+							{...register("body")}
 							className="w-full flex-1 resize-none border-0 bg-transparent p-0 text-sm text-text-strong-950 leading-relaxed placeholder-text-soft-400/80 outline-none dark:text-neutral-200"
 						/>
 
@@ -490,11 +513,10 @@ export const ComposeModal = ({
 							<motion.button
 								whileHover={{ scale: 1.02 }}
 								whileTap={{ scale: 0.98 }}
-								type="button"
-								onClick={handleSend}
+								type="submit"
 								disabled={
 									isSending ||
-									!to.trim() ||
+									to.length === 0 ||
 									attachments.some((att) => att.isUploading)
 								}
 								className="flex items-center gap-2 rounded-xl bg-[#18181b] px-6 py-2.5 font-semibold text-sm text-white shadow-sm transition-all duration-200 hover:bg-neutral-800 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100"
@@ -569,7 +591,7 @@ export const ComposeModal = ({
 							<span>Discard</span>
 						</motion.button>
 					</div>
-				</div>
+				</form>
 			</Modal.Content>
 		</Modal.Root>
 	);

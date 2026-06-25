@@ -102,9 +102,6 @@ export const ThreadDetail = ({
 	const [showReplyComposer, setShowReplyComposer] = useState(false);
 	const [replyBody, setReplyBody] = useState("");
 	const [showForwardComposer, setShowForwardComposer] = useState(false);
-	const [forwardTo, setForwardTo] = useState("");
-	const [forwardCc, setForwardCc] = useState("");
-	const [forwardBody, setForwardBody] = useState("");
 	const [isForwarding, setIsForwarding] = useState(false);
 
 	// ── Translation state ─────────────────────────────────────────────────────
@@ -137,9 +134,6 @@ export const ThreadDetail = ({
 		setReplyBody("");
 		setOptimisticReplies([]);
 		setShowForwardComposer(false);
-		setForwardTo("");
-		setForwardCc("");
-		setForwardBody("");
 	}, [thread?.id]);
 
 	// ── Build display messages list ───────────────────────────────────────────
@@ -280,21 +274,15 @@ export const ThreadDetail = ({
 		setShowForwardComposer(true);
 	};
 
-	const handleSendForward = async () => {
-		if (!thread || !forwardTo.trim()) return;
+	const handleSendForward = async (data: { to: string[]; cc: string[]; body: string }) => {
+		if (!thread || data.to.length === 0) return;
 
 		setIsForwarding(true);
-		const toList = forwardTo
-			.split(",")
-			.map((s) => s.trim())
-			.filter(Boolean);
-		const ccList = forwardCc
-			.split(",")
-			.map((s) => s.trim())
-			.filter(Boolean);
+		const toList = data.to;
+		const ccList = data.cc;
 
 		const fwdPromise = sendForward(thread.id, toList, {
-			text: forwardBody.trim() || undefined,
+			text: data.body.trim() || undefined,
 			cc: ccList.length ? ccList : undefined,
 		});
 
@@ -302,9 +290,6 @@ export const ThreadDetail = ({
 			loading: "Forwarding message…",
 			success: () => {
 				setShowForwardComposer(false);
-				setForwardTo("");
-				setForwardCc("");
-				setForwardBody("");
 				setIsForwarding(false);
 				return `Forwarded to ${toList.join(", ")} successfully`;
 			},
@@ -599,17 +584,8 @@ export const ThreadDetail = ({
 					originalSubject={thread.subject}
 					originalBodyText={thread.bodyText?.substring(0, 300)}
 					fromEmail={mailbox?.email || "agent@local.reloop.sh"}
-					toValue={forwardTo}
-					ccValue={forwardCc}
-					bodyValue={forwardBody}
-					onToChange={setForwardTo}
-					onCcChange={setForwardCc}
-					onBodyChange={setForwardBody}
 					onSend={handleSendForward}
 					onClose={() => {
-						setForwardTo("");
-						setForwardCc("");
-						setForwardBody("");
 						setShowForwardComposer(false);
 					}}
 					isSending={isForwarding}
