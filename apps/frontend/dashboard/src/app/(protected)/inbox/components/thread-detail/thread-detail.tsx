@@ -6,7 +6,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import type { AgentMailbox, InboundThread } from "../../mock-data";
+import type { AgentMailbox, InboundThread } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
 import { RawHeadersModal } from "./raw-headers-modal";
 import { ForwardComposer } from "./forward-composer";
@@ -59,7 +59,10 @@ interface ThreadDetailProps {
 const EmptyState = () => (
 	<div className="flex min-h-[400px] flex-col items-center justify-center gap-1.5 p-8 text-center bg-bg-weak-50/10 dark:bg-transparent">
 		<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm dark:border-neutral-850 dark:bg-neutral-900">
-			<Icon name="inbox" className="h-5 w-5 text-text-sub-600 dark:text-neutral-450" />
+			<Icon
+				name="inbox"
+				className="h-5 w-5 text-text-sub-600 dark:text-neutral-450"
+			/>
 		</div>
 		<h3 className="font-semibold text-base text-text-strong-950 dark:text-white">
 			Select a message to inspect
@@ -84,8 +87,14 @@ export const ThreadDetail = ({
 	mailbox,
 	onBack,
 }: ThreadDetailProps) => {
-	const { deleteMessage, markMessageRead, markMessageSpam, sendReply, sendForward, refresh } =
-		useAgentInbox();
+	const {
+		deleteMessage,
+		markMessageRead,
+		markMessageSpam,
+		sendReply,
+		sendForward,
+		refresh,
+	} = useAgentInbox();
 
 	// ── UI state ──────────────────────────────────────────────────────────────
 	const [parsedExpanded, setParsedExpanded] = useState(true);
@@ -154,7 +163,7 @@ export const ThreadDetail = ({
 			base = [
 				{
 					id: thread.id,
-					direction: "inbound",
+					direction: thread.direction || "inbound",
 					fromEmail: thread.from.email,
 					fromName: thread.from.name || null,
 					messageAt: thread.receivedAt,
@@ -162,7 +171,7 @@ export const ThreadDetail = ({
 					email: {
 						id: thread.id,
 						fromEmail: thread.from.email,
-						toEmails: [mailbox?.email || ""],
+						toEmails: thread.toEmails || [mailbox?.email || ""],
 						subject: thread.subject,
 						textBody: thread.bodyText,
 						htmlBody: thread.bodyHtml,
@@ -251,10 +260,7 @@ export const ThreadDetail = ({
 			loading: "Sending reply...",
 			success: async () => {
 				// Refresh both the thread view and the messages list
-				await Promise.all([
-					mutateThread(),
-					refresh(),
-				]);
+				await Promise.all([mutateThread(), refresh()]);
 				// Once real data is back, clear the optimistic entry
 				setOptimisticReplies([]);
 				return `Reply sent to ${thread.from.email} successfully`;
@@ -278,8 +284,14 @@ export const ThreadDetail = ({
 		if (!thread || !forwardTo.trim()) return;
 
 		setIsForwarding(true);
-		const toList = forwardTo.split(",").map((s) => s.trim()).filter(Boolean);
-		const ccList = forwardCc.split(",").map((s) => s.trim()).filter(Boolean);
+		const toList = forwardTo
+			.split(",")
+			.map((s) => s.trim())
+			.filter(Boolean);
+		const ccList = forwardCc
+			.split(",")
+			.map((s) => s.trim())
+			.filter(Boolean);
 
 		const fwdPromise = sendForward(thread.id, toList, {
 			text: forwardBody.trim() || undefined,
@@ -319,11 +331,7 @@ export const ThreadDetail = ({
 				const parser = new DOMParser();
 				const doc = parser.parseFromString(htmlBody, "text/html");
 				const textNodes: Node[] = [];
-				const walk = doc.createTreeWalker(
-					doc.body,
-					NodeFilter.SHOW_TEXT,
-					null,
-				);
+				const walk = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, null);
 				let node = walk.nextNode();
 				while (node) {
 					if (node.nodeValue?.trim()) textNodes.push(node);
@@ -340,7 +348,10 @@ export const ThreadDetail = ({
 						}
 					}),
 				);
-				setTranslatedHtmlMap((prev) => ({ ...prev, [key]: doc.body.innerHTML }));
+				setTranslatedHtmlMap((prev) => ({
+					...prev,
+					[key]: doc.body.innerHTML,
+				}));
 				toast.success("Translated email dynamically");
 			} catch {
 				toast.error("Failed to translate dynamically");
@@ -428,7 +439,10 @@ export const ThreadDetail = ({
 	const handlePrint = () => {
 		try {
 			const pw = window.open("", "_blank");
-			if (!pw) { window.print(); return; }
+			if (!pw) {
+				window.print();
+				return;
+			}
 			const messagesHtml = displayMessages
 				.map((msg) => {
 					const key = `${msg.id}-${targetLanguage}`;
@@ -474,8 +488,18 @@ export const ThreadDetail = ({
 				{/* High-fidelity Provenance strip */}
 				{thread.status === "needs_approval" && (
 					<div className="mx-6 mt-4 flex items-center gap-2.5 rounded-xl border border-amber-250 bg-amber-50/70 px-4 py-3 text-xs font-semibold text-amber-800 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
-						<svg className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
-							<path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+						<svg
+							className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-500"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							strokeWidth="2.2"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+							/>
 						</svg>
 						<span>
 							Draft prepared by agent
@@ -489,10 +513,7 @@ export const ThreadDetail = ({
 				{isTranslated && (
 					<div className="mx-5 my-4 flex items-center justify-between gap-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50 p-3 font-medium text-label-sm dark:border-stroke-soft-100/30 dark:bg-neutral-800/40">
 						<div className="flex items-center gap-2 text-text-sub-600 dark:text-neutral-400">
-							<Icon
-								name="translate"
-								className="h-4 w-4 text-primary-base"
-							/>
+							<Icon name="translate" className="h-4 w-4 text-primary-base" />
 							<span>Translated to</span>
 							<select
 								value={targetLanguage}
@@ -572,7 +593,9 @@ export const ThreadDetail = ({
 							? `${thread.from.name} <${thread.from.email}>`
 							: thread.from.email
 					}
-					originalDate={dayjs(thread.receivedAt).format("ddd, MMM D, YYYY [at] h:mm A")}
+					originalDate={dayjs(thread.receivedAt).format(
+						"ddd, MMM D, YYYY [at] h:mm A",
+					)}
 					originalSubject={thread.subject}
 					originalBodyText={thread.bodyText?.substring(0, 300)}
 					fromEmail={mailbox?.email || "agent@local.reloop.sh"}
@@ -600,8 +623,7 @@ export const ThreadDetail = ({
 								type="button"
 								onClick={() => {
 									const suggested =
-										(thread.parsed?.suggestedReply as string) ||
-										"";
+										(thread.parsed?.suggestedReply as string) || "";
 									handleSendReply(suggested || undefined);
 								}}
 								className="flex items-center gap-2 rounded-xl bg-text-strong-950 px-4 py-2.5 font-semibold text-xs text-white transition-all hover:opacity-85 dark:bg-white dark:text-neutral-900 shadow-sm"
@@ -625,8 +647,7 @@ export const ThreadDetail = ({
 								type="button"
 								onClick={() => {
 									const suggested =
-										(thread.parsed?.suggestedReply as string) ||
-										"";
+										(thread.parsed?.suggestedReply as string) || "";
 									setReplyBody(suggested);
 									setShowForwardComposer(false);
 									setShowReplyComposer(true);

@@ -222,7 +222,11 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 								isInline: att.contentDisposition === "inline",
 							})) || [],
 						timeline: [
-							{ label: "Email received", at: createdAtStr, state: "done" as const },
+							{
+								label: "Email received",
+								at: createdAtStr,
+								state: "done" as const,
+							},
 							{
 								label: "Delivered to NATS",
 								at: createdAtStr,
@@ -263,11 +267,10 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 						threadId: undefined,
 						from: { name: msg.fromName || undefined, email: msg.fromEmail },
 						subject: msg.subject || "(No Subject)",
-						preview:
-							msg.textBody
-								? msg.textBody.substring(0, 120) +
-									(msg.textBody.length > 120 ? "..." : "")
-								: "",
+						preview: msg.textBody
+							? msg.textBody.substring(0, 120) +
+								(msg.textBody.length > 120 ? "..." : "")
+							: "",
 						bodyText: msg.textBody || "",
 						bodyHtml: msg.htmlBody || undefined,
 						receivedAt,
@@ -280,7 +283,11 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 						toEmails: msg.toEmails,
 						attachments: [],
 						timeline: [
-							{ label: "Email composed", at: receivedAt, state: "done" as const },
+							{
+								label: "Email composed",
+								at: receivedAt,
+								state: "done" as const,
+							},
 							{
 								label: "Sent to KumoMTA",
 								at: receivedAt,
@@ -297,7 +304,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			: [];
 
 		return [...mappedInbound, ...mappedSent].sort(
-			(a, b) => new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime()
+			(a, b) =>
+				new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime(),
 		);
 	}, [messagesData, sentMessagesData, mailboxes]);
 

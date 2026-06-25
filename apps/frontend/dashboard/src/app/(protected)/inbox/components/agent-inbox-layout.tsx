@@ -47,7 +47,10 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 
 	// Dynamic folder counts
 	const inboxCount = useMemo(
-		() => mailboxThreads.filter((t) => t.direction === "inbound" && t.status !== "blocked").length,
+		() =>
+			mailboxThreads.filter(
+				(t) => t.direction === "inbound" && t.status !== "blocked",
+			).length,
 		[mailboxThreads],
 	);
 	const sentCount = useMemo(
@@ -57,16 +60,24 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 	const draftsCount = useMemo(
 		() =>
 			mailboxThreads.filter(
-				(t) => t.direction === "inbound" && (t.status === "needs_approval" || t.status === "parsing"),
+				(t) =>
+					t.direction === "inbound" &&
+					(t.status === "needs_approval" || t.status === "parsing"),
 			).length,
 		[mailboxThreads],
 	);
 	const spamCount = useMemo(
-		() => mailboxThreads.filter((t) => t.direction === "inbound" && t.status === "blocked").length,
+		() =>
+			mailboxThreads.filter(
+				(t) => t.direction === "inbound" && t.status === "blocked",
+			).length,
 		[mailboxThreads],
 	);
 	const agentCount = useMemo(
-		() => mailboxThreads.filter((t) => t.direction === "inbound" && t.status === "handled").length,
+		() =>
+			mailboxThreads.filter(
+				(t) => t.direction === "inbound" && t.status === "handled",
+			).length,
 		[mailboxThreads],
 	);
 	const youCount = useMemo(
@@ -74,7 +85,10 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 		[mailboxThreads],
 	);
 	const needsApprovalCount = useMemo(
-		() => mailboxThreads.filter((t) => t.direction === "inbound" && t.status === "needs_approval").length,
+		() =>
+			mailboxThreads.filter(
+				(t) => t.direction === "inbound" && t.status === "needs_approval",
+			).length,
 		[mailboxThreads],
 	);
 
@@ -83,23 +97,33 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 
 		// Apply folder / rail filters
 		if (folder === "inbox") {
-			result = result.filter((t) => t.direction === "inbound" && t.status !== "blocked");
+			result = result.filter(
+				(t) => t.direction === "inbound" && t.status !== "blocked",
+			);
 		} else if (folder === "sent") {
 			result = result.filter((t) => t.direction === "outbound");
 		} else if (folder === "drafts") {
 			result = result.filter(
-				(t) => t.direction === "inbound" && (t.status === "needs_approval" || t.status === "parsing"),
+				(t) =>
+					t.direction === "inbound" &&
+					(t.status === "needs_approval" || t.status === "parsing"),
 			);
 		} else if (folder === "spam") {
-			result = result.filter((t) => t.direction === "inbound" && t.status === "blocked");
+			result = result.filter(
+				(t) => t.direction === "inbound" && t.status === "blocked",
+			);
 		} else if (folder === "trash") {
 			result = [];
 		} else if (folder === "agent") {
-			result = result.filter((t) => t.direction === "inbound" && t.status === "handled");
+			result = result.filter(
+				(t) => t.direction === "inbound" && t.status === "handled",
+			);
 		} else if (folder === "you") {
 			result = result.filter((t) => t.direction === "outbound");
 		} else if (folder === "needs_approval") {
-			result = result.filter((t) => t.direction === "inbound" && t.status === "needs_approval");
+			result = result.filter(
+				(t) => t.direction === "inbound" && t.status === "needs_approval",
+			);
 		}
 
 		// Apply search

@@ -183,7 +183,10 @@ export const ThreadList = ({
 				{groups.map((group) => {
 					const isCollapsed = collapsedGroups[group.key];
 					return (
-						<div key={group.key} className="flex flex-col gap-1.5 pt-3 pb-1 px-4">
+						<div
+							key={group.key}
+							className="flex flex-col gap-1.5 pt-3 pb-1 px-4"
+						>
 							{/* Group Header */}
 							<div className="flex select-none items-center justify-between px-1 text-text-soft-400">
 								<span className="font-semibold text-[10px] uppercase tracking-wider">

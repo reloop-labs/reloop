@@ -140,14 +140,17 @@ export const ThreadMessageItem = ({
 								<div
 									className={cn(
 										"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-[11px] uppercase tracking-wide shadow-sm",
-										isOutbound 
-											? "bg-emerald-600" 
-											: getAvatarGradient(msg.fromEmail || "default")
+										isOutbound
+											? "bg-emerald-600"
+											: getAvatarGradient(msg.fromEmail || "default"),
 									)}
 								>
 									{isOutbound
 										? "ME"
-										: getAvatarInitial(msg.fromName ?? null, msg.fromEmail || "U")}
+										: getAvatarInitial(
+												msg.fromName ?? null,
+												msg.fromEmail || "U",
+											)}
 								</div>
 							</Avatar.Image>
 						</Avatar.Root>
