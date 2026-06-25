@@ -613,13 +613,20 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 				<section className="flex min-h-0 w-[360px] shrink-0 flex-col border-stroke-soft-100 border-r bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-neutral-950">
 					{/* Search & Meta */}
 					<div className="flex flex-col gap-3 border-stroke-soft-100/50 border-b p-4 dark:border-stroke-soft-100/10">
-						<div className="flex items-center justify-between">
-							<span className="font-mono font-semibold text-text-soft-400 text-xs uppercase tracking-wider">
-								{folder.replace("_", " ")}
-							</span>
-							<span className="font-medium text-[11px] text-text-sub-600 dark:text-neutral-400">
-								{filteredThreads.length} threads · {needsApprovalCount} waiting
-							</span>
+						<div className="flex flex-col gap-1">
+							<h2 className="font-semibold text-base text-text-strong-950 dark:text-white">
+								{folder === "needs_approval"
+									? "Needs your okay"
+									: folder === "agent"
+										? "Handled by agent"
+										: folder === "you"
+											? "Sent by you"
+											: folder.charAt(0).toUpperCase() + folder.slice(1).replace("_", " ")}
+							</h2>
+							<p className="font-medium text-[11px] text-text-soft-400">
+								{filteredThreads.length} {filteredThreads.length === 1 ? "message" : "messages"}
+								{needsApprovalCount > 0 && ` · ${needsApprovalCount} waiting on you`}
+							</p>
 						</div>
 
 						<Input.Root size="xsmall" className="rounded-lg shadow-sm">
@@ -631,7 +638,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 									className="text-text-soft-400"
 								/>
 								<Input.Input
-									placeholder="Search thread or sender..."
+									placeholder="Search mail"
 									value={searchQuery}
 									onChange={(e) => setSearchQuery(e.target.value)}
 									className="text-xs"
