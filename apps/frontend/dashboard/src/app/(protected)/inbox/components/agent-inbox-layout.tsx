@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import {
 	getAvatarGradient,
 	getAvatarInitial,
@@ -12,7 +13,7 @@ import * as Input from "@reloop/ui/input";
 import { Logo } from "@reloop/ui/logo";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { AgentMailbox } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
@@ -37,6 +38,26 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 		"thread",
 		parseAsString.withDefault(""),
 	);
+
+	// Hover & Active States
+	const [hoveredEl, setHoveredEl] = useState<HTMLButtonElement | undefined>(
+		undefined,
+	);
+	const [rect, setRect] = useState<DOMRect | undefined>(undefined);
+	const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+	const activeEl = folder
+		? (buttonRefs.current[folder] ?? undefined)
+		: undefined;
+	const currentEl = hoveredEl ?? activeEl;
+
+	useLayoutEffect(() => {
+		if (currentEl) {
+			setRect(currentEl.getBoundingClientRect());
+		} else {
+			setRect(undefined);
+		}
+	}, [currentEl]);
 
 	const { threads, markMessageRead, markMessageSpam, deleteMessage } =
 		useAgentInbox();
@@ -250,7 +271,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 			{/* Column Wrapper */}
 			<div className="flex min-h-0 flex-1">
 				{/* Left Folder Rail */}
-				<aside className="flex w-60 shrink-0 flex-col justify-between border-stroke-soft-100 border-r bg-bg-white-0 p-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">
+				<aside className="relative flex w-60 shrink-0 flex-col justify-between border-stroke-soft-100 border-r bg-bg-white-0 p-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">
 					<div className="flex flex-col gap-5">
 						<Button.Root
 							variant="neutral"
@@ -264,19 +285,34 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 						</Button.Root>
 
 						{/* Folders List */}
-						<div className="flex flex-col gap-0.5">
+						<div className="flex flex-col">
 							<button
 								type="button"
+								ref={(el) => {
+									buttonRefs.current["inbox"] = el;
+								}}
+								onPointerEnter={() =>
+									setHoveredEl(buttonRefs.current["inbox"] ?? undefined)
+								}
+								onPointerLeave={() => setHoveredEl(undefined)}
 								onClick={() => setFolder("inbox")}
 								className={cn(
-									"flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
+									"group relative z-10 flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
 									folder === "inbox"
-										? "bg-bg-weak-100 text-text-strong-950 dark:bg-neutral-800 dark:text-white"
-										: "text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-neutral-400 dark:hover:bg-neutral-800/40",
+										? "text-primary-base"
+										: "text-text-sub-600 hover:text-primary-base dark:text-neutral-400 dark:hover:text-primary-base",
 								)}
 							>
 								<div className="flex items-center gap-2.5">
-									<Icon name="inbox" className="h-3.5 w-3.5" />
+									<Icon
+										name="inbox"
+										className={cn(
+											"h-3.5 w-3.5 transition-colors",
+											folder === "inbox"
+												? "text-primary-base"
+												: "text-text-sub-600 opacity-70 group-hover:text-primary-base group-hover:opacity-100",
+										)}
+									/>
 									<span>Inbox</span>
 								</div>
 								{inboxCount > 0 && (
@@ -288,16 +324,31 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 
 							<button
 								type="button"
+								ref={(el) => {
+									buttonRefs.current["sent"] = el;
+								}}
+								onPointerEnter={() =>
+									setHoveredEl(buttonRefs.current["sent"] ?? undefined)
+								}
+								onPointerLeave={() => setHoveredEl(undefined)}
 								onClick={() => setFolder("sent")}
 								className={cn(
-									"flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
+									"group relative z-10 flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
 									folder === "sent"
-										? "bg-bg-weak-100 text-text-strong-950 dark:bg-neutral-800 dark:text-white"
-										: "text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-neutral-400 dark:hover:bg-neutral-800/40",
+										? "text-primary-base"
+										: "text-text-sub-600 hover:text-primary-base dark:text-neutral-400 dark:hover:text-primary-base",
 								)}
 							>
 								<div className="flex items-center gap-2.5">
-									<Icon name="send-1" className="h-3.5 w-3.5" />
+									<Icon
+										name="send-1"
+										className={cn(
+											"h-3.5 w-3.5 transition-colors",
+											folder === "sent"
+												? "text-primary-base"
+												: "text-text-sub-600 opacity-70 group-hover:text-primary-base group-hover:opacity-100",
+										)}
+									/>
 									<span>Sent</span>
 								</div>
 								{sentCount > 0 && (
@@ -309,16 +360,31 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 
 							<button
 								type="button"
+								ref={(el) => {
+									buttonRefs.current["drafts"] = el;
+								}}
+								onPointerEnter={() =>
+									setHoveredEl(buttonRefs.current["drafts"] ?? undefined)
+								}
+								onPointerLeave={() => setHoveredEl(undefined)}
 								onClick={() => setFolder("drafts")}
 								className={cn(
-									"flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
+									"group relative z-10 flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
 									folder === "drafts"
-										? "bg-bg-weak-100 text-text-strong-950 dark:bg-neutral-800 dark:text-white"
-										: "text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-neutral-400 dark:hover:bg-neutral-800/40",
+										? "text-primary-base"
+										: "text-text-sub-600 hover:text-primary-base dark:text-neutral-400 dark:hover:text-primary-base",
 								)}
 							>
 								<div className="flex items-center gap-2.5">
-									<Icon name="file" className="h-3.5 w-3.5" />
+									<Icon
+										name="file"
+										className={cn(
+											"h-3.5 w-3.5 transition-colors",
+											folder === "drafts"
+												? "text-primary-base"
+												: "text-text-sub-600 opacity-70 group-hover:text-primary-base group-hover:opacity-100",
+										)}
+									/>
 									<span>Drafts</span>
 								</div>
 								{draftsCount > 0 && (
@@ -330,16 +396,31 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 
 							<button
 								type="button"
+								ref={(el) => {
+									buttonRefs.current["spam"] = el;
+								}}
+								onPointerEnter={() =>
+									setHoveredEl(buttonRefs.current["spam"] ?? undefined)
+								}
+								onPointerLeave={() => setHoveredEl(undefined)}
 								onClick={() => setFolder("spam")}
 								className={cn(
-									"flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
+									"group relative z-10 flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
 									folder === "spam"
-										? "bg-bg-weak-100 text-text-strong-950 dark:bg-neutral-800 dark:text-white"
-										: "text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-neutral-400 dark:hover:bg-neutral-800/40",
+										? "text-primary-base"
+										: "text-text-sub-600 hover:text-primary-base dark:text-neutral-400 dark:hover:text-primary-base",
 								)}
 							>
 								<div className="flex items-center gap-2.5">
-									<Icon name="alert-triangle" className="h-3.5 w-3.5" />
+									<Icon
+										name="alert-triangle"
+										className={cn(
+											"h-3.5 w-3.5 transition-colors",
+											folder === "spam"
+												? "text-primary-base"
+												: "text-text-sub-600 opacity-70 group-hover:text-primary-base group-hover:opacity-100",
+										)}
+									/>
 									<span>Spam</span>
 								</div>
 								{spamCount > 0 && (
@@ -351,16 +432,31 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 
 							<button
 								type="button"
+								ref={(el) => {
+									buttonRefs.current["trash"] = el;
+								}}
+								onPointerEnter={() =>
+									setHoveredEl(buttonRefs.current["trash"] ?? undefined)
+								}
+								onPointerLeave={() => setHoveredEl(undefined)}
 								onClick={() => setFolder("trash")}
 								className={cn(
-									"flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
+									"group relative z-10 flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
 									folder === "trash"
-										? "bg-bg-weak-100 text-text-strong-950 dark:bg-neutral-800 dark:text-white"
-										: "text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-neutral-400 dark:hover:bg-neutral-800/40",
+										? "text-primary-base"
+										: "text-text-sub-600 hover:text-primary-base dark:text-neutral-400 dark:hover:text-primary-base",
 								)}
 							>
 								<div className="flex items-center gap-2.5">
-									<Icon name="trash" className="h-3.5 w-3.5" />
+									<Icon
+										name="trash"
+										className={cn(
+											"h-3.5 w-3.5 transition-colors",
+											folder === "trash"
+												? "text-primary-base"
+												: "text-text-sub-600 opacity-70 group-hover:text-primary-base group-hover:opacity-100",
+										)}
+									/>
 									<span>Trash</span>
 								</div>
 							</button>
@@ -371,19 +467,34 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 							<div className="px-3 font-bold font-mono text-[10px] text-text-soft-400 uppercase tracking-wider">
 								Filter by actor
 							</div>
-							<div className="flex flex-col gap-0.5">
+							<div className="flex flex-col">
 								<button
 									type="button"
+									ref={(el) => {
+										buttonRefs.current["agent"] = el;
+									}}
+									onPointerEnter={() =>
+										setHoveredEl(buttonRefs.current["agent"] ?? undefined)
+									}
+									onPointerLeave={() => setHoveredEl(undefined)}
 									onClick={() => setFolder("agent")}
 									className={cn(
-										"flex items-center justify-between rounded-lg px-3 py-1.5 font-medium text-xs transition-colors",
+										"group relative z-10 flex items-center justify-between rounded-lg px-3 py-1.5 font-medium text-xs transition-colors",
 										folder === "agent"
-											? "bg-bg-weak-100 text-text-strong-950 dark:bg-neutral-800 dark:text-white"
-											: "text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-neutral-400 dark:hover:bg-neutral-800/40",
+											? "text-primary-base"
+											: "text-text-sub-600 hover:text-primary-base dark:text-neutral-400 dark:hover:text-primary-base",
 									)}
 								>
 									<div className="flex items-center gap-2.5">
-										<Icon name="monitor" className="h-3.5 w-3.5" />
+										<Icon
+											name="monitor"
+											className={cn(
+												"h-3.5 w-3.5 transition-colors",
+												folder === "agent"
+													? "text-primary-base"
+													: "text-text-sub-600 opacity-70 group-hover:text-primary-base group-hover:opacity-100",
+											)}
+										/>
 										<span>Handled by agent</span>
 									</div>
 									{agentCount > 0 && (
@@ -395,16 +506,31 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 
 								<button
 									type="button"
+									ref={(el) => {
+										buttonRefs.current["you"] = el;
+									}}
+									onPointerEnter={() =>
+										setHoveredEl(buttonRefs.current["you"] ?? undefined)
+									}
+									onPointerLeave={() => setHoveredEl(undefined)}
 									onClick={() => setFolder("you")}
 									className={cn(
-										"flex items-center justify-between rounded-lg px-3 py-1.5 font-medium text-xs transition-colors",
+										"group relative z-10 flex items-center justify-between rounded-lg px-3 py-1.5 font-medium text-xs transition-colors",
 										folder === "you"
-											? "bg-bg-weak-100 text-text-strong-950 dark:bg-neutral-800 dark:text-white"
-											: "text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-neutral-400 dark:hover:bg-neutral-800/40",
+											? "text-primary-base"
+											: "text-text-sub-600 hover:text-primary-base dark:text-neutral-400 dark:hover:text-primary-base",
 									)}
 								>
 									<div className="flex items-center gap-2.5">
-										<Icon name="user" className="h-3.5 w-3.5" />
+										<Icon
+											name="user"
+											className={cn(
+												"h-3.5 w-3.5 transition-colors",
+												folder === "you"
+													? "text-primary-base"
+													: "text-text-sub-600 opacity-70 group-hover:text-primary-base group-hover:opacity-100",
+											)}
+										/>
 										<span>Sent by you</span>
 									</div>
 									{youCount > 0 && (
@@ -416,16 +542,33 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 
 								<button
 									type="button"
+									ref={(el) => {
+										buttonRefs.current["needs_approval"] = el;
+									}}
+									onPointerEnter={() =>
+										setHoveredEl(
+											buttonRefs.current["needs_approval"] ?? undefined,
+										)
+									}
+									onPointerLeave={() => setHoveredEl(undefined)}
 									onClick={() => setFolder("needs_approval")}
 									className={cn(
-										"flex items-center justify-between rounded-lg px-3 py-1.5 font-medium text-xs transition-colors",
+										"group relative z-10 flex items-center justify-between rounded-lg px-3 py-1.5 font-medium text-xs transition-colors",
 										folder === "needs_approval"
-											? "bg-bg-weak-100 text-text-strong-950 dark:bg-neutral-800 dark:text-white"
-											: "text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-neutral-400 dark:hover:bg-neutral-800/40",
+											? "text-primary-base"
+											: "text-text-sub-600 hover:text-primary-base dark:text-neutral-400 dark:hover:text-primary-base",
 									)}
 								>
 									<div className="flex items-center gap-2.5">
-										<Icon name="alert-triangle" className="h-3.5 w-3.5 text-amber-500" />
+										<Icon
+											name="alert-triangle"
+											className={cn(
+												"h-3.5 w-3.5 transition-colors",
+												folder === "needs_approval"
+													? "text-primary-base"
+													: "text-amber-500 opacity-90 group-hover:text-primary-base group-hover:opacity-100",
+											)}
+										/>
 										<span>Needs your okay</span>
 									</div>
 									{needsApprovalCount > 0 && (
@@ -441,12 +584,29 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 					{/* Bottom back to dashboard */}
 					<button
 						type="button"
+						ref={(el) => {
+							buttonRefs.current["exit"] = el;
+						}}
+						onPointerEnter={() =>
+							setHoveredEl(buttonRefs.current["exit"] ?? undefined)
+						}
+						onPointerLeave={() => setHoveredEl(undefined)}
 						onClick={() => router.push("/agent-inbox")}
-						className="flex w-full items-center gap-2 rounded-lg px-3 py-2 font-medium text-text-sub-600 text-xs transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:text-neutral-400 dark:hover:bg-neutral-800"
+						className="group relative z-10 flex w-full items-center gap-2 rounded-lg px-3 py-2 font-medium text-text-sub-600 transition-colors hover:text-primary-base text-xs dark:text-neutral-400 dark:hover:text-primary-base"
 					>
-						<Icon name="arrow-left" className="h-3.5 w-3.5" />
+						<Icon
+							name="arrow-left"
+							className="h-3.5 w-3.5 text-text-sub-600 opacity-70 transition-colors group-hover:text-primary-base group-hover:opacity-100"
+						/>
 						<span>Exit to dashboard</span>
 					</button>
+
+					{/* Shared animated hover/active background */}
+					<AnimatedHoverBackground
+						rect={rect}
+						tabElement={currentEl}
+						className="!bg-primary-base/10"
+					/>
 				</aside>
 
 				{/* Middle Column: Thread List Pane */}
