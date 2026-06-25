@@ -464,24 +464,21 @@ export const ThreadMessageItem = ({
 
 					{/* Draft held warning banner inside the card body */}
 					{isApproval && (
-						<div className="mx-6 mb-4 flex items-center gap-2.5 rounded-xl border border-amber-250 bg-amber-50/70 px-4 py-3 font-semibold text-amber-800 text-xs dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
+						<div className="mx-4 mb-4 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 font-medium text-amber-700 text-xs dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
 							<svg
-								className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-500"
+								className="h-3.5 w-3.5 shrink-0 text-amber-500"
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
-								strokeWidth="2.2"
+								strokeWidth="2"
 							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-								/>
+								<circle cx="12" cy="12" r="10" />
+								<polyline points="12 6 12 12 16 14" />
 							</svg>
 							<span>
-								Draft prepared by agent
-								<span className="mx-1.5 font-normal opacity-50">·</span>
-								held for your approval before sending
+								Agent flagged this at {dayjs(msg.messageAt).format("h:mm A")} for manual review
+								<span className="mx-1.5 opacity-50">·</span>
+								no reply sent yet
 							</span>
 						</div>
 					)}
