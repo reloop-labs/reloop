@@ -206,34 +206,12 @@ export const ThreadList = ({
 											<div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 transition-opacity duration-150 group-hover/card:opacity-100 pointer-events-none group-hover/card:pointer-events-auto">
 												<button
 													type="button"
-													title={thread.unread ? "Mark as Handled" : "Mark as Active"}
-													onClick={(e) => {
-														e.stopPropagation();
-														handleToggleRead(thread.id, thread.unread);
-													}}
-													className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-soft-400 shadow-sm transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-900 dark:hover:text-white"
-												>
-													<Icon name="check-circle" className="h-3.5 w-3.5" />
-												</button>
-												<button
-													type="button"
-													title="Mark as Spam"
-													onClick={(e) => {
-														e.stopPropagation();
-														handleMarkSpam(thread.id);
-													}}
-													className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-soft-400 shadow-sm transition-all hover:bg-bg-weak-50 hover:text-error-base dark:border-stroke-soft-100/30 dark:bg-neutral-900 dark:hover:text-red-400"
-												>
-													<Icon name="cross-circle" className="h-3.5 w-3.5" />
-												</button>
-												<button
-													type="button"
 													title="Delete Message"
 													onClick={(e) => {
 														e.stopPropagation();
 														handleDelete(thread.id);
 													}}
-													className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-soft-400 shadow-sm transition-all hover:bg-bg-weak-50 hover:text-error-base dark:border-stroke-soft-100/30 dark:bg-neutral-900 dark:hover:text-red-400"
+													className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-soft-400 transition-all hover:bg-bg-weak-50 hover:text-error-base dark:border-stroke-soft-100/30 dark:bg-neutral-900 dark:hover:text-red-400"
 												>
 													<Icon name="trash" className="h-3.5 w-3.5" />
 												</button>

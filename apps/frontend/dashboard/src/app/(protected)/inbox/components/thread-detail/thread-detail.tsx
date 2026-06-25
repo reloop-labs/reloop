@@ -500,9 +500,9 @@ export const ThreadDetail = ({
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			{/* Scrollable message area */}
-			<div className="min-h-0 flex-1 overflow-y-auto bg-neutral-50/50 dark:bg-neutral-950/20">
+			<div className="min-h-0 flex-1 overflow-y-auto bg-neutral-50/30 dark:bg-neutral-950/20">
 				{/* Subject header */}
-				<div className="flex items-start justify-between border-stroke-soft-100/60 border-b bg-white px-6 py-5 dark:border-stroke-soft-100/20 dark:bg-neutral-900">
+				<div className="flex items-start justify-between px-6 py-5">
 					<div className="flex flex-col gap-1.5">
 						<h1 className="font-bold text-xl text-text-strong-950 dark:text-white">
 							{thread.subject}
@@ -536,7 +536,7 @@ export const ThreadDetail = ({
 					<button
 						type="button"
 						onClick={handleDelete}
-						className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 shadow-sm transition-all hover:bg-bg-weak-50 hover:text-error-base dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-450"
+						className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-error-base dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-450"
 						title="Delete thread"
 					>
 						<Icon name="trash" className="h-4 w-4" />
@@ -577,7 +577,7 @@ export const ThreadDetail = ({
 				)}
 
 				{/* Message list cards container */}
-				<div className="flex flex-col gap-3 p-6">
+				<div className="flex flex-col gap-2 px-4 pb-4 pt-2">
 					{displayMessages.map((msg, index) => (
 						<ThreadMessageItem
 							key={msg.id}
