@@ -1967,6 +1967,24 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
+			<symbol id="forward" viewBox="0 0 24 24" fill="none">
+				<path
+					d="M15 17L20 12L15 7M4 18V16C4 13.7909 5.79086 12 8 12H20"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol id="reply" viewBox="0 0 24 24" fill="none">
+				<path
+					d="M9 17L4 12L9 7M20 18V16C20 13.7909 18.2091 12 16 12H4"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol id="bell-minus" viewBox="0 0 24 24" fill="none">
 				<path
 					opacity="0.12"

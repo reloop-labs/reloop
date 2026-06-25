@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -182,6 +183,39 @@ export const ThreadDetail = ({
 		const pending = optimisticReplies.filter((r) => !apiIds.has(r.id));
 		return [...base, ...pending];
 	}, [threadData, thread, mailbox, optimisticReplies]);
+
+	const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
+
+	// Update expandedIds when displayMessages changes
+	useEffect(() => {
+		if (displayMessages.length === 0) return;
+		const initial: Record<string, boolean> = {};
+		for (let i = 0; i < displayMessages.length; i++) {
+			const msg = displayMessages[i];
+			const isLast = i === displayMessages.length - 1;
+			const isApproval = msg.status === "needs_approval" || msg.parsed?.suggestedReply;
+			const isOutbound = msg.direction === "outbound";
+			if (displayMessages.length === 1 || isLast || isApproval || isOutbound) {
+				initial[msg.id] = true;
+			} else {
+				initial[msg.id] = false;
+			}
+		}
+		setExpandedIds(initial);
+	}, [displayMessages]);
+
+	// Participant names computation
+	const threadParticipants = useMemo(() => {
+		if (!thread) return "";
+		const primarySender = thread.from.name || thread.from.email.split("@")[0];
+		const hasOutbound = displayMessages.some(
+			(msg) => msg.direction === "outbound" || msg.status === "needs_approval",
+		);
+		if (hasOutbound) {
+			return `${primarySender} & You`;
+		}
+		return primarySender;
+	}, [thread, displayMessages]);
 
 	// ── Action handlers ───────────────────────────────────────────────────────
 
@@ -466,41 +500,52 @@ export const ThreadDetail = ({
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			{/* Scrollable message area */}
-			<div className="min-h-0 flex-1 overflow-y-auto">
+			<div className="min-h-0 flex-1 overflow-y-auto bg-neutral-50/50 dark:bg-neutral-950/20">
 				{/* Subject header */}
-				<div className="border-stroke-soft-100/60 border-b px-6 py-5 dark:border-stroke-soft-100/20">
-					<h1 className="font-semibold text-lg text-text-strong-950 dark:text-white">
-						{thread.subject}
-					</h1>
-				</div>
-
-				{/* High-fidelity Provenance strip */}
-				{thread.status === "needs_approval" && (
-					<div className="mx-6 mt-4 flex items-center gap-2.5 rounded-xl border border-amber-250 bg-amber-50/70 px-4 py-3 font-semibold text-amber-800 text-xs dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
-						<svg
-							className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-500"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							strokeWidth="2.2"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-							/>
-						</svg>
-						<span>
-							Draft prepared by agent
-							<span className="mx-1.5 font-normal opacity-50">·</span>
-							held for your approval before sending
-						</span>
+				<div className="flex items-start justify-between border-stroke-soft-100/60 border-b bg-white px-6 py-5 dark:border-stroke-soft-100/20 dark:bg-neutral-900">
+					<div className="flex flex-col gap-1.5">
+						<h1 className="font-bold text-xl text-text-strong-950 dark:text-white">
+							{thread.subject}
+						</h1>
+						<div className="flex items-center gap-2 font-medium text-text-soft-400 text-xs">
+							<span>
+								{displayMessages.length === 1 ? "1 message" : `${displayMessages.length} messages`}
+							</span>
+							<span className="opacity-50">·</span>
+							<span>{threadParticipants}</span>
+							<span className="opacity-50">·</span>
+							<div className="flex items-center gap-1">
+								{displayMessages.map((msg, i) => {
+									const isOutbound = msg.direction === "outbound";
+									const isApproval = msg.status === "needs_approval" || (i === displayMessages.length - 1 && thread.status === "needs_approval");
+									const colorClass = isApproval
+										? "bg-amber-500"
+										: isOutbound
+											? "bg-emerald-500"
+											: "bg-blue-500";
+									return (
+										<span
+											key={msg.id}
+											className={cn("h-1.5 w-1.5 rounded-full", colorClass)}
+										/>
+									);
+								})}
+							</div>
+						</div>
 					</div>
-				)}
+					<button
+						type="button"
+						onClick={handleDelete}
+						className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 shadow-sm transition-all hover:bg-bg-weak-50 hover:text-error-base dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-450"
+						title="Delete thread"
+					>
+						<Icon name="trash" className="h-4 w-4" />
+					</button>
+				</div>
 
 				{/* Translation banner */}
 				{isTranslated && (
-					<div className="mx-5 my-4 flex items-center justify-between gap-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50 p-3 font-medium text-label-sm dark:border-stroke-soft-100/30 dark:bg-neutral-800/40">
+					<div className="mx-6 my-4 flex items-center justify-between gap-3 rounded-xl border border-stroke-soft-100 bg-white p-3 font-medium text-label-sm dark:border-stroke-soft-100/30 dark:bg-neutral-850">
 						<div className="flex items-center gap-2 text-text-sub-600 dark:text-neutral-400">
 							<Icon name="translate" className="h-4 w-4 text-primary-base" />
 							<span>Translated to</span>
@@ -531,8 +576,8 @@ export const ThreadDetail = ({
 					</div>
 				)}
 
-				{/* Message list */}
-				<div className="flex flex-col">
+				{/* Message list cards container */}
+				<div className="flex flex-col gap-3 p-6">
 					{displayMessages.map((msg, index) => (
 						<ThreadMessageItem
 							key={msg.id}
@@ -546,8 +591,12 @@ export const ThreadDetail = ({
 							translatedTextMap={translatedTextMap}
 							parsedExpanded={parsedExpanded}
 							onToggleParsed={() => setParsedExpanded((v) => !v)}
-							onReply={() => setShowReplyComposer(true)}
-							onForward={handleForward}
+							onReply={() => {
+								setShowForwardComposer(false);
+								setReplyBody("");
+								setShowReplyComposer(true);
+							}}
+							onForward={() => handleForward()}
 							onDelete={handleDelete}
 							onToggleRead={handleToggleRead}
 							onMarkSpam={handleMarkSpam}
@@ -556,6 +605,18 @@ export const ThreadDetail = ({
 							onDownload={handleDownload}
 							onShowOriginal={() => setRawHeadersExpanded(true)}
 							onPrototypeAction={handlePrototypeAction}
+							isExpanded={!!expandedIds[msg.id]}
+							onToggleExpand={() =>
+								setExpandedIds((prev) => ({ ...prev, [msg.id]: !prev[msg.id] }))
+							}
+							onApproveSend={() =>
+								handleSendReply(msg.parsed?.suggestedReply || "")
+							}
+							onEditReply={() => {
+								setReplyBody(msg.parsed?.suggestedReply || "");
+								setShowForwardComposer(false);
+								setShowReplyComposer(true);
+							}}
 						/>
 					))}
 				</div>
@@ -595,80 +656,9 @@ export const ThreadDetail = ({
 					isSending={isForwarding}
 				/>
 			) : (
-				<div className="flex shrink-0 border-stroke-soft-100 border-t bg-bg-white-0 px-6 py-4 dark:border-stroke-soft-100/30 dark:bg-neutral-900">
-					{thread.status === "needs_approval" ? (
-						<div className="flex items-center gap-3">
-							{/* Approve & send */}
-							<button
-								type="button"
-								onClick={() => {
-									const suggested =
-										(thread.parsed?.suggestedReply as string) || "";
-									handleSendReply(suggested || undefined);
-								}}
-								className="flex items-center gap-2 rounded-xl bg-text-strong-950 px-4 py-2.5 font-semibold text-white text-xs shadow-sm transition-all hover:opacity-85 dark:bg-white dark:text-neutral-900"
-							>
-								<svg
-									className="h-3.5 w-3.5"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2.2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
-								</svg>
-								<span>Approve &amp; send</span>
-							</button>
-
-							{/* Edit reply */}
-							<button
-								type="button"
-								onClick={() => {
-									const suggested =
-										(thread.parsed?.suggestedReply as string) || "";
-									setReplyBody(suggested);
-									setShowForwardComposer(false);
-									setShowReplyComposer(true);
-								}}
-								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
-							>
-								<svg
-									className="h-3.5 w-3.5"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="1.5"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<path d="M3 10h10a4 4 0 014 4v4M3 10l6-6M3 10l6 6" />
-								</svg>
-								<span>Edit reply</span>
-							</button>
-
-							{/* Forward */}
-							<button
-								type="button"
-								onClick={() => handleForward()}
-								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
-							>
-								<svg
-									className="h-3.5 w-3.5"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="1.5"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<path d="M17 1l4 4-4 4M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 01-4 4H3" />
-								</svg>
-								<span>Forward</span>
-							</button>
-						</div>
-					) : (
+				// Show bottom composer bar only when there's no pending approval draft (actions are inline on the card)
+				thread.status !== "needs_approval" && (
+					<div className="flex shrink-0 border-stroke-soft-100 border-t bg-white px-6 py-4 dark:border-stroke-soft-100/30 dark:bg-neutral-900">
 						<div className="flex items-center gap-3">
 							{/* Reply */}
 							<button
@@ -679,18 +669,7 @@ export const ThreadDetail = ({
 								}}
 								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
 							>
-								<svg
-									className="h-3.5 w-3.5"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="1.5"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<polyline points="9 17 4 12 9 7" />
-									<path d="M20 18v-2a4 4 0 0 0-4-4H4" />
-								</svg>
+								<Icon name="reply" className="h-3.5 w-3.5" />
 								<span>Reply</span>
 							</button>
 							{/* Forward */}
@@ -699,23 +678,12 @@ export const ThreadDetail = ({
 								onClick={() => handleForward()}
 								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
 							>
-								<svg
-									className="h-3.5 w-3.5"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="1.5"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<polyline points="15 17 20 12 15 7" />
-									<path d="M4 18v-2a4 4 0 0 1 4-4h12" />
-								</svg>
+								<Icon name="forward" className="h-3.5 w-3.5" />
 								<span>Forward</span>
 							</button>
 						</div>
-					)}
-				</div>
+					</div>
+				)
 			)}
 
 			{/* Raw headers modal */}
