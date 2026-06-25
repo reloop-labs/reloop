@@ -161,10 +161,10 @@ export const ThreadList = ({
 								key={thread.id}
 								onClick={() => onSelect(thread.id)}
 								className={cn(
-									"group/card relative flex cursor-pointer flex-col gap-1 py-3.5 pr-4 pl-7 text-left transition-all duration-200",
+									"group/card relative flex cursor-pointer flex-col gap-1 py-3.5 pr-4 pl-7 text-left transition-all duration-200 border-l-[3px]",
 									isSelected
-										? "bg-[#FCF5EE] dark:bg-amber-950/20"
-										: "bg-bg-white-0 hover:bg-[#FCF5EE]/40 dark:bg-transparent dark:hover:bg-white/[0.01]",
+										? "bg-[#FCF5EE] border-primary-base dark:bg-amber-950/20"
+										: "bg-bg-white-0 border-transparent hover:bg-[#FCF5EE]/40 dark:bg-transparent dark:hover:bg-white/[0.01]",
 								)}
 							>
 								{/* Actor status vertical pill - centered, rounded */}
