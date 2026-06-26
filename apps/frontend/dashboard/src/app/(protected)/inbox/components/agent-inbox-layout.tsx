@@ -21,15 +21,25 @@ import { ComposeModal } from "./compose-modal";
 import { ThreadDetail } from "./thread-detail";
 import { ThreadList } from "./thread-list";
 
-export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
+export const AgentInboxLayout = ({
+	mailbox,
+	folder,
+}: {
+	mailbox: AgentMailbox;
+	folder: string;
+}) => {
 	const router = useRouter();
 	const mailboxId = mailbox.id;
 	const [isComposeOpen, setIsComposeOpen] = useState(false);
 
-	const [folder, setFolder] = useQueryState(
-		"folder",
-		parseAsString.withDefault("inbox"),
-	);
+	const handleFolderChange = (targetFolder: string) => {
+		if (targetFolder === "inbox") {
+			router.push(`/inbox/${mailboxId}`);
+		} else {
+			router.push(`/inbox/${mailboxId}/${targetFolder}`);
+		}
+	};
+
 	const [searchQuery, setSearchQuery] = useQueryState(
 		"q",
 		parseAsString.withDefault(""),
@@ -295,7 +305,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 									setHoveredEl(buttonRefs.current["inbox"] ?? undefined)
 								}
 								onPointerLeave={() => setHoveredEl(undefined)}
-								onClick={() => setFolder("inbox")}
+								onClick={() => handleFolderChange("inbox")}
 								className={cn(
 									"group relative z-10 flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
 									folder === "inbox"
@@ -331,7 +341,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 									setHoveredEl(buttonRefs.current["sent"] ?? undefined)
 								}
 								onPointerLeave={() => setHoveredEl(undefined)}
-								onClick={() => setFolder("sent")}
+								onClick={() => handleFolderChange("sent")}
 								className={cn(
 									"group relative z-10 flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
 									folder === "sent"
@@ -367,7 +377,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 									setHoveredEl(buttonRefs.current["drafts"] ?? undefined)
 								}
 								onPointerLeave={() => setHoveredEl(undefined)}
-								onClick={() => setFolder("drafts")}
+								onClick={() => handleFolderChange("drafts")}
 								className={cn(
 									"group relative z-10 flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
 									folder === "drafts"
@@ -403,7 +413,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 									setHoveredEl(buttonRefs.current["spam"] ?? undefined)
 								}
 								onPointerLeave={() => setHoveredEl(undefined)}
-								onClick={() => setFolder("spam")}
+								onClick={() => handleFolderChange("spam")}
 								className={cn(
 									"group relative z-10 flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
 									folder === "spam"
@@ -439,7 +449,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 									setHoveredEl(buttonRefs.current["trash"] ?? undefined)
 								}
 								onPointerLeave={() => setHoveredEl(undefined)}
-								onClick={() => setFolder("trash")}
+								onClick={() => handleFolderChange("trash")}
 								className={cn(
 									"group relative z-10 flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
 									folder === "trash"
@@ -477,7 +487,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 										setHoveredEl(buttonRefs.current["agent"] ?? undefined)
 									}
 									onPointerLeave={() => setHoveredEl(undefined)}
-									onClick={() => setFolder("agent")}
+									onClick={() => handleFolderChange("agent")}
 									className={cn(
 										"group relative z-10 flex items-center justify-between rounded-lg px-3 py-1.5 font-medium text-xs transition-colors",
 										folder === "agent"
@@ -513,7 +523,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 										setHoveredEl(buttonRefs.current["you"] ?? undefined)
 									}
 									onPointerLeave={() => setHoveredEl(undefined)}
-									onClick={() => setFolder("you")}
+									onClick={() => handleFolderChange("you")}
 									className={cn(
 										"group relative z-10 flex items-center justify-between rounded-lg px-3 py-1.5 font-medium text-xs transition-colors",
 										folder === "you"
@@ -551,7 +561,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 										)
 									}
 									onPointerLeave={() => setHoveredEl(undefined)}
-									onClick={() => setFolder("needs_approval")}
+									onClick={() => handleFolderChange("needs_approval")}
 									className={cn(
 										"group relative z-10 flex items-center justify-between rounded-lg px-3 py-1.5 font-medium text-xs transition-colors",
 										folder === "needs_approval"

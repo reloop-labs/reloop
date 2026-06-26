@@ -6,7 +6,7 @@ import { useAgentInbox } from "../components/agent-inbox-provider";
 import { AgentInboxSkeleton } from "../components/agent-inbox-skeleton";
 import { AgentMailboxNotFound } from "../components/agent-mailbox-not-found";
 
-export default function AgentInboxMailboxPage() {
+export function AgentInboxMailboxPageContainer({ folder }: { folder: string }) {
 	const params = useParams<{ mailboxId: string }>();
 	const mailboxId = params.mailboxId;
 	const { getMailbox, isLoadingMailboxes } = useAgentInbox();
@@ -20,5 +20,9 @@ export default function AgentInboxMailboxPage() {
 		return <AgentMailboxNotFound />;
 	}
 
-	return <AgentInboxLayout mailbox={mailbox} />;
+	return <AgentInboxLayout mailbox={mailbox} folder={folder} />;
+}
+
+export default function AgentInboxMailboxPage() {
+	return <AgentInboxMailboxPageContainer folder="inbox" />;
 }
