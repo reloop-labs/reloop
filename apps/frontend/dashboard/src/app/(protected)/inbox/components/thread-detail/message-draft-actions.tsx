@@ -18,7 +18,7 @@ export const MessageDraftActions = ({
 	onForward,
 }: MessageDraftActionsProps) => {
 	return (
-		<div className="mx-5 mb-5 flex items-center gap-2.5 border-stroke-inbox/60 border-t pt-4 dark:border-stroke-soft-100/10">
+		<div className="w-full mb-1 flex items-center gap-2.5 border-stroke-inbox/60 border-t pt-4 dark:border-stroke-soft-100/10">
 			{/* Primary: Approve & send */}
 			<button
 				type="button"

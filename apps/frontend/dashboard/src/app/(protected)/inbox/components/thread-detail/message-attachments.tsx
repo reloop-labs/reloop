@@ -17,7 +17,7 @@ export const MessageAttachments = ({
 	if (attachments.length === 0) return null;
 
 	return (
-		<div className="border-stroke-inbox border-t px-5 py-4 dark:border-stroke-soft-100/10">
+		<div className="border-stroke-inbox border-t py-4 dark:border-stroke-soft-100/10">
 			<h3 className="mb-3 font-medium text-text-sub-600 text-xs">
 				Attachments
 			</h3>

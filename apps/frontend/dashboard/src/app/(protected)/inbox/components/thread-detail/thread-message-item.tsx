@@ -8,6 +8,7 @@ import { MessageDraftBanner } from "./message-draft-banner";
 import { MessageHeaderCollapsed } from "./message-header-collapsed";
 import { MessageHeaderExpanded } from "./message-header-expanded";
 import { MessageParsedData } from "./message-parsed-data";
+import { MessageSentBanner } from "./message-sent-banner";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -132,7 +133,7 @@ export const ThreadMessageItem = ({
 		<div className="relative overflow-hidden rounded-xl border border-stroke-inbox bg-white shadow-sm dark:border-stroke-soft-100/10 dark:bg-neutral-900">
 			{/* Coloured left accent bar */}
 			<div
-				className="absolute top-0 bottom-0 left-0 w-[4px]"
+				className="absolute top-3.5 bottom-3.5 left-3 w-1 rounded-full"
 				style={{ backgroundColor: accentColor }}
 			/>
 
@@ -170,40 +171,46 @@ export const ThreadMessageItem = ({
 						onShowOriginal={onShowOriginal}
 					/>
 
-					{/* Draft held banner */}
-					{isApproval && <MessageDraftBanner messageAt={msg.messageAt} />}
+					{/* Indented Content Column */}
+					<div className="pl-16 pr-5 pb-4 flex flex-col gap-4">
+						{/* Draft held banner */}
+						{isApproval && <MessageDraftBanner messageAt={msg.messageAt} />}
 
-					{/* Body */}
-					<div className="px-5 pb-4">
+						{/* Body */}
 						<MessageBody
 							bodyHtml={bodyHtml}
 							bodyText={bodyText}
 							isTranslated={isTranslated}
 							targetLanguage={targetLanguage}
 						/>
-					</div>
 
-					{/* Approval action buttons */}
-					{isApproval && (onApproveSend || onEditReply) && (
-						<MessageDraftActions
-							onApproveSend={onApproveSend ?? (() => {})}
-							onEditReply={onEditReply ?? (() => {})}
-							onForward={onForward}
+						{/* Sent status banner */}
+						{isOutbound && !isApproval && (
+							<MessageSentBanner messageAt={msg.messageAt} isAgent={isAgent} />
+						)}
+
+						{/* Approval action buttons */}
+						{isApproval && (onApproveSend || onEditReply) && (
+							<MessageDraftActions
+								onApproveSend={onApproveSend ?? (() => {})}
+								onEditReply={onEditReply ?? (() => {})}
+								onForward={onForward}
+							/>
+						)}
+
+						{/* Attachments */}
+						<MessageAttachments
+							attachments={displayAttachments}
+							onDownload={(name) => onPrototypeAction(`Download ${name}`)}
 						/>
-					)}
 
-					{/* Attachments */}
-					<MessageAttachments
-						attachments={displayAttachments}
-						onDownload={(name) => onPrototypeAction(`Download ${name}`)}
-					/>
-
-					{/* Parsed metadata */}
-					<MessageParsedData
-						parsed={msg.parsed ?? {}}
-						isExpanded={parsedExpanded}
-						onToggle={onToggleParsed}
-					/>
+						{/* Parsed metadata */}
+						<MessageParsedData
+							parsed={msg.parsed ?? {}}
+							isExpanded={parsedExpanded}
+							onToggle={onToggleParsed}
+						/>
+					</div>
 				</div>
 			)}
 		</div>

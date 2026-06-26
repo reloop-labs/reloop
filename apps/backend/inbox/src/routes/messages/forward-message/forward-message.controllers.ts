@@ -42,7 +42,6 @@ export async function forwardMessageController(
 		? original.subject
 		: `Fwd: ${original.subject || ""}`;
 
-	// Construct forwarded body with original context
 	const forwardHeader = [
 		"---------- Forwarded message ----------",
 		`From: ${original.fromName ? `${original.fromName} <${original.fromEmail}>` : original.fromEmail}`,
@@ -57,14 +56,25 @@ export async function forwardMessageController(
 		.filter(Boolean)
 		.join("\n");
 
+	const forwardHeaderHtml = `
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; color: #4b5563; line-height: 1.5; padding: 16px 0; border-bottom: 1px solid #e5e7eb; margin-bottom: 16px; background-color: transparent;">
+	<div style="font-weight: 600; color: #111827; margin-bottom: 8px;">---------- Forwarded message ----------</div>
+	<div><strong>From:</strong> ${original.fromName ? `${original.fromName} &lt;${original.fromEmail || ""}&gt;` : original.fromEmail || ""}</div>
+	<div><strong>Date:</strong> ${original.date?.toISOString() || original.createdAt?.toISOString() || "Unknown"}</div>
+	<div><strong>Subject:</strong> ${original.subject || "(No Subject)"}</div>
+	<div><strong>To:</strong> ${original.toEmails?.join(", ") || ""}</div>
+	${original.ccEmails ? `<div><strong>Cc:</strong> ${(original.ccEmails as string[]).join(", ")}</div>` : ""}
+</div>
+`.trim();
+
 	const forwardedText = body.text
 		? `${body.text}\n\n${forwardHeader}\n${original.textBody || ""}`
 		: `${forwardHeader}\n${original.textBody || ""}`;
 
 	const forwardedHtml = body.html
-		? `${body.html}<br><br><hr>${forwardHeader.replace(/\n/g, "<br>")}<br>${original.htmlBody || original.textBody || ""}`
+		? `${body.html}<br><br>${forwardHeaderHtml}<br>${original.htmlBody || original.textBody || ""}`
 		: original.htmlBody
-			? `<hr>${forwardHeader.replace(/\n/g, "<br>")}<br>${original.htmlBody}`
+			? `${forwardHeaderHtml}<br>${original.htmlBody}`
 			: undefined;
 
 	log.info(

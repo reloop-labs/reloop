@@ -16,7 +16,7 @@ export const MessageDraftBanner = ({ messageAt }: MessageDraftBannerProps) => {
 		: dayjs(messageAt).format("MMM D, h:mm A");
 
 	return (
-		<div className="mx-4 mb-3 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 font-medium text-amber-700 text-xs dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
+		<div className="w-full mb-1 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 font-medium text-amber-700 text-xs dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
 			{/* Clock icon */}
 			<svg
 				className="h-3.5 w-3.5 shrink-0 text-amber-500"

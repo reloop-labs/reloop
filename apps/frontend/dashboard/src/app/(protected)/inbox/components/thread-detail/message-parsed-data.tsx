@@ -20,7 +20,7 @@ export const MessageParsedData = ({
 	if (!parsed || Object.keys(parsed).length === 0) return null;
 
 	return (
-		<div className="border-stroke-soft-100 border-t px-5 py-4 dark:border-stroke-soft-100/10">
+		<div className="border-stroke-soft-100 border-t py-4 dark:border-stroke-soft-100/10">
 			<button
 				type="button"
 				onClick={onToggle}

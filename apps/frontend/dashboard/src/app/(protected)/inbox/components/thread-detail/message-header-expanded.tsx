@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import type { AgentMailbox } from "../../types";
 import { MessageAvatar } from "./message-avatar";
 import { getBadgeVariant, MessageBadge } from "./message-badge";
+import { formatMessageTimestamp } from "./date-utils";
 
 interface MessageHeaderExpandedProps {
 	msg: any;
@@ -147,116 +148,14 @@ export const MessageHeaderExpanded = ({
 				</div>
 			</div>
 
-			{/* Right: Date · More menu · Collapse chevron */}
+			{/* Right: Date · Collapse chevron */}
 			<div
 				className="flex shrink-0 items-center gap-1.5"
 				onClick={(e) => e.stopPropagation()}
 			>
 				<span className="text-text-soft-400 text-xs">
-					{dayjs(msg.messageAt).format("ddd, h:mm A")}
+					{formatMessageTimestamp(msg.messageAt)}
 				</span>
-
-				<Dropdown.Root>
-					<Dropdown.Trigger asChild>
-						<button
-							type="button"
-							className="rounded-lg p-1.5 text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/10"
-							title="More actions"
-						>
-							{/* Vertical ellipsis */}
-							<svg
-								className="h-4 w-4"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="1.5"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							>
-								<circle cx="12" cy="5" r="1" />
-								<circle cx="12" cy="12" r="1" />
-								<circle cx="12" cy="19" r="1" />
-							</svg>
-						</button>
-					</Dropdown.Trigger>
-					<Dropdown.Content
-						align="end"
-						className="w-52 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-1.5 shadow-lg dark:border-stroke-soft-100/30 dark:bg-neutral-900"
-					>
-						<Dropdown.Item
-							onClick={onReply}
-							className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 text-xs transition-colors hover:bg-bg-weak-50 dark:text-white dark:hover:bg-zinc-800"
-						>
-							<Icon name="reply" className="h-3.5 w-3.5" />
-							<span>Reply</span>
-						</Dropdown.Item>
-						<Dropdown.Item
-							onClick={onForward}
-							className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 text-xs transition-colors hover:bg-bg-weak-50 dark:text-white dark:hover:bg-zinc-800"
-						>
-							<Icon name="forward" className="h-3.5 w-3.5" />
-							<span>Forward</span>
-						</Dropdown.Item>
-
-						<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
-
-						<Dropdown.Item
-							onClick={onDelete}
-							className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-error-base text-xs transition-colors hover:bg-red-50/50 dark:hover:bg-red-950/20"
-						>
-							<Icon name="trash" className="h-3.5 w-3.5" />
-							<span>Delete</span>
-						</Dropdown.Item>
-						<Dropdown.Item
-							onClick={() => onToggleRead(false)}
-							className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 text-xs transition-colors hover:bg-bg-weak-50 dark:text-white dark:hover:bg-zinc-800"
-						>
-							<Icon name="mail-send" className="h-3.5 w-3.5" />
-							<span>Mark as unread</span>
-						</Dropdown.Item>
-
-						<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
-
-						<Dropdown.Item
-							onClick={() => onMarkSpam(true)}
-							className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 text-xs transition-colors hover:bg-bg-weak-50 dark:text-white dark:hover:bg-zinc-800"
-						>
-							<Icon name="cross-circle" className="h-3.5 w-3.5" />
-							<span>Report spam</span>
-						</Dropdown.Item>
-
-						<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
-
-						<Dropdown.Item
-							onClick={onTranslate}
-							className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 text-xs transition-colors hover:bg-bg-weak-50 dark:text-white dark:hover:bg-zinc-800"
-						>
-							<Icon name="translate" className="h-3.5 w-3.5" />
-							<span>Translate message</span>
-						</Dropdown.Item>
-						<Dropdown.Item
-							onClick={onPrint}
-							className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 text-xs transition-colors hover:bg-bg-weak-50 dark:text-white dark:hover:bg-zinc-800"
-						>
-							<Icon name="printer" className="h-3.5 w-3.5" />
-							<span>Print</span>
-						</Dropdown.Item>
-						<Dropdown.Item
-							onClick={onDownload}
-							className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 text-xs transition-colors hover:bg-bg-weak-50 dark:text-white dark:hover:bg-zinc-800"
-						>
-							<Icon name="file-download" className="h-3.5 w-3.5" />
-							<span>Download message</span>
-						</Dropdown.Item>
-						<Dropdown.Item
-							onClick={onShowOriginal}
-							className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-text-strong-950 text-xs transition-colors hover:bg-bg-weak-50 dark:text-white dark:hover:bg-zinc-800"
-						>
-							<Icon name="code" className="h-3.5 w-3.5" />
-							<span>Show original</span>
-						</Dropdown.Item>
-					</Dropdown.Content>
-				</Dropdown.Root>
 
 				<button
 					type="button"

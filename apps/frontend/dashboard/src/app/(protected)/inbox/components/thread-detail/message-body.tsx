@@ -72,7 +72,7 @@ export const MessageBody = ({
 
 	if (bodyHtml) {
 		return (
-			<div className="overflow-hidden rounded-xl border border-stroke-soft-100/50">
+			<div className="overflow-hidden rounded-xl">
 				<iframe
 					ref={iframeRef}
 					onLoad={handleIframeLoad}
@@ -89,7 +89,7 @@ body {
   line-height: 1.5;
   color: #1c1917;
   margin: 0;
-  padding: 16px;
+  padding: 0;
   background-color: #ffffff;
 }
 img { max-width: 100%; height: auto; }
