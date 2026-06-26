@@ -1,14 +1,16 @@
 "use client";
 
+import { useAgentInbox } from "@fe/dashboard/app/(protected)/inbox/components/agent-inbox-provider";
+import { ThreadDetail } from "@fe/dashboard/app/(protected)/inbox/components/thread-detail";
+import { ThreadList } from "@fe/dashboard/app/(protected)/inbox/components/thread-list";
+import type {
+	AgentMailbox,
+	InboundThread,
+} from "@fe/dashboard/app/(protected)/inbox/types";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { parseAsString, useQueryState } from "nuqs";
 import { useMemo } from "react";
-import { toast } from "sonner";
-import type { AgentMailbox, AgentThread } from "../types";
-import { useAgentInbox } from "./agent-inbox-provider";
-import { ThreadDetail } from "./thread-detail";
-import { ThreadList } from "./thread-list";
 
 export const AgentInboxContent = ({
 	mailbox,
@@ -17,7 +19,7 @@ export const AgentInboxContent = ({
 }: {
 	mailbox: AgentMailbox;
 	folder: string;
-	threads: AgentThread[];
+	threads: InboundThread[];
 }) => {
 	const { markMessageRead, markMessageSpam, deleteMessage } = useAgentInbox();
 

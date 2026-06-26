@@ -1,5 +1,8 @@
 "use client";
 
+import { useAgentInbox } from "@fe/dashboard/app/(protected)/inbox/components/agent-inbox-provider";
+import { ComposeModal } from "@fe/dashboard/app/(protected)/inbox/components/compose-modal";
+import type { AgentMailbox } from "@fe/dashboard/app/(protected)/inbox/types";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import {
 	getAvatarGradient,
@@ -12,9 +15,6 @@ import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { useRouter } from "next/navigation";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import type { AgentMailbox } from "../types";
-import { useAgentInbox } from "./agent-inbox-provider";
-import { ComposeModal } from "./compose-modal";
 
 export const AgentInboxLayoutWrapper = ({
 	mailbox,
@@ -138,7 +138,7 @@ export const AgentInboxLayoutWrapper = ({
 				</div>
 			</header>
 
-			{/* Main Grid: Sidebar + dynamic children content */}
+			{/* Main Grid: Sidebar + children content */}
 			<div className="flex min-h-0 flex-1">
 				{/* Left Folder Rail */}
 				<aside className="relative flex w-60 shrink-0 flex-col justify-between border-stroke-inbox border-r bg-[#FAF8F4] p-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">

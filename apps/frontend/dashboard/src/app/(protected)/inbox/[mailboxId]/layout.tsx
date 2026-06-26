@@ -1,11 +1,11 @@
 "use client";
 
+import { AgentInboxLayoutWrapper } from "@fe/dashboard/app/(protected)/inbox/components/agent-inbox-layout-wrapper";
+import { useAgentInbox } from "@fe/dashboard/app/(protected)/inbox/components/agent-inbox-provider";
+import { AgentInboxSkeleton } from "@fe/dashboard/app/(protected)/inbox/components/agent-inbox-skeleton";
+import { AgentMailboxNotFound } from "@fe/dashboard/app/(protected)/inbox/components/agent-mailbox-not-found";
 import { useParams, usePathname } from "next/navigation";
 import { useMemo } from "react";
-import { AgentInboxLayoutWrapper } from "../components/agent-inbox-layout-wrapper";
-import { useAgentInbox } from "../components/agent-inbox-provider";
-import { AgentInboxSkeleton } from "../components/agent-inbox-skeleton";
-import { AgentMailboxNotFound } from "../components/agent-mailbox-not-found";
 
 export default function MailboxLayout({
 	children,
