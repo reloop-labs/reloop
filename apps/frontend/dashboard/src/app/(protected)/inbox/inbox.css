@@ -1,0 +1,11 @@
+@theme {
+	--color-stroke-inbox: var(--stroke-inbox);
+}
+
+:root {
+	--stroke-inbox: #e4dfd6;
+}
+
+.dark {
+	--stroke-inbox: var(--neutral-800);
+}

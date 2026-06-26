@@ -632,7 +632,10 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 							</p>
 						</div>
 
-						<Input.Root size="xsmall" className="rounded-xl shadow-none before:ring-stroke-inbox">
+						<Input.Root
+							size="xsmall"
+							className="rounded-xl shadow-none before:ring-stroke-inbox"
+						>
 							<Input.Wrapper>
 								<Input.Icon
 									as={Icon}
