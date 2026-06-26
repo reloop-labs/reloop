@@ -9,24 +9,21 @@ import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 import { Logo } from "@reloop/ui/logo";
 import { useRouter } from "next/navigation";
-import { parseAsString, useQueryState } from "nuqs";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
 import type { AgentMailbox } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
 import { ComposeModal } from "./compose-modal";
-import { ThreadDetail } from "./thread-detail";
-import { ThreadList } from "./thread-list";
 
-export const AgentInboxLayout = ({
+export const AgentInboxLayoutWrapper = ({
 	mailbox,
 	folder,
+	children,
 }: {
 	mailbox: AgentMailbox;
 	folder: string;
+	children: React.ReactNode;
 }) => {
 	const router = useRouter();
 	const mailboxId = mailbox.id;
@@ -40,37 +37,7 @@ export const AgentInboxLayout = ({
 		}
 	};
 
-	const [searchQuery, setSearchQuery] = useQueryState(
-		"q",
-		parseAsString.withDefault(""),
-	);
-	const [selectedThreadId, setSelectedThreadId] = useQueryState(
-		"thread",
-		parseAsString.withDefault(""),
-	);
-
-	// Hover & Active States
-	const [hoveredEl, setHoveredEl] = useState<HTMLButtonElement | undefined>(
-		undefined,
-	);
-	const [rect, setRect] = useState<DOMRect | undefined>(undefined);
-	const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
-
-	const activeEl = folder
-		? (buttonRefs.current[folder] ?? undefined)
-		: undefined;
-	const currentEl = hoveredEl ?? activeEl;
-
-	useLayoutEffect(() => {
-		if (currentEl) {
-			setRect(currentEl.getBoundingClientRect());
-		} else {
-			setRect(undefined);
-		}
-	}, [currentEl]);
-
-	const { threads, markMessageRead, markMessageSpam, deleteMessage } =
-		useAgentInbox();
+	const { threads } = useAgentInbox();
 
 	const mailboxThreads = useMemo(
 		() => threads.filter((t) => t.mailboxId === mailboxId),
@@ -124,138 +91,31 @@ export const AgentInboxLayout = ({
 		[mailboxThreads],
 	);
 
-	const filteredThreads = useMemo(() => {
-		let result = mailboxThreads;
-
-		// Apply folder / rail filters
-		if (folder === "inbox") {
-			result = result.filter(
-				(t) => t.direction === "inbound" && t.status !== "blocked",
-			);
-		} else if (folder === "sent") {
-			result = result.filter((t) => t.direction === "outbound");
-		} else if (folder === "drafts") {
-			result = result.filter(
-				(t) =>
-					t.direction === "inbound" &&
-					(t.status === "needs_approval" || t.status === "parsing"),
-			);
-		} else if (folder === "spam") {
-			result = result.filter(
-				(t) => t.direction === "inbound" && t.status === "blocked",
-			);
-		} else if (folder === "trash") {
-			result = [];
-		} else if (folder === "agent") {
-			result = result.filter(
-				(t) => t.direction === "inbound" && t.status === "handled",
-			);
-		} else if (folder === "you") {
-			result = result.filter((t) => t.direction === "outbound");
-		} else if (folder === "needs_approval") {
-			result = result.filter(
-				(t) => t.direction === "inbound" && t.status === "needs_approval",
-			);
-		}
-
-		// Apply search
-		if (searchQuery.trim()) {
-			const q = searchQuery.toLowerCase();
-			result = result.filter(
-				(t) =>
-					t.subject.toLowerCase().includes(q) ||
-					t.preview.toLowerCase().includes(q) ||
-					t.from.email.toLowerCase().includes(q) ||
-					t.from.name?.toLowerCase().includes(q),
-			);
-		}
-		return result;
-	}, [mailboxThreads, folder, searchQuery]);
-
-	const selectedThread = useMemo(
-		() =>
-			filteredThreads.find((t) => t.id === selectedThreadId) ??
-			mailboxThreads.find((t) => t.id === selectedThreadId) ??
-			null,
-		[filteredThreads, mailboxThreads, selectedThreadId],
+	// Hover & Active States
+	const [hoveredEl, setHoveredEl] = useState<HTMLButtonElement | undefined>(
+		undefined,
 	);
+	const [rect, setRect] = useState<DOMRect | undefined>(undefined);
+	const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
-	const threadsForNavigation = useMemo(() => {
-		return filteredThreads.length > 0 ? filteredThreads : mailboxThreads;
-	}, [filteredThreads, mailboxThreads]);
+	const activeEl = folder
+		? (buttonRefs.current[folder] ?? undefined)
+		: undefined;
+	const currentEl = hoveredEl ?? activeEl;
 
-	const { currentIndex, hasNavigation } = useMemo(() => {
-		if (!selectedThread) return { currentIndex: -1, hasNavigation: false };
-		const idx = threadsForNavigation.findIndex(
-			(t) => t.id === selectedThread.id,
-		);
-		return { currentIndex: idx, hasNavigation: idx !== -1 };
-	}, [selectedThread, threadsForNavigation]);
-
-	const handleNavigateAfterAction = (currentId: string) => {
-		const idx = threadsForNavigation.findIndex((t) => t.id === currentId);
-		if (idx !== -1 && threadsForNavigation.length > 1) {
-			if (idx < threadsForNavigation.length - 1) {
-				setSelectedThreadId(threadsForNavigation[idx + 1]?.id ?? "");
-			} else {
-				setSelectedThreadId(threadsForNavigation[idx - 1]?.id ?? "");
-			}
+	useLayoutEffect(() => {
+		if (currentEl) {
+			setRect(currentEl.getBoundingClientRect());
 		} else {
-			setSelectedThreadId("");
+			setRect(undefined);
 		}
-	};
-
-	const handleToggleRead = async (id: string, currentUnread: boolean) => {
-		try {
-			await markMessageRead(id, currentUnread);
-			toast.success(
-				currentUnread
-					? "Message marked as handled"
-					: "Message marked as active",
-			);
-		} catch (err: any) {
-			toast.error(err.message || "Failed to update status");
-		}
-	};
-
-	const handleMarkSpam = async (id: string) => {
-		try {
-			await markMessageSpam(id, true);
-			toast.success("Message marked as spam");
-			handleNavigateAfterAction(id);
-		} catch (err: any) {
-			toast.error(err.message || "Failed to update status");
-		}
-	};
-
-	const handleDelete = async (id: string) => {
-		if (!confirm("Are you sure you want to delete this message?")) return;
-		try {
-			await deleteMessage(id);
-			toast.success("Message deleted");
-			handleNavigateAfterAction(id);
-		} catch (err: any) {
-			toast.error(err.message || "Failed to delete message");
-		}
-	};
-
-	const handleSelectThread = (id: string) => {
-		setSelectedThreadId(id || null);
-	};
-
-	const emptyMessage =
-		mailboxThreads.length === 0
-			? "No inbound messages yet. Set up a webhook to receive email."
-			: folder === "spam"
-				? "No spam messages"
-				: "No messages in this folder";
+	}, [currentEl]);
 
 	return (
 		<div className="flex h-screen w-screen flex-col overflow-hidden bg-[#FAF8F4] font-sans text-text-strong-950 dark:bg-[#09090b] dark:text-neutral-50">
-			{/* Mockup Premium Topbar */}
+			{/* Topbar */}
 			<header className="flex h-14 shrink-0 items-center justify-between border-stroke-inbox border-b bg-[#FAF8F4] px-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">
 				<div className="flex items-center gap-3">
-					{/* Logo brand mark */}
 					<Logo className="h-11 w-11" />
 					<span className="-ml-3 font-semibold">Agent Inbox</span>
 					<div className="h-4 w-px bg-stroke-strong-200 dark:bg-neutral-800" />
@@ -278,7 +138,7 @@ export const AgentInboxLayout = ({
 				</div>
 			</header>
 
-			{/* Column Wrapper */}
+			{/* Main Grid: Sidebar + dynamic children content */}
 			<div className="flex min-h-0 flex-1">
 				{/* Left Folder Rail */}
 				<aside className="relative flex w-60 shrink-0 flex-col justify-between border-stroke-inbox border-r bg-[#FAF8F4] p-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">
@@ -619,100 +479,8 @@ export const AgentInboxLayout = ({
 					/>
 				</aside>
 
-				{/* Middle Column: Thread List Pane */}
-				<section className="flex min-h-0 w-[360px] shrink-0 flex-col border-stroke-inbox border-r bg-[#FAF8F4] dark:border-stroke-soft-100/40 dark:bg-neutral-950">
-					{/* Search & Meta */}
-					<div className="flex flex-col gap-3 border-stroke-inbox/50 border-b p-4 dark:border-stroke-soft-100/10">
-						<div className="flex flex-col gap-1">
-							<h2 className="font-semibold text-base text-text-strong-950 dark:text-white">
-								{folder === "needs_approval"
-									? "Needs your okay"
-									: folder === "agent"
-										? "Handled by agent"
-										: folder === "you"
-											? "Sent by you"
-											: folder.charAt(0).toUpperCase() +
-												folder.slice(1).replace("_", " ")}
-							</h2>
-							<p className="font-medium text-[11px] text-text-soft-400">
-								{filteredThreads.length}{" "}
-								{filteredThreads.length === 1 ? "message" : "messages"}
-								{needsApprovalCount > 0 &&
-									` · ${needsApprovalCount} waiting on you`}
-							</p>
-						</div>
-
-						<Input.Root
-							size="xsmall"
-							className="rounded-xl shadow-none before:ring-stroke-inbox"
-						>
-							<Input.Wrapper>
-								<Input.Icon
-									as={Icon}
-									name="search"
-									size="xsmall"
-									className="text-text-soft-400"
-								/>
-								<Input.Input
-									placeholder="Search mail"
-									value={searchQuery}
-									onChange={(e) => setSearchQuery(e.target.value)}
-									className="text-xs"
-								/>
-								{searchQuery && (
-									<button
-										type="button"
-										onClick={() => setSearchQuery("")}
-										className="mr-1 rounded p-0.5 text-text-soft-400 transition-colors hover:bg-neutral-alpha-10 hover:text-text-strong-950"
-									>
-										<Icon name="cross" className="h-3 w-3" />
-									</button>
-								)}
-							</Input.Wrapper>
-						</Input.Root>
-					</div>
-
-					{/* List scroll */}
-					<div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
-						<ThreadList
-							threads={filteredThreads}
-							selectedId={selectedThreadId}
-							onSelect={handleSelectThread}
-							emptyMessage={emptyMessage}
-							hasFilters={searchQuery !== ""}
-							onClearFilters={() => {
-								setSearchQuery("");
-							}}
-						/>
-					</div>
-				</section>
-
-				{/* Right Column: Reading Pane */}
-				<main className="flex min-w-0 flex-1 flex-col bg-[#FAF8F4] dark:bg-neutral-950">
-					{selectedThread ? (
-						<div className="flex min-h-0 flex-1 flex-col">
-							<div className="min-h-0 flex-1">
-								<ThreadDetail thread={selectedThread} mailbox={mailbox} />
-							</div>
-						</div>
-					) : (
-						<div className="flex min-h-0 flex-1 flex-col items-center justify-center bg-[#FAF8F4]/20 p-8 text-center dark:bg-transparent">
-							<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-stroke-inbox bg-bg-white-0 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-								<Icon
-									name="inbox"
-									className="h-5 w-5 text-text-sub-600 dark:text-neutral-400"
-								/>
-							</div>
-							<h3 className="font-semibold text-base text-text-strong-950 dark:text-white">
-								Select a thread to read
-							</h3>
-							<p className="mx-auto mt-1 max-w-sm text-text-sub-600 text-xs dark:text-neutral-400">
-								Choose a conversation from the list to review detailed events,
-								raw parsed data, and approval actions.
-							</p>
-						</div>
-					)}
-				</main>
+				{/* Render page specific child layouts */}
+				{children}
 			</div>
 
 			<ComposeModal
