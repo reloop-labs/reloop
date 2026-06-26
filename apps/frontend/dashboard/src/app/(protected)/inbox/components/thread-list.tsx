@@ -112,7 +112,7 @@ export const ThreadList = ({
 		return (
 			<div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
 				<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
-					<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
+					<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-inbox bg-bg-white-0 dark:border-stroke-soft-100/50">
 						<Icon
 							name={hasFilters ? "search" : "inbox"}
 							className="h-5 w-5 text-text-sub-600"
@@ -128,7 +128,7 @@ export const ThreadList = ({
 						<button
 							type="button"
 							onClick={onClearFilters}
-							className="inline-flex items-center gap-1.5 rounded-lg border border-stroke-soft-100 bg-white px-3 py-1.5 font-semibold text-text-sub-600 text-xs shadow-sm transition-all hover:bg-bg-weak-50 dark:border-stroke-soft-100/30 dark:bg-neutral-900 dark:text-neutral-300"
+							className="inline-flex items-center gap-1.5 rounded-lg border border-stroke-inbox bg-white px-3 py-1.5 font-semibold text-text-sub-600 text-xs shadow-sm transition-all hover:bg-bg-weak-50 dark:border-stroke-soft-100/30 dark:bg-neutral-900 dark:text-neutral-300"
 						>
 							<Icon name="minus-circle" className="h-4 w-4" />
 							Clear filters
@@ -214,7 +214,7 @@ export const ThreadList = ({
 														e.stopPropagation();
 														handleDelete(thread.id);
 													}}
-													className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-soft-400 transition-all hover:bg-bg-weak-50 hover:text-error-base dark:border-stroke-soft-100/30 dark:bg-neutral-900 dark:hover:text-red-400"
+													className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-inbox bg-white text-text-soft-400 transition-all hover:bg-bg-weak-50 hover:text-error-base dark:border-stroke-soft-100/30 dark:bg-neutral-900 dark:hover:text-red-400"
 												>
 													<Icon name="trash" className="h-3.5 w-3.5" />
 												</button>
@@ -260,7 +260,7 @@ export const ThreadList = ({
 												{thread.attachments.slice(0, 2).map((att, idx) => (
 													<div
 														key={att.name + idx}
-														className="flex items-center gap-1 rounded border border-stroke-soft-100 bg-bg-white-0 px-1.5 py-0.5 font-medium text-[9px] text-text-sub-600 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-800 dark:text-neutral-300"
+														className="flex items-center gap-1 rounded border border-stroke-inbox bg-bg-white-0 px-1.5 py-0.5 font-medium text-[9px] text-text-sub-600 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-800 dark:text-neutral-300"
 													>
 														<Icon
 															name="file-text"
@@ -272,7 +272,7 @@ export const ThreadList = ({
 													</div>
 												))}
 												{thread.attachments.length > 2 && (
-													<span className="rounded border border-stroke-soft-100 bg-bg-white-0 px-1.5 py-0.5 font-medium text-[9px] text-text-soft-400 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-800 dark:text-neutral-400">
+													<span className="rounded border border-stroke-inbox bg-bg-white-0 px-1.5 py-0.5 font-medium text-[9px] text-text-soft-400 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-800 dark:text-neutral-400">
 														+{thread.attachments.length - 2}
 													</span>
 												)}

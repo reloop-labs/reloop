@@ -243,7 +243,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 	return (
 		<div className="flex h-screen w-screen flex-col overflow-hidden bg-[#FAF8F4] font-sans text-text-strong-950 dark:bg-[#09090b] dark:text-neutral-50">
 			{/* Mockup Premium Topbar */}
-			<header className="flex h-14 shrink-0 items-center justify-between border-stroke-soft-100 border-b bg-[#FAF8F4] px-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">
+			<header className="flex h-14 shrink-0 items-center justify-between border-stroke-inbox border-b bg-[#FAF8F4] px-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">
 				<div className="flex items-center gap-3">
 					{/* Logo brand mark */}
 					<Logo className="h-11 w-11" />
@@ -271,7 +271,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 			{/* Column Wrapper */}
 			<div className="flex min-h-0 flex-1">
 				{/* Left Folder Rail */}
-				<aside className="relative flex w-60 shrink-0 flex-col justify-between border-stroke-soft-100 border-r bg-[#FAF8F4] p-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">
+				<aside className="relative flex w-60 shrink-0 flex-col justify-between border-stroke-inbox border-r bg-[#FAF8F4] p-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">
 					<div className="flex flex-col gap-5">
 						<Button.Root
 							variant="neutral"
@@ -610,9 +610,9 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 				</aside>
 
 				{/* Middle Column: Thread List Pane */}
-				<section className="flex min-h-0 w-[360px] shrink-0 flex-col border-stroke-soft-100 border-r bg-[#FAF8F4] dark:border-stroke-soft-100/40 dark:bg-neutral-950">
+				<section className="flex min-h-0 w-[360px] shrink-0 flex-col border-stroke-inbox border-r bg-[#FAF8F4] dark:border-stroke-soft-100/40 dark:bg-neutral-950">
 					{/* Search & Meta */}
-					<div className="flex flex-col gap-3 border-stroke-soft-100/50 border-b p-4 dark:border-stroke-soft-100/10">
+					<div className="flex flex-col gap-3 border-stroke-inbox/50 border-b p-4 dark:border-stroke-soft-100/10">
 						<div className="flex flex-col gap-1">
 							<h2 className="font-semibold text-base text-text-strong-950 dark:text-white">
 								{folder === "needs_approval"
@@ -632,7 +632,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 							</p>
 						</div>
 
-						<Input.Root size="xsmall" className="rounded-xl shadow-none">
+						<Input.Root size="xsmall" className="rounded-xl shadow-none before:ring-stroke-inbox">
 							<Input.Wrapper>
 								<Input.Icon
 									as={Icon}
@@ -684,7 +684,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 						</div>
 					) : (
 						<div className="flex min-h-0 flex-1 flex-col items-center justify-center bg-[#FAF8F4]/20 p-8 text-center dark:bg-transparent">
-							<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+							<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-stroke-inbox bg-bg-white-0 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
 								<Icon
 									name="inbox"
 									className="h-5 w-5 text-text-sub-600 dark:text-neutral-400"

@@ -60,10 +60,10 @@ export const ForwardComposer = ({
 	return (
 		<form
 			onSubmit={handleSubmit(onSubmit)}
-			className="mx-5 my-4 rounded-xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-900/40"
+			className="mx-5 my-4 rounded-xl border border-stroke-inbox bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-900/40"
 		>
 			{/* Header */}
-			<div className="flex items-center justify-between border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/30">
+			<div className="flex items-center justify-between border-stroke-inbox border-b px-4 py-3 dark:border-stroke-soft-100/30">
 				<div className="flex items-center gap-2">
 					{/* Forward icon */}
 					<svg
@@ -92,7 +92,7 @@ export const ForwardComposer = ({
 			</div>
 
 			{/* Fields */}
-			<div className="flex flex-col gap-0 divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/30">
+			<div className="flex flex-col gap-0 divide-y divide-stroke-inbox dark:divide-stroke-soft-100/30">
 				{/* From */}
 				<div className="flex items-center gap-2 px-4 py-2.5 text-label-sm">
 					<span className="w-12 shrink-0 text-text-soft-400">From:</span>
@@ -146,7 +146,7 @@ export const ForwardComposer = ({
 				/>
 
 				{/* Quoted original */}
-				<div className="mt-2 rounded-lg border border-stroke-soft-100 bg-bg-weak-50/60 p-3 dark:border-stroke-soft-100/20 dark:bg-neutral-800/30">
+				<div className="mt-2 rounded-lg border border-stroke-inbox bg-bg-weak-50/60 p-3 dark:border-stroke-soft-100/20 dark:bg-neutral-800/30">
 					<p className="mb-1.5 font-medium text-[11px] text-text-soft-400 uppercase tracking-wider">
 						Forwarded message
 					</p>
@@ -173,7 +173,7 @@ export const ForwardComposer = ({
 			</div>
 
 			{/* Footer */}
-			<div className="flex items-center justify-between rounded-b-xl border-stroke-soft-100 border-t bg-bg-weak-50/30 px-4 py-2.5 dark:border-stroke-soft-100/30 dark:bg-neutral-900/20">
+			<div className="flex items-center justify-between rounded-b-xl border-stroke-inbox border-t bg-bg-weak-50/30 px-4 py-2.5 dark:border-stroke-soft-100/30 dark:bg-neutral-900/20">
 				<div className="flex items-center gap-2">
 					<button
 						type="submit"

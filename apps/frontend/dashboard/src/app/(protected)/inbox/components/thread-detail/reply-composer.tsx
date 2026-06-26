@@ -25,9 +25,9 @@ export const ReplyComposer = ({
 	const displayTo = toName ? `${toName} <${toEmail}>` : toEmail;
 
 	return (
-		<div className="mx-5 my-4 rounded-xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-900/40">
+		<div className="mx-5 my-4 rounded-xl border border-stroke-inbox bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-900/40">
 			{/* Header */}
-			<div className="flex items-center justify-between border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/30">
+			<div className="flex items-center justify-between border-stroke-inbox border-b px-4 py-3 dark:border-stroke-soft-100/30">
 				<div className="flex flex-col gap-1 text-label-sm">
 					<div className="flex items-center gap-2 text-text-soft-400">
 						<span className="w-12">To:</span>
@@ -63,7 +63,7 @@ export const ReplyComposer = ({
 			</div>
 
 			{/* Footer */}
-			<div className="flex items-center justify-between rounded-b-xl border-stroke-soft-100 border-t bg-bg-weak-50/30 px-4 py-2.5 dark:border-stroke-soft-100/30 dark:bg-neutral-900/20">
+			<div className="flex items-center justify-between rounded-b-xl border-stroke-inbox border-t bg-bg-weak-50/30 px-4 py-2.5 dark:border-stroke-soft-100/30 dark:bg-neutral-900/20">
 				<div className="flex items-center gap-2">
 					<button
 						type="button"

@@ -17,7 +17,7 @@ export const MessageAttachments = ({
 	if (attachments.length === 0) return null;
 
 	return (
-		<div className="border-stroke-soft-100 border-t px-5 py-4 dark:border-stroke-soft-100/10">
+		<div className="border-stroke-inbox border-t px-5 py-4 dark:border-stroke-soft-100/10">
 			<h3 className="mb-3 font-medium text-text-sub-600 text-xs">
 				Attachments
 			</h3>
@@ -27,7 +27,7 @@ export const MessageAttachments = ({
 						<button
 							type="button"
 							onClick={() => onDownload(file.name)}
-							className="flex w-full items-center gap-3 rounded-lg border border-stroke-soft-100 px-3 py-2 text-left transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/10"
+							className="flex w-full items-center gap-3 rounded-lg border border-stroke-inbox px-3 py-2 text-left transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/10"
 						>
 							<Icon
 								name="file"

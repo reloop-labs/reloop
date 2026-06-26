@@ -18,7 +18,7 @@ export const MessageDraftActions = ({
 	onForward,
 }: MessageDraftActionsProps) => {
 	return (
-		<div className="mx-5 mb-5 flex items-center gap-2.5 border-stroke-soft-100/60 border-t pt-4 dark:border-stroke-soft-100/10">
+		<div className="mx-5 mb-5 flex items-center gap-2.5 border-stroke-inbox/60 border-t pt-4 dark:border-stroke-soft-100/10">
 			{/* Primary: Approve & send */}
 			<button
 				type="button"
@@ -33,7 +33,7 @@ export const MessageDraftActions = ({
 			<button
 				type="button"
 				onClick={onEditReply}
-				className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+				className="flex items-center gap-2 rounded-xl border border-stroke-inbox bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
 			>
 				<Icon name="edit" className="h-3.5 w-3.5" />
 				<span>Edit reply</span>
@@ -43,7 +43,7 @@ export const MessageDraftActions = ({
 			<button
 				type="button"
 				onClick={onForward}
-				className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+				className="flex items-center gap-2 rounded-xl border border-stroke-inbox bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
 			>
 				<Icon name="forward" className="h-3.5 w-3.5" />
 				<span>Forward</span>

@@ -59,7 +59,7 @@ interface ThreadDetailProps {
 
 const EmptyState = () => (
 	<div className="flex min-h-[400px] flex-col items-center justify-center gap-1.5 bg-bg-weak-50/10 p-8 text-center dark:bg-transparent">
-		<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm dark:border-neutral-850 dark:bg-neutral-900">
+		<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-stroke-inbox bg-bg-white-0 shadow-sm dark:border-neutral-850 dark:bg-neutral-900">
 			<Icon
 				name="inbox"
 				className="h-5 w-5 text-text-sub-600 dark:text-neutral-450"
@@ -542,7 +542,7 @@ export const ThreadDetail = ({
 					<button
 						type="button"
 						onClick={handleDelete}
-						className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-error-base dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-450"
+						className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-stroke-inbox bg-white text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-error-base dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-450"
 						title="Delete thread"
 					>
 						<Icon name="trash" className="h-4 w-4" />
@@ -551,14 +551,14 @@ export const ThreadDetail = ({
 
 				{/* Translation banner */}
 				{isTranslated && (
-					<div className="mx-6 my-4 flex items-center justify-between gap-3 rounded-xl border border-stroke-soft-100 bg-white p-3 font-medium text-label-sm dark:border-stroke-soft-100/30 dark:bg-neutral-850">
+					<div className="mx-6 my-4 flex items-center justify-between gap-3 rounded-xl border border-stroke-inbox bg-white p-3 font-medium text-label-sm dark:border-stroke-soft-100/30 dark:bg-neutral-850">
 						<div className="flex items-center gap-2 text-text-sub-600 dark:text-neutral-400">
 							<Icon name="translate" className="h-4 w-4 text-primary-base" />
 							<span>Translated to</span>
 							<select
 								value={targetLanguage}
 								onChange={(e) => handleLanguageChange(e.target.value)}
-								className="cursor-pointer rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-2.5 py-1 font-semibold text-text-strong-950 text-xs shadow-sm outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
+								className="cursor-pointer rounded-lg border border-stroke-inbox bg-bg-white-0 px-2.5 py-1 font-semibold text-text-strong-950 text-xs shadow-sm outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
 							>
 								<option value="es">Spanish (Español)</option>
 								<option value="fr">French (Français)</option>
@@ -664,7 +664,7 @@ export const ThreadDetail = ({
 			) : (
 				// Show bottom composer bar only when there's no pending approval draft (actions are inline on the card)
 				thread.status !== "needs_approval" && (
-					<div className="flex shrink-0 border-stroke-soft-100 border-t bg-[#FAF8F4] px-6 py-4 dark:border-stroke-soft-100/30 dark:bg-neutral-900">
+					<div className="flex shrink-0 border-stroke-inbox border-t bg-[#FAF8F4] px-6 py-4 dark:border-stroke-soft-100/30 dark:bg-neutral-900">
 						<div className="flex items-center gap-3">
 							{/* Reply */}
 							<button
@@ -673,7 +673,7 @@ export const ThreadDetail = ({
 									setShowForwardComposer(false);
 									setShowReplyComposer(true);
 								}}
-								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+								className="flex items-center gap-2 rounded-xl border border-stroke-inbox bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
 							>
 								<Icon name="reply" className="h-3.5 w-3.5" />
 								<span>Reply</span>
@@ -682,7 +682,7 @@ export const ThreadDetail = ({
 							<button
 								type="button"
 								onClick={() => handleForward()}
-								className="flex items-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+								className="flex items-center gap-2 rounded-xl border border-stroke-inbox bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
 							>
 								<Icon name="forward" className="h-3.5 w-3.5" />
 								<span>Forward</span>

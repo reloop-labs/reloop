@@ -129,7 +129,7 @@ export const ThreadMessageItem = ({
 
 	// ── Render ────────────────────────────────────────────────────────────────
 	return (
-		<div className="relative overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-sm dark:border-stroke-soft-100/10 dark:bg-neutral-900">
+		<div className="relative overflow-hidden rounded-xl border border-stroke-inbox bg-white shadow-sm dark:border-stroke-soft-100/10 dark:bg-neutral-900">
 			{/* Coloured left accent bar */}
 			<div
 				className="absolute top-0 bottom-0 left-0 w-[4px]"
