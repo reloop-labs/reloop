@@ -193,7 +193,8 @@ export const ThreadDetail = ({
 		for (let i = 0; i < displayMessages.length; i++) {
 			const msg = displayMessages[i];
 			const isLast = i === displayMessages.length - 1;
-			const isApproval = msg.status === "needs_approval" || msg.parsed?.suggestedReply;
+			const isApproval =
+				msg.status === "needs_approval" || msg.parsed?.suggestedReply;
 			const isOutbound = msg.direction === "outbound";
 			if (displayMessages.length === 1 || isLast || isApproval || isOutbound) {
 				initial[msg.id] = true;
@@ -500,16 +501,18 @@ export const ThreadDetail = ({
 	return (
 		<div className="flex h-full min-h-0 flex-col">
 			{/* Scrollable message area */}
-			<div className="min-h-0 flex-1 overflow-y-auto bg-neutral-50/30 dark:bg-neutral-950/20">
+			<div className="min-h-0 flex-1 overflow-y-auto bg-transparent dark:bg-neutral-950/20">
 				{/* Subject header */}
 				<div className="flex items-start justify-between px-6 py-5">
 					<div className="flex flex-col gap-1.5">
-						<h1 className="font-bold text-xl text-text-strong-950 dark:text-white">
+						<h1 className="font-bold text-text-strong-950 text-xl dark:text-white">
 							{thread.subject}
 						</h1>
 						<div className="flex items-center gap-2 font-medium text-text-soft-400 text-xs">
 							<span>
-								{displayMessages.length === 1 ? "1 message" : `${displayMessages.length} messages`}
+								{displayMessages.length === 1
+									? "1 message"
+									: `${displayMessages.length} messages`}
 							</span>
 							<span className="opacity-50">·</span>
 							<span>{threadParticipants}</span>
@@ -517,7 +520,10 @@ export const ThreadDetail = ({
 							<div className="flex items-center gap-1">
 								{displayMessages.map((msg, i) => {
 									const isOutbound = msg.direction === "outbound";
-									const isApproval = msg.status === "needs_approval" || (i === displayMessages.length - 1 && thread.status === "needs_approval");
+									const isApproval =
+										msg.status === "needs_approval" ||
+										(i === displayMessages.length - 1 &&
+											thread.status === "needs_approval");
 									const colorClass = isApproval
 										? "bg-amber-500"
 										: isOutbound
@@ -577,7 +583,7 @@ export const ThreadDetail = ({
 				)}
 
 				{/* Message list cards container */}
-				<div className="flex flex-col gap-2 px-4 pb-4 pt-2">
+				<div className="flex flex-col gap-2 px-4 pt-2 pb-4">
 					{displayMessages.map((msg, index) => (
 						<ThreadMessageItem
 							key={msg.id}
@@ -658,7 +664,7 @@ export const ThreadDetail = ({
 			) : (
 				// Show bottom composer bar only when there's no pending approval draft (actions are inline on the card)
 				thread.status !== "needs_approval" && (
-					<div className="flex shrink-0 border-stroke-soft-100 border-t bg-white px-6 py-4 dark:border-stroke-soft-100/30 dark:bg-neutral-900">
+					<div className="flex shrink-0 border-stroke-soft-100 border-t bg-[#FAF8F4] px-6 py-4 dark:border-stroke-soft-100/30 dark:bg-neutral-900">
 						<div className="flex items-center gap-3">
 							{/* Reply */}
 							<button

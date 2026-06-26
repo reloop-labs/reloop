@@ -95,7 +95,9 @@ export const ThreadMessageItem = ({
 	const isOutbound = msg.direction === "outbound";
 	const isApproval = msg.status === "needs_approval";
 	const isAgent =
-		msg.direction === "agent" || Boolean(msg.isAgent) || msg.fromEmail?.includes("agent");
+		msg.direction === "agent" ||
+		Boolean(msg.isAgent) ||
+		msg.fromEmail?.includes("agent");
 
 	const accentColor = isApproval
 		? ACCENT_COLORS.approval
@@ -130,7 +132,7 @@ export const ThreadMessageItem = ({
 		<div className="relative overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-sm dark:border-stroke-soft-100/10 dark:bg-neutral-900">
 			{/* Coloured left accent bar */}
 			<div
-				className="absolute bottom-0 left-0 top-0 w-[4px]"
+				className="absolute top-0 bottom-0 left-0 w-[4px]"
 				style={{ backgroundColor: accentColor }}
 			/>
 
@@ -169,9 +171,7 @@ export const ThreadMessageItem = ({
 					/>
 
 					{/* Draft held banner */}
-					{isApproval && (
-						<MessageDraftBanner messageAt={msg.messageAt} />
-					)}
+					{isApproval && <MessageDraftBanner messageAt={msg.messageAt} />}
 
 					{/* Body */}
 					<div className="px-5 pb-4">

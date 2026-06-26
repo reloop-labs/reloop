@@ -241,9 +241,9 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 				: "No messages in this folder";
 
 	return (
-		<div className="flex h-screen w-screen flex-col overflow-hidden bg-bg-weak-50 font-sans text-text-strong-950 dark:bg-[#09090b] dark:text-neutral-50">
+		<div className="flex h-screen w-screen flex-col overflow-hidden bg-[#FAF8F4] font-sans text-text-strong-950 dark:bg-[#09090b] dark:text-neutral-50">
 			{/* Mockup Premium Topbar */}
-			<header className="flex h-14 shrink-0 items-center justify-between border-stroke-soft-100 border-b bg-bg-white-0 px-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">
+			<header className="flex h-14 shrink-0 items-center justify-between border-stroke-soft-100 border-b bg-[#FAF8F4] px-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">
 				<div className="flex items-center gap-3">
 					{/* Logo brand mark */}
 					<Logo className="h-11 w-11" />
@@ -271,7 +271,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 			{/* Column Wrapper */}
 			<div className="flex min-h-0 flex-1">
 				{/* Left Folder Rail */}
-				<aside className="relative flex w-60 shrink-0 flex-col justify-between border-stroke-soft-100 border-r bg-bg-white-0 p-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">
+				<aside className="relative flex w-60 shrink-0 flex-col justify-between border-stroke-soft-100 border-r bg-[#FAF8F4] p-4 dark:border-stroke-soft-100/40 dark:bg-neutral-900">
 					<div className="flex flex-col gap-5">
 						<Button.Root
 							variant="neutral"
@@ -592,7 +592,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 						}
 						onPointerLeave={() => setHoveredEl(undefined)}
 						onClick={() => router.push("/agent-inbox")}
-						className="group relative z-10 flex w-full items-center gap-2 rounded-lg px-3 py-2 font-medium text-text-sub-600 transition-colors hover:text-primary-base text-xs dark:text-neutral-400 dark:hover:text-primary-base"
+						className="group relative z-10 flex w-full items-center gap-2 rounded-lg px-3 py-2 font-medium text-text-sub-600 text-xs transition-colors hover:text-primary-base dark:text-neutral-400 dark:hover:text-primary-base"
 					>
 						<Icon
 							name="arrow-left"
@@ -610,7 +610,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 				</aside>
 
 				{/* Middle Column: Thread List Pane */}
-				<section className="flex min-h-0 w-[360px] shrink-0 flex-col border-stroke-soft-100 border-r bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-neutral-950">
+				<section className="flex min-h-0 w-[360px] shrink-0 flex-col border-stroke-soft-100 border-r bg-[#FAF8F4] dark:border-stroke-soft-100/40 dark:bg-neutral-950">
 					{/* Search & Meta */}
 					<div className="flex flex-col gap-3 border-stroke-soft-100/50 border-b p-4 dark:border-stroke-soft-100/10">
 						<div className="flex flex-col gap-1">
@@ -621,15 +621,18 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 										? "Handled by agent"
 										: folder === "you"
 											? "Sent by you"
-											: folder.charAt(0).toUpperCase() + folder.slice(1).replace("_", " ")}
+											: folder.charAt(0).toUpperCase() +
+												folder.slice(1).replace("_", " ")}
 							</h2>
 							<p className="font-medium text-[11px] text-text-soft-400">
-								{filteredThreads.length} {filteredThreads.length === 1 ? "message" : "messages"}
-								{needsApprovalCount > 0 && ` · ${needsApprovalCount} waiting on you`}
+								{filteredThreads.length}{" "}
+								{filteredThreads.length === 1 ? "message" : "messages"}
+								{needsApprovalCount > 0 &&
+									` · ${needsApprovalCount} waiting on you`}
 							</p>
 						</div>
 
-						<Input.Root size="xsmall" className="rounded-lg shadow-sm">
+						<Input.Root size="xsmall" className="rounded-xl shadow-none">
 							<Input.Wrapper>
 								<Input.Icon
 									as={Icon}
@@ -672,7 +675,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 				</section>
 
 				{/* Right Column: Reading Pane */}
-				<main className="flex min-w-0 flex-1 flex-col bg-bg-white-0 dark:bg-neutral-950">
+				<main className="flex min-w-0 flex-1 flex-col bg-[#FAF8F4] dark:bg-neutral-950">
 					{selectedThread ? (
 						<div className="flex min-h-0 flex-1 flex-col">
 							<div className="min-h-0 flex-1">
@@ -680,7 +683,7 @@ export const AgentInboxLayout = ({ mailbox }: { mailbox: AgentMailbox }) => {
 							</div>
 						</div>
 					) : (
-						<div className="flex min-h-0 flex-1 flex-col items-center justify-center bg-bg-weak-50/20 p-8 text-center dark:bg-transparent">
+						<div className="flex min-h-0 flex-1 flex-col items-center justify-center bg-[#FAF8F4]/20 p-8 text-center dark:bg-transparent">
 							<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
 								<Icon
 									name="inbox"

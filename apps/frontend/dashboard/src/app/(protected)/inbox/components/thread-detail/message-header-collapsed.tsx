@@ -3,7 +3,7 @@
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
 import { MessageAvatar } from "./message-avatar";
-import { MessageBadge, getBadgeVariant } from "./message-badge";
+import { getBadgeVariant, MessageBadge } from "./message-badge";
 
 interface MessageHeaderCollapsedProps {
 	msg: any;
@@ -35,7 +35,7 @@ export const MessageHeaderCollapsed = ({
 		<div
 			role="button"
 			onClick={onClick}
-			className="flex cursor-pointer select-none items-center justify-between gap-4 px-5 py-3.5 hover:bg-neutral-50/50 dark:hover:bg-neutral-850/30 transition-colors"
+			className="flex cursor-pointer select-none items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-neutral-50/50 dark:hover:bg-neutral-850/30"
 		>
 			<div className="flex min-w-0 items-center gap-3">
 				<MessageAvatar
@@ -44,16 +44,16 @@ export const MessageHeaderCollapsed = ({
 					isOutbound={isOutbound}
 					size="sm"
 				/>
-				<span className="font-semibold text-sm text-text-strong-950 dark:text-white shrink-0">
+				<span className="shrink-0 font-semibold text-sm text-text-strong-950 dark:text-white">
 					{senderName}
 				</span>
-				<MessageBadge variant={getBadgeVariant(isApproval, isOutbound, isAgent)} />
-				<span className="truncate text-text-soft-400 text-xs">
-					{snippet}
-				</span>
+				<MessageBadge
+					variant={getBadgeVariant(isApproval, isOutbound, isAgent)}
+				/>
+				<span className="truncate text-text-soft-400 text-xs">{snippet}</span>
 			</div>
 
-			<div className="flex shrink-0 items-center gap-2 text-text-soft-400 text-xs font-medium">
+			<div className="flex shrink-0 items-center gap-2 font-medium text-text-soft-400 text-xs">
 				<span>{dayjs(msg.messageAt).format("ddd, h:mm A")}</span>
 				<Icon name="chevron-down" className="h-3.5 w-3.5" />
 			</div>

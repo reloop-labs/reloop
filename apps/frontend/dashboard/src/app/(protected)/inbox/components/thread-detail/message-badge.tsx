@@ -15,7 +15,7 @@ export const MessageBadge = ({ variant }: MessageBadgeProps) => {
 
 	if (variant === "approval") {
 		return (
-			<span className="rounded bg-amber-500/10 px-2 py-0.5 font-semibold text-[10px] text-amber-700 dark:text-amber-400 normal-case tracking-normal">
+			<span className="rounded bg-amber-500/10 px-2 py-0.5 font-semibold text-[10px] text-amber-700 normal-case tracking-normal dark:text-amber-400">
 				needs you
 			</span>
 		);
@@ -23,7 +23,7 @@ export const MessageBadge = ({ variant }: MessageBadgeProps) => {
 
 	if (variant === "you") {
 		return (
-			<span className="rounded bg-emerald-500/10 px-2 py-0.5 font-semibold text-[10px] text-emerald-700 dark:text-emerald-400 normal-case tracking-normal">
+			<span className="rounded bg-emerald-500/10 px-2 py-0.5 font-semibold text-[10px] text-emerald-700 normal-case tracking-normal dark:text-emerald-400">
 				via you
 			</span>
 		);
@@ -31,7 +31,7 @@ export const MessageBadge = ({ variant }: MessageBadgeProps) => {
 
 	if (variant === "agent") {
 		return (
-			<span className="rounded bg-blue-500/10 px-2 py-0.5 font-semibold text-[10px] text-blue-700 dark:text-blue-400 normal-case tracking-normal">
+			<span className="rounded bg-blue-500/10 px-2 py-0.5 font-semibold text-[10px] text-blue-700 normal-case tracking-normal dark:text-blue-400">
 				via agent
 			</span>
 		);

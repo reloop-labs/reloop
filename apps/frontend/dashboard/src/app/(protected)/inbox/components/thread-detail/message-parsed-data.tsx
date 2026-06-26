@@ -26,7 +26,7 @@ export const MessageParsedData = ({
 				onClick={onToggle}
 				className="mb-3 flex w-full items-center justify-between text-left"
 			>
-				<span className="font-medium text-xs text-text-sub-600">
+				<span className="font-medium text-text-sub-600 text-xs">
 					Parsed data
 				</span>
 				<Icon

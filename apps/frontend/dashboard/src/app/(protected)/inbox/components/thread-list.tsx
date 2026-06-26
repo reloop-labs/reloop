@@ -47,14 +47,17 @@ const formatReceivedAt = (dateStr: string, isFirstToday: boolean) => {
 	const date = dayjs(dateStr);
 	const now = dayjs();
 	if (date.isSame(now, "day")) {
-		return isFirstToday ? `Today, ${date.format("h:mm A")}` : date.format("h:mm A");
-	} else if (date.isSame(now.subtract(1, "day"), "day")) {
-		return "Yesterday";
-	} else if (date.isAfter(now.subtract(7, "day"))) {
-		return date.format("ddd");
-	} else {
-		return date.format("MMM D");
+		return isFirstToday
+			? `Today, ${date.format("h:mm A")}`
+			: date.format("h:mm A");
 	}
+	if (date.isSame(now.subtract(1, "day"), "day")) {
+		return "Yesterday";
+	}
+	if (date.isAfter(now.subtract(7, "day"))) {
+		return date.format("ddd");
+	}
+	return date.format("MMM D");
 };
 
 interface ThreadListProps {
@@ -125,7 +128,7 @@ export const ThreadList = ({
 						<button
 							type="button"
 							onClick={onClearFilters}
-							className="inline-flex items-center gap-1.5 rounded-lg border border-stroke-soft-100 bg-white px-3 py-1.5 text-xs font-semibold text-text-sub-600 shadow-sm transition-all hover:bg-bg-weak-50 dark:border-stroke-soft-100/30 dark:bg-neutral-900 dark:text-neutral-300"
+							className="inline-flex items-center gap-1.5 rounded-lg border border-stroke-soft-100 bg-white px-3 py-1.5 font-semibold text-text-sub-600 text-xs shadow-sm transition-all hover:bg-bg-weak-50 dark:border-stroke-soft-100/30 dark:bg-neutral-900 dark:text-neutral-300"
 						>
 							<Icon name="minus-circle" className="h-4 w-4" />
 							Clear filters
@@ -142,7 +145,7 @@ export const ThreadList = ({
 	return (
 		<div className="scrollbar-hide flex h-full w-full flex-col overflow-hidden text-paragraph-sm">
 			<div className="scrollbar-hide flex min-h-0 flex-1 flex-col overflow-y-auto">
-				<div className="flex flex-col bg-bg-white-0 dark:bg-transparent">
+				<div className="flex flex-col bg-transparent dark:bg-transparent">
 					{threads.map((thread) => {
 						const isSelected = selectedId === thread.id;
 						const isUnread = thread.unread;
@@ -161,10 +164,10 @@ export const ThreadList = ({
 								key={thread.id}
 								onClick={() => onSelect(thread.id)}
 								className={cn(
-									"group/card relative flex cursor-pointer flex-col gap-1 py-3.5 pr-4 pl-7 text-left transition-all duration-200 border-l-[3px]",
+									"group/card relative flex cursor-pointer flex-col gap-1 border-l-[3px] py-3.5 pr-4 pl-7 text-left transition-all duration-200",
 									isSelected
-										? "bg-[#FCF5EE] border-primary-base dark:bg-amber-950/20"
-										: "bg-bg-white-0 border-transparent hover:bg-[#FCF5EE]/40 dark:bg-transparent dark:hover:bg-white/[0.01]",
+										? "border-primary-base bg-[#FCF5EE] dark:bg-amber-950/20"
+										: "border-transparent bg-transparent hover:bg-[#FCF5EE]/40 dark:bg-transparent dark:hover:bg-white/[0.01]",
 								)}
 							>
 								{/* Actor status vertical pill - centered, rounded */}
@@ -203,7 +206,7 @@ export const ThreadList = ({
 											</div>
 
 											{/* Quick actions (visible on hover) */}
-											<div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 transition-opacity duration-150 group-hover/card:opacity-100 pointer-events-none group-hover/card:pointer-events-auto">
+											<div className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-0 flex items-center gap-1 opacity-0 transition-opacity duration-150 group-hover/card:pointer-events-auto group-hover/card:opacity-100">
 												<button
 													type="button"
 													title="Delete Message"
@@ -251,34 +254,31 @@ export const ThreadList = ({
 									)}
 
 									{/* Attachments Row */}
-									{thread.attachments &&
-										thread.attachments.length > 0 && (
-											<div className="mt-1 flex min-h-[20px] items-center gap-1.5">
-												<div className="flex min-w-0 shrink-0 flex-wrap items-center gap-1.5">
-													{thread.attachments
-														.slice(0, 2)
-														.map((att, idx) => (
-															<div
-																key={att.name + idx}
-																className="flex items-center gap-1 rounded border border-stroke-soft-100 bg-bg-white-0 px-1.5 py-0.5 font-medium text-[9px] text-text-sub-600 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-800 dark:text-neutral-300"
-															>
-																<Icon
-																	name="file-text"
-																	className="h-3 w-3 shrink-0 text-text-soft-400"
-																/>
-																<span className="max-w-[80px] truncate">
-																	{att.name}
-																</span>
-															</div>
-														))}
-													{thread.attachments.length > 2 && (
-														<span className="rounded border border-stroke-soft-100 bg-bg-white-0 px-1.5 py-0.5 font-medium text-[9px] text-text-soft-400 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-800 dark:text-neutral-400">
-															+{thread.attachments.length - 2}
+									{thread.attachments && thread.attachments.length > 0 && (
+										<div className="mt-1 flex min-h-[20px] items-center gap-1.5">
+											<div className="flex min-w-0 shrink-0 flex-wrap items-center gap-1.5">
+												{thread.attachments.slice(0, 2).map((att, idx) => (
+													<div
+														key={att.name + idx}
+														className="flex items-center gap-1 rounded border border-stroke-soft-100 bg-bg-white-0 px-1.5 py-0.5 font-medium text-[9px] text-text-sub-600 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-800 dark:text-neutral-300"
+													>
+														<Icon
+															name="file-text"
+															className="h-3 w-3 shrink-0 text-text-soft-400"
+														/>
+														<span className="max-w-[80px] truncate">
+															{att.name}
 														</span>
-													)}
-												</div>
+													</div>
+												))}
+												{thread.attachments.length > 2 && (
+													<span className="rounded border border-stroke-soft-100 bg-bg-white-0 px-1.5 py-0.5 font-medium text-[9px] text-text-soft-400 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-800 dark:text-neutral-400">
+														+{thread.attachments.length - 2}
+													</span>
+												)}
 											</div>
-										)}
+										</div>
+									)}
 								</div>
 							</div>
 						);
