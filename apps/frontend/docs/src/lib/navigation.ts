@@ -4,9 +4,4 @@ export const navigationTabs = [
 	{ title: "Webhooks", url: "/webhooks", iconName: "webhook" as const },
 	{ title: "Self-Hosted", url: "/self-host", iconName: "server" as const },
 	{ title: "Setup", url: "/setup", iconName: "terminal" as const },
-	{
-		title: "Database Schema",
-		url: "/database-schema",
-		iconName: "database" as const,
-	},
 ];

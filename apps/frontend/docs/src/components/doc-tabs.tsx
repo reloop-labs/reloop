@@ -43,11 +43,6 @@ export function DocTabs() {
 			url: "/setup",
 			icon: "terminal",
 		},
-		{
-			title: "Database Schema",
-			url: "/database-schema",
-			icon: "database",
-		},
 	];
 
 	return (

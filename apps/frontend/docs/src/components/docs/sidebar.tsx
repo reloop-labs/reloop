@@ -18,7 +18,10 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { isActive as checkIsActive } from "../../lib/is-active";
+import {
+	isActive as checkIsActive,
+	normalizeDocsPathname,
+} from "../../lib/is-active";
 import { AnimatedHoverBackground } from "./animated-hover-background";
 import { ApiSidebarSection } from "./sidebar-api";
 import { DefaultSidebarSection } from "./sidebar-default";
@@ -58,7 +61,7 @@ export function Sidebar({
 	pathname: propPathname,
 }: SidebarProps) {
 	const clientPathname = usePathname();
-	const pathname = propPathname || clientPathname || "";
+	const pathname = normalizeDocsPathname(propPathname || clientPathname || "");
 	const gradientFromClass = isMobile
 		? "from-bg-white-0 dark:from-[#0a0a0a]"
 		: "from-bg-weak-50 dark:from-black";
@@ -376,7 +379,7 @@ export function Sidebar({
 
 function ProductSwitcher({ pathname: propPathname }: { pathname?: string }) {
 	const clientPathname = usePathname();
-	const pathname = propPathname || clientPathname || "";
+	const pathname = normalizeDocsPathname(propPathname || clientPathname || "");
 	const activeTab =
 		navigationTabs.find((tab) =>
 			tab.url === "/" ? pathname === "/" : pathname.startsWith(tab.url),

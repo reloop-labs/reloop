@@ -27,6 +27,21 @@
 		"backend/email",
 		"backend/credits",
 		"backend/smtp",
-		"backend/inbound"
+		"backend/inbound",
+		"---Database Schema---",
+		"database-schema/index",
+		"database-schema/auth",
+		"database-schema/api-key",
+		"database-schema/domain",
+		"database-schema/webhook",
+		"database-schema/contact",
+		"database-schema/channel",
+		"database-schema/group",
+		"database-schema/email",
+		"database-schema/template",
+		"database-schema/inbox",
+		"database-schema/thread",
+		"database-schema/billing",
+		"database-schema/upload"
 	]
 }

@@ -9,6 +9,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { normalizeDocsPathname } from "../../lib/is-active";
 
 const DynamicActivePill = dynamic(
 	() => import("./navbar-animations").then((mod) => mod.ActivePill),
@@ -35,7 +36,7 @@ export function Navbar({
 	onMobileMenuClick: () => void;
 	onSearchClick?: () => void;
 }) {
-	const pathname = usePathname();
+	const pathname = normalizeDocsPathname(usePathname());
 	const tabs = navigationTabs;
 	const [hoveredTab, setHoveredTab] = useState<string | null>(null);
 	const [mounted, setMounted] = useState(false);
