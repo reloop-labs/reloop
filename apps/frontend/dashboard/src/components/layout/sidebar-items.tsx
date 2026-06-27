@@ -121,8 +121,8 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 											isSpecial
 												? ""
 												: activeMainIndex === index
-													? "text-white"
-													: "text-white/70 opacity-70 group-hover:text-white group-hover:opacity-100",
+													? "text-primary-base"
+													: "text-text-sub-600 opacity-70",
 										)}
 									/>
 									{!isCollapsed && (
@@ -132,8 +132,8 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 												isSpecial
 													? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
 													: activeMainIndex === index
-														? "text-white font-semibold"
-														: "text-white/70 group-hover:text-white",
+														? "text-primary-base font-semibold"
+														: "text-text-sub-600",
 											)}
 										>
 											{label}
@@ -210,17 +210,15 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 																className={cn(
 																	"group relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-[12px] transition-colors",
 																	isSubActive
-																		? "text-white font-semibold"
-																		: "text-white/70 hover:text-white",
+																		? "text-primary-base font-semibold"
+																		: "text-text-sub-600",
 																)}
 															>
 																<Icon
 																	name={subIcon}
 																	className={cn(
 																		"h-3 w-3 shrink-0 transition-colors",
-																		isSubActive
-																			? "text-white"
-																			: "text-white/60 group-hover:text-white",
+																		isSubActive ? "text-primary-base" : "opacity-70",
 																	)}
 																/>
 																{subLabel}
@@ -244,8 +242,8 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 				tabElement={currentEl}
 				className={
 					!hoveredEl && (activeMainIndex !== -1 || activeSubInfo)
-						? "!bg-white/20"
-						: "!bg-white/10"
+						? "!bg-primary-base/10"
+						: undefined
 				}
 			/>
 		</div>
