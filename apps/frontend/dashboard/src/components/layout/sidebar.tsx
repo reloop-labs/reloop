@@ -2,25 +2,18 @@
 
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { useUIStore } from "@fe/dashboard/store/use-ui-store";
-import { authClient } from "@reloop/auth/client";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-
-import { useRouter } from "next/navigation";
+import { Logo } from "@reloop/ui/logo";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import useSWR, { useSWRConfig } from "swr";
-import { OrganizationSwitcher } from "./organization-switcher";
 import { SidebarItems } from "./sidebar-items";
 import { UserMenuDropdown } from "./user-menu-dropdown";
 
 export const MainSidebar: React.FC = () => {
-	const { mutate } = useSWRConfig();
-	const { user, activeOrganization } = useUserOrganization();
-	const router = useRouter();
+	const { user } = useUserOrganization();
 	const { isSidebarCollapsed, setIsSidebarCollapsed, toggleSidebarCollapse } =
 		useUIStore();
-	const { refetch } = authClient.useSession();
 	const [isHeaderHovered, setIsHeaderHovered] = useState(false);
 
 	useEffect(() => {
@@ -37,31 +30,6 @@ export const MainSidebar: React.FC = () => {
 		toggleSidebarCollapse();
 	});
 
-	const { data: organizations } = useSWR(
-		"organizations",
-		async () => (await authClient.organization.list()).data ?? undefined,
-	);
-
-	const handleOrganizationChange = async (organization: {
-		id: string;
-		name: string;
-		slug: string;
-	}) => {
-		try {
-			await authClient.organization.setActive({
-				organizationId: organization.id,
-			});
-			await authClient.updateUser({
-				activeOrganizationId: organization.id,
-			});
-			await refetch();
-			await mutate(() => true, undefined, { revalidate: true });
-			router.refresh();
-		} catch (error) {
-			console.error("Error switching organization:", error);
-		}
-	};
-
 	return (
 		<div
 			className={cn(
@@ -76,7 +44,7 @@ export const MainSidebar: React.FC = () => {
 					"flex items-center transition-all",
 					isSidebarCollapsed
 						? "h-14 justify-center px-0"
-						: "h-12 justify-between pr-3 pl-1",
+						: "h-12 justify-between pr-3 pl-3",
 				)}
 			>
 				{isSidebarCollapsed ? (
@@ -96,23 +64,16 @@ export const MainSidebar: React.FC = () => {
 							/>
 						</button>
 					) : (
-						<OrganizationSwitcher
-							organizations={organizations}
-							activeOrganization={activeOrganization}
-							onOrganizationChange={handleOrganizationChange}
-							isCollapsed={isSidebarCollapsed}
-							side="bottom"
-						/>
+						<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-text-strong-950">
+							<span className="font-bold text-sm text-white">R</span>
+						</div>
 					)
 				) : (
 					<>
-						<OrganizationSwitcher
-							organizations={organizations}
-							activeOrganization={activeOrganization}
-							onOrganizationChange={handleOrganizationChange}
-							isCollapsed={isSidebarCollapsed}
-							side="bottom"
-						/>
+						<div className="flex items-center gap-2">
+							<Logo className="w-10" />
+							<p className="-ml-2 font-semibold text-text-strong-950">Reloop</p>
+						</div>
 						{isHeaderHovered && (
 							<button
 								type="button"

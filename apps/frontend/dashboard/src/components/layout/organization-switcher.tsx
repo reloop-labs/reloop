@@ -1,7 +1,6 @@
 "use client";
 
 import {
-	getAvatarGradient,
 	getAvatarInitial,
 } from "@fe/dashboard/utils/avatar";
 import * as Avatar from "@reloop/ui/avatar";
