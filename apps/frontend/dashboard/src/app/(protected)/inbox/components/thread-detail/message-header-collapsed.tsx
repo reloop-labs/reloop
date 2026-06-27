@@ -1,9 +1,9 @@
 "use client";
 
 import { Icon } from "@reloop/ui/icon";
+import { formatMessageTimestamp } from "./date-utils";
 import { MessageAvatar } from "./message-avatar";
 import { getBadgeVariant, MessageBadge } from "./message-badge";
-import { formatMessageTimestamp } from "./date-utils";
 
 interface MessageHeaderCollapsedProps {
 	msg: any;
@@ -59,11 +59,10 @@ export const MessageHeaderCollapsed = ({
 				</div>
 			</div>
 
-			<div className="flex shrink-0 items-center gap-2 font-medium text-text-soft-400 text-xs pt-1">
+			<div className="flex shrink-0 items-center gap-2 pt-1 font-medium text-text-soft-400 text-xs">
 				<span>{formatMessageTimestamp(msg.messageAt)}</span>
 				<Icon name="chevron-down" className="h-3.5 w-3.5" />
 			</div>
 		</div>
 	);
 };
-

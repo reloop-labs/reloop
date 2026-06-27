@@ -172,7 +172,7 @@ export const ThreadMessageItem = ({
 					/>
 
 					{/* Indented Content Column */}
-					<div className="pl-16 pr-5 pb-4 flex flex-col gap-4">
+					<div className="flex flex-col gap-4 pr-5 pb-4 pl-16">
 						{/* Draft held banner */}
 						{isApproval && <MessageDraftBanner messageAt={msg.messageAt} />}
 

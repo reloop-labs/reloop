@@ -4,9 +4,9 @@ import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
 import type { AgentMailbox } from "../../types";
+import { formatMessageTimestamp } from "./date-utils";
 import { MessageAvatar } from "./message-avatar";
 import { getBadgeVariant, MessageBadge } from "./message-badge";
-import { formatMessageTimestamp } from "./date-utils";
 
 interface MessageHeaderExpandedProps {
 	msg: any;
