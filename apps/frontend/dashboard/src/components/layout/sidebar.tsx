@@ -65,7 +65,7 @@ export const MainSidebar: React.FC = () => {
 	return (
 		<div
 			className={cn(
-				"sticky top-0 z-10 flex h-screen flex-col transition-[width] duration-200 ease-in-out bg-[#6A8068] text-white/90 border-r border-[#6A8068]/10",
+				"sticky top-0 z-10 flex h-screen flex-col transition-[width] duration-200 ease-in-out bg-[#677E64] text-white/90 border-r border-[#677E64]/10",
 				isSidebarCollapsed ? "w-14" : "w-60",
 			)}
 		>
