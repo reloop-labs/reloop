@@ -2,6 +2,7 @@
 
 import { useBillingUsage } from "@fe/dashboard/hooks/useBillingUsage";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -49,11 +50,18 @@ const UsagePage = () => {
 		: isNearLimit
 			? "High usage"
 			: "On track";
-	const statusColor = isOverLimit
-		? "border-error-light bg-error-lighter text-error-base"
-		: isNearLimit
-			? "border-warning-light bg-warning-lighter text-warning-base"
-			: "border-success-light bg-success-lighter text-success-base";
+
+	const getStatusColor = (status: string) => {
+		switch (status) {
+			case "Limit reached":
+				return "border-error-base bg-error-light/20 text-error-base";
+			case "High usage":
+				return "border-warning-base bg-warning-light/20 text-warning-base";
+			case "On track":
+			default:
+				return "border-success-base bg-success-light/20 text-success-base";
+		}
+	};
 
 	if (isLoading) {
 		return (
@@ -134,13 +142,16 @@ const UsagePage = () => {
 						<span>Emails sent</span>
 					</div>
 					{isLoading ? (
-						<Skeleton className="h-5 w-20 rounded-full" />
+						<Skeleton className="h-5 w-16 rounded-full" />
 					) : (
-						<div className={`rounded-full border px-2.5 py-0.5 ${statusColor}`}>
-							<span className="font-semibold text-[11px] uppercase tracking-wider">
-								{statusLabel}
-							</span>
-						</div>
+						<span
+							className={cn(
+								"inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 font-medium text-[10px] text-white",
+								getStatusColor(statusLabel),
+							)}
+						>
+							{statusLabel}
+						</span>
 					)}
 				</div>
 
