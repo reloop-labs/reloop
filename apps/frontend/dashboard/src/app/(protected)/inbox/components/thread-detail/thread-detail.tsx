@@ -524,15 +524,23 @@ export const ThreadDetail = ({
 										msg.status === "needs_approval" ||
 										(i === displayMessages.length - 1 &&
 											thread.status === "needs_approval");
-									const colorClass = isApproval
-										? "bg-[#C47839]"
-										: isOutbound
-											? "bg-emerald-500"
-											: "bg-[#3B629B]";
+									const isAgent =
+										msg.direction === "agent" ||
+										Boolean(msg.isAgent) ||
+										msg.fromEmail?.includes("agent");
+									// Mirror ACCENT_COLORS from thread-message-item.tsx exactly
+									const dotColor = isApproval
+										? "#C47839"
+										: isAgent
+											? "#3B629B"
+											: isOutbound
+												? "#677E64"
+												: "#3B629B";
 									return (
 										<span
 											key={msg.id}
-											className={cn("h-1.5 w-1.5 rounded-full", colorClass)}
+											className="h-1.5 w-1.5 rounded-full"
+											style={{ backgroundColor: dotColor }}
 										/>
 									);
 								})}

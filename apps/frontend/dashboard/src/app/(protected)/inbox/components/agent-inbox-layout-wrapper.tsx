@@ -451,22 +451,15 @@ export const AgentInboxLayoutWrapper = ({
 						</div>
 					</div>
 
-					{/* Bottom back to dashboard */}
+					{/* Bottom back to dashboard — static highlight, always visible */}
 					<button
 						type="button"
-						ref={(el) => {
-							buttonRefs.current["exit"] = el;
-						}}
-						onPointerEnter={() =>
-							setHoveredEl(buttonRefs.current["exit"] ?? undefined)
-						}
-						onPointerLeave={() => setHoveredEl(undefined)}
 						onClick={() => router.push("/agent-inbox")}
-						className="group relative z-10 flex w-full items-center gap-2 rounded-lg px-3 py-2 font-medium text-text-sub-600 text-xs transition-colors hover:text-[var(--color-primary-base)] dark:text-neutral-400 dark:hover:text-[var(--color-primary-base)]"
+						className="flex w-full items-center gap-2 rounded-lg border border-[var(--color-primary-base)]/20 bg-[var(--color-primary-base)]/10 px-3 py-2 font-semibold text-[var(--color-primary-base)] text-xs transition-colors hover:bg-[var(--color-primary-base)]/15 dark:border-[var(--color-primary-base)]/20 dark:bg-[var(--color-primary-base)]/15"
 					>
 						<Icon
 							name="arrow-left"
-							className="h-3.5 w-3.5 text-text-sub-600 opacity-70 transition-colors group-hover:text-[var(--color-primary-base)] group-hover:opacity-100"
+							className="h-3.5 w-3.5"
 						/>
 						<span>Back to dashboard</span>
 					</button>
