@@ -32,7 +32,8 @@ export const MessageHeaderCollapsed = ({
 		? "You"
 		: isApproval
 			? "Agent"
-			: msg.fromName || (msg.fromEmail ? msg.fromEmail.split("@")[0] : "Unknown");
+			: msg.fromName ||
+				(msg.fromEmail ? msg.fromEmail.split("@")[0] : "Unknown");
 
 	const snippet =
 		msg.email?.textBody?.substring(0, 100).replace(/\s+/g, " ") || "";
@@ -41,12 +42,12 @@ export const MessageHeaderCollapsed = ({
 		<div
 			role="button"
 			onClick={onClick}
-			className="flex cursor-pointer select-none items-start justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-neutral-50/50 dark:hover:bg-neutral-850/30"
+			className="flex cursor-pointer select-none items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-neutral-50/50 dark:hover:bg-neutral-850/30"
 		>
-			<div className="flex min-w-0 items-start gap-3">
-				<div className="flex items-center gap-2.5 shrink-0">
+			<div className="flex min-w-0 items-center gap-3">
+				<div className="flex shrink-0 items-center gap-2.5">
 					<div
-						className="h-6 w-[3px] rounded-full"
+						className="h-8 w-[3.5px] rounded-full"
 						style={{ backgroundColor: accentColor }}
 					/>
 					<MessageAvatar
@@ -57,7 +58,7 @@ export const MessageHeaderCollapsed = ({
 						size="md"
 					/>
 				</div>
-				<div className="flex min-w-0 flex-col gap-0.5 pt-0.5">
+				<div className="flex min-w-0 flex-col gap-0.5">
 					<div className="flex items-center gap-1.5">
 						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							{senderName}
@@ -70,7 +71,7 @@ export const MessageHeaderCollapsed = ({
 				</div>
 			</div>
 
-			<div className="flex shrink-0 items-center gap-2 pt-1 font-medium text-text-soft-400 text-xs">
+			<div className="flex shrink-0 items-center gap-2 font-medium text-text-soft-400 text-xs">
 				<span>{formatMessageTimestamp(msg.messageAt)}</span>
 				<Icon name="chevron-down" className="h-3.5 w-3.5" />
 			</div>
