@@ -503,12 +503,12 @@ export const ThreadDetail = ({
 			{/* Scrollable message area */}
 			<div className="min-h-0 flex-1 overflow-y-auto bg-transparent dark:bg-neutral-950/20">
 				{/* Subject header */}
-				<div className="flex items-start justify-between px-6 py-5">
+				<div className="sticky top-0 z-10 flex items-start justify-between border-stroke-inbox border-b bg-[#FAF8F4] px-6 py-5 dark:border-stroke-soft-100/30 dark:bg-neutral-950">
 					<div className="flex flex-col gap-1.5">
 						<h1 className="font-bold text-text-strong-950 text-xl dark:text-white">
 							{thread.subject}
 						</h1>
-						<div className="flex items-center gap-2 font-medium text-text-soft-400 text-xs">
+						<div className="flex items-center gap-2 text-text-soft-400 text-xs">
 							<span>
 								{displayMessages.length === 1
 									? "1 message"
