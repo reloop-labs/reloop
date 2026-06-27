@@ -153,12 +153,12 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 												[path]: !prev[path],
 											}));
 										}}
-										className="flex h-5 w-5 items-center justify-center rounded-md transition-colors hover:bg-white/10"
+										className="flex h-5 w-5 items-center justify-center rounded-md transition-colors hover:bg-bg-weak-50"
 									>
 										<Icon
 											name="chevron-right"
 											className={cn(
-												"h-3 w-3 shrink-0 text-white/60 opacity-60 transition-transform duration-200",
+												"h-3 w-3 shrink-0 text-text-sub-600 opacity-60 transition-transform duration-200",
 												isExpanded && "rotate-90",
 											)}
 										/>
@@ -177,7 +177,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 											transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
 											style={{ overflow: "hidden" }}
 										>
-											<div className="my-0.5 ml-[14px] flex flex-col border-white/15 border-l pb-0.5 pl-2">
+											<div className="my-0.5 ml-[14px] flex flex-col border-stroke-soft-200 border-l pb-0.5 pl-2">
 												{items.map(
 													(
 														{

@@ -76,11 +76,10 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 					variant="neutral"
 					mode="ghost"
 					className={cn(
-						"flex cursor-pointer items-center transition-all text-white/90! hover:text-white! hover:bg-white/10!",
+						"flex cursor-pointer items-center transition-all",
 						isCollapsed
 							? "h-9 w-9 justify-center rounded-lg p-0"
 							: "h-auto w-full justify-start gap-2.5 rounded-2xl! px-2 py-2",
-						isOpen ? "bg-white/10!" : "bg-transparent",
 					)}
 				>
 					<div className="relative flex-shrink-0">
@@ -103,7 +102,7 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 					</div>
 					{!isCollapsed && (
 						<div className="flex min-w-0 flex-1 flex-col items-start gap-px">
-							<p className="w-full truncate text-left font-medium text-sm text-white/90">
+							<p className="w-full truncate text-left font-medium text-sm text-text-sub-600">
 								{user.email}
 							</p>
 						</div>
