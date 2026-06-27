@@ -18,10 +18,10 @@ export const MessageSentBanner = ({
 	const senderLabel = isAgent ? "agent" : "you";
 
 	return (
-		<div className="mb-1 flex w-full items-center gap-2 rounded-lg border border-emerald-500/10 bg-emerald-500/5 px-3 py-2 font-medium text-emerald-700 text-xs dark:border-emerald-500/20 dark:bg-emerald-950/20 dark:text-emerald-400">
+		<div className="mb-1 flex w-full items-center gap-2 rounded-lg border border-[#677E64]/10 bg-[#677E64]/5 px-3 py-2 font-medium text-[#677E64] text-xs dark:border-[#677E64]/20 dark:bg-[#677E64]/10 dark:text-[#677E64]">
 			{/* Checkmark icon */}
 			<svg
-				className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400"
+				className="h-3.5 w-3.5 shrink-0 text-[#677E64] dark:text-[#677E64]"
 				fill="none"
 				viewBox="0 0 24 24"
 				stroke="currentColor"
