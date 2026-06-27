@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@reloop/ui/icon";
 import { formatMessageTimestamp } from "./date-utils";
 
 interface MessageSentBannerProps {
@@ -21,7 +22,7 @@ export const MessageSentBanner = ({
 		<div className="mb-1 flex w-full items-center gap-2 rounded-lg border border-[#677E64]/10 bg-[#677E64]/5 px-3 py-2 font-medium text-[#677E64] text-xs dark:border-[#677E64]/20 dark:bg-[#677E64]/10 dark:text-[#677E64]">
 			{/* Checkmark icon */}
 			<svg
-				className="h-3.5 w-3.5 shrink-0 text-[#677E64] dark:text-[#677E64]"
+				className="h-3.5 w-3.5 shrink-0"
 				fill="none"
 				viewBox="0 0 24 24"
 				stroke="currentColor"
@@ -31,8 +32,16 @@ export const MessageSentBanner = ({
 			>
 				<polyline points="20 6 9 17 4 12" />
 			</svg>
-			<span>
-				Sent by <span className="font-semibold">{senderLabel}</span> at{" "}
+			<span className="flex items-center gap-1">
+				Sent by{" "}
+				<span className="inline-flex items-center gap-0.5 font-semibold">
+					<Icon
+						name={isAgent ? "robot" : "user"}
+						className="h-2.5 w-2.5 shrink-0"
+					/>
+					{senderLabel}
+				</span>{" "}
+				at{" "}
 				<span className="font-semibold">
 					{formatMessageTimestamp(messageAt)}
 				</span>
