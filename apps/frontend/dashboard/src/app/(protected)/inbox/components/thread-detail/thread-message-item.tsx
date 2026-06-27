@@ -46,8 +46,9 @@ export interface ThreadMessageItemProps {
 // ---------------------------------------------------------------------------
 
 const ACCENT_COLORS = {
-	approval: "#f59e0b",
-	outbound: "#10b981",
+	approval: "#C47839",
+	outbound: "#677E64",
+	agent: "#3B629B",
 	inbound: "#3b82f6",
 } as const;
 
@@ -102,9 +103,11 @@ export const ThreadMessageItem = ({
 
 	const accentColor = isApproval
 		? ACCENT_COLORS.approval
-		: isOutbound
-			? ACCENT_COLORS.outbound
-			: ACCENT_COLORS.inbound;
+		: isAgent
+			? ACCENT_COLORS.agent
+			: isOutbound
+				? ACCENT_COLORS.outbound
+				: ACCENT_COLORS.inbound;
 
 	// ── Body content (translated or original) ─────────────────────────────────
 	const email = msg.email;
