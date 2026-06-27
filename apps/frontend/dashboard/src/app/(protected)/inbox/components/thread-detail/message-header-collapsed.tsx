@@ -59,13 +59,18 @@ export const MessageHeaderCollapsed = ({
 					/>
 				</div>
 				<div className="flex min-w-0 flex-col gap-0.5">
-					<div className="flex items-center gap-1.5">
+					<div className="flex flex-wrap items-center gap-1.5">
 						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							{senderName}
 						</span>
 						<MessageBadge
 							variant={getBadgeVariant(isApproval, isOutbound, isAgent)}
 						/>
+						{msg.fromEmail && (
+							<span className="font-mono text-text-sub-600 text-xs">
+								{msg.fromEmail}
+							</span>
+						)}
 					</div>
 					<span className="truncate text-text-sub-600 text-xs">{snippet}</span>
 				</div>
