@@ -232,7 +232,7 @@ export const ThreadList = ({
 										<div className="mt-1 flex items-center gap-1.5">
 											<span
 												className={cn(
-													"inline-flex items-center rounded-[3px] px-2 py-[1px] font-medium text-[10px] leading-none normal-case tracking-normal",
+													"inline-flex items-center rounded-[4px] px-1.5 py-[3px] font-medium text-[10px] leading-none normal-case tracking-normal",
 													actorInfo.tagStyle,
 												)}
 											>
