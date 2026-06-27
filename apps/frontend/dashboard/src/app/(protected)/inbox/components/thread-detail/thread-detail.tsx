@@ -525,10 +525,10 @@ export const ThreadDetail = ({
 										(i === displayMessages.length - 1 &&
 											thread.status === "needs_approval");
 									const colorClass = isApproval
-										? "bg-amber-500"
+										? "bg-[#C47839]"
 										: isOutbound
 											? "bg-emerald-500"
-											: "bg-blue-500";
+											: "bg-[#3B629B]";
 									return (
 										<span
 											key={msg.id}

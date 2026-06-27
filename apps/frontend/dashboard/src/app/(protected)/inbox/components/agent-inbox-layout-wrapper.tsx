@@ -468,7 +468,7 @@ export const AgentInboxLayoutWrapper = ({
 							name="arrow-left"
 							className="h-3.5 w-3.5 text-text-sub-600 opacity-70 transition-colors group-hover:text-[var(--color-primary-base)] group-hover:opacity-100"
 						/>
-						<span>Exit to dashboard</span>
+						<span>Back to dashboard</span>
 					</button>
 
 					{/* Shared animated hover/active background */}
