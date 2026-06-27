@@ -13,11 +13,12 @@ dayjs.extend(relativeTime);
 // Derive the left gutter color and actor pill from thread status
 const getActorInfo = (
 	thread: InboundThread,
-): { gutterColor: string; tag: string | null; tagStyle: string } => {
+): { gutterColor: string; tag: string | null; tagStyle: string; tagIcon: string } => {
 	if (thread.direction === "outbound") {
 		return {
 			gutterColor: "bg-[var(--color-primary-base)]",
 			tag: "via you",
+			tagIcon: "user",
 			tagStyle:
 				"bg-[var(--color-primary-base)]/10 text-[var(--color-primary-base)] dark:text-[var(--color-primary-base)]",
 		};
@@ -27,6 +28,7 @@ const getActorInfo = (
 			return {
 				gutterColor: "bg-[#C47839]",
 				tag: "needs you",
+				tagIcon: "alert-triangle",
 				tagStyle:
 					"bg-[#C47839]/10 text-[#C47839] dark:text-[#C47839]",
 			};
@@ -37,6 +39,7 @@ const getActorInfo = (
 			return {
 				gutterColor: "bg-[#3B629B]",
 				tag: "via agent",
+				tagIcon: "robot",
 				tagStyle:
 					"bg-[#3B629B]/10 text-[#3B629B] dark:text-[#3B629B]",
 			};
@@ -229,10 +232,11 @@ export const ThreadList = ({
 										<div className="mt-1 flex items-center gap-1.5">
 											<span
 												className={cn(
-													"inline-flex items-center rounded-[4px] px-1.5 py-[3px] font-medium text-[10px] leading-none normal-case tracking-normal",
+													"inline-flex items-center gap-1 rounded-[4px] px-1.5 py-[3px] font-medium text-[10px] leading-none normal-case tracking-normal",
 													actorInfo.tagStyle,
 												)}
 											>
+												<Icon name={actorInfo.tagIcon as any} className="h-2.5 w-2.5 shrink-0" />
 												{actorInfo.tag}
 											</span>
 										</div>
