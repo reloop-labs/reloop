@@ -44,7 +44,9 @@ export const PageHeader = () => {
 					onOrganizationChange={onOrganizationChange}
 					side="bottom"
 				/>
-				<span className="text-text-disabled-300 text-[13px] select-none">/</span>
+				<span className="select-none text-[13px] text-text-disabled-300">
+					/
+				</span>
 				<div className="flex items-center gap-1.5 px-1">
 					<Icon name={displayIcon} className="h-4 w-4 text-text-sub-600" />
 					<span className="font-medium text-[13px] text-text-strong-950 capitalize">

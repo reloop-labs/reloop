@@ -218,7 +218,9 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 																	name={subIcon}
 																	className={cn(
 																		"h-3 w-3 shrink-0 transition-colors",
-																		isSubActive ? "text-primary-base" : "opacity-70",
+																		isSubActive
+																			? "text-primary-base"
+																			: "opacity-70",
 																	)}
 																/>
 																{subLabel}

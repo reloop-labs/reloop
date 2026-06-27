@@ -5,7 +5,7 @@ import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { SidebarItems } from "./sidebar-items";
 import { UserMenuDropdown } from "./user-menu-dropdown";
@@ -14,7 +14,6 @@ export const MainSidebar: React.FC = () => {
 	const { user } = useUserOrganization();
 	const { isSidebarCollapsed, setIsSidebarCollapsed, toggleSidebarCollapse } =
 		useUIStore();
-	const [isHeaderHovered, setIsHeaderHovered] = useState(false);
 
 	useEffect(() => {
 		try {
@@ -38,8 +37,6 @@ export const MainSidebar: React.FC = () => {
 			)}
 		>
 			<div
-				onMouseEnter={() => setIsHeaderHovered(true)}
-				onMouseLeave={() => setIsHeaderHovered(false)}
 				className={cn(
 					"flex items-center transition-all",
 					isSidebarCollapsed
@@ -48,48 +45,40 @@ export const MainSidebar: React.FC = () => {
 				)}
 			>
 				{isSidebarCollapsed ? (
-					isHeaderHovered ? (
-						<button
-							type="button"
-							onClick={toggleSidebarCollapse}
-							title="Toggle Sidebar (Cmd+B)"
-							className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
-						>
-							<Icon
-								name="sidebar-left"
-								className="h-4 w-4 transition-transform duration-200"
-								style={{
-									transform: "rotate(180deg)",
-								}}
-							/>
-						</button>
-					) : (
-						<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-text-strong-950">
-							<span className="font-bold text-sm text-white">R</span>
-						</div>
-					)
+					<button
+						type="button"
+						onClick={toggleSidebarCollapse}
+						title="Toggle Sidebar (Cmd+B)"
+						className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+					>
+						<Icon
+							name="sidebar-left"
+							className="h-4 w-4 transition-transform duration-200"
+							style={{
+								transform: "rotate(180deg)",
+							}}
+						/>
+					</button>
 				) : (
 					<>
 						<div className="flex items-center gap-2">
 							<Logo className="w-10" />
 							<p className="-ml-2 font-semibold text-text-strong-950">Reloop</p>
 						</div>
-						{isHeaderHovered && (
-							<button
-								type="button"
-								onClick={toggleSidebarCollapse}
-								title="Toggle Sidebar (Cmd+B)"
-								className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
-							>
-								<Icon
-									name="sidebar-left"
-									className="h-4 w-4 transition-transform duration-200"
-									style={{
-										transform: "rotate(0deg)",
-									}}
-								/>
-							</button>
-						)}
+						<button
+							type="button"
+							onClick={toggleSidebarCollapse}
+							title="Toggle Sidebar (Cmd+B)"
+							className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+						>
+							<Icon
+								name="sidebar-left"
+								className="h-4 w-4 transition-transform duration-200"
+								style={{
+									transform: "rotate(0deg)",
+								}}
+							/>
+						</button>
 					</>
 				)}
 			</div>

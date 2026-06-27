@@ -23,16 +23,16 @@ const hashString = (str: string): number => {
 
 // Premium desaturated light backgrounds with matching dark text colors
 const AVATAR_COLORS = [
-	{ bg: "bg-[#677E64]/10", text: "text-[#677E64]" },   // Sage Green
-	{ bg: "bg-[#3B629B]/10", text: "text-[#3B629B]" },   // Steel Blue
-	{ bg: "bg-[#C47839]/10", text: "text-[#C47839]" },   // Amber Orange
-	{ bg: "bg-[#8E518E]/10", text: "text-[#8E518E]" },   // Muted Purple
-	{ bg: "bg-[#C04C4C]/10", text: "text-[#C04C4C]" },   // Muted Red
-	{ bg: "bg-[#4D8C8C]/10", text: "text-[#4D8C8C]" },   // Muted Teal
-	{ bg: "bg-[#7A5B9B]/10", text: "text-[#7A5B9B]" },   // Lavender
-	{ bg: "bg-[#9A7D3C]/10", text: "text-[#9A7D3C]" },   // Ochre Gold
-	{ bg: "bg-[#656E7B]/10", text: "text-[#656E7B]" },   // Slate Gray
-	{ bg: "bg-[#4A7F67]/10", text: "text-[#4A7F67]" },   // Forest Green
+	{ bg: "bg-[#677E64]/10", text: "text-[#677E64]" }, // Sage Green
+	{ bg: "bg-[#3B629B]/10", text: "text-[#3B629B]" }, // Steel Blue
+	{ bg: "bg-[#C47839]/10", text: "text-[#C47839]" }, // Amber Orange
+	{ bg: "bg-[#8E518E]/10", text: "text-[#8E518E]" }, // Muted Purple
+	{ bg: "bg-[#C04C4C]/10", text: "text-[#C04C4C]" }, // Muted Red
+	{ bg: "bg-[#4D8C8C]/10", text: "text-[#4D8C8C]" }, // Muted Teal
+	{ bg: "bg-[#7A5B9B]/10", text: "text-[#7A5B9B]" }, // Lavender
+	{ bg: "bg-[#9A7D3C]/10", text: "text-[#9A7D3C]" }, // Ochre Gold
+	{ bg: "bg-[#656E7B]/10", text: "text-[#656E7B]" }, // Slate Gray
+	{ bg: "bg-[#4A7F67]/10", text: "text-[#4A7F67]" }, // Forest Green
 ] as const;
 
 /**

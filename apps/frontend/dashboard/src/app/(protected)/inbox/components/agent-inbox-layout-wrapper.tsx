@@ -457,10 +457,7 @@ export const AgentInboxLayoutWrapper = ({
 						onClick={() => router.push("/agent-inbox")}
 						className="flex w-full items-center gap-2 rounded-lg bg-[var(--color-primary-base)]/10 px-3 py-2 font-semibold text-[var(--color-primary-base)] text-xs transition-colors hover:bg-[var(--color-primary-base)]/15 dark:bg-[var(--color-primary-base)]/15"
 					>
-						<Icon
-							name="arrow-left"
-							className="h-3.5 w-3.5"
-						/>
+						<Icon name="arrow-left" className="h-3.5 w-3.5" />
 						<span>Back to dashboard</span>
 					</button>
 

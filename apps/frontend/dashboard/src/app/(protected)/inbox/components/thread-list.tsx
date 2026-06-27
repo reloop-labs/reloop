@@ -13,7 +13,12 @@ dayjs.extend(relativeTime);
 // Derive the left gutter color and actor pill from thread status
 const getActorInfo = (
 	thread: InboundThread,
-): { gutterColor: string; tag: string | null; tagStyle: string; tagIcon: string } => {
+): {
+	gutterColor: string;
+	tag: string | null;
+	tagStyle: string;
+	tagIcon: string;
+} => {
 	if (thread.direction === "outbound") {
 		return {
 			gutterColor: "bg-[var(--color-primary-base)]",
@@ -29,8 +34,7 @@ const getActorInfo = (
 				gutterColor: "bg-[#C47839]",
 				tag: "needs you",
 				tagIcon: "alert-triangle",
-				tagStyle:
-					"bg-[#C47839]/10 text-[#C47839] dark:text-[#C47839]",
+				tagStyle: "bg-[#C47839]/10 text-[#C47839] dark:text-[#C47839]",
 			};
 		case "handled":
 		case "parsing":
@@ -39,8 +43,7 @@ const getActorInfo = (
 				gutterColor: "bg-[#3B629B]",
 				tag: "via agent",
 				tagIcon: "robot",
-				tagStyle:
-					"bg-[#3B629B]/10 text-[#3B629B] dark:text-[#3B629B]",
+				tagStyle: "bg-[#3B629B]/10 text-[#3B629B] dark:text-[#3B629B]",
 			};
 		case "new":
 		default:
@@ -175,10 +178,10 @@ export const ThreadList = ({
 								key={thread.id}
 								onClick={() => onSelect(thread.id)}
 								className={cn(
-									"group/card relative flex cursor-pointer flex-col gap-1 py-3.5 pr-4 pl-7 text-left transition-all duration-200 border-l-[3px]",
+									"group/card relative flex cursor-pointer flex-col gap-1 border-l-[3px] py-3.5 pr-4 pl-7 text-left transition-all duration-200",
 									isSelected
-										? "bg-[var(--color-primary-base)]/10 border-[var(--color-primary-base)] dark:bg-[var(--color-primary-base)]/20"
-										: "bg-transparent border-transparent hover:bg-neutral-50/50 dark:hover:bg-white/[0.01]",
+										? "border-[var(--color-primary-base)] bg-[var(--color-primary-base)]/10 dark:bg-[var(--color-primary-base)]/20"
+										: "border-transparent bg-transparent hover:bg-neutral-50/50 dark:hover:bg-white/[0.01]",
 								)}
 							>
 								{/* Actor status vertical pill - centered, rounded */}
@@ -193,9 +196,7 @@ export const ThreadList = ({
 								<div className="flex min-w-0 flex-1 flex-col gap-0.5">
 									{/* Sender & Time row */}
 									<div className="flex items-center justify-between gap-2">
-										<span
-											className="truncate text-sm font-semibold text-text-strong-950 dark:text-white"
-										>
+										<span className="truncate font-semibold text-sm text-text-strong-950 dark:text-white">
 											{thread.from.name
 												? `${thread.from.name}${thread.direction === "outbound" ? ", You" : ""}`
 												: thread.from.email}
@@ -203,7 +204,7 @@ export const ThreadList = ({
 										<div className="relative flex shrink-0 items-center">
 											{/* Time & Unread dot */}
 											<div className="flex items-center gap-2 transition-opacity duration-150 group-hover/card:pointer-events-none group-hover/card:opacity-0">
-																								<span className="font-medium text-xs text-text-soft-400 tabular-nums dark:text-neutral-500">
+												<span className="font-medium text-text-soft-400 text-xs tabular-nums dark:text-neutral-500">
 													{formatReceivedAt(thread.receivedAt, isFirstToday)}
 												</span>
 											</div>
@@ -226,12 +227,12 @@ export const ThreadList = ({
 									</div>
 
 									{/* Subject */}
-									<div className="truncate text-xs font-semibold text-text-strong-950 dark:text-white">
+									<div className="truncate font-semibold text-text-strong-950 text-xs dark:text-white">
 										{thread.subject}
 									</div>
 
 									{/* Snippet */}
-									<div className="truncate text-xs text-text-sub-600 leading-relaxed dark:text-neutral-400">
+									<div className="truncate text-text-sub-600 text-xs leading-relaxed dark:text-neutral-400">
 										{thread.preview}
 									</div>
 
@@ -240,11 +241,14 @@ export const ThreadList = ({
 										<div className="mt-1 flex items-center gap-1.5">
 											<span
 												className={cn(
-													"inline-flex items-center gap-1 rounded-[4px] px-1.5 py-[3px] font-medium text-[10px] leading-none normal-case tracking-normal",
+													"inline-flex items-center gap-1 rounded-[4px] px-1.5 py-[3px] font-medium text-[10px] normal-case leading-none tracking-normal",
 													actorInfo.tagStyle,
 												)}
 											>
-												<Icon name={actorInfo.tagIcon as any} className="h-2.5 w-2.5 shrink-0" />
+												<Icon
+													name={actorInfo.tagIcon as any}
+													className="h-2.5 w-2.5 shrink-0"
+												/>
 												{actorInfo.tag}
 											</span>
 										</div>
