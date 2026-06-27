@@ -166,7 +166,7 @@ export const ThreadList = ({
 								className={cn(
 									"group/card relative flex cursor-pointer flex-col gap-1 py-3.5 pr-4 pl-7 text-left transition-all duration-200",
 									isSelected
-										? "bg-[#FCF5EE] dark:bg-amber-950/20"
+										? "bg-[#677E64]/10 dark:bg-[#677E64]/20"
 										: "bg-transparent hover:bg-neutral-50/50 dark:hover:bg-white/[0.01]",
 								)}
 							>
@@ -192,10 +192,7 @@ export const ThreadList = ({
 										<div className="relative flex shrink-0 items-center">
 											{/* Time & Unread dot */}
 											<div className="flex items-center gap-2 transition-opacity duration-150 group-hover/card:pointer-events-none group-hover/card:opacity-0">
-												{isUnread && (
-													<span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-base" />
-												)}
-												<span className="font-medium text-xs text-text-soft-400 tabular-nums dark:text-neutral-500">
+																								<span className="font-medium text-xs text-text-soft-400 tabular-nums dark:text-neutral-500">
 													{formatReceivedAt(thread.receivedAt, isFirstToday)}
 												</span>
 											</div>
