@@ -1,0 +1,73 @@
+---
+title: Port
+description: Local ports for frontends, backend APIs, Docker infrastructure, and mail services.
+---
+
+All services bind to localhost when running locally. Use [https://local.reloop.sh](https://local.reloop.sh) for day-to-day development — Caddy routes traffic and keeps session cookies scoped correctly.
+
+<Callout type="warn" title="Port conflicts">
+  Stop any local PostgreSQL (`5432`), Redis (`6379`), or web servers on `80`/`443` before running `bun docker:up`.
+</Callout>
+
+
+## Unified Gateway
+
+| Route | Service | Port |
+| :--- | :--- | :--- |
+| [https://local.reloop.sh/](https://local.reloop.sh/) | Web | `3000` |
+| [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard) | Dashboard | `3001` |
+| [https://local.reloop.sh/docs](https://local.reloop.sh/docs) | Docs | `3003` |
+| [https://local.reloop.sh/preferences](https://local.reloop.sh/preferences) | Links | `3005` |
+| [https://local.reloop.sh/api/auth](https://local.reloop.sh/api/auth) | Auth API | `8000` |
+| [https://local.reloop.sh/api/...](https://local.reloop.sh/api/...) | Backend APIs | `8011`–`8023` |
+
+
+## Frontend
+
+| App | Direct URL | Port |
+| :--- | :--- | :--- |
+| Web | [http://localhost:3000](http://localhost:3000) | `3000` |
+| Dashboard | [http://localhost:3001](http://localhost:3001) | `3001` |
+| Docs | [http://localhost:3003](http://localhost:3003) | `3003` |
+| Links | [http://localhost:3005](http://localhost:3005) | `3005` |
+
+
+## Backend APIs
+
+| Service | Caddy route | Port |
+| :--- | :--- | :--- |
+| Auth | `/api/auth` | `8000` |
+| Domain | `/api/domain` | `8011` |
+| API Key | `/api/api-key` | `8012` |
+| Webhook | `/api/webhook` | `8013` |
+| Contacts | `/api/contacts` | `8014` |
+| Mail | `/api/mail` | `8015` |
+| Logs | `/api/logs` | `8016` |
+| Workflow | `/api/workflow` | `8017` |
+| Upload | `/api/upload` | `8018` |
+| Template | `/api/template` | `8019` |
+| Inbox | `/api/inbox` | `8021` |
+| Email | `/api/email` | `8022` |
+| Credits | `/api/credits` | `8023` |
+
+
+## Docker & Mail
+
+| Service | Port | Notes |
+| :--- | :--- | :--- |
+| SMTP (outbound) | `587`, `2025`, `8020` | KumoMTA — HTTP health on `8020` |
+| Inbound (MX) | `25`, `8030` | KumoMTA — health on `8030` |
+| Mailpit | `8025` | Captured outbound mail UI |
+| Caddy | `80`, `443` | Reverse proxy / TLS |
+
+
+## Infrastructure
+
+| Service | Port |
+| :--- | :--- |
+| PostgreSQL | `5432` |
+| Redis | `6379` |
+| ClickHouse | `8123` |
+| NATS | `4222` |
+| MinIO | `9010`, `9011` |
+| RSpamD | `11333` |
