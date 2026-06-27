@@ -102,9 +102,9 @@ export const ThreadMessageItem = ({
 
 	const accentColor = isApproval
 		? ACCENT_COLORS.approval
-		: isOutbound
-			? ACCENT_COLORS.outbound
-			: ACCENT_COLORS.inbound;
+		: isAgent
+			? ACCENT_COLORS.inbound
+			: ACCENT_COLORS.outbound;
 
 	// ── Body content (translated or original) ─────────────────────────────────
 	const email = msg.email;
@@ -131,26 +131,21 @@ export const ThreadMessageItem = ({
 	// ── Render ────────────────────────────────────────────────────────────────
 	return (
 		<div className="relative overflow-hidden rounded-xl border border-stroke-inbox bg-white dark:border-stroke-soft-100/10 dark:bg-neutral-900">
-			{/* Coloured left accent bar */}
-			<div
-				className="absolute top-0 bottom-0 left-0 w-1"
-				style={{ backgroundColor: accentColor }}
-			/>
-
 			{!isExpanded ? (
 				/* ── Collapsed ─────────────────────────────────────────────────── */
-				<div className="pl-1">
+				<div>
 					<MessageHeaderCollapsed
 						msg={msg}
 						isOutbound={isOutbound}
 						isApproval={isApproval}
 						isAgent={isAgent}
+						accentColor={accentColor}
 						onClick={onToggleExpand}
 					/>
 				</div>
 			) : (
 				/* ── Expanded ──────────────────────────────────────────────────── */
-				<div className="pl-1">
+				<div>
 					{/* Header */}
 					<MessageHeaderExpanded
 						msg={msg}
@@ -159,6 +154,7 @@ export const ThreadMessageItem = ({
 						isOutbound={isOutbound}
 						isApproval={isApproval}
 						isAgent={isAgent}
+						accentColor={accentColor}
 						onToggleExpand={onToggleExpand}
 						onReply={onReply}
 						onForward={onForward}
@@ -172,7 +168,7 @@ export const ThreadMessageItem = ({
 					/>
 
 					{/* Indented Content Column */}
-					<div className="flex flex-col gap-4 pr-5 pb-4 pl-16">
+					<div className="flex flex-col gap-4 pr-5 pb-4 pl-[77px]">
 						{/* Body */}
 						<MessageBody
 							bodyHtml={bodyHtml}

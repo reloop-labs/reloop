@@ -15,6 +15,7 @@ interface MessageHeaderExpandedProps {
 	isOutbound: boolean;
 	isApproval: boolean;
 	isAgent: boolean;
+	accentColor: string;
 	onToggleExpand: () => void;
 	onReply: () => void;
 	onForward: () => void;
@@ -38,6 +39,7 @@ export const MessageHeaderExpanded = ({
 	isOutbound,
 	isApproval,
 	isAgent,
+	accentColor,
 	onToggleExpand,
 	onReply,
 	onForward,
@@ -66,12 +68,18 @@ export const MessageHeaderExpanded = ({
 		>
 			{/* Left: Avatar + Info */}
 			<div className="flex min-w-0 items-center gap-3">
-				<MessageAvatar
-					fromEmail={msg.fromEmail || ""}
-					fromName={msg.fromName ?? null}
-					isOutbound={isOutbound}
-					isAgent={isAgent}
-				/>
+				<div className="flex items-center gap-2.5 shrink-0">
+					<div
+						className="h-6 w-[3px] rounded-full"
+						style={{ backgroundColor: accentColor }}
+					/>
+					<MessageAvatar
+						fromEmail={msg.fromEmail || ""}
+						fromName={msg.fromName ?? null}
+						isOutbound={isOutbound}
+						isAgent={isAgent}
+					/>
+				</div>
 
 				<div className="flex min-w-0 flex-col gap-0.5">
 					{/* Row 1: sender name · badge · email */}

@@ -10,6 +10,7 @@ interface MessageHeaderCollapsedProps {
 	isOutbound: boolean;
 	isApproval: boolean;
 	isAgent: boolean;
+	accentColor: string;
 	onClick: () => void;
 }
 
@@ -24,6 +25,7 @@ export const MessageHeaderCollapsed = ({
 	isOutbound,
 	isApproval,
 	isAgent,
+	accentColor,
 	onClick,
 }: MessageHeaderCollapsedProps) => {
 	const senderName = isOutbound
@@ -42,13 +44,19 @@ export const MessageHeaderCollapsed = ({
 			className="flex cursor-pointer select-none items-start justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-neutral-50/50 dark:hover:bg-neutral-850/30"
 		>
 			<div className="flex min-w-0 items-start gap-3">
-				<MessageAvatar
-					fromEmail={msg.fromEmail || ""}
-					fromName={msg.fromName ?? null}
-					isOutbound={isOutbound}
-					isAgent={isAgent}
-					size="md"
-				/>
+				<div className="flex items-center gap-2.5 shrink-0">
+					<div
+						className="h-6 w-[3px] rounded-full"
+						style={{ backgroundColor: accentColor }}
+					/>
+					<MessageAvatar
+						fromEmail={msg.fromEmail || ""}
+						fromName={msg.fromName ?? null}
+						isOutbound={isOutbound}
+						isAgent={isAgent}
+						size="md"
+					/>
+				</div>
 				<div className="flex min-w-0 flex-col gap-0.5 pt-0.5">
 					<div className="flex items-center gap-1.5">
 						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
