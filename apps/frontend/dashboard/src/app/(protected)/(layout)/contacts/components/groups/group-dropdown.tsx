@@ -2,6 +2,7 @@
 
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -10,7 +11,6 @@ import {
 	Root as PopoverRoot,
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
-import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 

@@ -1,5 +1,6 @@
 "use client";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -13,7 +14,6 @@ import * as Tooltip from "@reloop/ui/tooltip";
 import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import axios from "axios";
 import Link from "next/link";
-import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
@@ -291,7 +291,10 @@ export const WebhookTable = ({
 										isRowActive && "bg-bg-weak-50/50",
 									)}
 								>
-									<Link href={getBackToUrl(`/webhooks/${webhook.id}`)} className="contents">
+									<Link
+										href={getBackToUrl(`/webhooks/${webhook.id}`)}
+										className="contents"
+									>
 										<div className="flex min-w-0 items-center gap-2">
 											<Icon
 												name="link"

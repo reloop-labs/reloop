@@ -1,5 +1,6 @@
 "use client";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { StarterKit } from "@react-email/editor/extensions";
 import { EmailTheming } from "@react-email/editor/plugins";
 import * as Button from "@reloop/ui/button";
@@ -15,7 +16,6 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
-import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useEffect, useRef, useState } from "react";
 import { DeleteTemplateModal } from "./delete-template-modal";
 import "@react-email/editor/themes/default.css";

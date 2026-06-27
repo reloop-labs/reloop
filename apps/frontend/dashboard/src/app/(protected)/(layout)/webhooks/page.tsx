@@ -1,9 +1,9 @@
 "use client";
 
 import { WebhooksApiDetails } from "@fe/dashboard/components/api-details/webhooks";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRouter } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 import { DocsButton } from "./components/docs-button";

@@ -4,6 +4,7 @@ import { DeleteGroupModal } from "@fe/dashboard/app/(protected)/(layout)/contact
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -19,7 +20,6 @@ import {
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
-import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";

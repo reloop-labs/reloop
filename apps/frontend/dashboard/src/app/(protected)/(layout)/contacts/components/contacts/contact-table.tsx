@@ -8,11 +8,11 @@ import {
 	getStatusIcon,
 	getStatusLabel,
 } from "@fe/dashboard/utils/audience";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";

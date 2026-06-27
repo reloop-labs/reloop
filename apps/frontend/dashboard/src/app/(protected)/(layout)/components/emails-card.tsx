@@ -5,6 +5,7 @@ import {
 	getAvatarGradient,
 	getAvatarInitial,
 } from "@fe/dashboard/utils/avatar";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -13,7 +14,6 @@ import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { ArrowRight, Plus } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRef, useState } from "react";
 import useSWR from "swr";
 
@@ -352,7 +352,9 @@ export function EmailsCard() {
 								asChild
 								className="mt-6 shrink-0 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 							>
-								<Link href={getBackToUrl("/agent-inbox?modal=create-agent-mailbox")}>
+								<Link
+									href={getBackToUrl("/agent-inbox?modal=create-agent-mailbox")}
+								>
 									Set up inbox
 								</Link>
 							</Button.Root>

@@ -1,6 +1,7 @@
 "use client";
 
 import { CopyCodeBlock } from "@fe/dashboard/app/(protected)/onboarding/steps/generate-api-key/components/copy-code-block";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Badge from "@reloop/ui/badge";
 import { cn } from "@reloop/ui/cn";
@@ -8,7 +9,6 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
 import Link from "next/link";
-import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";

@@ -7,6 +7,7 @@ import {
 	getAvatarGradient,
 	getAvatarInitial,
 } from "@fe/dashboard/utils/avatar";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
@@ -18,7 +19,6 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { EmailsEmptyState } from "./emails-empty-state";
@@ -365,7 +365,9 @@ export const EmailTable = ({
 								>
 									<EmailActionsDropdown
 										log={log}
-										onViewDetails={(id) => router.push(getBackToUrl(`/emails/${id}`))}
+										onViewDetails={(id) =>
+											router.push(getBackToUrl(`/emails/${id}`))
+										}
 										onOpenChange={(open) =>
 											setActiveDropdownId(open ? log.id : null)
 										}

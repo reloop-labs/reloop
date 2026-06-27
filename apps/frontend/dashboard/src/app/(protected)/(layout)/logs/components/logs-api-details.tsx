@@ -266,10 +266,7 @@ type Language = keyof typeof codeExamples;
 export const LogsApiDetails = (
 	props: React.ComponentPropsWithoutRef<typeof Button.Root>,
 ) => {
-	const [isOpen, setIsOpen] = useQueryState(
-		"api-details",
-		parseAsBoolean.withDefault(false),
-	);
+	const [isOpen, setIsOpen] = useState(false);
 	const [selectedLanguage, setSelectedLanguage] = useApiLanguage<Language>(
 		languages.map((l) => l.id),
 		"nodejs",
@@ -420,21 +417,20 @@ export const LogsApiDetails = (
 			<Tooltip.Provider>
 				<Tooltip.Root>
 					<Tooltip.Trigger asChild>
-						<Drawer.Trigger asChild>
-							<Button.Root
-								variant={variant}
-								size={size}
-								mode={mode}
-								className={cn(
-									"aspect-square p-0",
-									isOpen && "bg-bg-weak-50",
-									className,
-								)}
-								{...rest}
-							>
-								<Icon name="code" className="h-4 w-4" />
-							</Button.Root>
-						</Drawer.Trigger>
+						<Button.Root
+							variant={variant}
+							size={size}
+							mode={mode}
+							className={cn(
+								"aspect-square p-0",
+								isOpen && "bg-bg-weak-50",
+								className,
+							)}
+							onClick={() => setIsOpen(true)}
+							{...rest}
+						>
+							<Icon name="code" className="h-4 w-4" />
+						</Button.Root>
 					</Tooltip.Trigger>
 					<Tooltip.Content className="flex items-center gap-2 rounded-lg">
 						<p className="font-medium text-label-sm">Logs API</p>

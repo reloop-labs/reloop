@@ -1,5 +1,6 @@
 "use client";
 import type { DomainListResponse } from "@fe/dashboard/types/api.types";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useRouter } from "next/navigation";
@@ -9,7 +10,6 @@ import {
 	parseAsStringLiteral,
 	useQueryState,
 } from "nuqs";
-import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 import useSWR from "swr";
 import { DeleteDomainModal } from "./components/delete-domain";

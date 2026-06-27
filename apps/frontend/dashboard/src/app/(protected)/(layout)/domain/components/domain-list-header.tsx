@@ -1,12 +1,12 @@
 "use client";
 
 import { DomainApiDetails } from "@fe/dashboard/components/api-details/domain";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdCommand } from "@reloop/ui/kbd-command";
 import { KbdKey } from "@reloop/ui/kbd-key";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
-import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import Link from "next/link";
 import { useHotkeys } from "react-hotkeys-hook";
 

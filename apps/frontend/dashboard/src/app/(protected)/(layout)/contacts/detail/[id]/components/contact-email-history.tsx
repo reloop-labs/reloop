@@ -1,10 +1,10 @@
 "use client";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Link from "next/link";
-import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import useSWR from "swr";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
