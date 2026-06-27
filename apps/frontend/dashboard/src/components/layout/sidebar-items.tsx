@@ -132,7 +132,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 												isSpecial
 													? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
 													: activeMainIndex === index
-														? "text-primary-base font-semibold"
+														? "text-primary-base"
 														: "text-text-sub-600",
 											)}
 										>
@@ -210,7 +210,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 																className={cn(
 																	"group relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-[12px] transition-colors",
 																	isSubActive
-																		? "text-primary-base font-semibold"
+																		? "text-primary-base"
 																		: "text-text-sub-600",
 																)}
 															>
