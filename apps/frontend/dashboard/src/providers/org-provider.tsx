@@ -22,9 +22,11 @@ type Organization = NonNullable<
 
 type UserOrganizationContextType = {
 	user: User | null;
+	organizations: Organization[] | undefined;
 	activeOrganization: Organization | null;
 	isLoading: boolean;
 	mutateOrganizations: () => void;
+	onOrganizationChange: (organization: Organization) => Promise<void>;
 };
 
 const UserOrganizationContext =
@@ -177,11 +179,27 @@ export const UserOrganizationProvider = ({
 		activeOrganization,
 	]);
 
+	const onOrganizationChange = async (organization: Organization) => {
+		try {
+			await authClient.organization.setActive({
+				organizationId: organization.id,
+			});
+			await authClient.updateUser({
+				activeOrganizationId: organization.id,
+			});
+			mutateOrganizations();
+		} catch (error) {
+			console.error("Error switching organization", { error });
+		}
+	};
+
 	const contextValue: UserOrganizationContextType = {
 		user: session?.user ?? null,
+		organizations: organizations ?? undefined,
 		activeOrganization,
 		isLoading,
 		mutateOrganizations,
+		onOrganizationChange,
 	};
 
 	// Determine if we should show children or a loading state.

@@ -1,12 +1,14 @@
 "use client";
 
 import { mainNavigation, userNavigation } from "@fe/dashboard/constants";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { OrganizationSwitcher } from "./organization-switcher";
 import { UserDropdown } from "./user-dropdown";
 
 export const PageHeader = () => {
@@ -17,6 +19,8 @@ export const PageHeader = () => {
 		aiPanelActiveTab,
 		setAiPanelActiveTab,
 	} = useUIStore();
+	const { organizations, activeOrganization, onOrganizationChange } =
+		useUserOrganization();
 
 	const activeItem = [...mainNavigation, ...userNavigation].find((item) => {
 		if (item.path === "/") return pathname === "/";
@@ -32,11 +36,18 @@ export const PageHeader = () => {
 
 	return (
 		<div className="sticky top-0 z-10 flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b pr-3 pl-3 dark:border-stroke-soft-100/40">
-			{/* Left Side: Page Title */}
-			<div className="flex items-center gap-3">
-				<div className="flex items-center gap-2">
+			{/* Left Side: Org Switcher / Page Label */}
+			<div className="flex items-center gap-1">
+				<OrganizationSwitcher
+					organizations={organizations}
+					activeOrganization={activeOrganization}
+					onOrganizationChange={onOrganizationChange}
+					side="bottom"
+				/>
+				<span className="text-text-disabled-300 text-[13px] select-none">/</span>
+				<div className="flex items-center gap-1.5 px-1">
 					<Icon name={displayIcon} className="h-4 w-4 text-text-sub-600" />
-					<span className="font-semibold text-[13px] text-text-strong-950 capitalize">
+					<span className="font-medium text-[13px] text-text-strong-950 capitalize">
 						{displayLabel}
 					</span>
 				</div>
