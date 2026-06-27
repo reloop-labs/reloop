@@ -10,6 +10,7 @@ import {
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useParams, useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
@@ -30,6 +31,7 @@ export const DomainTable = ({
 	isLoading,
 	loadingRows = 4,
 }: DomainTableProps) => {
+	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
 	const { domainId } = useParams();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
@@ -49,7 +51,7 @@ export const DomainTable = ({
 	const endIndex = Math.min(currentPage * pageSize, total);
 
 	const handleRowClick = (domainId: string) => {
-		router.push(`/domain/${domainId}`);
+		router.push(getBackToUrl(`/domain/${domainId}`));
 	};
 
 	const handleDeleteDomain = (domainId: string) => {

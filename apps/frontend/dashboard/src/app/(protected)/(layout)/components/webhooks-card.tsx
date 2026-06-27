@@ -5,9 +5,11 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { ArrowRight, Plus } from "lucide-react";
 import Link from "next/link";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useWebhooks } from "../webhooks/components/use-webhooks";
 
 export function WebhooksCard() {
+	const getBackToUrl = useGetBackToUrl();
 	const { webhooks, isTotalEmpty } = useWebhooks();
 
 	return (
@@ -15,7 +17,7 @@ export function WebhooksCard() {
 			{/* Header */}
 			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-1.5 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
 				<Link
-					href="/webhooks"
+					href={getBackToUrl("/webhooks")}
 					className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 				>
 					<Icon name="webhook" className="h-4 w-4 shrink-0" />
@@ -24,13 +26,13 @@ export function WebhooksCard() {
 
 				<div className="flex items-center gap-1.5">
 					<Link
-						href="/webhooks/create"
+						href={getBackToUrl("/webhooks/create")}
 						className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 transition-colors hover:bg-bg-weak-50/50 hover:text-text-strong-950 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/60"
 					>
 						<Plus className="h-3.5 w-3.5" />
 					</Link>
 					<Link
-						href="/webhooks"
+						href={getBackToUrl("/webhooks")}
 						className="flex h-7 w-7 shrink-0 items-center justify-center text-text-sub-600 transition-transform hover:translate-x-0.5 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 					>
 						<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -45,7 +47,7 @@ export function WebhooksCard() {
 						{webhooks.slice(0, 3).map((w) => (
 							<Link
 								key={w.id}
-								href={`/webhooks/${w.id}`}
+								href={getBackToUrl(`/webhooks/${w.id}`)}
 								className="grid grid-cols-3 items-center px-4 py-2.5 transition-colors hover:bg-bg-weak-50/50 dark:hover:bg-white/[0.01]"
 							>
 								<div className="flex min-w-0 flex-col pr-2">
@@ -107,7 +109,7 @@ export function WebhooksCard() {
 						asChild
 						className="mt-6 shrink-0 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 					>
-						<Link href="/webhooks/create">Create webhook</Link>
+						<Link href={getBackToUrl("/webhooks/create")}>Create webhook</Link>
 					</Button.Root>
 				</div>
 			)}

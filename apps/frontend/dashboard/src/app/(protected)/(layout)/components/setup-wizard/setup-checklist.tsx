@@ -1,5 +1,6 @@
 "use client";
 
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { cn } from "@reloop/ui/cn";
 import { BookOpen, Check, Globe, Info, Lock } from "lucide-react";
 import Link from "next/link";
@@ -77,6 +78,7 @@ export function SetupChecklist({
 	onGenerateApiKey: () => void;
 	onSendTestEmail: () => void;
 }) {
+	const getBackToUrl = useGetBackToUrl();
 	const progress = useSetupProgress({
 		domains,
 		primaryApiKey,
@@ -213,8 +215,8 @@ export function SetupChecklist({
 									<Link
 										href={
 											primaryDomain
-												? `/domain/${primaryDomain.id}`
-												: "/domain/add"
+												? getBackToUrl(`/domain/${primaryDomain.id}`)
+												: getBackToUrl("/domain/add")
 										}
 										className="inline-flex w-fit items-center gap-2 rounded-lg border border-stroke-soft-100 bg-bg-white-0 px-4 py-2 font-semibold text-sm text-text-strong-950 transition-all hover:bg-bg-weak-50 active:scale-[0.98] dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-white dark:hover:bg-white/[0.08]"
 									>

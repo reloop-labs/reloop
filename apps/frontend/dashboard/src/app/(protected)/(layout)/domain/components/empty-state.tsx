@@ -2,6 +2,7 @@
 import { getStatusLabel } from "@fe/dashboard/utils/domain";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import Link from "next/link";
 import {
 	parseAsInteger,
@@ -11,6 +12,7 @@ import {
 } from "nuqs";
 
 export const EmptyState = () => {
+	const getBackToUrl = useGetBackToUrl();
 	const [statusFilters, setStatusFilters] = useQueryState(
 		"status",
 		parseAsStringLiteral([
@@ -93,7 +95,7 @@ export const EmptyState = () => {
 						asChild
 						className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 					>
-						<Link href={"/domain/add"}>
+						<Link href={getBackToUrl("/domain/add")}>
 							<Icon name="plus" className="h-4 w-4" />
 							Add Domain
 							<span className="inline-flex items-center gap-0.5">

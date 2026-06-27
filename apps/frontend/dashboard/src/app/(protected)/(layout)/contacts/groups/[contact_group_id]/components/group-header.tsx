@@ -19,6 +19,7 @@ import {
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
@@ -63,6 +64,7 @@ const GroupContactsCount = ({ groupId }: { groupId: string }) => {
 };
 
 export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
+	const getBackToUrl = useGetBackToUrl();
 	const { mutate } = useSWRConfig();
 	const { activeOrganization } = useUserOrganization();
 	const router = useRouter();
@@ -96,7 +98,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 	const handleDeleteSuccess = () => {
 		toast.success("Group deleted");
 		if (activeOrganization?.slug) {
-			router.push("/contacts");
+			router.push(getBackToUrl("/contacts"));
 		}
 	};
 

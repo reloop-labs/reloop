@@ -6,6 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import axios from "axios";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -25,6 +26,7 @@ interface BulkImportResult {
 }
 
 export const BulkImportContent = () => {
+	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
 	const { changeStatus, status } = useLoading();
 	const { mutate } = useSWRConfig();
@@ -165,7 +167,7 @@ export const BulkImportContent = () => {
 	};
 
 	const handleBack = () => {
-		router.push("/contacts");
+		router.push(getBackToUrl("/contacts"));
 	};
 
 	return (

@@ -6,6 +6,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useEffect, useState } from "react";
 
 interface Workflow {
@@ -17,6 +18,7 @@ interface Workflow {
 }
 
 export function WorkflowsCard() {
+	const getBackToUrl = useGetBackToUrl();
 	const { activeOrganization } = useUserOrganization();
 	const [workflows, setWorkflows] = useState<Workflow[]>([]);
 	const orgSlug = activeOrganization?.slug ?? "";
@@ -61,7 +63,7 @@ export function WorkflowsCard() {
 		<div className="group flex w-full flex-col">
 			{/* Header */}
 			<Link
-				href="/workflows"
+				href={getBackToUrl("/workflows")}
 				className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-3 pb-5 dark:border-white/5 dark:bg-white/[0.02]"
 			>
 				<span className="flex items-center gap-2 font-medium text-sm text-text-sub-600 dark:text-white/60">
@@ -140,7 +142,7 @@ export function WorkflowsCard() {
 						asChild
 						className="mt-6 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 					>
-						<Link href="/workflows">Start building</Link>
+						<Link href={getBackToUrl("/workflows")}>Start building</Link>
 					</Button.Root>
 				</div>
 			)}

@@ -11,6 +11,7 @@ import * as Textarea from "@reloop/ui/textarea";
 import { useCurrentEditor } from "@tiptap/react";
 import { ChevronDown, ChevronUp, Save } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -284,6 +285,7 @@ export const EditorHeaderActions = ({
 	connectionStatus,
 	isSynced,
 }: EditorHeaderActionsProps) => {
+	const getBackToUrl = useGetBackToUrl();
 	const params = useParams<{ templateId: string }>();
 	const templateId = params?.templateId;
 	const router = useRouter();
@@ -453,7 +455,7 @@ export const EditorHeaderActions = ({
 				method: "DELETE",
 				credentials: "include",
 			});
-			router.push("/templates");
+			router.push(getBackToUrl("/templates"));
 		} catch (error) {
 			console.error("Failed to delete template:", error);
 			toast.error("Failed to delete template.");
@@ -475,7 +477,7 @@ export const EditorHeaderActions = ({
 
 			const newTemplate = await response.json();
 			toast.success("Template duplicated successfully");
-			router.push(`/templates/${newTemplate.id}`);
+			router.push(getBackToUrl(`/templates/${newTemplate.id}`));
 		} catch (error) {
 			console.error("Failed to duplicate template:", error);
 			toast.error("Failed to duplicate template");

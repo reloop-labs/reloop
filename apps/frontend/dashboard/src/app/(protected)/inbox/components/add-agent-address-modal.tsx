@@ -8,6 +8,7 @@ import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import Link from "next/link";
@@ -46,6 +47,7 @@ export const AddAgentAddressModal = ({
 	onClose: () => void;
 	onCreated?: (mailbox: AgentMailbox) => void;
 }) => {
+	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
 	const { addMailbox, mailboxes } = useAgentInbox();
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -200,7 +202,7 @@ export const AddAgentAddressModal = ({
 									variant="neutral"
 									size="xsmall"
 									onClick={() => {
-										router.push("/domain/add");
+										router.push(getBackToUrl("/domain/add"));
 									}}
 									className="flex items-center gap-1.5"
 								>

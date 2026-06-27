@@ -3,6 +3,7 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRouter } from "next/navigation";
 
 const steps = [
@@ -43,6 +44,7 @@ const features = [
 ];
 
 export const EmptyState = () => {
+	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
 	const { activeOrganization } = useUserOrganization();
 
@@ -64,7 +66,7 @@ export const EmptyState = () => {
 						variant="neutral"
 						mode="stroke"
 						size="xsmall"
-						onClick={() => router.push("/webhooks/create")}
+						onClick={() => router.push(getBackToUrl("/webhooks/create"))}
 						className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 					>
 						<Icon name="plus" className="h-4 w-4" />

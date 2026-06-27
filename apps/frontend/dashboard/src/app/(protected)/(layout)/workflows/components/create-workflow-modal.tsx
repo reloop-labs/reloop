@@ -6,6 +6,7 @@ import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import * as Textarea from "@reloop/ui/textarea";
 import { useRouter } from "next/navigation";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useState } from "react";
 import { useWorkflows } from "./workflows-provider";
 
@@ -18,6 +19,7 @@ export const CreateWorkflowModal = ({
 	open,
 	onOpenChange,
 }: CreateWorkflowModalProps) => {
+	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
 	const { createWorkflow } = useWorkflows();
 	const [name, setName] = useState("");
@@ -38,7 +40,7 @@ export const CreateWorkflowModal = ({
 			description: description.trim() || undefined,
 		});
 		handleClose();
-		router.push(`/workflows/${workflow.id}`);
+		router.push(getBackToUrl(`/workflows/${workflow.id}`));
 	};
 
 	return (

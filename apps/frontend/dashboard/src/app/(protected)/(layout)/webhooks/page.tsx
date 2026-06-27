@@ -3,6 +3,7 @@
 import { WebhooksApiDetails } from "@fe/dashboard/components/api-details/webhooks";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRouter } from "next/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 import { DocsButton } from "./components/docs-button";
@@ -12,6 +13,7 @@ import { WebhookTable } from "./components/webhook-table";
 import { WebhookToolbar } from "./components/webhook-toolbar";
 
 const WebhooksPage = () => {
+	const getBackToUrl = useGetBackToUrl();
 	const {
 		activeOrganization,
 		statusFilter,
@@ -28,7 +30,7 @@ const WebhooksPage = () => {
 
 	const handleCreateWebhook = () => {
 		if (activeOrganization?.slug) {
-			router.push("/webhooks/create");
+			router.push(getBackToUrl("/webhooks/create"));
 		}
 	};
 

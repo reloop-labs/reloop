@@ -21,8 +21,24 @@ export const AnimatedBackButton = ({
 	onClick,
 	showText = true,
 }: AnimatedBackButtonProps) => {
-	const { back } = useRouter();
+	const router = useRouter();
 	const [hovered, setHovered] = useState(false);
+
+	const handleBack = () => {
+		if (typeof window !== "undefined") {
+			const searchParams = new URLSearchParams(window.location.search);
+			const goBackTo = searchParams.get("goBackTo");
+			if (goBackTo) {
+				router.push(goBackTo);
+				return;
+			}
+		}
+		if (onClick) {
+			onClick();
+		} else {
+			router.back();
+		}
+	};
 
 	useHotkeys(
 		"esc",
@@ -33,7 +49,7 @@ export const AnimatedBackButton = ({
 				)
 			)
 				return;
-			onClick ? onClick() : back();
+			handleBack();
 		},
 		{ enabled: showEscKey },
 	);
@@ -41,7 +57,7 @@ export const AnimatedBackButton = ({
 	return (
 		<motion.button
 			type="button"
-			onClick={onClick ?? back}
+			onClick={handleBack}
 			onHoverStart={() => setHovered(true)}
 			onHoverEnd={() => setHovered(false)}
 			whileTap={{ scale: 0.96 }}

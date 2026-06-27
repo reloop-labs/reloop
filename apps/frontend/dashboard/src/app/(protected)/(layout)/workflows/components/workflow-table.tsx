@@ -4,6 +4,7 @@ import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import type { Workflow } from "../workflow-types";
 import { getWorkflowSummary } from "../workflow-validation";
 import { WorkflowEmptyState } from "./workflow-empty-state";
@@ -43,6 +44,7 @@ export const WorkflowTable = ({
 	isTotalEmpty,
 	onCreate,
 }: WorkflowTableProps) => {
+	const getBackToUrl = useGetBackToUrl();
 	if (isLoading) {
 		return (
 			<div className="flex flex-col gap-2 p-4">
@@ -67,7 +69,7 @@ export const WorkflowTable = ({
 				return (
 					<Link
 						key={workflow.id}
-						href={`/workflows/${workflow.id}`}
+						href={getBackToUrl(`/workflows/${workflow.id}`)}
 						className="group flex items-center gap-4 border-stroke-soft-100 border-b px-4 py-3 transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/50"
 					>
 						<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50 dark:border-stroke-soft-100/50">

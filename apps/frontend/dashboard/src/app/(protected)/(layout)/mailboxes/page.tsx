@@ -7,6 +7,7 @@ import * as StatusBadge from "@reloop/ui/status-badge";
 import * as Table from "@reloop/ui/table";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import Link from "next/link";
 import * as React from "react";
 import { useState } from "react";
@@ -50,6 +51,7 @@ const mailboxes: Array<{
 ];
 
 const EmptyState = () => {
+	const getBackToUrl = useGetBackToUrl();
 	const { activeOrganization } = useUserOrganization();
 	return (
 		<div className="flex flex-col items-center justify-center rounded-2xl border border-stroke-soft-100 p-6 py-20">
@@ -68,7 +70,7 @@ const EmptyState = () => {
 				className={Button.buttonVariants({
 					variant: "neutral",
 				}).root()}
-				href={"/domain/add"}
+				href={getBackToUrl("/domain/add")}
 			>
 				<Icon name="plus" className="h-4 w-4" />
 				Add your first mailbox

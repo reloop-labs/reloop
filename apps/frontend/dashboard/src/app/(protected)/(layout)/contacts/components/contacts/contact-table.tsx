@@ -12,6 +12,7 @@ import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
@@ -77,6 +78,7 @@ export const ContactTable = ({
 	emptyStateDocsText,
 	emptyStateDocsLink,
 }: ContactTableProps) => {
+	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
 	const { activeOrganization } = useUserOrganization();
 	const [, setModal] = useQueryState("modal");
@@ -98,7 +100,7 @@ export const ContactTable = ({
 
 	const handleRowClick = (contact: Contact) => {
 		if (activeOrganization?.slug) {
-			router.push(`/contacts/detail/${contact.id}`);
+			router.push(getBackToUrl(`/contacts/detail/${contact.id}`));
 		}
 	};
 

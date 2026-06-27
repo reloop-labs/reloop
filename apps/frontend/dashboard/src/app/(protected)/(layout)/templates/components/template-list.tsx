@@ -5,6 +5,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Spinner from "@reloop/ui/spinner";
 import { useRouter } from "next/navigation";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useState } from "react";
 import useSWR from "swr";
 import { EmptyState } from "./empty-state";
@@ -28,6 +29,7 @@ interface TemplateListResponse {
 }
 
 export const TemplateList = () => {
+	const getBackToUrl = useGetBackToUrl();
 	const { activeOrganization } = useUserOrganization();
 	const router = useRouter();
 	const [searchQuery, setSearchQuery] = useState<string>("");
@@ -60,7 +62,7 @@ export const TemplateList = () => {
 
 			if (response.ok) {
 				const template = await response.json();
-				router.push(`/templates/${template.id}`);
+				router.push(getBackToUrl(`/templates/${template.id}`));
 			}
 		} catch (error) {
 			console.error("Failed to create template:", error);

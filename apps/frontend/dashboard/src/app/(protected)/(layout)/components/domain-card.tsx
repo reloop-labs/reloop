@@ -10,6 +10,7 @@ import * as Popover from "@reloop/ui/popover";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, MoreHorizontal, Plus } from "lucide-react";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
@@ -217,6 +218,7 @@ const RowActionsDropdown = ({
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
 
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
@@ -257,7 +259,7 @@ const RowActionsDropdown = ({
 		e.stopPropagation();
 		setPopoverOpen(false);
 		if (itemId === "configure") {
-			router.push(`/domain/${domain.id}`);
+			router.push(getBackToUrl(`/domain/${domain.id}`));
 		} else if (itemId === "copy-id") {
 			navigator.clipboard.writeText(domain.id);
 			toast.success("Domain ID copied to clipboard");
@@ -333,6 +335,7 @@ const RowActionsDropdown = ({
 };
 
 export function DomainCard() {
+	const getBackToUrl = useGetBackToUrl();
 	const { activeOrganization } = useUserOrganization();
 	const [statusFilter, setStatusFilter] = useState<DomainData["status"] | null>(
 		null,
@@ -378,7 +381,7 @@ export function DomainCard() {
 				{/* Header Actions */}
 				<div className="flex items-center gap-1.5">
 					<Link
-						href="/domain/add"
+						href={getBackToUrl("/domain/add")}
 						className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 transition-colors hover:bg-bg-weak-50/50 hover:text-text-strong-950 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/60"
 					>
 						<Plus className="h-3.5 w-3.5" />
@@ -522,7 +525,7 @@ export function DomainCard() {
 											</Tooltip.Provider>
 
 											<Link
-												href={`/domain/${d.id}`}
+												href={getBackToUrl(`/domain/${d.id}`)}
 												className="truncate font-semibold text-text-strong-950 text-xs group-hover/row:underline dark:text-white"
 											>
 												{d.domain}
@@ -665,7 +668,7 @@ export function DomainCard() {
 							asChild
 							className="mt-6 shrink-0 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 						>
-							<Link href="/domain/add">Add your domain</Link>
+							<Link href={getBackToUrl("/domain/add")}>Add your domain</Link>
 						</Button.Root>
 					</motion.div>
 				)}

@@ -2,18 +2,20 @@
 
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
 export const DomainNotFound: React.FC = () => {
+	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
 
 	useHotkeys("mod+d", () => router.push("/domain"));
 	useHotkeys("mod+a", (e) => {
 		e.preventDefault();
-		router.push("/domain/add");
+		router.push(getBackToUrl("/domain/add"));
 	});
 
 	return (
@@ -55,7 +57,7 @@ export const DomainNotFound: React.FC = () => {
 						mode: "stroke",
 						size: "xsmall",
 					}).root()}`}
-					href={"/domain/add"}
+					href={getBackToUrl("/domain/add")}
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Add domain

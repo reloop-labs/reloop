@@ -22,6 +22,7 @@ import {
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Link from "next/link";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -84,6 +85,7 @@ export const ContactHeader = ({
 	enrolledChannels = [],
 }: ContactHeaderProps) => {
 	const { activeOrganization } = useUserOrganization();
+	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
 	const [copied, setCopied] = useState(false);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -113,7 +115,7 @@ export const ContactHeader = ({
 		toast.success("Contact deleted");
 		// Navigate back to contacts list
 		if (activeOrganization?.slug) {
-			router.push("/contacts");
+			router.push(getBackToUrl("/contacts"));
 		}
 	};
 
@@ -351,7 +353,7 @@ export const ContactHeader = ({
 								{contact.groups.map((group) => (
 									<Link
 										key={group.id}
-										href={`/contacts/groups/${group.id}`}
+										href={getBackToUrl(`/contacts/groups/${group.id}`)}
 										className="font-medium text-paragraph-sm text-text-strong-950 underline decoration-dashed underline-offset-2 transition-colors hover:text-primary-base"
 									>
 										{group.name}
@@ -381,7 +383,7 @@ export const ContactHeader = ({
 								{enrolledChannels.map((channel) => (
 									<Link
 										key={channel.id}
-										href={`/contacts/channels/${channel.id}`}
+										href={getBackToUrl(`/contacts/channels/${channel.id}`)}
 										className="font-medium text-paragraph-sm text-text-strong-950 underline decoration-dashed underline-offset-2 transition-colors hover:text-primary-base"
 									>
 										{channel.name}

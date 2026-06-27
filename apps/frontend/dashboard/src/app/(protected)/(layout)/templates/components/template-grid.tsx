@@ -15,6 +15,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useEffect, useRef, useState } from "react";
 import { DeleteTemplateModal } from "./delete-template-modal";
 import "@react-email/editor/themes/default.css";
@@ -242,6 +243,7 @@ export const TemplateGrid = ({
 	loadingRows = 6,
 	onMutate,
 }: TemplateGridProps) => {
+	const getBackToUrl = useGetBackToUrl();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [templateToDelete, setTemplateToDelete] = useState<{
@@ -335,7 +337,7 @@ export const TemplateGrid = ({
 
 									{/* Clickable Overlay Link to Editor (Base z-index) */}
 									<Link
-										href={`/templates/${template.id}`}
+										href={getBackToUrl(`/templates/${template.id}`)}
 										className="absolute inset-0 z-0"
 										aria-label={`Edit ${template.name}`}
 									/>

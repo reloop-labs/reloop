@@ -18,6 +18,7 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { EmailsEmptyState } from "./emails-empty-state";
@@ -243,6 +244,7 @@ export const EmailTable = ({
 	hasFilters = false,
 	onClearFilters,
 }: EmailTableProps) => {
+	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
@@ -251,7 +253,7 @@ export const EmailTable = ({
 	const endIndex = Math.min(currentPage * pageSize, totalLogs);
 
 	const handleRowClick = (log: EmailLogData) => {
-		router.push(`/emails/${log.id}`);
+		router.push(getBackToUrl(`/emails/${log.id}`));
 	};
 
 	return (
@@ -363,7 +365,7 @@ export const EmailTable = ({
 								>
 									<EmailActionsDropdown
 										log={log}
-										onViewDetails={(id) => router.push(`/emails/${id}`)}
+										onViewDetails={(id) => router.push(getBackToUrl(`/emails/${id}`))}
 										onOpenChange={(open) =>
 											setActiveDropdownId(open ? log.id : null)
 										}

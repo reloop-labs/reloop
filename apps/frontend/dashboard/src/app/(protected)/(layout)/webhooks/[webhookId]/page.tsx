@@ -1,5 +1,6 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import useSWR from "swr";
@@ -28,6 +29,7 @@ interface WebhookData {
 }
 
 const WebhookDetailPage = () => {
+	const getBackToUrl = useGetBackToUrl();
 	const { webhookId } = useParams();
 	const router = useRouter();
 	const [, setDeleteId] = useQueryState("delete");
@@ -75,7 +77,7 @@ const WebhookDetailPage = () => {
 					if (webhookData) setDeleteId(webhookData.id);
 				}}
 				onTriggerTest={() =>
-					router.push(`/webhooks/${webhookId as string}/test`)
+					router.push(getBackToUrl(`/webhooks/${webhookId as string}/test`))
 				}
 			/>
 

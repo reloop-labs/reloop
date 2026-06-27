@@ -3,9 +3,11 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useRouter } from "next/navigation";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useState } from "react";
 
 export const EmptyState = () => {
+	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
 	const [isCreating, setIsCreating] = useState(false);
 
@@ -24,7 +26,7 @@ export const EmptyState = () => {
 
 			if (response.ok) {
 				const template = await response.json();
-				router.push(`/templates/${template.id}`);
+				router.push(getBackToUrl(`/templates/${template.id}`));
 			}
 		} catch (error) {
 			console.error("Failed to create template:", error);

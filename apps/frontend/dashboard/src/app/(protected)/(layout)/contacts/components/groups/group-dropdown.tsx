@@ -10,6 +10,7 @@ import {
 	Root as PopoverRoot,
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
@@ -31,6 +32,7 @@ export const GroupDropdown = ({
 	isDeleting = false,
 	onOpenChange,
 }: GroupDropdownProps) => {
+	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
 	const { activeOrganization } = useUserOrganization();
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -66,7 +68,7 @@ export const GroupDropdown = ({
 		if (itemId === "view") {
 			setPopoverOpen(false);
 			if (activeOrganization?.slug) {
-				router.push(`/contacts/groups/${group.id}`);
+				router.push(getBackToUrl(`/contacts/groups/${group.id}`));
 			}
 		} else if (itemId === "delete") {
 			setPopoverOpen(false);

@@ -6,6 +6,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import useSWR from "swr";
 
 interface LogData {
@@ -105,6 +106,7 @@ const isError = (log: LogData) =>
 	(log.status_code != null && log.status_code >= 400);
 
 export function AuditLogsCard() {
+	const getBackToUrl = useGetBackToUrl();
 	const { activeOrganization } = useUserOrganization();
 
 	const { data: auditLogsData } = useSWR<LogListResponse>(
@@ -116,14 +118,14 @@ export function AuditLogsCard() {
 			{/* Header */}
 			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-1.5 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
 				<Link
-					href="/logs"
+					href={getBackToUrl("/logs")}
 					className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 				>
 					<Icon name="file-text" className="h-4 w-4 shrink-0" />
 					Audit Logs
 				</Link>
 				<Link
-					href="/logs"
+					href={getBackToUrl("/logs")}
 					className="flex h-7 w-7 shrink-0 items-center justify-center text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60"
 				>
 					<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -140,7 +142,7 @@ export function AuditLogsCard() {
 						return (
 							<Link
 								key={log.uuid}
-								href={`/logs?log=${log.uuid}`}
+								href={getBackToUrl(`/logs?log=${log.uuid}`)}
 								className="group/row flex items-center gap-3 border-stroke-soft-100 border-b py-3 no-underline last:border-b-0 dark:border-white/5"
 							>
 								{/* Icon */}
@@ -194,7 +196,7 @@ export function AuditLogsCard() {
 						asChild
 						className="mt-6 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 					>
-						<Link href="/logs">View audit logs</Link>
+						<Link href={getBackToUrl("/logs")}>View audit logs</Link>
 					</Button.Root>
 				</div>
 			)}

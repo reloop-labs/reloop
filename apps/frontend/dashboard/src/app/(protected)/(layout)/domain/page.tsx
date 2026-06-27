@@ -9,6 +9,7 @@ import {
 	parseAsStringLiteral,
 	useQueryState,
 } from "nuqs";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 import useSWR from "swr";
 import { DeleteDomainModal } from "./components/delete-domain";
@@ -20,6 +21,7 @@ import { DomainTable } from "./components/domain-table";
 dayjs.extend(relativeTime);
 
 const DomainPage = () => {
+	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
 	const [statusFilters] = useQueryState(
 		"status",
@@ -44,7 +46,7 @@ const DomainPage = () => {
 	);
 
 	useHotkeys("mod+a", () => {
-		router.push("/domain/add");
+		router.push(getBackToUrl("/domain/add"));
 	});
 
 	const domains = data?.domains || [];

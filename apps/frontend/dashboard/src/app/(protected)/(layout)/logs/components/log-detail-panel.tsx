@@ -8,6 +8,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
 import Link from "next/link";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -225,6 +226,7 @@ function PropertyValue({
  * Also used inside the drawer for the mobile/narrow-viewport experience.
  */
 export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
+	const getBackToUrl = useGetBackToUrl();
 	const { data: log, isLoading } = useSWR<LogDetail>(
 		logId ? `/api/logs/v1/${logId}` : null,
 		{ revalidateOnFocus: false },
@@ -294,7 +296,7 @@ export const LogDetailPanel = ({ logId }: LogDetailPanelProps) => {
 					</div>
 				</div>
 				<Link
-					href={`/logs/${log.uuid}`}
+					href={getBackToUrl(`/logs/${log.uuid}`)}
 					className="flex-shrink-0 rounded-md p-1 text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
 					title="View full details"
 				>

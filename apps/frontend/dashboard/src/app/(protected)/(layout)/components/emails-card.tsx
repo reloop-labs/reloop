@@ -13,6 +13,7 @@ import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { ArrowRight, Plus } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRef, useState } from "react";
 import useSWR from "swr";
 
@@ -101,6 +102,7 @@ const formatShortRelativeTime = (date: string | Date) => {
 };
 
 export function EmailsCard() {
+	const getBackToUrl = useGetBackToUrl();
 	const { activeOrganization } = useUserOrganization();
 	const [activeTab, setActiveTab] = useState<"sent" | "received">("sent");
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
@@ -136,7 +138,7 @@ export function EmailsCard() {
 			{/* Header */}
 			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-1.5 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
 				<Link
-					href={headerHref}
+					href={getBackToUrl(headerHref)}
 					className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 				>
 					<Icon name="mail-single" className="h-4 w-4 shrink-0" />
@@ -146,14 +148,14 @@ export function EmailsCard() {
 				<div className="flex items-center gap-1.5">
 					{activeTab === "received" && (
 						<Link
-							href="/agent-inbox?modal=create-agent-mailbox"
+							href={getBackToUrl("/agent-inbox?modal=create-agent-mailbox")}
 							className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 transition-colors hover:bg-bg-weak-50/50 hover:text-text-strong-950 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/60"
 						>
 							<Plus className="h-3.5 w-3.5" />
 						</Link>
 					)}
 					<Link
-						href={headerHref}
+						href={getBackToUrl(headerHref)}
 						className="flex h-7 w-7 shrink-0 items-center justify-center text-text-sub-600 transition-transform hover:translate-x-0.5 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 					>
 						<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -253,7 +255,7 @@ export function EmailsCard() {
 								{emailLogsData.data.slice(0, 6).map((d) => (
 									<Link
 										key={d.id}
-										href={`/emails/${d.id}`}
+										href={getBackToUrl(`/emails/${d.id}`)}
 										className="group/row flex items-center justify-between border-stroke-soft-100 border-b py-2.5 transition-colors last:border-b-0 hover:bg-bg-weak-50/50 dark:border-white/5 dark:hover:bg-white/[0.01]"
 									>
 										<div className="flex min-w-0 flex-1 items-center gap-3">
@@ -296,7 +298,7 @@ export function EmailsCard() {
 									asChild
 									className="mt-6 shrink-0 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 								>
-									<Link href="/api-keys">View API keys</Link>
+									<Link href={getBackToUrl("/api-keys")}>View API keys</Link>
 								</Button.Root>
 							</div>
 						)
@@ -305,7 +307,7 @@ export function EmailsCard() {
 							{messagesData.slice(0, 6).map((d) => (
 								<Link
 									key={d.id}
-									href={`/inbox/${d.mailboxId}`}
+									href={getBackToUrl(`/inbox/${d.mailboxId}`)}
 									className="group/row flex items-center justify-between border-stroke-soft-100 border-b py-2.5 transition-colors last:border-b-0 hover:bg-bg-weak-50/50 dark:border-white/5 dark:hover:bg-white/[0.01]"
 								>
 									<div className="flex min-w-0 flex-1 items-center gap-3">
@@ -350,7 +352,7 @@ export function EmailsCard() {
 								asChild
 								className="mt-6 shrink-0 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 							>
-								<Link href="/agent-inbox?modal=create-agent-mailbox">
+								<Link href={getBackToUrl("/agent-inbox?modal=create-agent-mailbox")}>
 									Set up inbox
 								</Link>
 							</Button.Root>

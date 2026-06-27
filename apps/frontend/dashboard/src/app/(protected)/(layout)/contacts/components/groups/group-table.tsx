@@ -6,10 +6,13 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useState } from "react";
 import useSWR from "swr";
 import { GroupDropdown } from "./group-dropdown";
 import { GroupsEmptyState } from "./groups-empty-state";
+
+// ... [rest of interface code]
 
 interface Group {
 	id: string;
@@ -72,11 +75,12 @@ export const GroupTable = ({
 	onAddGroup,
 	onDelete,
 }: GroupTableProps) => {
+	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	const handleRowClick = (groupId: string) => {
-		router.push(`/contacts/groups/${groupId}`);
+		router.push(getBackToUrl(`/contacts/groups/${groupId}`));
 	};
 
 	const totalPages = Math.ceil(total / pageSize);

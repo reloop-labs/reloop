@@ -6,10 +6,12 @@ import { Icon } from "@reloop/ui/icon";
 import { KbdCommand } from "@reloop/ui/kbd-command";
 import { KbdKey } from "@reloop/ui/kbd-key";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import Link from "next/link";
 import { useHotkeys } from "react-hotkeys-hook";
 
 export const DomainListHeader = () => {
+	const getBackToUrl = useGetBackToUrl();
 	const openDocs = () =>
 		window.open("https://reloop.sh/docs/domains", "_blank");
 
@@ -37,7 +39,7 @@ export const DomainListHeader = () => {
 						variant: "neutral",
 						size: "xsmall",
 					}).root()}`}
-					href={"/domain/add"}
+					href={getBackToUrl("/domain/add")}
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Add domain

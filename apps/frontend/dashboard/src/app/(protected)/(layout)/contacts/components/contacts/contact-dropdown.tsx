@@ -11,6 +11,7 @@ import {
 	Root as PopoverRoot,
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -44,6 +45,7 @@ export const ContactDropdown = ({
 	isDeleting,
 	onOpenChange,
 }: ContactDropdownProps) => {
+	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
 	const { mutate } = useSWRConfig();
 	const { activeOrganization } = useUserOrganization();
@@ -124,7 +126,7 @@ export const ContactDropdown = ({
 		if (itemId === "view") {
 			setPopoverOpen(false);
 			if (activeOrganization?.slug) {
-				router.push(`/contacts/detail/${contact.id}`);
+				router.push(getBackToUrl(`/contacts/detail/${contact.id}`));
 			}
 		} else if (itemId === "toggle-status") {
 			setPopoverOpen(false);

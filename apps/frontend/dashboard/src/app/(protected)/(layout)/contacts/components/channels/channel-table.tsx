@@ -6,6 +6,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useRouter } from "next/navigation";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useState } from "react";
 import { EmptyState } from "../shared/empty-state";
 import { ChannelDropdown } from "./channel-dropdown";
@@ -92,11 +93,12 @@ export const ChannelTable = ({
 	onDelete,
 	onAddChannel,
 }: ChannelTableProps) => {
+	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	const handleRowClick = (channelId: string) => {
-		router.push(`/contacts/channels/${channelId}`);
+		router.push(getBackToUrl(`/contacts/channels/${channelId}`));
 	};
 
 	const handleDelete = (channelId: string) => {

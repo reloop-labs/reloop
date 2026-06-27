@@ -4,6 +4,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Link from "next/link";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import useSWR from "swr";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -564,6 +565,7 @@ function EmailRow({
 	isLast: boolean;
 	contactEmail: string;
 }) {
+	const getBackToUrl = useGetBackToUrl();
 	const status = entry.status as EmailStatus;
 
 	return (
@@ -574,7 +576,7 @@ function EmailRow({
 				{/* Action line */}
 				<div className="flex flex-wrap items-center gap-x-2 gap-y-1">
 					<Link
-						href={`/emails/${entry.id}`}
+						href={getBackToUrl(`/emails/${entry.id}`)}
 						className="max-w-[320px] truncate font-medium text-[13px] text-text-strong-950 underline decoration-stroke-soft-200 decoration-dashed underline-offset-4 transition-colors hover:text-primary-base"
 					>
 						{entry.subject || "(no subject)"}

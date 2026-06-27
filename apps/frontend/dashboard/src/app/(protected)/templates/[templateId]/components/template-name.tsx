@@ -3,6 +3,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
+import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
@@ -12,6 +13,7 @@ const fetcher = (url: string) =>
 	fetch(url, { credentials: "include" }).then((res) => res.json());
 
 export const TemplateName = () => {
+	const getBackToUrl = useGetBackToUrl();
 	const params = useParams<{ templateId: string }>();
 	const templateId = params?.templateId;
 
@@ -75,7 +77,7 @@ export const TemplateName = () => {
 			<div className="flex items-center gap-1.5">
 				<Icon name="layout" className="size-4 text-text-sub-600" />
 				<Link
-					href="/templates"
+					href={getBackToUrl("/templates")}
 					className="font-medium text-sm hover:text-text-strong-950"
 				>
 					Templates
