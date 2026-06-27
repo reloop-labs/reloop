@@ -66,14 +66,14 @@ const UsagePage = () => {
 	}
 
 	return (
-		<div className="w-full space-y-5 pt-5">
+		<div className="w-full space-y-6 pt-5">
 			{/* Header */}
 			<div className="flex items-start justify-between">
 				<div>
-					<h1 className="font-semibold text-text-strong-950 text-title-h5">
+					<h1 className="font-semibold text-text-strong-950 text-title-h5 dark:text-white">
 						Usage
 					</h1>
-					<p className="mt-1 text-paragraph-sm text-text-sub-600">
+					<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-white/60">
 						Email sends for your current billing period.
 					</p>
 				</div>
@@ -90,13 +90,16 @@ const UsagePage = () => {
 			)}
 
 			{/* Billing Period Banner */}
-			<div className="flex items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-4">
+			<div className="flex items-center justify-between rounded-xl border border-stroke-soft-100 bg-white p-4 dark:border-white/5 dark:bg-white/[0.02]">
 				<div className="flex items-center gap-3">
-					<Icon name="calendar" className="h-5 w-5 text-text-sub-600" />
+					<Icon
+						name="calendar"
+						className="h-5 w-5 text-text-sub-600 dark:text-white/60"
+					/>
 					{isLoading ? (
 						<Skeleton className="h-4 w-52" />
 					) : (
-						<p className="font-medium text-label-sm text-text-strong-950">
+						<p className="font-medium text-label-sm text-text-strong-950 dark:text-white">
 							Billing period:{" "}
 							{data
 								? formatPeriod(
@@ -110,9 +113,9 @@ const UsagePage = () => {
 				{isLoading ? (
 					<Skeleton className="h-4 w-24" />
 				) : (
-					<p className="font-medium text-paragraph-xs text-text-sub-600">
+					<p className="font-medium text-paragraph-xs text-text-sub-600 dark:text-white/60">
 						Resets in{" "}
-						<span className="font-semibold text-text-strong-950">
+						<span className="font-semibold text-text-strong-950 dark:text-white">
 							{data ? daysUntil(data.subscription.currentPeriodEnd) : "—"} days
 						</span>
 					</p>
@@ -120,15 +123,15 @@ const UsagePage = () => {
 			</div>
 
 			{/* Main Usage Card */}
-			<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-6">
-				<div className="mb-4 flex items-center justify-between">
-					<div>
-						<p className="font-semibold text-label-md text-text-strong-950">
-							Emails sent
-						</p>
-						<p className="text-paragraph-xs text-text-sub-600">
-							Total outbound sends this period
-						</p>
+			<div className="group flex w-full flex-col">
+				{/* Header */}
+				<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-3 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
+					<div className="flex items-center gap-2 font-medium text-sm text-text-strong-950 dark:text-white">
+						<Icon
+							name="mail-send"
+							className="h-4 w-4 shrink-0 text-text-sub-600 dark:text-white/60"
+						/>
+						<span>Emails sent</span>
 					</div>
 					{isLoading ? (
 						<Skeleton className="h-5 w-20 rounded-full" />
@@ -141,139 +144,157 @@ const UsagePage = () => {
 					)}
 				</div>
 
-				<div className="mb-6">
-					{isLoading ? (
-						<Skeleton className="h-9 w-48" />
-					) : (
-						<div className="flex items-baseline gap-2">
-							<span className="font-bold text-text-strong-950 text-title-h3">
-								{data ? formatNumber(data.subscription.creditsUsed) : "—"}
-							</span>
-							<span className="font-medium text-paragraph-sm text-text-sub-600">
-								of {data ? formatNumber(data.plan.monthlyCredits) : "—"}{" "}
-								included
-							</span>
-						</div>
-					)}
-				</div>
+				{/* Body Container */}
+				<div className="-mt-1.5 flex flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+					<p className="mb-4 text-paragraph-xs text-text-sub-600 dark:text-white/60">
+						Total outbound sends this period
+					</p>
 
-				{/* Progress bar */}
-				<div className="relative h-2 w-full overflow-hidden rounded-full bg-bg-soft-200">
-					<div
-						className={`absolute top-0 left-0 h-full transition-all duration-500 ${
-							isOverLimit
-								? "bg-error-base"
-								: isNearLimit
-									? "bg-warning-base"
-									: "bg-blue-500"
-						}`}
-						style={{ width: `${Math.min(100, usagePercent)}%` }}
-					/>
-				</div>
+					<div className="mb-6">
+						{isLoading ? (
+							<Skeleton className="h-9 w-48" />
+						) : (
+							<div className="flex items-baseline gap-2">
+								<span className="font-bold text-text-strong-950 text-title-h3 dark:text-white">
+									{data ? formatNumber(data.subscription.creditsUsed) : "—"}
+								</span>
+								<span className="font-medium text-paragraph-sm text-text-sub-600 dark:text-white/60">
+									of {data ? formatNumber(data.plan.monthlyCredits) : "—"}{" "}
+									included
+								</span>
+							</div>
+						)}
+					</div>
 
-				<div className="mt-3 flex justify-between">
-					{isLoading ? (
-						<>
-							<Skeleton className="h-3 w-16" />
-							<Skeleton className="h-3 w-24" />
-						</>
-					) : (
-						<>
-							<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-tight">
-								{usagePercent.toFixed(1)}% used
-							</p>
-							<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-tight">
-								{data ? formatNumber(data.subscription.creditsRemaining) : "—"}{" "}
-								remaining
-							</p>
-						</>
-					)}
+					{/* Progress bar */}
+					<div className="relative h-2 w-full overflow-hidden rounded-full bg-bg-soft-200 dark:bg-white/10">
+						<div
+							className={`absolute top-0 left-0 h-full transition-all duration-500 ${
+								isOverLimit
+									? "bg-error-base"
+									: isNearLimit
+										? "bg-warning-base"
+										: "bg-blue-500"
+							}`}
+							style={{ width: `${Math.min(100, usagePercent)}%` }}
+						/>
+					</div>
+
+					<div className="mt-3 flex justify-between">
+						{isLoading ? (
+							<>
+								<Skeleton className="h-3 w-16" />
+								<Skeleton className="h-3 w-24" />
+							</>
+						) : (
+							<>
+								<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-tight dark:text-white/60">
+									{usagePercent.toFixed(1)}% used
+								</p>
+								<p className="font-medium text-[11px] text-text-sub-600 uppercase tracking-tight dark:text-white/60">
+									{data
+										? formatNumber(data.subscription.creditsRemaining)
+										: "—"}{" "}
+									remaining
+								</p>
+							</>
+						)}
+					</div>
 				</div>
 			</div>
 
 			{/* Rate Limits Card */}
-			<div className="relative overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-6">
-				<div className="mb-6">
-					<p className="font-semibold text-label-md text-text-strong-950">
-						Rate limits
-					</p>
-					<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
+			<div className="group flex w-full flex-col">
+				{/* Header */}
+				<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-3 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
+					<div className="flex items-center gap-2 font-medium text-sm text-text-strong-950 dark:text-white">
+						<Icon
+							name="clock"
+							className="h-4 w-4 shrink-0 text-text-sub-600 dark:text-white/60"
+						/>
+						<span>Rate limits</span>
+					</div>
+				</div>
+
+				{/* Body Container */}
+				<div className="-mt-1.5 flex flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+					<p className="mb-6 text-paragraph-xs text-text-sub-600 dark:text-white/60">
 						{data
 							? `${data.plan.name} plan thresholds`
 							: "Current plan thresholds"}
 					</p>
-				</div>
 
-				<div className="space-y-4">
-					{isLoading
-						? Array.from({ length: 5 }).map((_, i) => (
-								<div key={i} className="flex items-center justify-between">
-									<Skeleton className="h-4 w-32" />
-									<Skeleton className="h-4 w-28" />
-								</div>
-							))
-						: [
-								{
-									label: "Per second",
-									value: data
-										? `${formatNumber(data.plan.ratePerSecond)} emails / sec`
-										: "—",
-									icon: "clock",
-								},
-								{
-									label: "Per minute",
-									value: data
-										? `${formatNumber(data.plan.ratePerMinute)} emails / min`
-										: "—",
-									icon: "clock",
-								},
-								{
-									label: "Per hour",
-									value: data
-										? `${formatNumber(data.plan.ratePerHour)} emails / hr`
-										: "—",
-									icon: "clock",
-								},
-								{
-									label: "Monthly quota",
-									value: data
-										? `${formatNumber(data.plan.monthlyCredits)} emails`
-										: "—",
-									icon: "calendar",
-								},
-								{
-									label: "Max attachment size",
-									value: data ? `${data.plan.maxAttachmentSizeMb} MB` : "—",
-									icon: "file-text",
-								},
-							].map((limit) => (
-								<div
-									key={limit.label}
-									className="group flex items-center justify-between"
-								>
-									<div className="flex items-center gap-3 text-text-sub-600">
-										<Icon name={limit.icon} className="h-4 w-4" />
-										<span className="font-medium text-paragraph-sm">
-											{limit.label}
+					<div className="space-y-4">
+						{isLoading
+							? Array.from({ length: 5 }).map((_, i) => (
+									<div key={i} className="flex items-center justify-between">
+										<Skeleton className="h-4 w-32" />
+										<Skeleton className="h-4 w-28" />
+									</div>
+								))
+							: [
+									{
+										label: "Per second",
+										value: data
+											? `${formatNumber(data.plan.ratePerSecond)} emails / sec`
+											: "—",
+										icon: "clock",
+									},
+									{
+										label: "Per minute",
+										value: data
+											? `${formatNumber(data.plan.ratePerMinute)} emails / min`
+											: "—",
+										icon: "clock",
+									},
+									{
+										label: "Per hour",
+										value: data
+											? `${formatNumber(data.plan.ratePerHour)} emails / hr`
+											: "—",
+										icon: "clock",
+									},
+									{
+										label: "Monthly quota",
+										value: data
+											? `${formatNumber(data.plan.monthlyCredits)} emails`
+											: "—",
+										icon: "calendar",
+									},
+									{
+										label: "Max attachment size",
+										value: data ? `${data.plan.maxAttachmentSizeMb} MB` : "—",
+										icon: "file-text",
+									},
+								].map((limit) => (
+									<div
+										key={limit.label}
+										className="group flex items-center justify-between"
+									>
+										<div className="flex items-center gap-3 text-text-sub-600 dark:text-white/60">
+											<Icon name={limit.icon} className="h-4 w-4" />
+											<span className="font-medium text-paragraph-sm">
+												{limit.label}
+											</span>
+										</div>
+										<span className="font-semibold text-paragraph-sm text-text-strong-950 tracking-tight dark:text-white">
+											{limit.value}
 										</span>
 									</div>
-									<span className="font-semibold text-paragraph-sm text-text-strong-950 tracking-tight">
-										{limit.value}
-									</span>
-								</div>
-							))}
-				</div>
+								))}
+					</div>
 
-				<div className="mt-8 flex items-center justify-between border-stroke-soft-200/50 border-t pt-6">
-					<div />
-					<Button.Root
-						variant="neutral"
-						size="xsmall"
-						className="font-semibold"
-					>
-						<Icon name="arrow-top-circle" className="h-3.5 w-3.5" />
-						Upgrade plan
-					</Button.Root>
+					<div className="mt-8 flex items-center justify-between border-stroke-soft-200/50 border-t pt-6 dark:border-white/5">
+						<div />
+						<Button.Root
+							variant="neutral"
+							size="xsmall"
+							className="font-semibold"
+						>
+							<Icon name="arrow-top-circle" className="h-3.5 w-3.5" />
+							Upgrade plan
+						</Button.Root>
+					</div>
 				</div>
 			</div>
 		</div>
