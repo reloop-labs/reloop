@@ -5,8 +5,7 @@
 	"pages": [
 		"---Introduction---",
 		"index",
-		"tech-stack",
-		"project-structure",
+		"overview",
 		"port",
 		"---Frontend---",
 		"frontend/web",

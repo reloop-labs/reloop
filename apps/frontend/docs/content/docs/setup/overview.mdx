@@ -1,9 +1,21 @@
 ---
-title: Tech Stack
-description: Frameworks, databases, and tooling used across the Reloop monorepo.
+title: Overview
+description: Monorepo layout and technology stack.
 ---
 
-Technologies by layer. See [Project Structure](/docs/setup/project-structure) for where each piece lives in the repo.
+Reloop is a Bun monorepo — Next.js frontends, ElysiaJS microservices, shared packages, and Docker infrastructure.
+
+
+## Structure
+
+```
+reloop/
+├── apps/
+│   ├── backend/         # ElysiaJS APIs + KumoMTA (smtp, inbound)
+│   └── frontend/        # web, dashboard, docs, links
+├── packages/            # @reloop/ui, @reloop/db, @reloop/bus, …
+└── local/               # Docker Compose for local dev
+```
 
 
 ## Frontend
@@ -84,7 +96,7 @@ Technologies by layer. See [Project Structure](/docs/setup/project-structure) fo
 </CardGroup>
 
 
-## Developer Tooling
+## Tooling
 
 <CardGroup cols={2}>
   <Card icon="sparkles" title="Biome" href="https://biomejs.dev/">
@@ -94,3 +106,18 @@ Technologies by layer. See [Project Structure](/docs/setup/project-structure) fo
     Git pre-commit hooks.
   </Card>
 </CardGroup>
+
+
+## Shared Packages
+
+| Package | Purpose |
+| :--- | :--- |
+| `@reloop/ui` | Design system and components |
+| `@reloop/db` | Drizzle schema and Postgres client |
+| `@reloop/auth` | Shared auth utilities |
+| `@reloop/bus` | NATS messaging wrapper |
+| `@reloop/cache` | Redis caching helpers |
+| `@reloop/apikey` | API key hashing and verification |
+| `@reloop/webhook-events` | Webhook event types |
+| `@reloop/tailwind` | Shared Tailwind config |
+| `@reloop/tsconfig` | Shared TypeScript config |
