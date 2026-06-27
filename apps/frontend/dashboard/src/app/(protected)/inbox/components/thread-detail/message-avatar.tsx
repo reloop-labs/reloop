@@ -17,7 +17,7 @@ interface MessageAvatarProps {
 
 /**
  * Circular avatar showing sender initials with a colour-coded gradient.
- * Outbound messages always show "ME" on a green background.
+ * Generated dynamically from the email address and name.
  */
 export const MessageAvatar = ({
 	fromEmail,
@@ -27,25 +27,19 @@ export const MessageAvatar = ({
 	size = "md",
 }: MessageAvatarProps) => {
 	const dim = size === "sm" ? "28" : "32";
+	const email = fromEmail || "default";
 
 	return (
 		<Avatar.Root size={dim as any} color="gray" className="shrink-0">
 			<Avatar.Image asChild>
 				<div
 					className={cn(
-						"flex h-full w-full items-center justify-center rounded-full font-semibold text-[11px] uppercase tracking-wide shadow-sm",
-						isAgent
-							? "bg-[#dbeafe] text-blue-700 font-bold dark:bg-blue-900/40 dark:text-blue-300"
-							: isOutbound
-								? "bg-emerald-600 text-white"
-								: `${getAvatarGradient(fromEmail || "default")} text-white`,
+						"flex h-full w-full items-center justify-center rounded-full font-semibold uppercase tracking-wide shadow-sm text-white",
+						size === "sm" ? "text-[10px]" : "text-[11px]",
+						getAvatarGradient(email),
 					)}
 				>
-					{isAgent
-						? "AG"
-						: isOutbound
-							? "ME"
-							: getAvatarInitial(fromName ?? null, fromEmail || "U")}
+					{getAvatarInitial(fromName ?? null, email)}
 				</div>
 			</Avatar.Image>
 		</Avatar.Root>
