@@ -10,6 +10,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Resolver } from "react-hook-form";
@@ -60,6 +61,7 @@ export const AddAgentAddressModal = ({
 		"/api/domain/v1/list",
 	);
 	const domainsList = domainsData?.domains ?? [];
+	const hasNoDomains = domainsData !== undefined && domainsList.length === 0;
 
 	const form = useForm<AgentAddressFormValues>({
 		resolver: valibotResolver(
@@ -153,227 +155,289 @@ export const AddAgentAddressModal = ({
 					if (isSubmitting) e.preventDefault();
 				}}
 			>
-				<form onSubmit={form.handleSubmit(onSubmit)}>
-					<div className="flex flex-col border-stroke-soft-100 border-b dark:border-stroke-soft-100/40">
-						<div className="flex items-start justify-between px-5 pt-5 pb-4">
-							<div className="flex flex-col gap-1">
-								<div className="flex items-center gap-2.5">
-									<Icon
-										name="mail-single"
-										className="h-4 w-4 text-text-strong-950"
-									/>
-									<Modal.Title asChild>
-										<h2 className="font-semibold text-label-md text-text-strong-950">
-											Create Inbox for AI agent
-										</h2>
-									</Modal.Title>
+				{hasNoDomains ? (
+					<>
+						<div className="flex flex-col border-stroke-soft-100 border-b dark:border-stroke-soft-100/40">
+							<div className="flex items-start justify-between px-5 pt-5 pb-4">
+								<div className="flex flex-col gap-1">
+									<div className="flex items-center gap-2.5">
+										<Icon
+											name="mail-single"
+											className="h-4 w-4 text-text-strong-950"
+										/>
+										<Modal.Title asChild>
+											<h2 className="font-semibold text-label-md text-text-strong-950">
+												Create Inbox for AI agent
+											</h2>
+										</Modal.Title>
+									</div>
+									<p className="text-paragraph-xs text-text-sub-600">
+										Configure a new email inbox for your AI agents to send and
+										receive emails.
+									</p>
 								</div>
-								<p className="text-paragraph-xs text-text-sub-600">
-									Configure a new email inbox for your AI agents to send and
-									receive emails.
-								</p>
+								<button
+									type="button"
+									onClick={onClose}
+									className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50"
+								>
+									<Icon name="cross" className="h-3.5 w-3.5" />
+								</button>
 							</div>
-							<button
-								type="button"
-								onClick={onClose}
-								className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50"
-							>
-								<Icon name="cross" className="h-3.5 w-3.5" />
-							</button>
-						</div>
-					</div>
-
-					<Modal.Body className="space-y-4 px-5 py-4 pb-5">
-						<div className="flex flex-col gap-1.5">
-							<label
-								htmlFor="agent-label"
-								className="font-medium text-label-sm text-text-strong-950"
-							>
-								Agent name
-								<span className="ml-0.5 text-error-base">*</span>
-							</label>
-							<Input.Root
-								size="xsmall"
-								hasError={!!form.formState.errors.label}
-							>
-								<Input.Wrapper>
-									<Input.Input
-										id="agent-label"
-										placeholder="e.g. Support Agent"
-										autoFocus
-										{...form.register("label")}
-										disabled={isSubmitting}
-									/>
-								</Input.Wrapper>
-							</Input.Root>
-							{form.formState.errors.label && (
-								<p className="text-error-base text-paragraph-xs">
-									{form.formState.errors.label.message}
-								</p>
-							)}
 						</div>
 
-						<div className="flex flex-col gap-1.5">
-							<label
-								htmlFor="agent-email"
-								className="font-medium text-label-sm text-text-strong-950"
-							>
-								Email address
-								<span className="ml-0.5 text-error-base">*</span>
-							</label>
-							<Input.Root
-								size="xsmall"
-								hasError={
-									!!form.formState.errors.localPart ||
-									!!form.formState.errors.domain
-								}
-							>
-								<Input.Wrapper>
-									<Input.Input
-										id="agent-email"
-										placeholder="support-agent"
-										{...form.register("localPart")}
-										disabled={isSubmitting}
-									/>
-									<Dropdown.Root
-										open={isDropdownOpen}
-										onOpenChange={setIsDropdownOpen}
+						<Modal.Body className="flex flex-col items-center px-5 pt-8 pb-20 text-center">
+							<Icon name="globe" className="h-5 w-5 text-text-sub-600" />
+							<h3 className="mt-4 mb-1.5 font-semibold text-base text-text-strong-950">
+								Connect a domain
+							</h3>
+							<p className="mx-auto mb-6 max-w-[300px] text-balance font-medium text-[12px] text-text-sub-600">
+								Set up a domain to create email addresses for your AI agents.
+							</p>
+							<div className="flex items-center gap-2">
+								<Button.Root
+									type="button"
+									variant="neutral"
+									size="xsmall"
+									asChild
+								>
+									<Link
+										href="/domain/add"
+										onClick={onClose}
+										className="flex items-center gap-1.5"
 									>
-										<Dropdown.Trigger asChild>
-											<button
-												type="button"
-												disabled={isSubmitting}
-												className="group/trigger flex h-5 min-h-5 w-auto items-center gap-0 rounded-none bg-transparent p-0 font-medium text-text-sub-600 shadow-none outline-none ring-0 hover:bg-transparent hover:text-text-strong-950 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:text-text-strong-950"
-											>
-												<Icon
-													name="at-sign"
-													className="mr-1.5 h-4 w-4 shrink-0 text-text-soft-400 transition duration-200 ease-out group-hover/trigger:text-text-sub-600 group-data-[state=open]/trigger:text-text-sub-600"
-												/>
-												<span className="font-medium text-text-strong-950">
-													{form.watch("domain") || "domain"}
-												</span>
-												<Icon
-													name="chevron-down"
-													className={cn(
-														"ml-0.5 size-5 shrink-0 text-text-sub-600 transition duration-200 ease-out group-hover/trigger:text-text-strong-950 group-data-[state=open]/trigger:rotate-180 group-data-[state=open]/trigger:text-text-strong-950",
-														isDropdownOpen && "rotate-180 text-text-strong-950",
-													)}
-												/>
-											</button>
-										</Dropdown.Trigger>
-										<Dropdown.Content align="end" className="w-56 p-2">
-											<div className="relative max-h-80 overflow-y-auto">
-												{domainsList.map((d, idx) => {
-													const isSelected = d.domain === form.watch("domain");
-													return (
-														<button
-															key={d.id}
-															ref={(el) => {
-																if (el) buttonRefs.current[idx] = el;
-															}}
-															type="button"
-															onPointerEnter={() => setHoverIdx(idx)}
-															onPointerLeave={() => setHoverIdx(undefined)}
-															onClick={() => {
-																form.setValue("domain", d.domain);
-																setIsDropdownOpen(false);
-															}}
-															className={cn(
-																"flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-colors",
-																"text-text-strong-950",
-																isSelected && "bg-neutral-alpha-10",
-																!currentRect &&
-																	hoverIdx === idx &&
-																	"bg-neutral-alpha-10",
-															)}
-														>
-															<span className="truncate">{d.domain}</span>
-															{isSelected && (
-																<Icon
-																	name="check"
-																	className="h-3.5 w-3.5 text-text-strong-950"
-																/>
-															)}
-														</button>
-													);
-												})}
-												<AnimatedHoverBackground
-													rect={currentRect}
-													tabElement={currentTab}
-												/>
-											</div>
-										</Dropdown.Content>
-									</Dropdown.Root>
-								</Input.Wrapper>
-							</Input.Root>
-							{(form.formState.errors.localPart ||
-								form.formState.errors.domain) && (
-								<p className="text-error-base text-paragraph-xs">
-									{form.formState.errors.localPart?.message ??
-										form.formState.errors.domain?.message}
-								</p>
-							)}
+										<Icon name="plus" className="h-3.5 w-3.5" />
+										Add Domain
+									</Link>
+								</Button.Root>
+							</div>
+						</Modal.Body>
+					</>
+				) : (
+					<form onSubmit={form.handleSubmit(onSubmit)}>
+						<div className="flex flex-col border-stroke-soft-100 border-b dark:border-stroke-soft-100/40">
+							<div className="flex items-start justify-between px-5 pt-5 pb-4">
+								<div className="flex flex-col gap-1">
+									<div className="flex items-center gap-2.5">
+										<Icon
+											name="mail-single"
+											className="h-4 w-4 text-text-strong-950"
+										/>
+										<Modal.Title asChild>
+											<h2 className="font-semibold text-label-md text-text-strong-950">
+												Create Inbox for AI agent
+											</h2>
+										</Modal.Title>
+									</div>
+									<p className="text-paragraph-xs text-text-sub-600">
+										Configure a new email inbox for your AI agents to send and
+										receive emails.
+									</p>
+								</div>
+								<button
+									type="button"
+									onClick={onClose}
+									className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50"
+								>
+									<Icon name="cross" className="h-3.5 w-3.5" />
+								</button>
+							</div>
 						</div>
 
-						<p className="rounded-lg bg-bg-weak-50 px-3 py-2 font-medium text-[12px] text-text-sub-600 dark:bg-white/5">
-							<Icon name="globe" className="mr-1 inline h-3.5 w-3.5" />
-							Domain must have receiving enabled. Manage domains from{" "}
-							<a
-								href="/domain"
-								className="text-primary-base hover:underline"
-								onClick={onClose}
-							>
-								Domain settings
-							</a>
-							.
-						</p>
-					</Modal.Body>
-
-					<div className="flex items-center justify-end border-stroke-soft-100 border-t px-5 py-3.5 dark:border-stroke-soft-100/50">
-						<div className="flex items-center gap-2">
-							<Button.Root
-								type="button"
-								variant="neutral"
-								mode="stroke"
-								size="xsmall"
-								onClick={onClose}
-								disabled={isSubmitting}
-							>
-								Cancel
-								<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
-									Esc
-								</span>
-							</Button.Root>
-							<Button.Root
-								type="submit"
-								variant="neutral"
-								size="xsmall"
-								disabled={isSubmitting}
-							>
-								{isSubmitting ? (
-									<>
-										<Spinner size={12} color="currentColor" />
-										Creating...
-									</>
-								) : (
-									<>
-										Create address
-										<span className="inline-flex items-center gap-0.5">
-											<Icon
-												name="command"
-												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-											/>
-											<Icon
-												name="enter"
-												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-											/>
-										</span>
-									</>
+						<Modal.Body className="space-y-4 px-5 py-4 pb-5">
+							<div className="flex flex-col gap-1.5">
+								<label
+									htmlFor="agent-label"
+									className="font-medium text-label-sm text-text-strong-950"
+								>
+									Agent name
+									<span className="ml-0.5 text-error-base">*</span>
+								</label>
+								<Input.Root
+									size="xsmall"
+									hasError={!!form.formState.errors.label}
+								>
+									<Input.Wrapper>
+										<Input.Input
+											id="agent-label"
+											placeholder="e.g. Support Agent"
+											autoFocus
+											{...form.register("label")}
+											disabled={isSubmitting}
+										/>
+									</Input.Wrapper>
+								</Input.Root>
+								{form.formState.errors.label && (
+									<p className="text-error-base text-paragraph-xs">
+										{form.formState.errors.label.message}
+									</p>
 								)}
-							</Button.Root>
+							</div>
+
+							<div className="flex flex-col gap-1.5">
+								<label
+									htmlFor="agent-email"
+									className="font-medium text-label-sm text-text-strong-950"
+								>
+									Email address
+									<span className="ml-0.5 text-error-base">*</span>
+								</label>
+								<Input.Root
+									size="xsmall"
+									hasError={
+										!!form.formState.errors.localPart ||
+										!!form.formState.errors.domain
+									}
+								>
+									<Input.Wrapper>
+										<Input.Input
+											id="agent-email"
+											placeholder="support-agent"
+											{...form.register("localPart")}
+											disabled={isSubmitting}
+										/>
+										<Dropdown.Root
+											open={isDropdownOpen}
+											onOpenChange={setIsDropdownOpen}
+										>
+											<Dropdown.Trigger asChild>
+												<button
+													type="button"
+													disabled={isSubmitting}
+													className="group/trigger flex h-5 min-h-5 w-auto items-center gap-0 rounded-none bg-transparent p-0 font-medium text-text-sub-600 shadow-none outline-none ring-0 hover:bg-transparent hover:text-text-strong-950 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:text-text-strong-950"
+												>
+													<Icon
+														name="at-sign"
+														className="mr-1.5 h-4 w-4 shrink-0 text-text-soft-400 transition duration-200 ease-out group-hover/trigger:text-text-sub-600 group-data-[state=open]/trigger:text-text-sub-600"
+													/>
+													<span className="font-medium text-text-strong-950">
+														{form.watch("domain") || "domain"}
+													</span>
+													<Icon
+														name="chevron-down"
+														className={cn(
+															"ml-0.5 size-5 shrink-0 text-text-sub-600 transition duration-200 ease-out group-hover/trigger:text-text-strong-950 group-data-[state=open]/trigger:rotate-180 group-data-[state=open]/trigger:text-text-strong-950",
+															isDropdownOpen &&
+																"rotate-180 text-text-strong-950",
+														)}
+													/>
+												</button>
+											</Dropdown.Trigger>
+											<Dropdown.Content align="end" className="w-56 p-2">
+												<div className="relative max-h-80 overflow-y-auto">
+													{domainsList.map((d, idx) => {
+														const isSelected =
+															d.domain === form.watch("domain");
+														return (
+															<button
+																key={d.id}
+																ref={(el) => {
+																	if (el) buttonRefs.current[idx] = el;
+																}}
+																type="button"
+																onPointerEnter={() => setHoverIdx(idx)}
+																onPointerLeave={() => setHoverIdx(undefined)}
+																onClick={() => {
+																	form.setValue("domain", d.domain);
+																	setIsDropdownOpen(false);
+																}}
+																className={cn(
+																	"flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-colors",
+																	"text-text-strong-950",
+																	isSelected && "bg-neutral-alpha-10",
+																	!currentRect &&
+																		hoverIdx === idx &&
+																		"bg-neutral-alpha-10",
+																)}
+															>
+																<span className="truncate">{d.domain}</span>
+																{isSelected && (
+																	<Icon
+																		name="check"
+																		className="h-3.5 w-3.5 text-text-strong-950"
+																	/>
+																)}
+															</button>
+														);
+													})}
+													<AnimatedHoverBackground
+														rect={currentRect}
+														tabElement={currentTab}
+													/>
+												</div>
+											</Dropdown.Content>
+										</Dropdown.Root>
+									</Input.Wrapper>
+								</Input.Root>
+								{(form.formState.errors.localPart ||
+									form.formState.errors.domain) && (
+									<p className="text-error-base text-paragraph-xs">
+										{form.formState.errors.localPart?.message ??
+											form.formState.errors.domain?.message}
+									</p>
+								)}
+							</div>
+
+							<p className="rounded-lg bg-bg-weak-50 px-3 py-2 font-medium text-[12px] text-text-sub-600 dark:bg-white/5">
+								<Icon name="globe" className="mr-1 inline h-3.5 w-3.5" />
+								Domain must have receiving enabled. Manage domains from{" "}
+								<a
+									href="/domain"
+									className="text-primary-base hover:underline"
+									onClick={onClose}
+								>
+									Domain settings
+								</a>
+								.
+							</p>
+						</Modal.Body>
+
+						<div className="flex items-center justify-end border-stroke-soft-100 border-t px-5 py-3.5 dark:border-stroke-soft-100/50">
+							<div className="flex items-center gap-2">
+								<Button.Root
+									type="button"
+									variant="neutral"
+									mode="stroke"
+									size="xsmall"
+									onClick={onClose}
+									disabled={isSubmitting}
+								>
+									Cancel
+									<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
+										Esc
+									</span>
+								</Button.Root>
+								<Button.Root
+									type="submit"
+									variant="neutral"
+									size="xsmall"
+									disabled={isSubmitting}
+								>
+									{isSubmitting ? (
+										<>
+											<Spinner size={12} color="currentColor" />
+											Creating...
+										</>
+									) : (
+										<>
+											Create address
+											<span className="inline-flex items-center gap-0.5">
+												<Icon
+													name="command"
+													className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+												/>
+												<Icon
+													name="enter"
+													className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+												/>
+											</span>
+										</>
+									)}
+								</Button.Root>
+							</div>
 						</div>
-					</div>
-				</form>
+					</form>
+				)}
 			</Modal.Content>
 		</Modal.Root>
 	);
