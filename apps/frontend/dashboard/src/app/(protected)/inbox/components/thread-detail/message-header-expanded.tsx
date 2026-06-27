@@ -64,13 +64,13 @@ export const MessageHeaderExpanded = ({
 		<div
 			role="button"
 			onClick={onToggleExpand}
-			className="flex cursor-pointer select-none items-center justify-between gap-4 px-5 pt-4 pb-3 transition-colors hover:bg-neutral-50/20 dark:hover:bg-neutral-850/10"
+			className="flex cursor-pointer select-none items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-neutral-50/20 dark:hover:bg-neutral-850/10"
 		>
 			{/* Left: Avatar + Info */}
 			<div className="flex min-w-0 items-center gap-3">
 				<div className="flex shrink-0 items-center gap-2.5">
 					<div
-						className="h-6 w-[3px] rounded-full"
+						className="h-8 w-[3.5px] rounded-full"
 						style={{ backgroundColor: accentColor }}
 					/>
 					<MessageAvatar
@@ -91,7 +91,7 @@ export const MessageHeaderExpanded = ({
 							variant={getBadgeVariant(isApproval, isOutbound, isAgent)}
 						/>
 						{msg.fromEmail && (
-							<span className="text-text-soft-400 text-xs">
+							<span className="font-mono text-text-sub-600 text-xs">
 								{msg.fromEmail}
 							</span>
 						)}
@@ -104,7 +104,9 @@ export const MessageHeaderExpanded = ({
 				className="flex shrink-0 items-center gap-1.5"
 				onClick={(e) => e.stopPropagation()}
 			>
-				<span className="text-xs">{formatMessageTimestamp(msg.messageAt)}</span>
+				<p className="text-text-sub-600 text-xs">
+					{formatMessageTimestamp(msg.messageAt)}
+				</p>
 
 				<button
 					type="button"

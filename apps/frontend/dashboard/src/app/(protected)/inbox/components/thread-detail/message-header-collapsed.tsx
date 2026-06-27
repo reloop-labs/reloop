@@ -67,11 +67,11 @@ export const MessageHeaderCollapsed = ({
 							variant={getBadgeVariant(isApproval, isOutbound, isAgent)}
 						/>
 					</div>
-					<span className="truncate text-text-soft-400 text-xs">{snippet}</span>
+					<span className="truncate text-text-sub-600 text-xs">{snippet}</span>
 				</div>
 			</div>
 
-			<div className="flex shrink-0 items-center gap-2 font-medium text-text-soft-400 text-xs">
+			<div className="flex shrink-0 items-center gap-2 font-mono text-text-sub-600 text-xs">
 				<span>{formatMessageTimestamp(msg.messageAt)}</span>
 				<Icon name="chevron-down" className="h-3.5 w-3.5" />
 			</div>

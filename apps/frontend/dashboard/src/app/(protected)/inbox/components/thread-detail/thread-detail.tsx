@@ -508,7 +508,7 @@ export const ThreadDetail = ({
 						<h1 className="font-bold text-text-strong-950 text-xl dark:text-white">
 							{thread.subject}
 						</h1>
-						<div className="flex items-center gap-2 text-text-soft-400 text-xs">
+						<div className="flex items-center gap-2 text-text-sub-600 text-xs">
 							<span>
 								{displayMessages.length === 1
 									? "1 message"
