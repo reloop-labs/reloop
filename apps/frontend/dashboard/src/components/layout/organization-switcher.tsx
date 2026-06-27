@@ -16,11 +16,11 @@ function OrgAvatar({
 	org,
 	size,
 }: {
-	org: { name: string; logo?: string | null };
+	org: { id: string; name: string; logo?: string | null };
 	size: number;
 }) {
 	const [imgError, setImgError] = useState(false);
-	const gradient = getAvatarGradient(org.name);
+	const gradient = getAvatarGradient(org.id);
 	const initial = getAvatarInitial(org.name, org.name);
 	const dim = `h-${size === 20 ? 5 : 6} w-${size === 20 ? 5 : 6}`;
 	const textSize = size === 20 ? "text-[10px]" : "text-[11px]";
@@ -29,7 +29,7 @@ function OrgAvatar({
 		return (
 			<div
 				className={cn(
-					"flex flex-shrink-0 items-center justify-center overflow-hidden rounded-[6px]",
+					"flex flex-shrink-0 items-center justify-center overflow-hidden rounded-lg",
 					dim,
 				)}
 			>
@@ -47,7 +47,7 @@ function OrgAvatar({
 	return (
 		<div
 			className={cn(
-				"flex flex-shrink-0 items-center justify-center rounded-[6px] bg-gradient-to-br font-semibold text-white",
+				"flex flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br font-semibold text-white",
 				dim,
 				textSize,
 				gradient,
