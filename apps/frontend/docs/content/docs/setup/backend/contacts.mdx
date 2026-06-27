@@ -1,7 +1,7 @@
 ---
 title: Contacts
 icon: users
-description: Set up, configure, and run the Reloop Contacts microservice locally.
+description: Set up, configure, and run the Reloop contacts microservice locally.
 ---
 
 <Callout type="info" title="Complete Base Setup First" variant="note">
@@ -11,7 +11,7 @@ description: Set up, configure, and run the Reloop Contacts microservice locally
 
 ## Service Overview
 
-Subscriber profiles, static lists, custom properties, dynamic segmentation, and opt-out/unsubscribe logs.
+Subscriber profiles, groups, channels, custom properties, and suppression lists.
 
 | Property | Value |
 | :--- | :--- |
@@ -23,12 +23,11 @@ Subscriber profiles, static lists, custom properties, dynamic segmentation, and 
 
 
 ## Quick Start
-<Callout
-  icon="union"
-  variant="info"
->
-Run the following command from the root of the monorepo:
+
+<Callout icon="union" variant="info">
+Run from the monorepo root:
 </Callout>
+
 ```bash
 bun be:contacts:dev
 ```
@@ -41,34 +40,26 @@ The service starts with hot reloading on port `8014`.
 Variables live in `apps/backend/contacts/.env`. Running `bun env:setup` from the root auto-populates this file.
 
 ```bash
-# Database & Cache Configurations
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
-
-# Server Gateway Configuration
 PORT=8014
 BASE_URL="https://local.reloop.sh"
-NODE_ENV=development
-
-# Event Bus Broker
 NATS_URL=nats://localhost:4222
+NODE_ENV=development
 ```
 
 ### Reference Table
 
-| Variable | Required | Default Value |
+| Variable | Required | Default |
 | :--- | :--- | :--- |
-| `PG_URL` | **YES** | `postgresql://reloop:reloop123@localhost:5432/reloop` |
-| `REDIS_URL` | **YES** | `redis://:reloop123@localhost:6379` |
+| `PG_URL` | **YES** | `postgresql://...` |
+| `REDIS_URL` | **YES** | `redis://...` |
 | `PORT` | **YES** | `8014` |
 | `BASE_URL` | **YES** | `https://local.reloop.sh` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
-| `NODE_ENV` | **YES** | `development` |
 
 
 ## Development Commands
-
-All commands run from the **monorepo root**.
 
 | Command | Description |
 | :--- | :--- |
@@ -78,120 +69,11 @@ All commands run from the **monorepo root**.
 | `bun run --filter=contacts check-types` | TypeScript type-check |
 
 
-## Database Schema
-
-Schema defined in [`packages/db/src/schema/contact.ts`](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/contact.ts), [`packages/db/src/schema/channel.ts`](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/channel.ts), and [`packages/db/src/schema/group.ts`](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/group.ts).
-
-### `contact` Table
-
-Stores general recipient email profiles, subscription status, and automatic suppression details.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | `con_{cuid}` | Primary Key |
-| `email` | `varchar(255)` | — | Recipient email address |
-| `status` | `contact_status` | `'subscribed'` | Active subscription state |
-| `organizationId` | `text` | — | FK → `organization.id` |
-| `userId` | `text` | — | FK → `user.id` |
-| `firstName` | `varchar(255)` | `null` | Recipient given name |
-| `lastName` | `varchar(255)` | `null` | Recipient family name |
-| `suppressionReason` | `suppression_reason` | `null` | Populated automatically on hard bounces or spam flags |
-| `suppressedAt` | `timestamp` | `null` | Timestamp of suppression action |
-
----
-
-### `contact_property` Table
-
-Defines the custom property keys, types, and defaults scoped to an organization.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | `cp_{cuid}` | Primary Key |
-| `propertyName` | `varchar(255)` | — | Name of the custom property |
-| `propertyType` | `property_type` | — | Data type (`string` or `number`) |
-| `defaultValue` | `varchar(255)` | `null` | Default value if not specified |
-| `organizationId` | `text` | — | FK → `organization.id` |
-| `userId` | `text` | — | FK → `user.id` |
-
----
-
-### `contact_property_value` Table
-
-Links custom keys directly to specific contacts with the compiled field value.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | `cpv_{cuid}` | Primary Key |
-| `contactId` | `text` | — | FK → `contact.id` |
-| `propertyId` | `text` | — | FK → `contact_property.id` |
-| `value` | `text` | — | Value of the property for the contact |
-| `organizationId` | `text` | — | FK → `organization.id` |
-| `userId` | `text` | — | FK → `user.id` |
-
----
-
-### `channel` Table
-
-Represents a mailing subscription topic (e.g. Product Updates, Newsletter).
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | `chn_{cuid}` | Primary Key |
-| `name` | `varchar(255)` | — | Name of the channel |
-| `description` | `text` | `null` | Detailed description of the channel |
-| `organizationId` | `text` | — | FK → `organization.id` |
-| `visibility` | `visibility` | `'private'` | Opt-in preferences page channel visibility (`private` or `public`) |
-| `defaultSubscription` | `default_subscription` | `'opt_in'` | Default subscription state (`opt_in` or `opt_out`) |
-| `userId` | `text` | — | FK → `user.id` |
-
----
-
-### `channel_subscription` Table
-
-Link table mapping contacts to active channels.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | `sub_{cuid}` | Primary Key |
-| `contactId` | `text` | — | FK → `contact.id` |
-| `channelId` | `text` | — | FK → `channel.id` |
-| `organizationId` | `text` | — | FK → `organization.id` |
-| `status` | `enrollment_status` | `'enrolled'` | Enrollment status (`enrolled` or `unenrolled`) |
-
----
-
-### `group` Table
-
-Manual static segmentation grouping lists.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | `grp_{cuid}` | Primary Key |
-| `name` | `varchar(255)` | — | Name of the group |
-| `organizationId` | `text` | — | FK → `organization.id` |
-| `userId` | `text` | — | FK → `user.id` |
-
----
-
-### `contact_group` Table
-
-Joins contacts to specific user groups.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | `cgr_{cuid}` | Primary Key |
-| `contactId` | `text` | — | FK → `contact.id` |
-| `groupId` | `text` | — | FK → `group.id` |
-| `organizationId` | `text` | — | FK → `organization.id` |
-| `userId` | `text` | — | FK → `user.id` |
-
-
 ## Architecture
 
 | Layer | Detail |
 | :--- | :--- |
-| **Audience Management** | Creates, updates, and groups contacts into static lists or dynamic query-based segments. |
-| **Custom Properties** | Extensible schema attributes (custom properties and values) defined on a per-organization basis. |
-| **Caching** | Redis is utilized to store segmentation cache and temporary list metadata. |
-| **Events** | Lifecycle events (contact creation, deletion, opt-in/opt-out status changes) are published to NATS under `contacts.*`. |
-| **DB Client** | Relational data is stored in PostgreSQL and accessed using `@reloop/db` with Drizzle ORM. |
+| **Audience** | Contacts, groups, channels, and custom properties per organization. |
+| **Preferences** | Powers the [Links](/setup/frontend/links) preference center. |
+| **Events** | Lifecycle events published to NATS under `contacts.*`. |
+| **Schema** | `contact`, `channel`, `group` in `packages/db/src/schema/`. |

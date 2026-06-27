@@ -1,174 +1,83 @@
 ---
 title: Email
 icon: mail
-description: Learn how to set up, configure, and run the Reloop system transactional email service locally.
+description: Set up, configure, and run the Reloop platform email microservice locally.
 ---
 
-The **Email Service** is an **ElysiaJS** microservice responsible for dispatching platform transactional emails—such as organization invitations, password reset links, verification codes, and billing alerts—directly to Reloop's own platform users.
-
-<Callout type="warning" title="Important Distinction">
-  Do not confuse this with the **Mailing Service**!
-  * **Email Service (`email`)**: Direct platform notification service that listens to system NATS topics to email Reloop customers.
-  * **Mail Service (`mail`)**: High-throughput public API that allows Reloop customers to send campaigns to *their* audiences.
+<Callout type="info" title="Complete Base Setup First" variant="note">
+  Ensure you've finished the [Local Development Setup](/docs/setup) — before proceeding.
 </Callout>
 
-<Callout type="info" title="Prerequisite First">
-  Before starting the Email Service, make sure you've completed the base [Local Development Setup](/setup) (installed Bun, configured the hosts file, and started the Docker container stack).
+<Callout type="warn" title="Not the same as Mail">
+  **Email** sends platform notifications to Reloop users (invites, password resets). **Mail** is the customer-facing send API for their audiences.
 </Callout>
 
----
+
+## Service Overview
+
+Platform transactional emails triggered by NATS events (invites, OTPs, billing alerts).
+
+| Property | Value |
+| :--- | :--- |
+| **Directory** | `apps/backend/email` |
+| **Port** | `8022` |
+| **Local URL** | [https://local.reloop.sh/api/email](https://local.reloop.sh/api/email) |
+| **Swagger UI** | [https://local.reloop.sh/api/email/openapi](https://local.reloop.sh/api/email/openapi) |
+| **Stack** | `ElysiaJS` `Redis` `NATS` |
+
 
 ## Quick Start
 
-Dependencies are handled globally at the root directory. You can start the Email Service development server instantly:
+<Callout icon="union" variant="info">
+Run from the monorepo root:
+</Callout>
 
-<CodeGroup>
-  <CodeBlock title="From Monorepo Root (Recommended)">
-  ```bash
-  # Start the dev server with hot reloading
-  bun be:email:dev
-  ```
-  </CodeBlock>
+```bash
+bun be:email:dev
+```
 
-  <CodeBlock title="From the Service Folder">
-  ```bash
-  cd apps/backend/email
-  bun dev
-  ```
-  </CodeBlock>
-</CodeGroup>
+The service starts with hot reloading on port `8022`.
 
-Once running, the Email Service will listen locally on port `8022`. You can query it via Caddy at [https://local.reloop.sh/api/email](https://local.reloop.sh/api/email) 🎉
-
----
-
-## Service Information
-
-* **Directory Location:** `apps/backend/email/`
-* **Local Listening Port:** `8022` (configurable with `EMAIL_PORT` env variable)
-* **Unified Access Route:** [https://local.reloop.sh/api/email](https://local.reloop.sh/api/email)
-* **Primary Tech Stack:** ElysiaJS, NATS (for event subscriptions), Redis
-* **Dependencies:** Relies on Redis (for rate limiting system requests) and NATS (to subscribe to system trigger events).
-
----
 
 ## Environment Configuration
 
-The Email Service environment variables are defined in `apps/backend/email/.env`. If you ran `bun env:setup` at the root, your `.env` is already configured:
+Variables live in `apps/backend/email/.env`. Running `bun env:setup` from the root auto-populates this file.
 
 ```bash
-# App Configuration
 EMAIL_PORT=8022
-NODE_ENV=development
+PORT=8022
 BASE_URL="https://local.reloop.sh"
-
-# Event Bus Broker
 NATS_URL=nats://localhost:4222
-
-# System Keys & Senders
-RELOOP_API_KEY=your-system-reloop-api-key
-RELOOP_SENDER_DOMAIN=local.reloop.sh
+RELOOP_API_KEY=
+RELOOP_SENDER_DOMAIN=
+NODE_ENV=development
 ```
 
 ### Reference Table
 
-| Variable | Required | Default Value | Description |
+| Variable | Required | Default | Notes |
 | :--- | :--- | :--- | :--- |
-| `EMAIL_PORT` | **YES** | `8022` | Local port number the Elysia app listens to on the host. |
-| `BASE_URL` | **YES** | `https://local.reloop.sh` | Main application domain (used for cookie validations). |
-| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event bus messaging. |
-| `RELOOP_API_KEY` | **YES** | `(empty)` | Internal API key used to authorize transactional mail delivery requests. |
-| `RELOOP_SENDER_DOMAIN` | **YES** | `(empty)` | Base domain used in the "From" header of system transactional emails. |
-| `NODE_ENV` | **YES** | `development` | Active environment scope (`development` or `production`). |
+| `EMAIL_PORT` / `PORT` | **YES** | `8022` | Listening port |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` | Platform base URL |
+| `NATS_URL` | **YES** | `nats://localhost:4222` | Event subscriptions |
+| `RELOOP_API_KEY` | **YES** | — | Internal key for send authorization |
+| `RELOOP_SENDER_DOMAIN` | **YES** | — | From-address domain |
 
----
 
 ## Development Commands
 
-All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
+| Command | Description |
+| :--- | :--- |
+| `bun be:email:dev` | Start dev server with hot reloading |
+| `bun run --filter=email build` | Compile production bundle |
+| `bun run --filter=email start` | Run compiled production build |
+| `bun run --filter=email check-types` | TypeScript type-check |
 
-| Command | Action | Scope |
-| :--- | :--- | :--- |
-| `bun be:email:dev` | Start the Email dev server with hot reloading | Development |
-| `bun run --filter=email build` | Compile the Email service for production | Production |
-| `bun run --filter=email start` | Run the compiled production build locally | Production |
-| `bun run --filter=email check-types` | Verify TypeScript type-safety | Code Quality |
 
----
+## Architecture
 
-## Database Schema & Relationships
-
-The relational transactional sending logs and real-time delivery lifecycle events are defined inside [packages/db/src/schema/email.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/email.ts).
-
-### Enums
-
-| Enum | Values | Description |
-| :--- | :--- | :--- |
-| `email_status` | `pending` · `sent` · `delivered` · `failed` · `bounced` · `spam` · `archived` | Email dispatch lifecycle status |
-| `email_priority` | `low` · `normal` · `high` · `urgent` | Delivery routing queue prioritization tier |
-| `email_event_type`| `sent` · `delivered` · `opened` · `clicked` · `bounced` · `complaint` · `unsubscribed` · `deferred` | ClickHouse tracked real-time customer event types |
-
----
-
-### `email_log` Table
-
-Captures the precise metadata, content headers, physical sizing, and delivery checkpoints for every individual outbound dispatch.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | `eml_{cuid}` | Primary Key |
-| `messageId` | `varchar(500)` | — | Unique, cryptographically signed SMTP Message ID header |
-| `organizationId` | `text` | — | Foreign Key &rarr; [organization.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
-| `domainId` | `text` | — | Foreign Key &rarr; [domain.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/domain.ts) |
-| `userId` | `text` | `null` | Foreign Key &rarr; [user.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
-| `apikeyId` | `text` | `null` | Associated Foreign Key &rarr; [apikey.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/api-key.ts) |
-| `fromEmail` | `varchar(255)` | — | Validated sending sender email address |
-| `fromName` | `varchar(255)` | `null` | Friendly display name |
-| `toEmails` | `jsonb` | — | Recipient addresses list (`string[]`) |
-| `ccEmails` | `jsonb` | `null` | Carbon-Copy addresses list (`string[]`) |
-| `bccEmails` | `jsonb` | `null` | Blind Carbon-Copy addresses list (`string[]`) |
-| `replyTo` | `varchar(255)` | `null` | Overwritten routing destination for inbox responses |
-| `subject` | `text` | — | Target subject line string |
-| `textBody` | `text` | `null` | Plain text fallback rendering |
-| `htmlBody` | `text` | `null` | Rich Visual HTML message payload |
-| `status` | `email_status` | `pending` | Current delivery status checkpoint |
-| `priority` | `email_priority`| `normal` | Mailing queue priority weight |
-| `errorMessage` | `text` | `null` | Error detail dump if delivery fails |
-| `provider` | `varchar(100)` | `postfix` | Outbound mail gateway interface name |
-| `providerMessageId`| `varchar(500)` | `null` | MTA-assigned transaction receipting ID |
-| `size` | `bigint` | `0` | Physical body size in bytes |
-| `headers` | `jsonb` | `null` | Serialized custom key-value SMTP headers |
-
----
-
-### `email_event` Table
-
-Drizzle tracking table archiving the chronological events log linked directly to individual email logs.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | `ev_{cuid}` | Primary Key |
-| `emailLogId` | `text` | — | Foreign Key &rarr; [email_log.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/email.ts) |
-| `type` | `email_event_type`| — | Categorical status of tracking event |
-| `metadata` | `jsonb` | `null` | Dynamic serialized context (e.g. User-Agent strings) |
-
----
-
-## Interactive API Docs (Swagger)
-
-The Email Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:
-
-1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/email/openapi](https://local.reloop.sh/api/email/openapi) (or [http://localhost:8022/api/email/openapi](http://localhost:8022/api/email/openapi) directly).
-2. Use the interactive Swagger UI playground to run queries and inspect request schemas.
-
----
-
-## NATS Event Subscriptions
-
-The Email Service is strictly reactive. It listens to core subjects published by other microservices over the **NATS** broker to dispatch emails:
-
-* **`auth.*`**: Listens for authentication events, sending magic links and verification codes to users signing in.
-* **`api-key.*`**: Sends notifications when new API keys are generated or revoked.
-* **`domain.*`**: Triggers warnings when domain DNS checks fail, or confirmation notes once verified.
-* **`billing.*`**: Dispatches system emails alerting administrators of failed top-ups or depleted credit balances.
-* **`organization.*`**: Handles invitation emails when users are invited to join an organization.
+| Layer | Detail |
+| :--- | :--- |
+| **Triggers** | Subscribes to NATS subjects (`auth.*`, `billing.*`, etc.). |
+| **Delivery** | Sends via the [mail](/setup/backend/mail) pipeline using `RELOOP_API_KEY`. |
+| **Schema** | `email_log` in `packages/db/src/schema/email.ts`. |

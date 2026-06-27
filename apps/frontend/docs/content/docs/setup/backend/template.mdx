@@ -1,159 +1,78 @@
 ---
 title: Template
 icon: layout
-description: Learn how to set up, configure, and run the Reloop template service locally.
+description: Set up, configure, and run the Reloop template microservice locally.
 ---
 
-The **Template Service** is an **ElysiaJS** microservice that manages the creation, versioning, storage, block editing, and high-performance compilation of HTML and rich-text email templates. It is responsible for compiling handlebars-style parameters prior to email dispatch.
-
-<Callout type="info" title="Prerequisite First">
-  Before starting the Template Service, make sure you've completed the base [Local Development Setup](/setup) (installed Bun, configured the hosts file, and started the Docker container stack).
+<Callout type="info" title="Complete Base Setup First" variant="note">
+  Ensure you've finished the [Local Development Setup](/docs/setup) — before proceeding.
 </Callout>
 
----
+
+## Service Overview
+
+Email template CRUD, visual builder storage, and HTML compilation for outbound sends.
+
+| Property | Value |
+| :--- | :--- |
+| **Directory** | `apps/backend/template` |
+| **Port** | `8019` |
+| **Local URL** | [https://local.reloop.sh/api/template](https://local.reloop.sh/api/template) |
+| **Swagger UI** | [https://local.reloop.sh/api/template/openapi](https://local.reloop.sh/api/template/openapi) |
+| **Stack** | `ElysiaJS` `PostgreSQL` `Redis` `NATS` |
+
 
 ## Quick Start
 
-Dependencies are handled globally at the root directory. You can start the Template Service development server instantly:
+<Callout icon="union" variant="info">
+Run from the monorepo root:
+</Callout>
 
-<CodeGroup>
-  <CodeBlock title="From Monorepo Root (Recommended)">
-  ```bash
-  # Start the dev server with hot reloading
-  bun be:template:dev
-  ```
-  </CodeBlock>
+```bash
+bun be:template:dev
+```
 
-  <CodeBlock title="From the Service Folder">
-  ```bash
-  cd apps/backend/template
-  bun dev
-  ```
-  </CodeBlock>
-</CodeGroup>
+The service starts with hot reloading on port `8019`.
 
-Once running, the Template Service will listen locally on port `8019`. You can query it via Caddy at [https://local.reloop.sh/api/template](https://local.reloop.sh/api/template) 🎉
-
----
-
-## Service Information
-
-* **Directory Location:** `apps/backend/template/`
-* **Local Listening Port:** `8019` (configurable with `PORT` env variable)
-* **Unified Access Route:** [https://local.reloop.sh/api/template](https://local.reloop.sh/api/template)
-* **Primary Tech Stack:** ElysiaJS, PostgreSQL, Redis, NATS
-* **Dependencies:** Relies on PostgreSQL (to store templates) and Redis (to cache compiled layout objects).
-
----
 
 ## Environment Configuration
 
-The Template Service environment variables are defined in `apps/backend/template/.env`. If you ran `bun env:setup` at the root, your `.env` is already configured:
+Variables live in `apps/backend/template/.env`. Running `bun env:setup` from the root auto-populates this file.
 
 ```bash
-# Database & Cache Configurations
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
-
-# Server Gateway Configuration
 PORT=8019
 BASE_URL="https://local.reloop.sh"
-NODE_ENV=development
-NODE_TLS_REJECT_UNAUTHORIZED=0
-
-# Event Bus Broker
 NATS_URL=nats://localhost:4222
+NODE_ENV=development
 ```
 
 ### Reference Table
 
-| Variable | Required | Default Value | Description |
-| :--- | :--- | :--- | :--- |
-| `PG_URL` | **YES** | `postgresql://...` | PostgreSQL database connection string. |
-| `REDIS_URL` | **YES** | `redis://...` | Redis connection URL for temporary layout caching. |
-| `PORT` | **YES** | `8019` | Local port number the Elysia app listens to on the host. |
-| `BASE_URL` | **YES** | `https://local.reloop.sh` | Main application domain (used for cookie validations). |
-| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event bus messaging. |
-| `NODE_ENV` | **YES** | `development` | Active environment scope (`development` or `production`). |
+| Variable | Required | Default |
+| :--- | :--- | :--- |
+| `PG_URL` | **YES** | `postgresql://...` |
+| `REDIS_URL` | **YES** | `redis://...` |
+| `PORT` | **YES** | `8019` |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` |
+| `NATS_URL` | **YES** | `nats://localhost:4222` |
 
----
 
 ## Development Commands
 
-All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
+| Command | Description |
+| :--- | :--- |
+| `bun be:template:dev` | Start dev server with hot reloading |
+| `bun run --filter=template build` | Compile production bundle |
+| `bun run --filter=template start` | Run compiled production build |
+| `bun run --filter=template check-types` | TypeScript type-check |
 
-| Command | Action | Scope |
-| :--- | :--- | :--- |
-| `bun be:template:dev` | Start the Template dev server with hot reloading | Development |
-| `bun run --filter=template build` | Compile the Template service for production | Production |
-| `bun run --filter=template start` | Run the compiled production build locally | Production |
-| `bun run --filter=template check-types` | Verify TypeScript type-safety | Code Quality |
 
----
+## Architecture
 
-## Database Schema & Relationships
-
-The relational visual layouts blueprint and revision rollback schemas are defined inside [packages/db/src/schema/template.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/template.ts).
-
-### Enums
-
-| Enum | Values | Description |
-| :--- | :--- | :--- |
-| `template_status` | `draft` · `published` · `archived` | Template development lifecycle state |
-| `template_block_type` | `heading` · `text` · `button` · `image` · `divider` · `spacer` · `section` · `container` · `columns` · `html` | Semantic builder blocks for compiling visual content |
-
----
-
-### `template` Table
-
-Holds active drag-and-drop Lexical compiler state blueprints, parsed merge variables, and active thumbnails.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | `tmpl_{cuid}` | Primary Key |
-| `name` | `varchar(255)` | — | Friendly design/label name |
-| `description` | `text` | `null` | Contextual developer explanation details |
-| `subject` | `varchar(500)`| `null` | Default email subject line |
-| `organizationId` | `text` | — | Foreign Key &rarr; [organization.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
-| `createdByUserId` | `text` | — | Foreign Key &rarr; [user.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
-| `status` | `template_status`| `draft` | Deployment state of template |
-| `content` | `jsonb` | `[]` | Serialized Lexical builder block array (`TemplateBlock[]`) |
-| `variables` | `jsonb` | `[]` | Dynamically parsed dynamic token names (`string[]`) |
-| `currentVersion` | `integer` | `1` | Increment counter representing current published edition |
-| `thumbnailUrl` | `text` | `null` | Image preview URL generated on save |
-| `isDefault` | `boolean` | `false` | System standard placeholder flag |
-
----
-
-### `template_version` Table
-
-History ledger tracking every saved iteration, enabling single-click rollback capabilities.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | `tmpl_ver_{cuid}`| Primary Key |
-| `templateId` | `text` | — | Foreign Key &rarr; [template.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/template.ts) |
-| `version` | `integer` | — | Precise revision sequence number |
-| `subject` | `varchar(500)`| `null` | Subject line associated with version |
-| `content` | `jsonb` | — | Target block layout snapshot |
-| `variables` | `jsonb` | `[]` | Merge tags mapped for revision |
-| `renderedHtml` | `text` | `null` | Precompiled physical HTML rendering for high-performance sending |
-| `createdByUserId` | `text` | — | Foreign Key &rarr; [user.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
-
----
-
-## Interactive API Docs (Swagger)
-
-The Template Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:
-
-1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/template/openapi](https://local.reloop.sh/api/template/openapi) (or [http://localhost:8019/api/template/openapi](http://localhost:8019/api/template/openapi) directly).
-2. Use the interactive Swagger UI playground to run queries and inspect request schemas.
-
----
-
-## Core Capabilities Explained
-
-* **Variable Merging & Parsing**: Parses handlebars tokens (e.g. `{{ contact.first_name }}`) and dynamic organizational loops to construct the final HTML string.
-* **Layout Versioning States**: Separates draft versions from active campaign layouts. Enables content creators to revise templates in Drizzle without mutating active campaign queues.
-* **Asset Integration**: Integrates directly with the asset upload handlers, rendering S3-stored media URLs safely.
-* **Relational Storage**: Integrates `@reloop/db` schema, primarily manipulating records inside the `email_template` and `email_template_version` tables.
+| Layer | Detail |
+| :--- | :--- |
+| **Builder** | Stores drag-and-drop block JSON from the dashboard editor. |
+| **Compilation** | Renders HTML with merge tags for the [mail](/setup/backend/mail) service. |
+| **Schema** | `template` and revisions in `packages/db/src/schema/template.ts`. |

@@ -1,7 +1,7 @@
 ---
 title: Inbound
 icon: mail-receive
-description: Set up and run the Reloop inbound KumoMTA MX receiver locally in Docker.
+description: Set up and run the Reloop inbound MX receiver locally in Docker.
 ---
 
 <Callout type="info" title="Complete Base Setup First" variant="note">
@@ -11,89 +11,64 @@ description: Set up and run the Reloop inbound KumoMTA MX receiver locally in Do
 
 ## Service Overview
 
-Inbound KumoMTA MX receiver — accepts mail from external senders, validates recipients, scans for spam, and forwards to the [inbox](/setup/backend/inbox) service via NATS.
+Inbound KumoMTA MX receiver — accepts external mail, scans with RSpamD, forwards to [inbox](/setup/backend/inbox) via NATS.
 
 | Property | Value |
 | :--- | :--- |
 | **Directory** | `apps/backend/inbound` |
-| **Docker Service** | `inbound` (container `reloop-inbound`) |
-| **SMTP Port** | `25` (open MX) |
-| **HTTP Port** | `8030` (health check, host-mapped from container `8000`) |
+| **Docker service** | `inbound` (container `reloop-inbound`) |
+| **SMTP port** | `25` |
+| **HTTP port** | `8030` (health check) |
 | **Stack** | `KumoMTA` `Lua` `RSpamD` |
 
 
-<Callout type="info" title="Inbound vs Outbound">
-  Outbound mail submission is handled by the [SMTP](/setup/backend/smtp) service on ports `587`/`2025`.
-</Callout>
-
-
 ## Quick Start
-<Callout
-  icon="union"
-  variant="info"
->
-The inbound MTA starts with the full local Docker stack:
+
+<Callout icon="union" variant="info">
+Starts with the full Docker stack:
 </Callout>
+
 ```bash
 bun docker:up
 ```
 
-Or start only the inbound container from the `local/` directory:
+Or start only inbound from `local/`:
 
 ```bash
-cd local
-docker compose up -d inbound
+cd local && docker compose up -d inbound
 ```
 
 
 ## Configuration
 
-Container variables are defined in `local/docker-compose.yml`:
+Key variables in `local/docker-compose.yml`:
 
-| Variable | Default Value | Description |
-| :--- | :--- | :--- |
-| `INBOUND_HOSTNAME` | `inbound.reloop.sh` | EHLO hostname |
-| `NATS_URL` | `reloop-nats:4222` | Forward accepted mail to inbox |
-| `KUMOMTA_RSPAMD_URL` | `http://reloop-rspamd:11333/checkv2` | RSpamD scan endpoint |
-| `KUMOMTA_CHECK_RECIPIENT_URL` | `http://host.docker.internal:8011/api/domain` | Recipient validation (domain service) |
-| `NODE_ENV` | `development` | Environment scope |
-
-
-## Policy Files
-
-Lua policies live in `apps/backend/inbound/`:
-
-* **`init.lua`** — spool partitions, SMTP listeners, HTTP console
-* **`policy/`** — recipient validation, spam handling, NATS publishing
+| Variable | Default |
+| :--- | :--- |
+| `INBOUND_HOSTNAME` | `inbound.reloop.sh` |
+| `NATS_URL` | `reloop-nats:4222` |
+| `KUMOMTA_RSPAMD_URL` | `http://reloop-rspamd:11333/checkv2` |
+| `KUMOMTA_CHECK_RECIPIENT_URL` | `http://host.docker.internal:8011/api/domain` |
 
 
 ## Container Commands
 
-All commands run from the **`local/`** directory:
-
 | Command | Description |
 | :--- | :--- |
-| `docker compose up -d inbound` | Start the inbound container |
-| `docker logs -f reloop-inbound` | Stream container logs |
-| `docker compose stop inbound` | Stop the container |
+| `docker compose up -d inbound` | Start inbound container |
+| `docker logs -f reloop-inbound` | Stream logs |
 | `curl http://localhost:8030/health` | Health check |
-
-
-## DNS Requirements (Production)
-
-* **A Record**: `inbound.reloop.sh` → server IP
-* **MX Records**: Customer domains should point MX to `inbound.reloop.sh`
 
 
 ## Architecture
 
 ```
-External Sender → Port 25 (SMTP) → Recipient Check → RSpamD Scan → NATS → Inbox Service
+External Sender → Port 25 → Recipient Check → RSpamD → NATS → Inbox
 ```
 
 | Layer | Detail |
 | :--- | :--- |
-| **MX Reception** | Accepts inbound mail from external senders on port `25`. |
-| **Recipient Validation** | Domain service (`/api/domain`) verifies authorized recipients. |
-| **Spam Scanning** | RSpamD scans messages before acceptance. |
-| **NATS Forwarding** | Accepted messages are published for the inbox service to consume. |
+| **MX reception** | Accepts inbound mail on port `25`. |
+| **Validation** | [domain](/setup/backend/domain) service verifies recipients. |
+| **Forwarding** | Accepted messages published to NATS for inbox. |
+| **Outbound** | Submission is handled by [smtp](/setup/backend/smtp), not this service. |

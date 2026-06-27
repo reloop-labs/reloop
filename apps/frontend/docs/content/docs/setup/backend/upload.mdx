@@ -1,140 +1,85 @@
 ---
 title: Upload
 icon: image-upload
-description: Learn how to set up, configure, and run the Reloop asset upload service locally.
+description: Set up, configure, and run the Reloop upload microservice locally.
 ---
 
-The **Asset Upload Service** is an **ElysiaJS** microservice that manages bulk media uploads, campaign attachments, organization logos, and user avatars. It validates file headers, formats payload envelopes, and streams media securely to an S3-compatible storage backend (MinIO locally or AWS S3 in production).
-
-<Callout type="info" title="Prerequisite First">
-  Before starting the Upload Service, make sure you've completed the base [Local Development Setup](/setup) and have the local MinIO storage container active (`bun docker:up`).
+<Callout type="info" title="Complete Base Setup First" variant="note">
+  Ensure you've finished the [Local Development Setup](/docs/setup) and have MinIO running (`bun docker:up`).
 </Callout>
 
----
+
+## Service Overview
+
+File uploads — logos, attachments, and assets stored in MinIO/S3.
+
+| Property | Value |
+| :--- | :--- |
+| **Directory** | `apps/backend/upload` |
+| **Port** | `8018` |
+| **Local URL** | [https://local.reloop.sh/api/upload](https://local.reloop.sh/api/upload) |
+| **Swagger UI** | [https://local.reloop.sh/api/upload/openapi](https://local.reloop.sh/api/upload/openapi) |
+| **Stack** | `ElysiaJS` `PostgreSQL` `MinIO/S3` `NATS` |
+
 
 ## Quick Start
 
-Dependencies are handled globally at the root directory. You can start the Upload Service development server instantly:
+<Callout icon="union" variant="info">
+Run from the monorepo root:
+</Callout>
 
-<CodeGroup>
-  <CodeBlock title="From Monorepo Root (Recommended)">
-  ```bash
-  # Start the dev server with hot reloading
-  bun be:upload:dev
-  ```
-  </CodeBlock>
+```bash
+bun be:upload:dev
+```
 
-  <CodeBlock title="From the Service Folder">
-  ```bash
-  cd apps/backend/upload
-  bun dev
-  ```
-  </CodeBlock>
-</CodeGroup>
+The service starts with hot reloading on port `8018`.
 
-Once running, the Upload Service will listen locally on port `8018`. You can query it via Caddy at [https://local.reloop.sh/api/upload](https://local.reloop.sh/api/upload) 🎉
-
----
-
-## Service Information
-
-* **Directory Location:** `apps/backend/upload/`
-* **Local Listening Port:** `8018` (configurable with `PORT` env variable)
-* **Unified Access Route:** [https://local.reloop.sh/api/upload](https://local.reloop.sh/api/upload)
-* **Primary Tech Stack:** ElysiaJS, AWS SDK S3 (`@aws-sdk/client-s3`), PostgreSQL, Redis, NATS
-* **Dependencies:** Relies on PostgreSQL (to store asset metadata index logs) and MinIO/S3 (to host the physical files).
-
----
 
 ## Environment Configuration
 
-The Upload Service environment variables are defined in `apps/backend/upload/.env`. If you ran `bun env:setup` at the root, your `.env` is already configured:
+Variables live in `apps/backend/upload/.env`. Running `bun env:setup` from the root auto-populates this file.
 
 ```bash
-# Database & Cache Configurations
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
-
-# Server Gateway Configuration
 PORT=8018
 BASE_URL="https://local.reloop.sh"
-NODE_ENV=development
-NODE_TLS_REJECT_UNAUTHORIZED=0
-
-# MinIO / S3 Object Storage Configuration
 S3_ENDPOINT=http://localhost:9010
 S3_ACCESS_KEY=reloop
 S3_SECRET_KEY=reloop123
 S3_BUCKET=reloop-uploads
 S3_REGION=us-east-1
 S3_FORCE_PATH_STYLE=true
-
-# Event Bus Broker
 NATS_URL=nats://localhost:4222
+NODE_ENV=development
 ```
 
 ### Reference Table
 
-| Variable | Required | Default Value | Description |
-| :--- | :--- | :--- | :--- |
-| `PG_URL` | **YES** | `postgresql://...` | PostgreSQL database connection string. |
-| `S3_ENDPOINT` | **YES** | `http://localhost:9010` | Storage API gateway endpoint (MinIO locally, AWS in prod). |
-| `S3_ACCESS_KEY`| **YES** | `reloop` | Storage target access key credential. |
-| `S3_SECRET_KEY`| **YES** | `reloop123` | Storage target secret key credential. |
-| `S3_BUCKET` | **YES** | `reloop-uploads` | S3 Bucket name target. |
-| `S3_REGION` | **YES** | `us-east-1` | S3 Bucket deployment region standard. |
-| `PORT` | **YES** | `8018` | Local port number the Elysia app listens to on the host. |
-| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event bus messaging. |
-| `NODE_ENV` | **YES** | `development` | Active environment scope (`development` or `production`). |
+| Variable | Required | Default |
+| :--- | :--- | :--- |
+| `PG_URL` | **YES** | `postgresql://...` |
+| `S3_ENDPOINT` | **YES** | `http://localhost:9010` |
+| `S3_ACCESS_KEY` | **YES** | `reloop` |
+| `S3_SECRET_KEY` | **YES** | `reloop123` |
+| `S3_BUCKET` | **YES** | `reloop-uploads` |
+| `PORT` | **YES** | `8018` |
 
----
 
 ## Development Commands
 
-All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
+| Command | Description |
+| :--- | :--- |
+| `bun be:upload:dev` | Start dev server with hot reloading |
+| `bun run --filter=upload build` | Compile production bundle |
+| `bun run --filter=upload start` | Run compiled production build |
+| `bun run --filter=upload check-types` | TypeScript type-check |
 
-| Command | Action | Scope |
-| :--- | :--- | :--- |
-| `bun be:upload:dev` | Start the Upload dev server with hot reloading | Development |
-| `bun run --filter=upload build` | Compile the Upload service for production | Production |
-| `bun run --filter=upload start` | Run the compiled production build locally | Production |
-| `bun run --filter=upload check-types` | Verify TypeScript type-safety | Code Quality |
 
----
+## Architecture
 
-## Database Schema & Relationships
-
-The relational visual assets library index is defined inside [packages/db/src/schema/upload.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/upload.ts).
-
-### `upload` Table
-
-Stores details and object storage path mappings for uploaded attachments, visual logos, avatars, and assets.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | `up_{cuid}` | Primary Key |
-| `filename` | `varchar(255)` | — | Unique storage filename generated by the server |
-| `originalName` | `varchar(255)` | — | Original name of file uploaded by the user |
-| `mimeType` | `varchar(100)` | — | Content type description standard (e.g. `image/png`) |
-| `size` | `integer` | — | Physical file size in bytes |
-| `path` | `text` | — | S3/MinIO bucket object storage URI key location |
-| `userId` | `text` | — | Foreign Key &rarr; [user.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
-
----
-
-## Interactive API Docs (Swagger)
-
-The Upload Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:
-
-1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/upload/openapi](https://local.reloop.sh/api/upload/openapi) (or [http://localhost:8018/api/upload/openapi](http://localhost:8018/api/upload/openapi) directly).
-2. Use the interactive Swagger UI playground to run queries and inspect request schemas.
-
----
-
-## Safety Controls & Boundaries
-
-* **Size Limits**: Enforces a strict upload ceiling of **10MB** per asset.
-* **MIME Verification**: Restricts uploads strictly to web-safe images to prevent malicious payloads:
-  * `image/jpeg`, `image/jpg`, `image/png`, `image/gif`, `image/webp`, `image/svg+xml`.
-* **Metadata Persistence**: Details of successfully completed uploads (including S3 URI, mime type, byte size, and uploader UUID) are recorded inside the PostgreSQL `asset` table.
-* **NATS Broadcast**: Publishes events under `asset.uploaded` to NATS, triggering cache purges and dashboard updates in real time.
+| Layer | Detail |
+| :--- | :--- |
+| **Storage** | Files uploaded to MinIO locally (`localhost:9010`), S3 in production. |
+| **Metadata** | File index stored in Postgres (`upload` table). |
+| **Signed URLs** | Generates presigned upload/download URLs for the dashboard. |

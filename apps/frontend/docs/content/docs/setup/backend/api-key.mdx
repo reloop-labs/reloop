@@ -1,7 +1,7 @@
 ---
 title: API Key
 icon: code
-description: Set up, configure, and run the Reloop API Key microservice locally.
+description: Set up, configure, and run the Reloop API key microservice locally.
 ---
 
 <Callout type="info" title="Complete Base Setup First" variant="note">
@@ -11,7 +11,7 @@ description: Set up, configure, and run the Reloop API Key microservice locally.
 
 ## Service Overview
 
-Generation, hashing, validation, and revocation of external developer API keys.
+Generation, hashing, validation, and revocation of developer API keys.
 
 | Property | Value |
 | :--- | :--- |
@@ -19,16 +19,15 @@ Generation, hashing, validation, and revocation of external developer API keys.
 | **Port** | `8012` |
 | **Local URL** | [https://local.reloop.sh/api/api-key](https://local.reloop.sh/api/api-key) |
 | **Swagger UI** | [https://local.reloop.sh/api/api-key/openapi](https://local.reloop.sh/api/api-key/openapi) |
-| **Stack** | `ElysiaJS`  `Better Auth API Key Plugin` `PostgreSQL` `Redis` `NATS` |
+| **Stack** | `ElysiaJS` `Better Auth API Key` `PostgreSQL` `Redis` `NATS` |
 
 
 ## Quick Start
-<Callout
-  icon="union"
-  variant="info"
->
-Run the following command from the root of the monorepo:
+
+<Callout icon="union" variant="info">
+Run from the monorepo root:
 </Callout>
+
 ```bash
 bun be:api-key:dev
 ```
@@ -41,34 +40,26 @@ The service starts with hot reloading on port `8012`.
 Variables live in `apps/backend/api-key/.env`. Running `bun env:setup` from the root auto-populates this file.
 
 ```bash
-# Databases
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
-
-# Server
 PORT=8012
 BASE_URL="https://local.reloop.sh"
-NODE_ENV=development
-
-# Event Bus
 NATS_URL=nats://localhost:4222
+NODE_ENV=development
 ```
 
 ### Reference Table
 
-| Variable | Required | Default Value |
+| Variable | Required | Default |
 | :--- | :--- | :--- |
-| `PG_URL` | **YES** | `postgresql://reloop:reloop123@localhost:5432/reloop` |
-| `REDIS_URL` | **YES** | `redis://:reloop123@localhost:6379` |
+| `PG_URL` | **YES** | `postgresql://...` |
+| `REDIS_URL` | **YES** | `redis://...` |
 | `PORT` | **YES** | `8012` |
 | `BASE_URL` | **YES** | `https://local.reloop.sh` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
-| `NODE_ENV` | **YES** | `development` |
 
 
 ## Development Commands
-
-All commands run from the **monorepo root**.
 
 | Command | Description |
 | :--- | :--- |
@@ -77,42 +68,12 @@ All commands run from the **monorepo root**.
 | `bun run --filter=api-key start` | Run compiled production build |
 | `bun run --filter=api-key check-types` | TypeScript type-check |
 
-## Database Schema
-
-Schema defined in [`packages/db/src/schema/api-key.ts`](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/api-key.ts).
-
-### `apikey` Table
-
-Stores provisioned credentials, rate-limiting state, scopes, and request logs.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | — | Primary Key |
-| `name` | `text` | `null` | Human-readable label (e.g. `GitHub CI`) |
-| `start` | `text` | `null` | Visible key prefix shown in UI |
-| `prefix` | `text` | `null` | Semantic namespace prefix (e.g. `reloop_`) |
-| `key` | `text` | — | SHA-256 hashed key value |
-| `organizationId` | `text` | — | FK → `organization.id` |
-| `userId` | `text` | — | FK → `user.id` |
-| `refillInterval` | `integer` | `null` | Credit refill window in ms |
-| `refillAmount` | `integer` | `null` | Credits granted per refill |
-| `lastRefillAt` | `timestamp` | `null` | Last refill timestamp |
-| `enabled` | `boolean` | `true` | Whether the key is active |
-| `rateLimitEnabled` | `boolean` | `true` | Whether rate limiting is enforced |
-| `rateLimitTimeWindow` | `integer` | `86400000` | Rate limit sliding window in ms (default: 24h) |
-| `rateLimitMax` | `integer` | `10` | Max requests allowed per window |
-| `requestCount` | `integer` | `0` | Requests made in current window |
-| `remaining` | `integer` | `null` | Requests remaining before throttle |
-| `lastRequest` | `timestamp` | `null` | Timestamp of last request |
-| `expiresAt` | `timestamp` | `null` | Key expiration timestamp (`null` = no expiry) |
-| `permissions` | `text` | `null` | Serialized permission scopes |
-| `metadata` | `text` | `null` | Arbitrary serialized key attributes |
 
 ## Architecture
 
 | Layer | Detail |
 | :--- | :--- |
-| **Auth** | `@better-auth/api-key` handles SHA-256 hashing and key formatting |
-| **Caching** | Validated keys are cached in Redis — validation latency \< 5ms |
-| **Events** | Key lifecycle events published to NATS under `api-key.*` (consumed by analytics and log-tracking services) |
-| **DB Client** | Uses `@reloop/db` with Drizzle ORM — keys are hashed before any write to PostgreSQL |
+| **Auth** | `@better-auth/api-key` handles SHA-256 hashing and key formatting. |
+| **Caching** | Validated keys are cached in Redis for fast lookups. |
+| **Events** | Key lifecycle events published to NATS under `api-key.*`. |
+| **Schema** | `apikey` table in `packages/db/src/schema/api-key.ts`. |

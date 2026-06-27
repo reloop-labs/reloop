@@ -1,7 +1,7 @@
 ---
 title: SMTP
 icon: mail-send
-description: Set up and run the Reloop outbound KumoMTA SMTP engine locally in Docker.
+description: Set up and run the Reloop outbound SMTP engine locally in Docker.
 ---
 
 <Callout type="info" title="Complete Base Setup First" variant="note">
@@ -11,87 +11,58 @@ description: Set up and run the Reloop outbound KumoMTA SMTP engine locally in D
 
 ## Service Overview
 
-Outbound KumoMTA mail transfer agent — accepts submission from the [mail](/setup/backend/mail) service and delivers to destination MX servers (or Mailpit in local dev).
+Outbound KumoMTA engine — accepts mail from [mail](/setup/backend/mail) and delivers via SMTP (Mailpit locally).
 
 | Property | Value |
 | :--- | :--- |
 | **Directory** | `apps/backend/smtp` |
-| **Docker Service** | `smtp` (container `reloop-smtp`) |
-| **SMTP Ports** | `587`, `2025` (submission/STARTTLS) |
-| **HTTP Port** | `8020` (KumoMTA console, host-mapped from container `8000`) |
+| **Docker service** | `smtp` (container `reloop-smtp`) |
+| **SMTP ports** | `587`, `2025` |
+| **HTTP port** | `8020` |
 | **Stack** | `KumoMTA` `Lua` |
 
 
-<Callout type="info" title="Inbound vs Outbound">
-  Port `25` inbound MX reception is handled by the [inbound](/setup/backend/inbound) service, not this outbound engine.
-</Callout>
-
-
 ## Quick Start
-<Callout
-  icon="union"
-  variant="info"
->
-The SMTP engine starts with the full local Docker stack:
+
+<Callout icon="union" variant="info">
+Starts with the full Docker stack:
 </Callout>
+
 ```bash
 bun docker:up
 ```
 
-Or start only the SMTP container from the `local/` directory:
+Or start only SMTP + Mailpit from `local/`:
 
 ```bash
-cd local
-docker compose up -d smtp reloop-mailpit
+cd local && docker compose up -d smtp reloop-mailpit
 ```
 
 
 ## Configuration
 
-Container variables are defined in `local/docker-compose.yml`:
+Key variables in `local/docker-compose.yml`:
 
-| Variable | Default Value | Description |
-| :--- | :--- | :--- |
-| `BASE_URL` | `https://local.reloop.sh` | Platform base domain |
-| `NATS_URL` | `reloop-nats:4222` | Delivery event bus |
-| `KUMOMTA_TRUSTED_HOSTS` | RFC1918 ranges | Trusted submission sources |
-| `TRACKING_SECRET` | (dev default) | Tracking signature secret |
-
-
-## Policy Files
-
-Lua policies live in `apps/backend/smtp/`:
-
-* **`init.lua`** — spool partitions, SMTP listeners, HTTP console
-* **`policy/smtp.lua`** — ESMTP authentication and recipient validation
-* **`policy/queue.lua`** — scheduling, backoff, and retry logic
-* **`policy/webhooks.lua`** — delivery event HTTP callbacks
+| Variable | Default |
+| :--- | :--- |
+| `BASE_URL` | `https://local.reloop.sh` |
+| `NATS_URL` | `reloop-nats:4222` |
 
 
 ## Container Commands
 
-All commands run from the **`local/`** directory:
-
 | Command | Description |
 | :--- | :--- |
-| `docker compose up -d smtp` | Start the SMTP container |
-| `docker logs -f reloop-smtp` | Stream container logs |
-| `docker compose stop smtp` | Stop the container |
-
-
-## Mailpit Sandbox
-
-In local development, outbound mail is captured by **Mailpit** instead of real inboxes:
-
-* Web UI: [http://localhost:8025](http://localhost:8025)
-* Internal SMTP sink: port `1025` inside the Docker network
+| `docker compose up -d smtp` | Start SMTP container |
+| `docker logs -f reloop-smtp` | Stream logs |
+| `docker compose stop smtp` | Stop container |
 
 
 ## Architecture
 
 | Layer | Detail |
 | :--- | :--- |
-| **Submission** | Accepts outbound mail from the mail service on ports `587`/`2025`. |
-| **Spool** | Persists messages to Docker volumes for crash-safe recovery. |
-| **Policy** | Lua scripts govern throttling, DKIM signing, and routing rules. |
-| **Delivery** | Routes to real MX servers in production, or Mailpit locally. |
+| **Submission** | Accepts outbound mail on ports `587`/`2025` from the mail service. |
+| **Policies** | Lua scripts in `apps/backend/smtp/policy/` handle routing and DKIM. |
+| **Local delivery** | Captured by Mailpit at [http://localhost:8025](http://localhost:8025). |
+| **Inbound** | Port `25` MX is handled by [inbound](/setup/backend/inbound), not this service. |

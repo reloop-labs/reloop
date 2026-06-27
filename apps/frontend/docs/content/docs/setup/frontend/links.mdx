@@ -1,7 +1,7 @@
 ---
 title: Links
 icon: link
-description: Set up, configure, and run the Reloop links frontend app locally.
+description: Set up and run the Reloop links app locally.
 ---
 
 <Callout type="info" title="Complete Base Setup First" variant="note">
@@ -11,7 +11,7 @@ description: Set up, configure, and run the Reloop links frontend app locally.
 
 ## Service Overview
 
-Contact preference center and tracked link redirects for outbound email campaigns.
+Contact preference center and tracked link redirects for outbound email.
 
 | Property | Value |
 | :--- | :--- |
@@ -19,17 +19,15 @@ Contact preference center and tracked link redirects for outbound email campaign
 | **Port** | `3005` |
 | **Local URL (preferences)** | [https://local.reloop.sh/preferences](https://local.reloop.sh/preferences) |
 | **Local URL (redirect)** | [https://local.reloop.sh/redirect](https://local.reloop.sh/redirect) |
-| **Direct URL** | [http://localhost:3005](http://localhost:3005) |
 | **Stack** | `Next.js` `React 19` `Tailwind CSS` |
 
 
 ## Quick Start
-<Callout
-  icon="union"
-  variant="info"
->
-Run the following command from the root of the monorepo:
+
+<Callout icon="union" variant="info">
+Run from the monorepo root:
 </Callout>
+
 ```bash
 bun fe:links:dev
 ```
@@ -37,32 +35,28 @@ bun fe:links:dev
 The app starts with Turbopack hot reloading on port `3005`.
 
 
-## Development Commands
-
-All commands run from the **monorepo root**.
-
-| Command | Description |
-| :--- | :--- |
-| `bun fe:links:dev` | Start dev server with Turbopack hot reloading |
-| `bun run --filter=links build` | Compile production bundle |
-| `bun run --filter=links start` | Run compiled production build |
-| `bun run --filter=links lint` | Run ESLint checks |
-
-
 ## Routes
 
 | Route | Purpose |
 | :--- | :--- |
-| `/preferences/[token]` | Contact preference center — manage topics and unsubscribe |
-| `/redirect/[token]` | Tracked link redirect — records clicks and forwards to destination |
+| `/preferences/[token]` | Manage subscription topics and unsubscribe |
+| `/redirect/[token]` | Track clicks and redirect to destination URL |
 
-Both routes are proxied by Caddy from `local.reloop.sh` to port `3005`.
+
+## Development Commands
+
+| Command | Description |
+| :--- | :--- |
+| `bun fe:links:dev` | Start dev server with Turbopack |
+| `bun run --filter=links build` | Compile production bundle |
+| `bun run --filter=links start` | Run production build |
+| `bun run --filter=links lint` | Run ESLint checks |
 
 
 ## Architecture
 
 | Layer | Detail |
 | :--- | :--- |
-| **[Mail](/setup/backend/mail)** | Injects tracking redirect links pointing to `/redirect/[token]` in outbound HTML. |
-| **[Contacts](/setup/backend/contacts)** | Manages contact preferences and subscription topics on preference pages. |
-| **Caddy** | Routes `/preferences*` and `/redirect*` to this app on port `3005`. |
+| **[Mail](/setup/backend/mail)** | Injects `/redirect/[token]` links in outbound HTML. |
+| **[Contacts](/setup/backend/contacts)** | Powers preference page data. |
+| **Caddy** | Routes `/preferences*` and `/redirect*` to port `3005`. |

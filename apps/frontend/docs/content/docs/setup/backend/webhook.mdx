@@ -1,174 +1,79 @@
 ---
 title: Webhook
 icon: webhook
-description: Learn how to set up, configure, and run the Reloop webhook service locally.
+description: Set up, configure, and run the Reloop webhook microservice locally.
 ---
 
-The **Webhook Delivery Service** is an **ElysiaJS** microservice that manages the scheduling, formatting, cryptographical signing, and dispatching of outbound event webhooks to developer callback URLs. It listens for system-wide events and processes delivery retries using BullMQ.
-
-<Callout type="info" title="Prerequisite First">
-  Before configuring the Webhook Service, make sure you've completed the base [Local Development Setup](/setup) (installed Bun, configured the hosts file, and started the Docker container stack).
+<Callout type="info" title="Complete Base Setup First" variant="note">
+  Ensure you've finished the [Local Development Setup](/docs/setup) — before proceeding.
 </Callout>
 
----
+
+## Service Overview
+
+Outbound event webhooks — subscription management, HMAC signing, delivery, and retries via BullMQ.
+
+| Property | Value |
+| :--- | :--- |
+| **Directory** | `apps/backend/webhook` |
+| **Port** | `8013` |
+| **Local URL** | [https://local.reloop.sh/api/webhook](https://local.reloop.sh/api/webhook) |
+| **Swagger UI** | [https://local.reloop.sh/api/webhook/openapi](https://local.reloop.sh/api/webhook/openapi) |
+| **Stack** | `ElysiaJS` `PostgreSQL` `Redis` `NATS` `BullMQ` |
+
 
 ## Quick Start
 
-Dependencies are handled globally at the root directory. You can start the Webhook Service development server instantly:
+<Callout icon="union" variant="info">
+Run from the monorepo root:
+</Callout>
 
-<CodeGroup>
-  <CodeBlock title="From Monorepo Root (Recommended)">
-  ```bash
-  # Start the dev server with hot reloading
-  bun be:webhook:dev
-  ```
-  </CodeBlock>
+```bash
+bun be:webhook:dev
+```
 
-  <CodeBlock title="From the Service Folder">
-  ```bash
-  cd apps/backend/webhook
-  bun dev
-  ```
-  </CodeBlock>
-</CodeGroup>
+The service starts with hot reloading on port `8013`.
 
-Once running, the Webhook Service will listen locally on port `8013`. You can query it via Caddy at [https://local.reloop.sh/api/webhook](https://local.reloop.sh/api/webhook) 🎉
-
----
-
-## Service Information
-
-* **Directory Location:** `apps/backend/webhook/`
-* **Local Listening Port:** `8013` (configurable with `PORT` env variable)
-* **Unified Access Route:** [https://local.reloop.sh/api/webhook](https://local.reloop.sh/api/webhook)
-* **Primary Tech Stack:** ElysiaJS, BullMQ, Redis, PostgreSQL, NATS
-* **Dependencies:** Relies on PostgreSQL (to query subscriber callback targets) and Redis (to schedule and process BullMQ delivery jobs).
-
----
 
 ## Environment Configuration
 
-The Webhook Service environment variables are defined in `apps/backend/webhook/.env`. If you ran `bun env:setup` at the root, your `.env` is already configured:
+Variables live in `apps/backend/webhook/.env`. Running `bun env:setup` from the root auto-populates this file.
 
 ```bash
-# Database & Cache Configurations
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
-
-# Server Gateway Configuration
 PORT=8013
 BASE_URL="https://local.reloop.sh"
-NODE_ENV=development
-NODE_TLS_REJECT_UNAUTHORIZED=0
-
-# Event Bus Broker
 NATS_URL=nats://localhost:4222
+NODE_ENV=development
 ```
 
 ### Reference Table
 
-| Variable | Required | Default Value | Description |
-| :--- | :--- | :--- | :--- |
-| `PG_URL` | **YES** | `postgresql://...` | PostgreSQL database connection string. |
-| `REDIS_URL` | **YES** | `redis://...` | Redis connection URL used by BullMQ to schedule delivery jobs. |
-| `PORT` | **YES** | `8013` | Local port number the Elysia app listens to on the host. |
-| `BASE_URL` | **YES** | `https://local.reloop.sh` | Main application domain (used for cookie validations). |
-| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event bus messaging. |
-| `NODE_TLS_REJECT_UNAUTHORIZED` | **NO** | `0` | Allows self-signed certificates in local development mode. |
-| `NODE_ENV` | **YES** | `development` | Active environment scope (`development` or `production`). |
+| Variable | Required | Default |
+| :--- | :--- | :--- |
+| `PG_URL` | **YES** | `postgresql://...` |
+| `REDIS_URL` | **YES** | `redis://...` |
+| `PORT` | **YES** | `8013` |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` |
+| `NATS_URL` | **YES** | `nats://localhost:4222` |
 
----
 
 ## Development Commands
 
-All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
+| Command | Description |
+| :--- | :--- |
+| `bun be:webhook:dev` | Start dev server with hot reloading |
+| `bun run --filter=webhook build` | Compile production bundle |
+| `bun run --filter=webhook start` | Run compiled production build |
+| `bun run --filter=webhook check-types` | TypeScript type-check |
 
-| Command | Action | Scope |
-| :--- | :--- | :--- |
-| `bun be:webhook:dev` | Start the Webhook dev server with hot reloading | Development |
-| `bun run --filter=webhook build` | Compile the Webhook service for production | Production |
-| `bun run --filter=webhook start` | Run the compiled production build locally | Production |
-| `bun run --filter=webhook check-types` | Verify TypeScript type-safety | Code Quality |
 
----
+## Architecture
 
-## Database Schema & Relationships
-
-The relational subscriber endpoints configuration, event subscriptions, payload archives, and dispatch delivery logs are defined inside [packages/db/src/schema/webhook.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/webhook.ts).
-
-### Enums
-
-| Enum | Values | Description |
-| :--- | :--- | :--- |
-| `webhook_status` | `active` · `paused` · `disabled` · `failed` | Webhook subscription delivery status |
-| `webhook_delivery_status` | `pending` · `success` · `failed` · `retrying` | Specific event dispatch execution status |
-
----
-
-### `webhook` Table
-
-Holds user-configured outbound endpoints, secret signing tokens, and execution aggregations.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | `wh_{cuid}` | Primary Key |
-| `name` | `varchar(255)` | — | Friendly name label for the endpoint |
-| `url` | `text` | — | Recipient HTTP target URL destination |
-| `secret` | `text` | — | Cryptographic HMAC-SHA256 signature signing token |
-| `organizationId` | `text` | — | Foreign Key &rarr; [organization.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
-| `userId` | `text` | — | Foreign Key &rarr; [user.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
-| `status` | `webhook_status`| `active` | Active subscription configuration state |
-| `customHeaders` | `jsonb` | `null` | Key-value dictionary of custom HTTP headers sent (`Record<string, string>`) |
-| `rateLimitEnabled` | `boolean` | `true` | Throttling toggle constraint |
-| `maxRequestsPerMinute`| `integer` | `60` | Request rate volume ceiling |
-| `maxRetries` | `integer` | `3` | Maximum retry attempts for failed dispatches |
-| `successCount` | `integer` | `0` | Cumulative successful deliveries count |
-| `failureCount` | `integer` | `0` | Cumulative failed delivery attempts count |
-| `consecutiveFailures` | `integer` | `0` | Current series of consecutive failures before auto-disabling |
-
----
-
-### `webhook_delivery` Table
-
-High-fidelity transactional logs tracking the chronological attempts, network payloads, durations, and response status codes for every event dispatch.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | `whde_{cuid}` | Primary Key |
-| `webhookId` | `text` | — | Foreign Key &rarr; [webhook.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/webhook.ts) |
-| `webhookEventId` | `text` | `null` | Foreign Key &rarr; [webhook_event.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/webhook.ts) |
-| `eventType` | `text` | — | Semantic event type (e.g. `domain.verified`) |
-| `status` | `webhook_delivery_status`| `pending` | Dispatch attempt resolution state |
-| `requestUrl` | `text` | — | Dispatched network URL |
-| `requestHeaders` | `jsonb` | `null` | Sent headers including security signature |
-| `requestBody` | `jsonb` | — | Sent JSON body payload |
-| `responseStatus` | `integer` | `null` | Received HTTP response status code |
-| `responseBody` | `text` | `null` | Received body output stream |
-| `attemptNumber` | `integer` | `1` | Increment sequence of current attempt |
-| `durationMs` | `integer` | `null` | Request completion time (ms) |
-
----
-
-### Other Webhook Tables
-
-* **`webhook_event_subscription`**: Link table mapping [webhooks](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/webhook.ts) to specific event filters.
-* **`webhook_event`**: Relational event log storing the canonical payload structure and workspace context representing an asynchronous event trigger.
-
----
-
-## Interactive API Docs (Swagger)
-
-The Webhook Service publishes dynamic Swagger documentation directly from ElysiaJS. To test endpoints and query API structures:
-
-1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/webhook/openapi](https://local.reloop.sh/api/webhook/openapi) (or [http://localhost:8013/api/webhook/openapi](http://localhost:8013/api/webhook/openapi) directly).
-2. Use the interactive Swagger UI playground to run queries and inspect request schemas.
-
----
-
-## Core Operational Mechanics
-
-1. **Event Capture**: The service captures real-time campaign dispatches, click logs, and delivery notifications by subscribing to core NATS subjects (`kumomta.event.*`, `tracking.*`).
-2. **Subscription Matcher**: For every captured event, the PostgreSQL database is queried to find matching customer webhook configurations in the `webhook_subscription` table.
-3. **Queue Scheduling**: If an active subscriber matches the trigger event, a delivery payload is constructed and scheduled in BullMQ (`webhook-delivery-queue`) in Redis.
-4. **Signed Outbound Attempt**: A background BullMQ worker pulls the job, signs the payload string using the customer's shared subscription secret (`x-reloop-signature` header), and dispatches it over HTTP POST.
-5. **Robust Retry Loop**: If the destination server returns a non-2xx response, the worker registers a fail state, scheduling automated retries using exponential backoff (configured in `queues/webhook.queue.ts`).
+| Layer | Detail |
+| :--- | :--- |
+| **Event capture** | Subscribes to NATS subjects (`kumomta.event.*`, `tracking.*`). |
+| **Delivery** | BullMQ workers sign payloads with `x-reloop-signature` and POST to subscriber URLs. |
+| **Retries** | Failed deliveries retry with exponential backoff. |
+| **Schema** | `webhook`, `webhook_delivery` in `packages/db/src/schema/webhook.ts`. |

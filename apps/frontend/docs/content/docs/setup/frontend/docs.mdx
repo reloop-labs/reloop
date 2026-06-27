@@ -1,98 +1,54 @@
 ---
 title: Docs
 icon: book-closed
-description: Learn how to set up, configure, and run the Reloop developer documentation service locally.
+description: Set up and run the Reloop documentation site locally.
 ---
 
-The **Documentation Service** is a high-performance **Next.js** application that serves Reloop's public-facing guides, API sandbox resources, developer onboarding flows, and technical references. It parses static MDX content structures dynamically and integrates beautifully with the platform routing.
-
-<Callout type="info" title="Prerequisite First">
-  Before starting the Documentation app, make sure you've completed the base [Local Development Setup](/setup) and have the global Bun runtime installed.
+<Callout type="info" title="Complete Base Setup First" variant="note">
+  Ensure you've finished the [Local Development Setup](/docs/setup) — before proceeding.
 </Callout>
 
----
+
+## Service Overview
+
+This documentation site — MDX guides, API reference, and setup docs.
+
+| Property | Value |
+| :--- | :--- |
+| **Directory** | `apps/frontend/docs` |
+| **Port** | `3003` |
+| **Local URL** | [https://local.reloop.sh/docs](https://local.reloop.sh/docs) |
+| **Direct URL** | [http://localhost:3003](http://localhost:3003) |
+| **Stack** | `Next.js` `MDX` `Tailwind CSS` |
+
 
 ## Quick Start
 
-Dependencies are handled globally at the root directory. You can start the Documentation portal development server instantly:
+<Callout icon="union" variant="info">
+Run from the monorepo root:
+</Callout>
 
-<CodeGroup>
-  <CodeBlock title="From Monorepo Root (Recommended)">
-  ```bash
-  # Start the dev server with Next.js Turbo hot reloading
-  bun fe:docs:dev
-  ```
-  </CodeBlock>
-
-  <CodeBlock title="From the Service Folder">
-  ```bash
-  cd apps/frontend/docs
-  bun dev
-  ```
-  </CodeBlock>
-</CodeGroup>
-
-Once running, the Documentation service will listen on port `3003` locally. You can access the interface through the Caddy proxy at [https://local.reloop.sh/docs](https://local.reloop.sh/docs) (or directly at [http://localhost:3003](http://localhost:3003)) 🎉
-
----
-
-## Service Information
-
-* **Directory Location:** `apps/frontend/docs/`
-* **Local Listening Port:** `3003` (configured via `--port=3003` in the dev script)
-* **Unified Access Route:** [https://local.reloop.sh/docs](https://local.reloop.sh/docs)
-* **Primary Tech Stack:** Next.js (App Router), MDX parsing engine, Tailwind CSS, Mintlify Components, Shiki
-* **Dependencies:** Self-contained static site generator; utilizes Caddy for seamless unified local domain integration.
-
----
-
-## Environment Setup
-
-The Documentation service compiles MDX files locally from the workspace and does not strictly require active backend databases for basic reading. However, for complete path resolution:
-
-Create a `.env` file inside `/apps/frontend/docs`:
 ```bash
-NEXT_PUBLIC_APP_URL="https://local.reloop.sh"
+bun fe:docs:dev
 ```
 
----
+The app starts with Turbopack hot reloading on port `3003`.
+
+
+## Content Structure
+
+| Path | Purpose |
+| :--- | :--- |
+| `content/docs/setup/` | Local development setup guides (this section) |
+| `content/docs/api/` | Auto-generated API reference |
+| `content/docs/**/meta.json` | Sidebar navigation and ordering |
+
 
 ## Development Commands
 
-All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
-
-| Command | Action | Scope |
-| :--- | :--- | :--- |
-| `bun fe:docs:dev` | Start the Docs Next.js app in Turbopack development mode | Development |
-| `bun run --filter=docs build` | Compile and validate the MDX files for production static delivery | Production |
-| `bun run --filter=docs start` | Run the compiled production build locally | Production |
-| `bun run --filter=docs generate:api-docs` | Regenerate API specification pages from OpenAPI schemas | Tools |
-
----
-
-## Documentation File & Folder Structure
-
-* **MDX Pages location**: All page contents are authored in `/apps/frontend/docs/content/docs/`.
-* **Local Setup Guides**: The step-by-step setup guides you are reading right now live in `/apps/frontend/docs/content/docs/setup/`.
-* **Sidebar Navigation Control**: The sidebar directory lists, titles, and ordering rules are managed directly within the local **`meta.json`** files inside each folder level.
-
----
-
-## Troubleshooting Guide
-
-### Port `3003` Conflict
-If the port is occupied, identify and clear the PID manually:
-
-```bash
-# Locate the process listening on port 3003
-lsof -i :3003
-
-# Force terminate
-kill -9 <PID>
-```
-
-### Navigation Sidebar Hydration Flicker
-If sidebar lists show flicker during page loads:
-* Check that your local browser cache is refreshed.
-* The sidebar navigation tree compiles recursively. Ensure all subfolders have valid `meta.json` files matching MDX filename keys.
-* Run `bun run --filter=docs build` to confirm there are no syntax or type compilation errors within any MDX page files.
+| Command | Description |
+| :--- | :--- |
+| `bun fe:docs:dev` | Start dev server with Turbopack |
+| `bun run --filter=docs build` | Build and validate all MDX pages |
+| `bun run --filter=docs start` | Run production build |
+| `bun run --filter=docs generate:api-docs` | Regenerate API docs from OpenAPI specs |

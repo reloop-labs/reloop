@@ -11,7 +11,7 @@ description: Set up, configure, and run the Reloop inbox microservice locally.
 
 ## Service Overview
 
-Agent Inbox API — mailboxes, threads, and messages for inbound email consumed from NATS.
+Agent Inbox API — mailboxes, threads, and messages from inbound email via NATS.
 
 | Property | Value |
 | :--- | :--- |
@@ -23,12 +23,11 @@ Agent Inbox API — mailboxes, threads, and messages for inbound email consumed 
 
 
 ## Quick Start
-<Callout
-  icon="union"
-  variant="info"
->
-Run the following command from the root of the monorepo:
+
+<Callout icon="union" variant="info">
+Run from the monorepo root (requires [inbound](/setup/backend/inbound) via Docker):
 </Callout>
+
 ```bash
 bun be:inbox:dev
 ```
@@ -41,47 +40,32 @@ The service starts with hot reloading on port `8021`.
 Variables live in `apps/backend/inbox/.env`. Running `bun env:setup` from the root auto-populates this file.
 
 ```bash
-# Database & Cache
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
-
-# Server
 PORT=8021
 BASE_URL="https://local.reloop.sh"
-NODE_ENV=development
-
-# Event Bus
 NATS_URL=nats://localhost:4222
-
-# Outbound MTA
-KUMOMTA_HTTP_URL=http://localhost:8020
-
-# S3 / Storage (MinIO in local dev)
 S3_ENDPOINT=http://localhost:9010
 S3_ACCESS_KEY=reloop
 S3_SECRET_KEY=reloop123
 S3_BUCKET=reloop-attachments
 S3_REGION=us-east-1
 S3_FORCE_PATH_STYLE=true
+NODE_ENV=development
 ```
 
 ### Reference Table
 
-| Variable | Required | Default Value |
+| Variable | Required | Default |
 | :--- | :--- | :--- |
-| `PG_URL` | **YES** | `postgresql://reloop:reloop123@localhost:5432/reloop` |
-| `REDIS_URL` | **YES** | `redis://:reloop123@localhost:6379` |
+| `PG_URL` | **YES** | `postgresql://...` |
+| `REDIS_URL` | **YES** | `redis://...` |
 | `PORT` | **YES** | `8021` |
-| `BASE_URL` | **YES** | `https://local.reloop.sh` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
-| `KUMOMTA_HTTP_URL` | **YES** | `http://localhost:8020` |
 | `S3_ENDPOINT` | **YES** | `http://localhost:9010` |
-| `NODE_ENV` | **YES** | `development` |
 
 
 ## Development Commands
-
-All commands run from the **monorepo root**.
 
 | Command | Description |
 | :--- | :--- |
@@ -95,7 +79,6 @@ All commands run from the **monorepo root**.
 
 | Layer | Detail |
 | :--- | :--- |
-| **Inbound Reception** | The [inbound](/setup/backend/inbound) MTA accepts mail on port `25`, scans with RSpamD, and publishes to NATS. |
-| **NATS Consumer** | Subscribes to inbound mail events and persists threads and messages to PostgreSQL. |
-| **Attachments** | Stores large attachments in MinIO via the configured S3-compatible endpoint. |
-| **Dashboard API** | Exposes mailboxes, threads, and messages at `/api/inbox` (proxied by Caddy). |
+| **Inbound flow** | [inbound](/setup/backend/inbound) MTA → NATS → inbox persistence. |
+| **Attachments** | Stored in MinIO via S3-compatible endpoint. |
+| **Dashboard API** | Mailboxes, threads, and messages at `/api/inbox`. |

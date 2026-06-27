@@ -1,7 +1,7 @@
 ---
 title: Domain
 icon: globe
-description: Set up, configure, and run the Reloop Domain and DNS verification microservice locally.
+description: Set up, configure, and run the Reloop domain microservice locally.
 ---
 
 <Callout type="info" title="Complete Base Setup First" variant="note">
@@ -11,7 +11,7 @@ description: Set up, configure, and run the Reloop Domain and DNS verification m
 
 ## Service Overview
 
-Custom domain mapping, DKIM signature keys generation, SPF/DMARC/MX record lookups, and tracking subdomains (CNAME) verification.
+Custom sending domains, DKIM keys, DNS verification, and tracking subdomain setup.
 
 | Property | Value |
 | :--- | :--- |
@@ -19,13 +19,13 @@ Custom domain mapping, DKIM signature keys generation, SPF/DMARC/MX record looku
 | **Port** | `8011` |
 | **Local URL** | [https://local.reloop.sh/api/domain](https://local.reloop.sh/api/domain) |
 | **Swagger UI** | [https://local.reloop.sh/api/domain/openapi](https://local.reloop.sh/api/domain/openapi) |
-| **Stack** | `ElysiaJS` `PostgreSQL` `Redis` `NATS` `node:dns` |
+| **Stack** | `ElysiaJS` `PostgreSQL` `Redis` `NATS` |
 
 
 ## Quick Start
 
 <Callout icon="union" variant="info">
-Run the following command from the root of the monorepo:
+Run from the monorepo root:
 </Callout>
 
 ```bash
@@ -40,40 +40,30 @@ The service starts with hot reloading on port `8011`.
 Variables live in `apps/backend/domain/.env`. Running `bun env:setup` from the root auto-populates this file.
 
 ```bash
-# Databases
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
-
-# Server
 PORT=8011
 BASE_URL="https://local.reloop.sh"
-NODE_ENV=development
-
-# Verification Settings
 HOST_DOMAIN=reloop.sh
 DKIM_SELECTOR=reloop
-
-# Event Bus
 NATS_URL=nats://localhost:4222
+NODE_ENV=development
 ```
 
 ### Reference Table
 
-| Variable | Required | Default Value |
+| Variable | Required | Default |
 | :--- | :--- | :--- |
-| `PG_URL` | **YES** | `postgresql://reloop:reloop123@localhost:5432/reloop` |
-| `REDIS_URL` | **YES** | `redis://:reloop123@localhost:6379` |
+| `PG_URL` | **YES** | `postgresql://...` |
+| `REDIS_URL` | **YES** | `redis://...` |
 | `PORT` | **YES** | `8011` |
 | `BASE_URL` | **YES** | `https://local.reloop.sh` |
 | `HOST_DOMAIN` | **YES** | `reloop.sh` |
 | `DKIM_SELECTOR` | **YES** | `reloop` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
-| `NODE_ENV` | **YES** | `development` |
 
 
 ## Development Commands
-
-All commands run from the **monorepo root**.
 
 | Command | Description |
 | :--- | :--- |
@@ -83,120 +73,11 @@ All commands run from the **monorepo root**.
 | `bun run --filter=domain-service check-types` | TypeScript type-check |
 
 
-## Database Schema
+## Architecture
 
-Schema defined in [`packages/db/src/schema/domain.ts`](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/domain.ts).
-
-### `domain` Table
-
-Stores general domain profiles, capability configurations, capability switches, and overall confirmation checkpoints.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | `domain_{cuid}` | Primary Key |
-| `domain` | `varchar(255)` | — | Unique Domain string |
-| `organizationId` | `text` | — | FK &rarr; `organization.id` |
-| `userId` | `text` | — | FK &rarr; `user.id` |
-| `status` | `domain_status` | `pending` | Verification pipeline state |
-| `userVerifiedDomain` | `boolean` | `false` | User manually declared records as ready |
-| `systemVerified` | `boolean` | `false` | Reloop successfully validated records are live |
-| `customReturnPath` | `varchar(255)` | `inbound` | Custom return subdomain for bounce processing |
-| `trackingSubdomain` | `varchar(255)` | `tracking` | Custom branded tracking subdomain |
-| `isClickTrackingEnabled` | `boolean` | `false` | Enables click redirection and signing |
-| `isOpenTrackingEnabled` | `boolean` | `false` | Enables image pixel email open metrics |
-| `tls` | `tls_mode` | `opportunistic` | Minimum SMTP transport security standard |
-| `isTrackingDomain` | `boolean` | `false` | Indicates if this domain is a dedicated tracking domain |
-| `isSendingEmailEnabled` | `boolean` | `true` | Enable/Disable outbound sending capability |
-| `isReceivingEmailEnabled` | `boolean` | `true` | Enable/Disable inbound MX capability |
-| `verificationFailedReason` | `text` | `null` | Detailed error logs when validation fails |
-
----
-
-### `domain_dns_record` Table
-
-Contains the precise record targets that must be validated to confirm sending authority and enable tracking.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | `dns_{cuid}` | Primary Key |
-| `domainId` | `text` | — | FK &rarr; `domain.id` |
-| `recordType` | `dns_record_type` | — | Technical type (`MX`, `TXT`, `CNAME`) |
-| `recordTypeName` | `dns_record_type_name` | — | Semantic authentication role (`SPF`, `DKIM`, etc.) |
-| `purpose` | `dns_record_purpose` | `sending` | Operational grouping (`sending`, `receiving`, `tracking`) |
-| `name` | `text` | — | Domain host target (e.g. `reloop._domainkey.domain.com`) |
-| `value` | `text` | — | Expected DNS resource record value |
-| `status` | `domain_status` | `pending` | Individual record verification state |
-| `priority` | `integer` | `null` | MX record priority standard |
-| `privateKey` | `text` | `null` | Secure 2048-bit RSA private key (DKIM only) |
-| `verificationError` | `text` | `null` | DNS error trace if verify fails |
-
-
-## DNS Record Architecture & UI Sections
-
-The DNS records are grouped and displayed on the UI in five distinct functional capability sections. The backend dynamically verifies each section depending on the user's toggle configuration.
-
-### 1. Domain Verification
-This is the mandatory baseline record required to verify domain ownership and establish email authenticity.
-
-| Type | Default Name | Expected Value | TTL |
-| :--- | :--- | :--- | :--- |
-| `TXT` | `reloop._domainkey.send.example.com` | `v=DKIM1; k=rsa; p=<RSA-2048 Public Key>` | `Auto` |
-
-* **DKIM (DomainKeys Identified Mail)**: Cryptographically signs outbound message headers using a secure private key generated by the microservice. The public key is published here to let receiving inbox providers verify that the message was truly sent from this domain.
-
----
-
-### 2. Enable Sending
-These records authorize Reloop servers to deliver emails on behalf of the customer's domain and set up the default return path routing.
-
-| Type | Default Name | Expected Value | TTL | Priority |
-| :--- | :--- | :--- | :--- | :--- |
-| `TXT` | `send.example.com` | `v=spf1 include:reloop.sh -all` | `Auto` | — |
-| `MX` | `send.example.com` | `reloop.sh` | `Auto` | `10` |
-
-* **SPF (Sender Policy Framework)**: Whitelists the Reloop delivery IP pool/domain (`reloop.sh`) as a legitimate sender. Senders not explicitly included here are rejected (`-all`).
-* **MX (Outbound Return Path)**: Binds the bounce/delivery status feedback loop to Reloop SMTP gateways to track outbound bounces and failures.
-
----
-
-### 3. DMARC (Optional)
-Specifies the alignment standard rules for how receiving servers should treat unauthenticated mails.
-
-| Type | Default Name | Expected Value | TTL |
-| :--- | :--- | :--- | :--- |
-| `TXT` | `_dmarc.send.example.com` | `v=DMARC1; p=reject;` | `Auto` |
-
-* **DMARC Record**: Instructs recipient mailboxes to reject (`p=reject`) any messages failing SPF or DKIM checks, ensuring maximum brand safety.
-
----
-
-### 4. Enable Receiving
-Allows Reloop inbound servers to capture incoming contact replies and handle bounce signals.
-
-| Type | Default Name | Expected Value | TTL | Priority |
-| :--- | :--- | :--- | :--- | :--- |
-| `MX` | `inbound.send.example.com` | `reloop.sh` | `Auto` | `10` |
-
-* **MX (Inbound Receiving)**: Directs incoming contact responses or replies targeting `inbound.send.example.com` directly back into Reloop's message router.
-
----
-
-### 5. Enable Tracking
-Configures secure custom tracking subdomains to sign link click metrics and open tracking pixel assets.
-
-| Type | Default Name | Expected Value | TTL |
-| :--- | :--- | :--- | :--- |
-| `CNAME` | `tracking.send.example.com` | `reloop.sh` | `Auto` |
-
-* **CNAME (Custom Branded Tracking)**: Rewrites click-redirection endpoints and open metrics pixels under your custom tracking subdomain to optimize delivery reputation.
-
-
-## Dynamic Verification (NATS / BullMQ)
-
-| Component | Logic |
+| Layer | Detail |
 | :--- | :--- |
-| **DKIM Check** | Mandatory baseline verification — always queried. |
-| **SPF & DMARC Checks** | Verified only when `isSendingEmailEnabled` is set to `true`. |
-| **MX Inbound Check** | Verified only when `isReceivingEmailEnabled` is set to `true`. |
-| **CNAME Tracking Check** | Verified only when click or open tracking is enabled. |
-| **Auto-Pass Rules** | Bypassed capabilities automatically default their record success state to `true` to prevent blocking domain activation. |
+| **DNS verification** | Validates DKIM, SPF, DMARC, MX, and CNAME records per domain capability toggles. |
+| **Inbound validation** | Used by the [inbound](/setup/backend/inbound) MTA to verify recipient addresses. |
+| **Schema** | `domain` and `domain_dns_record` in `packages/db/src/schema/domain.ts`. |
+| **Events** | Publishes domain lifecycle events to NATS. |

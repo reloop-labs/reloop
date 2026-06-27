@@ -1,104 +1,68 @@
 ---
 title: Dashboard
 icon: home
-description: Learn how to set up, configure, and run the Reloop user dashboard locally.
+description: Set up and run the Reloop dashboard app locally.
 ---
 
-The **User Dashboard** is the primary, premium Next.js client-facing web application of the Reloop platform. It serves as the visual command center where users configure campaigns, view rich analytical dashboards, manage subscriber segments, design dynamic email layouts, and manage API keys and custom sending domains.
-
-<Callout type="info" title="Prerequisite First">
-  Before starting the Dashboard client app, make sure you've completed the base [Local Development Setup](/setup) and have the required backend microservices running (especially the `auth` service).
+<Callout type="info" title="Complete Base Setup First" variant="note">
+  Ensure you've finished the [Local Development Setup](/docs/setup) — before proceeding.
 </Callout>
 
----
+
+## Service Overview
+
+Main workspace app — campaigns, contacts, templates, analytics, and settings.
+
+| Property | Value |
+| :--- | :--- |
+| **Directory** | `apps/frontend/dashboard` |
+| **Port** | `3001` |
+| **Local URL** | [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard) |
+| **Direct URL** | [http://localhost:3001](http://localhost:3001) |
+| **Stack** | `Next.js` `React 19` `Tailwind CSS` |
+
 
 ## Quick Start
 
-Dependencies are handled globally at the root directory. You can start the Dashboard development server instantly:
+<Callout icon="union" variant="info">
+Run from the monorepo root (requires [auth](/setup/backend/auth) running):
+</Callout>
 
-<CodeGroup>
-  <CodeBlock title="From Monorepo Root (Recommended)">
-  ```bash
-  # Start the Next.js dev server with Turbopack hot reloading
-  bun fe:dashboard:dev
-  ```
-  </CodeBlock>
+```bash
+bun fe:dashboard:dev
+```
 
-  <CodeBlock title="From the Service Folder">
-  ```bash
-  cd apps/frontend/dashboard
-  bun dev
-  ```
-  </CodeBlock>
-</CodeGroup>
+The app starts with Turbopack hot reloading on port `3001`.
 
-Once running, the Dashboard service will listen on port `3001` locally. You can access the interface through Caddy proxy at [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard) (or directly at [http://localhost:3001](http://localhost:3001)) 🎉
+<Callout type="warn" title="Use the unified domain">
+  Open [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard), not `localhost:3001`, so session cookies work with [auth](/setup/backend/auth).
+</Callout>
 
----
-
-## Service Information
-
-* **Directory Location:** `apps/frontend/dashboard/`
-* **Local Listening Port:** `3001` (configured via `--port=3001` in the dev script)
-* **Unified Access Route:** [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard)
-* **Primary Tech Stack:** Next.js (with Turbopack), React 19, TypeScript, Tailwind CSS, Lucide Icons, Recharts, Tiptap, Framer Motion
-* **Dependencies:** Relies on Caddy to proxy Auth and API requests to ElysiaJS microservices.
-
----
 
 ## Environment Configuration
 
-The Dashboard environment variables are defined inside `apps/frontend/dashboard/.env`. If you ran `bun env:setup` at the root, your `.env` is already configured:
+Variables in `apps/frontend/dashboard/.env`:
 
 ```bash
-# Base URL for better-auth cookie domain and callback routing
 NEXT_PUBLIC_APP_URL="https://local.reloop.sh"
-
-# API Gateway Service URL routing to ElysiaJS backend microservices
 NEXT_PUBLIC_API_URL="https://local.reloop.sh/api"
-
-# Collaborative Editor Websocket Gateway Endpoint
 NEXT_PUBLIC_WS_URL="wss://local.reloop.sh"
 ```
 
 ### Reference Table
 
-| Variable | Required | Default Value | Description |
-| :--- | :--- | :--- | :--- |
-| `NEXT_PUBLIC_APP_URL` | **YES** | `https://local.reloop.sh` | Main base client URL (handles Better Auth OAuth redirects). |
-| `NEXT_PUBLIC_API_URL` | **YES** | `https://local.reloop.sh/api` | API proxy endpoint used by SWR and axios fetches. |
-| `NEXT_PUBLIC_WS_URL`  | **YES** | `wss://local.reloop.sh` | WebSocket presence gateway for real-time collaboration. |
+| Variable | Required | Default |
+| :--- | :--- | :--- |
+| `NEXT_PUBLIC_APP_URL` | **YES** | `https://local.reloop.sh` |
+| `NEXT_PUBLIC_API_URL` | **YES** | `https://local.reloop.sh/api` |
+| `NEXT_PUBLIC_WS_URL` | **YES** | `wss://local.reloop.sh` |
 
----
 
 ## Development Commands
 
-All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
-
-| Command | Action | Scope |
-| :--- | :--- | :--- |
-| `bun fe:dashboard:dev` | Start the Dashboard Next.js app in Turbopack development mode | Development |
-| `bun run --filter=dashboard build` | Compile the Dashboard for optimized static production | Production |
-| `bun run --filter=dashboard start` | Run the compiled production build locally | Production |
-| `bun run --filter=dashboard lint` | Run Next.js linting checks | Code Quality |
-
----
-
-## Troubleshooting Guide
-
-### Port `3001` Conflict
-If the terminal throws a port binding conflict, identify and clear the PID using port `3001`:
-
-```bash
-# Inspect process listening on port 3001
-lsof -i :3001
-
-# Terminate process manually
-kill -9 <PID>
-```
-
-### Authentication Redirect Failures
-If you experience infinite redirect loops or auth errors:
-1. Ensure the Elysia **`auth`** microservice is up and listening on port `8000` (`bun be:auth:dev`).
-2. Verify that `NEXT_PUBLIC_APP_URL` is set to exactly `https://local.reloop.sh` in `.env`.
-3. Check your browser developer tools to ensure cookies are being set on the correct domain context (`local.reloop.sh`).
+| Command | Description |
+| :--- | :--- |
+| `bun fe:dashboard:dev` | Start dev server with Turbopack |
+| `bun run --filter=dashboard build` | Compile production bundle |
+| `bun run --filter=dashboard start` | Run production build |
+| `bun run --filter=dashboard lint` | Run ESLint checks |

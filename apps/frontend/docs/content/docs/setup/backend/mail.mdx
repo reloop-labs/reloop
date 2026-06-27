@@ -11,7 +11,7 @@ description: Set up, configure, and run the Reloop mail microservice locally.
 
 ## Service Overview
 
-Outbound transactional email API — campaign dispatch, template compilation, tracking injection, and SMTP queue handoff.
+Outbound transactional email API — send requests, template compilation, tracking, and SMTP handoff.
 
 | Property | Value |
 | :--- | :--- |
@@ -23,12 +23,11 @@ Outbound transactional email API — campaign dispatch, template compilation, tr
 
 
 ## Quick Start
-<Callout
-  icon="union"
-  variant="info"
->
-Run the following command from the root of the monorepo:
+
+<Callout icon="union" variant="info">
+Run from the monorepo root (requires [SMTP](/setup/backend/smtp) via Docker):
 </Callout>
+
 ```bash
 bun be:mail:dev
 ```
@@ -41,38 +40,27 @@ The service starts with hot reloading on port `8015`.
 Variables live in `apps/backend/mail/.env`. Running `bun env:setup` from the root auto-populates this file.
 
 ```bash
-# Database & Cache
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
-
-# Server
 PORT=8015
 BASE_URL="https://local.reloop.sh"
-NODE_ENV=development
-
-# Event Bus
 NATS_URL=nats://localhost:4222
-
-# Outbound MTA
 KUMOMTA_HTTP_URL=http://localhost:8020
+NODE_ENV=development
 ```
 
 ### Reference Table
 
-| Variable | Required | Default Value |
+| Variable | Required | Default |
 | :--- | :--- | :--- |
-| `PG_URL` | **YES** | `postgresql://reloop:reloop123@localhost:5432/reloop` |
-| `REDIS_URL` | **YES** | `redis://:reloop123@localhost:6379` |
+| `PG_URL` | **YES** | `postgresql://...` |
+| `REDIS_URL` | **YES** | `redis://...` |
 | `PORT` | **YES** | `8015` |
-| `BASE_URL` | **YES** | `https://local.reloop.sh` |
-| `NATS_URL` | **YES** | `nats://localhost:4222` |
 | `KUMOMTA_HTTP_URL` | **YES** | `http://localhost:8020` |
-| `NODE_ENV` | **YES** | `development` |
+| `NATS_URL` | **YES** | `nats://localhost:4222` |
 
 
 ## Development Commands
-
-All commands run from the **monorepo root**.
 
 | Command | Description |
 | :--- | :--- |
@@ -82,19 +70,11 @@ All commands run from the **monorepo root**.
 | `bun run --filter=mail check-types` | TypeScript type-check |
 
 
-## Database Schema
-
-Schema defined in [`packages/db/src/schema/email.ts`](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/email.ts).
-
-Key tables: `email_log` and `template` (see also [Template](/setup/backend/template)).
-
-
 ## Architecture
 
 | Layer | Detail |
 | :--- | :--- |
-| **Authentication** | Validates API keys and dashboard sessions before accepting send requests. |
-| **Template Compilation** | Merges recipient merge tags into HTML templates. |
-| **Tracking** | Injects open pixels and redirect links for click tracking. |
-| **Queues** | BullMQ workers (`mail-queue`, `mail-retry-queue`) manage async dispatch via Redis. |
-| **MTA Handoff** | Delivers compiled messages to the [SMTP](/setup/backend/smtp) engine on port `8020`. |
+| **Send pipeline** | Validates API keys, compiles templates, injects tracking links. |
+| **Queues** | BullMQ workers dispatch via Redis (`mail-queue`, `mail-retry-queue`). |
+| **MTA handoff** | Delivers to the [SMTP](/setup/backend/smtp) engine on port `8020`. |
+| **Schema** | `email_log` in `packages/db/src/schema/email.ts`. |
