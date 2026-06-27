@@ -49,7 +49,7 @@ const ACCENT_COLORS = {
 	approval: "#C47839",
 	outbound: "#677E64",
 	agent: "#3B629B",
-	inbound: "#3b82f6",
+	inbound: "#3B629B",
 } as const;
 
 // ---------------------------------------------------------------------------
