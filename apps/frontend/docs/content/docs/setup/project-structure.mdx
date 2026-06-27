@@ -14,16 +14,18 @@ A modern monorepo with clear separation between apps, shared packages, and devel
 ```
 reloop/
 ├── apps/
-│   ├── backend/         # ElysiaJS microservices
+│   ├── backend/         # ElysiaJS microservices + KumoMTA containers
 │   │   ├── api-key/     # API key management
 │   │   ├── auth/        # Better Auth service
-│   │   ├── billing/     # Stripe billing service
 │   │   ├── contacts/    # Contact segmentation
+│   │   ├── credits/     # Credits & billing service
 │   │   ├── domain/      # Domain & DNS validations
-│   │   ├── email/       # Direct transactional mail
-│   │   ├── kumomta-smtp/# SMTP protocol service
-│   │   ├── logs/        # Clickhouse event logging
-│   │   ├── mailing/     # Campaign delivery queues
+│   │   ├── email/       # Platform transactional mail
+│   │   ├── inbound/     # Inbound KumoMTA MX receiver
+│   │   ├── inbox/       # Agent inbox API
+│   │   ├── logs/        # ClickHouse event logging
+│   │   ├── mail/        # Outbound mail API
+│   │   ├── smtp/        # Outbound KumoMTA SMTP engine
 │   │   ├── template/    # Visual template builder
 │   │   ├── upload/      # File & S3 upload manager
 │   │   ├── webhook/     # Webhook dispatching handlers
@@ -31,6 +33,7 @@ reloop/
 │   └── frontend/        # Next.js applications
 │       ├── dashboard/   # Core customer dashboard
 │       ├── docs/        # Public MDX docs (this app)
+│       ├── links/       # Preference center & link redirects
 │       └── web/         # Public marketing website
 ├── packages/            # Shared libraries (@reloop/ui, @reloop/db, etc.)
 └── package.json         # Workspace scripts & dependencies
@@ -38,79 +41,89 @@ reloop/
 
 ## Frontend Applications
 
-We maintain three user-facing applications inside the monorepo:
+Four Next.js apps under `apps/frontend/`:
 
 <Cards>
-<Card icon={<Icon name="home" />} title="Dashboard" href="/apps/frontend/dashboard">
-  **User Dashboard**: The main React/Next.js dashboard app. Includes workspaces, campaigns, templates, visual builders, and analytics views.
+<Card icon={<Icon name="globe" />} title="Web" href="/setup/frontend/web">
+  Public marketing website, pricing, and landing pages.
 </Card>
 
-<Card icon={<Icon name="globe" />} title="Web" href="/apps/frontend/web">
-  **Marketing Site**: The public-facing website, product features page, and branding home built on Next.js.
+<Card icon={<Icon name="home" />} title="Dashboard" href="/setup/frontend/dashboard">
+  Main workspace app — campaigns, templates, analytics, and settings.
 </Card>
 
-<Card icon={<Icon name="book-closed" />} title="Docs" href="/apps/frontend/docs">
-  **Public Docs Portal**: This developer documentation portal, built using standard MDX and Next.js.
+<Card icon={<Icon name="book-closed" />} title="Docs" href="/setup/frontend/docs">
+  This developer documentation portal (MDX + Next.js).
+</Card>
+
+<Card icon={<Icon name="share" />} title="Links" href="/setup/frontend/links">
+  Contact preference center and tracked link redirects.
 </Card>
 </Cards>
 
-## Backend API Microservices
+## Backend Services
 
-Our modular backend architecture consists of 13 dedicated **ElysiaJS** microservices inside `apps/backend/`. These coordinate via a NATS pub-sub bus and BullMQ background queues:
+Fifteen services under `apps/backend/` — ElysiaJS APIs plus KumoMTA Docker containers:
 
 <Cards>
-<Card icon={<Icon name="key-new" />} title="Auth Service" href="/apps/backend/auth">
-  Manages signup, signin, permissions, organization memberships, and integrates **Better Auth**.
+<Card icon={<Icon name="key-new" />} title="Auth" href="/setup/backend/auth">
+  Signup, signin, organizations, and Better Auth sessions.
 </Card>
 
-<Card icon={<Icon name="server" />} title="Mailing Service" href="/apps/backend/mailing">
-  Handles high-throughput marketing email delivery queues and campaigns dispatching.
+<Card icon={<Icon name="globe" />} title="Domain" href="/setup/backend/domain">
+  Sending domains, DKIM keys, and DNS verification.
 </Card>
 
-<Card icon={<Icon name="globe" />} title="Domain Service" href="/apps/backend/domain">
-  Manages sending domains, DKIM signing keys, and automated DNS verification.
+<Card icon={<Icon name="code" />} title="API Key" href="/setup/backend/api-key">
+  External developer API key provisioning and validation.
 </Card>
 
-<Card icon={<Icon name="webhook" />} title="Webhook Service" href="/apps/backend/webhook">
-  Processes system events, matches triggers, and dispatches external webhook payloads.
+<Card icon={<Icon name="webhook" />} title="Webhook" href="/setup/backend/webhook">
+  System event capture and external webhook dispatch.
 </Card>
 
-<Card icon={<Icon name="element-5" />} title="Contacts Service" href="/apps/backend/contacts">
-  Maintains contact books, segments lists, and manages contact metadata.
+<Card icon={<Icon name="element-5" />} title="Contacts" href="/setup/backend/contacts">
+  Contact books, segments, channels, and custom properties.
 </Card>
 
-<Card icon={<Icon name="code" />} title="API Key Service" href="/apps/backend/api-key">
-  Authorizes and manages developers' external API tokens.
+<Card icon={<Icon name="server" />} title="Mail" href="/setup/backend/mail">
+  Outbound transactional email API and campaign dispatch.
 </Card>
 
-<Card icon={<Icon name="database" />} title="Logs Service" href="/apps/backend/logs">
-  ClickHouse querying layer for tracking event histories, open/click counts, and bounces.
+<Card icon={<Icon name="database" />} title="Logs" href="/setup/backend/logs">
+  ClickHouse event logging, opens, clicks, and bounces.
 </Card>
 
-<Card icon={<Icon name="inbox" />} title="Workflow Service" href="/apps/backend/workflow">
-  Runs the automation sequence triggers and marketing logic flows.
+<Card icon={<Icon name="element-5" />} title="Workflow" href="/setup/backend/workflow">
+  Automation triggers and marketing logic flows.
 </Card>
 
-<Card icon={<Icon name="share" />} title="Upload Service" href="/apps/backend/upload">
-  Asset storage provider orchestrating direct-to-S3 signed uploads and CDNs.
+<Card icon={<Icon name="share" />} title="Upload" href="/setup/backend/upload">
+  S3/MinIO asset storage and signed upload URLs.
 </Card>
 
-<Card icon={<Icon name="document" />} title="Template Service" href="/apps/backend/template">
-  Manages visual email templates, drag-and-drop JSON blocks, and HTML rendering.
+<Card icon={<Icon name="document" />} title="Template" href="/setup/backend/template">
+  Visual email templates and HTML rendering.
 </Card>
 
-
-
-<Card icon={<Icon name="mail" />} title="Email Service" href="/apps/backend/email">
-  Serves single transactional emails and notifications.
+<Card icon={<Icon name="inbox" />} title="Inbox" href="/setup/backend/inbox">
+  Agent inbox mailboxes, threads, and messages.
 </Card>
 
-<Card icon={<Icon name="card" />} title="Billing Service" href="/apps/backend/billing">
-  Stripe integration managing client invoices and pricing tiers.
+<Card icon={<Icon name="mail" />} title="Email" href="/setup/backend/email">
+  Platform transactional emails to Reloop users.
 </Card>
 
-<Card icon={<Icon name="shield-check" />} title="Kumomta SMTP" href="/apps/backend/kumomta-smtp">
-  Handles low-level SMTP protocol setups for mail routing.
+<Card icon={<Icon name="card" />} title="Credits" href="/setup/backend/credits">
+  Credit balances, subscriptions, and Stripe billing.
+</Card>
+
+<Card icon={<Icon name="shield-check" />} title="SMTP" href="/setup/backend/smtp">
+  Outbound KumoMTA engine (Docker, ports 587/2025/8020).
+</Card>
+
+<Card icon={<Icon name="shield-check" />} title="Inbound" href="/setup/backend/inbound">
+  Inbound KumoMTA MX receiver (Docker, ports 25/8030).
 </Card>
 </Cards>
 

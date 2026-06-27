@@ -1,6 +1,6 @@
 {
-	"title": "How to Contribute",
-	"description": "Steps to Contribute Effectively",
+	"title": "Local Development",
+	"description": "Steps to set up and run Reloop services locally",
 	"root": true,
 	"pages": [
 		"---Introduction---",
@@ -11,19 +11,22 @@
 		"frontend/web",
 		"frontend/dashboard",
 		"frontend/docs",
+		"frontend/links",
 		"---Backend---",
 		"backend/auth",
 		"backend/domain",
 		"backend/api-key",
-		"backend/billing",
-		"backend/contacts",
-		"backend/email",
-		"backend/mailing",
-		"backend/smtp",
-		"backend/logs",
-		"backend/template",
-		"backend/upload",
 		"backend/webhook",
-		"backend/workflow"
+		"backend/contacts",
+		"backend/mail",
+		"backend/logs",
+		"backend/workflow",
+		"backend/upload",
+		"backend/template",
+		"backend/inbox",
+		"backend/email",
+		"backend/credits",
+		"backend/smtp",
+		"backend/inbound"
 	]
 }

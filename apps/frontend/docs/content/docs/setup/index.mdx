@@ -82,7 +82,12 @@ This boots the following services in the background:
 - **Redis** (`6379`): Cache store, background workers, and session management.
 - **ClickHouse** (`8123`): High-speed analytics and logs database.
 - **Caddy** (`80` / `443`): Auto-SSL gateway and reverse-proxy routing.
-- **Grafana & Loki** (`3000` / `3100`): Log aggregation and service dashboards.
+- **NATS** (`4222`): Core messaging bus for pub-sub between services.
+- **Mailpit** (`8025`): Local SMTP sandbox and web UI for captured mail.
+- **MinIO** (`9010` / `9011`): S3-compatible object storage for uploads and attachments.
+- **RSpamD** (`11333`): Spam filtering for inbound mail.
+- **SMTP** (`587` / `2025` / `8020`): Outbound KumoMTA mail engine (Docker).
+- **Inbound** (`25` / `8030`): Inbound KumoMTA MX receiver (Docker).
 
 <Callout type="warn" title="Troubleshoot Port Conflicts">
   Caddy, Postgres, and Redis bind to their standard ports on your host. If you have existing local instances of PostgreSQL (`5432`), Redis (`6379`), or web servers (Nginx/Apache on `80` or `443`) running directly on your host machine, you **must stop them** before starting the Docker container suite.
@@ -179,6 +184,8 @@ Thanks to the Caddy reverse proxy, you can access the entire unified platform se
 | [https://local.reloop.sh/](https://local.reloop.sh/) | **Web App** | `3000` | Main public marketing pages & landing site |
 | [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard) | **User Dashboard** | `3001` | Core workspace, campaigns, and user dashboard app |
 | [https://local.reloop.sh/docs](https://local.reloop.sh/docs) | **Public Docs** | `3003` | This developer/public documentation portal |
+| [https://local.reloop.sh/preferences](https://local.reloop.sh/preferences) | **Links App** | `3005` | Contact preference center |
+| [https://local.reloop.sh/redirect](https://local.reloop.sh/redirect) | **Links App** | `3005` | Tracked link redirects |
 | [https://local.reloop.sh/api/auth](https://local.reloop.sh/api/auth) | **Auth API** | `8000` | User auth, sessions, Better Auth handler |
 | [https://local.reloop.sh/api/...](https://local.reloop.sh/api/...) | **Microservice APIs** | `8011` - `8023` | Dynamic routes to individual backend APIs |
 
@@ -193,6 +200,7 @@ If you need to access frontend applications directly without the Caddy proxy:
 | **Web App** | [http://localhost:3000](http://localhost:3000) | `3000` | Marketing website and public content |
 | **User Dashboard** | [http://localhost:3001](http://localhost:3001) | `3001` | Main client app (workspaces, lists, campaigns) |
 | **Public Docs** | [http://localhost:3003](http://localhost:3003) | `3003` | This developer/public documentation portal |
+| **Links App** | [http://localhost:3005](http://localhost:3005) | `3005` | Preference center and tracked link redirects |
 
 ---
 
@@ -207,14 +215,16 @@ Backend microservices receive API requests from the frontend via the Caddy proxy
 | **API Key API** | `/api/api-key` | `8012` | External and internal API key provisioning |
 | **Webhook API** | `/api/webhook` | `8013` | Webhook ingress and dispatching handlers |
 | **Contacts API** | `/api/contacts` | `8014` | Recipient groups, segments, and contact listings |
-| **Mailing API** | `/api/mail` | `8015` | Campaign engine, SMTP queues, and sending pipeline |
+| **Mail API** | `/api/mail` | `8015` | Campaign engine, SMTP queues, and sending pipeline |
 | **Logs API** | `/api/logs` | `8016` | Event logger and ClickHouse query service |
 | **Workflow API** | `/api/workflow` | `8017` | Automation workflows and state engines |
 | **Upload API** | `/api/upload` | `8018` | File upload storage manager and CDN endpoints |
 | **Template API** | `/api/template` | `8019` | Visual email builder & templates repository |
-| **Kumomta API** | `/api/kumomta` | `8021` | Kumomta mail server synchronization hook |
-| **Email API** | `/api/email` | `8022` | Direct transactional email handler |
-| **Billing API** | `/api/billing` | `8023` | Stripe subscriptions and billing integration |
+| **Inbox API** | `/api/inbox` | `8021` | Agent inbox mailboxes, threads, and messages |
+| **Email API** | `/api/email` | `8022` | Platform transactional email handler |
+| **Credits API** | `/api/credits` | `8023` | Stripe subscriptions and credit balance management |
+| **SMTP Engine** | Docker HTTP | `8020` | Outbound KumoMTA mail engine (no Caddy API route) |
+| **Inbound MTA** | Docker HTTP | `8030` | Inbound KumoMTA MX receiver health endpoint |
 
 ---
 
@@ -228,8 +238,9 @@ These supporting systems are hosted inside Docker containers and run as your bac
 | **Redis** | `6379` | Cache and BullMQ background task queue |
 | **ClickHouse** | `8123` | High-volume analytical tracking database |
 | **NATS** | `4222` | Core messaging bus / pub-sub broker |
-| **Loki** | `3100` | Log aggregation engine |
-| **Grafana** | `3000` (Direct) | Infrastructure metrics dashboards |
+| **Mailpit** | `8025` | Local SMTP capture and web UI |
+| **MinIO** | `9010` / `9011` | S3-compatible object storage |
+| **RSpamD** | `11333` | Spam filtering for inbound mail |
 
 ---
 
@@ -257,9 +268,9 @@ Now that your base local environment is running, explore the specialized setup i
     Learn how apps, packages, and shared directories are organized.
   </Card>
   <Card icon={<Icon name="server" />} title="Backend Setup" href="/setup/backend/auth">
-    Configure auth keys, Stripe billing, Kumomta queues, webhooks, and mailing engines.
+    Configure auth keys, credits, SMTP, webhooks, and mail engines.
   </Card>
-  <Card icon={<Icon name="home" />} title="Frontend Setup" href="/setup/frontend/dashboard">
-    Configure the web application, user dashboard, and custom components.
+  <Card icon={<Icon name="home" />} title="Frontend Setup" href="/setup/frontend/web">
+    Configure web, dashboard, docs, and links apps.
   </Card>
 </Cards>

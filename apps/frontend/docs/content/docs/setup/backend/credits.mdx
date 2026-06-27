@@ -1,0 +1,88 @@
+---
+title: Credits
+description: Set up, configure, and run the Reloop credits microservice locally.
+---
+
+<Callout type="info" title="Complete Base Setup First" variant="note">
+  Ensure you've finished the [Local Development Setup](/docs/setup) — before proceeding.
+</Callout>
+
+
+## Service Overview
+
+Subscription tiers, credit balances, usage tracking, invoice history, and Stripe portal integration.
+
+| Property | Value |
+| :--- | :--- |
+| **Directory** | `apps/backend/credits` |
+| **Port** | `8023` |
+| **Local URL** | [https://local.reloop.sh/api/credits](https://local.reloop.sh/api/credits) |
+| **Swagger UI** | [https://local.reloop.sh/api/credits/openapi](https://local.reloop.sh/api/credits/openapi) |
+| **Stack** | `ElysiaJS` `PostgreSQL` `NATS` |
+
+
+## Quick Start
+<Callout
+  icon="union"
+  variant="info"
+>
+Run the following command from the root of the monorepo:
+</Callout>
+```bash
+bun be:credits:dev
+```
+
+The service starts with hot reloading on port `8023`.
+
+
+## Environment Configuration
+
+Variables live in `apps/backend/credits/.env`. Running `bun env:setup` from the root auto-populates this file.
+
+```bash
+# Server
+PORT=8023
+NODE_ENV=development
+INITIAL_CREDITS=100
+
+# Event Bus
+NATS_URL=nats://localhost:4222
+```
+
+### Reference Table
+
+| Variable | Required | Default Value |
+| :--- | :--- | :--- |
+| `PORT` | **YES** | `8023` |
+| `INITIAL_CREDITS` | **YES** | `100` |
+| `NATS_URL` | **YES** | `nats://localhost:4222` |
+| `NODE_ENV` | **YES** | `development` |
+
+
+## Development Commands
+
+All commands run from the **monorepo root**.
+
+| Command | Description |
+| :--- | :--- |
+| `bun be:credits:dev` | Start dev server with hot reloading |
+| `bun run --filter=credits build` | Compile production bundle |
+| `bun run --filter=credits start` | Run compiled production build |
+| `bun run --filter=credits check-types` | TypeScript type-check |
+
+
+## Database Schema
+
+Schema defined in [`packages/db/src/schema/billing.ts`](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/billing.ts).
+
+Key tables: `plan`, `subscription`, `credit_ledger`, `billing_invoice`, and `email_send`.
+
+
+## Architecture
+
+| Layer | Detail |
+| :--- | :--- |
+| **Credit Tracking** | Deducts outbound email credits in real time and blocks sends when balance reaches zero. |
+| **Stripe Integration** | Manages subscriptions, renewals, cancellations, and invoice webhooks. |
+| **Events** | Publishes and subscribes to NATS subjects such as `billing.quota-warning`. |
+| **DB Client** | Uses `@reloop/db` with Drizzle ORM for ledger and subscription data. |

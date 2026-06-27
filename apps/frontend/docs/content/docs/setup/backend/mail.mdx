@@ -1,0 +1,99 @@
+---
+title: Mail
+description: Set up, configure, and run the Reloop mail microservice locally.
+---
+
+<Callout type="info" title="Complete Base Setup First" variant="note">
+  Ensure you've finished the [Local Development Setup](/docs/setup) — before proceeding.
+</Callout>
+
+
+## Service Overview
+
+Outbound transactional email API — campaign dispatch, template compilation, tracking injection, and SMTP queue handoff.
+
+| Property | Value |
+| :--- | :--- |
+| **Directory** | `apps/backend/mail` |
+| **Port** | `8015` |
+| **Local URL** | [https://local.reloop.sh/api/mail](https://local.reloop.sh/api/mail) |
+| **Swagger UI** | [https://local.reloop.sh/api/mail/openapi](https://local.reloop.sh/api/mail/openapi) |
+| **Stack** | `ElysiaJS` `PostgreSQL` `Redis` `NATS` `BullMQ` |
+
+
+## Quick Start
+<Callout
+  icon="union"
+  variant="info"
+>
+Run the following command from the root of the monorepo:
+</Callout>
+```bash
+bun be:mail:dev
+```
+
+The service starts with hot reloading on port `8015`.
+
+
+## Environment Configuration
+
+Variables live in `apps/backend/mail/.env`. Running `bun env:setup` from the root auto-populates this file.
+
+```bash
+# Database & Cache
+PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
+REDIS_URL=redis://:reloop123@localhost:6379
+
+# Server
+PORT=8015
+BASE_URL="https://local.reloop.sh"
+NODE_ENV=development
+
+# Event Bus
+NATS_URL=nats://localhost:4222
+
+# Outbound MTA
+KUMOMTA_HTTP_URL=http://localhost:8020
+```
+
+### Reference Table
+
+| Variable | Required | Default Value |
+| :--- | :--- | :--- |
+| `PG_URL` | **YES** | `postgresql://reloop:reloop123@localhost:5432/reloop` |
+| `REDIS_URL` | **YES** | `redis://:reloop123@localhost:6379` |
+| `PORT` | **YES** | `8015` |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` |
+| `NATS_URL` | **YES** | `nats://localhost:4222` |
+| `KUMOMTA_HTTP_URL` | **YES** | `http://localhost:8020` |
+| `NODE_ENV` | **YES** | `development` |
+
+
+## Development Commands
+
+All commands run from the **monorepo root**.
+
+| Command | Description |
+| :--- | :--- |
+| `bun be:mail:dev` | Start dev server with hot reloading |
+| `bun run --filter=mail build` | Compile production bundle |
+| `bun run --filter=mail start` | Run compiled production build |
+| `bun run --filter=mail check-types` | TypeScript type-check |
+
+
+## Database Schema
+
+Schema defined in [`packages/db/src/schema/email.ts`](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/email.ts).
+
+Key tables: `email_log` and `template` (see also [Template](/setup/backend/template)).
+
+
+## Architecture
+
+| Layer | Detail |
+| :--- | :--- |
+| **Authentication** | Validates API keys and dashboard sessions before accepting send requests. |
+| **Template Compilation** | Merges recipient merge tags into HTML templates. |
+| **Tracking** | Injects open pixels and redirect links for click tracking. |
+| **Queues** | BullMQ workers (`mail-queue`, `mail-retry-queue`) manage async dispatch via Redis. |
+| **MTA Handoff** | Delivers compiled messages to the [SMTP](/setup/backend/smtp) engine on port `8020`. |

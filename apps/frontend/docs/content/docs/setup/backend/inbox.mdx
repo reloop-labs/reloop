@@ -1,0 +1,100 @@
+---
+title: Inbox
+description: Set up, configure, and run the Reloop inbox microservice locally.
+---
+
+<Callout type="info" title="Complete Base Setup First" variant="note">
+  Ensure you've finished the [Local Development Setup](/docs/setup) — before proceeding.
+</Callout>
+
+
+## Service Overview
+
+Agent Inbox API — mailboxes, threads, and messages for inbound email consumed from NATS.
+
+| Property | Value |
+| :--- | :--- |
+| **Directory** | `apps/backend/inbox` |
+| **Port** | `8021` |
+| **Local URL** | [https://local.reloop.sh/api/inbox](https://local.reloop.sh/api/inbox) |
+| **Swagger UI** | [https://local.reloop.sh/api/inbox/openapi](https://local.reloop.sh/api/inbox/openapi) |
+| **Stack** | `ElysiaJS` `PostgreSQL` `Redis` `NATS` `MinIO` |
+
+
+## Quick Start
+<Callout
+  icon="union"
+  variant="info"
+>
+Run the following command from the root of the monorepo:
+</Callout>
+```bash
+bun be:inbox:dev
+```
+
+The service starts with hot reloading on port `8021`.
+
+
+## Environment Configuration
+
+Variables live in `apps/backend/inbox/.env`. Running `bun env:setup` from the root auto-populates this file.
+
+```bash
+# Database & Cache
+PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
+REDIS_URL=redis://:reloop123@localhost:6379
+
+# Server
+PORT=8021
+BASE_URL="https://local.reloop.sh"
+NODE_ENV=development
+
+# Event Bus
+NATS_URL=nats://localhost:4222
+
+# Outbound MTA
+KUMOMTA_HTTP_URL=http://localhost:8020
+
+# S3 / Storage (MinIO in local dev)
+S3_ENDPOINT=http://localhost:9010
+S3_ACCESS_KEY=reloop
+S3_SECRET_KEY=reloop123
+S3_BUCKET=reloop-attachments
+S3_REGION=us-east-1
+S3_FORCE_PATH_STYLE=true
+```
+
+### Reference Table
+
+| Variable | Required | Default Value |
+| :--- | :--- | :--- |
+| `PG_URL` | **YES** | `postgresql://reloop:reloop123@localhost:5432/reloop` |
+| `REDIS_URL` | **YES** | `redis://:reloop123@localhost:6379` |
+| `PORT` | **YES** | `8021` |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` |
+| `NATS_URL` | **YES** | `nats://localhost:4222` |
+| `KUMOMTA_HTTP_URL` | **YES** | `http://localhost:8020` |
+| `S3_ENDPOINT` | **YES** | `http://localhost:9010` |
+| `NODE_ENV` | **YES** | `development` |
+
+
+## Development Commands
+
+All commands run from the **monorepo root**.
+
+| Command | Description |
+| :--- | :--- |
+| `bun be:inbox:dev` | Start dev server with hot reloading |
+| `bun run --filter=inbox build` | Compile production bundle |
+| `bun run --filter=inbox start` | Run compiled production build |
+| `bun run --filter=inbox check-types` | TypeScript type-check |
+
+
+## Architecture
+
+| Layer | Detail |
+| :--- | :--- |
+| **Inbound Reception** | The [inbound](/setup/backend/inbound) MTA accepts mail on port `25`, scans with RSpamD, and publishes to NATS. |
+| **NATS Consumer** | Subscribes to inbound mail events and persists threads and messages to PostgreSQL. |
+| **Attachments** | Stores large attachments in MinIO via the configured S3-compatible endpoint. |
+| **Dashboard API** | Exposes mailboxes, threads, and messages at `/api/inbox` (proxied by Caddy). |
