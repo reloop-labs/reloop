@@ -131,6 +131,7 @@ const links = [
 
 const githubUrl = "https://github.com/reloop-labs/reloop";
 const twitterUrl = "https://x.com/reloophq";
+const discordUrl = "https://discord.gg/bHnkBcp7xR";
 
 export function Footer() {
 	return (
@@ -167,6 +168,14 @@ export function Footer() {
 							className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-100/60 text-[#0a0d12]/40 transition-colors hover:bg-bg-weak-50/50 hover:text-[#0a0d12] dark:border-white/5 dark:text-white/40 dark:hover:bg-white/[0.02] dark:hover:text-white"
 						>
 							<Icon className="size-4" name="social-github" />
+						</Link>
+						<Link
+							href={discordUrl}
+							target="_blank"
+							rel="noreferrer"
+							className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-100/60 text-[#0a0d12]/40 transition-colors hover:bg-bg-weak-50/50 hover:text-[#0a0d12] dark:border-white/5 dark:text-white/40 dark:hover:bg-white/[0.02] dark:hover:text-white"
+						>
+							<Icon className="size-4" name="social-discord" />
 						</Link>
 					</div>
 				</div>

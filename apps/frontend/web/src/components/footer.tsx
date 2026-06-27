@@ -143,6 +143,7 @@ const links = [
 
 const githubUrl = "https://github.com/reloop-labs/reloop";
 const twitterUrl = "https://x.com/reloophq";
+const discordUrl = "https://discord.gg/bHnkBcp7xR";
 
 export const Footer = () => {
 	const { theme, setTheme } = useTheme();
@@ -185,6 +186,14 @@ export const Footer = () => {
 								className="text-[#0a0d12]/40 transition-colors hover:text-[#0a0d12] dark:text-white/40 dark:hover:text-white"
 							>
 								<Icon className="size-4.5" name="social-github" />
+							</Link>
+							<Link
+								href={discordUrl}
+								target="_blank"
+								rel="noreferrer"
+								className="text-[#0a0d12]/40 transition-colors hover:text-[#0a0d12] dark:text-white/40 dark:hover:text-white"
+							>
+								<Icon className="size-5" name="social-discord" />
 							</Link>
 						</div>
 					</div>
