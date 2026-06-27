@@ -1,0 +1,38 @@
+---
+title: Group
+icon: grid-5
+description: Contact groups and group membership.
+---
+
+Source: `packages/db/src/schema/group.ts`
+
+
+## `group`
+
+| Column | Type | Notes |
+| :--- | :--- | :--- |
+| `id` | text | PK, prefix `grp_` |
+| `name` | varchar(255) | NOT NULL |
+| `organization_id` | text | FK → `organization.id`, CASCADE |
+| `user_id` | text | FK → `user.id`, CASCADE |
+| `created_at` | timestamp | |
+| `updated_at` | timestamp | |
+| `deleted_at` | timestamp | |
+
+
+## `contact_group`
+
+Junction table linking contacts to groups.
+
+| Column | Type | Notes |
+| :--- | :--- | :--- |
+| `id` | text | PK, prefix `cgr_` |
+| `contact_id` | text | FK → `contact.id`, CASCADE |
+| `group_id` | text | FK → `group.id`, CASCADE |
+| `organization_id` | text | FK → `organization.id`, CASCADE |
+| `user_id` | text | FK → `user.id`, CASCADE |
+| `created_at` | timestamp | |
+| `updated_at` | timestamp | |
+| `deleted_at` | timestamp | |
+
+Unique: `(contact_id, group_id)`

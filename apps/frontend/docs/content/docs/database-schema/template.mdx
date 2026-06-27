@@ -1,0 +1,60 @@
+---
+title: Template
+icon: layout
+description: Email templates and version history.
+---
+
+Source: `packages/db/src/schema/template.ts`
+
+
+## Enums
+
+| Enum | Values |
+| :--- | :--- |
+| `template_status` | `draft`, `published`, `archived` |
+| `template_block_type` | `heading`, `text`, `button`, `image`, `divider`, `spacer`, `section`, `container`, `columns`, `html` |
+
+
+## `template`
+
+| Column | Type | Notes |
+| :--- | :--- | :--- |
+| `id` | text | PK, prefix `tmpl_` |
+| `name` | varchar(255) | NOT NULL |
+| `description` | text | |
+| `subject` | varchar(500) | |
+| `from_email` | varchar(255) | |
+| `reply_to` | varchar(255) | |
+| `preview_text` | text | |
+| `organization_id` | text | FK → `organization.id`, CASCADE |
+| `created_by_user_id` | text | FK → `user.id`, CASCADE |
+| `status` | template_status | default `draft` |
+| `content` | jsonb | block tree, default `[]` |
+| `variables` | jsonb | extracted variables |
+| `current_version` | integer | default `1` |
+| `thumbnail_url` | text | |
+| `is_default` | boolean | default `false` |
+| `deleted_at` | timestamp | |
+| `created_at` | timestamp | |
+| `updated_at` | timestamp | |
+
+
+## `template_version`
+
+| Column | Type | Notes |
+| :--- | :--- | :--- |
+| `id` | text | PK, prefix `tmpl_ver_` |
+| `template_id` | text | FK → `template.id`, CASCADE |
+| `version` | integer | NOT NULL |
+| `name` | varchar(255) | |
+| `is_major` | boolean | default `false` |
+| `subject` | varchar(500) | |
+| `from_email` | varchar(255) | |
+| `reply_to` | varchar(255) | |
+| `preview_text` | text | |
+| `description` | text | |
+| `content` | jsonb | NOT NULL |
+| `variables` | jsonb | |
+| `rendered_html` | text | cached HTML |
+| `created_by_user_id` | text | FK → `user.id`, CASCADE |
+| `created_at` | timestamp | |

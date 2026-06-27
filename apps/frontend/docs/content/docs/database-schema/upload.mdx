@@ -1,0 +1,25 @@
+---
+title: Upload
+icon: image-upload
+description: User file upload metadata stored in Postgres.
+---
+
+Source: `packages/db/src/schema/upload.ts`
+
+Binary files are stored in object storage (MinIO/S3). This table tracks metadata only.
+
+
+## `upload`
+
+| Column | Type | Notes |
+| :--- | :--- | :--- |
+| `id` | text | PK, prefix `up_` |
+| `filename` | varchar(255) | NOT NULL |
+| `original_name` | varchar(255) | NOT NULL |
+| `mime_type` | varchar(100) | NOT NULL |
+| `size` | integer | NOT NULL |
+| `path` | text | NOT NULL, storage path |
+| `user_id` | text | FK → `user.id`, CASCADE |
+| `deleted_at` | timestamp | soft delete |
+| `created_at` | timestamp | |
+| `updated_at` | timestamp | |

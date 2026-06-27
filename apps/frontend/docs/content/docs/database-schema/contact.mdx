@@ -1,0 +1,72 @@
+---
+title: Contact
+icon: users
+description: Contact profiles, custom properties, and property values.
+---
+
+Source: `packages/db/src/schema/contact.ts`
+
+
+## Enums
+
+| Enum | Values |
+| :--- | :--- |
+| `contact_status` | `subscribed`, `unsubscribed`, `blocked` |
+| `suppression_reason` | `hard_bounce`, `spam_complaint` |
+| `property_type` | `string`, `number` |
+
+
+## `contact`
+
+| Column | Type | Notes |
+| :--- | :--- | :--- |
+| `id` | text | PK, prefix `con_` |
+| `email` | varchar(255) | NOT NULL |
+| `status` | contact_status | default `subscribed` |
+| `organization_id` | text | FK → `organization.id`, CASCADE |
+| `user_id` | text | FK → `user.id`, CASCADE |
+| `first_name` | varchar(255) | |
+| `last_name` | varchar(255) | |
+| `suppression_reason` | suppression_reason | |
+| `suppressed_at` | timestamp | |
+| `created_at` | timestamp | |
+| `updated_at` | timestamp | |
+| `deleted_at` | timestamp | |
+
+Unique: `(organization_id, email)`
+
+
+## `contact_property`
+
+Custom field definitions per organization.
+
+| Column | Type | Notes |
+| :--- | :--- | :--- |
+| `id` | text | PK, prefix `cp_` |
+| `property_name` | varchar(255) | NOT NULL |
+| `property_type` | property_type | NOT NULL |
+| `default_value` | varchar(255) | |
+| `organization_id` | text | FK → `organization.id`, CASCADE |
+| `user_id` | text | FK → `user.id`, CASCADE |
+| `created_at` | timestamp | |
+| `updated_at` | timestamp | |
+| `deleted_at` | timestamp | |
+
+Unique: `(organization_id, property_name)`
+
+
+## `contact_property_value`
+
+| Column | Type | Notes |
+| :--- | :--- | :--- |
+| `id` | text | PK, prefix `cpv_` |
+| `contact_id` | text | FK → `contact.id`, CASCADE |
+| `property_id` | text | FK → `contact_property.id`, CASCADE |
+| `value` | text | NOT NULL |
+| `organization_id` | text | FK → `organization.id`, CASCADE |
+| `user_id` | text | FK → `user.id`, CASCADE |
+| `created_at` | timestamp | |
+| `updated_at` | timestamp | |
+| `deleted_at` | timestamp | |
+
+Unique: `(contact_id, property_id)`

@@ -11,6 +11,7 @@
 		"api",
 		"webhooks",
 		"self-host",
-		"setup"
+		"setup",
+		"database-schema"
 	]
 }
