@@ -455,7 +455,7 @@ export const AgentInboxLayoutWrapper = ({
 					<button
 						type="button"
 						onClick={() => router.push("/agent-inbox")}
-						className="flex w-full items-center gap-2 rounded-lg border border-[var(--color-primary-base)]/20 bg-[var(--color-primary-base)]/10 px-3 py-2 font-semibold text-[var(--color-primary-base)] text-xs transition-colors hover:bg-[var(--color-primary-base)]/15 dark:border-[var(--color-primary-base)]/20 dark:bg-[var(--color-primary-base)]/15"
+						className="flex w-full items-center gap-2 rounded-lg bg-[var(--color-primary-base)]/10 px-3 py-2 font-semibold text-[var(--color-primary-base)] text-xs transition-colors hover:bg-[var(--color-primary-base)]/15 dark:bg-[var(--color-primary-base)]/15"
 					>
 						<Icon
 							name="arrow-left"
