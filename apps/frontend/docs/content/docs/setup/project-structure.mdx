@@ -1,5 +1,6 @@
 ---
 title: Project Structure
+icon: element-5
 description: Quick overview of the monorepo organization - apps, packages, and tools.
 ---
 
@@ -56,7 +57,7 @@ Four Next.js apps under `apps/frontend/`:
   This developer documentation portal (MDX + Next.js).
 </Card>
 
-<Card icon={<Icon name="share" />} title="Links" href="/setup/frontend/links">
+<Card icon={<Icon name="link" />} title="Links" href="/setup/frontend/links">
   Contact preference center and tracked link redirects.
 </Card>
 </Cards>
@@ -82,27 +83,27 @@ Fifteen services under `apps/backend/` — ElysiaJS APIs plus KumoMTA Docker con
   System event capture and external webhook dispatch.
 </Card>
 
-<Card icon={<Icon name="element-5" />} title="Contacts" href="/setup/backend/contacts">
+<Card icon={<Icon name="users" />} title="Contacts" href="/setup/backend/contacts">
   Contact books, segments, channels, and custom properties.
 </Card>
 
-<Card icon={<Icon name="server" />} title="Mail" href="/setup/backend/mail">
+<Card icon={<Icon name="mail-single" />} title="Mail" href="/setup/backend/mail">
   Outbound transactional email API and campaign dispatch.
 </Card>
 
-<Card icon={<Icon name="database" />} title="Logs" href="/setup/backend/logs">
+<Card icon={<Icon name="file-text" />} title="Logs" href="/setup/backend/logs">
   ClickHouse event logging, opens, clicks, and bounces.
 </Card>
 
-<Card icon={<Icon name="element-5" />} title="Workflow" href="/setup/backend/workflow">
+<Card icon={<Icon name="modules" />} title="Workflow" href="/setup/backend/workflow">
   Automation triggers and marketing logic flows.
 </Card>
 
-<Card icon={<Icon name="share" />} title="Upload" href="/setup/backend/upload">
+<Card icon={<Icon name="image-upload" />} title="Upload" href="/setup/backend/upload">
   S3/MinIO asset storage and signed upload URLs.
 </Card>
 
-<Card icon={<Icon name="document" />} title="Template" href="/setup/backend/template">
+<Card icon={<Icon name="layout" />} title="Template" href="/setup/backend/template">
   Visual email templates and HTML rendering.
 </Card>
 
@@ -114,15 +115,15 @@ Fifteen services under `apps/backend/` — ElysiaJS APIs plus KumoMTA Docker con
   Platform transactional emails to Reloop users.
 </Card>
 
-<Card icon={<Icon name="card" />} title="Credits" href="/setup/backend/credits">
+<Card icon={<Icon name="fat-row" />} title="Credits" href="/setup/backend/credits">
   Credit balances, subscriptions, and Stripe billing.
 </Card>
 
-<Card icon={<Icon name="shield-check" />} title="SMTP" href="/setup/backend/smtp">
+<Card icon={<Icon name="mail-send" />} title="SMTP" href="/setup/backend/smtp">
   Outbound KumoMTA engine (Docker, ports 587/2025/8020).
 </Card>
 
-<Card icon={<Icon name="shield-check" />} title="Inbound" href="/setup/backend/inbound">
+<Card icon={<Icon name="mail-receive" />} title="Inbound" href="/setup/backend/inbound">
   Inbound KumoMTA MX receiver (Docker, ports 25/8030).
 </Card>
 </Cards>
