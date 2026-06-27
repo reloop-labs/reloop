@@ -117,7 +117,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 									<Icon
 										name={iconName}
 										className={cn(
-											"h-3.5 w-3.5 shrink-0 transition-all duration-200",
+											"h-4 w-4 shrink-0 transition-all duration-200",
 											isSpecial
 												? ""
 												: activeMainIndex === index
@@ -217,7 +217,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 																<Icon
 																	name={subIcon}
 																	className={cn(
-																		"h-3 w-3 shrink-0 transition-colors",
+																		"h-3.5 w-3.5 shrink-0 transition-colors",
 																		isSubActive
 																			? "text-primary-base"
 																			: "opacity-70 group-hover:text-primary-base group-hover:opacity-100",
