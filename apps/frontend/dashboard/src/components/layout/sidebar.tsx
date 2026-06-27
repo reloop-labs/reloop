@@ -51,7 +51,7 @@ export const MainSidebar: React.FC = () => {
 							type="button"
 							onClick={toggleSidebarCollapse}
 							title="Toggle Sidebar (Cmd+B)"
-							className="-translate-y-1/2 -right-2.5 absolute top-1/2 z-20 flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-text-sub-600 shadow-sm transition-colors hover:text-text-strong-950"
+							className="-translate-y-1/2 -right-2.5 absolute top-1/2 z-20 flex h-5 w-5 shrink-0 items-center justify-center text-text-sub-600 transition-colors hover:text-text-strong-950"
 						>
 							<Icon
 								name="sidebar-left"

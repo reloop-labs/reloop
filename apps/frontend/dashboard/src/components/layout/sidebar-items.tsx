@@ -122,7 +122,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 												? ""
 												: activeMainIndex === index
 													? "text-primary-base"
-													: "text-text-sub-600 opacity-70",
+													: "text-text-sub-600 opacity-70 group-hover:text-primary-base group-hover:opacity-100",
 										)}
 									/>
 									{!isCollapsed && (
@@ -133,7 +133,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 													? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
 													: activeMainIndex === index
 														? "text-primary-base"
-														: "text-text-sub-600",
+														: "text-text-sub-600 group-hover:text-primary-base",
 											)}
 										>
 											{label}
@@ -211,7 +211,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 																	"group relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-[12px] transition-colors",
 																	isSubActive
 																		? "text-primary-base"
-																		: "text-text-sub-600",
+																		: "text-text-sub-600 hover:text-primary-base",
 																)}
 															>
 																<Icon
@@ -220,7 +220,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 																		"h-3 w-3 shrink-0 transition-colors",
 																		isSubActive
 																			? "text-primary-base"
-																			: "opacity-70",
+																			: "opacity-70 group-hover:text-primary-base group-hover:opacity-100",
 																	)}
 																/>
 																{subLabel}
@@ -242,11 +242,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 			<AnimatedHoverBackground
 				rect={rect}
 				tabElement={currentEl}
-				className={
-					!hoveredEl && (activeMainIndex !== -1 || activeSubInfo)
-						? "!bg-primary-base/10"
-						: undefined
-				}
+				className="!bg-primary-alpha-10"
 			/>
 		</div>
 	);
