@@ -34,14 +34,22 @@ const getActorInfo = (
 			};
 		case "handled":
 		case "parsing":
-		case "new":
-		default:
+			// Agent has actively handled or is processing this thread
 			return {
 				gutterColor: "bg-[#3B629B]",
 				tag: "via agent",
 				tagIcon: "robot",
 				tagStyle:
 					"bg-[#3B629B]/10 text-[#3B629B] dark:text-[#3B629B]",
+			};
+		case "new":
+		default:
+			// Freshly received — agent hasn't acted yet, show no actor badge
+			return {
+				gutterColor: "bg-[#3B629B]",
+				tag: null,
+				tagIcon: "",
+				tagStyle: "",
 			};
 	}
 };
