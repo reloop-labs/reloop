@@ -46,6 +46,7 @@ PORT=8015
 BASE_URL="https://local.reloop.sh"
 NATS_URL=nats://localhost:4222
 KUMOMTA_HTTP_URL=http://localhost:8020
+TRACKING_SECRET=reloop_tracking_secret_default_123
 NODE_ENV=development
 ```
 
@@ -57,6 +58,7 @@ NODE_ENV=development
 | `REDIS_URL` | **YES** | `redis://...` |
 | `PORT` | **YES** | `8015` |
 | `KUMOMTA_HTTP_URL` | **YES** | `http://localhost:8020` |
+| `TRACKING_SECRET` | No | `reloop_tracking_secret_default_123` — signs tracked link and open-pixel tokens |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 
 

@@ -23,8 +23,8 @@ const dockerSteps = `# Clone the repository
 git clone https://github.com/reloop-labs/reloop.git
 cd reloop
 
-# Copy environment file
-cp .env.example .env
+# Configure backend environment files
+bun env:setup
 
 # Start all services
 docker compose up -d`;

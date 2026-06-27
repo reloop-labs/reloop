@@ -13,7 +13,7 @@
 		"build": "tsc --build",
 		"clean": "git clean -xdf .cache .turbo dist node_modules",
 		"dev": "tsc --build tsconfig.package.json",
-		"env:copy-example": "shx -- cp -n .env.example .env",
+		"env:copy-example": "shx -- cp -n .env.dev .env",
 		"env:remove": "shx -- rm -f .env",
 		"env:run": "dotenv --",
 		"push": "bun env:run drizzle-kit push",

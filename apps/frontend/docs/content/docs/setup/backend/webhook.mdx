@@ -42,11 +42,14 @@ Variables live in `apps/backend/webhook/.env`. Running `bun env:setup` from the 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
+WEBHOOK_ENCRYPTION_KEY=your-64-char-hex-key
 PORT=8013
 BASE_URL="https://local.reloop.sh"
 NATS_URL=nats://localhost:4222
 NODE_ENV=development
 ```
+
+`WEBHOOK_ENCRYPTION_KEY` encrypts stored webhook signing secrets. If unset, secrets are stored in plaintext (acceptable for local dev only).
 
 ### Reference Table
 
@@ -54,6 +57,7 @@ NODE_ENV=development
 | :--- | :--- | :--- |
 | `PG_URL` | **YES** | `postgresql://...` |
 | `REDIS_URL` | **YES** | `redis://...` |
+| `WEBHOOK_ENCRYPTION_KEY` | Prod only | Dev key in `.env.dev` — encrypts webhook secrets at rest |
 | `PORT` | **YES** | `8013` |
 | `BASE_URL` | **YES** | `https://local.reloop.sh` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |

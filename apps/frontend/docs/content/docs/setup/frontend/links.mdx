@@ -35,6 +35,33 @@ bun fe:links:dev
 The app starts with Turbopack hot reloading on port `3005`.
 
 
+## Environment Configuration
+
+Variables in `apps/frontend/links/.env` (committed with local defaults — no `bun env:setup` step needed):
+
+```bash
+NEXT_PUBLIC_URL=https://local.reloop.sh
+
+# Server-side contacts API (preferences page)
+INTERNAL_API_URL=http://localhost:8014/api/contacts
+
+# Rybbit analytics (optional)
+NEXT_PUBLIC_RYBBIT_HOST=https://app.rybbit.io
+NEXT_PUBLIC_RYBBIT_SITE_ID=reloop-web
+```
+
+The preferences page calls the [contacts](/setup/backend/contacts) service server-side via `INTERNAL_API_URL`. In production, point this at your internal contacts API endpoint.
+
+### Reference Table
+
+| Variable | Required | Default |
+| :--- | :--- | :--- |
+| `NEXT_PUBLIC_URL` | No | `https://link.reloop.sh` — base URL for redirect and preference links |
+| `INTERNAL_API_URL` | No | `http://localhost:8014/api/contacts` — server-side contacts API |
+| `NEXT_PUBLIC_RYBBIT_HOST` | No | Rybbit analytics host |
+| `NEXT_PUBLIC_RYBBIT_SITE_ID` | No | Rybbit site identifier |
+
+
 ## Routes
 
 | Route | Purpose |

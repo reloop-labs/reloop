@@ -35,6 +35,28 @@ bun fe:docs:dev
 The app starts with Turbopack hot reloading on port `3003`.
 
 
+## Environment Configuration
+
+Variables in `apps/frontend/docs/.env` (committed with local defaults — no `bun env:setup` step needed):
+
+```bash
+NEXT_PUBLIC_URL=https://local.reloop.sh
+
+# Rybbit analytics (optional)
+NEXT_PUBLIC_RYBBIT_HOST=https://app.rybbit.io
+NEXT_PUBLIC_RYBBIT_SITE_ID=reloop-docs
+```
+
+### Reference Table
+
+| Variable | Required | Default |
+| :--- | :--- | :--- |
+| `NEXT_PUBLIC_URL` | No | `https://reloop.sh` — used for canonical URLs and OG metadata |
+| `NEXT_PUBLIC_APP_URL` | No | `https://reloop.sh` — fallback in page metadata |
+| `NEXT_PUBLIC_RYBBIT_HOST` | No | Rybbit analytics host |
+| `NEXT_PUBLIC_RYBBIT_SITE_ID` | No | Rybbit site identifier |
+
+
 ## Content Structure
 
 | Path | Purpose |

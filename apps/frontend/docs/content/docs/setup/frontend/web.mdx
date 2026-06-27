@@ -37,19 +37,23 @@ The app starts with Turbopack hot reloading on port `3000`.
 
 ## Environment Configuration
 
-Optional variables in `apps/frontend/web/.env`:
+Variables in `apps/frontend/web/.env` (committed with local defaults — no `bun env:setup` step needed):
 
 ```bash
-NEXT_PUBLIC_WEB_URL="https://local.reloop.sh"
-NEXT_PUBLIC_API_URL="https://local.reloop.sh/api"
+NEXT_PUBLIC_URL=https://local.reloop.sh
+
+# Rybbit analytics (optional)
+NEXT_PUBLIC_RYBBIT_HOST=https://app.rybbit.io
+NEXT_PUBLIC_RYBBIT_SITE_ID=reloop-web
 ```
 
 ### Reference Table
 
 | Variable | Required | Default |
 | :--- | :--- | :--- |
-| `NEXT_PUBLIC_WEB_URL` | **YES** | `https://local.reloop.sh` |
-| `NEXT_PUBLIC_API_URL` | **YES** | `https://local.reloop.sh/api` |
+| `NEXT_PUBLIC_URL` | No | `https://reloop.sh` — canonical site URL for metadata and OG tags |
+| `NEXT_PUBLIC_RYBBIT_HOST` | No | Rybbit analytics host |
+| `NEXT_PUBLIC_RYBBIT_SITE_ID` | No | Rybbit site identifier |
 
 
 ## Development Commands

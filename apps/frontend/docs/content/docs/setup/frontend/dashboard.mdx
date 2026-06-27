@@ -41,21 +41,26 @@ The app starts with Turbopack hot reloading on port `3001`.
 
 ## Environment Configuration
 
-Variables in `apps/frontend/dashboard/.env`:
+Variables in `apps/frontend/dashboard/.env` (committed with local defaults — no `bun env:setup` step needed):
 
 ```bash
-NEXT_PUBLIC_APP_URL="https://local.reloop.sh"
-NEXT_PUBLIC_API_URL="https://local.reloop.sh/api"
 NEXT_PUBLIC_WS_URL="wss://local.reloop.sh"
+
+# Rybbit analytics (optional)
+NEXT_PUBLIC_RYBBIT_HOST=https://app.rybbit.io
+NEXT_PUBLIC_RYBBIT_SITE_ID=reloop-dashboard
 ```
+
+API calls use relative paths (`/api/*`) via Caddy, so no `NEXT_PUBLIC_API_URL` is required.
 
 ### Reference Table
 
 | Variable | Required | Default |
 | :--- | :--- | :--- |
-| `NEXT_PUBLIC_APP_URL` | **YES** | `https://local.reloop.sh` |
-| `NEXT_PUBLIC_API_URL` | **YES** | `https://local.reloop.sh/api` |
-| `NEXT_PUBLIC_WS_URL` | **YES** | `wss://local.reloop.sh` |
+| `NEXT_PUBLIC_WS_URL` | No | Current host (template collaboration WebSocket) |
+| `NEXT_PUBLIC_APP_URL` | No | `https://reloop.sh` — used as fallback in API details drawer only |
+| `NEXT_PUBLIC_RYBBIT_HOST` | No | Rybbit analytics host |
+| `NEXT_PUBLIC_RYBBIT_SITE_ID` | No | Rybbit site identifier |
 
 
 ## Development Commands

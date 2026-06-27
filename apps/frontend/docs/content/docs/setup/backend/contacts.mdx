@@ -45,8 +45,11 @@ REDIS_URL=redis://:reloop123@localhost:6379
 PORT=8014
 BASE_URL="https://local.reloop.sh"
 NATS_URL=nats://localhost:4222
+PREFERENCES_SECRET="reloop-preferences-secret-key-change-in-prod"
 NODE_ENV=development
 ```
+
+`PREFERENCES_SECRET` signs preference-center tokens consumed by the [Links](/setup/frontend/links) app. The service **refuses to start in production** if this is left at the default dev value.
 
 ### Reference Table
 
@@ -57,6 +60,7 @@ NODE_ENV=development
 | `PORT` | **YES** | `8014` |
 | `BASE_URL` | **YES** | `https://local.reloop.sh` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
+| `PREFERENCES_SECRET` | Prod only | Dev default in `.env.dev` — must be a strong random value in production |
 
 
 ## Development Commands

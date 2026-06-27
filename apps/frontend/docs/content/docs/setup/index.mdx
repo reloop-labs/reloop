@@ -68,7 +68,7 @@ bun db:seed
 bun env:setup
 ```
 
-This copies each service `.env.dev` template to `.env`. To do one service manually: `cp apps/backend/auth/.env.dev apps/backend/auth/.env`.
+This copies each backend service `.env.dev` template to `.env` (13 microservices under `apps/backend/`). Frontend apps ship with committed `.env` files and do not need this step. To do one service manually: `cp apps/backend/auth/.env.dev apps/backend/auth/.env`.
 
 ### 6. Start dev servers
 
