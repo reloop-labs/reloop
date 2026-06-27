@@ -68,7 +68,7 @@ export const MessageHeaderExpanded = ({
 		>
 			{/* Left: Avatar + Info */}
 			<div className="flex min-w-0 items-center gap-3">
-				<div className="flex items-center gap-2.5 shrink-0">
+				<div className="flex shrink-0 items-center gap-2.5">
 					<div
 						className="h-6 w-[3px] rounded-full"
 						style={{ backgroundColor: accentColor }}
@@ -104,9 +104,7 @@ export const MessageHeaderExpanded = ({
 				className="flex shrink-0 items-center gap-1.5"
 				onClick={(e) => e.stopPropagation()}
 			>
-				<span className="text-text-soft-400 text-xs">
-					{formatMessageTimestamp(msg.messageAt)}
-				</span>
+				<span className="text-xs">{formatMessageTimestamp(msg.messageAt)}</span>
 
 				<button
 					type="button"

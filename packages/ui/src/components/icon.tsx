@@ -2465,6 +2465,22 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
+			<symbol id="chevron-up" viewBox="0 0 24 24" fill="none">
+				<path
+					d="M18 15L15 12"
+					stroke="currentColor"
+					strokeWidth="2"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+				<path
+					d="M6 15L12 9L15 12"
+					stroke="currentColor"
+					strokeWidth="2"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol
 				id="arrow-down"
 				viewBox="0 0 24 24"
