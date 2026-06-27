@@ -258,9 +258,9 @@ export const ComposeModal = ({
 					</AnimatePresence>
 					{/* Top bar Header */}
 					<div className="flex items-center justify-between border-stroke-soft-100/60 border-b px-5 py-4 dark:border-neutral-800">
-						<h2 className="font-semibold text-sm text-text-strong-950 dark:text-white">
+						<Modal.Title className="font-semibold text-sm text-text-strong-950 dark:text-white">
 							New email
-						</h2>
+						</Modal.Title>
 						<div className="flex items-center gap-1">
 							{/* Close Button */}
 							<motion.button
