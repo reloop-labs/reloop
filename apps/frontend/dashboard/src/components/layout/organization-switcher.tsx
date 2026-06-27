@@ -1,15 +1,62 @@
 "use client";
 
 import {
+	getAvatarGradient,
 	getAvatarInitial,
 } from "@fe/dashboard/utils/avatar";
-import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { AnimatedHoverBackground } from "../animated-hover-background";
+
+/** Returns the first letter + gradient bg for an org, with image error fallback. */
+function OrgAvatar({
+	org,
+	size,
+}: {
+	org: { name: string; logo?: string | null };
+	size: number;
+}) {
+	const [imgError, setImgError] = useState(false);
+	const gradient = getAvatarGradient(org.name);
+	const initial = getAvatarInitial(org.name, org.name);
+	const dim = `h-${size === 20 ? 5 : 6} w-${size === 20 ? 5 : 6}`;
+	const textSize = size === 20 ? "text-[10px]" : "text-[11px]";
+
+	if (org.logo && !imgError) {
+		return (
+			<div
+				className={cn(
+					"flex flex-shrink-0 items-center justify-center overflow-hidden rounded-[6px]",
+					dim,
+				)}
+			>
+				{/* eslint-disable-next-line @next/next/no-img-element */}
+				<img
+					src={org.logo}
+					alt={org.name}
+					className="h-full w-full object-cover"
+					onError={() => setImgError(true)}
+				/>
+			</div>
+		);
+	}
+
+	return (
+		<div
+			className={cn(
+				"flex flex-shrink-0 items-center justify-center rounded-[6px] bg-gradient-to-br font-semibold text-white",
+				dim,
+				textSize,
+				gradient,
+			)}
+		>
+			{initial}
+		</div>
+	);
+}
 
 interface Organization {
 	id: string;
@@ -81,27 +128,7 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 						title={activeOrganization.name}
 						className="flex h-9 w-9 items-center justify-center rounded-lg outline-none transition-all hover:bg-bg-weak-50"
 					>
-						{activeOrganization.logo ? (
-							<Avatar.Root
-								size="24"
-								placeholderType="company"
-								className="rounded-[6px]"
-							>
-								<Avatar.Image
-									src={activeOrganization.logo}
-									alt={activeOrganization.name}
-								/>
-							</Avatar.Root>
-						) : (
-							<div
-								className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-[6px] bg-text-strong-950 font-semibold text-[11px] text-white"
-							>
-								{getAvatarInitial(
-									activeOrganization.name,
-									activeOrganization.name,
-								)}
-							</div>
-						)}
+						<OrgAvatar org={activeOrganization} size={24} />
 					</button>
 				) : (
 					<button
@@ -111,29 +138,7 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 							isOpen && "bg-bg-weak-50",
 						)}
 					>
-						<div className="relative flex-shrink-0">
-							{activeOrganization.logo ? (
-								<Avatar.Root
-									size="20"
-									placeholderType="company"
-									className="rounded-[6px]"
-								>
-									<Avatar.Image
-										src={activeOrganization.logo}
-										alt={activeOrganization.name}
-									/>
-								</Avatar.Root>
-							) : (
-								<div
-									className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-[6px] bg-text-strong-950 font-semibold text-[11px] text-white"
-								>
-									{getAvatarInitial(
-										activeOrganization.name,
-										activeOrganization.name,
-									)}
-								</div>
-							)}
-						</div>
+						<OrgAvatar org={activeOrganization} size={20} />
 						<div className="flex min-w-0 flex-shrink items-center gap-1.5">
 							<span className="truncate font-medium text-sm text-text-strong-950">
 								{activeOrganization.name}
@@ -221,26 +226,7 @@ const OrganizationList: React.FC<OrganizationListProps> = ({
 						onClick={() => onSelect(organization)}
 					>
 						<div className="flex min-w-0 flex-1 items-center gap-2.5">
-							<div className="relative flex-shrink-0">
-								{organization.logo ? (
-									<Avatar.Root
-										size="24"
-										placeholderType="company"
-										className="rounded-[6px]"
-									>
-										<Avatar.Image
-											src={organization.logo}
-											alt={organization.name}
-										/>
-									</Avatar.Root>
-								) : (
-									<div
-										className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-[6px] bg-text-strong-950 font-semibold text-[11px] text-white"
-									>
-										{getAvatarInitial(organization.name, organization.name)}
-									</div>
-								)}
-							</div>
+							<OrgAvatar org={organization} size={24} />
 							<p className="w-full truncate text-left font-medium text-sm text-text-strong-950">
 								{organization.name}
 							</p>
