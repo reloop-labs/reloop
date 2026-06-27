@@ -53,16 +53,16 @@ export const RateChart = ({
 	}
 
 	return (
-		<div className="group flex w-full flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
+		<div className="group flex w-full flex-col">
 			{/* Header */}
-			<div className="flex items-center justify-between border-stroke-soft-100 border-b bg-bg-weak-50/50 px-6 pt-3 pb-1 dark:border-white/5 dark:bg-white/[0.02]">
+			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-2 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
 				<span className="font-medium text-lg text-text-strong-950 dark:text-white">
 					{title}
 				</span>
 			</div>
 
 			{/* Body Container */}
-			<div className="flex flex-col px-6 pt-1.5 pb-6">
+			<div className="-mt-1.5 flex flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-white px-5 pt-4 pb-6 shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.01]">
 				<div className="mb-4 flex items-start justify-between">
 					<div className="flex flex-col gap-1">
 						<span className="font-bold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
