@@ -357,7 +357,7 @@ export const AgentInboxLayoutWrapper = ({
 								>
 									<div className="flex items-center gap-2.5">
 										<Icon
-											name="monitor"
+											name="robot"
 											className={cn(
 												"h-3.5 w-3.5 transition-colors",
 												folder === "agent"

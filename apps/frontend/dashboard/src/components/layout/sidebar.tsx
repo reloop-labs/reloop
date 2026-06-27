@@ -65,7 +65,7 @@ export const MainSidebar: React.FC = () => {
 	return (
 		<div
 			className={cn(
-				"sticky top-0 z-10 flex h-screen flex-col transition-[width] duration-200 ease-in-out",
+				"sticky top-0 z-10 flex h-screen flex-col transition-[width] duration-200 ease-in-out bg-[#6A8068] text-white/90 border-r border-[#6A8068]/10",
 				isSidebarCollapsed ? "w-14" : "w-60",
 			)}
 		>
@@ -85,7 +85,7 @@ export const MainSidebar: React.FC = () => {
 							type="button"
 							onClick={toggleSidebarCollapse}
 							title="Toggle Sidebar (Cmd+B)"
-							className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+							className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/10 hover:text-white"
 						>
 							<Icon
 								name="sidebar-left"
@@ -118,7 +118,7 @@ export const MainSidebar: React.FC = () => {
 								type="button"
 								onClick={toggleSidebarCollapse}
 								title="Toggle Sidebar (Cmd+B)"
-								className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+								className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/10 hover:text-white"
 							>
 								<Icon
 									name="sidebar-left"

@@ -15,7 +15,7 @@ export const MessageBadge = ({ variant }: MessageBadgeProps) => {
 
 	if (variant === "approval") {
 		return (
-			<span className="rounded-[4px] bg-amber-500/10 px-1.5 py-[3px] font-medium text-[10px] text-amber-700 normal-case tracking-normal dark:text-amber-400">
+			<span className="rounded-[4px] bg-[#C4793B]/10 px-1.5 py-[3px] font-medium text-[10px] text-[#C4793B] normal-case tracking-normal dark:text-[#C4793B]">
 				needs you
 			</span>
 		);
@@ -23,7 +23,7 @@ export const MessageBadge = ({ variant }: MessageBadgeProps) => {
 
 	if (variant === "you") {
 		return (
-			<span className="rounded-[4px] bg-emerald-500/10 px-1.5 py-[3px] font-medium text-[10px] text-emerald-700 normal-case tracking-normal dark:text-emerald-400">
+			<span className="rounded-[4px] bg-[#6A8068]/10 px-1.5 py-[3px] font-medium text-[10px] text-[#6A8068] normal-case tracking-normal dark:text-[#6A8068]">
 				via you
 			</span>
 		);
@@ -31,7 +31,7 @@ export const MessageBadge = ({ variant }: MessageBadgeProps) => {
 
 	if (variant === "agent") {
 		return (
-			<span className="rounded-[4px] bg-blue-500/10 px-1.5 py-[3px] font-medium text-[10px] text-blue-700 normal-case tracking-normal dark:text-blue-400">
+			<span className="rounded-[4px] bg-[#4A6FA5]/10 px-1.5 py-[3px] font-medium text-[10px] text-[#4A6FA5] normal-case tracking-normal dark:text-[#4A6FA5]">
 				via agent
 			</span>
 		);

@@ -80,7 +80,7 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 					<button
 						type="button"
 						title={activeOrganization.name}
-						className="flex h-9 w-9 items-center justify-center rounded-lg outline-none transition-all hover:bg-bg-weak-50 dark:hover:bg-white/5"
+						className="flex h-9 w-9 items-center justify-center rounded-lg outline-none transition-all hover:bg-white/10"
 					>
 						{activeOrganization.logo ? (
 							<Avatar.Root
@@ -111,8 +111,8 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 					<button
 						type="button"
 						className={cn(
-							"flex w-fit max-w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 outline-none transition-colors hover:bg-bg-weak-50",
-							isOpen && "bg-bg-weak-50",
+							"flex w-fit max-w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 outline-none transition-colors hover:bg-white/10 text-white",
+							isOpen && "bg-white/10",
 						)}
 					>
 						<div className="relative flex-shrink-0">
@@ -142,12 +142,12 @@ export const OrganizationSwitcher: React.FC<OrganizationSwitcherProps> = ({
 							)}
 						</div>
 						<div className="flex min-w-0 flex-shrink items-center gap-1.5">
-							<span className="truncate font-medium text-sm text-text-strong-950">
+							<span className="truncate font-medium text-sm text-white">
 								{activeOrganization.name}
 							</span>
 							<Icon
 								name="chevron-down"
-								className="h-3.5 w-3.5 flex-shrink-0 text-text-sub-600"
+								className="h-3.5 w-3.5 flex-shrink-0 text-white/60"
 							/>
 						</div>
 					</button>

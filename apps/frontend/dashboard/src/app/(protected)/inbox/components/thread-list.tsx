@@ -16,29 +16,29 @@ const getActorInfo = (
 ): { gutterColor: string; tag: string | null; tagStyle: string } => {
 	if (thread.direction === "outbound") {
 		return {
-			gutterColor: "bg-emerald-500 dark:bg-emerald-600",
+			gutterColor: "bg-[#6A8068]",
 			tag: "via you",
 			tagStyle:
-				"bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+				"bg-[#6A8068]/10 text-[#6A8068] dark:text-[#6A8068]",
 		};
 	}
 	switch (thread.status) {
 		case "needs_approval":
 			return {
-				gutterColor: "bg-amber-500 dark:bg-amber-600",
+				gutterColor: "bg-[#C4793B]",
 				tag: "needs you",
 				tagStyle:
-					"bg-amber-500/10 text-amber-700 dark:text-amber-400",
+					"bg-[#C4793B]/10 text-[#C4793B] dark:text-[#C4793B]",
 			};
 		case "handled":
 		case "parsing":
 		case "new":
 		default:
 			return {
-				gutterColor: "bg-blue-500 dark:bg-blue-600",
+				gutterColor: "bg-[#4A6FA5]",
 				tag: "via agent",
 				tagStyle:
-					"bg-blue-500/10 text-blue-700 dark:text-blue-400",
+					"bg-[#4A6FA5]/10 text-[#4A6FA5] dark:text-[#4A6FA5]",
 			};
 	}
 };

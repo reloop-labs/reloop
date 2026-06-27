@@ -98,7 +98,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 								onPointerEnter={() => setHoveredEl(mainNavRefs.current[index])}
 								onPointerLeave={() => setHoveredEl(undefined)}
 								className={cn(
-									"relative z-10 flex h-8 items-center rounded-lg transition-all",
+									"group relative z-10 flex h-8 items-center rounded-lg transition-all",
 									isCollapsed
 										? "h-8 w-8 justify-center px-0"
 										: cn(
@@ -121,8 +121,8 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 											isSpecial
 												? ""
 												: activeMainIndex === index
-													? "text-primary-base"
-													: "text-text-sub-600 opacity-70",
+													? "text-white"
+													: "text-white/70 opacity-70 group-hover:text-white group-hover:opacity-100",
 										)}
 									/>
 									{!isCollapsed && (
@@ -132,8 +132,8 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 												isSpecial
 													? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
 													: activeMainIndex === index
-														? "text-primary-base"
-														: "text-text-sub-600",
+														? "text-white font-semibold"
+														: "text-white/70 group-hover:text-white",
 											)}
 										>
 											{label}
@@ -153,12 +153,12 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 												[path]: !prev[path],
 											}));
 										}}
-										className="flex h-5 w-5 items-center justify-center rounded-md transition-colors hover:bg-neutral-alpha-10"
+										className="flex h-5 w-5 items-center justify-center rounded-md transition-colors hover:bg-white/10"
 									>
 										<Icon
 											name="chevron-right"
 											className={cn(
-												"h-3 w-3 shrink-0 text-text-sub-600 opacity-60 transition-transform duration-200",
+												"h-3 w-3 shrink-0 text-white/60 opacity-60 transition-transform duration-200",
 												isExpanded && "rotate-90",
 											)}
 										/>
@@ -177,7 +177,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 											transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
 											style={{ overflow: "hidden" }}
 										>
-											<div className="my-0.5 ml-[14px] flex flex-col border-neutral-alpha-10 border-l pb-0.5 pl-2">
+											<div className="my-0.5 ml-[14px] flex flex-col border-white/15 border-l pb-0.5 pl-2">
 												{items.map(
 													(
 														{
@@ -208,19 +208,19 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 																}
 																onPointerLeave={() => setHoveredEl(undefined)}
 																className={cn(
-																	"relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-[12px]",
+																	"group relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-[12px] transition-colors",
 																	isSubActive
-																		? "text-primary-base"
-																		: "text-text-sub-600",
+																		? "text-white font-semibold"
+																		: "text-white/70 hover:text-white",
 																)}
 															>
 																<Icon
 																	name={subIcon}
 																	className={cn(
-																		"h-3 w-3 shrink-0",
+																		"h-3 w-3 shrink-0 transition-colors",
 																		isSubActive
-																			? "text-primary-base"
-																			: "opacity-70",
+																			? "text-white"
+																			: "text-white/60 group-hover:text-white",
 																	)}
 																/>
 																{subLabel}
@@ -244,8 +244,8 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 				tabElement={currentEl}
 				className={
 					!hoveredEl && (activeMainIndex !== -1 || activeSubInfo)
-						? "!bg-primary-base/10"
-						: undefined
+						? "!bg-white/20"
+						: "!bg-white/10"
 				}
 			/>
 		</div>
