@@ -116,8 +116,6 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 								>
 									<Icon
 										name={iconName}
-										stroke="currentColor"
-										strokeWidth={1}
 										className={cn(
 											"h-4 w-4 shrink-0 transition-all duration-200",
 											isSpecial
@@ -218,8 +216,6 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 															>
 																<Icon
 																	name={subIcon}
-																	stroke="currentColor"
-																	strokeWidth={1}
 																	className={cn(
 																		"h-3.5 w-3.5 shrink-0 transition-colors",
 																		isSubActive
