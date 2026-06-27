@@ -40,25 +40,28 @@ export const MainSidebar: React.FC = () => {
 				className={cn(
 					"flex items-center transition-all",
 					isSidebarCollapsed
-						? "h-14 justify-center px-0"
+						? "h-14 w-full justify-center px-0"
 						: "h-12 justify-between pr-3 pl-3",
 				)}
 			>
 				{isSidebarCollapsed ? (
-					<button
-						type="button"
-						onClick={toggleSidebarCollapse}
-						title="Toggle Sidebar (Cmd+B)"
-						className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
-					>
-						<Icon
-							name="sidebar-left"
-							className="h-4 w-4 transition-transform duration-200"
-							style={{
-								transform: "rotate(180deg)",
-							}}
-						/>
-					</button>
+					<div className="relative flex h-full w-full items-center justify-center">
+						<Logo className="h-8 w-8 shrink-0" />
+						<button
+							type="button"
+							onClick={toggleSidebarCollapse}
+							title="Toggle Sidebar (Cmd+B)"
+							className="-translate-y-1/2 -right-2.5 absolute top-1/2 z-20 flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-text-sub-600 shadow-sm transition-colors hover:text-text-strong-950"
+						>
+							<Icon
+								name="sidebar-left"
+								className="h-3 w-3 transition-transform duration-200"
+								style={{
+									transform: "rotate(180deg)",
+								}}
+							/>
+						</button>
+					</div>
 				) : (
 					<>
 						<div className="flex items-center gap-2">
