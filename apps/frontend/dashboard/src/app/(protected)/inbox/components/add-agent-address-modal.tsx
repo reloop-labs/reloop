@@ -199,16 +199,13 @@ export const AddAgentAddressModal = ({
 									type="button"
 									variant="neutral"
 									size="xsmall"
-									asChild
+									onClick={() => {
+										router.push("/domain/add");
+									}}
+									className="flex items-center gap-1.5"
 								>
-									<Link
-										href="/domain/add"
-										onClick={onClose}
-										className="flex items-center gap-1.5"
-									>
-										<Icon name="plus" className="h-3.5 w-3.5" />
-										Add Domain
-									</Link>
+									<Icon name="plus" className="h-3.5 w-3.5" />
+									Add Domain
 								</Button.Root>
 							</div>
 						</Modal.Body>
