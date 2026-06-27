@@ -169,8 +169,8 @@ export const AgentInboxLayoutWrapper = ({
 								className={cn(
 									"group relative z-10 flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
 									folder === "inbox"
-										? "text-[#677E64]"
-										: "text-text-sub-600 hover:text-[#677E64] dark:text-neutral-400 dark:hover:text-[#677E64]",
+										? "text-[var(--color-primary-base)]"
+										: "text-text-sub-600 hover:text-[var(--color-primary-base)] dark:text-neutral-400 dark:hover:text-[var(--color-primary-base)]",
 								)}
 							>
 								<div className="flex items-center gap-2.5">
@@ -179,8 +179,8 @@ export const AgentInboxLayoutWrapper = ({
 										className={cn(
 											"h-3.5 w-3.5 transition-colors",
 											folder === "inbox"
-												? "text-[#677E64]"
-												: "text-text-sub-600 opacity-70 group-hover:text-[#677E64] group-hover:opacity-100",
+												? "text-[var(--color-primary-base)]"
+												: "text-text-sub-600 opacity-70 group-hover:text-[var(--color-primary-base)] group-hover:opacity-100",
 										)}
 									/>
 									<span>Inbox</span>
@@ -205,8 +205,8 @@ export const AgentInboxLayoutWrapper = ({
 								className={cn(
 									"group relative z-10 flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
 									folder === "sent"
-										? "text-[#677E64]"
-										: "text-text-sub-600 hover:text-[#677E64] dark:text-neutral-400 dark:hover:text-[#677E64]",
+										? "text-[var(--color-primary-base)]"
+										: "text-text-sub-600 hover:text-[var(--color-primary-base)] dark:text-neutral-400 dark:hover:text-[var(--color-primary-base)]",
 								)}
 							>
 								<div className="flex items-center gap-2.5">
@@ -215,8 +215,8 @@ export const AgentInboxLayoutWrapper = ({
 										className={cn(
 											"h-3.5 w-3.5 transition-colors",
 											folder === "sent"
-												? "text-[#677E64]"
-												: "text-text-sub-600 opacity-70 group-hover:text-[#677E64] group-hover:opacity-100",
+												? "text-[var(--color-primary-base)]"
+												: "text-text-sub-600 opacity-70 group-hover:text-[var(--color-primary-base)] group-hover:opacity-100",
 										)}
 									/>
 									<span>Sent</span>
@@ -241,8 +241,8 @@ export const AgentInboxLayoutWrapper = ({
 								className={cn(
 									"group relative z-10 flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
 									folder === "drafts"
-										? "text-[#677E64]"
-										: "text-text-sub-600 hover:text-[#677E64] dark:text-neutral-400 dark:hover:text-[#677E64]",
+										? "text-[var(--color-primary-base)]"
+										: "text-text-sub-600 hover:text-[var(--color-primary-base)] dark:text-neutral-400 dark:hover:text-[var(--color-primary-base)]",
 								)}
 							>
 								<div className="flex items-center gap-2.5">
@@ -251,8 +251,8 @@ export const AgentInboxLayoutWrapper = ({
 										className={cn(
 											"h-3.5 w-3.5 transition-colors",
 											folder === "drafts"
-												? "text-[#677E64]"
-												: "text-text-sub-600 opacity-70 group-hover:text-[#677E64] group-hover:opacity-100",
+												? "text-[var(--color-primary-base)]"
+												: "text-text-sub-600 opacity-70 group-hover:text-[var(--color-primary-base)] group-hover:opacity-100",
 										)}
 									/>
 									<span>Drafts</span>
@@ -277,8 +277,8 @@ export const AgentInboxLayoutWrapper = ({
 								className={cn(
 									"group relative z-10 flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
 									folder === "spam"
-										? "text-[#677E64]"
-										: "text-text-sub-600 hover:text-[#677E64] dark:text-neutral-400 dark:hover:text-[#677E64]",
+										? "text-[var(--color-primary-base)]"
+										: "text-text-sub-600 hover:text-[var(--color-primary-base)] dark:text-neutral-400 dark:hover:text-[var(--color-primary-base)]",
 								)}
 							>
 								<div className="flex items-center gap-2.5">
@@ -287,8 +287,8 @@ export const AgentInboxLayoutWrapper = ({
 										className={cn(
 											"h-3.5 w-3.5 transition-colors",
 											folder === "spam"
-												? "text-[#677E64]"
-												: "text-text-sub-600 opacity-70 group-hover:text-[#677E64] group-hover:opacity-100",
+												? "text-[var(--color-primary-base)]"
+												: "text-text-sub-600 opacity-70 group-hover:text-[var(--color-primary-base)] group-hover:opacity-100",
 										)}
 									/>
 									<span>Spam</span>
@@ -313,8 +313,8 @@ export const AgentInboxLayoutWrapper = ({
 								className={cn(
 									"group relative z-10 flex items-center justify-between rounded-lg px-3 py-2 font-medium text-xs transition-colors",
 									folder === "trash"
-										? "text-[#677E64]"
-										: "text-text-sub-600 hover:text-[#677E64] dark:text-neutral-400 dark:hover:text-[#677E64]",
+										? "text-[var(--color-primary-base)]"
+										: "text-text-sub-600 hover:text-[var(--color-primary-base)] dark:text-neutral-400 dark:hover:text-[var(--color-primary-base)]",
 								)}
 							>
 								<div className="flex items-center gap-2.5">
@@ -323,8 +323,8 @@ export const AgentInboxLayoutWrapper = ({
 										className={cn(
 											"h-3.5 w-3.5 transition-colors",
 											folder === "trash"
-												? "text-[#677E64]"
-												: "text-text-sub-600 opacity-70 group-hover:text-[#677E64] group-hover:opacity-100",
+												? "text-[var(--color-primary-base)]"
+												: "text-text-sub-600 opacity-70 group-hover:text-[var(--color-primary-base)] group-hover:opacity-100",
 										)}
 									/>
 									<span>Trash</span>
@@ -351,8 +351,8 @@ export const AgentInboxLayoutWrapper = ({
 									className={cn(
 										"group relative z-10 flex items-center justify-between rounded-lg px-3 py-1.5 font-medium text-xs transition-colors",
 										folder === "agent"
-											? "text-[#677E64]"
-											: "text-text-sub-600 hover:text-[#677E64] dark:text-neutral-400 dark:hover:text-[#677E64]",
+											? "text-[var(--color-primary-base)]"
+											: "text-text-sub-600 hover:text-[var(--color-primary-base)] dark:text-neutral-400 dark:hover:text-[var(--color-primary-base)]",
 									)}
 								>
 									<div className="flex items-center gap-2.5">
@@ -361,8 +361,8 @@ export const AgentInboxLayoutWrapper = ({
 											className={cn(
 												"h-3.5 w-3.5 transition-colors",
 												folder === "agent"
-													? "text-[#677E64]"
-													: "text-text-sub-600 opacity-70 group-hover:text-[#677E64] group-hover:opacity-100",
+													? "text-[var(--color-primary-base)]"
+													: "text-text-sub-600 opacity-70 group-hover:text-[var(--color-primary-base)] group-hover:opacity-100",
 											)}
 										/>
 										<span>Handled by agent</span>
@@ -387,8 +387,8 @@ export const AgentInboxLayoutWrapper = ({
 									className={cn(
 										"group relative z-10 flex items-center justify-between rounded-lg px-3 py-1.5 font-medium text-xs transition-colors",
 										folder === "you"
-											? "text-[#677E64]"
-											: "text-text-sub-600 hover:text-[#677E64] dark:text-neutral-400 dark:hover:text-[#677E64]",
+											? "text-[var(--color-primary-base)]"
+											: "text-text-sub-600 hover:text-[var(--color-primary-base)] dark:text-neutral-400 dark:hover:text-[var(--color-primary-base)]",
 									)}
 								>
 									<div className="flex items-center gap-2.5">
@@ -397,8 +397,8 @@ export const AgentInboxLayoutWrapper = ({
 											className={cn(
 												"h-3.5 w-3.5 transition-colors",
 												folder === "you"
-													? "text-[#677E64]"
-													: "text-text-sub-600 opacity-70 group-hover:text-[#677E64] group-hover:opacity-100",
+													? "text-[var(--color-primary-base)]"
+													: "text-text-sub-600 opacity-70 group-hover:text-[var(--color-primary-base)] group-hover:opacity-100",
 											)}
 										/>
 										<span>Sent by you</span>
@@ -425,8 +425,8 @@ export const AgentInboxLayoutWrapper = ({
 									className={cn(
 										"group relative z-10 flex items-center justify-between rounded-lg px-3 py-1.5 font-medium text-xs transition-colors",
 										folder === "needs_approval"
-											? "text-[#677E64]"
-											: "text-text-sub-600 hover:text-[#677E64] dark:text-neutral-400 dark:hover:text-[#677E64]",
+											? "text-[var(--color-primary-base)]"
+											: "text-text-sub-600 hover:text-[var(--color-primary-base)] dark:text-neutral-400 dark:hover:text-[var(--color-primary-base)]",
 									)}
 								>
 									<div className="flex items-center gap-2.5">
@@ -435,8 +435,8 @@ export const AgentInboxLayoutWrapper = ({
 											className={cn(
 												"h-3.5 w-3.5 transition-colors",
 												folder === "needs_approval"
-													? "text-[#677E64]"
-													: "text-amber-500 opacity-90 group-hover:text-[#677E64] group-hover:opacity-100",
+													? "text-[var(--color-primary-base)]"
+													: "text-amber-500 opacity-90 group-hover:text-[var(--color-primary-base)] group-hover:opacity-100",
 											)}
 										/>
 										<span>Needs your okay</span>
@@ -462,11 +462,11 @@ export const AgentInboxLayoutWrapper = ({
 						}
 						onPointerLeave={() => setHoveredEl(undefined)}
 						onClick={() => router.push("/agent-inbox")}
-						className="group relative z-10 flex w-full items-center gap-2 rounded-lg px-3 py-2 font-medium text-text-sub-600 text-xs transition-colors hover:text-[#677E64] dark:text-neutral-400 dark:hover:text-[#677E64]"
+						className="group relative z-10 flex w-full items-center gap-2 rounded-lg px-3 py-2 font-medium text-text-sub-600 text-xs transition-colors hover:text-[var(--color-primary-base)] dark:text-neutral-400 dark:hover:text-[var(--color-primary-base)]"
 					>
 						<Icon
 							name="arrow-left"
-							className="h-3.5 w-3.5 text-text-sub-600 opacity-70 transition-colors group-hover:text-[#677E64] group-hover:opacity-100"
+							className="h-3.5 w-3.5 text-text-sub-600 opacity-70 transition-colors group-hover:text-[var(--color-primary-base)] group-hover:opacity-100"
 						/>
 						<span>Exit to dashboard</span>
 					</button>
@@ -475,7 +475,7 @@ export const AgentInboxLayoutWrapper = ({
 					<AnimatedHoverBackground
 						rect={rect}
 						tabElement={currentEl}
-						className="!bg-[#677E64]/10"
+						className="!bg-[var(--color-primary-base)]/10"
 					/>
 				</aside>
 

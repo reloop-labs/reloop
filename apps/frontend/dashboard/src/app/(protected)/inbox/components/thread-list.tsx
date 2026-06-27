@@ -16,10 +16,10 @@ const getActorInfo = (
 ): { gutterColor: string; tag: string | null; tagStyle: string } => {
 	if (thread.direction === "outbound") {
 		return {
-			gutterColor: "bg-[#677E64]",
+			gutterColor: "bg-[var(--color-primary-base)]",
 			tag: "via you",
 			tagStyle:
-				"bg-[#677E64]/10 text-[#677E64] dark:text-[#677E64]",
+				"bg-[var(--color-primary-base)]/10 text-[var(--color-primary-base)] dark:text-[var(--color-primary-base)]",
 		};
 	}
 	switch (thread.status) {
@@ -164,16 +164,16 @@ export const ThreadList = ({
 								key={thread.id}
 								onClick={() => onSelect(thread.id)}
 								className={cn(
-									"group/card relative flex cursor-pointer flex-col gap-1 py-3.5 pr-4 pl-7 text-left transition-all duration-200",
+									"group/card relative flex cursor-pointer flex-col gap-1 py-3.5 pr-4 pl-7 text-left transition-all duration-200 border-l-[3px]",
 									isSelected
-										? "bg-[#677E64]/10 dark:bg-[#677E64]/20"
-										: "bg-transparent hover:bg-neutral-50/50 dark:hover:bg-white/[0.01]",
+										? "bg-[var(--color-primary-base)]/10 border-[var(--color-primary-base)] dark:bg-[var(--color-primary-base)]/20"
+										: "bg-transparent border-transparent hover:bg-neutral-50/50 dark:hover:bg-white/[0.01]",
 								)}
 							>
 								{/* Actor status vertical pill - centered, rounded */}
 								<div
 									className={cn(
-										"absolute top-3.5 bottom-3.5 left-3 w-[3.5px] rounded-full",
+										"absolute top-3.5 bottom-3.5 left-[14px] w-[3.5px] rounded-full",
 										actorInfo.gutterColor,
 									)}
 								/>
