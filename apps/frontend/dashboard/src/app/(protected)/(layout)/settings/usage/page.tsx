@@ -146,7 +146,7 @@ const UsagePage = () => {
 					) : (
 						<span
 							className={cn(
-								"inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 font-medium text-[10px] text-white",
+								"inline-flex shrink-0 items-center rounded-full border px-2.5 py-0.5 font-medium text-[10px]",
 								getStatusColor(statusLabel),
 							)}
 						>
