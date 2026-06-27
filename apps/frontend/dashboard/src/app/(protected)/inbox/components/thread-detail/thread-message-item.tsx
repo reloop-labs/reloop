@@ -102,9 +102,9 @@ export const ThreadMessageItem = ({
 
 	const accentColor = isApproval
 		? ACCENT_COLORS.approval
-		: isAgent
-			? ACCENT_COLORS.inbound
-			: ACCENT_COLORS.outbound;
+		: isOutbound
+			? ACCENT_COLORS.outbound
+			: ACCENT_COLORS.inbound;
 
 	// ── Body content (translated or original) ─────────────────────────────────
 	const email = msg.email;
