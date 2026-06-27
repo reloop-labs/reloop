@@ -1,205 +1,104 @@
 ---
 title: Auth
 icon: key-new
-description: Learn how to set up, configure, and run the Reloop authentication service locally.
+description: Set up, configure, and run the Reloop auth microservice locally.
 ---
 
-The **Auth Service** is a high-performance **ElysiaJS** microservice that orchestrates user registrations, logins, organization structures, and session authorization across the platform using **Better Auth**.
-
-<Callout type="info" title="Prerequisite First">
-  Before setting up the Auth Service individually, ensure you have completed the base [Local Development Setup](/setup) (installed Bun, configured the hosts file, and started the Docker container suite).
+<Callout type="info" title="Complete Base Setup First" variant="note">
+  Ensure you've finished the [Local Development Setup](/docs/setup) — before proceeding.
 </Callout>
 
----
+
+## Service Overview
+
+User signup, login, sessions, organizations, and workspace membership via **Better Auth**.
+
+| Property | Value |
+| :--- | :--- |
+| **Directory** | `apps/backend/auth` |
+| **Port** | `8000` |
+| **Local URL** | [https://local.reloop.sh/api/auth](https://local.reloop.sh/api/auth) |
+| **Swagger UI** | [https://local.reloop.sh/api/auth/openapi](https://local.reloop.sh/api/auth/openapi) |
+| **Stack** | `ElysiaJS` `Better Auth` `PostgreSQL` `Redis` `NATS` |
+
 
 ## Quick Start
 
-Since dependencies are managed globally at the monorepo root, you can boot the Auth Service development server instantly:
+<Callout icon="union" variant="info">
+Run from the monorepo root (requires Docker Postgres + Redis):
+</Callout>
 
-<CodeGroup>
-  <CodeBlock title="From Monorepo Root (Recommended)">
-  ```bash
-  # Start the dev server with hot reloading
-  bun be:auth:dev
-  ```
-  </CodeBlock>
+```bash
+bun be:auth:dev
+```
 
-  <CodeBlock title="From the Service Folder">
-  ```bash
-  cd apps/backend/auth
-  bun dev
-  ```
-  </CodeBlock>
-</CodeGroup>
+The service starts with hot reloading on port `8000`.
 
-Once running, the Auth Service API will be listening locally on port `8000`. You can test it via Caddy at [https://local.reloop.sh/api/auth](https://local.reloop.sh/api/auth) 🎉
+<Callout type="warn" title="Use the unified domain">
+  Access the dashboard at [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard), not `localhost:3001`. Session cookies are scoped to `local.reloop.sh`.
+</Callout>
 
----
-
-## Service Information
-
-* **Directory Location:** `apps/backend/auth/`
-* **Local Listening Port:** `8000` (ElysiaJS gateway)
-* **Unified Access Route:** [https://local.reloop.sh/api/auth](https://local.reloop.sh/api/auth)
-* **Primary Tech Stack:** ElysiaJS, Better Auth, PostgreSQL, Redis, NATS
-* **Dependencies:** Requires PostgreSQL (database) and Redis (caches & rate limits) to be healthy in Docker.
-
----
 
 ## Environment Configuration
 
-The Auth Service reads its environment variables from `apps/backend/auth/.env`. If you ran `bun env:setup` at the root, your `.env` has already been populated with the default configurations:
+Variables live in `apps/backend/auth/.env`. Running `bun env:setup` from the root auto-populates this file.
 
 ```bash
-# Database Configuration
+# Database & Cache
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
 
-# Better Auth Configuration
+# Better Auth
 BETTER_AUTH_SECRET=tENkVU4GrhckuRw4Bcfh93EWgXOFcszn
 BASE_URL="https://local.reloop.sh"
-NODE_ENV=development
 PORT=8000
-NODE_TLS_REJECT_UNAUTHORIZED=0
+NODE_ENV=development
 
-# Messaging Bus Broker
+# Event Bus
 NATS_URL=nats://localhost:4222
 
-# OAuth Credentials (Optional)
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-GITHUB_CLIENT_ID=your-github-client-id
-GITHUB_CLIENT_SECRET=your-github-client-secret
+# Local dev helpers
+DEFAULT_OTP=888888
+DISABLE_SIGNUP=false
 
-# Initial Self-Host Configuration
-DEFAULT_OTP=888888   # Default pass code for first login
-DISABLE_SIGNUP=false # Set to true to disable signups after creating your admin account
+# OAuth (optional)
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
 ```
 
 ### Reference Table
 
-| Variable | Required | Default Value | Description |
+| Variable | Required | Default | Notes |
 | :--- | :--- | :--- | :--- |
-| `PG_URL` | **YES** | `postgresql://...` | PostgreSQL database connection string. |
-| `REDIS_URL` | **YES** | `redis://...` | Redis cache and session management connection URL. |
-| `BETTER_AUTH_SECRET` | **YES** | `string` | Encryption key for securing active user sessions. |
-| `BASE_URL` | **YES** | `https://local.reloop.sh` | Main application domain (used for cookie setting). |
-| `PORT` | **YES** | `8000` | Local port number the Elysia app listens to on the host. |
-| `NATS_URL` | **YES** | `nats://localhost:4222` | Connection URL for NATS event broker messaging. |
-| `DEFAULT_OTP` | **NO** | `888888` | Development OTP bypass for initial account setup. |
-| `DISABLE_SIGNUP` | **NO** | `false` | Restricts new user signups when set to `true`. |
+| `PG_URL` | **YES** | `postgresql://...` | Shared Postgres from Docker |
+| `REDIS_URL` | **YES** | `redis://...` | Sessions and rate limits |
+| `BETTER_AUTH_SECRET` | **YES** | — | Session encryption key |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` | Must match Caddy domain for cookies |
+| `PORT` | **YES** | `8000` | Host port |
+| `NATS_URL` | **YES** | `nats://localhost:4222` | Event bus |
+| `DEFAULT_OTP` | **NO** | `888888` | Dev OTP bypass for first login |
+| `DISABLE_SIGNUP` | **NO** | `false` | Set `true` after creating admin account |
 
----
 
 ## Development Commands
 
-All workspace operations should be executed from the **monorepo root directory** using Turborepo filters:
+All commands run from the **monorepo root**.
 
-| Command | Action | Scope |
-| :--- | :--- | :--- |
-| `bun be:auth:dev` | Start the Auth dev server with hot reloading | Development |
-| `bun run --filter=auth build` | Build the Auth service for production | Production |
-| `bun run --filter=auth start` | Run the compiled production build locally | Production |
-| `bun run --filter=auth check-types` | Verify TypeScript type-safety | Code Quality |
-| `bun run --filter=auth auth:generate` | Regenerate the Drizzle DB auth schemas | Better Auth |
+| Command | Description |
+| :--- | :--- |
+| `bun be:auth:dev` | Start dev server with hot reloading |
+| `bun run --filter=auth build` | Compile production bundle |
+| `bun run --filter=auth start` | Run compiled production build |
+| `bun run --filter=auth check-types` | TypeScript type-check |
 
----
 
-## Database Schema & Relationships
+## Architecture
 
-The relational authentication and tenancy schemas are defined in [packages/db/src/schema/auth.ts](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts). Reloop manages access controls, workspaces, and multi-tenant hierarchies using seven interconnected tables.
-
-### Enums
-
-| Enum | Values | Description |
-| :--- | :--- | :--- |
-| `organization_status` | `active` · `suspended` · `deleted` | Reloop workspace subscription and operations state |
-
----
-
-### `user` Table
-
-Stores core profile details, role hierarchies, ban/moderation metadata, and active developer modes.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | — | Primary Key |
-| `name` | `text` | — | User's full display name |
-| `email` | `text` | — | Unique, authenticated user email |
-| `emailVerified` | `boolean` | `false` | Email validation checkpoint |
-| `image` | `text` | `null` | Profile avatar URL |
-| `role` | `text` | `null` | Global role mapping |
-| `banned` | `boolean` | `false` | System ban status flag |
-| `banReason` | `text` | `null` | Moderation explanation context |
-| `banExpires` | `timestamp` | `null` | Banning duration constraint |
-| `activeOrganizationId` | `text` | `null` | Cached workspace context identifier |
-| `mode` | `text` | `dev` | Sandbox/Developer context toggler (`dev` or `prod`) |
-
----
-
-### `organization` Table
-
-Represents a workspace or tenant. Organizations own API keys, domains, campaigns, and contacts.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | — | Primary Key |
-| `name` | `text` | — | Workspace/Company name |
-| `slug` | `text` | — | Unique routing segment (e.g. `acme-corp`) |
-| `logo` | `text` | `null` | Organization logo URL |
-| `metadata` | `text` | `null` | Dynamic serialized attributes |
-| `billingEmail` | `text` | `null` | Target inbox for Stripe receipting |
-| `billingName` | `text` | `null` | Company name on billing profiles |
-| `externalCustomerId` | `text` | `null` | Unique Stripe customer identifier |
-| `status` | `organization_status` | `active` | Workspace lifecycle operational state |
-
----
-
-### `member` Table
-
-Maps users to organizations, granting role-based access to specific workspace entities.
-
-| Column | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `id` | `text` | — | Primary Key |
-| `organizationId` | `text` | — | Foreign Key &rarr; [organization.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
-| `userId` | `text` | — | Foreign Key &rarr; [user.id](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) |
-| `role` | `text` | `member` | Workspace permission tier (`owner` · `admin` · `member`) |
-
----
-
-### Other Better Auth Tables
-
-* **`account`**: Connects login methods (OAuth credentials, passwords) to [user](file:///Users/pranavpatel/Downloads/reloop/packages/db/src/schema/auth.ts) accounts.
-* **`verification`**: Holds secure confirmation codes for email validation and password resets.
-* **`jwks`**: Manages secure cryptographic JSON Web Key Sets for signing/validating stateless JWT tokens.
-
----
-
-## Interactive API Docs (Swagger)
-
-ElysiaJS generates beautiful, interactive Swagger documentation directly from your API routes. To test endpoints, inspect schemas, and query API hooks:
-
-1. Open your browser and navigate to the interactive Swagger playground at [https://local.reloop.sh/api/auth/openapi](https://local.reloop.sh/api/auth/openapi) (or [http://localhost:8000/api/auth/openapi](http://localhost:8000/api/auth/openapi) directly).
-2. Use the interactive Swagger playground to execute authentications, fetch session information, and inspect endpoints.
-
----
-
-## Troubleshooting
-
-### PostgreSQL / Redis Connection Issues
-* **Symptom:** Auth server prints database connection timeouts or Redis connection failures.
-* **Resolution:** Ensure the global Docker Compose containers are fully operational:
-  ```bash
-  # Check container status
-  docker ps
-  
-  # Boot them up if stopped
-  bun docker:up
-  ```
-
-### Key and Cookie Share Issues
-* **Symptom:** User cannot log in, or session cookies are rejected across subpages.
-* **Resolution:** 
-  1. Confirm your hosts file maps `local.reloop.sh` correctly (see [hosts setup](/setup#step-2-configure-local-domain-hosts-file)).
-  2. Ensure you are accessing the user dashboard via `https://local.reloop.sh/dashboard` instead of `http://localhost:3001` (browsers block secure cookie sharing across distinct localhost ports).
+| Layer | Detail |
+| :--- | :--- |
+| **Sessions** | Better Auth manages login, OAuth, and cookie-based sessions via Redis + Postgres. |
+| **Multi-tenancy** | Users belong to organizations through the `member` table (`packages/db/src/schema/auth.ts`). |
+| **Events** | Auth lifecycle events published to NATS under `auth.*`. |
+| **First login** | Use OTP `888888` locally when `DEFAULT_OTP` is set. |
