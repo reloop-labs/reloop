@@ -19,7 +19,7 @@ const getActorInfo = (
 			gutterColor: "bg-emerald-500 dark:bg-emerald-600",
 			tag: "via you",
 			tagStyle:
-				"bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800/40",
+				"bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
 		};
 	}
 	switch (thread.status) {
@@ -28,7 +28,7 @@ const getActorInfo = (
 				gutterColor: "bg-amber-500 dark:bg-amber-600",
 				tag: "needs you",
 				tagStyle:
-					"bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800/40",
+					"bg-amber-500/10 text-amber-700 dark:text-amber-400",
 			};
 		case "handled":
 		case "parsing":
@@ -38,7 +38,7 @@ const getActorInfo = (
 				gutterColor: "bg-blue-500 dark:bg-blue-600",
 				tag: "via agent",
 				tagStyle:
-					"bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-800/40",
+					"bg-blue-500/10 text-blue-700 dark:text-blue-400",
 			};
 	}
 };
@@ -164,16 +164,16 @@ export const ThreadList = ({
 								key={thread.id}
 								onClick={() => onSelect(thread.id)}
 								className={cn(
-									"group/card relative flex cursor-pointer flex-col gap-1 border-l-[3px] py-3.5 pr-4 pl-7 text-left transition-all duration-200",
+									"group/card relative flex cursor-pointer flex-col gap-1 py-3.5 pr-4 pl-7 text-left transition-all duration-200",
 									isSelected
-										? "border-primary-base bg-[#FCF5EE] dark:bg-amber-950/20"
-										: "border-transparent bg-transparent hover:bg-[#FCF5EE]/40 dark:bg-transparent dark:hover:bg-white/[0.01]",
+										? "bg-[#FCF5EE] dark:bg-amber-950/20"
+										: "bg-transparent hover:bg-neutral-50/50 dark:hover:bg-white/[0.01]",
 								)}
 							>
 								{/* Actor status vertical pill - centered, rounded */}
 								<div
 									className={cn(
-										"absolute top-3 bottom-3 left-3 w-1 rounded-full",
+										"absolute top-3.5 bottom-3.5 left-3 w-[3.5px] rounded-full",
 										actorInfo.gutterColor,
 									)}
 								/>
@@ -183,12 +183,7 @@ export const ThreadList = ({
 									{/* Sender & Time row */}
 									<div className="flex items-center justify-between gap-2">
 										<span
-											className={cn(
-												"truncate text-xs tracking-tight",
-												isUnread
-													? "font-semibold text-text-strong-950 dark:text-white"
-													: "font-medium text-text-sub-600 dark:text-neutral-400",
-											)}
+											className="truncate text-sm font-semibold text-text-strong-950 dark:text-white"
 										>
 											{thread.from.name
 												? `${thread.from.name}${thread.direction === "outbound" ? ", You" : ""}`
@@ -200,7 +195,7 @@ export const ThreadList = ({
 												{isUnread && (
 													<span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary-base" />
 												)}
-												<span className="font-medium text-[10px] text-text-soft-400 tabular-nums dark:text-neutral-500">
+												<span className="font-medium text-xs text-text-soft-400 tabular-nums dark:text-neutral-500">
 													{formatReceivedAt(thread.receivedAt, isFirstToday)}
 												</span>
 											</div>
@@ -223,19 +218,12 @@ export const ThreadList = ({
 									</div>
 
 									{/* Subject */}
-									<div
-										className={cn(
-											"truncate text-xs",
-											isUnread
-												? "font-semibold text-text-strong-950 dark:text-white"
-												: "font-medium text-text-sub-600 dark:text-neutral-300",
-										)}
-									>
+									<div className="truncate text-xs font-semibold text-text-strong-950 dark:text-white">
 										{thread.subject}
 									</div>
 
 									{/* Snippet */}
-									<div className="truncate text-[11px] text-text-soft-400 leading-relaxed dark:text-neutral-400">
+									<div className="truncate text-xs text-text-sub-600 leading-relaxed dark:text-neutral-400">
 										{thread.preview}
 									</div>
 
@@ -244,7 +232,7 @@ export const ThreadList = ({
 										<div className="mt-1 flex items-center gap-1.5">
 											<span
 												className={cn(
-													"inline-flex items-center rounded px-1.5 py-0.5 font-medium font-mono text-[9px] leading-none tracking-wide",
+													"inline-flex items-center rounded-[3px] px-2 py-[1px] font-medium text-[10px] leading-none normal-case tracking-normal",
 													actorInfo.tagStyle,
 												)}
 											>
