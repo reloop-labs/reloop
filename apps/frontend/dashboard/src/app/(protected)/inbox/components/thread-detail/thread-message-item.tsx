@@ -133,7 +133,7 @@ export const ThreadMessageItem = ({
 		<div className="relative overflow-hidden rounded-xl border border-stroke-inbox bg-white dark:border-stroke-soft-100/10 dark:bg-neutral-900">
 			{/* Coloured left accent bar */}
 			<div
-				className="absolute top-3.5 bottom-3.5 left-3 w-1 rounded-full"
+				className="absolute top-0 bottom-0 left-0 w-1"
 				style={{ backgroundColor: accentColor }}
 			/>
 
@@ -173,9 +173,6 @@ export const ThreadMessageItem = ({
 
 					{/* Indented Content Column */}
 					<div className="flex flex-col gap-4 pr-5 pb-4 pl-16">
-						{/* Draft held banner */}
-						{isApproval && <MessageDraftBanner messageAt={msg.messageAt} />}
-
 						{/* Body */}
 						<MessageBody
 							bodyHtml={bodyHtml}
@@ -183,6 +180,9 @@ export const ThreadMessageItem = ({
 							isTranslated={isTranslated}
 							targetLanguage={targetLanguage}
 						/>
+
+						{/* Draft held banner */}
+						{isApproval && <MessageDraftBanner messageAt={msg.messageAt} />}
 
 						{/* Sent status banner */}
 						{isOutbound && !isApproval && (

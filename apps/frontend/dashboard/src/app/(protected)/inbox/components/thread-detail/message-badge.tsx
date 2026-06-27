@@ -46,8 +46,8 @@ export const getBadgeVariant = (
 	isOutbound: boolean,
 	isAgent: boolean,
 ): BadgeVariant => {
-	if (isApproval) return "approval";
-	if (isOutbound) return "you";
 	if (isAgent) return "agent";
+	if (isOutbound) return "you";
+	if (isApproval) return "approval";
 	return null;
 };

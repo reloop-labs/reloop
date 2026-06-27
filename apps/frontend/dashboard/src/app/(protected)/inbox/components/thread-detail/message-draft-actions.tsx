@@ -18,7 +18,7 @@ export const MessageDraftActions = ({
 	onForward,
 }: MessageDraftActionsProps) => {
 	return (
-		<div className="mb-1 flex w-full items-center gap-2.5 border-stroke-inbox/60 border-t pt-4 dark:border-stroke-soft-100/10">
+		<div className="mb-1 flex w-full items-center gap-2.5 pt-1">
 			{/* Primary: Approve & send */}
 			<button
 				type="button"
@@ -35,7 +35,7 @@ export const MessageDraftActions = ({
 				onClick={onEditReply}
 				className="flex items-center gap-2 rounded-xl border border-stroke-inbox bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
 			>
-				<Icon name="edit" className="h-3.5 w-3.5" />
+				<Icon name="reply" className="h-3.5 w-3.5" />
 				<span>Edit reply</span>
 			</button>
 

@@ -28,7 +28,9 @@ export const MessageHeaderCollapsed = ({
 }: MessageHeaderCollapsedProps) => {
 	const senderName = isOutbound
 		? "You"
-		: msg.fromName || (msg.fromEmail ? msg.fromEmail.split("@")[0] : "Unknown");
+		: isApproval
+			? "Agent"
+			: msg.fromName || (msg.fromEmail ? msg.fromEmail.split("@")[0] : "Unknown");
 
 	const snippet =
 		msg.email?.textBody?.substring(0, 100).replace(/\s+/g, " ") || "";
@@ -44,6 +46,7 @@ export const MessageHeaderCollapsed = ({
 					fromEmail={msg.fromEmail || ""}
 					fromName={msg.fromName ?? null}
 					isOutbound={isOutbound}
+					isAgent={isAgent}
 					size="md"
 				/>
 				<div className="flex min-w-0 flex-col gap-0.5 pt-0.5">

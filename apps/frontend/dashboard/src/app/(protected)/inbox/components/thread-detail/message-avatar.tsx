@@ -11,6 +11,7 @@ interface MessageAvatarProps {
 	fromEmail: string;
 	fromName: string | null;
 	isOutbound: boolean;
+	isAgent?: boolean;
 	size?: "sm" | "md";
 }
 
@@ -22,6 +23,7 @@ export const MessageAvatar = ({
 	fromEmail,
 	fromName,
 	isOutbound,
+	isAgent,
 	size = "md",
 }: MessageAvatarProps) => {
 	const dim = size === "sm" ? "28" : "32";
@@ -31,15 +33,19 @@ export const MessageAvatar = ({
 			<Avatar.Image asChild>
 				<div
 					className={cn(
-						"flex h-full w-full items-center justify-center rounded-full font-semibold text-[11px] text-white uppercase tracking-wide shadow-sm",
-						isOutbound
-							? "bg-emerald-600"
-							: getAvatarGradient(fromEmail || "default"),
+						"flex h-full w-full items-center justify-center rounded-full font-semibold text-[11px] uppercase tracking-wide shadow-sm",
+						isAgent
+							? "bg-[#dbeafe] text-blue-700 font-bold dark:bg-blue-900/40 dark:text-blue-300"
+							: isOutbound
+								? "bg-emerald-600 text-white"
+								: `${getAvatarGradient(fromEmail || "default")} text-white`,
 					)}
 				>
-					{isOutbound
-						? "ME"
-						: getAvatarInitial(fromName ?? null, fromEmail || "U")}
+					{isAgent
+						? "AG"
+						: isOutbound
+							? "ME"
+							: getAvatarInitial(fromName ?? null, fromEmail || "U")}
 				</div>
 			</Avatar.Image>
 		</Avatar.Root>
