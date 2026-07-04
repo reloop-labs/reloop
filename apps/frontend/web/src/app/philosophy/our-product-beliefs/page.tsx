@@ -1,5 +1,39 @@
 import * as Button from "@reloop/ui/button";
+import { getSiteUrl } from "@reloop/web/lib/site";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+const pagePath = "/philosophy/our-product-beliefs";
+const pageUrl = `${getSiteUrl()}${pagePath}`;
+
+export const metadata: Metadata = {
+	title: "Our Product Beliefs | Reloop",
+	description:
+		"The principles that guide every product decision at Reloop — from feature design to user experience. Learn what we believe about how email software should work.",
+	keywords: [
+		"product philosophy",
+		"email product design",
+		"Reloop product beliefs",
+		"open source product principles",
+		"developer-first product",
+		"email platform values",
+	],
+	alternates: { canonical: pageUrl },
+	openGraph: {
+		title: "Our Product Beliefs | Reloop",
+		description:
+			"The principles that guide every product decision at Reloop — from feature design to user experience.",
+		type: "website",
+		url: pageUrl,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Our Product Beliefs | Reloop",
+		description:
+			"The principles that guide every product decision at Reloop — from feature design to user experience.",
+	},
+};
 
 const OurProductBeliefsPage = () => {
 	return (

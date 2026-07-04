@@ -1,16 +1,36 @@
 import * as Button from "@reloop/ui/button";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
+
+const pageUrl = `${getSiteUrl()}/resources/glossary`;
 
 export const metadata: Metadata = {
 	title: "Email Glossary | Reloop",
 	description:
 		"Comprehensive glossary of email marketing and infrastructure terms. Learn about deliverability, authentication, analytics, and technical email concepts.",
+	keywords: [
+		"email glossary",
+		"email marketing terms",
+		"email deliverability glossary",
+		"SPF DKIM DMARC explained",
+		"email infrastructure terminology",
+		"email authentication terms",
+	],
+	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "Email Glossary | Reloop",
 		description:
-			"Comprehensive glossary of email marketing and infrastructure terms. Learn about deliverability, authentication, analytics, and technical email concepts.",
+			"Comprehensive glossary of email marketing and infrastructure terms.",
 		type: "website",
+		url: pageUrl,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Email Glossary | Reloop",
+		description:
+			"Comprehensive glossary of email marketing and infrastructure terms.",
 	},
 };
 

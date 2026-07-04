@@ -3,18 +3,37 @@ import {
 	MarketingPageShell,
 	PageSection,
 } from "@reloop/web/components/page-shell";
-import { socialProfiles } from "@reloop/web/lib/site";
+import { getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
+
+const pageUrl = `${getSiteUrl()}/philosophy/why-reloop`;
 
 export const metadata: Metadata = {
 	title: "Why Reloop | Reloop",
 	description:
 		"Why we built Reloop: open-source, self-hostable email infrastructure that puts developers back in control.",
+	keywords: [
+		"why Reloop",
+		"open source email",
+		"self-hosted email",
+		"email vendor lock-in",
+		"email infrastructure alternative",
+		"transparent email platform",
+	],
+	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "Why Reloop | Reloop",
 		description:
 			"Why we built Reloop: open-source, self-hostable email infrastructure that puts developers back in control.",
 		type: "website",
+		url: pageUrl,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Why Reloop | Reloop",
+		description:
+			"Open-source, self-hostable email infrastructure that puts developers back in control.",
 	},
 };
 

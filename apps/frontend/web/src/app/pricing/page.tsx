@@ -15,6 +15,15 @@ export const metadata: Metadata = {
 	title: "Pricing | Reloop",
 	description:
 		"Simple, transparent email pricing. Start free with 3,000 emails per month. Upgrade to Essentials or Enterprise—hosted or self-hosted.",
+	keywords: [
+		"email pricing",
+		"email API pricing",
+		"free email API",
+		"email service pricing",
+		"affordable email platform",
+		"open source email pricing",
+		"self-hosted email cost",
+	],
 	openGraph: {
 		title: "Pricing | Reloop",
 		description:
@@ -22,6 +31,12 @@ export const metadata: Metadata = {
 		type: "website",
 		url: pricingPageUrl,
 		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Pricing | Reloop",
+		description:
+			"Simple, transparent email pricing. Start free with 3,000 emails per month.",
 	},
 	alternates: {
 		canonical: pricingPageUrl,

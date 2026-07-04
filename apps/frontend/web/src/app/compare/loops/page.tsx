@@ -13,12 +13,25 @@ export const metadata: Metadata = {
 	title: "Reloop vs Loops | Email Provider Comparison",
 	description:
 		"Reloop vs Loops for SaaS product email, lifecycle campaigns, transactional API, and avoiding two-vendor email stacks.",
+	keywords: [
+		"Reloop vs Loops",
+		"Loops alternative",
+		"SaaS email comparison",
+		"product email platform",
+		"lifecycle email comparison",
+	],
 	openGraph: {
 		title: "Reloop vs Loops",
 		description: "Product email for SaaS—hosted UI vs open developer platform.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Reloop vs Loops | Email Provider Comparison",
+		description:
+			"SaaS product email, lifecycle campaigns, transactional API, and avoiding two-vendor email stacks.",
 	},
 	alternates: { canonical: pageUrl },
 };

@@ -3,19 +3,38 @@ import {
 	MarketingPageShell,
 	PageSection,
 } from "@reloop/web/components/page-shell";
-import { socialProfiles } from "@reloop/web/lib/site";
+import { getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
+
+const pageUrl = `${getSiteUrl()}/philosophy/why-open-source`;
 
 export const metadata: Metadata = {
 	title: "Why Open Source | Reloop",
 	description:
 		"Reloop is Apache 2.0 open source. Transparency, security through visibility, and community-driven development.",
+	keywords: [
+		"open source email",
+		"Apache 2.0 email platform",
+		"transparent email infrastructure",
+		"community-driven email",
+		"self-hostable email",
+		"open source sendgrid alternative",
+	],
+	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "Why Open Source | Reloop",
 		description:
 			"Reloop is Apache 2.0 open source. Transparency, security through visibility, and community-driven development.",
 		type: "website",
+		url: pageUrl,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Why Open Source | Reloop",
+		description:
+			"Apache 2.0 open source. Transparency, security through visibility, and community-driven development.",
 	},
 };
 

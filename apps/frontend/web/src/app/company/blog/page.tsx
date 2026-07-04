@@ -3,19 +3,37 @@ import {
 	MarketingPageShell,
 	PageSection,
 } from "@reloop/web/components/page-shell";
-import { socialProfiles } from "@reloop/web/lib/site";
+import { getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
+
+const pageUrl = `${getSiteUrl()}/company/blog`;
 
 export const metadata: Metadata = {
 	title: "Blog | Reloop",
 	description:
 		"Updates, release notes, and engineering notes from Reloop Labs. Follow development on GitHub and Discord.",
+	keywords: [
+		"Reloop blog",
+		"email infrastructure updates",
+		"Reloop release notes",
+		"open source email news",
+		"email platform changelog",
+	],
+	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "Blog | Reloop",
 		description:
 			"Updates, release notes, and engineering notes from Reloop Labs.",
 		type: "website",
+		url: pageUrl,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Blog | Reloop",
+		description:
+			"Updates, release notes, and engineering notes from Reloop Labs.",
 	},
 };
 

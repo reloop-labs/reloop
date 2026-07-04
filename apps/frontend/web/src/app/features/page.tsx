@@ -5,17 +5,39 @@ import {
 	PageSection,
 	SectionHeading,
 } from "@reloop/web/components/page-shell";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
+
+const pageUrl = `${getSiteUrl()}/features`;
 
 export const metadata: Metadata = {
 	title: "Features | Reloop",
 	description:
 		"Explore Reloop features—campaigns, transactional email, SMTP, analytics, deliverability, and developer tools.",
+	keywords: [
+		"email infrastructure features",
+		"email API features",
+		"email campaigns",
+		"transactional email",
+		"SMTP relay",
+		"email analytics",
+		"email deliverability",
+		"open source email platform",
+	],
+	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "Features | Reloop",
 		description: "Explore Reloop email infrastructure features.",
 		type: "website",
+		url: pageUrl,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Features | Reloop",
+		description:
+			"Explore Reloop features—campaigns, transactional email, SMTP, analytics, deliverability, and developer tools.",
 	},
 };
 

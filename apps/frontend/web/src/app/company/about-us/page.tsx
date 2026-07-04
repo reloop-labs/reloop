@@ -3,18 +3,36 @@ import {
 	MarketingPageShell,
 	PageSection,
 } from "@reloop/web/components/page-shell";
-import { contactEmail, socialProfiles } from "@reloop/web/lib/site";
+import { contactEmail, getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
+
+const pageUrl = `${getSiteUrl()}/company/about-us`;
 
 export const metadata: Metadata = {
 	title: "About Us | Reloop",
 	description:
 		"Reloop Labs builds open-source email infrastructure—hosted service or self-host—for developers who want transparency and control.",
+	keywords: [
+		"Reloop Labs",
+		"about Reloop",
+		"open source email company",
+		"email infrastructure team",
+		"developer email platform",
+	],
+	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "About Us | Reloop",
 		description:
 			"Reloop Labs builds open-source email infrastructure—hosted service or self-host—for developers who want transparency and control.",
 		type: "website",
+		url: pageUrl,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "About Us | Reloop",
+		description:
+			"Open-source email infrastructure—hosted or self-host—for developers who want transparency and control.",
 	},
 };
 

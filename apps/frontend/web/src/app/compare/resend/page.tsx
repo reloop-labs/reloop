@@ -15,6 +15,13 @@ export const metadata: Metadata = {
 	title: "Reloop vs Resend | Email Provider Comparison",
 	description:
 		"A practical comparison of Reloop and Resend—developer email APIs, self-hosting, campaigns, pricing, and when teams switch.",
+	keywords: [
+		"Reloop vs Resend",
+		"Resend alternative",
+		"email API comparison",
+		"open source Resend alternative",
+		"developer email API",
+	],
 	openGraph: {
 		title: "Reloop vs Resend",
 		description:
@@ -22,6 +29,12 @@ export const metadata: Metadata = {
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Reloop vs Resend | Email Provider Comparison",
+		description:
+			"Developer email APIs, self-hosting, campaigns, pricing, and when teams switch.",
 	},
 	alternates: { canonical: pageUrl },
 };

@@ -1,5 +1,39 @@
 import * as Button from "@reloop/ui/button";
+import { getSiteUrl } from "@reloop/web/lib/site";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+const pagePath = "/philosophy/what-we-stand-for";
+const pageUrl = `${getSiteUrl()}${pagePath}`;
+
+export const metadata: Metadata = {
+	title: "What We Stand For | Reloop",
+	description:
+		"Reloop's core values: transparency, developer empowerment, and open-source commitment. These principles guide every decision, feature, and relationship we build.",
+	keywords: [
+		"Reloop values",
+		"open source values",
+		"company principles",
+		"email infrastructure values",
+		"developer empowerment",
+		"transparent software company",
+	],
+	alternates: { canonical: pageUrl },
+	openGraph: {
+		title: "What We Stand For | Reloop",
+		description:
+			"Reloop's core values: transparency, developer empowerment, and open-source commitment.",
+		type: "website",
+		url: pageUrl,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "What We Stand For | Reloop",
+		description:
+			"Reloop's core values: transparency, developer empowerment, and open-source commitment.",
+	},
+};
 
 const WhatWeStandForPage = () => {
 	return (

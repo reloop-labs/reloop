@@ -14,6 +14,13 @@ export const metadata: Metadata = {
 	title: "Reloop vs Mailchimp | Email Provider Comparison",
 	description:
 		"Reloop vs Mailchimp for newsletters, audience pricing, transactional email, and developer-first campaign APIs.",
+	keywords: [
+		"Reloop vs Mailchimp",
+		"Mailchimp alternative",
+		"newsletter platform comparison",
+		"email marketing comparison",
+		"open source Mailchimp alternative",
+	],
 	openGraph: {
 		title: "Reloop vs Mailchimp",
 		description:
@@ -21,6 +28,12 @@ export const metadata: Metadata = {
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Reloop vs Mailchimp | Email Provider Comparison",
+		description:
+			"Newsletters, audience pricing, transactional email, and developer-first campaign APIs.",
 	},
 	alternates: { canonical: pageUrl },
 };

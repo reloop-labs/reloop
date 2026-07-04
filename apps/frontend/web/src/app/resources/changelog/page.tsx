@@ -3,20 +3,38 @@ import {
 	MarketingPageShell,
 	PageSection,
 } from "@reloop/web/components/page-shell";
-import { socialProfiles } from "@reloop/web/lib/site";
+import { getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { ChangelogTimeline } from "./changelog-timeline";
 import { changelogReleases } from "./changelog-utils";
+
+const pageUrl = `${getSiteUrl()}/resources/changelog`;
 
 export const metadata: Metadata = {
 	title: "Changelog | Reloop",
 	description:
 		"What's new in Reloop — product releases from September 2025 onward, organized by planning, design, frontend, backend, and DevOps.",
+	keywords: [
+		"Reloop changelog",
+		"email platform updates",
+		"Reloop releases",
+		"product updates",
+		"open source email changelog",
+	],
+	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "Changelog | Reloop",
 		description:
 			"What's new in Reloop — product releases from September 2025 onward.",
 		type: "website",
+		url: pageUrl,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Changelog | Reloop",
+		description:
+			"What's new in Reloop — product releases from September 2025 onward.",
 	},
 };
 

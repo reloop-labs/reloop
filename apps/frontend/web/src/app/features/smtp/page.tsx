@@ -1,3 +1,4 @@
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import CTA from "./components/cta";
 import Hero from "./components/hero";
@@ -8,11 +9,29 @@ export const metadata: Metadata = {
 	title: "SMTP Relay | Reloop",
 	description:
 		"Send email through Reloop's SMTP relay. Plain-language guide, connection settings, and examples for Nodemailer, Laravel, and more.",
+	keywords: [
+		"SMTP relay",
+		"SMTP email service",
+		"managed SMTP",
+		"Nodemailer SMTP",
+		"Laravel SMTP",
+		"email SMTP server",
+		"open source SMTP relay",
+	],
+	alternates: { canonical: `${getSiteUrl()}/features/smtp` },
 	openGraph: {
 		title: "SMTP Relay | Reloop",
 		description:
 			"Send email through Reloop's SMTP relay. Connection settings and examples for common mailers.",
 		type: "website",
+		url: `${getSiteUrl()}/features/smtp`,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "SMTP Relay | Reloop",
+		description:
+			"Send email through Reloop's SMTP relay. Connection settings and examples for common mailers.",
 	},
 };
 

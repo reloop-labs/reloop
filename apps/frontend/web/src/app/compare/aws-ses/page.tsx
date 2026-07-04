@@ -14,6 +14,13 @@ export const metadata: Metadata = {
 	title: "Reloop vs AWS SES | Email Provider Comparison",
 	description:
 		"Reloop vs Amazon SES: raw cloud email delivery vs a complete platform—TCO, campaigns, dashboards, and self-hosting on AWS.",
+	keywords: [
+		"Reloop vs AWS SES",
+		"Amazon SES alternative",
+		"AWS SES comparison",
+		"SES email platform",
+		"open source AWS SES alternative",
+	],
 	openGraph: {
 		title: "Reloop vs AWS SES",
 		description:
@@ -21,6 +28,12 @@ export const metadata: Metadata = {
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Reloop vs AWS SES | Email Provider Comparison",
+		description:
+			"Raw cloud email delivery vs a complete platform—TCO, campaigns, dashboards, and self-hosting.",
 	},
 	alternates: { canonical: pageUrl },
 };

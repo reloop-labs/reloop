@@ -13,6 +13,13 @@ export const metadata: Metadata = {
 	title: "Reloop vs Postmark | Email Provider Comparison",
 	description:
 		"Reloop vs Postmark for transactional email speed, deliverability reporting, campaigns, and open-source infrastructure.",
+	keywords: [
+		"Reloop vs Postmark",
+		"Postmark alternative",
+		"transactional email comparison",
+		"email deliverability comparison",
+		"open source Postmark alternative",
+	],
 	openGraph: {
 		title: "Reloop vs Postmark",
 		description:
@@ -20,6 +27,12 @@ export const metadata: Metadata = {
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Reloop vs Postmark | Email Provider Comparison",
+		description:
+			"Transactional email speed, deliverability reporting, campaigns, and open-source infrastructure.",
 	},
 	alternates: { canonical: pageUrl },
 };

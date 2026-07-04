@@ -13,12 +13,24 @@ const contactPageUrl = `${siteUrl}/company/contact-us`;
 export const metadata: Metadata = {
 	title: "Contact Us | Reloop",
 	description: "Contact Reloop Labs by email, Discord, or GitHub.",
+	keywords: [
+		"contact Reloop",
+		"Reloop support",
+		"email platform contact",
+		"Reloop Labs email",
+		"open source email support",
+	],
 	openGraph: {
 		title: "Contact Us | Reloop",
 		description: "Contact Reloop Labs by email, Discord, or GitHub.",
 		type: "website",
 		url: contactPageUrl,
 		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Contact Us | Reloop",
+		description: "Contact Reloop Labs by email, Discord, or GitHub.",
 	},
 	alternates: {
 		canonical: contactPageUrl,

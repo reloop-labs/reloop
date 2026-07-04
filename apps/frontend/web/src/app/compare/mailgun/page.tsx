@@ -14,6 +14,13 @@ export const metadata: Metadata = {
 	title: "Reloop vs Mailgun | Email Provider Comparison",
 	description:
 		"How Reloop compares to Mailgun for transactional email, SMTP, inbound parsing, self-hosting, and long-term vendor control.",
+	keywords: [
+		"Reloop vs Mailgun",
+		"Mailgun alternative",
+		"SMTP comparison",
+		"email API comparison",
+		"open source Mailgun alternative",
+	],
 	openGraph: {
 		title: "Reloop vs Mailgun",
 		description:
@@ -21,6 +28,12 @@ export const metadata: Metadata = {
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Reloop vs Mailgun | Email Provider Comparison",
+		description:
+			"Transactional email, SMTP, inbound parsing, self-hosting, and long-term vendor control.",
 	},
 	alternates: { canonical: pageUrl },
 };

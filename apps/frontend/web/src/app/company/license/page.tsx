@@ -3,20 +3,39 @@ import {
 	MarketingPageShell,
 	PageSection,
 } from "@reloop/web/components/page-shell";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { LicenseFaq } from "./components/license-faq";
 import { LicensePermissions } from "./components/license-permissions";
 import { LicenseText } from "./components/license-text";
 
+const pageUrl = `${getSiteUrl()}/company/license`;
+
 export const metadata: Metadata = {
 	title: "License | Reloop",
 	description:
 		"Reloop is licensed under Apache License 2.0 with additional use restrictions from Reloop Labs. Review permitted uses, hosted service, and self-hosting options.",
+	keywords: [
+		"Reloop license",
+		"Apache 2.0 license",
+		"open source email license",
+		"email platform license",
+		"self-hosting license",
+	],
+	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "License | Reloop",
 		description:
 			"Reloop is licensed under Apache License 2.0 with additional use restrictions from Reloop Labs.",
 		type: "website",
+		url: pageUrl,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "License | Reloop",
+		description:
+			"Reloop is licensed under Apache License 2.0 with additional use restrictions.",
 	},
 };
 

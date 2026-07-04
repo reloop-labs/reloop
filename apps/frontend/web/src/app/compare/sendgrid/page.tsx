@@ -13,6 +13,13 @@ export const metadata: Metadata = {
 	title: "Reloop vs SendGrid | Email Provider Comparison",
 	description:
 		"Reloop vs SendGrid for transactional email, marketing campaigns, enterprise scale, and escaping Twilio vendor lock-in.",
+	keywords: [
+		"Reloop vs SendGrid",
+		"SendGrid alternative",
+		"Twilio SendGrid alternative",
+		"email platform comparison",
+		"open source SendGrid",
+	],
 	openGraph: {
 		title: "Reloop vs SendGrid",
 		description:
@@ -20,6 +27,12 @@ export const metadata: Metadata = {
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Reloop vs SendGrid | Email Provider Comparison",
+		description:
+			"Transactional email, marketing campaigns, enterprise scale, and escaping Twilio vendor lock-in.",
 	},
 	alternates: { canonical: pageUrl },
 };

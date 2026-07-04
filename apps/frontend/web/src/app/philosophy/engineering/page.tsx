@@ -1,5 +1,39 @@
 import * as Button from "@reloop/ui/button";
+import { getSiteUrl } from "@reloop/web/lib/site";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+const pagePath = "/philosophy/engineering";
+const pageUrl = `${getSiteUrl()}${pagePath}`;
+
+export const metadata: Metadata = {
+	title: "Engineering Excellence | Reloop",
+	description:
+		"Our technical philosophy emphasizes reliability, performance, and maintainability. Learn how Reloop is built with modern engineering practices at every level of the stack.",
+	keywords: [
+		"engineering philosophy",
+		"email infrastructure architecture",
+		"reliable email delivery",
+		"open source engineering",
+		"Reloop technical stack",
+		"email platform engineering",
+	],
+	alternates: { canonical: pageUrl },
+	openGraph: {
+		title: "Engineering Excellence | Reloop",
+		description:
+			"Our technical philosophy emphasizes reliability, performance, and maintainability at every level of the stack.",
+		type: "website",
+		url: pageUrl,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Engineering Excellence | Reloop",
+		description:
+			"Our technical philosophy emphasizes reliability, performance, and maintainability at every level of the stack.",
+	},
+};
 
 const EngineeringPage = () => {
 	return (

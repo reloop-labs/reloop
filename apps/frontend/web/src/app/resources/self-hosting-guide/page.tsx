@@ -6,16 +6,36 @@ import {
 	PageSection,
 	SectionHeading,
 } from "@reloop/web/components/page-shell";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
+
+const pageUrl = `${getSiteUrl()}/resources/self-hosting-guide`;
 
 export const metadata: Metadata = {
 	title: "Self-Hosting Guide | Reloop",
 	description:
 		"Deploy Reloop on your own infrastructure with Docker Compose, Kubernetes, or bare metal. Full control over your email stack.",
+	keywords: [
+		"self-host email",
+		"self-hosted email server",
+		"deploy email infrastructure",
+		"Docker email server",
+		"Kubernetes email",
+		"open source email self-hosting",
+		"email server setup",
+	],
+	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "Self-Hosting Guide | Reloop",
-		description: "Deploy Reloop on your own infrastructure.",
+		description: "Deploy Reloop on your own infrastructure with Docker Compose, Kubernetes, or bare metal.",
 		type: "website",
+		url: pageUrl,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Self-Hosting Guide | Reloop",
+		description: "Deploy Reloop on your own infrastructure with Docker Compose, Kubernetes, or bare metal.",
 	},
 };
 

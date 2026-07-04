@@ -6,16 +6,34 @@ import {
 	PageSection,
 	SectionHeading,
 } from "@reloop/web/components/page-shell";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
+
+const pageUrl = `${getSiteUrl()}/resources/status`;
 
 export const metadata: Metadata = {
 	title: "System Status | Reloop",
 	description:
 		"Real-time system status and uptime for Reloop email infrastructure. Service health, incident history, and performance metrics.",
+	keywords: [
+		"Reloop status",
+		"email service status",
+		"system uptime",
+		"email infrastructure status",
+		"service health",
+	],
+	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "System Status | Reloop",
-		description: "Real-time system status and uptime for Reloop.",
+		description: "Real-time system status and uptime for Reloop email infrastructure.",
 		type: "website",
+		url: pageUrl,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "System Status | Reloop",
+		description: "Real-time system status and uptime for Reloop email infrastructure.",
 	},
 };
 

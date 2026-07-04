@@ -1,17 +1,34 @@
 import PageLayout from "@reloop/web/components/page-layout";
-import { contactEmail } from "@reloop/web/lib/site";
+import { contactEmail, getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
+
+const pageUrl = `${getSiteUrl()}/company/terms-and-conditions`;
 
 export const metadata: Metadata = {
 	title: "Terms of Service | Reloop",
 	description:
 		"Terms governing use of reloop.sh and the open-source Reloop email infrastructure software from Reloop Labs.",
+	keywords: [
+		"Reloop terms of service",
+		"email platform terms",
+		"terms and conditions",
+		"open source email terms",
+	],
+	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "Terms of Service | Reloop",
 		description:
 			"Terms governing use of reloop.sh and the open-source Reloop email infrastructure software from Reloop Labs.",
 		type: "website",
+		url: pageUrl,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Terms of Service | Reloop",
+		description:
+			"Terms governing use of reloop.sh and the open-source Reloop email infrastructure.",
 	},
 };
 

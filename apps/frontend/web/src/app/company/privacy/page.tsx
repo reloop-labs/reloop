@@ -1,17 +1,34 @@
 import PageLayout from "@reloop/web/components/page-layout";
-import { contactEmail } from "@reloop/web/lib/site";
+import { contactEmail, getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
+
+const pageUrl = `${getSiteUrl()}/company/privacy`;
 
 export const metadata: Metadata = {
 	title: "Privacy Policy | Reloop",
 	description:
 		"How Reloop Labs collects and uses information on reloop.sh and in relation to the open-source Reloop email platform.",
+	keywords: [
+		"Reloop privacy policy",
+		"email platform privacy",
+		"data collection policy",
+		"open source email privacy",
+	],
+	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "Privacy Policy | Reloop",
 		description:
 			"How Reloop Labs collects and uses information on reloop.sh and in relation to the open-source Reloop email platform.",
 		type: "website",
+		url: pageUrl,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Privacy Policy | Reloop",
+		description:
+			"How Reloop Labs collects and uses information on reloop.sh.",
 	},
 };
 

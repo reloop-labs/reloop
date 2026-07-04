@@ -1,16 +1,37 @@
 import * as Button from "@reloop/ui/button";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
+
+const pageUrl = `${getSiteUrl()}/resources/tools`;
 
 export const metadata: Metadata = {
 	title: "Free Email Tools | Reloop",
 	description:
 		"Free email tools and utilities for developers and marketers. Email validators, deliverability testers, template generators, and more to optimize your email campaigns.",
+	keywords: [
+		"free email tools",
+		"email validator tool",
+		"deliverability tester",
+		"email template generator",
+		"SPF checker",
+		"DKIM validator",
+		"email testing tools",
+	],
+	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "Free Email Tools | Reloop",
 		description:
-			"Free email tools and utilities for developers and marketers. Email validators, deliverability testers, template generators, and more to optimize your email campaigns.",
+			"Free email tools and utilities for developers and marketers.",
 		type: "website",
+		url: pageUrl,
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Free Email Tools | Reloop",
+		description:
+			"Free email tools and utilities for developers and marketers.",
 	},
 };
 

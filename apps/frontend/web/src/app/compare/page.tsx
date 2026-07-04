@@ -13,6 +13,15 @@ export const metadata: Metadata = {
 	title: "Compare Reloop | Email Provider Comparisons",
 	description:
 		"Compare Reloop with Resend, SendGrid, Mailgun, AWS SES, Postmark, Loops, and Mailchimp. Open-source, self-hostable email infrastructure.",
+	keywords: [
+		"email provider comparison",
+		"Reloop vs Resend",
+		"Reloop vs SendGrid",
+		"Reloop vs Mailgun",
+		"email API comparison",
+		"best email provider",
+		"open source email comparison",
+	],
 	openGraph: {
 		title: "Compare Reloop | Email Provider Comparisons",
 		description:
@@ -20,6 +29,12 @@ export const metadata: Metadata = {
 		type: "website",
 		url: comparePageUrl,
 		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Compare Reloop | Email Provider Comparisons",
+		description:
+			"Compare Reloop with Resend, SendGrid, Mailgun, AWS SES, Postmark, Loops, and Mailchimp.",
 	},
 	alternates: {
 		canonical: comparePageUrl,

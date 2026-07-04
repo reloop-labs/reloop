@@ -9,6 +9,7 @@ import {
 	PageSection,
 	SectionHeading,
 } from "@reloop/web/components/page-shell";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 
 export type FeatureMarketingSection = {
@@ -70,14 +71,33 @@ export function FeatureMarketingPage({
 export function featurePageMetadata(
 	title: string,
 	description: string,
+	options?: {
+		keywords?: string[];
+		/** Route path, e.g. "/features/webhooks". Auto-generates canonical URL. */
+		path?: string;
+	},
 ): Metadata {
+	const fullTitle = `${title} | Reloop`;
+	const canonicalUrl = options?.path
+		? `${getSiteUrl()}${options.path}`
+		: undefined;
+
 	return {
-		title: `${title} | Reloop`,
+		title: fullTitle,
 		description,
+		keywords: options?.keywords,
+		alternates: canonicalUrl ? { canonical: canonicalUrl } : undefined,
 		openGraph: {
-			title: `${title} | Reloop`,
+			title: fullTitle,
 			description,
 			type: "website",
+			...(canonicalUrl && { url: canonicalUrl }),
+			siteName: "Reloop",
+		},
+		twitter: {
+			card: "summary_large_image",
+			title: fullTitle,
+			description,
 		},
 	};
 }
