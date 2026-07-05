@@ -8,6 +8,8 @@ const config = {
 	serverExternalPackages: ["next-mdx-remote", "next-mdx-remote/rsc"],
 	cacheComponents: true,
 	experimental: {
+		turbopackMemoryEviction: false,
+		partialPrefetching: true,
 		optimizePackageImports: [
 			"lucide-react",
 			"simple-icons",
