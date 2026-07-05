@@ -1,8 +1,7 @@
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
-import Link from "next/link";
-
 import { cacheLife } from "next/cache";
+import Link from "next/link";
 
 async function getYear() {
 	"use cache";

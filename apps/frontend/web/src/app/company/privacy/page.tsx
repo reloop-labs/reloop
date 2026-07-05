@@ -31,8 +31,7 @@ export const metadata: Metadata = {
 	twitter: {
 		card: "summary_large_image",
 		title: "Privacy Policy | Reloop",
-		description:
-			"How Reloop Labs collects and uses information on reloop.sh.",
+		description: "How Reloop Labs collects and uses information on reloop.sh.",
 	},
 };
 

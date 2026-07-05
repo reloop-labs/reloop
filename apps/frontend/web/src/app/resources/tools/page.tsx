@@ -25,8 +25,7 @@ export const metadata: Metadata = {
 	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "Free Email Tools | Reloop",
-		description:
-			"Free email tools and utilities for developers and marketers.",
+		description: "Free email tools and utilities for developers and marketers.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -34,8 +33,7 @@ export const metadata: Metadata = {
 	twitter: {
 		card: "summary_large_image",
 		title: "Free Email Tools | Reloop",
-		description:
-			"Free email tools and utilities for developers and marketers.",
+		description: "Free email tools and utilities for developers and marketers.",
 	},
 };
 

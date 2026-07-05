@@ -14,8 +14,6 @@ import {
 	siRust,
 } from "simple-icons";
 
-
-
 function getFontBuffer(fontName: string): ArrayBuffer | null {
 	const paths = [
 		path.join(process.cwd(), "public/font/openRunde", fontName),

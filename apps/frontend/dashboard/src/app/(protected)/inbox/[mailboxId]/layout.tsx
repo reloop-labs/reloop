@@ -30,11 +30,21 @@ export default function MailboxLayout({
 	}, [pathname, mailboxId]);
 
 	if (isLoadingMailboxes) {
-		return <AgentInboxSkeleton />;
+		return (
+			<>
+				<AgentInboxSkeleton />
+				<div style={{ display: "none" }}>{children}</div>
+			</>
+		);
 	}
 
 	if (!mailbox) {
-		return <AgentMailboxNotFound />;
+		return (
+			<>
+				<AgentMailboxNotFound />
+				<div style={{ display: "none" }}>{children}</div>
+			</>
+		);
 	}
 
 	return (

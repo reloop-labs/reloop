@@ -29,7 +29,8 @@ export const metadata: Metadata = {
 	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "System Status | Reloop",
-		description: "Real-time system status and uptime for Reloop email infrastructure.",
+		description:
+			"Real-time system status and uptime for Reloop email infrastructure.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -37,7 +38,8 @@ export const metadata: Metadata = {
 	twitter: {
 		card: "summary_large_image",
 		title: "System Status | Reloop",
-		description: "Real-time system status and uptime for Reloop email infrastructure.",
+		description:
+			"Real-time system status and uptime for Reloop email infrastructure.",
 	},
 };
 

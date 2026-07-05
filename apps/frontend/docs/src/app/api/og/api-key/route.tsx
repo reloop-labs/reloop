@@ -3,8 +3,6 @@ import path from "node:path";
 import { ImageResponse } from "next/og";
 import type { NextRequest } from "next/server";
 
-
-
 function getFontBuffer(fontName: string): ArrayBuffer | null {
 	const paths = [
 		path.join(process.cwd(), "public/font/openRunde", fontName),

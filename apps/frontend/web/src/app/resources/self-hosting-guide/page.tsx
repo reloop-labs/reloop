@@ -31,7 +31,8 @@ export const metadata: Metadata = {
 	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "Self-Hosting Guide | Reloop",
-		description: "Deploy Reloop on your own infrastructure with Docker Compose, Kubernetes, or bare metal.",
+		description:
+			"Deploy Reloop on your own infrastructure with Docker Compose, Kubernetes, or bare metal.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -39,7 +40,8 @@ export const metadata: Metadata = {
 	twitter: {
 		card: "summary_large_image",
 		title: "Self-Hosting Guide | Reloop",
-		description: "Deploy Reloop on your own infrastructure with Docker Compose, Kubernetes, or bare metal.",
+		description:
+			"Deploy Reloop on your own infrastructure with Docker Compose, Kubernetes, or bare metal.",
 	},
 };
 
