@@ -10,7 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
 	const staticPages = sitemapRoutes.map((path) => ({
 		url: `${siteUrl}${path === "/" ? "" : path}`,
-		lastModified: new Date(),
+		lastModified: new Date("2026-07-05"),
 		changeFrequency:
 			path === "/resources/changelog"
 				? ("weekly" as const)
@@ -20,7 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
 	const changelogPages = changelogReleases.map((release) => ({
 		url: `${siteUrl}${getChangelogReleasePath(release.version)}`,
-		lastModified: new Date(),
+		lastModified: new Date("2026-07-05"),
 		changeFrequency: "monthly" as const,
 		priority: 0.6,
 	}));

@@ -2,7 +2,16 @@ import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import Link from "next/link";
 
-export default function NotFound() {
+import { cacheLife } from "next/cache";
+
+async function getYear() {
+	"use cache";
+	cacheLife("max");
+	return new Date().getFullYear();
+}
+
+export default async function NotFound() {
+	const year = await getYear();
 	return (
 		<div className="dark relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-black px-6 py-12 selection:bg-white/10">
 			<div className="relative z-10 flex w-full max-w-md flex-col items-center text-center">
@@ -45,7 +54,7 @@ export default function NotFound() {
 
 				{/* Footer Copyright */}
 				<p className="mt-8 font-medium text-white/20 text-xs">
-					&copy; {new Date().getFullYear()} Reloop. All rights reserved.
+					&copy; {year} Reloop. All rights reserved.
 				</p>
 			</div>
 		</div>

@@ -7,6 +7,10 @@ import { CompareOtherLinks } from "../components/compare-other-links";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
 import { ComparisonTable } from "../components/comparison-table";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 const pagePath = "/compare/resend";
 const siteUrl = getSiteUrl();
 const pageUrl = `${siteUrl}${pagePath}`;

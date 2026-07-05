@@ -4,6 +4,10 @@ import IndexCta from "./components/index-cta";
 import IndexHero from "./components/index-hero";
 import LanguagesGrid from "./components/languages-grid";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 const pageUrl = `${getSiteUrl()}/features/languages`;
 
 export const metadata: Metadata = {

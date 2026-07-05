@@ -4,6 +4,10 @@ import {
 } from "@reloop/web/components/feature-marketing-page";
 import { campaignsConfig } from "@reloop/web/lib/feature-marketing-configs";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 export const metadata = featurePageMetadata(
 	"Email Campaigns",
 	"Create, send, and track powerful email campaigns that drive engagement and conversions.",

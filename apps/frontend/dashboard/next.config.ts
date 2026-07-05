@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
 	basePath: "/dashboard",
 	output: "standalone",
 	allowedDevOrigins: ["local.reloop.sh", "*.local.reloop.sh"],
+	cacheComponents: true,
 	async rewrites() {
 		if (process.env.NODE_ENV === "development") {
 			return [];

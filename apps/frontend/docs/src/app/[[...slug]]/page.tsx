@@ -13,6 +13,10 @@ import { getMDXComponents } from "@reloop/fe-docs/mdx-components";
 import { Icon } from "@reloop/ui/icon";
 import { notFound } from "next/navigation";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 function getJsonLd(page: any, canonicalUrl: string) {
 	const siteUrl = "https://reloop.sh";
 	const siteName = "Reloop";
@@ -221,7 +225,7 @@ export async function generateStaticParams() {
 	];
 }
 
-export const dynamic = "force-dynamic";
+
 
 export default async function Page(props: {
 	params: Promise<{ slug?: string[] }>;

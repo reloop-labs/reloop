@@ -14,7 +14,7 @@ import {
 	siRust,
 } from "simple-icons";
 
-export const dynamic = "force-dynamic";
+
 
 function getFontBuffer(fontName: string): ArrayBuffer | null {
 	const paths = [

@@ -6,6 +6,7 @@ const config = {
 	poweredByHeader: false,
 	allowedDevOrigins: ["local.reloop.sh", "*.local.reloop.sh"],
 	serverExternalPackages: ["next-mdx-remote", "next-mdx-remote/rsc"],
+	cacheComponents: true,
 	experimental: {
 		optimizePackageImports: [
 			"lucide-react",

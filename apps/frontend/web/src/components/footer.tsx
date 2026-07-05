@@ -148,9 +148,11 @@ const discordUrl = "https://discord.gg/bHnkBcp7xR";
 export const Footer = () => {
 	const { theme, setTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
+	const [year, setYear] = useState(2026);
 
 	useEffect(() => {
 		setMounted(true);
+		setYear(new Date().getFullYear());
 	}, []);
 
 	return (
@@ -224,7 +226,7 @@ export const Footer = () => {
 				</div>
 				<div className="flex flex-col-reverse items-center justify-between gap-4 py-6 sm:flex-row">
 					<p className="text-[#0a0d12]/36 text-[13px] dark:text-white/36">
-						© {new Date().getFullYear()} Reloop. All rights reserved.
+						© {year} Reloop. All rights reserved.
 					</p>
 					<div className="inline-flex items-center rounded-full border border-[#0a0d12]/10 bg-[#0a0d12]/5 p-0.5 dark:border-white/5 dark:bg-white/[0.03]">
 						<button

@@ -103,7 +103,7 @@ export const TransactionalEmail = () => {
 	const [cards, setCards] = useState<CardWithId[]>(() =>
 		cardsData.map((card, index) => ({
 			...card,
-			uniqueId: `${card.id}-${Date.now()}-${index}`,
+			uniqueId: `${card.id}-${index}`,
 		})),
 	);
 	const currentIndexRef = useRef(0);

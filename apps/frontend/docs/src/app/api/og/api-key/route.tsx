@@ -3,7 +3,7 @@ import path from "node:path";
 import { ImageResponse } from "next/og";
 import type { NextRequest } from "next/server";
 
-export const dynamic = "force-dynamic";
+
 
 function getFontBuffer(fontName: string): ArrayBuffer | null {
 	const paths = [
