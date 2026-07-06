@@ -44,7 +44,7 @@ const faqItems = [
 ];
 
 const Faq = () => {
-	return <FaqSection items={faqItems} />;
+	return <FaqSection items={faqItems} plain />;
 };
 
 export default Faq;
