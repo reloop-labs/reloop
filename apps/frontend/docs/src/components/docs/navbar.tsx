@@ -70,7 +70,7 @@ export function Navbar({
 					<Icon name="menu-2" className="h-5 w-5" />
 				</button>
 				<a href="/" className="flex items-center lg:hidden">
-					<Logo className="h-10 w-10" />
+					<Logo className="size-11" />
 				</a>
 			</div>
 

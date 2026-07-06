@@ -214,8 +214,8 @@ export const Header = () => {
 						className="flex shrink-0 items-center gap-2.5 justify-self-start"
 						aria-label="Reloop home"
 					>
-						<Logo className="size-9 text-text-strong-950 dark:text-white" />
-						<span className="font-semibold text-[17px] text-text-strong-950 tracking-tight dark:text-white">
+						<Logo className="size-11 text-text-strong-950 dark:text-white" />
+						<span className="-ml-3 font-semibold text-[17px] text-text-strong-950 tracking-tight dark:text-white">
 							Reloop
 						</span>
 					</Link>
