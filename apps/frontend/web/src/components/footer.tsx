@@ -185,7 +185,7 @@ export const Footer = () => {
 				<div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-20">
 					<div className="flex shrink-0 flex-col lg:w-48">
 						<Link href="/" className="shrink-0" aria-label="Reloop home">
-							<Logo className="size-7 text-text-strong-950 dark:text-white" />
+							<Logo className="-mt-2 size-12 text-text-strong-950 dark:text-white" />
 						</Link>
 					</div>
 
