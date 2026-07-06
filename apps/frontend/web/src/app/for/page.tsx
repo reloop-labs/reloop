@@ -40,14 +40,16 @@ export default function ForIndexPage() {
 						<Link
 							key={persona.path}
 							href={persona.path}
-							className="group rounded-2xl border border-stroke-soft-200 p-6 transition-shadow hover:shadow-lg dark:border-white/10"
+							className={`group rounded-2xl border border-stroke-soft-200 p-6 transition-colors dark:border-white/10 ${accent.hoverBorder}`}
 						>
 							<span
 								className={`inline-flex rounded-full px-2.5 py-0.5 font-semibold text-[10px] uppercase tracking-wider ${accent.badge}`}
 							>
 								For {persona.titleLines.join(" ")}
 							</span>
-							<h2 className="mt-3 font-semibold text-[18px] text-text-strong-950 leading-snug dark:text-white">
+							<h2
+								className={`mt-3 font-semibold text-[18px] text-text-strong-950 leading-snug transition-colors ${accent.groupHoverText} dark:text-white`}
+							>
 								{extra.headline}
 							</h2>
 							<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/45">

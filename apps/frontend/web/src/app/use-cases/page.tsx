@@ -59,21 +59,23 @@ export default function UseCasesIndexPage() {
 						<Link
 							key={uc.path}
 							href={uc.path}
-							className={`group rounded-2xl border border-stroke-soft-200 p-5 transition-shadow hover:shadow-md dark:border-white/10 ${accent.ring} ring-1 ring-transparent`}
+							className={`group rounded-2xl border border-stroke-soft-200 p-5 transition-colors dark:border-white/10 ${accent.hoverBorder} ${accent.ring} ring-1 ring-transparent`}
 						>
 							<span
 								className={`inline-flex rounded-full px-2.5 py-0.5 font-semibold text-[10px] uppercase tracking-wider ${accent.badge}`}
 							>
 								{extra.metric.value}
 							</span>
-							<h2 className="mt-3 font-semibold text-[17px] text-text-strong-950 leading-snug group-hover:text-primary-base dark:text-white">
+							<h2
+								className={`mt-3 font-semibold text-[17px] text-text-strong-950 leading-snug transition-colors ${accent.groupHoverText} dark:text-white`}
+							>
 								{uc.titleLines.join(" ")}
 							</h2>
 							<p className="mt-2 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/45">
 								{uc.description}
 							</p>
 							<span
-								className={`mt-4 inline-block font-semibold text-sm ${accent.text}`}
+								className={`mt-4 inline-block font-semibold text-sm text-text-sub-600 transition-colors ${accent.groupHoverText} dark:text-white/45`}
 							>
 								View use case →
 							</span>
