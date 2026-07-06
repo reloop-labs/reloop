@@ -6,272 +6,256 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
-const links = [
+type FooterLink = {
+	title: string;
+	href: string;
+	external?: boolean;
+};
+
+type FooterColumn = {
+	group: string;
+	items: FooterLink[];
+};
+
+const columns: FooterColumn[] = [
 	{
-		group: "Product",
+		group: "Email",
 		items: [
-			{
-				title: "Campaigns",
-				href: "/features/campaigns",
-			},
-			{
-				title: "Email Analytics",
-				href: "/features/email-analytics",
-			},
-			{
-				title: "Transaction Emails",
-				href: "/features/transaction-emails",
-			},
-			{
-				title: "Email Validation",
-				href: "/features/email-validation",
-			},
-			{
-				title: "Email Templates",
-				href: "/features/email-templates",
-			},
-			{
-				title: "SMTP Relay",
-				href: "/features/smtp",
-			},
-			{
-				title: "Languages",
-				href: "/features/languages",
-			},
-			{
-				title: "Deliverability",
-				href: "/features/deliverability",
-			},
+			{ title: "Campaigns", href: "/features/campaigns" },
+			{ title: "Transaction Emails", href: "/features/transaction-emails" },
+			{ title: "SMTP Relay", href: "/features/smtp" },
+			{ title: "Email Analytics", href: "/features/email-analytics" },
+			{ title: "Email Validation", href: "/features/email-validation" },
+			{ title: "Email Templates", href: "/features/email-templates" },
 		],
 	},
 	{
 		group: "Platform",
 		items: [
+			{ title: "AI Agents", href: "/features/ai-agents" },
+			{ title: "Webhooks", href: "/features/webhooks" },
+			{ title: "Deliverability", href: "/features/deliverability" },
+			{ title: "Marketing Teams", href: "/features/marketing-teams" },
+			{ title: "Developers", href: "/features/developers" },
+			{ title: "Integrations", href: "/features/integration" },
+		],
+	},
+	{
+		group: "Developers",
+		items: [
+			{ title: "SDKs", href: "/features/SDKs" },
+			{ title: "API Reference", href: "/docs/api-reference" },
+			{ title: "Getting Started", href: "/docs/getting-started" },
+			{ title: "Campaign Builder", href: "/docs/campaign-builder" },
+			{ title: "Languages", href: "/features/languages" },
+			{ title: "Webhooks", href: "/docs/webhooks" },
+		],
+	},
+	{
+		group: "Docs",
+		items: [
+			{ title: "Documentation", href: "/docs" },
+			{ title: "Self-host", href: "/docs/self-host" },
+			{ title: "Integration", href: "/docs/integration" },
+			{ title: "SMTP", href: "/docs/quickstart/smtp" },
+			{ title: "API", href: "/docs/api" },
+		],
+	},
+	{
+		group: "Compare",
+		items: [
+			{ title: "vs Resend", href: "/compare/resend" },
+			{ title: "vs SendGrid", href: "/compare/sendgrid" },
+			{ title: "vs Mailgun", href: "/compare/mailgun" },
+			{ title: "vs AWS SES", href: "/compare/aws-ses" },
+			{ title: "vs Postmark", href: "/compare/postmark" },
+			{ title: "All comparisons", href: "/compare" },
+		],
+	},
+	{
+		group: "Tools",
+		items: [
+			{ title: "Free tools", href: "/resources/tools" },
+			{ title: "Email validator", href: "/tools/email-validator" },
+			{ title: "Subject tester", href: "/tools/subject-tester" },
+			{ title: "Template generator", href: "/tools/template-generator" },
+			{ title: "Deliverability tester", href: "/tools/deliverability-tester" },
+		],
+	},
+	{
+		group: "Learn",
+		items: [
+			{ title: "Blog", href: "/company/blog" },
+			{ title: "Changelog", href: "/resources/changelog" },
+			{ title: "Glossary", href: "/resources/glossary" },
+			{ title: "Community", href: "/resources/community" },
 			{
-				title: "Getting Started",
-				href: "/docs/getting-started",
-			},
-			{
-				title: "API Reference",
-				href: "/docs/api-reference",
-			},
-			{
-				title: "Campaign Builder",
-				href: "/docs/campaign-builder",
-			},
-			{
-				title: "Integration",
-				href: "/docs/integration",
-			},
-			{
-				title: "Webhooks",
-				href: "/docs/webhooks",
-			},
-			{
-				title: "SDKs",
-				href: "/docs/SDKs",
+				title: "Status",
+				href: "https://status.reloop.sh/status/live",
+				external: true,
 			},
 		],
 	},
 	{
 		group: "Company",
 		items: [
+			{ title: "About", href: "/company/about-us" },
+			{ title: "Contact", href: "/company/contact-us" },
+			{ title: "Pricing", href: "/pricing" },
+			{ title: "Compare", href: "/compare" },
+			{ title: "Get started", href: "/dashboard/signup" },
+		],
+	},
+	{
+		group: "Open Source",
+		items: [
+			{ title: "Why Open Source", href: "/philosophy/why-open-source" },
+			{ title: "Self-host", href: "/docs/self-host" },
+			{ title: "License", href: "/company/license" },
 			{
-				title: "About Us",
-				href: "/company/about-us",
-			},
-			{
-				title: "Blog",
-				href: "/company/blog",
-			},
-			{
-				title: "Contact Us",
-				href: "/company/contact-us",
-			},
-			{
-				title: "Pricing",
-				href: "/pricing",
-			},
-			{
-				title: "Grosory",
-				href: "/grosory",
-			},
-			{
-				title: "Compare",
-				href: "/compare",
-			},
-			{
-				title: "Why Reloop",
-				href: "/philosophy/why-reloop",
-			},
-			{
-				title: "Why Open-source",
-				href: "/philosophy/why-open-source",
-			},
-			{
-				title: "Changelog",
-				href: "/resources/changelog",
+				title: "GitHub",
+				href: "https://github.com/reloop-labs/reloop",
+				external: true,
 			},
 		],
 	},
 	{
-		group: "Legal",
+		group: "Philosophy",
 		items: [
-			{
-				title: "Terms and Conditions",
-				href: "/company/terms-and-conditions",
-			},
-			{
-				title: "Privacy Policy",
-				href: "/company/privacy",
-			},
-			{
-				title: "License",
-				href: "/company/license",
-			},
-			{
-				title: "Self-hosting Guide",
-				href: "/docs/self-host",
-			},
+			{ title: "Why Reloop", href: "/philosophy/why-reloop" },
+			{ title: "What We Stand For", href: "/philosophy/what-we-stand-for" },
+			{ title: "Product Beliefs", href: "/philosophy/our-product-beliefs" },
+			{ title: "Engineering", href: "/philosophy/engineering" },
+		],
+	},
+	{
+		group: "Legal & Trust",
+		items: [
+			{ title: "Privacy Policy", href: "/company/privacy" },
+			{ title: "Terms of Service", href: "/company/terms-and-conditions" },
+			{ title: "License", href: "/company/license" },
 			{
 				title: "Status",
 				href: "https://status.reloop.sh/status/live",
+				external: true,
 			},
+		],
+	},
+	{
+		group: "Social",
+		items: [
 			{
-				title: "Community",
-				href: "/resources/community",
+				title: "GitHub",
+				href: "https://github.com/reloop-labs/reloop",
+				external: true,
+			},
+			{ title: "X", href: "https://x.com/reloophq", external: true },
+			{
+				title: "Discord",
+				href: "https://discord.gg/bHnkBcp7xR",
+				external: true,
 			},
 		],
 	},
 ];
 
-const githubUrl = "https://github.com/reloop-labs/reloop";
-const twitterUrl = "https://x.com/reloophq";
-const discordUrl = "https://discord.gg/bHnkBcp7xR";
+function FooterLinkItem({ link }: { link: FooterLink }) {
+	return (
+		<li>
+			<Link
+				href={link.href}
+				{...(link.external ? { target: "_blank", rel: "noreferrer" } : {})}
+				className="text-[14px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white"
+			>
+				{link.title}
+			</Link>
+		</li>
+	);
+}
+
+const statusUrl = "https://status.reloop.sh/status/live";
 
 export const Footer = () => {
 	const { theme, setTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
-	const [year, setYear] = useState(2026);
 
 	useEffect(() => {
 		setMounted(true);
-		setYear(new Date().getFullYear());
 	}, []);
 
 	return (
-		<footer className="bg-[#f8f8f8] text-[#0a0d12] transition-colors duration-300 dark:bg-black dark:text-white">
-			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
-				{/* Top: CTA + link columns */}
-				<div className="flex flex-col gap-12 border-stroke-soft-200 border-b py-12 sm:py-16 lg:flex-row lg:gap-20 dark:border-stroke-soft-100">
-					{/* Left — branding / CTA */}
-					<div className="lg:w-[340px] lg:shrink-0">
-						<Link href="/" className="flex items-center">
-							<Logo className="-ml-2 h-10 w-10 text-[#0a0d12] dark:text-white" />
-							<span className="font-semibold text-[18px] tracking-[0.04em]">
-								Reloop
+		<footer className="border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:bg-black dark:text-white">
+			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+				<div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-8 lg:gap-y-12">
+					{columns.map((column) => (
+						<div key={column.group}>
+							<h4 className="font-medium text-[14px] text-text-strong-950 dark:text-white">
+								{column.group}
+							</h4>
+							<ul className="mt-4 flex flex-col gap-2.5">
+								{column.items.map((link) => (
+									<FooterLinkItem key={link.title} link={link} />
+								))}
+							</ul>
+						</div>
+					))}
+				</div>
+
+				<div className="mt-16 flex items-end justify-between">
+					<div className="flex flex-col gap-3">
+						<Link href="/" className="shrink-0" aria-label="Reloop home">
+							<Logo className="size-5 text-text-strong-950 dark:text-white" />
+						</Link>
+						<Link
+							href={statusUrl}
+							target="_blank"
+							rel="noreferrer"
+							className="inline-flex items-center gap-2 transition-opacity hover:opacity-80"
+						>
+							<span className="size-2 shrink-0 rounded-full bg-[#0070F3]" />
+							<span className="font-mono text-[#0070F3] text-[11px] uppercase tracking-wide">
+								All systems normal.
 							</span>
 						</Link>
-						<p className="mt-2 max-w-[300px] font-medium text-[#0a0d12]/50 text-sm dark:text-white/50">
-							Open-source email infrastructure for modern applications. Use
-							Reloop hosted or self-host—no vendor lock-in.
-						</p>
-						<div className="mt-4 flex items-center gap-2">
-							<Link
-								href={twitterUrl}
-								target="_blank"
-								rel="noreferrer"
-								className="text-[#0a0d12]/40 transition-colors hover:text-[#0a0d12] dark:text-white/40 dark:hover:text-white"
-							>
-								<Icon className="size-4.5" name="twitter" />
-							</Link>
-							<Link
-								href={githubUrl}
-								target="_blank"
-								rel="noreferrer"
-								className="text-[#0a0d12]/40 transition-colors hover:text-[#0a0d12] dark:text-white/40 dark:hover:text-white"
-							>
-								<Icon className="size-4.5" name="social-github" />
-							</Link>
-							<Link
-								href={discordUrl}
-								target="_blank"
-								rel="noreferrer"
-								className="text-[#0a0d12]/40 transition-colors hover:text-[#0a0d12] dark:text-white/40 dark:hover:text-white"
-							>
-								<Icon className="size-5" name="social-discord" />
-							</Link>
-						</div>
 					</div>
-					<div className="grid flex-1 grid-cols-2 gap-8 sm:grid-cols-4">
-						{links.map((group) => (
-							<div key={group.group}>
-								<h4 className="font-medium text-[#0a0d12] capitalize dark:text-white">
-									{group.group}
-								</h4>
-								<ul className="mt-4 flex flex-col gap-2.5">
-									{group.items.map((link) => (
-										<li key={link.title}>
-											<Link
-												href={link.href}
-												{...(link.href.startsWith("http")
-													? { target: "_blank", rel: "noreferrer" }
-													: {})}
-												className="font-medium text-[#0a0d12]/50 text-sm hover:text-[#0a0d12] dark:text-white/50 dark:hover:text-white"
-											>
-												{link.title}
-											</Link>
-										</li>
-									))}
-								</ul>
-							</div>
-						))}
-					</div>
-				</div>
-				<div className="flex flex-col-reverse items-center justify-between gap-4 py-6 sm:flex-row">
-					<p className="text-[#0a0d12]/36 text-[13px] dark:text-white/36">
-						© {year} Reloop. All rights reserved.
-					</p>
-					<div className="inline-flex items-center rounded-full border border-[#0a0d12]/10 bg-[#0a0d12]/5 p-0.5 dark:border-white/5 dark:bg-white/[0.03]">
+					<div className="inline-flex items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.04]">
 						<button
 							type="button"
 							onClick={() => setTheme("light")}
 							className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
 								mounted && theme === "light"
-									? "bg-white text-black shadow-sm"
-									: "text-[#0a0d12]/40 hover:text-[#0a0d12]/80 dark:text-white/40 dark:hover:text-white/80"
+									? "bg-white text-black shadow-sm dark:bg-white dark:text-black"
+									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white/80"
 							}`}
+							aria-label="Light mode"
 						>
 							<Icon className="size-3.5" name="sun" />
 						</button>
 						<button
 							type="button"
 							onClick={() => setTheme("dark")}
-							className={`flex items-center gap-1.5 rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
+							className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
 								mounted && theme === "dark"
 									? "bg-white text-black shadow-sm"
-									: "text-[#0a0d12]/40 hover:text-[#0a0d12]/80 dark:text-white/40 dark:hover:text-white/80"
+									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white/80"
 							}`}
+							aria-label="Dark mode"
 						>
 							<Icon className="size-3.5" name="moon" />
 						</button>
 						<button
 							type="button"
 							onClick={() => setTheme("system")}
-							className={`flex items-center gap-1.5 rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
+							className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
 								mounted && theme === "system"
 									? "bg-white text-black shadow-sm"
-									: "text-[#0a0d12]/40 hover:text-[#0a0d12]/80 dark:text-white/40 dark:hover:text-white/80"
+									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white/80"
 							}`}
+							aria-label="System theme"
 						>
 							<Icon className="size-3.5" name="laptop" />
 						</button>
 					</div>
-				</div>
-				<div className="relative overflow-hidden pb-6 sm:pb-10">
-					<span className="block w-full max-w-full font-black text-[#0a0d12] text-[clamp(3.5rem,calc((100vw-2rem)/3.6),13.75rem)] leading-[0.85] tracking-normal [-webkit-text-stroke:1px_#0a0d12] [text-shadow:3px_3px_0px_rgba(10,13,18,0.06),_0_0_20px_rgba(200,150,255,0.08)] dark:text-white sm:[-webkit-text-stroke:2px_#0a0d12] sm:[text-shadow:6px_6px_0px_rgba(10,13,18,0.06),_0_0_30px_rgba(200,150,255,0.1)] dark:[-webkit-text-stroke:1px_white] dark:[text-shadow:3px_3px_0px_rgba(255,255,255,0.12),_0_0_20px_rgba(200,150,255,0.15)] dark:sm:[-webkit-text-stroke:2px_white] dark:sm:[text-shadow:6px_6px_0px_rgba(255,255,255,0.12),_0_0_30px_rgba(200,150,255,0.2)]">
-						Reloop
-					</span>
 				</div>
 			</div>
 		</footer>
