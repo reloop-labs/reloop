@@ -8,7 +8,7 @@ export const instant = false;
 
 export const metadata = createLandingMetadata(
 	"Email Use Cases for Developers | Reloop",
-	"From transactional alerts to AI agent workflows — explore production-ready code and interactive flow diagrams for every email scenario you need to ship.",
+	"Copy production-ready code for transactional alerts, drip flows, AI agent inboxes, and more. Every Reloop use case ships with a live flow diagram and working API snippet.",
 	"/use-cases",
 	[
 		"email use cases",
@@ -30,15 +30,15 @@ export default function UseCasesIndexPage() {
 
 				<div className="relative mx-auto max-w-5xl px-4 text-center sm:px-6">
 					<h1 className="font-serif text-[2.2rem] text-text-strong-950 leading-[1.1] tracking-tight sm:text-[3.2rem] dark:text-white">
-						Every email workflow,{" "}
+						Ship email faster —{" "}
 						<span className="bg-gradient-to-r from-primary-base to-violet-500 bg-clip-text text-transparent dark:from-primary-base dark:to-violet-400">
-							ready to ship
+							whatever the workflow
 						</span>
 					</h1>
 
 					<p className="mx-auto mt-4 max-w-2xl text-[16px] text-text-sub-600 leading-relaxed sm:text-[18px] dark:text-white/60">
-						From transactional alerts to AI agent pipelines — pick a use case,
-						explore the flow diagram, and drop production-ready code straight into your app.
+						Pick a scenario, copy the code, and go live. Every use case includes
+						a flow diagram and a working API snippet — no boilerplate hunting.
 					</p>
 				</div>
 			</div>

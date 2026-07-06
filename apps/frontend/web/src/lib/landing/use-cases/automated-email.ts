@@ -5,7 +5,7 @@ export const config: LandingPageDefinition = {
 	path: "/use-cases/automated-email",
 	titleLines: ["Automated", "Email Flows"],
 	description:
-		"Welcome series, drip campaigns, renewal reminders, and re-engagement flows triggered by user behavior.",
+		"Trigger welcome series, drip campaigns, and renewal reminders from any user event — then let Reloop handle sequencing, timing, and per-step analytics.",
 	keywords: [
 		"email automation",
 		"drip campaign software",

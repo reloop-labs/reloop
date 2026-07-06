@@ -5,7 +5,7 @@ export const config: LandingPageDefinition = {
 	path: "/use-cases/transactional-email",
 	titleLines: ["Transactional", "Email API"],
 	description:
-		"Send password resets, receipts, and real-time notifications with low-latency delivery and delivery tracking.",
+		"Receipts, password resets, and notifications that arrive in under 2 seconds — with webhook confirmation so your app always knows what landed.",
 	keywords: [
 		"transactional email API",
 		"transactional email service",

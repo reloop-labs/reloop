@@ -5,7 +5,7 @@ export const config: LandingPageDefinition = {
 	path: "/use-cases/ai-agent-inbox",
 	titleLines: ["AI Agent", "Email Inbox"],
 	description:
-		"Email infrastructure for autonomous agents—dedicated inbox, drafting, human-in-the-loop, and contextual memory.",
+		"Give your AI agents a real inbox — read threads, draft replies, and send on approval. Purpose-built APIs so agents handle email without going rogue.",
 	keywords: [
 		"AI email agent",
 		"agent inbox API",

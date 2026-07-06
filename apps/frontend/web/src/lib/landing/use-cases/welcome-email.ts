@@ -5,7 +5,7 @@ export const config: LandingPageDefinition = {
 	path: "/use-cases/welcome-email",
 	titleLines: ["Welcome Email", "Automation"],
 	description:
-		"Onboard new users with branded welcome emails triggered at signup.",
+		"Fire a branded welcome the moment someone signs up — then extend into a multi-step onboarding series without touching the trigger code again.",
 	keywords: [
 		"welcome email automation",
 		"onboarding email API",

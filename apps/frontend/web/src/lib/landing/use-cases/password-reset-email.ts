@@ -5,7 +5,7 @@ export const config: LandingPageDefinition = {
 	path: "/use-cases/password-reset-email",
 	titleLines: ["Password Reset", "Email API"],
 	description:
-		"Send secure, fast password reset emails with expiring links and delivery tracking.",
+		"Deliver tokenized reset links in seconds — before the user gives up and contacts support. Bounce webhooks tell you when delivery fails so you can act.",
 	keywords: [
 		"password reset email API",
 		"forgot password email",

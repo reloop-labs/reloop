@@ -5,7 +5,7 @@ export const config: LandingPageDefinition = {
 	path: "/use-cases/marketing-email",
 	titleLines: ["Marketing", "Email Platform"],
 	description:
-		"Newsletters, product launches, and promotional campaigns with segmentation, analytics, and a visual editor.",
+		"Launch newsletters, promos, and product announcements via API or visual editor — with audience segmentation and per-campaign click analytics built in.",
 	keywords: [
 		"marketing email platform",
 		"newsletter software",

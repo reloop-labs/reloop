@@ -5,7 +5,7 @@ export const config: LandingPageDefinition = {
 	path: "/use-cases/system-monitoring-email",
 	titleLines: ["System &", "Monitoring Email"],
 	description:
-		"Zero-latency alerts for errors, downtime, reports, and admin approvals.",
+		"Send Sentry errors, Datadog alerts, and on-call pages through a relay with zero cold-start delay. The emails that can't miss, won't.",
 	keywords: [
 		"alert email service",
 		"ops notification email",

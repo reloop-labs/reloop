@@ -5,7 +5,7 @@ export const config: LandingPageDefinition = {
 	path: "/use-cases/email-verification",
 	titleLines: ["Email Verification", "API"],
 	description:
-		"Send verification links and OTP emails to confirm user email addresses at signup.",
+		"Verify new accounts with a magic link or OTP code that lands in under 3 seconds — and block typos before they hit your list with address validation built in.",
 	keywords: [
 		"email verification API",
 		"verify email address API",

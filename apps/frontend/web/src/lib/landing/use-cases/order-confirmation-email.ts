@@ -5,7 +5,7 @@ export const config: LandingPageDefinition = {
 	path: "/use-cases/order-confirmation-email",
 	titleLines: ["Order Confirmation", "Emails"],
 	description:
-		"Send purchase receipts and order confirmations with line items, totals, and tracking links.",
+		"Send a polished receipt with line items and totals the second checkout completes — triggered from your order webhook, no extra service needed.",
 	keywords: [
 		"order confirmation email API",
 		"purchase receipt email",
