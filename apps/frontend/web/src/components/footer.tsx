@@ -183,20 +183,9 @@ export const Footer = () => {
 		<footer className="border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:bg-black dark:text-white">
 			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
 				<div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-20">
-					<div className="flex shrink-0 flex-col gap-6 lg:w-48">
+					<div className="flex shrink-0 flex-col lg:w-48">
 						<Link href="/" className="shrink-0" aria-label="Reloop home">
 							<Logo className="size-7 text-text-strong-950 dark:text-white" />
-						</Link>
-						<Link
-							href={statusUrl}
-							target="_blank"
-							rel="noreferrer"
-							className="inline-flex items-center gap-2 transition-opacity hover:opacity-80"
-						>
-							<span className="size-2 shrink-0 rounded-full bg-[#0070F3]" />
-							<span className="font-mono text-[#0070F3] text-[11px] uppercase tracking-wide">
-								All systems normal.
-							</span>
 						</Link>
 					</div>
 
@@ -218,8 +207,31 @@ export const Footer = () => {
 					</div>
 				</div>
 
-				<div className="mt-12 flex justify-end">
+				<div className="mt-12 flex items-center justify-between">
+					<Link
+						href={statusUrl}
+						target="_blank"
+						rel="noreferrer"
+						className="inline-flex items-center gap-2 transition-opacity hover:opacity-80"
+					>
+						<span className="size-2 shrink-0 rounded-full bg-[#0070F3]" />
+						<span className="font-mono text-[#0070F3] text-[11px] uppercase tracking-wide">
+							All systems normal.
+						</span>
+					</Link>
 					<div className="inline-flex items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.04]">
+						<button
+							type="button"
+							onClick={() => setTheme("system")}
+							className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
+								mounted && theme === "system"
+									? "bg-white text-black shadow-sm"
+									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white/80"
+							}`}
+							aria-label="System theme"
+						>
+							<Icon className="size-3.5" name="laptop" />
+						</button>
 						<button
 							type="button"
 							onClick={() => setTheme("light")}
@@ -243,18 +255,6 @@ export const Footer = () => {
 							aria-label="Dark mode"
 						>
 							<Icon className="size-3.5" name="moon" />
-						</button>
-						<button
-							type="button"
-							onClick={() => setTheme("system")}
-							className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
-								mounted && theme === "system"
-									? "bg-white text-black shadow-sm"
-									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white/80"
-							}`}
-							aria-label="System theme"
-						>
-							<Icon className="size-3.5" name="laptop" />
 						</button>
 					</div>
 				</div>
