@@ -196,45 +196,50 @@ export const Header = () => {
 			onMouseLeave={() => setActiveMega(null)}
 		>
 			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
-				<div className="flex h-14 items-center justify-between">
-					<div className="flex items-center gap-8">
-						<Link href="/" className="shrink-0" aria-label="Reloop home">
-							<Logo className="size-7 text-text-strong-950 dark:text-white" />
-						</Link>
+				<div className="grid h-16 grid-cols-[1fr_auto_1fr] items-center">
+					<Link
+						href="/"
+						className="flex shrink-0 items-center gap-2.5 justify-self-start"
+						aria-label="Reloop home"
+					>
+						<Logo className="size-9 text-text-strong-950 dark:text-white" />
+						<span className="font-semibold text-[17px] text-text-strong-950 tracking-tight dark:text-white">
+							Reloop
+						</span>
+					</Link>
 
-						<nav className="hidden items-center lg:flex">
-							{navItems.map((item) => (
-								<div
-									key={item.title}
-									className="relative"
-									onMouseEnter={() =>
-										item.mega ? setActiveMega(item.title) : setActiveMega(null)
-									}
+					<nav className="hidden items-center justify-self-center lg:flex">
+						{navItems.map((item) => (
+							<div
+								key={item.title}
+								className="relative"
+								onMouseEnter={() =>
+									item.mega ? setActiveMega(item.title) : setActiveMega(null)
+								}
+							>
+								<Link
+									href={item.href}
+									className={`inline-flex items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
+										activeMega === item.title
+											? "text-text-strong-950 dark:text-white"
+											: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
+									}`}
 								>
-									<Link
-										href={item.href}
-										className={`inline-flex items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
-											activeMega === item.title
-												? "text-text-strong-950 dark:text-white"
-												: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
-										}`}
-									>
-										{item.title}
-										{item.mega && (
-											<Icon
-												name="chevron-down"
-												className={`size-3 transition-transform duration-200 ${
-													activeMega === item.title ? "rotate-180" : "opacity-50"
-												}`}
-											/>
-										)}
-									</Link>
-								</div>
-							))}
-						</nav>
-					</div>
+									{item.title}
+									{item.mega && (
+										<Icon
+											name="chevron-down"
+											className={`size-3 transition-transform duration-200 ${
+												activeMega === item.title ? "rotate-180" : "opacity-50"
+											}`}
+										/>
+									)}
+								</Link>
+							</div>
+						))}
+					</nav>
 
-					<div className="flex items-center gap-3 sm:gap-4">
+					<div className="flex items-center justify-self-end gap-3 sm:gap-4">
 						<a
 							href="https://github.com/reloop-labs/reloop"
 							target="_blank"
@@ -281,19 +286,23 @@ export const Header = () => {
 							className="overflow-hidden"
 						>
 							<div className="pb-10 pt-2">
-								<div className="flex flex-wrap gap-x-20 gap-y-10">
-									{activeItem.mega.categories.map((category) => (
-										<div key={category.title} className="min-w-[160px]">
-											<p className="mb-4 text-[13px] text-text-sub-600 dark:text-[#888888]">
-												{category.title}
-											</p>
-											<div className="flex flex-col gap-3">
-												{category.links.map((link) => (
-													<MegaLink key={link.title} link={link} />
-												))}
+								<div className="grid grid-cols-[1fr_auto_1fr]">
+									<div />
+									<div className="flex flex-wrap justify-center gap-x-20 gap-y-10">
+										{activeItem.mega.categories.map((category) => (
+											<div key={category.title} className="min-w-[160px]">
+												<p className="mb-4 text-[13px] text-text-sub-600 dark:text-[#888888]">
+													{category.title}
+												</p>
+												<div className="flex flex-col gap-3">
+													{category.links.map((link) => (
+														<MegaLink key={link.title} link={link} />
+													))}
+												</div>
 											</div>
-										</div>
-									))}
+										))}
+									</div>
+									<div />
 								</div>
 							</div>
 						</motion.div>
