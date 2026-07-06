@@ -1,4 +1,4 @@
-import type { WebhookEventDefinition } from "./types.js";
+import type { WebhookEventDefinition } from "./types";
 
 export const API_KEY_CREATE_WEBHOOK_EVENT = {
 	id: "api-key.create",

@@ -1,4 +1,4 @@
-import type { WebhookEventDefinition } from "./types.js";
+import type { WebhookEventDefinition } from "./types";
 
 export const EMAIL_SENT_WEBHOOK_EVENT = {
 	id: "email.sent",
