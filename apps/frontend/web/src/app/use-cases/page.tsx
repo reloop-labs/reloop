@@ -33,7 +33,7 @@ export default function UseCasesIndexPage() {
 						Ship email faster
 						<br />
 						<span className="bg-gradient-to-r from-primary-base to-violet-500 bg-clip-text text-transparent dark:from-primary-base dark:to-violet-400">
-							whatever the workflow
+							with your use case
 						</span>
 					</h1>
 
