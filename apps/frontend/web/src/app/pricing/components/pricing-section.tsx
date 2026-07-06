@@ -35,14 +35,16 @@ function PlanColumn({ plan }: { plan: (typeof pricingPlans)[number] }) {
 							Custom
 						</p>
 					) : (
-						<p className="font-serif text-[2.4rem] text-text-strong-950 leading-none tracking-tighter dark:text-white">
-							{formatPrice(price)}
+						<div className="flex items-end gap-1">
+							<span className="font-serif text-[2.4rem] text-text-strong-950 leading-none tracking-tighter dark:text-white">
+								{formatPrice(price)}
+							</span>
 							{price > 0 && (
-								<span className="ml-2 font-sans text-[15px] font-normal text-text-sub-600 dark:text-white/50">
+								<span className="mb-1 font-sans text-[15px] text-text-sub-600 dark:text-white/50">
 									{plan.priceSubline}
 								</span>
 							)}
-						</p>
+						</div>
 					)}
 					<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/45">
 						{isCustom || price === 0 ? plan.priceSubline : plan.emailsLabel}
@@ -101,9 +103,7 @@ function PlanColumn({ plan }: { plan: (typeof pricingPlans)[number] }) {
 					<Link
 						href={plan.secondaryCta.href}
 						target={plan.secondaryCta.external ? "_blank" : undefined}
-						rel={
-							plan.secondaryCta.external ? "noopener noreferrer" : undefined
-						}
+						rel={plan.secondaryCta.external ? "noopener noreferrer" : undefined}
 						className="inline-flex h-11 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 px-5 font-medium text-[14px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1]"
 					>
 						{plan.secondaryCta.label}

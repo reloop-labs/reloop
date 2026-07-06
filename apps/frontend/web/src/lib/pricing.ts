@@ -78,7 +78,7 @@ export const pricingPlans: PricingPlan[] = [
 		name: "Essentials",
 		description: "For startup founders & growing companies.",
 		monthlyPrice: 10,
-		priceSubline: "per month",
+		priceSubline: "/month",
 		emailsLabel: "25,000 emails / month",
 		includesLabel: "All Free features +",
 		ctaLabel: "Get started",
@@ -116,7 +116,7 @@ export const pricingPlans: PricingPlan[] = [
 		name: "Growth",
 		description: "For teams scaling email volume without enterprise overhead.",
 		monthlyPrice: 20,
-		priceSubline: "per month",
+		priceSubline: "/month",
 		emailsLabel: "50,000 emails / month",
 		includesLabel: "All Essentials features +",
 		ctaLabel: "Get started",
@@ -158,10 +158,6 @@ export const pricingPlans: PricingPlan[] = [
 		includesLabel: "All Growth features +",
 		ctaLabel: "Contact sales",
 		ctaHref: "/company/contact-us",
-		secondaryCta: {
-			label: "Get started",
-			href: "/dashboard/signup",
-		},
 		features: [
 			"Custom email volume & overage",
 			"Custom agent inboxes & webhooks",

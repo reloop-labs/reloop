@@ -49,10 +49,7 @@ export const metadata: Metadata = {
 
 const PricingPage = () => {
 	return (
-		<MarketingPageShell
-			titleLines={["Scale your Email,", "control your costs."]}
-			compactHero
-		>
+		<MarketingPageShell titleLines={["Pricing"]} compactHero>
 			<PageSection flushTop>
 				<PricingSection />
 			</PageSection>
