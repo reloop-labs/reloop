@@ -176,7 +176,7 @@ const SendGridComparisonPage = () => {
 					{
 						question: "Can Reloop handle SendGrid-scale volume?",
 						answer:
-							"Yes. Hosted Essentials and Enterprise tiers target high throughput; self-hosted Reloop scales with your Kubernetes or bare-metal footprint.",
+							"Yes. Hosted Individual, Startup, and Enterprise tiers target high throughput; self-hosted Reloop scales with your Kubernetes or bare-metal footprint.",
 					},
 					{
 						question: "What about dedicated IPs?",

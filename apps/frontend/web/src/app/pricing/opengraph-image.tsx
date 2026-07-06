@@ -276,11 +276,11 @@ export default function OpenGraphImage() {
 						desc: "3,000 emails / month. No credit card required.",
 					},
 					{
-						title: "Essentials — $10/mo",
-						desc: "25,000 emails with overage and email support.",
+						title: "Individual — $10/mo",
+						desc: "25,000 emails with overage and dedicated support.",
 					},
 					{
-						title: "Growth — $20/mo",
+						title: "Startup — $20/mo",
 						desc: "50,000 emails with higher throughput.",
 					},
 					{

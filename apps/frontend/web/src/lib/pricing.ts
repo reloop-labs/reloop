@@ -1,4 +1,4 @@
-export type PlanId = "free" | "essentials" | "growth" | "enterprise";
+export type PlanId = "free" | "individual" | "startup" | "enterprise";
 
 export interface PricingPlan {
 	id: PlanId;
@@ -17,6 +17,7 @@ export interface PricingPlan {
 		external?: boolean;
 	};
 	highlighted?: boolean;
+	badge?: string;
 	features: string[];
 	comparison: {
 		monthlyEmails: string;
@@ -74,16 +75,15 @@ export const pricingPlans: PricingPlan[] = [
 		},
 	},
 	{
-		id: "essentials",
-		name: "Essentials",
-		description: "For startup founders & growing companies.",
+		id: "individual",
+		name: "Individual",
+		description: "For solo developers and personal projects.",
 		monthlyPrice: 10,
 		priceSubline: "/month",
 		emailsLabel: "25,000 emails / month",
 		includesLabel: "All Free features +",
 		ctaLabel: "Get started",
 		ctaHref: "/dashboard/signup",
-		highlighted: true,
 		features: [
 			"25,000 emails per month",
 			"10 agent inboxes",
@@ -112,15 +112,17 @@ export const pricingPlans: PricingPlan[] = [
 		},
 	},
 	{
-		id: "growth",
-		name: "Growth",
-		description: "For teams scaling email volume without enterprise overhead.",
+		id: "startup",
+		name: "Startup",
+		description: "For early-stage founders and growing teams.",
 		monthlyPrice: 20,
 		priceSubline: "/month",
 		emailsLabel: "50,000 emails / month",
-		includesLabel: "All Essentials features +",
+		includesLabel: "All Individual features +",
 		ctaLabel: "Get started",
 		ctaHref: "/dashboard/signup",
+		badge: "Popular",
+		highlighted: true,
 		features: [
 			"50,000 emails per month",
 			"20 agent inboxes",
@@ -155,7 +157,7 @@ export const pricingPlans: PricingPlan[] = [
 		monthlyPrice: null,
 		priceSubline: "Custom volume & billing",
 		emailsLabel: "Custom volume",
-		includesLabel: "All Growth features +",
+		includesLabel: "All Startup features +",
 		ctaLabel: "Contact sales",
 		ctaHref: "/company/contact-us",
 		features: [

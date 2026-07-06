@@ -18,7 +18,7 @@ const pricingPageUrl = `${siteUrl}/pricing`;
 export const metadata: Metadata = {
 	title: "Pricing | Reloop",
 	description:
-		"Scale your Email, control your costs. Start free with 3,000 emails per month. Upgrade to Essentials or Enterprise—hosted or self-hosted.",
+		"Scale your Email, control your costs. Start free with 3,000 emails per month. Upgrade to Individual, Startup, or Enterprise—hosted or self-hosted.",
 	keywords: [
 		"email pricing",
 		"email API pricing",

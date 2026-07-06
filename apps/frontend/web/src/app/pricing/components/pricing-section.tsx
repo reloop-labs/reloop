@@ -18,16 +18,21 @@ function PlanColumn({ plan }: { plan: (typeof pricingPlans)[number] }) {
 	return (
 		<div
 			className={cn(
-				"flex min-h-[640px] flex-col border-stroke-soft-200 border-t border-l-0 p-8 sm:min-h-[680px] lg:border-t-0 lg:border-l lg:p-10 dark:border-white/10",
-				"first:border-t-0 sm:[&:nth-child(-n+2)]:border-t-0 lg:[&:nth-child(-n+4)]:border-t-0",
-				"sm:[&:nth-child(2n+1)]:border-l-0 lg:[&:nth-child(4n+1)]:border-l-0",
+				"flex min-h-[640px] flex-col border-stroke-soft-200 border-r border-b p-8 sm:min-h-[680px] lg:p-10 dark:border-white/10",
 				plan.highlighted && "bg-bg-weak-50 dark:bg-white/[0.03]",
 			)}
 		>
 			<div>
-				<h3 className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
-					{plan.name}
-				</h3>
+				<div className="flex items-center gap-2">
+					<h3 className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
+						{plan.name}
+					</h3>
+					{plan.badge && (
+						<span className="shrink-0 rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em]">
+							{plan.badge}
+						</span>
+					)}
+				</div>
 
 				<div className="mt-6">
 					{isCustom ? (
@@ -220,7 +225,7 @@ function ComparisonTable() {
 export function PricingSection() {
 	return (
 		<>
-			<div className="overflow-hidden rounded-4xl border border-stroke-soft-200 sm:grid sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
+			<div className="overflow-hidden rounded-4xl border-stroke-soft-200 border-t border-l sm:grid sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
 				{pricingPlans.map((plan) => (
 					<PlanColumn key={plan.id} plan={plan} />
 				))}
