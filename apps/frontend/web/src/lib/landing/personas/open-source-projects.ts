@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "open-source-projects",
 	path: "/for/open-source-projects",
-	titleLines: [
-		"Email for",
-		"Open Source",
-	],
-	description: "Free-tier friendly email for OSS maintainers—newsletters, release announcements, and community updates.",
+	titleLines: ["Email for", "Open Source"],
+	description:
+		"Free-tier friendly email for OSS maintainers—newsletters, release announcements, and community updates.",
 	keywords: [
 		"open source project email",
 		"OSS email infrastructure",
@@ -35,7 +33,8 @@ export const config: LandingPageDefinition = {
 				},
 				{
 					title: "Transparent infra",
-					description: "No proprietary black box behind your project's communications.",
+					description:
+						"No proprietary black box behind your project's communications.",
 				},
 			],
 		},

@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "enterprises",
 	path: "/for/enterprises",
-	titleLines: [
-		"Email for",
-		"Enterprise",
-	],
-	description: "Self-hosted email infrastructure for data residency, compliance, and control at scale.",
+	titleLines: ["Email for", "Enterprise"],
+	description:
+		"Self-hosted email infrastructure for data residency, compliance, and control at scale.",
 	keywords: [
 		"enterprise email infrastructure",
 		"self-hosted enterprise email",
@@ -35,7 +33,8 @@ export const config: LandingPageDefinition = {
 				},
 				{
 					title: "Full stack",
-					description: "Transactional, campaigns, SMTP, webhooks, and analytics.",
+					description:
+						"Transactional, campaigns, SMTP, webhooks, and analytics.",
 				},
 			],
 		},
@@ -43,7 +42,8 @@ export const config: LandingPageDefinition = {
 	cta: {
 		title: "Own your email stack",
 		titleMuted: "Start free today.",
-		description: "Hosted or self-hosted—same product, your infrastructure choice.",
+		description:
+			"Hosted or self-hosted—same product, your infrastructure choice.",
 		primary: {
 			label: "Get started free",
 			href: "/dashboard/signup",

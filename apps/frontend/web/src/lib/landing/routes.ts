@@ -1,10 +1,10 @@
-import { toolConfigs } from "./tools";
-import { useCaseConfigs } from "./use-cases";
 import { alternativeConfigs } from "./alternatives";
+import { blogPosts } from "./blog";
+import { glossaryTerms } from "./glossary";
 import { integrationConfigs } from "./integrations";
 import { personaConfigs } from "./personas";
-import { glossaryTerms } from "./glossary";
-import { blogPosts } from "./blog";
+import { toolConfigs } from "./tools";
+import { useCaseConfigs } from "./use-cases";
 
 /** All independent marketing landing routes for sitemap.xml */
 export function getLandingSitemapRoutes(): string[] {

@@ -16,8 +16,13 @@ const competitorAccent: Record<string, string> = {
 	loops: "border-violet-500/20 bg-violet-500/5",
 };
 
-export function AlternativePageView({ config }: { config: AlternativeDefinition }) {
-	const cardClass = competitorAccent[config.slug] ?? "border-stroke-soft-200 bg-bg-weak-50";
+export function AlternativePageView({
+	config,
+}: {
+	config: AlternativeDefinition;
+}) {
+	const cardClass =
+		competitorAccent[config.slug] ?? "border-stroke-soft-200 bg-bg-weak-50";
 
 	return (
 		<div className="min-h-screen bg-[#fafafa] dark:bg-black">
@@ -35,7 +40,9 @@ export function AlternativePageView({ config }: { config: AlternativeDefinition 
 						<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 px-6 py-4 font-bold text-lg dark:border-white/10">
 							Reloop
 						</div>
-						<span className="font-serif text-2xl text-text-sub-600 dark:text-white/30">vs</span>
+						<span className="font-serif text-2xl text-text-sub-600 dark:text-white/30">
+							vs
+						</span>
 						<div
 							className={`rounded-2xl border px-6 py-4 font-bold text-lg ${cardClass}`}
 						>
@@ -59,7 +66,10 @@ export function AlternativePageView({ config }: { config: AlternativeDefinition 
 						</Link>
 						<Link
 							href={config.compareHref}
-							className={Button.buttonVariants({ mode: "stroke", variant: "neutral" }).root({
+							className={Button.buttonVariants({
+								mode: "stroke",
+								variant: "neutral",
+							}).root({
 								className: "rounded-xl",
 							})}
 						>
@@ -71,7 +81,7 @@ export function AlternativePageView({ config }: { config: AlternativeDefinition 
 
 			{/* Why switch checklist */}
 			<div className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
-				<h2 className="font-semibold text-xl text-text-strong-950 dark:text-white">
+				<h2 className="font-semibold text-text-strong-950 text-xl dark:text-white">
 					Why teams switch from {config.competitorName}
 				</h2>
 				<ul className="mt-8 space-y-4">
@@ -80,7 +90,10 @@ export function AlternativePageView({ config }: { config: AlternativeDefinition 
 							key={item}
 							className="flex gap-3 rounded-xl border border-stroke-soft-200 bg-white p-5 dark:border-white/10 dark:bg-[#111]"
 						>
-							<Icon name="check" className="mt-0.5 size-5 shrink-0 text-emerald-500" />
+							<Icon
+								name="check"
+								className="mt-0.5 size-5 shrink-0 text-emerald-500"
+							/>
 							<span className="text-[15px] text-text-sub-600 leading-relaxed dark:text-white/60">
 								{item}
 							</span>

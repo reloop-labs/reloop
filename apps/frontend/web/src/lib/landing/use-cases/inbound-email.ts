@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "inbound-email",
 	path: "/use-cases/inbound-email",
-	titleLines: [
-		"Inbound",
-		"Email API",
-	],
-	description: "Receive and route inbound email to your app with webhooks, parsing, and mailbox APIs.",
+	titleLines: ["Inbound", "Email API"],
+	description:
+		"Receive and route inbound email to your app with webhooks, parsing, and mailbox APIs.",
 	keywords: [
 		"inbound email API",
 		"receive email webhook",
@@ -28,15 +26,18 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Inbound webhooks",
-					description: "POST parsed email payloads to your app when messages arrive.",
+					description:
+						"POST parsed email payloads to your app when messages arrive.",
 				},
 				{
 					title: "Mailbox API",
-					description: "Programmatic access to threads, attachments, and metadata.",
+					description:
+						"Programmatic access to threads, attachments, and metadata.",
 				},
 				{
 					title: "Routing rules",
-					description: "Route replies, support tickets, and notifications to the right handler.",
+					description:
+						"Route replies, support tickets, and notifications to the right handler.",
 				},
 			],
 		},

@@ -5,11 +5,9 @@ export const config: AlternativeDefinition = {
 	path: "/alternatives/postmark",
 	competitorName: "Postmark",
 	compareHref: "/compare/postmark",
-	titleLines: [
-		"Best Postmark",
-		"Alternative",
-	],
-	description: "Transactional email with deliverability focus—plus campaigns, self-hosting, and open-source transparency.",
+	titleLines: ["Best Postmark", "Alternative"],
+	description:
+		"Transactional email with deliverability focus—plus campaigns, self-hosting, and open-source transparency.",
 	keywords: [
 		"Postmark alternative",
 		"Postmark competitor",
@@ -35,11 +33,13 @@ export const config: AlternativeDefinition = {
 			items: [
 				{
 					title: "Grow without switching",
-					description: "Add campaigns on the same platform when marketing needs emerge.",
+					description:
+						"Add campaigns on the same platform when marketing needs emerge.",
 				},
 				{
 					title: "Ownership",
-					description: "Postmark is proprietary hosted-only; Reloop gives you the source.",
+					description:
+						"Postmark is proprietary hosted-only; Reloop gives you the source.",
 				},
 				{
 					title: "Modern API",

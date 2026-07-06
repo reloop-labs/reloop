@@ -2,8 +2,8 @@
 
 import * as Button from "@reloop/ui/button";
 import { ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
-import type { GlossaryTermDefinition } from "@reloop/web/lib/landing/types";
 import type { FeatureCtaBand } from "@reloop/web/components/landing/types";
+import type { GlossaryTermDefinition } from "@reloop/web/lib/landing/types";
 import Link from "next/link";
 
 export function GlossaryTermPageView({
@@ -19,7 +19,10 @@ export function GlossaryTermPageView({
 			<div className="border-stroke-soft-200 border-b bg-white dark:border-white/10 dark:bg-[#0a0a0a]">
 				<div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
 					<nav className="text-[13px] text-text-sub-600 dark:text-white/40">
-						<Link href="/resources/glossary" className="hover:text-primary-base">
+						<Link
+							href="/resources/glossary"
+							className="hover:text-primary-base"
+						>
 							Glossary
 						</Link>
 						<span className="mx-2">/</span>
@@ -28,7 +31,7 @@ export function GlossaryTermPageView({
 				</div>
 			</div>
 
-			<div className="mx-auto grid max-w-5xl gap-10 px-4 py-10 lg:grid-cols-[1fr_280px] sm:px-6">
+			<div className="mx-auto grid max-w-5xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[1fr_280px]">
 				<article>
 					<h1 className="font-serif text-4xl text-text-strong-950 tracking-tight dark:text-white">
 						{term.title}
@@ -49,7 +52,8 @@ export function GlossaryTermPageView({
 								In Reloop
 							</p>
 							<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/50">
-								See how Reloop helps you put {term.title} into practice in production.
+								See how Reloop helps you put {term.title} into practice in
+								production.
 							</p>
 							<Link
 								href={term.relatedFeatureHref}

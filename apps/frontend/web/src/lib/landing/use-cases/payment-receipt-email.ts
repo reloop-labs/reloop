@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "payment-receipt-email",
 	path: "/use-cases/payment-receipt-email",
-	titleLines: [
-		"Payment Receipt",
-		"Emails",
-	],
-	description: "Automated receipt and invoice emails for subscriptions, one-time payments, and refunds.",
+	titleLines: ["Payment Receipt", "Emails"],
+	description:
+		"Automated receipt and invoice emails for subscriptions, one-time payments, and refunds.",
 	keywords: [
 		"payment receipt email API",
 		"invoice email service",
@@ -28,7 +26,8 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Stripe webhooks",
-					description: "Trigger receipt emails from payment.succeeded and invoice.paid events.",
+					description:
+						"Trigger receipt emails from payment.succeeded and invoice.paid events.",
 				},
 				{
 					title: "Subscription renewals",
@@ -36,7 +35,8 @@ export const config: LandingPageDefinition = {
 				},
 				{
 					title: "Refund confirmations",
-					description: "Send clear refund receipts to close the loop with customers.",
+					description:
+						"Send clear refund receipts to close the loop with customers.",
 				},
 			],
 		},

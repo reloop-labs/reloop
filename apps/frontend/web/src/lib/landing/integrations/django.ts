@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "django",
 	path: "/integrations/django",
-	titleLines: [
-		"Send Email",
-		"with Django",
-	],
-	description: "Configure Django to send email via Reloop SMTP or the Python SDK.",
+	titleLines: ["Send Email", "with Django"],
+	description:
+		"Configure Django to send email via Reloop SMTP or the Python SDK.",
 	keywords: [
 		"Django email API",
 		"Django transactional email",
@@ -27,15 +25,18 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "SMTP backend",
-					description: "Set EMAIL_HOST to Reloop SMTP for standard Django mail sends.",
+					description:
+						"Set EMAIL_HOST to Reloop SMTP for standard Django mail sends.",
 				},
 				{
 					title: "Python SDK",
-					description: "Use the SDK in Celery tasks for advanced templates and tracking.",
+					description:
+						"Use the SDK in Celery tasks for advanced templates and tracking.",
 				},
 				{
 					title: "Admin notifications",
-					description: "Reliable delivery for password resets and admin alerts.",
+					description:
+						"Reliable delivery for password resets and admin alerts.",
 				},
 			],
 		},

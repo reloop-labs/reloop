@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "order-confirmation-email",
 	path: "/use-cases/order-confirmation-email",
-	titleLines: [
-		"Order Confirmation",
-		"Emails",
-	],
-	description: "Send purchase receipts and order confirmations with line items, totals, and tracking links.",
+	titleLines: ["Order Confirmation", "Emails"],
+	description:
+		"Send purchase receipts and order confirmations with line items, totals, and tracking links.",
 	keywords: [
 		"order confirmation email API",
 		"purchase receipt email",
@@ -28,15 +26,18 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Dynamic line items",
-					description: "Render product names, quantities, and prices from your order data.",
+					description:
+						"Render product names, quantities, and prices from your order data.",
 				},
 				{
 					title: "PDF attachments",
-					description: "Attach invoices and receipts when your flow requires them.",
+					description:
+						"Attach invoices and receipts when your flow requires them.",
 				},
 				{
 					title: "High deliverability",
-					description: "Receipt emails must reach the inbox—authentication and monitoring built in.",
+					description:
+						"Receipt emails must reach the inbox—authentication and monitoring built in.",
 				},
 			],
 		},

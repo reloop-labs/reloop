@@ -4,8 +4,8 @@ import {
 	PageSection,
 	SectionHeading,
 } from "@reloop/web/components/page-shell";
-import Link from "next/link";
 import type { AlternativeDefinition } from "@reloop/web/lib/landing/types";
+import Link from "next/link";
 
 export function AlternativeLandingPage({
 	config,

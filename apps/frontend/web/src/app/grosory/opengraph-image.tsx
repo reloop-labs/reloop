@@ -257,7 +257,9 @@ export default function OpenGraphImage() {
 							lineHeight: "1.4",
 						}}
 					>
-						Find everything you need to build with Reloop. Browse our full directory of developer tools, integrations, language SDKs, and guides.
+						Find everything you need to build with Reloop. Browse our full
+						directory of developer tools, integrations, language SDKs, and
+						guides.
 					</span>
 				</div>
 

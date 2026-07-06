@@ -1,6 +1,9 @@
 "use client";
 
-import { ToolTopBar, ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
+import {
+	ToolTopBar,
+	ToolUpsell,
+} from "@reloop/web/components/landing/tools/tool-chrome";
 import { useMemo, useState } from "react";
 
 export function SubjectTesterPageView() {
@@ -11,7 +14,8 @@ export function SubjectTesterPageView() {
 		let score = 100;
 		const tips: string[] = [];
 
-		if (len === 0) return { score: 0, len, tips: ["Enter a subject line"], preview: "" };
+		if (len === 0)
+			return { score: 0, len, tips: ["Enter a subject line"], preview: "" };
 
 		if (len > 60) {
 			score -= 25;
@@ -40,8 +44,7 @@ export function SubjectTesterPageView() {
 			tips.push("Contains common spam trigger words");
 		}
 
-		const preview =
-			len > 60 ? `${subject.slice(0, 57)}…` : subject;
+		const preview = len > 60 ? `${subject.slice(0, 57)}…` : subject;
 
 		return { score: Math.max(0, score), len, tips, preview };
 	}, [subject]);
@@ -67,7 +70,10 @@ export function SubjectTesterPageView() {
 
 			<div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
 				<div className="rounded-2xl border border-rose-100 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#111]">
-					<label htmlFor="subject" className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
+					<label
+						htmlFor="subject"
+						className="font-semibold text-[14px] text-text-strong-950 dark:text-white"
+					>
 						Subject line
 					</label>
 					<input
@@ -81,7 +87,9 @@ export function SubjectTesterPageView() {
 					<div className="mt-6">
 						<div className="mb-2 flex justify-between text-[13px] text-text-sub-600 dark:text-white/45">
 							<span>Score</span>
-							<span>{analysis.score}/100 · {analysis.len} characters</span>
+							<span>
+								{analysis.score}/100 · {analysis.len} characters
+							</span>
 						</div>
 						<div className="h-3 overflow-hidden rounded-full bg-bg-weak-50 dark:bg-white/10">
 							<div

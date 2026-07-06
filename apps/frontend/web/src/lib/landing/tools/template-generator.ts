@@ -4,11 +4,9 @@ export const config: ToolDefinition = {
 	slug: "template-generator",
 	path: "/tools/template-generator",
 	toolType: "template-generator",
-	titleLines: [
-		"Email Template",
-		"Generator",
-	],
-	description: "Generate responsive HTML email templates for newsletters, transactional messages, and welcome emails.",
+	titleLines: ["Email Template", "Generator"],
+	description:
+		"Generate responsive HTML email templates for newsletters, transactional messages, and welcome emails.",
 	keywords: [
 		"email template generator",
 		"HTML email template",
@@ -30,15 +28,18 @@ export const config: ToolDefinition = {
 			items: [
 				{
 					title: "Newsletter",
-					description: "Multi-section layouts with hero, body, and footer blocks for regular campaigns.",
+					description:
+						"Multi-section layouts with hero, body, and footer blocks for regular campaigns.",
 				},
 				{
 					title: "Transactional",
-					description: "Clean, minimal templates for receipts, resets, and account notifications.",
+					description:
+						"Clean, minimal templates for receipts, resets, and account notifications.",
 				},
 				{
 					title: "Welcome",
-					description: "Onboarding emails with clear CTAs and brand-friendly structure.",
+					description:
+						"Onboarding emails with clear CTAs and brand-friendly structure.",
 				},
 			],
 		},
@@ -46,7 +47,8 @@ export const config: ToolDefinition = {
 	cta: {
 		title: "Design templates in Reloop",
 		titleMuted: "Start free today.",
-		description: "Use the visual template editor and campaign builder in the dashboard.",
+		description:
+			"Use the visual template editor and campaign builder in the dashboard.",
 		primary: {
 			label: "Get started free",
 			href: "/dashboard/signup",

@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "startups",
 	path: "/for/startups",
-	titleLines: [
-		"Email for",
-		"Startups",
-	],
-	description: "Launch fast with free tier email—transactional, auth, and early campaigns without enterprise contracts.",
+	titleLines: ["Email for", "Startups"],
+	description:
+		"Launch fast with free tier email—transactional, auth, and early campaigns without enterprise contracts.",
 	keywords: [
 		"email API for startups",
 		"startup email infrastructure",
@@ -27,7 +25,8 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "No credit card",
-					description: "Free tier to validate product-market fit before you pay.",
+					description:
+						"Free tier to validate product-market fit before you pay.",
 				},
 				{
 					title: "One vendor",

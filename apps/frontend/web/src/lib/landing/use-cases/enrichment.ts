@@ -16,7 +16,11 @@ export const useCaseEnrichment: Record<string, UseCaseEnrichment> = {
   subject: "Your receipt",
   html: renderReceipt(order),
 });`,
-		flow: ["Trigger from your app", "Reloop delivers via API/SMTP", "Webhook confirms delivery"],
+		flow: [
+			"Trigger from your app",
+			"Reloop delivers via API/SMTP",
+			"Webhook confirms delivery",
+		],
 	},
 	"marketing-email": {
 		accent: "rose",
@@ -26,7 +30,11 @@ export const useCaseEnrichment: Record<string, UseCaseEnrichment> = {
   segment: "active_users",
   templateId: "tmpl_newsletter",
 });`,
-		flow: ["Design in builder", "Segment your audience", "Track opens & clicks"],
+		flow: [
+			"Design in builder",
+			"Segment your audience",
+			"Track opens & clicks",
+		],
 	},
 	"automated-email": {
 		accent: "violet",
@@ -35,7 +43,11 @@ export const useCaseEnrichment: Record<string, UseCaseEnrichment> = {
   event: "user.signed_up",
   workflow: "welcome_series",
 });`,
-		flow: ["Define trigger event", "Reloop sends sequence", "Analytics per step"],
+		flow: [
+			"Define trigger event",
+			"Reloop sends sequence",
+			"Analytics per step",
+		],
 	},
 	"ai-agent-inbox": {
 		accent: "indigo",
@@ -45,7 +57,11 @@ await reloop.inbox.drafts.create({
   threadId: thread.id,
   body: agentReply,
 });`,
-		flow: ["Agent reads thread", "Draft or send reply", "Human approves if needed"],
+		flow: [
+			"Agent reads thread",
+			"Draft or send reply",
+			"Human approves if needed",
+		],
 	},
 	"inbound-email": {
 		accent: "cyan",
@@ -56,7 +72,11 @@ await reloop.inbox.drafts.create({
   "subject": "Support request",
   "text": "..."
 }`,
-		flow: ["Mail arrives at your domain", "Reloop parses & POSTs webhook", "Your app routes the ticket"],
+		flow: [
+			"Mail arrives at your domain",
+			"Reloop parses & POSTs webhook",
+			"Your app routes the ticket",
+		],
 	},
 	"system-monitoring-email": {
 		accent: "slate",
@@ -66,7 +86,11 @@ await reloop.inbox.drafts.create({
   subject: "[CRITICAL] API latency spike",
   text: alertPayload,
 });`,
-		flow: ["Monitoring fires alert", "SMTP/API sends instantly", "On-call receives in inbox"],
+		flow: [
+			"Monitoring fires alert",
+			"SMTP/API sends instantly",
+			"On-call receives in inbox",
+		],
 	},
 	"password-reset-email": {
 		accent: "orange",
@@ -76,7 +100,11 @@ await reloop.inbox.drafts.create({
   subject: "Reset your password",
   html: resetLinkTemplate(token),
 });`,
-		flow: ["User clicks forgot password", "Tokenized link emailed", "Webhook tracks bounces"],
+		flow: [
+			"User clicks forgot password",
+			"Tokenized link emailed",
+			"Webhook tracks bounces",
+		],
 	},
 	"welcome-email": {
 		accent: "emerald",
@@ -86,7 +114,11 @@ await reloop.inbox.drafts.create({
   subject: "Welcome to Acme",
   template: "welcome_v1",
 });`,
-		flow: ["Signup event fires", "Welcome email sends", "Optional series follows"],
+		flow: [
+			"Signup event fires",
+			"Welcome email sends",
+			"Optional series follows",
+		],
 	},
 	"order-confirmation-email": {
 		accent: "blue",
@@ -96,7 +128,11 @@ await reloop.inbox.drafts.create({
   subject: \`Order #\${order.id} confirmed\`,
   html: orderReceiptHtml(order),
 });`,
-		flow: ["Checkout completes", "Receipt with line items", "Delivery webhook logged"],
+		flow: [
+			"Checkout completes",
+			"Receipt with line items",
+			"Delivery webhook logged",
+		],
 	},
 	"email-verification": {
 		accent: "violet",
@@ -106,7 +142,11 @@ await reloop.inbox.drafts.create({
   subject: "Verify your email",
   html: verifyLink(otp),
 });`,
-		flow: ["User registers", "Verification link sent", "Account activated on click"],
+		flow: [
+			"User registers",
+			"Verification link sent",
+			"Account activated on click",
+		],
 	},
 	"payment-receipt-email": {
 		accent: "emerald",
@@ -126,7 +166,7 @@ export function getUseCaseEnrichment(slug: string): UseCaseEnrichment {
 		useCaseEnrichment[slug] ?? {
 			accent: "blue",
 			metric: { label: "Delivery", value: "Fast" },
-			code: `await reloop.emails.send({ /* ... */ });`,
+			code: "await reloop.emails.send({ /* ... */ });",
 			flow: ["Integrate API", "Send email", "Track results"],
 		}
 	);

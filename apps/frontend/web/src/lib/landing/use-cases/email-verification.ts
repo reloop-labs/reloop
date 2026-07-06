@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "email-verification",
 	path: "/use-cases/email-verification",
-	titleLines: [
-		"Email Verification",
-		"API",
-	],
-	description: "Send verification links and OTP emails to confirm user email addresses at signup.",
+	titleLines: ["Email Verification", "API"],
+	description:
+		"Send verification links and OTP emails to confirm user email addresses at signup.",
 	keywords: [
 		"email verification API",
 		"verify email address API",
@@ -28,7 +26,8 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Magic links",
-					description: "Send one-click verification links with expiring tokens.",
+					description:
+						"Send one-click verification links with expiring tokens.",
 				},
 				{
 					title: "OTP codes",
@@ -36,7 +35,8 @@ export const config: LandingPageDefinition = {
 				},
 				{
 					title: "Validate first",
-					description: "Combine with address validation to block typos before sending.",
+					description:
+						"Combine with address validation to block typos before sending.",
 				},
 			],
 		},
@@ -44,7 +44,8 @@ export const config: LandingPageDefinition = {
 	cta: {
 		title: "Verify users reliably",
 		titleMuted: "Start free today.",
-		description: "Fast delivery and webhooks for verified, bounced, and failed sends.",
+		description:
+			"Fast delivery and webhooks for verified, bounced, and failed sends.",
 		primary: {
 			label: "Get started free",
 			href: "/dashboard/signup",

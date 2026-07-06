@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "supabase",
 	path: "/integrations/supabase",
-	titleLines: [
-		"Send Email",
-		"with Supabase",
-	],
-	description: "Replace Supabase Auth emails or send custom notifications via Reloop from Edge Functions.",
+	titleLines: ["Send Email", "with Supabase"],
+	description:
+		"Replace Supabase Auth emails or send custom notifications via Reloop from Edge Functions.",
 	keywords: [
 		"Supabase email",
 		"Supabase custom SMTP",
@@ -27,11 +25,13 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Custom SMTP",
-					description: "Point Supabase Auth SMTP settings to Reloop for branded auth emails.",
+					description:
+						"Point Supabase Auth SMTP settings to Reloop for branded auth emails.",
 				},
 				{
 					title: "Edge Functions",
-					description: "Call Reloop REST API from Supabase Edge Functions for app emails.",
+					description:
+						"Call Reloop REST API from Supabase Edge Functions for app emails.",
 				},
 				{
 					title: "Webhooks",
@@ -43,7 +43,8 @@ export const config: LandingPageDefinition = {
 	cta: {
 		title: "Better email for Supabase apps",
 		titleMuted: "Start free today.",
-		description: "Branded templates and deliverability beyond default auth mail.",
+		description:
+			"Branded templates and deliverability beyond default auth mail.",
 		primary: {
 			label: "Get started free",
 			href: "/dashboard/signup",

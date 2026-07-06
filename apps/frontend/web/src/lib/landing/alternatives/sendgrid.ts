@@ -5,11 +5,9 @@ export const config: AlternativeDefinition = {
 	path: "/alternatives/sendgrid",
 	competitorName: "SendGrid",
 	compareHref: "/compare/sendgrid",
-	titleLines: [
-		"Best SendGrid",
-		"Alternative",
-	],
-	description: "Modern email infrastructure without SendGrid's complexity—open source, developer-first, and self-hostable.",
+	titleLines: ["Best SendGrid", "Alternative"],
+	description:
+		"Modern email infrastructure without SendGrid's complexity—open source, developer-first, and self-hostable.",
 	keywords: [
 		"SendGrid alternative",
 		"SendGrid competitor",
@@ -36,15 +34,18 @@ export const config: AlternativeDefinition = {
 			items: [
 				{
 					title: "Pricing clarity",
-					description: "Predictable tiers without surprise overages on legacy plans.",
+					description:
+						"Predictable tiers without surprise overages on legacy plans.",
 				},
 				{
 					title: "Modern DX",
-					description: "Clean APIs, webhooks, and docs built for 2026—not 2012.",
+					description:
+						"Clean APIs, webhooks, and docs built for 2026—not 2012.",
 				},
 				{
 					title: "Open source",
-					description: "No black box—inspect routing, quotas, and delivery logic.",
+					description:
+						"No black box—inspect routing, quotas, and delivery logic.",
 				},
 			],
 		},

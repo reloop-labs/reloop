@@ -4,11 +4,9 @@ export const config: ToolDefinition = {
 	slug: "auth-checker",
 	path: "/tools/auth-checker",
 	toolType: "auth-checker",
-	titleLines: [
-		"SPF, DKIM &",
-		"DMARC Checker",
-	],
-	description: "Verify email authentication records for your domain. Ensure SPF, DKIM, and DMARC are configured correctly.",
+	titleLines: ["SPF, DKIM &", "DMARC Checker"],
+	description:
+		"Verify email authentication records for your domain. Ensure SPF, DKIM, and DMARC are configured correctly.",
 	keywords: [
 		"SPF checker",
 		"DKIM validator",
@@ -30,15 +28,18 @@ export const config: ToolDefinition = {
 			items: [
 				{
 					title: "SPF",
-					description: "Lists which servers are authorized to send email for your domain.",
+					description:
+						"Lists which servers are authorized to send email for your domain.",
 				},
 				{
 					title: "DKIM",
-					description: "Cryptographic signatures that prove messages weren't tampered with in transit.",
+					description:
+						"Cryptographic signatures that prove messages weren't tampered with in transit.",
 				},
 				{
 					title: "DMARC",
-					description: "Policy that tells receivers how to handle messages that fail SPF or DKIM.",
+					description:
+						"Policy that tells receivers how to handle messages that fail SPF or DKIM.",
 				},
 			],
 		},
@@ -46,7 +47,8 @@ export const config: ToolDefinition = {
 	cta: {
 		title: "Auto-configure auth in Reloop",
 		titleMuted: "Start free today.",
-		description: "Guided DNS setup for SPF, DKIM, and DMARC when you add a domain.",
+		description:
+			"Guided DNS setup for SPF, DKIM, and DMARC when you add a domain.",
 		primary: {
 			label: "Get started free",
 			href: "/dashboard/signup",

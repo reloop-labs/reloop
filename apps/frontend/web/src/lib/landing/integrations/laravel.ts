@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "laravel",
 	path: "/integrations/laravel",
-	titleLines: [
-		"Send Email",
-		"with Laravel",
-	],
-	description: "Send transactional email from Laravel using the Reloop PHP SDK or SMTP relay.",
+	titleLines: ["Send Email", "with Laravel"],
+	description:
+		"Send transactional email from Laravel using the Reloop PHP SDK or SMTP relay.",
 	keywords: [
 		"Laravel transactional email",
 		"Laravel email API",
@@ -28,15 +26,18 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "PHP SDK",
-					description: "Call Reloop directly from controllers, jobs, and notifications.",
+					description:
+						"Call Reloop directly from controllers, jobs, and notifications.",
 				},
 				{
 					title: "SMTP relay",
-					description: "Configure Laravel Mail to use Reloop SMTP for drop-in compatibility.",
+					description:
+						"Configure Laravel Mail to use Reloop SMTP for drop-in compatibility.",
 				},
 				{
 					title: "Queued sends",
-					description: "Dispatch email jobs to Laravel queues for async delivery.",
+					description:
+						"Dispatch email jobs to Laravel queues for async delivery.",
 				},
 			],
 		},

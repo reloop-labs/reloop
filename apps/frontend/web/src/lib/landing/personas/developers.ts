@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "developers",
 	path: "/for/developers",
-	titleLines: [
-		"Email for",
-		"Developers",
-	],
-	description: "API-first email infrastructure with type-safe SDKs, webhooks, sandbox, and docs built for shipping code.",
+	titleLines: ["Email for", "Developers"],
+	description:
+		"API-first email infrastructure with type-safe SDKs, webhooks, sandbox, and docs built for shipping code.",
 	keywords: [
 		"email API for developers",
 		"developer email infrastructure",
@@ -28,11 +26,13 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Official SDKs",
-					description: "Node, Python, Go, Rust, PHP, Ruby, Elixir, Java, and .NET.",
+					description:
+						"Node, Python, Go, Rust, PHP, Ruby, Elixir, Java, and .NET.",
 				},
 				{
 					title: "Real-time logs",
-					description: "Trace deliveries, bounces, and latencies in the dashboard.",
+					description:
+						"Trace deliveries, bounces, and latencies in the dashboard.",
 				},
 				{
 					title: "Open source",

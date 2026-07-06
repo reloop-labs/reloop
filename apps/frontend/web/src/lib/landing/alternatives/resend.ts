@@ -5,11 +5,9 @@ export const config: AlternativeDefinition = {
 	path: "/alternatives/resend",
 	competitorName: "Resend",
 	compareHref: "/compare/resend",
-	titleLines: [
-		"Best Resend",
-		"Alternative",
-	],
-	description: "Open-source email infrastructure with the same developer DX as Resend—plus self-hosting, campaigns, and agent workflows.",
+	titleLines: ["Best Resend", "Alternative"],
+	description:
+		"Open-source email infrastructure with the same developer DX as Resend—plus self-hosting, campaigns, and agent workflows.",
 	keywords: [
 		"Resend alternative",
 		"open source Resend alternative",
@@ -36,15 +34,18 @@ export const config: AlternativeDefinition = {
 			items: [
 				{
 					title: "Ownership",
-					description: "Read the source, run your own stack, or use hosted—your data, your choice.",
+					description:
+						"Read the source, run your own stack, or use hosted—your data, your choice.",
 				},
 				{
 					title: "One platform",
-					description: "Transactional, marketing, and AI agent email without adding vendors.",
+					description:
+						"Transactional, marketing, and AI agent email without adding vendors.",
 				},
 				{
 					title: "Transparent pricing",
-					description: "Free tier to start; self-host for unlimited sends on your hardware.",
+					description:
+						"Free tier to start; self-host for unlimited sends on your hardware.",
 				},
 			],
 		},

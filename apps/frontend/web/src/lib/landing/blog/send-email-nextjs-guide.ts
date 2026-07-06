@@ -3,7 +3,8 @@ import type { BlogPostDefinition } from "../types";
 export const post: BlogPostDefinition = {
 	slug: "send-email-nextjs-guide",
 	title: "How to Send Email in Next.js",
-	description: "Send transactional email from Next.js App Router using Reloop's Node.js SDK in Server Actions and Route Handlers.",
+	description:
+		"Send transactional email from Next.js App Router using Reloop's Node.js SDK in Server Actions and Route Handlers.",
 	keywords: [
 		"send email Next.js",
 		"Next.js email tutorial",

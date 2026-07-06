@@ -3,11 +3,9 @@ import type { BlogPostDefinition } from "../types";
 export const post: BlogPostDefinition = {
 	slug: "transactional-email-best-practices",
 	title: "Transactional Email Best Practices",
-	description: "Patterns for password resets, receipts, and notifications that arrive fast and stay out of spam.",
-	keywords: [
-		"transactional email best practices",
-		"transactional email tips",
-	],
+	description:
+		"Patterns for password resets, receipts, and notifications that arrive fast and stay out of spam.",
+	keywords: ["transactional email best practices", "transactional email tips"],
 	publishedAt: "2026-05-20",
 	tag: "Guides",
 	readTime: "7 min read",

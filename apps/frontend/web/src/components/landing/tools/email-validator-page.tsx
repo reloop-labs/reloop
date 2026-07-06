@@ -13,7 +13,7 @@ import {
 	validateEmailAddress,
 } from "@reloop/web/lib/landing/tools/validation-utils";
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { type FormEvent, useState } from "react";
 
 export function EmailValidatorPageView() {
 	const [email, setEmail] = useState("");
@@ -43,14 +43,17 @@ export function EmailValidatorPageView() {
 			<div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
 				<ToolPanel>
 					<form onSubmit={handleValidate} className="space-y-4">
-						<label htmlFor="email-input" className="block font-medium text-[14px] text-text-strong-950 dark:text-white">
+						<label
+							htmlFor="email-input"
+							className="block font-medium text-[14px] text-text-strong-950 dark:text-white"
+						>
 							Email address
 						</label>
 						<div className="flex flex-col gap-3 sm:flex-row">
 							<div className="relative flex-1">
 								<Icon
 									name="mail"
-									className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-text-sub-600 dark:text-white/30"
+									className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-4 size-5 text-text-sub-600 dark:text-white/30"
 								/>
 								<input
 									id="email-input"
@@ -72,7 +75,8 @@ export function EmailValidatorPageView() {
 							</button>
 						</div>
 						<p className="text-[12px] text-text-sub-600 dark:text-white/35">
-							Press Enter or click Verify. MX lookup uses public DNS—no address is stored.
+							Press Enter or click Verify. MX lookup uses public DNS—no address
+							is stored.
 						</p>
 					</form>
 
@@ -87,10 +91,15 @@ export function EmailValidatorPageView() {
 							>
 								<div
 									className={`flex size-10 shrink-0 items-center justify-center rounded-full ${
-										result.valid ? "bg-emerald-500 text-white" : "bg-red-500 text-white"
+										result.valid
+											? "bg-emerald-500 text-white"
+											: "bg-red-500 text-white"
 									}`}
 								>
-									<Icon name={result.valid ? "check" : "cross-circle"} className="size-5" />
+									<Icon
+										name={result.valid ? "check" : "cross-circle"}
+										className="size-5"
+									/>
 								</div>
 								<div>
 									<p className="font-semibold text-lg text-text-strong-950 dark:text-white">
@@ -141,7 +150,10 @@ export function EmailValidatorPageView() {
 
 				<p className="mt-8 text-center text-[13px] text-text-sub-600 dark:text-white/35">
 					Also try{" "}
-					<Link href="/tools/auth-checker" className="text-primary-base hover:underline">
+					<Link
+						href="/tools/auth-checker"
+						className="text-primary-base hover:underline"
+					>
 						SPF/DKIM/DMARC checker
 					</Link>{" "}
 					or browse the{" "}

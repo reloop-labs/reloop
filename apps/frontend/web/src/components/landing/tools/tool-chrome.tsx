@@ -39,7 +39,9 @@ export function ToolTopBar({
 						</span>
 					))}
 				</nav>
-				<div className={`mb-3 inline-flex rounded-full px-3 py-1 font-semibold text-[11px] uppercase tracking-wider ${accentBg}`}>
+				<div
+					className={`mb-3 inline-flex rounded-full px-3 py-1 font-semibold text-[11px] uppercase tracking-wider ${accentBg}`}
+				>
 					Free tool
 				</div>
 				<h1 className="font-semibold text-2xl text-text-strong-950 tracking-tight sm:text-3xl dark:text-white">
@@ -63,7 +65,12 @@ export function StatusIcon({ status }: { status: CheckStatus }) {
 	if (status === "warn") {
 		return <Icon name="alert-circle" className="size-5 text-amber-500" />;
 	}
-	return <Icon name="alert-circle" className="size-5 text-text-sub-600 dark:text-white/40" />;
+	return (
+		<Icon
+			name="alert-circle"
+			className="size-5 text-text-sub-600 dark:text-white/40"
+		/>
+	);
 }
 
 export function ToolUpsell({
@@ -121,7 +128,12 @@ export function ToolUpsell({
 export function ChecklistTable({
 	checks,
 }: {
-	checks: { label: string; status: CheckStatus; detail: string; record?: string }[];
+	checks: {
+		label: string;
+		status: CheckStatus;
+		detail: string;
+		record?: string;
+	}[];
 }) {
 	return (
 		<div className="overflow-hidden rounded-xl border border-stroke-soft-200 dark:border-white/10">
@@ -161,7 +173,13 @@ export function ChecklistTable({
 	);
 }
 
-export function ToolPanel({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function ToolPanel({
+	children,
+	className = "",
+}: {
+	children: ReactNode;
+	className?: string;
+}) {
 	return (
 		<div
 			className={`rounded-2xl border border-stroke-soft-200 bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] sm:p-8 dark:border-white/10 dark:bg-[#111] dark:shadow-none ${className}`}

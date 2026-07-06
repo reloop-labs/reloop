@@ -3,7 +3,8 @@ import type { BlogPostDefinition } from "../types";
 export const post: BlogPostDefinition = {
 	slug: "migrating-from-sendgrid",
 	title: "Migrating from SendGrid to Reloop",
-	description: "Step-by-step migration: map APIs, switch SMTP, update webhooks, and validate deliverability during the cutover.",
+	description:
+		"Step-by-step migration: map APIs, switch SMTP, update webhooks, and validate deliverability during the cutover.",
 	keywords: [
 		"migrate from SendGrid",
 		"SendGrid migration",

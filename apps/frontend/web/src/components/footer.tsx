@@ -92,14 +92,14 @@ const links = [
 				title: "Pricing",
 				href: "/pricing",
 			},
-		{
-			title: "Grosory",
-			href: "/grosory",
-		},
-		{
-			title: "Compare",
-			href: "/compare",
-		},
+			{
+				title: "Grosory",
+				href: "/grosory",
+			},
+			{
+				title: "Compare",
+				href: "/compare",
+			},
 			{
 				title: "Why Reloop",
 				href: "/philosophy/why-reloop",

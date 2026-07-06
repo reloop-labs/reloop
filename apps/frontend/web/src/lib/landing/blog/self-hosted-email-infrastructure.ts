@@ -3,7 +3,8 @@ import type { BlogPostDefinition } from "../types";
 export const post: BlogPostDefinition = {
 	slug: "self-hosted-email-infrastructure",
 	title: "Self-Hosted Email Infrastructure: When and How",
-	description: "Why teams self-host email, what Reloop gives you out of the box, and how to deploy with Docker Compose.",
+	description:
+		"Why teams self-host email, what Reloop gives you out of the box, and how to deploy with Docker Compose.",
 	keywords: [
 		"self-hosted email",
 		"self-host email server",

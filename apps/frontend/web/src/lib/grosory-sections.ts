@@ -1,5 +1,5 @@
-import { languages, LANGUAGE_SLUGS } from "../app/features/languages/languages";
 import { competitorBrands } from "../app/compare/competitor-brands";
+import { LANGUAGE_SLUGS, languages } from "../app/features/languages/languages";
 import {
 	alternativeConfigs,
 	blogPosts,
@@ -29,7 +29,12 @@ export function getSectionSlug(title: string): string {
 }
 
 function landingLinks(
-	items: { titleLines?: string[]; title?: string; path: string; slug?: string }[],
+	items: {
+		titleLines?: string[];
+		title?: string;
+		path: string;
+		slug?: string;
+	}[],
 	titleKey: "titleLines" | "title" = "titleLines",
 ): GrosoryLink[] {
 	return items.map((item) => ({
@@ -161,11 +166,16 @@ export function getGrosorySections(): GrosorySection[] {
 }
 
 export function getGrosoryLinkCount(): number {
-	return getGrosorySections().reduce((sum, section) => sum + section.links.length, 0);
+	return getGrosorySections().reduce(
+		(sum, section) => sum + section.links.length,
+		0,
+	);
 }
 
 export function getGrosoryPageDescription(totalLinks: number): string {
-	return "Find everything you need to build with Reloop. Browse our full directory of developer tools, integrations, language SDKs, and guides below.";
+	return "Explore the Reloop site directory. Browse our full collection of developer tools, integrations, language SDKs, blog posts, glossary terms, and guides.";
 }
 
-
+export function getGrosoryPageOgDescription(totalLinks: number): string {
+	return "Find everything you need to build with Reloop. Browse our directory of developer tools, integrations, SDKs, and guides.";
+}

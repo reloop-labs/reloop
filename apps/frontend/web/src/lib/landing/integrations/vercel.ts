@@ -3,16 +3,10 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "vercel",
 	path: "/integrations/vercel",
-	titleLines: [
-		"Send Email",
-		"on Vercel",
-	],
-	description: "Deploy Next.js or serverless apps on Vercel and send email via Reloop API.",
-	keywords: [
-		"Vercel email",
-		"send email Vercel",
-		"Vercel transactional email",
-	],
+	titleLines: ["Send Email", "on Vercel"],
+	description:
+		"Deploy Next.js or serverless apps on Vercel and send email via Reloop API.",
+	keywords: ["Vercel email", "send email Vercel", "Vercel transactional email"],
 	primaryCta: {
 		label: "Get started free",
 		href: "/dashboard/signup",
@@ -31,7 +25,8 @@ export const config: LandingPageDefinition = {
 				},
 				{
 					title: "Serverless functions",
-					description: "Send from API routes without managing SMTP connections.",
+					description:
+						"Send from API routes without managing SMTP connections.",
 				},
 				{
 					title: "Edge compatibility",

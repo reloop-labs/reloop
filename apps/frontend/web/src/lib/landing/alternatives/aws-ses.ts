@@ -5,11 +5,9 @@ export const config: AlternativeDefinition = {
 	path: "/alternatives/aws-ses",
 	competitorName: "AWS SES",
 	compareHref: "/compare/aws-ses",
-	titleLines: [
-		"Best AWS SES",
-		"Alternative",
-	],
-	description: "Email infrastructure with a real dashboard, templates, and campaigns—without wiring SES yourself.",
+	titleLines: ["Best AWS SES", "Alternative"],
+	description:
+		"Email infrastructure with a real dashboard, templates, and campaigns—without wiring SES yourself.",
 	keywords: [
 		"AWS SES alternative",
 		"SES alternative",
@@ -36,15 +34,18 @@ export const config: AlternativeDefinition = {
 			items: [
 				{
 					title: "Developer time",
-					description: "SES is cheap but you build everything—Reloop ships the full product.",
+					description:
+						"SES is cheap but you build everything—Reloop ships the full product.",
 				},
 				{
 					title: "Marketing email",
-					description: "Campaigns, segmentation, and analytics without a second vendor.",
+					description:
+						"Campaigns, segmentation, and analytics without a second vendor.",
 				},
 				{
 					title: "Support & docs",
-					description: "Human-readable docs and community—not AWS support tickets.",
+					description:
+						"Human-readable docs and community—not AWS support tickets.",
 				},
 			],
 		},

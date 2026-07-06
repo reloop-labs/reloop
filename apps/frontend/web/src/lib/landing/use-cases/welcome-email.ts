@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "welcome-email",
 	path: "/use-cases/welcome-email",
-	titleLines: [
-		"Welcome Email",
-		"Automation",
-	],
-	description: "Onboard new users with branded welcome emails triggered at signup.",
+	titleLines: ["Welcome Email", "Automation"],
+	description:
+		"Onboard new users with branded welcome emails triggered at signup.",
 	keywords: [
 		"welcome email automation",
 		"onboarding email API",
@@ -28,11 +26,13 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Trigger at signup",
-					description: "Send welcome emails via API or webhook when a user registers.",
+					description:
+						"Send welcome emails via API or webhook when a user registers.",
 				},
 				{
 					title: "On-brand templates",
-					description: "Design welcome emails that match your product's look and voice.",
+					description:
+						"Design welcome emails that match your product's look and voice.",
 				},
 				{
 					title: "Series support",

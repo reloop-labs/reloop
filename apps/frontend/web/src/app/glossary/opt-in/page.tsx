@@ -1,7 +1,7 @@
 import { GlossaryTermPageView } from "@reloop/web/components/landing/glossary/glossary-term-page-view";
 import { defaultLandingCta } from "@reloop/web/lib/landing/constants";
-import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { term } from "@reloop/web/lib/landing/glossary/opt-in";
+import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 
 export const instant = false;
 

@@ -16,7 +16,7 @@ export const metadata = createLandingMetadata(
 export default function UseCasesIndexPage() {
 	return (
 		<div className="min-h-screen bg-white dark:bg-black">
-			<div className="border-stroke-soft-200 border-b bg-[#fafafa] px-4 py-12 dark:border-white/10 dark:bg-[#0a0a0a] sm:px-6">
+			<div className="border-stroke-soft-200 border-b bg-[#fafafa] px-4 py-12 sm:px-6 dark:border-white/10 dark:bg-[#0a0a0a]">
 				<div className="mx-auto max-w-5xl">
 					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/40">
 						Use cases
@@ -25,13 +25,13 @@ export default function UseCasesIndexPage() {
 						Every email scenario, one platform
 					</h1>
 					<p className="mt-3 max-w-2xl text-[16px] text-text-sub-600 leading-relaxed dark:text-white/50">
-						Product-style pages with code samples and flow diagrams—like
-						Stripe or SendGrid docs, not generic marketing.
+						Product-style pages with code samples and flow diagrams—like Stripe
+						or SendGrid docs, not generic marketing.
 					</p>
 				</div>
 			</div>
 
-			<div className="mx-auto grid max-w-5xl gap-4 px-4 py-10 sm:grid-cols-2 lg:grid-cols-3 sm:px-6">
+			<div className="mx-auto grid max-w-5xl gap-4 px-4 py-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-3">
 				{useCaseConfigs.map((uc) => {
 					const extra = getUseCaseEnrichment(uc.slug);
 					const accent = accentStyles[extra.accent];
@@ -52,7 +52,9 @@ export default function UseCasesIndexPage() {
 							<p className="mt-2 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/45">
 								{uc.description}
 							</p>
-							<span className={`mt-4 inline-block font-semibold text-sm ${accent.text}`}>
+							<span
+								className={`mt-4 inline-block font-semibold text-sm ${accent.text}`}
+							>
 								View use case →
 							</span>
 						</Link>

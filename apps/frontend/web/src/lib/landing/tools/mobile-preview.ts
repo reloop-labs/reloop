@@ -4,11 +4,9 @@ export const config: ToolDefinition = {
 	slug: "mobile-preview",
 	path: "/tools/mobile-preview",
 	toolType: "mobile-preview",
-	titleLines: [
-		"Email Mobile",
-		"Preview",
-	],
-	description: "Preview how your HTML email renders on mobile devices before you send.",
+	titleLines: ["Email Mobile", "Preview"],
+	description:
+		"Preview how your HTML email renders on mobile devices before you send.",
 	keywords: [
 		"email mobile preview",
 		"email client preview",
@@ -30,15 +28,18 @@ export const config: ToolDefinition = {
 			items: [
 				{
 					title: "Mobile viewport",
-					description: "See how your email looks on narrow screens where most opens happen.",
+					description:
+						"See how your email looks on narrow screens where most opens happen.",
 				},
 				{
 					title: "Responsive checks",
-					description: "Catch broken layouts, oversized images, and unreadable font sizes.",
+					description:
+						"Catch broken layouts, oversized images, and unreadable font sizes.",
 				},
 				{
 					title: "Before you send",
-					description: "Fix rendering issues before they reach customers' inboxes.",
+					description:
+						"Fix rendering issues before they reach customers' inboxes.",
 				},
 			],
 		},
@@ -46,7 +47,8 @@ export const config: ToolDefinition = {
 	cta: {
 		title: "Send with confidence",
 		titleMuted: "Start free today.",
-		description: "Design responsive templates and preview campaigns in the Reloop dashboard.",
+		description:
+			"Design responsive templates and preview campaigns in the Reloop dashboard.",
 		primary: {
 			label: "Get started free",
 			href: "/dashboard/signup",

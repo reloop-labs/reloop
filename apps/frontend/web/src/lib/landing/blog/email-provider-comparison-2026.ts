@@ -3,7 +3,8 @@ import type { BlogPostDefinition } from "../types";
 export const post: BlogPostDefinition = {
 	slug: "email-provider-comparison-2026",
 	title: "Email Provider Comparison: Resend vs SendGrid vs Reloop",
-	description: "A 2026 comparison of developer email providers on open source, self-hosting, campaigns, and pricing.",
+	description:
+		"A 2026 comparison of developer email providers on open source, self-hosting, campaigns, and pricing.",
 	keywords: [
 		"email provider comparison",
 		"Resend vs SendGrid",

@@ -5,8 +5,8 @@ import {
 	PageSection,
 	SectionHeading,
 } from "@reloop/web/components/page-shell";
-import Link from "next/link";
 import type { LandingPageDefinition } from "@reloop/web/lib/landing/types";
+import Link from "next/link";
 
 export function SeoLandingPage({ config }: { config: LandingPageDefinition }) {
 	return (

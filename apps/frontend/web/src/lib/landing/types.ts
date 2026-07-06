@@ -1,4 +1,7 @@
-import type { FeatureCtaBand, FeatureCtaLink } from "@reloop/web/components/landing/types";
+import type {
+	FeatureCtaBand,
+	FeatureCtaLink,
+} from "@reloop/web/components/landing/types";
 
 export type LandingSection = {
 	title: string;

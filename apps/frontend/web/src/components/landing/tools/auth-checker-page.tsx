@@ -41,15 +41,18 @@ export function AuthCheckerPageView() {
 						SPF · DKIM · DMARC Lookup
 					</h1>
 					<p className="mt-2 max-w-2xl text-[15px] text-white/55">
-						DNS lookup for sending domains—similar to MXToolbox and DMARC analyzers.
-						Enter your domain to inspect authentication records.
+						DNS lookup for sending domains—similar to MXToolbox and DMARC
+						analyzers. Enter your domain to inspect authentication records.
 					</p>
 				</div>
 			</div>
 
 			<div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
 				<ToolPanel className="border-white/10! bg-[#111827]! text-white">
-					<form onSubmit={handleLookup} className="flex flex-col gap-3 sm:flex-row">
+					<form
+						onSubmit={handleLookup}
+						className="flex flex-col gap-3 sm:flex-row"
+					>
 						<input
 							value={domain}
 							onChange={(e) => setDomain(e.target.value)}
@@ -73,8 +76,12 @@ export function AuthCheckerPageView() {
 				</ToolPanel>
 
 				<div className="mt-6 font-mono text-[12px] text-white/35">
-					TXT lookup via public DNS. For guided SPF/DKIM setup, add your domain in{" "}
-					<Link href="/dashboard/signup" className="text-orange-400 hover:underline">
+					TXT lookup via public DNS. For guided SPF/DKIM setup, add your domain
+					in{" "}
+					<Link
+						href="/dashboard/signup"
+						className="text-orange-400 hover:underline"
+					>
 						Reloop
 					</Link>
 					.

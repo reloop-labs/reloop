@@ -4,11 +4,9 @@ export const config: ToolDefinition = {
 	slug: "subject-tester",
 	path: "/tools/subject-tester",
 	toolType: "subject-tester",
-	titleLines: [
-		"Subject Line",
-		"Tester",
-	],
-	description: "Score and optimize email subject lines for length, clarity, and spam trigger words.",
+	titleLines: ["Subject Line", "Tester"],
+	description:
+		"Score and optimize email subject lines for length, clarity, and spam trigger words.",
 	keywords: [
 		"email subject line tester",
 		"subject line analyzer",
@@ -30,15 +28,18 @@ export const config: ToolDefinition = {
 			items: [
 				{
 					title: "Length",
-					description: "Keep subjects under 50 characters so they display fully on mobile devices.",
+					description:
+						"Keep subjects under 50 characters so they display fully on mobile devices.",
 				},
 				{
 					title: "Clarity",
-					description: "Tell recipients exactly what's inside—avoid vague or clickbait phrasing.",
+					description:
+						"Tell recipients exactly what's inside—avoid vague or clickbait phrasing.",
 				},
 				{
 					title: "Spam words",
-					description: "Avoid ALL CAPS, excessive punctuation, and words that trigger filters.",
+					description:
+						"Avoid ALL CAPS, excessive punctuation, and words that trigger filters.",
 				},
 			],
 		},
@@ -46,7 +47,8 @@ export const config: ToolDefinition = {
 	cta: {
 		title: "A/B test subjects in campaigns",
 		titleMuted: "Start free today.",
-		description: "Track open rates and compare subject lines with Reloop analytics.",
+		description:
+			"Track open rates and compare subject lines with Reloop analytics.",
 		primary: {
 			label: "Get started free",
 			href: "/dashboard/signup",

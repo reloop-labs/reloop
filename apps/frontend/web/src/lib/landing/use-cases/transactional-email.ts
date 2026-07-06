@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "transactional-email",
 	path: "/use-cases/transactional-email",
-	titleLines: [
-		"Transactional",
-		"Email API",
-	],
-	description: "Send password resets, receipts, and real-time notifications with low-latency delivery and delivery tracking.",
+	titleLines: ["Transactional", "Email API"],
+	description:
+		"Send password resets, receipts, and real-time notifications with low-latency delivery and delivery tracking.",
 	keywords: [
 		"transactional email API",
 		"transactional email service",
@@ -28,15 +26,18 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Sub-second delivery",
-					description: "Low-latency API and SMTP relay for time-sensitive notifications.",
+					description:
+						"Low-latency API and SMTP relay for time-sensitive notifications.",
 				},
 				{
 					title: "Delivery events",
-					description: "Webhooks for delivered, bounced, and deferred events to keep your app in sync.",
+					description:
+						"Webhooks for delivered, bounced, and deferred events to keep your app in sync.",
 				},
 				{
 					title: "Templates & variables",
-					description: "Reusable templates with dynamic content for every transactional type.",
+					description:
+						"Reusable templates with dynamic content for every transactional type.",
 				},
 			],
 		},

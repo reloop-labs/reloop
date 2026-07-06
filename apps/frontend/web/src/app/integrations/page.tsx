@@ -1,7 +1,7 @@
-import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
-import { accentStyles } from "@reloop/web/lib/landing/page-accents";
 import { integrationConfigs } from "@reloop/web/lib/landing/integrations";
 import { getIntegrationEnrichment } from "@reloop/web/lib/landing/integrations/enrichment";
+import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
+import { accentStyles } from "@reloop/web/lib/landing/page-accents";
 import Link from "next/link";
 
 export const instant = false;
@@ -31,7 +31,7 @@ export default function IntegrationsIndexPage() {
 				</div>
 			</div>
 
-			<div className="mx-auto grid max-w-5xl gap-3 px-4 py-10 sm:grid-cols-2 lg:grid-cols-3 sm:px-6">
+			<div className="mx-auto grid max-w-5xl gap-3 px-4 py-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-3">
 				{integrationConfigs.map((item) => {
 					const extra = getIntegrationEnrichment(item.slug);
 					const accent = accentStyles[extra.accent];

@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "rails",
 	path: "/integrations/rails",
-	titleLines: [
-		"Send Email",
-		"with Rails",
-	],
-	description: "Send email from Ruby on Rails with Action Mailer and Reloop SMTP or the Ruby gem.",
+	titleLines: ["Send Email", "with Rails"],
+	description:
+		"Send email from Ruby on Rails with Action Mailer and Reloop SMTP or the Ruby gem.",
 	keywords: [
 		"Rails transactional email",
 		"Rails email API",
@@ -27,7 +25,8 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Action Mailer",
-					description: "Configure SMTP settings in production.rb for standard mailers.",
+					description:
+						"Configure SMTP settings in production.rb for standard mailers.",
 				},
 				{
 					title: "Active Job",

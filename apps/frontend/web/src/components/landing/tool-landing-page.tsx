@@ -1,3 +1,4 @@
+import { ToolWidget } from "@reloop/web/components/landing/content-pages";
 import {
 	cardGridClass,
 	FeatureCta,
@@ -5,9 +6,8 @@ import {
 	PageSection,
 	SectionHeading,
 } from "@reloop/web/components/page-shell";
-import { ToolWidget } from "@reloop/web/components/landing/content-pages";
-import Link from "next/link";
 import type { ToolDefinition } from "@reloop/web/lib/landing/types";
+import Link from "next/link";
 
 export function ToolLandingPage({ config }: { config: ToolDefinition }) {
 	return (

@@ -3,8 +3,8 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
-import type { LandingPageDefinition } from "@reloop/web/lib/landing/types";
 import { accentStyles } from "@reloop/web/lib/landing/page-accents";
+import type { LandingPageDefinition } from "@reloop/web/lib/landing/types";
 import { getUseCaseEnrichment } from "@reloop/web/lib/landing/use-cases/enrichment";
 import Link from "next/link";
 
@@ -16,7 +16,7 @@ export function UseCasePageView({ config }: { config: LandingPageDefinition }) {
 		<div className="min-h-screen bg-white dark:bg-black">
 			{/* Product-style split hero (Stripe / SendGrid pattern) */}
 			<div className="border-stroke-soft-200 border-b dark:border-white/10">
-				<div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 lg:grid-cols-2 lg:items-center lg:py-16 sm:px-6">
+				<div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-16">
 					<div>
 						<nav className="mb-4 flex gap-2 text-[13px] text-text-sub-600 dark:text-white/40">
 							<Link href="/use-cases" className="hover:text-primary-base">
@@ -40,9 +40,11 @@ export function UseCasePageView({ config }: { config: LandingPageDefinition }) {
 							{config.primaryCta && (
 								<Link
 									href={config.primaryCta.href}
-									className={Button.buttonVariants({ variant: "neutral" }).root({
-										className: "rounded-xl",
-									})}
+									className={Button.buttonVariants({ variant: "neutral" }).root(
+										{
+											className: "rounded-xl",
+										},
+									)}
 								>
 									{config.primaryCta.label}
 								</Link>
@@ -76,7 +78,9 @@ export function UseCasePageView({ config }: { config: LandingPageDefinition }) {
 							<div className="size-2.5 rounded-full bg-red-400" />
 							<div className="size-2.5 rounded-full bg-amber-400" />
 							<div className="size-2.5 rounded-full bg-emerald-400" />
-							<span className="ml-2 font-mono text-[11px] text-white/40">example.ts</span>
+							<span className="ml-2 font-mono text-[11px] text-white/40">
+								example.ts
+							</span>
 						</div>
 						<pre className="overflow-x-auto p-5 font-mono text-[12px] text-emerald-300/90 leading-relaxed">
 							{extra.code}
@@ -110,7 +114,7 @@ export function UseCasePageView({ config }: { config: LandingPageDefinition }) {
 
 				{config.sections[0] && (
 					<div className="mt-14">
-						<h2 className="font-semibold text-xl text-text-strong-950 dark:text-white">
+						<h2 className="font-semibold text-text-strong-950 text-xl dark:text-white">
 							{config.sections[0].title}
 						</h2>
 						<div className="mt-6 grid gap-4 sm:grid-cols-3">

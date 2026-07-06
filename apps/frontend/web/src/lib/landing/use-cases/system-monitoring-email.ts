@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "system-monitoring-email",
 	path: "/use-cases/system-monitoring-email",
-	titleLines: [
-		"System &",
-		"Monitoring Email",
-	],
-	description: "Zero-latency alerts for errors, downtime, reports, and admin approvals.",
+	titleLines: ["System &", "Monitoring Email"],
+	description:
+		"Zero-latency alerts for errors, downtime, reports, and admin approvals.",
 	keywords: [
 		"alert email service",
 		"ops notification email",
@@ -28,15 +26,18 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Error alerts",
-					description: "Route Sentry, Datadog, or custom alerts through a reliable SMTP relay.",
+					description:
+						"Route Sentry, Datadog, or custom alerts through a reliable SMTP relay.",
 				},
 				{
 					title: "Downtime notifications",
-					description: "Ensure status page and incident emails reach on-call engineers.",
+					description:
+						"Ensure status page and incident emails reach on-call engineers.",
 				},
 				{
 					title: "Scheduled reports",
-					description: "Send daily digests and admin reports on a predictable schedule.",
+					description:
+						"Send daily digests and admin reports on a predictable schedule.",
 				},
 			],
 		},

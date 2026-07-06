@@ -5,11 +5,9 @@ export const config: AlternativeDefinition = {
 	path: "/alternatives/mailgun",
 	competitorName: "Mailgun",
 	compareHref: "/compare/mailgun",
-	titleLines: [
-		"Best Mailgun",
-		"Alternative",
-	],
-	description: "Developer email API with deliverability tools, webhooks, and the option to self-host.",
+	titleLines: ["Best Mailgun", "Alternative"],
+	description:
+		"Developer email API with deliverability tools, webhooks, and the option to self-host.",
 	keywords: [
 		"Mailgun alternative",
 		"Mailgun competitor",
@@ -36,15 +34,18 @@ export const config: AlternativeDefinition = {
 			items: [
 				{
 					title: "Full stack",
-					description: "Transactional, campaigns, templates, and contacts in one product.",
+					description:
+						"Transactional, campaigns, templates, and contacts in one product.",
 				},
 				{
 					title: "Self-hosting",
-					description: "Mailgun is hosted-only; Reloop runs on your infrastructure.",
+					description:
+						"Mailgun is hosted-only; Reloop runs on your infrastructure.",
 				},
 				{
 					title: "Agent-ready",
-					description: "Native inbox APIs for AI workflows Mailgun doesn't offer.",
+					description:
+						"Native inbox APIs for AI workflows Mailgun doesn't offer.",
 				},
 			],
 		},

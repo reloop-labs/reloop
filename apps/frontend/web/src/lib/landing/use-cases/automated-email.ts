@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "automated-email",
 	path: "/use-cases/automated-email",
-	titleLines: [
-		"Automated",
-		"Email Flows",
-	],
-	description: "Welcome series, drip campaigns, renewal reminders, and re-engagement flows triggered by user behavior.",
+	titleLines: ["Automated", "Email Flows"],
+	description:
+		"Welcome series, drip campaigns, renewal reminders, and re-engagement flows triggered by user behavior.",
 	keywords: [
 		"email automation",
 		"drip campaign software",
@@ -28,15 +26,18 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Welcome series",
-					description: "Onboard new users with timed sequences triggered at signup.",
+					description:
+						"Onboard new users with timed sequences triggered at signup.",
 				},
 				{
 					title: "Renewal reminders",
-					description: "Reduce churn with automated billing and subscription nudges.",
+					description:
+						"Reduce churn with automated billing and subscription nudges.",
 				},
 				{
 					title: "Re-engagement",
-					description: "Win back inactive users with targeted win-back campaigns.",
+					description:
+						"Win back inactive users with targeted win-back campaigns.",
 				},
 			],
 		},
@@ -44,7 +45,8 @@ export const config: LandingPageDefinition = {
 	cta: {
 		title: "Build automated flows",
 		titleMuted: "Start free today.",
-		description: "Combine webhooks, contacts, and campaigns for full lifecycle email.",
+		description:
+			"Combine webhooks, contacts, and campaigns for full lifecycle email.",
 		primary: {
 			label: "Get started free",
 			href: "/dashboard/signup",

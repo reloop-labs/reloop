@@ -2,8 +2,8 @@
 
 import * as Button from "@reloop/ui/button";
 import { ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
-import type { BlogPostDefinition } from "@reloop/web/lib/landing/types";
 import type { FeatureCtaBand } from "@reloop/web/components/landing/types";
+import type { BlogPostDefinition } from "@reloop/web/lib/landing/types";
 import Link from "next/link";
 
 export function BlogPostPageView({
@@ -51,9 +51,14 @@ export function BlogPostPageView({
 
 				<div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-serif prose-p:text-[17px] prose-p:leading-8">
 					{post.sections.map((section) => (
-						<div key={section.heading ?? section.paragraphs[0]} className="mb-10">
+						<div
+							key={section.heading ?? section.paragraphs[0]}
+							className="mb-10"
+						>
 							{section.heading && (
-								<h2 className="font-serif text-2xl tracking-tight">{section.heading}</h2>
+								<h2 className="font-serif text-2xl tracking-tight">
+									{section.heading}
+								</h2>
 							)}
 							{section.paragraphs.map((paragraph) => (
 								<p key={paragraph.slice(0, 48)}>{paragraph}</p>
@@ -65,7 +70,10 @@ export function BlogPostPageView({
 				<div className="mt-12 border-stroke-soft-200 border-t pt-8 dark:border-white/10">
 					<Link
 						href="/company/blog"
-						className={Button.buttonVariants({ mode: "stroke", variant: "neutral" }).root({
+						className={Button.buttonVariants({
+							mode: "stroke",
+							variant: "neutral",
+						}).root({
 							className: "rounded-full",
 						})}
 					>

@@ -5,8 +5,6 @@ import { getSectionSlug } from "@reloop/web/lib/grosory-sections";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-
-
 export function GrosoryPageMain({ sections }: { sections: GrosorySection[] }) {
 	const [activeSection, setActiveSection] = useState<string>("");
 
@@ -42,7 +40,8 @@ export function GrosoryPageMain({ sections }: { sections: GrosorySection[] }) {
 				if (el) {
 					const headerOffset = 100; // Offset for sticky header
 					const elementPosition = el.getBoundingClientRect().top;
-					const offsetPosition = elementPosition + window.scrollY - headerOffset;
+					const offsetPosition =
+						elementPosition + window.scrollY - headerOffset;
 
 					window.scrollTo({
 						top: offsetPosition,
@@ -62,7 +61,6 @@ export function GrosoryPageMain({ sections }: { sections: GrosorySection[] }) {
 			window.removeEventListener("hashchange", handleHashChange);
 		};
 	}, []);
-
 
 	const handleScrollTo = (
 		e: React.MouseEvent<HTMLAnchorElement>,
@@ -204,4 +202,3 @@ export function GrosoryPageMain({ sections }: { sections: GrosorySection[] }) {
 		</div>
 	);
 }
-

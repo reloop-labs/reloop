@@ -6,6 +6,7 @@ export function createLandingMetadata(
 	description: string,
 	path: string,
 	keywords?: string[],
+	ogDescription?: string,
 ): Metadata {
 	const fullTitle = `${title} | Reloop`;
 	const canonicalUrl = `${getSiteUrl()}${path}`;
@@ -17,7 +18,7 @@ export function createLandingMetadata(
 		alternates: { canonical: canonicalUrl },
 		openGraph: {
 			title: fullTitle,
-			description,
+			description: ogDescription ?? description,
 			type: "website",
 			url: canonicalUrl,
 			siteName: "Reloop",
@@ -25,7 +26,7 @@ export function createLandingMetadata(
 		twitter: {
 			card: "summary_large_image",
 			title: fullTitle,
-			description,
+			description: ogDescription ?? description,
 		},
 	};
 }

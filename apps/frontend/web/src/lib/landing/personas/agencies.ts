@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "agencies",
 	path: "/for/agencies",
-	titleLines: [
-		"Email for",
-		"Agencies",
-	],
-	description: "Manage email infrastructure for multiple clients with domains, templates, and deliverability tools.",
+	titleLines: ["Email for", "Agencies"],
+	description:
+		"Manage email infrastructure for multiple clients with domains, templates, and deliverability tools.",
 	keywords: [
 		"email for agencies",
 		"white label email",
@@ -27,7 +25,8 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Per-client domains",
-					description: "Verify and manage DNS for each client's sending domain.",
+					description:
+						"Verify and manage DNS for each client's sending domain.",
 				},
 				{
 					title: "Template library",
@@ -35,7 +34,8 @@ export const config: LandingPageDefinition = {
 				},
 				{
 					title: "Analytics",
-					description: "Per-domain reporting for client deliverability reviews.",
+					description:
+						"Per-domain reporting for client deliverability reviews.",
 				},
 			],
 		},

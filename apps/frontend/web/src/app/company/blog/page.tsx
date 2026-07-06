@@ -95,8 +95,7 @@ const BlogPage = () => {
 						Articles
 					</p>
 					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
-						Guides &{" "}
-						<span className="text-primary-base">tutorials.</span>
+						Guides & <span className="text-primary-base">tutorials.</span>
 					</h2>
 				</div>
 				<div className="mx-auto mt-14 grid max-w-4xl gap-6">

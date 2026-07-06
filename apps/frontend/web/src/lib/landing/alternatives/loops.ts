@@ -5,11 +5,9 @@ export const config: AlternativeDefinition = {
 	path: "/alternatives/loops",
 	competitorName: "Loops",
 	compareHref: "/compare/loops",
-	titleLines: [
-		"Best Loops",
-		"Alternative",
-	],
-	description: "Product email for SaaS teams—transactional, lifecycle, and campaigns with open-source flexibility.",
+	titleLines: ["Best Loops", "Alternative"],
+	description:
+		"Product email for SaaS teams—transactional, lifecycle, and campaigns with open-source flexibility.",
 	keywords: [
 		"Loops alternative",
 		"Loops competitor",
@@ -35,7 +33,8 @@ export const config: AlternativeDefinition = {
 			items: [
 				{
 					title: "SaaS lifecycle",
-					description: "Welcome, upgrade, and churn emails triggered from your product events.",
+					description:
+						"Welcome, upgrade, and churn emails triggered from your product events.",
 				},
 				{
 					title: "Infrastructure choice",
@@ -43,7 +42,8 @@ export const config: AlternativeDefinition = {
 				},
 				{
 					title: "Beyond email marketing",
-					description: "SMTP, webhooks, validation, and agent APIs in one platform.",
+					description:
+						"SMTP, webhooks, validation, and agent APIs in one platform.",
 				},
 			],
 		},

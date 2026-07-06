@@ -1,7 +1,10 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
-import { ToolTopBar, ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
+import {
+	ToolTopBar,
+	ToolUpsell,
+} from "@reloop/web/components/landing/tools/tool-chrome";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -63,8 +66,7 @@ export function DeliverabilityTesterPageView() {
 		return {
 			score: rounded,
 			issues,
-			grade:
-				rounded >= 8 ? "Good" : rounded >= 5 ? "Review" : "High spam risk",
+			grade: rounded >= 8 ? "Good" : rounded >= 5 ? "Review" : "High spam risk",
 		};
 	}, [content, subject]);
 
@@ -87,7 +89,7 @@ export function DeliverabilityTesterPageView() {
 				subtitle="Paste your subject and body to get a spam score and checklist—like Mail-Tester and GlockApps pre-send checks."
 			/>
 
-			<div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[1fr_320px] sm:px-6">
+			<div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1fr_320px]">
 				<div className="space-y-4">
 					<label className="block font-medium text-[14px]">Subject line</label>
 					<input
@@ -96,7 +98,9 @@ export function DeliverabilityTesterPageView() {
 						placeholder="Your email subject…"
 						className="h-11 w-full rounded-lg border border-stroke-soft-200 px-4 text-[15px] dark:border-white/10 dark:bg-black"
 					/>
-					<label className="block font-medium text-[14px]">Email body (HTML or text)</label>
+					<label className="block font-medium text-[14px]">
+						Email body (HTML or text)
+					</label>
 					<textarea
 						value={content}
 						onChange={(e) => setContent(e.target.value)}
@@ -113,7 +117,9 @@ export function DeliverabilityTesterPageView() {
 						</p>
 						<p className={`mt-2 font-bold text-6xl ${scoreColor}`}>
 							{content || subject ? analysis.score : "—"}
-							<span className="text-2xl text-text-sub-600 dark:text-white/30">/10</span>
+							<span className="text-2xl text-text-sub-600 dark:text-white/30">
+								/10
+							</span>
 						</p>
 						<p className="mt-2 font-semibold text-[15px] text-text-strong-950 dark:text-white">
 							{content || subject ? analysis.grade : "Add content to analyze"}

@@ -1,6 +1,6 @@
 import { IntegrationPageView } from "@reloop/web/components/landing/integrations/integration-page-view";
-import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/integrations/fastapi";
+import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 
 export const instant = false;
 

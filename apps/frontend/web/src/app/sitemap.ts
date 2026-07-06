@@ -1,5 +1,8 @@
 import { getLandingSitemapRoutes } from "@reloop/web/lib/landing/routes";
-import { getSiteUrl, sitemapRoutes as baseSitemapRoutes } from "@reloop/web/lib/site";
+import {
+	sitemapRoutes as baseSitemapRoutes,
+	getSiteUrl,
+} from "@reloop/web/lib/site";
 import type { MetadataRoute } from "next";
 import {
 	changelogReleases,

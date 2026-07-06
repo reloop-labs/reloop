@@ -1,7 +1,10 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
-import { ToolTopBar, ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
+import {
+	ToolTopBar,
+	ToolUpsell,
+} from "@reloop/web/components/landing/tools/tool-chrome";
 import { useMemo, useState } from "react";
 
 const TEMPLATES = {
@@ -96,7 +99,7 @@ export function TemplateGeneratorPageView() {
 						<div className="border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-2 font-mono text-[12px] text-text-sub-600 dark:border-white/10 dark:bg-black dark:text-white/40">
 							HTML source
 						</div>
-						<pre className="max-h-[480px] overflow-auto p-4 font-mono text-[11px] leading-relaxed text-text-sub-600 dark:text-white/60">
+						<pre className="max-h-[480px] overflow-auto p-4 font-mono text-[11px] text-text-sub-600 leading-relaxed dark:text-white/60">
 							{html}
 						</pre>
 					</div>

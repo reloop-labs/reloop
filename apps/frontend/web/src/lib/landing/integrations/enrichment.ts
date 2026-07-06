@@ -22,9 +22,18 @@ export async function POST() {
   return Response.json({ ok: true });
 }`,
 		steps: [
-			{ title: "Add API key", body: "Set RELOOP_API_KEY in .env.local and Vercel." },
-			{ title: "Send from Route Handler", body: "Call the SDK in a Server Action or API route." },
-			{ title: "Verify domain", body: "Add DNS records in the Reloop dashboard." },
+			{
+				title: "Add API key",
+				body: "Set RELOOP_API_KEY in .env.local and Vercel.",
+			},
+			{
+				title: "Send from Route Handler",
+				body: "Call the SDK in a Server Action or API route.",
+			},
+			{
+				title: "Verify domain",
+				body: "Add DNS records in the Reloop dashboard.",
+			},
 		],
 	},
 	express: {
@@ -40,9 +49,18 @@ export async function POST() {
   res.json({ sent: true });
 });`,
 		steps: [
-			{ title: "Install SDK", body: "npm install reloop-email in your Express app." },
-			{ title: "Send on events", body: "Trigger sends from route handlers or jobs." },
-			{ title: "Handle webhooks", body: "Listen for bounce events on /webhooks/reloop." },
+			{
+				title: "Install SDK",
+				body: "npm install reloop-email in your Express app.",
+			},
+			{
+				title: "Send on events",
+				body: "Trigger sends from route handlers or jobs.",
+			},
+			{
+				title: "Handle webhooks",
+				body: "Listen for bounce events on /webhooks/reloop.",
+			},
 		],
 	},
 	laravel: {
@@ -53,9 +71,18 @@ export async function POST() {
 
 // config/mail.php → SMTP or API driver`,
 		steps: [
-			{ title: "Configure mailer", body: "Point Laravel Mail to Reloop SMTP or SDK." },
-			{ title: "Use Mailables", body: "Keep Action Mailer patterns you already use." },
-			{ title: "Queue sends", body: "Dispatch mail jobs with Horizon or Redis." },
+			{
+				title: "Configure mailer",
+				body: "Point Laravel Mail to Reloop SMTP or SDK.",
+			},
+			{
+				title: "Use Mailables",
+				body: "Keep Action Mailer patterns you already use.",
+			},
+			{
+				title: "Queue sends",
+				body: "Dispatch mail jobs with Horizon or Redis.",
+			},
 		],
 	},
 	django: {
@@ -67,8 +94,14 @@ EMAIL_HOST = "smtp.reloop.dev"
 EMAIL_HOST_USER = "reloop"
 EMAIL_HOST_PASSWORD = os.environ["RELOOP_API_KEY"]`,
 		steps: [
-			{ title: "SMTP backend", body: "Configure Django email settings for Reloop SMTP." },
-			{ title: "Or use SDK", body: "Call reloop-email in Celery tasks for templates." },
+			{
+				title: "SMTP backend",
+				body: "Configure Django email settings for Reloop SMTP.",
+			},
+			{
+				title: "Or use SDK",
+				body: "Call reloop-email in Celery tasks for templates.",
+			},
 			{ title: "Test locally", body: "Send a test mail from manage.py shell." },
 		],
 	},
@@ -81,8 +114,14 @@ async def send_email(payload: EmailPayload):
     reloop = Reloop(api_key=settings.RELOOP_API_KEY)
     return reloop.emails.send(payload.dict())`,
 		steps: [
-			{ title: "Async sends", body: "Use BackgroundTasks or Celery for non-blocking mail." },
-			{ title: "Type-safe payloads", body: "Validate requests with Pydantic models." },
+			{
+				title: "Async sends",
+				body: "Use BackgroundTasks or Celery for non-blocking mail.",
+			},
+			{
+				title: "Type-safe payloads",
+				body: "Validate requests with Pydantic models.",
+			},
 			{ title: "Webhooks", body: "Expose /webhooks for delivery status." },
 		],
 	},
@@ -96,8 +135,14 @@ async def send_email(payload: EmailPayload):
   end
 end`,
 		steps: [
-			{ title: "Action Mailer", body: "Configure SMTP settings in production.rb." },
-			{ title: "Background jobs", body: "Deliver later with Sidekiq or Solid Queue." },
+			{
+				title: "Action Mailer",
+				body: "Configure SMTP settings in production.rb.",
+			},
+			{
+				title: "Background jobs",
+				body: "Deliver later with Sidekiq or Solid Queue.",
+			},
 			{ title: "Devise emails", body: "Route password resets through Reloop." },
 		],
 	},
@@ -112,7 +157,10 @@ class MailService {
   }
 }`,
 		steps: [
-			{ title: "Add dependency", body: "Maven/Gradle dependency for reloop-email." },
+			{
+				title: "Add dependency",
+				body: "Maven/Gradle dependency for reloop-email.",
+			},
 			{ title: "Inject client", body: "Configure bean with API key from env." },
 			{ title: "Send async", body: "@Async mail for non-blocking requests." },
 		],
@@ -128,9 +176,15 @@ await fetch("https://api.reloop.dev/v1/emails", {
   body: JSON.stringify({ to, subject, html }),
 });`,
 		steps: [
-			{ title: "Custom SMTP", body: "Brand Supabase auth emails via Reloop SMTP." },
+			{
+				title: "Custom SMTP",
+				body: "Brand Supabase auth emails via Reloop SMTP.",
+			},
 			{ title: "Edge Functions", body: "Send app emails from Deno functions." },
-			{ title: "Sync status", body: "Store delivery events in Supabase tables." },
+			{
+				title: "Sync status",
+				body: "Store delivery events in Supabase tables.",
+			},
 		],
 	},
 	vercel: {
@@ -140,9 +194,18 @@ await fetch("https://api.reloop.dev/v1/emails", {
 		code: `// Works on Vercel Edge + Node runtimes
 export const runtime = "nodejs"; // recommended for SDK`,
 		steps: [
-			{ title: "Env vars", body: "Add RELOOP_API_KEY in Vercel project settings." },
-			{ title: "Serverless sends", body: "Send from API routes without managing SMTP." },
-			{ title: "Preview deploys", body: "Use sandbox keys on preview branches." },
+			{
+				title: "Env vars",
+				body: "Add RELOOP_API_KEY in Vercel project settings.",
+			},
+			{
+				title: "Serverless sends",
+				body: "Send from API routes without managing SMTP.",
+			},
+			{
+				title: "Preview deploys",
+				body: "Use sandbox keys on preview branches.",
+			},
 		],
 	},
 	"stripe-webhooks": {
@@ -157,8 +220,14 @@ export const runtime = "nodejs"; // recommended for SDK`,
   });
 }`,
 		steps: [
-			{ title: "Listen for events", body: "Handle invoice.paid and payment_intent.succeeded." },
-			{ title: "Render receipt", body: "Map Stripe line items to your template." },
+			{
+				title: "Listen for events",
+				body: "Handle invoice.paid and payment_intent.succeeded.",
+			},
+			{
+				title: "Render receipt",
+				body: "Map Stripe line items to your template.",
+			},
 			{ title: "Retry safely", body: "Idempotent sends on webhook retries." },
 		],
 	},
@@ -170,7 +239,7 @@ export function getIntegrationEnrichment(slug: string): IntegrationEnrichment {
 			accent: "blue",
 			install: "See documentation",
 			language: "API",
-			code: `await reloop.emails.send({ to, subject, html });`,
+			code: "await reloop.emails.send({ to, subject, html });",
 			steps: [
 				{ title: "Get API key", body: "Sign up at Reloop dashboard." },
 				{ title: "Install SDK", body: "Use the HTTP API or official SDK." },

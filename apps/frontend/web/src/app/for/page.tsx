@@ -16,7 +16,7 @@ export const metadata = createLandingMetadata(
 export default function ForIndexPage() {
 	return (
 		<div className="min-h-screen bg-white dark:bg-black">
-			<div className="relative overflow-hidden border-stroke-soft-200 border-b px-4 py-14 dark:border-white/10 sm:px-6">
+			<div className="relative overflow-hidden border-stroke-soft-200 border-b px-4 py-14 sm:px-6 dark:border-white/10">
 				<div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary-base/5 via-transparent to-violet-500/5" />
 				<div className="relative mx-auto max-w-4xl text-center">
 					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/40">
@@ -55,10 +55,7 @@ export default function ForIndexPage() {
 							</p>
 							<ul className="mt-4 space-y-1.5">
 								{extra.wins.slice(0, 2).map((win) => (
-									<li
-										key={win}
-										className={`text-[13px] ${accent.text}`}
-									>
+									<li key={win} className={`text-[13px] ${accent.text}`}>
 										✓ {win}
 									</li>
 								))}

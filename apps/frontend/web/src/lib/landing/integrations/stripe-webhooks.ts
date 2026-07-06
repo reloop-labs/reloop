@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "stripe-webhooks",
 	path: "/integrations/stripe-webhooks",
-	titleLines: [
-		"Stripe Receipt",
-		"Emails",
-	],
-	description: "Send payment receipts, invoices, and subscription emails triggered by Stripe webhooks.",
+	titleLines: ["Stripe Receipt", "Emails"],
+	description:
+		"Send payment receipts, invoices, and subscription emails triggered by Stripe webhooks.",
 	keywords: [
 		"Stripe receipt email",
 		"Stripe webhook email",
@@ -32,7 +30,8 @@ export const config: LandingPageDefinition = {
 				},
 				{
 					title: "invoice.paid",
-					description: "Email subscription invoices with line items and PDF links.",
+					description:
+						"Email subscription invoices with line items and PDF links.",
 				},
 				{
 					title: "customer.subscription.updated",

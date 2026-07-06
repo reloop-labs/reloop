@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "marketing-email",
 	path: "/use-cases/marketing-email",
-	titleLines: [
-		"Marketing",
-		"Email Platform",
-	],
-	description: "Newsletters, product launches, and promotional campaigns with segmentation, analytics, and a visual editor.",
+	titleLines: ["Marketing", "Email Platform"],
+	description:
+		"Newsletters, product launches, and promotional campaigns with segmentation, analytics, and a visual editor.",
 	keywords: [
 		"marketing email platform",
 		"newsletter software",
@@ -28,15 +26,18 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Visual editor",
-					description: "Drag-and-drop campaign builder with responsive templates.",
+					description:
+						"Drag-and-drop campaign builder with responsive templates.",
 				},
 				{
 					title: "Segmentation",
-					description: "Target audiences by behavior, tags, and custom properties.",
+					description:
+						"Target audiences by behavior, tags, and custom properties.",
 				},
 				{
 					title: "Analytics",
-					description: "Track opens, clicks, and conversions across every campaign.",
+					description:
+						"Track opens, clicks, and conversions across every campaign.",
 				},
 			],
 		},

@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "fastapi",
 	path: "/integrations/fastapi",
-	titleLines: [
-		"Send Email",
-		"with FastAPI",
-	],
-	description: "Async email sending from FastAPI with the Reloop Python client.",
+	titleLines: ["Send Email", "with FastAPI"],
+	description:
+		"Async email sending from FastAPI with the Reloop Python client.",
 	keywords: [
 		"FastAPI email",
 		"FastAPI transactional email",
@@ -27,11 +25,13 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Background tasks",
-					description: "Send email in FastAPI BackgroundTasks without blocking responses.",
+					description:
+						"Send email in FastAPI BackgroundTasks without blocking responses.",
 				},
 				{
 					title: "Dependency injection",
-					description: "Initialize the Reloop client once and inject into route handlers.",
+					description:
+						"Initialize the Reloop client once and inject into route handlers.",
 				},
 				{
 					title: "Webhooks",

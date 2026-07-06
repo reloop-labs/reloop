@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "express",
 	path: "/integrations/express",
-	titleLines: [
-		"Send Email",
-		"with Express",
-	],
-	description: "Integrate Reloop into Express.js apps for transactional notifications and auth emails.",
+	titleLines: ["Send Email", "with Express"],
+	description:
+		"Integrate Reloop into Express.js apps for transactional notifications and auth emails.",
 	keywords: [
 		"Express email API",
 		"Node.js Express transactional email",
@@ -27,15 +25,18 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Middleware-friendly",
-					description: "Send emails from route handlers after auth or payment events.",
+					description:
+						"Send emails from route handlers after auth or payment events.",
 				},
 				{
 					title: "Environment config",
-					description: "Store API keys in process.env and initialize once at boot.",
+					description:
+						"Store API keys in process.env and initialize once at boot.",
 				},
 				{
 					title: "Webhooks",
-					description: "Receive delivery events on Express endpoints for bounce handling.",
+					description:
+						"Receive delivery events on Express endpoints for bounce handling.",
 				},
 			],
 		},

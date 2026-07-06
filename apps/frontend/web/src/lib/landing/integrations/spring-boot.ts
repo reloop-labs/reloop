@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "spring-boot",
 	path: "/integrations/spring-boot",
-	titleLines: [
-		"Send Email",
-		"with Spring Boot",
-	],
-	description: "Integrate Reloop into Spring Boot apps with the Java SDK or JavaMail SMTP.",
+	titleLines: ["Send Email", "with Spring Boot"],
+	description:
+		"Integrate Reloop into Spring Boot apps with the Java SDK or JavaMail SMTP.",
 	keywords: [
 		"Spring Boot email",
 		"Java transactional email",
@@ -27,11 +25,13 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Java SDK",
-					description: "Inject ReloopEmail client as a Spring bean for service-layer sends.",
+					description:
+						"Inject ReloopEmail client as a Spring bean for service-layer sends.",
 				},
 				{
 					title: "JavaMail SMTP",
-					description: "Configure spring.mail properties for Reloop SMTP relay.",
+					description:
+						"Configure spring.mail properties for Reloop SMTP relay.",
 				},
 				{
 					title: "Async delivery",

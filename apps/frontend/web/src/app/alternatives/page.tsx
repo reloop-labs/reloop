@@ -12,7 +12,8 @@ export const metadata = createLandingMetadata(
 );
 
 const competitorStyle: Record<string, string> = {
-	resend: "border-black/20 bg-neutral-50 hover:border-black/40 dark:border-white/20 dark:bg-neutral-900/50",
+	resend:
+		"border-black/20 bg-neutral-50 hover:border-black/40 dark:border-white/20 dark:bg-neutral-900/50",
 	sendgrid: "border-[#51A9E3]/30 bg-[#51A9E3]/5 hover:border-[#51A9E3]/50",
 	mailgun: "border-red-500/20 bg-red-500/5 hover:border-red-500/40",
 	"aws-ses": "border-orange-500/20 bg-orange-500/5 hover:border-orange-500/40",
@@ -24,7 +25,7 @@ const competitorStyle: Record<string, string> = {
 export default function AlternativesIndexPage() {
 	return (
 		<div className="min-h-screen bg-[#fafafa] dark:bg-black">
-			<div className="border-stroke-soft-200 border-b bg-white px-4 py-12 text-center dark:border-white/10 dark:bg-[#0a0a0a] sm:px-6">
+			<div className="border-stroke-soft-200 border-b bg-white px-4 py-12 text-center sm:px-6 dark:border-white/10 dark:bg-[#0a0a0a]">
 				<div className="mx-auto max-w-3xl">
 					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/40">
 						Compare
@@ -33,8 +34,8 @@ export default function AlternativesIndexPage() {
 						Reloop vs. the rest
 					</h1>
 					<p className="mt-3 text-[16px] text-text-sub-600 leading-relaxed dark:text-white/50">
-						Side-by-side comparison pages—like alternative.to or G2—with
-						feature tables and migration paths.
+						Side-by-side comparison pages—like alternative.to or G2—with feature
+						tables and migration paths.
 					</p>
 				</div>
 			</div>

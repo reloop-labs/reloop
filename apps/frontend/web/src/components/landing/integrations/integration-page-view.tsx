@@ -3,13 +3,17 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
-import type { LandingPageDefinition } from "@reloop/web/lib/landing/types";
-import { accentStyles } from "@reloop/web/lib/landing/page-accents";
 import { getIntegrationEnrichment } from "@reloop/web/lib/landing/integrations/enrichment";
+import { accentStyles } from "@reloop/web/lib/landing/page-accents";
+import type { LandingPageDefinition } from "@reloop/web/lib/landing/types";
 import Link from "next/link";
 import { useState } from "react";
 
-export function IntegrationPageView({ config }: { config: LandingPageDefinition }) {
+export function IntegrationPageView({
+	config,
+}: {
+	config: LandingPageDefinition;
+}) {
 	const extra = getIntegrationEnrichment(config.slug);
 	const accent = accentStyles[extra.accent];
 	const [copied, setCopied] = useState(false);
@@ -40,7 +44,9 @@ export function IntegrationPageView({ config }: { config: LandingPageDefinition 
 					<h1 className="mt-4 font-semibold text-3xl tracking-tight">
 						{config.titleLines.join(" ")}
 					</h1>
-					<p className="mt-3 max-w-2xl text-[16px] text-white/55">{config.description}</p>
+					<p className="mt-3 max-w-2xl text-[16px] text-white/55">
+						{config.description}
+					</p>
 
 					<div className="mt-6 flex items-center gap-2 rounded-lg border border-white/10 bg-black/50 p-1 pl-4 font-mono text-[13px]">
 						<span className="flex-1 text-emerald-400">{extra.install}</span>
@@ -55,7 +61,7 @@ export function IntegrationPageView({ config }: { config: LandingPageDefinition 
 				</div>
 			</div>
 
-			<div className="mx-auto grid max-w-5xl gap-10 px-4 py-12 lg:grid-cols-[240px_1fr] sm:px-6">
+			<div className="mx-auto grid max-w-5xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[240px_1fr]">
 				{/* Sticky steps sidebar */}
 				<aside className="lg:sticky lg:top-24 lg:self-start">
 					<p className="font-semibold text-[11px] text-white/40 uppercase tracking-wider">
@@ -83,7 +89,7 @@ export function IntegrationPageView({ config }: { config: LandingPageDefinition 
 						<div className="border-white/10 border-b px-4 py-2 font-mono text-[11px] text-white/40">
 							Quickstart
 						</div>
-						<pre className="overflow-x-auto p-5 font-mono text-[12px] text-[#79c0ff] leading-relaxed">
+						<pre className="overflow-x-auto p-5 font-mono text-[#79c0ff] text-[12px] leading-relaxed">
 							{extra.code}
 						</pre>
 					</div>

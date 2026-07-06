@@ -1,8 +1,8 @@
 "use client";
 
+import { ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
 import Link from "next/link";
 import { useState } from "react";
-import { ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
 
 const DEFAULT_HTML = `<div style="font-family:system-ui,sans-serif;padding:16px;">
   <h2 style="margin:0 0 8px;font-size:20px;">Your headline</h2>
@@ -35,9 +35,12 @@ export function MobilePreviewPageView() {
 						<span className="mx-2">/</span>
 						<span className="text-white/70">Mobile Preview</span>
 					</nav>
-					<h1 className="font-semibold text-2xl sm:text-3xl">Email Client Preview</h1>
+					<h1 className="font-semibold text-2xl sm:text-3xl">
+						Email Client Preview
+					</h1>
 					<p className="mt-2 max-w-xl text-[15px] text-white/55">
-						Split editor and device preview—like Litmus and Email on Acid mobile views.
+						Split editor and device preview—like Litmus and Email on Acid mobile
+						views.
 					</p>
 				</div>
 			</div>
@@ -57,7 +60,7 @@ export function MobilePreviewPageView() {
 								key={d.id}
 								type="button"
 								onClick={() => setDevice(d.id)}
-								className={`rounded-full px-4 py-1.5 text-[13px] font-medium ${
+								className={`rounded-full px-4 py-1.5 font-medium text-[13px] ${
 									device === d.id
 										? "bg-indigo-500 text-white"
 										: "bg-white/10 text-white/60 hover:bg-white/15"
@@ -71,7 +74,7 @@ export function MobilePreviewPageView() {
 
 				<div className="flex min-h-[520px] items-center justify-center bg-[#0f0d24] p-8">
 					<div
-						className="overflow-hidden rounded-[2rem] border-[10px] border-[#2a2744] bg-white shadow-2xl transition-all"
+						className="overflow-hidden rounded-[2rem] border-[#2a2744] border-[10px] bg-white shadow-2xl transition-all"
 						style={{
 							width: device === "desktop" ? "100%" : frameWidth,
 							maxWidth: device === "desktop" ? "640px" : frameWidth,

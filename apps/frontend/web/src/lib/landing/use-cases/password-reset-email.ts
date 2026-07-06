@@ -3,11 +3,9 @@ import type { LandingPageDefinition } from "../types";
 export const config: LandingPageDefinition = {
 	slug: "password-reset-email",
 	path: "/use-cases/password-reset-email",
-	titleLines: [
-		"Password Reset",
-		"Email API",
-	],
-	description: "Send secure, fast password reset emails with expiring links and delivery tracking.",
+	titleLines: ["Password Reset", "Email API"],
+	description:
+		"Send secure, fast password reset emails with expiring links and delivery tracking.",
 	keywords: [
 		"password reset email API",
 		"forgot password email",
@@ -28,15 +26,18 @@ export const config: LandingPageDefinition = {
 			items: [
 				{
 					title: "Instant delivery",
-					description: "Users expect reset links in seconds—Reloop delivers with low latency.",
+					description:
+						"Users expect reset links in seconds—Reloop delivers with low latency.",
 				},
 				{
 					title: "Template variables",
-					description: "Inject reset URLs, expiry times, and user names dynamically.",
+					description:
+						"Inject reset URLs, expiry times, and user names dynamically.",
 				},
 				{
 					title: "Bounce handling",
-					description: "Webhooks notify your app when reset emails fail to deliver.",
+					description:
+						"Webhooks notify your app when reset emails fail to deliver.",
 				},
 			],
 		},

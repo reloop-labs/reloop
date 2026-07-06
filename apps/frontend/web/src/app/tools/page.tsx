@@ -8,29 +8,58 @@ export const metadata = createLandingMetadata(
 	"Free Email Tools",
 	"Email validator, SPF checker, deliverability tester, subject line analyzer, template generator, and mobile preview.",
 	"/tools",
-	["free email tools", "email validator", "SPF checker", "deliverability tester"],
+	[
+		"free email tools",
+		"email validator",
+		"SPF checker",
+		"deliverability tester",
+	],
 );
 
 const toolMeta: Record<string, { tag: string; accent: string }> = {
-	"email-validator": { tag: "Verify addresses", accent: "border-emerald-200 bg-emerald-50 dark:border-emerald-900/40 dark:bg-emerald-950/20" },
-	"deliverability-tester": { tag: "Spam score", accent: "border-blue-200 bg-blue-50 dark:border-blue-900/40 dark:bg-blue-950/20" },
-	"auth-checker": { tag: "DNS lookup", accent: "border-orange-200 bg-orange-50 dark:border-orange-900/40 dark:bg-orange-950/20" },
-	"subject-tester": { tag: "Open rate", accent: "border-rose-200 bg-rose-50 dark:border-rose-900/40 dark:bg-rose-950/20" },
-	"template-generator": { tag: "HTML templates", accent: "border-violet-200 bg-violet-50 dark:border-violet-900/40 dark:bg-violet-950/20" },
-	"mobile-preview": { tag: "Client preview", accent: "border-indigo-200 bg-indigo-50 dark:border-indigo-900/40 dark:bg-indigo-950/20" },
+	"email-validator": {
+		tag: "Verify addresses",
+		accent:
+			"border-emerald-200 bg-emerald-50 dark:border-emerald-900/40 dark:bg-emerald-950/20",
+	},
+	"deliverability-tester": {
+		tag: "Spam score",
+		accent:
+			"border-blue-200 bg-blue-50 dark:border-blue-900/40 dark:bg-blue-950/20",
+	},
+	"auth-checker": {
+		tag: "DNS lookup",
+		accent:
+			"border-orange-200 bg-orange-50 dark:border-orange-900/40 dark:bg-orange-950/20",
+	},
+	"subject-tester": {
+		tag: "Open rate",
+		accent:
+			"border-rose-200 bg-rose-50 dark:border-rose-900/40 dark:bg-rose-950/20",
+	},
+	"template-generator": {
+		tag: "HTML templates",
+		accent:
+			"border-violet-200 bg-violet-50 dark:border-violet-900/40 dark:bg-violet-950/20",
+	},
+	"mobile-preview": {
+		tag: "Client preview",
+		accent:
+			"border-indigo-200 bg-indigo-50 dark:border-indigo-900/40 dark:bg-indigo-950/20",
+	},
 };
 
 export default function ToolsIndexPage() {
 	return (
 		<div className="min-h-screen bg-[#f4f4f5] dark:bg-black">
-			<div className="border-stroke-soft-200 border-b bg-white px-4 py-12 dark:border-white/10 dark:bg-[#0a0a0a] sm:px-6">
+			<div className="border-stroke-soft-200 border-b bg-white px-4 py-12 sm:px-6 dark:border-white/10 dark:bg-[#0a0a0a]">
 				<div className="mx-auto max-w-4xl">
 					<h1 className="font-semibold text-3xl text-text-strong-950 tracking-tight dark:text-white">
 						Free email tools
 					</h1>
 					<p className="mt-3 max-w-2xl text-[16px] text-text-sub-600 leading-relaxed dark:text-white/50">
-						Each tool uses a familiar layout—like the validators and checkers you
-						already use—so you can get results immediately.
+						Each tool uses a familiar layout—like the validators and checkers
+						you already use—so you can get results immediately.
 					</p>
 				</div>
 			</div>

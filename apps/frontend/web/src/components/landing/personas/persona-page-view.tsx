@@ -3,9 +3,9 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
-import type { LandingPageDefinition } from "@reloop/web/lib/landing/types";
 import { accentStyles } from "@reloop/web/lib/landing/page-accents";
 import { getPersonaEnrichment } from "@reloop/web/lib/landing/personas/enrichment";
+import type { LandingPageDefinition } from "@reloop/web/lib/landing/types";
 import Link from "next/link";
 
 export function PersonaPageView({ config }: { config: LandingPageDefinition }) {
@@ -51,15 +51,21 @@ export function PersonaPageView({ config }: { config: LandingPageDefinition }) {
 				</div>
 			</div>
 
-			<div className="mx-auto grid max-w-5xl gap-10 px-4 py-14 lg:grid-cols-2 sm:px-6">
+			<div className="mx-auto grid max-w-5xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-2">
 				<div className="rounded-2xl border border-stroke-soft-200 p-8 dark:border-white/10">
 					<p className="font-semibold text-[11px] text-red-500 uppercase tracking-wider">
 						Without Reloop
 					</p>
 					<ul className="mt-6 space-y-3">
 						{extra.painPoints.map((point) => (
-							<li key={point} className="flex gap-2 text-[15px] text-text-sub-600 dark:text-white/55">
-								<Icon name="cross-circle" className="size-5 shrink-0 text-red-400" />
+							<li
+								key={point}
+								className="flex gap-2 text-[15px] text-text-sub-600 dark:text-white/55"
+							>
+								<Icon
+									name="cross-circle"
+									className="size-5 shrink-0 text-red-400"
+								/>
 								{point}
 							</li>
 						))}
@@ -71,8 +77,14 @@ export function PersonaPageView({ config }: { config: LandingPageDefinition }) {
 					</p>
 					<ul className="mt-6 space-y-3">
 						{extra.wins.map((win) => (
-							<li key={win} className="flex gap-2 text-[15px] text-text-sub-600 dark:text-white/55">
-								<Icon name="check" className="size-5 shrink-0 text-emerald-500" />
+							<li
+								key={win}
+								className="flex gap-2 text-[15px] text-text-sub-600 dark:text-white/55"
+							>
+								<Icon
+									name="check"
+									className="size-5 shrink-0 text-emerald-500"
+								/>
 								{win}
 							</li>
 						))}

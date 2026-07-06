@@ -103,7 +103,11 @@ export async function validateEmailAddress(
 		});
 	}
 
-	if (domain.includes(".") && !domain.startsWith(".") && !domain.endsWith(".")) {
+	if (
+		domain.includes(".") &&
+		!domain.startsWith(".") &&
+		!domain.endsWith(".")
+	) {
 		checks.push({
 			label: "Domain",
 			status: "pass",
@@ -182,7 +186,8 @@ export async function validateEmailAddress(
 	}
 
 	const hasFail = checks.some((c) => c.status === "fail");
-	const valid = !hasFail && checks.some((c) => c.label === "Format" && c.status === "pass");
+	const valid =
+		!hasFail && checks.some((c) => c.label === "Format" && c.status === "pass");
 
 	return {
 		email,
@@ -205,7 +210,9 @@ export async function lookupTxtRecords(name: string): Promise<string[]> {
 			Answer?: { data?: string }[];
 		};
 		if (!data.Answer) return [];
-		return data.Answer.map((a) => (a.data ?? "").replace(/^"|"$/g, "").replace(/"\s+"/g, ""));
+		return data.Answer.map((a) =>
+			(a.data ?? "").replace(/^"|"$/g, "").replace(/"\s+"/g, ""),
+		);
 	} catch {
 		return [];
 	}
@@ -218,8 +225,15 @@ export type AuthRecordResult = {
 	detail: string;
 };
 
-export async function checkDomainAuth(domain: string): Promise<AuthRecordResult[]> {
-	const clean = domain.trim().toLowerCase().replace(/^https?:\/\//, "").split("/")[0] ?? "";
+export async function checkDomainAuth(
+	domain: string,
+): Promise<AuthRecordResult[]> {
+	const clean =
+		domain
+			.trim()
+			.toLowerCase()
+			.replace(/^https?:\/\//, "")
+			.split("/")[0] ?? "";
 	if (!clean || !clean.includes(".")) {
 		return [
 			{

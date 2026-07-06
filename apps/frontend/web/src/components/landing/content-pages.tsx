@@ -1,16 +1,16 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
+import type { FeatureCtaBand } from "@reloop/web/components/landing/types";
 import {
 	FeatureCta,
 	MarketingPageShell,
 	PageSection,
 } from "@reloop/web/components/page-shell";
+import type { GlossaryTermDefinition } from "@reloop/web/lib/landing/types";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useState } from "react";
-import type { GlossaryTermDefinition } from "@reloop/web/lib/landing/types";
-import type { FeatureCtaBand } from "@reloop/web/components/landing/types";
 
 export function GlossaryTermPage({
 	term,
@@ -77,7 +77,11 @@ export function BlogPostPage({
 	cta: FeatureCtaBand;
 }) {
 	return (
-		<MarketingPageShell titleLines={[post.title]} description={post.description} compactHero>
+		<MarketingPageShell
+			titleLines={[post.title]}
+			description={post.description}
+			compactHero
+		>
 			<PageSection flushTop narrow>
 				<div className="mb-10 flex flex-wrap items-center gap-3 text-[13px] text-text-sub-600 dark:text-white/40">
 					<span className="font-semibold text-primary-base uppercase tracking-wider">
@@ -118,7 +122,10 @@ export function BlogPostPage({
 				<div className="mt-12 border-stroke-soft-200 border-t pt-8 dark:border-white/10">
 					<Link
 						href="/company/blog"
-						className={Button.buttonVariants({ mode: "stroke", variant: "neutral" }).root({
+						className={Button.buttonVariants({
+							mode: "stroke",
+							variant: "neutral",
+						}).root({
 							className: "rounded-full",
 						})}
 					>
@@ -170,7 +177,9 @@ function EmailValidatorWidget() {
 			setResult("Domain looks incomplete.");
 			return;
 		}
-		setResult("Format looks valid. Use Reloop validation API for MX and deliverability checks.");
+		setResult(
+			"Format looks valid. Use Reloop validation API for MX and deliverability checks.",
+		);
 	}
 
 	return (
@@ -199,7 +208,14 @@ function DeliverabilityTesterWidget() {
 	const [score, setScore] = useState<number | null>(null);
 
 	function analyze() {
-		const spamWords = ["free", "winner", "urgent", "act now", "click here", "!!!"];
+		const spamWords = [
+			"free",
+			"winner",
+			"urgent",
+			"act now",
+			"click here",
+			"!!!",
+		];
 		const lower = content.toLowerCase();
 		let penalty = 0;
 		for (const word of spamWords) {
@@ -263,8 +279,8 @@ function AuthCheckerWidget() {
 			{checked && (
 				<div className="mt-4 space-y-2 rounded-xl bg-bg-weak-50 p-4 font-mono text-sm dark:bg-white/5">
 					<p className="text-text-sub-600 dark:text-white/50">
-						Demo mode — add <strong>{domain}</strong> in Reloop to get exact SPF,
-						DKIM, and DMARC records.
+						Demo mode — add <strong>{domain}</strong> in Reloop to get exact
+						SPF, DKIM, and DMARC records.
 					</p>
 					<p>SPF: configure in dashboard</p>
 					<p>DKIM: configure in dashboard</p>
@@ -368,13 +384,7 @@ function MobilePreviewWidget() {
 	);
 }
 
-function ToolCard({
-	title,
-	children,
-}: {
-	title: string;
-	children: ReactNode;
-}) {
+function ToolCard({ title, children }: { title: string; children: ReactNode }) {
 	return (
 		<div className="mx-auto max-w-lg rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-8 dark:border-white/10">
 			<h2 className="mb-6 font-semibold text-lg text-text-strong-950 dark:text-white">

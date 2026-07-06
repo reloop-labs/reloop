@@ -3,7 +3,8 @@ import type { BlogPostDefinition } from "../types";
 export const post: BlogPostDefinition = {
 	slug: "spf-dkim-dmarc-setup-guide",
 	title: "SPF, DKIM, and DMARC Setup Guide",
-	description: "A practical guide to email authentication—what each record does, how to configure them, and common mistakes to avoid.",
+	description:
+		"A practical guide to email authentication—what each record does, how to configure them, and common mistakes to avoid.",
 	keywords: [
 		"SPF DKIM DMARC setup",
 		"email authentication guide",

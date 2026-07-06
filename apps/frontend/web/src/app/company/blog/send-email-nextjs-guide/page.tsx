@@ -1,7 +1,7 @@
 import { BlogPostPageView } from "@reloop/web/components/landing/blog/blog-post-page-view";
+import { post } from "@reloop/web/lib/landing/blog/send-email-nextjs-guide";
 import { defaultLandingCta } from "@reloop/web/lib/landing/constants";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
-import { post } from "@reloop/web/lib/landing/blog/send-email-nextjs-guide";
 
 export const instant = false;
 
