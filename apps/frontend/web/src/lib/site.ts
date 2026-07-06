@@ -64,7 +64,6 @@ export const sitemapRoutes = [
 	"/resources/changelog",
 	"/resources/community",
 	"/resources/glossary",
-	"/resources/self-hosting-guide",
 	"/resources/status",
 	"/resources/tools",
 	"/company/about-us",

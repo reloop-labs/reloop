@@ -222,7 +222,7 @@ const WhyOpenSourcePage = () => {
 				}}
 				secondary={{
 					label: "Self-hosting guide",
-					href: "/resources/self-hosting-guide",
+					href: "/docs/self-host",
 				}}
 			/>
 		</MarketingPageShell>

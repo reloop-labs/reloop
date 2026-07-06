@@ -115,7 +115,7 @@ const links = [
 			},
 			{
 				title: "Self-hosting Guide",
-				href: "/resources/self-hosting-guide",
+				href: "/docs/self-host",
 			},
 			{
 				title: "Status",

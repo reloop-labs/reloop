@@ -91,7 +91,7 @@ const LicensePage = () => {
 			}}
 			secondaryCta={{
 				label: "Self-hosting guide",
-				href: "/resources/self-hosting-guide",
+				href: "/docs/self-host",
 			}}
 			compactHero
 		>
@@ -112,7 +112,7 @@ const LicensePage = () => {
 				primary={{ label: "Get started", href: "/dashboard/signup" }}
 				secondary={{
 					label: "Self-hosting guide",
-					href: "/resources/self-hosting-guide",
+					href: "/docs/self-host",
 				}}
 			/>
 		</MarketingPageShell>

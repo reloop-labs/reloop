@@ -143,7 +143,7 @@ export function getGrosorySections(): GrosorySection[] {
 		section("Resources", [
 			{ title: "Changelog", href: "/resources/changelog" },
 			{ title: "Community", href: "/resources/community" },
-			{ title: "Self-hosting Guide", href: "/resources/self-hosting-guide" },
+			{ title: "Self-hosting Guide", href: "/docs/self-host" },
 			{ title: "Status", href: "/resources/status" },
 			{ title: "Tools overview", href: "/resources/tools" },
 		]),

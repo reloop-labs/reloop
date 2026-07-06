@@ -97,7 +97,7 @@ const WhyReloopPage = () => {
 			}}
 			secondaryCta={{
 				label: "Self-hosting guide",
-				href: "/resources/self-hosting-guide",
+				href: "/docs/self-host",
 			}}
 			compactHero
 		>
@@ -235,7 +235,7 @@ const WhyReloopPage = () => {
 				}}
 				secondary={{
 					label: "Self-hosting guide",
-					href: "/resources/self-hosting-guide",
+					href: "/docs/self-host",
 				}}
 			/>
 		</MarketingPageShell>

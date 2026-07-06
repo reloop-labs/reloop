@@ -232,7 +232,7 @@ const ResendComparisonPage = () => {
 					</Link>{" "}
 					and the{" "}
 					<Link
-						href="/resources/self-hosting-guide"
+						href="/docs/self-host"
 						className="font-semibold text-primary-base"
 					>
 						self-hosting guide

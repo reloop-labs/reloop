@@ -173,7 +173,7 @@ const BlogPage = () => {
 					</Link>{" "}
 					and{" "}
 					<Link
-						href="/resources/self-hosting-guide"
+						href="/docs/self-host"
 						className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
 					>
 						self-hosting guide

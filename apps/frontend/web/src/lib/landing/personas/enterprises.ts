@@ -17,7 +17,7 @@ export const config: LandingPageDefinition = {
 	},
 	secondaryCta: {
 		label: "Self-hosting guide",
-		href: "/resources/self-hosting-guide",
+		href: "/docs/self-host",
 	},
 	sections: [
 		{

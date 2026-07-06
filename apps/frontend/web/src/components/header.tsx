@@ -101,7 +101,7 @@ const navItems = [
 				{
 					title: "Developers",
 					links: [
-						{ title: "Self Hosting", href: "/resources/self-hosting-guide" },
+						{ title: "Self Hosting", href: "/docs/self-host" },
 						{ title: "Status", href: "/resources/status" },
 						{ title: "Tools", href: "/resources/tools" },
 					],

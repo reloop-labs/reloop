@@ -56,7 +56,7 @@ export function LicensePermissions() {
 					</a>{" "}
 					or{" "}
 					<a
-						href="/resources/self-hosting-guide"
+						href="/docs/self-host"
 						className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4 transition-opacity hover:opacity-80"
 					>
 						self-host

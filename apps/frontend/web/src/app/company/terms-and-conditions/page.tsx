@@ -148,7 +148,7 @@ const TermsPage = () => {
 						and privacy laws, and all content sent or received through your
 						instance. Reloop Labs does not operate or monitor your self-hosted
 						instance unless you explicitly engage us for support. See our{" "}
-						<Link href="/resources/self-hosting-guide">self-hosting guide</Link>{" "}
+						<Link href="/docs/self-host">self-hosting guide</Link>{" "}
 						for deployment documentation.
 					</p>
 				</section>
