@@ -30,7 +30,8 @@ export default function UseCasesIndexPage() {
 
 				<div className="relative mx-auto max-w-5xl px-4 text-center sm:px-6">
 					<h1 className="font-serif text-[2.2rem] text-text-strong-950 leading-[1.1] tracking-tight sm:text-[3.2rem] dark:text-white">
-						Ship email faster —{" "}
+						Ship email faster
+						<br />
 						<span className="bg-gradient-to-r from-primary-base to-violet-500 bg-clip-text text-transparent dark:from-primary-base dark:to-violet-400">
 							whatever the workflow
 						</span>
