@@ -30,7 +30,7 @@ const columns: FooterColumn[] = [
 		],
 	},
 	{
-		group: "Platform",
+		group: "Feather",
 		items: [
 			{ title: "AI Agents", href: "/features/ai-agents" },
 			{ title: "Webhooks", href: "/features/webhooks" },

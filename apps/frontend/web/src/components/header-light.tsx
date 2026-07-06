@@ -168,7 +168,7 @@ export const HeaderLight = () => {
 						href="https://github.com/reloop-labs/reloop"
 						target="_blank"
 						rel="noreferrer"
-						className="inline-flex items-center justify-center gap-2 rounded-[12px] border border-[#0a0d12]/10 bg-[#0a0d12]/4 px-4 py-2 font-semibold text-[#0a0d12] text-[13px] transition-all hover:border-[#0a0d12]/20 hover:bg-[#0a0d12]/8"
+						className="inline-flex items-center justify-center gap-2 px-2 py-2 font-semibold text-[#0a0d12] text-[13px] transition-opacity hover:opacity-70"
 					>
 						<Icon name="social-github" className="size-3.5" />
 						<span className="hidden sm:inline">GitHub</span>
