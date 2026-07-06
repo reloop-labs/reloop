@@ -82,10 +82,20 @@ const navItems = [
 				{
 					title: "Resources",
 					links: [
+						{ title: "Grosory", href: "/grosory" },
 						{ title: "Changelog", href: "/resources/changelog" },
 						{ title: "Compare", href: "/compare" },
 						{ title: "Community", href: "/resources/community" },
 						{ title: "Glossary", href: "/resources/glossary" },
+					],
+				},
+				{
+					title: "Explore",
+					links: [
+						{ title: "Use Cases", href: "/use-cases" },
+						{ title: "Alternatives", href: "/alternatives" },
+						{ title: "Integrations", href: "/integrations" },
+						{ title: "Free Tools", href: "/tools" },
 					],
 				},
 				{

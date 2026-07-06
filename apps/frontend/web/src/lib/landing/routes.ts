@@ -10,6 +10,7 @@ import { blogPosts } from "./blog";
 export function getLandingSitemapRoutes(): string[] {
 	return [
 		"/get-started",
+		"/grosory",
 		"/tools",
 		...toolConfigs.map((c) => c.path),
 		"/use-cases",
