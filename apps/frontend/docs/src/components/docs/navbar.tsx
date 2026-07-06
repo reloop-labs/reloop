@@ -4,22 +4,11 @@ import { navigationTabs } from "@reloop/fe-docs/lib/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { normalizeDocsPathname } from "../../lib/is-active";
-
-const DynamicActivePill = dynamic(
-	() => import("./navbar-animations").then((mod) => mod.ActivePill),
-	{ ssr: false },
-);
-
-const DynamicActiveUnderline = dynamic(
-	() => import("./navbar-animations").then((mod) => mod.ActiveUnderline),
-	{ ssr: false },
-);
 
 const tabColors: Record<string, string> = {
 	Documentation: "#3b82f6",
@@ -38,25 +27,6 @@ export function Navbar({
 }) {
 	const pathname = normalizeDocsPathname(usePathname());
 	const tabs = navigationTabs;
-	const [hoveredTab, setHoveredTab] = useState<string | null>(null);
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => {
-		setMounted(true);
-	}, []);
-
-	const activeTab =
-		tabs.find((tab) => {
-			if (tab.url === "/") {
-				// Documentation is active when no other tab matches
-				return !tabs
-					.filter((t) => t.url !== "/")
-					.some((t) => pathname.startsWith(t.url));
-			}
-			return pathname.startsWith(tab.url);
-		})?.title || "Documentation";
-
-	const currentHighlighted = hoveredTab || activeTab;
 
 	return (
 		<div className="flex h-full w-full items-center justify-between pr-3">
@@ -76,10 +46,7 @@ export function Navbar({
 
 			{/* Nav tabs */}
 			<div className="flex h-full flex-1 items-center">
-				<nav
-					className="hidden h-full items-center gap-0 lg:flex"
-					onPointerLeave={() => setHoveredTab(null)}
-				>
+				<nav className="hidden h-full items-center gap-0 lg:flex">
 					{tabs.map((tab) => {
 						const active =
 							tab.url === "/"
@@ -94,53 +61,36 @@ export function Navbar({
 								key={tab.title}
 								href={tab.url}
 								className={cn(
-									"relative flex h-full items-center gap-1.5 whitespace-nowrap px-4 font-semibold text-[13px] transition-colors duration-200",
-									active || hoveredTab === tab.title
-										? ""
-										: "text-text-sub-600 dark:text-white/60",
+									"relative flex h-full items-center gap-1.5 whitespace-nowrap px-4 font-semibold text-[13px]",
+									active ? "" : "text-text-sub-600 dark:text-white/60",
 								)}
 								style={{
-									color: active || hoveredTab === tab.title ? color : undefined,
+									color: active ? color : undefined,
 								}}
-								onPointerEnter={() => setHoveredTab(tab.title)}
 							>
-								{/* Pill background */}
-								{currentHighlighted === tab.title &&
-									(mounted ? (
-										<DynamicActivePill color={color} active={active} />
-									) : (
+								{active && (
+									<>
 										<div
-											className="-z-10 absolute inset-x-1 inset-y-2 rounded-lg transition-all duration-200"
+											className="-z-10 absolute inset-x-1 inset-y-2 rounded-lg"
 											style={{
-												backgroundColor: active
-													? `color-mix(in srgb, ${color} 12%, transparent)`
-													: `color-mix(in srgb, ${color} 8%, transparent)`,
+												backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)`,
 											}}
 										/>
-									))}
-
-								{/* Active bottom underline */}
-								{active &&
-									(mounted ? (
-										<DynamicActiveUnderline color={color} />
-									) : (
 										<div
 											className="absolute right-1 bottom-0 left-1 h-[2px] rounded-full"
 											style={{ backgroundColor: color }}
 										/>
-									))}
+									</>
+								)}
 
 								<Icon
 									name={tab.iconName}
 									className={cn(
-										"h-4 w-4 shrink-0 transition-colors duration-200",
-										active || hoveredTab === tab.title
-											? "opacity-100"
-											: "opacity-60",
+										"h-4 w-4 shrink-0",
+										active ? "opacity-100" : "opacity-60",
 									)}
 									style={{
-										color:
-											active || hoveredTab === tab.title ? color : undefined,
+										color: active ? color : undefined,
 									}}
 								/>
 								<span className="relative z-10">{tab.title}</span>
