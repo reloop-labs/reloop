@@ -1,8 +1,6 @@
+import { GlossaryPageHeader } from "@reloop/web/components/glossary/glossary-page-header";
 import { GlossaryPageMain } from "@reloop/web/components/glossary/glossary-page-main";
-import {
-	FeatureCta,
-	MarketingPageShell,
-} from "@reloop/web/components/page-shell";
+import { FeatureCta } from "@reloop/web/components/page-shell";
 import {
 	getGlossaryLinkCount,
 	getGlossaryPageDescription,
@@ -34,20 +32,15 @@ export default function GlossaryPage() {
 
 	return (
 		<div className="glossary-page">
-			<MarketingPageShell
-				titleLines={["Glossary"]}
-				description={description}
-				compactHero
-			>
-				<GlossaryPageMain sections={sections} />
+			<GlossaryPageHeader description={description} />
+			<GlossaryPageMain sections={sections} />
 
-				<FeatureCta
-					{...defaultLandingCta(
-						"Ready to send email?",
-						"Start free — transactional mail, campaigns, and a full API in one place.",
-					)}
-				/>
-			</MarketingPageShell>
+			<FeatureCta
+				{...defaultLandingCta(
+					"Ready to send email?",
+					"Start free — transactional mail, campaigns, and a full API in one place.",
+				)}
+			/>
 		</div>
 	);
 }
