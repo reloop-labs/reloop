@@ -1,5 +1,5 @@
 {
 	"title": "Logs",
-	"icon": "file-text",
+	"icon": "logs",
 	"pages": ["index", "details"]
 }

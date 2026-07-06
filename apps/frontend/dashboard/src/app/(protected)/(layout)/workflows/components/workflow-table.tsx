@@ -73,7 +73,7 @@ export const WorkflowTable = ({
 						className="group flex items-center gap-4 border-stroke-soft-100 border-b px-4 py-3 transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/50"
 					>
 						<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50 dark:border-stroke-soft-100/50">
-							<Icon name="modules" className="h-4 w-4 text-text-sub-600" />
+							<Icon name="workflow" className="h-4 w-4 text-text-sub-600" />
 						</div>
 						<div className="min-w-0 flex-1">
 							<p className="truncate font-medium text-sm text-text-strong-950">

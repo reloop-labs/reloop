@@ -60,7 +60,7 @@ export const mainNavigation: MainNavigationItem[] = [
 	{
 		label: "Logs",
 		path: "/logs",
-		iconName: "file-text",
+		iconName: "logs",
 	},
 	{
 		label: "Domain",
@@ -75,7 +75,7 @@ export const mainNavigation: MainNavigationItem[] = [
 	{
 		label: "Workflows",
 		path: "/workflows",
-		iconName: "modules",
+		iconName: "workflow",
 	},
 	{
 		label: "Settings",

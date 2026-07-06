@@ -31,9 +31,9 @@ const EVENT_ICONS: Record<string, string> = {
 	api_key: "key-new",
 	member: "users",
 	webhook: "webhook",
-	workflow: "modules",
+	workflow: "workflow",
 	template: "layout",
-	log: "file-text",
+	log: "logs",
 	settings: "gear",
 };
 
@@ -121,7 +121,7 @@ export function AuditLogsCard() {
 					href={getBackToUrl("/logs")}
 					className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
 				>
-					<Icon name="file-text" className="h-4 w-4 shrink-0" />
+					<Icon name="logs" className="h-4 w-4 shrink-0" />
 					Audit Logs
 				</Link>
 				<Link
@@ -179,7 +179,7 @@ export function AuditLogsCard() {
 			) : (
 				<div className="-mt-1.5 flex h-[250px] flex-col items-center justify-center rounded-xl border border-stroke-soft-100 bg-white p-6 text-center shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
 					<Icon
-						name="file-text"
+						name="logs"
 						className="h-6 w-6 text-text-sub-600 dark:text-white/40"
 					/>
 					<h4 className="mt-4 font-semibold text-[15px] text-text-strong-950 tracking-tight dark:text-white">

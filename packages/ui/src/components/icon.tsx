@@ -505,6 +505,53 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
+			<symbol
+				id="workflow"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<g opacity="0.12">
+					<path
+						d="M21 5C21 6.65685 19.6569 8 18 8C16.3431 8 15 6.65685 15 5C15 3.34315 16.3431 2 18 2C19.6569 2 21 3.34315 21 5Z"
+						fill="currentColor"
+					/>
+					<path
+						d="M8 19C8 20.6569 6.65685 22 5 22C3.34315 22 2 20.6569 2 19C2 17.3431 3.34315 16 5 16C6.65685 16 8 17.3431 8 19Z"
+						fill="currentColor"
+					/>
+				</g>
+				<path
+					d="M8 19H16.5C18.433 19 20 17.433 20 15.5C20 13.567 18.433 12 16.5 12H6.5C4.567 12 3 10.433 3 8.5C3 6.567 4.567 5 6.5 5H12M8 19C8 20.6569 6.65685 22 5 22C3.34315 22 2 20.6569 2 19C2 17.3431 3.34315 16 5 16C6.65685 16 8 17.3431 8 19ZM9.5 7.5L12 5L9.5 2.5M21 5C21 6.65685 19.6569 8 18 8C16.3431 8 15 6.65685 15 5C15 3.34315 16.3431 2 18 2C19.6569 2 21 3.34315 21 5Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol
+				id="logs"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<rect
+					opacity="0.12"
+					x={5}
+					y={2}
+					width={14}
+					height={20}
+					rx={4}
+					fill="currentColor"
+				/>
+				<path
+					d="M9 7H15M9 11H15M9 15H11M5 6C3.34315 6 2 7.34315 2 9V15C2 16.6569 3.34315 18 5 18M19 6C20.6569 6 22 7.34315 22 9V15C22 16.6569 20.6569 18 19 18M11.4 22H12.6C14.8402 22 15.9603 22 16.816 21.564C17.5686 21.1805 18.1805 20.5686 18.564 19.816C19 18.9603 19 17.8402 19 15.6V8.4C19 6.15979 19 5.03968 18.564 4.18404C18.1805 3.43139 17.5686 2.81947 16.816 2.43597C15.9603 2 14.8402 2 12.6 2H11.4C9.15979 2 8.03968 2 7.18404 2.43597C6.43139 2.81947 5.81947 3.43139 5.43597 4.18404C5 5.03968 5 6.15979 5 8.4V15.6C5 17.8402 5 18.9603 5.43597 19.816C5.81947 20.5686 6.43139 21.1805 7.18404 21.564C8.03968 22 9.15979 22 11.4 22Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol viewBox="0 0 24 24" fill="none" id="swatch-book">
 				<g opacity="0.12">
 					<path
@@ -1965,7 +2012,8 @@ export const IconsSprite = () => (
 				strokeLinecap="round"
 				strokeLinejoin="round"
 			>
-				<path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4" />
+				<path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z" />
+				<circle cx="16.5" cy="7.5" r={0.5} fill="currentColor" />
 			</symbol>
 			<symbol id="element-5" viewBox="0 0 24 24">
 				<path
