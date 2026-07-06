@@ -1,7 +1,7 @@
 "use client";
 
 import * as Input from "@reloop/ui/input";
-import { PageSection, SectionHeading } from "@reloop/web/components/page-shell";
+import { grosoryContentClass } from "@reloop/web/components/grosory/grosory-page-header";
 import type { GrosorySection } from "@reloop/web/lib/grosory-sections";
 import { getSectionSlug } from "@reloop/web/lib/grosory-sections";
 import Link from "next/link";
@@ -28,7 +28,7 @@ export function GrosoryPageMain({ sections }: { sections: GrosorySection[] }) {
 
 	return (
 		<>
-			<div className="mx-auto mt-6 max-w-[920px] px-6">
+			<div className={`${grosoryContentClass} mt-6`}>
 				<label htmlFor="grosory-search" className="sr-only">
 					Search links
 				</label>
@@ -73,42 +73,50 @@ export function GrosoryPageMain({ sections }: { sections: GrosorySection[] }) {
 				)}
 			</div>
 
-			{filteredSections.map((section, index) => {
+			{filteredSections.map((section) => {
 				const slug = getSectionSlug(section.title);
 				const originalIndex = sections.findIndex((s) => s.title === section.title);
 
 				return (
-					<PageSection
+					<section
 						key={section.title}
-						alt={originalIndex % 2 === 1}
+						className={
+							originalIndex % 2 === 1
+								? "bg-[#f8f8f8] text-text-strong-950 dark:bg-black dark:text-white"
+								: undefined
+						}
 					>
-						<div
-							id={slug}
-							className="scroll-mt-32 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
-						>
-							<SectionHeading title={section.title} center={false} compact />
-							{section.hub && (
-								<Link
-									href={section.hub.href}
-									className="shrink-0 font-semibold text-primary-base text-sm hover:underline"
-								>
-									{section.hub.title} →
-								</Link>
-							)}
-						</div>
-						<ul className="mt-8 columns-1 gap-x-10 sm:columns-2 lg:columns-3">
-							{section.links.map((link) => (
-								<li key={link.href} className="mb-3 break-inside-avoid">
+						<div className={`${grosoryContentClass} py-12 sm:py-14`}>
+							<div
+								id={slug}
+								className="scroll-mt-32 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+							>
+								<h2 className="font-serif text-[2.25rem] text-text-strong-950 leading-tight tracking-tight sm:text-[2.75rem] lg:text-[3rem] dark:text-white">
+									{section.title}
+								</h2>
+								{section.hub && (
 									<Link
-										href={link.href}
-										className="text-[15px] text-text-sub-600 leading-snug transition-colors hover:text-primary-base dark:text-white/60"
+										href={section.hub.href}
+										className="shrink-0 text-primary-base text-sm hover:underline"
 									>
-										{link.title}
+										{section.hub.title} →
 									</Link>
-								</li>
-							))}
-						</ul>
-					</PageSection>
+								)}
+							</div>
+							<ul className="mt-6 columns-1 gap-x-10 sm:columns-2 lg:columns-3">
+								{section.links.map((link) => (
+									<li key={link.href} className="mb-3 break-inside-avoid">
+										<Link
+											href={link.href}
+											className="text-[15px] text-text-sub-600 leading-snug transition-colors hover:text-primary-base dark:text-white/60"
+										>
+											{link.title}
+										</Link>
+									</li>
+								))}
+							</ul>
+						</div>
+					</section>
 				);
 			})}
 		</>
