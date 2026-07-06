@@ -30,7 +30,7 @@ export function GrosoryPageMain({ sections }: { sections: GrosorySection[] }) {
 		<>
 			<div className={`${grosoryContentClass} mt-6`}>
 				<label htmlFor="grosory-search" className="sr-only">
-					Search links
+					Search pages
 				</label>
 				<Input.Root size="medium">
 					<Input.Wrapper>
@@ -39,18 +39,18 @@ export function GrosoryPageMain({ sections }: { sections: GrosorySection[] }) {
 							type="search"
 							value={query}
 							onChange={(event) => setQuery(event.target.value)}
-							placeholder="Search for a page or resource (e.g. 'pricing', 'SMTP', 'glossary')"
+							placeholder="Find a page (pricing, webhooks, email validator, DKIM…)"
 							autoComplete="off"
 						/>
 					</Input.Wrapper>
 				</Input.Root>
 
 				<nav
-					aria-label="Jump to section"
+					aria-label="Browse by section"
 					className="mt-6 rounded-[10px] border border-stroke-soft-200 bg-bg-white-0 p-4 pr-5 dark:border-white/10 dark:bg-[#0a0a0a]"
 				>
 					<h2 className="mb-2.5 font-medium text-[0.85rem] text-text-sub-600 uppercase tracking-[0.08em] dark:text-white/40">
-						Jump to
+						Browse by section
 					</h2>
 					<ul className="m-0 flex list-none flex-wrap gap-x-4 gap-y-2 p-0">
 						{sections.map((section) => (
@@ -68,14 +68,17 @@ export function GrosoryPageMain({ sections }: { sections: GrosorySection[] }) {
 
 				{!hasResults && (
 					<p className="mt-6 py-2 text-text-sub-600 italic dark:text-white/50">
-						No links match your search. Try a different word.
+						Nothing matched that search. Try a shorter keyword or pick a section
+						below.
 					</p>
 				)}
 			</div>
 
 			{filteredSections.map((section) => {
 				const slug = getSectionSlug(section.title);
-				const originalIndex = sections.findIndex((s) => s.title === section.title);
+				const originalIndex = sections.findIndex(
+					(s) => s.title === section.title,
+				);
 
 				return (
 					<section
@@ -89,10 +92,14 @@ export function GrosoryPageMain({ sections }: { sections: GrosorySection[] }) {
 						<div className={`${grosoryContentClass} py-12 sm:py-14`}>
 							<div
 								id={slug}
-								className="scroll-mt-32 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+								className="flex scroll-mt-32 flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
 							>
 								<h2 className="font-serif text-[2.25rem] text-text-strong-950 leading-tight tracking-tight sm:text-[2.75rem] lg:text-[3rem] dark:text-white">
 									{section.title}
+									<span
+										aria-hidden
+										className="mt-0.5 block h-[3px] w-9 bg-primary-base"
+									/>
 								</h2>
 								{section.hub && (
 									<Link

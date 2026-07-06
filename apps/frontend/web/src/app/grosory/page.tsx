@@ -2,14 +2,18 @@ import { GrosoryPageHeader } from "@reloop/web/components/grosory/grosory-page-h
 import { GrosoryPageMain } from "@reloop/web/components/grosory/grosory-page-main";
 import { FeatureCta } from "@reloop/web/components/page-shell";
 import { defaultLandingCta } from "@reloop/web/lib/landing/constants";
-import { getGrosoryLinkCount, getGrosorySections } from "@reloop/web/lib/grosory-sections";
+import {
+	getGrosoryLinkCount,
+	getGrosoryPageDescription,
+	getGrosorySections,
+} from "@reloop/web/lib/grosory-sections";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 
 export const instant = false;
 
 export const metadata = createLandingMetadata(
-	"Grosory — Site Directory",
-	"Browse every Reloop page: tools, use cases, alternatives, integrations, features, glossary, blog, and more.",
+	"Grosory",
+	getGrosoryPageDescription(getGrosoryLinkCount()),
 	"/grosory",
 	[
 		"Reloop sitemap",
@@ -22,16 +26,17 @@ export const metadata = createLandingMetadata(
 export default function GrosoryPage() {
 	const sections = getGrosorySections();
 	const totalLinks = getGrosoryLinkCount();
+	const description = getGrosoryPageDescription(totalLinks);
 
 	return (
 		<div>
-			<GrosoryPageHeader totalLinks={totalLinks} />
+			<GrosoryPageHeader description={description} />
 			<GrosoryPageMain sections={sections} />
 
 			<FeatureCta
 				{...defaultLandingCta(
 					"Ready to send email?",
-					"Pick any page above—or start with a free account.",
+					"Start free — transactional mail, campaigns, and a full API in one place.",
 				)}
 			/>
 		</div>

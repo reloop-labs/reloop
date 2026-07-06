@@ -41,55 +41,54 @@ function landingLinks(
 	}));
 }
 
+function section(
+	title: string,
+	links: GrosoryLink[],
+	hub?: GrosoryLink,
+): GrosorySection {
+	return { title, links, hub };
+}
+
 /** All marketing pages grouped for the /grosory directory */
 export function getGrosorySections(): GrosorySection[] {
 	return [
-		{
-			title: "Get started",
-			links: [
-				{ title: "Get Started", href: "/get-started" },
-				{ title: "Pricing", href: "/pricing" },
-				{ title: "Contact", href: "/contact" },
-				{ title: "Documentation", href: "/docs" },
-			],
-		},
-		{
-			title: "Free tools",
-			hub: { title: "All tools", href: "/tools" },
-			links: landingLinks(toolConfigs),
-		},
-		{
-			title: "Use cases",
-			hub: { title: "All use cases", href: "/use-cases" },
-			links: landingLinks(useCaseConfigs),
-		},
-		{
-			title: "Alternatives",
-			hub: { title: "All alternatives", href: "/alternatives" },
-			links: landingLinks(alternativeConfigs),
-		},
-		{
-			title: "Compare",
-			hub: { title: "Compare index", href: "/compare" },
-			links: competitorBrands.map((brand) => ({
+		section("Get started", [
+			{ title: "Get Started", href: "/get-started" },
+			{ title: "Pricing", href: "/pricing" },
+			{ title: "Contact", href: "/contact" },
+			{ title: "Documentation", href: "/docs" },
+		]),
+		section("Free tools", landingLinks(toolConfigs), {
+			title: "View all tools",
+			href: "/tools",
+		}),
+		section("Use cases", landingLinks(useCaseConfigs), {
+			title: "View all use cases",
+			href: "/use-cases",
+		}),
+		section("Alternatives", landingLinks(alternativeConfigs), {
+			title: "View all alternatives",
+			href: "/alternatives",
+		}),
+		section(
+			"Compare",
+			competitorBrands.map((brand) => ({
 				title: `Reloop vs ${brand.name}`,
 				href: brand.href,
 			})),
-		},
-		{
-			title: "Integrations",
-			hub: { title: "All integrations", href: "/integrations" },
-			links: landingLinks(integrationConfigs),
-		},
-		{
-			title: "Who it's for",
-			hub: { title: "All audiences", href: "/for" },
-			links: landingLinks(personaConfigs),
-		},
-		{
-			title: "Features",
-			hub: { title: "All features", href: "/features" },
-			links: [
+			{ title: "View all comparisons", href: "/compare" },
+		),
+		section("Integrations", landingLinks(integrationConfigs), {
+			title: "View all integrations",
+			href: "/integrations",
+		}),
+		section("Who it's for", landingLinks(personaConfigs), {
+			title: "See all teams",
+			href: "/for",
+		}),
+		section(
+			"Features",
+			[
 				{ title: "AI Agents", href: "/features/ai-agents" },
 				{ title: "API Reference", href: "/features/api-reference" },
 				{ title: "Campaign Builder", href: "/features/campaign-builder" },
@@ -107,68 +106,64 @@ export function getGrosorySections(): GrosorySection[] {
 				{ title: "Transaction Emails", href: "/features/transaction-emails" },
 				{ title: "Webhooks", href: "/features/webhooks" },
 			],
-		},
-		{
-			title: "Language SDKs",
-			hub: { title: "All languages", href: "/features/languages" },
-			links: LANGUAGE_SLUGS.map((slug) => {
+			{ title: "View all features", href: "/features" },
+		),
+		section(
+			"Language SDKs",
+			LANGUAGE_SLUGS.map((slug) => {
 				const lang = languages.find((l) => l.slug === slug);
 				return {
 					title: lang?.name ?? slug,
 					href: `/features/languages/${slug}`,
 				};
 			}),
-		},
-		{
-			title: "Email glossary",
-			hub: { title: "Glossary index", href: "/resources/glossary" },
-			links: glossaryTerms.map((term) => ({
+			{ title: "View all SDKs", href: "/features/languages" },
+		),
+		section(
+			"Glossary",
+			glossaryTerms.map((term) => ({
 				title: term.title,
 				href: `/glossary/${term.slug}`,
 			})),
-		},
-		{
-			title: "Blog",
-			hub: { title: "All posts", href: "/company/blog" },
-			links: blogPosts.map((post) => ({
+			{ title: "View full glossary", href: "/resources/glossary" },
+		),
+		section(
+			"Blog",
+			blogPosts.map((post) => ({
 				title: post.title,
 				href: `/company/blog/${post.slug}`,
 			})),
-		},
-		{
-			title: "Resources",
-			links: [
-				{ title: "Changelog", href: "/resources/changelog" },
-				{ title: "Community", href: "/resources/community" },
-				{ title: "Self-hosting Guide", href: "/resources/self-hosting-guide" },
-				{ title: "Status", href: "/resources/status" },
-				{ title: "Free Tools (resources)", href: "/resources/tools" },
-			],
-		},
-		{
-			title: "Company",
-			links: [
-				{ title: "About Us", href: "/company/about-us" },
-				{ title: "Blog", href: "/company/blog" },
-				{ title: "Contact Us", href: "/company/contact-us" },
-				{ title: "License", href: "/company/license" },
-				{ title: "Privacy Policy", href: "/company/privacy" },
-				{ title: "Terms and Conditions", href: "/company/terms-and-conditions" },
-			],
-		},
-		{
-			title: "Philosophy",
-			links: [
-				{ title: "Why Reloop", href: "/philosophy/why-reloop" },
-				{ title: "Why Open Source", href: "/philosophy/why-open-source" },
-				{ title: "What We Stand For", href: "/philosophy/what-we-stand-for" },
-				{ title: "Our Product Beliefs", href: "/philosophy/our-product-beliefs" },
-				{ title: "Engineering", href: "/philosophy/engineering" },
-			],
-		},
+			{ title: "View all posts", href: "/company/blog" },
+		),
+		section("Resources", [
+			{ title: "Changelog", href: "/resources/changelog" },
+			{ title: "Community", href: "/resources/community" },
+			{ title: "Self-hosting Guide", href: "/resources/self-hosting-guide" },
+			{ title: "Status", href: "/resources/status" },
+			{ title: "Tools overview", href: "/resources/tools" },
+		]),
+		section("Company", [
+			{ title: "About Us", href: "/company/about-us" },
+			{ title: "Blog", href: "/company/blog" },
+			{ title: "Contact Us", href: "/company/contact-us" },
+			{ title: "License", href: "/company/license" },
+			{ title: "Privacy Policy", href: "/company/privacy" },
+			{ title: "Terms and Conditions", href: "/company/terms-and-conditions" },
+		]),
+		section("Philosophy", [
+			{ title: "Why Reloop", href: "/philosophy/why-reloop" },
+			{ title: "Why Open Source", href: "/philosophy/why-open-source" },
+			{ title: "What We Stand For", href: "/philosophy/what-we-stand-for" },
+			{ title: "Our Product Beliefs", href: "/philosophy/our-product-beliefs" },
+			{ title: "Engineering", href: "/philosophy/engineering" },
+		]),
 	];
 }
 
 export function getGrosoryLinkCount(): number {
 	return getGrosorySections().reduce((sum, section) => sum + section.links.length, 0);
+}
+
+export function getGrosoryPageDescription(totalLinks: number): string {
+	return `Every page on reloop.sh in one place — ${totalLinks} links to tools, docs, features, integrations, and more. Search or browse by section below.`;
 }
