@@ -40,7 +40,7 @@ export default function ForIndexPage() {
 						<Link
 							key={persona.path}
 							href={persona.path}
-							className={`group rounded-2xl border border-stroke-soft-200 p-6 transition-colors dark:border-white/10 ${accent.hoverBorder}`}
+							className={`group rounded-2xl border border-stroke-soft-200 p-6 transition-colors dark:border-white/10 ${accent.hoverBorder} ${accent.hoverBg}`}
 						>
 							<span
 								className={`inline-flex rounded-full px-2.5 py-0.5 font-semibold text-[10px] uppercase tracking-wider ${accent.badge}`}

@@ -19,6 +19,7 @@ export const accentStyles: Record<
 		badge: string;
 		hoverBorder: string;
 		groupHoverText: string;
+		hoverBg: string;
 	}
 > = {
 	emerald: {
@@ -30,6 +31,7 @@ export const accentStyles: Record<
 		hoverBorder: "hover:border-emerald-500/40 dark:hover:border-emerald-400/30",
 		groupHoverText:
 			"group-hover:text-emerald-600 dark:group-hover:text-emerald-400",
+		hoverBg: "hover:bg-emerald-500/[0.02] dark:hover:bg-emerald-500/[0.03]",
 	},
 	blue: {
 		bg: "bg-blue-500",
@@ -39,6 +41,7 @@ export const accentStyles: Record<
 		badge: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
 		hoverBorder: "hover:border-blue-500/40 dark:hover:border-blue-400/30",
 		groupHoverText: "group-hover:text-blue-600 dark:group-hover:text-blue-400",
+		hoverBg: "hover:bg-blue-500/[0.02] dark:hover:bg-blue-500/[0.03]",
 	},
 	violet: {
 		bg: "bg-violet-500",
@@ -49,6 +52,7 @@ export const accentStyles: Record<
 		hoverBorder: "hover:border-violet-500/40 dark:hover:border-violet-400/30",
 		groupHoverText:
 			"group-hover:text-violet-600 dark:group-hover:text-violet-400",
+		hoverBg: "hover:bg-violet-500/[0.02] dark:hover:bg-violet-500/[0.03]",
 	},
 	orange: {
 		bg: "bg-orange-500",
@@ -59,6 +63,7 @@ export const accentStyles: Record<
 		hoverBorder: "hover:border-orange-500/40 dark:hover:border-orange-400/30",
 		groupHoverText:
 			"group-hover:text-orange-600 dark:group-hover:text-orange-400",
+		hoverBg: "hover:bg-orange-500/[0.02] dark:hover:bg-orange-500/[0.03]",
 	},
 	rose: {
 		bg: "bg-rose-500",
@@ -68,6 +73,7 @@ export const accentStyles: Record<
 		badge: "bg-rose-500/10 text-rose-700 dark:text-rose-400",
 		hoverBorder: "hover:border-rose-500/40 dark:hover:border-rose-400/30",
 		groupHoverText: "group-hover:text-rose-600 dark:group-hover:text-rose-400",
+		hoverBg: "hover:bg-rose-500/[0.02] dark:hover:bg-rose-500/[0.03]",
 	},
 	indigo: {
 		bg: "bg-indigo-500",
@@ -78,6 +84,7 @@ export const accentStyles: Record<
 		hoverBorder: "hover:border-indigo-500/40 dark:hover:border-indigo-400/30",
 		groupHoverText:
 			"group-hover:text-indigo-600 dark:group-hover:text-indigo-400",
+		hoverBg: "hover:bg-indigo-500/[0.02] dark:hover:bg-indigo-500/[0.03]",
 	},
 	cyan: {
 		bg: "bg-cyan-500",
@@ -87,6 +94,7 @@ export const accentStyles: Record<
 		badge: "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400",
 		hoverBorder: "hover:border-cyan-500/40 dark:hover:border-cyan-400/30",
 		groupHoverText: "group-hover:text-cyan-600 dark:group-hover:text-cyan-400",
+		hoverBg: "hover:bg-cyan-500/[0.02] dark:hover:bg-cyan-500/[0.03]",
 	},
 	amber: {
 		bg: "bg-amber-500",
@@ -97,6 +105,7 @@ export const accentStyles: Record<
 		hoverBorder: "hover:border-amber-500/40 dark:hover:border-amber-400/30",
 		groupHoverText:
 			"group-hover:text-amber-600 dark:group-hover:text-amber-400",
+		hoverBg: "hover:bg-amber-500/[0.02] dark:hover:bg-amber-500/[0.03]",
 	},
 	slate: {
 		bg: "bg-slate-600",
@@ -107,5 +116,6 @@ export const accentStyles: Record<
 		hoverBorder: "hover:border-slate-500/40 dark:hover:border-slate-400/30",
 		groupHoverText:
 			"group-hover:text-slate-600 dark:group-hover:text-slate-400",
+		hoverBg: "hover:bg-slate-500/[0.02] dark:hover:bg-slate-500/[0.03]",
 	},
 };
