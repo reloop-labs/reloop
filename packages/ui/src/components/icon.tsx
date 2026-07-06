@@ -496,9 +496,24 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
-			<symbol viewBox="0 0 24 24" fill="none" id="modules">
+			<symbol
+				id="modules"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<g opacity="0.12">
+					<path
+						d="M1 18.8C1 16.149 3.14903 14 5.8 14H10.2C12.851 14 15 16.149 15 18.8C15 20.5673 13.5673 22 11.8 22H4.2C2.43269 22 1 20.5673 1 18.8Z"
+						fill="currentColor"
+					/>
+					<path
+						d="M12 6C12 8.20914 10.2091 10 8 10C5.79086 10 4 8.20914 4 6C4 3.79086 5.79086 2 8 2C10.2091 2 12 3.79086 12 6Z"
+						fill="currentColor"
+					/>
+				</g>
 				<path
-					d="M8 5H12M8 5C8 6.65685 6.65685 8 5 8C3.34315 8 2 6.65685 2 5C2 3.34315 3.34315 2 5 2C6.65685 2 8 3.34315 8 5ZM5 12V16M5 16C6.65685 16 8 17.3431 8 19C8 20.6569 6.65685 22 5 22C3.34315 22 2 20.6569 2 19C2 17.3431 3.34315 16 5 16ZM19 8V12M19 8C17.3431 8 16 6.65685 16 5C16 3.34315 17.3431 2 19 2C20.6569 2 22 3.34315 22 5C22 6.65685 20.6569 8 19 8ZM12 19H16M16 19C16 20.6569 17.3431 22 19 22C20.6569 22 22 20.6569 22 19C22 17.3431 20.6569 16 19 16C17.3431 16 16 17.3431 16 19Z"
+					d="M15 10C17.2091 10 19 8.20914 19 6C19 3.79086 17.2091 2 15 2M17 22H19.8C21.5673 22 23 20.5673 23 18.8C23 16.149 20.851 14 18.2 14H17M12 6C12 8.20914 10.2091 10 8 10C5.79086 10 4 8.20914 4 6C4 3.79086 5.79086 2 8 2C10.2091 2 12 3.79086 12 6ZM4.2 22H11.8C13.5673 22 15 20.5673 15 18.8C15 16.149 12.851 14 10.2 14H5.8C3.14903 14 1 16.149 1 18.8C1 20.5673 2.43269 22 4.2 22Z"
 					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"
@@ -577,42 +592,35 @@ export const IconsSprite = () => (
 			<symbol id="users" viewBox="0 0 24 24" fill="none">
 				<rect
 					opacity="0.12"
-					x="6"
-					y="3"
-					width="14"
-					height="18"
-					rx="2"
+					x={3}
+					y={4}
+					width={18}
+					height={18}
+					rx={2}
 					fill="currentColor"
 				/>
-				<rect
-					x="6"
-					y="3"
-					width="14"
-					height="18"
-					rx="2"
-					stroke="currentColor"
-					strokeWidth="1.5"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-				/>
 				<path
-					d="M9 3V21M3 7H6M3 12H6M3 17H6"
+					d="M16 2v2M17.915 22a6 6 0 0 0-12 0M8 2v2"
 					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"
 					strokeLinejoin="round"
 				/>
 				<circle
-					cx="14.5"
-					cy="9"
-					r="2.5"
+					cx={12}
+					cy={12}
+					r={4}
 					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"
 					strokeLinejoin="round"
 				/>
-				<path
-					d="M10.5 16.5C10.5 14.5 12 13.5 14.5 13.5C17 13.5 18.5 14.5 18.5 16.5"
+				<rect
+					x={3}
+					y={4}
+					width={18}
+					height={18}
+					rx={2}
 					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"
@@ -849,21 +857,6 @@ export const IconsSprite = () => (
 					clipRule="evenodd"
 					d="M12 1.25C7.16751 1.25 3.25 5.16751 3.25 10V14C3.25 18.8325 7.16751 22.75 12 22.75C16.8325 22.75 20.75 18.8325 20.75 14V10C20.75 5.16751 16.8325 1.25 12 1.25ZM4.75 10C4.75 5.99594 7.99594 2.75 12 2.75C16.0041 2.75 19.25 5.99594 19.25 10V14C19.25 18.0041 16.0041 21.25 12 21.25C7.99594 21.25 4.75 18.0041 4.75 14V10ZM12.75 8C12.75 7.58579 12.4142 7.25 12 7.25C11.5858 7.25 11.25 7.58579 11.25 8V10C11.25 10.4142 11.5858 10.75 12 10.75C12.4142 10.75 12.75 10.4142 12.75 10V8Z"
 				/>
-			</symbol>
-			<symbol
-				id="modules"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				strokeWidth="2"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-			>
-				<rect x="16" y="16" width="6" height="6" rx="1" />
-				<rect x="2" y="16" width="6" height="6" rx="1" />
-				<rect x="9" y="2" width="6" height="6" rx="1" />
-				<path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
-				<path d="M12 12V8" />
 			</symbol>
 
 			<symbol id="image-upload" viewBox="0 0 24 24" fill="none">
@@ -1796,15 +1789,18 @@ export const IconsSprite = () => (
 				/>
 			</symbol>
 			<symbol id="layout" fill="none" viewBox="0 0 24 24">
-				<path
+				<rect
 					opacity="0.12"
-					d="M2 9H22V15.6C22 17.8402 22 18.9603 21.564 19.816C21.1805 20.5686 20.5686 21.1805 19.816 21.564C18.9603 22 17.8402 22 15.6 22H8.4C6.15979 22 5.03969 22 4.18404 21.564C3.43139 21.1805 2.81947 20.5686 2.43597 19.816C2 18.9603 2 17.8402 2 15.6V9Z"
+					x={5}
+					y={5}
+					width={14}
+					height={14}
 					fill="currentColor"
 				/>
 				<path
-					d="M9 9L9 22M2 9H22M10 22H14C16.8003 22 18.2004 22 19.27 21.455C20.2108 20.9757 20.9757 20.2108 21.455 19.27C22 18.2004 22 16.8003 22 14V10C22 7.19974 22 5.79961 21.455 4.73005C20.9757 3.78924 20.2108 3.02433 19.27 2.54497C18.2004 2 16.8003 2 14 2H10C7.19974 2 5.79961 2 4.73005 2.54497C3.78924 3.02433 3.02433 3.78924 2.54497 4.73005C2 5.79961 2 7.19974 2 10V14C2 16.8003 2 18.2004 2.54497 19.27C3.02433 20.2108 3.78924 20.9757 4.73005 21.455C5.79961 22 7.19974 22 10 22Z"
+					d="M2 5H22M5 2L5 22M19 2V22M2 19H22"
 					stroke="currentColor"
-					strokeWidth="2"
+					strokeWidth="1.5"
 					strokeLinecap="round"
 					strokeLinejoin="round"
 				/>
