@@ -94,7 +94,7 @@ const productFeatures = [
 	},
 	{
 		title: "Languages & SDKs",
-		href: "/features/languages",
+		href: "/docs/resources/sdks",
 		description: "Quickstarts for every supported client library.",
 	},
 ];

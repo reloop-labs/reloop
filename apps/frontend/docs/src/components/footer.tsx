@@ -65,7 +65,7 @@ const links = [
 			},
 			{
 				title: "SDKs",
-				href: "/docs/SDKs",
+				href: "/docs/resources/sdks",
 			},
 		],
 	},

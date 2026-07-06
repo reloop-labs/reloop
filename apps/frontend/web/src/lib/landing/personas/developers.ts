@@ -61,7 +61,7 @@ export const config: LandingPageDefinition = {
 		},
 		{
 			label: "SDKs",
-			href: "/features/SDKs",
+			href: "/docs/resources/sdks",
 		},
 	],
 };

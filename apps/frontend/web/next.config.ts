@@ -28,6 +28,20 @@ const nextConfig: NextConfig = {
 			},
 		];
 	},
+	async redirects() {
+		return [
+			{
+				source: "/features/SDKs",
+				destination: "/docs/resources/sdks",
+				permanent: true,
+			},
+			{
+				source: "/features/sdks",
+				destination: "/docs/resources/sdks",
+				permanent: true,
+			},
+		];
+	},
 };
 
 export default nextConfig;

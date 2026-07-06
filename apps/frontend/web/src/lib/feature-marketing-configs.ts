@@ -139,7 +139,7 @@ export const developersConfig: FeatureMarketingPageConfig = {
 		description:
 			"Ship transactional and marketing email with APIs and SDKs designed for production workloads.",
 		primary: signup,
-		secondary: { label: "Explore SDKs", href: "/features/languages" },
+		secondary: { label: "Explore SDKs", href: "/docs/resources/sdks" },
 	},
 };
 
@@ -340,62 +340,6 @@ export const webhooksConfig: FeatureMarketingPageConfig = {
 			"Wire email events into your product with reliable, signed webhook deliveries.",
 		primary: signup,
 		secondary: docs,
-	},
-};
-
-export const sdksConfig: FeatureMarketingPageConfig = {
-	titleLines: ["Official SDKs"],
-	description:
-		"Client libraries for your favorite languages—type-safe, documented, and maintained by the Reloop team.",
-	primaryCta: signup,
-	secondaryCta: { label: "Language guides", href: "/features/languages" },
-	sections: [
-		{
-			title: "Choose your language",
-			description:
-				"Install from npm, PyPI, crates.io, Packagist, or Go modules.",
-			items: [
-				{
-					title: "Node.js & TypeScript",
-					description: "Full TypeScript support with ESM and CommonJS builds.",
-				},
-				{
-					title: "Python",
-					description: "Sync and async clients with Pydantic models.",
-				},
-				{
-					title: "Go",
-					description: "Idiomatic Go client with context-aware requests.",
-				},
-			],
-		},
-		{
-			title: "SDK features",
-			description: "Production-ready defaults out of the box.",
-			alt: true,
-			items: [
-				{
-					title: "Type Safety",
-					description: "Generated types and inline documentation in your IDE.",
-				},
-				{
-					title: "Automatic Retries",
-					description: "Configurable retry policies for transient failures.",
-				},
-				{
-					title: "Error Handling",
-					description: "Structured errors with codes and actionable messages.",
-				},
-			],
-		},
-	],
-	cta: {
-		title: "Ready to integrate?",
-		titleMuted: "Pick your SDK.",
-		description:
-			"Browse language-specific quickstarts and send your first email in minutes.",
-		primary: signup,
-		secondary: { label: "All languages", href: "/features/languages" },
 	},
 };
 

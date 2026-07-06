@@ -58,7 +58,7 @@ export const sitemapRoutes = [
 	"/features/languages",
 	"/features/marketing-teams",
 	"/features/smtp",
-	"/features/SDKs",
+	"/docs/resources/sdks",
 	"/features/transaction-emails",
 	"/features/webhooks",
 	"/resources/changelog",

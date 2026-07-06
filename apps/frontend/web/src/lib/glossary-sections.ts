@@ -106,7 +106,7 @@ export function getGlossarySections(): GlossarySection[] {
 				{ title: "Getting Started", href: "/features/getting-started" },
 				{ title: "Integrations", href: "/features/integration" },
 				{ title: "Marketing Teams", href: "/features/marketing-teams" },
-				{ title: "SDKs", href: "/features/SDKs" },
+				{ title: "SDKs", href: "/docs/resources/sdks" },
 				{ title: "SMTP Relay", href: "/features/smtp" },
 				{ title: "Transaction Emails", href: "/features/transaction-emails" },
 				{ title: "Webhooks", href: "/features/webhooks" },
@@ -122,7 +122,7 @@ export function getGlossarySections(): GlossarySection[] {
 					href: `/features/languages/${slug}`,
 				};
 			}),
-			{ title: "View all SDKs", href: "/features/languages" },
+			{ title: "View all SDKs", href: "/docs/resources/sdks" },
 		),
 		section(
 			"Glossary",
