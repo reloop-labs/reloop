@@ -7,8 +7,8 @@ import Link from "next/link";
 export const instant = false;
 
 export const metadata = createLandingMetadata(
-	"Email Use Cases & Developer Workflows",
-	"Explore production-ready code samples and interactive flow diagrams for transactional, marketing, automated, and AI agent email scenarios on Reloop.",
+	"Email Use Cases for Developers | Reloop",
+	"From transactional alerts to AI agent workflows — explore production-ready code and interactive flow diagrams for every email scenario you need to ship.",
 	"/use-cases",
 	[
 		"email use cases",
@@ -25,22 +25,20 @@ export default function UseCasesIndexPage() {
 				{/* Ambient Glow & Grid Accents */}
 				<div className="pointer-events-none absolute inset-0 overflow-hidden">
 					<div className="-translate-x-1/2 -translate-y-1/2 absolute top-0 left-1/2 h-[300px] w-[600px] rounded-full bg-gradient-to-r from-primary-base/15 via-violet-500/10 to-transparent blur-[80px] sm:h-[400px] sm:w-[800px] sm:blur-[120px] dark:from-primary-base/20 dark:via-violet-500/15" />
-					<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_80%,transparent_100%)]" />
+					<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px]" />
 				</div>
 
 				<div className="relative mx-auto max-w-5xl px-4 text-center sm:px-6">
 					<h1 className="font-serif text-[2.2rem] text-text-strong-950 leading-[1.1] tracking-tight sm:text-[3.2rem] dark:text-white">
-						Deploy{" "}
+						Every email workflow,{" "}
 						<span className="bg-gradient-to-r from-primary-base to-violet-500 bg-clip-text text-transparent dark:from-primary-base dark:to-violet-400">
-							any email workflow
+							ready to ship
 						</span>
-						, from transactional alerts to AI agents
 					</h1>
 
 					<p className="mx-auto mt-4 max-w-2xl text-[16px] text-text-sub-600 leading-relaxed sm:text-[18px] dark:text-white/60">
-						Explore interactive flow diagrams and production-ready code samples
-						for every scenario—designed like Stripe docs, built for developers
-						who want to ship fast.
+						From transactional alerts to AI agent pipelines — pick a use case,
+						explore the flow diagram, and drop production-ready code straight into your app.
 					</p>
 				</div>
 			</div>
