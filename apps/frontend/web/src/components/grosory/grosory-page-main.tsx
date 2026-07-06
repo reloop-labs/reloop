@@ -9,7 +9,7 @@ export function GrosoryPageMain({ sections }: { sections: GrosorySection[] }) {
 			<div className={`${grosoryContentClass} mt-6`}>
 				<nav
 					aria-label="Browse by section"
-					className="rounded-[10px] border border-stroke-soft-200 bg-bg-white-0 p-4 pr-5 dark:border-white/10 dark:bg-[#0a0a0a]"
+					className="rounded-2xl border border-stroke-soft-200 bg-bg-soft-50 p-4 pr-5 dark:border-white/10 dark:bg-[#0a0a0a]"
 				>
 					<h2 className="mb-2.5 font-medium text-[0.85rem] text-text-sub-600 uppercase tracking-[0.08em] dark:text-white/40">
 						Browse by section
