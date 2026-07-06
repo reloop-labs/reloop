@@ -206,7 +206,7 @@ export const Footer = () => {
 					<div className="grid flex-1 grid-cols-2 gap-8 sm:grid-cols-4">
 						{links.map((group) => (
 							<div key={group.group}>
-								<h4 className="font-semibold text-[#0a0d12]/40 text-sm uppercase dark:text-white/40">
+								<h4 className="font-medium text-[#0a0d12] capitalize dark:text-white">
 									{group.group}
 								</h4>
 								<ul className="mt-4 flex flex-col gap-2.5">
