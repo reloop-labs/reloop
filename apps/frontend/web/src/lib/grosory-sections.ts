@@ -21,6 +21,13 @@ export type GrosorySection = {
 	links: GrosoryLink[];
 };
 
+export function getSectionSlug(title: string): string {
+	return title
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/^-|-$/g, "");
+}
+
 function landingLinks(
 	items: { titleLines?: string[]; title?: string; path: string; slug?: string }[],
 	titleKey: "titleLines" | "title" = "titleLines",
