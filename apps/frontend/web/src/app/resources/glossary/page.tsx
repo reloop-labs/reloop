@@ -1,4 +1,5 @@
 import * as Button from "@reloop/ui/button";
+import { glossaryTerms } from "@reloop/web/lib/landing/glossary";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -39,6 +40,8 @@ export const metadata: Metadata = {
 };
 
 const GlossaryPage = () => {
+	const terms = glossaryTerms;
+
 	return (
 		<div className="mx-auto max-w-7xl border-stroke-soft-100 border-r border-l">
 			{/* Hero Section */}
@@ -69,6 +72,25 @@ const GlossaryPage = () => {
 					>
 						View Documentation
 					</Link>
+				</div>
+			</section>
+
+			<section className="border-stroke-soft-100 border-t px-6 py-12 md:px-12">
+				<div className="mx-auto max-w-4xl">
+					<h2 className="mb-6 text-center font-semibold text-xl">
+						Browse by term
+					</h2>
+					<div className="flex flex-wrap justify-center gap-2">
+						{terms.map((term) => (
+							<Link
+								key={term.slug}
+								href={`/glossary/${term.slug}`}
+								className="rounded-full border border-stroke-soft-200 px-3 py-1.5 text-sm text-text-sub-600 transition-colors hover:border-primary-base hover:text-primary-base dark:border-white/10"
+							>
+								{term.title}
+							</Link>
+						))}
+					</div>
 				</div>
 			</section>
 

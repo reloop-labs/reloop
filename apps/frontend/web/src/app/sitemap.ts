@@ -1,4 +1,5 @@
-import { getSiteUrl, sitemapRoutes } from "@reloop/web/lib/site";
+import { getLandingSitemapRoutes } from "@reloop/web/lib/landing/routes";
+import { getSiteUrl, sitemapRoutes as baseSitemapRoutes } from "@reloop/web/lib/site";
 import type { MetadataRoute } from "next";
 import {
 	changelogReleases,
@@ -7,6 +8,7 @@ import {
 
 export default function sitemap(): MetadataRoute.Sitemap {
 	const siteUrl = getSiteUrl();
+	const sitemapRoutes = [...baseSitemapRoutes, ...getLandingSitemapRoutes()];
 
 	const staticPages = sitemapRoutes.map((path) => ({
 		url: `${siteUrl}${path === "/" ? "" : path}`,

@@ -3,6 +3,7 @@ import {
 	MarketingPageShell,
 	PageSection,
 } from "@reloop/web/components/page-shell";
+import { blogPosts } from "@reloop/web/lib/landing/blog";
 import { getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -71,10 +72,12 @@ const updates = [
 ];
 
 const BlogPage = () => {
+	const posts = blogPosts;
+
 	return (
 		<MarketingPageShell
 			titleLines={["Blog & updates"]}
-			description="We're a small open-source team. Long-form posts are coming—until then, follow releases and discussions where we already publish."
+			description="Guides, tutorials, and updates from Reloop Labs—plus release notes on GitHub and Discord."
 			primaryCta={{
 				label: "GitHub Releases",
 				href: `${socialProfiles.github}/releases`,
@@ -89,6 +92,42 @@ const BlogPage = () => {
 			<PageSection>
 				<div className="text-center">
 					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
+						Articles
+					</p>
+					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
+						Guides &{" "}
+						<span className="text-primary-base">tutorials.</span>
+					</h2>
+				</div>
+				<div className="mx-auto mt-14 grid max-w-4xl gap-6">
+					{posts.map((post) => (
+						<Link
+							key={post.slug}
+							href={`/company/blog/${post.slug}`}
+							className="group flex flex-col rounded-2xl border border-stroke-soft-200 p-6 transition-colors hover:border-stroke-soft-300 sm:flex-row sm:items-start sm:gap-6 dark:border-white/10 dark:hover:border-white/20"
+						>
+							<div className="flex-1">
+								<span className="font-semibold text-[11px] text-primary-base uppercase tracking-[0.14em]">
+									{post.tag}
+								</span>
+								<h3 className="mt-2 font-semibold text-[19px] text-text-strong-950 leading-snug group-hover:text-primary-base dark:text-white">
+									{post.title}
+								</h3>
+								<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50">
+									{post.description}
+								</p>
+							</div>
+							<span className="mt-4 shrink-0 text-[13px] text-text-sub-600 sm:mt-0 dark:text-white/40">
+								{post.readTime}
+							</span>
+						</Link>
+					))}
+				</div>
+			</PageSection>
+
+			<PageSection alt>
+				<div className="text-center">
+					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
 						Where to follow along
 					</p>
 					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
@@ -97,8 +136,8 @@ const BlogPage = () => {
 						<span className="text-primary-base">for now.</span>
 					</h2>
 					<p className="mx-auto mt-6 max-w-2xl text-[15px] text-text-sub-600 leading-7 dark:text-white/50">
-						We don't have a traditional blog yet. These are the best places to
-						stay current on Reloop development.
+						We also publish release notes and roadmap updates in the channels
+						below.
 					</p>
 				</div>
 				<div className="mx-auto mt-14 grid max-w-4xl gap-6 sm:grid-cols-3">
