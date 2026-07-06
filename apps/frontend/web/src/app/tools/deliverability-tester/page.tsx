@@ -1,4 +1,4 @@
-import { ToolLandingPage } from "@reloop/web/components/landing/tool-landing-page";
+import { DeliverabilityTesterPageView } from "@reloop/web/components/landing/tools/deliverability-tester-page";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/tools/deliverability-tester";
 
@@ -12,5 +12,5 @@ export const metadata = createLandingMetadata(
 );
 
 export default function DeliverabilityTesterToolPage() {
-	return <ToolLandingPage config={config} />;
+	return <DeliverabilityTesterPageView />;
 }

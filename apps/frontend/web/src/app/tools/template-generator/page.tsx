@@ -1,4 +1,4 @@
-import { ToolLandingPage } from "@reloop/web/components/landing/tool-landing-page";
+import { TemplateGeneratorPageView } from "@reloop/web/components/landing/tools/template-generator-page";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/tools/template-generator";
 
@@ -12,5 +12,5 @@ export const metadata = createLandingMetadata(
 );
 
 export default function TemplateGeneratorToolPage() {
-	return <ToolLandingPage config={config} />;
+	return <TemplateGeneratorPageView />;
 }

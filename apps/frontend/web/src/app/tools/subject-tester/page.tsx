@@ -1,4 +1,4 @@
-import { ToolLandingPage } from "@reloop/web/components/landing/tool-landing-page";
+import { SubjectTesterPageView } from "@reloop/web/components/landing/tools/subject-tester-page";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/tools/subject-tester";
 
@@ -12,5 +12,5 @@ export const metadata = createLandingMetadata(
 );
 
 export default function SubjectTesterToolPage() {
-	return <ToolLandingPage config={config} />;
+	return <SubjectTesterPageView />;
 }

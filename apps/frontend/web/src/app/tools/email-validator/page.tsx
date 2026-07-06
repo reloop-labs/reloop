@@ -1,4 +1,4 @@
-import { ToolLandingPage } from "@reloop/web/components/landing/tool-landing-page";
+import { EmailValidatorPageView } from "@reloop/web/components/landing/tools/email-validator-page";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/tools/email-validator";
 
@@ -12,5 +12,5 @@ export const metadata = createLandingMetadata(
 );
 
 export default function EmailValidatorToolPage() {
-	return <ToolLandingPage config={config} />;
+	return <EmailValidatorPageView />;
 }

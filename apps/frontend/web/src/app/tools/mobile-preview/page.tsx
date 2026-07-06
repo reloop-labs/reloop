@@ -1,4 +1,4 @@
-import { ToolLandingPage } from "@reloop/web/components/landing/tool-landing-page";
+import { MobilePreviewPageView } from "@reloop/web/components/landing/tools/mobile-preview-page";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/tools/mobile-preview";
 
@@ -12,5 +12,5 @@ export const metadata = createLandingMetadata(
 );
 
 export default function MobilePreviewToolPage() {
-	return <ToolLandingPage config={config} />;
+	return <MobilePreviewPageView />;
 }

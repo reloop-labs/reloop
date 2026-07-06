@@ -1,4 +1,4 @@
-import { ToolLandingPage } from "@reloop/web/components/landing/tool-landing-page";
+import { AuthCheckerPageView } from "@reloop/web/components/landing/tools/auth-checker-page";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/tools/auth-checker";
 
@@ -12,5 +12,5 @@ export const metadata = createLandingMetadata(
 );
 
 export default function AuthCheckerToolPage() {
-	return <ToolLandingPage config={config} />;
+	return <AuthCheckerPageView />;
 }
