@@ -1,4 +1,4 @@
-export type PlanId = "free" | "essentials" | "enterprise";
+export type PlanId = "free" | "essentials" | "growth" | "enterprise";
 
 export interface PricingPlan {
 	id: PlanId;
@@ -68,7 +68,7 @@ export const pricingPlans: PricingPlan[] = [
 		id: "essentials",
 		name: "Essentials",
 		description: "For startup founders & growing companies.",
-		monthlyPrice: 9,
+		monthlyPrice: 10,
 		emailsLabel: "25,000 emails / month",
 		ctaLabel: "Start Essentials trial",
 		ctaHref: "/dashboard/signup",
@@ -93,6 +93,39 @@ export const pricingPlans: PricingPlan[] = [
 			customDomains: "5",
 			support: "Email",
 			emailValidation: "1,000 / mo",
+			dedicatedIp: "—",
+			sso: false,
+			sla: "—",
+		},
+	},
+	{
+		id: "growth",
+		name: "Growth",
+		description: "For teams scaling email volume without enterprise overhead.",
+		monthlyPrice: 20,
+		emailsLabel: "50,000 emails / month",
+		ctaLabel: "Start Growth trial",
+		ctaHref: "/dashboard/signup",
+		features: [
+			"50,000 emails per month",
+			"Overage at $0.80 / 1,000 emails",
+			"100 emails / second throughput",
+			"25 MB attachments",
+			"Email support",
+		],
+		comparison: {
+			monthlyEmails: "50,000",
+			overage: "$0.80 / 1k",
+			ratePerSecond: "100 / sec",
+			attachmentSize: "25 MB",
+			campaigns: true,
+			smtpRelay: true,
+			webhooks: true,
+			analytics: true,
+			agentInbox: true,
+			customDomains: "10",
+			support: "Email",
+			emailValidation: "5,000 / mo",
 			dedicatedIp: "—",
 			sso: false,
 			sla: "—",

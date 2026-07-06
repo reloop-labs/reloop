@@ -189,7 +189,7 @@ function ComparisonTable() {
 							<Fragment key={section.title}>
 								<tr className="bg-bg-weak-50/50 dark:bg-white/[0.02]">
 									<td
-										colSpan={4}
+										colSpan={pricingPlans.length + 1}
 										className="px-5 py-2.5 font-bold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40"
 									>
 										{section.title}
@@ -240,7 +240,7 @@ function ComparisonTable() {
 export function PricingSection() {
 	return (
 		<>
-			<div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
+			<div className="mx-auto grid max-w-6xl gap-6 sm:grid-cols-2 xl:grid-cols-4">
 				{pricingPlans.map((plan) => (
 					<PlanCard key={plan.id} plan={plan} />
 				))}
