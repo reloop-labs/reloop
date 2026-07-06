@@ -59,7 +59,7 @@ export default function UseCasesIndexPage() {
 						<Link
 							key={uc.path}
 							href={uc.path}
-							className={`group rounded-2xl border border-stroke-soft-200 p-5 transition-colors dark:border-white/10 ${accent.hoverBorder} ${accent.hoverBg} ${accent.ring} ring-1 ring-transparent`}
+							className={`group rounded-2xl border border-stroke-soft-200 p-5 transition-colors dark:border-white/10 ${accent.hoverBorder} ${accent.hoverBg}`}
 						>
 							<span
 								className={`inline-flex rounded-full px-2.5 py-0.5 font-semibold text-[10px] uppercase tracking-wider ${accent.badge}`}
