@@ -1,53 +1,15 @@
-"use client";
-
-import * as Input from "@reloop/ui/input";
 import { grosoryContentClass } from "@reloop/web/components/grosory/grosory-page-header";
 import type { GrosorySection } from "@reloop/web/lib/grosory-sections";
 import { getSectionSlug } from "@reloop/web/lib/grosory-sections";
 import Link from "next/link";
-import { useMemo, useState } from "react";
 
 export function GrosoryPageMain({ sections }: { sections: GrosorySection[] }) {
-	const [query, setQuery] = useState("");
-	const normalizedQuery = query.trim().toLowerCase();
-
-	const filteredSections = useMemo(() => {
-		if (!normalizedQuery) return sections;
-
-		return sections
-			.map((section) => ({
-				...section,
-				links: section.links.filter((link) =>
-					`${link.title} ${link.href}`.toLowerCase().includes(normalizedQuery),
-				),
-			}))
-			.filter((section) => section.links.length > 0);
-	}, [sections, normalizedQuery]);
-
-	const hasResults = filteredSections.length > 0;
-
 	return (
 		<>
 			<div className={`${grosoryContentClass} mt-6`}>
-				<label htmlFor="grosory-search" className="sr-only">
-					Search pages
-				</label>
-				<Input.Root size="medium">
-					<Input.Wrapper>
-						<Input.Input
-							id="grosory-search"
-							type="search"
-							value={query}
-							onChange={(event) => setQuery(event.target.value)}
-							placeholder="Find a page (pricing, webhooks, email validator, DKIM…)"
-							autoComplete="off"
-						/>
-					</Input.Wrapper>
-				</Input.Root>
-
 				<nav
 					aria-label="Browse by section"
-					className="mt-6 rounded-[10px] border border-stroke-soft-200 bg-bg-white-0 p-4 pr-5 dark:border-white/10 dark:bg-[#0a0a0a]"
+					className="rounded-[10px] border border-stroke-soft-200 bg-bg-white-0 p-4 pr-5 dark:border-white/10 dark:bg-[#0a0a0a]"
 				>
 					<h2 className="mb-2.5 font-medium text-[0.85rem] text-text-sub-600 uppercase tracking-[0.08em] dark:text-white/40">
 						Browse by section
@@ -65,26 +27,16 @@ export function GrosoryPageMain({ sections }: { sections: GrosorySection[] }) {
 						))}
 					</ul>
 				</nav>
-
-				{!hasResults && (
-					<p className="mt-6 py-2 text-text-sub-600 italic dark:text-white/50">
-						Nothing matched that search. Try a shorter keyword or pick a section
-						below.
-					</p>
-				)}
 			</div>
 
-			{filteredSections.map((section) => {
+			{sections.map((section, index) => {
 				const slug = getSectionSlug(section.title);
-				const originalIndex = sections.findIndex(
-					(s) => s.title === section.title,
-				);
 
 				return (
 					<section
 						key={section.title}
 						className={
-							originalIndex % 2 === 1
+							index % 2 === 1
 								? "bg-[#f8f8f8] text-text-strong-950 dark:bg-black dark:text-white"
 								: undefined
 						}

@@ -29,7 +29,7 @@ export default function GrosoryPage() {
 	const description = getGrosoryPageDescription(totalLinks);
 
 	return (
-		<div>
+		<div className="grosory-page">
 			<GrosoryPageHeader description={description} />
 			<GrosoryPageMain sections={sections} />
 
