@@ -16,7 +16,7 @@ export const metadata = createLandingMetadata(
 export default function UseCasesIndexPage() {
 	return (
 		<div className="min-h-screen bg-white dark:bg-black">
-			<div className="border-stroke-soft-200 border-b bg-[#fafafa] px-4 py-12 sm:px-6 dark:border-white/10 dark:bg-[#0a0a0a]">
+			<div className="border-stroke-soft-200 border-b bg-[#fafafa] px-4 pt-28 pb-12 sm:px-6 sm:pt-32 sm:pb-16 dark:border-white/10 dark:bg-[#0a0a0a]">
 				<div className="mx-auto max-w-5xl">
 					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/40">
 						Use cases
