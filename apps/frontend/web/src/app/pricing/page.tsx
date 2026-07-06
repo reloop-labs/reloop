@@ -56,7 +56,7 @@ const PricingPage = () => {
 			<FeatureCta
 				title="3,000 emails for free"
 				titleMuted="per month."
-				description="No credit card required. Join developers building the future of email on Reloop—hosted or self-hosted."
+				description="No credit card required."
 				primary={{ label: "Get started", href: hostedSignupHref }}
 				secondary={{
 					label: "Talk to us",
