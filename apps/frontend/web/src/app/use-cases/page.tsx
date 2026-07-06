@@ -21,21 +21,15 @@ export const metadata = createLandingMetadata(
 export default function UseCasesIndexPage() {
 	return (
 		<div className="min-h-screen bg-white dark:bg-black">
-			<div className="relative overflow-hidden border-stroke-soft-200 border-b bg-[#fafafa] pt-28 pb-16 sm:pt-36 sm:pb-20 dark:border-white/10 dark:bg-[#0a0a0a]">
+			<div className="relative overflow-hidden border-stroke-soft-200 border-b bg-[#fafafa] pt-36 pb-24 sm:pt-48 sm:pb-36 dark:border-white/10 dark:bg-[#0a0a0a]">
 				{/* Ambient Glow & Grid Accents */}
 				<div className="pointer-events-none absolute inset-0 overflow-hidden">
 					<div className="-translate-x-1/2 -translate-y-1/2 absolute top-0 left-1/2 h-[300px] w-[600px] rounded-full bg-gradient-to-r from-primary-base/15 via-violet-500/10 to-transparent blur-[80px] sm:h-[400px] sm:w-[800px] sm:blur-[120px] dark:from-primary-base/20 dark:via-violet-500/15" />
 					<div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_80%,transparent_100%)]" />
 				</div>
 
-				<div className="relative mx-auto max-w-5xl px-4 sm:px-6">
-					{/* Animated Pill Badge */}
-					<div className="inline-flex items-center gap-2 rounded-full border border-primary-base/20 bg-primary-base/[0.05] px-3 py-1 font-semibold text-primary-base text-xs transition-colors hover:bg-primary-base/[0.08] dark:border-primary-base/30 dark:bg-primary-base/[0.08]">
-						<span className="flex h-1.5 w-1.5 animate-pulse rounded-full bg-primary-base" />
-						Use Cases
-					</div>
-
-					<h1 className="mt-5 font-serif text-[2.2rem] text-text-strong-950 leading-[1.1] tracking-tight sm:text-[3.2rem] dark:text-white">
+				<div className="relative mx-auto max-w-5xl px-4 text-center sm:px-6">
+					<h1 className="font-serif text-[2.2rem] text-text-strong-950 leading-[1.1] tracking-tight sm:text-[3.2rem] dark:text-white">
 						Deploy{" "}
 						<span className="bg-gradient-to-r from-primary-base to-violet-500 bg-clip-text text-transparent dark:from-primary-base dark:to-violet-400">
 							any email workflow
@@ -43,7 +37,7 @@ export default function UseCasesIndexPage() {
 						, from transactional alerts to AI agents
 					</h1>
 
-					<p className="mt-4 max-w-2xl text-[16px] text-text-sub-600 leading-relaxed sm:text-[18px] dark:text-white/60">
+					<p className="mx-auto mt-4 max-w-2xl text-[16px] text-text-sub-600 leading-relaxed sm:text-[18px] dark:text-white/60">
 						Explore interactive flow diagrams and production-ready code samples
 						for every scenario—designed like Stripe docs, built for developers
 						who want to ship fast.
