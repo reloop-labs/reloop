@@ -442,18 +442,31 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
-			<symbol
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				strokeWidth={2}
-				strokeLinecap="round"
-				strokeLinejoin="round"
-				id="webhook"
-			>
-				<path d="M18 16.98h-5.99c-1.1 0-1.95.94-2.48 1.9A4 4 0 0 1 2 17c.01-.7.2-1.4.57-2" />
-				<path d="m6 17 3.13-5.78c.53-.97.1-2.18-.5-3.1a4 4 0 1 1 6.89-4.06" />
-				<path d="m12 6 3.13 5.73C15.66 12.7 16.9 13 18 13a4 4 0 0 1 0 8" />
+			<symbol id="webhook" viewBox="0 0 48 48" fill="none">
+				<path
+					fill="currentColor"
+					d="M35,37c-2.2,0-4-1.8-4-4s1.8-4,4-4s4,1.8,4,4S37.2,37,35,37z"
+				/>
+				<path
+					fill="currentColor"
+					d="M35,43c-3,0-5.9-1.4-7.8-3.7l3.1-2.5c1.1,1.4,2.9,2.3,4.7,2.3c3.3,0,6-2.7,6-6s-2.7-6-6-6 c-1,0-2,0.3-2.9,0.7l-1.7,1L23.3,16l3.5-1.9l5.3,9.4c1-0.3,2-0.5,3-0.5c5.5,0,10,4.5,10,10S40.5,43,35,43z"
+				/>
+				<path
+					fill="currentColor"
+					d="M14,43C8.5,43,4,38.5,4,33c0-4.6,3.1-8.5,7.5-9.7l1,3.9C9.9,27.9,8,30.3,8,33c0,3.3,2.7,6,6,6 s6-2.7,6-6v-2h15v4H23.8C22.9,39.6,18.8,43,14,43z"
+				/>
+				<path
+					fill="currentColor"
+					d="M14,37c-2.2,0-4-1.8-4-4s1.8-4,4-4s4,1.8,4,4S16.2,37,14,37z"
+				/>
+				<path
+					fill="currentColor"
+					d="M25,19c-2.2,0-4-1.8-4-4s1.8-4,4-4s4,1.8,4,4S27.2,19,25,19z"
+				/>
+				<path
+					fill="currentColor"
+					d="M15.7,34L12.3,32l5.9-9.7c-2-1.9-3.2-4.5-3.2-7.3c0-5.5,4.5-10,10-10c5.5,0,10,4.5,10,10 c0,0.9-0.1,1.7-0.3,2.5l-3.9-1c0.1-0.5,0.2-1,0.2-1.5c0-3.3-2.7-6-6-6s-6,2.7-6,6c0,2.1,1.1,4,2.9,5.1l1.7,1L15.7,34z"
+				/>
 			</symbol>
 			<symbol viewBox="0 0 24 24" fill="none" id="file-text">
 				<path
@@ -514,19 +527,50 @@ export const IconsSprite = () => (
 			<symbol id="twitter" viewBox="0 0 24 24" fill="currentColor">
 				<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
 			</symbol>
-			<symbol
-				id="users"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				strokeWidth="2"
-				strokeLinecap="round"
-				strokeLinejoin="round"
-			>
-				<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-				<circle cx="9" cy="7" r="4" />
-				<path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-				<path d="M16 3.13a4 4 0 0 1 0 7.75" />
+			<symbol id="users" viewBox="0 0 24 24" fill="none">
+				<rect
+					opacity="0.12"
+					x="6"
+					y="3"
+					width="14"
+					height="18"
+					rx="2"
+					fill="currentColor"
+				/>
+				<rect
+					x="6"
+					y="3"
+					width="14"
+					height="18"
+					rx="2"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+				<path
+					d="M9 3V21M3 7H6M3 12H6M3 17H6"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+				<circle
+					cx="14.5"
+					cy="9"
+					r="2.5"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+				<path
+					d="M10.5 16.5C10.5 14.5 12 13.5 14.5 13.5C17 13.5 18.5 14.5 18.5 16.5"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
 			</symbol>
 			<symbol id="user-circle" fill="none" viewBox="0 0 24 24">
 				<path
