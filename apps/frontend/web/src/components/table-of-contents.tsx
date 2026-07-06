@@ -54,7 +54,7 @@ function useHeadings() {
 			{
 				rootMargin: "-20% 0px -60% 0px",
 				threshold: 0,
-			}
+			},
 		);
 
 		for (const section of sectionElements) {
@@ -71,7 +71,8 @@ function useHeadings() {
 				if (el) {
 					const headerOffset = 100;
 					const elementPosition = el.getBoundingClientRect().top;
-					const offsetPosition = elementPosition + window.scrollY - headerOffset;
+					const offsetPosition =
+						elementPosition + window.scrollY - headerOffset;
 
 					window.scrollTo({
 						top: offsetPosition,
@@ -98,7 +99,7 @@ function useHeadings() {
 const handleScrollTo = (
 	e: React.MouseEvent<HTMLAnchorElement>,
 	id: string,
-	setActiveId: (id: string) => void
+	setActiveId: (id: string) => void,
 ) => {
 	e.preventDefault();
 	const el = document.getElementById(id);
@@ -122,7 +123,7 @@ export function TableOfContents() {
 	if (headings.length === 0) return null;
 
 	return (
-		<aside className="hidden lg:block w-full sticky top-28 self-start max-h-[calc(100vh-10rem)] overflow-y-auto pr-4">
+		<aside className="sticky top-28 hidden max-h-[calc(100vh-10rem)] w-full self-start overflow-y-auto pr-4 lg:block">
 			<nav>
 				<h2 className="mb-4 font-semibold text-[0.8rem] text-text-sub-600 uppercase tracking-[0.08em] dark:text-white/40">
 					On this page

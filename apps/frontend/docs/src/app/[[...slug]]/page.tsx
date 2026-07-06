@@ -6,6 +6,7 @@ import {
 import { DocsLayout } from "@reloop/fe-docs/components/docs/layout";
 import { PageFooter } from "@reloop/fe-docs/components/docs/page-footer";
 import { TableOfContents } from "@reloop/fe-docs/components/docs/toc";
+import { Footer } from "@reloop/fe-docs/components/footer";
 import { PageActions } from "@reloop/fe-docs/components/page-actions";
 import { source } from "@reloop/fe-docs/lib/source";
 import type { PageTreeItem, TOCItem } from "@reloop/fe-docs/lib/types";
@@ -353,6 +354,10 @@ export default async function Page(props: {
 							</div>
 						</aside>
 					)}
+
+					<div className="col-span-full px-6 md:px-10">
+						<Footer />
+					</div>
 				</div>
 			</DocsLayout>
 		</CodeColumnProvider>

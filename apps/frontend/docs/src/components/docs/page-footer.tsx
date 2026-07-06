@@ -6,7 +6,6 @@ import { Icon } from "@reloop/ui/icon";
 import { ChevronLeft, ChevronRight, ThumbsDown, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { Footer } from "../footer";
 
 interface PageFooterProps {
 	previous?: PageNode;
@@ -102,8 +101,6 @@ export function PageFooter({ previous, next, editUrl }: PageFooterProps) {
 					<div />
 				)}
 			</div>
-
-			<Footer />
 		</section>
 	);
 }

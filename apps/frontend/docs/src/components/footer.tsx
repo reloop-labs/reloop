@@ -1,213 +1,178 @@
-import { Icon } from "@reloop/ui/icon";
-import { Logo } from "@reloop/ui/logo";
-import Link from "next/link";
+type FooterLink = {
+	title: string;
+	href: string;
+	external?: boolean;
+};
 
-const links = [
+type FooterColumn = {
+	group: string;
+	items: FooterLink[];
+};
+
+const columns: FooterColumn[] = [
 	{
-		group: "Product",
+		group: "Email",
 		items: [
-			{
-				title: "Campaigns",
-				href: "/features/campaigns",
-			},
-			{
-				title: "Email Analytics",
-				href: "/features/email-analytics",
-			},
-			{
-				title: "Transaction Emails",
-				href: "/features/transaction-emails",
-			},
-			{
-				title: "Email Validation",
-				href: "/features/email-validation",
-			},
-			{
-				title: "Email Templates",
-				href: "/features/email-templates",
-			},
-			{
-				title: "SMTP Relay",
-				href: "/features/smtp",
-			},
-			{
-				title: "Languages",
-				href: "/features/languages",
-			},
-			{
-				title: "Deliverability",
-				href: "/features/deliverability",
-			},
+			{ title: "Campaigns", href: "/features/campaigns" },
+			{ title: "Transaction Emails", href: "/features/transaction-emails" },
+			{ title: "SMTP Relay", href: "/features/smtp" },
+			{ title: "Email Analytics", href: "/features/email-analytics" },
+			{ title: "Email Validation", href: "/features/email-validation" },
+			{ title: "Email Templates", href: "/features/email-templates" },
 		],
 	},
 	{
-		group: "Platform",
+		group: "Feather",
 		items: [
+			{ title: "AI Agents", href: "/features/ai-agents" },
+			{ title: "Webhooks", href: "/features/webhooks" },
+			{ title: "Deliverability", href: "/features/deliverability" },
+			{ title: "Marketing Teams", href: "/features/marketing-teams" },
+			{ title: "Developers", href: "/features/developers" },
+			{ title: "Integrations", href: "/features/integration" },
+		],
+	},
+	{
+		group: "Developers",
+		items: [
+			{ title: "SDKs", href: "/docs/resources/sdks" },
+			{ title: "API Reference", href: "/docs/api-reference" },
+			{ title: "Getting Started", href: "/docs/getting-started" },
+			{ title: "Campaign Builder", href: "/docs/campaign-builder" },
+			{ title: "Languages", href: "/features/languages" },
+			{ title: "Webhooks", href: "/docs/webhooks" },
+		],
+	},
+	{
+		group: "Docs",
+		items: [
+			{ title: "Documentation", href: "/docs" },
+			{ title: "Self-host", href: "/docs/self-host" },
+			{ title: "Integration", href: "/docs/integration" },
+			{ title: "SMTP", href: "/docs/quickstart/smtp" },
+			{ title: "API", href: "/docs/api" },
+		],
+	},
+	{
+		group: "Compare",
+		items: [
+			{ title: "vs Resend", href: "/compare/resend" },
+			{ title: "vs SendGrid", href: "/compare/sendgrid" },
+			{ title: "vs Mailgun", href: "/compare/mailgun" },
+			{ title: "vs AWS SES", href: "/compare/aws-ses" },
+			{ title: "vs Postmark", href: "/compare/postmark" },
+			{ title: "All comparisons", href: "/compare" },
+		],
+	},
+	{
+		group: "Tools",
+		items: [
+			{ title: "Free tools", href: "/resources/tools" },
+			{ title: "Email validator", href: "/tools/email-validator" },
+			{ title: "Subject tester", href: "/tools/subject-tester" },
+			{ title: "Template generator", href: "/tools/template-generator" },
+			{ title: "Deliverability tester", href: "/tools/deliverability-tester" },
+		],
+	},
+	{
+		group: "Learn",
+		items: [
+			{ title: "Blog", href: "/company/blog" },
+			{ title: "Changelog", href: "/resources/changelog" },
+			{ title: "Glossary", href: "/resources/glossary" },
+			{ title: "Sitemap", href: "/glossary" },
+			{ title: "Community", href: "/resources/community" },
 			{
-				title: "Getting Started",
-				href: "/docs/getting-started",
-			},
-			{
-				title: "API Reference",
-				href: "/docs/api-reference",
-			},
-			{
-				title: "Campaign Builder",
-				href: "/docs/campaign-builder",
-			},
-			{
-				title: "Integration",
-				href: "/docs/integration",
-			},
-			{
-				title: "Webhooks",
-				href: "/docs/webhooks",
-			},
-			{
-				title: "SDKs",
-				href: "/docs/resources/sdks",
+				title: "Status",
+				href: "https://status.reloop.sh/status/live",
+				external: true,
 			},
 		],
 	},
 	{
 		group: "Company",
 		items: [
+			{ title: "About", href: "/company/about-us" },
+			{ title: "Contact", href: "/company/contact-us" },
+			{ title: "Pricing", href: "/pricing" },
+			{ title: "Compare", href: "/compare" },
+			{ title: "Get started", href: "/dashboard/signup" },
+		],
+	},
+	{
+		group: "Open Source",
+		items: [
+			{ title: "Why Open Source", href: "/philosophy/why-open-source" },
+			{ title: "Self-host", href: "/docs/self-host" },
+			{ title: "License", href: "/company/license" },
+		],
+	},
+	{
+		group: "Philosophy",
+		items: [
+			{ title: "Why Reloop", href: "/philosophy/why-reloop" },
+			{ title: "What We Stand For", href: "/philosophy/what-we-stand-for" },
+			{ title: "Product Beliefs", href: "/philosophy/our-product-beliefs" },
+			{ title: "Engineering", href: "/philosophy/engineering" },
+		],
+	},
+	{
+		group: "Legal & Trust",
+		items: [
+			{ title: "Privacy Policy", href: "/company/privacy" },
+			{ title: "Terms of Service", href: "/company/terms-and-conditions" },
+			{ title: "License", href: "/company/license" },
 			{
-				title: "About Us",
-				href: "/company/about-us",
-			},
-			{
-				title: "Blog",
-				href: "/company/blog",
-			},
-			{
-				title: "Contact Us",
-				href: "/company/contact-us",
-			},
-			{
-				title: "Why Reloop",
-				href: "/philosophy/why-reloop",
-			},
-			{
-				title: "Why Open-source",
-				href: "/philosophy/why-open-source",
-			},
-			{
-				title: "Changelog",
-				href: "/resources/changelog",
+				title: "Status",
+				href: "https://status.reloop.sh/status/live",
+				external: true,
 			},
 		],
 	},
 	{
-		group: "Legal",
+		group: "Social",
 		items: [
 			{
-				title: "Terms & Conditions",
-				href: "/company/terms-and-conditions",
+				title: "GitHub",
+				href: "https://github.com/reloop-labs/reloop",
+				external: true,
 			},
+			{ title: "X", href: "https://x.com/reloophq", external: true },
 			{
-				title: "Privacy Policy",
-				href: "/company/privacy",
-			},
-			{
-				title: "License",
-				href: "/company/license",
-			},
-			{
-				title: "Self-hosting Guide",
-				href: "/docs/self-host",
-			},
-			{
-				title: "Status",
-				href: "https://status.reloop.sh/status/live",
-			},
-			{
-				title: "Community",
-				href: "/resources/community",
+				title: "Discord",
+				href: "https://discord.gg/bHnkBcp7xR",
+				external: true,
 			},
 		],
 	},
 ];
 
-const githubUrl = "https://github.com/reloop-labs/reloop";
-const twitterUrl = "https://x.com/reloophq";
-const discordUrl = "https://discord.gg/bHnkBcp7xR";
-
 export function Footer() {
 	return (
 		<footer className="border-stroke-soft-100/60 border-t pt-10 pb-8 dark:border-white/5">
-			<div className="flex flex-col gap-10">
-				{/* Top Area: Logo, tagline, and socials */}
-				<div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-start">
-					<div className="space-y-2.5">
-						<Link href="/" className="flex items-center gap-1.5">
-							<Logo className="-ml-1 h-7 w-7 text-[#0a0d12] dark:text-white" />
-							<span className="font-semibold text-[#0a0d12] text-[17px] tracking-tight dark:text-white">
-								Reloop
-							</span>
-						</Link>
-						<p className="max-w-[420px] font-medium text-[#0a0d12]/65 text-[14px] leading-relaxed dark:text-white/60">
-							Open-source email infrastructure for modern applications. Use
-							Reloop hosted or self-host—no vendor lock-in.
-						</p>
+			<div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-8 lg:gap-y-12">
+				{columns.map((column) => (
+					<div key={column.group}>
+						<h4 className="font-medium text-[#0a0d12] text-[14px] dark:text-white">
+							{column.group}
+						</h4>
+						<ul className="mt-4 flex flex-col gap-2.5">
+							{column.items.map((link) => (
+								<li key={link.title}>
+									<a
+										href={link.href}
+										{...(link.external
+											? { target: "_blank", rel: "noreferrer" }
+											: {})}
+										className="text-[#0a0d12]/70 text-[14px] transition-colors hover:text-[#0a0d12] dark:text-white/45 dark:hover:text-white"
+									>
+										{link.title}
+									</a>
+								</li>
+							))}
+						</ul>
 					</div>
-
-					<div className="flex items-center gap-2 pt-1">
-						<Link
-							href={twitterUrl}
-							target="_blank"
-							rel="noreferrer"
-							className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-100/60 text-[#0a0d12]/40 transition-colors hover:bg-bg-weak-50/50 hover:text-[#0a0d12] dark:border-white/5 dark:text-white/40 dark:hover:bg-white/[0.02] dark:hover:text-white"
-						>
-							<Icon className="size-4" name="twitter" />
-						</Link>
-						<Link
-							href={githubUrl}
-							target="_blank"
-							rel="noreferrer"
-							className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-100/60 text-[#0a0d12]/40 transition-colors hover:bg-bg-weak-50/50 hover:text-[#0a0d12] dark:border-white/5 dark:text-white/40 dark:hover:bg-white/[0.02] dark:hover:text-white"
-						>
-							<Icon className="size-4" name="social-github" />
-						</Link>
-						<Link
-							href={discordUrl}
-							target="_blank"
-							rel="noreferrer"
-							className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-100/60 text-[#0a0d12]/40 transition-colors hover:bg-bg-weak-50/50 hover:text-[#0a0d12] dark:border-white/5 dark:text-white/40 dark:hover:bg-white/[0.02] dark:hover:text-white"
-						>
-							<Icon className="size-4" name="social-discord" />
-						</Link>
-					</div>
-				</div>
-
-				{/* Divider */}
-				<div className="h-px w-full bg-stroke-soft-100/60 dark:bg-white/5" />
-
-				{/* Middle Area: 4-Column Links Grid */}
-				<div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4">
-					{links.map((group) => (
-						<div key={group.group} className="space-y-3.5">
-							<h4 className="font-semibold text-[12px] uppercase tracking-wider">
-								{group.group}
-							</h4>
-							<ul className="space-y-2.5">
-								{group.items.map((link) => (
-									<li key={link.title}>
-										<a
-											href={link.href}
-											{...(link.href.startsWith("http")
-												? { target: "_blank", rel: "noreferrer" }
-												: {})}
-											className="font-medium text-[#0a0d12]/70 text-[13.5px] transition-colors hover:text-[#0a0d12] dark:text-white/60 dark:hover:text-white"
-										>
-											{link.title}
-										</a>
-									</li>
-								))}
-							</ul>
-						</div>
-					))}
-				</div>
+				))}
 			</div>
 		</footer>
 	);
