@@ -5,10 +5,17 @@ export interface PricingPlan {
 	name: string;
 	description: string;
 	monthlyPrice: number | null;
+	priceSubline: string;
 	emailsLabel: string;
+	includesLabel?: string;
 	ctaLabel: string;
 	ctaHref: string;
 	ctaExternal?: boolean;
+	secondaryCta?: {
+		label: string;
+		href: string;
+		external?: boolean;
+	};
 	highlighted?: boolean;
 	features: string[];
 	comparison: {
@@ -18,14 +25,13 @@ export interface PricingPlan {
 		attachmentSize: string;
 		campaigns: boolean;
 		smtpRelay: boolean;
-		webhooks: boolean;
+		webhooks: string;
 		analytics: boolean;
-		agentInbox: boolean;
+		agentInbox: string;
 		customDomains: string;
 		support: string;
 		emailValidation: string;
 		dedicatedIp: string;
-		sso: boolean;
 		sla: string;
 	};
 }
@@ -36,31 +42,34 @@ export const pricingPlans: PricingPlan[] = [
 		name: "Free",
 		description: "For side projects and getting started with Reloop.",
 		monthlyPrice: 0,
+		priceSubline: "Free for everyone",
 		emailsLabel: "3,000 emails / month",
 		ctaLabel: "Get started",
 		ctaHref: "/dashboard/signup",
 		features: [
 			"3,000 emails per month",
+			"2 agent inboxes",
+			"2 webhooks",
+			"2 custom domains",
 			"Transactional & campaign email",
-			"SMTP relay & webhooks",
-			"Email analytics dashboard",
+			"SMTP relay & analytics",
+			"1 MB attachments",
 			"Community support",
 		],
 		comparison: {
 			monthlyEmails: "3,000",
 			overage: "—",
 			ratePerSecond: "10 / sec",
-			attachmentSize: "5 MB",
+			attachmentSize: "1 MB",
 			campaigns: true,
 			smtpRelay: true,
-			webhooks: true,
+			webhooks: "2 webhooks",
 			analytics: true,
-			agentInbox: true,
-			customDomains: "1",
+			agentInbox: "2 inboxes",
+			customDomains: "2 domains",
 			support: "Community",
 			emailValidation: "100 / mo",
 			dedicatedIp: "—",
-			sso: false,
 			sla: "—",
 		},
 	},
@@ -69,32 +78,36 @@ export const pricingPlans: PricingPlan[] = [
 		name: "Essentials",
 		description: "For startup founders & growing companies.",
 		monthlyPrice: 10,
+		priceSubline: "per month",
 		emailsLabel: "25,000 emails / month",
-		ctaLabel: "Start Essentials trial",
+		includesLabel: "All Free features +",
+		ctaLabel: "Get started",
 		ctaHref: "/dashboard/signup",
 		highlighted: true,
 		features: [
 			"25,000 emails per month",
+			"10 agent inboxes",
+			"10 webhooks",
+			"10 custom domains",
 			"Overage at $0.80 / 1,000 emails",
 			"50 emails / second throughput",
-			"25 MB attachments",
-			"Email support",
+			"5 MB attachments",
+			"Dedicated support",
 		],
 		comparison: {
 			monthlyEmails: "25,000",
 			overage: "$0.80 / 1k",
 			ratePerSecond: "50 / sec",
-			attachmentSize: "25 MB",
+			attachmentSize: "5 MB",
 			campaigns: true,
 			smtpRelay: true,
-			webhooks: true,
+			webhooks: "10 webhooks",
 			analytics: true,
-			agentInbox: true,
-			customDomains: "5",
-			support: "Email",
+			agentInbox: "10 inboxes",
+			customDomains: "10 domains",
+			support: "Dedicated",
 			emailValidation: "1,000 / mo",
 			dedicatedIp: "—",
-			sso: false,
 			sla: "—",
 		},
 	},
@@ -103,31 +116,35 @@ export const pricingPlans: PricingPlan[] = [
 		name: "Growth",
 		description: "For teams scaling email volume without enterprise overhead.",
 		monthlyPrice: 20,
+		priceSubline: "per month",
 		emailsLabel: "50,000 emails / month",
-		ctaLabel: "Start Growth trial",
+		includesLabel: "All Essentials features +",
+		ctaLabel: "Get started",
 		ctaHref: "/dashboard/signup",
 		features: [
 			"50,000 emails per month",
-			"Overage at $0.80 / 1,000 emails",
+			"20 agent inboxes",
+			"20 webhooks",
+			"20 custom domains",
 			"100 emails / second throughput",
-			"25 MB attachments",
-			"Email support",
+			"5,000 email validations / mo",
+			"5 MB attachments",
+			"Dedicated support",
 		],
 		comparison: {
 			monthlyEmails: "50,000",
 			overage: "$0.80 / 1k",
 			ratePerSecond: "100 / sec",
-			attachmentSize: "25 MB",
+			attachmentSize: "5 MB",
 			campaigns: true,
 			smtpRelay: true,
-			webhooks: true,
+			webhooks: "20 webhooks",
 			analytics: true,
-			agentInbox: true,
-			customDomains: "10",
-			support: "Email",
+			agentInbox: "20 inboxes",
+			customDomains: "20 domains",
+			support: "Dedicated",
 			emailValidation: "5,000 / mo",
 			dedicatedIp: "—",
-			sso: false,
 			sla: "—",
 		},
 	},
@@ -136,14 +153,22 @@ export const pricingPlans: PricingPlan[] = [
 		name: "Enterprise",
 		description: "Custom volume, security reviews, and dedicated support.",
 		monthlyPrice: null,
+		priceSubline: "Custom volume & billing",
 		emailsLabel: "Custom volume",
+		includesLabel: "All Growth features +",
 		ctaLabel: "Contact sales",
 		ctaHref: "/company/contact-us",
+		secondaryCta: {
+			label: "Get started",
+			href: "/dashboard/signup",
+		},
 		features: [
 			"Custom email volume & overage",
+			"Custom agent inboxes & webhooks",
+			"Custom domains",
 			"Dedicated throughput limits",
-			"SSO & advanced security",
 			"Dedicated IP options",
+			"Advanced security reviews",
 			"Dedicated support & SLA",
 		],
 		comparison: {
@@ -153,14 +178,13 @@ export const pricingPlans: PricingPlan[] = [
 			attachmentSize: "Custom",
 			campaigns: true,
 			smtpRelay: true,
-			webhooks: true,
+			webhooks: "Custom",
 			analytics: true,
-			agentInbox: true,
-			customDomains: "Unlimited",
+			agentInbox: "Custom",
+			customDomains: "Custom",
 			support: "Dedicated",
 			emailValidation: "Custom",
 			dedicatedIp: "Optional / custom",
-			sso: true,
 			sla: "99.99% / custom",
 		},
 	},
@@ -177,14 +201,14 @@ export interface ComparisonSection {
 
 export const comparisonSections: ComparisonSection[] = [
 	{
-		title: "Volume & Pricing",
+		title: "Volume",
 		rows: [
 			{ label: "Monthly emails", key: "monthlyEmails", type: "text" },
 			{ label: "Overage", key: "overage", type: "text" },
 		],
 	},
 	{
-		title: "Sending Infrastructure",
+		title: "Sending",
 		rows: [
 			{ label: "Throughput", key: "ratePerSecond", type: "text" },
 			{ label: "SMTP relay", key: "smtpRelay", type: "boolean" },
@@ -193,23 +217,22 @@ export const comparisonSections: ComparisonSection[] = [
 		],
 	},
 	{
-		title: "Inbound & Receiving",
+		title: "Inbound",
 		rows: [
-			{ label: "Agent inbox", key: "agentInbox", type: "boolean" },
-			{ label: "Webhooks", key: "webhooks", type: "boolean" },
+			{ label: "Agent inboxes", key: "agentInbox", type: "text" },
+			{ label: "Webhooks", key: "webhooks", type: "text" },
 		],
 	},
 	{
-		title: "Deliverability & Compliance",
+		title: "Deliverability",
 		rows: [
 			{ label: "Custom domains", key: "customDomains", type: "text" },
 			{ label: "Email validation", key: "emailValidation", type: "text" },
-			{ label: "SAML SSO", key: "sso", type: "boolean" },
 			{ label: "Dedicated IP", key: "dedicatedIp", type: "text" },
 		],
 	},
 	{
-		title: "Operations & Support",
+		title: "Support",
 		rows: [
 			{ label: "Analytics", key: "analytics", type: "boolean" },
 			{ label: "Support", key: "support", type: "text" },

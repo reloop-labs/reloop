@@ -18,7 +18,7 @@ const pricingPageUrl = `${siteUrl}/pricing`;
 export const metadata: Metadata = {
 	title: "Pricing | Reloop",
 	description:
-		"Simple, transparent email pricing. Start free with 3,000 emails per month. Upgrade to Essentials or Enterprise—hosted or self-hosted.",
+		"Scale your Email, control your costs. Start free with 3,000 emails per month. Upgrade to Essentials or Enterprise—hosted or self-hosted.",
 	keywords: [
 		"email pricing",
 		"email API pricing",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: "Pricing | Reloop",
 		description:
-			"Simple, transparent email pricing. Start free with 3,000 emails per month.",
+			"Scale your Email, control your costs. Start free with 3,000 emails per month.",
 		type: "website",
 		url: pricingPageUrl,
 		siteName: "Reloop",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Pricing | Reloop",
 		description:
-			"Simple, transparent email pricing. Start free with 3,000 emails per month.",
+			"Scale your Email, control your costs. Start free with 3,000 emails per month.",
 	},
 	alternates: {
 		canonical: pricingPageUrl,
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
 const PricingPage = () => {
 	return (
 		<MarketingPageShell
-			titleLines={["Simple, transparent", "pricing."]}
+			titleLines={["Scale your Email,", "control your costs."]}
 			compactHero
 		>
 			<PageSection flushTop>

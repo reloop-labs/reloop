@@ -11,228 +11,208 @@ import {
 import Link from "next/link";
 import { Fragment } from "react";
 
-function PlanCard({ plan }: { plan: (typeof pricingPlans)[number] }) {
+function PlanColumn({ plan }: { plan: (typeof pricingPlans)[number] }) {
 	const price = getPlanPrice(plan);
 	const isCustom = price === null;
 
 	return (
 		<div
 			className={cn(
-				"relative flex flex-col rounded-3xl border p-6 sm:p-8",
-				plan.highlighted
-					? "border-primary-base bg-[#0a0d12] text-white shadow-lg shadow-primary-base/10 dark:border-primary-base"
-					: "border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10",
+				"flex min-h-[640px] flex-col border-stroke-soft-200 border-t border-l-0 p-8 sm:min-h-[680px] lg:border-t-0 lg:border-l lg:p-10 dark:border-white/10",
+				"first:border-t-0 sm:[&:nth-child(-n+2)]:border-t-0 lg:[&:nth-child(-n+4)]:border-t-0",
+				"sm:[&:nth-child(2n+1)]:border-l-0 lg:[&:nth-child(4n+1)]:border-l-0",
+				plan.highlighted && "bg-bg-weak-50 dark:bg-white/[0.03]",
 			)}
 		>
-			{plan.highlighted && (
-				<span className="-translate-y-1/2 absolute top-0 right-6 rounded-full bg-primary-base px-3 py-1 font-semibold text-[11px] text-white uppercase tracking-[0.12em]">
-					Most popular
-				</span>
-			)}
-
 			<div>
-				<h3
-					className={cn(
-						"font-semibold text-lg",
-						plan.highlighted
-							? "text-white"
-							: "text-text-strong-950 dark:text-white",
-					)}
-				>
+				<h3 className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
 					{plan.name}
 				</h3>
-				<p
-					className={cn(
-						"mt-2 text-[14px] leading-relaxed",
-						plan.highlighted
-							? "text-white/60"
-							: "text-text-sub-600 dark:text-white/50",
-					)}
-				>
-					{plan.description}
-				</p>
-			</div>
 
-			<div className="mt-6">
-				{isCustom ? (
-					<p
-						className={cn(
-							"font-serif text-[2.4rem] leading-none tracking-tighter",
-							plan.highlighted
-								? "text-white"
-								: "text-text-strong-950 dark:text-white",
-						)}
-					>
-						Custom
-					</p>
-				) : (
-					<div className="flex items-end gap-1">
-						<span
-							className={cn(
-								"font-serif text-[2.8rem] leading-none tracking-tighter",
-								plan.highlighted
-									? "text-white"
-									: "text-text-strong-950 dark:text-white",
-							)}
-						>
+				<div className="mt-6">
+					{isCustom ? (
+						<p className="font-serif text-[2.4rem] text-text-strong-950 leading-none tracking-tighter dark:text-white">
+							Custom
+						</p>
+					) : (
+						<p className="font-serif text-[2.4rem] text-text-strong-950 leading-none tracking-tighter dark:text-white">
 							{formatPrice(price)}
-						</span>
-						<span
-							className={cn(
-								"mb-1 text-[14px]",
-								plan.highlighted
-									? "text-white/50"
-									: "text-text-sub-600 dark:text-white/50",
+							{price > 0 && (
+								<span className="ml-2 font-sans text-[15px] font-normal text-text-sub-600 dark:text-white/50">
+									{plan.priceSubline}
+								</span>
 							)}
-						>
-							/ month
-						</span>
-					</div>
-				)}
-				<p
-					className={cn(
-						"mt-2 font-medium text-[14px]",
-						plan.highlighted ? "text-primary-base" : "text-primary-base",
+						</p>
 					)}
-				>
-					{plan.emailsLabel}
-				</p>
+					<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/45">
+						{isCustom || price === 0 ? plan.priceSubline : plan.emailsLabel}
+					</p>
+				</div>
 			</div>
 
-			<ul className="mt-8 space-y-3">
+			<ul className="mt-10 flex-1 space-y-3">
+				{plan.includesLabel && (
+					<li className="flex items-start gap-3 text-[14px] leading-snug">
+						<Icon
+							name="check-circle"
+							className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/35"
+						/>
+						<span className="font-medium text-text-strong-950 dark:text-white/85">
+							{plan.includesLabel}
+						</span>
+					</li>
+				)}
 				{plan.features.map((feature) => (
 					<li
 						key={feature}
 						className="flex items-start gap-3 text-[14px] leading-snug"
 					>
 						<Icon
-							name="check"
-							className={cn(
-								"mt-0.5 size-4 shrink-0",
-								plan.highlighted ? "text-primary-base" : "text-primary-base",
-							)}
+							name="check-circle"
+							className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/35"
 						/>
-						<span
-							className={
-								plan.highlighted
-									? "text-white/80"
-									: "text-text-sub-600 dark:text-white/70"
-							}
-						>
+						<span className="text-text-sub-600 dark:text-white/60">
 							{feature}
 						</span>
 					</li>
 				))}
 			</ul>
 
-			<div className="mt-8">
+			<div
+				className={cn(
+					"mt-10 flex flex-col gap-3",
+					plan.secondaryCta && "sm:flex-row sm:items-center",
+				)}
+			>
 				<Link
 					href={plan.ctaHref}
 					target={plan.ctaExternal ? "_blank" : undefined}
 					rel={plan.ctaExternal ? "noopener noreferrer" : undefined}
 					className={cn(
-						"inline-flex h-12 w-full items-center justify-center rounded-2xl font-semibold text-[15px] transition-colors",
+						"inline-flex h-11 items-center justify-center rounded-full px-5 font-medium text-[14px] transition-colors",
 						plan.highlighted
-							? "bg-white text-[#0a0d12] hover:bg-white/90"
-							: "bg-[#0a0d12] text-white hover:bg-[#0a0d12]/90 dark:bg-white dark:text-black dark:hover:bg-white/90",
+							? "bg-text-strong-950 text-white hover:bg-text-strong-950/90 dark:bg-white dark:text-[#0a0d12] dark:hover:bg-white/90"
+							: "border border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 hover:bg-bg-weak-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1]",
 					)}
 				>
 					{plan.ctaLabel}
 				</Link>
+				{plan.secondaryCta && (
+					<Link
+						href={plan.secondaryCta.href}
+						target={plan.secondaryCta.external ? "_blank" : undefined}
+						rel={
+							plan.secondaryCta.external ? "noopener noreferrer" : undefined
+						}
+						className="inline-flex h-11 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 px-5 font-medium text-[14px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1]"
+					>
+						{plan.secondaryCta.label}
+					</Link>
+				)}
 			</div>
 		</div>
 	);
 }
 
+function ComparisonCell({
+	value,
+	type,
+}: {
+	value: string | boolean;
+	type: "text" | "boolean";
+}) {
+	const unavailable = type === "boolean" ? !value : value === "—";
+
+	if (unavailable) {
+		return (
+			<Icon
+				name="cross"
+				className="size-4 text-text-sub-600/50 dark:text-white/20"
+				aria-label="Not included"
+			/>
+		);
+	}
+
+	if (type === "boolean") {
+		return (
+			<Icon
+				name="check-circle"
+				className="size-4 text-text-strong-950 dark:text-white/85"
+				aria-label="Included"
+			/>
+		);
+	}
+
+	return (
+		<span className="inline-flex items-center gap-2.5 text-[14px]">
+			<Icon
+				name="check-circle"
+				className="size-4 shrink-0 text-text-strong-950 dark:text-white/85"
+				aria-hidden
+			/>
+			<span className="text-text-strong-950 dark:text-white/85">
+				{value as string}
+			</span>
+		</span>
+	);
+}
+
 function ComparisonTable() {
 	return (
-		<div className="overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
-			<div className="overflow-x-auto">
-				<table className="w-full min-w-[720px] text-left">
-					<thead>
-						<tr className="border-stroke-soft-100 border-b bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]">
-							<th className="px-5 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wider dark:text-white/50">
-								Compare plans
+		<div className="overflow-x-auto">
+			<table className="w-full min-w-[760px] border-collapse">
+				<thead>
+					<tr>
+						<th className="w-[34%] pb-8" aria-hidden />
+						{pricingPlans.map((plan) => (
+							<th
+								key={plan.id}
+								className="pb-8 text-left font-semibold text-[15px] text-text-strong-950 dark:text-white"
+							>
+								{plan.name}
 							</th>
-							{pricingPlans.map((plan) => (
-								<th
-									key={plan.id}
-									className="px-5 py-3 font-medium text-text-sub-600 text-xs uppercase tracking-wider dark:text-white/50"
-								>
-									{plan.name}
-								</th>
-							))}
-						</tr>
-					</thead>
-					<tbody className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
-						<tr className="bg-bg-weak-50/30 transition-colors hover:bg-bg-weak-50/50 dark:bg-white/[0.015] dark:hover:bg-white/[0.025]">
-							<td className="px-5 py-3.5 font-medium text-[13px] text-text-sub-600 dark:text-white/60">
-								Price
-							</td>
-							{pricingPlans.map((plan) => {
-								const price = getPlanPrice(plan);
-								return (
-									<td
-										key={plan.id}
-										className="px-5 py-3.5 font-bold text-[13px] text-text-strong-950 dark:text-white"
-									>
-										{price === null
-											? "Custom"
-											: price === 0
-												? "Free"
-												: `${formatPrice(price)}/mo`}
-									</td>
-								);
-							})}
-						</tr>
-						{comparisonSections.map((section) => (
-							<Fragment key={section.title}>
-								<tr className="bg-bg-weak-50/50 dark:bg-white/[0.02]">
-									<td
-										colSpan={pricingPlans.length + 1}
-										className="px-5 py-2.5 font-bold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40"
-									>
-										{section.title}
-									</td>
-								</tr>
-								{section.rows.map((row) => (
-									<tr
-										key={row.key}
-										className="transition-colors hover:bg-bg-weak-50/30 dark:hover:bg-white/[0.01]"
-									>
-										<td className="px-5 py-3 text-[13px] text-text-sub-600 dark:text-white/60">
-											{row.label}
-										</td>
-										{pricingPlans.map((plan) => {
-											const value = plan.comparison[row.key];
-											return (
-												<td key={plan.id} className="px-5 py-3">
-													{row.type === "boolean" ? (
-														value ? (
-															<Icon
-																name="check"
-																className="size-4 text-primary-base"
-															/>
-														) : (
-															<span className="text-[13px] text-text-sub-600 dark:text-white/30">
-																—
-															</span>
-														)
-													) : (
-														<span className="font-semibold text-[13px] text-text-strong-950 dark:text-white">
-															{value as string}
-														</span>
-													)}
-												</td>
-											);
-										})}
-									</tr>
-								))}
-							</Fragment>
 						))}
-					</tbody>
-				</table>
-			</div>
+					</tr>
+				</thead>
+				<tbody>
+					{comparisonSections.map((section, sectionIndex) => (
+						<Fragment key={section.title}>
+							<tr>
+								<td
+									colSpan={pricingPlans.length + 1}
+									className={cn(
+										"pb-4 font-medium text-[15px] text-text-strong-950 dark:text-white",
+										sectionIndex > 0 ? "pt-10" : "pt-2",
+									)}
+								>
+									{section.title}
+								</td>
+							</tr>
+							{section.rows.map((row) => (
+								<tr
+									key={row.key}
+									className="group border-stroke-soft-200 border-b transition-colors last:border-b-0 hover:bg-bg-weak-50/60 dark:border-white/[0.06] dark:hover:bg-white/[0.04]"
+								>
+									<td className="py-4 pr-8 text-[14px] text-text-sub-600 dark:text-white/45">
+										{row.label}
+									</td>
+									{pricingPlans.map((plan) => {
+										const value = plan.comparison[row.key];
+										return (
+											<td key={plan.id} className="py-4">
+												<ComparisonCell
+													value={value as string | boolean}
+													type={row.type}
+												/>
+											</td>
+										);
+									})}
+								</tr>
+							))}
+						</Fragment>
+					))}
+				</tbody>
+			</table>
 		</div>
 	);
 }
@@ -240,13 +220,13 @@ function ComparisonTable() {
 export function PricingSection() {
 	return (
 		<>
-			<div className="mx-auto grid max-w-6xl gap-6 sm:grid-cols-2 xl:grid-cols-4">
+			<div className="overflow-hidden rounded-4xl border border-stroke-soft-200 sm:grid sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
 				{pricingPlans.map((plan) => (
-					<PlanCard key={plan.id} plan={plan} />
+					<PlanColumn key={plan.id} plan={plan} />
 				))}
 			</div>
 
-			<div className="mt-16">
+			<div className="mt-24">
 				<ComparisonTable />
 			</div>
 		</>

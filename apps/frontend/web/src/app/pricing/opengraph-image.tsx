@@ -255,8 +255,8 @@ export default function OpenGraphImage() {
 							maxWidth: "900px",
 						}}
 					>
-						Simple, transparent email pricing. Start free with 3,000 emails per
-						month—hosted or self-hosted.
+						Scale your Email, control your costs. Start free with 3,000 emails
+						per month—hosted or self-hosted.
 					</span>
 				</div>
 			</div>
