@@ -182,25 +182,10 @@ export const Footer = () => {
 	return (
 		<footer className="border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 dark:bg-black dark:text-white">
 			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-				<div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-8 lg:gap-y-12">
-					{columns.map((column) => (
-						<div key={column.group}>
-							<h4 className="font-medium text-[14px] text-text-strong-950 dark:text-white">
-								{column.group}
-							</h4>
-							<ul className="mt-4 flex flex-col gap-2.5">
-								{column.items.map((link) => (
-									<FooterLinkItem key={link.title} link={link} />
-								))}
-							</ul>
-						</div>
-					))}
-				</div>
-
-				<div className="mt-16 flex items-end justify-between">
-					<div className="flex flex-col gap-3">
+				<div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-20">
+					<div className="flex shrink-0 flex-col gap-6 lg:w-48">
 						<Link href="/" className="shrink-0" aria-label="Reloop home">
-							<Logo className="size-5 text-text-strong-950 dark:text-white" />
+							<Logo className="size-7 text-text-strong-950 dark:text-white" />
 						</Link>
 						<Link
 							href={statusUrl}
@@ -214,6 +199,26 @@ export const Footer = () => {
 							</span>
 						</Link>
 					</div>
+
+					<div className="min-w-0 flex-1">
+						<div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-8 lg:gap-y-12">
+							{columns.map((column) => (
+								<div key={column.group}>
+									<h4 className="font-medium text-[14px] text-text-strong-950 dark:text-white">
+										{column.group}
+									</h4>
+									<ul className="mt-4 flex flex-col gap-2.5">
+										{column.items.map((link) => (
+											<FooterLinkItem key={link.title} link={link} />
+										))}
+									</ul>
+								</div>
+							))}
+						</div>
+					</div>
+				</div>
+
+				<div className="mt-12 flex justify-end">
 					<div className="inline-flex items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.04]">
 						<button
 							type="button"
