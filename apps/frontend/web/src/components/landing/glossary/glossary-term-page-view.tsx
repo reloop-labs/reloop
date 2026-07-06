@@ -58,7 +58,7 @@ export function GlossaryTermPageView({
 							<Link
 								href={term.relatedFeatureHref}
 								className={Button.buttonVariants({ variant: "neutral" }).root({
-									className: "mt-4 rounded-xl",
+									className: "mt-4 rounded-full",
 								})}
 							>
 								View feature →

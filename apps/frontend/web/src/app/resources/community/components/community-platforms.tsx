@@ -61,7 +61,7 @@ export function CommunityPlatforms() {
 		<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-[#f8f8f8] px-6 py-16 sm:px-10 sm:py-20 lg:py-24 dark:border-white/10 dark:bg-[#0a0a0a]">
 			<div className="text-center">
 				<h2 className="font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
-					Where our community meets
+					Join Reloop Community
 				</h2>
 				<p className="mx-auto mt-4 max-w-2xl text-base text-text-sub-600 leading-7 dark:text-white/50">
 					Find us across platforms where developers collaborate on email

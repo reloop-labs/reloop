@@ -184,7 +184,7 @@ export function ContactForm() {
 							className={`${Button.buttonVariants({
 								variant: "neutral",
 								mode: "filled",
-							}).root()} h-11! w-full rounded-2xl! px-8! font-semibold disabled:opacity-60`}
+							}).root()} h-11! w-full rounded-full! px-8! font-semibold disabled:opacity-60`}
 						>
 							{isSubmitting ? <Spinner size={16} /> : "Send"}
 						</button>

@@ -59,7 +59,7 @@ export function AlternativePageView({
 						<Link
 							href={config.primaryCta?.href ?? "/dashboard/signup"}
 							className={Button.buttonVariants({ variant: "neutral" }).root({
-								className: "rounded-xl",
+								className: "rounded-full",
 							})}
 						>
 							{config.primaryCta?.label ?? "Try Reloop free"}
@@ -70,7 +70,7 @@ export function AlternativePageView({
 								mode: "stroke",
 								variant: "neutral",
 							}).root({
-								className: "rounded-xl",
+								className: "rounded-full",
 							})}
 						>
 							Full comparison →

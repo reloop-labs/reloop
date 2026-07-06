@@ -175,7 +175,7 @@ export const HeaderLight = () => {
 					</a>
 					<a
 						href={mounted && session ? "/dashboard" : "/dashboard/login"}
-						className="inline-flex items-center justify-center gap-2 rounded-[12px] bg-[#0a0d12] px-4 py-2 font-semibold text-[13px] text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+						className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0a0d12] px-4 py-2 font-semibold text-[13px] text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
 					>
 						{mounted && session ? "Dashboard" : "Login"}
 					</a>

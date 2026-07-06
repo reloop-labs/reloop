@@ -194,7 +194,7 @@ function EmailValidatorWidget() {
 			<button
 				type="button"
 				onClick={validate}
-				className={`${Button.buttonVariants({ variant: "neutral" }).root()} mt-4 w-full rounded-xl`}
+				className={`${Button.buttonVariants({ variant: "neutral" }).root()} mt-4 w-full rounded-full`}
 			>
 				Validate
 			</button>
@@ -239,7 +239,7 @@ function DeliverabilityTesterWidget() {
 			<button
 				type="button"
 				onClick={analyze}
-				className={`${Button.buttonVariants({ variant: "neutral" }).root()} mt-4 w-full rounded-xl`}
+				className={`${Button.buttonVariants({ variant: "neutral" }).root()} mt-4 w-full rounded-full`}
 			>
 				Analyze
 			</button>
@@ -272,7 +272,7 @@ function AuthCheckerWidget() {
 			<button
 				type="button"
 				onClick={check}
-				className={`${Button.buttonVariants({ variant: "neutral" }).root()} mt-4 w-full rounded-xl`}
+				className={`${Button.buttonVariants({ variant: "neutral" }).root()} mt-4 w-full rounded-full`}
 			>
 				Check records
 			</button>
@@ -348,7 +348,7 @@ function SubjectTesterWidget() {
 			<button
 				type="button"
 				onClick={test}
-				className={`${Button.buttonVariants({ variant: "neutral" }).root()} mt-4 w-full rounded-xl`}
+				className={`${Button.buttonVariants({ variant: "neutral" }).root()} mt-4 w-full rounded-full`}
 			>
 				Score subject
 			</button>

@@ -23,7 +23,7 @@ export function CompareOtherLinks({ currentHref }: { currentHref: string }) {
 					<Link
 						key={item.href}
 						href={item.href}
-						className="rounded-xl border border-stroke-soft-200 px-4 py-2 font-semibold text-[14px] text-text-strong-950 transition-colors hover:border-primary-base/40 hover:text-primary-base dark:border-white/10 dark:text-white"
+						className="rounded-full border border-stroke-soft-200 px-4 py-2 font-semibold text-[14px] text-text-strong-950 transition-colors hover:border-primary-base/40 hover:text-primary-base dark:border-white/10 dark:text-white"
 					>
 						vs {item.label}
 					</Link>

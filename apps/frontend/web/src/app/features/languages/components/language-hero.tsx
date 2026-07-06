@@ -37,7 +37,7 @@ export default function LanguageHero({
 								className={`${Button.buttonVariants({
 									variant: "neutral",
 									mode: "filled",
-								}).root()} h-11! rounded-2xl! px-8! font-semibold`}
+								}).root()} h-11! rounded-full! px-8! font-semibold`}
 							>
 								Get API key
 							</a>
@@ -46,7 +46,7 @@ export default function LanguageHero({
 								className={`${Button.buttonVariants({
 									variant: "neutral",
 									mode: "stroke",
-								}).root()} h-11! rounded-2xl! px-8! font-semibold`}
+								}).root()} h-11! rounded-full! px-8! font-semibold`}
 							>
 								View sample code
 							</a>

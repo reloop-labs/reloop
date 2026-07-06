@@ -34,7 +34,7 @@ export function PersonaPageView({ config }: { config: LandingPageDefinition }) {
 						<Link
 							href={config.primaryCta?.href ?? "/dashboard/signup"}
 							className={Button.buttonVariants({ variant: "neutral" }).root({
-								className: "rounded-xl bg-white! text-black!",
+								className: "rounded-full bg-white! text-black!",
 							})}
 						>
 							{config.primaryCta?.label ?? "Get started"}
@@ -42,7 +42,7 @@ export function PersonaPageView({ config }: { config: LandingPageDefinition }) {
 						{config.secondaryCta && (
 							<Link
 								href={config.secondaryCta.href}
-								className="inline-flex items-center rounded-xl border border-white/25 px-5 py-2.5 text-[14px] hover:bg-white/10"
+								className="inline-flex items-center rounded-full border border-white/25 px-5 py-2.5 text-[14px] hover:bg-white/10"
 							>
 								{config.secondaryCta.label}
 							</Link>

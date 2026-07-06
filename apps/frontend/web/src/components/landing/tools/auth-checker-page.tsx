@@ -62,7 +62,7 @@ export function AuthCheckerPageView() {
 						<button
 							type="submit"
 							disabled={loading || !domain.trim()}
-							className={`${Button.buttonVariants({ variant: "neutral" }).root()} h-12 rounded-lg bg-orange-500! px-6 text-white! hover:bg-orange-600!`}
+							className={`${Button.buttonVariants({ variant: "neutral" }).root()} h-12 rounded-full bg-orange-500! px-6 text-white! hover:bg-orange-600!`}
 						>
 							{loading ? "Looking up…" : "Lookup DNS"}
 						</button>

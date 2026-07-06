@@ -324,7 +324,7 @@ const TransactionEmailsPage = () => {
 							className={`${Button.buttonVariants({
 								variant: "neutral",
 								mode: "filled",
-							}).root()} h-11! rounded-2xl! px-8! font-semibold`}
+							}).root()} h-11! rounded-full! px-8! font-semibold`}
 						>
 							Start for free
 						</Link>
@@ -333,7 +333,7 @@ const TransactionEmailsPage = () => {
 							className={`${Button.buttonVariants({
 								variant: "neutral",
 								mode: "stroke",
-							}).root()} h-11! rounded-2xl! px-8! font-semibold`}
+							}).root()} h-11! rounded-full! px-8! font-semibold`}
 						>
 							Try Sandbox
 						</a>
@@ -467,7 +467,7 @@ const TransactionEmailsPage = () => {
 										type="button"
 										onClick={triggerSimulation}
 										disabled={simulationState === "sending"}
-										className="inline-flex h-12 items-center justify-center rounded-2xl bg-[#0a0d12] px-8 font-semibold text-[14px] text-white transition-colors hover:bg-[#0a0d12]/90 active:scale-[0.98] disabled:pointer-events-none disabled:bg-[#0a0d12]/50"
+										className="inline-flex h-12 items-center justify-center rounded-full bg-[#0a0d12] px-8 font-semibold text-[14px] text-white transition-colors hover:bg-[#0a0d12]/90 active:scale-[0.98] disabled:pointer-events-none disabled:bg-[#0a0d12]/50"
 									>
 										<Icon name="send-2" className="mr-2 size-4" />
 										{simulationState === "sending"
@@ -877,13 +877,13 @@ const TransactionEmailsPage = () => {
 					<div className="mt-10 flex flex-wrap items-center justify-center gap-4">
 						<Link
 							href="/login"
-							className="inline-flex h-12 items-center justify-center rounded-2xl bg-[#0a0d12] px-8 font-semibold text-[15px] text-white transition-colors hover:bg-[#0a0d12]/90"
+							className="inline-flex h-12 items-center justify-center rounded-full bg-[#0a0d12] px-8 font-semibold text-[15px] text-white transition-colors hover:bg-[#0a0d12]/90"
 						>
 							Get started
 						</Link>
 						<Link
 							href="/pricing"
-							className="inline-flex h-12 items-center justify-center gap-2.5 rounded-2xl border border-[#0a0d12]/10 px-8 font-semibold text-[#0a0d12] text-[15px] transition-colors hover:bg-[#0a0d12]/10"
+							className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full border border-[#0a0d12]/10 px-8 font-semibold text-[#0a0d12] text-[15px] transition-colors hover:bg-[#0a0d12]/10"
 						>
 							See pricing
 						</Link>

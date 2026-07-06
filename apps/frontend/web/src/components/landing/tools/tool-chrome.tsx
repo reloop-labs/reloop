@@ -103,7 +103,7 @@ export function ToolUpsell({
 					<Link
 						href={primaryHref}
 						className={Button.buttonVariants({ variant: "neutral" }).root({
-							className: "rounded-xl px-5",
+							className: "rounded-full px-5",
 						})}
 					>
 						{primaryLabel}
@@ -114,7 +114,7 @@ export function ToolUpsell({
 							className={Button.buttonVariants({
 								mode: "stroke",
 								variant: "neutral",
-							}).root({ className: "rounded-xl px-5" })}
+							}).root({ className: "rounded-full px-5" })}
 						>
 							{secondaryLabel}
 						</Link>

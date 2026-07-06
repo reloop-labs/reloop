@@ -42,7 +42,7 @@ export function UseCasePageView({ config }: { config: LandingPageDefinition }) {
 									href={config.primaryCta.href}
 									className={Button.buttonVariants({ variant: "neutral" }).root(
 										{
-											className: "rounded-xl",
+											className: "rounded-full",
 										},
 									)}
 								>
@@ -55,7 +55,7 @@ export function UseCasePageView({ config }: { config: LandingPageDefinition }) {
 									className={Button.buttonVariants({
 										mode: "stroke",
 										variant: "neutral",
-									}).root({ className: "rounded-xl" })}
+									}).root({ className: "rounded-full" })}
 								>
 									{config.secondaryCta.label}
 								</Link>

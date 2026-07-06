@@ -26,7 +26,7 @@ export default function Hero() {
 								className={`${Button.buttonVariants({
 									variant: "neutral",
 									mode: "filled",
-								}).root()} h-11! rounded-2xl! px-8! font-semibold`}
+								}).root()} h-11! rounded-full! px-8! font-semibold`}
 							>
 								Start Creating
 							</a>
@@ -35,7 +35,7 @@ export default function Hero() {
 								className={`${Button.buttonVariants({
 									variant: "neutral",
 									mode: "stroke",
-								}).root()} h-11! rounded-2xl! px-8! font-semibold`}
+								}).root()} h-11! rounded-full! px-8! font-semibold`}
 							>
 								Preview Editor
 							</a>

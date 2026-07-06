@@ -51,7 +51,7 @@ const OpenSource = () => {
 								href={githubUrl}
 								target="_blank"
 								rel="noreferrer"
-								className="inline-flex items-center justify-center gap-2.5 rounded-[12px] bg-[#0a0d12] px-5 py-3 font-semibold text-[14px] text-white transition-colors hover:bg-[#0a0d12]/88 dark:bg-white dark:text-black dark:hover:bg-white/88"
+								className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[#0a0d12] px-5 py-3 font-semibold text-[14px] text-white transition-colors hover:bg-[#0a0d12]/88 dark:bg-white dark:text-black dark:hover:bg-white/88"
 							>
 								<Icon name="social-github" className="size-4" />
 								Star on GitHub

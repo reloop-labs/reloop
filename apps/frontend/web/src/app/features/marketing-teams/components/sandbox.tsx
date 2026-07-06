@@ -387,7 +387,7 @@ export default function Sandbox() {
 									type="button"
 									onClick={triggerSimulation}
 									disabled={simulationState === "broadcasting"}
-									className="inline-flex h-12 items-center justify-center rounded-2xl bg-[#0a0d12] px-8 font-semibold text-[14px] text-white transition-colors hover:bg-[#0a0d12]/90 active:scale-[0.98] disabled:pointer-events-none disabled:bg-[#0a0d12]/50"
+									className="inline-flex h-12 items-center justify-center rounded-full bg-[#0a0d12] px-8 font-semibold text-[14px] text-white transition-colors hover:bg-[#0a0d12]/90 active:scale-[0.98] disabled:pointer-events-none disabled:bg-[#0a0d12]/50"
 								>
 									<Icon name="send-2" className="mr-2 size-4" />
 									{simulationState === "broadcasting"

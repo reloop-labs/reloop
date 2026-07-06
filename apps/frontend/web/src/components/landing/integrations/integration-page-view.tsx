@@ -112,14 +112,14 @@ export function IntegrationPageView({
 						<Link
 							href={config.primaryCta?.href ?? "/dashboard/signup"}
 							className={Button.buttonVariants({ variant: "neutral" }).root({
-								className: "rounded-xl bg-white! text-black!",
+								className: "rounded-full bg-white! text-black!",
 							})}
 						>
 							{config.primaryCta?.label ?? "Get API key"}
 						</Link>
 						<Link
 							href="/docs"
-							className="inline-flex items-center gap-1 rounded-xl border border-white/15 px-5 py-2.5 text-[14px] text-white/70 hover:bg-white/5"
+							className="inline-flex items-center gap-1 rounded-full border border-white/15 px-5 py-2.5 text-[14px] text-white/70 hover:bg-white/5"
 						>
 							<Icon name="book-open" className="size-4" />
 							Docs

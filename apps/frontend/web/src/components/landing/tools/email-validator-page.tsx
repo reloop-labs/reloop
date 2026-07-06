@@ -69,7 +69,7 @@ export function EmailValidatorPageView() {
 							<button
 								type="submit"
 								disabled={loading || !email.trim()}
-								className={`${Button.buttonVariants({ variant: "neutral" }).root()} h-12 min-w-[140px] rounded-xl bg-emerald-600! text-white! hover:bg-emerald-700! disabled:opacity-50`}
+								className={`${Button.buttonVariants({ variant: "neutral" }).root()} h-12 min-w-[140px] rounded-full bg-emerald-600! text-white! hover:bg-emerald-700! disabled:opacity-50`}
 							>
 								{loading ? "Checking…" : "Verify email"}
 							</button>

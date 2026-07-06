@@ -88,7 +88,7 @@ export function TemplateGeneratorPageView() {
 					<button
 						type="button"
 						onClick={copyHtml}
-						className={`${Button.buttonVariants({ mode: "stroke", variant: "neutral" }).root()} ml-auto rounded-lg`}
+						className={`${Button.buttonVariants({ mode: "stroke", variant: "neutral" }).root()} ml-auto rounded-full`}
 					>
 						{copied ? "Copied!" : "Copy HTML"}
 					</button>
