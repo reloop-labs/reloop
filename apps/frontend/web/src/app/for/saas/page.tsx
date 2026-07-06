@@ -1,4 +1,4 @@
-import { SeoLandingPage } from "@reloop/web/components/landing/seo-landing-page";
+import { PersonaPageView } from "@reloop/web/components/landing/personas/persona-page-view";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/personas/saas";
 
@@ -11,6 +11,6 @@ export const metadata = createLandingMetadata(
 	config.keywords,
 );
 
-export default function SaasPage() {
-	return <SeoLandingPage config={config} />;
+export default function SaasPersonaPage() {
+	return <PersonaPageView config={config} />;
 }

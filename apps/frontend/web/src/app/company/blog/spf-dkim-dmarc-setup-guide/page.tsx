@@ -1,4 +1,4 @@
-import { BlogPostPage } from "@reloop/web/components/landing/content-pages";
+import { BlogPostPageView } from "@reloop/web/components/landing/blog/blog-post-page-view";
 import { defaultLandingCta } from "@reloop/web/lib/landing/constants";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { post } from "@reloop/web/lib/landing/blog/spf-dkim-dmarc-setup-guide";
@@ -14,7 +14,7 @@ export const metadata = createLandingMetadata(
 
 export default function SpfDkimDmarcSetupGuideBlogPage() {
 	return (
-		<BlogPostPage
+		<BlogPostPageView
 			post={post}
 			cta={defaultLandingCta(
 				"Ready to try Reloop?",

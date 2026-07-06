@@ -1,4 +1,4 @@
-import { SeoLandingPage } from "@reloop/web/components/landing/seo-landing-page";
+import { IntegrationPageView } from "@reloop/web/components/landing/integrations/integration-page-view";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/integrations/express";
 
@@ -11,6 +11,6 @@ export const metadata = createLandingMetadata(
 	config.keywords,
 );
 
-export default function ExpressPage() {
-	return <SeoLandingPage config={config} />;
+export default function ExpressIntegrationPage() {
+	return <IntegrationPageView config={config} />;
 }

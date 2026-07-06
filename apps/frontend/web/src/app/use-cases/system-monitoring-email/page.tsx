@@ -1,4 +1,4 @@
-import { SeoLandingPage } from "@reloop/web/components/landing/seo-landing-page";
+import { UseCasePageView } from "@reloop/web/components/landing/use-cases/use-case-page-view";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/use-cases/system-monitoring-email";
 
@@ -12,5 +12,5 @@ export const metadata = createLandingMetadata(
 );
 
 export default function SystemMonitoringEmailPage() {
-	return <SeoLandingPage config={config} />;
+	return <UseCasePageView config={config} />;
 }

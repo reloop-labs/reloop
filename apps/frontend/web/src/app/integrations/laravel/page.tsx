@@ -1,4 +1,4 @@
-import { SeoLandingPage } from "@reloop/web/components/landing/seo-landing-page";
+import { IntegrationPageView } from "@reloop/web/components/landing/integrations/integration-page-view";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/integrations/laravel";
 
@@ -11,6 +11,6 @@ export const metadata = createLandingMetadata(
 	config.keywords,
 );
 
-export default function LaravelPage() {
-	return <SeoLandingPage config={config} />;
+export default function LaravelIntegrationPage() {
+	return <IntegrationPageView config={config} />;
 }

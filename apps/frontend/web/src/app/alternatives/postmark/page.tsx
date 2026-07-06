@@ -1,4 +1,4 @@
-import { AlternativeLandingPage } from "@reloop/web/components/landing/alternative-landing-page";
+import { AlternativePageView } from "@reloop/web/components/landing/alternatives/alternative-page-view";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/alternatives/postmark";
 
@@ -12,5 +12,5 @@ export const metadata = createLandingMetadata(
 );
 
 export default function PostmarkAlternativePage() {
-	return <AlternativeLandingPage config={config} />;
+	return <AlternativePageView config={config} />;
 }

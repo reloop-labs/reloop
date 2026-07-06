@@ -1,4 +1,4 @@
-import { GlossaryTermPage } from "@reloop/web/components/landing/content-pages";
+import { GlossaryTermPageView } from "@reloop/web/components/landing/glossary/glossary-term-page-view";
 import { defaultLandingCta } from "@reloop/web/lib/landing/constants";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { term } from "@reloop/web/lib/landing/glossary/smtp";
@@ -14,7 +14,7 @@ export const metadata = createLandingMetadata(
 
 export default function SmtpGlossaryPage() {
 	return (
-		<GlossaryTermPage
+		<GlossaryTermPageView
 			term={term}
 			cta={defaultLandingCta(
 				"Put it into practice",
