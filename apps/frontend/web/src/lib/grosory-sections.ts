@@ -165,5 +165,7 @@ export function getGrosoryLinkCount(): number {
 }
 
 export function getGrosoryPageDescription(totalLinks: number): string {
-	return `Every page on reloop.sh in one place — ${totalLinks} links to tools, docs, features, integrations, and more. Browse by section below.`;
+	return "Find everything you need to build with Reloop. Browse our full directory of developer tools, integrations, language SDKs, and guides below.";
 }
+
+
