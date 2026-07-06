@@ -34,6 +34,36 @@ export function GrosoryPageMain({ sections }: { sections: GrosorySection[] }) {
 		return () => observer.disconnect();
 	}, [sections]);
 
+	useEffect(() => {
+		const handleHashChange = () => {
+			const hash = window.location.hash.replace("#", "");
+			if (hash) {
+				const el = document.getElementById(hash);
+				if (el) {
+					const headerOffset = 100; // Offset for sticky header
+					const elementPosition = el.getBoundingClientRect().top;
+					const offsetPosition = elementPosition + window.scrollY - headerOffset;
+
+					window.scrollTo({
+						top: offsetPosition,
+						behavior: "smooth",
+					});
+					setActiveSection(hash);
+				}
+			}
+		};
+
+		// Run on mount with a slight delay so browser layout is fully established
+		const timer = setTimeout(handleHashChange, 150);
+
+		window.addEventListener("hashchange", handleHashChange);
+		return () => {
+			clearTimeout(timer);
+			window.removeEventListener("hashchange", handleHashChange);
+		};
+	}, []);
+
+
 	const handleScrollTo = (
 		e: React.MouseEvent<HTMLAnchorElement>,
 		slug: string,
