@@ -10,15 +10,15 @@ import {
 	useCaseConfigs,
 } from "./landing/routes";
 
-export type GrosoryLink = {
+export type GlossaryLink = {
 	title: string;
 	href: string;
 };
 
-export type GrosorySection = {
+export type GlossarySection = {
 	title: string;
-	hub?: GrosoryLink;
-	links: GrosoryLink[];
+	hub?: GlossaryLink;
+	links: GlossaryLink[];
 };
 
 export function getSectionSlug(title: string): string {
@@ -36,7 +36,7 @@ function landingLinks(
 		slug?: string;
 	}[],
 	titleKey: "titleLines" | "title" = "titleLines",
-): GrosoryLink[] {
+): GlossaryLink[] {
 	return items.map((item) => ({
 		title:
 			titleKey === "titleLines"
@@ -48,14 +48,14 @@ function landingLinks(
 
 function section(
 	title: string,
-	links: GrosoryLink[],
-	hub?: GrosoryLink,
-): GrosorySection {
+	links: GlossaryLink[],
+	hub?: GlossaryLink,
+): GlossarySection {
 	return { title, links, hub };
 }
 
-/** All marketing pages grouped for the /grosory directory */
-export function getGrosorySections(): GrosorySection[] {
+/** All marketing pages grouped for the /glossary directory */
+export function getGlossarySections(): GlossarySection[] {
 	return [
 		section("Get started", [
 			{ title: "Get Started", href: "/get-started" },
@@ -165,17 +165,17 @@ export function getGrosorySections(): GrosorySection[] {
 	];
 }
 
-export function getGrosoryLinkCount(): number {
-	return getGrosorySections().reduce(
+export function getGlossaryLinkCount(): number {
+	return getGlossarySections().reduce(
 		(sum, section) => sum + section.links.length,
 		0,
 	);
 }
 
-export function getGrosoryPageDescription(totalLinks: number): string {
+export function getGlossaryPageDescription(_totalLinks: number): string {
 	return "Explore the Reloop site directory. Browse our full collection of developer tools, integrations, language SDKs, blog posts, glossary terms, and guides.";
 }
 
-export function getGrosoryPageOgDescription(totalLinks: number): string {
+export function getGlossaryPageOgDescription(_totalLinks: number): string {
 	return "Find everything you need to build with Reloop. Browse our directory of developer tools, integrations, SDKs, and guides.";
 }

@@ -34,7 +34,10 @@ const navItems: NavItem[] = [
 					title: "Email",
 					links: [
 						{ title: "Campaigns", href: "/features/campaigns" },
-						{ title: "Transaction Emails", href: "/features/transaction-emails" },
+						{
+							title: "Transaction Emails",
+							href: "/features/transaction-emails",
+						},
 						{ title: "SMTP Relay", href: "/features/smtp" },
 						{ title: "Email Analytics", href: "/features/email-analytics" },
 						{ title: "Email Validation", href: "/features/email-validation" },
@@ -74,7 +77,7 @@ const navItems: NavItem[] = [
 				{
 					title: "Learn",
 					links: [
-						{ title: "Blog", href: "/company/blog" },
+						{ title: "Sitemap", href: "/glossary" },
 						{ title: "Changelog", href: "/resources/changelog" },
 						{ title: "Glossary", href: "/resources/glossary" },
 						{ title: "Community", href: "/resources/community" },
@@ -98,7 +101,10 @@ const navItems: NavItem[] = [
 						{ title: "Email validator", href: "/tools/email-validator" },
 						{ title: "Subject tester", href: "/tools/subject-tester" },
 						{ title: "Template generator", href: "/tools/template-generator" },
-						{ title: "Deliverability tester", href: "/tools/deliverability-tester" },
+						{
+							title: "Deliverability tester",
+							href: "/tools/deliverability-tester",
+						},
 					],
 				},
 			],
@@ -135,8 +141,14 @@ const navItems: NavItem[] = [
 					title: "Philosophy",
 					links: [
 						{ title: "Why Reloop", href: "/philosophy/why-reloop" },
-						{ title: "What We Stand For", href: "/philosophy/what-we-stand-for" },
-						{ title: "Product Beliefs", href: "/philosophy/our-product-beliefs" },
+						{
+							title: "What We Stand For",
+							href: "/philosophy/what-we-stand-for",
+						},
+						{
+							title: "Product Beliefs",
+							href: "/philosophy/our-product-beliefs",
+						},
 						{ title: "Engineering", href: "/philosophy/engineering" },
 					],
 				},
@@ -155,7 +167,7 @@ function MegaLink({ link }: { link: NavLink }) {
 		>
 			{link.title}
 			{link.external && (
-				<span className="text-[12px] text-text-sub-600 transition-transform group-hover:-translate-y-px group-hover:translate-x-px dark:text-white/45">
+				<span className="group-hover:-translate-y-px text-[12px] text-text-sub-600 transition-transform group-hover:translate-x-px dark:text-white/45">
 					↗
 				</span>
 			)}
@@ -225,21 +237,32 @@ export const Header = () => {
 											: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
 									}`}
 								>
-									{item.title}
-									{item.mega && (
-										<Icon
-											name="chevron-down"
-											className={`size-3 transition-transform duration-200 ${
-												activeMega === item.title ? "rotate-180" : "opacity-50"
-											}`}
-										/>
-									)}
-								</Link>
-							</div>
-						))}
-					</nav>
+									<Link
+										href={item.href}
+										className={`inline-flex items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
+											activeMega === item.title
+												? "text-text-strong-950 dark:text-white"
+												: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
+										}`}
+									>
+										{item.title}
+										{item.mega && (
+											<Icon
+												name="chevron-down"
+												className={`size-3 transition-transform duration-200 ${
+													activeMega === item.title
+														? "rotate-180"
+														: "opacity-50"
+												}`}
+											/>
+										)}
+									</Link>
+								</div>
+							))}
+						</nav>
+					</div>
 
-					<div className="flex items-center justify-self-end gap-3 sm:gap-4">
+					<div className="flex items-center gap-3 justify-self-end sm:gap-4">
 						<a
 							href="https://github.com/reloop-labs/reloop"
 							target="_blank"
@@ -285,20 +308,17 @@ export const Header = () => {
 							transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
 							className="overflow-hidden"
 						>
-							<div className="pb-10 pt-2">
-								<div className="grid grid-cols-[1fr_auto_1fr]">
-									<div />
-									<div className="flex flex-wrap justify-center gap-x-20 gap-y-10">
-										{activeItem.mega.categories.map((category) => (
-											<div key={category.title} className="min-w-[160px]">
-												<p className="mb-4 text-[13px] text-text-sub-600 dark:text-[#888888]">
-													{category.title}
-												</p>
-												<div className="flex flex-col gap-3">
-													{category.links.map((link) => (
-														<MegaLink key={link.title} link={link} />
-													))}
-												</div>
+							<div className="pt-2 pb-10">
+								<div className="flex flex-wrap gap-x-20 gap-y-10">
+									{activeItem.mega.categories.map((category) => (
+										<div key={category.title} className="min-w-[160px]">
+											<p className="mb-4 text-[13px] text-text-sub-600 dark:text-[#888888]">
+												{category.title}
+											</p>
+											<div className="flex flex-col gap-3">
+												{category.links.map((link) => (
+													<MegaLink key={link.title} link={link} />
+												))}
 											</div>
 										))}
 									</div>

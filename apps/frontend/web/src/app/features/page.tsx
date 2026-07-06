@@ -1,3 +1,4 @@
+import { JsonLd } from "@reloop/web/components/json-ld";
 import {
 	cardGridClass,
 	FeatureCta,
@@ -131,67 +132,89 @@ const platformFeatures = [
 	},
 ];
 
+const featuresSchema = {
+	"@context": "https://schema.org" as const,
+	"@type": "ItemList" as const,
+	name: "Reloop Features",
+	description:
+		"Explore Reloop features—campaigns, transactional email, SMTP, analytics, deliverability, and developer tools.",
+	url: pageUrl,
+	numberOfItems: productFeatures.length + platformFeatures.length,
+	itemListElement: [...productFeatures, ...platformFeatures].map(
+		(feature, index) => ({
+			"@type": "ListItem" as const,
+			position: index + 1,
+			url: `${getSiteUrl()}${feature.href}`,
+			name: feature.title,
+			description: feature.description,
+		}),
+	),
+};
+
 export default function FeaturesIndexPage() {
 	return (
-		<MarketingPageShell
-			titleLines={["Email infrastructure", "built for builders"]}
-			description="Campaigns, transactionals, SMTP, analytics, and developer tools—on one platform."
-			primaryCta={{ label: "Get started", href: "/dashboard/signup" }}
-			secondaryCta={{ label: "Documentation", href: "/docs" }}
-		>
-			<PageSection>
-				<SectionHeading
-					title="Core capabilities"
-					description="Everything you need to send, measure, and improve email."
-				/>
-				<div className={cardGridClass}>
-					{productFeatures.map((feature) => (
-						<Link
-							key={feature.href}
-							href={feature.href}
-							className="group rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-8 transition-colors hover:bg-bg-soft-50 dark:border-white/10 dark:hover:bg-white/[0.02]"
-						>
-							<h3 className="mb-3 font-semibold text-lg text-text-strong-950 group-hover:text-primary-base dark:text-white">
-								{feature.title}
-							</h3>
-							<p className="text-sm text-text-sub-600 leading-relaxed dark:text-white/50">
-								{feature.description}
-							</p>
-						</Link>
-					))}
-				</div>
-			</PageSection>
+		<>
+			<JsonLd data={featuresSchema} />
+			<MarketingPageShell
+				titleLines={["Email infrastructure", "built for builders"]}
+				description="Campaigns, transactionals, SMTP, analytics, and developer tools—on one platform."
+				primaryCta={{ label: "Get started", href: "/dashboard/signup" }}
+				secondaryCta={{ label: "Documentation", href: "/docs" }}
+			>
+				<PageSection>
+					<SectionHeading
+						title="Core capabilities"
+						description="Everything you need to send, measure, and improve email."
+					/>
+					<div className={cardGridClass}>
+						{productFeatures.map((feature) => (
+							<Link
+								key={feature.href}
+								href={feature.href}
+								className="group rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-8 transition-colors hover:bg-bg-soft-50 dark:border-white/10 dark:hover:bg-white/[0.02]"
+							>
+								<h3 className="mb-3 font-semibold text-lg text-text-strong-950 group-hover:text-primary-base dark:text-white">
+									{feature.title}
+								</h3>
+								<p className="text-sm text-text-sub-600 leading-relaxed dark:text-white/50">
+									{feature.description}
+								</p>
+							</Link>
+						))}
+					</div>
+				</PageSection>
 
-			<PageSection alt>
-				<SectionHeading
-					title="Build & integrate"
-					description="APIs, SDKs, and workflows for engineering teams."
-				/>
-				<div className={cardGridClass}>
-					{platformFeatures.map((feature) => (
-						<Link
-							key={feature.href}
-							href={feature.href}
-							className="group rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-8 transition-colors hover:bg-bg-soft-50 dark:border-white/10 dark:hover:bg-white/[0.02]"
-						>
-							<h3 className="mb-3 font-semibold text-lg text-text-strong-950 group-hover:text-primary-base dark:text-white">
-								{feature.title}
-							</h3>
-							<p className="text-sm text-text-sub-600 leading-relaxed dark:text-white/50">
-								{feature.description}
-							</p>
-						</Link>
-					))}
-				</div>
-			</PageSection>
+				<PageSection alt>
+					<SectionHeading
+						title="Build & integrate"
+						description="APIs, SDKs, and workflows for engineering teams."
+					/>
+					<div className={cardGridClass}>
+						{platformFeatures.map((feature) => (
+							<Link
+								key={feature.href}
+								href={feature.href}
+								className="group rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-8 transition-colors hover:bg-bg-soft-50 dark:border-white/10 dark:hover:bg-white/[0.02]"
+							>
+								<h3 className="mb-3 font-semibold text-lg text-text-strong-950 group-hover:text-primary-base dark:text-white">
+									{feature.title}
+								</h3>
+								<p className="text-sm text-text-sub-600 leading-relaxed dark:text-white/50">
+									{feature.description}
+								</p>
+							</Link>
+						))}
+					</div>
+				</PageSection>
 
-			<FeatureCta
-				title="Start sending with Reloop"
-				titleMuted="Free tier included."
-				description="Create an account and send your first email in minutes."
-				primary={{ label: "Get started", href: "/dashboard/signup" }}
-				secondary={{ label: "Read docs", href: "/docs" }}
-			/>
-		</MarketingPageShell>
+				<FeatureCta
+					title="Start sending with Reloop"
+					titleMuted="Free tier included."
+					description="Create an account and send your first email in minutes."
+					primary={{ label: "Get started", href: "/dashboard/signup" }}
+					secondary={{ label: "Read docs", href: "/docs" }}
+				/>
+			</MarketingPageShell>
+		</>
 	);
 }

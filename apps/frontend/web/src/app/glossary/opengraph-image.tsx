@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Grosory | Reloop";
+export const alt = "Glossary | Reloop";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -248,7 +248,7 @@ export default function OpenGraphImage() {
 							letterSpacing: "-1.5px",
 						}}
 					>
-						Grosory
+						Glossary
 					</span>
 					<span
 						style={{

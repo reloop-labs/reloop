@@ -13,7 +13,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	html:has(.grosory-page) {
+	html:has(.glossary-page) {
 		scroll-behavior: smooth;
 	}
 }

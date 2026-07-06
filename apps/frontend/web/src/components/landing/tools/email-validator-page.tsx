@@ -157,7 +157,7 @@ export function EmailValidatorPageView() {
 						SPF/DKIM/DMARC checker
 					</Link>{" "}
 					or browse the{" "}
-					<Link href="/grosory" className="text-primary-base hover:underline">
+					<Link href="/glossary" className="text-primary-base hover:underline">
 						full site directory
 					</Link>
 					.

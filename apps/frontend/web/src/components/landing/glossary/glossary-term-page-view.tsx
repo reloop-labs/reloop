@@ -89,7 +89,7 @@ export function GlossaryTermPageView({
 					)}
 					<div className="mt-4 rounded-xl border border-stroke-soft-200 bg-white p-5 dark:border-white/10 dark:bg-[#111]">
 						<Link
-							href="/grosory"
+							href="/glossary"
 							className="text-[13px] text-text-sub-600 hover:text-primary-base dark:text-white/50"
 						>
 							Browse all pages →

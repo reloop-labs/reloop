@@ -1,11 +1,15 @@
 "use client";
 
-import type { GrosorySection } from "@reloop/web/lib/grosory-sections";
-import { getSectionSlug } from "@reloop/web/lib/grosory-sections";
+import type { GlossarySection } from "@reloop/web/lib/glossary-sections";
+import { getSectionSlug } from "@reloop/web/lib/glossary-sections";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-export function GrosoryPageMain({ sections }: { sections: GrosorySection[] }) {
+export function GlossaryPageMain({
+	sections,
+}: {
+	sections: GlossarySection[];
+}) {
 	const [activeSection, setActiveSection] = useState<string>("");
 
 	useEffect(() => {

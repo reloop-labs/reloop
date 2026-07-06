@@ -88,6 +88,7 @@ const columns: FooterColumn[] = [
 			{ title: "Blog", href: "/company/blog" },
 			{ title: "Changelog", href: "/resources/changelog" },
 			{ title: "Glossary", href: "/resources/glossary" },
+			{ title: "Sitemap", href: "/glossary" },
 			{ title: "Community", href: "/resources/community" },
 			{
 				title: "Status",
@@ -112,11 +113,6 @@ const columns: FooterColumn[] = [
 			{ title: "Why Open Source", href: "/philosophy/why-open-source" },
 			{ title: "Self-host", href: "/docs/self-host" },
 			{ title: "License", href: "/company/license" },
-			{
-				title: "GitHub",
-				href: "https://github.com/reloop-labs/reloop",
-				external: true,
-			},
 		],
 	},
 	{

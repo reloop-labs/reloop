@@ -1,4 +1,4 @@
-import type { WebhookEventDefinition } from "./types";
+import type { WebhookEventDefinition } from "./types.js";
 
 export const DOMAIN_CREATE_WEBHOOK_EVENT = {
 	id: "domain.create",

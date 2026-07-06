@@ -10,7 +10,7 @@ import { useCaseConfigs } from "./use-cases";
 export function getLandingSitemapRoutes(): string[] {
 	return [
 		"/get-started",
-		"/grosory",
+		"/glossary",
 		"/tools",
 		...toolConfigs.map((c) => c.path),
 		"/use-cases",
