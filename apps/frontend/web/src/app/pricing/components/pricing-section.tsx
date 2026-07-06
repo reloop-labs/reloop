@@ -11,6 +11,57 @@ import {
 import Link from "next/link";
 import { Fragment } from "react";
 
+function PlanCtaLink({
+	href,
+	label,
+	external,
+	variant = "default",
+}: {
+	href: string;
+	label: string;
+	external?: boolean;
+	variant?: "default" | "primary";
+}) {
+	const className = cn(
+		"group inline-flex h-11 items-center justify-center overflow-hidden rounded-full px-5 font-medium text-[14px] transition-colors duration-300",
+		variant === "primary"
+			? "bg-text-strong-950 text-white hover:bg-text-strong-950/90 dark:bg-white dark:text-[#0a0d12] dark:hover:bg-white/90"
+			: "border border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 hover:bg-bg-weak-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1]",
+	);
+
+	const content = (
+		<span className="inline-flex items-center">
+			<span className="group-hover:-translate-x-1 transition-transform duration-300 ease-out">
+				{label}
+			</span>
+			<Icon
+				name="arrow-left"
+				className="ml-0 size-4 max-w-0 shrink-0 translate-x-1 rotate-180 opacity-0 transition-all duration-300 ease-out group-hover:ml-2 group-hover:max-w-4 group-hover:translate-x-0 group-hover:opacity-100"
+				aria-hidden
+			/>
+		</span>
+	);
+
+	if (external) {
+		return (
+			<a
+				href={href}
+				target="_blank"
+				rel="noopener noreferrer"
+				className={className}
+			>
+				{content}
+			</a>
+		);
+	}
+
+	return (
+		<Link href={href} className={className}>
+			{content}
+		</Link>
+	);
+}
+
 function PlanColumn({ plan }: { plan: (typeof pricingPlans)[number] }) {
 	const price = getPlanPrice(plan);
 	const isCustom = price === null;
@@ -91,28 +142,18 @@ function PlanColumn({ plan }: { plan: (typeof pricingPlans)[number] }) {
 					plan.secondaryCta && "sm:flex-row sm:items-center",
 				)}
 			>
-				<Link
+				<PlanCtaLink
 					href={plan.ctaHref}
-					target={plan.ctaExternal ? "_blank" : undefined}
-					rel={plan.ctaExternal ? "noopener noreferrer" : undefined}
-					className={cn(
-						"inline-flex h-11 items-center justify-center rounded-full px-5 font-medium text-[14px] transition-colors",
-						plan.highlighted
-							? "bg-text-strong-950 text-white hover:bg-text-strong-950/90 dark:bg-white dark:text-[#0a0d12] dark:hover:bg-white/90"
-							: "border border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 hover:bg-bg-weak-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1]",
-					)}
-				>
-					{plan.ctaLabel}
-				</Link>
+					label={plan.ctaLabel}
+					external={plan.ctaExternal}
+					variant={plan.highlighted ? "primary" : "default"}
+				/>
 				{plan.secondaryCta && (
-					<Link
+					<PlanCtaLink
 						href={plan.secondaryCta.href}
-						target={plan.secondaryCta.external ? "_blank" : undefined}
-						rel={plan.secondaryCta.external ? "noopener noreferrer" : undefined}
-						className="inline-flex h-11 items-center justify-center rounded-full border border-stroke-soft-200 bg-bg-white-0 px-5 font-medium text-[14px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1]"
-					>
-						{plan.secondaryCta.label}
-					</Link>
+						label={plan.secondaryCta.label}
+						external={plan.secondaryCta.external}
+					/>
 				)}
 			</div>
 		</div>
