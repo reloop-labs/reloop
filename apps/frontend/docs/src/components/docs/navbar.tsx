@@ -1,5 +1,6 @@
 "use client";
 
+import { authClient } from "@reloop/auth/client";
 import { navigationTabs } from "@reloop/fe-docs/lib/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -27,6 +28,28 @@ export function Navbar({
 }) {
 	const pathname = normalizeDocsPathname(usePathname());
 	const tabs = navigationTabs;
+	const { useSession } = authClient;
+	const { data: session, isPending } = useSession();
+	const [mounted, setMounted] = useState(false);
+	const [stars, setStars] = useState<string>("GitHub");
+
+	useEffect(() => {
+		setMounted(true);
+
+		fetch("https://api.github.com/repos/reloop-labs/reloop")
+			.then((res) => res.json())
+			.then((data) => {
+				if (data && typeof data.stargazers_count === "number") {
+					const count = data.stargazers_count;
+					if (count >= 1000) {
+						setStars(`${(count / 1000).toFixed(1)}k stars`);
+					} else {
+						setStars(`${count} stars`);
+					}
+				}
+			})
+			.catch(() => {});
+	}, []);
 
 	return (
 		<div className="flex h-full w-full items-center justify-between pr-3">
@@ -127,14 +150,23 @@ export function Navbar({
 						className="hidden items-center gap-1.5 font-medium text-sm text-text-sub-600 transition-colors hover:text-[#171717] sm:flex dark:hover:text-white"
 					>
 						<Icon name="social-github" className="h-4 w-4 shrink-0" />
-						GitHub
+						{stars}
 					</Link>
-					<a
-						href="/dashboard"
-						className="ml-2 inline-flex h-9 items-center justify-center rounded-full bg-[#171717] px-5 font-semibold text-sm text-white transition-all hover:opacity-90 active:scale-[0.98] dark:bg-white dark:text-black"
-					>
-						Get Started
-					</a>
+					{mounted && !isPending && session ? (
+						<a
+							href="/dashboard"
+							className="ml-2 inline-flex h-9 items-center justify-center rounded-full bg-[#171717] px-5 font-semibold text-sm text-white transition-all hover:opacity-90 active:scale-[0.98] dark:bg-white dark:text-black"
+						>
+							Dashboard
+						</a>
+					) : (
+						<a
+							href="/dashboard"
+							className="ml-2 inline-flex h-9 items-center justify-center rounded-full bg-[#171717] px-5 font-semibold text-sm text-white transition-all hover:opacity-90 active:scale-[0.98] dark:bg-white dark:text-black"
+						>
+							Get Started
+						</a>
+					)}
 					<ThemeToggle />
 				</div>
 			</div>

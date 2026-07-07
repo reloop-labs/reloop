@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "reloop",
@@ -646,9 +647,11 @@
         "@radix-ui/react-popover": "catalog:ui",
         "@radix-ui/react-presence": "catalog:ui",
         "@radix-ui/react-scroll-area": "catalog:ui",
+        "@reloop/auth": "workspace:*",
         "@reloop/tailwind": "workspace:*",
         "@reloop/ui": "workspace:*",
         "ajv": "catalog:ui",
+        "better-auth": "catalog:",
         "class-variance-authority": "catalog:ui",
         "framer-motion": "catalog:ui",
         "gray-matter": "catalog:ui",
