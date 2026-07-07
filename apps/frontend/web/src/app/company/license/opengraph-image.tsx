@@ -273,7 +273,7 @@ export default function OpenGraphImage() {
 					<span
 						style={{
 							fontSize: "28px",
-							fontWeight: 800,
+							fontWeight: "bold",
 							color: "#ffffff",
 							letterSpacing: "-0.5px",
 							marginLeft: "-14px",
@@ -309,7 +309,7 @@ export default function OpenGraphImage() {
 							flexDirection: "column",
 							fontSize: 64,
 							lineHeight: 1.05,
-							fontWeight: 600,
+							fontWeight: 800,
 							color: "#ffffff",
 							fontFamily: "Georgia, serif",
 							letterSpacing: "-0.03em",
