@@ -280,8 +280,9 @@ export default function OpenGraphImage() {
 						margin: "4px 0 0 0",
 					}}
 				>
-					Need help setting up self-hosting, optimizing deliverability, or choosing
-					the right plan? We&apos;re online and typically reply in 2-3 minutes.
+					Need help setting up self-hosting, optimizing deliverability, or
+					choosing the right plan? We&apos;re online and typically reply in 2-3
+					minutes.
 				</p>
 			</div>
 

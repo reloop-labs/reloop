@@ -9,4 +9,3 @@ export const Icon = ({ name, ...props }: ISvgPropType) => (
 		<use href={`#${name}`} />
 	</svg>
 );
-

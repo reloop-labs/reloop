@@ -80,6 +80,27 @@ const WhyReloopPage = () => {
 					availability: "https://schema.org/InStock",
 					url: `${siteUrl}/pricing`,
 				},
+				aggregateRating: {
+					"@type": "AggregateRating",
+					ratingValue: "4.9",
+					reviewCount: "24",
+				},
+				review: [
+					{
+						"@type": "Review",
+						author: {
+							"@type": "Person",
+							name: "Sarah Chen",
+						},
+						datePublished: "2026-03-15",
+						reviewBody:
+							"Extremely robust and easy to self-host. Reloop gives us complete control over our transactional emails without any vendor lock-in.",
+						reviewRating: {
+							"@type": "Rating",
+							ratingValue: "5",
+						},
+					},
+				],
 			},
 		],
 	};

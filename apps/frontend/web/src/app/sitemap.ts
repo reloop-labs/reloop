@@ -1,5 +1,5 @@
-import { getAllSitemapRoutes } from "@reloop/web/lib/sitemap-routes";
 import { getSiteUrl } from "@reloop/web/lib/site";
+import { getAllSitemapRoutes } from "@reloop/web/lib/sitemap-routes";
 import type { MetadataRoute } from "next";
 
 function getRoutePriority(path: string): number {
@@ -12,7 +12,10 @@ function getRoutePriority(path: string): number {
 function getChangeFrequency(
 	path: string,
 ): MetadataRoute.Sitemap[number]["changeFrequency"] {
-	if (path === "/resources/changelog" || path.startsWith("/resources/changelog/")) {
+	if (
+		path === "/resources/changelog" ||
+		path.startsWith("/resources/changelog/")
+	) {
 		return "weekly";
 	}
 	return "monthly";

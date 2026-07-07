@@ -12,9 +12,7 @@ const APP_DIR = join(process.cwd(), "src/app");
 const EXTERNAL_ROUTES = ["/docs/resources/sdks"];
 
 function hasPage(dir: string) {
-	return (
-		existsSync(join(dir, "page.tsx")) || existsSync(join(dir, "page.ts"))
-	);
+	return existsSync(join(dir, "page.tsx")) || existsSync(join(dir, "page.ts"));
 }
 
 function collectStaticRoutes(dir: string, segments: string[] = []): string[] {

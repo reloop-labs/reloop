@@ -292,7 +292,8 @@ export default function OpenGraphImage() {
 						margin: "8px 0 0 0",
 					}}
 				>
-					Scale your email infrastructure, control your costs. Deploy on our managed cloud or self-host on your own servers with pricing parity.
+					Scale your email infrastructure, control your costs. Deploy on our
+					managed cloud or self-host on your own servers with pricing parity.
 				</p>
 			</div>
 

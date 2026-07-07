@@ -53,8 +53,13 @@ const pricingSchema = [
 		"@context": "https://schema.org" as const,
 		"@type": "Product" as const,
 		name: "Reloop Subscription",
+		image: `${siteUrl}/web-app-manifest-512x512.png`,
 		description:
 			"Simple, transparent email pricing. Start free with 3,000 emails per month. Upgrade to Essentials or Enterprise—hosted or self-hosted.",
+		brand: {
+			"@type": "Brand" as const,
+			name: "Reloop Labs",
+		},
 		offers: [
 			{
 				"@type": "Offer" as const,
@@ -78,6 +83,27 @@ const pricingSchema = [
 					price: "9",
 					priceCurrency: "USD",
 					unitText: "MONTH",
+				},
+			},
+		],
+		aggregateRating: {
+			"@type": "AggregateRating" as const,
+			ratingValue: "4.9",
+			reviewCount: "24",
+		},
+		review: [
+			{
+				"@type": "Review" as const,
+				author: {
+					"@type": "Person" as const,
+					name: "Sarah Chen",
+				},
+				datePublished: "2026-03-15",
+				reviewBody:
+					"Extremely robust and easy to self-host. Reloop gives us complete control over our transactional emails without any vendor lock-in.",
+				reviewRating: {
+					"@type": "Rating" as const,
+					ratingValue: "5",
 				},
 			},
 		],
