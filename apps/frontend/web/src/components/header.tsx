@@ -179,6 +179,8 @@ export const Header = () => {
 	const { useSession } = authClient;
 	const { data: session } = useSession();
 	const [activeMega, setActiveMega] = useState<string | null>(null);
+	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+	const [expandedMobile, setExpandedMobile] = useState<string | null>(null);
 	const [mounted, setMounted] = useState(false);
 	const [stars, setStars] = useState<string>("GitHub");
 
@@ -200,6 +202,31 @@ export const Header = () => {
 			.catch(() => {});
 	}, []);
 
+	useEffect(() => {
+		if (!mobileMenuOpen) {
+			document.body.style.overflow = "";
+			return;
+		}
+
+		document.body.style.overflow = "hidden";
+		return () => {
+			document.body.style.overflow = "";
+		};
+	}, [mobileMenuOpen]);
+
+	const closeMobileMenu = () => {
+		setMobileMenuOpen(false);
+		setExpandedMobile(null);
+	};
+
+	const toggleMobileMenu = () => {
+		setMobileMenuOpen((open) => {
+			if (open) setExpandedMobile(null);
+			return !open;
+		});
+		setActiveMega(null);
+	};
+
 	const activeItem = navItems.find((item) => item.title === activeMega);
 
 	return (
@@ -208,7 +235,7 @@ export const Header = () => {
 			onMouseLeave={() => setActiveMega(null)}
 		>
 			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
-				<div className="grid h-16 grid-cols-[1fr_auto_1fr] items-center">
+				<div className="grid h-16 grid-cols-[1fr_auto] items-center lg:grid-cols-[1fr_auto_1fr]">
 					<Link
 						href="/"
 						className="flex shrink-0 items-center gap-2.5 justify-self-start"
@@ -251,7 +278,7 @@ export const Header = () => {
 						))}
 					</nav>
 
-					<div className="flex items-center gap-3 justify-self-end sm:gap-4">
+					<div className="hidden items-center gap-3 justify-self-end sm:gap-4 lg:flex">
 						<a
 							href="https://github.com/reloop-labs/reloop"
 							target="_blank"
@@ -259,7 +286,7 @@ export const Header = () => {
 							className="inline-flex items-center gap-2 px-1 py-2 font-medium text-[13px] text-text-strong-950 transition-opacity hover:opacity-70 dark:text-white"
 						>
 							<Icon name="social-github" className="size-3.5" />
-							<span className="hidden sm:inline">{stars}</span>
+							<span>{stars}</span>
 						</a>
 
 						{mounted && session ? (
@@ -273,7 +300,7 @@ export const Header = () => {
 							<>
 								<Link
 									href="/dashboard/login"
-									className="hidden font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 sm:inline dark:text-white/55 dark:hover:text-white"
+									className="font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
 								>
 									Log in
 								</Link>
@@ -286,7 +313,159 @@ export const Header = () => {
 							</>
 						)}
 					</div>
+
+					<button
+						type="button"
+						className="inline-flex size-10 items-center justify-center rounded-lg text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] lg:hidden dark:text-white dark:hover:bg-white/[0.06]"
+						onClick={toggleMobileMenu}
+						aria-expanded={mobileMenuOpen}
+						aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+					>
+						<Icon
+							name={mobileMenuOpen ? "cross" : "menu"}
+							className="size-5"
+						/>
+					</button>
 				</div>
+
+				<AnimatePresence>
+					{mobileMenuOpen && (
+						<motion.div
+							initial={{ opacity: 0, height: 0 }}
+							animate={{ opacity: 1, height: "auto" }}
+							exit={{ opacity: 0, height: 0 }}
+							transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+							className="overflow-hidden border-stroke-soft-200/70 border-t lg:hidden dark:border-white/10"
+						>
+							<div className="max-h-[calc(100dvh-4rem)] overflow-y-auto py-4">
+								<nav className="flex flex-col gap-1">
+									{navItems.map((item) =>
+										item.mega ? (
+											<div key={item.title}>
+												<button
+													type="button"
+													className="flex w-full items-center justify-between rounded-lg px-2 py-3 font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] dark:text-white dark:hover:bg-white/[0.06]"
+													onClick={() =>
+														setExpandedMobile((current) =>
+															current === item.title ? null : item.title,
+														)
+													}
+													aria-expanded={expandedMobile === item.title}
+												>
+													{item.title}
+													<Icon
+														name="chevron-down"
+														className={`size-4 transition-transform duration-200 ${
+															expandedMobile === item.title
+																? "rotate-180"
+																: "opacity-50"
+														}`}
+													/>
+												</button>
+												<AnimatePresence initial={false}>
+													{expandedMobile === item.title && (
+														<motion.div
+															initial={{ height: 0, opacity: 0 }}
+															animate={{ height: "auto", opacity: 1 }}
+															exit={{ height: 0, opacity: 0 }}
+															transition={{
+																duration: 0.2,
+																ease: [0.23, 1, 0.32, 1],
+															}}
+															className="overflow-hidden"
+														>
+															<div className="space-y-6 pb-4 pl-2">
+																{item.mega.categories.map((category) => (
+																	<div key={category.title}>
+																		<p className="mb-3 text-[12px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
+																			{category.title}
+																		</p>
+																		<div className="flex flex-col gap-2">
+																			{category.links.map((link) => (
+																				<Link
+																					key={link.title}
+																					href={link.href}
+																					{...(link.external
+																						? {
+																								target: "_blank",
+																								rel: "noreferrer",
+																							}
+																						: {})}
+																					onClick={closeMobileMenu}
+																					className="inline-flex items-center gap-1 py-1 font-medium text-[15px] text-text-strong-950 transition-colors hover:text-text-strong-950/70 dark:text-white dark:hover:text-white/70"
+																				>
+																					{link.title}
+																					{link.external && (
+																						<span className="text-[12px] text-text-sub-600 dark:text-white/45">
+																							↗
+																						</span>
+																					)}
+																				</Link>
+																			))}
+																		</div>
+																	</div>
+																))}
+															</div>
+														</motion.div>
+													)}
+												</AnimatePresence>
+											</div>
+										) : (
+											<Link
+												key={item.title}
+												href={item.href}
+												onClick={closeMobileMenu}
+												className="rounded-lg px-2 py-3 font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] dark:text-white dark:hover:bg-white/[0.06]"
+											>
+												{item.title}
+											</Link>
+										),
+									)}
+								</nav>
+
+								<div className="mt-6 flex flex-col gap-3 border-stroke-soft-200/70 border-t pt-6 dark:border-white/10">
+									<a
+										href="https://github.com/reloop-labs/reloop"
+										target="_blank"
+										rel="noreferrer"
+										onClick={closeMobileMenu}
+										className="inline-flex items-center gap-2 rounded-lg px-2 py-3 font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] dark:text-white dark:hover:bg-white/[0.06]"
+									>
+										<Icon name="social-github" className="size-4" />
+										{stars}
+									</a>
+
+									{mounted && session ? (
+										<Link
+											href="/dashboard"
+											onClick={closeMobileMenu}
+											className="inline-flex items-center justify-center rounded-full bg-text-strong-950 px-4 py-3 font-medium text-[15px] text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-black"
+										>
+											Dashboard
+										</Link>
+									) : (
+										<div className="grid grid-cols-2 gap-3">
+											<Link
+												href="/dashboard/login"
+												onClick={closeMobileMenu}
+												className="inline-flex items-center justify-center rounded-full border border-stroke-soft-200 px-4 py-3 font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] dark:border-white/15 dark:text-white dark:hover:bg-white/[0.06]"
+											>
+												Log in
+											</Link>
+											<Link
+												href="/dashboard/signup"
+												onClick={closeMobileMenu}
+												className="inline-flex items-center justify-center rounded-full bg-text-strong-950 px-4 py-3 font-medium text-[15px] text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-black"
+											>
+												Sign up
+											</Link>
+										</div>
+									)}
+								</div>
+							</div>
+						</motion.div>
+					)}
+				</AnimatePresence>
 
 				<AnimatePresence>
 					{activeMega && activeItem?.mega && (
@@ -295,7 +474,7 @@ export const Header = () => {
 							animate={{ opacity: 1, height: "auto" }}
 							exit={{ opacity: 0, height: 0 }}
 							transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-							className="overflow-hidden"
+							className="hidden overflow-hidden lg:block"
 						>
 							<div className="pt-2 pb-10">
 								<div className="grid grid-cols-[1fr_auto_1fr]">

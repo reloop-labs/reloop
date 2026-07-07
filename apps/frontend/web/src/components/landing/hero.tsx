@@ -72,12 +72,12 @@ export function FeatureHero({
 		<div
 			className={
 				fullViewport
-					? "relative flex h-dvh items-center justify-center overflow-hidden bg-transparent"
+					? "relative flex min-h-screen items-center justify-center overflow-hidden bg-transparent pt-20 pb-12"
 					: compact
 						? tightBottom
 							? "relative overflow-hidden bg-transparent pt-40 pb-2 sm:pt-44 sm:pb-4"
 							: "relative overflow-hidden bg-transparent pt-40 pb-8 sm:pt-44 sm:pb-10"
-						: "relative flex min-h-dvh items-center justify-center overflow-hidden bg-transparent pt-48 pb-28 sm:pt-52"
+						: "relative flex min-h-screen items-center justify-center overflow-hidden bg-transparent pt-48 pb-28 sm:pt-52"
 			}
 		>
 			<main className="relative z-10">
