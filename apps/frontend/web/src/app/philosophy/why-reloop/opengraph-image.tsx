@@ -245,22 +245,6 @@ export default function OpenGraphImage() {
 						reloop
 					</span>
 				</div>
-				<div
-					style={{
-						display: "flex",
-						padding: "6px 14px",
-						borderRadius: "9999px",
-						backgroundColor: "rgba(255, 255, 255, 0.04)",
-						border: "1px solid rgba(255, 255, 255, 0.08)",
-						fontSize: "12px",
-						fontWeight: 600,
-						color: "#A1A1AA",
-						textTransform: "uppercase",
-						letterSpacing: "1px",
-					}}
-				>
-					Philosophy
-				</div>
 			</div>
 
 			{/* Main content area */}
@@ -273,25 +257,6 @@ export default function OpenGraphImage() {
 					marginBottom: "auto",
 				}}
 			>
-				<div
-					style={{
-						display: "flex",
-						alignItems: "center",
-						gap: "8px",
-						padding: "4px 12px",
-						borderRadius: "6px",
-						backgroundColor: "rgba(139, 92, 246, 0.1)",
-						border: "1px solid rgba(139, 92, 246, 0.2)",
-						color: "#A78BFA",
-						fontSize: "12px",
-						fontWeight: 600,
-						textTransform: "uppercase",
-						letterSpacing: "0.5px",
-						alignSelf: "flex-start",
-					}}
-				>
-					Why Reloop?
-				</div>
 				<div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
 					<span
 						style={{
@@ -326,8 +291,9 @@ export default function OpenGraphImage() {
 						margin: "8px 0 0 0",
 					}}
 				>
-					Reloop is open-source, self-hostable infrastructure. Use it hosted on
-					our managed cloud or deploy it directly on your own servers.
+					Get transactional sending, marketing campaigns, SMTP relay, and deep
+					analytics without the black box. Run Reloop on our secure cloud or
+					deploy it on your own servers.
 				</p>
 			</div>
 
@@ -337,8 +303,6 @@ export default function OpenGraphImage() {
 					display: "flex",
 					justifyContent: "space-between",
 					alignItems: "center",
-					borderTop: "1px solid rgba(255, 255, 255, 0.06)",
-					paddingTop: "24px",
 					width: "100%",
 				}}
 			>
@@ -346,15 +310,15 @@ export default function OpenGraphImage() {
 					style={{
 						display: "flex",
 						alignItems: "center",
-						gap: "24px",
-						fontSize: "14px",
+						gap: "32px",
+						fontSize: "18px",
 						color: "#A1A1AA",
 					}}
 				>
-					<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+					<div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
 						<svg
-							width="16"
-							height="16"
+							width="20"
+							height="20"
 							viewBox="0 0 24 24"
 							fill="none"
 							stroke="#34D399"
@@ -368,16 +332,16 @@ export default function OpenGraphImage() {
 					</div>
 					<div
 						style={{
-							width: "4px",
-							height: "4px",
+							width: "6px",
+							height: "6px",
 							borderRadius: "50%",
 							backgroundColor: "#52525B",
 						}}
 					/>
-					<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+					<div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
 						<svg
-							width="16"
-							height="16"
+							width="20"
+							height="20"
 							viewBox="0 0 24 24"
 							fill="none"
 							stroke="#34D399"
@@ -392,13 +356,13 @@ export default function OpenGraphImage() {
 				</div>
 				<div
 					style={{
-						fontSize: "12px",
+						fontSize: "16px",
 						color: "#71717A",
 						fontFamily: "monospace",
 						letterSpacing: "1px",
 					}}
 				>
-					reloop.sh/philosophy
+					reloop.sh/philosophy/why-reloop
 				</div>
 			</div>
 		</div>,

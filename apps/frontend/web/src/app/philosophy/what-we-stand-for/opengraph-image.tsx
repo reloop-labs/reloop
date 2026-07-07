@@ -245,22 +245,6 @@ export default function OpenGraphImage() {
 						reloop
 					</span>
 				</div>
-				<div
-					style={{
-						display: "flex",
-						padding: "6px 14px",
-						borderRadius: "9999px",
-						backgroundColor: "rgba(255, 255, 255, 0.04)",
-						border: "1px solid rgba(255, 255, 255, 0.08)",
-						fontSize: "12px",
-						fontWeight: 600,
-						color: "#A1A1AA",
-						textTransform: "uppercase",
-						letterSpacing: "1px",
-					}}
-				>
-					Philosophy
-				</div>
 			</div>
 
 			{/* Main content area */}
@@ -272,25 +256,6 @@ export default function OpenGraphImage() {
 					marginTop: "24px",
 				}}
 			>
-				<div
-					style={{
-						display: "flex",
-						alignItems: "center",
-						gap: "8px",
-						padding: "4px 12px",
-						borderRadius: "6px",
-						backgroundColor: "rgba(139, 92, 246, 0.1)",
-						border: "1px solid rgba(139, 92, 246, 0.2)",
-						color: "#A78BFA",
-						fontSize: "12px",
-						fontWeight: 600,
-						textTransform: "uppercase",
-						letterSpacing: "0.5px",
-						alignSelf: "flex-start",
-					}}
-				>
-					What we stand for
-				</div>
 				<div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
 					<span
 						style={{
@@ -301,7 +266,7 @@ export default function OpenGraphImage() {
 							lineHeight: 1.1,
 						}}
 					>
-						What We Stand For.
+						Principles we build by. Not taglines we hide behind.
 					</span>
 				</div>
 				<p
@@ -314,69 +279,10 @@ export default function OpenGraphImage() {
 						margin: "4px 0 0 0",
 					}}
 				>
-					Our core engineering beliefs: developer autonomy, transparent
-					licensing, and code visibility.
+					Reloop is built on absolute transparency. These six principles guide
+					every feature we design, the code we open-source, and how we protect
+					your developer independence.
 				</p>
-			</div>
-
-			{/* Bottom Row of Cards */}
-			<div
-				style={{
-					display: "flex",
-					flexDirection: "row",
-					gap: "16px",
-					marginTop: "16px",
-					width: "100%",
-				}}
-			>
-				{[
-					{
-						title: "Transparency",
-						desc: "Every single line of code is open source and auditable.",
-					},
-					{
-						title: "Developer Autonomy",
-						desc: "Run on our cloud infrastructure or host on your own network.",
-					},
-					{
-						title: "Code Parity",
-						desc: "No features are hidden behind closed proprietary layers.",
-					},
-				].map((item, idx) => (
-					<div
-						key={idx}
-						style={{
-							display: "flex",
-							flexDirection: "column",
-							flex: 1,
-							backgroundColor: "rgba(255, 255, 255, 0.02)",
-							border: "1px solid rgba(255, 255, 255, 0.08)",
-							borderRadius: "16px",
-							padding: "20px 24px",
-							height: "140px",
-						}}
-					>
-						<span
-							style={{
-								fontSize: "16px",
-								fontWeight: 600,
-								color: "#ffffff",
-							}}
-						>
-							{item.title}
-						</span>
-						<span
-							style={{
-								fontSize: "13px",
-								color: "#71717A",
-								marginTop: "6px",
-								lineHeight: "1.4",
-							}}
-						>
-							{item.desc}
-						</span>
-					</div>
-				))}
 			</div>
 
 			{/* Footer Row */}
@@ -385,8 +291,6 @@ export default function OpenGraphImage() {
 					display: "flex",
 					justifyContent: "space-between",
 					alignItems: "center",
-					borderTop: "1px solid rgba(255, 255, 255, 0.06)",
-					paddingTop: "20px",
 					width: "100%",
 				}}
 			>
@@ -394,15 +298,15 @@ export default function OpenGraphImage() {
 					style={{
 						display: "flex",
 						alignItems: "center",
-						gap: "24px",
-						fontSize: "14px",
+						gap: "32px",
+						fontSize: "18px",
 						color: "#A1A1AA",
 					}}
 				>
-					<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+					<div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
 						<svg
-							width="16"
-							height="16"
+							width="20"
+							height="20"
 							viewBox="0 0 24 24"
 							fill="none"
 							stroke="#34D399"
@@ -416,16 +320,16 @@ export default function OpenGraphImage() {
 					</div>
 					<div
 						style={{
-							width: "4px",
-							height: "4px",
+							width: "6px",
+							height: "6px",
 							borderRadius: "50%",
 							backgroundColor: "#52525B",
 						}}
 					/>
-					<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+					<div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
 						<svg
-							width="16"
-							height="16"
+							width="20"
+							height="20"
 							viewBox="0 0 24 24"
 							fill="none"
 							stroke="#34D399"
@@ -440,13 +344,13 @@ export default function OpenGraphImage() {
 				</div>
 				<div
 					style={{
-						fontSize: "12px",
+						fontSize: "16px",
 						color: "#71717A",
 						fontFamily: "monospace",
 						letterSpacing: "1px",
 					}}
 				>
-					reloop.sh/philosophy
+					reloop.sh/philosophy/what-we-stand-for
 				</div>
 			</div>
 		</div>,

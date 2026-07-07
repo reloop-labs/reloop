@@ -351,7 +351,7 @@ export default function OpenGraphImage() {
 						letterSpacing: "1px",
 					}}
 				>
-					reloop.sh/company/about
+					reloop.sh/company/about-us
 				</div>
 			</div>
 		</div>,
