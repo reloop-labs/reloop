@@ -7,7 +7,6 @@ const nextConfig: NextConfig = {
 	partialPrefetching: true,
 	experimental: {
 		turbopackMemoryEviction: false,
-		inlineCss: true,
 	},
 	images: {
 		remotePatterns: [
