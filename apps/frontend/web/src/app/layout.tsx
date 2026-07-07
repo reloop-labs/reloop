@@ -13,6 +13,7 @@ import {
 } from "@reloop/web/lib/site";
 import { ThemeProvider } from "@reloop/web/providers/theme-provider";
 import localFont from "next/font/local";
+import Script from "next/script";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -88,7 +89,10 @@ export default function RootLayout({
 			className={`${openRunde.variable} overscroll-y-none scroll-auto`}
 		>
 			<head>
-				<link rel="manifest" href="/manifest.json" crossOrigin="use-credentials" />
+				<Script
+					id="manifest-loader"
+					strategy="afterInteractive"
+				>{`var l=document.createElement('link');l.rel='manifest';l.href='/manifest.json';document.head.appendChild(l)`}</Script>
 			</head>
 			<body
 				className="min-h-full overscroll-y-none bg-bg-white-0 antialiased"
