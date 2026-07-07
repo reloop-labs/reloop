@@ -18,7 +18,7 @@ export function CareersSection() {
 					Our culture
 				</p>
 				<h2 className="mt-4 font-serif text-[2rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.6rem] lg:text-[3rem] dark:text-white">
-					What it&apos;s like here.
+					People who care about taste.
 				</h2>
 				<div className="mt-8 space-y-6">
 					{cultureParagraphs.map((paragraph) => (

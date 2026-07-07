@@ -93,10 +93,7 @@ const CareersPage = () => {
 	return (
 		<>
 			<JsonLd data={jsonLd} />
-			<MarketingPageShell
-				titleLines={["Careers at Reloop.", "People who care about taste."]}
-				compactHero
-			>
+			<MarketingPageShell titleLines={["Careers at Reloop."]} compactHero>
 				<PageSection narrow flushTop>
 					<CareersSection />
 				</PageSection>
