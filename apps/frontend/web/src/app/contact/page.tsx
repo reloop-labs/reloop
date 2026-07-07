@@ -95,15 +95,18 @@ const ContactPage = () => {
 				<div className="mx-auto w-full max-w-4xl px-5 pb-10 pt-6 sm:px-6 sm:pb-12 sm:pt-8 lg:py-12">
 					<div className="grid items-start gap-8 sm:gap-10 lg:grid-cols-2 lg:gap-16 xl:gap-20">
 						<div className="min-w-0">
-							<h1 className="font-serif text-[2rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.5rem] lg:text-[3rem] dark:text-white">
-								Contact support
+							<h1 className="font-serif text-[1.85rem] text-text-strong-950 leading-[1.1] tracking-tighter sm:text-[2.25rem] lg:text-[2.5rem] dark:text-white">
+								Get help from the engineers who built it
 							</h1>
+							<p className="mt-4 text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/55">
+								Need help optimizing deliverability, configuring DNS, or choosing the right plan? We&apos;re online and typically reply in 2 to 3 minutes.
+							</p>
 							<ul className="mt-6 space-y-3.5 sm:mt-8 sm:space-y-4">
-								<CheckItem>Ask product questions</CheckItem>
+								<CheckItem>Get help setting up self-hosting or SMTP</CheckItem>
 								<CheckItem>
-									Report problems or unexpected behaviour
+									Debug deliverability or API integration issues
 								</CheckItem>
-								<CheckItem>Leave feedback</CheckItem>
+								<CheckItem>Share feedback and feature requests directly</CheckItem>
 							</ul>
 						</div>
 						<div className="min-w-0 lg:pt-1">
