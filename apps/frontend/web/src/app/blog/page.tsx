@@ -12,7 +12,7 @@ import Link from "next/link";
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
 
-const pageUrl = `${getSiteUrl()}/company/blog`;
+const pageUrl = `${getSiteUrl()}/blog`;
 
 export const metadata: Metadata = {
 	title: "Blog | Reloop",
@@ -102,7 +102,7 @@ const BlogPage = () => {
 					{posts.map((post) => (
 						<Link
 							key={post.slug}
-							href={`/company/blog/${post.slug}`}
+							href={`/blog/${post.slug}`}
 							className="group flex flex-col rounded-2xl border border-stroke-soft-200 p-6 transition-colors hover:border-stroke-soft-300 sm:flex-row sm:items-start sm:gap-6 dark:border-white/10 dark:hover:border-white/20"
 						>
 							<div className="flex-1">

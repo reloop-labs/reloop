@@ -16,7 +16,7 @@ const navItems = [
 		mega: {
 			links: [
 				{ title: "About", href: "/about" },
-				{ title: "Blog", href: "/company/blog" },
+				{ title: "Blog", href: "/blog" },
 				{ title: "Careers", href: "/company/careers" },
 				{ title: "Customers", href: "/company/customers" },
 				{ title: "Humans", href: "/company/humans" },

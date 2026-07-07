@@ -8,7 +8,7 @@ export const instant = false;
 export const metadata = createLandingMetadata(
 	post.title,
 	post.description,
-	`/company/blog/${post.slug}`,
+	`/blog/${post.slug}`,
 	post.keywords,
 );
 

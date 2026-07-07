@@ -18,7 +18,7 @@ export function BlogPostPageView({
 			{/* Article layout — dev blog / Medium style */}
 			<article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
 				<nav className="mb-8 text-[13px] text-text-sub-600 dark:text-white/55">
-					<Link href="/company/blog" className="hover:text-primary-base">
+					<Link href="/blog" className="hover:text-primary-base">
 						Blog
 					</Link>
 					<span className="mx-2">/</span>
@@ -69,7 +69,7 @@ export function BlogPostPageView({
 
 				<div className="mt-12 border-stroke-soft-200 border-t pt-8 dark:border-white/10">
 					<Link
-						href="/company/blog"
+						href="/blog"
 						className={Button.buttonVariants({
 							mode: "stroke",
 							variant: "neutral",

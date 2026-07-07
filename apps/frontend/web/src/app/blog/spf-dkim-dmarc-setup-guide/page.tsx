@@ -1,5 +1,5 @@
 import { BlogPostPageView } from "@reloop/web/components/landing/blog/blog-post-page-view";
-import { post } from "@reloop/web/lib/landing/blog/transactional-email-best-practices";
+import { post } from "@reloop/web/lib/landing/blog/spf-dkim-dmarc-setup-guide";
 import { defaultLandingCta } from "@reloop/web/lib/landing/constants";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 
@@ -8,11 +8,11 @@ export const instant = false;
 export const metadata = createLandingMetadata(
 	post.title,
 	post.description,
-	`/company/blog/${post.slug}`,
+	`/blog/${post.slug}`,
 	post.keywords,
 );
 
-export default function TransactionalEmailBestPracticesBlogPage() {
+export default function SpfDkimDmarcSetupGuideBlogPage() {
 	return (
 		<BlogPostPageView
 			post={post}

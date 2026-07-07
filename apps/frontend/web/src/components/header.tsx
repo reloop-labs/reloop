@@ -77,7 +77,7 @@ const navItems: NavItem[] = [
 				{
 					title: "Learn",
 					links: [
-						{ title: "Blog", href: "/company/blog" },
+						{ title: "Blog", href: "/blog" },
 						{ title: "Changelog", href: "/resources/changelog" },
 						{ title: "Glossary", href: "/resources/glossary" },
 						{ title: "Community", href: "/resources/community" },
@@ -120,7 +120,7 @@ const navItems: NavItem[] = [
 					links: [
 						{ title: "About", href: "/about" },
 						{ title: "Contact", href: "/contact" },
-						{ title: "Blog", href: "/company/blog" },
+						{ title: "Blog", href: "/blog" },
 						{ title: "Pricing", href: "/pricing" },
 					],
 				},

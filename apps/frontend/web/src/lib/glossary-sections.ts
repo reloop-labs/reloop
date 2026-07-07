@@ -128,9 +128,9 @@ export function getGlossarySections(): GlossarySection[] {
 			"Blog",
 			blogPosts.map((post) => ({
 				title: post.title,
-				href: `/company/blog/${post.slug}`,
+				href: `/blog/${post.slug}`,
 			})),
-			{ title: "View all posts", href: "/company/blog" },
+			{ title: "View all posts", href: "/blog" },
 		),
 		section("Resources", [
 			{ title: "Changelog", href: "/resources/changelog" },
@@ -141,7 +141,7 @@ export function getGlossarySections(): GlossarySection[] {
 		]),
 		section("Company", [
 			{ title: "About Us", href: "/about" },
-			{ title: "Blog", href: "/company/blog" },
+			{ title: "Blog", href: "/blog" },
 			{ title: "Contact Us", href: "/contact" },
 			{ title: "License", href: "/company/license" },
 			{ title: "Privacy Policy", href: "/company/privacy" },

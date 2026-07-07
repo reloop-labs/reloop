@@ -121,7 +121,7 @@ export function BlogPostPage({
 
 				<div className="mt-12 border-stroke-soft-200 border-t pt-8 dark:border-white/10">
 					<Link
-						href="/company/blog"
+						href="/blog"
 						className={Button.buttonVariants({
 							mode: "stroke",
 							variant: "neutral",
