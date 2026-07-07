@@ -303,7 +303,7 @@ export const ReceivedEmailTable = ({
 							>
 								{/* From */}
 								<div className="flex min-w-0 items-center gap-2 pr-4">
-									<Avatar.Root size="24" color="gray" className="flex-shrink-0">
+									<Avatar.Root size="20" color="gray" className="flex-shrink-0">
 										<Avatar.Image asChild>
 											<div
 												className={cn(

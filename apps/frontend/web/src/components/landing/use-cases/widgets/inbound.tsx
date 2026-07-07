@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { Icon } from "@reloop/ui/icon";
+import { useState } from "react";
 
 export default function InboundWidget() {
 	const [sender, setSender] = useState("john.doe@company.com");
 	const [subject, setSubject] = useState("Bug report: checkout page crashing");
-	const [body, setBody] = useState("Whenever I click 'Purchase', the app gets stuck on the loading spinner.");
+	const [body, setBody] = useState(
+		"Whenever I click 'Purchase', the app gets stuck on the loading spinner.",
+	);
 	const [hasAttachment, setHasAttachment] = useState(true);
 
 	const [timestamp] = useState("2026-07-07T08:00:00.000Z");
@@ -36,98 +38,110 @@ export default function InboundWidget() {
 								sizeBytes: 104857,
 								url: "https://cdn.reloop.dev/attachments/scr_1.png",
 							},
-					  ]
+						]
 					: [],
 				spamScore: 0.1,
 				dkimStatus: "pass",
 			},
 		},
 		null,
-		2
+		2,
 	);
 
 	return (
-		<div className="flex flex-col h-full min-h-[420px] bg-slate-950 rounded-2xl border border-white/10 overflow-hidden shadow-2xl font-sans text-left">
+		<div className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950 text-left font-sans shadow-2xl">
 			{/* Header */}
-			<div className="flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-white/5">
+			<div className="flex items-center justify-between border-white/5 border-b bg-slate-900 px-4 py-3">
 				<div className="flex items-center gap-1.5">
-					<span className="w-2.5 h-2.5 rounded-full bg-cyan-500/80" />
-					<span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-					<span className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
-					<span className="text-xs text-white/40 font-mono ml-2">inbound_router.json</span>
+					<span className="h-2.5 w-2.5 rounded-full bg-cyan-500/80" />
+					<span className="h-2.5 w-2.5 rounded-full bg-yellow-500/80" />
+					<span className="h-2.5 w-2.5 rounded-full bg-green-500/80" />
+					<span className="ml-2 font-mono text-white/40 text-xs">
+						inbound_router.json
+					</span>
 				</div>
-				<span className="text-[10px] text-cyan-400 font-mono bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+				<span className="rounded border border-cyan-500/20 bg-cyan-500/10 px-2 py-0.5 font-mono text-[10px] text-cyan-400">
 					MX Webhook Relay
 				</span>
 			</div>
 
-			<div className="flex-1 grid grid-cols-1 lg:grid-cols-2 overflow-hidden">
+			<div className="grid flex-1 grid-cols-1 overflow-hidden lg:grid-cols-2">
 				{/* Left Side: Mock Email Input Form */}
-				<div className="p-4 border-b lg:border-b-0 lg:border-r border-white/5 flex flex-col gap-3.5 bg-slate-950/40">
-					<h3 className="text-xs font-bold text-white/40 uppercase tracking-wider flex items-center gap-1">
-						<Icon name="Mail" className="w-3.5 h-3.5" />
+				<div className="flex flex-col gap-3.5 border-white/5 border-b bg-slate-950/40 p-4 lg:border-r lg:border-b-0">
+					<h3 className="flex items-center gap-1 font-bold text-white/40 text-xs uppercase tracking-wider">
+						<Icon name="Mail" className="h-3.5 w-3.5" />
 						<span>Compose Inbound Email</span>
 					</h3>
 
 					<div className="flex flex-col gap-2.5">
 						<div>
-							<label className="text-[10px] text-white/40 font-mono block mb-1">FROM SENDER</label>
+							<label className="mb-1 block font-mono text-[10px] text-white/40">
+								FROM SENDER
+							</label>
 							<input
 								type="text"
 								value={sender}
 								onChange={(e) => setSender(e.target.value)}
-								className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white/80 focus:outline-none focus:border-cyan-500/50 font-mono"
+								className="w-full rounded-lg border border-white/10 bg-slate-900 px-3 py-1.5 font-mono text-white/80 text-xs focus:border-cyan-500/50 focus:outline-none"
 							/>
 						</div>
 
 						<div>
-							<label className="text-[10px] text-white/40 font-mono block mb-1">SUBJECT LINE</label>
+							<label className="mb-1 block font-mono text-[10px] text-white/40">
+								SUBJECT LINE
+							</label>
 							<input
 								type="text"
 								value={subject}
 								onChange={(e) => setSubject(e.target.value)}
-								className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white/80 focus:outline-none focus:border-cyan-500/50"
+								className="w-full rounded-lg border border-white/10 bg-slate-900 px-3 py-1.5 text-white/80 text-xs focus:border-cyan-500/50 focus:outline-none"
 							/>
 						</div>
 
 						<div>
-							<label className="text-[10px] text-white/40 font-mono block mb-1">MESSAGE BODY</label>
+							<label className="mb-1 block font-mono text-[10px] text-white/40">
+								MESSAGE BODY
+							</label>
 							<textarea
 								value={body}
 								onChange={(e) => setBody(e.target.value)}
 								rows={3}
-								className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white/80 focus:outline-none focus:border-cyan-500/50 resize-none leading-relaxed"
+								className="w-full resize-none rounded-lg border border-white/10 bg-slate-900 px-3 py-1.5 text-white/80 text-xs leading-relaxed focus:border-cyan-500/50 focus:outline-none"
 							/>
 						</div>
 
 						{/* Attachment simulator */}
 						<button
 							onClick={() => setHasAttachment(!hasAttachment)}
-							className={`flex items-center justify-between p-2 rounded-lg border text-left transition-all cursor-pointer ${
+							className={`flex cursor-pointer items-center justify-between rounded-lg border p-2 text-left transition-all ${
 								hasAttachment
-									? "bg-cyan-950/20 border-cyan-500/30 text-cyan-300"
-									: "bg-slate-900 border-white/5 text-white/40"
+									? "border-cyan-500/30 bg-cyan-950/20 text-cyan-300"
+									: "border-white/5 bg-slate-900 text-white/40"
 							}`}
 						>
 							<div className="flex items-center gap-1.5 text-xs">
-								<Icon name="Paperclip" className="w-3.5 h-3.5" />
+								<Icon name="Paperclip" className="h-3.5 w-3.5" />
 								<span>Include 100KB Screenshot</span>
 							</div>
-							<div className={`w-3 h-3 rounded-full border transition-colors ${hasAttachment ? "bg-cyan-400 border-cyan-400" : "border-white/20"}`} />
+							<div
+								className={`h-3 w-3 rounded-full border transition-colors ${hasAttachment ? "border-cyan-400 bg-cyan-400" : "border-white/20"}`}
+							/>
 						</button>
 					</div>
 				</div>
 
 				{/* Right Side: Parsed Webhook JSON Output */}
-				<div className="p-4 flex flex-col gap-2.5 overflow-hidden">
-					<h3 className="text-xs font-bold text-white/40 uppercase tracking-wider flex items-center gap-1 justify-between">
+				<div className="flex flex-col gap-2.5 overflow-hidden p-4">
+					<h3 className="flex items-center justify-between gap-1 font-bold text-white/40 text-xs uppercase tracking-wider">
 						<span className="flex items-center gap-1">
-							<Icon name="Code" className="w-3.5 h-3.5" />
+							<Icon name="Code" className="h-3.5 w-3.5" />
 							<span>Webhook Payload Delivery</span>
 						</span>
-						<span className="text-[10px] text-emerald-400 font-mono">POST 200 OK</span>
+						<span className="font-mono text-[10px] text-emerald-400">
+							POST 200 OK
+						</span>
 					</h3>
-					<pre className="flex-1 bg-slate-900 border border-white/5 rounded-xl p-3 font-mono text-[10px] text-cyan-300/80 leading-relaxed overflow-auto max-h-[260px] text-left">
+					<pre className="max-h-[260px] flex-1 overflow-auto rounded-xl border border-white/5 bg-slate-900 p-3 text-left font-mono text-[10px] text-cyan-300/80 leading-relaxed">
 						{generatedJson}
 					</pre>
 				</div>

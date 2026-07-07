@@ -325,7 +325,7 @@ export const AgentMailboxList = () => {
 									{/* Agent & Info */}
 									<div className="flex min-w-0 items-center gap-2 pr-4">
 										<Avatar.Root
-											size="24"
+											size="20"
 											color="gray"
 											className="flex-shrink-0"
 										>

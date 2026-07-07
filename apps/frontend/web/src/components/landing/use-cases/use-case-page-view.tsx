@@ -7,18 +7,17 @@ import { accentStyles } from "@reloop/web/lib/landing/page-accents";
 import type { LandingPageDefinition } from "@reloop/web/lib/landing/types";
 import { getUseCaseEnrichment } from "@reloop/web/lib/landing/use-cases/enrichment";
 import Link from "next/link";
-
-import TransactionalWidget from "./widgets/transactional";
-import MarketingWidget from "./widgets/marketing";
-import AutomatedWidget from "./widgets/automated";
 import AiAgentWidget from "./widgets/ai-agent";
-import InboundWidget from "./widgets/inbound";
-import SystemMonitoringWidget from "./widgets/system-monitoring";
-import PasswordResetWidget from "./widgets/password-reset";
-import WelcomeWidget from "./widgets/welcome";
-import OrderConfirmationWidget from "./widgets/order-confirmation";
+import AutomatedWidget from "./widgets/automated";
 import EmailVerificationWidget from "./widgets/email-verification";
+import InboundWidget from "./widgets/inbound";
+import MarketingWidget from "./widgets/marketing";
+import OrderConfirmationWidget from "./widgets/order-confirmation";
+import PasswordResetWidget from "./widgets/password-reset";
 import PaymentReceiptWidget from "./widgets/payment-receipt";
+import SystemMonitoringWidget from "./widgets/system-monitoring";
+import TransactionalWidget from "./widgets/transactional";
+import WelcomeWidget from "./widgets/welcome";
 
 function getUseCaseWidget(slug: string) {
 	switch (slug) {
@@ -114,7 +113,7 @@ export function UseCasePageView({ config }: { config: LandingPageDefinition }) {
 					</div>
 
 					{widget ? (
-						<div className="w-full h-full min-h-[420px] max-w-xl mx-auto">
+						<div className="mx-auto h-full min-h-[420px] w-full max-w-xl">
 							{widget}
 						</div>
 					) : (

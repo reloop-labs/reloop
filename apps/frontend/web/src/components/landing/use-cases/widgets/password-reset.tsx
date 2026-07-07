@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "@reloop/ui/icon";
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
 
 export default function PasswordResetWidget() {
-	const [step, setStep] = useState<"idle" | "notified" | "form" | "done">("idle");
+	const [step, setStep] = useState<"idle" | "notified" | "form" | "done">(
+		"idle",
+	);
 	const [pass, setPass] = useState("");
 	const [confirm, setConfirm] = useState("");
 	const [error, setError] = useState("");
@@ -41,24 +43,26 @@ export default function PasswordResetWidget() {
 	};
 
 	return (
-		<div className="flex flex-col h-full min-h-[420px] bg-slate-950 rounded-2xl border border-white/10 overflow-hidden shadow-2xl font-sans text-left items-center justify-center p-6">
+		<div className="flex h-full min-h-[420px] flex-col items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-slate-950 p-6 text-left font-sans shadow-2xl">
 			{/* Controls outside phone */}
-			<div className="mb-4 w-full flex justify-between items-center bg-slate-900/60 p-3 rounded-xl border border-white/5">
+			<div className="mb-4 flex w-full items-center justify-between rounded-xl border border-white/5 bg-slate-900/60 p-3">
 				<div>
-					<span className="text-[10px] text-white/40 font-mono">AUTH TYPE</span>
-					<div className="text-xs text-white/80 font-bold font-mono">Transactional JWT Drip</div>
+					<span className="font-mono text-[10px] text-white/40">AUTH TYPE</span>
+					<div className="font-bold font-mono text-white/80 text-xs">
+						Transactional JWT Drip
+					</div>
 				</div>
 				{step === "idle" ? (
 					<button
 						onClick={requestReset}
-						className="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white font-medium text-xs shadow-lg shadow-orange-600/20 active:scale-95 transition-all cursor-pointer"
+						className="cursor-pointer rounded-lg bg-orange-600 px-4 py-2 font-medium text-white text-xs shadow-lg shadow-orange-600/20 transition-all hover:bg-orange-500 active:scale-95"
 					>
 						🔑 Request Reset Link
 					</button>
 				) : (
 					<button
 						onClick={resetAll}
-						className="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-white text-xs transition-colors cursor-pointer"
+						className="cursor-pointer rounded bg-slate-800 px-3 py-1.5 text-white text-xs transition-colors hover:bg-slate-700"
 					>
 						Reset Simulation
 					</button>
@@ -66,38 +70,42 @@ export default function PasswordResetWidget() {
 			</div>
 
 			{/* Smartphone Case Mockup */}
-			<div className="relative w-[210px] h-[340px] border-[6px] border-slate-800 bg-slate-950 rounded-[28px] overflow-hidden shadow-xl ring-2 ring-white/10 flex flex-col justify-between">
+			<div className="relative flex h-[340px] w-[210px] flex-col justify-between overflow-hidden rounded-[28px] border-[6px] border-slate-800 bg-slate-950 shadow-xl ring-2 ring-white/10">
 				{/* Camera Notch */}
-				<div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-16 h-3.5 bg-slate-800 rounded-full z-30 flex items-center justify-center">
-					<div className="w-1.5 h-1.5 rounded-full bg-slate-900 ml-6" />
+				<div className="-translate-x-1/2 absolute top-1.5 left-1/2 z-30 flex h-3.5 w-16 items-center justify-center rounded-full bg-slate-800">
+					<div className="ml-6 h-1.5 w-1.5 rounded-full bg-slate-900" />
 				</div>
 
 				{/* Smartphone Screen Content */}
-				<div className="flex-1 pt-6 pb-4 px-3 flex flex-col justify-between text-xs select-none">
+				<div className="flex flex-1 select-none flex-col justify-between px-3 pt-6 pb-4 text-xs">
 					{/* Status Bar */}
-					<div className="flex justify-between items-center text-[8px] text-white/50 px-1 font-mono">
+					<div className="flex items-center justify-between px-1 font-mono text-[8px] text-white/50">
 						<span>08:14 AM</span>
 						<div className="flex items-center gap-1">
-							<Icon name="Wifi" className="w-2 h-2" />
-							<Icon name="BatteryCharging" className="w-2.5 h-2.5" />
+							<Icon name="Wifi" className="h-2 w-2" />
+							<Icon name="BatteryCharging" className="h-2.5 w-2.5" />
 						</div>
 					</div>
 
 					{/* Step Screens */}
-					<div className="flex-1 flex flex-col justify-center items-center relative mt-4">
+					<div className="relative mt-4 flex flex-1 flex-col items-center justify-center">
 						{step === "idle" && (
-							<div className="text-center space-y-2">
-								<Icon name="Lock" className="w-8 h-8 mx-auto text-white/20" />
-								<p className="text-[10px] text-white/40">Waiting for trigger request...</p>
+							<div className="space-y-2 text-center">
+								<Icon name="Lock" className="mx-auto h-8 w-8 text-white/20" />
+								<p className="text-[10px] text-white/40">
+									Waiting for trigger request...
+								</p>
 							</div>
 						)}
 
 						{step === "notified" && (
-							<div className="w-full h-full flex flex-col justify-between py-4 items-center">
+							<div className="flex h-full w-full flex-col items-center justify-between py-4">
 								{/* Locked Screen Wallpaper Details */}
-								<div className="text-center pt-2">
-									<div className="text-2xl font-bold text-white/95">08:14</div>
-									<div className="text-[9px] text-white/60">Tuesday, July 7</div>
+								<div className="pt-2 text-center">
+									<div className="font-bold text-2xl text-white/95">08:14</div>
+									<div className="text-[9px] text-white/60">
+										Tuesday, July 7
+									</div>
 								</div>
 
 								{/* Animated Dropdown Push Notification Banner */}
@@ -105,44 +113,61 @@ export default function PasswordResetWidget() {
 									initial={{ y: -60, opacity: 0 }}
 									animate={{ y: 0, opacity: 1 }}
 									onClick={openResetForm}
-									className="bg-slate-900/90 border border-white/10 p-2.5 rounded-xl shadow-2xl flex flex-col gap-1 w-full text-left cursor-pointer hover:border-orange-500/30 transition-colors"
+									className="flex w-full cursor-pointer flex-col gap-1 rounded-xl border border-white/10 bg-slate-900/90 p-2.5 text-left shadow-2xl transition-colors hover:border-orange-500/30"
 								>
-									<div className="flex justify-between items-center">
-										<span className="font-bold text-[9px] text-orange-400">🛡️ Reloop Identity</span>
+									<div className="flex items-center justify-between">
+										<span className="font-bold text-[9px] text-orange-400">
+											🛡️ Reloop Identity
+										</span>
 										<span className="text-[8px] text-white/30">now</span>
 									</div>
-									<p className="text-[10px] text-white font-medium">Reset your password</p>
-									<p className="text-[9px] text-white/60">Click here to complete password update token verification.</p>
+									<p className="font-medium text-[10px] text-white">
+										Reset your password
+									</p>
+									<p className="text-[9px] text-white/60">
+										Click here to complete password update token verification.
+									</p>
 								</motion.div>
 
-								<span className="text-[8px] text-white/30 animate-pulse mt-2">Tap notification to open</span>
+								<span className="mt-2 animate-pulse text-[8px] text-white/30">
+									Tap notification to open
+								</span>
 							</div>
 						)}
 
 						{step === "form" && (
-							<form onSubmit={submitNewPassword} className="w-full flex flex-col gap-2">
-								<h4 className="text-[11px] font-bold text-white/95 text-center mb-1">Set New Password</h4>
-								
+							<form
+								onSubmit={submitNewPassword}
+								className="flex w-full flex-col gap-2"
+							>
+								<h4 className="mb-1 text-center font-bold text-[11px] text-white/95">
+									Set New Password
+								</h4>
+
 								<input
 									type="password"
 									placeholder="New Password"
 									value={pass}
 									onChange={(e) => setPass(e.target.value)}
-									className="w-full bg-slate-900 border border-white/10 rounded px-2 py-1 text-[10px] text-white focus:outline-none focus:border-orange-500/50"
+									className="w-full rounded border border-white/10 bg-slate-900 px-2 py-1 text-[10px] text-white focus:border-orange-500/50 focus:outline-none"
 								/>
 								<input
 									type="password"
 									placeholder="Confirm Password"
 									value={confirm}
 									onChange={(e) => setConfirm(e.target.value)}
-									className="w-full bg-slate-900 border border-white/10 rounded px-2 py-1 text-[10px] text-white focus:outline-none focus:border-orange-500/50"
+									className="w-full rounded border border-white/10 bg-slate-900 px-2 py-1 text-[10px] text-white focus:border-orange-500/50 focus:outline-none"
 								/>
 
-								{error && <p className="text-[8px] text-red-400 text-center leading-normal">{error}</p>}
+								{error && (
+									<p className="text-center text-[8px] text-red-400 leading-normal">
+										{error}
+									</p>
+								)}
 
 								<button
 									type="submit"
-									className="w-full bg-orange-600 hover:bg-orange-500 text-white font-semibold py-1 rounded text-[10px] transition-colors cursor-pointer"
+									className="w-full cursor-pointer rounded bg-orange-600 py-1 font-semibold text-[10px] text-white transition-colors hover:bg-orange-500"
 								>
 									Update Password
 								</button>
@@ -153,13 +178,17 @@ export default function PasswordResetWidget() {
 							<motion.div
 								initial={{ scale: 0.8, opacity: 0 }}
 								animate={{ scale: 1, opacity: 1 }}
-								className="text-center space-y-2 flex flex-col items-center"
+								className="flex flex-col items-center space-y-2 text-center"
 							>
-								<div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center border border-green-500/50">
-									<Icon name="Check" className="w-5 h-5 text-green-400" />
+								<div className="flex h-10 w-10 items-center justify-center rounded-full border border-green-500/50 bg-green-500/20">
+									<Icon name="Check" className="h-5 w-5 text-green-400" />
 								</div>
-								<h4 className="text-[11px] font-bold text-white">Password Updated</h4>
-								<p className="text-[9px] text-white/50 leading-relaxed">Secure credentials successfully updated.</p>
+								<h4 className="font-bold text-[11px] text-white">
+									Password Updated
+								</h4>
+								<p className="text-[9px] text-white/50 leading-relaxed">
+									Secure credentials successfully updated.
+								</p>
 							</motion.div>
 						)}
 					</div>
