@@ -19,7 +19,7 @@ export function RybbitLoader() {
 	return (
 		<Script
 			id="rybbit-sdk"
-			src="/api/script.js"
+			src="/api/analytics/script.js"
 			data-site-id="1fb7d359339f"
 			strategy="afterInteractive"
 		/>

@@ -20,6 +20,15 @@ const nextConfig: NextConfig = {
 					},
 				],
 			},
+			{
+				source: "/api/analytics/script.js",
+				headers: [
+					{
+						key: "Cache-Control",
+						value: "public, max-age=86400, stale-while-revalidate=604800",
+					},
+				],
+			},
 		];
 	},
 	images: {
@@ -33,15 +42,15 @@ const nextConfig: NextConfig = {
 	async rewrites() {
 		return [
 			{
-				source: "/api/script.js",
+				source: "/api/analytics/script.js",
 				destination: "https://rybbit.reloop.sh/api/script.js",
 			},
 			{
-				source: "/api/track",
+				source: "/api/analytics/track",
 				destination: "https://rybbit.reloop.sh/api/track",
 			},
 			{
-				source: "/api/site/:path*",
+				source: "/api/analytics/site/:path*",
 				destination: "https://rybbit.reloop.sh/api/site/:path*",
 			},
 		];
