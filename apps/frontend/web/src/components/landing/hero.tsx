@@ -1,8 +1,53 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import * as Button from "@reloop/ui/button";
 import type React from "react";
 import type { FeatureCtaLink } from "./types";
+
+function HeroCtaLink({
+	href,
+	label,
+	external,
+	variant,
+}: {
+	href: string;
+	label: string;
+	external?: boolean;
+	variant: "primary" | "secondary";
+}) {
+	const className = cn(
+		"group inline-flex h-11 items-center justify-center overflow-hidden rounded-full px-8 font-semibold transition-colors duration-300",
+		variant === "primary"
+			? Button.buttonVariants({ variant: "neutral", mode: "filled" }).root()
+			: Button.buttonVariants({ variant: "neutral", mode: "stroke" }).root(),
+	);
+
+	const content = (
+		<span className="inline-flex items-center">
+			<span className="group-hover:-translate-x-1 transition-transform duration-300 ease-out">
+				{label}
+			</span>
+			<Icon
+				name="arrow-left"
+				className="ml-0 size-4 max-w-0 shrink-0 translate-x-1 rotate-180 opacity-0 transition-all duration-300 ease-out group-hover:ml-2 group-hover:max-w-4 group-hover:translate-x-0 group-hover:opacity-100"
+				aria-hidden
+			/>
+		</span>
+	);
+
+	return (
+		<a
+			href={href}
+			target={external ? "_blank" : undefined}
+			rel={external ? "noopener noreferrer" : undefined}
+			className={className}
+		>
+			{content}
+		</a>
+	);
+}
 
 export function FeatureHero({
 	titleLines,
@@ -70,31 +115,19 @@ export function FeatureHero({
 										: "mt-7 flex flex-wrap items-center justify-center gap-4"
 								}
 							>
-								<a
+								<HeroCtaLink
 									href={primaryCta.href}
-									target={primaryCta.external ? "_blank" : undefined}
-									rel={primaryCta.external ? "noopener noreferrer" : undefined}
-									className={`${Button.buttonVariants({
-										variant: "neutral",
-										mode: "filled",
-									}).root()} h-11! rounded-full! px-8! font-semibold`}
-								>
-									{primaryCta.label}
-								</a>
+									label={primaryCta.label}
+									external={primaryCta.external}
+									variant="primary"
+								/>
 								{secondaryCta && (
-									<a
+									<HeroCtaLink
 										href={secondaryCta.href}
-										target={secondaryCta.external ? "_blank" : undefined}
-										rel={
-											secondaryCta.external ? "noopener noreferrer" : undefined
-										}
-										className={`${Button.buttonVariants({
-											variant: "neutral",
-											mode: "stroke",
-										}).root()} h-11! rounded-full! px-8! font-semibold`}
-									>
-										{secondaryCta.label}
-									</a>
+										label={secondaryCta.label}
+										external={secondaryCta.external}
+										variant="secondary"
+									/>
 								)}
 							</div>
 						)}
