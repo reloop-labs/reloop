@@ -240,9 +240,10 @@ export default function OpenGraphImage() {
 							fontWeight: 700,
 							color: "#ffffff",
 							letterSpacing: "-0.5px",
+							marginLeft: "-14px",
 						}}
 					>
-						reloop
+						Reloop
 					</span>
 				</div>
 			</div>
