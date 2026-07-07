@@ -1,0 +1,50 @@
+---
+title: FastAPI
+description: Learn how to integrate Reloop with FastAPI to send emails.
+---
+
+# FastAPI Integration
+
+Reloop can be easily integrated into any FastAPI application.
+
+## Installation
+
+Install the official Python SDK:
+
+```bash
+pip install reloop-python
+```
+
+## Setup Environment Variables
+
+Add your API key to your environment:
+
+```bash
+export RELOOP_API_KEY="re_your_api_key_here"
+```
+
+## Sending an Email
+
+Here is a simple FastAPI route that sends an email:
+
+```python
+import os
+from fastapi import FastAPI, HTTPException
+from reloop import Reloop
+
+app = FastAPI()
+reloop = Reloop(api_key=os.environ.get("RELOOP_API_KEY"))
+
+@app.post("/send-email")
+async def send_email():
+    try:
+        response = reloop.emails.send(
+            sender="onboarding@reloop.dev",
+            to="delivered@resend.dev",
+            subject="Hello from FastAPI",
+            html="<p>Congrats on sending your first email via Reloop from FastAPI!</p>"
+        )
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+```

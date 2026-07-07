@@ -1,0 +1,58 @@
+---
+title: Laravel
+description: Learn how to integrate Reloop with Laravel.
+---
+
+# Laravel Integration
+
+Integrate Reloop into your Laravel application.
+
+## Installation
+
+Install the official PHP SDK via Composer:
+
+```bash
+composer require reloop-labs/reloop-php
+```
+
+## Setup Configuration
+
+Add the API key to your `.env` file:
+
+```env
+RELOOP_API_KEY=re_your_api_key_here
+```
+
+## Sending an Email
+
+Here is an example of sending an email from a controller:
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Reloop\ReloopClient;
+
+class EmailController extends Controller
+{
+    public function send()
+    {
+        $reloop = new ReloopClient(env('RELOOP_API_KEY'));
+
+        try {
+            $response = $reloop->emails.send([
+                'from' => 'onboarding@reloop.dev',
+                'to' => 'delivered@resend.dev',
+                'subject' => 'Hello from Laravel',
+                'html' => '<p>Congrats on sending your first email via Reloop from Laravel!</p>',
+            ]);
+
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+}
+```

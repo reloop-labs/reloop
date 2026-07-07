@@ -5,6 +5,7 @@
 	"pages": [
 		"---Documentation---",
 		"index",
+		"examples",
 		"features",
 		"integrations",
 		"resources",

@@ -1,0 +1,41 @@
+---
+title: Flask
+description: Learn how to integrate Reloop with Flask to send emails.
+---
+
+# Flask Integration
+
+Integrate Reloop into your Flask application.
+
+## Installation
+
+```bash
+pip install reloop-python
+```
+
+## Sending an Email
+
+```python
+import os
+from flask import Flask, jsonify
+from reloop import Reloop
+
+app = Flask(__name__)
+reloop = Reloop(api_key=os.environ.get("RELOOP_API_KEY"))
+
+@app.route("/send-email", methods=["POST"])
+def send_email():
+    try:
+        response = reloop.emails.send(
+            sender="onboarding@reloop.dev",
+            to="delivered@resend.dev",
+            subject="Hello from Flask",
+            html="<p>Congrats on sending your first email via Reloop from Flask!</p>"
+        )
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == "__main__":
+    app.run(port=5000)
+```

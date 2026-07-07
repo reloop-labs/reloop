@@ -41,6 +41,8 @@ export function DefaultSidebarFolder({
 	const isOpen = openFolders.has(node.url);
 	const handleToggle = () => toggleFolder(node.url);
 
+	const isLanguageFolder = node.url.startsWith("/examples/");
+
 	return (
 		<div className="space-y-px">
 			<button
@@ -63,8 +65,8 @@ export function DefaultSidebarFolder({
 							: "text-text-sub-600 hover:text-primary-base",
 				)}
 			>
-				<div className="relative z-10 flex w-full items-center gap-2 text-left">
-					{node.icon && (
+				<div className="relative z-10 flex w-full items-center gap-2 text-left min-w-0">
+					{!isLanguageFolder && node.icon && (
 						<span
 							className={cn(
 								"flex h-4 w-4 shrink-0 items-center justify-center transition-colors",
@@ -78,15 +80,29 @@ export function DefaultSidebarFolder({
 					)}
 					<span className="truncate">{node.name as string}</span>
 				</div>
-				<ChevronRight
-					className={cn(
-						"relative z-10 h-3.5 w-3.5 transition-transform duration-200",
-						isActive
-							? "text-primary-base"
-							: "text-text-sub-600 opacity-50 group-hover:text-primary-base",
-						isOpen && "rotate-90",
+				<div className="relative z-10 flex items-center gap-1.5 shrink-0">
+					{isLanguageFolder && node.icon && (
+						<span
+							className={cn(
+								"flex h-4 w-4 shrink-0 items-center justify-center transition-colors",
+								isActive
+									? "text-primary-base"
+									: "text-text-sub-600 opacity-70 group-hover:text-primary-base group-hover:opacity-100",
+							)}
+						>
+							{node.icon}
+						</span>
 					)}
-				/>
+					<ChevronRight
+						className={cn(
+							"h-3.5 w-3.5 transition-transform duration-200",
+							isActive
+								? "text-primary-base"
+								: "text-text-sub-600 opacity-50 group-hover:text-primary-base",
+							isOpen && "rotate-90",
+						)}
+					/>
+				</div>
 			</button>
 
 			<AnimatePresence initial={false}>

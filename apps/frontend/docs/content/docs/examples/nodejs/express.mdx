@@ -1,0 +1,55 @@
+---
+title: Express
+description: Learn how to integrate Reloop with Express to send emails and handle webhook events.
+---
+
+# Express Integration
+
+Reloop can be easily integrated into any Express application.
+
+## Installation
+
+Install the official Node.js SDK:
+
+```bash
+npm install reloop-email
+```
+
+## Setup Environment Variables
+
+Add your Reloop API key to your environment variables or a `.env` file:
+
+```env
+RELOOP_API_KEY=re_your_api_key_here
+```
+
+## Sending an Email
+
+Here is an example of an Express route that sends an email:
+
+```typescript
+import express from 'express';
+import Reloop from 'reloop-email';
+
+const app = express();
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+app.post('/send-email', async (req, res) => {
+  try {
+    const data = await reloop.emails.send({
+      from: 'onboarding@reloop.dev',
+      to: 'delivered@resend.dev',
+      subject: 'Hello from Express',
+      html: '<p>Congrats on sending your first email via Reloop from an Express app!</p>',
+    });
+
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+});
+
+app.listen(3000, () => {
+  console.log('App listening on port 3000');
+});
+```

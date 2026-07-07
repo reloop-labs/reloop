@@ -1,0 +1,50 @@
+---
+title: Django
+description: Learn how to integrate Reloop with Django to send emails.
+---
+
+# Django Integration
+
+Integrate Reloop into your Django application using the Python SDK.
+
+## Installation
+
+```bash
+pip install reloop-python
+```
+
+## Setup settings.py
+
+Add your API key to your settings:
+
+```python
+# settings.py
+import os
+
+RELOOP_API_KEY = os.environ.get("RELOOP_API_KEY", "re_your_api_key_here")
+```
+
+## Sending an Email
+
+Use the client within your Django views:
+
+```python
+from django.http import JsonResponse
+from django.conf import settings
+from reloop import Reloop
+
+reloop = Reloop(api_key=settings.RELOOP_API_KEY)
+
+def send_email_view(request):
+    if request.method == 'POST':
+        try:
+            response = reloop.emails.send(
+                sender="onboarding@reloop.dev",
+                to="delivered@resend.dev",
+                subject="Hello from Django",
+                html="<p>Congrats on sending your first email via Reloop from Django!</p>"
+            )
+            return JsonResponse(response)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+```

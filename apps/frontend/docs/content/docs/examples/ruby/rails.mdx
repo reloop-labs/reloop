@@ -1,0 +1,54 @@
+---
+title: Rails
+description: Learn how to integrate Reloop with Ruby on Rails.
+---
+
+# Rails Integration
+
+Integrate Reloop into your Ruby on Rails application.
+
+## Installation
+
+Add the official Ruby SDK to your Gemfile:
+
+```ruby
+gem 'reloop-ruby'
+```
+
+And run:
+
+```bash
+bundle install
+```
+
+## Setup Credentials
+
+Set your API key in your environment variables:
+
+```bash
+export RELOOP_API_KEY="re_your_api_key_here"
+```
+
+## Sending an Email
+
+Define a controller or a mailer to send emails:
+
+```ruby
+class EmailsController < ApplicationController
+  def create
+    reloop = Reloop::Client.new(api_key: ENV['RELOOP_API_KEY'])
+    
+    begin
+      response = reloop.emails.send(
+        from: 'onboarding@reloop.dev',
+        to: 'delivered@resend.dev',
+        subject: 'Hello from Rails',
+        html: '<p>Congrats on sending your first email via Reloop from Ruby on Rails!</p>'
+      )
+      render json: response
+    rescue => e
+      render json: { error: e.message }, status: :internal_server_error
+    end
+  end
+end
+```

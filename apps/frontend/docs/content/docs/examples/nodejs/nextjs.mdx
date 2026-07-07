@@ -1,0 +1,50 @@
+---
+title: Next.js
+description: Learn how to integrate Reloop into a Next.js application to send transactional emails and handle agent inboxes.
+---
+
+# Next.js Integration
+
+Reloop is easy to integrate with Next.js, whether you are using the App Router or Pages Router.
+
+## Installation
+
+First, install the official Node.js SDK:
+
+```bash
+npm install reloop-email
+```
+
+## Setup Environment Variables
+
+Add your Reloop API key to your `.env.local` file:
+
+```env
+RELOOP_API_KEY=re_your_api_key_here
+```
+
+## Sending an Email
+
+You can send emails from a Next.js Server Action or Route Handler. Here is an example of a Route Handler:
+
+```typescript
+import { NextResponse } from 'next/server';
+import Reloop from 'reloop-email';
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+export async function POST() {
+  try {
+    const data = await reloop.emails.send({
+      from: 'onboarding@reloop.dev',
+      to: 'delivered@resend.dev',
+      subject: 'Hello World',
+      html: '<p>Congrats on sending your first email via Reloop!</p>',
+    });
+
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json({ error }, { status: 500 });
+  }
+}
+```

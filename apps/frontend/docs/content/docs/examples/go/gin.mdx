@@ -1,0 +1,55 @@
+---
+title: Gin
+description: Learn how to integrate Reloop with Gin to send emails.
+---
+
+# Gin Integration
+
+Integrate Reloop into your Go web application using the Gin framework.
+
+## Installation
+
+Install the official Go SDK:
+
+```bash
+go get github.com/reloop-labs/reloop-go
+```
+
+## Sending an Email
+
+```go
+package main
+
+import (
+	"context"
+	"net/http"
+	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/reloop-labs/reloop-go"
+)
+
+func main() {
+	r := gin.Default()
+	client := reloop.NewClient(os.Getenv("RELOOP_API_KEY"))
+
+	r.POST("/send-email", func(c *gin.Context) {
+		params := &reloop.SendEmailParams{
+			From:    "onboarding@reloop.dev",
+			To:      []string{"delivered@resend.dev"},
+			Subject: "Hello from Gin",
+			HTML:    "<p>Congrats on sending your first email via Reloop from Go Gin!</p>",
+		}
+
+		res, err := client.Emails.Send(context.Background(), params)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, res)
+	})
+
+	r.Run(":8080")
+}
+```

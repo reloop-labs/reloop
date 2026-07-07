@@ -1,0 +1,9 @@
+{
+	"title": "Python",
+	"icon": "siPython",
+	"pages": [
+		"fastapi",
+		"django",
+		"flask"
+	]
+}
