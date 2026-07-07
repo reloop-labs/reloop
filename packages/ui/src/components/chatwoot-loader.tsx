@@ -26,7 +26,7 @@ declare global {
 			toggle: (action?: "open" | "close") => void;
 		};
 		chatwootSettings?: {
-			launcherNeed?: boolean;
+			hideMessageBubble?: boolean;
 		};
 	}
 }
@@ -38,7 +38,7 @@ export function ChatwootLoader() {
 
 	if (typeof window !== "undefined") {
 		window.chatwootSettings = {
-			launcherNeed: false,
+			hideMessageBubble: true,
 		};
 	}
 
