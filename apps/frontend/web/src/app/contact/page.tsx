@@ -5,7 +5,7 @@ import { ContactPanel } from "./contact-form";
 
 function CheckItem({ children }: { children: React.ReactNode }) {
 	return (
-		<li className="flex items-start gap-3 text-[15px] text-text-sub-600 leading-relaxed dark:text-white/55">
+		<li className="flex items-start gap-3 text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/55">
 			<span
 				className="mt-0.5 flex size-[18px] shrink-0 items-center justify-center rounded-full bg-text-strong-950 dark:bg-white"
 				aria-hidden="true"
@@ -91,14 +91,14 @@ const ContactPage = () => {
 				{JSON.stringify(contactPageSchema)}
 			</Script>
 
-			<section className="flex min-h-[calc(100dvh-4.5rem)] items-center bg-bg-white-0 dark:bg-black">
-				<div className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6">
-					<div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16 xl:gap-20">
-						<div>
-							<h1 className="font-serif text-[2.5rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3rem] dark:text-white">
+			<section className="min-h-dvh bg-bg-white-0 pt-16 dark:bg-black lg:flex lg:items-center">
+				<div className="mx-auto w-full max-w-4xl px-5 pb-10 pt-6 sm:px-6 sm:pb-12 sm:pt-8 lg:py-12">
+					<div className="grid items-start gap-8 sm:gap-10 lg:grid-cols-2 lg:gap-16 xl:gap-20">
+						<div className="min-w-0">
+							<h1 className="font-serif text-[2rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.5rem] lg:text-[3rem] dark:text-white">
 								Contact support
 							</h1>
-							<ul className="mt-8 space-y-4">
+							<ul className="mt-6 space-y-3.5 sm:mt-8 sm:space-y-4">
 								<CheckItem>Ask product questions</CheckItem>
 								<CheckItem>
 									Report problems or unexpected behaviour
@@ -106,7 +106,9 @@ const ContactPage = () => {
 								<CheckItem>Leave feedback</CheckItem>
 							</ul>
 						</div>
-						<ContactPanel />
+						<div className="min-w-0 lg:pt-1">
+							<ContactPanel />
+						</div>
 					</div>
 				</div>
 			</section>
