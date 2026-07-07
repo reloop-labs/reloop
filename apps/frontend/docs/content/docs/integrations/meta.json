@@ -1,5 +1,5 @@
 {
 	"title": "Integration",
 	"icon": "workflow",
-	"pages": ["index"]
+	"pages": ["index", "n8n", "make", "zapier", "wordpress"]
 }

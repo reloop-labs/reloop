@@ -1,0 +1,95 @@
+---
+title: n8n Integration
+sidebarTitle: n8n
+icon: "siN8n"
+description: Automate email notifications and notifications triggers by connecting n8n workflows with Reloop.
+---
+
+[n8n](https://n8n.io) is a fair-code, extendable workflow automation tool. You can connect Reloop to your n8n workflows using either:
+
+1. **SMTP Connection** (using n8n's built-in **Send Email** node)
+2. **REST API Connection** (using n8n's built-in **HTTP Request** node)
+
+---
+
+## Method 1: SMTP via n8n's Send Email Node
+
+You can route emails directly using n8n's native **Send Email** node configured with Reloop's SMTP credentials.
+
+### Step 1: Add the Send Email Node
+1. Inside your n8n workflow editor, click the **+** icon to add a node.
+2. Search for and select the **Send Email** node.
+
+### Step 2: Configure Credentials
+1. Under **Credential for Send Email**, select **Create New Credential**.
+2. Set the connection settings as follows:
+
+| Parameter | Value |
+| :--- | :--- |
+| **Host** | `smtp.reloop.dev` |
+| **Port** | `587` |
+| **SSL/TLS** | `STARTTLS` (enabled via toggle / selection) |
+| **User** | *Your Reloop API Key* (starts with `rl_`) |
+| **Password** | *Your Reloop API Key* (starts with `rl_`) |
+
+3. Save the credential.
+
+### Step 3: Set Email Parameters
+Configure the email body and headers:
+- **From Email**: Enter a verified email address from your Reloop sending domain (e.g., `app@yourdomain.com`).
+- **To Email**: Map the recipient's email address dynamically from prior nodes.
+- **Subject**: Enter a subject line.
+- **HTML / Text**: Choose your email body format and insert your content.
+
+---
+
+## Method 2: REST API via HTTP Request Node
+
+Use n8n's **HTTP Request** node to access advanced API features such as templating, tag tracking, attachments, or scheduling.
+
+### Step 1: Add the HTTP Request Node
+1. Click the **+** icon to add a new node.
+2. Search for and select **HTTP Request**.
+
+### Step 2: Configure Node Parameters
+Configure the node parameters for the Reloop Send Mail API:
+
+- **Method**: `POST`
+- **URL**: `https://reloop.sh/api/mail/v1/send`
+- **Authentication**: `Header Auth` (or choose None and add it manually in Headers)
+- **Headers**:
+  - Name: `x-api-key`
+  - Value: *Your Reloop API Key*
+  - Name: `Content-Type`
+  - Value: `application/json`
+- **Specify Body**: `Using JSON`
+- **Body Parameters**: Toggle to **JSON** format and enter the payload:
+```json
+{
+  "from": "Marketing <marketing@yourdomain.com>",
+  "to": "={{ $json.email }}",
+  "subject": "Thank you for subscribing!",
+  "html": "<h1>Welcome {{ $json.name }}!</h1><p>We are glad to have you aboard.</p>",
+  "tags": [
+    {
+      "name": "campaign",
+      "value": "onboarding_n8n"
+    }
+  ]
+}
+```
+*Note: Use n8n's expression syntax `={{ ... }}` to pull data from your webhook or database triggers.*
+
+---
+
+## Step 3: Test and Verify
+1. Click **Test step** or **Execute Node** in n8n.
+2. Inspect the JSON response to ensure it returns a success confirmation:
+```json
+{
+  "success": true,
+  "messageId": "msg_8d8b9c2a1e...",
+  "status": "sent"
+}
+```
+3. Check your recipient inbox and check the **Reloop Dashboard Logs** to confirm the email was delivered successfully.

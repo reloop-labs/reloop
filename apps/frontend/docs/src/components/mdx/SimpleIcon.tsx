@@ -24,10 +24,17 @@ import {
 	siPython,
 	siRailway,
 	siReadthedocs,
+	siReplit,
 	siRuby,
 	siRubyonrails,
 	siRust,
+	siV0,
 	siVercel,
+	siWindsurf,
+	siN8n,
+	siMake,
+	siZapier,
+	siWordpress,
 } from "simple-icons";
 
 const Icons: Record<string, SimpleIconType> = {
@@ -56,6 +63,13 @@ const Icons: Record<string, SimpleIconType> = {
 	siDjango,
 	siFlask,
 	siGin,
+	siReplit,
+	siV0,
+	siWindsurf,
+	siN8n,
+	siMake,
+	siZapier,
+	siWordpress,
 };
 
 interface SimpleIconProps extends Omit<SVGProps<SVGSVGElement>, "ref"> {

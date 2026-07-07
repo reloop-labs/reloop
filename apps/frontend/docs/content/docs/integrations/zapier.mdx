@@ -1,0 +1,89 @@
+---
+title: Zapier Integration
+sidebarTitle: Zapier
+icon: "siZapier"
+description: Connect Reloop with thousands of apps using Zapier to automate email sending workflows.
+---
+
+[Zapier](https://zapier.com) is the leading workflow automation platform. You can integrate Reloop with Zapier in two ways to send emails when triggers happen in other apps (like CRM updates, new form responses, or database inserts):
+
+1. **SMTP Integration** (using Zapier's built-in **SMTP by Zapier** action)
+2. **API Integration** (using Zapier's built-in **Webhooks by Zapier** action)
+
+---
+
+## Method 1: SMTP by Zapier
+
+This is the easiest way to send plain text or HTML emails from any app trigger without writing API payloads.
+
+### Step 1: Add a Trigger
+Create a new Zap and configure the trigger app (e.g., Google Sheets, Typeform, Stripe).
+
+### Step 2: Add the "SMTP by Zapier" Action
+1. Search for and select **SMTP by Zapier** as your action step.
+2. Select **Send Email** as the Event and click **Continue**.
+
+### Step 3: Connect Reloop SMTP
+In the **Choose Account** tab, set up the SMTP server configuration:
+
+| Field | Value |
+| :--- | :--- |
+| **SMTP Host** | `smtp.reloop.dev` |
+| **SMTP Port** | `587` |
+| **Username** | *Your Reloop API Key* (starts with `rl_`) |
+| **Password** | *Your Reloop API Key* (starts with `rl_`) |
+| **Security/Encryption** | `TLS` or `STARTTLS` |
+
+### Step 4: Configure Email Fields
+Set up the message template by mapping dynamic fields from your trigger step:
+- **From Email**: Enter a verified email address from your Reloop sending domain (e.g., `notification@yourdomain.com`).
+- **To**: Select the recipient's email address from your trigger.
+- **Subject**: Enter the subject line (you can mix static text and dynamic fields).
+- **Body (HTML or Text)**: Enter the body of the email. Set **Format** to `html` if you want to send styled content.
+
+---
+
+## Method 2: Webhooks by Zapier (REST API)
+
+Use this method if you need advanced features like email tagging, custom headers, scheduling emails to send later, or attachments.
+
+### Step 1: Add a Trigger
+Set up your Zap's trigger step.
+
+### Step 2: Add Webhooks by Zapier
+1. Add a new action step and select **Webhooks by Zapier**.
+2. Select **Custom Request** or **POST** as the Event and click **Continue**.
+
+### Step 3: Configure the API Request
+Fill out the API endpoint details exactly as follows:
+
+- **Method**: `POST`
+- **URL**: `https://reloop.sh/api/mail/v1/send`
+- **Data (Payload)**: Define your email parameters in JSON format. For example:
+```json
+{
+  "from": "Your Company <hello@yourdomain.com>",
+  "to": "recipient@example.com",
+  "subject": "Hello from Zapier Webhook!",
+  "html": "<p>Hi {{first_name}}, this email was sent automatically.</p>",
+  "tags": [
+    {
+      "name": "source",
+      "value": "zapier"
+    }
+  ]
+}
+```
+*Note: Replace `{{first_name}}` and `recipient@example.com` with dynamic values from your Zap trigger.*
+
+- **Headers**: Add the following headers for authorization:
+
+| Header Name | Value |
+| :--- | :--- |
+| **x-api-key** | *Your Reloop API Key* |
+| **Content-Type** | `application/json` |
+
+---
+
+## Step 4: Test your Zap
+Click **Test Step** in Zapier. You should receive a `200 OK` response with a `messageId`. Verify the message has arrived in the recipient's inbox and appears under the Logs tab in your **Reloop Dashboard**.

@@ -1,0 +1,91 @@
+---
+title: Make.com Integration
+sidebarTitle: Make.com
+icon: "siMake"
+description: Build complex, visual automation scenarios in Make.com to trigger emails through Reloop.
+---
+
+[Make.com](https://make.com) (formerly Integromat) is a powerful visual automation platform. You can connect Reloop to any Make scenario using either:
+
+1. **SMTP Connection** (using Make's built-in **Email** app)
+2. **REST API Connection** (using Make's built-in **HTTP** app)
+
+---
+
+## Method 1: SMTP via Make's Email App
+
+The standard **Email** app in Make allows you to send transactional messages instantly using Reloop SMTP.
+
+### Step 1: Add the Email Module
+1. In your Make scenario, click **Add module** (+).
+2. Search for and select the **Email** app.
+3. Select the **Send an email** module.
+
+### Step 2: Create a Connection
+1. Click **Add** next to the **Connection** drop-down.
+2. Choose **Other SMTP server** as your connection type.
+3. Configure the connection settings:
+   - **Connection name**: `Reloop SMTP`
+   - **SMTP server**: `smtp.reloop.dev`
+   - **Port**: `587`
+   - **Use secure connection**: `TLS` or `STARTTLS` (recommended)
+   - **Username**: *Your Reloop API Key* (starts with `rl_`)
+   - **Password**: *Your Reloop API Key* (starts with `rl_`)
+
+4. Click **Save**.
+
+### Step 3: Map Email Details
+Configure the fields inside the Email module:
+- **To**: Add recipients (use dynamic values from previous nodes, e.g., CRM contacts).
+- **Subject**: Enter a subject line.
+- **Content**: Choose `HTML` or `Plain Text` and compose your message body.
+- **Sender**: Click **Show advanced settings** and enter a verified sender email address from your Reloop dashboard (e.g., `sales@yourdomain.com`).
+
+---
+
+## Method 2: REST API via Make's HTTP App
+
+If you want to use advanced features like email templates, tagging, or attachment files from Google Drive or Dropbox, you can call the Reloop API directly.
+
+### Step 1: Add the HTTP Module
+1. In your Make scenario, click **Add module**.
+2. Search for and select the **HTTP** app.
+3. Select the **Make a request** module.
+
+### Step 2: Configure the API Request
+Configure the module fields as follows:
+
+- **URL**: `https://reloop.sh/api/mail/v1/send`
+- **Method**: `POST`
+- **Headers**:
+  - Item 1:
+    - **Name**: `x-api-key`
+    - **Value**: *Your Reloop API Key* (starts with `rl_`)
+  - Item 2:
+    - **Name**: `Content-Type`
+    - **Value**: `application/json`
+- **Body type**: `Raw`
+- **Content type**: `JSON (application/json)`
+- **Request content**: Compose the JSON payload. For example:
+```json
+{
+  "from": "Support Team <support@yourdomain.com>",
+  "to": "{{1.email}}",
+  "subject": "Ticket Resolved",
+  "html": "<p>Hi {{1.name}}, your support ticket has been closed.</p>",
+  "tags": [
+    {
+      "name": "type",
+      "value": "transactional"
+    }
+  ]
+}
+```
+*Note: Replace `{{1.email}}` and `{{1.name}}` with mapping variables from previous nodes in your Make scenario.*
+
+- **Parse response**: `Yes` (this allows subsequent nodes to easily reference the `messageId` and status).
+
+---
+
+## Step 3: Run the Scenario
+Click **Run once** at the bottom left of the Make dashboard to test. Verify the execution bubbles show green checkboxes, check the recipient's inbox, and inspect the delivery logs in the **Reloop Dashboard**.

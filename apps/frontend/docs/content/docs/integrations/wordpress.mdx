@@ -1,0 +1,78 @@
+---
+title: WordPress Integration
+sidebarTitle: WordPress
+icon: "siWordpress"
+description: Configure WordPress to send all transactional and site emails via Reloop's SMTP relay.
+---
+
+By default, WordPress sends transactional emails (like password resets, user registrations, and order notifications) using PHP's built-in `mail()` function. These emails often lack authentication and end up in the spam folder.
+
+Using **Reloop SMTP** ensures your WordPress emails are fully authenticated with SPF, DKIM, and DMARC, leading to high inbox delivery rates.
+
+---
+
+## Prerequisites
+
+Before starting, make sure you have:
+1. A verified sending domain in your [Reloop Dashboard](https://app.reloop.dev).
+2. A Reloop API Key (which acts as your SMTP username and password).
+
+---
+
+## Step 1: Install an SMTP Plugin
+
+To route WordPress emails through Reloop, you need to install an SMTP plugin. We recommend **WP Mail SMTP** (the most popular free option), but any standard SMTP plugin will work.
+
+1. Log in to your WordPress Admin Dashboard.
+2. Go to **Plugins** → **Add New**.
+3. Search for **WP Mail SMTP**.
+4. Click **Install Now** and then **Activate**.
+
+---
+
+## Step 2: Configure SMTP Settings
+
+1. In your WordPress dashboard, navigate to **WP Mail SMTP** → **Settings**.
+2. Under the **General** tab, configure the following:
+   - **From Email**: Enter a verified email address from your Reloop sending domain (e.g., `info@yourdomain.com`). Check the **Force From Email** box to ensure consistency.
+   - **From Name**: The sender name you want your recipients to see.
+3. Scroll down to the **Mailer** section and select **Other SMTP**.
+
+   ![WP Mail SMTP Other SMTP Configuration](https://raw.githubusercontent.com/reloop-labs/reloop/main/assets/wp-mail-smtp-other.png)
+
+4. Enter the Reloop SMTP credentials under the **Other SMTP** settings:
+
+| Setting | Value |
+| :--- | :--- |
+| **SMTP Host** | `smtp.reloop.dev` |
+| **Encryption** | `TLS` (or `STARTTLS` depending on the plugin) |
+| **SMTP Port** | `587` |
+| **Auto TLS** | **ON** |
+| **Authentication** | **ON** |
+| **SMTP Username** | *Your Reloop API Key* (starts with `rl_`) |
+| **SMTP Password** | *Your Reloop API Key* (starts with `rl_`) |
+
+5. Click **Save Settings**.
+
+---
+
+## Step 3: Send a Test Email
+
+Verify that WordPress can successfully connect and send emails through Reloop.
+
+1. In the WP Mail SMTP menu, go to the **Tools** tab (or **Email Test**).
+2. In the **Send To** field, enter your personal email address.
+3. Click **Send Email**.
+4. Check your inbox (and spam folder) for the test message. Once received, check your **Reloop Dashboard Logs** to see the delivery metrics and headers.
+
+---
+
+## Troubleshooting
+
+### Email Bounced with "Domain Verification Required"
+Verify that the **From Email** configured in WP Mail SMTP belongs to a domain you have added and fully verified (with valid MX, TXT, and CNAME records) in the Reloop dashboard. Reloop will block emails sent from unverified domains.
+
+### Connection Timeout (Port 587 Blocked)
+Some shared hosting providers block outgoing port `587` to prevent spam. If the connection fails or times out:
+1. Try changing the port to `2525` or `25` with `TLS` / `STARTTLS` encryption enabled.
+2. If those are blocked, contact your hosting provider's support team to request that they open outbound connections on port `587` for `smtp.reloop.dev`.

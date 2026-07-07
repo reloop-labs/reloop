@@ -158,6 +158,13 @@ Important notes:
 - [Email Best Practices Skill](https://docs.reloop.dev/docs/integrations/email-best-practices): Agent skill for production-ready email guidelines
 - [Agent Email Inbox](https://docs.reloop.dev/docs/integrations/agent-email-inbox): Give your AI agent its own email inbox
 
+## No-Code & Automation
+
+- [n8n Integration](https://docs.reloop.dev/docs/integrations/n8n): Guide on connecting n8n workflows with Reloop SMTP or API
+- [Make.com Integration](https://docs.reloop.dev/docs/integrations/make): Integrate Reloop email sending into Make scenarios
+- [Zapier Integration](https://docs.reloop.dev/docs/integrations/zapier): Connect Reloop with thousands of apps via Zapier Zaps
+- [WordPress Integration](https://docs.reloop.dev/docs/integrations/wordpress): Route WordPress site emails through Reloop SMTP
+
 ## Resources
 
 - [Examples](https://docs.reloop.dev/docs/resources/examples): Code examples and sample projects
