@@ -18,7 +18,7 @@ export const config: LandingPageDefinition = {
 	},
 	secondaryCta: {
 		label: "Stripe integration",
-		href: "/integrations/stripe-webhooks",
+		href: "/docs/integrations",
 	},
 	sections: [
 		{

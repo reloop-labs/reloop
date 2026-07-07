@@ -17,13 +17,6 @@ export function PersonaPageView({ config }: { config: LandingPageDefinition }) {
 			{/* Audience landing — bold gradient hero */}
 			<div className={`bg-gradient-to-br ${accent.code} text-white`}>
 				<div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24">
-					<nav className="mb-6 text-[13px] text-white/50">
-						<Link href="/for" className="hover:text-white">
-							Who it&apos;s for
-						</Link>
-						<span className="mx-2">/</span>
-						<span>{config.titleLines.join(" ")}</span>
-					</nav>
 					<h1 className="font-semibold text-4xl tracking-tight sm:text-5xl">
 						{extra.headline}
 					</h1>

@@ -97,7 +97,7 @@ export function MobilePreviewPageView() {
 			<ToolUpsell
 				title="Preview campaigns before send"
 				description="Design responsive emails in Reloop and preview across clients in the dashboard."
-				primaryHref="/features/campaign-builder"
+				primaryHref="/features/campaigns"
 				primaryLabel="Campaign builder"
 				secondaryHref="/dashboard/signup"
 				secondaryLabel="Start free"

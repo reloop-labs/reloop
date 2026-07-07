@@ -58,7 +58,7 @@ export const config: LandingPageDefinition = {
 	relatedLinks: [
 		{
 			label: "Vercel integration",
-			href: "/integrations/vercel",
+			href: "/docs/integrations",
 		},
 		{
 			label: "Node.js guide",

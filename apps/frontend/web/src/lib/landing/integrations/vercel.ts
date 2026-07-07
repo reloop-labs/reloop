@@ -13,7 +13,7 @@ export const config: LandingPageDefinition = {
 	},
 	secondaryCta: {
 		label: "Next.js guide",
-		href: "/integrations/nextjs",
+		href: "/docs/integrations",
 	},
 	sections: [
 		{

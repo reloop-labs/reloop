@@ -65,7 +65,7 @@ export const config: ToolDefinition = {
 		},
 		{
 			label: "Campaign Builder",
-			href: "/features/campaign-builder",
+			href: "/features/campaigns",
 		},
 	],
 };

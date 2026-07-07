@@ -88,11 +88,6 @@ const productFeatures = [
 		description: "Spam testing, reputation monitoring, and auth setup.",
 	},
 	{
-		title: "Marketing Teams",
-		href: "/marketing-teams",
-		description: "Collaborative campaign workspace for teams.",
-	},
-	{
 		title: "Languages & SDKs",
 		href: "/docs/resources/sdks",
 		description: "Quickstarts for every supported client library.",
@@ -109,11 +104,6 @@ const platformFeatures = [
 		title: "Webhooks",
 		href: "/features/webhooks",
 		description: "Real-time events for delivery and engagement.",
-	},
-	{
-		title: "Campaign Builder",
-		href: "/features/campaign-builder",
-		description: "Visual editor for on-brand campaigns.",
 	},
 ];
 

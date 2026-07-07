@@ -571,7 +571,7 @@ const OurProductBeliefsPage = () => {
 
 				<div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
 					<Link
-						href="/get-started"
+						href="/docs"
 						className={Button.buttonVariants({
 							variant: "neutral",
 						}).root({ className: "h-12 rounded-full px-8" })}

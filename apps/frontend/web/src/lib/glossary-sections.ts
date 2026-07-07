@@ -58,7 +58,7 @@ function section(
 export function getGlossarySections(): GlossarySection[] {
 	return [
 		section("Get started", [
-			{ title: "Get Started", href: "/get-started" },
+			{ title: "Get Started", href: "/docs" },
 			{ title: "Pricing", href: "/pricing" },
 			{ title: "Contact", href: "/contact" },
 			{ title: "Documentation", href: "/docs" },
@@ -85,25 +85,21 @@ export function getGlossarySections(): GlossarySection[] {
 		),
 		section("Integrations", landingLinks(integrationConfigs), {
 			title: "View all integrations",
-			href: "/integrations",
+			href: "/docs/integrations",
 		}),
-		section("Who it's for", landingLinks(personaConfigs), {
-			title: "See all teams",
-			href: "/for",
-		}),
+		section("Who it's for", landingLinks(personaConfigs)),
 		section(
 			"Features",
 			[
 				{ title: "AI Agents", href: "/features/ai-agents" },
-				{ title: "Campaign Builder", href: "/features/campaign-builder" },
+				{ title: "Campaign Builder", href: "/features/campaigns" },
 				{ title: "Campaigns", href: "/features/campaigns" },
 				{ title: "Deliverability", href: "/features/deliverability" },
 				{ title: "Developers", href: "/developers" },
 				{ title: "Email Analytics", href: "/features/email-analytics" },
 				{ title: "Email Templates", href: "/features/email-templates" },
 				{ title: "Email Validation", href: "/features/email-validation" },
-				{ title: "Integrations", href: "/integrations" },
-				{ title: "Marketing Teams", href: "/marketing-teams" },
+				{ title: "Integrations", href: "/docs/integrations" },
 				{ title: "SDKs", href: "/docs/resources/sdks" },
 				{ title: "SMTP Relay", href: "/features/smtp" },
 				{ title: "Transaction Emails", href: "/features/transaction-emails" },

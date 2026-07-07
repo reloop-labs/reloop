@@ -24,7 +24,7 @@ export function GlossaryTermPage({
 			titleLines={[term.title]}
 			description={term.description}
 			compactHero
-			primaryCta={{ label: "Get started", href: "/get-started" }}
+			primaryCta={{ label: "Get started", href: "/docs" }}
 			secondaryCta={
 				term.relatedFeatureHref
 					? { label: "Related feature", href: term.relatedFeatureHref }
