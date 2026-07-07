@@ -11,7 +11,7 @@ type ChangelogItem = {
 	description: string;
 };
 
-export type ChangelogSection = {
+type ChangelogSection = {
 	category: ChangelogCategory;
 	items: ChangelogItem[];
 };

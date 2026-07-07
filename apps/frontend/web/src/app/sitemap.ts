@@ -12,10 +12,7 @@ function getRoutePriority(path: string): number {
 function getChangeFrequency(
 	path: string,
 ): MetadataRoute.Sitemap[number]["changeFrequency"] {
-	if (
-		path === "/changelog" ||
-		path.startsWith("/changelog/")
-	) {
+	if (path === "/changelog" || path.startsWith("/changelog/")) {
 		return "weekly";
 	}
 	return "monthly";

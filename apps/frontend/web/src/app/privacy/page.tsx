@@ -125,8 +125,8 @@ const PrivacyPage = () => {
 						Reloop Labs&apos; infrastructure to operate the product. When you
 						self-host, that data stays on servers you control. The open-source
 						software is available under our{" "}
-						<Link href="/license">Apache 2.0 license</Link> with
-						additional use restrictions.
+						<Link href="/license">Apache 2.0 license</Link> with additional use
+						restrictions.
 					</p>
 				</section>
 

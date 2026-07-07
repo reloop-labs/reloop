@@ -1,6 +1,6 @@
 export type CheckStatus = "pass" | "fail" | "warn" | "unknown";
 
-export type ValidationCheck = {
+type ValidationCheck = {
 	label: string;
 	status: CheckStatus;
 	detail: string;
@@ -201,7 +201,7 @@ export async function validateEmailAddress(
 	};
 }
 
-export async function lookupTxtRecords(name: string): Promise<string[]> {
+async function lookupTxtRecords(name: string): Promise<string[]> {
 	try {
 		const res = await fetch(
 			`https://dns.google/resolve?name=${encodeURIComponent(name)}&type=TXT`,

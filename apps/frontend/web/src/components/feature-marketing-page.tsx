@@ -12,7 +12,7 @@ import {
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 
-export type FeatureMarketingSection = {
+type FeatureMarketingSection = {
 	title: string;
 	description?: string;
 	alt?: boolean;

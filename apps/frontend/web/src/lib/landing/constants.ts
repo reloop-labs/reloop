@@ -1,11 +1,11 @@
 import type { FeatureCtaBand } from "@reloop/web/components/landing/types";
 
-export const defaultSignupCta = {
+const defaultSignupCta = {
 	label: "Get started free",
 	href: "/dashboard/signup",
 } as const;
 
-export const defaultDocsCta = {
+const defaultDocsCta = {
 	label: "Read documentation",
 	href: "/docs",
 } as const;

@@ -10,7 +10,7 @@ export function getChangelogReleaseByVersion(version: string) {
 	return changelogReleases.find((release) => release.version === version);
 }
 
-export function withChangelogPreviews(
+function withChangelogPreviews(
 	releases: Omit<ChangelogRelease, "preview" | "code">[],
 ): ChangelogRelease[] {
 	return releases.map((release) => ({

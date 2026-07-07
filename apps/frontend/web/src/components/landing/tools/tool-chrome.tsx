@@ -55,7 +55,7 @@ export function ToolTopBar({
 	);
 }
 
-export function StatusIcon({ status }: { status: CheckStatus }) {
+function StatusIcon({ status }: { status: CheckStatus }) {
 	if (status === "pass") {
 		return <Icon name="check" className="size-5 text-emerald-500" />;
 	}

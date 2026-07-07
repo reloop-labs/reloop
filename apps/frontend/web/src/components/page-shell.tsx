@@ -3,7 +3,7 @@ import { FeatureHero } from "@reloop/web/components/landing/hero";
 import type { FeatureCtaLink } from "@reloop/web/components/landing/types";
 import type React from "react";
 
-export { FeatureHero, FeatureCta };
+export { FeatureCta };
 
 export function MarketingPageShell({
 	titleLines,
@@ -111,52 +111,12 @@ export function SectionHeading({
 	);
 }
 
-export function InfoCard({
-	title,
-	description,
-	children,
-}: {
-	title: string;
-	description: string;
-	children?: React.ReactNode;
-}) {
-	return (
-		<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-8 transition-colors hover:bg-bg-soft-50 dark:border-white/10 dark:hover:bg-white/[0.02]">
-			{children}
-			<h3 className="mb-3 font-semibold text-lg text-text-strong-950 leading-snug dark:text-white">
-				{title}
-			</h3>
-			<p className="text-sm text-text-sub-600 leading-relaxed dark:text-white/50">
-				{description}
-			</p>
-		</div>
-	);
-}
-
 export const cardGridClass = "grid gap-6 sm:grid-cols-2 lg:grid-cols-3";
-
-export const metricsGridClass = "grid gap-6 md:grid-cols-2 lg:grid-cols-4";
 
 export function CodeBlock({ children }: { children: string }) {
 	return (
 		<div className="overflow-hidden rounded-3xl border border-stroke-soft-200 font-mono text-[14px] leading-relaxed sm:text-[15px] dark:border-white/10">
 			<pre className="overflow-x-auto p-5 sm:p-6">{children}</pre>
-		</div>
-	);
-}
-
-export function ContentCard({
-	children,
-	className = "",
-}: {
-	children: React.ReactNode;
-	className?: string;
-}) {
-	return (
-		<div
-			className={`rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-6 dark:border-white/10 ${className}`}
-		>
-			{children}
 		</div>
 	);
 }

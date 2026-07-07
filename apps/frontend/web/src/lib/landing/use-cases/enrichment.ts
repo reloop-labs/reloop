@@ -7,7 +7,7 @@ export type UseCaseEnrichment = {
 	flow: string[];
 };
 
-export const useCaseEnrichment: Record<string, UseCaseEnrichment> = {
+const useCaseEnrichment: Record<string, UseCaseEnrichment> = {
 	"transactional-email": {
 		accent: "blue",
 		metric: { label: "P99 delivery", value: "< 2s" },

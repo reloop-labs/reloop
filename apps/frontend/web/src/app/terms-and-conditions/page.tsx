@@ -67,8 +67,7 @@ const TermsPage = () => {
 						You can use Reloop in two ways: sign up for our hosted email
 						service, or self-host the open-source platform on your own
 						infrastructure. Third parties may not resell or offer competing
-						hosted services; see our{" "}
-						<Link href="/license">license terms</Link>.
+						hosted services; see our <Link href="/license">license terms</Link>.
 					</p>
 				</section>
 
@@ -138,9 +137,8 @@ const TermsPage = () => {
 					<p>
 						When you use Reloop as a hosted service, Reloop Labs operates the
 						platform and processes data as described in our{" "}
-						<Link href="/privacy">Privacy Policy</Link>. You are
-						responsible for lawful use, recipient consent, and acceptable
-						sending practices.
+						<Link href="/privacy">Privacy Policy</Link>. You are responsible for
+						lawful use, recipient consent, and acceptable sending practices.
 					</p>
 					<p>
 						When you self-host Reloop, you are solely responsible for your

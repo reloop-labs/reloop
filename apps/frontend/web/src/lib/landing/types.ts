@@ -3,7 +3,7 @@ import type {
 	FeatureCtaLink,
 } from "@reloop/web/components/landing/types";
 
-export type LandingSection = {
+type LandingSection = {
 	title: string;
 	description?: string;
 	alt?: boolean;
