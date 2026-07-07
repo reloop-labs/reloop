@@ -5,9 +5,9 @@ import Link from "next/link";
 const careersMailto = `mailto:${contactEmail}?subject=${encodeURIComponent("I'd like to build with Reloop")}`;
 
 const cultureParagraphs = [
-	"We're not in a rush to hire. We're not even looking for a particular experience or skill. Starting this company was simply a selfish need to find people who raise the bar—and build a team of them. That takes time.",
-	"We care obsessively about craft. Work gets questioned, broken down, rebuilt, because the bar here is higher than most places.",
-	"This place will cost you something. You'll think about problems after hours. You'll redo things until they feel right.",
+	"We're not hiring for a résumé. We're hiring for taste—the instinct that something is off before anyone else says it, and the conviction to fix it anyway. That's rarer than any credential.",
+	"Taste means you know the difference between work that's done and work that's good. You notice the pixel that's two points too heavy. You rewrite the sentence that technically says the right thing but feels wrong. You don't stop at functional.",
+	"This place will cost you something. You'll sit with problems longer than is comfortable. You'll throw out things you spent days on. But what comes out the other side is work you'd actually put your name on.",
 ];
 
 export function CareersSection() {
