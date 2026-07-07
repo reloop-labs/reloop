@@ -59,9 +59,9 @@ const navItems: NavItem[] = [
 					title: "Developers",
 					links: [
 						{ title: "SDKs", href: "/docs/resources/sdks" },
-						{ title: "API Reference", href: "/docs/api-reference" },
-						{ title: "Getting Started", href: "/docs/getting-started" },
-						{ title: "Campaign Builder", href: "/docs/campaign-builder" },
+						{ title: "API Reference", href: "/docs/api" },
+						{ title: "Getting Started", href: "/docs" },
+						{ title: "Campaign Builder", href: "/docs/features/templates" },
 						{ title: "Languages", href: "/features/languages" },
 						{ title: "Webhooks", href: "/docs/webhooks" },
 					],
@@ -160,6 +160,26 @@ const navItems: NavItem[] = [
 ];
 
 function MegaLink({ link }: { link: NavLink }) {
+	const isCrossDomain =
+		link.href.startsWith("/docs") || link.href.startsWith("/dashboard");
+
+	if (isCrossDomain) {
+		return (
+			<a
+				href={link.href}
+				{...(link.external ? { target: "_blank", rel: "noreferrer" } : {})}
+				className="group inline-flex items-center gap-1 font-medium text-[18px] text-text-strong-950 leading-snug transition-colors hover:text-text-strong-950/70 dark:text-white dark:hover:text-white/70"
+			>
+				{link.title}
+				{link.external && (
+					<span className="group-hover:-translate-y-px text-[12px] text-text-sub-600 transition-transform group-hover:translate-x-px dark:text-white/55">
+						↗
+					</span>
+				)}
+			</a>
+		);
+	}
+
 	return (
 		<Link
 			href={link.href}
@@ -389,27 +409,48 @@ export const Header = () => {
 																			{category.title}
 																		</p>
 																		<div className="flex flex-col gap-2">
-																			{category.links.map((link) => (
-																				<Link
-																					key={link.title}
-																					href={link.href}
-																					{...(link.external
+																			{category.links.map((link) => {
+																				const isCrossDomain =
+																					link.href.startsWith("/docs") ||
+																					link.href.startsWith("/dashboard");
+																				const linkProps = {
+																					key: link.title,
+																					href: link.href,
+																					onClick: closeMobileMenu,
+																					className:
+																						"inline-flex items-center gap-1 py-1 font-medium text-[15px] text-text-strong-950 transition-colors hover:text-text-strong-950/70 dark:text-white dark:hover:text-white/70",
+																					...(link.external
 																						? {
 																								target: "_blank",
 																								rel: "noreferrer",
 																							}
-																						: {})}
-																					onClick={closeMobileMenu}
-																					className="inline-flex items-center gap-1 py-1 font-medium text-[15px] text-text-strong-950 transition-colors hover:text-text-strong-950/70 dark:text-white dark:hover:text-white/70"
-																				>
-																					{link.title}
-																					{link.external && (
-																						<span className="text-[12px] text-text-sub-600 dark:text-white/55">
-																							↗
-																						</span>
-																					)}
-																				</Link>
-																			))}
+																						: {}),
+																				};
+
+																				if (isCrossDomain) {
+																					return (
+																						<a {...linkProps}>
+																							{link.title}
+																							{link.external && (
+																								<span className="text-[12px] text-text-sub-600 dark:text-white/55">
+																									↗
+																								</span>
+																							)}
+																						</a>
+																					);
+																				}
+
+																				return (
+																					<Link {...linkProps}>
+																						{link.title}
+																						{link.external && (
+																							<span className="text-[12px] text-text-sub-600 dark:text-white/55">
+																								↗
+																							</span>
+																						)}
+																					</Link>
+																				);
+																			})}
 																		</div>
 																	</div>
 																))}
@@ -444,32 +485,29 @@ export const Header = () => {
 									</a>
 
 									{mounted && session ? (
-										<Link
-											prefetch={false}
+										<a
 											href="/dashboard"
 											onClick={closeMobileMenu}
 											className="inline-flex items-center justify-center rounded-full bg-text-strong-950 px-4 py-3 font-medium text-[15px] text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-black"
 										>
 											Dashboard
-										</Link>
+										</a>
 									) : (
 										<div className="grid grid-cols-2 gap-3">
-											<Link
-												prefetch={false}
+											<a
 												href="/dashboard/login"
 												onClick={closeMobileMenu}
 												className="inline-flex items-center justify-center rounded-full border border-stroke-soft-200 px-4 py-3 font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] dark:border-white/15 dark:text-white dark:hover:bg-white/[0.06]"
 											>
 												Log in
-											</Link>
-											<Link
-												prefetch={false}
+											</a>
+											<a
 												href="/dashboard/signup"
 												onClick={closeMobileMenu}
 												className="inline-flex items-center justify-center rounded-full bg-text-strong-950 px-4 py-3 font-medium text-[15px] text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-black"
 											>
 												Sign up
-											</Link>
+											</a>
 										</div>
 									)}
 								</div>

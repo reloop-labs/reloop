@@ -25,34 +25,72 @@ type Integration = {
 	icon: SimpleIcon;
 };
 
-const smtpDocs = "/docs/quickstart/smtp";
-
 /** Diamond layout: 1 · 2 · 3 · 2 · 3 · 2 · 1 (14 icons) */
 const columns: Integration[][] = [
-	[{ label: "WordPress", href: `${smtpDocs}/wordpress`, icon: siWordpress }],
 	[
-		{ label: "Laravel", href: `${smtpDocs}/laravel`, icon: siLaravel },
-		{ label: "n8n", href: smtpDocs, icon: siN8n },
+		{
+			label: "WordPress",
+			href: "/docs/integrations/wordpress",
+			icon: siWordpress,
+		},
 	],
 	[
-		{ label: "Nodemailer", href: `${smtpDocs}/nodemailer`, icon: siNodedotjs },
-		{ label: "Django", href: `${smtpDocs}/django`, icon: siDjango },
-		{ label: "Metabase", href: `${smtpDocs}/metabase`, icon: siMetabase },
+		{
+			label: "Laravel",
+			href: "/docs/examples/smtp/introduction",
+			icon: siLaravel,
+		},
+		{ label: "n8n", href: "/docs/integrations/n8n", icon: siN8n },
 	],
 	[
-		{ label: "Rails", href: `${smtpDocs}/rails`, icon: siRubyonrails },
-		{ label: "Auth0", href: `${smtpDocs}/auth0`, icon: siAuth0 },
+		{
+			label: "Nodemailer",
+			href: "/docs/examples/smtp/nodemailer",
+			icon: siNodedotjs,
+		},
+		{
+			label: "Django",
+			href: "/docs/examples/smtp/introduction",
+			icon: siDjango,
+		},
+		{
+			label: "Metabase",
+			href: "/docs/examples/smtp/introduction",
+			icon: siMetabase,
+		},
 	],
 	[
-		{ label: "Supabase", href: `${smtpDocs}/supabase`, icon: siSupabase },
-		{ label: "Zapier", href: smtpDocs, icon: siZapier },
-		{ label: "NestJS", href: smtpDocs, icon: siNestjs },
+		{ label: "Rails", href: "/docs/examples/smtp/ruby", icon: siRubyonrails },
+		{ label: "Auth0", href: "/docs/examples/smtp/introduction", icon: siAuth0 },
 	],
 	[
-		{ label: "PHPMailer", href: `${smtpDocs}/phpmailer`, icon: siPhp },
-		{ label: "Spring", href: smtpDocs, icon: siSpring },
+		{
+			label: "Supabase",
+			href: "/docs/knowledge-base/supabase-quickstart",
+			icon: siSupabase,
+		},
+		{ label: "Zapier", href: "/docs/integrations/zapier", icon: siZapier },
+		{
+			label: "NestJS",
+			href: "/docs/examples/smtp/introduction",
+			icon: siNestjs,
+		},
 	],
-	[{ label: "Shopify", href: smtpDocs, icon: siShopify }],
+	[
+		{ label: "PHPMailer", href: "/docs/examples/smtp/php", icon: siPhp },
+		{
+			label: "Spring",
+			href: "/docs/examples/smtp/introduction",
+			icon: siSpring,
+		},
+	],
+	[
+		{
+			label: "Shopify",
+			href: "/docs/examples/smtp/introduction",
+			icon: siShopify,
+		},
+	],
 ];
 
 const integrations = columns.flat();
@@ -99,7 +137,7 @@ function IntegrationCard({
 	const glow = `#${item.icon.hex}`;
 
 	return (
-		<Link
+		<a
 			href={item.href}
 			aria-label={`${item.label} SMTP guide`}
 			className="group relative flex flex-col items-center transition-transform duration-300 hover:scale-[1.04]"
@@ -120,7 +158,7 @@ function IntegrationCard({
 			>
 				<IntegrationIcon icon={item.icon} topFold={topFold} />
 			</div>
-		</Link>
+		</a>
 	);
 }
 
@@ -186,8 +224,8 @@ export default function WorksWith({ topFold = false }: { topFold?: boolean }) {
 				<div
 					className={`text-center ${topFold ? "mt-8 sm:mt-10 lg:mt-12" : "mt-10 sm:mt-14 lg:mt-20"}`}
 				>
-					<Link
-						href={smtpDocs}
+					<a
+						href="/docs/integrations"
 						className="group inline-flex h-11 items-center justify-center overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-white-0 px-5 font-medium text-[14px] text-text-strong-950 transition-colors duration-300 hover:bg-bg-weak-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1]"
 					>
 						<span className="inline-flex items-center">
@@ -209,7 +247,7 @@ export default function WorksWith({ topFold = false }: { topFold?: boolean }) {
 								/>
 							</svg>
 						</span>
-					</Link>
+					</a>
 				</div>
 			</div>
 		</section>

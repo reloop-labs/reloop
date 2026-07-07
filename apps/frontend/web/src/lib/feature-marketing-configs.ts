@@ -348,7 +348,7 @@ export const apiReferenceConfig: FeatureMarketingPageConfig = {
 	description:
 		"RESTful APIs for sending email, managing contacts, and tracking analytics—designed for simplicity and scale.",
 	primaryCta: signup,
-	secondaryCta: { label: "Open API docs", href: "/docs/api-reference" },
+	secondaryCta: { label: "Open API docs", href: "/docs/api" },
 	sections: [
 		{
 			title: "Core API endpoints",
@@ -399,7 +399,7 @@ export const apiReferenceConfig: FeatureMarketingPageConfig = {
 		description:
 			"Create an API key and explore interactive docs with copy-paste examples.",
 		primary: signup,
-		secondary: { label: "API documentation", href: "/docs/api-reference" },
+		secondary: { label: "API documentation", href: "/docs/api" },
 	},
 };
 

@@ -91,8 +91,8 @@ export default function Sandbox() {
 									</li>
 								))}
 							</ul>
-							<Link
-								href="/docs/quickstart/smtp"
+							<a
+								href="/docs/examples/smtp/introduction"
 								className="group mt-8 inline-flex h-11 items-center justify-center overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-white-0 px-5 font-medium text-[14px] text-text-strong-950 transition-colors duration-300 hover:bg-bg-weak-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1]"
 							>
 								<span className="inline-flex items-center">
@@ -105,7 +105,7 @@ export default function Sandbox() {
 										aria-hidden
 									/>
 								</span>
-							</Link>
+							</a>
 						</div>
 
 						<CopyCodeBlock

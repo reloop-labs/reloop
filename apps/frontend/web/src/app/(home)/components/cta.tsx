@@ -21,12 +21,12 @@ const CTA = () => {
 					</p>
 
 					<div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-						<Link
-							href="/login"
+						<a
+							href="/dashboard/signup"
 							className="inline-flex h-12 items-center justify-center rounded-full bg-[#0a0d12] px-8 font-semibold text-[15px] text-white transition-colors hover:bg-[#0a0d12]/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
 						>
 							Get started
-						</Link>
+						</a>
 						<Link
 							href="/pricing"
 							className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full border border-[#0a0d12]/10 px-8 font-semibold text-[#0a0d12] text-[15px] transition-colors hover:bg-[#0a0d12]/10 dark:border-white/10 dark:text-white dark:hover:bg-white/10"

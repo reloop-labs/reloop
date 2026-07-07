@@ -36,9 +36,9 @@ const columns: FooterColumn[] = [
 		group: "Developers",
 		items: [
 			{ title: "SDKs", href: "/docs/resources/sdks" },
-			{ title: "API Reference", href: "/docs/api-reference" },
-			{ title: "Getting Started", href: "/docs/getting-started" },
-			{ title: "Campaign Builder", href: "/docs/campaign-builder" },
+			{ title: "API Reference", href: "/docs/api" },
+			{ title: "Getting Started", href: "/docs" },
+			{ title: "Campaign Builder", href: "/docs/features/templates" },
 			{ title: "Languages", href: "/features/languages" },
 			{ title: "Webhooks", href: "/docs/webhooks" },
 		],
@@ -48,8 +48,8 @@ const columns: FooterColumn[] = [
 		items: [
 			{ title: "Documentation", href: "/docs" },
 			{ title: "Self-host", href: "/docs/self-host" },
-			{ title: "Integration", href: "/docs/integration" },
-			{ title: "SMTP", href: "/docs/quickstart/smtp" },
+			{ title: "Integration", href: "/docs/integrations" },
+			{ title: "SMTP", href: "/docs/examples/smtp/introduction" },
 			{ title: "API", href: "/docs/api" },
 		],
 	},
