@@ -11,7 +11,7 @@ import Sandbox from "./components/sandbox";
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
 
-const pagePath = "/features/marketing-teams";
+const pagePath = "/marketing-teams";
 const pageUrl = `${getSiteUrl()}${pagePath}`;
 
 export const metadata: Metadata = {

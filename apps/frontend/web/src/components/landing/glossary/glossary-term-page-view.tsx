@@ -46,25 +46,34 @@ export function GlossaryTermPageView({
 						</p>
 					</div>
 
-					{term.relatedFeatureHref && (
-						<div className="mt-8 rounded-xl border border-primary-base/20 bg-primary-base/5 p-6">
-							<p className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
-								In Reloop
-							</p>
-							<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/50">
-								See how Reloop helps you put {term.title} into practice in
-								production.
-							</p>
-							<Link
-								href={term.relatedFeatureHref}
-								className={Button.buttonVariants({ variant: "neutral" }).root({
-									className: "mt-4 rounded-full",
-								})}
-							>
-								View feature →
-							</Link>
-						</div>
-					)}
+					{term.relatedFeatureHref && (() => {
+						const isCrossDomain =
+							term.relatedFeatureHref.startsWith("/docs") ||
+							term.relatedFeatureHref.startsWith("/dashboard");
+						const className = Button.buttonVariants({ variant: "neutral" }).root({
+							className: "mt-4 rounded-full",
+						});
+						return (
+							<div className="mt-8 rounded-xl border border-primary-base/20 bg-primary-base/5 p-6">
+								<p className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
+									In Reloop
+								</p>
+								<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/50">
+									See how Reloop helps you put {term.title} into practice in
+									production.
+								</p>
+								{isCrossDomain ? (
+									<a href={term.relatedFeatureHref} className={className}>
+										View feature →
+									</a>
+								) : (
+									<Link href={term.relatedFeatureHref} className={className}>
+										View feature →
+									</Link>
+								)}
+							</div>
+						);
+					})()}
 				</article>
 
 				<aside className="lg:sticky lg:top-24 lg:self-start">

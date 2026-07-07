@@ -89,7 +89,7 @@ const productFeatures = [
 	},
 	{
 		title: "Marketing Teams",
-		href: "/features/marketing-teams",
+		href: "/marketing-teams",
 		description: "Collaborative campaign workspace for teams.",
 	},
 	{
@@ -109,11 +109,6 @@ const platformFeatures = [
 		title: "Webhooks",
 		href: "/features/webhooks",
 		description: "Real-time events for delivery and engagement.",
-	},
-	{
-		title: "Integration",
-		href: "/features/integration",
-		description: "Connect Reloop to your stack.",
 	},
 	{
 		title: "Campaign Builder",

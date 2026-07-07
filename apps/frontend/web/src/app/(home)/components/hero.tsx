@@ -32,7 +32,7 @@ export default function Hero() {
 							</Link>{" "}
 							&{" "}
 							<Link
-								href="/features/marketing-teams"
+								href="/marketing-teams"
 								className="relative bg-[length:6px_3px] bg-[radial-gradient(circle,_#a3a3a3_1px,_transparent_1.5px)] bg-bottom bg-repeat-x transition-all duration-300 hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)] hover:text-primary-base dark:bg-[radial-gradient(circle,_#525252_1px,_transparent_1.5px)] dark:hover:bg-[radial-gradient(circle,_var(--color-primary-base)_1px,_transparent_1.5px)]"
 							>
 								Marketing teams

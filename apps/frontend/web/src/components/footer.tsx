@@ -35,9 +35,9 @@ const columns: FooterColumn[] = [
 			{ title: "AI Agents", href: "/features/ai-agents" },
 			{ title: "Webhooks", href: "/features/webhooks" },
 			{ title: "Deliverability", href: "/features/deliverability" },
-			{ title: "Marketing Teams", href: "/features/marketing-teams" },
+			{ title: "Marketing Teams", href: "/marketing-teams" },
 			{ title: "Developers", href: "/developers" },
-			{ title: "Integrations", href: "/features/integration" },
+			{ title: "Integrations", href: "/integrations" },
 		],
 	},
 	{
