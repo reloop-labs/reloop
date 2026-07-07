@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import SWRProvider from "@fe/dashboard/providers/swr.config";
 import { ThemeProvider } from "@fe/dashboard/providers/theme-provider";
-import { IconsSprite } from "@reloop/ui/icon";
+import { IconsSprite } from "@reloop/ui/icons-sprite";
 import { RybbitLoader } from "@reloop/ui/rybbit-loader";
 import { Toaster } from "@reloop/ui/toast";
 import * as Tooltip from "@reloop/ui/tooltip";

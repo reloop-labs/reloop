@@ -54,7 +54,7 @@
 		"./form": "./src/components/form.tsx",
 		"./globals.css": "./src/globals.css",
 		"./hover-card": "./src/components/hover-card.tsx",
-		"./icons": "./src/components/icons.tsx",
+		"./icons-sprite": "./src/components/icons-sprite.tsx",
 		"./input": "./src/components/input.tsx",
 		"./label": "./src/components/label.tsx",
 		"./navigation-menu": "./src/components/navigation-menu.tsx",

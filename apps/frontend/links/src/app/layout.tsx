@@ -7,7 +7,7 @@ import {
 	siteName,
 } from "@reloop/links/lib/site";
 import { ThemeProvider } from "@reloop/links/providers/theme-provider";
-import { IconsSprite } from "@reloop/ui/icon";
+import { IconsSprite } from "@reloop/ui/icons-sprite";
 import { RybbitLoader } from "@reloop/ui/rybbit-loader";
 import localFont from "next/font/local";
 

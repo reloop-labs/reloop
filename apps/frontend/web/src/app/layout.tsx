@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { IconsSprite } from "@reloop/ui/icon";
+import { IconsSprite } from "@reloop/ui/icons-sprite";
 import { RybbitLoader } from "@reloop/ui/rybbit-loader";
 import { Footer } from "@reloop/web/components/footer";
 import { Header } from "@reloop/web/components/header";
