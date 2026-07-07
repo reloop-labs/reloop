@@ -1,6 +1,5 @@
 "use client";
 
-import * as Button from "@reloop/ui/button";
 import {
 	ToolTopBar,
 	ToolUpsell,

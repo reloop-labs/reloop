@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import type { SimpleIcon } from "simple-icons";
 import {
 	siAuth0,

@@ -4,7 +4,6 @@ import * as Button from "@reloop/ui/button";
 import {
 	ChecklistTable,
 	ToolPanel,
-	ToolTopBar,
 	ToolUpsell,
 } from "@reloop/web/components/landing/tools/tool-chrome";
 import {

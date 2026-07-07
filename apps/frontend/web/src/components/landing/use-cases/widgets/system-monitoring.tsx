@@ -1,6 +1,5 @@
 "use client";
 
-import { Icon } from "@reloop/ui/icon";
 import { motion } from "framer-motion";
 import { useState } from "react";
 

@@ -1,6 +1,5 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import Link from "next/link";
 import { Fragment } from "react";
 
 type BentoItem = {

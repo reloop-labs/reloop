@@ -2,7 +2,6 @@
 
 import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
 import { Icon } from "@reloop/ui/icon";
-import Link from "next/link";
 import { useState } from "react";
 import { siNodedotjs, siPython } from "simple-icons";
 

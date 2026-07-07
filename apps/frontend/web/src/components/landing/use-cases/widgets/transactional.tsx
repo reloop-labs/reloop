@@ -1,7 +1,7 @@
 "use client";
 
 import { Icon } from "@reloop/ui/icon";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState } from "react";
 
 export default function TransactionalWidget() {
@@ -83,9 +83,7 @@ export default function TransactionalWidget() {
 								Sending...
 							</>
 						) : (
-							<>
-								<span>⚡ Run API Request</span>
-							</>
+							<span>⚡ Run API Request</span>
 						)}
 					</button>
 				</div>

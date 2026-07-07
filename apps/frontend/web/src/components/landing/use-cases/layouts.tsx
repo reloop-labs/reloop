@@ -1,7 +1,6 @@
 "use client";
 
 import * as Button from "@reloop/ui/button";
-import { Icon } from "@reloop/ui/icon";
 import { ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
 import { accentStyles } from "@reloop/web/lib/landing/page-accents";
 import type { LandingPageDefinition } from "@reloop/web/lib/landing/types";
@@ -122,7 +121,7 @@ export function SplitScreenLayout({ config, children }: LayoutProps) {
 // 2. Console-First Dark Layout (API & Devops Ops)
 export function ConsoleFirstLayout({ config, children }: LayoutProps) {
 	const extra = getUseCaseEnrichment(config.slug);
-	const accent = accentStyles[extra.accent];
+	const _accent = accentStyles[extra.accent];
 
 	return (
 		<div className="min-h-screen bg-slate-950 text-left font-sans text-white">

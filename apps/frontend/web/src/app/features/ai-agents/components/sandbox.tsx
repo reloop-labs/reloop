@@ -325,7 +325,7 @@ export default function Sandbox() {
 	useEffect(() => {
 		setSimulationState("idle");
 		setSimulationLogs([]);
-	}, [activeTemplate]);
+	}, []);
 
 	return (
 		<section id="playground" className="scroll-mt-10">
