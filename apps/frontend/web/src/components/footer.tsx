@@ -18,6 +18,7 @@ type FooterColumn = {
 };
 
 const columns: FooterColumn[] = [
+	// --- Row 1: Product & Developer ---
 	{
 		group: "Email",
 		items: [
@@ -35,9 +36,6 @@ const columns: FooterColumn[] = [
 			{ title: "AI Agents", href: "/features/ai-agents" },
 			{ title: "Webhooks", href: "/features/webhooks" },
 			{ title: "Deliverability", href: "/features/deliverability" },
-			{ title: "Marketing Teams", href: "/features/campaigns" },
-			{ title: "Developers", href: "/developers" },
-			{ title: "Integrations", href: "/docs/integrations" },
 		],
 	},
 	{
@@ -46,7 +44,6 @@ const columns: FooterColumn[] = [
 			{ title: "SDKs", href: "/docs/resources/sdks" },
 			{ title: "API Reference", href: "/docs/api" },
 			{ title: "Getting Started", href: "/docs" },
-			{ title: "Campaign Builder", href: "/docs/features/templates" },
 			{ title: "Languages", href: "/languages" },
 			{ title: "Webhooks", href: "/docs/webhooks" },
 		],
@@ -56,9 +53,7 @@ const columns: FooterColumn[] = [
 		items: [
 			{ title: "Documentation", href: "/docs" },
 			{ title: "Self-host", href: "/docs/self-host" },
-			{ title: "Integration", href: "/docs/integrations" },
 			{ title: "SMTP", href: "/docs/examples/smtp/introduction" },
-			{ title: "API", href: "/docs/api" },
 		],
 	},
 	{
@@ -82,6 +77,7 @@ const columns: FooterColumn[] = [
 			{ title: "Deliverability tester", href: "/tools/deliverability-tester" },
 		],
 	},
+	// --- Row 2: Company & Info ---
 	{
 		group: "Learn",
 		items: [
@@ -103,8 +99,8 @@ const columns: FooterColumn[] = [
 		group: "Open Source",
 		items: [
 			{ title: "Why Open Source", href: "/philosophy/why-open-source" },
+			{ title: "Integrations", href: "/docs/integrations" },
 			{ title: "Self-host", href: "/docs/self-host" },
-			{ title: "License", href: "/license" },
 		],
 	},
 	{
@@ -198,9 +194,26 @@ export const Footer = () => {
 						</Link>
 					</div>
 
-					<div className="min-w-0 flex-1">
-						<div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-8 lg:gap-y-12">
-							{columns.map((column) => (
+					<div className="min-w-0 flex-1 flex flex-col gap-10 lg:gap-12">
+						{/* Row 1: Primary columns */}
+						<div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-8">
+							{columns.slice(0, 6).map((column) => (
+								<div key={column.group}>
+									<h4 className="font-medium text-[14px] text-text-strong-950 dark:text-white">
+										{column.group}
+									</h4>
+									<ul className="mt-4 flex flex-col gap-2.5">
+										{column.items.map((link) => (
+											<FooterLinkItem key={link.title} link={link} />
+										))}
+									</ul>
+								</div>
+							))}
+						</div>
+
+						{/* Row 2: Secondary info columns */}
+						<div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-8">
+							{columns.slice(6).map((column) => (
 								<div key={column.group}>
 									<h4 className="font-medium text-[14px] text-text-strong-950 dark:text-white">
 										{column.group}
