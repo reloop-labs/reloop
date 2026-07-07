@@ -28,7 +28,7 @@ export function GlossaryTermPage({
 			secondaryCta={
 				term.relatedFeatureHref
 					? { label: "Related feature", href: term.relatedFeatureHref }
-					: { label: "Full glossary", href: "/resources/glossary" }
+					: { label: "Full glossary", href: "/glossary" }
 			}
 		>
 			<PageSection flushTop narrow>

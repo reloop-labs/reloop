@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Glossary | Reloop";
+export const alt = "Email Glossary | Reloop";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -228,7 +228,7 @@ export default function OpenGraphImage() {
 							color: "rgba(255, 255, 255, 0.6)",
 						}}
 					>
-						Directory
+						Resources
 					</span>
 				</div>
 
@@ -248,7 +248,7 @@ export default function OpenGraphImage() {
 							letterSpacing: "-1.5px",
 						}}
 					>
-						Glossary
+						Email Glossary
 					</span>
 					<span
 						style={{
@@ -257,9 +257,8 @@ export default function OpenGraphImage() {
 							lineHeight: "1.4",
 						}}
 					>
-						Find everything you need to build with Reloop. Browse our full
-						directory of developer tools, integrations, language SDKs, and
-						guides.
+						Learn key email terminology, standards, protocols, and best
+						practices.
 					</span>
 				</div>
 
@@ -273,7 +272,7 @@ export default function OpenGraphImage() {
 					}}
 				>
 					<span style={{ fontSize: "14px", color: "rgba(255, 255, 255, 0.3)" }}>
-						Modern email infrastructure for developers
+						Infrastructure for developers
 					</span>
 					<span
 						style={{ fontSize: "16px", fontWeight: 600, color: primaryColor }}
@@ -295,16 +294,16 @@ export default function OpenGraphImage() {
 			>
 				{[
 					{
-						title: "Developer Tools",
-						desc: "Email validator, templates, Mobile previews, and Deliverability checks.",
+						title: "SPF (Sender Policy)",
+						desc: "Specifies which mail servers are authorized to send email.",
 					},
 					{
-						title: "Integrations & SDKs",
-						desc: "Node, Go, Python, and Rust client libraries to easily connect.",
+						title: "DKIM Signatures",
+						desc: "Cryptographic signature verifying email authenticity.",
 					},
 					{
-						title: "Sitemap Directory",
-						desc: "Detailed documentation paths, self-hosting guides, and use cases.",
+						title: "DMARC Policies",
+						desc: "Instructs providers how to handle emails failing SPF/DKIM.",
 					},
 				].map((item, idx) => (
 					<div

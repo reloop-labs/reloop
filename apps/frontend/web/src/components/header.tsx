@@ -79,7 +79,7 @@ const navItems: NavItem[] = [
 					links: [
 						{ title: "Blog", href: "/blog" },
 						{ title: "Changelog", href: "/changelog" },
-						{ title: "Glossary", href: "/resources/glossary" },
+						{ title: "Glossary", href: "/glossary" },
 						{ title: "Community", href: "/resources/community" },
 						{ title: "Documentation", href: "/docs" },
 					],

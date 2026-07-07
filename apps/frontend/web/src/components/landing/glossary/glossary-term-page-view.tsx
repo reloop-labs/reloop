@@ -20,7 +20,7 @@ export function GlossaryTermPageView({
 				<div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
 					<nav className="text-[13px] text-text-sub-600 dark:text-white/55">
 						<Link
-							href="/resources/glossary"
+							href="/glossary"
 							className="hover:text-primary-base"
 						>
 							Glossary
@@ -87,14 +87,6 @@ export function GlossaryTermPageView({
 							</ul>
 						</div>
 					)}
-					<div className="mt-4 rounded-xl border border-stroke-soft-200 bg-white p-5 dark:border-white/10 dark:bg-[#111]">
-						<Link
-							href="/glossary"
-							className="text-[13px] text-text-sub-600 hover:text-primary-base dark:text-white/50"
-						>
-							Browse all pages →
-						</Link>
-					</div>
 				</aside>
 			</div>
 
