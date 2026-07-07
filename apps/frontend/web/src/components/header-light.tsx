@@ -15,7 +15,7 @@ const navItems = [
 		hasDropdown: true,
 		mega: {
 			links: [
-				{ title: "About", href: "/company/about-us" },
+				{ title: "About", href: "/about" },
 				{ title: "Blog", href: "/company/blog" },
 				{ title: "Careers", href: "/company/careers" },
 				{ title: "Customers", href: "/company/customers" },

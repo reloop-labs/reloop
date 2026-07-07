@@ -31,7 +31,7 @@ export default function Hero() {
 								Create a Campaign
 							</a>
 							<a
-								href="/company/contact-us"
+								href="/contact"
 								className={`${Button.buttonVariants({
 									variant: "neutral",
 									mode: "stroke",

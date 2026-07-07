@@ -156,7 +156,7 @@ const PricingPage = () => {
 					primary={{ label: "Get started", href: hostedSignupHref }}
 					secondary={{
 						label: "Talk to us",
-						href: "/company/contact-us",
+						href: "/contact",
 					}}
 					compact
 				/>

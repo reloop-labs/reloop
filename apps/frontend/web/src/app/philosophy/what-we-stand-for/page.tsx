@@ -74,7 +74,7 @@ const WhatWeStandForPage = () => {
 				}}
 				secondaryCta={{
 					label: "Meet our team",
-					href: "/company/about-us",
+					href: "/about",
 				}}
 				fullViewportHero
 			>

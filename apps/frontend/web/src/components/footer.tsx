@@ -100,8 +100,8 @@ const columns: FooterColumn[] = [
 	{
 		group: "Company",
 		items: [
-			{ title: "About", href: "/company/about-us" },
-			{ title: "Contact", href: "/company/contact-us" },
+			{ title: "About", href: "/about" },
+			{ title: "Contact", href: "/contact" },
 			{ title: "Pricing", href: "/pricing" },
 			{ title: "Compare", href: "/compare" },
 			{ title: "Get started", href: "/dashboard/signup" },

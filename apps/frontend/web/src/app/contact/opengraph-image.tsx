@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Contact | Reloop";
+export const alt = "Contact Us | Reloop";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -228,7 +228,7 @@ export default function OpenGraphImage() {
 							marginLeft: "8px",
 						}}
 					>
-						Contact
+						Company
 					</span>
 				</div>
 
@@ -247,7 +247,7 @@ export default function OpenGraphImage() {
 							letterSpacing: "-1.5px",
 						}}
 					>
-						Contact
+						Contact Us
 					</span>
 					<span
 						style={{
@@ -257,8 +257,8 @@ export default function OpenGraphImage() {
 							maxWidth: "900px",
 						}}
 					>
-						Have questions about Reloop? Reach out via Discord, GitHub, or
-						direct email.
+						Get in touch with the Reloop Labs core engineering team for support,
+						issues, and discussions.
 					</span>
 				</div>
 			</div>

@@ -112,14 +112,14 @@ const navItems: NavItem[] = [
 	},
 	{
 		title: "Company",
-		href: "/company/about-us",
+		href: "/about",
 		mega: {
 			categories: [
 				{
 					title: "Company",
 					links: [
-						{ title: "About", href: "/company/about-us" },
-						{ title: "Contact", href: "/company/contact-us" },
+						{ title: "About", href: "/about" },
+						{ title: "Contact", href: "/contact" },
 						{ title: "Blog", href: "/company/blog" },
 						{ title: "Pricing", href: "/pricing" },
 					],

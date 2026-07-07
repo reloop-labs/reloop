@@ -17,7 +17,7 @@ export const config: LandingPageDefinition = {
 	},
 	secondaryCta: {
 		label: "Contact sales",
-		href: "/company/contact-us",
+		href: "/contact",
 	},
 	sections: [
 		{

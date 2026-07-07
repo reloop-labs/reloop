@@ -159,7 +159,7 @@ export const pricingPlans: PricingPlan[] = [
 		emailsLabel: "Custom volume",
 		includesLabel: "All Startup features +",
 		ctaLabel: "Contact sales",
-		ctaHref: "/company/contact-us",
+		ctaHref: "/contact",
 		features: [
 			"Custom email volume & overage",
 			"Custom agent inboxes & webhooks",

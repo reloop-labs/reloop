@@ -11,7 +11,7 @@ import { AboutUsSection } from "./components/about-us-section";
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
 
-const pageUrl = `${getSiteUrl()}/company/about-us`;
+const pageUrl = `${getSiteUrl()}/about`;
 
 export const metadata: Metadata = {
 	title: "About Reloop Labs | The Open-Source Email Infrastructure",

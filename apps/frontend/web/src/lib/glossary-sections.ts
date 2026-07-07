@@ -140,9 +140,9 @@ export function getGlossarySections(): GlossarySection[] {
 			{ title: "Tools overview", href: "/resources/tools" },
 		]),
 		section("Company", [
-			{ title: "About Us", href: "/company/about-us" },
+			{ title: "About Us", href: "/about" },
 			{ title: "Blog", href: "/company/blog" },
-			{ title: "Contact Us", href: "/company/contact-us" },
+			{ title: "Contact Us", href: "/contact" },
 			{ title: "License", href: "/company/license" },
 			{ title: "Privacy Policy", href: "/company/privacy" },
 			{ title: "Terms and Conditions", href: "/company/terms-and-conditions" },
