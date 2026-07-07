@@ -21,7 +21,7 @@ export function RybbitLoader() {
 			id="rybbit-sdk"
 			src="/api/analytics/script.js"
 			data-site-id="1fb7d359339f"
-			strategy="afterInteractive"
+			strategy="lazyOnload"
 		/>
 	);
 }
