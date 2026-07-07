@@ -13,10 +13,10 @@ export const instant = false;
 
 const pagePath = "/careers";
 const pageUrl = `${getSiteUrl()}${pagePath}`;
-const careersMailto = `mailto:${contactEmail}?subject=${encodeURIComponent("Interested in contributing to Reloop")}`;
+const careersMailto = `mailto:${contactEmail}?subject=${encodeURIComponent("I'd like to build with Reloop")}`;
 
 const pageDescription =
-	"No open roles at Reloop right now. We're building a team of A players who care obsessively about craft. Love the product? Email us.";
+	"Reloop is building a team of A players who care obsessively about craft. Open-source email infrastructure—if that sounds like your kind of work, we'd like to hear from you.";
 
 export const metadata: Metadata = {
 	title: "Careers | Reloop",
@@ -64,10 +64,10 @@ const CareersPage = () => {
 		<>
 			<JsonLd data={jsonLd} />
 			<MarketingPageShell
-				titleLines={["Careers at Reloop.", "Built slowly, on purpose."]}
-				description="We're not rushing to hire. We're looking for people who care about craft—and want to build email infrastructure that holds up."
+				titleLines={["Careers at Reloop.", "Built one A player at a time."]}
+				description="We're building open-source email infrastructure with people who care about craft more than credentials. If that sounds like you, read on."
 				primaryCta={{
-					label: "Email us",
+					label: "Introduce yourself",
 					href: careersMailto,
 				}}
 				secondaryCta={{
