@@ -1,5 +1,5 @@
 {
-	"title": "Build with AI",
-	"description": "Everything you need to onboard your AI agent to Reloop",
-	"pages": ["index", "ai-tools", "agent-skills"]
+	"title": "Integration",
+	"icon": "workflow",
+	"pages": ["index"]
 }
