@@ -125,14 +125,6 @@ export function getGlossarySections(): GlossarySection[] {
 			{ title: "View all SDKs", href: "/docs/resources/sdks" },
 		),
 		section(
-			"Glossary",
-			glossaryTerms.map((term) => ({
-				title: term.title,
-				href: `/glossary/${term.slug}`,
-			})),
-			{ title: "View full glossary", href: "/resources/glossary" },
-		),
-		section(
 			"Blog",
 			blogPosts.map((post) => ({
 				title: post.title,
@@ -162,6 +154,13 @@ export function getGlossarySections(): GlossarySection[] {
 			{ title: "Our Product Beliefs", href: "/philosophy/our-product-beliefs" },
 			{ title: "Engineering", href: "/philosophy/engineering" },
 		]),
+		section(
+			"Glossary",
+			glossaryTerms.map((term) => ({
+				title: term.title,
+				href: `/glossary/${term.slug}`,
+			})),
+		),
 	];
 }
 
