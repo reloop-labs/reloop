@@ -19,35 +19,35 @@ type Founder = {
 
 const story: StoryChapter[] = [
 	{
-		eyebrow: "Where it started",
-		title: "Email infrastructure kept failing us.",
+		eyebrow: "The problem",
+		title: "Every app needs email. Most infra makes you guess.",
 		paragraphs: [
-			"Every project we shipped needed email—password resets, receipts, onboarding, campaigns. And every time, the same tradeoff: trust a proprietary vendor you can't audit, or wire up fragile SMTP yourself and hope deliverability holds.",
-			"Pricing crept up. Routing logic stayed hidden. When something broke at 2 a.m., there was nothing to read except a status page. We kept asking the same question: why can't this be open, self-hostable, and good enough to run in production?",
+			"Password resets, receipts, onboarding, campaigns—email shows up in every product we ship. The options never felt right. Pay a proprietary vendor and trust routing logic you can't read. Or roll your own SMTP and pray deliverability holds when traffic spikes.",
+			"Bills climbed. Black-box routing stayed black-box. At 2 a.m. with failed sends, the only thing to debug was a status page. We wanted what you probably want too: production-grade email you can audit, self-host, and actually understand.",
 		],
 	},
 	{
 		eyebrow: "September 2025",
-		title: "Pranav and Twinkal founded Reloop Labs.",
+		title: "Pranav and Twinkal started Reloop Labs.",
 		paragraphs: [
-			"Two engineers, one decision—build the email stack we wished existed. Not a wrapper around someone else's API. A full platform: transactional sends, campaigns, SMTP, webhooks, analytics—the same capabilities as proprietary providers, under Apache 2.0.",
-			"We started in public. Issues on GitHub, progress in Discord, code anyone could clone. No stealth mode, no pitch deck. Just shipping.",
+			"Two engineers, one bet: build the full stack—not a thin API wrapper. Transactional sends, campaigns, SMTP relay, webhooks, analytics. The same capabilities as closed platforms, released under Apache 2.0 from the start.",
+			"No stealth mode. No pitch deck. Issues on GitHub, progress in Discord, code anyone could clone and run. If we were going to fix email, we were going to do it where you could watch—and verify.",
 		],
 	},
 	{
 		eyebrow: "2025–2026",
-		title: "We built the hard parts in the open.",
+		title: "We shipped the hard parts in public.",
 		paragraphs: [
-			"APIs and SDKs. Self-hosting with Docker. Agent inboxes for AI workflows. Deliverability tooling you can actually inspect. Each piece went into the same codebase—whether you run it on your servers or use reloop.sh.",
-			"Reloop Labs maintains that codebase and operates the hosted service. Same software, your choice of deployment. That was the point from day one.",
+			"APIs and SDKs. Docker-based self-hosting. Agent inboxes for AI workflows. Deliverability tooling with logic you can trace in source. Every feature landed in one codebase—whether you deploy it yourself or use reloop.sh.",
+			"Reloop Labs maintains that codebase and runs the hosted service. Same software, your choice of deployment. That wasn't a marketing line. It was the requirement.",
 		],
 	},
 	{
 		eyebrow: "July 2026",
-		title: "Reloop goes live.",
+		title: "Reloop is live. The code is still public.",
 		paragraphs: [
-			"Hosted and self-host from launch day. No forked enterprise edition, no features locked behind a sales call. Read the source, run it yourself, or sign up and send—3,000 emails per month free.",
-			"We're early. A team of two, a public roadmap, and weekly releases. But the foundation is solid, the code is public, and we're not going back to closed email.",
+			"Sign up and send 3,000 emails per month free—or clone the repo and run it on infrastructure you control. No enterprise fork. No features held for a sales call. Read every routing decision before you trust it.",
+			"We're a team of two, shipping weekly, with a public roadmap. Early days—but the foundation is open, the stack is real, and we're not going back to closed email.",
 		],
 	},
 ];
@@ -56,14 +56,14 @@ const founders: Founder[] = [
 	{
 		name: "Pranav Patel",
 		role: "Co-founder",
-		bio: "Product, platform architecture, and Reloop Labs.",
+		bio: "Sets product direction and platform architecture. Keeps Reloop Labs focused on open source—not shortcuts.",
 		image: "/company/team/pranav-patel.jpg",
 		github: "https://github.com/pranavp10",
 	},
 	{
 		name: "Twinkal P",
 		role: "Co-founder",
-		bio: "Platform engineering and the open-source stack.",
+		bio: "Builds the stack you deploy—same code on reloop.sh or your own servers.",
 		image: "/company/team/twinkal-p.jpg",
 		github: "https://github.com/twinkalp10",
 	},
@@ -143,10 +143,10 @@ export function AboutUsSection() {
 
 			<div className="mt-20 border-stroke-soft-200 border-t pt-16 dark:border-white/10 lg:mt-24 lg:pt-20">
 				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-					The team
+					Who we are
 				</p>
 				<h2 className="mt-4 font-serif text-[2rem] text-text-strong-950 leading-[1.08] tracking-tighter sm:text-[2.4rem] dark:text-white">
-					Built by Pranav and Twinkal.
+					Two founders. Still writing the code.
 				</h2>
 			</div>
 
@@ -159,21 +159,21 @@ export function AboutUsSection() {
 			</div>
 
 			<p className="mt-16 text-center text-[15px] text-text-sub-600 leading-[1.8] dark:text-white/50">
-				Want to know why we built it this way? Read{" "}
+				Want the reasoning behind every decision? Read{" "}
 				<Link
 					href="/philosophy/why-reloop"
 					className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
 				>
-					why Reloop
+					why we built Reloop
 				</Link>{" "}
 				and{" "}
 				<Link
 					href="/philosophy/what-we-stand-for"
 					className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
 				>
-					what we stand for
+					what we won't compromise on
 				</Link>
-				. Or reach us at{" "}
+				. Questions?{" "}
 				<a
 					href={`mailto:${contactEmail}`}
 					className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
