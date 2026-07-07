@@ -87,6 +87,9 @@ export default function RootLayout({
 			suppressHydrationWarning
 			className={`${openRunde.variable} overscroll-y-none scroll-auto`}
 		>
+			<head>
+				<link rel="manifest" href="/manifest.json" crossOrigin="use-credentials" />
+			</head>
 			<body
 				className="min-h-full overscroll-y-none bg-bg-white-0 antialiased"
 				style={{ fontFamily: "var(--font-open-runde)" }}
