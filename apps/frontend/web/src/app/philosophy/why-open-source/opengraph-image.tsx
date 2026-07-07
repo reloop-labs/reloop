@@ -315,8 +315,7 @@ export default function OpenGraphImage() {
 							letterSpacing: "-0.03em",
 						}}
 					>
-						Why
-						<span style={{ color: "#ffffff", marginTop: 4 }}>Open Source</span>
+						Why Open Source
 					</div>
 					<div
 						style={{
