@@ -11,6 +11,8 @@ export function MarketingPageShell({
 	primaryCta,
 	secondaryCta,
 	compactHero = false,
+	tightHeroBottom = false,
+	fullViewportHero = false,
 	heroLeading,
 	children,
 }: {
@@ -19,6 +21,8 @@ export function MarketingPageShell({
 	primaryCta?: FeatureCtaLink;
 	secondaryCta?: FeatureCtaLink;
 	compactHero?: boolean;
+	tightHeroBottom?: boolean;
+	fullViewportHero?: boolean;
 	heroLeading?: React.ReactNode;
 	children: React.ReactNode;
 }) {
@@ -30,6 +34,8 @@ export function MarketingPageShell({
 				primaryCta={primaryCta}
 				secondaryCta={secondaryCta}
 				compact={compactHero}
+				tightBottom={tightHeroBottom}
+				fullViewport={fullViewportHero}
 				leading={heroLeading}
 			/>
 			{children}

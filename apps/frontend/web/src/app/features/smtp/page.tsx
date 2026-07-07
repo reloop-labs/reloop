@@ -55,13 +55,13 @@ const SmtpPage = () => {
 				href: hostedSignupHref,
 			}}
 			secondaryCta={{ label: "See how to connect", href: "#setup" }}
-			compactHero
+			fullViewportHero
 		>
-			<PageSection flushTop>
+			<WorksWith />
+
+			<PageSection>
 				<ConnectionSettings />
 			</PageSection>
-
-			<WorksWith />
 			<Sandbox />
 			<Features />
 

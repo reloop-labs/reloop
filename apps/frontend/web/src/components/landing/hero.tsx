@@ -10,6 +10,8 @@ export function FeatureHero({
 	primaryCta,
 	secondaryCta,
 	compact = false,
+	tightBottom = false,
+	fullViewport = false,
 	leading,
 }: {
 	titleLines: string[];
@@ -17,22 +19,30 @@ export function FeatureHero({
 	primaryCta?: FeatureCtaLink;
 	secondaryCta?: FeatureCtaLink;
 	compact?: boolean;
+	tightBottom?: boolean;
+	fullViewport?: boolean;
 	leading?: React.ReactNode;
 }) {
 	return (
 		<div
 			className={
-				compact
-					? "relative overflow-hidden bg-transparent pt-40 pb-8 sm:pt-44 sm:pb-10"
-					: "relative flex min-h-dvh items-center justify-center overflow-hidden bg-transparent pt-48 pb-28 sm:pt-52"
+				fullViewport
+					? "relative flex h-dvh items-center justify-center overflow-hidden bg-transparent"
+					: compact
+						? tightBottom
+							? "relative overflow-hidden bg-transparent pt-40 pb-2 sm:pt-44 sm:pb-4"
+							: "relative overflow-hidden bg-transparent pt-40 pb-8 sm:pt-44 sm:pb-10"
+						: "relative flex min-h-dvh items-center justify-center overflow-hidden bg-transparent pt-48 pb-28 sm:pt-52"
 			}
 		>
 			<main className="relative z-10">
 				<section
 					className={
-						compact
+						fullViewport
 							? "mx-auto flex max-w-4xl flex-col px-4 sm:px-6 lg:px-8"
-							: "mx-auto flex max-w-4xl flex-col px-4 pb-16 sm:px-6 lg:px-8 lg:pb-24"
+							: compact
+								? "mx-auto flex max-w-4xl flex-col px-4 sm:px-6 lg:px-8"
+								: "mx-auto flex max-w-4xl flex-col px-4 pb-16 sm:px-6 lg:px-8 lg:pb-24"
 					}
 				>
 					<div className="mx-auto max-w-[1020px] text-center">
@@ -55,9 +65,9 @@ export function FeatureHero({
 						{primaryCta && (
 							<div
 								className={
-									compact
-										? "mt-7 flex flex-wrap items-center justify-center gap-4"
-										: "mt-10 flex flex-wrap items-center justify-center gap-4"
+									fullViewport || !compact
+										? "mt-10 flex flex-wrap items-center justify-center gap-4"
+										: "mt-7 flex flex-wrap items-center justify-center gap-4"
 								}
 							>
 								<a
