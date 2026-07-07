@@ -1,0 +1,35 @@
+---
+title: Ruby
+description: Send emails via Reloop SMTP using net/smtp in Ruby.
+---
+
+# Ruby SMTP Integration
+
+You can send emails through Reloop using Ruby's standard `net/smtp` library.
+
+## Code Example
+
+```ruby
+require 'net/smtp'
+
+api_key = ENV['RELOOP_API_KEY']
+
+message = <<MESSAGE_END
+From: onboarding@reloop.dev
+To: delivered@resend.dev
+MIME-Version: 1.0
+Content-type: text/html
+Subject: Hello from Ruby net/smtp
+
+<p>Congrats on sending your first email via Reloop SMTP using net/smtp!</p>
+MESSAGE_END
+
+begin
+  Net::SMTP.start('smtp.reloop.dev', 587, 'localhost', api_key, api_key, :plain) do |smtp|
+    smtp.send_message message, 'onboarding@reloop.dev', 'delivered@resend.dev'
+  end
+  puts "Email sent successfully!"
+rescue => e
+  puts "Error: #{e.message}"
+end
+```

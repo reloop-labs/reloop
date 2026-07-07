@@ -1,0 +1,45 @@
+---
+title: Nodemailer
+description: Send emails via Reloop SMTP using Nodemailer in Node.js.
+---
+
+# Nodemailer SMTP Integration
+
+You can send emails through Reloop using **Nodemailer** in a Node.js environment.
+
+## Installation
+
+Install Nodemailer:
+
+```bash
+npm install nodemailer
+```
+
+## Code Example
+
+```javascript
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  host: 'smtp.reloop.dev',
+  port: 587,
+  secure: false, // true for port 465, false for other ports
+  auth: {
+    user: process.env.RELOOP_API_KEY,
+    pass: process.env.RELOOP_API_KEY,
+  },
+});
+
+async function main() {
+  const info = await transporter.sendMail({
+    from: '"Onboarding" <onboarding@reloop.dev>',
+    to: 'delivered@resend.dev',
+    subject: 'Hello from Nodemailer',
+    html: '<p>Congrats on sending your first email via Reloop SMTP using Nodemailer!</p>',
+  });
+
+  console.log('Message sent: %s', info.messageId);
+}
+
+main().catch(console.error);
+```

@@ -1,0 +1,13 @@
+{
+	"title": "SMTP",
+	"icon": "mail-single",
+	"pages": [
+		"introduction",
+		"nodemailer",
+		"python",
+		"go",
+		"ruby",
+		"php",
+		"rust"
+	]
+}

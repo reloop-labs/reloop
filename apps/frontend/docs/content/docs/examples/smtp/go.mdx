@@ -1,0 +1,45 @@
+---
+title: Go
+description: Send emails via Reloop SMTP using net/smtp in Go.
+---
+
+# Go SMTP Integration
+
+Use Go's standard library `net/smtp` package to send emails.
+
+## Code Example
+
+```go
+package main
+
+import (
+	"fmt"
+	"net/smtp"
+	"os"
+)
+
+func main() {
+	apiKey := os.Getenv("RELOOP_API_KEY")
+	
+	// SMTP server configuration
+	smtpHost := "smtp.reloop.dev"
+	smtpPort := "587"
+	
+	auth := smtp.PlainAuth("", apiKey, apiKey, smtpHost)
+	
+	to := []string{"delivered@resend.dev"}
+	msg := []byte("To: delivered@resend.dev\r\n" +
+		"Subject: Hello from Go net/smtp\r\n" +
+		"Content-Type: text/html; charset=UTF-8\r\n" +
+		"\r\n" +
+		"<p>Congrats on sending your first email via Reloop SMTP using net/smtp!</p>\r\n")
+		
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, "onboarding@reloop.dev", to, msg)
+	if err != nil {
+		fmt.Println("Error sending email:", err)
+		return
+	}
+	
+	fmt.Println("Email sent successfully!")
+}
+```

@@ -1,0 +1,41 @@
+---
+title: Python
+description: Send emails via Reloop SMTP using smtplib in Python.
+---
+
+# Python SMTP Integration
+
+Python's built-in `smtplib` and `email` packages can be used to send emails through Reloop SMTP.
+
+## Code Example
+
+```python
+import os
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+api_key = os.environ.get("RELOOP_API_KEY")
+
+# Create message
+msg = MIMEMultipart()
+msg['From'] = 'onboarding@reloop.dev'
+msg['To'] = 'delivered@resend.dev'
+msg['Subject'] = 'Hello from Python smtplib'
+
+body = '<p>Congrats on sending your first email via Reloop SMTP using smtplib!</p>'
+msg.attach(MIMEText(body, 'html'))
+
+try:
+    # Connect to the server
+    server = smtplib.SMTP('smtp.reloop.dev', 587)
+    server.starttls()  # Upgrade connection to secure
+    server.login(api_key, api_key)
+    
+    # Send email
+    server.sendmail(msg['From'], msg['To'], msg.as_string())
+    server.quit()
+    print("Email sent successfully!")
+except Exception as e:
+    print(f"Error: {e}")
+```

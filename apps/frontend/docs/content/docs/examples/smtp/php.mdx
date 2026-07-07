@@ -1,0 +1,53 @@
+---
+title: PHP
+description: Send emails via Reloop SMTP using PHPMailer in PHP.
+---
+
+# PHPMailer SMTP Integration
+
+Use the popular **PHPMailer** library to send transactional emails via Reloop.
+
+## Installation
+
+Install PHPMailer via Composer:
+
+```bash
+composer require phpmailer/phpmailer
+```
+
+## Code Example
+
+```php
+<?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'vendor/autoload.php';
+
+$mail = new PHPMailer(true);
+
+try {
+    // Server settings
+    $mail->isSMTP();
+    $mail->Host       = 'smtp.reloop.dev';
+    $mail->SMTPAuth   = true;
+    $mail->Username   = getenv('RELOOP_API_KEY');
+    $mail->Password   = getenv('RELOOP_API_KEY');
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port       = 587;
+
+    // Recipients
+    $mail->setFrom('onboarding@reloop.dev', 'Onboarding');
+    $mail->addAddress('delivered@resend.dev');
+
+    // Content
+    $mail->isHTML(true);
+    $mail->Subject = 'Hello from PHPMailer';
+    $mail->Body    = '<p>Congrats on sending your first email via Reloop SMTP using PHPMailer!</p>';
+
+    $mail->send();
+    echo 'Message has been sent';
+} catch (Exception $e) {
+    echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+}
+```

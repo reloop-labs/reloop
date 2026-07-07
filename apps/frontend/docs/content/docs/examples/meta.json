@@ -2,11 +2,13 @@
 	"title": "Examples",
 	"description": "Real-world examples using Reloop.",
 	"pages": [
+		"index",
 		"nodejs",
 		"python",
 		"go",
 		"ruby",
 		"php",
-		"rust"
+		"rust",
+		"smtp"
 	]
 }
