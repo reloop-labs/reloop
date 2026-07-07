@@ -61,16 +61,6 @@ function LoggedInChat() {
 			<ChatwootLoader />
 			<ChatwootUserSync />
 			<div className="space-y-4 sm:space-y-5">
-				<div>
-					<h2 className="font-medium text-[14px] text-text-strong-950 sm:text-[15px] dark:text-white">
-						Tell us how we can help
-					</h2>
-					<p className="mt-2 text-[13px] text-text-sub-600 leading-relaxed sm:text-[14px] dark:text-white/45">
-						Start a live chat with our team. We typically reply within 10 to 15
-						minutes.
-					</p>
-				</div>
-
 				<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/[0.08] dark:bg-[#161616]">
 					<iframe
 						src={chatwootWidgetUrl}

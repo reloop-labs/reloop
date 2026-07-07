@@ -1,6 +1,6 @@
-import { contactEmail, getSiteUrl, defaultOgImage } from "@reloop/web/lib/site";
+import { JsonLd } from "@reloop/web/components/json-ld";
+import { contactEmail, defaultOgImage, getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
-import Script from "next/script";
 import { ContactPanel } from "./contact-form";
 
 function CheckItem({ children }: { children: React.ReactNode }) {
@@ -96,30 +96,26 @@ const contactPageSchema = {
 const ContactPage = () => {
 	return (
 		<>
-			<Script
-				id="contact-page-schema"
-				type="application/ld+json"
-				strategy="afterInteractive"
-			>
-				{JSON.stringify(contactPageSchema)}
-			</Script>
+			<JsonLd data={contactPageSchema} />
 
-			<section className="min-h-dvh bg-bg-white-0 pt-16 dark:bg-black lg:flex lg:items-center">
-				<div className="mx-auto w-full max-w-4xl px-5 pb-10 pt-6 sm:px-6 sm:pb-12 sm:pt-8 lg:py-12">
+			<section className="min-h-dvh bg-bg-white-0 pt-16 lg:flex lg:items-center dark:bg-black">
+				<div className="mx-auto w-full max-w-4xl px-5 pt-6 pb-10 sm:px-6 sm:pt-8 sm:pb-12 lg:py-12">
 					<div className="grid items-start gap-8 sm:gap-10 lg:grid-cols-2 lg:gap-16 xl:gap-20">
 						<div className="min-w-0">
 							<h1 className="font-serif text-[1.85rem] text-text-strong-950 leading-[1.1] tracking-tighter sm:text-[2.25rem] lg:text-[2.5rem] dark:text-white">
 								Get help from the engineers who built it
 							</h1>
 							<p className="mt-4 text-[15px] text-text-sub-600 leading-relaxed sm:text-[16px] dark:text-white/55">
-								Need help optimizing deliverability, configuring DNS, or choosing the right plan? We&apos;re online and typically reply in 2 to 3 minutes.
+								We&apos;re online and typically reply in 2 to 3 minutes.
 							</p>
 							<ul className="mt-6 space-y-3.5 sm:mt-8 sm:space-y-4">
 								<CheckItem>Get help setting up self-hosting or SMTP</CheckItem>
 								<CheckItem>
 									Debug deliverability or API integration issues
 								</CheckItem>
-								<CheckItem>Share feedback and feature requests directly</CheckItem>
+								<CheckItem>
+									Share feedback and feature requests directly
+								</CheckItem>
 							</ul>
 						</div>
 						<div className="min-w-0 lg:pt-1">
