@@ -40,7 +40,7 @@ const contactPageUrl = `${siteUrl}/contact`;
 export const metadata: Metadata = {
 	title: "Contact Support | Reloop",
 	description:
-		"Get help with Reloop. Ask product questions, report issues, leave feedback, or reach our team by email.",
+		"Get help with Reloop. Start a live chat, ask product questions, report issues, or leave feedback.",
 	keywords: [
 		"contact Reloop",
 		"Reloop support",
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: "Contact Support | Reloop",
 		description:
-			"Get help with Reloop. Ask product questions, report issues, leave feedback, or reach our team by email.",
+			"Get help with Reloop. Start a live chat, ask product questions, report issues, or leave feedback.",
 		type: "website",
 		url: contactPageUrl,
 		siteName: "Reloop",
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Contact Support | Reloop",
 		description:
-			"Get help with Reloop. Ask product questions, report issues, leave feedback, or reach our team by email.",
+			"Get help with Reloop. Start a live chat, ask product questions, report issues, or leave feedback.",
 	},
 	alternates: {
 		canonical: contactPageUrl,
@@ -93,7 +93,7 @@ const ContactPage = () => {
 
 			<section className="flex min-h-[calc(100dvh-4.5rem)] items-center bg-bg-white-0 dark:bg-black">
 				<div className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6">
-					<div className="grid items-start gap-12 lg:grid-cols-2 lg:items-center lg:gap-16 xl:gap-20">
+					<div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16 xl:gap-20">
 						<div>
 							<h1 className="font-semibold text-[2rem] text-text-strong-950 tracking-tight sm:text-[2.25rem] dark:text-white">
 								Contact support

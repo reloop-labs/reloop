@@ -1,26 +1,20 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
-import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
-import Spinner from "@reloop/ui/spinner";
-import * as Textarea from "@reloop/ui/textarea";
+import {
+	CHATWOOT_BASE_URL,
+	CHATWOOT_WEBSITE_TOKEN,
+} from "@reloop/ui/chatwoot-loader";
+import {
+	ChatwootLoader,
+	ChatwootUserSync,
+} from "@reloop/web/components/chatwoot-widget";
 import { contactEmail } from "@reloop/web/lib/site";
-import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { Resolver } from "react-hook-form";
-import { useForm } from "react-hook-form";
-import * as v from "valibot";
 
-const contactSchema = v.object({
-	message: v.pipe(
-		v.string("Message is required"),
-		v.minLength(10, "Message must be at least 10 characters"),
-	),
-});
-
-type ContactFormData = v.InferInput<typeof contactSchema>;
+const chatwootWidgetUrl = `${CHATWOOT_BASE_URL.replace(/\/+$/, "")}/widget?website_token=${CHATWOOT_WEBSITE_TOKEN.trim()}&locale=en`;
 
 function LoginPrompt() {
 	return (
@@ -55,84 +49,30 @@ function LoginPrompt() {
 	);
 }
 
-function SupportForm() {
-	const [isSubmitted, setIsSubmitted] = useState(false);
-
-	const {
-		register,
-		handleSubmit,
-		formState: { errors, isSubmitting },
-	} = useForm<ContactFormData>({
-		resolver: valibotResolver(contactSchema) as Resolver<ContactFormData>,
-		mode: "onChange",
-	});
-
-	const onSubmit = async (data: ContactFormData) => {
-		// TODO: wire to a contact API or email service
-		console.log("Submitting:", data);
-		await new Promise((resolve) => setTimeout(resolve, 1000));
-		setIsSubmitted(true);
-	};
-
-	if (isSubmitted) {
-		return (
-			<motion.div
-				initial={{ opacity: 0, y: 8 }}
-				animate={{ opacity: 1, y: 0 }}
-				className="flex min-h-[280px] flex-col items-center justify-center text-center"
-			>
-				<div className="mb-4 flex size-14 items-center justify-center rounded-full bg-primary-base/10">
-					<svg
-						className="size-7 text-primary-base"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="2.5"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						aria-hidden="true"
-					>
-						<polyline points="4 12 9 17 20 6" />
-					</svg>
-				</div>
-				<h3 className="font-medium text-lg text-text-strong-950 dark:text-white">
-					Message sent
-				</h3>
-				<p className="mt-2 max-w-sm text-[14px] text-text-sub-600 dark:text-white/45">
-					Thanks for reaching out. We&apos;ll get back to you within a few
-					business days.
-				</p>
-			</motion.div>
-		);
-	}
-
+function LoggedInChat() {
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-			<div>
-				<h2 className="font-medium text-[15px] text-text-strong-950 dark:text-white">
-					Tell us how we can help
-				</h2>
-				<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/45">
-					Please share any relevant information we may need to answer your
-					question.
-				</p>
-			</div>
+		<>
+			<ChatwootLoader />
+			<ChatwootUserSync />
+			<div className="space-y-5">
+				<div>
+					<h2 className="font-medium text-[15px] text-text-strong-950 dark:text-white">
+						Tell us how we can help
+					</h2>
+					<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/45">
+						Start a live chat with our team. We typically reply within 10 to 15
+						minutes.
+					</p>
+				</div>
 
-			<div>
-				<Textarea.Root
-					id="message"
-					placeholder="How do I…"
-					rows={6}
-					hasError={!!errors.message}
-					className="min-h-28 text-[15px] text-text-strong-950 dark:text-white"
-					{...register("message")}
-				/>
-				{errors.message && (
-					<p className="mt-1.5 text-error-base text-xs">{errors.message.message}</p>
-				)}
-			</div>
+				<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-white/[0.08] dark:bg-[#161616]">
+					<iframe
+						src={chatwootWidgetUrl}
+						className="h-[480px] w-full border-none bg-bg-white-0 dark:bg-[#161616]"
+						title="Support live chat"
+					/>
+				</div>
 
-			<div className="flex flex-col gap-4 pt-1 sm:flex-row sm:items-center sm:justify-between">
 				<p className="text-[13px] text-text-sub-600 dark:text-white/45">
 					You can also email us at{" "}
 					<a
@@ -142,22 +82,12 @@ function SupportForm() {
 						{contactEmail}
 					</a>
 				</p>
-				<button
-					type="submit"
-					disabled={isSubmitting}
-					className={`${Button.buttonVariants({
-						variant: "neutral",
-						mode: "filled",
-					}).root()} h-9! shrink-0 rounded-full! px-5! font-medium text-sm! disabled:opacity-60 dark:bg-[#2a2a2a] dark:text-white dark:hover:bg-[#333333]`}
-				>
-					{isSubmitting ? <Spinner size={16} /> : "Send message"}
-				</button>
 			</div>
-		</form>
+		</>
 	);
 }
 
-function ContactPanelContent() {
+function ContactChatPanel() {
 	const { useSession } = authClient;
 	const { data: session, isPending } = useSession();
 	const [mounted, setMounted] = useState(false);
@@ -172,21 +102,9 @@ function ContactPanelContent() {
 		);
 	}
 
-	return (
-		<AnimatePresence mode="wait">
-			<motion.div
-				key={session ? "form" : "login"}
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				exit={{ opacity: 0 }}
-				transition={{ duration: 0.2 }}
-			>
-				{session ? <SupportForm /> : <LoginPrompt />}
-			</motion.div>
-		</AnimatePresence>
-	);
+	return session ? <LoggedInChat /> : <LoginPrompt />;
 }
 
 export function ContactPanel() {
-	return <ContactPanelContent />;
+	return <ContactChatPanel />;
 }
