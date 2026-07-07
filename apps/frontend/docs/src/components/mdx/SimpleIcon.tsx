@@ -35,6 +35,10 @@ import {
 	siMake,
 	siZapier,
 	siWordpress,
+	siGhost,
+	siStrapi,
+	siDirectus,
+	siSupabase,
 } from "simple-icons";
 
 const Icons: Record<string, SimpleIconType> = {
@@ -70,6 +74,10 @@ const Icons: Record<string, SimpleIconType> = {
 	siMake,
 	siZapier,
 	siWordpress,
+	siGhost,
+	siStrapi,
+	siDirectus,
+	siSupabase,
 };
 
 interface SimpleIconProps extends Omit<SVGProps<SVGSVGElement>, "ref"> {

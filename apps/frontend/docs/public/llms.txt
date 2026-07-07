@@ -164,6 +164,10 @@ Important notes:
 - [Make.com Integration](https://docs.reloop.dev/docs/integrations/make): Integrate Reloop email sending into Make scenarios
 - [Zapier Integration](https://docs.reloop.dev/docs/integrations/zapier): Connect Reloop with thousands of apps via Zapier Zaps
 - [WordPress Integration](https://docs.reloop.dev/docs/integrations/wordpress): Route WordPress site emails through Reloop SMTP
+- [Ghost CMS Integration](https://docs.reloop.dev/docs/integrations/ghost): Configure Ghost CMS to send newsletter signups and transactional emails
+- [Strapi Integration](https://docs.reloop.dev/docs/integrations/strapi): Configure the Strapi headless CMS to send emails via Reloop SMTP
+- [Directus Integration](https://docs.reloop.dev/docs/integrations/directus): Configure Directus CMS via environment variables to send system emails
+- [Supabase Integration](https://docs.reloop.dev/docs/knowledge-base/supabase-quickstart): Configure Supabase authentication and database emails via Reloop SMTP
 
 ## Resources
 

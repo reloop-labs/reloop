@@ -1,0 +1,85 @@
+---
+title: Strapi Integration
+sidebarTitle: Strapi
+icon: "siStrapi"
+description: Configure the Strapi headless CMS to send emails via Reloop SMTP using Nodemailer.
+---
+
+[Strapi](https://strapi.io) is a leading open-source headless CMS. Out of the box, Strapi provides a mock email sender. To send real transactional emails (like user password resets, email address confirmations, or custom workflow triggers), you must configure an email provider.
+
+Reloop SMTP integrates seamlessly with Strapi using the standard `@strapi/provider-email-nodemailer` package.
+
+---
+
+## Prerequisites
+
+Before starting, make sure you have:
+1. A verified sending domain in your [Reloop Dashboard](https://app.reloop.dev).
+2. A Reloop API Key (starts with `rl_`).
+
+---
+
+## Step 1: Install Nodemailer Provider
+
+Run the following command in your Strapi project root folder to install the official Nodemailer email provider:
+
+```package-install
+npm install @strapi/provider-email-nodemailer
+```
+
+---
+
+## Step 2: Configure the Plugin
+
+Create or edit your Strapi plugin configuration file.
+
+- File path: `config/plugins.js` (or `config/plugins.ts` for TypeScript projects)
+
+Add the `email` provider configuration block:
+
+```javascript
+module.exports = ({ env }) => ({
+  // ... existing plugins
+  email: {
+    config: {
+      provider: 'nodemailer',
+      providerOptions: {
+        host: 'smtp.reloop.dev',
+        port: 587,
+        auth: {
+          user: env('RELOOP_API_KEY'),
+          pass: env('RELOOP_API_KEY'),
+        },
+      },
+      settings: {
+        defaultFrom: env('RELOOP_FROM_EMAIL', 'hello@yourdomain.com'),
+        defaultReplyTo: env('RELOOP_REPLY_TO_EMAIL', 'hello@yourdomain.com'),
+      },
+    },
+  },
+});
+```
+
+---
+
+## Step 3: Set Environment Variables
+
+Add the required environment variables to your `.env` file:
+
+```env
+RELOOP_API_KEY="your-reloop-api-key"
+RELOOP_FROM_EMAIL="sender@yourdomain.com"
+RELOOP_REPLY_TO_EMAIL="sender@yourdomain.com"
+```
+
+> [!IMPORTANT]
+> Make sure `RELOOP_FROM_EMAIL` is a verified email address from your Reloop sending domain.
+
+---
+
+## Step 4: Verify the Integration
+
+1. Restart your Strapi application (`npm run develop` or `npm run build && npm run start`).
+2. Log in to the Strapi Admin Panel.
+3. Trigger a password reset email or go to **Settings** → **Email Settings** to send a test message.
+4. Verify receipt of the email and check delivery metrics in your **Reloop Dashboard**.

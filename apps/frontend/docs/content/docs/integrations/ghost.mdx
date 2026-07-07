@@ -1,0 +1,79 @@
+---
+title: Ghost CMS Integration
+sidebarTitle: Ghost CMS
+icon: "siGhost"
+description: Configure Ghost CMS to send newsletter signups, login links, and staff invites via Reloop SMTP.
+---
+
+[Ghost](https://ghost.org) is a popular open-source publishing platform. While Ghost uses Mailgun for sending bulk newsletters, it uses a standard SMTP configuration for **transactional emails** (such as member login links, password resets, signup notifications, and staff invitations).
+
+Configuring Ghost to route these emails through Reloop ensures that your login links and administrative emails arrive in the inbox instantly.
+
+---
+
+## Prerequisites
+
+Before starting, make sure you have:
+1. A verified sending domain in your [Reloop Dashboard](https://app.reloop.dev).
+2. A Reloop API Key (starts with `rl_`).
+
+---
+
+## Step 1: Locate your Ghost Configuration File
+
+In self-hosted Ghost environments, the configuration is stored in a JSON file in the root of your Ghost installation directory.
+
+- Production file: `config.production.json`
+- Development/Local file: `config.development.json`
+
+---
+
+## Step 2: Edit Mail Configuration
+
+Open your configuration file in a text editor and locate or add the `"mail"` block. Replace the default settings with your Reloop SMTP credentials:
+
+```json
+{
+  "url": "https://yourdomain.com",
+  "database": { ... },
+  "mail": {
+    "transport": "SMTP",
+    "options": {
+      "host": "smtp.reloop.dev",
+      "port": 587,
+      "auth": {
+        "user": "YOUR_RELOOP_API_KEY",
+        "pass": "YOUR_RELOOP_API_KEY"
+      }
+    }
+  }
+}
+```
+
+> [!NOTE]
+> Make sure to replace `YOUR_RELOOP_API_KEY` with your actual Reloop API Key. Both the `user` and `pass` values should be set to your Reloop API Key.
+
+---
+
+## Step 3: Restart Ghost
+
+For the email changes to take effect, you need to restart the Ghost process:
+
+```bash
+ghost restart
+```
+
+If you are running Ghost in a Docker container, restart the container:
+
+```bash
+docker restart ghost_container_name
+```
+
+---
+
+## Step 3: Verify the Integration
+
+1. Go to your Ghost admin panel (`https://yourdomain.com/ghost/`).
+2. Go to **Settings** → **Staff** and invite a new staff member or send a test email.
+3. Check the inbox of the invited user to confirm receipt of the invitation link.
+4. Verify the delivery status and headers in your **Reloop Dashboard Logs**.

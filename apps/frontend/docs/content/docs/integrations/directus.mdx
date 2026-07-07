@@ -1,0 +1,69 @@
+---
+title: Directus Integration
+sidebarTitle: Directus
+icon: "siDirectus"
+description: Configure Directus CMS via environment variables to send system and transactional emails through Reloop SMTP.
+---
+
+[Directus](https://directus.io) is a highly flexible, open-source data platform and headless CMS. By default, Directus does not send system emails (like password resets, user invitations, or activity notifications) unless an email transport is configured.
+
+Connecting Directus with Reloop takes less than two minutes and is configured entirely through your `.env` configuration file.
+
+---
+
+## Prerequisites
+
+Before starting, make sure you have:
+1. A verified sending domain in your [Reloop Dashboard](https://app.reloop.dev).
+2. A Reloop API Key (starts with `rl_`).
+
+---
+
+## Step 1: Configure SMTP in `.env`
+
+Open the `.env` file in the root of your Directus project and locate the email configuration variables. Add or update the values to match the Reloop SMTP credentials below:
+
+```env
+# Email General Settings
+EMAIL_FROM="notifications@yourdomain.com"
+EMAIL_TRANSPORT="smtp"
+
+# Reloop SMTP Configuration
+EMAIL_SMTP_HOST="smtp.reloop.dev"
+EMAIL_SMTP_PORT=587
+EMAIL_SMTP_USER="YOUR_RELOOP_API_KEY"
+EMAIL_SMTP_PASSWORD="YOUR_RELOOP_API_KEY"
+EMAIL_SMTP_SECURE="false"
+EMAIL_SMTP_IGNORE_TLS="false"
+```
+
+> [!IMPORTANT]
+> - Ensure `EMAIL_FROM` matches a verified email address from your Reloop sending domain.
+> - `EMAIL_SMTP_SECURE` must be set to `false`. Reloop uses port `587` with standard `STARTTLS` encryption (which is initiated automatically after connection). Setting this to `true` forces SSL on connection (SMLTPS on port 465) and will fail.
+
+---
+
+## Step 2: Restart Directus
+
+To apply the configuration changes, restart your Directus service.
+
+If you are running Directus locally or via Node:
+
+```bash
+npx directus start
+```
+
+If you are using Docker/Docker Compose:
+
+```bash
+docker compose restart directus
+```
+
+---
+
+## Step 3: Test Email Delivery
+
+1. Log in to the Directus Admin Panel.
+2. Go to **Settings** → **User Directory** and invite a new user.
+3. Check the inbox of the invited user to confirm receipt of the invite email.
+4. Verify the delivery metrics and logs inside the **Reloop Dashboard**.
