@@ -18,7 +18,7 @@ export const config: LandingPageDefinition = {
 	},
 	secondaryCta: {
 		label: "API Reference",
-		href: "/features/api-reference",
+		href: "/docs/api",
 	},
 	sections: [
 		{
@@ -57,7 +57,7 @@ export const config: LandingPageDefinition = {
 	relatedLinks: [
 		{
 			label: "Developers feature page",
-			href: "/features/developers",
+			href: "/developers",
 		},
 		{
 			label: "SDKs",

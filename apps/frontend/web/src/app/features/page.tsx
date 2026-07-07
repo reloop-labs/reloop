@@ -102,18 +102,8 @@ const productFeatures = [
 const platformFeatures = [
 	{
 		title: "Developers",
-		href: "/features/developers",
+		href: "/developers",
 		description: "APIs, SDKs, and sandbox tooling built for DX.",
-	},
-	{
-		title: "Getting Started",
-		href: "/features/getting-started",
-		description: "From signup to first send in minutes.",
-	},
-	{
-		title: "API Reference",
-		href: "/features/api-reference",
-		description: "REST endpoints for send, list, and analytics.",
 	},
 	{
 		title: "Webhooks",

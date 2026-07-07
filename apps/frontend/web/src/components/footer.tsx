@@ -36,7 +36,7 @@ const columns: FooterColumn[] = [
 			{ title: "Webhooks", href: "/features/webhooks" },
 			{ title: "Deliverability", href: "/features/deliverability" },
 			{ title: "Marketing Teams", href: "/features/marketing-teams" },
-			{ title: "Developers", href: "/features/developers" },
+			{ title: "Developers", href: "/developers" },
 			{ title: "Integrations", href: "/features/integration" },
 		],
 	},
