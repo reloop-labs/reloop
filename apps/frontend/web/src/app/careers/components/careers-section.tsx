@@ -5,7 +5,7 @@ import Link from "next/link";
 const careersMailto = `mailto:${contactEmail}?subject=${encodeURIComponent("I'd like to build with Reloop")}`;
 
 const cultureParagraphs = [
-	"We're not in a rush to hire. We're not even looking for a particular experience or skill. Starting this company was simply a selfish need to look for A players and building a team of them. That takes time.",
+	"We're not in a rush to hire. We're not even looking for a particular experience or skill. Starting this company was simply a selfish need to find people who raise the bar—and build a team of them. That takes time.",
 	"We care obsessively about craft. Work gets questioned, broken down, rebuilt, because the bar here is higher than most places.",
 	"This place will cost you something. You'll think about problems after hours. You'll redo things until they feel right.",
 ];
@@ -37,16 +37,17 @@ export function CareersSection() {
 					Get in touch
 				</p>
 				<h3 className="mt-4 font-serif text-[1.75rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2rem] dark:text-white">
-					Love what we&apos;re building?
+					Think you&apos;d fit here?
 				</h3>
 				<p className="mx-auto mt-4 max-w-lg text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-					If Reloop is the kind of work you want to do, send us a note. Share
-					your GitHub, your portfolio, or what you&apos;d want to help build.
+					Reloop is open-source email infrastructure for developers. If
+					that&apos;s the work you want to do, send us a note—your GitHub,
+					portfolio, or what you&apos;d help build.
 				</p>
 
 				<div className="mx-auto mt-8 max-w-lg rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 px-5 py-8 sm:px-6 sm:py-10 dark:border-white/[0.08] dark:bg-[#161616]">
 					<p className="text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/45">
-						We read every message. No cover letter template—just tell us what
+						We read every message. Skip the cover letter template. Tell us what
 						you&apos;d work on and why it matters to you.
 					</p>
 					<a

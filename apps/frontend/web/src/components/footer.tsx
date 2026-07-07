@@ -88,12 +88,6 @@ const columns: FooterColumn[] = [
 			{ title: "Blog", href: "/blog" },
 			{ title: "Changelog", href: "/changelog" },
 			{ title: "Glossary", href: "/glossary" },
-			{ title: "Community", href: "/community" },
-			{
-				title: "Status",
-				href: "https://status.reloop.sh/status/live",
-				external: true,
-			},
 		],
 	},
 	{
@@ -102,8 +96,7 @@ const columns: FooterColumn[] = [
 			{ title: "About", href: "/about" },
 			{ title: "Contact", href: "/contact" },
 			{ title: "Pricing", href: "/pricing" },
-			{ title: "Compare", href: "/compare" },
-			{ title: "Get started", href: "/dashboard/signup" },
+			{ title: "Careers", href: "/careers" },
 		],
 	},
 	{
