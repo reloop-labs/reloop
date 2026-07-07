@@ -42,6 +42,7 @@ const navItems = [
 	{ title: "Docs", href: "/docs", hasDropdown: true },
 	{ title: "AI", href: "/ai", hasDropdown: true },
 	{ title: "Pricing", href: "/pricing" },
+	{ title: "Contact", href: "/contact" },
 ];
 
 export const HeaderLight = () => {

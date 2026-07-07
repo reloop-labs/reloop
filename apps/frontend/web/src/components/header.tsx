@@ -156,6 +156,7 @@ const navItems: NavItem[] = [
 		},
 	},
 	{ title: "Pricing", href: "/pricing" },
+	{ title: "Contact", href: "/contact" },
 ];
 
 function MegaLink({ link }: { link: NavLink }) {
