@@ -82,8 +82,8 @@ export const TemplateList = () => {
 		}) || [];
 
 	return (
-		<div className="mx-auto max-w-3xl sm:px-8">
-			<div className="flex items-center justify-between pt-10">
+		<div className="mx-auto max-w-7xl space-y-8 p-6 lg:p-8">
+			<div className="flex items-center justify-between pb-6">
 				<p className="font-medium text-2xl">
 					Template{data?.templates.length !== 1 ? "s" : ""}
 				</p>

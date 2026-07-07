@@ -15,9 +15,9 @@ const EmailsLayout = ({ children }: { children: React.ReactNode }) => {
 		pathname !== "/dashboard/emails"; // support local basePaths
 
 	return (
-		<div className="mx-auto max-w-3xl sm:px-8">
+		<div className="mx-auto max-w-4xl space-y-8 p-6 lg:p-8">
 			{!isDetailPage && (
-				<div className="flex items-center justify-between pt-10 pb-6">
+				<div className="flex items-center justify-between pb-6">
 					<div className="flex flex-col gap-1">
 						<h1 className="font-medium text-2xl">Emails</h1>
 					</div>

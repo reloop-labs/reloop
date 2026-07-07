@@ -83,25 +83,20 @@ const MailboxesPage = () => {
 	const { activeOrganization } = useUserOrganization();
 	const [open, setState] = useState(false);
 	return (
-		<div className="mb-28">
-			<div className="border-stroke-soft-100 border-b">
-				<div className="mx-auto flex max-w-3xl items-center justify-between">
-					<div className="flex items-center gap-4 py-10">
-						<div>
-							<h1 className="font-medium text-title-h4">Mailboxes</h1>
-						</div>
-					</div>
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						onClick={() => setState(true)}
-					>
-						<Icon name="plus" className="h-4 w-4" />
-						Add Mailbox
-					</Button.Root>
-				</div>
+		<div className="mx-auto max-w-4xl space-y-8 p-6 lg:p-8">
+			<div className="flex items-center justify-between pb-6">
+				<h1 className="font-medium text-2xl">Mailboxes</h1>
+				<Button.Root
+					variant="neutral"
+					size="xsmall"
+					onClick={() => setState(true)}
+					className="gap-2"
+				>
+					<Icon name="plus" className="h-4 w-4" />
+					Add Mailbox
+				</Button.Root>
 			</div>
-			<div className="mx-auto max-w-3xl py-10">
+			<div>
 				{mailboxes.length === 0 ? (
 					<EmptyState />
 				) : (

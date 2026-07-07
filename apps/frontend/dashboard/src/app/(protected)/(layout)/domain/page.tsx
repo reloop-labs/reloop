@@ -52,7 +52,7 @@ const DomainPage = () => {
 	const domains = data?.domains || [];
 
 	return (
-		<div className="mx-auto max-w-3xl sm:px-8">
+		<div className="mx-auto max-w-4xl space-y-8 p-6 lg:p-8">
 			<DomainListHeader />
 			<DomainListToolbar />
 			<div className="mt-4">
