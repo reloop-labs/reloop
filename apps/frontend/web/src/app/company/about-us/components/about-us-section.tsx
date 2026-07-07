@@ -75,9 +75,9 @@ function StoryBlock({ chapter }: { chapter: StoryChapter }) {
 			<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
 				{chapter.eyebrow}
 			</p>
-			<h2 className="mt-4 font-serif text-[2rem] text-text-strong-950 leading-[1.08] tracking-tighter sm:text-[2.4rem] dark:text-white">
+			<h3 className="mt-4 font-serif text-[2rem] text-text-strong-950 leading-[1.08] tracking-tighter sm:text-[2.4rem] dark:text-white">
 				{chapter.title}
-			</h2>
+			</h3>
 			<div className="mt-6 space-y-5">
 				{chapter.paragraphs.map((paragraph) => (
 					<p
@@ -145,7 +145,7 @@ export function AboutUsSection() {
 				))}
 			</div>
 
-			<div className="mt-20 border-stroke-soft-200 border-t pt-16 dark:border-white/10 lg:mt-24 lg:pt-20">
+			<div className="mt-20 border-stroke-soft-200 border-t pt-16 lg:mt-24 lg:pt-20 dark:border-white/10">
 				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
 					Who we are
 				</p>

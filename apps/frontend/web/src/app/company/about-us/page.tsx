@@ -41,16 +41,54 @@ export const metadata: Metadata = {
 };
 
 const AboutUsPage = () => {
+	const siteUrl = getSiteUrl();
+	const jsonLd = {
+		"@context": "https://schema.org",
+		"@type": "AboutPage",
+		mainEntity: {
+			"@type": "Organization",
+			"@id": `${siteUrl}/#organization`,
+			name: "Reloop Labs",
+			url: siteUrl,
+			logo: `${siteUrl}/web-app-manifest-512x512.png`,
+			description:
+				"Open-source, self-hostable email infrastructure with a hosted service at reloop.sh.",
+			founders: [
+				{
+					"@type": "Person",
+					name: "Pranav Patel",
+					sameAs: "https://github.com/pranavp10",
+				},
+				{
+					"@type": "Person",
+					name: "Twinkal P",
+					sameAs: "https://github.com/twinkalp10",
+				},
+			],
+			sameAs: [
+				"https://github.com/reloop-labs/reloop",
+				"https://discord.gg/bHnkBcp7xR",
+				"https://x.com/reloophq",
+			],
+		},
+	};
+
 	return (
-		<MarketingPageShell
-			titleLines={["We built the email", "stack we couldn't buy."]}
-			description="Pranav and Twinkal founded Reloop Labs to ship proprietary-grade email infrastructure as open source—hosted at reloop.sh or on your servers."
-			fullViewportHero
-		>
-			<PageSection narrow flushTop>
-				<AboutUsSection />
-			</PageSection>
-		</MarketingPageShell>
+		<>
+			<script
+				type="application/ld+json"
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+			/>
+			<MarketingPageShell
+				titleLines={["We built the email", "stack we couldn't buy."]}
+				description="Pranav and Twinkal founded Reloop Labs to ship proprietary-grade email infrastructure as open source—hosted at reloop.sh or on your servers."
+				fullViewportHero
+			>
+				<PageSection narrow flushTop>
+					<AboutUsSection />
+				</PageSection>
+			</MarketingPageShell>
+		</>
 	);
 };
 
