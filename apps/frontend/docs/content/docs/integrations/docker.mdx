@@ -1,0 +1,37 @@
+---
+title: Docker Integration
+sidebarTitle: Docker
+icon: "siDocker"
+description: Configure Docker containers and Docker Compose environments with Reloop credentials.
+---
+
+[Docker](https://docker.com) simplifies shipping applications. Configure your containerized services to connect to Reloop's SMTP or API endpoints.
+
+---
+
+## Step 1: Add Credentials to Docker Compose
+
+Add the credentials under the `environment` section in your `docker-compose.yml` file:
+
+```yaml
+version: '3.8'
+
+services:
+  app:
+    image: node:18
+    environment:
+      - RELOOP_API_KEY=rl_your_api_key_here
+      - SMTP_HOST=smtp.reloop.dev
+      - SMTP_PORT=587
+      - SMTP_USER=reloop
+      - SMTP_PASS=rl_your_api_key_here
+    ports:
+      - "3000:3000"
+    command: npm start
+```
+
+---
+
+## Step 2: Use credentials in your container
+
+Your application inside the container can now access the environment variables naturally (e.g. `process.env.RELOOP_API_KEY` in Node.js or `os.environ.get('RELOOP_API_KEY')` in Python).

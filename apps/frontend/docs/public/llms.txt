@@ -169,6 +169,24 @@ Important notes:
 - [Directus Integration](https://docs.reloop.dev/docs/integrations/directus): Configure Directus CMS via environment variables to send system emails
 - [Supabase Integration](https://docs.reloop.dev/docs/knowledge-base/supabase-quickstart): Configure Supabase authentication and database emails via Reloop SMTP
 
+## Cloud & Hosting Platforms
+
+- [Vercel Integration](https://docs.reloop.dev/docs/integrations/vercel): Deploy frontend applications and route transactional emails
+- [Railway Integration](https://docs.reloop.dev/docs/integrations/railway): Host your Reloop instance or run your backends
+- [Cloudflare Integration](https://docs.reloop.dev/docs/integrations/cloudflare): Deliver emails globally using Cloudflare Workers and Pages
+- [Netlify Integration](https://docs.reloop.dev/docs/integrations/netlify): Connect your Netlify builds and serverless functions
+- [Docker Integration](https://docs.reloop.dev/docs/integrations/docker): Run Reloop services locally or in production containers
+- [Coolify Integration](https://docs.reloop.dev/docs/integrations/coolify): Self-host Reloop with simple open-source PaaS integrations
+
+## AI App Builders & Tools
+
+- [Lovable Integration](https://docs.reloop.dev/docs/integrations/lovable): Build full-stack apps with natural language using Reloop SMTP or REST APIs
+- [Bolt.new Integration](https://docs.reloop.dev/docs/integrations/bolt): Integrate Reloop into full-stack web applications generated in the browser
+- [v0 Integration](https://docs.reloop.dev/docs/integrations/v0): Integrate Reloop email templates and APIs into AI-generated React/Next.js components
+- [Replit Integration](https://docs.reloop.dev/docs/integrations/replit): Deploy Reloop-integrated apps and agent inboxes instantly on Replit Repls
+- [Cursor Integration](https://docs.reloop.dev/docs/integrations/cursor): Use Cursor composer or chat with Reloop's MCP server and agent-ready docs
+- [Windsurf Integration](https://docs.reloop.dev/docs/integrations/windsurf): Code alongside the Windsurf agent with full monorepo and API context
+
 ## Resources
 
 - [Examples](https://docs.reloop.dev/docs/resources/examples): Code examples and sample projects

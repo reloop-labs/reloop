@@ -1,0 +1,44 @@
+---
+title: v0 Integration
+sidebarTitle: v0
+icon: "siV0"
+description: Integrate Reloop email APIs and templates into React/Next.js components generated with v0.dev.
+---
+
+[v0 by Vercel](https://v0.dev) is a generative UI system that creates production-ready frontend code. To connect v0 components to a backend that sends emails with Reloop:
+
+---
+
+## Step 1: Prompt v0 for Frontend UI
+
+Generate your components in v0:
+
+> "Generate a beautiful contact form component that sends form data to a Next.js App Router API route at `/api/send`."
+
+Copy the generated code into your Next.js project.
+
+---
+
+## Step 2: Build the API Route with Reloop
+
+In your Next.js project, create `/app/api/send/route.ts` to process the form using Reloop:
+
+```typescript
+import { NextResponse } from 'next/server';
+import Reloop from 'reloop-email';
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+export async function POST(req: Request) {
+  const { name, email, message } = await req.json();
+
+  const data = await reloop.emails.send({
+    from: 'support@yourdomain.com',
+    to: 'info@yourdomain.com',
+    subject: `New form submission from ${name}`,
+    html: `<p>Name: ${name}</p><p>Email: ${email}</p><p>Message: ${message}</p>`,
+  });
+
+  return NextResponse.json(data);
+}
+```

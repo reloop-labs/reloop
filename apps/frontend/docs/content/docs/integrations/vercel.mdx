@@ -1,0 +1,42 @@
+---
+title: Vercel Integration
+sidebarTitle: Vercel
+icon: "siVercel"
+description: Configure applications hosted on Vercel to send emails using Reloop SMTP or REST APIs.
+---
+
+[Vercel](https://vercel.com) is the premier cloud platform for frontends and serverless functions. Integrating Reloop with your Vercel-deployed applications takes just a few steps.
+
+---
+
+## Step 1: Configure Vercel Environment Variables
+
+To allow your serverless functions or Next.js API routes to authenticate with Reloop, configure your API key in the Vercel dashboard:
+
+1. Go to your project on the **Vercel Dashboard**.
+2. Navigate to **Settings** → **Environment Variables**.
+3. Add a new variable:
+   - **Key**: `RELOOP_API_KEY`
+   - **Value**: `YOUR_RELOOP_API_KEY` (starts with `rl_`)
+4. Click **Save**.
+
+---
+
+## Step 2: Deploy and Route Emails
+
+Use the official Node.js SDK to send emails in your serverless code:
+
+```typescript
+import Reloop from 'reloop-email';
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+export async function POST() {
+  const data = await reloop.emails.send({
+    from: 'onboarding@yourdomain.com',
+    to: 'user@example.com',
+    subject: 'Welcome!',
+    html: '<p>Thanks for signing up!</p>',
+  });
+}
+```

@@ -1,0 +1,31 @@
+---
+title: Windsurf Integration
+sidebarTitle: Windsurf
+icon: "siWindsurf"
+description: Connect Windsurf agent features to Reloop using the MCP Server.
+---
+
+[Windsurf](https://codeium.com/windsurf) is an agentic IDE built by Codeium. You can register Reloop's MCP server to grant the Windsurf agent capability to dispatch emails and interact with the Reloop platform.
+
+---
+
+## Step 1: Add Reloop MCP to Windsurf Config
+
+1. Open Windsurf and navigate to **Settings** → **Developer Tools** → **MCP**.
+2. Click **Add Server**.
+3. Input the following configurations:
+   - **Name**: `reloop`
+   - **Transport**: `STDIO`
+   - **Command**: `npx`
+   - **Arguments**: `-y`, `reloop-mcp`
+4. Set the environment variable:
+   - `RELOOP_API_KEY`: `rl_your_api_key`
+5. Save the configuration.
+
+---
+
+## Step 2: Query the Agent
+
+In the Windsurf chat or agent panel, prompt the agent:
+
+> "Send an onboarding email to contact@example.com using the Reloop MCP tool."

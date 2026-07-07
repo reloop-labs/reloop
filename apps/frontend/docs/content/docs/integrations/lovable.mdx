@@ -1,0 +1,31 @@
+---
+title: Lovable Integration
+sidebarTitle: Lovable
+icon: "heart"
+description: Connect Reloop with full-stack applications built using Lovable.dev.
+---
+
+[Lovable](https://lovable.dev) is a powerful AI builder that generates full-stack web applications from natural language. You can easily prompt Lovable to integrate Reloop SMTP or REST APIs to handle email communications.
+
+---
+
+## Step 1: Provide Reloop Credentials to Lovable
+
+To let your Lovable-generated backend send emails:
+
+1. Copy your Reloop API key from the Reloop dashboard.
+2. In the Lovable chat panel, configure the environment variables by prompting:
+   > "Add `RELOOP_API_KEY` to the environment variables with value `rl_your_key`."
+3. Prompt Lovable to configure SMTP settings if using SMTP:
+   - Host: `smtp.reloop.dev`
+   - Port: `587`
+   - User: `reloop`
+   - Pass: `rl_your_key`
+
+---
+
+## Step 2: Prompt Lovable to write Reloop logic
+
+You can ask Lovable to write code to send verification or transactional emails using the SDK or API:
+
+> "Create a contact form submission handler that sends an email to admin@mydomain.com using the Reloop API key."

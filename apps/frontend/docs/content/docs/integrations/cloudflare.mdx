@@ -1,0 +1,48 @@
+---
+title: Cloudflare Integration
+sidebarTitle: Cloudflare
+icon: "siCloudflare"
+description: Connect Cloudflare Workers, Pages, and serverless logic with Reloop.
+---
+
+[Cloudflare Workers](https://workers.cloudflare.com) allow you to run serverless code globally. Since standard TCP sockets can be limited in edge environments, routing emails through the Reloop HTTP API is the recommended approach.
+
+---
+
+## Step 1: Bind Secret in Wrangler
+
+To add your Reloop API key to your Cloudflare Worker environment securely, run the following command in your terminal:
+
+```bash
+wrangler secret put RELOOP_API_KEY
+```
+
+When prompted, input your Reloop API key starting with `rl_`.
+
+---
+
+## Step 2: Send Email via Fetch in Cloudflare Workers
+
+Send emails with a standard POST request inside your Worker:
+
+```typescript
+export default {
+  async fetch(request, env) {
+    const response = await fetch('https://api.reloop.dev/v1/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.RELOOP_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'alerts@yourdomain.com',
+        to: 'user@example.com',
+        subject: 'Edge Alert',
+        html: '<p>Sent from the edge via Reloop!</p>',
+      }),
+    });
+
+    return response;
+  }
+};
+```

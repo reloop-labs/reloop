@@ -1,0 +1,40 @@
+---
+title: Replit Integration
+sidebarTitle: Replit
+icon: "siReplit"
+description: Configure environment variables in Replit Workspace to send emails using Reloop.
+---
+
+[Replit](https://replit.com) is an online IDE and hosting service. Follow these steps to configure your Replit Repl to send emails via Reloop.
+
+---
+
+## Step 1: Add API Key to Replit Secrets
+
+1. Open your Repl workspace on **Replit**.
+2. Click on the **Secrets** tool in the left sidebar (represented by a lock icon).
+3. Add a new secret:
+   - **Key**: `RELOOP_API_KEY`
+   - **Value**: `rl_your_api_key_here`
+4. Click **Add Secret**.
+
+Replit automatically injects secrets as environment variables.
+
+---
+
+## Step 2: Write Email Dispatch Logic
+
+Send an email in Node.js on Replit:
+
+```javascript
+import Reloop from 'reloop-email';
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+reloop.emails.send({
+  from: 'hello@yourdomain.com',
+  to: 'friend@example.com',
+  subject: 'Greetings from Replit',
+  html: '<p>This was sent from my online Repl!</p>'
+});
+```

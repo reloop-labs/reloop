@@ -1,5 +1,26 @@
 {
 	"title": "Integration",
 	"icon": "workflow",
-	"pages": ["index", "n8n", "make", "zapier", "wordpress", "ghost", "strapi", "directus"]
+	"pages": [
+		"index",
+		"n8n",
+		"make",
+		"zapier",
+		"wordpress",
+		"ghost",
+		"strapi",
+		"directus",
+		"vercel",
+		"railway",
+		"cloudflare",
+		"netlify",
+		"docker",
+		"coolify",
+		"lovable",
+		"bolt",
+		"v0",
+		"replit",
+		"cursor",
+		"windsurf"
+	]
 }

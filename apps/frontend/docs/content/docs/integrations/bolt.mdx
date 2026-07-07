@@ -1,0 +1,30 @@
+---
+title: Bolt.new Integration
+sidebarTitle: Bolt.new
+icon: "zap"
+description: Connect Reloop with full-stack applications built using Bolt.new.
+---
+
+[Bolt.new](https://bolt.new) allows you to edit, run, and deploy full-stack web applications entirely in your browser using AI. Adding Reloop support takes only two steps.
+
+---
+
+## Step 1: Set Environment Variables in Bolt.new
+
+Inside your Bolt.new chat or the terminal panel:
+
+1. Create or open the `.env` file at the root of the project.
+2. Add your Reloop API key:
+   ```env
+   RELOOP_API_KEY=rl_your_api_key_here
+   ```
+3. Alternatively, prompt the AI agent:
+   > "Configure my `.env` variables to include `RELOOP_API_KEY`."
+
+---
+
+## Step 2: Prompt Bolt.new for Email Dispatch
+
+Ask the Bolt AI assistant to add the email logic:
+
+> "Install `reloop-email` and create a server endpoint `api/send-email` that sends a transactional email when a user registers."

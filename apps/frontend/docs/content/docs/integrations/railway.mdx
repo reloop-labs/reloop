@@ -1,0 +1,36 @@
+---
+title: Railway Integration
+sidebarTitle: Railway
+icon: "siRailway"
+description: Configure services hosted on Railway to send emails using Reloop.
+---
+
+[Railway](https://railway.app) simplifies hosting backends, databases, and cron jobs. Configure your Railway services to send emails via Reloop with environment variables.
+
+---
+
+## Step 1: Set Environment Variables in Railway
+
+1. Go to your **Railway Project**.
+2. Select the service that will send emails.
+3. Click on the **Variables** tab.
+4. Add the following variable:
+   - **Name**: `RELOOP_API_KEY`
+   - **Value**: `rl_your_api_key`
+5. If using standard SMTP connections, also configure:
+   - **Name**: `SMTP_HOST` → `smtp.reloop.dev`
+   - **Name**: `SMTP_PORT` → `587`
+   - **Name**: `SMTP_USER` → `reloop`
+   - **Name**: `SMTP_PASS` → `rl_your_api_key`
+
+Railway will automatically redeploy your service to apply the variables.
+
+---
+
+## Step 2: Code Integration
+
+Retrieve the environment variables in your server code:
+
+```typescript
+const apiKey = process.env.RELOOP_API_KEY;
+```

@@ -1,0 +1,35 @@
+---
+title: Coolify Integration
+sidebarTitle: Coolify
+icon: "siCoolify"
+description: Configure services deployed on Coolify to route emails using Reloop SMTP.
+---
+
+[Coolify](https://coolify.io) is an open-source, self-hostable alternative to Heroku and Netlify. You can easily integrate Reloop into your Coolify applications or use Reloop SMTP as the global system transactional mail provider.
+
+---
+
+## Step 1: Set Reloop SMTP as System SMTP
+
+To send system alerts and registration emails from Coolify itself via Reloop:
+
+1. Open your **Coolify Dashboard**.
+2. Navigate to **Settings** → **Transactional Email**.
+3. Enable transactional emails and enter the following settings:
+   - **SMTP Server**: `smtp.reloop.dev`
+   - **SMTP Port**: `587`
+   - **SMTP User**: `reloop`
+   - **SMTP Password**: `rl_your_api_key`
+   - **From Address**: `noreply@yourdomain.com`
+4. Click **Save**.
+
+---
+
+## Step 2: Configure Application Environment Variables
+
+For apps hosted on Coolify:
+
+1. Select your **Application** in Coolify.
+2. Go to **Environment Variables**.
+3. Add `RELOOP_API_KEY` as a secret variable.
+4. Save and redeploy.

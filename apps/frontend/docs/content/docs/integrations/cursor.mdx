@@ -1,0 +1,33 @@
+---
+title: Cursor Integration
+sidebarTitle: Cursor
+icon: "siCursor"
+description: Connect Cursor's Composer and chat features to Reloop using the MCP Server.
+---
+
+[Cursor](https://cursor.com) is an AI-first code editor. By connecting Cursor to the Reloop Model Context Protocol (MCP) server, your Cursor agent can send test emails, check domain logs, and manage templates directly from the chat window.
+
+---
+
+## Step 1: Configure Reloop MCP in Cursor
+
+1. Open Cursor and navigate to **Cursor Settings** (Gear icon on the top right) → **Features** → **MCP**.
+2. Click **+ Add New MCP Server**.
+3. Fill in the configuration:
+   - **Name**: `reloop`
+   - **Type**: `command`
+   - **Command**: `npx -y reloop-mcp`
+4. Under environment variables in the dialog, add:
+   - **Key**: `RELOOP_API_KEY`
+   - **Value**: `rl_your_api_key_here`
+5. Click **Save**.
+
+Cursor will initialize the MCP server and list all available tools.
+
+---
+
+## Step 2: Use in Chat
+
+In the Cursor chat panel, type:
+
+> "Send a test email to customer@example.com saying 'Hello from Cursor Composer!' using the Reloop MCP tool."

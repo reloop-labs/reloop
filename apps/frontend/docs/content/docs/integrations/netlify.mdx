@@ -1,0 +1,47 @@
+---
+title: Netlify Integration
+sidebarTitle: Netlify
+icon: "siNetlify"
+description: Configure Netlify projects and serverless functions to send emails using Reloop.
+---
+
+[Netlify](https://netlify.com) makes deploying frontends and serverless functions effortless. Follow these steps to route emails via Reloop from your Netlify-deployed applications.
+
+---
+
+## Step 1: Configure Environment Variables
+
+1. Go to your **Netlify Team Dashboard**.
+2. Select your project and navigate to **Site configuration** → **Environment variables**.
+3. Click **Add a variable** and choose **Add single variable**.
+4. Configure the variable:
+   - **Key**: `RELOOP_API_KEY`
+   - **Value**: `rl_your_api_key`
+5. Click **Create variable**.
+
+---
+
+## Step 2: Use in Netlify Functions
+
+Retrieve the variable inside a Netlify Serverless Function:
+
+```typescript
+import { Handler } from '@netlify/functions';
+import Reloop from 'reloop-email';
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY);
+
+export const handler: Handler = async (event, context) => {
+  const result = await reloop.emails.send({
+    from: 'hello@yourdomain.com',
+    to: 'customer@example.com',
+    subject: 'Netlify Alert',
+    html: '<p>Sent from a Netlify Serverless Function!</p>',
+  });
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify(result),
+  };
+};
+```
