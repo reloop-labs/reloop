@@ -78,7 +78,7 @@ const EngineeringPage = () => {
 				}}
 				secondaryCta={{
 					label: "Join our team",
-					href: "/company/careers",
+					href: "/careers",
 				}}
 				compactHero
 			>
@@ -91,8 +91,8 @@ const EngineeringPage = () => {
 					titleMuted="of email infrastructure."
 					description="We're looking for engineers who share our passion for reliability, performance, and open source. Explore our codebase or get in touch."
 					primary={{
-						label: "View open positions",
-						href: "/company/careers",
+						label: "Get in touch",
+						href: "/careers",
 					}}
 					secondary={{
 						label: "Explore our code",
