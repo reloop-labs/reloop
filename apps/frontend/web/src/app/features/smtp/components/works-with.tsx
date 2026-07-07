@@ -80,9 +80,7 @@ function IntegrationIcon({
 		<svg
 			viewBox="0 0 24 24"
 			className={
-				topFold
-					? "size-7 sm:size-8 lg:size-10"
-					: "size-8 sm:size-9 lg:size-12"
+				topFold ? "size-7 sm:size-8 lg:size-10" : "size-8 sm:size-9 lg:size-12"
 			}
 			aria-hidden
 		>
@@ -144,7 +142,7 @@ export default function WorksWith({ topFold = false }: { topFold?: boolean }) {
 								: "text-balance font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white"
 						}
 					>
-						Works with your stack
+						Connect easily with any service.
 					</h2>
 					<p
 						className={`mx-auto max-w-xl text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50 ${topFold ? "mt-3" : "mt-4"}`}

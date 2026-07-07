@@ -34,5 +34,5 @@ const smtpFaqItems = [
 ];
 
 export function SmtpFaq() {
-	return <FaqSection items={smtpFaqItems} id="smtp-faq" compact />;
+	return <FaqSection items={smtpFaqItems} id="smtp-faq" compact plain />;
 }

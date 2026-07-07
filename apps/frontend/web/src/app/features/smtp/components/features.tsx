@@ -32,8 +32,8 @@ export default function Features() {
 								No SDK required
 							</h3>
 							<p className="text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-								Point Nodemailer, PHPMailer, Django, Rails, or any SMTP client at
-								Reloop. Same host, port, and credentials everywhere.
+								Point Nodemailer, PHPMailer, Django, Rails, or any SMTP client
+								at Reloop. Same host, port, and credentials everywhere.
 							</p>
 						</div>
 					</div>

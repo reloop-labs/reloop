@@ -16,9 +16,9 @@ import WorksWith from "./components/works-with";
 export const instant = false;
 
 export const metadata: Metadata = {
-	title: "High-Deliverability SMTP Relay & Email Service | Reloop",
+	title: "Fast, Reliable SMTP Relay & Email Service | Reloop",
 	description:
-		"Connect your existing applications to Reloop's fast, high-deliverability SMTP relay. No SDK migration required. Get credentials and start sending in under 2 minutes.",
+		"Connect your existing applications to Reloop's fast, reliable SMTP relay. No SDK migration required. Get credentials and start sending in under 2 minutes.",
 	keywords: [
 		"SMTP relay",
 		"SMTP email service",
@@ -30,26 +30,26 @@ export const metadata: Metadata = {
 	],
 	alternates: { canonical: `${getSiteUrl()}/features/smtp` },
 	openGraph: {
-		title: "High-Deliverability SMTP Relay & Email Service | Reloop",
+		title: "Fast, Reliable SMTP Relay & Email Service | Reloop",
 		description:
-			"Connect your existing applications to Reloop's fast, high-deliverability SMTP relay. No SDK migration required. Get credentials and start sending in under 2 minutes.",
+			"Connect your existing applications to Reloop's fast, reliable SMTP relay. No SDK migration required. Get credentials and start sending in under 2 minutes.",
 		type: "website",
 		url: `${getSiteUrl()}/features/smtp`,
 		siteName: "Reloop",
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "High-Deliverability SMTP Relay & Email Service | Reloop",
+		title: "Fast, Reliable SMTP Relay & Email Service | Reloop",
 		description:
-			"Connect your existing applications to Reloop's fast, high-deliverability SMTP relay. No SDK migration required. Get credentials and start sending in under 2 minutes.",
+			"Connect your existing applications to Reloop's fast, reliable SMTP relay. No SDK migration required. Get credentials and start sending in under 2 minutes.",
 	},
 };
 
 const SmtpPage = () => {
 	return (
 		<MarketingPageShell
-			titleLines={["Drop-in SMTP relay.", "Zero code changes."]}
-			description="Point your existing mailer, application, or CRM at Reloop's high-deliverability SMTP relay. No APIs or SDKs to integrate—just copy your credentials and send immediately."
+			titleLines={["Fast and reliable", "SMTP service."]}
+			description="Point your existing application, mailer, or CRM at Reloop's lightning-fast SMTP relay. Zero code changes."
 			primaryCta={{
 				label: "Get SMTP credentials",
 				href: hostedSignupHref,
