@@ -256,24 +256,34 @@ export const Header = () => {
 									item.mega ? setActiveMega(item.title) : setActiveMega(null)
 								}
 							>
-								<Link
-									href={item.href}
-									className={`inline-flex items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
-										activeMega === item.title
-											? "text-text-strong-950 dark:text-white"
-											: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
-									}`}
-								>
-									{item.title}
-									{item.mega && (
+								{item.mega ? (
+									<span
+										className={`inline-flex cursor-default items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
+											activeMega === item.title
+												? "text-text-strong-950 dark:text-white"
+												: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
+										}`}
+									>
+										{item.title}
 										<Icon
 											name="chevron-down"
 											className={`size-3 transition-transform duration-200 ${
 												activeMega === item.title ? "rotate-180" : "opacity-50"
 											}`}
 										/>
-									)}
-								</Link>
+									</span>
+								) : (
+									<Link
+										href={item.href}
+										className={`inline-flex items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
+											activeMega === item.title
+												? "text-text-strong-950 dark:text-white"
+												: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
+										}`}
+									>
+										{item.title}
+									</Link>
+								)}
 							</div>
 						))}
 					</nav>
