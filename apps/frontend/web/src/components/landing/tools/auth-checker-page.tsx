@@ -78,12 +78,12 @@ export function AuthCheckerPageView() {
 				<div className="mt-6 font-mono text-[12px] text-white/35">
 					TXT lookup via public DNS. For guided SPF/DKIM setup, add your domain
 					in{" "}
-					<Link
+					<a
 						href="/dashboard/signup"
 						className="text-orange-400 hover:underline"
 					>
 						Reloop
-					</Link>
+					</a>
 					.
 				</div>
 			</div>

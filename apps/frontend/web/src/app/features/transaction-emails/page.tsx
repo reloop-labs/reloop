@@ -319,7 +319,7 @@ const TransactionEmailsPage = () => {
 					</p>
 
 					<div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-						<Link
+						<a
 							href="/dashboard/signup"
 							className={`${Button.buttonVariants({
 								variant: "neutral",
@@ -327,7 +327,7 @@ const TransactionEmailsPage = () => {
 							}).root()} h-11! rounded-full! px-8! font-semibold`}
 						>
 							Start for free
-						</Link>
+						</a>
 						<a
 							href="#playground"
 							className={`${Button.buttonVariants({

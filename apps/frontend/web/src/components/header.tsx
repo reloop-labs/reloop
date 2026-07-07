@@ -300,26 +300,26 @@ export const Header = () => {
 						</a>
 
 						{mounted && session ? (
-							<Link
+							<a
 								href="/dashboard"
 								className="inline-flex items-center justify-center rounded-full bg-text-strong-950 px-4 py-1.5 font-medium text-[13px] text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-black"
 							>
 								Dashboard
-							</Link>
+							</a>
 						) : (
 							<>
-								<Link
+								<a
 									href="/dashboard/login"
 									className="font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
 								>
 									Log in
-								</Link>
-								<Link
+								</a>
+								<a
 									href="/dashboard/signup"
 									className="inline-flex items-center justify-center rounded-full bg-text-strong-950 px-4 py-1.5 font-medium text-[13px] text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-black"
 								>
 									Sign up
-								</Link>
+								</a>
 							</>
 						)}
 					</div>
@@ -444,6 +444,7 @@ export const Header = () => {
 
 									{mounted && session ? (
 										<Link
+											prefetch={false}
 											href="/dashboard"
 											onClick={closeMobileMenu}
 											className="inline-flex items-center justify-center rounded-full bg-text-strong-950 px-4 py-3 font-medium text-[15px] text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-black"
@@ -453,6 +454,7 @@ export const Header = () => {
 									) : (
 										<div className="grid grid-cols-2 gap-3">
 											<Link
+												prefetch={false}
 												href="/dashboard/login"
 												onClick={closeMobileMenu}
 												className="inline-flex items-center justify-center rounded-full border border-stroke-soft-200 px-4 py-3 font-medium text-[15px] text-text-strong-950 transition-colors hover:bg-neutral-950/[0.04] dark:border-white/15 dark:text-white dark:hover:bg-white/[0.06]"
@@ -460,6 +462,7 @@ export const Header = () => {
 												Log in
 											</Link>
 											<Link
+												prefetch={false}
 												href="/dashboard/signup"
 												onClick={closeMobileMenu}
 												className="inline-flex items-center justify-center rounded-full bg-text-strong-950 px-4 py-3 font-medium text-[15px] text-white transition-opacity hover:opacity-90 dark:bg-white dark:text-black"

@@ -402,7 +402,7 @@ function BentoCard({
 							3,000 emails / month
 						</p>
 					</div>
-					<Link
+					<a
 						href="/dashboard/signup"
 						className="group inline-flex h-11 items-center justify-center overflow-hidden rounded-full bg-text-strong-950 px-5 font-medium text-[14px] text-white transition-colors duration-300 hover:bg-text-strong-950/90 dark:bg-white dark:text-[#0a0d12] dark:hover:bg-white/90"
 					>
@@ -416,7 +416,7 @@ function BentoCard({
 								aria-hidden
 							/>
 						</span>
-					</Link>
+					</a>
 				</div>
 			)}
 		</div>
