@@ -9,15 +9,8 @@ import { siNodedotjs, siPython } from "simple-icons";
 type Language = "node" | "python";
 
 const SMTP_HOST = "smtp.reloop.sh";
-const SMTP_PORTS = "587/2587/2465";
 const SMTP_USER = "reloop";
 const DEFAULT_SMTP_PORT = 587;
-
-const copySettings = [
-	{ label: "Host", value: SMTP_HOST },
-	{ label: "Port", value: SMTP_PORTS },
-	{ label: "Username", value: SMTP_USER },
-];
 
 const snippets: Record<Language, string> = {
 	node: `import nodemailer from 'nodemailer';
@@ -59,155 +52,62 @@ const languageTabs = [
 	{ id: "python", label: "Python", si: siPython },
 ] as const;
 
-const codeGuide = {
-	eyebrow: "Example",
-	title: "Send your first email",
-	description:
-		"Use the settings above with your API key as the password. Pick a language — the snippet updates, this guide stays the same.",
-	points: [
-		"Port 587 with STARTTLS (or 2465 / 2587)",
-		"Same host, user, and key for every mailer",
-	],
-};
-
-function CodeGuidePanel() {
-	return (
-		<div className="flex flex-col lg:pr-4">
-			<p className="font-semibold text-[11px] text-primary-base uppercase tracking-[0.16em]">
-				{codeGuide.eyebrow}
-			</p>
-			<h3 className="mt-3 font-serif text-[1.75rem] text-text-strong-950 leading-[1.1] tracking-tighter sm:text-[2rem] dark:text-white">
-				{codeGuide.title}
-			</h3>
-			<p className="mt-4 text-[15px] text-text-sub-600 leading-7 dark:text-white/50">
-				{codeGuide.description}
-			</p>
-			<ul className="mt-6 space-y-3">
-				{codeGuide.points.map((point) => (
-					<li
-						key={point}
-						className="flex items-start gap-2.5 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/50"
-					>
-						<span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary-base" />
-						{point}
-					</li>
-				))}
-			</ul>
-			<Link
-				href="/docs/quickstart/smtp"
-				className="mt-8 inline-flex items-center gap-1.5 font-semibold text-primary-base text-sm transition-colors hover:text-primary-dark"
-			>
-				View SMTP docs
-				<svg
-					viewBox="0 0 24 24"
-					className="size-4"
-					fill="none"
-					stroke="currentColor"
-					strokeWidth="2"
-					aria-hidden
-				>
-					<path
-						d="M5 12h14M13 6l6 6-6 6"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-					/>
-				</svg>
-			</Link>
-		</div>
-	);
-}
-
-function CopySetting({ label, value }: { label: string; value: string }) {
-	const [copied, setCopied] = useState(false);
-
-	const handleCopy = async () => {
-		await navigator.clipboard.writeText(value);
-		setCopied(true);
-		setTimeout(() => setCopied(false), 2000);
-	};
-
-	return (
-		<button
-			type="button"
-			onClick={handleCopy}
-			className="group flex w-full flex-col rounded-xl border border-stroke-soft-100 px-4 py-3 text-left transition-colors hover:border-primary-base/40 hover:bg-primary-base/[0.03] dark:border-stroke-soft-100/40 dark:hover:border-primary-base/30"
-		>
-			<div className="flex items-center justify-between gap-2">
-				<span className="font-semibold text-[11px] text-primary-base uppercase tracking-[0.12em]">
-					{label}
-				</span>
-				<span className="flex items-center gap-1 font-medium text-[11px] text-text-sub-600 opacity-0 transition-opacity group-hover:opacity-100 dark:text-white/40">
-					<Icon name="copy" className="size-3" />
-					{copied ? "Copied" : "Copy"}
-				</span>
-			</div>
-			<span className="mt-1.5 font-mono text-[14px] text-text-strong-950 dark:text-white">
-				{value}
-			</span>
-		</button>
-	);
-}
-
-function PasswordSetting() {
-	return (
-		<Link
-			href="/dashboard/signup"
-			className="group flex w-full flex-col rounded-xl border border-stroke-soft-100 px-4 py-3 transition-colors hover:border-primary-base/40 hover:bg-primary-base/[0.03] dark:border-stroke-soft-100/40 dark:hover:border-primary-base/30"
-		>
-			<span className="font-semibold text-[11px] text-primary-base uppercase tracking-[0.12em]">
-				Password
-			</span>
-			<span className="mt-1.5 inline-flex items-center gap-1.5 font-semibold text-[14px] text-text-strong-950 dark:text-white">
-				Get your API key
-				<svg
-					viewBox="0 0 24 24"
-					className="size-4 transition-transform group-hover:translate-x-0.5"
-					fill="none"
-					stroke="currentColor"
-					strokeWidth="2"
-					aria-hidden
-				>
-					<path
-						d="M5 12h14M13 6l6 6-6 6"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-					/>
-				</svg>
-			</span>
-		</Link>
-	);
-}
-
 export default function Sandbox() {
 	const [lang, setLang] = useState<Language>("node");
 
 	return (
-		<section id="setup" className="scroll-mt-24">
-			<div className="mx-auto max-w-[1320px] px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
-				<div className="mx-auto mb-10 max-w-2xl text-center">
-					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-						Connect
-					</p>
-					<h2 className="mt-3 font-serif text-[2rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.6rem] dark:text-white">
-						Copy settings,{" "}
-						<span className="text-primary-base">paste into your app.</span>
+		<section id="example" className="scroll-mt-24">
+			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+				<div className="mx-auto mb-16 max-w-3xl text-center">
+					<h2 className="font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
+						Send your first email
 					</h2>
-					<p className="mt-4 text-[15px] text-text-sub-600 leading-7 dark:text-white/50">
-						Same host and port everywhere. Grab an API key from the dashboard
-						for the password.
+					<p className="mx-auto mt-6 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
+						Use the connection settings above with your API key as the password.
+						Pick a language—the snippet updates, the guide stays the same.
 					</p>
 				</div>
 
-				<div className="mx-auto max-w-5xl space-y-24 lg:space-y-32">
-					<div className="grid gap-3 sm:grid-cols-2">
-						{copySettings.map((setting) => (
-							<CopySetting key={setting.label} {...setting} />
-						))}
-						<PasswordSetting />
-					</div>
-
+				<div className="rounded-4xl border border-stroke-soft-200 bg-bg-weak-50 p-6 md:p-8 dark:border-white/10">
 					<div className="grid items-start gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-10">
-						<CodeGuidePanel />
+						<div className="flex flex-col lg:pr-4">
+							<ul className="space-y-3">
+								{[
+									"Port 587 with STARTTLS (or 2465 / 2587)",
+									"Same host, user, and key for every mailer",
+									"API key from the dashboard as password",
+								].map((point) => (
+									<li
+										key={point}
+										className="flex items-start gap-3 text-[14px] leading-snug"
+									>
+										<Icon
+											name="check-circle"
+											className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/35"
+										/>
+										<span className="text-text-sub-600 dark:text-white/60">
+											{point}
+										</span>
+									</li>
+								))}
+							</ul>
+							<Link
+								href="/docs/quickstart/smtp"
+								className="group mt-8 inline-flex h-11 items-center justify-center overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-white-0 px-5 font-medium text-[14px] text-text-strong-950 transition-colors duration-300 hover:bg-bg-weak-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1]"
+							>
+								<span className="inline-flex items-center">
+									<span className="group-hover:-translate-x-1 transition-transform duration-300 ease-out">
+										View SMTP docs
+									</span>
+									<Icon
+										name="arrow-left"
+										className="ml-0 size-4 max-w-0 shrink-0 translate-x-1 rotate-180 opacity-0 transition-all duration-300 ease-out group-hover:ml-2 group-hover:max-w-4 group-hover:translate-x-0 group-hover:opacity-100"
+										aria-hidden
+									/>
+								</span>
+							</Link>
+						</div>
+
 						<CopyCodeBlock
 							code={snippets[lang]}
 							lang={lang === "node" ? "javascript" : "python"}

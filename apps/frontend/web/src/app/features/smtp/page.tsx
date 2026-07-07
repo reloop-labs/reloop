@@ -1,8 +1,14 @@
-import { getSiteUrl } from "@reloop/web/lib/site";
+import {
+	MarketingPageShell,
+	PageSection,
+} from "@reloop/web/components/page-shell";
+import { getSiteUrl, hostedSignupHref } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
+import ConnectionSettings from "./components/connection-settings";
 import CTA from "./components/cta";
-import Hero from "./components/hero";
+import Features from "./components/features";
 import Sandbox from "./components/sandbox";
+import { SmtpFaq } from "./components/smtp-faq";
 import WorksWith from "./components/works-with";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
@@ -10,9 +16,9 @@ import WorksWith from "./components/works-with";
 export const instant = false;
 
 export const metadata: Metadata = {
-	title: "SMTP Relay | Reloop",
+	title: "High-Deliverability SMTP Relay & Email Service | Reloop",
 	description:
-		"Send email through Reloop's SMTP relay. Plain-language guide, connection settings, and examples for Nodemailer, Laravel, and more.",
+		"Connect your existing applications to Reloop's fast, high-deliverability SMTP relay. No SDK migration required. Get credentials and start sending in under 2 minutes.",
 	keywords: [
 		"SMTP relay",
 		"SMTP email service",
@@ -24,29 +30,44 @@ export const metadata: Metadata = {
 	],
 	alternates: { canonical: `${getSiteUrl()}/features/smtp` },
 	openGraph: {
-		title: "SMTP Relay | Reloop",
+		title: "High-Deliverability SMTP Relay & Email Service | Reloop",
 		description:
-			"Send email through Reloop's SMTP relay. Connection settings and examples for common mailers.",
+			"Connect your existing applications to Reloop's fast, high-deliverability SMTP relay. No SDK migration required. Get credentials and start sending in under 2 minutes.",
 		type: "website",
 		url: `${getSiteUrl()}/features/smtp`,
 		siteName: "Reloop",
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "SMTP Relay | Reloop",
+		title: "High-Deliverability SMTP Relay & Email Service | Reloop",
 		description:
-			"Send email through Reloop's SMTP relay. Connection settings and examples for common mailers.",
+			"Connect your existing applications to Reloop's fast, high-deliverability SMTP relay. No SDK migration required. Get credentials and start sending in under 2 minutes.",
 	},
 };
 
 const SmtpPage = () => {
 	return (
-		<div>
-			<Hero />
+		<MarketingPageShell
+			titleLines={["Drop-in SMTP relay.", "Zero code changes."]}
+			description="Point your existing mailer, application, or CRM at Reloop's high-deliverability SMTP relay. No APIs or SDKs to integrate—just copy your credentials and send immediately."
+			primaryCta={{
+				label: "Get SMTP credentials",
+				href: hostedSignupHref,
+			}}
+			secondaryCta={{ label: "See how to connect", href: "#setup" }}
+			compactHero
+		>
+			<PageSection flushTop>
+				<ConnectionSettings />
+			</PageSection>
+
 			<WorksWith />
 			<Sandbox />
+			<Features />
+
 			<CTA />
-		</div>
+			<SmtpFaq />
+		</MarketingPageShell>
 	);
 };
 

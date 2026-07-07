@@ -103,9 +103,13 @@ export default function WorksWith() {
 		<section id="works-with">
 			<div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-28">
 				<div className="text-center">
-					<h2 className="text-balance font-serif text-[1.9rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[2.75rem] lg:text-[3.6rem] dark:text-white">
+					<h2 className="text-balance font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
 						Works with your stack
 					</h2>
+					<p className="mx-auto mt-4 max-w-xl text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
+						No extra setup — plug Reloop into the mailer or platform you already
+						use.
+					</p>
 				</div>
 
 				{/* Mobile & tablet — centered wrap grid */}
@@ -131,31 +135,30 @@ export default function WorksWith() {
 					</div>
 				</div>
 
-				<p className="mx-auto mt-10 max-w-xl text-center text-[15px] text-text-sub-600 leading-7 sm:mt-14 lg:mt-20 dark:text-white/50">
-					No extra setup — plug Reloop into the mailer or platform you already
-					use.
-				</p>
-
-				<div className="mt-8 text-center">
+				<div className="mt-10 text-center sm:mt-14 lg:mt-20">
 					<Link
 						href={smtpDocs}
-						className="inline-flex items-center gap-1.5 font-semibold text-primary-base text-sm transition-colors hover:text-primary-dark"
+						className="group inline-flex h-11 items-center justify-center overflow-hidden rounded-full border border-stroke-soft-200 bg-bg-white-0 px-5 font-medium text-[14px] text-text-strong-950 transition-colors duration-300 hover:bg-bg-weak-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1]"
 					>
-						Explore all integrations
-						<svg
-							viewBox="0 0 24 24"
-							className="size-4"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							aria-hidden
-						>
-							<path
-								d="M7 17L17 7M17 7H8M17 7V16"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							/>
-						</svg>
+						<span className="inline-flex items-center">
+							<span className="group-hover:-translate-x-1 transition-transform duration-300 ease-out">
+								Explore all integrations
+							</span>
+							<svg
+								viewBox="0 0 24 24"
+								className="ml-0 size-4 max-w-0 shrink-0 translate-x-1 opacity-0 transition-all duration-300 ease-out group-hover:ml-2 group-hover:max-w-4 group-hover:translate-x-0 group-hover:opacity-100"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								aria-hidden
+							>
+								<path
+									d="M5 12h14M13 6l6 6-6 6"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								/>
+							</svg>
+						</span>
 					</Link>
 				</div>
 			</div>
