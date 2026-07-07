@@ -4,9 +4,42 @@ export const alt = "Why Open Source | Reloop";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpenGraphImage() {
-	const primaryColor = "#d97757";
+const CheckIcon = () => (
+	<svg
+		width="14"
+		height="10"
+		viewBox="0 0 14 10"
+		fill="none"
+		style={{ display: "flex" }}
+	>
+		<path
+			d="M1 5L4.5 8.5L13 1"
+			stroke="#4ade80"
+			strokeWidth="2.5"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		/>
+	</svg>
+);
 
+const CrossIcon = () => (
+	<svg
+		width="10"
+		height="10"
+		viewBox="0 0 10 10"
+		fill="none"
+		style={{ display: "flex" }}
+	>
+		<path
+			d="M1 1L9 9M9 1L1 9"
+			stroke="#f87171"
+			strokeWidth="2.5"
+			strokeLinecap="round"
+		/>
+	</svg>
+);
+
+export default function OpenGraphImage() {
 	return new ImageResponse(
 		<div
 			style={{
@@ -15,32 +48,70 @@ export default function OpenGraphImage() {
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: "space-between",
-				backgroundColor: "#000000",
-				padding: "56px",
+				backgroundColor: "#050506",
+				padding: "64px",
 				fontFamily: "sans-serif",
 				position: "relative",
 				overflow: "hidden",
 			}}
 		>
-			{/* Top Part */}
-			<div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
-				{/* Logo / Header */}
-				<div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+			{/* SVG Background Grid */}
+			<svg
+				width="100%"
+				height="100%"
+				style={{
+					position: "absolute",
+					top: 0,
+					left: 0,
+					right: 0,
+					bottom: 0,
+				}}
+			>
+				<defs>
+					<pattern
+						id="grid"
+						width="40"
+						height="40"
+						patternUnits="userSpaceOnUse"
+					>
+						<path
+							d="M 40 0 L 0 0 0 40"
+							fill="none"
+							stroke="rgba(255, 255, 255, 0.04)"
+							strokeWidth="1"
+						/>
+					</pattern>
+				</defs>
+				<rect width="100%" height="100%" fill="url(#grid)" />
+			</svg>
+
+			{/* Top Header */}
+			<div
+				style={{
+					display: "flex",
+					justifyContent: "space-between",
+					alignItems: "center",
+					width: "100%",
+					zIndex: 10,
+				}}
+			>
+				<div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
 					<svg
-						width="45"
-						height="45"
+						width="40"
+						height="40"
 						viewBox="0 0 200 200"
 						fill="none"
 						xmlns="http://www.w3.org/2000/svg"
 					>
-						<rect x="55" y="51" width="83" height="8" fill="#ffffff" />
+						{/* fillClassName properties */}
+						<rect x="55" y="51" width="83" height="8" fill="#FFFFFF" />
 						<rect
 							x="55"
 							y="59"
 							width="75"
 							height="8"
 							transform="rotate(90 55 59)"
-							fill="#ffffff"
+							fill="#FFFFFF"
 						/>
 						<rect
 							x="146"
@@ -48,7 +119,7 @@ export default function OpenGraphImage() {
 							width="46"
 							height="8"
 							transform="rotate(90 146 59)"
-							fill="#ffffff"
+							fill="#FFFFFF"
 						/>
 						<rect
 							x="154"
@@ -56,47 +127,7 @@ export default function OpenGraphImage() {
 							width="44"
 							height="8"
 							transform="rotate(90 154 69)"
-							fill="#ffffff"
-						/>
-						<rect
-							x="138"
-							y="59"
-							width="46"
-							height="8"
-							transform="rotate(90 138 59)"
-							fill="#878787"
-						/>
-						<rect
-							x="130"
-							y="59"
-							width="46"
-							height="8"
-							transform="rotate(90 130 59)"
-							fill="#878787"
-						/>
-						<rect
-							x="90"
-							y="105"
-							width="29"
-							height="8"
-							transform="rotate(90 90 105)"
-							fill="#878787"
-						/>
-						<rect
-							x="82"
-							y="105"
-							width="29"
-							height="8"
-							transform="rotate(90 82 105)"
-							fill="#878787"
-						/>
-						<rect
-							x="138"
-							y="105"
-							width="8"
-							height="8"
-							transform="rotate(90 138 105)"
-							fill="#ffffff"
+							fill="#FFFFFF"
 						/>
 						<rect
 							x="146"
@@ -104,7 +135,15 @@ export default function OpenGraphImage() {
 							width="8"
 							height="8"
 							transform="rotate(90 146 105)"
-							fill="#ffffff"
+							fill="#FFFFFF"
+						/>
+						<rect
+							x="138"
+							y="105"
+							width="8"
+							height="8"
+							transform="rotate(90 138 105)"
+							fill="#FFFFFF"
 						/>
 						<rect
 							x="146"
@@ -112,23 +151,7 @@ export default function OpenGraphImage() {
 							width="8"
 							height="8"
 							transform="rotate(90 146 134)"
-							fill="#ffffff"
-						/>
-						<rect
-							x="130"
-							y="105"
-							width="8"
-							height="8"
-							transform="rotate(90 130 105)"
-							fill="#878787"
-						/>
-						<rect
-							x="122"
-							y="105"
-							width="8"
-							height="8"
-							transform="rotate(90 122 105)"
-							fill="#878787"
+							fill="#FFFFFF"
 						/>
 						<rect
 							x="98"
@@ -136,23 +159,7 @@ export default function OpenGraphImage() {
 							width="10"
 							height="8"
 							transform="rotate(90 98 77)"
-							fill="#ffffff"
-						/>
-						<rect
-							x="90"
-							y="77"
-							width="10"
-							height="8"
-							transform="rotate(90 90 77)"
-							fill="#878787"
-						/>
-						<rect
-							x="82"
-							y="77"
-							width="10"
-							height="8"
-							transform="rotate(90 82 77)"
-							fill="#878787"
+							fill="#FFFFFF"
 						/>
 						<rect
 							x="146"
@@ -160,7 +167,7 @@ export default function OpenGraphImage() {
 							width="21"
 							height="8"
 							transform="rotate(90 146 113)"
-							fill="#ffffff"
+							fill="#FFFFFF"
 						/>
 						<rect
 							x="154"
@@ -168,23 +175,7 @@ export default function OpenGraphImage() {
 							width="20"
 							height="8"
 							transform="rotate(90 154 122)"
-							fill="#ffffff"
-						/>
-						<rect
-							x="138"
-							y="113"
-							width="21"
-							height="8"
-							transform="rotate(90 138 113)"
-							fill="#878787"
-						/>
-						<rect
-							x="130"
-							y="113"
-							width="21"
-							height="8"
-							transform="rotate(90 130 113)"
-							fill="#878787"
+							fill="#FFFFFF"
 						/>
 						<rect
 							x="98"
@@ -192,156 +183,349 @@ export default function OpenGraphImage() {
 							width="21"
 							height="8"
 							transform="rotate(90 98 113)"
-							fill="#ffffff"
+							fill="#FFFFFF"
 						/>
-						<rect x="55" y="134" width="83" height="8" fill="#ffffff" />
-						<rect x="63" y="142" width="83" height="8" fill="#ffffff" />
+						<rect x="55" y="134" width="83" height="8" fill="#FFFFFF" />
+						<rect x="63" y="142" width="83" height="8" fill="#FFFFFF" />
+
+						{/* strokeClassName properties */}
+						<rect
+							x="138"
+							y="59"
+							width="46"
+							height="8"
+							transform="rotate(90 138 59)"
+							fill="#A3A3A3"
+						/>
+						<rect
+							x="130"
+							y="59"
+							width="46"
+							height="8"
+							transform="rotate(90 130 59)"
+							fill="#A3A3A3"
+						/>
+						<rect
+							x="90"
+							y="105"
+							width="29"
+							height="8"
+							transform="rotate(90 90 105)"
+							fill="#A3A3A3"
+						/>
+						<rect
+							x="82"
+							y="105"
+							width="29"
+							height="8"
+							transform="rotate(90 82 105)"
+							fill="#A3A3A3"
+						/>
+						<rect
+							x="130"
+							y="105"
+							width="8"
+							height="8"
+							transform="rotate(90 130 105)"
+							fill="#A3A3A3"
+						/>
+						<rect
+							x="122"
+							y="105"
+							width="8"
+							height="8"
+							transform="rotate(90 122 105)"
+							fill="#A3A3A3"
+						/>
+						<rect
+							x="90"
+							y="77"
+							width="10"
+							height="8"
+							transform="rotate(90 90 77)"
+							fill="#A3A3A3"
+						/>
+						<rect
+							x="82"
+							y="77"
+							width="10"
+							height="8"
+							transform="rotate(90 82 77)"
+							fill="#A3A3A3"
+						/>
+						<rect
+							x="138"
+							y="113"
+							width="21"
+							height="8"
+							transform="rotate(90 138 113)"
+							fill="#A3A3A3"
+						/>
+						<rect
+							x="130"
+							y="113"
+							width="21"
+							height="8"
+							transform="rotate(90 130 113)"
+							fill="#A3A3A3"
+						/>
 					</svg>
 					<span
 						style={{
-							fontSize: "22px",
-							fontWeight: 600,
+							fontSize: "28px",
+							fontWeight: 800,
 							color: "#ffffff",
 							letterSpacing: "-0.5px",
-							marginLeft: "8px",
+							marginLeft: "-14px",
 						}}
 					>
 						Reloop
 					</span>
-					<span
-						style={{
-							fontSize: "22px",
-							fontWeight: 400,
-							color: "rgba(255, 255, 255, 0.4)",
-							letterSpacing: "-0.5px",
-							marginLeft: "8px",
-						}}
-					>
-						/
-					</span>
-					<span
-						style={{
-							fontSize: "22px",
-							fontWeight: 500,
-							color: "rgba(255, 255, 255, 0.6)",
-							letterSpacing: "-0.5px",
-							marginLeft: "8px",
-						}}
-					>
-						Philosophy
-					</span>
 				</div>
+				<span
+					style={{
+						color: "rgba(255,255,255,0.45)",
+						fontSize: 22,
+						fontWeight: 600,
+						letterSpacing: "0.18em",
+					}}
+				>
+					PHILOSOPHY
+				</span>
+			</div>
 
+			{/* Main Content Area */}
+			<div
+				style={{
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "space-between",
+					gap: 48,
+					width: "100%",
+					zIndex: 10,
+				}}
+			>
+				{/* Left side text info */}
 				<div
 					style={{
 						display: "flex",
 						flexDirection: "column",
-						marginTop: "24px",
+						maxWidth: 580,
 					}}
 				>
-					<span
-						style={{
-							fontSize: "52px",
-							fontWeight: 700,
-							color: "#ffffff",
-							letterSpacing: "-1.5px",
-						}}
-					>
-						Why Open Source
-					</span>
-					<span
-						style={{
-							fontSize: "18px",
-							color: "rgba(255, 255, 255, 0.5)",
-							marginTop: "10px",
-							maxWidth: "900px",
-						}}
-					>
-						Why we chose Apache 2.0 open-source licensing for our core email
-						infrastructure codebase.
-					</span>
-				</div>
-			</div>
-
-			{/* Bottom Row of Cards */}
-			<div
-				style={{
-					display: "flex",
-					flexDirection: "row",
-					gap: "16px",
-					marginTop: "32px",
-					width: "100%",
-				}}
-			>
-				{[
-					{
-						title: "Zero Lock-In",
-						desc: "Migrate your database and deployment setups at any time.",
-					},
-					{
-						title: "Security Auditing",
-						desc: "Visibility enables community code audits and patches.",
-					},
-					{
-						title: "Collaborative Growth",
-						desc: "Contributions from developers shape the future roadmap.",
-					},
-				].map((item, idx) => (
 					<div
-						key={idx}
 						style={{
 							display: "flex",
 							flexDirection: "column",
-							flex: 1,
-							backgroundColor: "rgba(255, 255, 255, 0.02)",
-							border: "1px solid rgba(255, 255, 255, 0.08)",
-							borderRadius: "16px",
-							padding: "20px 24px",
-							height: "150px",
+							fontSize: 64,
+							lineHeight: 1.05,
+							fontWeight: 600,
+							color: "#ffffff",
+							fontFamily: "Georgia, serif",
+							letterSpacing: "-0.03em",
 						}}
 					>
-						<span
-							style={{ fontSize: "16px", fontWeight: 600, color: "#ffffff" }}
-						>
-							{item.title}
-						</span>
-						<span
+						Why
+						<span style={{ color: "#d97757", marginTop: 4 }}>Open Source</span>
+					</div>
+					<div
+						style={{
+							marginTop: 24,
+							fontSize: 26,
+							lineHeight: 1.45,
+							color: "rgba(255,255,255,0.55)",
+						}}
+					>
+						Reloop is Apache 2.0 open source. Transparency, security through
+						visibility, and community-driven development.
+					</div>
+					<div
+						style={{
+							display: "flex",
+							marginTop: 32,
+							gap: 16,
+							fontSize: 20,
+							color: "rgba(255,255,255,0.38)",
+						}}
+					>
+						<span>Self-Hostable</span>
+						<span>·</span>
+						<span>Apache 2.0</span>
+						<span>·</span>
+						<span>Open Source</span>
+					</div>
+				</div>
+
+				{/* Right side bento preview */}
+				<div
+					style={{
+						display: "flex",
+						flexDirection: "column",
+						width: 440,
+						borderRadius: 24,
+						border: "1px solid rgba(255, 255, 255, 0.08)",
+						background: "rgba(255, 255, 255, 0.02)",
+						padding: 32,
+						gap: 20,
+					}}
+				>
+					<div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+						<div
 							style={{
-								fontSize: "13px",
-								color: "rgba(255, 255, 255, 0.4)",
-								marginTop: "6px",
-								lineHeight: "1.4",
+								fontSize: 13,
+								fontWeight: 700,
+								color: "#d97757",
+								letterSpacing: "0.1em",
 							}}
 						>
-							{item.desc}
-						</span>
+							RELOOP OPEN SOURCE
+						</div>
+						<div
+							style={{
+								display: "flex",
+								alignItems: "center",
+								gap: 14,
+								fontSize: 18,
+								color: "rgba(255,255,255,0.85)",
+							}}
+						>
+							<div
+								style={{
+									display: "flex",
+									alignItems: "center",
+									justifyContent: "center",
+									width: 24,
+									height: 24,
+									borderRadius: "50%",
+									background: "rgba(34, 197, 94, 0.15)",
+								}}
+							>
+								<CheckIcon />
+							</div>
+							<span>Complete Transparency (Auditable Routing)</span>
+						</div>
+						<div
+							style={{
+								display: "flex",
+								alignItems: "center",
+								gap: 14,
+								fontSize: 18,
+								color: "rgba(255,255,255,0.85)",
+							}}
+						>
+							<div
+								style={{
+									display: "flex",
+									alignItems: "center",
+									justifyContent: "center",
+									width: 24,
+									height: 24,
+									borderRadius: "50%",
+									background: "rgba(34, 197, 94, 0.15)",
+								}}
+							>
+								<CheckIcon />
+							</div>
+							<span>Run Anywhere (Hosted or Self-Hosted)</span>
+						</div>
 					</div>
-				))}
+
+					<div style={{ height: 1, background: "rgba(255, 255, 255, 0.08)" }} />
+
+					<div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+						<div
+							style={{
+								fontSize: 13,
+								fontWeight: 700,
+								color: "rgba(255,255,255,0.4)",
+								letterSpacing: "0.1em",
+							}}
+						>
+							PROPRIETARY PROVIDERS
+						</div>
+						<div
+							style={{
+								display: "flex",
+								alignItems: "center",
+								gap: 14,
+								fontSize: 18,
+								color: "rgba(255,255,255,0.65)",
+							}}
+						>
+							<div
+								style={{
+									display: "flex",
+									alignItems: "center",
+									justifyContent: "center",
+									width: 24,
+									height: 24,
+									borderRadius: "50%",
+									background: "rgba(239, 68, 68, 0.15)",
+								}}
+							>
+								<CrossIcon />
+							</div>
+							<span>Black-Box Deliverability Decisions</span>
+						</div>
+						<div
+							style={{
+								display: "flex",
+								alignItems: "center",
+								gap: 14,
+								fontSize: 18,
+								color: "rgba(255,255,255,0.65)",
+							}}
+						>
+							<div
+								style={{
+									display: "flex",
+									alignItems: "center",
+									justifyContent: "center",
+									width: 24,
+									height: 24,
+									borderRadius: "50%",
+									background: "rgba(239, 68, 68, 0.15)",
+								}}
+							>
+								<CrossIcon />
+							</div>
+							<span>Vendor Lock-In & Opaque Pricing</span>
+						</div>
+					</div>
+				</div>
 			</div>
 
-			{/* Small Footer bar */}
+			{/* Bottom Footer */}
 			<div
 				style={{
 					display: "flex",
 					justifyContent: "space-between",
+					alignItems: "center",
 					width: "100%",
-					borderTop: "1px solid rgba(255, 255, 255, 0.06)",
-					paddingTop: "16px",
-					marginTop: "16px",
+					zIndex: 10,
 				}}
 			>
-				<span style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.3)" }}>
-					Modern email infrastructure for developers
+				<span
+					style={{
+						fontSize: "16px",
+						color: "rgba(255,255,255,0.35)",
+						fontFamily: "sans-serif",
+					}}
+				>
+					Open source lets you verify.
 				</span>
 				<span
-					style={{ fontSize: "14px", fontWeight: 600, color: primaryColor }}
+					style={{
+						fontSize: "16px",
+						color: "#71717A",
+						fontFamily: "monospace",
+						letterSpacing: "1px",
+					}}
 				>
-					reloop.sh
+					reloop.sh/philosophy/why-open-source
 				</span>
 			</div>
 		</div>,
-		{
-			...size,
-		},
+		{ ...size },
 	);
 }

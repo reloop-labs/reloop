@@ -48,20 +48,51 @@ export default function LicenseOpenGraphImage() {
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: "space-between",
-				backgroundColor: "#000000",
-				padding: "56px 72px",
+				backgroundColor: "#050506",
+				padding: "64px",
+				fontFamily: "sans-serif",
+				position: "relative",
+				overflow: "hidden",
 			}}
 		>
+			{/* SVG Background Grid */}
+			<svg
+				width="100%"
+				height="100%"
+				style={{
+					position: "absolute",
+					top: 0,
+					left: 0,
+					right: 0,
+					bottom: 0,
+				}}
+			>
+				<defs>
+					<pattern
+						id="grid"
+						width="40"
+						height="40"
+						patternUnits="userSpaceOnUse"
+					>
+						<path
+							d="M 40 0 L 0 0 0 40"
+							fill="none"
+							stroke="rgba(255, 255, 255, 0.04)"
+							strokeWidth="1"
+						/>
+					</pattern>
+				</defs>
+				<rect width="100%" height="100%" fill="url(#grid)" />
+			</svg>
+
 			{/* Top Header */}
 			<div
 				style={{
 					display: "flex",
 					justifyContent: "space-between",
 					alignItems: "center",
-					color: "rgba(255,255,255,0.45)",
-					fontSize: 22,
-					fontWeight: 600,
-					letterSpacing: "0.18em",
+					width: "100%",
+					zIndex: 10,
 				}}
 			>
 				<div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -251,7 +282,16 @@ export default function LicenseOpenGraphImage() {
 						Reloop
 					</span>
 				</div>
-				<span>LICENSE</span>
+				<span
+					style={{
+						color: "rgba(255,255,255,0.45)",
+						fontSize: 22,
+						fontWeight: 600,
+						letterSpacing: "0.18em",
+					}}
+				>
+					LICENSE
+				</span>
 			</div>
 
 			{/* Main Content Area */}
@@ -261,6 +301,8 @@ export default function LicenseOpenGraphImage() {
 					alignItems: "center",
 					justifyContent: "space-between",
 					gap: 48,
+					width: "100%",
+					zIndex: 10,
 				}}
 			>
 				{/* Left side text info */}
@@ -461,12 +503,29 @@ export default function LicenseOpenGraphImage() {
 					display: "flex",
 					justifyContent: "space-between",
 					alignItems: "center",
-					color: "rgba(255,255,255,0.35)",
-					fontSize: 24,
+					width: "100%",
+					zIndex: 10,
 				}}
 			>
-				<span>Apache 2.0 with custom restrictions.</span>
-				<span>reloop.sh/company/license</span>
+				<span
+					style={{
+						fontSize: "16px",
+						color: "rgba(255,255,255,0.35)",
+						fontFamily: "sans-serif",
+					}}
+				>
+					Apache 2.0 with custom restrictions.
+				</span>
+				<span
+					style={{
+						fontSize: "16px",
+						color: "#71717A",
+						fontFamily: "monospace",
+						letterSpacing: "1px",
+					}}
+				>
+					reloop.sh/company/license
+				</span>
 			</div>
 		</div>,
 		{ ...size },
