@@ -46,7 +46,7 @@ export function ChatwootLoader() {
 		<Script
 			id="chatwoot-sdk"
 			src={`${baseUrl}/packs/js/sdk.js`}
-			strategy="afterInteractive"
+			strategy="lazyOnload"
 			onLoad={() => {
 				if (didInit.current) return;
 				didInit.current = true;
