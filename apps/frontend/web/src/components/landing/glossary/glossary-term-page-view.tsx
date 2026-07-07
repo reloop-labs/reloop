@@ -18,7 +18,7 @@ export function GlossaryTermPageView({
 			{/* Dictionary / MDN-style layout */}
 			<div className="border-stroke-soft-200 border-b bg-white dark:border-white/10 dark:bg-[#0a0a0a]">
 				<div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-					<nav className="text-[13px] text-text-sub-600 dark:text-white/40">
+					<nav className="text-[13px] text-text-sub-600 dark:text-white/55">
 						<Link
 							href="/resources/glossary"
 							className="hover:text-primary-base"
@@ -70,7 +70,7 @@ export function GlossaryTermPageView({
 				<aside className="lg:sticky lg:top-24 lg:self-start">
 					{term.relatedTerms && term.relatedTerms.length > 0 && (
 						<div className="rounded-xl border border-stroke-soft-200 bg-white p-5 dark:border-white/10 dark:bg-[#111]">
-							<p className="font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+							<p className="font-semibold text-[12px] text-text-sub-600 uppercase tracking-wider dark:text-white/55">
 								Related terms
 							</p>
 							<ul className="mt-4 space-y-2">

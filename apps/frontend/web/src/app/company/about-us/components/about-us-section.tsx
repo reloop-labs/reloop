@@ -105,7 +105,7 @@ function FounderCard({ founder }: { founder: Founder }) {
 				/>
 			</div>
 			<div className="flex flex-1 flex-col p-8 lg:p-10">
-				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/40">
+				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/55">
 					{founder.role}
 				</p>
 				<h3 className="mt-3 font-semibold text-[18px] text-text-strong-950 leading-snug sm:text-[20px] dark:text-white">

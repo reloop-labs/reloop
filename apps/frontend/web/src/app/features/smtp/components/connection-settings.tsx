@@ -41,13 +41,13 @@ function SettingCell({
 					{value}
 				</p>
 				{href && hrefLabel && (
-					<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/45">
+					<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/55">
 						{hrefLabel}
 					</p>
 				)}
 			</div>
 			{copyable && (
-				<div className="mt-10 flex items-center gap-2 text-[14px] text-text-sub-600 dark:text-white/45">
+				<div className="mt-10 flex items-center gap-2 text-[14px] text-text-sub-600 dark:text-white/55">
 					<Icon name="copy" className="size-4" />
 					<span>{copied ? "Copied" : "Click to copy"}</span>
 				</div>

@@ -85,7 +85,7 @@ export function SubjectTesterPageView() {
 					/>
 
 					<div className="mt-6">
-						<div className="mb-2 flex justify-between text-[13px] text-text-sub-600 dark:text-white/45">
+						<div className="mb-2 flex justify-between text-[13px] text-text-sub-600 dark:text-white/55">
 							<span>Score</span>
 							<span>
 								{analysis.score}/100 · {analysis.len} characters
@@ -100,13 +100,13 @@ export function SubjectTesterPageView() {
 					</div>
 
 					<div className="mt-8 rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-4 dark:border-white/10 dark:bg-black">
-						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/55">
 							Inbox preview
 						</p>
 						<p className="mt-2 font-medium text-[15px] text-text-strong-950 dark:text-white">
 							{analysis.preview || "Your subject preview appears here"}
 						</p>
-						<p className="mt-1 text-[13px] text-text-sub-600 dark:text-white/40">
+						<p className="mt-1 text-[13px] text-text-sub-600 dark:text-white/55">
 							Acme Inc · Preview text snippet…
 						</p>
 					</div>

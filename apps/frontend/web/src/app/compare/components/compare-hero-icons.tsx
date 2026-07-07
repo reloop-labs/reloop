@@ -19,7 +19,7 @@ export function CompareHeroIcons({
 			</div>
 
 			<span
-				className="font-semibold text-sm text-text-sub-600 uppercase tracking-[0.12em] sm:text-base dark:text-white/40"
+				className="font-semibold text-sm text-text-sub-600 uppercase tracking-[0.12em] sm:text-base dark:text-white/55"
 				aria-hidden
 			>
 				vs

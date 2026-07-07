@@ -164,7 +164,7 @@ export function Footer() {
 										{...(link.external
 											? { target: "_blank", rel: "noreferrer" }
 											: {})}
-										className="text-[#0a0d12]/70 text-[14px] transition-colors hover:text-[#0a0d12] dark:text-white/45 dark:hover:text-white"
+										className="text-[#0a0d12]/70 text-[14px] transition-colors hover:text-[#0a0d12] dark:text-white/55 dark:hover:text-white"
 									>
 										{link.title}
 									</a>

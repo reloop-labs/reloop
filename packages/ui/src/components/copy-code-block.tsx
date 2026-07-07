@@ -177,7 +177,7 @@ export function CopyCodeBlock({
 				type="button"
 				onClick={handleCopy}
 				aria-label={copied ? "Copied" : "Copy code"}
-				className="shrink-0 cursor-pointer text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white"
+				className="shrink-0 cursor-pointer text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
 			>
 				<Icon name={copied ? "check" : "copy"} className="size-4 stroke-3" />
 			</button>
@@ -349,7 +349,7 @@ export function CopyCodeBlock({
 											<path d={si.path} />
 										</svg>
 									))}
-								<span className="font-mono text-[11px] text-text-sub-500 dark:text-white/40">
+								<span className="font-mono text-[11px] text-text-sub-500 dark:text-white/55">
 									{displayLabel}
 								</span>
 							</>

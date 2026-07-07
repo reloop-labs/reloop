@@ -116,7 +116,7 @@ const BlogPage = () => {
 									{post.description}
 								</p>
 							</div>
-							<span className="mt-4 shrink-0 text-[13px] text-text-sub-600 sm:mt-0 dark:text-white/40">
+							<span className="mt-4 shrink-0 text-[13px] text-text-sub-600 sm:mt-0 dark:text-white/55">
 								{post.readTime}
 							</span>
 						</Link>
@@ -163,7 +163,7 @@ const BlogPage = () => {
 						</a>
 					))}
 				</div>
-				<p className="mx-auto mt-12 max-w-xl text-center text-[14px] text-text-sub-600 dark:text-white/40">
+				<p className="mx-auto mt-12 max-w-xl text-center text-[14px] text-text-sub-600 dark:text-white/55">
 					Want deep dives and tutorials? Our{" "}
 					<Link
 						href="/docs"

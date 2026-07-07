@@ -108,7 +108,7 @@ export function EmailValidatorPageView() {
 									<p className="mt-1 text-[14px] text-text-sub-600 dark:text-white/50">
 										{result.summary}
 									</p>
-									<p className="mt-2 font-mono text-[13px] text-text-sub-600 dark:text-white/40">
+									<p className="mt-2 font-mono text-[13px] text-text-sub-600 dark:text-white/55">
 										{result.email}
 									</p>
 								</div>
@@ -141,7 +141,7 @@ export function EmailValidatorPageView() {
 							<p className="font-semibold text-[14px] text-text-strong-950 dark:text-white">
 								{item.title}
 							</p>
-							<p className="mt-1 text-[13px] text-text-sub-600 dark:text-white/45">
+							<p className="mt-1 text-[13px] text-text-sub-600 dark:text-white/55">
 								{item.text}
 							</p>
 						</div>

@@ -112,7 +112,7 @@ export function DeliverabilityTesterPageView() {
 
 				<div className="lg:sticky lg:top-24 lg:self-start">
 					<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-6 text-center dark:border-white/10 dark:bg-white/[0.03]">
-						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/55">
 							Spam score
 						</p>
 						<p className={`mt-2 font-bold text-6xl ${scoreColor}`}>

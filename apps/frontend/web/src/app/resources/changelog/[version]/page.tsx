@@ -62,7 +62,7 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 			<PageSection narrow flushTop>
 				<Link
 					href="/resources/changelog"
-					className="inline-flex items-center gap-1 font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white"
+					className="inline-flex items-center gap-1 font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
 				>
 					<span aria-hidden="true">‹</span>
 					All updates
@@ -81,7 +81,7 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 							/>
 						</div>
 					) : null}
-					<time className="mt-6 block font-medium text-[13px] text-text-sub-600 tabular-nums dark:text-white/40">
+					<time className="mt-6 block font-medium text-[13px] text-text-sub-600 tabular-nums dark:text-white/55">
 						{release.date}
 					</time>
 					<h1 className="mt-3 font-semibold text-[1.35rem] text-text-strong-950 leading-snug sm:text-[1.5rem] dark:text-white">

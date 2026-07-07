@@ -29,7 +29,7 @@ export function AlternativePageView({
 			{/* VS header — alternative.to / G2 pattern */}
 			<div className="border-stroke-soft-200 border-b bg-white dark:border-white/10 dark:bg-[#0a0a0a]">
 				<div className="mx-auto max-w-4xl px-4 py-12 text-center sm:px-6">
-					<nav className="mb-6 text-[13px] text-text-sub-600 dark:text-white/40">
+					<nav className="mb-6 text-[13px] text-text-sub-600 dark:text-white/55">
 						<Link href="/alternatives" className="hover:text-primary-base">
 							Alternatives
 						</Link>
@@ -109,7 +109,7 @@ export function AlternativePageView({
 								className="rounded-xl border border-stroke-soft-200 p-5 dark:border-white/10"
 							>
 								<p className="font-semibold text-[14px]">{item.title}</p>
-								<p className="mt-2 text-[13px] text-text-sub-600 dark:text-white/45">
+								<p className="mt-2 text-[13px] text-text-sub-600 dark:text-white/55">
 									{item.description}
 								</p>
 							</div>

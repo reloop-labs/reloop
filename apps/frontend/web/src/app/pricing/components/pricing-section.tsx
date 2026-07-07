@@ -102,7 +102,7 @@ function PlanColumn({ plan }: { plan: (typeof pricingPlans)[number] }) {
 							)}
 						</div>
 					)}
-					<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/45">
+					<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/55">
 						{isCustom || price === 0 ? plan.priceSubline : plan.emailsLabel}
 					</p>
 				</div>
@@ -239,7 +239,7 @@ function ComparisonTable() {
 									key={row.key}
 									className="group border-stroke-soft-200 border-b transition-colors last:border-b-0 hover:bg-bg-weak-50/60 dark:border-white/[0.06] dark:hover:bg-white/[0.04]"
 								>
-									<td className="py-4 pr-8 text-[14px] text-text-sub-600 dark:text-white/45">
+									<td className="py-4 pr-8 text-[14px] text-text-sub-600 dark:text-white/55">
 										{row.label}
 									</td>
 									{pricingPlans.map((plan) => {

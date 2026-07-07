@@ -131,7 +131,7 @@ export default function DeveloperSection() {
 											<h4 className="font-semibold text-[#0a0d12] text-sm leading-snug dark:text-white">
 												{card.title}
 											</h4>
-											<p className="mt-1 text-[#0a0d12]/50 text-[13px] leading-relaxed dark:text-white/40">
+											<p className="mt-1 text-[#0a0d12]/50 text-[13px] leading-relaxed dark:text-white/55">
 												{card.description}
 											</p>
 										</div>
@@ -188,7 +188,7 @@ export default function DeveloperSection() {
 											<h4 className="font-semibold text-[#0a0d12] text-sm leading-snug dark:text-white">
 												{card.title}
 											</h4>
-											<p className="mt-1 text-[#0a0d12]/50 text-[13px] leading-relaxed dark:text-white/40">
+											<p className="mt-1 text-[#0a0d12]/50 text-[13px] leading-relaxed dark:text-white/55">
 												{card.description}
 											</p>
 										</div>
@@ -245,7 +245,7 @@ export default function DeveloperSection() {
 											<h4 className="font-semibold text-[#0a0d12] text-sm leading-snug dark:text-white">
 												{card.title}
 											</h4>
-											<p className="mt-1 text-[#0a0d12]/50 text-[13px] leading-relaxed dark:text-white/40">
+											<p className="mt-1 text-[#0a0d12]/50 text-[13px] leading-relaxed dark:text-white/55">
 												{card.description}
 											</p>
 										</div>

@@ -471,7 +471,7 @@ export default function Sandbox() {
 									{/* Inbound email state */}
 									<div className="space-y-4">
 										<div className="rounded-lg bg-bg-weak-50 p-3 text-xs dark:bg-white/[0.02]">
-											<div className="font-semibold text-text-soft-400 dark:text-white/40">
+											<div className="font-semibold text-text-soft-400 dark:text-white/55">
 												INBOUND EMAIL
 											</div>
 											<div className="mt-1 font-semibold text-text-strong-950 dark:text-white">

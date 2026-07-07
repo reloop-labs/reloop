@@ -46,7 +46,7 @@ export function LicensePermissions() {
 					email service or self-host the open-source platform—free for personal
 					and internal use under the license.
 				</p>
-				<p className="mt-6 max-w-[420px] text-[14px] text-text-sub-600 leading-7 dark:text-white/40">
+				<p className="mt-6 max-w-[420px] text-[14px] text-text-sub-600 leading-7 dark:text-white/55">
 					Third parties may not resell or offer competing hosted services.{" "}
 					<a
 						href="/dashboard/signup"
@@ -63,7 +63,7 @@ export function LicensePermissions() {
 					</a>{" "}
 					on your own infrastructure.
 				</p>
-				<p className="mt-4 max-w-[420px] text-[14px] text-text-sub-600 leading-7 dark:text-white/40">
+				<p className="mt-4 max-w-[420px] text-[14px] text-text-sub-600 leading-7 dark:text-white/55">
 					Questions?{" "}
 					<a
 						href={`mailto:${contactEmail}`}

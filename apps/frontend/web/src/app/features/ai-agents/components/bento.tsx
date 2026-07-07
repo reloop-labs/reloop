@@ -40,7 +40,7 @@ export default function Bento() {
 
 						<div className="mt-12 grid grid-cols-2 gap-4">
 							<div className="rounded-xl border border-stroke-soft-200 bg-bg-soft-50 p-4 dark:border-white/10">
-								<div className="mb-1 font-mono text-text-soft-400 text-xs dark:text-white/40">
+								<div className="mb-1 font-mono text-text-soft-400 text-xs dark:text-white/55">
 									INBOUND FORMAT
 								</div>
 								<div className="font-mono font-semibold text-[13px] text-text-strong-950 dark:text-white">
@@ -51,7 +51,7 @@ export default function Bento() {
 								</div>
 							</div>
 							<div className="rounded-xl border border-stroke-soft-200 bg-bg-soft-50 p-4 dark:border-white/10">
-								<div className="mb-1 font-mono text-text-soft-400 text-xs dark:text-white/40">
+								<div className="mb-1 font-mono text-text-soft-400 text-xs dark:text-white/55">
 									OUTBOUND TO AGENT
 								</div>
 								<div className="font-mono font-semibold text-[13px] text-text-strong-950 dark:text-white">
@@ -86,7 +86,7 @@ export default function Bento() {
 								<div className="font-bold text-3xl text-primary-base tracking-tight">
 									&lt;15ms
 								</div>
-								<div className="mt-1 text-[11px] text-text-soft-400 dark:text-white/40">
+								<div className="mt-1 text-[11px] text-text-soft-400 dark:text-white/55">
 									Average Context Stitching
 								</div>
 							</div>

@@ -142,7 +142,7 @@ export default function Features() {
 							<div className="font-serif text-[2.4rem] text-text-strong-950 leading-none tracking-tighter dark:text-white">
 								$0
 							</div>
-							<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/45">
+							<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/55">
 								3,000 emails / month
 							</p>
 						</div>

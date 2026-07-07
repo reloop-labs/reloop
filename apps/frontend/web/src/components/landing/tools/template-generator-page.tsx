@@ -96,7 +96,7 @@ export function TemplateGeneratorPageView() {
 
 				<div className="grid gap-6 lg:grid-cols-2">
 					<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-white dark:border-white/10 dark:bg-[#111]">
-						<div className="border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-2 font-mono text-[12px] text-text-sub-600 dark:border-white/10 dark:bg-black dark:text-white/40">
+						<div className="border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-2 font-mono text-[12px] text-text-sub-600 dark:border-white/10 dark:bg-black dark:text-white/55">
 							HTML source
 						</div>
 						<pre className="max-h-[480px] overflow-auto p-4 font-mono text-[11px] text-text-sub-600 leading-relaxed dark:text-white/60">
@@ -104,7 +104,7 @@ export function TemplateGeneratorPageView() {
 						</pre>
 					</div>
 					<div className="overflow-hidden rounded-xl border border-stroke-soft-200 bg-white dark:border-white/10">
-						<div className="border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-2 text-[12px] text-text-sub-600 dark:border-white/10 dark:bg-black dark:text-white/40">
+						<div className="border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-2 text-[12px] text-text-sub-600 dark:border-white/10 dark:bg-black dark:text-white/55">
 							Preview
 						</div>
 						<div

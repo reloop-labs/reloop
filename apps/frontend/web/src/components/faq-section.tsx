@@ -55,7 +55,7 @@ export function FaqSection({
 								</span>
 								<span
 									className={cn(
-										"mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border border-[#0a0d12]/12 text-[#0a0d12]/40 transition-transform dark:border-white/12 dark:text-white/40",
+										"mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border border-[#0a0d12]/12 text-[#0a0d12]/40 transition-transform dark:border-white/12 dark:text-white/55",
 										openIndex === i && "rotate-45",
 									)}
 								>

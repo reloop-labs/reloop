@@ -161,7 +161,7 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
 			<Link
 				href={link.href}
 				{...(link.external ? { target: "_blank", rel: "noreferrer" } : {})}
-				className="text-[14px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white"
+				className="text-[14px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
 			>
 				{link.title}
 			</Link>
@@ -226,7 +226,7 @@ export const Footer = () => {
 							className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
 								mounted && theme === "system"
 									? "bg-white text-black shadow-sm"
-									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white/80"
+									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
 							}`}
 							aria-label="System theme"
 						>
@@ -238,7 +238,7 @@ export const Footer = () => {
 							className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
 								mounted && theme === "light"
 									? "bg-white text-black shadow-sm dark:bg-white dark:text-black"
-									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white/80"
+									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
 							}`}
 							aria-label="Light mode"
 						>
@@ -250,7 +250,7 @@ export const Footer = () => {
 							className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
 								mounted && theme === "dark"
 									? "bg-white text-black shadow-sm"
-									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/40 dark:hover:text-white/80"
+									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
 							}`}
 							aria-label="Dark mode"
 						>

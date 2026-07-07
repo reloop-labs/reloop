@@ -59,7 +59,7 @@ export function UseCasePageView({ config }: { config: LandingPageDefinition }) {
 			<div className="border-stroke-soft-200 border-b dark:border-white/10">
 				<div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-16">
 					<div>
-						<nav className="mb-4 flex gap-2 text-[13px] text-text-sub-600 dark:text-white/40">
+						<nav className="mb-4 flex gap-2 text-[13px] text-text-sub-600 dark:text-white/55">
 							<Link href="/use-cases" className="hover:text-primary-base">
 								Use cases
 							</Link>
@@ -106,7 +106,7 @@ export function UseCasePageView({ config }: { config: LandingPageDefinition }) {
 							<span className={`font-bold text-2xl ${accent.text}`}>
 								{extra.metric.value}
 							</span>
-							<span className="text-[13px] text-text-sub-600 dark:text-white/45">
+							<span className="text-[13px] text-text-sub-600 dark:text-white/55">
 								{extra.metric.label}
 							</span>
 						</div>
@@ -173,7 +173,7 @@ export function UseCasePageView({ config }: { config: LandingPageDefinition }) {
 									<p className="font-semibold text-[15px] text-text-strong-950 dark:text-white">
 										{item.title}
 									</p>
-									<p className="mt-2 text-[13px] text-text-sub-600 dark:text-white/45">
+									<p className="mt-2 text-[13px] text-text-sub-600 dark:text-white/55">
 										{item.description}
 									</p>
 								</div>

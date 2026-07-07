@@ -167,7 +167,7 @@ function MegaLink({ link }: { link: NavLink }) {
 		>
 			{link.title}
 			{link.external && (
-				<span className="group-hover:-translate-y-px text-[12px] text-text-sub-600 transition-transform group-hover:translate-x-px dark:text-white/45">
+				<span className="group-hover:-translate-y-px text-[12px] text-text-sub-600 transition-transform group-hover:translate-x-px dark:text-white/55">
 					↗
 				</span>
 			)}
@@ -321,10 +321,7 @@ export const Header = () => {
 						aria-expanded={mobileMenuOpen}
 						aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
 					>
-						<Icon
-							name={mobileMenuOpen ? "cross" : "menu"}
-							className="size-5"
-						/>
+						<Icon name={mobileMenuOpen ? "cross" : "menu"} className="size-5" />
 					</button>
 				</div>
 
@@ -377,7 +374,7 @@ export const Header = () => {
 															<div className="space-y-6 pb-4 pl-2">
 																{item.mega.categories.map((category) => (
 																	<div key={category.title}>
-																		<p className="mb-3 text-[12px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/40">
+																		<p className="mb-3 text-[12px] text-text-sub-600 uppercase tracking-[0.12em] dark:text-white/55">
 																			{category.title}
 																		</p>
 																		<div className="flex flex-col gap-2">
@@ -396,7 +393,7 @@ export const Header = () => {
 																				>
 																					{link.title}
 																					{link.external && (
-																						<span className="text-[12px] text-text-sub-600 dark:text-white/45">
+																						<span className="text-[12px] text-text-sub-600 dark:text-white/55">
 																							↗
 																						</span>
 																					)}

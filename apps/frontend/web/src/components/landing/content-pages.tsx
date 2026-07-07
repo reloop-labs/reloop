@@ -83,7 +83,7 @@ export function BlogPostPage({
 			compactHero
 		>
 			<PageSection flushTop narrow>
-				<div className="mb-10 flex flex-wrap items-center gap-3 text-[13px] text-text-sub-600 dark:text-white/40">
+				<div className="mb-10 flex flex-wrap items-center gap-3 text-[13px] text-text-sub-600 dark:text-white/55">
 					<span className="font-semibold text-primary-base uppercase tracking-wider">
 						{post.tag}
 					</span>
@@ -315,7 +315,7 @@ function TemplateGeneratorWidget() {
 			<pre className="mt-4 overflow-x-auto rounded-xl bg-bg-weak-50 p-4 font-mono text-xs dark:bg-white/5">
 				{templates[type]}
 			</pre>
-			<p className="mt-3 text-[13px] text-text-sub-600 dark:text-white/40">
+			<p className="mt-3 text-[13px] text-text-sub-600 dark:text-white/55">
 				Use the Reloop template editor for full drag-and-drop design.
 			</p>
 		</ToolCard>

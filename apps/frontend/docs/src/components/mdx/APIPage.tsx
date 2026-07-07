@@ -260,7 +260,7 @@ export function APIPage(props: APIPageProps) {
 							type="button"
 							onClick={handleCopyEndpoint}
 							aria-label={copiedEndpoint ? "Copied" : "Copy endpoint URL"}
-							className="shrink-0 cursor-pointer text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white"
+							className="shrink-0 cursor-pointer text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
 						>
 							{copiedEndpoint ? (
 								<Check className="size-4 stroke-[3px]" />

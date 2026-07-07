@@ -27,7 +27,7 @@ export default function AlternativesIndexPage() {
 		<div className="min-h-screen bg-[#fafafa] dark:bg-black">
 			<div className="border-stroke-soft-200 border-b bg-white px-4 py-12 text-center sm:px-6 dark:border-white/10 dark:bg-[#0a0a0a]">
 				<div className="mx-auto max-w-3xl">
-					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/40">
+					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/55">
 						Compare
 					</p>
 					<h1 className="mt-3 font-semibold text-3xl text-text-strong-950 tracking-tight dark:text-white">
@@ -53,7 +53,7 @@ export default function AlternativesIndexPage() {
 							className={`rounded-2xl border p-6 transition-shadow hover:shadow-md ${style}`}
 						>
 							<div className="flex items-center justify-between gap-3">
-								<span className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+								<span className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/55">
 									Alternative
 								</span>
 								<span className="rounded-full bg-primary-base/10 px-2.5 py-0.5 font-semibold text-[10px] text-primary-base uppercase tracking-wider">

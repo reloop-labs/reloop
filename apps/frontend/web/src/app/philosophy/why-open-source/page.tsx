@@ -199,7 +199,7 @@ const WhyOpenSourcePage = () => {
 						</ul>
 					</div>
 				</div>
-				<p className="mx-auto mt-10 max-w-xl text-center text-[14px] text-text-sub-600 dark:text-white/40">
+				<p className="mx-auto mt-10 max-w-xl text-center text-[14px] text-text-sub-600 dark:text-white/55">
 					Reloop is licensed under{" "}
 					<Link
 						href="/company/license"

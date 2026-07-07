@@ -17,7 +17,7 @@ export function BlogPostPageView({
 		<div className="min-h-screen bg-white dark:bg-black">
 			{/* Article layout — dev blog / Medium style */}
 			<article className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
-				<nav className="mb-8 text-[13px] text-text-sub-600 dark:text-white/40">
+				<nav className="mb-8 text-[13px] text-text-sub-600 dark:text-white/55">
 					<Link href="/company/blog" className="hover:text-primary-base">
 						Blog
 					</Link>
@@ -25,7 +25,7 @@ export function BlogPostPageView({
 					<span>{post.tag}</span>
 				</nav>
 
-				<div className="mb-6 flex flex-wrap items-center gap-3 text-[13px] text-text-sub-600 dark:text-white/40">
+				<div className="mb-6 flex flex-wrap items-center gap-3 text-[13px] text-text-sub-600 dark:text-white/55">
 					<span className="rounded-full bg-primary-base/10 px-3 py-1 font-semibold text-primary-base">
 						{post.tag}
 					</span>

@@ -35,7 +35,7 @@ export function AlternativeLandingPage({
 						</li>
 					))}
 				</ul>
-				<p className="mt-8 text-[14px] text-text-sub-600 dark:text-white/40">
+				<p className="mt-8 text-[14px] text-text-sub-600 dark:text-white/55">
 					Want the full breakdown?{" "}
 					<Link
 						href={config.compareHref}

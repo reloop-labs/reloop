@@ -101,7 +101,7 @@ export function CommunityPlatforms() {
 						<h3 className="font-semibold text-base text-text-strong-950 leading-snug group-hover:text-primary-base dark:text-white">
 							{platform.title}
 						</h3>
-						<p className="mt-2 flex-1 text-sm text-text-sub-600 leading-relaxed dark:text-white/45">
+						<p className="mt-2 flex-1 text-sm text-text-sub-600 leading-relaxed dark:text-white/55">
 							{platform.description}
 						</p>
 						<span className="mt-4 inline-flex items-center justify-center gap-1.5 font-semibold text-primary-base text-sm">

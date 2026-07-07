@@ -73,7 +73,7 @@ export default function ToolsIndexPage() {
 							href={tool.path}
 							className={`rounded-2xl border p-6 transition-shadow hover:shadow-md ${meta.accent}`}
 						>
-							<span className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+							<span className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/55">
 								{meta.tag}
 							</span>
 							<h2 className="mt-2 font-semibold text-[18px] text-text-strong-950 dark:text-white">

@@ -29,7 +29,7 @@ export function ToolTopBar({
 	return (
 		<div className="border-stroke-soft-200 border-b bg-white dark:border-white/10 dark:bg-[#0a0a0a]">
 			<div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-				<nav className="mb-4 flex flex-wrap items-center gap-2 text-[13px] text-text-sub-600 dark:text-white/40">
+				<nav className="mb-4 flex flex-wrap items-center gap-2 text-[13px] text-text-sub-600 dark:text-white/55">
 					{breadcrumb.map((item, i) => (
 						<span key={item.href} className="flex items-center gap-2">
 							{i > 0 && <span>/</span>}
@@ -68,7 +68,7 @@ export function StatusIcon({ status }: { status: CheckStatus }) {
 	return (
 		<Icon
 			name="alert-circle"
-			className="size-5 text-text-sub-600 dark:text-white/40"
+			className="size-5 text-text-sub-600 dark:text-white/55"
 		/>
 	);
 }

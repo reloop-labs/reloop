@@ -21,7 +21,7 @@ function ReleaseMeta({
 }) {
 	return (
 		<div className={className}>
-			<time className="block font-medium text-[13px] text-text-sub-600 tabular-nums dark:text-white/40">
+			<time className="block font-medium text-[13px] text-text-sub-600 tabular-nums dark:text-white/55">
 				{date}
 			</time>
 			<div className="mt-2.5 inline-flex min-w-[2.75rem] items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 px-2.5 py-1.5 font-semibold text-[13px] text-text-strong-950 tabular-nums dark:border-white/10 dark:bg-white/[0.04] dark:text-white">

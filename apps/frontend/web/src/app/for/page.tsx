@@ -19,7 +19,7 @@ export default function ForIndexPage() {
 			<div className="relative overflow-hidden border-stroke-soft-200 border-b px-4 py-14 sm:px-6 dark:border-white/10">
 				<div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary-base/5 via-transparent to-violet-500/5" />
 				<div className="relative mx-auto max-w-4xl text-center">
-					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/40">
+					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/55">
 						Audiences
 					</p>
 					<h1 className="mt-3 font-semibold text-3xl text-text-strong-950 tracking-tight dark:text-white">
@@ -52,7 +52,7 @@ export default function ForIndexPage() {
 							>
 								{extra.headline}
 							</h2>
-							<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/45">
+							<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed dark:text-white/55">
 								{persona.description}
 							</p>
 							<ul className="mt-4 space-y-1.5">

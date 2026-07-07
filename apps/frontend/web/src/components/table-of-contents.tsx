@@ -125,7 +125,7 @@ export function TableOfContents() {
 	return (
 		<aside className="sticky top-28 hidden max-h-[calc(100vh-10rem)] w-full self-start overflow-y-auto pr-4 lg:block">
 			<nav>
-				<h2 className="mb-4 font-semibold text-[0.8rem] text-text-sub-600 uppercase tracking-[0.08em] dark:text-white/40">
+				<h2 className="mb-4 font-semibold text-[0.8rem] text-text-sub-600 uppercase tracking-[0.08em] dark:text-white/55">
 					On this page
 				</h2>
 				<ul className="relative m-0 flex list-none flex-col gap-2.5 border-stroke-soft-200 border-l pl-0 dark:border-white/10">
@@ -167,7 +167,7 @@ export function MobileTableOfContents() {
 				aria-label="On this page"
 				className="rounded-2xl border border-stroke-soft-200 bg-bg-soft-50 p-4 pr-5 dark:border-white/10 dark:bg-[#0a0a0a]"
 			>
-				<h2 className="mb-2.5 font-medium text-[0.85rem] text-text-sub-600 uppercase tracking-[0.08em] dark:text-white/40">
+				<h2 className="mb-2.5 font-medium text-[0.85rem] text-text-sub-600 uppercase tracking-[0.08em] dark:text-white/55">
 					On this page
 				</h2>
 				<ul className="m-0 flex list-none flex-wrap gap-x-4 gap-y-2 p-0">

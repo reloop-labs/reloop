@@ -20,7 +20,7 @@ export function ToolLandingPage({ config }: { config: ToolDefinition }) {
 		>
 			<PageSection flushTop narrow>
 				<ToolWidget toolType={config.toolType} />
-				<p className="mx-auto mt-6 max-w-lg text-center text-[13px] text-text-sub-600 dark:text-white/40">
+				<p className="mx-auto mt-6 max-w-lg text-center text-[13px] text-text-sub-600 dark:text-white/55">
 					Free browser tool for quick checks. For production validation and
 					deliverability, use Reloop's API.
 				</p>

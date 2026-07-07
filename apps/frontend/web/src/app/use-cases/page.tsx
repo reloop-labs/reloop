@@ -64,11 +64,11 @@ export default function UseCasesIndexPage() {
 							>
 								{uc.titleLines.join(" ")}
 							</h2>
-							<p className="mt-2 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/45">
+							<p className="mt-2 text-[13px] text-text-sub-600 leading-relaxed dark:text-white/55">
 								{uc.description}
 							</p>
 							<span
-								className={`mt-4 inline-block font-semibold text-sm text-text-sub-600 transition-colors ${accent.groupHoverText} dark:text-white/45`}
+								className={`mt-4 inline-block font-semibold text-sm text-text-sub-600 transition-colors ${accent.groupHoverText} dark:text-white/55`}
 							>
 								View use case →
 							</span>

@@ -235,7 +235,7 @@ function ProprietaryCell({ value }: { value: string | boolean }) {
 	}
 
 	return (
-		<span className="text-[14px] text-text-sub-600 dark:text-white/45">
+		<span className="text-[14px] text-text-sub-600 dark:text-white/55">
 			{value}
 		</span>
 	);
@@ -313,7 +313,7 @@ function ComparisonTable() {
 									key={row.label}
 									className="group border-stroke-soft-200 border-b transition-colors last:border-b-0 hover:bg-bg-weak-50/60 dark:border-white/[0.06] dark:hover:bg-white/[0.04]"
 								>
-									<td className="py-4 pr-8 text-[14px] text-text-sub-600 dark:text-white/45">
+									<td className="py-4 pr-8 text-[14px] text-text-sub-600 dark:text-white/55">
 										{row.label}
 									</td>
 									<td className="py-4">
@@ -398,7 +398,7 @@ function BentoCard({
 						<p className="font-serif text-[2.4rem] text-text-strong-950 leading-none tracking-tighter dark:text-white">
 							$0
 						</p>
-						<p className="mt-1 text-[13px] text-text-sub-600 dark:text-white/45">
+						<p className="mt-1 text-[13px] text-text-sub-600 dark:text-white/55">
 							3,000 emails / month
 						</p>
 					</div>
