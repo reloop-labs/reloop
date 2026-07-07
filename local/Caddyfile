@@ -23,14 +23,6 @@ local.reloop.sh, *.local.reloop.sh {
             header_up X-Forwarded-For {remote}
         }
     }
-    handle /dev* {
-        reverse_proxy host.docker.internal:3004 {
-            header_up Host {host}
-            header_up X-Forwarded-Proto {scheme}
-            header_up X-Forwarded-For {remote}
-        }
-    }
-
     # API routes
     handle /api/auth* {
         reverse_proxy host.docker.internal:8000 {
