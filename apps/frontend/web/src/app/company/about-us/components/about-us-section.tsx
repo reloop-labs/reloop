@@ -1,360 +1,187 @@
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { contactEmail } from "@reloop/web/lib/site";
+import Image from "next/image";
 import Link from "next/link";
 
-type EntityCard = {
+type StoryChapter = {
+	eyebrow: string;
 	title: string;
-	subtitle: string;
-	description: string;
-	points: string[];
-	highlighted?: boolean;
+	paragraphs: string[];
 };
 
-type RoleItem = {
-	title: string;
-	description: string;
-	icon: string;
-	iconColor: string;
-	iconBorder: string;
+type Founder = {
+	name: string;
+	role: string;
+	bio: string;
+	image: string;
+	github: string;
 };
 
-type TimelineItem = {
-	year: string;
-	title: string;
-	description: string;
-};
-
-type ExploreLink = {
-	title: string;
-	description: string;
-	href: string;
-	external?: boolean;
-};
-
-const entities: EntityCard[] = [
+const story: StoryChapter[] = [
 	{
-		title: "Reloop",
-		subtitle: "The platform",
-		description:
-			"Open-source email infrastructure under Apache 2.0. The codebase, APIs, and docs.",
-		points: [
-			"Transactional email, campaigns, SMTP, webhooks",
-			"Self-host on your infrastructure",
-			"Fork, audit, and contribute on GitHub",
+		eyebrow: "Where it started",
+		title: "Email infrastructure kept failing us.",
+		paragraphs: [
+			"Every project we shipped needed email—password resets, receipts, onboarding, campaigns. And every time, the same tradeoff: trust a proprietary vendor you can't audit, or wire up fragile SMTP yourself and hope deliverability holds.",
+			"Pricing crept up. Routing logic stayed hidden. When something broke at 2 a.m., there was nothing to read except a status page. We kept asking the same question: why can't this be open, self-hostable, and good enough to run in production?",
 		],
 	},
 	{
-		title: "Reloop Labs",
-		subtitle: "The company",
-		description:
-			"The team that builds, maintains, and operates Reloop—the product and the hosted service.",
-		points: [
-			"Maintains the open-source codebase",
-			"Runs the hosted service at reloop.sh",
-			"Ships in public with the community",
+		eyebrow: "September 2025",
+		title: "Pranav and Twinkal founded Reloop Labs.",
+		paragraphs: [
+			"Two engineers, one decision—build the email stack we wished existed. Not a wrapper around someone else's API. A full platform: transactional sends, campaigns, SMTP, webhooks, analytics—the same capabilities as proprietary providers, under Apache 2.0.",
+			"We started in public. Issues on GitHub, progress in Discord, code anyone could clone. No stealth mode, no pitch deck. Just shipping.",
 		],
-		highlighted: true,
+	},
+	{
+		eyebrow: "2025–2026",
+		title: "We built the hard parts in the open.",
+		paragraphs: [
+			"APIs and SDKs. Self-hosting with Docker. Agent inboxes for AI workflows. Deliverability tooling you can actually inspect. Each piece went into the same codebase—whether you run it on your servers or use reloop.sh.",
+			"Reloop Labs maintains that codebase and operates the hosted service. Same software, your choice of deployment. That was the point from day one.",
+		],
+	},
+	{
+		eyebrow: "July 2026",
+		title: "Reloop goes live.",
+		paragraphs: [
+			"Hosted and self-host from launch day. No forked enterprise edition, no features locked behind a sales call. Read the source, run it yourself, or sign up and send—3,000 emails per month free.",
+			"We're early. A team of two, a public roadmap, and weekly releases. But the foundation is solid, the code is public, and we're not going back to closed email.",
+		],
 	},
 ];
 
-const roles: RoleItem[] = [
+const founders: Founder[] = [
 	{
-		title: "Maintain the codebase",
-		description:
-			"We write, review, and release Reloop as open source—same code whether you host it or we do.",
-		icon: "code",
-		iconColor: "text-violet-500 dark:text-violet-400",
-		iconBorder: "border-violet-500/25 dark:border-violet-400/30",
+		name: "Pranav Patel",
+		role: "Co-founder",
+		bio: "Product, platform architecture, and Reloop Labs.",
+		image: "/company/team/pranav-patel.jpg",
+		github: "https://github.com/pranavp10",
 	},
 	{
-		title: "Run the hosted service",
-		description:
-			"Reloop Labs operates reloop.sh so teams can use Reloop without managing their own infrastructure.",
-		icon: "server",
-		iconColor: "text-blue-500 dark:text-blue-400",
-		iconBorder: "border-blue-500/25 dark:border-blue-400/30",
-	},
-	{
-		title: "Support the community",
-		description:
-			"Discord, GitHub issues, docs, and a public roadmap—so you always know where the project is headed.",
-		icon: "users",
-		iconColor: "text-emerald-500 dark:text-emerald-400",
-		iconBorder: "border-emerald-500/25 dark:border-emerald-400/30",
+		name: "Twinkal P",
+		role: "Co-founder",
+		bio: "Platform engineering and the open-source stack.",
+		image: "/company/team/twinkal-p.jpg",
+		github: "https://github.com/twinkalp10",
 	},
 ];
 
-const timeline: TimelineItem[] = [
-	{
-		year: "Sep 2025",
-		title: "Reloop Labs founded",
-		description:
-			"Started building open-source email infrastructure after one too many opaque vendor contracts.",
-	},
-	{
-		year: "2025–2026",
-		title: "Building in public",
-		description:
-			"Shipped APIs, self-hosting, agent inboxes, and deliverability tooling on GitHub and Discord.",
-	},
-	{
-		year: "Jul 2026",
-		title: "Public launch",
-		description:
-			"Reloop goes live—hosted service and self-host from day one, same Apache 2.0 codebase.",
-	},
-	{
-		year: "Now",
-		title: "Early and shipping",
-		description:
-			"A small team, a public roadmap, and weekly improvements. We're just getting started.",
-	},
-];
-
-const exploreLinks: ExploreLink[] = [
-	{
-		title: "Why Reloop",
-		description: "The problem we set out to solve.",
-		href: "/philosophy/why-reloop",
-	},
-	{
-		title: "What we stand for",
-		description: "The principles behind every decision.",
-		href: "/philosophy/what-we-stand-for",
-	},
-	{
-		title: "Why open source",
-		description: "Why the codebase is public.",
-		href: "/philosophy/why-open-source",
-	},
-	{
-		title: "Contact us",
-		description: "Email, Discord, or GitHub.",
-		href: "/company/contact-us",
-	},
-];
-
-function EntityColumn({ entity }: { entity: EntityCard }) {
+function StoryBlock({ chapter }: { chapter: StoryChapter }) {
 	return (
-		<div
-			className={cn(
-				"flex flex-col bg-bg-white-0 p-8 lg:p-10",
-				entity.highlighted && "lg:min-h-[360px]",
-			)}
-		>
-			<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/40">
-				{entity.subtitle}
+		<article className="border-stroke-soft-200 border-t pt-12 first:border-t-0 first:pt-0 dark:border-white/10">
+			<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
+				{chapter.eyebrow}
 			</p>
-			<h3
-				className={cn(
-					"mt-3 font-semibold text-[18px] leading-snug sm:text-[20px]",
-					entity.highlighted
-						? "text-primary-base"
-						: "text-text-strong-950 dark:text-white",
-				)}
-			>
-				{entity.title}
-			</h3>
-			<p className="mt-3 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-				{entity.description}
-			</p>
-			<ul className="mt-8 flex-1 space-y-2.5">
-				{entity.points.map((point) => (
-					<li
-						key={point}
-						className="flex items-start gap-3 text-[14px] leading-snug"
+			<h2 className="mt-4 font-serif text-[2rem] text-text-strong-950 leading-[1.08] tracking-tighter sm:text-[2.4rem] dark:text-white">
+				{chapter.title}
+			</h2>
+			<div className="mt-6 space-y-5">
+				{chapter.paragraphs.map((paragraph) => (
+					<p
+						key={paragraph.slice(0, 40)}
+						className="text-[16px] text-text-sub-600 leading-[1.8] sm:text-[17px] dark:text-white/55"
 					>
-						<Icon
-							name="check-circle"
-							className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/35"
-						/>
-						<span className="text-text-sub-600 dark:text-white/60">{point}</span>
-					</li>
+						{paragraph}
+					</p>
 				))}
-			</ul>
-		</div>
-	);
-}
-
-function RoleCard({ item }: { item: RoleItem }) {
-	return (
-		<div className="flex flex-col bg-bg-white-0 p-8 transition-colors duration-300 hover:bg-neutral-950/[0.004] lg:p-10 dark:bg-transparent dark:hover:bg-white/[0.012]">
-			<div
-				className={cn(
-					"inline-flex size-10 items-center justify-center rounded-xl border bg-transparent",
-					item.iconBorder,
-				)}
-			>
-				<Icon name={item.icon} className={cn("size-5", item.iconColor)} />
 			</div>
-			<h3 className="mt-6 font-semibold text-[15px] text-text-strong-950 leading-snug sm:text-[17px] dark:text-white">
-				{item.title}
-			</h3>
-			<p className="mt-3 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-				{item.description}
-			</p>
-		</div>
+		</article>
 	);
 }
 
-function TimelineCard({ item }: { item: TimelineItem }) {
+function FounderCard({ founder }: { founder: Founder }) {
 	return (
-		<div className="flex flex-col bg-bg-white-0 p-8 lg:p-10">
-			<span className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/40">
-				{item.year}
-			</span>
-			<h3 className="mt-4 font-semibold text-[15px] text-text-strong-950 leading-snug sm:text-[17px] dark:text-white">
-				{item.title}
-			</h3>
-			<p className="mt-3 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-				{item.description}
-			</p>
-		</div>
-	);
-}
-
-function ExploreCard({ link }: { link: ExploreLink }) {
-	const className =
-		"group flex flex-col justify-between bg-bg-white-0 p-8 transition-colors duration-300 hover:bg-neutral-950/[0.004] lg:p-10 dark:bg-transparent dark:hover:bg-white/[0.012]";
-
-	const content = (
-		<>
-			<div>
-				<h3 className="font-semibold text-[15px] text-text-strong-950 leading-snug group-hover:text-primary-base sm:text-[17px] dark:text-white">
-					{link.title}
+		<div className="flex flex-col bg-bg-white-0">
+			<div className="relative aspect-[5/4] w-full overflow-hidden bg-neutral-100 dark:bg-white/5">
+				<Image
+					src={founder.image}
+					alt={founder.name}
+					fill
+					className="object-cover object-center"
+					sizes="(max-width: 1024px) 100vw, 50vw"
+				/>
+			</div>
+			<div className="flex flex-1 flex-col p-8 lg:p-10">
+				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/40">
+					{founder.role}
+				</p>
+				<h3 className="mt-3 font-semibold text-[18px] text-text-strong-950 leading-snug sm:text-[20px] dark:text-white">
+					{founder.name}
 				</h3>
 				<p className="mt-2 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50">
-					{link.description}
+					{founder.bio}
 				</p>
+				<a
+					href={founder.github}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="group mt-6 inline-flex items-center gap-2 font-semibold text-[14px] text-text-strong-950 transition-colors hover:text-primary-base dark:text-white"
+				>
+					GitHub
+					<Icon
+						name="arrow-left"
+						className="size-3.5 rotate-180 opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100"
+						aria-hidden
+					/>
+				</a>
 			</div>
-			<Icon
-				name="arrow-left"
-				className="mt-8 size-4 rotate-180 text-text-sub-600 opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100 dark:text-white/40"
-				aria-hidden
-			/>
-		</>
-	);
-
-	if (link.external) {
-		return (
-			<a
-				href={link.href}
-				target="_blank"
-				rel="noopener noreferrer"
-				className={className}
-			>
-				{content}
-			</a>
-		);
-	}
-
-	return (
-		<Link href={link.href} className={className}>
-			{content}
-		</Link>
+		</div>
 	);
 }
 
 export function AboutUsSection() {
 	return (
-		<>
-			<div className="mb-12 text-center lg:mb-16">
-				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-					Reloop vs Reloop Labs
-				</p>
-				<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
-					The platform and
-					<br />
-					<span className="text-primary-base">the company.</span>
-				</h2>
-				<p className="mx-auto mt-4 max-w-lg text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-					Reloop is the open-source email stack. Reloop Labs is the team that
-					builds it, runs the hosted service, and works with the community.
-				</p>
+		<div className="mx-auto max-w-2xl">
+			<div className="space-y-12 lg:space-y-16">
+				{story.map((chapter) => (
+					<StoryBlock key={chapter.eyebrow} chapter={chapter} />
+				))}
 			</div>
 
-			<div className="overflow-hidden rounded-4xl border border-stroke-soft-200 bg-stroke-soft-200 dark:border-white/10 dark:bg-white/10">
+			<div className="mt-20 border-stroke-soft-200 border-t pt-16 dark:border-white/10 lg:mt-24 lg:pt-20">
+				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
+					The team
+				</p>
+				<h2 className="mt-4 font-serif text-[2rem] text-text-strong-950 leading-[1.08] tracking-tighter sm:text-[2.4rem] dark:text-white">
+					Built by Pranav and Twinkal.
+				</h2>
+			</div>
+
+			<div className="mx-auto mt-10 max-w-4xl overflow-hidden rounded-4xl border border-stroke-soft-200 bg-stroke-soft-200 dark:border-white/10 dark:bg-white/10">
 				<div className="grid gap-px lg:grid-cols-2">
-					{entities.map((entity) => (
-						<EntityColumn key={entity.title} entity={entity} />
+					{founders.map((founder) => (
+						<FounderCard key={founder.name} founder={founder} />
 					))}
 				</div>
 			</div>
 
-			<div className="mt-24">
-				<div className="mb-12 text-center lg:mb-16">
-					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-						What we do
-					</p>
-					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
-						Three jobs.
-						<br />
-						<span className="text-primary-base">One open codebase.</span>
-					</h2>
-				</div>
-				<div className="overflow-hidden rounded-4xl border border-stroke-soft-200 bg-stroke-soft-200 dark:border-white/10 dark:bg-white/10">
-					<div className="grid gap-px lg:grid-cols-3">
-						{roles.map((item) => (
-							<RoleCard key={item.title} item={item} />
-						))}
-					</div>
-				</div>
-			</div>
-
-			<div className="mt-24">
-				<div className="mb-12 text-center lg:mb-16">
-					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-						Our story
-					</p>
-					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
-						Started in 2025.
-						<br />
-						<span className="text-primary-base">Still shipping.</span>
-					</h2>
-					<p className="mx-auto mt-4 max-w-lg text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-						Reloop Labs began because email infrastructure shouldn't require
-						trusting a vendor you can't audit—or running fragile SMTP yourself.
-					</p>
-				</div>
-				<div className="overflow-hidden rounded-4xl border border-stroke-soft-200 bg-stroke-soft-200 dark:border-white/10 dark:bg-white/10">
-					<div className="grid gap-px sm:grid-cols-2 lg:grid-cols-4">
-						{timeline.map((item) => (
-							<TimelineCard key={item.year + item.title} item={item} />
-						))}
-					</div>
-				</div>
-			</div>
-
-			<div className="mt-24">
-				<div className="mb-12 text-center lg:mb-16">
-					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-						Go deeper
-					</p>
-					<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
-						Learn more about
-						<br />
-						<span className="text-primary-base">how we think.</span>
-					</h2>
-				</div>
-				<div className="overflow-hidden rounded-4xl border border-stroke-soft-200 bg-stroke-soft-200 dark:border-white/10 dark:bg-white/10">
-					<div className="grid gap-px sm:grid-cols-2">
-						{exploreLinks.map((link) => (
-							<ExploreCard key={link.title} link={link} />
-						))}
-					</div>
-				</div>
-				<p className="mx-auto mt-10 max-w-lg text-center text-[14px] text-text-sub-600 leading-7 dark:text-white/45">
-					Reach us anytime at{" "}
-					<a
-						href={`mailto:${contactEmail}`}
-						className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
-					>
-						{contactEmail}
-					</a>
-					.
-				</p>
-			</div>
-		</>
+			<p className="mt-16 text-center text-[15px] text-text-sub-600 leading-[1.8] dark:text-white/50">
+				Want to know why we built it this way? Read{" "}
+				<Link
+					href="/philosophy/why-reloop"
+					className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
+				>
+					why Reloop
+				</Link>{" "}
+				and{" "}
+				<Link
+					href="/philosophy/what-we-stand-for"
+					className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
+				>
+					what we stand for
+				</Link>
+				. Or reach us at{" "}
+				<a
+					href={`mailto:${contactEmail}`}
+					className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
+				>
+					{contactEmail}
+				</a>
+				.
+			</p>
+		</div>
 	);
 }

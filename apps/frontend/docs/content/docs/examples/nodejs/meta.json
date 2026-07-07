@@ -1,8 +1,5 @@
 {
 	"title": "Node.js",
 	"icon": "siNodedotjs",
-	"pages": [
-		"express",
-		"nextjs"
-	]
+	"pages": ["express", "nextjs"]
 }

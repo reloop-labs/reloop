@@ -1,9 +1,5 @@
 {
 	"title": "Python",
 	"icon": "siPython",
-	"pages": [
-		"fastapi",
-		"django",
-		"flask"
-	]
+	"pages": ["fastapi", "django", "flask"]
 }

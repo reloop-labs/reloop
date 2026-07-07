@@ -1,7 +1,5 @@
 {
 	"title": "PHP",
 	"icon": "siPhp",
-	"pages": [
-		"laravel"
-	]
+	"pages": ["laravel"]
 }

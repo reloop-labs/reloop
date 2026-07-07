@@ -63,7 +63,7 @@ export function DefaultSidebarFolder({
 							: "text-text-sub-600 hover:text-primary-base",
 				)}
 			>
-				<div className="relative z-10 flex w-full items-center gap-2 text-left min-w-0">
+				<div className="relative z-10 flex w-full min-w-0 items-center gap-2 text-left">
 					{node.icon && (
 						<span
 							className={cn(

@@ -1,7 +1,5 @@
 {
 	"title": "Rust",
 	"icon": "siRust",
-	"pages": [
-		"axum"
-	]
+	"pages": ["axum"]
 }

@@ -156,7 +156,9 @@ function PrincipleCard({ item }: { item: PrincipleItem }) {
 							name="check-circle"
 							className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/35"
 						/>
-						<span className="text-text-sub-600 dark:text-white/60">{point}</span>
+						<span className="text-text-sub-600 dark:text-white/60">
+							{point}
+						</span>
 					</li>
 				))}
 			</ul>
@@ -192,17 +194,14 @@ export function WhatWeStandForSection() {
 	return (
 		<>
 			<div className="mb-12 text-center lg:mb-16">
-				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-					Six principles
-				</p>
-				<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
+				<h2 className="font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
 					How we decide
 					<br />
 					<span className="text-primary-base">what ships.</span>
 				</h2>
 				<p className="mx-auto mt-4 max-w-lg text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-					No poster on a wall. Rules we use when choosing features, defaults, and
-					what stays open source.
+					No poster on a wall. Rules we use when choosing features, defaults,
+					and what stays open source.
 				</p>
 			</div>
 
@@ -219,7 +218,8 @@ export function WhatWeStandForSection() {
 						<span className="text-primary-base">check in GitHub.</span>
 					</h2>
 					<p className="mx-auto mt-4 max-w-lg text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-						Three ways these values show up in the product—not just on this page.
+						Three ways these values show up in the product—not just on this
+						page.
 					</p>
 				</div>
 				<PrinciplesGrid />

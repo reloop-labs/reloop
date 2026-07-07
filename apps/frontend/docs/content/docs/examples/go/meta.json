@@ -1,7 +1,5 @@
 {
 	"title": "Go",
 	"icon": "siGo",
-	"pages": [
-		"gin"
-	]
+	"pages": ["gin"]
 }

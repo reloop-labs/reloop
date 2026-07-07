@@ -467,10 +467,7 @@ export function WhyReloopSection() {
 	return (
 		<>
 			<div className="mb-12 text-center lg:mb-16">
-				<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-					Why developers switch
-				</p>
-				<h2 className="mt-4 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
+				<h2 className="font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white">
 					SendGrid-level email.
 					<br />
 					<span className="text-primary-base">None of the lock-in.</span>

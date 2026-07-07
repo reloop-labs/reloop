@@ -33,7 +33,12 @@ export default function OpenGraphImage() {
 				}}
 			>
 				<defs>
-					<pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+					<pattern
+						id="grid"
+						width="40"
+						height="40"
+						patternUnits="userSpaceOnUse"
+					>
 						<path
 							d="M 40 0 L 0 0 0 40"
 							fill="none"
@@ -321,8 +326,8 @@ export default function OpenGraphImage() {
 						margin: "8px 0 0 0",
 					}}
 				>
-					Reloop is open-source, self-hostable infrastructure. Use it hosted on our
-					managed cloud or deploy it directly on your own servers.
+					Reloop is open-source, self-hostable infrastructure. Use it hosted on
+					our managed cloud or deploy it directly on your own servers.
 				</p>
 			</div>
 
