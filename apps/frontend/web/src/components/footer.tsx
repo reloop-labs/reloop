@@ -194,7 +194,7 @@ export const Footer = () => {
 						</Link>
 					</div>
 
-					<div className="min-w-0 flex-1 flex flex-col gap-10 lg:gap-12">
+					<div className="flex min-w-0 flex-1 flex-col gap-10 lg:gap-12">
 						{/* Row 1: Primary columns */}
 						<div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-8">
 							{columns.slice(0, 6).map((column) => (

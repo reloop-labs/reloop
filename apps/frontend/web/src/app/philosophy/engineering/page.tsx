@@ -66,10 +66,7 @@ const EngineeringPage = () => {
 		<>
 			<JsonLd data={jsonLd} />
 			<MarketingPageShell
-				titleLines={[
-					"Engineering excellence.",
-					"Built to last at scale.",
-				]}
+				titleLines={["Engineering excellence.", "Built to last at scale."]}
 				description="Great products are built by great engineering. Our technical philosophy emphasizes reliability, performance, and maintainability at every level of the stack."
 				primaryCta={{
 					label: "View on GitHub",

@@ -3,6 +3,7 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import Link from "next/link";
 import type React from "react";
 import type { FeatureCtaLink } from "./types";
 
@@ -37,15 +38,26 @@ function HeroCtaLink({
 		</span>
 	);
 
+	const isCrossDomain =
+		href.startsWith("/docs") || href.startsWith("/dashboard");
+
+	if (external || isCrossDomain) {
+		return (
+			<a
+				href={href}
+				target={external ? "_blank" : undefined}
+				rel={external ? "noopener noreferrer" : undefined}
+				className={className}
+			>
+				{content}
+			</a>
+		);
+	}
+
 	return (
-		<a
-			href={href}
-			target={external ? "_blank" : undefined}
-			rel={external ? "noopener noreferrer" : undefined}
-			className={className}
-		>
+		<Link href={href} className={className}>
 			{content}
-		</a>
+		</Link>
 	);
 }
 
