@@ -96,7 +96,7 @@ const WhyOpenSourcePage = () => {
 			}}
 			secondaryCta={{
 				label: "License",
-				href: "/company/license",
+				href: "/license",
 			}}
 			compactHero
 		>
@@ -202,7 +202,7 @@ const WhyOpenSourcePage = () => {
 				<p className="mx-auto mt-10 max-w-xl text-center text-[14px] text-text-sub-600 dark:text-white/55">
 					Reloop is licensed under{" "}
 					<Link
-						href="/company/license"
+						href="/license"
 						className="font-semibold text-primary-link underline decoration-primary-link/30 underline-offset-4"
 					>
 						Apache 2.0 with additional use restrictions

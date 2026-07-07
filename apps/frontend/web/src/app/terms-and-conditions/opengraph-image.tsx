@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Privacy Policy | Reloop";
+export const alt = "Terms of Service | Reloop";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -267,7 +267,7 @@ export default function OpenGraphImage() {
 							lineHeight: 1.1,
 						}}
 					>
-						Privacy Policy
+						Terms of Service
 					</span>
 				</div>
 				<p
@@ -280,8 +280,8 @@ export default function OpenGraphImage() {
 						margin: "4px 0 0 0",
 					}}
 				>
-					How Reloop Labs collects and uses information on reloop.sh and in
-					relation to the open-source Reloop email platform.
+					Terms governing use of reloop.sh and the open-source Reloop email
+					infrastructure software from Reloop Labs.
 				</p>
 			</div>
 
@@ -350,7 +350,7 @@ export default function OpenGraphImage() {
 						letterSpacing: "1px",
 					}}
 				>
-					reloop.sh/company/privacy
+					reloop.sh/terms-and-conditions
 				</div>
 			</div>
 		</div>,

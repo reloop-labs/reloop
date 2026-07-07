@@ -112,7 +112,7 @@ const columns: FooterColumn[] = [
 		items: [
 			{ title: "Why Open Source", href: "/philosophy/why-open-source" },
 			{ title: "Self-host", href: "/docs/self-host" },
-			{ title: "License", href: "/company/license" },
+			{ title: "License", href: "/license" },
 		],
 	},
 	{
@@ -127,9 +127,9 @@ const columns: FooterColumn[] = [
 	{
 		group: "Legal & Trust",
 		items: [
-			{ title: "Privacy Policy", href: "/company/privacy" },
-			{ title: "Terms of Service", href: "/company/terms-and-conditions" },
-			{ title: "License", href: "/company/license" },
+			{ title: "Privacy Policy", href: "/privacy" },
+			{ title: "Terms of Service", href: "/terms-and-conditions" },
+			{ title: "License", href: "/license" },
 			{
 				title: "Status",
 				href: "https://status.reloop.sh/status/live",

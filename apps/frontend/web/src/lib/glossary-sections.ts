@@ -143,9 +143,9 @@ export function getGlossarySections(): GlossarySection[] {
 			{ title: "About Us", href: "/about" },
 			{ title: "Blog", href: "/blog" },
 			{ title: "Contact Us", href: "/contact" },
-			{ title: "License", href: "/company/license" },
-			{ title: "Privacy Policy", href: "/company/privacy" },
-			{ title: "Terms and Conditions", href: "/company/terms-and-conditions" },
+			{ title: "License", href: "/license" },
+			{ title: "Privacy Policy", href: "/privacy" },
+			{ title: "Terms and Conditions", href: "/terms-and-conditions" },
 		]),
 		section("Philosophy", [
 			{ title: "Why Reloop", href: "/philosophy/why-reloop" },

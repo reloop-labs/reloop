@@ -514,7 +514,7 @@ export default function OpenGraphImage() {
 						letterSpacing: "1px",
 					}}
 				>
-					reloop.sh/company/license
+					reloop.sh/license
 				</span>
 			</div>
 		</div>,

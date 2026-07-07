@@ -7,7 +7,7 @@ import Link from "next/link";
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
 
-const pageUrl = `${getSiteUrl()}/company/terms-and-conditions`;
+const pageUrl = `${getSiteUrl()}/terms-and-conditions`;
 
 export const metadata: Metadata = {
 	title: "Terms of Service | Reloop",
@@ -68,7 +68,7 @@ const TermsPage = () => {
 						service, or self-host the open-source platform on your own
 						infrastructure. Third parties may not resell or offer competing
 						hosted services; see our{" "}
-						<Link href="/company/license">license terms</Link>.
+						<Link href="/license">license terms</Link>.
 					</p>
 				</section>
 
@@ -78,7 +78,7 @@ const TermsPage = () => {
 						The Reloop source code is licensed under the{" "}
 						<strong>Apache License, Version 2.0</strong>, with additional use
 						restrictions defined by Reloop Labs. The full license is available
-						on our <Link href="/company/license">License</Link> page and in the
+						on our <Link href="/license">License</Link> page and in the
 						repository.
 					</p>
 					<p>In summary, you may:</p>
@@ -138,7 +138,7 @@ const TermsPage = () => {
 					<p>
 						When you use Reloop as a hosted service, Reloop Labs operates the
 						platform and processes data as described in our{" "}
-						<Link href="/company/privacy">Privacy Policy</Link>. You are
+						<Link href="/privacy">Privacy Policy</Link>. You are
 						responsible for lawful use, recipient consent, and acceptable
 						sending practices.
 					</p>
@@ -233,7 +233,7 @@ const TermsPage = () => {
 						updated&rdquo; date. Continued use of the website after changes
 						become effective constitutes acceptance of the revised Terms.
 						Material changes to software licensing are reflected in the{" "}
-						<Link href="/company/license">License</Link> page and repository.
+						<Link href="/license">License</Link> page and repository.
 					</p>
 				</section>
 

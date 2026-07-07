@@ -129,7 +129,7 @@ const navItems: NavItem[] = [
 					links: [
 						{ title: "Why Open Source", href: "/philosophy/why-open-source" },
 						{ title: "Self-host", href: "/docs/self-host" },
-						{ title: "License", href: "/company/license" },
+						{ title: "License", href: "/license" },
 						{
 							title: "GitHub",
 							href: "https://github.com/reloop-labs/reloop",

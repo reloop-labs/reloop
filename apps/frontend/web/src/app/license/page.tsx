@@ -13,7 +13,7 @@ import { LicenseText } from "./components/license-text";
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
 
-const pageUrl = `${getSiteUrl()}/company/license`;
+const pageUrl = `${getSiteUrl()}/license`;
 
 export const metadata: Metadata = {
 	title: "License | Reloop",
