@@ -1,6 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
+import { Fragment } from "react";
 
 type BentoItem = {
 	title: string;
@@ -74,19 +75,262 @@ const hostedItem: BentoItem = {
 	iconBorder: "border-emerald-500/25 dark:border-emerald-400/30",
 };
 
-const proprietaryPoints = [
-	"Pricing spikes as you grow",
-	"Deliverability you can't debug",
-	"Data lives on their servers",
-	"Roadmap you can't influence",
-];
+const comparisonSections = [
+	{
+		title: "Pricing",
+		rows: [
+			{
+				label: "Free tier",
+				proprietary: "Trial / credit card required",
+				reloop: "3,000 emails/month",
+			},
+			{
+				label: "Published pricing",
+				proprietary: false,
+				reloop: true,
+			},
+			{
+				label: "Predictable overage",
+				proprietary: false,
+				reloop: "Fixed per-thousand rate",
+			},
+			{
+				label: "Same price hosted or self-host",
+				proprietary: false,
+				reloop: true,
+			},
+		],
+	},
+	{
+		title: "Control & transparency",
+		rows: [
+			{
+				label: "Open source",
+				proprietary: false,
+				reloop: "Apache 2.0",
+			},
+			{
+				label: "Audit routing logic",
+				proprietary: false,
+				reloop: true,
+			},
+			{
+				label: "Debug deliverability",
+				proprietary: "Black box",
+				reloop: "Full source access",
+			},
+			{
+				label: "Data location",
+				proprietary: "Vendor servers only",
+				reloop: "Your network or ours",
+			},
+		],
+	},
+	{
+		title: "Deployment",
+		rows: [
+			{
+				label: "Self-hosting",
+				proprietary: false,
+				reloop: true,
+			},
+			{
+				label: "Vendor lock-in",
+				proprietary: "High",
+				reloop: "None",
+			},
+			{
+				label: "Export contacts & templates",
+				proprietary: "Limited",
+				reloop: "Full export",
+			},
+			{
+				label: "Leave without migration pain",
+				proprietary: false,
+				reloop: true,
+			},
+		],
+	},
+	{
+		title: "Platform",
+		rows: [
+			{
+				label: "Agent inboxes",
+				proprietary: "Add-on / limited",
+				reloop: "Included",
+			},
+			{
+				label: "Custom domains",
+				proprietary: "Paid tiers",
+				reloop: "2+ on free plan",
+			},
+			{
+				label: "Email validation",
+				proprietary: "Paid add-on",
+				reloop: "100+/month included",
+			},
+			{
+				label: "Dedicated IP",
+				proprietary: "Enterprise only",
+				reloop: "Available on paid plans",
+			},
+			{
+				label: "Full email stack (API, SMTP, campaigns)",
+				proprietary: true,
+				reloop: true,
+			},
+		],
+	},
+	{
+		title: "Developer experience",
+		rows: [
+			{
+				label: "REST API & typed SDKs",
+				proprietary: true,
+				reloop: true,
+			},
+			{
+				label: "Contribute on GitHub",
+				proprietary: false,
+				reloop: true,
+			},
+			{
+				label: "Roadmap influence",
+				proprietary: "Sales-driven",
+				reloop: "Community + GitHub",
+			},
+			{
+				label: "Fix bugs in production yourself",
+				proprietary: false,
+				reloop: true,
+			},
+			{
+				label: "Support",
+				proprietary: "Ticket queue",
+				reloop: "Source + community",
+			},
+		],
+	},
+] as const;
 
-const reloopPoints = [
-	"3,000 emails/month, free",
-	"Hosted or self-host—the same code",
-	"Every routing decision in source",
-	"Ship features on GitHub",
-];
+function ProprietaryCell({ value }: { value: string | boolean }) {
+	if (value === false || value === "—") {
+		return (
+			<Icon
+				name="cross"
+				className="size-4 text-text-sub-600/50 dark:text-white/20"
+				aria-label="Not available"
+			/>
+		);
+	}
+
+	if (value === true) {
+		return (
+			<Icon
+				name="check-circle"
+				className="size-4 text-text-strong-950 dark:text-white/85"
+				aria-label="Included"
+			/>
+		);
+	}
+
+	return (
+		<span className="text-[14px] text-text-sub-600 dark:text-white/45">
+			{value}
+		</span>
+	);
+}
+
+function ReloopCell({ value }: { value: string | boolean }) {
+	if (value === false || value === "—") {
+		return (
+			<Icon
+				name="cross"
+				className="size-4 text-text-sub-600/50 dark:text-white/20"
+				aria-label="Not available"
+			/>
+		);
+	}
+
+	if (value === true) {
+		return (
+			<Icon
+				name="check-circle"
+				className="size-4 text-text-strong-950 dark:text-white/85"
+				aria-label="Included"
+			/>
+		);
+	}
+
+	return (
+		<span className="inline-flex items-center gap-2.5 text-[14px]">
+			<Icon
+				name="check-circle"
+				className="size-4 shrink-0 text-text-strong-950 dark:text-white/85"
+				aria-hidden
+			/>
+			<span className="text-text-strong-950 dark:text-white/85">{value}</span>
+		</span>
+	);
+}
+
+function ComparisonTable() {
+	return (
+		<div className="overflow-x-auto">
+			<table className="w-full min-w-[640px] border-collapse">
+				<thead>
+					<tr>
+						<th className="w-[40%] pb-8" aria-hidden />
+						<th className="pb-8 text-left font-semibold text-[15px] text-text-strong-950 dark:text-white">
+							Proprietary platforms
+						</th>
+						<th className="pb-8 text-left font-semibold text-[15px] text-primary-base">
+							<span className="inline-flex items-center gap-2">
+								Reloop
+								<span className="rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em]">
+									Recommended
+								</span>
+							</span>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					{comparisonSections.map((section, sectionIndex) => (
+						<Fragment key={section.title}>
+							<tr>
+								<td
+									colSpan={3}
+									className={cn(
+										"pb-4 font-medium text-[15px] text-text-strong-950 dark:text-white",
+										sectionIndex > 0 ? "pt-10" : "pt-2",
+									)}
+								>
+									{section.title}
+								</td>
+							</tr>
+							{section.rows.map((row) => (
+								<tr
+									key={row.label}
+									className="group border-stroke-soft-200 border-b transition-colors last:border-b-0 hover:bg-bg-weak-50/60 dark:border-white/[0.06] dark:hover:bg-white/[0.04]"
+								>
+									<td className="py-4 pr-8 text-[14px] text-text-sub-600 dark:text-white/45">
+										{row.label}
+									</td>
+									<td className="py-4">
+										<ProprietaryCell value={row.proprietary} />
+									</td>
+									<td className="py-4">
+										<ReloopCell value={row.reloop} />
+									</td>
+								</tr>
+							))}
+						</Fragment>
+					))}
+				</tbody>
+			</table>
+		</div>
+	);
+}
 
 function BentoCard({
 	item,
@@ -180,60 +424,6 @@ function BentoCard({
 	);
 }
 
-function ComparisonColumn({
-	title,
-	items,
-	positive,
-	highlighted = false,
-}: {
-	title: string;
-	items: string[];
-	positive: boolean;
-	highlighted?: boolean;
-}) {
-	return (
-		<div className="flex flex-col bg-bg-white-0 p-6 sm:p-7 lg:p-8 dark:bg-transparent">
-			<div className="flex items-center gap-2">
-				<h3
-					className={cn(
-						"font-semibold text-[15px] text-text-strong-950 dark:text-white",
-						positive && "text-primary-base",
-					)}
-				>
-					{title}
-				</h3>
-				{highlighted && (
-					<span className="shrink-0 rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em]">
-						Recommended
-					</span>
-				)}
-			</div>
-
-			<ul className="mt-6 flex-1 space-y-2.5">
-				{items.map((item) => (
-					<li
-						key={item}
-						className="flex items-start gap-3 text-[14px] leading-snug"
-					>
-						{positive ? (
-							<Icon
-								name="check-circle"
-								className="mt-0.5 size-4 shrink-0 text-text-strong-950 dark:text-white/85"
-							/>
-						) : (
-							<Icon
-								name="cross"
-								className="mt-0.5 size-4 shrink-0 text-text-sub-600/50 dark:text-white/20"
-							/>
-						)}
-						<span className="text-text-sub-600 dark:text-white/60">{item}</span>
-					</li>
-				))}
-			</ul>
-		</div>
-	);
-}
-
 function BentoGrid() {
 	return (
 		<div className="overflow-hidden rounded-4xl border border-stroke-soft-200 bg-stroke-soft-200 dark:border-white/10 dark:bg-white/10">
@@ -307,21 +497,7 @@ export function WhyReloopSection() {
 						Same features as closed platforms. You can verify every claim yourself.
 					</p>
 				</div>
-				<div className="mx-auto max-w-3xl overflow-hidden rounded-4xl border border-stroke-soft-200 bg-stroke-soft-200 dark:border-white/10 dark:bg-white/10">
-					<div className="grid gap-px sm:grid-cols-2">
-						<ComparisonColumn
-							title="Proprietary platforms"
-							items={proprietaryPoints}
-							positive={false}
-						/>
-						<ComparisonColumn
-							title="Reloop"
-							items={reloopPoints}
-							positive
-							highlighted
-						/>
-					</div>
-				</div>
+				<ComparisonTable />
 			</div>
 		</>
 	);
