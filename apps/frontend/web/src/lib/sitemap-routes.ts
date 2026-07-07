@@ -4,7 +4,7 @@ import { LANGUAGE_SLUGS } from "../app/features/languages/languages";
 import {
 	changelogReleases,
 	getChangelogReleasePath,
-} from "../app/resources/changelog/changelog-utils";
+} from "../app/changelog/changelog-utils";
 
 const APP_DIR = join(process.cwd(), "src/app");
 
@@ -36,7 +36,7 @@ function collectStaticRoutes(dir: string, segments: string[] = []): string[] {
 		if (entry.startsWith("[")) {
 			const segmentPath = segments.join("/");
 
-			if (entry === "[version]" && segmentPath === "resources/changelog") {
+			if (entry === "[version]" && segmentPath === "changelog") {
 				for (const release of changelogReleases) {
 					routes.push(getChangelogReleasePath(release.version));
 				}

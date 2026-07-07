@@ -3,7 +3,7 @@ import { changelogReleasesData } from "./changelog-releases";
 import type { ChangelogRelease } from "./changelog-types";
 
 export function getChangelogReleasePath(version: string) {
-	return `/resources/changelog/${version}`;
+	return `/changelog/${version}`;
 }
 
 export function getChangelogReleaseByVersion(version: string) {

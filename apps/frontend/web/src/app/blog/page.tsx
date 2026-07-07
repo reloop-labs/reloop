@@ -57,7 +57,7 @@ const updates = [
 		title: "Product changelog",
 		description:
 			"A curated summary of what's shipped recently—features, fixes, and infrastructure improvements.",
-		href: "/resources/changelog",
+		href: "/changelog",
 		label: "Read changelog",
 	},
 	{
@@ -85,7 +85,7 @@ const BlogPage = () => {
 			}}
 			secondaryCta={{
 				label: "Changelog",
-				href: "/resources/changelog",
+				href: "/changelog",
 			}}
 			compactHero
 		>

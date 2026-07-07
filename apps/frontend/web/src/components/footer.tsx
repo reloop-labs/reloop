@@ -86,7 +86,7 @@ const columns: FooterColumn[] = [
 		group: "Learn",
 		items: [
 			{ title: "Blog", href: "/blog" },
-			{ title: "Changelog", href: "/resources/changelog" },
+			{ title: "Changelog", href: "/changelog" },
 			{ title: "Glossary", href: "/resources/glossary" },
 			{ title: "Sitemap", href: "/glossary" },
 			{ title: "Community", href: "/resources/community" },

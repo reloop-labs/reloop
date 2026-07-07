@@ -61,7 +61,7 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 		<div className="pb-16 sm:pb-20">
 			<PageSection narrow flushTop>
 				<Link
-					href="/resources/changelog"
+					href="/changelog"
 					className="inline-flex items-center gap-1 font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
 				>
 					<span aria-hidden="true">‹</span>

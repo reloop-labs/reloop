@@ -133,7 +133,7 @@ export function getGlossarySections(): GlossarySection[] {
 			{ title: "View all posts", href: "/blog" },
 		),
 		section("Resources", [
-			{ title: "Changelog", href: "/resources/changelog" },
+			{ title: "Changelog", href: "/changelog" },
 			{ title: "Community", href: "/resources/community" },
 			{ title: "Self-hosting Guide", href: "/docs/self-host" },
 			{ title: "Status", href: "/resources/status" },

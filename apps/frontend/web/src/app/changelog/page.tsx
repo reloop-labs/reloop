@@ -12,7 +12,7 @@ import { changelogReleases } from "./changelog-utils";
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
 
-const pageUrl = `${getSiteUrl()}/resources/changelog`;
+const pageUrl = `${getSiteUrl()}/changelog`;
 
 export const metadata: Metadata = {
 	title: "Changelog | Reloop",
