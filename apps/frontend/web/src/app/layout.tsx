@@ -47,7 +47,6 @@ const openRunde = localFont({
 
 export const metadata: Metadata = {
 	metadataBase: new URL(getSiteUrl()),
-	manifest: "/manifest.json",
 	title: {
 		default: siteName,
 		template: `%s | ${siteName}`,
