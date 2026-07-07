@@ -273,7 +273,7 @@ export default function OpenGraphImage() {
 					<span
 						style={{
 							fontSize: "28px",
-							fontWeight: 800,
+							fontWeight: "bold",
 							color: "#ffffff",
 							letterSpacing: "-0.5px",
 							marginLeft: "-14px",
@@ -282,16 +282,6 @@ export default function OpenGraphImage() {
 						Reloop
 					</span>
 				</div>
-				<span
-					style={{
-						color: "rgba(255,255,255,0.45)",
-						fontSize: 22,
-						fontWeight: 600,
-						letterSpacing: "0.18em",
-					}}
-				>
-					PHILOSOPHY
-				</span>
 			</div>
 
 			{/* Main Content Area */}
@@ -319,14 +309,14 @@ export default function OpenGraphImage() {
 							flexDirection: "column",
 							fontSize: 64,
 							lineHeight: 1.05,
-							fontWeight: 600,
+							fontWeight: 800,
 							color: "#ffffff",
 							fontFamily: "Georgia, serif",
 							letterSpacing: "-0.03em",
 						}}
 					>
 						Why
-						<span style={{ color: "#d97757", marginTop: 4 }}>Open Source</span>
+						<span style={{ color: "#ffffff", marginTop: 4 }}>Open Source</span>
 					</div>
 					<div
 						style={{
@@ -374,7 +364,7 @@ export default function OpenGraphImage() {
 							style={{
 								fontSize: 13,
 								fontWeight: 700,
-								color: "#d97757",
+								color: "#ffffff",
 								letterSpacing: "0.1em",
 							}}
 						>
@@ -437,7 +427,7 @@ export default function OpenGraphImage() {
 							style={{
 								fontSize: 13,
 								fontWeight: 700,
-								color: "rgba(255,255,255,0.4)",
+								color: "#ffffff",
 								letterSpacing: "0.1em",
 							}}
 						>
