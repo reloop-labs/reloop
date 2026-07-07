@@ -39,7 +39,7 @@ export function AlternativeLandingPage({
 					Want the full breakdown?{" "}
 					<Link
 						href={config.compareHref}
-						className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
+						className="font-semibold text-primary-link underline decoration-primary-link/30 underline-offset-4"
 					>
 						Read Reloop vs {config.competitorName}
 					</Link>

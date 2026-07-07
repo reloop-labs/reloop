@@ -166,21 +166,21 @@ export function AboutUsSection() {
 				Want the reasoning behind every decision? Read{" "}
 				<Link
 					href="/philosophy/why-reloop"
-					className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
+					className="font-semibold text-primary-link underline decoration-primary-link/30 underline-offset-4"
 				>
 					why we built Reloop
 				</Link>{" "}
 				and{" "}
 				<Link
 					href="/philosophy/what-we-stand-for"
-					className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
+					className="font-semibold text-primary-link underline decoration-primary-link/30 underline-offset-4"
 				>
 					what we won't compromise on
 				</Link>
 				. Questions?{" "}
 				<a
 					href={`mailto:${contactEmail}`}
-					className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
+					className="font-semibold text-primary-link underline decoration-primary-link/30 underline-offset-4"
 				>
 					{contactEmail}
 				</a>

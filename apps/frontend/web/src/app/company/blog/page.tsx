@@ -167,14 +167,14 @@ const BlogPage = () => {
 					Want deep dives and tutorials? Our{" "}
 					<Link
 						href="/docs"
-						className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
+						className="font-semibold text-primary-link underline decoration-primary-link/30 underline-offset-4"
 					>
 						documentation
 					</Link>{" "}
 					and{" "}
 					<Link
 						href="/docs/self-host"
-						className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
+						className="font-semibold text-primary-link underline decoration-primary-link/30 underline-offset-4"
 					>
 						self-hosting guide
 					</Link>{" "}

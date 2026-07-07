@@ -50,14 +50,14 @@ export function LicensePermissions() {
 					Third parties may not resell or offer competing hosted services.{" "}
 					<a
 						href="/dashboard/signup"
-						className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4 transition-opacity hover:opacity-80"
+						className="font-semibold text-primary-link underline decoration-primary-link/30 underline-offset-4 transition-opacity hover:opacity-80"
 					>
 						Use Reloop hosted
 					</a>{" "}
 					or{" "}
 					<a
 						href="/docs/self-host"
-						className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4 transition-opacity hover:opacity-80"
+						className="font-semibold text-primary-link underline decoration-primary-link/30 underline-offset-4 transition-opacity hover:opacity-80"
 					>
 						self-host
 					</a>{" "}
@@ -67,7 +67,7 @@ export function LicensePermissions() {
 					Questions?{" "}
 					<a
 						href={`mailto:${contactEmail}`}
-						className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4 transition-opacity hover:opacity-80"
+						className="font-semibold text-primary-link underline decoration-primary-link/30 underline-offset-4 transition-opacity hover:opacity-80"
 					>
 						{contactEmail}
 					</a>

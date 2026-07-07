@@ -229,6 +229,7 @@
 	--color-primary-dark: var(--primary-dark);
 	--color-primary-darker: var(--primary-darker);
 	--color-primary-base: var(--primary-base);
+	--color-primary-link: var(--primary-link);
 	--color-primary-alpha-24: var(--primary-alpha-24);
 	--color-primary-alpha-16: var(--primary-alpha-16);
 	--color-primary-alpha-10: var(--primary-alpha-10);
@@ -893,6 +894,7 @@
 	--primary-dark: #d97757;
 	--primary-darker: #d97757;
 	--primary-base: #d97757;
+	--primary-link: #bc512d;
 	--primary-alpha-24: #d977573d;
 	--primary-alpha-16: #d9775729;
 	--primary-alpha-10: #d977571a;
@@ -1056,6 +1058,7 @@
 	--social-tidal: #fff;
 	--social-amazon: #fff;
 	--social-zendesk: #fff;
+	--primary-link: #d97757;
 }
 
 @keyframes spinnerFade {

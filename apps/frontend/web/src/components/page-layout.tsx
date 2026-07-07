@@ -32,7 +32,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
 					<div className="lg:grid lg:grid-cols-[1fr_240px] lg:items-start lg:gap-16">
 						<div className="flex-1">
 							<MobileTableOfContents />
-							<div className="legal-content max-w-3xl text-[15px] text-text-strong-950 leading-relaxed sm:text-[17px] dark:text-white/80 [&_a]:text-primary-base [&_a]:underline [&_h2]:mt-10 [&_h2]:mb-3 [&_h2]:font-semibold [&_h2]:text-lg [&_h2]:text-text-strong-950 [&_h2]:dark:text-white [&_li]:text-text-sub-600 [&_p]:text-text-sub-600 [&_p]:dark:text-white/60 [&_section]:space-y-6 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6">
+							<div className="legal-content max-w-3xl text-[15px] text-text-strong-950 leading-relaxed sm:text-[17px] dark:text-white/80 [&_a]:text-primary-link [&_a]:underline [&_h2]:mt-10 [&_h2]:mb-3 [&_h2]:font-semibold [&_h2]:text-lg [&_h2]:text-text-strong-950 [&_h2]:dark:text-white [&_li]:text-text-sub-600 [&_p]:text-text-sub-600 [&_p]:dark:text-white/60 [&_section]:space-y-6 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6">
 								{children}
 							</div>
 						</div>

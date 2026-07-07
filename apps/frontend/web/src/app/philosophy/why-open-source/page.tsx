@@ -203,7 +203,7 @@ const WhyOpenSourcePage = () => {
 					Reloop is licensed under{" "}
 					<Link
 						href="/company/license"
-						className="font-semibold text-primary-base underline decoration-primary-base/30 underline-offset-4"
+						className="font-semibold text-primary-link underline decoration-primary-link/30 underline-offset-4"
 					>
 						Apache 2.0 with additional use restrictions
 					</Link>
