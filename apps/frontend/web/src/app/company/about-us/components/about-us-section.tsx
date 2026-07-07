@@ -135,6 +135,10 @@ function FounderCard({ founder }: { founder: Founder }) {
 export function AboutUsSection() {
 	return (
 		<div className="mx-auto max-w-2xl">
+			<h2 className="mb-12 font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:mb-16 dark:text-white">
+				Our story.
+			</h2>
+
 			<div className="space-y-12 lg:space-y-16">
 				{story.map((chapter) => (
 					<StoryBlock key={chapter.eyebrow} chapter={chapter} />
