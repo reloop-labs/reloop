@@ -1,4 +1,5 @@
-import { UseCasePageView } from "@reloop/web/components/landing/use-cases/use-case-page-view";
+import { AutomationFlowLayout } from "@reloop/web/components/landing/use-cases/layouts";
+import AutomatedWidget from "@reloop/web/components/landing/use-cases/widgets/automated";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/use-cases/automated-email";
 
@@ -12,5 +13,9 @@ export const metadata = createLandingMetadata(
 );
 
 export default function AutomatedEmailPage() {
-	return <UseCasePageView config={config} />;
+	return (
+		<AutomationFlowLayout config={config}>
+			<AutomatedWidget />
+		</AutomationFlowLayout>
+	);
 }

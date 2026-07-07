@@ -8,9 +8,51 @@ import type { LandingPageDefinition } from "@reloop/web/lib/landing/types";
 import { getUseCaseEnrichment } from "@reloop/web/lib/landing/use-cases/enrichment";
 import Link from "next/link";
 
+import TransactionalWidget from "./widgets/transactional";
+import MarketingWidget from "./widgets/marketing";
+import AutomatedWidget from "./widgets/automated";
+import AiAgentWidget from "./widgets/ai-agent";
+import InboundWidget from "./widgets/inbound";
+import SystemMonitoringWidget from "./widgets/system-monitoring";
+import PasswordResetWidget from "./widgets/password-reset";
+import WelcomeWidget from "./widgets/welcome";
+import OrderConfirmationWidget from "./widgets/order-confirmation";
+import EmailVerificationWidget from "./widgets/email-verification";
+import PaymentReceiptWidget from "./widgets/payment-receipt";
+
+function getUseCaseWidget(slug: string) {
+	switch (slug) {
+		case "transactional-email":
+			return <TransactionalWidget />;
+		case "marketing-email":
+			return <MarketingWidget />;
+		case "automated-email":
+			return <AutomatedWidget />;
+		case "ai-agent-inbox":
+			return <AiAgentWidget />;
+		case "inbound-email":
+			return <InboundWidget />;
+		case "system-monitoring-email":
+			return <SystemMonitoringWidget />;
+		case "password-reset-email":
+			return <PasswordResetWidget />;
+		case "welcome-email":
+			return <WelcomeWidget />;
+		case "order-confirmation-email":
+			return <OrderConfirmationWidget />;
+		case "email-verification":
+			return <EmailVerificationWidget />;
+		case "payment-receipt-email":
+			return <PaymentReceiptWidget />;
+		default:
+			return null;
+	}
+}
+
 export function UseCasePageView({ config }: { config: LandingPageDefinition }) {
 	const extra = getUseCaseEnrichment(config.slug);
 	const accent = accentStyles[extra.accent];
+	const widget = getUseCaseWidget(config.slug);
 
 	return (
 		<div className="min-h-screen bg-white dark:bg-black">
@@ -71,21 +113,27 @@ export function UseCasePageView({ config }: { config: LandingPageDefinition }) {
 						</div>
 					</div>
 
-					<div
-						className={`overflow-hidden rounded-2xl bg-gradient-to-br ${accent.code} ring-1 ${accent.ring}`}
-					>
-						<div className="flex items-center gap-2 border-white/10 border-b px-4 py-3">
-							<div className="size-2.5 rounded-full bg-red-400" />
-							<div className="size-2.5 rounded-full bg-amber-400" />
-							<div className="size-2.5 rounded-full bg-emerald-400" />
-							<span className="ml-2 font-mono text-[11px] text-white/40">
-								example.ts
-							</span>
+					{widget ? (
+						<div className="w-full h-full min-h-[420px] max-w-xl mx-auto">
+							{widget}
 						</div>
-						<pre className="overflow-x-auto p-5 font-mono text-[12px] text-emerald-300/90 leading-relaxed">
-							{extra.code}
-						</pre>
-					</div>
+					) : (
+						<div
+							className={`overflow-hidden rounded-2xl bg-gradient-to-br ${accent.code} ring-1 ${accent.ring}`}
+						>
+							<div className="flex items-center gap-2 border-white/10 border-b px-4 py-3">
+								<div className="size-2.5 rounded-full bg-red-400" />
+								<div className="size-2.5 rounded-full bg-amber-400" />
+								<div className="size-2.5 rounded-full bg-emerald-400" />
+								<span className="ml-2 font-mono text-[11px] text-white/40">
+									example.ts
+								</span>
+							</div>
+							<pre className="overflow-x-auto p-5 font-mono text-[12px] text-emerald-300/90 leading-relaxed">
+								{extra.code}
+							</pre>
+						</div>
+					)}
 				</div>
 			</div>
 

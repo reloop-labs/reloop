@@ -1,4 +1,5 @@
-import { UseCasePageView } from "@reloop/web/components/landing/use-cases/use-case-page-view";
+import { SplitScreenLayout } from "@reloop/web/components/landing/use-cases/layouts";
+import TransactionalWidget from "@reloop/web/components/landing/use-cases/widgets/transactional";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/use-cases/transactional-email";
 
@@ -12,5 +13,9 @@ export const metadata = createLandingMetadata(
 );
 
 export default function TransactionalEmailPage() {
-	return <UseCasePageView config={config} />;
+	return (
+		<SplitScreenLayout config={config}>
+			<TransactionalWidget />
+		</SplitScreenLayout>
+	);
 }

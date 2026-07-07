@@ -1,4 +1,5 @@
-import { UseCasePageView } from "@reloop/web/components/landing/use-cases/use-case-page-view";
+import { CenteredVisualLayout } from "@reloop/web/components/landing/use-cases/layouts";
+import WelcomeWidget from "@reloop/web/components/landing/use-cases/widgets/welcome";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/use-cases/welcome-email";
 
@@ -12,5 +13,9 @@ export const metadata = createLandingMetadata(
 );
 
 export default function WelcomeEmailPage() {
-	return <UseCasePageView config={config} />;
+	return (
+		<CenteredVisualLayout config={config}>
+			<WelcomeWidget />
+		</CenteredVisualLayout>
+	);
 }

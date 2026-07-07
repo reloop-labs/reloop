@@ -1,4 +1,5 @@
-import { UseCasePageView } from "@reloop/web/components/landing/use-cases/use-case-page-view";
+import { ConsoleFirstLayout } from "@reloop/web/components/landing/use-cases/layouts";
+import AiAgentWidget from "@reloop/web/components/landing/use-cases/widgets/ai-agent";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/use-cases/ai-agent-inbox";
 
@@ -12,5 +13,9 @@ export const metadata = createLandingMetadata(
 );
 
 export default function AiAgentInboxPage() {
-	return <UseCasePageView config={config} />;
+	return (
+		<ConsoleFirstLayout config={config}>
+			<AiAgentWidget />
+		</ConsoleFirstLayout>
+	);
 }

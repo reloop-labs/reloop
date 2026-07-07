@@ -1,4 +1,5 @@
-import { UseCasePageView } from "@reloop/web/components/landing/use-cases/use-case-page-view";
+import { SplitScreenLayout } from "@reloop/web/components/landing/use-cases/layouts";
+import PasswordResetWidget from "@reloop/web/components/landing/use-cases/widgets/password-reset";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { config } from "@reloop/web/lib/landing/use-cases/password-reset-email";
 
@@ -12,5 +13,9 @@ export const metadata = createLandingMetadata(
 );
 
 export default function PasswordResetEmailPage() {
-	return <UseCasePageView config={config} />;
+	return (
+		<SplitScreenLayout config={config}>
+			<PasswordResetWidget />
+		</SplitScreenLayout>
+	);
 }
