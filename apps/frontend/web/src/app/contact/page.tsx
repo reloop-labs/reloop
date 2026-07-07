@@ -1,4 +1,4 @@
-import { contactEmail, getSiteUrl } from "@reloop/web/lib/site";
+import { contactEmail, getSiteUrl, defaultOgImage } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Script from "next/script";
 import { ContactPanel } from "./contact-form";
@@ -37,30 +37,41 @@ export const instant = false;
 const siteUrl = getSiteUrl();
 const contactPageUrl = `${siteUrl}/contact`;
 
+const seoDescription =
+	"Get help from the engineers who built Reloop. Start a live chat, configure self-hosting or SMTP, and debug API delivery. Typically reply in 2-3 minutes.";
+
 export const metadata: Metadata = {
-	title: "Contact Support | Reloop",
-	description:
-		"Get help with Reloop. Start a live chat, ask product questions, report issues, or leave feedback.",
+	title: "Get help from the engineers who built it | Reloop",
+	description: seoDescription,
 	keywords: [
 		"contact Reloop",
 		"Reloop support",
 		"email platform support",
 		"Reloop Labs help",
 		"open source email support",
+		"SMTP support",
+		"self-hosted email support",
 	],
 	openGraph: {
-		title: "Contact Support | Reloop",
-		description:
-			"Get help with Reloop. Start a live chat, ask product questions, report issues, or leave feedback.",
+		title: "Get help from the engineers who built it | Reloop",
+		description: seoDescription,
 		type: "website",
 		url: contactPageUrl,
 		siteName: "Reloop",
+		images: [
+			{
+				url: `${siteUrl}/contact/opengraph-image`,
+				width: 1200,
+				height: 630,
+				alt: "Contact Us | Reloop",
+			},
+		],
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "Contact Support | Reloop",
-		description:
-			"Get help with Reloop. Start a live chat, ask product questions, report issues, or leave feedback.",
+		title: "Get help from the engineers who built it | Reloop",
+		description: seoDescription,
+		images: [`${siteUrl}/contact/opengraph-image`],
 	},
 	alternates: {
 		canonical: contactPageUrl,
@@ -70,12 +81,14 @@ export const metadata: Metadata = {
 const contactPageSchema = {
 	"@context": "https://schema.org",
 	"@type": "ContactPage",
-	name: "Contact Reloop Support",
+	name: "Get help from the engineers who built it | Reloop",
+	description: seoDescription,
 	url: contactPageUrl,
 	mainEntity: {
 		"@type": "Organization",
 		name: "Reloop Labs",
 		url: siteUrl,
+		logo: `${siteUrl}${defaultOgImage}`,
 		email: contactEmail,
 	},
 };
