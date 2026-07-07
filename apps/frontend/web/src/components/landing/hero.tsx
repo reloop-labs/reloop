@@ -1,8 +1,8 @@
 "use client";
 
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as Button from "@reloop/ui/button";
 import type React from "react";
 import type { FeatureCtaLink } from "./types";
 
@@ -18,7 +18,7 @@ function HeroCtaLink({
 	variant: "primary" | "secondary";
 }) {
 	const className = cn(
-		"group inline-flex h-11 items-center justify-center overflow-hidden rounded-full px-8 font-semibold transition-colors duration-300",
+		"group inline-flex h-11! items-center justify-center overflow-hidden rounded-full px-8 font-semibold transition-colors duration-300",
 		variant === "primary"
 			? Button.buttonVariants({ variant: "neutral", mode: "filled" }).root()
 			: Button.buttonVariants({ variant: "neutral", mode: "stroke" }).root(),

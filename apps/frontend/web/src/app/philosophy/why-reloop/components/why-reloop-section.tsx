@@ -347,10 +347,9 @@ function BentoCard({
 	return (
 		<div
 			className={cn(
-				"flex flex-col bg-bg-white-0 p-8 transition-colors duration-300 hover:bg-black/[0.01] lg:p-10 dark:bg-transparent dark:hover:bg-white/[0.02]",
+				"flex flex-col bg-bg-white-0 p-8 transition-colors duration-300 hover:bg-bg-soft-50/40 lg:p-10",
 				isTall && "h-full justify-between lg:min-h-[280px]",
-				isWide &&
-					"lg:flex-row lg:items-center lg:justify-between lg:gap-10",
+				isWide && "lg:flex-row lg:items-center lg:justify-between lg:gap-10",
 				className,
 			)}
 		>
@@ -389,7 +388,7 @@ function BentoCard({
 				</div>
 			</div>
 			{isTall && (
-				<p className="mt-8 text-[14px] text-text-sub-600 leading-[1.7] dark:text-white/50 lg:mt-0">
+				<p className="mt-8 text-[14px] text-text-sub-600 leading-[1.7] lg:mt-0 dark:text-white/50">
 					{item.description}
 				</p>
 			)}
@@ -425,28 +424,29 @@ function BentoCard({
 }
 
 function BentoGrid() {
+	const [leftItem1 = centerItem, leftItem2 = centerItem] = leftItems;
+	const [
+		rightItem1 = centerItem,
+		rightItem2 = centerItem,
+		rightItem3 = centerItem,
+	] = rightItems;
+
 	return (
 		<div className="overflow-hidden rounded-4xl border border-stroke-soft-200 bg-stroke-soft-200 dark:border-white/10 dark:bg-white/10">
 			<div className="grid gap-px lg:grid-cols-3 lg:grid-rows-3">
-				<BentoCard
-					item={leftItems[0]}
-					className="lg:col-start-1 lg:row-start-1"
-				/>
-				<BentoCard
-					item={leftItems[1]}
-					className="lg:col-start-1 lg:row-start-2"
-				/>
+				<BentoCard item={leftItem1} className="lg:col-start-1 lg:row-start-1" />
+				<BentoCard item={leftItem2} className="lg:col-start-1 lg:row-start-2" />
 				<BentoCard
 					item={centerItem}
 					variant="highlighted"
 					className="lg:col-start-2 lg:row-span-2 lg:row-start-1"
 				/>
 				<BentoCard
-					item={rightItems[0]}
+					item={rightItem1}
 					className="lg:col-start-3 lg:row-start-1"
 				/>
 				<BentoCard
-					item={rightItems[1]}
+					item={rightItem2}
 					className="lg:col-start-3 lg:row-start-2"
 				/>
 				<BentoCard
@@ -455,7 +455,7 @@ function BentoGrid() {
 					className="lg:col-span-2 lg:col-start-1 lg:row-start-3"
 				/>
 				<BentoCard
-					item={rightItems[2]}
+					item={rightItem3}
 					className="lg:col-start-3 lg:row-start-3"
 				/>
 			</div>
@@ -494,7 +494,8 @@ export function WhyReloopSection() {
 						<span className="text-primary-base">We show you the code.</span>
 					</h2>
 					<p className="mx-auto mt-4 max-w-lg text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-						Same features as closed platforms. You can verify every claim yourself.
+						Same features as closed platforms. You can verify every claim
+						yourself.
 					</p>
 				</div>
 				<ComparisonTable />
