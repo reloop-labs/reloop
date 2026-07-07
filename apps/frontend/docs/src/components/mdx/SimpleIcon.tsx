@@ -6,10 +6,14 @@ import {
 	siCloudflare,
 	siCoolify,
 	siCursor,
+	siDjango,
 	siDocker,
 	siDotnet,
 	siElixir,
 	siExpress,
+	siFastapi,
+	siFlask,
+	siGin,
 	siGo,
 	siLaravel,
 	siNetlify,
@@ -48,6 +52,10 @@ const Icons: Record<string, SimpleIconType> = {
 	siCloudflare,
 	siNetlify,
 	siDocker,
+	siFastapi,
+	siDjango,
+	siFlask,
+	siGin,
 };
 
 interface SimpleIconProps extends Omit<SVGProps<SVGSVGElement>, "ref"> {
