@@ -1,3 +1,4 @@
+import { JsonLd } from "@reloop/web/components/json-ld";
 import {
 	MarketingPageShell,
 	PageSection,
@@ -13,9 +14,9 @@ export const instant = false;
 const pageUrl = `${getSiteUrl()}/company/about-us`;
 
 export const metadata: Metadata = {
-	title: "About Reloop Labs | Built by Pranav and Twinkal",
+	title: "About Reloop Labs | The Open-Source Email Infrastructure",
 	description:
-		"Pranav and Twinkal founded Reloop Labs to build open-source email infrastructure—proprietary-grade sends, self-hostable code, and a hosted service at reloop.sh.",
+		"Learn why we built Reloop Labs: proprietary-grade, self-hostable email infrastructure. Meet our founders and see our open-source commitment to developer freedom.",
 	keywords: [
 		"Reloop Labs",
 		"about Reloop",
@@ -25,18 +26,18 @@ export const metadata: Metadata = {
 	],
 	alternates: { canonical: pageUrl },
 	openGraph: {
-		title: "About Reloop Labs | Built by Pranav and Twinkal",
+		title: "About Reloop Labs | The Open-Source Email Infrastructure",
 		description:
-			"Two engineers built the email stack they couldn't buy—open source, self-hostable, and available as a hosted service from day one.",
+			"Learn why we built Reloop Labs: proprietary-grade, self-hostable email infrastructure. Meet our founders and see our open-source commitment to developer freedom.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
 	},
 	twitter: {
 		card: "summary_large_image",
-		title: "About Reloop Labs | Built by Pranav and Twinkal",
+		title: "About Reloop Labs | The Open-Source Email Infrastructure",
 		description:
-			"Two engineers built the email stack they couldn't buy—open source, self-hostable, and available as a hosted service from day one.",
+			"Learn why we built Reloop Labs: proprietary-grade, self-hostable email infrastructure. Meet our founders and see our open-source commitment to developer freedom.",
 	},
 };
 
@@ -75,13 +76,10 @@ const AboutUsPage = () => {
 
 	return (
 		<>
-			<script
-				type="application/ld+json"
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-			/>
+			<JsonLd data={jsonLd} />
 			<MarketingPageShell
-				titleLines={["We built the email", "stack we couldn't buy."]}
-				description="Pranav and Twinkal founded Reloop Labs to ship proprietary-grade email infrastructure as open source—hosted at reloop.sh or on your servers."
+				titleLines={["We built the email", "infrastructure we couldn't buy."]}
+				description="We started Reloop Labs to build email infrastructure you actually control. Send transactionals, run campaigns, and track analytics from our hosted platform or your own servers."
 				fullViewportHero
 			>
 				<PageSection narrow flushTop>
