@@ -1,6 +1,9 @@
 "use client";
 
-import { ChatwootUserSync } from "@fe/dashboard/components/chatwoot-widget";
+import {
+	ChatwootLoader,
+	ChatwootUserSync,
+} from "@fe/dashboard/components/chatwoot-widget";
 import { AiPanel } from "@fe/dashboard/components/layout/ai-panel";
 import { PageHeader } from "@fe/dashboard/components/layout/page-header";
 import { MainSidebar } from "@fe/dashboard/components/layout/sidebar";
@@ -23,6 +26,7 @@ const OrgLayout = ({ children }: { children: React.ReactNode }) => {
 					<AnimatePresence>{isAiPanelOpen && <AiPanel />}</AnimatePresence>
 				</main>
 			</div>
+			<ChatwootLoader />
 			<ChatwootUserSync />
 		</UserOrganizationProvider>
 	);

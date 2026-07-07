@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ChatwootLoader } from "@reloop/ui/chatwoot-loader";
 import { IconsSprite } from "@reloop/ui/icon";
 import { RybbitLoader } from "@reloop/ui/rybbit-loader";
 import { Footer } from "@reloop/web/components/footer";
@@ -110,7 +109,6 @@ export default function RootLayout({
 						<Footer />
 					</div>
 					<IconsSprite />
-					<ChatwootLoader />
 					<RybbitLoader />
 				</ThemeProvider>
 			</body>

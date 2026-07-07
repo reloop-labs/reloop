@@ -7,7 +7,6 @@ import {
 	siteName,
 } from "@reloop/links/lib/site";
 import { ThemeProvider } from "@reloop/links/providers/theme-provider";
-import { ChatwootLoader } from "@reloop/ui/chatwoot-loader";
 import { IconsSprite } from "@reloop/ui/icon";
 import { RybbitLoader } from "@reloop/ui/rybbit-loader";
 import localFont from "next/font/local";
@@ -84,7 +83,6 @@ export default function RootLayout({
 				>
 					{children}
 					<IconsSprite />
-					<ChatwootLoader />
 					<RybbitLoader />
 				</ThemeProvider>
 			</body>
