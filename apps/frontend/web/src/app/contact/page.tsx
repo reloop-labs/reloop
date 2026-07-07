@@ -95,7 +95,7 @@ const ContactPage = () => {
 				<div className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6">
 					<div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16 xl:gap-20">
 						<div>
-							<h1 className="font-semibold text-[2rem] text-text-strong-950 tracking-tight sm:text-[2.25rem] dark:text-white">
+							<h1 className="font-serif text-[2.5rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3rem] dark:text-white">
 								Contact support
 							</h1>
 							<ul className="mt-8 space-y-4">
