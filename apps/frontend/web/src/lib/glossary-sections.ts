@@ -1,5 +1,5 @@
 import { competitorBrands } from "../app/compare/competitor-brands";
-import { LANGUAGE_SLUGS, languages } from "../app/features/languages/languages";
+import { LANGUAGE_SLUGS, languages } from "../app/languages/languages";
 import {
 	alternativeConfigs,
 	blogPosts,
@@ -119,7 +119,7 @@ export function getGlossarySections(): GlossarySection[] {
 				const lang = languages.find((l) => l.slug === slug);
 				return {
 					title: lang?.name ?? slug,
-					href: `/features/languages/${slug}`,
+					href: `/languages/${slug}`,
 				};
 			}),
 			{ title: "View all SDKs", href: "/docs/resources/sdks" },
@@ -137,7 +137,7 @@ export function getGlossarySections(): GlossarySection[] {
 			{ title: "Community", href: "/resources/community" },
 			{ title: "Self-hosting Guide", href: "/docs/self-host" },
 			{ title: "Status", href: "/resources/status" },
-			{ title: "Tools overview", href: "/resources/tools" },
+			{ title: "Tools overview", href: "/tools" },
 		]),
 		section("Company", [
 			{ title: "About Us", href: "/about" },

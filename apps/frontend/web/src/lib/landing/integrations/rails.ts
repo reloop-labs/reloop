@@ -17,7 +17,7 @@ export const config: LandingPageDefinition = {
 	},
 	secondaryCta: {
 		label: "Ruby SDK",
-		href: "/features/languages/ruby",
+		href: "/languages/ruby",
 	},
 	sections: [
 		{

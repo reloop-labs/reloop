@@ -17,7 +17,7 @@ export const config: LandingPageDefinition = {
 	},
 	secondaryCta: {
 		label: "Python SDK",
-		href: "/features/languages/python",
+		href: "/languages/python",
 	},
 	sections: [
 		{

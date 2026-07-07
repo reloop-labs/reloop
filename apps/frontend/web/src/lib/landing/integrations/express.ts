@@ -17,7 +17,7 @@ export const config: LandingPageDefinition = {
 	},
 	secondaryCta: {
 		label: "Node.js SDK",
-		href: "/features/languages/nodejs",
+		href: "/languages/nodejs",
 	},
 	sections: [
 		{

@@ -35,7 +35,7 @@ export default function LanguageCta({
 
 					<p className="mt-8 text-sm text-text-sub-600 dark:text-white/50">
 						<Link
-							href="/features/languages"
+							href="/languages"
 							className="text-primary-base hover:underline"
 						>
 							← All languages

@@ -18,7 +18,7 @@ export const config: LandingPageDefinition = {
 	},
 	secondaryCta: {
 		label: "Node.js SDK",
-		href: "/features/languages/nodejs",
+		href: "/languages/nodejs",
 	},
 	sections: [
 		{
@@ -62,7 +62,7 @@ export const config: LandingPageDefinition = {
 		},
 		{
 			label: "Node.js guide",
-			href: "/features/languages/nodejs",
+			href: "/languages/nodejs",
 		},
 	],
 };

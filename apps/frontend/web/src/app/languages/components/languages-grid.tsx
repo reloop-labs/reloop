@@ -20,7 +20,7 @@ export default function LanguagesGrid() {
 					{languages.map((lang, i) => (
 						<Link
 							key={lang.slug}
-							href={`/features/languages/${lang.slug}`}
+							href={`/languages/${lang.slug}`}
 							className="group flex flex-col border-stroke-soft-200 border-t border-l-0 bg-bg-weak-50 p-8 transition-colors duration-300 first:border-t-0 hover:bg-bg-soft-50 sm:border-t sm:border-l lg:border-t lg:border-l lg:p-10 dark:border-white/10 dark:bg-transparent dark:hover:bg-white/[0.02] sm:[&:nth-child(-n+2)]:border-t-0 lg:[&:nth-child(-n+3)]:border-t-0 sm:[&:nth-child(2n+1)]:border-l-0 lg:[&:nth-child(3n)]:border-l lg:[&:nth-child(3n+1)]:border-l-0 lg:[&:nth-child(3n+2)]:border-l"
 						>
 							<span className="font-semibold text-sm text-text-soft-400 tabular-nums dark:text-white/28">

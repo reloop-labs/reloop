@@ -18,7 +18,7 @@ export const config: LandingPageDefinition = {
 	},
 	secondaryCta: {
 		label: "PHP SDK",
-		href: "/features/languages/php",
+		href: "/languages/php",
 	},
 	sections: [
 		{

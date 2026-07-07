@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { LANGUAGE_SLUGS } from "../app/features/languages/languages";
+import { LANGUAGE_SLUGS } from "../app/languages/languages";
 import {
 	changelogReleases,
 	getChangelogReleasePath,
@@ -40,9 +40,9 @@ function collectStaticRoutes(dir: string, segments: string[] = []): string[] {
 				for (const release of changelogReleases) {
 					routes.push(getChangelogReleasePath(release.version));
 				}
-			} else if (entry === "[slug]" && segmentPath === "features/languages") {
+			} else if (entry === "[slug]" && segmentPath === "languages") {
 				for (const slug of LANGUAGE_SLUGS) {
-					routes.push(`/features/languages/${slug}`);
+					routes.push(`/languages/${slug}`);
 				}
 			}
 

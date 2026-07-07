@@ -17,7 +17,7 @@ export const config: LandingPageDefinition = {
 	},
 	secondaryCta: {
 		label: "Java SDK",
-		href: "/features/languages/java",
+		href: "/languages/java",
 	},
 	sections: [
 		{

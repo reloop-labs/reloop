@@ -8,7 +8,7 @@ import LanguagesGrid from "./components/languages-grid";
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
 
-const pageUrl = `${getSiteUrl()}/features/languages`;
+const pageUrl = `${getSiteUrl()}/languages`;
 
 export const metadata: Metadata = {
 	title: "Send Email in Your Language | Reloop",

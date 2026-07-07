@@ -67,7 +67,7 @@ export const config: ToolDefinition = {
 		},
 		{
 			label: "All free tools",
-			href: "/resources/tools",
+			href: "/tools",
 		},
 	],
 };

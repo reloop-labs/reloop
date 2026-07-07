@@ -62,7 +62,7 @@ const navItems: NavItem[] = [
 						{ title: "API Reference", href: "/docs/api" },
 						{ title: "Getting Started", href: "/docs" },
 						{ title: "Campaign Builder", href: "/docs/features/templates" },
-						{ title: "Languages", href: "/features/languages" },
+						{ title: "Languages", href: "/languages" },
 						{ title: "Webhooks", href: "/docs/webhooks" },
 					],
 				},
@@ -97,7 +97,7 @@ const navItems: NavItem[] = [
 				{
 					title: "Tools",
 					links: [
-						{ title: "Free tools", href: "/resources/tools" },
+						{ title: "Free tools", href: "/tools" },
 						{ title: "Email validator", href: "/tools/email-validator" },
 						{ title: "Subject tester", href: "/tools/subject-tester" },
 						{ title: "Template generator", href: "/tools/template-generator" },
