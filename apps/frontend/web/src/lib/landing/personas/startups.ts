@@ -2,7 +2,7 @@ import type { LandingPageDefinition } from "../types";
 
 export const config: LandingPageDefinition = {
 	slug: "startups",
-	path: "/for/startups",
+	path: "/startups",
 	titleLines: ["Email for", "Startups"],
 	description:
 		"Launch fast with free tier email—transactional, auth, and early campaigns without enterprise contracts.",

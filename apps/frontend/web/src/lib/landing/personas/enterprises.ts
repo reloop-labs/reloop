@@ -2,7 +2,7 @@ import type { LandingPageDefinition } from "../types";
 
 export const config: LandingPageDefinition = {
 	slug: "enterprises",
-	path: "/for/enterprises",
+	path: "/enterprises",
 	titleLines: ["Email for", "Enterprise"],
 	description:
 		"Self-hosted email infrastructure for data residency, compliance, and control at scale.",

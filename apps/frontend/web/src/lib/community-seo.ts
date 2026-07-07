@@ -1,6 +1,6 @@
 import { getSiteUrl, siteName, socialProfiles } from "./site";
 
-const communityPath = "/resources/community";
+const communityPath = "/community";
 
 export const communitySeo = {
 	title: "Community",

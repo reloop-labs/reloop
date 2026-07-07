@@ -2,7 +2,7 @@ import type { LandingPageDefinition } from "../types";
 
 export const config: LandingPageDefinition = {
 	slug: "saas",
-	path: "/for/saas",
+	path: "/saas",
 	titleLines: ["Email for", "SaaS"],
 	description:
 		"Product-led email—onboarding, billing, lifecycle, and in-app triggered sends for SaaS companies.",

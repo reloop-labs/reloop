@@ -88,7 +88,7 @@ const columns: FooterColumn[] = [
 			{ title: "Blog", href: "/blog" },
 			{ title: "Changelog", href: "/changelog" },
 			{ title: "Glossary", href: "/glossary" },
-			{ title: "Community", href: "/resources/community" },
+			{ title: "Community", href: "/community" },
 			{
 				title: "Status",
 				href: "https://status.reloop.sh/status/live",

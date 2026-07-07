@@ -2,7 +2,7 @@ import type { LandingPageDefinition } from "../types";
 
 export const config: LandingPageDefinition = {
 	slug: "developers",
-	path: "/for/developers",
+	path: "/developers",
 	titleLines: ["Email for", "Developers"],
 	description:
 		"API-first email infrastructure with type-safe SDKs, webhooks, sandbox, and docs built for shipping code.",

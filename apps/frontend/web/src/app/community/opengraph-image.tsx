@@ -152,7 +152,7 @@ export default function CommunityOpenGraphImage() {
 				}}
 			>
 				<span>We&apos;d love to meet you.</span>
-				<span>reloop.sh/resources/community</span>
+				<span>reloop.sh/community</span>
 			</div>
 		</div>,
 		{ ...size },

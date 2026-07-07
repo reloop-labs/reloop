@@ -134,9 +134,8 @@ export function getGlossarySections(): GlossarySection[] {
 		),
 		section("Resources", [
 			{ title: "Changelog", href: "/changelog" },
-			{ title: "Community", href: "/resources/community" },
+			{ title: "Community", href: "/community" },
 			{ title: "Self-hosting Guide", href: "/docs/self-host" },
-			{ title: "Status", href: "/resources/status" },
 			{ title: "Tools overview", href: "/tools" },
 		]),
 		section("Company", [
