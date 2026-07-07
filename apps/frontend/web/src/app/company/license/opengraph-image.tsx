@@ -39,7 +39,7 @@ const CrossIcon = () => (
 	</svg>
 );
 
-export default function LicenseOpenGraphImage() {
+export default function OpenGraphImage() {
 	return new ImageResponse(
 		<div
 			style={{
@@ -282,16 +282,6 @@ export default function LicenseOpenGraphImage() {
 						Reloop
 					</span>
 				</div>
-				<span
-					style={{
-						color: "rgba(255,255,255,0.45)",
-						fontSize: 22,
-						fontWeight: 600,
-						letterSpacing: "0.18em",
-					}}
-				>
-					LICENSE
-				</span>
 			</div>
 
 			{/* Main Content Area */}
@@ -326,7 +316,7 @@ export default function LicenseOpenGraphImage() {
 						}}
 					>
 						Apache 2.0
-						<span style={{ color: "#d97757", marginTop: 4 }}>
+						<span style={{ color: "#ffffff", marginTop: 4 }}>
 							License Terms
 						</span>
 					</div>
@@ -376,7 +366,7 @@ export default function LicenseOpenGraphImage() {
 							style={{
 								fontSize: 13,
 								fontWeight: 700,
-								color: "#d97757",
+								color: "#ffffff",
 								letterSpacing: "0.1em",
 							}}
 						>
@@ -439,7 +429,7 @@ export default function LicenseOpenGraphImage() {
 							style={{
 								fontSize: 13,
 								fontWeight: 700,
-								color: "rgba(255,255,255,0.4)",
+								color: "#ffffff",
 								letterSpacing: "0.1em",
 							}}
 						>
