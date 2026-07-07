@@ -1,5 +1,5 @@
 {
 	"title": "Resources",
 	"description": "Developer resources, examples, and integrations.",
-	"pages": ["sdks", "cli", "security", "integrations"]
+	"pages": ["sdks", "cli", "security"]
 }
