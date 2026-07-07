@@ -26,14 +26,7 @@ export function FaqSection({
 	const [openIndex, setOpenIndex] = useState<number | null>(null);
 
 	return (
-		<section
-			id={id}
-			className={
-				plain
-					? "text-[#0a0d12] dark:bg-black dark:text-white"
-					: "bg-[#f8f8f8] text-[#0a0d12] dark:bg-black dark:text-white"
-			}
-		>
+		<section id={id} className="text-[#0a0d12] dark:text-white">
 			<div
 				className={`mx-auto max-w-3xl px-4 sm:px-6 ${compact ? "py-12 sm:py-14" : "py-16 sm:px-6 sm:py-20 lg:py-24"}`}
 			>
