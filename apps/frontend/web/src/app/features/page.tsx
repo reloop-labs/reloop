@@ -53,11 +53,6 @@ const productFeatures = [
 		description: "Email infrastructure for autonomous agents and LLMs.",
 	},
 	{
-		title: "Campaigns",
-		href: "/features/campaigns",
-		description: "Create and track marketing campaigns end to end.",
-	},
-	{
 		title: "Transaction Emails",
 		href: "/features/transaction-emails",
 		description: "Low-latency transactional delivery for developers.",

@@ -34,7 +34,6 @@ const navItems: NavItem[] = [
 				{
 					title: "Email",
 					links: [
-						{ title: "Campaigns", href: "/features/campaigns" },
 						{
 							title: "Transaction Emails",
 							href: "/features/transaction-emails",

@@ -95,10 +95,10 @@ export function MobilePreviewPageView() {
 			</div>
 
 			<ToolUpsell
-				title="Preview campaigns before send"
+				title="Preview templates before send"
 				description="Design responsive emails in Reloop and preview across clients in the dashboard."
-				primaryHref="/features/campaigns"
-				primaryLabel="Campaign builder"
+				primaryHref="/features/email-templates"
+				primaryLabel="Template editor"
 				secondaryHref="/dashboard/signup"
 				secondaryLabel="Start free"
 			/>

@@ -22,7 +22,6 @@ const columns: FooterColumn[] = [
 	{
 		group: "Email",
 		items: [
-			{ title: "Campaigns", href: "/features/campaigns" },
 			{ title: "Transaction Emails", href: "/features/transaction-emails" },
 			{ title: "SMTP Relay", href: "/features/smtp" },
 			{ title: "Email Analytics", href: "/features/email-analytics" },

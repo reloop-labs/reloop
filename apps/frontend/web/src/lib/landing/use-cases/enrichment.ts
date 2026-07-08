@@ -22,20 +22,6 @@ const useCaseEnrichment: Record<string, UseCaseEnrichment> = {
 			"Webhook confirms delivery",
 		],
 	},
-	"marketing-email": {
-		accent: "rose",
-		metric: { label: "Campaign types", value: "Newsletters + promos" },
-		code: `await reloop.campaigns.create({
-  name: "March newsletter",
-  segment: "active_users",
-  templateId: "tmpl_newsletter",
-});`,
-		flow: [
-			"Design in builder",
-			"Segment your audience",
-			"Track opens & clicks",
-		],
-	},
 	"automated-email": {
 		accent: "violet",
 		metric: { label: "Automation", value: "Drip + lifecycle" },

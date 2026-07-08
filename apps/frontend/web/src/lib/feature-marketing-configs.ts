@@ -3,46 +3,6 @@ import type { FeatureMarketingPageConfig } from "@reloop/web/components/feature-
 const signup = { label: "Get started", href: "/dashboard/signup" };
 const docs = { label: "Read documentation", href: "/docs" };
 
-export const campaignsConfig: FeatureMarketingPageConfig = {
-	titleLines: ["Email Campaigns"],
-	description:
-		"Create, send, and track powerful email campaigns that drive engagement and conversions—from newsletters to product announcements.",
-	primaryCta: { label: "Start creating campaigns", href: "/dashboard/signup" },
-	secondaryCta: { label: "View docs", href: "/docs" },
-	sections: [
-		{
-			title: "Everything you need for successful campaigns",
-			description:
-				"From design to delivery to analytics, we provide the tools to create campaigns that perform.",
-			items: [
-				{
-					title: "Drag & Drop Editor",
-					description:
-						"Create beautiful emails with an intuitive visual editor. No coding required—drag, drop, and match your brand.",
-				},
-				{
-					title: "Smart Segmentation",
-					description:
-						"Target the right audience with powerful segmentation. Build dynamic lists from behavior, preferences, and demographics.",
-				},
-				{
-					title: "Real-time Analytics",
-					description:
-						"Track opens, clicks, conversions, and more. Make data-driven decisions to improve performance.",
-				},
-			],
-		},
-	],
-	cta: {
-		title: "Ready to launch your first campaign?",
-		titleMuted: "Start free today.",
-		description:
-			"Join thousands of marketers who trust Reloop. Start with our free tier and scale as you grow.",
-		primary: signup,
-		secondary: docs,
-	},
-};
-
 export const deliverabilityConfig: FeatureMarketingPageConfig = {
 	titleLines: ["Email Deliverability"],
 	description:

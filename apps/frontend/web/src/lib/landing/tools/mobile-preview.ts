@@ -64,8 +64,8 @@ export const config: ToolDefinition = {
 			href: "/tools/template-generator",
 		},
 		{
-			label: "Campaign Builder",
-			href: "/features/campaigns",
+			label: "AI Agents",
+			href: "/features/ai-agents",
 		},
 	],
 };
