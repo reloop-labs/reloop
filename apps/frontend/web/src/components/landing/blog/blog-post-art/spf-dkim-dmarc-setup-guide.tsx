@@ -1,4 +1,4 @@
-import { WireLine, WireNode } from "./primitives";
+import { RoundedFrame, WireLine, WireNode } from "./primitives";
 import type { BlogPostArtProps } from "./types";
 
 export function SpfDkimDmarcSetupGuideArt(_props: BlogPostArtProps) {
@@ -7,7 +7,7 @@ export function SpfDkimDmarcSetupGuideArt(_props: BlogPostArtProps) {
 			<WireLine d="M 168 188 L 264 188 L 360 188 L 456 188" opacity={0.22} />
 			<rect x={148} y={156} width={64} height={64} rx={8} fill="none" stroke="currentColor" strokeOpacity={0.28} />
 			<rect x={244} y={156} width={64} height={64} rx={8} fill="none" stroke="currentColor" strokeOpacity={0.28} />
-			<rect x={340} y={156} width={64} height={64} rx={8} fill="none" stroke="currentColor" strokeOpacity={0.28} accent />
+			<RoundedFrame x={340} y={156} width={64} height={64} rx={8} opacity={0.28} accent />
 			<WireNode cx={180} cy={188} />
 			<WireNode cx={276} cy={188} />
 			<WireNode cx={372} cy={188} accent />

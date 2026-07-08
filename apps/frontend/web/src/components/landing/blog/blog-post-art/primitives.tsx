@@ -96,6 +96,7 @@ export function RoundedFrame({
 	height,
 	rx = 8,
 	opacity = 0.3,
+	accent = false,
 }: {
 	x: number;
 	y: number;
@@ -103,7 +104,38 @@ export function RoundedFrame({
 	height: number;
 	rx?: number;
 	opacity?: number;
+	accent?: boolean;
 }) {
+	if (accent) {
+		return (
+			<>
+				<rect
+					x={x}
+					y={y}
+					width={width}
+					height={height}
+					rx={rx}
+					fill="none"
+					stroke="currentColor"
+					strokeOpacity={opacity}
+					strokeWidth="1"
+					className="dark:hidden"
+				/>
+				<rect
+					x={x}
+					y={y}
+					width={width}
+					height={height}
+					rx={rx}
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="1"
+					className="text-primary-base opacity-0 dark:opacity-80"
+				/>
+			</>
+		);
+	}
+
 	return (
 		<rect
 			x={x}
@@ -116,6 +148,42 @@ export function RoundedFrame({
 			strokeOpacity={opacity}
 			strokeWidth="1"
 		/>
+	);
+}
+
+export function AccentCircle({
+	cx,
+	cy,
+	r,
+	opacity = 0.22,
+}: {
+	cx: number;
+	cy: number;
+	r: number;
+	opacity?: number;
+}) {
+	return (
+		<>
+			<circle
+				cx={cx}
+				cy={cy}
+				r={r}
+				fill="none"
+				stroke="currentColor"
+				strokeOpacity={opacity}
+				strokeWidth="1"
+				className="dark:hidden"
+			/>
+			<circle
+				cx={cx}
+				cy={cy}
+				r={r}
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="1"
+				className="text-primary-base opacity-0 dark:opacity-80"
+			/>
+		</>
 	);
 }
 

@@ -1,11 +1,11 @@
-import { WireLine, WireNode } from "./primitives";
+import { RoundedFrame, WireLine, WireNode } from "./primitives";
 import type { BlogPostArtProps } from "./types";
 
 export function MigratingFromSendgridArt(_props: BlogPostArtProps) {
 	return (
 		<>
-			<rect x={168} y={168} width={88} height={88} rx={8} fill="none" stroke="currentColor" strokeOpacity={0.2} />
-			<rect x={344} y={168} width={88} height={88} rx={8} fill="none" stroke="currentColor" strokeOpacity={0.28} accent />
+			<RoundedFrame x={168} y={168} width={88} height={88} rx={8} opacity={0.2} />
+			<RoundedFrame x={344} y={168} width={88} height={88} rx={8} opacity={0.28} accent />
 			<WireLine d="M 256 212 L 344 212" opacity={0.25} accent />
 			<polygon points="320,204 332,212 320,220" fill="currentColor" fillOpacity={0.35} className="dark:fill-primary-base dark:opacity-80" />
 			<WireNode cx={212} cy={212} />
