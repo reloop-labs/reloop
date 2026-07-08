@@ -23,15 +23,6 @@ const DashboardLayoutContent = ({
 	const { isAiPanelOpen } = useUIStore();
 	const { user, isLoading } = useUserOrganization();
 
-	// If session is loading or user is not determined yet, show full screen loader
-	if (!user) {
-		return (
-			<div className="flex h-screen w-full items-center justify-center text-text-strong-950 dark:text-white">
-				<Loader loader="pulse" />
-			</div>
-		);
-	}
-
 	return (
 		<div className="flex h-screen overflow-hidden bg-bg-weak-50 dark:bg-black">
 			<MainSidebar />
@@ -39,7 +30,7 @@ const DashboardLayoutContent = ({
 				<div className="flex flex-1 flex-col overflow-hidden">
 					<PageHeader />
 					<div className="flex-1 overflow-y-auto">
-						{isLoading ? (
+						{isLoading || !user ? (
 							<div className="flex h-full w-full items-center justify-center text-text-strong-950 dark:text-white">
 								<Loader loader="pulse" />
 							</div>
