@@ -31,9 +31,12 @@ const DashboardLayoutContent = ({
 					<PageHeader />
 					<div className="flex-1 overflow-y-auto">
 						{isLoading || !user ? (
-							<div className="flex h-full w-full items-center justify-center text-text-strong-950 dark:text-white">
-								<Loader loader="pulse" />
-							</div>
+							<>
+								<div className="flex h-full w-full items-center justify-center text-text-strong-950 dark:text-white">
+									<Loader loader="pulse" />
+								</div>
+								<div style={{ display: "none" }}>{children}</div>
+							</>
 						) : (
 							children
 						)}
