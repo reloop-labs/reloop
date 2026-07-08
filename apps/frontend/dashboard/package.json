@@ -15,6 +15,7 @@
 		"@dnd-kit/core": "catalog:ui",
 		"@dnd-kit/sortable": "catalog:ui",
 		"@dnd-kit/utilities": "catalog:ui",
+		"@dot-loaders/react": "catalog:ui",
 		"@hookform/resolvers": "catalog:ui",
 		"@number-flow/react": "catalog:ui",
 		"@react-email/editor": "catalog:ui",

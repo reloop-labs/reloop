@@ -1,7 +1,7 @@
 "use client";
 
+import { Loader } from "@dot-loaders/react";
 import { authClient } from "@reloop/auth/client";
-import Spinner from "@reloop/ui/spinner";
 import { usePathname, useRouter } from "next/navigation";
 import {
 	createContext,
@@ -44,8 +44,10 @@ export const useUserOrganization = (): UserOrganizationContextType => {
 
 export const UserOrganizationProvider = ({
 	children,
+	alwaysRender = false,
 }: {
 	children: ReactNode;
+	alwaysRender?: boolean;
 }) => {
 	const router = useRouter();
 	const pathname = usePathname();
@@ -220,11 +222,11 @@ export const UserOrganizationProvider = ({
 
 	return (
 		<UserOrganizationContext.Provider value={contextValue}>
-			{shouldShowChildren ? (
+			{alwaysRender || shouldShowChildren ? (
 				children
 			) : (
-				<div className="flex h-screen w-full items-center justify-center">
-					<Spinner size={24} />
+				<div className="flex h-screen w-full items-center justify-center text-text-strong-950 dark:text-white">
+					<Loader loader="pulse" />
 				</div>
 			)}
 		</UserOrganizationContext.Provider>

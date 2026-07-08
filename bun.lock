@@ -572,6 +572,7 @@
         "@dnd-kit/core": "catalog:ui",
         "@dnd-kit/sortable": "catalog:ui",
         "@dnd-kit/utilities": "catalog:ui",
+        "@dot-loaders/react": "catalog:ui",
         "@hookform/resolvers": "catalog:ui",
         "@number-flow/react": "catalog:ui",
         "@react-email/editor": "catalog:ui",
@@ -1368,6 +1369,12 @@
     "@dnd-kit/sortable": ["@dnd-kit/sortable@10.0.0", "", { "dependencies": { "@dnd-kit/utilities": "^3.2.2", "tslib": "^2.0.0" }, "peerDependencies": { "@dnd-kit/core": "^6.3.0", "react": ">=16.8.0" } }, "sha512-+xqhmIIzvAYMGfBYYnbKuNicfSsk4RksY2XdmJhT+HAC01nix6fHCztU68jooFiMUB01Ky3F0FyOvhG/BZrWkg=="],
 
     "@dnd-kit/utilities": ["@dnd-kit/utilities@3.2.2", "", { "dependencies": { "tslib": "^2.0.0" }, "peerDependencies": { "react": ">=16.8.0" } }, "sha512-+MKAJEOfaBe5SmV6t34p80MMKhjvUz0vRrvVJbPT0WElzaOJ/1xs+D+KDv+tD/NE5ujfrChEcshd4fLn0wpiqg=="],
+
+    "@dot-loaders/core": ["@dot-loaders/core@0.1.0", "", {}, "sha512-0SzDzZ53ax4fLLneSuDaXsAPV+5ORB59ABfIjLzyTOT7GYYCxsBbXUuzieqW1Bm9O3JPWLbWDcBmpWp3D1FN7g=="],
+
+    "@dot-loaders/presets": ["@dot-loaders/presets@0.1.0", "", { "dependencies": { "@dot-loaders/core": "0.1.0" } }, "sha512-BqXsqz4TMCeCO8gWBizkvBsHkNHIa/TEuP0OtTNlFIuhREeumPkpA7X7ATsGZ4fXjuLeN342aMciXtk8zldbYQ=="],
+
+    "@dot-loaders/react": ["@dot-loaders/react@0.1.0", "", { "dependencies": { "@dot-loaders/core": "0.1.0", "@dot-loaders/presets": "0.1.0" }, "peerDependencies": { "react": "^19.0.0", "react-dom": "^19.0.0" } }, "sha512-iN3yCRA6Vwf3z2/dsqQiA0PCS4XBsezxJk7RJp87ezSk4VLm1hGQN9Fy2p5rtJr036KzVMCLmwLNDKOZ7/45XA=="],
 
     "@drizzle-team/brocli": ["@drizzle-team/brocli@0.10.2", "", {}, "sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w=="],
 
