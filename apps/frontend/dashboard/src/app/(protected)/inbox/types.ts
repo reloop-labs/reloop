@@ -40,6 +40,8 @@ export interface InboundThread {
 	id: string;
 	mailboxId: string;
 	threadId?: string;
+	/** Original message id when list row uses threadId as id */
+	messageId?: string;
 	from: { name?: string; email: string };
 	subject: string;
 	preview: string;
@@ -49,6 +51,8 @@ export interface InboundThread {
 	status: InboundThreadStatus;
 	securityLevel: 1 | 2 | 3 | 4 | 5;
 	unread: boolean;
+	isStarred?: boolean;
+	isArchived?: boolean;
 	entityTag?: "invoice" | "support" | "order" | "security";
 	direction?: "inbound" | "outbound";
 	toEmails?: string[];

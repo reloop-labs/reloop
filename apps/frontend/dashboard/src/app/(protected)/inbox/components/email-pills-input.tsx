@@ -135,7 +135,7 @@ export const EmailPillsInput = ({
 							transition={{ duration: 0.15 }}
 							className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-0.5 font-medium text-xs shadow-xs transition-colors ${
 								isValid
-									? "border-stroke-soft-100 bg-bg-weak-50 text-text-sub-600 dark:border-neutral-700/60 dark:bg-neutral-800/40 dark:text-neutral-300"
+									? "border-mail-border bg-offset-light text-mail-muted border-mail-border/60 bg-mail-accent/40 text-mail-muted"
 									: "border-red-200 bg-red-50 text-red-600 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400"
 							}`}
 						>
@@ -154,10 +154,10 @@ export const EmailPillsInput = ({
 							)}
 							{name ? (
 								<span className="max-w-[280px] truncate">
-									<span className="mr-1 font-semibold text-text-strong-950 dark:text-white">
+									<span className="mr-1 font-semibold text-mail-foreground text-mail-foreground">
 										{name}
 									</span>
-									<span className="font-normal text-text-soft-400 dark:text-neutral-500">
+									<span className="font-normal text-mail-muted text-mail-muted">
 										&lt;{email}&gt;
 									</span>
 								</span>
@@ -171,9 +171,9 @@ export const EmailPillsInput = ({
 									removeEmail(idx);
 								}}
 								disabled={disabled}
-								className={`-mr-1 shrink-0 rounded-full p-0.5 transition-colors hover:bg-black/5 dark:hover:bg-white/10 ${
+								className={`-mr-1 shrink-0 rounded-full p-0.5 transition-colors hover:bg-black/5 hover:bg-[#202020] ${
 									isValid
-										? "text-text-soft-400 hover:text-text-strong-950 dark:hover:text-white"
+										? "text-mail-muted hover:text-mail-foreground hover:text-mail-foreground"
 										: "text-red-400 hover:text-red-700 dark:hover:text-red-300"
 								}`}
 							>
@@ -193,7 +193,7 @@ export const EmailPillsInput = ({
 				onPaste={handlePaste}
 				disabled={disabled}
 				placeholder={emails.length === 0 ? placeholder : ""}
-				className="min-w-[120px] flex-1 bg-transparent py-1 text-text-strong-950 placeholder-text-soft-400 outline-none dark:text-white"
+				className="min-w-[120px] flex-1 bg-transparent py-1 text-mail-foreground placeholder-text-soft-400 outline-none text-mail-foreground"
 			/>
 		</div>
 	);

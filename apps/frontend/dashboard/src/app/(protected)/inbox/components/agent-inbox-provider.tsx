@@ -86,9 +86,26 @@ interface BackendSentMessage {
 	createdAt: string | Date;
 }
 
+interface BackendThread {
+	id: string;
+	mailboxId: string | null;
+	organizationId: string;
+	subject: string | null;
+	lastMessagePreview: string | null;
+	lastMessageAt: string | Date;
+	status: string;
+	messageCount: number;
+	participants: string[];
+	isRead: boolean;
+	isStarred: boolean;
+	createdAt: string | Date;
+	updatedAt: string | Date;
+}
+
 interface AgentInboxContextValue {
 	mailboxes: AgentMailbox[];
 	threads: InboundThread[];
+	archivedThreads: InboundThread[];
 	isLoadingMailboxes: boolean;
 	isLoadingThreads: boolean;
 	getMailbox: (id: string) => AgentMailbox | undefined;
@@ -97,6 +114,8 @@ interface AgentInboxContextValue {
 	markMessageRead: (id: string, isRead: boolean) => Promise<void>;
 	deleteMessage: (id: string) => Promise<void>;
 	markMessageSpam: (id: string, isSpam: boolean) => Promise<void>;
+	toggleMessageStar: (id: string, isStarred: boolean) => Promise<void>;
+	archiveThread: (threadId: string) => Promise<void>;
 	sendReply: (id: string, text: string, html?: string) => Promise<void>;
 	sendForward: (
 		id: string,
@@ -126,31 +145,129 @@ interface AgentInboxContextValue {
 
 const AgentInboxContext = createContext<AgentInboxContextValue | null>(null);
 
+const mapMessageToThread = (msg: BackendMessage): InboundThread => {
+	const receivedAtDate = msg.date || msg.createdAt;
+	const receivedAt =
+		typeof receivedAtDate === "string"
+			? receivedAtDate
+			: receivedAtDate
+				? receivedAtDate.toISOString()
+				: new Date().toISOString();
+
+	const createdAtStr =
+		typeof msg.createdAt === "string"
+			? msg.createdAt
+			: msg.createdAt.toISOString();
+
+	return {
+		id: msg.id,
+		mailboxId: msg.mailboxId,
+		threadId: msg.threadId || undefined,
+		messageId: msg.id,
+		from: { name: msg.fromName || undefined, email: msg.fromEmail },
+		subject: msg.subject || "(No Subject)",
+		preview:
+			msg.snippet ||
+			(msg.textBody
+				? msg.textBody.substring(0, 120) +
+					(msg.textBody.length > 120 ? "..." : "")
+				: ""),
+		bodyText: msg.textBody || "",
+		bodyHtml: msg.htmlBody || undefined,
+		receivedAt,
+		status: msg.isSpam
+			? ("blocked" as const)
+			: msg.status === "processing"
+				? ("parsing" as const)
+				: msg.status === "needs_approval"
+					? ("needs_approval" as const)
+					: msg.isRead
+						? ("handled" as const)
+						: ("new" as const),
+		securityLevel: 5 as const,
+		unread: !msg.isRead,
+		isStarred: msg.isStarred,
+		isArchived: false,
+		direction: "inbound" as const,
+		toEmails: msg.toEmails,
+		attachments:
+			msg.attachments?.map((att) => ({
+				name: att.filename,
+				size: `${(att.size / 1024).toFixed(1)} KB`,
+				contentType: att.contentType,
+				isInline: att.contentDisposition === "inline",
+			})) || [],
+		timeline: [
+			{ label: "Email received", at: createdAtStr, state: "done" as const },
+			{
+				label: "Delivered to NATS",
+				at: createdAtStr,
+				state: "done" as const,
+			},
+			{
+				label: "Inbox storage complete",
+				at: createdAtStr,
+				state: "done" as const,
+			},
+		],
+	};
+};
+
+const mapBackendThreadToInbound = (
+	thread: BackendThread,
+	mailboxId: string,
+): InboundThread => {
+	const receivedAt =
+		typeof thread.lastMessageAt === "string"
+			? thread.lastMessageAt
+			: thread.lastMessageAt.toISOString();
+	const participant = thread.participants[0] || "unknown@unknown.com";
+
+	return {
+		id: thread.id,
+		mailboxId: thread.mailboxId || mailboxId,
+		threadId: thread.id,
+		messageId: thread.id,
+		from: { email: participant, name: participant.split("@")[0] },
+		subject: thread.subject || "(No Subject)",
+		preview: thread.lastMessagePreview || "",
+		bodyText: thread.lastMessagePreview || "",
+		receivedAt,
+		status: "handled",
+		securityLevel: 5,
+		unread: !thread.isRead,
+		isStarred: thread.isStarred,
+		isArchived: thread.status === "archived",
+		direction: "inbound",
+		timeline: [],
+	};
+};
+
 export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
-	// Fetch mailboxes from actual endpoint
 	const {
 		data: mailboxesData,
 		isLoading: isLoadingMailboxes,
 		mutate: mutateMailboxes,
 	} = useSWR<BackendMailbox[]>("/api/inbox/v1/mailboxes/list");
 
-	// Fetch messages from actual endpoint
 	const {
 		data: messagesData,
 		isLoading: isLoadingInboundThreads,
 		mutate: mutateMessages,
 	} = useSWR<BackendMessage[]>("/api/inbox/v1/messages");
 
-	// Fetch sent messages from actual endpoint
 	const {
 		data: sentMessagesData,
 		isLoading: isLoadingSentMessages,
 		mutate: mutateSentMessages,
 	} = useSWR<BackendSentMessage[]>("/api/inbox/v1/messages/sent");
 
+	const { data: allThreadsData, mutate: mutateThreads } = useSWR<
+		BackendThread[]
+	>("/api/inbox/v1/threads?limit=100");
+
 	const isLoadingThreads = isLoadingInboundThreads || isLoadingSentMessages;
 
-	// Map backend mailboxes to UI structures
 	const mailboxes = useMemo(() => {
 		if (!mailboxesData) return [];
 		return mailboxesData.map((mb) => ({
@@ -167,79 +284,32 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		}));
 	}, [mailboxesData]);
 
-	// Map backend messages to UI threads
 	const threads = useMemo(() => {
+		const archivedThreadIds = new Set(
+			(allThreadsData || [])
+				.filter((t) => t.status === "archived")
+				.map((t) => t.id),
+		);
+
+		const threadMeta = new Map(
+			(allThreadsData || []).map((t) => [t.id, t]),
+		);
+
 		const mappedInbound = messagesData
-			? messagesData.map((msg) => {
-					const receivedAtDate = msg.date || msg.createdAt;
-					const receivedAt =
-						typeof receivedAtDate === "string"
-							? receivedAtDate
-							: receivedAtDate
-								? receivedAtDate.toISOString()
-								: new Date().toISOString();
-
-					const createdAtStr =
-						typeof msg.createdAt === "string"
-							? msg.createdAt
-							: msg.createdAt.toISOString();
-
-					return {
-						id: msg.id,
-						mailboxId: msg.mailboxId,
-						threadId: msg.threadId || undefined,
-						from: { name: msg.fromName || undefined, email: msg.fromEmail },
-						subject: msg.subject || "(No Subject)",
-						preview:
-							msg.snippet ||
-							(msg.textBody
-								? msg.textBody.substring(0, 120) +
-									(msg.textBody.length > 120 ? "..." : "")
-								: ""),
-						bodyText: msg.textBody || "",
-						bodyHtml: msg.htmlBody || undefined,
-						receivedAt,
-						status: msg.isSpam
-							? ("blocked" as const)
-							: msg.status === "processing"
-								? ("parsing" as const)
-								: msg.status === "needs_approval"
-									? ("needs_approval" as const)
-									: msg.isRead
-										? ("handled" as const)
-										: ("new" as const),
-						securityLevel: 5 as const,
-						unread: !msg.isRead,
-						cc: msg.ccEmails || undefined,
-						replyTo: msg.replyTo || undefined,
-						direction: "inbound" as const,
-						toEmails: msg.toEmails,
-						attachments:
-							msg.attachments?.map((att) => ({
-								name: att.filename,
-								size: `${(att.size / 1024).toFixed(1)} KB`,
-								contentType: att.contentType,
-								isInline: att.contentDisposition === "inline",
-							})) || [],
-						timeline: [
-							{
-								label: "Email received",
-								at: createdAtStr,
-								state: "done" as const,
-							},
-							{
-								label: "Delivered to NATS",
-								at: createdAtStr,
-								state: "done" as const,
-							},
-							{
-								label: "Inbox storage complete",
-								at: createdAtStr,
-								state: "done" as const,
-							},
-						],
-					};
-				})
+			? messagesData
+					.filter((msg) => !archivedThreadIds.has(msg.threadId || ""))
+					.map((msg) => {
+						const base = mapMessageToThread(msg);
+						if (msg.threadId && threadMeta.has(msg.threadId)) {
+							const meta = threadMeta.get(msg.threadId)!;
+							return {
+								...base,
+								isStarred: base.isStarred || meta.isStarred,
+								unread: base.unread || !meta.isRead,
+							};
+						}
+						return base;
+					})
 			: [];
 
 		const parseEmail = (emailStr: string) => {
@@ -255,7 +325,6 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 							? receivedAtDate
 							: receivedAtDate.toISOString();
 
-					// Find the mailbox by comparing fromEmail
 					const fromEmailParsed = parseEmail(msg.fromEmail);
 					const mailbox = mailboxes.find(
 						(mb) => parseEmail(mb.email) === fromEmailParsed,
@@ -265,6 +334,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 						id: msg.id,
 						mailboxId: mailbox?.id ?? "",
 						threadId: undefined,
+						messageId: msg.id,
 						from: { name: msg.fromName || undefined, email: msg.fromEmail },
 						subject: msg.subject || "(No Subject)",
 						preview: msg.textBody
@@ -277,8 +347,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 						status: "handled" as const,
 						securityLevel: 5 as const,
 						unread: false,
-						cc: msg.ccEmails || undefined,
-						replyTo: undefined,
+						isStarred: false,
+						isArchived: false,
 						direction: "outbound" as const,
 						toEmails: msg.toEmails,
 						attachments: [],
@@ -307,7 +377,14 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			(a, b) =>
 				new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime(),
 		);
-	}, [messagesData, sentMessagesData, mailboxes]);
+	}, [messagesData, sentMessagesData, mailboxes, allThreadsData]);
+
+	const archivedThreads = useMemo(() => {
+		if (!allThreadsData) return [];
+		return allThreadsData
+			.filter((t) => t.status === "archived")
+			.map((t) => mapBackendThreadToInbound(t, t.mailboxId || ""));
+	}, [allThreadsData]);
 
 	const getMailbox = useCallback(
 		(id: string) => mailboxes.find((m) => m.id === id),
@@ -384,9 +461,9 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				throw new Error(body || "Failed to delete message");
 			}
 
-			await mutateMessages();
+			await Promise.all([mutateMessages(), mutateThreads()]);
 		},
-		[mutateMessages],
+		[mutateMessages, mutateThreads],
 	);
 
 	const markMessageSpam = useCallback(
@@ -400,10 +477,48 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 							: msg,
 					);
 				},
-				{ revalidate: false },
+				{ revalidate: true },
 			);
 		},
 		[mutateMessages],
+	);
+
+	const toggleMessageStar = useCallback(
+		async (id: string, isStarred: boolean) => {
+			const res = await fetch(`/api/inbox/v1/messages/${id}/star`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ isStarred }),
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to update star status");
+			}
+
+			await Promise.all([mutateMessages(), mutateThreads()]);
+		},
+		[mutateMessages, mutateThreads],
+	);
+
+	const archiveThread = useCallback(
+		async (threadId: string) => {
+			const res = await fetch(`/api/inbox/v1/threads/${threadId}/archive`, {
+				method: "POST",
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to archive thread");
+			}
+
+			await Promise.all([
+				mutateMessages(),
+				mutateThreads(),
+				mutateSentMessages(),
+			]);
+		},
+		[mutateMessages, mutateThreads, mutateSentMessages],
 	);
 
 	const sendReply = useCallback(
@@ -487,13 +602,15 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			mutateMailboxes(),
 			mutateMessages(),
 			mutateSentMessages(),
+			mutateThreads(),
 		]);
-	}, [mutateMailboxes, mutateMessages, mutateSentMessages]);
+	}, [mutateMailboxes, mutateMessages, mutateSentMessages, mutateThreads]);
 
 	const value = useMemo(
 		() => ({
 			mailboxes,
 			threads,
+			archivedThreads,
 			isLoadingMailboxes,
 			isLoadingThreads,
 			getMailbox,
@@ -502,6 +619,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			markMessageRead,
 			deleteMessage,
 			markMessageSpam,
+			toggleMessageStar,
+			archiveThread,
 			sendReply,
 			sendForward,
 			sendMessage,
@@ -509,6 +628,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		[
 			mailboxes,
 			threads,
+			archivedThreads,
 			isLoadingMailboxes,
 			isLoadingThreads,
 			getMailbox,
@@ -517,6 +637,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			markMessageRead,
 			deleteMessage,
 			markMessageSpam,
+			toggleMessageStar,
+			archiveThread,
 			sendReply,
 			sendForward,
 			sendMessage,

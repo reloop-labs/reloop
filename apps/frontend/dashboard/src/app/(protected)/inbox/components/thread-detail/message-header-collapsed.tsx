@@ -42,7 +42,7 @@ export const MessageHeaderCollapsed = ({
 		<div
 			role="button"
 			onClick={onClick}
-			className="flex cursor-pointer select-none items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-neutral-50/50 dark:hover:bg-neutral-850/30"
+			className="flex cursor-pointer select-none items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-offset-light/50 hover:bg-[#202020]/30"
 		>
 			<div className="flex min-w-0 items-center gap-3">
 				<div className="flex shrink-0 items-center gap-2.5">
@@ -60,23 +60,23 @@ export const MessageHeaderCollapsed = ({
 				</div>
 				<div className="flex min-w-0 flex-col gap-0.5">
 					<div className="flex flex-wrap items-center gap-1.5">
-						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
+						<span className="font-semibold text-sm text-mail-foreground text-mail-foreground">
 							{senderName}
 						</span>
 						<MessageBadge
 							variant={getBadgeVariant(isApproval, isOutbound, isAgent)}
 						/>
 						{msg.fromEmail && (
-							<span className="font-mono text-text-sub-600 text-xs">
+							<span className="font-mono text-mail-muted text-xs">
 								{msg.fromEmail}
 							</span>
 						)}
 					</div>
-					<span className="truncate text-text-sub-600 text-xs">{snippet}</span>
+					<span className="truncate text-mail-muted text-xs">{snippet}</span>
 				</div>
 			</div>
 
-			<div className="flex shrink-0 items-center gap-2 font-mono text-text-sub-600 text-xs">
+			<div className="flex shrink-0 items-center gap-2 font-mono text-mail-muted text-xs">
 				<span>{formatMessageTimestamp(msg.messageAt)}</span>
 				<Icon name="chevron-down" className="h-3.5 w-3.5" />
 			</div>

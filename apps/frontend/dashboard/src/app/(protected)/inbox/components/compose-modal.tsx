@@ -214,7 +214,7 @@ export const ComposeModal = ({
 	return (
 		<Modal.Root open={isOpen} onOpenChange={onClose}>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-white p-0 shadow-2xl sm:max-w-[620px] dark:border-stroke-soft-100/40 dark:bg-neutral-900"
+				className="overflow-hidden rounded-2xl border border-mail-border bg-panel-light p-0 shadow-2xl sm:max-w-[620px] border-mail-border/40 "
 				showClose={false}
 				onEscapeKeyDown={(e) => {
 					if (isSending) e.preventDefault();
@@ -235,11 +235,11 @@ export const ComposeModal = ({
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
-								className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-white/85 backdrop-blur-sm dark:bg-neutral-900/85"
+								className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-panel-light/85 backdrop-blur-sm /85"
 							>
 								<div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-2xl border-2 border-[#18181b] border-dashed dark:border-white">
 									<svg
-										className="h-7 w-7 text-text-strong-950 dark:text-white"
+										className="h-7 w-7 text-mail-foreground text-mail-foreground"
 										viewBox="0 0 24 24"
 										fill="none"
 										stroke="currentColor"
@@ -250,15 +250,15 @@ export const ComposeModal = ({
 										<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
 									</svg>
 								</div>
-								<p className="font-semibold text-base text-text-strong-950 dark:text-white">
+								<p className="font-semibold text-base text-mail-foreground text-mail-foreground">
 									Drop files here to attach
 								</p>
 							</motion.div>
 						)}
 					</AnimatePresence>
 					{/* Top bar Header */}
-					<div className="flex items-center justify-between border-stroke-soft-100/60 border-b px-5 py-4 dark:border-neutral-800">
-						<Modal.Title className="font-semibold text-sm text-text-strong-950 dark:text-white">
+					<div className="flex items-center justify-between border-mail-border/60 border-b px-5 py-4 border-mail-border">
+						<Modal.Title className="font-semibold text-sm text-mail-foreground text-mail-foreground">
 							New email
 						</Modal.Title>
 						<div className="flex items-center gap-1">
@@ -269,7 +269,7 @@ export const ComposeModal = ({
 								type="button"
 								onClick={onClose}
 								title="Close"
-								className="flex h-7 w-7 items-center justify-center rounded-lg text-text-soft-400 transition-colors hover:bg-bg-weak-50 dark:hover:bg-neutral-800"
+								className="flex h-7 w-7 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-offset-light hover:bg-[#202020]"
 							>
 								<Icon name="cross" className="h-3.5 w-3.5" />
 							</motion.button>
@@ -277,7 +277,7 @@ export const ComposeModal = ({
 					</div>
 
 					{/* Agent Provenance Row */}
-					<div className="flex items-center border-stroke-soft-100/40 border-b bg-[#f4f6f0] px-5 py-2.5 dark:border-neutral-800/40 dark:bg-[#171b13]">
+					<div className="flex items-center border-mail-border/40 border-b bg-[#f4f6f0] px-5 py-2.5 border-mail-border/40 dark:bg-[#171b13]">
 						<div className="flex items-center gap-2 font-medium text-[#727d6d] text-xs dark:text-[#9ea899]">
 							<svg
 								className="h-4 w-4 text-[#727d6d] dark:text-[#9ea899]"
@@ -302,19 +302,19 @@ export const ComposeModal = ({
 					{/* Field Inputs */}
 					<div className="flex flex-col text-sm">
 						{/* From Row */}
-						<div className="flex items-center border-stroke-soft-100/50 border-b px-5 py-2.5 dark:border-neutral-800/60">
-							<span className="w-16 select-none text-text-soft-400">From</span>
+						<div className="flex items-center border-mail-border/50 border-b px-5 py-2.5 border-mail-border/60">
+							<span className="w-16 select-none text-mail-muted">From</span>
 							<input
 								type="text"
 								value={mailbox.email}
 								readOnly
-								className="flex-1 cursor-default select-none bg-transparent text-text-strong-950 outline-none dark:text-white"
+								className="flex-1 cursor-default select-none bg-transparent text-mail-foreground outline-none text-mail-foreground"
 							/>
 						</div>
 
 						{/* To Row */}
-						<div className="flex items-start border-stroke-soft-100/50 border-b px-5 py-1.5 dark:border-neutral-800/60">
-							<span className="w-16 select-none py-2 text-text-soft-400">
+						<div className="flex items-start border-mail-border/50 border-b px-5 py-1.5 border-mail-border/60">
+							<span className="w-16 select-none py-2 text-mail-muted">
 								To
 							</span>
 							<Controller
@@ -329,15 +329,15 @@ export const ComposeModal = ({
 									/>
 								)}
 							/>
-							<div className="flex select-none items-center gap-2.5 py-2 pl-2 font-mono text-text-soft-400 text-xs">
+							<div className="flex select-none items-center gap-2.5 py-2 pl-2 font-mono text-mail-muted text-xs">
 								<motion.button
 									whileHover={{ scale: 1.05 }}
 									whileTap={{ scale: 0.95 }}
 									type="button"
 									onClick={() => setShowCc(!showCc)}
-									className={`rounded px-1 py-0.5 transition-colors hover:text-text-strong-950 dark:hover:text-white ${
+									className={`rounded px-1 py-0.5 transition-colors hover:text-mail-foreground hover:text-mail-foreground ${
 										showCc
-											? "font-semibold text-text-strong-950 dark:text-white"
+											? "font-semibold text-mail-foreground text-mail-foreground"
 											: ""
 									}`}
 								>
@@ -348,9 +348,9 @@ export const ComposeModal = ({
 									whileTap={{ scale: 0.95 }}
 									type="button"
 									onClick={() => setShowBcc(!showBcc)}
-									className={`rounded px-1 py-0.5 transition-colors hover:text-text-strong-950 dark:hover:text-white ${
+									className={`rounded px-1 py-0.5 transition-colors hover:text-mail-foreground hover:text-mail-foreground ${
 										showBcc
-											? "font-semibold text-text-strong-950 dark:text-white"
+											? "font-semibold text-mail-foreground text-mail-foreground"
 											: ""
 									}`}
 								>
@@ -369,8 +369,8 @@ export const ComposeModal = ({
 									transition={{ duration: 0.2, ease: "easeInOut" }}
 									className="overflow-hidden"
 								>
-									<div className="flex items-start border-stroke-soft-100/50 border-b px-5 py-1.5 dark:border-neutral-800/60">
-										<span className="w-16 select-none py-2 text-text-soft-400">
+									<div className="flex items-start border-mail-border/50 border-b px-5 py-1.5 border-mail-border/60">
+										<span className="w-16 select-none py-2 text-mail-muted">
 											Cc
 										</span>
 										<Controller
@@ -400,8 +400,8 @@ export const ComposeModal = ({
 									transition={{ duration: 0.2, ease: "easeInOut" }}
 									className="overflow-hidden"
 								>
-									<div className="flex items-start border-stroke-soft-100/50 border-b px-5 py-1.5 dark:border-neutral-800/60">
-										<span className="w-16 select-none py-2 text-text-soft-400">
+									<div className="flex items-start border-mail-border/50 border-b px-5 py-1.5 border-mail-border/60">
+										<span className="w-16 select-none py-2 text-mail-muted">
 											Bcc
 										</span>
 										<Controller
@@ -422,8 +422,8 @@ export const ComposeModal = ({
 						</AnimatePresence>
 
 						{/* Subject Row */}
-						<div className="flex items-center border-stroke-soft-100/50 border-b px-5 py-2.5 dark:border-neutral-800/60">
-							<span className="w-16 select-none text-text-soft-400">
+						<div className="flex items-center border-mail-border/50 border-b px-5 py-2.5 border-mail-border/60">
+							<span className="w-16 select-none text-mail-muted">
 								Subject
 							</span>
 							<input
@@ -431,7 +431,7 @@ export const ComposeModal = ({
 								placeholder="Add a subject"
 								disabled={isSending}
 								{...register("subject")}
-								className="flex-1 bg-transparent text-text-strong-950 placeholder-text-soft-400/80 outline-none dark:text-white"
+								className="flex-1 bg-transparent text-mail-foreground placeholder-text-soft-400/80 outline-none text-mail-foreground"
 							/>
 						</div>
 					</div>
@@ -443,12 +443,12 @@ export const ComposeModal = ({
 							disabled={isSending}
 							rows={8}
 							{...register("body")}
-							className="w-full flex-1 resize-none border-0 bg-transparent p-0 text-sm text-text-strong-950 leading-relaxed placeholder-text-soft-400/80 outline-none dark:text-neutral-200"
+							className="w-full flex-1 resize-none border-0 bg-transparent p-0 text-sm text-mail-foreground leading-relaxed placeholder-text-soft-400/80 outline-none text-mail-foreground"
 						/>
 
 						{/* Attachments Section */}
 						{attachments.length > 0 && (
-							<div className="mt-4 flex flex-wrap gap-2 border-stroke-soft-100/30 border-t pt-3 dark:border-neutral-800/40">
+							<div className="mt-4 flex flex-wrap gap-2 border-mail-border/30 border-t pt-3 border-mail-border/40">
 								<AnimatePresence>
 									{attachments.map((file, idx) => (
 										<motion.div
@@ -514,7 +514,7 @@ export const ComposeModal = ({
 					</div>
 
 					{/* Footer Actions */}
-					<div className="flex items-center justify-between border-stroke-soft-100/60 border-t bg-bg-white-0 px-5 py-4 dark:border-neutral-800 dark:bg-neutral-900">
+					<div className="flex items-center justify-between border-mail-border/60 border-t bg-panel-light  px-5 py-4 border-mail-border ">
 						<div className="flex items-center gap-3">
 							{/* Send Button */}
 							<motion.button
@@ -526,7 +526,7 @@ export const ComposeModal = ({
 									to.length === 0 ||
 									attachments.some((att) => att.isUploading)
 								}
-								className="flex items-center gap-2 rounded-xl bg-[#18181b] px-6 py-2.5 font-semibold text-sm text-white shadow-sm transition-all duration-200 hover:bg-neutral-800 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100"
+								className="flex items-center gap-2 rounded-xl bg-[#18181b] px-6 py-2.5 font-semibold text-sm text-white shadow-sm transition-all duration-200 hover:bg-neutral-800 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40  dark:text-neutral-950 dark:hover:bg-offset-light"
 							>
 								<svg
 									className="mr-0.5 h-3.5 w-3.5 rotate-45 fill-current text-white dark:text-neutral-950"
@@ -558,7 +558,7 @@ export const ComposeModal = ({
 								onClick={open}
 								title="Attach files"
 								disabled={isSending}
-								className="flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-200 text-text-sub-600 transition-colors hover:bg-bg-weak-50 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800"
+								className="flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-200 text-mail-muted transition-colors hover:bg-offset-light border-mail-border text-mail-muted hover:bg-[#202020]"
 							>
 								<svg
 									className="h-4.5 w-4.5"
@@ -581,7 +581,7 @@ export const ComposeModal = ({
 							type="button"
 							onClick={onClose}
 							disabled={isSending}
-							className="flex items-center gap-1.5 font-medium text-sm text-text-sub-600 transition-colors hover:text-red-600 disabled:opacity-40 dark:text-neutral-400 dark:hover:text-red-400"
+							className="flex items-center gap-1.5 font-medium text-sm text-mail-muted transition-colors hover:text-red-600 disabled:opacity-40 text-mail-muted hover:text-red-400"
 						>
 							<svg
 								className="h-4.5 w-4.5"

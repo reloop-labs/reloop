@@ -256,6 +256,19 @@
 	--color-stroke-soft-200: var(--stroke-soft-200);
 	--color-stroke-soft-100: var(--stroke-soft-100);
 	--color-stroke-inbox: var(--stroke-inbox);
+	--color-panel-light: var(--panel-light);
+	--color-panel-dark: var(--panel-dark);
+	--color-offset-light: var(--offset-light);
+	--color-offset-dark: var(--offset-dark);
+	--color-sidebar: var(--sidebar-background);
+	--color-mail-foreground: var(--mail-foreground);
+	--color-mail-muted: var(--mail-muted);
+	--color-mail-border: var(--mail-border);
+	--color-mail-accent: var(--mail-accent);
+	--color-mail-primary: var(--mail-primary);
+	--color-mail-background: var(--mail-background);
+	--color-zero-blue: var(--zero-blue);
+	--color-zero-blue-hover: var(--zero-blue-hover);
 	--color-stroke-white-0: var(--stroke-white-0);
 
 	--color-faded-dark: var(--faded-dark);
@@ -921,6 +934,19 @@
 	--stroke-soft-200: var(--neutral-200);
 	--stroke-soft-100: var(--neutral-100);
 	--stroke-inbox: #e4dfd6;
+	--panel-light: #ffffff;
+	--panel-dark: #1a1a1a;
+	--offset-light: #f5f5f5;
+	--offset-dark: #0a0a0a;
+	--sidebar-background: hsl(0 0% 98%);
+	--mail-background: hsl(0 0% 100%);
+	--mail-foreground: hsl(240 10% 3.9%);
+	--mail-muted: hsl(240 3.8% 46.1%);
+	--mail-border: hsl(240 5.9% 90%);
+	--mail-primary: hsl(240 5.9% 10%);
+	--mail-accent: hsl(240 4.8% 95.9%);
+	--zero-blue: #006ffe;
+	--zero-blue-hover: #0056cc;
 	--stroke-white-0: var(--neutral-0);
 
 	--faded-dark: var(--neutral-800);
@@ -994,6 +1020,19 @@
 	--stroke-soft-200: var(--neutral-700);
 	--stroke-soft-100: var(--neutral-800);
 	--stroke-inbox: var(--neutral-800);
+	--panel-light: #ffffff;
+	--panel-dark: #1a1a1a;
+	--offset-light: #f5f5f5;
+	--offset-dark: #0a0a0a;
+	--sidebar-background: hsl(240 3.9% 7%);
+	--mail-background: hsl(240 3.9% 7%);
+	--mail-foreground: hsl(0 0% 98%);
+	--mail-muted: hsl(240 5% 64.9%);
+	--mail-border: hsl(240 3.7% 20%);
+	--mail-primary: hsl(0 0% 98%);
+	--mail-accent: hsl(240 3.7% 15.9%);
+	--zero-blue: #006ffe;
+	--zero-blue-hover: #0056cc;
 	--stroke-white-0: var(--neutral-950);
 
 	--faded-dark: var(--neutral-300);

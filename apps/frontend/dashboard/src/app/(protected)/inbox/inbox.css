@@ -1,11 +1,30 @@
-@theme {
-	--color-stroke-inbox: var(--stroke-inbox);
+/**
+ * Zero mail inbox shell — scoped theme overrides.
+ * Color utilities are registered in @reloop/tailwind/style.css.
+ */
+.inbox-zero-theme {
+	isolation: isolate;
+	height: 100dvh;
+	width: 100vw;
+	overflow: hidden;
+	background-color: var(--sidebar-background);
+	color: var(--mail-foreground);
+	font-family: var(--font-geist-sans, var(--font-sans));
 }
 
-:root {
-	--stroke-inbox: #e4dfd6;
-}
-
-.dark {
-	--stroke-inbox: var(--neutral-800);
+.inbox-zero-theme.dark,
+.inbox-zero-theme .dark {
+	--sidebar-background: hsl(240 3.9% 7%);
+	--mail-background: hsl(240 3.9% 7%);
+	--mail-foreground: hsl(0 0% 98%);
+	--mail-muted: hsl(240 5% 64.9%);
+	--mail-border: hsl(240 3.7% 20%);
+	--mail-primary: hsl(0 0% 98%);
+	--mail-accent: hsl(240 3.7% 15.9%);
+	--panel-light: #ffffff;
+	--panel-dark: #1a1a1a;
+	--offset-light: #f5f5f5;
+	--offset-dark: #0a0a0a;
+	--zero-blue: #006ffe;
+	--zero-blue-hover: #0056cc;
 }

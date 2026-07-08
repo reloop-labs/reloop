@@ -20,3 +20,19 @@ export const formatMessageTimestamp = (dateStr: string): string => {
 
 	return date.format("ddd, h:mm A");
 };
+
+/** Zero-style compact time: "5:19 PM" today, "Jul 07" otherwise */
+export const formatZeroMessageTime = (dateStr: string): string => {
+	const date = dayjs(dateStr);
+	const now = dayjs();
+
+	if (date.isSame(now, "day")) {
+		return date.format("h:mm A");
+	}
+
+	if (date.isSame(now, "year")) {
+		return date.format("MMM DD");
+	}
+
+	return date.format("MMM DD, YYYY");
+};

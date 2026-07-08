@@ -133,7 +133,7 @@ export const ThreadMessageItem = ({
 
 	// ── Render ────────────────────────────────────────────────────────────────
 	return (
-		<div className="relative overflow-hidden rounded-xl border border-stroke-inbox bg-white dark:border-stroke-soft-100/10 dark:bg-neutral-900">
+		<div className="relative overflow-hidden rounded-xl border border-mail-border bg-panel-light ">
 			{!isExpanded ? (
 				/* ── Collapsed ─────────────────────────────────────────────────── */
 				<div>

@@ -23,7 +23,7 @@ export const MessageDraftActions = ({
 			<button
 				type="button"
 				onClick={onApproveSend}
-				className="flex items-center gap-2 rounded-xl bg-text-strong-950 px-4 py-2.5 font-semibold text-white text-xs shadow-sm transition-all hover:opacity-85 dark:bg-white dark:text-neutral-900"
+				className="flex items-center gap-2 rounded-xl bg-mail-primary px-4 py-2.5 font-semibold text-panel-light text-xs shadow-sm transition-all hover:opacity-85 bg-mail-primary dark:text-panel-light"
 			>
 				<Icon name="send" className="h-3.5 w-3.5" />
 				<span>Approve &amp; send</span>
@@ -33,7 +33,7 @@ export const MessageDraftActions = ({
 			<button
 				type="button"
 				onClick={onEditReply}
-				className="flex items-center gap-2 rounded-xl border border-stroke-inbox bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+				className="flex items-center gap-2 rounded-xl border border-mail-border bg-panel-light  px-4 py-2.5 font-semibold text-mail-muted text-xs transition-all hover:bg-offset-light hover:text-mail-foreground border-mail-border/30 bg-mail-accent/20"
 			>
 				<Icon name="reply" className="h-3.5 w-3.5" />
 				<span>Edit reply</span>
@@ -43,7 +43,7 @@ export const MessageDraftActions = ({
 			<button
 				type="button"
 				onClick={onForward}
-				className="flex items-center gap-2 rounded-xl border border-stroke-inbox bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
+				className="flex items-center gap-2 rounded-xl border border-mail-border bg-panel-light  px-4 py-2.5 font-semibold text-mail-muted text-xs transition-all hover:bg-offset-light hover:text-mail-foreground border-mail-border/30 bg-mail-accent/20"
 			>
 				<Icon name="forward" className="h-3.5 w-3.5" />
 				<span>Forward</span>

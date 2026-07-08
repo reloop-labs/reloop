@@ -52,7 +52,7 @@ export const InboxFilterTabs = ({
 				)}
 				aria-label="Inbox filters"
 			>
-				<p className="mb-2 px-2 font-medium text-label-xs text-text-soft-400">
+				<p className="mb-2 px-2 font-medium text-label-xs text-mail-muted">
 					Filters
 				</p>
 				{INBOX_FILTERS.map((filter, idx) => {
@@ -73,14 +73,14 @@ export const InboxFilterTabs = ({
 									? filter.id === "primary"
 										? "text-blue-600 dark:text-blue-400"
 										: "text-error-base dark:text-red-500"
-									: "text-text-sub-600 hover:text-text-strong-950",
+									: "text-mail-muted hover:text-mail-foreground",
 							)}
 						>
 							<span className="truncate">{filter.label}</span>
 							<span
 								className={cn(
 									"shrink-0 text-label-xs tabular-nums",
-									isActive ? "text-text-sub-600" : "text-text-soft-400",
+									isActive ? "text-mail-muted" : "text-mail-muted",
 								)}
 							>
 								{counts[filter.id]}
@@ -91,7 +91,7 @@ export const InboxFilterTabs = ({
 				<AnimatedHoverBackground
 					rect={currentRect}
 					tabElement={currentEl}
-					className="bg-bg-weak-50 ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/20 dark:ring-stroke-soft-100/40"
+					className="bg-offset-light ring-1 ring-stroke-soft-100 /20 dark:ring-stroke-soft-100/40"
 				/>
 			</nav>
 		);
@@ -130,7 +130,7 @@ export const InboxFilterTabs = ({
 									? filter.id === "primary"
 										? "text-blue-600! dark:text-blue-400!"
 										: "text-error-base! dark:text-red-500!"
-									: "text-text-sub-600 hover:text-text-strong-950",
+									: "text-mail-muted hover:text-mail-foreground",
 							)}
 							key={filter.id}
 							value={filter.id}
@@ -144,7 +144,7 @@ export const InboxFilterTabs = ({
 										? filter.id === "primary"
 											? "text-blue-600 dark:text-blue-400"
 											: "text-error-base dark:text-red-500"
-										: "text-text-sub-600",
+										: "text-mail-muted",
 								)}
 							/>
 							<span className="capitalize">
@@ -158,7 +158,7 @@ export const InboxFilterTabs = ({
 											? filter.id === "primary"
 												? "bg-blue-500/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400"
 												: "bg-error-base/10 text-error-base dark:bg-red-500/10 dark:text-red-500"
-											: "bg-bg-weak-50 text-text-soft-400 dark:bg-white/10",
+											: "bg-offset-light text-mail-muted /10",
 									)}
 								>
 									{count}

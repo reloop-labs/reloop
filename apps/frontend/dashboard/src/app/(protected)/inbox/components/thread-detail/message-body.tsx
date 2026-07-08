@@ -72,7 +72,7 @@ export const MessageBody = ({
 
 	if (bodyHtml) {
 		return (
-			<div className="overflow-hidden rounded-xl">
+			<div className="overflow-hidden rounded-lg bg-white shadow-sm">
 				<iframe
 					ref={iframeRef}
 					onLoad={handleIframeLoad}
@@ -122,13 +122,13 @@ ${bodyHtml}
 	}
 
 	return (
-		<div className="flex flex-col gap-3">
+		<div className="overflow-hidden rounded-lg bg-white p-4 shadow-sm">
 			{isTranslated && (
-				<div className="rounded-lg bg-yellow-50 px-3 py-2 font-medium text-[12px] text-yellow-800 dark:bg-yellow-950/20 dark:text-yellow-200">
+				<div className="mb-3 rounded-lg bg-yellow-50 px-3 py-2 font-medium text-[12px] text-yellow-800">
 					Dynamic {LANGUAGE_NAMES[targetLanguage] || targetLanguage} Translation
 				</div>
 			)}
-			<p className="whitespace-pre-wrap text-sm text-text-strong-950 leading-relaxed dark:text-neutral-350">
+			<p className="whitespace-pre-wrap text-neutral-800 text-sm leading-relaxed">
 				{bodyText}
 			</p>
 		</div>

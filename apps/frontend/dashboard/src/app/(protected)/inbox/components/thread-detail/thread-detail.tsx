@@ -1,10 +1,10 @@
 "use client";
 
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useEffect, useMemo, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import useSWR from "swr";
 import type { AgentMailbox, InboundThread } from "../../types";
@@ -12,7 +12,9 @@ import { useAgentInbox } from "../agent-inbox-provider";
 import { ForwardComposer } from "./forward-composer";
 import { RawHeadersModal } from "./raw-headers-modal";
 import { ReplyComposer } from "./reply-composer";
-import { ThreadMessageItem } from "./thread-message-item";
+import { ZeroMailDisplay } from "./zero-mail-display";
+import { ZeroThreadFooter } from "./zero-thread-footer";
+import { ZeroThreadToolbar } from "./zero-thread-toolbar";
 
 dayjs.extend(relativeTime);
 
@@ -53,26 +55,22 @@ interface ThreadDetailProps {
 	showBack?: boolean;
 }
 
-// ---------------------------------------------------------------------------
-// Empty state
-// ---------------------------------------------------------------------------
-
 const EmptyState = () => (
-	<div className="flex min-h-[400px] flex-col items-center justify-center gap-1.5 bg-bg-weak-50/10 p-8 text-center dark:bg-transparent">
-		<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-stroke-inbox bg-bg-white-0 shadow-sm dark:border-neutral-850 dark:bg-neutral-900">
+	<div className="flex min-h-[400px] flex-col items-center justify-center gap-1.5 bg-offset-light/10 p-8 text-center dark:bg-transparent">
+		<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-mail-border bg-panel-light  shadow-sm dark:border-neutral-850 ">
 			<Icon
 				name="inbox"
-				className="h-5 w-5 text-text-sub-600 dark:text-neutral-450"
+				className="h-5 w-5 text-mail-muted dark:text-neutral-450"
 			/>
 		</div>
-		<h3 className="font-semibold text-base text-text-strong-950 dark:text-white">
+		<h3 className="font-semibold text-base text-mail-foreground text-mail-foreground">
 			Select a message to inspect
 		</h3>
-		<p className="mx-auto max-w-sm text-text-sub-600 text-xs dark:text-neutral-400">
+		<p className="mx-auto max-w-sm text-mail-muted text-xs text-mail-muted">
 			Click any message on the left to review parsing, timeline, and approval
 			actions.
 		</p>
-		<div className="mt-4 flex items-center gap-1.5 text-text-soft-400 text-xs dark:text-neutral-500">
+		<div className="mt-4 flex items-center gap-1.5 text-mail-muted text-xs text-mail-muted">
 			<Icon name="arrow-left" className="h-3.5 w-3.5 animate-pulse" />
 			<span className="font-medium">Pick a message to get started</span>
 		</div>
@@ -87,17 +85,21 @@ export const ThreadDetail = ({
 	thread,
 	mailbox,
 	onBack,
+	showBack,
 }: ThreadDetailProps) => {
 	const {
 		deleteMessage,
 		markMessageRead,
 		markMessageSpam,
+		toggleMessageStar,
+		archiveThread,
 		sendReply,
 		sendForward,
 		refresh,
 	} = useAgentInbox();
 
 	// ── UI state ──────────────────────────────────────────────────────────────
+	const messageId = thread?.messageId ?? thread?.id;
 	const [parsedExpanded, setParsedExpanded] = useState(true);
 	const [rawHeadersExpanded, setRawHeadersExpanded] = useState(false);
 	const [showReplyComposer, setShowReplyComposer] = useState(false);
@@ -224,11 +226,34 @@ export const ThreadDetail = ({
 		toast.info(`${action} — prototype only`);
 	};
 
+	const handleToggleStar = async () => {
+		if (!thread) return;
+		const msgId = thread.messageId ?? thread.id;
+		try {
+			await toggleMessageStar(msgId, !thread.isStarred);
+			toast.success(thread.isStarred ? "Unstarred" : "Starred");
+		} catch (err: unknown) {
+			toast.error(err instanceof Error ? err.message : "Failed to update star");
+		}
+	};
+
+	const handleArchive = async () => {
+		if (!thread) return;
+		const archiveId = thread.threadId ?? thread.id;
+		try {
+			await archiveThread(archiveId);
+			toast.success("Archived");
+			onBack?.();
+		} catch (err: unknown) {
+			toast.error(err instanceof Error ? err.message : "Failed to archive");
+		}
+	};
+
 	const handleDelete = async () => {
-		if (!thread || !confirm("Are you sure you want to delete this message?"))
+		if (!thread || !messageId || !confirm("Are you sure you want to delete this message?"))
 			return;
 		try {
-			await deleteMessage(thread.id);
+			await deleteMessage(messageId);
 			toast.success("Message deleted");
 			if (onBack) onBack();
 		} catch (err: any) {
@@ -237,9 +262,9 @@ export const ThreadDetail = ({
 	};
 
 	const handleToggleRead = async (isRead: boolean) => {
-		if (!thread) return;
+		if (!thread || !messageId) return;
 		try {
-			await markMessageRead(thread.id, isRead);
+			await markMessageRead(messageId, isRead);
 			toast.success(isRead ? "Marked as Handled" : "Marked as Active");
 		} catch (err: any) {
 			toast.error(err.message || "Failed to update status");
@@ -247,9 +272,9 @@ export const ThreadDetail = ({
 	};
 
 	const handleMarkSpam = async (isSpam: boolean) => {
-		if (!thread) return;
+		if (!thread || !messageId) return;
 		try {
-			await markMessageSpam(thread.id, isSpam);
+			await markMessageSpam(messageId, isSpam);
 			toast.success(isSpam ? "Marked as Spam" : "Marked as Not Spam");
 		} catch (err: any) {
 			toast.error(err.message || "Failed to mark as spam");
@@ -258,7 +283,7 @@ export const ThreadDetail = ({
 
 	const handleSendReply = async (bodyOverride?: string) => {
 		const body = (bodyOverride ?? replyBody).trim();
-		if (!thread || !body) return;
+		if (!thread || !messageId || !body) return;
 
 		// Optimistically add the reply bubble immediately
 		const optimisticMsg = {
@@ -284,7 +309,7 @@ export const ThreadDetail = ({
 		setReplyBody("");
 		setShowReplyComposer(false);
 
-		const replyPromise = sendReply(thread.id, optimisticMsg.email.textBody);
+		const replyPromise = sendReply(messageId, optimisticMsg.email.textBody);
 		toast.promise(replyPromise, {
 			loading: "Sending reply...",
 			success: async () => {
@@ -309,18 +334,37 @@ export const ThreadDetail = ({
 		setShowForwardComposer(true);
 	};
 
+	const openReplyComposer = () => {
+		setShowForwardComposer(false);
+		setReplyBody("");
+		setShowReplyComposer(true);
+	};
+
+	useHotkeys("r", openReplyComposer);
+	useHotkeys("a", openReplyComposer);
+	useHotkeys("f", () => handleForward());
+	useHotkeys("s", () => {
+		void handleToggleStar();
+	});
+	useHotkeys("e", () => {
+		void handleArchive();
+	});
+	useHotkeys("shift+3", () => {
+		void handleDelete();
+	});
+
 	const handleSendForward = async (data: {
 		to: string[];
 		cc: string[];
 		body: string;
 	}) => {
-		if (!thread || data.to.length === 0) return;
+		if (!thread || !messageId || data.to.length === 0) return;
 
 		setIsForwarding(true);
 		const toList = data.to;
 		const ccList = data.cc;
 
-		const fwdPromise = sendForward(thread.id, toList, {
+		const fwdPromise = sendForward(messageId, toList, {
 			text: data.body.trim() || undefined,
 			cc: ccList.length ? ccList : undefined,
 		});
@@ -499,141 +543,84 @@ export const ThreadDetail = ({
 	if (!thread) return <EmptyState />;
 
 	return (
-		<div className="flex h-full min-h-0 flex-col">
-			{/* Scrollable message area */}
-			<div className="min-h-0 flex-1 overflow-y-auto bg-transparent dark:bg-neutral-950/20">
-				{/* Subject header */}
-				<div className="sticky top-0 z-10 flex items-start justify-between border-stroke-inbox border-b bg-[#FAF8F4] px-6 py-5 dark:border-stroke-soft-100/30 dark:bg-neutral-950">
-					<div className="flex flex-col gap-1.5">
-						<h1 className="font-bold text-text-strong-950 text-xl dark:text-white">
-							{thread.subject}
-						</h1>
-						<div className="flex items-center gap-2 text-text-sub-600 text-xs">
-							<span>
-								{displayMessages.length === 1
-									? "1 message"
-									: `${displayMessages.length} messages`}
-							</span>
-							<span className="opacity-50">·</span>
-							<span>{threadParticipants}</span>
-							<span className="opacity-50">·</span>
-							<div className="flex items-center gap-1">
-								{displayMessages.map((msg, i) => {
-									const isOutbound = msg.direction === "outbound";
-									const isApproval =
-										msg.status === "needs_approval" ||
-										(i === displayMessages.length - 1 &&
-											thread.status === "needs_approval");
-									const isAgent =
-										msg.direction === "agent" ||
-										Boolean(msg.isAgent) ||
-										msg.fromEmail?.includes("agent");
-									// Mirror ACCENT_COLORS from thread-message-item.tsx exactly
-									const dotColor = isApproval
-										? "#C47839"
-										: isAgent
-											? "#3B629B"
-											: isOutbound
-												? "#677E64"
-												: "#3B629B";
-									return (
-										<span
-											key={msg.id}
-											className="h-1.5 w-1.5 rounded-full"
-											style={{ backgroundColor: dotColor }}
-										/>
-									);
-								})}
-							</div>
-						</div>
-					</div>
-					<button
-						type="button"
-						onClick={handleDelete}
-						className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-stroke-inbox bg-white text-text-sub-600 transition-all hover:bg-bg-weak-50 hover:text-error-base dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-450"
-						title="Delete thread"
-					>
-						<Icon name="trash" className="h-4 w-4" />
-					</button>
-				</div>
+		<div className="flex h-full min-h-0 flex-col rounded-xl bg-panel-dark">
+			<ZeroThreadToolbar
+				isStarred={!!thread.isStarred}
+				showBack={showBack}
+				onClose={onBack}
+				onReplyAll={openReplyComposer}
+				onToggleStar={() => void handleToggleStar()}
+				onArchive={() => void handleArchive()}
+				onDelete={handleDelete}
+				onPrint={handlePrint}
+				onMarkSpam={() => void handleMarkSpam(true)}
+			/>
 
-				{/* Translation banner */}
+			<div className="min-h-0 flex-1 overflow-y-auto">
 				{isTranslated && (
-					<div className="mx-6 my-4 flex items-center justify-between gap-3 rounded-xl border border-stroke-inbox bg-white p-3 font-medium text-label-sm dark:border-stroke-soft-100/30 dark:bg-neutral-850">
-						<div className="flex items-center gap-2 text-text-sub-600 dark:text-neutral-400">
-							<Icon name="translate" className="h-4 w-4 text-primary-base" />
+					<div className="mx-4 my-3 flex items-center justify-between gap-3 rounded-lg border border-mail-border bg-[#262626] p-3 text-xs">
+						<div className="flex items-center gap-2 text-mail-muted">
+							<Icon name="translate" className="h-4 w-4" />
 							<span>Translated to</span>
 							<select
 								value={targetLanguage}
 								onChange={(e) => handleLanguageChange(e.target.value)}
-								className="cursor-pointer rounded-lg border border-stroke-inbox bg-bg-white-0 px-2.5 py-1 font-semibold text-text-strong-950 text-xs shadow-sm outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
+								className="cursor-pointer rounded-md border border-mail-border bg-[#313131] px-2 py-1 text-mail-foreground outline-none"
 							>
-								<option value="es">Spanish (Español)</option>
-								<option value="fr">French (Français)</option>
-								<option value="de">German (Deutsch)</option>
-								<option value="it">Italian (Italiano)</option>
-								<option value="ja">Japanese (日本語)</option>
-								<option value="zh">Chinese (中文)</option>
-								<option value="pt">Portuguese (Português)</option>
-								<option value="ru">Russian (Русский)</option>
-								<option value="ar">Arabic (العربية)</option>
-								<option value="hi">Hindi (हिन्दी)</option>
+								<option value="es">Spanish</option>
+								<option value="fr">French</option>
+								<option value="de">German</option>
+								<option value="it">Italian</option>
+								<option value="ja">Japanese</option>
+								<option value="zh">Chinese</option>
+								<option value="pt">Portuguese</option>
+								<option value="ru">Russian</option>
+								<option value="ar">Arabic</option>
+								<option value="hi">Hindi</option>
 							</select>
 						</div>
 						<button
 							type="button"
 							onClick={() => setIsTranslated(false)}
-							className="font-semibold text-primary-base text-xs hover:underline"
+							className="font-medium text-mail-foreground hover:underline"
 						>
 							Show original
 						</button>
 					</div>
 				)}
 
-				{/* Message list cards container */}
-				<div className="flex flex-col gap-2 px-4 pt-2 pb-4">
-					{displayMessages.map((msg, index) => (
-						<ThreadMessageItem
-							key={msg.id}
-							msg={msg}
-							index={index}
-							mailbox={mailbox}
-							thread={thread}
-							isTranslated={isTranslated}
-							targetLanguage={targetLanguage}
-							translatedHtmlMap={translatedHtmlMap}
-							translatedTextMap={translatedTextMap}
-							parsedExpanded={parsedExpanded}
-							onToggleParsed={() => setParsedExpanded((v) => !v)}
-							onReply={() => {
-								setShowForwardComposer(false);
-								setReplyBody("");
-								setShowReplyComposer(true);
-							}}
-							onForward={() => handleForward()}
-							onDelete={handleDelete}
-							onToggleRead={handleToggleRead}
-							onMarkSpam={handleMarkSpam}
-							onTranslate={handleTranslate}
-							onPrint={handlePrint}
-							onDownload={handleDownload}
-							onShowOriginal={() => setRawHeadersExpanded(true)}
-							onPrototypeAction={handlePrototypeAction}
-							isExpanded={!!expandedIds[msg.id]}
-							onToggleExpand={() =>
-								setExpandedIds((prev) => ({ ...prev, [msg.id]: !prev[msg.id] }))
-							}
-							onApproveSend={() =>
-								handleSendReply(msg.parsed?.suggestedReply || "")
-							}
-							onEditReply={() => {
-								setReplyBody(msg.parsed?.suggestedReply || "");
-								setShowForwardComposer(false);
-								setShowReplyComposer(true);
-							}}
-						/>
-					))}
-				</div>
+				{displayMessages.map((msg, index) => (
+					<ZeroMailDisplay
+						key={msg.id}
+						msg={msg}
+						mailbox={mailbox}
+						threadSubject={thread.subject}
+						index={index}
+						totalCount={displayMessages.length}
+						isTranslated={isTranslated}
+						targetLanguage={targetLanguage}
+						translatedHtmlMap={translatedHtmlMap}
+						translatedTextMap={translatedTextMap}
+						parsedExpanded={parsedExpanded}
+						onToggleParsed={() => setParsedExpanded((v) => !v)}
+						onReply={() => {
+							setShowForwardComposer(false);
+							setReplyBody("");
+							setShowReplyComposer(true);
+						}}
+						onForward={() => handleForward()}
+						onDelete={handleDelete}
+						onPrint={handlePrint}
+						onApproveSend={() =>
+							handleSendReply(msg.parsed?.suggestedReply || "")
+						}
+						onEditReply={() => {
+							setReplyBody(msg.parsed?.suggestedReply || "");
+							setShowForwardComposer(false);
+							setShowReplyComposer(true);
+						}}
+					/>
+				))}
 			</div>
 
 			{/* Reply / forward composer / action buttons — pinned outside scroll area */}
@@ -672,31 +659,11 @@ export const ThreadDetail = ({
 			) : (
 				// Show bottom composer bar only when there's no pending approval draft (actions are inline on the card)
 				thread.status !== "needs_approval" && (
-					<div className="flex shrink-0 border-stroke-inbox border-t bg-[#FAF8F4] px-6 py-4 dark:border-stroke-soft-100/30 dark:bg-neutral-900">
-						<div className="flex items-center gap-3">
-							{/* Reply */}
-							<button
-								type="button"
-								onClick={() => {
-									setShowForwardComposer(false);
-									setShowReplyComposer(true);
-								}}
-								className="flex items-center gap-2 rounded-xl border border-stroke-inbox bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
-							>
-								<Icon name="reply" className="h-3.5 w-3.5" />
-								<span>Reply</span>
-							</button>
-							{/* Forward */}
-							<button
-								type="button"
-								onClick={() => handleForward()}
-								className="flex items-center gap-2 rounded-xl border border-stroke-inbox bg-bg-white-0 px-4 py-2.5 font-semibold text-text-sub-600 text-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/30 dark:bg-neutral-800/20"
-							>
-								<Icon name="forward" className="h-3.5 w-3.5" />
-								<span>Forward</span>
-							</button>
-						</div>
-					</div>
+					<ZeroThreadFooter
+						onReply={openReplyComposer}
+						onReplyAll={openReplyComposer}
+						onForward={() => handleForward()}
+					/>
 				)
 			)}
 

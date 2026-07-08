@@ -148,7 +148,7 @@ export const AddAgentAddressModal = ({
 	return (
 		<Modal.Root open={isOpen} onOpenChange={onClose}>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-stroke-soft-100 p-0 sm:max-w-[480px] dark:border-stroke-soft-100/40"
+				className="overflow-hidden rounded-2xl border border-mail-border p-0 sm:max-w-[480px] border-mail-border/40"
 				showClose={false}
 				onEscapeKeyDown={(e) => {
 					if (isSubmitting) e.preventDefault();
@@ -159,21 +159,21 @@ export const AddAgentAddressModal = ({
 			>
 				{hasNoDomains ? (
 					<>
-						<div className="flex flex-col border-stroke-soft-100 border-b dark:border-stroke-soft-100/40">
+						<div className="flex flex-col border-mail-border border-b border-mail-border/40">
 							<div className="flex items-start justify-between px-5 pt-5 pb-4">
 								<div className="flex flex-col gap-1">
 									<div className="flex items-center gap-2.5">
 										<Icon
 											name="mail-single"
-											className="h-4 w-4 text-text-strong-950"
+											className="h-4 w-4 text-mail-foreground"
 										/>
 										<Modal.Title asChild>
-											<h2 className="font-semibold text-label-md text-text-strong-950">
+											<h2 className="font-semibold text-label-md text-mail-foreground">
 												Create Inbox for AI agent
 											</h2>
 										</Modal.Title>
 									</div>
-									<p className="text-paragraph-xs text-text-sub-600">
+									<p className="text-paragraph-xs text-mail-muted">
 										Configure a new email inbox for your AI agents to send and
 										receive emails.
 									</p>
@@ -181,7 +181,7 @@ export const AddAgentAddressModal = ({
 								<button
 									type="button"
 									onClick={onClose}
-									className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50"
+									className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-panel-light  text-mail-muted transition-colors hover:bg-offset-light"
 								>
 									<Icon name="cross" className="h-3.5 w-3.5" />
 								</button>
@@ -189,11 +189,11 @@ export const AddAgentAddressModal = ({
 						</div>
 
 						<Modal.Body className="flex flex-col items-center px-5 pt-8 pb-20 text-center">
-							<Icon name="globe" className="h-5 w-5 text-text-sub-600" />
-							<h3 className="mt-4 mb-1.5 font-semibold text-base text-text-strong-950">
+							<Icon name="globe" className="h-5 w-5 text-mail-muted" />
+							<h3 className="mt-4 mb-1.5 font-semibold text-base text-mail-foreground">
 								Connect a domain
 							</h3>
-							<p className="mx-auto mb-6 max-w-[300px] text-balance font-medium text-[12px] text-text-sub-600">
+							<p className="mx-auto mb-6 max-w-[300px] text-balance font-medium text-[12px] text-mail-muted">
 								Set up a domain to create email addresses for your AI agents.
 							</p>
 							<div className="flex items-center gap-2">
@@ -214,21 +214,21 @@ export const AddAgentAddressModal = ({
 					</>
 				) : (
 					<form onSubmit={form.handleSubmit(onSubmit)}>
-						<div className="flex flex-col border-stroke-soft-100 border-b dark:border-stroke-soft-100/40">
+						<div className="flex flex-col border-mail-border border-b border-mail-border/40">
 							<div className="flex items-start justify-between px-5 pt-5 pb-4">
 								<div className="flex flex-col gap-1">
 									<div className="flex items-center gap-2.5">
 										<Icon
 											name="mail-single"
-											className="h-4 w-4 text-text-strong-950"
+											className="h-4 w-4 text-mail-foreground"
 										/>
 										<Modal.Title asChild>
-											<h2 className="font-semibold text-label-md text-text-strong-950">
+											<h2 className="font-semibold text-label-md text-mail-foreground">
 												Create Inbox for AI agent
 											</h2>
 										</Modal.Title>
 									</div>
-									<p className="text-paragraph-xs text-text-sub-600">
+									<p className="text-paragraph-xs text-mail-muted">
 										Configure a new email inbox for your AI agents to send and
 										receive emails.
 									</p>
@@ -236,7 +236,7 @@ export const AddAgentAddressModal = ({
 								<button
 									type="button"
 									onClick={onClose}
-									className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50"
+									className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-panel-light  text-mail-muted transition-colors hover:bg-offset-light"
 								>
 									<Icon name="cross" className="h-3.5 w-3.5" />
 								</button>
@@ -247,7 +247,7 @@ export const AddAgentAddressModal = ({
 							<div className="flex flex-col gap-1.5">
 								<label
 									htmlFor="agent-label"
-									className="font-medium text-label-sm text-text-strong-950"
+									className="font-medium text-label-sm text-mail-foreground"
 								>
 									Agent name
 									<span className="ml-0.5 text-error-base">*</span>
@@ -276,7 +276,7 @@ export const AddAgentAddressModal = ({
 							<div className="flex flex-col gap-1.5">
 								<label
 									htmlFor="agent-email"
-									className="font-medium text-label-sm text-text-strong-950"
+									className="font-medium text-label-sm text-mail-foreground"
 								>
 									Email address
 									<span className="ml-0.5 text-error-base">*</span>
@@ -303,21 +303,21 @@ export const AddAgentAddressModal = ({
 												<button
 													type="button"
 													disabled={isSubmitting}
-													className="group/trigger flex h-5 min-h-5 w-auto items-center gap-0 rounded-none bg-transparent p-0 font-medium text-text-sub-600 shadow-none outline-none ring-0 hover:bg-transparent hover:text-text-strong-950 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:text-text-strong-950"
+													className="group/trigger flex h-5 min-h-5 w-auto items-center gap-0 rounded-none bg-transparent p-0 font-medium text-mail-muted shadow-none outline-none ring-0 hover:bg-transparent hover:text-mail-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:text-mail-foreground"
 												>
 													<Icon
 														name="at-sign"
-														className="mr-1.5 h-4 w-4 shrink-0 text-text-soft-400 transition duration-200 ease-out group-hover/trigger:text-text-sub-600 group-data-[state=open]/trigger:text-text-sub-600"
+														className="mr-1.5 h-4 w-4 shrink-0 text-mail-muted transition duration-200 ease-out group-hover/trigger:text-mail-muted group-data-[state=open]/trigger:text-mail-muted"
 													/>
-													<span className="font-medium text-text-strong-950">
+													<span className="font-medium text-mail-foreground">
 														{form.watch("domain") || "domain"}
 													</span>
 													<Icon
 														name="chevron-down"
 														className={cn(
-															"ml-0.5 size-5 shrink-0 text-text-sub-600 transition duration-200 ease-out group-hover/trigger:text-text-strong-950 group-data-[state=open]/trigger:rotate-180 group-data-[state=open]/trigger:text-text-strong-950",
+															"ml-0.5 size-5 shrink-0 text-mail-muted transition duration-200 ease-out group-hover/trigger:text-mail-foreground group-data-[state=open]/trigger:rotate-180 group-data-[state=open]/trigger:text-mail-foreground",
 															isDropdownOpen &&
-																"rotate-180 text-text-strong-950",
+																"rotate-180 text-mail-foreground",
 														)}
 													/>
 												</button>
@@ -342,7 +342,7 @@ export const AddAgentAddressModal = ({
 																}}
 																className={cn(
 																	"flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-colors",
-																	"text-text-strong-950",
+																	"text-mail-foreground",
 																	isSelected && "bg-neutral-alpha-10",
 																	!currentRect &&
 																		hoverIdx === idx &&
@@ -353,7 +353,7 @@ export const AddAgentAddressModal = ({
 																{isSelected && (
 																	<Icon
 																		name="check"
-																		className="h-3.5 w-3.5 text-text-strong-950"
+																		className="h-3.5 w-3.5 text-mail-foreground"
 																	/>
 																)}
 															</button>
@@ -377,12 +377,12 @@ export const AddAgentAddressModal = ({
 								)}
 							</div>
 
-							<p className="rounded-lg bg-bg-weak-50 px-3 py-2 font-medium text-[12px] text-text-sub-600 dark:bg-white/5">
+							<p className="rounded-lg bg-offset-light px-3 py-2 font-medium text-[12px] text-mail-muted /5">
 								<Icon name="globe" className="mr-1 inline h-3.5 w-3.5" />
 								Domain must have receiving enabled. Manage domains from{" "}
 								<a
 									href="/domain"
-									className="text-primary-base hover:underline"
+									className="text-mail-foreground hover:underline"
 									onClick={onClose}
 								>
 									Domain settings
@@ -391,7 +391,7 @@ export const AddAgentAddressModal = ({
 							</p>
 						</Modal.Body>
 
-						<div className="flex items-center justify-end border-stroke-soft-100 border-t px-5 py-3.5 dark:border-stroke-soft-100/50">
+						<div className="flex items-center justify-end border-mail-border border-t px-5 py-3.5 border-mail-border/50">
 							<div className="flex items-center gap-2">
 								<Button.Root
 									type="button"
@@ -402,7 +402,7 @@ export const AddAgentAddressModal = ({
 									disabled={isSubmitting}
 								>
 									Cancel
-									<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
+									<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-mail-border bg-offset-light/50 p-px font-medium text-[10px]">
 										Esc
 									</span>
 								</Button.Root>
@@ -423,11 +423,11 @@ export const AddAgentAddressModal = ({
 											<span className="inline-flex items-center gap-0.5">
 												<Icon
 													name="command"
-													className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+													className="h-4 w-4 rounded-sm border border-mail-border/20 p-px"
 												/>
 												<Icon
 													name="enter"
-													className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+													className="h-4 w-4 rounded-sm border border-mail-border/20 p-px"
 												/>
 											</span>
 										</>

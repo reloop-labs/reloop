@@ -20,13 +20,15 @@ export default function MailboxLayout({
 
 	// Determine current folder from URL path
 	const folder = useMemo(() => {
-		if (!pathname) return "inbox";
-		const parts = pathname.split("/");
-		const lastPart = parts[parts.length - 1];
-		if (lastPart === mailboxId) {
-			return "inbox";
+		if (!pathname || !mailboxId) return "inbox";
+		const base = `/inbox/${mailboxId}`;
+		if (pathname === base) return "inbox";
+		const suffix = pathname.slice(base.length + 1);
+		if (suffix.startsWith("label/")) {
+			const labelId = suffix.split("/")[1];
+			return labelId ? `label:${labelId}` : "inbox";
 		}
-		return lastPart || "inbox";
+		return suffix.split("/")[0] || "inbox";
 	}, [pathname, mailboxId]);
 
 	if (isLoadingMailboxes) {

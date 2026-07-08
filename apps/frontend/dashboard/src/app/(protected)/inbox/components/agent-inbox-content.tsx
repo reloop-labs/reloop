@@ -1,192 +1,241 @@
 "use client";
 
 import { useAgentInbox } from "@fe/dashboard/app/(protected)/inbox/components/agent-inbox-provider";
+import {
+	applyInboxFilters,
+	InboxCommandPalette,
+	InboxSearchTrigger,
+	useInboxActiveFilterCount,
+} from "@fe/dashboard/app/(protected)/inbox/components/inbox-command-palette";
+import { InboxEmptyState } from "@fe/dashboard/app/(protected)/inbox/components/inbox-empty-state";
+import { useInboxSidebar } from "@fe/dashboard/app/(protected)/inbox/components/inbox-sidebar-context";
+import { InboxSidebarToggle } from "@fe/dashboard/app/(protected)/inbox/components/inbox-sidebar-toggle";
 import { ThreadDetail } from "@fe/dashboard/app/(protected)/inbox/components/thread-detail";
-import { ThreadList } from "@fe/dashboard/app/(protected)/inbox/components/thread-list";
+import {
+	ThreadList,
+	useInboxNavigation,
+} from "@fe/dashboard/app/(protected)/inbox/components/thread-list";
+import {
+	ResizablePanel,
+	ResizablePanelGroup,
+} from "@fe/dashboard/app/(protected)/inbox/components/ui/resizable";
+import { useInboxMail } from "@fe/dashboard/app/(protected)/inbox/components/use-inbox-mail";
+import {
+	findThreadByListId,
+	groupThreadsByConversation,
+} from "@fe/dashboard/app/(protected)/inbox/utils/group-threads";
 import type {
 	AgentMailbox,
 	InboundThread,
 } from "@fe/dashboard/app/(protected)/inbox/types";
-import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
+import { cn } from "@reloop/ui/cn";
+import { RefreshCcw, X } from "lucide-react";
+import { useMediaQuery } from "usehooks-ts";
 import { parseAsString, useQueryState } from "nuqs";
-import { useMemo } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 export const AgentInboxContent = ({
 	mailbox,
-	folder,
 	threads,
 }: {
 	mailbox: AgentMailbox;
 	folder: string;
 	threads: InboundThread[];
 }) => {
-	const { markMessageRead, markMessageSpam, deleteMessage } = useAgentInbox();
+	const { markMessageRead, refresh } = useAgentInbox();
+	const { toggleSidebar, openCompose } = useInboxSidebar();
+	const [mail, setMail] = useInboxMail();
+	const isDesktop = useMediaQuery("(min-width: 1024px)");
+	const listContainerRef = useRef<HTMLDivElement>(null);
+	const [paletteOpen, setPaletteOpen] = useState(false);
+	const [isRefreshing, setIsRefreshing] = useState(false);
+	const activeFilterCount = useInboxActiveFilterCount();
 
 	const [searchQuery, setSearchQuery] = useQueryState(
 		"q",
 		parseAsString.withDefault(""),
 	);
+	const [filterParam, setFilterParam] = useQueryState(
+		"filter",
+		parseAsString.withDefault(""),
+	);
 	const [selectedThreadId, setSelectedThreadId] = useQueryState(
-		"thread",
+		"threadId",
 		parseAsString.withDefault(""),
 	);
 
-	const filteredThreads = useMemo(() => {
-		let result = threads;
-		if (searchQuery.trim()) {
-			const q = searchQuery.toLowerCase();
-			result = result.filter(
-				(t) =>
-					t.subject.toLowerCase().includes(q) ||
-					t.preview.toLowerCase().includes(q) ||
-					t.from.email.toLowerCase().includes(q) ||
-					t.from.name?.toLowerCase().includes(q),
-			);
-		}
-		return result;
-	}, [threads, searchQuery]);
-
-	const selectedThread = useMemo(
-		() =>
-			filteredThreads.find((t) => t.id === selectedThreadId) ??
-			threads.find((t) => t.id === selectedThreadId) ??
-			null,
-		[filteredThreads, threads, selectedThreadId],
+	const groupedThreads = useMemo(
+		() => groupThreadsByConversation(threads),
+		[threads],
 	);
 
-	const threadsForNavigation = useMemo(() => {
-		return filteredThreads.length > 0 ? filteredThreads : threads;
-	}, [filteredThreads, threads]);
+	const filteredThreads = useMemo(() => {
+		return applyInboxFilters(groupedThreads, searchQuery, filterParam);
+	}, [groupedThreads, searchQuery, filterParam]);
 
-	const handleNavigateAfterAction = (currentId: string) => {
-		const idx = threadsForNavigation.findIndex((t) => t.id === currentId);
-		if (idx !== -1 && threadsForNavigation.length > 1) {
-			if (idx < threadsForNavigation.length - 1) {
-				setSelectedThreadId(threadsForNavigation[idx + 1]?.id ?? "");
-			} else {
-				setSelectedThreadId(threadsForNavigation[idx - 1]?.id ?? "");
+	const selectedThread = useMemo(() => {
+		if (!selectedThreadId) return null;
+		return (
+			findThreadByListId(filteredThreads, selectedThreadId) ??
+			findThreadByListId(groupedThreads, selectedThreadId) ??
+			findThreadByListId(threads, selectedThreadId) ??
+			null
+		);
+	}, [filteredThreads, groupedThreads, threads, selectedThreadId]);
+
+	const handleSelectThread = useCallback(
+		(id: string | null) => {
+			setSelectedThreadId(id || null);
+			if (!id) return;
+			const thread = findThreadByListId(filteredThreads, id);
+			if (thread?.unread && thread.messageId) {
+				markMessageRead(thread.messageId, true).catch(() => {});
 			}
-		} else {
-			setSelectedThreadId("");
+		},
+		[setSelectedThreadId, filteredThreads, markMessageRead],
+	);
+
+	const handleCloseThread = useCallback(() => {
+		setSelectedThreadId(null);
+	}, [setSelectedThreadId]);
+
+	const { focusedIndex, handleMouseEnter, resetNavigation } =
+		useInboxNavigation({
+			items: filteredThreads,
+			containerRef: listContainerRef,
+			onNavigate: handleSelectThread,
+			onMarkRead: (id) => {
+				const thread = findThreadByListId(filteredThreads, id);
+				if (thread?.messageId) {
+					markMessageRead(thread.messageId, true).catch(() => {});
+				}
+			},
+			isCommandPaletteOpen: paletteOpen,
+		});
+
+	const handleRefresh = useCallback(async () => {
+		setIsRefreshing(true);
+		try {
+			await refresh();
+		} finally {
+			setIsRefreshing(false);
 		}
-	};
+	}, [refresh]);
 
-	const handleSelectThread = (id: string) => {
-		setSelectedThreadId(id || null);
-	};
+	const handleExitBulkSelection = useCallback(() => {
+		setMail((prev) => ({ ...prev, bulkSelected: [] }));
+	}, [setMail]);
 
-	const emptyMessage =
-		threads.length === 0
-			? "No inbound messages yet. Set up a webhook to receive email."
-			: folder === "spam"
-				? "No spam messages"
-				: "No messages in this folder";
-
-	const needsApprovalCount = useMemo(
-		() =>
-			threads.filter(
-				(t) => t.direction === "inbound" && t.status === "needs_approval",
-			).length,
-		[threads],
+	const detailPane = selectedThread ? (
+		<ThreadDetail
+			thread={selectedThread}
+			mailbox={mailbox}
+			onBack={!isDesktop ? handleCloseThread : undefined}
+			showBack={!isDesktop}
+		/>
+	) : (
+		<InboxEmptyState onCompose={openCompose} />
 	);
 
 	return (
 		<>
-			{/* Middle Column: Thread List Pane */}
-			<section className="flex min-h-0 w-[360px] shrink-0 flex-col border-stroke-inbox border-r bg-[#FAF8F4] dark:border-stroke-soft-100/40 dark:bg-neutral-950">
-				{/* Search & Meta */}
-				<div className="flex flex-col gap-3 border-stroke-inbox/50 border-b p-4 dark:border-stroke-soft-100/10">
-					<div className="flex flex-col gap-1">
-						<h2 className="font-semibold text-base text-text-strong-950 dark:text-white">
-							{folder === "needs_approval"
-								? "Needs your okay"
-								: folder === "agent"
-									? "Handled by agent"
-									: folder === "you"
-										? "Sent by you"
-										: folder.charAt(0).toUpperCase() +
-											folder.slice(1).replace("_", " ")}
-						</h2>
-						<p className="font-medium text-[11px] text-text-soft-400">
-							{filteredThreads.length}{" "}
-							{filteredThreads.length === 1 ? "message" : "messages"}
-							{needsApprovalCount > 0 &&
-								` · ${needsApprovalCount} waiting on you`}
-						</p>
-					</div>
-
-					<Input.Root
-						size="xsmall"
-						className="rounded-xl shadow-none before:ring-stroke-inbox"
+			<InboxCommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+			<div className="relative flex min-h-0 min-w-0 flex-1 rounded-inherit p-0 lg:h-[calc(100dvh-8px)]">
+				<ResizablePanelGroup
+					direction="horizontal"
+					autoSaveId="agent-inbox-panel-layout"
+					className="h-full min-h-0 flex-1 overflow-hidden rounded-inherit"
+				>
+					<ResizablePanel
+						defaultSize={35}
+						minSize={35}
+						maxSize={35}
+						className={cn(
+							"mb-1 flex min-h-0 flex-1 flex-col bg-panel-dark shadow-sm md:mr-[3px] md:rounded-2xl lg:h-[calc(100dvh-8px)]",
+							!isDesktop && selectedThreadId && "hidden",
+						)}
 					>
-						<Input.Wrapper>
-							<Input.Icon
-								as={Icon}
-								name="search"
-								size="xsmall"
-								className="text-text-soft-400"
-							/>
-							<Input.Input
-								placeholder="Search mail"
-								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
-								className="text-xs"
-							/>
-							{searchQuery && (
-								<button
-									type="button"
-									onClick={() => setSearchQuery("")}
-									className="mr-1 rounded p-0.5 text-text-soft-400 transition-colors hover:bg-neutral-alpha-10 hover:text-text-strong-950"
-								>
-									<Icon name="cross" className="h-3 w-3" />
-								</button>
-							)}
-						</Input.Wrapper>
-					</Input.Root>
-				</div>
+						<div className="flex min-h-0 flex-1 flex-col">
+							<div className="sticky top-0 z-15 shrink-0 p-4 pb-0">
+								<div className="flex items-center gap-2">
+									<InboxSidebarToggle onClick={toggleSidebar} />
 
-				{/* List scroll */}
-				<div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
-					<ThreadList
-						threads={filteredThreads}
-						selectedId={selectedThreadId}
-						onSelect={handleSelectThread}
-						emptyMessage={emptyMessage}
-						hasFilters={searchQuery !== ""}
-						onClearFilters={() => {
-							setSearchQuery("");
-						}}
-					/>
-				</div>
-			</section>
+									{mail.bulkSelected.length === 0 ? (
+										<InboxSearchTrigger
+											onOpenPalette={() => setPaletteOpen(true)}
+											activeFilterCount={activeFilterCount}
+										/>
+									) : (
+										<div className="flex flex-1 items-center justify-between">
+											<div className="font-medium text-mail-foreground text-sm">
+												{mail.bulkSelected.length} selected
+											</div>
+											<button
+												type="button"
+												onClick={handleExitBulkSelection}
+												className="inline-flex h-8 items-center gap-2 rounded-lg bg-mail-accent px-2 text-xs"
+											>
+												<X className="h-3 w-3" />
+												<span>ESC</span>
+											</button>
+										</div>
+									)}
 
-			{/* Right Column: Reading Pane */}
-			<main className="flex min-w-0 flex-1 flex-col bg-[#FAF8F4] dark:bg-neutral-950">
-				{selectedThread ? (
-					<div className="flex min-h-0 flex-1 flex-col">
-						<div className="min-h-0 flex-1">
-							<ThreadDetail thread={selectedThread} mailbox={mailbox} />
+									<button
+										type="button"
+										onClick={handleRefresh}
+										disabled={isRefreshing}
+										className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-[#202020] disabled:opacity-50"
+										aria-label="Refresh"
+									>
+										<RefreshCcw
+											className={cn(
+												"h-4 w-4 text-mail-muted",
+												isRefreshing && "animate-spin",
+											)}
+										/>
+									</button>
+								</div>
+							</div>
+
+							<div
+								ref={listContainerRef}
+								className="relative z-1 flex min-h-0 flex-1 flex-col overflow-hidden"
+							>
+								<ThreadList
+									threads={filteredThreads}
+									selectedId={selectedThreadId}
+									onSelect={handleSelectThread}
+									hasFilters={searchQuery !== "" || activeFilterCount > 0}
+									onClearFilters={() => {
+										setSearchQuery(null);
+										setFilterParam(null);
+										resetNavigation();
+									}}
+									focusedIndex={focusedIndex}
+									onMouseEnterRow={handleMouseEnter}
+								/>
+							</div>
 						</div>
-					</div>
-				) : (
-					<div className="flex min-h-0 flex-1 flex-col items-center justify-center bg-[#FAF8F4]/20 p-8 text-center dark:bg-transparent">
-						<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-stroke-inbox bg-bg-white-0 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-							<Icon
-								name="inbox"
-								className="h-5 w-5 text-text-sub-600 dark:text-neutral-400"
-							/>
-						</div>
-						<h3 className="font-semibold text-base text-text-strong-950 dark:text-white">
-							Select a thread to read
-						</h3>
-						<p className="mx-auto mt-1 max-w-sm text-text-sub-600 text-xs dark:text-neutral-400">
-							Choose a conversation from the list to review detailed events, raw
-							parsed data, and approval actions.
-						</p>
+					</ResizablePanel>
+
+					{isDesktop && (
+						<ResizablePanel
+							defaultSize={65}
+							minSize={30}
+							className="mb-1 mr-0.5 flex min-h-0 flex-col rounded-2xl bg-panel-dark shadow-sm lg:h-[calc(100dvh-8px)]"
+						>
+							{detailPane}
+						</ResizablePanel>
+					)}
+				</ResizablePanelGroup>
+
+				{!isDesktop && selectedThreadId && (
+					<div className="fixed inset-0 z-50 flex flex-col bg-panel-dark">
+						{detailPane}
 					</div>
 				)}
-			</main>
+			</div>
 		</>
 	);
 };

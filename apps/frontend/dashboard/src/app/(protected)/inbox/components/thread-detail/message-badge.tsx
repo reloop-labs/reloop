@@ -26,7 +26,7 @@ export const MessageBadge = ({ variant }: MessageBadgeProps) => {
 
 	if (variant === "you") {
 		return (
-			<span className="inline-flex items-center gap-1 rounded-[4px] bg-[var(--color-primary-base)]/10 px-1.5 py-[3px] font-medium text-[10px] text-[var(--color-primary-base)] normal-case tracking-normal dark:text-[var(--color-primary-base)]">
+			<span className="inline-flex items-center gap-1 rounded-[4px] bg-mail-accent px-1.5 py-[3px] font-medium text-[10px] text-mail-muted normal-case tracking-normal">
 				<Icon name="user" className="h-2.5 w-2.5 shrink-0" />
 				via you
 			</span>

@@ -1,78 +1,17 @@
 "use client";
 
-import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
+import * as Checkbox from "@reloop/ui/checkbox";
+import { InboxListEmptyState } from "./inbox-empty-state";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { VList, type VListHandle } from "virtua";
 import type { InboundThread } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
+import { InboxThreadRow } from "./inbox-thread-row";
+import { useInboxMail } from "./use-inbox-mail";
+import { useInboxNavigation } from "./use-inbox-navigation";
 
-dayjs.extend(relativeTime);
-
-// Derive the left gutter color and actor pill from thread status
-const getActorInfo = (
-	thread: InboundThread,
-): {
-	gutterColor: string;
-	tag: string | null;
-	tagStyle: string;
-	tagIcon: string;
-} => {
-	if (thread.direction === "outbound") {
-		return {
-			gutterColor: "bg-[var(--color-primary-base)]",
-			tag: "via you",
-			tagIcon: "user",
-			tagStyle:
-				"bg-[var(--color-primary-base)]/10 text-[var(--color-primary-base)] dark:text-[var(--color-primary-base)]",
-		};
-	}
-	switch (thread.status) {
-		case "needs_approval":
-			return {
-				gutterColor: "bg-[#C47839]",
-				tag: "needs you",
-				tagIcon: "alert-triangle",
-				tagStyle: "bg-[#C47839]/10 text-[#C47839] dark:text-[#C47839]",
-			};
-		case "handled":
-		case "parsing":
-			// Agent has actively handled or is processing this thread
-			return {
-				gutterColor: "bg-[#3B629B]",
-				tag: "via agent",
-				tagIcon: "robot",
-				tagStyle: "bg-[#3B629B]/10 text-[#3B629B] dark:text-[#3B629B]",
-			};
-		case "new":
-		default:
-			// Freshly received — agent hasn't acted yet, show no actor badge
-			return {
-				gutterColor: "bg-[#3B629B]",
-				tag: null,
-				tagIcon: "",
-				tagStyle: "",
-			};
-	}
-};
-
-const formatReceivedAt = (dateStr: string, isFirstToday: boolean) => {
-	const date = dayjs(dateStr);
-	const now = dayjs();
-	if (date.isSame(now, "day")) {
-		return isFirstToday
-			? `Today, ${date.format("h:mm A")}`
-			: date.format("h:mm A");
-	}
-	if (date.isSame(now.subtract(1, "day"), "day")) {
-		return "Yesterday";
-	}
-	if (date.isAfter(now.subtract(7, "day"))) {
-		return date.format("ddd");
-	}
-	return date.format("MMM D");
-};
+const PAGE_SIZE = 30;
 
 interface ThreadListProps {
 	threads: InboundThread[];
@@ -81,6 +20,8 @@ interface ThreadListProps {
 	emptyMessage?: string;
 	hasFilters?: boolean;
 	onClearFilters?: () => void;
+	focusedIndex?: number | null;
+	onMouseEnterRow?: (id: string) => void;
 }
 
 export const ThreadList = ({
@@ -90,83 +31,144 @@ export const ThreadList = ({
 	emptyMessage = "No messages in this filter",
 	hasFilters = false,
 	onClearFilters,
+	focusedIndex = null,
+	onMouseEnterRow,
 }: ThreadListProps) => {
-	const { markMessageRead, deleteMessage, markMessageSpam } = useAgentInbox();
+	const {
+		deleteMessage,
+		toggleMessageStar,
+		archiveThread,
+	} = useAgentInbox();
+	const [mail, setMail] = useInboxMail();
+	const vListRef = useRef<VListHandle>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-	const handleToggleRead = async (id: string, currentlyUnread: boolean) => {
+	const visibleThreads = useMemo(
+		() => threads.slice(0, visibleCount),
+		[threads, visibleCount],
+	);
+
+	const handleToggleBulk = useCallback(
+		(id: string) => {
+			setMail((prev) => {
+				const isSelected = prev.bulkSelected.includes(id);
+				return {
+					...prev,
+					bulkSelected: isSelected
+						? prev.bulkSelected.filter((x) => x !== id)
+						: [...prev.bulkSelected, id],
+				};
+			});
+		},
+		[setMail],
+	);
+
+	const handleToggleStar = async (id: string, starred: boolean) => {
 		try {
-			await markMessageRead(id, currentlyUnread);
-			toast.success(currentlyUnread ? "Marked as Handled" : "Marked as Active");
-		} catch (err: any) {
-			toast.error(err.message || "Failed to update status");
+			await toggleMessageStar(id, starred);
+		} catch (err: unknown) {
+			toast.error(err instanceof Error ? err.message : "Failed to update star");
 		}
 	};
 
-	const handleMarkSpam = async (id: string) => {
+	const handleArchive = async (listId: string) => {
+		const thread = threads.find((t) => t.id === listId);
+		const archiveId = thread?.threadId || listId;
 		try {
-			await markMessageSpam(id, true);
-			toast.success("Marked as Spam");
-		} catch (err: any) {
-			toast.error(err.message || "Failed to mark as spam");
+			await archiveThread(archiveId);
+			toast.success("Archived");
+		} catch (err: unknown) {
+			toast.error(err instanceof Error ? err.message : "Failed to archive");
 		}
 	};
 
 	const handleDelete = async (id: string) => {
-		if (confirm("Are you sure you want to delete this message?")) {
-			try {
-				await deleteMessage(id);
-				toast.success("Message deleted");
-			} catch (err: any) {
-				toast.error(err.message || "Failed to delete message");
-			}
+		if (!confirm("Are you sure you want to delete this message?")) return;
+		try {
+			await deleteMessage(id);
+			toast.success("Message deleted");
+		} catch (err: unknown) {
+			toast.error(err instanceof Error ? err.message : "Failed to delete");
 		}
 	};
 
+	const handleSelectAll = () => {
+		if (mail.bulkSelected.length === visibleThreads.length) {
+			setMail((prev) => ({ ...prev, bulkSelected: [] }));
+		} else {
+			setMail((prev) => ({
+				...prev,
+				bulkSelected: visibleThreads.map((t) => t.id),
+			}));
+		}
+	};
+
+	const handleLoadMore = useCallback(() => {
+		if (visibleCount < threads.length) {
+			setVisibleCount((c) => Math.min(c + PAGE_SIZE, threads.length));
+		}
+	}, [visibleCount, threads.length]);
+
+	let foundFirstToday = false;
+
 	if (threads.length === 0) {
 		return (
-			<div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
-				<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
-					<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-inbox bg-bg-white-0 dark:border-stroke-soft-100/50">
-						<Icon
-							name={hasFilters ? "search" : "inbox"}
-							className="h-5 w-5 text-text-sub-600"
-						/>
-					</div>
-					<h3 className="mb-2 font-semibold text-base text-text-strong-950 dark:text-white">
-						{hasFilters ? "No results found" : "No messages yet"}
-					</h3>
-					<p className="mx-auto mb-5 max-w-sm text-balance text-text-sub-600 text-xs dark:text-neutral-400">
-						{emptyMessage}
-					</p>
-					{hasFilters && onClearFilters && (
-						<button
-							type="button"
-							onClick={onClearFilters}
-							className="inline-flex items-center gap-1.5 rounded-lg border border-stroke-inbox bg-white px-3 py-1.5 font-semibold text-text-sub-600 text-xs shadow-sm transition-all hover:bg-bg-weak-50 dark:border-stroke-soft-100/30 dark:bg-neutral-900 dark:text-neutral-300"
-						>
-							<Icon name="minus-circle" className="h-4 w-4" />
-							Clear filters
-						</button>
-					)}
-				</div>
-			</div>
+			<InboxListEmptyState
+				hasFilters={hasFilters}
+				onClearFilters={onClearFilters}
+			/>
 		);
 	}
 
-	// Check if any thread is from today so we can flag the first one for "Today, h:mm AM/PM" formatting
-	let foundFirstToday = false;
-
 	return (
-		<div className="scrollbar-hide flex h-full w-full flex-col overflow-hidden text-paragraph-sm">
-			<div className="scrollbar-hide flex min-h-0 flex-1 flex-col overflow-y-auto">
-				<div className="flex flex-col bg-transparent dark:bg-transparent">
-					{threads.map((thread) => {
-						const isSelected = selectedId === thread.id;
-						const isUnread = thread.unread;
-						const actorInfo = getActorInfo(thread);
+		<div ref={containerRef} className="flex h-full min-h-0 flex-1 flex-col">
+			{mail.bulkSelected.length > 0 ? (
+				<div className="flex items-center justify-between border-mail-border border-b px-4 py-2 border-mail-border">
+					<div className="flex items-center gap-2">
+						<Checkbox.Root
+							checked={mail.bulkSelected.length === visibleThreads.length}
+							onCheckedChange={handleSelectAll}
+						/>
+						<span className="font-medium text-sm text-mail-foreground text-mail-foreground">
+							{mail.bulkSelected.length} selected
+						</span>
+					</div>
+					<button
+						type="button"
+						onClick={() => setMail((prev) => ({ ...prev, bulkSelected: [] }))}
+						className="font-medium text-mail-foreground text-xs hover:underline"
+					>
+						Clear
+					</button>
+				</div>
+			) : null}
 
-						const dateObj = dayjs(thread.receivedAt);
-						const isToday = dateObj.isSame(dayjs(), "day");
+			<div
+				className="relative min-h-0 flex-1 overflow-hidden"
+				id="mail-list-scroll"
+			>
+				<VList
+					ref={vListRef}
+					count={visibleThreads.length}
+					overscan={5}
+					itemSize={100}
+					className="absolute inset-0 overflow-x-hidden scrollbar-hide"
+					onScroll={() => {
+						const handle = vListRef.current;
+						if (!handle) return;
+						const end = handle.findEndIndex();
+						if (end >= visibleThreads.length - 5) {
+							handleLoadMore();
+						}
+					}}
+				>
+					{(index) => {
+						const thread = visibleThreads[index];
+						if (!thread) return <div key={index} />;
+
+						const dateObj = new Date(thread.receivedAt);
+						const isToday = dateObj.toDateString() === new Date().toDateString();
 						let isFirstToday = false;
 						if (isToday && !foundFirstToday) {
 							isFirstToday = true;
@@ -174,118 +176,27 @@ export const ThreadList = ({
 						}
 
 						return (
-							<div
+							<InboxThreadRow
 								key={thread.id}
-								onClick={() => onSelect(thread.id)}
-								className={cn(
-									"group/card relative flex cursor-pointer flex-col gap-1 border-l-[3px] py-3.5 pr-4 pl-7 text-left transition-all duration-200",
-									isSelected
-										? "border-[var(--color-primary-base)] bg-[var(--color-primary-base)]/10 dark:bg-[var(--color-primary-base)]/20"
-										: "border-transparent bg-transparent hover:bg-neutral-50/50 dark:hover:bg-white/[0.01]",
-								)}
-							>
-								{/* Actor status vertical pill - centered, rounded */}
-								<div
-									className={cn(
-										"absolute top-3.5 bottom-3.5 left-[14px] w-[3.5px] rounded-full",
-										actorInfo.gutterColor,
-									)}
-								/>
-
-								{/* Details Block */}
-								<div className="flex min-w-0 flex-1 flex-col gap-0.5">
-									{/* Sender & Time row */}
-									<div className="flex items-center justify-between gap-2">
-										<span className="truncate font-semibold text-sm text-text-strong-950 dark:text-white">
-											{thread.from.name
-												? `${thread.from.name}${thread.direction === "outbound" ? ", You" : ""}`
-												: thread.from.email}
-										</span>
-										<div className="relative flex shrink-0 items-center">
-											{/* Time & Unread dot */}
-											<div className="flex items-center gap-2 transition-opacity duration-150 group-hover/card:pointer-events-none group-hover/card:opacity-0">
-												<span className="font-medium text-text-soft-400 text-xs tabular-nums dark:text-neutral-500">
-													{formatReceivedAt(thread.receivedAt, isFirstToday)}
-												</span>
-											</div>
-
-											{/* Quick actions (visible on hover) */}
-											<div className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-0 flex items-center gap-1 opacity-0 transition-opacity duration-150 group-hover/card:pointer-events-auto group-hover/card:opacity-100">
-												<button
-													type="button"
-													title="Delete Message"
-													onClick={(e) => {
-														e.stopPropagation();
-														handleDelete(thread.id);
-													}}
-													className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-inbox bg-white text-text-soft-400 transition-all hover:bg-bg-weak-50 hover:text-error-base dark:border-stroke-soft-100/30 dark:bg-neutral-900 dark:hover:text-red-400"
-												>
-													<Icon name="trash" className="h-3.5 w-3.5" />
-												</button>
-											</div>
-										</div>
-									</div>
-
-									{/* Subject */}
-									<div className="truncate font-semibold text-text-strong-950 text-xs dark:text-white">
-										{thread.subject}
-									</div>
-
-									{/* Snippet */}
-									<div className="truncate text-text-sub-600 text-xs leading-relaxed dark:text-neutral-400">
-										{thread.preview}
-									</div>
-
-									{/* Actor tag pill */}
-									{actorInfo.tag && (
-										<div className="mt-1 flex items-center gap-1.5">
-											<span
-												className={cn(
-													"inline-flex items-center gap-1 rounded-[4px] px-1.5 py-[3px] font-medium text-[10px] normal-case leading-none tracking-normal",
-													actorInfo.tagStyle,
-												)}
-											>
-												<Icon
-													name={actorInfo.tagIcon as any}
-													className="h-2.5 w-2.5 shrink-0"
-												/>
-												{actorInfo.tag}
-											</span>
-										</div>
-									)}
-
-									{/* Attachments Row */}
-									{thread.attachments && thread.attachments.length > 0 && (
-										<div className="mt-1 flex min-h-[20px] items-center gap-1.5">
-											<div className="flex min-w-0 shrink-0 flex-wrap items-center gap-1.5">
-												{thread.attachments.slice(0, 2).map((att, idx) => (
-													<div
-														key={att.name + idx}
-														className="flex items-center gap-1 rounded border border-stroke-inbox bg-bg-white-0 px-1.5 py-0.5 font-medium text-[9px] text-text-sub-600 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-800 dark:text-neutral-300"
-													>
-														<Icon
-															name="file-text"
-															className="h-3 w-3 shrink-0 text-text-soft-400"
-														/>
-														<span className="max-w-[80px] truncate">
-															{att.name}
-														</span>
-													</div>
-												))}
-												{thread.attachments.length > 2 && (
-													<span className="rounded border border-stroke-inbox bg-bg-white-0 px-1.5 py-0.5 font-medium text-[9px] text-text-soft-400 shadow-sm dark:border-stroke-soft-100/30 dark:bg-neutral-800 dark:text-neutral-400">
-														+{thread.attachments.length - 2}
-													</span>
-												)}
-											</div>
-										</div>
-									)}
-								</div>
-							</div>
+								thread={thread}
+								index={index}
+								isSelected={selectedId === thread.id}
+								isKeyboardFocused={focusedIndex === index}
+								isBulkSelected={mail.bulkSelected.includes(thread.id)}
+								isFirstToday={isFirstToday}
+								onSelect={onSelect}
+								onMouseEnter={onMouseEnterRow ?? (() => {})}
+								onToggleStar={handleToggleStar}
+								onArchive={handleArchive}
+								onDelete={handleDelete}
+								onToggleBulk={handleToggleBulk}
+							/>
 						);
-					})}
-				</div>
+					}}
+				</VList>
 			</div>
 		</div>
 	);
 };
+
+export { useInboxNavigation };

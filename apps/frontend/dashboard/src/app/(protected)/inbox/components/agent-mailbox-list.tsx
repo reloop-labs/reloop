@@ -141,7 +141,7 @@ const AgentMailboxActionsDropdown = ({
 								}
 								className={cn(
 									"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
-									item.isDanger ? "text-error-base" : "text-text-strong-950",
+									item.isDanger ? "text-error-base" : "text-mail-foreground",
 									!currentRect &&
 										hoverIdx === idx &&
 										(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
@@ -153,7 +153,7 @@ const AgentMailboxActionsDropdown = ({
 								{item.id === "toggle" && isToggling ? (
 									<Icon
 										name="loader-2"
-										className="h-3.5 w-3.5 animate-spin text-text-sub-600"
+										className="h-3.5 w-3.5 animate-spin text-mail-muted"
 									/>
 								) : item.id === "delete" && isDeleting ? (
 									<Icon
@@ -165,7 +165,7 @@ const AgentMailboxActionsDropdown = ({
 										name={item.icon}
 										className={cn(
 											"h-3.5 w-3.5",
-											item.isDanger ? "" : "text-text-sub-600",
+											item.isDanger ? "" : "text-mail-muted",
 										)}
 									/>
 								)}
@@ -254,7 +254,7 @@ export const AgentMailboxList = () => {
 				<div
 					className={cn(
 						gridClass,
-						"rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-white/[0.03]",
+						"rounded-t-[14px] border-mail-border border-t border-r border-l bg-offset-light/50 pt-2.5 pb-5 font-medium text-mail-muted dark:border-[#101010] /[0.03]",
 					)}
 				>
 					<div className="flex items-center gap-1">
@@ -273,7 +273,7 @@ export const AgentMailboxList = () => {
 				</div>
 
 				{/* Table Body */}
-				<div className="-mt-2.5 mb-16 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+				<div className="-mt-2.5 mb-16 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-mail-border bg-panel-light  dark:divide-stroke-soft-100/50 border-mail-border/40">
 					{isLoadingMailboxes ? (
 						[1, 2, 3].map((i) => (
 							<div
@@ -284,7 +284,7 @@ export const AgentMailboxList = () => {
 								)}
 							>
 								<div className="flex items-center gap-2">
-									<div className="h-4 w-4 shrink-0 rounded bg-bg-weak-50/50 dark:bg-white/5" />
+									<div className="h-4 w-4 shrink-0 rounded bg-offset-light/50 /5" />
 									<Skeleton className="h-4 w-48 rounded" />
 								</div>
 								<div className="flex items-center gap-2">
@@ -318,8 +318,8 @@ export const AgentMailboxList = () => {
 									className={cn(
 										gridClass,
 										"group/row cursor-pointer py-2 text-left transition-all duration-200",
-										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base",
-										isRowActive && "bg-bg-weak-50/50",
+										"hover:bg-offset-light/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base",
+										isRowActive && "bg-offset-light/50",
 									)}
 								>
 									{/* Agent & Info */}
@@ -340,7 +340,7 @@ export const AgentMailboxList = () => {
 												</div>
 											</Avatar.Image>
 										</Avatar.Root>
-										<span className="truncate font-medium text-label-sm text-text-strong-950">
+										<span className="truncate font-medium text-label-sm text-mail-foreground">
 											{mailbox.email}
 										</span>
 										{stats.spam > 0 && (
@@ -381,7 +381,7 @@ export const AgentMailboxList = () => {
 
 									{/* Actions */}
 									<div
-										className="flex items-center justify-center text-text-soft-400"
+										className="flex items-center justify-center text-mail-muted"
 										onClick={(e) => e.stopPropagation()}
 									>
 										<AgentMailboxActionsDropdown

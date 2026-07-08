@@ -64,7 +64,7 @@ export const MessageHeaderExpanded = ({
 		<div
 			role="button"
 			onClick={onToggleExpand}
-			className="flex cursor-pointer select-none items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-neutral-50/20 dark:hover:bg-neutral-850/10"
+			className="flex cursor-pointer select-none items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-offset-light/20 hover:bg-[#202020]/10"
 		>
 			{/* Left: Avatar + Info */}
 			<div className="flex min-w-0 items-center gap-3">
@@ -84,14 +84,14 @@ export const MessageHeaderExpanded = ({
 				<div className="flex min-w-0 flex-col gap-0.5">
 					{/* Row 1: sender name · badge · email */}
 					<div className="flex flex-wrap items-center gap-1.5">
-						<span className="font-semibold text-sm text-text-strong-950 dark:text-white">
+						<span className="font-semibold text-sm text-mail-foreground text-mail-foreground">
 							{senderName}
 						</span>
 						<MessageBadge
 							variant={getBadgeVariant(isApproval, isOutbound, isAgent)}
 						/>
 						{msg.fromEmail && (
-							<span className="font-mono text-text-sub-600 text-xs">
+							<span className="font-mono text-mail-muted text-xs">
 								{msg.fromEmail}
 							</span>
 						)}
@@ -104,14 +104,14 @@ export const MessageHeaderExpanded = ({
 				className="flex shrink-0 items-center gap-1.5"
 				onClick={(e) => e.stopPropagation()}
 			>
-				<p className="text-text-sub-600 text-xs">
+				<p className="text-mail-muted text-xs">
 					{formatMessageTimestamp(msg.messageAt)}
 				</p>
 
 				<button
 					type="button"
 					onClick={onToggleExpand}
-					className="rounded-lg p-1 text-text-soft-400 hover:bg-neutral-100 hover:text-text-strong-950 dark:hover:bg-zinc-800"
+					className="rounded-lg p-1 text-mail-muted hover:bg-offset-light hover:text-mail-foreground hover:bg-[#202020]"
 				>
 					<Icon name="chevron-up" className="h-4 w-4" />
 				</button>

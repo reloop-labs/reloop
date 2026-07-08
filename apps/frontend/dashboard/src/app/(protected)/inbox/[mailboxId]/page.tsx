@@ -2,6 +2,7 @@
 
 import { AgentInboxContent } from "@fe/dashboard/app/(protected)/inbox/components/agent-inbox-content";
 import { useAgentInbox } from "@fe/dashboard/app/(protected)/inbox/components/agent-inbox-provider";
+import { filterInboxThreads } from "@fe/dashboard/app/(protected)/inbox/utils/inbox-folder-filters";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
 
@@ -12,12 +13,7 @@ export default function AgentInboxMailboxPage() {
 	const mailbox = mailboxId ? getMailbox(mailboxId) : undefined;
 
 	const filteredThreads = useMemo(() => {
-		return threads.filter(
-			(t) =>
-				t.mailboxId === mailboxId &&
-				t.direction === "inbound" &&
-				t.status !== "blocked",
-		);
+		return filterInboxThreads(threads, mailboxId);
 	}, [threads, mailboxId]);
 
 	if (!mailbox) return null;
