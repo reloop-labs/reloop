@@ -1,4 +1,3 @@
-import * as Button from "@reloop/ui/button";
 import { BlogBody } from "@reloop/web/components/landing/blog/blog-body";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
 import { BlogPostCoverImage } from "@reloop/web/components/landing/blog/blog-post-cover-image";
@@ -85,26 +84,10 @@ export function BlogPostPageView({
 					</header>
 
 					<BlogBody className="mt-2">{body}</BlogBody>
-
-					<div className="mt-16">
-						<BlogCta category={post.category} />
-					</div>
-
-					<div className="mt-12 border-stroke-soft-200 border-t pt-8 dark:border-white/10">
-						<Link
-							href="/blog"
-							className={Button.buttonVariants({
-								mode: "stroke",
-								variant: "neutral",
-							}).root({
-								className: "rounded-full",
-							})}
-						>
-							← All posts
-						</Link>
-					</div>
 				</article>
 			</div>
+
+			<BlogCta category={post.category} />
 		</div>
 	);
 }

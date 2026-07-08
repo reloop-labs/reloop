@@ -44,7 +44,7 @@ export function FeatureCta({
 	);
 }
 
-function CtaLink({
+export function CtaLink({
 	label,
 	href,
 	external,
