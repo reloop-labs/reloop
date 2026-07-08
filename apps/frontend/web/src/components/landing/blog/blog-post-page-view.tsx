@@ -43,7 +43,7 @@ export function BlogPostPageView({
 						</Link>
 					</nav>
 
-					<h1 className="mt-8 font-semibold text-3xl text-text-strong-950 leading-[1.15] tracking-[-0.03em] sm:text-[2.75rem] dark:text-white">
+					<h1 className="mt-8 font-serif text-3xl text-text-strong-950 leading-[1.1] tracking-tighter sm:text-[2.75rem] dark:text-white">
 						{post.title}
 					</h1>
 
