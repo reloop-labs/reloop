@@ -118,10 +118,9 @@ export const WelcomeEmail = ({
 						</Text>
 						<Text className={cls.bodyText}>
 							A new era of software is being built — AI agents that run
-							autonomously, indie developers shipping overnight, startups moving
-							from idea to launch in days, and marketing teams that operate at
-							full speed. The builders are getting faster. The tools around
-							email haven't changed much.
+							autonomously, indie developers shipping overnight, and startups
+							moving from idea to launch in days. The builders are getting
+							faster. The tools around email haven't changed much.
 						</Text>
 						<Text className={cls.bodyText}>That's why Reloop exists.</Text>
 
@@ -129,9 +128,9 @@ export const WelcomeEmail = ({
 						<Section className={cls.missionBox}>
 							<Text className={cls.label}>Our Mission</Text>
 							<Text className={cls.missionQuote}>
-								"Open-source email infrastructure built for AI agents,
-								developers and marketing teams — so you can focus on what you're
-								building, and not on email deliverability."
+								"Open-source email infrastructure built for AI agents and
+								developers — so you can focus on what you're building, and not
+								on email deliverability."
 							</Text>
 						</Section>
 
@@ -186,9 +185,7 @@ export const WelcomeEmail = ({
 									</td>
 									<td
 										style={{
-											borderBottom: tdBorder,
 											paddingTop: "24px",
-											paddingBottom: "24px",
 										}}
 									>
 										<Text className={cls.rowTitle}>Developers</Text>
@@ -196,25 +193,6 @@ export const WelcomeEmail = ({
 											Built for developers — clean APIs, great DX, and full
 											control. Self-host or use our cloud. Your stack, your
 											rules.
-										</Text>
-									</td>
-								</tr>
-								<tr>
-									<td
-										style={{
-											verticalAlign: "top",
-											width: "32px",
-											paddingTop: "24px",
-										}}
-									>
-										<Text className={cls.rowNum}>03</Text>
-									</td>
-									<td style={{ paddingTop: "24px" }}>
-										<Text className={cls.rowTitle}>Marketing Team</Text>
-										<Text className={cls.rowDesc}>
-											From idea to campaign in minutes. Generate email templates
-											with AI, collaborate in real time, and broadcast to your
-											entire audience — no friction
 										</Text>
 									</td>
 								</tr>

@@ -12,7 +12,6 @@ import Hero from "./components/hero";
 import OpenSource from "./components/open-source";
 import UseCase from "./components/use-case";
 
-
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
@@ -74,7 +73,7 @@ const homeSchema = [
 				name: "Who can benefit from using Reloop?",
 				acceptedAnswer: {
 					"@type": "Answer" as const,
-					text: "Reloop is ideal for developers building applications that require email functionality, marketing teams managing large-scale email campaigns, and businesses that need reliable email delivery without vendor lock-in.",
+					text: "Reloop is ideal for developers building applications that require email functionality, AI agents, and businesses that need reliable email delivery without vendor lock-in.",
 				},
 			},
 			{

@@ -14,7 +14,12 @@ export function BuildingWebhookDeliverySystemArt(_props: BlogPostArtProps) {
 			<WireNode cx={220} cy={248} />
 			<WireNode cx={380} cy={188} />
 			<WireNode cx={360} cy={216} accent />
-			<polygon points="340,208 352,216 340,224" fill="currentColor" fillOpacity={0.35} className="dark:fill-primary-base dark:opacity-80" />
+			<polygon
+				points="340,208 352,216 340,224"
+				fill="currentColor"
+				fillOpacity={0.35}
+				className="dark:fill-primary-base dark:opacity-80"
+			/>
 		</>
 	);
 }

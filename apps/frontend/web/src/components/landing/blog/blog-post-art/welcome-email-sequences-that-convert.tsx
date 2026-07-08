@@ -11,11 +11,29 @@ export function WelcomeEmailSequencesThatConvertArt(_props: BlogPostArtProps) {
 
 	return (
 		<>
-			<WireLine d="M 168 248 L 248 208 L 328 168 L 408 128" opacity={0.22} accent />
+			<WireLine
+				d="M 168 248 L 248 208 L 328 168 L 408 128"
+				opacity={0.22}
+				accent
+			/>
 			{nodes.map((node, index) => (
-				<WireNode key={node.x} cx={node.x} cy={node.y} accent={index === nodes.length - 1} />
+				<WireNode
+					key={node.x}
+					cx={node.x}
+					cy={node.y}
+					accent={index === nodes.length - 1}
+				/>
 			))}
-			<rect x={392} y={108} width={48} height={32} rx={6} fill="none" stroke="currentColor" strokeOpacity={0.2} />
+			<rect
+				x={392}
+				y={108}
+				width={48}
+				height={32}
+				rx={6}
+				fill="none"
+				stroke="currentColor"
+				strokeOpacity={0.2}
+			/>
 		</>
 	);
 }

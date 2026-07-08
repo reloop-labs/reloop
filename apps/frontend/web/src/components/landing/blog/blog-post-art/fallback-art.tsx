@@ -89,7 +89,13 @@ export function FallbackWireframeArt({ slug }: { slug: string }) {
 					stroke="currentColor"
 					strokeOpacity="0.3"
 				/>
-				<circle cx="300" cy="188" r="4" fill="currentColor" fillOpacity="0.55" />
+				<circle
+					cx="300"
+					cy="188"
+					r="4"
+					fill="currentColor"
+					fillOpacity="0.55"
+				/>
 				<circle cx="204" cy="128" r="3" fill="currentColor" fillOpacity="0.4" />
 				<circle cx="396" cy="248" r="3" fill="currentColor" fillOpacity="0.4" />
 				<path
@@ -143,7 +149,13 @@ export function FallbackWireframeArt({ slug }: { slug: string }) {
 					stroke="currentColor"
 					strokeOpacity="0.35"
 				/>
-				<circle cx="360" cy="190" r="3" fill="currentColor" fillOpacity="0.45" />
+				<circle
+					cx="360"
+					cy="190"
+					r="3"
+					fill="currentColor"
+					fillOpacity="0.45"
+				/>
 			</>
 		);
 	}

@@ -57,10 +57,6 @@ export const config: LandingPageDefinition = {
 	},
 	relatedLinks: [
 		{
-			label: "For marketing teams",
-			href: "/features/campaigns",
-		},
-		{
 			label: "Campaign Builder",
 			href: "/features/campaigns",
 		},

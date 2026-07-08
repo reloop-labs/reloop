@@ -14,7 +14,7 @@ const faqItems = [
 	{
 		question: "Who can benefit from using Reloop?",
 		answer:
-			"Reloop is ideal for developers building applications that require email functionality, marketing teams managing large-scale email campaigns, and businesses that need reliable email delivery without vendor lock-in.",
+			"Reloop is ideal for developers building applications that require email functionality, AI agents, and businesses that need reliable email delivery without vendor lock-in.",
 	},
 	{
 		question: "Is Reloop open-source?",

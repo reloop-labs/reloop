@@ -51,7 +51,6 @@ const navItems: NavItem[] = [
 						{ title: "AI Agents", href: "/features/ai-agents" },
 						{ title: "Webhooks", href: "/features/webhooks" },
 						{ title: "Deliverability", href: "/features/deliverability" },
-						{ title: "Marketing Teams", href: "/features/campaigns" },
 						{ title: "Developers", href: "/developers" },
 						{ title: "Integrations", href: "/docs/integrations" },
 					],

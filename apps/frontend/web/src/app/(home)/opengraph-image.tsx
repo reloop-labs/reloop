@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Reloop — Email for AI Agents, Developers & Marketing teams";
+export const alt = "Reloop — Email for AI Agents & Developers";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -317,7 +317,7 @@ export default async function OpenGraphImage() {
 						lineHeight: 1.0,
 					}}
 				>
-					Email for AI Agents,
+					Email for AI Agents
 				</span>
 
 				{/* headline line 2 — dim white */}
@@ -330,7 +330,7 @@ export default async function OpenGraphImage() {
 						lineHeight: 1.05,
 					}}
 				>
-					Developers & Teams.
+					& Developers.
 				</span>
 
 				{/* descriptor */}

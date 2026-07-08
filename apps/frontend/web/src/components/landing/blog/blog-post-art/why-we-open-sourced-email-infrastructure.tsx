@@ -1,11 +1,20 @@
 import { BroadcastRays, RoundedFrame, WireLine, WireNode } from "./primitives";
 import type { BlogPostArtProps } from "./types";
 
-export function WhyWeOpenSourcedEmailInfrastructureArt(_props: BlogPostArtProps) {
+export function WhyWeOpenSourcedEmailInfrastructureArt(
+	_props: BlogPostArtProps,
+) {
 	return (
 		<>
 			<BroadcastRays cx={300} cy={188} count={6} length={48} />
-			<circle cx={300} cy={188} r={44} fill="none" stroke="currentColor" strokeOpacity={0.2} />
+			<circle
+				cx={300}
+				cy={188}
+				r={44}
+				fill="none"
+				stroke="currentColor"
+				strokeOpacity={0.2}
+			/>
 			<WireNode cx={300} cy={188} r={4} accent />
 			<WireLine d="M 300 144 L 300 108" opacity={0.2} />
 			<WireLine d="M 336 188 L 372 188" opacity={0.2} />
@@ -17,7 +26,14 @@ export function WhyWeOpenSourcedEmailInfrastructureArt(_props: BlogPostArtProps)
 			<WireNode cx={228} cy={188} />
 			<WireNode cx={356} cy={124} />
 			<WireNode cx={244} cy={124} />
-			<RoundedFrame x={196} y={248} width={208} height={72} rx={8} opacity={0.18} />
+			<RoundedFrame
+				x={196}
+				y={248}
+				width={208}
+				height={72}
+				rx={8}
+				opacity={0.18}
+			/>
 		</>
 	);
 }

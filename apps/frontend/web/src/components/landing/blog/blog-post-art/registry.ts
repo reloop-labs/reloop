@@ -53,8 +53,7 @@ export const blogPostArtRegistry: Record<
 	"send-email-remix": SendEmailRemixArt,
 	"send-email-sveltekit": SendEmailSveltekitArt,
 	"spf-dkim-dmarc-setup-guide": SpfDkimDmarcSetupGuideArt,
-	"transactional-email-as-growth-channel":
-		TransactionalEmailAsGrowthChannelArt,
+	"transactional-email-as-growth-channel": TransactionalEmailAsGrowthChannelArt,
 	"transactional-email-best-practices": TransactionalEmailBestPracticesArt,
 	"vercel-ai-sdk-reloop-notifications": VercelAiSdkReloopNotificationsArt,
 	"welcome-email-sequences-that-convert": WelcomeEmailSequencesThatConvertArt,

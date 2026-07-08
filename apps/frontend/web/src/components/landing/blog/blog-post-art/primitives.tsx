@@ -31,15 +31,7 @@ export function WireNode({
 		);
 	}
 
-	return (
-		<circle
-			cx={cx}
-			cy={cy}
-			r={r}
-			fill="currentColor"
-			fillOpacity={0.5}
-		/>
-	);
+	return <circle cx={cx} cy={cy} r={r} fill="currentColor" fillOpacity={0.5} />;
 }
 
 export function WireLine({

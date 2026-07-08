@@ -39,11 +39,5 @@ export default async function BlogPostPage({ params }: PageProps) {
 		notFound();
 	}
 
-	return (
-		<BlogPostPageView
-			post={post}
-			body={post.body()}
-			toc={post.toc}
-		/>
-	);
+	return <BlogPostPageView post={post} body={post.body()} toc={post.toc} />;
 }

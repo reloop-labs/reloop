@@ -53,9 +53,7 @@ export function BlogTableOfContents({
 			(entries) => {
 				const visible = entries
 					.filter((entry) => entry.isIntersecting)
-					.sort(
-						(a, b) => a.boundingClientRect.top - b.boundingClientRect.top,
-					);
+					.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
 
 				if (visible[0]) {
 					setActiveId(visible[0].target.id);
@@ -82,10 +80,7 @@ export function BlogTableOfContents({
 	if (items.length === 0) return null;
 
 	return (
-		<nav
-			aria-label="Table of contents"
-			className={cn("w-max", className)}
-		>
+		<nav aria-label="Table of contents" className={cn("w-max", className)}>
 			<ul className="m-0 flex list-none flex-col gap-3 p-0">
 				{items.map((item) => {
 					const id = getHeadingId(item.url);
@@ -114,7 +109,7 @@ export function BlogTableOfContents({
 								/>
 								<span
 									className={cn(
-										"text-[13px] leading-none whitespace-nowrap",
+										"whitespace-nowrap text-[13px] leading-none",
 										isActive && "font-medium",
 									)}
 									title={item.title}
