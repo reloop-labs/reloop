@@ -4,6 +4,7 @@ import {
 	generateStaticParams,
 	getPost,
 	getRelatedPosts,
+	isPostViewable,
 } from "@reloop/web/lib/landing/blog/source";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
 import { notFound } from "next/navigation";
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: PageProps) {
 	const { slug } = await params;
 	const post = getPost(slug);
 
-	if (!post || post.draft) {
+	if (!isPostViewable(post)) {
 		return {};
 	}
 
@@ -36,7 +37,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 	const { slug } = await params;
 	const post = getPost(slug);
 
-	if (!post || post.draft) {
+	if (!isPostViewable(post)) {
 		notFound();
 	}
 

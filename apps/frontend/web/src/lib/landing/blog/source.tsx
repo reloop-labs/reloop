@@ -226,6 +226,20 @@ export function getPublishedPosts() {
 	return getAllPosts().filter((post) => !post.draft);
 }
 
+export function isPostViewable(
+	post: BlogPostDefinition | null | undefined,
+): post is BlogPostDefinition {
+	if (!post) {
+		return false;
+	}
+
+	if (process.env.NODE_ENV === "development") {
+		return true;
+	}
+
+	return !post.draft;
+}
+
 export function getPost(slug: string): BlogPostPage | null {
 	const file = readPostFile(slug);
 
