@@ -1,0 +1,54 @@
+---
+title: "How to Use Email to Reduce Churn: Sequences That Work"
+description: A practical breakdown of the email sequences that reduce SaaS churn — from early warning signals to win-back campaigns.
+keywords:
+  - email churn reduction
+  - reduce SaaS churn email
+  - churn prevention email sequence
+  - SaaS retention email
+publishedAt: 2026-08-05
+category: Growth
+tags: [growth, churn, retention, sequences, saas]
+readTime: 9 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - transactional-email-as-growth-channel
+  - welcome-email-sequences-that-convert
+---
+
+## Churn is usually predictable — if you're watching
+
+Most churn doesn't happen suddenly. It follows a pattern: decreased logins → fewer API calls → silence → cancellation. Email sequences, triggered by these behavioral signals, can interrupt that pattern before the user is mentally gone.
+
+## The three churn windows
+
+### 1. Day 1–14: Activation churn
+Users who never activate are the most likely to churn. Identify your activation event (first email sent, first domain verified, first API call) and build a sequence around it.
+
+- **Day 2**: "One thing to try today" — single CTA to the activation step
+- **Day 5**: "Here's how [similar company] got started" — social proof
+- **Day 10**: "Need help?" — personal outreach from a founder
+
+### 2. Day 30–90: Engagement churn
+Users who activated but stopped engaging. These are often users who got distracted or didn't see enough value.
+
+- Trigger: No login in 14 days
+- Email: Surface a specific piece of value they haven't discovered yet
+- Follow-up: Offer a 1:1 call or product walkthrough
+
+### 3. Day 90+: Win-back
+Users who've fully disengaged. Low-probability but still worth a single, honest outreach.
+
+- Don't oversell. Acknowledge the silence.
+- Offer something concrete: a feature they requested, a pricing adjustment, a migration path.
+- One email. If no response, let them go.
+
+## What to measure
+
+Track churn rate segmented by whether a user received the at-risk sequence vs. didn't. This lets you A/B test the sequences themselves over time.
+
+## Building this with Reloop
+
+Use Reloop's webhook events (login events, API call events from your backend) to trigger sequences. When you detect the inactivity signal, enqueue the appropriate email sequence via the Reloop API.

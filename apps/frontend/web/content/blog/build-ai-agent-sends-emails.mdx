@@ -1,0 +1,67 @@
+---
+title: "Build an AI Agent That Sends Emails on Your Behalf"
+description: Learn how to build an autonomous AI agent that composes and sends emails using tool calling — with Reloop handling delivery.
+keywords:
+  - AI agent email automation
+  - LLM email sending
+  - AI agent tool calling email
+  - build AI email agent nodejs
+publishedAt: 2026-07-22
+category: AI & Automation
+tags: [ai, agents, llm, openai, automation]
+readTime: 9 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - ai-generate-transactional-email-templates
+  - vercel-ai-sdk-reloop-notifications
+---
+
+## What an email-capable agent looks like
+
+Modern LLMs support tool calling — you define a function, describe it in natural language, and the model decides when and how to call it. Wiring `send_email` as a tool turns any LLM into an agent that can compose, address, and dispatch email without a human in the loop.
+
+## Defining the send_email tool
+
+```typescript
+const tools = {
+  send_email: {
+    description: "Send an email to one or more recipients.",
+    parameters: z.object({
+      to: z.string().email(),
+      subject: z.string(),
+      body: z.string(),
+    }),
+    execute: async ({ to, subject, body }) => {
+      await reloop.emails.send({
+        from: "agent@yourdomain.com",
+        to,
+        subject,
+        html: `<p>${body}</p>`,
+      });
+      return { sent: true };
+    },
+  },
+};
+```
+
+## Building the agent loop
+
+The agent loop runs until the model stops requesting tool calls. Each iteration feeds previous tool results back as context so the model can reason about whether the task is complete.
+
+## Guardrails you need
+
+- **Allowlist recipients** — never let the agent send to arbitrary addresses without approval.
+- **Rate limiting** — cap the number of emails per agent session.
+- **Human-in-the-loop for bulk** — any send to more than one recipient should require confirmation.
+
+## Real-world use cases
+
+- Customer support agent that drafts and sends resolution emails
+- Scheduling assistant that confirms meetings via email
+- Onboarding bot that triggers personalized welcome sequences
+
+## What's next
+
+Combine this with Reloop's webhook events — when an email is opened or clicked, feed that signal back to the agent as context to trigger a follow-up action.

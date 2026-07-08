@@ -218,6 +218,11 @@ export function getAllPosts(): BlogPostDefinition[] {
 }
 
 export function getPublishedPosts() {
+	// In development, show drafts so they are previewable on the local server.
+	// In production, only show published posts.
+	if (process.env.NODE_ENV === "development") {
+		return getAllPosts();
+	}
 	return getAllPosts().filter((post) => !post.draft);
 }
 

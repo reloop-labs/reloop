@@ -1,0 +1,71 @@
+---
+title: "Self-Host Your Email Infrastructure for $5/Month"
+description: Run your own transactional email infrastructure with Reloop on a $6 Hetzner VPS — full SMTP, API, analytics, and dashboard included.
+keywords:
+  - self host email cheap
+  - cheap transactional email
+  - self host email server $5
+  - hetzner email server
+publishedAt: 2026-08-12
+category: Self-Hosting
+tags: [self-host, hetzner, vps, docker, cheap]
+readTime: 10 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - self-hosted-email-infrastructure
+  - reloop-coolify-setup
+---
+
+## Why self-host?
+
+At 10,000 emails/month, SendGrid charges ~$20. Resend charges $20. A $6 Hetzner CAX11 ARM server running Reloop costs $6 — and you own everything: the data, the logs, the deliverability reputation.
+
+## What you get for $6/month
+
+- Full Reloop stack: SMTP relay + REST API + analytics dashboard
+- Up to ~100,000 emails/month (limited by your sending domain/IP, not a SaaS pricing tier)
+- Self-managed bounce processing and suppression lists
+- No per-email pricing ever
+
+## Prerequisites
+
+- A Hetzner account (or any VPS provider — DigitalOcean, Linode, OVH)
+- A domain with DNS access
+- Basic Docker knowledge
+
+## Step 1: Provision the server
+
+Choose a Hetzner CAX11 (ARM, 2 vCPU, 4 GB RAM) in the region closest to your users. Add your SSH key during setup.
+
+## Step 2: Set up your domain
+
+Before your server sends a single email, configure:
+- **SPF record** — authorize your server IP to send for your domain
+- **DKIM** — Reloop generates the key pair; add the public key as a TXT record
+- **DMARC** — start with `p=none` and monitor, then move to `p=quarantine`
+
+## Step 3: Deploy with Docker Compose
+
+```bash
+git clone https://github.com/reloop-labs/reloop
+cd reloop
+cp .env.example .env
+# Fill in your domain, SMTP credentials, and database URL
+docker compose up -d
+```
+
+## Step 4: Verify delivery
+
+Send a test email through the dashboard. Check the logs for the SMTP handshake and delivery receipt. Use [mail-tester.com](https://mail-tester.com) to verify your spam score.
+
+## What you'll need to maintain
+
+- Monthly OS updates (`apt upgrade`)
+- Monitor disk usage — email logs grow fast
+- Keep an eye on your IP reputation via MXToolbox
+
+## Is self-hosting right for you?
+
+Self-hosting is best if you: send predictable volume, care about data sovereignty, or want to eliminate per-email pricing. If you need guaranteed SLA, dedicated IPs, or zero ops burden, a managed provider may fit better.

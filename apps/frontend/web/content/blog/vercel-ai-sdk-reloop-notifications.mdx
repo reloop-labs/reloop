@@ -1,0 +1,76 @@
+---
+title: "Vercel AI SDK + Reloop: Send Smart Notifications from Your AI App"
+description: Combine the Vercel AI SDK's tool calling with Reloop to trigger intelligent, context-aware email notifications from any AI-powered Next.js application.
+keywords:
+  - vercel ai sdk email
+  - vercel ai sdk tool calling
+  - send email from AI app
+  - nextjs ai email notifications
+publishedAt: 2026-07-28
+category: AI & Automation
+tags: [vercel-ai-sdk, nextjs, ai, notifications, tools]
+readTime: 6 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - build-ai-agent-sends-emails
+  - send-email-nextjs-app-router
+---
+
+## Why combine Vercel AI SDK with Reloop
+
+The Vercel AI SDK makes it trivially easy to add tool calling to any Next.js app. Reloop gives you reliable, observable email delivery. Together, they let your AI decide *when* to send an email and *what* to say — while Reloop handles the infrastructure.
+
+## Setting up the tool
+
+Define a `notifyUser` tool using the AI SDK's `tool()` helper and the Zod schema it expects:
+
+```typescript
+import { tool } from "ai";
+import { z } from "zod";
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY!);
+
+export const notifyUser = tool({
+  description: "Send an email notification to the user about a task or event.",
+  parameters: z.object({
+    email: z.string().email(),
+    subject: z.string(),
+    message: z.string(),
+  }),
+  execute: async ({ email, subject, message }) => {
+    await reloop.emails.send({
+      from: "notifications@yourdomain.com",
+      to: email,
+      subject,
+      html: `<p>${message}</p>`,
+    });
+    return { delivered: true };
+  },
+});
+```
+
+## Wiring it into a Server Action
+
+```typescript
+import { streamText } from "ai";
+import { openai } from "@ai-sdk/openai";
+
+export async function runAgent(prompt: string, userEmail: string) {
+  return streamText({
+    model: openai("gpt-4o"),
+    prompt,
+    tools: { notifyUser },
+  });
+}
+```
+
+## Example: a task completion agent
+
+When a long-running background task finishes, the model can decide to notify the user by email rather than just returning a response. This keeps the user in the loop without polling.
+
+## Observability
+
+Every email triggered by the AI agent appears in Reloop's logs with full metadata — subject, recipient, timestamp, delivery status. You can see exactly what your agent sent and when.

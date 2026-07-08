@@ -1,0 +1,61 @@
+---
+title: "How We Built a Multi-Tenant Email Delivery Queue with BullMQ"
+description: A deep dive into the job queue architecture powering Reloop's multi-tenant email delivery — rate limiting, priority lanes, and failure recovery.
+keywords:
+  - bullmq email queue
+  - multi-tenant email delivery
+  - job queue nodejs email
+  - email infrastructure architecture
+publishedAt: 2026-07-10
+category: Engineering
+tags: [bullmq, redis, queue, architecture, nodejs]
+readTime: 10 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - building-webhook-delivery-system
+  - email-bounce-processing-automation
+---
+
+## Why a queue, not direct SMTP calls
+
+Sending email synchronously inside a request handler is the fastest way to have unreliable delivery. A dedicated queue decouples the trigger from the send, giving you retries, back-pressure control, and observability for free. Here's how we designed ours.
+
+## Choosing BullMQ over alternatives
+
+We evaluated several options — SQS, RabbitMQ, and Inngest — before settling on BullMQ backed by Redis. The key deciding factors were local dev simplicity (one Redis container), mature TypeScript types, and built-in rate limiting primitives that map directly to SMTP provider limits.
+
+## Queue topology
+
+We operate three priority lanes per tenant:
+
+- **Critical** — password resets, 2FA codes. Zero delay, max concurrency.
+- **Standard** — transactional receipts, notifications. Slight delay allowed.
+- **Bulk** — marketing campaigns. Throttled to provider limits.
+
+## Per-tenant rate limiting
+
+Each tenant gets a sliding-window rate limiter keyed by `tenantId:providerId`. We use BullMQ's `RateLimiter` to cap sends per second and per day, respecting each provider's API limits without cross-tenant interference.
+
+```typescript
+const queue = new Queue("email-delivery", {
+  connection: redis,
+  defaultJobOptions: {
+    attempts: 4,
+    backoff: { type: "exponential", delay: 2000 },
+  },
+});
+```
+
+## Failure recovery and dead-letter handling
+
+Jobs that exhaust their retry budget move to a dead-letter queue. A nightly process reviews these, attempts to categorize failures (bounce vs. rate limit vs. provider outage), and re-queues or surfaces them in the dashboard.
+
+## Observability
+
+Every job emits lifecycle events — `active`, `completed`, `failed` — to our metrics pipeline. This drives the real-time delivery dashboard inside Reloop and powers the webhook events we send to customers.
+
+## What we'd do differently
+
+Running BullMQ workers in the same Node process as the API works fine at small scale. As volume grows, we plan to extract workers into dedicated containers with independent autoscaling.

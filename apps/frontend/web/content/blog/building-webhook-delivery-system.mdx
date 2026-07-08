@@ -1,0 +1,59 @@
+---
+title: "Building a Webhook Delivery System That Actually Retries"
+description: How Reloop built a reliable, observable webhook delivery system with exponential backoff, signature verification, and replay support.
+keywords:
+  - webhook delivery system
+  - reliable webhooks nodejs
+  - webhook retry exponential backoff
+  - webhook signature verification
+publishedAt: 2026-07-15
+category: Engineering
+tags: [webhooks, reliability, nodejs, architecture]
+readTime: 8 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - how-we-built-email-delivery-queue-bullmq
+  - email-bounce-processing-automation
+---
+
+## The problem with naive webhook delivery
+
+Most webhook implementations fire an HTTP request and forget. If your customer's server is down, or returns a 500, the event is lost forever. We've been on the receiving end of that — it's a terrible developer experience. Here's how we avoided it.
+
+## Delivery guarantees we target
+
+We aim for **at-least-once delivery** with a maximum of 5 attempts over 24 hours. We intentionally avoid exactly-once delivery — it requires distributed transactions that add too much complexity for the value gained at our scale.
+
+## The retry schedule
+
+Retries follow exponential backoff with jitter to avoid thundering herds:
+
+- Attempt 1: immediate
+- Attempt 2: 30 seconds
+- Attempt 3: 5 minutes
+- Attempt 4: 30 minutes
+- Attempt 5: 6 hours
+
+```typescript
+function nextRetryDelay(attempt: number): number {
+  const base = Math.pow(2, attempt) * 1000; // exponential
+  const jitter = Math.random() * 1000;       // ±1s jitter
+  return Math.min(base + jitter, 6 * 60 * 60 * 1000);
+}
+```
+
+## Signature verification
+
+Every webhook payload is signed with HMAC-SHA256 using a per-endpoint secret. This lets customers verify that requests genuinely come from Reloop.
+
+## The replay UI
+
+Failed deliveries are surfaced in the dashboard with full request/response details. One click re-queues the event. This turns webhook debugging from a black box into a transparent, self-service experience.
+
+## Lessons learned
+
+- **Log everything**: store the raw outbound payload and the response body, not just the status code.
+- **Separate delivery from processing**: webhook workers should not share a process with API workers.
+- **Circuit break slow endpoints**: if an endpoint consistently times out, back off aggressively before burning through retries.

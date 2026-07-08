@@ -1,0 +1,57 @@
+---
+title: "How to Use AI to Generate Transactional Email Templates"
+description: Use LLMs to generate, personalize, and iterate on transactional email templates — then send them reliably with Reloop.
+keywords:
+  - AI email templates
+  - LLM email generation
+  - generate transactional email templates AI
+  - ChatGPT email template
+publishedAt: 2026-07-25
+category: AI & Automation
+tags: [ai, llm, templates, personalization]
+readTime: 7 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - build-ai-agent-sends-emails
+  - vercel-ai-sdk-reloop-notifications
+---
+
+## The problem with hand-written templates
+
+Most teams have a handful of email templates written years ago. They're generic, outdated, and nobody owns them. AI gives you a practical way to generate, personalize, and continuously improve them — without a designer.
+
+## Prompt patterns that work
+
+The key is specificity. A vague prompt produces a vague template. Give the model your product context, the trigger event, the recipient's state, and the desired tone.
+
+```typescript
+const prompt = `
+  Write a transactional email for a SaaS product called "${productName}".
+  Event: User just completed onboarding.
+  Recipient: ${user.name}, joined ${daysAgo} days ago, hasn't sent their first email yet.
+  Goal: Encourage them to send their first email using a code example.
+  Tone: Friendly, developer-focused, concise.
+  Format: Subject line + plain HTML body.
+`;
+```
+
+## Streaming the template into your editor
+
+Use streaming responses to show the template generating in real-time in your admin UI — it feels fast and gives your team confidence they can iterate quickly.
+
+## Personalization at send time
+
+Generate a base template with the LLM, then swap in per-recipient variables at send time using Reloop's template engine. You get AI quality without per-send LLM latency.
+
+## Evaluating quality
+
+Before shipping AI-generated templates, run them through:
+- A spam scorer (check subject line trigger words)
+- A readability check (Flesch-Kincaid score)
+- A preview across major email clients (Gmail, Outlook, Apple Mail)
+
+## Iterating with feedback loops
+
+Log open rates and click rates per template variant. Feed low-performing metrics back to the LLM as context to generate improved versions. This creates a continuous improvement loop without manual A/B testing setup.

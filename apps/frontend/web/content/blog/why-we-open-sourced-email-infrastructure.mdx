@@ -1,0 +1,50 @@
+---
+title: "Why We Open-Sourced Our Email Infrastructure"
+description: The story behind Reloop — why we built an open-source alternative to SendGrid, Resend, and Loops, and what we're trying to change about email infrastructure.
+keywords:
+  - open source email infrastructure
+  - open source sendgrid alternative
+  - why open source email
+  - reloop open source story
+publishedAt: 2026-09-10
+category: Open Source
+tags: [open-source, company, story, email-infrastructure]
+readTime: 8 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - self-hosted-email-infrastructure
+  - why-we-open-sourced-email-infrastructure
+---
+
+## The problem we kept running into
+
+Every team we knew was paying $200–$2,000/month for email infrastructure at scale. The tools were closed, vendor-specific, and extractive. If you wanted to leave SendGrid, you rewrote integrations. If you wanted to own your data, you couldn't. If a provider went down, you were down.
+
+## Why "just use Postfix" isn't the answer
+
+The obvious counter is: run your own SMTP server. But raw Postfix gives you delivery, not infrastructure. You still need bounce handling, suppression lists, analytics, a REST API, a dashboard, template management, and webhook events. That's 6–8 months of engineering work before you've sent a single email.
+
+## What we built
+
+Reloop is what we wished existed: a fully open-source, self-hostable email platform with everything you'd expect from a managed provider:
+
+- REST API compatible with the Resend API shape (easy migration)
+- SMTP relay with automatic bounce classification
+- Analytics dashboard — opens, clicks, bounces, complaints
+- Webhooks for every email event
+- Template management with React Email support
+- Multi-tenancy for agencies and platforms
+
+## The open-source bet
+
+We believe email infrastructure is too critical to be locked behind a SaaS paywall. The tools that power the internet — Linux, PostgreSQL, Redis, nginx — are open source. Email infrastructure should be too.
+
+Open source means: you can audit the code, host it yourself, extend it, and contribute back. It means the community owns the roadmap, not a single company's growth targets.
+
+## What's next
+
+We're building toward full API parity with the major providers so that switching to Reloop is a single line change. We're also working on a hosted version for teams who want the open-source foundation without the self-hosting ops.
+
+Star us on GitHub and follow along — we ship in public.

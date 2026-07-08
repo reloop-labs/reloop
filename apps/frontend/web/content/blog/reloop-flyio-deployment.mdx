@@ -1,0 +1,80 @@
+---
+title: "Reloop on Fly.io: Full Deployment Guide"
+description: Deploy Reloop on Fly.io — from fly launch to a production-ready email infrastructure with persistent volumes and custom domains.
+keywords:
+  - deploy email server fly.io
+  - reloop fly.io deployment
+  - self host email flyio
+  - flyio email infrastructure
+publishedAt: 2026-08-15
+category: Self-Hosting
+tags: [self-host, flyio, deployment, docker]
+readTime: 8 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - self-host-email-5-dollars
+  - reloop-coolify-setup
+---
+
+## Why Fly.io?
+
+Fly.io is a developer-first platform with global edge locations, built-in Postgres, and a generous free tier. It's an excellent choice for self-hosting Reloop if you want managed infrastructure without giving up control over your data.
+
+## Prerequisites
+
+- Fly.io account (free tier works for getting started)
+- Fly CLI installed: `curl -L https://fly.io/install.sh | sh`
+- Docker installed locally for building
+
+## Step 1: Clone and configure
+
+```bash
+git clone https://github.com/reloop-labs/reloop
+cd reloop
+cp .env.example .env
+```
+
+Fill in your environment variables — at minimum: `DATABASE_URL`, `SMTP_HOST`, and `RELOOP_API_SECRET`.
+
+## Step 2: Initialize the Fly app
+
+```bash
+fly launch --name my-reloop --region iad --no-deploy
+```
+
+This creates your `fly.toml`. Review it and set `auto_stop_machines = false` for the email worker — you don't want it sleeping mid-delivery.
+
+## Step 3: Set up Fly Postgres
+
+```bash
+fly postgres create --name my-reloop-db --region iad
+fly postgres attach my-reloop-db
+```
+
+This automatically sets `DATABASE_URL` in your app's secrets.
+
+## Step 4: Add a persistent volume for email storage
+
+```bash
+fly volumes create reloop_data --size 10 --region iad
+```
+
+Mount it in `fly.toml` under `[mounts]` so email logs and attachments survive restarts.
+
+## Step 5: Deploy
+
+```bash
+fly deploy
+```
+
+Watch the logs with `fly logs` to confirm the SMTP server and API are both healthy.
+
+## Step 6: Configure your domain
+
+Point your domain's MX records to your Fly app's hostname, then add SPF, DKIM, and DMARC records as prompted by the Reloop dashboard.
+
+## Scaling considerations
+
+Fly.io makes it easy to scale horizontally. Email delivery workers should run on dedicated machines to isolate queue processing from API traffic.

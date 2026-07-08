@@ -1,0 +1,96 @@
+---
+title: "Send Transactional Email from Remix"
+description: Add reliable transactional email to your Remix app using Reloop's Node.js SDK — from loader/action setup to environment variable handling.
+keywords:
+  - send email remix
+  - remix transactional email
+  - remix email tutorial
+  - remix nodejs email
+publishedAt: 2026-08-28
+category: Tutorials
+tags: [remix, nodejs, sdk, tutorial]
+readTime: 6 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - send-email-nextjs-app-router
+  - send-email-sveltekit
+---
+
+## Why Remix is different
+
+Remix runs loaders and actions on the server by default, which means you can safely call the Reloop SDK without ever exposing your API key to the browser. No API routes, no extra setup — just call it in the action.
+
+## Installation
+
+```bash
+npm install reloop-email
+```
+
+Add your API key to `.env`:
+
+```env
+RELOOP_API_KEY=re_your_api_key_here
+```
+
+## Sending from an action
+
+The most common pattern — trigger an email when a form is submitted:
+
+```typescript
+// app/routes/contact.tsx
+import { ActionFunctionArgs } from "@remix-run/node";
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY!);
+
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const email = formData.get("email") as string;
+
+  await reloop.emails.send({
+    from: "hello@yourdomain.com",
+    to: email,
+    subject: "Thanks for reaching out",
+    html: "<p>We'll get back to you within 24 hours.</p>",
+  });
+
+  return { success: true };
+}
+```
+
+## Sending from a resource route
+
+For webhook-triggered emails or programmatic sends, use a resource route:
+
+```typescript
+// app/routes/api.send-welcome.ts
+import { json } from "@remix-run/node";
+import { Reloop } from "reloop-email";
+
+const reloop = new Reloop(process.env.RELOOP_API_KEY!);
+
+export async function action({ request }: { request: Request }) {
+  const { email, name } = await request.json();
+
+  await reloop.emails.send({
+    from: "onboarding@yourdomain.com",
+    to: email,
+    subject: `Welcome, ${name}!`,
+    html: `<p>Your account is ready. Let's get started.</p>`,
+  });
+
+  return json({ sent: true });
+}
+```
+
+## Error handling
+
+Wrap sends in try/catch and return structured errors to the client. Never let email failures crash your action — degrade gracefully.
+
+## Next steps
+
+- Add [React Email](https://react.email) for beautiful HTML templates
+- Use Reloop's webhook events to track opens and clicks
+- See the [Reloop SDK docs](/docs/examples/nodejs) for the full API reference

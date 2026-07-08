@@ -1,0 +1,90 @@
+---
+title: "Send Email from Cloudflare Workers"
+description: Send transactional email from Cloudflare Workers using Reloop's HTTP API — no Node.js SDK required, works on the edge runtime.
+keywords:
+  - cloudflare workers email
+  - send email cloudflare workers
+  - edge runtime email
+  - cloudflare workers transactional email
+publishedAt: 2026-09-05
+category: Tutorials
+tags: [cloudflare, edge, workers, http-api, tutorial]
+readTime: 5 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - send-email-nextjs-app-router
+  - send-email-sveltekit
+---
+
+## Why the SDK doesn't work on Cloudflare Workers
+
+Cloudflare Workers run in a V8 isolate, not a Node.js environment. Node.js built-ins like `net`, `tls`, and `http` are unavailable. The Reloop Node.js SDK uses these for SMTP — so on Workers, you call the HTTP REST API directly instead.
+
+## The good news: the HTTP API is simple
+
+Everything the SDK does, the HTTP API does too. And `fetch` is available natively in Workers.
+
+## Setting up your Worker
+
+```typescript
+// src/index.ts
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    if (request.method === "POST" && new URL(request.url).pathname === "/send") {
+      return sendEmail(env);
+    }
+    return new Response("Not found", { status: 404 });
+  },
+};
+```
+
+## Sending an email via the HTTP API
+
+```typescript
+async function sendEmail(env: Env): Promise<Response> {
+  const response = await fetch("https://api.reloop.dev/v1/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.RELOOP_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "hello@yourdomain.com",
+      to: "user@example.com",
+      subject: "Hello from the edge",
+      html: "<p>Sent from a Cloudflare Worker.</p>",
+    }),
+  });
+
+  const data = await response.json();
+  return Response.json(data);
+}
+```
+
+## Storing your API key securely
+
+Never hardcode the API key. Add it as a Cloudflare secret:
+
+```bash
+wrangler secret put RELOOP_API_KEY
+```
+
+Access it as `env.RELOOP_API_KEY` in your Worker.
+
+## Defining the Env type
+
+```typescript
+interface Env {
+  RELOOP_API_KEY: string;
+}
+```
+
+## Deploying
+
+```bash
+wrangler deploy
+```
+
+Your Worker is now live globally on Cloudflare's edge network with email sending built in.

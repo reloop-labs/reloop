@@ -1,0 +1,66 @@
+---
+title: "Why Your Emails Land in Spam — And How to Fix It"
+description: The most common reasons transactional emails end up in spam folders, with actionable fixes for each one.
+keywords:
+  - emails going to spam fix
+  - why emails land in spam
+  - transactional email spam fix
+  - email deliverability problems
+publishedAt: 2026-08-20
+category: Deliverability
+tags: [deliverability, spam, spf, dkim, dmarc]
+readTime: 10 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - spf-dkim-dmarc-setup-guide
+  - ip-warming-guide
+---
+
+## The spam filter is not your enemy
+
+Spam filters are protecting your recipients — they're just doing it imperfectly. Understanding what triggers them lets you fix your sending practices rather than just trying to outsmart the filter.
+
+## Reason 1: Missing or misconfigured authentication
+
+This is the most common cause. If your domain doesn't have valid SPF, DKIM, and DMARC records, Gmail and Outlook will either reject or spam-folder your email immediately.
+
+**Fix**: Set up all three. In that order. Check with `dig TXT yourdomain.com` after each one.
+
+## Reason 2: Sending from a new IP with no reputation
+
+A brand-new IP has zero reputation — ISPs are cautious about unknown senders.
+
+**Fix**: Warm up your IP. Start with 50–100 emails/day to your most engaged recipients and ramp up over 4–6 weeks. See our [IP warm-up guide](/blog/ip-warming-guide) for a week-by-week schedule.
+
+## Reason 3: High bounce rate
+
+If more than 2% of your sends bounce, ISPs flag your domain as sending to bad data.
+
+**Fix**: Never send to unverified or purchased lists. Remove addresses after the first hard bounce. Use double opt-in for marketing lists.
+
+## Reason 4: Spam trigger words in subject lines
+
+Words like "FREE!!!", "WINNER", "Act now", and excessive punctuation are red flags for Bayesian spam filters.
+
+**Fix**: Write subject lines the way a human colleague would. Test with [mail-tester.com](https://mail-tester.com) before sending.
+
+## Reason 5: Low engagement signals
+
+ISPs track how recipients interact with your email. If recipients consistently ignore or delete your emails without opening them, your sender score drops.
+
+**Fix**: Regularly clean your list. Remove subscribers who haven't opened in 90 days. It feels counterintuitive, but a smaller engaged list outperforms a large disengaged one.
+
+## Reason 6: Sending from noreply@
+
+`noreply@` tells ISPs that you're not interested in two-way communication — a signal associated with spam.
+
+**Fix**: Send from a real address with a working reply-to. Even `hello@yourdomain.com` is dramatically better.
+
+## How to diagnose your specific issue
+
+1. Use [MXToolbox](https://mxtoolbox.com) to check your DNS records
+2. Use [mail-tester.com](https://mail-tester.com) to get a spam score with specific issues flagged
+3. Check Google Postmaster Tools for your domain's reputation score
+4. Review Reloop's delivery logs for SMTP response codes — a 550 or 421 tells you a lot

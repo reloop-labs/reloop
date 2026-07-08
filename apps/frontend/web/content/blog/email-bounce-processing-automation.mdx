@@ -1,0 +1,63 @@
+---
+title: "How We Handle Email Bounce Processing Automatically"
+description: Inside Reloop's bounce processing pipeline — classifying hard vs soft bounces, updating suppression lists, and protecting sender reputation automatically.
+keywords:
+  - email bounce processing
+  - email bounce handling automation
+  - hard bounce soft bounce
+  - sender reputation protection
+publishedAt: 2026-07-20
+category: Engineering
+tags: [bounces, deliverability, automation, architecture]
+readTime: 7 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - spf-dkim-dmarc-setup-guide
+  - why-emails-land-in-spam-fix
+---
+
+## Why bounce handling matters more than you think
+
+Every hard bounce you re-send to damages your sender reputation. ISPs track your bounce rate, and crossing the 2% threshold can get your domain or IP blacklisted. Proper automated bounce handling isn't optional — it's infrastructure.
+
+## Bounce types we classify
+
+- **Hard bounce** — permanent failure (invalid address, domain doesn't exist). Added to suppression list immediately.
+- **Soft bounce** — temporary failure (mailbox full, server busy). Retried with backoff; suppressed after 3 consecutive soft bounces.
+- **Complaint** — recipient marked as spam. Suppressed immediately, never re-sent.
+
+## How we receive bounce data
+
+Bounces arrive via two channels:
+
+1. **SMTP DSN (Delivery Status Notifications)** — Reloop's inbound SMTP listener captures these and pushes them to a processing queue.
+2. **Provider webhooks** — When routing through a third-party SMTP relay, bounce events arrive as webhook payloads we normalize into our internal format.
+
+## The processing pipeline
+
+```typescript
+async function processBounce(event: BounceEvent) {
+  const { email, type, reason } = event;
+
+  if (type === "hard" || type === "complaint") {
+    await suppressionList.add(email, { reason, suppressedAt: new Date() });
+    return;
+  }
+
+  // Soft bounce — increment counter
+  const count = await bounceCounter.increment(email);
+  if (count >= 3) {
+    await suppressionList.add(email, { reason: "repeated_soft_bounce" });
+  }
+}
+```
+
+## Surfacing data to customers
+
+Suppressed addresses appear in the Reloop dashboard. Customers can review them, export for CRM hygiene, or manually remove addresses if they believe the suppression was erroneous.
+
+## What's next
+
+We're working on enriched bounce classification using the SMTP enhanced status codes (e.g., 5.1.1 vs 5.7.1) to give customers more actionable feedback rather than just "hard bounce."

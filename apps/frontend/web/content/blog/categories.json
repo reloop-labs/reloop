@@ -1,32 +1,37 @@
 [
 	{
-		"slug": "deliverability",
-		"name": "Deliverability",
-		"description": "SPF, DKIM, DMARC, and inbox placement best practices."
+		"slug": "engineering",
+		"name": "Engineering",
+		"description": "How we build Reloop — architecture, systems design, and technical deep dives."
 	},
 	{
-		"slug": "migration",
-		"name": "Migration",
-		"description": "Guides for switching from other email providers to Reloop."
+		"slug": "ai-automation",
+		"name": "AI & Automation",
+		"description": "AI-powered email workflows, LLM integration, and intelligent notification systems."
 	},
 	{
-		"slug": "guides",
-		"name": "Guides",
-		"description": "Practical patterns for transactional email and infrastructure."
-	},
-	{
-		"slug": "tutorial",
-		"name": "Tutorial",
-		"description": "Step-by-step tutorials for integrating Reloop into your stack."
+		"slug": "growth",
+		"name": "Growth",
+		"description": "Use email as a growth channel — activation flows, re-engagement, and product-led strategies."
 	},
 	{
 		"slug": "self-hosting",
-		"name": "Self-hosting",
+		"name": "Self-Hosting",
 		"description": "Deploy and operate Reloop on your own infrastructure."
 	},
 	{
-		"slug": "comparison",
-		"name": "Comparison",
-		"description": "How Reloop compares to other email providers."
+		"slug": "deliverability",
+		"name": "Deliverability",
+		"description": "SPF, DKIM, DMARC, IP warming, and getting to the inbox."
+	},
+	{
+		"slug": "tutorials",
+		"name": "Tutorials",
+		"description": "Step-by-step guides for integrating Reloop into Next.js, Remix, Python, and more."
+	},
+	{
+		"slug": "open-source",
+		"name": "Open Source",
+		"description": "Company updates, product releases, and why open source email matters."
 	}
 ]

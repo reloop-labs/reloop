@@ -1,0 +1,97 @@
+---
+title: "Email with SvelteKit: A Developer's Guide"
+description: Send transactional email from SvelteKit server endpoints and form actions using Reloop's Node.js SDK — with full TypeScript support.
+keywords:
+  - send email sveltekit
+  - sveltekit email tutorial
+  - sveltekit transactional email
+  - sveltekit server actions email
+publishedAt: 2026-09-01
+category: Tutorials
+tags: [sveltekit, nodejs, sdk, tutorial]
+readTime: 6 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - send-email-nextjs-app-router
+  - send-email-remix
+---
+
+## SvelteKit's server-side model
+
+SvelteKit form actions and `+server.ts` endpoints run exclusively on the server — perfect for API key usage. You never have to worry about the Reloop key leaking to the client.
+
+## Installation
+
+```bash
+npm install reloop-email
+```
+
+Add to `.env`:
+
+```env
+RELOOP_API_KEY=re_your_api_key_here
+```
+
+## Sending from a form action
+
+The cleanest pattern for contact forms, signup flows, or any user-triggered email:
+
+```typescript
+// src/routes/contact/+page.server.ts
+import { Reloop } from "reloop-email";
+import type { Actions } from "./$types";
+
+const reloop = new Reloop(import.meta.env.RELOOP_API_KEY);
+
+export const actions: Actions = {
+  default: async ({ request }) => {
+    const data = await request.formData();
+    const email = data.get("email") as string;
+
+    await reloop.emails.send({
+      from: "hello@yourdomain.com",
+      to: email,
+      subject: "Thanks for reaching out",
+      html: "<p>We'll be in touch soon.</p>",
+    });
+
+    return { success: true };
+  },
+};
+```
+
+## Sending from a server endpoint
+
+For API-style sends (webhooks, cron jobs, programmatic triggers):
+
+```typescript
+// src/routes/api/send-welcome/+server.ts
+import { json } from "@sveltejs/kit";
+import { Reloop } from "reloop-email";
+import type { RequestHandler } from "./$types";
+
+const reloop = new Reloop(import.meta.env.RELOOP_API_KEY);
+
+export const POST: RequestHandler = async ({ request }) => {
+  const { email, name } = await request.json();
+
+  await reloop.emails.send({
+    from: "onboarding@yourdomain.com",
+    to: email,
+    subject: `Welcome, ${name}!`,
+    html: `<p>Your account is ready.</p>`,
+  });
+
+  return json({ sent: true });
+};
+```
+
+## Environment variable note
+
+SvelteKit uses `import.meta.env` for environment variables. Private variables (not exposed to the client) should be prefixed with nothing or `SECRET_`. Never use `PUBLIC_` for API keys.
+
+## Deploying
+
+SvelteKit works on Node.js, Vercel, Netlify, Cloudflare Workers, and more. The Reloop SDK is compatible with all Node.js-based adapters. For the Cloudflare adapter, see our [Cloudflare Workers guide](/blog/send-email-cloudflare-workers).

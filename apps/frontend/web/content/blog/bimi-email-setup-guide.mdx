@@ -1,0 +1,69 @@
+---
+title: "BIMI: Show Your Logo in the Gmail Inbox"
+description: BIMI (Brand Indicators for Message Identification) lets verified senders display their logo next to emails in Gmail and Apple Mail. Here's how to set it up.
+keywords:
+  - BIMI email setup
+  - show logo in gmail
+  - brand indicators for message identification
+  - BIMI DNS record
+publishedAt: 2026-08-25
+category: Deliverability
+tags: [deliverability, bimi, dmarc, branding, dns]
+readTime: 7 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - spf-dkim-dmarc-setup-guide
+  - why-emails-land-in-spam-fix
+---
+
+## What is BIMI?
+
+BIMI (Brand Indicators for Message Identification) is an email standard that displays your brand logo next to your email in the recipient's inbox. It's supported by Gmail, Apple Mail, Yahoo, and Fastmail. Beyond branding, it signals to recipients — and ISPs — that you're a verified, trustworthy sender.
+
+## Prerequisites
+
+BIMI has strict requirements. You need all of these before starting:
+
+- ✅ SPF record configured
+- ✅ DKIM configured
+- ✅ DMARC policy set to `p=quarantine` or `p=reject` (not `p=none`)
+- ✅ A Verified Mark Certificate (VMC) — required for Gmail (optional for others)
+- ✅ An SVG logo in the specific BIMI format
+
+## Step 1: Prepare your SVG logo
+
+BIMI requires a specific SVG profile (Tiny PS). Your regular SVG will likely not work. Requirements:
+- Square aspect ratio
+- SVG 1.2 Tiny PS format
+- No external resources
+- Validated at [bimigroup.org/svg-validator](https://bimigroup.org/svg-validator/)
+
+## Step 2: Host your logo
+
+Upload your BIMI-compliant SVG to a publicly accessible HTTPS URL. It must be served over HTTPS — HTTP won't work.
+
+```
+https://yourdomain.com/.well-known/bimi-logo.svg
+```
+
+## Step 3: Add the BIMI DNS record
+
+```
+v=BIMI1; l=https://yourdomain.com/.well-known/bimi-logo.svg; a=https://yourdomain.com/.well-known/vmc.pem
+```
+
+The `a=` parameter points to your VMC. For non-Gmail clients, you can omit `a=` and the logo will still appear.
+
+## Step 4: Obtain a VMC (for Gmail)
+
+A Verified Mark Certificate is issued by authorized CAs (DigiCert, Entrust). It verifies that you own the trademarked logo. Cost is ~$1,200–$1,500/year. For most early-stage startups, the non-Gmail BIMI (without VMC) is a reasonable starting point.
+
+## Verifying your setup
+
+Check your BIMI record with [BIMI Inspector](https://bimigroup.org/bimi-generator/) and then send a test email to a Gmail address to confirm the logo appears.
+
+## Is BIMI worth it?
+
+Yes — but only after SPF, DKIM, and DMARC are solid. The brand visibility boost is real, and the DMARC requirement means you're forced into a good security posture to qualify.

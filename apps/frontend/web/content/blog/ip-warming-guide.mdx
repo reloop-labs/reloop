@@ -1,0 +1,72 @@
+---
+title: "IP Warm-Up Guide: How to Build Sender Reputation From Scratch"
+description: A week-by-week IP warm-up schedule for new sending IPs — with volume targets, recipient selection strategy, and what to watch for along the way.
+keywords:
+  - ip warm up email
+  - email ip warmup guide
+  - new ip warmup schedule
+  - build sender reputation email
+publishedAt: 2026-08-22
+category: Deliverability
+tags: [deliverability, ip-warming, reputation, smtp]
+readTime: 8 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - why-emails-land-in-spam-fix
+  - spf-dkim-dmarc-setup-guide
+---
+
+## Why IP warm-up matters
+
+ISPs assign reputation scores to sending IPs. A new IP has no score — which ISPs treat as suspicious. Warm-up is the process of gradually increasing volume to demonstrate consistent, legitimate sending behaviour before going full throttle.
+
+## Who needs to warm up
+
+- New dedicated IPs added to your sending pool
+- Any IP that hasn't sent in 30+ days (reputation decays)
+- Shared IPs from a new provider where your domain is new
+
+You don't need to warm up if you're using a shared pool from an established provider — they manage pool reputation for you.
+
+## Before you start
+
+Complete these first or warm-up won't help:
+- ✅ SPF, DKIM, DMARC all configured and verified
+- ✅ Unsubscribe link in every email
+- ✅ Suppression list clean (no previous bounces or complaints)
+- ✅ From domain has at least 30 days of age (brand-new domains are high-risk)
+
+## Week-by-week schedule
+
+| Week | Daily volume | Cumulative |
+|------|-------------|------------|
+| 1 | 50–200 | ~1,000 |
+| 2 | 200–500 | ~3,500 |
+| 3 | 500–1,000 | ~10,500 |
+| 4 | 1,000–2,000 | ~24,500 |
+| 5 | 2,000–5,000 | ~59,500 |
+| 6 | 5,000–10,000 | ~129,500 |
+
+After week 6 you can ramp more aggressively if metrics are healthy.
+
+## Recipient selection strategy
+
+Send to your most engaged recipients first — people who signed up recently, opened emails in the past 30 days, or are actively using your product. Positive engagement signals (opens, clicks) build reputation faster than just delivering to inactive addresses.
+
+## Metrics to watch
+
+- **Bounce rate**: Keep below 2%. Stop and investigate if it spikes.
+- **Spam complaint rate**: Keep below 0.1% (Google's threshold for warnings is 0.1%, suspension is 0.3%).
+- **Delivery rate**: Should be above 98% for major ISPs.
+
+## Red flags that mean you should pause
+
+- Bounce rate above 5% for a single send
+- Spam complaint rate above 0.3%
+- Gmail Postmaster Tools showing "Bad" reputation for your domain
+
+## Checking your progress
+
+Use [Google Postmaster Tools](https://postmaster.google.com) and [Microsoft SNDS](https://sendersupport.olc.protection.outlook.com/snds/) to monitor your reputation at the two largest ISPs throughout the warm-up period.

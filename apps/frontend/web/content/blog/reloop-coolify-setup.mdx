@@ -1,0 +1,60 @@
+---
+title: "Reloop on Coolify: Self-Hosted Email Without the Complexity"
+description: Deploy Reloop using Coolify's UI-driven deployment — no Docker expertise required. Full email infrastructure in under 20 minutes.
+keywords:
+  - coolify email server
+  - reloop coolify deployment
+  - self host email coolify
+  - coolify docker deployment
+publishedAt: 2026-08-18
+category: Self-Hosting
+tags: [self-host, coolify, deployment, docker]
+readTime: 6 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - self-host-email-5-dollars
+  - reloop-flyio-deployment
+---
+
+## What is Coolify?
+
+Coolify is an open-source, self-hostable platform-as-a-service (think Heroku/Render but self-hosted). It gives you a clean UI to deploy Docker Compose stacks, manage databases, and handle SSL — without writing any infra code.
+
+## Why Coolify + Reloop is a great combo
+
+Both tools are open-source. Both are designed for developers who want control without complexity. Coolify handles the deployment ops; Reloop handles the email ops.
+
+## Prerequisites
+
+- A VPS with Coolify installed (see [coolify.io/docs](https://coolify.io/docs))
+- A domain with DNS access
+- 2 GB RAM minimum (4 GB recommended)
+
+## Step 1: Add Reloop as a new resource in Coolify
+
+In the Coolify dashboard, click **New Resource → Docker Compose**. Paste the Reloop `docker-compose.yml` URL or upload it directly.
+
+## Step 2: Configure environment variables
+
+Coolify provides an environment variable editor. Set:
+- `DATABASE_URL` — Coolify can provision a Postgres instance for you
+- `SMTP_DOMAIN` — your sending domain
+- `RELOOP_API_SECRET` — a secure random string
+
+## Step 3: Set up SSL
+
+Coolify integrates with Let's Encrypt. Enable SSL for your Reloop domain in one click — no Certbot scripting required.
+
+## Step 4: Deploy
+
+Click **Deploy**. Coolify pulls the image, runs migrations, and starts all services. Watch the real-time deployment log.
+
+## Step 5: Configure DNS
+
+Add your SPF, DKIM, and DMARC records. The Reloop dashboard shows you exactly what to add after your first login.
+
+## Ongoing maintenance
+
+Coolify shows you when new Reloop versions are available and handles rolling restarts. Most updates take under 60 seconds with zero downtime.
