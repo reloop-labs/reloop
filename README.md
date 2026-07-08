@@ -9,12 +9,14 @@
 Self-host on your own servers or use the hosted service from Reloop Labs.\
 No vendor lock-in. Full transparency. Sub-900ms delivery latency.
 
-[![License](https://img.shields.io/github/license/reloop-labs/reloop?style=flat-square)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/reloop-labs/reloop?style=flat-square)](https://github.com/reloop-labs/reloop)
-[![Discord](https://img.shields.io/badge/Discord-Join%20Chat-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.gg/bHnkBcp7xR)
-[![Twitter](https://img.shields.io/badge/Twitter-Follow-000000?style=flat-square&logo=x&logoColor=white)](https://x.com/reloophq)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Bun](https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+[![License](https://img.shields.io/github/license/reloop-labs/reloop?style=for-the-badge)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/reloop-labs/reloop?style=for-the-badge)](https://github.com/reloop-labs/reloop)
 
-[Website](https://reloop.sh) · [Documentation](https://reloop.sh/docs) · [Hosted Sign-up](https://reloop.sh/dashboard/signup) · [Discord Community](https://discord.gg/bHnkBcp7xR)
+[Website](https://reloop.sh) · [Documentation](https://reloop.sh/docs) · [Hosted Sign-up](https://reloop.sh/dashboard/signup) · [Discord](https://discord.gg/bHnkBcp7xR)
 
 </div>
 
@@ -51,6 +53,14 @@ Use Reloop as a **hosted service** (Reloop Labs handles the infrastructure) or *
 
 ---
 
+## Who This Is For
+
+**Developers** who need a reliable email API without vendor lock-in — integrate via REST or SMTP, manage sending domains, and receive webhook events for every delivery state.
+
+**DevOps and platform teams** who want full control over their email infrastructure — run Reloop on your own servers, inspect every component, and keep all data inside your network.
+
+**Marketing and growth teams** who need campaign tools and audience management without depending on a proprietary SaaS platform that can change pricing or terms at any time.
+
 ---
 
 ## Quick Start
@@ -74,7 +84,7 @@ For full setup instructions — prerequisites, environment config, Docker servic
 
 ## Hosted Service
 
-Don't want to manage infrastructure? [Sign up for Reloop](https://reloop.sh/dashboard/signup) — a fully managed hosted version of this exact codebase. Same features, zero ops overhead.
+Reloop is also available as a fully managed hosted service from Reloop Labs — same codebase, zero infrastructure to run. [Sign up at reloop.sh](https://reloop.sh/dashboard/signup).
 
 ---
 
@@ -90,6 +100,7 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on reporting bugs, reques
 - 🐦 **Twitter/X** — [Follow @reloophq](https://x.com/reloophq)
 - 🐙 **GitHub Issues** — [Report bugs or request features](https://github.com/reloop-labs/reloop/issues)
 - 📚 **Documentation** — [reloop.sh/docs](https://reloop.sh/docs)
+- 📋 **Changelog** — [CHANGELOG.md](CHANGELOG.md)
 - 🆘 **Support** — [reloop.sh/support](https://reloop.sh/support)
 
 ---
