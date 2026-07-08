@@ -1,40 +1,208 @@
 ---
-title: SPF, DKIM, and DMARC Setup Guide
-description: A practical guide to email authentication—what each record does, how to configure them, and common mistakes to avoid.
+title: "SPF, DKIM, and DMARC: The Complete Setup Guide (2026)"
+description: A thorough, practical guide to configuring SPF, DKIM, and DMARC for your sending domain — with exact DNS records, common mistakes, and a step-by-step verification checklist.
 keywords:
   - SPF DKIM DMARC setup
   - email authentication guide
   - DMARC setup guide
+  - configure email authentication
+  - SPF record setup
+  - DKIM configuration
 publishedAt: 2026-06-15
 category: Deliverability
-tags: [spf, dkim, dmarc, dns]
-readTime: 8 min read
+tags: [spf, dkim, dmarc, dns, deliverability, authentication]
+readTime: 12 min read
 author:
   name: Reloop Labs
 draft: false
 relatedSlugs:
-  - transactional-email-best-practices
-  - self-hosted-email-infrastructure
+  - why-emails-land-in-spam-fix
+  - ip-warming-guide
 ---
 
-## Why authentication matters
+## Why email authentication exists
 
-Without SPF, DKIM, and DMARC, your emails are far more likely to land in spam—or be rejected entirely. Authentication tells receiving servers that you are who you claim to be.
+When email was designed in the 1970s, there was no mechanism to verify that a sender was who they claimed to be. Anyone could put any address in the `From:` field. SPF, DKIM, and DMARC were created over the following decades to fix this — and in 2024, Google and Yahoo made all three mandatory for bulk senders. If you're sending transactional email today without proper authentication, you're fighting deliverability with both hands tied behind your back.
 
-Reloop generates the DNS records you need when you add a sending domain. This guide explains what each record does so you can troubleshoot confidently.
+This guide walks you through configuring all three records correctly, in the right order, and verifying they work before a single production email is sent.
 
-## SPF first
+---
 
-SPF (Sender Policy Framework) is a TXT record listing which servers may send email for your domain. Add Reloop's include directive to your SPF record—never create duplicate SPF records; merge into one.
+## Step 1: SPF (Sender Policy Framework)
 
-<Callout type="tip">
-  Use a single SPF TXT record per domain. Multiple SPF records cause permanent authentication failures.
-</Callout>
+SPF is a DNS TXT record that declares which mail servers are authorized to send email for your domain. When a receiving server gets an email claiming to be from `you@yourdomain.com`, it looks up the SPF record for `yourdomain.com` and checks whether the sending IP is on the authorized list. If it's not, the email fails SPF — and depending on your DMARC policy, may be rejected or marked as spam.
 
-## Add DKIM
+### What an SPF record looks like
 
-DKIM signs each message with a private key; receivers verify against your public key in DNS. Reloop provides CNAME records for selector-based DKIM—copy them exactly as shown in the dashboard.
+```
+v=spf1 include:_spf.reloop.dev ~all
+```
 
-## Roll out DMARC
+Breaking this down:
 
-Start with `p=none` to collect reports without affecting delivery. Once SPF and DKIM pass consistently, move to quarantine then reject. Use Reloop's auth checker tool to verify all three records.
+- `v=spf1` — declares this is an SPF record
+- `include:_spf.reloop.dev` — authorizes all IPs in Reloop's published SPF range
+- `~all` — soft fail for everything else (use `-all` to hard fail once confident)
+
+### How to add your SPF record
+
+1. Go to your DNS provider (Cloudflare, Route 53, Namecheap, etc.)
+2. Create a new **TXT record** on your root domain (`@` or `yourdomain.com`)
+3. Set the value to `v=spf1 include:_spf.reloop.dev ~all`
+4. TTL: 300 seconds (low during setup; increase to 3600+ after confirming it works)
+
+### The most common SPF mistake
+
+**Never create two SPF records for the same domain.** DNS only permits one SPF TXT record per hostname. If you have multiple sending services (Reloop + G Suite, for example), combine them into a single record:
+
+```
+v=spf1 include:_spf.reloop.dev include:_spf.google.com ~all
+```
+
+### Verifying your SPF record
+
+```bash
+dig TXT yourdomain.com | grep spf
+```
+
+Or use [MXToolbox SPF Lookup](https://mxtoolbox.com/spf.aspx). You should see a single record returned with your `include:` directives.
+
+> **SPF lookup limit**: SPF allows a maximum of 10 DNS lookups during evaluation. Each `include:` counts as one. If you have many services, consolidate using an SPF flattening tool.
+
+---
+
+## Step 2: DKIM (DomainKeys Identified Mail)
+
+DKIM adds a cryptographic signature to every outgoing email. The sending server signs the message with a private key. The receiving server looks up the corresponding public key in DNS and verifies the signature. If the signature is valid, the email hasn't been tampered with in transit and genuinely originated from an authorized sender.
+
+### How Reloop handles DKIM
+
+Reloop uses selector-based DKIM. When you add a sending domain in the Reloop dashboard, it generates a public/private key pair and shows you the DNS records to add. These are typically CNAME records pointing to Reloop-managed keys, which means Reloop handles key rotation automatically — you set it once and never touch it again.
+
+### What Reloop's DKIM records look like
+
+You'll be given two CNAME records:
+
+```
+reloop1._domainkey.yourdomain.com → reloop1._domainkey.reloop.dev
+reloop2._domainkey.yourdomain.com → reloop2._domainkey.reloop.dev
+```
+
+Add both exactly as shown. The selector (`reloop1`, `reloop2`) is what the email header references so receivers know which DNS record to look up.
+
+### Verifying your DKIM records
+
+```bash
+dig TXT reloop1._domainkey.yourdomain.com
+```
+
+You should see the CNAME resolution chain return a TXT record containing `v=DKIM1; k=rsa; p=...`.
+
+Alternatively, send a test email to [mail-tester.com](https://mail-tester.com) — it shows you DKIM pass/fail with the exact header it evaluated.
+
+### Why DKIM sometimes fails after setup
+
+- **DNS propagation**: New records can take 15 minutes to 48 hours to propagate. Test after waiting at least 15 minutes.
+- **Trailing spaces or quote marks**: Some DNS providers wrap TXT records in quotes. The record itself should not have wrapping quotes in the value field.
+- **Wrong hostname**: Adding the record to `_domainkey.yourdomain.com` instead of `reloop1._domainkey.yourdomain.com` is a common mistake.
+
+---
+
+## Step 3: DMARC (Domain-based Message Authentication, Reporting & Conformance)
+
+DMARC is the policy layer that sits on top of SPF and DKIM. It tells receiving servers what to do when an email fails authentication: nothing (`none`), quarantine it, or reject it. It also instructs receiving servers to send you reports of authentication failures — which is invaluable for detecting spoofing and misconfiguration.
+
+### The three DMARC policies
+
+| Policy | Effect |
+|--------|--------|
+| `p=none` | Monitor only. No impact on delivery. Reports are sent. |
+| `p=quarantine` | Failed emails go to spam folder. |
+| `p=reject` | Failed emails are rejected outright. |
+
+**Always start with `p=none`.** Never jump straight to `p=reject`. You need time to confirm that your own legitimate mail is passing authentication before you start rejecting anything.
+
+### Your starter DMARC record
+
+```
+v=DMARC1; p=none; rua=mailto:dmarc@yourdomain.com; ruf=mailto:dmarc@yourdomain.com; fo=1
+```
+
+Breaking this down:
+
+- `v=DMARC1` — declares this as a DMARC record
+- `p=none` — monitor-only policy (start here)
+- `rua=mailto:...` — where to send aggregate reports (daily summaries)
+- `ruf=mailto:...` — where to send forensic reports (individual failure details)
+- `fo=1` — generate forensic reports for any authentication failure
+
+### How to add your DMARC record
+
+Create a **TXT record** at `_dmarc.yourdomain.com` (not the root) with the value above.
+
+```bash
+# Verify it's in place:
+dig TXT _dmarc.yourdomain.com
+```
+
+### Reading DMARC reports
+
+DMARC aggregate reports arrive as XML attachments. They're unreadable raw. Use a free tool like [DMARC Analyzer](https://www.dmarcanalyzer.com) or [Postmark's DMARC tool](https://dmarc.postmarkapp.com) to parse and visualize them. What you're looking for:
+
+- **High SPF/DKIM pass rate on your own mail** — should be near 100%
+- **Unexpected sources sending as your domain** — these are either misconfigurations or spoofing attempts
+
+### Graduating your DMARC policy
+
+Once you've confirmed (via reports) that all your legitimate mail passes authentication:
+
+1. Move from `p=none` to `p=quarantine`:
+   ```
+   v=DMARC1; p=quarantine; pct=10; rua=mailto:dmarc@yourdomain.com
+   ```
+   The `pct=10` applies the quarantine policy to only 10% of failing mail — a safe way to test the change.
+
+2. After 2–4 weeks with no legitimate mail affected, increase to `pct=100`.
+
+3. Finally, move to `p=reject`:
+   ```
+   v=DMARC1; p=reject; rua=mailto:dmarc@yourdomain.com
+   ```
+
+This graduated rollout is the industry standard. Rushing to `p=reject` on day one risks losing legitimate email.
+
+---
+
+## The verification checklist
+
+Run through this before going to production:
+
+- [ ] **Single SPF record** — `dig TXT yourdomain.com` returns exactly one SPF record
+- [ ] **SPF includes Reloop** — the record includes `include:_spf.reloop.dev`
+- [ ] **Both DKIM CNAME records resolve** — test each selector with `dig TXT selector._domainkey.yourdomain.com`
+- [ ] **DMARC record at `_dmarc.yourdomain.com`** — starts with `p=none`
+- [ ] **Test email passes all three** — send to [mail-tester.com](https://mail-tester.com) and confirm SPF: pass, DKIM: pass, DMARC: pass
+- [ ] **DMARC reports are arriving** — check the `rua` mailbox after 24 hours
+
+---
+
+## What Reloop's dashboard does for you
+
+When you add a domain in Reloop, the dashboard:
+
+1. Generates your DKIM key pair and shows you the exact CNAME records to add
+2. Provides a pre-filled SPF include directive
+3. Runs live verification checks and shows you which records are missing or misconfigured
+4. Alerts you if your DMARC reports indicate authentication failures from your domain
+
+You don't need to generate keys or write records manually — Reloop produces the exact strings to paste into your DNS provider.
+
+---
+
+## Common gotchas
+
+**Subdomain sending**: If you send from `notifications.yourdomain.com`, the SPF and DKIM records need to be set for that subdomain specifically, not the root domain. DMARC applies at the organisational domain level by default (`yourdomain.com`), so one DMARC record covers all subdomains — but SPF and DKIM must be per-subdomain.
+
+**Multiple DKIM selectors**: If you use multiple email services (Reloop for transactional, Google Workspace for internal mail), each service gets its own selector. They don't conflict — just add all of them.
+
+**Testing in staging**: Never use your production domain for testing. Create a separate subdomain (`test.yourdomain.com`) with its own SPF/DKIM/DMARC records. This protects your production sender reputation during development.

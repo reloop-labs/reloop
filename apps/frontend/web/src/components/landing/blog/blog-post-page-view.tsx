@@ -70,7 +70,7 @@ export function BlogPostPageView({
 					</p>
 				</header>
 
-				<BlogBody>{body}</BlogBody>
+				<BlogBody className="mt-2">{body}</BlogBody>
 
 				{relatedPosts.length > 0 ? (
 					<section className="mt-16 border-stroke-soft-200 border-t pt-12 dark:border-white/10">

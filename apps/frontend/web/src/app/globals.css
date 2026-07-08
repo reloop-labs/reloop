@@ -17,3 +17,143 @@
 		scroll-behavior: smooth;
 	}
 }
+
+/* Blog post prose — mirrors docs typography */
+.blog-prose {
+	color: rgb(23 23 23 / 0.8);
+	font-size: 15px;
+	line-height: 1.75;
+}
+
+.dark .blog-prose {
+	color: rgb(255 255 255 / 0.8);
+}
+
+.blog-prose h2 {
+	scroll-margin-top: 6rem;
+	margin-top: 2.5rem;
+	margin-bottom: 1rem;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid var(--color-stroke-soft-100);
+	font-size: 1.25rem;
+	font-weight: 600;
+	letter-spacing: -0.025em;
+	line-height: 1.4;
+	color: var(--color-text-strong-950);
+}
+
+.dark .blog-prose h2 {
+	color: white;
+	border-color: var(--color-stroke-soft-100);
+}
+
+.blog-prose h3 {
+	scroll-margin-top: 6rem;
+	margin-top: 2rem;
+	margin-bottom: 0.75rem;
+	font-size: 1.125rem;
+	font-weight: 600;
+	letter-spacing: -0.025em;
+	line-height: 1.4;
+	color: var(--color-text-strong-950);
+}
+
+.dark .blog-prose h3 {
+	color: white;
+}
+
+.blog-prose p {
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+	font-size: 15px;
+	line-height: 1.75;
+}
+
+.blog-prose > :first-child {
+	margin-top: 0;
+}
+
+.blog-prose ul,
+.blog-prose ol {
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+	padding-left: 1.5rem;
+}
+
+.blog-prose ul {
+	list-style-type: disc;
+}
+
+.blog-prose ol {
+	list-style-type: decimal;
+}
+
+.blog-prose li {
+	margin-top: 0.35rem;
+	margin-bottom: 0.35rem;
+	font-size: 15px;
+	line-height: 1.75;
+}
+
+.blog-prose li > ul,
+.blog-prose li > ol {
+	margin-top: 0.35rem;
+	margin-bottom: 0.35rem;
+}
+
+.blog-prose strong {
+	font-weight: 600;
+	color: var(--color-text-strong-950);
+}
+
+.dark .blog-prose strong {
+	color: white;
+}
+
+.blog-prose a {
+	font-weight: 500;
+	color: var(--color-text-strong-950);
+	text-decoration: underline;
+	text-decoration-color: rgb(23 23 23 / 0.25);
+	text-underline-offset: 4px;
+	transition: color 150ms ease;
+}
+
+.dark .blog-prose a {
+	color: white;
+	text-decoration-color: rgb(255 255 255 / 0.25);
+}
+
+.blog-prose a:hover {
+	text-decoration-color: currentcolor;
+}
+
+.blog-prose code:not(pre code) {
+	border-radius: 0.25rem;
+	background: var(--color-bg-weak-50);
+	padding: 0.125rem 0.375rem;
+	font-size: 13px;
+	font-weight: 400;
+}
+
+.blog-prose pre {
+	margin-top: 1.5rem;
+	margin-bottom: 1.5rem;
+}
+
+.blog-prose hr {
+	margin-top: 2rem;
+	margin-bottom: 2rem;
+	border-color: var(--color-stroke-soft-200);
+}
+
+.blog-prose h2 + .my-6,
+.blog-prose h3 + .my-6 {
+	margin-top: 0 !important;
+}
+
+.blog-prose .my-6 {
+	margin-top: 0.75rem !important;
+	margin-bottom: 0.75rem !important;
+}
+

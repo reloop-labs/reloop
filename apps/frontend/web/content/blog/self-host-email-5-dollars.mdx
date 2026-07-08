@@ -1,71 +1,389 @@
 ---
 title: "Self-Host Your Email Infrastructure for $5/Month"
-description: Run your own transactional email infrastructure with Reloop on a $6 Hetzner VPS — full SMTP, API, analytics, and dashboard included.
+description: A complete guide to running your own transactional email stack with Reloop on a cheap VPS — SMTP, REST API, analytics dashboard, and bounce handling — for less than a cup of coffee a month.
 keywords:
   - self host email cheap
   - cheap transactional email
-  - self host email server $5
-  - hetzner email server
+  - self host email server 5 dollars
+  - hetzner email server self host
+  - self hosted email alternative sendgrid
 publishedAt: 2026-08-12
 category: Self-Hosting
-tags: [self-host, hetzner, vps, docker, cheap]
-readTime: 10 min read
+tags: [self-host, hetzner, vps, docker, cheap, infrastructure]
+readTime: 14 min read
 author:
   name: Reloop Labs
 draft: true
 relatedSlugs:
   - self-hosted-email-infrastructure
-  - reloop-coolify-setup
+  - spf-dkim-dmarc-setup-guide
 ---
 
-## Why self-host?
+## The math on managed email providers
 
-At 10,000 emails/month, SendGrid charges ~$20. Resend charges $20. A $6 Hetzner CAX11 ARM server running Reloop costs $6 — and you own everything: the data, the logs, the deliverability reputation.
+At 10,000 emails/month: SendGrid charges $19.95. Resend charges $20. Mailgun charges $35. Postmark charges $15.
 
-## What you get for $6/month
+Scale to 50,000/month and you're looking at $89 (SendGrid), $90 (Resend), or $75 (Mailgun). Per month. Every month. With per-email overages if you spike.
 
-- Full Reloop stack: SMTP relay + REST API + analytics dashboard
-- Up to ~100,000 emails/month (limited by your sending domain/IP, not a SaaS pricing tier)
-- Self-managed bounce processing and suppression lists
-- No per-email pricing ever
+A Hetzner CAX11 ARM VPS costs **€3.29/month** (~$3.50). With a custom domain and proper DNS, running Reloop on that server gives you everything those managed providers offer — the REST API, the analytics dashboard, SMTP relay, bounce handling, webhook events, template management — for a fixed cost that doesn't scale with volume.
+
+This guide walks you through the full setup, from provisioning the server to sending your first production email.
+
+---
+
+## What you get with a self-hosted Reloop stack
+
+| Feature | Managed providers | Self-hosted Reloop |
+|---------|-------------------|-------------------|
+| REST API | ✅ | ✅ |
+| SMTP relay | ✅ | ✅ |
+| Analytics (opens, clicks, bounces) | ✅ | ✅ |
+| Webhook events | ✅ | ✅ |
+| Template management | ✅ | ✅ |
+| Multi-tenancy | Paid plan | ✅ |
+| Data ownership | ❌ | ✅ |
+| Source code access | ❌ | ✅ |
+| Monthly cost at 50k emails | $75–$90 | ~$4 |
+
+---
 
 ## Prerequisites
 
-- A Hetzner account (or any VPS provider — DigitalOcean, Linode, OVH)
-- A domain with DNS access
-- Basic Docker knowledge
+Before starting, you need:
 
-## Step 1: Provision the server
+- A **VPS provider account** (we'll use Hetzner, but DigitalOcean, Linode, OVH, or Vultr all work)
+- A **domain name** with DNS access (Cloudflare DNS is free and recommended)
+- Basic comfort with **SSH and the Linux command line**
+- About **45 minutes**
 
-Choose a Hetzner CAX11 (ARM, 2 vCPU, 4 GB RAM) in the region closest to your users. Add your SSH key during setup.
+---
 
-## Step 2: Set up your domain
+## Step 1: Choose and provision your server
 
-Before your server sends a single email, configure:
-- **SPF record** — authorize your server IP to send for your domain
-- **DKIM** — Reloop generates the key pair; add the public key as a TXT record
-- **DMARC** — start with `p=none` and monitor, then move to `p=quarantine`
+### Minimum specs
 
-## Step 3: Deploy with Docker Compose
+| Resource | Minimum | Recommended |
+|----------|---------|-------------|
+| CPU | 1 vCPU | 2 vCPU |
+| RAM | 1 GB | 4 GB |
+| Disk | 20 GB | 40 GB |
+| OS | Ubuntu 22.04 | Ubuntu 22.04 LTS |
+
+For Hetzner specifically: the **CAX11** (ARM, 2 vCPU, 4 GB RAM, 40 GB SSD) at €3.29/month is the sweet spot. ARM instances have excellent price/performance for this workload.
+
+### Provision on Hetzner
+
+1. Go to [hetzner.com/cloud](https://hetzner.com/cloud) and create an account
+2. Create a new project
+3. Click **Add Server**
+4. Select location closest to your users (Nuremberg/Helsinki for EU, Ashburn for US East)
+5. Image: **Ubuntu 22.04**
+6. Type: **CAX11** (ARM)
+7. Add your SSH public key (or create one: `ssh-keygen -t ed25519 -C "your-email"`)
+8. Click **Create & Buy Now**
+
+Note your server's public IP address — you'll need it shortly.
+
+### Important: check port 25
+
+Many VPS providers block outbound SMTP (port 25) by default to prevent spam abuse. Hetzner blocks it initially. Before setting up email, **request port 25 to be opened** through Hetzner's support panel. They typically approve within a few hours for legitimate use cases.
+
+While you wait, continue with DNS setup.
+
+---
+
+## Step 2: Configure DNS
+
+Good DNS setup is what separates a self-hosted email stack that lands in the inbox from one that goes straight to spam. Do this before installing anything.
+
+### A record — point your domain to the server
+
+```
+Type: A
+Name: mail (or reloop, or whatever subdomain you prefer)
+Value: YOUR_SERVER_IP
+TTL: 300
+```
+
+This creates `mail.yourdomain.com` pointing to your server.
+
+### PTR record (reverse DNS)
+
+This is critical and often overlooked. A PTR record is the reverse of an A record — it maps an IP address back to a hostname. ISPs check PTR records to verify that the IP sending email is who it claims to be.
+
+In Hetzner's console, go to your server → **Networking** → **Set rDNS** and set it to `mail.yourdomain.com` (matching your A record).
+
+Most spam issues from fresh self-hosted setups come from missing PTR records. Don't skip this.
+
+### MX record — for receiving email (optional but recommended)
+
+If you want to receive email (not just send), add an MX record:
+
+```
+Type: MX
+Name: @ (root domain)
+Value: mail.yourdomain.com
+Priority: 10
+TTL: 3600
+```
+
+### SPF, DKIM, DMARC
+
+You'll add these after Reloop is running — the dashboard gives you the exact records to add. For now, add a placeholder SPF:
+
+```
+Type: TXT
+Name: @ (root domain)
+Value: v=spf1 ~all
+TTL: 300
+```
+
+You'll update this once Reloop is running.
+
+---
+
+## Step 3: Install Docker and Docker Compose
+
+SSH into your server:
 
 ```bash
-git clone https://github.com/reloop-labs/reloop
-cd reloop
+ssh root@YOUR_SERVER_IP
+```
+
+Install Docker:
+
+```bash
+# Update package index
+apt update && apt upgrade -y
+
+# Install Docker
+curl -fsSL https://get.docker.com | sh
+
+# Install Docker Compose plugin
+apt install docker-compose-plugin -y
+
+# Verify
+docker --version
+docker compose version
+```
+
+---
+
+## Step 4: Deploy Reloop
+
+### Clone the repository
+
+```bash
+git clone https://github.com/reloop-labs/reloop /opt/reloop
+cd /opt/reloop
+```
+
+### Configure environment variables
+
+```bash
 cp .env.example .env
-# Fill in your domain, SMTP credentials, and database URL
+nano .env
+```
+
+The critical variables to set:
+
+```bash
+# Your sending domain
+MAIL_DOMAIN=mail.yourdomain.com
+
+# A secure random string for API auth
+RELOOP_API_SECRET=your-very-secure-random-string-here
+
+# Database (Reloop includes Postgres in the compose file)
+DATABASE_URL=postgresql://reloop:reloop@postgres:5432/reloop
+
+# Your server's public IP or domain
+PUBLIC_URL=https://mail.yourdomain.com
+
+# SMTP settings (Reloop IS the SMTP server, but it needs your hostname)
+SMTP_HOSTNAME=mail.yourdomain.com
+```
+
+Generate a secure API secret:
+```bash
+openssl rand -base64 32
+```
+
+### Start the stack
+
+```bash
 docker compose up -d
 ```
 
-## Step 4: Verify delivery
+This pulls all images and starts:
+- Reloop API server (port 3000)
+- Reloop dashboard (port 3001)
+- Reloop SMTP server (port 25, 587)
+- PostgreSQL database
+- Redis (for the job queue)
 
-Send a test email through the dashboard. Check the logs for the SMTP handshake and delivery receipt. Use [mail-tester.com](https://mail-tester.com) to verify your spam score.
+Check all services are healthy:
 
-## What you'll need to maintain
+```bash
+docker compose ps
+docker compose logs --tail=50
+```
 
-- Monthly OS updates (`apt upgrade`)
-- Monitor disk usage — email logs grow fast
-- Keep an eye on your IP reputation via MXToolbox
+---
+
+## Step 5: Set up SSL with Caddy
+
+You need HTTPS for the dashboard and API. Caddy is the easiest way to add automatic SSL:
+
+```bash
+apt install caddy -y
+```
+
+Create the Caddyfile:
+
+```bash
+nano /etc/caddy/Caddyfile
+```
+
+```
+mail.yourdomain.com {
+  reverse_proxy localhost:3000
+}
+
+dashboard.yourdomain.com {
+  reverse_proxy localhost:3001
+}
+```
+
+Start Caddy:
+
+```bash
+systemctl enable caddy
+systemctl start caddy
+```
+
+Caddy automatically obtains Let's Encrypt certificates and handles renewal. Your API is now available at `https://mail.yourdomain.com/v1` and your dashboard at `https://dashboard.yourdomain.com`.
+
+---
+
+## Step 6: Configure authentication records
+
+Open your dashboard at `https://dashboard.yourdomain.com`. On first login:
+
+1. Add your sending domain (`mail.yourdomain.com`)
+2. The dashboard shows you the exact DNS records to add:
+   - **SPF**: the `include:` directive for your server
+   - **DKIM**: two CNAME records with your public key
+   - **DMARC**: a starter `p=none` record
+
+Add them all to your DNS. Then click **Verify** in the dashboard — it will confirm each record is in place.
+
+---
+
+## Step 7: Send your first email
+
+Create an API key in the dashboard under **Settings → API Keys**.
+
+Test with curl:
+
+```bash
+curl -X POST https://mail.yourdomain.com/v1/emails \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "from": "hello@yourdomain.com",
+    "to": "your-personal-email@gmail.com",
+    "subject": "Hello from my self-hosted Reloop!",
+    "html": "<p>It works. 🎉</p>",
+    "text": "It works."
+  }'
+```
+
+Check your inbox. If it's not there, check:
+1. `docker compose logs reloop-api` — any errors?
+2. `docker compose logs reloop-smtp` — SMTP handshake issues?
+3. DNS is propagated — `dig TXT yourdomain.com` shows your SPF record?
+
+---
+
+## Step 8: Integrate with your application
+
+The Reloop API is compatible with the Resend API shape. If you're migrating from Resend, it's usually a one-line change:
+
+```typescript
+// Before (Resend)
+import { Resend } from "resend";
+const client = new Resend(process.env.RESEND_API_KEY);
+
+// After (Reloop — self-hosted)
+import { Reloop } from "reloop-email";
+const client = new Reloop(process.env.RELOOP_API_KEY, {
+  baseUrl: "https://mail.yourdomain.com/v1",
+});
+
+// The send call is identical
+await client.emails.send({
+  from: "hello@yourdomain.com",
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<p>Thanks for signing up.</p>",
+});
+```
+
+---
+
+## Ongoing maintenance
+
+### What needs attention
+
+| Task | Frequency | Time |
+|------|-----------|------|
+| OS security updates | Monthly | 5 min |
+| Reloop updates | As released | 10 min |
+| Disk space check | Monthly | 2 min |
+| Review DMARC reports | Weekly | 5 min |
+| Monitor bounce/complaint rate | Weekly | 5 min |
+
+### Updating Reloop
+
+```bash
+cd /opt/reloop
+git pull
+docker compose pull
+docker compose up -d
+```
+
+Rolling restart with zero downtime for the API. SMTP connections in flight will complete before the old container stops.
+
+### Monitoring disk usage
+
+Email logs can grow fast. Set up a log rotation policy:
+
+```bash
+# Check current disk usage
+df -h
+docker system df
+
+# Clean up old logs
+docker system prune --volumes
+```
+
+Consider adding a monitoring alert when disk usage exceeds 80%.
+
+---
 
 ## Is self-hosting right for you?
 
-Self-hosting is best if you: send predictable volume, care about data sovereignty, or want to eliminate per-email pricing. If you need guaranteed SLA, dedicated IPs, or zero ops burden, a managed provider may fit better.
+**Self-hosting is the right choice if:**
+- You send predictable, moderate volume (< 500k/month)
+- You care about data sovereignty or have GDPR/compliance requirements
+- You want to eliminate per-email pricing as you scale
+- You have basic DevOps comfort (or someone on your team does)
+
+**A managed provider is better if:**
+- You need zero operational overhead
+- You're sending at very high volume (millions/month) where infrastructure complexity is real
+- You need guaranteed SLAs with financial backing
+- Your team has no one comfortable maintaining a Linux server
+
+For most early-stage and growing startups, self-hosting Reloop on a $4–6/month VPS is the highest-leverage infrastructure decision you can make. The cost savings compound and the control you gain is permanent.

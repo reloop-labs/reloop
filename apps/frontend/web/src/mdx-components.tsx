@@ -42,7 +42,6 @@ export function getMDXComponents(
 		a: ({ href, children, ...props }) => (
 			<a
 				href={href}
-				className="font-medium text-primary-link underline decoration-primary-link/30 underline-offset-4"
 				{...props}
 			>
 				{children}
@@ -55,22 +54,28 @@ export function getMDXComponents(
 			/>
 		),
 		table: (props) => (
-			<div className="my-6 w-full overflow-y-auto rounded-xl border border-stroke-soft-200 dark:border-white/10">
-				<table className="my-0 w-full border-collapse text-sm" {...props} />
+			<div className="my-6! w-full overflow-y-auto rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/50">
+				<table className="my-0! w-full border-collapse text-sm" {...props} />
 			</div>
 		),
 		thead: (props) => (
-			<thead className="bg-bg-weak-50 text-left dark:bg-white/5" {...props} />
+			<thead className="bg-bg-soft-50 text-left dark:bg-white/5" {...props} />
+		),
+		tr: (props) => (
+			<tr
+				className="transition-colors hover:bg-bg-soft-50 dark:hover:bg-white/5"
+				{...props}
+			/>
 		),
 		th: (props) => (
 			<th
-				className="border-stroke-soft-200 border-b px-4 py-3 font-semibold dark:border-white/10"
+				className="border-stroke-soft-100 border-b px-4 py-3 font-semibold text-[#171717] dark:border-stroke-soft-100/50 dark:text-white"
 				{...props}
 			/>
 		),
 		td: (props) => (
 			<td
-				className="border-stroke-soft-200 border-b px-4 py-3 dark:border-white/10"
+				className="border-stroke-soft-100 border-b px-4 py-3 text-[#171717] dark:border-stroke-soft-100/50 dark:text-white"
 				{...props}
 			/>
 		),
