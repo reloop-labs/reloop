@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useTheme } from "next-themes";
 
 const AsciiWordmark = dynamic(
 	() => import("./ascii-wordmark").then((m) => m.AsciiWordmark),
@@ -8,6 +9,9 @@ const AsciiWordmark = dynamic(
 );
 
 export function AsciiWordmarkSection() {
+	const { resolvedTheme } = useTheme();
+	const inkColor = resolvedTheme === "dark" ? "#a1a1aa" : "#52525b";
+
 	return (
 		<section
 			aria-label="Reloop ASCII wordmark"
@@ -19,7 +23,7 @@ export function AsciiWordmarkSection() {
 				background: "transparent",
 			}}
 		>
-			<AsciiWordmark word="RELOOP" inkColor="#ffffff" />
+			<AsciiWordmark word="RELOOP" inkColor={inkColor} />
 		</section>
 	);
 }

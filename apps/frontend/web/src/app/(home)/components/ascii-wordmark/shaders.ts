@@ -201,9 +201,7 @@ void main() {
 
   vec2 cellCenter = uvPixel + normalizedPixelSize * 0.5;
 
-  vec3 inkDeep = vec3(0.14, 0.16, 0.30);
-  vec3 inkLift = vec3(0.20, 0.24, 0.42);
-  vec3 baseColor = mix(inkDeep, inkLift, smoothstep(0.0, 1.0, cellCenter.x));
+  vec3 baseColor = mix(uInk * 0.8, uInk * 1.2, smoothstep(0.0, 1.0, cellCenter.x));
 
   float trail = 0.0;
   float headness = 0.0;

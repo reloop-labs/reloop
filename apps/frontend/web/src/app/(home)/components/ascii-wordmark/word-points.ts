@@ -46,7 +46,7 @@ export function buildWordPoints(word: string, size: number): WordPoints {
 	const aspect = W / H;
 	const positions = new Float32Array(count * 4);
 	for (let i = 0; i < count; i++) {
-		const p = lit[(Math.random() * lit.length) | 0];
+		const p = lit[(Math.random() * lit.length) | 0] ?? [W / 2, H / 2];
 		const jx = (Math.random() - 0.5) * stride;
 		const jy = (Math.random() - 0.5) * stride;
 		const nx = ((p[0] + jx) / W - 0.5) * 2 * aspect;
