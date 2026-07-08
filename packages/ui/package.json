@@ -96,7 +96,8 @@
 		"./vertical-stepper": "./src/components/vertical-stepper.tsx",
 		"./digit-input": "./src/components/digit-input.tsx",
 		"./chatwoot-loader": "./src/components/chatwoot-loader.tsx",
-		"./rybbit-loader": "./src/components/rybbit-loader.tsx"
+		"./rybbit-loader": "./src/components/rybbit-loader.tsx",
+		"./not-found-illustration": "./src/components/not-found-illustration.tsx"
 	},
 	"dependencies": {
 		"@radix-ui/react-accordion": "catalog:ui",

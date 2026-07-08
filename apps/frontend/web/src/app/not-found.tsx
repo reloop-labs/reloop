@@ -1,5 +1,5 @@
 import { Icon } from "@reloop/ui/icon";
-import { NotFoundIllustration } from "@reloop/web/components/not-found-illustration";
+import { NotFoundIllustration } from "@reloop/ui/not-found-illustration";
 import type { Metadata } from "next";
 import Link from "next/link";
 

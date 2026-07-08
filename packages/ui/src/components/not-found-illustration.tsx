@@ -1,24 +1,20 @@
 import { cn } from "@reloop/ui/cn";
 
-export function NotFoundIllustration({
-	className,
-}: {
-	className?: string;
-}) {
+export function NotFoundIllustration({ className }: { className?: string }) {
 	return (
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox="0 0 58 58"
 			className={cn(
 				"size-20",
-				"[--nf-body:#E8E2D4] [--nf-base:#D1C9BB] [--nf-track-dark:#A89878] [--nf-track-light:#EDE8E0]",
-				"[--nf-screen:#2BA8D4] [--nf-screen-static:#FFFFFF]",
+				"[--nf-base:#D1C9BB] [--nf-body:#E8E2D4] [--nf-track-dark:#A89878] [--nf-track-light:#EDE8E0]",
+				"[--nf-screen-static:#FFFFFF] [--nf-screen:#2BA8D4]",
 				"[--nf-cable:#525252] [--nf-connector:#737373]",
-				"[--nf-port-blue:#1081E0] [--nf-port-red:#D75A4A] [--nf-port-orange:#ED8A19] [--nf-port-green:#6DB544]",
-				"dark:[--nf-body:#2A2A2A] dark:[--nf-base:#363636] dark:[--nf-track-dark:#4A4A4A] dark:[--nf-track-light:#5C5C5C]",
-				"dark:[--nf-screen:#1A4D6E] dark:[--nf-screen-static:rgba(255,255,255,0.85)]",
+				"[--nf-port-blue:#1081E0] [--nf-port-green:#6DB544] [--nf-port-orange:#ED8A19] [--nf-port-red:#D75A4A]",
+				"dark:[--nf-base:#363636] dark:[--nf-body:#2A2A2A] dark:[--nf-track-dark:#4A4A4A] dark:[--nf-track-light:#5C5C5C]",
+				"dark:[--nf-screen-static:rgba(255,255,255,0.85)] dark:[--nf-screen:#1A4D6E]",
 				"dark:[--nf-cable:#A3A3A3] dark:[--nf-connector:#8A8A8A]",
-				"dark:[--nf-port-blue:#3B82F6] dark:[--nf-port-red:#F87171] dark:[--nf-port-orange:#FB923C] dark:[--nf-port-green:#4ADE80]",
+				"dark:[--nf-port-blue:#3B82F6] dark:[--nf-port-green:#4ADE80] dark:[--nf-port-orange:#FB923C] dark:[--nf-port-red:#F87171]",
 				className,
 			)}
 			aria-hidden
@@ -96,9 +92,27 @@ export function NotFoundIllustration({
 				width="7"
 				height="4"
 			/>
-			<rect x="9" y="43.987" fill="var(--nf-port-blue)" width="7" height="2.013" />
-			<rect x="9" y="41.987" fill="var(--nf-port-red)" width="7" height="2.013" />
-			<rect x="9" y="40" fill="var(--nf-port-orange)" width="7" height="2.013" />
+			<rect
+				x="9"
+				y="43.987"
+				fill="var(--nf-port-blue)"
+				width="7"
+				height="2.013"
+			/>
+			<rect
+				x="9"
+				y="41.987"
+				fill="var(--nf-port-red)"
+				width="7"
+				height="2.013"
+			/>
+			<rect
+				x="9"
+				y="40"
+				fill="var(--nf-port-orange)"
+				width="7"
+				height="2.013"
+			/>
 			<rect x="9" y="38" fill="var(--nf-port-green)" width="7" height="2.013" />
 		</svg>
 	);

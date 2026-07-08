@@ -92,18 +92,12 @@ export function Navbar({
 								}}
 							>
 								{active && (
-									<>
-										<div
-											className="-z-10 absolute inset-x-1 inset-y-2 rounded-lg"
-											style={{
-												backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)`,
-											}}
-										/>
-										<div
-											className="absolute right-1 bottom-0 left-1 h-[2px] rounded-full"
-											style={{ backgroundColor: color }}
-										/>
-									</>
+									<div
+										className="-z-10 absolute inset-x-1 inset-y-2 rounded-full"
+										style={{
+											backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)`,
+										}}
+									/>
 								)}
 
 								<Icon
