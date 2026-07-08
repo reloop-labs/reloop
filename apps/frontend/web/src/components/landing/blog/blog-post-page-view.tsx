@@ -1,7 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import { BlogBody } from "@reloop/web/components/landing/blog/blog-body";
 import { BlogCta } from "@reloop/web/components/landing/blog/blog-cta";
-import { BlogPostCard } from "@reloop/web/components/landing/blog/blog-post-card";
 import { BlogPostCoverImage } from "@reloop/web/components/landing/blog/blog-post-cover-image";
 import { BlogTableOfContents } from "@reloop/web/components/landing/blog/blog-table-of-contents";
 import {
@@ -19,12 +18,10 @@ import type { ReactNode } from "react";
 export function BlogPostPageView({
 	post,
 	body,
-	relatedPosts,
 	toc,
 }: {
 	post: BlogPostDefinition;
 	body: ReactNode;
-	relatedPosts: BlogPostDefinition[];
 	toc: BlogTocItem[];
 }) {
 	const category = getCategoryByName(post.category);
@@ -89,23 +86,9 @@ export function BlogPostPageView({
 
 					<BlogBody className="mt-2">{body}</BlogBody>
 
-					{/* Dynamic blog CTA — inline before related posts */}
 					<div className="mt-16">
 						<BlogCta category={post.category} />
 					</div>
-
-					{relatedPosts.length > 0 ? (
-						<section className="mt-16 border-stroke-soft-200 border-t pt-12 dark:border-white/10">
-							<h2 className="font-semibold text-2xl text-text-strong-950 tracking-tight dark:text-white">
-								Related posts
-							</h2>
-							<div className="mt-8 grid gap-8 sm:grid-cols-2">
-								{relatedPosts.map((relatedPost) => (
-									<BlogPostCard key={relatedPost.slug} post={relatedPost} />
-								))}
-							</div>
-						</section>
-					) : null}
 
 					<div className="mt-12 border-stroke-soft-200 border-t pt-8 dark:border-white/10">
 						<Link

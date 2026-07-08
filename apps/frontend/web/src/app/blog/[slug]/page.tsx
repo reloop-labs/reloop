@@ -2,7 +2,6 @@ import { BlogPostPageView } from "@reloop/web/components/landing/blog/blog-post-
 import {
 	generateStaticParams,
 	getPost,
-	getRelatedPosts,
 	isPostViewable,
 } from "@reloop/web/lib/landing/blog/source";
 import { createLandingMetadata } from "@reloop/web/lib/landing/metadata";
@@ -45,7 +44,6 @@ export default async function BlogPostPage({ params }: PageProps) {
 			post={post}
 			body={post.body()}
 			toc={post.toc}
-			relatedPosts={getRelatedPosts(slug)}
 		/>
 	);
 }
