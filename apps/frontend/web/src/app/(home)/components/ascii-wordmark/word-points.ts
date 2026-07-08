@@ -19,12 +19,12 @@ export function buildWordPoints(word: string, size: number): WordPoints {
 	ctx.textBaseline = "middle";
 
 	let fontSize = 240;
-	ctx.font = `800 ${fontSize}px ui-sans-serif, system-ui, sans-serif`;
+	ctx.font = `900 ${fontSize}px ui-sans-serif, system-ui, sans-serif`;
 	const margin = 80;
 	const measured = ctx.measureText(word).width;
 	if (measured > W - margin) {
 		fontSize = Math.floor(fontSize * ((W - margin) / measured));
-		ctx.font = `800 ${fontSize}px ui-sans-serif, system-ui, sans-serif`;
+		ctx.font = `900 ${fontSize}px ui-sans-serif, system-ui, sans-serif`;
 	}
 	ctx.fillText(word, W / 2, H / 2);
 

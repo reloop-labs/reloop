@@ -114,7 +114,7 @@ export default function TransactionalWidget() {
 									: "border-white/10 bg-slate-900 text-white/40"
 							}`}
 						>
-							<Icon name="Laptop" className="h-4 w-4" />
+							<Icon name="laptop" className="h-4 w-4" />
 						</div>
 						<span className="font-mono text-[10px] text-white/60">
 							App Send

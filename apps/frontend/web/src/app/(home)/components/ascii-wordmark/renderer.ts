@@ -14,8 +14,8 @@ import {
 } from "./shaders";
 import { buildWordPoints } from "./word-points";
 
-const FLOW_INFLUENCE = 0.43;
-const FLOW_STRENGTH = 1.09;
+const FLOW_INFLUENCE = 0.35;
+const FLOW_STRENGTH = 0.85;
 const FLOW_FREQUENCY = 0.53;
 const MOUSE_STRENGTH = 0.08;
 const MOUSE_SPEED_GAIN = 1.5;
@@ -24,7 +24,7 @@ const IS_TOUCH =
 	typeof window !== "undefined" &&
 	(window.matchMedia?.("(pointer: coarse)").matches ?? false);
 
-const FBO_SIZE = IS_TOUCH ? 128 : 200;
+const FBO_SIZE = IS_TOUCH ? 160 : 300;
 const MAX_DPR = IS_TOUCH ? 1.5 : 2;
 const RENDER_SCALE = 0.5;
 const ASCII_CELL_DIVISOR = 100;
@@ -183,7 +183,7 @@ export class AsciiWordmarkRenderer {
 			blending: THREE.AdditiveBlending,
 			uniforms: {
 				uResolution: { value: new THREE.Vector2() },
-				uSize: { value: 4 },
+				uSize: { value: 5.5 },
 				uVisibility: { value: 0 },
 				uParticlesTexture: { value: null },
 			},

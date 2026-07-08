@@ -102,7 +102,7 @@ void main() {
 
     particle.a += uDeltaTime * 0.3;
     vec3 toTarget = base.xyz - particle.xyz;
-    particle.xyz += toTarget * uDeltaTime * 2.2;
+    particle.xyz += toTarget * uDeltaTime * 3.2;
   }
 
   gl_FragColor = particle;
@@ -221,7 +221,7 @@ void main() {
 
   vec3 glyphColor = mix(baseColor, trailColor, clamp(trail, 0.0, 1.0));
 
-  float ink = character * smoothstep(0.015, 0.18, luma);
+  float ink = character * smoothstep(0.01, 0.12, luma);
   ink = min(1.0, ink + trail * character * 0.3);
 
   gl_FragColor = vec4(glyphColor * ink, ink);
