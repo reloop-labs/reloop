@@ -27,7 +27,7 @@ export default function NotFound() {
 			<div className="mt-8">
 				<Link
 					href="/"
-					className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full bg-[#0a0d12] px-8 font-semibold text-[15px] text-white transition-colors hover:bg-[#0a0d12]/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+					className="inline-flex h-11 items-center justify-center gap-2.5 rounded-full bg-[#0a0d12] pr-8 pl-6 font-semibold text-[15px] text-white transition-colors hover:bg-[#0a0d12]/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
 				>
 					<Icon name="arrow-left" className="size-4" aria-hidden />
 					Return home
