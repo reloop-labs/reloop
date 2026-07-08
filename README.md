@@ -7,13 +7,12 @@
 **Open-source email infrastructure — send, receive, and manage emails at scale.**
 
 Self-host on your own servers or use the hosted service from Reloop Labs.\
-No vendor lock-in. Full transparency. Sub-900ms delivery latency.
+No vendor lock-in. Full transparency. No proprietary black boxes.
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Bun](https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-[![License](https://img.shields.io/github/license/reloop-labs/reloop?style=for-the-badge)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/reloop-labs/reloop?style=for-the-badge)](https://github.com/reloop-labs/reloop)
 
 [Website](https://reloop.sh) · [Documentation](https://reloop.sh/docs) · [Hosted Sign-up](https://reloop.sh/dashboard/signup) · [Discord](https://discord.gg/bHnkBcp7xR)
@@ -47,7 +46,6 @@ Use Reloop as a **hosted service** (Reloop Labs handles the infrastructure) or *
 | Open source | ✅ | ❌ |
 | Self-hostable | ✅ | ❌ |
 | Vendor lock-in | ❌ None | ✅ Locked in |
-| Delivery latency | ~900ms | Varies |
 | Transparent pricing | ✅ | ❌ |
 | Data stays on your servers | ✅ (self-hosted) | ❌ |
 
