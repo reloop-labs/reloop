@@ -1,29 +1,35 @@
 {
-	"version": 1,
-	"skills": {
-		"ai-seo": {
-			"source": "coreyhaines31/marketingskills",
-			"sourceType": "github",
-			"skillPath": "skills/ai-seo/SKILL.md",
-			"computedHash": "8fbda031c25d3a198725dd8b5a61133d2ac5c409f7b79fe893ee6b77b84d9b54"
-		},
-		"copywriting": {
-			"source": "coreyhaines31/marketingskills",
-			"sourceType": "github",
-			"skillPath": "skills/copywriting/SKILL.md",
-			"computedHash": "c8d63b1f77be04fd54981720de65697988810bd28331097dbe0aaf3e166d638a"
-		},
-		"seo": {
-			"source": "addyosmani/web-quality-skills",
-			"sourceType": "github",
-			"skillPath": "skills/seo/SKILL.md",
-			"computedHash": "1f1551c898c17a88a976b4f4aa84e17886f115f3887b62d1c4f8a1c040e4d1ef"
-		},
-		"seo-audit": {
-			"source": "coreyhaines31/marketingskills",
-			"sourceType": "github",
-			"skillPath": "skills/seo-audit/SKILL.md",
-			"computedHash": "f2dc52130189068981f21e1c0bdc4471ac7cd9b08d8a1320604411aa0f950385"
-		}
-	}
+  "version": 1,
+  "skills": {
+    "ai-seo": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "skillPath": "skills/ai-seo/SKILL.md",
+      "computedHash": "8fbda031c25d3a198725dd8b5a61133d2ac5c409f7b79fe893ee6b77b84d9b54"
+    },
+    "copywriting": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "skillPath": "skills/copywriting/SKILL.md",
+      "computedHash": "c8d63b1f77be04fd54981720de65697988810bd28331097dbe0aaf3e166d638a"
+    },
+    "github-readme": {
+      "source": "thatrebeccarae/claude-marketing",
+      "sourceType": "github",
+      "skillPath": "skills/github-readme/SKILL.md",
+      "computedHash": "9a47f3f0985e846562ebdf977e83ec034e66aa490b372c86cb966d36e6d79945"
+    },
+    "seo": {
+      "source": "addyosmani/web-quality-skills",
+      "sourceType": "github",
+      "skillPath": "skills/seo/SKILL.md",
+      "computedHash": "1f1551c898c17a88a976b4f4aa84e17886f115f3887b62d1c4f8a1c040e4d1ef"
+    },
+    "seo-audit": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "skillPath": "skills/seo-audit/SKILL.md",
+      "computedHash": "f2dc52130189068981f21e1c0bdc4471ac7cd9b08d8a1320604411aa0f950385"
+    }
+  }
 }
