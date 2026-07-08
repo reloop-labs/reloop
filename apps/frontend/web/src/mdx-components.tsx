@@ -25,9 +25,7 @@ const getSlug = (children: React.ReactNode): string => {
 	return "";
 };
 
-export function getMDXComponents(
-	components?: MDXComponents,
-): MDXComponents {
+export function getMDXComponents(components?: MDXComponents): MDXComponents {
 	return {
 		h2: ({ children, ...props }) => (
 			<h2 id={getSlug(children)} {...props}>
@@ -40,10 +38,7 @@ export function getMDXComponents(
 			</h3>
 		),
 		a: ({ href, children, ...props }) => (
-			<a
-				href={href}
-				{...props}
-			>
+			<a href={href} {...props}>
 				{children}
 			</a>
 		),
@@ -88,8 +83,12 @@ export function getMDXComponents(
 		pre: (props: React.ComponentProps<"pre">) => {
 			const children = React.Children.toArray(props.children);
 			const codeElement = children.find(
-				(child): child is React.ReactElement<{ className?: string; children?: React.ReactNode }> =>
-					React.isValidElement(child) && child.type === "code",
+				(
+					child,
+				): child is React.ReactElement<{
+					className?: string;
+					children?: React.ReactNode;
+				}> => React.isValidElement(child) && child.type === "code",
 			);
 
 			if (codeElement) {

@@ -89,21 +89,39 @@ export function ToolUpsell({
 	secondaryLabel?: string;
 }) {
 	return (
-		<div className="border-stroke-soft-200 border-t bg-[#f8f8f8] dark:border-white/10 dark:bg-white/[0.02]">
-			<div className="mx-auto flex max-w-4xl flex-col items-start justify-between gap-6 px-4 py-10 sm:flex-row sm:items-center sm:px-6">
-				<div>
-					<p className="font-semibold text-lg text-text-strong-950 dark:text-white">
+		<div className="relative overflow-hidden border-stroke-soft-200 border-t bg-[#0d0d0f] dark:border-white/[0.06]">
+			{/* Subtle grid overlay */}
+			<div
+				className="pointer-events-none absolute inset-0"
+				style={{
+					backgroundImage:
+						"linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
+					backgroundSize: "40px 40px",
+				}}
+			/>
+			{/* Radial glow */}
+			<div
+				className="pointer-events-none absolute inset-0"
+				style={{
+					background:
+						"radial-gradient(ellipse 60% 80% at 50% 50%, rgba(109,40,217,0.18) 0%, transparent 70%)",
+				}}
+			/>
+			<div className="relative mx-auto flex max-w-4xl flex-col items-center gap-8 px-6 py-20 text-center sm:px-10">
+				<div className="flex flex-col items-center gap-4">
+					<p className="font-semibold text-3xl text-white leading-tight tracking-tight sm:text-4xl">
 						{title}
 					</p>
-					<p className="mt-1 max-w-lg text-[14px] text-text-sub-600 dark:text-white/50">
+					<p className="max-w-md text-[15px] text-white/50 leading-relaxed">
 						{description}
 					</p>
 				</div>
-				<div className="flex flex-wrap gap-3">
+				<div className="flex flex-wrap items-center justify-center gap-3">
 					<Link
 						href={primaryHref}
 						className={Button.buttonVariants({ variant: "neutral" }).root({
-							className: "rounded-full px-5",
+							className:
+								"rounded-full bg-white! px-6 text-black! hover:bg-white/90!",
 						})}
 					>
 						{primaryLabel}
@@ -114,7 +132,10 @@ export function ToolUpsell({
 							className={Button.buttonVariants({
 								mode: "stroke",
 								variant: "neutral",
-							}).root({ className: "rounded-full px-5" })}
+							}).root({
+								className:
+									"rounded-full border-white/20! px-6 text-white! hover:border-white/40! hover:bg-white/5!",
+							})}
 						>
 							{secondaryLabel}
 						</Link>

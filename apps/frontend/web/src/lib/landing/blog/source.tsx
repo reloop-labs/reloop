@@ -98,22 +98,25 @@ function slugifyHeading(title: string) {
 
 function extractToc(content: string): BlogTocItem[] {
 	const toc: BlogTocItem[] = [];
-	const headingRegex = /^(##|###)\s+(.*)$/gm;
+	const headingRegex = /^##\s+(.*)$/gm;
 
 	for (const match of content.matchAll(headingRegex)) {
-		if (!match[1] || !match[2]) continue;
-		const title = match[2].trim();
+		if (!match[1]) continue;
+		const title = match[1].trim();
 		toc.push({
 			title,
 			url: `#${slugifyHeading(title)}`,
-			depth: match[1].length,
+			depth: 2,
 		});
 	}
 
 	return toc;
 }
 
-function parseFrontmatter(slug: string, data: Record<string, unknown>): BlogPostDefinition {
+function parseFrontmatter(
+	slug: string,
+	data: Record<string, unknown>,
+): BlogPostDefinition {
 	const author = data.author as BlogPostDefinition["author"] | undefined;
 
 	return {
@@ -121,7 +124,8 @@ function parseFrontmatter(slug: string, data: Record<string, unknown>): BlogPost
 		title: (data.title as string) || slug,
 		description: (data.description as string) || "",
 		keywords: (data.keywords as string[]) || [],
-		publishedAt: (data.publishedAt as string) || new Date().toISOString().slice(0, 10),
+		publishedAt:
+			(data.publishedAt as string) || new Date().toISOString().slice(0, 10),
 		category: (data.category as string) || "Guides",
 		tags: (data.tags as string[]) || [],
 		readTime: (data.readTime as string) || "5 min read",
@@ -287,15 +291,15 @@ export function getRelatedPosts(slug: string, limit = 3): BlogPostDefinition[] {
 	if (current.relatedSlugs?.length) {
 		addPosts(
 			current.relatedSlugs
-				.map((relatedSlug) => published.find((post) => post.slug === relatedSlug))
+				.map((relatedSlug) =>
+					published.find((post) => post.slug === relatedSlug),
+				)
 				.filter((post): post is BlogPostDefinition => post !== undefined),
 		);
 	}
 
 	if (related.length < limit) {
-		addPosts(
-			published.filter((post) => post.category === current.category),
-		);
+		addPosts(published.filter((post) => post.category === current.category));
 	}
 
 	if (related.length < limit && current.tags.length > 0) {

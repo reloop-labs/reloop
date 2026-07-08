@@ -4,9 +4,9 @@ import { cn } from "@reloop/ui/cn";
 import {
 	Children,
 	isValidElement,
-	useState,
 	type ReactElement,
 	type ReactNode,
+	useState,
 } from "react";
 
 type TabProps = {
@@ -19,7 +19,9 @@ export function Tab(_props: TabProps) {
 }
 
 export function Tabs({ children }: { children: ReactNode }) {
-	const tabs = Children.toArray(children).filter(isValidElement) as ReactElement<TabProps>[];
+	const tabs = Children.toArray(children).filter(
+		isValidElement,
+	) as ReactElement<TabProps>[];
 	const [activeIndex, setActiveIndex] = useState(0);
 
 	if (tabs.length === 0) {
@@ -45,7 +47,9 @@ export function Tabs({ children }: { children: ReactNode }) {
 					</button>
 				))}
 			</div>
-			<div className="p-4 text-[15px] leading-relaxed">{tabs[activeIndex]?.props.children}</div>
+			<div className="p-4 text-[15px] leading-relaxed">
+				{tabs[activeIndex]?.props.children}
+			</div>
 		</div>
 	);
 }

@@ -24,20 +24,21 @@ export function Cta({
 		className: "mt-4 inline-flex rounded-full",
 	});
 
-	const button = external || isCrossDomain ? (
-		<a
-			href={href}
-			target={external ? "_blank" : undefined}
-			rel={external ? "noopener noreferrer" : undefined}
-			className={className}
-		>
-			{label}
-		</a>
-	) : (
-		<Link href={href} className={className}>
-			{label}
-		</Link>
-	);
+	const button =
+		external || isCrossDomain ? (
+			<a
+				href={href}
+				target={external ? "_blank" : undefined}
+				rel={external ? "noopener noreferrer" : undefined}
+				className={className}
+			>
+				{label}
+			</a>
+		) : (
+			<Link href={href} className={className}>
+				{label}
+			</Link>
+		);
 
 	return (
 		<aside className="my-8 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 p-6 dark:border-white/10 dark:bg-white/[0.03]">

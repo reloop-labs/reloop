@@ -84,7 +84,7 @@ export function BlogTableOfContents({
 	return (
 		<nav
 			aria-label="Table of contents"
-			className={cn("w-44", className)}
+			className={cn("w-max", className)}
 		>
 			<ul className="m-0 flex list-none flex-col gap-3 p-0">
 				{items.map((item) => {
@@ -92,12 +92,12 @@ export function BlogTableOfContents({
 					const isActive = activeId === id;
 
 					return (
-						<li key={id} className={cn(item.depth === 3 && "pl-3")}>
+						<li key={id}>
 							<a
 								href={item.url}
 								onClick={(e) => handleScrollTo(e, id, setActiveId)}
 								className={cn(
-									"group flex items-center gap-3 no-underline transition-colors",
+									"group flex min-w-0 items-center gap-3 no-underline transition-colors",
 									isActive
 										? "text-primary-base"
 										: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/45 dark:hover:text-white",
@@ -114,9 +114,10 @@ export function BlogTableOfContents({
 								/>
 								<span
 									className={cn(
-										"text-[13px] leading-snug",
+										"text-[13px] leading-none whitespace-nowrap",
 										isActive && "font-medium",
 									)}
+									title={item.title}
 								>
 									{item.title}
 								</span>

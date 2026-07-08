@@ -189,7 +189,10 @@ export function AnimatedAlternative() {
 				if (!activeRef.current) break;
 
 				indexRef.current = (indexRef.current + 1) % alternatives.length;
-				currentUnits = createPhrase(stage, alternatives[indexRef.current] ?? "");
+				currentUnits = createPhrase(
+					stage,
+					alternatives[indexRef.current] ?? "",
+				);
 				await animateUnits(currentUnits, "enter", activeControls);
 				if (!activeRef.current) break;
 			}

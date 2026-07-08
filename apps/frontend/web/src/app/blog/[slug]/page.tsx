@@ -1,5 +1,4 @@
 import { BlogPostPageView } from "@reloop/web/components/landing/blog/blog-post-page-view";
-import { defaultLandingCta } from "@reloop/web/lib/landing/constants";
 import {
 	generateStaticParams,
 	getPost,
@@ -47,10 +46,6 @@ export default async function BlogPostPage({ params }: PageProps) {
 			body={post.body()}
 			toc={post.toc}
 			relatedPosts={getRelatedPosts(slug)}
-			cta={defaultLandingCta(
-				"Ready to try Reloop?",
-				"Open-source email infrastructure with a free hosted tier.",
-			)}
 		/>
 	);
 }

@@ -1,5 +1,5 @@
-import { FeatureCta } from "@reloop/web/components/page-shell";
 import { BlogIndex } from "@reloop/web/components/landing/blog/blog-index";
+import { FeatureCta } from "@reloop/web/components/page-shell";
 import {
 	getCategories,
 	getPublishedPosts,
@@ -25,8 +25,7 @@ export const metadata: Metadata = {
 	alternates: { canonical: pageUrl },
 	openGraph: {
 		title: "Blog | Reloop",
-		description:
-			"Guides, tutorials, and engineering notes from Reloop Labs.",
+		description: "Guides, tutorials, and engineering notes from Reloop Labs.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -34,18 +33,14 @@ export const metadata: Metadata = {
 	twitter: {
 		card: "summary_large_image",
 		title: "Blog | Reloop",
-		description:
-			"Guides, tutorials, and engineering notes from Reloop Labs.",
+		description: "Guides, tutorials, and engineering notes from Reloop Labs.",
 	},
 };
 
 const BlogPage = () => {
 	return (
 		<>
-			<BlogIndex
-				posts={getPublishedPosts()}
-				categories={getCategories()}
-			/>
+			<BlogIndex posts={getPublishedPosts()} categories={getCategories()} />
 			<FeatureCta
 				title="Stay in the loop"
 				titleMuted="Star us on GitHub."

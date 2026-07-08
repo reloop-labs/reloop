@@ -30,12 +30,7 @@ export function filterBlogPosts(
 			return true;
 		}
 
-		const haystack = [
-			post.title,
-			post.description,
-			post.category,
-			...post.tags,
-		]
+		const haystack = [post.title, post.description, post.category, ...post.tags]
 			.join(" ")
 			.toLowerCase();
 

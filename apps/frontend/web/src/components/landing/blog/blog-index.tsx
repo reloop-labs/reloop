@@ -3,11 +3,13 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { BlogPostCard } from "@reloop/web/components/landing/blog/blog-post-card";
-import type { BlogCategoryDefinition } from "@reloop/web/lib/landing/types";
 import { filterBlogPosts } from "@reloop/web/lib/landing/blog/utils";
-import type { BlogPostDefinition } from "@reloop/web/lib/landing/types";
+import type {
+	BlogCategoryDefinition,
+	BlogPostDefinition,
+} from "@reloop/web/lib/landing/types";
 import Link from "next/link";
-import { useMemo, useState, type ReactNode } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 
 function RssIcon({ className }: { className?: string }) {
 	return (
@@ -98,7 +100,7 @@ export function BlogIndex({
 						<label className="relative block w-full min-w-[220px] sm:w-[260px]">
 							<Icon
 								name="search"
-								className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-text-soft-400"
+								className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3.5 size-4 text-text-soft-400"
 								aria-hidden="true"
 							/>
 							<input
@@ -106,7 +108,7 @@ export function BlogIndex({
 								value={query}
 								onChange={(event) => setQuery(event.target.value)}
 								placeholder="Search..."
-								className="h-10 w-full rounded-full border border-stroke-soft-200 bg-bg-weak-50 pr-4 pl-10 text-[14px] text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 focus:border-stroke-sub-300 focus:bg-bg-white-0 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:placeholder:text-white/35 dark:focus:border-white/20 dark:focus:bg-white/[0.06]"
+								className="h-10 w-full rounded-full border border-stroke-soft-200 bg-bg-weak-50 pr-4 pl-10 text-[14px] text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 focus:border-stroke-sub-300 focus:bg-bg-white-0 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:focus:border-white/20 dark:focus:bg-white/[0.06] dark:placeholder:text-white/35"
 							/>
 						</label>
 						<a
@@ -122,7 +124,7 @@ export function BlogIndex({
 
 			<div className="mx-auto max-w-[1320px] px-4 pb-20 sm:px-6 lg:px-8">
 				{filteredPosts.length === 0 ? (
-					<div className="rounded-2xl border border-dashed border-stroke-soft-200 px-6 py-16 text-center dark:border-white/10">
+					<div className="rounded-2xl border border-stroke-soft-200 border-dashed px-6 py-16 text-center dark:border-white/10">
 						<p className="font-semibold text-[17px] text-text-strong-950 dark:text-white">
 							No posts found
 						</p>

@@ -6,8 +6,8 @@ import {
 } from "../app/changelog/changelog-utils";
 import { LANGUAGE_SLUGS } from "../app/languages/languages";
 import {
-	generateCategoryStaticParams,
 	generateStaticParams as generateBlogStaticParams,
+	generateCategoryStaticParams,
 } from "./landing/blog/source";
 
 const APP_DIR = join(process.cwd(), "src/app");

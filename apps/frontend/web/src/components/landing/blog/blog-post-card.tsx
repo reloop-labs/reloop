@@ -23,7 +23,9 @@ export function BlogPostCard({ post }: { post: BlogPostDefinition }) {
 			<p className="mt-4 text-[13px] text-text-sub-600 dark:text-white/45">
 				{post.author.name}
 				<span aria-hidden="true"> · </span>
-				<time dateTime={post.publishedAt}>{formatBlogDate(post.publishedAt)}</time>
+				<time dateTime={post.publishedAt}>
+					{formatBlogDate(post.publishedAt)}
+				</time>
 			</p>
 		</Link>
 	);

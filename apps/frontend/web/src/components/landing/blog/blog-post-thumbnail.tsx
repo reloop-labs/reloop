@@ -80,8 +80,21 @@ function WireframePattern({ seed }: { seed: number }) {
 					strokeOpacity="0.15"
 					strokeWidth="1"
 				/>
-				<circle cx="160" cy="100" r="28" fill="none" stroke="currentColor" strokeOpacity="0.3" />
-				<circle cx="160" cy="100" r="4" fill="currentColor" fillOpacity="0.55" />
+				<circle
+					cx="160"
+					cy="100"
+					r="28"
+					fill="none"
+					stroke="currentColor"
+					strokeOpacity="0.3"
+				/>
+				<circle
+					cx="160"
+					cy="100"
+					r="4"
+					fill="currentColor"
+					fillOpacity="0.55"
+				/>
 				<circle cx="88" cy="68" r="3" fill="currentColor" fillOpacity="0.4" />
 				<circle cx="232" cy="132" r="3" fill="currentColor" fillOpacity="0.4" />
 				<circle cx="104" cy="148" r="2" fill="currentColor" fillOpacity="0.3" />
@@ -111,8 +124,22 @@ function WireframePattern({ seed }: { seed: number }) {
 					strokeOpacity="0.2"
 					strokeWidth="1"
 				/>
-				<line x1="56" y1="80" x2="264" y2="80" stroke="currentColor" strokeOpacity="0.12" />
-				<line x1="120" y1="48" x2="120" y2="152" stroke="currentColor" strokeOpacity="0.12" />
+				<line
+					x1="56"
+					y1="80"
+					x2="264"
+					y2="80"
+					stroke="currentColor"
+					strokeOpacity="0.12"
+				/>
+				<line
+					x1="120"
+					y1="48"
+					x2="120"
+					y2="152"
+					stroke="currentColor"
+					strokeOpacity="0.12"
+				/>
 				<rect
 					x="136"
 					y="96"
@@ -130,7 +157,13 @@ function WireframePattern({ seed }: { seed: number }) {
 					strokeOpacity="0.3"
 					strokeWidth="1"
 				/>
-				<circle cx="200" cy="112" r="3" fill="currentColor" fillOpacity="0.45" />
+				<circle
+					cx="200"
+					cy="112"
+					r="3"
+					fill="currentColor"
+					fillOpacity="0.45"
+				/>
 			</>
 		);
 	}

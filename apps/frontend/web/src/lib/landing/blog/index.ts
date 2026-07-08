@@ -1,14 +1,14 @@
 export {
+	type BlogPostPage,
 	generateCategoryStaticParams,
 	generateStaticParams,
 	getAllPosts,
 	getCategories,
-	getCategoryBySlug,
 	getCategoryByName,
+	getCategoryBySlug,
 	getCategoryPath,
 	getPost,
 	getPostsByCategory,
 	getPublishedPosts,
 	getRelatedPosts,
-	type BlogPostPage,
 } from "./source";
