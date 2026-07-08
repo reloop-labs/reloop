@@ -52,16 +52,15 @@ export default function OpenGraphImage() {
 			<div
 				style={{
 					position: "absolute",
-					top: "48px",
+					top: "44px",
 					left: "56px",
 					display: "flex",
 					alignItems: "center",
-					gap: "10px",
 				}}
 			>
 				<svg
-					width="24"
-					height="24"
+					width="78"
+					height="78"
 					viewBox="0 0 200 200"
 					fill="none"
 					xmlns="http://www.w3.org/2000/svg"
@@ -232,7 +231,7 @@ export default function OpenGraphImage() {
 				</svg>
 				<span
 					style={{
-						fontSize: "17px",
+						fontSize: "32px",
 						fontWeight: 600,
 						color: "#ffffff",
 						letterSpacing: "-0.2px",
@@ -246,14 +245,16 @@ export default function OpenGraphImage() {
 			<div
 				style={{
 					position: "absolute",
-					top: "52px",
+					top: "44px",
 					right: "56px",
 					display: "flex",
+					alignItems: "center",
+					height: "48px",
 				}}
 			>
 				<span
 					style={{
-						fontSize: "14px",
+						fontSize: "24px",
 						fontWeight: 500,
 						color: "rgba(255,255,255,0.3)",
 						letterSpacing: "0px",
@@ -281,7 +282,6 @@ export default function OpenGraphImage() {
 						fontWeight: 500,
 						color: "rgba(255,255,255,0.35)",
 						letterSpacing: "2px",
-						textTransform: "uppercase",
 						marginBottom: "32px",
 					}}
 				>
@@ -306,7 +306,7 @@ export default function OpenGraphImage() {
 					style={{
 						fontSize: "78px",
 						fontWeight: 800,
-						color: "rgba(255,255,255,0.25)",
+						color: "#ffffff",
 						letterSpacing: "-3.5px",
 						lineHeight: 1.05,
 					}}
