@@ -5,6 +5,10 @@ import {
 	getChangelogReleasePath,
 } from "../app/changelog/changelog-utils";
 import { LANGUAGE_SLUGS } from "../app/languages/languages";
+import {
+	generateCategoryStaticParams,
+	generateStaticParams as generateBlogStaticParams,
+} from "./landing/blog/source";
 
 const APP_DIR = join(process.cwd(), "src/app");
 
@@ -43,6 +47,14 @@ function collectStaticRoutes(dir: string, segments: string[] = []): string[] {
 			} else if (entry === "[slug]" && segmentPath === "languages") {
 				for (const slug of LANGUAGE_SLUGS) {
 					routes.push(`/languages/${slug}`);
+				}
+			} else if (entry === "[slug]" && segmentPath === "blog") {
+				for (const { slug } of generateBlogStaticParams()) {
+					routes.push(`/blog/${slug}`);
+				}
+			} else if (entry === "[slug]" && segmentPath === "blog/category") {
+				for (const { slug } of generateCategoryStaticParams()) {
+					routes.push(`/blog/category/${slug}`);
 				}
 			}
 

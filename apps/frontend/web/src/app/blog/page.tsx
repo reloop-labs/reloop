@@ -1,11 +1,12 @@
 import { FeatureCta } from "@reloop/web/components/page-shell";
 import { BlogIndex } from "@reloop/web/components/landing/blog/blog-index";
-import { blogPosts } from "@reloop/web/lib/landing/blog";
+import {
+	getCategories,
+	getPublishedPosts,
+} from "@reloop/web/lib/landing/blog/source";
 import { getSiteUrl, socialProfiles } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
 export const instant = false;
 
 const pageUrl = `${getSiteUrl()}/blog`;
@@ -41,7 +42,10 @@ export const metadata: Metadata = {
 const BlogPage = () => {
 	return (
 		<>
-			<BlogIndex posts={blogPosts} />
+			<BlogIndex
+				posts={getPublishedPosts()}
+				categories={getCategories()}
+			/>
 			<FeatureCta
 				title="Stay in the loop"
 				titleMuted="Star us on GitHub."

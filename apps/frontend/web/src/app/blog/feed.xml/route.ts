@@ -1,10 +1,9 @@
-import { blogPosts } from "@reloop/web/lib/landing/blog";
-import { sortBlogPosts } from "@reloop/web/lib/landing/blog/utils";
+import { getPublishedPosts } from "@reloop/web/lib/landing/blog/source";
 import { getSiteUrl } from "@reloop/web/lib/site";
 
 export function GET() {
 	const siteUrl = getSiteUrl();
-	const posts = sortBlogPosts(blogPosts);
+	const posts = getPublishedPosts();
 
 	const items = posts
 		.map((post) => {
@@ -17,7 +16,7 @@ export function GET() {
       <guid>${url}</guid>
       <description><![CDATA[${post.description}]]></description>
       <pubDate>${new Date(post.publishedAt).toUTCString()}</pubDate>
-      <category><![CDATA[${post.tag}]]></category>
+      <category><![CDATA[${post.category}]]></category>
     </item>`;
 		})
 		.join("");

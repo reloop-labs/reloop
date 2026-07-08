@@ -3,12 +3,11 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { BlogPostCard } from "@reloop/web/components/landing/blog/blog-post-card";
-import {
-	filterBlogPosts,
-	getBlogCategories,
-} from "@reloop/web/lib/landing/blog/utils";
+import type { BlogCategoryDefinition } from "@reloop/web/lib/landing/types";
+import { filterBlogPosts } from "@reloop/web/lib/landing/blog/utils";
 import type { BlogPostDefinition } from "@reloop/web/lib/landing/types";
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useMemo, useState, type ReactNode } from "react";
 
 function RssIcon({ className }: { className?: string }) {
 	return (
@@ -27,33 +26,61 @@ function RssIcon({ className }: { className?: string }) {
 	);
 }
 
-export function BlogIndex({ posts }: { posts: BlogPostDefinition[] }) {
-	const categories = useMemo(() => getBlogCategories(posts), [posts]);
-	const [activeCategory, setActiveCategory] = useState("All");
+export function BlogIndex({
+	posts,
+	categories,
+	title = "Blog",
+	description,
+	activeCategorySlug,
+	breadcrumb,
+}: {
+	posts: BlogPostDefinition[];
+	categories: BlogCategoryDefinition[];
+	title?: string;
+	description?: string;
+	activeCategorySlug?: string;
+	breadcrumb?: ReactNode;
+}) {
 	const [query, setQuery] = useState("");
 
 	const filteredPosts = useMemo(
-		() => filterBlogPosts(posts, { category: activeCategory, query }),
-		[posts, activeCategory, query],
+		() => filterBlogPosts(posts, { query }),
+		[posts, query],
 	);
 
 	return (
 		<div className="min-h-screen bg-white dark:bg-black">
 			<div className="mx-auto max-w-[1320px] px-4 pt-40 pb-10 sm:px-6 lg:px-8">
+				{breadcrumb}
 				<h1 className="font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.6rem] lg:text-[4.2rem] dark:text-white">
-					Blog
+					{title}
 				</h1>
+				{description ? (
+					<p className="mt-4 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed dark:text-white/50">
+						{description}
+					</p>
+				) : null}
 
 				<div className="mt-8 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
 					<div className="flex flex-wrap gap-1">
+						<Link
+							href="/blog"
+							className={cn(
+								"rounded-full px-3.5 py-1.5 font-medium text-[14px] transition-colors",
+								!activeCategorySlug
+									? "bg-bg-weak-50 text-text-strong-950 dark:bg-white/10 dark:text-white"
+									: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white",
+							)}
+						>
+							All
+						</Link>
 						{categories.map((category) => {
-							const isActive = category === activeCategory;
+							const isActive = category.slug === activeCategorySlug;
 
 							return (
-								<button
-									key={category}
-									type="button"
-									onClick={() => setActiveCategory(category)}
+								<Link
+									key={category.slug}
+									href={`/blog/category/${category.slug}`}
 									className={cn(
 										"rounded-full px-3.5 py-1.5 font-medium text-[14px] transition-colors",
 										isActive
@@ -61,8 +88,8 @@ export function BlogIndex({ posts }: { posts: BlogPostDefinition[] }) {
 											: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white",
 									)}
 								>
-									{category}
-								</button>
+									{category.name}
+								</Link>
 							);
 						})}
 					</div>

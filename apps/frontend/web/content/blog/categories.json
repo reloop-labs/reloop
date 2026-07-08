@@ -1,0 +1,32 @@
+[
+	{
+		"slug": "deliverability",
+		"name": "Deliverability",
+		"description": "SPF, DKIM, DMARC, and inbox placement best practices."
+	},
+	{
+		"slug": "migration",
+		"name": "Migration",
+		"description": "Guides for switching from other email providers to Reloop."
+	},
+	{
+		"slug": "guides",
+		"name": "Guides",
+		"description": "Practical patterns for transactional email and infrastructure."
+	},
+	{
+		"slug": "tutorial",
+		"name": "Tutorial",
+		"description": "Step-by-step tutorials for integrating Reloop into your stack."
+	},
+	{
+		"slug": "self-hosting",
+		"name": "Self-hosting",
+		"description": "Deploy and operate Reloop on your own infrastructure."
+	},
+	{
+		"slug": "comparison",
+		"name": "Comparison",
+		"description": "How Reloop compares to other email providers."
+	}
+]

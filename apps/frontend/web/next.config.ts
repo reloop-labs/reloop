@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+	serverExternalPackages: ["next-mdx-remote", "next-mdx-remote/rsc"],
 	output: "standalone",
 	allowedDevOrigins: ["local.reloop.sh", "*.local.reloop.sh"],
 	cacheComponents: true,

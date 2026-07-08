@@ -8,11 +8,6 @@ export function formatBlogDate(date: string) {
 	});
 }
 
-export function getBlogCategories(posts: BlogPostDefinition[]) {
-	const tags = [...new Set(posts.map((post) => post.tag))].sort();
-	return ["All", ...tags];
-}
-
 export function sortBlogPosts(posts: BlogPostDefinition[]) {
 	return [...posts].sort(
 		(a, b) =>
@@ -23,23 +18,27 @@ export function sortBlogPosts(posts: BlogPostDefinition[]) {
 export function filterBlogPosts(
 	posts: BlogPostDefinition[],
 	{
-		category,
 		query,
 	}: {
-		category: string;
 		query: string;
 	},
 ) {
 	const normalizedQuery = query.trim().toLowerCase();
 
 	return sortBlogPosts(posts).filter((post) => {
-		const matchesCategory = category === "All" || post.tag === category;
-		const matchesQuery =
-			normalizedQuery.length === 0 ||
-			post.title.toLowerCase().includes(normalizedQuery) ||
-			post.description.toLowerCase().includes(normalizedQuery) ||
-			post.tag.toLowerCase().includes(normalizedQuery);
+		if (normalizedQuery.length === 0) {
+			return true;
+		}
 
-		return matchesCategory && matchesQuery;
+		const haystack = [
+			post.title,
+			post.description,
+			post.category,
+			...post.tags,
+		]
+			.join(" ")
+			.toLowerCase();
+
+		return haystack.includes(normalizedQuery);
 	});
 }

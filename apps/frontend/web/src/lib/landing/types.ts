@@ -49,13 +49,34 @@ export type GlossaryTermDefinition = {
 	relatedFeatureHref?: string;
 };
 
+export type BlogPostAuthor = {
+	name: string;
+	avatar?: string;
+};
+
+export type BlogCategoryDefinition = {
+	slug: string;
+	name: string;
+	description: string;
+};
+
 export type BlogPostDefinition = {
 	slug: string;
 	title: string;
 	description: string;
 	keywords: string[];
 	publishedAt: string;
-	tag: string;
+	category: string;
+	tags: string[];
 	readTime: string;
-	sections: { heading?: string; paragraphs: string[] }[];
+	author: BlogPostAuthor;
+	image?: string;
+	draft?: boolean;
+	relatedSlugs?: string[];
+};
+
+export type BlogTocItem = {
+	title: string;
+	url: string;
+	depth: number;
 };
