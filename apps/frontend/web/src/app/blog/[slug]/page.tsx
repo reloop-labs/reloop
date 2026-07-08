@@ -45,6 +45,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 		<BlogPostPageView
 			post={post}
 			body={post.body()}
+			toc={post.toc}
 			relatedPosts={getRelatedPosts(slug)}
 			cta={defaultLandingCta(
 				"Ready to try Reloop?",

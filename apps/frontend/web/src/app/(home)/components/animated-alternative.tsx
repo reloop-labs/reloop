@@ -185,12 +185,13 @@ export function AnimatedAlternative() {
 				await animateUnits(currentUnits, "exit", activeControls);
 				if (!activeRef.current) break;
 
+				await sleep(GAP_MS);
+				if (!activeRef.current) break;
+
 				indexRef.current = (indexRef.current + 1) % alternatives.length;
 				currentUnits = createPhrase(stage, alternatives[indexRef.current] ?? "");
 				await animateUnits(currentUnits, "enter", activeControls);
 				if (!activeRef.current) break;
-
-				await sleep(GAP_MS);
 			}
 		};
 

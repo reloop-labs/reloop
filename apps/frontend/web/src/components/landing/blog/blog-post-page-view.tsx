@@ -2,6 +2,7 @@ import * as Button from "@reloop/ui/button";
 import { BlogBody } from "@reloop/web/components/landing/blog/blog-body";
 import { BlogPostCard } from "@reloop/web/components/landing/blog/blog-post-card";
 import { BlogPostCoverImage } from "@reloop/web/components/landing/blog/blog-post-cover-image";
+import { BlogTableOfContents } from "@reloop/web/components/landing/blog/blog-table-of-contents";
 import { ToolUpsell } from "@reloop/web/components/landing/tools/tool-chrome";
 import type { FeatureCtaBand } from "@reloop/web/components/landing/types";
 import { formatBlogDate } from "@reloop/web/lib/landing/blog/utils";
@@ -9,7 +10,10 @@ import {
 	getCategoryByName,
 	getCategoryPath,
 } from "@reloop/web/lib/landing/blog/source";
-import type { BlogPostDefinition } from "@reloop/web/lib/landing/types";
+import type {
+	BlogPostDefinition,
+	BlogTocItem,
+} from "@reloop/web/lib/landing/types";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -17,18 +21,31 @@ export function BlogPostPageView({
 	post,
 	body,
 	relatedPosts,
+	toc,
 	cta,
 }: {
 	post: BlogPostDefinition;
 	body: ReactNode;
 	relatedPosts: BlogPostDefinition[];
+	toc: BlogTocItem[];
 	cta: FeatureCtaBand;
 }) {
 	const category = getCategoryByName(post.category);
+	const showToc = toc.length > 0;
 
 	return (
 		<div className="min-h-screen bg-white dark:bg-black">
-			<article className="mx-auto w-full max-w-[720px] px-6 py-8 pt-40 md:px-10">
+			<div className="relative mx-auto w-full max-w-[720px] px-6 py-8 pt-40 md:px-10">
+				{showToc ? (
+					<div className="pointer-events-none absolute top-0 right-full bottom-0 mr-10 hidden w-44 xl:block">
+						<BlogTableOfContents
+							items={toc}
+							className="pointer-events-auto sticky top-1/2 -translate-y-1/2"
+						/>
+					</div>
+				) : null}
+
+				<article>
 				<header className="mb-20 text-center">
 					<nav className="text-[13px] text-text-sub-600 tracking-wide dark:text-white/45">
 						<Link href="/blog" className="transition-colors hover:text-text-strong-950 dark:hover:text-white">
@@ -98,7 +115,8 @@ export function BlogPostPageView({
 						← All posts
 					</Link>
 				</div>
-			</article>
+				</article>
+			</div>
 
 			<ToolUpsell
 				title={cta.title}
