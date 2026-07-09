@@ -11,6 +11,8 @@ export const listThreadsRoute = new Elysia().use(authMiddleware).get(
 			query.mailboxId,
 			query.limit,
 			query.offset,
+			query.folder,
+			query.q,
 		);
 	},
 	{
@@ -19,8 +21,15 @@ export const listThreadsRoute = new Elysia().use(authMiddleware).get(
 			mailboxId: t.Optional(
 				t.String({ description: "Filter threads by mailbox ID" }),
 			),
-			limit: t.Optional(t.Numeric({ default: 50, maximum: 100 })),
+			limit: t.Optional(t.Numeric({ default: 50, maximum: 200 })),
 			offset: t.Optional(t.Numeric({ default: 0 })),
+			folder: t.Optional(
+				t.String({
+					description:
+						"Filter by folder: inbox, archive, trash, snoozed (omit for all)",
+				}),
+			),
+			q: t.Optional(t.String({ description: "Search subject and preview" })),
 		}),
 		response: {
 			200: MailModel.threadListResponse,

@@ -1,126 +1,149 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
+import useSWR from "swr";
+import type { InboxLabel } from "../types";
 
-export type InboxLabel = {
+type ApiLabel = {
 	id: string;
+	mailboxId: string;
+	organizationId: string;
 	name: string;
-	icon?: "bookmark" | "folder";
-};
-
-const DEFAULT_LABELS: InboxLabel[] = [
-	{ id: "notes", name: "Notes", icon: "bookmark" },
-	{ id: "other", name: "Other", icon: "folder" },
-];
-
-const labelsKey = (mailboxId: string) => `inbox-labels-${mailboxId}`;
-const assignmentsKey = (mailboxId: string) =>
-	`inbox-label-assignments-${mailboxId}`;
-
-const readLabels = (mailboxId: string): InboxLabel[] => {
-	if (typeof window === "undefined") return DEFAULT_LABELS;
-	try {
-		const raw = localStorage.getItem(labelsKey(mailboxId));
-		if (!raw) {
-			localStorage.setItem(labelsKey(mailboxId), JSON.stringify(DEFAULT_LABELS));
-			return DEFAULT_LABELS;
-		}
-		return JSON.parse(raw) as InboxLabel[];
-	} catch {
-		return DEFAULT_LABELS;
-	}
-};
-
-const readAssignments = (mailboxId: string): Record<string, string[]> => {
-	if (typeof window === "undefined") return {};
-	try {
-		const raw = localStorage.getItem(assignmentsKey(mailboxId));
-		return raw ? (JSON.parse(raw) as Record<string, string[]>) : {};
-	} catch {
-		return {};
-	}
+	color: string;
+	createdAt: string | Date;
+	updatedAt: string | Date;
 };
 
 export const useInboxLabels = (mailboxId: string) => {
-	const [labels, setLabels] = useState<InboxLabel[]>(() =>
-		readLabels(mailboxId),
-	);
-	const [assignments, setAssignments] = useState<Record<string, string[]>>(
-		() => readAssignments(mailboxId),
+	const { data, mutate, isLoading } = useSWR<ApiLabel[]>(
+		mailboxId ? `/api/inbox/v1/labels?mailboxId=${mailboxId}` : null,
 	);
 
-	useEffect(() => {
-		setLabels(readLabels(mailboxId));
-		setAssignments(readAssignments(mailboxId));
-	}, [mailboxId]);
-
-	const persistLabels = useCallback(
-		(next: InboxLabel[]) => {
-			setLabels(next);
-			localStorage.setItem(labelsKey(mailboxId), JSON.stringify(next));
-		},
-		[mailboxId],
-	);
-
-	const persistAssignments = useCallback(
-		(next: Record<string, string[]>) => {
-			setAssignments(next);
-			localStorage.setItem(assignmentsKey(mailboxId), JSON.stringify(next));
-		},
-		[mailboxId],
+	const labels: InboxLabel[] = useMemo(
+		() =>
+			(data || []).map((l) => ({
+				id: l.id,
+				mailboxId: l.mailboxId,
+				name: l.name,
+				color: l.color,
+			})),
+		[data],
 	);
 
 	const addLabel = useCallback(
-		(name: string) => {
+		async (name: string, color = "default") => {
 			const trimmed = name.trim();
-			if (!trimmed) return null;
-			const id = trimmed.toLowerCase().replace(/\s+/g, "-");
-			if (labels.some((l) => l.id === id)) return null;
-			const next = [...labels, { id, name: trimmed, icon: "folder" as const }];
-			persistLabels(next);
-			return id;
+			if (!trimmed || !mailboxId) return null;
+			const res = await fetch("/api/inbox/v1/labels", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ mailboxId, name: trimmed, color }),
+			});
+			if (!res.ok) return null;
+			const created = (await res.json()) as ApiLabel;
+			await mutate();
+			return created.id;
 		},
-		[labels, persistLabels],
+		[mailboxId, mutate],
 	);
 
-	const getLabelCount = useCallback(
-		(labelId: string) => {
-			return Object.values(assignments).filter((ids) =>
-				ids.includes(labelId),
-			).length;
+	const deleteLabel = useCallback(
+		async (labelId: string) => {
+			const res = await fetch(`/api/inbox/v1/labels/${labelId}`, {
+				method: "DELETE",
+			});
+			if (!res.ok) throw new Error("Failed to delete label");
+			await mutate();
 		},
-		[assignments],
-	);
-
-	const getThreadIdsForLabel = useCallback(
-		(labelId: string) => {
-			return Object.entries(assignments)
-				.filter(([, ids]) => ids.includes(labelId))
-				.map(([threadId]) => threadId);
-		},
-		[assignments],
+		[mutate],
 	);
 
 	const assignThreadToLabel = useCallback(
-		(threadId: string, labelId: string) => {
-			const current = assignments[threadId] ?? [];
-			if (current.includes(labelId)) return;
-			persistAssignments({
-				...assignments,
-				[threadId]: [...current, labelId],
-			});
+		async (threadId: string, labelId: string) => {
+			const res = await fetch(
+				`/api/inbox/v1/labels/threads/${threadId}/assign`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ labelId }),
+				},
+			);
+			if (!res.ok) throw new Error("Failed to assign label");
 		},
-		[assignments, persistAssignments],
+		[],
 	);
+
+	const unassignThreadFromLabel = useCallback(
+		async (threadId: string, labelId: string) => {
+			const res = await fetch(
+				`/api/inbox/v1/labels/threads/${threadId}/unassign`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ labelId }),
+				},
+			);
+			if (!res.ok) throw new Error("Failed to unassign label");
+		},
+		[],
+	);
+
+	const getThreadLabels = useCallback(async (threadId: string) => {
+		const res = await fetch(`/api/inbox/v1/labels/threads/${threadId}`);
+		if (!res.ok) return [] as InboxLabel[];
+		const list = (await res.json()) as ApiLabel[];
+		return list.map((l) => ({
+			id: l.id,
+			mailboxId: l.mailboxId,
+			name: l.name,
+			color: l.color,
+		}));
+	}, []);
+
+	const fetchThreadIdsForLabel = useCallback(async (labelId: string) => {
+		const res = await fetch(`/api/inbox/v1/labels/${labelId}/threads`);
+		if (!res.ok) return [] as string[];
+		const body = (await res.json()) as { threadIds: string[] };
+		return body.threadIds || [];
+	}, []);
+
+	const getLabelCount = useCallback((_labelId: string) => 0, []);
 
 	return useMemo(
 		() => ({
 			labels,
+			isLoading,
 			addLabel,
+			deleteLabel,
 			getLabelCount,
-			getThreadIdsForLabel,
+			fetchThreadIdsForLabel,
 			assignThreadToLabel,
+			unassignThreadFromLabel,
+			getThreadLabels,
+			refreshLabels: mutate,
 		}),
-		[labels, addLabel, getLabelCount, getThreadIdsForLabel, assignThreadToLabel],
+		[
+			labels,
+			isLoading,
+			addLabel,
+			deleteLabel,
+			getLabelCount,
+			fetchThreadIdsForLabel,
+			assignThreadToLabel,
+			unassignThreadFromLabel,
+			getThreadLabels,
+			mutate,
+		],
 	);
+};
+
+export const useLabelThreadIds = (labelId: string | undefined) => {
+	const { data, isLoading, mutate } = useSWR<{ threadIds: string[] }>(
+		labelId ? `/api/inbox/v1/labels/${labelId}/threads` : null,
+	);
+	return {
+		threadIds: data?.threadIds ?? [],
+		isLoading,
+		refresh: mutate,
+	};
 };

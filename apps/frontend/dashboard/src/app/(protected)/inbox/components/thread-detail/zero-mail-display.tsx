@@ -90,11 +90,15 @@ export const ZeroMailDisplay = ({
 
 	const displayAttachments = (email?.attachments || msg.attachments || []).map(
 		(att: any) => ({
+			id: att.id,
 			name: att.filename || att.name || "Attachment",
 			size:
 				typeof att.size === "number"
 					? `${(att.size / 1024).toFixed(1)} KB`
 					: att.size || "Unknown size",
+			contentType: att.contentType,
+			inboundEmailId: att.inboundEmailId || email?.id || msg.inboundEmailId,
+			messageId: email?.id || msg.inboundEmailId || msg.id,
 			...att,
 		}),
 	);
@@ -252,7 +256,7 @@ export const ZeroMailDisplay = ({
 						<div className="mt-4">
 							<MessageAttachments
 								attachments={displayAttachments}
-								onDownload={() => {}}
+								messageId={email?.id || msg.inboundEmailId}
 							/>
 						</div>
 					)}

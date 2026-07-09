@@ -20,9 +20,17 @@ export const updateThreadRoute = new Elysia().use(authMiddleware).patch(
 			isStarred: t.Optional(
 				t.Boolean({ description: "Starred/unstarred status of the thread" }),
 			),
+			isImportant: t.Optional(
+				t.Boolean({ description: "Important flag for the thread" }),
+			),
 			status: t.Optional(
 				t.Union(
-					[t.Literal("active"), t.Literal("archived"), t.Literal("closed")],
+					[
+						t.Literal("active"),
+						t.Literal("archived"),
+						t.Literal("closed"),
+						t.Literal("trash"),
+					],
 					{ description: "Thread status" },
 				),
 			),
@@ -39,7 +47,7 @@ export const updateThreadRoute = new Elysia().use(authMiddleware).patch(
 			tags: ["Threads"],
 			summary: "Update Thread",
 			description:
-				"Update thread-wide attributes like read/starred status or workflow state",
+				"Update thread-wide attributes like read/starred/important status or workflow state",
 		},
 	},
 );

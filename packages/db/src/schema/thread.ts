@@ -7,6 +7,7 @@ import {
 	jsonb,
 	pgEnum,
 	pgTable,
+	primaryKey,
 	text,
 	timestamp,
 	varchar,
@@ -18,12 +19,15 @@ import { inboundEmail, mailbox } from "./inbox";
 // Custom ID generation functions with prefixes
 const createThreadId = () => `thr_${createId()}`;
 const createThreadMessageId = () => `tmsg_${createId()}`;
+const createLabelId = () => `lbl_${createId()}`;
+const createNoteId = () => `note_${createId()}`;
 
 // Enums
 export const threadStatusEnum = pgEnum("thread_status", [
 	"active",
 	"archived",
 	"closed",
+	"trash",
 ]);
 
 export const messageDirectionEnum = pgEnum("message_direction", [
@@ -54,6 +58,9 @@ export const emailThread = pgTable(
 		participants: jsonb("participants").$type<string[]>().default([]),
 		isRead: boolean("is_read").notNull().default(false),
 		isStarred: boolean("is_starred").notNull().default(false),
+		isImportant: boolean("is_important").notNull().default(false),
+		snoozedUntil: timestamp("snoozed_until"),
+		deletedAt: timestamp("deleted_at"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at")
 			.notNull()
@@ -70,6 +77,83 @@ export const emailThread = pgTable(
 			table.mailboxId,
 			table.lastMessageAt,
 		),
+		index("email_thread_idx_snoozed_until").on(table.snoozedUntil),
+		index("email_thread_idx_is_important").on(table.isImportant),
+	],
+);
+
+// ─── email_label ─────────────────────────────────────────────────────
+export const emailLabel = pgTable(
+	"email_label",
+	{
+		id: text("id")
+			.$defaultFn(() => createLabelId())
+			.primaryKey(),
+		mailboxId: text("mailbox_id")
+			.notNull()
+			.references(() => mailbox.id, { onDelete: "cascade" }),
+		organizationId: text("organization_id")
+			.notNull()
+			.references(() => organization.id, { onDelete: "cascade" }),
+		name: varchar("name", { length: 100 }).notNull(),
+		color: varchar("color", { length: 32 }).notNull().default("default"),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+		updatedAt: timestamp("updated_at")
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		index("email_label_idx_mailbox_id").on(table.mailboxId),
+		index("email_label_idx_organization_id").on(table.organizationId),
+	],
+);
+
+// ─── thread_label ────────────────────────────────────────────────────
+export const threadLabel = pgTable(
+	"thread_label",
+	{
+		threadId: text("thread_id")
+			.notNull()
+			.references(() => emailThread.id, { onDelete: "cascade" }),
+		labelId: text("label_id")
+			.notNull()
+			.references(() => emailLabel.id, { onDelete: "cascade" }),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+	},
+	(table) => [
+		primaryKey({ columns: [table.threadId, table.labelId] }),
+		index("thread_label_idx_thread_id").on(table.threadId),
+		index("thread_label_idx_label_id").on(table.labelId),
+	],
+);
+
+// ─── thread_note ─────────────────────────────────────────────────────
+export const threadNote = pgTable(
+	"thread_note",
+	{
+		id: text("id")
+			.$defaultFn(() => createNoteId())
+			.primaryKey(),
+		threadId: text("thread_id")
+			.notNull()
+			.references(() => emailThread.id, { onDelete: "cascade" }),
+		organizationId: text("organization_id")
+			.notNull()
+			.references(() => organization.id, { onDelete: "cascade" }),
+		content: text("content").notNull(),
+		color: varchar("color", { length: 32 }).notNull().default("default"),
+		isPinned: boolean("is_pinned").notNull().default(false),
+		order: integer("order").notNull().default(0),
+		createdAt: timestamp("created_at").notNull().defaultNow(),
+		updatedAt: timestamp("updated_at")
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		index("thread_note_idx_thread_id").on(table.threadId),
+		index("thread_note_idx_organization_id").on(table.organizationId),
 	],
 );
 
@@ -125,6 +209,8 @@ export const emailThreadRelations = relations(emailThread, ({ one, many }) => ({
 		references: [organization.id],
 	}),
 	messages: many(threadMessage),
+	labels: many(threadLabel),
+	notes: many(threadNote),
 }));
 
 export const threadMessageRelations = relations(threadMessage, ({ one }) => ({
@@ -142,11 +228,48 @@ export const threadMessageRelations = relations(threadMessage, ({ one }) => ({
 	}),
 }));
 
+export const emailLabelRelations = relations(emailLabel, ({ one, many }) => ({
+	mailbox: one(mailbox, {
+		fields: [emailLabel.mailboxId],
+		references: [mailbox.id],
+	}),
+	organization: one(organization, {
+		fields: [emailLabel.organizationId],
+		references: [organization.id],
+	}),
+	threads: many(threadLabel),
+}));
+
+export const threadLabelRelations = relations(threadLabel, ({ one }) => ({
+	thread: one(emailThread, {
+		fields: [threadLabel.threadId],
+		references: [emailThread.id],
+	}),
+	label: one(emailLabel, {
+		fields: [threadLabel.labelId],
+		references: [emailLabel.id],
+	}),
+}));
+
+export const threadNoteRelations = relations(threadNote, ({ one }) => ({
+	thread: one(emailThread, {
+		fields: [threadNote.threadId],
+		references: [emailThread.id],
+	}),
+	organization: one(organization, {
+		fields: [threadNote.organizationId],
+		references: [organization.id],
+	}),
+}));
+
 // ─── Exports ─────────────────────────────────────────────────────────
 
 export const threadTables = {
 	emailThread,
 	threadMessage,
+	emailLabel,
+	threadLabel,
+	threadNote,
 } as const;
 
 export type ThreadTable = typeof threadTables;

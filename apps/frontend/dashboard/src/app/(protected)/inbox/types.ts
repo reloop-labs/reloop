@@ -36,6 +36,24 @@ export interface AgentMailboxStats {
 	unread: number;
 }
 
+export interface InboxLabel {
+	id: string;
+	mailboxId: string;
+	name: string;
+	color: string;
+}
+
+export interface ThreadNote {
+	id: string;
+	threadId: string;
+	content: string;
+	color: string;
+	isPinned: boolean;
+	order: number;
+	createdAt: string;
+	updatedAt: string;
+}
+
 export interface InboundThread {
 	id: string;
 	mailboxId: string;
@@ -53,6 +71,11 @@ export interface InboundThread {
 	unread: boolean;
 	isStarred?: boolean;
 	isArchived?: boolean;
+	isImportant?: boolean;
+	isSpam?: boolean;
+	isTrashed?: boolean;
+	snoozedUntil?: string | null;
+	labels?: InboxLabel[];
 	entityTag?: "invoice" | "support" | "order" | "security";
 	direction?: "inbound" | "outbound";
 	toEmails?: string[];
@@ -60,6 +83,19 @@ export interface InboundThread {
 	parsed?: Record<string, unknown>;
 	timeline: InboundTimelineStep[];
 }
+
+export type BatchThreadAction =
+	| "archive"
+	| "trash"
+	| "restore"
+	| "star"
+	| "unstar"
+	| "read"
+	| "unread"
+	| "important"
+	| "unimportant"
+	| "spam"
+	| "unspam";
 
 export const INBOX_FILTERS: { id: InboxFilter; label: string }[] = [
 	{ id: "primary", label: "Primary" },

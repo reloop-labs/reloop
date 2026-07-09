@@ -105,6 +105,7 @@
 		"@radix-ui/react-checkbox": "catalog:ui",
 		"@radix-ui/react-dialog": "catalog:ui",
 		"@radix-ui/react-dropdown-menu": "catalog:ui",
+		"@radix-ui/react-context-menu": "catalog:ui",
 		"@radix-ui/react-icons": "catalog:ui",
 		"@radix-ui/react-label": "catalog:ui",
 		"@radix-ui/react-popover": "catalog:ui",

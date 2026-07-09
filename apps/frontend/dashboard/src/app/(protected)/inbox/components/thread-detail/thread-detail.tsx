@@ -3,6 +3,7 @@
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
@@ -10,8 +11,10 @@ import useSWR from "swr";
 import type { AgentMailbox, InboundThread } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
 import { ForwardComposer } from "./forward-composer";
+import { NotesPanel } from "./note-panel";
 import { RawHeadersModal } from "./raw-headers-modal";
 import { ReplyComposer } from "./reply-composer";
+import { SnoozeDialog } from "./snooze-dialog";
 import { ZeroMailDisplay } from "./zero-mail-display";
 import { ZeroThreadFooter } from "./zero-thread-footer";
 import { ZeroThreadToolbar } from "./zero-thread-toolbar";
@@ -51,8 +54,10 @@ const translateText = async (
 interface ThreadDetailProps {
 	thread: InboundThread | null;
 	mailbox: AgentMailbox | undefined;
+	folder?: string;
 	onBack?: () => void;
 	showBack?: boolean;
+	onToggleAi?: () => void;
 }
 
 const EmptyState = () => (
@@ -84,8 +89,10 @@ const EmptyState = () => (
 export const ThreadDetail = ({
 	thread,
 	mailbox,
+	folder,
 	onBack,
 	showBack,
+	onToggleAi,
 }: ThreadDetailProps) => {
 	const {
 		deleteMessage,
@@ -93,7 +100,14 @@ export const ThreadDetail = ({
 		markMessageSpam,
 		toggleMessageStar,
 		archiveThread,
+		trashThread,
+		restoreThread,
+		unarchiveThread,
+		snoozeThread,
+		unsnoozeThread,
+		toggleThreadImportant,
 		sendReply,
+		sendReplyAll,
 		sendForward,
 		refresh,
 	} = useAgentInbox();
@@ -106,6 +120,12 @@ export const ThreadDetail = ({
 	const [replyBody, setReplyBody] = useState("");
 	const [showForwardComposer, setShowForwardComposer] = useState(false);
 	const [isForwarding, setIsForwarding] = useState(false);
+	const [snoozeOpen, setSnoozeOpen] = useState(false);
+	const [replyMode, setReplyMode] = useState<"reply" | "replyAll">("reply");
+	const [composeParam, setComposeParam] = useQueryState(
+		"compose",
+		parseAsString.withDefault(""),
+	);
 
 	// ── Translation state ─────────────────────────────────────────────────────
 	const [isTranslated, setIsTranslated] = useState(false);
@@ -138,6 +158,20 @@ export const ThreadDetail = ({
 		setOptimisticReplies([]);
 		setShowForwardComposer(false);
 	}, [thread?.id]);
+
+	useEffect(() => {
+		if (!composeParam || !thread) return;
+		if (composeParam === "forward") {
+			setShowReplyComposer(false);
+			setShowForwardComposer(true);
+		} else if (composeParam === "reply" || composeParam === "replyAll") {
+			setReplyMode(composeParam);
+			setShowForwardComposer(false);
+			setReplyBody("");
+			setShowReplyComposer(true);
+		}
+		void setComposeParam(null);
+	}, [composeParam, thread, setComposeParam]);
 
 	// ── Build display messages list ───────────────────────────────────────────
 	const displayMessages = useMemo(() => {
@@ -237,11 +271,12 @@ export const ThreadDetail = ({
 		}
 	};
 
+	const threadKey = thread?.threadId ?? thread?.id;
+
 	const handleArchive = async () => {
-		if (!thread) return;
-		const archiveId = thread.threadId ?? thread.id;
+		if (!thread || !threadKey) return;
 		try {
-			await archiveThread(archiveId);
+			await archiveThread(threadKey);
 			toast.success("Archived");
 			onBack?.();
 		} catch (err: unknown) {
@@ -249,16 +284,105 @@ export const ThreadDetail = ({
 		}
 	};
 
-	const handleDelete = async () => {
-		if (!thread || !messageId || !confirm("Are you sure you want to delete this message?"))
-			return;
+	const handleUnarchive = async () => {
+		if (!threadKey) return;
 		try {
-			await deleteMessage(messageId);
-			toast.success("Message deleted");
-			if (onBack) onBack();
-		} catch (err: any) {
-			toast.error(err.message || "Failed to delete message");
+			await unarchiveThread(threadKey);
+			toast.success("Moved to inbox");
+			onBack?.();
+		} catch (err: unknown) {
+			toast.error(err instanceof Error ? err.message : "Failed to unarchive");
 		}
+	};
+
+	const handleRestore = async () => {
+		if (!threadKey) return;
+		try {
+			if (folder === "spam" && messageId) {
+				await markMessageSpam(messageId, false);
+			} else if (folder === "snoozed") {
+				await unsnoozeThread(threadKey);
+			} else {
+				await restoreThread(threadKey);
+			}
+			toast.success("Moved to inbox");
+			onBack?.();
+		} catch (err: unknown) {
+			toast.error(err instanceof Error ? err.message : "Failed to restore");
+		}
+	};
+
+	const handleDelete = async () => {
+		if (!thread) return;
+		const inTrash = folder === "trash";
+		if (
+			!confirm(
+				inTrash
+					? "Permanently delete this thread?"
+					: "Move this thread to trash?",
+			)
+		) {
+			return;
+		}
+		try {
+			if (inTrash) {
+				if (messageId) await deleteMessage(messageId);
+			} else if (threadKey) {
+				await trashThread(threadKey);
+			} else if (messageId) {
+				await deleteMessage(messageId);
+			}
+			toast.success(inTrash ? "Deleted forever" : "Moved to trash");
+			onBack?.();
+		} catch (err: unknown) {
+			toast.error(err instanceof Error ? err.message : "Failed to delete");
+		}
+	};
+
+	const handleToggleImportant = async () => {
+		if (!threadKey) return;
+		try {
+			await toggleThreadImportant(threadKey, !thread?.isImportant);
+			toast.success(
+				thread?.isImportant ? "Unmarked important" : "Marked important",
+			);
+		} catch (err: unknown) {
+			toast.error(
+				err instanceof Error ? err.message : "Failed to update important",
+			);
+		}
+	};
+
+	const handleSnooze = async (until: Date) => {
+		if (!threadKey) return;
+		try {
+			await snoozeThread(threadKey, until);
+			toast.success("Snoozed");
+			onBack?.();
+		} catch (err: unknown) {
+			toast.error(err instanceof Error ? err.message : "Failed to snooze");
+		}
+	};
+
+	const listUnsubscribeUrl = useMemo(() => {
+		const headers =
+			displayMessages.find((m) => m.direction !== "outbound")?.email?.headers ||
+			displayMessages.find((m) => m.direction !== "outbound")?.headers ||
+			null;
+		if (!headers || typeof headers !== "object") return null;
+		const raw =
+			headers["List-Unsubscribe"] ||
+			headers["list-unsubscribe"] ||
+			headers["LIST-UNSUBSCRIBE"];
+		if (!raw || typeof raw !== "string") return null;
+		const match = raw.match(/<(https?:\/\/[^>]+)>/i) || raw.match(/(https?:\/\/\S+)/i);
+		return match?.[1] ?? null;
+	}, [displayMessages]);
+
+	const handleUnsubscribe = () => {
+		if (!listUnsubscribeUrl) return;
+		window.open(listUnsubscribeUrl, "_blank", "noopener,noreferrer");
+		toast.success("Opened unsubscribe link");
 	};
 
 	const handleToggleRead = async (isRead: boolean) => {
@@ -276,6 +400,7 @@ export const ThreadDetail = ({
 		try {
 			await markMessageSpam(messageId, isSpam);
 			toast.success(isSpam ? "Marked as Spam" : "Marked as Not Spam");
+			if (isSpam) onBack?.();
 		} catch (err: any) {
 			toast.error(err.message || "Failed to mark as spam");
 		}
@@ -285,7 +410,6 @@ export const ThreadDetail = ({
 		const body = (bodyOverride ?? replyBody).trim();
 		if (!thread || !messageId || !body) return;
 
-		// Optimistically add the reply bubble immediately
 		const optimisticMsg = {
 			id: `optimistic-${Date.now()}`,
 			direction: "outbound",
@@ -309,18 +433,19 @@ export const ThreadDetail = ({
 		setReplyBody("");
 		setShowReplyComposer(false);
 
-		const replyPromise = sendReply(messageId, optimisticMsg.email.textBody);
-		toast.promise(replyPromise, {
+		const send =
+			replyMode === "replyAll"
+				? sendReplyAll(messageId, optimisticMsg.email.textBody)
+				: sendReply(messageId, optimisticMsg.email.textBody);
+
+		toast.promise(send, {
 			loading: "Sending reply...",
 			success: async () => {
-				// Refresh both the thread view and the messages list
 				await Promise.all([mutateThread(), refresh()]);
-				// Once real data is back, clear the optimistic entry
 				setOptimisticReplies([]);
 				return `Reply sent to ${thread.from.email} successfully`;
 			},
 			error: (err) => {
-				// Roll back optimistic entry on failure
 				setOptimisticReplies((prev) =>
 					prev.filter((r) => r.id !== optimisticMsg.id),
 				);
@@ -329,19 +454,20 @@ export const ThreadDetail = ({
 		});
 	};
 
-	const handleForward = (msgId?: string) => {
+	const handleForward = (_msgId?: string) => {
 		setShowReplyComposer(false);
 		setShowForwardComposer(true);
 	};
 
-	const openReplyComposer = () => {
+	const openReplyComposer = (mode: "reply" | "replyAll" = "reply") => {
+		setReplyMode(mode);
 		setShowForwardComposer(false);
 		setReplyBody("");
 		setShowReplyComposer(true);
 	};
 
-	useHotkeys("r", openReplyComposer);
-	useHotkeys("a", openReplyComposer);
+	useHotkeys("r", () => openReplyComposer("reply"));
+	useHotkeys("a", () => openReplyComposer("replyAll"));
 	useHotkeys("f", () => handleForward());
 	useHotkeys("s", () => {
 		void handleToggleStar();
@@ -546,14 +672,32 @@ export const ThreadDetail = ({
 		<div className="flex h-full min-h-0 flex-col rounded-xl bg-panel-dark">
 			<ZeroThreadToolbar
 				isStarred={!!thread.isStarred}
+				isImportant={!!thread.isImportant}
+				folder={folder}
 				showBack={showBack}
 				onClose={onBack}
-				onReplyAll={openReplyComposer}
+				onReplyAll={() => openReplyComposer("replyAll")}
 				onToggleStar={() => void handleToggleStar()}
+				onToggleImportant={() => void handleToggleImportant()}
 				onArchive={() => void handleArchive()}
-				onDelete={handleDelete}
+				onUnarchive={() => void handleUnarchive()}
+				onRestore={() => void handleRestore()}
+				onMoveToInbox={() => void handleRestore()}
+				onDelete={() => void handleDelete()}
 				onPrint={handlePrint}
 				onMarkSpam={() => void handleMarkSpam(true)}
+				onSnooze={() => setSnoozeOpen(true)}
+				onUnsubscribe={
+					listUnsubscribeUrl ? handleUnsubscribe : undefined
+				}
+				notesSlot={
+					thread.threadId ? <NotesPanel threadId={thread.threadId} /> : null
+				}
+			/>
+			<SnoozeDialog
+				open={snoozeOpen}
+				onOpenChange={setSnoozeOpen}
+				onConfirm={(until) => void handleSnooze(until)}
 			/>
 
 			<div className="min-h-0 flex-1 overflow-y-auto">

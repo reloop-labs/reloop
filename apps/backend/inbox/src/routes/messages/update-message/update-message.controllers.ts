@@ -10,6 +10,7 @@ export async function updateMessageController(
 	updates: {
 		isRead?: boolean;
 		isStarred?: boolean;
+		isSpam?: boolean;
 	},
 ) {
 	const log = useLogger();
@@ -33,6 +34,10 @@ export async function updateMessageController(
 	const updateData: Partial<typeof inboundEmail.$inferInsert> = {};
 	if (updates.isRead !== undefined) updateData.isRead = updates.isRead;
 	if (updates.isStarred !== undefined) updateData.isStarred = updates.isStarred;
+	if (updates.isSpam !== undefined) {
+		updateData.isSpam = updates.isSpam;
+		updateData.status = updates.isSpam ? "spam" : "received";
+	}
 
 	if (Object.keys(updateData).length === 0) {
 		return { success: true, id, message: "No changes" };

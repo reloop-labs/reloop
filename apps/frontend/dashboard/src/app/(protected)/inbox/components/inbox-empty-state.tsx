@@ -1,17 +1,20 @@
 "use client";
 
 import { InboxEmptyStateIcon } from "./inbox-empty-state-icon";
+import { AiSidebarToggle } from "./ai-sidebar";
 import { Mail } from "lucide-react";
 
 export const InboxEmptyState = ({
 	title = "It's empty here",
 	description = "Choose an email to view details",
 	onCompose,
+	onOpenAi,
 	showComposeAction = true,
 }: {
 	title?: string;
 	description?: string;
 	onCompose?: () => void;
+	onOpenAi?: () => void;
 	showComposeAction?: boolean;
 }) => (
 	<div className="flex h-full items-center justify-center">
@@ -20,16 +23,19 @@ export const InboxEmptyState = ({
 			<div className="mt-4">
 				<p className="text-lg">{title}</p>
 				<p className="text-md text-mail-muted">{description}</p>
-				{showComposeAction && onCompose ? (
+				{(showComposeAction && onCompose) || onOpenAi ? (
 					<div className="mt-4 grid grid-cols-1 gap-2 xl:grid-cols-2">
-						<button
-							type="button"
-							onClick={onCompose}
-							className="inline-flex h-7 cursor-pointer items-center justify-center gap-0.5 overflow-hidden rounded-lg border-none bg-[#313131] px-2 transition-colors hover:bg-[#404040]"
-						>
-							<Mail className="mr-1 h-3.5 w-3.5 fill-[#959595]" />
-							<span className="text-sm leading-none">Send email</span>
-						</button>
+						{onOpenAi ? <AiSidebarToggle onClick={onOpenAi} /> : null}
+						{showComposeAction && onCompose ? (
+							<button
+								type="button"
+								onClick={onCompose}
+								className="inline-flex h-7 cursor-pointer items-center justify-center gap-0.5 overflow-hidden rounded-lg border-none bg-[#313131] px-2 transition-colors hover:bg-[#404040]"
+							>
+								<Mail className="mr-1 h-3.5 w-3.5 fill-[#959595]" />
+								<span className="text-sm leading-none">Send email</span>
+							</button>
+						) : null}
 					</div>
 				) : null}
 			</div>

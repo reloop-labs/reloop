@@ -262,7 +262,11 @@ export namespace MailModel {
 		message: t.Optional(t.String()),
 		isRead: t.Optional(t.Boolean()),
 		isStarred: t.Optional(t.Boolean()),
+		isSpam: t.Optional(t.Boolean()),
+		isImportant: t.Optional(t.Boolean()),
 		status: t.Optional(t.String()),
+		snoozedUntil: t.Optional(t.Union([t.String(), t.Null()])),
+		deletedAt: t.Optional(t.Union([t.String(), t.Null(), t.Date()])),
 	});
 
 	export const ErrorResponseSchema = t.Object({
@@ -377,9 +381,38 @@ export namespace MailModel {
 		participants: t.Array(t.String()),
 		isRead: t.Boolean(),
 		isStarred: t.Boolean(),
+		isImportant: t.Optional(t.Boolean()),
+		snoozedUntil: t.Optional(t.Union([t.String(), t.Null(), t.Date()])),
+		deletedAt: t.Optional(t.Union([t.String(), t.Null(), t.Date()])),
 		createdAt: t.Union([t.Date(), t.String()]),
 		updatedAt: t.Union([t.Date(), t.String()]),
 	});
+
+	export const labelItem = t.Object({
+		id: t.String(),
+		mailboxId: t.String(),
+		organizationId: t.String(),
+		name: t.String(),
+		color: t.String(),
+		createdAt: t.Union([t.Date(), t.String()]),
+		updatedAt: t.Union([t.Date(), t.String()]),
+	});
+
+	export const labelListResponse = t.Array(labelItem);
+
+	export const noteItem = t.Object({
+		id: t.String(),
+		threadId: t.String(),
+		organizationId: t.String(),
+		content: t.String(),
+		color: t.String(),
+		isPinned: t.Boolean(),
+		order: t.Number(),
+		createdAt: t.Union([t.Date(), t.String()]),
+		updatedAt: t.Union([t.Date(), t.String()]),
+	});
+
+	export const noteListResponse = t.Array(noteItem);
 
 	export const threadListResponse = t.Array(threadItem);
 

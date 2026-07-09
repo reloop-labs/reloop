@@ -8,7 +8,7 @@ import {
 	useMemo,
 } from "react";
 import useSWR from "swr";
-import type { AgentMailbox, InboundThread } from "../types";
+import type { AgentMailbox, BatchThreadAction, InboundThread } from "../types";
 
 export type NewAgentAddressInput = {
 	label: string;
@@ -98,6 +98,9 @@ interface BackendThread {
 	participants: string[];
 	isRead: boolean;
 	isStarred: boolean;
+	isImportant?: boolean;
+	snoozedUntil?: string | Date | null;
+	deletedAt?: string | Date | null;
 	createdAt: string | Date;
 	updatedAt: string | Date;
 }
@@ -106,6 +109,8 @@ interface AgentInboxContextValue {
 	mailboxes: AgentMailbox[];
 	threads: InboundThread[];
 	archivedThreads: InboundThread[];
+	trashThreads: InboundThread[];
+	snoozedThreads: InboundThread[];
 	isLoadingMailboxes: boolean;
 	isLoadingThreads: boolean;
 	getMailbox: (id: string) => AgentMailbox | undefined;
@@ -116,7 +121,18 @@ interface AgentInboxContextValue {
 	markMessageSpam: (id: string, isSpam: boolean) => Promise<void>;
 	toggleMessageStar: (id: string, isStarred: boolean) => Promise<void>;
 	archiveThread: (threadId: string) => Promise<void>;
+	unarchiveThread: (threadId: string) => Promise<void>;
+	trashThread: (threadId: string) => Promise<void>;
+	restoreThread: (threadId: string) => Promise<void>;
+	snoozeThread: (threadId: string, until: Date) => Promise<void>;
+	unsnoozeThread: (threadId: string) => Promise<void>;
+	toggleThreadImportant: (
+		threadId: string,
+		isImportant: boolean,
+	) => Promise<void>;
+	batchThreads: (ids: string[], action: BatchThreadAction) => Promise<void>;
 	sendReply: (id: string, text: string, html?: string) => Promise<void>;
+	sendReplyAll: (id: string, text: string, html?: string) => Promise<void>;
 	sendForward: (
 		id: string,
 		to: string | string[],
@@ -144,6 +160,23 @@ interface AgentInboxContextValue {
 }
 
 const AgentInboxContext = createContext<AgentInboxContextValue | null>(null);
+
+const toIsoString = (value: string | Date): string =>
+	typeof value === "string" ? value : value.toISOString();
+
+const toOptionalIsoString = (
+	value: string | Date | null | undefined,
+): string | null => {
+	if (value == null) return null;
+	return toIsoString(value);
+};
+
+const isCurrentlySnoozed = (
+	snoozedUntil: string | Date | null | undefined,
+): boolean => {
+	if (snoozedUntil == null) return false;
+	return new Date(snoozedUntil).getTime() > Date.now();
+};
 
 const mapMessageToThread = (msg: BackendMessage): InboundThread => {
 	const receivedAtDate = msg.date || msg.createdAt;
@@ -188,6 +221,10 @@ const mapMessageToThread = (msg: BackendMessage): InboundThread => {
 		unread: !msg.isRead,
 		isStarred: msg.isStarred,
 		isArchived: false,
+		isImportant: false,
+		isSpam: msg.isSpam,
+		isTrashed: false,
+		snoozedUntil: null,
 		direction: "inbound" as const,
 		toEmails: msg.toEmails,
 		attachments:
@@ -222,6 +259,8 @@ const mapBackendThreadToInbound = (
 			? thread.lastMessageAt
 			: thread.lastMessageAt.toISOString();
 	const participant = thread.participants[0] || "unknown@unknown.com";
+	const isTrashed = thread.status === "trash";
+	const isArchived = thread.status === "archived";
 
 	return {
 		id: thread.id,
@@ -237,7 +276,11 @@ const mapBackendThreadToInbound = (
 		securityLevel: 5,
 		unread: !thread.isRead,
 		isStarred: thread.isStarred,
-		isArchived: thread.status === "archived",
+		isArchived,
+		isImportant: thread.isImportant ?? false,
+		isSpam: false,
+		isTrashed,
+		snoozedUntil: toOptionalIsoString(thread.snoozedUntil),
 		direction: "inbound",
 		timeline: [],
 	};
@@ -264,7 +307,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 	const { data: allThreadsData, mutate: mutateThreads } = useSWR<
 		BackendThread[]
-	>("/api/inbox/v1/threads?limit=100");
+	>("/api/inbox/v1/threads?limit=200");
 
 	const isLoadingThreads = isLoadingInboundThreads || isLoadingSentMessages;
 
@@ -285,9 +328,14 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 	}, [mailboxesData]);
 
 	const threads = useMemo(() => {
-		const archivedThreadIds = new Set(
+		const excludedThreadIds = new Set(
 			(allThreadsData || [])
-				.filter((t) => t.status === "archived")
+				.filter(
+					(t) =>
+						t.status === "archived" ||
+						t.status === "trash" ||
+						isCurrentlySnoozed(t.snoozedUntil),
+				)
 				.map((t) => t.id),
 		);
 
@@ -297,15 +345,25 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 		const mappedInbound = messagesData
 			? messagesData
-					.filter((msg) => !archivedThreadIds.has(msg.threadId || ""))
+					.filter((msg) => !excludedThreadIds.has(msg.threadId || ""))
 					.map((msg) => {
 						const base = mapMessageToThread(msg);
 						if (msg.threadId && threadMeta.has(msg.threadId)) {
 							const meta = threadMeta.get(msg.threadId)!;
+							const isArchived = meta.status === "archived";
+							const isTrashed = meta.status === "trash";
 							return {
 								...base,
 								isStarred: base.isStarred || meta.isStarred,
 								unread: base.unread || !meta.isRead,
+								isImportant: meta.isImportant ?? base.isImportant,
+								isSpam: base.isSpam,
+								isTrashed,
+								isArchived,
+								snoozedUntil: toOptionalIsoString(meta.snoozedUntil),
+								status: base.isSpam
+									? ("blocked" as const)
+									: base.status,
 							};
 						}
 						return base;
@@ -349,6 +407,10 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 						unread: false,
 						isStarred: false,
 						isArchived: false,
+						isImportant: false,
+						isSpam: false,
+						isTrashed: false,
+						snoozedUntil: null,
 						direction: "outbound" as const,
 						toEmails: msg.toEmails,
 						attachments: [],
@@ -383,6 +445,20 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		if (!allThreadsData) return [];
 		return allThreadsData
 			.filter((t) => t.status === "archived")
+			.map((t) => mapBackendThreadToInbound(t, t.mailboxId || ""));
+	}, [allThreadsData]);
+
+	const trashThreads = useMemo(() => {
+		if (!allThreadsData) return [];
+		return allThreadsData
+			.filter((t) => t.status === "trash")
+			.map((t) => mapBackendThreadToInbound(t, t.mailboxId || ""));
+	}, [allThreadsData]);
+
+	const snoozedThreads = useMemo(() => {
+		if (!allThreadsData) return [];
+		return allThreadsData
+			.filter((t) => isCurrentlySnoozed(t.snoozedUntil))
 			.map((t) => mapBackendThreadToInbound(t, t.mailboxId || ""));
 	}, [allThreadsData]);
 
@@ -468,19 +544,20 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 	const markMessageSpam = useCallback(
 		async (id: string, isSpam: boolean) => {
-			await mutateMessages(
-				(current) => {
-					if (!current) return current;
-					return current.map((msg) =>
-						msg.id === id
-							? { ...msg, isSpam, status: isSpam ? "spam" : "received" }
-							: msg,
-					);
-				},
-				{ revalidate: true },
-			);
+			const res = await fetch(`/api/inbox/v1/messages/${id}`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ isSpam }),
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to update spam status");
+			}
+
+			await Promise.all([mutateMessages(), mutateThreads()]);
 		},
-		[mutateMessages],
+		[mutateMessages, mutateThreads],
 	);
 
 	const toggleMessageStar = useCallback(
@@ -521,6 +598,150 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		[mutateMessages, mutateThreads, mutateSentMessages],
 	);
 
+	const unarchiveThread = useCallback(
+		async (threadId: string) => {
+			const res = await fetch(`/api/inbox/v1/threads/${threadId}`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ status: "active" }),
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to unarchive thread");
+			}
+
+			await Promise.all([
+				mutateMessages(),
+				mutateThreads(),
+				mutateSentMessages(),
+			]);
+		},
+		[mutateMessages, mutateThreads, mutateSentMessages],
+	);
+
+	const trashThread = useCallback(
+		async (threadId: string) => {
+			const res = await fetch(`/api/inbox/v1/threads/${threadId}/trash`, {
+				method: "POST",
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to trash thread");
+			}
+
+			await Promise.all([
+				mutateMessages(),
+				mutateThreads(),
+				mutateSentMessages(),
+			]);
+		},
+		[mutateMessages, mutateThreads, mutateSentMessages],
+	);
+
+	const restoreThread = useCallback(
+		async (threadId: string) => {
+			const res = await fetch(`/api/inbox/v1/threads/${threadId}/restore`, {
+				method: "POST",
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to restore thread");
+			}
+
+			await Promise.all([
+				mutateMessages(),
+				mutateThreads(),
+				mutateSentMessages(),
+			]);
+		},
+		[mutateMessages, mutateThreads, mutateSentMessages],
+	);
+
+	const snoozeThread = useCallback(
+		async (threadId: string, until: Date) => {
+			const res = await fetch(`/api/inbox/v1/threads/${threadId}/snooze`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ until: until.toISOString() }),
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to snooze thread");
+			}
+
+			await Promise.all([
+				mutateMessages(),
+				mutateThreads(),
+				mutateSentMessages(),
+			]);
+		},
+		[mutateMessages, mutateThreads, mutateSentMessages],
+	);
+
+	const unsnoozeThread = useCallback(
+		async (threadId: string) => {
+			const res = await fetch(`/api/inbox/v1/threads/${threadId}/unsnooze`, {
+				method: "POST",
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to unsnooze thread");
+			}
+
+			await Promise.all([
+				mutateMessages(),
+				mutateThreads(),
+				mutateSentMessages(),
+			]);
+		},
+		[mutateMessages, mutateThreads, mutateSentMessages],
+	);
+
+	const toggleThreadImportant = useCallback(
+		async (threadId: string, isImportant: boolean) => {
+			const res = await fetch(`/api/inbox/v1/threads/${threadId}`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ isImportant }),
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to update important status");
+			}
+
+			await Promise.all([mutateMessages(), mutateThreads()]);
+		},
+		[mutateMessages, mutateThreads],
+	);
+
+	const batchThreads = useCallback(
+		async (ids: string[], action: BatchThreadAction) => {
+			const res = await fetch("/api/inbox/v1/threads/batch", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ ids, action }),
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to batch update threads");
+			}
+
+			await Promise.all([
+				mutateMessages(),
+				mutateThreads(),
+				mutateSentMessages(),
+			]);
+		},
+		[mutateMessages, mutateThreads, mutateSentMessages],
+	);
+
 	const sendReply = useCallback(
 		async (id: string, text: string, html?: string) => {
 			const res = await fetch(`/api/inbox/v1/messages/${id}/reply`, {
@@ -532,6 +753,24 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			if (!res.ok) {
 				const body = await res.text();
 				throw new Error(body || "Failed to send reply");
+			}
+
+			await Promise.all([mutateMessages(), mutateSentMessages()]);
+		},
+		[mutateMessages, mutateSentMessages],
+	);
+
+	const sendReplyAll = useCallback(
+		async (id: string, text: string, html?: string) => {
+			const res = await fetch(`/api/inbox/v1/messages/${id}/reply-all`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ text, html }),
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to send reply all");
 			}
 
 			await Promise.all([mutateMessages(), mutateSentMessages()]);
@@ -611,6 +850,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			mailboxes,
 			threads,
 			archivedThreads,
+			trashThreads,
+			snoozedThreads,
 			isLoadingMailboxes,
 			isLoadingThreads,
 			getMailbox,
@@ -621,7 +862,15 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			markMessageSpam,
 			toggleMessageStar,
 			archiveThread,
+			unarchiveThread,
+			trashThread,
+			restoreThread,
+			snoozeThread,
+			unsnoozeThread,
+			toggleThreadImportant,
+			batchThreads,
 			sendReply,
+			sendReplyAll,
 			sendForward,
 			sendMessage,
 		}),
@@ -629,6 +878,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			mailboxes,
 			threads,
 			archivedThreads,
+			trashThreads,
+			snoozedThreads,
 			isLoadingMailboxes,
 			isLoadingThreads,
 			getMailbox,
@@ -639,7 +890,15 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			markMessageSpam,
 			toggleMessageStar,
 			archiveThread,
+			unarchiveThread,
+			trashThread,
+			restoreThread,
+			snoozeThread,
+			unsnoozeThread,
+			toggleThreadImportant,
+			batchThreads,
 			sendReply,
+			sendReplyAll,
 			sendForward,
 			sendMessage,
 		],

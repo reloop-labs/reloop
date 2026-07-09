@@ -12,7 +12,6 @@ import { cn } from "@reloop/ui/cn";
 import {
 	AlertCircle,
 	Archive,
-	Bookmark,
 	Clock,
 	Folder,
 	Inbox,
@@ -22,6 +21,7 @@ import {
 	Plane,
 	Plus,
 	Settings,
+	Tag,
 	Trash2,
 } from "lucide-react";
 import Link from "next/link";
@@ -210,9 +210,6 @@ export const InboxSidebar = ({
 
 	const activeLabelId = folder.startsWith("label:") ? folder.slice(6) : null;
 
-	const labelIcon = (icon?: string) =>
-		icon === "bookmark" ? Bookmark : Folder;
-
 	return (
 		<>
 			<aside
@@ -274,7 +271,6 @@ export const InboxSidebar = ({
 							</div>
 							<div className="space-y-1">
 								{labels.map((label) => {
-									const Icon = labelIcon(label.icon);
 									const href = `${base}/label/${label.id}`;
 									const active =
 										activeLabelId === label.id ||
@@ -290,7 +286,15 @@ export const InboxSidebar = ({
 													: "text-mail-muted",
 											)}
 										>
-											<Icon className="h-3.5 w-3.5 shrink-0" />
+											<Tag
+												className="h-3.5 w-3.5 shrink-0"
+												style={{
+													color:
+														label.color === "default"
+															? undefined
+															: label.color,
+												}}
+											/>
 											<span className="relative bottom-px mt-0.5 min-w-0 flex-1 truncate">
 												{label.name}
 											</span>
@@ -330,11 +334,13 @@ export const InboxSidebar = ({
 			<InboxLabelDialog
 				open={isLabelDialogOpen}
 				onOpenChange={setIsLabelDialogOpen}
-				onSubmit={(name) => {
-					const id = addLabel(name);
+				onSubmit={async (name) => {
+					const id = await addLabel(name);
 					if (id) {
 						toast.success(`Label "${name}" created`);
 						router.push(`${base}/label/${id}`);
+					} else {
+						toast.error("Failed to create label");
 					}
 				}}
 			/>

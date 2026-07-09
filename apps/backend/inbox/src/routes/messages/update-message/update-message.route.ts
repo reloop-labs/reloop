@@ -20,6 +20,9 @@ export const updateMessageRoute = new Elysia().use(authMiddleware).patch(
 			isStarred: t.Optional(
 				t.Boolean({ description: "Starred status of the message" }),
 			),
+			isSpam: t.Optional(
+				t.Boolean({ description: "Spam status of the message" }),
+			),
 		}),
 		response: {
 			200: MailModel.successResponse,
@@ -32,7 +35,8 @@ export const updateMessageRoute = new Elysia().use(authMiddleware).patch(
 		detail: {
 			tags: ["Messages"],
 			summary: "Update Message Status",
-			description: "Update status attributes (isRead, isStarred) of a message",
+			description:
+				"Update status attributes (isRead, isStarred, isSpam) of a message",
 		},
 	},
 );

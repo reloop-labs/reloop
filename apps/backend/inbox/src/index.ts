@@ -6,11 +6,14 @@ import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
 import { createOTLPDrain } from "evlog/otlp";
+import { unsnoozeCron } from "./cron/unsnooze.cron";
 import { inboxConfig } from "./inbox.config";
 import { healthRoute } from "./routes/landing/health.route";
 import { landingRoute } from "./routes/landing/landing.route";
+import { labelsRoutes } from "./routes/labels/labels.routes";
 import { mailboxRoutes } from "./routes/mailbox/mailbox.routes";
 import { messagesRoutes } from "./routes/messages/messages.routes";
+import { notesRoutes } from "./routes/notes/notes.routes";
 import { threadsRoutes } from "./routes/threads/threads.routes";
 import { loader } from "./utils/loader";
 
@@ -83,6 +86,9 @@ const inboxService = new Elysia({
 	.use(mailboxRoutes)
 	.use(messagesRoutes)
 	.use(threadsRoutes)
+	.use(labelsRoutes)
+	.use(notesRoutes)
+	.use(unsnoozeCron)
 	.onStart(async () => {
 		await loader();
 	})

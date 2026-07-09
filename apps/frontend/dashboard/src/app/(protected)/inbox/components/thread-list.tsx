@@ -1,13 +1,14 @@
 "use client";
 
 import * as Checkbox from "@reloop/ui/checkbox";
-import { InboxListEmptyState } from "./inbox-empty-state";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { VList, type VListHandle } from "virtua";
 import type { InboundThread } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
+import { InboxListEmptyState } from "./inbox-empty-state";
 import { InboxThreadRow } from "./inbox-thread-row";
+import { ThreadContextMenu } from "./thread-context-menu";
 import { useInboxMail } from "./use-inbox-mail";
 import { useInboxNavigation } from "./use-inbox-navigation";
 
@@ -15,6 +16,8 @@ const PAGE_SIZE = 30;
 
 interface ThreadListProps {
 	threads: InboundThread[];
+	mailboxId: string;
+	folder?: string;
 	selectedId: string | null;
 	onSelect: (id: string) => void;
 	emptyMessage?: string;
@@ -22,10 +25,17 @@ interface ThreadListProps {
 	onClearFilters?: () => void;
 	focusedIndex?: number | null;
 	onMouseEnterRow?: (id: string) => void;
+	searchQuery?: string;
+	onReply?: (thread: InboundThread) => void;
+	onReplyAll?: (thread: InboundThread) => void;
+	onForward?: (thread: InboundThread) => void;
+	onSnooze?: (thread: InboundThread) => void;
 }
 
 export const ThreadList = ({
 	threads,
+	mailboxId,
+	folder,
 	selectedId,
 	onSelect,
 	emptyMessage = "No messages in this filter",
@@ -33,16 +43,18 @@ export const ThreadList = ({
 	onClearFilters,
 	focusedIndex = null,
 	onMouseEnterRow,
+	searchQuery,
+	onReply,
+	onReplyAll,
+	onForward,
+	onSnooze,
 }: ThreadListProps) => {
-	const {
-		deleteMessage,
-		toggleMessageStar,
-		archiveThread,
-	} = useAgentInbox();
+	const { toggleMessageStar, archiveThread, trashThread } = useAgentInbox();
 	const [mail, setMail] = useInboxMail();
 	const vListRef = useRef<VListHandle>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+	const lastBulkIndexRef = useRef<number | null>(null);
 
 	const visibleThreads = useMemo(
 		() => threads.slice(0, visibleCount),
@@ -50,7 +62,24 @@ export const ThreadList = ({
 	);
 
 	const handleToggleBulk = useCallback(
-		(id: string) => {
+		(id: string, event?: React.MouseEvent) => {
+			const index = visibleThreads.findIndex((t) => t.id === id);
+
+			if (event?.shiftKey && lastBulkIndexRef.current !== null && index >= 0) {
+				const start = Math.min(lastBulkIndexRef.current, index);
+				const end = Math.max(lastBulkIndexRef.current, index);
+				const rangeIds = visibleThreads.slice(start, end + 1).map((t) => t.id);
+				setMail((prev) => ({
+					...prev,
+					bulkSelected: Array.from(
+						new Set([...prev.bulkSelected, ...rangeIds]),
+					),
+				}));
+				return;
+			}
+
+			if (index >= 0) lastBulkIndexRef.current = index;
+
 			setMail((prev) => {
 				const isSelected = prev.bulkSelected.includes(id);
 				return {
@@ -61,7 +90,18 @@ export const ThreadList = ({
 				};
 			});
 		},
-		[setMail],
+		[setMail, visibleThreads],
+	);
+
+	const handleRowSelect = useCallback(
+		(id: string, event?: React.MouseEvent) => {
+			if (event?.shiftKey && mail.bulkSelected.length > 0) {
+				handleToggleBulk(id, event);
+				return;
+			}
+			onSelect(id);
+		},
+		[handleToggleBulk, mail.bulkSelected.length, onSelect],
 	);
 
 	const handleToggleStar = async (id: string, starred: boolean) => {
@@ -83,13 +123,15 @@ export const ThreadList = ({
 		}
 	};
 
-	const handleDelete = async (id: string) => {
-		if (!confirm("Are you sure you want to delete this message?")) return;
+	const handleDelete = async (listId: string) => {
+		const thread = threads.find((t) => t.id === listId);
+		const trashId = thread?.threadId || listId;
+		if (!confirm("Move this thread to trash?")) return;
 		try {
-			await deleteMessage(id);
-			toast.success("Message deleted");
+			await trashThread(trashId);
+			toast.success("Moved to trash");
 		} catch (err: unknown) {
-			toast.error(err instanceof Error ? err.message : "Failed to delete");
+			toast.error(err instanceof Error ? err.message : "Failed to trash");
 		}
 	};
 
@@ -124,13 +166,13 @@ export const ThreadList = ({
 	return (
 		<div ref={containerRef} className="flex h-full min-h-0 flex-1 flex-col">
 			{mail.bulkSelected.length > 0 ? (
-				<div className="flex items-center justify-between border-mail-border border-b px-4 py-2 border-mail-border">
+				<div className="flex items-center justify-between border-mail-border border-b px-4 py-2">
 					<div className="flex items-center gap-2">
 						<Checkbox.Root
 							checked={mail.bulkSelected.length === visibleThreads.length}
 							onCheckedChange={handleSelectAll}
 						/>
-						<span className="font-medium text-sm text-mail-foreground text-mail-foreground">
+						<span className="font-medium text-sm text-mail-foreground">
 							{mail.bulkSelected.length} selected
 						</span>
 					</div>
@@ -176,21 +218,33 @@ export const ThreadList = ({
 						}
 
 						return (
-							<InboxThreadRow
+							<ThreadContextMenu
 								key={thread.id}
 								thread={thread}
-								index={index}
-								isSelected={selectedId === thread.id}
-								isKeyboardFocused={focusedIndex === index}
-								isBulkSelected={mail.bulkSelected.includes(thread.id)}
-								isFirstToday={isFirstToday}
-								onSelect={onSelect}
-								onMouseEnter={onMouseEnterRow ?? (() => {})}
-								onToggleStar={handleToggleStar}
-								onArchive={handleArchive}
-								onDelete={handleDelete}
-								onToggleBulk={handleToggleBulk}
-							/>
+								mailboxId={mailboxId}
+								folder={folder}
+								onOpenThread={onSelect}
+								onReply={onReply}
+								onReplyAll={onReplyAll}
+								onForward={onForward}
+								onSnooze={onSnooze}
+							>
+								<InboxThreadRow
+									thread={thread}
+									index={index}
+									isSelected={selectedId === thread.id}
+									isKeyboardFocused={focusedIndex === index}
+									isBulkSelected={mail.bulkSelected.includes(thread.id)}
+									isFirstToday={isFirstToday}
+									searchQuery={searchQuery}
+									onSelect={handleRowSelect}
+									onMouseEnter={onMouseEnterRow ?? (() => {})}
+									onToggleStar={handleToggleStar}
+									onArchive={handleArchive}
+									onDelete={handleDelete}
+									onToggleBulk={handleToggleBulk}
+								/>
+							</ThreadContextMenu>
 						);
 					}}
 				</VList>

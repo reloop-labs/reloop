@@ -8,7 +8,8 @@ import * as Checkbox from "@reloop/ui/checkbox";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
-import { Archive, Star, Trash2 } from "lucide-react";
+import { Archive, Star, Trash2, Zap } from "lucide-react";
+import { forwardRef, type ReactNode } from "react";
 import type { InboundThread } from "../types";
 import { useInboxMail } from "./use-inbox-mail";
 
@@ -56,6 +57,28 @@ const formatReceivedAt = (dateStr: string, isFirstToday: boolean) => {
 	return date.format("MMM D");
 };
 
+const highlightMatches = (text: string, query?: string): ReactNode => {
+	const q = query?.trim();
+	if (!q || !text) return text;
+
+	const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+	const parts = text.split(new RegExp(`(${escaped})`, "gi"));
+	if (parts.length === 1) return text;
+
+	return parts.map((part, i) =>
+		part.toLowerCase() === q.toLowerCase() ? (
+			<mark
+				key={`${part}-${i}`}
+				className="rounded-sm bg-yellow-400/30 px-0.5 text-inherit"
+			>
+				{part}
+			</mark>
+		) : (
+			part
+		),
+	);
+};
+
 export interface InboxThreadRowProps {
 	thread: InboundThread;
 	isSelected: boolean;
@@ -63,28 +86,34 @@ export interface InboxThreadRowProps {
 	isBulkSelected: boolean;
 	isFirstToday: boolean;
 	index: number;
-	onSelect: (id: string) => void;
+	searchQuery?: string;
+	onSelect: (id: string, event?: React.MouseEvent) => void;
 	onMouseEnter: (id: string) => void;
 	onToggleStar: (id: string, starred: boolean) => void;
 	onArchive: (id: string) => void;
 	onDelete: (id: string) => void;
-	onToggleBulk: (id: string) => void;
+	onToggleBulk: (id: string, event?: React.MouseEvent) => void;
 }
 
-export const InboxThreadRow = ({
-	thread,
-	isSelected,
-	isKeyboardFocused,
-	isBulkSelected,
-	isFirstToday,
-	index,
-	onSelect,
-	onMouseEnter,
-	onToggleStar,
-	onArchive,
-	onDelete,
-	onToggleBulk,
-}: InboxThreadRowProps) => {
+export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
+	(
+		{
+			thread,
+			isSelected,
+			isKeyboardFocused,
+			isBulkSelected,
+			isFirstToday,
+			index,
+			searchQuery,
+			onSelect,
+			onMouseEnter,
+			onToggleStar,
+			onArchive,
+			onDelete,
+			onToggleBulk,
+		},
+		ref,
+	) => {
 	const [mail] = useInboxMail();
 	const actorInfo = getActorInfo(thread);
 	const listId = thread.id;
@@ -94,8 +123,9 @@ export const InboxThreadRow = ({
 
 	return (
 		<div
+			ref={ref}
 			data-thread-id={listId}
-			onClick={() => onSelect(listId)}
+			onClick={(e) => onSelect(listId, e)}
 			onMouseEnter={() => onMouseEnter(listId)}
 			className={cn(
 				"group relative mx-[8px] flex cursor-pointer flex-col items-start overflow-visible rounded-[10px] border-transparent py-3 text-left text-sm transition-colors hover:bg-offset-dark/50 hover:opacity-100",
@@ -103,7 +133,6 @@ export const InboxThreadRow = ({
 					"bg-[#202020]",
 			)}
 		>
-			{/* Hover action bar */}
 			<div
 				className={cn(
 					"absolute right-2 z-20 flex -translate-y-1/2 items-center gap-1 rounded-xl border border-mail-border/30 bg-panel-dark p-1 opacity-0 shadow-xs transition-opacity group-hover:opacity-100",
@@ -144,7 +173,7 @@ export const InboxThreadRow = ({
 					title="Delete"
 					onClick={(e) => {
 						e.stopPropagation();
-						onDelete(thread.messageId ?? thread.id);
+						onDelete(listId);
 					}}
 					className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-red-50 hover:bg-red-950/30"
 				>
@@ -179,6 +208,9 @@ export const InboxThreadRow = ({
 				<div className="min-w-0 flex-1">
 					<div className="flex w-full flex-row items-center justify-between">
 						<div className="flex min-w-0 flex-row items-center gap-1">
+							{thread.isImportant && (
+								<Zap className="h-3 w-3 shrink-0 fill-amber-400 text-amber-400" />
+							)}
 							<span
 								className={cn(
 									"truncate text-[13px]",
@@ -207,12 +239,38 @@ export const InboxThreadRow = ({
 								: "text-mail-foreground",
 						)}
 					>
-						{thread.subject}
+						{highlightMatches(thread.subject, searchQuery)}
 					</div>
 
 					<div className="truncate text-[12px] text-mail-muted leading-relaxed">
-						{thread.preview}
+						{highlightMatches(thread.preview, searchQuery)}
 					</div>
+
+					{thread.labels && thread.labels.length > 0 && (
+						<div className="mt-1 flex flex-wrap gap-1">
+							{thread.labels.map((label) => (
+								<span
+									key={label.id}
+									className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium text-[10px] text-mail-muted"
+									style={{
+										backgroundColor:
+											label.color === "default"
+												? "rgba(155,155,155,0.15)"
+												: `${label.color}22`,
+									}}
+								>
+									<span
+										className="h-1.5 w-1.5 rounded-full"
+										style={{
+											backgroundColor:
+												label.color === "default" ? "#9B9B9B" : label.color,
+										}}
+									/>
+									{label.name}
+								</span>
+							))}
+						</div>
+					)}
 
 					{actorInfo.tag && (
 						<span
@@ -239,4 +297,7 @@ export const InboxThreadRow = ({
 			</div>
 		</div>
 	);
-};
+	},
+);
+
+InboxThreadRow.displayName = "InboxThreadRow";

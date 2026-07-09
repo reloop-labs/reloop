@@ -12,15 +12,15 @@ export const InboxLabelDialog = ({
 }: {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onSubmit: (name: string) => void;
+	onSubmit: (name: string) => void | Promise<void>;
 }) => {
 	const [name, setName] = useState("");
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const trimmed = name.trim();
 		if (!trimmed) return;
-		onSubmit(trimmed);
+		await onSubmit(trimmed);
 		setName("");
 		onOpenChange(false);
 	};

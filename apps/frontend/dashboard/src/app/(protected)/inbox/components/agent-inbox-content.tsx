@@ -2,6 +2,10 @@
 
 import { useAgentInbox } from "@fe/dashboard/app/(protected)/inbox/components/agent-inbox-provider";
 import {
+	AiSidebar,
+	useAiSidebar,
+} from "@fe/dashboard/app/(protected)/inbox/components/ai-sidebar";
+import {
 	applyInboxFilters,
 	InboxCommandPalette,
 	InboxSearchTrigger,
@@ -10,6 +14,7 @@ import {
 import { InboxEmptyState } from "@fe/dashboard/app/(protected)/inbox/components/inbox-empty-state";
 import { useInboxSidebar } from "@fe/dashboard/app/(protected)/inbox/components/inbox-sidebar-context";
 import { InboxSidebarToggle } from "@fe/dashboard/app/(protected)/inbox/components/inbox-sidebar-toggle";
+import { SnoozeDialog } from "@fe/dashboard/app/(protected)/inbox/components/thread-detail/snooze-dialog";
 import { ThreadDetail } from "@fe/dashboard/app/(protected)/inbox/components/thread-detail";
 import {
 	ThreadList,
@@ -20,35 +25,60 @@ import {
 	ResizablePanelGroup,
 } from "@fe/dashboard/app/(protected)/inbox/components/ui/resizable";
 import { useInboxMail } from "@fe/dashboard/app/(protected)/inbox/components/use-inbox-mail";
+import { useInboxUndo } from "@fe/dashboard/app/(protected)/inbox/hooks/use-inbox-undo";
 import {
 	findThreadByListId,
 	groupThreadsByConversation,
 } from "@fe/dashboard/app/(protected)/inbox/utils/group-threads";
 import type {
 	AgentMailbox,
+	BatchThreadAction,
 	InboundThread,
 } from "@fe/dashboard/app/(protected)/inbox/types";
 import { cn } from "@reloop/ui/cn";
-import { RefreshCcw, X } from "lucide-react";
-import { useMediaQuery } from "usehooks-ts";
+import {
+	Archive,
+	MailOpen,
+	RefreshCcw,
+	Star,
+	Trash2,
+	X,
+} from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import { toast } from "sonner";
+import { useMediaQuery } from "usehooks-ts";
+
+const isTypingTarget = (target: EventTarget | null) => {
+	if (!(target instanceof HTMLElement)) return false;
+	const tag = target.tagName;
+	if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+	if (target.isContentEditable) return true;
+	return Boolean(target.closest("[contenteditable='true'], [role='textbox']"));
+};
 
 export const AgentInboxContent = ({
 	mailbox,
+	folder,
 	threads,
 }: {
 	mailbox: AgentMailbox;
 	folder: string;
 	threads: InboundThread[];
 }) => {
-	const { markMessageRead, refresh } = useAgentInbox();
+	const { markMessageRead, batchThreads, snoozeThread, refresh } =
+		useAgentInbox();
 	const { toggleSidebar, openCompose } = useInboxSidebar();
+	const { open: aiOpen, setOpen: setAiOpen, toggle: toggleAi } = useAiSidebar();
+	const { pushBatchUndo, undo } = useInboxUndo();
 	const [mail, setMail] = useInboxMail();
 	const isDesktop = useMediaQuery("(min-width: 1024px)");
 	const listContainerRef = useRef<HTMLDivElement>(null);
 	const [paletteOpen, setPaletteOpen] = useState(false);
 	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [snoozeThreadTarget, setSnoozeThreadTarget] =
+		useState<InboundThread | null>(null);
 	const activeFilterCount = useInboxActiveFilterCount();
 
 	const [searchQuery, setSearchQuery] = useQueryState(
@@ -63,6 +93,12 @@ export const AgentInboxContent = ({
 		"threadId",
 		parseAsString.withDefault(""),
 	);
+
+	useEffect(() => {
+		setMail((prev) =>
+			prev.bulkSelected.length === 0 ? prev : { ...prev, bulkSelected: [] },
+		);
+	}, [folder, setMail]);
 
 	const groupedThreads = useMemo(
 		() => groupThreadsByConversation(threads),
@@ -113,6 +149,31 @@ export const AgentInboxContent = ({
 			isCommandPaletteOpen: paletteOpen,
 		});
 
+	const resolveBulkThreadIds = useCallback(() => {
+		return mail.bulkSelected
+			.map((listId) => {
+				const thread = findThreadByListId(filteredThreads, listId);
+				return thread?.threadId || thread?.id || listId;
+			})
+			.filter(Boolean);
+	}, [mail.bulkSelected, filteredThreads]);
+
+	const runBulkAction = useCallback(
+		async (action: BatchThreadAction, success: string) => {
+			const ids = resolveBulkThreadIds();
+			if (ids.length === 0) return;
+			try {
+				await batchThreads(ids, action);
+				pushBatchUndo(ids, action, success);
+				toast.success(success);
+				setMail((prev) => ({ ...prev, bulkSelected: [] }));
+			} catch (err: unknown) {
+				toast.error(err instanceof Error ? err.message : "Bulk action failed");
+			}
+		},
+		[batchThreads, resolveBulkThreadIds, setMail, pushBatchUndo],
+	);
+
 	const handleRefresh = useCallback(async () => {
 		setIsRefreshing(true);
 		try {
@@ -126,20 +187,171 @@ export const AgentInboxContent = ({
 		setMail((prev) => ({ ...prev, bulkSelected: [] }));
 	}, [setMail]);
 
+	const openThreadComposer = useCallback(
+		(thread: InboundThread, mode: "reply" | "replyAll" | "forward") => {
+			handleSelectThread(thread.id);
+			const url = new URL(window.location.href);
+			url.searchParams.set("threadId", thread.id);
+			url.searchParams.set("compose", mode);
+			window.history.replaceState({}, "", url.toString());
+		},
+		[handleSelectThread],
+	);
+
+	const hotkeysEnabled =
+		!paletteOpen &&
+		(mail.bulkSelected.length > 0 || focusedIndex !== null || !!selectedThreadId);
+
+	const listHotkeysEnabled = !paletteOpen;
+
+	useHotkeys(
+		"e",
+		(e) => {
+			if (isTypingTarget(e.target)) return;
+			if (mail.bulkSelected.length > 0) {
+				void runBulkAction("archive", "Archived");
+				return;
+			}
+			if (!selectedThread) return;
+			const id = selectedThread.threadId || selectedThread.id;
+			void batchThreads([id], "archive")
+				.then(() => toast.success("Archived"))
+				.catch((err: unknown) =>
+					toast.error(err instanceof Error ? err.message : "Failed to archive"),
+				);
+		},
+		{ enabled: hotkeysEnabled, preventDefault: true },
+		[mail.bulkSelected.length, selectedThread, runBulkAction, batchThreads],
+	);
+
+	useHotkeys(
+		"d",
+		(e) => {
+			if (isTypingTarget(e.target)) return;
+			if (mail.bulkSelected.length > 0) {
+				void runBulkAction("trash", "Moved to trash");
+				return;
+			}
+			if (!selectedThread) return;
+			const id = selectedThread.threadId || selectedThread.id;
+			void batchThreads([id], "trash")
+				.then(() => toast.success("Moved to trash"))
+				.catch((err: unknown) =>
+					toast.error(err instanceof Error ? err.message : "Failed to trash"),
+				);
+		},
+		{ enabled: hotkeysEnabled, preventDefault: true },
+		[mail.bulkSelected.length, selectedThread, runBulkAction, batchThreads],
+	);
+
+	useHotkeys(
+		"s",
+		(e) => {
+			if (isTypingTarget(e.target)) return;
+			if (mail.bulkSelected.length > 0) {
+				void runBulkAction("star", "Starred");
+			}
+		},
+		{ enabled: hotkeysEnabled && mail.bulkSelected.length > 0, preventDefault: true },
+		[mail.bulkSelected.length, runBulkAction],
+	);
+
+	useHotkeys(
+		"u",
+		(e) => {
+			if (isTypingTarget(e.target)) return;
+			if (mail.bulkSelected.length > 0) {
+				void runBulkAction("unread", "Marked unread");
+				return;
+			}
+			if (!selectedThread?.messageId && !selectedThread?.id) return;
+			const msgId = selectedThread.messageId ?? selectedThread.id;
+			void markMessageRead(msgId, false)
+				.then(() => toast.success("Marked unread"))
+				.catch((err: unknown) =>
+					toast.error(err instanceof Error ? err.message : "Failed"),
+				);
+		},
+		{ enabled: hotkeysEnabled, preventDefault: true },
+		[mail.bulkSelected.length, selectedThread, runBulkAction, markMessageRead],
+	);
+
+	useHotkeys(
+		"mod+a",
+		(e) => {
+			if (isTypingTarget(e.target)) return;
+			e.preventDefault();
+			setMail((prev) => ({
+				...prev,
+				bulkSelected: filteredThreads.map((t) => t.id),
+			}));
+		},
+		{ enabled: listHotkeysEnabled, preventDefault: true },
+		[filteredThreads, setMail],
+	);
+
+	useHotkeys(
+		"c",
+		(e) => {
+			if (isTypingTarget(e.target)) return;
+			openCompose();
+		},
+		{ enabled: listHotkeysEnabled, preventDefault: true },
+		[openCompose],
+	);
+
+	useHotkeys(
+		"mod+z",
+		(e) => {
+			if (isTypingTarget(e.target)) return;
+			void undo().then((did) => {
+				if (did) toast.success("Undone");
+			});
+		},
+		{ enabled: !paletteOpen, preventDefault: true },
+		[undo, paletteOpen],
+	);
+
 	const detailPane = selectedThread ? (
 		<ThreadDetail
 			thread={selectedThread}
 			mailbox={mailbox}
+			folder={folder}
 			onBack={!isDesktop ? handleCloseThread : undefined}
 			showBack={!isDesktop}
+			onToggleAi={toggleAi}
 		/>
 	) : (
-		<InboxEmptyState onCompose={openCompose} />
+		<InboxEmptyState
+			onCompose={openCompose}
+			onOpenAi={toggleAi}
+		/>
 	);
 
 	return (
 		<>
 			<InboxCommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+			<SnoozeDialog
+				open={!!snoozeThreadTarget}
+				onOpenChange={(open) => {
+					if (!open) setSnoozeThreadTarget(null);
+				}}
+				onConfirm={(until) => {
+					if (!snoozeThreadTarget) return;
+					const id =
+						snoozeThreadTarget.threadId || snoozeThreadTarget.id;
+					void snoozeThread(id, until)
+						.then(() => {
+							toast.success("Snoozed");
+							setSnoozeThreadTarget(null);
+						})
+						.catch((err: unknown) =>
+							toast.error(
+								err instanceof Error ? err.message : "Failed to snooze",
+							),
+						);
+				}}
+			/>
 			<div className="relative flex min-h-0 min-w-0 flex-1 rounded-inherit p-0 lg:h-[calc(100dvh-8px)]">
 				<ResizablePanelGroup
 					direction="horizontal"
@@ -166,18 +378,70 @@ export const AgentInboxContent = ({
 											activeFilterCount={activeFilterCount}
 										/>
 									) : (
-										<div className="flex flex-1 items-center justify-between">
+										<div className="flex flex-1 items-center justify-between gap-2">
 											<div className="font-medium text-mail-foreground text-sm">
 												{mail.bulkSelected.length} selected
 											</div>
-											<button
-												type="button"
-												onClick={handleExitBulkSelection}
-												className="inline-flex h-8 items-center gap-2 rounded-lg bg-mail-accent px-2 text-xs"
-											>
-												<X className="h-3 w-3" />
-												<span>ESC</span>
-											</button>
+											<div className="flex items-center gap-1">
+												<button
+													type="button"
+													title="Archive"
+													onClick={() =>
+														void runBulkAction("archive", "Archived")
+													}
+													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#313131] hover:bg-[#404040]"
+												>
+													<Archive className="h-3.5 w-3.5 text-mail-muted" />
+												</button>
+												<button
+													type="button"
+													title="Trash"
+													onClick={() =>
+														void runBulkAction("trash", "Moved to trash")
+													}
+													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#313131] hover:bg-[#404040]"
+												>
+													<Trash2 className="h-3.5 w-3.5 text-mail-muted" />
+												</button>
+												<button
+													type="button"
+													title="Spam"
+													onClick={() =>
+														void runBulkAction("spam", "Moved to spam")
+													}
+													className="inline-flex h-8 items-center justify-center rounded-lg bg-[#313131] px-2 text-[11px] text-mail-muted hover:bg-[#404040]"
+												>
+													Spam
+												</button>
+												<button
+													type="button"
+													title="Star"
+													onClick={() =>
+														void runBulkAction("star", "Starred")
+													}
+													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#313131] hover:bg-[#404040]"
+												>
+													<Star className="h-3.5 w-3.5 text-mail-muted" />
+												</button>
+												<button
+													type="button"
+													title="Mark read"
+													onClick={() =>
+														void runBulkAction("read", "Marked as read")
+													}
+													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#313131] hover:bg-[#404040]"
+												>
+													<MailOpen className="h-3.5 w-3.5 text-mail-muted" />
+												</button>
+												<button
+													type="button"
+													onClick={handleExitBulkSelection}
+													className="inline-flex h-8 items-center gap-2 rounded-lg bg-mail-accent px-2 text-xs"
+												>
+													<X className="h-3 w-3" />
+													<span>ESC</span>
+												</button>
+											</div>
 										</div>
 									)}
 
@@ -204,6 +468,8 @@ export const AgentInboxContent = ({
 							>
 								<ThreadList
 									threads={filteredThreads}
+									mailboxId={mailbox.id}
+									folder={folder}
 									selectedId={selectedThreadId}
 									onSelect={handleSelectThread}
 									hasFilters={searchQuery !== "" || activeFilterCount > 0}
@@ -214,6 +480,11 @@ export const AgentInboxContent = ({
 									}}
 									focusedIndex={focusedIndex}
 									onMouseEnterRow={handleMouseEnter}
+									searchQuery={searchQuery}
+									onReply={(t) => openThreadComposer(t, "reply")}
+									onReplyAll={(t) => openThreadComposer(t, "replyAll")}
+									onForward={(t) => openThreadComposer(t, "forward")}
+									onSnooze={(t) => setSnoozeThreadTarget(t)}
 								/>
 							</div>
 						</div>
@@ -229,6 +500,14 @@ export const AgentInboxContent = ({
 						</ResizablePanel>
 					)}
 				</ResizablePanelGroup>
+
+				{isDesktop && (
+					<AiSidebar
+						open={aiOpen}
+						onClose={() => setAiOpen(false)}
+						thread={selectedThread}
+					/>
+				)}
 
 				{!isDesktop && selectedThreadId && (
 					<div className="fixed inset-0 z-50 flex flex-col bg-panel-dark">
