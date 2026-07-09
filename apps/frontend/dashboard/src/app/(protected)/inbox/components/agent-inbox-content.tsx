@@ -43,12 +43,10 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import {
 	Archive,
-	Check,
 	Inbox,
 	MailOpen,
 	RefreshCcw,
 	SlidersHorizontal,
-	Trash2,
 	X,
 } from "lucide-react";
 import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
@@ -426,7 +424,7 @@ export const AgentInboxContent = ({
 												onClick={handleEnterSelectMode}
 												className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 font-medium text-mail-muted text-xs transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
 											>
-												<Check className="h-3.5 w-3.5" />
+												<Icon name="check" className="h-3.5 w-3.5" />
 												Select
 											</button>
 											<button
@@ -494,7 +492,7 @@ export const AgentInboxContent = ({
 													}
 													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
 												>
-													<Trash2 className="h-3.5 w-3.5 text-mail-muted" />
+													<Icon name="trash" className="h-3.5 w-3.5 text-mail-muted" />
 												</button>
 												<button
 													type="button"

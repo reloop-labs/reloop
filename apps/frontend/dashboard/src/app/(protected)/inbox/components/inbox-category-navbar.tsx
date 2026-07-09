@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, Tag, User, Zap } from "lucide-react";
 import type { InboxView } from "../types";
 import { INBOX_VIEWS } from "../types";
@@ -32,13 +31,6 @@ const ACTIVE_STYLES = {
 	},
 } as const;
 
-const layoutSpring = {
-	type: "spring" as const,
-	stiffness: 500,
-	damping: 36,
-	mass: 0.6,
-};
-
 interface InboxCategoryNavbarProps {
 	activeView: InboxView;
 	onViewChange: (view: InboxView) => void;
@@ -61,52 +53,43 @@ export function InboxCategoryNavbar({
 				const styles = ACTIVE_STYLES[view.id];
 
 				return (
-					<motion.button
-						layout
+					<button
 						key={view.id}
 						type="button"
 						onClick={() => onViewChange(view.id)}
 						className={cn(
-							"inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 overflow-hidden rounded-xl font-medium text-sm focus:outline-none",
+							"inline-flex h-9 cursor-pointer items-center justify-center overflow-hidden rounded-xl font-medium text-sm focus:outline-none transition-all duration-300 ease-in-out",
 							isActive
-								? cn("min-w-0 flex-1 px-3.5", styles.btn)
-								: "w-9 shrink-0 bg-[var(--inbox-control)] text-mail-muted hover:bg-[var(--inbox-control-hover)] hover:text-mail-foreground",
+								? cn("min-w-0 flex-1 px-3.5 gap-1.5", styles.btn)
+								: "w-9 shrink-0 gap-0 bg-[var(--inbox-control)] text-mail-muted hover:bg-[var(--inbox-control-hover)] hover:text-mail-foreground",
 						)}
 						aria-pressed={isActive}
 						aria-label={isActive ? undefined : view.label}
 						title={isActive ? undefined : view.label}
-						transition={layoutSpring}
 					>
-						{/* layout="position" prevents Framer from scaling/stretching the icon */}
-						<motion.span
-							layout="position"
-							className="flex h-4 w-4 shrink-0 items-center justify-center"
-						>
+						<span className="flex h-4 w-4 shrink-0 items-center justify-center">
 							<Icon
 								className={cn(
-									"h-4 w-4",
+									"h-4 w-4 transition-colors duration-300",
 									isActive ? styles.icon : "text-mail-muted",
 								)}
 								aria-hidden
 							/>
-						</motion.span>
-						<AnimatePresence initial={false}>
-							{isActive ? (
-								<motion.span
-									key="label"
-									initial={{ opacity: 0, x: -6 }}
-									animate={{ opacity: 1, x: 0 }}
-									exit={{ opacity: 0, x: -6 }}
-									transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
-									className="truncate font-semibold"
-								>
-									{view.label}
-								</motion.span>
-							) : null}
-						</AnimatePresence>
-					</motion.button>
+						</span>
+						<span
+							className={cn(
+								"truncate font-semibold transition-all duration-300 ease-in-out",
+								isActive
+									? "max-w-[100px] opacity-100 translate-x-0"
+									: "max-w-0 opacity-0 -translate-x-2 pointer-events-none",
+							)}
+						>
+							{view.label}
+						</span>
+					</button>
 				);
 			})}
 		</nav>
 	);
 }
+
