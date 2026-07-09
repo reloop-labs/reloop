@@ -321,7 +321,7 @@ export const InboxSidebar = ({
 };
 
 const FooterThemeToggle = () => {
-	const { theme, setTheme } = useTheme();
+	const { theme, setTheme, resolvedTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => {
@@ -329,13 +329,15 @@ const FooterThemeToggle = () => {
 	}, []);
 
 	return (
-		<div className="inline-flex items-center rounded-full border border-stroke-soft-200 p-0.5 dark:border-white/10">
+		<div className="inline-flex items-center rounded-full border border-stroke-soft-200 p-0.5 dark:border-stroke-soft-100/40">
 			<button
 				type="button"
 				onClick={() => setTheme("system")}
 				className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
 					mounted && theme === "system"
-						? "bg-white text-black"
+						? resolvedTheme === "dark"
+							? "bg-[#1A1A1A] text-white"
+							: "bg-white text-black"
 						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
 				}`}
 				aria-label="System theme"
@@ -371,7 +373,7 @@ const FooterThemeToggle = () => {
 };
 
 const CollapsedThemeToggle = () => {
-	const { theme, setTheme } = useTheme();
+	const { setTheme, resolvedTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => {
@@ -380,7 +382,7 @@ const CollapsedThemeToggle = () => {
 
 	if (!mounted) return null;
 
-	const nextTheme = theme === "dark" ? "light" : "dark";
+	const nextTheme = resolvedTheme === "dark" ? "light" : "dark";
 	return (
 		<button
 			type="button"
@@ -388,7 +390,10 @@ const CollapsedThemeToggle = () => {
 			className="flex size-7 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
 			title={`Switch to ${nextTheme} theme`}
 		>
-			<Icon name={theme === "dark" ? "sun" : "moon"} className="h-4 w-4" />
+			<Icon
+				name={resolvedTheme === "dark" ? "sun" : "moon"}
+				className="h-4 w-4"
+			/>
 		</button>
 	);
 };

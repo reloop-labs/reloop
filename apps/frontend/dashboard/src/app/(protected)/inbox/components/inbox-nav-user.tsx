@@ -10,6 +10,7 @@ import { cn } from "@reloop/ui/cn";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
+import { toast } from "sonner";
 
 export const InboxNavUser = ({
 	mailbox,
@@ -107,9 +108,18 @@ export const InboxNavUser = ({
 				<div className="flex items-center gap-1 font-medium text-[14px] text-mail-foreground leading-none">
 					<p className="max-w-[14.5ch] truncate">{displayName}</p>
 				</div>
-				<p className="h-5 max-w-[200px] truncate text-[13px] text-mail-muted leading-none">
+				<button
+					type="button"
+					onClick={(e) => {
+						e.stopPropagation();
+						navigator.clipboard.writeText(mailbox.email);
+						toast.success("Email copied");
+					}}
+					className="h-5 max-w-[200px] truncate text-left text-[13px] text-mail-muted leading-none transition-colors hover:text-mail-foreground focus:outline-none"
+					title="Copy email address"
+				>
 					{mailbox.email}
-				</p>
+				</button>
 			</div>
 		</div>
 	);
