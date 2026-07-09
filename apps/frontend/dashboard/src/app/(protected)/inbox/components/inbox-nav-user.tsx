@@ -7,9 +7,9 @@ import {
 	getAvatarInitial,
 } from "@fe/dashboard/utils/avatar";
 import { cn } from "@reloop/ui/cn";
-import { Plus } from "lucide-react";
+import { Check, Copy, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 export const InboxNavUser = ({
@@ -34,6 +34,15 @@ export const InboxNavUser = ({
 	const switchMailbox = (id: string) => {
 		if (id === mailbox.id) return;
 		router.push(`/inbox/${id}`);
+	};
+
+	const [copied, setCopied] = useState(false);
+
+	const handleCopy = () => {
+		navigator.clipboard.writeText(mailbox.email);
+		setCopied(true);
+		toast.success("Email copied");
+		setTimeout(() => setCopied(false), 2000);
 	};
 
 	if (collapsed) {
@@ -108,18 +117,34 @@ export const InboxNavUser = ({
 				<div className="flex items-center gap-1 font-medium text-[14px] text-mail-foreground leading-none">
 					<p className="max-w-[14.5ch] truncate">{displayName}</p>
 				</div>
-				<button
-					type="button"
-					onClick={(e) => {
-						e.stopPropagation();
-						navigator.clipboard.writeText(mailbox.email);
-						toast.success("Email copied");
-					}}
-					className="h-5 max-w-[200px] truncate text-left text-[13px] text-mail-muted leading-none transition-colors hover:text-mail-foreground focus:outline-none"
-					title="Copy email address"
-				>
-					{mailbox.email}
-				</button>
+				<div className="group/copy flex w-full items-center justify-between gap-1.5">
+					<button
+						type="button"
+						onClick={(e) => {
+							e.stopPropagation();
+							handleCopy();
+						}}
+						className="h-5 flex-1 min-w-0 truncate text-left text-[13px] text-mail-muted leading-none transition-colors hover:text-mail-foreground focus:outline-none"
+						title="Copy email address"
+					>
+						{mailbox.email}
+					</button>
+					<button
+						type="button"
+						onClick={(e) => {
+							e.stopPropagation();
+							handleCopy();
+						}}
+						className="shrink-0 flex items-center justify-center text-mail-muted transition-colors hover:text-mail-foreground focus:outline-none"
+						title="Copy email address"
+					>
+						{copied ? (
+							<Check className="size-3.5 text-green-500" />
+						) : (
+							<Copy className="size-3.5 opacity-0 group-hover/copy:opacity-100 transition-opacity" />
+						)}
+					</button>
+				</div>
 			</div>
 		</div>
 	);
