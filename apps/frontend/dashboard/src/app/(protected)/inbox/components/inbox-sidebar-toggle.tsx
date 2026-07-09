@@ -1,6 +1,6 @@
 "use client";
 
-import { PanelLeft } from "lucide-react";
+import { PanelLeftOpenIcon } from "./zero-icons";
 
 export const InboxSidebarToggle = ({
 	onClick,
@@ -13,6 +13,6 @@ export const InboxSidebarToggle = ({
 		className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-[var(--inbox-hover)]"
 		aria-label="Toggle sidebar"
 	>
-		<PanelLeft className="h-4 w-4" />
+		<PanelLeftOpenIcon className="h-[12px] w-[14px]" />
 	</button>
 );

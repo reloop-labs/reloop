@@ -1,31 +1,30 @@
 "use client";
 
+import { AddAgentAddressModal } from "@fe/dashboard/app/(protected)/inbox/components/add-agent-address-modal";
+import { ComposeModal } from "@fe/dashboard/app/(protected)/inbox/components/compose-modal";
 import { InboxLabelDialog } from "@fe/dashboard/app/(protected)/inbox/components/inbox-label-dialog";
 import { InboxNavUser } from "@fe/dashboard/app/(protected)/inbox/components/inbox-nav-user";
 import { useInboxSidebar } from "@fe/dashboard/app/(protected)/inbox/components/inbox-sidebar-context";
-import { AddAgentAddressModal } from "@fe/dashboard/app/(protected)/inbox/components/add-agent-address-modal";
-import { ComposeModal } from "@fe/dashboard/app/(protected)/inbox/components/compose-modal";
 import { useInboxFolderStats } from "@fe/dashboard/app/(protected)/inbox/hooks/use-inbox-folder-stats";
 import { useInboxLabels } from "@fe/dashboard/app/(protected)/inbox/hooks/use-inbox-labels";
 import type { AgentMailbox } from "@fe/dashboard/app/(protected)/inbox/types";
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import {
 	AlertCircle,
 	Archive,
 	Clock,
 	Folder,
 	Inbox,
-	MessageSquare,
 	Pencil,
-	Phone,
 	Plane,
 	Plus,
-	Settings,
 	Tag,
 	Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -114,9 +113,9 @@ const NavSection = ({
 }) => (
 	<div className="space-y-1 pb-2">
 		{collapsed ? (
-			<div className="mx-2 mb-2 mt-1 h-px bg-[var(--inbox-muted-bg)]" />
+			<div className="mx-2 mt-1 mb-2 h-px bg-[var(--inbox-muted-bg)]" />
 		) : (
-			<p className="mx-2 mb-2 text-[13px] text-[#898989]">{title}</p>
+			<p className="mx-2 mb-2 text-[#898989] text-[13px]">{title}</p>
 		)}
 		{items.map((item) => (
 			<NavLink
@@ -157,7 +156,13 @@ export const InboxSidebar = ({
 	const coreItems: NavItem[] = [
 		{ id: "inbox", label: "Inbox", href: base, icon: Inbox, showCount: true },
 		{ id: "drafts", label: "Drafts", href: `${base}/drafts`, icon: Folder },
-		{ id: "sent", label: "Sent", href: `${base}/sent`, icon: Plane, showCount: true },
+		{
+			id: "sent",
+			label: "Sent",
+			href: `${base}/sent`,
+			icon: Plane,
+			showCount: true,
+		},
 	];
 
 	const managementItems: NavItem[] = [
@@ -182,29 +187,6 @@ export const InboxSidebar = ({
 			href: `${base}/trash`,
 			icon: Trash2,
 			showCount: true,
-		},
-	];
-
-	const bottomItems: NavItem[] = [
-		{
-			id: "support",
-			label: "Live Support",
-			href: "https://discord.gg/mail0",
-			icon: Phone,
-			external: true,
-		},
-		{
-			id: "feedback",
-			label: "Feedback",
-			href: "https://feedback.0.email",
-			icon: MessageSquare,
-			external: true,
-		},
-		{
-			id: "settings",
-			label: "Settings",
-			href: "/settings",
-			icon: Settings,
 		},
 	];
 
@@ -259,7 +241,7 @@ export const InboxSidebar = ({
 					{!collapsed && (
 						<div className="pb-4">
 							<div className="mx-2 mb-4 flex items-center justify-between">
-								<span className="text-[13px] text-[#898989]">Labels</span>
+								<span className="text-[#898989] text-[13px]">Labels</span>
 								<button
 									type="button"
 									onClick={() => setIsLabelDialogOpen(true)}
@@ -273,8 +255,7 @@ export const InboxSidebar = ({
 								{labels.map((label) => {
 									const href = `${base}/label/${label.id}`;
 									const active =
-										activeLabelId === label.id ||
-										pathname === href;
+										activeLabelId === label.id || pathname === href;
 									return (
 										<Link
 											key={label.id}
@@ -290,9 +271,7 @@ export const InboxSidebar = ({
 												className="h-3.5 w-3.5 shrink-0"
 												style={{
 													color:
-														label.color === "default"
-															? undefined
-															: label.color,
+														label.color === "default" ? undefined : label.color,
 												}}
 											/>
 											<span className="relative bottom-px mt-0.5 min-w-0 flex-1 truncate">
@@ -306,15 +285,8 @@ export const InboxSidebar = ({
 					)}
 				</div>
 
-				<div className={cn("mt-auto space-y-1", collapsed && "px-0")}>
-					{bottomItems.map((item) => (
-						<NavLink
-							key={item.id}
-							item={item}
-							active={false}
-							collapsed={collapsed}
-						/>
-					))}
+				<div className="mt-auto flex w-full py-2">
+					{!collapsed ? <FooterThemeToggle /> : <CollapsedThemeToggle />}
 				</div>
 			</aside>
 
@@ -345,5 +317,78 @@ export const InboxSidebar = ({
 				}}
 			/>
 		</>
+	);
+};
+
+const FooterThemeToggle = () => {
+	const { theme, setTheme } = useTheme();
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	return (
+		<div className="inline-flex items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.04]">
+			<button
+				type="button"
+				onClick={() => setTheme("system")}
+				className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
+					mounted && theme === "system"
+						? "bg-white text-black shadow-sm"
+						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
+				}`}
+				aria-label="System theme"
+			>
+				<Icon className="size-3.5" name="laptop" />
+			</button>
+			<button
+				type="button"
+				onClick={() => setTheme("light")}
+				className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
+					mounted && theme === "light"
+						? "bg-white text-black shadow-sm dark:bg-white dark:text-black"
+						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
+				}`}
+				aria-label="Light mode"
+			>
+				<Icon className="size-3.5" name="sun" />
+			</button>
+			<button
+				type="button"
+				onClick={() => setTheme("dark")}
+				className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
+					mounted && theme === "dark"
+						? "bg-white text-black shadow-sm"
+						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
+				}`}
+				aria-label="Dark mode"
+			>
+				<Icon className="size-3.5" name="moon" />
+			</button>
+		</div>
+	);
+};
+
+const CollapsedThemeToggle = () => {
+	const { theme, setTheme } = useTheme();
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	if (!mounted) return null;
+
+	const nextTheme = theme === "dark" ? "light" : "dark";
+	return (
+		<button
+			type="button"
+			onClick={() => setTheme(nextTheme)}
+			className="flex size-7 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
+			title={`Switch to ${nextTheme} theme`}
+		>
+			<Icon name={theme === "dark" ? "sun" : "moon"} className="h-4 w-4" />
+		</button>
 	);
 };
