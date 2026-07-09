@@ -9,11 +9,9 @@ import { useInboxFolderStats } from "@fe/dashboard/app/(protected)/inbox/hooks/u
 import { useInboxLabels } from "@fe/dashboard/app/(protected)/inbox/hooks/use-inbox-labels";
 import type { AgentMailbox } from "@fe/dashboard/app/(protected)/inbox/types";
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
 import * as FancyButton from "@reloop/ui/fancy-button";
-import {
-	Plus,
-} from "lucide-react";
+import { Icon } from "@reloop/ui/icon";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -32,9 +30,9 @@ const SentIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
 	<Icon name="sent" {...props} />
 );
 
-const ArchiveIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
-	<Icon name="archive" {...props} />
-);
+const ArchiveIcon = (
+	props: Omit<React.ComponentProps<typeof Icon>, "name">,
+) => <Icon name="archive" {...props} />;
 
 const SnoozeIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
 	<Icon name="snooze" {...props} />
@@ -82,7 +80,7 @@ const NavLink = ({
 }) => {
 	const className = cn(
 		"flex w-full items-center rounded-lg px-2 py-1.5 text-[13px] transition-colors hover:bg-[var(--inbox-hover)]",
-		active && "bg-[var(--inbox-hover)] text-mail-foreground",
+		active && "bg-[var(--inbox-active)] font-medium text-mail-foreground",
 		!active && "text-mail-muted",
 		collapsed ? "justify-center" : "gap-2",
 	);
@@ -186,8 +184,20 @@ export const InboxSidebar = ({
 	const base = `/inbox/${mailboxId}`;
 
 	const coreItems: NavItem[] = [
-		{ id: "inbox", label: "Inbox", href: base, icon: InboxIcon, showCount: true },
-		{ id: "agent", label: "Agent", href: `${base}/agent`, icon: AgentIcon, showCount: true },
+		{
+			id: "inbox",
+			label: "Inbox",
+			href: base,
+			icon: InboxIcon,
+			showCount: true,
+		},
+		{
+			id: "agent",
+			label: "Agent",
+			href: `${base}/agent`,
+			icon: AgentIcon,
+			showCount: true,
+		},
 		{ id: "drafts", label: "Drafts", href: `${base}/drafts`, icon: DraftIcon },
 		{
 			id: "sent",
@@ -206,7 +216,12 @@ export const InboxSidebar = ({
 			icon: ArchiveIcon,
 			showCount: true,
 		},
-		{ id: "snoozed", label: "Snoozed", href: `${base}/snoozed`, icon: SnoozeIcon },
+		{
+			id: "snoozed",
+			label: "Snoozed",
+			href: `${base}/snoozed`,
+			icon: SnoozeIcon,
+		},
 		{
 			id: "spam",
 			label: "Spam",
@@ -244,9 +259,12 @@ export const InboxSidebar = ({
 						onClick={() => setIsComposeOpen(true)}
 						variant="blue"
 						size="xsmall"
-						className={cn("w-full mb-1.5", collapsed && "px-0")}
+						className={cn("mb-1.5 w-full", collapsed && "px-0")}
 					>
-						<FancyButton.Icon as={PencilIcon} className="h-3.5 w-3.5 fill-white text-white" />
+						<FancyButton.Icon
+							as={PencilIcon}
+							className="h-3.5 w-3.5 fill-white text-white"
+						/>
 						{!collapsed && (
 							<span className="text-sm leading-none">New email</span>
 						)}
@@ -294,7 +312,7 @@ export const InboxSidebar = ({
 											className={cn(
 												"flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-[13px] transition-colors hover:bg-[var(--inbox-hover)]",
 												active
-													? "bg-[var(--inbox-hover)] text-mail-foreground"
+													? "bg-[var(--inbox-active)] font-medium text-mail-foreground"
 													: "text-mail-muted",
 											)}
 										>

@@ -60,7 +60,7 @@ export const MessageHeaderCollapsed = ({
 				</div>
 				<div className="flex min-w-0 flex-col gap-0.5">
 					<div className="flex flex-wrap items-center gap-1.5">
-						<span className="font-semibold text-sm text-mail-foreground text-mail-foreground">
+						<span className="font-semibold text-mail-foreground text-mail-foreground text-sm">
 							{senderName}
 						</span>
 						<MessageBadge

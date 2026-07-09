@@ -1,19 +1,19 @@
 "use client";
 
-import * as Dropdown from "@reloop/ui/dropdown";
 import { cn } from "@reloop/ui/cn";
+import * as Dropdown from "@reloop/ui/dropdown";
 import {
 	Archive,
 	ArchiveRestore,
 	Clock,
 	Inbox,
 	MoreHorizontal,
-	Zap,
 	Printer,
 	Reply,
 	Star,
 	Trash2,
 	X,
+	Zap,
 } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -66,7 +66,7 @@ export const ZeroThreadToolbar = ({
 	const showRestore = inArchive || inTrash || inSpam || inSnoozed;
 
 	return (
-		<div className="flex shrink-0 items-center px-1 pb-[10px] md:px-3 md:pb-[11px] md:pt-3">
+		<div className="flex shrink-0 items-center px-1 pb-[10px] md:px-3 md:pt-3 md:pb-[11px]">
 			<div className="flex flex-1 items-center gap-2">
 				{(showBack || onClose) && (
 					<button
@@ -97,7 +97,7 @@ export const ZeroThreadToolbar = ({
 					className="inline-flex h-7 cursor-pointer items-center justify-center gap-1 overflow-hidden rounded-lg border-none bg-[var(--inbox-control)] px-1.5 transition-colors hover:bg-[var(--inbox-control-hover)]"
 				>
 					<Reply className="h-3.5 w-3.5 text-[#9B9B9B]" />
-					<span className="whitespace-nowrap pr-1 text-sm leading-none text-mail-foreground">
+					<span className="whitespace-nowrap pr-1 text-mail-foreground text-sm leading-none">
 						Reply all
 					</span>
 				</button>
@@ -153,11 +153,7 @@ export const ZeroThreadToolbar = ({
 					<button
 						type="button"
 						onClick={
-							inArchive
-								? onUnarchive
-								: inSnoozed
-									? onMoveToInbox
-									: onRestore
+							inArchive ? onUnarchive : inSnoozed ? onMoveToInbox : onRestore
 						}
 						className={iconBtn}
 						aria-label="Move to inbox"

@@ -10,9 +10,9 @@ interface RawHeadersModalProps {
 export const RawHeadersModal = ({ thread, onClose }: RawHeadersModalProps) => {
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-			<div className="flex max-h-[80vh] w-full max-w-2xl flex-col rounded-xl border border-mail-border bg-panel-light  shadow-2xl border-mail-border/30 ">
-				<div className="flex items-center justify-between border-mail-border border-b p-4 border-mail-border/30">
-					<h3 className="font-semibold text-sm text-mail-foreground text-mail-foreground">
+			<div className="flex max-h-[80vh] w-full max-w-2xl flex-col rounded-xl border border-mail-border border-mail-border/30 bg-panel-light shadow-2xl">
+				<div className="flex items-center justify-between border-mail-border border-mail-border/30 border-b p-4">
+					<h3 className="font-semibold text-mail-foreground text-mail-foreground text-sm">
 						Original Message Source
 					</h3>
 					<button
@@ -23,7 +23,7 @@ export const RawHeadersModal = ({ thread, onClose }: RawHeadersModalProps) => {
 						<Icon name="cross" className="h-4 w-4" />
 					</button>
 				</div>
-				<div className="flex-1 select-text overflow-auto bg-offset-light/30 p-4 font-mono text-[11px] text-mail-muted /20 text-mail-muted">
+				<div className="/20 flex-1 select-text overflow-auto bg-offset-light/30 p-4 font-mono text-[11px] text-mail-muted text-mail-muted">
 					<pre className="whitespace-pre-wrap leading-relaxed">
 						{JSON.stringify(
 							{

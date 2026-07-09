@@ -62,7 +62,7 @@ interface ThreadDetailProps {
 
 const EmptyState = () => (
 	<div className="flex min-h-[400px] flex-col items-center justify-center gap-1.5 bg-offset-light/10 p-8 text-center dark:bg-transparent">
-		<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-mail-border bg-panel-light  shadow-sm dark:border-neutral-850 ">
+		<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-mail-border bg-panel-light shadow-sm dark:border-neutral-850">
 			<Icon
 				name="inbox"
 				className="h-5 w-5 text-mail-muted dark:text-neutral-450"
@@ -71,11 +71,11 @@ const EmptyState = () => (
 		<h3 className="font-semibold text-base text-mail-foreground text-mail-foreground">
 			Select a message to inspect
 		</h3>
-		<p className="mx-auto max-w-sm text-mail-muted text-xs text-mail-muted">
+		<p className="mx-auto max-w-sm text-mail-muted text-mail-muted text-xs">
 			Click any message on the left to review parsing, timeline, and approval
 			actions.
 		</p>
-		<div className="mt-4 flex items-center gap-1.5 text-mail-muted text-xs text-mail-muted">
+		<div className="mt-4 flex items-center gap-1.5 text-mail-muted text-mail-muted text-xs">
 			<Icon name="arrow-left" className="h-3.5 w-3.5 animate-pulse" />
 			<span className="font-medium">Pick a message to get started</span>
 		</div>
@@ -395,7 +395,8 @@ export const ThreadDetail = ({
 			headers["list-unsubscribe"] ||
 			headers["LIST-UNSUBSCRIBE"];
 		if (!raw || typeof raw !== "string") return null;
-		const match = raw.match(/<(https?:\/\/[^>]+)>/i) || raw.match(/(https?:\/\/\S+)/i);
+		const match =
+			raw.match(/<(https?:\/\/[^>]+)>/i) || raw.match(/(https?:\/\/\S+)/i);
 		return match?.[1] ?? null;
 	}, [displayMessages]);
 
@@ -707,9 +708,7 @@ export const ThreadDetail = ({
 				onPrint={handlePrint}
 				onMarkSpam={() => void handleMarkSpam(true)}
 				onSnooze={() => setSnoozeOpen(true)}
-				onUnsubscribe={
-					listUnsubscribeUrl ? handleUnsubscribe : undefined
-				}
+				onUnsubscribe={listUnsubscribeUrl ? handleUnsubscribe : undefined}
 				notesSlot={
 					thread.threadId ? <NotesPanel threadId={thread.threadId} /> : null
 				}

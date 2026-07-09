@@ -136,10 +136,7 @@ export async function updateNoteController(
 	return updated;
 }
 
-export async function deleteNoteController(
-	id: string,
-	organizationId: string,
-) {
+export async function deleteNoteController(id: string, organizationId: string) {
 	const log = useLogger();
 
 	const existing = await db.query.threadNote.findFirst({

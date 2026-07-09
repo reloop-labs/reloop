@@ -1,15 +1,12 @@
 "use client";
 
-import { Skeleton } from "@reloop/ui/skeleton";
 import { cn } from "@reloop/ui/cn";
+import { Skeleton } from "@reloop/ui/skeleton";
 
 /** Centered spinner used for mail list initial load (Zero pattern). */
 export const MailListSpinner = ({ className }: { className?: string }) => (
 	<div
-		className={cn(
-			"flex h-32 w-full items-center justify-center",
-			className,
-		)}
+		className={cn("flex h-32 w-full items-center justify-center", className)}
 	>
 		<div className="h-4 w-4 animate-spin rounded-full border-2 border-neutral-900 border-t-transparent dark:border-white dark:border-t-transparent" />
 	</div>

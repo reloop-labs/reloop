@@ -22,7 +22,7 @@ const ZeroFooterAction = ({
 		className="inline-flex h-7 cursor-pointer items-center justify-center gap-1 overflow-hidden rounded-md border-none bg-[var(--inbox-control)] px-1.5 transition-colors hover:bg-[#3d3d3d]"
 	>
 		{icon}
-		<span className="pr-1 pl-0.5 text-sm leading-none text-white">{text}</span>
+		<span className="pr-1 pl-0.5 text-sm text-white leading-none">{text}</span>
 		{shortcut && (
 			<kbd
 				className={cn(

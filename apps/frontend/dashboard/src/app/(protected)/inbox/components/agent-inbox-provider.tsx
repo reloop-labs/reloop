@@ -339,9 +339,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				.map((t) => t.id),
 		);
 
-		const threadMeta = new Map(
-			(allThreadsData || []).map((t) => [t.id, t]),
-		);
+		const threadMeta = new Map((allThreadsData || []).map((t) => [t.id, t]));
 
 		const mappedInbound = messagesData
 			? messagesData
@@ -361,9 +359,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 								isTrashed,
 								isArchived,
 								snoozedUntil: toOptionalIsoString(meta.snoozedUntil),
-								status: base.isSpam
-									? ("blocked" as const)
-									: base.status,
+								status: base.isSpam ? ("blocked" as const) : base.status,
 							};
 						}
 						return base;

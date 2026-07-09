@@ -44,7 +44,7 @@ export const AiSidebar = ({
 	return (
 		<aside
 			className={cn(
-				"mb-1 flex h-full w-[min(320px,100%)] shrink-0 flex-col overflow-hidden rounded-2xl border border-mail-border bg-panel-light dark:bg-panel-dark shadow-sm",
+				"mb-1 flex h-full w-[min(320px,100%)] shrink-0 flex-col overflow-hidden rounded-2xl border border-mail-border bg-panel-light shadow-sm dark:bg-panel-dark",
 			)}
 		>
 			<div className="flex items-center justify-between border-mail-border border-b px-3 py-2.5">
@@ -67,7 +67,7 @@ export const AiSidebar = ({
 			<div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3">
 				{thread ? (
 					<div className="rounded-lg border border-mail-border bg-[var(--inbox-muted-bg)] p-3">
-						<p className="mb-1 text-[10px] uppercase tracking-wide text-mail-muted">
+						<p className="mb-1 text-[10px] text-mail-muted uppercase tracking-wide">
 							Current thread
 						</p>
 						<p className="line-clamp-2 font-medium text-mail-foreground text-xs">
@@ -85,21 +85,21 @@ export const AiSidebar = ({
 				)}
 
 				<div className="space-y-1.5">
-					<p className="text-[10px] uppercase tracking-wide text-mail-muted">
+					<p className="text-[10px] text-mail-muted uppercase tracking-wide">
 						Suggestions
 					</p>
 					{suggestions.map((s) => (
 						<button
 							key={s}
 							type="button"
-							className="w-full rounded-lg border border-mail-border bg-[var(--inbox-control)] px-2.5 py-2 text-left text-xs text-mail-foreground transition-colors hover:bg-[var(--inbox-control-hover)]"
+							className="w-full rounded-lg border border-mail-border bg-[var(--inbox-control)] px-2.5 py-2 text-left text-mail-foreground text-xs transition-colors hover:bg-[var(--inbox-control-hover)]"
 						>
 							{s}
 						</button>
 					))}
 				</div>
 
-				<div className="mt-auto rounded-lg border border-dashed border-mail-border/60 p-3 text-[11px] text-mail-muted">
+				<div className="mt-auto rounded-lg border border-mail-border/60 border-dashed p-3 text-[11px] text-mail-muted">
 					Agent assist uses Reloop inbox context. Wire your agent runtime here
 					to stream answers for the selected thread.
 				</div>
@@ -124,6 +124,8 @@ export const AiSidebarToggle = ({
 		)}
 	>
 		<Sparkles className="mr-1 h-3.5 w-3.5 fill-[#959595]" />
-		<span className="text-sm leading-none text-mail-foreground">Agent chat</span>
+		<span className="text-mail-foreground text-sm leading-none">
+			Agent chat
+		</span>
 	</button>
 );

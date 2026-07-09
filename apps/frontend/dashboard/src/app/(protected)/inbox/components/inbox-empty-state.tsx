@@ -1,8 +1,8 @@
 "use client";
 
-import { InboxEmptyStateIcon } from "./inbox-empty-state-icon";
-import { AiSidebarToggle } from "./ai-sidebar";
 import { Mail } from "lucide-react";
+import { AiSidebarToggle } from "./ai-sidebar";
+import { InboxEmptyStateIcon } from "./inbox-empty-state-icon";
 
 export const InboxEmptyState = ({
 	title = "It's empty here",
@@ -22,7 +22,7 @@ export const InboxEmptyState = ({
 			<InboxEmptyStateIcon width={200} height={200} />
 			<div className="mt-4">
 				<p className="text-lg">{title}</p>
-				<p className="text-md text-mail-muted">{description}</p>
+				<p className="text-mail-muted text-md">{description}</p>
 				{(showComposeAction && onCompose) || onOpenAi ? (
 					<div className="mt-4 grid grid-cols-1 gap-2 xl:grid-cols-2">
 						{onOpenAi ? <AiSidebarToggle onClick={onOpenAi} /> : null}
@@ -55,7 +55,7 @@ export const InboxListEmptyState = ({
 			<InboxEmptyStateIcon width={200} height={200} />
 			<div className="mt-5">
 				<p className="text-lg">It's empty here</p>
-				<p className="text-md text-mail-muted">
+				<p className="text-mail-muted text-md">
 					{hasFilters ? (
 						<>
 							Search for another email or{" "}

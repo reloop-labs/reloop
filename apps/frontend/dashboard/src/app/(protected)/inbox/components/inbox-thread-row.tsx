@@ -16,7 +16,9 @@ const formatReceivedAt = (dateStr: string, isFirstToday: boolean) => {
 	const date = dayjs(dateStr);
 	const now = dayjs();
 	if (date.isSame(now, "day")) {
-		return isFirstToday ? `Today, ${date.format("h:mm A")}` : date.format("h:mm A");
+		return isFirstToday
+			? `Today, ${date.format("h:mm A")}`
+			: date.format("h:mm A");
 	}
 	if (date.isSame(now.subtract(1, "day"), "day")) return "Yesterday";
 	if (date.isAfter(now.subtract(7, "day"))) return date.format("ddd");
@@ -100,7 +102,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 			>
 				<div
 					className={cn(
-						"absolute right-2 z-20 flex -translate-y-1/2 items-center gap-1 rounded-xl border border-mail-border/30 bg-panel-light p-1 opacity-0 shadow-xs transition-opacity group-hover:opacity-100 dark:bg-panel-dark",
+						"-translate-y-1/2 absolute right-2 z-20 flex items-center gap-1 rounded-xl border border-mail-border/30 bg-panel-light p-1 opacity-0 shadow-xs transition-opacity group-hover:opacity-100 dark:bg-panel-dark",
 						index === 0 ? "top-4" : "top-[-1px]",
 					)}
 				>
@@ -148,10 +150,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 
 				<div className="flex w-full items-center justify-between gap-4 px-4">
 					{mail.bulkSelected.length > 0 ? (
-						<div
-							className="shrink-0"
-							onClick={(e) => e.stopPropagation()}
-						>
+						<div className="shrink-0" onClick={(e) => e.stopPropagation()}>
 							<Checkbox.Root
 								checked={isBulkSelected}
 								onCheckedChange={() => onToggleBulk(listId)}

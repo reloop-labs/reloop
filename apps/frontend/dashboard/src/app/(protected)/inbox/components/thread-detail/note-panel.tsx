@@ -2,10 +2,10 @@
 
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
-import { StickyNote, MoreVertical, Pin, Trash2, Copy, X } from "lucide-react";
+import { Copy, MoreVertical, Pin, StickyNote, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import useSWR from "swr";
 import { toast } from "sonner";
+import useSWR from "swr";
 import type { ThreadNote } from "../../types";
 
 const NOTE_COLORS = [
@@ -108,7 +108,9 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 
 	const deleteNote = useCallback(
 		async (id: string) => {
-			const res = await fetch(`/api/inbox/v1/notes/${id}`, { method: "DELETE" });
+			const res = await fetch(`/api/inbox/v1/notes/${id}`, {
+				method: "DELETE",
+			});
 			if (!res.ok) {
 				toast.error("Failed to delete note");
 				return;
@@ -132,7 +134,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 			>
 				<StickyNote className="h-3.5 w-3.5" />
 				{notes.length > 0 && (
-					<span className="absolute -top-1 -right-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-amber-500 px-0.5 text-[9px] font-semibold text-black">
+					<span className="-top-1 -right-1 absolute flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-amber-500 px-0.5 font-semibold text-[9px] text-black">
 						{notes.length}
 					</span>
 				)}
@@ -140,13 +142,13 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 
 			{isOpen && (
 				<div
-					className="absolute top-9 right-0 z-50 flex w-[min(350px,calc(100vw-2rem))] flex-col overflow-hidden rounded-xl border border-mail-border bg-panel-light dark:bg-panel-dark shadow-xl"
+					className="absolute top-9 right-0 z-50 flex w-[min(350px,calc(100vw-2rem))] flex-col overflow-hidden rounded-xl border border-mail-border bg-panel-light shadow-xl dark:bg-panel-dark"
 					onClick={(e) => e.stopPropagation()}
 					onKeyDown={(e) => e.stopPropagation()}
 				>
-					<div className="flex items-center justify-between border-b border-mail-border px-3 py-2">
+					<div className="flex items-center justify-between border-mail-border border-b px-3 py-2">
 						<div className="flex items-center gap-2">
-							<span className="text-sm font-medium text-mail-foreground">
+							<span className="font-medium text-mail-foreground text-sm">
 								Notes
 							</span>
 							{notes.length > 0 && (
@@ -166,19 +168,19 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 					</div>
 
 					{notes.length > 0 && (
-						<div className="border-b border-mail-border px-3 py-2">
+						<div className="border-mail-border border-b px-3 py-2">
 							<input
 								value={searchQuery}
 								onChange={(e) => setSearchQuery(e.target.value)}
 								placeholder="Search notes…"
-								className="w-full rounded-md bg-[var(--inbox-control)] px-2 py-1.5 text-xs text-mail-foreground outline-none placeholder:text-mail-muted"
+								className="w-full rounded-md bg-[var(--inbox-control)] px-2 py-1.5 text-mail-foreground text-xs outline-none placeholder:text-mail-muted"
 							/>
 						</div>
 					)}
 
 					<div className="max-h-72 space-y-2 overflow-y-auto p-3">
 						{filtered.length === 0 && !isAdding && (
-							<p className="py-4 text-center text-xs text-mail-muted">
+							<p className="py-4 text-center text-mail-muted text-xs">
 								{notes.length === 0
 									? "No notes yet"
 									: "No notes match your search"}
@@ -199,19 +201,19 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 											value={editContent}
 											onChange={(e) => setEditContent(e.target.value)}
 											rows={3}
-											className="w-full resize-none rounded-md bg-[var(--inbox-control)] p-2 text-xs text-mail-foreground outline-none"
+											className="w-full resize-none rounded-md bg-[var(--inbox-control)] p-2 text-mail-foreground text-xs outline-none"
 										/>
 										<div className="flex justify-end gap-1.5">
 											<button
 												type="button"
-												className="rounded-md px-2 py-1 text-xs text-mail-muted hover:bg-[var(--inbox-control-hover)]"
+												className="rounded-md px-2 py-1 text-mail-muted text-xs hover:bg-[var(--inbox-control-hover)]"
 												onClick={() => setEditingId(null)}
 											>
 												Cancel
 											</button>
 											<button
 												type="button"
-												className="rounded-md bg-mail-primary px-2 py-1 text-xs text-panel-light"
+												className="rounded-md bg-mail-primary px-2 py-1 text-panel-light text-xs"
 												onClick={async () => {
 													await updateNote(note.id, {
 														content: editContent.trim(),
@@ -226,7 +228,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 								) : (
 									<>
 										<div className="flex items-start justify-between gap-2">
-											<p className="whitespace-pre-wrap text-xs text-mail-foreground">
+											<p className="whitespace-pre-wrap text-mail-foreground text-xs">
 												{note.content}
 											</p>
 											<Dropdown.Root>
@@ -302,7 +304,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 									onChange={(e) => setNewContent(e.target.value)}
 									placeholder="Write a note…"
 									rows={3}
-									className="w-full resize-none rounded-md bg-[var(--inbox-control)] p-2 text-xs text-mail-foreground outline-none"
+									className="w-full resize-none rounded-md bg-[var(--inbox-control)] p-2 text-mail-foreground text-xs outline-none"
 									onKeyDown={(e) => {
 										if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
 											e.preventDefault();
@@ -318,14 +320,13 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 											onClick={() => setSelectedColor(c)}
 											className={cn(
 												"h-4 w-4 rounded-full border border-mail-border",
-												colorClass(c).replace("border-l-", "bg-").replace("-500", "-500"),
+												colorClass(c)
+													.replace("border-l-", "bg-")
+													.replace("-500", "-500"),
 												selectedColor === c && "ring-2 ring-white/40",
 											)}
 											style={{
-												background:
-													c === "default"
-														? "#737373"
-														: undefined,
+												background: c === "default" ? "#737373" : undefined,
 											}}
 											aria-label={c}
 										/>
@@ -334,7 +335,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 								<div className="flex justify-end gap-1.5">
 									<button
 										type="button"
-										className="rounded-md px-2 py-1 text-xs text-mail-muted hover:bg-[var(--inbox-control-hover)]"
+										className="rounded-md px-2 py-1 text-mail-muted text-xs hover:bg-[var(--inbox-control-hover)]"
 										onClick={() => {
 											setIsAdding(false);
 											setNewContent("");
@@ -344,7 +345,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 									</button>
 									<button
 										type="button"
-										className="rounded-md bg-mail-primary px-2 py-1 text-xs text-panel-light disabled:opacity-40"
+										className="rounded-md bg-mail-primary px-2 py-1 text-panel-light text-xs disabled:opacity-40"
 										disabled={!newContent.trim()}
 										onClick={createNote}
 									>
@@ -356,11 +357,11 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 					</div>
 
 					{!isAdding && (
-						<div className="border-t border-mail-border p-2">
+						<div className="border-mail-border border-t p-2">
 							<button
 								type="button"
 								onClick={() => setIsAdding(true)}
-								className="w-full rounded-md bg-[var(--inbox-control)] py-1.5 text-xs text-mail-muted transition-colors hover:bg-[var(--inbox-control-hover)]"
+								className="w-full rounded-md bg-[var(--inbox-control)] py-1.5 text-mail-muted text-xs transition-colors hover:bg-[var(--inbox-control-hover)]"
 							>
 								Add note
 							</button>

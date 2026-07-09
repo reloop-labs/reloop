@@ -1829,13 +1829,7 @@ export const IconsSprite = () => (
 				/>
 			</symbol>
 			<symbol id="alert" viewBox="0 0 24 24" fill="none">
-				<circle
-					opacity="0.12"
-					cx="12"
-					cy="12"
-					r="10"
-					fill="currentColor"
-				/>
+				<circle opacity="0.12" cx="12" cy="12" r="10" fill="currentColor" />
 				<path
 					d="M12 16V11M12.5 8C12.5 8.27614 12.2761 8.5 12 8.5C11.7239 8.5 11.5 8.27614 11.5 8M12.5 8C12.5 7.72386 12.2761 7.5 12 7.5C11.7239 7.5 11.5 7.72386 11.5 8M12.5 8H11.5M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
 					fill="none"

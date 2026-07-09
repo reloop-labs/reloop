@@ -22,9 +22,7 @@ const InboxSidebarContext = createContext<InboxSidebarContextValue | null>(
 
 export const InboxSidebarProvider = ({ children }: { children: ReactNode }) => {
 	const [collapsed, setCollapsed] = useState(false);
-	const [openComposeFn, setOpenComposeFn] = useState<(() => void) | null>(
-		null,
-	);
+	const [openComposeFn, setOpenComposeFn] = useState<(() => void) | null>(null);
 
 	const toggleSidebar = useCallback(() => {
 		setCollapsed((prev) => !prev);

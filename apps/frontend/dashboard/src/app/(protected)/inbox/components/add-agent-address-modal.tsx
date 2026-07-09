@@ -148,7 +148,7 @@ export const AddAgentAddressModal = ({
 	return (
 		<Modal.Root open={isOpen} onOpenChange={onClose}>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-mail-border p-0 sm:max-w-[480px] border-mail-border/40"
+				className="overflow-hidden rounded-2xl border border-mail-border border-mail-border/40 p-0 sm:max-w-[480px]"
 				showClose={false}
 				onEscapeKeyDown={(e) => {
 					if (isSubmitting) e.preventDefault();
@@ -159,7 +159,7 @@ export const AddAgentAddressModal = ({
 			>
 				{hasNoDomains ? (
 					<>
-						<div className="flex flex-col border-mail-border border-b border-mail-border/40">
+						<div className="flex flex-col border-mail-border border-mail-border/40 border-b">
 							<div className="flex items-start justify-between px-5 pt-5 pb-4">
 								<div className="flex flex-col gap-1">
 									<div className="flex items-center gap-2.5">
@@ -173,7 +173,7 @@ export const AddAgentAddressModal = ({
 											</h2>
 										</Modal.Title>
 									</div>
-									<p className="text-paragraph-xs text-mail-muted">
+									<p className="text-mail-muted text-paragraph-xs">
 										Configure a new email inbox for your AI agents to send and
 										receive emails.
 									</p>
@@ -181,7 +181,7 @@ export const AddAgentAddressModal = ({
 								<button
 									type="button"
 									onClick={onClose}
-									className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-panel-light  text-mail-muted transition-colors hover:bg-offset-light"
+									className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-panel-light text-mail-muted transition-colors hover:bg-offset-light"
 								>
 									<Icon name="cross" className="h-3.5 w-3.5" />
 								</button>
@@ -214,7 +214,7 @@ export const AddAgentAddressModal = ({
 					</>
 				) : (
 					<form onSubmit={form.handleSubmit(onSubmit)}>
-						<div className="flex flex-col border-mail-border border-b border-mail-border/40">
+						<div className="flex flex-col border-mail-border border-mail-border/40 border-b">
 							<div className="flex items-start justify-between px-5 pt-5 pb-4">
 								<div className="flex flex-col gap-1">
 									<div className="flex items-center gap-2.5">
@@ -228,7 +228,7 @@ export const AddAgentAddressModal = ({
 											</h2>
 										</Modal.Title>
 									</div>
-									<p className="text-paragraph-xs text-mail-muted">
+									<p className="text-mail-muted text-paragraph-xs">
 										Configure a new email inbox for your AI agents to send and
 										receive emails.
 									</p>
@@ -236,7 +236,7 @@ export const AddAgentAddressModal = ({
 								<button
 									type="button"
 									onClick={onClose}
-									className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-panel-light  text-mail-muted transition-colors hover:bg-offset-light"
+									className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-panel-light text-mail-muted transition-colors hover:bg-offset-light"
 								>
 									<Icon name="cross" className="h-3.5 w-3.5" />
 								</button>
@@ -377,7 +377,7 @@ export const AddAgentAddressModal = ({
 								)}
 							</div>
 
-							<p className="rounded-lg bg-offset-light px-3 py-2 font-medium text-[12px] text-mail-muted /5">
+							<p className="/5 rounded-lg bg-offset-light px-3 py-2 font-medium text-[12px] text-mail-muted">
 								<Icon name="globe" className="mr-1 inline h-3.5 w-3.5" />
 								Domain must have receiving enabled. Manage domains from{" "}
 								<a
@@ -391,7 +391,7 @@ export const AddAgentAddressModal = ({
 							</p>
 						</Modal.Body>
 
-						<div className="flex items-center justify-end border-mail-border border-t px-5 py-3.5 border-mail-border/50">
+						<div className="flex items-center justify-end border-mail-border border-mail-border/50 border-t px-5 py-3.5">
 							<div className="flex items-center gap-2">
 								<Button.Root
 									type="button"

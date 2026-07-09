@@ -1,8 +1,8 @@
 "use client";
 
 import { useAgentInbox } from "@fe/dashboard/app/(protected)/inbox/components/agent-inbox-provider";
-import { filterInboxThreads } from "@fe/dashboard/app/(protected)/inbox/utils/inbox-folder-filters";
 import { groupThreadsByConversation } from "@fe/dashboard/app/(protected)/inbox/utils/group-threads";
+import { filterInboxThreads } from "@fe/dashboard/app/(protected)/inbox/utils/inbox-folder-filters";
 import { useMemo } from "react";
 
 export type InboxFolderStats = {

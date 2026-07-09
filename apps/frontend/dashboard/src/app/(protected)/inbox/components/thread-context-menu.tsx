@@ -25,7 +25,8 @@ import { toast } from "sonner";
 const itemClass =
 	"rounded-md text-[13px] text-mail-muted data-[highlighted]:bg-[var(--inbox-control-hover)] data-[highlighted]:text-mail-foreground";
 
-const contentClass = "min-w-48 border-mail-border bg-[var(--inbox-control)] p-1";
+const contentClass =
+	"min-w-48 border-mail-border bg-[var(--inbox-control)] p-1";
 
 export type ThreadContextMenuProps = {
 	thread: InboundThread;
@@ -39,8 +40,7 @@ export type ThreadContextMenuProps = {
 	onSnooze?: (thread: InboundThread) => void;
 };
 
-const resolveThreadId = (thread: InboundThread) =>
-	thread.threadId || thread.id;
+const resolveThreadId = (thread: InboundThread) => thread.threadId || thread.id;
 
 const resolveMessageId = (thread: InboundThread) =>
 	thread.messageId ?? thread.id;
@@ -201,9 +201,7 @@ export const ThreadContextMenu = ({
 				{!showMoveToInbox && (
 					<ContextMenu.Item
 						className={itemClass}
-						onSelect={() =>
-							void run(() => archiveThread(threadId), "Archived")
-						}
+						onSelect={() => void run(() => archiveThread(threadId), "Archived")}
 					>
 						<Archive className="h-3.5 w-3.5" />
 						Archive
@@ -213,9 +211,7 @@ export const ThreadContextMenu = ({
 				{showMoveToInbox && (
 					<ContextMenu.Item
 						className={itemClass}
-						onSelect={() =>
-							void run(handleMoveToInbox, "Moved to inbox")
-						}
+						onSelect={() => void run(handleMoveToInbox, "Moved to inbox")}
 					>
 						<Inbox className="h-3.5 w-3.5" />
 						Move to inbox
@@ -238,10 +234,7 @@ export const ThreadContextMenu = ({
 					<ContextMenu.Item
 						className={itemClass}
 						onSelect={() =>
-							void run(
-								() => markMessageSpam(messageId, true),
-								"Moved to spam",
-							)
+							void run(() => markMessageSpam(messageId, true), "Moved to spam")
 						}
 					>
 						Move to spam
@@ -282,9 +275,7 @@ export const ThreadContextMenu = ({
 											className="h-2 w-2 shrink-0 rounded-full"
 											style={{
 												backgroundColor:
-													label.color === "default"
-														? "#9B9B9B"
-														: label.color,
+													label.color === "default" ? "#9B9B9B" : label.color,
 											}}
 										/>
 										{label.name}

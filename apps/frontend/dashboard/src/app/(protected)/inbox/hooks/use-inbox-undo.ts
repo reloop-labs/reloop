@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useRef } from "react";
-import type { BatchThreadAction } from "../types";
 import { useAgentInbox } from "../components/agent-inbox-provider";
+import type { BatchThreadAction } from "../types";
 
 type UndoAction =
 	| {

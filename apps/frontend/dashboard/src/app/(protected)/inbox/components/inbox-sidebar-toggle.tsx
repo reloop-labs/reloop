@@ -2,11 +2,7 @@
 
 import { PanelLeftOpenIcon } from "./zero-icons";
 
-export const InboxSidebarToggle = ({
-	onClick,
-}: {
-	onClick: () => void;
-}) => (
+export const InboxSidebarToggle = ({ onClick }: { onClick: () => void }) => (
 	<button
 		type="button"
 		onClick={onClick}

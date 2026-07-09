@@ -27,7 +27,7 @@ export const ReplyComposer = ({
 	return (
 		<div className="mx-5 my-4 rounded-xl border border-mail-border bg-panel-light shadow-sm dark:bg-panel-dark">
 			{/* Header */}
-			<div className="flex items-center justify-between border-mail-border border-b px-4 py-3 border-mail-border/30">
+			<div className="flex items-center justify-between border-mail-border border-mail-border/30 border-b px-4 py-3">
 				<div className="flex flex-col gap-1 text-label-sm">
 					<div className="flex items-center gap-2 text-mail-muted">
 						<span className="w-12">To:</span>
@@ -37,9 +37,7 @@ export const ReplyComposer = ({
 					</div>
 					<div className="flex items-center gap-2 text-mail-muted">
 						<span className="w-12">From:</span>
-						<span className="text-mail-muted text-mail-muted">
-							{fromEmail}
-						</span>
+						<span className="text-mail-muted text-mail-muted">{fromEmail}</span>
 					</div>
 				</div>
 				<button
@@ -58,12 +56,12 @@ export const ReplyComposer = ({
 					onChange={(e) => onBodyChange(e.target.value)}
 					placeholder={`Reply to ${toName || toEmail.split("@")[0]}...`}
 					rows={5}
-					className="w-full resize-none bg-transparent text-label-sm text-mail-foreground placeholder-text-soft-400 outline-none text-mail-foreground"
+					className="w-full resize-none bg-transparent text-label-sm text-mail-foreground text-mail-foreground placeholder-text-soft-400 outline-none"
 				/>
 			</div>
 
 			{/* Footer */}
-			<div className="flex items-center justify-between rounded-b-xl border-mail-border border-t bg-offset-light/30 px-4 py-2.5 border-mail-border/30 /20">
+			<div className="/20 flex items-center justify-between rounded-b-xl border-mail-border border-mail-border/30 border-t bg-offset-light/30 px-4 py-2.5">
 				<div className="flex items-center gap-2">
 					<button
 						type="button"
@@ -88,7 +86,7 @@ export const ReplyComposer = ({
 
 					<button
 						type="button"
-						className="rounded-lg p-1.5 text-mail-muted hover:bg-offset-light hover:text-mail-foreground hover:bg-[var(--inbox-hover)]"
+						className="rounded-lg p-1.5 text-mail-muted hover:bg-[var(--inbox-hover)] hover:bg-offset-light hover:text-mail-foreground"
 						title="Attach files"
 						onClick={() => toast.info("Attachment uploading prototype")}
 					>
@@ -109,7 +107,7 @@ export const ReplyComposer = ({
 				<button
 					type="button"
 					onClick={onClose}
-					className="rounded-lg p-1.5 text-mail-muted hover:bg-red-50 hover:text-error-base hover:bg-red-950/20"
+					className="rounded-lg p-1.5 text-mail-muted hover:bg-red-50 hover:bg-red-950/20 hover:text-error-base"
 					title="Discard draft"
 				>
 					<svg

@@ -15,10 +15,6 @@ export default function AgentInboxSnoozedPage() {
 	const filtered = snoozedThreads.filter((t) => t.mailboxId === mailboxId);
 
 	return (
-		<AgentInboxContent
-			mailbox={mailbox}
-			folder="snoozed"
-			threads={filtered}
-		/>
+		<AgentInboxContent mailbox={mailbox} folder="snoozed" threads={filtered} />
 	);
 }

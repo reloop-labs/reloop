@@ -23,10 +23,10 @@ export const listMessagesRoute = new Elysia().use(authMiddleware).get(
 			),
 			limit: t.Optional(t.Numeric({ default: 100, maximum: 200 })),
 			offset: t.Optional(t.Numeric({ default: 0 })),
-			q: t.Optional(t.String({ description: "Search subject, snippet, sender" })),
-			isSpam: t.Optional(
-				t.Boolean({ description: "Filter by spam status" }),
+			q: t.Optional(
+				t.String({ description: "Search subject, snippet, sender" }),
 			),
+			isSpam: t.Optional(t.Boolean({ description: "Filter by spam status" })),
 		}),
 		response: {
 			200: MailModel.messageListResponse,

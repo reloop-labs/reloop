@@ -55,7 +55,7 @@ export const SnoozeDialog = ({
 
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
-			<Modal.Content className="max-w-md border-mail-border bg-panel-light dark:bg-panel-dark sm:rounded-xl">
+			<Modal.Content className="max-w-md border-mail-border bg-panel-light sm:rounded-xl dark:bg-panel-dark">
 				<Modal.Header
 					title="Snooze until…"
 					description="Hide this thread until the wake time you choose."
@@ -71,7 +71,7 @@ export const SnoozeDialog = ({
 								key={p.label}
 								type="button"
 								onClick={() => applyPreset(p.ms)}
-								className="rounded-md bg-[var(--inbox-control)] px-2.5 py-1 text-xs text-mail-muted transition-colors hover:bg-[var(--inbox-control-hover)]"
+								className="rounded-md bg-[var(--inbox-control)] px-2.5 py-1 text-mail-muted text-xs transition-colors hover:bg-[var(--inbox-control-hover)]"
 							>
 								{p.label}
 							</button>
@@ -79,23 +79,23 @@ export const SnoozeDialog = ({
 					</div>
 
 					<div className="grid gap-3 sm:grid-cols-2">
-						<label className="flex flex-col gap-1.5 text-xs text-mail-muted">
+						<label className="flex flex-col gap-1.5 text-mail-muted text-xs">
 							Date
 							<input
 								type="date"
 								min={toDateInput(new Date())}
 								value={date}
 								onChange={(e) => setDate(e.target.value)}
-								className="rounded-md border border-mail-border bg-[var(--inbox-control)] px-2 py-1.5 text-sm text-mail-foreground outline-none"
+								className="rounded-md border border-mail-border bg-[var(--inbox-control)] px-2 py-1.5 text-mail-foreground text-sm outline-none"
 							/>
 						</label>
-						<label className="flex flex-col gap-1.5 text-xs text-mail-muted">
+						<label className="flex flex-col gap-1.5 text-mail-muted text-xs">
 							Time ({timeZoneLabel})
 							<input
 								type="time"
 								value={time}
 								onChange={(e) => setTime(e.target.value)}
-								className="rounded-md border border-mail-border bg-[var(--inbox-control)] px-2 py-1.5 text-sm text-mail-foreground outline-none"
+								className="rounded-md border border-mail-border bg-[var(--inbox-control)] px-2 py-1.5 text-mail-foreground text-sm outline-none"
 							/>
 						</label>
 					</div>

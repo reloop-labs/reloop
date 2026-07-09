@@ -20,15 +20,13 @@ export const MessageParsedData = ({
 	if (!parsed || Object.keys(parsed).length === 0) return null;
 
 	return (
-		<div className="border-mail-border border-t py-4 border-mail-border/10">
+		<div className="border-mail-border border-mail-border/10 border-t py-4">
 			<button
 				type="button"
 				onClick={onToggle}
 				className="mb-3 flex w-full items-center justify-between text-left"
 			>
-				<span className="font-medium text-mail-muted text-xs">
-					Parsed data
-				</span>
+				<span className="font-medium text-mail-muted text-xs">Parsed data</span>
 				<Icon
 					name="chevron-down"
 					className={cn(
@@ -39,7 +37,7 @@ export const MessageParsedData = ({
 			</button>
 
 			{isExpanded && (
-				<div className="flex flex-col gap-2 rounded-lg border border-mail-border bg-offset-light/50 p-3 border-mail-border/10 /20">
+				<div className="/20 flex flex-col gap-2 rounded-lg border border-mail-border border-mail-border/10 bg-offset-light/50 p-3">
 					{Object.entries(parsed).map(([k, v]) => (
 						<div
 							key={k}

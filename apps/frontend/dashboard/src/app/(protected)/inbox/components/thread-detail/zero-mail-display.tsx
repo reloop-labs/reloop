@@ -4,18 +4,18 @@ import {
 	getAvatarGradient,
 	getAvatarInitial,
 } from "@fe/dashboard/utils/avatar";
-import * as Dropdown from "@reloop/ui/dropdown";
 import { cn } from "@reloop/ui/cn";
+import * as Dropdown from "@reloop/ui/dropdown";
 import { MoreHorizontal, Tag } from "lucide-react";
 import { useState } from "react";
 import type { AgentMailbox } from "../../types";
+import { formatMessageTimestamp, formatZeroMessageTime } from "./date-utils";
 import { MessageAttachments } from "./message-attachments";
 import { MessageBody } from "./message-body";
 import { MessageDraftActions } from "./message-draft-actions";
 import { MessageDraftBanner } from "./message-draft-banner";
 import { MessageParsedData } from "./message-parsed-data";
 import { MessageSentBanner } from "./message-sent-banner";
-import { formatMessageTimestamp, formatZeroMessageTime } from "./date-utils";
 
 const cleanName = (name?: string | null) =>
 	(name ?? "").replace(/["<>]/g, "") || "Unknown";
@@ -104,7 +104,12 @@ export const ZeroMailDisplay = ({
 	);
 
 	return (
-		<div className={cn("relative flex-1", index > 0 && "border-mail-border border-t")}>
+		<div
+			className={cn(
+				"relative flex-1",
+				index > 0 && "border-mail-border border-t",
+			)}
+		>
 			{index === 0 && (
 				<div className="border-mail-border border-b px-4 py-4">
 					<h1 className="font-medium text-base text-mail-foreground leading-snug">
@@ -148,16 +153,15 @@ export const ZeroMailDisplay = ({
 										Details
 									</button>
 								</div>
-								<p className="mt-0.5 text-[#8C8C8C] text-sm">
-									To: {toLabel}
-								</p>
+								<p className="mt-0.5 text-[#8C8C8C] text-sm">To: {toLabel}</p>
 								{detailsOpen && (
 									<div className="mt-3 space-y-1 rounded-lg border border-mail-border bg-[var(--inbox-muted-bg)] p-3 text-xs">
 										<div className="flex gap-2">
-											<span className="w-12 shrink-0 text-[#8C8C8C]">From:</span>
+											<span className="w-12 shrink-0 text-[#8C8C8C]">
+												From:
+											</span>
 											<span className="text-mail-muted">
-												{senderName}{" "}
-												&lt;{senderEmail}&gt;
+												{senderName} &lt;{senderEmail}&gt;
 											</span>
 										</div>
 										<div className="flex gap-2">
@@ -165,7 +169,9 @@ export const ZeroMailDisplay = ({
 											<span className="text-mail-muted">{toLabel}</span>
 										</div>
 										<div className="flex gap-2">
-											<span className="w-12 shrink-0 text-[#8C8C8C]">Date:</span>
+											<span className="w-12 shrink-0 text-[#8C8C8C]">
+												Date:
+											</span>
 											<span className="text-mail-muted">
 												{formatMessageTimestamp(msg.messageAt)}
 											</span>

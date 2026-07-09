@@ -1,10 +1,10 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { cn } from "@reloop/ui/cn";
 import { Provider as JotaiProvider } from "jotai";
 import { useTheme } from "next-themes";
-import { cn } from "@reloop/ui/cn";
+import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { AgentInboxProvider } from "./components/agent-inbox-provider";
 import { InboxHotkeysProvider } from "./components/inbox-hotkeys-provider";
 import { InboxSidebarProvider } from "./components/inbox-sidebar-context";
@@ -26,10 +26,7 @@ export default function AgentInboxSectionLayout({
 
 	return (
 		<div
-			className={cn(
-				"inbox-zero-theme fixed inset-0 z-40",
-				isDark && "dark",
-			)}
+			className={cn("inbox-zero-theme fixed inset-0 z-40", isDark && "dark")}
 		>
 			<AgentInboxProvider>
 				<JotaiProvider>

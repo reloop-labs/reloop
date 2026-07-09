@@ -179,7 +179,7 @@ export const ThreadList = ({
 							checked={mail.bulkSelected.length === visibleThreads.length}
 							onCheckedChange={handleSelectAll}
 						/>
-						<span className="font-medium text-sm text-mail-foreground">
+						<span className="font-medium text-mail-foreground text-sm">
 							{mail.bulkSelected.length} selected
 						</span>
 					</div>
@@ -202,7 +202,7 @@ export const ThreadList = ({
 					count={visibleThreads.length}
 					overscan={5}
 					itemSize={72}
-					className="absolute inset-0 overflow-x-hidden scrollbar-hide"
+					className="scrollbar-hide absolute inset-0 overflow-x-hidden"
 					onScroll={() => {
 						const handle = vListRef.current;
 						if (!handle) return;
@@ -217,7 +217,8 @@ export const ThreadList = ({
 						if (!thread) return <div key={index} />;
 
 						const dateObj = new Date(thread.receivedAt);
-						const isToday = dateObj.toDateString() === new Date().toDateString();
+						const isToday =
+							dateObj.toDateString() === new Date().toDateString();
 						let isFirstToday = false;
 						if (isToday && !foundFirstToday) {
 							isFirstToday = true;

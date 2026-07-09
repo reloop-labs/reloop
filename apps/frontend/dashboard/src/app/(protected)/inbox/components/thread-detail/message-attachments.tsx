@@ -63,7 +63,7 @@ export const MessageAttachments = ({
 	};
 
 	return (
-		<div className="border-mail-border border-t border-mail-border/10 py-4">
+		<div className="border-mail-border border-mail-border/10 border-t py-4">
 			<h3 className="mb-3 font-medium text-mail-muted text-xs">Attachments</h3>
 			<ul className="flex flex-col gap-2">
 				{attachments.map((file) => (

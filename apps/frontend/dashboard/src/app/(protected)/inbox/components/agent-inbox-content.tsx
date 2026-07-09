@@ -15,8 +15,8 @@ import { InboxEmptyState } from "@fe/dashboard/app/(protected)/inbox/components/
 import { useInboxSidebar } from "@fe/dashboard/app/(protected)/inbox/components/inbox-sidebar-context";
 import { InboxSidebarToggle } from "@fe/dashboard/app/(protected)/inbox/components/inbox-sidebar-toggle";
 import { MailDisplaySkeleton } from "@fe/dashboard/app/(protected)/inbox/components/mail-skeleton";
-import { SnoozeDialog } from "@fe/dashboard/app/(protected)/inbox/components/thread-detail/snooze-dialog";
 import { ThreadDetail } from "@fe/dashboard/app/(protected)/inbox/components/thread-detail";
+import { SnoozeDialog } from "@fe/dashboard/app/(protected)/inbox/components/thread-detail/snooze-dialog";
 import {
 	ThreadList,
 	useInboxNavigation,
@@ -27,24 +27,17 @@ import {
 } from "@fe/dashboard/app/(protected)/inbox/components/ui/resizable";
 import { useInboxMail } from "@fe/dashboard/app/(protected)/inbox/components/use-inbox-mail";
 import { useInboxUndo } from "@fe/dashboard/app/(protected)/inbox/hooks/use-inbox-undo";
-import {
-	findThreadByListId,
-	groupThreadsByConversation,
-} from "@fe/dashboard/app/(protected)/inbox/utils/group-threads";
 import type {
 	AgentMailbox,
 	BatchThreadAction,
 	InboundThread,
 } from "@fe/dashboard/app/(protected)/inbox/types";
-import { cn } from "@reloop/ui/cn";
 import {
-	Archive,
-	MailOpen,
-	RefreshCcw,
-	Star,
-	Trash2,
-	X,
-} from "lucide-react";
+	findThreadByListId,
+	groupThreadsByConversation,
+} from "@fe/dashboard/app/(protected)/inbox/utils/group-threads";
+import { cn } from "@reloop/ui/cn";
+import { Archive, MailOpen, RefreshCcw, Star, Trash2, X } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -206,7 +199,9 @@ export const AgentInboxContent = ({
 
 	const hotkeysEnabled =
 		!paletteOpen &&
-		(mail.bulkSelected.length > 0 || focusedIndex !== null || !!selectedThreadId);
+		(mail.bulkSelected.length > 0 ||
+			focusedIndex !== null ||
+			!!selectedThreadId);
 
 	const listHotkeysEnabled = !paletteOpen;
 
@@ -258,7 +253,10 @@ export const AgentInboxContent = ({
 				void runBulkAction("star", "Starred");
 			}
 		},
-		{ enabled: hotkeysEnabled && mail.bulkSelected.length > 0, preventDefault: true },
+		{
+			enabled: hotkeysEnabled && mail.bulkSelected.length > 0,
+			preventDefault: true,
+		},
 		[mail.bulkSelected.length, runBulkAction],
 	);
 
@@ -332,10 +330,7 @@ export const AgentInboxContent = ({
 			<MailDisplaySkeleton />
 		</div>
 	) : (
-		<InboxEmptyState
-			onCompose={openCompose}
-			onOpenAi={toggleAi}
-		/>
+		<InboxEmptyState onCompose={openCompose} onOpenAi={toggleAi} />
 	);
 
 	return (
@@ -353,8 +348,7 @@ export const AgentInboxContent = ({
 				}}
 				onConfirm={(until) => {
 					if (!snoozeThreadTarget) return;
-					const id =
-						snoozeThreadTarget.threadId || snoozeThreadTarget.id;
+					const id = snoozeThreadTarget.threadId || snoozeThreadTarget.id;
 					void snoozeThread(id, until)
 						.then(() => {
 							toast.success("Snoozed");
@@ -378,7 +372,7 @@ export const AgentInboxContent = ({
 						minSize={35}
 						maxSize={35}
 						className={cn(
-							"mb-1 flex min-h-0 flex-1 flex-col bg-panel-light dark:bg-panel-dark shadow-sm md:mr-[3px] md:rounded-2xl lg:h-[calc(100dvh-8px)]",
+							"mb-1 flex min-h-0 flex-1 flex-col bg-panel-light shadow-sm md:mr-[3px] md:rounded-2xl lg:h-[calc(100dvh-8px)] dark:bg-panel-dark",
 							!isDesktop && selectedThreadId && "hidden",
 						)}
 					>
@@ -431,9 +425,7 @@ export const AgentInboxContent = ({
 												<button
 													type="button"
 													title="Star"
-													onClick={() =>
-														void runBulkAction("star", "Starred")
-													}
+													onClick={() => void runBulkAction("star", "Starred")}
 													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
 												>
 													<Star className="h-3.5 w-3.5 text-mail-muted" />
@@ -510,7 +502,7 @@ export const AgentInboxContent = ({
 						<ResizablePanel
 							defaultSize={65}
 							minSize={30}
-							className="mb-1 mr-0.5 flex min-h-0 flex-col rounded-2xl bg-panel-light dark:bg-panel-dark shadow-sm lg:h-[calc(100dvh-8px)]"
+							className="mr-0.5 mb-1 flex min-h-0 flex-col rounded-2xl bg-panel-light shadow-sm lg:h-[calc(100dvh-8px)] dark:bg-panel-dark"
 						>
 							{detailPane}
 						</ResizablePanel>

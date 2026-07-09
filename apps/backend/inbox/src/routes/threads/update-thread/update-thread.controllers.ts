@@ -58,7 +58,9 @@ export async function updateThreadController(
 		success: true,
 		id,
 		...(updates.isRead !== undefined ? { isRead: updates.isRead } : {}),
-		...(updates.isStarred !== undefined ? { isStarred: updates.isStarred } : {}),
+		...(updates.isStarred !== undefined
+			? { isStarred: updates.isStarred }
+			: {}),
 		...(updates.isImportant !== undefined
 			? { isImportant: updates.isImportant }
 			: {}),

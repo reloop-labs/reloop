@@ -1,5 +1,10 @@
 import { db } from "@reloop/db/client";
-import { emailLabel, emailThread, mailbox, threadLabel } from "@reloop/db/schema";
+import {
+	emailLabel,
+	emailThread,
+	mailbox,
+	threadLabel,
+} from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";

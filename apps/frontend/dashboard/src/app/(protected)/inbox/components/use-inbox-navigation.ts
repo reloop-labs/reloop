@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
 import { atom, useAtom } from "jotai";
 import { parseAsString, useQueryState } from "nuqs";
+import { useCallback, useEffect, useRef } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { useInboxMail } from "./use-inbox-mail";
 
 export const focusedIndexAtom = atom<number | null>(null);

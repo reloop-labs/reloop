@@ -135,7 +135,7 @@ export const EmailPillsInput = ({
 							transition={{ duration: 0.15 }}
 							className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-0.5 font-medium text-xs shadow-xs transition-colors ${
 								isValid
-									? "border-mail-border bg-offset-light text-mail-muted border-mail-border/60 bg-mail-accent/40 text-mail-muted"
+									? "border-mail-border border-mail-border/60 bg-mail-accent/40 bg-offset-light text-mail-muted text-mail-muted"
 									: "border-red-200 bg-red-50 text-red-600 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400"
 							}`}
 						>
@@ -171,7 +171,7 @@ export const EmailPillsInput = ({
 									removeEmail(idx);
 								}}
 								disabled={disabled}
-								className={`-mr-1 shrink-0 rounded-full p-0.5 transition-colors hover:bg-black/5 hover:bg-[var(--inbox-hover)] ${
+								className={`-mr-1 shrink-0 rounded-full p-0.5 transition-colors hover:bg-[var(--inbox-hover)] hover:bg-black/5 ${
 									isValid
 										? "text-mail-muted hover:text-mail-foreground hover:text-mail-foreground"
 										: "text-red-400 hover:text-red-700 dark:hover:text-red-300"
@@ -193,7 +193,7 @@ export const EmailPillsInput = ({
 				onPaste={handlePaste}
 				disabled={disabled}
 				placeholder={emails.length === 0 ? placeholder : ""}
-				className="min-w-[120px] flex-1 bg-transparent py-1 text-mail-foreground placeholder-text-soft-400 outline-none text-mail-foreground"
+				className="min-w-[120px] flex-1 bg-transparent py-1 text-mail-foreground text-mail-foreground placeholder-text-soft-400 outline-none"
 			/>
 		</div>
 	);

@@ -84,7 +84,7 @@ export const MessageHeaderExpanded = ({
 				<div className="flex min-w-0 flex-col gap-0.5">
 					{/* Row 1: sender name · badge · email */}
 					<div className="flex flex-wrap items-center gap-1.5">
-						<span className="font-semibold text-sm text-mail-foreground text-mail-foreground">
+						<span className="font-semibold text-mail-foreground text-mail-foreground text-sm">
 							{senderName}
 						</span>
 						<MessageBadge
@@ -111,7 +111,7 @@ export const MessageHeaderExpanded = ({
 				<button
 					type="button"
 					onClick={onToggleExpand}
-					className="rounded-lg p-1 text-mail-muted hover:bg-offset-light hover:text-mail-foreground hover:bg-[var(--inbox-hover)]"
+					className="rounded-lg p-1 text-mail-muted hover:bg-[var(--inbox-hover)] hover:bg-offset-light hover:text-mail-foreground"
 				>
 					<Icon name="chevron-up" className="h-4 w-4" />
 				</button>

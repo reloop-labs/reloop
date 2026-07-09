@@ -1,7 +1,7 @@
 "use client";
 
-import * as CommandMenu from "@reloop/ui/command";
 import { cn } from "@reloop/ui/cn";
+import * as CommandMenu from "@reloop/ui/command";
 import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import {
@@ -38,8 +38,16 @@ const FILTER_OPTIONS: {
 	label: string;
 	icon: React.ReactNode;
 }[] = [
-	{ id: "unread", label: "Unread", icon: <Mail className="h-4 w-4 opacity-60" /> },
-	{ id: "starred", label: "Starred", icon: <Star className="h-4 w-4 opacity-60" /> },
+	{
+		id: "unread",
+		label: "Unread",
+		icon: <Mail className="h-4 w-4 opacity-60" />,
+	},
+	{
+		id: "starred",
+		label: "Starred",
+		icon: <Star className="h-4 w-4 opacity-60" />,
+	},
 	{
 		id: "needs_approval",
 		label: "Needs approval",
@@ -226,7 +234,7 @@ export const InboxCommandPalette = ({
 								{activeFilters.map((filter) => (
 									<span
 										key={filter}
-										className="inline-flex items-center gap-1 rounded-md bg-[var(--inbox-muted-bg)] pr-1 pl-2 text-xs text-mail-foreground"
+										className="inline-flex items-center gap-1 rounded-md bg-[var(--inbox-muted-bg)] pr-1 pl-2 text-mail-foreground text-xs"
 									>
 										{FILTER_LABELS[filter]}
 										<button
@@ -240,7 +248,7 @@ export const InboxCommandPalette = ({
 									</span>
 								))}
 								{searchQuery.trim() && (
-									<span className="inline-flex items-center gap-1 rounded-md bg-[var(--inbox-muted-bg)] pr-1 pl-2 text-xs text-mail-foreground">
+									<span className="inline-flex items-center gap-1 rounded-md bg-[var(--inbox-muted-bg)] pr-1 pl-2 text-mail-foreground text-xs">
 										“{searchQuery.trim()}”
 										<button
 											type="button"
@@ -283,8 +291,8 @@ export const InboxCommandPalette = ({
 
 					<CommandMenu.List className="max-h-80">
 						<CommandMenu.Empty>
-							No results found. Press{" "}
-							<span className="font-bold">Enter</span> to search mail.
+							No results found. Press <span className="font-bold">Enter</span>{" "}
+							to search mail.
 						</CommandMenu.Empty>
 
 						<CommandMenu.Group heading="Search">
@@ -478,26 +486,23 @@ export const InboxCommandPalette = ({
 
 						{!draftQuery && (
 							<CommandMenu.Group heading="Try searching">
-								{[
-									"unread",
-									"meeting",
-									"invoice",
-									"from last week",
-								].map((example) => (
-									<CommandMenu.Item
-										key={example}
-										value={`example ${example}`}
-										onSelect={() => {
-											setDraftQuery(example);
-											applySearch(example, true);
-										}}
-									>
-										<ArrowRight className="h-4 w-4 opacity-60" />
-										<span className="ml-2 italic text-mail-muted">
-											{example}
-										</span>
-									</CommandMenu.Item>
-								))}
+								{["unread", "meeting", "invoice", "from last week"].map(
+									(example) => (
+										<CommandMenu.Item
+											key={example}
+											value={`example ${example}`}
+											onSelect={() => {
+												setDraftQuery(example);
+												applySearch(example, true);
+											}}
+										>
+											<ArrowRight className="h-4 w-4 opacity-60" />
+											<span className="ml-2 text-mail-muted italic">
+												{example}
+											</span>
+										</CommandMenu.Item>
+									),
+								)}
 							</CommandMenu.Group>
 						)}
 					</CommandMenu.List>
@@ -630,9 +635,7 @@ export function applyInboxFilters(
 		result = result.filter((t) => t.status === "needs_approval");
 	}
 	if (filters.includes("has_attachment")) {
-		result = result.filter(
-			(t) => (t.attachments?.length ?? 0) > 0,
-		);
+		result = result.filter((t) => (t.attachments?.length ?? 0) > 0);
 	}
 
 	return result;

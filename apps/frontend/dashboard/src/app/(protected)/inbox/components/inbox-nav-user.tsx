@@ -158,7 +158,7 @@ export const InboxNavUser = ({
 				<button
 					type="button"
 					onClick={onAddMailbox}
-					className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-[8px] border border-mail-muted border-dashed bg-[var(--inbox-muted-bg)] text-mail-muted transition duration-200 ease-out active:scale-[0.97] hover:bg-[var(--inbox-hover)] hover:text-mail-foreground focus:outline-none"
+					className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-[8px] border border-mail-muted border-dashed bg-[var(--inbox-muted-bg)] text-mail-muted transition duration-200 ease-out hover:bg-[var(--inbox-hover)] hover:text-mail-foreground focus:outline-none active:scale-[0.97]"
 					aria-label="Add mailbox"
 				>
 					<Plus className="size-4" />

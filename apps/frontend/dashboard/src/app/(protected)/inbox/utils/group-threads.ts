@@ -38,10 +38,7 @@ export function findThreadByListId(
 ): InboundThread | null {
 	return (
 		threads.find(
-			(t) =>
-				t.id === listId ||
-				t.threadId === listId ||
-				t.messageId === listId,
+			(t) => t.id === listId || t.threadId === listId || t.messageId === listId,
 		) ?? null
 	);
 }

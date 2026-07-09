@@ -1,6 +1,16 @@
 import { db } from "@reloop/db/client";
 import { emailThread } from "@reloop/db/schema";
-import { and, desc, eq, gt, ilike, isNotNull, isNull, lte, or } from "drizzle-orm";
+import {
+	and,
+	desc,
+	eq,
+	gt,
+	ilike,
+	isNotNull,
+	isNull,
+	lte,
+	or,
+} from "drizzle-orm";
 
 export async function getThreadsController(
 	organizationId: string,
@@ -21,7 +31,10 @@ export async function getThreadsController(
 		case "inbox":
 			conditions.push(eq(emailThread.status, "active"));
 			conditions.push(
-				or(isNull(emailThread.snoozedUntil), lte(emailThread.snoozedUntil, now))!,
+				or(
+					isNull(emailThread.snoozedUntil),
+					lte(emailThread.snoozedUntil, now),
+				)!,
 			);
 			break;
 		case "archived":

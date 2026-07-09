@@ -63,7 +63,7 @@ export const ForwardComposer = ({
 			className="mx-5 my-4 rounded-xl border border-mail-border bg-panel-light shadow-sm dark:bg-panel-dark"
 		>
 			{/* Header */}
-			<div className="flex items-center justify-between border-mail-border border-b px-4 py-3 border-mail-border/30">
+			<div className="flex items-center justify-between border-mail-border border-mail-border/30 border-b px-4 py-3">
 				<div className="flex items-center gap-2">
 					{/* Forward icon */}
 					<svg
@@ -96,9 +96,7 @@ export const ForwardComposer = ({
 				{/* From */}
 				<div className="flex items-center gap-2 px-4 py-2.5 text-label-sm">
 					<span className="w-12 shrink-0 text-mail-muted">From:</span>
-					<span className="text-mail-muted text-mail-muted">
-						{fromEmail}
-					</span>
+					<span className="text-mail-muted text-mail-muted">{fromEmail}</span>
 				</div>
 
 				{/* To */}
@@ -142,11 +140,11 @@ export const ForwardComposer = ({
 					{...register("body")}
 					placeholder="Add a note (optional)…"
 					rows={3}
-					className="w-full resize-none bg-transparent text-label-sm text-mail-foreground placeholder-text-soft-400 outline-none text-mail-foreground"
+					className="w-full resize-none bg-transparent text-label-sm text-mail-foreground text-mail-foreground placeholder-text-soft-400 outline-none"
 				/>
 
 				{/* Quoted original */}
-				<div className="mt-2 rounded-lg border border-mail-border bg-offset-light/60 p-3 border-mail-border/20 bg-mail-accent/30">
+				<div className="mt-2 rounded-lg border border-mail-border border-mail-border/20 bg-mail-accent/30 bg-offset-light/60 p-3">
 					<p className="mb-1.5 font-medium text-[11px] text-mail-muted uppercase tracking-wider">
 						Forwarded message
 					</p>
@@ -165,7 +163,7 @@ export const ForwardComposer = ({
 						</span>
 					</div>
 					{originalBodyText && (
-						<p className="mt-2 line-clamp-3 whitespace-pre-wrap text-label-xs text-mail-muted leading-relaxed text-mail-muted">
+						<p className="mt-2 line-clamp-3 whitespace-pre-wrap text-label-xs text-mail-muted text-mail-muted leading-relaxed">
 							{originalBodyText}
 						</p>
 					)}
@@ -173,7 +171,7 @@ export const ForwardComposer = ({
 			</div>
 
 			{/* Footer */}
-			<div className="flex items-center justify-between rounded-b-xl border-mail-border border-t bg-offset-light/30 px-4 py-2.5 border-mail-border/30 /20">
+			<div className="/20 flex items-center justify-between rounded-b-xl border-mail-border border-mail-border/30 border-t bg-offset-light/30 px-4 py-2.5">
 				<div className="flex items-center gap-2">
 					<button
 						type="submit"
@@ -203,7 +201,7 @@ export const ForwardComposer = ({
 
 					<button
 						type="button"
-						className="rounded-lg p-1.5 text-mail-muted hover:bg-offset-light hover:text-mail-foreground hover:bg-[var(--inbox-hover)]"
+						className="rounded-lg p-1.5 text-mail-muted hover:bg-[var(--inbox-hover)] hover:bg-offset-light hover:text-mail-foreground"
 						title="Attach files"
 						onClick={() => toast.info("Attachment uploading prototype")}
 					>
@@ -224,7 +222,7 @@ export const ForwardComposer = ({
 				<button
 					type="button"
 					onClick={onClose}
-					className="rounded-lg p-1.5 text-mail-muted hover:bg-red-50 hover:text-error-base hover:bg-red-950/20"
+					className="rounded-lg p-1.5 text-mail-muted hover:bg-red-50 hover:bg-red-950/20 hover:text-error-base"
 					title="Discard draft"
 				>
 					<svg

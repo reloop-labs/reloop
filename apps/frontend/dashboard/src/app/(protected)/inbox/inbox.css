@@ -30,7 +30,8 @@
 	/* Semantic controls (theme-aware replacements for hardcoded hex) */
 	--inbox-control: #e8e8e8;
 	--inbox-control-hover: #dcdcdc;
-	--inbox-hover: #f0f0f0;
+	--inbox-hover: #eaeaea;
+	--inbox-active: #dfdfdf;
 	--inbox-menu: #ffffff;
 	--inbox-muted-bg: #f4f4f5;
 	--inbox-danger-bg: #fff1f2;
@@ -61,6 +62,7 @@
 	--inbox-control: #313131;
 	--inbox-control-hover: #404040;
 	--inbox-hover: #202020;
+	--inbox-active: var(--inbox-hover);
 	--inbox-menu: #131313;
 	--inbox-muted-bg: #262626;
 	--inbox-danger-bg: #411d23;

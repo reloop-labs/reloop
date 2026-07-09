@@ -1,8 +1,8 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import * as Modal from "@reloop/ui/modal";
 import * as Popover from "@reloop/ui/popover";
-import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion } from "framer-motion";
 import {
 	Command,
@@ -285,7 +285,7 @@ export const ComposeModal = ({
 						{/* To / Cc / Bcc */}
 						<div className="shrink-0 overflow-visible border-[#E7E7E7] border-b pb-2 dark:border-[#252525]">
 							<div className="flex justify-between px-3 pt-3">
-								<div className="flex min-w-0 w-full items-center gap-2">
+								<div className="flex w-full min-w-0 items-center gap-2">
 									<p className="shrink-0 font-medium text-[#8C8C8C] text-sm">
 										To:
 									</p>
@@ -388,7 +388,7 @@ export const ComposeModal = ({
 								Subject:
 							</p>
 							<input
-								className="h-4 w-full bg-transparent font-normal text-sm leading-normal text-black outline-none placeholder:text-[#797979] dark:text-white/90"
+								className="h-4 w-full bg-transparent font-normal text-black text-sm leading-normal outline-none placeholder:text-[#797979] dark:text-white/90"
 								placeholder="Re: Design review feedback"
 								disabled={isSending}
 								{...register("subject")}
@@ -410,7 +410,7 @@ export const ComposeModal = ({
 								placeholder="Start writing..."
 								disabled={isSending}
 								rows={8}
-								className="min-h-[200px] w-full resize-none border-0 bg-transparent p-0 text-sm leading-relaxed text-black outline-none placeholder:text-[#797979] dark:text-white/90"
+								className="min-h-[200px] w-full resize-none border-0 bg-transparent p-0 text-black text-sm leading-relaxed outline-none placeholder:text-[#797979] dark:text-white/90"
 								onKeyDown={(e) => {
 									if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
 										e.preventDefault();
@@ -444,7 +444,7 @@ export const ComposeModal = ({
 								type="button"
 								onClick={() => fileInputRef.current?.click()}
 								disabled={isSending}
-								className="inline-flex h-8 cursor-pointer items-center gap-1 rounded-md border border-[#E7E7E7] bg-transparent px-2 text-sm text-mail-foreground transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-[#2B2B2B] dark:hover:bg-[var(--inbox-control-hover)]"
+								className="inline-flex h-8 cursor-pointer items-center gap-1 rounded-md border border-[#E7E7E7] bg-transparent px-2 text-mail-foreground text-sm transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-[#2B2B2B] dark:hover:bg-[var(--inbox-control-hover)]"
 							>
 								<Plus className="h-3 w-3 text-[#9A9A9A]" />
 								<span className="hidden px-0.5 md:inline">Add</span>

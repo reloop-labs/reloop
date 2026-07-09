@@ -27,7 +27,7 @@ export const InboxLabelDialog = ({
 
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
-			<Modal.Content className="max-w-sm border-mail-border bg-panel-light dark:bg-panel-dark sm:rounded-xl">
+			<Modal.Content className="max-w-sm border-mail-border bg-panel-light sm:rounded-xl dark:bg-panel-dark">
 				<form onSubmit={handleSubmit}>
 					<Modal.Header>
 						<Modal.Title className="text-mail-foreground">
