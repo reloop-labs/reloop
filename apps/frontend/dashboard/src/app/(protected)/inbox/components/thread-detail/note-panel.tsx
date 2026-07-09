@@ -125,7 +125,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 				type="button"
 				onClick={() => setIsOpen((v) => !v)}
 				className={cn(
-					"inline-flex h-7 w-7 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-[#313131] transition-colors hover:bg-[#404040]",
+					"inline-flex h-7 w-7 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-[var(--inbox-control)] transition-colors hover:bg-[var(--inbox-control-hover)]",
 					notes.length > 0 && "text-amber-400",
 				)}
 				aria-label="Notes"
@@ -140,7 +140,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 
 			{isOpen && (
 				<div
-					className="absolute top-9 right-0 z-50 flex w-[min(350px,calc(100vw-2rem))] flex-col overflow-hidden rounded-xl border border-mail-border bg-panel-dark shadow-xl"
+					className="absolute top-9 right-0 z-50 flex w-[min(350px,calc(100vw-2rem))] flex-col overflow-hidden rounded-xl border border-mail-border bg-panel-light dark:bg-panel-dark shadow-xl"
 					onClick={(e) => e.stopPropagation()}
 					onKeyDown={(e) => e.stopPropagation()}
 				>
@@ -150,7 +150,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 								Notes
 							</span>
 							{notes.length > 0 && (
-								<span className="rounded-full bg-[#404040] px-1.5 text-[10px] text-mail-muted">
+								<span className="rounded-full bg-[var(--inbox-control-hover)] px-1.5 text-[10px] text-mail-muted">
 									{notes.length}
 								</span>
 							)}
@@ -158,7 +158,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 						<button
 							type="button"
 							onClick={() => setIsOpen(false)}
-							className="rounded-md p-1 text-mail-muted hover:bg-[#404040]"
+							className="rounded-md p-1 text-mail-muted hover:bg-[var(--inbox-control-hover)]"
 							aria-label="Close notes"
 						>
 							<X className="h-3.5 w-3.5" />
@@ -171,7 +171,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 								value={searchQuery}
 								onChange={(e) => setSearchQuery(e.target.value)}
 								placeholder="Search notes…"
-								className="w-full rounded-md bg-[#313131] px-2 py-1.5 text-xs text-mail-foreground outline-none placeholder:text-mail-muted"
+								className="w-full rounded-md bg-[var(--inbox-control)] px-2 py-1.5 text-xs text-mail-foreground outline-none placeholder:text-mail-muted"
 							/>
 						</div>
 					)}
@@ -189,7 +189,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 							<div
 								key={note.id}
 								className={cn(
-									"rounded-lg border border-mail-border border-l-4 bg-[#2a2a2a] p-2.5",
+									"rounded-lg border border-mail-border border-l-4 bg-[var(--inbox-muted-bg)] p-2.5",
 									colorClass(note.color),
 								)}
 							>
@@ -199,12 +199,12 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 											value={editContent}
 											onChange={(e) => setEditContent(e.target.value)}
 											rows={3}
-											className="w-full resize-none rounded-md bg-[#313131] p-2 text-xs text-mail-foreground outline-none"
+											className="w-full resize-none rounded-md bg-[var(--inbox-control)] p-2 text-xs text-mail-foreground outline-none"
 										/>
 										<div className="flex justify-end gap-1.5">
 											<button
 												type="button"
-												className="rounded-md px-2 py-1 text-xs text-mail-muted hover:bg-[#404040]"
+												className="rounded-md px-2 py-1 text-xs text-mail-muted hover:bg-[var(--inbox-control-hover)]"
 												onClick={() => setEditingId(null)}
 											>
 												Cancel
@@ -233,14 +233,14 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 												<Dropdown.Trigger asChild>
 													<button
 														type="button"
-														className="shrink-0 rounded p-0.5 text-mail-muted hover:bg-[#404040]"
+														className="shrink-0 rounded p-0.5 text-mail-muted hover:bg-[var(--inbox-control-hover)]"
 													>
 														<MoreVertical className="h-3.5 w-3.5" />
 													</button>
 												</Dropdown.Trigger>
 												<Dropdown.Content
 													align="end"
-													className="min-w-36 border-mail-border bg-[#313131]"
+													className="min-w-36 border-mail-border bg-[var(--inbox-control)]"
 												>
 													<Dropdown.Item
 														onSelect={() => {
@@ -296,13 +296,13 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 						))}
 
 						{isAdding && (
-							<div className="space-y-2 rounded-lg border border-mail-border bg-[#2a2a2a] p-2.5">
+							<div className="space-y-2 rounded-lg border border-mail-border bg-[var(--inbox-muted-bg)] p-2.5">
 								<textarea
 									value={newContent}
 									onChange={(e) => setNewContent(e.target.value)}
 									placeholder="Write a note…"
 									rows={3}
-									className="w-full resize-none rounded-md bg-[#313131] p-2 text-xs text-mail-foreground outline-none"
+									className="w-full resize-none rounded-md bg-[var(--inbox-control)] p-2 text-xs text-mail-foreground outline-none"
 									onKeyDown={(e) => {
 										if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
 											e.preventDefault();
@@ -334,7 +334,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 								<div className="flex justify-end gap-1.5">
 									<button
 										type="button"
-										className="rounded-md px-2 py-1 text-xs text-mail-muted hover:bg-[#404040]"
+										className="rounded-md px-2 py-1 text-xs text-mail-muted hover:bg-[var(--inbox-control-hover)]"
 										onClick={() => {
 											setIsAdding(false);
 											setNewContent("");
@@ -360,7 +360,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 							<button
 								type="button"
 								onClick={() => setIsAdding(true)}
-								className="w-full rounded-md bg-[#313131] py-1.5 text-xs text-mail-muted transition-colors hover:bg-[#404040]"
+								className="w-full rounded-md bg-[var(--inbox-control)] py-1.5 text-xs text-mail-muted transition-colors hover:bg-[var(--inbox-control-hover)]"
 							>
 								Add note
 							</button>

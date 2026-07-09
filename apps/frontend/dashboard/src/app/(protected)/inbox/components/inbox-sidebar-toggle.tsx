@@ -10,7 +10,7 @@ export const InboxSidebarToggle = ({
 	<button
 		type="button"
 		onClick={onClick}
-		className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-[#202020]"
+		className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-[var(--inbox-hover)]"
 		aria-label="Toggle sidebar"
 	>
 		<PanelLeft className="h-4 w-4" />

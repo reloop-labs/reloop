@@ -44,7 +44,7 @@ export const AiSidebar = ({
 	return (
 		<aside
 			className={cn(
-				"mb-1 flex h-full w-[min(320px,100%)] shrink-0 flex-col overflow-hidden rounded-2xl border border-mail-border bg-panel-dark shadow-sm",
+				"mb-1 flex h-full w-[min(320px,100%)] shrink-0 flex-col overflow-hidden rounded-2xl border border-mail-border bg-panel-light dark:bg-panel-dark shadow-sm",
 			)}
 		>
 			<div className="flex items-center justify-between border-mail-border border-b px-3 py-2.5">
@@ -57,7 +57,7 @@ export const AiSidebar = ({
 				<button
 					type="button"
 					onClick={onClose}
-					className="rounded-md p-1 text-mail-muted hover:bg-[#404040]"
+					className="rounded-md p-1 text-mail-muted hover:bg-[var(--inbox-control-hover)]"
 					aria-label="Close AI sidebar"
 				>
 					<X className="h-3.5 w-3.5" />
@@ -66,7 +66,7 @@ export const AiSidebar = ({
 
 			<div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3">
 				{thread ? (
-					<div className="rounded-lg border border-mail-border bg-[#262626] p-3">
+					<div className="rounded-lg border border-mail-border bg-[var(--inbox-muted-bg)] p-3">
 						<p className="mb-1 text-[10px] uppercase tracking-wide text-mail-muted">
 							Current thread
 						</p>
@@ -92,7 +92,7 @@ export const AiSidebar = ({
 						<button
 							key={s}
 							type="button"
-							className="w-full rounded-lg border border-mail-border bg-[#313131] px-2.5 py-2 text-left text-xs text-mail-foreground transition-colors hover:bg-[#404040]"
+							className="w-full rounded-lg border border-mail-border bg-[var(--inbox-control)] px-2.5 py-2 text-left text-xs text-mail-foreground transition-colors hover:bg-[var(--inbox-control-hover)]"
 						>
 							{s}
 						</button>
@@ -119,7 +119,7 @@ export const AiSidebarToggle = ({
 		type="button"
 		onClick={onClick}
 		className={cn(
-			"inline-flex h-7 items-center justify-center gap-1 overflow-hidden rounded-lg border-none bg-[#313131] px-2 transition-colors hover:bg-[#404040]",
+			"inline-flex h-7 items-center justify-center gap-1 overflow-hidden rounded-lg border-none bg-[var(--inbox-control)] px-2 transition-colors hover:bg-[var(--inbox-control-hover)]",
 			active && "ring-1 ring-amber-400/40",
 		)}
 	>

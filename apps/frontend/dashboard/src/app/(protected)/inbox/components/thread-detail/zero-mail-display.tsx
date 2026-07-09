@@ -115,7 +115,7 @@ export const ZeroMailDisplay = ({
 					</h1>
 					<div className="mt-2 flex items-center gap-1.5">
 						<Tag className="h-3.5 w-3.5 text-[#F43F5E]" />
-						<span className="rounded-md border border-mail-border/50 bg-[#262626] px-2 py-0.5 text-mail-foreground text-xs">
+						<span className="rounded-md border border-mail-border/50 bg-[var(--inbox-muted-bg)] px-2 py-0.5 text-mail-foreground text-xs">
 							{senderName}
 						</span>
 					</div>
@@ -152,7 +152,7 @@ export const ZeroMailDisplay = ({
 									To: {toLabel}
 								</p>
 								{detailsOpen && (
-									<div className="mt-3 space-y-1 rounded-lg border border-mail-border bg-[#262626] p-3 text-xs">
+									<div className="mt-3 space-y-1 rounded-lg border border-mail-border bg-[var(--inbox-muted-bg)] p-3 text-xs">
 										<div className="flex gap-2">
 											<span className="w-12 shrink-0 text-[#8C8C8C]">From:</span>
 											<span className="text-mail-muted">
@@ -182,14 +182,14 @@ export const ZeroMailDisplay = ({
 									<Dropdown.Trigger asChild>
 										<button
 											type="button"
-											className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-[#313131] hover:bg-[#3d3d3d]"
+											className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-[var(--inbox-control)] hover:bg-[#3d3d3d]"
 										>
 											<MoreHorizontal className="h-4 w-4 text-mail-muted" />
 										</button>
 									</Dropdown.Trigger>
 									<Dropdown.Content
 										align="end"
-										className="min-w-40 border-mail-border bg-[#313131] p-1"
+										className="min-w-40 border-mail-border bg-[var(--inbox-control)] p-1"
 									>
 										<Dropdown.Item
 											className="rounded-md text-[13px] text-mail-muted"
@@ -262,7 +262,7 @@ export const ZeroMailDisplay = ({
 					)}
 
 					{msg.parsed && Object.keys(msg.parsed).length > 0 && (
-						<div className="mt-4 rounded-lg border border-mail-border/30 bg-[#262626]/50">
+						<div className="mt-4 rounded-lg border border-mail-border/30 bg-[var(--inbox-muted-bg)]/50">
 							<MessageParsedData
 								parsed={msg.parsed}
 								isExpanded={parsedExpanded}

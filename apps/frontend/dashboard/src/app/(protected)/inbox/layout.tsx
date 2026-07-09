@@ -1,7 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { Provider as JotaiProvider } from "jotai";
+import { useTheme } from "next-themes";
+import { cn } from "@reloop/ui/cn";
 import { AgentInboxProvider } from "./components/agent-inbox-provider";
 import { InboxHotkeysProvider } from "./components/inbox-hotkeys-provider";
 import { InboxSidebarProvider } from "./components/inbox-sidebar-context";
@@ -12,8 +15,22 @@ export default function AgentInboxSectionLayout({
 }: {
 	children: ReactNode;
 }) {
+	const { resolvedTheme } = useTheme();
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	const isDark = mounted ? resolvedTheme === "dark" : true;
+
 	return (
-		<div className="inbox-zero-theme dark fixed inset-0 z-40">
+		<div
+			className={cn(
+				"inbox-zero-theme fixed inset-0 z-40",
+				isDark && "dark",
+			)}
+		>
 			<AgentInboxProvider>
 				<JotaiProvider>
 					<InboxSidebarProvider>

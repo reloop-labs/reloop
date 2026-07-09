@@ -139,7 +139,7 @@ export const InboxNavUser = ({
 					<button
 						type="button"
 						onClick={onAddMailbox}
-						className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-[5px] border border-dashed border-[#929292] bg-[#262626] text-[#929292] transition-colors hover:bg-[#303030]"
+						className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-[5px] border border-dashed border-mail-muted bg-[var(--inbox-muted-bg)] text-mail-muted transition-colors hover:bg-[var(--inbox-hover)]"
 						aria-label="Add mailbox"
 					>
 						<Plus className="size-4" />
@@ -150,7 +150,7 @@ export const InboxNavUser = ({
 					<Dropdown.Trigger asChild>
 						<button
 							type="button"
-							className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-[#202020]"
+							className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-[var(--inbox-hover)]"
 							aria-label="Account menu"
 						>
 							<ThreeDots className="text-mail-muted" />
@@ -158,52 +158,52 @@ export const InboxNavUser = ({
 					</Dropdown.Trigger>
 					<Dropdown.Content
 						align="end"
-						className="min-w-56 border-mail-border bg-[#131313] p-1 text-mail-foreground shadow-lg"
+						className="min-w-56 border-mail-border bg-[var(--inbox-menu)] p-1 text-mail-foreground shadow-lg"
 					>
 						<Dropdown.Item
-							className="rounded-md text-[13px] text-mail-muted hover:bg-[#202020] focus:bg-[#202020]"
+							className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-hover)] focus:bg-[var(--inbox-hover)]"
 							onSelect={() => router.push("/settings")}
 						>
 							<Settings className="size-4 opacity-60" />
 							Settings
 						</Dropdown.Item>
 						<Dropdown.Item
-							className="rounded-md text-[13px] text-mail-muted hover:bg-[#202020] focus:bg-[#202020]"
+							className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-hover)] focus:bg-[var(--inbox-hover)]"
 							onSelect={() => void handleRefresh()}
 						>
 							<RefreshCcw className="size-4 opacity-60" />
 							Force re-sync
 						</Dropdown.Item>
 						<Dropdown.Item
-							className="rounded-md text-[13px] text-mail-muted hover:bg-[#202020] focus:bg-[#202020]"
+							className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-hover)] focus:bg-[var(--inbox-hover)]"
 							onSelect={() => void handleCopyId()}
 						>
 							<Copy className="size-4 opacity-60" />
 							Copy mailbox ID
 						</Dropdown.Item>
 						<Dropdown.Item
-							className="rounded-md text-[13px] text-mail-muted hover:bg-[#202020] focus:bg-[#202020]"
+							className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-hover)] focus:bg-[var(--inbox-hover)]"
 							onSelect={() =>
 								setTheme(theme === "dark" ? "light" : "dark")
 							}
 						>
 							{theme === "dark" ? (
-								<Moon className="size-4 opacity-60" />
-							) : (
 								<Sun className="size-4 opacity-60" />
+							) : (
+								<Moon className="size-4 opacity-60" />
 							)}
-							App theme
+							{theme === "dark" ? "Light mode" : "Dark mode"}
 						</Dropdown.Item>
 						<Dropdown.Separator className="my-1 bg-mail-border" />
 						<Dropdown.Item
-							className="rounded-md text-[13px] text-mail-muted hover:bg-[#202020] focus:bg-[#202020]"
+							className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-hover)] focus:bg-[var(--inbox-hover)]"
 							onSelect={() => router.push("/agent-inbox")}
 						>
 							<Trash2 className="size-4 opacity-60" />
 							All mailboxes
 						</Dropdown.Item>
 						<Dropdown.Item
-							className="rounded-md text-[13px] text-mail-muted hover:bg-[#202020] focus:bg-[#202020]"
+							className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-hover)] focus:bg-[var(--inbox-hover)]"
 							onSelect={() => router.push("/login")}
 						>
 							<LogOut className="size-4 opacity-60" />
@@ -217,7 +217,7 @@ export const InboxNavUser = ({
 				<div className="flex items-center gap-1 text-[13px] leading-none text-mail-foreground">
 					<p className="max-w-[14.5ch] truncate">{displayName}</p>
 				</div>
-				<p className="h-5 max-w-[200px] truncate text-[#898989] text-xs leading-none">
+				<p className="h-5 max-w-[200px] truncate text-mail-muted text-xs leading-none">
 					{mailbox.email}
 				</p>
 			</div>

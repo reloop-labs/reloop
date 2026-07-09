@@ -42,7 +42,7 @@ export const MessageHeaderCollapsed = ({
 		<div
 			role="button"
 			onClick={onClick}
-			className="flex cursor-pointer select-none items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-offset-light/50 hover:bg-[#202020]/30"
+			className="flex cursor-pointer select-none items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-[var(--inbox-hover)]"
 		>
 			<div className="flex min-w-0 items-center gap-3">
 				<div className="flex shrink-0 items-center gap-2.5">

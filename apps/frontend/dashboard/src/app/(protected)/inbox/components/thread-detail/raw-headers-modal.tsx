@@ -18,7 +18,7 @@ export const RawHeadersModal = ({ thread, onClose }: RawHeadersModalProps) => {
 					<button
 						type="button"
 						onClick={onClose}
-						className="rounded-lg p-1.5 text-mail-muted hover:bg-offset-light hover:bg-[#202020]"
+						className="rounded-lg p-1.5 text-mail-muted hover:bg-[var(--inbox-hover)]"
 					>
 						<Icon name="cross" className="h-4 w-4" />
 					</button>

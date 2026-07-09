@@ -363,7 +363,7 @@ export const AgentInboxContent = ({
 						minSize={35}
 						maxSize={35}
 						className={cn(
-							"mb-1 flex min-h-0 flex-1 flex-col bg-panel-dark shadow-sm md:mr-[3px] md:rounded-2xl lg:h-[calc(100dvh-8px)]",
+							"mb-1 flex min-h-0 flex-1 flex-col bg-panel-light dark:bg-panel-dark shadow-sm md:mr-[3px] md:rounded-2xl lg:h-[calc(100dvh-8px)]",
 							!isDesktop && selectedThreadId && "hidden",
 						)}
 					>
@@ -389,7 +389,7 @@ export const AgentInboxContent = ({
 													onClick={() =>
 														void runBulkAction("archive", "Archived")
 													}
-													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#313131] hover:bg-[#404040]"
+													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
 												>
 													<Archive className="h-3.5 w-3.5 text-mail-muted" />
 												</button>
@@ -399,7 +399,7 @@ export const AgentInboxContent = ({
 													onClick={() =>
 														void runBulkAction("trash", "Moved to trash")
 													}
-													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#313131] hover:bg-[#404040]"
+													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
 												>
 													<Trash2 className="h-3.5 w-3.5 text-mail-muted" />
 												</button>
@@ -409,7 +409,7 @@ export const AgentInboxContent = ({
 													onClick={() =>
 														void runBulkAction("spam", "Moved to spam")
 													}
-													className="inline-flex h-8 items-center justify-center rounded-lg bg-[#313131] px-2 text-[11px] text-mail-muted hover:bg-[#404040]"
+													className="inline-flex h-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] px-2 text-[11px] text-mail-muted hover:bg-[var(--inbox-control-hover)]"
 												>
 													Spam
 												</button>
@@ -419,7 +419,7 @@ export const AgentInboxContent = ({
 													onClick={() =>
 														void runBulkAction("star", "Starred")
 													}
-													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#313131] hover:bg-[#404040]"
+													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
 												>
 													<Star className="h-3.5 w-3.5 text-mail-muted" />
 												</button>
@@ -429,7 +429,7 @@ export const AgentInboxContent = ({
 													onClick={() =>
 														void runBulkAction("read", "Marked as read")
 													}
-													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#313131] hover:bg-[#404040]"
+													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
 												>
 													<MailOpen className="h-3.5 w-3.5 text-mail-muted" />
 												</button>
@@ -449,7 +449,7 @@ export const AgentInboxContent = ({
 										type="button"
 										onClick={handleRefresh}
 										disabled={isRefreshing}
-										className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-[#202020] disabled:opacity-50"
+										className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-[var(--inbox-hover)] disabled:opacity-50"
 										aria-label="Refresh"
 									>
 										<RefreshCcw
@@ -494,7 +494,7 @@ export const AgentInboxContent = ({
 						<ResizablePanel
 							defaultSize={65}
 							minSize={30}
-							className="mb-1 mr-0.5 flex min-h-0 flex-col rounded-2xl bg-panel-dark shadow-sm lg:h-[calc(100dvh-8px)]"
+							className="mb-1 mr-0.5 flex min-h-0 flex-col rounded-2xl bg-panel-light dark:bg-panel-dark shadow-sm lg:h-[calc(100dvh-8px)]"
 						>
 							{detailPane}
 						</ResizablePanel>
@@ -510,7 +510,7 @@ export const AgentInboxContent = ({
 				)}
 
 				{!isDesktop && selectedThreadId && (
-					<div className="fixed inset-0 z-50 flex flex-col bg-panel-dark">
+					<div className="fixed inset-0 z-50 flex flex-col bg-panel-light dark:bg-panel-dark">
 						{detailPane}
 					</div>
 				)}

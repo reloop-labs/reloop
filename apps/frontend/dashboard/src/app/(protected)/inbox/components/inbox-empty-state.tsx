@@ -30,7 +30,7 @@ export const InboxEmptyState = ({
 							<button
 								type="button"
 								onClick={onCompose}
-								className="inline-flex h-7 cursor-pointer items-center justify-center gap-0.5 overflow-hidden rounded-lg border-none bg-[#313131] px-2 transition-colors hover:bg-[#404040]"
+								className="inline-flex h-7 cursor-pointer items-center justify-center gap-0.5 overflow-hidden rounded-lg border-none bg-[var(--inbox-control)] px-2 transition-colors hover:bg-[var(--inbox-control-hover)]"
 							>
 								<Mail className="mr-1 h-3.5 w-3.5 fill-[#959595]" />
 								<span className="text-sm leading-none">Send email</span>

@@ -669,7 +669,7 @@ export const ThreadDetail = ({
 	if (!thread) return <EmptyState />;
 
 	return (
-		<div className="flex h-full min-h-0 flex-col rounded-xl bg-panel-dark">
+		<div className="flex h-full min-h-0 flex-col rounded-xl bg-panel-light dark:bg-panel-dark">
 			<ZeroThreadToolbar
 				isStarred={!!thread.isStarred}
 				isImportant={!!thread.isImportant}
@@ -702,14 +702,14 @@ export const ThreadDetail = ({
 
 			<div className="min-h-0 flex-1 overflow-y-auto">
 				{isTranslated && (
-					<div className="mx-4 my-3 flex items-center justify-between gap-3 rounded-lg border border-mail-border bg-[#262626] p-3 text-xs">
+					<div className="mx-4 my-3 flex items-center justify-between gap-3 rounded-lg border border-mail-border bg-[var(--inbox-muted-bg)] p-3 text-xs">
 						<div className="flex items-center gap-2 text-mail-muted">
 							<Icon name="translate" className="h-4 w-4" />
 							<span>Translated to</span>
 							<select
 								value={targetLanguage}
 								onChange={(e) => handleLanguageChange(e.target.value)}
-								className="cursor-pointer rounded-md border border-mail-border bg-[#313131] px-2 py-1 text-mail-foreground outline-none"
+								className="cursor-pointer rounded-md border border-mail-border bg-[var(--inbox-control)] px-2 py-1 text-mail-foreground outline-none"
 							>
 								<option value="es">Spanish</option>
 								<option value="fr">French</option>

@@ -1,19 +1,49 @@
 /**
  * Zero mail inbox shell — scoped theme overrides.
  * Color utilities are registered in @reloop/tailwind/style.css.
+ *
+ * Light is the default for `.inbox-zero-theme`.
+ * Dark tokens apply when `.dark` is present on the shell (synced via next-themes).
  */
 .inbox-zero-theme {
 	isolation: isolate;
 	height: 100dvh;
 	width: 100vw;
 	overflow: hidden;
+	font-family: var(--font-geist-sans, var(--font-sans));
+
+	/* Light mode (default) — mirrors Zero panelLight surfaces */
+	--sidebar-background: hsl(0 0% 96%);
+	--mail-background: hsl(0 0% 100%);
+	--mail-foreground: hsl(240 10% 3.9%);
+	--mail-muted: hsl(240 3.8% 46.1%);
+	--mail-border: hsl(240 5.9% 90%);
+	--mail-primary: hsl(240 5.9% 10%);
+	--mail-accent: hsl(240 4.8% 95.9%);
+	--panel-light: #ffffff;
+	--panel-dark: #fafafa;
+	--offset-light: #f5f5f5;
+	--offset-dark: #ebebeb;
+	--zero-blue: #006ffe;
+	--zero-blue-hover: #0056cc;
+
+	/* Semantic controls (theme-aware replacements for hardcoded hex) */
+	--inbox-control: #e8e8e8;
+	--inbox-control-hover: #dcdcdc;
+	--inbox-hover: #f0f0f0;
+	--inbox-menu: #ffffff;
+	--inbox-muted-bg: #f4f4f5;
+	--inbox-danger-bg: #fff1f2;
+	--inbox-danger-border: #fecdd3;
+	--inbox-danger-fg: #e11d48;
+	--inbox-compose-bar: #f4f6f0;
+
 	background-color: var(--sidebar-background);
 	color: var(--mail-foreground);
-	font-family: var(--font-geist-sans, var(--font-sans));
+	color-scheme: light;
 }
 
-.inbox-zero-theme.dark,
-.inbox-zero-theme .dark {
+.inbox-zero-theme.dark {
 	--sidebar-background: hsl(240 3.9% 7%);
 	--mail-background: hsl(240 3.9% 7%);
 	--mail-foreground: hsl(0 0% 98%);
@@ -27,4 +57,34 @@
 	--offset-dark: #0a0a0a;
 	--zero-blue: #006ffe;
 	--zero-blue-hover: #0056cc;
+
+	--inbox-control: #313131;
+	--inbox-control-hover: #404040;
+	--inbox-hover: #202020;
+	--inbox-menu: #131313;
+	--inbox-muted-bg: #262626;
+	--inbox-danger-bg: #411d23;
+	--inbox-danger-border: #6e2532;
+	--inbox-danger-fg: #f43f5e;
+	--inbox-compose-bar: #171b13;
+
+	color-scheme: dark;
+}
+
+/* Shared interactive helpers */
+.inbox-zero-theme .inbox-control {
+	background-color: var(--inbox-control);
+	transition: background-color 0.15s ease;
+}
+.inbox-zero-theme .inbox-control:hover {
+	background-color: var(--inbox-control-hover);
+}
+.inbox-zero-theme .inbox-hover:hover {
+	background-color: var(--inbox-hover);
+}
+.inbox-zero-theme .inbox-menu-surface {
+	background-color: var(--inbox-menu);
+}
+.inbox-zero-theme .inbox-muted-surface {
+	background-color: var(--inbox-muted-bg);
 }

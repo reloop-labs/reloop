@@ -23,9 +23,9 @@ import type { ReactNode } from "react";
 import { toast } from "sonner";
 
 const itemClass =
-	"rounded-md text-[13px] text-mail-muted data-[highlighted]:bg-[#404040] data-[highlighted]:text-mail-foreground";
+	"rounded-md text-[13px] text-mail-muted data-[highlighted]:bg-[var(--inbox-control-hover)] data-[highlighted]:text-mail-foreground";
 
-const contentClass = "min-w-48 border-mail-border bg-[#313131] p-1";
+const contentClass = "min-w-48 border-mail-border bg-[var(--inbox-control)] p-1";
 
 export type ThreadContextMenuProps = {
 	thread: InboundThread;

@@ -50,8 +50,8 @@ const NavLink = ({
 	collapsed: boolean;
 }) => {
 	const className = cn(
-		"flex w-full items-center rounded-lg px-2 py-1.5 text-[13px] transition-colors hover:bg-[#202020]",
-		active && "bg-[#202020] text-mail-foreground",
+		"flex w-full items-center rounded-lg px-2 py-1.5 text-[13px] transition-colors hover:bg-[var(--inbox-hover)]",
+		active && "bg-[var(--inbox-hover)] text-mail-foreground",
 		!active && "text-mail-muted",
 		collapsed ? "justify-center" : "gap-2",
 	);
@@ -114,7 +114,7 @@ const NavSection = ({
 }) => (
 	<div className="space-y-1 pb-2">
 		{collapsed ? (
-			<div className="mx-2 mb-2 mt-1 h-px bg-[#262626]" />
+			<div className="mx-2 mb-2 mt-1 h-px bg-[var(--inbox-muted-bg)]" />
 		) : (
 			<p className="mx-2 mb-2 text-[13px] text-[#898989]">{title}</p>
 		)}
@@ -280,9 +280,9 @@ export const InboxSidebar = ({
 											key={label.id}
 											href={href}
 											className={cn(
-												"flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-[13px] transition-colors hover:bg-[#202020]",
+												"flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-[13px] transition-colors hover:bg-[var(--inbox-hover)]",
 												active
-													? "bg-[#202020] text-mail-foreground"
+													? "bg-[var(--inbox-hover)] text-mail-foreground"
 													: "text-mail-muted",
 											)}
 										>

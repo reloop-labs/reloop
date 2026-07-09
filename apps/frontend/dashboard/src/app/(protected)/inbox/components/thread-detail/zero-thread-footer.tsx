@@ -19,14 +19,14 @@ const ZeroFooterAction = ({
 	<button
 		type="button"
 		onClick={onClick}
-		className="inline-flex h-7 cursor-pointer items-center justify-center gap-1 overflow-hidden rounded-md border-none bg-[#313131] px-1.5 transition-colors hover:bg-[#3d3d3d]"
+		className="inline-flex h-7 cursor-pointer items-center justify-center gap-1 overflow-hidden rounded-md border-none bg-[var(--inbox-control)] px-1.5 transition-colors hover:bg-[#3d3d3d]"
 	>
 		{icon}
 		<span className="pr-1 pl-0.5 text-sm leading-none text-white">{text}</span>
 		{shortcut && (
 			<kbd
 				className={cn(
-					"-me-1 ms-auto hidden h-6 max-h-full items-center rounded-[6px] border border-white/10 bg-[#404040] px-1.5 font-mono text-white text-xs leading-6 md:inline-flex",
+					"-me-1 ms-auto hidden h-6 max-h-full items-center rounded-[6px] border border-mail-border bg-[var(--inbox-control-hover)] px-1.5 font-mono text-mail-foreground text-xs leading-6 md:inline-flex",
 				)}
 			>
 				{shortcut}

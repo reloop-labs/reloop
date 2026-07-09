@@ -18,7 +18,7 @@ import {
 import type { ReactNode } from "react";
 
 const iconBtn =
-	"inline-flex h-7 w-7 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-[#313131] transition-colors hover:bg-[#404040]";
+	"inline-flex h-7 w-7 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-[var(--inbox-control)] transition-colors hover:bg-[var(--inbox-control-hover)]";
 
 export const ZeroThreadToolbar = ({
 	isStarred,
@@ -94,7 +94,7 @@ export const ZeroThreadToolbar = ({
 				<button
 					type="button"
 					onClick={onReplyAll}
-					className="inline-flex h-7 cursor-pointer items-center justify-center gap-1 overflow-hidden rounded-lg border-none bg-[#313131] px-1.5 transition-colors hover:bg-[#404040]"
+					className="inline-flex h-7 cursor-pointer items-center justify-center gap-1 overflow-hidden rounded-lg border-none bg-[var(--inbox-control)] px-1.5 transition-colors hover:bg-[var(--inbox-control-hover)]"
 				>
 					<Reply className="h-3.5 w-3.5 text-[#9B9B9B]" />
 					<span className="whitespace-nowrap pr-1 text-sm leading-none text-mail-foreground">
@@ -182,10 +182,10 @@ export const ZeroThreadToolbar = ({
 				<button
 					type="button"
 					onClick={onDelete}
-					className="inline-flex h-7 w-7 cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-[#6E2532] bg-[#411D23] transition-colors hover:bg-[#6E2532]/70"
+					className="inline-flex h-7 w-7 cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-[var(--inbox-danger-border)] bg-[var(--inbox-danger-bg)] transition-colors hover:opacity-80"
 					aria-label={inTrash ? "Delete forever" : "Move to trash"}
 				>
-					<Trash2 className="h-3.5 w-3.5 text-[#F43F5E]" />
+					<Trash2 className="h-3.5 w-3.5 text-[var(--inbox-danger-fg)]" />
 				</button>
 
 				<Dropdown.Root>
@@ -196,11 +196,11 @@ export const ZeroThreadToolbar = ({
 					</Dropdown.Trigger>
 					<Dropdown.Content
 						align="end"
-						className="min-w-44 border-mail-border bg-[#313131] p-1"
+						className="min-w-44 border-mail-border bg-[var(--inbox-control)] p-1"
 					>
 						{showRestore && (
 							<Dropdown.Item
-								className="rounded-md text-[13px] text-mail-muted hover:bg-[#404040]"
+								className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-control-hover)]"
 								onSelect={
 									inArchive
 										? onUnarchive
@@ -214,7 +214,7 @@ export const ZeroThreadToolbar = ({
 							</Dropdown.Item>
 						)}
 						<Dropdown.Item
-							className="rounded-md text-[13px] text-mail-muted hover:bg-[#404040]"
+							className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-control-hover)]"
 							onSelect={onPrint}
 						>
 							<Printer className="mr-2 h-4 w-4" />
@@ -222,7 +222,7 @@ export const ZeroThreadToolbar = ({
 						</Dropdown.Item>
 						{!inSpam && (
 							<Dropdown.Item
-								className="rounded-md text-[13px] text-mail-muted hover:bg-[#404040]"
+								className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-control-hover)]"
 								onSelect={onMarkSpam}
 							>
 								Move to spam
@@ -230,7 +230,7 @@ export const ZeroThreadToolbar = ({
 						)}
 						{onUnsubscribe && (
 							<Dropdown.Item
-								className="rounded-md text-[13px] text-mail-muted hover:bg-[#404040]"
+								className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-control-hover)]"
 								onSelect={onUnsubscribe}
 							>
 								Unsubscribe
@@ -238,7 +238,7 @@ export const ZeroThreadToolbar = ({
 						)}
 						{onToggleImportant && (
 							<Dropdown.Item
-								className="rounded-md text-[13px] text-mail-muted hover:bg-[#404040]"
+								className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-control-hover)]"
 								onSelect={onToggleImportant}
 							>
 								<Zap className="mr-2 h-4 w-4" />

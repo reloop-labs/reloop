@@ -133,7 +133,7 @@ export const InboxSearchTrigger = ({
 			type="button"
 			onClick={onOpenPalette}
 			className={cn(
-				"relative flex h-10 flex-1 select-none items-center justify-start overflow-hidden rounded-lg border border-mail-border/20 bg-panel-dark/40 pl-3 text-left text-sm font-normal shadow-none backdrop-blur-sm transition-all hover:bg-mail-accent/30 focus-visible:ring-2 focus-visible:ring-mail-primary/30",
+				"relative flex h-10 flex-1 select-none items-center justify-start overflow-hidden rounded-lg border border-mail-border/20 bg-panel-light dark:bg-panel-dark/40 pl-3 text-left text-sm font-normal shadow-none backdrop-blur-sm transition-all hover:bg-mail-accent/30 focus-visible:ring-2 focus-visible:ring-mail-primary/30",
 			)}
 		>
 			<Search className="h-4 w-4 text-mail-muted" />

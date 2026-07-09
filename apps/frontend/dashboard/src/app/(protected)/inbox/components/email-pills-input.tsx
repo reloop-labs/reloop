@@ -171,7 +171,7 @@ export const EmailPillsInput = ({
 									removeEmail(idx);
 								}}
 								disabled={disabled}
-								className={`-mr-1 shrink-0 rounded-full p-0.5 transition-colors hover:bg-black/5 hover:bg-[#202020] ${
+								className={`-mr-1 shrink-0 rounded-full p-0.5 transition-colors hover:bg-black/5 hover:bg-[var(--inbox-hover)] ${
 									isValid
 										? "text-mail-muted hover:text-mail-foreground hover:text-mail-foreground"
 										: "text-red-400 hover:text-red-700 dark:hover:text-red-300"

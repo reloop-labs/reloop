@@ -128,14 +128,14 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 			onClick={(e) => onSelect(listId, e)}
 			onMouseEnter={() => onMouseEnter(listId)}
 			className={cn(
-				"group relative mx-[8px] flex cursor-pointer flex-col items-start overflow-visible rounded-[10px] border-transparent py-3 text-left text-sm transition-colors hover:bg-offset-dark/50 hover:opacity-100",
+				"group relative mx-[8px] flex cursor-pointer flex-col items-start overflow-visible rounded-[10px] border-transparent py-3 text-left text-sm transition-colors hover:bg-[var(--inbox-hover)] hover:opacity-100",
 				(isSelected || isBulkSelected || isKeyboardFocused) &&
-					"bg-[#202020]",
+					"bg-[var(--inbox-hover)]",
 			)}
 		>
 			<div
 				className={cn(
-					"absolute right-2 z-20 flex -translate-y-1/2 items-center gap-1 rounded-xl border border-mail-border/30 bg-panel-dark p-1 opacity-0 shadow-xs transition-opacity group-hover:opacity-100",
+					"absolute right-2 z-20 flex -translate-y-1/2 items-center gap-1 rounded-xl border border-mail-border/30 bg-panel-light dark:bg-panel-dark p-1 opacity-0 shadow-xs transition-opacity group-hover:opacity-100",
 					index === 0 ? "top-4" : "top-[-1px]",
 				)}
 			>
@@ -146,7 +146,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						e.stopPropagation();
 						onToggleStar(thread.messageId ?? thread.id, !thread.isStarred);
 					}}
-					className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-offset-light hover:bg-[#202020]"
+					className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[var(--inbox-hover)]"
 				>
 					<Star
 						className={cn(
@@ -164,7 +164,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						e.stopPropagation();
 						onArchive(listId);
 					}}
-					className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-offset-light hover:bg-[#202020]"
+					className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[var(--inbox-hover)]"
 				>
 					<Archive className="h-3.5 w-3.5 stroke-mail-muted" />
 				</button>

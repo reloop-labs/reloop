@@ -60,7 +60,7 @@ export const ForwardComposer = ({
 	return (
 		<form
 			onSubmit={handleSubmit(onSubmit)}
-			className="mx-5 my-4 rounded-xl border border-mail-border bg-panel-light shadow-sm "
+			className="mx-5 my-4 rounded-xl border border-mail-border bg-panel-light shadow-sm dark:bg-panel-dark"
 		>
 			{/* Header */}
 			<div className="flex items-center justify-between border-mail-border border-b px-4 py-3 border-mail-border/30">
@@ -85,7 +85,7 @@ export const ForwardComposer = ({
 				<button
 					type="button"
 					onClick={onClose}
-					className="rounded-lg p-1.5 text-mail-muted hover:bg-offset-light hover:bg-[#202020]"
+					className="rounded-lg p-1.5 text-mail-muted hover:bg-[var(--inbox-hover)]"
 				>
 					<Icon name="cross" className="h-4 w-4" />
 				</button>
@@ -203,7 +203,7 @@ export const ForwardComposer = ({
 
 					<button
 						type="button"
-						className="rounded-lg p-1.5 text-mail-muted hover:bg-offset-light hover:text-mail-foreground hover:bg-[#202020]"
+						className="rounded-lg p-1.5 text-mail-muted hover:bg-offset-light hover:text-mail-foreground hover:bg-[var(--inbox-hover)]"
 						title="Attach files"
 						onClick={() => toast.info("Attachment uploading prototype")}
 					>

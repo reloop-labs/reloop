@@ -214,7 +214,7 @@ export const ComposeModal = ({
 	return (
 		<Modal.Root open={isOpen} onOpenChange={onClose}>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-mail-border bg-panel-light p-0 shadow-2xl sm:max-w-[620px] border-mail-border/40 "
+				className="overflow-hidden rounded-2xl border border-mail-border/40 bg-panel-light p-0 shadow-2xl sm:max-w-[620px] dark:bg-panel-dark"
 				showClose={false}
 				onEscapeKeyDown={(e) => {
 					if (isSending) e.preventDefault();
@@ -235,7 +235,7 @@ export const ComposeModal = ({
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
-								className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-panel-light/85 backdrop-blur-sm /85"
+								className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-panel-light/85 backdrop-blur-sm dark:bg-panel-dark/85"
 							>
 								<div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-2xl border-2 border-[#18181b] border-dashed dark:border-white">
 									<svg
@@ -269,7 +269,7 @@ export const ComposeModal = ({
 								type="button"
 								onClick={onClose}
 								title="Close"
-								className="flex h-7 w-7 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-offset-light hover:bg-[#202020]"
+								className="flex h-7 w-7 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-[var(--inbox-hover)]"
 							>
 								<Icon name="cross" className="h-3.5 w-3.5" />
 							</motion.button>
@@ -277,7 +277,7 @@ export const ComposeModal = ({
 					</div>
 
 					{/* Agent Provenance Row */}
-					<div className="flex items-center border-mail-border/40 border-b bg-[#f4f6f0] px-5 py-2.5 border-mail-border/40 dark:bg-[#171b13]">
+					<div className="flex items-center border-mail-border/40 border-b bg-[var(--inbox-compose-bar)] px-5 py-2.5">
 						<div className="flex items-center gap-2 font-medium text-[#727d6d] text-xs dark:text-[#9ea899]">
 							<svg
 								className="h-4 w-4 text-[#727d6d] dark:text-[#9ea899]"
@@ -514,7 +514,7 @@ export const ComposeModal = ({
 					</div>
 
 					{/* Footer Actions */}
-					<div className="flex items-center justify-between border-mail-border/60 border-t bg-panel-light  px-5 py-4 border-mail-border ">
+					<div className="flex items-center justify-between border-mail-border/60 border-t bg-panel-light px-5 py-4 dark:bg-panel-dark">
 						<div className="flex items-center gap-3">
 							{/* Send Button */}
 							<motion.button
@@ -558,7 +558,7 @@ export const ComposeModal = ({
 								onClick={open}
 								title="Attach files"
 								disabled={isSending}
-								className="flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-200 text-mail-muted transition-colors hover:bg-offset-light border-mail-border text-mail-muted hover:bg-[#202020]"
+								className="flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-200 text-mail-muted transition-colors hover:bg-offset-light border-mail-border text-mail-muted hover:bg-[var(--inbox-hover)]"
 							>
 								<svg
 									className="h-4.5 w-4.5"

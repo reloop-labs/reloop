@@ -64,7 +64,7 @@ export const MessageHeaderExpanded = ({
 		<div
 			role="button"
 			onClick={onToggleExpand}
-			className="flex cursor-pointer select-none items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-offset-light/20 hover:bg-[#202020]/10"
+			className="flex cursor-pointer select-none items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-[var(--inbox-hover)]"
 		>
 			{/* Left: Avatar + Info */}
 			<div className="flex min-w-0 items-center gap-3">
@@ -111,7 +111,7 @@ export const MessageHeaderExpanded = ({
 				<button
 					type="button"
 					onClick={onToggleExpand}
-					className="rounded-lg p-1 text-mail-muted hover:bg-offset-light hover:text-mail-foreground hover:bg-[#202020]"
+					className="rounded-lg p-1 text-mail-muted hover:bg-offset-light hover:text-mail-foreground hover:bg-[var(--inbox-hover)]"
 				>
 					<Icon name="chevron-up" className="h-4 w-4" />
 				</button>

@@ -55,7 +55,7 @@ export const SnoozeDialog = ({
 
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
-			<Modal.Content className="max-w-md border-mail-border bg-panel-dark sm:rounded-xl">
+			<Modal.Content className="max-w-md border-mail-border bg-panel-light dark:bg-panel-dark sm:rounded-xl">
 				<Modal.Header
 					title="Snooze until…"
 					description="Hide this thread until the wake time you choose."
@@ -71,7 +71,7 @@ export const SnoozeDialog = ({
 								key={p.label}
 								type="button"
 								onClick={() => applyPreset(p.ms)}
-								className="rounded-md bg-[#313131] px-2.5 py-1 text-xs text-mail-muted transition-colors hover:bg-[#404040]"
+								className="rounded-md bg-[var(--inbox-control)] px-2.5 py-1 text-xs text-mail-muted transition-colors hover:bg-[var(--inbox-control-hover)]"
 							>
 								{p.label}
 							</button>
@@ -86,7 +86,7 @@ export const SnoozeDialog = ({
 								min={toDateInput(new Date())}
 								value={date}
 								onChange={(e) => setDate(e.target.value)}
-								className="rounded-md border border-mail-border bg-[#313131] px-2 py-1.5 text-sm text-mail-foreground outline-none"
+								className="rounded-md border border-mail-border bg-[var(--inbox-control)] px-2 py-1.5 text-sm text-mail-foreground outline-none"
 							/>
 						</label>
 						<label className="flex flex-col gap-1.5 text-xs text-mail-muted">
@@ -95,7 +95,7 @@ export const SnoozeDialog = ({
 								type="time"
 								value={time}
 								onChange={(e) => setTime(e.target.value)}
-								className="rounded-md border border-mail-border bg-[#313131] px-2 py-1.5 text-sm text-mail-foreground outline-none"
+								className="rounded-md border border-mail-border bg-[var(--inbox-control)] px-2 py-1.5 text-sm text-mail-foreground outline-none"
 							/>
 						</label>
 					</div>
