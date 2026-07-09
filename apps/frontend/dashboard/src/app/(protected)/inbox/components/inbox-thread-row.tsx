@@ -8,7 +8,7 @@ import * as Checkbox from "@reloop/ui/checkbox";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
-import { AlertTriangle, Archive, Pin, Tag, Trash2, User } from "lucide-react";
+import { User } from "lucide-react";
 import { forwardRef, type ReactNode } from "react";
 import type { InboundThread } from "../types";
 import { useInboxMail } from "./use-inbox-mail";
@@ -110,8 +110,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 			>
 				<div
 					className={cn(
-						"-translate-y-1/2 absolute right-2 z-20 flex items-center gap-1 rounded-xl border border-mail-border/30 bg-panel-light p-1 opacity-0 shadow-xs transition-opacity group-hover:opacity-100 dark:bg-panel-dark",
-						index === 0 ? "top-4" : "top-[-1px]",
+						"-translate-y-1/2 absolute top-[-1px] right-2 z-20 flex items-center gap-1 rounded-xl border border-mail-border/30 bg-panel-light p-1 opacity-0 shadow-xs transition-opacity group-hover:opacity-100 dark:bg-panel-dark",
 					)}
 				>
 					<button
@@ -140,7 +139,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						}}
 						className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[var(--inbox-hover)]"
 					>
-						<Archive className="h-3.5 w-3.5 stroke-mail-muted" />
+						<Icon name="archive" className="h-3.5 w-3.5 text-mail-muted" />
 					</button>
 					<button
 						type="button"
@@ -151,13 +150,16 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						}}
 						className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30"
 					>
-						<Trash2 className="h-3.5 w-3.5 stroke-red-500" />
+						<Icon name="trash" className="h-3.5 w-3.5 text-red-500" />
 					</button>
 				</div>
 
 				<div className="flex w-full items-start justify-between gap-3 px-4">
 					{mail.bulkSelected.length > 0 ? (
-						<div className="mt-0.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+						<div
+							className="mt-0.5 shrink-0"
+							onClick={(e) => e.stopPropagation()}
+						>
 							<Checkbox.Root
 								checked={isBulkSelected}
 								onCheckedChange={() => onToggleBulk(listId)}
@@ -179,7 +181,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						<div className="flex w-full flex-row items-start justify-between gap-2">
 							<div className="flex min-w-0 flex-row items-center gap-1">
 								{thread.isPinned && (
-									<Pin className="h-3 w-3 shrink-0 fill-mail-muted text-mail-muted" />
+									<Icon name="pin" className="h-3 w-3 shrink-0 text-mail-muted fill-mail-muted" />
 								)}
 								<span
 									className={cn(
@@ -213,13 +215,15 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 							{(showAlert || showPerson || showTag) && (
 								<div className="flex shrink-0 items-center gap-1.5 pb-0.5">
 									{showAlert && (
-										<AlertTriangle
+										<Icon
+											name="alert-triangle"
 											className="h-3.5 w-3.5 text-amber-400"
 											aria-label="Alert"
 										/>
 									)}
 									{showTag && (
-										<Tag
+										<Icon
+											name="tag"
 											className="h-3.5 w-3.5 text-blue-400"
 											aria-label="Has labels"
 										/>

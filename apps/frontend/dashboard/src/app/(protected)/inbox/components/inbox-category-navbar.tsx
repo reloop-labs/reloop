@@ -1,16 +1,10 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import { AlertTriangle, Tag, User, Zap } from "lucide-react";
+import { Icon } from "@reloop/ui/icon";
+import { User } from "lucide-react";
 import type { InboxView } from "../types";
 import { INBOX_VIEWS } from "../types";
-
-const VIEW_ICONS = {
-	zap: Zap,
-	"alert-triangle": AlertTriangle,
-	user: User,
-	tag: Tag,
-} as const;
 
 const ACTIVE_STYLES = {
 	primary: {
@@ -48,7 +42,6 @@ export function InboxCategoryNavbar({
 			aria-label="Inbox categories"
 		>
 			{INBOX_VIEWS.map((view) => {
-				const Icon = VIEW_ICONS[view.icon];
 				const isActive = activeView === view.id;
 				const styles = ACTIVE_STYLES[view.id];
 
@@ -68,13 +61,24 @@ export function InboxCategoryNavbar({
 						title={isActive ? undefined : view.label}
 					>
 						<span className="flex h-4 w-4 shrink-0 items-center justify-center">
-							<Icon
-								className={cn(
-									"h-4 w-4 transition-colors duration-300",
-									isActive ? styles.icon : "text-mail-muted",
-								)}
-								aria-hidden
-							/>
+							{view.icon === "user" ? (
+								<User
+									className={cn(
+										"h-4 w-4 transition-colors duration-300",
+										isActive ? styles.icon : "text-mail-muted",
+									)}
+									aria-hidden
+								/>
+							) : (
+								<Icon
+									name={view.icon}
+									className={cn(
+										"h-4 w-4 transition-colors duration-300",
+										isActive ? styles.icon : "text-mail-muted",
+									)}
+									aria-hidden
+								/>
+							)}
 						</span>
 						<span
 							className={cn(
@@ -92,4 +96,5 @@ export function InboxCategoryNavbar({
 		</nav>
 	);
 }
+
 
