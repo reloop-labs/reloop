@@ -14,13 +14,13 @@ import {
 	MailOpen,
 	Reply,
 	ReplyAll,
-	Star,
 	Tag,
 	Trash2,
 	Zap,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { toast } from "sonner";
+import { Icon } from "@reloop/ui/icon";
 
 const itemClass =
 	"rounded-md text-[13px] text-mail-muted data-[highlighted]:bg-[var(--inbox-control-hover)] data-[highlighted]:text-mail-foreground";
@@ -162,7 +162,10 @@ export const ThreadContextMenu = ({
 						)
 					}
 				>
-					<Star className="h-3.5 w-3.5" />
+					<Icon
+						name={thread.isStarred ? "star-filled" : "star"}
+						className="h-3.5 w-3.5"
+					/>
 					{thread.isStarred ? "Unstar" : "Star"}
 				</ContextMenu.Item>
 

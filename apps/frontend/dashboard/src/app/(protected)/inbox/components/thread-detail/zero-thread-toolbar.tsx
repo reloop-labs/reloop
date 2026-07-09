@@ -10,12 +10,12 @@ import {
 	MoreHorizontal,
 	Printer,
 	Reply,
-	Star,
 	Trash2,
 	X,
 	Zap,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import { Icon } from "@reloop/ui/icon";
 
 const iconBtn =
 	"inline-flex h-7 w-7 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-[var(--inbox-control)] transition-colors hover:bg-[var(--inbox-control-hover)]";
@@ -110,12 +110,11 @@ export const ZeroThreadToolbar = ({
 					className={iconBtn}
 					aria-label={isStarred ? "Unstar" : "Star"}
 				>
-					<Star
+					<Icon
+						name={isStarred ? "star-filled" : "star"}
 						className={cn(
 							"h-4 w-4",
-							isStarred
-								? "fill-yellow-400 stroke-yellow-400"
-								: "fill-transparent stroke-[#9D9D9D]",
+							isStarred ? "text-yellow-400" : "text-[#9D9D9D]",
 						)}
 					/>
 				</button>

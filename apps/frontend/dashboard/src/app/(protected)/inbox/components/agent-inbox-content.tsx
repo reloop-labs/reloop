@@ -37,7 +37,8 @@ import {
 	groupThreadsByConversation,
 } from "@fe/dashboard/app/(protected)/inbox/utils/group-threads";
 import { cn } from "@reloop/ui/cn";
-import { Archive, MailOpen, RefreshCcw, Star, Trash2, X } from "lucide-react";
+import { Archive, MailOpen, RefreshCcw, Trash2, X } from "lucide-react";
+import { Icon } from "@reloop/ui/icon";
 import { parseAsString, useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -428,7 +429,7 @@ export const AgentInboxContent = ({
 													onClick={() => void runBulkAction("star", "Starred")}
 													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
 												>
-													<Star className="h-3.5 w-3.5 text-mail-muted" />
+													<Icon name="star" className="h-3.5 w-3.5 text-mail-muted" />
 												</button>
 												<button
 													type="button"

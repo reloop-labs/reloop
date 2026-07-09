@@ -13,7 +13,6 @@ import {
 	Mail,
 	Paperclip,
 	PenSquare,
-	Star,
 	X as XIcon,
 } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
@@ -21,7 +20,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import type { InboundThread } from "../types";
 import { useInboxSidebar } from "./inbox-sidebar-context";
-import { SearchIcon } from "./zero-icons";
 
 type InboxFilterChip =
 	| "unread"
@@ -47,7 +45,7 @@ const FILTER_OPTIONS: {
 	{
 		id: "starred",
 		label: "Starred",
-		icon: <Star className="h-4 w-4 opacity-60" />,
+		icon: <Icon name="star" className="h-4 w-4 opacity-60" />,
 	},
 	{
 		id: "needs_approval",
@@ -269,7 +267,7 @@ export const InboxCommandPalette = ({
 					)}
 
 					<div className="group/cmd-input flex h-12 w-full items-center gap-2.5 border-mail-border border-b px-4">
-						<SearchIcon className="h-4 w-4 shrink-0 text-mail-muted" />
+			<Icon name="search" className="h-4 w-4 shrink-0 text-mail-muted" />
 						<CommandMenu.Input
 							value={commandInput}
 							onValueChange={setCommandInput}
@@ -304,7 +302,7 @@ export const InboxCommandPalette = ({
 									setDraftQuery(searchQuery);
 								}}
 							>
-								<SearchIcon className="h-4 w-4 opacity-60" />
+								<Icon name="search" className="h-4 w-4 opacity-60" />
 								<div className="ml-2 flex flex-1 flex-col">
 									<span>Search emails</span>
 									<span className="text-mail-muted text-xs">
@@ -448,7 +446,7 @@ export const InboxCommandPalette = ({
 									value={`search for ${draftQuery}`}
 									onSelect={() => applySearch(draftQuery, true)}
 								>
-									<SearchIcon className="h-4 w-4 opacity-60" />
+									<Icon name="search" className="h-4 w-4 opacity-60" />
 									<span className="ml-2">Search for “{draftQuery.trim()}”</span>
 								</CommandMenu.Item>
 								{draftQuery.includes("@") && (
@@ -556,7 +554,7 @@ export const InboxSearchTrigger = ({
 				"relative flex h-10 flex-1 select-none items-center justify-start overflow-hidden rounded-2xl border border-mail-border/20 bg-panel-light pl-3 text-left font-normal text-sm shadow-none backdrop-blur-sm transition-all hover:bg-mail-accent/30 focus-visible:ring-2 focus-visible:ring-mail-primary/30 dark:bg-panel-dark/40",
 			)}
 		>
-			<SearchIcon className="h-4 w-4 text-mail-muted" />
+			<Icon name="search" className="h-4 w-4 text-mail-muted" />
 			<span
 				className={cn(
 					"ml-3 truncate pr-24",

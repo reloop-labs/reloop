@@ -7,7 +7,8 @@ import {
 import * as Checkbox from "@reloop/ui/checkbox";
 import { cn } from "@reloop/ui/cn";
 import dayjs from "dayjs";
-import { Archive, Star, Trash2, Zap } from "lucide-react";
+import { Archive, Trash2, Zap } from "lucide-react";
+import { Icon } from "@reloop/ui/icon";
 import { forwardRef, type ReactNode } from "react";
 import type { InboundThread } from "../types";
 import { useInboxMail } from "./use-inbox-mail";
@@ -115,12 +116,11 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						}}
 						className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[var(--inbox-hover)]"
 					>
-						<Star
+						<Icon
+							name={thread.isStarred ? "star-filled" : "star"}
 							className={cn(
 								"h-3.5 w-3.5",
-								thread.isStarred
-									? "fill-yellow-400 stroke-yellow-400"
-									: "stroke-mail-muted",
+								thread.isStarred ? "text-yellow-400" : "text-mail-muted",
 							)}
 						/>
 					</button>

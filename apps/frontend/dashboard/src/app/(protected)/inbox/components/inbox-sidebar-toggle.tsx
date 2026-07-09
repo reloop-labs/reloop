@@ -1,6 +1,6 @@
 "use client";
 
-import { PanelLeftOpenIcon } from "./zero-icons";
+import { Icon } from "@reloop/ui/icon";
 
 export const InboxSidebarToggle = ({ onClick }: { onClick: () => void }) => (
 	<button
@@ -9,6 +9,6 @@ export const InboxSidebarToggle = ({ onClick }: { onClick: () => void }) => (
 		className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-mail-muted transition-colors hover:bg-[var(--inbox-hover)]"
 		aria-label="Toggle sidebar"
 	>
-		<PanelLeftOpenIcon className="h-[12px] w-[14px]" />
+		<Icon name="panel-left" className="h-[12px] w-[14px]" />
 	</button>
 );
