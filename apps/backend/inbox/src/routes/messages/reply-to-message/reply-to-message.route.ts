@@ -32,6 +32,18 @@ export const replyToMessageRoute = new Elysia().use(authMiddleware).post(
 					description: "BCC recipient address(es)",
 				}),
 			),
+			attachments: t.Optional(
+				t.Array(
+					t.Object({
+						content: t.Optional(t.String()),
+						filename: t.Optional(t.String()),
+						path: t.Optional(t.String()),
+						content_type: t.Optional(t.String()),
+						content_id: t.Optional(t.String()),
+					}),
+					{ description: "Email attachments" },
+				),
+			),
 		}),
 		response: {
 			200: MailModel.sendEmailResponse,

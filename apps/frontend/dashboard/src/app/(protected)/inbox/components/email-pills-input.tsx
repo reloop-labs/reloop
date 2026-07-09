@@ -1,10 +1,17 @@
 "use client";
 
+import {
+	getAvatarGradient,
+	getAvatarInitial,
+} from "@fe/dashboard/utils/avatar";
 import { Icon } from "@reloop/ui/icon";
+import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion } from "framer-motion";
 import {
 	type ClipboardEvent,
 	type KeyboardEvent,
+	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from "react";
@@ -14,10 +21,11 @@ interface EmailPillsInputProps {
 	onChange: (emails: string[]) => void;
 	placeholder?: string;
 	disabled?: boolean;
+	/** Optional suggestions (emails or "Name <email>") from loaded threads */
+	suggestions?: string[];
 }
 
 export const parseEmail = (input: string) => {
-	// Matches: "Name" <email@domain.com> or Name <email@domain.com> or email@domain.com
 	const match = input.match(/^(?:["']?([^"']+)["']?\s+)?<([^>]+)>$/);
 	if (match) {
 		return {
@@ -41,12 +49,29 @@ export const EmailPillsInput = ({
 	onChange,
 	placeholder = "Add email address",
 	disabled = false,
+	suggestions = [],
 }: EmailPillsInputProps) => {
 	const [inputValue, setInputValue] = useState("");
+	const [highlight, setHighlight] = useState(0);
 	const inputRef = useRef<HTMLInputElement>(null);
 
+	const filteredSuggestions = useMemo(() => {
+		const q = inputValue.trim().toLowerCase();
+		if (q.length < 1) return [];
+		return suggestions
+			.filter((s) => {
+				const { email } = parseEmail(s);
+				if (emails.some((e) => parseEmail(e).email === email)) return false;
+				return s.toLowerCase().includes(q);
+			})
+			.slice(0, 6);
+	}, [inputValue, suggestions, emails]);
+
+	useEffect(() => {
+		setHighlight(0);
+	}, [filteredSuggestions.length]);
+
 	const addEmails = (newEmailsStr: string) => {
-		// First split by commas and semicolons
 		const initialSplit = newEmailsStr
 			.split(/[,;]+/)
 			.map((s) => s.trim())
@@ -54,11 +79,9 @@ export const EmailPillsInput = ({
 		const parsed: string[] = [];
 
 		for (const item of initialSplit) {
-			// Check if it has a <email> format: e.g. "John Doe <john@example.com>"
 			if (/<[^\s@]+@[^\s@]+\.[^\s@]+>/.test(item)) {
 				parsed.push(item);
 			} else {
-				// If not, it might be space separated email list (e.g. "foo@bar.com baz@bar.com")
 				const spaceSplit = item
 					.split(/\s+/)
 					.map((s) => s.trim())
@@ -69,7 +92,6 @@ export const EmailPillsInput = ({
 
 		if (parsed.length === 0) return;
 
-		// Filter out duplicates in current list
 		const updated = [...emails, ...parsed].filter(
 			(val, idx, self) => self.indexOf(val) === idx,
 		);
@@ -80,7 +102,30 @@ export const EmailPillsInput = ({
 	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
 		if (disabled) return;
 
-		// Commit on Enter, Comma, Semicolon, Tab, or Space (only if the typed input contains '@')
+		if (filteredSuggestions.length > 0) {
+			if (e.key === "ArrowDown") {
+				e.preventDefault();
+				setHighlight((h) => (h + 1) % filteredSuggestions.length);
+				return;
+			}
+			if (e.key === "ArrowUp") {
+				e.preventDefault();
+				setHighlight(
+					(h) =>
+						(h - 1 + filteredSuggestions.length) % filteredSuggestions.length,
+				);
+				return;
+			}
+			if (e.key === "Enter" || e.key === "Tab") {
+				const pick = filteredSuggestions[highlight];
+				if (pick) {
+					e.preventDefault();
+					addEmails(pick);
+					return;
+				}
+			}
+		}
+
 		const shouldCommit =
 			e.key === "Enter" ||
 			e.key === "," ||
@@ -90,25 +135,19 @@ export const EmailPillsInput = ({
 
 		if (shouldCommit) {
 			e.preventDefault();
-			if (inputValue.trim()) {
-				addEmails(inputValue);
-			}
+			if (inputValue.trim()) addEmails(inputValue);
 		} else if (e.key === "Backspace" && !inputValue && emails.length > 0) {
-			// Remove last pill
 			onChange(emails.slice(0, -1));
 		}
 	};
 
 	const handleBlur = () => {
-		if (inputValue.trim()) {
-			addEmails(inputValue);
-		}
+		if (inputValue.trim()) addEmails(inputValue);
 	};
 
 	const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
 		e.preventDefault();
-		const pastedText = e.clipboardData.getData("text");
-		addEmails(pastedText);
+		addEmails(e.clipboardData.getData("text"));
 	};
 
 	const removeEmail = (indexToRemove: number) => {
@@ -117,84 +156,111 @@ export const EmailPillsInput = ({
 	};
 
 	return (
-		<div
-			onClick={() => inputRef.current?.focus()}
-			className="flex min-h-[32px] flex-1 cursor-text flex-wrap items-center gap-1.5 py-0.5"
-		>
-			<AnimatePresence initial={false}>
-				{emails.map((emailStr, idx) => {
-					const isValid = validateEmail(emailStr);
-					const { name, email } = parseEmail(emailStr);
+		<div className="relative min-w-0 flex-1">
+			<div
+				onClick={() => inputRef.current?.focus()}
+				className="flex min-h-[32px] cursor-text flex-wrap items-center gap-1.5 py-0.5"
+			>
+				<AnimatePresence initial={false}>
+					{emails.map((emailStr, idx) => {
+						const isValid = validateEmail(emailStr);
+						const { name, email } = parseEmail(emailStr);
+						const display = name || email.split("@")[0] || email;
 
-					return (
-						<motion.div
-							key={`${emailStr}-${idx}`}
-							initial={{ opacity: 0, scale: 0.8 }}
-							animate={{ opacity: 1, scale: 1 }}
-							exit={{ opacity: 0, scale: 0.8 }}
-							transition={{ duration: 0.15 }}
-							className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-0.5 font-medium text-xs shadow-xs transition-colors ${
-								isValid
-									? "border-mail-border border-mail-border/60 bg-mail-accent/40 bg-offset-light text-mail-muted text-mail-muted"
-									: "border-red-200 bg-red-50 text-red-600 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400"
-							}`}
-						>
-							{!isValid && (
-								<svg
-									className="h-3.5 w-3.5 shrink-0 text-red-500"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2.5"
-								>
-									<line x1="12" y1="9" x2="12" y2="13" />
-									<line x1="12" y1="17" x2="12.01" y2="17" />
-									<circle cx="12" cy="12" r="10" />
-								</svg>
-							)}
-							{name ? (
-								<span className="max-w-[280px] truncate">
-									<span className="mr-1 font-semibold text-mail-foreground text-mail-foreground">
-										{name}
-									</span>
-									<span className="font-normal text-mail-muted text-mail-muted">
-										&lt;{email}&gt;
-									</span>
-								</span>
-							) : (
-								<span className="max-w-[200px] truncate">{email}</span>
-							)}
-							<button
-								type="button"
-								onClick={(e) => {
-									e.stopPropagation();
-									removeEmail(idx);
-								}}
-								disabled={disabled}
-								className={`-mr-1 shrink-0 rounded-full p-0.5 transition-colors hover:bg-[var(--inbox-hover)] hover:bg-black/5 ${
+						return (
+							<motion.div
+								key={`${emailStr}-${idx}`}
+								initial={{ opacity: 0, scale: 0.8 }}
+								animate={{ opacity: 1, scale: 1 }}
+								exit={{ opacity: 0, scale: 0.8 }}
+								transition={{ duration: 0.15 }}
+								className={cn(
+									"inline-flex items-center gap-1.5 rounded-full border py-0.5 pr-1.5 pl-0.5 font-medium text-xs",
 									isValid
-										? "text-mail-muted hover:text-mail-foreground hover:text-mail-foreground"
-										: "text-red-400 hover:text-red-700 dark:hover:text-red-300"
-								}`}
+										? "border-mail-border/60 bg-mail-accent/40 text-mail-muted"
+										: "border-red-200 bg-red-50 text-red-600 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400",
+								)}
 							>
-								<Icon name="cross" className="h-3 w-3" />
+								<div
+									className={cn(
+										"flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-semibold text-[10px] text-white uppercase",
+										getAvatarGradient(email),
+									)}
+								>
+									{getAvatarInitial(name || null, email)}
+								</div>
+								<span className="max-w-[180px] truncate">{display}</span>
+								<button
+									type="button"
+									onClick={(e) => {
+										e.stopPropagation();
+										removeEmail(idx);
+									}}
+									disabled={disabled}
+									className="shrink-0 rounded-full p-0.5 text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
+								>
+									<Icon name="cross" className="h-3 w-3" />
+								</button>
+							</motion.div>
+						);
+					})}
+				</AnimatePresence>
+				<input
+					ref={inputRef}
+					type="text"
+					value={inputValue}
+					onChange={(e) => setInputValue(e.target.value)}
+					onKeyDown={handleKeyDown}
+					onBlur={handleBlur}
+					onPaste={handlePaste}
+					disabled={disabled}
+					placeholder={emails.length === 0 ? placeholder : ""}
+					className="min-w-[120px] flex-1 bg-transparent py-1 text-mail-foreground outline-none placeholder:text-[#797979]"
+				/>
+			</div>
+
+			{filteredSuggestions.length > 0 && (
+				<div className="absolute top-full left-0 z-50 mt-1 max-h-48 w-full min-w-[240px] overflow-y-auto rounded-lg border border-mail-border bg-panel-light py-1 shadow-lg dark:bg-panel-dark">
+					{filteredSuggestions.map((s, i) => {
+						const { name, email } = parseEmail(s);
+						return (
+							<button
+								key={s}
+								type="button"
+								className={cn(
+									"flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm hover:bg-[var(--inbox-hover)]",
+									i === highlight && "bg-[var(--inbox-hover)]",
+								)}
+								onMouseDown={(e) => {
+									e.preventDefault();
+									addEmails(s);
+								}}
+							>
+								<div
+									className={cn(
+										"flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] text-white uppercase",
+										getAvatarGradient(email),
+									)}
+								>
+									{getAvatarInitial(name || null, email)}
+								</div>
+								<div className="min-w-0 flex-1">
+									{name ? (
+										<>
+											<p className="truncate font-medium text-mail-foreground">
+												{name}
+											</p>
+											<p className="truncate text-mail-muted text-xs">{email}</p>
+										</>
+									) : (
+										<p className="truncate text-mail-foreground">{email}</p>
+									)}
+								</div>
 							</button>
-						</motion.div>
-					);
-				})}
-			</AnimatePresence>
-			<input
-				ref={inputRef}
-				type="text"
-				value={inputValue}
-				onChange={(e) => setInputValue(e.target.value)}
-				onKeyDown={handleKeyDown}
-				onBlur={handleBlur}
-				onPaste={handlePaste}
-				disabled={disabled}
-				placeholder={emails.length === 0 ? placeholder : ""}
-				className="min-w-[120px] flex-1 bg-transparent py-1 text-mail-foreground text-mail-foreground placeholder-text-soft-400 outline-none"
-			/>
+						);
+					})}
+				</div>
+			)}
 		</div>
 	);
 };

@@ -9,6 +9,7 @@ export const inboxConfig = {
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
+	OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY || "",
 
 	// S3 Configuration for attachments
 	S3: {

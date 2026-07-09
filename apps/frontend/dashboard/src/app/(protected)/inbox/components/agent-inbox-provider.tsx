@@ -131,8 +131,26 @@ interface AgentInboxContextValue {
 		isImportant: boolean,
 	) => Promise<void>;
 	batchThreads: (ids: string[], action: BatchThreadAction) => Promise<void>;
-	sendReply: (id: string, text: string, html?: string) => Promise<void>;
-	sendReplyAll: (id: string, text: string, html?: string) => Promise<void>;
+	sendReply: (
+		id: string,
+		text: string,
+		html?: string,
+		attachments?: Array<{
+			filename?: string;
+			path?: string;
+			content_type?: string;
+		}>,
+	) => Promise<void>;
+	sendReplyAll: (
+		id: string,
+		text: string,
+		html?: string,
+		attachments?: Array<{
+			filename?: string;
+			path?: string;
+			content_type?: string;
+		}>,
+	) => Promise<void>;
 	sendForward: (
 		id: string,
 		to: string | string[],
@@ -141,6 +159,11 @@ interface AgentInboxContextValue {
 			html?: string;
 			cc?: string | string[];
 			bcc?: string | string[];
+			attachments?: Array<{
+				filename?: string;
+				path?: string;
+				content_type?: string;
+			}>;
 		},
 	) => Promise<void>;
 	sendMessage: (input: {
@@ -156,7 +179,62 @@ interface AgentInboxContextValue {
 			path?: string;
 			content_type?: string;
 		}>;
-	}) => Promise<void>;
+		scheduledAt?: string;
+		undoWindowSeconds?: number;
+	}) => Promise<{
+		pending?: boolean;
+		id?: string;
+		sendAt?: string;
+		messageId?: string;
+		success?: boolean;
+	} | void>;
+	saveDraft: (input: {
+		id?: string;
+		mailboxId: string;
+		to?: string[];
+		cc?: string[];
+		bcc?: string[];
+		subject?: string;
+		html?: string;
+		text?: string;
+		attachments?: Array<{
+			id?: string;
+			filename?: string;
+			path?: string;
+			url?: string;
+			content_type?: string;
+			size?: string;
+		}>;
+	}) => Promise<{ id: string } | null>;
+	getDraft: (id: string) => Promise<{
+		id: string;
+		mailboxId: string;
+		to: string[];
+		cc: string[];
+		bcc: string[];
+		subject: string;
+		html: string;
+		text: string;
+		attachments: Array<{
+			id?: string;
+			filename?: string;
+			path?: string;
+			url?: string;
+			content_type?: string;
+			size?: string;
+		}>;
+	} | null>;
+	deleteDraft: (id: string) => Promise<void>;
+	listComposeDrafts: (mailboxId: string) => Promise<
+		Array<{
+			id: string;
+			mailboxId: string;
+			to: string[];
+			subject: string;
+			text: string;
+			updatedAt: string;
+		}>
+	>;
 }
 
 const AgentInboxContext = createContext<AgentInboxContextValue | null>(null);
@@ -739,11 +817,20 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 	);
 
 	const sendReply = useCallback(
-		async (id: string, text: string, html?: string) => {
+		async (
+			id: string,
+			text: string,
+			html?: string,
+			attachments?: Array<{
+				filename?: string;
+				path?: string;
+				content_type?: string;
+			}>,
+		) => {
 			const res = await fetch(`/api/inbox/v1/messages/${id}/reply`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ text, html }),
+				body: JSON.stringify({ text, html, attachments }),
 			});
 
 			if (!res.ok) {
@@ -757,11 +844,20 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 	);
 
 	const sendReplyAll = useCallback(
-		async (id: string, text: string, html?: string) => {
+		async (
+			id: string,
+			text: string,
+			html?: string,
+			attachments?: Array<{
+				filename?: string;
+				path?: string;
+				content_type?: string;
+			}>,
+		) => {
 			const res = await fetch(`/api/inbox/v1/messages/${id}/reply-all`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ text, html }),
+				body: JSON.stringify({ text, html, attachments }),
 			});
 
 			if (!res.ok) {
@@ -783,6 +879,11 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				html?: string;
 				cc?: string | string[];
 				bcc?: string | string[];
+				attachments?: Array<{
+					filename?: string;
+					path?: string;
+					content_type?: string;
+				}>;
 			},
 		) => {
 			const res = await fetch(`/api/inbox/v1/messages/${id}/forward`, {
@@ -815,6 +916,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				path?: string;
 				content_type?: string;
 			}>;
+			scheduledAt?: string;
+			undoWindowSeconds?: number;
 		}) => {
 			const res = await fetch("/api/inbox/v1/messages/send", {
 				method: "POST",
@@ -827,10 +930,118 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				throw new Error(body || "Failed to send message");
 			}
 
-			await Promise.all([mutateMessages(), mutateSentMessages()]);
+			const data = (await res.json()) as {
+				pending?: boolean;
+				id?: string;
+				sendAt?: string;
+				messageId?: string;
+				success?: boolean;
+			};
+
+			if (!data.pending) {
+				await Promise.all([mutateMessages(), mutateSentMessages()]);
+			}
+
+			return data;
 		},
 		[mutateMessages, mutateSentMessages],
 	);
+
+	const saveDraft = useCallback(
+		async (input: {
+			id?: string;
+			mailboxId: string;
+			to?: string[];
+			cc?: string[];
+			bcc?: string[];
+			subject?: string;
+			html?: string;
+			text?: string;
+			attachments?: Array<{
+				id?: string;
+				filename?: string;
+				path?: string;
+				url?: string;
+				content_type?: string;
+				size?: string;
+			}>;
+		}) => {
+			if (input.id) {
+				const res = await fetch(`/api/inbox/v1/drafts/${input.id}`, {
+					method: "PATCH",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						to: input.to,
+						cc: input.cc,
+						bcc: input.bcc,
+						subject: input.subject,
+						html: input.html,
+						text: input.text,
+						attachments: input.attachments,
+					}),
+				});
+				if (!res.ok) throw new Error("Failed to update draft");
+				const data = (await res.json()) as { id: string };
+				return data;
+			}
+			const res = await fetch("/api/inbox/v1/drafts", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(input),
+			});
+			if (!res.ok) throw new Error("Failed to create draft");
+			return (await res.json()) as { id: string };
+		},
+		[],
+	);
+
+	const getDraft = useCallback(async (id: string) => {
+		const res = await fetch(`/api/inbox/v1/drafts/${id}`);
+		if (!res.ok) return null;
+		return (await res.json()) as {
+			id: string;
+			mailboxId: string;
+			to: string[];
+			cc: string[];
+			bcc: string[];
+			subject: string;
+			html: string;
+			text: string;
+			attachments: Array<{
+				id?: string;
+				filename?: string;
+				path?: string;
+				url?: string;
+				content_type?: string;
+				size?: string;
+			}>;
+		};
+	}, []);
+
+	const deleteDraft = useCallback(async (id: string) => {
+		const res = await fetch(`/api/inbox/v1/drafts/${id}`, {
+			method: "DELETE",
+		});
+		if (!res.ok) throw new Error("Failed to delete draft");
+	}, []);
+
+	const listComposeDrafts = useCallback(async (mailboxId: string) => {
+		const res = await fetch(
+			`/api/inbox/v1/drafts?mailboxId=${encodeURIComponent(mailboxId)}`,
+		);
+		if (!res.ok) return [];
+		const data = (await res.json()) as {
+			drafts?: Array<{
+				id: string;
+				mailboxId: string;
+				to: string[];
+				subject: string;
+				text: string;
+				updatedAt: string;
+			}>;
+		};
+		return data.drafts ?? [];
+	}, []);
 
 	const refresh = useCallback(async () => {
 		await Promise.all([
@@ -869,6 +1080,10 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			sendReplyAll,
 			sendForward,
 			sendMessage,
+			saveDraft,
+			getDraft,
+			deleteDraft,
+			listComposeDrafts,
 		}),
 		[
 			mailboxes,
@@ -897,6 +1112,10 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			sendReplyAll,
 			sendForward,
 			sendMessage,
+			saveDraft,
+			getDraft,
+			deleteDraft,
+			listComposeDrafts,
 		],
 	);
 

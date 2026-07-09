@@ -14,6 +14,13 @@ export async function forwardMessageController(
 		html?: string;
 		cc?: string | string[];
 		bcc?: string | string[];
+		attachments?: Array<{
+			content?: string;
+			filename?: string;
+			path?: string;
+			content_type?: string;
+			content_id?: string;
+		}>;
 	},
 	apiKey: string,
 	cookie?: string,
@@ -91,6 +98,7 @@ export async function forwardMessageController(
 			html: forwardedHtml,
 			cc: body.cc,
 			bcc: body.bcc,
+			attachments: body.attachments,
 		},
 		apiKey,
 		cookie,

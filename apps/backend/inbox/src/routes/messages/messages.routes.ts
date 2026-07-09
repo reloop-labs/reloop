@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import { batchGetMessagesRoute } from "./batch-get-messages/batch-get-messages.route";
+import { cancelPendingRoute } from "./cancel-pending/cancel-pending.route";
 import { deleteMessageRoute } from "./delete-message/delete-message.route";
 import { forwardMessageRoute } from "./forward-message/forward-message.route";
 import { getMessageRoute } from "./get-message/get-message.route";
@@ -29,6 +30,7 @@ export const messagesRoutes = new Elysia({
 	.use(toggleMessageStarRoute)
 	.use(deleteMessageRoute)
 	.use(sendMessageRoute)
+	.use(cancelPendingRoute)
 	.use(replyToMessageRoute)
 	.use(replyAllToMessageRoute)
 	.use(forwardMessageRoute);

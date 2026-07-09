@@ -2,6 +2,7 @@ export * from "./api-key";
 export * from "./auth";
 export * from "./billing";
 export * from "./channel";
+export * from "./compose";
 export * from "./contact";
 export * from "./domain";
 export * from "./email";

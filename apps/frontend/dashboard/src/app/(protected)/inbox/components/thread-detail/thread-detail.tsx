@@ -117,7 +117,7 @@ export const ThreadDetail = ({
 	const [parsedExpanded, setParsedExpanded] = useState(true);
 	const [rawHeadersExpanded, setRawHeadersExpanded] = useState(false);
 	const [showReplyComposer, setShowReplyComposer] = useState(false);
-	const [replyBody, setReplyBody] = useState("");
+	const [replySeed, setReplySeed] = useState("");
 	const [showForwardComposer, setShowForwardComposer] = useState(false);
 	const [isForwarding, setIsForwarding] = useState(false);
 	const [snoozeOpen, setSnoozeOpen] = useState(false);
@@ -170,7 +170,7 @@ export const ThreadDetail = ({
 		setTargetLanguage("es");
 		setIsTranslating(false);
 		setShowReplyComposer(false);
-		setReplyBody("");
+		setReplySeed("");
 		setOptimisticReplies([]);
 		setShowForwardComposer(false);
 	}, [thread?.id]);
@@ -183,7 +183,7 @@ export const ThreadDetail = ({
 		} else if (composeParam === "reply" || composeParam === "replyAll") {
 			setReplyMode(composeParam);
 			setShowForwardComposer(false);
-			setReplyBody("");
+			setReplySeed("");
 			setShowReplyComposer(true);
 		}
 		void setComposeParam(null);
@@ -427,8 +427,16 @@ export const ThreadDetail = ({
 		}
 	};
 
-	const handleSendReply = async (bodyOverride?: string) => {
-		const body = (bodyOverride ?? replyBody).trim();
+	const handleSendReply = async (payload: {
+		text: string;
+		html: string;
+		attachments?: Array<{
+			filename?: string;
+			path?: string;
+			content_type?: string;
+		}>;
+	}) => {
+		const body = payload.text.trim();
 		if (!thread || !messageId || !body) return;
 
 		const optimisticMsg = {
@@ -444,20 +452,24 @@ export const ThreadDetail = ({
 				toEmails: [thread.from.email],
 				subject: `Re: ${thread.subject}`,
 				textBody: body,
-				htmlBody: null,
+				htmlBody: payload.html || null,
 				attachments: [],
 				createdAt: new Date().toISOString(),
 			},
 			parsed: null,
 		};
 		setOptimisticReplies((prev) => [...prev, optimisticMsg]);
-		setReplyBody("");
 		setShowReplyComposer(false);
 
 		const send =
 			replyMode === "replyAll"
-				? sendReplyAll(messageId, optimisticMsg.email.textBody)
-				: sendReply(messageId, optimisticMsg.email.textBody);
+				? sendReplyAll(
+						messageId,
+						body,
+						payload.html,
+						payload.attachments,
+					)
+				: sendReply(messageId, body, payload.html, payload.attachments);
 
 		toast.promise(send, {
 			loading: "Sending reply...",
@@ -483,7 +495,7 @@ export const ThreadDetail = ({
 	const openReplyComposer = (mode: "reply" | "replyAll" = "reply") => {
 		setReplyMode(mode);
 		setShowForwardComposer(false);
-		setReplyBody("");
+		setReplySeed("");
 		setShowReplyComposer(true);
 	};
 
@@ -503,7 +515,13 @@ export const ThreadDetail = ({
 	const handleSendForward = async (data: {
 		to: string[];
 		cc: string[];
-		body: string;
+		text: string;
+		html: string;
+		attachments?: Array<{
+			filename?: string;
+			path?: string;
+			content_type?: string;
+		}>;
 	}) => {
 		if (!thread || !messageId || data.to.length === 0) return;
 
@@ -512,8 +530,10 @@ export const ThreadDetail = ({
 		const ccList = data.cc;
 
 		const fwdPromise = sendForward(messageId, toList, {
-			text: data.body.trim() || undefined,
+			text: data.text.trim() || undefined,
+			html: data.html || undefined,
 			cc: ccList.length ? ccList : undefined,
+			attachments: data.attachments,
 		});
 
 		toast.promise(fwdPromise, {
@@ -775,17 +795,26 @@ export const ThreadDetail = ({
 						onToggleParsed={() => setParsedExpanded((v) => !v)}
 						onReply={() => {
 							setShowForwardComposer(false);
-							setReplyBody("");
+							setReplySeed("");
 							setShowReplyComposer(true);
 						}}
 						onForward={() => handleForward()}
 						onDelete={handleDelete}
 						onPrint={handlePrint}
-						onApproveSend={() =>
-							handleSendReply(msg.parsed?.suggestedReply || "")
-						}
+						onApproveSend={() => {
+							const suggested = msg.parsed?.suggestedReply || "";
+							if (!suggested.trim()) return;
+							void handleSendReply({
+								text: suggested,
+								html: `<p>${suggested
+									.replaceAll("&", "&amp;")
+									.replaceAll("<", "&lt;")
+									.replaceAll(">", "&gt;")
+									.replaceAll("\n", "<br />")}</p>`,
+							});
+						}}
 						onEditReply={() => {
-							setReplyBody(msg.parsed?.suggestedReply || "");
+							setReplySeed(msg.parsed?.suggestedReply || "");
 							setShowForwardComposer(false);
 							setShowReplyComposer(true);
 						}}
@@ -796,14 +825,14 @@ export const ThreadDetail = ({
 			{/* Reply / forward composer / action buttons — pinned outside scroll area */}
 			{showReplyComposer ? (
 				<ReplyComposer
-					replyBody={replyBody}
+					key={`${thread.id}-${replySeed.slice(0, 32)}`}
 					toName={thread.from.name || ""}
 					toEmail={thread.from.email}
 					fromEmail={mailbox?.email || "agent@local.reloop.sh"}
-					onBodyChange={setReplyBody}
+					initialContent={replySeed}
 					onSend={handleSendReply}
 					onClose={() => {
-						setReplyBody("");
+						setReplySeed("");
 						setShowReplyComposer(false);
 					}}
 				/>

@@ -45,9 +45,21 @@ export const sendMessageRoute = new Elysia().use(authMiddleware).post(
 					{ description: "Email attachments" },
 				),
 			),
+			scheduledAt: t.Optional(
+				t.String({
+					description: "ISO 8601 datetime to send the email later",
+				}),
+			),
+			undoWindowSeconds: t.Optional(
+				t.Number({
+					minimum: 0,
+					description:
+						"Seconds to wait before sending (default 15 when not scheduled; 0 for immediate)",
+				}),
+			),
 		}),
 		response: {
-			200: MailModel.sendEmailResponse,
+			200: MailModel.sendEmailOrPendingResponse,
 			400: MailModel.ErrorResponseSchema,
 			401: MailModel.ErrorResponseSchema,
 			403: MailModel.ErrorResponseSchema,

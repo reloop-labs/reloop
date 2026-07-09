@@ -6,8 +6,11 @@ import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
 import { createOTLPDrain } from "evlog/otlp";
+import { pendingOutboundCron } from "./cron/pending-outbound.cron";
 import { unsnoozeCron } from "./cron/unsnooze.cron";
 import { inboxConfig } from "./inbox.config";
+import { aiRoutes } from "./routes/ai/ai.routes";
+import { draftsRoutes } from "./routes/drafts/drafts.routes";
 import { labelsRoutes } from "./routes/labels/labels.routes";
 import { healthRoute } from "./routes/landing/health.route";
 import { landingRoute } from "./routes/landing/landing.route";
@@ -88,7 +91,10 @@ const inboxService = new Elysia({
 	.use(threadsRoutes)
 	.use(labelsRoutes)
 	.use(notesRoutes)
+	.use(draftsRoutes)
+	.use(aiRoutes)
 	.use(unsnoozeCron)
+	.use(pendingOutboundCron)
 	.onStart(async () => {
 		await loader();
 	})

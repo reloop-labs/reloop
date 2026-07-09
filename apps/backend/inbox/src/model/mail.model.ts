@@ -178,6 +178,54 @@ export namespace MailModel {
 
 	export type SendEmailResponse = typeof sendEmailResponse.static;
 
+	export const pendingSendResponse = t.Object({
+		success: t.Boolean(),
+		pending: t.Literal(true),
+		id: t.String(),
+		sendAt: t.String(),
+		messageId: t.String(),
+	});
+
+	export const sendEmailOrPendingResponse = t.Union([
+		sendEmailResponse,
+		pendingSendResponse,
+	]);
+
+	export const draftAttachmentItem = t.Object({
+		id: t.Optional(t.String()),
+		filename: t.Optional(t.String()),
+		path: t.Optional(t.String()),
+		url: t.Optional(t.String()),
+		content_type: t.Optional(t.String()),
+		size: t.Optional(t.String()),
+	});
+
+	export const draftItem = t.Object({
+		id: t.String(),
+		organizationId: t.String(),
+		mailboxId: t.String(),
+		to: t.Array(t.String()),
+		cc: t.Array(t.String()),
+		bcc: t.Array(t.String()),
+		subject: t.String(),
+		html: t.String(),
+		text: t.String(),
+		attachments: t.Array(draftAttachmentItem),
+		createdAt: t.Union([t.Date(), t.String()]),
+		updatedAt: t.Union([t.Date(), t.String()]),
+	});
+
+	export const draftListResponse = t.Array(draftItem);
+
+	export const aiSubjectResponse = t.Object({
+		subject: t.String(),
+	});
+
+	export const aiComposeResponse = t.Object({
+		html: t.String(),
+		text: t.String(),
+	});
+
 	export const getAttachmentParams = t.Object({
 		emailId: t.String({
 			description: "The Email ID",

@@ -44,7 +44,9 @@
 		"@elysiajs/openapi": "catalog:backend",
 		"mailparser": "catalog:backend",
 		"@aws-sdk/client-s3": "catalog:backend",
-		"@aws-sdk/s3-request-presigner": "catalog:backend"
+		"@aws-sdk/s3-request-presigner": "catalog:backend",
+		"ai": "catalog:ui",
+		"@openrouter/ai-sdk-provider": "catalog:ui"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

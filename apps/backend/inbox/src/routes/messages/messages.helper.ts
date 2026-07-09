@@ -25,12 +25,23 @@ export interface SendFromInboxParams {
 	}>;
 }
 
+function getLog() {
+	try {
+		return useLogger();
+	} catch {
+		return {
+			info: (msg: string) => console.log(msg),
+			error: (msg: string) => console.error(msg),
+		};
+	}
+}
+
 export async function proxySendToMailService(
 	params: SendFromInboxParams,
 	apiKey: string,
 	cookie?: string,
 ) {
-	const log = useLogger();
+	const log = getLog();
 
 	let resolvedApiKey = apiKey;
 	if (!resolvedApiKey) {

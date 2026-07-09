@@ -13,6 +13,13 @@ export async function replyToMessageController(
 		html?: string;
 		cc?: string | string[];
 		bcc?: string | string[];
+		attachments?: Array<{
+			content?: string;
+			filename?: string;
+			path?: string;
+			content_type?: string;
+			content_id?: string;
+		}>;
 	},
 	apiKey: string,
 	cookie?: string,
@@ -62,6 +69,7 @@ export async function replyToMessageController(
 			html: body.html,
 			cc: body.cc,
 			bcc: body.bcc,
+			attachments: body.attachments,
 			threadId: threadMsg?.threadId || undefined,
 			headers: original.messageId
 				? { "In-Reply-To": original.messageId }
