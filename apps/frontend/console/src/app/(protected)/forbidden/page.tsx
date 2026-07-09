@@ -4,8 +4,21 @@ import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { Logo } from "@reloop/ui/logo";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function ForbiddenPage() {
+	const router = useRouter();
+
+	const handleSignOut = async () => {
+		await authClient.signOut({
+			fetchOptions: {
+				onSuccess: () => {
+					router.push("/login");
+				},
+			},
+		});
+	};
+
 	return (
 		<div className="flex h-dvh flex-col items-center justify-center gap-4 p-6 text-center">
 			<Logo className="h-12" />
@@ -21,7 +34,7 @@ export default function ForbiddenPage() {
 				<Button.Root
 					variant="neutral"
 					mode="stroke"
-					onClick={() => authClient.signOut()}
+					onClick={handleSignOut}
 				>
 					Sign out
 				</Button.Root>
@@ -32,3 +45,4 @@ export default function ForbiddenPage() {
 		</div>
 	);
 }
+

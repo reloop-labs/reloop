@@ -198,7 +198,7 @@ export async function updateOrganizationStatusController({
 
 	await db
 		.update(organization)
-		.set({ status })
+		.set({ status, updatedAt: new Date() })
 		.where(eq(organization.id, organizationId));
 
 	await writeAdminAudit({

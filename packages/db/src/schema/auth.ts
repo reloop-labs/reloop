@@ -88,6 +88,10 @@ export const organization = pgTable("organization", {
 	slug: text("slug").notNull().unique(),
 	logo: text("logo"),
 	createdAt: timestamp("created_at").notNull(),
+	updatedAt: timestamp("updated_at")
+		.notNull()
+		.defaultNow()
+		.$onUpdate(() => new Date()),
 	metadata: text("metadata"),
 	billingEmail: text("billing_email"),
 	billingName: text("billing_name"),
