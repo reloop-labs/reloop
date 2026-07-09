@@ -1,10 +1,12 @@
 import { creditsConfig } from "@reloop/credits/credits.config";
 
-export async function validateSession(cookie: string | null): Promise<{
-	userId: string;
-	organizationId: string;
-	authType: "session";
-} | null> {
+type SessionUser = {
+	id: string;
+	role?: string | null;
+	activeOrganizationId?: string | null;
+};
+
+async function fetchSession(cookie: string | null): Promise<SessionUser | null> {
 	const response = await fetch(
 		`${creditsConfig.BASE_URL}/api/auth/v1/get-session`,
 		{
@@ -19,19 +21,42 @@ export async function validateSession(cookie: string | null): Promise<{
 	if (!response.ok) return null;
 
 	const session = (await response.json()) as {
-		user?: {
-			id: string;
-			activeOrganizationId?: string;
-		};
+		user?: SessionUser;
 	};
 
-	if (session?.user?.activeOrganizationId) {
-		return {
-			userId: session.user.id,
-			organizationId: session.user.activeOrganizationId,
-			authType: "session",
-		};
-	}
+	return session?.user ?? null;
+}
 
-	return null;
+export async function validateSession(cookie: string | null): Promise<{
+	userId: string;
+	organizationId: string;
+	role: string | null;
+	authType: "session";
+} | null> {
+	const user = await fetchSession(cookie);
+	if (!user?.activeOrganizationId) return null;
+
+	return {
+		userId: user.id,
+		organizationId: user.activeOrganizationId,
+		role: user.role ?? null,
+		authType: "session",
+	};
+}
+
+export async function validatePlatformAdmin(cookie: string | null): Promise<{
+	userId: string;
+	role: string;
+	organizationId: string | null;
+	authType: "session";
+} | null> {
+	const user = await fetchSession(cookie);
+	if (!user?.id || user.role !== "admin") return null;
+
+	return {
+		userId: user.id,
+		role: "admin",
+		organizationId: user.activeOrganizationId ?? null,
+		authType: "session",
+	};
 }

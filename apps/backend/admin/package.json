@@ -1,0 +1,33 @@
+{
+	"name": "admin-service",
+	"version": "1.0.0",
+	"main": "src/index.ts",
+	"type": "module",
+	"scripts": {
+		"dev": "bun run --hot src/index.ts",
+		"start": "bun run dist/index.js",
+		"build": "tsdown",
+		"check-types": "tsc --noEmit",
+		"lint": "biome check .",
+		"fix-lint": "biome check --fix .",
+		"format": "biome format ."
+	},
+	"dependencies": {
+		"@elysiajs/cors": "catalog:backend",
+		"@elysiajs/openapi": "catalog:backend",
+		"@paralleldrive/cuid2": "catalog:backend",
+		"@reloop/db": "workspace:*",
+		"dotenv": "catalog:backend",
+		"drizzle-orm": "catalog:db",
+		"elysia": "catalog:backend",
+		"evlog": "catalog:backend",
+		"pg": "catalog:db",
+		"zod": "catalog:ui"
+	},
+	"devDependencies": {
+		"@reloop/tsconfig": "workspace:*",
+		"@types/bun": "catalog:backend",
+		"tsdown": "catalog:backend",
+		"typescript": "catalog:"
+	}
+}

@@ -129,7 +129,10 @@ export const auth = betterAuth({
 	plugins: [
 		jwt(),
 		bearer(),
-		admin(),
+		admin({
+			defaultRole: "user",
+			adminRoles: ["admin"],
+		}),
 		apiKey({ defaultPrefix: "rl" }),
 		lastLoginMethod({
 			cookieName: "better-auth.last_used_login_method",

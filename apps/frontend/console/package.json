@@ -1,0 +1,41 @@
+{
+	"name": "console",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev --turbopack --port=3002",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"dependencies": {
+		"@dot-loaders/react": "catalog:ui",
+		"@hookform/resolvers": "catalog:ui",
+		"@reloop/auth": "workspace:*",
+		"@reloop/tailwind": "workspace:*",
+		"@reloop/ui": "workspace:*",
+		"axios": "catalog:",
+		"babel-plugin-react-compiler": "catalog:ui",
+		"better-auth": "catalog:",
+		"framer-motion": "catalog:ui",
+		"lucide-react": "catalog:ui",
+		"next": "catalog:ui",
+		"next-themes": "catalog:ui",
+		"nuqs": "catalog:ui",
+		"react": "catalog:ui",
+		"react-dom": "catalog:ui",
+		"react-hook-form": "catalog:ui",
+		"sonner": "catalog:ui",
+		"swr": "catalog:ui",
+		"valibot": "catalog:db"
+	},
+	"devDependencies": {
+		"@reloop/tsconfig": "workspace:*",
+		"@tailwindcss/postcss": "catalog:ui",
+		"@types/node": "catalog:",
+		"@types/react": "catalog:ui",
+		"@types/react-dom": "catalog:ui",
+		"tailwindcss": "catalog:ui",
+		"typescript": "catalog:"
+	}
+}

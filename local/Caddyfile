@@ -9,7 +9,7 @@ local.reloop.sh, *.local.reloop.sh {
             header_up X-Forwarded-For {remote}
         }
     }
-    handle /admin* {
+    handle /console* {
         reverse_proxy host.docker.internal:3002 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
@@ -104,6 +104,13 @@ local.reloop.sh, *.local.reloop.sh {
     }
     handle /api/credits* {
         reverse_proxy host.docker.internal:8023 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up X-Forwarded-For {remote}
+        }
+    }
+    handle /api/admin* {
+        reverse_proxy host.docker.internal:8024 {
             header_up Host {host}
             header_up X-Forwarded-Proto {scheme}
             header_up X-Forwarded-For {remote}

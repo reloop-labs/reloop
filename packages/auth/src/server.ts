@@ -24,7 +24,10 @@ export const auth = betterAuth({
 	plugins: [
 		jwt(),
 		bearer(),
-		admin(),
+		admin({
+			defaultRole: "user",
+			adminRoles: ["admin"],
+		}),
 		apiKey({ defaultPrefix: "rl" }),
 		organization({
 			teams: {

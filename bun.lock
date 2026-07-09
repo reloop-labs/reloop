@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "reloop",
@@ -9,6 +8,28 @@
         "husky": "9.1.7",
         "lint-staged": "16.2.4",
         "turbo": "2.10.3",
+      },
+    },
+    "apps/backend/admin": {
+      "name": "admin-service",
+      "version": "1.0.0",
+      "dependencies": {
+        "@elysiajs/cors": "catalog:backend",
+        "@elysiajs/openapi": "catalog:backend",
+        "@paralleldrive/cuid2": "catalog:backend",
+        "@reloop/db": "workspace:*",
+        "dotenv": "catalog:backend",
+        "drizzle-orm": "catalog:db",
+        "elysia": "catalog:backend",
+        "evlog": "catalog:backend",
+        "pg": "catalog:db",
+        "zod": "catalog:ui",
+      },
+      "devDependencies": {
+        "@reloop/tsconfig": "workspace:*",
+        "@types/bun": "catalog:backend",
+        "tsdown": "catalog:backend",
+        "typescript": "catalog:",
       },
     },
     "apps/backend/api-key": {
@@ -562,6 +583,40 @@
         "@types/pg": "catalog:db",
         "drizzle-kit": "catalog:db",
         "tsdown": "catalog:backend",
+        "typescript": "catalog:",
+      },
+    },
+    "apps/frontend/console": {
+      "name": "console",
+      "version": "0.1.0",
+      "dependencies": {
+        "@dot-loaders/react": "catalog:ui",
+        "@hookform/resolvers": "catalog:ui",
+        "@reloop/auth": "workspace:*",
+        "@reloop/tailwind": "workspace:*",
+        "@reloop/ui": "workspace:*",
+        "axios": "catalog:",
+        "babel-plugin-react-compiler": "catalog:ui",
+        "better-auth": "catalog:",
+        "framer-motion": "catalog:ui",
+        "lucide-react": "catalog:ui",
+        "next": "catalog:ui",
+        "next-themes": "catalog:ui",
+        "nuqs": "catalog:ui",
+        "react": "catalog:ui",
+        "react-dom": "catalog:ui",
+        "react-hook-form": "catalog:ui",
+        "sonner": "catalog:ui",
+        "swr": "catalog:ui",
+        "valibot": "catalog:db",
+      },
+      "devDependencies": {
+        "@reloop/tsconfig": "workspace:*",
+        "@tailwindcss/postcss": "catalog:ui",
+        "@types/node": "catalog:",
+        "@types/react": "catalog:ui",
+        "@types/react-dom": "catalog:ui",
+        "tailwindcss": "catalog:ui",
         "typescript": "catalog:",
       },
     },
@@ -2469,6 +2524,8 @@
 
     "acorn-jsx": ["acorn-jsx@5.3.2", "", { "peerDependencies": { "acorn": "^6.0.0 || ^7.0.0 || ^8.0.0" } }, "sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ=="],
 
+    "admin-service": ["admin-service@workspace:apps/backend/admin"],
+
     "ai": ["ai@6.0.138", "", { "dependencies": { "@ai-sdk/gateway": "3.0.80", "@ai-sdk/provider": "3.0.8", "@ai-sdk/provider-utils": "4.0.21", "@opentelemetry/api": "1.9.0" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-49OfPe0f5uxJ6jUdA5BBXjIinP6+ZdYfAtpF2aEH64GA5wPcxH2rf/TBUQQ0bbamBz/D+TLMV18xilZqOC+zaA=="],
 
     "ajv": ["ajv@8.17.1", "", { "dependencies": { "fast-deep-equal": "^3.1.3", "fast-uri": "^3.0.1", "json-schema-traverse": "^1.0.0", "require-from-string": "^2.0.2" } }, "sha512-B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g=="],
@@ -2630,6 +2687,8 @@
     "conf": ["conf@15.1.0", "", { "dependencies": { "ajv": "^8.17.1", "ajv-formats": "^3.0.1", "atomically": "^2.0.3", "debounce-fn": "^6.0.0", "dot-prop": "^10.0.0", "env-paths": "^3.0.0", "json-schema-typed": "^8.0.1", "semver": "^7.7.2", "uint8array-extras": "^1.5.0" } }, "sha512-Uy5YN9KEu0WWDaZAVJ5FAmZoaJt9rdK6kH+utItPyGsCqCgaTKkrmZx3zoE0/3q6S3bcp3Ihkk+ZqPxWxFK5og=="],
 
     "confbox": ["confbox@0.2.4", "", {}, "sha512-ysOGlgTFbN2/Y6Cg3Iye8YKulHw+R2fNXHrgSmXISQdMnomY6eNDprVdW9R5xBguEqI954+S6709UyiO7B+6OQ=="],
+
+    "console": ["console@workspace:apps/frontend/console"],
 
     "contacts": ["contacts@workspace:apps/backend/contacts"],
 
