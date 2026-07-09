@@ -4,9 +4,9 @@ import { useAgentInbox } from "@fe/dashboard/app/(protected)/inbox/components/ag
 import type { AgentMailbox } from "@fe/dashboard/app/(protected)/inbox/types";
 import { getAvatarInitial } from "@fe/dashboard/utils/avatar";
 import { cn } from "@reloop/ui/cn";
-import { Check, Copy, Plus } from "lucide-react";
+import { Check, Copy, Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 function mailboxSortKey(m: AgentMailbox) {
@@ -46,19 +46,19 @@ const MailboxAvatar = ({
 		type="button"
 		onClick={onClick}
 		title={mailbox.email}
-		className="relative flex shrink-0 cursor-pointer items-center rounded-[5px] focus:outline-none"
+		className="relative flex shrink-0 cursor-pointer items-center rounded-lg focus:outline-none"
 	>
 		<div
 			className={cn(
-				"relative rounded-[5px]",
+				"relative rounded-lg",
 				active && "ring-2 ring-[#006ffe] ring-offset-0",
 			)}
 		>
-			<div className="flex size-7 items-center justify-center rounded-[5px] bg-[#2B2B2B] font-medium text-[10px] text-white uppercase">
+			<div className="flex size-7 items-center justify-center rounded-lg bg-[#2B2B2B] font-medium text-[10px] text-white uppercase">
 				{getAvatarInitial(mailbox.label, mailbox.email)}
 			</div>
 			{active && (
-				<CircleCheckBadge className="absolute -right-2 -bottom-2 z-10 size-4 rounded-full bg-[var(--sidebar-background)]" />
+				<CircleCheckBadge className="-right-2 -bottom-2 absolute z-10 size-4 rounded-full bg-[var(--sidebar-background)]" />
 			)}
 		</div>
 	</button>
@@ -74,8 +74,25 @@ export const InboxNavUser = ({
 	onAddMailbox: () => void;
 }) => {
 	const router = useRouter();
-	const { mailboxes } = useAgentInbox();
+	const { mailboxes, updateMailboxDisplayName } = useAgentInbox();
 	const [copied, setCopied] = useState(false);
+	const [isEditingName, setIsEditingName] = useState(false);
+	const [nameDraft, setNameDraft] = useState("");
+	const [isSavingName, setIsSavingName] = useState(false);
+	const [showNameSaved, setShowNameSaved] = useState(false);
+	const nameInputRef = useRef<HTMLInputElement>(null);
+	const skipNameSaveRef = useRef(false);
+	const nameSavedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+		null,
+	);
+
+	useEffect(() => {
+		return () => {
+			if (nameSavedTimeoutRef.current) {
+				clearTimeout(nameSavedTimeoutRef.current);
+			}
+		};
+	}, []);
 
 	const sortedMailboxes = useMemo(
 		() =>
@@ -85,7 +102,14 @@ export const InboxNavUser = ({
 		[mailboxes],
 	);
 
-	const displayName = mailbox.label || mailbox.email.split("@")[0];
+	const displayName = mailbox.label || mailbox.email?.split("@")[0] || "";
+
+	useEffect(() => {
+		if (isEditingName) {
+			nameInputRef.current?.focus();
+			nameInputRef.current?.select();
+		}
+	}, [isEditingName]);
 
 	const switchMailbox = (id: string) => {
 		if (id === mailbox.id) return;
@@ -99,11 +123,63 @@ export const InboxNavUser = ({
 		setTimeout(() => setCopied(false), 2000);
 	};
 
+	const startEditingName = () => {
+		if (isSavingName) return;
+		skipNameSaveRef.current = false;
+		setShowNameSaved(false);
+		if (nameSavedTimeoutRef.current) {
+			clearTimeout(nameSavedTimeoutRef.current);
+			nameSavedTimeoutRef.current = null;
+		}
+		setNameDraft(displayName);
+		setIsEditingName(true);
+	};
+
+	const cancelEditingName = () => {
+		skipNameSaveRef.current = true;
+		setIsEditingName(false);
+		setNameDraft("");
+	};
+
+	const saveDisplayName = async () => {
+		if (skipNameSaveRef.current) {
+			skipNameSaveRef.current = false;
+			return;
+		}
+
+		const trimmed = nameDraft.trim();
+		if (!trimmed || trimmed === displayName) {
+			setIsEditingName(false);
+			setNameDraft("");
+			return;
+		}
+
+		setIsSavingName(true);
+		setShowNameSaved(false);
+		try {
+			await updateMailboxDisplayName(mailbox.id, trimmed);
+			setIsEditingName(false);
+			setNameDraft("");
+			setShowNameSaved(true);
+			if (nameSavedTimeoutRef.current) {
+				clearTimeout(nameSavedTimeoutRef.current);
+			}
+			nameSavedTimeoutRef.current = setTimeout(() => {
+				setShowNameSaved(false);
+				nameSavedTimeoutRef.current = null;
+			}, 1200);
+		} catch {
+			// Stay in edit mode so the user can retry
+		} finally {
+			setIsSavingName(false);
+		}
+	};
+
 	const addButton = (
 		<button
 			type="button"
 			onClick={onAddMailbox}
-			className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-[5px] border border-dashed border-[#929292]/50 bg-transparent px-0 text-[#929292] transition duration-200 ease-out hover:bg-[var(--inbox-hover)] hover:text-mail-foreground focus:outline-none active:scale-[0.97] dark:bg-[#262626]"
+			className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-[#929292]/50 border-dashed bg-transparent px-0 text-[#929292] transition duration-200 ease-out hover:bg-[var(--inbox-hover)] hover:text-mail-foreground focus:outline-none active:scale-[0.97] dark:bg-[#262626]"
 			aria-label="Add mailbox"
 		>
 			<Plus className="size-4" />
@@ -137,9 +213,53 @@ export const InboxNavUser = ({
 				{addButton}
 			</div>
 
-			<div className="mt-2 flex w-full flex-col gap-1.5 text-left">
-				<div className="flex items-center gap-1 font-medium text-[14px] text-mail-foreground leading-none">
-					<p className="max-w-[14.5ch] truncate">{displayName}</p>
+			<div className="mt-2 flex w-full flex-col gap-1 text-left">
+				<div className="flex min-h-[1.25rem] items-center gap-1.5 font-medium text-[14px] text-mail-foreground leading-snug">
+					{isEditingName ? (
+						<input
+							ref={nameInputRef}
+							value={nameDraft}
+							onChange={(e) => setNameDraft(e.target.value)}
+							onBlur={() => {
+								void saveDisplayName();
+							}}
+							onKeyDown={(e) => {
+								if (e.key === "Enter") {
+									e.preventDefault();
+									void saveDisplayName();
+								} else if (e.key === "Escape") {
+									e.preventDefault();
+									cancelEditingName();
+								}
+							}}
+							disabled={isSavingName}
+							maxLength={255}
+							aria-label="Mailbox display name"
+							className="min-w-0 flex-1 max-w-[14.5ch] rounded-sm border-0 bg-transparent p-0 font-medium text-[14px] text-mail-foreground leading-snug outline-none ring-1 ring-[#006ffe]/60 focus:ring-[#006ffe] disabled:opacity-70"
+						/>
+					) : (
+						<button
+							type="button"
+							onClick={startEditingName}
+							title="Click to rename"
+							className="max-w-[14.5ch] cursor-text truncate text-left focus:outline-none"
+						>
+							{displayName}
+						</button>
+					)}
+					{(isSavingName || showNameSaved) && (
+						<span
+							className="flex size-3.5 shrink-0 items-center justify-center"
+							aria-live="polite"
+							aria-label={isSavingName ? "Saving" : "Saved"}
+						>
+							{isSavingName ? (
+								<Loader2 className="size-3 animate-spin text-mail-muted" />
+							) : (
+								<Check className="size-3 text-green-500" />
+							)}
+						</span>
+					)}
 				</div>
 				<div className="flex w-full items-center gap-1.5">
 					<button
@@ -148,7 +268,7 @@ export const InboxNavUser = ({
 							e.stopPropagation();
 							handleCopy();
 						}}
-						className="h-5 max-w-[170px] cursor-pointer truncate text-left text-[13px] text-mail-muted leading-none transition-colors hover:text-mail-foreground focus:outline-none"
+						className="h-5 max-w-[170px] cursor-pointer truncate text-left text-[13px] text-mail-muted leading-snug transition-colors hover:text-mail-foreground focus:outline-none"
 						title="Copy email address"
 					>
 						{mailbox.email}

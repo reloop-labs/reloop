@@ -265,8 +265,8 @@ export const InboxSidebar = ({
 					<FancyButton.Root
 						onClick={() => setIsComposeOpen(true)}
 						variant="blue"
-						size="small"
-						className={cn("mb-1.5 w-full rounded-xl", collapsed && "px-0")}
+						size="xsmall"
+						className={cn("mt-3 mb-1.5 w-full", collapsed && "px-0")}
 					>
 						<FancyButton.Icon
 							as={PencilIcon}

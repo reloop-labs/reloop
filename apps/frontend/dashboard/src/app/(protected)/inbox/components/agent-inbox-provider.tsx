@@ -115,6 +115,7 @@ interface AgentInboxContextValue {
 	isLoadingThreads: boolean;
 	getMailbox: (id: string) => AgentMailbox | undefined;
 	addMailbox: (input: NewAgentAddressInput) => Promise<AgentMailbox>;
+	updateMailboxDisplayName: (id: string, displayName: string) => Promise<void>;
 	refresh: () => Promise<void>;
 	markMessageRead: (id: string, isRead: boolean) => Promise<void>;
 	deleteMessage: (id: string) => Promise<void>;
@@ -551,6 +552,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 					domainId: input.domainId,
 					email,
 					quota: "5 GB",
+					displayName: input.label,
 				}),
 			});
 
@@ -576,6 +578,35 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 			await mutateMailboxes();
 			return newMailbox;
+		},
+		[mutateMailboxes],
+	);
+
+	const updateMailboxDisplayName = useCallback(
+		async (id: string, displayName: string) => {
+			const trimmed = displayName.trim();
+			if (!trimmed) {
+				throw new Error("Display name is required");
+			}
+
+			const res = await fetch(`/api/inbox/v1/mailboxes/${id}`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ displayName: trimmed }),
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to update mailbox name");
+			}
+
+			await mutateMailboxes(
+				(current) =>
+					current?.map((mb) =>
+						mb.id === id ? { ...mb, displayName: trimmed } : mb,
+					),
+				{ revalidate: true },
+			);
 		},
 		[mutateMailboxes],
 	);
@@ -1063,6 +1094,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			isLoadingThreads,
 			getMailbox,
 			addMailbox,
+			updateMailboxDisplayName,
 			refresh,
 			markMessageRead,
 			deleteMessage,
@@ -1095,6 +1127,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			isLoadingThreads,
 			getMailbox,
 			addMailbox,
+			updateMailboxDisplayName,
 			refresh,
 			markMessageRead,
 			deleteMessage,
