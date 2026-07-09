@@ -12,6 +12,39 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
+const RING_GRADIENTS_4COL = [
+	["#f43f5e", "#ec4899", "#d946ef", "#8b5cf6"], // Rose/Pink base
+	["#ec4899", "#d946ef", "#a855f7", "#6366f1"], // Pink/Fuchsia base
+	["#d946ef", "#a855f7", "#8b5cf6", "#3b82f6"], // Fuchsia/Purple base
+	["#a855f7", "#6366f1", "#4f46e5", "#06b6d4"], // Purple/Indigo base
+	["#6366f1", "#3b82f6", "#0ea5e9", "#0d9488"], // Indigo/Blue base
+	["#3b82f6", "#06b6d4", "#14b8a6", "#10b981"], // Blue/Cyan base
+	["#06b6d4", "#14b8a6", "#10b981", "#84cc16"], // Cyan/Teal base
+	["#14b8a6", "#10b981", "#84cc16", "#eab308"], // Teal/Emerald base
+	["#10b981", "#22c55e", "#84cc16", "#f97316"], // Emerald/Green base
+	["#22c55e", "#84cc16", "#eab308", "#ef4444"], // Green/Lime base
+	["#84cc16", "#eab308", "#f97316", "#ec4899"], // Lime/Yellow base
+	["#eab308", "#f59e0b", "#f97316", "#f43f5e"], // Yellow/Amber base
+	["#f59e0b", "#f97316", "#ef4444", "#ec4899"], // Amber/Orange base
+	["#f97316", "#ef4444", "#ec4899", "#a855f7"], // Orange/Red base
+	["#ef4444", "#f43f5e", "#ec4899", "#8b5cf6"], // Red/Rose base
+	["#0ea5e9", "#3b82f6", "#6366f1", "#a855f7"], // Sky/Blue base
+	["#8b5cf6", "#a855f7", "#d946ef", "#ec4899"], // Violet/Purple base
+	["#64748b", "#4b5563", "#374151", "#1f2937"], // Slate/Gray base
+] as const;
+
+function getRingGradientStyle(email: string) {
+	let hash = 5381;
+	for (let i = 0; i < email.length; i++) {
+		hash = (hash * 33) ^ email.charCodeAt(i);
+	}
+	const index = Math.abs(hash) % RING_GRADIENTS_4COL.length;
+	const colors = RING_GRADIENTS_4COL[index] || ["#f43f5e", "#ec4899", "#d946ef", "#8b5cf6"];
+	return {
+		background: `linear-gradient(135deg, ${colors[0]}, ${colors[1]}, ${colors[2]}, ${colors[3]})`,
+	};
+}
+
 export const InboxNavUser = ({
 	mailbox,
 	collapsed,
@@ -48,7 +81,7 @@ export const InboxNavUser = ({
 	if (collapsed) {
 		return (
 			<div className="relative mx-auto flex h-9 w-9 items-center justify-center shrink-0">
-				<div className="absolute inset-0 rounded-[12px] bg-gradient-to-tr from-[#A855F7] via-[#EC4899] to-[#FF9500]" />
+				<div className="absolute inset-0 rounded-[12px]" style={getRingGradientStyle(mailbox.email)} />
 				<div className="absolute h-8 w-8 rounded-[10px] bg-[var(--sidebar-background)]" />
 				<button
 					type="button"
@@ -73,7 +106,7 @@ export const InboxNavUser = ({
 		<div className="flex flex-col gap-2">
 			<div className="flex items-center gap-2">
 				<div className="relative flex h-9 w-9 items-center justify-center shrink-0">
-					<div className="absolute inset-0 rounded-[12px] bg-gradient-to-tr from-[#A855F7] via-[#EC4899] to-[#FF9500]" />
+					<div className="absolute inset-0 rounded-[12px]" style={getRingGradientStyle(mailbox.email)} />
 					<div className="absolute h-8 w-8 rounded-[10px] bg-[var(--sidebar-background)]" />
 					<button
 						type="button"
