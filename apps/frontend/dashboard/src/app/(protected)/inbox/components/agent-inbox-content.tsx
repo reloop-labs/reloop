@@ -335,7 +335,12 @@ export const AgentInboxContent = ({
 
 	return (
 		<>
-			<InboxCommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+			<InboxCommandPalette
+				open={paletteOpen}
+				onOpenChange={setPaletteOpen}
+				threads={filteredThreads}
+				onSelectThread={handleSelectThread}
+			/>
 			<SnoozeDialog
 				open={!!snoozeThreadTarget}
 				onOpenChange={(open) => {
