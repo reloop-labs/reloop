@@ -1,9 +1,18 @@
 "use client";
 
-import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
+import * as Popover from "@reloop/ui/popover";
+import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect, useState } from "react";
+import {
+	Command,
+	CornerDownLeft,
+	Loader2,
+	Paperclip,
+	Plus,
+	X as XIcon,
+} from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -34,14 +43,26 @@ const formatBytes = (bytes: number, decimals = 1) => {
 	return `${Number.parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`;
 };
 
+const attachmentIcon = (contentType: string) => {
+	if (contentType.includes("pdf")) return "📄";
+	if (contentType.includes("excel") || contentType.includes("spreadsheet"))
+		return "📊";
+	if (contentType.includes("word") || contentType.includes("wordprocessing"))
+		return "📝";
+	if (contentType.startsWith("image/")) return "🖼️";
+	return "📎";
+};
+
 export const ComposeModal = ({
 	isOpen,
 	onClose,
 	mailbox,
 }: ComposeModalProps) => {
 	const { sendMessage } = useAgentInbox();
+	const bodyRef = useRef<HTMLTextAreaElement | null>(null);
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
-	const { control, handleSubmit, register, reset, watch } =
+	const { control, handleSubmit, register, reset, watch, setFocus } =
 		useForm<ComposeFormValues>({
 			defaultValues: {
 				to: [],
@@ -54,12 +75,9 @@ export const ComposeModal = ({
 
 	const to = watch("to") || [];
 
-	// UI controls
 	const [showCc, setShowCc] = useState(false);
 	const [showBcc, setShowBcc] = useState(false);
 	const [isSending, setIsSending] = useState(false);
-
-	// Real attachment state tracking upload progress and URL/path metadata
 	const [attachments, setAttachments] = useState<
 		Array<{
 			id: string;
@@ -72,49 +90,40 @@ export const ComposeModal = ({
 		}>
 	>([]);
 
-	// Reset form when modal opens/closes
 	useEffect(() => {
-		if (isOpen) {
-			reset({
-				to: [],
-				subject: "",
-				body: "",
-				cc: [],
-				bcc: [],
-			});
-			setShowCc(false);
-			setShowBcc(false);
-			setAttachments([]);
-		}
-	}, [isOpen, reset]);
+		if (!isOpen) return;
+		reset({ to: [], subject: "", body: "", cc: [], bcc: [] });
+		setShowCc(false);
+		setShowBcc(false);
+		setAttachments([]);
+		const t = window.setTimeout(() => setFocus("to"), 50);
+		return () => window.clearTimeout(t);
+	}, [isOpen, reset, setFocus]);
 
 	const uploadFile = useCallback(async (file: File) => {
 		const tempId = Math.random().toString();
-		const newAttachment = {
-			id: tempId,
-			name: file.name,
-			size: formatBytes(file.size),
-			url: "",
-			path: "",
-			content_type: file.type || "application/octet-stream",
-			isUploading: true,
-		};
-		setAttachments((prev) => [...prev, newAttachment]);
+		setAttachments((prev) => [
+			...prev,
+			{
+				id: tempId,
+				name: file.name,
+				size: formatBytes(file.size),
+				url: "",
+				path: "",
+				content_type: file.type || "application/octet-stream",
+				isUploading: true,
+			},
+		]);
 
 		try {
 			const formData = new FormData();
 			formData.append("file", file);
-
 			const res = await fetch("/api/upload/v1/upload", {
 				method: "POST",
 				body: formData,
 			});
-
-			if (!res.ok) {
-				throw new Error("Upload failed");
-			}
-
-			const data = await res.json();
+			if (!res.ok) throw new Error("Upload failed");
+			const data = (await res.json()) as { url: string; path: string };
 			setAttachments((prev) =>
 				prev.map((att) =>
 					att.id === tempId
@@ -127,7 +136,7 @@ export const ComposeModal = ({
 						: att,
 				),
 			);
-		} catch (_error) {
+		} catch {
 			toast.error(`Failed to upload ${file.name}`);
 			setAttachments((prev) => prev.filter((att) => att.id !== tempId));
 		}
@@ -140,13 +149,13 @@ export const ComposeModal = ({
 					toast.error(`${file.name} is too large. Max size is 10MB.`);
 					continue;
 				}
-				uploadFile(file);
+				void uploadFile(file);
 			}
 		},
 		[uploadFile],
 	);
 
-	const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
+	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		onDrop,
 		noClick: true,
 		noKeyboard: true,
@@ -154,50 +163,39 @@ export const ComposeModal = ({
 
 	const onSubmit = async (data: ComposeFormValues) => {
 		if (data.to.length === 0) {
-			toast.error("Please specify at least one recipient in the 'To' field.");
+			toast.error("Please specify at least one recipient.");
 			return;
 		}
-
-		// Validation of all emails
-		const hasInvalidTo = data.to.some((email) => !validateEmail(email));
-		const hasInvalidCc = data.cc.some((email) => !validateEmail(email));
-		const hasInvalidBcc = data.bcc.some((email) => !validateEmail(email));
-
-		if (hasInvalidTo || hasInvalidCc || hasInvalidBcc) {
+		if (
+			data.to.some((e) => !validateEmail(e)) ||
+			data.cc.some((e) => !validateEmail(e)) ||
+			data.bcc.some((e) => !validateEmail(e))
+		) {
 			toast.error("Please fix invalid email addresses before sending.");
 			return;
 		}
-
 		if (attachments.some((att) => att.isUploading)) {
-			toast.error("Please wait for all attachments to finish uploading.");
+			toast.error("Please wait for attachments to finish uploading.");
 			return;
 		}
 
 		setIsSending(true);
 		try {
-			const toEmails = data.to;
-			const ccEmails = data.cc.length > 0 ? data.cc : undefined;
-			const bccEmails = data.bcc.length > 0 ? data.bcc : undefined;
-
-			// Map attachments payload
-			const attachmentsPayload = attachments
-				.filter((att) => !att.isUploading && att.url)
-				.map((att) => ({
-					filename: att.name,
-					path: att.url,
-					content_type: att.content_type,
-				}));
-
 			await sendMessage({
 				mailboxId: mailbox.id,
-				to: toEmails,
+				to: data.to,
 				subject: data.subject || "(No Subject)",
 				text: data.body,
-				cc: ccEmails,
-				bcc: bccEmails,
-				attachments: attachmentsPayload,
+				cc: data.cc.length > 0 ? data.cc : undefined,
+				bcc: data.bcc.length > 0 ? data.bcc : undefined,
+				attachments: attachments
+					.filter((att) => !att.isUploading && att.url)
+					.map((att) => ({
+						filename: att.name,
+						path: att.url,
+						content_type: att.content_type,
+					})),
 			});
-
 			toast.success("Email sent successfully!");
 			onClose();
 		} catch (err) {
@@ -211,11 +209,19 @@ export const ComposeModal = ({
 		setAttachments((prev) => prev.filter((_, idx) => idx !== indexToRemove));
 	};
 
+	const { ref: bodyRegisterRef, ...bodyRegister } = register("body");
+
 	return (
-		<Modal.Root open={isOpen} onOpenChange={onClose}>
+		<Modal.Root
+			open={isOpen}
+			onOpenChange={(open) => {
+				if (!open && !isSending) onClose();
+			}}
+		>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-mail-border/40 bg-panel-light p-0 shadow-2xl sm:max-w-[620px] dark:bg-panel-dark"
 				showClose={false}
+				overlayClassName="bg-black/50 p-4"
+				className="flex w-full max-w-[750px] flex-col items-center gap-1 border-none bg-transparent p-0 shadow-none"
 				onEscapeKeyDown={(e) => {
 					if (isSending) e.preventDefault();
 				}}
@@ -223,380 +229,319 @@ export const ComposeModal = ({
 					if (isSending) e.preventDefault();
 				}}
 			>
+				{/* Zero-style esc chip above the composer */}
+				<div className="flex w-full justify-start">
+					<button
+						type="button"
+						onClick={onClose}
+						disabled={isSending}
+						className="flex cursor-pointer items-center gap-1 rounded-lg bg-[#F0F0F0] px-2 py-1 transition-colors hover:bg-gray-100 disabled:opacity-40 dark:bg-[var(--inbox-muted-bg)] dark:hover:bg-[var(--inbox-control-hover)]"
+					>
+						<XIcon className="mt-0.5 h-3.5 w-3.5 text-mail-muted" />
+						<span className="font-medium text-mail-muted text-sm dark:text-white">
+							esc
+						</span>
+					</button>
+				</div>
+
 				<form
 					onSubmit={handleSubmit(onSubmit)}
 					{...getRootProps()}
-					className="relative flex flex-col"
+					className={cn(
+						"relative mb-12 flex max-h-[min(500px,80dvh)] w-full flex-col overflow-hidden rounded-2xl border border-[#E7E7E7] bg-[#FAFAFA] shadow-sm dark:border-[#252525] dark:bg-[#202020]",
+					)}
 				>
 					<input {...getInputProps()} />
+					<input
+						ref={fileInputRef}
+						type="file"
+						className="hidden"
+						multiple
+						accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+						onChange={(e) => {
+							const files = e.target.files;
+							if (files) void onDrop(Array.from(files));
+							e.target.value = "";
+						}}
+					/>
+
 					<AnimatePresence>
 						{isDragActive && (
 							<motion.div
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
-								className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-panel-light/85 backdrop-blur-sm dark:bg-panel-dark/85"
+								className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-3 rounded-2xl bg-[#FAFAFA]/90 backdrop-blur-sm dark:bg-[#202020]/90"
 							>
-								<div className="flex h-16 w-16 animate-pulse items-center justify-center rounded-2xl border-2 border-[#18181b] border-dashed dark:border-white">
-									<svg
-										className="h-7 w-7 text-mail-foreground text-mail-foreground"
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										strokeWidth="2"
-										strokeLinecap="round"
-										strokeLinejoin="round"
-									>
-										<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-									</svg>
-								</div>
-								<p className="font-semibold text-base text-mail-foreground text-mail-foreground">
+								<Paperclip className="h-7 w-7 text-mail-muted" />
+								<p className="font-medium text-mail-foreground text-sm">
 									Drop files here to attach
 								</p>
 							</motion.div>
 						)}
 					</AnimatePresence>
-					{/* Top bar Header */}
-					<div className="flex items-center justify-between border-mail-border/60 border-b px-5 py-4 border-mail-border">
-						<Modal.Title className="font-semibold text-sm text-mail-foreground text-mail-foreground">
-							New email
-						</Modal.Title>
-						<div className="flex items-center gap-1">
-							{/* Close Button */}
-							<motion.button
-								whileHover={{ scale: 1.08 }}
-								whileTap={{ scale: 0.92 }}
-								type="button"
-								onClick={onClose}
-								title="Close"
-								className="flex h-7 w-7 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-[var(--inbox-hover)]"
-							>
-								<Icon name="cross" className="h-3.5 w-3.5" />
-							</motion.button>
-						</div>
-					</div>
 
-					{/* Agent Provenance Row */}
-					<div className="flex items-center border-mail-border/40 border-b bg-[var(--inbox-compose-bar)] px-5 py-2.5">
-						<div className="flex items-center gap-2 font-medium text-[#727d6d] text-xs dark:text-[#9ea899]">
-							<svg
-								className="h-4 w-4 text-[#727d6d] dark:text-[#9ea899]"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								strokeWidth="2"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-								/>
-							</svg>
-							<span>
-								Sending as <strong className="font-semibold">human</strong> ·
-								won't pass through the agent
-							</span>
-						</div>
-					</div>
-
-					{/* Field Inputs */}
-					<div className="flex flex-col text-sm">
-						{/* From Row */}
-						<div className="flex items-center border-mail-border/50 border-b px-5 py-2.5 border-mail-border/60">
-							<span className="w-16 select-none text-mail-muted">From</span>
-							<input
-								type="text"
-								value={mailbox.email}
-								readOnly
-								className="flex-1 cursor-default select-none bg-transparent text-mail-foreground outline-none text-mail-foreground"
-							/>
-						</div>
-
-						{/* To Row */}
-						<div className="flex items-start border-mail-border/50 border-b px-5 py-1.5 border-mail-border/60">
-							<span className="w-16 select-none py-2 text-mail-muted">
-								To
-							</span>
-							<Controller
-								name="to"
-								control={control}
-								render={({ field }) => (
-									<EmailPillsInput
-										emails={field.value}
-										onChange={field.onChange}
-										placeholder="Recipient email address"
-										disabled={isSending}
+					<div className="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto rounded-2xl">
+						{/* To / Cc / Bcc */}
+						<div className="shrink-0 overflow-visible border-[#E7E7E7] border-b pb-2 dark:border-[#252525]">
+							<div className="flex justify-between px-3 pt-3">
+								<div className="flex min-w-0 w-full items-center gap-2">
+									<p className="shrink-0 font-medium text-[#8C8C8C] text-sm">
+										To:
+									</p>
+									<Controller
+										name="to"
+										control={control}
+										render={({ field }) => (
+											<EmailPillsInput
+												emails={field.value}
+												onChange={field.onChange}
+												placeholder="Enter email address"
+												disabled={isSending}
+											/>
+										)}
 									/>
-								)}
-							/>
-							<div className="flex select-none items-center gap-2.5 py-2 pl-2 font-mono text-mail-muted text-xs">
-								<motion.button
-									whileHover={{ scale: 1.05 }}
-									whileTap={{ scale: 0.95 }}
-									type="button"
-									onClick={() => setShowCc(!showCc)}
-									className={`rounded px-1 py-0.5 transition-colors hover:text-mail-foreground hover:text-mail-foreground ${
-										showCc
-											? "font-semibold text-mail-foreground text-mail-foreground"
-											: ""
-									}`}
-								>
-									Cc
-								</motion.button>
-								<motion.button
-									whileHover={{ scale: 1.05 }}
-									whileTap={{ scale: 0.95 }}
-									type="button"
-									onClick={() => setShowBcc(!showBcc)}
-									className={`rounded px-1 py-0.5 transition-colors hover:text-mail-foreground hover:text-mail-foreground ${
-										showBcc
-											? "font-semibold text-mail-foreground text-mail-foreground"
-											: ""
-									}`}
-								>
-									Bcc
-								</motion.button>
+								</div>
+								<div className="flex shrink-0 items-center gap-2">
+									<button
+										type="button"
+										tabIndex={-1}
+										onClick={() => setShowCc((v) => !v)}
+										className={cn(
+											"cursor-pointer rounded-sm px-1 py-0.5 font-medium text-[#8C8C8C] text-sm transition-colors hover:bg-gray-50 hover:text-[#A8A8A8] dark:hover:bg-[var(--inbox-control-hover)]",
+											showCc && "text-mail-foreground",
+										)}
+									>
+										Cc
+									</button>
+									<button
+										type="button"
+										tabIndex={-1}
+										onClick={() => setShowBcc((v) => !v)}
+										className={cn(
+											"cursor-pointer rounded-sm px-1 py-0.5 font-medium text-[#8C8C8C] text-sm transition-colors hover:bg-gray-50 hover:text-[#A8A8A8] dark:hover:bg-[var(--inbox-control-hover)]",
+											showBcc && "text-mail-foreground",
+										)}
+									>
+										Bcc
+									</button>
+									<button
+										type="button"
+										tabIndex={-1}
+										onClick={onClose}
+										disabled={isSending}
+										className="cursor-pointer rounded-sm px-1 py-0.5 text-[#8C8C8C] transition-colors hover:bg-gray-50 hover:text-[#A8A8A8] dark:hover:bg-[var(--inbox-control-hover)]"
+										aria-label="Close"
+									>
+										<XIcon className="h-3.5 w-3.5 text-[#9A9A9A]" />
+									</button>
+								</div>
 							</div>
+
+							{(showCc || showBcc) && (
+								<div className="flex flex-col gap-2 pt-2">
+									{showCc && (
+										<div className="flex items-center gap-2 px-3">
+											<p className="shrink-0 font-medium text-[#8C8C8C] text-sm">
+												Cc:
+											</p>
+											<Controller
+												name="cc"
+												control={control}
+												render={({ field }) => (
+													<EmailPillsInput
+														emails={field.value}
+														onChange={field.onChange}
+														placeholder="Enter email for Cc"
+														disabled={isSending}
+													/>
+												)}
+											/>
+										</div>
+									)}
+									{showBcc && (
+										<div className="flex items-center gap-2 px-3">
+											<p className="shrink-0 font-medium text-[#8C8C8C] text-sm">
+												Bcc:
+											</p>
+											<Controller
+												name="bcc"
+												control={control}
+												render={({ field }) => (
+													<EmailPillsInput
+														emails={field.value}
+														onChange={field.onChange}
+														placeholder="Enter email for Bcc"
+														disabled={isSending}
+													/>
+												)}
+											/>
+										</div>
+									)}
+								</div>
+							)}
 						</div>
 
-						{/* Cc Row (Conditional) */}
-						<AnimatePresence initial={false}>
-							{showCc && (
-								<motion.div
-									initial={{ height: 0, opacity: 0 }}
-									animate={{ height: "auto", opacity: 1 }}
-									exit={{ height: 0, opacity: 0 }}
-									transition={{ duration: 0.2, ease: "easeInOut" }}
-									className="overflow-hidden"
-								>
-									<div className="flex items-start border-mail-border/50 border-b px-5 py-1.5 border-mail-border/60">
-										<span className="w-16 select-none py-2 text-mail-muted">
-											Cc
-										</span>
-										<Controller
-											name="cc"
-											control={control}
-											render={({ field }) => (
-												<EmailPillsInput
-													emails={field.value}
-													onChange={field.onChange}
-													placeholder="cc@example.com"
-													disabled={isSending}
-												/>
-											)}
-										/>
-									</div>
-								</motion.div>
-							)}
-						</AnimatePresence>
-
-						{/* Bcc Row (Conditional) */}
-						<AnimatePresence initial={false}>
-							{showBcc && (
-								<motion.div
-									initial={{ height: 0, opacity: 0 }}
-									animate={{ height: "auto", opacity: 1 }}
-									exit={{ height: 0, opacity: 0 }}
-									transition={{ duration: 0.2, ease: "easeInOut" }}
-									className="overflow-hidden"
-								>
-									<div className="flex items-start border-mail-border/50 border-b px-5 py-1.5 border-mail-border/60">
-										<span className="w-16 select-none py-2 text-mail-muted">
-											Bcc
-										</span>
-										<Controller
-											name="bcc"
-											control={control}
-											render={({ field }) => (
-												<EmailPillsInput
-													emails={field.value}
-													onChange={field.onChange}
-													placeholder="bcc@example.com"
-													disabled={isSending}
-												/>
-											)}
-										/>
-									</div>
-								</motion.div>
-							)}
-						</AnimatePresence>
-
-						{/* Subject Row */}
-						<div className="flex items-center border-mail-border/50 border-b px-5 py-2.5 border-mail-border/60">
-							<span className="w-16 select-none text-mail-muted">
-								Subject
-							</span>
+						{/* Subject */}
+						<div className="flex items-center gap-2 border-[#E7E7E7] border-b p-3 dark:border-[#252525]">
+							<p className="shrink-0 font-medium text-[#8C8C8C] text-sm">
+								Subject:
+							</p>
 							<input
-								type="text"
-								placeholder="Add a subject"
+								className="h-4 w-full bg-transparent font-normal text-sm leading-normal text-black outline-none placeholder:text-[#797979] dark:text-white/90"
+								placeholder="Re: Design review feedback"
 								disabled={isSending}
 								{...register("subject")}
-								className="flex-1 bg-transparent text-mail-foreground placeholder-text-soft-400/80 outline-none text-mail-foreground"
+							/>
+						</div>
+
+						{/* Body */}
+						<div
+							className="flex-1 overflow-y-auto border-[#E7E7E7] border-t bg-white px-3 py-3 dark:border-[#252525] dark:bg-[#202020]"
+							onClick={() => bodyRef.current?.focus()}
+							onKeyDown={() => {}}
+						>
+							<textarea
+								{...bodyRegister}
+								ref={(el) => {
+									bodyRegisterRef(el);
+									bodyRef.current = el;
+								}}
+								placeholder="Start writing..."
+								disabled={isSending}
+								rows={8}
+								className="min-h-[200px] w-full resize-none border-0 bg-transparent p-0 text-sm leading-relaxed text-black outline-none placeholder:text-[#797979] dark:text-white/90"
+								onKeyDown={(e) => {
+									if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+										e.preventDefault();
+										void handleSubmit(onSubmit)();
+									}
+								}}
 							/>
 						</div>
 					</div>
 
-					{/* Textarea Body Editor Area */}
-					<div className="flex min-h-[220px] flex-col px-5 py-4">
-						<textarea
-							placeholder="Write your message..."
-							disabled={isSending}
-							rows={8}
-							{...register("body")}
-							className="w-full flex-1 resize-none border-0 bg-transparent p-0 text-sm text-mail-foreground leading-relaxed placeholder-text-soft-400/80 outline-none text-mail-foreground"
-						/>
-
-						{/* Attachments Section */}
-						{attachments.length > 0 && (
-							<div className="mt-4 flex flex-wrap gap-2 border-mail-border/30 border-t pt-3 border-mail-border/40">
-								<AnimatePresence>
-									{attachments.map((file, idx) => (
-										<motion.div
-											key={file.id || file.name}
-											initial={{ opacity: 0, scale: 0.9, y: 5 }}
-											animate={{ opacity: 1, scale: 1, y: 0 }}
-											exit={{ opacity: 0, scale: 0.9 }}
-											transition={{ duration: 0.2 }}
-											className={`inline-flex items-center gap-2 rounded border border-zinc-700/50 bg-zinc-800 px-2.5 py-1 font-mono text-xs text-zinc-100 shadow-sm dark:bg-zinc-950 ${file.isUploading ? "opacity-60" : ""}`}
-										>
-											{file.isUploading ? (
-												<svg
-													className="h-3.5 w-3.5 animate-spin text-zinc-400"
-													xmlns="http://www.w3.org/2000/svg"
-													fill="none"
-													viewBox="0 0 24 24"
-												>
-													<circle
-														className="opacity-25"
-														cx="12"
-														cy="12"
-														r="10"
-														stroke="currentColor"
-														strokeWidth="3"
-													/>
-													<path
-														className="opacity-75"
-														fill="currentColor"
-														d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-													/>
-												</svg>
-											) : (
-												<svg
-													className="h-3.5 w-3.5 text-zinc-400"
-													viewBox="0 0 24 24"
-													fill="none"
-													stroke="currentColor"
-													strokeWidth="2"
-												>
-													<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-													<polyline points="14 2 14 8 20 8" />
-												</svg>
-											)}
-											<span className="max-w-[180px] truncate">
-												{file.name}
-											</span>
-											<span className="text-[10px] text-zinc-400/80">
-												({file.size})
-											</span>
-											<button
-												type="button"
-												onClick={() => removeAttachment(idx)}
-												title="Remove file"
-												className="ml-1 flex h-4.5 w-4.5 items-center justify-center rounded-full text-zinc-500 hover:bg-zinc-700/40 hover:text-zinc-300"
-											>
-												&times;
-											</button>
-										</motion.div>
-									))}
-								</AnimatePresence>
-							</div>
-						)}
-					</div>
-
-					{/* Footer Actions */}
-					<div className="flex items-center justify-between border-mail-border/60 border-t bg-panel-light px-5 py-4 dark:bg-panel-dark">
-						<div className="flex items-center gap-3">
-							{/* Send Button */}
-							<motion.button
-								whileHover={{ scale: 1.02 }}
-								whileTap={{ scale: 0.98 }}
+					{/* Bottom actions — Zero style */}
+					<div className="inline-flex w-full shrink-0 items-end justify-between self-stretch rounded-b-2xl bg-white px-3 py-3 dark:bg-[#202020]">
+						<div className="flex items-center justify-start gap-2">
+							<button
 								type="submit"
 								disabled={
 									isSending ||
 									to.length === 0 ||
 									attachments.some((att) => att.isUploading)
 								}
-								className="flex items-center gap-2 rounded-xl bg-[#18181b] px-6 py-2.5 font-semibold text-sm text-white shadow-sm transition-all duration-200 hover:bg-neutral-800 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40  dark:text-neutral-950 dark:hover:bg-offset-light"
+								className="inline-flex h-8 items-center gap-2 rounded-md bg-black px-3 text-sm text-white transition-opacity disabled:pointer-events-none disabled:opacity-40 dark:bg-white dark:text-black"
 							>
-								<svg
-									className="mr-0.5 h-3.5 w-3.5 rotate-45 fill-current text-white dark:text-neutral-950"
-									viewBox="0 0 24 24"
-								>
-									<line
-										x1="22"
-										y1="2"
-										x2="11"
-										y2="13"
-										stroke="currentColor"
-										strokeWidth="2.5"
-									/>
-									<polygon
-										points="22 2 15 22 11 13 2 9 22 2"
-										stroke="currentColor"
-										strokeWidth="2"
-										strokeLinejoin="round"
-									/>
-								</svg>
-								<span>{isSending ? "Sending..." : "Send"}</span>
-							</motion.button>
+								<span>{isSending ? "Sending…" : "Send"}</span>
+								<span className="hidden h-5 items-center gap-0.5 rounded-sm bg-white/10 px-1 sm:inline-flex dark:bg-black/10">
+									<Command className="h-3.5 w-3.5" />
+									<CornerDownLeft className="h-3.5 w-3.5" />
+								</span>
+							</button>
 
-							{/* Attach File Button */}
-							<motion.button
-								whileHover={{ scale: 1.05 }}
-								whileTap={{ scale: 0.95 }}
+							<button
 								type="button"
-								onClick={open}
-								title="Attach files"
+								onClick={() => fileInputRef.current?.click()}
 								disabled={isSending}
-								className="flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-200 text-mail-muted transition-colors hover:bg-offset-light border-mail-border text-mail-muted hover:bg-[var(--inbox-hover)]"
+								className="inline-flex h-8 cursor-pointer items-center gap-1 rounded-md border border-[#E7E7E7] bg-transparent px-2 text-sm text-mail-foreground transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-[#2B2B2B] dark:hover:bg-[var(--inbox-control-hover)]"
 							>
-								<svg
-									className="h-4.5 w-4.5"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-								</svg>
-							</motion.button>
-						</div>
+								<Plus className="h-3 w-3 text-[#9A9A9A]" />
+								<span className="hidden px-0.5 md:inline">Add</span>
+							</button>
 
-						{/* Discard Button */}
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
-							type="button"
-							onClick={onClose}
-							disabled={isSending}
-							className="flex items-center gap-1.5 font-medium text-sm text-mail-muted transition-colors hover:text-red-600 disabled:opacity-40 text-mail-muted hover:text-red-400"
-						>
-							<svg
-								className="h-4.5 w-4.5"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="1.8"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							>
-								<polyline points="3 6 5 6 21 6" />
-								<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-							</svg>
-							<span>Discard</span>
-						</motion.button>
+							{attachments.length > 0 && (
+								<Popover.Root>
+									<Popover.Trigger asChild>
+										<button
+											type="button"
+											className="flex cursor-pointer items-center gap-1.5 rounded-md border border-[#E7E7E7] bg-white/5 px-2 py-1 text-sm hover:bg-black/5 dark:border-[#2B2B2B] dark:hover:bg-white/10"
+											aria-label={`View ${attachments.length} attached file${attachments.length === 1 ? "" : "s"}`}
+										>
+											<Paperclip className="h-3.5 w-3.5 text-[#9A9A9A]" />
+											<span className="font-medium">{attachments.length}</span>
+										</button>
+									</Popover.Trigger>
+									<Popover.Content
+										align="start"
+										sideOffset={6}
+										showArrow={false}
+										className="z-[100] w-[340px] rounded-lg border border-[#E7E7E7] bg-white p-0 shadow-lg dark:border-[#2B2B2B] dark:bg-[#202020]"
+									>
+										<div className="flex flex-col">
+											<div className="border-[#E7E7E7] border-b p-3 dark:border-[#2B2B2B]">
+												<h4 className="font-semibold text-black text-sm dark:text-white/90">
+													Attachments
+												</h4>
+												<p className="text-mail-muted text-xs">
+													{attachments.length}{" "}
+													{attachments.length === 1 ? "file" : "files"}
+												</p>
+											</div>
+											<div className="max-h-[250px] space-y-0.5 overflow-y-auto p-1.5">
+												{attachments.map((file, idx) => {
+													const nameParts = file.name.split(".");
+													const extension =
+														nameParts.length > 1 ? nameParts.pop() : undefined;
+													const nameWithoutExt = nameParts.join(".");
+													const truncatedName =
+														nameWithoutExt.length > 22
+															? `${nameWithoutExt.slice(0, 22)}…`
+															: nameWithoutExt;
+													return (
+														<div
+															key={file.id}
+															className={cn(
+																"group flex items-center justify-between gap-3 rounded-md px-1.5 py-1.5 hover:bg-black/5 dark:hover:bg-white/10",
+																file.isUploading && "opacity-60",
+															)}
+														>
+															<div className="flex min-w-0 flex-1 items-center gap-3">
+																<div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[#F0F0F0] dark:bg-[#2C2C2C]">
+																	{file.isUploading ? (
+																		<Loader2 className="h-3.5 w-3.5 animate-spin text-mail-muted" />
+																	) : (
+																		<span className="text-sm" aria-hidden>
+																			{attachmentIcon(file.content_type)}
+																		</span>
+																	)}
+																</div>
+																<div className="flex min-w-0 flex-1 flex-col">
+																	<p
+																		className="flex items-baseline text-black text-sm dark:text-white/90"
+																		title={file.name}
+																	>
+																		<span className="truncate">
+																			{truncatedName}
+																		</span>
+																		{extension && (
+																			<span className="ml-0.5 shrink-0 text-[#8C8C8C] text-[10px]">
+																				.{extension}
+																			</span>
+																		)}
+																	</p>
+																	<p className="text-mail-muted text-xs">
+																		{file.size}
+																	</p>
+																</div>
+															</div>
+															<button
+																type="button"
+																onClick={() => removeAttachment(idx)}
+																className="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10"
+																aria-label={`Remove ${file.name}`}
+															>
+																<XIcon className="h-3.5 w-3.5 text-mail-muted" />
+															</button>
+														</div>
+													);
+												})}
+											</div>
+										</div>
+									</Popover.Content>
+								</Popover.Root>
+							)}
+						</div>
 					</div>
 				</form>
 			</Modal.Content>
