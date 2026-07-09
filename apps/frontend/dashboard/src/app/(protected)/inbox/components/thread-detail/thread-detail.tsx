@@ -18,7 +18,6 @@ import { ReplyComposer } from "./reply-composer";
 import type { ThreadParticipant } from "./thread-header";
 import { ThreadHeader } from "./thread-header";
 import { ZeroMailDisplay } from "./zero-mail-display";
-import { ZeroThreadFooter } from "./zero-thread-footer";
 import { ZeroThreadToolbar } from "./zero-thread-toolbar";
 
 const extractSummaryText = (
@@ -900,16 +899,7 @@ export const ThreadDetail = ({
 					}}
 					isSending={isForwarding}
 				/>
-			) : (
-				// Show bottom composer bar only when there's no pending approval draft (actions are inline on the card)
-				thread.status !== "needs_approval" && (
-					<ZeroThreadFooter
-						onReply={openReplyComposer}
-						onReplyAll={openReplyComposer}
-						onForward={() => handleForward()}
-					/>
-				)
-			)}
+			) : null}
 
 			{/* Raw headers modal */}
 			{rawHeadersExpanded && (
