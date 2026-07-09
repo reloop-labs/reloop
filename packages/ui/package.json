@@ -16,6 +16,7 @@
 		"./chart": "./src/components/chart.tsx",
 		"./currency-input": "./src/components/currency-input.tsx",
 		"./submit-button": "./src/components/submit-button.tsx",
+		"./fancy-button": "./src/components/fancy-button.tsx",
 		"./avatar": "./src/components/avatar.tsx",
 		"./segmented-control": "./src/components/segmented-control.tsx",
 		"./tab-menu-horizontal": "./src/components/tab-menu-horizontal.tsx",

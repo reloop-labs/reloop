@@ -14,7 +14,7 @@ export const fancyButtonVariants = tv({
 		root: [
 			// base
 			"group relative inline-flex items-center justify-center whitespace-nowrap label-sm outline-none cursor-pointer",
-			"transition duration-200 ease-out",
+			"transition duration-200 ease-out active:scale-[0.97]",
 			// focus
 			"focus:outline-none",
 			// disabled
@@ -33,6 +33,12 @@ export const fancyButtonVariants = tv({
 			},
 			destructive: {
 				root: "bg-error-base text-static-white shadow-fancy-buttons-error",
+			},
+			blue: {
+				root: [
+					"bg-zero-blue text-white shadow-[0_1px_2px_0_rgba(14,18,27,0.24),0_0_0_1px_#006ffe]",
+					"hover:bg-zero-blue-hover",
+				],
 			},
 			basic: {
 				root: [
@@ -60,7 +66,7 @@ export const fancyButtonVariants = tv({
 	},
 	compoundVariants: [
 		{
-			variant: ["neutral", "primary", "destructive"],
+			variant: ["neutral", "primary", "destructive", "blue"],
 			class: {
 				root: [
 					// before

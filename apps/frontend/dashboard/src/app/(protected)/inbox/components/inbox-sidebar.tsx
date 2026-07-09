@@ -10,8 +10,8 @@ import { useInboxLabels } from "@fe/dashboard/app/(protected)/inbox/hooks/use-in
 import type { AgentMailbox } from "@fe/dashboard/app/(protected)/inbox/types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import {
-	Pencil,
 	Plus,
 } from "lucide-react";
 import Link from "next/link";
@@ -54,6 +54,10 @@ const TagIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
 
 const TrashIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
 	<Icon name="trash" {...props} />
+);
+
+const PencilIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
+	<Icon name="pencil" {...props} />
 );
 
 type NavItem = {
@@ -236,19 +240,17 @@ export const InboxSidebar = ({
 						onAddMailbox={() => setIsAddMailboxOpen(true)}
 					/>
 
-					<button
-						type="button"
+					<FancyButton.Root
 						onClick={() => setIsComposeOpen(true)}
-						className={cn(
-							"relative mb-1.5 inline-flex h-8 w-full cursor-pointer items-center justify-center gap-1 self-stretch overflow-hidden rounded-lg border-none bg-zero-blue text-white transition-colors hover:bg-zero-blue-hover",
-							collapsed && "px-0",
-						)}
+						variant="blue"
+						size="xsmall"
+						className={cn("w-full mb-1.5", collapsed && "px-0")}
 					>
-						<Pencil className="h-3.5 w-3.5 fill-white" />
+						<FancyButton.Icon as={PencilIcon} className="h-3.5 w-3.5 fill-white text-white" />
 						{!collapsed && (
 							<span className="text-sm leading-none">New email</span>
 						)}
-					</button>
+					</FancyButton.Root>
 				</div>
 
 				<div className="scrollbar-hide mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
