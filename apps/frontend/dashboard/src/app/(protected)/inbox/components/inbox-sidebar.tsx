@@ -94,7 +94,7 @@ const NavLink = ({
 						{item.label}
 					</span>
 					{item.showCount && count !== undefined && (
-						<span className="shrink-0 text-mail-muted tabular-nums">
+						<span className="mr-[3px] shrink-0 text-mail-muted tabular-nums">
 							{count.toLocaleString()}
 						</span>
 					)}

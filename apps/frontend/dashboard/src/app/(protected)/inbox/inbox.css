@@ -31,7 +31,7 @@
 	--inbox-control: #e8e8e8;
 	--inbox-control-hover: #dcdcdc;
 	--inbox-hover: #eaeaea;
-	--inbox-active: #dfdfdf;
+	--inbox-active: var(--inbox-hover);
 	--inbox-menu: #ffffff;
 	--inbox-muted-bg: #f4f4f5;
 	--inbox-danger-bg: #fff1f2;
