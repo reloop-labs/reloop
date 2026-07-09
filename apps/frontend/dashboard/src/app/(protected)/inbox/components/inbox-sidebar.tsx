@@ -11,22 +11,50 @@ import type { AgentMailbox } from "@fe/dashboard/app/(protected)/inbox/types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import {
-	AlertCircle,
-	Archive,
-	Clock,
-	Folder,
-	Inbox,
 	Pencil,
-	Plane,
 	Plus,
-	Tag,
-	Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+
+const InboxIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
+	<Icon name="inbox" {...props} />
+);
+
+const DraftIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
+	<Icon name="draft" {...props} />
+);
+
+const SentIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
+	<Icon name="sent" {...props} />
+);
+
+const ArchiveIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
+	<Icon name="archive" {...props} />
+);
+
+const SnoozeIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
+	<Icon name="snooze" {...props} />
+);
+
+const AlertIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
+	<Icon name="alert" {...props} />
+);
+
+const AgentIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
+	<Icon name="agent" {...props} />
+);
+
+const TagIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
+	<Icon name="tag" {...props} />
+);
+
+const TrashIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
+	<Icon name="trash" {...props} />
+);
 
 type NavItem = {
 	id: string;
@@ -154,13 +182,14 @@ export const InboxSidebar = ({
 	const base = `/inbox/${mailboxId}`;
 
 	const coreItems: NavItem[] = [
-		{ id: "inbox", label: "Inbox", href: base, icon: Inbox, showCount: true },
-		{ id: "drafts", label: "Drafts", href: `${base}/drafts`, icon: Folder },
+		{ id: "inbox", label: "Inbox", href: base, icon: InboxIcon, showCount: true },
+		{ id: "agent", label: "Agent", href: `${base}/agent`, icon: AgentIcon, showCount: true },
+		{ id: "drafts", label: "Drafts", href: `${base}/drafts`, icon: DraftIcon },
 		{
 			id: "sent",
 			label: "Sent",
 			href: `${base}/sent`,
-			icon: Plane,
+			icon: SentIcon,
 			showCount: true,
 		},
 	];
@@ -170,22 +199,22 @@ export const InboxSidebar = ({
 			id: "archive",
 			label: "Archive",
 			href: `${base}/archive`,
-			icon: Archive,
+			icon: ArchiveIcon,
 			showCount: true,
 		},
-		{ id: "snoozed", label: "Snoozed", href: `${base}/snoozed`, icon: Clock },
+		{ id: "snoozed", label: "Snoozed", href: `${base}/snoozed`, icon: SnoozeIcon },
 		{
 			id: "spam",
 			label: "Spam",
 			href: `${base}/spam`,
-			icon: AlertCircle,
+			icon: AlertIcon,
 			showCount: true,
 		},
 		{
 			id: "trash",
 			label: "Bin",
 			href: `${base}/trash`,
-			icon: Trash2,
+			icon: TrashIcon,
 			showCount: true,
 		},
 	];
@@ -267,7 +296,7 @@ export const InboxSidebar = ({
 													: "text-mail-muted",
 											)}
 										>
-											<Tag
+											<TagIcon
 												className="h-3.5 w-3.5 shrink-0"
 												style={{
 													color:

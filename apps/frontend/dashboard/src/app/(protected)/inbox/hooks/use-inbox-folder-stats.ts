@@ -7,6 +7,7 @@ import { useMemo } from "react";
 
 export type InboxFolderStats = {
 	inbox: number;
+	agent: number;
 	drafts: number;
 	sent: number;
 	archive: number;
@@ -27,6 +28,11 @@ export const useInboxFolderStats = (mailboxId: string): InboxFolderStats => {
 		return {
 			inbox: groupThreadsByConversation(
 				filterInboxThreads(mailboxThreads, mailboxId),
+			).length,
+			agent: groupThreadsByConversation(
+				mailboxThreads.filter(
+					(t) => t.direction === "inbound" && t.status === "handled",
+				),
 			).length,
 			drafts: mailboxThreads.filter(
 				(t) =>

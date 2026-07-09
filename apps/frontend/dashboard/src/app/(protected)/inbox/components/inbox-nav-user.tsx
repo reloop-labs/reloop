@@ -39,7 +39,12 @@ function getRingGradientStyle(email: string) {
 		hash = (hash * 33) ^ email.charCodeAt(i);
 	}
 	const index = Math.abs(hash) % RING_GRADIENTS_4COL.length;
-	const colors = RING_GRADIENTS_4COL[index] || ["#f43f5e", "#ec4899", "#d946ef", "#8b5cf6"];
+	const colors = RING_GRADIENTS_4COL[index] || [
+		"#f43f5e",
+		"#ec4899",
+		"#d946ef",
+		"#8b5cf6",
+	];
 	return {
 		background: `linear-gradient(135deg, ${colors[0]}, ${colors[1]}, ${colors[2]}, ${colors[3]})`,
 	};
@@ -80,18 +85,21 @@ export const InboxNavUser = ({
 
 	if (collapsed) {
 		return (
-			<div className="relative mx-auto flex h-9 w-9 items-center justify-center shrink-0">
-				<div className="absolute inset-0 rounded-[12px]" style={getRingGradientStyle(mailbox.email)} />
+			<div className="relative mx-auto flex h-9 w-9 shrink-0 items-center justify-center">
+				<div
+					className="absolute inset-0 rounded-[12px]"
+					style={getRingGradientStyle(mailbox.email)}
+				/>
 				<div className="absolute h-8 w-8 rounded-[10px] bg-[var(--sidebar-background)]" />
 				<button
 					type="button"
 					onClick={() => switchMailbox(mailbox.id)}
-					className="relative z-10 flex h-7 w-7 items-center justify-center rounded-[8px] font-semibold text-[11px] text-white uppercase focus:outline-none"
+					className="relative z-10 shrink-0 rounded-[8px] focus:outline-none"
 					title={mailbox.email}
 				>
 					<div
 						className={cn(
-							"flex h-7 w-7 items-center justify-center rounded-[8px] font-semibold text-[11px] text-white uppercase",
+							"flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] font-semibold text-[11px] text-white uppercase",
 							getAvatarGradient(mailbox.email),
 						)}
 					>
@@ -105,18 +113,21 @@ export const InboxNavUser = ({
 	return (
 		<div className="flex flex-col gap-2">
 			<div className="flex items-center gap-2">
-				<div className="relative flex h-9 w-9 items-center justify-center shrink-0">
-					<div className="absolute inset-0 rounded-[12px]" style={getRingGradientStyle(mailbox.email)} />
+				<div className="relative flex h-9 w-9 shrink-0 items-center justify-center">
+					<div
+						className="absolute inset-0 rounded-[12px]"
+						style={getRingGradientStyle(mailbox.email)}
+					/>
 					<div className="absolute h-8 w-8 rounded-[10px] bg-[var(--sidebar-background)]" />
 					<button
 						type="button"
 						onClick={() => switchMailbox(mailbox.id)}
-						className="relative z-10 flex h-7 w-7 items-center justify-center rounded-[8px] font-semibold text-[11px] text-white uppercase focus:outline-none"
+						className="relative z-10 shrink-0 rounded-[8px] focus:outline-none"
 						title={mailbox.email}
 					>
 						<div
 							className={cn(
-								"flex h-7 w-7 items-center justify-center rounded-[8px] font-semibold text-[11px] text-white uppercase",
+								"flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] font-semibold text-[11px] text-white uppercase",
 								getAvatarGradient(mailbox.email),
 							)}
 						>
