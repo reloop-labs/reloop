@@ -1,8 +1,8 @@
 "use client";
 
+import { cn } from "@reloop/ui/cn";
 import * as Modal from "@reloop/ui/modal";
 import * as Popover from "@reloop/ui/popover";
-import { cn } from "@reloop/ui/cn";
 import { EditorContent } from "@tiptap/react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -22,7 +22,6 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { AgentMailbox } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
-import { EmailPillsInput, validateEmail } from "./email-pills-input";
 import { AiComposePreview } from "./compose/ai-compose-preview";
 import { ComposeToolbar } from "./compose/compose-toolbar";
 import { ScheduleSendPicker } from "./compose/schedule-send-picker";
@@ -31,6 +30,7 @@ import {
 	TemplateButton,
 } from "./compose/template-button";
 import { useComposeEditor } from "./compose/use-compose-editor";
+import { EmailPillsInput, validateEmail } from "./email-pills-input";
 
 interface ComposeModalProps {
 	isOpen: boolean;
@@ -626,7 +626,7 @@ export const ComposeModal = ({
 						<div className="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto rounded-2xl">
 							<div className="shrink-0 overflow-visible border-[#E7E7E7] border-b pb-2 dark:border-[#252525]">
 								<div className="flex justify-between px-3 pt-3">
-									<div className="flex min-w-0 w-full items-center gap-2">
+									<div className="flex w-full min-w-0 items-center gap-2">
 										<p className="shrink-0 font-medium text-[#8C8C8C] text-sm">
 											To:
 										</p>
@@ -731,7 +731,7 @@ export const ComposeModal = ({
 									Subject:
 								</p>
 								<input
-									className="h-4 w-full bg-transparent font-normal text-sm leading-normal text-black outline-none placeholder:text-[#797979] dark:text-white/90"
+									className="h-4 w-full bg-transparent font-normal text-black text-sm leading-normal outline-none placeholder:text-[#797979] dark:text-white/90"
 									placeholder="Re: Design review feedback"
 									disabled={isSending}
 									{...register("subject")}
@@ -820,7 +820,7 @@ export const ComposeModal = ({
 										type="button"
 										onClick={() => fileInputRef.current?.click()}
 										disabled={isSending}
-										className="inline-flex h-8 cursor-pointer items-center gap-1 rounded-md border border-[#E7E7E7] bg-transparent px-2 text-sm text-mail-foreground transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-[#2B2B2B] dark:hover:bg-[var(--inbox-control-hover)]"
+										className="inline-flex h-8 cursor-pointer items-center gap-1 rounded-md border border-[#E7E7E7] bg-transparent px-2 text-mail-foreground text-sm transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-[#2B2B2B] dark:hover:bg-[var(--inbox-control-hover)]"
 									>
 										<Plus className="h-3 w-3 text-[#9A9A9A]" />
 										<span className="hidden px-0.5 md:inline">Add</span>
@@ -851,9 +851,7 @@ export const ComposeModal = ({
 												className="z-[100] w-[340px] rounded-lg border border-[#E7E7E7] bg-white p-0 shadow-lg dark:border-[#2B2B2B] dark:bg-[#202020]"
 											>
 												<div className="border-[#E7E7E7] border-b p-3 dark:border-[#2B2B2B]">
-													<h4 className="font-semibold text-sm">
-														Attachments
-													</h4>
+													<h4 className="font-semibold text-sm">Attachments</h4>
 												</div>
 												<div className="max-h-[250px] space-y-0.5 overflow-y-auto p-1.5">
 													{attachments.map((file, idx) => (
@@ -875,7 +873,9 @@ export const ComposeModal = ({
 																	)}
 																</div>
 																<div className="min-w-0 flex-1">
-																	<p className="truncate text-sm">{file.name}</p>
+																	<p className="truncate text-sm">
+																		{file.name}
+																	</p>
 																	<p className="text-mail-muted text-xs">
 																		{file.size}
 																	</p>
@@ -930,7 +930,9 @@ export const ComposeModal = ({
 
 			<Modal.Root open={showDiscard} onOpenChange={setShowDiscard}>
 				<Modal.Content className="max-w-sm p-5">
-					<h3 className="font-semibold text-mail-foreground">Discard message?</h3>
+					<h3 className="font-semibold text-mail-foreground">
+						Discard message?
+					</h3>
 					<p className="mt-1 text-mail-muted text-sm">
 						Your draft will be deleted and this can’t be undone.
 					</p>

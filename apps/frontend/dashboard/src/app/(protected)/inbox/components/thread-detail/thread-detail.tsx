@@ -463,12 +463,7 @@ export const ThreadDetail = ({
 
 		const send =
 			replyMode === "replyAll"
-				? sendReplyAll(
-						messageId,
-						body,
-						payload.html,
-						payload.attachments,
-					)
+				? sendReplyAll(messageId, body, payload.html, payload.attachments)
 				: sendReply(messageId, body, payload.html, payload.attachments);
 
 		toast.promise(send, {

@@ -96,7 +96,7 @@ export const TemplateButton = ({
 				<button
 					type="button"
 					disabled={disabled}
-					className="inline-flex h-8 items-center gap-1 rounded-md border border-[#E7E7E7] bg-transparent px-2 text-sm text-mail-foreground transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-[#2B2B2B] dark:hover:bg-[var(--inbox-control-hover)]"
+					className="inline-flex h-8 items-center gap-1 rounded-md border border-[#E7E7E7] bg-transparent px-2 text-mail-foreground text-sm transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-[#2B2B2B] dark:hover:bg-[var(--inbox-control-hover)]"
 				>
 					<FileText className="h-3.5 w-3.5 text-[#9A9A9A]" />
 					<span className="hidden md:inline">Templates</span>

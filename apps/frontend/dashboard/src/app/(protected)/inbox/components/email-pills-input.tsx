@@ -4,8 +4,8 @@ import {
 	getAvatarGradient,
 	getAvatarInitial,
 } from "@fe/dashboard/utils/avatar";
-import { Icon } from "@reloop/ui/icon";
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
 import {
 	type ClipboardEvent,
@@ -250,7 +250,9 @@ export const EmailPillsInput = ({
 											<p className="truncate font-medium text-mail-foreground">
 												{name}
 											</p>
-											<p className="truncate text-mail-muted text-xs">{email}</p>
+											<p className="truncate text-mail-muted text-xs">
+												{email}
+											</p>
 										</>
 									) : (
 										<p className="truncate text-mail-foreground">{email}</p>

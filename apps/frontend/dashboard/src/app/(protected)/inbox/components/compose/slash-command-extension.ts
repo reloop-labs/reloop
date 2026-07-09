@@ -1,12 +1,12 @@
 "use client";
 
 import { Extension } from "@tiptap/core";
+import { PluginKey } from "@tiptap/pm/state";
 import { ReactRenderer } from "@tiptap/react";
 import Suggestion, {
 	type SuggestionKeyDownProps,
 	type SuggestionProps,
 } from "@tiptap/suggestion";
-import { PluginKey } from "@tiptap/pm/state";
 import {
 	filterSlashCommands,
 	type SlashCommandItem,

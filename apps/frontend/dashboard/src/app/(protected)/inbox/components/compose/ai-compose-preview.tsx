@@ -19,7 +19,7 @@ export const AiComposePreview = ({
 	return (
 		<div className="absolute inset-x-3 bottom-3 z-20 rounded-xl border border-violet-500/40 bg-panel-light/95 p-3 shadow-lg backdrop-blur dark:bg-[#202020]/95">
 			<div className="mb-2 flex items-center justify-between">
-				<div className="flex items-center gap-1.5 text-violet-400 text-xs font-medium">
+				<div className="flex items-center gap-1.5 font-medium text-violet-400 text-xs">
 					<Sparkles className="h-3.5 w-3.5" />
 					AI draft
 				</div>

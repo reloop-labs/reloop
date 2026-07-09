@@ -45,7 +45,7 @@ export default function AgentInboxDraftsPage() {
 	if (!mailbox) return null;
 
 	return (
-		<div className="flex h-full min-h-0 flex-1 flex-col rounded-2xl bg-panel-light p-4 shadow-sm dark:bg-panel-dark md:m-1">
+		<div className="flex h-full min-h-0 flex-1 flex-col rounded-2xl bg-panel-light p-4 shadow-sm md:m-1 dark:bg-panel-dark">
 			<div className="mb-4 flex items-center justify-between">
 				<div>
 					<h1 className="font-semibold text-lg text-mail-foreground">Drafts</h1>

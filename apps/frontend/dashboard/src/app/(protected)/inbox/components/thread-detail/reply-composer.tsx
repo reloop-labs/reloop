@@ -1,19 +1,19 @@
 "use client";
 
-import { Icon } from "@reloop/ui/icon";
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { EditorContent } from "@tiptap/react";
 import { Paperclip, Type, X as XIcon } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
-import { ComposeToolbar } from "../compose/compose-toolbar";
 import {
 	type ComposeAttachment,
 	formatBytes,
 	toSendAttachments,
 	uploadComposeFile,
 } from "../compose/compose-attachments";
+import { ComposeToolbar } from "../compose/compose-toolbar";
 import { useComposeEditor } from "../compose/use-compose-editor";
 
 interface ReplyComposerProps {
@@ -152,7 +152,9 @@ export const ReplyComposer = ({
 				<div className="flex flex-col gap-1 text-label-sm">
 					<div className="flex items-center gap-2 text-mail-muted">
 						<span className="w-12">To:</span>
-						<span className="font-semibold text-mail-foreground">{displayTo}</span>
+						<span className="font-semibold text-mail-foreground">
+							{displayTo}
+						</span>
 					</div>
 					<div className="flex items-center gap-2 text-mail-muted">
 						<span className="w-12">From:</span>

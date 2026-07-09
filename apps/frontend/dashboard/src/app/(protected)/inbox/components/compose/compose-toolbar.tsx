@@ -51,7 +51,8 @@ export const ComposeToolbar = ({ editor }: { editor: Editor | null }) => {
 				tabIndex={-1}
 				className={cn(
 					btn,
-					editor.isActive("heading", { level: 1 }) && "bg-[var(--inbox-muted-bg)]",
+					editor.isActive("heading", { level: 1 }) &&
+						"bg-[var(--inbox-muted-bg)]",
 				)}
 				onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
 				aria-label="Heading 1"
@@ -63,7 +64,8 @@ export const ComposeToolbar = ({ editor }: { editor: Editor | null }) => {
 				tabIndex={-1}
 				className={cn(
 					btn,
-					editor.isActive("heading", { level: 2 }) && "bg-[var(--inbox-muted-bg)]",
+					editor.isActive("heading", { level: 2 }) &&
+						"bg-[var(--inbox-muted-bg)]",
 				)}
 				onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
 				aria-label="Heading 2"
@@ -75,7 +77,8 @@ export const ComposeToolbar = ({ editor }: { editor: Editor | null }) => {
 				tabIndex={-1}
 				className={cn(
 					btn,
-					editor.isActive("heading", { level: 3 }) && "bg-[var(--inbox-muted-bg)]",
+					editor.isActive("heading", { level: 3 }) &&
+						"bg-[var(--inbox-muted-bg)]",
 				)}
 				onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
 				aria-label="Heading 3"
@@ -86,7 +89,10 @@ export const ComposeToolbar = ({ editor }: { editor: Editor | null }) => {
 			<button
 				type="button"
 				tabIndex={-1}
-				className={cn(btn, editor.isActive("bold") && "bg-[var(--inbox-muted-bg)]")}
+				className={cn(
+					btn,
+					editor.isActive("bold") && "bg-[var(--inbox-muted-bg)]",
+				)}
 				onClick={() => editor.chain().focus().toggleBold().run()}
 				aria-label="Bold"
 			>

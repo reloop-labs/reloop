@@ -1,12 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
-import {
-	forwardRef,
-	useEffect,
-	useImperativeHandle,
-	useState,
-} from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import {
 	filterSlashCommands,
 	type SlashCommandItem,
@@ -27,8 +22,7 @@ export const SlashCommandMenu = forwardRef<
 	SlashCommandMenuProps
 >(function SlashCommandMenu({ items, command, query = "" }, ref) {
 	const [selectedIndex, setSelectedIndex] = useState(0);
-	const filtered =
-		items.length > 0 ? items : filterSlashCommands(query);
+	const filtered = items.length > 0 ? items : filterSlashCommands(query);
 
 	useEffect(() => {
 		setSelectedIndex(0);

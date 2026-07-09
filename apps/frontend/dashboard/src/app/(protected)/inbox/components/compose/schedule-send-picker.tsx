@@ -48,10 +48,14 @@ export const ScheduleSendPicker = ({
 				disabled={disabled}
 				onClick={() => setOpen((v) => !v)}
 				className={cn(
-					"inline-flex h-8 items-center gap-1 rounded-md border border-[#E7E7E7] bg-transparent px-2 text-sm text-mail-foreground transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-[#2B2B2B] dark:hover:bg-[var(--inbox-control-hover)]",
+					"inline-flex h-8 items-center gap-1 rounded-md border border-[#E7E7E7] bg-transparent px-2 text-mail-foreground text-sm transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-[#2B2B2B] dark:hover:bg-[var(--inbox-control-hover)]",
 					value && "border-zero-blue/40 bg-zero-blue/5",
 				)}
-				title={value ? `Scheduled: ${new Date(value).toLocaleString()}` : "Send later"}
+				title={
+					value
+						? `Scheduled: ${new Date(value).toLocaleString()}`
+						: "Send later"
+				}
 			>
 				<Clock className="h-3.5 w-3.5 text-[#9A9A9A]" />
 				{value ? (
