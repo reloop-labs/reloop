@@ -23,6 +23,9 @@ export const updateThreadRoute = new Elysia().use(authMiddleware).patch(
 			isImportant: t.Optional(
 				t.Boolean({ description: "Important flag for the thread" }),
 			),
+			isPinned: t.Optional(
+				t.Boolean({ description: "Pinned status of the thread" }),
+			),
 			status: t.Optional(
 				t.Union(
 					[

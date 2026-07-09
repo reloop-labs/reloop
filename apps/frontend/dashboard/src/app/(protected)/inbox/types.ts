@@ -5,7 +5,7 @@ export type InboundThreadStatus =
 	| "handled"
 	| "blocked";
 
-export type InboxFilter = "primary" | "spam";
+export type InboxView = "primary" | "alerts" | "person" | "tag";
 
 export type TimelineStepState = "done" | "active" | "pending";
 
@@ -72,6 +72,9 @@ export interface InboundThread {
 	isStarred?: boolean;
 	isArchived?: boolean;
 	isImportant?: boolean;
+	isPinned?: boolean;
+	pinnedAt?: string | null;
+	messageCount?: number;
 	isSpam?: boolean;
 	isTrashed?: boolean;
 	labels?: InboxLabel[];
@@ -94,11 +97,19 @@ export type BatchThreadAction =
 	| "important"
 	| "unimportant"
 	| "spam"
-	| "unspam";
+	| "unspam"
+	| "pin"
+	| "unpin";
 
-export const INBOX_FILTERS: { id: InboxFilter; label: string }[] = [
-	{ id: "primary", label: "Primary" },
-	{ id: "spam", label: "Spam" },
+export const INBOX_VIEWS: {
+	id: InboxView;
+	label: string;
+	icon: "zap" | "alert-triangle" | "user" | "tag";
+}[] = [
+	{ id: "primary", label: "Primary", icon: "zap" },
+	{ id: "alerts", label: "Alerts", icon: "alert-triangle" },
+	{ id: "person", label: "Person", icon: "user" },
+	{ id: "tag", label: "Tag", icon: "tag" },
 ];
 
 export const SECURITY_LEVEL_LABELS: Record<

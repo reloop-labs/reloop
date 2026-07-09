@@ -13,6 +13,8 @@ export const listThreadsRoute = new Elysia().use(authMiddleware).get(
 			query.offset,
 			query.folder,
 			query.q,
+			query.isPinned,
+			query.filter,
 		);
 	},
 	{
@@ -30,6 +32,23 @@ export const listThreadsRoute = new Elysia().use(authMiddleware).get(
 				}),
 			),
 			q: t.Optional(t.String({ description: "Search subject and preview" })),
+			isPinned: t.Optional(
+				t.Boolean({ description: "Filter by pinned status" }),
+			),
+			filter: t.Optional(
+				t.Union(
+					[
+						t.Literal("primary"),
+						t.Literal("alerts"),
+						t.Literal("person"),
+						t.Literal("tag"),
+					],
+					{
+						description:
+							"Category filter: primary, alerts (important), person, tag (has labels)",
+					},
+				),
+			),
 		}),
 		response: {
 			200: MailModel.threadListResponse,

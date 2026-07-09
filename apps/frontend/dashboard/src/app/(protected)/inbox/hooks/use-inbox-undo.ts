@@ -43,6 +43,10 @@ const undoForBatch = (
 			return "unimportant";
 		case "unimportant":
 			return "important";
+		case "pin":
+			return "unpin";
+		case "unpin":
+			return "pin";
 		case "restore":
 		case "unspam":
 			return null;

@@ -99,6 +99,9 @@ interface BackendThread {
 	isRead: boolean;
 	isStarred: boolean;
 	isImportant?: boolean;
+	isPinned?: boolean;
+	pinnedAt?: string | Date | null;
+	labels?: { id: string; name: string; color: string }[];
 	deletedAt?: string | Date | null;
 	createdAt: string | Date;
 	updatedAt: string | Date;
@@ -127,6 +130,7 @@ interface AgentInboxContextValue {
 		threadId: string,
 		isImportant: boolean,
 	) => Promise<void>;
+	toggleThreadPinned: (threadId: string, isPinned: boolean) => Promise<void>;
 	batchThreads: (ids: string[], action: BatchThreadAction) => Promise<void>;
 	sendReply: (
 		id: string,
@@ -280,6 +284,8 @@ const mapMessageToThread = (msg: BackendMessage): InboundThread => {
 		isStarred: msg.isStarred,
 		isArchived: false,
 		isImportant: false,
+		isPinned: false,
+		messageCount: 1,
 		isSpam: msg.isSpam,
 		isTrashed: false,
 		direction: "inbound" as const,
@@ -335,6 +341,19 @@ const mapBackendThreadToInbound = (
 		isStarred: thread.isStarred,
 		isArchived,
 		isImportant: thread.isImportant ?? false,
+		isPinned: thread.isPinned ?? false,
+		pinnedAt: thread.pinnedAt
+			? typeof thread.pinnedAt === "string"
+				? thread.pinnedAt
+				: thread.pinnedAt.toISOString()
+			: null,
+		messageCount: thread.messageCount,
+		labels: (thread.labels ?? []).map((l) => ({
+			id: l.id,
+			mailboxId: thread.mailboxId || mailboxId,
+			name: l.name,
+			color: l.color,
+		})),
 		isSpam: false,
 		isTrashed,
 		direction: "inbound",
@@ -408,6 +427,19 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 								isStarred: base.isStarred || meta.isStarred,
 								unread: base.unread || !meta.isRead,
 								isImportant: meta.isImportant ?? base.isImportant,
+								isPinned: meta.isPinned ?? base.isPinned,
+								pinnedAt: meta.pinnedAt
+									? typeof meta.pinnedAt === "string"
+										? meta.pinnedAt
+										: meta.pinnedAt.toISOString()
+									: null,
+								messageCount: meta.messageCount ?? base.messageCount,
+								labels: (meta.labels ?? []).map((l) => ({
+									id: l.id,
+									mailboxId: meta.mailboxId || base.mailboxId,
+									name: l.name,
+									color: l.color,
+								})),
 								isSpam: base.isSpam,
 								isTrashed,
 								isArchived,
@@ -456,6 +488,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 						isStarred: false,
 						isArchived: false,
 						isImportant: false,
+						isPinned: false,
+						messageCount: 1,
 						isSpam: false,
 						isTrashed: false,
 						direction: "outbound" as const,
@@ -748,6 +782,24 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		[mutateMessages, mutateThreads],
 	);
 
+	const toggleThreadPinned = useCallback(
+		async (threadId: string, isPinned: boolean) => {
+			const res = await fetch(`/api/inbox/v1/threads/${threadId}`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ isPinned }),
+			});
+
+			if (!res.ok) {
+				const body = await res.text();
+				throw new Error(body || "Failed to update pinned status");
+			}
+
+			await Promise.all([mutateMessages(), mutateThreads()]);
+		},
+		[mutateMessages, mutateThreads],
+	);
+
 	const batchThreads = useCallback(
 		async (ids: string[], action: BatchThreadAction) => {
 			const res = await fetch("/api/inbox/v1/threads/batch", {
@@ -1027,6 +1079,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			trashThread,
 			restoreThread,
 			toggleThreadImportant,
+			toggleThreadPinned,
 			batchThreads,
 			sendReply,
 			sendReplyAll,
@@ -1057,6 +1110,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			trashThread,
 			restoreThread,
 			toggleThreadImportant,
+			toggleThreadPinned,
 			batchThreads,
 			sendReply,
 			sendReplyAll,

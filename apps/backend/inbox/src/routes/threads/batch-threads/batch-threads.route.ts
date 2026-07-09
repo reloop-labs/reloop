@@ -15,6 +15,8 @@ const batchAction = t.Union([
 	t.Literal("unimportant"),
 	t.Literal("spam"),
 	t.Literal("unspam"),
+	t.Literal("pin"),
+	t.Literal("unpin"),
 ]);
 
 export const batchThreadsRoute = new Elysia().use(authMiddleware).post(

@@ -59,6 +59,8 @@ export const emailThread = pgTable(
 		isRead: boolean("is_read").notNull().default(false),
 		isStarred: boolean("is_starred").notNull().default(false),
 		isImportant: boolean("is_important").notNull().default(false),
+		isPinned: boolean("is_pinned").notNull().default(false),
+		pinnedAt: timestamp("pinned_at"),
 		deletedAt: timestamp("deleted_at"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at")
@@ -77,6 +79,10 @@ export const emailThread = pgTable(
 			table.lastMessageAt,
 		),
 		index("email_thread_idx_is_important").on(table.isImportant),
+		index("email_thread_idx_mailbox_is_pinned").on(
+			table.mailboxId,
+			table.isPinned,
+		),
 	],
 );
 

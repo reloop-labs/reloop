@@ -11,6 +11,8 @@ import {
 	Inbox,
 	Mail,
 	MailOpen,
+	Pin,
+	PinOff,
 	Reply,
 	ReplyAll,
 	Tag,
@@ -56,6 +58,7 @@ export const ThreadContextMenu = ({
 	const {
 		toggleMessageStar,
 		toggleThreadImportant,
+		toggleThreadPinned,
 		markMessageRead,
 		archiveThread,
 		trashThread,
@@ -173,6 +176,23 @@ export const ThreadContextMenu = ({
 				>
 					<Zap className="h-3.5 w-3.5" />
 					{thread.isImportant ? "Unmark important" : "Mark important"}
+				</ContextMenu.Item>
+
+				<ContextMenu.Item
+					className={itemClass}
+					onSelect={() =>
+						void run(
+							() => toggleThreadPinned(threadId, !thread.isPinned),
+							thread.isPinned ? "Unpinned" : "Pinned",
+						)
+					}
+				>
+					{thread.isPinned ? (
+						<PinOff className="h-3.5 w-3.5" />
+					) : (
+						<Pin className="h-3.5 w-3.5" />
+					)}
+					{thread.isPinned ? "Unpin" : "Pin"}
 				</ContextMenu.Item>
 
 				<ContextMenu.Item

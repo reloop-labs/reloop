@@ -312,6 +312,7 @@ export namespace MailModel {
 		isStarred: t.Optional(t.Boolean()),
 		isSpam: t.Optional(t.Boolean()),
 		isImportant: t.Optional(t.Boolean()),
+		isPinned: t.Optional(t.Boolean()),
 		status: t.Optional(t.String()),
 		deletedAt: t.Optional(t.Union([t.String(), t.Null(), t.Date()])),
 	});
@@ -429,6 +430,17 @@ export namespace MailModel {
 		isRead: t.Boolean(),
 		isStarred: t.Boolean(),
 		isImportant: t.Optional(t.Boolean()),
+		isPinned: t.Optional(t.Boolean()),
+		pinnedAt: t.Optional(t.Union([t.String(), t.Null(), t.Date()])),
+		labels: t.Optional(
+			t.Array(
+				t.Object({
+					id: t.String(),
+					name: t.String(),
+					color: t.String(),
+				}),
+			),
+		),
 		deletedAt: t.Optional(t.Union([t.String(), t.Null(), t.Date()])),
 		createdAt: t.Union([t.Date(), t.String()]),
 		updatedAt: t.Union([t.Date(), t.String()]),

@@ -11,6 +11,7 @@ export async function updateThreadController(
 		isRead?: boolean;
 		isStarred?: boolean;
 		isImportant?: boolean;
+		isPinned?: boolean;
 		status?: "active" | "archived" | "closed" | "trash";
 	},
 ) {
@@ -37,6 +38,10 @@ export async function updateThreadController(
 	if (updates.isStarred !== undefined) updateData.isStarred = updates.isStarred;
 	if (updates.isImportant !== undefined)
 		updateData.isImportant = updates.isImportant;
+	if (updates.isPinned !== undefined) {
+		updateData.isPinned = updates.isPinned;
+		updateData.pinnedAt = updates.isPinned ? new Date() : null;
+	}
 	if (updates.status !== undefined) {
 		updateData.status = updates.status;
 		if (updates.status === "trash") {
@@ -63,6 +68,7 @@ export async function updateThreadController(
 		...(updates.isImportant !== undefined
 			? { isImportant: updates.isImportant }
 			: {}),
+		...(updates.isPinned !== undefined ? { isPinned: updates.isPinned } : {}),
 		...(updates.status !== undefined ? { status: updates.status } : {}),
 	};
 }

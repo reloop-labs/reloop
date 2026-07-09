@@ -5,6 +5,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { VList, type VListHandle } from "virtua";
 import type { InboundThread } from "../types";
+import { splitPinnedThreads } from "../utils/group-threads";
 import { useAgentInbox } from "./agent-inbox-provider";
 import { InboxListEmptyState } from "./inbox-empty-state";
 import { InboxThreadRow } from "./inbox-thread-row";
@@ -14,11 +15,18 @@ import { useInboxMail } from "./use-inbox-mail";
 import { useInboxNavigation } from "./use-inbox-navigation";
 
 const PAGE_SIZE = 30;
+const SECTION_HEADER_SIZE = 32;
+const THREAD_ROW_SIZE = 72;
+
+type ListItem =
+	| { type: "header"; key: string; label: string; count: number }
+	| { type: "thread"; key: string; thread: InboundThread; flatIndex: number };
 
 interface ThreadListProps {
 	threads: InboundThread[];
 	mailboxId: string;
 	folder?: string;
+	sectionLabel?: string;
 	selectedId: string | null;
 	onSelect: (id: string) => void;
 	emptyMessage?: string;
@@ -37,6 +45,7 @@ export const ThreadList = ({
 	threads,
 	mailboxId,
 	folder,
+	sectionLabel = "Primary",
 	selectedId,
 	onSelect,
 	emptyMessage = "No messages in this filter",
@@ -57,10 +66,63 @@ export const ThreadList = ({
 	const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 	const lastBulkIndexRef = useRef<number | null>(null);
 
-	const visibleThreads = useMemo(
-		() => threads.slice(0, visibleCount),
-		[threads, visibleCount],
+	const { pinned, rest } = useMemo(
+		() => splitPinnedThreads(threads),
+		[threads],
 	);
+
+	const orderedThreads = useMemo(
+		() => [...pinned, ...rest],
+		[pinned, rest],
+	);
+
+	const visibleThreads = useMemo(
+		() => orderedThreads.slice(0, visibleCount),
+		[orderedThreads, visibleCount],
+	);
+
+	const listItems = useMemo(() => {
+		const items: ListItem[] = [];
+		const visiblePinned = visibleThreads.filter((t) => t.isPinned);
+		const visibleRest = visibleThreads.filter((t) => !t.isPinned);
+		let flatIndex = 0;
+
+		if (pinned.length > 0 && visiblePinned.length > 0) {
+			items.push({
+				type: "header",
+				key: "header-pinned",
+				label: "Pinned",
+				count: pinned.length,
+			});
+			for (const thread of visiblePinned) {
+				items.push({
+					type: "thread",
+					key: thread.id,
+					thread,
+					flatIndex: flatIndex++,
+				});
+			}
+		}
+
+		if (visibleRest.length > 0 || (pinned.length === 0 && rest.length > 0)) {
+			items.push({
+				type: "header",
+				key: `header-${sectionLabel}`,
+				label: sectionLabel,
+				count: rest.length,
+			});
+			for (const thread of visibleRest) {
+				items.push({
+					type: "thread",
+					key: thread.id,
+					thread,
+					flatIndex: flatIndex++,
+				});
+			}
+		}
+
+		return items;
+	}, [visibleThreads, pinned.length, rest.length, sectionLabel]);
 
 	const handleToggleBulk = useCallback(
 		(id: string, event?: React.MouseEvent) => {
@@ -148,10 +210,10 @@ export const ThreadList = ({
 	};
 
 	const handleLoadMore = useCallback(() => {
-		if (visibleCount < threads.length) {
-			setVisibleCount((c) => Math.min(c + PAGE_SIZE, threads.length));
+		if (visibleCount < orderedThreads.length) {
+			setVisibleCount((c) => Math.min(c + PAGE_SIZE, orderedThreads.length));
 		}
-	}, [visibleCount, threads.length]);
+	}, [visibleCount, orderedThreads.length]);
 
 	let foundFirstToday = false;
 
@@ -199,23 +261,39 @@ export const ThreadList = ({
 			>
 				<VList
 					ref={vListRef}
-					count={visibleThreads.length}
+					count={listItems.length}
 					overscan={5}
-					itemSize={72}
+					itemSize={THREAD_ROW_SIZE}
 					className="scrollbar-hide absolute inset-0 overflow-x-hidden"
 					onScroll={() => {
 						const handle = vListRef.current;
 						if (!handle) return;
 						const end = handle.findEndIndex();
-						if (end >= visibleThreads.length - 5) {
+						if (end >= listItems.length - 5) {
 							handleLoadMore();
 						}
 					}}
 				>
 					{(index) => {
-						const thread = visibleThreads[index];
-						if (!thread) return <div key={index} />;
+						const item = listItems[index];
+						if (!item) return <div key={index} />;
 
+						if (item.type === "header") {
+							return (
+								<div
+									key={item.key}
+									className="flex h-8 items-center px-5 pt-1"
+									style={{ height: SECTION_HEADER_SIZE }}
+								>
+									<span className="font-medium text-[11px] text-mail-muted tracking-wide">
+										{item.label}{" "}
+										<span className="text-mail-muted/70">[{item.count}]</span>
+									</span>
+								</div>
+							);
+						}
+
+						const { thread, flatIndex } = item;
 						const dateObj = new Date(thread.receivedAt);
 						const isToday =
 							dateObj.toDateString() === new Date().toDateString();
@@ -238,9 +316,9 @@ export const ThreadList = ({
 							>
 								<InboxThreadRow
 									thread={thread}
-									index={index}
+									index={flatIndex}
 									isSelected={selectedId === thread.id}
-									isKeyboardFocused={focusedIndex === index}
+									isKeyboardFocused={focusedIndex === flatIndex}
 									isBulkSelected={mail.bulkSelected.includes(thread.id)}
 									isFirstToday={isFirstToday}
 									searchQuery={searchQuery}

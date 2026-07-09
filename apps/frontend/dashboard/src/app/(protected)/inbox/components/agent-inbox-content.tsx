@@ -5,6 +5,7 @@ import {
 	AiSidebar,
 	useAiSidebar,
 } from "@fe/dashboard/app/(protected)/inbox/components/ai-sidebar";
+import { InboxCategoryNavbar } from "@fe/dashboard/app/(protected)/inbox/components/inbox-category-navbar";
 import {
 	applyInboxFilters,
 	InboxCommandPalette,
@@ -21,6 +22,7 @@ import {
 	useInboxNavigation,
 } from "@fe/dashboard/app/(protected)/inbox/components/thread-list";
 import {
+	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@fe/dashboard/app/(protected)/inbox/components/ui/resizable";
@@ -30,19 +32,43 @@ import type {
 	AgentMailbox,
 	BatchThreadAction,
 	InboundThread,
+	InboxView,
 } from "@fe/dashboard/app/(protected)/inbox/types";
 import {
+	applyInboxViewFilter,
 	findThreadByListId,
 	groupThreadsByConversation,
 } from "@fe/dashboard/app/(protected)/inbox/utils/group-threads";
 import { cn } from "@reloop/ui/cn";
-import { Archive, MailOpen, RefreshCcw, Trash2, X } from "lucide-react";
 import { Icon } from "@reloop/ui/icon";
-import { parseAsString, useQueryState } from "nuqs";
+import {
+	Archive,
+	Check,
+	Inbox,
+	MailOpen,
+	RefreshCcw,
+	SlidersHorizontal,
+	Trash2,
+	X,
+} from "lucide-react";
+import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useMediaQuery } from "usehooks-ts";
+
+const INBOX_VIEW_VALUES = ["primary", "alerts", "person", "tag"] as const;
+
+const FOLDER_TITLES: Record<string, string> = {
+	inbox: "Inbox",
+	agent: "Agent",
+	sent: "Sent",
+	archive: "Archive",
+	spam: "Spam",
+	trash: "Bin",
+	drafts: "Drafts",
+	needs_approval: "Needs approval",
+};
 
 const isTypingTarget = (target: EventTarget | null) => {
 	if (!(target instanceof HTMLElement)) return false;
@@ -85,10 +111,20 @@ export const AgentInboxContent = ({
 		"filter",
 		parseAsString.withDefault(""),
 	);
+	const [viewParam, setViewParam] = useQueryState(
+		"view",
+		parseAsStringLiteral(INBOX_VIEW_VALUES).withDefault("primary"),
+	);
 	const [selectedThreadId, setSelectedThreadId] = useQueryState(
 		"threadId",
 		parseAsString.withDefault(""),
 	);
+
+	const activeView = viewParam as InboxView;
+	const folderTitle = folder.startsWith("label:")
+		? "Label"
+		: (FOLDER_TITLES[folder] ?? "Inbox");
+	const showCategoryNavbar = folder === "inbox";
 
 	useEffect(() => {
 		setMail((prev) =>
@@ -102,8 +138,32 @@ export const AgentInboxContent = ({
 	);
 
 	const filteredThreads = useMemo(() => {
-		return applyInboxFilters(groupedThreads, searchQuery, filterParam);
-	}, [groupedThreads, searchQuery, filterParam]);
+		const searched = applyInboxFilters(
+			groupedThreads,
+			searchQuery,
+			filterParam,
+		);
+		if (!showCategoryNavbar) return searched;
+		return applyInboxViewFilter(searched, activeView);
+	}, [
+		groupedThreads,
+		searchQuery,
+		filterParam,
+		activeView,
+		showCategoryNavbar,
+	]);
+
+	const handleEnterSelectMode = useCallback(() => {
+		const first = filteredThreads[0];
+		if (!first) {
+			setMail((prev) => ({ ...prev, bulkSelected: [] }));
+			return;
+		}
+		setMail((prev) => ({
+			...prev,
+			bulkSelected: prev.bulkSelected.length > 0 ? prev.bulkSelected : [first.id],
+		}));
+	}, [filteredThreads, setMail]);
 
 	const selectedThread = useMemo(() => {
 		if (!selectedThreadId) return null;
@@ -346,24 +406,75 @@ export const AgentInboxContent = ({
 				>
 					<ResizablePanel
 						defaultSize={35}
-						minSize={35}
-						maxSize={35}
+						minSize={25}
+						maxSize={50}
 						className={cn(
-							"mb-1 flex min-h-0 flex-1 flex-col bg-panel-light shadow-sm md:mr-[3px] md:rounded-2xl lg:h-[calc(100dvh-8px)] dark:bg-panel-dark",
+							"mb-1 flex min-h-0 flex-1 flex-col bg-panel-light shadow-sm md:rounded-2xl lg:h-[calc(100dvh-8px)] dark:bg-panel-dark",
 							!isDesktop && selectedThreadId && "hidden",
 						)}
 					>
 						<div className="flex min-h-0 flex-1 flex-col">
-							<div className="sticky top-0 z-15 shrink-0 p-4 pb-0">
-								<div className="flex items-center gap-1">
-									<InboxSidebarToggle onClick={toggleSidebar} />
+							<div className="sticky top-0 z-15 shrink-0 space-y-3 p-4 pb-2">
+								{mail.bulkSelected.length === 0 ? (
+									<>
+										<div className="flex items-center gap-2">
+											<InboxSidebarToggle onClick={toggleSidebar} />
+											<div className="flex min-w-0 flex-1 items-center gap-2">
+												<Inbox className="h-4 w-4 shrink-0 text-mail-muted" />
+												<h1 className="truncate font-semibold text-mail-foreground text-base">
+													{folderTitle}
+												</h1>
+											</div>
+											<button
+												type="button"
+												onClick={handleEnterSelectMode}
+												className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 font-medium text-mail-muted text-xs transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
+											>
+												<Check className="h-3.5 w-3.5" />
+												Select
+											</button>
+											<button
+												type="button"
+												onClick={() => setPaletteOpen(true)}
+												className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
+												aria-label="Filters"
+											>
+												<SlidersHorizontal className="h-4 w-4" />
+											</button>
+											<button
+												type="button"
+												onClick={handleRefresh}
+												disabled={isRefreshing}
+												className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-[var(--inbox-hover)] disabled:opacity-50"
+												aria-label="Refresh"
+											>
+												<RefreshCcw
+													className={cn(
+														"h-4 w-4 text-mail-muted",
+														isRefreshing && "animate-spin",
+													)}
+												/>
+											</button>
+										</div>
 
-									{mail.bulkSelected.length === 0 ? (
 										<InboxSearchTrigger
 											onOpenPalette={() => setPaletteOpen(true)}
 											activeFilterCount={activeFilterCount}
 										/>
-									) : (
+
+										{showCategoryNavbar && (
+											<InboxCategoryNavbar
+												activeView={activeView}
+												onViewChange={(view) => {
+													void setViewParam(view === "primary" ? null : view);
+													resetNavigation();
+												}}
+											/>
+										)}
+									</>
+								) : (
+									<div className="flex items-center gap-1">
+										<InboxSidebarToggle onClick={toggleSidebar} />
 										<div className="flex flex-1 items-center justify-between gap-2">
 											<div className="font-medium text-mail-foreground text-sm">
 												{mail.bulkSelected.length} selected
@@ -405,7 +516,18 @@ export const AgentInboxContent = ({
 													onClick={() => void runBulkAction("star", "Starred")}
 													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
 												>
-													<Icon name="star" className="h-3.5 w-3.5 text-mail-muted" />
+													<Icon
+														name="star"
+														className="h-3.5 w-3.5 text-mail-muted"
+													/>
+												</button>
+												<button
+													type="button"
+													title="Pin"
+													onClick={() => void runBulkAction("pin", "Pinned")}
+													className="inline-flex h-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] px-2 text-[11px] text-mail-muted hover:bg-[var(--inbox-control-hover)]"
+												>
+													Pin
 												</button>
 												<button
 													type="button"
@@ -427,23 +549,8 @@ export const AgentInboxContent = ({
 												</button>
 											</div>
 										</div>
-									)}
-
-									<button
-										type="button"
-										onClick={handleRefresh}
-										disabled={isRefreshing}
-										className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors hover:bg-[var(--inbox-hover)] disabled:opacity-50"
-										aria-label="Refresh"
-									>
-										<RefreshCcw
-											className={cn(
-												"h-4 w-4 text-mail-muted",
-												isRefreshing && "animate-spin",
-											)}
-										/>
-									</button>
-								</div>
+									</div>
+								)}
 							</div>
 
 							<div
@@ -454,13 +561,29 @@ export const AgentInboxContent = ({
 									threads={filteredThreads}
 									mailboxId={mailbox.id}
 									folder={folder}
+									sectionLabel={
+										showCategoryNavbar
+											? activeView === "primary"
+												? "Primary"
+												: activeView === "alerts"
+													? "Alerts"
+													: activeView === "person"
+														? "Person"
+														: "Tag"
+											: folderTitle
+									}
 									selectedId={selectedThreadId}
 									onSelect={handleSelectThread}
 									isLoading={isLoadingThreads}
-									hasFilters={searchQuery !== "" || activeFilterCount > 0}
+									hasFilters={
+										searchQuery !== "" ||
+										activeFilterCount > 0 ||
+										(showCategoryNavbar && activeView !== "primary")
+									}
 									onClearFilters={() => {
 										setSearchQuery(null);
 										setFilterParam(null);
+										void setViewParam(null);
 										resetNavigation();
 									}}
 									focusedIndex={focusedIndex}
@@ -475,13 +598,16 @@ export const AgentInboxContent = ({
 					</ResizablePanel>
 
 					{isDesktop && (
-						<ResizablePanel
-							defaultSize={65}
-							minSize={30}
-							className="mr-0.5 mb-1 flex min-h-0 flex-col rounded-2xl bg-panel-light shadow-sm lg:h-[calc(100dvh-8px)] dark:bg-panel-dark"
-						>
-							{detailPane}
-						</ResizablePanel>
+						<>
+							<ResizableHandle className="mx-0.5 w-1 rounded-full bg-transparent transition-colors hover:bg-mail-border/60 data-[resize-handle-active]:bg-mail-primary/40" />
+							<ResizablePanel
+								defaultSize={65}
+								minSize={30}
+								className="mr-0.5 mb-1 flex min-h-0 flex-col rounded-2xl bg-panel-light shadow-sm lg:h-[calc(100dvh-8px)] dark:bg-panel-dark"
+							>
+								{detailPane}
+							</ResizablePanel>
+						</>
 					)}
 				</ResizablePanelGroup>
 

@@ -15,7 +15,9 @@ export type BatchThreadAction =
 	| "important"
 	| "unimportant"
 	| "spam"
-	| "unspam";
+	| "unspam"
+	| "pin"
+	| "unpin";
 
 async function setSpamForThreads(
 	threadIds: string[],
@@ -144,6 +146,18 @@ export async function batchThreadsController(
 			break;
 		case "unspam":
 			await setSpamForThreads(foundIds, organizationId, false);
+			break;
+		case "pin":
+			await db
+				.update(emailThread)
+				.set({ isPinned: true, pinnedAt: new Date() })
+				.where(inArray(emailThread.id, foundIds));
+			break;
+		case "unpin":
+			await db
+				.update(emailThread)
+				.set({ isPinned: false, pinnedAt: null })
+				.where(inArray(emailThread.id, foundIds));
 			break;
 		default:
 			throw createError({

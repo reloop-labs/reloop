@@ -6,9 +6,9 @@ import {
 } from "@fe/dashboard/utils/avatar";
 import * as Checkbox from "@reloop/ui/checkbox";
 import { cn } from "@reloop/ui/cn";
-import dayjs from "dayjs";
-import { Archive, Trash2, Zap } from "lucide-react";
 import { Icon } from "@reloop/ui/icon";
+import dayjs from "dayjs";
+import { AlertTriangle, Archive, Pin, Tag, Trash2, User } from "lucide-react";
 import { forwardRef, type ReactNode } from "react";
 import type { InboundThread } from "../types";
 import { useInboxMail } from "./use-inbox-mail";
@@ -88,6 +88,13 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 		const isUnread = thread.unread;
 		const displayName =
 			thread.from.name || thread.from.email.split("@")[0] || thread.from.email;
+		const messageCount = thread.messageCount ?? 1;
+		const snippet = thread.preview || thread.subject;
+		const showAlert =
+			thread.status === "needs_approval" || !!thread.isImportant;
+		const showPerson =
+			thread.direction !== "outbound" && thread.status !== "handled";
+		const showTag = (thread.labels?.length ?? 0) > 0;
 
 		return (
 			<div
@@ -148,9 +155,9 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 					</button>
 				</div>
 
-				<div className="flex w-full items-center justify-between gap-4 px-4">
+				<div className="flex w-full items-start justify-between gap-3 px-4">
 					{mail.bulkSelected.length > 0 ? (
-						<div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+						<div className="mt-0.5 shrink-0" onClick={(e) => e.stopPropagation()}>
 							<Checkbox.Root
 								checked={isBulkSelected}
 								onCheckedChange={() => onToggleBulk(listId)}
@@ -159,7 +166,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 					) : (
 						<div
 							className={cn(
-								"relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase",
+								"relative mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase",
 								getAvatarGradient(thread.from.email),
 								!isUnread && "border border-mail-border/40",
 							)}
@@ -169,11 +176,10 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 					)}
 
 					<div className="min-w-0 flex-1">
-						{/* Zero: name + unread + time */}
-						<div className="flex w-full flex-row items-center justify-between">
+						<div className="flex w-full flex-row items-start justify-between gap-2">
 							<div className="flex min-w-0 flex-row items-center gap-1">
-								{thread.isImportant && (
-									<Zap className="h-3 w-3 shrink-0 fill-amber-400 text-amber-400" />
+								{thread.isPinned && (
+									<Pin className="h-3 w-3 shrink-0 fill-mail-muted text-mail-muted" />
 								)}
 								<span
 									className={cn(
@@ -185,6 +191,11 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 								>
 									{highlightMatches(displayName, searchQuery)}
 									{thread.direction === "outbound" ? ", You" : ""}
+									{messageCount > 1 && (
+										<span className="ml-1 font-normal text-mail-muted">
+											[{messageCount}]
+										</span>
+									)}
 								</span>
 								{isUnread && (
 									<span className="ml-0.5 size-2 shrink-0 rounded-full bg-zero-blue" />
@@ -195,34 +206,30 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 							</span>
 						</div>
 
-						{/* Zero: subject only (muted) */}
-						<div className="mt-1 flex justify-between gap-2">
+						<div className="mt-1 flex items-end justify-between gap-2">
 							<p className="line-clamp-1 min-w-0 flex-1 overflow-hidden text-[#8C8C8C] text-sm">
-								{highlightMatches(thread.subject, searchQuery)}
+								{highlightMatches(snippet, searchQuery)}
 							</p>
-							{thread.labels && thread.labels.length > 0 && (
-								<div className="mr-0 flex w-fit shrink-0 items-center justify-end gap-1">
-									{thread.labels.slice(0, 2).map((label) => (
-										<span
-											key={label.id}
-											className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-medium text-[10px] text-mail-muted"
-											style={{
-												backgroundColor:
-													label.color === "default"
-														? "rgba(155,155,155,0.15)"
-														: `${label.color}22`,
-											}}
-										>
-											<span
-												className="h-1.5 w-1.5 rounded-full"
-												style={{
-													backgroundColor:
-														label.color === "default" ? "#9B9B9B" : label.color,
-												}}
-											/>
-											{label.name}
-										</span>
-									))}
+							{(showAlert || showPerson || showTag) && (
+								<div className="flex shrink-0 items-center gap-1.5 pb-0.5">
+									{showAlert && (
+										<AlertTriangle
+											className="h-3.5 w-3.5 text-amber-400"
+											aria-label="Alert"
+										/>
+									)}
+									{showTag && (
+										<Tag
+											className="h-3.5 w-3.5 text-blue-400"
+											aria-label="Has labels"
+										/>
+									)}
+									{showPerson && (
+										<User
+											className="h-3.5 w-3.5 text-emerald-400"
+											aria-label="Direct"
+										/>
+									)}
 								</div>
 							)}
 						</div>
