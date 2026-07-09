@@ -8,6 +8,7 @@ import type { InboundThread } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
 import { InboxListEmptyState } from "./inbox-empty-state";
 import { InboxThreadRow } from "./inbox-thread-row";
+import { MailListSpinner } from "./mail-skeleton";
 import { ThreadContextMenu } from "./thread-context-menu";
 import { useInboxMail } from "./use-inbox-mail";
 import { useInboxNavigation } from "./use-inbox-navigation";
@@ -30,6 +31,7 @@ interface ThreadListProps {
 	onReplyAll?: (thread: InboundThread) => void;
 	onForward?: (thread: InboundThread) => void;
 	onSnooze?: (thread: InboundThread) => void;
+	isLoading?: boolean;
 }
 
 export const ThreadList = ({
@@ -48,6 +50,7 @@ export const ThreadList = ({
 	onReplyAll,
 	onForward,
 	onSnooze,
+	isLoading = false,
 }: ThreadListProps) => {
 	const { toggleMessageStar, archiveThread, trashThread } = useAgentInbox();
 	const [mail, setMail] = useInboxMail();
@@ -153,6 +156,10 @@ export const ThreadList = ({
 	}, [visibleCount, threads.length]);
 
 	let foundFirstToday = false;
+
+	if (isLoading && threads.length === 0) {
+		return <MailListSpinner />;
+	}
 
 	if (threads.length === 0) {
 		return (

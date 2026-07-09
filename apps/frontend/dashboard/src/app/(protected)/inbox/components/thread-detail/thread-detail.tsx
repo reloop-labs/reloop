@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import type { AgentMailbox, InboundThread } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
+import { MailDisplaySkeleton } from "../mail-skeleton";
 import { ForwardComposer } from "./forward-composer";
 import { NotesPanel } from "./note-panel";
 import { RawHeadersModal } from "./raw-headers-modal";
@@ -142,7 +143,11 @@ export const ThreadDetail = ({
 	const [optimisticReplies, setOptimisticReplies] = useState<any[]>([]);
 
 	// ── Thread fetch (for full conversation when a threadId exists) ───────────
-	const { data: threadData, mutate: mutateThread } = useSWR<any>(
+	const {
+		data: threadData,
+		mutate: mutateThread,
+		isLoading: isLoadingThread,
+	} = useSWR<any>(
 		thread?.threadId ? `/api/inbox/v1/threads/${thread.threadId}` : null,
 	);
 
@@ -667,6 +672,15 @@ export const ThreadDetail = ({
 	// ── Render ────────────────────────────────────────────────────────────────
 
 	if (!thread) return <EmptyState />;
+
+	// Zero: while thread messages load, show message skeletons (no toolbar).
+	if (thread.threadId && isLoadingThread && !threadData) {
+		return (
+			<div className="flex h-full min-h-0 flex-col rounded-xl bg-panel-light dark:bg-panel-dark">
+				<MailDisplaySkeleton />
+			</div>
+		);
+	}
 
 	return (
 		<div className="flex h-full min-h-0 flex-col rounded-xl bg-panel-light dark:bg-panel-dark">

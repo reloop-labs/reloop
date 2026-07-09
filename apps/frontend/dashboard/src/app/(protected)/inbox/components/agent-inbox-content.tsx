@@ -67,8 +67,13 @@ export const AgentInboxContent = ({
 	folder: string;
 	threads: InboundThread[];
 }) => {
-	const { markMessageRead, batchThreads, snoozeThread, refresh } =
-		useAgentInbox();
+	const {
+		markMessageRead,
+		batchThreads,
+		snoozeThread,
+		refresh,
+		isLoadingThreads,
+	} = useAgentInbox();
 	const { toggleSidebar, openCompose } = useInboxSidebar();
 	const { open: aiOpen, setOpen: setAiOpen, toggle: toggleAi } = useAiSidebar();
 	const { pushBatchUndo, undo } = useInboxUndo();
@@ -472,6 +477,7 @@ export const AgentInboxContent = ({
 									folder={folder}
 									selectedId={selectedThreadId}
 									onSelect={handleSelectThread}
+									isLoading={isLoadingThreads}
 									hasFilters={searchQuery !== "" || activeFilterCount > 0}
 									onClearFilters={() => {
 										setSearchQuery(null);
