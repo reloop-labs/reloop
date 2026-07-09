@@ -11,11 +11,13 @@ import type { AgentMailbox } from "@fe/dashboard/app/(protected)/inbox/types";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 
 const InboxIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
@@ -180,6 +182,11 @@ export const InboxSidebar = ({
 		registerOpenCompose(() => setIsComposeOpen(true));
 	}, [registerOpenCompose]);
 
+	useHotkeys("alt+n", (e) => {
+		e.preventDefault();
+		setIsComposeOpen(true);
+	});
+
 	const mailboxId = mailbox.id;
 	const base = `/inbox/${mailboxId}`;
 
@@ -266,7 +273,17 @@ export const InboxSidebar = ({
 							className="h-3.5 w-3.5 fill-white text-white"
 						/>
 						{!collapsed && (
-							<span className="text-sm leading-none">New email</span>
+							<>
+								<span className="text-sm leading-none">New email</span>
+								<div className="-translate-y-1/2 absolute top-1/2 right-2.5 z-20 flex items-center gap-0.5 opacity-70">
+									<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
+										⌥
+									</KbdKeyOutline>
+									<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
+										n
+									</KbdKeyOutline>
+								</div>
+							</>
 						)}
 					</FancyButton.Root>
 				</div>
