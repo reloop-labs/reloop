@@ -329,13 +329,13 @@ const FooterThemeToggle = () => {
 	}, []);
 
 	return (
-		<div className="inline-flex items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.04]">
+		<div className="inline-flex items-center rounded-full border border-stroke-soft-200 p-0.5 dark:border-white/10">
 			<button
 				type="button"
 				onClick={() => setTheme("system")}
 				className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
 					mounted && theme === "system"
-						? "bg-white text-black shadow-sm"
+						? "bg-white text-black"
 						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
 				}`}
 				aria-label="System theme"
@@ -347,7 +347,7 @@ const FooterThemeToggle = () => {
 				onClick={() => setTheme("light")}
 				className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
 					mounted && theme === "light"
-						? "bg-white text-black shadow-sm dark:bg-white dark:text-black"
+						? "bg-white text-black dark:bg-white dark:text-black"
 						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
 				}`}
 				aria-label="Light mode"
@@ -359,7 +359,7 @@ const FooterThemeToggle = () => {
 				onClick={() => setTheme("dark")}
 				className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
 					mounted && theme === "dark"
-						? "bg-white text-black shadow-sm"
+						? "bg-[#1A1A1A] text-white"
 						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
 				}`}
 				aria-label="Dark mode"
