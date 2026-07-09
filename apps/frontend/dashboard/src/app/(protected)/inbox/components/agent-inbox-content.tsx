@@ -378,7 +378,7 @@ export const AgentInboxContent = ({
 					>
 						<div className="flex min-h-0 flex-1 flex-col">
 							<div className="sticky top-0 z-15 shrink-0 p-4 pb-0">
-								<div className="flex items-center gap-2">
+								<div className="flex items-center gap-1">
 									<InboxSidebarToggle onClick={toggleSidebar} />
 
 									{mail.bulkSelected.length === 0 ? (
@@ -456,7 +456,7 @@ export const AgentInboxContent = ({
 										type="button"
 										onClick={handleRefresh}
 										disabled={isRefreshing}
-										className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-[var(--inbox-hover)] disabled:opacity-50"
+										className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors hover:bg-[var(--inbox-hover)] disabled:opacity-50"
 										aria-label="Refresh"
 									>
 										<RefreshCcw

@@ -574,9 +574,8 @@ export const InboxSearchTrigger = ({
 			</span>
 			<div className="absolute right-2 flex items-center gap-1.5">
 				{activeFilterCount > 0 && (
-					<span
-						role="button"
-						tabIndex={0}
+					<button
+						type="button"
 						onClick={handleClear}
 						onKeyDown={(e) => {
 							if (e.key === "Enter" || e.key === " ") {
@@ -587,11 +586,11 @@ export const InboxSearchTrigger = ({
 						className="inline-flex h-6 items-center rounded-md bg-[var(--inbox-muted-bg)] px-2 font-medium text-mail-foreground text-xs transition-colors hover:bg-[var(--inbox-control-hover)]"
 					>
 						Clear
-					</span>
+					</button>
 				)}
 				<span className="pointer-events-none hidden items-center gap-0.5 sm:inline-flex">
-					<KbdCommand className="h-5 w-5 border-mail-border/40 text-mail-muted dark:border-white/15" />
-					<KbdKey className="h-5 w-5 border-mail-border/40 text-mail-muted dark:border-white/15">
+					<KbdCommand className="h-3.5 w-3.5 border-mail-border/40 p-0 text-mail-muted dark:border-white/15" />
+					<KbdKey className="h-3.5 w-3.5 border-mail-border/40 p-0 text-[9px] text-mail-muted dark:border-white/15">
 						K
 					</KbdKey>
 				</span>

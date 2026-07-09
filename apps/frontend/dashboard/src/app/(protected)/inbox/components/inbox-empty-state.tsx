@@ -22,7 +22,7 @@ export const InboxEmptyState = ({
 		<div className="flex flex-col items-center justify-center text-center">
 			<InboxEmptyStateIcon width={140} height={152} />
 			<div className="mt-2">
-				<p className="font-medium text-xl text-mail-foreground tracking-tight">
+				<p className="font-medium text-mail-foreground text-xl tracking-tight">
 					{title}
 				</p>
 				<p className="mt-1 text-mail-muted text-sm dark:text-white/50">
@@ -63,7 +63,7 @@ export const InboxListEmptyState = ({
 				className="text-mail-muted opacity-80"
 			/>
 			<div className="mt-1">
-				<p className="font-mediumimage.png text-xl text-mail-foreground tracking-tight">
+				<p className="font-mediumimage.png text-mail-foreground text-xl tracking-tight">
 					It's empty here
 				</p>
 				<p className="mt-1 text-mail-muted text-sm dark:text-white/50">
