@@ -267,7 +267,7 @@ export const InboxCommandPalette = ({
 					)}
 
 					<div className="group/cmd-input flex h-12 w-full items-center gap-2.5 border-mail-border border-b px-4">
-			<Icon name="search" className="h-4 w-4 shrink-0 text-mail-muted" />
+						<Icon name="search" className="h-4 w-4 shrink-0 text-mail-muted" />
 						<CommandMenu.Input
 							value={commandInput}
 							onValueChange={setCommandInput}
@@ -551,7 +551,7 @@ export const InboxSearchTrigger = ({
 			type="button"
 			onClick={onOpenPalette}
 			className={cn(
-				"relative flex h-10 flex-1 select-none items-center justify-start overflow-hidden rounded-2xl border border-mail-border/20 bg-panel-light pl-3 text-left font-normal text-sm shadow-none backdrop-blur-sm transition-all hover:bg-mail-accent/30 focus-visible:ring-2 focus-visible:ring-mail-primary/30 dark:bg-panel-dark/40",
+				"relative flex h-10 w-full flex-1 select-none items-center justify-start overflow-hidden rounded-2xl border border-mail-border/20 bg-panel-light pl-3 text-left font-normal text-sm shadow-none backdrop-blur-sm transition-all hover:bg-mail-accent/30 focus-visible:ring-2 focus-visible:ring-mail-primary/30 dark:bg-panel-dark/40",
 			)}
 		>
 			<Icon name="search" className="h-4 w-4 text-mail-muted" />

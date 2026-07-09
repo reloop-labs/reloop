@@ -87,12 +87,8 @@ export const AgentInboxContent = ({
 	folder: string;
 	threads: InboundThread[];
 }) => {
-	const {
-		markMessageRead,
-		batchThreads,
-		refresh,
-		isLoadingThreads,
-	} = useAgentInbox();
+	const { markMessageRead, batchThreads, refresh, isLoadingThreads } =
+		useAgentInbox();
 	const { toggleSidebar, openCompose } = useInboxSidebar();
 	const { open: aiOpen, setOpen: setAiOpen, toggle: toggleAi } = useAiSidebar();
 	const { pushBatchUndo, undo } = useInboxUndo();
@@ -161,7 +157,8 @@ export const AgentInboxContent = ({
 		}
 		setMail((prev) => ({
 			...prev,
-			bulkSelected: prev.bulkSelected.length > 0 ? prev.bulkSelected : [first.id],
+			bulkSelected:
+				prev.bulkSelected.length > 0 ? prev.bulkSelected : [first.id],
 		}));
 	}, [filteredThreads, setMail]);
 
@@ -417,11 +414,10 @@ export const AgentInboxContent = ({
 							<div className="sticky top-0 z-15 shrink-0 space-y-3 p-4 pb-2">
 								{mail.bulkSelected.length === 0 ? (
 									<>
-										<div className="flex items-center gap-2">
+										<div className="flex items-center">
 											<InboxSidebarToggle onClick={toggleSidebar} />
 											<div className="flex min-w-0 flex-1 items-center gap-2">
-												<Inbox className="h-4 w-4 shrink-0 text-mail-muted" />
-												<h1 className="truncate font-semibold text-mail-foreground text-base">
+												<h1 className="truncate font-medium text-base text-mail-foreground">
 													{folderTitle}
 												</h1>
 											</div>
