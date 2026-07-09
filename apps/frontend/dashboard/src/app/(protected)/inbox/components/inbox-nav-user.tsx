@@ -47,32 +47,14 @@ export const InboxNavUser = ({
 
 	if (collapsed) {
 		return (
-			<button
-				type="button"
-				onClick={() => switchMailbox(mailbox.id)}
-				className="mx-auto flex h-7 w-7 items-center justify-center rounded-[8px] font-semibold text-[11px] text-white uppercase ring-2 ring-zero-blue ring-offset-2 ring-offset-[var(--sidebar-background)] focus:outline-none"
-				style={{ background: undefined }}
-				title={mailbox.email}
-			>
-				<div
-					className={cn(
-						"flex h-7 w-7 items-center justify-center rounded-[8px] font-semibold text-[11px] text-white uppercase",
-						getAvatarGradient(mailbox.email),
-					)}
-				>
-					{getAvatarInitial(mailbox.label, mailbox.email)}
-				</div>
-			</button>
-		);
-	}
-
-	return (
-		<div className="flex flex-col gap-2">
-			<div className="flex items-center gap-2">
+			<div className="relative mx-auto flex h-9 w-9 items-center justify-center shrink-0">
+				<div className="absolute inset-0 rounded-[12px] bg-gradient-to-tr from-[#A855F7] via-[#EC4899] to-[#FF9500]" />
+				<div className="absolute h-8 w-8 rounded-[10px] bg-[var(--sidebar-background)]" />
 				<button
 					type="button"
 					onClick={() => switchMailbox(mailbox.id)}
-					className="relative shrink-0 rounded-[8px] ring-2 ring-zero-blue ring-offset-2 ring-offset-[var(--sidebar-background)] focus:outline-none"
+					className="relative z-10 flex h-7 w-7 items-center justify-center rounded-[8px] font-semibold text-[11px] text-white uppercase focus:outline-none"
+					title={mailbox.email}
 				>
 					<div
 						className={cn(
@@ -83,6 +65,32 @@ export const InboxNavUser = ({
 						{getAvatarInitial(mailbox.label, mailbox.email)}
 					</div>
 				</button>
+			</div>
+		);
+	}
+
+	return (
+		<div className="flex flex-col gap-2">
+			<div className="flex items-center gap-2">
+				<div className="relative flex h-9 w-9 items-center justify-center shrink-0">
+					<div className="absolute inset-0 rounded-[12px] bg-gradient-to-tr from-[#A855F7] via-[#EC4899] to-[#FF9500]" />
+					<div className="absolute h-8 w-8 rounded-[10px] bg-[var(--sidebar-background)]" />
+					<button
+						type="button"
+						onClick={() => switchMailbox(mailbox.id)}
+						className="relative z-10 flex h-7 w-7 items-center justify-center rounded-[8px] font-semibold text-[11px] text-white uppercase focus:outline-none"
+						title={mailbox.email}
+					>
+						<div
+							className={cn(
+								"flex h-7 w-7 items-center justify-center rounded-[8px] font-semibold text-[11px] text-white uppercase",
+								getAvatarGradient(mailbox.email),
+							)}
+						>
+							{getAvatarInitial(mailbox.label, mailbox.email)}
+						</div>
+					</button>
+				</div>
 
 				{otherMailboxes.slice(0, 2).map((m) => (
 					<button
