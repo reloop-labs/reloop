@@ -5,6 +5,7 @@ import {
 	ChatwootLoader,
 	ChatwootUserSync,
 } from "@fe/dashboard/components/chatwoot-widget";
+import { CommandMenuGlobal } from "@fe/dashboard/components/command-menu";
 import { AiPanel } from "@fe/dashboard/components/layout/ai-panel";
 import { PageHeader } from "@fe/dashboard/components/layout/page-header";
 import { MainSidebar } from "@fe/dashboard/components/layout/sidebar";
@@ -52,6 +53,7 @@ const OrgLayout = ({ children }: { children: React.ReactNode }) => {
 	return (
 		<UserOrganizationProvider alwaysRender>
 			<DashboardLayoutContent>{children}</DashboardLayoutContent>
+			<CommandMenuGlobal />
 			<ChatwootLoader />
 			<ChatwootUserSync />
 		</UserOrganizationProvider>
