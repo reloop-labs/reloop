@@ -201,7 +201,7 @@ export const ThreadList = ({
 					ref={vListRef}
 					count={visibleThreads.length}
 					overscan={5}
-					itemSize={100}
+					itemSize={72}
 					className="absolute inset-0 overflow-x-hidden scrollbar-hide"
 					onScroll={() => {
 						const handle = vListRef.current;

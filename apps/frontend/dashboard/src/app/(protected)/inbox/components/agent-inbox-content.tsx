@@ -322,7 +322,7 @@ export const AgentInboxContent = ({
 			thread={selectedThread}
 			mailbox={mailbox}
 			folder={folder}
-			onBack={!isDesktop ? handleCloseThread : undefined}
+			onBack={handleCloseThread}
 			showBack={!isDesktop}
 			onToggleAi={toggleAi}
 		/>
