@@ -229,6 +229,10 @@ export const ComposeModal = ({
 					if (isSending) e.preventDefault();
 				}}
 			>
+				<Modal.Title className="sr-only">Compose Email</Modal.Title>
+				<Modal.Description className="sr-only">
+					Create and send a new email message
+				</Modal.Description>
 				{/* Zero-style esc chip above the composer */}
 				<div className="flex w-full justify-start">
 					<button
