@@ -11,12 +11,54 @@ import useSWR from "swr";
 import type { AgentMailbox, InboundThread } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
 import { ForwardComposer } from "./forward-composer";
+import type { AttachmentItem } from "./message-attachments";
 import { NotesPanel } from "./note-panel";
 import { RawHeadersModal } from "./raw-headers-modal";
 import { ReplyComposer } from "./reply-composer";
+import type { ThreadParticipant } from "./thread-header";
+import { ThreadHeader } from "./thread-header";
 import { ZeroMailDisplay } from "./zero-mail-display";
 import { ZeroThreadFooter } from "./zero-thread-footer";
 import { ZeroThreadToolbar } from "./zero-thread-toolbar";
+
+const extractSummaryText = (
+	parsed: Record<string, unknown> | null | undefined,
+	preview?: string,
+): string | null => {
+	if (parsed) {
+		for (const key of [
+			"summary",
+			"aiSummary",
+			"threadSummary",
+			"overview",
+			"description",
+		]) {
+			const val = parsed[key];
+			if (typeof val === "string" && val.trim()) return val.trim();
+		}
+	}
+	if (preview?.trim()) return preview.trim();
+	return null;
+};
+
+const formatThreadDateRange = (messages: Array<{ messageAt?: string }>) => {
+	const dates = messages
+		.map((m) => m.messageAt)
+		.filter(Boolean)
+		.map((d) => dayjs(d as string))
+		.filter((d) => d.isValid())
+		.sort((a, b) => a.valueOf() - b.valueOf());
+	if (dates.length === 0) return null;
+	const first = dates[0]!;
+	const last = dates[dates.length - 1]!;
+	if (first.isSame(last, "day")) {
+		return first.format("MMMM D");
+	}
+	if (first.isSame(last, "year")) {
+		return `${first.format("MMMM D")} - ${last.format("MMMM D")}`;
+	}
+	return `${first.format("MMM D, YYYY")} - ${last.format("MMM D, YYYY")}`;
+};
 
 dayjs.extend(relativeTime);
 
@@ -236,45 +278,72 @@ export const ThreadDetail = ({
 		return [...base, ...pending];
 	}, [threadData, threadDataMatches, thread, mailbox, optimisticReplies]);
 
-	const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
+	const threadParticipants = useMemo((): ThreadParticipant[] => {
+		const seen = new Set<string>();
+		const people: ThreadParticipant[] = [];
+		for (const msg of displayMessages) {
+			const email = (msg.fromEmail || msg.email?.fromEmail || "").toLowerCase();
+			if (!email || seen.has(email)) continue;
+			seen.add(email);
+			people.push({
+				name: msg.fromName || msg.email?.fromName || "",
+				email: msg.fromEmail || msg.email?.fromEmail || "",
+			});
+		}
+		if (
+			people.length === 0 &&
+			thread?.from?.email
+		) {
+			people.push({
+				name: thread.from.name || "",
+				email: thread.from.email,
+			});
+		}
+		return people;
+	}, [displayMessages, thread]);
 
-	// Update expandedIds when displayMessages changes
-	useEffect(() => {
-		if (displayMessages.length === 0) return;
-		const initial: Record<string, boolean> = {};
-		for (let i = 0; i < displayMessages.length; i++) {
-			const msg = displayMessages[i];
-			const isLast = i === displayMessages.length - 1;
-			const isApproval =
-				msg.status === "needs_approval" || msg.parsed?.suggestedReply;
-			const isOutbound = msg.direction === "outbound";
-			if (displayMessages.length === 1 || isLast || isApproval || isOutbound) {
-				initial[msg.id] = true;
-			} else {
-				initial[msg.id] = false;
+	const threadAttachments = useMemo((): AttachmentItem[] => {
+		const items: AttachmentItem[] = [];
+		const seen = new Set<string>();
+		for (const msg of displayMessages) {
+			const atts = msg.email?.attachments || msg.attachments || [];
+			for (const att of atts) {
+				if (att.isInline) continue;
+				const id = att.id || `${att.filename || att.name}-${att.size}`;
+				if (seen.has(id)) continue;
+				seen.add(id);
+				items.push({
+					id: att.id,
+					name: att.filename || att.name || "Attachment",
+					size:
+						typeof att.size === "number"
+							? `${(att.size / 1024).toFixed(1)} KB`
+							: att.size || "Unknown size",
+					contentType: att.contentType,
+					isInline: att.isInline,
+					inboundEmailId:
+						att.inboundEmailId || msg.email?.id || msg.inboundEmailId,
+					messageId: msg.email?.id || msg.inboundEmailId || msg.id,
+				});
 			}
 		}
-		setExpandedIds(initial);
+		return items;
 	}, [displayMessages]);
 
-	// Participant names computation
-	const threadParticipants = useMemo(() => {
-		if (!thread) return "";
-		const primarySender = thread.from.name || thread.from.email.split("@")[0];
-		const hasOutbound = displayMessages.some(
-			(msg) => msg.direction === "outbound" || msg.status === "needs_approval",
-		);
-		if (hasOutbound) {
-			return `${primarySender} & You`;
+	const dateRangeLabel = useMemo(
+		() => formatThreadDateRange(displayMessages),
+		[displayMessages],
+	);
+
+	const aiSummaryText = useMemo(() => {
+		for (const msg of displayMessages) {
+			const fromParsed = extractSummaryText(msg.parsed);
+			if (fromParsed) return fromParsed;
 		}
-		return primarySender;
-	}, [thread, displayMessages]);
+		return extractSummaryText(thread?.parsed, thread?.preview);
+	}, [displayMessages, thread]);
 
 	// ── Action handlers ───────────────────────────────────────────────────────
-
-	const handlePrototypeAction = (action: string) => {
-		toast.info(`${action} — prototype only`);
-	};
 
 	const handleToggleStar = async () => {
 		if (!thread) return;
@@ -750,12 +819,23 @@ export const ThreadDetail = ({
 					</div>
 				)}
 
+				{displayMessages.length > 0 && (
+					<ThreadHeader
+						subject={thread.subject}
+						messageCount={displayMessages.length}
+						dateRangeLabel={dateRangeLabel}
+						participants={threadParticipants}
+						summary={aiSummaryText}
+						attachments={threadAttachments}
+						labels={thread.labels}
+					/>
+				)}
+
 				{displayMessages.map((msg, index) => (
 					<ZeroMailDisplay
 						key={msg.id}
 						msg={msg}
 						mailbox={mailbox}
-						threadSubject={thread.subject}
 						index={index}
 						totalCount={displayMessages.length}
 						isTranslated={isTranslated}
@@ -764,11 +844,8 @@ export const ThreadDetail = ({
 						translatedTextMap={translatedTextMap}
 						parsedExpanded={parsedExpanded}
 						onToggleParsed={() => setParsedExpanded((v) => !v)}
-						onReply={() => {
-							setShowForwardComposer(false);
-							setReplySeed("");
-							setShowReplyComposer(true);
-						}}
+						onReply={() => openReplyComposer("reply")}
+						onReplyAll={() => openReplyComposer("replyAll")}
 						onForward={() => handleForward()}
 						onDelete={handleDelete}
 						onPrint={handlePrint}

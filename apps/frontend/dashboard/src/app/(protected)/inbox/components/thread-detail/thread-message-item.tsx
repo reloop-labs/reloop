@@ -200,7 +200,7 @@ export const ThreadMessageItem = ({
 						{/* Attachments */}
 						<MessageAttachments
 							attachments={displayAttachments}
-							onDownload={(name) => onPrototypeAction(`Download ${name}`)}
+							onDownload={(file) => onPrototypeAction(`Download ${file.name}`)}
 						/>
 
 						{/* Parsed metadata */}

@@ -46,6 +46,7 @@
 		"bright": "catalog:ui",
 		"calligraph": "catalog:ui",
 		"dayjs": "catalog:ui",
+		"dompurify": "^3.4.11",
 		"framer-motion": "catalog:ui",
 		"jotai": "^2.12.5",
 		"lucide-react": "catalog:ui",
@@ -82,6 +83,7 @@
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
 		"@tailwindcss/postcss": "catalog:ui",
+		"@types/dompurify": "^3.2.0",
 		"@types/node": "catalog:",
 		"@types/prismjs": "^1.26.6",
 		"@types/react": "catalog:ui",

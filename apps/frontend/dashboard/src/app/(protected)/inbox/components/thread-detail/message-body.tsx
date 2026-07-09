@@ -1,7 +1,11 @@
 "use client";
 
-import { Icon } from "@reloop/ui/icon";
-import { useEffect, useRef, useState } from "react";
+import { useTheme } from "next-themes";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	type EmailTheme,
+	processEmailHtmlForDisplay,
+} from "./email-html";
 
 const LANGUAGE_NAMES: Record<string, string> = {
 	es: "Spanish",
@@ -21,114 +25,161 @@ interface MessageBodyProps {
 	bodyText: string | undefined;
 	isTranslated: boolean;
 	targetLanguage: string;
+	/** Stable id for this message — used to reset image toggle when switching */
+	messageId?: string;
 }
 
 /**
- * Renders the email body — either as a sandboxed iframe (HTML) or as plain text.
- * Auto-sizes the iframe to its content height via postMessage from an inline
- * ResizeObserver.
+ * Renders the email body via Shadow DOM (Zero-style), with sanitization,
+ * quote collapsing, theme-aware styles, and an optional image-block banner.
+ * Falls back to plain text on the panel (no white card).
  */
 export const MessageBody = ({
 	bodyHtml,
 	bodyText,
 	isTranslated,
 	targetLanguage,
+	messageId,
 }: MessageBodyProps) => {
-	const [iframeHeight, setIframeHeight] = useState(350);
-	const iframeRef = useRef<HTMLIFrameElement>(null);
+	const { resolvedTheme } = useTheme();
+	const theme: EmailTheme =
+		resolvedTheme === "light" ? "light" : "dark";
 
-	const handleIframeLoad = () => {
-		const iframe = iframeRef.current;
-		if (!iframe) return;
-		try {
-			const doc = iframe.contentDocument || iframe.contentWindow?.document;
-			if (doc?.body) {
-				const h = doc.documentElement.scrollHeight || doc.body.scrollHeight;
-				setIframeHeight(Math.max(h, 120));
-			}
-		} catch {
-			// sandboxed — rely on postMessage instead
-		}
-	};
+	const [showImages, setShowImages] = useState(false);
+	const [hasBlockedImages, setHasBlockedImages] = useState(false);
+	const hostRef = useRef<HTMLDivElement>(null);
+	const shadowRootRef = useRef<ShadowRoot | null>(null);
+
+	// Reset image toggle when the message changes
+	useEffect(() => {
+		setShowImages(false);
+		setHasBlockedImages(false);
+	}, [messageId]);
+
+	const processed = useMemo(() => {
+		if (!bodyHtml) return null;
+		return processEmailHtmlForDisplay({
+			html: bodyHtml,
+			shouldLoadImages: showImages,
+			theme,
+		});
+	}, [bodyHtml, showImages, theme]);
 
 	useEffect(() => {
-		const handler = (e: MessageEvent) => {
-			if (
-				e.data?.type === "iframe-height" &&
-				typeof e.data.height === "number" &&
-				iframeRef.current &&
-				e.source === iframeRef.current.contentWindow
-			) {
-				setIframeHeight(Math.max(e.data.height, 120));
+		if (processed?.hasBlockedImages) {
+			setHasBlockedImages(true);
+		} else if (showImages) {
+			setHasBlockedImages(false);
+		}
+	}, [processed, showImages]);
+
+	useEffect(() => {
+		const host = hostRef.current;
+		if (!host) return;
+
+		if (!host.shadowRoot) {
+			shadowRootRef.current = host.attachShadow({ mode: "open" });
+		} else {
+			shadowRootRef.current = host.shadowRoot;
+		}
+
+		return () => {
+			shadowRootRef.current = null;
+		};
+	}, [bodyHtml]);
+
+	useEffect(() => {
+		if (!shadowRootRef.current || !processed) return;
+		shadowRootRef.current.innerHTML = processed.processedHtml;
+	}, [processed]);
+
+	const handleImageError = useCallback(
+		(e: Event) => {
+			const target = e.target as HTMLImageElement;
+			if (target.tagName === "IMG" && !showImages) {
+				setHasBlockedImages(true);
+				target.style.display = "none";
+			}
+		},
+		[showImages],
+	);
+
+	useEffect(() => {
+		if (!shadowRootRef.current) return;
+		const root = shadowRootRef.current;
+
+		root.addEventListener("error", handleImageError, true);
+
+		const handleClick = (e: Event) => {
+			const target = e.target as HTMLElement;
+			if (target.tagName === "A") {
+				e.preventDefault();
+				const href = target.getAttribute("href");
+				if (href && (href.startsWith("http://") || href.startsWith("https://"))) {
+					window.open(href, "_blank", "noopener,noreferrer");
+				} else if (href?.startsWith("mailto:")) {
+					window.location.href = href;
+				}
 			}
 		};
-		window.addEventListener("message", handler);
-		return () => window.removeEventListener("message", handler);
-	}, []);
 
-	const translationBanner = isTranslated
-		? `<div style="background:#fef08a;color:#854d0e;padding:8px 12px;margin-bottom:12px;border-radius:6px;font-size:12px;font-weight:500;font-family:sans-serif;">Dynamic ${LANGUAGE_NAMES[targetLanguage] || targetLanguage} Translation</div>`
-		: "";
+		root.addEventListener("click", handleClick);
+
+		return () => {
+			root.removeEventListener("error", handleImageError, true);
+			root.removeEventListener("click", handleClick);
+		};
+	}, [processed, handleImageError]);
 
 	if (bodyHtml) {
 		return (
-			<div className="overflow-hidden rounded-lg bg-white shadow-sm">
-				<iframe
-					ref={iframeRef}
-					onLoad={handleIframeLoad}
-					srcDoc={`<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<style>
-* { box-sizing: border-box; }
-html, body { overflow: hidden; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #1c1917;
-  margin: 0;
-  padding: 0;
-  background-color: #ffffff;
-}
-img { max-width: 100%; height: auto; }
-</style>
-</head>
-<body>
-${translationBanner}
-${bodyHtml}
-<script>
-(function() {
-  function sendHeight() {
-    var h = document.documentElement.scrollHeight || document.body.scrollHeight;
-    window.parent.postMessage({ type: 'iframe-height', height: h }, '*');
-  }
-  window.addEventListener('load', sendHeight);
-  if (typeof ResizeObserver !== 'undefined') {
-    new ResizeObserver(sendHeight).observe(document.body);
-  }
-})();
-</script>
-</body>
-</html>`}
-					sandbox="allow-popups allow-popups-to-escape-sandbox allow-scripts"
-					style={{ height: iframeHeight }}
-					className="w-full border-0 bg-white transition-[height] duration-150"
-					title="Email HTML body"
+			<>
+				{isTranslated && (
+					<div className="mb-3 rounded-lg bg-yellow-50 px-3 py-2 font-medium text-[12px] text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200">
+						Dynamic {LANGUAGE_NAMES[targetLanguage] || targetLanguage}{" "}
+						Translation
+					</div>
+				)}
+				{hasBlockedImages && !showImages && (
+					<div className="mb-2 flex items-center justify-start bg-amber-600/20 px-2 py-1 text-amber-600 text-sm">
+						<p>Images in this message have been blocked.</p>
+						<button
+							type="button"
+							onClick={() => setShowImages(true)}
+							className="ml-2 cursor-pointer underline"
+						>
+							Show images
+						</button>
+					</div>
+				)}
+				{hasBlockedImages && showImages && (
+					<div className="mb-2 flex items-center justify-start bg-amber-600/20 px-2 py-1 text-amber-600 text-sm">
+						<p>Images are visible for this message.</p>
+						<button
+							type="button"
+							onClick={() => setShowImages(false)}
+							className="ml-2 cursor-pointer underline"
+						>
+							Hide images
+						</button>
+					</div>
+				)}
+				<div
+					ref={hostRef}
+					className="mail-content w-full flex-1 overflow-x-auto px-0 text-mail-foreground"
 				/>
-			</div>
+			</>
 		);
 	}
 
 	return (
-		<div className="overflow-hidden rounded-lg bg-white p-4 shadow-sm">
+		<div className="px-0">
 			{isTranslated && (
-				<div className="mb-3 rounded-lg bg-yellow-50 px-3 py-2 font-medium text-[12px] text-yellow-800">
+				<div className="mb-3 rounded-lg bg-yellow-50 px-3 py-2 font-medium text-[12px] text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200">
 					Dynamic {LANGUAGE_NAMES[targetLanguage] || targetLanguage} Translation
 				</div>
 			)}
-			<p className="whitespace-pre-wrap text-neutral-800 text-sm leading-relaxed">
+			<p className="whitespace-pre-wrap text-mail-foreground text-sm leading-relaxed">
 				{bodyText}
 			</p>
 		</div>
