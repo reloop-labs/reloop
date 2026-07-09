@@ -91,7 +91,7 @@ export const InboxFilterTabs = ({
 				<AnimatedHoverBackground
 					rect={currentRect}
 					tabElement={currentEl}
-					className="/20 bg-offset-light ring-1 ring-stroke-soft-100 dark:ring-stroke-soft-100/40"
+					className="bg-offset-light/20 ring-1 ring-stroke-soft-100 dark:ring-stroke-soft-100/40"
 				/>
 			</nav>
 		);
@@ -158,7 +158,7 @@ export const InboxFilterTabs = ({
 											? filter.id === "primary"
 												? "bg-blue-500/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400"
 												: "bg-error-base/10 text-error-base dark:bg-red-500/10 dark:text-red-500"
-											: "/10 bg-offset-light text-mail-muted",
+											: "bg-offset-light/10 text-mail-muted",
 									)}
 								>
 									{count}

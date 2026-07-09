@@ -37,7 +37,7 @@ export const MessageParsedData = ({
 			</button>
 
 			{isExpanded && (
-				<div className="/20 flex flex-col gap-2 rounded-lg border border-mail-border border-mail-border/10 bg-offset-light/50 p-3">
+				<div className="flex flex-col gap-2 rounded-lg border border-mail-border border-mail-border/10 bg-offset-light/50 p-3">
 					{Object.entries(parsed).map(([k, v]) => (
 						<div
 							key={k}

@@ -23,7 +23,7 @@ export const RawHeadersModal = ({ thread, onClose }: RawHeadersModalProps) => {
 						<Icon name="cross" className="h-4 w-4" />
 					</button>
 				</div>
-				<div className="/20 flex-1 select-text overflow-auto bg-offset-light/30 p-4 font-mono text-[11px] text-mail-muted text-mail-muted">
+				<div className="flex-1 select-text overflow-auto bg-offset-light/30 p-4 font-mono text-[11px] text-mail-muted">
 					<pre className="whitespace-pre-wrap leading-relaxed">
 						{JSON.stringify(
 							{

@@ -181,7 +181,7 @@ export const AddAgentAddressModal = ({
 								<button
 									type="button"
 									onClick={onClose}
-									className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-panel-light text-mail-muted transition-colors hover:bg-offset-light"
+									className="flex h-7 w-7 items-center justify-center rounded-lg border border-mail-border/60 bg-transparent text-mail-muted transition-all hover:bg-[var(--inbox-hover)] active:scale-[0.95]"
 								>
 									<Icon name="cross" className="h-3.5 w-3.5" />
 								</button>
@@ -236,7 +236,7 @@ export const AddAgentAddressModal = ({
 								<button
 									type="button"
 									onClick={onClose}
-									className="flex h-7 w-7 items-center justify-center rounded-lg border border-stroke-soft-200 bg-panel-light text-mail-muted transition-colors hover:bg-offset-light"
+									className="flex h-7 w-7 items-center justify-center rounded-lg border border-mail-border/60 bg-transparent text-mail-muted transition-all hover:bg-[var(--inbox-hover)] active:scale-[0.95]"
 								>
 									<Icon name="cross" className="h-3.5 w-3.5" />
 								</button>
@@ -377,7 +377,7 @@ export const AddAgentAddressModal = ({
 								)}
 							</div>
 
-							<p className="/5 rounded-lg bg-offset-light px-3 py-2 font-medium text-[12px] text-mail-muted">
+							<p className="rounded-lg bg-offset-light/5 px-3 py-2 font-medium text-[12px] text-mail-muted">
 								<Icon name="globe" className="mr-1 inline h-3.5 w-3.5" />
 								Domain must have receiving enabled. Manage domains from{" "}
 								<a
