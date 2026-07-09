@@ -117,14 +117,14 @@ export const InboxNavUser = ({
 				<div className="flex items-center gap-1 font-medium text-[14px] text-mail-foreground leading-none">
 					<p className="max-w-[14.5ch] truncate">{displayName}</p>
 				</div>
-				<div className="group/copy flex w-full items-center justify-between gap-1.5">
+				<div className="flex w-full items-center gap-1.5">
 					<button
 						type="button"
 						onClick={(e) => {
 							e.stopPropagation();
 							handleCopy();
 						}}
-						className="h-5 flex-1 min-w-0 truncate text-left text-[13px] text-mail-muted leading-none transition-colors hover:text-mail-foreground focus:outline-none"
+						className="h-5 max-w-[170px] cursor-pointer truncate text-left text-[13px] text-mail-muted leading-none transition-colors hover:text-mail-foreground focus:outline-none"
 						title="Copy email address"
 					>
 						{mailbox.email}
@@ -135,13 +135,13 @@ export const InboxNavUser = ({
 							e.stopPropagation();
 							handleCopy();
 						}}
-						className="shrink-0 flex items-center justify-center text-mail-muted transition-colors hover:text-mail-foreground focus:outline-none"
+						className="flex shrink-0 cursor-pointer items-center justify-center text-mail-muted transition-colors hover:text-mail-foreground focus:outline-none"
 						title="Copy email address"
 					>
 						{copied ? (
-							<Check className="size-3.5 text-green-500" />
+							<Check className="size-3 text-green-500" />
 						) : (
-							<Copy className="size-3.5 opacity-0 group-hover/copy:opacity-100 transition-opacity" />
+							<Copy className="size-2.5" />
 						)}
 					</button>
 				</div>
