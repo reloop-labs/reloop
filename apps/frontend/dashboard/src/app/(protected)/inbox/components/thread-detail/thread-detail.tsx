@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import useSWR from "swr";
 import type { AgentMailbox, InboundThread } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
-import { MailDisplaySkeleton } from "../mail-skeleton";
 import { ForwardComposer } from "./forward-composer";
 import { NotesPanel } from "./note-panel";
 import { RawHeadersModal } from "./raw-headers-modal";
@@ -143,13 +142,25 @@ export const ThreadDetail = ({
 	const [optimisticReplies, setOptimisticReplies] = useState<any[]>([]);
 
 	// ── Thread fetch (for full conversation when a threadId exists) ───────────
+	// KeepPreviousData is intentionally off — switching threads must not flash
+	// the previous conversation. List payload is enough to render immediately.
 	const {
 		data: threadData,
 		mutate: mutateThread,
 		isLoading: isLoadingThread,
 	} = useSWR<any>(
 		thread?.threadId ? `/api/inbox/v1/threads/${thread.threadId}` : null,
+		{
+			revalidateOnFocus: false,
+			keepPreviousData: false,
+		},
 	);
+
+	const threadDataMatches =
+		!!thread?.threadId &&
+		!!threadData &&
+		(threadData.id === thread.threadId ||
+			threadData.threadId === thread.threadId);
 
 	// Reset all local state when the selected thread changes
 	useEffect(() => {
@@ -184,7 +195,11 @@ export const ThreadDetail = ({
 
 		// Base: either thread API messages or single inbound fallback
 		let base: any[];
-		if (threadData?.messages && threadData.messages.length > 0) {
+		if (
+			threadDataMatches &&
+			threadData?.messages &&
+			threadData.messages.length > 0
+		) {
 			const sorted = [...threadData.messages].sort(
 				(a, b) =>
 					new Date(a.messageAt).getTime() - new Date(b.messageAt).getTime(),
@@ -223,7 +238,7 @@ export const ThreadDetail = ({
 		const apiIds = new Set(base.map((m) => m.id));
 		const pending = optimisticReplies.filter((r) => !apiIds.has(r.id));
 		return [...base, ...pending];
-	}, [threadData, thread, mailbox, optimisticReplies]);
+	}, [threadData, threadDataMatches, thread, mailbox, optimisticReplies]);
 
 	const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
 
@@ -673,15 +688,6 @@ export const ThreadDetail = ({
 
 	if (!thread) return <EmptyState />;
 
-	// Zero: while thread messages load, show message skeletons (no toolbar).
-	if (thread.threadId && isLoadingThread && !threadData) {
-		return (
-			<div className="flex h-full min-h-0 flex-col rounded-xl bg-panel-light dark:bg-panel-dark">
-				<MailDisplaySkeleton />
-			</div>
-		);
-	}
-
 	return (
 		<div className="flex h-full min-h-0 flex-col rounded-xl bg-panel-light dark:bg-panel-dark">
 			<ZeroThreadToolbar
@@ -715,6 +721,13 @@ export const ThreadDetail = ({
 			/>
 
 			<div className="min-h-0 flex-1 overflow-y-auto">
+				{/* Soft refresh indicator while conversation hydrates */}
+				{thread.threadId && isLoadingThread && !threadDataMatches && (
+					<div className="flex items-center justify-center border-mail-border border-b py-1.5">
+						<div className="h-3 w-3 animate-spin rounded-full border-2 border-neutral-900 border-t-transparent dark:border-white dark:border-t-transparent" />
+					</div>
+				)}
+
 				{isTranslated && (
 					<div className="mx-4 my-3 flex items-center justify-between gap-3 rounded-lg border border-mail-border bg-[var(--inbox-muted-bg)] p-3 text-xs">
 						<div className="flex items-center gap-2 text-mail-muted">

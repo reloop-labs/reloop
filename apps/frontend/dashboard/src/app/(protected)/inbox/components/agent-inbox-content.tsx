@@ -14,6 +14,7 @@ import {
 import { InboxEmptyState } from "@fe/dashboard/app/(protected)/inbox/components/inbox-empty-state";
 import { useInboxSidebar } from "@fe/dashboard/app/(protected)/inbox/components/inbox-sidebar-context";
 import { InboxSidebarToggle } from "@fe/dashboard/app/(protected)/inbox/components/inbox-sidebar-toggle";
+import { MailDisplaySkeleton } from "@fe/dashboard/app/(protected)/inbox/components/mail-skeleton";
 import { SnoozeDialog } from "@fe/dashboard/app/(protected)/inbox/components/thread-detail/snooze-dialog";
 import { ThreadDetail } from "@fe/dashboard/app/(protected)/inbox/components/thread-detail";
 import {
@@ -326,6 +327,10 @@ export const AgentInboxContent = ({
 			showBack={!isDesktop}
 			onToggleAi={toggleAi}
 		/>
+	) : selectedThreadId && isLoadingThreads ? (
+		<div className="flex h-full min-h-0 flex-col rounded-xl bg-panel-light dark:bg-panel-dark">
+			<MailDisplaySkeleton />
+		</div>
 	) : (
 		<InboxEmptyState
 			onCompose={openCompose}
