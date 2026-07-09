@@ -3,6 +3,7 @@
 import { Mail } from "lucide-react";
 import { AiSidebarToggle } from "./ai-sidebar";
 import { InboxEmptyStateIcon } from "./inbox-empty-state-icon";
+import { InboxListEmptyIcon } from "./inbox-list-empty-icon";
 
 export const InboxEmptyState = ({
 	title = "It's empty here",
@@ -17,12 +18,16 @@ export const InboxEmptyState = ({
 	onOpenAi?: () => void;
 	showComposeAction?: boolean;
 }) => (
-	<div className="flex h-full items-center justify-center">
-		<div className="flex flex-col items-center justify-center gap-2 text-center">
-			<InboxEmptyStateIcon width={200} height={200} />
-			<div className="mt-4">
-				<p className="text-lg">{title}</p>
-				<p className="text-mail-muted text-md">{description}</p>
+	<div className="flex h-full w-full items-center justify-center">
+		<div className="flex flex-col items-center justify-center text-center">
+			<InboxEmptyStateIcon width={140} height={152} />
+			<div className="mt-2">
+				<p className="font-medium text-xl text-mail-foreground tracking-tight">
+					{title}
+				</p>
+				<p className="mt-1 text-mail-muted text-sm dark:text-white/50">
+					{description}
+				</p>
 				{(showComposeAction && onCompose) || onOpenAi ? (
 					<div className="mt-4 grid grid-cols-1 gap-2 xl:grid-cols-2">
 						{onOpenAi ? <AiSidebarToggle onClick={onOpenAi} /> : null}
@@ -50,12 +55,18 @@ export const InboxListEmptyState = ({
 	hasFilters?: boolean;
 	onClearFilters?: () => void;
 }) => (
-	<div className="flex w-full items-center justify-center py-12">
-		<div className="flex flex-col items-center justify-center gap-2 text-center">
-			<InboxEmptyStateIcon width={200} height={200} />
-			<div className="mt-5">
-				<p className="text-lg">It's empty here</p>
-				<p className="text-mail-muted text-md">
+	<div className="flex h-full w-full items-center justify-center">
+		<div className="flex flex-col items-center justify-center text-center">
+			<InboxListEmptyIcon
+				width={96}
+				height={96}
+				className="text-mail-muted opacity-80"
+			/>
+			<div className="mt-1">
+				<p className="font-medium text-xl text-mail-foreground tracking-tight">
+					It's empty here
+				</p>
+				<p className="mt-1 text-mail-muted text-sm dark:text-white/50">
 					{hasFilters ? (
 						<>
 							Search for another email or{" "}

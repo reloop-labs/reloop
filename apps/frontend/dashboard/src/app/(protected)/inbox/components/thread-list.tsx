@@ -163,10 +163,12 @@ export const ThreadList = ({
 
 	if (threads.length === 0) {
 		return (
-			<InboxListEmptyState
-				hasFilters={hasFilters}
-				onClearFilters={onClearFilters}
-			/>
+			<div className="flex h-full min-h-0 w-full flex-1 items-center justify-center">
+				<InboxListEmptyState
+					hasFilters={hasFilters}
+					onClearFilters={onClearFilters}
+				/>
+			</div>
 		);
 	}
 

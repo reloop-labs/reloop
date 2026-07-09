@@ -3,7 +3,8 @@
 import { cn } from "@reloop/ui/cn";
 import * as CommandMenu from "@reloop/ui/command";
 import { Icon } from "@reloop/ui/icon";
-import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
+import { KbdCommand } from "@reloop/ui/kbd-command";
+import { KbdKey } from "@reloop/ui/kbd-key";
 import {
 	ArrowRight,
 	Clock,
@@ -552,7 +553,7 @@ export const InboxSearchTrigger = ({
 			type="button"
 			onClick={onOpenPalette}
 			className={cn(
-				"relative flex h-10 flex-1 select-none items-center justify-start overflow-hidden rounded-lg border border-mail-border/20 bg-panel-light pl-3 text-left font-normal text-sm shadow-none backdrop-blur-sm transition-all hover:bg-mail-accent/30 focus-visible:ring-2 focus-visible:ring-mail-primary/30 dark:bg-panel-dark/40",
+				"relative flex h-10 flex-1 select-none items-center justify-start overflow-hidden rounded-2xl border border-mail-border/20 bg-panel-light pl-3 text-left font-normal text-sm shadow-none backdrop-blur-sm transition-all hover:bg-mail-accent/30 focus-visible:ring-2 focus-visible:ring-mail-primary/30 dark:bg-panel-dark/40",
 			)}
 		>
 			<SearchIcon className="h-4 w-4 text-mail-muted" />
@@ -588,7 +589,12 @@ export const InboxSearchTrigger = ({
 						Clear
 					</span>
 				)}
-				<KbdKeyOutline className="hidden sm:flex">⌘K</KbdKeyOutline>
+				<span className="pointer-events-none hidden items-center gap-0.5 sm:inline-flex">
+					<KbdCommand className="h-5 w-5 border-mail-border/40 text-mail-muted dark:border-white/15" />
+					<KbdKey className="h-5 w-5 border-mail-border/40 text-mail-muted dark:border-white/15">
+						K
+					</KbdKey>
+				</span>
 			</div>
 		</button>
 	);
