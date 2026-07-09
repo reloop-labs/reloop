@@ -14,7 +14,6 @@ import { ForwardComposer } from "./forward-composer";
 import { NotesPanel } from "./note-panel";
 import { RawHeadersModal } from "./raw-headers-modal";
 import { ReplyComposer } from "./reply-composer";
-import { SnoozeDialog } from "./snooze-dialog";
 import { ZeroMailDisplay } from "./zero-mail-display";
 import { ZeroThreadFooter } from "./zero-thread-footer";
 import { ZeroThreadToolbar } from "./zero-thread-toolbar";
@@ -103,8 +102,6 @@ export const ThreadDetail = ({
 		trashThread,
 		restoreThread,
 		unarchiveThread,
-		snoozeThread,
-		unsnoozeThread,
 		toggleThreadImportant,
 		sendReply,
 		sendReplyAll,
@@ -120,7 +117,6 @@ export const ThreadDetail = ({
 	const [replySeed, setReplySeed] = useState("");
 	const [showForwardComposer, setShowForwardComposer] = useState(false);
 	const [isForwarding, setIsForwarding] = useState(false);
-	const [snoozeOpen, setSnoozeOpen] = useState(false);
 	const [replyMode, setReplyMode] = useState<"reply" | "replyAll">("reply");
 	const [composeParam, setComposeParam] = useQueryState(
 		"compose",
@@ -320,8 +316,6 @@ export const ThreadDetail = ({
 		try {
 			if (folder === "spam" && messageId) {
 				await markMessageSpam(messageId, false);
-			} else if (folder === "snoozed") {
-				await unsnoozeThread(threadKey);
 			} else {
 				await restoreThread(threadKey);
 			}
@@ -370,17 +364,6 @@ export const ThreadDetail = ({
 			toast.error(
 				err instanceof Error ? err.message : "Failed to update important",
 			);
-		}
-	};
-
-	const handleSnooze = async (until: Date) => {
-		if (!threadKey) return;
-		try {
-			await snoozeThread(threadKey, until);
-			toast.success("Snoozed");
-			onBack?.();
-		} catch (err: unknown) {
-			toast.error(err instanceof Error ? err.message : "Failed to snooze");
 		}
 	};
 
@@ -718,20 +701,13 @@ export const ThreadDetail = ({
 				onArchive={() => void handleArchive()}
 				onUnarchive={() => void handleUnarchive()}
 				onRestore={() => void handleRestore()}
-				onMoveToInbox={() => void handleRestore()}
 				onDelete={() => void handleDelete()}
 				onPrint={handlePrint}
 				onMarkSpam={() => void handleMarkSpam(true)}
-				onSnooze={() => setSnoozeOpen(true)}
 				onUnsubscribe={listUnsubscribeUrl ? handleUnsubscribe : undefined}
 				notesSlot={
 					thread.threadId ? <NotesPanel threadId={thread.threadId} /> : null
 				}
-			/>
-			<SnoozeDialog
-				open={snoozeOpen}
-				onOpenChange={setSnoozeOpen}
-				onConfirm={(until) => void handleSnooze(until)}
 			/>
 
 			<div className="min-h-0 flex-1 overflow-y-auto">

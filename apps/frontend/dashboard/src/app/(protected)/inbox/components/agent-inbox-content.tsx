@@ -16,7 +16,6 @@ import { useInboxSidebar } from "@fe/dashboard/app/(protected)/inbox/components/
 import { InboxSidebarToggle } from "@fe/dashboard/app/(protected)/inbox/components/inbox-sidebar-toggle";
 import { MailDisplaySkeleton } from "@fe/dashboard/app/(protected)/inbox/components/mail-skeleton";
 import { ThreadDetail } from "@fe/dashboard/app/(protected)/inbox/components/thread-detail";
-import { SnoozeDialog } from "@fe/dashboard/app/(protected)/inbox/components/thread-detail/snooze-dialog";
 import {
 	ThreadList,
 	useInboxNavigation,
@@ -65,7 +64,6 @@ export const AgentInboxContent = ({
 	const {
 		markMessageRead,
 		batchThreads,
-		snoozeThread,
 		refresh,
 		isLoadingThreads,
 	} = useAgentInbox();
@@ -77,8 +75,6 @@ export const AgentInboxContent = ({
 	const listContainerRef = useRef<HTMLDivElement>(null);
 	const [paletteOpen, setPaletteOpen] = useState(false);
 	const [isRefreshing, setIsRefreshing] = useState(false);
-	const [snoozeThreadTarget, setSnoozeThreadTarget] =
-		useState<InboundThread | null>(null);
 	const activeFilterCount = useInboxActiveFilterCount();
 
 	const [searchQuery, setSearchQuery] = useQueryState(
@@ -342,26 +338,6 @@ export const AgentInboxContent = ({
 				threads={filteredThreads}
 				onSelectThread={handleSelectThread}
 			/>
-			<SnoozeDialog
-				open={!!snoozeThreadTarget}
-				onOpenChange={(open) => {
-					if (!open) setSnoozeThreadTarget(null);
-				}}
-				onConfirm={(until) => {
-					if (!snoozeThreadTarget) return;
-					const id = snoozeThreadTarget.threadId || snoozeThreadTarget.id;
-					void snoozeThread(id, until)
-						.then(() => {
-							toast.success("Snoozed");
-							setSnoozeThreadTarget(null);
-						})
-						.catch((err: unknown) =>
-							toast.error(
-								err instanceof Error ? err.message : "Failed to snooze",
-							),
-						);
-				}}
-			/>
 			<div className="relative flex min-h-0 min-w-0 flex-1 rounded-inherit p-0 lg:h-[calc(100dvh-8px)]">
 				<ResizablePanelGroup
 					direction="horizontal"
@@ -493,7 +469,6 @@ export const AgentInboxContent = ({
 									onReply={(t) => openThreadComposer(t, "reply")}
 									onReplyAll={(t) => openThreadComposer(t, "replyAll")}
 									onForward={(t) => openThreadComposer(t, "forward")}
-									onSnooze={(t) => setSnoozeThreadTarget(t)}
 								/>
 							</div>
 						</div>

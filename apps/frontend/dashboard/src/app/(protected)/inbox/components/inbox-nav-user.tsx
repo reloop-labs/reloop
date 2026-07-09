@@ -54,11 +54,11 @@ const MailboxAvatar = ({
 				active && "ring-2 ring-[#006ffe] ring-offset-0",
 			)}
 		>
-			<div className="flex size-7 items-center justify-center rounded-lg bg-[#2B2B2B] font-medium text-[10px] text-white uppercase">
+			<div className="flex size-7 items-center justify-center rounded-lg bg-[#2B2B2B] font-semibold text-white text-xs uppercase">
 				{getAvatarInitial(mailbox.label, mailbox.email)}
 			</div>
 			{active && (
-				<CircleCheckBadge className="-right-2 -bottom-2 absolute z-10 size-4 rounded-full bg-[var(--sidebar-background)]" />
+				<CircleCheckBadge className="-right-1.5 -bottom-2 absolute z-10 size-4 rounded-full bg-[var(--sidebar-background)]" />
 			)}
 		</div>
 	</button>
@@ -235,7 +235,7 @@ export const InboxNavUser = ({
 							disabled={isSavingName}
 							maxLength={255}
 							aria-label="Mailbox display name"
-							className="min-w-0 flex-1 max-w-[14.5ch] rounded-sm border-0 bg-transparent p-0 font-medium text-[14px] text-mail-foreground leading-snug outline-none ring-1 ring-[#006ffe]/60 focus:ring-[#006ffe] disabled:opacity-70"
+							className="min-w-0 max-w-[14.5ch] flex-1 rounded-sm border-0 bg-transparent p-0 font-medium text-[14px] text-mail-foreground leading-snug outline-none ring-1 ring-[#006ffe]/60 focus:ring-[#006ffe] disabled:opacity-70"
 						/>
 					) : (
 						<button
@@ -251,8 +251,10 @@ export const InboxNavUser = ({
 						<span
 							className="flex size-3.5 shrink-0 items-center justify-center"
 							aria-live="polite"
-							aria-label={isSavingName ? "Saving" : "Saved"}
 						>
+							<span className="sr-only">
+								{isSavingName ? "Saving" : "Saved"}
+							</span>
 							{isSavingName ? (
 								<Loader2 className="size-3 animate-spin text-mail-muted" />
 							) : (

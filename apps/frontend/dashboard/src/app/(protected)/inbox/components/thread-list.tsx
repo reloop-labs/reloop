@@ -30,7 +30,6 @@ interface ThreadListProps {
 	onReply?: (thread: InboundThread) => void;
 	onReplyAll?: (thread: InboundThread) => void;
 	onForward?: (thread: InboundThread) => void;
-	onSnooze?: (thread: InboundThread) => void;
 	isLoading?: boolean;
 }
 
@@ -49,7 +48,6 @@ export const ThreadList = ({
 	onReply,
 	onReplyAll,
 	onForward,
-	onSnooze,
 	isLoading = false,
 }: ThreadListProps) => {
 	const { toggleMessageStar, archiveThread, trashThread } = useAgentInbox();
@@ -237,7 +235,6 @@ export const ThreadList = ({
 								onReply={onReply}
 								onReplyAll={onReplyAll}
 								onForward={onForward}
-								onSnooze={onSnooze}
 							>
 								<InboxThreadRow
 									thread={thread}

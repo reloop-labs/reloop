@@ -31,7 +31,6 @@ export async function restoreThreadController(
 		.set({
 			status: "active",
 			deletedAt: null,
-			snoozedUntil: null,
 		})
 		.where(eq(emailThread.id, id));
 

@@ -85,7 +85,7 @@ export async function batchThreadsController(
 		case "archive":
 			await db
 				.update(emailThread)
-				.set({ status: "archived", snoozedUntil: null })
+				.set({ status: "archived" })
 				.where(inArray(emailThread.id, foundIds));
 			break;
 		case "trash":
@@ -94,14 +94,13 @@ export async function batchThreadsController(
 				.set({
 					status: "trash",
 					deletedAt: new Date(),
-					snoozedUntil: null,
 				})
 				.where(inArray(emailThread.id, foundIds));
 			break;
 		case "restore":
 			await db
 				.update(emailThread)
-				.set({ status: "active", deletedAt: null, snoozedUntil: null })
+				.set({ status: "active", deletedAt: null })
 				.where(inArray(emailThread.id, foundIds));
 			break;
 		case "star":

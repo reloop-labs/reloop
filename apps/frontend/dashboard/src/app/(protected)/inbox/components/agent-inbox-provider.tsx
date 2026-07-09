@@ -99,7 +99,6 @@ interface BackendThread {
 	isRead: boolean;
 	isStarred: boolean;
 	isImportant?: boolean;
-	snoozedUntil?: string | Date | null;
 	deletedAt?: string | Date | null;
 	createdAt: string | Date;
 	updatedAt: string | Date;
@@ -110,7 +109,6 @@ interface AgentInboxContextValue {
 	threads: InboundThread[];
 	archivedThreads: InboundThread[];
 	trashThreads: InboundThread[];
-	snoozedThreads: InboundThread[];
 	isLoadingMailboxes: boolean;
 	isLoadingThreads: boolean;
 	getMailbox: (id: string) => AgentMailbox | undefined;
@@ -125,8 +123,6 @@ interface AgentInboxContextValue {
 	unarchiveThread: (threadId: string) => Promise<void>;
 	trashThread: (threadId: string) => Promise<void>;
 	restoreThread: (threadId: string) => Promise<void>;
-	snoozeThread: (threadId: string, until: Date) => Promise<void>;
-	unsnoozeThread: (threadId: string) => Promise<void>;
 	toggleThreadImportant: (
 		threadId: string,
 		isImportant: boolean,
@@ -240,23 +236,6 @@ interface AgentInboxContextValue {
 
 const AgentInboxContext = createContext<AgentInboxContextValue | null>(null);
 
-const toIsoString = (value: string | Date): string =>
-	typeof value === "string" ? value : value.toISOString();
-
-const toOptionalIsoString = (
-	value: string | Date | null | undefined,
-): string | null => {
-	if (value == null) return null;
-	return toIsoString(value);
-};
-
-const isCurrentlySnoozed = (
-	snoozedUntil: string | Date | null | undefined,
-): boolean => {
-	if (snoozedUntil == null) return false;
-	return new Date(snoozedUntil).getTime() > Date.now();
-};
-
 const mapMessageToThread = (msg: BackendMessage): InboundThread => {
 	const receivedAtDate = msg.date || msg.createdAt;
 	const receivedAt =
@@ -303,7 +282,6 @@ const mapMessageToThread = (msg: BackendMessage): InboundThread => {
 		isImportant: false,
 		isSpam: msg.isSpam,
 		isTrashed: false,
-		snoozedUntil: null,
 		direction: "inbound" as const,
 		toEmails: msg.toEmails,
 		attachments:
@@ -359,7 +337,6 @@ const mapBackendThreadToInbound = (
 		isImportant: thread.isImportant ?? false,
 		isSpam: false,
 		isTrashed,
-		snoozedUntil: toOptionalIsoString(thread.snoozedUntil),
 		direction: "inbound",
 		timeline: [],
 	};
@@ -410,10 +387,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		const excludedThreadIds = new Set(
 			(allThreadsData || [])
 				.filter(
-					(t) =>
-						t.status === "archived" ||
-						t.status === "trash" ||
-						isCurrentlySnoozed(t.snoozedUntil),
+					(t) => t.status === "archived" || t.status === "trash",
 				)
 				.map((t) => t.id),
 		);
@@ -437,7 +411,6 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 								isSpam: base.isSpam,
 								isTrashed,
 								isArchived,
-								snoozedUntil: toOptionalIsoString(meta.snoozedUntil),
 								status: base.isSpam ? ("blocked" as const) : base.status,
 							};
 						}
@@ -485,7 +458,6 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 						isImportant: false,
 						isSpam: false,
 						isTrashed: false,
-						snoozedUntil: null,
 						direction: "outbound" as const,
 						toEmails: msg.toEmails,
 						attachments: [],
@@ -527,13 +499,6 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		if (!allThreadsData) return [];
 		return allThreadsData
 			.filter((t) => t.status === "trash")
-			.map((t) => mapBackendThreadToInbound(t, t.mailboxId || ""));
-	}, [allThreadsData]);
-
-	const snoozedThreads = useMemo(() => {
-		if (!allThreadsData) return [];
-		return allThreadsData
-			.filter((t) => isCurrentlySnoozed(t.snoozedUntil))
 			.map((t) => mapBackendThreadToInbound(t, t.mailboxId || ""));
 	}, [allThreadsData]);
 
@@ -754,48 +719,6 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			if (!res.ok) {
 				const body = await res.text();
 				throw new Error(body || "Failed to restore thread");
-			}
-
-			await Promise.all([
-				mutateMessages(),
-				mutateThreads(),
-				mutateSentMessages(),
-			]);
-		},
-		[mutateMessages, mutateThreads, mutateSentMessages],
-	);
-
-	const snoozeThread = useCallback(
-		async (threadId: string, until: Date) => {
-			const res = await fetch(`/api/inbox/v1/threads/${threadId}/snooze`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ until: until.toISOString() }),
-			});
-
-			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to snooze thread");
-			}
-
-			await Promise.all([
-				mutateMessages(),
-				mutateThreads(),
-				mutateSentMessages(),
-			]);
-		},
-		[mutateMessages, mutateThreads, mutateSentMessages],
-	);
-
-	const unsnoozeThread = useCallback(
-		async (threadId: string) => {
-			const res = await fetch(`/api/inbox/v1/threads/${threadId}/unsnooze`, {
-				method: "POST",
-			});
-
-			if (!res.ok) {
-				const body = await res.text();
-				throw new Error(body || "Failed to unsnooze thread");
 			}
 
 			await Promise.all([
@@ -1089,7 +1012,6 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			threads,
 			archivedThreads,
 			trashThreads,
-			snoozedThreads,
 			isLoadingMailboxes,
 			isLoadingThreads,
 			getMailbox,
@@ -1104,8 +1026,6 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			unarchiveThread,
 			trashThread,
 			restoreThread,
-			snoozeThread,
-			unsnoozeThread,
 			toggleThreadImportant,
 			batchThreads,
 			sendReply,
@@ -1122,7 +1042,6 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			threads,
 			archivedThreads,
 			trashThreads,
-			snoozedThreads,
 			isLoadingMailboxes,
 			isLoadingThreads,
 			getMailbox,
@@ -1137,8 +1056,6 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			unarchiveThread,
 			trashThread,
 			restoreThread,
-			snoozeThread,
-			unsnoozeThread,
 			toggleThreadImportant,
 			batchThreads,
 			sendReply,

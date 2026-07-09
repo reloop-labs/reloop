@@ -5,7 +5,6 @@ import * as Dropdown from "@reloop/ui/dropdown";
 import {
 	Archive,
 	ArchiveRestore,
-	Clock,
 	Inbox,
 	MoreHorizontal,
 	Printer,
@@ -34,8 +33,6 @@ export const ZeroThreadToolbar = ({
 	onDelete,
 	onPrint,
 	onMarkSpam,
-	onMoveToInbox,
-	onSnooze,
 	onUnsubscribe,
 	notesSlot,
 	showBack,
@@ -53,8 +50,6 @@ export const ZeroThreadToolbar = ({
 	onDelete: () => void;
 	onPrint: () => void;
 	onMarkSpam: () => void;
-	onMoveToInbox?: () => void;
-	onSnooze?: () => void;
 	onUnsubscribe?: () => void;
 	notesSlot?: ReactNode;
 	showBack?: boolean;
@@ -62,8 +57,7 @@ export const ZeroThreadToolbar = ({
 	const inArchive = folder === "archive" || folder === "archived";
 	const inTrash = folder === "trash";
 	const inSpam = folder === "spam";
-	const inSnoozed = folder === "snoozed";
-	const showRestore = inArchive || inTrash || inSpam || inSnoozed;
+	const showRestore = inArchive || inTrash || inSpam;
 
 	return (
 		<div className="flex shrink-0 items-center px-1 pb-[10px] md:px-3 md:pt-3 md:pb-[11px]">
@@ -137,23 +131,10 @@ export const ZeroThreadToolbar = ({
 					</button>
 				)}
 
-				{onSnooze && !showRestore && (
-					<button
-						type="button"
-						onClick={onSnooze}
-						className={iconBtn}
-						aria-label="Snooze"
-					>
-						<Clock className="h-3.5 w-3.5 text-mail-muted" />
-					</button>
-				)}
-
 				{showRestore ? (
 					<button
 						type="button"
-						onClick={
-							inArchive ? onUnarchive : inSnoozed ? onMoveToInbox : onRestore
-						}
+						onClick={inArchive ? onUnarchive : onRestore}
 						className={iconBtn}
 						aria-label="Move to inbox"
 					>
@@ -196,13 +177,7 @@ export const ZeroThreadToolbar = ({
 						{showRestore && (
 							<Dropdown.Item
 								className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-control-hover)]"
-								onSelect={
-									inArchive
-										? onUnarchive
-										: inSnoozed
-											? onMoveToInbox
-											: onRestore
-								}
+								onSelect={inArchive ? onUnarchive : onRestore}
 							>
 								<Inbox className="mr-2 h-4 w-4" />
 								Move to inbox

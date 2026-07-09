@@ -313,7 +313,6 @@ export namespace MailModel {
 		isSpam: t.Optional(t.Boolean()),
 		isImportant: t.Optional(t.Boolean()),
 		status: t.Optional(t.String()),
-		snoozedUntil: t.Optional(t.Union([t.String(), t.Null()])),
 		deletedAt: t.Optional(t.Union([t.String(), t.Null(), t.Date()])),
 	});
 
@@ -430,7 +429,6 @@ export namespace MailModel {
 		isRead: t.Boolean(),
 		isStarred: t.Boolean(),
 		isImportant: t.Optional(t.Boolean()),
-		snoozedUntil: t.Optional(t.Union([t.String(), t.Null(), t.Date()])),
 		deletedAt: t.Optional(t.Union([t.String(), t.Null(), t.Date()])),
 		createdAt: t.Union([t.Date(), t.String()]),
 		updatedAt: t.Union([t.Date(), t.String()]),

@@ -41,7 +41,6 @@ export async function updateThreadController(
 		updateData.status = updates.status;
 		if (updates.status === "trash") {
 			updateData.deletedAt = new Date();
-			updateData.snoozedUntil = null;
 		} else if (updates.status === "active") {
 			updateData.deletedAt = null;
 		}

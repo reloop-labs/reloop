@@ -7,7 +7,6 @@ import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
 import { createOTLPDrain } from "evlog/otlp";
 import { pendingOutboundCron } from "./cron/pending-outbound.cron";
-import { unsnoozeCron } from "./cron/unsnooze.cron";
 import { inboxConfig } from "./inbox.config";
 import { aiRoutes } from "./routes/ai/ai.routes";
 import { draftsRoutes } from "./routes/drafts/drafts.routes";
@@ -93,7 +92,6 @@ const inboxService = new Elysia({
 	.use(notesRoutes)
 	.use(draftsRoutes)
 	.use(aiRoutes)
-	.use(unsnoozeCron)
 	.use(pendingOutboundCron)
 	.onStart(async () => {
 		await loader();

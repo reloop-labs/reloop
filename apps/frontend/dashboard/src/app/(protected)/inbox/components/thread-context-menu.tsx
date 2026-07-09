@@ -6,7 +6,6 @@ import type { InboundThread } from "@fe/dashboard/app/(protected)/inbox/types";
 import * as ContextMenu from "@reloop/ui/context-menu";
 import {
 	Archive,
-	Clock,
 	ExternalLink,
 	Forward,
 	Inbox,
@@ -37,7 +36,6 @@ export type ThreadContextMenuProps = {
 	onReply?: (thread: InboundThread) => void;
 	onReplyAll?: (thread: InboundThread) => void;
 	onForward?: (thread: InboundThread) => void;
-	onSnooze?: (thread: InboundThread) => void;
 };
 
 const resolveThreadId = (thread: InboundThread) => thread.threadId || thread.id;
@@ -54,7 +52,6 @@ export const ThreadContextMenu = ({
 	onReply,
 	onReplyAll,
 	onForward,
-	onSnooze,
 }: ThreadContextMenuProps) => {
 	const {
 		toggleMessageStar,
@@ -64,7 +61,6 @@ export const ThreadContextMenu = ({
 		trashThread,
 		restoreThread,
 		unarchiveThread,
-		unsnoozeThread,
 		markMessageSpam,
 	} = useAgentInbox();
 	const { labels, assignThreadToLabel } = useInboxLabels(mailboxId);
@@ -74,8 +70,7 @@ export const ThreadContextMenu = ({
 	const inArchive = folder === "archive" || folder === "archived";
 	const inTrash = folder === "trash";
 	const inSpam = folder === "spam";
-	const inSnoozed = folder === "snoozed";
-	const showMoveToInbox = inArchive || inTrash || inSpam || inSnoozed;
+	const showMoveToInbox = inArchive || inTrash || inSpam;
 
 	const run = async (action: () => Promise<void>, success: string) => {
 		try {
@@ -95,8 +90,6 @@ export const ThreadContextMenu = ({
 	const handleMoveToInbox = async () => {
 		if (inSpam) {
 			await markMessageSpam(messageId, false);
-		} else if (inSnoozed) {
-			await unsnoozeThread(threadId);
 		} else if (inArchive) {
 			await unarchiveThread(threadId);
 		} else {
@@ -241,16 +234,6 @@ export const ThreadContextMenu = ({
 						}
 					>
 						Move to spam
-					</ContextMenu.Item>
-				)}
-
-				{onSnooze && !showMoveToInbox && (
-					<ContextMenu.Item
-						className={itemClass}
-						onSelect={() => onSnooze(thread)}
-					>
-						<Clock className="h-3.5 w-3.5" />
-						Snooze
 					</ContextMenu.Item>
 				)}
 

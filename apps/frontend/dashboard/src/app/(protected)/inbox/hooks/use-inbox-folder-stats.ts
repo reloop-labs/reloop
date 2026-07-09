@@ -11,7 +11,6 @@ export type InboxFolderStats = {
 	drafts: number;
 	sent: number;
 	archive: number;
-	snoozed: number;
 	spam: number;
 	bin: number;
 };
@@ -41,7 +40,6 @@ export const useInboxFolderStats = (mailboxId: string): InboxFolderStats => {
 			).length,
 			sent: mailboxThreads.filter((t) => t.direction === "outbound").length,
 			archive: mailboxArchived.length,
-			snoozed: 0,
 			spam: mailboxThreads.filter(
 				(t) => t.direction === "inbound" && t.status === "blocked",
 			).length,

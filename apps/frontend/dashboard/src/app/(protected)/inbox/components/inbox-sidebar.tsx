@@ -36,10 +36,6 @@ const ArchiveIcon = (
 	props: Omit<React.ComponentProps<typeof Icon>, "name">,
 ) => <Icon name="archive" {...props} />;
 
-const SnoozeIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
-	<Icon name="snooze" {...props} />
-);
-
 const AlertIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
 	<Icon name="alert" {...props} />
 );
@@ -222,12 +218,6 @@ export const InboxSidebar = ({
 			href: `${base}/archive`,
 			icon: ArchiveIcon,
 			showCount: true,
-		},
-		{
-			id: "snoozed",
-			label: "Snoozed",
-			href: `${base}/snoozed`,
-			icon: SnoozeIcon,
 		},
 		{
 			id: "spam",

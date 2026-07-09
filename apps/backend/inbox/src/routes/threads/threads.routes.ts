@@ -7,10 +7,8 @@ import { getThreadAttachmentRoute } from "./get-thread-attachment/get-thread-att
 import { listThreadsRoute } from "./list-threads/list-threads.route";
 import { markThreadReadRoute } from "./mark-thread-read/mark-thread-read.route";
 import { restoreThreadRoute } from "./restore-thread/restore-thread.route";
-import { snoozeThreadRoute } from "./snooze-thread/snooze-thread.route";
 import { toggleThreadStarRoute } from "./toggle-thread-star/toggle-thread-star.route";
 import { trashThreadRoute } from "./trash-thread/trash-thread.route";
-import { unsnoozeThreadRoute } from "./unsnooze-thread/unsnooze-thread.route";
 import { updateThreadRoute } from "./update-thread/update-thread.route";
 
 export const threadsRoutes = new Elysia({
@@ -27,6 +25,4 @@ export const threadsRoutes = new Elysia({
 	.use(archiveThreadRoute)
 	.use(trashThreadRoute)
 	.use(restoreThreadRoute)
-	.use(snoozeThreadRoute)
-	.use(unsnoozeThreadRoute)
 	.use(deleteThreadRoute);

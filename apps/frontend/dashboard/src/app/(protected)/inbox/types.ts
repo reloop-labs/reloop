@@ -74,7 +74,6 @@ export interface InboundThread {
 	isImportant?: boolean;
 	isSpam?: boolean;
 	isTrashed?: boolean;
-	snoozedUntil?: string | null;
 	labels?: InboxLabel[];
 	entityTag?: "invoice" | "support" | "order" | "security";
 	direction?: "inbound" | "outbound";

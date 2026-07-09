@@ -31,7 +31,6 @@ export async function trashThreadController(
 		.set({
 			status: "trash",
 			deletedAt: new Date(),
-			snoozedUntil: null,
 		})
 		.where(eq(emailThread.id, id));
 
