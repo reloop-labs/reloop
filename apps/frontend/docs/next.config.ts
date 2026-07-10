@@ -1,3 +1,4 @@
+
 /** @type {import('next').NextConfig} */
 const config = {
 	reactStrictMode: true,
@@ -6,10 +7,10 @@ const config = {
 	poweredByHeader: false,
 	allowedDevOrigins: ["local.reloop.sh", "*.local.reloop.sh"],
 	serverExternalPackages: ["next-mdx-remote", "next-mdx-remote/rsc"],
+	partialPrefetching: true,
 	cacheComponents: true,
 	experimental: {
 		turbopackMemoryEviction: false,
-		partialPrefetching: true,
 		optimizePackageImports: [
 			"lucide-react",
 			"simple-icons",
