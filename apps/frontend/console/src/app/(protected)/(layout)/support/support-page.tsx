@@ -17,7 +17,14 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { ArrowUp, MessageSquare } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	Fragment,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import useSWR, { mutate as globalMutate } from "swr";
 
 type ConversationsResponse = { items: SupportConversation[]; total: number };
@@ -30,6 +37,33 @@ function avatarInitial(name: string | null, email: string | null) {
 	if (name?.trim()) return name.trim().charAt(0).toUpperCase();
 	if (email?.trim()) return email.trim().charAt(0).toUpperCase();
 	return "?";
+}
+
+/** First message from `fromRole` after lastReadAt — used for the unread divider. */
+function findFirstUnreadMessageId(
+	messages: SupportMessage[],
+	lastReadAt: string | null,
+	fromRole: "user" | "admin",
+): string | null {
+	for (const m of messages) {
+		if (m.senderRole !== fromRole) continue;
+		if (!lastReadAt || new Date(m.createdAt) > new Date(lastReadAt)) {
+			return m.id;
+		}
+	}
+	return null;
+}
+
+function UnreadMessagesBanner() {
+	return (
+		<div className="flex items-center gap-3 py-1">
+			<div className="h-px flex-1 bg-orange-400/70" />
+			<span className="shrink-0 font-semibold text-[11px] text-orange-600 uppercase tracking-wide">
+				New messages
+			</span>
+			<div className="h-px flex-1 bg-orange-400/70" />
+		</div>
+	);
 }
 
 function SupportPersonAvatar({
@@ -88,7 +122,11 @@ export default function SupportPage() {
 	const [messages, setMessages] = useState<SupportMessage[]>([]);
 	const [draft, setDraft] = useState("");
 	const [sending, setSending] = useState(false);
+	/** Sticky for this open session — captured before mark-read. */
+	const [unreadAnchorId, setUnreadAnchorId] = useState<string | null>(null);
 	const bottomRef = useRef<HTMLDivElement>(null);
+	const unreadBannerRef = useRef<HTMLDivElement>(null);
+	const didScrollToUnreadRef = useRef(false);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	const activeId = selectedId || null;
@@ -149,9 +187,16 @@ export default function SupportPage() {
 
 	const loadConversation = useCallback(
 		async (id: string) => {
+			didScrollToUnreadRef.current = false;
 			const detail = await adminGet<ConversationDetail>(
 				`/support/conversations/${id}`,
 			);
+			const anchor = findFirstUnreadMessageId(
+				detail.messages,
+				detail.conversation.adminLastReadAt,
+				"user",
+			);
+			setUnreadAnchorId(anchor);
 			setSelectedDetail(detail.conversation);
 			setMessages(detail.messages);
 			await markRead(id);
@@ -164,14 +209,28 @@ export default function SupportPage() {
 		if (!activeId) {
 			setMessages([]);
 			setSelectedDetail(null);
+			setUnreadAnchorId(null);
 			return;
 		}
 		void loadConversation(activeId);
 	}, [activeId, loadConversation]);
 
 	useEffect(() => {
+		if (
+			unreadAnchorId &&
+			!didScrollToUnreadRef.current &&
+			unreadBannerRef.current
+		) {
+			didScrollToUnreadRef.current = true;
+			unreadBannerRef.current.scrollIntoView({
+				behavior: "smooth",
+				block: "center",
+			});
+			return;
+		}
+		if (unreadAnchorId && !didScrollToUnreadRef.current) return;
 		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-	}, [messages.length]);
+	}, [messages.length, unreadAnchorId]);
 
 	const onEvent = useCallback(
 		(event: SupportServerEvent) => {
@@ -436,48 +495,55 @@ export default function SupportPage() {
 								) : (
 									messages.map((m) => {
 										const isAdmin = m.senderRole === "admin";
+										const showUnreadBanner = m.id === unreadAnchorId;
 										return (
-											<div
-												key={m.id}
-												className={cn(
-													"flex flex-col gap-1",
-													isAdmin ? "items-end" : "items-start",
-												)}
-											>
+											<Fragment key={m.id}>
+												{showUnreadBanner ? (
+													<div ref={unreadBannerRef}>
+														<UnreadMessagesBanner />
+													</div>
+												) : null}
 												<div
 													className={cn(
-														"flex max-w-[85%] items-end gap-2",
-														isAdmin ? "flex-row-reverse" : "flex-row",
+														"flex flex-col gap-1",
+														isAdmin ? "items-end" : "items-start",
 													)}
 												>
-													<SupportPersonAvatar
-														name={m.senderName}
-														email={m.senderEmail}
-														image={m.senderImage}
-													/>
 													<div
 														className={cn(
-															"min-w-0 rounded-[22px] px-3.5 py-2.5 text-[13px] leading-relaxed",
-															isAdmin
-																? "rounded-br-md bg-text-strong-950 text-white"
-																: "rounded-bl-md bg-bg-weak-50 text-text-strong-950",
+															"flex max-w-[85%] items-end gap-2",
+															isAdmin ? "flex-row-reverse" : "flex-row",
 														)}
 													>
-														<p className="whitespace-pre-wrap break-words">
-															{m.body}
-														</p>
+														<SupportPersonAvatar
+															name={m.senderName}
+															email={m.senderEmail}
+															image={m.senderImage}
+														/>
+														<div
+															className={cn(
+																"min-w-0 rounded-[22px] px-3.5 py-2.5 text-[13px] leading-relaxed",
+																isAdmin
+																	? "rounded-br-md bg-text-strong-950 text-white"
+																	: "rounded-bl-md bg-bg-weak-50 text-text-strong-950",
+															)}
+														>
+															<p className="whitespace-pre-wrap break-words">
+																{m.body}
+															</p>
+														</div>
 													</div>
+													<p
+														className={cn(
+															"text-[11px] text-text-soft-400",
+															isAdmin ? "mr-10" : "ml-10",
+														)}
+													>
+														{m.senderName || m.senderRole} ·{" "}
+														{formatTime(m.createdAt)}
+													</p>
 												</div>
-												<p
-													className={cn(
-														"text-[11px] text-text-soft-400",
-														isAdmin ? "mr-10" : "ml-10",
-													)}
-												>
-													{m.senderName || m.senderRole} ·{" "}
-													{formatTime(m.createdAt)}
-												</p>
-											</div>
+											</Fragment>
 										);
 									})
 								)}

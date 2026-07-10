@@ -16,7 +16,7 @@ import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
 import axios from "axios";
 import { ArrowDown, ArrowUp, MessageSquare, RotateCcw } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 
 type ConversationPayload = {
 	conversation: SupportConversation;
@@ -32,6 +32,33 @@ function formatTime(value: string) {
 	} catch {
 		return "";
 	}
+}
+
+/** First message from `fromRole` after lastReadAt — used for the unread divider. */
+function findFirstUnreadMessageId(
+	messages: SupportMessage[],
+	lastReadAt: string | null,
+	fromRole: "user" | "admin",
+): string | null {
+	for (const m of messages) {
+		if (m.senderRole !== fromRole) continue;
+		if (!lastReadAt || new Date(m.createdAt) > new Date(lastReadAt)) {
+			return m.id;
+		}
+	}
+	return null;
+}
+
+function UnreadMessagesBanner() {
+	return (
+		<div className="flex items-center gap-3 py-1">
+			<div className="h-px flex-1 bg-orange-400/70" />
+			<span className="shrink-0 font-semibold text-[11px] text-orange-600 uppercase tracking-wide dark:text-orange-400">
+				New messages
+			</span>
+			<div className="h-px flex-1 bg-orange-400/70" />
+		</div>
+	);
 }
 
 function greetingForHour() {
@@ -91,9 +118,13 @@ export function SupportChatPanel() {
 	const [sending, setSending] = useState(false);
 	const [followOutput, setFollowOutput] = useState(true);
 	const [showJumpLatest, setShowJumpLatest] = useState(false);
+	/** Sticky for this open session — captured before mark-read. */
+	const [unreadAnchorId, setUnreadAnchorId] = useState<string | null>(null);
 
 	const viewportRef = useRef<HTMLDivElement>(null);
 	const bottomRef = useRef<HTMLDivElement>(null);
+	const unreadBannerRef = useRef<HTMLDivElement>(null);
+	const didScrollToUnreadRef = useRef(false);
 	const followRef = useRef(true);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const conversationIdRef = useRef<string | null>(null);
@@ -102,16 +133,24 @@ export function SupportChatPanel() {
 	const bootstrap = useCallback(async () => {
 		setLoading(true);
 		setError(null);
+		didScrollToUnreadRef.current = false;
 		try {
 			const { data } = await axios.post<ConversationPayload>(
 				"/api/admin/v1/support/conversations",
 				{},
 				{ withCredentials: true },
 			);
+			// Capture unread boundary before mark-read clears the cursor
+			const anchor = findFirstUnreadMessageId(
+				data.messages,
+				data.conversation.userLastReadAt,
+				"admin",
+			);
+			setUnreadAnchorId(anchor);
 			setConversation(data.conversation);
 			setMessages(data.messages);
-			followRef.current = true;
-			setFollowOutput(true);
+			followRef.current = !anchor;
+			setFollowOutput(!anchor);
 			setShowJumpLatest(false);
 
 			// Mark as read when opening the support panel
@@ -156,12 +195,25 @@ export function SupportChatPanel() {
 	}, [messages.length]);
 
 	useEffect(() => {
+		if (loading) return;
+		if (
+			unreadAnchorId &&
+			!didScrollToUnreadRef.current &&
+			unreadBannerRef.current
+		) {
+			didScrollToUnreadRef.current = true;
+			unreadBannerRef.current.scrollIntoView({
+				behavior: "smooth",
+				block: "center",
+			});
+			return;
+		}
 		if (!followRef.current) {
 			setShowJumpLatest(messages.length > 0);
 			return;
 		}
 		bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-	}, [messages.length]);
+	}, [messages.length, unreadAnchorId, loading]);
 
 	const onEvent = useCallback((event: SupportServerEvent) => {
 		if (event.type === "ready") {
@@ -328,59 +380,66 @@ export function SupportChatPanel() {
 					<div className="mx-auto flex w-full max-w-md flex-col gap-5">
 						{messages.map((m) => {
 							const mine = m.senderRole === "user";
+							const showUnreadBanner = m.id === unreadAnchorId;
 							return (
-								<div
-									key={m.id}
-									data-message-id={m.id}
-									className={cn(
-										"flex w-full flex-col gap-1",
-										mine ? "items-end" : "items-start",
-									)}
-								>
-									{/* Avatar + bubble share one row so they stay bottom-aligned */}
+								<Fragment key={m.id}>
+									{showUnreadBanner ? (
+										<div ref={unreadBannerRef}>
+											<UnreadMessagesBanner />
+										</div>
+									) : null}
 									<div
+										data-message-id={m.id}
 										className={cn(
-											"flex max-w-[92%] items-end gap-2",
-											mine ? "flex-row-reverse" : "flex-row",
+											"flex w-full flex-col gap-1",
+											mine ? "items-end" : "items-start",
 										)}
 									>
-										<SupportPersonAvatar
-											name={
-												mine
-													? user?.name || m.senderName
-													: m.senderName || "Support"
-											}
-											email={
-												mine ? user?.email || m.senderEmail : m.senderEmail
-											}
-											image={
-												mine ? user?.image || m.senderImage : m.senderImage
-											}
-										/>
+										{/* Avatar + bubble share one row so they stay bottom-aligned */}
 										<div
 											className={cn(
-												"min-w-0 rounded-[22px] px-3.5 py-2.5 text-[13px] leading-relaxed",
-												mine
-													? "rounded-br-md bg-text-strong-950 text-white dark:bg-white dark:text-black"
-													: "rounded-bl-md bg-bg-weak-50 text-text-strong-950 dark:bg-white/[0.06] dark:text-white/90",
+												"flex max-w-[92%] items-end gap-2",
+												mine ? "flex-row-reverse" : "flex-row",
 											)}
 										>
-											<p className="whitespace-pre-wrap break-words">
-												{m.body}
-											</p>
+											<SupportPersonAvatar
+												name={
+													mine
+														? user?.name || m.senderName
+														: m.senderName || "Support"
+												}
+												email={
+													mine ? user?.email || m.senderEmail : m.senderEmail
+												}
+												image={
+													mine ? user?.image || m.senderImage : m.senderImage
+												}
+											/>
+											<div
+												className={cn(
+													"min-w-0 rounded-[22px] px-3.5 py-2.5 text-[13px] leading-relaxed",
+													mine
+														? "rounded-br-md bg-text-strong-950 text-white dark:bg-white dark:text-black"
+														: "rounded-bl-md bg-bg-weak-50 text-text-strong-950 dark:bg-white/[0.06] dark:text-white/90",
+												)}
+											>
+												<p className="whitespace-pre-wrap break-words">
+													{m.body}
+												</p>
+											</div>
 										</div>
+										{/* Indent past avatar (32px) + gap (8px) so meta sits under the bubble */}
+										<p
+											className={cn(
+												"text-[11px] text-text-soft-400 dark:text-white/30",
+												mine ? "mr-10" : "ml-10",
+											)}
+										>
+											{mine ? "You" : m.senderName || "Support"} ·{" "}
+											{formatTime(m.createdAt)}
+										</p>
 									</div>
-									{/* Indent past avatar (32px) + gap (8px) so meta sits under the bubble */}
-									<p
-										className={cn(
-											"text-[11px] text-text-soft-400 dark:text-white/30",
-											mine ? "mr-10" : "ml-10",
-										)}
-									>
-										{mine ? "You" : m.senderName || "Support"} ·{" "}
-										{formatTime(m.createdAt)}
-									</p>
-								</div>
+								</Fragment>
 							);
 						})}
 						<div ref={bottomRef} className="h-px w-full shrink-0" />
