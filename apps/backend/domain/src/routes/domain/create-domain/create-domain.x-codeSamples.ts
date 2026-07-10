@@ -14,7 +14,7 @@ const { response: domain, error } = await reloop.domain.create({
   open_tracking: true,
   tls: "opportunistic",
   sending_email: true,
-  receiving_email: true,
+  receiving_email: false,
 });
 if (error) throw error;`,
 	},
@@ -25,7 +25,7 @@ if (error) throw error;`,
 		source: `curl -X POST https://reloop.sh/api/domain/v1/create \\
   -H "x-api-key: rl_123456789" \\
   -H "Content-Type: application/json" \\
-  -d '{"domain": "send.example.com","custom_return_path": "inbound","click_tracking": true,"open_tracking": true,"tls": "opportunistic","sending_email": true,"receiving_email": true}'`,
+  -d '{"domain": "send.example.com","custom_return_path": "inbound","click_tracking": true,"open_tracking": true,"tls": "opportunistic","sending_email": true,"receiving_email": false}'`,
 	},
 	{
 		id: "python",
@@ -42,7 +42,7 @@ domain = reloop.domain.create(
     open_tracking=True,
     tls="opportunistic",
     sending_email=True,
-    receiving_email=True,
+    receiving_email=False,
 )`,
 	},
 	{
@@ -58,7 +58,7 @@ $domain = $reloop->domain->create([
     'open_tracking' => true,
     'tls' => 'opportunistic',
     'sending_email' => true,
-    'receiving_email' => true,
+    'receiving_email' => false,
 ]);`,
 	},
 	{
@@ -138,7 +138,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         open_tracking: Some(true),
         tls: Some("opportunistic".to_string()),
         sending_email: Some(true),
-        receiving_email: Some(true),
+        receiving_email: Some(false),
         ..Default::default()
     }).await?;
 
@@ -160,7 +160,7 @@ domain = reloop.domain.create(
   open_tracking: true,
   tls: "opportunistic",
   sending_email: true,
-  receiving_email: true,
+  receiving_email: false,
 )`,
 	},
 	{
@@ -176,7 +176,7 @@ domain = reloop.domain.create(
   open_tracking: true,
   tls: "opportunistic",
   sending_email: true,
-  receiving_email: true
+  receiving_email: false
 })`,
 	},
 ];

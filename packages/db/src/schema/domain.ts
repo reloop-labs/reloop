@@ -85,7 +85,7 @@ export const domain = pgTable(
 			.default(true),
 		isReceivingEmailEnabled: boolean("is_receiving_email_enabled")
 			.notNull()
-			.default(true),
+			.default(false),
 		verificationFailedReason: text("verification_failed_reason"),
 		deletedAt: timestamp("deleted_at"),
 		lastVerifiedAt: timestamp("last_verified_at"),

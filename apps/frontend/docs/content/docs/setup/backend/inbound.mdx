@@ -64,11 +64,12 @@ Key variables in `local/docker-compose.yml`:
 
 ```
 External Sender → Port 25 → Recipient Check → RSpamD → NATS → Inbox
+                                                    ↘ discard (no SMTP egress)
 ```
 
 | Layer | Detail |
 | :--- | :--- |
 | **MX reception** | Accepts inbound mail on port `25`. |
 | **Validation** | [domain](/setup/backend/domain) service verifies recipients. |
-| **Forwarding** | Accepted messages published to NATS for inbox. |
-| **Outbound** | Submission is handled by [smtp](/setup/backend/smtp), not this service. |
+| **Forwarding** | Accepted messages published to NATS for inbox, then assigned to the `null` queue. |
+| **Receive-only** | No SMTP AUTH, no HTTP inject, no outbound delivery — submission is [smtp](/setup/backend/smtp) only. |

@@ -152,7 +152,7 @@ export const DomainHeader = ({ domain, isLoading }: DomainHeaderProps) => {
 						tls: "opportunistic" as const,
 						isTrackingDomain: false,
 						isSendingEmailEnabled: true,
-						isReceivingEmailEnabled: true,
+						isReceivingEmailEnabled: false,
 						verificationFailedReason: null,
 						dnsRecords: [],
 						deletedAt: null,

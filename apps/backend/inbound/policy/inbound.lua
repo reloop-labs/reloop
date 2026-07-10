@@ -12,11 +12,29 @@ local function get_nats_client()
   return nats_client
 end
 
--- Accept all domains — this is an open MX receiver
+-- Receive-only MX: accept mail addressed to any domain (recipient check gates
+-- actual acceptance). Never allow relay_from — this MTA must not send outbound.
 kumo.on('get_listener_domain', function(domain, listener, conn_meta)
   return kumo.make_listener_domain {
     relay_to = true,
+    relay_from = {},
   }
+end)
+
+-- No SMTP AUTH — inbound is not a submission/relay endpoint
+kumo.on('smtp_server_auth_plain', function(authz, authc, password, conn_meta)
+  print("[INBOUND AUTH] Rejected AUTH attempt from " .. tostring(authc))
+  return false
+end)
+
+-- Block HTTP inject / outbound generation entirely
+kumo.on('http_server_validate_auth_basic', function(user, password)
+  return false
+end)
+
+kumo.on('http_message_generated', function(msg)
+  print("[INBOUND HTTP] Rejected outbound inject attempt id=" .. tostring(msg:id()))
+  kumo.reject(550, "5.7.1 Inbound MTA does not accept outbound mail")
 end)
 
 -- Validate recipient mailbox before accepting the message
@@ -63,7 +81,7 @@ kumo.on('smtp_server_rcpt_to', function(recipient, conn_meta)
   end
 end)
 
--- Process received inbound email: RSpamD scan → NATS publish
+-- Process received inbound email: RSpamD scan → NATS publish → discard (no egress)
 kumo.on('smtp_server_message_received', function(msg)
   local msg_id = msg:id()
   print("[INBOUND] [" .. msg_id .. "] Processing inbound email")
@@ -109,7 +127,7 @@ kumo.on('smtp_server_message_received', function(msg)
         local status_prefix = is_spam and "Yes" or "No"
         local symbols_str = table.concat(rspamd_symbols, ",")
         local status_value = status_prefix .. ", score=" .. tostring(rspamd_score or 0) .. " required=5 tests=" .. symbols_str
-        
+
         msg:append_header('X-Spam-Score', tostring(rspamd_score or 0))
         msg:append_header('X-Spam-Flag', flag_value)
         msg:append_header('X-Spam-Status', status_value)
@@ -143,5 +161,25 @@ kumo.on('smtp_server_message_received', function(msg)
     return
   end
 
-  print("[INBOUND] [" .. msg_id .. "] Successfully published to NATS")
+  -- 3. CRITICAL: discard from scheduled queues — never attempt SMTP egress.
+  -- Without this, KumoMTA would try to deliver the message outbound to the
+  -- recipient MX (open-relay / delivery loop risk).
+  msg:set_meta('queue', 'null')
+
+  print("[INBOUND] [" .. msg_id .. "] Successfully published to NATS (queued for discard, no outbound)")
+end)
+
+-- Defense in depth: if anything still hits a scheduled queue, do not deliver.
+kumo.on('get_queue_config', function(domain, tenant, campaign, routing_domain)
+  print("[INBOUND QUEUE] Refusing egress for domain=" .. tostring(domain))
+  return kumo.make_queue_config {
+    max_age = '1 second',
+    protocol = {
+      -- Route nowhere — messages should already be on the null queue.
+      smtp = {
+        mx_list = { '127.0.0.1:1' },
+        ehlo_domain = constants.hostname,
+      },
+    },
+  }
 end)

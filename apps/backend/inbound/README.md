@@ -8,6 +8,8 @@ KumoMTA instance dedicated to **receiving inbound email** at `inbound.reloop.sh`
 
 This service handles the MX side of the email infrastructure — accepting mail from external senders, validating recipients, scanning for spam, and forwarding to the inbox service via NATS.
 
+**Receive-only:** this MTA must never send outbound mail. After NATS publish, messages are assigned to the `null` queue (discard). SMTP AUTH and HTTP inject are rejected.
+
 ## 🚀 Setup
 
 For detailed setup and development instructions, please refer to the [Setup Guide](https://reloop.sh/docs/setup/backend/inbound).
@@ -16,6 +18,7 @@ For detailed setup and development instructions, please refer to the [Setup Guid
 
 ```
 External Sender → Port 25 (SMTP) → Recipient Check → RSpamD Scan → NATS → Inbox Service
+                                                              ↘ discard (null queue, no SMTP egress)
 ```
 
 ## Ports

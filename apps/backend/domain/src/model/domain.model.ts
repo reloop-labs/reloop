@@ -58,7 +58,7 @@ export namespace DomainModel {
 			),
 			receiving_email: t.Optional(
 				t.Boolean({
-					default: true,
+					default: false,
 					description: "Whether receiving email is enabled",
 				}),
 			),
@@ -72,7 +72,7 @@ export namespace DomainModel {
 					open_tracking: true,
 					tls: "opportunistic",
 					sending_email: true,
-					receiving_email: true,
+					receiving_email: false,
 				},
 			],
 		},
@@ -320,7 +320,7 @@ export namespace DomainModel {
 					click_tracking: true,
 					open_tracking: true,
 					sending_email: true,
-					receiving_email: true,
+					receiving_email: false,
 				},
 			],
 		},
