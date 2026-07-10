@@ -1,4 +1,5 @@
 import { apiKey } from "@better-auth/api-key";
+import { ac, orgRoles } from "@reloop/auth/permissions";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -192,6 +193,8 @@ export const auth = betterAuth({
 			},
 		}),
 		organization({
+			ac,
+			roles: orgRoles,
 			additionalFields: {
 				organization: {
 					billingEmail: {

@@ -4,6 +4,7 @@ import {
 	getAvatarGradient,
 	getAvatarInitial,
 } from "@fe/dashboard/utils/avatar";
+import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { authClient } from "@reloop/auth/client";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
@@ -30,6 +31,7 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 	user,
 	isCollapsed = false,
 }) => {
+	const { canManageBilling } = useOrgPermissions();
 	const { theme, setTheme } = useTheme();
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -205,21 +207,23 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 					<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 
 					<Dropdown.Group className="gap-0">
-						<Dropdown.Item
-							ref={(el) => {
-								if (el) itemRefs.current[5] = el;
-							}}
-							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-							onPointerEnter={() => setHoverIdx(5)}
-							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => router.push("/settings/credits")}
-						>
-							<Icon
-								name="arrow-top-circle"
-								className="h-4 w-4 text-text-sub-600"
-							/>
-							<span className="flex-1 truncate text-sm">Manage credits</span>
-						</Dropdown.Item>
+						{canManageBilling && (
+							<Dropdown.Item
+								ref={(el) => {
+									if (el) itemRefs.current[5] = el;
+								}}
+								className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+								onPointerEnter={() => setHoverIdx(5)}
+								onPointerLeave={() => setHoverIdx(undefined)}
+								onClick={() => router.push("/settings/credits")}
+							>
+								<Icon
+									name="arrow-top-circle"
+									className="h-4 w-4 text-text-sub-600"
+								/>
+								<span className="flex-1 truncate text-sm">Manage credits</span>
+							</Dropdown.Item>
+						)}
 
 						<Dropdown.Item
 							ref={(el) => {

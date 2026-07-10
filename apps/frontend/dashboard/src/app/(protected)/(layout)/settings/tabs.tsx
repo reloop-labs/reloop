@@ -1,10 +1,11 @@
 "use client";
+import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 const list = [
 	{
@@ -16,6 +17,7 @@ const list = [
 		title: "Members",
 		path: "/settings/members",
 		iconName: "users",
+		requiresTeamAdmin: true,
 	},
 	{
 		title: "SMTP",
@@ -31,35 +33,51 @@ const list = [
 		title: "Credits",
 		path: "/settings/credits",
 		iconName: "invoice",
+		requiresBillingAdmin: true,
 	},
 	{
 		title: "Usage",
 		path: "/settings/usage",
 		iconName: "barchart",
 	},
-];
+] as const;
 
 export const SettingsTabs = () => {
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const pathname = usePathname();
 	const router = useRouter();
-	const activeIndex = list.findIndex((item) => item.path === pathname);
+	const { canManageTeam, canManageBilling, isPending } = useOrgPermissions();
+
+	const visibleList = useMemo(
+		() =>
+			list.filter((item) => {
+				if ("requiresTeamAdmin" in item && item.requiresTeamAdmin) {
+					return canManageTeam;
+				}
+				if ("requiresBillingAdmin" in item && item.requiresBillingAdmin) {
+					return canManageBilling;
+				}
+				return true;
+			}),
+		[canManageTeam, canManageBilling],
+	);
+
+	const activeIndex = visibleList.findIndex((item) => item.path === pathname);
 	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
 	const tab = buttonRefs.current[currentIdx];
 	const rect = tab?.getBoundingClientRect();
 
-	const getTabValue = (pathname: string) => {
-		return pathname;
-	};
+	if (isPending) {
+		return (
+			<div className="h-10 border-stroke-soft-200 border-b dark:border-stroke-soft-100/40" />
+		);
+	}
 
 	return (
-		<TabMenuHorizontal.Root
-			defaultValue="/settings"
-			value={getTabValue(pathname)}
-		>
+		<TabMenuHorizontal.Root defaultValue="/settings" value={pathname}>
 			<TabMenuHorizontal.List className="relative h-10 gap-0 border-b! py-0">
-				{list.map(({ path, title, iconName }, index) => (
+				{visibleList.map(({ path, title, iconName }, index) => (
 					<TabMenuHorizontal.Trigger
 						ref={(el) => {
 							if (el) {

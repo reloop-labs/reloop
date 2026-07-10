@@ -39,16 +39,16 @@ const ROLE_CONFIG: {
 	dotColor: string;
 }[] = [
 	{
-		value: "member",
-		label: "Member",
-		description: "Can create, view & delete own content",
-		dotColor: "bg-neutral-600",
-	},
-	{
 		value: "admin",
 		label: "Admin",
-		description: "Can manage members and settings and everything",
+		description: "Invite users, update payment, and delete the team.",
 		dotColor: "bg-feature-base",
+	},
+	{
+		value: "member",
+		label: "Member",
+		description: "Manage emails, domains, and webhooks.",
+		dotColor: "bg-neutral-600",
 	},
 ];
 
@@ -423,7 +423,7 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 						)}
 					</AnimatePresence>
 					<p className="pt-3 font-medium text-label-sm text-text-strong-950">
-						Assign role
+						Select role
 					</p>
 					<div className="grid grid-cols-2 gap-2">
 						{ROLE_CONFIG.map(({ value, label, description, dotColor }) => {

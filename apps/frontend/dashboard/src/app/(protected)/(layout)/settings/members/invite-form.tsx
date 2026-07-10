@@ -32,13 +32,13 @@ const roleOptions = [
 	{
 		value: "admin",
 		label: "Admin",
-		description: "Full access to all features",
+		description: "Invite users, update payment, and delete the team.",
 		icon: "shield",
 	},
 	{
 		value: "member",
 		label: "Member",
-		description: "Read-only access",
+		description: "Manage emails, domains, and webhooks.",
 		icon: "user",
 	},
 ] as const;

@@ -35,6 +35,7 @@
 		"pg": "catalog:db",
 		"redis": "catalog:db",
 		"zod": "catalog:ui",
+		"@reloop/auth": "workspace:*",
 		"@reloop/db": "workspace:*",
 		"@reloop/cache": "workspace:*",
 		"@reloop/bus": "workspace:*",

@@ -1,7 +1,10 @@
 "use client";
 
+import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import useSWR from "swr";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -84,16 +87,32 @@ const entryTypeStyles: Record<string, string> = {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 const CreditsPage = () => {
+	const router = useRouter();
+	const { canManageBilling, isPending: rolePending } = useOrgPermissions();
 	const {
 		data: planData,
 		isLoading: planLoading,
 		error: planError,
-	} = useSWR<PlanData>("/api/credits/v1/plan");
+	} = useSWR<PlanData>(
+		canManageBilling ? "/api/credits/v1/plan" : null,
+	);
 	const {
 		data: transactions,
 		isLoading: transactionsLoading,
 		error: transactionsError,
-	} = useSWR<Transaction[]>("/api/credits/v1/transactions");
+	} = useSWR<Transaction[]>(
+		canManageBilling ? "/api/credits/v1/transactions" : null,
+	);
+
+	useEffect(() => {
+		if (!rolePending && !canManageBilling) {
+			router.replace("/settings");
+		}
+	}, [canManageBilling, rolePending, router]);
+
+	if (rolePending || !canManageBilling) {
+		return null;
+	}
 
 	const isLoading = planLoading || transactionsLoading;
 	const error = planError || transactionsError;

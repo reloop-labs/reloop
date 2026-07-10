@@ -6,6 +6,7 @@
 		"./client": "./src/client.ts",
 		"./server": "./src/server.ts",
 		"./roles": "./src/roles.ts",
+		"./permissions": "./src/permissions.ts",
 		"./platform-permissions": "./src/platform-permissions.ts"
 	},
 	"scripts": {

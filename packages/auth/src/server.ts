@@ -1,7 +1,7 @@
 import { apiKey } from "@better-auth/api-key";
 import { betterAuth } from "better-auth";
 import { admin, bearer, jwt, openAPI, organization } from "better-auth/plugins";
-import { ac, dev, marketing, admin as orgAdmin } from "./permissions";
+import { ac, orgRoles } from "./permissions";
 import { platformAc, platformRoles } from "./platform-permissions";
 import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "./roles";
 
@@ -34,18 +34,8 @@ export const auth = betterAuth({
 		}),
 		apiKey({ defaultPrefix: "rl" }),
 		organization({
-			teams: {
-				enabled: true,
-				defaultTeam: {
-					enabled: false,
-				},
-			},
 			ac,
-			roles: {
-				orgAdmin,
-				dev,
-				marketing,
-			},
+			roles: orgRoles,
 			sendInvitationEmail: async () => {},
 		}),
 		openAPI({ path: "/docs" }),

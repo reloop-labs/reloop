@@ -1,10 +1,12 @@
 "use client";
 
+import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { useQueryState } from "nuqs";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { InviteModal } from "./invite-modal";
 import {
@@ -17,11 +19,27 @@ const Team = () => {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [filters, setFilters] = useState<TeamFilterValue>("all");
 	const [modal, setModal] = useQueryState("modal", { history: "replace" });
+	const router = useRouter();
+	const { canManageTeam, canInvite, isPending } = useOrgPermissions();
 
-	useHotkeys("mod+a", (e) => {
-		e.preventDefault();
-		setModal("invite");
-	});
+	useEffect(() => {
+		if (!isPending && !canManageTeam) {
+			router.replace("/settings");
+		}
+	}, [canManageTeam, isPending, router]);
+
+	useHotkeys(
+		"mod+a",
+		(e) => {
+			e.preventDefault();
+			if (canInvite) setModal("invite");
+		},
+		{ enabled: canInvite },
+	);
+
+	if (isPending || !canManageTeam) {
+		return null;
+	}
 
 	return (
 		<div className="w-full space-y-6 pt-5">
@@ -50,33 +68,37 @@ const Team = () => {
 
 				<TeamFilterDropdown value={filters} onChange={setFilters} />
 
-				<Button.Root
-					variant="neutral"
-					size="xsmall"
-					onClick={() => setModal("invite")}
-				>
-					<Icon name="user-plus" className="h-4 w-4" />
-					<span>Invite members</span>
-					<span className="inline-flex items-center gap-0.5">
-						<Icon
-							name="command"
-							className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-						/>
-						<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
-							a
+				{canInvite && (
+					<Button.Root
+						variant="neutral"
+						size="xsmall"
+						onClick={() => setModal("invite")}
+					>
+						<Icon name="user-plus" className="h-4 w-4" />
+						<span>Invite members</span>
+						<span className="inline-flex items-center gap-0.5">
+							<Icon
+								name="command"
+								className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+							/>
+							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
+								a
+							</span>
 						</span>
-					</span>
-				</Button.Root>
+					</Button.Root>
+				)}
 			</div>
 
 			{/* Team List */}
 			<TeamList searchQuery={searchQuery} filters={filters} />
 
 			{/* Invite Modal */}
-			<InviteModal
-				open={modal === "invite"}
-				onOpenChange={(open) => setModal(open ? "invite" : null)}
-			/>
+			{canInvite && (
+				<InviteModal
+					open={modal === "invite"}
+					onOpenChange={(open) => setModal(open ? "invite" : null)}
+				/>
+			)}
 		</div>
 	);
 };
