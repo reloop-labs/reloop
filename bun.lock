@@ -11,13 +11,17 @@
       },
     },
     "apps/backend/admin": {
-      "name": "admin-service",
+      "name": "admin",
       "version": "1.0.0",
       "dependencies": {
+        "@elysia/opentelemetry": "catalog:backend",
         "@elysiajs/cors": "catalog:backend",
         "@elysiajs/openapi": "catalog:backend",
+        "@elysiajs/server-timing": "catalog:backend",
         "@paralleldrive/cuid2": "catalog:backend",
         "@reloop/auth": "workspace:*",
+        "@reloop/bus": "workspace:*",
+        "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
         "dotenv": "catalog:backend",
         "drizzle-orm": "catalog:db",
@@ -2529,7 +2533,7 @@
 
     "acorn-jsx": ["acorn-jsx@5.3.2", "", { "peerDependencies": { "acorn": "^6.0.0 || ^7.0.0 || ^8.0.0" } }, "sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ=="],
 
-    "admin-service": ["admin-service@workspace:apps/backend/admin"],
+    "admin": ["admin@workspace:apps/backend/admin"],
 
     "ai": ["ai@6.0.138", "", { "dependencies": { "@ai-sdk/gateway": "3.0.80", "@ai-sdk/provider": "3.0.8", "@ai-sdk/provider-utils": "4.0.21", "@opentelemetry/api": "1.9.0" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-49OfPe0f5uxJ6jUdA5BBXjIinP6+ZdYfAtpF2aEH64GA5wPcxH2rf/TBUQQ0bbamBz/D+TLMV18xilZqOC+zaA=="],
 

@@ -5,13 +5,10 @@ import {
 	organization,
 	organizationCredits,
 } from "@reloop/db/schema";
-import { createError } from "evlog";
 import { desc, eq, sql } from "drizzle-orm";
+import { createError } from "evlog";
 
-async function getOrProvisionCredits(
-	orgId: string,
-	tx: DatabaseInstance = db,
-) {
+async function getOrProvisionCredits(orgId: string, tx: DatabaseInstance = db) {
 	let activeCredits = await tx.query.organizationCredits.findFirst({
 		where: (c, { and, eq: eqFn }) =>
 			and(eqFn(c.organizationId, orgId), eqFn(c.status, "active")),

@@ -4,13 +4,7 @@ import { Loader } from "@dot-loaders/react";
 import { authClient } from "@reloop/auth/client";
 import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
 import { useRouter } from "next/navigation";
-import {
-	createContext,
-	useContext,
-	useEffect,
-	useMemo,
-	useRef,
-} from "react";
+import { createContext, useContext, useEffect, useMemo, useRef } from "react";
 
 type AdminUser = {
 	id: string;

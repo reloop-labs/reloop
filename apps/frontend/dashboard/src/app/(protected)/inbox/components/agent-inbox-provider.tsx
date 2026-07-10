@@ -405,9 +405,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 	const threads = useMemo(() => {
 		const excludedThreadIds = new Set(
 			(allThreadsData || [])
-				.filter(
-					(t) => t.status === "archived" || t.status === "trash",
-				)
+				.filter((t) => t.status === "archived" || t.status === "trash")
 				.map((t) => t.id),
 		);
 

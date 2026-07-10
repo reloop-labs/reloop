@@ -71,10 +71,7 @@ export const ThreadList = ({
 		[threads],
 	);
 
-	const orderedThreads = useMemo(
-		() => [...pinned, ...rest],
-		[pinned, rest],
-	);
+	const orderedThreads = useMemo(() => [...pinned, ...rest], [pinned, rest]);
 
 	const visibleThreads = useMemo(
 		() => orderedThreads.slice(0, visibleCount),

@@ -5,7 +5,10 @@ export const adminApi = axios.create({
 	withCredentials: true,
 });
 
-export async function adminGet<T>(path: string, params?: Record<string, unknown>) {
+export async function adminGet<T>(
+	path: string,
+	params?: Record<string, unknown>,
+) {
 	const { data } = await adminApi.get<T>(path, { params });
 	return data;
 }

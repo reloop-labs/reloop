@@ -492,7 +492,10 @@ export const AgentInboxContent = ({
 													}
 													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
 												>
-													<Icon name="trash" className="h-3.5 w-3.5 text-mail-muted" />
+													<Icon
+														name="trash"
+														className="h-3.5 w-3.5 text-mail-muted"
+													/>
 												</button>
 												<button
 													type="button"

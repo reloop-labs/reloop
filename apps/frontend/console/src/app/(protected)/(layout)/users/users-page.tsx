@@ -116,10 +116,7 @@ export default function UsersPage() {
 							</tr>
 						) : (
 							users.map((user) => (
-								<tr
-									key={user.id}
-									className="border-stroke-soft-100 border-t"
-								>
+								<tr key={user.id} className="border-stroke-soft-100 border-t">
 									<td className="px-4 py-3">
 										<p className="font-medium text-text-strong-950">
 											{user.name}
@@ -129,7 +126,9 @@ export default function UsersPage() {
 									<td className="px-4 py-3">
 										<Badge.Root
 											variant="light"
-											color={user.role === PLATFORM_ADMIN_ROLE ? "blue" : "gray"}
+											color={
+												user.role === PLATFORM_ADMIN_ROLE ? "blue" : "gray"
+											}
 										>
 											{user.role || "user"}
 										</Badge.Root>

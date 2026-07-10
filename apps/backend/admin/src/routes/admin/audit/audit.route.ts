@@ -1,6 +1,6 @@
+import { authMiddleware } from "@reloop/admin/middleware/auth-middleware";
 import { AdminModel } from "@reloop/admin/model/admin.model";
 import { Elysia, t } from "elysia";
-import { authMiddleware } from "../../../middleware/auth-middleware";
 import { listAuditController } from "./audit.controllers";
 
 export const auditRoute = new Elysia().use(authMiddleware).get(

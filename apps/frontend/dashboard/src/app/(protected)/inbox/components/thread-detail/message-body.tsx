@@ -2,10 +2,7 @@
 
 import { useTheme } from "next-themes";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-	type EmailTheme,
-	processEmailHtmlForDisplay,
-} from "./email-html";
+import { type EmailTheme, processEmailHtmlForDisplay } from "./email-html";
 
 const LANGUAGE_NAMES: Record<string, string> = {
 	es: "Spanish",
@@ -42,8 +39,7 @@ export const MessageBody = ({
 	messageId,
 }: MessageBodyProps) => {
 	const { resolvedTheme } = useTheme();
-	const theme: EmailTheme =
-		resolvedTheme === "light" ? "light" : "dark";
+	const theme: EmailTheme = resolvedTheme === "light" ? "light" : "dark";
 
 	const [showImages, setShowImages] = useState(false);
 	const [hasBlockedImages, setHasBlockedImages] = useState(false);
@@ -115,7 +111,10 @@ export const MessageBody = ({
 			if (target.tagName === "A") {
 				e.preventDefault();
 				const href = target.getAttribute("href");
-				if (href && (href.startsWith("http://") || href.startsWith("https://"))) {
+				if (
+					href &&
+					(href.startsWith("http://") || href.startsWith("https://"))
+				) {
 					window.open(href, "_blank", "noopener,noreferrer");
 				} else if (href?.startsWith("mailto:")) {
 					window.location.href = href;

@@ -128,7 +128,12 @@ export default function OrganizationsPage() {
 									</td>
 									<td className="px-4 py-3">
 										<div className="flex flex-wrap gap-2">
-											<Button.Root asChild size="xsmall" variant="neutral" mode="stroke">
+											<Button.Root
+												asChild
+												size="xsmall"
+												variant="neutral"
+												mode="stroke"
+											>
 												<Link href={`/organizations/${org.id}`}>View</Link>
 											</Button.Root>
 											{org.status === "suspended" ? (
@@ -140,7 +145,10 @@ export default function OrganizationsPage() {
 														try {
 															await adminPatch(
 																`/organizations/${org.id}/status`,
-																{ status: "active", reason: "Reactivated by admin" },
+																{
+																	status: "active",
+																	reason: "Reactivated by admin",
+																},
 															);
 															toast.success("Organization reactivated");
 															mutate();

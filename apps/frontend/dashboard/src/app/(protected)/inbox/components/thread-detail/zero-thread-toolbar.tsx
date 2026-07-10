@@ -2,6 +2,7 @@
 
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
+import { Icon } from "@reloop/ui/icon";
 import {
 	Archive,
 	ArchiveRestore,
@@ -14,7 +15,6 @@ import {
 	Zap,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { Icon } from "@reloop/ui/icon";
 
 const iconBtn =
 	"inline-flex h-7 w-7 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-[var(--inbox-control)] transition-colors hover:bg-[var(--inbox-control-hover)]";

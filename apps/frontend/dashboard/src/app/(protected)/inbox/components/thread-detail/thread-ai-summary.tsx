@@ -14,7 +14,10 @@ interface ThreadAiSummaryProps {
  * Zero-style purple-bordered collapsible AI Summary shell.
  * No summary API yet — parent supplies text from parsed data / preview.
  */
-export const ThreadAiSummary = ({ summary, className }: ThreadAiSummaryProps) => {
+export const ThreadAiSummary = ({
+	summary,
+	className,
+}: ThreadAiSummaryProps) => {
 	const [open, setOpen] = useState(true);
 
 	if (!summary?.trim()) return null;

@@ -181,7 +181,10 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						<div className="flex w-full flex-row items-start justify-between gap-2">
 							<div className="flex min-w-0 flex-row items-center gap-1">
 								{thread.isPinned && (
-									<Icon name="pin" className="h-3 w-3 shrink-0 text-mail-muted fill-mail-muted" />
+									<Icon
+										name="pin"
+										className="h-3 w-3 shrink-0 fill-mail-muted text-mail-muted"
+									/>
 								)}
 								<span
 									className={cn(

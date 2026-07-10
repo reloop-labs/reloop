@@ -1,9 +1,7 @@
 "use client";
 
 import { ADMIN_NAV } from "@fe/console/constants/navigation";
-import {
-	usePlatformAdmin,
-} from "@fe/console/providers/platform-admin-provider";
+import { usePlatformAdmin } from "@fe/console/providers/platform-admin-provider";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { Logo } from "@reloop/ui/logo";

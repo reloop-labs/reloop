@@ -4,6 +4,7 @@ import { useAgentInbox } from "@fe/dashboard/app/(protected)/inbox/components/ag
 import { useInboxLabels } from "@fe/dashboard/app/(protected)/inbox/hooks/use-inbox-labels";
 import type { InboundThread } from "@fe/dashboard/app/(protected)/inbox/types";
 import * as ContextMenu from "@reloop/ui/context-menu";
+import { Icon } from "@reloop/ui/icon";
 import {
 	Archive,
 	ExternalLink,
@@ -21,7 +22,6 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { toast } from "sonner";
-import { Icon } from "@reloop/ui/icon";
 
 const itemClass =
 	"rounded-md text-[13px] text-mail-muted data-[highlighted]:bg-[var(--inbox-control-hover)] data-[highlighted]:text-mail-foreground";

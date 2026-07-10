@@ -45,10 +45,7 @@ export function groupThreadsByConversation(
 
 	const grouped = [...groups.entries()].map(([threadId, thread]) => ({
 		...thread,
-		messageCount: Math.max(
-			thread.messageCount ?? 0,
-			counts.get(threadId) ?? 1,
-		),
+		messageCount: Math.max(thread.messageCount ?? 0, counts.get(threadId) ?? 1),
 	}));
 
 	return [...grouped, ...ungrouped].sort(
@@ -103,9 +100,7 @@ export function splitPinnedThreads(threads: InboundThread[]): {
 		const aAt = a.pinnedAt ? new Date(a.pinnedAt).getTime() : 0;
 		const bAt = b.pinnedAt ? new Date(b.pinnedAt).getTime() : 0;
 		if (bAt !== aAt) return bAt - aAt;
-		return (
-			new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime()
-		);
+		return new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime();
 	});
 	return { pinned, rest };
 }

@@ -17,13 +17,13 @@ import {
 import { eq } from "drizzle-orm";
 import { log } from "evlog";
 import { authConfig } from "../auth.config";
-import { redis } from "./redis";
 import {
 	DEFAULT_USER_ROLE,
 	PLATFORM_ADMIN_ROLE,
 	platformAc,
 	platformRoles,
 } from "./platform-roles";
+import { redis } from "./redis";
 
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {

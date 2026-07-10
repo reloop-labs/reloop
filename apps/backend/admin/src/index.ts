@@ -1,14 +1,18 @@
 import "dotenv/config";
+import { opentelemetry } from "@elysia/opentelemetry";
 import cors from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
+import { serverTiming } from "@elysiajs/server-timing";
+import { adminConfig } from "@reloop/admin/admin.config";
+import { adminRoutes } from "@reloop/admin/routes/admin/admin.routes";
+import { agentCardRoute } from "@reloop/admin/routes/landing/agent-card.route";
+import { healthRoute } from "@reloop/admin/routes/landing/health.route";
+import { landingRoute } from "@reloop/admin/routes/landing/landing.route";
+import { loader } from "@reloop/admin/utils/loader";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
 import { createOTLPDrain } from "evlog/otlp";
-import { adminConfig } from "./admin.config";
-import { adminRoutes } from "./routes/admin/admin.routes";
-import { healthRoute } from "./routes/landing/health.route";
-import { landingRoute } from "./routes/landing/landing.route";
 
 const parseOtlpHeaders = (
 	headersStr?: string,
@@ -37,9 +41,10 @@ initLogger({
 		: undefined,
 });
 
-const port = adminConfig.PORT;
+const port = adminConfig.port;
 
 const app = new Elysia({ prefix: "/api/admin", name: "Admin Service" })
+	.use(opentelemetry())
 	.use(cors({ origin: "*", credentials: true }))
 	.use(
 		openapi({
@@ -48,21 +53,14 @@ const app = new Elysia({ prefix: "/api/admin", name: "Admin Service" })
 					title: "Admin Service",
 					version: "1.0.0",
 				},
-				components: {
-					securitySchemes: {
-						cookieAuth: {
-							type: "apiKey",
-							in: "cookie",
-							name: "better-auth.session_token",
-						},
-					},
-				},
 			},
 		}),
 	)
 	.use(evlog({ exclude: ["**/health"] }))
+	.use(serverTiming())
 	.use(landingRoute)
 	.use(healthRoute)
+	.use(agentCardRoute)
 	.use(adminRoutes)
 	.onError(({ error, set }) => {
 		const parsed = parseError(error);
@@ -73,6 +71,9 @@ const app = new Elysia({ prefix: "/api/admin", name: "Admin Service" })
 			fix: parsed.fix,
 			link: parsed.link,
 		};
+	})
+	.onStart(async () => {
+		await loader();
 	})
 	.listen(port, () => {
 		log.info(

@@ -7,8 +7,8 @@ import {
 	organizationCredits,
 	user,
 } from "@reloop/db/schema";
-import { createError } from "evlog";
 import { and, count, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+import { createError } from "evlog";
 
 export async function listOrganizationsController({
 	limit = 50,

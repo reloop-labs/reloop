@@ -51,9 +51,9 @@ export function InboxCategoryNavbar({
 						type="button"
 						onClick={() => onViewChange(view.id)}
 						className={cn(
-							"inline-flex h-9 cursor-pointer items-center justify-center overflow-hidden rounded-xl font-medium text-sm focus:outline-none transition-all duration-300 ease-in-out",
+							"inline-flex h-9 cursor-pointer items-center justify-center overflow-hidden rounded-xl font-medium text-sm transition-all duration-300 ease-in-out focus:outline-none",
 							isActive
-								? cn("min-w-0 flex-1 px-3.5 gap-1.5", styles.btn)
+								? cn("min-w-0 flex-1 gap-1.5 px-3.5", styles.btn)
 								: "w-9 shrink-0 gap-0 bg-[var(--inbox-control)] text-mail-muted hover:bg-[var(--inbox-control-hover)] hover:text-mail-foreground",
 						)}
 						aria-pressed={isActive}
@@ -84,8 +84,8 @@ export function InboxCategoryNavbar({
 							className={cn(
 								"truncate font-semibold transition-all duration-300 ease-in-out",
 								isActive
-									? "max-w-[100px] opacity-100 translate-x-0"
-									: "max-w-0 opacity-0 -translate-x-2 pointer-events-none",
+									? "max-w-[100px] translate-x-0 opacity-100"
+									: "-translate-x-2 pointer-events-none max-w-0 opacity-0",
 							)}
 						>
 							{view.label}
@@ -96,5 +96,3 @@ export function InboxCategoryNavbar({
 		</nav>
 	);
 }
-
-

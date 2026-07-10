@@ -77,9 +77,7 @@ export const preprocessEmailHtml = (html: string): string => {
 	}
 
 	for (const el of Array.from(
-		doc.querySelectorAll(
-			'.preheader, .preheaderText, [class*="preheader"]',
-		),
+		doc.querySelectorAll('.preheader, .preheaderText, [class*="preheader"]'),
 	)) {
 		const style = el.getAttribute("style") || "";
 		if (

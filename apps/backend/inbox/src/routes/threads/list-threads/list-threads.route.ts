@@ -27,8 +27,7 @@ export const listThreadsRoute = new Elysia().use(authMiddleware).get(
 			offset: t.Optional(t.Numeric({ default: 0 })),
 			folder: t.Optional(
 				t.String({
-					description:
-						"Filter by folder: inbox, archive, trash (omit for all)",
+					description: "Filter by folder: inbox, archive, trash (omit for all)",
 				}),
 			),
 			q: t.Optional(t.String({ description: "Search subject and preview" })),

@@ -1,11 +1,11 @@
+import { authMiddleware } from "@reloop/admin/middleware/auth-middleware";
+import { auditRoute } from "@reloop/admin/routes/admin/audit/audit.route";
+import { creditsRoute } from "@reloop/admin/routes/admin/credits/credits.route";
+import { domainsRoute } from "@reloop/admin/routes/admin/domains/domains.route";
+import { emailsRoute } from "@reloop/admin/routes/admin/emails/emails.route";
+import { organizationsRoute } from "@reloop/admin/routes/admin/organizations/organizations.route";
+import { overviewRoute } from "@reloop/admin/routes/admin/overview/overview.route";
 import { Elysia } from "elysia";
-import { authMiddleware } from "../../middleware/auth-middleware";
-import { auditRoute } from "./audit/audit.route";
-import { creditsRoute } from "./credits/credits.route";
-import { domainsRoute } from "./domains/domains.route";
-import { emailsRoute } from "./emails/emails.route";
-import { organizationsRoute } from "./organizations/organizations.route";
-import { overviewRoute } from "./overview/overview.route";
 
 export const adminRoutes = new Elysia({
 	prefix: "/v1",

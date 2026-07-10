@@ -93,7 +93,9 @@ export const ThreadHeader = ({
 								>
 									{getAvatarInitial(person.name || null, person.email)}
 								</div>
-								<span className="text-mail-foreground">{shortName(person)}</span>
+								<span className="text-mail-foreground">
+									{shortName(person)}
+								</span>
 							</div>
 						))}
 						{overflow > 0 && (

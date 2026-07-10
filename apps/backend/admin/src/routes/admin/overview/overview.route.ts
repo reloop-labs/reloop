@@ -1,12 +1,11 @@
+import { authMiddleware } from "@reloop/admin/middleware/auth-middleware";
 import { AdminModel } from "@reloop/admin/model/admin.model";
 import { Elysia } from "elysia";
-import { authMiddleware } from "../../../middleware/auth-middleware";
 import { getOverviewController } from "./overview.controllers";
 
-export const overviewRoute = new Elysia().use(authMiddleware).get(
-	"/overview",
-	async () => getOverviewController(),
-	{
+export const overviewRoute = new Elysia()
+	.use(authMiddleware)
+	.get("/overview", async () => getOverviewController(), {
 		platformAdmin: true,
 		response: {
 			200: AdminModel.overviewResponse,
@@ -16,5 +15,4 @@ export const overviewRoute = new Elysia().use(authMiddleware).get(
 			tags: ["Admin"],
 			summary: "Platform overview KPIs",
 		},
-	},
-);
+	});

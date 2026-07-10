@@ -1,9 +1,5 @@
 import { db } from "@reloop/db/client";
-import {
-	emailLabel,
-	emailThread,
-	threadLabel,
-} from "@reloop/db/schema";
+import { emailLabel, emailThread, threadLabel } from "@reloop/db/schema";
 import { and, desc, eq, exists, ilike, inArray, or } from "drizzle-orm";
 
 export type ThreadListFilter = "primary" | "alerts" | "person" | "tag";

@@ -290,10 +290,7 @@ export const ThreadDetail = ({
 				email: msg.fromEmail || msg.email?.fromEmail || "",
 			});
 		}
-		if (
-			people.length === 0 &&
-			thread?.from?.email
-		) {
+		if (people.length === 0 && thread?.from?.email) {
 			people.push({
 				name: thread.from.name || "",
 				email: thread.from.email,

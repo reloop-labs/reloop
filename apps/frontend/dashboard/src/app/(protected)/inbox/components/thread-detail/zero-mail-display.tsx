@@ -6,12 +6,7 @@ import {
 } from "@fe/dashboard/utils/avatar";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
-import {
-	Forward,
-	MoreHorizontal,
-	Reply,
-	ReplyAll,
-} from "lucide-react";
+import { Forward, MoreHorizontal, Reply, ReplyAll } from "lucide-react";
 import { useState } from "react";
 import type { AgentMailbox } from "../../types";
 import { formatMessageTimestamp, formatZeroMessageTime } from "./date-utils";
@@ -164,7 +159,10 @@ export const ZeroMailDisplay = ({
 								getAvatarGradient(senderEmail || senderName),
 							)}
 						>
-							{getAvatarInitial(msg.fromName ?? null, senderEmail || senderName)}
+							{getAvatarInitial(
+								msg.fromName ?? null,
+								senderEmail || senderName,
+							)}
 						</div>
 
 						<div className="flex w-full items-center justify-between gap-2">
@@ -185,9 +183,7 @@ export const ZeroMailDisplay = ({
 									</button>
 								</div>
 								{!isCollapsed && (
-									<p className="mt-0.5 text-[#8C8C8C] text-sm">
-										To: {toLabel}
-									</p>
+									<p className="mt-0.5 text-[#8C8C8C] text-sm">To: {toLabel}</p>
 								)}
 								{isCollapsed && (
 									<p className="mt-0.5 line-clamp-1 text-[#8C8C8C] text-sm">
@@ -353,9 +349,7 @@ export const ZeroMailDisplay = ({
 										e.stopPropagation();
 										onReply();
 									}}
-									icon={
-										<Reply className="h-3.5 w-3.5 text-[#9B9B9B]" />
-									}
+									icon={<Reply className="h-3.5 w-3.5 text-[#9B9B9B]" />}
 									text="Reply"
 								/>
 								{onReplyAll && (
@@ -364,9 +358,7 @@ export const ZeroMailDisplay = ({
 											e.stopPropagation();
 											onReplyAll();
 										}}
-										icon={
-											<ReplyAll className="h-3.5 w-3.5 text-[#9B9B9B]" />
-										}
+										icon={<ReplyAll className="h-3.5 w-3.5 text-[#9B9B9B]" />}
 										text="Reply all"
 									/>
 								)}
@@ -375,9 +367,7 @@ export const ZeroMailDisplay = ({
 										e.stopPropagation();
 										onForward();
 									}}
-									icon={
-										<Forward className="h-3.5 w-3.5 text-[#9B9B9B]" />
-									}
+									icon={<Forward className="h-3.5 w-3.5 text-[#9B9B9B]" />}
 									text="Forward"
 								/>
 							</div>

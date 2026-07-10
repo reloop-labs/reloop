@@ -1,8 +1,8 @@
 import { writeAdminAudit } from "@reloop/admin/utils/audit";
 import { db } from "@reloop/db/client";
 import { domain, organization } from "@reloop/db/schema";
-import { createError } from "evlog";
 import { and, count, desc, eq, ilike, sql } from "drizzle-orm";
+import { createError } from "evlog";
 
 export async function listDomainsController({
 	limit = 50,

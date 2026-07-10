@@ -17,25 +17,81 @@ export async function validatePlatformAdmin(cookie: string | null): Promise<{
 	organizationId: string | null;
 	authType: "session";
 } | null> {
-	const response = await fetch(
-		`${adminConfig.BASE_URL}/api/auth/v1/get-session`,
-		{
-			method: "GET",
-			headers: new Headers({
-				"Content-Type": "application/json",
-				Cookie: cookie || "",
-			}),
-		},
-	);
+	const sessionUrl = `${adminConfig.BASE_URL}/api/auth/v1/get-session`;
+	const cookieNames = cookie
+		? cookie
+				.split(";")
+				.map((part) => part.trim().split("=")[0])
+				.filter(Boolean)
+		: [];
 
-	if (!response.ok) return null;
+	// console.* so logs show immediately in turbo/dev terminals.
+	// evlog request log.info() only buffers until the response finishes.
+	console.log("[admin-auth] session check started", {
+		sessionUrl,
+		hasCookie: Boolean(cookie),
+		cookieLength: cookie?.length ?? 0,
+		cookieNames,
+	});
 
-	const session = (await response.json()) as {
+	const response = await fetch(sessionUrl, {
+		method: "GET",
+		headers: new Headers({
+			"Content-Type": "application/json",
+			Cookie: cookie || "",
+		}),
+	});
+
+	const responseBody = await response.json().catch((error) => ({
+		parseError:
+			error instanceof Error ? error.message : "Failed to parse response",
+	}));
+
+	if (!response.ok) {
+		console.error("[admin-auth] session endpoint error", {
+			sessionUrl,
+			status: response.status,
+			statusText: response.statusText,
+			hasCookie: Boolean(cookie),
+			cookieNames,
+			response: responseBody,
+		});
+		return null;
+	}
+
+	const session = responseBody as {
 		user?: SessionUser;
 	};
 
 	const user = session?.user;
-	if (!user?.id || user.role !== PLATFORM_ADMIN_ROLE) return null;
+	if (!user?.id) {
+		console.warn("[admin-auth] no user in session", {
+			sessionUrl,
+			hasCookie: Boolean(cookie),
+			cookieNames,
+			sessionKeys: Object.keys(session ?? {}),
+			response: responseBody,
+		});
+		return null;
+	}
+
+	if (user.role !== PLATFORM_ADMIN_ROLE) {
+		console.warn("[admin-auth] insufficient role", {
+			sessionUrl,
+			userId: user.id,
+			email: user.email ?? null,
+			role: user.role ?? null,
+			requiredRole: PLATFORM_ADMIN_ROLE,
+		});
+		return null;
+	}
+
+	console.log("[admin-auth] authentication succeeded", {
+		userId: user.id,
+		email: user.email ?? null,
+		role: user.role,
+		organizationId: user.activeOrganizationId ?? null,
+	});
 
 	return {
 		userId: user.id,

@@ -7,7 +7,9 @@ type SessionUser = {
 	activeOrganizationId?: string | null;
 };
 
-async function fetchSession(cookie: string | null): Promise<SessionUser | null> {
+async function fetchSession(
+	cookie: string | null,
+): Promise<SessionUser | null> {
 	const response = await fetch(
 		`${creditsConfig.BASE_URL}/api/auth/v1/get-session`,
 		{

@@ -39,11 +39,7 @@ const FileTypeIcon = ({ filename }: { filename: string }) => {
 	switch (extension) {
 		case "pdf":
 			return (
-				<svg
-					viewBox="0 0 16 16"
-					className="h-4 w-4 shrink-0"
-					aria-hidden
-				>
+				<svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0" aria-hidden>
 					<title>PDF</title>
 					<path
 						fill="#F43F5E"
@@ -87,7 +83,10 @@ const FileTypeIcon = ({ filename }: { filename: string }) => {
 	}
 };
 
-export const downloadAttachment = async (file: AttachmentItem, messageId?: string) => {
+export const downloadAttachment = async (
+	file: AttachmentItem,
+	messageId?: string,
+) => {
 	const msgId = messageId || file.messageId || file.inboundEmailId;
 	if (!msgId || !file.id) return;
 
@@ -144,8 +143,7 @@ export const MessageAttachments = ({
 			{showLabel && (
 				<div className="mb-2 flex items-center gap-2">
 					<span className="font-medium text-mail-foreground text-sm">
-						{label}{" "}
-						<span className="text-[#8D8D8D]">[{visible.length}]</span>
+						{label} <span className="text-[#8D8D8D]">[{visible.length}]</span>
 					</span>
 				</div>
 			)}
