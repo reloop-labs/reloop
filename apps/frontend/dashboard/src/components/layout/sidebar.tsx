@@ -5,8 +5,10 @@ import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { InviteFriendsModal } from "./invite-friends-modal";
+import { ReferFriendsBanner } from "./refer-friends-banner";
 import { SidebarItems } from "./sidebar-items";
 import { UserMenuDropdown } from "./user-menu-dropdown";
 
@@ -14,6 +16,7 @@ export const MainSidebar: React.FC = () => {
 	const { user } = useUserOrganization();
 	const { isSidebarCollapsed, setIsSidebarCollapsed, toggleSidebarCollapse } =
 		useUIStore();
+	const [inviteOpen, setInviteOpen] = useState(false);
 
 	useEffect(() => {
 		try {
@@ -99,8 +102,17 @@ export const MainSidebar: React.FC = () => {
 					isSidebarCollapsed ? "px-0" : "px-3",
 				)}
 			>
-				<UserMenuDropdown user={user} isCollapsed={isSidebarCollapsed} />
+				<ReferFriendsBanner
+					isCollapsed={isSidebarCollapsed}
+					onInvite={() => setInviteOpen(true)}
+				/>
+				<UserMenuDropdown
+					user={user}
+					isCollapsed={isSidebarCollapsed}
+					onInviteFriends={() => setInviteOpen(true)}
+				/>
 			</div>
+			<InviteFriendsModal open={inviteOpen} onOpenChange={setInviteOpen} />
 		</div>
 	);
 };
