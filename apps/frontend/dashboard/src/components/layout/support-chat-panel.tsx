@@ -166,7 +166,7 @@ export function SupportChatPanel() {
 		}
 	}, []);
 
-	const { ready, join, leave, sendMessage } = useSupportSocket({
+	const { ready, join, leave } = useSupportSocket({
 		enabled: Boolean(conversation?.id),
 		onEvent,
 	});
@@ -190,22 +190,19 @@ export function SupportChatPanel() {
 		setFollowOutput(true);
 		setShowJumpLatest(false);
 		try {
-			const sent = sendMessage(conversation.id, body);
-			if (!sent) {
-				const { data } = await axios.post<{
-					message: SupportMessage;
-					conversation: SupportConversation;
-				}>(
-					`/api/admin/v1/support/conversations/${conversation.id}/messages`,
-					{ body },
-					{ withCredentials: true },
-				);
-				setMessages((prev) => {
-					if (prev.some((m) => m.id === data.message.id)) return prev;
-					return [...prev, data.message];
-				});
-				setConversation(data.conversation);
-			}
+			const { data } = await axios.post<{
+				message: SupportMessage;
+				conversation: SupportConversation;
+			}>(
+				`/api/admin/v1/support/conversations/${conversation.id}/messages`,
+				{ body },
+				{ withCredentials: true },
+			);
+			setMessages((prev) => {
+				if (prev.some((m) => m.id === data.message.id)) return prev;
+				return [...prev, data.message];
+			});
+			setConversation(data.conversation);
 			setDraft("");
 		} catch (e) {
 			setError(e instanceof Error ? e.message : "Failed to send message");
@@ -321,14 +318,10 @@ export function SupportChatPanel() {
 													: m.senderName || "Support"
 											}
 											email={
-												mine
-													? user?.email || m.senderEmail
-													: m.senderEmail
+												mine ? user?.email || m.senderEmail : m.senderEmail
 											}
 											image={
-												mine
-													? user?.image || m.senderImage
-													: m.senderImage
+												mine ? user?.image || m.senderImage : m.senderImage
 											}
 										/>
 										<div

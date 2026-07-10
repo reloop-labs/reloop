@@ -156,7 +156,7 @@ export default function SupportPage() {
 		[mutate, selectedId, status],
 	);
 
-	const { ready, join, leave, sendMessage } = useSupportSocket({
+	const { ready, join, leave } = useSupportSocket({
 		enabled: true,
 		onEvent,
 	});
@@ -174,14 +174,19 @@ export default function SupportPage() {
 		if (!body || !selectedId || sending) return;
 		setSending(true);
 		try {
-			const sent = sendMessage(selectedId, body);
-			if (!sent) {
-				await adminPost(`/support/conversations/${selectedId}/messages`, {
-					body,
-				});
-				await loadConversation(selectedId);
-			}
+			const res = await adminPost<{
+				message: SupportMessage;
+				conversation: SupportConversation;
+			}>(`/support/conversations/${selectedId}/messages`, {
+				body,
+			});
+			setMessages((prev) => {
+				if (prev.some((m) => m.id === res.message.id)) return prev;
+				return [...prev, res.message];
+			});
 			setDraft("");
+		} catch (e) {
+			console.error("Failed to send support message", e);
 		} finally {
 			setSending(false);
 		}
