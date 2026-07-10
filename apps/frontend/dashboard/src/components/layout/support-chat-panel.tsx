@@ -94,6 +94,7 @@ export function SupportChatPanel() {
 	const viewportRef = useRef<HTMLDivElement>(null);
 	const bottomRef = useRef<HTMLDivElement>(null);
 	const followRef = useRef(true);
+	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	const bootstrap = useCallback(async () => {
 		setLoading(true);
@@ -204,6 +205,9 @@ export function SupportChatPanel() {
 			});
 			setConversation(data.conversation);
 			setDraft("");
+			if (textareaRef.current) {
+				textareaRef.current.style.height = "auto";
+			}
 		} catch (e) {
 			setError(e instanceof Error ? e.message : "Failed to send message");
 		} finally {
@@ -382,8 +386,13 @@ export function SupportChatPanel() {
 					)}
 				>
 					<textarea
+						ref={textareaRef}
 						value={draft}
-						onChange={(e) => setDraft(e.target.value)}
+						onChange={(e) => {
+							setDraft(e.target.value);
+							e.target.style.height = "auto";
+							e.target.style.height = `${e.target.scrollHeight}px`;
+						}}
 						onKeyDown={(e) => {
 							if (e.key === "Enter" && !e.shiftKey) {
 								e.preventDefault();
@@ -395,7 +404,7 @@ export function SupportChatPanel() {
 							closed ? "Conversation closed" : "Ask support anything…"
 						}
 						rows={1}
-						className="scrollbar-none max-h-28 min-h-[40px] flex-1 resize-none bg-transparent px-2 py-2.5 text-[13px] text-text-strong-950 placeholder-text-soft-400 outline-none dark:text-white/90 dark:placeholder-white/30"
+						className="scrollbar-thin max-h-28 min-h-[40px] flex-1 resize-none bg-transparent px-2 py-2.5 text-[13px] text-text-strong-950 placeholder-text-soft-400 outline-none dark:text-white/90 dark:placeholder-white/30 overflow-y-auto"
 					/>
 					<button
 						type="button"

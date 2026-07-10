@@ -79,6 +79,7 @@ export default function SupportPage() {
 	const [draft, setDraft] = useState("");
 	const [sending, setSending] = useState(false);
 	const bottomRef = useRef<HTMLDivElement>(null);
+	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	const listKey = ["/support/conversations", status] as const;
 	const { data, isLoading, mutate } = useSWR<ConversationsResponse>(
@@ -185,6 +186,9 @@ export default function SupportPage() {
 				return [...prev, res.message];
 			});
 			setDraft("");
+			if (textareaRef.current) {
+				textareaRef.current.style.height = "auto";
+			}
 		} catch (e) {
 			console.error("Failed to send support message", e);
 		} finally {
@@ -398,8 +402,13 @@ export default function SupportPage() {
 									)}
 								>
 									<textarea
+										ref={textareaRef}
 										value={draft}
-										onChange={(e) => setDraft(e.target.value)}
+										onChange={(e) => {
+											setDraft(e.target.value);
+											e.target.style.height = "auto";
+											e.target.style.height = `${e.target.scrollHeight}px`;
+										}}
 										onKeyDown={(e) => {
 											if (e.key === "Enter" && !e.shiftKey) {
 												e.preventDefault();
@@ -413,7 +422,7 @@ export default function SupportPage() {
 												: "Reply to customer…"
 										}
 										rows={1}
-										className="scrollbar-none max-h-28 min-h-[40px] flex-1 resize-none bg-transparent px-2 py-2.5 text-[13px] text-text-strong-950 outline-none placeholder:text-text-soft-400"
+										className="scrollbar-thin max-h-28 min-h-[40px] flex-1 resize-none bg-transparent px-2 py-2.5 text-[13px] text-text-strong-950 outline-none placeholder:text-text-soft-400 overflow-y-auto"
 									/>
 									<button
 										type="button"
