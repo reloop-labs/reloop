@@ -2,6 +2,7 @@
 
 import { ConfirmActionDialog } from "@fe/console/components/confirm-action-dialog";
 import { authClient } from "@reloop/auth/client";
+import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import * as Input from "@reloop/ui/input";
@@ -128,7 +129,7 @@ export default function UsersPage() {
 									<td className="px-4 py-3">
 										<Badge.Root
 											variant="light"
-											color={user.role === "admin" ? "blue" : "gray"}
+											color={user.role === PLATFORM_ADMIN_ROLE ? "blue" : "gray"}
 										>
 											{user.role || "user"}
 										</Badge.Root>
@@ -172,14 +173,14 @@ export default function UsersPage() {
 													Ban
 												</Button.Root>
 											)}
-											{user.role !== "admin" ? (
+											{user.role !== PLATFORM_ADMIN_ROLE ? (
 												<Button.Root
 													size="xsmall"
 													variant="neutral"
 													mode="stroke"
 													onClick={() => setPromoteTarget(user)}
 												>
-													Make admin
+													Make super-admin
 												</Button.Root>
 											) : (
 												<Button.Root
@@ -195,11 +196,11 @@ export default function UsersPage() {
 															toast.error(error.message || "Failed to demote");
 															return;
 														}
-														toast.success("Removed admin role");
+														toast.success("Removed super-admin role");
 														loadUsers();
 													}}
 												>
-													Remove admin
+													Remove super-admin
 												</Button.Root>
 											)}
 											<Button.Root
@@ -244,20 +245,20 @@ export default function UsersPage() {
 			<ConfirmActionDialog
 				open={!!promoteTarget}
 				onOpenChange={(open) => !open && setPromoteTarget(null)}
-				title="Promote to platform admin"
-				description={`Grant platform admin access to ${promoteTarget?.email}? They will be able to manage all organizations.`}
-				confirmLabel="Make admin"
+				title="Promote to platform super-admin"
+				description={`Grant platform super-admin access to ${promoteTarget?.email}? They will be able to manage all organizations.`}
+				confirmLabel="Make super-admin"
 				onConfirm={async () => {
 					if (!promoteTarget) return;
 					const { error } = await authClient.admin.setRole({
 						userId: promoteTarget.id,
-						role: "admin",
+						role: PLATFORM_ADMIN_ROLE,
 					});
 					if (error) {
 						toast.error(error.message || "Failed to promote user");
 						return;
 					}
-					toast.success("User promoted to admin");
+					toast.success("User promoted to super-admin");
 					loadUsers();
 				}}
 			/>

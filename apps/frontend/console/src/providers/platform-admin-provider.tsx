@@ -2,6 +2,7 @@
 
 import { Loader } from "@dot-loaders/react";
 import { authClient } from "@reloop/auth/client";
+import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
 import { useRouter } from "next/navigation";
 import {
 	createContext,
@@ -47,7 +48,7 @@ export function PlatformAdminProvider({
 	const hasRedirected = useRef(false);
 
 	const user = (session?.user as AdminUser | undefined) ?? null;
-	const isAdmin = user?.role === "admin";
+	const isAdmin = user?.role === PLATFORM_ADMIN_ROLE;
 	const isImpersonating = Boolean(
 		(session as { session?: { impersonatedBy?: string } } | null)?.session
 			?.impersonatedBy,
@@ -62,7 +63,7 @@ export function PlatformAdminProvider({
 			}
 			return;
 		}
-		if (user && user.role !== "admin") {
+		if (user && user.role !== PLATFORM_ADMIN_ROLE) {
 			if (!hasRedirected.current) {
 				hasRedirected.current = true;
 				router.replace("/forbidden");

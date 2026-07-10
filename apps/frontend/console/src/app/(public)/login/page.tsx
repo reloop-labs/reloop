@@ -1,6 +1,7 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
+import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
 import { Logo } from "@reloop/ui/logo";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "framer-motion";
@@ -57,7 +58,7 @@ export default function LoginPage() {
 
 	useEffect(() => {
 		if (!session) return;
-		if (session.user.role === "admin") {
+		if (session.user.role === PLATFORM_ADMIN_ROLE) {
 			router.replace("/");
 		} else {
 			router.replace("/forbidden");

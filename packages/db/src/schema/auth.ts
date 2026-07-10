@@ -9,6 +9,9 @@ import {
 	timestamp,
 } from "drizzle-orm/pg-core";
 
+/** Platform user roles (Better Auth admin plugin). Distinct from org member.role. */
+export const userRoleEnum = pgEnum("user_role", ["user", "super-admin"]);
+
 export const user = pgTable("user", {
 	id: text("id").primaryKey(),
 	name: text("name").notNull(),
@@ -20,7 +23,7 @@ export const user = pgTable("user", {
 		.defaultNow()
 		.$onUpdate(() => /* @__PURE__ */ new Date())
 		.notNull(),
-	role: text("role"),
+	role: userRoleEnum("role").default("user").notNull(),
 	banned: boolean("banned").default(false),
 	banReason: text("ban_reason"),
 	banExpires: timestamp("ban_expires"),

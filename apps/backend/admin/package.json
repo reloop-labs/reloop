@@ -16,6 +16,7 @@
 		"@elysiajs/cors": "catalog:backend",
 		"@elysiajs/openapi": "catalog:backend",
 		"@paralleldrive/cuid2": "catalog:backend",
+		"@reloop/auth": "workspace:*",
 		"@reloop/db": "workspace:*",
 		"dotenv": "catalog:backend",
 		"drizzle-orm": "catalog:db",

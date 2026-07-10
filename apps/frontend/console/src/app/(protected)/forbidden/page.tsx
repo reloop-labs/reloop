@@ -1,6 +1,7 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
+import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
 import * as Button from "@reloop/ui/button";
 import { Logo } from "@reloop/ui/logo";
 import Link from "next/link";
@@ -27,8 +28,9 @@ export default function ForbiddenPage() {
 			</h1>
 			<p className="max-w-md text-paragraph-sm text-text-sub-600">
 				Your account is signed in but does not have the platform{" "}
-				<code className="rounded bg-bg-weak-50 px-1">admin</code> role. Ask an
-				existing operator to promote you, or run the promote-admin script.
+				<code className="rounded bg-bg-weak-50 px-1">{PLATFORM_ADMIN_ROLE}</code>{" "}
+				role. Ask an existing operator to promote you, or run the promote-admin
+				script.
 			</p>
 			<div className="flex gap-2">
 				<Button.Root
@@ -45,4 +47,3 @@ export default function ForbiddenPage() {
 		</div>
 	);
 }
-

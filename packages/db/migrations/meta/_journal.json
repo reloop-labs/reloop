@@ -64,6 +64,13 @@
       "when": 1783600263272,
       "tag": "0008_careful_juggernaut",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1783650000000,
+      "tag": "0009_super_admin_role",
+      "breakpoints": true
     }
   ]
 }

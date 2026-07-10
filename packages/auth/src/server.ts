@@ -2,6 +2,8 @@ import { apiKey } from "@better-auth/api-key";
 import { betterAuth } from "better-auth";
 import { admin, bearer, jwt, openAPI, organization } from "better-auth/plugins";
 import { ac, dev, marketing, admin as orgAdmin } from "./permissions";
+import { platformAc, platformRoles } from "./platform-permissions";
+import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "./roles";
 
 export const auth = betterAuth({
 	baseURL: process.env.BASE_URL || "https://local.reloop.sh",
@@ -25,8 +27,10 @@ export const auth = betterAuth({
 		jwt(),
 		bearer(),
 		admin({
-			defaultRole: "user",
-			adminRoles: ["admin"],
+			defaultRole: DEFAULT_USER_ROLE,
+			adminRoles: [PLATFORM_ADMIN_ROLE],
+			ac: platformAc,
+			roles: platformRoles,
 		}),
 		apiKey({ defaultPrefix: "rl" }),
 		organization({

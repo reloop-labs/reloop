@@ -18,6 +18,12 @@ import { eq } from "drizzle-orm";
 import { log } from "evlog";
 import { authConfig } from "../auth.config";
 import { redis } from "./redis";
+import {
+	DEFAULT_USER_ROLE,
+	PLATFORM_ADMIN_ROLE,
+	platformAc,
+	platformRoles,
+} from "./platform-roles";
 
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
@@ -130,8 +136,10 @@ export const auth = betterAuth({
 		jwt(),
 		bearer(),
 		admin({
-			defaultRole: "user",
-			adminRoles: ["admin"],
+			defaultRole: DEFAULT_USER_ROLE,
+			adminRoles: [PLATFORM_ADMIN_ROLE],
+			ac: platformAc,
+			roles: platformRoles,
 		}),
 		apiKey({ defaultPrefix: "rl" }),
 		lastLoginMethod({

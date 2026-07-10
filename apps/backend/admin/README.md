@@ -31,7 +31,7 @@ Or include them via root `bun run dev` / `frontend:dev` / `backend:dev`.
 
 ## Security model
 
-Only users with `user.role === "admin"` (Better Auth platform role) can access:
+Only users with `user.role === "super-admin"` (Better Auth platform role) can access:
 
 - Console UI (`/console`)
 - Admin API (`/api/admin/v1/*`)

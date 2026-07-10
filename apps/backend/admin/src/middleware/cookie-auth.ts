@@ -1,4 +1,5 @@
 import { adminConfig } from "@reloop/admin/admin.config";
+import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
 
 type SessionUser = {
 	id: string;
@@ -34,11 +35,11 @@ export async function validatePlatformAdmin(cookie: string | null): Promise<{
 	};
 
 	const user = session?.user;
-	if (!user?.id || user.role !== "admin") return null;
+	if (!user?.id || user.role !== PLATFORM_ADMIN_ROLE) return null;
 
 	return {
 		userId: user.id,
-		role: "admin",
+		role: PLATFORM_ADMIN_ROLE,
 		email: user.email ?? null,
 		name: user.name ?? null,
 		organizationId: user.activeOrganizationId ?? null,

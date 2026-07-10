@@ -60,7 +60,7 @@ export default function OverviewPage() {
 			{error ? (
 				<p className="text-error-base text-paragraph-sm">
 					Failed to load overview. Ensure the admin API is running and you are a
-					platform admin.
+					platform super-admin.
 				</p>
 			) : null}
 

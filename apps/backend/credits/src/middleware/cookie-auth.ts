@@ -1,3 +1,4 @@
+import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
 import { creditsConfig } from "@reloop/credits/credits.config";
 
 type SessionUser = {
@@ -51,11 +52,11 @@ export async function validatePlatformAdmin(cookie: string | null): Promise<{
 	authType: "session";
 } | null> {
 	const user = await fetchSession(cookie);
-	if (!user?.id || user.role !== "admin") return null;
+	if (!user?.id || user.role !== PLATFORM_ADMIN_ROLE) return null;
 
 	return {
 		userId: user.id,
-		role: "admin",
+		role: PLATFORM_ADMIN_ROLE,
 		organizationId: user.activeOrganizationId ?? null,
 		authType: "session",
 	};
