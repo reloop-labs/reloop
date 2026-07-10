@@ -1,6 +1,7 @@
 "use client";
 
 import { useSupportSocket } from "@fe/dashboard/hooks/use-support-socket";
+import { clearSupportUnreadCache } from "@fe/dashboard/hooks/use-support-unread";
 import type {
 	SupportConversation,
 	SupportMessage,
@@ -95,6 +96,8 @@ export function SupportChatPanel() {
 	const bottomRef = useRef<HTMLDivElement>(null);
 	const followRef = useRef(true);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	const conversationIdRef = useRef<string | null>(null);
+	conversationIdRef.current = conversation?.id ?? null;
 
 	const bootstrap = useCallback(async () => {
 		setLoading(true);
@@ -110,6 +113,20 @@ export function SupportChatPanel() {
 			followRef.current = true;
 			setFollowOutput(true);
 			setShowJumpLatest(false);
+
+			// Mark as read when opening the support panel
+			if (data.conversation?.id) {
+				try {
+					await axios.post(
+						`/api/admin/v1/support/conversations/${data.conversation.id}/read`,
+						{},
+						{ withCredentials: true },
+					);
+					void clearSupportUnreadCache();
+				} catch {
+					// non-fatal
+				}
+			}
 		} catch (e) {
 			setError(e instanceof Error ? e.message : "Failed to start support chat");
 		} finally {
@@ -157,6 +174,18 @@ export function SupportChatPanel() {
 				return [...prev, event.message];
 			});
 			setError(null);
+			// Incoming admin reply while panel is open — mark read
+			if (event.message.senderRole === "admin" && conversationIdRef.current) {
+				const id = conversationIdRef.current;
+				void axios
+					.post(
+						`/api/admin/v1/support/conversations/${id}/read`,
+						{},
+						{ withCredentials: true },
+					)
+					.then(() => clearSupportUnreadCache())
+					.catch(() => undefined);
+			}
 		}
 		if (event.type === "conversation_updated") {
 			setConversation(event.conversation);
@@ -404,7 +433,7 @@ export function SupportChatPanel() {
 							closed ? "Conversation closed" : "Ask support anything…"
 						}
 						rows={1}
-						className="scrollbar-thin max-h-28 min-h-[40px] flex-1 resize-none bg-transparent px-2 py-2.5 text-[13px] text-text-strong-950 placeholder-text-soft-400 outline-none dark:text-white/90 dark:placeholder-white/30 overflow-y-auto"
+						className="scrollbar-thin max-h-28 min-h-[40px] flex-1 resize-none overflow-y-auto bg-transparent px-2 py-2.5 text-[13px] text-text-strong-950 placeholder-text-soft-400 outline-none dark:text-white/90 dark:placeholder-white/30"
 					/>
 					<button
 						type="button"

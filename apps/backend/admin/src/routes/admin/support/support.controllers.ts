@@ -4,7 +4,7 @@ import {
 	supportMessage,
 	user,
 } from "@reloop/db/schema";
-import { and, count, desc, eq, sql } from "drizzle-orm";
+import { and, count, desc, eq, gt, sql } from "drizzle-orm";
 import { createError } from "evlog";
 
 const MESSAGE_PREVIEW_LEN = 120;
@@ -22,6 +22,9 @@ export type SupportConversationDto = {
 	userName: string | null;
 	userEmail: string | null;
 	userImage: string | null;
+	userLastReadAt: Date | null;
+	adminLastReadAt: Date | null;
+	unreadCount: number;
 };
 
 export type SupportMessageDto = {
@@ -36,13 +39,7 @@ export type SupportMessageDto = {
 	senderImage: string | null;
 };
 
-function previewFromBody(body: string) {
-	const trimmed = body.trim();
-	if (trimmed.length <= MESSAGE_PREVIEW_LEN) return trimmed;
-	return `${trimmed.slice(0, MESSAGE_PREVIEW_LEN - 1)}…`;
-}
-
-function mapConversation(row: {
+type ConversationRow = {
 	id: string;
 	userId: string;
 	organizationId: string | null;
@@ -54,7 +51,64 @@ function mapConversation(row: {
 	userName: string | null;
 	userEmail: string | null;
 	userImage: string | null;
-}): SupportConversationDto {
+	userLastReadAt: Date | null;
+	adminLastReadAt: Date | null;
+};
+
+function previewFromBody(body: string) {
+	const trimmed = body.trim();
+	if (trimmed.length <= MESSAGE_PREVIEW_LEN) return trimmed;
+	return `${trimmed.slice(0, MESSAGE_PREVIEW_LEN - 1)}…`;
+}
+
+const conversationSelect = {
+	id: supportConversation.id,
+	userId: supportConversation.userId,
+	organizationId: supportConversation.organizationId,
+	status: supportConversation.status,
+	lastMessageAt: supportConversation.lastMessageAt,
+	lastMessagePreview: supportConversation.lastMessagePreview,
+	createdAt: supportConversation.createdAt,
+	updatedAt: supportConversation.updatedAt,
+	userName: user.name,
+	userEmail: user.email,
+	userImage: user.image,
+	userLastReadAt: supportConversation.userLastReadAt,
+	adminLastReadAt: supportConversation.adminLastReadAt,
+};
+
+async function countUnreadForConversation(
+	conversationId: string,
+	isPlatformAdmin: boolean,
+	lastReadAt: Date | null,
+): Promise<number> {
+	const role = isPlatformAdmin ? "user" : "admin";
+	const conditions = [
+		eq(supportMessage.conversationId, conversationId),
+		eq(supportMessage.senderRole, role),
+	];
+	if (lastReadAt) {
+		conditions.push(gt(supportMessage.createdAt, lastReadAt));
+	}
+	const [row] = await db
+		.select({ value: count() })
+		.from(supportMessage)
+		.where(and(...conditions));
+	return row?.value ?? 0;
+}
+
+async function mapConversation(
+	row: ConversationRow,
+	isPlatformAdmin: boolean,
+): Promise<SupportConversationDto> {
+	const lastReadAt = isPlatformAdmin
+		? row.adminLastReadAt
+		: row.userLastReadAt;
+	const unreadCount = await countUnreadForConversation(
+		row.id,
+		isPlatformAdmin,
+		lastReadAt,
+	);
 	return {
 		id: row.id,
 		userId: row.userId,
@@ -67,7 +121,17 @@ function mapConversation(row: {
 		userName: row.userName,
 		userEmail: row.userEmail,
 		userImage: row.userImage,
+		userLastReadAt: row.userLastReadAt,
+		adminLastReadAt: row.adminLastReadAt,
+		unreadCount,
 	};
+}
+
+async function mapConversations(
+	rows: ConversationRow[],
+	isPlatformAdmin: boolean,
+): Promise<SupportConversationDto[]> {
+	return Promise.all(rows.map((row) => mapConversation(row, isPlatformAdmin)));
 }
 
 function mapMessage(row: {
@@ -96,19 +160,7 @@ function mapMessage(row: {
 
 async function getConversationRow(conversationId: string) {
 	const [row] = await db
-		.select({
-			id: supportConversation.id,
-			userId: supportConversation.userId,
-			organizationId: supportConversation.organizationId,
-			status: supportConversation.status,
-			lastMessageAt: supportConversation.lastMessageAt,
-			lastMessagePreview: supportConversation.lastMessagePreview,
-			createdAt: supportConversation.createdAt,
-			updatedAt: supportConversation.updatedAt,
-			userName: user.name,
-			userEmail: user.email,
-			userImage: user.image,
-		})
+		.select(conversationSelect)
 		.from(supportConversation)
 		.innerJoin(user, eq(supportConversation.userId, user.id))
 		.where(eq(supportConversation.id, conversationId))
@@ -158,19 +210,7 @@ export async function getOrCreateMyConversationController(input: {
 	organizationId: string | null;
 }) {
 	const [existing] = await db
-		.select({
-			id: supportConversation.id,
-			userId: supportConversation.userId,
-			organizationId: supportConversation.organizationId,
-			status: supportConversation.status,
-			lastMessageAt: supportConversation.lastMessageAt,
-			lastMessagePreview: supportConversation.lastMessagePreview,
-			createdAt: supportConversation.createdAt,
-			updatedAt: supportConversation.updatedAt,
-			userName: user.name,
-			userEmail: user.email,
-			userImage: user.image,
-		})
+		.select(conversationSelect)
 		.from(supportConversation)
 		.innerJoin(user, eq(supportConversation.userId, user.id))
 		.where(
@@ -184,17 +224,19 @@ export async function getOrCreateMyConversationController(input: {
 	if (existing) {
 		const messages = await listMessagesForConversation(existing.id);
 		return {
-			conversation: mapConversation(existing),
+			conversation: await mapConversation(existing, false),
 			messages: messages.items,
 		};
 	}
 
+	const now = new Date();
 	const [created] = await db
 		.insert(supportConversation)
 		.values({
 			userId: input.userId,
 			organizationId: input.organizationId,
 			status: "open",
+			userLastReadAt: now,
 		})
 		.returning();
 
@@ -218,7 +260,7 @@ export async function getOrCreateMyConversationController(input: {
 	}
 
 	return {
-		conversation: mapConversation(conversation),
+		conversation: await mapConversation(conversation, false),
 		messages: [] as SupportMessageDto[],
 	};
 }
@@ -227,19 +269,7 @@ export async function getMyConversationController(input: {
 	userId: string;
 }) {
 	const [existing] = await db
-		.select({
-			id: supportConversation.id,
-			userId: supportConversation.userId,
-			organizationId: supportConversation.organizationId,
-			status: supportConversation.status,
-			lastMessageAt: supportConversation.lastMessageAt,
-			lastMessagePreview: supportConversation.lastMessagePreview,
-			createdAt: supportConversation.createdAt,
-			updatedAt: supportConversation.updatedAt,
-			userName: user.name,
-			userEmail: user.email,
-			userImage: user.image,
-		})
+		.select(conversationSelect)
 		.from(supportConversation)
 		.innerJoin(user, eq(supportConversation.userId, user.id))
 		.where(
@@ -256,7 +286,7 @@ export async function getMyConversationController(input: {
 
 	const messages = await listMessagesForConversation(existing.id);
 	return {
-		conversation: mapConversation(existing),
+		conversation: await mapConversation(existing, false),
 		messages: messages.items,
 	};
 }
@@ -290,19 +320,7 @@ export async function listConversationsController(input: {
 		.where(where);
 
 	const rows = await db
-		.select({
-			id: supportConversation.id,
-			userId: supportConversation.userId,
-			organizationId: supportConversation.organizationId,
-			status: supportConversation.status,
-			lastMessageAt: supportConversation.lastMessageAt,
-			lastMessagePreview: supportConversation.lastMessagePreview,
-			createdAt: supportConversation.createdAt,
-			updatedAt: supportConversation.updatedAt,
-			userName: user.name,
-			userEmail: user.email,
-			userImage: user.image,
-		})
+		.select(conversationSelect)
 		.from(supportConversation)
 		.innerJoin(user, eq(supportConversation.userId, user.id))
 		.where(where)
@@ -311,7 +329,7 @@ export async function listConversationsController(input: {
 		.offset(offset);
 
 	return {
-		items: rows.map(mapConversation),
+		items: await mapConversations(rows, true),
 		total: totalRow?.value ?? 0,
 	};
 }
@@ -342,7 +360,7 @@ export async function getConversationController(input: {
 
 	const messages = await listMessagesForConversation(conversation.id);
 	return {
-		conversation: mapConversation(conversation),
+		conversation: await mapConversation(conversation, input.isPlatformAdmin),
 		messages: messages.items,
 	};
 }
@@ -407,11 +425,11 @@ export async function updateConversationStatusController(input: {
 
 		if (openExisting && openExisting.id !== conversation.id) {
 			throw createError({
-			status: 409,
-			message: "User already has an open conversation",
-			why: "Only one open support conversation is allowed per user",
-			fix: "Close the other open conversation first",
-		});
+				status: 409,
+				message: "User already has an open conversation",
+				why: "Only one open support conversation is allowed per user",
+				fix: "Close the other open conversation first",
+			});
 		}
 	}
 
@@ -431,7 +449,7 @@ export async function updateConversationStatusController(input: {
 		});
 	}
 
-	return { conversation: mapConversation(updated) };
+	return { conversation: await mapConversation(updated, true) };
 }
 
 export async function createMessageController(input: {
@@ -508,12 +526,18 @@ export async function createMessageController(input: {
 		});
 	}
 
+	// Sender has read up through their own message
+	const readUpdate = input.isPlatformAdmin
+		? { adminLastReadAt: now }
+		: { userLastReadAt: now };
+
 	await db
 		.update(supportConversation)
 		.set({
 			lastMessageAt: now,
 			lastMessagePreview: previewFromBody(trimmed),
 			updatedAt: now,
+			...readUpdate,
 		})
 		.where(eq(supportConversation.id, conversation.id));
 
@@ -536,13 +560,122 @@ export async function createMessageController(input: {
 	});
 
 	const updatedConversation = await getConversationRow(conversation.id);
+	const mapped = updatedConversation
+		? await mapConversation(updatedConversation, input.isPlatformAdmin)
+		: await mapConversation(conversation, input.isPlatformAdmin);
+
+	// For broadcasts, also compute the other party's unread view
+	const forAdmin = updatedConversation
+		? await mapConversation(updatedConversation, true)
+		: mapped;
+	const forUser = updatedConversation
+		? await mapConversation(updatedConversation, false)
+		: mapped;
 
 	return {
 		message,
-		conversation: updatedConversation
-			? mapConversation(updatedConversation)
-			: mapConversation(conversation),
+		conversation: mapped,
+		conversationForAdmin: forAdmin,
+		conversationForUser: forUser,
 	};
+}
+
+export async function markConversationReadController(input: {
+	conversationId: string;
+	userId: string;
+	isPlatformAdmin: boolean;
+}) {
+	const conversation = await getConversationRow(input.conversationId);
+	if (!conversation) {
+		throw createError({
+			status: 404,
+			message: "Conversation not found",
+			why: "No support conversation exists with that id",
+			fix: "Refresh the conversation list",
+		});
+	}
+
+	if (!input.isPlatformAdmin && conversation.userId !== input.userId) {
+		throw createError({
+			status: 403,
+			message: "Forbidden",
+			why: "You can only mark your own conversations as read",
+			fix: "Open support from your account",
+		});
+	}
+
+	const now = new Date();
+	await db
+		.update(supportConversation)
+		.set(
+			input.isPlatformAdmin
+				? { adminLastReadAt: now, updatedAt: now }
+				: { userLastReadAt: now, updatedAt: now },
+		)
+		.where(eq(supportConversation.id, input.conversationId));
+
+	const updated = await getConversationRow(input.conversationId);
+	if (!updated) {
+		throw createError({
+			status: 500,
+			message: "Failed to mark conversation as read",
+			why: "Conversation missing after update",
+			fix: "Retry the request",
+		});
+	}
+
+	return {
+		conversation: await mapConversation(updated, input.isPlatformAdmin),
+		conversationForAdmin: await mapConversation(updated, true),
+		conversationForUser: await mapConversation(updated, false),
+	};
+}
+
+export async function getUnreadCountController(input: {
+	userId: string;
+	isPlatformAdmin: boolean;
+}) {
+	if (input.isPlatformAdmin) {
+		const [row] = await db
+			.select({
+				value: sql<number>`coalesce(sum(
+					(select count(*)::int from ${supportMessage}
+					 where ${supportMessage.conversationId} = ${supportConversation.id}
+					   and ${supportMessage.senderRole} = 'user'
+					   and (
+					     ${supportConversation.adminLastReadAt} is null
+					     or ${supportMessage.createdAt} > ${supportConversation.adminLastReadAt}
+					   )
+					)
+				), 0)`,
+			})
+			.from(supportConversation)
+			.where(eq(supportConversation.status, "open"));
+		return { count: Number(row?.value ?? 0) };
+	}
+
+	const [open] = await db
+		.select({
+			id: supportConversation.id,
+			userLastReadAt: supportConversation.userLastReadAt,
+		})
+		.from(supportConversation)
+		.where(
+			and(
+				eq(supportConversation.userId, input.userId),
+				eq(supportConversation.status, "open"),
+			),
+		)
+		.limit(1);
+
+	if (!open) return { count: 0 };
+
+	const unread = await countUnreadForConversation(
+		open.id,
+		false,
+		open.userLastReadAt,
+	);
+	return { count: unread };
 }
 
 export async function assertConversationAccess(input: {
@@ -555,5 +688,5 @@ export async function assertConversationAccess(input: {
 	if (!input.isPlatformAdmin && conversation.userId !== input.userId) {
 		return null;
 	}
-	return mapConversation(conversation);
+	return mapConversation(conversation, input.isPlatformAdmin);
 }

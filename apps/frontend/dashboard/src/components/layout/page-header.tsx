@@ -1,5 +1,6 @@
 "use client";
 
+import { useSupportUnread } from "@fe/dashboard/hooks/use-support-unread";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import * as Button from "@reloop/ui/button";
@@ -18,6 +19,7 @@ export const PageHeader = () => {
 	} = useUIStore();
 	const { organizations, activeOrganization, onOrganizationChange } =
 		useUserOrganization();
+	const { unreadCount } = useSupportUnread();
 
 	return (
 		<div className="sticky top-0 z-10 flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b pr-3 pl-3 dark:border-stroke-soft-100/40">
@@ -81,7 +83,7 @@ export const PageHeader = () => {
 					mode="ghost"
 					size="xxsmall"
 					className={cn(
-						"gap-1.5 text-text-sub-600 hover:text-text-strong-950",
+						"relative gap-1.5 text-text-sub-600 hover:text-text-strong-950",
 						isAiPanelOpen &&
 							aiPanelActiveTab === "support" &&
 							"bg-bg-weak-50 text-text-strong-950",
@@ -99,6 +101,11 @@ export const PageHeader = () => {
 				>
 					<Icon name="question" className="h-4 w-4 text-text-sub-600" />
 					<span>Support</span>
+					{unreadCount > 0 ? (
+						<span className="-top-0.5 -right-0.5 absolute flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 font-semibold text-[10px] text-white tabular-nums">
+							{unreadCount > 99 ? "99+" : unreadCount}
+						</span>
+					) : null}
 				</Button.Root>
 
 				<UserDropdown />

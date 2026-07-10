@@ -10,6 +10,9 @@ export type SupportConversation = {
 	userName: string | null;
 	userEmail: string | null;
 	userImage: string | null;
+	userLastReadAt: string | null;
+	adminLastReadAt: string | null;
+	unreadCount: number;
 };
 
 export type SupportMessage = {
@@ -31,7 +34,11 @@ export type SupportServerEvent =
 	| { type: "lobby_joined" }
 	| { type: "lobby_left" }
 	| { type: "message_created"; message: SupportMessage }
-	| { type: "conversation_updated"; conversation: SupportConversation }
+	| {
+			type: "conversation_updated";
+			conversation: SupportConversation;
+			conversationAdmin?: SupportConversation;
+	  }
 	| { type: "error"; message: string };
 
 export function supportWsUrl() {

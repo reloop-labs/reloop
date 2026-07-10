@@ -222,6 +222,9 @@ export namespace AdminModel {
 		userName: t.Union([t.String(), t.Null()]),
 		userEmail: t.Union([t.String(), t.Null()]),
 		userImage: t.Union([t.String(), t.Null()]),
+		userLastReadAt: t.Union([t.Date(), t.Null()]),
+		adminLastReadAt: t.Union([t.Date(), t.Null()]),
+		unreadCount: t.Number(),
 	});
 
 	export const supportConversationWithMessages = t.Object({
@@ -242,6 +245,10 @@ export namespace AdminModel {
 	export const supportMessagesResponse = t.Object({
 		items: t.Array(supportMessage),
 		total: t.Number(),
+	});
+
+	export const supportUnreadCountResponse = t.Object({
+		count: t.Number(),
 	});
 
 	export const updateSupportStatusBody = t.Object({

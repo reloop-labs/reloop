@@ -199,19 +199,23 @@ export const supportWsRoute = new Elysia()
 						isPlatformAdmin,
 					});
 
-					const messagePayload = {
-						type: "message_created" as const,
+					broadcastToConversation(parsed.conversationId, {
+						type: "message_created",
 						message: result.message,
-					};
-					const conversationPayload = {
-						type: "conversation_updated" as const,
-						conversation: result.conversation,
-					};
-
-					broadcastToConversation(parsed.conversationId, messagePayload);
-					broadcastToConversation(parsed.conversationId, conversationPayload);
-					broadcastToLobby(conversationPayload);
-					broadcastToLobby(messagePayload);
+					});
+					broadcastToLobby({
+						type: "message_created",
+						message: result.message,
+					});
+					broadcastToLobby({
+						type: "conversation_updated",
+						conversation: result.conversationForAdmin,
+					});
+					broadcastToConversation(parsed.conversationId, {
+						type: "conversation_updated",
+						conversation: result.conversationForUser,
+						conversationAdmin: result.conversationForAdmin,
+					});
 				} catch (error) {
 					const errMessage =
 						error &&

@@ -1,6 +1,10 @@
 "use client";
 
 import { useSupportSocket } from "@fe/console/hooks/use-support-socket";
+import {
+	SUPPORT_UNREAD_KEY,
+	useSupportUnread,
+} from "@fe/console/hooks/use-support-unread";
 import { adminGet, adminPatch, adminPost } from "@fe/console/lib/admin-api";
 import type {
 	SupportConversation,
@@ -12,8 +16,9 @@ import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { ArrowUp, MessageSquare } from "lucide-react";
+import { parseAsString, useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import useSWR from "swr";
+import useSWR, { mutate as globalMutate } from "swr";
 
 type ConversationsResponse = { items: SupportConversation[]; total: number };
 type ConversationDetail = {
@@ -74,12 +79,20 @@ function formatTime(value: string) {
 
 export default function SupportPage() {
 	const [status, setStatus] = useState<"open" | "closed" | "">("open");
-	const [selectedId, setSelectedId] = useState<string | null>(null);
+	const [selectedId, setSelectedId] = useQueryState(
+		"c",
+		parseAsString.withDefault(""),
+	);
+	const [selectedDetail, setSelectedDetail] =
+		useState<SupportConversation | null>(null);
 	const [messages, setMessages] = useState<SupportMessage[]>([]);
 	const [draft, setDraft] = useState("");
 	const [sending, setSending] = useState(false);
 	const bottomRef = useRef<HTMLDivElement>(null);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+	const activeId = selectedId || null;
+	const { mutateUnread } = useSupportUnread();
 
 	const listKey = ["/support/conversations", status] as const;
 	const { data, isLoading, mutate } = useSWR<ConversationsResponse>(
@@ -92,26 +105,69 @@ export default function SupportPage() {
 	);
 
 	const conversations = data?.items ?? [];
-	const selected = useMemo(
-		() => conversations.find((c) => c.id === selectedId) ?? null,
-		[conversations, selectedId],
+	const selected = useMemo(() => {
+		if (!activeId) return null;
+		return (
+			conversations.find((c) => c.id === activeId) ?? selectedDetail ?? null
+		);
+	}, [conversations, activeId, selectedDetail]);
+
+	const selectConversation = useCallback(
+		(id: string | null) => {
+			void setSelectedId(id || null);
+		},
+		[setSelectedId],
 	);
 
-	const loadConversation = useCallback(async (id: string) => {
-		const detail = await adminGet<ConversationDetail>(
-			`/support/conversations/${id}`,
-		);
-		setMessages(detail.messages);
-		return detail;
-	}, []);
+	const markRead = useCallback(
+		async (id: string) => {
+			try {
+				const res = await adminPost<{ conversation: SupportConversation }>(
+					`/support/conversations/${id}/read`,
+				);
+				setSelectedDetail(res.conversation);
+				void mutate(
+					(current) => {
+						if (!current) return current;
+						return {
+							...current,
+							items: current.items.map((c) =>
+								c.id === id ? { ...c, unreadCount: 0 } : c,
+							),
+						};
+					},
+					{ revalidate: false },
+				);
+				void globalMutate(SUPPORT_UNREAD_KEY);
+				void mutateUnread();
+			} catch {
+				// non-fatal
+			}
+		},
+		[mutate, mutateUnread],
+	);
+
+	const loadConversation = useCallback(
+		async (id: string) => {
+			const detail = await adminGet<ConversationDetail>(
+				`/support/conversations/${id}`,
+			);
+			setSelectedDetail(detail.conversation);
+			setMessages(detail.messages);
+			await markRead(id);
+			return detail;
+		},
+		[markRead],
+	);
 
 	useEffect(() => {
-		if (!selectedId) {
+		if (!activeId) {
 			setMessages([]);
+			setSelectedDetail(null);
 			return;
 		}
-		void loadConversation(selectedId);
-	}, [selectedId, loadConversation]);
+		void loadConversation(activeId);
+	}, [activeId, loadConversation]);
 
 	useEffect(() => {
 		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -120,17 +176,19 @@ export default function SupportPage() {
 	const onEvent = useCallback(
 		(event: SupportServerEvent) => {
 			if (event.type === "conversation_updated") {
+				const conv = event.conversationAdmin ?? event.conversation;
+				if (conv.id === activeId) {
+					setSelectedDetail(conv);
+				}
 				void mutate(
 					(current) => {
 						if (!current) return current;
-						const idx = current.items.findIndex(
-							(c) => c.id === event.conversation.id,
-						);
+						const idx = current.items.findIndex((c) => c.id === conv.id);
 						const items = [...current.items];
 						if (idx >= 0) {
-							items[idx] = event.conversation;
-						} else if (!status || event.conversation.status === status) {
-							items.unshift(event.conversation);
+							items[idx] = conv;
+						} else if (!status || conv.status === status) {
+							items.unshift(conv);
 						}
 						items.sort(
 							(a, b) =>
@@ -143,18 +201,23 @@ export default function SupportPage() {
 					},
 					{ revalidate: false },
 				);
+				void mutateUnread();
 			}
 
 			if (event.type === "message_created") {
-				if (event.message.conversationId === selectedId) {
+				if (event.message.conversationId === activeId) {
 					setMessages((prev) => {
 						if (prev.some((m) => m.id === event.message.id)) return prev;
 						return [...prev, event.message];
 					});
+					if (event.message.senderRole === "user" && activeId) {
+						void markRead(activeId);
+					}
 				}
+				void mutateUnread();
 			}
 		},
-		[mutate, selectedId, status],
+		[mutate, activeId, status, mutateUnread, markRead],
 	);
 
 	const { ready, join, leave } = useSupportSocket({
@@ -163,28 +226,29 @@ export default function SupportPage() {
 	});
 
 	useEffect(() => {
-		if (!ready || !selectedId) return;
-		join(selectedId);
+		if (!ready || !activeId) return;
+		join(activeId);
 		return () => {
-			leave(selectedId);
+			leave(activeId);
 		};
-	}, [ready, selectedId, join, leave]);
+	}, [ready, activeId, join, leave]);
 
 	const handleSend = async () => {
 		const body = draft.trim();
-		if (!body || !selectedId || sending) return;
+		if (!body || !activeId || sending) return;
 		setSending(true);
 		try {
 			const res = await adminPost<{
 				message: SupportMessage;
 				conversation: SupportConversation;
-			}>(`/support/conversations/${selectedId}/messages`, {
+			}>(`/support/conversations/${activeId}/messages`, {
 				body,
 			});
 			setMessages((prev) => {
 				if (prev.some((m) => m.id === res.message.id)) return prev;
 				return [...prev, res.message];
 			});
+			setSelectedDetail(res.conversation);
 			setDraft("");
 			if (textareaRef.current) {
 				textareaRef.current.style.height = "auto";
@@ -199,12 +263,14 @@ export default function SupportPage() {
 	const toggleStatus = async () => {
 		if (!selected) return;
 		const next = selected.status === "open" ? "closed" : "open";
-		await adminPatch(`/support/conversations/${selected.id}`, {
-			status: next,
-		});
+		const res = await adminPatch<{ conversation: SupportConversation }>(
+			`/support/conversations/${selected.id}`,
+			{ status: next },
+		);
+		setSelectedDetail(res.conversation);
 		await mutate();
 		if (status && next !== status) {
-			setSelectedId(null);
+			setStatus(next);
 		}
 	};
 
@@ -225,7 +291,6 @@ export default function SupportPage() {
 					value={status}
 					onChange={(e) => {
 						setStatus(e.target.value as "open" | "closed" | "");
-						setSelectedId(null);
 					}}
 				>
 					<option value="open">Open</option>
@@ -247,12 +312,13 @@ export default function SupportPage() {
 							</p>
 						) : (
 							conversations.map((c) => {
-								const active = c.id === selectedId;
+								const active = c.id === activeId;
+								const unread = c.unreadCount ?? 0;
 								return (
 									<button
 										key={c.id}
 										type="button"
-										onClick={() => setSelectedId(c.id)}
+										onClick={() => selectConversation(c.id)}
 										className={cn(
 											"w-full border-stroke-soft-100 border-b px-4 py-3 text-left transition-colors",
 											active ? "bg-bg-weak-50" : "hover:bg-bg-weak-50/60",
@@ -260,14 +326,24 @@ export default function SupportPage() {
 									>
 										<div className="flex items-start justify-between gap-2">
 											<div className="flex min-w-0 items-center gap-2.5">
-												<SupportPersonAvatar
-													name={c.userName}
-													email={c.userEmail}
-													image={c.userImage}
-													size="32"
-												/>
+												<div className="relative">
+													<SupportPersonAvatar
+														name={c.userName}
+														email={c.userEmail}
+														image={c.userImage}
+														size="32"
+													/>
+													{unread > 0 ? (
+														<span className="-top-0.5 -right-0.5 absolute h-2.5 w-2.5 rounded-full bg-orange-500 ring-2 ring-white" />
+													) : null}
+												</div>
 												<div className="min-w-0">
-													<p className="truncate font-medium text-label-sm text-text-strong-950">
+													<p
+														className={cn(
+															"truncate text-label-sm text-text-strong-950",
+															unread > 0 ? "font-semibold" : "font-medium",
+														)}
+													>
 														{c.userName || c.userEmail || c.userId}
 													</p>
 													<p className="truncate text-[12px] text-text-sub-600">
@@ -275,14 +351,28 @@ export default function SupportPage() {
 													</p>
 												</div>
 											</div>
-											<Badge.Root
-												variant="light"
-												color={c.status === "open" ? "green" : "gray"}
-											>
-												{c.status}
-											</Badge.Root>
+											<div className="flex shrink-0 flex-col items-end gap-1">
+												<Badge.Root
+													variant="light"
+													color={c.status === "open" ? "green" : "gray"}
+												>
+													{c.status}
+												</Badge.Root>
+												{unread > 0 ? (
+													<span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1.5 font-semibold text-[10px] text-white">
+														{unread > 99 ? "99+" : unread}
+													</span>
+												) : null}
+											</div>
 										</div>
-										<p className="mt-1 line-clamp-2 text-[12px] text-text-sub-600">
+										<p
+											className={cn(
+												"mt-1 line-clamp-2 text-[12px]",
+												unread > 0
+													? "font-medium text-text-strong-950"
+													: "text-text-sub-600",
+											)}
+										>
 											{c.lastMessagePreview || "No messages yet"}
 										</p>
 										<p className="mt-1 text-[11px] text-text-soft-400">
@@ -422,7 +512,7 @@ export default function SupportPage() {
 												: "Reply to customer…"
 										}
 										rows={1}
-										className="scrollbar-thin max-h-28 min-h-[40px] flex-1 resize-none bg-transparent px-2 py-2.5 text-[13px] text-text-strong-950 outline-none placeholder:text-text-soft-400 overflow-y-auto"
+										className="scrollbar-thin max-h-28 min-h-[40px] flex-1 resize-none overflow-y-auto bg-transparent px-2 py-2.5 text-[13px] text-text-strong-950 outline-none placeholder:text-text-soft-400"
 									/>
 									<button
 										type="button"

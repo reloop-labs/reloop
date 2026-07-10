@@ -6,15 +6,66 @@ import {
 	getConversationController,
 	getMyConversationController,
 	getOrCreateMyConversationController,
+	getUnreadCountController,
 	listConversationsController,
 	listMessagesController,
+	markConversationReadController,
 	updateConversationStatusController,
 } from "./support.controllers";
 import { supportWsRoute } from "./support.ws";
 
+async function broadcastConversationUpdate(input: {
+	conversationId: string;
+	conversationForAdmin: unknown;
+	conversationForUser: unknown;
+	message?: unknown;
+}) {
+	const { broadcastToConversation, broadcastToLobby } = await import(
+		"./support.rooms"
+	);
+	if (input.message) {
+		broadcastToConversation(input.conversationId, {
+			type: "message_created",
+			message: input.message,
+		});
+		broadcastToLobby({
+			type: "message_created",
+			message: input.message,
+		});
+	}
+	// Lobby (admins) get admin-perspective unread
+	broadcastToLobby({
+		type: "conversation_updated",
+		conversation: input.conversationForAdmin,
+	});
+	// Conversation room gets both perspectives via a dual payload;
+	// clients pick unreadCount based on their role from their own view.
+	broadcastToConversation(input.conversationId, {
+		type: "conversation_updated",
+		conversation: input.conversationForUser,
+		conversationAdmin: input.conversationForAdmin,
+	});
+}
+
 export const supportRoute = new Elysia({ prefix: "/support" })
 	.use(authMiddleware)
 	.use(supportWsRoute)
+	.get(
+		"/unread-count",
+		async ({ userId, isPlatformAdmin }) =>
+			getUnreadCountController({ userId, isPlatformAdmin }),
+		{
+			supportSession: true,
+			response: {
+				200: AdminModel.supportUnreadCountResponse,
+				401: AdminModel.unauthorized,
+			},
+			detail: {
+				tags: ["Support"],
+				summary: "Get unread support message count for current user",
+			},
+		},
+	)
 	.post(
 		"/conversations",
 		async ({ userId, organizationId }) => {
@@ -25,7 +76,11 @@ export const supportRoute = new Elysia({ prefix: "/support" })
 			const { broadcastToLobby } = await import("./support.rooms");
 			broadcastToLobby({
 				type: "conversation_updated",
-				conversation: result.conversation,
+				conversation: {
+					...result.conversation,
+					// Admin view of a brand-new empty thread
+					unreadCount: 0,
+				},
 			});
 			return result;
 		},
@@ -134,6 +189,36 @@ export const supportRoute = new Elysia({ prefix: "/support" })
 		},
 	)
 	.post(
+		"/conversations/:conversationId/read",
+		async ({ params, userId, isPlatformAdmin }) => {
+			const result = await markConversationReadController({
+				conversationId: params.conversationId,
+				userId,
+				isPlatformAdmin,
+			});
+			await broadcastConversationUpdate({
+				conversationId: params.conversationId,
+				conversationForAdmin: result.conversationForAdmin,
+				conversationForUser: result.conversationForUser,
+			});
+			return { conversation: result.conversation };
+		},
+		{
+			supportSession: true,
+			params: t.Object({ conversationId: t.String() }),
+			response: {
+				200: t.Object({
+					conversation: AdminModel.supportConversation,
+				}),
+				401: AdminModel.unauthorized,
+			},
+			detail: {
+				tags: ["Support"],
+				summary: "Mark a support conversation as read",
+			},
+		},
+	)
+	.post(
 		"/conversations/:conversationId/messages",
 		async ({ params, body, userId, isPlatformAdmin }) => {
 			const result = await createMessageController({
@@ -143,26 +228,16 @@ export const supportRoute = new Elysia({ prefix: "/support" })
 				body: body.body,
 				isPlatformAdmin,
 			});
-			const { broadcastToConversation, broadcastToLobby } = await import(
-				"./support.rooms"
-			);
-			broadcastToConversation(params.conversationId, {
-				type: "message_created",
+			await broadcastConversationUpdate({
+				conversationId: params.conversationId,
+				conversationForAdmin: result.conversationForAdmin,
+				conversationForUser: result.conversationForUser,
 				message: result.message,
 			});
-			broadcastToConversation(params.conversationId, {
-				type: "conversation_updated",
-				conversation: result.conversation,
-			});
-			broadcastToLobby({
-				type: "conversation_updated",
-				conversation: result.conversation,
-			});
-			broadcastToLobby({
-				type: "message_created",
+			return {
 				message: result.message,
-			});
-			return result;
+				conversation: result.conversation,
+			};
 		},
 		{
 			supportSession: true,

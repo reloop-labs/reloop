@@ -38,6 +38,8 @@ export const supportConversation = pgTable(
 		status: supportConversationStatusEnum("status").notNull().default("open"),
 		lastMessageAt: timestamp("last_message_at").notNull().defaultNow(),
 		lastMessagePreview: text("last_message_preview"),
+		userLastReadAt: timestamp("user_last_read_at"),
+		adminLastReadAt: timestamp("admin_last_read_at"),
 		createdAt: timestamp("created_at").notNull().defaultNow(),
 		updatedAt: timestamp("updated_at").notNull().defaultNow(),
 	},
