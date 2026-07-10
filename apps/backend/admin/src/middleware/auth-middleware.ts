@@ -1,6 +1,9 @@
 import { createId } from "@paralleldrive/cuid2";
 import { adminConfig } from "@reloop/admin/admin.config";
-import { validatePlatformAdmin } from "@reloop/admin/middleware/cookie-auth";
+import {
+	validatePlatformAdmin,
+	validateSupportSession,
+} from "@reloop/admin/middleware/cookie-auth";
 import { Elysia } from "elysia";
 import { log } from "evlog";
 import { evlog } from "evlog/elysia";
@@ -31,6 +34,7 @@ export const authMiddleware = new Elysia({
 							email: session.email,
 							name: session.name,
 							organizationId: session.organizationId,
+							isPlatformAdmin: true as const,
 							authType: "session" as const,
 						};
 						requestLog.set({ ...result });
@@ -56,6 +60,56 @@ export const authMiddleware = new Elysia({
 						stack: e instanceof Error ? e.stack : undefined,
 					});
 					requestLog.error("Platform admin authentication error", {
+						error: e instanceof Error ? e.message : "Unknown error",
+						stack: e instanceof Error ? e.stack : undefined,
+					});
+					return status(401, {
+						message: "Unauthorized access",
+						why: e instanceof Error ? e.message : "Unknown auth error",
+						fix: "Verify credentials and retry",
+					});
+				}
+			},
+		},
+		supportSession: {
+			async resolve({ status, request, log: requestLog }) {
+				try {
+					const { headers, method, url } = request;
+					const cookie = headers.get("cookie");
+					const traceId = `req_${createId()}`;
+					requestLog.set({ traceId, service: "admin" });
+					const session = await validateSupportSession(cookie);
+					requestLog.set({ session });
+
+					if (session) {
+						const result = {
+							userId: session.userId,
+							role: session.role,
+							email: session.email,
+							name: session.name,
+							organizationId: session.organizationId,
+							isPlatformAdmin: session.isPlatformAdmin,
+							authType: "session" as const,
+						};
+						requestLog.set({ ...result });
+						return { ...result, traceId, logger: requestLog };
+					}
+
+					log.warn({
+						message: "Support session authentication rejected",
+						traceId,
+						method,
+						url,
+						hasCookie: Boolean(cookie),
+					});
+					return status(401, {
+						message: "Unauthorized access",
+						why: "A signed-in session is required for support chat",
+						fix: "Sign in to your Reloop account and retry",
+					});
+				} catch (e) {
+					log.error({
+						message: "Support session authentication error",
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
 					});

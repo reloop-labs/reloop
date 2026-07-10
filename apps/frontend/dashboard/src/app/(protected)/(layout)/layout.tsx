@@ -1,10 +1,6 @@
 "use client";
 
 import { Loader } from "@dot-loaders/react";
-import {
-	ChatwootLoader,
-	ChatwootUserSync,
-} from "@fe/dashboard/components/chatwoot-widget";
 import { CommandMenuGlobal } from "@fe/dashboard/components/command-menu";
 import { AiPanel } from "@fe/dashboard/components/layout/ai-panel";
 import { PageHeader } from "@fe/dashboard/components/layout/page-header";
@@ -54,8 +50,6 @@ const OrgLayout = ({ children }: { children: React.ReactNode }) => {
 		<UserOrganizationProvider alwaysRender>
 			<DashboardLayoutContent>{children}</DashboardLayoutContent>
 			<CommandMenuGlobal />
-			<ChatwootLoader />
-			<ChatwootUserSync />
 		</UserOrganizationProvider>
 	);
 };

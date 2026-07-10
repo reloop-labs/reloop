@@ -19,6 +19,7 @@ import {
 	X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { SupportChatPanel } from "./support-chat-panel";
 
 interface Message {
 	id: string;
@@ -495,11 +496,7 @@ export const AiPanel = () => {
 							transition={{ duration: 0.15 }}
 							className="flex flex-1 flex-col overflow-hidden bg-white dark:bg-[#0c0c0c]"
 						>
-							<iframe
-								src="https://chatwoot.reloop.sh/widget?website_token=WsUSVMPZG5goFYPcJQLQVAjD&locale=en"
-								className="h-full w-full border-none bg-white dark:bg-[#0c0c0c]"
-								title="Support Live Chat"
-							/>
+							<SupportChatPanel />
 						</motion.div>
 					)}
 				</AnimatePresence>

@@ -197,4 +197,56 @@ export namespace AdminModel {
 	export const successResponse = t.Object({
 		success: t.Boolean(),
 	});
+
+	export const supportMessage = t.Object({
+		id: t.String(),
+		conversationId: t.String(),
+		senderUserId: t.String(),
+		senderRole: t.Union([t.Literal("user"), t.Literal("admin")]),
+		body: t.String(),
+		createdAt: t.Date(),
+		senderName: t.Union([t.String(), t.Null()]),
+		senderEmail: t.Union([t.String(), t.Null()]),
+	});
+
+	export const supportConversation = t.Object({
+		id: t.String(),
+		userId: t.String(),
+		organizationId: t.Union([t.String(), t.Null()]),
+		status: t.Union([t.Literal("open"), t.Literal("closed")]),
+		lastMessageAt: t.Date(),
+		lastMessagePreview: t.Union([t.String(), t.Null()]),
+		createdAt: t.Date(),
+		updatedAt: t.Date(),
+		userName: t.Union([t.String(), t.Null()]),
+		userEmail: t.Union([t.String(), t.Null()]),
+	});
+
+	export const supportConversationWithMessages = t.Object({
+		conversation: supportConversation,
+		messages: t.Array(supportMessage),
+	});
+
+	export const supportMyConversationResponse = t.Object({
+		conversation: t.Union([supportConversation, t.Null()]),
+		messages: t.Array(supportMessage),
+	});
+
+	export const supportConversationsResponse = t.Object({
+		items: t.Array(supportConversation),
+		total: t.Number(),
+	});
+
+	export const supportMessagesResponse = t.Object({
+		items: t.Array(supportMessage),
+		total: t.Number(),
+	});
+
+	export const updateSupportStatusBody = t.Object({
+		status: t.Union([t.Literal("open"), t.Literal("closed")]),
+	});
+
+	export const createSupportMessageBody = t.Object({
+		body: t.String({ minLength: 1, maxLength: 4000 }),
+	});
 }

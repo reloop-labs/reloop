@@ -11,15 +11,6 @@
 
 For detailed setup and development instructions, please refer to the [Setup Guide](https://reloop.sh/docs/setup/frontend/web).
 
-## Chatwoot widget
-
-Set in `apps/frontend/web/.env` (same values as the dashboard):
-
-- `NEXT_PUBLIC_CHATWOOT_BASE_URL`
-- `NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN`
-
-In Chatwoot inbox settings, **Website domain** must match where the site is served (e.g. `https://local.reloop.sh` for local dev).
-
 ---
 
 ## 🔗 Resources & Community
