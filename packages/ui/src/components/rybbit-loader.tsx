@@ -20,7 +20,7 @@ export function RybbitLoader() {
 		<Script
 			id="rybbit-sdk"
 			src="/api/analytics/script.js"
-			data-site-id="1fb7d359339f"
+			data-site-id="9af96c42b437"
 			strategy="lazyOnload"
 		/>
 	);

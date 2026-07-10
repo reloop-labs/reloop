@@ -43,7 +43,7 @@ const workflowService = new Elysia({
 	prefix: "/api/workflow",
 	name: "Workflow Service",
 })
-	.use(evlog({ exclude: ["**/health"] }))
+	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(
 		openapi({
 			documentation: {

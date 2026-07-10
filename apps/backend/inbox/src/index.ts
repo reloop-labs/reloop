@@ -51,7 +51,7 @@ const inboxService = new Elysia({
 	prefix: "/api/inbox",
 	name: "Inbox Service",
 })
-	.use(evlog({ exclude: ["**/health"] }))
+	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(opentelemetry())
 	.use(
 		openapi({

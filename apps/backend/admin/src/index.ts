@@ -56,7 +56,7 @@ const app = new Elysia({ prefix: "/api/admin", name: "Admin Service" })
 			},
 		}),
 	)
-	.use(evlog({ exclude: ["**/health"] }))
+	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(serverTiming())
 	.use(landingRoute)
 	.use(healthRoute)
