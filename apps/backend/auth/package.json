@@ -1,5 +1,5 @@
 {
-	"name": "auth",
+	"name": "be-auth",
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {
@@ -39,7 +39,7 @@
 		"@reloop/db": "workspace:*",
 		"@reloop/cache": "workspace:*",
 		"@reloop/bus": "workspace:*",
-		"email": "workspace:*",
+		"be-email": "workspace:*",
 		"@better-auth/api-key": "catalog:",
 		"evlog": "catalog:backend"
 	},

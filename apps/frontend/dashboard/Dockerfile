@@ -4,7 +4,7 @@ FROM oven/bun:alpine AS base
 FROM base AS deps
 WORKDIR /app
 COPY . .
-RUN bun --filter=dashboard install
+RUN bun --filter=fe-dashboard install
 
 # Stage 2: Build the application
 FROM base AS builder
@@ -18,7 +18,7 @@ ENV NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN bun run --filter=dashboard build
+RUN bun run --filter=fe-dashboard build
 
 # Stage 3: Production server
 FROM base AS runner

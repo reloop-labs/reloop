@@ -8,7 +8,7 @@ WORKDIR /app
 RUN apk add --no-cache python3 make g++
 
 COPY . .
-RUN bun --filter=api-key install
+RUN bun --filter=be-api-key install
 
 # Stage 2: Build the application
 FROM base AS builder
@@ -18,7 +18,7 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN bun run --filter=api-key build
+RUN bun run --filter=be-api-key build
 
 # Stage 3: Production server
 FROM base AS runner

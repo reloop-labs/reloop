@@ -1,5 +1,5 @@
 {
-	"name": "webhook",
+	"name": "be-webhook",
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {

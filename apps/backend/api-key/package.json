@@ -1,5 +1,5 @@
 {
-	"name": "api-key",
+	"name": "be-api-key",
 	"version": "1.2.0",
 	"main": "src/index.ts",
 	"type": "module",
@@ -7,9 +7,7 @@
 		"dev": "bun run --hot src/index.ts",
 		"start": "bun run dist/index.js",
 		"build": "tsdown",
-
 		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
-
 		"lint": "biome check .",
 		"fix-lint": "biome check --fix .",
 		"format": "biome format ."

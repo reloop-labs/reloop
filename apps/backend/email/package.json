@@ -1,5 +1,5 @@
 {
-	"name": "email",
+	"name": "be-email",
 	"version": "1.0.0",
 	"private": true,
 	"main": "src/index.ts",

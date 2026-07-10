@@ -4,7 +4,7 @@ FROM oven/bun:alpine AS base
 FROM base AS deps
 WORKDIR /app
 COPY . .
-RUN bun --filter=links install
+RUN bun --filter=fe-links install
 
 # Stage 2: Build the application
 FROM base AS builder
@@ -19,7 +19,7 @@ ARG NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN
 ENV NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN=${NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN bun run --filter=links build
+RUN bun run --filter=fe-links build
 
 # Stage 3: Production server
 FROM base AS runner

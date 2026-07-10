@@ -1,5 +1,5 @@
 {
-	"name": "admin",
+	"name": "be-admin",
 	"version": "1.0.0",
 	"main": "src/index.ts",
 	"type": "module",

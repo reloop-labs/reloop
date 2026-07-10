@@ -4,7 +4,7 @@ FROM oven/bun:alpine AS base
 FROM base AS deps
 WORKDIR /app
 COPY . .
-RUN bun --filter=console install
+RUN bun --filter=fe-console install
 
 # Stage 2: Build the application
 FROM base AS builder
@@ -15,7 +15,7 @@ ENV NODE_ENV=${NODE_ENV}
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN bun run --filter=console build
+RUN bun run --filter=fe-console build
 
 # Stage 3: Production server
 FROM base AS runner

@@ -5,7 +5,7 @@ FROM base AS deps
 WORKDIR /app
 
 COPY . .
-RUN bun --filter=email install
+RUN bun --filter=be-email install
 
 # Stage 2: Build the application
 FROM base AS builder
@@ -15,7 +15,7 @@ ENV NODE_ENV=${NODE_ENV}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Note: email build might need specific setup depending on react-email
-RUN bun run --filter=email build
+RUN bun run --filter=be-email build
 
 # Stage 3: Production server
 FROM base AS runner

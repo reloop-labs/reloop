@@ -1,5 +1,5 @@
 {
-	"name": "inbox",
+	"name": "be-inbox",
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {

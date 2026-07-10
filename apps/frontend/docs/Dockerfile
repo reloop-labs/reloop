@@ -5,7 +5,7 @@ RUN apk add --no-cache git libc6-compat
 FROM base AS deps
 WORKDIR /app
 COPY . .
-RUN bun --filter=docs install
+RUN bun --filter=fe-docs install
 
 # Stage 2: Build the application
 FROM base AS builder
@@ -16,7 +16,7 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN bun run --filter=docs build
+RUN bun run --filter=fe-docs build
 
 # Stage 3: Production server
 FROM base AS runner

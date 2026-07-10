@@ -1,5 +1,5 @@
 {
-	"name": "credits",
+	"name": "be-credits",
 	"main": "src/index.ts",
 	"type": "module",
 	"scripts": {
