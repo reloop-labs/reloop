@@ -89,8 +89,11 @@ services:
       dockerfile: Dockerfile
     container_name: reloop-smtp
     ports:
+      - "465:465"    # Submission (SMTPS / TLS upstream)
       - "587:587"    # Submission (STARTTLS)
-      - "2025:2025"  # Alt SMTP submission (STARTTLS)
+      - "2025:2025"  # Alt STARTTLS (networks blocking 587)
+      - "2465:2465"  # Alt SMTPS
+      - "2587:2587"  # Alt STARTTLS
       - "8020:8000"  # HTTP API
     volumes:
       - ../docker-data/kumomta/data:/var/spool/kumomta/data

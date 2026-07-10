@@ -17,7 +17,7 @@ Outbound KumoMTA engine — accepts mail from [mail](/setup/backend/mail) and de
 | :--- | :--- |
 | **Directory** | `apps/backend/smtp` |
 | **Docker service** | `smtp` (container `reloop-smtp`) |
-| **SMTP ports** | `587`, `2025` |
+| **SMTP ports** | `465`, `587`, `2025`, `2465`, `2587` |
 | **HTTP port** | `8020` |
 | **Stack** | `KumoMTA` `Lua` |
 
@@ -62,7 +62,7 @@ Key variables in `local/docker-compose.yml`:
 
 | Layer | Detail |
 | :--- | :--- |
-| **Submission** | Accepts outbound mail on ports `587`/`2025` from the mail service. |
+| **Submission** | Accepts outbound mail on ports `465`/`587`/`2025`/`2465`/`2587` from clients and the mail service. |
 | **Policies** | Lua scripts in `apps/backend/smtp/policy/` handle routing and DKIM. |
 | **Local delivery** | Captured by Mailpit at [http://localhost:8025](http://localhost:8025). |
 | **Inbound** | Port `25` MX is handled by [inbound](/setup/backend/inbound), not this service. |
