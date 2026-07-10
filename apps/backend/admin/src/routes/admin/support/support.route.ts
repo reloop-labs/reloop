@@ -73,16 +73,19 @@ export const supportRoute = new Elysia({ prefix: "/support" })
 				userId,
 				organizationId,
 			});
-			const { broadcastToLobby } = await import("./support.rooms");
-			broadcastToLobby({
-				type: "conversation_updated",
-				conversation: {
-					...result.conversation,
-					// Admin view of a brand-new empty thread
-					unreadCount: 0,
-				},
-			});
-			return result;
+			// Only notify admin lobby when a new thread is created — never wipe
+			// unread by broadcasting a user-perspective / zeroed payload.
+			if (result.created) {
+				const { broadcastToLobby } = await import("./support.rooms");
+				broadcastToLobby({
+					type: "conversation_updated",
+					conversation: result.conversationForAdmin,
+				});
+			}
+			return {
+				conversation: result.conversation,
+				messages: result.messages,
+			};
 		},
 		{
 			supportSession: true,

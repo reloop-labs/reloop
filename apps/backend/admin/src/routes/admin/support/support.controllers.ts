@@ -225,7 +225,9 @@ export async function getOrCreateMyConversationController(input: {
 		const messages = await listMessagesForConversation(existing.id);
 		return {
 			conversation: await mapConversation(existing, false),
+			conversationForAdmin: await mapConversation(existing, true),
 			messages: messages.items,
+			created: false as const,
 		};
 	}
 
@@ -261,7 +263,9 @@ export async function getOrCreateMyConversationController(input: {
 
 	return {
 		conversation: await mapConversation(conversation, false),
+		conversationForAdmin: await mapConversation(conversation, true),
 		messages: [] as SupportMessageDto[],
+		created: true as const,
 	};
 }
 

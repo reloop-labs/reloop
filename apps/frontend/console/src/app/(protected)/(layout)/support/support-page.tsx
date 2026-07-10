@@ -26,6 +26,7 @@ import {
 	useState,
 } from "react";
 import useSWR, { mutate as globalMutate } from "swr";
+import { SupportContextPanel } from "./support-context-panel";
 
 type ConversationsResponse = { items: SupportConversation[]; total: number };
 type ConversationDetail = {
@@ -130,6 +131,8 @@ export default function SupportPage() {
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	const activeId = selectedId || null;
+	const activeIdRef = useRef(activeId);
+	activeIdRef.current = activeId;
 	const { mutateUnread } = useSupportUnread();
 
 	const listKey = ["/support/conversations", status] as const;
@@ -159,10 +162,14 @@ export default function SupportPage() {
 
 	const markRead = useCallback(
 		async (id: string) => {
+			// Only mark read while this conversation is the open thread
+			if (id !== activeIdRef.current) return;
 			try {
 				const res = await adminPost<{ conversation: SupportConversation }>(
 					`/support/conversations/${id}/read`,
 				);
+				// Bail if user switched away while the request was in flight
+				if (id !== activeIdRef.current) return;
 				setSelectedDetail(res.conversation);
 				void mutate(
 					(current) => {
@@ -269,9 +276,26 @@ export default function SupportPage() {
 						if (prev.some((m) => m.id === event.message.id)) return prev;
 						return [...prev, event.message];
 					});
+					// Mark read only while this thread is open in the pane
 					if (event.message.senderRole === "user" && activeId) {
 						void markRead(activeId);
 					}
+				} else if (event.message.senderRole === "user") {
+					// Incoming on another thread — bump that row's unread locally
+					void mutate(
+						(current) => {
+							if (!current) return current;
+							return {
+								...current,
+								items: current.items.map((c) =>
+									c.id === event.message.conversationId
+										? { ...c, unreadCount: (c.unreadCount ?? 0) + 1 }
+										: c,
+								),
+							};
+						},
+						{ revalidate: false },
+					);
 				}
 				void mutateUnread();
 			}
@@ -359,7 +383,7 @@ export default function SupportPage() {
 			</div>
 
 			<div className="flex min-h-0 flex-1">
-				<aside className="flex w-80 shrink-0 flex-col border-stroke-soft-100 border-r">
+				<aside className="flex w-72 shrink-0 flex-col border-stroke-soft-100 border-r">
 					<div className="flex-1 overflow-y-auto">
 						{isLoading ? (
 							<p className="px-4 py-6 text-paragraph-sm text-text-sub-600">
@@ -602,6 +626,8 @@ export default function SupportPage() {
 						</>
 					)}
 				</section>
+
+				{selected ? <SupportContextPanel conversation={selected} /> : null}
 			</div>
 		</div>
 	);
