@@ -82,21 +82,16 @@ export function PlatformAdminProvider({
 		[user, isReady, isAdmin, isImpersonating],
 	);
 
-	// Always keep {children} in the tree so Next.js can validate the route
-	// segment for instant navigation. Gate access with an overlay instead.
+	// Always render {children} so Next.js can validate route segments for
+	// instant navigation. Gate access with an overlay instead of omitting children.
 	return (
 		<PlatformAdminContext.Provider value={value}>
 			{!isReady ? (
-				<div className="flex h-dvh items-center justify-center">
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-bg-white-0">
 					<Loader loader="pulse" />
 				</div>
 			) : null}
-			<div
-				className={!isReady ? "hidden" : undefined}
-				aria-hidden={!isReady}
-			>
-				{children}
-			</div>
+			{children}
 		</PlatformAdminContext.Provider>
 	);
 }
