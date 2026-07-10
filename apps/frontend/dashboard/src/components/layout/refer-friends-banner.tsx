@@ -25,14 +25,6 @@ export const ReferFriendsBanner = ({
 		}
 	}, []);
 
-	const dismiss = (e: React.MouseEvent) => {
-		e.stopPropagation();
-		try {
-			localStorage.setItem(DISMISS_KEY, "true");
-		} catch {}
-		setDismissed(true);
-	};
-
 	if (dismissed === null || dismissed) return null;
 
 	if (isCollapsed) {
@@ -63,17 +55,9 @@ export const ReferFriendsBanner = ({
 					name="gift"
 					className="mt-0.5 size-4 shrink-0 text-primary-base"
 				/>
-				<span className="text-[13px] text-primary-base leading-snug">
-					Refer friends, earn up to 5000 credits each
+				<span className="font-medium text-[13px] text-primary-base leading-snug">
+					Refer friends, earn up to <b> $20 </b> worth of credits
 				</span>
-			</button>
-			<button
-				type="button"
-				onClick={dismiss}
-				aria-label="Dismiss"
-				className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded text-primary-base/50 transition-colors hover:text-primary-base"
-			>
-				<Icon name="cross" className="size-3" />
 			</button>
 		</div>
 	);
