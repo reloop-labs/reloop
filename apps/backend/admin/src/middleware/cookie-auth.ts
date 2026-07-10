@@ -1,5 +1,6 @@
 import { adminConfig } from "@reloop/admin/admin.config";
 import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
+import { log } from "evlog";
 
 type SessionUser = {
 	id: string;
@@ -24,16 +25,6 @@ export async function validatePlatformAdmin(cookie: string | null): Promise<{
 				.map((part) => part.trim().split("=")[0])
 				.filter(Boolean)
 		: [];
-
-	// console.* so logs show immediately in turbo/dev terminals.
-	// evlog request log.info() only buffers until the response finishes.
-	console.log("[admin-auth] session check started", {
-		sessionUrl,
-		hasCookie: Boolean(cookie),
-		cookieLength: cookie?.length ?? 0,
-		cookieNames,
-	});
-
 	const response = await fetch(sessionUrl, {
 		method: "GET",
 		headers: new Headers({
@@ -48,7 +39,8 @@ export async function validatePlatformAdmin(cookie: string | null): Promise<{
 	}));
 
 	if (!response.ok) {
-		console.error("[admin-auth] session endpoint error", {
+		log.error({
+			message: "Platform admin authentication failed: session endpoint error",
 			sessionUrl,
 			status: response.status,
 			statusText: response.statusText,
@@ -65,7 +57,8 @@ export async function validatePlatformAdmin(cookie: string | null): Promise<{
 
 	const user = session?.user;
 	if (!user?.id) {
-		console.warn("[admin-auth] no user in session", {
+		log.warn({
+			message: "Platform admin authentication failed: no user in session",
 			sessionUrl,
 			hasCookie: Boolean(cookie),
 			cookieNames,
@@ -76,7 +69,8 @@ export async function validatePlatformAdmin(cookie: string | null): Promise<{
 	}
 
 	if (user.role !== PLATFORM_ADMIN_ROLE) {
-		console.warn("[admin-auth] insufficient role", {
+		log.warn({
+			message: "Platform admin authentication failed: insufficient role",
 			sessionUrl,
 			userId: user.id,
 			email: user.email ?? null,
@@ -85,14 +79,6 @@ export async function validatePlatformAdmin(cookie: string | null): Promise<{
 		});
 		return null;
 	}
-
-	console.log("[admin-auth] authentication succeeded", {
-		userId: user.id,
-		email: user.email ?? null,
-		role: user.role,
-		organizationId: user.activeOrganizationId ?? null,
-	});
-
 	return {
 		userId: user.id,
 		role: PLATFORM_ADMIN_ROLE,

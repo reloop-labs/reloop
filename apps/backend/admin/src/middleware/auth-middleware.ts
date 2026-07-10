@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { adminConfig } from "@reloop/admin/admin.config";
 import { validatePlatformAdmin } from "@reloop/admin/middleware/cookie-auth";
 import { Elysia } from "elysia";
+import { log } from "evlog";
 import { evlog } from "evlog/elysia";
 
 if (adminConfig.NODE_ENV !== "production") {
@@ -14,25 +15,14 @@ export const authMiddleware = new Elysia({
 	.use(evlog())
 	.macro({
 		platformAdmin: {
-			async resolve({ status, request, log }) {
+			async resolve({ status, request, log: requestLog }) {
 				try {
 					const { headers, method, url } = request;
 					const cookie = headers.get("cookie");
 					const traceId = `req_${createId()}`;
-					log.set({ traceId, service: "admin" });
-
-					console.log("[admin-auth] incoming request", {
-						traceId,
-						method,
-						url,
-						hasCookie: Boolean(cookie),
-						origin: headers.get("origin"),
-						referer: headers.get("referer"),
-						host: headers.get("host"),
-					});
-
+					requestLog.set({ traceId, service: "admin" });
 					const session = await validatePlatformAdmin(cookie);
-					log.set({ session });
+					requestLog.set({ session });
 
 					if (session) {
 						const result = {
@@ -43,17 +33,12 @@ export const authMiddleware = new Elysia({
 							organizationId: session.organizationId,
 							authType: "session" as const,
 						};
-						log.set({ ...result });
-						console.log("[admin-auth] authorized", {
-							traceId,
-							userId: result.userId,
-							email: result.email,
-							role: result.role,
-						});
-						return { ...result, traceId, logger: log };
+						requestLog.set({ ...result });
+						return { ...result, traceId, logger: requestLog };
 					}
 
-					console.warn("[admin-auth] rejected (401)", {
+					log.warn({
+						message: "Platform admin authentication rejected",
 						traceId,
 						method,
 						url,
@@ -65,11 +50,12 @@ export const authMiddleware = new Elysia({
 						fix: "Sign in with a platform admin account",
 					});
 				} catch (e) {
-					console.error("[admin-auth] error", {
+					log.error({
+						message: "Platform admin authentication error",
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
 					});
-					log.error("Platform admin authentication error", {
+					requestLog.error("Platform admin authentication error", {
 						error: e instanceof Error ? e.message : "Unknown error",
 						stack: e instanceof Error ? e.stack : undefined,
 					});
