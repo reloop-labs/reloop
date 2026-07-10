@@ -9,6 +9,7 @@ export type SupportConversation = {
 	updatedAt: string;
 	userName: string | null;
 	userEmail: string | null;
+	userImage: string | null;
 };
 
 export type SupportMessage = {
@@ -20,6 +21,7 @@ export type SupportMessage = {
 	createdAt: string;
 	senderName: string | null;
 	senderEmail: string | null;
+	senderImage: string | null;
 };
 
 export type SupportServerEvent =

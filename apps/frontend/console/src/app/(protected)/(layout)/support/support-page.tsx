@@ -7,9 +7,11 @@ import type {
 	SupportMessage,
 	SupportServerEvent,
 } from "@fe/console/lib/support-types";
+import * as Avatar from "@reloop/ui/avatar";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import { ArrowUp, MessageSquare } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
 
@@ -18,6 +20,44 @@ type ConversationDetail = {
 	conversation: SupportConversation;
 	messages: SupportMessage[];
 };
+
+function avatarInitial(name: string | null, email: string | null) {
+	if (name?.trim()) return name.trim().charAt(0).toUpperCase();
+	if (email?.trim()) return email.trim().charAt(0).toUpperCase();
+	return "?";
+}
+
+function SupportPersonAvatar({
+	name,
+	email,
+	image,
+	size = "32",
+}: {
+	name: string | null;
+	email: string | null;
+	image: string | null;
+	size?: "24" | "32";
+}) {
+	const label = name || email || "User";
+	return (
+		<Avatar.Root size={size} color="blue" className="shrink-0">
+			{image ? (
+				<Avatar.Image src={image} alt={label} />
+			) : (
+				<Avatar.Image asChild>
+					<div
+						className={cn(
+							"flex h-full w-full items-center justify-center rounded-full bg-blue-200 font-semibold text-blue-950 uppercase",
+							size === "24" ? "text-[10px]" : "text-[11px]",
+						)}
+					>
+						{avatarInitial(name, email)}
+					</div>
+				</Avatar.Image>
+			)}
+		</Avatar.Root>
+	);
+}
 
 function formatTime(value: string) {
 	try {
@@ -97,9 +137,7 @@ export default function SupportPage() {
 								new Date(a.lastMessageAt).getTime(),
 						);
 						const filtered =
-							status === ""
-								? items
-								: items.filter((c) => c.status === status);
+							status === "" ? items : items.filter((c) => c.status === status);
 						return { items: filtered, total: filtered.length };
 					},
 					{ revalidate: false },
@@ -208,19 +246,25 @@ export default function SupportPage() {
 										onClick={() => setSelectedId(c.id)}
 										className={cn(
 											"w-full border-stroke-soft-100 border-b px-4 py-3 text-left transition-colors",
-											active
-												? "bg-bg-weak-50"
-												: "hover:bg-bg-weak-50/60",
+											active ? "bg-bg-weak-50" : "hover:bg-bg-weak-50/60",
 										)}
 									>
 										<div className="flex items-start justify-between gap-2">
-											<div className="min-w-0">
-												<p className="truncate font-medium text-label-sm text-text-strong-950">
-													{c.userName || c.userEmail || c.userId}
-												</p>
-												<p className="truncate text-[12px] text-text-sub-600">
-													{c.userEmail}
-												</p>
+											<div className="flex min-w-0 items-center gap-2.5">
+												<SupportPersonAvatar
+													name={c.userName}
+													email={c.userEmail}
+													image={c.userImage}
+													size="32"
+												/>
+												<div className="min-w-0">
+													<p className="truncate font-medium text-label-sm text-text-strong-950">
+														{c.userName || c.userEmail || c.userId}
+													</p>
+													<p className="truncate text-[12px] text-text-sub-600">
+														{c.userEmail}
+													</p>
+												</div>
 											</div>
 											<Badge.Root
 												variant="light"
@@ -242,21 +286,38 @@ export default function SupportPage() {
 					</div>
 				</aside>
 
-				<section className="flex min-w-0 flex-1 flex-col">
+				<section className="flex min-w-0 flex-1 flex-col bg-bg-white-0">
 					{!selected ? (
-						<div className="flex flex-1 items-center justify-center text-paragraph-sm text-text-sub-600">
-							Select a conversation
+						<div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
+							<div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-stroke-soft-200 border-dashed bg-bg-weak-50">
+								<MessageSquare className="h-5 w-5 text-text-sub-600" />
+							</div>
+							<p className="font-medium text-label-sm text-text-strong-950">
+								Select a conversation
+							</p>
+							<p className="max-w-xs text-[13px] text-text-sub-600">
+								Pick a thread on the left to reply to a customer in real time.
+							</p>
 						</div>
 					) : (
 						<>
-							<div className="flex items-center justify-between border-stroke-soft-100 border-b px-4 py-3">
-								<div className="min-w-0">
-									<p className="truncate font-medium text-label-sm text-text-strong-950">
-										{selected.userName || selected.userEmail}
-									</p>
-									<p className="truncate text-[12px] text-text-sub-600">
-										{selected.userEmail}
-									</p>
+							<div className="flex items-start justify-between gap-3 border-stroke-soft-100 border-b px-5 py-4">
+								<div className="flex min-w-0 items-center gap-3">
+									<SupportPersonAvatar
+										name={selected.userName}
+										email={selected.userEmail}
+										image={selected.userImage}
+										size="32"
+									/>
+									<div className="min-w-0">
+										<p className="truncate font-semibold text-[15px] text-text-strong-950 tracking-tight">
+											{selected.userName || selected.userEmail}
+										</p>
+										<p className="mt-0.5 truncate text-[13px] text-text-sub-600">
+											{selected.userEmail}
+											{ready ? " · live" : " · connecting…"}
+										</p>
+									</div>
 								</div>
 								<Button.Root
 									variant="neutral"
@@ -268,46 +329,69 @@ export default function SupportPage() {
 								</Button.Root>
 							</div>
 
-							<div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
-								{messages.map((m) => {
-									const isAdmin = m.senderRole === "admin";
-									return (
-										<div
-											key={m.id}
-											className={cn(
-												"flex",
-												isAdmin ? "justify-end" : "justify-start",
-											)}
-										>
+							<div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
+								{messages.length === 0 ? (
+									<p className="py-10 text-center text-[13px] text-text-sub-600">
+										No messages yet. Say hello to start the thread.
+									</p>
+								) : (
+									messages.map((m) => {
+										const isAdmin = m.senderRole === "admin";
+										return (
 											<div
+												key={m.id}
 												className={cn(
-													"max-w-[75%] rounded-2xl px-3 py-2 text-paragraph-sm",
-													isAdmin
-														? "bg-orange-500 text-white"
-														: "bg-bg-weak-50 text-text-strong-950",
+													"flex flex-col gap-1",
+													isAdmin ? "items-end" : "items-start",
 												)}
 											>
-												<p className="whitespace-pre-wrap break-words">
-													{m.body}
-												</p>
+												<div
+													className={cn(
+														"flex max-w-[85%] items-end gap-2",
+														isAdmin ? "flex-row-reverse" : "flex-row",
+													)}
+												>
+													<SupportPersonAvatar
+														name={m.senderName}
+														email={m.senderEmail}
+														image={m.senderImage}
+													/>
+													<div
+														className={cn(
+															"min-w-0 rounded-[22px] px-3.5 py-2.5 text-[13px] leading-relaxed",
+															isAdmin
+																? "rounded-br-md bg-text-strong-950 text-white"
+																: "rounded-bl-md bg-bg-weak-50 text-text-strong-950",
+														)}
+													>
+														<p className="whitespace-pre-wrap break-words">
+															{m.body}
+														</p>
+													</div>
+												</div>
 												<p
 													className={cn(
-														"mt-1 text-[10px]",
-														isAdmin ? "text-white/70" : "text-text-soft-400",
+														"text-[11px] text-text-soft-400",
+														isAdmin ? "mr-10" : "ml-10",
 													)}
 												>
 													{m.senderName || m.senderRole} ·{" "}
 													{formatTime(m.createdAt)}
 												</p>
 											</div>
-										</div>
-									);
-								})}
+										);
+									})
+								)}
 								<div ref={bottomRef} />
 							</div>
 
-							<div className="border-stroke-soft-100 border-t p-4">
-								<div className="flex gap-2">
+							<div className="px-4 pt-1 pb-4">
+								<div
+									className={cn(
+										"flex items-end gap-2 rounded-[28px] border border-stroke-soft-100 bg-bg-weak-50/80 p-1.5 pl-2",
+										selected.status === "closed" && "opacity-60",
+									)}
+								>
 									<textarea
 										value={draft}
 										onChange={(e) => setDraft(e.target.value)}
@@ -323,21 +407,26 @@ export default function SupportPage() {
 												? "Conversation is closed"
 												: "Reply to customer…"
 										}
-										rows={2}
-										className="min-h-[44px] flex-1 resize-none rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-2 text-paragraph-sm outline-none focus:border-stroke-strong-950"
+										rows={1}
+										className="scrollbar-none max-h-28 min-h-[40px] flex-1 resize-none bg-transparent px-2 py-2.5 text-[13px] text-text-strong-950 outline-none placeholder:text-text-soft-400"
 									/>
-									<Button.Root
-										variant="primary"
-										mode="filled"
-										disabled={
-											!draft.trim() ||
-											sending ||
-											selected.status === "closed"
-										}
+									<button
+										type="button"
 										onClick={() => void handleSend()}
+										disabled={
+											!draft.trim() || sending || selected.status === "closed"
+										}
+										aria-label="Send reply"
+										className={cn(
+											"mb-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all",
+											draft.trim() && selected.status !== "closed"
+												? "bg-blue-600 text-white shadow-sm hover:bg-blue-700"
+												: "bg-bg-weak-100 text-text-soft-400",
+										)}
 									>
-										Send
-									</Button.Root>
+										<span className="sr-only">Send</span>
+										<ArrowUp className="h-4 w-4" />
+									</button>
 								</div>
 							</div>
 						</>

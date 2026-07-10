@@ -207,6 +207,7 @@ export namespace AdminModel {
 		createdAt: t.Date(),
 		senderName: t.Union([t.String(), t.Null()]),
 		senderEmail: t.Union([t.String(), t.Null()]),
+		senderImage: t.Union([t.String(), t.Null()]),
 	});
 
 	export const supportConversation = t.Object({
@@ -220,6 +221,7 @@ export namespace AdminModel {
 		updatedAt: t.Date(),
 		userName: t.Union([t.String(), t.Null()]),
 		userEmail: t.Union([t.String(), t.Null()]),
+		userImage: t.Union([t.String(), t.Null()]),
 	});
 
 	export const supportConversationWithMessages = t.Object({

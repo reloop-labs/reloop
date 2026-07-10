@@ -21,6 +21,7 @@ export type SupportConversationDto = {
 	updatedAt: Date;
 	userName: string | null;
 	userEmail: string | null;
+	userImage: string | null;
 };
 
 export type SupportMessageDto = {
@@ -32,6 +33,7 @@ export type SupportMessageDto = {
 	createdAt: Date;
 	senderName: string | null;
 	senderEmail: string | null;
+	senderImage: string | null;
 };
 
 function previewFromBody(body: string) {
@@ -51,6 +53,7 @@ function mapConversation(row: {
 	updatedAt: Date;
 	userName: string | null;
 	userEmail: string | null;
+	userImage: string | null;
 }): SupportConversationDto {
 	return {
 		id: row.id,
@@ -63,6 +66,7 @@ function mapConversation(row: {
 		updatedAt: row.updatedAt,
 		userName: row.userName,
 		userEmail: row.userEmail,
+		userImage: row.userImage,
 	};
 }
 
@@ -75,6 +79,7 @@ function mapMessage(row: {
 	createdAt: Date;
 	senderName: string | null;
 	senderEmail: string | null;
+	senderImage: string | null;
 }): SupportMessageDto {
 	return {
 		id: row.id,
@@ -85,6 +90,7 @@ function mapMessage(row: {
 		createdAt: row.createdAt,
 		senderName: row.senderName,
 		senderEmail: row.senderEmail,
+		senderImage: row.senderImage,
 	};
 }
 
@@ -101,6 +107,7 @@ async function getConversationRow(conversationId: string) {
 			updatedAt: supportConversation.updatedAt,
 			userName: user.name,
 			userEmail: user.email,
+			userImage: user.image,
 		})
 		.from(supportConversation)
 		.innerJoin(user, eq(supportConversation.userId, user.id))
@@ -131,6 +138,7 @@ async function listMessagesForConversation(
 			createdAt: supportMessage.createdAt,
 			senderName: user.name,
 			senderEmail: user.email,
+			senderImage: user.image,
 		})
 		.from(supportMessage)
 		.innerJoin(user, eq(supportMessage.senderUserId, user.id))
@@ -161,6 +169,7 @@ export async function getOrCreateMyConversationController(input: {
 			updatedAt: supportConversation.updatedAt,
 			userName: user.name,
 			userEmail: user.email,
+			userImage: user.image,
 		})
 		.from(supportConversation)
 		.innerJoin(user, eq(supportConversation.userId, user.id))
@@ -229,6 +238,7 @@ export async function getMyConversationController(input: {
 			updatedAt: supportConversation.updatedAt,
 			userName: user.name,
 			userEmail: user.email,
+			userImage: user.image,
 		})
 		.from(supportConversation)
 		.innerJoin(user, eq(supportConversation.userId, user.id))
@@ -291,6 +301,7 @@ export async function listConversationsController(input: {
 			updatedAt: supportConversation.updatedAt,
 			userName: user.name,
 			userEmail: user.email,
+			userImage: user.image,
 		})
 		.from(supportConversation)
 		.innerJoin(user, eq(supportConversation.userId, user.id))
@@ -507,7 +518,7 @@ export async function createMessageController(input: {
 		.where(eq(supportConversation.id, conversation.id));
 
 	const [sender] = await db
-		.select({ name: user.name, email: user.email })
+		.select({ name: user.name, email: user.email, image: user.image })
 		.from(user)
 		.where(eq(user.id, input.senderUserId))
 		.limit(1);
@@ -521,6 +532,7 @@ export async function createMessageController(input: {
 		createdAt: inserted.createdAt,
 		senderName: sender?.name ?? null,
 		senderEmail: sender?.email ?? null,
+		senderImage: sender?.image ?? null,
 	});
 
 	const updatedConversation = await getConversationRow(conversation.id);
