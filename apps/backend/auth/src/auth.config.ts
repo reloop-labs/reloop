@@ -14,6 +14,8 @@ export const authConfig = {
 	GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
 	DEFAULT_OTP: process.env.DEFAULT_OTP,
 	DISABLE_SIGNUP: process.env.DISABLE_SIGNUP,
+	/** When true, new accounts require a valid platform signup invite. */
+	REQUIRE_SIGNUP_INVITE: process.env.REQUIRE_SIGNUP_INVITE === "true",
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",

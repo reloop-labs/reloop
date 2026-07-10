@@ -7,6 +7,7 @@ import * as Input from "@reloop/ui/input";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import { useQueryState } from "nuqs";
+import { useEffect } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -22,28 +23,39 @@ const signupSchema = v.object({
 
 type SignupFormData = v.InferInput<typeof signupSchema>;
 
-export const SignupForm = () => {
+export const SignupForm = ({ lockedEmail }: { lockedEmail?: string }) => {
 	const { changeStatus, status } = useLoading();
 	const [, setOtpSentEmail] = useQueryState("otpSent");
 
 	const {
 		register,
 		handleSubmit,
+		setValue,
 		formState: { errors, isValid },
 	} = useForm<SignupFormData>({
 		resolver: valibotResolver(signupSchema) as Resolver<SignupFormData>,
 		mode: "onChange",
+		defaultValues: {
+			email: lockedEmail || "",
+		},
 	});
+
+	useEffect(() => {
+		if (lockedEmail) {
+			setValue("email", lockedEmail, { shouldValidate: true });
+		}
+	}, [lockedEmail, setValue]);
 
 	const onSubmit = async (data: SignupFormData) => {
 		try {
 			changeStatus("loading");
+			const email = lockedEmail || data.email;
 			const success = await authClient.emailOtp.sendVerificationOtp({
-				email: data.email,
+				email,
 				type: "sign-in",
 			});
 			if (success) {
-				setOtpSentEmail(data.email);
+				setOtpSentEmail(email);
 				changeStatus("idle");
 			}
 		} catch (e) {
@@ -66,6 +78,7 @@ export const SignupForm = () => {
 							id="email"
 							type="email"
 							placeholder="steve@apple.com"
+							readOnly={!!lockedEmail}
 							{...register("email")}
 						/>
 					</Input.Wrapper>
@@ -73,16 +86,22 @@ export const SignupForm = () => {
 				{errors.email && (
 					<p className="text-error-base text-sm">{errors.email.message}</p>
 				)}
+				{lockedEmail && (
+					<p className="text-[12px] text-text-sub-600">
+						This invite is locked to {lockedEmail}
+					</p>
+				)}
 			</div>
 
 			<Button.Root
 				type="submit"
 				disabled={status === "loading" || !isValid}
-				variant="neutral"
-				className="mt-2 h-12 w-full rounded-2xl!"
+				className="h-11 w-full rounded-2xl!"
 			>
-				{status === "loading" && <Spinner color="var(--text-strong-950)" />}
-				{status === "loading" ? "Continuing..." : "Continue with email"}
+				{status === "loading" && (
+					<Spinner size={16} color="var(--text-strong-950)" />
+				)}
+				{status === "loading" ? "Sending…" : "Continue"}
 			</Button.Root>
 		</form>
 	);

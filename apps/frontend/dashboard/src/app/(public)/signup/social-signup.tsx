@@ -11,9 +11,13 @@ import { useEffect, useState } from "react";
 export function SocialSignup({
 	onContinueWithEmail,
 	inviteId,
+	inviteCode,
+	lockedEmail,
 }: {
 	onContinueWithEmail: () => void;
 	inviteId?: string;
+	inviteCode?: string;
+	lockedEmail?: string;
 }) {
 	const [loading, setLoading] = useState<{
 		name: "google" | "github" | "email";
@@ -36,8 +40,22 @@ export function SocialSignup({
 		error: string | null;
 	}>({ name: "email", error: null });
 
+	const buildCallbackURL = () => {
+		const params = new URLSearchParams();
+		if (inviteId) params.set("inviteId", inviteId);
+		if (inviteCode) params.set("inviteCode", inviteCode);
+		const qs = params.toString();
+		return qs ? `/signup?${qs}` : "/dashboard";
+	};
+
 	return (
 		<>
+			{lockedEmail && (
+				<p className="pb-3 text-center text-[12px] text-text-sub-600">
+					Sign up with the invited email:{" "}
+					<span className="font-medium text-text-strong-950">{lockedEmail}</span>
+				</p>
+			)}
 			<div className="grid grid-cols-1 gap-2">
 				<Button.Root
 					disabled={loading.loading}
@@ -48,9 +66,7 @@ export function SocialSignup({
 							setLoading({ name: "google", loading: true });
 							await authClient.signIn.social({
 								provider: "google",
-								callbackURL: inviteId
-									? `/signup?inviteId=${inviteId}`
-									: "/dashboard",
+								callbackURL: buildCallbackURL(),
 							});
 						} catch {
 							setLoading({ name: "google", loading: false });
@@ -99,9 +115,7 @@ export function SocialSignup({
 							setLoading({ name: "github", loading: true });
 							await authClient.signIn.social({
 								provider: "github",
-								callbackURL: inviteId
-									? `/signup?inviteId=${inviteId}`
-									: "/dashboard",
+								callbackURL: buildCallbackURL(),
 							});
 						} catch {
 							setLoading({ name: "github", loading: false });

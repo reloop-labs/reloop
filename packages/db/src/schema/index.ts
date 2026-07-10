@@ -9,6 +9,7 @@ export * from "./domain";
 export * from "./email";
 export * from "./group";
 export * from "./inbox";
+export * from "./signup-invite";
 export * from "./support";
 export * from "./template";
 export * from "./thread";
