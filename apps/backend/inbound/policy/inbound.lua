@@ -15,9 +15,10 @@ end
 -- Receive-only MX: accept mail addressed to any domain (recipient check gates
 -- actual acceptance). Never allow relay_from — this MTA must not send outbound.
 kumo.on('get_listener_domain', function(domain, listener, conn_meta)
+  -- Omit relay_from: empty Lua {} serializes as a map; KumoMTA expects a
+  -- sequence. No relay_from means nobody may use this as an outbound relay.
   return kumo.make_listener_domain {
     relay_to = true,
-    relay_from = {},
   }
 end)
 
