@@ -1,10 +1,10 @@
 "use client";
 
+import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import {
 	getAvatarGradient,
 	getAvatarInitial,
 } from "@fe/dashboard/utils/avatar";
-import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { authClient } from "@reloop/auth/client";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
@@ -206,7 +206,7 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 									onInviteFriends();
 								}}
 							>
-								<Icon name="gift" className="h-4 w-4 text-text-sub-600" />
+								<Icon name="user-plus" className="h-4 w-4 text-text-sub-600" />
 								<span className="flex-1 truncate text-sm">Invite friends</span>
 							</Dropdown.Item>
 						) : null}

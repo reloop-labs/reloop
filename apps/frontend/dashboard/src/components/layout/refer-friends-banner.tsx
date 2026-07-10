@@ -35,7 +35,7 @@ export const ReferFriendsBanner = ({
 				title="Invite friends"
 				className="flex size-9 items-center justify-center rounded-xl bg-primary-alpha-10 text-primary-base transition-colors hover:bg-primary-alpha-16"
 			>
-				<Icon name="gift" className="size-4" />
+				<Icon name="user-plus" className="size-4" />
 			</button>
 		);
 	}
@@ -52,11 +52,11 @@ export const ReferFriendsBanner = ({
 				className="flex min-w-0 flex-1 items-start gap-2.5 text-left"
 			>
 				<Icon
-					name="gift"
+					name="user-plus"
 					className="mt-0.5 size-4 shrink-0 text-primary-base"
 				/>
 				<span className="font-medium text-[13px] text-primary-base leading-snug">
-					Refer friends, earn up to <b> $20 </b> worth of credits
+					Invite friends to Reloop
 				</span>
 			</button>
 		</div>
