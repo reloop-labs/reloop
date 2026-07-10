@@ -824,6 +824,9 @@ export const ThreadDetail = ({
 						summary={aiSummaryText}
 						attachments={threadAttachments}
 						labels={thread.labels}
+						entityTag={thread.entityTag}
+						isImportant={thread.isImportant}
+						isStarred={thread.isStarred}
 					/>
 				)}
 
