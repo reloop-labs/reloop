@@ -53,6 +53,7 @@ export function PlatformAdminProvider({
 		(session as { session?: { impersonatedBy?: string } } | null)?.session
 			?.impersonatedBy,
 	);
+	const isReady = !isPending && session !== undefined && isAdmin;
 
 	useEffect(() => {
 		if (isPending) return;
@@ -74,32 +75,28 @@ export function PlatformAdminProvider({
 	const value = useMemo(
 		() => ({
 			user: isAdmin ? user : null,
-			isLoading: isPending || (session !== null && !isAdmin && !user),
+			isLoading: !isReady,
 			isAdmin,
 			isImpersonating,
 		}),
-		[user, isPending, session, isAdmin, isImpersonating],
+		[user, isReady, isAdmin, isImpersonating],
 	);
 
-	if (isPending || session === undefined) {
-		return (
-			<div className="flex h-dvh items-center justify-center">
-				<Loader loader="pulse" />
-			</div>
-		);
-	}
-
-	if (session === null || !isAdmin) {
-		return (
-			<div className="flex h-dvh items-center justify-center">
-				<Loader loader="pulse" />
-			</div>
-		);
-	}
-
+	// Always keep {children} in the tree so Next.js can validate the route
+	// segment for instant navigation. Gate access with an overlay instead.
 	return (
 		<PlatformAdminContext.Provider value={value}>
-			{children}
+			{!isReady ? (
+				<div className="flex h-dvh items-center justify-center">
+					<Loader loader="pulse" />
+				</div>
+			) : null}
+			<div
+				className={!isReady ? "hidden" : undefined}
+				aria-hidden={!isReady}
+			>
+				{children}
+			</div>
 		</PlatformAdminContext.Provider>
 	);
 }
