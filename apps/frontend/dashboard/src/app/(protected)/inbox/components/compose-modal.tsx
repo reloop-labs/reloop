@@ -566,6 +566,7 @@ export const ComposeModal = ({
 					showClose={false}
 					overlayClassName="bg-black/50 p-4"
 					className="flex w-full max-w-[750px] flex-col items-center gap-1 border-none bg-transparent p-0 shadow-none"
+					aria-describedby={undefined}
 					onEscapeKeyDown={(e) => {
 						e.preventDefault();
 						requestClose();
@@ -574,6 +575,7 @@ export const ComposeModal = ({
 						if (isSending) e.preventDefault();
 					}}
 				>
+					<Modal.Title className="sr-only">New Email</Modal.Title>
 					<div className="flex w-full justify-start">
 						<button
 							type="button"
@@ -930,12 +932,16 @@ export const ComposeModal = ({
 
 			<Modal.Root open={showDiscard} onOpenChange={setShowDiscard}>
 				<Modal.Content className="max-w-sm p-5">
-					<h3 className="font-semibold text-mail-foreground">
-						Discard message?
-					</h3>
-					<p className="mt-1 text-mail-muted text-sm">
-						Your draft will be deleted and this can’t be undone.
-					</p>
+					<Modal.Title asChild>
+						<h3 className="font-semibold text-mail-foreground">
+							Discard message?
+						</h3>
+					</Modal.Title>
+					<Modal.Description asChild>
+						<p className="mt-1 text-mail-muted text-sm">
+							Your draft will be deleted and this can’t be undone.
+						</p>
+					</Modal.Description>
 					<div className="mt-4 flex justify-end gap-2">
 						<button
 							type="button"

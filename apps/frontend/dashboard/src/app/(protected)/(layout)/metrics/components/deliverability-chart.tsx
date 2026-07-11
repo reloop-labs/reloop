@@ -1,7 +1,7 @@
 "use client";
 
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
 	Area,
 	CartesianGrid,
@@ -44,6 +44,11 @@ export const DeliverabilityChart = ({
 }: DeliverabilityChartProps) => {
 	const { activeOrganization } = useUserOrganization();
 	const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
+	const [isMounted, setIsMounted] = useState(false);
+
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
 
 	const buildApiUrl = () => {
 		if (!activeOrganization?.id) return null;
@@ -218,105 +223,113 @@ export const DeliverabilityChart = ({
 
 				{/* Chart */}
 				<div className="h-[300px] w-full">
-					<ResponsiveContainer width="100%" height="100%">
-						<ComposedChart
-							data={chartData}
-							margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
-						>
-							<defs>
-								<linearGradient id="colorDelivered" x1="0" y1="0" x2="0" y2="1">
-									<stop offset="5%" stopColor="#10B981" stopOpacity={0.15} />
-									<stop offset="95%" stopColor="#10B981" stopOpacity={0} />
-								</linearGradient>
-							</defs>
-							<CartesianGrid
-								strokeDasharray="3 3"
-								stroke="currentColor"
-								strokeOpacity={0.05}
-								vertical={false}
-							/>
-							<XAxis
-								dataKey="date"
-								axisLine={false}
-								tickLine={false}
-								tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
-								dy={10}
-							/>
-							<YAxis
-								orientation="right"
-								domain={[0, maxSentValue]}
-								ticks={[0, Math.round(maxSentValue / 2), maxSentValue]}
-								axisLine={false}
-								tickLine={false}
-								tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
-								width={35}
-							/>
-							<Tooltip content={<CustomTooltip />} />
-							{(isAllSelected || selectedEvents.includes("delivered")) && (
-								<Area
-									type="monotone"
-									dataKey="delivered"
-									name="Delivered"
-									stroke="#10B981"
-									strokeWidth={2}
-									fillOpacity={1}
-									fill="url(#colorDelivered)"
-									isAnimationActive={false}
+					{isMounted && (
+						<ResponsiveContainer width="100%" height="100%">
+							<ComposedChart
+								data={chartData}
+								margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+							>
+								<defs>
+									<linearGradient
+										id="colorDelivered"
+										x1="0"
+										y1="0"
+										x2="0"
+										y2="1"
+									>
+										<stop offset="5%" stopColor="#10B981" stopOpacity={0.15} />
+										<stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+									</linearGradient>
+								</defs>
+								<CartesianGrid
+									strokeDasharray="3 3"
+									stroke="currentColor"
+									strokeOpacity={0.05}
+									vertical={false}
 								/>
-							)}
-							{(isAllSelected || selectedEvents.includes("bounced")) && (
-								<Line
-									type="monotone"
-									dataKey="bounced"
-									name="Bounces"
-									stroke="#EF4444"
-									strokeWidth={2}
-									dot={false}
-									activeDot={{ r: 5 }}
-									isAnimationActive={false}
+								<XAxis
+									dataKey="date"
+									axisLine={false}
+									tickLine={false}
+									tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
+									dy={10}
 								/>
-							)}
-							{(isAllSelected || selectedEvents.includes("complained")) && (
-								<Line
-									type="monotone"
-									dataKey="complaint"
-									name="Complained"
-									stroke="#D97706"
-									strokeWidth={2}
-									dot={false}
-									activeDot={{ r: 5 }}
-									isAnimationActive={false}
+								<YAxis
+									orientation="right"
+									domain={[0, maxSentValue]}
+									ticks={[0, Math.round(maxSentValue / 2), maxSentValue]}
+									axisLine={false}
+									tickLine={false}
+									tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
+									width={35}
 								/>
-							)}
-							{!isAllSelected &&
-								selectedEvents
-									.filter(
-										(id) =>
-											id !== "delivered" &&
-											id !== "bounced" &&
-											id !== "complained",
-									)
-									.map((eventId) => {
-										const event = EVENTS.find((e) => e.id === eventId);
-										if (!event) return null;
-										const key =
-											event.id === "complained" ? "complaint" : event.id;
-										return (
-											<Line
-												key={event.id}
-												type="monotone"
-												dataKey={key}
-												name={event.label}
-												stroke={event.color}
-												strokeWidth={2}
-												dot={false}
-												activeDot={{ r: 5 }}
-												isAnimationActive={false}
-											/>
-										);
-									})}
-						</ComposedChart>
-					</ResponsiveContainer>
+								<Tooltip content={<CustomTooltip />} />
+								{(isAllSelected || selectedEvents.includes("delivered")) && (
+									<Area
+										type="monotone"
+										dataKey="delivered"
+										name="Delivered"
+										stroke="#10B981"
+										strokeWidth={2}
+										fillOpacity={1}
+										fill="url(#colorDelivered)"
+										isAnimationActive={false}
+									/>
+								)}
+								{(isAllSelected || selectedEvents.includes("bounced")) && (
+									<Line
+										type="monotone"
+										dataKey="bounced"
+										name="Bounces"
+										stroke="#EF4444"
+										strokeWidth={2}
+										dot={false}
+										activeDot={{ r: 5 }}
+										isAnimationActive={false}
+									/>
+								)}
+								{(isAllSelected || selectedEvents.includes("complained")) && (
+									<Line
+										type="monotone"
+										dataKey="complaint"
+										name="Complained"
+										stroke="#D97706"
+										strokeWidth={2}
+										dot={false}
+										activeDot={{ r: 5 }}
+										isAnimationActive={false}
+									/>
+								)}
+								{!isAllSelected &&
+									selectedEvents
+										.filter(
+											(id) =>
+												id !== "delivered" &&
+												id !== "bounced" &&
+												id !== "complained",
+										)
+										.map((eventId) => {
+											const event = EVENTS.find((e) => e.id === eventId);
+											if (!event) return null;
+											const key =
+												event.id === "complained" ? "complaint" : event.id;
+											return (
+												<Line
+													key={event.id}
+													type="monotone"
+													dataKey={key}
+													name={event.label}
+													stroke={event.color}
+													strokeWidth={2}
+													dot={false}
+													activeDot={{ r: 5 }}
+													isAnimationActive={false}
+												/>
+											);
+										})}
+							</ComposedChart>
+						</ResponsiveContainer>
+					)}
 				</div>
 			</div>
 		</div>

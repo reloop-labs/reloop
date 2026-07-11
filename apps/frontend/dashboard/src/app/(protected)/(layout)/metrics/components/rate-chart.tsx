@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
 	Bar,
 	BarChart,
@@ -45,6 +46,12 @@ export const RateChart = ({
 	yAxisDomain = [0, 10],
 	riskValue,
 }: RateChartProps) => {
+	const [isMounted, setIsMounted] = useState(false);
+
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
+
 	let ticks: number[] | undefined;
 	if (riskValue === 4) {
 		ticks = [0, 2, 4, 6, 8, 10];
@@ -73,80 +80,82 @@ export const RateChart = ({
 
 				{/* Chart */}
 				<div className="h-[200px] w-full">
-					<ResponsiveContainer width="100%" height="100%">
-						<BarChart
-							data={data}
-							margin={{ top: 20, right: 0, left: 0, bottom: 15 }}
-						>
-							<CartesianGrid
-								vertical={false}
-								stroke="currentColor"
-								strokeOpacity={0.06}
-								strokeDasharray="3 3"
-							/>
-							<XAxis
-								dataKey="date"
-								axisLine={false}
-								tickLine={false}
-								tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
-								dy={10}
-							/>
-							<YAxis
-								domain={yAxisDomain}
-								ticks={ticks}
-								orientation="right"
-								axisLine={false}
-								tickLine={false}
-								tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
-								width={30}
-								tickFormatter={(val) => `${val}%`}
-								interval="preserveStartEnd"
-							/>
-							<Tooltip
-								content={<CustomTooltip />}
-								cursor={{ fill: "rgba(0, 0, 0, 0.05)" }}
-							/>
-							{riskValue !== undefined && (
-								<ReferenceLine
-									y={riskValue}
-									stroke="#FDB022"
-									strokeDasharray="3 3"
-									label={{
-										value: "RISK",
-										position: "insideBottomLeft",
-										fill: "#FDB022",
-										fontSize: 10,
-										fontWeight: 500,
-										offset: 6,
-									}}
-								/>
-							)}
-							<Bar
-								dataKey="rate"
-								name={title}
-								fill={color}
-								radius={[4, 4, 0, 0]}
-								maxBarSize={16}
-								isAnimationActive={false}
+					{isMounted && (
+						<ResponsiveContainer width="100%" height="100%">
+							<BarChart
+								data={data}
+								margin={{ top: 20, right: 0, left: 0, bottom: 15 }}
 							>
-								<LabelList
-									dataKey="rate"
-									position="top"
-									formatter={(val: unknown) => {
-										if (val === undefined || val === null) return "";
-										const num = Number(val);
-										return num === 0 ? "" : `${Number(num.toFixed(2))}%`;
-									}}
-									style={{
-										fill: "#888888",
-										opacity: 0.8,
-										fontSize: 9,
-										fontWeight: 500,
-									}}
+								<CartesianGrid
+									vertical={false}
+									stroke="currentColor"
+									strokeOpacity={0.06}
+									strokeDasharray="3 3"
 								/>
-							</Bar>
-						</BarChart>
-					</ResponsiveContainer>
+								<XAxis
+									dataKey="date"
+									axisLine={false}
+									tickLine={false}
+									tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
+									dy={10}
+								/>
+								<YAxis
+									domain={yAxisDomain}
+									ticks={ticks}
+									orientation="right"
+									axisLine={false}
+									tickLine={false}
+									tick={{ fill: "#888888", opacity: 0.8, fontSize: 10 }}
+									width={30}
+									tickFormatter={(val) => `${val}%`}
+									interval="preserveStartEnd"
+								/>
+								<Tooltip
+									content={<CustomTooltip />}
+									cursor={{ fill: "rgba(0, 0, 0, 0.05)" }}
+								/>
+								{riskValue !== undefined && (
+									<ReferenceLine
+										y={riskValue}
+										stroke="#FDB022"
+										strokeDasharray="3 3"
+										label={{
+											value: "RISK",
+											position: "insideBottomLeft",
+											fill: "#FDB022",
+											fontSize: 10,
+											fontWeight: 500,
+											offset: 6,
+										}}
+									/>
+								)}
+								<Bar
+									dataKey="rate"
+									name={title}
+									fill={color}
+									radius={[4, 4, 0, 0]}
+									maxBarSize={16}
+									isAnimationActive={false}
+								>
+									<LabelList
+										dataKey="rate"
+										position="top"
+										formatter={(val: unknown) => {
+											if (val === undefined || val === null) return "";
+											const num = Number(val);
+											return num === 0 ? "" : `${Number(num.toFixed(2))}%`;
+										}}
+										style={{
+											fill: "#888888",
+											opacity: 0.8,
+											fontSize: 9,
+											fontWeight: 500,
+										}}
+									/>
+								</Bar>
+							</BarChart>
+						</ResponsiveContainer>
+					)}
 				</div>
 
 				{/* Breakdown */}

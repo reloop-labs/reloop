@@ -33,10 +33,7 @@ const agentAddressSchema = v.object({
 		v.trim(),
 		v.minLength(1, "Email prefix is required"),
 		v.maxLength(64, "Email prefix must be 64 characters or fewer"),
-		v.check(
-			(val) => !/\s/.test(val),
-			"Email prefix can't contain spaces",
-		),
+		v.check((val) => !/\s/.test(val), "Email prefix can't contain spaces"),
 		v.check(
 			(val) => !val.startsWith(".") && !val.endsWith("."),
 			"Email prefix can't start or end with a dot",
@@ -221,6 +218,7 @@ export const AddAgentAddressModal = ({
 			<Modal.Content
 				className="overflow-hidden rounded-3xl border border-mail-border border-mail-border/40 p-0 sm:max-w-[480px]"
 				showClose={false}
+				aria-describedby={undefined}
 				onEscapeKeyDown={(e) => {
 					if (isSubmitting) e.preventDefault();
 				}}
