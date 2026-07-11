@@ -7,6 +7,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
+import { cn } from "@reloop/ui/cn";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -28,6 +29,7 @@ const AccountPage = () => {
 	const { data: session, refetch } = authClient.useSession();
 	const user = session?.user;
 	const [isSaving, setIsSaving] = useState(false);
+	const [emailCopied, setEmailCopied] = useState(false);
 	const nameParts = user?.name?.split(" ") || [];
 
 	const {
@@ -54,6 +56,20 @@ const AccountPage = () => {
 	const fullName = `${firstName} ${lastName}`.trim();
 	const hasChanges =
 		fullName !== (user?.name || "") || image !== (user?.image || "");
+
+	const handleCopyEmail = async () => {
+		const email = user?.email || "";
+		if (email) {
+			try {
+				await navigator.clipboard.writeText(email);
+				toast.success("Email address copied to clipboard");
+				setEmailCopied(true);
+				setTimeout(() => setEmailCopied(false), 2000);
+			} catch {
+				toast.error("Failed to copy email address");
+			}
+		}
+	};
 
 	const handleSaveChanges = async (data: AccountFormValues) => {
 		const updatedFullName = `${data.firstName} ${data.lastName}`.trim();
@@ -112,6 +128,7 @@ const AccountPage = () => {
 							setValue("image", url, { shouldDirty: true })
 						}
 						initials={getInitials()}
+						email={user?.email || ""}
 					/>
 					<div className="grid grid-cols-2 gap-4 pt-3">
 						<div>
@@ -160,13 +177,27 @@ const AccountPage = () => {
 							</span>
 						</Label.Root>
 						<Input.Root className="mt-1 w-full" size="small">
-							<Input.Wrapper className="w-full">
+							<Input.Wrapper className="w-full pr-1.5!">
 								<Input.Input
 									id="email"
 									type="email"
 									value={user?.email || ""}
 									readOnly
 								/>
+								<button
+									type="button"
+									onClick={handleCopyEmail}
+									className="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+									title="Copy email address"
+								>
+									<Icon
+										name={emailCopied ? "check" : "copy"}
+										className={cn(
+											"h-3.5 w-3.5",
+											emailCopied ? "text-success-base" : "text-text-sub-600",
+										)}
+									/>
+								</button>
 							</Input.Wrapper>
 						</Input.Root>
 						<p className="mt-1 font-medium text-paragraph-xs text-text-sub-600">

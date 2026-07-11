@@ -7,6 +7,7 @@ import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
+import { getAvatarGradient } from "@fe/dashboard/utils/avatar";
 import axios from "axios";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -15,12 +16,14 @@ interface AccountProfilePictureProps {
 	initialImageUrl?: string;
 	onImageChange: (url: string) => void;
 	initials: string;
+	email: string;
 }
 
 export const AccountProfilePicture = ({
 	initialImageUrl,
 	onImageChange,
 	initials,
+	email,
 }: AccountProfilePictureProps) => {
 	const { refetch } = authClient.useSession();
 	const [imagePreview, setImagePreview] = useState(initialImageUrl || "");
@@ -113,10 +116,10 @@ export const AccountProfilePicture = ({
 				/>
 				<FileUpload.Root
 					className={cn(
-						"flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-full",
+						"flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-full shadow-inner",
 						imageUrl || imagePreview
-							? "border border-stroke-sub-300 border-solid p-0"
-							: "border border-stroke-sub-300 bg-primary p-1",
+							? "border border-stroke-sub-300 border-solid p-0 bg-background"
+							: cn("border-none p-0", getAvatarGradient(email)),
 						isUploading && "cursor-wait opacity-50",
 						!isUploading && "cursor-pointer",
 					)}
@@ -132,7 +135,9 @@ export const AccountProfilePicture = ({
 							className="h-full w-full rounded-full object-cover"
 						/>
 					) : (
-						<span className="font-medium text-white text-xl">{initials}</span>
+						<span className="font-semibold text-white text-2xl uppercase tracking-wide">
+							{initials}
+						</span>
 					)}
 				</FileUpload.Root>
 				<div>
