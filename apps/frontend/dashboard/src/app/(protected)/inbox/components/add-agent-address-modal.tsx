@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
-import type { DomainListResponse } from "@fe/dashboard/types/api.types";
+import type { Domain, DomainListResponse } from "@fe/dashboard/types/api.types";
 import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
@@ -13,7 +13,7 @@ import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -37,6 +37,32 @@ const agentAddressSchema = v.object({
 });
 
 type AgentAddressFormValues = v.InferInput<typeof agentAddressSchema>;
+
+const isDomainReady = (d: Domain) =>
+	d.isSendingEmailEnabled && d.isReceivingEmailEnabled;
+
+const pickPreferredDomain = (domains: Domain[]) =>
+	domains.find(isDomainReady) ?? domains[0];
+
+const DomainCapabilityHint = ({
+	sending,
+	receiving,
+}: {
+	sending: boolean;
+	receiving: boolean;
+}) => (
+	<span className="flex shrink-0 items-center gap-1.5 font-medium text-[10px]">
+		<span className={cn(sending ? "text-success-base" : "text-mail-muted/60")}>
+			Send{sending ? "" : " off"}
+		</span>
+		<span className="text-mail-muted/40">·</span>
+		<span
+			className={cn(receiving ? "text-success-base" : "text-mail-muted/60")}
+		>
+			Receive{receiving ? "" : " off"}
+		</span>
+	</span>
+);
 
 export const AddAgentAddressModal = ({
 	isOpen,
@@ -76,11 +102,27 @@ export const AddAgentAddressModal = ({
 		},
 	});
 
+	const selectedDomainName = form.watch("domain");
+	const selectedDomain = useMemo(
+		() => domainsList.find((d) => d.domain === selectedDomainName),
+		[domainsList, selectedDomainName],
+	);
+	const domainReady = selectedDomain ? isDomainReady(selectedDomain) : false;
+
+	const missingCapabilities = useMemo(() => {
+		if (!selectedDomain) return [];
+		const missing: string[] = [];
+		if (!selectedDomain.isSendingEmailEnabled) missing.push("sending");
+		if (!selectedDomain.isReceivingEmailEnabled) missing.push("receiving");
+		return missing;
+	}, [selectedDomain]);
+
 	// Command/Ctrl + Enter to submit form
 	useHotkeys(
 		"mod+enter",
 		(e) => {
 			e.preventDefault();
+			if (!domainReady || isSubmitting) return;
 			form.handleSubmit(onSubmit)();
 		},
 		{ enableOnFormTags: ["INPUT"] },
@@ -88,7 +130,8 @@ export const AddAgentAddressModal = ({
 
 	useEffect(() => {
 		if (domainsList.length > 0 && !form.getValues("domain")) {
-			form.setValue("domain", domainsList[0]?.domain ?? "");
+			const preferred = pickPreferredDomain(domainsList);
+			form.setValue("domain", preferred?.domain ?? "");
 		}
 	}, [domainsList, form]);
 
@@ -98,7 +141,8 @@ export const AddAgentAddressModal = ({
 			const timer = setTimeout(() => {
 				form.reset();
 				if (domainsList.length > 0) {
-					form.setValue("domain", domainsList[0]?.domain ?? "");
+					const preferred = pickPreferredDomain(domainsList);
+					form.setValue("domain", preferred?.domain ?? "");
 				}
 			}, 300); // Wait for transition
 			return () => clearTimeout(timer);
@@ -117,6 +161,13 @@ export const AddAgentAddressModal = ({
 		const selectedDomainObj = domainsList.find((d) => d.domain === data.domain);
 		if (!selectedDomainObj) {
 			toast.error("Please select a valid domain");
+			return;
+		}
+
+		if (!isDomainReady(selectedDomainObj)) {
+			toast.error(
+				"Domain must have sending and receiving enabled to create a mailbox",
+			);
 			return;
 		}
 
@@ -144,6 +195,10 @@ export const AddAgentAddressModal = ({
 			setIsSubmitting(false);
 		}
 	};
+
+	const domainSettingsHref = selectedDomain
+		? `/domain/${selectedDomain.id}`
+		: "/domain";
 
 	return (
 		<Modal.Root open={isOpen} onOpenChange={onClose}>
@@ -288,13 +343,20 @@ export const AddAgentAddressModal = ({
 										!!form.formState.errors.domain
 									}
 								>
-									<Input.Wrapper>
+									<Input.Wrapper className="gap-0">
 										<Input.Input
 											id="agent-email"
 											placeholder="support-agent"
+											className="min-w-0 flex-1"
 											{...form.register("localPart")}
 											disabled={isSubmitting}
 										/>
+										<span
+											aria-hidden
+											className="shrink-0 select-none px-0.5 font-medium text-mail-muted text-paragraph-sm"
+										>
+											@
+										</span>
 										<Dropdown.Root
 											open={isDropdownOpen}
 											onOpenChange={setIsDropdownOpen}
@@ -303,30 +365,27 @@ export const AddAgentAddressModal = ({
 												<button
 													type="button"
 													disabled={isSubmitting}
-													className="group/trigger flex h-5 min-h-5 w-auto items-center gap-0 rounded-none bg-transparent p-0 font-medium text-mail-muted shadow-none outline-none ring-0 hover:bg-transparent hover:text-mail-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=open]:text-mail-foreground"
+													aria-label="Select domain"
+													className="group/trigger flex h-5 min-h-5 max-w-[55%] shrink items-center gap-0.5 rounded-none bg-transparent p-0 font-medium text-mail-foreground shadow-none outline-none ring-0 hover:bg-transparent disabled:pointer-events-none disabled:opacity-50"
 												>
-													<Icon
-														name="at-sign"
-														className="mr-1.5 h-4 w-4 shrink-0 text-mail-muted transition duration-200 ease-out group-hover/trigger:text-mail-muted group-data-[state=open]/trigger:text-mail-muted"
-													/>
-													<span className="font-medium text-mail-foreground">
-														{form.watch("domain") || "domain"}
+													<span className="truncate">
+														{selectedDomainName || "domain"}
 													</span>
 													<Icon
 														name="chevron-down"
 														className={cn(
-															"ml-0.5 size-5 shrink-0 text-mail-muted transition duration-200 ease-out group-hover/trigger:text-mail-foreground group-data-[state=open]/trigger:rotate-180 group-data-[state=open]/trigger:text-mail-foreground",
+															"size-4 shrink-0 text-mail-muted transition duration-200 ease-out group-hover/trigger:text-mail-foreground group-data-[state=open]/trigger:rotate-180",
 															isDropdownOpen &&
 																"rotate-180 text-mail-foreground",
 														)}
 													/>
 												</button>
 											</Dropdown.Trigger>
-											<Dropdown.Content align="end" className="w-56 p-2">
+											<Dropdown.Content align="end" className="w-72 p-2">
 												<div className="relative max-h-80 overflow-y-auto">
 													{domainsList.map((d, idx) => {
-														const isSelected =
-															d.domain === form.watch("domain");
+														const isSelected = d.domain === selectedDomainName;
+														const ready = isDomainReady(d);
 														return (
 															<button
 																key={d.id}
@@ -341,19 +400,28 @@ export const AddAgentAddressModal = ({
 																	setIsDropdownOpen(false);
 																}}
 																className={cn(
-																	"flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-colors",
+																	"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-xs transition-colors",
 																	"text-mail-foreground",
 																	isSelected && "bg-neutral-alpha-10",
 																	!currentRect &&
 																		hoverIdx === idx &&
 																		"bg-neutral-alpha-10",
+																	!ready && "opacity-80",
 																)}
 															>
-																<span className="truncate">{d.domain}</span>
+																<div className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
+																	<span className="w-full truncate text-left font-medium">
+																		{d.domain}
+																	</span>
+																	<DomainCapabilityHint
+																		sending={d.isSendingEmailEnabled}
+																		receiving={d.isReceivingEmailEnabled}
+																	/>
+																</div>
 																{isSelected && (
 																	<Icon
 																		name="check"
-																		className="h-3.5 w-3.5 text-mail-foreground"
+																		className="h-3.5 w-3.5 shrink-0 text-mail-foreground"
 																	/>
 																)}
 															</button>
@@ -377,18 +445,33 @@ export const AddAgentAddressModal = ({
 								)}
 							</div>
 
-							<p className="rounded-lg bg-offset-light/5 px-3 py-2 font-medium text-[12px] text-mail-muted">
-								<Icon name="globe" className="mr-1 inline h-3.5 w-3.5" />
-								Domain must have receiving enabled. Manage domains from{" "}
-								<a
-									href="/domain"
-									className="text-mail-foreground hover:underline"
-									onClick={onClose}
-								>
-									Domain settings
-								</a>
-								.
-							</p>
+							{domainReady ? (
+								<p className="rounded-lg bg-offset-light/5 px-3 py-2 font-medium text-[12px] text-mail-muted">
+									<Icon
+										name="check-circle"
+										className="mr-1 inline h-3.5 w-3.5 text-success-base"
+									/>
+									Sending and receiving are enabled on this domain. Both are
+									required for an agent inbox.
+								</p>
+							) : (
+								<p className="rounded-lg border border-error-base/20 bg-error-base/5 px-3 py-2 font-medium text-[12px] text-mail-foreground">
+									<Icon
+										name="alert-circle"
+										className="mr-1 inline h-3.5 w-3.5 text-error-base"
+									/>
+									{missingCapabilities.length === 2
+										? "Enable sending and receiving on this domain to create an inbox."
+										: `Enable ${missingCapabilities[0]} on this domain to create an inbox. Both sending and receiving are required.`}{" "}
+									<Link
+										href={domainSettingsHref}
+										className="text-mail-foreground underline underline-offset-2 hover:opacity-80"
+										onClick={onClose}
+									>
+										Domain settings
+									</Link>
+								</p>
+							)}
 						</Modal.Body>
 
 						<div className="flex items-center justify-end border-mail-border border-mail-border/50 border-t px-5 py-3.5">
@@ -410,7 +493,7 @@ export const AddAgentAddressModal = ({
 									type="submit"
 									variant="neutral"
 									size="xsmall"
-									disabled={isSubmitting}
+									disabled={isSubmitting || !domainReady}
 								>
 									{isSubmitting ? (
 										<>

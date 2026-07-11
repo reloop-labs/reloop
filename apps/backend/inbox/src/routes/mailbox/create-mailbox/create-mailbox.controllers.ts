@@ -1,7 +1,7 @@
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
-import { mailbox } from "@reloop/db/schema";
-import { eq } from "drizzle-orm";
+import { domain, mailbox } from "@reloop/db/schema";
+import { and, eq, isNull } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
 
@@ -21,6 +21,44 @@ export async function createMailboxController({
 	displayName?: string;
 }) {
 	const log = useLogger();
+
+	const domainRecord = await db.query.domain.findFirst({
+		where: and(
+			eq(domain.id, domainId),
+			eq(domain.organizationId, organizationId),
+			isNull(domain.deletedAt),
+		),
+		columns: {
+			id: true,
+			domain: true,
+			isSendingEmailEnabled: true,
+			isReceivingEmailEnabled: true,
+		},
+	});
+
+	if (!domainRecord) {
+		throw createError({
+			status: 400,
+			message: "Domain not found",
+			why: `No domain with id ${domainId} exists for this organization`,
+			fix: "Select a valid domain from Domain settings",
+		});
+	}
+
+	if (
+		!domainRecord.isSendingEmailEnabled ||
+		!domainRecord.isReceivingEmailEnabled
+	) {
+		const missing: string[] = [];
+		if (!domainRecord.isSendingEmailEnabled) missing.push("sending");
+		if (!domainRecord.isReceivingEmailEnabled) missing.push("receiving");
+		throw createError({
+			status: 400,
+			message: "Domain must have sending and receiving enabled to create a mailbox",
+			why: `Domain ${domainRecord.domain} is missing ${missing.join(" and ")}`,
+			fix: "Enable both sending and receiving in Domain settings, then try again",
+		});
+	}
 
 	const existing = await db.query.mailbox.findFirst({
 		where: eq(mailbox.email, email),

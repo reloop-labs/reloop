@@ -555,7 +555,14 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 			if (!res.ok) {
 				const body = await res.text();
-				throw new Error(body || "Failed to create mailbox");
+				let message = "Failed to create mailbox";
+				try {
+					const parsed = JSON.parse(body) as { message?: string };
+					if (parsed.message) message = parsed.message;
+				} catch {
+					if (body) message = body;
+				}
+				throw new Error(message);
 			}
 
 			const data = (await res.json()) as {
