@@ -2,7 +2,7 @@
 
 import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover-background";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
-import { getStatusColorClass, getStatusIcon } from "@fe/dashboard/utils/domain";
+import { getStatusColorClass, getStatusIcon, getVerificationFailedMessage } from "@fe/dashboard/utils/domain";
 import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -195,10 +195,7 @@ const getTooltipText = (
 			return "Almost there! Add the DNS records shown below, then click Verify — and you'll be ready to send.";
 		case "failed":
 		case "suspended":
-			return (
-				reason ||
-				"We couldn't verify your domain. Double-check your DNS records and try again."
-			);
+			return getVerificationFailedMessage(reason);
 		default:
 			return "Checking your domain authentication — this will just take a moment…";
 	}

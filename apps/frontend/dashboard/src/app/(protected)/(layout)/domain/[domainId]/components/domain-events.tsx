@@ -1,6 +1,7 @@
 "use client";
 
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
+import { getVerificationFailedMessage } from "@fe/dashboard/utils/domain";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { StatusTimeline, StatusTimelineSkeleton } from "./status-timeline";
@@ -20,9 +21,7 @@ export const DomainEvents = ({
 			case "active":
 				return "You're all set! Your domain is ready to send emails.";
 			case "failed":
-				return domain.verificationFailedReason
-					? `We couldn't verify your domain: ${domain.verificationFailedReason}. Double-check your DNS records and try again.`
-					: "We couldn't verify your domain. Double-check your DNS records and try again.";
+				return getVerificationFailedMessage(domain.verificationFailedReason);
 			case "pending":
 				return "Almost there! Add the DNS records shown below, then click Verify — and you'll be ready to send.";
 			default:

@@ -85,3 +85,37 @@ export const getRootDomain = (domain: string): string => {
 	if (parts.length <= 2) return domain;
 	return parts.slice(-2).join(".");
 };
+
+function formatFailedRecords(names: string[]): string {
+	if (names.length === 1) {
+		return `Your ${names[0]} record is missing or incorrect`;
+	}
+	const last = names[names.length - 1];
+	const rest = names.slice(0, -1).join(", ");
+	return `Your ${rest}, and ${last} records are missing or incorrect`;
+}
+
+/**
+ * Normalize stored failure reasons (including legacy DKIM=false dumps) for display.
+ */
+export const formatVerificationFailedReason = (reason: string): string => {
+	const legacyMatches = [...reason.matchAll(/([A-Z]+)=false/g)].map(
+		(match) => match[1],
+	);
+	if (legacyMatches.length > 0) {
+		return formatFailedRecords(legacyMatches);
+	}
+	return reason;
+};
+
+/**
+ * Banner / tooltip copy for a failed domain verification.
+ */
+export const getVerificationFailedMessage = (
+	reason?: string | null,
+): string => {
+	if (!reason) {
+		return "We couldn't verify your domain. Double-check your DNS records and try again.";
+	}
+	return `We couldn't verify your domain — ${formatVerificationFailedReason(reason)}. Double-check your DNS records and try again.`;
+};

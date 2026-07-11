@@ -12,9 +12,21 @@ import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";
 
 function buildFailureReason(checks: Record<string, boolean>): string {
-	return Object.entries(checks)
-		.map(([name, ok]) => `${name}=${ok}`)
-		.join(" ");
+	const failed = Object.entries(checks)
+		.filter(([, ok]) => !ok)
+		.map(([name]) => name);
+
+	if (failed.length === 0) {
+		return "One or more DNS records could not be verified";
+	}
+
+	if (failed.length === 1) {
+		return `Your ${failed[0]} record is missing or incorrect`;
+	}
+
+	const last = failed[failed.length - 1];
+	const rest = failed.slice(0, -1).join(", ");
+	return `Your ${rest}, and ${last} records are missing or incorrect`;
 }
 
 async function markDomainFailed(
