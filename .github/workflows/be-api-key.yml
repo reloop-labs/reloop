@@ -64,5 +64,9 @@ jobs:
 
       - name: Image digest
         run: echo ${{ steps.build.outputs.digest }}
-
+      - name: Trigger Coolify Deploy
+        if: github.event_name != 'pull_request'
+        run: |
+          curl --fail -i -X GET "https://coolify.reloop.sh/api/v1/deploy?uuid=zmwc8rmff2md4wpeqw25eeki&force=false" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"
 
