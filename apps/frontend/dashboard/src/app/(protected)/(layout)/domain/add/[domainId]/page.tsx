@@ -96,7 +96,7 @@ const NewDomainPage = () => {
 	} = groupDomainDnsRecords(domainData?.dnsRecords);
 
 	return (
-		<div className="mx-auto max-w-4xl space-y-8 p-6 lg:p-8">
+		<div className="mx-auto max-w-3xl space-y-8 p-6 lg:p-8">
 			<div className="flex w-full items-center justify-between pb-6">
 				<div>
 					<h1 className="flex items-center gap-2 font-semibold text-title-h5 leading-8">

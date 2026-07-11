@@ -61,6 +61,7 @@ export const DNSRecordSection: React.FC<DNSRecordSectionProps> = ({
 					isLoading={isLoading}
 					loadingRows={loadingRows}
 					tableId={tableId}
+					hideStatus={true}
 				/>
 			</div>
 		</div>
