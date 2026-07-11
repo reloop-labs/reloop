@@ -1,3 +1,4 @@
+import { mailConfig } from "@reloop/be-mail/mail.config";
 import { authMiddleware } from "@reloop/be-mail/middleware/auth";
 import { checkRateLimit } from "@reloop/be-mail/middleware/rate-limiter";
 import { MailModel } from "@reloop/be-mail/model/mail.model.js";
@@ -34,12 +35,22 @@ export const sendEmailRoute = new Elysia()
 				set.headers[key] = value;
 			}
 
+			const requestApiKey = request.headers.get("x-api-key");
+			// External API key path uses the caller's key for KumoMTA.
+			// Session/internal auth uses the shared internal secret so inject
+			// can authenticate without a recoverable plaintext org API key.
+			const useInternalInject = !apiKeyId;
+			const injectApiKey = useInternalInject
+				? mailConfig.RELOOP_INTERNAL_SECRET
+				: (requestApiKey ?? "");
+
 			return await sendEmailController({
 				organizationId: activeOrganizationId,
 				body,
-				apiKey: request.headers.get("x-api-key") ?? "",
+				apiKey: injectApiKey,
 				apiKeyId,
 				userId,
+				useInternalInject,
 			});
 		},
 		{

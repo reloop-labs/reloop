@@ -12,6 +12,9 @@ export const domainConfig = {
 		`link.${process.env.HOST_DOMAIN || "reloop.sh"}`,
 	DKIM_SELECTOR: process.env.DKIM_SELECTOR || "reloop",
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
+	RELOOP_INTERNAL_SECRET:
+		process.env.RELOOP_INTERNAL_SECRET ||
+		"reloop_internal_secret_default_123",
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
 

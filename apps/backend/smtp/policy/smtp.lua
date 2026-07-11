@@ -44,7 +44,23 @@ local function apply_reloop_logic(msg, api_key)
     text_body = data
   end
 
-  print("[LOG-INCOMING] [" .. msg_id .. "] processing message: api_key=" .. api_key .. " domain=" .. domain .. " recipients=" .. #to_emails)
+  print("[LOG-INCOMING] [" .. msg_id .. "] processing message: domain=" .. domain .. " recipients=" .. #to_emails)
+
+  local existing_log_id = msg:get_first_named_header_value('X-Email-Log-ID')
+  local org_id = msg:get_first_named_header_value('X-Org-ID') or ""
+  local is_internal = (api_key ~= "" and api_key == constants.internal_secret)
+
+  if is_internal and (not existing_log_id or existing_log_id == "") then
+    print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Internal secret requires X-Email-Log-ID (mail service inject only)")
+    kumo.reject(550, "5.7.1 Authentication required")
+    return
+  end
+
+  if is_internal and (org_id == "") then
+    print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Internal secret requires X-Org-ID")
+    kumo.reject(550, "5.7.1 Missing organization context")
+    return
+  end
 
   if api_key == "" or domain == "" then
     print("[LOG-INCOMING] [" .. msg_id .. "] REJECTED: Missing credentials or sender domain")
@@ -57,8 +73,6 @@ local function apply_reloop_logic(msg, api_key)
   })
 
   -- Check if message was already logged by internal backend HTTP inject
-  local existing_log_id = msg:get_first_named_header_value('X-Email-Log-ID')
-
   if not existing_log_id then
     local target_url = constants.kumomta_url .. "/v1/log-incoming"
     print("[LOG-INCOMING] [" .. msg_id .. "] calling webhook: " .. target_url)
@@ -166,9 +180,15 @@ local function apply_reloop_logic(msg, api_key)
 
   local dkim_ok, dkim_resp = pcall(function()
     local req = client:post(dkim_target)
+    req = req:header("Content-Type", "application/json")
+    if is_internal then
+      req = req
+        :header("x-internal-secret", constants.internal_secret)
+        :header("x-organization-id", org_id)
+    else
+      req = req:header("x-api-key", api_key)
+    end
     return req
-      :header("x-api-key", api_key)
-      :header("Content-Type", "application/json")
       :body(kumo.serde.json_encode({ domainName = domain }))
       :send()
   end)

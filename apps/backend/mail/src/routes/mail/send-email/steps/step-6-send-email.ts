@@ -13,6 +13,7 @@ export async function sendEmail_step6({
 	domainId,
 	emailLogId,
 	apiKey,
+	useInternalInject = false,
 }: {
 	body: MailModel.SendEmailBody;
 	finalSubject: string;
@@ -22,6 +23,7 @@ export async function sendEmail_step6({
 	domainId: string;
 	emailLogId: string;
 	apiKey: string;
+	useInternalInject?: boolean;
 }) {
 	try {
 		return await kumomtaClient.sendEmail({
@@ -49,7 +51,8 @@ export async function sendEmail_step6({
 				"X-Org-ID": organizationId,
 				"X-Domain-ID": domainId,
 				"X-Email-Log-ID": emailLogId,
-				"X-Api-Key": apiKey,
+				// Never put the internal secret into outbound message headers.
+				...(useInternalInject ? {} : { "X-Api-Key": apiKey }),
 				...(body.headers || {}),
 			},
 		});

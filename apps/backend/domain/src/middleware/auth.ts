@@ -63,6 +63,62 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 				security: [{ apiKey: [] }],
 			},
 		},
+		/**
+		 * API key or internal service secret (KumoMTA → dkim-key for
+		 * already-authenticated mail-service injects).
+		 */
+		apiKeyOrInternalAuth: {
+			async resolve({ status, request: { headers }, log }) {
+				try {
+					const traceId = `req_${createId()}`;
+					log.set({ traceId, service: "domain" });
+
+					const apiKey = headers.get("x-api-key");
+					const apiKeyResult = await validateApiKey(apiKey);
+					if (apiKeyResult) {
+						log.set({
+							...apiKeyResult,
+						});
+						log.info("API key authentication successful");
+						return { ...apiKeyResult, traceId, logger: log };
+					}
+
+					const internalSecret = headers.get("x-internal-secret");
+					const organizationId = headers.get("x-organization-id");
+					if (
+						internalSecret &&
+						organizationId &&
+						domainConfig.RELOOP_INTERNAL_SECRET &&
+						internalSecret === domainConfig.RELOOP_INTERNAL_SECRET
+					) {
+						log.set({
+							authType: "internal",
+							organizationId,
+							userId: "system",
+						});
+						log.info("Internal secret authentication successful");
+						return {
+							userId: "system",
+							organizationId,
+							authType: "internal" as const,
+							traceId,
+							logger: log,
+						};
+					}
+
+					return status(401, { message: "Authentication required" });
+				} catch (e) {
+					log.error("Authentication error", {
+						error: e instanceof Error ? e.message : "Unknown error",
+						stack: e instanceof Error ? e.stack : undefined,
+					});
+					return status(401, { message: "Authentication failed" });
+				}
+			},
+			detail: {
+				security: [{ apiKey: [] }],
+			},
+		},
 		auth: {
 			async resolve({ status, request: { headers }, log }) {
 				try {

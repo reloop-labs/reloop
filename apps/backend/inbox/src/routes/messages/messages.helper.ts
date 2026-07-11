@@ -1,5 +1,5 @@
 import { db } from "@reloop/db/client";
-import { apikey, mailbox } from "@reloop/db/schema";
+import { mailbox } from "@reloop/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
@@ -42,19 +42,6 @@ export async function proxySendToMailService(
 	cookie?: string,
 ) {
 	const log = getLog();
-
-	let resolvedApiKey = apiKey;
-	if (!resolvedApiKey) {
-		const keyRecord = await db.query.apikey.findFirst({
-			where: and(
-				eq(apikey.organizationId, params.organizationId),
-				eq(apikey.enabled, true),
-			),
-		});
-		if (keyRecord) {
-			resolvedApiKey = keyRecord.key;
-		}
-	}
 
 	// Resolve the mailbox to get the from address
 	const mbx = await db.query.mailbox.findFirst({
@@ -103,12 +90,19 @@ export async function proxySendToMailService(
 		"Content-Type": "application/json",
 	};
 
-	if (resolvedApiKey) {
-		headers["x-api-key"] = resolvedApiKey;
+	if (apiKey) {
+		// Caller supplied a plaintext API key (e.g. from x-api-key on the request)
+		headers["x-api-key"] = apiKey;
 	}
 
 	if (cookie) {
 		headers["cookie"] = cookie;
+	}
+
+	// Backend-only path (cron): no cookie and no recoverable plaintext key in DB
+	if (!apiKey && !cookie) {
+		headers["x-internal-secret"] = inboxConfig.RELOOP_INTERNAL_SECRET;
+		headers["x-organization-id"] = params.organizationId;
 	}
 
 	const response = await fetch(mailServiceUrl, {

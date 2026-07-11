@@ -1,16 +1,24 @@
 import { mailConfig } from "@reloop/be-mail/mail.config";
 
 export async function validateSession(cookie: string | null) {
+	if (!cookie) {
+		return null;
+	}
+
 	const response = await fetch(
 		`${mailConfig.BASE_URL}/api/auth/v1/get-session`,
 		{
 			method: "GET",
 			headers: new Headers({
 				"Content-Type": "application/json",
-				Cookie: cookie || "",
+				Cookie: cookie,
 			}),
 		},
 	);
+
+	if (!response.ok) {
+		return null;
+	}
 
 	const session = (await response.json()) as {
 		user?: {
@@ -23,7 +31,7 @@ export async function validateSession(cookie: string | null) {
 		return {
 			userId: session.user.id,
 			activeOrganizationId: session.user.activeOrganizationId,
-			authType: "auth" as const,
+			authType: "session" as const,
 		};
 	}
 

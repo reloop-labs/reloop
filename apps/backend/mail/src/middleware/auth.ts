@@ -125,6 +125,29 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 							traceId,
 						};
 					}
+
+					const internalSecret = headers.get("x-internal-secret");
+					const organizationId = headers.get("x-organization-id");
+					if (
+						internalSecret &&
+						organizationId &&
+						mailConfig.RELOOP_INTERNAL_SECRET &&
+						internalSecret === mailConfig.RELOOP_INTERNAL_SECRET
+					) {
+						log.set({
+							authType: "internal",
+							activeOrganizationId: organizationId,
+							userId: "system",
+						});
+						log.info("Internal secret authentication successful");
+						return {
+							userId: "system",
+							activeOrganizationId: organizationId,
+							authType: "internal" as const,
+							traceId,
+						};
+					}
+
 					const sessionResult = await validateSession(cookie);
 					if (sessionResult) {
 						log.set({

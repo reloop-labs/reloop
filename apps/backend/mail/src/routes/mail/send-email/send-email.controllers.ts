@@ -31,12 +31,14 @@ export async function sendEmailController({
 	apiKey,
 	apiKeyId,
 	userId,
+	useInternalInject = false,
 }: {
 	organizationId: string;
 	body: MailModel.SendEmailBody;
 	apiKey: string;
 	apiKeyId?: string;
 	userId?: string;
+	useInternalInject?: boolean;
 }): Promise<MailModel.SendEmailResponse> {
 	const logger = useLogger();
 	logger.set({
@@ -138,6 +140,7 @@ export async function sendEmailController({
 		domainId: currentDomain.id,
 		emailLogId,
 		apiKey,
+		useInternalInject,
 	});
 
 	const response = await finalizeEmail_step7({
