@@ -1,44 +1,55 @@
 "use client";
 
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { motion } from "motion/react";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
 	const { theme, setTheme } = useTheme();
+	const [mounted, setMounted] = useState(false);
 
-	const themes = [
-		{ value: "system", icon: "monitor", label: "System theme" },
-		{ value: "light", icon: "sun", label: "Light theme" },
-		{ value: "dark", icon: "moon", label: "Dark theme" },
-	];
+	useEffect(() => {
+		setMounted(true);
+	}, []);
 
 	return (
-		<div className="flex w-fit items-center rounded-full border border-stroke-soft-200">
-			{themes.map((themeOption) => (
-				<motion.button
-					key={themeOption.value}
-					onClick={() => setTheme(themeOption.value)}
-					className={cn(
-						"flex size-6 items-center justify-center rounded-full transition-all duration-200 hover:text-text-900 dark:text-text-400 dark:hover:bg-gray-800 dark:hover:text-text-200",
-						theme === "system" &&
-							themeOption.value === "system" &&
-							"border border-stroke-soft-200 bg-primary-600 text-white shadow-sm",
-						theme === "light" &&
-							themeOption.value === "light" &&
-							"border border-stroke-soft-200 bg-white text-text-strong-950 shadow-sm",
-						theme === "dark" &&
-							themeOption.value === "dark" &&
-							"border border-stroke-soft-200 bg-black text-white shadow-sm",
-					)}
-					title={themeOption.label}
-					whileHover={{ scale: 1.05 }}
-					whileTap={{ scale: 0.95 }}
-				>
-					<Icon name={themeOption.icon} className="w-3.5" />
-				</motion.button>
-			))}
+		<div className="inline-flex items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 p-0.5 dark:border-white/10 dark:bg-white/[0.04]">
+			<button
+				type="button"
+				onClick={() => setTheme("system")}
+				className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
+					mounted && theme === "system"
+						? "bg-white text-black shadow-sm"
+						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
+				}`}
+				aria-label="System theme"
+			>
+				<Icon className="size-3.5" name="laptop" />
+			</button>
+			<button
+				type="button"
+				onClick={() => setTheme("light")}
+				className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
+					mounted && theme === "light"
+						? "bg-white text-black shadow-sm dark:bg-white dark:text-black"
+						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
+				}`}
+				aria-label="Light mode"
+			>
+				<Icon className="size-3.5" name="sun" />
+			</button>
+			<button
+				type="button"
+				onClick={() => setTheme("dark")}
+				className={`flex items-center rounded-full px-1.5 py-1.5 font-semibold text-[12px] transition-all duration-200 ${
+					mounted && theme === "dark"
+						? "bg-white text-black shadow-sm"
+						: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white/80"
+				}`}
+				aria-label="Dark mode"
+			>
+				<Icon className="size-3.5" name="moon" />
+			</button>
 		</div>
 	);
 }

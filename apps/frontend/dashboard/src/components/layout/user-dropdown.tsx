@@ -11,6 +11,7 @@ import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
+import { ThemeToggle } from "@fe/dashboard/components/theme-toggle";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -114,24 +115,16 @@ export const UserDropdown = () => {
 							<span className="flex-1 truncate text-sm">My profile</span>
 						</Dropdown.Item>
 
-						<Dropdown.Item
-							ref={(el) => {
-								if (el) itemRefs.current[1] = el;
-							}}
-							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-							onPointerEnter={() => setHoverIdx(1)}
-							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-						>
-							<Icon
-								name={theme === "dark" ? "sun" : "moon"}
-								className="h-4 w-4 text-text-sub-600"
-							/>
-							<span className="flex-1 truncate text-sm">Toggle theme</span>
-							<span className="flex h-5 w-5 items-center justify-center rounded bg-bg-weak-50 font-medium text-[10px] text-text-soft-400">
-								M
-							</span>
-						</Dropdown.Item>
+						<div className="flex items-center justify-between px-2.5 py-1.5">
+							<div className="flex items-center gap-2">
+								<Icon
+									name="moon"
+									className="h-4 w-4 text-text-sub-600"
+								/>
+								<span className="text-sm font-medium text-text-sub-600">Theme</span>
+							</div>
+							<ThemeToggle />
+						</div>
 					</Dropdown.Group>
 
 					<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
