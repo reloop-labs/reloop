@@ -235,7 +235,7 @@ export const AgentMailboxList = () => {
 		}
 	};
 	return (
-		<div className="mx-auto max-w-4xl space-y-8 p-6 lg:p-8">
+		<div className="mx-auto max-w-3xl space-y-8 p-6 lg:p-8">
 			<div className="flex items-center justify-between pb-6">
 				<h1 className="font-medium text-2xl">Agent Inbox</h1>
 				<Button.Root

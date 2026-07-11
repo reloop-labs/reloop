@@ -228,11 +228,7 @@ export const AddAgentAddressModal = ({
 												Create Inbox for AI agent
 											</h2>
 										</Modal.Title>
-									</div>
-									<p className="text-mail-muted text-paragraph-xs">
-										Configure a new email inbox for your AI agents to send and
-										receive emails.
-									</p>
+									</div>{" "}
 								</div>
 								<button
 									type="button"
@@ -275,7 +271,7 @@ export const AddAgentAddressModal = ({
 								<div className="flex flex-col gap-1">
 									<div className="flex items-center gap-2.5">
 										<Icon
-											name="mail-single"
+											name="inbox"
 											className="h-4 w-4 text-mail-foreground"
 										/>
 										<Modal.Title asChild>
@@ -284,10 +280,6 @@ export const AddAgentAddressModal = ({
 											</h2>
 										</Modal.Title>
 									</div>
-									<p className="text-mail-muted text-paragraph-xs">
-										Configure a new email inbox for your AI agents to send and
-										receive emails.
-									</p>
 								</div>
 								<button
 									type="button"
