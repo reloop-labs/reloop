@@ -11,7 +11,6 @@ import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Resolver } from "react-hook-form";
@@ -196,14 +195,19 @@ export const AddAgentAddressModal = ({
 		}
 	};
 
-	const domainSettingsHref = selectedDomain
-		? `/domain/${selectedDomain.id}`
-		: "/domain";
+	const domainSettingsHref = getBackToUrl(
+		selectedDomain ? `/domain/${selectedDomain.id}` : "/domain",
+	);
 
 	return (
-		<Modal.Root open={isOpen} onOpenChange={onClose}>
+		<Modal.Root
+			open={isOpen}
+			onOpenChange={(open) => {
+				if (!open) onClose();
+			}}
+		>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-mail-border border-mail-border/40 p-0 sm:max-w-[480px]"
+				className="overflow-hidden rounded-3xl border border-mail-border border-mail-border/40 p-0 sm:max-w-[480px]"
 				showClose={false}
 				onEscapeKeyDown={(e) => {
 					if (isSubmitting) e.preventDefault();
@@ -310,6 +314,7 @@ export const AddAgentAddressModal = ({
 								<Input.Root
 									size="xsmall"
 									hasError={!!form.formState.errors.label}
+									className="rounded-xl"
 								>
 									<Input.Wrapper>
 										<Input.Input
@@ -342,6 +347,7 @@ export const AddAgentAddressModal = ({
 										!!form.formState.errors.localPart ||
 										!!form.formState.errors.domain
 									}
+									className="rounded-xl"
 								>
 									<Input.Wrapper className="gap-0">
 										<Input.Input
@@ -446,16 +452,16 @@ export const AddAgentAddressModal = ({
 							</div>
 
 							{domainReady ? (
-								<p className="rounded-lg bg-offset-light/5 px-3 py-2 font-medium text-[12px] text-mail-muted">
+								<div className="rounded-xl bg-offset-light/5 px-3 py-2.5 font-medium text-[12px] text-mail-muted">
 									<Icon
 										name="check-circle"
 										className="mr-1 inline h-3.5 w-3.5 text-success-base"
 									/>
 									Sending and receiving are enabled on this domain. Both are
 									required for an agent inbox.
-								</p>
+								</div>
 							) : (
-								<p className="rounded-lg border border-error-base/20 bg-error-base/5 px-3 py-2 font-medium text-[12px] text-mail-foreground">
+								<div className="rounded-xl border border-error-base/20 bg-error-base/5 px-3 py-2.5 font-medium text-[12px] text-mail-foreground">
 									<Icon
 										name="alert-circle"
 										className="mr-1 inline h-3.5 w-3.5 text-error-base"
@@ -463,18 +469,18 @@ export const AddAgentAddressModal = ({
 									{missingCapabilities.length === 2
 										? "Enable sending and receiving on this domain to create an inbox."
 										: `Enable ${missingCapabilities[0]} on this domain to create an inbox. Both sending and receiving are required.`}{" "}
-									<Link
-										href={domainSettingsHref}
-										className="text-mail-foreground underline underline-offset-2 hover:opacity-80"
-										onClick={onClose}
+									<button
+										type="button"
+										className="relative z-10 inline cursor-pointer underline underline-offset-2 hover:opacity-80"
+										onClick={() => router.push(domainSettingsHref)}
 									>
 										Domain settings
-									</Link>
-								</p>
+									</button>
+								</div>
 							)}
 						</Modal.Body>
 
-						<div className="flex items-center justify-end border-mail-border border-mail-border/50 border-t px-5 py-3.5">
+						<div className="flex items-center justify-end border-stroke-soft-100 border-t px-5 py-3.5 dark:border-stroke-soft-200/50">
 							<div className="flex items-center gap-2">
 								<Button.Root
 									type="button"
