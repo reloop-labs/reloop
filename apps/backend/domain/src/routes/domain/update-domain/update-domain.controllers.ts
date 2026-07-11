@@ -80,6 +80,17 @@ export async function updateDomainController({
 				? body.open_tracking
 				: existingDomain.isOpenTrackingEnabled;
 
+		// Re-verify when sending/receiving changes, or when tracking is newly enabled
+		// (needs CNAME). Disabling tracking alone should not kick off a full verify.
+		const emailFeaturesChanged =
+			body.sending_email !== undefined || body.receiving_email !== undefined;
+		const trackingEnabled = clickTracking || openTracking;
+		const trackingTurnedOn =
+			(body.click_tracking === true && !existingDomain.isClickTrackingEnabled) ||
+			(body.open_tracking === true && !existingDomain.isOpenTrackingEnabled);
+		const shouldReverify =
+			emailFeaturesChanged || (trackingEnabled && trackingTurnedOn);
+
 		if (!clickTracking && !openTracking) {
 			await db
 				.update(schema.domainDnsRecord)
@@ -90,7 +101,7 @@ export async function updateDomainController({
 						eq(schema.domainDnsRecord.recordType, "CNAME"),
 					),
 				);
-		} else {
+		} else if (shouldReverify && trackingEnabled) {
 			await db
 				.update(schema.domainDnsRecord)
 				.set({ status: "verifying" })
@@ -102,13 +113,7 @@ export async function updateDomainController({
 				);
 		}
 
-		// Trigger DNS re-verification only if sending or receiving email features are updated
-		if (
-			body.sending_email !== undefined ||
-			body.receiving_email !== undefined ||
-			body.click_tracking !== undefined ||
-			body.open_tracking !== undefined
-		) {
+		if (shouldReverify) {
 			try {
 				await verifyDNSRecordController({ domainId, organizationId });
 			} catch (verifyError) {

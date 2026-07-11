@@ -98,6 +98,12 @@ export const useDomainActions = (
 				);
 
 				await mutate(cacheKey, data, false);
+				if (data.status === "verifying") {
+					await mutate(
+						(key) =>
+							typeof key === "string" && key.startsWith("/api/domain/v1/list"),
+					);
+				}
 				toast.success(successMessage);
 			} catch (error) {
 				await mutate(cacheKey);

@@ -39,16 +39,18 @@ export const loader = async () => {
 				const existing = await workflowQueue.getJob(jobId);
 				if (existing) {
 					const state = await existing.getState();
-					if (state === "completed" || state === "failed") {
-						await existing.remove();
-					} else {
+					// Active jobs are locked — let them finish (they re-read settings from DB).
+					// Otherwise replace so config toggles / re-verify restart the staggered schedule.
+					if (state === "active") {
 						log.info({
-							message: "Domain verification job already in progress",
+							message:
+								"Domain verification job already running; latest settings will be used",
 							domainId: payload.domainId,
 							state,
 						});
 						return;
 					}
+					await existing.remove();
 				}
 				await workflowQueue.add(
 					"verify-domain",
