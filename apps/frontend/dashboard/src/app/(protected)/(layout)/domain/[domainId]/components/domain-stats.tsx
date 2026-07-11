@@ -1,11 +1,11 @@
+import { AnimatedClock } from "@fe/dashboard/components/animated-clock";
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
-import { getStatusIcon } from "@fe/dashboard/utils/domain";
+import { getStatusColorClass, getStatusIcon } from "@fe/dashboard/utils/domain";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import type * as React from "react";
-import { getStatusBadgeStyles } from "../utils";
 import { DNSProviderInfo } from "./dns-provider-info";
 
 interface DomainStatsProps {
@@ -47,18 +47,24 @@ export const DomainStats: React.FC<DomainStatsProps> = ({
 				{isLoading ? (
 					<Skeleton className="h-5 w-20 rounded-lg" />
 				) : (
-					<span
+					<div
 						className={cn(
-							"inline-flex w-fit items-center gap-1 rounded-md border-[1px] px-[6px] py-0.5 font-medium text-[10px]",
-							getStatusBadgeStyles(domain?.status || "pending"),
+							"flex items-center gap-1",
+							getStatusColorClass(domain?.status || "pending"),
 						)}
 					>
-						<Icon
-							name={getStatusIcon(domain?.status || "pending")}
-							className="h-3 w-3"
-						/>
-						{domain?.status || "pending"}
-					</span>
+						{(domain?.status || "pending") === "verifying" ? (
+							<AnimatedClock className="h-3.5 w-3.5" />
+						) : (
+							<Icon
+								name={getStatusIcon(domain?.status || "pending")}
+								className="h-3.5 w-3.5"
+							/>
+						)}
+						<p className="font-medium text-paragraph-xs capitalize">
+							{domain?.status || "pending"}
+						</p>
+					</div>
 				)}
 			</div>
 
