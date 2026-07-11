@@ -23,6 +23,9 @@ export const auth = betterAuth({
 		},
 	},
 	basePath: "/api/auth/v1",
+	advanced: {
+		cookiePrefix: "reloop",
+	},
 	plugins: [
 		jwt(),
 		bearer(),

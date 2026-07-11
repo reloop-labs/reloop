@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeToggle } from "@fe/dashboard/components/theme-toggle";
 import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import {
@@ -11,7 +12,6 @@ import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
-import { ThemeToggle } from "@fe/dashboard/components/theme-toggle";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -118,16 +118,22 @@ export const UserDropdown = () => {
 						<div className="flex items-center justify-between px-2.5 py-1.5">
 							<div className="flex items-center gap-2">
 								<Icon
-									name={theme === "system" ? "laptop" : theme === "dark" ? "moon" : "sun"}
+									name={
+										theme === "system"
+											? "laptop"
+											: theme === "dark"
+												? "moon"
+												: "sun"
+									}
 									className="h-4 w-4 text-text-sub-600"
 								/>
-								<span className="text-sm font-medium text-text-sub-600">Theme</span>
+								<span className="font-medium text-sm text-text-sub-600">
+									Theme
+								</span>
 							</div>
 							<ThemeToggle />
 						</div>
 					</Dropdown.Group>
-
-
 
 					{canManageBilling && (
 						<>
@@ -146,7 +152,9 @@ export const UserDropdown = () => {
 										name="arrow-top-circle"
 										className="h-4 w-4 text-text-sub-600"
 									/>
-									<span className="flex-1 truncate text-sm">Manage credits</span>
+									<span className="flex-1 truncate text-sm">
+										Manage credits
+									</span>
 								</Dropdown.Item>
 							</Dropdown.Group>
 						</>

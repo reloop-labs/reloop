@@ -2,9 +2,8 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { SidebarLayoutIcon } from "./sidebar-layout-icon";
-
-import { useState, useEffect } from "react";
 
 export function ThemeToggleAppearance() {
 	const [mounted, setMounted] = useState(false);

@@ -36,7 +36,7 @@ export default function WorkspaceLayout({
 				</p>
 			</div>
 			<SettingsTabs />
-			<div className="w-full flex-1 mt-0 pb-10">{children}</div>
+			<div className="mt-0 w-full flex-1 pb-10">{children}</div>
 		</div>
 	);
 }

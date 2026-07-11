@@ -20,6 +20,9 @@ const baseURL =
 export const authClient = createAuthClient({
 	baseURL,
 	basePath: "/api/auth/v1/",
+	advanced: {
+		cookiePrefix: "reloop",
+	},
 	plugins: [
 		adminClient({
 			ac: platformAc,

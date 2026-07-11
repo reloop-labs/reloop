@@ -1,5 +1,6 @@
 "use client";
 
+import { getAvatarGradient } from "@fe/dashboard/utils/avatar";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -7,7 +8,6 @@ import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
-import { getAvatarGradient } from "@fe/dashboard/utils/avatar";
 import axios from "axios";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -118,7 +118,7 @@ export const AccountProfilePicture = ({
 					className={cn(
 						"flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-full shadow-inner",
 						imageUrl || imagePreview
-							? "border border-stroke-sub-300 border-solid p-0 bg-background"
+							? "border border-stroke-sub-300 border-solid bg-background p-0"
 							: cn("border-none p-0", getAvatarGradient(email)),
 						isUploading && "cursor-wait opacity-50",
 						!isUploading && "cursor-pointer",
@@ -135,7 +135,7 @@ export const AccountProfilePicture = ({
 							className="h-full w-full rounded-full object-cover"
 						/>
 					) : (
-						<span className="font-semibold text-white text-2xl uppercase tracking-wide">
+						<span className="font-semibold text-2xl text-white uppercase tracking-wide">
 							{initials}
 						</span>
 					)}
