@@ -93,6 +93,11 @@ export const mainNavigation: MainNavigationItem[] = [
 			{ label: "Usage", path: "/settings/usage", iconName: "barchart" },
 		],
 	},
+	{
+		label: "Profile",
+		path: "/profile",
+		iconName: "user",
+	},
 ];
 
 export const userNavigation: MainNavigationItem[] = [

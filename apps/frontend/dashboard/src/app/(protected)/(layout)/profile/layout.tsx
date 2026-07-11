@@ -28,15 +28,15 @@ export default function WorkspaceLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="mx-auto max-w-4xl space-y-8 p-6 lg:p-8">
-			<div>
+		<div className="mx-auto max-w-3xl p-6 lg:p-8">
+			<div className="mb-6">
 				<p className="font-medium text-2xl">Profile</p>
 				<p className="text-paragraph-sm text-text-sub-600">
 					Manage your personal account and profile information.
 				</p>
 			</div>
 			<SettingsTabs />
-			<div className="w-full flex-1 pb-10">{children}</div>
+			<div className="w-full flex-1 mt-0 pb-10">{children}</div>
 		</div>
 	);
 }

@@ -99,7 +99,7 @@ const AccountPage = () => {
 	};
 
 	return (
-		<div className="w-full space-y-8 pt-5">
+		<div className="w-full space-y-6 pt-4">
 			<div>
 				<AccountHeader />
 				<form

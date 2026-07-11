@@ -4,7 +4,7 @@ import { ThemeToggleAppearance } from "./theme-toggle";
 
 const AppearancePage = () => {
 	return (
-		<div className="w-full space-y-8 pt-5">
+		<div className="w-full space-y-6 pt-4">
 			{/* Theme Section */}
 			<div>
 				<div className="mb-6">
