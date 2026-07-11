@@ -37,11 +37,13 @@ const agentAddressSchema = v.object({
 
 type AgentAddressFormValues = v.InferInput<typeof agentAddressSchema>;
 
-const isDomainReady = (d: Domain) =>
+const isVerifiedDomain = (d: Domain) => d.status === "active";
+
+const isSendReceiveReady = (d: Domain) =>
 	d.isSendingEmailEnabled && d.isReceivingEmailEnabled;
 
 const pickPreferredDomain = (domains: Domain[]) =>
-	domains.find(isDomainReady) ?? domains[0];
+	domains.find(isSendReceiveReady) ?? domains[0];
 
 export const AddAgentAddressModal = ({
 	isOpen,
@@ -59,7 +61,9 @@ export const AddAgentAddressModal = ({
 
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const [domainTriggerWidth, setDomainTriggerWidth] = useState<number>();
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const domainFieldRef = useRef<HTMLDivElement>(null);
 
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
@@ -68,7 +72,12 @@ export const AddAgentAddressModal = ({
 		"/api/domain/v1/list",
 	);
 	const domainsList = domainsData?.domains ?? [];
-	const hasNoDomains = domainsData !== undefined && domainsList.length === 0;
+	const verifiedDomains = useMemo(
+		() => domainsList.filter(isVerifiedDomain),
+		[domainsList],
+	);
+	const hasNoDomains =
+		domainsData !== undefined && verifiedDomains.length === 0;
 
 	const form = useForm<AgentAddressFormValues>({
 		resolver: valibotResolver(
@@ -83,10 +92,10 @@ export const AddAgentAddressModal = ({
 
 	const selectedDomainName = form.watch("domain");
 	const selectedDomain = useMemo(
-		() => domainsList.find((d) => d.domain === selectedDomainName),
-		[domainsList, selectedDomainName],
+		() => verifiedDomains.find((d) => d.domain === selectedDomainName),
+		[verifiedDomains, selectedDomainName],
 	);
-	const domainReady = selectedDomain ? isDomainReady(selectedDomain) : false;
+	const canCreate = selectedDomain ? isSendReceiveReady(selectedDomain) : false;
 
 	const missingCapabilities = useMemo(() => {
 		if (!selectedDomain) return [];
@@ -101,32 +110,38 @@ export const AddAgentAddressModal = ({
 		"mod+enter",
 		(e) => {
 			e.preventDefault();
-			if (!domainReady || isSubmitting) return;
+			if (!canCreate || isSubmitting) return;
 			form.handleSubmit(onSubmit)();
 		},
 		{ enableOnFormTags: ["INPUT"] },
 	);
 
 	useEffect(() => {
-		if (domainsList.length > 0 && !form.getValues("domain")) {
-			const preferred = pickPreferredDomain(domainsList);
+		if (verifiedDomains.length > 0 && !form.getValues("domain")) {
+			const preferred = pickPreferredDomain(verifiedDomains);
 			form.setValue("domain", preferred?.domain ?? "");
 		}
-	}, [domainsList, form]);
+	}, [verifiedDomains, form]);
 
 	// Reset state when modal is closed
 	useEffect(() => {
 		if (!isOpen) {
 			const timer = setTimeout(() => {
 				form.reset();
-				if (domainsList.length > 0) {
-					const preferred = pickPreferredDomain(domainsList);
+				if (verifiedDomains.length > 0) {
+					const preferred = pickPreferredDomain(verifiedDomains);
 					form.setValue("domain", preferred?.domain ?? "");
 				}
 			}, 300); // Wait for transition
 			return () => clearTimeout(timer);
 		}
-	}, [isOpen, form, domainsList]);
+	}, [isOpen, form, verifiedDomains]);
+
+	useEffect(() => {
+		if (!isDropdownOpen) return;
+		const width = domainFieldRef.current?.offsetWidth;
+		if (width) setDomainTriggerWidth(width);
+	}, [isDropdownOpen]);
 
 	const onSubmit = async (data: AgentAddressFormValues) => {
 		const email = `${data.localPart}@${data.domain}`;
@@ -137,13 +152,15 @@ export const AddAgentAddressModal = ({
 			return;
 		}
 
-		const selectedDomainObj = domainsList.find((d) => d.domain === data.domain);
+		const selectedDomainObj = verifiedDomains.find(
+			(d) => d.domain === data.domain,
+		);
 		if (!selectedDomainObj) {
 			toast.error("Please select a valid domain");
 			return;
 		}
 
-		if (!isDomainReady(selectedDomainObj)) {
+		if (!isSendReceiveReady(selectedDomainObj)) {
 			toast.error(
 				"Domain must have sending and receiving enabled to create a mailbox",
 			);
@@ -321,17 +338,17 @@ export const AddAgentAddressModal = ({
 									Email address
 									<span className="ml-0.5 text-error-base">*</span>
 								</label>
-								<div className="flex items-center gap-2">
+								<div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
 									<Input.Root
 										size="xsmall"
 										hasError={!!form.formState.errors.localPart}
-										className="flex-1 rounded-xl"
+										className="min-w-0 rounded-xl"
 									>
 										<Input.Wrapper>
 											<Input.Input
 												id="agent-email"
 												placeholder="support-agent"
-												className="min-w-0 flex-1"
+												className="min-w-0"
 												{...form.register("localPart")}
 												disabled={isSubmitting}
 											/>
@@ -345,91 +362,101 @@ export const AddAgentAddressModal = ({
 										@
 									</span>
 
-									<Input.Root
-										size="xsmall"
-										hasError={!!form.formState.errors.domain}
-										className={cn(
-											"flex-1 rounded-xl",
-											form.formState.errors.domain
-												? "focus-within:shadow-button-error-focus focus-within:before:ring-error-base"
-												: "focus-within:shadow-button-important-focus focus-within:before:ring-stroke-strong-950",
-										)}
-									>
-										<Input.Wrapper className="w-full">
-											<Dropdown.Root
-												open={isDropdownOpen}
-												onOpenChange={setIsDropdownOpen}
-											>
-												<Dropdown.Trigger asChild>
-													<button
-														type="button"
-														disabled={isSubmitting}
-														aria-label="Select domain"
-														className="group/trigger flex h-8 w-full items-center justify-between gap-1 bg-transparent p-0 text-left font-medium text-mail-foreground text-paragraph-sm outline-none ring-0 disabled:pointer-events-none disabled:opacity-50"
+									<div ref={domainFieldRef} className="min-w-0">
+										<Input.Root
+											size="xsmall"
+											hasError={!!form.formState.errors.domain}
+											className={cn(
+												"min-w-0 rounded-xl",
+												form.formState.errors.domain
+													? "focus-within:shadow-button-error-focus focus-within:before:ring-error-base"
+													: "focus-within:shadow-button-important-focus focus-within:before:ring-stroke-strong-950",
+											)}
+										>
+											<Input.Wrapper className="w-full">
+												<Dropdown.Root
+													open={isDropdownOpen}
+													onOpenChange={setIsDropdownOpen}
+												>
+													<Dropdown.Trigger asChild>
+														<button
+															type="button"
+															disabled={isSubmitting}
+															aria-label="Select domain"
+															className="group/trigger flex h-8 w-full items-center justify-between gap-1 bg-transparent p-0 text-left font-medium text-mail-foreground text-paragraph-sm outline-none ring-0 disabled:pointer-events-none disabled:opacity-50"
+														>
+															<span className="truncate">
+																{selectedDomainName || "domain"}
+															</span>
+															<Icon
+																name="chevron-down"
+																className={cn(
+																	"size-4 shrink-0 text-mail-muted transition duration-200 ease-out group-hover/trigger:text-mail-foreground group-data-[state=open]/trigger:rotate-180",
+																	isDropdownOpen &&
+																		"rotate-180 text-mail-foreground",
+																)}
+															/>
+														</button>
+													</Dropdown.Trigger>
+													<Dropdown.Content
+														align="end"
+														className="min-w-0 p-2"
+														style={
+															domainTriggerWidth
+																? { width: domainTriggerWidth }
+																: undefined
+														}
 													>
-														<span className="truncate">
-															{selectedDomainName || "domain"}
-														</span>
-														<Icon
-															name="chevron-down"
-															className={cn(
-																"size-4 shrink-0 text-mail-muted transition duration-200 ease-out group-hover/trigger:text-mail-foreground group-data-[state=open]/trigger:rotate-180",
-																isDropdownOpen &&
-																	"rotate-180 text-mail-foreground",
-															)}
-														/>
-													</button>
-												</Dropdown.Trigger>
-												<Dropdown.Content align="end" className="w-72 p-2">
-													<div className="relative max-h-80 overflow-y-auto">
-														{domainsList.map((d, idx) => {
-															const isSelected =
-																d.domain === selectedDomainName;
-															const ready = isDomainReady(d);
-															return (
-																<button
-																	key={d.id}
-																	ref={(el) => {
-																		if (el) buttonRefs.current[idx] = el;
-																	}}
-																	type="button"
-																	onPointerEnter={() => setHoverIdx(idx)}
-																	onPointerLeave={() => setHoverIdx(undefined)}
-																	onClick={() => {
-																		form.setValue("domain", d.domain);
-																		setIsDropdownOpen(false);
-																	}}
-																	className={cn(
-																		"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-xs transition-colors",
-																		"text-mail-foreground",
-																		isSelected && "bg-neutral-alpha-10",
-																		!currentRect &&
-																			hoverIdx === idx &&
-																			"bg-neutral-alpha-10",
-																		!ready && "opacity-80",
-																	)}
-																>
-																	<span className="truncate text-left font-medium">
-																		{d.domain}
-																	</span>
-																	{isSelected && (
-																		<Icon
-																			name="check"
-																			className="h-3.5 w-3.5 shrink-0 text-mail-foreground"
-																		/>
-																	)}
-																</button>
-															);
-														})}
-														<AnimatedHoverBackground
-															rect={currentRect}
-															tabElement={currentTab}
-														/>
-													</div>
-												</Dropdown.Content>
-											</Dropdown.Root>
-										</Input.Wrapper>
-									</Input.Root>
+														<div className="relative max-h-80 overflow-y-auto">
+															{verifiedDomains.map((d, idx) => {
+																const isSelected =
+																	d.domain === selectedDomainName;
+																return (
+																	<button
+																		key={d.id}
+																		ref={(el) => {
+																			if (el) buttonRefs.current[idx] = el;
+																		}}
+																		type="button"
+																		onPointerEnter={() => setHoverIdx(idx)}
+																		onPointerLeave={() =>
+																			setHoverIdx(undefined)
+																		}
+																		onClick={() => {
+																			form.setValue("domain", d.domain);
+																			setIsDropdownOpen(false);
+																		}}
+																		className={cn(
+																			"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-xs transition-colors",
+																			"text-mail-foreground",
+																			isSelected && "bg-neutral-alpha-10",
+																			!currentRect &&
+																				hoverIdx === idx &&
+																				"bg-neutral-alpha-10",
+																		)}
+																	>
+																		<span className="truncate text-left font-medium">
+																			{d.domain}
+																		</span>
+																		{isSelected && (
+																			<Icon
+																				name="check"
+																				className="h-3.5 w-3.5 shrink-0 text-mail-foreground"
+																			/>
+																		)}
+																	</button>
+																);
+															})}
+															<AnimatedHoverBackground
+																rect={currentRect}
+																tabElement={currentTab}
+															/>
+														</div>
+													</Dropdown.Content>
+												</Dropdown.Root>
+											</Input.Wrapper>
+										</Input.Root>
+									</div>
 								</div>
 								{(form.formState.errors.localPart ||
 									form.formState.errors.domain) && (
@@ -440,16 +467,7 @@ export const AddAgentAddressModal = ({
 								)}
 							</div>
 
-							{domainReady ? (
-								<div className="rounded-xl bg-offset-light/5 px-3 py-2.5 font-medium text-[12px] text-mail-muted">
-									<Icon
-										name="check-circle"
-										className="mr-1 inline h-3.5 w-3.5 text-success-base"
-									/>
-									Sending and receiving are enabled on this domain. Both are
-									required for an agent inbox.
-								</div>
-							) : (
+							{selectedDomain && !canCreate && (
 								<div className="rounded-xl border border-error-base/20 bg-error-base/5 px-3 py-2.5 font-medium text-[12px] text-mail-foreground">
 									<Icon
 										name="alert-circle"
@@ -461,7 +479,9 @@ export const AddAgentAddressModal = ({
 									<button
 										type="button"
 										className="relative z-10 inline cursor-pointer underline underline-offset-2 hover:opacity-80"
-										onClick={() => router.push(domainSettingsHref)}
+										onClick={() => {
+											router.push(domainSettingsHref);
+										}}
 									>
 										Domain settings
 									</button>
@@ -488,7 +508,7 @@ export const AddAgentAddressModal = ({
 									type="submit"
 									variant="neutral"
 									size="xsmall"
-									disabled={isSubmitting || !domainReady}
+									disabled={isSubmitting || !canCreate}
 								>
 									{isSubmitting ? (
 										<>
