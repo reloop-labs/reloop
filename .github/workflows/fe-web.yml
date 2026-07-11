@@ -38,5 +38,9 @@ jobs:
           file: ./apps/frontend/web/Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/fe-web:latest
-
+      - name: Trigger Coolify Deploy
+        if: github.event_name != 'pull_request'
+        run: |
+          curl --fail -i -X GET "https://coolify.reloop.sh/api/v1/deploy?uuid=CHANGE_ID&force=false" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"
 
