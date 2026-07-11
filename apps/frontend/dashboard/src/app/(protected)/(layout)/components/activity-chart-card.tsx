@@ -4,7 +4,7 @@ import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { Icon } from "@reloop/ui/icon";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
 	Area,
 	AreaChart,
@@ -27,10 +27,24 @@ interface EmailStatsResponse {
 
 export function ActivityChartCard() {
 	const { activeOrganization } = useUserOrganization();
-	const [isMounted, setIsMounted] = useState(false);
+	const chartContainerRef = useRef<HTMLDivElement>(null);
+	const [hasSize, setHasSize] = useState(false);
 
+	// Only render the chart once the container has real (non-zero) dimensions,
+	// otherwise recharts' ResponsiveContainer measures 0x0 and warns.
 	useEffect(() => {
-		setIsMounted(true);
+		const el = chartContainerRef.current;
+		if (!el) return;
+
+		const observer = new ResizeObserver((entries) => {
+			for (const entry of entries) {
+				const { width, height } = entry.contentRect;
+				setHasSize(width > 0 && height > 0);
+			}
+		});
+
+		observer.observe(el);
+		return () => observer.disconnect();
 	}, []);
 
 	// Date range for the 7-day activity graph
@@ -136,8 +150,8 @@ export function ActivityChartCard() {
 				</div>
 
 				{/* Area Chart Container */}
-				<div className="h-[150px] w-full">
-					{isMounted && (
+				<div ref={chartContainerRef} className="h-[150px] w-full">
+					{hasSize && (
 						<ResponsiveContainer width="100%" height="100%">
 							<AreaChart
 								data={chartData}

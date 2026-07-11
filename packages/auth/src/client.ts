@@ -12,7 +12,13 @@ import { ac, orgRoles } from "./permissions";
 import { platformAc, platformRoles } from "./platform-permissions";
 import type { AuthInstance } from "./server";
 
+const baseURL =
+	process.env.NEXT_PUBLIC_URL ||
+	process.env.NEXT_PUBLIC_APP_URL ||
+	"https://local.reloop.sh";
+
 export const authClient = createAuthClient({
+	baseURL,
 	basePath: "/api/auth/v1/",
 	plugins: [
 		adminClient({
