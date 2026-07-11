@@ -93,7 +93,7 @@ export async function checkRateLimit({
 }: {
 	headers: Headers;
 	activeOrganizationId: string;
-	userId: string;
+	userId?: string;
 	log: {
 		warn: (msg: string, meta?: Record<string, unknown>) => void;
 		error: (msg: string, meta?: Record<string, unknown>) => void;
@@ -125,18 +125,22 @@ export async function checkRateLimit({
 				windowSeconds: 86400, // 24 hours
 			},
 			{
-				name: "user",
-				key: `rl:send:user:${userId}`,
-				max: mailConfig.RATE_LIMIT_USER_MAX,
-				windowSeconds: mailConfig.RATE_LIMIT_USER_WINDOW_SECONDS,
-			},
-			{
 				name: "global",
 				key: "rl:send:global",
 				max: mailConfig.RATE_LIMIT_GLOBAL_MAX,
 				windowSeconds: mailConfig.RATE_LIMIT_GLOBAL_WINDOW_SECONDS,
 			},
 		];
+
+		// Per-user layer only when we have a real user (session/API key auth)
+		if (userId) {
+			layers.splice(3, 0, {
+				name: "user",
+				key: `rl:send:user:${userId}`,
+				max: mailConfig.RATE_LIMIT_USER_MAX,
+				windowSeconds: mailConfig.RATE_LIMIT_USER_WINDOW_SECONDS,
+			});
+		}
 
 		// Check all layers in parallel for efficiency
 		const results = await Promise.all(

@@ -59,9 +59,23 @@ export async function sendEmail(options: SendEmailOptions) {
 
 		return info;
 	} catch (error) {
+		const detail =
+			error instanceof Error
+				? {
+						message: error.message,
+						cause:
+							error.cause instanceof Error
+								? error.cause.message
+								: error.cause
+									? String(error.cause)
+									: undefined,
+					}
+				: { message: String(error) };
 		log.error({
-			error: error instanceof Error ? error.message : String(error),
+			error: detail.message,
+			cause: detail.cause,
 			to: options.to,
+			from: options.from,
 			message: "Failed to send email",
 		});
 		throw error;

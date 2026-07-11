@@ -277,7 +277,8 @@ kumo.on('http_message_generated', function(msg)
   local api_key = ""
   if type(http_auth) == "table" and http_auth.password then
     api_key = http_auth.password
-  elseif type(http_auth) == "string" and string.match(http_auth, "^rl_") then
+  elseif type(http_auth) == "string" and http_auth ~= "" then
+    -- Identity is the Basic-auth password: org API key (rl_...) or internal secret
     api_key = http_auth
   end
   apply_reloop_logic(msg, api_key)

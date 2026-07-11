@@ -94,11 +94,9 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 						log.set({
 							authType: "internal",
 							organizationId,
-							userId: "system",
 						});
 						log.info("Internal secret authentication successful");
 						return {
-							userId: "system",
 							organizationId,
 							authType: "internal" as const,
 							traceId,
