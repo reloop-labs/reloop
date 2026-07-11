@@ -99,9 +99,9 @@ function formatFailedRecords(names: string[]): string {
  * Normalize stored failure reasons (including legacy DKIM=false dumps) for display.
  */
 export const formatVerificationFailedReason = (reason: string): string => {
-	const legacyMatches = [...reason.matchAll(/([A-Z]+)=false/g)].map(
-		(match) => match[1],
-	);
+	const legacyMatches = [...reason.matchAll(/([A-Z]+)=false/g)]
+		.map((match) => match[1])
+		.filter((name): name is string => name !== undefined);
 	if (legacyMatches.length > 0) {
 		return formatFailedRecords(legacyMatches);
 	}
