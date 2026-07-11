@@ -93,7 +93,7 @@ export const UserDropdown = () => {
 							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(0)}
 							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => router.push("/settings")}
+							onClick={() => router.push("/profile")}
 						>
 							<Avatar.Root size="20" color="blue" className="shrink-0">
 								{user.image ? (
@@ -154,56 +154,30 @@ export const UserDropdown = () => {
 								<span>,</span>
 							</span>
 						</Dropdown.Item>
-						<Dropdown.Item
-							ref={(el) => {
-								if (el) itemRefs.current[4] = el;
-							}}
-							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-							onPointerEnter={() => setHoverIdx(4)}
-							onPointerLeave={() => setHoverIdx(undefined)}
-						>
-							<Icon name="question" className="h-4 w-4 text-text-sub-600" />
-							<span className="flex-1 truncate text-sm">Get help</span>
-						</Dropdown.Item>
 					</Dropdown.Group>
 
-					<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
-
-					<Dropdown.Group className="gap-0">
-						{canManageBilling && (
-							<Dropdown.Item
-								ref={(el) => {
-									if (el) itemRefs.current[5] = el;
-								}}
-								className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-								onPointerEnter={() => setHoverIdx(5)}
-								onPointerLeave={() => setHoverIdx(undefined)}
-								onClick={() => router.push("/settings/credits")}
-							>
-								<Icon
-									name="arrow-top-circle"
-									className="h-4 w-4 text-text-sub-600"
-								/>
-								<span className="flex-1 truncate text-sm">Manage credits</span>
-							</Dropdown.Item>
-						)}
-
-						<Dropdown.Item
-							ref={(el) => {
-								if (el) itemRefs.current[7] = el;
-							}}
-							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-							onPointerEnter={() => setHoverIdx(7)}
-							onPointerLeave={() => setHoverIdx(undefined)}
-						>
-							<Icon name="info-outline" className="h-4 w-4 text-text-sub-600" />
-							<span className="flex-1 truncate text-sm">Learn more</span>
-							<Icon
-								name="right"
-								className="h-3 w-3 text-text-soft-400 opacity-40"
-							/>
-						</Dropdown.Item>
-					</Dropdown.Group>
+					{canManageBilling && (
+						<>
+							<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+							<Dropdown.Group className="gap-0">
+								<Dropdown.Item
+									ref={(el) => {
+										if (el) itemRefs.current[5] = el;
+									}}
+									className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+									onPointerEnter={() => setHoverIdx(5)}
+									onPointerLeave={() => setHoverIdx(undefined)}
+									onClick={() => router.push("/settings/credits")}
+								>
+									<Icon
+										name="arrow-top-circle"
+										className="h-4 w-4 text-text-sub-600"
+									/>
+									<span className="flex-1 truncate text-sm">Manage credits</span>
+								</Dropdown.Item>
+							</Dropdown.Group>
+						</>
+					)}
 					<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 
 					<Dropdown.Group className="gap-0">

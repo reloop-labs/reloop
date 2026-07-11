@@ -98,22 +98,22 @@ export const mainNavigation: MainNavigationItem[] = [
 export const userNavigation: MainNavigationItem[] = [
 	{
 		label: "General",
-		path: "/settings",
+		path: "/profile",
 		iconName: "user",
 	},
 	{
 		label: "Team",
-		path: "/settings/team",
+		path: "/settings/members",
 		iconName: "gear",
 	},
 	{
 		label: "Security",
-		path: "/settings/security",
+		path: "/profile/security",
 		iconName: "shield-check",
 	},
 	{
 		label: "Appearance",
-		path: "/settings/appearance",
+		path: "/profile/appearance",
 		iconName: "swatch-book",
 	},
 	{

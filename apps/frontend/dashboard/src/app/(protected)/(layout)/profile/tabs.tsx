@@ -1,4 +1,10 @@
 "use client";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import {
+	getAvatarGradient,
+	getAvatarInitial,
+} from "@fe/dashboard/utils/avatar";
+import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
@@ -25,6 +31,7 @@ const list = [
 ];
 
 export const SettingsTabs = () => {
+	const { user } = useUserOrganization();
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const pathname = usePathname();
@@ -65,7 +72,26 @@ export const SettingsTabs = () => {
 							router.push(path);
 						}}
 					>
-						<Icon name={iconName} className="h-4 w-4" />
+						{title === "Profile" && user ? (
+							<Avatar.Root size="16" color="blue" className="shrink-0">
+								{user.image ? (
+									<Avatar.Image src={user.image} alt={user.name} />
+								) : (
+									<Avatar.Image asChild>
+										<div
+											className={cn(
+												"flex h-full w-full items-center justify-center rounded-full font-medium text-[7px] text-white uppercase tracking-wide",
+												getAvatarGradient(user.email),
+											)}
+										>
+											{getAvatarInitial(user.name, user.email)}
+										</div>
+									</Avatar.Image>
+								)}
+							</Avatar.Root>
+						) : (
+							<Icon name={iconName} className="h-4 w-4" />
+						)}
 						{title}
 					</TabMenuHorizontal.Trigger>
 				))}
