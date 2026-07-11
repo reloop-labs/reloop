@@ -100,17 +100,12 @@ export const mainNavigation: MainNavigationItem[] = [
 			{ label: "Members", path: "/settings/members", iconName: "users" },
 		],
 	},
-	{
-		label: "Profile",
-		path: "/profile",
-		iconName: "user",
-	},
 ];
 
 export const userNavigation: MainNavigationItem[] = [
 	{
 		label: "General",
-		path: "/profile",
+		path: "/settings/profile",
 		iconName: "user",
 	},
 	{
@@ -120,12 +115,12 @@ export const userNavigation: MainNavigationItem[] = [
 	},
 	{
 		label: "Security",
-		path: "/profile/security",
+		path: "/settings/security",
 		iconName: "shield-check",
 	},
 	{
 		label: "Appearance",
-		path: "/profile/appearance",
+		path: "/settings/theme",
 		iconName: "swatch-book",
 	},
 	{

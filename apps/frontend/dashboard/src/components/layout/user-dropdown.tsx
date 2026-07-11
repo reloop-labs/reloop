@@ -94,7 +94,7 @@ export const UserDropdown = () => {
 							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(0)}
 							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => router.push("/profile")}
+							onClick={() => router.push("/settings/profile")}
 						>
 							<Avatar.Root size="20" color="blue" className="shrink-0">
 								{user.image ? (

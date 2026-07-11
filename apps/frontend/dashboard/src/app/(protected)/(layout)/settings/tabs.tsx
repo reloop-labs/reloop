@@ -11,15 +11,30 @@ import { useMemo, useRef, useState } from "react";
 
 const list = [
 	{
+		title: "Workspace",
+		path: "/settings",
+		iconName: "gear",
+	},
+	{
 		title: "Members",
 		path: "/settings/members",
 		iconName: "users",
 		requiresTeamAdmin: true,
 	},
 	{
-		title: "Workspace",
-		path: "/settings",
-		iconName: "gear",
+		title: "Profile",
+		path: "/settings/profile",
+		iconName: "user",
+	},
+	{
+		title: "Theme",
+		path: "/settings/theme",
+		iconName: "swatch-book",
+	},
+	{
+		title: "Security",
+		path: "/settings/security",
+		iconName: "shield-check",
 	},
 ] as const;
 

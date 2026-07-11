@@ -8,7 +8,7 @@ import {
 	Safari,
 	Ubuntu,
 	Windows,
-} from "@fe/dashboard/app/(protected)/(layout)/profile/security/session-icons";
+} from "@fe/dashboard/app/(protected)/(layout)/settings/security/session-icons";
 import { Icon } from "@reloop/ui/icon";
 
 export interface Session {

@@ -28,11 +28,11 @@ export default function WorkspaceLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="mx-auto max-w-4xl space-y-8 p-6 lg:p-8">
-			<div>
+		<div className="mx-auto max-w-3xl p-6 lg:p-8">
+			<div className="mb-5">
 				<p className="font-medium text-2xl">Settings</p>
 				<p className="text-paragraph-sm text-text-sub-600">
-					Change the settings for your current workspace
+					Manage your personal profile, workspace settings, and team members.
 				</p>
 			</div>
 			<SettingsTabs />
