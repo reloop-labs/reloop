@@ -4,6 +4,7 @@ import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import Spinner from "@reloop/ui/spinner";
 import { format } from "date-fns";
 
 interface StatusTimelineProps {
@@ -122,22 +123,23 @@ export const StatusTimeline = ({ domain }: StatusTimelineProps) => {
 										)}
 									/>
 
-									<Icon
-										name={step.icon}
-										className={cn(
-											"relative z-10 h-5 w-5 transition-colors duration-300",
-											state === "active" && step.number !== 1
-												? "text-warning-base"
-												: state === "completed" && canShowSuccess
-													? "text-success-base"
-													: state === "failed"
-														? "text-error-base"
-														: "text-text-soft-400",
-											domain.status === "verifying" &&
-												step.number === 2 &&
-												"animate-spin",
-										)}
-									/>
+									{domain.status === "verifying" && step.number === 2 ? (
+										<Spinner size={20} color="currentColor" />
+									) : (
+										<Icon
+											name={step.icon}
+											className={cn(
+												"relative z-10 h-5 w-5 transition-colors duration-300",
+												state === "active" && step.number !== 1
+													? "text-warning-base"
+													: state === "completed" && canShowSuccess
+														? "text-success-base"
+														: state === "failed"
+															? "text-error-base"
+															: "text-text-soft-400",
+											)}
+										/>
+									)}
 								</div>
 
 								{/* Connector Line */}
