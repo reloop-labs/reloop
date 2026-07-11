@@ -30,6 +30,11 @@ export async function verifyDNSRecordController({
 			organizationId,
 			domainName: domainWithRecords.domain,
 			previousStatus: domainWithRecords.status,
+			previousUserVerifiedDomain: domainWithRecords.userVerifiedDomain,
+			previousDnsStatuses: domainWithRecords.dnsRecords.map((r) => ({
+				id: r.id,
+				status: r.status,
+			})),
 		});
 
 		log.info("Domain verification started successfully");

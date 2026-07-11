@@ -18,13 +18,17 @@ export const useDomainActions = (
 
 		setIsVerifying(true);
 		try {
-			// Trigger Inngest workflow for background verification
+			// Trigger background verification
 			await axios.post(`/api/domain/v1/verify/${domainId}`, undefined, {
 				headers: { credentials: "include" },
 			});
 
-			// Refresh domain data to get "verifying" status
+			// Refresh domain detail and list caches
 			await mutate(`/api/domain/v1/${domainId}`);
+			await mutate(
+				(key) =>
+					typeof key === "string" && key.startsWith("/api/domain/v1/list"),
+			);
 
 			toast.success(
 				"DNS verification started! Verification will continue in the background.",

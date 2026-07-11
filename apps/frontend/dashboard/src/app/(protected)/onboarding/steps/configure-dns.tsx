@@ -51,6 +51,10 @@ export const ConfigureDnsStep = () => {
 				headers: { credentials: "include" },
 			});
 			await mutate(`/api/domain/v1/${domainId}`);
+			await mutate(
+				(key) =>
+					typeof key === "string" && key.startsWith("/api/domain/v1/list"),
+			);
 			toast.success(
 				"DNS verification started! Verification will continue in the background.",
 			);

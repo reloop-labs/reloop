@@ -5,10 +5,31 @@ import {
 	verifyMxRecord,
 	verifySpfRecord,
 } from "@be/workflow/utils/verify-dns-records";
+import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";
+
+function buildFailureReason(checks: Record<string, boolean>): string {
+	return Object.entries(checks)
+		.map(([name, ok]) => `${name}=${ok}`)
+		.join(" ");
+}
+
+async function markDomainFailed(
+	domainId: string,
+	reason: string,
+): Promise<void> {
+	await db
+		.update(schema.domain)
+		.set({
+			status: "failed",
+			systemVerified: false,
+			verificationFailedReason: reason,
+		})
+		.where(eq(schema.domain.id, domainId));
+}
 
 export async function processDomainVerification({
 	domainId,
@@ -54,10 +75,7 @@ export async function processDomainVerification({
 			message: "Missing mandatory DKIM record for verification",
 			domainId,
 		});
-		await db
-			.update(schema.domain)
-			.set({ status: "failed" })
-			.where(eq(schema.domain.id, domainId));
+		await markDomainFailed(domainId, "Missing mandatory DKIM record");
 		return;
 	}
 
@@ -78,15 +96,22 @@ export async function processDomainVerification({
 		: undefined;
 
 	if (isSendingEnabled && (!spfRecord || !dmarcRecord || !sendingMxRecord)) {
+		const missing = [
+			!spfRecord && "SPF",
+			!dmarcRecord && "DMARC",
+			!sendingMxRecord && "sending MX",
+		]
+			.filter(Boolean)
+			.join(", ");
 		log.warn({
 			message:
 				"Missing SPF, DMARC, or sending MX record when sending is enabled",
 			domainId,
 		});
-		await db
-			.update(schema.domain)
-			.set({ status: "failed" })
-			.where(eq(schema.domain.id, domainId));
+		await markDomainFailed(
+			domainId,
+			`Missing required records when sending is enabled: ${missing}`,
+		);
 		return;
 	}
 
@@ -104,10 +129,10 @@ export async function processDomainVerification({
 			message: "Missing receiving MX record when receiving is enabled",
 			domainId,
 		});
-		await db
-			.update(schema.domain)
-			.set({ status: "failed" })
-			.where(eq(schema.domain.id, domainId));
+		await markDomainFailed(
+			domainId,
+			"Missing receiving MX record when receiving is enabled",
+		);
 		return;
 	}
 
@@ -124,10 +149,10 @@ export async function processDomainVerification({
 			message: "Missing CNAME record when tracking is enabled",
 			domainId,
 		});
-		await db
-			.update(schema.domain)
-			.set({ status: "failed" })
-			.where(eq(schema.domain.id, domainId));
+		await markDomainFailed(
+			domainId,
+			"Missing CNAME record when tracking is enabled",
+		);
 		return;
 	}
 
@@ -244,23 +269,48 @@ export async function processDomainVerification({
 	]);
 
 	const allPassed = dkimOk && spfOk && dmarcOk && mxOk && cnameOk;
+	const failureReason = buildFailureReason({
+		DKIM: dkimOk,
+		SPF: spfOk,
+		DMARC: dmarcOk,
+		MX: mxOk,
+		CNAME: cnameOk,
+	});
 
-	if (allPassed || isLastAttempt) {
-		const newDomainStatus = allPassed ? "active" : "failed";
-
+	if (allPassed) {
 		await db
 			.update(schema.domain)
 			.set({
-				status: newDomainStatus,
-				systemVerified: allPassed,
+				status: "active",
+				systemVerified: true,
+				userVerifiedDomain: true,
+				lastVerifiedAt: new Date(),
+				verificationFailedReason: null,
 				isTrackingDomain: cnameOk && isTrackingEnabled,
 			})
 			.where(eq(schema.domain.id, domainId));
+
+		await bus.publish(BusEvent.DOMAIN_VERIFIED, {
+			domainId,
+			domain: domainName,
+			organizationId,
+		});
+
+		log.info({ message: "Domain verified successfully", domainId, domainName });
+		return;
 	}
 
-	if (allPassed) {
-		log.info({ message: "Domain verified successfully", domainId, domainName });
-	} else {
+	if (isLastAttempt) {
+		await db
+			.update(schema.domain)
+			.set({
+				status: "failed",
+				systemVerified: false,
+				verificationFailedReason: failureReason,
+				isTrackingDomain: false,
+			})
+			.where(eq(schema.domain.id, domainId));
+
 		log.warn({
 			message:
 				"Domain verification failed — one or more DNS records did not match",
@@ -272,9 +322,23 @@ export async function processDomainVerification({
 			mxOk,
 			cnameOk,
 		});
-
-		throw new Error(
-			`Verification failed for ${domainName}: DKIM=${dkimOk} SPF=${spfOk} DMARC=${dmarcOk} MX=${mxOk} CNAME=${cnameOk}`,
-		);
+		// Do not throw after final failure write — status is already persisted
+		return;
 	}
+
+	log.warn({
+		message:
+			"Domain verification failed — one or more DNS records did not match",
+		domainId,
+		domainName,
+		dkimOk,
+		spfOk,
+		dmarcOk,
+		mxOk,
+		cnameOk,
+	});
+
+	throw new Error(
+		`Verification failed for ${domainName}: ${failureReason}`,
+	);
 }

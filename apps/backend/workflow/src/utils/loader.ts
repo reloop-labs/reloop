@@ -30,6 +30,21 @@ export const loader = async () => {
 					message: "Received domain verification request via NATS",
 					domainId: payload.domainId,
 				});
+				const jobId = `verify-domain-${payload.domainId}`;
+				const existing = await workflowQueue.getJob(jobId);
+				if (existing) {
+					const state = await existing.getState();
+					if (state === "completed" || state === "failed") {
+						await existing.remove();
+					} else {
+						log.info({
+							message: "Domain verification job already in progress",
+							domainId: payload.domainId,
+							state,
+						});
+						return;
+					}
+				}
 				await workflowQueue.add(
 					"verify-domain",
 					{
@@ -38,7 +53,7 @@ export const loader = async () => {
 						type: "verify-domain",
 						payload: { domain: payload.domain },
 					},
-					{ jobId: `verify-domain-${payload.domainId}-${Date.now()}` },
+					{ jobId },
 				);
 			},
 		);

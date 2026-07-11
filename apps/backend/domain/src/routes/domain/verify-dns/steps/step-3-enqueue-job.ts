@@ -12,11 +12,15 @@ export async function enqueueVerificationJob_step3({
 	organizationId,
 	domainName,
 	previousStatus,
+	previousUserVerifiedDomain,
+	previousDnsStatuses,
 }: {
 	domainId: string;
 	organizationId: string;
 	domainName: string;
 	previousStatus: DomainStatus;
+	previousUserVerifiedDomain: boolean;
+	previousDnsStatuses: { id: string; status: DomainStatus }[];
 }) {
 	const log = useLogger();
 
@@ -33,8 +37,20 @@ export async function enqueueVerificationJob_step3({
 		log.error("Failed to publish domain verification request");
 		await db
 			.update(schema.domain)
-			.set({ status: previousStatus })
+			.set({
+				status: previousStatus,
+				userVerifiedDomain: previousUserVerifiedDomain,
+			})
 			.where(eq(schema.domain.id, domainId));
+
+		await Promise.all(
+			previousDnsStatuses.map((record) =>
+				db
+					.update(schema.domainDnsRecord)
+					.set({ status: record.status })
+					.where(eq(schema.domainDnsRecord.id, record.id)),
+			),
+		);
 
 		throw DomainErrors.verificationFailed(
 			domainName,

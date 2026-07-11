@@ -17,7 +17,7 @@ export async function updateStatusToVerifying_step2({
 	log.info("Updating domain status to verifying");
 	await db
 		.update(schema.domain)
-		.set({ status: "verifying" })
+		.set({ status: "verifying", userVerifiedDomain: true })
 		.where(eq(schema.domain.id, domainId));
 
 	log.info(

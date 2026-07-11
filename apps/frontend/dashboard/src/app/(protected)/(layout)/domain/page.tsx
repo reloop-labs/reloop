@@ -42,6 +42,8 @@ const DomainPage = () => {
 		{
 			revalidateOnFocus: true,
 			revalidateOnReconnect: true,
+			refreshInterval: (latest) =>
+				latest?.domains?.some((d) => d.status === "verifying") ? 3000 : 0,
 		},
 	);
 

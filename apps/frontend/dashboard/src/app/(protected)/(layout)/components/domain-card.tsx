@@ -354,6 +354,10 @@ export function DomainCard() {
 		activeOrganization?.id
 			? `/api/domain/v1/list?limit=5&page=1${statusFilter ? `&status=${statusFilter}` : ""}`
 			: null,
+		{
+			refreshInterval: (latest) =>
+				latest?.domains?.some((d) => d.status === "verifying") ? 3000 : 0,
+		},
 	);
 
 	const [_, setDeleteId] = useQueryState("delete");
