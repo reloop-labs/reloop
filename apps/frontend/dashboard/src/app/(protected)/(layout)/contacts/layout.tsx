@@ -100,7 +100,7 @@ const ContactsLayout = ({ children }: { children: React.ReactNode }) => {
 
 	return (
 		<>
-			<div className="mx-auto max-w-4xl space-y-8 p-6 lg:p-8">
+			<div className="mx-auto max-w-3xl space-y-8 p-6 lg:p-8">
 				{!isDetailPage && (
 					<div className="flex items-center justify-between pb-6">
 						<div className="flex flex-col gap-1">
