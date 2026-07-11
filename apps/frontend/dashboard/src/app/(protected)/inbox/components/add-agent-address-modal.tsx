@@ -22,15 +22,30 @@ import * as v from "valibot";
 import type { AgentMailbox } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
 
+/** RFC 5321/5322 unquoted local-part (dot-atom), max 64 chars */
+const EMAIL_LOCAL_PART_REGEX =
+	/^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*$/;
+
 const agentAddressSchema = v.object({
 	label: v.pipe(v.string(), v.minLength(1, "Agent name is required")),
 	localPart: v.pipe(
 		v.string(),
+		v.trim(),
 		v.minLength(1, "Email prefix is required"),
-		v.regex(
-			/^[a-z0-9][a-z0-9-]*[a-z0-9]$/i,
-			"Use letters, numbers, and hyphens only",
+		v.maxLength(64, "Email prefix must be 64 characters or fewer"),
+		v.check(
+			(val) => !/\s/.test(val),
+			"Email prefix can't contain spaces",
 		),
+		v.check(
+			(val) => !val.startsWith(".") && !val.endsWith("."),
+			"Email prefix can't start or end with a dot",
+		),
+		v.check(
+			(val) => !val.includes(".."),
+			"Email prefix can't contain consecutive dots",
+		),
+		v.regex(EMAIL_LOCAL_PART_REGEX, "Enter a valid email prefix"),
 	),
 	domain: v.pipe(v.string(), v.minLength(1, "Select a domain")),
 });
@@ -233,7 +248,7 @@ export const AddAgentAddressModal = ({
 								<button
 									type="button"
 									onClick={onClose}
-									className="flex h-7 w-7 items-center justify-center rounded-lg border border-mail-border/60 bg-transparent text-mail-muted transition-all hover:bg-[var(--inbox-hover)] active:scale-[0.95]"
+									className="flex h-7 w-7 items-center justify-center rounded-lg bg-transparent text-mail-muted transition-all hover:bg-[var(--inbox-hover)] active:scale-[0.95]"
 								>
 									<Icon name="cross" className="h-3.5 w-3.5" />
 								</button>
@@ -284,7 +299,7 @@ export const AddAgentAddressModal = ({
 								<button
 									type="button"
 									onClick={onClose}
-									className="flex h-7 w-7 items-center justify-center rounded-lg border border-mail-border/60 bg-transparent text-mail-muted transition-all hover:bg-[var(--inbox-hover)] active:scale-[0.95]"
+									className="flex h-7 w-7 items-center justify-center rounded-lg bg-transparent text-mail-muted transition-all hover:bg-[var(--inbox-hover)] active:scale-[0.95]"
 								>
 									<Icon name="cross" className="h-3.5 w-3.5" />
 								</button>
@@ -341,6 +356,9 @@ export const AddAgentAddressModal = ({
 												id="agent-email"
 												placeholder="support-agent"
 												className="min-w-0"
+												autoComplete="off"
+												spellCheck={false}
+												maxLength={64}
 												{...form.register("localPart")}
 												disabled={isSubmitting}
 											/>
