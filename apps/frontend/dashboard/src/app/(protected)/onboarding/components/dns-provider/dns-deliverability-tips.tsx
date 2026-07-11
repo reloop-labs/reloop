@@ -41,7 +41,7 @@ const TIPS_DATA: TipItem[] = [
 		description: "Use mail-tester.com to catch issues early.",
 		details:
 			"Send a test email to mail-tester.com — it checks SPF, DKIM, DMARC, and blacklist status before you go live.",
-		icon: "barchart",
+		icon: "doughnut",
 		iconBg: "bg-[#FEF3F2]",
 		iconColor: "text-[#F04438]",
 	},

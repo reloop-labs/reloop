@@ -85,12 +85,12 @@ export const mainNavigation: MainNavigationItem[] = [
 	{
 		label: "Integrations",
 		path: "/integrations",
-		iconName: "webhook",
+		iconName: "integration",
 	},
 	{
 		label: "Usage & Credits",
 		path: "/credits",
-		iconName: "barchart",
+		iconName: "doughnut",
 	},
 	{
 		label: "Settings",
