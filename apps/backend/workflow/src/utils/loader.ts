@@ -1,3 +1,8 @@
+import {
+	DOMAIN_VERIFY_ATTEMPTS,
+	DOMAIN_VERIFY_BACKOFF_TYPE,
+	DOMAIN_VERIFY_INITIAL_DELAY_MS,
+} from "@be/workflow/queues/domain-verify-schedule";
 import { workflowQueue } from "@be/workflow/queues/workflow.queue";
 import { startWorkflowWorker } from "@be/workflow/queues/workflow.worker";
 import { initWebhookSubscribers } from "@be/workflow/subscribers/webhook.subscriber";
@@ -53,7 +58,12 @@ export const loader = async () => {
 						type: "verify-domain",
 						payload: { domain: payload.domain },
 					},
-					{ jobId },
+					{
+						jobId,
+						delay: DOMAIN_VERIFY_INITIAL_DELAY_MS,
+						attempts: DOMAIN_VERIFY_ATTEMPTS,
+						backoff: { type: DOMAIN_VERIFY_BACKOFF_TYPE },
+					},
 				);
 			},
 		);

@@ -1,5 +1,9 @@
 import { processDomainVerification } from "@be/workflow/handlers/domain-verification.handler";
 import { processWebhookDelivery } from "@be/workflow/handlers/webhook-delivery.handler";
+import {
+	DOMAIN_VERIFY_BACKOFF_TYPE,
+	getDomainVerifyBackoffDelay,
+} from "@be/workflow/queues/domain-verify-schedule";
 import { workflowConfig } from "@be/workflow/workflow.config";
 import { type Job, Worker } from "bullmq";
 import { log } from "evlog";
@@ -58,6 +62,15 @@ export function startWorkflowWorker(): Worker {
 		{
 			connection,
 			concurrency: 5,
+			settings: {
+				backoffStrategy: (attemptsMade, type) => {
+					if (type === DOMAIN_VERIFY_BACKOFF_TYPE) {
+						return getDomainVerifyBackoffDelay(attemptsMade);
+					}
+					// Built-in exponential/fixed strategies are used for other types.
+					return 0;
+				},
+			},
 		},
 	);
 
