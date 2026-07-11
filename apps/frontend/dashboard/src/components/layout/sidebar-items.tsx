@@ -76,7 +76,9 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 	const activeSubInfo = navigation
 		.map((item, _mainIndex) => {
 			const subIndex = item.items?.findIndex((sub) =>
-				pathWithoutSlug.startsWith(sub.path),
+				sub.path === "/settings"
+					? pathWithoutSlug === "/settings"
+					: pathWithoutSlug.startsWith(sub.path),
 			);
 			if (subIndex !== undefined && subIndex !== -1) {
 				return { mainPath: item.path, subIndex };
@@ -204,8 +206,9 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 													{ label: subLabel, path: subPath, iconName: subIcon },
 													subIndex,
 												) => {
-													const isSubActive =
-														pathWithoutSlug.startsWith(subPath);
+													const isSubActive = subPath === "/settings"
+														? pathWithoutSlug === "/settings"
+														: pathWithoutSlug.startsWith(subPath);
 													return (
 														<Link
 															key={subPath}

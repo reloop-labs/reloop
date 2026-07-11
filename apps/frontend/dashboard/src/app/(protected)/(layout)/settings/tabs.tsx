@@ -7,8 +7,6 @@ import { AnimatePresence, motion } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 
-
-
 const list = [
 	{
 		title: "Workspace",
@@ -27,14 +25,14 @@ const list = [
 		iconName: "user",
 	},
 	{
-		title: "Theme",
-		path: "/settings/theme",
-		iconName: "swatch-book",
-	},
-	{
 		title: "Security",
 		path: "/settings/security",
 		iconName: "shield-check",
+	},
+	{
+		title: "Theme",
+		path: "/settings/theme",
+		iconName: "swatch-book",
 	},
 ] as const;
 
