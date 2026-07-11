@@ -7,12 +7,9 @@ import { AnimatePresence, motion } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 
+
+
 const list = [
-	{
-		title: "Workspace",
-		path: "/settings",
-		iconName: "gear",
-	},
 	{
 		title: "Members",
 		path: "/settings/members",
@@ -20,25 +17,9 @@ const list = [
 		requiresTeamAdmin: true,
 	},
 	{
-		title: "SMTP",
-		path: "/settings/smtp",
-		iconName: "mail-single",
-	},
-	{
-		title: "Integration",
-		path: "/settings/integrations",
-		iconName: "webhook",
-	},
-	{
-		title: "Credits",
-		path: "/settings/credits",
-		iconName: "invoice",
-		requiresBillingAdmin: true,
-	},
-	{
-		title: "Usage",
-		path: "/settings/usage",
-		iconName: "barchart",
+		title: "Workspace",
+		path: "/settings",
+		iconName: "gear",
 	},
 ] as const;
 

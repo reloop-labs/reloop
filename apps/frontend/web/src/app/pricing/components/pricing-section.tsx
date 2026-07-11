@@ -62,14 +62,28 @@ function PlanCtaLink({
 	);
 }
 
-function PlanColumn({ plan }: { plan: (typeof pricingPlans)[number] }) {
+function PlanColumn({
+	plan,
+	index,
+}: {
+	plan: (typeof pricingPlans)[number];
+	index: number;
+}) {
 	const price = getPlanPrice(plan);
 	const isCustom = price === null;
+
+	const borderClasses = [
+		"border-b sm:border-r sm:border-b lg:border-r lg:border-b-0",
+		"border-b sm:border-r-0 sm:border-b lg:border-r lg:border-b-0",
+		"border-b sm:border-r sm:border-b-0 lg:border-r lg:border-b-0",
+		"border-b-0 sm:border-b-0 sm:border-r-0 lg:border-r-0 lg:border-b-0",
+	][index];
 
 	return (
 		<div
 			className={cn(
-				"flex min-h-[640px] flex-col border-stroke-soft-200 border-r border-b p-8 sm:min-h-[680px] lg:p-10 dark:border-white/10",
+				"flex min-h-[640px] flex-col border-stroke-soft-200 p-8 sm:min-h-[680px] lg:p-10 dark:border-white/10",
+				borderClasses,
 				plan.highlighted && "bg-bg-weak-50 dark:bg-white/[0.03]",
 			)}
 		>
@@ -266,12 +280,11 @@ function ComparisonTable() {
 export function PricingSection() {
 	return (
 		<>
-			<div className="overflow-hidden rounded-4xl border-stroke-soft-200 border-t border-l sm:grid sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
-				{pricingPlans.map((plan) => (
-					<PlanColumn key={plan.id} plan={plan} />
+			<div className="overflow-hidden rounded-4xl border border-stroke-soft-200 sm:grid sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
+				{pricingPlans.map((plan, index) => (
+					<PlanColumn key={plan.id} plan={plan} index={index} />
 				))}
 			</div>
-
 			<div className="mt-24">
 				<ComparisonTable />
 			</div>

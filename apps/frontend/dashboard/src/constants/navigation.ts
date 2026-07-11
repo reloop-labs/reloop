@@ -78,19 +78,26 @@ export const mainNavigation: MainNavigationItem[] = [
 		iconName: "workflow",
 	},
 	{
+		label: "SMTP",
+		path: "/smtp",
+		iconName: "mail-single",
+	},
+	{
+		label: "Integrations",
+		path: "/integrations",
+		iconName: "webhook",
+	},
+	{
+		label: "Usage & Credits",
+		path: "/credits",
+		iconName: "barchart",
+	},
+	{
 		label: "Settings",
 		path: "/settings",
 		iconName: "gear",
 		items: [
 			{ label: "Members", path: "/settings/members", iconName: "users" },
-			{ label: "SMTP", path: "/settings/smtp", iconName: "mail-single" },
-			{
-				label: "Integrations",
-				path: "/settings/integrations",
-				iconName: "webhook",
-			},
-			{ label: "Credits", path: "/settings/credits", iconName: "invoice" },
-			{ label: "Usage", path: "/settings/usage", iconName: "barchart" },
 		],
 	},
 	{

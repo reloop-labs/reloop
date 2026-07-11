@@ -32,17 +32,21 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 
 	const navigation = useMemo(
 		() =>
-			mainNavigation.map((item) => {
-				if (item.path !== "/settings" || !item.items) return item;
-				return {
-					...item,
-					items: item.items.filter((sub) => {
-						if (sub.path === "/settings/members") return canManageTeam;
-						if (sub.path === "/settings/credits") return canManageBilling;
-						return true;
-					}),
-				};
-			}),
+			mainNavigation
+				.filter((item) => {
+					if (item.path === "/credits") return canManageBilling;
+					return true;
+				})
+				.map((item) => {
+					if (item.path !== "/settings" || !item.items) return item;
+					return {
+						...item,
+						items: item.items.filter((sub) => {
+							if (sub.path === "/settings/members") return canManageTeam;
+							return true;
+						}),
+					};
+				}),
 		[canManageTeam, canManageBilling],
 	);
 

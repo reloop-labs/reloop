@@ -234,7 +234,7 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 								className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 								onPointerEnter={() => setHoverIdx(5)}
 								onPointerLeave={() => setHoverIdx(undefined)}
-								onClick={() => router.push("/settings/credits")}
+								onClick={() => router.push("/credits")}
 							>
 								<Icon
 									name="arrow-top-circle"
