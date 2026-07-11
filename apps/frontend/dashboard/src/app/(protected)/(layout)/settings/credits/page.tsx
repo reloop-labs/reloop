@@ -93,9 +93,7 @@ const CreditsPage = () => {
 		data: planData,
 		isLoading: planLoading,
 		error: planError,
-	} = useSWR<PlanData>(
-		canManageBilling ? "/api/credits/v1/plan" : null,
-	);
+	} = useSWR<PlanData>(canManageBilling ? "/api/credits/v1/plan" : null);
 	const {
 		data: transactions,
 		isLoading: transactionsLoading,

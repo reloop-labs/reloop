@@ -1,9 +1,5 @@
 import { db } from "@reloop/db/client";
-import {
-	supportConversation,
-	supportMessage,
-	user,
-} from "@reloop/db/schema";
+import { supportConversation, supportMessage, user } from "@reloop/db/schema";
 import { and, count, desc, eq, gt, sql } from "drizzle-orm";
 import { createError } from "evlog";
 
@@ -101,9 +97,7 @@ async function mapConversation(
 	row: ConversationRow,
 	isPlatformAdmin: boolean,
 ): Promise<SupportConversationDto> {
-	const lastReadAt = isPlatformAdmin
-		? row.adminLastReadAt
-		: row.userLastReadAt;
+	const lastReadAt = isPlatformAdmin ? row.adminLastReadAt : row.userLastReadAt;
 	const unreadCount = await countUnreadForConversation(
 		row.id,
 		isPlatformAdmin,
@@ -269,9 +263,7 @@ export async function getOrCreateMyConversationController(input: {
 	};
 }
 
-export async function getMyConversationController(input: {
-	userId: string;
-}) {
+export async function getMyConversationController(input: { userId: string }) {
 	const [existing] = await db
 		.select(conversationSelect)
 		.from(supportConversation)

@@ -77,8 +77,7 @@ export const SignupInviteEmail = ({
 							className={cls.heading}
 							style={{ fontFamily: "Georgia, serif" }}
 						>
-							You're invited to join{" "}
-							<span className="font-bold">Reloop.</span>
+							You're invited to join <span className="font-bold">Reloop.</span>
 						</Heading>
 
 						<Hr className={cls.hr} />
@@ -96,8 +95,7 @@ export const SignupInviteEmail = ({
 
 						{inviteCode && (
 							<Text className={cls.bodyText}>
-								Your invite code:{" "}
-								<span className={cls.code}>{inviteCode}</span>
+								Your invite code: <span className={cls.code}>{inviteCode}</span>
 							</Text>
 						)}
 

@@ -86,7 +86,8 @@ export async function updateDomainController({
 			body.sending_email !== undefined || body.receiving_email !== undefined;
 		const trackingEnabled = clickTracking || openTracking;
 		const trackingTurnedOn =
-			(body.click_tracking === true && !existingDomain.isClickTrackingEnabled) ||
+			(body.click_tracking === true &&
+				!existingDomain.isClickTrackingEnabled) ||
 			(body.open_tracking === true && !existingDomain.isOpenTrackingEnabled);
 		const shouldReverify =
 			emailFeaturesChanged || (trackingEnabled && trackingTurnedOn);

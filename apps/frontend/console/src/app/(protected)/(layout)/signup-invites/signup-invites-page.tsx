@@ -64,8 +64,8 @@ export default function SignupInvitesPage() {
 			mutate();
 		} catch (err) {
 			const message =
-				(err as { response?: { data?: { message?: string } } })?.response
-					?.data?.message ||
+				(err as { response?: { data?: { message?: string } } })?.response?.data
+					?.message ||
 				(err instanceof Error ? err.message : "Failed to send invite");
 			toast.error(message);
 		} finally {

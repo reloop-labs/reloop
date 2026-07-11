@@ -7,11 +7,11 @@ import { useRouter } from "next/navigation";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { SignupForm } from "./signup-form";
-import { SignupInviteGate } from "./signup-invite-gate";
 import {
 	fetchSignupInviteStatus,
 	validateSignupInviteCode,
 } from "./signup-invite";
+import { SignupInviteGate } from "./signup-invite-gate";
 import { SocialSignup } from "./social-signup";
 import { VerifyOTP } from "./verify-otp";
 

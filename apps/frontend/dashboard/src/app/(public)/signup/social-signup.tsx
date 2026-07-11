@@ -53,7 +53,9 @@ export function SocialSignup({
 			{lockedEmail && (
 				<p className="pb-3 text-center text-[12px] text-text-sub-600">
 					Sign up with the invited email:{" "}
-					<span className="font-medium text-text-strong-950">{lockedEmail}</span>
+					<span className="font-medium text-text-strong-950">
+						{lockedEmail}
+					</span>
 				</p>
 			)}
 			<div className="grid grid-cols-1 gap-2">

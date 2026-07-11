@@ -129,9 +129,7 @@ export const supportRoute = new Elysia({ prefix: "/support" })
 				limit: t.Optional(t.Numeric({ default: 50, minimum: 1, maximum: 200 })),
 				offset: t.Optional(t.Numeric({ default: 0, minimum: 0 })),
 				q: t.Optional(t.String()),
-				status: t.Optional(
-					t.Union([t.Literal("open"), t.Literal("closed")]),
-				),
+				status: t.Optional(t.Union([t.Literal("open"), t.Literal("closed")])),
 			}),
 			response: {
 				200: AdminModel.supportConversationsResponse,

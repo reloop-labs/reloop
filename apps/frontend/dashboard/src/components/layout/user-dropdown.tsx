@@ -1,7 +1,7 @@
 "use client";
 
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import {
 	getAvatarGradient,
 	getAvatarInitial,

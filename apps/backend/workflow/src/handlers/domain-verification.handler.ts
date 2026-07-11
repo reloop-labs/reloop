@@ -350,7 +350,5 @@ export async function processDomainVerification({
 		cnameOk,
 	});
 
-	throw new Error(
-		`Verification failed for ${domainName}: ${failureReason}`,
-	);
+	throw new Error(`Verification failed for ${domainName}: ${failureReason}`);
 }

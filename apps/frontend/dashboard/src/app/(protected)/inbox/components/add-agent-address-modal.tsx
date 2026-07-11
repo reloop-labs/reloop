@@ -43,26 +43,6 @@ const isDomainReady = (d: Domain) =>
 const pickPreferredDomain = (domains: Domain[]) =>
 	domains.find(isDomainReady) ?? domains[0];
 
-const DomainCapabilityHint = ({
-	sending,
-	receiving,
-}: {
-	sending: boolean;
-	receiving: boolean;
-}) => (
-	<span className="flex shrink-0 items-center gap-1.5 font-medium text-[10px]">
-		<span className={cn(sending ? "text-success-base" : "text-mail-muted/60")}>
-			Send{sending ? "" : " off"}
-		</span>
-		<span className="text-mail-muted/40">·</span>
-		<span
-			className={cn(receiving ? "text-success-base" : "text-mail-muted/60")}
-		>
-			Receive{receiving ? "" : " off"}
-		</span>
-	</span>
-);
-
 export const AddAgentAddressModal = ({
 	isOpen,
 	onClose,
@@ -341,107 +321,116 @@ export const AddAgentAddressModal = ({
 									Email address
 									<span className="ml-0.5 text-error-base">*</span>
 								</label>
-								<Input.Root
-									size="xsmall"
-									hasError={
-										!!form.formState.errors.localPart ||
-										!!form.formState.errors.domain
-									}
-									className="rounded-xl"
-								>
-									<Input.Wrapper className="gap-0">
-										<Input.Input
-											id="agent-email"
-											placeholder="support-agent"
-											className="min-w-0 flex-1"
-											{...form.register("localPart")}
-											disabled={isSubmitting}
-										/>
-										<span
-											aria-hidden
-											className="shrink-0 select-none px-0.5 font-medium text-mail-muted text-paragraph-sm"
-										>
-											@
-										</span>
-										<Dropdown.Root
-											open={isDropdownOpen}
-											onOpenChange={setIsDropdownOpen}
-										>
-											<Dropdown.Trigger asChild>
-												<button
-													type="button"
-													disabled={isSubmitting}
-													aria-label="Select domain"
-													className="group/trigger flex h-5 min-h-5 max-w-[55%] shrink items-center gap-0.5 rounded-none bg-transparent p-0 font-medium text-mail-foreground shadow-none outline-none ring-0 hover:bg-transparent disabled:pointer-events-none disabled:opacity-50"
-												>
-													<span className="truncate">
-														{selectedDomainName || "domain"}
-													</span>
-													<Icon
-														name="chevron-down"
-														className={cn(
-															"size-4 shrink-0 text-mail-muted transition duration-200 ease-out group-hover/trigger:text-mail-foreground group-data-[state=open]/trigger:rotate-180",
-															isDropdownOpen &&
-																"rotate-180 text-mail-foreground",
-														)}
-													/>
-												</button>
-											</Dropdown.Trigger>
-											<Dropdown.Content align="end" className="w-72 p-2">
-												<div className="relative max-h-80 overflow-y-auto">
-													{domainsList.map((d, idx) => {
-														const isSelected = d.domain === selectedDomainName;
-														const ready = isDomainReady(d);
-														return (
-															<button
-																key={d.id}
-																ref={(el) => {
-																	if (el) buttonRefs.current[idx] = el;
-																}}
-																type="button"
-																onPointerEnter={() => setHoverIdx(idx)}
-																onPointerLeave={() => setHoverIdx(undefined)}
-																onClick={() => {
-																	form.setValue("domain", d.domain);
-																	setIsDropdownOpen(false);
-																}}
-																className={cn(
-																	"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-2 text-xs transition-colors",
-																	"text-mail-foreground",
-																	isSelected && "bg-neutral-alpha-10",
-																	!currentRect &&
-																		hoverIdx === idx &&
-																		"bg-neutral-alpha-10",
-																	!ready && "opacity-80",
-																)}
-															>
-																<div className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
-																	<span className="w-full truncate text-left font-medium">
+								<div className="flex items-center gap-2">
+									<Input.Root
+										size="xsmall"
+										hasError={!!form.formState.errors.localPart}
+										className="flex-1 rounded-xl"
+									>
+										<Input.Wrapper>
+											<Input.Input
+												id="agent-email"
+												placeholder="support-agent"
+												className="min-w-0 flex-1"
+												{...form.register("localPart")}
+												disabled={isSubmitting}
+											/>
+										</Input.Wrapper>
+									</Input.Root>
+
+									<span
+										aria-hidden
+										className="shrink-0 select-none font-medium text-mail-muted text-paragraph-sm"
+									>
+										@
+									</span>
+
+									<Input.Root
+										size="xsmall"
+										hasError={!!form.formState.errors.domain}
+										className={cn(
+											"flex-1 rounded-xl",
+											form.formState.errors.domain
+												? "focus-within:shadow-button-error-focus focus-within:before:ring-error-base"
+												: "focus-within:shadow-button-important-focus focus-within:before:ring-stroke-strong-950",
+										)}
+									>
+										<Input.Wrapper className="w-full">
+											<Dropdown.Root
+												open={isDropdownOpen}
+												onOpenChange={setIsDropdownOpen}
+											>
+												<Dropdown.Trigger asChild>
+													<button
+														type="button"
+														disabled={isSubmitting}
+														aria-label="Select domain"
+														className="group/trigger flex h-8 w-full items-center justify-between gap-1 bg-transparent p-0 text-left font-medium text-mail-foreground text-paragraph-sm outline-none ring-0 disabled:pointer-events-none disabled:opacity-50"
+													>
+														<span className="truncate">
+															{selectedDomainName || "domain"}
+														</span>
+														<Icon
+															name="chevron-down"
+															className={cn(
+																"size-4 shrink-0 text-mail-muted transition duration-200 ease-out group-hover/trigger:text-mail-foreground group-data-[state=open]/trigger:rotate-180",
+																isDropdownOpen &&
+																	"rotate-180 text-mail-foreground",
+															)}
+														/>
+													</button>
+												</Dropdown.Trigger>
+												<Dropdown.Content align="end" className="w-72 p-2">
+													<div className="relative max-h-80 overflow-y-auto">
+														{domainsList.map((d, idx) => {
+															const isSelected =
+																d.domain === selectedDomainName;
+															const ready = isDomainReady(d);
+															return (
+																<button
+																	key={d.id}
+																	ref={(el) => {
+																		if (el) buttonRefs.current[idx] = el;
+																	}}
+																	type="button"
+																	onPointerEnter={() => setHoverIdx(idx)}
+																	onPointerLeave={() => setHoverIdx(undefined)}
+																	onClick={() => {
+																		form.setValue("domain", d.domain);
+																		setIsDropdownOpen(false);
+																	}}
+																	className={cn(
+																		"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-xs transition-colors",
+																		"text-mail-foreground",
+																		isSelected && "bg-neutral-alpha-10",
+																		!currentRect &&
+																			hoverIdx === idx &&
+																			"bg-neutral-alpha-10",
+																		!ready && "opacity-80",
+																	)}
+																>
+																	<span className="truncate text-left font-medium">
 																		{d.domain}
 																	</span>
-																	<DomainCapabilityHint
-																		sending={d.isSendingEmailEnabled}
-																		receiving={d.isReceivingEmailEnabled}
-																	/>
-																</div>
-																{isSelected && (
-																	<Icon
-																		name="check"
-																		className="h-3.5 w-3.5 shrink-0 text-mail-foreground"
-																	/>
-																)}
-															</button>
-														);
-													})}
-													<AnimatedHoverBackground
-														rect={currentRect}
-														tabElement={currentTab}
-													/>
-												</div>
-											</Dropdown.Content>
-										</Dropdown.Root>
-									</Input.Wrapper>
-								</Input.Root>
+																	{isSelected && (
+																		<Icon
+																			name="check"
+																			className="h-3.5 w-3.5 shrink-0 text-mail-foreground"
+																		/>
+																	)}
+																</button>
+															);
+														})}
+														<AnimatedHoverBackground
+															rect={currentRect}
+															tabElement={currentTab}
+														/>
+													</div>
+												</Dropdown.Content>
+											</Dropdown.Root>
+										</Input.Wrapper>
+									</Input.Root>
+								</div>
 								{(form.formState.errors.localPart ||
 									form.formState.errors.domain) && (
 									<p className="text-error-base text-paragraph-xs">

@@ -83,8 +83,7 @@ export const auth = betterAuth({
 
 					if (!access.allowed) {
 						throw new APIError("FORBIDDEN", {
-							message:
-								"A valid signup invite is required to create an account",
+							message: "A valid signup invite is required to create an account",
 						});
 					}
 

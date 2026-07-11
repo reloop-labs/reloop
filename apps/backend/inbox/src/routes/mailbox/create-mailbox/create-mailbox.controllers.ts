@@ -54,7 +54,8 @@ export async function createMailboxController({
 		if (!domainRecord.isReceivingEmailEnabled) missing.push("receiving");
 		throw createError({
 			status: 400,
-			message: "Domain must have sending and receiving enabled to create a mailbox",
+			message:
+				"Domain must have sending and receiving enabled to create a mailbox",
 			why: `Domain ${domainRecord.domain} is missing ${missing.join(" and ")}`,
 			fix: "Enable both sending and receiving in Domain settings, then try again",
 		});

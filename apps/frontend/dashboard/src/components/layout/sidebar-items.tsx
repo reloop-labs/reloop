@@ -197,11 +197,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 										<div className="my-0.5 ml-[14px] flex flex-col border-stroke-soft-200 border-l pb-0.5 pl-2">
 											{items.map(
 												(
-													{
-														label: subLabel,
-														path: subPath,
-														iconName: subIcon,
-													},
+													{ label: subLabel, path: subPath, iconName: subIcon },
 													subIndex,
 												) => {
 													const isSubActive =

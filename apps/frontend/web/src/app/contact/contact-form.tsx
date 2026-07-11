@@ -47,8 +47,8 @@ function LoggedInSupport() {
 			</p>
 			<div className="rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 px-5 py-8 text-center sm:px-6 sm:py-10 dark:border-white/[0.08] dark:bg-[#161616]">
 				<p className="text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/45">
-					Open live support from your Reloop dashboard — we&apos;re available
-					to help signed-in customers there.
+					Open live support from your Reloop dashboard — we&apos;re available to
+					help signed-in customers there.
 				</p>
 				<Link
 					href="/dashboard"
