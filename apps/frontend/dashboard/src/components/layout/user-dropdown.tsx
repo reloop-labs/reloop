@@ -21,7 +21,7 @@ import { AnimatedHoverBackground } from "../animated-hover-background";
 export const UserDropdown = () => {
 	const { user } = useUserOrganization();
 	const { canManageBilling } = useOrgPermissions();
-	const { theme, setTheme } = useTheme();
+	const { theme, setTheme, resolvedTheme } = useTheme();
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const itemRefs = useRef<(HTMLElement | null)[]>([]);
@@ -118,7 +118,7 @@ export const UserDropdown = () => {
 						<div className="flex items-center justify-between px-2.5 py-1.5">
 							<div className="flex items-center gap-2">
 								<Icon
-									name="moon"
+									name={theme === "system" ? "laptop" : theme === "dark" ? "moon" : "sun"}
 									className="h-4 w-4 text-text-sub-600"
 								/>
 								<span className="text-sm font-medium text-text-sub-600">Theme</span>
@@ -127,27 +127,7 @@ export const UserDropdown = () => {
 						</div>
 					</Dropdown.Group>
 
-					<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 
-					<Dropdown.Group className="gap-0">
-						<Dropdown.Item
-							ref={(el) => {
-								if (el) itemRefs.current[2] = el;
-							}}
-							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-							onPointerEnter={() => setHoverIdx(2)}
-							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => router.push("/settings")}
-						>
-							<Icon name="gear" className="h-4 w-4 text-text-sub-600" />
-							<span className="flex-1 truncate text-sm">Settings</span>
-							<span className="flex items-center gap-0.5 font-medium text-[10px] text-text-soft-400 opacity-60">
-								<span>⇧</span>
-								<span>⌘</span>
-								<span>,</span>
-							</span>
-						</Dropdown.Item>
-					</Dropdown.Group>
 
 					{canManageBilling && (
 						<>
