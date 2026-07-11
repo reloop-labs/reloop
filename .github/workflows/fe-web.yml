@@ -41,6 +41,6 @@ jobs:
       - name: Trigger Coolify Deploy
         if: github.event_name != 'pull_request'
         run: |
-          curl --fail -i -X GET "https://coolify.reloop.sh/api/v1/deploy?uuid=CHANGE_ID&force=false" \
+          curl --fail -i -X GET "https://coolify.reloop.sh/api/v1/deploy?uuid=e44u9e6koh8xg5q537zj69mi&force=false" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"
 
