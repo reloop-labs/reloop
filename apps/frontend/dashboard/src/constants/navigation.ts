@@ -129,7 +129,7 @@ export const settingsNavigation: SettingsNavigationSection[] = [
 		items: [
 			{ label: "Usage", path: "/settings", iconName: "doughnut" },
 			{ label: "Billing", path: "/settings/billing", iconName: "billing-custom" },
-			{ label: "Workspace", path: "/settings/workspace", iconName: "gear" },
+			{ label: "Workspace", path: "/settings/workspace", iconName: "workspace-custom" },
 			{ label: "Teams", path: "/settings/teams", iconName: "users", requiresTeamAdmin: true },
 		],
 	},
