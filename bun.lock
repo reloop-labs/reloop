@@ -116,6 +116,7 @@
       },
       "devDependencies": {
         "@better-auth/cli": "catalog:backend",
+        "@reloop/apikey": "workspace:*",
         "@reloop/tsconfig": "workspace:*",
         "@types/bun": "catalog:backend",
         "@types/pg": "catalog:db",

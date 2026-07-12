@@ -11,7 +11,8 @@
 		"fix-lint": "biome check --fix .",
 		"format": "biome format .",
 		"lint": "biome check .",
-		"start": "bun run dist/index.js"
+		"start": "bun run dist/index.js",
+		"test": "bun run test/run.ts"
 	},
 	"dependencies": {
 		"@elysiajs/cors": "catalog:backend",
@@ -45,6 +46,7 @@
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
+		"@reloop/apikey": "workspace:*",
 		"tsdown": "catalog:backend",
 		"typescript": "catalog:",
 		"@types/bun": "catalog:backend",
