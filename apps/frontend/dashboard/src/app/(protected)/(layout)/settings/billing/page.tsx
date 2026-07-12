@@ -20,7 +20,7 @@ import { useEffect, useState } from "react";
 import { SwitchPlanModal } from "./switch-plan-modal";
 
 const CARD =
-	"rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-5 dark:border-stroke-soft-100/40";
+	"rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-5 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]";
 
 function resolvePlanId(name: string | undefined): PlanId {
 	const normalized = (name ?? "free").toLowerCase();
@@ -106,7 +106,7 @@ const BillingPage = () => {
 			)}
 
 			{/* Card 1: Current plan */}
-			<div className="rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-5 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
+			<div className={CARD}>
 				<div className="flex items-center justify-between">
 					<div>
 						<div className="flex items-center gap-2">
@@ -117,7 +117,7 @@ const BillingPage = () => {
 								Current
 							</span>
 						</div>
-						<p className="mt-1 text-paragraph-sm text-text-sub-600">
+						<p className="mt-1 font-medium text-paragraph-sm text-text-sub-600">
 							{currentPlan.priceSubline}
 						</p>
 					</div>
@@ -148,7 +148,7 @@ const BillingPage = () => {
 									</Badge.Root>
 								)}
 							</div>
-							<p className="mt-1 text-paragraph-sm text-text-sub-600">
+							<p className="mt-1 font-medium text-paragraph-sm text-text-sub-600">
 								{nextPlanPriceLabel}
 							</p>
 						</div>
@@ -157,16 +157,16 @@ const BillingPage = () => {
 								variant="neutral"
 								mode="ghost"
 								size="small"
-								className="font-semibold text-text-sub-600 hover:text-text-strong-950"
+								className="font-medium text-text-sub-600 hover:text-text-strong-950"
 								onClick={() => router.push("/settings/billing/plans")}
 							>
 								View all plans
 							</Button.Root>
 							<Button.Root
-								variant="primary"
+								variant="neutral"
 								mode="filled"
 								size="small"
-								className="font-semibold"
+								className="rounded-full font-semibold"
 							>
 								Upgrade now
 							</Button.Root>
@@ -204,7 +204,7 @@ const BillingPage = () => {
 				<h2 className="font-semibold text-paragraph-lg text-text-strong-950">
 					Recent invoices
 				</h2>
-				<div className="flex h-32 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
+				<div className="flex h-32 items-center justify-center rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
 					<p className="text-paragraph-sm text-text-soft-400">
 						No invoices yet
 					</p>
