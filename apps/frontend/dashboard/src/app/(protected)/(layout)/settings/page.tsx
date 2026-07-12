@@ -50,7 +50,9 @@ const UsagePage = () => {
 				</div>
 			)}
 
-			<UsageSection onUpgrade={() => router.push("/settings/billing")} />
+			<UsageSection
+				onUpgrade={() => router.push("/settings/billing/plans")}
+			/>
 		</div>
 	);
 };

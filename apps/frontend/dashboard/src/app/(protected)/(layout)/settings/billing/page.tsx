@@ -174,14 +174,14 @@ const BillingPage = () => {
 					</div>
 
 					{/* Features checklist (3 columns grid layout) */}
-					<div className="grid grid-cols-1 gap-x-6 gap-y-3.5 pt-5 sm:grid-cols-3">
+					<div className="grid grid-cols-1 gap-x-6 gap-y-3 pt-5 sm:grid-cols-2">
 						{nextPlan.features.map((feature) => (
-							<div key={feature} className="flex items-start gap-2">
+							<div key={feature} className="flex items-center gap-2">
 								<Icon
 									name="check-circle"
-									className="mt-0.5 h-4 w-4 shrink-0 text-text-sub-600"
+									className="h-4 w-4 shrink-0 text-text-sub-600"
 								/>
-								<span className="text-paragraph-sm text-text-sub-600">
+								<span className="whitespace-nowrap font-medium text-paragraph-sm text-text-sub-600">
 									{feature}
 								</span>
 							</div>

@@ -42,8 +42,8 @@ function RingMeter({ ratio, status }: { ratio: number; status: UsageStatus }) {
 		<Circle
 			className="h-5 w-5 shrink-0"
 			percent={percent}
-			strokeWidth={10}
-			trailWidth={10}
+			strokeWidth={14}
+			trailWidth={14}
 			strokeLinecap="round"
 			strokeColor={STROKE_COLOR[status]}
 			trailColor="var(--bg-soft-200)"
@@ -94,7 +94,7 @@ function UsageRow({
 				</span>
 				<span
 					className={cn(
-						"shrink-0 font-medium text-paragraph-sm tabular-nums",
+						"shrink-0 font-medium text-paragraph-xs tabular-nums",
 						isUnlimited ? "text-text-soft-400" : "text-text-strong-950",
 					)}
 				>
@@ -263,7 +263,7 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 				description="All sending and receiving email through Reloop."
 				planName={planName}
 				onUpgrade={onUpgrade}
-				showUpgrade={showUpgrade && status !== "healthy"}
+				showUpgrade={showUpgrade}
 			>
 				{/* Monthly emails hero row */}
 				<div className="border-stroke-soft-100 border-b py-3.5 dark:border-stroke-soft-100/40">
@@ -320,7 +320,7 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 				description="Inbox for AI Agents and humans."
 				planName={planName}
 				onUpgrade={onUpgrade}
-				showUpgrade={showUpgrade}
+				showUpgrade={false}
 			>
 				<UsageRow
 					label="Agent inboxes"
@@ -353,7 +353,7 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 				description="Custom domains and email validation for better inbox placement."
 				planName={planName}
 				onUpgrade={onUpgrade}
-				showUpgrade={showUpgrade}
+				showUpgrade={false}
 			>
 				<UsageRow
 					label="Custom domains"
