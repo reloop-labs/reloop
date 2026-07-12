@@ -12,15 +12,7 @@ import {
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { useRouter } from "next/navigation";
-import { Circle, Line } from "rc-progress";
-
-const STROKE_COLOR: Record<UsageStatus, string> = {
-	healthy: "var(--success-base)",
-	warning: "var(--warning-base)",
-	critical: "var(--error-base)",
-	unlimited: "var(--text-soft-400)",
-};
+import { Circle } from "rc-progress";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -33,11 +25,31 @@ function statusFromRatio(ratio: number, isUnlimited = false): UsageStatus {
 	return "healthy";
 }
 
+const STROKE_COLOR: Record<UsageStatus, string> = {
+	healthy: "var(--success-base)",
+	warning: "var(--warning-base)",
+	critical: "var(--error-base)",
+	unlimited: "var(--text-soft-400)",
+};
+
+const STATUS_PILL: Record<UsageStatus, string> = {
+	healthy: "bg-success-lighter text-success-base dark:bg-success-base/10",
+	warning: "bg-warning-lighter text-warning-base dark:bg-warning-base/10",
+	critical: "bg-error-lighter text-error-base dark:bg-error-base/10",
+	unlimited: "bg-bg-weak-50 text-text-soft-400 dark:bg-white/[0.06]",
+};
+
+const STATUS_LABEL: Record<UsageStatus, string> = {
+	healthy: "Healthy",
+	warning: "Near limit",
+	critical: "Limit reached",
+	unlimited: "Unlimited",
+};
+
 // ─── Ring Meter ───────────────────────────────────────────────────────────────
 
 function RingMeter({ ratio, status }: { ratio: number; status: UsageStatus }) {
 	const percent = status === "unlimited" ? 0 : Math.min(100, ratio * 100);
-
 	return (
 		<Circle
 			className="h-5 w-5 shrink-0"
@@ -51,7 +63,7 @@ function RingMeter({ ratio, status }: { ratio: number; status: UsageStatus }) {
 	);
 }
 
-// ─── Usage Row ────────────────────────────────────────────────────────────────
+// ─── Usage Row (tracked: has ring + ratio) ────────────────────────────────────
 
 function UsageRow({
 	label,
@@ -62,22 +74,14 @@ function UsageRow({
 	isLast,
 }: {
 	label: string;
-	used: number | string;
-	total: number | string;
+	used: number;
+	total: number;
 	unit?: string;
 	isUnlimited?: boolean;
 	isLast?: boolean;
 }) {
-	const numUsed = typeof used === "number" ? used : 0;
-	const numTotal = typeof total === "number" ? total : 0;
-	const ratio = isUnlimited || numTotal === 0 ? 0 : numUsed / numTotal;
+	const ratio = isUnlimited || total === 0 ? 0 : used / total;
 	const status = statusFromRatio(ratio, isUnlimited);
-
-	const displayValue = isUnlimited
-		? "Unlimited"
-		: typeof used === "number"
-			? `${numUsed.toLocaleString()} / ${numTotal.toLocaleString()}`
-			: `${used} / ${total}`;
 
 	return (
 		<div
@@ -100,20 +104,53 @@ function UsageRow({
 				>
 					{isUnlimited ? (
 						"Unlimited"
-					) : typeof used === "number" ? (
+					) : (
 						<>
-							<NumberFlow value={numUsed} className="tabular-nums" />
+							<NumberFlow value={used} className="tabular-nums" />
 							{" / "}
-							{numTotal.toLocaleString()}
+							{total.toLocaleString()}
 							{unit ? (
 								<span className="ml-1 font-normal text-paragraph-xs text-text-soft-400">
 									{unit}
 								</span>
 							) : null}
 						</>
-					) : (
-						displayValue
 					)}
+				</span>
+			</div>
+		</div>
+	);
+}
+
+// ─── Spec Row (non-trackable: just a plan limit, no ring) ─────────────────────
+
+function SpecRow({
+	label,
+	value,
+	isLast,
+}: {
+	label: string;
+	value: string;
+	isLast?: boolean;
+}) {
+	return (
+		<div
+			className={cn(
+				"flex items-center gap-4 py-3.5",
+				!isLast &&
+					"border-stroke-soft-100 border-b dark:border-stroke-soft-100/40",
+			)}
+		>
+			{/* Spacer to align with ring rows */}
+			<div className="flex h-5 w-5 shrink-0 items-center justify-center">
+				<div className="h-1.5 w-1.5 rounded-full bg-stroke-soft-200 dark:bg-white/20" />
+			</div>
+			<div className="flex min-w-0 flex-1 items-center justify-between gap-3">
+				<span className="truncate font-medium text-paragraph-sm text-text-sub-600">
+					{label}
+				</span>
+				<span className="inline-flex h-5 shrink-0 items-center rounded-full bg-bg-weak-50 px-2.5 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
+					{value}
 				</span>
 			</div>
 		</div>
@@ -123,49 +160,24 @@ function UsageRow({
 // ─── Category Card ────────────────────────────────────────────────────────────
 
 function CategoryCard({
-	icon,
 	title,
 	description,
-	planName,
-	onUpgrade,
-	showUpgrade,
 	children,
 }: {
-	icon: string;
 	title: string;
 	description: string;
-	planName: string;
-	onUpgrade?: () => void;
-	showUpgrade?: boolean;
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="grid grid-cols-1 gap-0 overflow-hidden rounded-2xl border border-stroke-soft-100 sm:grid-cols-[220px_1fr] dark:border-stroke-soft-100/40">
+		<div className="grid grid-cols-1 overflow-hidden rounded-2xl border border-stroke-soft-100 sm:grid-cols-[200px_1fr] dark:border-stroke-soft-100/40">
 			{/* Left info panel */}
-			<div className="flex flex-col justify-between gap-4 border-stroke-soft-100 bg-bg-weak-50/30 p-5 sm:border-r dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
-				<div>
-					<h2 className="font-semibold text-label-md text-text-strong-950">
-						{title}
-					</h2>
-					<p className="mt-1 text-paragraph-xs text-text-sub-600 leading-relaxed">
-						{description}
-					</p>
-				</div>
-				<div className="space-y-2">
-					{showUpgrade && onUpgrade && (
-						<div>
-							<Button.Root
-								variant="neutral"
-								mode="filled"
-								size="xxsmall"
-								className="rounded-full font-medium"
-								onClick={onUpgrade}
-							>
-								Upgrade
-							</Button.Root>
-						</div>
-					)}
-				</div>
+			<div className="flex flex-col border-stroke-soft-100 border-b bg-bg-weak-50/30 p-5 sm:border-r sm:border-b-0 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
+				<h2 className="font-semibold text-label-md text-text-strong-950">
+					{title}
+				</h2>
+				<p className="mt-1 text-paragraph-xs text-text-sub-600 leading-relaxed">
+					{description}
+				</p>
 			</div>
 
 			{/* Right usage panel */}
@@ -176,20 +188,58 @@ function CategoryCard({
 	);
 }
 
+// ─── Upgrade Banner ───────────────────────────────────────────────────────────
+
+function UpgradeBanner({
+	planName,
+	nextPlanName,
+	onUpgrade,
+}: {
+	planName: string;
+	nextPlanName: string;
+	onUpgrade: () => void;
+}) {
+	return (
+		<div className="flex items-center justify-between gap-4 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
+			<div className="min-w-0">
+				<p className="font-medium text-paragraph-sm text-text-strong-950">
+					You're on the{" "}
+					<span className="text-text-strong-950">{planName} plan</span>
+				</p>
+				<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
+					Upgrade to {nextPlanName} for higher limits on emails, inboxes, and
+					more.
+				</p>
+			</div>
+			<Button.Root
+				variant="neutral"
+				mode="filled"
+				size="xsmall"
+				className="shrink-0 rounded-full font-medium"
+				onClick={onUpgrade}
+			>
+				Upgrade plan
+			</Button.Root>
+		</div>
+	);
+}
+
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
 function SkeletonCard() {
 	return (
-		<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 sm:grid sm:grid-cols-[220px_1fr] dark:border-stroke-soft-100/40">
+		<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 sm:grid sm:grid-cols-[200px_1fr] dark:border-stroke-soft-100/40">
 			<div className="bg-bg-weak-50/30 p-5 dark:bg-white/[0.02]">
-				<div className="mb-3 h-8 w-8 animate-pulse rounded-lg bg-bg-weak-100 dark:bg-white/5" />
-				<div className="h-4 w-20 animate-pulse rounded bg-bg-weak-100 dark:bg-white/5" />
-				<div className="mt-2 h-3 w-32 animate-pulse rounded bg-bg-weak-100 dark:bg-white/5" />
+				<div className="h-4 w-24 animate-pulse rounded bg-bg-weak-100 dark:bg-white/5" />
+				<div className="mt-2 h-3 w-36 animate-pulse rounded bg-bg-weak-100 dark:bg-white/5" />
 			</div>
-			<div className="space-y-4 bg-bg-white-0 p-5 dark:bg-white/[0.01]">
+			<div className="space-y-0 bg-bg-white-0 px-5 dark:bg-white/[0.01]">
 				{[0, 1, 2].map((i) => (
-					<div key={i} className="flex items-center gap-4">
-						<div className="h-9 w-9 shrink-0 animate-pulse rounded-full bg-bg-weak-100 dark:bg-white/5" />
+					<div
+						key={i}
+						className="flex items-center gap-4 border-stroke-soft-100 border-b py-3.5 last:border-0 dark:border-stroke-soft-100/40"
+					>
+						<div className="h-5 w-5 shrink-0 animate-pulse rounded-full bg-bg-weak-100 dark:bg-white/5" />
 						<div className="h-3 flex-1 animate-pulse rounded bg-bg-weak-100 dark:bg-white/5" />
 						<div className="h-3 w-16 animate-pulse rounded bg-bg-weak-100 dark:bg-white/5" />
 					</div>
@@ -199,7 +249,7 @@ function SkeletonCard() {
 	);
 }
 
-// ─── Helper ───────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function resolvePlanId(name: string | undefined): PlanId {
 	const normalized = (name ?? "free").toLowerCase();
@@ -219,15 +269,20 @@ function formatDate(dateStr: string): string {
 	return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
+function parseCount(val: string): number {
+	if (val === "Custom") return 0;
+	return Number.parseInt(val.replace(/\D/g, ""), 10) || 0;
+}
+
 // ─── Main Export ──────────────────────────────────────────────────────────────
 
 export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
-	const router = useRouter();
 	const { data, isLoading } = useBillingUsage();
 
 	if (isLoading || !data) {
 		return (
 			<div className="space-y-4">
+				<div className="h-16 animate-pulse rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]" />
 				<SkeletonCard />
 				<SkeletonCard />
 				<SkeletonCard />
@@ -251,31 +306,36 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 	const currentPlanId = resolvePlanId(plan.name);
 	const currentPlan = getPlanById(currentPlanId) ?? defaultPlan;
 	const nextPlan = getNextPlan(currentPlanId);
-	const planName = currentPlan.name;
-	const showUpgrade = !!nextPlan;
 
 	return (
 		<div className="space-y-4">
-			{/* ── Sending (Transactional) ───────────────────────────────────── */}
+			{/* ── Single upgrade banner (shown once, not in every section) ── */}
+			{nextPlan && onUpgrade && (
+				<UpgradeBanner
+					planName={currentPlan.name}
+					nextPlanName={nextPlan.name}
+					onUpgrade={onUpgrade}
+				/>
+			)}
+
+			{/* ── Emails ───────────────────────────────────────────────────── */}
 			<CategoryCard
-				icon="send"
 				title="Emails"
-				description="All sending and receiving email through Reloop."
-				planName={planName}
-				onUpgrade={onUpgrade}
-				showUpgrade={showUpgrade}
+				description="Transactional & campaign emails sent through Reloop."
 			>
-				{/* Monthly emails hero row */}
+				{/* Monthly emails — stacked bar with sent / received breakdown */}
 				<div className="border-stroke-soft-100 border-b py-3.5 dark:border-stroke-soft-100/40">
 					<div className="mb-2 flex items-center justify-between">
-						<span className="text-paragraph-sm text-text-sub-600">
+						<span className="font-medium text-paragraph-sm text-text-sub-600">
 							Monthly emails
 						</span>
 						<span className="text-paragraph-xs text-text-soft-400">
 							{periodRange} · Resets in {resetDays}d
 						</span>
 					</div>
-					<div className="mb-2.5 flex items-end justify-between gap-3">
+
+					{/* Big number */}
+					<div className="mb-3 flex items-end justify-between gap-3">
 						<p className="flex items-baseline gap-1.5">
 							<span className="font-semibold text-text-strong-950 text-title-h5 tabular-nums">
 								<NumberFlow value={used} />
@@ -288,155 +348,132 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 							{percent}% used
 						</span>
 					</div>
-					{/* Progress bar */}
-					<Line
-						className="h-1.5 w-full"
-						percent={Math.max(percent, ratio > 0 ? 1 : 0)}
-						strokeWidth={2}
-						trailWidth={2}
-						strokeLinecap="round"
-						strokeColor={STROKE_COLOR[status]}
-						trailColor="var(--bg-soft-200)"
-					/>
-					<div className="mt-1.5 text-right text-paragraph-xs text-text-soft-400">
-						<NumberFlow value={remaining} className="tabular-nums" /> remaining
-					</div>
+
+					{/* Stacked bar: sent (blue) + received (violet) */}
+					{(() => {
+						const sent = subscription.creditsSent ?? used;
+						const received = subscription.creditsReceived ?? 0;
+						const sentPct = total > 0 ? Math.min(100, (sent / total) * 100) : 0;
+						const recvPct =
+							total > 0 ? Math.min(100 - sentPct, (received / total) * 100) : 0;
+						return (
+							<>
+								<div className="relative h-1.5 w-full overflow-hidden rounded-full bg-bg-soft-200 dark:bg-white/10">
+									{/* sent segment */}
+									<div
+										className="absolute top-0 left-0 h-full rounded-l-full bg-information-base transition-all duration-500"
+										style={{ width: `${Math.max(sentPct, sent > 0 ? 1 : 0)}%` }}
+									/>
+									{/* received segment — starts right after sent */}
+									<div
+										className="absolute top-0 h-full bg-purple-500 transition-all duration-500"
+										style={{
+											left: `${Math.max(sentPct, sent > 0 ? 1 : 0)}%`,
+											width: `${Math.max(recvPct, received > 0 ? 1 : 0)}%`,
+											borderRadius:
+												recvPct > 0 ? "0 9999px 9999px 0" : undefined,
+										}}
+									/>
+								</div>
+
+								{/* Legend row */}
+								<div className="mt-2.5 flex items-center justify-between gap-4">
+									<div className="flex items-center gap-4">
+										<div className="flex items-center gap-1.5">
+											<span className="h-2 w-2 shrink-0 rounded-full bg-information-base" />
+											<span className="font-medium text-paragraph-xs text-text-sub-600">
+												Sent
+											</span>
+											<span className="font-medium text-paragraph-xs text-text-strong-950 tabular-nums">
+												<NumberFlow value={sent} />
+											</span>
+										</div>
+										<div className="flex items-center gap-1.5">
+											<span className="h-2 w-2 shrink-0 rounded-full bg-purple-500" />
+											<span className="font-medium text-paragraph-xs text-text-sub-600">
+												Received
+											</span>
+											<span className="font-medium text-paragraph-xs text-text-strong-950 tabular-nums">
+												<NumberFlow value={received} />
+											</span>
+										</div>
+									</div>
+									<span className="text-paragraph-xs text-text-soft-400 tabular-nums">
+										<NumberFlow value={remaining} /> remaining
+									</span>
+								</div>
+							</>
+						);
+					})()}
 				</div>
 
-				<UsageRow
+				{/* Send rate — plan spec, not a counter */}
+				<SpecRow
 					label="Send rate"
-					used={plan.ratePerSecond}
-					total={plan.ratePerSecond}
-					unit="/ sec"
-					isUnlimited={false}
+					value={`${plan.ratePerSecond} / sec`}
+					isLast={false}
+				/>
+				{/* Max attachment size — plan spec */}
+				<SpecRow
+					label="Max attachment size"
+					value={`${plan.maxAttachmentSizeMb} MB`}
 					isLast={true}
 				/>
 			</CategoryCard>
 
-			{/* ── Inbound & Routing ─────────────────────────────────────────── */}
+			{/* ── AI Agent Inbox ────────────────────────────────────────────── */}
 			<CategoryCard
-				icon="inbox"
 				title="AI Agent Inbox"
-				description="Inbox for AI Agents and humans."
-				planName={planName}
-				onUpgrade={onUpgrade}
-				showUpgrade={false}
+				description="Inboxes for AI agents and humans to receive and route email."
 			>
 				<UsageRow
 					label="Agent inboxes"
 					used={0}
-					total={
-						currentPlan.comparison.agentInbox === "Custom"
-							? 0
-							: Number.parseInt(
-									currentPlan.comparison.agentInbox.replace(/\D/g, ""),
-									10,
-								) || 0
-					}
+					total={parseCount(currentPlan.comparison.agentInbox)}
 					isUnlimited={currentPlan.comparison.agentInbox === "Custom"}
 					isLast={false}
 				/>
 				<UsageRow
-					label="Max attachment size"
-					used={plan.maxAttachmentSizeMb}
-					total={plan.maxAttachmentSizeMb}
-					unit="MB"
-					isUnlimited={false}
+					label="Webhooks"
+					used={0}
+					total={parseCount(currentPlan.comparison.webhooks)}
+					isUnlimited={currentPlan.comparison.webhooks === "Custom"}
 					isLast={true}
 				/>
 			</CategoryCard>
 
 			{/* ── Deliverability ────────────────────────────────────────────── */}
 			<CategoryCard
-				icon="shield-check"
 				title="Deliverability"
-				description="Custom domains and email validation for better inbox placement."
-				planName={planName}
-				onUpgrade={onUpgrade}
-				showUpgrade={false}
+				description="Domains, validation, and IP options for better inbox placement."
 			>
 				<UsageRow
 					label="Custom domains"
 					used={0}
-					total={
-						currentPlan.comparison.customDomains === "Custom"
-							? 0
-							: Number.parseInt(
-									currentPlan.comparison.customDomains.replace(/\D/g, ""),
-									10,
-								) || 0
-					}
+					total={parseCount(currentPlan.comparison.customDomains)}
 					isUnlimited={currentPlan.comparison.customDomains === "Custom"}
 					isLast={false}
 				/>
 				<UsageRow
 					label="Email validation"
 					used={0}
-					total={
-						currentPlan.comparison.emailValidation === "Custom"
-							? 0
-							: Number.parseInt(
-									currentPlan.comparison.emailValidation.replace(/\D/g, ""),
-									10,
-								) || 0
-					}
+					total={parseCount(currentPlan.comparison.emailValidation)}
 					unit="/ mo"
 					isUnlimited={currentPlan.comparison.emailValidation === "Custom"}
 					isLast={false}
 				/>
-				<UsageRow
+				{/* Dedicated IP — plan spec (not a counter) */}
+				<SpecRow
 					label="Dedicated IP"
-					used={0}
-					total={0}
-					isUnlimited={
-						currentPlan.comparison.dedicatedIp !== "—" &&
-						currentPlan.comparison.dedicatedIp !== ""
+					value={
+						currentPlan.comparison.dedicatedIp === "—" ||
+						currentPlan.comparison.dedicatedIp === ""
+							? "Not included"
+							: currentPlan.comparison.dedicatedIp
 					}
-					isLast={false}
-				/>
-				<UsageRow
-					label="Webhooks"
-					used={0}
-					total={
-						currentPlan.comparison.webhooks === "Custom"
-							? 0
-							: Number.parseInt(
-									currentPlan.comparison.webhooks.replace(/\D/g, ""),
-									10,
-								) || 0
-					}
-					isUnlimited={currentPlan.comparison.webhooks === "Custom"}
 					isLast={true}
 				/>
 			</CategoryCard>
-
-			{/* ── Overage notice ────────────────────────────────────────────── */}
-			{status !== "healthy" && onUpgrade && (
-				<div className="flex items-center justify-between gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-4 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
-					<div className="flex items-center gap-3">
-						<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-warning-lighter dark:bg-warning-base/10">
-							<Icon
-								name="triangle-alert"
-								className="h-4 w-4 text-warning-base"
-							/>
-						</div>
-						<p className="text-paragraph-sm text-text-sub-600">
-							{status === "critical"
-								? "You've reached your monthly email limit. Upgrade to keep sending."
-								: "You're approaching your monthly email limit."}
-						</p>
-					</div>
-					<Button.Root
-						variant="neutral"
-						mode="filled"
-						size="xxsmall"
-						className="shrink-0 rounded-full font-medium"
-						onClick={onUpgrade}
-					>
-						Upgrade
-					</Button.Root>
-				</div>
-			)}
 		</div>
 	);
 }

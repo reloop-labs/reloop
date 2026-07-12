@@ -20,6 +20,10 @@ export interface BillingUsage {
 		status: string;
 		creditsUsed: number;
 		creditsRemaining: number;
+		/** Emails sent outbound this period (optional, from backend breakdown) */
+		creditsSent?: number;
+		/** Emails received inbound this period (optional, from backend breakdown) */
+		creditsReceived?: number;
 		currentPeriodStart: string;
 		currentPeriodEnd: string;
 	};
