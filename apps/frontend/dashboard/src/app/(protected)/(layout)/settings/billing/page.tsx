@@ -22,10 +22,6 @@ import { SwitchPlanModal } from "./switch-plan-modal";
 const CARD =
 	"rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-5 dark:border-stroke-soft-100/40";
 
-function formatNumber(num: number): string {
-	return num.toLocaleString();
-}
-
 function resolvePlanId(name: string | undefined): PlanId {
 	const normalized = (name ?? "free").toLowerCase();
 	const match = pricingPlans.find((p) => p.id === normalized);
@@ -73,11 +69,6 @@ const BillingPage = () => {
 			? nextPlan.priceSubline
 			: `${formatPrice(nextPlan.monthlyPrice)} ${nextPlan.priceSubline}`
 		: "";
-
-	// Dynamically read remaining credits from usage hook
-	const creditsRemainingStr = usageData
-		? `${formatNumber(usageData.subscription.creditsRemaining)} credits remaining`
-		: "$0.00 remaining";
 
 	return (
 		<div className="w-full space-y-6 pt-5">
@@ -207,25 +198,6 @@ const BillingPage = () => {
 					</p>
 				</div>
 			)}
-
-			{/* Card 3: AI Usage and Credits */}
-			<div
-				onClick={() => router.push("/settings")}
-				className="group flex cursor-pointer items-center justify-between rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-5 transition hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:hover:bg-bg-weak-50/40"
-			>
-				<div>
-					<h2 className="font-medium text-label-md text-text-strong-950 transition-colors group-hover:text-primary-base">
-						AI usage and credits
-					</h2>
-					<p className="mt-1 text-paragraph-sm text-text-sub-600">
-						{creditsRemainingStr}
-					</p>
-				</div>
-				<Icon
-					name="chevron-right"
-					className="h-5 w-5 text-text-sub-600 transition-colors group-hover:text-text-strong-950"
-				/>
-			</div>
 
 			{/* Card 4: Recent Invoices */}
 			<div className="space-y-3">
