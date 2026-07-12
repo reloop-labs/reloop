@@ -209,9 +209,7 @@ function CategoryCard({
 			{/* Left info panel */}
 			<div className="flex flex-col justify-between gap-4 border-stroke-soft-100 p-5 dark:border-stroke-soft-100/40 sm:border-r bg-bg-weak-50/30 dark:bg-white/[0.02]">
 				<div>
-					<div className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-white/[0.04] mb-3">
-						<Icon name={icon} className="h-4 w-4 text-text-sub-600" />
-					</div>
+
 					<h2 className="font-semibold text-label-md text-text-strong-950">
 						{title}
 					</h2>
@@ -220,9 +218,6 @@ function CategoryCard({
 					</p>
 				</div>
 				<div className="space-y-2">
-					<span className="inline-flex h-5 items-center rounded-full bg-bg-weak-50 px-2 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
-						{planName}
-					</span>
 					{showUpgrade && onUpgrade && (
 						<div>
 							<Button.Root
@@ -330,8 +325,8 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 			{/* ── Sending (Transactional) ───────────────────────────────────── */}
 			<CategoryCard
 				icon="send"
-				title="Sending"
-				description="Transactional & campaign emails sent through Reloop."
+				title="Emails"
+				description="All sending and receiving email through Reloop."
 				planName={planName}
 				onUpgrade={onUpgrade}
 				showUpgrade={showUpgrade && status !== "healthy"}
