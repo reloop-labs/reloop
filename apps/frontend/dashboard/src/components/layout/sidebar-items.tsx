@@ -105,6 +105,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 	return (
 		<div
 			className={cn("relative flex flex-col", isCollapsed && "items-center")}
+			onPointerLeave={() => setHoveredEl(undefined)}
 		>
 			{navigation.map((item, index) => {
 				const { path, label, iconName, isSpecial, items, section } = item;
@@ -144,7 +145,6 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 								if (el) mainNavRefs.current[index] = el;
 							}}
 							onPointerEnter={() => setHoveredEl(mainNavRefs.current[index])}
-							onPointerLeave={() => setHoveredEl(undefined)}
 							className={cn(
 								"group relative z-10 flex h-8 items-center rounded-lg transition-all",
 								isCollapsed
@@ -252,7 +252,6 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 																	subNavRefs.current[path]?.[subIndex],
 																)
 															}
-															onPointerLeave={() => setHoveredEl(undefined)}
 															className={cn(
 																"group relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-[12px] transition-colors",
 																isSubActive
@@ -356,13 +355,13 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 	return (
 		<div
 			className={cn("relative flex flex-col", isCollapsed && "items-center")}
+			onPointerLeave={() => setHoveredEl(undefined)}
 		>
 			{/* Back Button */}
 			<Link
 				href={backHref}
 				ref={backNavRef}
 				onPointerEnter={() => setHoveredEl(backNavRef.current ?? undefined)}
-				onPointerLeave={() => setHoveredEl(undefined)}
 				className={cn(
 					"group relative z-10 mb-4 flex h-8 items-center rounded-lg transition-all",
 					isCollapsed
@@ -427,7 +426,6 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 								onPointerEnter={() =>
 									setHoveredEl(itemRefs.current[currentIdx])
 								}
-								onPointerLeave={() => setHoveredEl(undefined)}
 								className={cn(
 									"group relative z-10 flex h-8 items-center rounded-lg transition-all",
 									isCollapsed
