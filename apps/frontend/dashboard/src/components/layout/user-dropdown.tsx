@@ -20,7 +20,7 @@ import { AnimatedHoverBackground } from "../animated-hover-background";
 
 export const UserDropdown = () => {
 	const { user } = useUserOrganization();
-	const { canManageBilling } = useOrgPermissions();
+	const { canManageBilling, canManageTeam } = useOrgPermissions();
 	const { theme, setTheme, resolvedTheme } = useTheme();
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -82,10 +82,14 @@ export const UserDropdown = () => {
 				align="end"
 			>
 				<div className="px-2.5 py-2 pb-1.5">
-					<p className="truncate font-medium text-xs">{user.email}</p>
+					<p className="truncate font-medium text-xs text-text-sub-600">{user.email}</p>
 				</div>
 				<div className="h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 				<div className="relative">
+					{/* Workspace Section */}
+					<Dropdown.Label className="px-2.5 pt-2 pb-1 text-[10px] font-semibold text-text-soft-400 uppercase tracking-wider">
+						Workspace
+					</Dropdown.Label>
 					<Dropdown.Group className="gap-0">
 						<Dropdown.Item
 							ref={(el) => {
@@ -94,7 +98,71 @@ export const UserDropdown = () => {
 							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(0)}
 							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => router.push("/settings/profile")}
+							onClick={() => handleAction("/settings", undefined)}
+						>
+							<Icon name="doughnut" className="h-4 w-4 text-text-sub-600" />
+							<span className="flex-1 truncate text-sm">Usage</span>
+						</Dropdown.Item>
+
+						{canManageBilling && (
+							<Dropdown.Item
+								ref={(el) => {
+									if (el) itemRefs.current[1] = el;
+								}}
+								className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+								onPointerEnter={() => setHoverIdx(1)}
+								onPointerLeave={() => setHoverIdx(undefined)}
+								onClick={() => handleAction("/settings/billing", undefined)}
+							>
+								<Icon name="billing-custom" className="h-4 w-4 text-text-sub-600" />
+								<span className="flex-1 truncate text-sm">Billing</span>
+							</Dropdown.Item>
+						)}
+
+						{canManageTeam && (
+							<Dropdown.Item
+								ref={(el) => {
+									if (el) itemRefs.current[2] = el;
+								}}
+								className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+								onPointerEnter={() => setHoverIdx(2)}
+								onPointerLeave={() => setHoverIdx(undefined)}
+								onClick={() => handleAction("/settings/teams", undefined)}
+							>
+								<Icon name="users" className="h-4 w-4 text-text-sub-600" />
+								<span className="flex-1 truncate text-sm">Teams</span>
+							</Dropdown.Item>
+						)}
+
+						<Dropdown.Item
+							ref={(el) => {
+								if (el) itemRefs.current[3] = el;
+							}}
+							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+							onPointerEnter={() => setHoverIdx(3)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+							onClick={() => handleAction("/settings/workspace", undefined)}
+						>
+							<Icon name="workspace-custom" className="h-4 w-4 text-text-sub-600" />
+							<span className="flex-1 truncate text-sm">Workspace</span>
+						</Dropdown.Item>
+					</Dropdown.Group>
+
+					<div className="my-1.5 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+
+					{/* Account Section */}
+					<Dropdown.Label className="px-2.5 pt-1.5 pb-1 text-[10px] font-semibold text-text-soft-400 uppercase tracking-wider">
+						Account
+					</Dropdown.Label>
+					<Dropdown.Group className="gap-0">
+						<Dropdown.Item
+							ref={(el) => {
+								if (el) itemRefs.current[4] = el;
+							}}
+							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+							onPointerEnter={() => setHoverIdx(4)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+							onClick={() => handleAction("/settings/profile", undefined)}
 						>
 							<Avatar.Root size="20" color="blue" className="shrink-0">
 								{user.image ? (
@@ -113,6 +181,19 @@ export const UserDropdown = () => {
 								)}
 							</Avatar.Root>
 							<span className="flex-1 truncate text-sm">My profile</span>
+						</Dropdown.Item>
+
+						<Dropdown.Item
+							ref={(el) => {
+								if (el) itemRefs.current[5] = el;
+							}}
+							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+							onPointerEnter={() => setHoverIdx(5)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+							onClick={() => handleAction("/settings/security", undefined)}
+						>
+							<Icon name="shield-check" className="h-4 w-4 text-text-sub-600" />
+							<span className="flex-1 truncate text-sm">Security</span>
 						</Dropdown.Item>
 
 						<div className="flex items-center justify-between px-2.5 py-1.5">
@@ -135,31 +216,7 @@ export const UserDropdown = () => {
 						</div>
 					</Dropdown.Group>
 
-					{canManageBilling && (
-						<>
-							<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
-							<Dropdown.Group className="gap-0">
-								<Dropdown.Item
-									ref={(el) => {
-										if (el) itemRefs.current[5] = el;
-									}}
-									className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-									onPointerEnter={() => setHoverIdx(5)}
-									onPointerLeave={() => setHoverIdx(undefined)}
-									onClick={() => router.push("/settings/billing")}
-								>
-									<Icon
-										name="arrow-top-circle"
-										className="h-4 w-4 text-text-sub-600"
-									/>
-									<span className="flex-1 truncate text-sm">
-										Billing & credits
-									</span>
-								</Dropdown.Item>
-							</Dropdown.Group>
-						</>
-					)}
-					<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+					<div className="my-1.5 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 
 					<Dropdown.Group className="gap-0">
 						<Dropdown.Item
