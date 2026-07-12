@@ -23,7 +23,7 @@ function planIndex(id: PlanId): number {
 	return pricingPlans.findIndex((p) => p.id === id);
 }
 
-const GRID_COLS = "grid-cols-[minmax(180px,1.6fr)_repeat(4,minmax(150px,1fr))]";
+const GRID_COLS = "grid-cols-[minmax(160px,240px)_repeat(4,minmax(150px,1fr))]";
 
 const PlansPage = () => {
 	const router = useRouter();
@@ -221,7 +221,11 @@ function ComparisonCell({
 	const unavailable = type === "boolean" ? !value : value === "—";
 
 	if (unavailable) {
-		return <span className="text-paragraph-sm text-text-soft-400">—</span>;
+		return (
+			<span className="font-medium text-paragraph-sm text-text-soft-400">
+				—
+			</span>
+		);
 	}
 
 	if (type === "boolean") {
@@ -231,7 +235,7 @@ function ComparisonCell({
 	}
 
 	return (
-		<span className="inline-flex items-center gap-2 text-paragraph-sm text-text-strong-950">
+		<span className="inline-flex items-center gap-2 font-medium text-paragraph-sm text-text-strong-950">
 			<Icon name="check" className="h-4 w-4 shrink-0 text-text-sub-600" />
 			{value as string}
 		</span>
