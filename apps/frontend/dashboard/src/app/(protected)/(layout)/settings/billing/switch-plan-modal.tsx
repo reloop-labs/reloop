@@ -67,7 +67,7 @@ export const SwitchPlanModal = ({
 							onClick={goToPlans}
 							className="inline-flex items-center gap-1 font-medium text-paragraph-sm text-text-sub-600 transition-colors hover:text-text-strong-950"
 						>
-							<Icon name="external-link" className="h-4 w-4" />
+							<Icon name="arrow-up-right" className="h-4 w-4" />
 							Compare plans
 						</button>
 						<Modal.Close asChild>
@@ -128,8 +128,8 @@ export const SwitchPlanModal = ({
 							{selectedPlan.features.map((feature) => (
 								<li key={feature} className="flex items-start gap-2.5">
 									<Icon
-										name="check"
-										className="mt-0.5 h-4 w-4 shrink-0 text-text-strong-950"
+										name="check-circle"
+										className="mt-0.5 h-4 w-4 shrink-0 text-text-sub-600"
 									/>
 									<span className="text-paragraph-sm text-text-strong-950">
 										{feature}
@@ -142,7 +142,7 @@ export const SwitchPlanModal = ({
 									onClick={goToPlans}
 									className="inline-flex items-center gap-2 text-paragraph-sm text-text-sub-600 transition-colors hover:text-text-strong-950"
 								>
-									<Icon name="external-link" className="h-4 w-4 shrink-0" />
+									<Icon name="arrow-up-right" className="h-4 w-4 shrink-0" />
 									Full feature list
 								</button>
 							</li>
