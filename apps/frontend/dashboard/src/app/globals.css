@@ -135,3 +135,49 @@ body {
 	-ms-overflow-style: none; /* IE and Edge */
 	scrollbar-width: none; /* Firefox */
 }
+
+/* Workflow canvas (React Flow) — match the AI Search pipeline aesthetic */
+.workflow-canvas .react-flow__handle {
+	width: 9px;
+	height: 9px;
+	min-width: 0;
+	min-height: 0;
+	border: 1.5px solid var(--color-bg-white-0);
+	background: var(--color-stroke-sub-300);
+	border-radius: 9999px;
+	opacity: 0;
+	transition: opacity 0.15s ease;
+}
+
+/* Reveal connection handles on hover / while connecting so the canvas stays clean */
+.workflow-canvas .react-flow__node:hover .react-flow__handle,
+.workflow-canvas .react-flow__node.selected .react-flow__handle,
+.workflow-canvas.react-flow__pane--connecting .react-flow__handle,
+.workflow-canvas .react-flow__handle-connecting,
+.workflow-canvas .react-flow__handle-valid {
+	opacity: 1;
+}
+
+.workflow-canvas .react-flow__handle.react-flow__handle-connecting {
+	background: var(--color-orange-500);
+}
+
+/* Dashed connection line while dragging a new edge */
+.workflow-canvas .react-flow__connection-path {
+	stroke: var(--color-orange-500);
+	stroke-width: 1.5;
+}
+
+/* Group container should sit behind its child nodes and ignore drags on the body */
+.workflow-canvas .react-flow__node-group {
+	z-index: -1 !important;
+	pointer-events: none;
+}
+
+.workflow-canvas .react-flow__edge .react-flow__edge-path {
+	stroke-width: 1.5;
+}
+
+.workflow-canvas .react-flow__edge.selected .react-flow__edge-path {
+	stroke: var(--color-orange-500);
+}

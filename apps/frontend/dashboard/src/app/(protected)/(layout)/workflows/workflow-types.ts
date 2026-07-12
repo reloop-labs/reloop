@@ -1,16 +1,26 @@
 import type { WebhookEventName } from "@reloop/webhook-events";
 import type { Edge, Node } from "@xyflow/react";
+import type { EdgeTone } from "./components/nodes/flow-edge";
+import type { GroupNodeData } from "./components/nodes/group-node";
 
 export type WorkflowStatus = "draft" | "active" | "paused";
 
-export type WorkflowNodeType = "trigger" | "send_email";
+export type WorkflowNodeType = "trigger" | "send_email" | "group";
 
-export interface TriggerNodeData {
+/** Presentational fields shared by every node card (see FlowNodeCard). */
+interface NodeCardMeta {
+	/** Monospace category label rendered in the card header. */
+	category?: string;
+	/** Renders the "OPTIONAL" pill in the card header. */
+	optional?: boolean;
+}
+
+export interface TriggerNodeData extends NodeCardMeta {
 	eventId?: WebhookEventName | string;
 	[key: string]: unknown;
 }
 
-export interface SendEmailNodeData {
+export interface SendEmailNodeData extends NodeCardMeta {
 	to: string;
 	subject: string;
 	from?: string;
@@ -18,10 +28,18 @@ export interface SendEmailNodeData {
 	[key: string]: unknown;
 }
 
-export type WorkflowNodeData = TriggerNodeData | SendEmailNodeData;
+export type WorkflowNodeData =
+	| TriggerNodeData
+	| SendEmailNodeData
+	| GroupNodeData;
 
 export type WorkflowNode = Node<WorkflowNodeData, WorkflowNodeType>;
-export type WorkflowEdge = Edge;
+
+export interface WorkflowEdgeData extends Record<string, unknown> {
+	tone?: EdgeTone;
+}
+
+export type WorkflowEdge = Edge<WorkflowEdgeData>;
 
 export interface Workflow {
 	id: string;

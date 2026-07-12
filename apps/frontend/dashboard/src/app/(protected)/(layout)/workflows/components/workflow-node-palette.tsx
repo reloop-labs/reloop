@@ -11,8 +11,8 @@ export const WorkflowNodePalette = ({
 	onAddSendEmail,
 }: WorkflowNodePaletteProps) => {
 	return (
-		<div className="absolute top-4 left-4 z-10 flex flex-col gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-2 shadow-regular-sm dark:border-stroke-soft-100/50 dark:bg-bg-white-0/95">
-			<p className="px-2 font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider">
+		<div className="absolute top-4 left-4 z-10 flex flex-col gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-2 shadow-regular-sm dark:border-stroke-soft-100/60 dark:bg-bg-white-0/95">
+			<p className="px-1.5 font-mono text-[10px] text-text-soft-400 uppercase tracking-[0.12em]">
 				Add step
 			</p>
 			<Button.Root

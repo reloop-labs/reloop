@@ -7,10 +7,14 @@ import { TRIGGER_NODE_ID } from "./workflow-types";
 
 const now = () => new Date().toISOString();
 
+/** Horizontal center used so cards (300px wide) line up in a vertical column. */
+const COLUMN_X = 220;
+const ROW_GAP = 200;
+
 export const createTriggerNode = (): WorkflowNode => ({
 	id: TRIGGER_NODE_ID,
 	type: "trigger",
-	position: { x: 80, y: 200 },
+	position: { x: COLUMN_X, y: 60 },
 	data: {},
 });
 
@@ -20,7 +24,7 @@ export const createSendEmailNode = (
 ): WorkflowNode => ({
 	id: `send_email_${Date.now()}_${index}`,
 	type: "send_email",
-	position: { x: 380, y: 120 + yOffset * 140 },
+	position: { x: COLUMN_X, y: 60 + ROW_GAP + yOffset * ROW_GAP },
 	data: {
 		to: "",
 		subject: "",
@@ -57,13 +61,13 @@ export const seedWorkflows = (organizationId: string): Workflow[] => {
 				{
 					id: TRIGGER_NODE_ID,
 					type: "trigger",
-					position: { x: 80, y: 200 },
+					position: { x: COLUMN_X, y: 60 },
 					data: { eventId: "email.delivered" },
 				},
 				{
 					id: welcomeSendId,
 					type: "send_email",
-					position: { x: 380, y: 200 },
+					position: { x: COLUMN_X, y: 60 + ROW_GAP },
 					data: {
 						to: "{{contact.email}}",
 						subject: "Thanks for reading!",
@@ -76,6 +80,8 @@ export const seedWorkflows = (organizationId: string): Workflow[] => {
 					id: "e_trigger_welcome",
 					source: TRIGGER_NODE_ID,
 					target: welcomeSendId,
+					type: "flow",
+					data: { tone: "accent" },
 				},
 			],
 			createdAt: timestamp,
@@ -91,13 +97,13 @@ export const seedWorkflows = (organizationId: string): Workflow[] => {
 				{
 					id: TRIGGER_NODE_ID,
 					type: "trigger",
-					position: { x: 80, y: 200 },
+					position: { x: COLUMN_X, y: 60 },
 					data: { eventId: "email.bounced" },
 				},
 				{
 					id: "send_email_alert",
 					type: "send_email",
-					position: { x: 380, y: 200 },
+					position: { x: COLUMN_X, y: 60 + ROW_GAP },
 					data: {
 						to: "ops@yourdomain.com",
 						subject: "Email bounced",
@@ -109,6 +115,8 @@ export const seedWorkflows = (organizationId: string): Workflow[] => {
 					id: "e_trigger_alert",
 					source: TRIGGER_NODE_ID,
 					target: "send_email_alert",
+					type: "flow",
+					data: { tone: "accent" },
 				},
 			],
 			createdAt: timestamp,

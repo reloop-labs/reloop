@@ -3,8 +3,9 @@
 import {
 	addEdge,
 	Background,
+	BackgroundVariant,
 	type Connection,
-	Controls,
+	type DefaultEdgeOptions,
 	ReactFlow,
 	ReactFlowProvider,
 	useEdgesState,
@@ -23,6 +24,8 @@ import {
 	type WorkflowNode,
 } from "../workflow-types";
 import { NodeConfigPanel } from "./node-config-panel";
+import { FlowEdge } from "./nodes/flow-edge";
+import { GroupNode } from "./nodes/group-node";
 import { SendEmailNode } from "./nodes/send-email-node";
 import { TriggerNode } from "./nodes/trigger-node";
 import { WorkflowEditorToolbar } from "./workflow-editor-toolbar";
@@ -31,7 +34,21 @@ import { WorkflowNodePalette } from "./workflow-node-palette";
 const nodeTypes = {
 	trigger: TriggerNode,
 	send_email: SendEmailNode,
+	group: GroupNode,
 };
+
+const edgeTypes = {
+	flow: FlowEdge,
+};
+
+const defaultEdgeOptions: DefaultEdgeOptions = {
+	type: "flow",
+	data: { tone: "default" },
+};
+
+/** Horizontal center of the vertical node column (cards are 300px wide). */
+const COLUMN_X = 220;
+const ROW_GAP = 200;
 
 interface WorkflowEditorProps {
 	workflow: Workflow;
@@ -88,7 +105,12 @@ const WorkflowEditorInner = ({
 
 	const onConnect = useCallback(
 		(connection: Connection) => {
-			setEdges((eds) => addEdge(connection, eds));
+			setEdges((eds) =>
+				addEdge(
+					{ ...connection, type: "flow", data: { tone: "default" } },
+					eds,
+				),
+			);
 		},
 		[setEdges],
 	);
@@ -106,9 +128,9 @@ const WorkflowEditorInner = ({
 
 	const handleAddSendEmail = useCallback(() => {
 		const sendCount = nodes.filter(isSendEmailNode).length;
-		const maxY = Math.max(...nodes.map((n) => n.position.y), 200);
+		const maxY = Math.max(...nodes.map((n) => n.position.y), 0);
 		const newNode = createSendEmailNode(sendCount, 0);
-		newNode.position = { x: 380, y: maxY + (sendCount > 0 ? 140 : 0) };
+		newNode.position = { x: COLUMN_X, y: maxY + ROW_GAP };
 		setNodes((nds) => [...nds, newNode]);
 		setSelectedNodeId(newNode.id);
 	}, [nodes, setNodes]);
@@ -161,14 +183,21 @@ const WorkflowEditorInner = ({
 						onEdgesChange={onEdgesChange}
 						onConnect={onConnect}
 						nodeTypes={nodeTypes}
+						edgeTypes={edgeTypes}
+						defaultEdgeOptions={defaultEdgeOptions}
 						fitView
-						fitViewOptions={{ padding: 0.2 }}
+						fitViewOptions={{ padding: 0.3 }}
+						proOptions={{ hideAttribution: true }}
 						onPaneClick={() => setSelectedNodeId(null)}
 						deleteKeyCode={null}
-						className="bg-bg-weak-50/30"
+						className="workflow-canvas bg-bg-weak-50/30"
 					>
-						<Background gap={16} size={1} />
-						<Controls showInteractive={false} />
+						<Background
+							variant={BackgroundVariant.Dots}
+							gap={20}
+							size={1.5}
+							color="var(--color-stroke-sub-300)"
+						/>
 					</ReactFlow>
 				</div>
 				<div className="w-[320px] shrink-0">
