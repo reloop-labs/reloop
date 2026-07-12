@@ -124,7 +124,7 @@ const PlansPage = () => {
 			</div>
 
 			{/* Comparison table */}
-			<div className="overflow-x-auto pb-4">
+			<div className="mb-12 overflow-x-auto pb-4">
 				<div className={cn("grid min-w-[900px]", GRID_COLS)}>
 					{/* Plan header row */}
 					<div className="border-stroke-soft-100 border-b dark:border-stroke-soft-100/40" />
@@ -134,7 +134,7 @@ const PlansPage = () => {
 							<div
 								key={plan.id}
 								className={cn(
-									"flex flex-col gap-4 rounded-2xl border-stroke-soft-100 border-b p-4 dark:border-stroke-soft-100/40",
+									"flex flex-col gap-4 rounded-t-2xl border-stroke-soft-100 border-b p-4 dark:border-stroke-soft-100/40",
 									cellBg(plan),
 								)}
 							>
@@ -194,6 +194,16 @@ const PlansPage = () => {
 								</div>
 							))}
 						</div>
+					))}
+
+					{/* Bottom cap so the highlighted column reads as an independent
+					    rounded block */}
+					<div />
+					{pricingPlans.map((plan) => (
+						<div
+							key={`cap-${plan.id}`}
+							className={cn("h-8 rounded-b-2xl", cellBg(plan))}
+						/>
 					))}
 				</div>
 			</div>
