@@ -32,8 +32,14 @@ const PlansPage = () => {
 	const currentPlanId = resolvePlanId(usageData?.plan?.name);
 	const currentIndex = planIndex(currentPlanId);
 
+	// Emphasize the next plan the user can upgrade to (matches the marketing
+	// pricing page highlight color).
+	const nextIndex = currentIndex + 1;
+
 	const cellBg = (plan: PricingPlan) =>
-		plan.highlighted ? "bg-bg-weak-50 dark:bg-bg-weak-50/40" : "";
+		planIndex(plan.id) === nextIndex
+			? "bg-bg-weak-50 dark:bg-white/[0.03]"
+			: "";
 
 	function priceLine(plan: PricingPlan) {
 		if (plan.monthlyPrice === null) {
@@ -42,12 +48,9 @@ const PlansPage = () => {
 		if (plan.monthlyPrice === 0) {
 			return { amount: formatPrice(0), caption: "Free for everyone" };
 		}
-		const monthly = billedYearly
-			? Math.round(plan.monthlyPrice * (1 - ANNUAL_DISCOUNT))
-			: plan.monthlyPrice;
 		return {
-			amount: formatPrice(monthly),
-			caption: billedYearly ? "per month, billed yearly" : "per month",
+			amount: formatPrice(plan.monthlyPrice),
+			caption: "per month",
 		};
 	}
 
@@ -83,10 +86,11 @@ const PlansPage = () => {
 		}
 
 		const isUpgrade = index > currentIndex;
+		const isNext = index === nextIndex;
 		return (
 			<Button.Root
-				variant={plan.highlighted ? "primary" : "neutral"}
-				mode={plan.highlighted ? "filled" : "stroke"}
+				variant="neutral"
+				mode={isNext ? "filled" : "stroke"}
 				size="small"
 				className="w-full font-semibold"
 			>
@@ -119,14 +123,6 @@ const PlansPage = () => {
 				</p>
 			</div>
 
-			{/* Billing period toggle */}
-			<div className="mb-4 flex items-center justify-end gap-2">
-				<span className="text-paragraph-sm text-text-sub-600">
-					Billed yearly
-				</span>
-				<Switch.Root checked={billedYearly} onCheckedChange={setBilledYearly} />
-			</div>
-
 			{/* Comparison table */}
 			<div className="overflow-x-auto pb-4">
 				<div className={cn("grid min-w-[900px]", GRID_COLS)}>
@@ -143,16 +139,9 @@ const PlansPage = () => {
 								)}
 							>
 								<div>
-									<div className="flex items-center gap-2">
-										<h2 className="font-medium text-label-md text-text-strong-950">
-											{plan.name}
-										</h2>
-										{plan.badge && (
-											<span className="rounded-full bg-primary-base px-2 py-0.5 font-semibold text-[10px] text-static-white uppercase tracking-wider">
-												{plan.badge}
-											</span>
-										)}
-									</div>
+									<h2 className="font-medium text-label-md text-text-strong-950">
+										{plan.name}
+									</h2>
 									<div className="mt-2 flex items-baseline gap-1.5">
 										<span className="font-semibold text-text-strong-950 text-title-h6">
 											{price.amount}
