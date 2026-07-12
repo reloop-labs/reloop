@@ -1,10 +1,12 @@
 "use client";
 
 import { useUIStore } from "@fe/dashboard/store/use-ui-store";
+import NumberFlow from "@number-flow/react";
 import {
 	defaultPlan,
 	formatPrice,
 	type PlanId,
+	type PricingPlan,
 	pricingPlans,
 } from "@reloop/pricing";
 import * as Button from "@reloop/ui/button";
@@ -13,6 +15,60 @@ import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
+/**
+ * Feature rows that share the same structure across Free / Individual / Startup
+ * — only the number changes. Rendering these with a stable key + NumberFlow lets
+ * the value animate in place instead of the whole list re-rendering.
+ */
+type StringComparisonKey = {
+	[K in keyof PricingPlan["comparison"]]: PricingPlan["comparison"][K] extends string
+		? K
+		: never;
+}[keyof PricingPlan["comparison"]];
+
+const NUMERIC_FEATURES: Array<{
+	id: string;
+	key: StringComparisonKey;
+	suffix: string;
+}> = [
+	{ id: "emails", key: "monthlyEmails", suffix: "emails per month" },
+	{ id: "inboxes", key: "agentInbox", suffix: "agent inboxes" },
+	{ id: "webhooks", key: "webhooks", suffix: "webhooks" },
+	{ id: "domains", key: "customDomains", suffix: "custom domains" },
+	{ id: "throughput", key: "ratePerSecond", suffix: "emails / sec throughput" },
+	{ id: "attachments", key: "attachmentSize", suffix: "MB attachments" },
+	{
+		id: "validation",
+		key: "emailValidation",
+		suffix: "email validations / mo",
+	},
+];
+
+/** Static rows shared by every numeric plan. */
+const STATIC_FEATURES = [
+	"Transactional & campaign email",
+	"SMTP relay & analytics",
+];
+
+function toNumber(value: string): number {
+	const digits = value.replace(/[^0-9]/g, "");
+	return digits ? Number.parseInt(digits, 10) : 0;
+}
+
+function FeatureItem({ children }: { children: React.ReactNode }) {
+	return (
+		<li className="flex items-start gap-2.5">
+			<Icon
+				name="check-circle"
+				className="mt-0.5 h-4 w-4 shrink-0 text-text-sub-600"
+			/>
+			<span className="flex items-center gap-1 text-paragraph-sm text-text-strong-950">
+				{children}
+			</span>
+		</li>
+	);
+}
 
 interface SwitchPlanModalProps {
 	open: boolean;
@@ -56,6 +112,7 @@ export const SwitchPlanModal = ({
 
 	const selectedPlan =
 		pricingPlans.find((p) => p.id === selectedId) ?? defaultPlan;
+	const isEnterprise = selectedPlan.monthlyPrice === null;
 
 	const goToPlans = () => {
 		onOpenChange(false);
@@ -148,18 +205,32 @@ export const SwitchPlanModal = ({
 						<p className="text-paragraph-sm text-text-sub-600">
 							Included features
 						</p>
-						<ul className="mt-4 space-y-3.5">
-							{selectedPlan.features.map((feature) => (
-								<li key={feature} className="flex items-start gap-2.5">
-									<Icon
-										name="check-circle"
-										className="mt-0.5 h-4 w-4 shrink-0 text-text-sub-600"
-									/>
-									<span className="text-paragraph-sm text-text-strong-950">
-										{feature}
-									</span>
-								</li>
-							))}
+						<ul className="mt-4 min-h-[380px] space-y-3.5">
+							{isEnterprise
+								? selectedPlan.features.map((feature) => (
+										<FeatureItem key={feature}>{feature}</FeatureItem>
+									))
+								: [
+										...NUMERIC_FEATURES.map((row) => (
+											<FeatureItem key={row.id}>
+												<NumberFlow
+													value={toNumber(selectedPlan.comparison[row.key])}
+													className="font-medium tabular-nums"
+													transformTiming={{
+														duration: 500,
+														easing: "ease-out",
+													}}
+												/>
+												{row.suffix}
+											</FeatureItem>
+										)),
+										...STATIC_FEATURES.map((feature) => (
+											<FeatureItem key={feature}>{feature}</FeatureItem>
+										)),
+										<FeatureItem key="support">
+											{selectedPlan.comparison.support} support
+										</FeatureItem>,
+									]}
 							<li>
 								<button
 									type="button"
