@@ -16,8 +16,9 @@ import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
+import { SwitchPlanModal } from "./switch-plan-modal";
 
 const CARD =
 	"rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-5 dark:border-stroke-soft-100/40";
@@ -34,6 +35,7 @@ function resolvePlanId(name: string | undefined): PlanId {
 
 const BillingPage = () => {
 	const router = useRouter();
+	const [switchOpen, setSwitchOpen] = useState(false);
 	const { canManageBilling, isPending: rolePending } = useOrgPermissions();
 	const { activeOrganization } = useUserOrganization();
 
@@ -159,7 +161,7 @@ const BillingPage = () => {
 							mode="stroke"
 							size="small"
 							className="font-semibold"
-							onClick={() => router.push("/settings/teams")}
+							onClick={() => setSwitchOpen(true)}
 						>
 							Manage
 						</Button.Root>
@@ -263,6 +265,13 @@ const BillingPage = () => {
 					</p>
 				</div>
 			</div>
+
+			<SwitchPlanModal
+				open={switchOpen}
+				onOpenChange={setSwitchOpen}
+				currentPlanId={currentPlanId}
+				userCount={userCount}
+			/>
 		</div>
 	);
 };

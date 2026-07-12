@@ -11,13 +11,7 @@ import {
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as Switch from "@reloop/ui/switch";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-
-// Annual billing applies a standard 20% discount. Replace once
-// @reloop/pricing exposes real annual pricing.
-const ANNUAL_DISCOUNT = 0.2;
 
 function resolvePlanId(name: string | undefined): PlanId {
 	const normalized = (name ?? "free").toLowerCase();
@@ -33,7 +27,6 @@ const GRID_COLS = "grid-cols-[minmax(180px,1.6fr)_repeat(4,minmax(150px,1fr))]";
 
 const PlansPage = () => {
 	const router = useRouter();
-	const [billedYearly, setBilledYearly] = useState(false);
 	const { data: usageData } = useBillingUsage();
 
 	const currentPlanId = resolvePlanId(usageData?.plan?.name);
