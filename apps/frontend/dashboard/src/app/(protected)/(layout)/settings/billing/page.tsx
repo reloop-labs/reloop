@@ -3,9 +3,7 @@
 import { AnimatedForwardButton } from "@fe/dashboard/components/animated-forward-button";
 import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { useBillingUsage } from "@fe/dashboard/hooks/useBillingUsage";
-import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { useUIStore } from "@fe/dashboard/store/use-ui-store";
-import { authClient } from "@reloop/auth/client";
 import {
 	defaultPlan,
 	formatPrice,
@@ -19,7 +17,6 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import useSWR from "swr";
 import { SwitchPlanModal } from "./switch-plan-modal";
 
 const CARD =
@@ -46,29 +43,12 @@ const BillingPage = () => {
 		setIsAiPanelOpen(true);
 	};
 	const { canManageBilling, isPending: rolePending } = useOrgPermissions();
-	const { activeOrganization } = useUserOrganization();
 
 	const {
 		data: usageData,
 		error: usageError,
 		refetch: refetchUsage,
 	} = useBillingUsage();
-
-	// Fetch members dynamically to show the exact number of active users
-	const { data: membersData, isLoading: membersLoading } = useSWR<{
-		members: { id: string }[];
-	}>(
-		activeOrganization?.id
-			? `organization-member-${activeOrganization.id}`
-			: null,
-		async () => {
-			if (!activeOrganization?.id) return { members: [] };
-			const result = await authClient.organization.listMembers({
-				query: { organizationId: activeOrganization.id },
-			});
-			return result.data ?? { members: [] };
-		},
-	);
 
 	useEffect(() => {
 		if (!rolePending && !canManageBilling) {
@@ -81,9 +61,6 @@ const BillingPage = () => {
 	}
 
 	const error = usageError;
-
-	// Total user count
-	const userCount = membersLoading ? "—" : (membersData?.members?.length ?? 1);
 
 	// Resolve the current plan and the next tier to upgrade to
 	const currentPlanId = resolvePlanId(usageData?.plan?.name);
@@ -105,7 +82,7 @@ const BillingPage = () => {
 	return (
 		<div className="w-full space-y-6 pt-5">
 			{/* Header */}
-			<div className="flex items-start justify-between">
+			<div className="flex items-end justify-between">
 				<div>
 					<h1 className="font-semibold text-text-strong-950 text-title-h5">
 						Billing
@@ -153,25 +130,15 @@ const BillingPage = () => {
 							{currentPlan.priceSubline}
 						</p>
 					</div>
-					<div className="flex items-center gap-6">
-						<div className="text-right">
-							<p className="font-semibold text-subheading-2xs text-text-soft-400 uppercase tracking-wider">
-								Users
-							</p>
-							<p className="font-bold text-text-strong-950 text-title-h4">
-								{userCount}
-							</p>
-						</div>
-						<Button.Root
-							variant="neutral"
-							mode="stroke"
-							size="small"
-							className="font-semibold"
-							onClick={() => setSwitchOpen(true)}
-						>
-							Manage
-						</Button.Root>
-					</div>
+					<Button.Root
+						variant="neutral"
+						mode="stroke"
+						size="small"
+						className="font-semibold"
+						onClick={() => setSwitchOpen(true)}
+					>
+						Manage
+					</Button.Root>
 				</div>
 			</div>
 
@@ -276,7 +243,6 @@ const BillingPage = () => {
 				open={switchOpen}
 				onOpenChange={setSwitchOpen}
 				currentPlanId={currentPlanId}
-				userCount={userCount}
 			/>
 		</div>
 	);

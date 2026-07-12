@@ -19,7 +19,6 @@ interface SwitchPlanModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	currentPlanId: PlanId;
-	userCount: number | string;
 }
 
 function planPriceLabel(plan: (typeof pricingPlans)[number]): string {
@@ -32,7 +31,6 @@ export const SwitchPlanModal = ({
 	open,
 	onOpenChange,
 	currentPlanId,
-	userCount,
 }: SwitchPlanModalProps) => {
 	const router = useRouter();
 	const [selectedId, setSelectedId] = useState<PlanId>(currentPlanId);
@@ -154,19 +152,11 @@ export const SwitchPlanModal = ({
 
 				{/* Footer */}
 				<Modal.Footer className="border-stroke-soft-100 dark:border-stroke-soft-100/40">
-					<div className="flex items-center gap-8">
-						<div>
-							<p className="text-paragraph-xs text-text-sub-600">Plan</p>
-							<p className="font-medium text-label-sm text-text-strong-950">
-								{selectedPlan.name}
-							</p>
-						</div>
-						<div>
-							<p className="text-paragraph-xs text-text-sub-600">Users</p>
-							<p className="font-medium text-label-sm text-text-strong-950">
-								{userCount}
-							</p>
-						</div>
+					<div>
+						<p className="text-paragraph-xs text-text-sub-600">Plan</p>
+						<p className="font-medium text-label-sm text-text-strong-950">
+							{selectedPlan.name}
+						</p>
 					</div>
 					<div className="flex items-center gap-3">
 						<Button.Root
