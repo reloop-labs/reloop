@@ -113,7 +113,7 @@ const BillingPage = () => {
 							<h2 className="font-medium text-label-md text-text-strong-950">
 								{currentPlan.name} plan
 							</h2>
-							<span className="inline-flex h-5 items-center rounded-full border border-stroke-soft-200 bg-bg-white-0 px-2 font-medium text-label-xs text-text-sub-600 dark:border-stroke-soft-100/40 dark:bg-white/[0.04]">
+							<span className="inline-flex h-5 items-center rounded-full bg-bg-weak-50 px-2 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
 								Current
 							</span>
 						</div>
@@ -157,7 +157,7 @@ const BillingPage = () => {
 								variant="neutral"
 								mode="ghost"
 								size="small"
-								className="font-medium text-text-sub-600 hover:text-text-strong-950"
+								className="rounded-full font-medium text-text-sub-600 hover:text-text-strong-950"
 								onClick={() => router.push("/settings/billing/plans")}
 							>
 								View all plans

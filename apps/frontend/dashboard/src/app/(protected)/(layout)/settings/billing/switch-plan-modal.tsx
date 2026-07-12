@@ -178,7 +178,7 @@ export const SwitchPlanModal = ({
 									className={cn(
 										"rounded-2xl border p-4 text-left transition-colors",
 										isSelected
-											? "border-primary-base bg-primary-alpha-10"
+											? "border-text-strong-950 bg-bg-weak-50 dark:border-white dark:bg-white/[0.06]"
 											: "border-stroke-soft-100 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40",
 									)}
 								>
@@ -187,7 +187,7 @@ export const SwitchPlanModal = ({
 											{plan.name}
 										</span>
 										{isCurrent && (
-											<span className="inline-flex h-5 items-center rounded-full border border-stroke-soft-200 bg-bg-white-0 px-2 font-medium text-label-xs text-text-sub-600 dark:border-stroke-soft-100/40 dark:bg-white/[0.04]">
+											<span className="inline-flex h-5 items-center rounded-full bg-bg-weak-50 px-2 font-medium text-label-xs text-text-sub-600 dark:bg-white/[0.06]">
 												Current plan
 											</span>
 										)}
