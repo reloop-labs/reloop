@@ -641,6 +641,7 @@
         "@number-flow/react": "catalog:ui",
         "@react-email/editor": "catalog:ui",
         "@reloop/auth": "workspace:*",
+        "@reloop/pricing": "workspace:*",
         "@reloop/tailwind": "workspace:*",
         "@reloop/ui": "workspace:*",
         "@reloop/webhook-events": "workspace:*",
@@ -790,6 +791,7 @@
       "dependencies": {
         "@hookform/resolvers": "catalog:ui",
         "@reloop/auth": "workspace:*",
+        "@reloop/pricing": "workspace:*",
         "@reloop/tailwind": "workspace:*",
         "@reloop/ui": "workspace:*",
         "@tailwindcss/postcss": "catalog:ui",
@@ -887,6 +889,15 @@
         "dotenv-cli": "catalog:db",
         "drizzle-kit": "catalog:db",
         "shx": "catalog:db",
+        "typescript": "catalog:",
+      },
+    },
+    "packages/pricing": {
+      "name": "@reloop/pricing",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@reloop/tsconfig": "workspace:*",
+        "@types/node": "catalog:",
         "typescript": "catalog:",
       },
     },
@@ -2056,6 +2067,8 @@
     "@reloop/cache": ["@reloop/cache@workspace:packages/cache"],
 
     "@reloop/db": ["@reloop/db@workspace:packages/db"],
+
+    "@reloop/pricing": ["@reloop/pricing@workspace:packages/pricing"],
 
     "@reloop/tailwind": ["@reloop/tailwind@workspace:packages/tailwind"],
 

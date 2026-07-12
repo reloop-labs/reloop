@@ -1,103 +1,59 @@
 "use client";
 
-import { useBillingUsage } from "@fe/dashboard/hooks/useBillingUsage";
 import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
+import { useBillingUsage } from "@fe/dashboard/hooks/useBillingUsage";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { authClient } from "@reloop/auth/client";
+import {
+	defaultPlan,
+	formatPrice,
+	getNextPlan,
+	getPlanById,
+	type PlanId,
+	pricingPlans,
+} from "@reloop/pricing";
+import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import useSWR from "swr";
 
-interface Transaction {
-	id: string;
-	entryType:
-		| "credit_purchased"
-		| "email_sent"
-		| "rollover_applied"
-		| "manual_adjustment"
-		| "refund"
-		| "plan_change"
-		| "period_reset";
-	delta: number;
-	balanceAfter: number;
-	reason: string | null;
-	createdAt: string;
-}
-
-function formatDate(iso: string): string {
-	return new Date(iso).toLocaleDateString("en-US", {
-		month: "short",
-		day: "numeric",
-		year: "numeric",
-		hour: "2-digit",
-		minute: "2-digit",
-	});
-}
-
 function formatNumber(num: number): string {
 	return num.toLocaleString();
 }
 
-function formatPeriod(start: string, end: string): string {
-	const fmt = (d: string) =>
-		new Date(d).toLocaleDateString("en-US", {
-			month: "short",
-			day: "numeric",
-			year: "numeric",
-		});
-	return `${fmt(start)} – ${fmt(end)}`;
+function resolvePlanId(name: string | undefined): PlanId {
+	const normalized = (name ?? "free").toLowerCase();
+	const match = pricingPlans.find((p) => p.id === normalized);
+	return match?.id ?? "free";
 }
-
-function daysUntil(isoDate: string): number {
-	const end = new Date(isoDate).getTime();
-	const now = Date.now();
-	return Math.max(0, Math.ceil((end - now) / (1000 * 60 * 60 * 24)));
-}
-
-const Skeleton = ({ className }: { className?: string }) => (
-	<div
-		className={`animate-pulse rounded bg-bg-soft-200 dark:bg-white/10 ${className ?? ""}`}
-	/>
-);
-
-const entryTypeLabels: Record<string, string> = {
-	credit_purchased: "Quota Purchased",
-	email_sent: "Email Delivery",
-	rollover_applied: "Rollover",
-	manual_adjustment: "Adjustment",
-	refund: "Refund",
-	plan_change: "Plan Change",
-	period_reset: "Monthly Reset",
-};
-
-const entryTypeStyles: Record<string, string> = {
-	credit_purchased:
-		"bg-green-50 text-green-700 border border-green-100 dark:bg-green-500/10 dark:text-green-400 dark:border-green-500/20",
-	email_sent:
-		"bg-neutral-50 text-neutral-600 border border-neutral-100 dark:bg-white/5 dark:text-white/60 dark:border-white/10",
-	manual_adjustment:
-		"bg-blue-50 text-blue-700 border border-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20",
-	period_reset:
-		"bg-amber-50 text-amber-700 border border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20",
-};
 
 const BillingPage = () => {
 	const router = useRouter();
 	const { canManageBilling, isPending: rolePending } = useOrgPermissions();
+	const { activeOrganization } = useUserOrganization();
 
 	const {
 		data: usageData,
-		isLoading: usageLoading,
 		error: usageError,
 		refetch: refetchUsage,
 	} = useBillingUsage();
 
-	const {
-		data: transactions,
-		isLoading: transactionsLoading,
-		error: transactionsError,
-	} = useSWR<Transaction[]>(
-		canManageBilling ? "/api/credits/v1/transactions" : null,
+	// Fetch members dynamically to show the exact number of active users
+	const { data: membersData, isLoading: membersLoading } = useSWR<{
+		members: { id: string }[];
+	}>(
+		activeOrganization?.id
+			? `organization-member-${activeOrganization.id}`
+			: null,
+		async () => {
+			if (!activeOrganization?.id) return { members: [] };
+			const result = await authClient.organization.listMembers({
+				query: { organizationId: activeOrganization.id },
+			});
+			return result.data ?? { members: [] };
+		},
 	);
 
 	useEffect(() => {
@@ -110,8 +66,27 @@ const BillingPage = () => {
 		return null;
 	}
 
-	const isLoading = usageLoading || transactionsLoading;
-	const error = usageError || transactionsError;
+	const error = usageError;
+
+	// Total user count
+	const userCount = membersLoading ? "—" : (membersData?.members?.length ?? 1);
+
+	// Resolve the current plan and the next tier to upgrade to
+	const currentPlanId = resolvePlanId(usageData?.plan?.name);
+	const currentPlan = getPlanById(currentPlanId) ?? defaultPlan;
+	const nextPlan = getNextPlan(currentPlanId);
+
+	// Format the next plan's price line
+	const nextPlanPriceLabel = nextPlan
+		? nextPlan.monthlyPrice === null
+			? nextPlan.priceSubline
+			: `${formatPrice(nextPlan.monthlyPrice)} ${nextPlan.priceSubline}`
+		: "";
+
+	// Dynamically read remaining credits from usage hook
+	const creditsRemainingStr = usageData
+		? `${formatNumber(usageData.subscription.creditsRemaining)} credits remaining`
+		: "$0.00 remaining";
 
 	return (
 		<div className="w-full space-y-6 pt-5">
@@ -122,9 +97,23 @@ const BillingPage = () => {
 						Billing
 					</h1>
 					<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-white/60">
-						Manage your subscription plan, view invoice history, and buy credits.
+						For questions about billing,{" "}
+						<a
+							href="mailto:support@reloop.dev"
+							className="font-semibold text-text-strong-950 underline hover:text-text-sub-600 dark:text-white dark:hover:text-white/80"
+						>
+							contact us
+						</a>
 					</p>
 				</div>
+				<button
+					type="button"
+					onClick={() => router.push("/settings")}
+					className="flex items-center gap-1 font-semibold text-paragraph-sm text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+				>
+					<span>All plans</span>
+					<Icon name="chevron-right" className="h-4 w-4" />
+				</button>
 			</div>
 
 			{/* Error state */}
@@ -137,148 +126,138 @@ const BillingPage = () => {
 				</div>
 			)}
 
-			{/* Billing Period Banner */}
-			<div className="flex items-center justify-between rounded-xl border border-stroke-soft-100 bg-white p-4 dark:border-white/5 dark:bg-white/[0.02]">
-				<div className="flex items-center gap-3">
-					<Icon
-						name="calendar"
-						className="h-5 w-5 text-text-sub-600 dark:text-white/60"
-					/>
-					{usageLoading ? (
-						<Skeleton className="h-4 w-52" />
-					) : (
-						<p className="font-medium text-label-sm text-text-strong-950 dark:text-white">
-							Billing period:{" "}
-							{usageData
-								? formatPeriod(
-										usageData.subscription.currentPeriodStart,
-										usageData.subscription.currentPeriodEnd,
-									)
-								: "—"}
+			{/* Card 1: Current plan */}
+			<div className="rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.02]">
+				<div className="flex items-center justify-between">
+					<div>
+						<div className="flex items-center gap-2">
+							<h2 className="font-semibold text-base text-text-strong-950 dark:text-white">
+								{currentPlan.name} plan
+							</h2>
+							<Badge.Root size="small" variant="lighter" color="gray">
+								Current
+							</Badge.Root>
+						</div>
+						<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-white/60">
+							{currentPlan.priceSubline}
 						</p>
-					)}
+					</div>
+					<div className="flex items-center gap-6">
+						<div className="text-right">
+							<p className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+								Users
+							</p>
+							<p className="font-bold text-text-strong-950 text-title-h4 dark:text-white">
+								{userCount}
+							</p>
+						</div>
+						<Button.Root
+							variant="neutral"
+							mode="stroke"
+							size="small"
+							className="font-semibold"
+							onClick={() => router.push("/settings/teams")}
+						>
+							Manage
+						</Button.Root>
+					</div>
 				</div>
-				{usageLoading ? (
-					<Skeleton className="h-4 w-24" />
-				) : (
-					<p className="font-medium text-paragraph-xs text-text-sub-600 dark:text-white/60">
-						Resets in{" "}
-						<span className="font-semibold text-text-strong-950 dark:text-white">
-							{usageData ? daysUntil(usageData.subscription.currentPeriodEnd) : "—"} days
-						</span>
-					</p>
-				)}
 			</div>
 
-			{/* Transactions History */}
-			<div className="group flex w-full flex-col">
-				<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-3 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
-					<div className="flex items-center gap-2 font-medium text-sm text-text-strong-950 dark:text-white">
-						<Icon
-							name="file-text"
-							className="h-4 w-4 shrink-0 text-text-sub-600 dark:text-white/60"
-						/>
-						<span>Credit Ledger &amp; Transactions</span>
+			{/* Card 2: Upgrade to the next tier */}
+			{nextPlan ? (
+				<div className="rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.02]">
+					<div className="flex items-center justify-between border-stroke-soft-100/50 border-b pb-5 dark:border-white/5">
+						<div>
+							<div className="flex items-center gap-2">
+								<h2 className="font-semibold text-base text-text-strong-950 dark:text-white">
+									Upgrade to {nextPlan.name} plan
+								</h2>
+								{nextPlan.badge && (
+									<Badge.Root size="small" variant="lighter" color="blue">
+										{nextPlan.badge}
+									</Badge.Root>
+								)}
+							</div>
+							<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-white/60">
+								{nextPlanPriceLabel}
+							</p>
+						</div>
+						<div className="flex items-center gap-3">
+							<Button.Root
+								variant="neutral"
+								mode="ghost"
+								size="small"
+								className="font-semibold text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+								onClick={() => router.push("/settings")}
+							>
+								View all plans
+							</Button.Root>
+							<Button.Root
+								variant="primary"
+								mode="filled"
+								size="small"
+								className="font-semibold"
+							>
+								Upgrade now
+							</Button.Root>
+						</div>
 					</div>
-					<div className="flex gap-2">
-						<Button.Root variant="neutral" size="xsmall" className="font-semibold">
-							Request Custom Quota
-						</Button.Root>
-						<Button.Root variant="neutral" size="xsmall" className="font-semibold">
-							<Icon name="arrow-top-circle" className="h-3.5 w-3.5" />
-							Upgrade Plan
-						</Button.Root>
+
+					{/* Features checklist (3 columns grid layout) */}
+					<div className="grid grid-cols-1 gap-x-6 gap-y-3.5 pt-5 sm:grid-cols-3">
+						{nextPlan.features.map((feature) => (
+							<div key={feature} className="flex items-start gap-2">
+								<Icon
+									name="check"
+									className="mt-0.5 h-4 w-4 shrink-0 text-primary-base dark:text-primary-base"
+								/>
+								<span className="text-paragraph-sm text-text-sub-600 dark:text-white/70">
+									{feature}
+								</span>
+							</div>
+						))}
 					</div>
 				</div>
+			) : (
+				<div className="rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.02]">
+					<h2 className="font-semibold text-base text-text-strong-950 dark:text-white">
+						You're on the {currentPlan.name} plan
+					</h2>
+					<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-white/60">
+						You have access to the highest plan available.
+					</p>
+				</div>
+			)}
 
-				<div className="-mt-1.5 overflow-hidden rounded-xl border border-stroke-soft-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] dark:border-white/5 dark:bg-white/[0.02]">
-					<table className="w-full text-left text-sm">
-						<thead className="border-stroke-soft-100 border-b bg-neutral-alpha-5 dark:border-white/5 dark:bg-white/[0.02]">
-							<tr>
-								<th className="px-4 py-3 font-medium text-text-sub-600 dark:text-white/60">
-									Date
-								</th>
-								<th className="px-4 py-3 font-medium text-text-sub-600 dark:text-white/60">
-									Type
-								</th>
-								<th className="px-4 py-3 font-medium text-text-sub-600 dark:text-white/60">
-									Description
-								</th>
-								<th className="px-4 py-3 text-right font-medium text-text-sub-600 dark:text-white/60">
-									Change
-								</th>
-								<th className="px-4 py-3 text-right font-medium text-text-sub-600 dark:text-white/60">
-									Balance
-								</th>
-							</tr>
-						</thead>
-						<tbody className="divide-y divide-stroke-soft-100 dark:divide-white/5">
-							{isLoading ? (
-								Array.from({ length: 3 }).map((_, i) => (
-									<tr key={i} className="dark:border-white/5">
-										<td className="px-4 py-3">
-											<Skeleton className="h-4 w-28" />
-										</td>
-										<td className="px-4 py-3">
-											<Skeleton className="h-4.5 w-20 rounded" />
-										</td>
-										<td className="px-4 py-3">
-											<Skeleton className="h-4 w-40" />
-										</td>
-										<td className="px-4 py-3 text-right">
-											<Skeleton className="ml-auto h-4 w-12" />
-										</td>
-										<td className="px-4 py-3 text-right">
-											<Skeleton className="ml-auto h-4 w-16" />
-										</td>
-									</tr>
-								))
-							) : (transactions ?? []).length === 0 ? (
-								<tr>
-									<td
-										colSpan={5}
-										className="px-4 py-8 text-center text-paragraph-sm text-text-sub-600 dark:text-white/60"
-									>
-										No credit transactions recorded yet.
-									</td>
-								</tr>
-							) : (
-								(transactions ?? []).map((tx) => (
-									<tr
-										key={tx.id}
-										className="transition-colors hover:bg-neutral-alpha-5/5 dark:hover:bg-white/[0.01]"
-									>
-										<td className="whitespace-nowrap px-4 py-3 text-text-strong-950 dark:text-white">
-											{formatDate(tx.createdAt)}
-										</td>
-										<td className="whitespace-nowrap px-4 py-3">
-											<span
-												className={`inline-flex items-center gap-1.5 rounded px-2 py-0.5 font-medium text-[10px] capitalize ${entryTypeStyles[tx.entryType] ?? "bg-neutral-100 text-neutral-600 dark:border-white/10 dark:bg-white/5 dark:text-white/60"}`}
-											>
-												{entryTypeLabels[tx.entryType] ?? tx.entryType}
-											</span>
-										</td>
-										<td className="max-w-[240px] truncate px-4 py-3 text-text-sub-600 dark:text-white/60">
-											{tx.reason ?? "—"}
-										</td>
-										<td
-											className={`whitespace-nowrap px-4 py-3 text-right font-medium ${
-												tx.delta > 0
-													? "text-green-600 dark:text-green-400"
-													: "text-text-strong-950 dark:text-white"
-											}`}
-										>
-											{tx.delta > 0 ? "+" : ""}
-											{formatNumber(tx.delta)}
-										</td>
-										<td className="whitespace-nowrap px-4 py-3 text-right font-medium text-text-strong-950 dark:text-white">
-											{formatNumber(tx.balanceAfter)}
-										</td>
-									</tr>
-								))
-							)}
-						</tbody>
-					</table>
+			{/* Card 3: AI Usage and Credits */}
+			<div
+				onClick={() => router.push("/settings")}
+				className="group flex cursor-pointer items-center justify-between rounded-xl border border-stroke-soft-100 bg-white p-5 transition hover:bg-neutral-alpha-5/5 dark:border-white/5 dark:bg-white/[0.02] dark:hover:bg-white/[0.04]"
+			>
+				<div>
+					<h2 className="font-semibold text-base text-text-strong-950 transition-colors group-hover:text-primary-base dark:text-white dark:group-hover:text-primary-base">
+						AI usage and credits
+					</h2>
+					<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-white/60">
+						{creditsRemainingStr}
+					</p>
+				</div>
+				<Icon
+					name="chevron-right"
+					className="h-5 w-5 text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:text-white/60 dark:group-hover:text-white"
+				/>
+			</div>
+
+			{/* Card 4: Recent Invoices */}
+			<div className="space-y-3">
+				<h2 className="font-semibold text-paragraph-lg text-text-strong-950 dark:text-white">
+					Recent invoices
+				</h2>
+				<div className="flex h-32 items-center justify-center rounded-xl border border-stroke-soft-100 bg-white dark:border-white/5 dark:bg-white/[0.02]">
+					<p className="text-paragraph-sm text-text-sub-600 dark:text-white/40">
+						No invoices yet
+					</p>
 				</div>
 			</div>
 		</div>

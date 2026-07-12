@@ -1,0 +1,20 @@
+{
+	"name": "@reloop/pricing",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"build": "tsc --build",
+		"clean": "git clean -xdf .cache .turbo dist node_modules",
+		"dev": "tsc --build tsconfig.package.json",
+		"typecheck": "tsc --build --noEmit --emitDeclarationOnly false"
+	},
+	"devDependencies": {
+		"@reloop/tsconfig": "workspace:*",
+		"@types/node": "catalog:",
+		"typescript": "catalog:"
+	}
+}

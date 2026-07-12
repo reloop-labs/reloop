@@ -11,6 +11,7 @@
 	"dependencies": {
 		"@hookform/resolvers": "catalog:ui",
 		"@reloop/auth": "workspace:*",
+		"@reloop/pricing": "workspace:*",
 		"@reloop/tailwind": "workspace:*",
 		"@reloop/ui": "workspace:*",
 		"@tailwindcss/postcss": "catalog:ui",

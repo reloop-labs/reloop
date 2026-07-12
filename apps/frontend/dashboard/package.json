@@ -20,6 +20,7 @@
 		"@number-flow/react": "catalog:ui",
 		"@react-email/editor": "catalog:ui",
 		"@reloop/auth": "workspace:*",
+		"@reloop/pricing": "workspace:*",
 		"@reloop/tailwind": "workspace:*",
 		"@reloop/ui": "workspace:*",
 		"@reloop/webhook-events": "workspace:*",
