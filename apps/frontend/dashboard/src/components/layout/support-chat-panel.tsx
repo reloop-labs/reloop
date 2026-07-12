@@ -8,6 +8,7 @@ import type {
 	SupportServerEvent,
 } from "@fe/dashboard/lib/support-types";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import {
 	getAvatarGradient,
 	getAvatarInitial,
@@ -107,6 +108,12 @@ const NEAR_BOTTOM_PX = 80;
 export function SupportChatPanel() {
 	const { user } = useUserOrganization();
 	const firstName = user?.name?.split(" ")[0] || "there";
+
+	const pendingSupportMessage = useUIStore((s) => s.pendingSupportMessage);
+	const setPendingSupportMessage = useUIStore(
+		(s) => s.setPendingSupportMessage,
+	);
+	const autoSentRef = useRef(false);
 
 	const [conversation, setConversation] = useState<SupportConversation | null>(
 		null,
@@ -260,6 +267,48 @@ export function SupportChatPanel() {
 			leave(conversation.id);
 		};
 	}, [ready, conversation?.id, join, leave]);
+
+	// Auto-send a queued message (e.g. from an "Upgrade" click) once the
+	// conversation is ready.
+	useEffect(() => {
+		if (!conversation?.id || conversation.status === "closed") return;
+		if (!pendingSupportMessage || autoSentRef.current) return;
+		autoSentRef.current = true;
+		const body = pendingSupportMessage.trim();
+		setPendingSupportMessage(null);
+		if (!body) return;
+		const conversationId = conversation.id;
+		followRef.current = true;
+		setFollowOutput(true);
+		void (async () => {
+			setSending(true);
+			try {
+				const { data } = await axios.post<{
+					message: SupportMessage;
+					conversation: SupportConversation;
+				}>(
+					`/api/admin/v1/support/conversations/${conversationId}/messages`,
+					{ body },
+					{ withCredentials: true },
+				);
+				setMessages((prev) =>
+					prev.some((m) => m.id === data.message.id)
+						? prev
+						: [...prev, data.message],
+				);
+				setConversation(data.conversation);
+			} catch (e) {
+				setError(e instanceof Error ? e.message : "Failed to send message");
+			} finally {
+				setSending(false);
+			}
+		})();
+	}, [
+		conversation?.id,
+		conversation?.status,
+		pendingSupportMessage,
+		setPendingSupportMessage,
+	]);
 
 	const handleSend = async () => {
 		const body = draft.trim();

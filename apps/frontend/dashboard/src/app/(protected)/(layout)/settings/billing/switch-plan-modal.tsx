@@ -47,7 +47,7 @@ export const SwitchPlanModal = ({
 
 	const goToPlans = () => {
 		onOpenChange(false);
-		router.push("/plans");
+		router.push("/settings/billing/plans");
 	};
 
 	const handleSwitch = () => {

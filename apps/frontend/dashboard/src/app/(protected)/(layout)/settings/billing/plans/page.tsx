@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { useBillingUsage } from "@fe/dashboard/hooks/useBillingUsage";
 import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import {
@@ -30,11 +31,30 @@ const PlansPage = () => {
 	const router = useRouter();
 	const setIsAiPanelOpen = useUIStore((s) => s.setIsAiPanelOpen);
 	const setAiPanelActiveTab = useUIStore((s) => s.setAiPanelActiveTab);
+	const setPendingSupportMessage = useUIStore(
+		(s) => s.setPendingSupportMessage,
+	);
 	const { data: usageData } = useBillingUsage();
 
 	const openSupport = () => {
 		setAiPanelActiveTab("support");
 		setIsAiPanelOpen(true);
+	};
+
+	const requestPlan = (
+		plan: PricingPlan,
+		action: "upgrade" | "downgrade" | "enterprise",
+	) => {
+		const priceStr =
+			plan.monthlyPrice === null
+				? "custom pricing"
+				: `${formatPrice(plan.monthlyPrice)}/month`;
+		const message =
+			action === "enterprise"
+				? "Hi! I'm interested in the Enterprise plan. Can you help me get set up?"
+				: `Hi! I'd like to ${action} to the ${plan.name} plan (${priceStr}). Can you help me with that?`;
+		setPendingSupportMessage(message);
+		openSupport();
 	};
 
 	const currentPlanId = resolvePlanId(usageData?.plan?.name);
@@ -88,7 +108,7 @@ const PlansPage = () => {
 					mode="stroke"
 					size="small"
 					className="w-full rounded-full font-semibold"
-					onClick={() => router.push("/settings/billing")}
+					onClick={() => requestPlan(plan, "enterprise")}
 				>
 					Contact sales
 				</Button.Root>
@@ -103,6 +123,7 @@ const PlansPage = () => {
 				mode={isNext ? "filled" : "stroke"}
 				size="small"
 				className="w-full rounded-full font-semibold"
+				onClick={() => requestPlan(plan, isUpgrade ? "upgrade" : "downgrade")}
 			>
 				{isUpgrade ? "Upgrade" : "Downgrade"}
 			</Button.Root>
@@ -111,6 +132,15 @@ const PlansPage = () => {
 
 	return (
 		<div className="mx-auto w-full max-w-6xl px-6 py-8 lg:px-8">
+			{/* Back to billing */}
+			<div className="mb-6">
+				<AnimatedBackButton
+					label="Billing"
+					showEscKey={false}
+					onClick={() => router.push("/settings/billing")}
+				/>
+			</div>
+
 			{/* Header */}
 			<div className="mb-8">
 				<h1 className="font-semibold text-text-strong-950 text-title-h5">

@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatedForwardButton } from "@fe/dashboard/components/animated-forward-button";
 import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { useBillingUsage } from "@fe/dashboard/hooks/useBillingUsage";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
@@ -111,14 +112,10 @@ const BillingPage = () => {
 						</a>
 					</p>
 				</div>
-				<button
-					type="button"
-					onClick={() => router.push("/plans")}
-					className="flex items-center gap-1 font-semibold text-paragraph-sm text-text-sub-600 hover:text-text-strong-950"
-				>
-					<span>All plans</span>
-					<Icon name="chevron-right" className="h-4 w-4" />
-				</button>
+				<AnimatedForwardButton
+					label="All plans"
+					onClick={() => router.push("/settings/billing/plans")}
+				/>
 			</div>
 
 			{/* Error state */}
@@ -194,7 +191,7 @@ const BillingPage = () => {
 								mode="ghost"
 								size="small"
 								className="font-semibold text-text-sub-600 hover:text-text-strong-950"
-								onClick={() => router.push("/plans")}
+								onClick={() => router.push("/settings/billing/plans")}
 							>
 								View all plans
 							</Button.Root>

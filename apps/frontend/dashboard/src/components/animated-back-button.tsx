@@ -11,6 +11,7 @@ interface AnimatedBackButtonProps {
 	showEscKey?: boolean;
 	onClick?: () => void;
 	showText?: boolean;
+	label?: string;
 }
 
 const easing = [0.4, 0, 0.2, 1] as const;
@@ -20,6 +21,7 @@ export const AnimatedBackButton = ({
 	showEscKey = true,
 	onClick,
 	showText = true,
+	label = "Back",
 }: AnimatedBackButtonProps) => {
 	const router = useRouter();
 	const [hovered, setHovered] = useState(false);
@@ -105,7 +107,7 @@ export const AnimatedBackButton = ({
 						}}
 						transition={transition}
 					>
-						Back
+						{label}
 					</motion.span>
 				)}
 

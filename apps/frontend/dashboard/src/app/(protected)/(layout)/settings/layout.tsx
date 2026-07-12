@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-
+import { SettingsShell } from "./settings-shell";
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -27,9 +27,5 @@ export default function WorkspaceLayout({
 }: {
 	children: React.ReactNode;
 }) {
-	return (
-		<div className="mx-auto max-w-3xl p-6 lg:p-8">
-			<div className="w-full flex-1 pb-10">{children}</div>
-		</div>
-	);
+	return <SettingsShell>{children}</SettingsShell>;
 }
