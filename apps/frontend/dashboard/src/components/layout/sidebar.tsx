@@ -71,6 +71,9 @@ export const MainSidebar: React.FC = () => {
 						<div className="flex items-center gap-2">
 							<Logo className="w-10" />
 							<p className="-ml-2 font-semibold text-text-strong-950">Reloop</p>
+							<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[10px] text-text-sub-600 uppercase tracking-wide dark:bg-white/[0.06]">
+								Beta
+							</span>
 						</div>
 						<button
 							type="button"

@@ -169,8 +169,8 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 										isSpecial
 											? ""
 											: activeMainIndex === index
-												? "text-primary-base"
-												: "text-text-sub-600 opacity-70 group-hover:text-primary-base group-hover:opacity-100",
+												? "text-text-strong-950"
+												: "text-text-sub-600 opacity-70 group-hover:text-text-strong-950 group-hover:opacity-100",
 									)}
 								/>
 								{!isCollapsed && (
@@ -180,8 +180,8 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 											isSpecial
 												? "bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text text-transparent"
 												: activeMainIndex === index
-													? "text-primary-base"
-													: "text-text-sub-600 group-hover:text-primary-base",
+													? "text-text-strong-950"
+													: "text-text-sub-600 group-hover:text-text-strong-950",
 										)}
 									>
 										{label}
@@ -255,8 +255,8 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 															className={cn(
 																"group relative z-10 flex h-7 items-center gap-1.5 rounded-md px-2 font-medium text-[12px] transition-colors",
 																isSubActive
-																	? "text-primary-base"
-																	: "text-text-sub-600 hover:text-primary-base",
+																	? "text-text-strong-950"
+																	: "text-text-sub-600 hover:text-text-strong-950",
 															)}
 														>
 															<Icon
@@ -264,8 +264,8 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 																className={cn(
 																	"h-3.5 w-3.5 shrink-0 transition-colors",
 																	isSubActive
-																		? "text-primary-base"
-																		: "opacity-70 group-hover:text-primary-base group-hover:opacity-100",
+																		? "text-text-strong-950"
+																		: "opacity-70 group-hover:text-text-strong-950 group-hover:opacity-100",
 																)}
 															/>
 															{subLabel}
@@ -286,7 +286,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 			<AnimatedHoverBackground
 				rect={rect}
 				tabElement={currentEl}
-				className="!bg-primary-alpha-10"
+				className="!bg-neutral-alpha-10"
 			/>
 		</div>
 	);
@@ -378,10 +378,10 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 				>
 					<Icon
 						name="arrow-left"
-						className="h-4 w-4 shrink-0 text-text-sub-600 opacity-70 transition-all duration-200 group-hover:text-primary-base group-hover:opacity-100"
+						className="h-4 w-4 shrink-0 text-text-sub-600 opacity-70 transition-all duration-200 group-hover:text-text-strong-950 group-hover:opacity-100"
 					/>
 					{!isCollapsed && (
-						<span className="font-medium text-[13px] text-text-sub-600 transition-colors group-hover:text-primary-base">
+						<span className="font-medium text-[13px] text-text-sub-600 transition-colors group-hover:text-text-strong-950">
 							Back to app
 						</span>
 					)}
@@ -445,8 +445,8 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 										className={cn(
 											"h-4 w-4 shrink-0 transition-all duration-200",
 											isItemActive
-												? "text-primary-base"
-												: "text-text-sub-600 opacity-70 group-hover:text-primary-base group-hover:opacity-100",
+												? "text-text-strong-950"
+												: "text-text-sub-600 opacity-70 group-hover:text-text-strong-950 group-hover:opacity-100",
 										)}
 									/>
 									{!isCollapsed && (
@@ -454,8 +454,8 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 											className={cn(
 												"font-medium text-[13px] transition-colors",
 												isItemActive
-													? "text-primary-base"
-													: "text-text-sub-600 group-hover:text-primary-base",
+													? "text-text-strong-950"
+													: "text-text-sub-600 group-hover:text-text-strong-950",
 											)}
 										>
 											{item.label}
@@ -472,7 +472,7 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 			<AnimatedHoverBackground
 				rect={rect}
 				tabElement={currentEl}
-				className="!bg-primary-alpha-10"
+				className="!bg-neutral-alpha-10"
 			/>
 		</div>
 	);
