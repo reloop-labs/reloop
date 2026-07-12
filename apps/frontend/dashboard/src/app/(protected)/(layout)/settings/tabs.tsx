@@ -14,8 +14,8 @@ const list = [
 		iconName: "gear",
 	},
 	{
-		title: "Members",
-		path: "/settings/members",
+		title: "Teams",
+		path: "/settings/teams",
 		iconName: "users",
 		requiresTeamAdmin: true,
 	},

@@ -45,7 +45,7 @@ const Team = () => {
 		<div className="w-full space-y-6 pt-5">
 			{/* Header */}
 			<div>
-				<h1 className="font-medium text-label-lg text-text-strong-950">Team</h1>
+				<h1 className="font-medium text-label-lg text-text-strong-950">Teams</h1>
 				<p className="text-paragraph-sm text-text-sub-600">
 					Manage workspace members, set access levels, and invite new users.
 				</p>

@@ -6,11 +6,11 @@ export const instant = false;
 
 export function generateMetadata(): Metadata {
 	return {
-		title: "Team · Reloop",
+		title: "Teams · Reloop",
 		description:
 			"Manage workspace members, set access levels, and invite new users.",
 		openGraph: {
-			title: "Team · Reloop",
+			title: "Teams · Reloop",
 			description:
 				"Manage workspace members, set access levels, and invite new users.",
 			type: "website",

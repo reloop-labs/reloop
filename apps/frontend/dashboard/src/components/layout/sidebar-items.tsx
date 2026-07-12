@@ -42,7 +42,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 					return {
 						...item,
 						items: item.items.filter((sub) => {
-							if (sub.path === "/settings/members") return canManageTeam;
+							if (sub.path === "/settings/teams") return canManageTeam;
 							return true;
 						}),
 					};
