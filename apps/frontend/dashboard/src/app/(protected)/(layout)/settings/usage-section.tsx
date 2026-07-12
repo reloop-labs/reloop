@@ -4,8 +4,8 @@ import { useBillingUsage } from "@fe/dashboard/hooks/useBillingUsage";
 import NumberFlow from "@number-flow/react";
 import {
 	defaultPlan,
-	getPlanById,
 	getNextPlan,
+	getPlanById,
 	type PlanId,
 	pricingPlans,
 } from "@reloop/pricing";
@@ -18,10 +18,7 @@ import { useRouter } from "next/navigation";
 
 type UsageStatus = "healthy" | "warning" | "critical" | "unlimited";
 
-function statusFromRatio(
-	ratio: number,
-	isUnlimited = false,
-): UsageStatus {
+function statusFromRatio(ratio: number, isUnlimited = false): UsageStatus {
 	if (isUnlimited) return "unlimited";
 	if (ratio >= 1) return "critical";
 	if (ratio >= 0.8) return "warning";
@@ -67,19 +64,18 @@ const STATUS_META: Record<
 const RADIUS = 14;
 const CIRC = 2 * Math.PI * RADIUS;
 
-function RingMeter({
-	ratio,
-	status,
-}: {
-	ratio: number;
-	status: UsageStatus;
-}) {
+function RingMeter({ ratio, status }: { ratio: number; status: UsageStatus }) {
 	const meta = STATUS_META[status];
 	const dashOffset =
 		status === "unlimited" ? CIRC : CIRC * (1 - Math.min(1, ratio));
 
 	return (
-		<svg width={36} height={36} viewBox="0 0 36 36" className="shrink-0 -rotate-90">
+		<svg
+			width={36}
+			height={36}
+			viewBox="0 0 36 36"
+			className="-rotate-90 shrink-0"
+		>
 			{/* Track */}
 			<circle
 				cx={18}
@@ -128,7 +124,6 @@ function UsageRow({
 	const numTotal = typeof total === "number" ? total : 0;
 	const ratio = isUnlimited || numTotal === 0 ? 0 : numUsed / numTotal;
 	const status = statusFromRatio(ratio, isUnlimited);
-	const meta = STATUS_META[status];
 
 	const displayValue = isUnlimited
 		? "Unlimited"
@@ -145,8 +140,8 @@ function UsageRow({
 			)}
 		>
 			<RingMeter ratio={ratio} status={status} />
-			<div className="flex flex-1 items-center justify-between gap-3 min-w-0">
-				<span className="text-paragraph-sm text-text-sub-600 truncate">
+			<div className="flex min-w-0 flex-1 items-center justify-between gap-3">
+				<span className="truncate text-paragraph-sm text-text-sub-600">
 					{label}
 				</span>
 				<span
@@ -163,7 +158,7 @@ function UsageRow({
 							{" / "}
 							{numTotal.toLocaleString()}
 							{unit ? (
-								<span className="ml-1 text-paragraph-xs text-text-soft-400 font-normal">
+								<span className="ml-1 font-normal text-paragraph-xs text-text-soft-400">
 									{unit}
 								</span>
 							) : null}
@@ -173,14 +168,6 @@ function UsageRow({
 					)}
 				</span>
 			</div>
-			<span
-				className={cn(
-					"hidden sm:inline-flex h-5 shrink-0 items-center rounded-full px-2 font-medium text-label-xs",
-					meta.pill,
-				)}
-			>
-				{meta.label}
-			</span>
 		</div>
 	);
 }
@@ -205,11 +192,10 @@ function CategoryCard({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="grid grid-cols-1 gap-0 overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40 sm:grid-cols-[220px_1fr]">
+		<div className="grid grid-cols-1 gap-0 overflow-hidden rounded-2xl border border-stroke-soft-100 sm:grid-cols-[220px_1fr] dark:border-stroke-soft-100/40">
 			{/* Left info panel */}
-			<div className="flex flex-col justify-between gap-4 border-stroke-soft-100 p-5 dark:border-stroke-soft-100/40 sm:border-r bg-bg-weak-50/30 dark:bg-white/[0.02]">
+			<div className="flex flex-col justify-between gap-4 border-stroke-soft-100 bg-bg-weak-50/30 p-5 sm:border-r dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
 				<div>
-
 					<h2 className="font-semibold text-label-md text-text-strong-950">
 						{title}
 					</h2>
@@ -235,7 +221,7 @@ function CategoryCard({
 			</div>
 
 			{/* Right usage panel */}
-			<div className="bg-bg-white-0 px-5 dark:bg-white/[0.01] divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
+			<div className="divide-y divide-stroke-soft-100 bg-bg-white-0 px-5 dark:divide-stroke-soft-100/40 dark:bg-white/[0.01]">
 				{children}
 			</div>
 		</div>
@@ -246,17 +232,17 @@ function CategoryCard({
 
 function SkeletonCard() {
 	return (
-		<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40 sm:grid sm:grid-cols-[220px_1fr]">
+		<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 sm:grid sm:grid-cols-[220px_1fr] dark:border-stroke-soft-100/40">
 			<div className="bg-bg-weak-50/30 p-5 dark:bg-white/[0.02]">
-				<div className="h-8 w-8 animate-pulse rounded-lg bg-bg-weak-100 dark:bg-white/5 mb-3" />
+				<div className="mb-3 h-8 w-8 animate-pulse rounded-lg bg-bg-weak-100 dark:bg-white/5" />
 				<div className="h-4 w-20 animate-pulse rounded bg-bg-weak-100 dark:bg-white/5" />
 				<div className="mt-2 h-3 w-32 animate-pulse rounded bg-bg-weak-100 dark:bg-white/5" />
 			</div>
-			<div className="bg-bg-white-0 p-5 dark:bg-white/[0.01] space-y-4">
+			<div className="space-y-4 bg-bg-white-0 p-5 dark:bg-white/[0.01]">
 				{[0, 1, 2].map((i) => (
 					<div key={i} className="flex items-center gap-4">
-						<div className="h-9 w-9 animate-pulse rounded-full bg-bg-weak-100 dark:bg-white/5 shrink-0" />
-						<div className="flex-1 h-3 animate-pulse rounded bg-bg-weak-100 dark:bg-white/5" />
+						<div className="h-9 w-9 shrink-0 animate-pulse rounded-full bg-bg-weak-100 dark:bg-white/5" />
+						<div className="h-3 flex-1 animate-pulse rounded bg-bg-weak-100 dark:bg-white/5" />
 						<div className="h-3 w-16 animate-pulse rounded bg-bg-weak-100 dark:bg-white/5" />
 					</div>
 				))}
@@ -332,8 +318,8 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 				showUpgrade={showUpgrade && status !== "healthy"}
 			>
 				{/* Monthly emails hero row */}
-				<div className="py-3.5 border-b border-stroke-soft-100 dark:border-stroke-soft-100/40">
-					<div className="flex items-center justify-between mb-2">
+				<div className="border-stroke-soft-100 border-b py-3.5 dark:border-stroke-soft-100/40">
+					<div className="mb-2 flex items-center justify-between">
 						<span className="text-paragraph-sm text-text-sub-600">
 							Monthly emails
 						</span>
@@ -341,7 +327,7 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 							{periodRange} · Resets in {resetDays}d
 						</span>
 					</div>
-					<div className="flex items-end justify-between gap-3 mb-2.5">
+					<div className="mb-2.5 flex items-end justify-between gap-3">
 						<p className="flex items-baseline gap-1.5">
 							<span className="font-semibold text-text-strong-950 text-title-h5 tabular-nums">
 								<NumberFlow value={used} />
@@ -350,19 +336,9 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 								/ {total.toLocaleString()}
 							</span>
 						</p>
-						<div className="flex items-center gap-2">
-							<span className="text-paragraph-xs text-text-soft-400 tabular-nums">
-								{percent}% used
-							</span>
-							<span
-								className={cn(
-									"inline-flex h-5 items-center rounded-full px-2 font-medium text-label-xs",
-									STATUS_META[status].pill,
-								)}
-							>
-								{STATUS_META[status].label}
-							</span>
-						</div>
+						<span className="text-paragraph-xs text-text-soft-400 tabular-nums">
+							{percent}% used
+						</span>
 					</div>
 					{/* Progress bar */}
 					<div className="h-1.5 w-full overflow-hidden rounded-full bg-bg-weak-100 dark:bg-white/10">
@@ -374,7 +350,7 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 							style={{ width: `${Math.max(percent, ratio > 0 ? 1 : 0)}%` }}
 						/>
 					</div>
-					<div className="mt-1.5 text-paragraph-xs text-text-soft-400 text-right">
+					<div className="mt-1.5 text-right text-paragraph-xs text-text-soft-400">
 						<NumberFlow value={remaining} className="tabular-nums" /> remaining
 					</div>
 				</div>
@@ -385,6 +361,31 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 					total={plan.ratePerSecond}
 					unit="/ sec"
 					isUnlimited={false}
+					isLast={true}
+				/>
+			</CategoryCard>
+
+			{/* ── Inbound & Routing ─────────────────────────────────────────── */}
+			<CategoryCard
+				icon="inbox"
+				title="AI Agent Inbox"
+				description="Inbox for AI Agents and humans."
+				planName={planName}
+				onUpgrade={onUpgrade}
+				showUpgrade={showUpgrade}
+			>
+				<UsageRow
+					label="Agent inboxes"
+					used={0}
+					total={
+						currentPlan.comparison.agentInbox === "Custom"
+							? 0
+							: Number.parseInt(
+									currentPlan.comparison.agentInbox.replace(/\D/g, ""),
+									10,
+								) || 0
+					}
+					isUnlimited={currentPlan.comparison.agentInbox === "Custom"}
 					isLast={false}
 				/>
 				<UsageRow
@@ -412,7 +413,7 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 					total={
 						currentPlan.comparison.customDomains === "Custom"
 							? 0
-							: parseInt(
+							: Number.parseInt(
 									currentPlan.comparison.customDomains.replace(/\D/g, ""),
 									10,
 								) || 0
@@ -426,7 +427,7 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 					total={
 						currentPlan.comparison.emailValidation === "Custom"
 							? 0
-							: parseInt(
+							: Number.parseInt(
 									currentPlan.comparison.emailValidation.replace(/\D/g, ""),
 									10,
 								) || 0
@@ -443,31 +444,6 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 						currentPlan.comparison.dedicatedIp !== "—" &&
 						currentPlan.comparison.dedicatedIp !== ""
 					}
-					isLast={true}
-				/>
-			</CategoryCard>
-
-			{/* ── Inbound & Routing ─────────────────────────────────────────── */}
-			<CategoryCard
-				icon="inbox"
-				title="Inbound & routing"
-				description="Agent inboxes and webhooks for receiving and routing email."
-				planName={planName}
-				onUpgrade={onUpgrade}
-				showUpgrade={showUpgrade}
-			>
-				<UsageRow
-					label="Agent inboxes"
-					used={0}
-					total={
-						currentPlan.comparison.agentInbox === "Custom"
-							? 0
-							: parseInt(
-									currentPlan.comparison.agentInbox.replace(/\D/g, ""),
-									10,
-								) || 0
-					}
-					isUnlimited={currentPlan.comparison.agentInbox === "Custom"}
 					isLast={false}
 				/>
 				<UsageRow
@@ -476,7 +452,7 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 					total={
 						currentPlan.comparison.webhooks === "Custom"
 							? 0
-							: parseInt(
+							: Number.parseInt(
 									currentPlan.comparison.webhooks.replace(/\D/g, ""),
 									10,
 								) || 0
