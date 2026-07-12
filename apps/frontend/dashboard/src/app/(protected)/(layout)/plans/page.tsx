@@ -38,7 +38,7 @@ const PlansPage = () => {
 
 	const cellBg = (plan: PricingPlan) =>
 		planIndex(plan.id) === nextIndex
-			? "bg-bg-weak-50 dark:bg-white/[0.03]"
+			? "bg-bg-weak-50/60 dark:bg-white/[0.03]"
 			: "";
 
 	function priceLine(plan: PricingPlan) {
@@ -63,7 +63,7 @@ const PlansPage = () => {
 					variant="neutral"
 					mode="stroke"
 					size="small"
-					className="w-full font-semibold"
+					className="w-full rounded-full font-semibold"
 					disabled
 				>
 					Current plan
@@ -77,7 +77,7 @@ const PlansPage = () => {
 					variant="neutral"
 					mode="stroke"
 					size="small"
-					className="w-full font-semibold"
+					className="w-full rounded-full font-semibold"
 					onClick={() => router.push("/settings/billing")}
 				>
 					Contact sales
@@ -92,7 +92,7 @@ const PlansPage = () => {
 				variant="neutral"
 				mode={isNext ? "filled" : "stroke"}
 				size="small"
-				className="w-full font-semibold"
+				className="w-full rounded-full font-semibold"
 			>
 				{isUpgrade ? "Upgrade" : "Downgrade"}
 			</Button.Root>
@@ -134,7 +134,7 @@ const PlansPage = () => {
 							<div
 								key={plan.id}
 								className={cn(
-									"flex flex-col gap-4 rounded-t-xl border-stroke-soft-100 border-b p-4 dark:border-stroke-soft-100/40",
+									"flex flex-col gap-4 rounded-2xl border-stroke-soft-100 border-b p-4 dark:border-stroke-soft-100/40",
 									cellBg(plan),
 								)}
 							>
