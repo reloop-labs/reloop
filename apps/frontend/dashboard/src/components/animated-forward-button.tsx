@@ -28,7 +28,7 @@ export const AnimatedForwardButton = ({
 			onHoverEnd={() => setHovered(false)}
 			whileTap={{ scale: 0.96 }}
 			className={cn(
-				"flex cursor-pointer items-center gap-1.5 py-1.5 font-semibold text-paragraph-sm text-text-sub-600 transition-colors duration-200 hover:text-text-strong-950",
+				"flex cursor-pointer items-center gap-1.5 py-1.5 font-semibold text-text-sub-600 text-xs transition-colors duration-200 hover:text-text-strong-950",
 				className,
 			)}
 		>
