@@ -113,9 +113,32 @@ export const mainNavigation: MainNavigationItem[] = [
 		path: "/settings",
 		iconName: "gear",
 		section: "Settings",
+	},
+];
+
+export interface SettingsNavigationItem {
+	label: string;
+	path: string;
+	iconName: string;
+	requiresTeamAdmin?: boolean;
+}
+
+export interface SettingsNavigationSection {
+	section: string;
+	items: SettingsNavigationItem[];
+}
+
+export const settingsNavigation: SettingsNavigationSection[] = [
+	{
+		section: "Workspace",
 		items: [
 			{ label: "Workspace", path: "/settings", iconName: "gear" },
-			{ label: "Teams", path: "/settings/teams", iconName: "users" },
+			{ label: "Teams", path: "/settings/teams", iconName: "users", requiresTeamAdmin: true },
+		],
+	},
+	{
+		section: "Account",
+		items: [
 			{ label: "Profile", path: "/settings/profile", iconName: "user" },
 			{
 				label: "Security",

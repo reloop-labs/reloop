@@ -1,6 +1,6 @@
 "use client";
 
-import { mainNavigation } from "@fe/dashboard/constants";
+import { mainNavigation, settingsNavigation } from "@fe/dashboard/constants";
 import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -278,6 +278,180 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 					</div>
 				);
 			})}
+
+			{/* The ONE shared animated hover/active background for everything */}
+			<AnimatedHoverBackground
+				rect={rect}
+				tabElement={currentEl}
+				className="!bg-primary-alpha-10"
+			/>
+		</div>
+	);
+};
+
+export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
+	isCollapsed = false,
+}) => {
+	const [hoveredEl, setHoveredEl] = useState<HTMLAnchorElement | undefined>(
+		undefined,
+	);
+	const [rect, setRect] = useState<DOMRect | undefined>(undefined);
+
+	const backNavRef = useRef<HTMLAnchorElement>(null);
+	const itemRefs = useRef<HTMLAnchorElement[]>([]);
+
+	const pathname = usePathname();
+	const { canManageTeam } = useOrgPermissions();
+
+	const filteredSettingsNavigation = useMemo(() => {
+		return settingsNavigation
+			.map((section) => ({
+				...section,
+				items: section.items.filter((item) => {
+					if (item.requiresTeamAdmin) return canManageTeam;
+					return true;
+				}),
+			}))
+			.filter((section) => section.items.length > 0);
+	}, [canManageTeam]);
+
+	// Flatten items for active state indexing
+	const flatItems = useMemo(() => {
+		const items: typeof settingsNavigation[number]["items"][number][] = [];
+		filteredSettingsNavigation.forEach((section) => {
+			items.push(...section.items);
+		});
+		return items;
+	}, [filteredSettingsNavigation]);
+
+	const activeIndex = flatItems.findIndex((item) => {
+		if (item.path === "/settings") return pathname === "/settings";
+		return pathname.startsWith(item.path);
+	});
+
+	const activeEl = activeIndex !== -1 ? itemRefs.current[activeIndex] : undefined;
+	const currentEl = hoveredEl ?? activeEl;
+
+	useLayoutEffect(() => {
+		if (currentEl) {
+			setRect(currentEl.getBoundingClientRect());
+		} else {
+			setRect(undefined);
+		}
+	}, [currentEl]);
+
+	let globalIndex = 0;
+
+	return (
+		<div
+			className={cn("relative flex flex-col", isCollapsed && "items-center")}
+		>
+			{/* Back Button */}
+			<Link
+				href="/"
+				ref={backNavRef}
+				onPointerEnter={() => setHoveredEl(backNavRef.current ?? undefined)}
+				onPointerLeave={() => setHoveredEl(undefined)}
+				className={cn(
+					"group relative z-10 flex h-8 items-center rounded-lg transition-all mb-4",
+					isCollapsed
+						? "h-8 w-8 justify-center px-0"
+						: "w-full gap-2.5 px-2.5 justify-start",
+				)}
+				title={isCollapsed ? "Back to dashboard" : undefined}
+			>
+				<span
+					className={cn(
+						"flex min-w-0 items-center",
+						isCollapsed ? "" : "gap-2.5",
+					)}
+				>
+					<Icon
+						name="arrow-left"
+						className="h-4 w-4 shrink-0 text-text-sub-600 opacity-70 group-hover:text-primary-base group-hover:opacity-100 transition-all duration-200"
+					/>
+					{!isCollapsed && (
+						<span className="font-medium text-[13px] text-text-sub-600 group-hover:text-primary-base transition-colors">
+							Back to dashboard
+						</span>
+					)}
+				</span>
+			</Link>
+
+			{filteredSettingsNavigation.map((section, sectionIdx) => (
+				<div key={section.section} className="flex flex-col">
+					{isCollapsed ? (
+						sectionIdx > 0 && (
+							<div className="my-2 h-[1px] w-6 self-center bg-stroke-soft-200" />
+						)
+					) : (
+						<div
+							className={cn(
+								"px-2.5 pt-4 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em]",
+								sectionIdx === 0 && "pt-1.5",
+							)}
+						>
+							{section.section}
+						</div>
+					)}
+
+					{section.items.map((item) => {
+						const currentIdx = globalIndex++;
+						const isItemActive =
+							item.path === "/settings"
+								? pathname === "/settings"
+								: pathname.startsWith(item.path);
+
+						return (
+							<Link
+								key={item.path}
+								href={item.path}
+								ref={(el) => {
+									if (el) itemRefs.current[currentIdx] = el;
+								}}
+								onPointerEnter={() => setHoveredEl(itemRefs.current[currentIdx])}
+								onPointerLeave={() => setHoveredEl(undefined)}
+								className={cn(
+									"group relative z-10 flex h-8 items-center rounded-lg transition-all",
+									isCollapsed
+										? "h-8 w-8 justify-center px-0"
+										: "w-full gap-2.5 px-2.5 justify-start",
+								)}
+								title={isCollapsed ? item.label : undefined}
+							>
+								<span
+									className={cn(
+										"flex min-w-0 items-center",
+										isCollapsed ? "" : "gap-2.5",
+									)}
+								>
+									<Icon
+										name={item.iconName}
+										className={cn(
+											"h-4 w-4 shrink-0 transition-all duration-200",
+											isItemActive
+												? "text-primary-base"
+												: "text-text-sub-600 opacity-70 group-hover:text-primary-base group-hover:opacity-100",
+										)}
+									/>
+									{!isCollapsed && (
+										<span
+											className={cn(
+												"font-medium text-[13px] transition-colors",
+												isItemActive
+													? "text-primary-base"
+													: "text-text-sub-600 group-hover:text-primary-base",
+											)}
+										>
+											{item.label}
+										</span>
+									)}
+								</span>
+							</Link>
+						);
+					})}
+				</div>
+			))}
 
 			{/* The ONE shared animated hover/active background for everything */}
 			<AnimatedHoverBackground

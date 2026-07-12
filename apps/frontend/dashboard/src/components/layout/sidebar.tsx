@@ -8,12 +8,14 @@ import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { InviteFriendsModal } from "./invite-friends-modal";
 import { ReferFriendsBanner } from "./refer-friends-banner";
-import { SidebarItems } from "./sidebar-items";
+import { SidebarItems, SettingsSidebarItems } from "./sidebar-items";
+import { usePathname } from "next/navigation";
 
 export const MainSidebar: React.FC = () => {
 	const { isSidebarCollapsed, setIsSidebarCollapsed, toggleSidebarCollapse } =
 		useUIStore();
 	const [inviteOpen, setInviteOpen] = useState(false);
+	const pathname = usePathname();
 
 	useEffect(() => {
 		try {
@@ -91,7 +93,11 @@ export const MainSidebar: React.FC = () => {
 					isSidebarCollapsed ? "px-0" : "px-2",
 				)}
 			>
-				<SidebarItems isCollapsed={isSidebarCollapsed} />
+				{pathname.startsWith("/settings") ? (
+					<SettingsSidebarItems isCollapsed={isSidebarCollapsed} />
+				) : (
+					<SidebarItems isCollapsed={isSidebarCollapsed} />
+				)}
 			</div>
 			<div
 				className={cn(

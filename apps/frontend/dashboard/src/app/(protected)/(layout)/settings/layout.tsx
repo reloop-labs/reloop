@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SettingsTabs } from "./tabs";
+
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -29,13 +29,6 @@ export default function WorkspaceLayout({
 }) {
 	return (
 		<div className="mx-auto max-w-3xl p-6 lg:p-8">
-			<div className="mb-5">
-				<p className="font-medium text-2xl">Settings</p>
-				<p className="text-paragraph-sm text-text-sub-600">
-					Manage your personal profile, workspace settings, and team members.
-				</p>
-			</div>
-			<SettingsTabs />
 			<div className="w-full flex-1 pb-10">{children}</div>
 		</div>
 	);
