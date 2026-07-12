@@ -19,6 +19,9 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import useSWR from "swr";
 
+const CARD =
+	"rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-5 dark:border-stroke-soft-100/40";
+
 function formatNumber(num: number): string {
 	return num.toLocaleString();
 }
@@ -93,14 +96,14 @@ const BillingPage = () => {
 			{/* Header */}
 			<div className="flex items-start justify-between">
 				<div>
-					<h1 className="font-semibold text-text-strong-950 text-title-h5 dark:text-white">
+					<h1 className="font-semibold text-text-strong-950 text-title-h5">
 						Billing
 					</h1>
-					<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-white/60">
+					<p className="mt-1 text-paragraph-sm text-text-sub-600">
 						For questions about billing,{" "}
 						<a
 							href="mailto:support@reloop.dev"
-							className="font-semibold text-text-strong-950 underline hover:text-text-sub-600 dark:text-white dark:hover:text-white/80"
+							className="font-semibold text-text-strong-950 underline hover:text-text-sub-600"
 						>
 							contact us
 						</a>
@@ -108,8 +111,8 @@ const BillingPage = () => {
 				</div>
 				<button
 					type="button"
-					onClick={() => router.push("/settings")}
-					className="flex items-center gap-1 font-semibold text-paragraph-sm text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
+					onClick={() => router.push("/plans")}
+					className="flex items-center gap-1 font-semibold text-paragraph-sm text-text-sub-600 hover:text-text-strong-950"
 				>
 					<span>All plans</span>
 					<Icon name="chevron-right" className="h-4 w-4" />
@@ -127,27 +130,27 @@ const BillingPage = () => {
 			)}
 
 			{/* Card 1: Current plan */}
-			<div className="rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.02]">
+			<div className={CARD}>
 				<div className="flex items-center justify-between">
 					<div>
 						<div className="flex items-center gap-2">
-							<h2 className="font-semibold text-base text-text-strong-950 dark:text-white">
+							<h2 className="font-medium text-label-md text-text-strong-950">
 								{currentPlan.name} plan
 							</h2>
 							<Badge.Root size="small" variant="lighter" color="gray">
 								Current
 							</Badge.Root>
 						</div>
-						<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-white/60">
+						<p className="mt-1 text-paragraph-sm text-text-sub-600">
 							{currentPlan.priceSubline}
 						</p>
 					</div>
 					<div className="flex items-center gap-6">
 						<div className="text-right">
-							<p className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-white/40">
+							<p className="font-semibold text-subheading-2xs text-text-soft-400 uppercase tracking-wider">
 								Users
 							</p>
-							<p className="font-bold text-text-strong-950 text-title-h4 dark:text-white">
+							<p className="font-bold text-text-strong-950 text-title-h4">
 								{userCount}
 							</p>
 						</div>
@@ -166,11 +169,11 @@ const BillingPage = () => {
 
 			{/* Card 2: Upgrade to the next tier */}
 			{nextPlan ? (
-				<div className="rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.02]">
-					<div className="flex items-center justify-between border-stroke-soft-100/50 border-b pb-5 dark:border-white/5">
+				<div className={CARD}>
+					<div className="flex items-center justify-between border-stroke-soft-100 border-b pb-5 dark:border-stroke-soft-100/40">
 						<div>
 							<div className="flex items-center gap-2">
-								<h2 className="font-semibold text-base text-text-strong-950 dark:text-white">
+								<h2 className="font-medium text-label-md text-text-strong-950">
 									Upgrade to {nextPlan.name} plan
 								</h2>
 								{nextPlan.badge && (
@@ -179,7 +182,7 @@ const BillingPage = () => {
 									</Badge.Root>
 								)}
 							</div>
-							<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-white/60">
+							<p className="mt-1 text-paragraph-sm text-text-sub-600">
 								{nextPlanPriceLabel}
 							</p>
 						</div>
@@ -188,8 +191,8 @@ const BillingPage = () => {
 								variant="neutral"
 								mode="ghost"
 								size="small"
-								className="font-semibold text-text-sub-600 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
-								onClick={() => router.push("/settings")}
+								className="font-semibold text-text-sub-600 hover:text-text-strong-950"
+								onClick={() => router.push("/plans")}
 							>
 								View all plans
 							</Button.Root>
@@ -210,9 +213,9 @@ const BillingPage = () => {
 							<div key={feature} className="flex items-start gap-2">
 								<Icon
 									name="check"
-									className="mt-0.5 h-4 w-4 shrink-0 text-primary-base dark:text-primary-base"
+									className="mt-0.5 h-4 w-4 shrink-0 text-primary-base"
 								/>
-								<span className="text-paragraph-sm text-text-sub-600 dark:text-white/70">
+								<span className="text-paragraph-sm text-text-sub-600">
 									{feature}
 								</span>
 							</div>
@@ -220,11 +223,11 @@ const BillingPage = () => {
 					</div>
 				</div>
 			) : (
-				<div className="rounded-xl border border-stroke-soft-100 bg-white p-5 dark:border-white/5 dark:bg-white/[0.02]">
-					<h2 className="font-semibold text-base text-text-strong-950 dark:text-white">
+				<div className={CARD}>
+					<h2 className="font-medium text-label-md text-text-strong-950">
 						You're on the {currentPlan.name} plan
 					</h2>
-					<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-white/60">
+					<p className="mt-1 text-paragraph-sm text-text-sub-600">
 						You have access to the highest plan available.
 					</p>
 				</div>
@@ -233,29 +236,29 @@ const BillingPage = () => {
 			{/* Card 3: AI Usage and Credits */}
 			<div
 				onClick={() => router.push("/settings")}
-				className="group flex cursor-pointer items-center justify-between rounded-xl border border-stroke-soft-100 bg-white p-5 transition hover:bg-neutral-alpha-5/5 dark:border-white/5 dark:bg-white/[0.02] dark:hover:bg-white/[0.04]"
+				className="group flex cursor-pointer items-center justify-between rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-5 transition hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:hover:bg-bg-weak-50/40"
 			>
 				<div>
-					<h2 className="font-semibold text-base text-text-strong-950 transition-colors group-hover:text-primary-base dark:text-white dark:group-hover:text-primary-base">
+					<h2 className="font-medium text-label-md text-text-strong-950 transition-colors group-hover:text-primary-base">
 						AI usage and credits
 					</h2>
-					<p className="mt-1 text-paragraph-sm text-text-sub-600 dark:text-white/60">
+					<p className="mt-1 text-paragraph-sm text-text-sub-600">
 						{creditsRemainingStr}
 					</p>
 				</div>
 				<Icon
 					name="chevron-right"
-					className="h-5 w-5 text-text-sub-600 transition-colors group-hover:text-text-strong-950 dark:text-white/60 dark:group-hover:text-white"
+					className="h-5 w-5 text-text-sub-600 transition-colors group-hover:text-text-strong-950"
 				/>
 			</div>
 
 			{/* Card 4: Recent Invoices */}
 			<div className="space-y-3">
-				<h2 className="font-semibold text-paragraph-lg text-text-strong-950 dark:text-white">
+				<h2 className="font-semibold text-paragraph-lg text-text-strong-950">
 					Recent invoices
 				</h2>
-				<div className="flex h-32 items-center justify-center rounded-xl border border-stroke-soft-100 bg-white dark:border-white/5 dark:bg-white/[0.02]">
-					<p className="text-paragraph-sm text-text-sub-600 dark:text-white/40">
+				<div className="flex h-32 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
+					<p className="text-paragraph-sm text-text-soft-400">
 						No invoices yet
 					</p>
 				</div>
