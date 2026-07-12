@@ -20,10 +20,20 @@ interface SwitchPlanModalProps {
 	currentPlanId: PlanId;
 }
 
-function planPriceLabel(plan: (typeof pricingPlans)[number]): string {
-	if (plan.monthlyPrice === null) return "Contact sales";
-	if (plan.monthlyPrice === 0) return "$0 per month";
-	return `${formatPrice(plan.monthlyPrice)} per month`;
+function renderPlanPrice(plan: (typeof pricingPlans)[number]) {
+	if (plan.monthlyPrice === null) {
+		return (
+			<span className="font-medium text-text-strong-950">Contact sales</span>
+		);
+	}
+	return (
+		<>
+			<span className="font-medium text-text-strong-950">
+				{formatPrice(plan.monthlyPrice)}
+			</span>
+			<span className="font-normal text-text-sub-600"> per month</span>
+		</>
+	);
 }
 
 export const SwitchPlanModal = ({
@@ -125,8 +135,8 @@ export const SwitchPlanModal = ({
 											</span>
 										)}
 									</div>
-									<p className="font-medium text-[12px] text-text-sub-600">
-										{planPriceLabel(plan)}
+									<p className="text-[12px] text-text-sub-600">
+										{renderPlanPrice(plan)}
 									</p>
 								</button>
 							);
