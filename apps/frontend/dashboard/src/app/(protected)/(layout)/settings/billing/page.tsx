@@ -106,7 +106,7 @@ const BillingPage = () => {
 						For questions about billing,{" "}
 						<a
 							href="mailto:support@reloop.dev"
-							className="font-semibold text-text-strong-950 underline hover:text-text-sub-600"
+							className="font-medium text-text-strong-950 hover:text-text-sub-600"
 						>
 							contact us
 						</a>

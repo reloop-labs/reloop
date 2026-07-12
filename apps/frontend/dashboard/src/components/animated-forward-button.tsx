@@ -28,7 +28,7 @@ export const AnimatedForwardButton = ({
 			onHoverEnd={() => setHovered(false)}
 			whileTap={{ scale: 0.96 }}
 			className={cn(
-				"flex cursor-pointer items-center gap-1.5 py-1.5 font-semibold text-text-sub-600 text-xs transition-colors duration-200 hover:text-text-strong-950",
+				"flex cursor-pointer items-center gap-1.5 py-1.5 font-medium text-text-sub-600 text-xs transition-colors duration-200 hover:text-text-strong-950",
 				className,
 			)}
 		>
@@ -41,21 +41,21 @@ export const AnimatedForwardButton = ({
 			</motion.span>
 
 			{/* Icon track */}
-			<div className="relative flex h-3.5 w-3.5 items-center justify-end">
+			<div className="relative flex h-3 w-3 items-center justify-end">
 				{/* Tail — grows from right, anchored to chevron tip */}
 				<motion.div
-					className="-translate-y-1/2 absolute top-1/2 right-[1.5px] h-[1.5px] rounded-full bg-current"
+					className="-translate-y-1/2 absolute top-1/2 right-[1.25px] h-[1.5px] rounded-full bg-current"
 					initial={{ width: 0, opacity: 0 }}
 					animate={{
-						width: hovered ? 10 : 0,
+						width: hovered ? 8 : 0,
 						opacity: hovered ? 1 : 0,
 					}}
 					transition={transition}
 				/>
 				{/* Chevron — stationary, pointing right */}
 				<motion.svg
-					width={6}
-					height={10}
+					width={5}
+					height={8}
 					viewBox="0 0 6 10"
 					fill="none"
 					className="absolute right-0"
