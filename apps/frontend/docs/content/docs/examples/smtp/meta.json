@@ -1,5 +1,5 @@
 {
 	"title": "SMTP",
-	"icon": "mail-single",
+	"icon": "smtp",
 	"pages": ["introduction", "nodemailer", "python", "go", "ruby", "php", "rust"]
 }

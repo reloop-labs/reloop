@@ -80,7 +80,7 @@ export const mainNavigation: MainNavigationItem[] = [
 	{
 		label: "SMTP",
 		path: "/smtp",
-		iconName: "mail-single",
+		iconName: "smtp",
 	},
 	{
 		label: "Integrations",

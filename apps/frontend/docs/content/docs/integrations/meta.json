@@ -1,6 +1,6 @@
 {
 	"title": "Integration",
-	"icon": "workflow",
+	"icon": "integration",
 	"pages": [
 		"index",
 		"n8n",
