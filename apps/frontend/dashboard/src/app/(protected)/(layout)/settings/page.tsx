@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatedForwardButton } from "@fe/dashboard/components/animated-forward-button";
 import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { useBillingUsage } from "@fe/dashboard/hooks/useBillingUsage";
 import { useRouter } from "next/navigation";
@@ -24,13 +25,19 @@ const UsagePage = () => {
 	return (
 		<div className="w-full space-y-6 pt-5">
 			{/* Header */}
-			<div>
-				<h1 className="font-semibold text-text-strong-950 text-title-h5">
-					Usage
-				</h1>
-				<p className="mt-1 text-paragraph-sm text-text-sub-600">
-					Track how close you are to your plan limits this billing period.
-				</p>
+			<div className="flex items-end justify-between">
+				<div>
+					<h1 className="font-semibold text-text-strong-950 text-title-h5">
+						Usage
+					</h1>
+					<p className="mt-1 text-paragraph-sm text-text-sub-600">
+						Track your plan limits and resource usage for this billing period.
+					</p>
+				</div>
+				<AnimatedForwardButton
+					label="Manage billing"
+					onClick={() => router.push("/settings/billing")}
+				/>
 			</div>
 
 			{/* Error state */}
