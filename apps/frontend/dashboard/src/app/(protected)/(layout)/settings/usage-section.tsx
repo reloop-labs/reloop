@@ -431,22 +431,22 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 					used={0}
 					total={parseCount(currentPlan.comparison.agentInbox)}
 					isUnlimited={currentPlan.comparison.agentInbox === "Custom"}
-					isLast={false}
+					isLast={true}
 				/>
+			</CategoryCard>
+
+			{/* ── Email Infrastructure ───────────────────────────────────── */}
+			<CategoryCard
+				title="Other Limits"
+				description="Additional plan limits for domains, email verification, and dedicated IPs."
+			>
 				<UsageRow
 					label="Webhooks"
 					used={0}
 					total={parseCount(currentPlan.comparison.webhooks)}
 					isUnlimited={currentPlan.comparison.webhooks === "Custom"}
-					isLast={true}
+					isLast={false}
 				/>
-			</CategoryCard>
-
-			{/* ── Deliverability ────────────────────────────────────────────── */}
-			<CategoryCard
-				title="Deliverability"
-				description="Domains, validation, and IP options for better inbox placement."
-			>
 				<UsageRow
 					label="Custom domains"
 					used={0}
