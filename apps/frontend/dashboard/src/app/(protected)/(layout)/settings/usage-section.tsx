@@ -13,7 +13,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
-import { Line } from "rc-progress";
+import { Circle, Line } from "rc-progress";
 
 const STROKE_COLOR: Record<UsageStatus, string> = {
 	healthy: "var(--success-base)",
@@ -33,81 +33,21 @@ function statusFromRatio(ratio: number, isUnlimited = false): UsageStatus {
 	return "healthy";
 }
 
-const STATUS_META: Record<
-	UsageStatus,
-	{ label: string; pill: string; ring: string; track: string; text: string }
-> = {
-	healthy: {
-		label: "Healthy",
-		pill: "bg-success-lighter text-success-base dark:bg-success-base/10",
-		ring: "text-success-base",
-		track: "text-bg-weak-100 dark:text-white/10",
-		text: "text-success-base",
-	},
-	warning: {
-		label: "Approaching limit",
-		pill: "bg-warning-lighter text-warning-base dark:bg-warning-base/10",
-		ring: "text-warning-base",
-		track: "text-bg-weak-100 dark:text-white/10",
-		text: "text-warning-base",
-	},
-	critical: {
-		label: "Limit reached",
-		pill: "bg-error-lighter text-error-base dark:bg-error-base/10",
-		ring: "text-error-base",
-		track: "text-bg-weak-100 dark:text-white/10",
-		text: "text-error-base",
-	},
-	unlimited: {
-		label: "Unlimited",
-		pill: "bg-bg-weak-50 text-text-sub-600 dark:bg-white/[0.06]",
-		ring: "text-text-soft-400",
-		track: "text-bg-weak-100 dark:text-white/10",
-		text: "text-text-sub-600",
-	},
-};
-
 // ─── Ring Meter ───────────────────────────────────────────────────────────────
 
-const RADIUS = 14;
-const CIRC = 2 * Math.PI * RADIUS;
-
 function RingMeter({ ratio, status }: { ratio: number; status: UsageStatus }) {
-	const meta = STATUS_META[status];
-	const dashOffset =
-		status === "unlimited" ? CIRC : CIRC * (1 - Math.min(1, ratio));
+	const percent = status === "unlimited" ? 0 : Math.min(100, ratio * 100);
 
 	return (
-		<svg
-			width={36}
-			height={36}
-			viewBox="0 0 36 36"
-			className="-rotate-90 shrink-0"
-		>
-			{/* Track */}
-			<circle
-				cx={18}
-				cy={18}
-				r={RADIUS}
-				fill="none"
-				strokeWidth={3.5}
-				className={cn("transition-all", meta.track)}
-				stroke="currentColor"
-			/>
-			{/* Progress */}
-			<circle
-				cx={18}
-				cy={18}
-				r={RADIUS}
-				fill="none"
-				strokeWidth={3.5}
-				strokeLinecap="round"
-				strokeDasharray={CIRC}
-				strokeDashoffset={status === "unlimited" ? CIRC * 0.25 : dashOffset}
-				className={cn("transition-all duration-500", meta.ring)}
-				stroke="currentColor"
-			/>
-		</svg>
+		<Circle
+			className="h-5 w-5 shrink-0"
+			percent={percent}
+			strokeWidth={10}
+			trailWidth={10}
+			strokeLinecap="round"
+			strokeColor={STROKE_COLOR[status]}
+			trailColor="var(--bg-soft-200)"
+		/>
 	);
 }
 
@@ -149,7 +89,7 @@ function UsageRow({
 		>
 			<RingMeter ratio={ratio} status={status} />
 			<div className="flex min-w-0 flex-1 items-center justify-between gap-3">
-				<span className="truncate text-paragraph-sm text-text-sub-600">
+				<span className="truncate font-medium text-paragraph-sm text-text-sub-600">
 					{label}
 				</span>
 				<span
