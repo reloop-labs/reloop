@@ -4,6 +4,7 @@ import { AnimatedForwardButton } from "@fe/dashboard/components/animated-forward
 import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { useBillingUsage } from "@fe/dashboard/hooks/useBillingUsage";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
+import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import { authClient } from "@reloop/auth/client";
 import {
 	defaultPlan,
@@ -36,7 +37,14 @@ function resolvePlanId(name: string | undefined): PlanId {
 
 const BillingPage = () => {
 	const router = useRouter();
+	const setIsAiPanelOpen = useUIStore((s) => s.setIsAiPanelOpen);
+	const setAiPanelActiveTab = useUIStore((s) => s.setAiPanelActiveTab);
 	const [switchOpen, setSwitchOpen] = useState(false);
+
+	const openSupport = () => {
+		setAiPanelActiveTab("support");
+		setIsAiPanelOpen(true);
+	};
 	const { canManageBilling, isPending: rolePending } = useOrgPermissions();
 	const { activeOrganization } = useUserOrganization();
 
@@ -104,12 +112,13 @@ const BillingPage = () => {
 					</h1>
 					<p className="mt-1 text-paragraph-sm text-text-sub-600">
 						For questions about billing,{" "}
-						<a
-							href="mailto:support@reloop.dev"
-							className="font-medium text-text-strong-950 hover:text-text-sub-600"
+						<button
+							type="button"
+							onClick={openSupport}
+							className="-mx-1 cursor-pointer rounded-full px-1 font-medium text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:hover:bg-white/5"
 						>
 							contact us
-						</a>
+						</button>
 					</p>
 				</div>
 				<AnimatedForwardButton
