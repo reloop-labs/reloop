@@ -2761,6 +2761,22 @@ export const IconsSprite = () => (
 					fill="currentColor"
 				/>
 			</symbol>
+			<symbol id="arrow-right" viewBox="0 0 24 24" fill="none">
+				<path
+					d="M4 12H20"
+					stroke="currentColor"
+					strokeWidth="2"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+				<path
+					d="M13 5L20 12L13 19"
+					stroke="currentColor"
+					strokeWidth="2"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol id="chevron-down" viewBox="0 0 24 24" fill="none">
 				<path
 					d="M18 9L15 12"

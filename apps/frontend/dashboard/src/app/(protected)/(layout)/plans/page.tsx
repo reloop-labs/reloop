@@ -1,6 +1,7 @@
 "use client";
 
 import { useBillingUsage } from "@fe/dashboard/hooks/useBillingUsage";
+import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import {
 	comparisonSections,
 	formatPrice,
@@ -27,7 +28,14 @@ const GRID_COLS = "grid-cols-[minmax(160px,240px)_repeat(4,minmax(150px,1fr))]";
 
 const PlansPage = () => {
 	const router = useRouter();
+	const setIsAiPanelOpen = useUIStore((s) => s.setIsAiPanelOpen);
+	const setAiPanelActiveTab = useUIStore((s) => s.setAiPanelActiveTab);
 	const { data: usageData } = useBillingUsage();
+
+	const openSupport = () => {
+		setAiPanelActiveTab("support");
+		setIsAiPanelOpen(true);
+	};
 
 	const currentPlanId = resolvePlanId(usageData?.plan?.name);
 	const currentIndex = planIndex(currentPlanId);
@@ -113,13 +121,14 @@ const PlansPage = () => {
 					</span>
 					. If you have any questions or would like further support with your
 					plan,{" "}
-					<a
-						href="mailto:support@reloop.dev"
+					<button
+						type="button"
+						onClick={openSupport}
 						className="inline-flex items-center gap-0.5 font-medium text-text-strong-950 underline hover:text-text-sub-600"
 					>
 						contact us
-						<Icon name="chevron-right" className="h-3.5 w-3.5" />
-					</a>
+						<Icon name="arrow-right" className="h-3.5 w-3.5" />
+					</button>
 				</p>
 			</div>
 
