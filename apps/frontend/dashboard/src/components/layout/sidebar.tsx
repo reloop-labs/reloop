@@ -101,9 +101,9 @@ export const MainSidebar: React.FC = () => {
 					{isSettings ? (
 						<motion.div
 							key="settings"
-							initial={{ x: "-100%", opacity: 0 }}
+							initial={{ x: "100%", opacity: 0 }}
 							animate={{ x: 0, opacity: 1 }}
-							exit={{ x: "-100%", opacity: 0 }}
+							exit={{ x: "100%", opacity: 0 }}
 							transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
 							className="absolute inset-0 px-[inherit] py-2"
 							style={{ paddingInline: isSidebarCollapsed ? 0 : 8 }}
@@ -113,9 +113,9 @@ export const MainSidebar: React.FC = () => {
 					) : (
 						<motion.div
 							key="main"
-							initial={{ x: "100%", opacity: 0 }}
+							initial={{ x: "-100%", opacity: 0 }}
 							animate={{ x: 0, opacity: 1 }}
-							exit={{ x: "100%", opacity: 0 }}
+							exit={{ x: "-100%", opacity: 0 }}
 							transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
 							className="absolute inset-0 py-2"
 							style={{ paddingInline: isSidebarCollapsed ? 0 : 8 }}
