@@ -278,14 +278,17 @@ function ComparisonCell({
 		return (
 			<Icon
 				name="check-mark"
-				className="h-4 w-4 shrink-0 text-text-strong-950"
+				className="h-3.5 w-3.5 shrink-0 text-text-strong-950"
 			/>
 		);
 	}
 
 	return (
 		<span className="inline-flex items-center gap-2 font-medium text-paragraph-sm text-text-strong-950">
-			<Icon name="check-mark" className="h-4 w-4 shrink-0 text-text-sub-600" />
+			<Icon
+				name="check-mark"
+				className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+			/>
 			{value as string}
 		</span>
 	);
