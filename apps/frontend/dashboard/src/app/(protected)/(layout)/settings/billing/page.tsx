@@ -178,8 +178,8 @@ const BillingPage = () => {
 						{nextPlan.features.map((feature) => (
 							<div key={feature} className="flex items-start gap-2">
 								<Icon
-									name="check"
-									className="mt-0.5 h-4 w-4 shrink-0 text-primary-base"
+									name="check-circle"
+									className="mt-0.5 h-4 w-4 shrink-0 text-text-sub-600"
 								/>
 								<span className="text-paragraph-sm text-text-sub-600">
 									{feature}
