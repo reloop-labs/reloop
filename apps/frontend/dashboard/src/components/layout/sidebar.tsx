@@ -4,18 +4,20 @@ import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
+import { AnimatePresence, motion } from "motion/react";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { InviteFriendsModal } from "./invite-friends-modal";
 import { ReferFriendsBanner } from "./refer-friends-banner";
-import { SidebarItems, SettingsSidebarItems } from "./sidebar-items";
-import { usePathname } from "next/navigation";
+import { SettingsSidebarItems, SidebarItems } from "./sidebar-items";
 
 export const MainSidebar: React.FC = () => {
 	const { isSidebarCollapsed, setIsSidebarCollapsed, toggleSidebarCollapse } =
 		useUIStore();
 	const [inviteOpen, setInviteOpen] = useState(false);
 	const pathname = usePathname();
+	const isSettings = pathname.startsWith("/settings");
 
 	useEffect(() => {
 		try {
@@ -87,18 +89,43 @@ export const MainSidebar: React.FC = () => {
 					</>
 				)}
 			</div>
+
+			{/* Animated sidebar content — slides on settings ↔ main switch */}
 			<div
 				className={cn(
-					"flex-1 overflow-y-auto py-2 transition-all",
+					"relative flex-1 overflow-hidden py-2 transition-all",
 					isSidebarCollapsed ? "px-0" : "px-2",
 				)}
 			>
-				{pathname.startsWith("/settings") ? (
-					<SettingsSidebarItems isCollapsed={isSidebarCollapsed} />
-				) : (
-					<SidebarItems isCollapsed={isSidebarCollapsed} />
-				)}
+				<AnimatePresence mode="popLayout" initial={false}>
+					{isSettings ? (
+						<motion.div
+							key="settings"
+							initial={{ x: "-100%", opacity: 0 }}
+							animate={{ x: 0, opacity: 1 }}
+							exit={{ x: "-100%", opacity: 0 }}
+							transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+							className="absolute inset-0 px-[inherit] py-2"
+							style={{ paddingInline: isSidebarCollapsed ? 0 : 8 }}
+						>
+							<SettingsSidebarItems isCollapsed={isSidebarCollapsed} />
+						</motion.div>
+					) : (
+						<motion.div
+							key="main"
+							initial={{ x: "100%", opacity: 0 }}
+							animate={{ x: 0, opacity: 1 }}
+							exit={{ x: "100%", opacity: 0 }}
+							transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+							className="absolute inset-0 py-2"
+							style={{ paddingInline: isSidebarCollapsed ? 0 : 8 }}
+						>
+							<SidebarItems isCollapsed={isSidebarCollapsed} />
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</div>
+
 			<div
 				className={cn(
 					"mt-1 mb-3 flex w-full flex-col items-center justify-center gap-1.5 transition-all",
