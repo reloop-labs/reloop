@@ -113,7 +113,7 @@ const BillingPage = () => {
 							<h2 className="font-medium text-label-md text-text-strong-950">
 								{currentPlan.name} plan
 							</h2>
-							<span className="inline-flex h-5 items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 pr-2 pl-1.5 font-medium text-label-xs text-text-sub-600 dark:border-stroke-soft-100/40 dark:bg-white/[0.04]">
+							<span className="inline-flex h-5 items-center rounded-full border border-stroke-soft-200 bg-bg-white-0 px-2 font-medium text-label-xs text-text-sub-600 dark:border-stroke-soft-100/40 dark:bg-white/[0.04]">
 								Current
 							</span>
 						</div>

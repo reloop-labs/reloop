@@ -6,7 +6,6 @@ import {
 	type PlanId,
 	pricingPlans,
 } from "@reloop/pricing";
-import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -57,8 +56,8 @@ export const SwitchPlanModal = ({
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
 			<Modal.Content className="max-w-[820px]" showClose={false}>
 				{/* Header */}
-				<div className="flex items-center justify-between border-stroke-soft-100 border-b px-5 py-4 dark:border-stroke-soft-100/40">
-					<Modal.Title className="text-label-md text-text-strong-950">
+				<div className="flex items-center justify-between px-5 py-4">
+					<Modal.Title className="font-semibold text-text-strong-950 text-title-h6">
 						Switch plan
 					</Modal.Title>
 					<div className="flex items-center gap-4">
@@ -95,7 +94,7 @@ export const SwitchPlanModal = ({
 									type="button"
 									onClick={() => setSelectedId(plan.id)}
 									className={cn(
-										"rounded-xl border p-4 text-left transition-colors",
+										"rounded-2xl border p-4 text-left transition-colors",
 										isSelected
 											? "border-primary-base bg-primary-alpha-10"
 											: "border-stroke-soft-100 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40",
@@ -106,12 +105,12 @@ export const SwitchPlanModal = ({
 											{plan.name}
 										</span>
 										{isCurrent && (
-											<Badge.Root size="small" variant="lighter" color="gray">
+											<span className="inline-flex h-5 items-center rounded-full border border-stroke-soft-200 bg-bg-white-0 px-2 font-medium text-label-xs text-text-sub-600 dark:border-stroke-soft-100/40 dark:bg-white/[0.04]">
 												Current plan
-											</Badge.Root>
+											</span>
 										)}
 									</div>
-									<p className="mt-1 text-paragraph-sm text-text-sub-600">
+									<p className="mt-1 font-medium text-paragraph-sm text-text-sub-600">
 										{planPriceLabel(plan)}
 									</p>
 								</button>
