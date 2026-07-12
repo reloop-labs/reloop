@@ -72,12 +72,7 @@ export const mainNavigation: MainNavigationItem[] = [
 		iconName: "logs",
 		section: "Analytics",
 	},
-	{
-		label: "Usage & Credits",
-		path: "/credits",
-		iconName: "doughnut",
-		section: "Analytics",
-	},
+
 	{
 		label: "API Keys",
 		path: "/api-keys",
@@ -132,7 +127,9 @@ export const settingsNavigation: SettingsNavigationSection[] = [
 	{
 		section: "Workspace",
 		items: [
-			{ label: "Workspace", path: "/settings", iconName: "gear" },
+			{ label: "Usage", path: "/settings", iconName: "doughnut" },
+			{ label: "Billing", path: "/settings/billing", iconName: "billing-custom" },
+			{ label: "Workspace", path: "/settings/workspace", iconName: "gear" },
 			{ label: "Teams", path: "/settings/teams", iconName: "users", requiresTeamAdmin: true },
 		],
 	},

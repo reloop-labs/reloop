@@ -146,14 +146,14 @@ export const UserDropdown = () => {
 									className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 									onPointerEnter={() => setHoverIdx(5)}
 									onPointerLeave={() => setHoverIdx(undefined)}
-									onClick={() => router.push("/credits")}
+									onClick={() => router.push("/settings/billing")}
 								>
 									<Icon
 										name="arrow-top-circle"
 										className="h-4 w-4 text-text-sub-600"
 									/>
 									<span className="flex-1 truncate text-sm">
-										Manage credits
+										Billing & credits
 									</span>
 								</Dropdown.Item>
 							</Dropdown.Group>

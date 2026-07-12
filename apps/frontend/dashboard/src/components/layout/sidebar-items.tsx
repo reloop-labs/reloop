@@ -301,7 +301,7 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 	const itemRefs = useRef<HTMLAnchorElement[]>([]);
 
 	const pathname = usePathname();
-	const { canManageTeam } = useOrgPermissions();
+	const { canManageTeam, canManageBilling } = useOrgPermissions();
 
 	const filteredSettingsNavigation = useMemo(() => {
 		return settingsNavigation
@@ -309,11 +309,14 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 				...section,
 				items: section.items.filter((item) => {
 					if (item.requiresTeamAdmin) return canManageTeam;
+					if (item.path === "/settings" || item.path === "/settings/billing") {
+						return canManageBilling;
+					}
 					return true;
 				}),
 			}))
 			.filter((section) => section.items.length > 0);
-	}, [canManageTeam]);
+	}, [canManageTeam, canManageBilling]);
 
 	// Flatten items for active state indexing
 	const flatItems = useMemo(() => {
@@ -358,7 +361,7 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 						? "h-8 w-8 justify-center px-0"
 						: "w-full gap-2.5 px-2.5 justify-start",
 				)}
-				title={isCollapsed ? "Back to dashboard" : undefined}
+				title={isCollapsed ? "Back to app" : undefined}
 			>
 				<span
 					className={cn(
@@ -372,7 +375,7 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 					/>
 					{!isCollapsed && (
 						<span className="font-medium text-[13px] text-text-sub-600 group-hover:text-primary-base transition-colors">
-							Back to dashboard
+							Back to app
 						</span>
 					)}
 				</span>
