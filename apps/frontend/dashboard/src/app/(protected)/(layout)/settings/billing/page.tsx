@@ -115,16 +115,16 @@ const BillingPage = () => {
 			)}
 
 			{/* Card 1: Current plan */}
-			<div className={CARD}>
+			<div className="rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/30 p-5 dark:border-stroke-soft-100/40 dark:bg-white/[0.02]">
 				<div className="flex items-center justify-between">
 					<div>
 						<div className="flex items-center gap-2">
 							<h2 className="font-medium text-label-md text-text-strong-950">
 								{currentPlan.name} plan
 							</h2>
-							<Badge.Root size="small" variant="lighter" color="gray">
+							<span className="inline-flex h-5 items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-white-0 pr-2 pl-1.5 font-medium text-label-xs text-text-sub-600 dark:border-stroke-soft-100/40 dark:bg-white/[0.04]">
 								Current
-							</Badge.Root>
+							</span>
 						</div>
 						<p className="mt-1 text-paragraph-sm text-text-sub-600">
 							{currentPlan.priceSubline}
@@ -133,8 +133,8 @@ const BillingPage = () => {
 					<Button.Root
 						variant="neutral"
 						mode="stroke"
-						size="small"
-						className="font-semibold"
+						size="xxsmall"
+						className="rounded-full"
 						onClick={() => setSwitchOpen(true)}
 					>
 						Manage
