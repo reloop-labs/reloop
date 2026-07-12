@@ -106,13 +106,34 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 		<div
 			className={cn("relative flex flex-col", isCollapsed && "items-center")}
 		>
-			{navigation.map(({ path, label, iconName, isSpecial, items }, index) => {
+			{navigation.map((item, index) => {
+				const { path, label, iconName, isSpecial, items, section } = item;
 				if (path === "/ai") return null;
 				const hasSubNav = items && items.length > 0;
 				const isExpanded = expandedItems[path] && !isCollapsed;
 
+				// Check if we should render a section header/divider
+				const prevItem = index > 0 ? navigation[index - 1] : null;
+				const showSectionHeader =
+					section && (!prevItem || prevItem.section !== section);
+
 				return (
-					<div key={path + index}>
+					<div key={path + index} className="flex flex-col">
+						{showSectionHeader &&
+							(isCollapsed ? (
+								index > 0 && (
+									<div className="my-2 h-[1px] w-6 self-center bg-stroke-soft-200" />
+								)
+							) : (
+								<div
+									className={cn(
+										"px-2.5 pt-4 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em]",
+										index === 0 && "pt-1.5",
+									)}
+								>
+									{section}
+								</div>
+							))}
 						<Link
 							href={path}
 							ref={(el) => {
@@ -206,9 +227,10 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 													{ label: subLabel, path: subPath, iconName: subIcon },
 													subIndex,
 												) => {
-													const isSubActive = subPath === "/settings"
-														? pathWithoutSlug === "/settings"
-														: pathWithoutSlug.startsWith(subPath);
+													const isSubActive =
+														subPath === "/settings"
+															? pathWithoutSlug === "/settings"
+															: pathWithoutSlug.startsWith(subPath);
 													return (
 														<Link
 															key={subPath}

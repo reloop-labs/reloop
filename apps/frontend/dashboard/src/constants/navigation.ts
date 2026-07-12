@@ -6,6 +6,7 @@ export interface MainNavigationItem {
 	action?: "signout";
 	isSpecial?: boolean;
 	items?: MainNavigationItem[];
+	section?: string;
 }
 
 export const mainNavigation: MainNavigationItem[] = [
@@ -13,30 +14,19 @@ export const mainNavigation: MainNavigationItem[] = [
 		label: "Overview",
 		path: "/",
 		iconName: "home",
+		section: "Main",
 	},
 	{
 		label: "Agent Inbox",
 		path: "/agent-inbox",
 		iconName: "inbox",
-	},
-	{
-		label: "Emails",
-		path: "/emails",
-		iconName: "mail-single",
-		items: [
-			{ label: "Sent", path: "/emails/sent", iconName: "mail-send" },
-			{ label: "Received", path: "/emails/received", iconName: "mail-receive" },
-		],
-	},
-	{
-		label: "Metrics",
-		path: "/metrics",
-		iconName: "fat-row",
+		section: "Main",
 	},
 	{
 		label: "Contacts",
 		path: "/contacts",
-		iconName: "users",
+		iconName: "contacts",
+		section: "Email",
 		items: [
 			{ label: "Properties", path: "/contacts/properties", iconName: "tag" },
 			{ label: "Groups", path: "/contacts/groups", iconName: "modules" },
@@ -48,59 +38,90 @@ export const mainNavigation: MainNavigationItem[] = [
 		],
 	},
 	{
+		label: "Emails",
+		path: "/emails",
+		iconName: "mail-single",
+		section: "Email",
+		items: [
+			{ label: "Sent", path: "/emails/sent", iconName: "mail-send" },
+			{ label: "Received", path: "/emails/received", iconName: "mail-receive" },
+		],
+	},
+	{
 		label: "Templates",
 		path: "/templates",
 		iconName: "layout",
+		section: "Email",
+	},
+
+	{
+		label: "Workflows",
+		path: "/workflows",
+		iconName: "workflow",
+		section: "Email",
 	},
 	{
-		label: "API Keys",
-		path: "/api-keys",
-		iconName: "key-new",
+		label: "Metrics",
+		path: "/metrics",
+		iconName: "fat-row",
+		section: "Analytics",
 	},
 	{
 		label: "Logs",
 		path: "/logs",
 		iconName: "logs",
-	},
-	{
-		label: "Domain",
-		path: "/domain",
-		iconName: "globe",
-	},
-	{
-		label: "Webhooks",
-		path: "/webhooks",
-		iconName: "webhook",
-	},
-	{
-		label: "Workflows",
-		path: "/workflows",
-		iconName: "workflow",
-	},
-	{
-		label: "SMTP",
-		path: "/smtp",
-		iconName: "smtp",
-	},
-	{
-		label: "Integrations",
-		path: "/integrations",
-		iconName: "integration",
+		section: "Analytics",
 	},
 	{
 		label: "Usage & Credits",
 		path: "/credits",
 		iconName: "doughnut",
+		section: "Analytics",
+	},
+	{
+		label: "API Keys",
+		path: "/api-keys",
+		iconName: "key-new",
+		section: "Developer",
+	},
+	{
+		label: "Domain",
+		path: "/domain",
+		iconName: "globe",
+		section: "Developer",
+	},
+	{
+		label: "Webhooks",
+		path: "/webhooks",
+		iconName: "webhook",
+		section: "Developer",
+	},
+	{
+		label: "Integrations",
+		path: "/integrations",
+		iconName: "integration",
+		section: "Developer",
+	},
+	{
+		label: "SMTP",
+		path: "/smtp",
+		iconName: "smtp",
+		section: "Developer",
 	},
 	{
 		label: "Settings",
 		path: "/settings",
 		iconName: "gear",
+		section: "Settings",
 		items: [
 			{ label: "Workspace", path: "/settings", iconName: "gear" },
 			{ label: "Teams", path: "/settings/teams", iconName: "users" },
 			{ label: "Profile", path: "/settings/profile", iconName: "user" },
-			{ label: "Security", path: "/settings/security", iconName: "shield-check" },
+			{
+				label: "Security",
+				path: "/settings/security",
+				iconName: "shield-check",
+			},
 			{ label: "Theme", path: "/settings/theme", iconName: "swatch-book" },
 		],
 	},
