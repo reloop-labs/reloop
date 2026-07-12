@@ -58,6 +58,7 @@
 		"ollama-ai-provider": "^1.2.0",
 		"perfect-cursors": "catalog:ui",
 		"prismjs": "^1.30.0",
+		"rc-progress": "^4.0.0",
 		"react": "catalog:ui",
 		"react-colorful": "catalog:ui",
 		"react-dom": "catalog:ui",

@@ -13,6 +13,14 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { useRouter } from "next/navigation";
+import { Line } from "rc-progress";
+
+const STROKE_COLOR: Record<UsageStatus, string> = {
+	healthy: "var(--success-base)",
+	warning: "var(--warning-base)",
+	critical: "var(--error-base)",
+	unlimited: "var(--text-soft-400)",
+};
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -341,15 +349,15 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 						</span>
 					</div>
 					{/* Progress bar */}
-					<div className="h-1.5 w-full overflow-hidden rounded-full bg-bg-weak-100 dark:bg-white/10">
-						<div
-							className={cn(
-								"h-full rounded-full transition-all duration-500",
-								STATUS_META[status].ring.replace("text-", "bg-"),
-							)}
-							style={{ width: `${Math.max(percent, ratio > 0 ? 1 : 0)}%` }}
-						/>
-					</div>
+					<Line
+						className="h-1.5 w-full"
+						percent={Math.max(percent, ratio > 0 ? 1 : 0)}
+						strokeWidth={2}
+						trailWidth={2}
+						strokeLinecap="round"
+						strokeColor={STROKE_COLOR[status]}
+						trailColor="var(--bg-soft-200)"
+					/>
 					<div className="mt-1.5 text-right text-paragraph-xs text-text-soft-400">
 						<NumberFlow value={remaining} className="tabular-nums" /> remaining
 					</div>
