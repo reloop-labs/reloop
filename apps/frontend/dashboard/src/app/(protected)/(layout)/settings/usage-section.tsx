@@ -11,8 +11,9 @@ import {
 } from "@reloop/pricing";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
 import { Circle } from "rc-progress";
+import { useState } from "react";
+import { SwitchPlanModal } from "./billing/switch-plan-modal";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -276,8 +277,9 @@ function parseCount(val: string): number {
 
 // ─── Main Export ──────────────────────────────────────────────────────────────
 
-export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
+export function UsageSection() {
 	const { data, isLoading } = useBillingUsage();
+	const [switchOpen, setSwitchOpen] = useState(false);
 
 	if (isLoading || !data) {
 		return (
@@ -310,11 +312,11 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 	return (
 		<div className="space-y-4">
 			{/* ── Single upgrade banner (shown once, not in every section) ── */}
-			{nextPlan && onUpgrade && (
+			{nextPlan && (
 				<UpgradeBanner
 					planName={currentPlan.name}
 					nextPlanName={nextPlan.name}
-					onUpgrade={onUpgrade}
+					onUpgrade={() => setSwitchOpen(true)}
 				/>
 			)}
 
@@ -474,6 +476,12 @@ export function UsageSection({ onUpgrade }: { onUpgrade?: () => void }) {
 					isLast={true}
 				/>
 			</CategoryCard>
+
+			<SwitchPlanModal
+				open={switchOpen}
+				onOpenChange={setSwitchOpen}
+				currentPlanId={currentPlanId}
+			/>
 		</div>
 	);
 }

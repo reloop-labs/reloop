@@ -32,6 +32,9 @@ const BillingPage = () => {
 	const router = useRouter();
 	const setIsAiPanelOpen = useUIStore((s) => s.setIsAiPanelOpen);
 	const setAiPanelActiveTab = useUIStore((s) => s.setAiPanelActiveTab);
+	const setPendingSupportMessage = useUIStore(
+		(s) => s.setPendingSupportMessage,
+	);
 	const [switchOpen, setSwitchOpen] = useState(false);
 
 	const openSupport = () => {
@@ -69,6 +72,19 @@ const BillingPage = () => {
 			? nextPlan.priceSubline
 			: `${formatPrice(nextPlan.monthlyPrice)} ${nextPlan.priceSubline}`
 		: "";
+
+	const handleUpgrade = () => {
+		if (!nextPlan) return;
+		const message =
+			nextPlan.monthlyPrice === null
+				? `Hi! I'm interested in the ${nextPlan.name} plan. Can you help me get set up?`
+				: `Hi! I'd like to upgrade to the ${nextPlan.name} plan (${formatPrice(
+						nextPlan.monthlyPrice,
+					)}/month). Can you help me with that?`;
+		setPendingSupportMessage(message);
+		setAiPanelActiveTab("support");
+		setIsAiPanelOpen(true);
+	};
 
 	return (
 		<div className="w-full space-y-6 pt-5">
@@ -167,6 +183,7 @@ const BillingPage = () => {
 								mode="filled"
 								size="small"
 								className="rounded-full font-semibold"
+								onClick={handleUpgrade}
 							>
 								Upgrade now
 							</Button.Root>

@@ -43,9 +43,7 @@ const UsagePage = () => {
 				</div>
 			)}
 
-			<UsageSection
-				onUpgrade={() => router.push("/settings/billing/plans")}
-			/>
+			<UsageSection />
 		</div>
 	);
 };
