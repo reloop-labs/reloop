@@ -148,7 +148,7 @@ const BillingPage = () => {
 									</Badge.Root>
 								)}
 							</div>
-							<p className="mt-1 font-medium text-paragraph-sm text-text-sub-600">
+							<p className="mt-1 font-medium text-[12px] text-text-sub-600">
 								{nextPlanPriceLabel}
 							</p>
 						</div>

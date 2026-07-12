@@ -1,5 +1,6 @@
 "use client";
 
+import { useUIStore } from "@fe/dashboard/store/use-ui-store";
 import {
 	defaultPlan,
 	formatPrice,
@@ -12,7 +13,6 @@ import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 interface SwitchPlanModalProps {
 	open: boolean;
@@ -32,6 +32,11 @@ export const SwitchPlanModal = ({
 	currentPlanId,
 }: SwitchPlanModalProps) => {
 	const router = useRouter();
+	const setIsAiPanelOpen = useUIStore((s) => s.setIsAiPanelOpen);
+	const setAiPanelActiveTab = useUIStore((s) => s.setAiPanelActiveTab);
+	const setPendingSupportMessage = useUIStore(
+		(s) => s.setPendingSupportMessage,
+	);
 	const [selectedId, setSelectedId] = useState<PlanId>(currentPlanId);
 
 	// Reset the selection to the current plan whenever the modal is opened
@@ -48,7 +53,17 @@ export const SwitchPlanModal = ({
 	};
 
 	const handleSwitch = () => {
-		toast.info("Plan changes aren't available yet — contact us to switch.");
+		const priceStr =
+			selectedPlan.monthlyPrice === null
+				? "custom pricing"
+				: `${formatPrice(selectedPlan.monthlyPrice)}/month`;
+		const message =
+			selectedPlan.monthlyPrice === null
+				? "Hi! I'm interested in the Enterprise plan. Can you help me get set up?"
+				: `Hi! I'd like to switch to the ${selectedPlan.name} plan (${priceStr}). Can you help me with that?`;
+		setPendingSupportMessage(message);
+		setAiPanelActiveTab("support");
+		setIsAiPanelOpen(true);
 		onOpenChange(false);
 	};
 
@@ -110,7 +125,7 @@ export const SwitchPlanModal = ({
 											</span>
 										)}
 									</div>
-									<p className="mt-1 font-medium text-paragraph-sm text-text-sub-600">
+									<p className="font-medium text-[12px] text-text-sub-600">
 										{planPriceLabel(plan)}
 									</p>
 								</button>
@@ -163,15 +178,17 @@ export const SwitchPlanModal = ({
 							variant="neutral"
 							mode="stroke"
 							size="small"
+							className="rounded-full font-medium"
 							onClick={() => onOpenChange(false)}
 						>
 							Cancel
 						</Button.Root>
 						<Button.Root
 							type="button"
-							variant="primary"
+							variant="neutral"
 							mode="filled"
 							size="small"
+							className="rounded-full font-medium"
 							disabled={selectedId === currentPlanId}
 							onClick={handleSwitch}
 						>
