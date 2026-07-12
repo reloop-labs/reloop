@@ -44,9 +44,11 @@ const PlansPage = () => {
 	// pricing page highlight color).
 	const nextIndex = currentIndex + 1;
 
+	const isHighlight = (plan: PricingPlan) => planIndex(plan.id) === nextIndex;
+
 	const cellBg = (plan: PricingPlan) =>
-		planIndex(plan.id) === nextIndex
-			? "bg-bg-weak-50/60 dark:bg-white/[0.03]"
+		isHighlight(plan)
+			? "border-stroke-soft-200 border-x bg-bg-weak-50/60 dark:border-stroke-soft-100/40 dark:bg-white/[0.03]"
 			: "";
 
 	function priceLine(plan: PricingPlan) {
@@ -124,10 +126,10 @@ const PlansPage = () => {
 					<button
 						type="button"
 						onClick={openSupport}
-						className="inline-flex items-center gap-0.5 font-medium text-text-strong-950 underline hover:text-text-sub-600"
+						className="inline-flex items-center gap-1 font-medium text-text-strong-950 hover:text-text-sub-600"
 					>
 						contact us
-						<Icon name="arrow-right" className="h-3.5 w-3.5" />
+						<Icon name="arrow-right" className="h-3 w-3" />
 					</button>
 				</p>
 			</div>
@@ -144,6 +146,7 @@ const PlansPage = () => {
 								key={plan.id}
 								className={cn(
 									"flex flex-col gap-4 rounded-t-2xl border-stroke-soft-100 border-b p-4 dark:border-stroke-soft-100/40",
+									isHighlight(plan) && "border-t",
 									cellBg(plan),
 								)}
 							>
@@ -211,7 +214,11 @@ const PlansPage = () => {
 					{pricingPlans.map((plan) => (
 						<div
 							key={`cap-${plan.id}`}
-							className={cn("h-8 rounded-b-2xl", cellBg(plan))}
+							className={cn(
+								"h-8 rounded-b-2xl",
+								isHighlight(plan) && "border-b",
+								cellBg(plan),
+							)}
 						/>
 					))}
 				</div>
@@ -239,13 +246,16 @@ function ComparisonCell({
 
 	if (type === "boolean") {
 		return (
-			<Icon name="check" className="h-4 w-4 shrink-0 text-text-strong-950" />
+			<Icon
+				name="check-mark"
+				className="h-4 w-4 shrink-0 text-text-strong-950"
+			/>
 		);
 	}
 
 	return (
 		<span className="inline-flex items-center gap-2 font-medium text-paragraph-sm text-text-strong-950">
-			<Icon name="check" className="h-4 w-4 shrink-0 text-text-sub-600" />
+			<Icon name="check-mark" className="h-4 w-4 shrink-0 text-text-sub-600" />
 			{value as string}
 		</span>
 	);
