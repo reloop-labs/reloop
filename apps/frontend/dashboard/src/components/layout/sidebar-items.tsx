@@ -6,7 +6,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "../animated-hover-background";
 
@@ -135,7 +135,11 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 								</div>
 							))}
 						<Link
-							href={path}
+							href={
+								path === "/settings"
+									? `/settings?from=${encodeURIComponent(pathname)}`
+									: path
+							}
 							ref={(el) => {
 								if (el) mainNavRefs.current[index] = el;
 							}}
@@ -302,6 +306,9 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 
 	const pathname = usePathname();
 	const { canManageTeam, canManageBilling } = useOrgPermissions();
+	const searchParams = useSearchParams();
+	const fromParam = searchParams.get("from");
+	const backHref = fromParam || "/";
 
 	const filteredSettingsNavigation = useMemo(() => {
 		return settingsNavigation
@@ -320,7 +327,7 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 
 	// Flatten items for active state indexing
 	const flatItems = useMemo(() => {
-		const items: typeof settingsNavigation[number]["items"][number][] = [];
+		const items: (typeof settingsNavigation)[number]["items"][number][] = [];
 		filteredSettingsNavigation.forEach((section) => {
 			items.push(...section.items);
 		});
@@ -332,7 +339,8 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 		return pathname.startsWith(item.path);
 	});
 
-	const activeEl = activeIndex !== -1 ? itemRefs.current[activeIndex] : undefined;
+	const activeEl =
+		activeIndex !== -1 ? itemRefs.current[activeIndex] : undefined;
 	const currentEl = hoveredEl ?? activeEl;
 
 	useLayoutEffect(() => {
@@ -351,15 +359,15 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 		>
 			{/* Back Button */}
 			<Link
-				href="/"
+				href={backHref}
 				ref={backNavRef}
 				onPointerEnter={() => setHoveredEl(backNavRef.current ?? undefined)}
 				onPointerLeave={() => setHoveredEl(undefined)}
 				className={cn(
-					"group relative z-10 flex h-8 items-center rounded-lg transition-all mb-4",
+					"group relative z-10 mb-4 flex h-8 items-center rounded-lg transition-all",
 					isCollapsed
 						? "h-8 w-8 justify-center px-0"
-						: "w-full gap-2.5 px-2.5 justify-start",
+						: "w-full justify-start gap-2.5 px-2.5",
 				)}
 				title={isCollapsed ? "Back to app" : undefined}
 			>
@@ -371,10 +379,10 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 				>
 					<Icon
 						name="arrow-left"
-						className="h-4 w-4 shrink-0 text-text-sub-600 opacity-70 group-hover:text-primary-base group-hover:opacity-100 transition-all duration-200"
+						className="h-4 w-4 shrink-0 text-text-sub-600 opacity-70 transition-all duration-200 group-hover:text-primary-base group-hover:opacity-100"
 					/>
 					{!isCollapsed && (
-						<span className="font-medium text-[13px] text-text-sub-600 group-hover:text-primary-base transition-colors">
+						<span className="font-medium text-[13px] text-text-sub-600 transition-colors group-hover:text-primary-base">
 							Back to app
 						</span>
 					)}
@@ -408,17 +416,23 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 						return (
 							<Link
 								key={item.path}
-								href={item.path}
+								href={
+									fromParam
+										? `${item.path}?from=${encodeURIComponent(fromParam)}`
+										: item.path
+								}
 								ref={(el) => {
 									if (el) itemRefs.current[currentIdx] = el;
 								}}
-								onPointerEnter={() => setHoveredEl(itemRefs.current[currentIdx])}
+								onPointerEnter={() =>
+									setHoveredEl(itemRefs.current[currentIdx])
+								}
 								onPointerLeave={() => setHoveredEl(undefined)}
 								className={cn(
 									"group relative z-10 flex h-8 items-center rounded-lg transition-all",
 									isCollapsed
 										? "h-8 w-8 justify-center px-0"
-										: "w-full gap-2.5 px-2.5 justify-start",
+										: "w-full justify-start gap-2.5 px-2.5",
 								)}
 								title={isCollapsed ? item.label : undefined}
 							>

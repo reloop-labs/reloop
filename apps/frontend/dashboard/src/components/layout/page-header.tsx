@@ -7,10 +7,12 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { OrganizationSwitcher } from "./organization-switcher";
 import { UserDropdown } from "./user-dropdown";
 
 export const PageHeader = () => {
+	const pathname = usePathname();
 	const {
 		isAiPanelOpen,
 		setIsAiPanelOpen,
@@ -39,7 +41,7 @@ export const PageHeader = () => {
 
 				{/* Settings Button */}
 				<Link
-					href="/settings"
+					href={`/settings?from=${encodeURIComponent(pathname)}`}
 					title="Settings"
 					className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
 				>

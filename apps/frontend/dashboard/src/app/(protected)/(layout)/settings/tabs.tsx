@@ -4,7 +4,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
 import { AnimatePresence, motion } from "motion/react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 
 const list = [
@@ -41,6 +41,8 @@ export const SettingsTabs = () => {
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const pathname = usePathname();
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const fromParam = searchParams.get("from");
 	const { canManageTeam, canManageBilling, isPending } = useOrgPermissions();
 
 	const visibleList = useMemo(
@@ -89,7 +91,10 @@ export const SettingsTabs = () => {
 						key={path}
 						value={path}
 						onClick={() => {
-							router.push(path);
+							const href = fromParam
+								? `${path}?from=${encodeURIComponent(fromParam)}`
+								: path;
+							router.push(href);
 						}}
 					>
 						<Icon name={iconName} className="h-4 w-4" />

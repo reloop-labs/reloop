@@ -11,7 +11,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useRef, useState } from "react";
 import { AnimatedHoverBackground } from "../animated-hover-background";
@@ -39,6 +39,16 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const itemRefs = useRef<(HTMLElement | null)[]>([]);
 	const router = useRouter();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+	const fromParam = searchParams.get("from");
+
+	const getHref = (path: string) => {
+		const fromVal = !pathname.startsWith("/settings")
+			? pathname
+			: fromParam || "/";
+		return `${path}?from=${encodeURIComponent(fromVal)}`;
+	};
 
 	const currentTab = itemRefs.current[hoverIdx ?? -1] || undefined;
 	const currentRect = currentTab?.getBoundingClientRect();
@@ -132,7 +142,7 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(0)}
 							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => router.push("/settings/profile")}
+							onClick={() => router.push(getHref("/settings/profile"))}
 						>
 							<Avatar.Root size="20" color="blue" className="shrink-0">
 								{user.image ? (
@@ -183,7 +193,7 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(2)}
 							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => router.push("/settings")}
+							onClick={() => router.push(getHref("/settings"))}
 						>
 							<Icon name="gear" className="h-4 w-4 text-text-sub-600" />
 							<span className="flex-1 truncate text-sm">Settings</span>
@@ -234,13 +244,15 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 								className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 								onPointerEnter={() => setHoverIdx(5)}
 								onPointerLeave={() => setHoverIdx(undefined)}
-								onClick={() => router.push("/settings/billing")}
+								onClick={() => router.push(getHref("/settings/billing"))}
 							>
 								<Icon
 									name="arrow-top-circle"
 									className="h-4 w-4 text-text-sub-600"
 								/>
-								<span className="flex-1 truncate text-sm">Billing & credits</span>
+								<span className="flex-1 truncate text-sm">
+									Billing & credits
+								</span>
 							</Dropdown.Item>
 						)}
 

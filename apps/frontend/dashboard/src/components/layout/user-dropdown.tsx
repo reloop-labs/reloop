@@ -13,7 +13,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useRef, useState } from "react";
 import { AnimatedHoverBackground } from "../animated-hover-background";
@@ -26,6 +26,16 @@ export const UserDropdown = () => {
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const itemRefs = useRef<(HTMLElement | null)[]>([]);
 	const router = useRouter();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+	const fromParam = searchParams.get("from");
+
+	const getHref = (path: string) => {
+		const fromVal = !pathname.startsWith("/settings")
+			? pathname
+			: fromParam || "/";
+		return `${path}?from=${encodeURIComponent(fromVal)}`;
+	};
 
 	const currentTab = itemRefs.current[hoverIdx ?? -1] || undefined;
 	const currentRect = currentTab?.getBoundingClientRect();
@@ -82,12 +92,14 @@ export const UserDropdown = () => {
 				align="end"
 			>
 				<div className="px-2.5 py-2 pb-1.5">
-					<p className="truncate font-medium text-xs text-text-sub-600">{user.email}</p>
+					<p className="truncate font-medium text-text-sub-600 text-xs">
+						{user.email}
+					</p>
 				</div>
 				<div className="h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 				<div className="relative">
 					{/* Workspace Section */}
-					<Dropdown.Label className="px-2.5 pt-2 pb-1 text-[10px] font-semibold text-text-soft-400 uppercase tracking-wider">
+					<Dropdown.Label className="px-2.5 pt-2 pb-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">
 						Workspace
 					</Dropdown.Label>
 					<Dropdown.Group className="gap-0">
@@ -98,7 +110,7 @@ export const UserDropdown = () => {
 							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(0)}
 							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => handleAction("/settings", undefined)}
+							onClick={() => handleAction(getHref("/settings"), undefined)}
 						>
 							<Icon name="doughnut" className="h-4 w-4 text-text-sub-600" />
 							<span className="flex-1 truncate text-sm">Usage</span>
@@ -112,9 +124,14 @@ export const UserDropdown = () => {
 								className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 								onPointerEnter={() => setHoverIdx(1)}
 								onPointerLeave={() => setHoverIdx(undefined)}
-								onClick={() => handleAction("/settings/billing", undefined)}
+								onClick={() =>
+									handleAction(getHref("/settings/billing"), undefined)
+								}
 							>
-								<Icon name="billing-custom" className="h-4 w-4 text-text-sub-600" />
+								<Icon
+									name="billing-custom"
+									className="h-4 w-4 text-text-sub-600"
+								/>
 								<span className="flex-1 truncate text-sm">Billing</span>
 							</Dropdown.Item>
 						)}
@@ -127,7 +144,9 @@ export const UserDropdown = () => {
 								className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 								onPointerEnter={() => setHoverIdx(2)}
 								onPointerLeave={() => setHoverIdx(undefined)}
-								onClick={() => handleAction("/settings/teams", undefined)}
+								onClick={() =>
+									handleAction(getHref("/settings/teams"), undefined)
+								}
 							>
 								<Icon name="users" className="h-4 w-4 text-text-sub-600" />
 								<span className="flex-1 truncate text-sm">Teams</span>
@@ -141,9 +160,14 @@ export const UserDropdown = () => {
 							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(3)}
 							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => handleAction("/settings/workspace", undefined)}
+							onClick={() =>
+								handleAction(getHref("/settings/workspace"), undefined)
+							}
 						>
-							<Icon name="workspace-custom" className="h-4 w-4 text-text-sub-600" />
+							<Icon
+								name="workspace-custom"
+								className="h-4 w-4 text-text-sub-600"
+							/>
 							<span className="flex-1 truncate text-sm">Workspace</span>
 						</Dropdown.Item>
 					</Dropdown.Group>
@@ -151,7 +175,7 @@ export const UserDropdown = () => {
 					<div className="my-1.5 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 
 					{/* Account Section */}
-					<Dropdown.Label className="px-2.5 pt-1.5 pb-1 text-[10px] font-semibold text-text-soft-400 uppercase tracking-wider">
+					<Dropdown.Label className="px-2.5 pt-1.5 pb-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">
 						Account
 					</Dropdown.Label>
 					<Dropdown.Group className="gap-0">
@@ -162,7 +186,9 @@ export const UserDropdown = () => {
 							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(4)}
 							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => handleAction("/settings/profile", undefined)}
+							onClick={() =>
+								handleAction(getHref("/settings/profile"), undefined)
+							}
 						>
 							<Avatar.Root size="20" color="blue" className="shrink-0">
 								{user.image ? (
@@ -190,7 +216,9 @@ export const UserDropdown = () => {
 							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(5)}
 							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => handleAction("/settings/security", undefined)}
+							onClick={() =>
+								handleAction(getHref("/settings/security"), undefined)
+							}
 						>
 							<Icon name="shield-check" className="h-4 w-4 text-text-sub-600" />
 							<span className="flex-1 truncate text-sm">Security</span>
