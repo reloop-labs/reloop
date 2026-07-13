@@ -292,6 +292,67 @@ describe("ApiKeyCredential.disable", () => {
 		});
 	});
 
+	test("missing creator after commit still returns successful disable (no 404)", async () => {
+		const hashed = hashApiKey(generateApiKey());
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		const now = new Date();
+		const { db, getRow } = createFakeDb({
+			id: "key-1",
+			organizationId: "org-1",
+			userId: "user-1",
+			key: hashed,
+			enabled: true,
+			name: "test",
+			start: null,
+			prefix: null,
+			refillInterval: null,
+			refillAmount: null,
+			lastRefillAt: null,
+			rateLimitEnabled: true,
+			rateLimitTimeWindow: 1000,
+			rateLimitMax: 100,
+			requestCount: 0,
+			remaining: null,
+			lastRequest: null,
+			expiresAt: null,
+			createdAt: now,
+			updatedAt: now,
+			permissions: null,
+			metadata: null,
+			user: {
+				id: "user-1",
+				name: "Test",
+				image: null,
+				email: "t@example.com",
+			},
+		});
+
+		// Simulate missing user relation on post-commit reload
+		(db as { query: { apikey: { findFirst: () => Promise<unknown> } } }).query =
+			{
+				apikey: {
+					findFirst: async () => ({
+						...getRow(),
+						user: null,
+					}),
+				},
+			};
+
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache,
+			bus: { publish: async () => {} },
+		});
+
+		const result = await credential.disable({
+			id: "key-1",
+			organizationId: "org-1",
+		});
+		expect(result.row.enabled).toBe(false);
+		expect(result.row.user).toBeNull();
+	});
+
 	test("bus failure after successful invalidate still succeeds", async () => {
 		const hashed = hashApiKey(generateApiKey());
 		const store = memoryStore();
