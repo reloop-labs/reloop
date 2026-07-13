@@ -82,6 +82,7 @@ export const SignupForm = () => {
 			<Button.Root
 				type="submit"
 				disabled={status === "loading" || !isValid}
+				variant="neutral"
 				className="h-11 w-full rounded-2xl!"
 			>
 				{status === "loading" && (
