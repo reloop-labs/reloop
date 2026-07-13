@@ -850,6 +850,7 @@
         "@reloop/db": "workspace:*",
         "better-auth": "catalog:",
         "drizzle-orm": "catalog:db",
+        "elysia": "catalog:backend",
         "evlog": "catalog:backend",
       },
       "devDependencies": {
