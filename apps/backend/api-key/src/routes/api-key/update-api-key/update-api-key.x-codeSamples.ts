@@ -7,8 +7,13 @@ export const updateApiKeyXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: apiKey, error } = await reloop.apiKey.update("key_123456789", { name: "Updated Key Name" });
-if (error) throw error;`,
+const { response: apiKey, error } = await reloop.apiKey.update("key_123456789", {
+  name: "Updated Key Name",
+});
+
+if (error) throw error;
+
+console.log(apiKey.id, apiKey.name);`,
 	},
 	{
 		id: "curl",

@@ -7,8 +7,15 @@ export const listApiKeysXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: apiKeys, error } = await reloop.apiKey.list({ page: 1, limit: 10 });
-if (error) throw error;`,
+const { response, error } = await reloop.apiKey.list({
+  page: 1,
+  limit: 10,
+  enabled: true,
+});
+
+if (error) throw error;
+
+console.log(response.total, response.apiKeys);`,
 	},
 	{
 		id: "curl",

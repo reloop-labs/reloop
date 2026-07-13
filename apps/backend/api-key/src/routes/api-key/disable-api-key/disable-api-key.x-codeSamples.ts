@@ -7,8 +7,11 @@ export const disableApiKeyXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.apiKey.disable("key_123456789");
-if (error) throw error;`,
+const { response: apiKey, error } = await reloop.apiKey.disable("key_123456789");
+
+if (error) throw error;
+
+console.log(apiKey.id, apiKey.enabled);`,
 	},
 	{
 		id: "curl",
