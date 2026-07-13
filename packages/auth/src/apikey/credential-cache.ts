@@ -175,9 +175,11 @@ export function createApiKeyCredentialCache(
 			const hashedKey = await store.get<string>(indexKey);
 
 			if (!hashedKey) {
-				// No reverse index: under verified writes, that means we never
-				// successfully cached this key (primary is always paired with reverse).
-				// Pre-migration hash-only entries expire via TTL.
+				// No reverse index: under verified writes (primary + reverse confirmed
+				// together), that means we never successfully cached this key id.
+				// Pre-migration hash-only entries (before reverse index) cannot be
+				// found by id alone and expire via TTL — scanning the keyspace is
+				// intentionally out of scope.
 				return;
 			}
 
