@@ -3,7 +3,7 @@ import { db } from "@reloop/db/client";
 import { invitation, signupInvite, user } from "@reloop/db/schema";
 import { and, count, desc, eq, gt, inArray, ne, sql } from "drizzle-orm";
 import { createError } from "evlog";
-import { authConfig } from "../auth.config";
+import { authServerConfig } from "./config";
 
 export const SIGNUP_INVITE_COOKIE = "reloop.signup_invite";
 export const SIGNUP_INVITE_COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
@@ -173,7 +173,7 @@ export async function listPeerSignupInvites(userId: string) {
 
 	return items.map((item) => ({
 		...item,
-		inviteLink: signupInviteLink(authConfig.BASE_URL, item.code),
+		inviteLink: signupInviteLink(authServerConfig.BASE_URL, item.code),
 	}));
 }
 
@@ -261,7 +261,7 @@ export async function createPeerSignupInvite(opts: {
 		});
 	}
 
-	const inviteLink = signupInviteLink(authConfig.BASE_URL, created.code);
+	const inviteLink = signupInviteLink(authServerConfig.BASE_URL, created.code);
 
 	await bus.publish(
 		BusEvent.SIGNUP_INVITE_CREATED,
@@ -326,8 +326,17 @@ export async function revokePeerSignupInvite(opts: {
 		)
 		.returning();
 
+	if (!updated) {
+		throw createError({
+			status: 500,
+			message: "Failed to revoke invite",
+			why: "Update returned no row",
+			fix: "Retry the request",
+		});
+	}
+
 	return {
-		id: updated!.id,
-		status: updated!.status,
+		id: updated.id,
+		status: updated.status,
 	};
 }

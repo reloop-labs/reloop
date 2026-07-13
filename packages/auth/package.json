@@ -5,6 +5,7 @@
 	"exports": {
 		"./client": "./src/client.ts",
 		"./server": "./src/server.ts",
+		"./types": "./src/types.ts",
 		"./roles": "./src/roles.ts",
 		"./permissions": "./src/permissions.ts",
 		"./platform-permissions": "./src/platform-permissions.ts"
@@ -13,15 +14,24 @@
 		"build": "tsc",
 		"clean": "git clean -xdf .cache .turbo dist node_modules",
 		"dev": "tsc",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "tsc --noEmit",
+		"test": "bun test test/"
 	},
 	"dependencies": {
+		"@better-auth/api-key": "catalog:",
+		"@reloop/bus": "workspace:*",
+		"@reloop/cache": "workspace:*",
+		"@reloop/db": "workspace:*",
 		"better-auth": "catalog:",
-		"@better-auth/api-key": "catalog:"
+		"drizzle-orm": "catalog:db",
+		"evlog": "catalog:backend"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
 		"@types/node": "catalog:",
 		"typescript": "catalog:"
+	},
+	"peerDependencies": {
+		"react": ">=18"
 	}
 }

@@ -10,7 +10,7 @@ import {
 import { createAuthClient } from "better-auth/react";
 import { ac, orgRoles } from "./permissions";
 import { platformAc, platformRoles } from "./platform-permissions";
-import type { AuthInstance } from "./server";
+import type { AuthInstance } from "./types";
 
 const baseURL =
 	process.env.NEXT_PUBLIC_URL ||
