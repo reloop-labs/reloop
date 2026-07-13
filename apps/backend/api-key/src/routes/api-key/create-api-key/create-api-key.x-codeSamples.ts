@@ -7,11 +7,11 @@ export const createApiKeyXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: apiKey, error } = await reloop.apiKey.create({
+const { apiKey, apiKeyError } = await reloop.apiKey.create({
   name: "Production Key",
 });
 
-if (error) throw error;
+if (apiKeyError) throw apiKeyError;
 
 console.log(apiKey.id, apiKey.key);`,
 	},

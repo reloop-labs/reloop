@@ -22,11 +22,11 @@ _apiData:
         
         const reloop = new Reloop({ apiKey: "rl_123456789" });
         
-        const { response: apiKey, error } = await reloop.apiKey.update("key_123456789", {
+        const { apiKey, apiKeyError } = await reloop.apiKey.update("key_123456789", {
           name: "Updated Key Name",
         });
         
-        if (error) throw error;
+        if (apiKeyError) throw apiKeyError;
         
         console.log(apiKey.id, apiKey.name);
     - id: curl

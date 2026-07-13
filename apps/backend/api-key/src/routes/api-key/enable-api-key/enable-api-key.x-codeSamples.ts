@@ -7,9 +7,9 @@ export const enableApiKeyXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: apiKey, error } = await reloop.apiKey.enable("key_123456789");
+const { apiKey, apiKeyError } = await reloop.apiKey.enable("key_123456789");
 
-if (error) throw error;
+if (apiKeyError) throw apiKeyError;
 
 console.log(apiKey.id, apiKey.enabled);`,
 	},

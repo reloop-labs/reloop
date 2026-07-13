@@ -7,11 +7,11 @@ export const deleteApiKeyXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.apiKey.delete("key_123456789");
+const { apiKey, apiKeyError } = await reloop.apiKey.delete("key_123456789");
 
-if (error) throw error;
+if (apiKeyError) throw apiKeyError;
 
-console.log(response.id, response.message);`,
+console.log(apiKey.id, apiKey.message);`,
 	},
 	{
 		id: "curl",
