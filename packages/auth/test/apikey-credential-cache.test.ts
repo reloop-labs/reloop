@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
 	API_KEY_CREDENTIAL_CACHE_TTL_SECONDS,
 	apiKeyCredentialCacheKey,
+	authRedisAsCredentialStore,
 	createApiKeyCredentialCache,
 	type ApiKeyCredentialEntry,
 	type ApiKeyCredentialStore,
@@ -78,6 +79,30 @@ describe("ApiKeyCredentialCache", () => {
 		await expect(cache.invalidate("prod-hash")).rejects.toThrow(
 			/credential cache invalidate failed/,
 		);
+	});
+
+	test("authRedisAsCredentialStore prefers deleteStrict over best-effort delete", async () => {
+		let strictCalled = false;
+		let softCalled = false;
+		const store = authRedisAsCredentialStore({
+			async get() {
+				return undefined;
+			},
+			async set() {},
+			async delete() {
+				softCalled = true;
+			},
+			async deleteStrict() {
+				strictCalled = true;
+				throw new Error("redis unavailable");
+			},
+		});
+		const cache = createApiKeyCredentialCache(store);
+		await expect(cache.invalidate("h")).rejects.toThrow(
+			/credential cache invalidate failed/,
+		);
+		expect(strictCalled).toBe(true);
+		expect(softCalled).toBe(false);
 	});
 
 	test("write uses default 30-day TTL when caller omits ttl", async () => {

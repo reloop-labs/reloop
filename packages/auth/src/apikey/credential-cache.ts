@@ -39,6 +39,29 @@ export type ApiKeyCredentialCache = {
 	invalidate(hashedKey: string): Promise<void>;
 };
 
+/**
+ * Auth Redis / session cache often uses best-effort `delete`.
+ * Prefer `deleteStrict` when available so credential invalidate fails closed.
+ */
+export function authRedisAsCredentialStore(redis: {
+	get<T>(key: string): Promise<T | undefined>;
+	set(key: string, value: unknown, ttlSeconds?: number): Promise<void>;
+	delete(key: string): Promise<void>;
+	deleteStrict?(key: string): Promise<void>;
+}): ApiKeyCredentialStore {
+	return {
+		get: (key) => redis.get(key),
+		set: (key, value, ttl) => redis.set(key, value, ttl),
+		delete: async (key) => {
+			if (redis.deleteStrict) {
+				await redis.deleteStrict(key);
+				return;
+			}
+			await redis.delete(key);
+		},
+	};
+}
+
 export function createApiKeyCredentialCache(
 	store: ApiKeyCredentialStore,
 ): ApiKeyCredentialCache {
