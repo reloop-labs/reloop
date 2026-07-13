@@ -1,9 +1,8 @@
 import { addTokenToUserIndex } from "./add-token-to-user-index";
-import { extractSessionToken } from "../keys/extract-session-token";
 import { fetchGetSession } from "./fetch-get-session";
 import type { ResolveSessionOptions } from "./resolve-session-options";
-import { sessionTokenCacheKey } from "../keys/session-token-cache-key";
 import type { AuthContext, AuthContextWithProfile } from "../types";
+import { extractSessionToken, sessionTokenCacheKey } from "../keys";
 
 export async function resolveSessionWithProfile(
 	cookie: string | null,

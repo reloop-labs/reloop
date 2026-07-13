@@ -1,9 +1,8 @@
 import { PLATFORM_ADMIN_ROLE } from "../../roles";
-import { extractSessionToken } from "../keys/extract-session-token";
 import type { ResolverDeps } from "./resolver-deps";
 import { resolveSessionAuthWithProfile } from "./resolve-session-auth-with-profile";
-import { sessionTokenCacheKey } from "../keys/session-token-cache-key";
 import type { AuthContext, SupportAuthContext } from "../types";
+import { extractSessionToken, sessionTokenCacheKey } from "../keys";
 
 export async function resolveSupportSession(
 	headers: Headers,

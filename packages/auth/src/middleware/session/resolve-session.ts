@@ -1,10 +1,9 @@
 import { addTokenToUserIndex } from "./add-token-to-user-index";
-import { extractSessionToken } from "../keys/extract-session-token";
 import { fetchGetSession } from "./fetch-get-session";
 import { normalizeCachedContext } from "./normalize-cached-context";
 import type { ResolveSessionOptions } from "./resolve-session-options";
-import { sessionTokenCacheKey } from "../keys/session-token-cache-key";
 import type { AuthContext } from "../types";
+import { extractSessionToken, sessionTokenCacheKey } from "../keys";
 
 export async function resolveSession(
 	cookie: string | null,

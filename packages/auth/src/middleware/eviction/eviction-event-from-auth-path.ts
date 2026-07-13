@@ -1,4 +1,4 @@
-import { extractSessionToken } from "../keys/extract-session-token";
+import { extractSessionToken } from "../keys";
 import type { SessionEvictionEvent } from "./session-eviction-event";
 
 export function evictionEventFromAuthPath(opts: {

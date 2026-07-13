@@ -1,6 +1,5 @@
-import { sessionTokenCacheKey } from "../keys/session-token-cache-key";
-import { sessionUserIndexKey } from "../keys/session-user-index-key";
 import type { AuthRedis } from "../types";
+import { sessionTokenCacheKey, sessionUserIndexKey } from "../keys";
 
 export async function evictSessionByToken(
 	redis: AuthRedis,

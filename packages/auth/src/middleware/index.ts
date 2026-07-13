@@ -6,9 +6,11 @@ export { handleAuthLifecycleEviction } from "./eviction/handle-auth-lifecycle-ev
 export { SESSION_CACHE_REDIS_PREFIX } from "./eviction/session-cache-redis-prefix";
 export type { SessionEvictionEvent } from "./eviction/session-eviction-event";
 
-export { extractSessionToken } from "./keys/extract-session-token";
-export { sessionTokenCacheKey } from "./keys/session-token-cache-key";
-export { sessionUserIndexKey } from "./keys/session-user-index-key";
+export {
+	extractSessionToken,
+	sessionTokenCacheKey,
+	sessionUserIndexKey,
+} from "./keys";
 
 export { createAuthPlugin, type AuthPlugin } from "./plugin/create-auth-plugin";
 

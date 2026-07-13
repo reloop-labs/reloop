@@ -1,4 +1,4 @@
-import { sessionUserIndexKey } from "../keys/session-user-index-key";
+import { sessionUserIndexKey } from "../keys";
 import type { AuthRedis } from "../types";
 
 export async function addTokenToUserIndex(
