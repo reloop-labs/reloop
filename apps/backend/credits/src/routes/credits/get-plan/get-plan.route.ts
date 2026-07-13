@@ -9,7 +9,7 @@ export const getPlanRoute = new Elysia().use(authMiddleware).get(
 		return await getPlanController({ organizationId });
 	},
 	{
-		cookieAuth: true,
+		auth: true,
 		response: {
 			200: CreditsModel.planResponse,
 			401: CreditsModel.unauthorized,

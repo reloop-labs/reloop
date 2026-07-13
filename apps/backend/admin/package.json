@@ -10,7 +10,8 @@
 		"check-types": "tsc --noEmit",
 		"lint": "biome check .",
 		"fix-lint": "biome check --fix .",
-		"format": "biome format ."
+		"format": "biome format .",
+		"test": "bun test test/"
 	},
 	"dependencies": {
 		"@elysiajs/cors": "catalog:backend",
