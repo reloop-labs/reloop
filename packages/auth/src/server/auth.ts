@@ -24,6 +24,18 @@ import {
 import { and, eq } from "drizzle-orm";
 import { log } from "evlog";
 
+/** Accounts created within this window are treated as signups, not return logins. */
+const NEW_USER_SIGNIN_GRACE_MS = 2 * 60 * 1000;
+
+function isRecentlyCreatedUser(user: {
+	createdAt?: Date | string | null;
+}): boolean {
+	if (!user.createdAt) return false;
+	const createdAtMs = new Date(user.createdAt).getTime();
+	if (Number.isNaN(createdAtMs)) return false;
+	return Date.now() - createdAtMs < NEW_USER_SIGNIN_GRACE_MS;
+}
+
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
 		provider: "pg",
@@ -52,6 +64,35 @@ export const auth = betterAuth({
 	 * immediately without requiring a manual org switch in the UI.
 	 */
 	databaseHooks: {
+		user: {
+			create: {
+				// Signup uses the same paths as sign-in (`/sign-in/email-otp`, OAuth
+				// callbacks). Emit welcome from the actual user-create hook so first-time
+				// accounts get WelcomeEmail regardless of which auth path created them.
+				after: async (user) => {
+					try {
+						log.info({
+							...{ data: { id: user.id, email: user.email } },
+							message: "User registered:",
+						});
+						await bus.publish(
+							BusEvent.USER_CREATED,
+							{
+								id: user.id,
+								email: user.email,
+								name: user.name || undefined,
+							},
+							{ msgId: `user_created:${user.email}` },
+						);
+					} catch (error) {
+						log.error({
+							...{ data: error },
+							message: "Failed to publish USER_CREATED",
+						});
+					}
+				},
+			},
+		},
 		session: {
 			create: {
 				before: async (session) => {
@@ -112,25 +153,6 @@ export const auth = betterAuth({
 				});
 			}
 
-			if (path === "/sign-up/email-otp") {
-				const newSession = context.newSession;
-				if (newSession) {
-					log.info({
-						...{ data: newSession.user },
-						message: "User registered:",
-					});
-					await bus.publish(
-						BusEvent.USER_CREATED,
-						{
-							id: newSession.user.id,
-							email: newSession.user.email,
-							name: newSession.user.name || undefined,
-						},
-						{ msgId: `user_created:${newSession.user.email}` },
-					);
-				}
-			}
-
 			if (
 				path === "/sign-in/email-otp" ||
 				path === "/callback/google" ||
@@ -139,6 +161,17 @@ export const auth = betterAuth({
 				const data = context.newSession;
 				if (data) {
 					const { session, user } = data;
+
+					// First-time signup auto-creates a session on these same paths.
+					// Skip the security alert so new users only get the welcome email.
+					if (isRecentlyCreatedUser(user)) {
+						log.info({
+							...{ data: user.email },
+							message: "Skipping signin alert for newly created user:",
+						});
+						return;
+					}
+
 					log.info({ ...{ data: user.email }, message: "User signed in:" });
 
 					const bucket = Math.floor(Date.now() / 60000);
