@@ -1,7 +1,7 @@
+import type { AuthRedis } from "../types";
 import { evictAllSessionsForUser } from "./evict-all-sessions-for-user";
 import { evictSessionByToken } from "./evict-session-by-token";
 import type { SessionEvictionEvent } from "./session-eviction-event";
-import type { AuthRedis } from "../types";
 
 export async function applySessionCacheEviction(
 	redis: AuthRedis,

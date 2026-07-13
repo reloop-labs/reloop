@@ -1,7 +1,7 @@
+import type { AuthRedis } from "../types";
 import { applySessionCacheEviction } from "./apply-session-cache-eviction";
 import { evictionEventFromAuthPath } from "./eviction-event-from-auth-path";
 import type { SessionEvictionEvent } from "./session-eviction-event";
-import type { AuthRedis } from "../types";
 
 export async function handleAuthLifecycleEviction(
 	redis: AuthRedis,
@@ -15,8 +15,6 @@ export async function handleAuthLifecycleEviction(
 	if (!event) return null;
 	try {
 		await applySessionCacheEviction(redis, event);
-	} catch {
-
-	}
+	} catch { }
 	return event;
 }
