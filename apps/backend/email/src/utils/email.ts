@@ -9,8 +9,8 @@ const isProduction =
 let reloop: Reloop | null = null;
 if (isProduction) {
 	reloop = new Reloop({
-		key: emailConfig.RELOOP_API_KEY,
-		url: emailConfig.BASE_URL,
+		apiKey: emailConfig.RELOOP_API_KEY,
+		baseUrl: emailConfig.BASE_URL,
 	});
 }
 
@@ -34,13 +34,17 @@ export async function sendEmail(options: SendEmailOptions) {
 				...{ to: options.to, subject: options.subject },
 				message: "Sending email via Reloop SDK",
 			});
-			const response = await reloop.mail.send({
+			const { response, error } = await reloop.mail.send({
 				from: options.from,
 				to: Array.isArray(options.to) ? options.to : [options.to],
 				subject: options.subject,
 				html: options.html,
 				text: options.text,
 			});
+
+			if (error) {
+				throw error;
+			}
 
 			return response;
 		}

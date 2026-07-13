@@ -16,19 +16,31 @@ const EXTRA_DIRS = [
 function standardize(content: string): string {
 	let next = content;
 
-	// Node.js
+	// Node.js — SDK 2.0: named import + { apiKey } (no key/url aliases, no string ctor)
 	next = next.replace(/@reloop\/node/g, "reloop-email");
 	next = next.replace(
-		/import \{ Reloop \} from ['"]reloop-email['"];\n\nconst reloop = new Reloop\(\{\s*key:\s*(['"])(.*?)\1\s*\}\)/g,
-		"import Reloop from 'reloop-email';\n\nconst reloop = new Reloop($1$2$1)",
+		/import Reloop from ['"]reloop-email['"];/g,
+		'import { Reloop } from "reloop-email";',
 	);
 	next = next.replace(
-		/import \{ Reloop \} from "@reloop\/node";\n\nconst reloop = new Reloop\(\{\s*key:\s*(['"])(.*?)\1\s*\}\)/g,
-		"import Reloop from 'reloop-email';\n\nconst reloop = new Reloop($1$2$1)",
+		/import \{ Reloop \} from ['"]reloop-email['"];\n\nconst reloop = new Reloop\(\{\s*key:\s*(['"])(.*?)\1\s*(?:,\s*url:\s*(['"])(.*?)\3\s*)?\}\)/g,
+		'import { Reloop } from "reloop-email";\n\nconst reloop = new Reloop({ apiKey: $1$2$1 });',
 	);
 	next = next.replace(
-		/import \{ Reloop \} from '@reloop\/node';\n\nconst reloop = new Reloop\(\{\s*key:\s*(['"])(.*?)\1\s*\}\)/g,
-		"import Reloop from 'reloop-email';\n\nconst reloop = new Reloop($1$2$1)",
+		/import \{ Reloop \} from ['"]reloop-email['"];\n\nconst reloop = new Reloop\(\{\s*url:\s*(['"])(.*?)\1\s*,\s*key:\s*(['"])(.*?)\3\s*\}\)/g,
+		'import { Reloop } from "reloop-email";\n\nconst reloop = new Reloop({ apiKey: $3$4$3 });',
+	);
+	next = next.replace(
+		/const reloop = new Reloop\(\{\s*key:\s*(['"])(.*?)\1\s*(?:,\s*url:\s*(['"])(.*?)\3\s*)?\}\)/g,
+		"const reloop = new Reloop({ apiKey: $1$2$1 })",
+	);
+	next = next.replace(
+		/const reloop = new Reloop\((['"])(.*?)\1\);/g,
+		'const reloop = new Reloop({ apiKey: $1$2$1 });',
+	);
+	next = next.replace(
+		/const reloop = new Reloop\((['"])(.*?)\1\)/g,
+		'const reloop = new Reloop({ apiKey: $1$2$1 })',
 	);
 
 	// Python

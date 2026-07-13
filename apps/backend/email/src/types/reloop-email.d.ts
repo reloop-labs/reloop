@@ -1,10 +1,26 @@
 declare module "reloop-email" {
 	interface ReloopClientOptions {
-		apiKey?: string;
+		apiKey: string;
 		baseUrl?: string;
-		key?: string;
-		url?: string;
 	}
+
+	interface ReloopApiErrorBody {
+		message?: string;
+		why?: string;
+		fix?: string;
+		link?: string;
+		[key: string]: unknown;
+	}
+
+	class ReloopApiError extends Error {
+		readonly status: number;
+		readonly statusText: string;
+		readonly body: ReloopApiErrorBody;
+	}
+
+	type ReloopResult<T> =
+		| { response: T; error: null }
+		| { response: null; error: ReloopApiError };
 
 	interface SendMailParams {
 		from: string;
@@ -33,6 +49,7 @@ declare module "reloop-email" {
 			id: string;
 			variables?: Record<string, string | number>;
 		};
+		thread_id?: string;
 	}
 
 	interface SendMailResponse {
@@ -40,10 +57,11 @@ declare module "reloop-email" {
 		messageId: string;
 		status: string;
 		timestamp: string;
+		id: string;
 	}
 
 	class MailService {
-		send(params: SendMailParams): Promise<SendMailResponse>;
+		send(params: SendMailParams): Promise<ReloopResult<SendMailResponse>>;
 	}
 
 	export class Reloop {
@@ -53,8 +71,12 @@ declare module "reloop-email" {
 
 	export type {
 		ReloopClientOptions,
+		ReloopApiErrorBody,
+		ReloopResult,
 		SendMailParams,
 		SendMailResponse,
 		MailService,
 	};
+
+	export { ReloopApiError };
 }
