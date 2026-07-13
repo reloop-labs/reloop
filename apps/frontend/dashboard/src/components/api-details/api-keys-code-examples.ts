@@ -1,152 +1,95 @@
 export const codeExamples = {
 	javascript: {
-		create: `const response = await fetch("https://reloop.sh/api-key/v1/", {
-  method: "POST",
-  credentials: "include",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: "Bearer YOUR_API_KEY",
-  },
-  body: JSON.stringify({
-    name: "Production key",
-    enabled: true,
-  }),
+		create: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { apiKey, apiKeyError } = await reloop.apiKey.create({
+  name: "Production Key",
 });
 
-const apiKey = await response.json();`,
-		list: `const response = await fetch(
-  "https://reloop.sh/api-key/v1/?page=1&limit=10",
-  {
-    credentials: "include",
-    headers: {
-      Authorization: "Bearer YOUR_API_KEY",
-    },
-  },
-);
+if (apiKeyError) throw apiKeyError;
 
-const apiKeys = await response.json();`,
-		rotate: `const response = await fetch(
-  "https://reloop.sh/api-key/v1/api_key_id/rotate",
-  {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      Authorization: "Bearer YOUR_API_KEY",
-    },
-  },
-);
+console.log(apiKey.id, apiKey.key);`,
+		list: `import { Reloop } from "reloop-email";
 
-const rotatedKey = await response.json();`,
-		disable: `const response = await fetch(
-  "https://reloop.sh/api-key/v1/api_key_id/disable",
-  {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      Authorization: "Bearer YOUR_API_KEY",
-    },
-  },
-);
+const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const result = await response.json();`,
+const { apiKeys, apiKeyError } = await reloop.apiKey.list({
+  page: 1,
+  limit: 10,
+  enabled: true,
+});
+
+if (apiKeyError) throw apiKeyError;
+
+console.log(apiKeys.total, apiKeys.apiKeys);`,
+		rotate: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { apiKey, apiKeyError } = await reloop.apiKey.rotate("key_123456789");
+
+if (apiKeyError) throw apiKeyError;
+
+console.log(apiKey.id, apiKey.key);`,
+		disable: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { apiKey, apiKeyError } = await reloop.apiKey.disable("key_123456789");
+
+if (apiKeyError) throw apiKeyError;
+
+console.log(apiKey.id, apiKey.enabled);`,
 	},
 	python: {
-		create: `import requests
+		create: `from reloop import Reloop
 
-response = requests.post(
-    "https://reloop.sh/api-key/v1/",
-    headers={
-        "Content-Type": "application/json",
-        "Authorization": "Bearer YOUR_API_KEY",
-    },
-    json={
-        "name": "Production key",
-        "enabled": True,
-    },
-)
+reloop = Reloop(api_key="rl_123456789")
 
-api_key = response.json()`,
-		list: `import requests
+api_key = reloop.api_keys.create(name="Production Key")
+print(api_key.id, api_key.key)`,
+		list: `from reloop import Reloop
 
-response = requests.get(
-    "https://reloop.sh/api-key/v1/?page=1&limit=10",
-    headers={
-        "Authorization": "Bearer YOUR_API_KEY",
-    },
-)
+reloop = Reloop(api_key="rl_123456789")
 
-api_keys = response.json()`,
-		rotate: `import requests
+api_keys = reloop.api_keys.list(page=1, limit=10)
+print(api_keys)`,
+		rotate: `from reloop import Reloop
 
-response = requests.post(
-    "https://reloop.sh/api-key/v1/api_key_id/rotate",
-    headers={
-        "Authorization": "Bearer YOUR_API_KEY",
-    },
-)
+reloop = Reloop(api_key="rl_123456789")
 
-rotated_key = response.json()`,
-		disable: `import requests
+api_key = reloop.api_keys.rotate("key_123456789")
+print(api_key.id, api_key.key)`,
+		disable: `from reloop import Reloop
 
-response = requests.post(
-    "https://reloop.sh/api-key/v1/api_key_id/disable",
-    headers={
-        "Authorization": "Bearer YOUR_API_KEY",
-    },
-)
+reloop = Reloop(api_key="rl_123456789")
 
-result = response.json()`,
+api_key = reloop.api_keys.disable("key_123456789")
+print(api_key.id, api_key.enabled)`,
 	},
 	php: {
 		create: `<?php
-$payload = [
-    "name" => "Production key",
-    "enabled" => true,
-];
+$reloop = Reloop::client('rl_123456789');
 
-$ch = curl_init("https://reloop.sh/api-key/v1/");
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "Content-Type: application/json",
-    "Authorization: Bearer YOUR_API_KEY",
-]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-$apiKey = curl_exec($ch);
-curl_close($ch);
+$apiKey = $reloop->apiKeys->create(['name' => 'Production Key']);
+echo $apiKey->id;
 ?>`,
 		list: `<?php
-$ch = curl_init("https://reloop.sh/api-key/v1/?page=1&limit=10");
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "Authorization: Bearer YOUR_API_KEY",
-]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$reloop = Reloop::client('rl_123456789');
 
-$apiKeys = curl_exec($ch);
-curl_close($ch);
+$apiKeys = $reloop->apiKeys->list(['page' => 1, 'limit' => 10]);
 ?>`,
 		rotate: `<?php
-$ch = curl_init("https://reloop.sh/api-key/v1/api_key_id/rotate");
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "Authorization: Bearer YOUR_API_KEY",
-]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$reloop = Reloop::client('rl_123456789');
 
-$rotatedKey = curl_exec($ch);
-curl_close($ch);
+$apiKey = $reloop->apiKeys->rotate('key_123456789');
 ?>`,
 		disable: `<?php
-$ch = curl_init("https://reloop.sh/api-key/v1/api_key_id/disable");
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "Authorization: Bearer YOUR_API_KEY",
-]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$reloop = Reloop::client('rl_123456789');
 
-$result = curl_exec($ch);
-curl_close($ch);
+$apiKey = $reloop->apiKeys->disable('key_123456789');
 ?>`,
 	},
 };

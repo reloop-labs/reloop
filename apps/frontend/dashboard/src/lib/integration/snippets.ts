@@ -51,18 +51,19 @@ export const sendEmailCode: Record<
 	{ code: string; lang: string }
 > = {
 	nodejs: {
-		code: `import Reloop from 'reloop-email';
+		code: `import { Reloop } from "reloop-email";
 
-const reloop = new Reloop(process.env.RELOOP_API_KEY);
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
 
-const result = await reloop.mail.send({
-  from: 'sender@example.com',
-  to: 'recipient@example.com',
-  subject: 'Hello from Reloop!',
-  text: 'Hello World!',
+const { response, error } = await reloop.mail.send({
+  from: "sender@example.com",
+  to: "recipient@example.com",
+  subject: "Hello from Reloop!",
+  text: "Hello World!",
 });
 
-console.log(result);`,
+if (error) throw error;
+console.log(response.messageId, response.id);`,
 		lang: "typescript",
 	},
 	python: {
@@ -164,28 +165,21 @@ export function buildSetupCodeSnippet(
 	const fromAddr = `hello@${domain}`;
 	switch (lang) {
 		case "nodejs":
-			return `import Reloop from 'reloop-email';
+			return `import { Reloop } from "reloop-email";
 
 const reloop = new Reloop({
-  apiKey: "${apiKeyDisplay}"
+  apiKey: "${apiKeyDisplay}",
 });
 
-try {
-  const { data, error } = await reloop.emails.send({
-    from: "${fromAddr}",
-    to: "user@example.com",
-    subject: "Welcome aboard",
-    text: "Welcome to our platform!"
-  });
+const { response, error } = await reloop.mail.send({
+  from: "${fromAddr}",
+  to: "user@example.com",
+  subject: "Welcome aboard",
+  text: "Welcome to our platform!",
+});
 
-  if (error) {
-    console.error("Failed to send:", error);
-  } else {
-    console.log("Sent successfully! ID:", data.id);
-  }
-} catch (err) {
-  console.error("Error sending email:", err);
-}`;
+if (error) throw error;
+console.log(response.messageId, response.id);`;
 		case "python":
 			return `from reloop_email import Reloop
 
