@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
+import { apiKeyCredentialCacheKey } from "@reloop/auth/apikey/credential-cache";
 
 export const API_KEY_PREFIX = "rl_prod";
 export const API_KEY_LENGTH = 20;
@@ -16,6 +17,10 @@ export function getKeyStart(key: string): string {
 	return key.substring(0, 17);
 }
 
-export function getApiKeyCacheKey(apiKey: string): string {
-	return `apikey:v1:${apiKey}`;
+/**
+ * Redis key for a hashed API Key secret.
+ * Delegates to `apiKeyCredentialCacheKey` so the formula stays single-sourced.
+ */
+export function getApiKeyCacheKey(hashedKey: string): string {
+	return apiKeyCredentialCacheKey(hashedKey);
 }

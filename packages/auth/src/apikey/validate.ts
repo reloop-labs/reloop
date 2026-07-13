@@ -1,11 +1,17 @@
-import { getApiKeyCacheKey, hashApiKey } from "@reloop/auth/apikey/helpers";
+import {
+	createApiKeyCredentialCache,
+	type ApiKeyCredentialStore,
+} from "@reloop/auth/apikey/credential-cache";
+import { hashApiKey } from "@reloop/auth/apikey/helpers";
 import { db as defaultDb } from "@reloop/db/client";
 import { apikey } from "@reloop/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 
+/** Store used by validate (get/set; delete optional for this path). */
 export type ApiKeyCache = {
 	get<T>(key: string): Promise<T | undefined>;
 	set(key: string, value: unknown, ttlSeconds?: number): Promise<void>;
+	delete?(key: string): Promise<void>;
 };
 
 export interface ApiKeyValidationResult {
@@ -13,6 +19,23 @@ export interface ApiKeyValidationResult {
 	organizationId: string;
 	apiKeyId: string;
 	authType: "apikey";
+}
+
+function asCredentialStore(redis: ApiKeyCache): ApiKeyCredentialStore {
+	return {
+		get: (key) => redis.get(key),
+		set: (key, value, ttl) => redis.set(key, value, ttl),
+		delete: async (key) => {
+			if (redis.delete) {
+				await redis.delete(key);
+				return;
+			}
+			// Callers that only implement get/set never hit invalidate via this store.
+			throw new Error(
+				"API key credential store does not implement delete; cannot invalidate",
+			);
+		},
+	};
 }
 
 export async function validateApiKey(
@@ -27,13 +50,9 @@ export async function validateApiKey(
 	}
 
 	const hashedKey = hashApiKey(apiKey);
-	const cacheKey = getApiKeyCacheKey(hashedKey);
+	const credentialCache = createApiKeyCredentialCache(asCredentialStore(redis));
 
-	const cached = await redis.get<{
-		userId: string;
-		organizationId: string;
-		apiKeyId: string;
-	}>(cacheKey);
+	const cached = await credentialCache.read(hashedKey);
 
 	if (cached) {
 		db.update(apikey)
@@ -57,12 +76,12 @@ export async function validateApiKey(
 	});
 
 	if (apiKeyRecord) {
-		const result = {
+		const entry = {
 			userId: apiKeyRecord.userId,
 			organizationId: apiKeyRecord.organizationId,
 			apiKeyId: apiKeyRecord.id,
 		};
-		await redis.set(cacheKey, result, 30 * 24 * 60 * 60);
+		await credentialCache.write(hashedKey, entry);
 
 		db.update(apikey)
 			.set({
@@ -73,7 +92,7 @@ export async function validateApiKey(
 			.catch((err) => console.error("Failed to update API key stats:", err));
 
 		return {
-			...result,
+			...entry,
 			authType: "apikey",
 		};
 	}

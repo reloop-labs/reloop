@@ -102,6 +102,10 @@ export class RedisCache {
 				error,
 			);
 			this.redis = null;
+			// Fail closed — callers (e.g. API key credential invalidate) must not treat a failed delete as success
+			throw error instanceof Error
+				? error
+				: new Error(String(error));
 		}
 	}
 
