@@ -253,7 +253,7 @@ for (const mdxPath of findMdxFiles(DOCS_API_DIR)) {
 if (CHECK) {
 	if (stale > 0) {
 		console.error(
-			`\n${stale} MDX file(s) out of date. Run: bun run sync:sdk-samples`,
+			`\n${stale} MDX file(s) out of date. Run from repo root: bun run sync:sdk-samples`,
 		);
 		process.exit(1);
 	}

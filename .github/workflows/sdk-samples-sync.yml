@@ -7,6 +7,7 @@ on:
       - "apps/frontend/dashboard/src/components/api-details/api-keys-code-examples.ts"
       - "apps/frontend/docs/content/docs/api/api-key/**"
       - "apps/frontend/docs/scripts/**"
+      - "scripts/**"
       - ".github/workflows/sdk-samples-sync.yml"
   push:
     branches:
@@ -16,6 +17,7 @@ on:
       - "apps/frontend/dashboard/src/components/api-details/api-keys-code-examples.ts"
       - "apps/frontend/docs/content/docs/api/api-key/**"
       - "apps/frontend/docs/scripts/**"
+      - "scripts/**"
       - ".github/workflows/sdk-samples-sync.yml"
   workflow_dispatch:
 
@@ -36,5 +38,4 @@ jobs:
           bun-version: latest
 
       - name: Check dashboard + docs match backend x-codeSamples
-        working-directory: apps/frontend/docs
-        run: bun run sync:sdk-samples --check
+        run: bun run sync:sdk-samples:check

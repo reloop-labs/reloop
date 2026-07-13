@@ -267,7 +267,9 @@
 		"db:studio": "bun run --filter=@reloop/db studio",
 		"db:generate": "bun run --filter=@reloop/db generate",
 		"db:migrate": "bun run --filter=@reloop/db migrate",
-		"db:seed": "bun run --filter=@reloop/db seed"
+		"db:seed": "bun run --filter=@reloop/db seed",
+		"sync:sdk-samples": "bun run scripts/sync-sdk-samples.ts",
+		"sync:sdk-samples:check": "bun run scripts/sync-sdk-samples.ts --check"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.6",
