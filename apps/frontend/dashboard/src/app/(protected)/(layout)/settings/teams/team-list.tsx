@@ -117,10 +117,7 @@ const TableHeader = () => (
 	</div>
 );
 
-import {
-	type AssignableRole,
-	ChangeRoleModal,
-} from "./change-role-modal";
+import { type AssignableRole, ChangeRoleModal } from "./change-role-modal";
 import { InviteDropdown } from "./invite-dropdown";
 import { MemberDropdown } from "./member-dropdown";
 import { RemoveMemberModal } from "./remove-member-modal";
@@ -147,9 +144,7 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 	const [memberToChangeRole, setMemberToChangeRole] = useState<Member | null>(
 		null,
 	);
-	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(
-		null,
-	);
+	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	// Fetch members
 	const {
@@ -329,7 +324,9 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 				return;
 			}
 			const displayName =
-				member.user.name || member.user.email.split("@")[0] || member.user.email;
+				member.user.name ||
+				member.user.email.split("@")[0] ||
+				member.user.email;
 			toast.success(
 				`Updated ${displayName} to ${formatRoleLabel(role).toLowerCase()}`,
 			);
@@ -469,190 +466,191 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 						</div>
 					) : (
 						<>
-						{/* Pending Invites */}
-						{filteredData.invites.map((invite, index) => {
-							const expired = isInvitationExpiredPending(invite);
-							const actionable = isInvitationActionable(invite);
-							const rowId = invite.id
-								? `invite-${invite.id}`
-								: `invite-idx-${index}`;
-							const isRowActive = activeDropdownId === rowId;
+							{/* Pending Invites */}
+							{filteredData.invites.map((invite, index) => {
+								const expired = isInvitationExpiredPending(invite);
+								const actionable = isInvitationActionable(invite);
+								const rowId = invite.id
+									? `invite-${invite.id}`
+									: `invite-idx-${index}`;
+								const isRowActive = activeDropdownId === rowId;
 
-							return (
-								<div
-									key={rowId}
-									className={cn(
-										`group/row grid ${GRID} items-center px-4 py-2 text-left transition-colors`,
-										"hover:bg-bg-weak-50/50",
-										isRowActive && "bg-bg-weak-50/50",
-									)}
-								>
-									{/* User Column */}
-									<div className="flex min-w-0 items-center gap-3">
-										<div
-											className={cn(
-												"flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
-												getAvatarGradient(invite.email),
-											)}
-										>
-											{getAvatarInitial(null, invite.email)}
-										</div>
-										<div className="min-w-0">
-											<span className="block truncate font-medium text-label-sm text-text-strong-950">
-												{invite.email.split("@")[0]}
-											</span>
-											<span className="block truncate text-[11px] text-text-sub-600">
-												{invite.email}
-											</span>
-										</div>
-									</div>
-
-									{/* Role Column */}
-									<div className="flex items-center">
-										<span
-											className={cn(
-												"inline-flex rounded-full px-2.5 py-0.5 font-medium text-[11px]",
-												getRoleBadgeStyles(invite.role),
-											)}
-										>
-											{formatRoleLabel(invite.role)}
-										</span>
-									</div>
-
-									{/* Status Column */}
-									<div className="flex items-center gap-2">
-										<span
-											className={cn(
-												"h-1.5 w-1.5 flex-shrink-0 rounded-full",
-												expired ? "bg-error-base" : "bg-amber-400",
-											)}
-										/>
-										<span className="font-medium text-[12px] text-text-sub-600">
-											{expired ? "Invite Expired" : "Invite Pending"}
-										</span>
-									</div>
-
-									{/* Actions Column */}
-									<div className="flex items-center justify-center text-text-soft-400">
-										<InviteDropdown
-											inviteId={invite.id}
-											onResendInvite={handleResendInvite}
-											onCopyInviteLink={
-												actionable ? handleCopyInviteLink : undefined
-											}
-											onRevokeInvite={handleRevokeInviteClick}
-											isResending={resendingInvite === invite.id}
-											onOpenChange={(open) =>
-												setActiveDropdownId(open ? rowId : null)
-											}
-										/>
-									</div>
-								</div>
-							);
-						})}
-
-						{/* Members */}
-						{filteredData.members.map((member, index) => {
-							const memberIsOwner = primaryRole(member.role) === "owner";
-							const isCurrentUser = member.user.id === currentUserId;
-							const canEditRole = canChangeMemberRole(member);
-							const rowId =
-								member.id && member.id.length > 0
-									? `member-${member.id}`
-									: `member-idx-${index}`;
-							const isRowActive = activeDropdownId === rowId;
-
-							return (
-								<div
-									key={rowId}
-									className={cn(
-										`group/row grid ${GRID} items-center px-4 py-2 text-left transition-colors`,
-										"hover:bg-bg-weak-50/50",
-										(isRowActive || isCurrentUser) && "bg-bg-weak-50/50",
-									)}
-								>
-									{/* User Column */}
-									<div className="flex min-w-0 items-center gap-3">
-										<Avatar.Root
-											size="24"
-											color="gray"
-											className="flex-shrink-0"
-										>
-											{member.user.image ? (
-												<Avatar.Image
-													src={member.user.image}
-													alt={member.user.name || member.user.email}
-												/>
-											) : (
-												<Avatar.Image asChild>
-													<div
-														className={cn(
-															"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
-															getAvatarGradient(member.user.email),
-														)}
-													>
-														{getAvatarInitial(
-															member.user.name,
-															member.user.email,
-														)}
-													</div>
-												</Avatar.Image>
-											)}
-										</Avatar.Root>
-										<div className="min-w-0 flex-1">
-											<div className="flex min-w-0 items-center gap-1.5">
-												<span className="truncate font-medium text-label-sm text-text-strong-950">
-													{member.user.name || member.user.email.split("@")[0]}
-												</span>
-												{isCurrentUser && (
-													<span className="inline-flex flex-shrink-0 items-center rounded-full bg-primary-base px-1.5 py-0.5 font-bold text-[9px] text-white uppercase leading-none tracking-wider">
-														You
-													</span>
+								return (
+									<div
+										key={rowId}
+										className={cn(
+											`group/row grid ${GRID} items-center px-4 py-2 text-left transition-colors`,
+											"hover:bg-bg-weak-50/50",
+											isRowActive && "bg-bg-weak-50/50",
+										)}
+									>
+										{/* User Column */}
+										<div className="flex min-w-0 items-center gap-3">
+											<div
+												className={cn(
+													"flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
+													getAvatarGradient(invite.email),
 												)}
+											>
+												{getAvatarInitial(null, invite.email)}
 											</div>
-											<span className="block truncate text-[11px] text-text-sub-600">
-												{member.user.email}
+											<div className="min-w-0">
+												<span className="block truncate font-medium text-label-sm text-text-strong-950">
+													{invite.email.split("@")[0]}
+												</span>
+												<span className="block truncate text-[11px] text-text-sub-600">
+													{invite.email}
+												</span>
+											</div>
+										</div>
+
+										{/* Role Column */}
+										<div className="flex items-center">
+											<span
+												className={cn(
+													"inline-flex rounded-full px-2.5 py-0.5 font-medium text-[11px]",
+													getRoleBadgeStyles(invite.role),
+												)}
+											>
+												{formatRoleLabel(invite.role)}
 											</span>
 										</div>
-									</div>
 
-									{/* Role Column */}
-									<div className="flex items-center">
-										<span
-											className={cn(
-												"inline-flex rounded-full px-2.5 py-0.5 font-medium text-[11px]",
-												getRoleBadgeStyles(member.role),
-											)}
-										>
-											{formatRoleLabel(primaryRole(member.role))}
-										</span>
-									</div>
+										{/* Status Column */}
+										<div className="flex items-center gap-2">
+											<span
+												className={cn(
+													"h-1.5 w-1.5 flex-shrink-0 rounded-full",
+													expired ? "bg-error-base" : "bg-amber-400",
+												)}
+											/>
+											<span className="font-medium text-[12px] text-text-sub-600">
+												{expired ? "Invite Expired" : "Invite Pending"}
+											</span>
+										</div>
 
-									{/* Status Column */}
-									<div className="flex items-center gap-2">
-										<span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-success-base" />
-										<span className="font-medium text-[12px] text-text-sub-600">
-											Active
-										</span>
-									</div>
-
-									{/* Actions Column */}
-									<div className="flex items-center justify-center text-text-soft-400">
-										{!memberIsOwner && !isCurrentUser && canManageTeam && (
-											<MemberDropdown
-												memberId={member.id}
-												canChangeRole={canEditRole}
-												onChangeRole={handleChangeRoleClick}
-												onRemove={handleRemoveMemberById}
+										{/* Actions Column */}
+										<div className="flex items-center justify-center text-text-soft-400">
+											<InviteDropdown
+												inviteId={invite.id}
+												onResendInvite={handleResendInvite}
+												onCopyInviteLink={
+													actionable ? handleCopyInviteLink : undefined
+												}
+												onRevokeInvite={handleRevokeInviteClick}
+												isResending={resendingInvite === invite.id}
 												onOpenChange={(open) =>
 													setActiveDropdownId(open ? rowId : null)
 												}
 											/>
-										)}
+										</div>
 									</div>
-								</div>
-							);
-						})}
+								);
+							})}
+
+							{/* Members */}
+							{filteredData.members.map((member, index) => {
+								const memberIsOwner = primaryRole(member.role) === "owner";
+								const isCurrentUser = member.user.id === currentUserId;
+								const canEditRole = canChangeMemberRole(member);
+								const rowId =
+									member.id && member.id.length > 0
+										? `member-${member.id}`
+										: `member-idx-${index}`;
+								const isRowActive = activeDropdownId === rowId;
+
+								return (
+									<div
+										key={rowId}
+										className={cn(
+											`group/row grid ${GRID} items-center px-4 py-2 text-left transition-colors`,
+											"hover:bg-bg-weak-50/50",
+											(isRowActive || isCurrentUser) && "bg-bg-weak-50/50",
+										)}
+									>
+										{/* User Column */}
+										<div className="flex min-w-0 items-center gap-3">
+											<Avatar.Root
+												size="24"
+												color="gray"
+												className="flex-shrink-0"
+											>
+												{member.user.image ? (
+													<Avatar.Image
+														src={member.user.image}
+														alt={member.user.name || member.user.email}
+													/>
+												) : (
+													<Avatar.Image asChild>
+														<div
+															className={cn(
+																"flex h-full w-full items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
+																getAvatarGradient(member.user.email),
+															)}
+														>
+															{getAvatarInitial(
+																member.user.name,
+																member.user.email,
+															)}
+														</div>
+													</Avatar.Image>
+												)}
+											</Avatar.Root>
+											<div className="min-w-0 flex-1">
+												<div className="flex min-w-0 items-center gap-1.5">
+													<span className="truncate font-medium text-label-sm text-text-strong-950">
+														{member.user.name ||
+															member.user.email.split("@")[0]}
+													</span>
+													{isCurrentUser && (
+														<span className="inline-flex flex-shrink-0 items-center rounded-full bg-gray-950 px-1.5 py-0.5 font-bold text-[9px] text-bg-white-0 leading-none tracking-wider">
+															You
+														</span>
+													)}
+												</div>
+												<span className="block truncate text-[11px] text-text-sub-600">
+													{member.user.email}
+												</span>
+											</div>
+										</div>
+
+										{/* Role Column */}
+										<div className="flex items-center">
+											<span
+												className={cn(
+													"inline-flex rounded-full px-2.5 py-0.5 font-medium text-[11px]",
+													getRoleBadgeStyles(member.role),
+												)}
+											>
+												{formatRoleLabel(primaryRole(member.role))}
+											</span>
+										</div>
+
+										{/* Status Column */}
+										<div className="flex items-center gap-2">
+											<span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-success-base" />
+											<span className="font-medium text-[12px] text-text-sub-600">
+												Active
+											</span>
+										</div>
+
+										{/* Actions Column */}
+										<div className="flex items-center justify-center text-text-soft-400">
+											{!memberIsOwner && !isCurrentUser && canManageTeam && (
+												<MemberDropdown
+													memberId={member.id}
+													canChangeRole={canEditRole}
+													onChangeRole={handleChangeRoleClick}
+													onRemove={handleRemoveMemberById}
+													onOpenChange={(open) =>
+														setActiveDropdownId(open ? rowId : null)
+													}
+												/>
+											)}
+										</div>
+									</div>
+								);
+							})}
 						</>
 					)}
 				</div>
@@ -692,9 +690,7 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 				memberName={memberToChangeRole?.user.name ?? ""}
 				memberEmail={memberToChangeRole?.user.email ?? ""}
 				currentRole={
-					memberToChangeRole
-						? primaryRole(memberToChangeRole.role)
-						: "member"
+					memberToChangeRole ? primaryRole(memberToChangeRole.role) : "member"
 				}
 			/>
 		</div>
