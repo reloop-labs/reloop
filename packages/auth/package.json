@@ -14,7 +14,7 @@
 		"./roles": "./src/roles.ts",
 		"./permissions": "./src/permissions.ts",
 		"./platform-permissions": "./src/platform-permissions.ts",
-		"./*": "./src/*"
+		"./*": "./src/*.ts"
 	},
 	"scripts": {
 		"build": "tsc",
