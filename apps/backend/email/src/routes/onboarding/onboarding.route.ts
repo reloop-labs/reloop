@@ -1,4 +1,4 @@
-import { validateApiKey } from "@reloop/apikey";
+import { validateApiKey } from "@reloop/auth/apikey/validate";
 import { emailConfig } from "@reloop/email/email.config";
 import OnboardingTestEmail from "@reloop/email/emails/onboarding-test";
 import { redis } from "@reloop/email/lib/redis";

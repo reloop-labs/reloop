@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from "bun:test";
-import { generateApiKey, hashApiKey, validateApiKey } from "@reloop/apikey";
+import { generateApiKey, hashApiKey } from "@reloop/auth/apikey";
+import { validateApiKey } from "@reloop/auth/apikey/validate";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
 import { apikey, organization, user } from "@reloop/db/schema";

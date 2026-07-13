@@ -57,7 +57,6 @@
         "@opentelemetry/sdk-trace-node": "catalog:backend",
         "@opentelemetry/semantic-conventions": "catalog:backend",
         "@paralleldrive/cuid2": "catalog:backend",
-        "@reloop/apikey": "workspace:*",
         "@reloop/auth": "workspace:*",
         "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
@@ -116,7 +115,6 @@
       },
       "devDependencies": {
         "@better-auth/cli": "catalog:backend",
-        "@reloop/apikey": "workspace:*",
         "@reloop/tsconfig": "workspace:*",
         "@types/bun": "catalog:backend",
         "@types/pg": "catalog:db",
@@ -250,6 +248,7 @@
         "@elysiajs/openapi": "catalog:backend",
         "@react-email/render": "catalog:ui",
         "@react-email/tailwind": "catalog:ui",
+        "@reloop/auth": "workspace:*",
         "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
         "@reloop/db": "workspace:*",
@@ -561,7 +560,6 @@
         "@opentelemetry/sdk-trace-node": "catalog:backend",
         "@opentelemetry/semantic-conventions": "catalog:backend",
         "@paralleldrive/cuid2": "catalog:backend",
-        "@reloop/apikey": "workspace:*",
         "@reloop/auth": "workspace:*",
         "@reloop/bus": "workspace:*",
         "@reloop/cache": "workspace:*",
@@ -819,18 +817,6 @@
         "@types/node": "catalog:",
         "@types/react": "catalog:ui",
         "@types/react-dom": "catalog:ui",
-        "typescript": "catalog:",
-      },
-    },
-    "packages/apikey": {
-      "name": "@reloop/apikey",
-      "version": "0.1.0",
-      "dependencies": {
-        "@reloop/auth": "workspace:*",
-      },
-      "devDependencies": {
-        "@reloop/tsconfig": "workspace:*",
-        "@types/node": "catalog:",
         "typescript": "catalog:",
       },
     },
@@ -2060,8 +2046,6 @@
     "@redis/search": ["@redis/search@5.8.2", "", { "peerDependencies": { "@redis/client": "^5.8.2" } }, "sha512-cNv7HlgayavCBXqPXgaS97DRPVWFznuzsAmmuemi2TMCx5scwLiP50TeZvUS06h/MG96YNPe6A0Zt57yayfxwA=="],
 
     "@redis/time-series": ["@redis/time-series@5.8.2", "", { "peerDependencies": { "@redis/client": "^5.8.2" } }, "sha512-g2NlHM07fK8H4k+613NBsk3y70R2JIM2dPMSkhIjl2Z17SYvaYKdusz85d7VYOrZBWtDrHV/WD2E3vGu+zni8A=="],
-
-    "@reloop/apikey": ["@reloop/apikey@workspace:packages/apikey"],
 
     "@reloop/auth": ["@reloop/auth@workspace:packages/auth"],
 

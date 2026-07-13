@@ -46,7 +46,6 @@
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",
-		"@reloop/apikey": "workspace:*",
 		"tsdown": "catalog:backend",
 		"typescript": "catalog:",
 		"@types/bun": "catalog:backend",
