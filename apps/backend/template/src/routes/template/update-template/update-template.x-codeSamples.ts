@@ -3,9 +3,9 @@ export const updateTemplateXCodeSamples = [
 		id: "node",
 		lang: "javascript",
 		label: "Node.js",
-		source: `import Reloop from 'reloop-email';
+		source: `import { Reloop } from "reloop-email";
 
-const reloop = new Reloop("rl_123456789");
+const reloop = new Reloop({ apiKey: "rl_123456789" });
 
 const updatedTemplate = await reloop.template.update("tpl_123456789", {
   name: "Updated Welcome Email",

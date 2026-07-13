@@ -3,9 +3,9 @@ export const createVersionXCodeSamples = [
 		id: "node",
 		lang: "javascript",
 		label: "Node.js",
-		source: `import Reloop from 'reloop-email';
+		source: `import { Reloop } from "reloop-email";
 
-const reloop = new Reloop("rl_123456789");
+const reloop = new Reloop({ apiKey: "rl_123456789" });
 
 const version = await reloop.template.createVersion("tpl_123456789", {
   content: [],

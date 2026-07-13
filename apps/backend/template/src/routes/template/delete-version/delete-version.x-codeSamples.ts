@@ -3,9 +3,9 @@ export const deleteVersionXCodeSamples = [
 		id: "node",
 		lang: "javascript",
 		label: "Node.js",
-		source: `import Reloop from 'reloop-email';
+		source: `import { Reloop } from "reloop-email";
 
-const reloop = new Reloop("rl_123456789");
+const reloop = new Reloop({ apiKey: "rl_123456789" });
 
 await reloop.template.deleteVersion("tpl_123456789", "ver_123456789");`,
 	},
