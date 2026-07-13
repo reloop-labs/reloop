@@ -6,7 +6,7 @@ import {
 	generateApiKey,
 	getKeyStart,
 	hashApiKey,
-} from "@reloop/apikey";
+} from "@reloop/auth/apikey";
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
