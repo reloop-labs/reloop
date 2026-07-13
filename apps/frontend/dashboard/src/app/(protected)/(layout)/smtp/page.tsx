@@ -6,8 +6,8 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCallback, useState } from "react";
-import { SmtpCodePanel } from "./smtp-code-panel";
 import { SMTP_HOST, SMTP_PORT, SMTP_USER } from "./smtp-code-examples";
+import { SmtpCodePanel } from "./smtp-code-panel";
 
 function CredentialInput({
 	label,

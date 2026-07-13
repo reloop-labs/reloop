@@ -1,37 +1,35 @@
-import { apiKeyCredential } from "@reloop/api-key/utils/loader";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
+import { apiKeyCredential } from "@reloop/api-key/utils/loader";
 import { API_KEY_UPDATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
 import { useLogger } from "evlog/elysia";
 
-function toApiKeyResponse(
-	row: {
+function toApiKeyResponse(row: {
+	id: string;
+	name: string | null;
+	start: string | null;
+	prefix: string | null;
+	refillInterval: number | null;
+	refillAmount: number | null;
+	lastRefillAt: Date | null;
+	enabled: boolean;
+	rateLimitEnabled: boolean;
+	rateLimitTimeWindow: number;
+	rateLimitMax: number;
+	requestCount: number;
+	remaining: number | null;
+	lastRequest: Date | null;
+	expiresAt: Date | null;
+	createdAt: Date;
+	updatedAt: Date;
+	permissions: string | null;
+	metadata: string | null;
+	user?: {
 		id: string;
 		name: string | null;
-		start: string | null;
-		prefix: string | null;
-		refillInterval: number | null;
-		refillAmount: number | null;
-		lastRefillAt: Date | null;
-		enabled: boolean;
-		rateLimitEnabled: boolean;
-		rateLimitTimeWindow: number;
-		rateLimitMax: number;
-		requestCount: number;
-		remaining: number | null;
-		lastRequest: Date | null;
-		expiresAt: Date | null;
-		createdAt: Date;
-		updatedAt: Date;
-		permissions: string | null;
-		metadata: string | null;
-		user?: {
-			id: string;
-			name: string | null;
-			image: string | null;
-			email: string;
-		} | null;
-	},
-): ApiKeyTypes.ApiKeyResponse {
+		image: string | null;
+		email: string;
+	} | null;
+}): ApiKeyTypes.ApiKeyResponse {
 	return {
 		id: row.id,
 		name: row.name,

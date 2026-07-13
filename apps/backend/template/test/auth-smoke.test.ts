@@ -1,17 +1,21 @@
 /**
  * Smoke: webhook batch-A migration onto @reloop/auth/middleware.
  */
-import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:test";
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	test,
+} from "bun:test";
 import { randomBytes } from "node:crypto";
 import {
 	API_KEY_PREFIX,
 	getApiKeyCacheKey,
 	hashApiKey,
 } from "@reloop/auth/apikey";
-import {
-	createAuthPlugin,
-	type AuthContext,
-} from "@reloop/auth/middleware";
+import { type AuthContext, createAuthPlugin } from "@reloop/auth/middleware";
 import { Elysia } from "elysia";
 
 class MemoryRedis {
@@ -48,22 +52,25 @@ let fakeAuth: ReturnType<Elysia["listen"]> | null = null;
 let baseUrl = "";
 
 beforeAll(async () => {
-	const app = new Elysia().get("/api/auth/v1/get-session", ({ request, set }) => {
-		const cookie = request.headers.get("cookie") ?? "";
-		const match = cookie.match(/reloop\.session_token=([^.;]+)/);
-		const token = match?.[1];
-		if (!token || !sessions.has(token)) {
-			set.status = 200;
-			return null;
-		}
-		const s = sessions.get(token)!;
-		return {
-			user: {
-				id: s.userId,
-				activeOrganizationId: s.activeOrganizationId ?? null,
-			},
-		};
-	});
+	const app = new Elysia().get(
+		"/api/auth/v1/get-session",
+		({ request, set }) => {
+			const cookie = request.headers.get("cookie") ?? "";
+			const match = cookie.match(/reloop\.session_token=([^.;]+)/);
+			const token = match?.[1];
+			if (!token || !sessions.has(token)) {
+				set.status = 200;
+				return null;
+			}
+			const s = sessions.get(token)!;
+			return {
+				user: {
+					id: s.userId,
+					activeOrganizationId: s.activeOrganizationId ?? null,
+				},
+			};
+		},
+	);
 	fakeAuth = app.listen(0);
 	baseUrl = `http://127.0.0.1:${fakeAuth.server?.port}`;
 });
@@ -71,17 +78,15 @@ afterAll(() => fakeAuth?.stop());
 beforeEach(() => sessions.clear());
 
 function app(redis: MemoryRedis) {
-	return new Elysia()
-		.use(createAuthPlugin({ baseUrl, redis, ttl: 5 }))
-		.get(
-			"/protected",
-			({ userId, organizationId, authType }) => ({
-				userId,
-				organizationId,
-				authType,
-			}),
-			{ auth: true },
-		);
+	return new Elysia().use(createAuthPlugin({ baseUrl, redis, ttl: 5 })).get(
+		"/protected",
+		({ userId, organizationId, authType }) => ({
+			userId,
+			organizationId,
+			authType,
+		}),
+		{ auth: true },
+	);
 }
 
 describe("template batch-B smoke", () => {

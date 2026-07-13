@@ -14,7 +14,7 @@ export default function SMTPLayout({
 }) {
 	return (
 		<div className="mx-auto w-full max-w-6xl space-y-8 p-6 lg:p-8">
-			<div className="w-full flex-1 pb-10 pt-1">{children}</div>
+			<div className="w-full flex-1 pt-1 pb-10">{children}</div>
 		</div>
 	);
 }

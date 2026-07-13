@@ -1,8 +1,8 @@
 import {
+	type AuthContext,
 	createAuthPlugin,
 	createSessionCacheRedis,
 	resolveApiKeyInternalOrSession,
-	type AuthContext,
 } from "@reloop/auth/middleware";
 import { Elysia } from "elysia";
 import { evlog } from "evlog/elysia";
@@ -27,7 +27,6 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 		}),
 	)
 	.macro({
-
 		auth: {
 			async resolve({ status, request: { headers } }) {
 				const ctx = await resolveApiKeyInternalOrSession(headers, {

@@ -23,7 +23,10 @@ describe("fetchGetSession", () => {
 		}) as typeof fetch;
 
 		try {
-			const result = await fetchGetSession("reloop.session_token=tok", "http://auth");
+			const result = await fetchGetSession(
+				"reloop.session_token=tok",
+				"http://auth",
+			);
 			expect(result).toEqual({
 				id: "u1",
 				role: "user",
@@ -55,7 +58,10 @@ describe("fetchGetSession", () => {
 		}) as typeof fetch;
 
 		try {
-			const result = await fetchGetSession("reloop.session_token=tok", "http://auth");
+			const result = await fetchGetSession(
+				"reloop.session_token=tok",
+				"http://auth",
+			);
 			expect(result?.activeOrganizationId).toBe("user-org");
 		} finally {
 			globalThis.fetch = originalFetch;

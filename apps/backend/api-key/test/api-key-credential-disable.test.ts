@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { createApiKeyCredential } from "@reloop/api-key/credential/api-key-credential";
-import {
-	createApiKeyCredentialCache,
-	type ApiKeyCredentialEntry,
-} from "@reloop/auth/apikey/credential-cache";
 import { generateApiKey, hashApiKey } from "@reloop/auth/apikey";
+import {
+	type ApiKeyCredentialEntry,
+	createApiKeyCredentialCache,
+} from "@reloop/auth/apikey/credential-cache";
 import { validateApiKey } from "@reloop/auth/apikey/validate";
 import { BusEvent } from "@reloop/bus";
 
@@ -489,9 +489,7 @@ describe("ApiKeyCredential.disable — greptile follow-ups", () => {
 			apiKeyId: "key-1",
 		});
 
-		const { db } = createFakeDb(
-			sampleRow(hashed, { enabled: false }),
-		);
+		const { db } = createFakeDb(sampleRow(hashed, { enabled: false }));
 		const credential = createApiKeyCredential({
 			db,
 			credentialCache,

@@ -36,11 +36,11 @@ function standardize(content: string): string {
 	);
 	next = next.replace(
 		/const reloop = new Reloop\((['"])(.*?)\1\);/g,
-		'const reloop = new Reloop({ apiKey: $1$2$1 });',
+		"const reloop = new Reloop({ apiKey: $1$2$1 });",
 	);
 	next = next.replace(
 		/const reloop = new Reloop\((['"])(.*?)\1\)/g,
-		'const reloop = new Reloop({ apiKey: $1$2$1 })',
+		"const reloop = new Reloop({ apiKey: $1$2$1 })",
 	);
 
 	// Python

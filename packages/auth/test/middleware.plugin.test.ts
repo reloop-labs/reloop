@@ -7,11 +7,8 @@ import {
 	test,
 } from "bun:test";
 import { randomBytes } from "node:crypto";
-import {
-	API_KEY_PREFIX,
-	hashApiKey,
-} from "@reloop/auth/apikey/helpers";
 import { createApiKeyCredentialCache } from "@reloop/auth/apikey/credential-cache";
+import { API_KEY_PREFIX, hashApiKey } from "@reloop/auth/apikey/helpers";
 import {
 	type AuthContext,
 	createAuthPlugin,

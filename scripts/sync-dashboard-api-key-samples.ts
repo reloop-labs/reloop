@@ -24,7 +24,10 @@ import {
 	sampleById,
 } from "./lib/extract-x-code-samples";
 
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const REPO_ROOT = path.resolve(
+	path.dirname(fileURLToPath(import.meta.url)),
+	"..",
+);
 const API_KEY_ROUTES = path.join(
 	REPO_ROOT,
 	"apps/backend/api-key/src/routes/api-key",

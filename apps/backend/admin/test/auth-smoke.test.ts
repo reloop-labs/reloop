@@ -113,9 +113,9 @@ describe("admin special-service smoke", () => {
 			}),
 		);
 		expect(res.status).toBe(200);
-		expect(
-			((await res.json()) as { platformRole: string }).platformRole,
-		).toBe(PLATFORM_ADMIN_ROLE);
+		expect(((await res.json()) as { platformRole: string }).platformRole).toBe(
+			PLATFORM_ADMIN_ROLE,
+		);
 	});
 
 	test("authSupport allows any signed-in user and sets isPlatformAdmin", async () => {

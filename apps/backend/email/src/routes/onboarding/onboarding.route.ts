@@ -24,7 +24,6 @@ export const onboardingRoute = new Elysia({
 	.post(
 		"/onboarding/send-test-email",
 		async ({ body: { to, from }, request, set }) => {
-
 			const apiKey = request.headers.get("x-api-key") ?? "";
 
 			const html = await render(

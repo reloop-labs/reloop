@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import {
 	API_KEY_CREDENTIAL_CACHE_TTL_SECONDS,
+	type ApiKeyCredentialEntry,
+	type ApiKeyCredentialStore,
 	apiKeyCredentialCacheKey,
 	authRedisAsCredentialStore,
 	createApiKeyCredentialCache,
-	type ApiKeyCredentialEntry,
-	type ApiKeyCredentialStore,
 } from "@reloop/auth/apikey/credential-cache";
 import { MemoryRedis } from "./memory-redis";
 
@@ -168,7 +168,9 @@ describe("ApiKeyCredentialCache", () => {
 
 	test("invalidateByApiKeyId is no-op success when never written", async () => {
 		const cache = createApiKeyCredentialCache(new MemoryRedis());
-		await expect(cache.invalidateByApiKeyId("missing-id")).resolves.toBeUndefined();
+		await expect(
+			cache.invalidateByApiKeyId("missing-id"),
+		).resolves.toBeUndefined();
 	});
 
 	test("write confirms reverse index for hex that JSON.parse would treat as a number", async () => {

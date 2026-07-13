@@ -16,15 +16,19 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const CHECK = process.argv.includes("--check");
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const SCRIPTS = path.join(REPO_ROOT, "scripts");
-const DOCS_SCRIPTS = path.join(
-	REPO_ROOT,
-	"apps/frontend/docs/scripts",
+const REPO_ROOT = path.resolve(
+	path.dirname(fileURLToPath(import.meta.url)),
+	"..",
 );
+const SCRIPTS = path.join(REPO_ROOT, "scripts");
+const DOCS_SCRIPTS = path.join(REPO_ROOT, "apps/frontend/docs/scripts");
 const checkFlag = CHECK ? ["--check"] : [];
 
-function run(scriptPath: string, extraArgs: string[] = [], cwd = REPO_ROOT): void {
+function run(
+	scriptPath: string,
+	extraArgs: string[] = [],
+	cwd = REPO_ROOT,
+): void {
 	const result = spawnSync(
 		"bun",
 		["run", scriptPath, ...extraArgs, ...checkFlag],
@@ -37,5 +41,9 @@ function run(scriptPath: string, extraArgs: string[] = [], cwd = REPO_ROOT): voi
 
 console.log(CHECK ? "Checking SDK samples…" : "Syncing SDK samples…");
 run(path.join(SCRIPTS, "sync-dashboard-api-key-samples.ts"));
-run(path.join(DOCS_SCRIPTS, "sync-code-samples-from-source.ts"), ["api-key"], path.join(REPO_ROOT, "apps/frontend/docs"));
+run(
+	path.join(DOCS_SCRIPTS, "sync-code-samples-from-source.ts"),
+	["api-key"],
+	path.join(REPO_ROOT, "apps/frontend/docs"),
+);
 console.log(CHECK ? "All SDK sample checks passed." : "SDK samples synced.");

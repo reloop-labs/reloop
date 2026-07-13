@@ -125,7 +125,6 @@ export const MainSidebar: React.FC = () => {
 					)}
 				</AnimatePresence>
 			</div>
-
 		</div>
 	);
 };

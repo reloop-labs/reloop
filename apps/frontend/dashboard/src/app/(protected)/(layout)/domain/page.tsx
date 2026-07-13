@@ -56,17 +56,19 @@ const DomainPage = () => {
 	return (
 		<div className="mx-auto max-w-3xl space-y-8 p-6 lg:p-8">
 			<DomainListHeader />
-			<DomainListToolbar />
-			<div className="mt-4">
-				{error ? (
-					<DomainErrorState />
-				) : (
-					<DomainTable
-						domains={domains}
-						total={data?.total || 0}
-						isLoading={isLoading}
-					/>
-				)}
+			<div className="space-y-4">
+				<DomainListToolbar />
+				<div>
+					{error ? (
+						<DomainErrorState />
+					) : (
+						<DomainTable
+							domains={domains}
+							total={data?.total || 0}
+							isLoading={isLoading}
+						/>
+					)}
+				</div>
 			</div>
 			<DeleteDomainModal domains={data?.domains || []} mutate={mutate} />
 		</div>

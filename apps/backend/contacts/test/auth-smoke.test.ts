@@ -15,10 +15,7 @@ import {
 	getApiKeyCacheKey,
 	hashApiKey,
 } from "@reloop/auth/apikey";
-import {
-	type AuthContext,
-	createAuthPlugin,
-} from "@reloop/auth/middleware";
+import { type AuthContext, createAuthPlugin } from "@reloop/auth/middleware";
 import { Elysia } from "elysia";
 
 class MemoryRedis {
@@ -82,17 +79,15 @@ afterAll(() => fakeAuth?.stop());
 beforeEach(() => sessions.clear());
 
 function app(redis: MemoryRedis) {
-	return new Elysia()
-		.use(createAuthPlugin({ baseUrl, redis, ttl: 5 }))
-		.get(
-			"/protected",
-			({ userId, organizationId, authType }) => ({
-				userId,
-				organizationId,
-				authType,
-			}),
-			{ auth: true },
-		);
+	return new Elysia().use(createAuthPlugin({ baseUrl, redis, ttl: 5 })).get(
+		"/protected",
+		({ userId, organizationId, authType }) => ({
+			userId,
+			organizationId,
+			authType,
+		}),
+		{ auth: true },
+	);
 }
 
 describe("contacts special-service smoke", () => {

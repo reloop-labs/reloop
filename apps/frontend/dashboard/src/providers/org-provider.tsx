@@ -151,8 +151,7 @@ export const UserOrganizationProvider = ({
 
 			// Better Auth gates org membership APIs on session.activeOrganizationId.
 			// user.activeOrganizationId is our durable "last used org" preference.
-			const sessionActiveOrgId =
-				session?.session?.activeOrganizationId ?? null;
+			const sessionActiveOrgId = session?.session?.activeOrganizationId ?? null;
 			const userActiveOrgId = session?.user?.activeOrganizationId ?? null;
 
 			const preferredOrgId =

@@ -16,7 +16,12 @@ export type SmtpLanguageConfig = {
 
 /** Languages shown in the SMTP code panel. */
 export const SMTP_LANGUAGES: readonly SmtpLanguageConfig[] = [
-	{ id: "nodejs", label: "Node.js", shikiLang: "javascript", filename: "send.js" },
+	{
+		id: "nodejs",
+		label: "Node.js",
+		shikiLang: "javascript",
+		filename: "send.js",
+	},
 	{ id: "python", label: "Python", shikiLang: "python", filename: "send.py" },
 	{ id: "go", label: "Go", shikiLang: "go", filename: "send.go" },
 	{ id: "php", label: "PHP", shikiLang: "php", filename: "send.php" },
@@ -33,10 +38,9 @@ export const SMTP_USER = "reloop";
  * Generate SMTP send examples. Password is the API key; username is `reloop`
  * (matches the SMTP credentials panel).
  */
-export function buildSmtpCodeExamples(apiKeyPlaceholder = "YOUR_API_KEY"): Record<
-	SmtpLanguageId,
-	string
-> {
+export function buildSmtpCodeExamples(
+	apiKeyPlaceholder = "YOUR_API_KEY",
+): Record<SmtpLanguageId, string> {
 	const host = SMTP_HOST;
 	const port = SMTP_PORT;
 	const user = SMTP_USER;

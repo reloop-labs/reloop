@@ -77,11 +77,9 @@ function mountCredits(redis: MemoryRedis) {
 			({ userId, organizationId }) => ({ userId, organizationId }),
 			{ auth: true },
 		)
-		.get(
-			"/topup",
-			({ userId, platformRole }) => ({ userId, platformRole }),
-			{ authAdmin: true },
-		);
+		.get("/topup", ({ userId, platformRole }) => ({ userId, platformRole }), {
+			authAdmin: true,
+		});
 }
 
 describe("credits special-service smoke", () => {
@@ -128,8 +126,8 @@ describe("credits special-service smoke", () => {
 			}),
 		);
 		expect(res.status).toBe(200);
-		expect(
-			((await res.json()) as { platformRole: string }).platformRole,
-		).toBe(PLATFORM_ADMIN_ROLE);
+		expect(((await res.json()) as { platformRole: string }).platformRole).toBe(
+			PLATFORM_ADMIN_ROLE,
+		);
 	});
 });

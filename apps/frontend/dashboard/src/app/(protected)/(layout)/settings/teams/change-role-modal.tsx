@@ -86,8 +86,7 @@ export const ChangeRoleModal = ({
 }: ChangeRoleModalProps) => {
 	const initialRole: AssignableRole =
 		currentRole.toLowerCase() === "admin" ? "admin" : "member";
-	const [selectedRole, setSelectedRole] =
-		useState<AssignableRole>(initialRole);
+	const [selectedRole, setSelectedRole] = useState<AssignableRole>(initialRole);
 
 	useEffect(() => {
 		if (open) {
@@ -261,9 +260,7 @@ export const ChangeRoleModal = ({
 				{/* Footer — matches invite modal */}
 				<div className="flex items-center justify-between border-stroke-soft-100 border-t px-5 py-3.5 dark:border-stroke-soft-100/50">
 					<p className="text-paragraph-xs text-text-sub-600">
-						{hasChanges
-							? `Will update to ${selectedRole}`
-							: "No changes yet"}
+						{hasChanges ? `Will update to ${selectedRole}` : "No changes yet"}
 					</p>
 					<div className="flex items-center gap-2">
 						<Button.Root

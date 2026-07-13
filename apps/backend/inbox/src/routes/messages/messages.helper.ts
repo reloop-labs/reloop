@@ -90,7 +90,6 @@ export async function proxySendToMailService(
 	};
 
 	if (apiKey) {
-
 		headers["x-api-key"] = apiKey;
 	}
 

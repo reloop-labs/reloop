@@ -1,10 +1,10 @@
 "use client";
 
+import { UserAvatar } from "@fe/dashboard/components/user-avatar";
 import {
 	SETTINGS_ADMIN_HOME,
 	SETTINGS_MEMBER_HOME,
 } from "@fe/dashboard/constants/navigation";
-import { UserAvatar } from "@fe/dashboard/components/user-avatar";
 import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
@@ -31,8 +31,11 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 	user,
 	isCollapsed = false,
 }) => {
-	const { canManageBilling, isOrgAdmin, isPending: rolePending } =
-		useOrgPermissions();
+	const {
+		canManageBilling,
+		isOrgAdmin,
+		isPending: rolePending,
+	} = useOrgPermissions();
 	const settingsHome =
 		!rolePending && !isOrgAdmin ? SETTINGS_MEMBER_HOME : SETTINGS_ADMIN_HOME;
 	const { theme, setTheme } = useTheme();

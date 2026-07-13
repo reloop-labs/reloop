@@ -86,60 +86,58 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 			organizationId: string;
 			log?: ApiKeyCredentialLog;
 		}): Promise<DisableApiKeyResult> {
-			const {
-				hashedKey,
-				alreadyDisabled,
-				committedRow,
-			} = await db.transaction(async (tx) => {
-				const locked = await tx
-					.select()
-					.from(schema.apikey)
-					.where(
-						and(
-							eq(schema.apikey.id, id),
-							eq(schema.apikey.organizationId, organizationId),
-						),
-					)
-					.for("update");
+			const { hashedKey, alreadyDisabled, committedRow } = await db.transaction(
+				async (tx) => {
+					const locked = await tx
+						.select()
+						.from(schema.apikey)
+						.where(
+							and(
+								eq(schema.apikey.id, id),
+								eq(schema.apikey.organizationId, organizationId),
+							),
+						)
+						.for("update");
 
-				const row = locked[0];
-				if (!row) {
-					log.warn("API key not found");
-					throw ApiKeyErrors.notFound(id);
-				}
+					const row = locked[0];
+					if (!row) {
+						log.warn("API key not found");
+						throw ApiKeyErrors.notFound(id);
+					}
 
-				if (!row.enabled) {
-					log.info("API key is already disabled");
+					if (!row.enabled) {
+						log.info("API key is already disabled");
+						return {
+							hashedKey: row.key,
+							alreadyDisabled: true as const,
+							committedRow: row,
+						};
+					}
+
+					const [updated] = await tx
+						.update(schema.apikey)
+						.set({ enabled: false, updatedAt: new Date() })
+						.where(
+							and(
+								eq(schema.apikey.id, id),
+								eq(schema.apikey.organizationId, organizationId),
+							),
+						)
+						.returning();
+
+					if (!updated) {
+						log.error("Failed to disable API key");
+						throw ApiKeyErrors.disableFailed(id);
+					}
+
+					log.info("API key disabled successfully");
 					return {
-						hashedKey: row.key,
-						alreadyDisabled: true as const,
-						committedRow: row,
+						hashedKey: updated.key,
+						alreadyDisabled: false as const,
+						committedRow: updated,
 					};
-				}
-
-				const [updated] = await tx
-					.update(schema.apikey)
-					.set({ enabled: false, updatedAt: new Date() })
-					.where(
-						and(
-							eq(schema.apikey.id, id),
-							eq(schema.apikey.organizationId, organizationId),
-						),
-					)
-					.returning();
-
-				if (!updated) {
-					log.error("Failed to disable API key");
-					throw ApiKeyErrors.disableFailed(id);
-				}
-
-				log.info("API key disabled successfully");
-				return {
-					hashedKey: updated.key,
-					alreadyDisabled: false as const,
-					committedRow: updated,
-				};
-			});
+				},
+			);
 
 			// Post-commit: fail closed if cache cannot be cleared
 			try {

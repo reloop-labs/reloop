@@ -159,10 +159,7 @@ export const UserDropdown = () => {
 										onPointerEnter={() => setHoverIdx(3)}
 										onPointerLeave={() => setHoverIdx(undefined)}
 										onClick={() =>
-											handleAction(
-												getHref("/settings/workspace"),
-												undefined,
-											)
+											handleAction(getHref("/settings/workspace"), undefined)
 										}
 									>
 										<Icon

@@ -126,9 +126,8 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 		) ?? []),
 		// Only block on still-valid pending invites — expired ones can be re-sent.
 		...(invitesData
-			?.filter(
-				(i: { status: string; expiresAt: Date | string }) =>
-					isInvitationActionable(i),
+			?.filter((i: { status: string; expiresAt: Date | string }) =>
+				isInvitationActionable(i),
 			)
 			.map((i: { email: string }) => i.email.toLowerCase()) ?? []),
 	]);

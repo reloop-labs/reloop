@@ -74,9 +74,7 @@ export function dedupePendingInvitesByEmail<T extends InvitationLike>(
 			continue;
 		}
 
-		const inviteTime = new Date(
-			invite.createdAt ?? invite.expiresAt,
-		).getTime();
+		const inviteTime = new Date(invite.createdAt ?? invite.expiresAt).getTime();
 		const existingTime = new Date(
 			existing.createdAt ?? existing.expiresAt,
 		).getTime();
