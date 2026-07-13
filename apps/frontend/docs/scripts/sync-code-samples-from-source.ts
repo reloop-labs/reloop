@@ -17,7 +17,8 @@ const WATCHER_TRIGGER = path.join(
 	"apps/frontend/docs/src/lib/watcher-trigger.ts",
 );
 
-const TARGETS = process.argv.slice(2);
+const CHECK = process.argv.includes("--check");
+const TARGETS = process.argv.slice(2).filter((a) => a !== "--check");
 
 interface CodeSample {
 	id: string;
@@ -215,6 +216,7 @@ for (const service of services) {
 }
 
 let updated = 0;
+let stale = 0;
 for (const mdxPath of findMdxFiles(DOCS_API_DIR)) {
 	const content = fs.readFileSync(mdxPath, "utf8");
 	const parsed = parseFrontmatter(content);
@@ -238,10 +240,28 @@ for (const mdxPath of findMdxFiles(DOCS_API_DIR)) {
 	if (nextFrontmatter === parsed.frontmatter) {
 		continue;
 	}
+	if (CHECK) {
+		stale++;
+		console.error(`Out of date: ${path.relative(REPO_ROOT, mdxPath)}`);
+		continue;
+	}
 	fs.writeFileSync(mdxPath, `---\n${nextFrontmatter}\n---\n${parsed.body}`);
 	updated++;
 	console.log(`Updated ${path.relative(REPO_ROOT, mdxPath)}`);
 }
 
-bumpWatcherTrigger();
+if (CHECK) {
+	if (stale > 0) {
+		console.error(
+			`\n${stale} MDX file(s) out of date. Run: bun run sync:sdk-samples`,
+		);
+		process.exit(1);
+	}
+	console.log("OK: docs code samples match backend x-codeSamples.");
+	process.exit(0);
+}
+
+if (updated > 0) {
+	bumpWatcherTrigger();
+}
 console.log(`\nDone. Updated ${updated} MDX file(s).`);

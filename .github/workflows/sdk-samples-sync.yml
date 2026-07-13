@@ -1,0 +1,40 @@
+name: SDK samples sync
+
+on:
+  pull_request:
+    paths:
+      - "apps/backend/api-key/**"
+      - "apps/frontend/dashboard/src/components/api-details/api-keys-code-examples.ts"
+      - "apps/frontend/docs/content/docs/api/api-key/**"
+      - "apps/frontend/docs/scripts/**"
+      - ".github/workflows/sdk-samples-sync.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/backend/api-key/**"
+      - "apps/frontend/dashboard/src/components/api-details/api-keys-code-examples.ts"
+      - "apps/frontend/docs/content/docs/api/api-key/**"
+      - "apps/frontend/docs/scripts/**"
+      - ".github/workflows/sdk-samples-sync.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Samples in sync
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Check dashboard + docs match backend x-codeSamples
+        working-directory: apps/frontend/docs
+        run: bun run sync:sdk-samples --check

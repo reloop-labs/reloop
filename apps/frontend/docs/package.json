@@ -8,6 +8,8 @@
 		"start": "next start",
 		"generate:api-docs": "bun run scripts/generate-api-docs.ts",
 		"sync:code-samples": "bun run scripts/sync-code-samples-from-source.ts",
+		"sync:dashboard-api-key-samples": "bun run scripts/sync-dashboard-api-key-samples.ts",
+		"sync:sdk-samples": "bun run scripts/sync-sdk-samples.ts",
 		"standardize:reloop-email": "bun run scripts/standardize-reloop-email-samples.ts",
 		"update:go-samples": "bun run scripts/update-go-from-python-samples.ts",
 		"update:java-samples": "bun run scripts/update-java-from-python-samples.ts",
