@@ -17,8 +17,19 @@ export async function deleteApiKeyController({
 		warn: (message: string) => {
 			elysiaLog.warn(message);
 		},
-		error: (message: string, _data?: unknown) => {
-			elysiaLog.error(message);
+		error: (message: string, data?: unknown) => {
+			if (data !== undefined) {
+				elysiaLog.error({
+					message,
+					error: data instanceof Error ? data.message : String(data),
+					cause:
+						data instanceof Error && data.cause != null
+							? String(data.cause)
+							: undefined,
+				});
+			} else {
+				elysiaLog.error(message);
+			}
 		},
 	};
 

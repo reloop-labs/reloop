@@ -477,6 +477,38 @@ describe("ApiKeyCredential.disable", () => {
 	});
 });
 
+describe("ApiKeyCredential.disable — greptile follow-ups", () => {
+	test("already-disabled retry still invalidates credential cache", async () => {
+		const raw = generateApiKey();
+		const hashed = hashApiKey(raw);
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		await credentialCache.write(hashed, {
+			userId: "user-1",
+			organizationId: "org-1",
+			apiKeyId: "key-1",
+		});
+
+		const { db } = createFakeDb(
+			sampleRow(hashed, { enabled: false }),
+		);
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache,
+			bus: { publish: async () => {} },
+		});
+
+		const result = await credential.disable({
+			id: "key-1",
+			organizationId: "org-1",
+		});
+		expect(result.alreadyDisabled).toBe(true);
+
+		const after = await validateApiKey(raw, store, stubValidateDb());
+		expect(after).toBeNull();
+	});
+});
+
 describe("ApiKeyCredential.delete", () => {
 	test("after delete, previously cached secret fails validateApiKey", async () => {
 		const raw = generateApiKey();
@@ -566,5 +598,63 @@ describe("ApiKeyCredential.delete", () => {
 		await expect(
 			credential.delete({ id: "key-1", organizationId: "org-1" }),
 		).resolves.toEqual({ id: "key-1" });
+	});
+
+	test("retry after row gone still clears cache via id index (idempotent delete)", async () => {
+		const raw = generateApiKey();
+		const hashed = hashApiKey(raw);
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		await credentialCache.write(hashed, {
+			userId: "user-1",
+			organizationId: "org-1",
+			apiKeyId: "key-1",
+		});
+
+		// Row already deleted — empty fake db
+		const emptyDb = {
+			async transaction<T>(
+				fn: (tx: {
+					select: () => {
+						from: () => {
+							where: () => { for: () => Promise<unknown[]> };
+						};
+					};
+				}) => Promise<T>,
+			): Promise<T> {
+				const tx = {
+					select() {
+						return {
+							from() {
+								return {
+									where() {
+										return {
+											for() {
+												return Promise.resolve([]);
+											},
+										};
+									},
+								};
+							},
+						};
+					},
+				};
+				return fn(tx);
+			},
+			query: { apikey: { findFirst: async () => undefined } },
+		};
+
+		const credential = createApiKeyCredential({
+			db: emptyDb as never,
+			credentialCache,
+			bus: { publish: async () => {} },
+		});
+
+		await expect(
+			credential.delete({ id: "key-1", organizationId: "org-1" }),
+		).resolves.toEqual({ id: "key-1" });
+
+		const after = await validateApiKey(raw, store, stubValidateDb());
+		expect(after).toBeNull();
 	});
 });

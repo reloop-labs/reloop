@@ -106,21 +106,39 @@ describe("ApiKeyCredentialCache", () => {
 	});
 
 	test("write uses default 30-day TTL when caller omits ttl", async () => {
+		const data = new Map<string, unknown>();
 		let seenTtl: number | undefined;
 		const store: ApiKeyCredentialStore = {
-			async get() {
-				return undefined;
+			async get<T>(key: string) {
+				return data.get(key) as T | undefined;
 			},
-			async set(_key, _value, ttlSeconds) {
+			async set(key, value, ttlSeconds) {
 				seenTtl = ttlSeconds;
+				data.set(key, value);
 			},
-			async delete() {},
+			async delete(key) {
+				data.delete(key);
+			},
 		};
 		const cache = createApiKeyCredentialCache(store);
 
 		await cache.write("h", sampleEntry);
 		expect(seenTtl).toBe(API_KEY_CREDENTIAL_CACHE_TTL_SECONDS);
 		expect(API_KEY_CREDENTIAL_CACHE_TTL_SECONDS).toBe(30 * 24 * 60 * 60);
+	});
+
+	test("write fails closed when store cannot confirm primary + reverse", async () => {
+		const store: ApiKeyCredentialStore = {
+			async get() {
+				return undefined; // never confirms
+			},
+			async set() {},
+			async delete() {},
+		};
+		const cache = createApiKeyCredentialCache(store);
+		await expect(cache.write("h", sampleEntry)).rejects.toThrow(
+			/write not confirmed/,
+		);
 	});
 
 	test("keys are hash-based: different hashes do not collide", async () => {
@@ -139,5 +157,17 @@ describe("ApiKeyCredentialCache", () => {
 		await cache.invalidate("hash-a");
 		await expect(cache.read("hash-a")).resolves.toBeUndefined();
 		await expect(cache.read("hash-b")).resolves.toEqual(other);
+	});
+
+	test("invalidateByApiKeyId clears credential via reverse index", async () => {
+		const cache = createApiKeyCredentialCache(new MemoryRedis());
+		await cache.write("deadbeef", sampleEntry);
+		await cache.invalidateByApiKeyId("key-1");
+		await expect(cache.read("deadbeef")).resolves.toBeUndefined();
+	});
+
+	test("invalidateByApiKeyId is no-op success when never written", async () => {
+		const cache = createApiKeyCredentialCache(new MemoryRedis());
+		await expect(cache.invalidateByApiKeyId("missing-id")).resolves.toBeUndefined();
 	});
 });
