@@ -1,4 +1,4 @@
-import { extractSessionToken } from "./extract-session-token";
+import { extractSessionToken } from "../keys/extract-session-token";
 import type { SessionEvictionEvent } from "./session-eviction-event";
 
 /**

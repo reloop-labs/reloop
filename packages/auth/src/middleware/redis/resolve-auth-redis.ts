@@ -3,7 +3,7 @@ import {
 	type AuthMiddlewareConfig,
 	type AuthRedis,
 	DEFAULT_SESSION_CACHE_TTL_SECONDS,
-} from "./types";
+} from "../types";
 
 /**
  * Resolve the Redis client from plugin config.

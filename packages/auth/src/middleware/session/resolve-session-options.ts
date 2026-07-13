@@ -1,4 +1,4 @@
-import type { AuthRedis } from "./types";
+import type { AuthRedis } from "../types";
 
 export type ResolveSessionOptions = {
 	baseUrl: string;

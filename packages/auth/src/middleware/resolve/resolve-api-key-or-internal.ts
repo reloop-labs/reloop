@@ -1,7 +1,7 @@
 import { resolveApiKeyAuth } from "./resolve-api-key-auth";
 import { resolveInternalAuth } from "./resolve-internal-auth";
 import type { ResolverDeps } from "./resolver-deps";
-import type { AuthContext } from "./types";
+import type { AuthContext } from "../types";
 
 /** API Key, then internal. Fail closed on invalid key. */
 export async function resolveApiKeyOrInternal(

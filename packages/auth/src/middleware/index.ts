@@ -3,33 +3,39 @@
  * and session-cache helpers for backend services.
  */
 
-export { applySessionCacheEviction } from "./apply-session-cache-eviction";
-export { createAuthPlugin, type AuthPlugin } from "./create-auth-plugin";
-export { createSessionCacheRedis } from "./create-session-cache-redis";
-export { evictAllSessionsForUser } from "./evict-all-sessions-for-user";
-export { evictionEventFromAuthPath } from "./eviction-event-from-auth-path";
-export { evictSessionByToken } from "./evict-session-by-token";
-export { extractSessionToken } from "./extract-session-token";
-export { handleAuthLifecycleEviction } from "./handle-auth-lifecycle-eviction";
-export { resolveApiKeyAuth } from "./resolve-api-key-auth";
-export { resolveApiKeyInternalOrSession } from "./resolve-api-key-internal-or-session";
-export { resolveApiKeyOrInternal } from "./resolve-api-key-or-internal";
-export { resolveAuthRedis } from "./resolve-auth-redis";
-export { resolveCollabAuth } from "./resolve-collab-auth";
-export { resolveInternalAuth } from "./resolve-internal-auth";
-export { resolvePlatformAdmin } from "./resolve-platform-admin";
-export { resolveSession } from "./resolve-session";
-export { resolveSessionAuth } from "./resolve-session-auth";
-export { resolveSessionAuthWithProfile } from "./resolve-session-auth-with-profile";
-export type { ResolveSessionOptions } from "./resolve-session-options";
-export { resolveSessionOrApiKey } from "./resolve-session-or-api-key";
-export { resolveSessionWithProfile } from "./resolve-session-with-profile";
-export { resolveSupportSession } from "./resolve-support-session";
-export type { ResolverDeps } from "./resolver-deps";
-export { SESSION_CACHE_REDIS_PREFIX } from "./session-cache-redis-prefix";
-export type { SessionEvictionEvent } from "./session-eviction-event";
-export { sessionTokenCacheKey } from "./session-token-cache-key";
-export { sessionUserIndexKey } from "./session-user-index-key";
+export { applySessionCacheEviction } from "./eviction/apply-session-cache-eviction";
+export { evictionEventFromAuthPath } from "./eviction/eviction-event-from-auth-path";
+export { evictAllSessionsForUser } from "./eviction/evict-all-sessions-for-user";
+export { evictSessionByToken } from "./eviction/evict-session-by-token";
+export { handleAuthLifecycleEviction } from "./eviction/handle-auth-lifecycle-eviction";
+export { SESSION_CACHE_REDIS_PREFIX } from "./eviction/session-cache-redis-prefix";
+export type { SessionEvictionEvent } from "./eviction/session-eviction-event";
+
+export { extractSessionToken } from "./keys/extract-session-token";
+export { sessionTokenCacheKey } from "./keys/session-token-cache-key";
+export { sessionUserIndexKey } from "./keys/session-user-index-key";
+
+export { createAuthPlugin, type AuthPlugin } from "./plugin/create-auth-plugin";
+
+export { createSessionCacheRedis } from "./redis/create-session-cache-redis";
+export { resolveAuthRedis } from "./redis/resolve-auth-redis";
+
+export { resolveApiKeyAuth } from "./resolve/resolve-api-key-auth";
+export { resolveApiKeyInternalOrSession } from "./resolve/resolve-api-key-internal-or-session";
+export { resolveApiKeyOrInternal } from "./resolve/resolve-api-key-or-internal";
+export { resolveCollabAuth } from "./resolve/resolve-collab-auth";
+export { resolveInternalAuth } from "./resolve/resolve-internal-auth";
+export { resolvePlatformAdmin } from "./resolve/resolve-platform-admin";
+export { resolveSessionAuth } from "./resolve/resolve-session-auth";
+export { resolveSessionAuthWithProfile } from "./resolve/resolve-session-auth-with-profile";
+export { resolveSessionOrApiKey } from "./resolve/resolve-session-or-api-key";
+export { resolveSupportSession } from "./resolve/resolve-support-session";
+export type { ResolverDeps } from "./resolve/resolver-deps";
+
+export { resolveSession } from "./session/resolve-session";
+export { resolveSessionWithProfile } from "./session/resolve-session-with-profile";
+export type { ResolveSessionOptions } from "./session/resolve-session-options";
+
 export {
 	type AuthContext,
 	type AuthContextWithProfile,

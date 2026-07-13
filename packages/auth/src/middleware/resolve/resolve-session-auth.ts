@@ -1,6 +1,6 @@
 import type { ResolverDeps } from "./resolver-deps";
-import { resolveSession } from "./resolve-session";
-import type { AuthContext } from "./types";
+import { resolveSession } from "../session/resolve-session";
+import type { AuthContext } from "../types";
 
 /** Resolve Session from cookie (lean AuthContext). */
 export async function resolveSessionAuth(

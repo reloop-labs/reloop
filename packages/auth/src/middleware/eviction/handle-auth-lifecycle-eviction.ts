@@ -1,7 +1,7 @@
 import { applySessionCacheEviction } from "./apply-session-cache-eviction";
 import { evictionEventFromAuthPath } from "./eviction-event-from-auth-path";
 import type { SessionEvictionEvent } from "./session-eviction-event";
-import type { AuthRedis } from "./types";
+import type { AuthRedis } from "../types";
 
 /**
  * Best-effort hook entrypoint: resolve an event from the path and apply it.

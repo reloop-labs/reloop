@@ -1,6 +1,6 @@
-import { sessionTokenCacheKey } from "./session-token-cache-key";
-import { sessionUserIndexKey } from "./session-user-index-key";
-import type { AuthRedis } from "./types";
+import { sessionTokenCacheKey } from "../keys/session-token-cache-key";
+import { sessionUserIndexKey } from "../keys/session-user-index-key";
+import type { AuthRedis } from "../types";
 
 /** Read the per-user index and delete every session-token entry + the index. */
 export async function evictAllSessionsForUser(

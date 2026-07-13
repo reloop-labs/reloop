@@ -1,7 +1,7 @@
-import { PLATFORM_ADMIN_ROLE } from "../roles";
+import { PLATFORM_ADMIN_ROLE } from "../../roles";
 import type { ResolverDeps } from "./resolver-deps";
 import { resolveSessionAuth } from "./resolve-session-auth";
-import type { AuthContext } from "./types";
+import type { AuthContext } from "../types";
 
 /** Platform Admin session only (no API key). */
 export async function resolvePlatformAdmin(

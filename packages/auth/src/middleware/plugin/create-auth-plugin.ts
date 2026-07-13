@@ -1,16 +1,16 @@
 import { Elysia } from "elysia";
-import { resolveAuthRedis } from "./resolve-auth-redis";
-import { resolveApiKeyAuth } from "./resolve-api-key-auth";
-import { resolveApiKeyOrInternal } from "./resolve-api-key-or-internal";
-import { resolveCollabAuth } from "./resolve-collab-auth";
-import { resolveInternalAuth } from "./resolve-internal-auth";
-import { resolvePlatformAdmin } from "./resolve-platform-admin";
-import { resolveSessionOrApiKey } from "./resolve-session-or-api-key";
-import { resolveSupportSession } from "./resolve-support-session";
+import { resolveAuthRedis } from "../redis/resolve-auth-redis";
+import { resolveApiKeyAuth } from "../resolve/resolve-api-key-auth";
+import { resolveApiKeyOrInternal } from "../resolve/resolve-api-key-or-internal";
+import { resolveCollabAuth } from "../resolve/resolve-collab-auth";
+import { resolveInternalAuth } from "../resolve/resolve-internal-auth";
+import { resolvePlatformAdmin } from "../resolve/resolve-platform-admin";
+import { resolveSessionOrApiKey } from "../resolve/resolve-session-or-api-key";
+import { resolveSupportSession } from "../resolve/resolve-support-session";
 import {
 	type AuthMiddlewareConfig,
 	DEFAULT_SESSION_CACHE_TTL_SECONDS,
-} from "./types";
+} from "../types";
 
 const UNAUTH = { message: "Authentication required" };
 

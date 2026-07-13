@@ -4,7 +4,7 @@ import {
 	INTERNAL_ORG_ID_HEADER,
 	INTERNAL_SECRET_HEADER,
 	INTERNAL_USER_ID_HEADER,
-} from "./types";
+} from "../types";
 
 /**
  * Resolve internal service auth from headers.

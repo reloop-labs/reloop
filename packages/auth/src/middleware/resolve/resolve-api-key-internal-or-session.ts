@@ -2,7 +2,7 @@ import { resolveApiKeyAuth } from "./resolve-api-key-auth";
 import { resolveInternalAuth } from "./resolve-internal-auth";
 import type { ResolverDeps } from "./resolver-deps";
 import { resolveSessionAuth } from "./resolve-session-auth";
-import type { AuthContext } from "./types";
+import type { AuthContext } from "../types";
 
 /**
  * Mail-style composer: API key → internal → session (fail-closed org).

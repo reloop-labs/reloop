@@ -1,4 +1,4 @@
-import type { AuthContext } from "./types";
+import type { AuthContext } from "../types";
 
 /** Validate and normalize a lean AuthContext read from the session cache. */
 export function normalizeCachedContext(cached: AuthContext): AuthContext | null {

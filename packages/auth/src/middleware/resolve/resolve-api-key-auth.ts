@@ -1,7 +1,7 @@
-import { validateApiKey } from "../apikey/validate";
+import { validateApiKey } from "../../apikey/validate";
 import { extractApiKey } from "./extract-api-key";
 import type { ResolverDeps } from "./resolver-deps";
-import type { AuthContext } from "./types";
+import type { AuthContext } from "../types";
 
 /**
  * Resolve API Key from headers.
