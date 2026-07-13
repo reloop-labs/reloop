@@ -36,7 +36,7 @@ const columns: FooterColumn[] = [
 			{ title: "SDKs", href: "/docs/resources/sdks" },
 			{ title: "API Reference", href: "/docs/api" },
 			{ title: "Getting Started", href: "/docs" },
-			{ title: "Campaign Builder", href: "/docs/features/templates" },
+			{ title: "Campaign Builder", href: "/docs/learn/templates" },
 			{ title: "Languages", href: "/features/languages" },
 			{ title: "Webhooks", href: "/docs/webhooks" },
 		],
