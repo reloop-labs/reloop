@@ -1,1 +1,1 @@
-export * from "./server/index";
+export * from "@reloop/auth/server/index";

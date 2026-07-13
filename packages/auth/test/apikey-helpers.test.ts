@@ -6,7 +6,7 @@ import {
 	getApiKeyCacheKey,
 	getKeyStart,
 	hashApiKey,
-} from "../src/apikey/helpers";
+} from "@reloop/auth/apikey/helpers";
 
 describe("API key generation / hashing helpers", () => {
 	test("generateApiKey uses the production prefix and a long enough secret", () => {

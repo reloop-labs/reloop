@@ -8,7 +8,7 @@ import {
 	handleAuthLifecycleEviction,
 	sessionTokenCacheKey,
 	sessionUserIndexKey,
-} from "../src/middleware";
+} from "@reloop/auth/middleware";
 import { MemoryRedis } from "./memory-redis";
 
 async function seedUserSessions(

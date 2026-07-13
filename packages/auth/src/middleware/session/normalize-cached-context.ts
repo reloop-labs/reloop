@@ -1,4 +1,4 @@
-import type { AuthContext } from "../types";
+import type { AuthContext } from "@reloop/auth/middleware/types";
 
 export function normalizeCachedContext(cached: AuthContext): AuthContext | null {
 	if (!cached.userId) return null;

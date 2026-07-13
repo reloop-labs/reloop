@@ -1,4 +1,4 @@
-import type { AuthRedis } from "../src/middleware/types";
+import type { AuthRedis } from "@reloop/auth/middleware/types";
 
 /**
  * In-memory Redis stand-in for package-level middleware tests.

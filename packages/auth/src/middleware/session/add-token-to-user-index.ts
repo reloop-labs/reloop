@@ -1,5 +1,5 @@
-import { sessionUserIndexKey } from "../keys";
-import type { AuthRedis } from "../types";
+import { sessionUserIndexKey } from "@reloop/auth/middleware/keys";
+import type { AuthRedis } from "@reloop/auth/middleware/types";
 
 export async function addTokenToUserIndex(
 	redis: AuthRedis,

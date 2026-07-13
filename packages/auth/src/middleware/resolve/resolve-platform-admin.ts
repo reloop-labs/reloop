@@ -1,7 +1,7 @@
-import { PLATFORM_ADMIN_ROLE } from "../../roles";
-import type { ResolverDeps } from "./resolver-deps";
-import { resolveSessionAuth } from "./resolve-session-auth";
-import type { AuthContext } from "../types";
+import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
+import type { AuthContext } from "@reloop/auth/middleware/types";
+import { resolveSessionAuth } from "@reloop/auth/middleware/resolve/resolve-session-auth";
+import type { ResolverDeps } from "@reloop/auth/middleware/resolve/resolver-deps";
 
 export async function resolvePlatformAdmin(
 	headers: Headers,

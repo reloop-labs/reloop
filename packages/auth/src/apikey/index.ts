@@ -5,4 +5,4 @@ export {
 	getApiKeyCacheKey,
 	getKeyStart,
 	hashApiKey,
-} from "./helpers";
+} from "@reloop/auth/apikey/helpers";

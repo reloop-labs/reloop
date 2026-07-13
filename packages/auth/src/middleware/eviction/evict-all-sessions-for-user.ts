@@ -1,5 +1,5 @@
-import { sessionTokenCacheKey, sessionUserIndexKey } from "../keys";
-import type { AuthRedis } from "../types";
+import { sessionTokenCacheKey, sessionUserIndexKey } from "@reloop/auth/middleware/keys";
+import type { AuthRedis } from "@reloop/auth/middleware/types";
 
 export async function evictAllSessionsForUser(
 	redis: AuthRedis,

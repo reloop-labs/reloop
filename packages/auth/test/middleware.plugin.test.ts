@@ -12,15 +12,15 @@ import {
 	API_KEY_PREFIX,
 	getApiKeyCacheKey,
 	hashApiKey,
-} from "../src/apikey/helpers";
+} from "@reloop/auth/apikey/helpers";
 import {
 	type AuthContext,
 	createAuthPlugin,
 	resolveApiKeyInternalOrSession,
 	sessionTokenCacheKey,
 	sessionUserIndexKey,
-} from "../src/middleware";
-import { PLATFORM_ADMIN_ROLE } from "../src/roles";
+} from "@reloop/auth/middleware";
+import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
 import { MemoryRedis } from "./memory-redis";
 
 type FakeSession = {

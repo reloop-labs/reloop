@@ -1,8 +1,8 @@
-import { addTokenToUserIndex } from "./add-token-to-user-index";
-import { fetchGetSession } from "./fetch-get-session";
-import type { ResolveSessionOptions } from "./resolve-session-options";
-import type { AuthContext, AuthContextWithProfile } from "../types";
-import { extractSessionToken, sessionTokenCacheKey } from "../keys";
+import { extractSessionToken, sessionTokenCacheKey } from "@reloop/auth/middleware/keys";
+import type { AuthContext, AuthContextWithProfile } from "@reloop/auth/middleware/types";
+import { addTokenToUserIndex } from "@reloop/auth/middleware/session/add-token-to-user-index";
+import { fetchGetSession } from "@reloop/auth/middleware/session/fetch-get-session";
+import type { ResolveSessionOptions } from "@reloop/auth/middleware/session/resolve-session-options";
 
 export async function resolveSessionWithProfile(
 	cookie: string | null,

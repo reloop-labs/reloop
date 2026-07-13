@@ -1,6 +1,6 @@
 import { RedisCache } from "@reloop/cache/redis-client";
-import { SESSION_CACHE_REDIS_PREFIX } from "../middleware/eviction/session-cache-redis-prefix";
-import { authServerConfig } from "./config";
+import { SESSION_CACHE_REDIS_PREFIX } from "@reloop/auth/middleware/eviction/session-cache-redis-prefix";
+import { authServerConfig } from "@reloop/auth/server/config";
 
 export const sessionCacheRedis = new RedisCache(
 	SESSION_CACHE_REDIS_PREFIX,

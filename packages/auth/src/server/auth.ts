@@ -16,13 +16,13 @@ import {
 } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
 import { log } from "evlog";
-import { handleAuthLifecycleEviction } from "../middleware/eviction/handle-auth-lifecycle-eviction";
-import { ac, orgRoles } from "../permissions";
-import { platformAc, platformRoles } from "../platform-permissions";
-import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "../roles";
-import { authServerConfig } from "./config";
-import { redis } from "./redis";
-import { sessionCacheRedis } from "./session-cache-redis";
+import { handleAuthLifecycleEviction } from "@reloop/auth/middleware/eviction/handle-auth-lifecycle-eviction";
+import { ac, orgRoles } from "@reloop/auth/permissions";
+import { platformAc, platformRoles } from "@reloop/auth/platform-permissions";
+import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
+import { authServerConfig } from "@reloop/auth/server/config";
+import { redis } from "@reloop/auth/server/redis";
+import { sessionCacheRedis } from "@reloop/auth/server/session-cache-redis";
 
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {

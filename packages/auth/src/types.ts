@@ -1,4 +1,4 @@
-import type { auth } from "./server/auth";
+import type { auth } from "@reloop/auth/server/auth";
 
 export type AuthInstance = typeof auth;
 export type User = typeof auth.$Infer.Session.user;

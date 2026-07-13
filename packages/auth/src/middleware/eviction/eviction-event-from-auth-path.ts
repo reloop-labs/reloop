@@ -1,5 +1,5 @@
-import { extractSessionToken } from "../keys";
-import type { SessionEvictionEvent } from "./session-eviction-event";
+import { extractSessionToken } from "@reloop/auth/middleware/keys";
+import type { SessionEvictionEvent } from "@reloop/auth/middleware/eviction/session-eviction-event";
 
 export function evictionEventFromAuthPath(opts: {
 	path: string;

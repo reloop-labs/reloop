@@ -1,4 +1,4 @@
-import type { AuthRedis } from "../types";
+import type { AuthRedis } from "@reloop/auth/middleware/types";
 
 export type ResolverDeps = {
 	baseUrl: string;

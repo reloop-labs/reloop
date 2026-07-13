@@ -1,6 +1,6 @@
-import type { ResolverDeps } from "./resolver-deps";
-import { resolveSession } from "../session/resolve-session";
-import type { AuthContext } from "../types";
+import { resolveSession } from "@reloop/auth/middleware/session/resolve-session";
+import type { AuthContext } from "@reloop/auth/middleware/types";
+import type { ResolverDeps } from "@reloop/auth/middleware/resolve/resolver-deps";
 
 export async function resolveSessionAuth(
 	headers: Headers,

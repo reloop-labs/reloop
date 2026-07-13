@@ -1,4 +1,7 @@
 import { apiKeyClient } from "@better-auth/api-key/client";
+import { ac, orgRoles } from "@reloop/auth/permissions";
+import { platformAc, platformRoles } from "@reloop/auth/platform-permissions";
+import type { AuthInstance } from "@reloop/auth/types";
 import {
 	adminClient,
 	emailOTPClient,
@@ -8,9 +11,6 @@ import {
 	organizationClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
-import { ac, orgRoles } from "./permissions";
-import { platformAc, platformRoles } from "./platform-permissions";
-import type { AuthInstance } from "./types";
 
 const baseURL =
 	process.env.NEXT_PUBLIC_URL ||

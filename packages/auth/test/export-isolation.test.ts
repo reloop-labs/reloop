@@ -26,8 +26,14 @@ const FORBIDDEN_VALUE_IMPORT_SUBSTRINGS = [
 ] as const;
 
 function resolveLocal(fromFile: string, spec: string): string | null {
-	if (!spec.startsWith(".")) return null;
-	const base = join(dirname(fromFile), spec);
+	let base: string;
+	if (spec.startsWith("@reloop/auth/")) {
+		base = join(PKG_SRC, spec.slice("@reloop/auth/".length));
+	} else if (spec.startsWith(".")) {
+		base = join(dirname(fromFile), spec);
+	} else {
+		return null;
+	}
 	const candidates = [
 		base,
 		`${base}.ts`,
@@ -77,25 +83,18 @@ function collectValueImports(entryRel: string): {
 			// inline type-only named imports: `import { type Foo } from` is rare.
 
 			for (const match of line.matchAll(
-				/from\s+["'](\.[^"']+)["']|import\s+["'](\.[^"']+)["']/g,
+				/from\s+["']([^"']+)["']|import\s+["']([^"']+)["']/g,
 			)) {
 				const spec = match[1] ?? match[2];
 				if (!spec) continue;
-				// Whole-line type-only already skipped; if the line is
-				// `import type { ... } from` we continue above.
 				if (line.includes("import type") || line.includes("export type")) {
 					continue;
 				}
-				const resolved = resolveLocal(file, spec);
-				if (resolved) queue.push(resolved);
-			}
-
-			for (const match of line.matchAll(
-				/from\s+["'](@?[^"']+)["']|import\s+["'](@?[^"']+)["']/g,
-			)) {
-				const spec = match[1] ?? match[2];
-				if (!spec || spec.startsWith(".")) continue;
-				if (line.includes("import type") || line.includes("export type")) {
+				if (spec.startsWith(".") || spec.startsWith("@reloop/auth/")) {
+					const resolved = resolveLocal(file, spec);
+					if (resolved) queue.push(resolved);
+					// Internal absolute package paths are not external deps.
+					if (spec.startsWith("@reloop/auth/")) continue;
 					continue;
 				}
 				packageSpecs.add(spec);
@@ -139,21 +138,19 @@ describe("export isolation (client / types)", () => {
 
 	test("types.ts only type-imports the auth instance module (not the server barrel)", () => {
 		const typesSrc = readFileSync(join(PKG_SRC, "types.ts"), "utf8");
-		// Must not value-import server.
 		expect(typesSrc).not.toMatch(/^import\s+(?!type\b)/m);
-		// Prefer the instance module over the barrel so typecheck does not
-		// pull re-exported redis helpers.
-		expect(typesSrc).toMatch(/import\s+type\s+\{[^}]*auth[^}]*\}\s+from\s+["']\.\/server\/auth["']/);
+		expect(typesSrc).toMatch(
+			/import\s+type\s+\{[^}]*auth[^}]*\}\s+from\s+["']@reloop\/auth\/server\/auth["']/,
+		);
+		expect(typesSrc).not.toMatch(/from\s+["']@reloop\/auth\/server["']/);
 		expect(typesSrc).not.toMatch(/from\s+["']\.\/server["']/);
 	});
 
 	test("server export path exists and re-exports the runtime instance", () => {
 		const serverEntry = readFileSync(join(PKG_SRC, "server.ts"), "utf8");
-		expect(serverEntry).toContain("./server");
-		// Runtime module must construct betterAuth (single source of truth).
+		expect(serverEntry).toContain("@reloop/auth/server/index");
 		const authImpl = readFileSync(join(PKG_SRC, "server", "auth.ts"), "utf8");
 		expect(authImpl).toContain("betterAuth(");
-		// Exactly one betterAuth( call in the package src tree (excluding tests).
 		const betterAuthCalls: string[] = [];
 		function walk(dir: string) {
 			for (const name of readdirSync(dir)) {

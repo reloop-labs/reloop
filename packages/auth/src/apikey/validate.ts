@@ -1,7 +1,7 @@
 import { db as defaultDb } from "@reloop/db/client";
 import { apikey } from "@reloop/db/schema";
 import { and, eq, sql } from "drizzle-orm";
-import { getApiKeyCacheKey, hashApiKey } from "./helpers";
+import { getApiKeyCacheKey, hashApiKey } from "@reloop/auth/apikey/helpers";
 
 export type ApiKeyCache = {
 	get<T>(key: string): Promise<T | undefined>;

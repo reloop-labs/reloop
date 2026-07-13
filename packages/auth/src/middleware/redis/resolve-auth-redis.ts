@@ -1,9 +1,9 @@
-import { createSessionCacheRedis } from "./create-session-cache-redis";
+import { createSessionCacheRedis } from "@reloop/auth/middleware/redis/create-session-cache-redis";
 import {
 	type AuthMiddlewareConfig,
 	type AuthRedis,
 	DEFAULT_SESSION_CACHE_TTL_SECONDS,
-} from "../types";
+} from "@reloop/auth/middleware/types";
 
 export function resolveAuthRedis(config: AuthMiddlewareConfig): AuthRedis {
 	if (config.redis) return config.redis;

@@ -1,8 +1,8 @@
-import { resolveApiKeyAuth } from "./resolve-api-key-auth";
-import { resolveInternalAuth } from "./resolve-internal-auth";
-import type { ResolverDeps } from "./resolver-deps";
-import { resolveSessionAuth } from "./resolve-session-auth";
-import type { AuthContext } from "../types";
+import type { AuthContext } from "@reloop/auth/middleware/types";
+import { resolveApiKeyAuth } from "@reloop/auth/middleware/resolve/resolve-api-key-auth";
+import { resolveInternalAuth } from "@reloop/auth/middleware/resolve/resolve-internal-auth";
+import { resolveSessionAuth } from "@reloop/auth/middleware/resolve/resolve-session-auth";
+import type { ResolverDeps } from "@reloop/auth/middleware/resolve/resolver-deps";
 
 export async function resolveApiKeyInternalOrSession(
 	headers: Headers,

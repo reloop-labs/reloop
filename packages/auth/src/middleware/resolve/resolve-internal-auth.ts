@@ -1,10 +1,10 @@
-import type { ResolverDeps } from "./resolver-deps";
 import {
 	type AuthContext,
 	INTERNAL_ORG_ID_HEADER,
 	INTERNAL_SECRET_HEADER,
 	INTERNAL_USER_ID_HEADER,
-} from "../types";
+} from "@reloop/auth/middleware/types";
+import type { ResolverDeps } from "@reloop/auth/middleware/resolve/resolver-deps";
 
 export function resolveInternalAuth(
 	headers: Headers,
