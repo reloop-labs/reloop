@@ -1,8 +1,13 @@
-import type { RedisCache } from "@reloop/cache/redis-client";
 import { db as defaultDb } from "@reloop/db/client";
 import { apikey } from "@reloop/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { getApiKeyCacheKey, hashApiKey } from "./helpers";
+
+/** Minimal cache surface (satisfied by `@reloop/cache` RedisCache). */
+export type ApiKeyCache = {
+	get<T>(key: string): Promise<T | undefined>;
+	set(key: string, value: unknown, ttlSeconds?: number): Promise<void>;
+};
 
 export interface ApiKeyValidationResult {
 	userId: string;
@@ -17,7 +22,7 @@ export interface ApiKeyValidationResult {
  */
 export async function validateApiKey(
 	apiKey: string | null | undefined,
-	redis: RedisCache,
+	redis: ApiKeyCache,
 	db = defaultDb,
 ): Promise<ApiKeyValidationResult | null> {
 	if (!apiKey || typeof apiKey !== "string") return null;

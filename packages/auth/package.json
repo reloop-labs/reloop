@@ -9,6 +9,7 @@
 		"./types": "./src/types.ts",
 		"./apikey": "./src/apikey/index.ts",
 		"./apikey/validate": "./src/apikey/validate.ts",
+		"./middleware": "./src/middleware/index.ts",
 		"./roles": "./src/roles.ts",
 		"./permissions": "./src/permissions.ts",
 		"./platform-permissions": "./src/platform-permissions.ts"
@@ -27,6 +28,7 @@
 		"@reloop/db": "workspace:*",
 		"better-auth": "catalog:",
 		"drizzle-orm": "catalog:db",
+		"elysia": "catalog:backend",
 		"evlog": "catalog:backend"
 	},
 	"devDependencies": {
