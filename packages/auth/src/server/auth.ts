@@ -16,7 +16,7 @@ import {
 } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
 import { log } from "evlog";
-import { handleAuthLifecycleEviction } from "../middleware/eviction";
+import { handleAuthLifecycleEviction } from "../middleware/handle-auth-lifecycle-eviction";
 import { ac, orgRoles } from "../permissions";
 import { platformAc, platformRoles } from "../platform-permissions";
 import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "../roles";

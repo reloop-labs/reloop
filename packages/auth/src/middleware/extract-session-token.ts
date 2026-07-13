@@ -1,19 +1,4 @@
 /**
- * Cache key convention for validated sessions.
- * Owned by `@reloop/auth` so every service + central eviction agree.
- */
-
-/** Validated session context, keyed by the raw session token (not full cookie). */
-export function sessionTokenCacheKey(sessionToken: string): string {
-	return `session:token:${sessionToken}`;
-}
-
-/** Per-user index of cached session tokens (for bulk eviction). */
-export function sessionUserIndexKey(userId: string): string {
-	return `session:user:${userId}`;
-}
-
-/**
  * Extract the Better Auth session token from a Cookie header.
  * Cookie name uses the `reloop` cookiePrefix: `reloop.session_token`.
  */

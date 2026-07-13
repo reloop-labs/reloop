@@ -1,0 +1,36 @@
+import { extractSessionToken } from "./extract-session-token";
+import type { SessionEvictionEvent } from "./session-eviction-event";
+
+/**
+ * Map a Better Auth request path (+ cookie / user) onto an eviction event.
+ * Returns null when the path is not a lifecycle event we care about.
+ */
+export function evictionEventFromAuthPath(opts: {
+	path: string;
+	cookieHeader?: string | null;
+	userId?: string | null;
+}): SessionEvictionEvent | null {
+	const path = opts.path;
+
+	if (path === "/sign-out") {
+		const token = extractSessionToken(opts.cookieHeader ?? null);
+		if (!token) return null;
+		return {
+			type: "logout",
+			sessionToken: token,
+			userId: opts.userId ?? null,
+		};
+	}
+
+	if (path === "/change-password" || path === "/reset-password") {
+		if (!opts.userId) return null;
+		return { type: "password-change", userId: opts.userId };
+	}
+
+	if (path === "/organization/set-active") {
+		if (!opts.userId) return null;
+		return { type: "organization-switch", userId: opts.userId };
+	}
+
+	return null;
+}

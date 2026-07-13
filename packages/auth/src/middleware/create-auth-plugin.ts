@@ -1,14 +1,12 @@
 import { Elysia } from "elysia";
-import { resolveAuthRedis } from "./redis-factory";
-import {
-	resolveApiKeyAuth,
-	resolveApiKeyOrInternal,
-	resolveCollabAuth,
-	resolveInternalAuth,
-	resolvePlatformAdmin,
-	resolveSessionOrApiKey,
-	resolveSupportSession,
-} from "./resolve";
+import { resolveAuthRedis } from "./resolve-auth-redis";
+import { resolveApiKeyAuth } from "./resolve-api-key-auth";
+import { resolveApiKeyOrInternal } from "./resolve-api-key-or-internal";
+import { resolveCollabAuth } from "./resolve-collab-auth";
+import { resolveInternalAuth } from "./resolve-internal-auth";
+import { resolvePlatformAdmin } from "./resolve-platform-admin";
+import { resolveSessionOrApiKey } from "./resolve-session-or-api-key";
+import { resolveSupportSession } from "./resolve-support-session";
 import {
 	type AuthMiddlewareConfig,
 	DEFAULT_SESSION_CACHE_TTL_SECONDS,
@@ -31,10 +29,6 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 	const deps = { baseUrl, redis, ttl, internalSecret };
 
 	return new Elysia({ name: "reloop-auth-middleware" }).macro({
-		/**
-		 * Session or API key; fail closed without active org.
-		 * Does not accept internal auth even when internalSecret is set.
-		 */
 		auth: {
 			async resolve({ status, request: { headers } }) {
 				const ctx = await resolveSessionOrApiKey(headers, deps, {
@@ -43,7 +37,6 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 				if (!ctx?.organizationId) {
 					return status(401, UNAUTH);
 				}
-				// Explicit fields so organizationId narrows to string for handlers.
 				return {
 					userId: ctx.userId,
 					organizationId: ctx.organizationId,
@@ -57,9 +50,6 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 			},
 		},
 
-		/**
-		 * Session or API key; organization optional.
-		 */
 		authNoOrg: {
 			async resolve({ status, request: { headers } }) {
 				const ctx = await resolveSessionOrApiKey(headers, deps, {
@@ -78,9 +68,6 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 			},
 		},
 
-		/**
-		 * API-key only. Organization comes from the key's owning org.
-		 */
 		authKey: {
 			async resolve({ status, request: { headers } }) {
 				const result = await resolveApiKeyAuth(headers, deps, {
@@ -102,9 +89,6 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 			},
 		},
 
-		/**
-		 * Session only; requires Platform Admin. Org optional.
-		 */
 		authAdmin: {
 			async resolve({ status, request: { headers } }) {
 				const ctx = await resolvePlatformAdmin(headers, deps);
@@ -124,9 +108,6 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 			},
 		},
 
-		/**
-		 * Internal headers only (secret + user id + org id).
-		 */
 		authInternal: {
 			async resolve({ status, request: { headers } }) {
 				const ctx = resolveInternalAuth(headers, deps);
@@ -142,9 +123,6 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 			},
 		},
 
-		/**
-		 * API key, then internal. Fail closed on invalid key.
-		 */
 		authKeyInternal: {
 			async resolve({ status, request: { headers } }) {
 				const ctx = await resolveApiKeyOrInternal(headers, deps);
@@ -164,9 +142,6 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 			},
 		},
 
-		/**
-		 * Any signed-in session; org optional; isPlatformAdmin derived.
-		 */
 		authSupport: {
 			async resolve({ status, request: { headers } }) {
 				const ctx = await resolveSupportSession(headers, deps);
@@ -190,9 +165,6 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 			},
 		},
 
-		/**
-		 * Session or API key; fail-closed org; profile fields when session.
-		 */
 		authCollab: {
 			async resolve({ status, request: { headers } }) {
 				const ctx = await resolveCollabAuth(headers, deps);
