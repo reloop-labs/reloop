@@ -1,10 +1,31 @@
 import { apiKeyConfig } from "@reloop/api-key/api-key.config";
+import { createApiKeyCredential } from "@reloop/api-key/credential/api-key-credential";
+import {
+	authRedisAsCredentialStore,
+	createApiKeyCredentialCache,
+} from "@reloop/auth/apikey/credential-cache";
+import { createSessionCacheRedis } from "@reloop/auth/middleware";
 import { bus } from "@reloop/bus";
 import { RedisCache } from "@reloop/cache/redis-client";
 import { db } from "@reloop/db/client";
 import { log } from "evlog";
 
+/** Management rate-limit Redis (api-key prefix) — not used for auth credentials. */
 export const redis = new RedisCache("api-key", 86400);
+
+/** Same Redis family as request-auth validation cache (reloop-session prefix). */
+const authCredentialRedis = createSessionCacheRedis(apiKeyConfig.REDIS_URL);
+
+/** Uses deleteStrict so invalidate fails closed without breaking session soft-delete. */
+export const apiKeyCredentialCache = createApiKeyCredentialCache(
+	authRedisAsCredentialStore(authCredentialRedis),
+);
+
+export const apiKeyCredential = createApiKeyCredential({
+	db,
+	credentialCache: apiKeyCredentialCache,
+	bus,
+});
 
 export const loader = async () => {
 	try {
