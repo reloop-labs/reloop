@@ -127,6 +127,7 @@ const AccountPage = () => {
 						onImageChange={(url) =>
 							setValue("image", url, { shouldDirty: true })
 						}
+						name={fullName || user?.name}
 						initials={getInitials()}
 						email={user?.email || ""}
 					/>

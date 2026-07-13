@@ -1,14 +1,10 @@
 "use client";
 
 import { ThemeToggle } from "@fe/dashboard/components/theme-toggle";
+import { UserAvatar } from "@fe/dashboard/components/user-avatar";
 import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
-import {
-	getAvatarGradient,
-	getAvatarInitial,
-} from "@fe/dashboard/utils/avatar";
 import { authClient } from "@reloop/auth/client";
-import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
@@ -68,22 +64,13 @@ export const UserDropdown = () => {
 						isOpen && "bg-bg-weak-50",
 					)}
 				>
-					<Avatar.Root size="24" color="blue">
-						{user.image ? (
-							<Avatar.Image src={user.image} alt={user.name} />
-						) : (
-							<Avatar.Image asChild>
-								<div
-									className={cn(
-										"flex h-full w-full items-center justify-center rounded-full font-medium text-[10px] text-white uppercase tracking-wide shadow-sm",
-										getAvatarGradient(user.email),
-									)}
-								>
-									{getAvatarInitial(user.name, user.email)}
-								</div>
-							</Avatar.Image>
-						)}
-					</Avatar.Root>
+					<UserAvatar
+						name={user.name}
+						email={user.email}
+						image={user.image}
+						size="24"
+						initialsClassName="text-[10px]"
+					/>
 				</Button.Root>
 			</Dropdown.Trigger>
 			<Dropdown.Content
@@ -207,22 +194,14 @@ export const UserDropdown = () => {
 								handleAction(getHref("/settings/profile"), undefined)
 							}
 						>
-							<Avatar.Root size="20" color="blue" className="shrink-0">
-								{user.image ? (
-									<Avatar.Image src={user.image} alt={user.name} />
-								) : (
-									<Avatar.Image asChild>
-										<div
-											className={cn(
-												"flex h-full w-full items-center justify-center rounded-full font-medium text-[8px] text-white uppercase tracking-wide",
-												getAvatarGradient(user.email),
-											)}
-										>
-											{getAvatarInitial(user.name, user.email)}
-										</div>
-									</Avatar.Image>
-								)}
-							</Avatar.Root>
+							<UserAvatar
+								name={user.name}
+								email={user.email}
+								image={user.image}
+								size="20"
+								className="shrink-0"
+								initialsClassName="text-[8px]"
+							/>
 							<span className="flex-1 truncate text-sm">My profile</span>
 						</Dropdown.Item>
 

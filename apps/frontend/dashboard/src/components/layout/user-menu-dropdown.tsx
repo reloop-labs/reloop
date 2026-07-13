@@ -4,13 +4,9 @@ import {
 	SETTINGS_ADMIN_HOME,
 	SETTINGS_MEMBER_HOME,
 } from "@fe/dashboard/constants/navigation";
+import { UserAvatar } from "@fe/dashboard/components/user-avatar";
 import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
-import {
-	getAvatarGradient,
-	getAvatarInitial,
-} from "@fe/dashboard/utils/avatar";
 import { authClient } from "@reloop/auth/client";
-import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
@@ -102,22 +98,13 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 					)}
 				>
 					<div className="relative flex-shrink-0">
-						<Avatar.Root size="24" color="blue">
-							{user.image ? (
-								<Avatar.Image src={user.image} alt={user.name} />
-							) : (
-								<Avatar.Image asChild>
-									<div
-										className={cn(
-											"flex h-full w-full items-center justify-center rounded-full font-medium text-[13px] text-white uppercase tracking-wide shadow-sm",
-											getAvatarGradient(user.email),
-										)}
-									>
-										{getAvatarInitial(user.name, user.email)}
-									</div>
-								</Avatar.Image>
-							)}
-						</Avatar.Root>
+						<UserAvatar
+							name={user.name}
+							email={user.email}
+							image={user.image}
+							size="24"
+							initialsClassName="text-[13px]"
+						/>
 					</div>
 					{!isCollapsed && (
 						<div className="flex min-w-0 flex-1 flex-col items-start gap-px">
@@ -149,22 +136,14 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 							onPointerLeave={() => setHoverIdx(undefined)}
 							onClick={() => router.push(getHref("/settings/profile"))}
 						>
-							<Avatar.Root size="20" color="blue" className="shrink-0">
-								{user.image ? (
-									<Avatar.Image src={user.image} alt={user.name} />
-								) : (
-									<Avatar.Image asChild>
-										<div
-											className={cn(
-												"flex h-full w-full items-center justify-center rounded-full font-medium text-[8px] text-white uppercase tracking-wide",
-												getAvatarGradient(user.email),
-											)}
-										>
-											{getAvatarInitial(user.name, user.email)}
-										</div>
-									</Avatar.Image>
-								)}
-							</Avatar.Root>
+							<UserAvatar
+								name={user.name}
+								email={user.email}
+								image={user.image}
+								size="20"
+								className="shrink-0"
+								initialsClassName="text-[8px]"
+							/>
 							<span className="flex-1 truncate text-sm">My profile</span>
 						</Dropdown.Item>
 
