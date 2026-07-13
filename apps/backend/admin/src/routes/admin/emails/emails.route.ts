@@ -14,7 +14,7 @@ export const emailsRoute = new Elysia().use(authMiddleware).get(
 			organizationId: query.organizationId,
 		}),
 	{
-		platformAdmin: true,
+		authAdmin: true,
 		query: t.Object({
 			limit: t.Optional(t.Numeric({ default: 50, minimum: 1, maximum: 200 })),
 			offset: t.Optional(t.Numeric({ default: 0, minimum: 0 })),

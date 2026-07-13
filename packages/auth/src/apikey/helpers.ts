@@ -1,10 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
 
-/**
- * Dependency-light API-key helpers (no Elysia, Redis, or DB).
- * Used by the api-key service and absorbed into `@reloop/auth/apikey`.
- */
-
 export const API_KEY_PREFIX = "rl_prod";
 export const API_KEY_LENGTH = 20;
 

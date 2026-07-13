@@ -12,7 +12,7 @@ export const creditsRoute = new Elysia()
 		"/credits/:organizationId",
 		async ({ params }) => getCreditsController(params.organizationId),
 		{
-			platformAdmin: true,
+			authAdmin: true,
 			params: t.Object({ organizationId: t.String() }),
 			response: {
 				200: AdminModel.creditsDetailResponse,
@@ -34,7 +34,7 @@ export const creditsRoute = new Elysia()
 				actorUserId: userId,
 			}),
 		{
-			platformAdmin: true,
+			authAdmin: true,
 			body: AdminModel.topupBody,
 			response: {
 				200: AdminModel.topupResponse,

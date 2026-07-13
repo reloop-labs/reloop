@@ -75,10 +75,10 @@ function mountProtectedApp(redis: MemoryRedis) {
 			// Mirrors production: user-scoped upload endpoints use authNoOrg.
 			.get(
 				"/protected",
-				({ userId, organizationId, role, authType }) => ({
+				({ userId, organizationId, platformRole, authType }) => ({
 					userId,
 					organizationId,
-					role,
+					platformRole,
 					authType,
 				}),
 				{ authNoOrg: true },
@@ -101,7 +101,7 @@ beforeAll(async () => {
 			return {
 				user: {
 					id: session.userId,
-					role: session.role ?? "user",
+					platformRole: session.role ?? "user",
 					activeOrganizationId: session.activeOrganizationId ?? null,
 				},
 			};
@@ -172,7 +172,7 @@ describe("upload pilot — API key call", () => {
 		expect(body).toEqual({
 			userId: "key-user",
 			organizationId: "key-org",
-			role: null,
+			platformRole: null,
 			authType: "apikey",
 		});
 	});

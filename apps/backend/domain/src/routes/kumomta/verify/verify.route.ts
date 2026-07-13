@@ -14,7 +14,7 @@ export const verifyRoute = new Elysia().use(authMiddleware).post(
 		return { userId, organizationId, ...domainResult };
 	},
 	{
-		apiKeyAuth: true,
+		authKey: true,
 		response: {
 			200: t.Object({
 				userId: t.String(),

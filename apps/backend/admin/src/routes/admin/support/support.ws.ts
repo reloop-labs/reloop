@@ -80,7 +80,7 @@ function getOrCreateClient(ws: {
 }
 
 export const supportWsRoute = new Elysia().use(authMiddleware).ws("/ws", {
-	supportSession: true,
+	authSupport: true,
 	body: t.Unknown(),
 	async open(ws) {
 		const userId = ws.data.userId as string | undefined;

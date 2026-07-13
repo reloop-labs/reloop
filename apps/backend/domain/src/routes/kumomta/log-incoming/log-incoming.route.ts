@@ -15,7 +15,7 @@ export const logIncomingRoute = new Elysia().use(authMiddleware).post(
 		});
 	},
 	{
-		apiKeyAuth: true,
+		authKey: true,
 		afterResponse: auditLogHook({
 			resourceType: "email",
 			action: "sent",

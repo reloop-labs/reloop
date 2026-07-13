@@ -19,7 +19,7 @@ export const organizationsRoute = new Elysia()
 				status: query.status,
 			}),
 		{
-			platformAdmin: true,
+			authAdmin: true,
 			query: t.Object({
 				limit: t.Optional(t.Numeric({ default: 50, minimum: 1, maximum: 200 })),
 				offset: t.Optional(t.Numeric({ default: 0, minimum: 0 })),
@@ -46,7 +46,7 @@ export const organizationsRoute = new Elysia()
 		"/organizations/:organizationId",
 		async ({ params }) => getOrganizationController(params.organizationId),
 		{
-			platformAdmin: true,
+			authAdmin: true,
 			params: t.Object({ organizationId: t.String() }),
 			response: {
 				200: AdminModel.organizationDetail,
@@ -68,7 +68,7 @@ export const organizationsRoute = new Elysia()
 				actorUserId: userId,
 			}),
 		{
-			platformAdmin: true,
+			authAdmin: true,
 			params: t.Object({ organizationId: t.String() }),
 			body: AdminModel.updateOrgStatusBody,
 			response: {

@@ -18,7 +18,7 @@ export const domainsRoute = new Elysia()
 				status: query.status,
 			}),
 		{
-			platformAdmin: true,
+			authAdmin: true,
 			query: t.Object({
 				limit: t.Optional(t.Numeric({ default: 50, minimum: 1, maximum: 200 })),
 				offset: t.Optional(t.Numeric({ default: 0, minimum: 0 })),
@@ -53,7 +53,7 @@ export const domainsRoute = new Elysia()
 				actorUserId: userId,
 			}),
 		{
-			platformAdmin: true,
+			authAdmin: true,
 			params: t.Object({ domainId: t.String() }),
 			body: AdminModel.updateDomainStatusBody,
 			response: {

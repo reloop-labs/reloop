@@ -13,7 +13,7 @@ export const dkimKeyRoute = new Elysia().use(authMiddleware).post(
 		});
 	},
 	{
-		apiKeyOrInternalAuth: true,
+		authKeyInternal: true,
 		response: {
 			200: t.Object({
 				selector: t.String(),

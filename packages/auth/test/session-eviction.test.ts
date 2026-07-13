@@ -20,7 +20,7 @@ async function seedUserSessions(
 		const ctx: AuthContext = {
 			userId,
 			organizationId: "org-1",
-			role: "user",
+			platformRole: "user",
 			authType: "session",
 		};
 		await redis.set(sessionTokenCacheKey(token), ctx, 5);
@@ -55,7 +55,7 @@ describe("session cache eviction", () => {
 		await redis.set(sessionTokenCacheKey(token), {
 			userId: "u",
 			organizationId: "o",
-			role: null,
+			platformRole: null,
 			authType: "session",
 		} satisfies AuthContext);
 

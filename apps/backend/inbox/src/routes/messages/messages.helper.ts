@@ -8,6 +8,8 @@ import { inboxConfig } from "../../inbox.config";
 export interface SendFromInboxParams {
 	mailboxId: string;
 	organizationId: string;
+	/** Actor for internal mail inject when no cookie/API key (cron). */
+	userId?: string;
 	to: string | string[];
 	subject: string;
 	text?: string;
@@ -102,6 +104,7 @@ export async function proxySendToMailService(
 	// Backend-only path (cron): no cookie and no recoverable plaintext key in DB
 	if (!apiKey && !cookie) {
 		headers["x-internal-secret"] = inboxConfig.RELOOP_INTERNAL_SECRET;
+		headers["x-user-id"] = params.userId ?? "system";
 		headers["x-organization-id"] = params.organizationId;
 	}
 

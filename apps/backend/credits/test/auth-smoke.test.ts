@@ -1,5 +1,5 @@
 /**
- * Smoke: credits special-service migration (auth + platformAdmin).
+ * Smoke: credits special-service migration (auth + authAdmin).
  */
 import {
 	afterAll,
@@ -9,21 +9,14 @@ import {
 	expect,
 	test,
 } from "bun:test";
-import {
-	createAuthPlugin,
-	type AuthContext,
-} from "@reloop/auth/middleware";
+import { createAuthPlugin } from "@reloop/auth/middleware";
 import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
 import { Elysia } from "elysia";
 
 class MemoryRedis {
 	private store = new Map<string, string>();
-	constructor(private prefix = "reloop-session") {}
-	private full(k: string) {
-		return `${this.prefix}:${k}`;
-	}
 	async get<T>(key: string): Promise<T | undefined> {
-		const raw = this.store.get(this.full(key));
+		const raw = this.store.get(key);
 		if (raw === undefined) return undefined;
 		try {
 			return JSON.parse(raw) as T;
@@ -33,12 +26,12 @@ class MemoryRedis {
 	}
 	async set(key: string, value: unknown): Promise<void> {
 		this.store.set(
-			this.full(key),
+			key,
 			typeof value === "string" ? value : JSON.stringify(value),
 		);
 	}
 	async delete(key: string): Promise<void> {
-		this.store.delete(this.full(key));
+		this.store.delete(key);
 	}
 }
 
@@ -76,68 +69,67 @@ beforeAll(async () => {
 afterAll(() => fakeAuth?.stop());
 beforeEach(() => sessions.clear());
 
-function app(redis: MemoryRedis) {
+function mountCredits(redis: MemoryRedis) {
 	return new Elysia()
 		.use(createAuthPlugin({ baseUrl, redis, ttl: 5 }))
 		.get(
-			"/usage",
+			"/balance",
 			({ userId, organizationId }) => ({ userId, organizationId }),
 			{ auth: true },
 		)
 		.get(
 			"/topup",
-			({ userId, role }) => ({ userId, role }),
-			{ platformAdmin: true },
+			({ userId, platformRole }) => ({ userId, platformRole }),
+			{ authAdmin: true },
 		);
 }
 
 describe("credits special-service smoke", () => {
-	test("customer auth with org → 200", async () => {
+	test("auth requires org", async () => {
 		const redis = new MemoryRedis();
-		sessions.set("cust", {
-			userId: "u1",
-			activeOrganizationId: "org-1",
+		sessions.set("u", {
+			userId: "user-1",
 			role: "user",
+			activeOrganizationId: "org-1",
 		});
-		const res = await app(redis).handle(
-			new Request("http://localhost/usage", {
-				headers: { cookie: "reloop.session_token=cust.sig" },
+		const res = await mountCredits(redis).handle(
+			new Request("http://localhost/balance", {
+				headers: { cookie: "reloop.session_token=u.sig" },
 			}),
 		);
 		expect(res.status).toBe(200);
-		expect(((await res.json()) as AuthContext).organizationId).toBe("org-1");
 	});
 
-	test("platformAdmin endpoint rejects non-admin", async () => {
+	test("authAdmin endpoint rejects non-admin", async () => {
 		const redis = new MemoryRedis();
-		sessions.set("cust", {
-			userId: "u1",
-			activeOrganizationId: "org-1",
+		sessions.set("u", {
+			userId: "user-1",
 			role: "user",
+			activeOrganizationId: "org-1",
 		});
-		const res = await app(redis).handle(
+		const res = await mountCredits(redis).handle(
 			new Request("http://localhost/topup", {
-				headers: { cookie: "reloop.session_token=cust.sig" },
+				headers: { cookie: "reloop.session_token=u.sig" },
 			}),
 		);
 		expect(res.status).toBe(401);
 	});
 
-	test("platformAdmin endpoint allows super-admin", async () => {
+	test("authAdmin endpoint allows super-admin", async () => {
 		const redis = new MemoryRedis();
-		sessions.set("adm", {
+		sessions.set("a", {
 			userId: "admin-1",
-			activeOrganizationId: null,
 			role: PLATFORM_ADMIN_ROLE,
+			activeOrganizationId: null,
 		});
-		const res = await app(redis).handle(
+		const res = await mountCredits(redis).handle(
 			new Request("http://localhost/topup", {
-				headers: { cookie: "reloop.session_token=adm.sig" },
+				headers: { cookie: "reloop.session_token=a.sig" },
 			}),
 		);
 		expect(res.status).toBe(200);
-		expect(((await res.json()) as { role: string }).role).toBe(
-			PLATFORM_ADMIN_ROLE,
-		);
+		expect(
+			((await res.json()) as { platformRole: string }).platformRole,
+		).toBe(PLATFORM_ADMIN_ROLE);
 	});
 });

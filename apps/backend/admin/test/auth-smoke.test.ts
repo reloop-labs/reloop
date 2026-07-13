@@ -1,5 +1,5 @@
 /**
- * Smoke: admin special-service migration (platformAdmin + supportSession).
+ * Smoke: admin special-service migration (authAdmin + authSupport).
  */
 import {
 	afterAll,
@@ -9,21 +9,14 @@ import {
 	expect,
 	test,
 } from "bun:test";
-import {
-	createAuthPlugin,
-	SESSION_CACHE_REDIS_PREFIX,
-} from "@reloop/auth/middleware";
+import { createAuthPlugin } from "@reloop/auth/middleware";
 import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
 import { Elysia } from "elysia";
 
 class MemoryRedis {
 	private store = new Map<string, string>();
-	constructor(private prefix = SESSION_CACHE_REDIS_PREFIX) {}
-	private full(k: string) {
-		return `${this.prefix}:${k}`;
-	}
 	async get<T>(key: string): Promise<T | undefined> {
-		const raw = this.store.get(this.full(key));
+		const raw = this.store.get(key);
 		if (raw === undefined) return undefined;
 		try {
 			return JSON.parse(raw) as T;
@@ -33,12 +26,12 @@ class MemoryRedis {
 	}
 	async set(key: string, value: unknown): Promise<void> {
 		this.store.set(
-			this.full(key),
+			key,
 			typeof value === "string" ? value : JSON.stringify(value),
 		);
 	}
 	async delete(key: string): Promise<void> {
-		this.store.delete(this.full(key));
+		this.store.delete(key);
 	}
 }
 
@@ -76,68 +69,23 @@ beforeAll(async () => {
 afterAll(() => fakeAuth?.stop());
 beforeEach(() => sessions.clear());
 
-/** Mirrors admin middleware: shared plugin + supportSession scoped macro. */
 function mountAdminLike(redis: MemoryRedis) {
 	return new Elysia()
 		.use(createAuthPlugin({ baseUrl, redis, ttl: 5 }))
-		.macro({
-			supportSession: {
-				async resolve({
-					status,
-					request,
-				}: {
-					status: (code: number, body: unknown) => unknown;
-					request: Request;
-				}) {
-					const cookie = request.headers.get("cookie");
-					const response = await fetch(
-						`${baseUrl}/api/auth/v1/get-session`,
-						{
-							headers: {
-								"Content-Type": "application/json",
-								Cookie: cookie || "",
-							},
-						},
-					);
-					if (!response.ok) {
-						return status(401, { message: "Unauthorized access" });
-					}
-					const body = (await response.json()) as {
-						user?: {
-							id: string;
-							role?: string | null;
-							activeOrganizationId?: string | null;
-						};
-					} | null;
-					const user = body?.user;
-					if (!user?.id) {
-						return status(401, { message: "Unauthorized access" });
-					}
-					const role = user.role ?? "user";
-					return {
-						userId: user.id,
-						organizationId: user.activeOrganizationId ?? null,
-						role,
-						authType: "session" as const,
-						isPlatformAdmin: role === PLATFORM_ADMIN_ROLE,
-					};
-				},
-			},
-		})
 		.get(
 			"/overview",
-			({ userId, role }) => ({ userId, role }),
-			{ platformAdmin: true },
+			({ userId, platformRole }) => ({ userId, platformRole }),
+			{ authAdmin: true },
 		)
 		.get(
 			"/support",
 			({ userId, isPlatformAdmin }) => ({ userId, isPlatformAdmin }),
-			{ supportSession: true },
+			{ authSupport: true },
 		);
 }
 
 describe("admin special-service smoke", () => {
-	test("platformAdmin rejects regular user", async () => {
+	test("authAdmin rejects regular user", async () => {
 		const redis = new MemoryRedis();
 		sessions.set("u", {
 			userId: "user-1",
@@ -152,7 +100,7 @@ describe("admin special-service smoke", () => {
 		expect(res.status).toBe(401);
 	});
 
-	test("platformAdmin allows super-admin", async () => {
+	test("authAdmin allows super-admin", async () => {
 		const redis = new MemoryRedis();
 		sessions.set("a", {
 			userId: "admin-1",
@@ -165,12 +113,12 @@ describe("admin special-service smoke", () => {
 			}),
 		);
 		expect(res.status).toBe(200);
-		expect(((await res.json()) as { role: string }).role).toBe(
-			PLATFORM_ADMIN_ROLE,
-		);
+		expect(
+			((await res.json()) as { platformRole: string }).platformRole,
+		).toBe(PLATFORM_ADMIN_ROLE);
 	});
 
-	test("supportSession allows any signed-in user and sets isPlatformAdmin", async () => {
+	test("authSupport allows any signed-in user and sets isPlatformAdmin", async () => {
 		const redis = new MemoryRedis();
 		sessions.set("u", {
 			userId: "user-1",

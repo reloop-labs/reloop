@@ -6,7 +6,7 @@ import { getOverviewController } from "./overview.controllers";
 export const overviewRoute = new Elysia()
 	.use(authMiddleware)
 	.get("/overview", async () => getOverviewController(), {
-		platformAdmin: true,
+		authAdmin: true,
 		response: {
 			200: AdminModel.overviewResponse,
 			401: AdminModel.unauthorized,

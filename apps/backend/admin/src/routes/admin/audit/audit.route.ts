@@ -11,7 +11,7 @@ export const auditRoute = new Elysia().use(authMiddleware).get(
 			offset: query.offset,
 		}),
 	{
-		platformAdmin: true,
+		authAdmin: true,
 		query: t.Object({
 			limit: t.Optional(t.Numeric({ default: 50, minimum: 1, maximum: 200 })),
 			offset: t.Optional(t.Numeric({ default: 0, minimum: 0 })),

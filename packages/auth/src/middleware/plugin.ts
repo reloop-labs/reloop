@@ -1,99 +1,53 @@
 import { Elysia } from "elysia";
-import { validateApiKey } from "../apikey/validate";
-import { PLATFORM_ADMIN_ROLE } from "../roles";
-import { resolveSession } from "./session";
+import { resolveAuthRedis } from "./redis-factory";
 import {
-	type AuthContext,
+	resolveApiKeyAuth,
+	resolveApiKeyOrInternal,
+	resolveCollabAuth,
+	resolveInternalAuth,
+	resolvePlatformAdmin,
+	resolveSessionOrApiKey,
+	resolveSupportSession,
+} from "./resolve";
+import {
 	type AuthMiddlewareConfig,
-	type AuthRedis,
 	DEFAULT_SESSION_CACHE_TTL_SECONDS,
 } from "./types";
 
-type ResolveOpts = {
-	baseUrl: string;
-	redis: AuthRedis;
-	ttl: number;
-	requireOrg: boolean;
-	allowApiKey: boolean;
-	requirePlatformAdmin: boolean;
-};
-
-type ResolvedAuth = AuthContext & { apiKeyId?: string };
-
-async function resolveFromHeaders(
-	headers: Headers,
-	opts: ResolveOpts,
-): Promise<ResolvedAuth | null> {
-	if (opts.allowApiKey) {
-		const apiKey =
-			headers.get("x-api-key") ||
-			headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-		if (apiKey) {
-			const result = await validateApiKey(apiKey, opts.redis);
-			if (result) {
-				if (opts.requireOrg && !result.organizationId) return null;
-				if (opts.requirePlatformAdmin) return null;
-				// Extra apiKeyId is useful for audit logs; not part of AuthContext.
-				return {
-					userId: result.userId,
-					organizationId: result.organizationId,
-					role: null,
-					authType: "apikey" as const,
-					apiKeyId: result.apiKeyId,
-				};
-			}
-		}
-	}
-
-	const cookie = headers.get("cookie");
-	const session = await resolveSession(cookie, {
-		baseUrl: opts.baseUrl,
-		redis: opts.redis,
-		ttl: opts.ttl,
-		requireOrg: opts.requireOrg && !opts.requirePlatformAdmin,
-	});
-	if (!session) return null;
-
-	if (opts.requirePlatformAdmin) {
-		if (session.role !== PLATFORM_ADMIN_ROLE) return null;
-	}
-
-	return session;
-}
+const UNAUTH = { message: "Authentication required" };
 
 /**
  * Shared Elysia auth plugin factory.
  *
- * Inject `{ baseUrl, redis, ttl }` per service — nothing is hardcoded.
- * Registers four guard macros that all produce the canonical {@link AuthContext}.
+ * Pass `redisUrl` in production (package owns prefix + TTL).
+ * Pass `redis` override in tests (e.g. MemoryRedis).
+ * Optional `internalSecret` enables internal resolvers/macros.
  */
 export function createAuthPlugin(config: AuthMiddlewareConfig) {
 	const baseUrl = config.baseUrl;
-	const redis = config.redis;
+	const redis = resolveAuthRedis(config);
 	const ttl = config.ttl ?? DEFAULT_SESSION_CACHE_TTL_SECONDS;
-
-	const base = { baseUrl, redis, ttl };
+	const internalSecret = config.internalSecret;
+	const deps = { baseUrl, redis, ttl, internalSecret };
 
 	return new Elysia({ name: "reloop-auth-middleware" }).macro({
 		/**
-		 * Default guard: session or API key; fail closed without active org.
+		 * Session or API key; fail closed without active org.
+		 * Does not accept internal auth even when internalSecret is set.
 		 */
 		auth: {
 			async resolve({ status, request: { headers } }) {
-				const ctx = await resolveFromHeaders(headers, {
-					...base,
+				const ctx = await resolveSessionOrApiKey(headers, deps, {
 					requireOrg: true,
-					allowApiKey: true,
-					requirePlatformAdmin: false,
 				});
-				// Fail-closed: organizationId is always a non-null string here.
 				if (!ctx?.organizationId) {
-					return status(401, { message: "Authentication required" });
+					return status(401, UNAUTH);
 				}
+				// Explicit fields so organizationId narrows to string for handlers.
 				return {
 					userId: ctx.userId,
 					organizationId: ctx.organizationId,
-					role: ctx.role,
+					platformRole: ctx.platformRole,
 					authType: ctx.authType,
 					...(ctx.apiKeyId ? { apiKeyId: ctx.apiKeyId } : {}),
 				};
@@ -108,37 +62,39 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 		 */
 		authNoOrg: {
 			async resolve({ status, request: { headers } }) {
-				const ctx = await resolveFromHeaders(headers, {
-					...base,
+				const ctx = await resolveSessionOrApiKey(headers, deps, {
 					requireOrg: false,
-					allowApiKey: true,
-					requirePlatformAdmin: false,
 				});
 				if (!ctx) {
-					return status(401, { message: "Authentication required" });
+					return status(401, UNAUTH);
 				}
-				return ctx;
+				return {
+					userId: ctx.userId,
+					organizationId: ctx.organizationId,
+					platformRole: ctx.platformRole,
+					authType: ctx.authType,
+					...(ctx.apiKeyId ? { apiKeyId: ctx.apiKeyId } : {}),
+				};
 			},
 		},
 
 		/**
 		 * API-key only. Organization comes from the key's owning org.
 		 */
-		apiKeyAuth: {
+		authKey: {
 			async resolve({ status, request: { headers } }) {
-				const apiKey =
-					headers.get("x-api-key") ||
-					headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-				const result = await validateApiKey(apiKey, redis);
-				if (!result?.organizationId) {
-					return status(401, { message: "Authentication required" });
+				const result = await resolveApiKeyAuth(headers, deps, {
+					requireOrg: true,
+				});
+				if (!result.ok || !result.ctx.organizationId) {
+					return status(401, UNAUTH);
 				}
 				return {
-					userId: result.userId,
-					organizationId: result.organizationId,
-					role: null as string | null,
-					authType: "apikey" as const,
-					apiKeyId: result.apiKeyId,
+					userId: result.ctx.userId,
+					organizationId: result.ctx.organizationId,
+					platformRole: result.ctx.platformRole,
+					authType: result.ctx.authType,
+					apiKeyId: result.ctx.apiKeyId,
 				};
 			},
 			detail: {
@@ -147,16 +103,11 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 		},
 
 		/**
-		 * Session only; requires platform-admin role. Org optional.
+		 * Session only; requires Platform Admin. Org optional.
 		 */
-		platformAdmin: {
+		authAdmin: {
 			async resolve({ status, request: { headers } }) {
-				const ctx = await resolveFromHeaders(headers, {
-					...base,
-					requireOrg: false,
-					allowApiKey: false,
-					requirePlatformAdmin: true,
-				});
+				const ctx = await resolvePlatformAdmin(headers, deps);
 				if (!ctx) {
 					return status(401, {
 						message: "Unauthorized access",
@@ -164,7 +115,103 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 						fix: "Sign in with a platform admin account",
 					});
 				}
-				return ctx;
+				return {
+					userId: ctx.userId,
+					organizationId: ctx.organizationId,
+					platformRole: ctx.platformRole,
+					authType: ctx.authType,
+				};
+			},
+		},
+
+		/**
+		 * Internal headers only (secret + user id + org id).
+		 */
+		authInternal: {
+			async resolve({ status, request: { headers } }) {
+				const ctx = resolveInternalAuth(headers, deps);
+				if (!ctx?.organizationId) {
+					return status(401, UNAUTH);
+				}
+				return {
+					userId: ctx.userId,
+					organizationId: ctx.organizationId,
+					platformRole: ctx.platformRole,
+					authType: ctx.authType,
+				};
+			},
+		},
+
+		/**
+		 * API key, then internal. Fail closed on invalid key.
+		 */
+		authKeyInternal: {
+			async resolve({ status, request: { headers } }) {
+				const ctx = await resolveApiKeyOrInternal(headers, deps);
+				if (!ctx?.organizationId) {
+					return status(401, UNAUTH);
+				}
+				return {
+					userId: ctx.userId,
+					organizationId: ctx.organizationId,
+					platformRole: ctx.platformRole,
+					authType: ctx.authType,
+					...(ctx.apiKeyId ? { apiKeyId: ctx.apiKeyId } : {}),
+				};
+			},
+			detail: {
+				security: [{ apiKey: [] }],
+			},
+		},
+
+		/**
+		 * Any signed-in session; org optional; isPlatformAdmin derived.
+		 */
+		authSupport: {
+			async resolve({ status, request: { headers } }) {
+				const ctx = await resolveSupportSession(headers, deps);
+				if (!ctx) {
+					return status(401, {
+						message: "Unauthorized access",
+						why: "A signed-in session is required for support chat",
+						fix: "Sign in to your Reloop account and retry",
+					});
+				}
+				return {
+					userId: ctx.userId,
+					organizationId: ctx.organizationId,
+					platformRole: ctx.platformRole,
+					authType: ctx.authType,
+					isPlatformAdmin: ctx.isPlatformAdmin,
+					userEmail: ctx.userEmail,
+					userName: ctx.userName,
+					userImage: ctx.userImage,
+				};
+			},
+		},
+
+		/**
+		 * Session or API key; fail-closed org; profile fields when session.
+		 */
+		authCollab: {
+			async resolve({ status, request: { headers } }) {
+				const ctx = await resolveCollabAuth(headers, deps);
+				if (!ctx?.organizationId) {
+					return status(401, UNAUTH);
+				}
+				return {
+					userId: ctx.userId,
+					organizationId: ctx.organizationId,
+					platformRole: ctx.platformRole,
+					authType: ctx.authType,
+					userEmail: ctx.userEmail,
+					userName: ctx.userName,
+					userImage: ctx.userImage,
+					...(ctx.apiKeyId ? { apiKeyId: ctx.apiKeyId } : {}),
+				};
+			},
+			detail: {
+				security: [{ apiKey: [] }],
 			},
 		},
 	});

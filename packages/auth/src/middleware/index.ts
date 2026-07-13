@@ -1,6 +1,6 @@
 /**
- * `@reloop/auth/middleware` — shared Elysia auth plugin factory.
- * Not yet mounted by services (pilot migration is a later ticket).
+ * `@reloop/auth/middleware` — shared Elysia auth plugin, pure resolvers,
+ * and session-cache helpers for backend services.
  */
 
 export {
@@ -18,10 +18,32 @@ export {
 	sessionUserIndexKey,
 } from "./keys";
 export { type AuthPlugin, createAuthPlugin } from "./plugin";
-export { resolveSession } from "./session";
+export {
+	createSessionCacheRedis,
+	resolveAuthRedis,
+} from "./redis-factory";
+export {
+	type ResolverDeps,
+	resolveApiKeyAuth,
+	resolveApiKeyInternalOrSession,
+	resolveApiKeyOrInternal,
+	resolveCollabAuth,
+	resolveInternalAuth,
+	resolvePlatformAdmin,
+	resolveSessionAuth,
+	resolveSessionAuthWithProfile,
+	resolveSessionOrApiKey,
+	resolveSupportSession,
+} from "./resolve";
+export { resolveSession, resolveSessionWithProfile } from "./session";
 export {
 	type AuthContext,
+	type AuthContextWithProfile,
 	type AuthMiddlewareConfig,
 	type AuthRedis,
 	DEFAULT_SESSION_CACHE_TTL_SECONDS,
+	INTERNAL_ORG_ID_HEADER,
+	INTERNAL_SECRET_HEADER,
+	INTERNAL_USER_ID_HEADER,
+	type SupportAuthContext,
 } from "./types";

@@ -55,7 +55,7 @@ export const supportRoute = new Elysia({ prefix: "/support" })
 		async ({ userId, isPlatformAdmin }) =>
 			getUnreadCountController({ userId, isPlatformAdmin }),
 		{
-			supportSession: true,
+			authSupport: true,
 			response: {
 				200: AdminModel.supportUnreadCountResponse,
 				401: AdminModel.unauthorized,
@@ -88,7 +88,7 @@ export const supportRoute = new Elysia({ prefix: "/support" })
 			};
 		},
 		{
-			supportSession: true,
+			authSupport: true,
 			response: {
 				200: AdminModel.supportConversationWithMessages,
 				401: AdminModel.unauthorized,
@@ -103,7 +103,7 @@ export const supportRoute = new Elysia({ prefix: "/support" })
 		"/conversations/me",
 		async ({ userId }) => getMyConversationController({ userId }),
 		{
-			supportSession: true,
+			authSupport: true,
 			response: {
 				200: AdminModel.supportMyConversationResponse,
 				401: AdminModel.unauthorized,
@@ -124,7 +124,7 @@ export const supportRoute = new Elysia({ prefix: "/support" })
 				q: query.q,
 			}),
 		{
-			platformAdmin: true,
+			authAdmin: true,
 			query: t.Object({
 				limit: t.Optional(t.Numeric({ default: 50, minimum: 1, maximum: 200 })),
 				offset: t.Optional(t.Numeric({ default: 0, minimum: 0 })),
@@ -150,7 +150,7 @@ export const supportRoute = new Elysia({ prefix: "/support" })
 				isPlatformAdmin,
 			}),
 		{
-			supportSession: true,
+			authSupport: true,
 			params: t.Object({ conversationId: t.String() }),
 			response: {
 				200: AdminModel.supportConversationWithMessages,
@@ -173,7 +173,7 @@ export const supportRoute = new Elysia({ prefix: "/support" })
 				offset: query.offset,
 			}),
 		{
-			supportSession: true,
+			authSupport: true,
 			params: t.Object({ conversationId: t.String() }),
 			query: t.Object({
 				limit: t.Optional(t.Numeric({ default: 50, minimum: 1, maximum: 200 })),
@@ -205,7 +205,7 @@ export const supportRoute = new Elysia({ prefix: "/support" })
 			return { conversation: result.conversation };
 		},
 		{
-			supportSession: true,
+			authSupport: true,
 			params: t.Object({ conversationId: t.String() }),
 			response: {
 				200: t.Object({
@@ -241,7 +241,7 @@ export const supportRoute = new Elysia({ prefix: "/support" })
 			};
 		},
 		{
-			supportSession: true,
+			authSupport: true,
 			params: t.Object({ conversationId: t.String() }),
 			body: AdminModel.createSupportMessageBody,
 			response: {
@@ -276,7 +276,7 @@ export const supportRoute = new Elysia({ prefix: "/support" })
 			return result;
 		},
 		{
-			platformAdmin: true,
+			authAdmin: true,
 			params: t.Object({ conversationId: t.String() }),
 			body: AdminModel.updateSupportStatusBody,
 			response: {

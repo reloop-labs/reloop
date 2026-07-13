@@ -15,7 +15,7 @@ export const topupCreditsRoute = new Elysia().use(authMiddleware).post(
 		});
 	},
 	{
-		platformAdmin: true,
+		authAdmin: true,
 		body: CreditsModel.topupBody,
 		response: {
 			200: CreditsModel.topupResponse,
