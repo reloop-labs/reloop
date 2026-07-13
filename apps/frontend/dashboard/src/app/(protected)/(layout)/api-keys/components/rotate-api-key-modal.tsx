@@ -42,7 +42,7 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 	const [rotatedApiKey, setRotatedApiKey] =
 		useState<ApiKeyWithKeyResponse | null>(null);
 	const [keyCopied, setKeyCopied] = useState(false);
-	const [activeTab, setActiveTab] = useState<"env" | "key">("env");
+	const [activeTab, setActiveTab] = useState<"key" | "env">("key");
 	const { mutate } = useSWRConfig();
 	const [html, setHtml] = useState("");
 
@@ -154,7 +154,7 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 			const timer = setTimeout(() => {
 				setRotatedApiKey(null);
 				setKeyCopied(false);
-				setActiveTab("env");
+				setActiveTab("key");
 				setHtml("");
 			}, 300); // Wait for transition
 			return () => clearTimeout(timer);
@@ -185,21 +185,6 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 									<div className="flex items-center gap-4">
 										<button
 											type="button"
-											onClick={() => setActiveTab("env")}
-											className={cn(
-												"relative cursor-pointer py-2 font-medium text-xs transition-colors",
-												activeTab === "env"
-													? "font-semibold text-text-strong-950"
-													: "text-text-soft-400 hover:text-text-sub-600",
-											)}
-										>
-											.env
-											{activeTab === "env" && (
-												<span className="absolute right-0 bottom-0 left-0 h-[1.5px] rounded-full bg-text-strong-950" />
-											)}
-										</button>
-										<button
-											type="button"
 											onClick={() => setActiveTab("key")}
 											className={cn(
 												"relative cursor-pointer py-2 font-medium text-xs transition-colors",
@@ -213,21 +198,24 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 												<span className="absolute right-0 bottom-0 left-0 h-[1.5px] rounded-full bg-text-strong-950" />
 											)}
 										</button>
-									</div>
-									<div className="flex items-center gap-2">
 										<button
 											type="button"
-											onClick={handleCopyKey}
-											className="cursor-pointer text-text-sub-600 transition-colors hover:text-text-strong-950"
+											onClick={() => setActiveTab("env")}
+											className={cn(
+												"relative cursor-pointer py-2 font-medium text-xs transition-colors",
+												activeTab === "env"
+													? "font-semibold text-text-strong-950"
+													: "text-text-soft-400 hover:text-text-sub-600",
+											)}
 										>
-											<Icon
-												name={keyCopied ? "check" : "copy"}
-												className={"h-3.5 w-3.5 stroke-3"}
-											/>
+											.env
+											{activeTab === "env" && (
+												<span className="absolute right-0 bottom-0 left-0 h-[1.5px] rounded-full bg-text-strong-950" />
+											)}
 										</button>
 									</div>
 								</div>
-								<div className="rounded-t-[10px] rounded-b-2xl bg-bg-weak-50/70 dark:bg-bg-weak-50/45">
+								<div className="group/code relative rounded-t-[10px] rounded-b-2xl bg-bg-weak-50/70 dark:bg-bg-weak-50/45">
 									<CodeBlock
 										code={
 											activeTab === "env"
@@ -235,11 +223,23 @@ export const RotateApiKeyModal = ({ apiKeys }: RotateApiKeyModalProps) => {
 												: rotatedApiKey.key
 										}
 										lang="bash"
-										className="text-[10px]"
+										className="pr-12 text-[10px]"
 										hideLineNumbers={true}
 										noScroll={true}
 										defaultHtml={activeTab === "env" ? html : undefined}
 									/>
+									<div className="-translate-y-1/2 absolute top-1/2 right-4">
+										<button
+											type="button"
+											onClick={handleCopyKey}
+											className="cursor-pointer text-text-sub-600 transition-colors hover:text-text-strong-950"
+										>
+											<Icon
+												name={keyCopied ? "check" : "copy"}
+												className="h-3.5 w-3.5 stroke-3"
+											/>
+										</button>
+									</div>
 								</div>
 							</div>
 

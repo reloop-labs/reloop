@@ -21,7 +21,7 @@ export const SuccessStep = ({
 	defaultHtml,
 }: SuccessStepProps) => {
 	const [copied, setCopied] = useState(false);
-	const [activeTab, setActiveTab] = useState<"env" | "key">("env");
+	const [activeTab, setActiveTab] = useState<"key" | "env">("key");
 
 	const handleCopy = async () => {
 		try {
@@ -52,21 +52,6 @@ export const SuccessStep = ({
 						<div className="flex items-center gap-4">
 							<button
 								type="button"
-								onClick={() => setActiveTab("env")}
-								className={cn(
-									"relative cursor-pointer py-2 font-medium text-xs transition-colors",
-									activeTab === "env"
-										? "font-semibold text-text-strong-950"
-										: "text-text-soft-400 hover:text-text-sub-600",
-								)}
-							>
-								.env
-								{activeTab === "env" && (
-									<span className="absolute right-0 bottom-0 left-0 h-[1.5px] rounded-full bg-text-strong-950" />
-								)}
-							</button>
-							<button
-								type="button"
 								onClick={() => setActiveTab("key")}
 								className={cn(
 									"relative cursor-pointer py-2 font-medium text-xs transition-colors",
@@ -80,8 +65,33 @@ export const SuccessStep = ({
 									<span className="absolute right-0 bottom-0 left-0 h-[1.5px] rounded-full bg-text-strong-950" />
 								)}
 							</button>
+							<button
+								type="button"
+								onClick={() => setActiveTab("env")}
+								className={cn(
+									"relative cursor-pointer py-2 font-medium text-xs transition-colors",
+									activeTab === "env"
+										? "font-semibold text-text-strong-950"
+										: "text-text-soft-400 hover:text-text-sub-600",
+								)}
+							>
+								.env
+								{activeTab === "env" && (
+									<span className="absolute right-0 bottom-0 left-0 h-[1.5px] rounded-full bg-text-strong-950" />
+								)}
+							</button>
 						</div>
-						<div className="flex items-center gap-2">
+					</div>
+					<div className="group/code relative rounded-t-[10px] rounded-b-2xl bg-bg-weak-50/70 dark:bg-bg-weak-50/45">
+						<CodeBlock
+							code={activeTab === "env" ? `RELOOP_API_KEY=${apiKey}` : apiKey}
+							lang="bash"
+							className="pr-12 text-[10px]"
+							hideLineNumbers={true}
+							noScroll={true}
+							defaultHtml={activeTab === "env" ? defaultHtml : undefined}
+						/>
+						<div className="-translate-y-1/2 absolute top-1/2 right-4">
 							<button
 								type="button"
 								onClick={handleCopy}
@@ -89,20 +99,10 @@ export const SuccessStep = ({
 							>
 								<Icon
 									name={copied ? "check" : "copy"}
-									className={"h-3.5 w-3.5 stroke-3"}
+									className="h-3.5 w-3.5 stroke-3"
 								/>
 							</button>
 						</div>
-					</div>
-					<div className="rounded-t-[10px] rounded-b-2xl bg-bg-weak-50/70 dark:bg-bg-weak-50/45">
-						<CodeBlock
-							code={activeTab === "env" ? `RELOOP_API_KEY=${apiKey}` : apiKey}
-							lang="bash"
-							className="text-[10px]"
-							hideLineNumbers={true}
-							noScroll={true}
-							defaultHtml={activeTab === "env" ? defaultHtml : undefined}
-						/>
 					</div>
 				</div>
 
