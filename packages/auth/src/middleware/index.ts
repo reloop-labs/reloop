@@ -4,6 +4,15 @@
  */
 
 export {
+	applySessionCacheEviction,
+	evictAllSessionsForUser,
+	evictionEventFromAuthPath,
+	evictSessionByToken,
+	handleAuthLifecycleEviction,
+	SESSION_CACHE_REDIS_PREFIX,
+	type SessionEvictionEvent,
+} from "./eviction";
+export {
 	extractSessionToken,
 	sessionTokenCacheKey,
 	sessionUserIndexKey,
