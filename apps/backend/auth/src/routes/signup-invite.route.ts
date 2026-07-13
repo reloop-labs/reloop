@@ -1,7 +1,5 @@
-import { Elysia, t } from "elysia";
-import { authConfig } from "../auth.config";
-import { auth } from "../lib/auth";
 import {
+	auth,
 	countPeerSignupInvitesUsed,
 	createPeerSignupInvite,
 	findSignupInviteByCode,
@@ -11,7 +9,9 @@ import {
 	revokePeerSignupInvite,
 	SIGNUP_INVITE_COOKIE,
 	SIGNUP_INVITE_COOKIE_MAX_AGE,
-} from "../lib/signup-invite";
+} from "@reloop/auth/server";
+import { Elysia, t } from "elysia";
+import { authConfig } from "../auth.config";
 
 async function requireSession(request: Request) {
 	return auth.api.getSession({ headers: request.headers });

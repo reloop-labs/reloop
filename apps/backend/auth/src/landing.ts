@@ -1,6 +1,6 @@
+import { authRedis as redis } from "@reloop/auth/server";
 import { db } from "@reloop/db/client";
 import { Elysia } from "elysia";
-import { redis } from "./lib/redis";
 
 export const landing = new Elysia()
 	.get("/", async () => {

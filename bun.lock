@@ -847,12 +847,20 @@
       "version": "0.1.0",
       "dependencies": {
         "@better-auth/api-key": "catalog:",
+        "@reloop/bus": "workspace:*",
+        "@reloop/cache": "workspace:*",
+        "@reloop/db": "workspace:*",
         "better-auth": "catalog:",
+        "drizzle-orm": "catalog:db",
+        "evlog": "catalog:backend",
       },
       "devDependencies": {
         "@reloop/tsconfig": "workspace:*",
         "@types/node": "catalog:",
         "typescript": "catalog:",
+      },
+      "peerDependencies": {
+        "react": ">=18",
       },
     },
     "packages/bus": {
