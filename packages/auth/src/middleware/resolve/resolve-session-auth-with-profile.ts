@@ -2,7 +2,6 @@ import type { ResolverDeps } from "./resolver-deps";
 import { resolveSessionWithProfile } from "../session/resolve-session-with-profile";
 import type { AuthContextWithProfile } from "../types";
 
-/** Resolve Session with profile fields. */
 export async function resolveSessionAuthWithProfile(
 	headers: Headers,
 	deps: ResolverDeps,

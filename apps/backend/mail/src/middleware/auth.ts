@@ -16,10 +16,6 @@ const sessionRedis = createSessionCacheRedis(mailConfig.REDIS_URL, 5);
 
 export type MailAuthContext = AuthContext;
 
-/**
- * Shared plugin + mail composer for `auth`:
- * API key → internal (secret + user + org) → session. Fail-closed org.
- */
 export const authMiddleware = new Elysia({ name: "auth-middleware" })
 	.use(evlog())
 	.use(
@@ -31,9 +27,7 @@ export const authMiddleware = new Elysia({ name: "auth-middleware" })
 		}),
 	)
 	.macro({
-		/**
-		 * Overrides shared `auth` with the mail credential chain.
-		 */
+
 		auth: {
 			async resolve({ status, request: { headers } }) {
 				const ctx = await resolveApiKeyInternalOrSession(headers, {

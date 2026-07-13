@@ -1,7 +1,6 @@
 import { sessionUserIndexKey } from "../keys/session-user-index-key";
 import type { AuthRedis } from "../types";
 
-/** Track a session token under the per-user index for bulk eviction. */
 export async function addTokenToUserIndex(
 	redis: AuthRedis,
 	userId: string,

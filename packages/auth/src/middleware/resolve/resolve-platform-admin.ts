@@ -3,7 +3,6 @@ import type { ResolverDeps } from "./resolver-deps";
 import { resolveSessionAuth } from "./resolve-session-auth";
 import type { AuthContext } from "../types";
 
-/** Platform Admin session only (no API key). */
 export async function resolvePlatformAdmin(
 	headers: Headers,
 	deps: ResolverDeps,

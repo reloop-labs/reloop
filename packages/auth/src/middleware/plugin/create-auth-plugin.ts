@@ -14,13 +14,6 @@ import {
 
 const UNAUTH = { message: "Authentication required" };
 
-/**
- * Shared Elysia auth plugin factory.
- *
- * Pass `redisUrl` in production (package owns prefix + TTL).
- * Pass `redis` override in tests (e.g. MemoryRedis).
- * Optional `internalSecret` enables internal resolvers/macros.
- */
 export function createAuthPlugin(config: AuthMiddlewareConfig) {
 	const baseUrl = config.baseUrl;
 	const redis = resolveAuthRedis(config);

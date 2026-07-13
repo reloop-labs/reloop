@@ -3,11 +3,6 @@ import { extractApiKey } from "./extract-api-key";
 import type { ResolverDeps } from "./resolver-deps";
 import type { AuthContext } from "../types";
 
-/**
- * Resolve API Key from headers.
- * No key header → `{ ok: false, invalid: false }`.
- * Present but invalid → `{ ok: false, invalid: true }` (fail closed, no fallthrough).
- */
 export async function resolveApiKeyAuth(
 	headers: Headers,
 	deps: Pick<ResolverDeps, "redis">,

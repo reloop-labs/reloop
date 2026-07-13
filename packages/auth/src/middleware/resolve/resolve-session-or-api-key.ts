@@ -3,10 +3,6 @@ import type { ResolverDeps } from "./resolver-deps";
 import { resolveSessionAuth } from "./resolve-session-auth";
 import type { AuthContext } from "../types";
 
-/**
- * Session or API Key. Prefer API key when key header is present
- * (invalid key → fail closed, no session fallthrough).
- */
 export async function resolveSessionOrApiKey(
 	headers: Headers,
 	deps: ResolverDeps,

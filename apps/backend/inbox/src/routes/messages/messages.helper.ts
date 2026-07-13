@@ -8,7 +8,7 @@ import { inboxConfig } from "../../inbox.config";
 export interface SendFromInboxParams {
 	mailboxId: string;
 	organizationId: string;
-	/** Actor for internal mail inject when no cookie/API key (cron). */
+
 	userId?: string;
 	to: string | string[];
 	subject: string;
@@ -45,7 +45,6 @@ export async function proxySendToMailService(
 ) {
 	const log = getLog();
 
-	// Resolve the mailbox to get the from address
 	const mbx = await db.query.mailbox.findFirst({
 		where: and(
 			eq(mailbox.id, params.mailboxId),
@@ -79,12 +78,10 @@ export async function proxySendToMailService(
 		attachments: params.attachments,
 	};
 
-	// Remove undefined values
 	for (const key of Object.keys(sendBody)) {
 		if (sendBody[key] === undefined) delete sendBody[key];
 	}
 
-	// Proxy to the mail service
 	const mailServiceUrl = `${inboxConfig.BASE_URL}/api/mail/v1/send`;
 	log.info(`[INBOX] Proxying send to mail service: ${mailServiceUrl}`);
 
@@ -93,7 +90,7 @@ export async function proxySendToMailService(
 	};
 
 	if (apiKey) {
-		// Caller supplied a plaintext API key (e.g. from x-api-key on the request)
+
 		headers["x-api-key"] = apiKey;
 	}
 
@@ -101,7 +98,6 @@ export async function proxySendToMailService(
 		headers["cookie"] = cookie;
 	}
 
-	// Backend-only path (cron): no cookie and no recoverable plaintext key in DB
 	if (!apiKey && !cookie) {
 		headers["x-internal-secret"] = inboxConfig.RELOOP_INTERNAL_SECRET;
 		headers["x-user-id"] = params.userId ?? "system";

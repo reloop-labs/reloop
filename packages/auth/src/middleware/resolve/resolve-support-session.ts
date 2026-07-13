@@ -5,10 +5,6 @@ import { resolveSessionAuthWithProfile } from "./resolve-session-auth-with-profi
 import { sessionTokenCacheKey } from "../keys/session-token-cache-key";
 import type { AuthContext, SupportAuthContext } from "../types";
 
-/**
- * Support: any signed-in session; org optional; isPlatformAdmin derived.
- * Lean session cache hit → identity without profile. Miss → one get-session.
- */
 export async function resolveSupportSession(
 	headers: Headers,
 	deps: ResolverDeps,

@@ -24,10 +24,6 @@ import { authServerConfig } from "./config";
 import { redis } from "./redis";
 import { sessionCacheRedis } from "./session-cache-redis";
 
-/**
- * The single runtime Better Auth instance for Reloop.
- * Auth service mounts `auth.handler`; client/types derive from this config only.
- */
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
 		provider: "pg",
@@ -65,17 +61,15 @@ export const auth = betterAuth({
 			const { path, context } = ctx;
 			log.info({ message: String(ctx.path) });
 
-			// Near-instant session-validation cache eviction (shared Redis).
-			// Logout → that token; password-change / org-switch → all user tokens.
 			try {
 				const cookieHeader =
 					typeof ctx.headers?.get === "function"
 						? ctx.headers.get("cookie")
 						: null;
 				const sessionUser =
-					// biome-ignore lint/suspicious/noExplicitAny: Better Auth context shape
+
 					(context as any)?.session?.user ??
-					// biome-ignore lint/suspicious/noExplicitAny: Better Auth context shape
+
 					(context as any)?.newSession?.user;
 				await handleAuthLifecycleEviction(sessionCacheRedis, {
 					path: String(path),
@@ -89,7 +83,6 @@ export const auth = betterAuth({
 				});
 			}
 
-			// 🔐 User registered
 			if (path === "/sign-up/email-otp") {
 				const newSession = context.newSession;
 				if (newSession) {
@@ -109,7 +102,6 @@ export const auth = betterAuth({
 				}
 			}
 
-			// 🔓 User signed in
 			if (
 				path === "/sign-in/email-otp" ||
 				path === "/callback/google" ||
@@ -119,7 +111,7 @@ export const auth = betterAuth({
 				if (data) {
 					const { session, user } = data;
 					log.info({ ...{ data: user.email }, message: "🔓 User signed in:" });
-					// Use a 1-minute bucket for sign-in deduplication
+
 					const bucket = Math.floor(Date.now() / 60000);
 					await bus.publish(
 						BusEvent.SIGNIN_DETECTED,
@@ -211,7 +203,7 @@ export const auth = betterAuth({
 						...{ data: error },
 						message: "Failed to publish OTP event:",
 					});
-					// If we are not using a default OTP, we must throw to notify the user
+
 					if (!authServerConfig.DEFAULT_OTP) {
 						throw new Error("Failed to send OTP email");
 					}
@@ -261,7 +253,6 @@ export const auth = betterAuth({
 					message: "📧 Organization invitation email requested:",
 				});
 
-				// Log invite URL in development for easy testing
 				if (authServerConfig.NODE_ENV === "development") {
 					log.info("server", `🔗 Invite URL (DEV): ${inviteLink}`);
 				}
@@ -317,7 +308,6 @@ export const auth = betterAuth({
 							`✅ Organization joined bus event published for ${user.email}`,
 						);
 
-						// Set active organization for the user
 						await db
 							.update(schema.user)
 							.set({ activeOrganizationId: organization.id })

@@ -7,9 +7,6 @@ if (uploadConfig.NODE_ENV !== "production") {
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
-/**
- * Upload routes are user-scoped (not org-scoped) → use `authNoOrg`.
- */
 export const authMiddleware = new Elysia({ name: "auth-middleware" })
 	.use(evlog())
 	.use(

@@ -3,7 +3,6 @@ import { apikey } from "@reloop/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { getApiKeyCacheKey, hashApiKey } from "./helpers";
 
-/** Minimal cache surface (satisfied by `@reloop/cache` RedisCache). */
 export type ApiKeyCache = {
 	get<T>(key: string): Promise<T | undefined>;
 	set(key: string, value: unknown, ttlSeconds?: number): Promise<void>;
@@ -16,10 +15,6 @@ export interface ApiKeyValidationResult {
 	authType: "apikey";
 }
 
-/**
- * Validate a raw API key against Redis cache + Postgres.
- * Consumed by service middleware today and by the shared auth plugin later.
- */
 export async function validateApiKey(
 	apiKey: string | null | undefined,
 	redis: ApiKeyCache,
@@ -27,7 +22,6 @@ export async function validateApiKey(
 ): Promise<ApiKeyValidationResult | null> {
 	if (!apiKey || typeof apiKey !== "string") return null;
 
-	// Basic format check
 	if (!apiKey.includes("_") || !/^[a-zA-Z0-9_-]+$/.test(apiKey)) {
 		return null;
 	}
@@ -42,7 +36,7 @@ export async function validateApiKey(
 	}>(cacheKey);
 
 	if (cached) {
-		// Update request stats in database asynchronously
+
 		db.update(apikey)
 			.set({
 				requestCount: sql`${apikey.requestCount} + 1`,
@@ -71,7 +65,6 @@ export async function validateApiKey(
 		};
 		await redis.set(cacheKey, result, 30 * 24 * 60 * 60);
 
-		// Update request stats in database asynchronously
 		db.update(apikey)
 			.set({
 				requestCount: sql`${apikey.requestCount} + 1`,

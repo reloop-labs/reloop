@@ -2,7 +2,6 @@ import { sessionTokenCacheKey } from "../keys/session-token-cache-key";
 import { sessionUserIndexKey } from "../keys/session-user-index-key";
 import type { AuthRedis } from "../types";
 
-/** Delete one cached session and optionally remove it from the user index. */
 export async function evictSessionByToken(
 	redis: AuthRedis,
 	sessionToken: string,

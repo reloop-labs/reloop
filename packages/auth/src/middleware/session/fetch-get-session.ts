@@ -20,7 +20,6 @@ export type FetchedUser = {
 	activeOrganizationId: string | null;
 };
 
-/** HTTP get-session against the auth host. */
 export async function fetchGetSession(
 	cookie: string,
 	baseUrl: string,

@@ -1,10 +1,6 @@
 import { extractSessionToken } from "../keys/extract-session-token";
 import type { SessionEvictionEvent } from "./session-eviction-event";
 
-/**
- * Map a Better Auth request path (+ cookie / user) onto an eviction event.
- * Returns null when the path is not a lifecycle event we care about.
- */
 export function evictionEventFromAuthPath(opts: {
 	path: string;
 	cookieHeader?: string | null;

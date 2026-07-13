@@ -5,11 +5,6 @@ import type { ResolveSessionOptions } from "./resolve-session-options";
 import { sessionTokenCacheKey } from "../keys/session-token-cache-key";
 import type { AuthContext, AuthContextWithProfile } from "../types";
 
-/**
- * Resolve session with profile fields via get-session.
- * Always fetches (profile is not cached). Writes lean AuthContext to the
- * session-validation cache so subsequent lean macros hit Redis.
- */
 export async function resolveSessionWithProfile(
 	cookie: string | null,
 	opts: ResolveSessionOptions,

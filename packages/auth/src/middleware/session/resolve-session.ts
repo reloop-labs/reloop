@@ -6,10 +6,6 @@ import type { ResolveSessionOptions } from "./resolve-session-options";
 import { sessionTokenCacheKey } from "../keys/session-token-cache-key";
 import type { AuthContext } from "../types";
 
-/**
- * Resolve a session cookie to lean AuthContext via cache or get-session HTTP.
- * Always checks response.ok before trusting the body.
- */
 export async function resolveSession(
 	cookie: string | null,
 	opts: ResolveSessionOptions,

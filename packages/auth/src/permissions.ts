@@ -6,14 +6,6 @@ import {
 	ownerAc,
 } from "better-auth/plugins/organization/access";
 
-/**
- * Organization access control for Reloop workspaces.
- *
- * Invite UI offers Admin / Member only. Creator is Owner (Better Auth default).
- * - Owner: full control (including delete org / transfer ownership)
- * - Admin: invite users, update payment, delete the team
- * - Member: manage emails, domains, and webhooks
- */
 const statement = {
 	...defaultStatements,
 	billing: ["update"],

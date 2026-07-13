@@ -7,12 +7,6 @@ if (adminConfig.NODE_ENV !== "production") {
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
-/**
- * Platform-admin routes use `authAdmin`.
- * Support chat uses `authSupport` (any signed-in user, org optional).
- * Lean AuthContext omits email/name from default macros; authSupport may
- * include profile fields. isPlatformAdmin is derived on authSupport.
- */
 export const authMiddleware = new Elysia({
 	name: "admin-auth-middleware",
 })

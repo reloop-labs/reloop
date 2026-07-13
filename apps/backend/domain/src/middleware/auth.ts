@@ -7,9 +7,6 @@ if (domainConfig.NODE_ENV !== "production") {
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
-/**
- * Shared plugin macros include `authKeyInternal` for KumoMTA dkim-key injects.
- */
 export const authMiddleware = new Elysia({ name: "auth-middleware" })
 	.use(evlog())
 	.use(

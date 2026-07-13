@@ -5,10 +5,6 @@ import {
 	DEFAULT_SESSION_CACHE_TTL_SECONDS,
 } from "../types";
 
-/**
- * Build the shared session-validation Redis client.
- * Prefix and default TTL are package-owned so central eviction hits the same keys.
- */
 export function createSessionCacheRedis(
 	redisUrl: string,
 	ttl: number = DEFAULT_SESSION_CACHE_TTL_SECONDS,

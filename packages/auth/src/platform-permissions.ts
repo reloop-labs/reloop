@@ -6,7 +6,6 @@ import {
 } from "better-auth/plugins/admin/access";
 import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "./roles";
 
-/** Access control for Better Auth's platform admin plugin (not org roles). */
 export const platformAc = createAccessControl(defaultStatements);
 
 export const platformSuperAdmin = platformAc.newRole({

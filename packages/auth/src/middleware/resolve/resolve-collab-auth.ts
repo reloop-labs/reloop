@@ -3,7 +3,6 @@ import type { ResolverDeps } from "./resolver-deps";
 import { resolveSessionAuthWithProfile } from "./resolve-session-auth-with-profile";
 import type { AuthContextWithProfile } from "../types";
 
-/** Collab: session or API key, fail-closed org, profile when session. */
 export async function resolveCollabAuth(
 	headers: Headers,
 	deps: ResolverDeps,

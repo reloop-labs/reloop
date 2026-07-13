@@ -24,7 +24,7 @@ export const onboardingRoute = new Elysia({
 	.post(
 		"/onboarding/send-test-email",
 		async ({ body: { to, from }, request, set }) => {
-			// authKey macro already validated the key; forward the raw header to mail.
+
 			const apiKey = request.headers.get("x-api-key") ?? "";
 
 			const html = await render(

@@ -6,10 +6,6 @@ import {
 	INTERNAL_USER_ID_HEADER,
 } from "../types";
 
-/**
- * Resolve internal service auth from headers.
- * Requires x-internal-secret + x-user-id + x-organization-id.
- */
 export function resolveInternalAuth(
 	headers: Headers,
 	deps: Pick<ResolverDeps, "internalSecret">,

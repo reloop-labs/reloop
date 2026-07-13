@@ -7,10 +7,6 @@ if (creditsConfig.NODE_ENV !== "production") {
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
-/**
- * - Customer routes: `auth` (fail-closed org)
- * - Top-up / admin: `authAdmin`
- */
 export const authMiddleware = new Elysia({
 	name: "billing-auth-middleware",
 })

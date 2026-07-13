@@ -4,10 +4,6 @@ import type { ResolverDeps } from "./resolver-deps";
 import { resolveSessionAuth } from "./resolve-session-auth";
 import type { AuthContext } from "../types";
 
-/**
- * Mail-style composer: API key → internal → session (fail-closed org).
- * Invalid API key does not fall through.
- */
 export async function resolveApiKeyInternalOrSession(
 	headers: Headers,
 	deps: ResolverDeps,

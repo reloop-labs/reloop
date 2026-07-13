@@ -1,8 +1,3 @@
-/**
- * `@reloop/auth/middleware` — shared Elysia auth plugin, pure resolvers,
- * and session-cache helpers for backend services.
- */
-
 export { applySessionCacheEviction } from "./eviction/apply-session-cache-eviction";
 export { evictionEventFromAuthPath } from "./eviction/eviction-event-from-auth-path";
 export { evictAllSessionsForUser } from "./eviction/evict-all-sessions-for-user";
