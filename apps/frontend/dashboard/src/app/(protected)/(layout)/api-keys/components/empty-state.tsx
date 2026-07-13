@@ -123,7 +123,7 @@ export const EmptyState = ({ onCreateApiKey }: EmptyStateProps) => {
 						className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 					>
 						<a
-							href="https://reloop.sh/docs/api-keys"
+							href="https://reloop.sh/docs/learn/api-keys"
 							target="_blank"
 							rel="noopener noreferrer"
 						>

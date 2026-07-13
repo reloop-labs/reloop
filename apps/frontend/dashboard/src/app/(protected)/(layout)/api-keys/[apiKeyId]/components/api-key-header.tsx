@@ -161,7 +161,7 @@ export const ApiKeyHeader = ({
 
 	const handleMenuItemClick = (itemId: string) => {
 		if (itemId === "docs") {
-			window.open("https://reloop.sh/docs/api-keys", "_blank");
+			window.open("https://reloop.sh/docs/learn/api-keys", "_blank");
 		} else if (itemId === "rotate") {
 			if (apiKey?.id) {
 				setRotateId(apiKey.id);
