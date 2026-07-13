@@ -40,11 +40,11 @@ type FakeRow = {
 };
 
 /**
- * Minimal db stand-in: transaction + query.findFirst for disable path.
+ * Minimal db stand-in for disable/delete mutator paths.
  * Not a full drizzle mock — only methods the mutator uses.
  */
 function createFakeDb(initial: FakeRow) {
-	let row = { ...initial };
+	let row: FakeRow | null = { ...initial };
 
 	const db = {
 		async transaction<T>(fn: (tx: typeof tx) => Promise<T>): Promise<T> {
@@ -52,10 +52,13 @@ function createFakeDb(initial: FakeRow) {
 		},
 		query: {
 			apikey: {
-				findFirst: async () => ({
-					...row,
-					user: row.user,
-				}),
+				findFirst: async () =>
+					row
+						? {
+								...row,
+								user: row.user,
+							}
+						: undefined,
 			},
 		},
 	};
@@ -68,7 +71,7 @@ function createFakeDb(initial: FakeRow) {
 						where() {
 							return {
 								for() {
-									return Promise.resolve([{ ...row }]);
+									return Promise.resolve(row ? [{ ...row }] : []);
 								},
 							};
 						},
@@ -83,6 +86,7 @@ function createFakeDb(initial: FakeRow) {
 						where() {
 							return {
 								returning() {
+									if (!row) return Promise.resolve([]);
 									row = {
 										...row,
 										...values,
@@ -97,12 +101,78 @@ function createFakeDb(initial: FakeRow) {
 				},
 			};
 		},
+		delete() {
+			return {
+				where() {
+					return {
+						returning() {
+							if (!row) return Promise.resolve([]);
+							const id = row.id;
+							row = null;
+							return Promise.resolve([{ id }]);
+						},
+					};
+				},
+			};
+		},
 	};
 
 	return {
 		db: db as never,
 		getRow: () => row,
 	};
+}
+
+function sampleRow(hashed: string, overrides: Partial<FakeRow> = {}): FakeRow {
+	const now = new Date();
+	return {
+		id: "key-1",
+		organizationId: "org-1",
+		userId: "user-1",
+		key: hashed,
+		enabled: true,
+		name: "test",
+		start: null,
+		prefix: null,
+		refillInterval: null,
+		refillAmount: null,
+		lastRefillAt: null,
+		rateLimitEnabled: true,
+		rateLimitTimeWindow: 1000,
+		rateLimitMax: 100,
+		requestCount: 0,
+		remaining: null,
+		lastRequest: null,
+		expiresAt: null,
+		createdAt: now,
+		updatedAt: now,
+		permissions: null,
+		metadata: null,
+		user: {
+			id: "user-1",
+			name: "Test",
+			image: null,
+			email: "t@example.com",
+		},
+		...overrides,
+	};
+}
+
+function stubValidateDb() {
+	return {
+		query: {
+			apikey: {
+				findFirst: async () => null,
+			},
+		},
+		update: () => ({
+			set: () => ({
+				where: () => ({
+					catch: () => {},
+				}),
+			}),
+		}),
+	} as never;
 }
 
 function memoryStore() {
@@ -404,5 +474,97 @@ describe("ApiKeyCredential.disable", () => {
 			organizationId: "org-1",
 		});
 		expect(result.row.enabled).toBe(false);
+	});
+});
+
+describe("ApiKeyCredential.delete", () => {
+	test("after delete, previously cached secret fails validateApiKey", async () => {
+		const raw = generateApiKey();
+		const hashed = hashApiKey(raw);
+		const entry: ApiKeyCredentialEntry = {
+			userId: "user-1",
+			organizationId: "org-1",
+			apiKeyId: "key-1",
+		};
+
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		await credentialCache.write(hashed, entry);
+
+		const before = await validateApiKey(raw, store, stubValidateDb());
+		expect(before?.authType).toBe("apikey");
+
+		const publishes: unknown[] = [];
+		const { db } = createFakeDb(sampleRow(hashed));
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache,
+			bus: {
+				publish: async (event, payload) => {
+					publishes.push({ event, payload });
+				},
+			},
+		});
+
+		const result = await credential.delete({
+			id: "key-1",
+			organizationId: "org-1",
+		});
+		expect(result).toEqual({ id: "key-1" });
+		expect(publishes).toEqual([
+			{
+				event: BusEvent.API_KEY_DELETED,
+				payload: { api_key_id: "key-1", organizationId: "org-1" },
+			},
+		]);
+
+		const after = await validateApiKey(raw, store, stubValidateDb());
+		expect(after).toBeNull();
+	});
+
+	test("invalidate failure fails the operation after DB delete", async () => {
+		const hashed = hashApiKey(generateApiKey());
+		const { db } = createFakeDb(sampleRow(hashed));
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache: {
+				read: async () => undefined,
+				write: async () => {},
+				invalidate: async () => {
+					throw new Error("redis down");
+				},
+			},
+			bus: {
+				publish: async () => {
+					throw new Error("should not publish");
+				},
+			},
+		});
+
+		await expect(
+			credential.delete({ id: "key-1", organizationId: "org-1" }),
+		).rejects.toMatchObject({
+			message: "Failed to revoke API key credential cache",
+		});
+	});
+
+	test("bus failure after successful invalidate still succeeds", async () => {
+		const hashed = hashApiKey(generateApiKey());
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		const { db } = createFakeDb(sampleRow(hashed));
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache,
+			bus: {
+				publish: async () => {
+					throw new Error("nats down");
+				},
+			},
+		});
+
+		await expect(
+			credential.delete({ id: "key-1", organizationId: "org-1" }),
+		).resolves.toEqual({ id: "key-1" });
 	});
 });
