@@ -9,7 +9,7 @@ export const getUsageRoute = new Elysia().use(authMiddleware).get(
 		return await getUsageController({ organizationId });
 	},
 	{
-		cookieAuth: true,
+		auth: true,
 		response: {
 			200: CreditsModel.usageResponse,
 			401: CreditsModel.unauthorized,

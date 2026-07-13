@@ -9,7 +9,7 @@ export const listTransactionsRoute = new Elysia().use(authMiddleware).get(
 		return await listTransactionsController({ organizationId });
 	},
 	{
-		cookieAuth: true,
+		auth: true,
 		response: {
 			200: CreditsModel.transactionsResponse,
 			401: CreditsModel.unauthorized,
