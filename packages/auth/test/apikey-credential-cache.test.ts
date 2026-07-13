@@ -170,4 +170,61 @@ describe("ApiKeyCredentialCache", () => {
 		const cache = createApiKeyCredentialCache(new MemoryRedis());
 		await expect(cache.invalidateByApiKeyId("missing-id")).resolves.toBeUndefined();
 	});
+
+	test("write confirms reverse index for hex that JSON.parse would treat as a number", async () => {
+		// Mimics RedisCache: bare strings that look like JSON numbers get parsed
+		// as numbers; reverse index must store an object so hashes stay strings.
+		const data = new Map<string, string>();
+		const store: ApiKeyCredentialStore = {
+			async get<T>(key: string) {
+				const raw = data.get(key);
+				if (raw === undefined) return undefined;
+				try {
+					return JSON.parse(raw) as T;
+				} catch {
+					return raw as unknown as T;
+				}
+			},
+			async set(key, value) {
+				const serialized =
+					typeof value === "string" ? value : JSON.stringify(value);
+				data.set(key, serialized);
+			},
+			async delete(key) {
+				data.delete(key);
+			},
+		};
+		const cache = createApiKeyCredentialCache(store);
+		// Pure digits + scientific-notation "e" — JSON.parse yields Infinity/number
+		const sciHash =
+			"123e45678901234567890123456789012345678901234567890123456789012";
+
+		await cache.write(sciHash, sampleEntry);
+		await expect(cache.read(sciHash)).resolves.toEqual(sampleEntry);
+		await cache.invalidateByApiKeyId("key-1");
+		await expect(cache.read(sciHash)).resolves.toBeUndefined();
+	});
+
+	test("invalidateByApiKeyId accepts legacy bare-string reverse indexes", async () => {
+		const data = new Map<string, unknown>();
+		const store: ApiKeyCredentialStore = {
+			async get<T>(key: string) {
+				return data.get(key) as T | undefined;
+			},
+			async set(key, value) {
+				data.set(key, value);
+			},
+			async delete(key) {
+				data.delete(key);
+			},
+		};
+		// Pre-envelope reverse index: raw hashed secret string
+		data.set("apikey:v1:legacyhash", sampleEntry);
+		data.set("apikey:v1:id:key-1", "legacyhash");
+
+		const cache = createApiKeyCredentialCache(store);
+		await cache.invalidateByApiKeyId("key-1");
+		expect(data.has("apikey:v1:legacyhash")).toBe(false);
+		expect(data.has("apikey:v1:id:key-1")).toBe(false);
+	});
 });

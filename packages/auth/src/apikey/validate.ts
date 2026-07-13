@@ -81,7 +81,13 @@ export async function validateApiKey(
 			organizationId: apiKeyRecord.organizationId,
 			apiKeyId: apiKeyRecord.id,
 		};
-		await credentialCache.write(hashedKey, entry);
+		// Cache is acceleration only — never fail closed on write.
+		// Invalidate (revoke) is the fail-closed path; auth must honor DB truth.
+		try {
+			await credentialCache.write(hashedKey, entry);
+		} catch (err) {
+			console.error("Failed to cache API key credential:", err);
+		}
 
 		db.update(apikey)
 			.set({

@@ -27,6 +27,27 @@ export type ApiKeyCredentialEntry = {
 };
 
 /**
+ * Reverse index payload (apiKeyId → hashed secret).
+ * Stored as an object so RedisCache JSON round-trips never mis-parse a raw hex
+ * string as a number (e.g. scientific notation).
+ */
+export type ApiKeyCredentialReverseEntry = {
+	hashedKey: string;
+};
+
+/** Accept object form and legacy bare-string reverse indexes. */
+function parseReverseEntry(
+	value: ApiKeyCredentialReverseEntry | string | undefined,
+): string | undefined {
+	if (value == null) return undefined;
+	if (typeof value === "string") return value;
+	if (typeof value === "object" && typeof value.hashedKey === "string") {
+		return value.hashedKey;
+	}
+	return undefined;
+}
+
+/**
  * Low-level store (e.g. AuthRedis / MemoryRedis).
  * `set` / `delete` must reject when the operation cannot be confirmed for fail-closed paths.
  */
@@ -117,9 +138,10 @@ export function createApiKeyCredentialCache(
 
 			// Primary first, then reverse index, then verify both so we never leave
 			// a valid credential without a recoverable id→hash mapping.
+			const reverseEntry: ApiKeyCredentialReverseEntry = { hashedKey };
 			try {
 				await store.set(hashKey, entry, ttlSeconds);
-				await store.set(idKey, hashedKey, ttlSeconds);
+				await store.set(idKey, reverseEntry, ttlSeconds);
 			} catch (cause) {
 				// Best-effort compensate if reverse failed after primary
 				try {
@@ -139,7 +161,9 @@ export function createApiKeyCredentialCache(
 			}
 
 			const primary = await store.get<ApiKeyCredentialEntry>(hashKey);
-			const reverse = await store.get<string>(idKey);
+			const reverse = parseReverseEntry(
+				await store.get<ApiKeyCredentialReverseEntry | string>(idKey),
+			);
 			if (
 				!primary ||
 				primary.apiKeyId !== entry.apiKeyId ||
@@ -172,7 +196,9 @@ export function createApiKeyCredentialCache(
 
 		async invalidateByApiKeyId(apiKeyId) {
 			const indexKey = apiKeyCredentialIdIndexKey(apiKeyId);
-			const hashedKey = await store.get<string>(indexKey);
+			const hashedKey = parseReverseEntry(
+				await store.get<ApiKeyCredentialReverseEntry | string>(indexKey),
+			);
 
 			if (!hashedKey) {
 				// No reverse index: under verified writes (primary + reverse confirmed

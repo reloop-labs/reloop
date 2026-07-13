@@ -134,6 +134,20 @@ describe("evictionEventFromAuthPath (lifecycle mapping)", () => {
 		});
 	});
 
+	test("maps /sign-out with __Secure- session cookie (HTTPS Better Auth)", () => {
+		const event = evictionEventFromAuthPath({
+			path: "/sign-out",
+			cookieHeader:
+				"__Secure-reloop.session_token=secureTok.sig%3D; other=1",
+			userId: "u1",
+		});
+		expect(event).toEqual({
+			type: "logout",
+			sessionToken: "secureTok",
+			userId: "u1",
+		});
+	});
+
 	test("maps /change-password and /reset-password to password-change", () => {
 		expect(
 			evictionEventFromAuthPath({ path: "/change-password", userId: "u" }),
