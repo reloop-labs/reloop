@@ -10,8 +10,9 @@ import { useMemo, useRef, useState } from "react";
 const list = [
 	{
 		title: "Workspace",
-		path: "/settings",
+		path: "/settings/workspace",
 		iconName: "gear",
+		requiresOrgAdmin: true,
 	},
 	{
 		title: "Teams",
@@ -43,7 +44,7 @@ export const SettingsTabs = () => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const fromParam = searchParams.get("from");
-	const { canManageTeam, canManageBilling, isPending } = useOrgPermissions();
+	const { canManageTeam, canManageWorkspace, isPending } = useOrgPermissions();
 
 	const visibleList = useMemo(
 		() =>
@@ -51,12 +52,12 @@ export const SettingsTabs = () => {
 				if ("requiresTeamAdmin" in item && item.requiresTeamAdmin) {
 					return canManageTeam;
 				}
-				if ("requiresBillingAdmin" in item && item.requiresBillingAdmin) {
-					return canManageBilling;
+				if ("requiresOrgAdmin" in item && item.requiresOrgAdmin) {
+					return canManageWorkspace;
 				}
 				return true;
 			}),
-		[canManageTeam, canManageBilling],
+		[canManageTeam, canManageWorkspace],
 	);
 
 	const activeIndex = visibleList.findIndex((item) => item.path === pathname);

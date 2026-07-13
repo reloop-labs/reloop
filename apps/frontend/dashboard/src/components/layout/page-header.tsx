@@ -1,5 +1,10 @@
 "use client";
 
+import {
+	SETTINGS_ADMIN_HOME,
+	SETTINGS_MEMBER_HOME,
+} from "@fe/dashboard/constants/navigation";
+import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { useSupportUnread } from "@fe/dashboard/hooks/use-support-unread";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { useUIStore } from "@fe/dashboard/store/use-ui-store";
@@ -22,6 +27,9 @@ export const PageHeader = () => {
 	const { organizations, activeOrganization, onOrganizationChange } =
 		useUserOrganization();
 	const { unreadCount } = useSupportUnread();
+	const { isOrgAdmin, isPending: rolePending } = useOrgPermissions();
+	const settingsHome =
+		!rolePending && !isOrgAdmin ? SETTINGS_MEMBER_HOME : SETTINGS_ADMIN_HOME;
 
 	return (
 		<div className="sticky top-0 z-10 flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b pr-3 pl-3 dark:border-stroke-soft-100/40">
@@ -41,7 +49,7 @@ export const PageHeader = () => {
 
 				{/* Settings Button */}
 				<Link
-					href={`/settings?from=${encodeURIComponent(pathname)}`}
+					href={`${settingsHome}?from=${encodeURIComponent(pathname)}`}
 					title="Settings"
 					className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
 				>

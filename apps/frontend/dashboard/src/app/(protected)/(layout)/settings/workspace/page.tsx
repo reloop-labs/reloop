@@ -1,5 +1,7 @@
 "use client";
 
+import { SETTINGS_MEMBER_HOME } from "@fe/dashboard/constants/navigation";
+import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { authClient } from "@reloop/auth/client";
@@ -9,7 +11,8 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
@@ -279,8 +282,20 @@ const WorkspaceForm = ({
 // ---------- Page ----------
 
 const SettingsPage = () => {
+	const router = useRouter();
+	const { canManageWorkspace, isPending: rolePending } = useOrgPermissions();
 	const { activeOrganization, isLoading, mutateOrganizations } =
 		useUserOrganization();
+
+	useEffect(() => {
+		if (!rolePending && !canManageWorkspace) {
+			router.replace(SETTINGS_MEMBER_HOME);
+		}
+	}, [canManageWorkspace, rolePending, router]);
+
+	if (rolePending || !canManageWorkspace) {
+		return null;
+	}
 
 	if (isLoading || !activeOrganization) {
 		return <SettingsSkeleton />;

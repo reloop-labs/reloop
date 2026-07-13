@@ -1,5 +1,6 @@
 "use client";
 
+import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import {
 	getAvatarGradient,
@@ -13,9 +14,7 @@ import {
 } from "@fe/dashboard/utils/invitations";
 import { authClient } from "@reloop/auth/client";
 import * as Avatar from "@reloop/ui/avatar";
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
-import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useQueryState } from "nuqs";
@@ -73,9 +72,10 @@ const formatRoleLabel = (role: string) => {
 	}
 };
 
-const GRID = "grid-cols-[minmax(0,1fr)_100px_130px_32px]";
-const BORDER = "border-stroke-soft-100 dark:border-stroke-soft-100/50";
-const DIVIDER = "divide-stroke-soft-100 dark:divide-stroke-soft-100/50";
+const primaryRole = (role: string) =>
+	role.split(",")[0]?.trim().toLowerCase() ?? role.toLowerCase();
+
+const GRID = "grid-cols-[minmax(0,1fr)_120px_130px_32px]";
 
 const TeamSkeleton = () => (
 	<div className={`grid ${GRID} items-center px-4 py-2`}>
@@ -91,19 +91,48 @@ const TeamSkeleton = () => (
 			<Skeleton className="h-2 w-2 rounded-full" />
 			<Skeleton className="h-3 w-24" />
 		</div>
-		<Skeleton className="h-4 w-4 rounded" />
+		<div className="flex items-center justify-center">
+			<Skeleton className="h-4 w-4 rounded" />
+		</div>
 	</div>
 );
 
+const TableHeader = () => (
+	<div
+		className={`grid ${GRID} items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-white/[0.03]`}
+	>
+		<div className="flex items-center gap-1">
+			<Icon name="user" className="h-3 w-3" />
+			<span className="text-xs">User</span>
+		</div>
+		<div className="flex items-center gap-1">
+			<Icon name="user-role" className="h-3 w-3" />
+			<span className="text-xs">Role</span>
+		</div>
+		<div className="flex items-center gap-1">
+			<Icon name="activity" className="h-3 w-3" />
+			<span className="text-xs">Status</span>
+		</div>
+		<div />
+	</div>
+);
+
+import {
+	type AssignableRole,
+	ChangeRoleModal,
+} from "./change-role-modal";
 import { InviteDropdown } from "./invite-dropdown";
+import { MemberDropdown } from "./member-dropdown";
 import { RemoveMemberModal } from "./remove-member-modal";
 import { RevokeInviteModal } from "./revoke-invite-modal";
 
 export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 	const { activeOrganization } = useUserOrganization();
+	const { canManageTeam, isOwner } = useOrgPermissions();
 	const [removingMember, setRemovingMember] = useState<string | null>(null);
 	const [cancellingInvite, setCancellingInvite] = useState<string | null>(null);
 	const [resendingInvite, setResendingInvite] = useState<string | null>(null);
+	const [updatingRole, setUpdatingRole] = useState(false);
 	const [modal, setModal] = useQueryState("modal", { history: "replace" });
 	const [inviteId, setInviteId] = useQueryState("inviteId", {
 		history: "replace",
@@ -114,6 +143,13 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 		name: string | null;
 		email: string;
 	} | null>(null);
+	const [changeRoleModalOpen, setChangeRoleModalOpen] = useState(false);
+	const [memberToChangeRole, setMemberToChangeRole] = useState<Member | null>(
+		null,
+	);
+	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(
+		null,
+	);
 
 	// Fetch members
 	const {
@@ -243,6 +279,70 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 		await handleRemoveMember(memberToRemove.id);
 	};
 
+	/**
+	 * Whether the current user can change this member's role.
+	 * - Owners/admins manage the team
+	 * - Owner role is fixed (cannot reassign here)
+	 * - You cannot change your own role
+	 * - Only owners can demote other admins (admins cannot update owners anyway)
+	 */
+	const canChangeMemberRole = (member: Member) => {
+		if (!canManageTeam) return false;
+		if (member.user.id === currentUserId) return false;
+		const role = primaryRole(member.role);
+		if (role === "owner") return false;
+		if (role === "admin" && !isOwner) return false;
+		return true;
+	};
+
+	const handleChangeRoleClick = (memberId: string) => {
+		const member = membersData?.members?.find((m) => m.id === memberId);
+		if (!member) return;
+		setMemberToChangeRole(member);
+		setChangeRoleModalOpen(true);
+	};
+
+	const handleRemoveMemberById = (memberId: string) => {
+		const member = membersData?.members?.find((m) => m.id === memberId);
+		if (!member) return;
+		handleRemoveMemberClick(member);
+	};
+
+	const handleConfirmChangeRole = async (role: AssignableRole) => {
+		const member = memberToChangeRole;
+		if (!member || !activeOrganization?.id) return;
+		if (primaryRole(member.role) === role) {
+			setChangeRoleModalOpen(false);
+			setMemberToChangeRole(null);
+			return;
+		}
+
+		setUpdatingRole(true);
+		try {
+			const { error } = await authClient.organization.updateMemberRole({
+				memberId: member.id,
+				role,
+				organizationId: activeOrganization.id,
+			});
+			if (error) {
+				toast.error(error.message || "Failed to update role");
+				return;
+			}
+			const displayName =
+				member.user.name || member.user.email.split("@")[0] || member.user.email;
+			toast.success(
+				`Updated ${displayName} to ${formatRoleLabel(role).toLowerCase()}`,
+			);
+			mutateMembers();
+			setChangeRoleModalOpen(false);
+			setMemberToChangeRole(null);
+		} catch {
+			toast.error("Failed to update role");
+		} finally {
+			setUpdatingRole(false);
+		}
+	};
+
 	const handleCancelInvite = async (invitationId: string) => {
 		setCancellingInvite(invitationId);
 		try {
@@ -329,27 +429,9 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 
 	if (isLoading) {
 		return (
-			<div
-				className={`w-full overflow-hidden rounded-xl border text-paragraph-sm ${BORDER}`}
-			>
-				<div
-					className={`grid ${GRID} items-center border-b bg-bg-weak-50/50 px-4 py-2.5 text-text-sub-600 dark:bg-bg-weak-50/40 ${BORDER}`}
-				>
-					<div className="flex items-center gap-1">
-						<Icon name="user" className="h-3 w-3" />
-						<span className="font-medium text-xs tracking-wide">User</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<Icon name="user-role" className="h-3 w-3" />
-						<span className="font-medium text-xs tracking-wide">Role</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<Icon name="activity" className="h-3 w-3" />
-						<span className="font-medium text-xs tracking-wide">Status</span>
-					</div>
-					<div />
-				</div>
-				<div className={`divide-y ${DIVIDER}`}>
+			<div className="w-full text-paragraph-sm">
+				<TableHeader />
+				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
 					{Array.from({ length: 3 }).map((_, index) => (
 						<TeamSkeleton key={`skeleton-${index}`} />
 					))}
@@ -363,62 +445,46 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 
 	return (
 		<div>
-			<div
-				className={`w-full overflow-hidden rounded-xl border text-paragraph-sm ${BORDER}`}
-			>
-				<div
-					className={`grid ${GRID} items-center border-b bg-bg-weak-50/50 px-4 py-2.5 text-text-sub-600 dark:bg-bg-weak-50/40 ${BORDER}`}
-				>
-					<div className="flex items-center gap-1">
-						<Icon name="user" className="h-3 w-3" />
-						<span className="font-medium text-xs tracking-wide">User</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<Icon name="user-role" className="h-3 w-3" />
-						<span className="font-medium text-xs tracking-wide">Role</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<Icon name="activity" className="h-3 w-3" />
-						<span className="font-medium text-xs tracking-wide">Status</span>
-					</div>
-					<div />
-				</div>
+			<div className="w-full text-paragraph-sm">
+				<TableHeader />
 
-				{/* Combined List or Empty State */}
-				{noResults ? (
-					<div className="flex flex-col items-center justify-center py-16">
-						<div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50">
-							<Icon
-								name={searchQuery ? "search" : "users"}
-								className="h-6 w-6 text-text-sub-600"
-							/>
+				{/* Table body — stacked over header with rounded corners (same as domains) */}
+				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+					{noResults ? (
+						<div className="flex flex-col items-center justify-center py-16">
+							<div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-weak-50">
+								<Icon
+									name={searchQuery ? "search" : "users"}
+									className="h-6 w-6 text-text-sub-600"
+								/>
+							</div>
+							<p className="mt-4 font-medium text-text-strong-950">
+								{searchQuery ? "No results found" : "No team members yet"}
+							</p>
+							<p className="mt-1 text-sm text-text-sub-600">
+								{searchQuery
+									? "Try a different search term"
+									: "Invite members to get started"}
+							</p>
 						</div>
-						<p className="mt-4 font-medium text-text-strong-950">
-							{searchQuery ? "No results found" : "No team members yet"}
-						</p>
-						<p className="mt-1 text-sm text-text-sub-600">
-							{searchQuery
-								? "Try a different search term"
-								: "Invite members to get started"}
-						</p>
-					</div>
-				) : (
-					<div className={`divide-y ${DIVIDER}`}>
+					) : (
+						<>
 						{/* Pending Invites */}
 						{filteredData.invites.map((invite, index) => {
 							const expired = isInvitationExpiredPending(invite);
 							const actionable = isInvitationActionable(invite);
+							const rowId = invite.id
+								? `invite-${invite.id}`
+								: `invite-idx-${index}`;
+							const isRowActive = activeDropdownId === rowId;
 
 							return (
 								<div
-									key={
-										invite.id && invite.id.length > 0
-											? `invite-${invite.id}`
-											: `invite-idx-${index}`
-									}
+									key={rowId}
 									className={cn(
-										`group/row grid ${GRID} items-center px-4 py-2 transition-colors`,
+										`group/row grid ${GRID} items-center px-4 py-2 text-left transition-colors`,
 										"hover:bg-bg-weak-50/50",
+										isRowActive && "bg-bg-weak-50/50",
 									)}
 								>
 									{/* User Column */}
@@ -467,7 +533,7 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 									</div>
 
 									{/* Actions Column */}
-									<div className="flex items-center justify-end">
+									<div className="flex items-center justify-center text-text-soft-400">
 										<InviteDropdown
 											inviteId={invite.id}
 											onResendInvite={handleResendInvite}
@@ -476,6 +542,9 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 											}
 											onRevokeInvite={handleRevokeInviteClick}
 											isResending={resendingInvite === invite.id}
+											onOpenChange={(open) =>
+												setActiveDropdownId(open ? rowId : null)
+											}
 										/>
 									</div>
 								</div>
@@ -484,20 +553,22 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 
 						{/* Members */}
 						{filteredData.members.map((member, index) => {
-							const isOwner = member.role.toLowerCase() === "owner";
+							const memberIsOwner = primaryRole(member.role) === "owner";
 							const isCurrentUser = member.user.id === currentUserId;
+							const canEditRole = canChangeMemberRole(member);
+							const rowId =
+								member.id && member.id.length > 0
+									? `member-${member.id}`
+									: `member-idx-${index}`;
+							const isRowActive = activeDropdownId === rowId;
 
 							return (
 								<div
-									key={
-										member.id && member.id.length > 0
-											? `member-${member.id}`
-											: `member-idx-${index}`
-									}
+									key={rowId}
 									className={cn(
-										`group/row grid ${GRID} items-center px-4 py-2 transition-colors`,
+										`group/row grid ${GRID} items-center px-4 py-2 text-left transition-colors`,
 										"hover:bg-bg-weak-50/50",
-										isCurrentUser && "bg-bg-weak-50/40",
+										(isRowActive || isCurrentUser) && "bg-bg-weak-50/50",
 									)}
 								>
 									{/* User Column */}
@@ -553,7 +624,7 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 												getRoleBadgeStyles(member.role),
 											)}
 										>
-											{formatRoleLabel(member.role)}
+											{formatRoleLabel(primaryRole(member.role))}
 										</span>
 									</div>
 
@@ -566,35 +637,25 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 									</div>
 
 									{/* Actions Column */}
-									<div className="flex items-center justify-end">
-										{!isOwner && !isCurrentUser && (
-											<Dropdown.Root>
-												<Dropdown.Trigger asChild>
-													<Button.Root
-														variant="neutral"
-														mode="ghost"
-														size="xxsmall"
-													>
-														<Icon name="more-horizontal" className="h-3 w-3" />
-													</Button.Root>
-												</Dropdown.Trigger>
-												<Dropdown.Content align="end" className="w-52 text-xs">
-													<Dropdown.Item
-														className="text-error-base"
-														onClick={() => handleRemoveMemberClick(member)}
-													>
-														<Icon name="user-minus" className="h-3 w-3" />
-														Remove from organization
-													</Dropdown.Item>
-												</Dropdown.Content>
-											</Dropdown.Root>
+									<div className="flex items-center justify-center text-text-soft-400">
+										{!memberIsOwner && !isCurrentUser && canManageTeam && (
+											<MemberDropdown
+												memberId={member.id}
+												canChangeRole={canEditRole}
+												onChangeRole={handleChangeRoleClick}
+												onRemove={handleRemoveMemberById}
+												onOpenChange={(open) =>
+													setActiveDropdownId(open ? rowId : null)
+												}
+											/>
 										)}
 									</div>
 								</div>
 							);
 						})}
-					</div>
-				)}
+						</>
+					)}
+				</div>
 			</div>
 			<RevokeInviteModal
 				open={modal === "revoke-invite"}
@@ -619,6 +680,22 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 				isRemoving={removingMember === memberToRemove?.id}
 				memberName={memberToRemove?.name ?? ""}
 				memberEmail={memberToRemove?.email ?? ""}
+			/>
+			<ChangeRoleModal
+				open={changeRoleModalOpen}
+				onOpenChange={(open) => {
+					setChangeRoleModalOpen(open);
+					if (!open) setMemberToChangeRole(null);
+				}}
+				onConfirm={handleConfirmChangeRole}
+				isUpdating={updatingRole}
+				memberName={memberToChangeRole?.user.name ?? ""}
+				memberEmail={memberToChangeRole?.user.email ?? ""}
+				currentRole={
+					memberToChangeRole
+						? primaryRole(memberToChangeRole.role)
+						: "member"
+				}
 			/>
 		</div>
 	);

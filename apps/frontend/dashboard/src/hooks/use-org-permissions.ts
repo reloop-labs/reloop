@@ -33,6 +33,9 @@ export function useOrgPermissions() {
 		const isMember = roleIncludes(role, ["member"]);
 		const canManageTeam = isOwner || isAdmin;
 		const canManageBilling = isOwner || isAdmin;
+		// Workspace name/slug/logo + org-level settings (owner/admin only).
+		const canManageWorkspace = isOwner || isAdmin;
+		const isOrgAdmin = isOwner || isAdmin;
 
 		const typedRole = role ? asOrgRole(role) : null;
 		const canInvite = typedRole
@@ -49,8 +52,10 @@ export function useOrgPermissions() {
 			isOwner,
 			isAdmin,
 			isMember,
+			isOrgAdmin,
 			canManageTeam,
 			canManageBilling,
+			canManageWorkspace,
 			canInvite,
 		};
 	}, [role, isPending, error]);

@@ -1,6 +1,11 @@
 "use client";
 
-import { mainNavigation, settingsNavigation } from "@fe/dashboard/constants";
+import {
+	mainNavigation,
+	SETTINGS_ADMIN_HOME,
+	SETTINGS_MEMBER_HOME,
+	settingsNavigation,
+} from "@fe/dashboard/constants";
 import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -28,7 +33,14 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 
 	const pathname = usePathname();
 	const pathWithoutSlug = pathname;
-	const { canManageTeam, canManageBilling } = useOrgPermissions();
+	const {
+		canManageTeam,
+		canManageBilling,
+		isOrgAdmin,
+		isPending: rolePending,
+	} = useOrgPermissions();
+	const settingsHome =
+		!rolePending && !isOrgAdmin ? SETTINGS_MEMBER_HOME : SETTINGS_ADMIN_HOME;
 
 	const navigation = useMemo(
 		() =>
@@ -138,7 +150,7 @@ export const SidebarItems: React.FC<SidebarItemsProps> = ({
 						<Link
 							href={
 								path === "/settings"
-									? `/settings?from=${encodeURIComponent(pathname)}`
+									? `${settingsHome}?from=${encodeURIComponent(pathname)}`
 									: path
 							}
 							ref={(el) => {
@@ -315,8 +327,9 @@ export const SettingsSidebarItems: React.FC<SidebarItemsProps> = ({
 				...section,
 				items: section.items.filter((item) => {
 					if (item.requiresTeamAdmin) return canManageTeam;
-					if (item.path === "/settings" || item.path === "/settings/billing") {
-						return canManageBilling;
+					if (item.requiresOrgAdmin) {
+						// Usage / billing / workspace are owner-admin only.
+						return canManageBilling || canManageTeam;
 					}
 					return true;
 				}),

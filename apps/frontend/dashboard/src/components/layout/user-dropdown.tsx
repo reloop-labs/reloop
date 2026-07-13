@@ -20,7 +20,8 @@ import { AnimatedHoverBackground } from "../animated-hover-background";
 
 export const UserDropdown = () => {
 	const { user } = useUserOrganization();
-	const { canManageBilling, canManageTeam } = useOrgPermissions();
+	const { canManageBilling, canManageTeam, canManageWorkspace } =
+		useOrgPermissions();
 	const { theme, setTheme, resolvedTheme } = useTheme();
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -98,81 +99,97 @@ export const UserDropdown = () => {
 				</div>
 				<div className="h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
 				<div className="relative">
-					{/* Workspace Section */}
-					<Dropdown.Label className="px-2.5 pt-2 pb-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">
-						Workspace
-					</Dropdown.Label>
-					<Dropdown.Group className="gap-0">
-						<Dropdown.Item
-							ref={(el) => {
-								if (el) itemRefs.current[0] = el;
-							}}
-							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-							onPointerEnter={() => setHoverIdx(0)}
-							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => handleAction(getHref("/settings"), undefined)}
-						>
-							<Icon name="doughnut" className="h-4 w-4 text-text-sub-600" />
-							<span className="flex-1 truncate text-sm">Usage</span>
-						</Dropdown.Item>
+					{/* Workspace Section — only for org admins */}
+					{(canManageBilling || canManageTeam || canManageWorkspace) && (
+						<>
+							<Dropdown.Label className="px-2.5 pt-2 pb-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">
+								Workspace
+							</Dropdown.Label>
+							<Dropdown.Group className="gap-0">
+								{canManageBilling && (
+									<Dropdown.Item
+										ref={(el) => {
+											if (el) itemRefs.current[0] = el;
+										}}
+										className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+										onPointerEnter={() => setHoverIdx(0)}
+										onPointerLeave={() => setHoverIdx(undefined)}
+										onClick={() =>
+											handleAction(getHref("/settings"), undefined)
+										}
+									>
+										<Icon
+											name="doughnut"
+											className="h-4 w-4 text-text-sub-600"
+										/>
+										<span className="flex-1 truncate text-sm">Usage</span>
+									</Dropdown.Item>
+								)}
 
-						{canManageBilling && (
-							<Dropdown.Item
-								ref={(el) => {
-									if (el) itemRefs.current[1] = el;
-								}}
-								className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-								onPointerEnter={() => setHoverIdx(1)}
-								onPointerLeave={() => setHoverIdx(undefined)}
-								onClick={() =>
-									handleAction(getHref("/settings/billing"), undefined)
-								}
-							>
-								<Icon
-									name="billing-custom"
-									className="h-4 w-4 text-text-sub-600"
-								/>
-								<span className="flex-1 truncate text-sm">Billing</span>
-							</Dropdown.Item>
-						)}
+								{canManageBilling && (
+									<Dropdown.Item
+										ref={(el) => {
+											if (el) itemRefs.current[1] = el;
+										}}
+										className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+										onPointerEnter={() => setHoverIdx(1)}
+										onPointerLeave={() => setHoverIdx(undefined)}
+										onClick={() =>
+											handleAction(getHref("/settings/billing"), undefined)
+										}
+									>
+										<Icon
+											name="billing-custom"
+											className="h-4 w-4 text-text-sub-600"
+										/>
+										<span className="flex-1 truncate text-sm">Billing</span>
+									</Dropdown.Item>
+								)}
 
-						{canManageTeam && (
-							<Dropdown.Item
-								ref={(el) => {
-									if (el) itemRefs.current[2] = el;
-								}}
-								className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-								onPointerEnter={() => setHoverIdx(2)}
-								onPointerLeave={() => setHoverIdx(undefined)}
-								onClick={() =>
-									handleAction(getHref("/settings/teams"), undefined)
-								}
-							>
-								<Icon name="users" className="h-4 w-4 text-text-sub-600" />
-								<span className="flex-1 truncate text-sm">Teams</span>
-							</Dropdown.Item>
-						)}
+								{canManageTeam && (
+									<Dropdown.Item
+										ref={(el) => {
+											if (el) itemRefs.current[2] = el;
+										}}
+										className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+										onPointerEnter={() => setHoverIdx(2)}
+										onPointerLeave={() => setHoverIdx(undefined)}
+										onClick={() =>
+											handleAction(getHref("/settings/teams"), undefined)
+										}
+									>
+										<Icon name="users" className="h-4 w-4 text-text-sub-600" />
+										<span className="flex-1 truncate text-sm">Teams</span>
+									</Dropdown.Item>
+								)}
 
-						<Dropdown.Item
-							ref={(el) => {
-								if (el) itemRefs.current[3] = el;
-							}}
-							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-							onPointerEnter={() => setHoverIdx(3)}
-							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() =>
-								handleAction(getHref("/settings/workspace"), undefined)
-							}
-						>
-							<Icon
-								name="workspace-custom"
-								className="h-4 w-4 text-text-sub-600"
-							/>
-							<span className="flex-1 truncate text-sm">Workspace</span>
-						</Dropdown.Item>
-					</Dropdown.Group>
+								{canManageWorkspace && (
+									<Dropdown.Item
+										ref={(el) => {
+											if (el) itemRefs.current[3] = el;
+										}}
+										className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
+										onPointerEnter={() => setHoverIdx(3)}
+										onPointerLeave={() => setHoverIdx(undefined)}
+										onClick={() =>
+											handleAction(
+												getHref("/settings/workspace"),
+												undefined,
+											)
+										}
+									>
+										<Icon
+											name="workspace-custom"
+											className="h-4 w-4 text-text-sub-600"
+										/>
+										<span className="flex-1 truncate text-sm">Workspace</span>
+									</Dropdown.Item>
+								)}
+							</Dropdown.Group>
 
-					<div className="my-1.5 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+							<div className="my-1.5 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+						</>
+					)}
 
 					{/* Account Section */}
 					<Dropdown.Label className="px-2.5 pt-1.5 pb-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">

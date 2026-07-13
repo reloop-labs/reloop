@@ -1,5 +1,9 @@
 "use client";
 
+import {
+	SETTINGS_ADMIN_HOME,
+	SETTINGS_MEMBER_HOME,
+} from "@fe/dashboard/constants/navigation";
 import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import {
 	getAvatarGradient,
@@ -31,7 +35,10 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 	user,
 	isCollapsed = false,
 }) => {
-	const { canManageBilling } = useOrgPermissions();
+	const { canManageBilling, isOrgAdmin, isPending: rolePending } =
+		useOrgPermissions();
+	const settingsHome =
+		!rolePending && !isOrgAdmin ? SETTINGS_MEMBER_HOME : SETTINGS_ADMIN_HOME;
 	const { theme, setTheme } = useTheme();
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -191,7 +198,7 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
 							onPointerEnter={() => setHoverIdx(2)}
 							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => router.push(getHref("/settings"))}
+							onClick={() => router.push(getHref(settingsHome))}
 						>
 							<Icon name="gear" className="h-4 w-4 text-text-sub-600" />
 							<span className="flex-1 truncate text-sm">Settings</span>

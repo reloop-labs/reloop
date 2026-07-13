@@ -1,5 +1,6 @@
 "use client";
 
+import { SETTINGS_MEMBER_HOME } from "@fe/dashboard/constants/navigation";
 import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
@@ -24,7 +25,7 @@ const Team = () => {
 
 	useEffect(() => {
 		if (!isPending && !canManageTeam) {
-			router.replace("/settings");
+			router.replace(SETTINGS_MEMBER_HOME);
 		}
 	}, [canManageTeam, isPending, router]);
 

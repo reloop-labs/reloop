@@ -5,59 +5,49 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Popover from "@reloop/ui/popover";
-import Spinner from "@reloop/ui/spinner";
 import { useRef, useState } from "react";
 
-export interface InviteDropdownProps {
-	inviteId: string;
-	onResendInvite: (id: string) => Promise<void>;
-	/** Omit for expired invites — the link is no longer usable. */
-	onCopyInviteLink?: (id: string) => void;
-	onRevokeInvite: (id: string) => void;
-	isResending: boolean;
+export interface MemberDropdownProps {
+	memberId: string;
+	canChangeRole: boolean;
+	onChangeRole: (id: string) => void;
+	onRemove: (id: string) => void;
 	onOpenChange?: (open: boolean) => void;
 }
 
-const inviteMenuItems = [
-	{
-		id: "resend",
-		label: "Resend invite",
-		icon: "mail-single" as const,
-		isDanger: false,
-	},
-	{
-		id: "copy",
-		label: "Copy invite link",
-		icon: "link" as const,
-		isDanger: false,
-	},
-	{
-		id: "revoke",
-		label: "Revoke invite",
-		icon: "cross-circle" as const,
-		isDanger: true,
-	},
-] as const;
-
-export const InviteDropdown = ({
-	inviteId,
-	onResendInvite,
-	onCopyInviteLink,
-	onRevokeInvite,
-	isResending,
+export const MemberDropdown = ({
+	memberId,
+	canChangeRole,
+	onChangeRole,
+	onRemove,
 	onOpenChange,
-}: InviteDropdownProps) => {
+}: MemberDropdownProps) => {
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
-	const visibleItems = inviteMenuItems.filter(
-		(item) => item.id !== "copy" || Boolean(onCopyInviteLink),
-	);
+	const menuItems = [
+		...(canChangeRole
+			? [
+					{
+						id: "change-role" as const,
+						label: "Change role",
+						icon: "user-role" as const,
+						isDanger: false,
+					},
+				]
+			: []),
+		{
+			id: "remove" as const,
+			label: "Remove member",
+			icon: "user-minus" as const,
+			isDanger: true,
+		},
+	];
 
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
-	const hoveredItem = visibleItems[hoverIdx ?? -1];
+	const hoveredItem = menuItems[hoverIdx ?? -1];
 	const isDanger = hoveredItem?.isDanger ?? false;
 
 	const handleOpenChange = (open: boolean) => {
@@ -65,16 +55,13 @@ export const InviteDropdown = ({
 		onOpenChange?.(open);
 	};
 
-	const handleItemClick = async (itemId: string) => {
-		if (itemId === "revoke") {
+	const handleItemClick = (itemId: string) => {
+		if (itemId === "remove") {
 			handleOpenChange(false);
-			onRevokeInvite(inviteId);
-		} else if (itemId === "copy") {
-			onCopyInviteLink?.(inviteId);
+			onRemove(memberId);
+		} else if (itemId === "change-role") {
 			handleOpenChange(false);
-		} else if (itemId === "resend") {
-			await onResendInvite(inviteId);
-			handleOpenChange(false);
+			onChangeRole(memberId);
 		}
 	};
 
@@ -100,7 +87,7 @@ export const InviteDropdown = ({
 				showArrow
 			>
 				<div className="relative">
-					{visibleItems.map((item, idx) => (
+					{menuItems.map((item, idx) => (
 						<button
 							key={item.id}
 							ref={(el) => {
@@ -110,29 +97,21 @@ export const InviteDropdown = ({
 							onPointerEnter={() => setHoverIdx(idx)}
 							onPointerLeave={() => setHoverIdx(undefined)}
 							onClick={() => handleItemClick(item.id)}
-							disabled={item.id === "resend" && isResending}
 							className={cn(
 								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
 								item.isDanger ? "text-error-base" : "text-text-strong-950",
 								!currentRect &&
 									hoverIdx === idx &&
 									(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
-								isResending &&
-									item.id === "resend" &&
-									"cursor-not-allowed opacity-50",
 							)}
 						>
-							{item.id === "resend" && isResending ? (
-								<Spinner size={14} color="var(--text-sub-600)" />
-							) : (
-								<Icon
-									name={item.icon}
-									className={cn(
-										"h-3.5 w-3.5",
-										item.isDanger ? "" : "text-text-sub-600",
-									)}
-								/>
-							)}
+							<Icon
+								name={item.icon}
+								className={cn(
+									"h-3.5 w-3.5",
+									item.isDanger ? "" : "text-text-sub-600",
+								)}
+							/>
 							<span>{item.label}</span>
 						</button>
 					))}

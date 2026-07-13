@@ -115,6 +115,9 @@ export interface SettingsNavigationItem {
 	label: string;
 	path: string;
 	iconName: string;
+	/** Owner/admin only (usage, billing, workspace settings). */
+	requiresOrgAdmin?: boolean;
+	/** Owner/admin only (team management). */
 	requiresTeamAdmin?: boolean;
 }
 
@@ -123,14 +126,40 @@ export interface SettingsNavigationSection {
 	items: SettingsNavigationItem[];
 }
 
+/** Default settings landing for members without org-admin access. */
+export const SETTINGS_MEMBER_HOME = "/settings/profile";
+
+/** Default settings landing for owners/admins. */
+export const SETTINGS_ADMIN_HOME = "/settings";
+
 export const settingsNavigation: SettingsNavigationSection[] = [
 	{
 		section: "Workspace",
 		items: [
-			{ label: "Usage", path: "/settings", iconName: "doughnut" },
-			{ label: "Billing", path: "/settings/billing", iconName: "billing-custom" },
-			{ label: "Teams", path: "/settings/teams", iconName: "users", requiresTeamAdmin: true },
-			{ label: "Workspace", path: "/settings/workspace", iconName: "workspace-custom" },
+			{
+				label: "Usage",
+				path: "/settings",
+				iconName: "doughnut",
+				requiresOrgAdmin: true,
+			},
+			{
+				label: "Billing",
+				path: "/settings/billing",
+				iconName: "billing-custom",
+				requiresOrgAdmin: true,
+			},
+			{
+				label: "Teams",
+				path: "/settings/teams",
+				iconName: "users",
+				requiresTeamAdmin: true,
+			},
+			{
+				label: "Workspace",
+				path: "/settings/workspace",
+				iconName: "workspace-custom",
+				requiresOrgAdmin: true,
+			},
 		],
 	},
 	{

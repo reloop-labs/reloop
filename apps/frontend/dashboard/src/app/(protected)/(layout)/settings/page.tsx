@@ -1,5 +1,6 @@
 "use client";
 
+import { SETTINGS_MEMBER_HOME } from "@fe/dashboard/constants/navigation";
 import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { useBillingUsage } from "@fe/dashboard/hooks/useBillingUsage";
 import { useRouter } from "next/navigation";
@@ -13,7 +14,9 @@ const UsagePage = () => {
 
 	useEffect(() => {
 		if (!rolePending && !canManageBilling) {
-			router.replace("/settings");
+			// Members land on settings via "/settings" — send them to profile
+			// instead of rendering an empty usage page.
+			router.replace(SETTINGS_MEMBER_HOME);
 		}
 	}, [canManageBilling, rolePending, router]);
 

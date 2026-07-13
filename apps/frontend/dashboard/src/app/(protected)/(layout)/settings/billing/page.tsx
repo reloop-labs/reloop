@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatedForwardButton } from "@fe/dashboard/components/animated-forward-button";
+import { SETTINGS_MEMBER_HOME } from "@fe/dashboard/constants/navigation";
 import { useOrgPermissions } from "@fe/dashboard/hooks/use-org-permissions";
 import { useBillingUsage } from "@fe/dashboard/hooks/useBillingUsage";
 import { useUIStore } from "@fe/dashboard/store/use-ui-store";
@@ -51,7 +52,7 @@ const BillingPage = () => {
 
 	useEffect(() => {
 		if (!rolePending && !canManageBilling) {
-			router.replace("/settings");
+			router.replace(SETTINGS_MEMBER_HOME);
 		}
 	}, [canManageBilling, rolePending, router]);
 
