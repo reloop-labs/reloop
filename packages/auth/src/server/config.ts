@@ -1,6 +1,10 @@
 /**
  * Env-driven config for the single runtime Better Auth instance.
- * Reads process.env at module load (set env before importing `@reloop/auth/server`).
+ * Single source of truth for shared auth env keys — service processes may
+ * spread this and add process-only fields (port, OTEL, etc.).
+ *
+ * Lightweight export: `@reloop/auth/server/config` (no betterAuth / DB load).
+ * Reads process.env at module load (set env before importing).
  */
 export const authServerConfig = {
 	PG_URL:

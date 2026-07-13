@@ -437,23 +437,28 @@ const getSchema = async () => {
 	return _schema;
 };
 
+type OpenAPIPathItem = Record<string, unknown> & {
+	[method: string]: { tags?: string[] } | unknown;
+};
+
 export const OpenAPI = {
 	getPaths: async (prefix = "/api/auth/v1") => {
 		try {
 			const { paths } = await getSchema();
-			const reference: Record<string, any> = {};
+			const reference: Record<string, OpenAPIPathItem> = {};
 
 			for (const path of Object.keys(paths)) {
 				const pathData = paths[path];
 				if (!pathData) continue;
 
 				const key = prefix + path;
-				reference[key] = { ...pathData };
+				const item: OpenAPIPathItem = { ...pathData };
+				reference[key] = item;
 
 				for (const method of Object.keys(pathData)) {
-					const operation = reference[key][method];
+					const operation = item[method];
 					if (operation && typeof operation === "object") {
-						operation.tags = ["Better Auth"];
+						(operation as { tags?: string[] }).tags = ["Better Auth"];
 					}
 				}
 			}

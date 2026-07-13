@@ -137,6 +137,16 @@ describe("export isolation (client / types)", () => {
 		expect(forbidden).toEqual([]);
 	});
 
+	test("types.ts only type-imports the auth instance module (not the server barrel)", () => {
+		const typesSrc = readFileSync(join(PKG_SRC, "types.ts"), "utf8");
+		// Must not value-import server.
+		expect(typesSrc).not.toMatch(/^import\s+(?!type\b)/m);
+		// Prefer the instance module over the barrel so typecheck does not
+		// pull re-exported signup-invite / redis helpers.
+		expect(typesSrc).toMatch(/import\s+type\s+\{[^}]*auth[^}]*\}\s+from\s+["']\.\/server\/auth["']/);
+		expect(typesSrc).not.toMatch(/from\s+["']\.\/server["']/);
+	});
+
 	test("server export path exists and re-exports the runtime instance", () => {
 		const serverEntry = readFileSync(join(PKG_SRC, "server.ts"), "utf8");
 		expect(serverEntry).toContain("./server");
