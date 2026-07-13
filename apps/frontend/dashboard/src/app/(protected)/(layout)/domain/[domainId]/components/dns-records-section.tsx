@@ -233,7 +233,7 @@ const DNSRecordSectionGroup = ({
 							{title}
 						</span>
 						<Icon
-							name="arrow-top-right"
+							name="arrow-up-right"
 							className="h-2.5 w-2.5 stroke-[2.5] text-text-sub-600"
 						/>
 					</a>

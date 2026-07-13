@@ -63,8 +63,8 @@ function SettingCell({
 								Get your API key
 							</span>
 							<Icon
-								name="arrow-left"
-								className="ml-0 size-4 max-w-0 shrink-0 translate-x-1 rotate-180 opacity-0 transition-all duration-300 ease-out group-hover:ml-2 group-hover:max-w-4 group-hover:translate-x-0 group-hover:opacity-100"
+								name="arrow-up-right"
+								className="ml-0 size-4 max-w-0 shrink-0 translate-x-1 opacity-0 transition-all duration-300 ease-out group-hover:ml-2 group-hover:max-w-4 group-hover:translate-x-0 group-hover:opacity-100"
 								aria-hidden
 							/>
 						</span>

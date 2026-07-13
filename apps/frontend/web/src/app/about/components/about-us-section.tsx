@@ -122,8 +122,8 @@ function FounderCard({ founder }: { founder: Founder }) {
 				>
 					GitHub
 					<Icon
-						name="arrow-left"
-						className="size-3.5 rotate-180 opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100"
+						name="arrow-up-right"
+						className="size-3.5 opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100"
 						aria-hidden
 					/>
 				</a>

@@ -17,8 +17,8 @@ import {
 } from "simple-icons";
 import {
 	buildSmtpCodeExamples,
-	type SmtpLanguageId,
 	SMTP_LANGUAGES,
+	type SmtpLanguageId,
 } from "./smtp-code-examples";
 
 const langIcons: Record<SmtpLanguageId, { path: string; hex: string }> = {
@@ -174,10 +174,7 @@ export function SmtpCodePanel({
 }: {
 	apiKeyPlaceholder?: string;
 }) {
-	const languageIds = useMemo(
-		() => SMTP_LANGUAGES.map((l) => l.id),
-		[],
-	);
+	const languageIds = useMemo(() => SMTP_LANGUAGES.map((l) => l.id), []);
 	const [selectedLanguage, setSelectedLanguage] =
 		useApiLanguage<SmtpLanguageId>(languageIds, "nodejs");
 
@@ -202,14 +199,13 @@ export function SmtpCodePanel({
 				</p>
 			</div>
 
-			<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40">
-				<div className="border-stroke-soft-100 border-b px-1 dark:border-stroke-soft-100/40">
-					<SmtpLanguagePills
-						value={selectedLanguage}
-						onChange={setSelectedLanguage}
-					/>
-				</div>
-				<div className="p-3">
+			<div>
+				<SmtpLanguagePills
+					value={selectedLanguage}
+					onChange={setSelectedLanguage}
+				/>
+
+				<div className="pt-3">
 					<CopyCodeBlock
 						key={selectedLanguage}
 						code={code}

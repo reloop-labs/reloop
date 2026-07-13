@@ -210,8 +210,8 @@ export function CopyCodeBlock({
 								>
 									{title}
 									<Icon
-										name="arrow-top-right"
-										className="h-2.5 w-2.5 stroke-[2.5] text-text-sub-400"
+										name="arrow-up-right"
+										className="h-3 w-3 text-text-sub-400"
 									/>
 								</a>
 							) : (
@@ -323,8 +323,8 @@ export function CopyCodeBlock({
 									>
 										{title}
 										<Icon
-											name="arrow-top-right"
-											className="h-2.5 w-2.5 stroke-[2.5] text-text-sub-400"
+											name="arrow-up-right"
+											className="h-3 w-3 text-text-sub-400"
 										/>
 									</a>
 								) : (

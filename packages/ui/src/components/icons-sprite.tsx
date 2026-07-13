@@ -2768,25 +2768,30 @@ export const IconsSprite = () => (
 					fill="currentColor"
 				/>
 			</symbol>
-			<symbol id="arrow-right" viewBox="0 0 24 24" fill="none">
+			{/* Filled arrows — same weight/style family (16×16). */}
+			<symbol id="arrow-right" viewBox="0 0 16 16" fill="none">
 				<path
-					d="M4 12H20"
-					stroke="currentColor"
-					strokeWidth="2"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-				/>
-				<path
-					d="M13 5L20 12L13 19"
-					stroke="currentColor"
-					strokeWidth="2"
-					strokeLinecap="round"
-					strokeLinejoin="round"
+					d="M8.22 2.97a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06l2.97-2.97H3.75a.75.75 0 0 1 0-1.5h7.44L8.22 4.03a.75.75 0 0 1 0-1.06Z"
+					fill="currentColor"
 				/>
 			</symbol>
+			<symbol id="arrow-left" viewBox="0 0 16 16" fill="none">
+				<path
+					d="M7.78 12.53a.75.75 0 0 1-1.06 0L2.47 8.28a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 1.06L4.81 7h7.44a.75.75 0 0 1 0 1.5H4.81l2.97 2.97a.75.75 0 0 1 0 1.06Z"
+					fill="currentColor"
+				/>
+			</symbol>
+			{/* Filled up-right arrow (tip points top-right). */}
 			<symbol id="arrow-up-right" viewBox="0 0 16 16" fill="none">
 				<path
-					d="M11.75 10a.75.75 0 1 1-1.5 0V6.81l-4.72 4.72a.75.75 0 1 1-1.06-1.06l4.72-4.72H6a.75.75 0 0 1 0-1.5h5a.75.75 0 0 1 .75.75z"
+					d="M4.22 11.78a.75.75 0 0 1 0-1.06L9.44 5.5H5.75a.75.75 0 0 1 0-1.5h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V6.56l-5.22 5.22a.75.75 0 0 1-1.06 0Z"
+					fill="currentColor"
+				/>
+			</symbol>
+			{/* Alias — same glyph as arrow-up-right for older call sites. */}
+			<symbol id="arrow-top-right" viewBox="0 0 16 16" fill="none">
+				<path
+					d="M4.22 11.78a.75.75 0 0 1 0-1.06L9.44 5.5H5.75a.75.75 0 0 1 0-1.5h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V6.56l-5.22 5.22a.75.75 0 0 1-1.06 0Z"
 					fill="currentColor"
 				/>
 			</symbol>
@@ -2845,34 +2850,6 @@ export const IconsSprite = () => (
 			>
 				<path
 					d="M12 21L12 3M12 3L19 10M12 3L5 10"
-					stroke="currentColor"
-					strokeWidth="1.5"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-				/>
-			</symbol>
-			<symbol
-				id="arrow-top-right"
-				viewBox="0 0 24 24"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<path
-					d="M4 20L20 4M20 4V15M20 4H9"
-					stroke="currentColor"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-				/>
-			</symbol>
-
-			<symbol
-				id="arrow-left"
-				viewBox="0 0 24 24"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<path
-					d="M10 5L3 11.9999M3 11.9999L10 18.9999M3 11.9999H21"
 					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"
