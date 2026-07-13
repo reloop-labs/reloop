@@ -93,6 +93,35 @@ export class RedisCache {
 	}
 
 	/**
+	 * Fail-closed set for security-sensitive paths (e.g. API key credential cache).
+	 * Rethrows so callers cannot treat a failed write as success.
+	 */
+	async setStrict(
+		key: string,
+		value: unknown,
+		ttlSeconds?: number,
+	): Promise<void> {
+		try {
+			const redis = await this.getRedisClient();
+			const serializedValue = this.stringifyValue(value);
+			const redisKey = this.getKey(key);
+			const ttl = ttlSeconds ?? this.defaultTTL;
+
+			await redis.set(redisKey, serializedValue);
+			if (ttl > 0) {
+				await redis.expire(redisKey, ttl);
+			}
+		} catch (error) {
+			console.error(
+				`Redis setStrict error for ${this.prefix} cache, key "${key}":`,
+				error,
+			);
+			this.redis = null;
+			throw error instanceof Error ? error : new Error(String(error));
+		}
+	}
+
+	/**
 	 * Best-effort delete (session cleanup, secondary storage).
 	 * Logs and swallows Redis errors so logout/session paths stay available.
 	 */

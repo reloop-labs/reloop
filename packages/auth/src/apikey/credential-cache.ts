@@ -28,7 +28,7 @@ export type ApiKeyCredentialEntry = {
 
 /**
  * Low-level store (e.g. AuthRedis / MemoryRedis).
- * `delete` must reject when the operation cannot be confirmed so invalidate can fail closed.
+ * `set` / `delete` must reject when the operation cannot be confirmed for fail-closed paths.
  */
 export type ApiKeyCredentialStore = {
 	get<T>(key: string): Promise<T | undefined>;
@@ -47,24 +47,32 @@ export type ApiKeyCredentialCache = {
 	invalidate(hashedKey: string): Promise<void>;
 	/**
 	 * Clears cache when only the API key id is known (e.g. row already deleted).
-	 * No-op success if no reverse index exists. Throws if a known entry cannot be cleared.
+	 * Uses reverse index written on every successful write.
+	 * Throws if a reverse index exists but cleanup cannot be confirmed.
 	 */
 	invalidateByApiKeyId(apiKeyId: string): Promise<void>;
 };
 
 /**
- * Auth Redis / session cache often uses best-effort `delete`.
- * Prefer `deleteStrict` when available so credential invalidate fails closed.
+ * Auth Redis / session cache often uses best-effort get/set/delete.
+ * Prefer *Strict methods when available so credential cache can fail closed.
  */
 export function authRedisAsCredentialStore(redis: {
 	get<T>(key: string): Promise<T | undefined>;
 	set(key: string, value: unknown, ttlSeconds?: number): Promise<void>;
+	setStrict?(key: string, value: unknown, ttlSeconds?: number): Promise<void>;
 	delete(key: string): Promise<void>;
 	deleteStrict?(key: string): Promise<void>;
 }): ApiKeyCredentialStore {
 	return {
 		get: (key) => redis.get(key),
-		set: (key, value, ttl) => redis.set(key, value, ttl),
+		set: async (key, value, ttl) => {
+			if (redis.setStrict) {
+				await redis.setStrict(key, value, ttl);
+				return;
+			}
+			await redis.set(key, value, ttl);
+		},
 		delete: async (key) => {
 			if (redis.deleteStrict) {
 				await redis.deleteStrict(key);
@@ -104,16 +112,53 @@ export function createApiKeyCredentialCache(
 			entry,
 			ttlSeconds = API_KEY_CREDENTIAL_CACHE_TTL_SECONDS,
 		) {
-			await store.set(
-				apiKeyCredentialCacheKey(hashedKey),
-				entry,
-				ttlSeconds,
-			);
-			await store.set(
-				apiKeyCredentialIdIndexKey(entry.apiKeyId),
-				hashedKey,
-				ttlSeconds,
-			);
+			const hashKey = apiKeyCredentialCacheKey(hashedKey);
+			const idKey = apiKeyCredentialIdIndexKey(entry.apiKeyId);
+
+			// Primary first, then reverse index, then verify both so we never leave
+			// a valid credential without a recoverable id→hash mapping.
+			try {
+				await store.set(hashKey, entry, ttlSeconds);
+				await store.set(idKey, hashedKey, ttlSeconds);
+			} catch (cause) {
+				// Best-effort compensate if reverse failed after primary
+				try {
+					await store.delete(hashKey);
+				} catch {
+					// ignore
+				}
+				try {
+					await store.delete(idKey);
+				} catch {
+					// ignore
+				}
+				throw new Error(
+					`API key credential cache write failed for key "${hashKey}"`,
+					{ cause },
+				);
+			}
+
+			const primary = await store.get<ApiKeyCredentialEntry>(hashKey);
+			const reverse = await store.get<string>(idKey);
+			if (
+				!primary ||
+				primary.apiKeyId !== entry.apiKeyId ||
+				reverse !== hashedKey
+			) {
+				try {
+					await store.delete(hashKey);
+				} catch {
+					// ignore
+				}
+				try {
+					await store.delete(idKey);
+				} catch {
+					// ignore
+				}
+				throw new Error(
+					`API key credential cache write not confirmed for key "${hashKey}"`,
+				);
+			}
 		},
 
 		async invalidate(hashedKey) {
@@ -128,11 +173,17 @@ export function createApiKeyCredentialCache(
 		async invalidateByApiKeyId(apiKeyId) {
 			const indexKey = apiKeyCredentialIdIndexKey(apiKeyId);
 			const hashedKey = await store.get<string>(indexKey);
-			if (hashedKey) {
-				await this.invalidate(hashedKey);
+
+			if (!hashedKey) {
+				// No reverse index: under verified writes, that means we never
+				// successfully cached this key (primary is always paired with reverse).
+				// Pre-migration hash-only entries expire via TTL.
 				return;
 			}
-			// No reverse index: nothing to clear (or never authenticated via cache)
+
+			// Clear primary (and reverse via entry if present)
+			await this.invalidate(hashedKey);
+			// Ensure reverse is gone even if primary was already absent
 			await strictDelete(store, indexKey);
 		},
 	};
