@@ -1,12 +1,12 @@
 #!/usr/bin/env bun
 /**
- * Generate dashboard API Keys code examples from backend x-codeSamples.
+ * Fully generate dashboard API Keys drawer config from backend x-codeSamples.
  *
- * Canonical source: apps/backend/api-key route x-codeSamples.ts files
- * Output: apps/frontend/dashboard/src/components/api-details/api-keys-code-examples.ts
+ * Discovers every api-key route folder with samples — no hand-maintained op list.
+ * Emits languages, operations, and codeExamples.
  *
  *   bun run sync:sdk-samples
- *   bun run scripts/sync-dashboard-api-key-samples.ts --check
+ *   bun run sync:sdk-samples:check
  */
 
 import fs from "node:fs";
@@ -16,6 +16,11 @@ import {
 	escapeTemplateLiteral,
 	extractSamples,
 	findSampleFiles,
+	folderToOpKey,
+	loadDocSlugIndex,
+	opKeyToLabel,
+	parseCurlMeta,
+	resolveDocSlug,
 	sampleById,
 } from "./lib/extract-x-code-samples";
 
@@ -24,6 +29,10 @@ const API_KEY_ROUTES = path.join(
 	REPO_ROOT,
 	"apps/backend/api-key/src/routes/api-key",
 );
+const DOCS_DIR = path.join(
+	REPO_ROOT,
+	"apps/frontend/docs/content/docs/api/api-key",
+);
 const OUT_FILE = path.join(
 	REPO_ROOT,
 	"apps/frontend/dashboard/src/components/api-details/api-keys-code-examples.ts",
@@ -31,49 +40,111 @@ const OUT_FILE = path.join(
 
 const CHECK = process.argv.includes("--check");
 
-const OPS = [
-	{ folder: "create-api-key", key: "create" },
-	{ folder: "list-api-keys", key: "list" },
-	{ folder: "get-api-key", key: "get" },
-	{ folder: "update-api-key", key: "update" },
-	{ folder: "delete-api-key", key: "delete" },
-	{ folder: "rotate-api-key", key: "rotate" },
-	{ folder: "enable-api-key", key: "enable" },
-	{ folder: "disable-api-key", key: "disable" },
-] as const;
+/** Sample id → dashboard language config */
+const LANG_MAP: Record<
+	string,
+	{ langKey: string; label: string; shikiLang: string }
+> = {
+	node: { langKey: "nodejs", label: "Node", shikiLang: "javascript" },
+	python: { langKey: "python", label: "Python", shikiLang: "python" },
+	php: { langKey: "php", label: "PHP", shikiLang: "php" },
+};
 
-const LANGS = [
-	{ sampleId: "node", langKey: "nodejs" },
-	{ sampleId: "python", langKey: "python" },
-	{ sampleId: "php", langKey: "php" },
-] as const;
+const DASHBOARD_LANG_ORDER = ["node", "python", "php"] as const;
 
-function loadOpSamples(folder: string) {
-	const dir = path.join(API_KEY_ROUTES, folder);
-	const files = findSampleFiles(dir);
-	if (files.length === 0) {
-		throw new Error(`No x-codeSamples under ${dir}`);
+type OpMeta = {
+	id: string;
+	label: string;
+	method: string;
+	endpoint: string;
+	docSlug?: string;
+	folder: string;
+	samples: ReturnType<typeof extractSamples>;
+};
+
+function discoverOps(): OpMeta[] {
+	const docSlugs = loadDocSlugIndex(DOCS_DIR);
+	const entries = fs
+		.readdirSync(API_KEY_ROUTES, { withFileTypes: true })
+		.filter((e) => e.isDirectory())
+		.map((e) => e.name)
+		.sort();
+
+	const ops: OpMeta[] = [];
+
+	for (const folder of entries) {
+		const files = findSampleFiles(path.join(API_KEY_ROUTES, folder));
+		if (files.length === 0) continue;
+
+		const samples = extractSamples(files[0]!);
+		const curl = sampleById(samples, "curl");
+		if (!curl) {
+			throw new Error(`Missing curl sample in ${folder}`);
+		}
+
+		const { method, endpoint } = parseCurlMeta(curl.source);
+		const id = folderToOpKey(folder);
+		const docSlug = resolveDocSlug(docSlugs, method, endpoint);
+
+		ops.push({
+			id,
+			label: opKeyToLabel(id),
+			method,
+			endpoint,
+			docSlug,
+			folder,
+			samples,
+		});
 	}
-	return extractSamples(files[0]!);
+
+	if (ops.length === 0) {
+		throw new Error(`No api-key route samples found under ${API_KEY_ROUTES}`);
+	}
+
+	// Stable product order: create first, then list, rest alpha by id
+	const preferred = [
+		"create",
+		"list",
+		"get",
+		"update",
+		"delete",
+		"rotate",
+		"enable",
+		"disable",
+	];
+	ops.sort((a, b) => {
+		const ai = preferred.indexOf(a.id);
+		const bi = preferred.indexOf(b.id);
+		if (ai === -1 && bi === -1) return a.id.localeCompare(b.id);
+		if (ai === -1) return 1;
+		if (bi === -1) return -1;
+		return ai - bi;
+	});
+
+	return ops;
 }
 
-function buildFile(): string {
-	const byLang: Record<string, Record<string, string>> = {
-		nodejs: {},
-		python: {},
-		php: {},
-	};
+function buildFile(ops: OpMeta[]): string {
+	const langKeysUsed: string[] = [];
+	for (const sampleId of DASHBOARD_LANG_ORDER) {
+		if (LANG_MAP[sampleId]) langKeysUsed.push(sampleId);
+	}
 
-	for (const op of OPS) {
-		const samples = loadOpSamples(op.folder);
-		for (const { sampleId, langKey } of LANGS) {
-			const sample = sampleById(samples, sampleId);
+	const byLang: Record<string, Record<string, string>> = {};
+	for (const sampleId of langKeysUsed) {
+		byLang[LANG_MAP[sampleId]!.langKey] = {};
+	}
+
+	for (const op of ops) {
+		for (const sampleId of langKeysUsed) {
+			const { langKey } = LANG_MAP[sampleId]!;
+			const sample = sampleById(op.samples, sampleId);
 			if (!sample) {
 				throw new Error(
 					`Missing sample id="${sampleId}" for api-key op "${op.folder}"`,
 				);
 			}
-			byLang[langKey]![op.key] = sample.source.trimEnd();
+			byLang[langKey]![op.id] = sample.source.trimEnd();
 		}
 	}
 
@@ -83,14 +154,38 @@ function buildFile(): string {
 		"// Canonical source: apps/backend/api-key route x-codeSamples.ts files",
 		"// Regenerate: bun run sync:sdk-samples",
 		"",
-		"export const codeExamples = {",
+		"export const languages = [",
 	];
 
-	for (const { langKey } of LANGS) {
+	for (const sampleId of langKeysUsed) {
+		const lang = LANG_MAP[sampleId]!;
+		lines.push(
+			`\t{ id: "${lang.langKey}", label: "${lang.label}", shikiLang: "${lang.shikiLang}" },`,
+		);
+	}
+	lines.push("] as const;");
+	lines.push("");
+	lines.push("export const operations = [");
+
+	for (const op of ops) {
+		const doc = op.docSlug ? `,\n\t\tdocSlug: "${op.docSlug}"` : "";
+		lines.push("\t{");
+		lines.push(`\t\tid: "${op.id}",`);
+		lines.push(`\t\tlabel: "${op.label}",`);
+		lines.push(`\t\tmethod: "${op.method}",`);
+		lines.push(`\t\tendpoint: "${op.endpoint}"${doc},`);
+		lines.push("\t},");
+	}
+	lines.push("] as const;");
+	lines.push("");
+	lines.push("export const codeExamples = {");
+
+	for (const sampleId of langKeysUsed) {
+		const { langKey } = LANG_MAP[sampleId]!;
 		lines.push(`\t${langKey}: {`);
-		for (const op of OPS) {
-			const source = byLang[langKey]![op.key]!;
-			lines.push(`\t\t${op.key}: \`${escapeTemplateLiteral(source)}\`,`);
+		for (const op of ops) {
+			const source = byLang[langKey]![op.id]!;
+			lines.push(`\t\t${op.id}: \`${escapeTemplateLiteral(source)}\`,`);
 		}
 		lines.push("\t},");
 	}
@@ -100,7 +195,8 @@ function buildFile(): string {
 	return lines.join("\n");
 }
 
-const next = buildFile();
+const ops = discoverOps();
+const next = buildFile(ops);
 const prev = fs.existsSync(OUT_FILE) ? fs.readFileSync(OUT_FILE, "utf8") : "";
 
 if (CHECK) {
@@ -111,14 +207,20 @@ if (CHECK) {
 		);
 		process.exit(1);
 	}
-	console.log("OK: dashboard api-key samples match backend x-codeSamples.");
+	console.log(
+		`OK: dashboard api-key samples match backend (${ops.length} ops).`,
+	);
 	process.exit(0);
 }
 
 if (prev === next) {
-	console.log("Dashboard api-key samples already up to date.");
+	console.log(
+		`Dashboard api-key samples already up to date (${ops.length} ops).`,
+	);
 	process.exit(0);
 }
 
 fs.writeFileSync(OUT_FILE, next);
-console.log(`Updated ${path.relative(REPO_ROOT, OUT_FILE)}`);
+console.log(
+	`Updated ${path.relative(REPO_ROOT, OUT_FILE)} (${ops.length} ops: ${ops.map((o) => o.id).join(", ")})`,
+);
