@@ -140,4 +140,16 @@ describe("ApiKeyCredentialCache", () => {
 		await expect(cache.read("hash-a")).resolves.toBeUndefined();
 		await expect(cache.read("hash-b")).resolves.toEqual(other);
 	});
+
+	test("invalidateByApiKeyId clears credential via reverse index", async () => {
+		const cache = createApiKeyCredentialCache(new MemoryRedis());
+		await cache.write("deadbeef", sampleEntry);
+		await cache.invalidateByApiKeyId("key-1");
+		await expect(cache.read("deadbeef")).resolves.toBeUndefined();
+	});
+
+	test("invalidateByApiKeyId is no-op success when never written", async () => {
+		const cache = createApiKeyCredentialCache(new MemoryRedis());
+		await expect(cache.invalidateByApiKeyId("missing-id")).resolves.toBeUndefined();
+	});
 });

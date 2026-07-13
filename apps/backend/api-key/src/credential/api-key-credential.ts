@@ -201,7 +201,7 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 			organizationId: string;
 			log?: ApiKeyCredentialLog;
 		}): Promise<DeleteApiKeyResult> {
-			const { hashedKey } = await db.transaction(async (tx) => {
+			const txnResult = await db.transaction(async (tx) => {
 				const locked = await tx
 					.select()
 					.from(schema.apikey)
@@ -215,8 +215,7 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 
 				const row = locked[0];
 				if (!row) {
-					log.warn("API key not found");
-					throw ApiKeyErrors.notFound(id);
+					return { kind: "missing" as const };
 				}
 
 				const hashedKey = row.key;
@@ -237,16 +236,30 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 				}
 
 				log.info("API key deleted successfully");
-				return { hashedKey };
+				return { kind: "deleted" as const, hashedKey };
 			});
 
+			// Row already gone (retry after prior commit): still clear cache via id index.
+			if (txnResult.kind === "missing") {
+				log.warn("API key not found; clearing any residual credential cache");
+				try {
+					await credentialCache.invalidateByApiKeyId(id);
+				} catch (cause) {
+					log.error("Failed to invalidate API key credential cache", cause);
+					throw credentialCacheRevokeError("deleted");
+				}
+				// Idempotent delete: key is gone and cache was cleared (or never present).
+				return { id };
+			}
+
 			try {
-				await credentialCache.invalidate(hashedKey);
+				await credentialCache.invalidate(txnResult.hashedKey);
 			} catch (cause) {
 				log.error("Failed to invalidate API key credential cache", cause);
 				throw credentialCacheRevokeError("deleted");
 			}
 
+			// Bus is best-effort (see #64): auth correctness does not depend on NATS.
 			try {
 				await bus.publish(BusEvent.API_KEY_DELETED, {
 					api_key_id: id,
