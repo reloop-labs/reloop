@@ -7,6 +7,9 @@ const PKG_SRC = join(import.meta.dir, "..", "src");
 /** Relative paths under `src/` that form the client + types surface. */
 const CLIENT_SURFACE_ENTRYPOINTS = ["client.ts", "types.ts"] as const;
 
+/** Dependency-light API-key helpers — must not pull Redis/DB/Elysia. */
+const APIKEY_HELPERS_ENTRYPOINT = "apikey/index.ts";
+
 /**
  * Modules that may appear on the client/types import graph.
  * Anything under `server/` (or the old monoloithic server.ts re-export tree
@@ -19,6 +22,7 @@ const FORBIDDEN_VALUE_IMPORT_SUBSTRINGS = [
 	"drizzle-orm",
 	"better-auth/adapters",
 	"evlog",
+	"elysia",
 ] as const;
 
 function resolveLocal(fromFile: string, spec: string): string | null {
@@ -168,5 +172,27 @@ describe("export isolation (client / types)", () => {
 		}
 		walk(PKG_SRC);
 		expect(betterAuthCalls).toEqual(["server/auth.ts"]);
+	});
+
+	test("apikey helpers value-import graph excludes Redis/DB/Elysia", () => {
+		const { localFiles, packageSpecs } = collectValueImports(
+			APIKEY_HELPERS_ENTRYPOINT,
+		);
+		const localRels = [...localFiles].map((f) => relative(PKG_SRC, f));
+
+		const heavyLocals = localRels.filter(
+			(r) =>
+				r.includes("validate") ||
+				r.startsWith(`server${"/"}`) ||
+				r === "server.ts",
+		);
+		expect(heavyLocals).toEqual([]);
+
+		const forbidden = [...packageSpecs].filter((spec) =>
+			FORBIDDEN_VALUE_IMPORT_SUBSTRINGS.some(
+				(frag) => spec === frag || spec.startsWith(`${frag}/`),
+			),
+		);
+		expect(forbidden).toEqual([]);
 	});
 });

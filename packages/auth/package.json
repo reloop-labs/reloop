@@ -7,6 +7,8 @@
 		"./server": "./src/server.ts",
 		"./server/config": "./src/server/config.ts",
 		"./types": "./src/types.ts",
+		"./apikey": "./src/apikey/index.ts",
+		"./apikey/validate": "./src/apikey/validate.ts",
 		"./roles": "./src/roles.ts",
 		"./permissions": "./src/permissions.ts",
 		"./platform-permissions": "./src/platform-permissions.ts"
