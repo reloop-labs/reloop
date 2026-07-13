@@ -6,8 +6,7 @@ import { Elysia } from "elysia";
 
 export const uploadFileRoute = new Elysia().use(authMiddleware).post(
 	"/upload",
-	async ({ request, user }) => {
-		const { id: userId } = user;
+	async ({ request, userId }) => {
 		const formData = await request.formData();
 		const file = formData.get("file") as File | null;
 
@@ -21,7 +20,8 @@ export const uploadFileRoute = new Elysia().use(authMiddleware).post(
 		});
 	},
 	{
-		auth: true,
+		// User-scoped resource; org not required (authNoOrg).
+		authNoOrg: true,
 		response: {
 			200: UploadModel.uploadResponse,
 			400: UploadModel.validationError,

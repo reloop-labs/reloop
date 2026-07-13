@@ -10,7 +10,8 @@
 		"start": "bun run dist/index.js",
 		"lint": "biome check .",
 		"fix-lint": "biome check --fix .",
-		"format": "biome format ."
+		"format": "biome format .",
+		"test": "bun test test/"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "catalog:backend",
@@ -30,7 +31,6 @@
 		"@opentelemetry/sdk-trace-node": "catalog:backend",
 		"@opentelemetry/semantic-conventions": "catalog:backend",
 		"@paralleldrive/cuid2": "catalog:backend",
-		"@reloop/apikey": "workspace:*",
 		"@reloop/auth": "workspace:*",
 		"@reloop/bus": "workspace:*",
 		"@reloop/cache": "workspace:*",
