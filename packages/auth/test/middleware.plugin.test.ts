@@ -7,7 +7,6 @@ import {
 	test,
 } from "bun:test";
 import { randomBytes } from "node:crypto";
-import { Elysia } from "elysia";
 import {
 	API_KEY_PREFIX,
 	getApiKeyCacheKey,
@@ -21,6 +20,7 @@ import {
 	sessionUserIndexKey,
 } from "@reloop/auth/middleware";
 import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
+import { Elysia } from "elysia";
 import { MemoryRedis } from "./memory-redis";
 
 type FakeSession = {
@@ -42,10 +42,7 @@ function cookieFor(token: string): string {
 	return `reloop.session_token=${token}.fakesig`;
 }
 
-function mountApp(
-	redis: MemoryRedis,
-	opts: { internalSecret?: string } = {},
-) {
+function mountApp(redis: MemoryRedis, opts: { internalSecret?: string } = {}) {
 	const plugin = createAuthPlugin({
 		baseUrl,
 		redis,
@@ -653,9 +650,9 @@ describe("createAuthPlugin — authSupport / authCollab", () => {
 		);
 
 		expect(res.status).toBe(200);
-		expect(((await res.json()) as { isPlatformAdmin: boolean }).isPlatformAdmin).toBe(
-			true,
-		);
+		expect(
+			((await res.json()) as { isPlatformAdmin: boolean }).isPlatformAdmin,
+		).toBe(true);
 	});
 
 	test("authCollab: session returns profile + org", async () => {
@@ -769,8 +766,8 @@ describe("resolveApiKeyInternalOrSession (mail composer)", () => {
 
 describe("createAuthPlugin config", () => {
 	test("throws when neither redisUrl nor redis provided", () => {
-		expect(() =>
-			createAuthPlugin({ baseUrl: "http://localhost" }),
-		).toThrow(/redisUrl/);
+		expect(() => createAuthPlugin({ baseUrl: "http://localhost" })).toThrow(
+			/redisUrl/,
+		);
 	});
 });

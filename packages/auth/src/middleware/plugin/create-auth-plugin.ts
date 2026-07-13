@@ -1,4 +1,3 @@
-import { Elysia } from "elysia";
 import { resolveAuthRedis } from "@reloop/auth/middleware/redis/resolve-auth-redis";
 import { resolveApiKeyAuth } from "@reloop/auth/middleware/resolve/resolve-api-key-auth";
 import { resolveApiKeyOrInternal } from "@reloop/auth/middleware/resolve/resolve-api-key-or-internal";
@@ -11,6 +10,7 @@ import {
 	type AuthMiddlewareConfig,
 	DEFAULT_SESSION_CACHE_TTL_SECONDS,
 } from "@reloop/auth/middleware/types";
+import { Elysia } from "elysia";
 
 const UNAUTH = { message: "Authentication required" };
 

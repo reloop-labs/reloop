@@ -12,7 +12,10 @@ export {
 	sessionUserIndexKey,
 } from "@reloop/auth/middleware/keys";
 
-export { type AuthPlugin, createAuthPlugin } from "@reloop/auth/middleware/plugin/create-auth-plugin";
+export {
+	type AuthPlugin,
+	createAuthPlugin,
+} from "@reloop/auth/middleware/plugin/create-auth-plugin";
 
 export { createSessionCacheRedis } from "@reloop/auth/middleware/redis/create-session-cache-redis";
 export { resolveAuthRedis } from "@reloop/auth/middleware/redis/resolve-auth-redis";

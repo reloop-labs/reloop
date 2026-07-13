@@ -1,5 +1,5 @@
-import { RedisCache } from "@reloop/cache/redis-client";
 import { authServerConfig } from "@reloop/auth/server/config";
+import { RedisCache } from "@reloop/cache/redis-client";
 
 export const redis = new RedisCache(
 	"auth",

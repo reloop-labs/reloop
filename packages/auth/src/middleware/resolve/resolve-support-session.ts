@@ -1,8 +1,14 @@
-import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
-import { extractSessionToken, sessionTokenCacheKey } from "@reloop/auth/middleware/keys";
-import type { AuthContext, SupportAuthContext } from "@reloop/auth/middleware/types";
+import {
+	extractSessionToken,
+	sessionTokenCacheKey,
+} from "@reloop/auth/middleware/keys";
 import { resolveSessionAuthWithProfile } from "@reloop/auth/middleware/resolve/resolve-session-auth-with-profile";
 import type { ResolverDeps } from "@reloop/auth/middleware/resolve/resolver-deps";
+import type {
+	AuthContext,
+	SupportAuthContext,
+} from "@reloop/auth/middleware/types";
+import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
 
 export async function resolveSupportSession(
 	headers: Headers,

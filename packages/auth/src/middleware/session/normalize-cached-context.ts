@@ -1,6 +1,8 @@
 import type { AuthContext } from "@reloop/auth/middleware/types";
 
-export function normalizeCachedContext(cached: AuthContext): AuthContext | null {
+export function normalizeCachedContext(
+	cached: AuthContext,
+): AuthContext | null {
 	if (!cached.userId) return null;
 	if (
 		cached.authType !== "session" &&

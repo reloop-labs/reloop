@@ -1,7 +1,7 @@
-import type { AuthContextWithProfile } from "@reloop/auth/middleware/types";
 import { resolveApiKeyAuth } from "@reloop/auth/middleware/resolve/resolve-api-key-auth";
 import { resolveSessionAuthWithProfile } from "@reloop/auth/middleware/resolve/resolve-session-auth-with-profile";
 import type { ResolverDeps } from "@reloop/auth/middleware/resolve/resolver-deps";
+import type { AuthContextWithProfile } from "@reloop/auth/middleware/types";
 
 export async function resolveCollabAuth(
 	headers: Headers,

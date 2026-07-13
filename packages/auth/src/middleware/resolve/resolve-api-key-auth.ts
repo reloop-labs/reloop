@@ -1,7 +1,7 @@
 import { validateApiKey } from "@reloop/auth/apikey/validate";
-import type { AuthContext } from "@reloop/auth/middleware/types";
 import { extractApiKey } from "@reloop/auth/middleware/resolve/extract-api-key";
 import type { ResolverDeps } from "@reloop/auth/middleware/resolve/resolver-deps";
+import type { AuthContext } from "@reloop/auth/middleware/types";
 
 export async function resolveApiKeyAuth(
 	headers: Headers,

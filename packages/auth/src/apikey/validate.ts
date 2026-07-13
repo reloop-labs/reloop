@@ -1,7 +1,7 @@
+import { getApiKeyCacheKey, hashApiKey } from "@reloop/auth/apikey/helpers";
 import { db as defaultDb } from "@reloop/db/client";
 import { apikey } from "@reloop/db/schema";
 import { and, eq, sql } from "drizzle-orm";
-import { getApiKeyCacheKey, hashApiKey } from "@reloop/auth/apikey/helpers";
 
 export type ApiKeyCache = {
 	get<T>(key: string): Promise<T | undefined>;
@@ -36,7 +36,6 @@ export async function validateApiKey(
 	}>(cacheKey);
 
 	if (cached) {
-
 		db.update(apikey)
 			.set({
 				requestCount: sql`${apikey.requestCount} + 1`,

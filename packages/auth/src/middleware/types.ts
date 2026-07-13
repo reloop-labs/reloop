@@ -28,7 +28,6 @@ export type AuthRedis = {
 };
 
 export type AuthMiddlewareConfig = {
-
 	baseUrl: string;
 
 	redisUrl?: string;

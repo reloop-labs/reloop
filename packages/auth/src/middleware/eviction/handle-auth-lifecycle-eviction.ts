@@ -1,7 +1,7 @@
-import type { AuthRedis } from "@reloop/auth/middleware/types";
 import { applySessionCacheEviction } from "@reloop/auth/middleware/eviction/apply-session-cache-eviction";
 import { evictionEventFromAuthPath } from "@reloop/auth/middleware/eviction/eviction-event-from-auth-path";
 import type { SessionEvictionEvent } from "@reloop/auth/middleware/eviction/session-eviction-event";
+import type { AuthRedis } from "@reloop/auth/middleware/types";
 
 export async function handleAuthLifecycleEviction(
 	redis: AuthRedis,
@@ -15,6 +15,6 @@ export async function handleAuthLifecycleEviction(
 	if (!event) return null;
 	try {
 		await applySessionCacheEviction(redis, event);
-	} catch { }
+	} catch {}
 	return event;
 }
