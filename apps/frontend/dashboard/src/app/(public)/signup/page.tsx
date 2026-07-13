@@ -5,13 +5,8 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { SignupForm } from "./signup-form";
-import {
-	fetchSignupInviteStatus,
-	validateSignupInviteCode,
-} from "./signup-invite";
-import { SignupInviteGate } from "./signup-invite-gate";
 import { SocialSignup } from "./social-signup";
 import { VerifyOTP } from "./verify-otp";
 
@@ -46,16 +41,8 @@ const Page = () => {
 		parseAsBoolean.withDefault(false),
 	);
 	const [, setOtpValue] = useQueryState("otp", parseAsString.withDefault(""));
+	// Organization Invitation deep link (not platform signup codes).
 	const [inviteId] = useQueryState("inviteId", parseAsString.withDefault(""));
-	const [inviteCode, setInviteCode] = useQueryState(
-		"inviteCode",
-		parseAsString.withDefault(""),
-	);
-
-	const [inviteRequired, setInviteRequired] = useState<boolean | null>(null);
-	const [inviteEmail, setInviteEmail] = useState<string | null>(null);
-	const [inviteReady, setInviteReady] = useState(false);
-	const [inviteError, setInviteError] = useState<string | null>(null);
 
 	const currentLevel = otpSentEmail ? 2 : showEmail ? 1 : 0;
 	const prevLevel = useRef(currentLevel);
@@ -68,39 +55,6 @@ const Page = () => {
 		prevLevel.current = currentLevel;
 		prevDirection.current = direction;
 	}, [currentLevel, direction]);
-
-	useEffect(() => {
-		let cancelled = false;
-		(async () => {
-			const status = await fetchSignupInviteStatus();
-			if (cancelled) return;
-			setInviteRequired(status.required);
-
-			if (!status.required || inviteId) {
-				setInviteReady(true);
-				return;
-			}
-
-			if (inviteCode) {
-				const result = await validateSignupInviteCode(inviteCode);
-				if (cancelled) return;
-				if (result.valid && result.email && result.code) {
-					setInviteEmail(result.email);
-					setInviteCode(result.code);
-					setInviteReady(true);
-					setInviteError(null);
-				} else {
-					setInviteError(result.message || "Invalid or expired invite code");
-					setInviteReady(false);
-				}
-			} else {
-				setInviteReady(false);
-			}
-		})();
-		return () => {
-			cancelled = true;
-		};
-	}, [inviteCode, inviteId, setInviteCode]);
 
 	useEffect(() => {
 		if (session) {
@@ -138,21 +92,6 @@ const Page = () => {
 		);
 	}
 
-	if (inviteRequired === null) {
-		return (
-			<div className="flex h-dvh flex-col items-center justify-center">
-				<div className="w-full max-w-sm p-5 md:p-8">
-					<div className="mb-2 flex items-center justify-center">
-						<Logo className="h-16" />
-					</div>
-					<Skeleton className="mx-auto h-11 w-full rounded-2xl!" />
-				</div>
-			</div>
-		);
-	}
-
-	const showInviteGate = inviteRequired && !inviteReady;
-
 	return (
 		<div className="flex h-dvh flex-col items-center justify-center">
 			<AnimatePresence mode="wait" custom={direction}>
@@ -166,16 +105,7 @@ const Page = () => {
 						</div>
 					</motion.div>
 
-					{showInviteGate ? (
-						<SignupInviteGate
-							onValidated={({ email, code }) => {
-								setInviteEmail(email);
-								setInviteCode(code);
-								setInviteReady(true);
-								setInviteError(null);
-							}}
-						/>
-					) : otpSentEmail ? (
+					{otpSentEmail ? (
 						<motion.div
 							key="verify-otp"
 							custom={direction}
@@ -225,23 +155,10 @@ const Page = () => {
 								<h2 className="font-medium text-label-lg text-text-strong-950">
 									Create your workspace
 								</h2>
-								{inviteEmail && (
-									<p className="text-[13px] text-text-sub-600">
-										Invited as{" "}
-										<span className="font-medium text-text-strong-950">
-											{inviteEmail}
-										</span>
-									</p>
-								)}
-								{inviteError && (
-									<p className="text-[13px] text-error-base">{inviteError}</p>
-								)}
 							</div>
 							<SocialSignup
 								onContinueWithEmail={() => setShowEmail(true)}
 								inviteId={inviteId || undefined}
-								inviteCode={inviteCode || undefined}
-								lockedEmail={inviteEmail || undefined}
 							/>
 						</motion.div>
 					) : (
@@ -260,7 +177,7 @@ const Page = () => {
 								</h2>
 							</div>
 							<div className="flex flex-col gap-4">
-								<SignupForm lockedEmail={inviteEmail || undefined} />
+								<SignupForm />
 								<div className="flex justify-center">
 									<button
 										type="button"

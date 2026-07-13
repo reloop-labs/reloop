@@ -25,13 +25,11 @@ interface User {
 interface UserMenuDropdownProps {
 	user: User | null | undefined;
 	isCollapsed?: boolean;
-	onInviteFriends?: () => void;
 }
 
 export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 	user,
 	isCollapsed = false,
-	onInviteFriends,
 }) => {
 	const { canManageBilling } = useOrgPermissions();
 	const { theme, setTheme } = useTheme();
@@ -203,29 +201,12 @@ export const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
 								<span>,</span>
 							</span>
 						</Dropdown.Item>
-						{onInviteFriends ? (
-							<Dropdown.Item
-								ref={(el) => {
-									if (el) itemRefs.current[3] = el;
-								}}
-								className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-								onPointerEnter={() => setHoverIdx(3)}
-								onPointerLeave={() => setHoverIdx(undefined)}
-								onClick={() => {
-									setIsOpen(false);
-									onInviteFriends();
-								}}
-							>
-								<Icon name="user-plus" className="h-4 w-4 text-text-sub-600" />
-								<span className="flex-1 truncate text-sm">Invite friends</span>
-							</Dropdown.Item>
-						) : null}
 						<Dropdown.Item
 							ref={(el) => {
-								if (el) itemRefs.current[4] = el;
+								if (el) itemRefs.current[3] = el;
 							}}
 							className="gap-2 px-2 py-1.5 data-[highlighted]:bg-transparent!"
-							onPointerEnter={() => setHoverIdx(4)}
+							onPointerEnter={() => setHoverIdx(3)}
 							onPointerLeave={() => setHoverIdx(undefined)}
 						>
 							<Icon name="question" className="h-4 w-4 text-text-sub-600" />

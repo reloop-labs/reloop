@@ -11,13 +11,10 @@ import { useEffect, useState } from "react";
 export function SocialSignup({
 	onContinueWithEmail,
 	inviteId,
-	inviteCode,
-	lockedEmail,
 }: {
 	onContinueWithEmail: () => void;
+	/** Organization Invitation id — preserved through OAuth callback. */
 	inviteId?: string;
-	inviteCode?: string;
-	lockedEmail?: string;
 }) {
 	const [loading, setLoading] = useState<{
 		name: "google" | "github" | "email";
@@ -43,21 +40,12 @@ export function SocialSignup({
 	const buildCallbackURL = () => {
 		const params = new URLSearchParams();
 		if (inviteId) params.set("inviteId", inviteId);
-		if (inviteCode) params.set("inviteCode", inviteCode);
 		const qs = params.toString();
 		return qs ? `/signup?${qs}` : "/dashboard";
 	};
 
 	return (
 		<>
-			{lockedEmail && (
-				<p className="pb-3 text-center text-[12px] text-text-sub-600">
-					Sign up with the invited email:{" "}
-					<span className="font-medium text-text-strong-950">
-						{lockedEmail}
-					</span>
-				</p>
-			)}
 			<div className="grid grid-cols-1 gap-2">
 				<Button.Root
 					disabled={loading.loading}

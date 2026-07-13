@@ -146,14 +146,6 @@ export interface InviteCreatedPayload {
 	isResend?: boolean;
 }
 
-export interface SignupInviteCreatedPayload {
-	email: string;
-	inviteLink: string;
-	inviteCode: string;
-	inviterName: string;
-	inviterEmail: string;
-}
-
 export interface OtpRequestedPayload {
 	email: string;
 	otp: string;
@@ -350,7 +342,6 @@ export interface EventPayloads {
 	[BusEvent.API_KEY_ROTATED]: ApiKeyRotatedPayload;
 	[BusEvent.API_KEY_UPDATED]: ApiKeyUpdatedPayload;
 	[BusEvent.INVITE_CREATED]: InviteCreatedPayload;
-	[BusEvent.SIGNUP_INVITE_CREATED]: SignupInviteCreatedPayload;
 	[BusEvent.OTP_REQUESTED]: OtpRequestedPayload;
 	[BusEvent.PAYMENT_FAILED]: PaymentFailedPayload;
 	[BusEvent.QUOTA_WARNING]: QuotaWarningPayload;

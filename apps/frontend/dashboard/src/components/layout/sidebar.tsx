@@ -6,16 +6,13 @@ import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion } from "motion/react";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { InviteFriendsModal } from "./invite-friends-modal";
-import { ReferFriendsBanner } from "./refer-friends-banner";
 import { SettingsSidebarItems, SidebarItems } from "./sidebar-items";
 
 export const MainSidebar: React.FC = () => {
 	const { isSidebarCollapsed, setIsSidebarCollapsed, toggleSidebarCollapse } =
 		useUIStore();
-	const [inviteOpen, setInviteOpen] = useState(false);
 	const pathname = usePathname();
 	const isSettings = pathname.startsWith("/settings");
 
@@ -129,18 +126,6 @@ export const MainSidebar: React.FC = () => {
 				</AnimatePresence>
 			</div>
 
-			<div
-				className={cn(
-					"mt-1 mb-3 flex w-full flex-col items-center justify-center gap-1.5 transition-all",
-					isSidebarCollapsed ? "px-0" : "px-3",
-				)}
-			>
-				<ReferFriendsBanner
-					isCollapsed={isSidebarCollapsed}
-					onInvite={() => setInviteOpen(true)}
-				/>
-			</div>
-			<InviteFriendsModal open={inviteOpen} onOpenChange={setInviteOpen} />
 		</div>
 	);
 };

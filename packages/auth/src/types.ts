@@ -2,7 +2,7 @@
  * Type-only surface derived from the single runtime Better Auth instance.
  *
  * Imports types from `./server/auth` (the instance module only), not the
- * server barrel — so typecheck does not pull signup-invite / redis re-exports.
+ * server barrel — so typecheck does not pull redis / heavy re-exports.
  * Value imports of this module must not pull server runtime deps into clients;
  * use `import type` (enforced by export-isolation tests).
  */

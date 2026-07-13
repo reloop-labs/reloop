@@ -4,7 +4,7 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { APIError, createAuthMiddleware } from "better-auth/api";
+import { createAuthMiddleware } from "better-auth/api";
 import {
 	admin,
 	bearer,
@@ -23,14 +23,6 @@ import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "../roles";
 import { authServerConfig } from "./config";
 import { redis } from "./redis";
 import { sessionCacheRedis } from "./session-cache-redis";
-import {
-	canCreateAccount,
-	findValidSignupInvite,
-	getSignupInviteCodeFromRequest,
-	markSignupInviteUsed,
-	normalizeEmail,
-	userExistsByEmail,
-} from "./signup-invite";
 
 /**
  * The single runtime Better Auth instance for Reloop.
@@ -66,62 +58,6 @@ export const auth = betterAuth({
 		},
 		delete: async (key) => {
 			await redis.delete(key);
-		},
-	},
-	databaseHooks: {
-		user: {
-			create: {
-				before: async (user, context) => {
-					if (!authServerConfig.REQUIRE_SIGNUP_INVITE) return;
-
-					const email = normalizeEmail(user.email);
-					const code = context?.headers
-						? getSignupInviteCodeFromRequest(context.headers)
-						: null;
-					let access = await canCreateAccount({ email, code });
-					if (!access.allowed && code) {
-						access = await canCreateAccount({ email });
-					}
-
-					if (!access.allowed) {
-						throw new APIError("FORBIDDEN", {
-							message: "A valid signup invite is required to create an account",
-						});
-					}
-
-					if (access.signupInvite) {
-						await redis.set(
-							`signup_invite:pending:${email}`,
-							access.signupInvite.id,
-							60 * 30,
-						);
-					}
-				},
-				after: async (user) => {
-					if (!authServerConfig.REQUIRE_SIGNUP_INVITE) return;
-
-					const email = normalizeEmail(user.email);
-					const inviteId = await redis.get<string>(
-						`signup_invite:pending:${email}`,
-					);
-					if (inviteId) {
-						await markSignupInviteUsed({
-							inviteId,
-							userId: user.id,
-						});
-						await redis.delete(`signup_invite:pending:${email}`);
-						return;
-					}
-
-					const invite = await findValidSignupInvite({ email });
-					if (invite) {
-						await markSignupInviteUsed({
-							inviteId: invite.id,
-							userId: user.id,
-						});
-					}
-				},
-			},
 		},
 	},
 	hooks: {
@@ -257,22 +193,6 @@ export const auth = betterAuth({
 			expiresIn: 60 * 15,
 			allowedAttempts: 3,
 			async sendVerificationOTP({ email, otp, type }) {
-				if (
-					authServerConfig.REQUIRE_SIGNUP_INVITE &&
-					(type === "sign-in" || type === "email-verification")
-				) {
-					const exists = await userExistsByEmail(email);
-					if (!exists) {
-						const access = await canCreateAccount({ email });
-						if (!access.allowed) {
-							throw new APIError("FORBIDDEN", {
-								message:
-									"A valid signup invite is required to create an account",
-							});
-						}
-					}
-				}
-
 				log.info("server", `Sending OTP (${type}) to: ${email} (OTP: ${otp})`);
 				if (
 					authServerConfig.DEFAULT_OTP &&

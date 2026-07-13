@@ -142,7 +142,7 @@ describe("export isolation (client / types)", () => {
 		// Must not value-import server.
 		expect(typesSrc).not.toMatch(/^import\s+(?!type\b)/m);
 		// Prefer the instance module over the barrel so typecheck does not
-		// pull re-exported signup-invite / redis helpers.
+		// pull re-exported redis helpers.
 		expect(typesSrc).toMatch(/import\s+type\s+\{[^}]*auth[^}]*\}\s+from\s+["']\.\/server\/auth["']/);
 		expect(typesSrc).not.toMatch(/from\s+["']\.\/server["']/);
 	});

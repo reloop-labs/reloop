@@ -258,42 +258,4 @@ export namespace AdminModel {
 	export const createSupportMessageBody = t.Object({
 		body: t.String({ minLength: 1, maxLength: 4000 }),
 	});
-
-	export const createSignupInviteBody = t.Object({
-		email: t.String({ minLength: 3, maxLength: 320 }),
-	});
-
-	export const signupInviteItem = t.Object({
-		id: t.String(),
-		code: t.String(),
-		email: t.String(),
-		status: t.String(),
-		expiresAt: t.Date(),
-		invitedByUserId: t.String(),
-		invitedByEmail: t.Union([t.String(), t.Null()]),
-		invitedByName: t.Union([t.String(), t.Null()]),
-		usedByUserId: t.Union([t.String(), t.Null()]),
-		inviteLink: t.String(),
-		createdAt: t.Date(),
-	});
-
-	export const signupInvitesResponse = t.Object({
-		items: t.Array(signupInviteItem),
-		total: t.Number(),
-	});
-
-	export const signupInviteCreatedResponse = t.Object({
-		id: t.String(),
-		code: t.String(),
-		email: t.String(),
-		status: t.String(),
-		expiresAt: t.Date(),
-		inviteLink: t.String(),
-		createdAt: t.Date(),
-	});
-
-	export const signupInviteRevokeResponse = t.Object({
-		id: t.String(),
-		status: t.String(),
-	});
 }

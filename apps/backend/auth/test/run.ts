@@ -36,9 +36,6 @@ try {
 				BETTER_AUTH_SECRET:
 					process.env.BETTER_AUTH_SECRET ?? "test-secret-characterization",
 				NODE_ENV: "test",
-				// Characterize the ungated signup path; the app .env enables the
-				// invite gate, which env vars must override for a clean baseline.
-				REQUIRE_SIGNUP_INVITE: "false",
 				DISABLE_SIGNUP: "false",
 			},
 			stdio: ["inherit", "inherit", "inherit"],
