@@ -66,11 +66,7 @@ export const auth = betterAuth({
 					typeof ctx.headers?.get === "function"
 						? ctx.headers.get("cookie")
 						: null;
-				const sessionUser =
-
-					(context as any)?.session?.user ??
-
-					(context as any)?.newSession?.user;
+				const sessionUser = context?.session?.user ?? context?.newSession?.user;
 				await handleAuthLifecycleEviction(sessionCacheRedis, {
 					path: String(path),
 					cookieHeader,
@@ -88,7 +84,7 @@ export const auth = betterAuth({
 				if (newSession) {
 					log.info({
 						...{ data: newSession.user },
-						message: "🔐 User registered:",
+						message: "User registered:",
 					});
 					await bus.publish(
 						BusEvent.USER_CREATED,
@@ -110,7 +106,7 @@ export const auth = betterAuth({
 				const data = context.newSession;
 				if (data) {
 					const { session, user } = data;
-					log.info({ ...{ data: user.email }, message: "🔓 User signed in:" });
+					log.info({ ...{ data: user.email }, message: "User signed in:" });
 
 					const bucket = Math.floor(Date.now() / 60000);
 					await bus.publish(
@@ -250,11 +246,11 @@ export const auth = betterAuth({
 						email: data.email,
 						organization: data.organization.name,
 					},
-					message: "📧 Organization invitation email requested:",
+					message: "Organization invitation email requested:",
 				});
 
 				if (authServerConfig.NODE_ENV === "development") {
-					log.info("server", `🔗 Invite URL (DEV): ${inviteLink}`);
+					log.info("server", `Invite URL (DEV): ${inviteLink}`);
 				}
 
 				const isResend =
@@ -278,12 +274,12 @@ export const auth = betterAuth({
 					);
 					log.info(
 						"server",
-						`✅ Organization invite bus event published for ${data.email} (resend: ${isResend})`,
+						`Organization invite bus event published for ${data.email} (resend: ${isResend})`,
 					);
 				} catch (error) {
 					log.error(
 						"server",
-						`❌ Failed to publish organization invite event:${error}`,
+						`Failed to publish organization invite event:${error}`,
 					);
 				}
 			},
@@ -305,7 +301,7 @@ export const auth = betterAuth({
 						);
 						log.info(
 							"server",
-							`✅ Organization joined bus event published for ${user.email}`,
+							`Organization joined bus event published for ${user.email}`,
 						);
 
 						await db
@@ -314,13 +310,13 @@ export const auth = betterAuth({
 							.where(eq(schema.user.id, user.id));
 						log.info(
 							"server",
-							`✅ Active organization set to ${organization.id} for user ${user.id}`,
+							`Active organization set to ${organization.id} for user ${user.id}`,
 						);
 					} catch (error) {
 						log.error({
 							...{ data: error },
 							message:
-								"❌ Failed to publish organization joined event or update user:",
+								"Failed to publish organization joined event or update user:",
 						});
 					}
 				},
