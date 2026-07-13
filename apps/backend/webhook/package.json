@@ -10,7 +10,8 @@
 		"start": "bun run dist/index.js",
 		"lint": "biome check .",
 		"fix-lint": "biome check --fix .",
-		"format": "biome format ."
+		"format": "biome format .",
+		"test": "bun test test/"
 	},
 	"dependencies": {
 		"bullmq": "catalog:backend",
@@ -38,7 +39,6 @@
 		"@reloop/db": "workspace:*",
 		"@reloop/cache": "workspace:*",
 		"@reloop/auth": "workspace:*",
-		"@reloop/apikey": "workspace:*",
 		"@reloop/bus": "workspace:*",
 		"@reloop/webhook-events": "workspace:*",
 		"@elysiajs/openapi": "catalog:backend",

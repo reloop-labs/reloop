@@ -15,8 +15,9 @@ export const sendEmailRoute = new Elysia()
 		"/send",
 		async ({
 			body,
-			activeOrganizationId,
+			organizationId,
 			userId,
+			authType,
 			apiKeyId,
 			request,
 			set,
@@ -25,7 +26,7 @@ export const sendEmailRoute = new Elysia()
 			// Rate limit check — runs after auth so we have org/user IDs
 			const rateLimitHeaders = await checkRateLimit({
 				headers: request.headers,
-				activeOrganizationId,
+				activeOrganizationId: organizationId,
 				userId,
 				log,
 			});
@@ -39,13 +40,13 @@ export const sendEmailRoute = new Elysia()
 			// External API key path uses the caller's key for KumoMTA.
 			// Session/internal auth uses the shared internal secret so inject
 			// can authenticate without a recoverable plaintext org API key.
-			const useInternalInject = !apiKeyId;
+			const useInternalInject = authType !== "apikey";
 			const injectApiKey = useInternalInject
 				? mailConfig.RELOOP_INTERNAL_SECRET
 				: (requestApiKey ?? "");
 
 			return await sendEmailController({
-				organizationId: activeOrganizationId,
+				organizationId,
 				body,
 				apiKey: injectApiKey,
 				apiKeyId,
