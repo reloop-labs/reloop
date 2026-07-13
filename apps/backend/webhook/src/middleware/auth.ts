@@ -1,110 +1,29 @@
-import { createId } from "@paralleldrive/cuid2";
-import { webhookConfig } from "@reloop/webhook/webhook.config";
+import {
+	createAuthPlugin,
+	SESSION_CACHE_REDIS_PREFIX,
+} from "@reloop/auth/middleware";
+import { RedisCache } from "@reloop/cache/redis-client";
 import { Elysia } from "elysia";
 import { evlog } from "evlog/elysia";
-import { validateApiKey } from "./api-key-auth";
-import { validateSession } from "./cookie-auth";
+import { webhookConfig } from "../webhook.config";
 
 if (webhookConfig.NODE_ENV !== "production") {
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
+const sessionRedis = new RedisCache(
+	SESSION_CACHE_REDIS_PREFIX,
+	5,
+	webhookConfig.REDIS_URL,
+);
+
+/** Batch A migration: shared auth plugin (fail-closed org via `auth`). */
 export const authMiddleware = new Elysia({ name: "auth-middleware" })
 	.use(evlog())
-	.macro({
-		cookieAuth: {
-			async resolve({ status, request: { headers }, log }) {
-				try {
-					const cookie = headers.get("cookie");
-					const traceId = `req_${createId()}`;
-					log.set({ traceId, service: "webhook" });
-					const sessionResult = await validateSession(cookie);
-					if (sessionResult) {
-						log.set({
-							user: sessionResult.userId,
-							organizationId: sessionResult.organizationId,
-							authType: sessionResult.authType,
-						});
-						log.info("Session authentication successful");
-						return { ...sessionResult, traceId };
-					}
-					return status(401, { message: "Authentication required" });
-				} catch (e) {
-					log.error("Authentication error", {
-						error: e instanceof Error ? e.message : "Unknown error",
-						stack: e instanceof Error ? e.stack : undefined,
-					});
-					return status(401, { message: "Authentication failed" });
-				}
-			},
-		},
-		apiKeyAuth: {
-			async resolve({ status, request: { headers }, log }) {
-				try {
-					const apiKey = headers.get("x-api-key");
-					const traceId = `req_${createId()}`;
-					log.set({ traceId, service: "webhook" });
-					const apiKeyResult = await validateApiKey(apiKey);
-					if (apiKeyResult) {
-						log.set({
-							user: apiKeyResult.userId,
-							organizationId: apiKeyResult.organizationId,
-							authType: apiKeyResult.authType,
-						});
-						log.info("API key authentication successful");
-						return { ...apiKeyResult, traceId };
-					}
-					return status(401, { message: "Authentication required" });
-				} catch (e) {
-					log.error("Authentication error", {
-						error: e instanceof Error ? e.message : "Unknown error",
-						stack: e instanceof Error ? e.stack : undefined,
-					});
-					return status(401, { message: "Authentication failed" });
-				}
-			},
-			detail: {
-				security: [{ apiKey: [] }],
-			},
-		},
-		auth: {
-			async resolve({ status, request: { headers }, log }) {
-				try {
-					const apiKey = headers.get("x-api-key");
-					const cookie = headers.get("cookie");
-					const traceId = `req_${createId()}`;
-					log.set({ traceId, service: "webhook" });
-					const apiKeyResult = await validateApiKey(apiKey);
-					if (apiKeyResult) {
-						log.set({
-							user: apiKeyResult.userId,
-							organizationId: apiKeyResult.organizationId,
-							authType: apiKeyResult.authType,
-						});
-						log.info("API key authentication successful");
-						return { ...apiKeyResult, traceId };
-					}
-					const sessionResult = await validateSession(cookie);
-					if (sessionResult) {
-						log.set({
-							user: sessionResult.userId,
-							organizationId: sessionResult.organizationId,
-							authType: sessionResult.authType,
-						});
-						log.info("Session authentication successful");
-						return { ...sessionResult, traceId };
-					}
-					return status(401, { message: "Authentication required" });
-				} catch (e) {
-					log.error("Authentication error", {
-						error: e instanceof Error ? e.message : "Unknown error",
-						stack: e instanceof Error ? e.stack : undefined,
-					});
-					return status(401, { message: "Authentication failed" });
-				}
-			},
-			detail: {
-				security: [{ apiKey: [] }],
-			},
-		},
-	});
+	.use(
+		createAuthPlugin({
+			baseUrl: webhookConfig.BASE_URL,
+			redis: sessionRedis,
+			ttl: 5,
+		}),
+	);

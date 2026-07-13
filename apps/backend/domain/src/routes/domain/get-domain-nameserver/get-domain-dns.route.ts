@@ -13,7 +13,7 @@ export const getDomainNameserversRoute = new Elysia().use(authMiddleware).get(
 		});
 	},
 	{
-		cookieAuth: true,
+		auth: true,
 		params: t.Object({
 			domain_id: t.String(),
 		}),

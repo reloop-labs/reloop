@@ -1,153 +1,72 @@
-import { createId } from "@paralleldrive/cuid2";
+import { validateApiKey } from "@reloop/auth/apikey/validate";
+import {
+	createAuthPlugin,
+	SESSION_CACHE_REDIS_PREFIX,
+} from "@reloop/auth/middleware";
+import { RedisCache } from "@reloop/cache/redis-client";
 import { domainConfig } from "@reloop/domain/domain.config";
 import { Elysia } from "elysia";
 import { evlog } from "evlog/elysia";
-import { validateApiKey } from "./api-key-auth";
-import { validateSession } from "./cookie-auth";
 
 if (domainConfig.NODE_ENV !== "production") {
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
+const sessionRedis = new RedisCache(
+	SESSION_CACHE_REDIS_PREFIX,
+	5,
+	domainConfig.REDIS_URL,
+);
+
+/**
+ * Batch A migration: shared plugin + service-specific internal-secret macro
+ * for KumoMTA dkim-key injects.
+ */
 export const authMiddleware = new Elysia({ name: "auth-middleware" })
 	.use(evlog())
+	.use(
+		createAuthPlugin({
+			baseUrl: domainConfig.BASE_URL,
+			redis: sessionRedis,
+			ttl: 5,
+		}),
+	)
 	.macro({
-		cookieAuth: {
-			async resolve({ status, request: { headers }, log }) {
-				try {
-					const cookie = headers.get("cookie");
-					const traceId = `req_${createId()}`;
-					log.set({ traceId, service: "domain" });
-					const sessionResult = await validateSession(cookie);
-					if (sessionResult) {
-						log.set({
-							...sessionResult,
-						});
-						log.info("Session authentication successful");
-						return { ...sessionResult, traceId, logger: log };
-					}
-					return status(401, { message: "Authentication required" });
-				} catch (e) {
-					log.error("Authentication error", {
-						error: e instanceof Error ? e.message : "Unknown error",
-						stack: e instanceof Error ? e.stack : undefined,
-					});
-					return status(401, { message: "Authentication failed" });
-				}
-			},
-		},
-		apiKeyAuth: {
-			async resolve({ status, request: { headers }, log }) {
-				try {
-					const apiKey = headers.get("x-api-key");
-					const traceId = `req_${createId()}`;
-					log.set({ traceId, service: "domain" });
-					const apiKeyResult = await validateApiKey(apiKey);
-					if (apiKeyResult) {
-						log.set({
-							...apiKeyResult,
-						});
-						log.info("API key authentication successful");
-						return { ...apiKeyResult, traceId, logger: log };
-					}
-					return status(401, { message: "Authentication required" });
-				} catch (e) {
-					log.error("Authentication error", {
-						error: e instanceof Error ? e.message : "Unknown error",
-						stack: e instanceof Error ? e.stack : undefined,
-					});
-					return status(401, { message: "Authentication failed" });
-				}
-			},
-			detail: {
-				security: [{ apiKey: [] }],
-			},
-		},
 		/**
 		 * API key or internal service secret (KumoMTA → dkim-key for
 		 * already-authenticated mail-service injects).
 		 */
 		apiKeyOrInternalAuth: {
-			async resolve({ status, request: { headers }, log }) {
-				try {
-					const traceId = `req_${createId()}`;
-					log.set({ traceId, service: "domain" });
-
-					const apiKey = headers.get("x-api-key");
-					const apiKeyResult = await validateApiKey(apiKey);
-					if (apiKeyResult) {
-						log.set({
-							...apiKeyResult,
-						});
-						log.info("API key authentication successful");
-						return { ...apiKeyResult, traceId, logger: log };
-					}
-
-					const internalSecret = headers.get("x-internal-secret");
-					const organizationId = headers.get("x-organization-id");
-					if (
-						internalSecret &&
-						organizationId &&
-						domainConfig.RELOOP_INTERNAL_SECRET &&
-						internalSecret === domainConfig.RELOOP_INTERNAL_SECRET
-					) {
-						log.set({
-							authType: "internal",
-							organizationId,
-						});
-						log.info("Internal secret authentication successful");
-						return {
-							organizationId,
-							authType: "internal" as const,
-							traceId,
-							logger: log,
-						};
-					}
-
-					return status(401, { message: "Authentication required" });
-				} catch (e) {
-					log.error("Authentication error", {
-						error: e instanceof Error ? e.message : "Unknown error",
-						stack: e instanceof Error ? e.stack : undefined,
-					});
-					return status(401, { message: "Authentication failed" });
+			async resolve({ status, request: { headers } }) {
+				const apiKey = headers.get("x-api-key");
+				const apiKeyResult = await validateApiKey(apiKey, sessionRedis);
+				if (apiKeyResult?.organizationId) {
+					return {
+						userId: apiKeyResult.userId,
+						organizationId: apiKeyResult.organizationId,
+						role: null as string | null,
+						authType: "apikey" as const,
+						apiKeyId: apiKeyResult.apiKeyId,
+					};
 				}
-			},
-			detail: {
-				security: [{ apiKey: [] }],
-			},
-		},
-		auth: {
-			async resolve({ status, request: { headers }, log }) {
-				try {
-					const apiKey = headers.get("x-api-key");
-					const cookie = headers.get("cookie");
-					const traceId = `req_${createId()}`;
-					log.set({ traceId, service: "domain" });
-					const apiKeyResult = await validateApiKey(apiKey);
-					if (apiKeyResult) {
-						log.set({
-							...apiKeyResult,
-						});
-						log.info("API key authentication successful");
-						return { ...apiKeyResult, traceId, logger: log };
-					}
-					const sessionResult = await validateSession(cookie);
-					if (sessionResult) {
-						log.set({
-							...sessionResult,
-						});
-						log.info("Session authentication successful");
-						return { ...sessionResult, traceId, logger: log };
-					}
-					return status(401, { message: "Authentication required" });
-				} catch (e) {
-					log.error("Authentication error", {
-						error: e instanceof Error ? e.message : "Unknown error",
-						stack: e instanceof Error ? e.stack : undefined,
-					});
-					return status(401, { message: "Authentication failed" });
+
+				const internalSecret = headers.get("x-internal-secret");
+				const organizationId = headers.get("x-organization-id");
+				if (
+					internalSecret &&
+					organizationId &&
+					domainConfig.RELOOP_INTERNAL_SECRET &&
+					internalSecret === domainConfig.RELOOP_INTERNAL_SECRET
+				) {
+					return {
+						userId: "internal",
+						organizationId,
+						role: null as string | null,
+						authType: "session" as const,
+					};
 				}
+
+				return status(401, { message: "Authentication required" });
 			},
 			detail: {
 				security: [{ apiKey: [] }],

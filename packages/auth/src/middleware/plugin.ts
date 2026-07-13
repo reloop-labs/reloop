@@ -18,10 +18,12 @@ type ResolveOpts = {
 	requirePlatformAdmin: boolean;
 };
 
+type ResolvedAuth = AuthContext & { apiKeyId?: string };
+
 async function resolveFromHeaders(
 	headers: Headers,
 	opts: ResolveOpts,
-): Promise<AuthContext | null> {
+): Promise<ResolvedAuth | null> {
 	if (opts.allowApiKey) {
 		const apiKey =
 			headers.get("x-api-key") ||
@@ -30,14 +32,15 @@ async function resolveFromHeaders(
 			const result = await validateApiKey(apiKey, opts.redis);
 			if (result) {
 				if (opts.requireOrg && !result.organizationId) return null;
-				const ctx: AuthContext = {
+				if (opts.requirePlatformAdmin) return null;
+				// Extra apiKeyId is useful for audit logs; not part of AuthContext.
+				return {
 					userId: result.userId,
 					organizationId: result.organizationId,
 					role: null,
-					authType: "apikey",
+					authType: "apikey" as const,
+					apiKeyId: result.apiKeyId,
 				};
-				if (opts.requirePlatformAdmin) return null;
-				return ctx;
 			}
 		}
 	}
@@ -83,10 +86,17 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 					allowApiKey: true,
 					requirePlatformAdmin: false,
 				});
-				if (!ctx) {
+				// Fail-closed: organizationId is always a non-null string here.
+				if (!ctx?.organizationId) {
 					return status(401, { message: "Authentication required" });
 				}
-				return ctx;
+				return {
+					userId: ctx.userId,
+					organizationId: ctx.organizationId,
+					role: ctx.role,
+					authType: ctx.authType,
+					...(ctx.apiKeyId ? { apiKeyId: ctx.apiKeyId } : {}),
+				};
 			},
 			detail: {
 				security: [{ apiKey: [] }],
@@ -123,13 +133,13 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 				if (!result?.organizationId) {
 					return status(401, { message: "Authentication required" });
 				}
-				const ctx: AuthContext = {
+				return {
 					userId: result.userId,
 					organizationId: result.organizationId,
-					role: null,
-					authType: "apikey",
+					role: null as string | null,
+					authType: "apikey" as const,
+					apiKeyId: result.apiKeyId,
 				};
-				return ctx;
 			},
 			detail: {
 				security: [{ apiKey: [] }],
