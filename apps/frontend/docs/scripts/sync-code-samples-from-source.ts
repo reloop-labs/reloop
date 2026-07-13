@@ -188,7 +188,7 @@ function replaceCodeSamples(
 function bumpWatcherTrigger(): void {
 	fs.writeFileSync(
 		WATCHER_TRIGGER,
-		`export const watcherTrigger = ${Date.now()};\n`,
+		`export const timestamp = ${Date.now()};\n`,
 	);
 }
 
