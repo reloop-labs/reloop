@@ -11,7 +11,8 @@
 		"cleanup": "bun run scripts/cleanup.ts",
 		"lint": "biome check .",
 		"fix-lint": "biome check --fix .",
-		"format": "biome format ."
+		"format": "biome format .",
+		"test": "bun test test/"
 	},
 	"dependencies": {
 		"@clickhouse/client": "catalog:backend",
@@ -38,7 +39,7 @@
 		"pg": "catalog:db",
 		"@reloop/db": "workspace:*",
 		"@reloop/cache": "workspace:*",
-		"@reloop/apikey": "workspace:*",
+		"@reloop/auth": "workspace:*",
 		"@reloop/bus": "workspace:*",
 		"@paralleldrive/cuid2": "catalog:backend",
 		"evlog": "catalog:backend"

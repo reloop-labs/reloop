@@ -9,6 +9,7 @@
 		"dev": "bun run --hot src/index.ts",
 		"fix-lint": "biome check --fix .",
 		"format": "biome format .",
+		"test": "bun test test/",
 		"lint": "biome check .",
 		"start": "bun run dist/index.js"
 	},
@@ -40,7 +41,6 @@
 		"@reloop/db": "workspace:*",
 		"@reloop/cache": "workspace:*",
 		"@reloop/auth": "workspace:*",
-		"@reloop/apikey": "workspace:*",
 		"@reloop/bus": "workspace:*",
 		"@elysiajs/openapi": "catalog:backend",
 		"evlog": "catalog:backend"

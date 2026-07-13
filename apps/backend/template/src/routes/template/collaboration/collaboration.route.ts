@@ -19,7 +19,7 @@ export const collaborationRoute = new Elysia({
 })
 	.use(authMiddleware)
 	.ws("/collab/:roomName", {
-		auth: true,
+		collabAuth: true,
 		async open(ws) {
 			const { userId, organizationId, userEmail, userName, userImage } =
 				ws.data;
