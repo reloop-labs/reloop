@@ -12,6 +12,7 @@ import {
 	useState,
 } from "react";
 import useSWR from "swr";
+import { isInvitationActionable } from "../utils/invitations";
 
 type User = NonNullable<
 	ReturnType<typeof authClient.useSession>["data"]
@@ -68,9 +69,15 @@ export const UserOrganizationProvider = ({
 	const [isSettingDefaultOrg, setIsSettingDefaultOrg] = useState(false);
 	const [hasInitialized, setHasInitialized] = useState(false);
 
+	// Prefer Better Auth's session active org (what membership APIs use), then
+	// the durable user preference, then the first membership as a last resort.
+	const resolvedActiveOrgId =
+		session?.session?.activeOrganizationId ??
+		session?.user?.activeOrganizationId ??
+		null;
 	const activeOrganization =
 		organizations?.find(
-			(organization) => organization.id === session?.user?.activeOrganizationId,
+			(organization) => organization.id === resolvedActiveOrgId,
 		) ||
 		organizations?.[0] ||
 		null;
@@ -103,9 +110,15 @@ export const UserOrganizationProvider = ({
 			if (pathname.startsWith("/invite") || pathname.startsWith("/onboarding"))
 				return;
 
-			if (invitations && invitations.length > 0 && invitations[0]) {
+			// Only redirect for still-valid invites. Better Auth leaves expired
+			// rows as status "pending", which used to trap users who could neither
+			// accept the invite nor create their own organization.
+			const actionableInvite = invitations?.find((invite) =>
+				isInvitationActionable(invite),
+			);
+			if (actionableInvite) {
 				hasRedirected.current = true;
-				router.push(`/invite?id=${invitations[0].id}`);
+				router.push(`/invite?id=${actionableInvite.id}`);
 				return;
 			}
 
@@ -125,60 +138,74 @@ export const UserOrganizationProvider = ({
 	]);
 
 	useEffect(() => {
-		const handleOrganizationRedirect = async () => {
+		const syncActiveOrganization = async () => {
 			if (
-				!sessionLoading &&
-				!organizationsLoading &&
-				organizations &&
-				!isSettingDefaultOrg &&
-				!hasInitialized
+				sessionLoading ||
+				organizationsLoading ||
+				!organizations ||
+				isSettingDefaultOrg ||
+				hasInitialized
 			) {
-				// If user already has an active org that exists in the list, just mark as initialized
-				if (session?.user?.activeOrganizationId && activeOrganization) {
-					setHasInitialized(true);
-					return;
-				}
+				return;
+			}
 
-				// No active org set — pick the first available one
-				if (!activeOrganization && organizations.length > 0) {
-					setIsSettingDefaultOrg(true);
+			// Better Auth gates org membership APIs on session.activeOrganizationId.
+			// user.activeOrganizationId is our durable "last used org" preference.
+			const sessionActiveOrgId =
+				session?.session?.activeOrganizationId ?? null;
+			const userActiveOrgId = session?.user?.activeOrganizationId ?? null;
 
-					const firstOrg = organizations[0];
-					if (firstOrg?.id) {
-						try {
-							await authClient.organization.setActive({
-								organizationId: firstOrg.id,
-							});
-							await authClient.updateUser({
-								activeOrganizationId: firstOrg.id,
-							});
-						} catch (error) {
-							console.log("Error setting active organization", { error });
-						} finally {
-							setIsSettingDefaultOrg(false);
-							setHasInitialized(true);
-						}
-					} else {
-						setIsSettingDefaultOrg(false);
-						setHasInitialized(true);
-					}
-				} else {
-					setHasInitialized(true);
+			const preferredOrgId =
+				(sessionActiveOrgId &&
+					organizations.find((org) => org.id === sessionActiveOrgId)?.id) ||
+				(userActiveOrgId &&
+					organizations.find((org) => org.id === userActiveOrgId)?.id) ||
+				organizations[0]?.id ||
+				null;
+
+			if (!preferredOrgId) {
+				setHasInitialized(true);
+				return;
+			}
+
+			// Already aligned — nothing to do.
+			if (
+				sessionActiveOrgId === preferredOrgId &&
+				userActiveOrgId === preferredOrgId
+			) {
+				setHasInitialized(true);
+				return;
+			}
+
+			setIsSettingDefaultOrg(true);
+			try {
+				if (sessionActiveOrgId !== preferredOrgId) {
+					await authClient.organization.setActive({
+						organizationId: preferredOrgId,
+					});
 				}
+				if (userActiveOrgId !== preferredOrgId) {
+					await authClient.updateUser({
+						activeOrganizationId: preferredOrgId,
+					});
+				}
+			} catch (error) {
+				console.log("Error setting active organization", { error });
+			} finally {
+				setIsSettingDefaultOrg(false);
+				setHasInitialized(true);
 			}
 		};
 
-		handleOrganizationRedirect();
+		void syncActiveOrganization();
 	}, [
 		sessionLoading,
 		organizationsLoading,
-		organizations?.length,
-		activeOrganization?.id,
+		organizations,
 		isSettingDefaultOrg,
 		hasInitialized,
+		session?.session?.activeOrganizationId,
 		session?.user?.activeOrganizationId,
-		organizations,
-		activeOrganization,
 	]);
 
 	const onOrganizationChange = async (organization: Organization) => {
@@ -205,14 +232,21 @@ export const UserOrganizationProvider = ({
 	};
 
 	// Determine if we should show children or a loading state.
-	// This prevents the dashboard from flashing before redirecting to onboarding.
+	// This prevents the dashboard from flashing before redirecting to onboarding,
+	// and waits until session/user active org are synced so org-gated pages work.
 	const shouldShowChildren = (() => {
-		// Still loading data — don't render children yet
-		if (sessionLoading || organizationsLoading) return false;
+		// Still loading data or syncing active org — don't render children yet
+		if (sessionLoading || organizationsLoading || isSettingDefaultOrg)
+			return false;
 		// No session — will redirect to login
 		if (!session) return false;
-		// Has organizations with an active one — safe to render
-		if (organizations && organizations.length > 0 && activeOrganization)
+		// Has organizations with an active one and sync finished — safe to render
+		if (
+			organizations &&
+			organizations.length > 0 &&
+			activeOrganization &&
+			hasInitialized
+		)
 			return true;
 		// No organizations — will redirect to onboarding (or invite)
 		if (organizations && organizations.length === 0) return false;

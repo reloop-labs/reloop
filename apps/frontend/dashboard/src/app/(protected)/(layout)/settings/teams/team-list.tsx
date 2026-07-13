@@ -5,6 +5,12 @@ import {
 	getAvatarGradient,
 	getAvatarInitial,
 } from "@fe/dashboard/utils/avatar";
+import {
+	dedupePendingInvitesByEmail,
+	isInvitationActionable,
+	isInvitationExpiredPending,
+	isInvitationPending,
+} from "@fe/dashboard/utils/invitations";
 import { authClient } from "@reloop/auth/client";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
@@ -149,8 +155,10 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 	// Filter based on search query and filter type
 	const filteredData = useMemo(() => {
 		const members = membersData?.members ?? [];
-		const pendingInvites = (invites ?? []).filter(
-			(i) => i.status.toLowerCase() === "pending",
+		// Deduplicate pending invites by email so an expired row + a re-invite
+		// never appear as two separate people in the team list.
+		const pendingInvites = dedupePendingInvitesByEmail(
+			(invites ?? []).filter((i) => isInvitationPending(i)),
 		);
 
 		let filteredMembers = members;
@@ -256,24 +264,42 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 
 	const handleResendInvite = async (inviteId: string) => {
 		const invite = invites?.find((i) => i.id === inviteId);
-		if (!invite) return;
+		if (!invite || !activeOrganization?.id) return;
 
 		setResendingInvite(inviteId);
 		try {
+			// Better Auth only matches *non-expired* pending invites for `resend: true`.
+			// Expired rows stay `status: "pending"`, so a naive resend inserts a second
+			// pending invite for the same email. Cancel every pending invite for that
+			// email first, then create a fresh one.
+			const sameEmailPending = (invites ?? []).filter(
+				(i) =>
+					isInvitationPending(i) &&
+					i.email.toLowerCase() === invite.email.toLowerCase(),
+			);
+
+			await Promise.all(
+				sameEmailPending.map((i) =>
+					authClient.organization.cancelInvitation({ invitationId: i.id }),
+				),
+			);
+
 			const { error } = await authClient.organization.inviteMember({
 				email: invite.email,
 				role: invite.role as "admin" | "member",
-				organizationId: activeOrganization?.id ?? "",
-				resend: true,
+				organizationId: activeOrganization.id,
 			});
 			if (error) {
 				toast.error(error.message || "Failed to resend invitation");
+				// Refresh so canceled rows don't leave the UI empty if create failed.
+				mutateInvites();
 				return;
 			}
 			toast.success("Invitation resent successfully");
 			mutateInvites();
 		} catch (_err) {
 			toast.error("Failed to resend invitation");
+			mutateInvites();
 		} finally {
 			setResendingInvite(null);
 		}
@@ -379,70 +405,82 @@ export const TeamList = ({ searchQuery, filters = "all" }: TeamListProps) => {
 				) : (
 					<div className={`divide-y ${DIVIDER}`}>
 						{/* Pending Invites */}
-						{filteredData.invites.map((invite, index) => (
-							<div
-								key={
-									invite.id && invite.id.length > 0
-										? `invite-${invite.id}`
-										: `invite-idx-${index}`
-								}
-								className={cn(
-									`group/row grid ${GRID} items-center px-4 py-2 transition-colors`,
-									"hover:bg-bg-weak-50/50",
-								)}
-							>
-								{/* User Column */}
-								<div className="flex min-w-0 items-center gap-3">
-									<div
-										className={cn(
-											"flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
-											getAvatarGradient(invite.email),
-										)}
-									>
-										{getAvatarInitial(null, invite.email)}
+						{filteredData.invites.map((invite, index) => {
+							const expired = isInvitationExpiredPending(invite);
+							const actionable = isInvitationActionable(invite);
+
+							return (
+								<div
+									key={
+										invite.id && invite.id.length > 0
+											? `invite-${invite.id}`
+											: `invite-idx-${index}`
+									}
+									className={cn(
+										`group/row grid ${GRID} items-center px-4 py-2 transition-colors`,
+										"hover:bg-bg-weak-50/50",
+									)}
+								>
+									{/* User Column */}
+									<div className="flex min-w-0 items-center gap-3">
+										<div
+											className={cn(
+												"flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase tracking-wide shadow-sm",
+												getAvatarGradient(invite.email),
+											)}
+										>
+											{getAvatarInitial(null, invite.email)}
+										</div>
+										<div className="min-w-0">
+											<span className="block truncate font-medium text-label-sm text-text-strong-950">
+												{invite.email.split("@")[0]}
+											</span>
+											<span className="block truncate text-[11px] text-text-sub-600">
+												{invite.email}
+											</span>
+										</div>
 									</div>
-									<div className="min-w-0">
-										<span className="block truncate font-medium text-label-sm text-text-strong-950">
-											{invite.email.split("@")[0]}
-										</span>
-										<span className="block truncate text-[11px] text-text-sub-600">
-											{invite.email}
+
+									{/* Role Column */}
+									<div className="flex items-center">
+										<span
+											className={cn(
+												"inline-flex rounded-full px-2.5 py-0.5 font-medium text-[11px]",
+												getRoleBadgeStyles(invite.role),
+											)}
+										>
+											{formatRoleLabel(invite.role)}
 										</span>
 									</div>
-								</div>
 
-								{/* Role Column */}
-								<div className="flex items-center">
-									<span
-										className={cn(
-											"inline-flex rounded-full px-2.5 py-0.5 font-medium text-[11px]",
-											getRoleBadgeStyles(invite.role),
-										)}
-									>
-										{formatRoleLabel(invite.role)}
-									</span>
-								</div>
+									{/* Status Column */}
+									<div className="flex items-center gap-2">
+										<span
+											className={cn(
+												"h-1.5 w-1.5 flex-shrink-0 rounded-full",
+												expired ? "bg-error-base" : "bg-amber-400",
+											)}
+										/>
+										<span className="font-medium text-[12px] text-text-sub-600">
+											{expired ? "Invite Expired" : "Invite Pending"}
+										</span>
+									</div>
 
-								{/* Status Column */}
-								<div className="flex items-center gap-2">
-									<span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-amber-400" />
-									<span className="font-medium text-[12px] text-text-sub-600">
-										Invite Pending
-									</span>
+									{/* Actions Column */}
+									<div className="flex items-center justify-end">
+										<InviteDropdown
+											inviteId={invite.id}
+											onResendInvite={handleResendInvite}
+											onCopyInviteLink={
+												actionable ? handleCopyInviteLink : undefined
+											}
+											onRevokeInvite={handleRevokeInviteClick}
+											isResending={resendingInvite === invite.id}
+										/>
+									</div>
 								</div>
-
-								{/* Actions Column */}
-								<div className="flex items-center justify-end">
-									<InviteDropdown
-										inviteId={invite.id}
-										onResendInvite={handleResendInvite}
-										onCopyInviteLink={handleCopyInviteLink}
-										onRevokeInvite={handleRevokeInviteClick}
-										isResending={resendingInvite === invite.id}
-									/>
-								</div>
-							</div>
-						))}
+							);
+						})}
 
 						{/* Members */}
 						{filteredData.members.map((member, index) => {

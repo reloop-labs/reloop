@@ -21,7 +21,7 @@ import {
 	openAPI,
 	organization,
 } from "better-auth/plugins";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { log } from "evlog";
 
 export const auth = betterAuth({
@@ -41,6 +41,39 @@ export const auth = betterAuth({
 				required: false,
 				input: true,
 				defaultValue: "dev",
+			},
+		},
+	},
+	/**
+	 * Better Auth stores the active org on the *session* (`session.activeOrganizationId`).
+	 * We also persist the last-used org on the *user* (`user.activeOrganizationId`) so it
+	 * survives across logins. On every new session, copy the user's preference onto the
+	 * session so org-scoped endpoints (get-active-member-role, billing, teams, etc.) work
+	 * immediately without requiring a manual org switch in the UI.
+	 */
+	databaseHooks: {
+		session: {
+			create: {
+				before: async (session) => {
+					if (session.activeOrganizationId) return;
+
+					const [found] = await db
+						.select({
+							activeOrganizationId: schema.user.activeOrganizationId,
+						})
+						.from(schema.user)
+						.where(eq(schema.user.id, session.userId))
+						.limit(1);
+
+					if (!found?.activeOrganizationId) return;
+
+					return {
+						data: {
+							...session,
+							activeOrganizationId: found.activeOrganizationId,
+						},
+					};
+				},
 			},
 		},
 	},
@@ -283,7 +316,47 @@ export const auth = betterAuth({
 					);
 				}
 			},
+			// Better Auth's findPendingInvitation ignores expired rows, so a
+			// re-invite after expiry would create a second `pending` invite while
+			// the old one remains. Cancel expired pending invites for the same
+			// email+org before inserting a new one.
+			cancelPendingInvitationsOnReInvite: true,
 			organizationHooks: {
+				beforeCreateInvitation: async ({ invitation }) => {
+					const email = invitation.email.toLowerCase();
+					const now = new Date();
+					const existing = await db
+						.select({
+							id: schema.invitation.id,
+							expiresAt: schema.invitation.expiresAt,
+						})
+						.from(schema.invitation)
+						.where(
+							and(
+								eq(schema.invitation.email, email),
+								eq(schema.invitation.organizationId, invitation.organizationId),
+								eq(schema.invitation.status, "pending"),
+							),
+						);
+
+					const expiredIds = existing
+						.filter((row) => new Date(row.expiresAt).getTime() <= now.getTime())
+						.map((row) => row.id);
+
+					if (expiredIds.length === 0) return;
+
+					for (const id of expiredIds) {
+						await db
+							.update(schema.invitation)
+							.set({ status: "canceled" })
+							.where(eq(schema.invitation.id, id));
+					}
+
+					log.info(
+						"server",
+						`Canceled ${expiredIds.length} expired pending invitation(s) for ${email} before re-invite`,
+					);
+				},
 				afterAcceptInvitation: async ({ member, user, organization }) => {
 					try {
 						await bus.publish(
@@ -294,8 +367,8 @@ export const auth = betterAuth({
 								userId: user.id,
 								userEmail: user.email,
 								memberName: user.name || user.email,
-								role: member.role,
 								inviterName: "Admin",
+								role: member.role,
 							},
 							{ msgId: `org_joined:${organization.id}:${user.id}` },
 						);

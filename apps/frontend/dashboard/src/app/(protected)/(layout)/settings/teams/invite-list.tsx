@@ -10,6 +10,12 @@ import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
+import {
+	dedupePendingInvitesByEmail,
+	isInvitationActionable,
+	isInvitationExpiredPending,
+	isInvitationPending,
+} from "@fe/dashboard/utils/invitations";
 import useSWR from "swr";
 
 interface Invite {
@@ -88,7 +94,8 @@ export const InviteList = () => {
 			const result = await authClient.organization.listInvitations({
 				query: { organizationId: activeOrganization.id },
 			});
-			return result.data ?? [];
+			const pending = (result.data ?? []).filter((i) => isInvitationPending(i));
+			return dedupePendingInvitesByEmail(pending);
 		},
 	);
 
@@ -193,7 +200,8 @@ export const InviteList = () => {
 				{/* Table Body */}
 				<div className="space-y-1">
 					{invites.map((invite, index) => {
-						const isPending = invite.status.toLowerCase() === "pending";
+						const expired = isInvitationExpiredPending(invite);
+						const actionable = isInvitationActionable(invite);
 
 						return (
 							<div
@@ -246,12 +254,12 @@ export const InviteList = () => {
 
 								{/* Status & Actions Column */}
 								<div className="flex w-32 items-center justify-end gap-2">
-									{isPending && (
+									{(actionable || expired) && (
 										<motion.span
 											{...getAnimationProps(index + 1, 4)}
 											className="rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 text-text-sub-600 text-xs"
 										>
-											Invite pendi...
+											{expired ? "Invite expired" : "Invite pending"}
 										</motion.span>
 									)}
 									<motion.div {...getAnimationProps(index + 1, 5)}>

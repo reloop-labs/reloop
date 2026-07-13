@@ -4,6 +4,7 @@ import {
 	getAvatarGradient,
 	getAvatarInitial,
 } from "@fe/dashboard/utils/avatar";
+import { isInvitationActionable } from "@fe/dashboard/utils/invitations";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -123,8 +124,12 @@ export const InviteModal = ({ open, onOpenChange }: InviteModalProps) => {
 		...(membersData?.members?.map((m: { user: { email: string } }) =>
 			m.user.email.toLowerCase(),
 		) ?? []),
+		// Only block on still-valid pending invites — expired ones can be re-sent.
 		...(invitesData
-			?.filter((i: { status: string }) => i.status.toLowerCase() === "pending")
+			?.filter(
+				(i: { status: string; expiresAt: Date | string }) =>
+					isInvitationActionable(i),
+			)
 			.map((i: { email: string }) => i.email.toLowerCase()) ?? []),
 	]);
 

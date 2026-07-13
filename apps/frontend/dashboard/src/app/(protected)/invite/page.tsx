@@ -49,6 +49,10 @@ export default function InvitePage() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isAccepting, setIsAccepting] = useState(false);
 
+	const [loadError, setLoadError] = useState<"expired" | "not_found" | null>(
+		null,
+	);
+
 	useEffect(() => {
 		if (!id) return;
 
@@ -61,21 +65,35 @@ export default function InvitePage() {
 				});
 
 				if (error) {
-					toast.error("Invalid or expired invitation");
-					router.push("/login");
+					// Better Auth returns the same generic error for expired and missing
+					// invites. Treat either as unusable so the user can create their own org.
+					setLoadError("expired");
+					setInvitation(null);
+					return;
+				}
+
+				if (
+					data &&
+					(data.status !== "pending" ||
+						new Date(data.expiresAt).getTime() <= Date.now())
+				) {
+					setLoadError("expired");
+					setInvitation(null);
 					return;
 				}
 
 				setInvitation(data);
+				setLoadError(null);
 			} catch (err) {
 				console.error(err);
+				setLoadError("not_found");
 			} finally {
 				setIsLoading(false);
 			}
 		};
 
 		fetchInvitation();
-	}, [id, router]);
+	}, [id]);
 
 	const handleJoin = async () => {
 		if (!session) {
@@ -139,6 +157,7 @@ export default function InvitePage() {
 	}
 
 	if (!invitation) {
+		const isExpired = loadError === "expired";
 		return (
 			<div className="flex h-dvh flex-col items-center justify-center">
 				<div className="w-full max-w-sm p-5 md:p-8">
@@ -149,20 +168,44 @@ export default function InvitePage() {
 					</div>
 					<div className="space-y-1 pb-6 text-center">
 						<h2 className="font-medium text-label-lg text-text-strong-950">
-							Invitation not found
+							{isExpired ? "Invitation expired" : "Invitation not found"}
 						</h2>
 						<p className="mt-2 text-center text-[13px] text-text-sub-600">
-							This invitation may have expired or been revoked.
+							{isExpired
+								? "This invitation is no longer valid. Ask the workspace admin to send a new one, or create your own organization."
+								: "This invitation may have been revoked or the link is invalid."}
 						</p>
 					</div>
-					<Button.Root
-						variant="neutral"
-						mode="filled"
-						className="h-11 w-full rounded-2xl!"
-						onClick={() => router.push("/login")}
-					>
-						Go to Login
-					</Button.Root>
+					<div className="space-y-3">
+						{session ? (
+							<Button.Root
+								variant="neutral"
+								mode="filled"
+								className="h-11 w-full rounded-2xl!"
+								onClick={() => router.push("/onboarding")}
+							>
+								Create your organization
+							</Button.Root>
+						) : (
+							<Button.Root
+								variant="neutral"
+								mode="filled"
+								className="h-11 w-full rounded-2xl!"
+								onClick={() => router.push("/login")}
+							>
+								Go to Login
+							</Button.Root>
+						)}
+						{session && (
+							<button
+								type="button"
+								className="w-full cursor-pointer text-center text-[13px] text-text-sub-600 hover:text-text-strong-950 hover:underline"
+								onClick={() => router.push("/")}
+							>
+								Go to dashboard
+							</button>
+						)}
+					</div>
 				</div>
 			</div>
 		);

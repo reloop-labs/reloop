@@ -11,7 +11,8 @@ import { useRef, useState } from "react";
 export interface InviteDropdownProps {
 	inviteId: string;
 	onResendInvite: (id: string) => Promise<void>;
-	onCopyInviteLink: (id: string) => void;
+	/** Omit for expired invites — the link is no longer usable. */
+	onCopyInviteLink?: (id: string) => void;
 	onRevokeInvite: (id: string) => void;
 	isResending: boolean;
 }
@@ -35,7 +36,7 @@ const inviteMenuItems = [
 		icon: "cross-circle" as const,
 		isDanger: true,
 	},
-];
+] as const;
 
 export const InviteDropdown = ({
 	inviteId,
@@ -48,9 +49,13 @@ export const InviteDropdown = ({
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
+	const visibleItems = inviteMenuItems.filter(
+		(item) => item.id !== "copy" || Boolean(onCopyInviteLink),
+	);
+
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
-	const hoveredItem = inviteMenuItems[hoverIdx ?? -1];
+	const hoveredItem = visibleItems[hoverIdx ?? -1];
 	const isDanger = hoveredItem?.isDanger ?? false;
 
 	const handleItemClick = async (itemId: string) => {
@@ -58,7 +63,7 @@ export const InviteDropdown = ({
 			setDropdownOpen(false);
 			onRevokeInvite(inviteId);
 		} else if (itemId === "copy") {
-			onCopyInviteLink(inviteId);
+			onCopyInviteLink?.(inviteId);
 			setDropdownOpen(false);
 		} else if (itemId === "resend") {
 			await onResendInvite(inviteId);
@@ -80,7 +85,7 @@ export const InviteDropdown = ({
 			</Dropdown.Trigger>
 			<Dropdown.Content align="end" className="w-40 p-1.5">
 				<div className="relative">
-					{inviteMenuItems.map((item, idx) => (
+					{visibleItems.map((item, idx) => (
 						<button
 							key={item.id}
 							ref={(el) => {

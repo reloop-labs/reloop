@@ -7,8 +7,13 @@ type SessionUser = {
 	activeOrganizationId?: string | null;
 };
 
+type SessionRecord = {
+	activeOrganizationId?: string | null;
+};
+
 type GetSessionBody = {
 	user?: SessionUser | null;
+	session?: SessionRecord | null;
 } | null;
 
 export type FetchedUser = {
@@ -50,12 +55,16 @@ export async function fetchGetSession(
 	const user = body?.user;
 	if (!user?.id) return null;
 
+	// Prefer the Better Auth session field; fall back to the durable user preference.
+	const activeOrganizationId =
+		body?.session?.activeOrganizationId ?? user.activeOrganizationId ?? null;
+
 	return {
 		id: user.id,
 		role: user.role ?? null,
 		email: user.email ?? undefined,
 		name: user.name ?? undefined,
 		image: user.image ?? undefined,
-		activeOrganizationId: user.activeOrganizationId ?? null,
+		activeOrganizationId,
 	};
 }
