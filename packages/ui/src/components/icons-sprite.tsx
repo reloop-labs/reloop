@@ -1490,6 +1490,7 @@ export const IconsSprite = () => (
 				<path
 					d="M8 6L2 12L8 18M16 6L22 12L16 18"
 					stroke="currentColor"
+					strokeWidth="2.5"
 					strokeLinecap="round"
 					strokeLinejoin="round"
 				/>
