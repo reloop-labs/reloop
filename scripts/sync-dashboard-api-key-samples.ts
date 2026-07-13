@@ -34,12 +34,16 @@ const CHECK = process.argv.includes("--check");
 const OPS = [
 	{ folder: "create-api-key", key: "create" },
 	{ folder: "list-api-keys", key: "list" },
+	{ folder: "get-api-key", key: "get" },
+	{ folder: "update-api-key", key: "update" },
+	{ folder: "delete-api-key", key: "delete" },
 	{ folder: "rotate-api-key", key: "rotate" },
+	{ folder: "enable-api-key", key: "enable" },
 	{ folder: "disable-api-key", key: "disable" },
 ] as const;
 
 const LANGS = [
-	{ sampleId: "node", langKey: "javascript" },
+	{ sampleId: "node", langKey: "nodejs" },
 	{ sampleId: "python", langKey: "python" },
 	{ sampleId: "php", langKey: "php" },
 ] as const;
@@ -55,7 +59,7 @@ function loadOpSamples(folder: string) {
 
 function buildFile(): string {
 	const byLang: Record<string, Record<string, string>> = {
-		javascript: {},
+		nodejs: {},
 		python: {},
 		php: {},
 	};

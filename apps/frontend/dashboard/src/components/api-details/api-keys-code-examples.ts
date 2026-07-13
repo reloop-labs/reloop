@@ -4,7 +4,7 @@
 // Regenerate: bun run sync:sdk-samples
 
 export const codeExamples = {
-	javascript: {
+	nodejs: {
 		create: `import { Reloop } from "reloop-email";
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
@@ -29,6 +29,35 @@ const { apiKeys, apiKeyError } = await reloop.apiKey.list({
 if (apiKeyError) throw apiKeyError;
 
 console.log(apiKeys.total, apiKeys.apiKeys);`,
+		get: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { apiKey, apiKeyError } = await reloop.apiKey.get("key_123456789");
+
+if (apiKeyError) throw apiKeyError;
+
+console.log(apiKey.id, apiKey.name, apiKey.enabled);`,
+		update: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { apiKey, apiKeyError } = await reloop.apiKey.update("key_123456789", {
+  name: "Updated Key Name",
+});
+
+if (apiKeyError) throw apiKeyError;
+
+console.log(apiKey.id, apiKey.name);`,
+		delete: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { apiKey, apiKeyError } = await reloop.apiKey.delete("key_123456789");
+
+if (apiKeyError) throw apiKeyError;
+
+console.log(apiKey.id, apiKey.message);`,
 		rotate: `import { Reloop } from "reloop-email";
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
@@ -38,6 +67,15 @@ const { apiKey, apiKeyError } = await reloop.apiKey.rotate("key_123456789");
 if (apiKeyError) throw apiKeyError;
 
 console.log(apiKey.id, apiKey.key);`,
+		enable: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { apiKey, apiKeyError } = await reloop.apiKey.enable("key_123456789");
+
+if (apiKeyError) throw apiKeyError;
+
+console.log(apiKey.id, apiKey.enabled);`,
 		disable: `import { Reloop } from "reloop-email";
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
@@ -59,11 +97,31 @@ api_key = reloop.api_keys.create(name="Production Key")`,
 reloop = Reloop(api_key="rl_123456789")
 
 api_keys = reloop.api_keys.list(page=1, limit=10)`,
+		get: `from reloop import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+reloop.api_keys.get("key_123456789")`,
+		update: `from reloop import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+api_key = reloop.api_keys.update("key_123456789", name="Updated Key Name")`,
+		delete: `from reloop import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+reloop.api_keys.delete("key_123456789")`,
 		rotate: `from reloop import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
 reloop.api_keys.rotate("key_123456789")`,
+		enable: `from reloop import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+reloop.api_keys.enable("key_123456789")`,
 		disable: `from reloop import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
@@ -77,9 +135,21 @@ $apiKey = $reloop->apiKeys->create(['name' => 'Production Key']);`,
 		list: `$reloop = Reloop::client('rl_123456789');
 
 $apiKeys = $reloop->apiKeys->list(['page' => 1, 'limit' => 10]);`,
+		get: `$reloop = Reloop::client('rl_123456789');
+
+$reloop->apiKeys->get('key_123456789');`,
+		update: `$reloop = Reloop::client('rl_123456789');
+
+$apiKey = $reloop->apiKeys->update('key_123456789', ['name' => 'Updated Key Name']);`,
+		delete: `$reloop = Reloop::client('rl_123456789');
+
+$reloop->apiKeys->delete('key_123456789');`,
 		rotate: `$reloop = Reloop::client('rl_123456789');
 
 $reloop->apiKeys->rotate('key_123456789');`,
+		enable: `$reloop = Reloop::client('rl_123456789');
+
+$reloop->apiKeys->enable('key_123456789');`,
 		disable: `$reloop = Reloop::client('rl_123456789');
 
 $reloop->apiKeys->disable('key_123456789');`,
