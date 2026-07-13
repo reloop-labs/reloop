@@ -24,7 +24,13 @@ export type SupportAuthContext = AuthContext & {
 export type AuthRedis = {
 	get<T>(key: string): Promise<T | undefined>;
 	set(key: string, value: unknown, ttlSeconds?: number): Promise<void>;
+	/** Best-effort delete (session cleanup may swallow Redis errors). */
 	delete(key: string): Promise<void>;
+	/**
+	 * Fail-closed delete when present (e.g. RedisCache).
+	 * Used by API key credential invalidate — must throw if delete cannot be confirmed.
+	 */
+	deleteStrict?(key: string): Promise<void>;
 };
 
 export type AuthMiddlewareConfig = {

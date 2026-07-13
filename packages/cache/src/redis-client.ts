@@ -92,6 +92,10 @@ export class RedisCache {
 		}
 	}
 
+	/**
+	 * Best-effort delete (session cleanup, secondary storage).
+	 * Logs and swallows Redis errors so logout/session paths stay available.
+	 */
 	async delete(key: string): Promise<void> {
 		try {
 			const redis = await this.getRedisClient();
@@ -102,6 +106,24 @@ export class RedisCache {
 				error,
 			);
 			this.redis = null;
+		}
+	}
+
+	/**
+	 * Fail-closed delete for security-sensitive paths (e.g. API key credential invalidate).
+	 * Rethrows so callers cannot treat a failed delete as success.
+	 */
+	async deleteStrict(key: string): Promise<void> {
+		try {
+			const redis = await this.getRedisClient();
+			await redis.del(this.getKey(key));
+		} catch (error) {
+			console.error(
+				`Redis deleteStrict error for ${this.prefix} cache, key "${key}":`,
+				error,
+			);
+			this.redis = null;
+			throw error instanceof Error ? error : new Error(String(error));
 		}
 	}
 

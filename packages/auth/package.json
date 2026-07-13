@@ -8,6 +8,7 @@
 		"./server/config": "./src/server/config.ts",
 		"./types": "./src/types.ts",
 		"./apikey": "./src/apikey/index.ts",
+		"./apikey/credential-cache": "./src/apikey/credential-cache.ts",
 		"./apikey/validate": "./src/apikey/validate.ts",
 		"./middleware": "./src/middleware/index.ts",
 		"./roles": "./src/roles.ts",

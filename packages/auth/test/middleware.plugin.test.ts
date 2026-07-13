@@ -9,9 +9,9 @@ import {
 import { randomBytes } from "node:crypto";
 import {
 	API_KEY_PREFIX,
-	getApiKeyCacheKey,
 	hashApiKey,
 } from "@reloop/auth/apikey/helpers";
+import { createApiKeyCredentialCache } from "@reloop/auth/apikey/credential-cache";
 import {
 	type AuthContext,
 	createAuthPlugin,
@@ -389,7 +389,7 @@ describe("createAuthPlugin — authKey", () => {
 		const redis = new MemoryRedis();
 		const raw = makeRawKey();
 		const hashed = hashApiKey(raw);
-		await redis.set(getApiKeyCacheKey(hashed), {
+		await createApiKeyCredentialCache(redis).write(hashed, {
 			userId: "key-user",
 			organizationId: "key-org",
 			apiKeyId: "key-id-1",
@@ -424,7 +424,7 @@ describe("createAuthPlugin — authKey", () => {
 		const redis = new MemoryRedis();
 		const raw = makeRawKey();
 		const hashed = hashApiKey(raw);
-		await redis.set(getApiKeyCacheKey(hashed), {
+		await createApiKeyCredentialCache(redis).write(hashed, {
 			userId: "key-user",
 			organizationId: "key-org",
 			apiKeyId: "key-id-2",
@@ -539,7 +539,7 @@ describe("createAuthPlugin — internal", () => {
 	test("authKeyInternal: API key wins over internal", async () => {
 		const redis = new MemoryRedis();
 		const raw = makeRawKey();
-		await redis.set(getApiKeyCacheKey(hashApiKey(raw)), {
+		await createApiKeyCredentialCache(redis).write(hashApiKey(raw), {
 			userId: "key-user",
 			organizationId: "key-org",
 			apiKeyId: "k1",
