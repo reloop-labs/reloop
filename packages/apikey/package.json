@@ -14,11 +14,9 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@reloop/db": "workspace:*",
-		"drizzle-orm": "catalog:db"
+		"@reloop/auth": "workspace:*"
 	},
 	"devDependencies": {
-		"@reloop/cache": "workspace:*",
 		"@reloop/tsconfig": "workspace:*",
 		"@types/node": "catalog:",
 		"typescript": "catalog:"
