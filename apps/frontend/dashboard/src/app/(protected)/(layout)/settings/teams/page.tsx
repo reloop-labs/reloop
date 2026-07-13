@@ -76,6 +76,7 @@ const Team = () => {
 						variant="neutral"
 						size="xsmall"
 						onClick={() => setModal("invite")}
+						className="rounded-xl"
 					>
 						<Icon name="user-plus" className="h-4 w-4" />
 						<span>Invite members</span>
