@@ -30,13 +30,16 @@ export type ApiKeyCredentialDeps = {
 	bus: ApiKeyCredentialBus;
 };
 
+export type ApiKeyCreator = {
+	id: string;
+	name: string | null;
+	image: string | null;
+	email: string;
+};
+
+/** API Key row after disable; creator may be missing if the user relation is gone. */
 export type ApiKeyRowWithUser = typeof schema.apikey.$inferSelect & {
-	user: {
-		id: string;
-		name: string | null;
-		image: string | null;
-		email: string;
-	};
+	user?: ApiKeyCreator | null;
 };
 
 export type DisableApiKeyResult = {
@@ -70,56 +73,60 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 			organizationId: string;
 			log?: ApiKeyCredentialLog;
 		}): Promise<DisableApiKeyResult> {
-			const { hashedKey, alreadyDisabled } = await db.transaction(
-				async (tx) => {
-					const locked = await tx
-						.select()
-						.from(schema.apikey)
-						.where(
-							and(
-								eq(schema.apikey.id, id),
-								eq(schema.apikey.organizationId, organizationId),
-							),
-						)
-						.for("update");
+			const {
+				hashedKey,
+				alreadyDisabled,
+				committedRow,
+			} = await db.transaction(async (tx) => {
+				const locked = await tx
+					.select()
+					.from(schema.apikey)
+					.where(
+						and(
+							eq(schema.apikey.id, id),
+							eq(schema.apikey.organizationId, organizationId),
+						),
+					)
+					.for("update");
 
-					const row = locked[0];
-					if (!row) {
-						log.warn("API key not found");
-						throw ApiKeyErrors.notFound(id);
-					}
+				const row = locked[0];
+				if (!row) {
+					log.warn("API key not found");
+					throw ApiKeyErrors.notFound(id);
+				}
 
-					if (!row.enabled) {
-						log.info("API key is already disabled");
-						return {
-							hashedKey: row.key,
-							alreadyDisabled: true as const,
-						};
-					}
-
-					const [updated] = await tx
-						.update(schema.apikey)
-						.set({ enabled: false, updatedAt: new Date() })
-						.where(
-							and(
-								eq(schema.apikey.id, id),
-								eq(schema.apikey.organizationId, organizationId),
-							),
-						)
-						.returning();
-
-					if (!updated) {
-						log.error("Failed to disable API key");
-						throw ApiKeyErrors.disableFailed(id);
-					}
-
-					log.info("API key disabled successfully");
+				if (!row.enabled) {
+					log.info("API key is already disabled");
 					return {
-						hashedKey: updated.key,
-						alreadyDisabled: false as const,
+						hashedKey: row.key,
+						alreadyDisabled: true as const,
+						committedRow: row,
 					};
-				},
-			);
+				}
+
+				const [updated] = await tx
+					.update(schema.apikey)
+					.set({ enabled: false, updatedAt: new Date() })
+					.where(
+						and(
+							eq(schema.apikey.id, id),
+							eq(schema.apikey.organizationId, organizationId),
+						),
+					)
+					.returning();
+
+				if (!updated) {
+					log.error("Failed to disable API key");
+					throw ApiKeyErrors.disableFailed(id);
+				}
+
+				log.info("API key disabled successfully");
+				return {
+					hashedKey: updated.key,
+					alreadyDisabled: false as const,
+					committedRow: updated,
+				};
+			});
 
 			// Post-commit: fail closed if cache cannot be cleared
 			try {
@@ -142,10 +149,14 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 					});
 					log.info("NATS event published");
 				} catch (err) {
-					log.error("NATS publish failed after disable (auth already revoked)", err);
+					log.error(
+						"NATS publish failed after disable (auth already revoked)",
+						err,
+					);
 				}
 			}
 
+			// Prefer full row + creator for the response; never 404 after a committed disable.
 			const withUser = await db.query.apikey.findFirst({
 				where: and(
 					eq(schema.apikey.id, id),
@@ -154,12 +165,21 @@ export function createApiKeyCredential(deps: ApiKeyCredentialDeps) {
 				with: { user: true },
 			});
 
-			if (!withUser?.user) {
-				throw ApiKeyErrors.notFound(id);
+			if (withUser) {
+				return {
+					row: {
+						...withUser,
+						user: withUser.user ?? null,
+					},
+					alreadyDisabled,
+				};
 			}
 
+			log.warn(
+				"API key row missing after successful disable; returning committed row without creator",
+			);
 			return {
-				row: withUser as ApiKeyRowWithUser,
+				row: { ...committedRow, user: null },
 				alreadyDisabled,
 			};
 		},

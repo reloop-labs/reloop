@@ -24,12 +24,12 @@ function toApiKeyResponse(
 		updatedAt: Date;
 		permissions: string | null;
 		metadata: string | null;
-		user: {
+		user?: {
 			id: string;
 			name: string | null;
 			image: string | null;
 			email: string;
-		};
+		} | null;
 	},
 ): ApiKeyTypes.ApiKeyResponse {
 	return {
@@ -52,12 +52,14 @@ function toApiKeyResponse(
 		updatedAt: row.updatedAt.toISOString(),
 		permissions: row.permissions,
 		metadata: row.metadata,
-		createdBy: {
-			id: row.user.id,
-			name: row.user.name,
-			image: row.user.image,
-			email: row.user.email,
-		},
+		createdBy: row.user
+			? {
+					id: row.user.id,
+					name: row.user.name,
+					image: row.user.image,
+					email: row.user.email,
+				}
+			: undefined,
 		object: "api_key" as const,
 		event: API_KEY_UPDATE_WEBHOOK_EVENT.id,
 	};
