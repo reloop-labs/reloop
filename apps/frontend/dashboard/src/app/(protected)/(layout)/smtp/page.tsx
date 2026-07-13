@@ -6,6 +6,8 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCallback, useState } from "react";
+import { SmtpCodePanel } from "./smtp-code-panel";
+import { SMTP_HOST, SMTP_PORT, SMTP_USER } from "./smtp-code-examples";
 
 function CredentialInput({
 	label,
@@ -124,39 +126,40 @@ function InlineCopy({ value }: { value: string }) {
 
 const SMTPPage = () => {
 	return (
-		<div className="w-full max-w-2xl space-y-8 pt-5">
-			<div>
-				<div className="mb-6">
+		<div className="grid w-full gap-10 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:gap-12">
+			{/* Left — credentials */}
+			<div className="min-w-0 space-y-6">
+				<div>
 					<p className="font-medium text-label-md text-text-strong-950">SMTP</p>
-					<p className="text-paragraph-sm text-text-sub-600">
-						Send emails using SMTP instead of the REST API.{" "}
+					<p className="mt-1 text-paragraph-sm text-text-sub-600">
+						Send emails using SMTP instead of the REST API.
 						<a
-							href="https://reloop.sh/docs/smtp"
+							href="https://reloop.sh/docs/examples/smtp/introduction"
 							target="_blank"
 							rel="noreferrer"
-							className="text-primary-base hover:underline"
+							className="rounded-full px-1 py-0.5 font-semibold text-text-strong-950 transition-colors duration-200 hover:bg-bg-soft-50"
 						>
-							See documentation
+							Read Docs
 						</a>{" "}
 						for more information.
 					</p>
 				</div>
 
-				<div className="space-y-6">
-					<CredentialInput id="host" label="Host" value="smtp.reloop.sh" />
+				<div className="space-y-5">
+					<CredentialInput id="host" label="Host" value={SMTP_HOST} />
 
-					<CredentialInput id="port" label="Port" value="465">
+					<CredentialInput id="port" label="Port" value={String(SMTP_PORT)}>
 						<div className="flex flex-wrap items-center gap-1.5 pt-1 text-paragraph-sm text-text-sub-600">
-							<span>For encrypted/TLS connections use</span>
-							<InlineCopy value="2465" />
-							<span>,</span>
+							<span>For STARTTLS use</span>
 							<InlineCopy value="587" />
 							<span>or</span>
 							<InlineCopy value="2587" />
+							<span>· encrypted TLS</span>
+							<InlineCopy value="2465" />
 						</div>
 					</CredentialInput>
 
-					<CredentialInput id="user" label="User" value="reloop" />
+					<CredentialInput id="user" label="User" value={SMTP_USER} />
 
 					<CredentialInput
 						id="password"
@@ -166,6 +169,11 @@ const SMTPPage = () => {
 						isMono
 					/>
 				</div>
+			</div>
+
+			{/* Right — multi-language code */}
+			<div className="min-w-0 lg:sticky lg:top-6 lg:self-start">
+				<SmtpCodePanel apiKeyPlaceholder="YOUR_API_KEY" />
 			</div>
 		</div>
 	);
