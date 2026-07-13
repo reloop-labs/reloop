@@ -18,8 +18,29 @@ import {
 import { PromptActions } from "@reloop/fe-docs/components/mdx/PromptActions";
 import { Side, SideBySide } from "@reloop/fe-docs/components/mdx/SideBySide";
 import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
+import { RELOOP_ICON_NAMES } from "@reloop/fe-docs/lib/reloop-icon-names";
+import { Icon as ReloopIcon } from "@reloop/ui/icon";
 import type { MDXComponents } from "mdx/types";
 import React from "react";
+
+function resolveCardIcon(icon: unknown): React.ReactNode {
+	if (typeof icon !== "string") {
+		return icon as React.ReactNode;
+	}
+
+	// Brand marks (e.g. siNodedotjs) → Simple Icons
+	if (icon.startsWith("si") || icon.startsWith("Si")) {
+		return <SimpleIcon name={icon} />;
+	}
+
+	// Same sprite icons as the docs sidebar (e.g. inbox, mail-single, key-new)
+	if (RELOOP_ICON_NAMES.has(icon)) {
+		return <ReloopIcon name={icon} className="size-6 shrink-0" />;
+	}
+
+	// Fall through to Mintlify/Font Awesome for other string names
+	return icon;
+}
 
 const getSlug = (children: React.ReactNode): string => {
 	if (typeof children === "string")
@@ -51,14 +72,6 @@ export function getMDXComponents(
 		),
 		...restComponents,
 		Card: ({ icon, href, children, ...props }: any) => {
-			const processedIcon =
-				typeof icon === "string" &&
-				(icon.startsWith("si") || icon.startsWith("Si")) ? (
-					<SimpleIcon name={icon} />
-				) : (
-					icon
-				);
-
 			const finalHref =
 				href?.startsWith("/") && !href.startsWith("/docs")
 					? `/docs${href}`
@@ -68,7 +81,7 @@ export function getMDXComponents(
 				<Card
 					{...props}
 					href={finalHref}
-					icon={processedIcon}
+					icon={resolveCardIcon(icon)}
 					className="no-underline"
 				>
 					{children}
