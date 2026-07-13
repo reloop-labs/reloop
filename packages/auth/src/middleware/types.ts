@@ -19,7 +19,12 @@ export type AuthRedis = {
 export type AuthMiddlewareConfig = {
 	/** Base URL of the auth service (e.g. https://local.reloop.sh). */
 	baseUrl: string;
-	/** Shared Redis used for short-TTL session cache + API-key cache. */
+	/**
+	 * Shared Redis used for short-TTL session cache + API-key cache.
+	 * Session keys use a package-owned convention; construct RedisCache with
+	 * `SESSION_CACHE_REDIS_PREFIX` so central eviction in the auth service
+	 * hits the same keys.
+	 */
 	redis: AuthRedis;
 	/** Session-cache TTL in seconds. Default 5. */
 	ttl?: number;

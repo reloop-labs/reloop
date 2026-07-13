@@ -16,11 +16,13 @@ import {
 } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
 import { log } from "evlog";
+import { handleAuthLifecycleEviction } from "../middleware/eviction";
 import { ac, orgRoles } from "../permissions";
 import { platformAc, platformRoles } from "../platform-permissions";
 import { DEFAULT_USER_ROLE, PLATFORM_ADMIN_ROLE } from "../roles";
 import { authServerConfig } from "./config";
 import { redis } from "./redis";
+import { sessionCacheRedis } from "./session-cache-redis";
 import {
 	canCreateAccount,
 	findValidSignupInvite,
@@ -126,6 +128,31 @@ export const auth = betterAuth({
 		after: createAuthMiddleware(async (ctx) => {
 			const { path, context } = ctx;
 			log.info({ message: String(ctx.path) });
+
+			// Near-instant session-validation cache eviction (shared Redis).
+			// Logout → that token; password-change / org-switch → all user tokens.
+			try {
+				const cookieHeader =
+					typeof ctx.headers?.get === "function"
+						? ctx.headers.get("cookie")
+						: null;
+				const sessionUser =
+					// biome-ignore lint/suspicious/noExplicitAny: Better Auth context shape
+					(context as any)?.session?.user ??
+					// biome-ignore lint/suspicious/noExplicitAny: Better Auth context shape
+					(context as any)?.newSession?.user;
+				await handleAuthLifecycleEviction(sessionCacheRedis, {
+					path: String(path),
+					cookieHeader,
+					userId: sessionUser?.id ?? null,
+				});
+			} catch (err) {
+				log.error({
+					...{ data: err },
+					message: "Session cache eviction failed",
+				});
+			}
+
 			// 🔐 User registered
 			if (path === "/sign-up/email-otp") {
 				const newSession = context.newSession;
