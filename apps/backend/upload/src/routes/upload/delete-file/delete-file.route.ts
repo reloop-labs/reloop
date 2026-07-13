@@ -12,7 +12,8 @@ export const deleteFileRoute = new Elysia().use(authMiddleware).delete(
 		});
 	},
 	{
-		auth: true,
+		// Guard only — handler does not need org (authNoOrg).
+		authNoOrg: true,
 		params: t.Object({
 			fileId: UploadModel.fileIdParam,
 		}),
