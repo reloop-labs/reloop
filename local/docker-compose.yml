@@ -23,11 +23,26 @@ services:
   reloop-redis:
     image: redis:7-alpine
     container_name: reloop-redis
-    command: redis-server --requirepass reloop123
+    # stop-writes-on-bgsave-error no: local Docker volumes (esp. macOS bind mounts)
+    # can fail RDB snapshots due to ownership/disk; default Redis then refuses ALL
+    # writes (sessions, OTP, health), which surfaces as auth "Redis health check failed".
+    command:
+      - redis-server
+      - --requirepass
+      - reloop123
+      - --stop-writes-on-bgsave-error
+      - "no"
+      - --dir
+      - /data
     volumes:
       - ../docker-data/redis:/data
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "reloop123", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
 
   reloop-clickhouse:
