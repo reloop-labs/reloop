@@ -1,1 +1,0 @@
-ALTER TABLE "domain" ALTER COLUMN "is_receiving_email_enabled" SET DEFAULT false;

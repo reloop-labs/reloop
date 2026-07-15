@@ -1,4 +1,5 @@
 CREATE TYPE "public"."organization_status" AS ENUM('active', 'suspended', 'deleted');--> statement-breakpoint
+CREATE TYPE "public"."user_role" AS ENUM('user', 'super-admin');--> statement-breakpoint
 CREATE TYPE "public"."billing_cycle" AS ENUM('monthly', 'annual');--> statement-breakpoint
 CREATE TYPE "public"."email_send_status" AS ENUM('queued', 'sent', 'skipped', 'failed', 'bounced');--> statement-breakpoint
 CREATE TYPE "public"."invoice_status" AS ENUM('draft', 'open', 'paid', 'void', 'uncollectible');--> statement-breakpoint
@@ -8,6 +9,7 @@ CREATE TYPE "public"."subscription_status" AS ENUM('active', 'past_due', 'cancel
 CREATE TYPE "public"."default_subscription" AS ENUM('opt_in', 'opt_out');--> statement-breakpoint
 CREATE TYPE "public"."enrollment_status" AS ENUM('enrolled', 'unenrolled');--> statement-breakpoint
 CREATE TYPE "public"."visibility" AS ENUM('private', 'public');--> statement-breakpoint
+CREATE TYPE "public"."pending_outbound_status" AS ENUM('pending', 'cancelled', 'sent', 'failed');--> statement-breakpoint
 CREATE TYPE "public"."contact_status" AS ENUM('subscribed', 'unsubscribed', 'blocked');--> statement-breakpoint
 CREATE TYPE "public"."property_type" AS ENUM('string', 'number');--> statement-breakpoint
 CREATE TYPE "public"."suppression_reason" AS ENUM('hard_bounce', 'spam_complaint');--> statement-breakpoint
@@ -19,10 +21,27 @@ CREATE TYPE "public"."tls_mode" AS ENUM('opportunistic', 'enforced');--> stateme
 CREATE TYPE "public"."email_event_type" AS ENUM('sent', 'delivered', 'opened', 'clicked', 'bounced', 'complaint', 'unsubscribed', 'deferred');--> statement-breakpoint
 CREATE TYPE "public"."email_priority" AS ENUM('low', 'normal', 'high', 'urgent');--> statement-breakpoint
 CREATE TYPE "public"."email_status" AS ENUM('pending', 'sent', 'delivered', 'failed', 'bounced', 'spam', 'archived');--> statement-breakpoint
+CREATE TYPE "public"."inbound_email_status" AS ENUM('received', 'processing', 'delivered', 'spam', 'rejected', 'failed');--> statement-breakpoint
+CREATE TYPE "public"."mailbox_status" AS ENUM('active', 'disabled');--> statement-breakpoint
+CREATE TYPE "public"."support_conversation_status" AS ENUM('open', 'closed');--> statement-breakpoint
+CREATE TYPE "public"."support_sender_role" AS ENUM('user', 'admin');--> statement-breakpoint
 CREATE TYPE "public"."template_block_type" AS ENUM('heading', 'text', 'button', 'image', 'divider', 'spacer', 'section', 'container', 'columns', 'html');--> statement-breakpoint
 CREATE TYPE "public"."template_status" AS ENUM('draft', 'published', 'archived');--> statement-breakpoint
+CREATE TYPE "public"."message_direction" AS ENUM('inbound', 'outbound');--> statement-breakpoint
+CREATE TYPE "public"."thread_status" AS ENUM('active', 'archived', 'closed', 'trash');--> statement-breakpoint
 CREATE TYPE "public"."webhook_delivery_status" AS ENUM('pending', 'success', 'failed', 'retrying');--> statement-breakpoint
 CREATE TYPE "public"."webhook_status" AS ENUM('active', 'paused', 'disabled', 'failed');--> statement-breakpoint
+CREATE TABLE "admin_audit_log" (
+	"id" text PRIMARY KEY NOT NULL,
+	"actor_user_id" text NOT NULL,
+	"action" text NOT NULL,
+	"resource_type" text NOT NULL,
+	"resource_id" text,
+	"organization_id" text,
+	"metadata" jsonb,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "apikey" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text,
@@ -97,6 +116,7 @@ CREATE TABLE "organization" (
 	"slug" text NOT NULL,
 	"logo" text,
 	"created_at" timestamp NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"metadata" text,
 	"billing_email" text,
 	"billing_name" text,
@@ -114,7 +134,7 @@ CREATE TABLE "user" (
 	"image" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
-	"role" text,
+	"role" "user_role" DEFAULT 'user' NOT NULL,
 	"banned" boolean DEFAULT false,
 	"ban_reason" text,
 	"ban_expires" timestamp,
@@ -196,6 +216,34 @@ CREATE TABLE "channel_subscription" (
 	CONSTRAINT "channel_subscription_unique" UNIQUE("contact_id","channel_id")
 );
 --> statement-breakpoint
+CREATE TABLE "compose_draft" (
+	"id" text PRIMARY KEY NOT NULL,
+	"organization_id" text NOT NULL,
+	"mailbox_id" text NOT NULL,
+	"to" jsonb DEFAULT '[]'::jsonb NOT NULL,
+	"cc" jsonb DEFAULT '[]'::jsonb NOT NULL,
+	"bcc" jsonb DEFAULT '[]'::jsonb NOT NULL,
+	"subject" text DEFAULT '' NOT NULL,
+	"html" text DEFAULT '' NOT NULL,
+	"text" text DEFAULT '' NOT NULL,
+	"attachments" jsonb DEFAULT '[]'::jsonb NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "pending_outbound_email" (
+	"id" text PRIMARY KEY NOT NULL,
+	"organization_id" text NOT NULL,
+	"mailbox_id" text NOT NULL,
+	"status" "pending_outbound_status" DEFAULT 'pending' NOT NULL,
+	"send_at" timestamp NOT NULL,
+	"payload" jsonb NOT NULL,
+	"error" text,
+	"mail_message_id" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "contact" (
 	"id" text PRIMARY KEY NOT NULL,
 	"email" varchar(255) NOT NULL,
@@ -253,7 +301,7 @@ CREATE TABLE "domain" (
 	"tls" "tls_mode" DEFAULT 'opportunistic' NOT NULL,
 	"is_tracking_domain" boolean DEFAULT false NOT NULL,
 	"is_sending_email_enabled" boolean DEFAULT true NOT NULL,
-	"is_receiving_email_enabled" boolean DEFAULT true NOT NULL,
+	"is_receiving_email_enabled" boolean DEFAULT false NOT NULL,
 	"verification_failed_reason" text,
 	"deleted_at" timestamp,
 	"last_verified_at" timestamp,
@@ -346,6 +394,85 @@ CREATE TABLE "group" (
 	"deleted_at" timestamp
 );
 --> statement-breakpoint
+CREATE TABLE "inbound_attachment" (
+	"id" text PRIMARY KEY NOT NULL,
+	"inbound_email_id" text NOT NULL,
+	"filename" text NOT NULL,
+	"content_type" varchar(255) NOT NULL,
+	"size" integer NOT NULL,
+	"storage_path" text NOT NULL,
+	"content_disposition" varchar(50) DEFAULT 'attachment',
+	"content_id" text,
+	"checksum" varchar(128),
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "inbound_email" (
+	"id" text PRIMARY KEY NOT NULL,
+	"mailbox_id" text NOT NULL,
+	"organization_id" text NOT NULL,
+	"from_email" varchar(255) NOT NULL,
+	"from_name" varchar(255),
+	"to_emails" text[] NOT NULL,
+	"cc_emails" jsonb,
+	"bcc_emails" jsonb,
+	"reply_to" varchar(255),
+	"subject" text,
+	"text_body" text,
+	"html_body" text,
+	"snippet" varchar(300),
+	"raw_message" text,
+	"size" bigint DEFAULT 0 NOT NULL,
+	"status" "inbound_email_status" DEFAULT 'received' NOT NULL,
+	"is_read" boolean DEFAULT false NOT NULL,
+	"is_starred" boolean DEFAULT false NOT NULL,
+	"is_spam" boolean DEFAULT false NOT NULL,
+	"spam_score" real,
+	"message_id" text,
+	"thread_id" text,
+	"in_reply_to" text,
+	"references" jsonb,
+	"headers" jsonb,
+	"date" timestamp,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "mailbox" (
+	"id" text PRIMARY KEY NOT NULL,
+	"email" varchar(255) NOT NULL,
+	"password" text NOT NULL,
+	"quota" text DEFAULT '5 GB' NOT NULL,
+	"status" "mailbox_status" DEFAULT 'active' NOT NULL,
+	"display_name" varchar(255),
+	"organization_id" text NOT NULL,
+	"domain_id" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "mailbox_unique_email" UNIQUE("email")
+);
+--> statement-breakpoint
+CREATE TABLE "support_conversation" (
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"organization_id" text,
+	"status" "support_conversation_status" DEFAULT 'open' NOT NULL,
+	"last_message_at" timestamp DEFAULT now() NOT NULL,
+	"last_message_preview" text,
+	"user_last_read_at" timestamp,
+	"admin_last_read_at" timestamp,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "support_message" (
+	"id" text PRIMARY KEY NOT NULL,
+	"conversation_id" text NOT NULL,
+	"sender_user_id" text NOT NULL,
+	"sender_role" "support_sender_role" NOT NULL,
+	"body" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "template" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" varchar(255) NOT NULL,
@@ -383,6 +510,71 @@ CREATE TABLE "template_version" (
 	"rendered_html" text,
 	"created_by_user_id" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "email_label" (
+	"id" text PRIMARY KEY NOT NULL,
+	"mailbox_id" text NOT NULL,
+	"organization_id" text NOT NULL,
+	"name" varchar(100) NOT NULL,
+	"color" varchar(32) DEFAULT 'default' NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "email_thread" (
+	"id" text PRIMARY KEY NOT NULL,
+	"mailbox_id" text,
+	"organization_id" text NOT NULL,
+	"subject" text,
+	"last_message_preview" text,
+	"last_message_at" timestamp DEFAULT now() NOT NULL,
+	"status" "thread_status" DEFAULT 'active' NOT NULL,
+	"message_count" integer DEFAULT 0 NOT NULL,
+	"participants" jsonb DEFAULT '[]'::jsonb,
+	"is_read" boolean DEFAULT false NOT NULL,
+	"is_starred" boolean DEFAULT false NOT NULL,
+	"is_important" boolean DEFAULT false NOT NULL,
+	"is_pinned" boolean DEFAULT false NOT NULL,
+	"pinned_at" timestamp,
+	"deleted_at" timestamp,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "thread_label" (
+	"thread_id" text NOT NULL,
+	"label_id" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "thread_label_thread_id_label_id_pk" PRIMARY KEY("thread_id","label_id")
+);
+--> statement-breakpoint
+CREATE TABLE "thread_message" (
+	"id" text PRIMARY KEY NOT NULL,
+	"thread_id" text NOT NULL,
+	"direction" "message_direction" NOT NULL,
+	"inbound_email_id" text,
+	"email_log_id" text,
+	"from_email" varchar(255) NOT NULL,
+	"from_name" varchar(255),
+	"subject" text,
+	"preview" text,
+	"message_at" timestamp DEFAULT now() NOT NULL,
+	"rfc822_message_id" text,
+	"in_reply_to" text,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "thread_note" (
+	"id" text PRIMARY KEY NOT NULL,
+	"thread_id" text NOT NULL,
+	"organization_id" text NOT NULL,
+	"content" text NOT NULL,
+	"color" varchar(32) DEFAULT 'default' NOT NULL,
+	"is_pinned" boolean DEFAULT false NOT NULL,
+	"order" integer DEFAULT 0 NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "upload" (
@@ -445,6 +637,19 @@ CREATE TABLE "webhook_delivery" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "webhook_delivery_attempt" (
+	"id" text PRIMARY KEY NOT NULL,
+	"webhook_delivery_id" text NOT NULL,
+	"attempt_number" integer NOT NULL,
+	"status" "webhook_delivery_status" NOT NULL,
+	"response_status" integer,
+	"response_body" text,
+	"response_headers" jsonb,
+	"duration_ms" integer,
+	"error_message" text,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "webhook_event" (
 	"id" text PRIMARY KEY NOT NULL,
 	"event" text NOT NULL,
@@ -464,6 +669,8 @@ CREATE TABLE "webhook_event_subscription" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+ALTER TABLE "admin_audit_log" ADD CONSTRAINT "admin_audit_log_actor_user_id_user_id_fk" FOREIGN KEY ("actor_user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "admin_audit_log" ADD CONSTRAINT "admin_audit_log_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "apikey" ADD CONSTRAINT "apikey_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "apikey" ADD CONSTRAINT "apikey_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -482,6 +689,10 @@ ALTER TABLE "channel" ADD CONSTRAINT "channel_user_id_user_id_fk" FOREIGN KEY ("
 ALTER TABLE "channel_subscription" ADD CONSTRAINT "channel_subscription_contact_id_contact_id_fk" FOREIGN KEY ("contact_id") REFERENCES "public"."contact"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "channel_subscription" ADD CONSTRAINT "channel_subscription_channel_id_channel_id_fk" FOREIGN KEY ("channel_id") REFERENCES "public"."channel"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "channel_subscription" ADD CONSTRAINT "channel_subscription_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "compose_draft" ADD CONSTRAINT "compose_draft_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "compose_draft" ADD CONSTRAINT "compose_draft_mailbox_id_mailbox_id_fk" FOREIGN KEY ("mailbox_id") REFERENCES "public"."mailbox"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "pending_outbound_email" ADD CONSTRAINT "pending_outbound_email_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "pending_outbound_email" ADD CONSTRAINT "pending_outbound_email_mailbox_id_mailbox_id_fk" FOREIGN KEY ("mailbox_id") REFERENCES "public"."mailbox"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "contact" ADD CONSTRAINT "contact_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "contact" ADD CONSTRAINT "contact_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "contact_property" ADD CONSTRAINT "contact_property_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -506,18 +717,43 @@ ALTER TABLE "contact_group" ADD CONSTRAINT "contact_group_organization_id_organi
 ALTER TABLE "contact_group" ADD CONSTRAINT "contact_group_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "group" ADD CONSTRAINT "group_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "group" ADD CONSTRAINT "group_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "inbound_attachment" ADD CONSTRAINT "inbound_attachment_inbound_email_id_inbound_email_id_fk" FOREIGN KEY ("inbound_email_id") REFERENCES "public"."inbound_email"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "inbound_email" ADD CONSTRAINT "inbound_email_mailbox_id_mailbox_id_fk" FOREIGN KEY ("mailbox_id") REFERENCES "public"."mailbox"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "inbound_email" ADD CONSTRAINT "inbound_email_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "mailbox" ADD CONSTRAINT "mailbox_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "mailbox" ADD CONSTRAINT "mailbox_domain_id_domain_id_fk" FOREIGN KEY ("domain_id") REFERENCES "public"."domain"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "support_conversation" ADD CONSTRAINT "support_conversation_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "support_conversation" ADD CONSTRAINT "support_conversation_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "support_message" ADD CONSTRAINT "support_message_conversation_id_support_conversation_id_fk" FOREIGN KEY ("conversation_id") REFERENCES "public"."support_conversation"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "support_message" ADD CONSTRAINT "support_message_sender_user_id_user_id_fk" FOREIGN KEY ("sender_user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "template" ADD CONSTRAINT "template_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "template" ADD CONSTRAINT "template_created_by_user_id_user_id_fk" FOREIGN KEY ("created_by_user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "template_version" ADD CONSTRAINT "template_version_template_id_template_id_fk" FOREIGN KEY ("template_id") REFERENCES "public"."template"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "template_version" ADD CONSTRAINT "template_version_created_by_user_id_user_id_fk" FOREIGN KEY ("created_by_user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "email_label" ADD CONSTRAINT "email_label_mailbox_id_mailbox_id_fk" FOREIGN KEY ("mailbox_id") REFERENCES "public"."mailbox"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "email_label" ADD CONSTRAINT "email_label_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "email_thread" ADD CONSTRAINT "email_thread_mailbox_id_mailbox_id_fk" FOREIGN KEY ("mailbox_id") REFERENCES "public"."mailbox"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "email_thread" ADD CONSTRAINT "email_thread_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "thread_label" ADD CONSTRAINT "thread_label_thread_id_email_thread_id_fk" FOREIGN KEY ("thread_id") REFERENCES "public"."email_thread"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "thread_label" ADD CONSTRAINT "thread_label_label_id_email_label_id_fk" FOREIGN KEY ("label_id") REFERENCES "public"."email_label"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "thread_message" ADD CONSTRAINT "thread_message_thread_id_email_thread_id_fk" FOREIGN KEY ("thread_id") REFERENCES "public"."email_thread"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "thread_message" ADD CONSTRAINT "thread_message_inbound_email_id_inbound_email_id_fk" FOREIGN KEY ("inbound_email_id") REFERENCES "public"."inbound_email"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "thread_message" ADD CONSTRAINT "thread_message_email_log_id_email_log_id_fk" FOREIGN KEY ("email_log_id") REFERENCES "public"."email_log"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "thread_note" ADD CONSTRAINT "thread_note_thread_id_email_thread_id_fk" FOREIGN KEY ("thread_id") REFERENCES "public"."email_thread"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "thread_note" ADD CONSTRAINT "thread_note_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "upload" ADD CONSTRAINT "upload_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "webhook" ADD CONSTRAINT "webhook_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "webhook" ADD CONSTRAINT "webhook_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "webhook_delivery" ADD CONSTRAINT "webhook_delivery_webhook_id_webhook_id_fk" FOREIGN KEY ("webhook_id") REFERENCES "public"."webhook"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "webhook_delivery" ADD CONSTRAINT "webhook_delivery_webhook_event_id_webhook_event_id_fk" FOREIGN KEY ("webhook_event_id") REFERENCES "public"."webhook_event"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "webhook_delivery_attempt" ADD CONSTRAINT "webhook_delivery_attempt_webhook_delivery_id_webhook_delivery_id_fk" FOREIGN KEY ("webhook_delivery_id") REFERENCES "public"."webhook_delivery"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "webhook_event" ADD CONSTRAINT "webhook_event_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "webhook_event" ADD CONSTRAINT "webhook_event_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "webhook_event_subscription" ADD CONSTRAINT "webhook_event_subscription_webhook_id_webhook_id_fk" FOREIGN KEY ("webhook_id") REFERENCES "public"."webhook"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "admin_audit_log_actor_idx" ON "admin_audit_log" USING btree ("actor_user_id");--> statement-breakpoint
+CREATE INDEX "admin_audit_log_action_idx" ON "admin_audit_log" USING btree ("action");--> statement-breakpoint
+CREATE INDEX "admin_audit_log_created_idx" ON "admin_audit_log" USING btree ("created_at");--> statement-breakpoint
+CREATE INDEX "admin_audit_log_org_idx" ON "admin_audit_log" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "apikey_key_idx" ON "apikey" USING btree ("key");--> statement-breakpoint
 CREATE INDEX "apikey_organizationId_idx" ON "apikey" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "apikey_userId_idx" ON "apikey" USING btree ("user_id");--> statement-breakpoint
@@ -542,6 +778,11 @@ CREATE INDEX "channel_subscription_idx_contact_id" ON "channel_subscription" USI
 CREATE INDEX "channel_subscription_idx_channel_id" ON "channel_subscription" USING btree ("channel_id");--> statement-breakpoint
 CREATE INDEX "channel_subscription_idx_organization_id" ON "channel_subscription" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "channel_subscription_idx_status" ON "channel_subscription" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "compose_draft_idx_org" ON "compose_draft" USING btree ("organization_id");--> statement-breakpoint
+CREATE INDEX "compose_draft_idx_mailbox" ON "compose_draft" USING btree ("mailbox_id");--> statement-breakpoint
+CREATE INDEX "compose_draft_idx_updated" ON "compose_draft" USING btree ("updated_at");--> statement-breakpoint
+CREATE INDEX "pending_outbound_idx_org" ON "pending_outbound_email" USING btree ("organization_id");--> statement-breakpoint
+CREATE INDEX "pending_outbound_idx_status_send_at" ON "pending_outbound_email" USING btree ("status","send_at");--> statement-breakpoint
 CREATE INDEX "contact_idx_email" ON "contact" USING btree ("email");--> statement-breakpoint
 CREATE INDEX "contact_idx_organization_id" ON "contact" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "contact_idx_org_email" ON "contact" USING btree ("organization_id","email");--> statement-breakpoint
@@ -591,6 +832,26 @@ CREATE INDEX "contact_group_idx_group_id" ON "contact_group" USING btree ("group
 CREATE INDEX "contact_group_idx_organization_id" ON "contact_group" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "group_idx_organization_id" ON "group" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "group_idx_name" ON "group" USING btree ("name");--> statement-breakpoint
+CREATE INDEX "inbound_attachment_idx_inbound_email_id" ON "inbound_attachment" USING btree ("inbound_email_id");--> statement-breakpoint
+CREATE INDEX "inbound_email_idx_mailbox_id" ON "inbound_email" USING btree ("mailbox_id");--> statement-breakpoint
+CREATE INDEX "inbound_email_idx_organization_id" ON "inbound_email" USING btree ("organization_id");--> statement-breakpoint
+CREATE INDEX "inbound_email_idx_from_email" ON "inbound_email" USING btree ("from_email");--> statement-breakpoint
+CREATE INDEX "inbound_email_idx_created_at" ON "inbound_email" USING btree ("created_at");--> statement-breakpoint
+CREATE INDEX "inbound_email_idx_thread_id" ON "inbound_email" USING btree ("thread_id");--> statement-breakpoint
+CREATE INDEX "inbound_email_idx_status" ON "inbound_email" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "inbound_email_idx_is_spam" ON "inbound_email" USING btree ("is_spam");--> statement-breakpoint
+CREATE INDEX "inbound_email_idx_message_id" ON "inbound_email" USING btree ("message_id");--> statement-breakpoint
+CREATE INDEX "mailbox_idx_email" ON "mailbox" USING btree ("email");--> statement-breakpoint
+CREATE INDEX "mailbox_idx_organization_id" ON "mailbox" USING btree ("organization_id");--> statement-breakpoint
+CREATE INDEX "mailbox_idx_domain_id" ON "mailbox" USING btree ("domain_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "support_conversation_open_user_idx" ON "support_conversation" USING btree ("user_id") WHERE "support_conversation"."status" = 'open';--> statement-breakpoint
+CREATE INDEX "support_conversation_user_idx" ON "support_conversation" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "support_conversation_status_idx" ON "support_conversation" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "support_conversation_last_message_idx" ON "support_conversation" USING btree ("last_message_at");--> statement-breakpoint
+CREATE INDEX "support_conversation_org_idx" ON "support_conversation" USING btree ("organization_id");--> statement-breakpoint
+CREATE INDEX "support_message_conversation_idx" ON "support_message" USING btree ("conversation_id");--> statement-breakpoint
+CREATE INDEX "support_message_created_idx" ON "support_message" USING btree ("created_at");--> statement-breakpoint
+CREATE INDEX "support_message_sender_idx" ON "support_message" USING btree ("sender_user_id");--> statement-breakpoint
 CREATE INDEX "template_idx_organization_id" ON "template" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "template_idx_created_by" ON "template" USING btree ("created_by_user_id");--> statement-breakpoint
 CREATE INDEX "template_idx_status" ON "template" USING btree ("status");--> statement-breakpoint
@@ -599,6 +860,25 @@ CREATE INDEX "template_idx_org_status" ON "template" USING btree ("organization_
 CREATE INDEX "template_idx_deleted_at" ON "template" USING btree ("deleted_at");--> statement-breakpoint
 CREATE INDEX "template_version_idx_template_id" ON "template_version" USING btree ("template_id");--> statement-breakpoint
 CREATE INDEX "template_version_idx_version" ON "template_version" USING btree ("version");--> statement-breakpoint
+CREATE INDEX "email_label_idx_mailbox_id" ON "email_label" USING btree ("mailbox_id");--> statement-breakpoint
+CREATE INDEX "email_label_idx_organization_id" ON "email_label" USING btree ("organization_id");--> statement-breakpoint
+CREATE INDEX "email_thread_idx_mailbox_id" ON "email_thread" USING btree ("mailbox_id");--> statement-breakpoint
+CREATE INDEX "email_thread_idx_organization_id" ON "email_thread" USING btree ("organization_id");--> statement-breakpoint
+CREATE INDEX "email_thread_idx_last_message_at" ON "email_thread" USING btree ("last_message_at");--> statement-breakpoint
+CREATE INDEX "email_thread_idx_status" ON "email_thread" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "email_thread_idx_org_status" ON "email_thread" USING btree ("organization_id","status");--> statement-breakpoint
+CREATE INDEX "email_thread_idx_mailbox_last_msg" ON "email_thread" USING btree ("mailbox_id","last_message_at");--> statement-breakpoint
+CREATE INDEX "email_thread_idx_is_important" ON "email_thread" USING btree ("is_important");--> statement-breakpoint
+CREATE INDEX "email_thread_idx_mailbox_is_pinned" ON "email_thread" USING btree ("mailbox_id","is_pinned");--> statement-breakpoint
+CREATE INDEX "thread_label_idx_thread_id" ON "thread_label" USING btree ("thread_id");--> statement-breakpoint
+CREATE INDEX "thread_label_idx_label_id" ON "thread_label" USING btree ("label_id");--> statement-breakpoint
+CREATE INDEX "thread_message_idx_thread_id" ON "thread_message" USING btree ("thread_id");--> statement-breakpoint
+CREATE INDEX "thread_message_idx_inbound_email_id" ON "thread_message" USING btree ("inbound_email_id");--> statement-breakpoint
+CREATE INDEX "thread_message_idx_email_log_id" ON "thread_message" USING btree ("email_log_id");--> statement-breakpoint
+CREATE INDEX "thread_message_idx_rfc822_message_id" ON "thread_message" USING btree ("rfc822_message_id");--> statement-breakpoint
+CREATE INDEX "thread_message_idx_thread_message_at" ON "thread_message" USING btree ("thread_id","message_at");--> statement-breakpoint
+CREATE INDEX "thread_note_idx_thread_id" ON "thread_note" USING btree ("thread_id");--> statement-breakpoint
+CREATE INDEX "thread_note_idx_organization_id" ON "thread_note" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "upload_idx_user_id" ON "upload" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "upload_idx_deleted_at" ON "upload" USING btree ("deleted_at");--> statement-breakpoint
 CREATE INDEX "upload_idx_filename" ON "upload" USING btree ("filename");--> statement-breakpoint
@@ -618,6 +898,8 @@ CREATE INDEX "webhook_delivery_idx_webhook_status" ON "webhook_delivery" USING b
 CREATE INDEX "webhook_delivery_idx_webhook_created" ON "webhook_delivery" USING btree ("webhook_id","created_at");--> statement-breakpoint
 CREATE INDEX "webhook_delivery_idx_retry_pending" ON "webhook_delivery" USING btree ("status","next_retry_at");--> statement-breakpoint
 CREATE INDEX "webhook_delivery_idx_event_instance" ON "webhook_delivery" USING btree ("webhook_event_id");--> statement-breakpoint
+CREATE INDEX "webhook_delivery_attempt_idx_delivery_id" ON "webhook_delivery_attempt" USING btree ("webhook_delivery_id");--> statement-breakpoint
+CREATE INDEX "webhook_delivery_attempt_idx_created_at" ON "webhook_delivery_attempt" USING btree ("created_at");--> statement-breakpoint
 CREATE INDEX "webhook_event_idx_organization_id" ON "webhook_event" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "webhook_event_idx_event" ON "webhook_event" USING btree ("event");--> statement-breakpoint
 CREATE INDEX "webhook_event_idx_source" ON "webhook_event" USING btree ("source");--> statement-breakpoint
