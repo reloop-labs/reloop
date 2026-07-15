@@ -1,175 +1,273 @@
+/**
+ * Domain API samples for the dashboard drawer.
+ * Paths must match the Domain service (apps/backend/domain):
+ *   POST   /api/domain/v1/create
+ *   GET    /api/domain/v1/list
+ *   GET    /api/domain/v1/:domain_id
+ *   PATCH  /api/domain/v1/:domain_id
+ *   DELETE /api/domain/v1/:domain_id
+ *   POST   /api/domain/v1/verify/:domain_id
+ * There is no collection route at /api/domain/v1/domain.
+ */
 export const codeExamples = {
 	javascript: {
-		add: `// Add a new domain
-const response = await fetch('https://reloop.sh/api/v1/add', {
-  method: 'POST',
+		create: `// Create a domain
+const response = await fetch("https://reloop.sh/api/domain/v1/create", {
+  method: "POST",
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer YOUR_API_KEY'
+    "Content-Type": "application/json",
+    "x-api-key": "rl_123456789",
   },
   body: JSON.stringify({
-    domain: 'example.com',
-    serverIP: '192.168.1.100',
-    adminEmail: 'admin@example.com',
-    adminPassword: 'securepassword123',
-    adminFullName: 'Admin User',
-    mailboxes: 100,
-    mailboxQuota: 10737418240, // 10GB
-    quota: 21474836480, // 20GB
-    rateLimit: 20
-  })
+    domain: "send.example.com",
+    custom_return_path: "inbound",
+    tracking: "tracking",
+    click_tracking: true,
+    open_tracking: true,
+    tls: "opportunistic",
+    sending_email: true,
+    receiving_email: false,
+  }),
 });
 
-const result = await response.json();`,
-		list: `// List all domains
-const response = await fetch('https://reloop.sh/api/v1/list?page=1&limit=10', {
-  headers: {
-    'Authorization': 'Bearer YOUR_API_KEY'
-  }
-});
+const domain = await response.json();`,
+		list: `// List domains
+const response = await fetch(
+  "https://reloop.sh/api/domain/v1/list?page=1&limit=10&status=active",
+  {
+    headers: {
+      "x-api-key": "rl_123456789",
+    },
+  },
+);
 
 const domains = await response.json();`,
-		delete: `// Delete a domain
-const response = await fetch('https://reloop.sh/api/v1/delete', {
-  method: 'DELETE',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer YOUR_API_KEY'
+		get: `// Get a domain by ID
+const response = await fetch(
+  "https://reloop.sh/api/domain/v1/dom_123456789",
+  {
+    headers: {
+      "x-api-key": "rl_123456789",
+    },
   },
-  body: JSON.stringify({
-    domain: 'example.com'
-  })
-});
+);
+
+const domain = await response.json();`,
+		update: `// Update domain settings
+const response = await fetch(
+  "https://reloop.sh/api/domain/v1/dom_123456789",
+  {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": "rl_123456789",
+    },
+    body: JSON.stringify({
+      click_tracking: false,
+      open_tracking: true,
+      sending_email: true,
+    }),
+  },
+);
+
+const domain = await response.json();`,
+		delete: `// Delete a domain by ID
+const response = await fetch(
+  "https://reloop.sh/api/domain/v1/dom_123456789",
+  {
+    method: "DELETE",
+    headers: {
+      "x-api-key": "rl_123456789",
+    },
+  },
+);
 
 const result = await response.json();`,
-		details: `// Get domain details
-const response = await fetch('https://reloop.sh/api/v1/details?domain=example.com', {
-  headers: {
-    'Authorization': 'Bearer YOUR_API_KEY'
-  }
-});
+		verify: `// Start DNS verification
+const response = await fetch(
+  "https://reloop.sh/api/domain/v1/verify/dom_123456789",
+  {
+    method: "POST",
+    headers: {
+      "x-api-key": "rl_123456789",
+    },
+  },
+);
 
-const domainDetails = await response.json();`,
+const result = await response.json();`,
 	},
 	python: {
-		add: `# Add a new domain
+		create: `# Create a domain
 import requests
 
-response = requests.post('https://reloop.sh/api/v1/add',
-  headers={
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer YOUR_API_KEY'
-  },
-  json={
-    'domain': 'example.com',
-    'serverIP': '192.168.1.100',
-    'adminEmail': 'admin@example.com',
-    'adminPassword': 'securepassword123',
-    'adminFullName': 'Admin User',
-    'mailboxes': 100,
-    'mailboxQuota': 10737418240,
-    'quota': 21474836480,
-    'rateLimit': 20
-  }
+response = requests.post(
+    "https://reloop.sh/api/domain/v1/create",
+    headers={
+        "Content-Type": "application/json",
+        "x-api-key": "rl_123456789",
+    },
+    json={
+        "domain": "send.example.com",
+        "custom_return_path": "inbound",
+        "tracking": "tracking",
+        "click_tracking": True,
+        "open_tracking": True,
+        "tls": "opportunistic",
+        "sending_email": True,
+        "receiving_email": False,
+    },
 )
 
-result = response.json()`,
-		list: `# List all domains
+domain = response.json()`,
+		list: `# List domains
 import requests
 
-response = requests.get('https://reloop.sh/api/v1/list?page=1&limit=10',
-  headers={'Authorization': 'Bearer YOUR_API_KEY'}
+response = requests.get(
+    "https://reloop.sh/api/domain/v1/list",
+    params={"page": 1, "limit": 10, "status": "active"},
+    headers={"x-api-key": "rl_123456789"},
 )
 
 domains = response.json()`,
-		delete: `# Delete a domain
+		get: `# Get a domain by ID
 import requests
 
-response = requests.delete('https://reloop.sh/api/v1/delete',
-  headers={
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer YOUR_API_KEY'
-  },
-  json={'domain': 'example.com'}
+response = requests.get(
+    "https://reloop.sh/api/domain/v1/dom_123456789",
+    headers={"x-api-key": "rl_123456789"},
+)
+
+domain = response.json()`,
+		update: `# Update domain settings
+import requests
+
+response = requests.patch(
+    "https://reloop.sh/api/domain/v1/dom_123456789",
+    headers={
+        "Content-Type": "application/json",
+        "x-api-key": "rl_123456789",
+    },
+    json={
+        "click_tracking": False,
+        "open_tracking": True,
+        "sending_email": True,
+    },
+)
+
+domain = response.json()`,
+		delete: `# Delete a domain by ID
+import requests
+
+response = requests.delete(
+    "https://reloop.sh/api/domain/v1/dom_123456789",
+    headers={"x-api-key": "rl_123456789"},
 )
 
 result = response.json()`,
-		details: `# Get domain details
+		verify: `# Start DNS verification
 import requests
 
-response = requests.get('https://reloop.sh/api/v1/details?domain=example.com',
-  headers={'Authorization': 'Bearer YOUR_API_KEY'}
+response = requests.post(
+    "https://reloop.sh/api/domain/v1/verify/dom_123456789",
+    headers={"x-api-key": "rl_123456789"},
 )
 
-domain_details = response.json()`,
+result = response.json()`,
 	},
 	php: {
-		add: `<?php
-// Add a new domain
-$data = [
-    'domain' => 'example.com',
-    'serverIP' => '192.168.1.100',
-    'adminEmail' => 'admin@example.com',
-    'adminPassword' => 'securepassword123',
-    'adminFullName' => 'Admin User',
-    'mailboxes' => 100,
-    'mailboxQuota' => 10737418240,
-    'quota' => 21474836480,
-    'rateLimit' => 20
+		create: `<?php
+// Create a domain
+$payload = [
+    'domain' => 'send.example.com',
+    'custom_return_path' => 'inbound',
+    'tracking' => 'tracking',
+    'click_tracking' => true,
+    'open_tracking' => true,
+    'tls' => 'opportunistic',
+    'sending_email' => true,
+    'receiving_email' => false,
 ];
 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://reloop.sh/api/v1/add');
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Content-Type: application/json',
-    'Authorization: Bearer YOUR_API_KEY'
+$ch = curl_init('https://reloop.sh/api/domain/v1/create');
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_POSTFIELDS => json_encode($payload),
+    CURLOPT_HTTPHEADER => [
+        'Content-Type: application/json',
+        'x-api-key: rl_123456789',
+    ],
+    CURLOPT_RETURNTRANSFER => true,
 ]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-$result = curl_exec($ch);
+$domain = curl_exec($ch);
 curl_close($ch);
 ?>`,
 		list: `<?php
-// List all domains
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://reloop.sh/api/v1/list?page=1&limit=10');
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Authorization: Bearer YOUR_API_KEY'
+// List domains
+$ch = curl_init('https://reloop.sh/api/domain/v1/list?page=1&limit=10&status=active');
+curl_setopt_array($ch, [
+    CURLOPT_HTTPHEADER => ['x-api-key: rl_123456789'],
+    CURLOPT_RETURNTRANSFER => true,
 ]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
 $domains = curl_exec($ch);
 curl_close($ch);
 ?>`,
-		delete: `<?php
-// Delete a domain
-$data = ['domain' => 'example.com'];
-
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://reloop.sh/api/v1/delete');
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Content-Type: application/json',
-    'Authorization: Bearer YOUR_API_KEY'
+		get: `<?php
+// Get a domain by ID
+$ch = curl_init('https://reloop.sh/api/domain/v1/dom_123456789');
+curl_setopt_array($ch, [
+    CURLOPT_HTTPHEADER => ['x-api-key: rl_123456789'],
+    CURLOPT_RETURNTRANSFER => true,
 ]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$domain = curl_exec($ch);
+curl_close($ch);
+?>`,
+		update: `<?php
+// Update domain settings
+$payload = [
+    'click_tracking' => false,
+    'open_tracking' => true,
+    'sending_email' => true,
+];
+
+$ch = curl_init('https://reloop.sh/api/domain/v1/dom_123456789');
+curl_setopt_array($ch, [
+    CURLOPT_CUSTOMREQUEST => 'PATCH',
+    CURLOPT_POSTFIELDS => json_encode($payload),
+    CURLOPT_HTTPHEADER => [
+        'Content-Type: application/json',
+        'x-api-key: rl_123456789',
+    ],
+    CURLOPT_RETURNTRANSFER => true,
+]);
+
+$domain = curl_exec($ch);
+curl_close($ch);
+?>`,
+		delete: `<?php
+// Delete a domain by ID
+$ch = curl_init('https://reloop.sh/api/domain/v1/dom_123456789');
+curl_setopt_array($ch, [
+    CURLOPT_CUSTOMREQUEST => 'DELETE',
+    CURLOPT_HTTPHEADER => ['x-api-key: rl_123456789'],
+    CURLOPT_RETURNTRANSFER => true,
+]);
 
 $result = curl_exec($ch);
 curl_close($ch);
 ?>`,
-		details: `<?php
-// Get domain details
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, 'https://reloop.sh/api/v1/details?domain=example.com');
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Authorization: Bearer YOUR_API_KEY'
+		verify: `<?php
+// Start DNS verification
+$ch = curl_init('https://reloop.sh/api/domain/v1/verify/dom_123456789');
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_HTTPHEADER => ['x-api-key: rl_123456789'],
+    CURLOPT_RETURNTRANSFER => true,
 ]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-$domainDetails = curl_exec($ch);
+$result = curl_exec($ch);
 curl_close($ch);
 ?>`,
 	},

@@ -4,6 +4,25 @@ import type { DomainStatus } from "@fe/dashboard/types/api.types";
 export type { DomainStatus };
 
 /**
+ * Static Domain Service path segments under `/api/domain/v1/*`.
+ * Never treat these as a domain_id for GET/PATCH/DELETE `/:domain_id`.
+ */
+const DOMAIN_API_RESERVED_IDS = new Set([
+	"list",
+	"create",
+	"domain",
+	"nameservers",
+	"verify",
+	"add",
+	"details",
+	"delete",
+]);
+
+/** True when `id` is a real domain id, not a reserved route segment. */
+export const isDomainRecordId = (id: unknown): id is string =>
+	typeof id === "string" && id.length > 0 && !DOMAIN_API_RESERVED_IDS.has(id);
+
+/**
  * Get human-readable label for domain status
  */
 export const getStatusLabel = (status: DomainStatus): string => {

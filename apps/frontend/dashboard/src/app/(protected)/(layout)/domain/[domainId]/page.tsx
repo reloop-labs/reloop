@@ -1,6 +1,7 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
+import { isDomainRecordId } from "@fe/dashboard/utils/domain";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
@@ -20,7 +21,10 @@ import { DomainStats } from "./components/domain-stats";
 
 const DomainPage = () => {
 	const params = useParams();
-	const domainId = typeof params.domainId === "string" ? params.domainId : null;
+	const rawDomainId =
+		typeof params.domainId === "string" ? params.domainId : null;
+	// Never call GET /api/domain/v1/{id} with reserved segments (list, create, domain, …).
+	const domainId = isDomainRecordId(rawDomainId) ? rawDomainId : null;
 	// Layout mounts this page while org/session sync is still in progress
 	// (hidden under a loader). Domain APIs require session.activeOrganizationId —
 	// fetching before that settles causes 401s on hard reload, which this page
@@ -56,6 +60,15 @@ const DomainPage = () => {
 	});
 
 	const showLoading = !canFetch || isLoading;
+
+	// Invalid path segment (e.g. /domain/domain) — never hit the API.
+	if (rawDomainId && !domainId) {
+		return (
+			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-3xl flex-col items-center justify-center sm:px-8">
+				<DomainNotFound />
+			</div>
+		);
+	}
 
 	if (error) {
 		const status = axios.isAxiosError(error)

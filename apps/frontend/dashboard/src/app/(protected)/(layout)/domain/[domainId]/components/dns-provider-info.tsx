@@ -1,5 +1,6 @@
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import type { DomainNameserversResponse } from "@fe/dashboard/types/api.types";
+import { isDomainRecordId } from "@fe/dashboard/utils/domain";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useParams } from "next/navigation";
@@ -17,7 +18,9 @@ export const DNSProviderInfo: React.FC<DNSProviderInfoProps> = ({
 	isLoading: isLoadingDomain,
 }) => {
 	const params = useParams();
-	const domainId = typeof params.domainId === "string" ? params.domainId : null;
+	const rawDomainId =
+		typeof params.domainId === "string" ? params.domainId : null;
+	const domainId = isDomainRecordId(rawDomainId) ? rawDomainId : null;
 	const { activeOrganization, isLoading: orgLoading } = useUserOrganization();
 	// Same gate as the domain detail page: wait for active org before org-scoped APIs.
 	const canFetch = Boolean(domainId && activeOrganization && !orgLoading);

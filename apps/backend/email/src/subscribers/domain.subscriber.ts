@@ -17,7 +17,7 @@ export async function initDomainSubscribers() {
 					React.createElement(DomainVerifiedEmail, {
 						fullName: "User", // Default to User if not provided in payload
 						domain: payload.domain,
-						dashboardUrl: `${emailConfig.BASE_URL}/dashboard/domains`,
+						dashboardUrl: `${emailConfig.BASE_URL}/dashboard/domain`,
 					}),
 				);
 
@@ -85,7 +85,7 @@ export async function initDomainSubscribers() {
 						dkimRecords,
 						spfRecords,
 						dmarcRecords,
-						dashboardUrl: `${emailConfig.BASE_URL}/dashboard/domains`,
+						dashboardUrl: `${emailConfig.BASE_URL}/dashboard/domain`,
 					}),
 				);
 

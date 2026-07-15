@@ -8,12 +8,14 @@ import { verifyDNSRecordRoute } from "@reloop/domain/routes/domain/verify-dns/ve
 import { kumomtaRoutes } from "@reloop/domain/routes/kumomta/kumomta.routes";
 import { Elysia } from "elysia";
 
+// Register static paths before `/:domain_id` so list/create/verify never
+// get captured as a domain id (e.g. GET /v1/domain → not a real collection).
 export const domainRoutes = new Elysia({ prefix: "/v1", name: "DomainRoutes" })
 	.use(createDomainRoute)
+	.use(listDomainsRoute)
 	.use(getDomainNameserversRoute)
+	.use(verifyDNSRecordRoute)
 	.use(getDomainRoute)
 	.use(updateDomainRoute)
 	.use(deleteDomainRoute)
-	.use(listDomainsRoute)
-	.use(verifyDNSRecordRoute)
 	.use(kumomtaRoutes);

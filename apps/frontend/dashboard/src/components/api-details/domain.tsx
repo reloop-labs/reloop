@@ -2,34 +2,49 @@ import type * as Button from "@reloop/ui/button";
 import { ApiDetailsDrawer } from "./api-details-drawer";
 import { codeExamples } from "./domain-code-examples";
 
+/** Real Domain Service routes (prefix `/api/domain`). There is no `/api/domain/v1/domain`. */
 const operations = [
 	{
-		id: "add",
-		label: "Add Domain",
+		id: "create",
+		label: "Create Domain",
 		method: "POST",
-		endpoint: "/api/v1/add",
-		docSlug: "post-api-v1-add",
+		endpoint: "/api/domain/v1/create",
+		docSlug: "post-api-domain-v1create",
 	},
 	{
 		id: "list",
 		label: "List Domains",
 		method: "GET",
-		endpoint: "/api/v1/list",
-		docSlug: "get-api-v1-list",
+		endpoint: "/api/domain/v1/list",
+		docSlug: "get-api-domain-v1list",
 	},
 	{
-		id: "details",
-		label: "Get Details",
+		id: "get",
+		label: "Get Domain",
 		method: "GET",
-		endpoint: "/api/v1/details",
-		docSlug: "get-api-v1-details",
+		endpoint: "/api/domain/v1/:domain_id",
+		docSlug: "get-api-domain-v1by-domain_id",
+	},
+	{
+		id: "update",
+		label: "Update Domain",
+		method: "PATCH",
+		endpoint: "/api/domain/v1/:domain_id",
+		docSlug: "patch-api-domain-v1by-domain_id",
 	},
 	{
 		id: "delete",
 		label: "Delete Domain",
 		method: "DELETE",
-		endpoint: "/api/v1/delete",
-		docSlug: "delete-api-v1-delete",
+		endpoint: "/api/domain/v1/:domain_id",
+		docSlug: "delete-api-domain-v1by-domain_id",
+	},
+	{
+		id: "verify",
+		label: "Verify DNS",
+		method: "POST",
+		endpoint: "/api/domain/v1/verify/:domain_id",
+		docSlug: "post-api-domain-v1verify-by-domain_id",
 	},
 ] as const;
 
