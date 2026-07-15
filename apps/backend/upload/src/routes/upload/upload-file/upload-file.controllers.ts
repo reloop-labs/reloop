@@ -15,18 +15,6 @@ function sanitizeFilename(filename: string): string {
 		.substring(0, 255);
 }
 
-function getFileExtension(mimeType: string): string {
-	const mimeToExt: Record<string, string> = {
-		"image/jpeg": "jpg",
-		"image/jpg": "jpg",
-		"image/png": "png",
-		"image/gif": "gif",
-		"image/webp": "webp",
-		"image/svg+xml": "svg",
-	};
-	return mimeToExt[mimeType] || "jpg";
-}
-
 export async function uploadFile(params: {
 	userId: string;
 	file: File;

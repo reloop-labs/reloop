@@ -1,4 +1,7 @@
-import { UploadErrors } from "@be/upload/error/upload.error-response";
+import {
+	AuthErrors,
+	UploadErrors,
+} from "@be/upload/error/upload.error-response";
 import { storage } from "@be/upload/lib/storage";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
@@ -7,8 +10,9 @@ import { useLogger } from "evlog/elysia";
 
 export async function deleteFile(params: {
 	fileId: string;
+	userId: string;
 }): Promise<{ message: string }> {
-	const { fileId } = params;
+	const { fileId, userId } = params;
 	const log = useLogger();
 	try {
 		// Get file metadata from database
@@ -24,6 +28,18 @@ export async function deleteFile(params: {
 		}
 
 		const upload = fileRecord[0];
+
+		// Check file ownership
+		if (upload.userId !== userId) {
+			log.warn("Unauthorized file delete attempt", {
+				fileId,
+				userId,
+				fileOwnerId: upload.userId,
+			});
+			throw AuthErrors.forbidden(
+				"You do not have permission to delete this file",
+			);
+		}
 
 		// Delete from S3 storage
 		await storage.delete(upload.path);
@@ -49,7 +65,13 @@ export async function deleteFile(params: {
 			error: error instanceof Error ? error.message : String(error),
 			stack: error instanceof Error ? error.stack : undefined,
 		});
-		if (error instanceof Error && error.message.includes("File not found")) {
+		if (
+			error &&
+			typeof error === "object" &&
+			"status" in error &&
+			typeof (error as { status: unknown }).status === "number" &&
+			(error as { status: number }).status < 500
+		) {
 			throw error;
 		}
 		throw UploadErrors.deleteFailed(
@@ -61,10 +83,12 @@ export async function deleteFile(params: {
 
 export async function deleteFileHandler(params: {
 	fileId: string;
+	userId: string;
 }): Promise<{ message: string }> {
-	const { fileId } = params;
+	const { fileId, userId } = params;
 	const result = await deleteFile({
 		fileId,
+		userId,
 	});
 	return result;
 }

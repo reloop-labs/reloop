@@ -5,10 +5,11 @@ import { Elysia, t } from "elysia";
 
 export const deleteFileRoute = new Elysia().use(authMiddleware).delete(
 	"/files/:fileId",
-	async ({ params }) => {
+	async ({ params, userId }) => {
 		const { fileId } = params;
 		return await deleteFileHandler({
 			fileId,
+			userId,
 		});
 	},
 	{

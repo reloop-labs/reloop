@@ -17,6 +17,15 @@ export const AuthErrors = {
 			why,
 			fix: fix ?? "Check your credentials and try again",
 		}),
+	forbidden: (why: string, fix?: string) =>
+		createError({
+			status: 403,
+			message: "Unauthorized access",
+			why,
+			fix:
+				fix ??
+				"Ensure you have the required permissions to perform this action",
+		}),
 };
 
 export const UploadErrors = {

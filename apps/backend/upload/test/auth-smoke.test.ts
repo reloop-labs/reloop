@@ -83,6 +83,18 @@ function mountProtectedApp(redis: MemoryRedis) {
 				}),
 				{ authNoOrg: true },
 			)
+			.delete(
+				"/files/:fileId",
+				({ params: { fileId }, userId, set }) => {
+					const fileRecord = { id: fileId, userId: "user-upload" };
+					if (fileRecord.userId !== userId) {
+						set.status = 403;
+						return { message: "Unauthorized access" };
+					}
+					return { message: "File deleted successfully" };
+				},
+				{ authNoOrg: true },
+			)
 	);
 }
 
@@ -93,11 +105,11 @@ beforeAll(async () => {
 			const cookie = request.headers.get("cookie") ?? "";
 			const match = cookie.match(/reloop\.session_token=([^.;]+)/);
 			const token = match?.[1] ? decodeURIComponent(match[1]) : null;
-			if (!token || !sessions.has(token)) {
+			const session = token ? sessions.get(token) : undefined;
+			if (!session) {
 				set.status = 200;
 				return null;
 			}
-			const session = sessions.get(token)!;
 			return {
 				user: {
 					id: session.userId,
@@ -175,5 +187,57 @@ describe("upload pilot — API key call", () => {
 			platformRole: null,
 			authType: "apikey",
 		});
+	});
+});
+
+describe("upload pilot — delete file authorization", () => {
+	test("authenticated owner can delete file", async () => {
+		const redis = new MemoryRedis();
+		const token = "owner-session";
+		sessions.set(token, {
+			userId: "user-upload",
+			activeOrganizationId: null,
+		});
+
+		const res = await mountProtectedApp(redis).handle(
+			new Request("http://localhost/files/file-123", {
+				method: "DELETE",
+				headers: { cookie: cookieFor(token) },
+			}),
+		);
+
+		expect(res.status).toBe(200);
+		const body = (await res.json()) as { message: string };
+		expect(body.message).toBe("File deleted successfully");
+	});
+
+	test("authenticated non-owner is forbidden (403)", async () => {
+		const redis = new MemoryRedis();
+		const token = "other-session";
+		sessions.set(token, {
+			userId: "user-attacker",
+			activeOrganizationId: null,
+		});
+
+		const res = await mountProtectedApp(redis).handle(
+			new Request("http://localhost/files/file-123", {
+				method: "DELETE",
+				headers: { cookie: cookieFor(token) },
+			}),
+		);
+
+		expect(res.status).toBe(403);
+		const body = (await res.json()) as { message: string };
+		expect(body.message).toBe("Unauthorized access");
+	});
+
+	test("unauthenticated call is rejected (401)", async () => {
+		const redis = new MemoryRedis();
+		const res = await mountProtectedApp(redis).handle(
+			new Request("http://localhost/files/file-123", {
+				method: "DELETE",
+			}),
+		);
+		expect(res.status).toBe(401);
 	});
 });
