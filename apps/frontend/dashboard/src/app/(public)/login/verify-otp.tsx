@@ -1,5 +1,6 @@
 "use client";
 
+import { resolvePostAuthDestination } from "@fe/dashboard/utils/post-auth-destination";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import * as DigitInput from "@reloop/ui/digit-input";
@@ -14,9 +15,12 @@ import { useEffect, useRef, useState } from "react";
 export function VerifyOTP({
 	email,
 	onBack,
+	inviteId,
 }: {
 	email: string;
 	onBack: () => void;
+	/** Organization invitation id preserved through email OTP login. */
+	inviteId?: string;
 }) {
 	const router = useRouter();
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -54,8 +58,11 @@ export function VerifyOTP({
 			if (data?.user.id) {
 				setIsSuccess(true);
 				changeStatus("idle");
+				const destination = await resolvePostAuthDestination({
+					inviteId: inviteId || null,
+				});
 				timeoutRef.current = setTimeout(() => {
-					router.push("/");
+					router.push(destination);
 				}, 2000);
 			} else {
 				changeStatus("idle");

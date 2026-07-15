@@ -1,7 +1,8 @@
 "use client";
+import { Loader } from "@dot-loaders/react";
+import { resolvePostAuthDestination } from "@fe/dashboard/utils/post-auth-destination";
 import { authClient } from "@reloop/auth/client";
 import { Logo } from "@reloop/ui/logo";
-import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
@@ -57,37 +58,27 @@ const Page = () => {
 	}, [currentLevel, direction]);
 
 	useEffect(() => {
-		if (session) {
-			if (inviteId) {
-				router.push(`/invite?id=${inviteId}`);
-			} else {
-				router.push("/");
-			}
-		}
+		if (!session) return;
+		let cancelled = false;
+		void (async () => {
+			const destination = await resolvePostAuthDestination({
+				inviteId: inviteId || null,
+			});
+			if (!cancelled) router.push(destination);
+		})();
+		return () => {
+			cancelled = true;
+		};
 	}, [session, router, inviteId]);
 
-	if (isPending && session === undefined) {
+	// Match the dashboard pulse loader while session is unknown or a signed-in
+	// user is being routed (onboarding / invite / home). Never flash the form.
+	const isSessionLoading = isPending && session === undefined;
+	const isRedirecting = Boolean(session);
+	if (isSessionLoading || isRedirecting) {
 		return (
-			<div className="flex h-dvh flex-col items-center justify-center">
-				<div className="w-full max-w-sm p-5 md:p-8">
-					<div className="flex flex-col items-center justify-center gap-2">
-						<div className="mb-2 flex items-center justify-center">
-							<Logo className="h-16" />
-						</div>
-					</div>
-					<div>
-						<div className="space-y-1 pb-5 text-center">
-							<h2 className="font-medium text-label-lg text-text-strong-950">
-								We are getting things ready...
-							</h2>
-						</div>
-						<div className="w-full space-y-3">
-							<Skeleton className="h-11 w-full rounded-2xl!" />
-							<Skeleton className="h-11 w-full rounded-2xl!" />
-							<Skeleton className="h-11 w-full rounded-2xl!" />
-						</div>
-					</div>
-				</div>
+			<div className="flex h-dvh w-full items-center justify-center text-text-strong-950 dark:text-white">
+				<Loader loader="pulse" />
 			</div>
 		);
 	}
@@ -132,6 +123,7 @@ const Page = () => {
 							</div>
 							<VerifyOTP
 								email={otpSentEmail}
+								inviteId={inviteId || undefined}
 								onBack={() => {
 									setOtpSentEmail(null);
 									setEnterCode(null);

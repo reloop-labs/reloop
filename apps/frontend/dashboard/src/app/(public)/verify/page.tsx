@@ -1,5 +1,6 @@
 "use client";
 
+import { resolvePostAuthDestination } from "@fe/dashboard/utils/post-auth-destination";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
@@ -37,7 +38,8 @@ const AutoLoginPage = () => {
 				});
 
 				if (data?.user.id) {
-					router.push("/");
+					const destination = await resolvePostAuthDestination();
+					router.push(destination);
 				} else {
 					setError(error?.message || "Failed to sign in. Please try manually.");
 					setIsVerifying(false);

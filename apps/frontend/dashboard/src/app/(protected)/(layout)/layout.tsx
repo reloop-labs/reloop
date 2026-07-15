@@ -18,7 +18,16 @@ const DashboardLayoutContent = ({
 	children: React.ReactNode;
 }) => {
 	const { isAiPanelOpen } = useUIStore();
-	const { user, isLoading } = useUserOrganization();
+	const { user, isLoading, organizations, activeOrganization } =
+		useUserOrganization();
+
+	// Orgless users must not see dashboard pages while redirecting to
+	// onboarding or invites (provider handles navigation).
+	const orgsResolved = organizations !== undefined;
+	const hasOrg =
+		(organizations?.length ?? 0) > 0 && activeOrganization != null;
+	const blockContent =
+		isLoading || !user || (orgsResolved && !hasOrg);
 
 	return (
 		<div className="flex h-screen overflow-hidden bg-bg-weak-50 dark:bg-black">
@@ -27,7 +36,7 @@ const DashboardLayoutContent = ({
 				<div className="flex flex-1 flex-col overflow-hidden">
 					<PageHeader />
 					<div className="flex-1 overflow-y-auto">
-						{isLoading || !user ? (
+						{blockContent ? (
 							<>
 								<div className="flex h-full w-full items-center justify-center text-text-strong-950 dark:text-white">
 									<Loader loader="pulse" />

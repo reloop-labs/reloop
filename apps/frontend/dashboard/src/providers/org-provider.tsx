@@ -54,17 +54,19 @@ export const UserOrganizationProvider = ({
 	const pathname = usePathname();
 	const { data: session, isPending: sessionPending } = authClient.useSession();
 	const sessionLoading = sessionPending && session === undefined;
+	const userId = session?.user?.id ?? null;
 	const {
 		data: organizations,
 		isLoading: organizationsLoading,
 		mutate: mutateOrganizations,
 	} = useSWR(
-		"organizations",
-		async () => (await authClient.organization.list()).data,
+		userId ? ["organizations", userId] : null,
+		async () => (await authClient.organization.list()).data ?? [],
 	);
 	const { data: invitations, isLoading: invitationsLoading } = useSWR(
-		session ? "user-invitations" : null,
-		async () => (await authClient.organization.listUserInvitations()).data,
+		userId ? ["user-invitations", userId] : null,
+		async () =>
+			(await authClient.organization.listUserInvitations()).data ?? [],
 	);
 	const [isSettingDefaultOrg, setIsSettingDefaultOrg] = useState(false);
 	const [hasInitialized, setHasInitialized] = useState(false);
@@ -84,11 +86,21 @@ export const UserOrganizationProvider = ({
 
 	const isLoading =
 		sessionLoading ||
-		organizationsLoading ||
-		(session && invitationsLoading) ||
+		(!!userId && organizationsLoading) ||
+		(!!userId && invitationsLoading) ||
 		isSettingDefaultOrg;
 
 	const hasRedirected = useRef(false);
+	const lastRedirectUserId = useRef<string | null>(null);
+
+	// Allow re-evaluation when the authenticated user changes (logout → signup).
+	useEffect(() => {
+		if (userId !== lastRedirectUserId.current) {
+			hasRedirected.current = false;
+			lastRedirectUserId.current = userId;
+			setHasInitialized(false);
+		}
+	}, [userId]);
 
 	useEffect(() => {
 		if (session === undefined || hasRedirected.current || sessionPending)
@@ -101,31 +113,29 @@ export const UserOrganizationProvider = ({
 			return;
 		}
 
-		if (
-			!organizationsLoading &&
-			organizations &&
-			organizations.length === 0 &&
-			!invitationsLoading
-		) {
-			if (pathname.startsWith("/invite") || pathname.startsWith("/onboarding"))
-				return;
+		// Wait until membership + invite lists have settled for this user.
+		if (organizationsLoading || invitationsLoading) return;
+		// SWR finished: treat missing data as empty (network/null responses).
+		const orgList = organizations ?? [];
+		if (orgList.length > 0) return;
 
-			// Only redirect for still-valid invites. Better Auth leaves expired
-			// rows as status "pending", which used to trap users who could neither
-			// accept the invite nor create their own organization.
-			const actionableInvite = invitations?.find((invite) =>
-				isInvitationActionable(invite),
-			);
-			if (actionableInvite) {
-				hasRedirected.current = true;
-				router.push(`/invite?id=${actionableInvite.id}`);
-				return;
-			}
+		if (pathname.startsWith("/invite") || pathname.startsWith("/onboarding"))
+			return;
 
+		// Only redirect for still-valid invites. Better Auth leaves expired
+		// rows as status "pending", which used to trap users who could neither
+		// accept the invite nor create their own organization.
+		const actionableInvite = (invitations ?? []).find((invite) =>
+			isInvitationActionable(invite),
+		);
+		if (actionableInvite) {
 			hasRedirected.current = true;
-			router.push("/onboarding");
+			router.push(`/invite?id=${actionableInvite.id}`);
 			return;
 		}
+
+		hasRedirected.current = true;
+		router.push("/onboarding");
 	}, [
 		session,
 		organizations,

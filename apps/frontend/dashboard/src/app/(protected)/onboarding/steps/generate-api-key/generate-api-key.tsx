@@ -86,8 +86,8 @@ export const GenerateApiKeyStep = () => {
 						await authClient.getSession();
 						try {
 							await mutate(
-								"organizations",
-								async () => (await authClient.organization.list()).data,
+								(key) => Array.isArray(key) && key[0] === "organizations",
+								async () => (await authClient.organization.list()).data ?? [],
 								{ revalidate: false },
 							);
 						} catch (error) {

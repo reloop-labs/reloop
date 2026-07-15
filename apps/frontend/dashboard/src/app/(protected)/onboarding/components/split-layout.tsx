@@ -241,10 +241,10 @@ export const SplitLayout = ({
 				<div className="-translate-x-1/2 absolute top-5 left-1/2 z-50 flex items-center space-x-2">
 					<Logo className="h-10 w-10 lg:h-11 lg:w-11" />
 					<span
-						className="-ml-3 -mt-1 font-semibold text-text-strong-950 text-xl"
+						className="-ml-3 font-semibold text-text-strong-950 text-xl"
 						style={{ fontFamily: "var(--font-outfit)" }}
 					>
-						reloop
+						Reloop
 					</span>
 				</div>
 				<div

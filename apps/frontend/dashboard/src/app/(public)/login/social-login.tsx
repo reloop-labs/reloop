@@ -79,9 +79,10 @@ export function SocialLogin({
 					setLoading({ name: "google", loading: true });
 					await authClient.signIn.social({
 						provider: "google",
+						// Land on login so the session effect resolves org/invite destination.
 						callbackURL: inviteId
 							? `/login?inviteId=${inviteId}`
-							: "/dashboard",
+							: "/login",
 					});
 				} catch {
 					setLoading({ name: "google", loading: false });
@@ -109,7 +110,7 @@ export function SocialLogin({
 						provider: "github",
 						callbackURL: inviteId
 							? `/login?inviteId=${inviteId}`
-							: "/dashboard",
+							: "/login",
 					});
 				} catch {
 					setLoading({ name: "github", loading: false });

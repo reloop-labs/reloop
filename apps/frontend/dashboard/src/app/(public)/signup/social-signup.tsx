@@ -37,11 +37,12 @@ export function SocialSignup({
 		error: string | null;
 	}>({ name: "email", error: null });
 
+	// Land back on signup so the session effect can resolve onboarding vs invites.
 	const buildCallbackURL = () => {
 		const params = new URLSearchParams();
 		if (inviteId) params.set("inviteId", inviteId);
 		const qs = params.toString();
-		return qs ? `/signup?${qs}` : "/dashboard";
+		return qs ? `/signup?${qs}` : "/signup";
 	};
 
 	return (
