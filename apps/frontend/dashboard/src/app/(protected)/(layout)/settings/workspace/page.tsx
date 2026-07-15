@@ -164,9 +164,7 @@ const WorkspaceForm = ({
 				toast.error(error.message || "Failed to update workspace");
 				return;
 			}
-			await mutate(
-				(key) => Array.isArray(key) && key[0] === "organizations",
-			);
+			await mutate((key) => Array.isArray(key) && key[0] === "organizations");
 			mutateOrganizations();
 			toast.success("Workspace updated successfully");
 		} catch (error) {

@@ -79,9 +79,7 @@ export const WorkspaceLogoUpload = ({
 			}
 
 			// Refresh organization data
-			await mutate(
-				(key) => Array.isArray(key) && key[0] === "organizations",
-			);
+			await mutate((key) => Array.isArray(key) && key[0] === "organizations");
 			mutateOrganizations();
 			toast.success("Logo updated successfully");
 		} catch (error) {

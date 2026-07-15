@@ -80,9 +80,7 @@ export function SocialLogin({
 					await authClient.signIn.social({
 						provider: "google",
 						// Land on login so the session effect resolves org/invite destination.
-						callbackURL: inviteId
-							? `/login?inviteId=${inviteId}`
-							: "/login",
+						callbackURL: inviteId ? `/login?inviteId=${inviteId}` : "/login",
 					});
 				} catch {
 					setLoading({ name: "google", loading: false });
@@ -108,9 +106,7 @@ export function SocialLogin({
 					setLoading({ name: "github", loading: true });
 					await authClient.signIn.social({
 						provider: "github",
-						callbackURL: inviteId
-							? `/login?inviteId=${inviteId}`
-							: "/login",
+						callbackURL: inviteId ? `/login?inviteId=${inviteId}` : "/login",
 					});
 				} catch {
 					setLoading({ name: "github", loading: false });

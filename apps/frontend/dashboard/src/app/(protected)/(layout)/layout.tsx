@@ -24,10 +24,8 @@ const DashboardLayoutContent = ({
 	// Orgless users must not see dashboard pages while redirecting to
 	// onboarding or invites (provider handles navigation).
 	const orgsResolved = organizations !== undefined;
-	const hasOrg =
-		(organizations?.length ?? 0) > 0 && activeOrganization != null;
-	const blockContent =
-		isLoading || !user || (orgsResolved && !hasOrg);
+	const hasOrg = (organizations?.length ?? 0) > 0 && activeOrganization != null;
+	const blockContent = isLoading || !user || (orgsResolved && !hasOrg);
 
 	return (
 		<div className="flex h-screen overflow-hidden bg-bg-weak-50 dark:bg-black">
