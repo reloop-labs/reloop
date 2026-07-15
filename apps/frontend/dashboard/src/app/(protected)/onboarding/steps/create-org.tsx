@@ -4,19 +4,64 @@ import { AnimatedHoverBackground } from "@fe/dashboard/components/animated-hover
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
-import * as Popover from "@reloop/ui/popover";
 import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
+import * as Popover from "@reloop/ui/popover";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { AnimatePresence, motion } from "motion/react";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import type React from "react";
 import { useRef, useState } from "react";
+import * as simpleIcons from "simple-icons";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
+
+const renderSimpleIcon = (slug: string, className?: string) => {
+	const icon = (simpleIcons as any)[slug];
+	if (!icon) {
+		const fallbackMap: Record<string, string> = {
+			siLinkedin: "linkedin",
+			siGoogle: "globe",
+			siGithub: "github",
+			siX: "twitter",
+		};
+		const fallbackName = fallbackMap[slug];
+		if (fallbackName) {
+			return (
+				<Icon
+					name={fallbackName}
+					className={cn(className, "text-text-sub-600")}
+				/>
+			);
+		}
+		return null;
+	}
+
+	const monochromeSlugs = [
+		"siGithub",
+		"siX",
+		"siMedium",
+		"siSlack",
+		"siLinkedin",
+	];
+	const isMonochrome = monochromeSlugs.includes(slug);
+
+	return (
+		<svg
+			role="img"
+			viewBox="0 0 24 24"
+			className={cn(className, isMonochrome ? "text-text-sub-600" : "")}
+			fill="currentColor"
+			xmlns="http://www.w3.org/2000/svg"
+			style={!isMonochrome ? { color: `#${icon.hex}` } : undefined}
+		>
+			<path d={icon.path} />
+		</svg>
+	);
+};
 
 export const CreateOrgStep = () => {
 	const { mutate } = useSWRConfig();
@@ -51,25 +96,30 @@ export const CreateOrgStep = () => {
 	const [searchQuery, setSearchQuery] = useState("");
 
 	const referralOptions = [
-		{ id: "google", label: "Google Search", icon: "globe" },
-		{ id: "github", label: "GitHub", icon: "github" },
-		{ id: "twitter", label: "Twitter / X", icon: "twitter" },
-		{ id: "linkedin", label: "LinkedIn", icon: "linkedin" },
-		{ id: "friend", label: "Friend / Colleague", icon: "users" },
-		{ id: "community", label: "Online Community (Reddit, Slack, Discord)", icon: "users" },
-		{ id: "blog", label: "Blog or Article", icon: "file-text" },
-		{ id: "newsletter", label: "Newsletter", icon: "mail" },
-		{ id: "youtube", label: "YouTube or Video", icon: "play" },
-		{ id: "podcast", label: "Podcast", icon: "mega-phone" },
-		{ id: "ad", label: "Advertisement", icon: "mega-phone" },
-		{ id: "other", label: "Other", icon: "info-outline" },
+		{ id: "google", label: "Google Search", iconSlug: "siGoogle" },
+		{ id: "github", label: "GitHub", iconSlug: "siGithub" },
+		{ id: "twitter", label: "Twitter / X", iconSlug: "siX" },
+		{ id: "linkedin", label: "LinkedIn", iconSlug: "siLinkedin" },
+		{
+			id: "community",
+			label: "Online Community (Reddit, Slack, Discord)",
+			iconSlug: "siDiscord",
+		},
+		{ id: "blog", label: "Blog or Article", iconSlug: "siMedium" },
+		{ id: "newsletter", label: "Newsletter", iconSlug: "siSubstack" },
+		{ id: "youtube", label: "YouTube or Video", iconSlug: "siYoutube" },
+		{ id: "podcast", label: "Podcast", iconSlug: "siSpotify" },
+		{ id: "ad", label: "Advertisement", iconSlug: "siGoogleads" },
+		{ id: "other", label: "Other", iconSlug: "siSafari" },
 	];
 
 	const filteredOptions = referralOptions.filter((option) =>
 		option.label.toLowerCase().includes(searchQuery.toLowerCase()),
 	);
 
-	const currentTab = hoverId ? (buttonRefs.current[hoverId] ?? undefined) : undefined;
+	const currentTab = hoverId
+		? (buttonRefs.current[hoverId] ?? undefined)
+		: undefined;
 	const currentRect = currentTab?.getBoundingClientRect();
 
 	const selectedOption = referralOptions.find((o) => o.id === referral);
@@ -314,12 +364,8 @@ export const CreateOrgStep = () => {
 									className="w-full justify-between gap-1.5 rounded-xl font-medium text-sm"
 								>
 									<span className="flex items-center gap-2">
-										{selectedOption?.icon && (
-											<Icon
-												name={selectedOption.icon}
-												className="h-4 w-4 text-text-sub-600"
-											/>
-										)}
+										{selectedOption?.iconSlug &&
+											renderSimpleIcon(selectedOption.iconSlug, "h-4 w-4")}
 										<span>{displayLabel}</span>
 									</span>
 									<Icon name="chevron-down" className="h-4 w-4 shrink-0" />
@@ -330,20 +376,20 @@ export const CreateOrgStep = () => {
 								showArrow={false}
 								unstyled
 								style={{ width: "var(--radix-popover-trigger-width)" }}
-								className="z-50 rounded-2xl bg-bg-white-0 p-1.5 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50 flex flex-col gap-1.5"
+								className="z-50 flex flex-col rounded-2xl bg-bg-white-0 p-1.5 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
 							>
-								<div className="flex items-center gap-2 border-b border-stroke-soft-100/80 px-2 pb-2 pt-1">
-									<Icon name="search" className="h-3.5 w-3.5 text-text-soft-400" />
+								<div className="flex h-10 items-center gap-2.5 border-stroke-soft-100/80 border-b px-3 pb-1">
+									<Icon name="search" className="h-4 w-4 text-text-soft-400" />
 									<input
 										type="text"
 										placeholder="Search sources..."
 										value={searchQuery}
 										onChange={(e) => setSearchQuery(e.target.value)}
-										className="w-full bg-transparent text-sm font-medium text-text-strong-950 outline-none placeholder:text-text-soft-400"
+										className="w-full bg-transparent font-medium text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
 										autoFocus
 									/>
 								</div>
-								<div className="relative flex max-h-[220px] flex-col gap-0.5 overflow-y-auto custom-scrollbar">
+								<div className="scrollbar-hide relative flex max-h-[380px] flex-col overflow-y-auto">
 									{filteredOptions.map((option) => {
 										const isChecked = referral === option.id;
 										return (
@@ -360,33 +406,32 @@ export const CreateOrgStep = () => {
 													setIsOpen(false);
 												}}
 												className={cn(
-													"relative z-10 flex h-9 w-full cursor-pointer items-center justify-between gap-2.5 rounded-lg px-2.5 font-medium text-sm transition-colors",
+													"relative z-10 flex h-12 w-full cursor-pointer items-center justify-between gap-3.5 rounded-lg px-3.5 font-medium text-sm transition-colors",
 													"text-text-strong-950",
 													isChecked && "bg-neutral-alpha-10",
 												)}
 											>
-												<span className="flex items-center gap-2.5 text-left">
-													{option.icon && (
-														<Icon
-															name={option.icon}
-															className="h-4 w-4 text-text-sub-600"
-														/>
-													)}
+												<span className="flex items-center gap-3.5 text-left">
+													{option.iconSlug &&
+														renderSimpleIcon(option.iconSlug, "h-5 w-5")}
 													<span>{option.label}</span>
 												</span>
 												{isChecked && (
 													<Icon
 														name="check"
-														className="h-4 w-4 text-text-strong-950 shrink-0"
+														className="h-4 w-4 shrink-0 text-text-strong-950"
 													/>
 												)}
 											</button>
 										);
 									})}
 									{filteredOptions.length === 0 && (
-										<div className="flex flex-col items-center justify-center py-6 px-4 text-center">
-											<Icon name="search" className="h-6 w-6 text-text-soft-400 mb-1.5" />
-											<p className="text-xs font-medium text-text-soft-400">
+										<div className="flex flex-col items-center justify-center px-4 py-6 text-center">
+											<Icon
+												name="search"
+												className="mb-1.5 h-6 w-6 text-text-soft-400"
+											/>
+											<p className="font-medium text-text-soft-400 text-xs">
 												No results found
 											</p>
 										</div>
