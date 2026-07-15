@@ -1,8 +1,10 @@
 import { $ } from "bun";
 import { Client } from "pg";
+import { createClient } from "redis";
 
 async function resetDb() {
 	const pgUrl = process.env.PG_URL;
+	const redisUrl = process.env.REDIS_URL;
 
 	if (!pgUrl) {
 		throw new Error("PG_URL environment variable is not set.");
@@ -15,6 +17,22 @@ async function resetDb() {
 	const maintenanceDb = dbName === "postgres" ? "template1" : "postgres";
 	const maintenanceUrl = new URL(pgUrl);
 	maintenanceUrl.pathname = `/${maintenanceDb}`;
+
+	// Flush Redis to prevent stale cache entries (like Better Auth sessions)
+	if (redisUrl) {
+		console.log("🧹 Flushing Redis cache...");
+		try {
+			const redisClient = createClient({ url: redisUrl });
+			await redisClient.connect();
+			await redisClient.flushAll();
+			await redisClient.quit();
+			console.log("✅ Redis flushed.");
+		} catch (error) {
+			console.error("⚠️ Failed to flush Redis:", error);
+		}
+	} else {
+		console.log("⚠️ REDIS_URL not set, skipping Redis flush.");
+	}
 
 	console.log(`🚀 Resetting database: ${dbName}...`);
 
