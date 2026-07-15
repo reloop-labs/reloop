@@ -23,6 +23,9 @@ const DashboardLayoutContent = ({
 
 	// Orgless users must not see dashboard pages while redirecting to
 	// onboarding or invites (provider handles navigation).
+	// Do not mount page children under a hidden tree while loading — that ran
+	// SWR hooks early and caused hard-reload 401/404 "not found" races.
+	// `isLoading` already includes the first active-org sync (`hasInitialized`).
 	const orgsResolved = organizations !== undefined;
 	const hasOrg = (organizations?.length ?? 0) > 0 && activeOrganization != null;
 	const blockContent = isLoading || !user || (orgsResolved && !hasOrg);
@@ -35,12 +38,9 @@ const DashboardLayoutContent = ({
 					<PageHeader />
 					<div className="flex-1 overflow-y-auto">
 						{blockContent ? (
-							<>
-								<div className="flex h-full w-full items-center justify-center text-text-strong-950 dark:text-white">
-									<Loader loader="pulse" />
-								</div>
-								<div style={{ display: "none" }}>{children}</div>
-							</>
+							<div className="flex h-full w-full items-center justify-center text-text-strong-950 dark:text-white">
+								<Loader loader="pulse" />
+							</div>
 						) : (
 							children
 						)}

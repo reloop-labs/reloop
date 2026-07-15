@@ -1,6 +1,10 @@
 "use client";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
+import {
+	isDomainDetailSwrKey,
+	isDomainListSwrKey,
+} from "@fe/dashboard/utils/domain";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdCommand } from "@reloop/ui/kbd-command";
@@ -27,11 +31,17 @@ const NewDomainPage = () => {
 	const params = useParams();
 	const domainId = typeof params.domainId === "string" ? params.domainId : null;
 	const router = useRouter();
-	const { activeOrganization, isLoading: orgLoading } = useUserOrganization();
-	const canFetch = Boolean(domainId && activeOrganization && !orgLoading);
+	const {
+		isOrgReady,
+		sessionActiveOrganizationId,
+		isLoading: orgLoading,
+	} = useUserOrganization();
+	const canFetch = Boolean(domainId && isOrgReady && !orgLoading);
 
 	const { data: domainData, isLoading } = useSWR<DomainResponse>(
-		canFetch ? `/api/domain/v1/${domainId}` : null,
+		canFetch
+			? [`/api/domain/v1/${domainId}`, sessionActiveOrganizationId]
+			: null,
 	);
 	const showLoading = !canFetch || isLoading;
 
@@ -60,11 +70,8 @@ const NewDomainPage = () => {
 			await axios.post(`/api/domain/v1/verify/${domainId}`, undefined, {
 				headers: { credentials: "include" },
 			});
-			await mutate(`/api/domain/v1/${domainId}`);
-			await mutate(
-				(key) =>
-					typeof key === "string" && key.startsWith("/api/domain/v1/list"),
-			);
+			await mutate((key) => isDomainDetailSwrKey(key, domainId));
+			await mutate((key) => isDomainListSwrKey(key));
 			toast.success(
 				"DNS verification started! Verification will continue in the background.",
 			);

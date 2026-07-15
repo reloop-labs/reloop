@@ -25,6 +25,20 @@ type UserOrganizationContextType = {
 	user: User | null;
 	organizations: Organization[] | undefined;
 	activeOrganization: Organization | null;
+	/**
+	 * Better Auth session active org (server truth for org-scoped APIs).
+	 * Prefer this over client-only fallbacks when gating fetches.
+	 */
+	sessionActiveOrganizationId: string | null;
+	/**
+	 * True after the first active-org sync attempt has finished for this user.
+	 * Until then, org-scoped API calls can 401/404 on hard reload.
+	 */
+	hasInitialized: boolean;
+	/**
+	 * Session + memberships loaded, active org synced, and safe for org-scoped APIs.
+	 */
+	isOrgReady: boolean;
 	isLoading: boolean;
 	mutateOrganizations: () => void;
 	onOrganizationChange: (organization: Organization) => Promise<void>;
@@ -70,13 +84,19 @@ export const UserOrganizationProvider = ({
 	);
 	const [isSettingDefaultOrg, setIsSettingDefaultOrg] = useState(false);
 	const [hasInitialized, setHasInitialized] = useState(false);
+	/** Org id we successfully aligned on the server (covers useSession lag). */
+	const [confirmedSessionOrgId, setConfirmedSessionOrgId] = useState<
+		string | null
+	>(null);
 
 	// Prefer Better Auth's session active org (what membership APIs use), then
 	// the durable user preference, then the first membership as a last resort.
+	const sessionActiveOrganizationId =
+		session?.session?.activeOrganizationId ?? null;
+	const effectiveSessionOrgId =
+		sessionActiveOrganizationId ?? confirmedSessionOrgId;
 	const resolvedActiveOrgId =
-		session?.session?.activeOrganizationId ??
-		session?.user?.activeOrganizationId ??
-		null;
+		effectiveSessionOrgId ?? session?.user?.activeOrganizationId ?? null;
 	const activeOrganization =
 		organizations?.find(
 			(organization) => organization.id === resolvedActiveOrgId,
@@ -84,11 +104,30 @@ export const UserOrganizationProvider = ({
 		organizations?.[0] ||
 		null;
 
+	// Stay in loading until the first setActive/sync attempt finishes so
+	// org-scoped pages never fetch against a half-hydrated session.
+	const awaitingOrgSync =
+		!!userId &&
+		!organizationsLoading &&
+		organizations !== undefined &&
+		!hasInitialized;
+
 	const isLoading =
 		sessionLoading ||
 		(!!userId && organizationsLoading) ||
 		(!!userId && invitationsLoading) ||
-		isSettingDefaultOrg;
+		isSettingDefaultOrg ||
+		awaitingOrgSync;
+
+	/** Safe to call org-scoped backend APIs (session has the active org). */
+	const isOrgReady = Boolean(
+		hasInitialized &&
+			!isSettingDefaultOrg &&
+			!sessionLoading &&
+			effectiveSessionOrgId &&
+			activeOrganization &&
+			activeOrganization.id === effectiveSessionOrgId,
+	);
 
 	const hasRedirected = useRef(false);
 	const lastRedirectUserId = useRef<string | null>(null);
@@ -99,6 +138,7 @@ export const UserOrganizationProvider = ({
 			hasRedirected.current = false;
 			lastRedirectUserId.current = userId;
 			setHasInitialized(false);
+			setConfirmedSessionOrgId(null);
 		}
 	}, [userId]);
 
@@ -182,6 +222,7 @@ export const UserOrganizationProvider = ({
 				sessionActiveOrgId === preferredOrgId &&
 				userActiveOrgId === preferredOrgId
 			) {
+				setConfirmedSessionOrgId(preferredOrgId);
 				setHasInitialized(true);
 				return;
 			}
@@ -198,8 +239,16 @@ export const UserOrganizationProvider = ({
 						activeOrganizationId: preferredOrgId,
 					});
 				}
+				// Force session rehydration so isOrgReady sees the new
+				// session.activeOrganizationId before org-scoped pages fetch.
+				await authClient.getSession();
+				setConfirmedSessionOrgId(preferredOrgId);
 			} catch (error) {
 				console.log("Error setting active organization", { error });
+				// If setActive partially worked or session already had the org, keep going.
+				if (sessionActiveOrgId === preferredOrgId) {
+					setConfirmedSessionOrgId(preferredOrgId);
+				}
 			} finally {
 				setIsSettingDefaultOrg(false);
 				setHasInitialized(true);
@@ -225,6 +274,8 @@ export const UserOrganizationProvider = ({
 			await authClient.updateUser({
 				activeOrganizationId: organization.id,
 			});
+			await authClient.getSession();
+			setConfirmedSessionOrgId(organization.id);
 			mutateOrganizations();
 		} catch (error) {
 			console.error("Error switching organization", { error });
@@ -235,6 +286,10 @@ export const UserOrganizationProvider = ({
 		user: session?.user ?? null,
 		organizations: organizations ?? undefined,
 		activeOrganization,
+		// Prefer live session value; fall back to last confirmed sync for keying.
+		sessionActiveOrganizationId: effectiveSessionOrgId,
+		hasInitialized,
+		isOrgReady,
 		isLoading,
 		mutateOrganizations,
 		onOrganizationChange,

@@ -21,12 +21,21 @@ export const DNSProviderInfo: React.FC<DNSProviderInfoProps> = ({
 	const rawDomainId =
 		typeof params.domainId === "string" ? params.domainId : null;
 	const domainId = isDomainRecordId(rawDomainId) ? rawDomainId : null;
-	const { activeOrganization, isLoading: orgLoading } = useUserOrganization();
-	// Same gate as the domain detail page: wait for active org before org-scoped APIs.
-	const canFetch = Boolean(domainId && activeOrganization && !orgLoading);
+	const {
+		isOrgReady,
+		sessionActiveOrganizationId,
+		isLoading: orgLoading,
+	} = useUserOrganization();
+	// Same gate as the domain detail page: wait for session active org.
+	const canFetch = Boolean(domainId && isOrgReady && !orgLoading);
 	const { data: nameserverData, isLoading: isLoadingNameservers } =
 		useSWR<DomainNameserversResponse>(
-			canFetch ? `/api/domain/v1/nameservers/${domainId}` : null,
+			canFetch
+				? [
+						`/api/domain/v1/nameservers/${domainId}`,
+						sessionActiveOrganizationId,
+					]
+				: null,
 		);
 
 	const nameservers = nameserverData?.nameservers;

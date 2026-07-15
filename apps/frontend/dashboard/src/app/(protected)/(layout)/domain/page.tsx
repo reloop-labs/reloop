@@ -24,7 +24,11 @@ dayjs.extend(relativeTime);
 const DomainPage = () => {
 	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
-	const { activeOrganization, isLoading: orgLoading } = useUserOrganization();
+	const {
+		isOrgReady,
+		sessionActiveOrganizationId,
+		isLoading: orgLoading,
+	} = useUserOrganization();
 	const [statusFilters] = useQueryState(
 		"status",
 		parseAsStringLiteral([
@@ -39,11 +43,10 @@ const DomainPage = () => {
 	const [currentPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 
-	const canFetch = Boolean(activeOrganization && !orgLoading);
+	const canFetch = Boolean(isOrgReady && !orgLoading);
+	const listUrl = `/api/domain/v1/list?limit=${pageSize}&page=${currentPage}${statusFilters ? `&status=${statusFilters}` : ""}${searchQuery ? `&q=${searchQuery}` : ""}`;
 	const { data, error, isLoading, mutate } = useSWR<DomainListResponse>(
-		canFetch
-			? `/api/domain/v1/list?limit=${pageSize}&page=${currentPage}${statusFilters ? `&status=${statusFilters}` : ""}${searchQuery ? `&q=${searchQuery}` : ""}`
-			: null,
+		canFetch ? [listUrl, sessionActiveOrganizationId] : null,
 		{
 			revalidateOnFocus: true,
 			revalidateOnReconnect: true,

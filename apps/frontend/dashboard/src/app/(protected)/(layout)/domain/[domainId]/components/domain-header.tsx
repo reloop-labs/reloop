@@ -3,7 +3,11 @@
 import { AnimatedBackButton } from "@fe/dashboard/components/animated-back-button";
 import { AnimatedClock } from "@fe/dashboard/components/animated-clock";
 import type { Domain } from "@fe/dashboard/types/api.types";
-import { getStatusColorClass, getStatusIcon } from "@fe/dashboard/utils/domain";
+import {
+	getStatusColorClass,
+	getStatusIcon,
+	isDomainDetailSwrKey,
+} from "@fe/dashboard/utils/domain";
 import { formatRelativeTime } from "@fe/dashboard/utils/time";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
@@ -31,7 +35,8 @@ export const DomainHeader = ({ domain, isLoading }: DomainHeaderProps) => {
 		_domainId as string,
 		undefined,
 	);
-	const mutateDomain = () => mutate(`/api/domain/v1/${_domainId}`);
+	const mutateDomain = () =>
+		mutate((key) => isDomainDetailSwrKey(key, String(_domainId)));
 	const router = useRouter();
 
 	useHotkeys(

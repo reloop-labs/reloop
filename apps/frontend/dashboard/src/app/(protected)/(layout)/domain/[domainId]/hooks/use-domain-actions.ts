@@ -1,4 +1,8 @@
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
+import {
+	isDomainDetailSwrKey,
+	isDomainListSwrKey,
+} from "@fe/dashboard/utils/domain";
 import axios from "axios";
 import * as React from "react";
 import { toast } from "sonner";
@@ -9,6 +13,15 @@ export const useDomainActions = (
 	domainData: DomainResponse | undefined,
 ) => {
 	const [isVerifying, setIsVerifying] = React.useState(false);
+
+	const revalidateDomainDetail = React.useCallback(async () => {
+		if (!domainId) return;
+		await mutate((key) => isDomainDetailSwrKey(key, domainId));
+	}, [domainId]);
+
+	const revalidateDomainList = React.useCallback(async () => {
+		await mutate((key) => isDomainListSwrKey(key));
+	}, []);
 
 	const handleVerifyDNS = React.useCallback(async () => {
 		if (!domainId) {
@@ -23,12 +36,9 @@ export const useDomainActions = (
 				headers: { credentials: "include" },
 			});
 
-			// Refresh domain detail and list caches
-			await mutate(`/api/domain/v1/${domainId}`);
-			await mutate(
-				(key) =>
-					typeof key === "string" && key.startsWith("/api/domain/v1/list"),
-			);
+			// Refresh domain detail and list caches (string or [url, orgId] keys)
+			await revalidateDomainDetail();
+			await revalidateDomainList();
 
 			toast.success(
 				"DNS verification started! Verification will continue in the background.",
@@ -41,7 +51,7 @@ export const useDomainActions = (
 		} finally {
 			setIsVerifying(false);
 		}
-	}, [domainId]);
+	}, [domainId, revalidateDomainDetail, revalidateDomainList]);
 
 	const handleUpdateDomain = React.useCallback(
 		async (
@@ -62,10 +72,10 @@ export const useDomainActions = (
 				return;
 			}
 
-			const cacheKey = `/api/domain/v1/${domainId}`;
+			const matchDetail = (key: unknown) => isDomainDetailSwrKey(key, domainId);
 			const optimisticData = { ...domainData, ...payload };
 
-			await mutate(cacheKey, optimisticData, false);
+			await mutate(matchDetail, optimisticData, false);
 
 			try {
 				const apiPayload: {
@@ -97,23 +107,20 @@ export const useDomainActions = (
 					{ headers: { credentials: "include" } },
 				);
 
-				await mutate(cacheKey, data, false);
+				await mutate(matchDetail, data, false);
 				if (data.status === "verifying") {
-					await mutate(
-						(key) =>
-							typeof key === "string" && key.startsWith("/api/domain/v1/list"),
-					);
+					await revalidateDomainList();
 				}
 				toast.success(successMessage);
 			} catch (error) {
-				await mutate(cacheKey);
+				await mutate(matchDetail);
 				const errorMessage = axios.isAxiosError(error)
 					? error.response?.data?.message || "Failed to update domain settings"
 					: "Failed to update domain settings";
 				toast.error(errorMessage);
 			}
 		},
-		[domainId, domainData],
+		[domainId, domainData, revalidateDomainList],
 	);
 
 	return {

@@ -4,6 +4,10 @@ import type {
 	DomainListResponse,
 	DomainResponse,
 } from "@fe/dashboard/types/api.types";
+import {
+	isDomainDetailSwrKey,
+	isDomainListSwrKey,
+} from "@fe/dashboard/utils/domain";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -68,11 +72,8 @@ const AddDomain = () => {
 				},
 				{ headers: { credentials: "include" } },
 			);
-			await mutate(
-				(key) =>
-					typeof key === "string" && key.startsWith("/api/domain/v1/list"),
-			);
-			await mutate(`/api/domain/v1/${data.id}`, data, false);
+			await mutate((key) => isDomainListSwrKey(key));
+			await mutate((key) => isDomainDetailSwrKey(key, data.id), data, false);
 			handleAddDomain(data.id);
 		} catch (error) {
 			const isAlreadyExists =

@@ -22,6 +22,28 @@ const DOMAIN_API_RESERVED_IDS = new Set([
 export const isDomainRecordId = (id: unknown): id is string =>
 	typeof id === "string" && id.length > 0 && !DOMAIN_API_RESERVED_IDS.has(id);
 
+/** Resolve the URL portion of a string or `[url, ...deps]` SWR key. */
+export const domainSwrUrl = (key: unknown): string | null => {
+	if (typeof key === "string") return key;
+	if (Array.isArray(key) && typeof key[0] === "string") return key[0];
+	return null;
+};
+
+/** Match domain detail keys (`/api/domain/v1/:id` or `[url, orgId]`). */
+export const isDomainDetailSwrKey = (
+	key: unknown,
+	domainId: string,
+): boolean => {
+	const url = domainSwrUrl(key);
+	return url === `/api/domain/v1/${domainId}`;
+};
+
+/** Match domain list keys (`/api/domain/v1/list…` or `[url, orgId]`). */
+export const isDomainListSwrKey = (key: unknown): boolean => {
+	const url = domainSwrUrl(key);
+	return typeof url === "string" && url.startsWith("/api/domain/v1/list");
+};
+
 /**
  * Get human-readable label for domain status
  */

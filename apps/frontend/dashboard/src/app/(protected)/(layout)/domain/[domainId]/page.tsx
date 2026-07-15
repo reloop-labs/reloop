@@ -25,11 +25,14 @@ const DomainPage = () => {
 		typeof params.domainId === "string" ? params.domainId : null;
 	// Never call GET /api/domain/v1/{id} with reserved segments (list, create, domain, …).
 	const domainId = isDomainRecordId(rawDomainId) ? rawDomainId : null;
-	// Layout mounts this page while org/session sync is still in progress
-	// (hidden under a loader). Domain APIs require session.activeOrganizationId —
-	// fetching before that settles causes 401s on hard reload, which this page
-	// previously treated as "not found".
-	const { activeOrganization, isLoading: orgLoading } = useUserOrganization();
+	// Domain APIs require session.activeOrganizationId. Gate on isOrgReady so
+	// hard reloads never fetch before setActive/sync finishes (that produced
+	// 401/404 and the "domain not found" empty state).
+	const {
+		isOrgReady,
+		sessionActiveOrganizationId,
+		isLoading: orgLoading,
+	} = useUserOrganization();
 	const [activeTab, setActiveTab] = useQueryState(
 		"tab",
 		parseAsString.withDefault("dns"),
@@ -49,15 +52,21 @@ const DomainPage = () => {
 	const tab = buttonRefs.current[currentIdx];
 	const rect = tab?.getBoundingClientRect();
 
-	const canFetch = Boolean(domainId && activeOrganization && !orgLoading);
+	const canFetch = Boolean(domainId && isOrgReady && !orgLoading);
 
 	const {
 		data: domainData,
 		error,
 		isLoading,
-	} = useSWR<DomainResponse>(canFetch ? `/api/domain/v1/${domainId}` : null, {
-		refreshInterval: (data) => (data?.status === "verifying" ? 3000 : 0),
-	});
+	} = useSWR<DomainResponse>(
+		// Include org id in the key so org switches revalidate cleanly.
+		canFetch
+			? [`/api/domain/v1/${domainId}`, sessionActiveOrganizationId]
+			: null,
+		{
+			refreshInterval: (data) => (data?.status === "verifying" ? 3000 : 0),
+		},
+	);
 
 	const showLoading = !canFetch || isLoading;
 
@@ -70,7 +79,8 @@ const DomainPage = () => {
 		);
 	}
 
-	if (error) {
+	// Ignore stale errors from a previous key while org is still gating.
+	if (error && canFetch && !isLoading) {
 		const status = axios.isAxiosError(error)
 			? error.response?.status
 			: undefined;

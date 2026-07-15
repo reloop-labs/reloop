@@ -3,6 +3,10 @@
 import { DNSAutoConnectBanner } from "@fe/dashboard/app/(protected)/(layout)/domain/[domainId]/components/dns-auto-connect-banner";
 import { useDomainActions } from "@fe/dashboard/app/(protected)/(layout)/domain/[domainId]/hooks/use-domain-actions";
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
+import {
+	isDomainDetailSwrKey,
+	isDomainListSwrKey,
+} from "@fe/dashboard/utils/domain";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
@@ -50,11 +54,8 @@ export const ConfigureDnsStep = () => {
 			await axios.post(`/api/domain/v1/verify/${domainId}`, undefined, {
 				headers: { credentials: "include" },
 			});
-			await mutate(`/api/domain/v1/${domainId}`);
-			await mutate(
-				(key) =>
-					typeof key === "string" && key.startsWith("/api/domain/v1/list"),
-			);
+			await mutate((key) => isDomainDetailSwrKey(key, domainId));
+			await mutate((key) => isDomainListSwrKey(key));
 			toast.success(
 				"DNS verification started! Verification will continue in the background.",
 			);
