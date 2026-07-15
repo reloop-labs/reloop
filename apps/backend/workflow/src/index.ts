@@ -43,20 +43,18 @@ initLogger({
 
 const port = workflowConfig.port;
 
-const workflowService = new Elysia({
+/**
+ * API routes under `/api/workflow`.
+ * Workbench is mounted on the root app (not under this prefix) because
+ * Elysia's nested `.mount()` + parent prefix breaks Workbench asset/API routing.
+ */
+const workflowApi = new Elysia({
 	prefix: "/api/workflow",
 	name: "Workflow Service",
 })
 	.use(
 		evlog({
-			exclude: [
-				"/",
-				"/api/*",
-				"/api/*/",
-				"**/health",
-				"**/jobs",
-				"**/jobs/**",
-			],
+			exclude: ["/", "/api/*", "/api/*/", "**/health"],
 		}),
 	)
 	.use(
@@ -90,11 +88,14 @@ const workflowService = new Elysia({
 		};
 	})
 	.use(landing)
-	// Same Redis + workflow-queue as the worker — no extra process.
-	.mount("/jobs", workbenchApp)
 	.onStart(async () => {
 		await loader();
-	})
+	});
+
+const workflowService = new Elysia({ name: "Workflow" })
+	// Same Redis + workflow-queue as the worker — no extra process.
+	.mount(WORKBENCH_PATH, workbenchApp)
+	.use(workflowApi)
 	.listen(port, () => {
 		log.info(
 			"server",
