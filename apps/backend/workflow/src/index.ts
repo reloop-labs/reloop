@@ -1,5 +1,9 @@
 import "dotenv/config";
 import { landing } from "@be/workflow/routes/landing/landing.index";
+import {
+	WORKBENCH_PATH,
+	workbenchApp,
+} from "@be/workflow/routes/workbench/workbench.route";
 import { loader } from "@be/workflow/utils/loader";
 import { workflowConfig } from "@be/workflow/workflow.config";
 import { openapi } from "@elysiajs/openapi";
@@ -43,7 +47,18 @@ const workflowService = new Elysia({
 	prefix: "/api/workflow",
 	name: "Workflow Service",
 })
-	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
+	.use(
+		evlog({
+			exclude: [
+				"/",
+				"/api/*",
+				"/api/*/",
+				"**/health",
+				"**/jobs",
+				"**/jobs/**",
+			],
+		}),
+	)
 	.use(
 		openapi({
 			documentation: {
@@ -75,6 +90,8 @@ const workflowService = new Elysia({
 		};
 	})
 	.use(landing)
+	// Same Redis + workflow-queue as the worker — no extra process.
+	.mount("/jobs", workbenchApp)
 	.onStart(async () => {
 		await loader();
 	})
@@ -82,6 +99,10 @@ const workflowService = new Elysia({
 		log.info(
 			"server",
 			`Workflow Server is running on http://localhost:${port}/api/workflow`,
+		);
+		log.info(
+			"workbench",
+			`BullMQ Workbench at http://localhost:${port}${WORKBENCH_PATH}`,
 		);
 	});
 

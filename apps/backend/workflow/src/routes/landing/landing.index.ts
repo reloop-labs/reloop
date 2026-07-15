@@ -26,6 +26,7 @@ export const landing = new Elysia()
 ║ 📚 Docs: https://reloop.sh/docs/workflow                             ║
 ║ 🤖 Discovery: https://reloop.sh/api/workflow/agent-card.json         ║
 ║ 📖 OpenAPI: https://reloop.sh/api/workflow/openapi                   ║
+║ 📊 Jobs UI: /api/workflow/jobs  (BullMQ Workbench)                   ║
 ║ 🐙 GitHub: https://github.com/reloop-labs/reloop                     ║
 ║ 🆘 Support: https://reloop.sh/support                                ║
 ║ 💬 Discord: https://discord.gg/bHnkBcp7xR                                ║
@@ -101,7 +102,7 @@ export const landing = new Elysia()
 			},
 		],
 		usage_guidelines:
-			"1. Workflows are processed asynchronously via BullMQ.\n2. Failed jobs are retried automatically based on the queue policy.\n3. The Bull Board UI is available for monitoring job status.",
+			"1. Workflows are processed asynchronously via BullMQ.\n2. Failed jobs are retried automatically based on the queue policy.\n3. Monitor jobs live at /api/workflow/jobs (Workbench dashboard).",
 		authentication: {
 			schemes: ["bearer", "cookie"],
 			headerName: "Authorization",

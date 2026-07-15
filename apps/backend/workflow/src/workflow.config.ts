@@ -9,4 +9,7 @@ export const workflowConfig = {
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
+	/** Optional basic-auth for Workbench (`/api/workflow/jobs`). Empty = open (dev only). */
+	WORKBENCH_USER: process.env.WORKBENCH_USER || "",
+	WORKBENCH_PASS: process.env.WORKBENCH_PASS || "",
 };
