@@ -15,7 +15,9 @@ import { createAuthClient } from "better-auth/react";
 const baseURL =
 	process.env.NEXT_PUBLIC_URL ||
 	process.env.NEXT_PUBLIC_APP_URL ||
-	"https://local.reloop.sh";
+	(typeof window !== "undefined"
+		? window.location.origin
+		: "https://local.reloop.sh");
 
 export const authClient = createAuthClient({
 	baseURL,
