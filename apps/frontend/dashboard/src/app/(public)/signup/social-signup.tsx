@@ -138,7 +138,7 @@ export function SocialSignup({
 			<p className="pt-5 text-center font-medium text-[13px] text-text-sub-600">
 				By creating an account, you agree to our <br />
 				<a
-					href="/terms"
+					href="/terms-and-conditions"
 					className={LinkButton.linkButtonVariants({
 						variant: "black",
 					}).root({ className: "text-xs!" })}
