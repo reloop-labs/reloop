@@ -1,4 +1,5 @@
 "use client";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
@@ -23,12 +24,16 @@ import { ForwardDNSRecordsButton } from "./components/forward-dns-records";
 
 const NewDomainPage = () => {
 	const [isVerifying, setIsVerifying] = React.useState(false);
-	const { domainId } = useParams();
+	const params = useParams();
+	const domainId = typeof params.domainId === "string" ? params.domainId : null;
 	const router = useRouter();
+	const { activeOrganization, isLoading: orgLoading } = useUserOrganization();
+	const canFetch = Boolean(domainId && activeOrganization && !orgLoading);
 
 	const { data: domainData, isLoading } = useSWR<DomainResponse>(
-		`/api/domain/v1/${domainId}`,
+		canFetch ? `/api/domain/v1/${domainId}` : null,
 	);
+	const showLoading = !canFetch || isLoading;
 
 	const { handleUpdateDomain } = useDomainActions(
 		domainId as string,
@@ -78,7 +83,7 @@ const NewDomainPage = () => {
 		(!domainData ||
 			!domainData.dnsRecords ||
 			domainData.dnsRecords.length === 0) &&
-		!isLoading
+		!showLoading
 	) {
 		return (
 			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-3xl flex-col items-center justify-center sm:px-8">
@@ -127,7 +132,7 @@ const NewDomainPage = () => {
 						<DNSRecordSection
 							title="DKIM"
 							records={dkimRecords}
-							isLoading={isLoading}
+							isLoading={showLoading}
 							docsUrl="https://reloop.sh/docs/dns/dkim"
 							tableId="dkim-"
 						/>
@@ -166,7 +171,7 @@ const NewDomainPage = () => {
 									<DNSRecordSection
 										title="SPF"
 										records={sendingRecords}
-										isLoading={isLoading}
+										isLoading={showLoading}
 										docsUrl="https://reloop.sh/docs/dns/spf"
 										tableId="spf-"
 									/>
@@ -175,7 +180,7 @@ const NewDomainPage = () => {
 											loadingRows={2}
 											title="DMARC (Optional)"
 											records={dmarcRecords}
-											isLoading={isLoading}
+											isLoading={showLoading}
 											docsUrl="https://reloop.sh/docs/dns/dmarc"
 											tableId="dmarc-"
 											className="mt-7"
@@ -219,7 +224,7 @@ const NewDomainPage = () => {
 									<DNSRecordSection
 										title="MX"
 										records={receivingRecords}
-										isLoading={isLoading}
+										isLoading={showLoading}
 										docsUrl="https://reloop.sh/docs/dns/mx"
 										tableId="mx-"
 									/>
@@ -268,7 +273,7 @@ const NewDomainPage = () => {
 									<DNSRecordSection
 										title="CNAME"
 										records={trackingRecords}
-										isLoading={isLoading}
+										isLoading={showLoading}
 										docsUrl="https://reloop.sh/docs/dns/cname"
 										tableId="cname-"
 									/>

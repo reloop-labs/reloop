@@ -1,3 +1,4 @@
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import type { DomainNameserversResponse } from "@fe/dashboard/types/api.types";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -15,14 +16,18 @@ interface DNSProviderInfoProps {
 export const DNSProviderInfo: React.FC<DNSProviderInfoProps> = ({
 	isLoading: isLoadingDomain,
 }) => {
-	const { domainId } = useParams();
+	const params = useParams();
+	const domainId = typeof params.domainId === "string" ? params.domainId : null;
+	const { activeOrganization, isLoading: orgLoading } = useUserOrganization();
+	// Same gate as the domain detail page: wait for active org before org-scoped APIs.
+	const canFetch = Boolean(domainId && activeOrganization && !orgLoading);
 	const { data: nameserverData, isLoading: isLoadingNameservers } =
 		useSWR<DomainNameserversResponse>(
-			domainId ? `/api/domain/v1/nameservers/${domainId}` : null,
+			canFetch ? `/api/domain/v1/nameservers/${domainId}` : null,
 		);
 
 	const nameservers = nameserverData?.nameservers;
-	const isLoading = isLoadingDomain || isLoadingNameservers;
+	const isLoading = isLoadingDomain || !canFetch || isLoadingNameservers;
 
 	const provider = React.useMemo(() => {
 		// If we have a dnsProvider from the API, we can use it or fallback to inference

@@ -1,13 +1,16 @@
 "use client";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
+import axios from "axios";
 import { AnimatePresence, motion } from "motion/react";
 import { useParams } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import * as React from "react";
 import useSWR from "swr";
+import { DomainErrorState } from "../components/domain-error-state";
 import { DomainNotFound } from "../components/domain-not-found";
 import { DNSRecordsSection } from "./components/dns-records-section";
 import { DomainConfigurationSection } from "./components/domain-configuration-section";
@@ -16,7 +19,13 @@ import { DomainHeader } from "./components/domain-header";
 import { DomainStats } from "./components/domain-stats";
 
 const DomainPage = () => {
-	const { domainId } = useParams();
+	const params = useParams();
+	const domainId = typeof params.domainId === "string" ? params.domainId : null;
+	// Layout mounts this page while org/session sync is still in progress
+	// (hidden under a loader). Domain APIs require session.activeOrganizationId —
+	// fetching before that settles causes 401s on hard reload, which this page
+	// previously treated as "not found".
+	const { activeOrganization, isLoading: orgLoading } = useUserOrganization();
 	const [activeTab, setActiveTab] = useQueryState(
 		"tab",
 		parseAsString.withDefault("dns"),
@@ -36,29 +45,38 @@ const DomainPage = () => {
 	const tab = buttonRefs.current[currentIdx];
 	const rect = tab?.getBoundingClientRect();
 
+	const canFetch = Boolean(domainId && activeOrganization && !orgLoading);
+
 	const {
 		data: domainData,
 		error,
 		isLoading,
-	} = useSWR<DomainResponse>(domainId ? `/api/domain/v1/${domainId}` : null, {
+	} = useSWR<DomainResponse>(canFetch ? `/api/domain/v1/${domainId}` : null, {
 		refreshInterval: (data) => (data?.status === "verifying" ? 3000 : 0),
 	});
 
-	const { domainId: _domainId } = useParams();
+	const showLoading = !canFetch || isLoading;
 
 	if (error) {
+		const status = axios.isAxiosError(error)
+			? error.response?.status
+			: undefined;
 		return (
 			<div className="mx-auto flex min-h-[calc(100vh-200px)] max-w-3xl flex-col items-center justify-center sm:px-8">
-				<DomainNotFound />
+				{status === 404 ? (
+					<DomainNotFound />
+				) : (
+					<DomainErrorState message="Failed to load domain" />
+				)}
 			</div>
 		);
 	}
 
 	return (
 		<div className="mx-auto max-w-3xl space-y-8 p-6 lg:p-8">
-			<DomainHeader domain={domainData} isLoading={isLoading} />
-			<DomainStats domain={domainData} isLoading={isLoading} />
-			<DomainEvents domain={domainData} isLoading={isLoading} />
+			<DomainHeader domain={domainData} isLoading={showLoading} />
+			<DomainStats domain={domainData} isLoading={showLoading} />
+			<DomainEvents domain={domainData} isLoading={showLoading} />
 			<TabMenu.Root
 				value={activeTab}
 				onValueChange={setActiveTab}
@@ -134,12 +152,12 @@ const DomainPage = () => {
 					</AnimatePresence>
 				</TabMenu.List>
 				<TabMenu.Content value="dns" className="outline-none">
-					<DNSRecordsSection domain={domainData} isLoading={isLoading} />
+					<DNSRecordsSection domain={domainData} isLoading={showLoading} />
 				</TabMenu.Content>
 				<TabMenu.Content value="configuration">
 					<DomainConfigurationSection
 						domain={domainData}
-						isLoading={isLoading}
+						isLoading={showLoading}
 					/>
 				</TabMenu.Content>
 			</TabMenu.Root>

@@ -1,4 +1,5 @@
 "use client";
+import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import type { DomainListResponse } from "@fe/dashboard/types/api.types";
 import { useGetBackToUrl } from "@fe/dashboard/utils/navigation";
 import dayjs from "dayjs";
@@ -23,6 +24,7 @@ dayjs.extend(relativeTime);
 const DomainPage = () => {
 	const getBackToUrl = useGetBackToUrl();
 	const router = useRouter();
+	const { activeOrganization, isLoading: orgLoading } = useUserOrganization();
 	const [statusFilters] = useQueryState(
 		"status",
 		parseAsStringLiteral([
@@ -37,8 +39,11 @@ const DomainPage = () => {
 	const [currentPage] = useQueryState("page", parseAsInteger.withDefault(1));
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 
+	const canFetch = Boolean(activeOrganization && !orgLoading);
 	const { data, error, isLoading, mutate } = useSWR<DomainListResponse>(
-		`/api/domain/v1/list?limit=${pageSize}&page=${currentPage}${statusFilters ? `&status=${statusFilters}` : ""}${searchQuery ? `&q=${searchQuery}` : ""}`,
+		canFetch
+			? `/api/domain/v1/list?limit=${pageSize}&page=${currentPage}${statusFilters ? `&status=${statusFilters}` : ""}${searchQuery ? `&q=${searchQuery}` : ""}`
+			: null,
 		{
 			revalidateOnFocus: true,
 			revalidateOnReconnect: true,
@@ -46,6 +51,7 @@ const DomainPage = () => {
 				latest?.domains?.some((d) => d.status === "verifying") ? 3000 : 0,
 		},
 	);
+	const showLoading = !canFetch || isLoading;
 
 	useHotkeys("mod+a", () => {
 		router.push(getBackToUrl("/domain/add"));
@@ -65,7 +71,7 @@ const DomainPage = () => {
 						<DomainTable
 							domains={domains}
 							total={data?.total || 0}
-							isLoading={isLoading}
+							isLoading={showLoading}
 						/>
 					)}
 				</div>
