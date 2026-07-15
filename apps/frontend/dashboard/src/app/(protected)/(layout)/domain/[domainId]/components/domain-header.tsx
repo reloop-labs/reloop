@@ -61,7 +61,7 @@ export const DomainHeader = ({ domain, isLoading }: DomainHeaderProps) => {
 	);
 
 	return (
-		<div className="pt-10">
+		<div>
 			<AnimatedBackButton onClick={() => router.push("/domain")} />
 			<div className="flex items-center justify-between pt-6">
 				<div>
