@@ -4,7 +4,11 @@ export const emailConfig = {
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 	RELOOP_API_KEY: process.env.RELOOP_API_KEY || "",
 	RELOOP_SENDER_DOMAIN: process.env.RELOOP_SENDER_DOMAIN || "",
-	BASE_URL: process.env.BASE_URL || "https://local.reloop.sh",
+	/** Public site origin for links in emails. Set `BASE_URL=https://reloop.sh` in prod. */
+	BASE_URL: (process.env.BASE_URL || "https://local.reloop.sh").replace(
+		/\/$/,
+		"",
+	),
 	REDIS_URL: process.env.REDIS_URL || "redis://:reloop123@localhost:6379",
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",

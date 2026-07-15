@@ -12,6 +12,10 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
+# NEXT_PUBLIC_* are inlined at build time. When omitted, auth uses window.location.origin.
+# Pass --build-arg NEXT_PUBLIC_URL=https://your-domain.com to pin an absolute origin.
+ARG NEXT_PUBLIC_URL
+ENV NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL}
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .

@@ -90,7 +90,7 @@ export async function generateMetadata(props: {
 	params: Promise<{ slug?: string[] }>;
 }) {
 	const params = await props.params;
-	const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://reloop.sh";
+	const appUrl = process.env.NEXT_PUBLIC_URL || "https://reloop.sh";
 
 	const page = source.getPage(params.slug);
 	if (!page) {
@@ -255,7 +255,7 @@ export default async function Page(props: {
 	// Force RSC cache bust: 2026-05-17T03:30:00Z
 	const pathname = page.url;
 
-	const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://reloop.sh";
+	const appUrl = process.env.NEXT_PUBLIC_URL || "https://reloop.sh";
 	const canonicalUrl = `${appUrl}/docs${page.url === "/introduction" ? "" : page.url}`;
 	const jsonLdData = getJsonLd(page, canonicalUrl);
 

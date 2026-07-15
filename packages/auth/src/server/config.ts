@@ -2,7 +2,11 @@ export const authServerConfig = {
 	PG_URL:
 		process.env.PG_URL || "postgresql://reloop:reloop123@localhost:5432/reloop",
 	REDIS_URL: process.env.REDIS_URL || "redis://:reloop123@localhost:6379",
-	BASE_URL: process.env.BASE_URL || "https://local.reloop.sh",
+	/** Public site origin (invite links, etc.). Set `BASE_URL=https://reloop.sh` in prod. */
+	BASE_URL: (process.env.BASE_URL || "https://local.reloop.sh").replace(
+		/\/$/,
+		"",
+	),
 	NODE_ENV: process.env.NODE_ENV || "development",
 	BETTER_AUTH_SECRET:
 		process.env.BETTER_AUTH_SECRET || "tENkVU4GrhckuRw4Bcfh93EWgXOFcszn",

@@ -75,7 +75,7 @@ GITHUB_CLIENT_SECRET=
 | `PG_URL` | **YES** | `postgresql://...` | Shared Postgres from Docker |
 | `REDIS_URL` | **YES** | `redis://...` | Sessions and rate limits |
 | `BETTER_AUTH_SECRET` | **YES** | — | Session encryption key |
-| `BASE_URL` | **YES** | `https://local.reloop.sh` | Must match Caddy domain for cookies |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` | Public site origin. Local: Caddy host. Production: `https://reloop.sh` (or your domain) — used for OAuth callbacks and invite links |
 | `PORT` | **YES** | `8000` | Host port |
 | `NATS_URL` | **YES** | `nats://localhost:4222` | Event bus |
 | `DEFAULT_OTP` | **NO** | `888888` | Dev OTP bypass for first login |

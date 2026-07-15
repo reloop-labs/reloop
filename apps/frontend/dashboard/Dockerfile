@@ -13,6 +13,11 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # Use ARG for build-time variables that can be overridden
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
+# NEXT_PUBLIC_* are inlined at build time. When NEXT_PUBLIC_URL is omitted, the
+# auth client uses window.location.origin (works for any public hostname).
+# Pass --build-arg NEXT_PUBLIC_URL=https://your-domain.com to pin an absolute origin.
+ARG NEXT_PUBLIC_URL
+ENV NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL}
 ARG NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-wss://reloop.sh}
 ENV NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
 
