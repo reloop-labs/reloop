@@ -1,4 +1,5 @@
 import { cn } from "@reloop/ui/cn";
+import { useNavigate } from "@tanstack/react-router";
 import {
 	flexRender,
 	getCoreRowModel,
@@ -9,6 +10,7 @@ import { useCallback, useMemo, useState } from "react";
 import type { ApiKeysListParams } from "../hooks/use-api-keys-query";
 import { useToggleApiKey } from "../hooks/use-toggle-api-key";
 import { DeleteApiKeyModal } from "../modals/delete-api-key-modal";
+import { EditApiKeyModal } from "../modals/edit-api-key-modal";
 import { RotateApiKeyModal } from "../modals/rotate-api-key-modal";
 import type { ApiKeyData } from "../types";
 import {
@@ -34,6 +36,7 @@ export function ApiKeyTable({
 	isLoading?: boolean;
 	loadingRows?: number;
 }) {
+	const navigate = useNavigate();
 	const [, setDeleteId] = useQueryState("delete");
 	const [, setRotateId] = useQueryState("rotate");
 	const [, setModal] = useQueryState("modal");
@@ -125,8 +128,25 @@ export function ApiKeyTable({
 							return (
 								<div
 									key={row.id}
+									role="link"
+									tabIndex={0}
+									onClick={() =>
+										void navigate({
+											to: "/api-keys/$apiKeyId",
+											params: { apiKeyId: apiKey.id },
+										})
+									}
+									onKeyDown={(e) => {
+										if (e.key === "Enter" || e.key === " ") {
+											e.preventDefault();
+											void navigate({
+												to: "/api-keys/$apiKeyId",
+												params: { apiKeyId: apiKey.id },
+											});
+										}
+									}}
 									className={cn(
-										`group/row grid w-full ${API_KEY_TABLE_GRID} items-center px-4 py-2 text-left transition-colors`,
+										`group/row grid w-full cursor-pointer ${API_KEY_TABLE_GRID} items-center px-4 py-2 text-left transition-colors`,
 										"hover:bg-bg-weak-50/50",
 										isRowActive && "bg-bg-weak-50/50",
 									)}
@@ -140,10 +160,15 @@ export function ApiKeyTable({
 										</div>
 									))}
 									{/* Actions outside column defs so open state never remounts with columns */}
-									<ApiKeyActionsMenu
-										apiKey={apiKey}
-										handlers={actionsHandlers}
-									/>
+									<div
+										onClick={(e) => e.stopPropagation()}
+										onKeyDown={(e) => e.stopPropagation()}
+									>
+										<ApiKeyActionsMenu
+											apiKey={apiKey}
+											handlers={actionsHandlers}
+										/>
+									</div>
 								</div>
 							);
 						})
@@ -154,6 +179,7 @@ export function ApiKeyTable({
 			</div>
 			<DeleteApiKeyModal apiKeys={apiKeys} />
 			<RotateApiKeyModal apiKeys={apiKeys} />
+			<EditApiKeyModal apiKeys={apiKeys} />
 		</>
 	);
 }

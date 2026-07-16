@@ -1,5 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { Link } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import type { ApiKeyData } from "../types";
@@ -14,9 +15,13 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 				apiKey.name || apiKey.start || apiKey.prefix || "Unnamed";
 			return (
 				<div className="flex min-w-0 items-center gap-2">
-					<div className="truncate font-medium text-label-sm text-text-strong-950">
+					<Link
+						to="/api-keys/$apiKeyId"
+						params={{ apiKeyId: apiKey.id }}
+						className="truncate font-medium text-label-sm text-text-strong-950 hover:underline"
+					>
 						{displayName}
-					</div>
+					</Link>
 				</div>
 			);
 		},

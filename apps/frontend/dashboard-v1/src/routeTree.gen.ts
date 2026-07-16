@@ -42,6 +42,7 @@ import { Route as DashboardEmailsReceivedRouteImport } from './routes/_dashboard
 import { Route as DashboardContactsPropertiesRouteImport } from './routes/_dashboard/contacts/properties'
 import { Route as DashboardContactsGroupsRouteImport } from './routes/_dashboard/contacts/groups'
 import { Route as DashboardContactsChannelsRouteImport } from './routes/_dashboard/contacts/channels'
+import { Route as DashboardApiKeysApiKeyIdRouteImport } from './routes/_dashboard/api-keys.$apiKeyId'
 import { Route as DashboardSettingsBillingIndexRouteImport } from './routes/_dashboard/settings/billing/index'
 import { Route as DashboardSettingsBillingPlansRouteImport } from './routes/_dashboard/settings/billing/plans'
 
@@ -215,6 +216,12 @@ const DashboardContactsChannelsRoute =
     path: '/channels',
     getParentRoute: () => DashboardContactsRoute,
   } as any)
+const DashboardApiKeysApiKeyIdRoute =
+  DashboardApiKeysApiKeyIdRouteImport.update({
+    id: '/$apiKeyId',
+    path: '/$apiKeyId',
+    getParentRoute: () => DashboardApiKeysRoute,
+  } as any)
 const DashboardSettingsBillingIndexRoute =
   DashboardSettingsBillingIndexRouteImport.update({
     id: '/',
@@ -235,7 +242,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
   '/agent-inbox': typeof DashboardAgentInboxRoute
-  '/api-keys': typeof DashboardApiKeysRoute
+  '/api-keys': typeof DashboardApiKeysRouteWithChildren
   '/contacts': typeof DashboardContactsRouteWithChildren
   '/domain': typeof DashboardDomainRoute
   '/emails': typeof DashboardEmailsRouteWithChildren
@@ -247,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/templates': typeof DashboardTemplatesRoute
   '/webhooks': typeof DashboardWebhooksRoute
   '/workflows': typeof DashboardWorkflowsRoute
+  '/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
   '/contacts/channels': typeof DashboardContactsChannelsRoute
   '/contacts/groups': typeof DashboardContactsGroupsRoute
   '/contacts/properties': typeof DashboardContactsPropertiesRoute
@@ -270,7 +278,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
   '/agent-inbox': typeof DashboardAgentInboxRoute
-  '/api-keys': typeof DashboardApiKeysRoute
+  '/api-keys': typeof DashboardApiKeysRouteWithChildren
   '/domain': typeof DashboardDomainRoute
   '/integrations': typeof DashboardIntegrationsRoute
   '/logs': typeof DashboardLogsRoute
@@ -280,6 +288,7 @@ export interface FileRoutesByTo {
   '/webhooks': typeof DashboardWebhooksRoute
   '/workflows': typeof DashboardWorkflowsRoute
   '/': typeof DashboardIndexRoute
+  '/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
   '/contacts/channels': typeof DashboardContactsChannelsRoute
   '/contacts/groups': typeof DashboardContactsGroupsRoute
   '/contacts/properties': typeof DashboardContactsPropertiesRoute
@@ -304,7 +313,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
   '/_dashboard/agent-inbox': typeof DashboardAgentInboxRoute
-  '/_dashboard/api-keys': typeof DashboardApiKeysRoute
+  '/_dashboard/api-keys': typeof DashboardApiKeysRouteWithChildren
   '/_dashboard/contacts': typeof DashboardContactsRouteWithChildren
   '/_dashboard/domain': typeof DashboardDomainRoute
   '/_dashboard/emails': typeof DashboardEmailsRouteWithChildren
@@ -317,6 +326,7 @@ export interface FileRoutesById {
   '/_dashboard/webhooks': typeof DashboardWebhooksRoute
   '/_dashboard/workflows': typeof DashboardWorkflowsRoute
   '/_dashboard/': typeof DashboardIndexRoute
+  '/_dashboard/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
   '/_dashboard/contacts/channels': typeof DashboardContactsChannelsRoute
   '/_dashboard/contacts/groups': typeof DashboardContactsGroupsRoute
   '/_dashboard/contacts/properties': typeof DashboardContactsPropertiesRoute
@@ -355,6 +365,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/webhooks'
     | '/workflows'
+    | '/api-keys/$apiKeyId'
     | '/contacts/channels'
     | '/contacts/groups'
     | '/contacts/properties'
@@ -388,6 +399,7 @@ export interface FileRouteTypes {
     | '/webhooks'
     | '/workflows'
     | '/'
+    | '/api-keys/$apiKeyId'
     | '/contacts/channels'
     | '/contacts/groups'
     | '/contacts/properties'
@@ -424,6 +436,7 @@ export interface FileRouteTypes {
     | '/_dashboard/webhooks'
     | '/_dashboard/workflows'
     | '/_dashboard/'
+    | '/_dashboard/api-keys/$apiKeyId'
     | '/_dashboard/contacts/channels'
     | '/_dashboard/contacts/groups'
     | '/_dashboard/contacts/properties'
@@ -683,6 +696,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardContactsChannelsRouteImport
       parentRoute: typeof DashboardContactsRoute
     }
+    '/_dashboard/api-keys/$apiKeyId': {
+      id: '/_dashboard/api-keys/$apiKeyId'
+      path: '/$apiKeyId'
+      fullPath: '/api-keys/$apiKeyId'
+      preLoaderRoute: typeof DashboardApiKeysApiKeyIdRouteImport
+      parentRoute: typeof DashboardApiKeysRoute
+    }
     '/_dashboard/settings/billing/': {
       id: '/_dashboard/settings/billing/'
       path: '/'
@@ -699,6 +719,17 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface DashboardApiKeysRouteChildren {
+  DashboardApiKeysApiKeyIdRoute: typeof DashboardApiKeysApiKeyIdRoute
+}
+
+const DashboardApiKeysRouteChildren: DashboardApiKeysRouteChildren = {
+  DashboardApiKeysApiKeyIdRoute: DashboardApiKeysApiKeyIdRoute,
+}
+
+const DashboardApiKeysRouteWithChildren =
+  DashboardApiKeysRoute._addFileChildren(DashboardApiKeysRouteChildren)
 
 interface DashboardContactsRouteChildren {
   DashboardContactsChannelsRoute: typeof DashboardContactsChannelsRoute
@@ -774,7 +805,7 @@ const DashboardSettingsRouteWithChildren =
 
 interface DashboardRouteChildren {
   DashboardAgentInboxRoute: typeof DashboardAgentInboxRoute
-  DashboardApiKeysRoute: typeof DashboardApiKeysRoute
+  DashboardApiKeysRoute: typeof DashboardApiKeysRouteWithChildren
   DashboardContactsRoute: typeof DashboardContactsRouteWithChildren
   DashboardDomainRoute: typeof DashboardDomainRoute
   DashboardEmailsRoute: typeof DashboardEmailsRouteWithChildren
@@ -791,7 +822,7 @@ interface DashboardRouteChildren {
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAgentInboxRoute: DashboardAgentInboxRoute,
-  DashboardApiKeysRoute: DashboardApiKeysRoute,
+  DashboardApiKeysRoute: DashboardApiKeysRouteWithChildren,
   DashboardContactsRoute: DashboardContactsRouteWithChildren,
   DashboardDomainRoute: DashboardDomainRoute,
   DashboardEmailsRoute: DashboardEmailsRouteWithChildren,

@@ -36,3 +36,18 @@ export type ApiKeyWithSecret = {
 	name: string | null;
 	key: string;
 };
+
+/** Full key payload from GET /api/api-key/v1/:id */
+export type ApiKeyDetail = ApiKeyData & {
+	organizationId?: string;
+	userId?: string;
+	refillInterval?: number | null;
+	refillAmount?: number | null;
+	lastRefillAt?: string | null;
+	rateLimitEnabled?: boolean;
+	rateLimitTimeWindow?: number;
+	rateLimitMax?: number;
+	updatedAt?: string;
+	permissions?: string | null;
+	metadata?: string | null;
+};

@@ -11,7 +11,13 @@ import { toast } from "sonner";
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import type { ApiKeyData } from "../types";
 
-export function DeleteApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
+export function DeleteApiKeyModal({
+	apiKeys,
+	onDeleteSuccess,
+}: {
+	apiKeys: ApiKeyData[];
+	onDeleteSuccess?: () => void;
+}) {
 	const [deleteId, setDeleteId] = useQueryState("delete");
 	const [confirmationText, setConfirmationText] = useState("");
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -35,6 +41,7 @@ export function DeleteApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
 			void setDeleteId(null);
 			setConfirmationText("");
 			await invalidate();
+			onDeleteSuccess?.();
 		} catch (error) {
 			const message = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to delete API key"
