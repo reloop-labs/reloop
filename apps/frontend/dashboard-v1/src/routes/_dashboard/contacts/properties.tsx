@@ -1,11 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PagePlaceholder } from "#/features/dashboard/page-placeholder";
+import { PropertyList } from "#/features/contacts/components/properties/property-list";
 
 export const Route = createFileRoute("/_dashboard/contacts/properties")({
-	component: () => (
-		<PagePlaceholder
-			title="Properties"
-			description="Contact property definitions will live here."
-		/>
-	),
+	component: PropertyList,
+	head: () => ({
+		meta: [
+			{ title: "Properties · Reloop" },
+			{
+				name: "description",
+				content: "Custom contact properties for your audience.",
+			},
+		],
+	}),
 });

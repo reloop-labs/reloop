@@ -44,6 +44,26 @@ export const queryKeys = {
 		}) => [...queryKeys.logs.all, "list", params] as const,
 		detail: (id: string) => [...queryKeys.logs.all, "detail", id] as const,
 	},
+	contacts: {
+		all: ["contacts"] as const,
+		list: (params: {
+			page: number;
+			limit: number;
+			search: string;
+			status: string;
+		}) => [...queryKeys.contacts.all, "list", params] as const,
+		detail: (id: string) =>
+			[...queryKeys.contacts.all, "detail", id] as const,
+		groups: (params: { page: number; limit: number; search: string }) =>
+			[...queryKeys.contacts.all, "groups", params] as const,
+		properties: (params: {
+			page: number;
+			limit: number;
+			search: string;
+			type: string;
+		}) => [...queryKeys.contacts.all, "properties", params] as const,
+		channels: () => [...queryKeys.contacts.all, "channels"] as const,
+	},
 	domain: {
 		all: ["domain"] as const,
 		detail: (domainId: string) =>

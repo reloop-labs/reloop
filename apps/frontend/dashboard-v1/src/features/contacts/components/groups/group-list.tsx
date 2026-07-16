@@ -1,0 +1,87 @@
+import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
+import { parseAsInteger, useQueryState } from "nuqs";
+import { useState } from "react";
+import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import { useGroupsQuery } from "../../hooks/use-contacts-query";
+import { GroupTable } from "./group-table";
+
+export function GroupList() {
+	const { activeOrganization } = useActiveOrganization();
+	const [searchQuery, setSearchQuery] = useState("");
+	const [, setModal] = useQueryState("modal");
+	const [currentPage, setCurrentPage] = useQueryState(
+		"page",
+		parseAsInteger.withDefault(1),
+	);
+	const [pageSize, setPageSize] = useQueryState(
+		"limit",
+		parseAsInteger.withDefault(10),
+	);
+
+	const { data, error, isPending, isFetching } = useGroupsQuery({
+		page: currentPage ?? 1,
+		limit: pageSize ?? 10,
+		search: searchQuery,
+		enabled: !!activeOrganization?.id,
+	});
+	const isLoading = isPending || (isFetching && !data);
+
+	if (error) {
+		return (
+			<div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-12 text-center">
+				<div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-error-light/10">
+					<Icon name="alert-circle" className="h-5 w-5 text-error-base" />
+				</div>
+				<h3 className="font-semibold text-text-strong-950">
+					Failed to load groups
+				</h3>
+				<p className="mx-auto max-w-xs text-sm text-text-sub-600">
+					Something went wrong while fetching the groups list. Please try again.
+				</p>
+			</div>
+		);
+	}
+
+	return (
+		<div>
+			<div className="flex items-center gap-3">
+				<div className="flex-1">
+					<Input.Root size="xsmall" className="rounded-[10px]">
+						<Input.Wrapper>
+							<Input.Icon
+								as={Icon}
+								name="search"
+								size="xsmall"
+								className="h-3.5 w-3.5"
+							/>
+							<Input.Input
+								placeholder="Search groups..."
+								value={searchQuery}
+								onChange={(e) => {
+									setSearchQuery(e.target.value);
+									void setCurrentPage(1);
+								}}
+							/>
+						</Input.Wrapper>
+					</Input.Root>
+				</div>
+			</div>
+			<div className="mt-4">
+				<GroupTable
+					groups={(data?.groups || []).map((g) => ({ ...g, organizationId: g.organizationId || "", createdAt: g.createdAt || "", updatedAt: g.updatedAt || "", deletedAt: g.deletedAt ?? null })) as any}
+					total={data?.total || 0}
+					isLoading={isLoading}
+					onAddGroup={() => void setModal("create-group")}
+					currentPage={currentPage ?? 1}
+					pageSize={pageSize ?? 10}
+					onPageChange={(p) => void setCurrentPage(p)}
+					onPageSizeChange={(v) => {
+						void setPageSize(v);
+						void setCurrentPage(1);
+					}}
+				/>
+			</div>
+		</div>
+	);
+}

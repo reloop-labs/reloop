@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PagePlaceholder } from "#/features/dashboard/page-placeholder";
+import { GroupList } from "#/features/contacts/components/groups/group-list";
 
 export const Route = createFileRoute("/_dashboard/contacts/groups")({
-	component: () => (
-		<PagePlaceholder
-			title="Groups"
-			description="Contact groups will live here."
-		/>
-	),
+	component: GroupList,
+	head: () => ({
+		meta: [
+			{ title: "Groups · Reloop" },
+			{ name: "description", content: "Organize contacts into groups." },
+		],
+	}),
 });
