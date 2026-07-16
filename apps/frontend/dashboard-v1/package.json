@@ -1,0 +1,78 @@
+{
+  "name": "dashboard-v1",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "scripts": {
+    "dev": "vite dev --port 3001",
+    "generate-routes": "tsr generate",
+    "build": "vite build",
+    "preview": "vite preview --port 3001",
+    "start": "vite preview --port 3001",
+    "test": "vitest run",
+    "format": "biome format",
+    "lint": "biome lint",
+    "check": "biome check",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@code-hike/lighter": "^1.0.3",
+    "@dot-loaders/react": "catalog:ui",
+    "@hookform/resolvers": "catalog:ui",
+    "@number-flow/react": "catalog:ui",
+    "@reloop/auth": "workspace:*",
+    "@reloop/tailwind": "workspace:*",
+    "@reloop/ui": "workspace:*",
+    "@tailwindcss/vite": "^4.1.18",
+    "@tanstack/react-devtools": "latest",
+    "@tanstack/react-query": "^5.101.2",
+    "@tanstack/react-query-devtools": "^5.101.2",
+    "@tanstack/react-router": "latest",
+    "@tanstack/react-router-devtools": "latest",
+    "@tanstack/react-router-ssr-query": "latest",
+    "@tanstack/react-start": "latest",
+    "@tanstack/router-plugin": "^1.132.0",
+    "axios": "catalog:",
+    "better-auth": "catalog:",
+    "bright": "catalog:ui",
+    "calligraph": "catalog:ui",
+    "framer-motion": "catalog:ui",
+    "lucide-react": "^0.545.0",
+    "motion": "catalog:ui",
+    "next-themes": "catalog:ui",
+    "nitro": "npm:nitro-nightly@latest",
+    "nuqs": "catalog:ui",
+    "react": "catalog:ui",
+    "react-dom": "catalog:ui",
+    "react-hook-form": "catalog:ui",
+    "react-hotkeys-hook": "catalog:ui",
+    "simple-icons": "catalog:ui",
+    "sonner": "catalog:ui",
+    "tailwindcss": "^4.1.18",
+    "valibot": "catalog:db"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.5",
+    "@tailwindcss/typography": "^0.5.16",
+    "@tanstack/devtools-vite": "latest",
+    "@tanstack/router-cli": "^1.132.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.0",
+    "@types/node": "^22.10.2",
+    "@types/react": "catalog:ui",
+    "@types/react-dom": "catalog:ui",
+    "@vitejs/plugin-react": "^6.0.1",
+    "jsdom": "^28.1.0",
+    "typescript": "^5.9.2",
+    "vite": "^8.0.0",
+    "vitest": "^4.1.5"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "lightningcss"
+    ]
+  }
+}
