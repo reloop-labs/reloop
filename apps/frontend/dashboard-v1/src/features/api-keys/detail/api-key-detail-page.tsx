@@ -51,7 +51,6 @@ export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
 						Try again
 					</button>
 				</div>
-				<ActivitySection />
 			</div>
 		);
 	}
@@ -83,7 +82,7 @@ export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
 						if (data?.id) void setDeleteId(data.id);
 					}}
 				/>
-				<ActivitySection />
+				<ActivitySection actorId={data?.id} />
 			</div>
 
 			<DeleteApiKeyModal

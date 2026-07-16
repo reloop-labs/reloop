@@ -742,6 +742,7 @@
         "nuqs": "catalog:ui",
         "rc-progress": "^4.0.0",
         "react": "catalog:ui",
+        "react-day-picker": "catalog:ui",
         "react-dom": "catalog:ui",
         "react-hook-form": "catalog:ui",
         "react-hotkeys-hook": "catalog:ui",

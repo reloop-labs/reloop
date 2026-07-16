@@ -30,6 +30,20 @@ export const queryKeys = {
 		}) => [...queryKeys.apiKeys.all, "list", params] as const,
 		detail: (id: string) => [...queryKeys.apiKeys.all, "detail", id] as const,
 	},
+	logs: {
+		all: ["logs"] as const,
+		list: (params: {
+			page: number;
+			limit: number;
+			search: string;
+			startDate: string;
+			endDate: string;
+			statusCode: string;
+			outcome: string;
+			actorId: string;
+		}) => [...queryKeys.logs.all, "list", params] as const,
+		detail: (id: string) => [...queryKeys.logs.all, "detail", id] as const,
+	},
 	domain: {
 		all: ["domain"] as const,
 		detail: (domainId: string) =>

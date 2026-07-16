@@ -1,11 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PagePlaceholder } from "#/features/dashboard/page-placeholder";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
+/** Layout for /logs and /logs/$logId — must render an Outlet. */
 export const Route = createFileRoute("/_dashboard/logs")({
-	component: () => (
-		<PagePlaceholder
-			title="Logs"
-			description="Request and event logs will live here."
-		/>
-	),
+	component: () => <Outlet />,
 });
