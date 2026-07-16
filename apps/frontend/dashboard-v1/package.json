@@ -51,7 +51,8 @@
     "simple-icons": "catalog:ui",
     "sonner": "catalog:ui",
     "tailwindcss": "^4.1.18",
-    "valibot": "catalog:db"
+    "valibot": "catalog:db",
+    "@reloop/pricing": "workspace:*"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.5",

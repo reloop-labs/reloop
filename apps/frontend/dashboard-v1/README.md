@@ -108,6 +108,12 @@ src/features/settings/
     change-role-modal.tsx
     remove-member-modal.tsx
     revoke-invite-modal.tsx
+  billing/
+    billing-page.tsx
+    plans-page.tsx
+    switch-plan-modal.tsx
+    use-billing-usage.ts
+    request-support.ts
   use-org-permissions.ts
 src/features/onboarding/...
 src/features/invite/invite-page.tsx

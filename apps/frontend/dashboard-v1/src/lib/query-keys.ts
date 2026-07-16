@@ -15,6 +15,10 @@ export const queryKeys = {
 		invitations: (orgId: string) =>
 			[...queryKeys.organization.all, "invitations", orgId] as const,
 	},
+	billing: {
+		all: ["billing"] as const,
+		usage: () => [...queryKeys.billing.all, "usage"] as const,
+	},
 	domain: {
 		all: ["domain"] as const,
 		detail: (domainId: string) =>

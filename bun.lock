@@ -717,6 +717,7 @@
         "@hookform/resolvers": "catalog:ui",
         "@number-flow/react": "catalog:ui",
         "@reloop/auth": "workspace:*",
+        "@reloop/pricing": "workspace:*",
         "@reloop/tailwind": "workspace:*",
         "@reloop/ui": "workspace:*",
         "@tailwindcss/vite": "^4.1.18",

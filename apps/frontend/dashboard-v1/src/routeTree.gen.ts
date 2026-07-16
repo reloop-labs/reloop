@@ -42,6 +42,8 @@ import { Route as DashboardEmailsReceivedRouteImport } from './routes/_dashboard
 import { Route as DashboardContactsPropertiesRouteImport } from './routes/_dashboard/contacts/properties'
 import { Route as DashboardContactsGroupsRouteImport } from './routes/_dashboard/contacts/groups'
 import { Route as DashboardContactsChannelsRouteImport } from './routes/_dashboard/contacts/channels'
+import { Route as DashboardSettingsBillingIndexRouteImport } from './routes/_dashboard/settings/billing/index'
+import { Route as DashboardSettingsBillingPlansRouteImport } from './routes/_dashboard/settings/billing/plans'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -213,6 +215,18 @@ const DashboardContactsChannelsRoute =
     path: '/channels',
     getParentRoute: () => DashboardContactsRoute,
   } as any)
+const DashboardSettingsBillingIndexRoute =
+  DashboardSettingsBillingIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardSettingsBillingRoute,
+  } as any)
+const DashboardSettingsBillingPlansRoute =
+  DashboardSettingsBillingPlansRouteImport.update({
+    id: '/plans',
+    path: '/plans',
+    getParentRoute: () => DashboardSettingsBillingRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof DashboardIndexRoute
@@ -238,7 +252,7 @@ export interface FileRoutesByFullPath {
   '/contacts/properties': typeof DashboardContactsPropertiesRoute
   '/emails/received': typeof DashboardEmailsReceivedRoute
   '/emails/sent': typeof DashboardEmailsSentRoute
-  '/settings/billing': typeof DashboardSettingsBillingRoute
+  '/settings/billing': typeof DashboardSettingsBillingRouteWithChildren
   '/settings/profile': typeof DashboardSettingsProfileRoute
   '/settings/security': typeof DashboardSettingsSecurityRoute
   '/settings/teams': typeof DashboardSettingsTeamsRoute
@@ -247,6 +261,8 @@ export interface FileRoutesByFullPath {
   '/contacts/': typeof DashboardContactsIndexRoute
   '/emails/': typeof DashboardEmailsIndexRoute
   '/settings/': typeof DashboardSettingsIndexRoute
+  '/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
+  '/settings/billing/': typeof DashboardSettingsBillingIndexRoute
 }
 export interface FileRoutesByTo {
   '/invite': typeof InviteRoute
@@ -269,7 +285,6 @@ export interface FileRoutesByTo {
   '/contacts/properties': typeof DashboardContactsPropertiesRoute
   '/emails/received': typeof DashboardEmailsReceivedRoute
   '/emails/sent': typeof DashboardEmailsSentRoute
-  '/settings/billing': typeof DashboardSettingsBillingRoute
   '/settings/profile': typeof DashboardSettingsProfileRoute
   '/settings/security': typeof DashboardSettingsSecurityRoute
   '/settings/teams': typeof DashboardSettingsTeamsRoute
@@ -278,6 +293,8 @@ export interface FileRoutesByTo {
   '/contacts': typeof DashboardContactsIndexRoute
   '/emails': typeof DashboardEmailsIndexRoute
   '/settings': typeof DashboardSettingsIndexRoute
+  '/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
+  '/settings/billing': typeof DashboardSettingsBillingIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -305,7 +322,7 @@ export interface FileRoutesById {
   '/_dashboard/contacts/properties': typeof DashboardContactsPropertiesRoute
   '/_dashboard/emails/received': typeof DashboardEmailsReceivedRoute
   '/_dashboard/emails/sent': typeof DashboardEmailsSentRoute
-  '/_dashboard/settings/billing': typeof DashboardSettingsBillingRoute
+  '/_dashboard/settings/billing': typeof DashboardSettingsBillingRouteWithChildren
   '/_dashboard/settings/profile': typeof DashboardSettingsProfileRoute
   '/_dashboard/settings/security': typeof DashboardSettingsSecurityRoute
   '/_dashboard/settings/teams': typeof DashboardSettingsTeamsRoute
@@ -314,6 +331,8 @@ export interface FileRoutesById {
   '/_dashboard/contacts/': typeof DashboardContactsIndexRoute
   '/_dashboard/emails/': typeof DashboardEmailsIndexRoute
   '/_dashboard/settings/': typeof DashboardSettingsIndexRoute
+  '/_dashboard/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
+  '/_dashboard/settings/billing/': typeof DashboardSettingsBillingIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -350,6 +369,8 @@ export interface FileRouteTypes {
     | '/contacts/'
     | '/emails/'
     | '/settings/'
+    | '/settings/billing/plans'
+    | '/settings/billing/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/invite'
@@ -372,7 +393,6 @@ export interface FileRouteTypes {
     | '/contacts/properties'
     | '/emails/received'
     | '/emails/sent'
-    | '/settings/billing'
     | '/settings/profile'
     | '/settings/security'
     | '/settings/teams'
@@ -381,6 +401,8 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/emails'
     | '/settings'
+    | '/settings/billing/plans'
+    | '/settings/billing'
   id:
     | '__root__'
     | '/_dashboard'
@@ -416,6 +438,8 @@ export interface FileRouteTypes {
     | '/_dashboard/contacts/'
     | '/_dashboard/emails/'
     | '/_dashboard/settings/'
+    | '/_dashboard/settings/billing/plans'
+    | '/_dashboard/settings/billing/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -659,6 +683,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardContactsChannelsRouteImport
       parentRoute: typeof DashboardContactsRoute
     }
+    '/_dashboard/settings/billing/': {
+      id: '/_dashboard/settings/billing/'
+      path: '/'
+      fullPath: '/settings/billing/'
+      preLoaderRoute: typeof DashboardSettingsBillingIndexRouteImport
+      parentRoute: typeof DashboardSettingsBillingRoute
+    }
+    '/_dashboard/settings/billing/plans': {
+      id: '/_dashboard/settings/billing/plans'
+      path: '/plans'
+      fullPath: '/settings/billing/plans'
+      preLoaderRoute: typeof DashboardSettingsBillingPlansRouteImport
+      parentRoute: typeof DashboardSettingsBillingRoute
+    }
   }
 }
 
@@ -695,8 +733,24 @@ const DashboardEmailsRouteWithChildren = DashboardEmailsRoute._addFileChildren(
   DashboardEmailsRouteChildren,
 )
 
+interface DashboardSettingsBillingRouteChildren {
+  DashboardSettingsBillingPlansRoute: typeof DashboardSettingsBillingPlansRoute
+  DashboardSettingsBillingIndexRoute: typeof DashboardSettingsBillingIndexRoute
+}
+
+const DashboardSettingsBillingRouteChildren: DashboardSettingsBillingRouteChildren =
+  {
+    DashboardSettingsBillingPlansRoute: DashboardSettingsBillingPlansRoute,
+    DashboardSettingsBillingIndexRoute: DashboardSettingsBillingIndexRoute,
+  }
+
+const DashboardSettingsBillingRouteWithChildren =
+  DashboardSettingsBillingRoute._addFileChildren(
+    DashboardSettingsBillingRouteChildren,
+  )
+
 interface DashboardSettingsRouteChildren {
-  DashboardSettingsBillingRoute: typeof DashboardSettingsBillingRoute
+  DashboardSettingsBillingRoute: typeof DashboardSettingsBillingRouteWithChildren
   DashboardSettingsProfileRoute: typeof DashboardSettingsProfileRoute
   DashboardSettingsSecurityRoute: typeof DashboardSettingsSecurityRoute
   DashboardSettingsTeamsRoute: typeof DashboardSettingsTeamsRoute
@@ -706,7 +760,7 @@ interface DashboardSettingsRouteChildren {
 }
 
 const DashboardSettingsRouteChildren: DashboardSettingsRouteChildren = {
-  DashboardSettingsBillingRoute: DashboardSettingsBillingRoute,
+  DashboardSettingsBillingRoute: DashboardSettingsBillingRouteWithChildren,
   DashboardSettingsProfileRoute: DashboardSettingsProfileRoute,
   DashboardSettingsSecurityRoute: DashboardSettingsSecurityRoute,
   DashboardSettingsTeamsRoute: DashboardSettingsTeamsRoute,
