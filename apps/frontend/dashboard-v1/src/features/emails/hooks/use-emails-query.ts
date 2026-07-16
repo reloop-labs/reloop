@@ -101,3 +101,49 @@ export function useMailboxesQuery(enabled = true) {
 		enabled,
 	});
 }
+
+export type EmailDetailData = {
+	id: string;
+	messageId: string;
+	organizationId: string;
+	domainId: string;
+	fromEmail: string;
+	fromName: string | null;
+	toEmails: string[];
+	ccEmails: string[] | null;
+	bccEmails: string[] | null;
+	replyTo: string | null;
+	subject: string;
+	textBody: string | null;
+	htmlBody: string | null;
+	status: string;
+	errorMessage: string | null;
+	provider: string;
+	size: number;
+	headers: Record<string, string> | null;
+	sentAt: string | null;
+	deliveredAt: string | null;
+	failedAt: string | null;
+	createdAt: string;
+	updatedAt: string;
+	events?: {
+		id: string;
+		type: string;
+		metadata: Record<string, string>;
+		createdAt: string;
+	}[];
+};
+
+export function useEmailDetailQuery(emailId: string | null | undefined) {
+	return useQuery({
+		queryKey: queryKeys.emails.detail(emailId ?? ""),
+		queryFn: async () => {
+			const res = await fetch(`/api/logs/v1/emails/${emailId}`, {
+				credentials: "include",
+			});
+			if (!res.ok) throw new Error(`Failed to load email (${res.status})`);
+			return res.json() as Promise<EmailDetailData>;
+		},
+		enabled: !!emailId,
+	});
+}
