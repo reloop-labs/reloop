@@ -1,11 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SettingsPlaceholderPage } from "#/features/settings/settings-placeholder-page";
+import { TeamsPage } from "#/features/settings/teams/teams-page";
 
 export const Route = createFileRoute("/_dashboard/settings/teams")({
-	component: () => (
-		<SettingsPlaceholderPage
-			title="Teams"
-			description="Invite members and manage roles will live here."
-		/>
-	),
+	component: TeamsPage,
+	head: () => ({
+		meta: [
+			{ title: "Teams · Reloop" },
+			{
+				name: "description",
+				content:
+					"Manage workspace members, set access levels, and invite new users.",
+			},
+		],
+	}),
 });

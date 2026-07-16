@@ -97,8 +97,18 @@ src/features/settings/
     workspace-page.tsx
     workspace-header.tsx
     workspace-logo-upload.tsx
-    workspace-slug-input.tsx
     workspace-danger-zone.tsx
+  teams/
+    teams-page.tsx
+    team-list.tsx
+    team-filter-dropdown.tsx
+    invite-modal.tsx
+    invite-dropdown.tsx
+    member-dropdown.tsx
+    change-role-modal.tsx
+    remove-member-modal.tsx
+    revoke-invite-modal.tsx
+  use-org-permissions.ts
 src/features/onboarding/...
 src/features/invite/invite-page.tsx
 ```

@@ -33,3 +33,54 @@ export function isInvitationActionable(
 ) {
 	return isInvitationPending(invite) && !isInvitationExpired(invite, now);
 }
+
+/** Pending but past `expiresAt` — shown as expired, safe to re-invite. */
+export function isInvitationExpiredPending(
+	invite: Pick<InvitationLike, "status" | "expiresAt">,
+	now: Date = new Date(),
+) {
+	return isInvitationPending(invite) && isInvitationExpired(invite, now);
+}
+
+/**
+ * Collapse multiple pending invites for the same email into one row.
+ * Prefers non-expired invites, then the latest `expiresAt` / `createdAt`.
+ */
+export function dedupePendingInvitesByEmail<T extends InvitationLike>(
+	invites: T[],
+	now: Date = new Date(),
+): T[] {
+	const byEmail = new Map<string, T>();
+
+	for (const invite of invites) {
+		if (!isInvitationPending(invite)) continue;
+
+		const key = invite.email.toLowerCase();
+		const existing = byEmail.get(key);
+		if (!existing) {
+			byEmail.set(key, invite);
+			continue;
+		}
+
+		const inviteActionable = isInvitationActionable(invite, now);
+		const existingActionable = isInvitationActionable(existing, now);
+
+		if (inviteActionable && !existingActionable) {
+			byEmail.set(key, invite);
+			continue;
+		}
+		if (!inviteActionable && existingActionable) {
+			continue;
+		}
+
+		const inviteTime = new Date(invite.createdAt ?? invite.expiresAt).getTime();
+		const existingTime = new Date(
+			existing.createdAt ?? existing.expiresAt,
+		).getTime();
+		if (inviteTime >= existingTime) {
+			byEmail.set(key, invite);
+		}
+	}
+
+	return [...byEmail.values()];
+}

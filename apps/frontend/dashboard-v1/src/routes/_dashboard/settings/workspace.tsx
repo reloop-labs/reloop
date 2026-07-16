@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_dashboard/settings/workspace")({
 			{ title: "Workspace · Reloop" },
 			{
 				name: "description",
-				content: "Customize your workspace name, logo, and URL slug.",
+				content: "Customize your workspace name and logo.",
 			},
 		],
 	}),

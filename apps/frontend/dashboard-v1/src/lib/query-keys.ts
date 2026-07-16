@@ -8,6 +8,13 @@ export const queryKeys = {
 		accounts: () => [...queryKeys.auth.all, "accounts"] as const,
 		sessions: () => [...queryKeys.auth.all, "sessions"] as const,
 	},
+	organization: {
+		all: ["organization"] as const,
+		members: (orgId: string) =>
+			[...queryKeys.organization.all, "members", orgId] as const,
+		invitations: (orgId: string) =>
+			[...queryKeys.organization.all, "invitations", orgId] as const,
+	},
 	domain: {
 		all: ["domain"] as const,
 		detail: (domainId: string) =>

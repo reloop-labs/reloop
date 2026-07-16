@@ -20,17 +20,9 @@ import { queryKeys } from "#/lib/query-keys";
 import { WorkspaceDangerZone } from "./workspace-danger-zone";
 import { WorkspaceHeader } from "./workspace-header";
 import { WorkspaceLogoUpload } from "./workspace-logo-upload";
-import {
-	type SlugStatus,
-	WorkspaceSlugInput,
-} from "./workspace-slug-input";
 
 const workspaceSchema = v.object({
 	name: v.pipe(v.string(), v.minLength(1, "Name is required")),
-	slug: v.pipe(
-		v.string(),
-		v.minLength(2, "Slug must be at least 2 characters"),
-	),
 	logo: v.string(),
 });
 
@@ -55,17 +47,10 @@ function SettingsSkeleton() {
 						</div>
 					</div>
 
-					<div className="grid grid-cols-1 gap-3">
-						<div>
-							<Skeleton className="mb-1 h-4 w-28" />
-							<Skeleton className="h-9 w-full rounded-lg" />
-							<Skeleton className="mt-1 h-3.5 w-64" />
-						</div>
-						<div>
-							<Skeleton className="mb-1 h-4 w-28" />
-							<Skeleton className="h-9 w-full rounded-lg" />
-							<Skeleton className="mt-1 h-3.5 w-72" />
-						</div>
+					<div>
+						<Skeleton className="mb-1 h-4 w-28" />
+						<Skeleton className="h-9 w-full rounded-lg" />
+						<Skeleton className="mt-1 h-3.5 w-64" />
 					</div>
 
 					<div className="flex justify-end">
@@ -97,7 +82,6 @@ function WorkspaceForm({
 }) {
 	const queryClient = useQueryClient();
 	const [isSaving, setIsSaving] = useState(false);
-	const [slugStatus, setSlugStatus] = useState<SlugStatus>("idle");
 
 	const {
 		register,
@@ -109,37 +93,24 @@ function WorkspaceForm({
 		resolver: valibotResolver(workspaceSchema),
 		values: {
 			name: activeOrganization.name,
-			slug: activeOrganization.slug,
 			logo: activeOrganization.logo || "",
 		},
 	});
 
 	const nameValue = watch("name");
-	const slugValue = watch("slug");
 	const logoValue = watch("logo");
 
 	const hasChanges =
 		nameValue !== activeOrganization.name ||
-		slugValue !== activeOrganization.slug ||
 		logoValue !== (activeOrganization.logo || "");
 
 	const handleSaveChanges = async (data: WorkspaceFormValues) => {
-		if (slugStatus === "taken") {
-			toast.error("Please choose a different slug");
-			return;
-		}
-		if (slugStatus === "checking") {
-			toast.error("Please wait for slug validation to complete");
-			return;
-		}
 		setIsSaving(true);
 		try {
-			const normalizedSlug = data.slug.toLowerCase().replace(/\s+/g, "-");
 			const { error } = await authClient.organization.update({
 				organizationId: activeOrganization.id,
 				data: {
 					name: data.name,
-					slug: normalizedSlug,
 					logo: data.logo || undefined,
 				},
 			});
@@ -163,12 +134,7 @@ function WorkspaceForm({
 	useHotkeys(
 		"mod+enter",
 		() => {
-			if (
-				hasChanges &&
-				slugStatus !== "taken" &&
-				slugStatus !== "checking" &&
-				!isSaving
-			) {
+			if (hasChanges && !isSaving) {
 				void handleSubmit(handleSaveChanges)();
 			}
 		},
@@ -190,41 +156,31 @@ function WorkspaceForm({
 						initialLogoUrl={activeOrganization.logo || ""}
 						onLogoChange={(url) => setValue("logo", url, { shouldDirty: true })}
 					/>
-					<div className="grid grid-cols-1 gap-3">
-						<div>
-							<Label.Root htmlFor="name">Workspace Name</Label.Root>
-							<Input.Root
-								className="mt-1 w-full"
-								size="small"
-								hasError={!!errors.name}
-							>
-								<Input.Wrapper className="w-full">
-									<Input.Input
-										id="name"
-										type="text"
-										placeholder="Organization Name"
-										{...register("name")}
-									/>
-								</Input.Wrapper>
-							</Input.Root>
-							{errors.name ? (
-								<p className="mt-1 text-paragraph-xs text-red-500">
-									{errors.name.message}
-								</p>
-							) : (
-								<p className="mt-1 font-medium text-paragraph-xs text-text-sub-600">
-									This is the display name shown across your workspace
-								</p>
-							)}
-						</div>
-						<WorkspaceSlugInput
-							initialSlug={activeOrganization.slug}
-							currentOrgSlug={activeOrganization.slug}
-							onSlugChange={(newSlug, status) => {
-								setValue("slug", newSlug, { shouldDirty: true });
-								setSlugStatus(status);
-							}}
-						/>
+					<div>
+						<Label.Root htmlFor="name">Workspace Name</Label.Root>
+						<Input.Root
+							className="mt-1 w-full"
+							size="small"
+							hasError={!!errors.name}
+						>
+							<Input.Wrapper className="w-full">
+								<Input.Input
+									id="name"
+									type="text"
+									placeholder="Organization Name"
+									{...register("name")}
+								/>
+							</Input.Wrapper>
+						</Input.Root>
+						{errors.name ? (
+							<p className="mt-1 text-paragraph-xs text-red-500">
+								{errors.name.message}
+							</p>
+						) : (
+							<p className="mt-1 font-medium text-paragraph-xs text-text-sub-600">
+								This is the display name shown across your workspace
+							</p>
+						)}
 					</div>
 					<div className="flex justify-end">
 						<Button.Root
@@ -232,12 +188,7 @@ function WorkspaceForm({
 							size="xsmall"
 							type="submit"
 							className="w-40"
-							disabled={
-								!hasChanges ||
-								slugStatus === "taken" ||
-								slugStatus === "checking" ||
-								isSaving
-							}
+							disabled={!hasChanges || isSaving}
 						>
 							{isSaving ? (
 								<Spinner size={14} color="var(--text-strong-950)" />
