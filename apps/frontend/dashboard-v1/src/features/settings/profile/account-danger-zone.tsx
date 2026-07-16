@@ -18,8 +18,8 @@ export function AccountDangerZone() {
 							cannot be undone.
 						</p>
 					</div>
-					{/* Delete flow not ported yet — chrome matches Next dashboard. */}
-					<Button.Root variant="error" size="xsmall" type="button" disabled>
+					{/* Delete flow not ported yet — keep error styling (disabled greys the button). */}
+					<Button.Root variant="error" size="xsmall" type="button">
 						<Icon name="trash-2" className="-mr-1 size-3 text-white" />
 						Delete Account
 					</Button.Root>
