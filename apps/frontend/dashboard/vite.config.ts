@@ -36,18 +36,20 @@ const config = defineConfig({
 		viteReact(),
 	],
 	server: {
-		// Listen on all interfaces so Caddy (Docker host.docker.internal:3001) can proxy.
+		// Listen on all interfaces so reverse proxies (Caddy, Coolify, etc.) can reach us.
 		// Default Vite bind is localhost-only, which returns 502 via local.reloop.sh.
 		host: "0.0.0.0",
 		port: 3001,
 		strictPort: true,
-		// Allow the reverse-proxied host used in local docker compose.
-		allowedHosts: ["local.reloop.sh", ".local.reloop.sh"],
+		// Allow any Host header (local, preview, and production domains).
+		// Restricting this caused 502s behind deploy reverse proxies.
+		allowedHosts: true,
 	},
 	preview: {
 		host: "0.0.0.0",
 		port: 3001,
 		strictPort: true,
+		allowedHosts: true,
 	},
 });
 
