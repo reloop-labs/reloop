@@ -1,4 +1,9 @@
 import { authClient } from "@reloop/auth/client";
+import type { QueryClient } from "@tanstack/react-query";
+import {
+	organizationsQueryOptions,
+	userInvitationsQueryOptions,
+} from "#/features/auth/organizations-query";
 import { isInvitationActionable } from "./invitations";
 
 export type PostAuthDestinationOptions = {
@@ -23,6 +28,10 @@ export type PostAuthDestinationDeps = {
 	listUserInvitations: () => Promise<InvitationListResult>;
 };
 
+/**
+ * Default deps call Better Auth directly. Prefer
+ * `resolvePostAuthDestinationWithQuery` so results share the RQ cache.
+ */
 const defaultDeps: PostAuthDestinationDeps = {
 	listOrganizations: async () => authClient.organization.list(),
 	listUserInvitations: async () =>
@@ -37,6 +46,8 @@ const defaultDeps: PostAuthDestinationDeps = {
  * 2. Existing organization membership → dashboard home
  * 3. Actionable pending invite (not expired) → accept page
  * 4. Otherwise → onboarding (create a workspace)
+ *
+ * Paths are router-relative (basepath `/dashboard` is applied by the router).
  */
 export async function resolvePostAuthDestination(
 	options: PostAuthDestinationOptions = {},
@@ -69,4 +80,25 @@ export async function resolvePostAuthDestination(
 	}
 
 	return "/onboarding";
+}
+
+/** Resolve destination using the shared TanStack Query cache. */
+export async function resolvePostAuthDestinationWithQuery(
+	queryClient: QueryClient,
+	options: PostAuthDestinationOptions = {},
+): Promise<string> {
+	return resolvePostAuthDestination(options, {
+		listOrganizations: async () => {
+			const data = await queryClient.ensureQueryData(
+				organizationsQueryOptions(),
+			);
+			return { data };
+		},
+		listUserInvitations: async () => {
+			const data = await queryClient.ensureQueryData(
+				userInvitationsQueryOptions(),
+			);
+			return { data };
+		},
+	});
 }

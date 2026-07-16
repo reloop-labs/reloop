@@ -1,0 +1,147 @@
+
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import * as Popover from "@reloop/ui/popover";
+import Spinner from "@reloop/ui/spinner";
+import { useRef, useState } from "react";
+
+export interface InviteDropdownProps {
+	inviteId: string;
+	onResendInvite: (id: string) => Promise<void>;
+	/** Omit for expired invites — the link is no longer usable. */
+	onCopyInviteLink?: (id: string) => void;
+	onRevokeInvite: (id: string) => void;
+	isResending: boolean;
+	onOpenChange?: (open: boolean) => void;
+}
+
+const inviteMenuItems = [
+	{
+		id: "resend",
+		label: "Resend invite",
+		icon: "mail-single" as const,
+		isDanger: false,
+	},
+	{
+		id: "copy",
+		label: "Copy invite link",
+		icon: "link" as const,
+		isDanger: false,
+	},
+	{
+		id: "revoke",
+		label: "Revoke invite",
+		icon: "cross-circle" as const,
+		isDanger: true,
+	},
+] as const;
+
+export const InviteDropdown = ({
+	inviteId,
+	onResendInvite,
+	onCopyInviteLink,
+	onRevokeInvite,
+	isResending,
+	onOpenChange,
+}: InviteDropdownProps) => {
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const [popoverOpen, setPopoverOpen] = useState(false);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+
+	const visibleItems = inviteMenuItems.filter(
+		(item) => item.id !== "copy" || Boolean(onCopyInviteLink),
+	);
+
+	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const currentRect = currentTab?.getBoundingClientRect();
+	const hoveredItem = visibleItems[hoverIdx ?? -1];
+	const isDanger = hoveredItem?.isDanger ?? false;
+
+	const handleOpenChange = (open: boolean) => {
+		setPopoverOpen(open);
+		onOpenChange?.(open);
+	};
+
+	const handleItemClick = async (itemId: string) => {
+		if (itemId === "revoke") {
+			handleOpenChange(false);
+			onRevokeInvite(inviteId);
+		} else if (itemId === "copy") {
+			onCopyInviteLink?.(inviteId);
+			handleOpenChange(false);
+		} else if (itemId === "resend") {
+			await onResendInvite(inviteId);
+			handleOpenChange(false);
+		}
+	};
+
+	return (
+		<Popover.Root open={popoverOpen} onOpenChange={handleOpenChange}>
+			<Popover.Trigger asChild>
+				<Button.Root
+					variant="neutral"
+					mode="ghost"
+					size="xxsmall"
+					className="rounded p-1"
+				>
+					<Icon
+						name="more-horizontal"
+						className="h-3 w-3 text-text-sub-600 hover:text-text-strong-950"
+					/>
+				</Button.Root>
+			</Popover.Trigger>
+			<Popover.Content
+				align="end"
+				sideOffset={-8}
+				className="w-40 rounded-xl p-1.5"
+				showArrow
+			>
+				<div className="relative">
+					{visibleItems.map((item, idx) => (
+						<button
+							key={item.id}
+							ref={(el) => {
+								if (el) buttonRefs.current[idx] = el;
+							}}
+							type="button"
+							onPointerEnter={() => setHoverIdx(idx)}
+							onPointerLeave={() => setHoverIdx(undefined)}
+							onClick={() => handleItemClick(item.id)}
+							disabled={item.id === "resend" && isResending}
+							className={cn(
+								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-normal text-xs transition-colors",
+								item.isDanger ? "text-error-base" : "text-text-strong-950",
+								!currentRect &&
+									hoverIdx === idx &&
+									(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
+								isResending &&
+									item.id === "resend" &&
+									"cursor-not-allowed opacity-50",
+							)}
+						>
+							{item.id === "resend" && isResending ? (
+								<Spinner size={14} color="var(--text-sub-600)" />
+							) : (
+								<Icon
+									name={item.icon}
+									className={cn(
+										"h-3.5 w-3.5",
+										item.isDanger ? "" : "text-text-sub-600",
+									)}
+								/>
+							)}
+							<span>{item.label}</span>
+						</button>
+					))}
+					<AnimatedHoverBackground
+						rect={currentRect}
+						tabElement={currentTab}
+						isDanger={isDanger}
+					/>
+				</div>
+			</Popover.Content>
+		</Popover.Root>
+	);
+};

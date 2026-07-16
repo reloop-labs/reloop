@@ -1,0 +1,329 @@
+
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import * as Popover from "@reloop/ui/popover";
+import { useEffect, useRef, useState } from "react";
+import type { DateRange, Matcher } from "react-day-picker";
+import { toast } from "sonner";
+import { LogsCalendar } from "./logs-calendar";
+
+export type DatePreset = {
+	label: string;
+	value: string;
+	getRange: () => { from: Date; to: Date };
+};
+
+const DATE_PRESETS: DatePreset[] = [
+	{
+		label: "Last 1 hour",
+		value: "1h",
+		getRange: () => ({
+			from: new Date(Date.now() - 60 * 60 * 1000),
+			to: new Date(),
+		}),
+	},
+	{
+		label: "Last 24 hours",
+		value: "24h",
+		getRange: () => ({
+			from: new Date(Date.now() - 24 * 60 * 60 * 1000),
+			to: new Date(),
+		}),
+	},
+	{
+		label: "Last 7 days",
+		value: "7d",
+		getRange: () => ({
+			from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+			to: new Date(),
+		}),
+	},
+	{
+		label: "Last 15 days",
+		value: "15d",
+		getRange: () => ({
+			from: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
+			to: new Date(),
+		}),
+	},
+	{
+		label: "Last 30 days",
+		value: "30d",
+		getRange: () => ({
+			from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+			to: new Date(),
+		}),
+	},
+	{
+		label: "Last 3 months",
+		value: "90d",
+		getRange: () => ({
+			from: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+			to: new Date(),
+		}),
+	},
+	{
+		label: "Last 6 months",
+		value: "180d",
+		getRange: () => ({
+			from: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000),
+			to: new Date(),
+		}),
+	},
+];
+
+interface DateRangeFilterProps {
+	startDate: string | null;
+	endDate: string | null;
+	activePreset: string | null;
+	onDateChange: (
+		startDate: string | null,
+		endDate: string | null,
+		preset: string | null,
+	) => void;
+	numberOfMonths?: number;
+	/** Cap selectable range length (and presets) in days. */
+	maxDays?: number;
+	align?: "start" | "end";
+}
+
+export const DateRangeFilter = ({
+	startDate,
+	endDate,
+	activePreset,
+	onDateChange,
+	numberOfMonths = 2,
+	maxDays,
+	align = "start",
+}: DateRangeFilterProps) => {
+	const [isOpen, setIsOpen] = useState(false);
+	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	// Sync internal range with props when they change
+	const [calendarRange, setCalendarRange] = useState<DateRange | undefined>(
+		startDate && endDate
+			? (() => {
+					const fromDate = new Date(startDate);
+					fromDate.setHours(0, 0, 0, 0);
+					const toDate = new Date(endDate);
+					toDate.setHours(0, 0, 0, 0);
+					return { from: fromDate, to: toDate };
+				})()
+			: undefined,
+	);
+
+	const filteredPresets = DATE_PRESETS.filter((preset) => {
+		if (!maxDays) return true;
+		const range = preset.getRange();
+		const diffMs = range.to.getTime() - range.from.getTime();
+		const diffDays = diffMs / (24 * 60 * 60 * 1000);
+		return diffDays <= maxDays;
+	});
+
+	const getDisabledDays = (): Matcher | Matcher[] => {
+		const today = new Date();
+		const disabled: Matcher[] = [{ after: today }];
+
+		if (maxDays && calendarRange?.from && !calendarRange?.to) {
+			const from = calendarRange.from;
+			const minDate = new Date(
+				from.getTime() - (maxDays - 1) * 24 * 60 * 60 * 1000,
+			);
+			const maxDate = new Date(
+				from.getTime() + (maxDays - 1) * 24 * 60 * 60 * 1000,
+			);
+			disabled.push({ before: minDate });
+			disabled.push({ after: maxDate > today ? today : maxDate });
+		}
+
+		return disabled;
+	};
+
+	// Update internal state when props change (e.g. from presets)
+	useEffect(() => {
+		if (startDate && endDate) {
+			const fromDate = new Date(startDate);
+			fromDate.setHours(0, 0, 0, 0);
+			const toDate = new Date(endDate);
+			toDate.setHours(0, 0, 0, 0);
+			setCalendarRange({ from: fromDate, to: toDate });
+		} else {
+			setCalendarRange(undefined);
+		}
+	}, [startDate, endDate]);
+
+	const currentTab = buttonRefs.current[hoverIdx ?? -1];
+	const currentRect = currentTab?.getBoundingClientRect();
+
+	const activePresetLabel =
+		DATE_PRESETS.find((p) => p.value === activePreset)?.label || null;
+
+	const hasActiveFilter = startDate || endDate;
+
+	const formatDisplayLabel = () => {
+		if (activePresetLabel) return activePresetLabel;
+		if (startDate && endDate) {
+			const start = new Date(startDate);
+			const end = new Date(endDate);
+			return `${start.toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${end.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+		}
+		return "All time";
+	};
+
+	const handlePresetSelect = (preset: DatePreset) => {
+		const range = preset.getRange();
+		onDateChange(
+			range.from.toISOString(),
+			range.to.toISOString(),
+			preset.value,
+		);
+		setIsOpen(false);
+	};
+
+	const handleCalendarSelect = (range: DateRange | undefined) => {
+		if (range?.from && range?.to) {
+			const diffTime = Math.abs(range.to.getTime() - range.from.getTime());
+			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+			if (maxDays && diffDays > maxDays) {
+				toast.error(`Maximum date range allowed is ${maxDays} days`);
+				setCalendarRange({ from: range.from, to: undefined });
+				return;
+			}
+		}
+		setCalendarRange(range);
+	};
+
+	const handleApply = () => {
+		if (calendarRange?.from && calendarRange?.to) {
+			const diffTime = Math.abs(
+				calendarRange.to.getTime() - calendarRange.from.getTime(),
+			);
+			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+			if (maxDays && diffDays > maxDays) {
+				toast.error(`Maximum date range allowed is ${maxDays} days`);
+				return;
+			}
+			const endOfDay = new Date(calendarRange.to);
+			endOfDay.setHours(23, 59, 59, 999);
+			onDateChange(
+				calendarRange.from.toISOString(),
+				endOfDay.toISOString(),
+				null,
+			);
+			setIsOpen(false);
+		}
+	};
+
+	const handleClear = () => {
+		onDateChange(null, null, null);
+		setCalendarRange(undefined);
+		setIsOpen(false);
+	};
+
+	return (
+		<Popover.Root open={isOpen} onOpenChange={setIsOpen}>
+			<Popover.Trigger asChild>
+				<Button.Root
+					variant="neutral"
+					mode="stroke"
+					size="xsmall"
+					className={cn(
+						"gap-1.5 whitespace-nowrap rounded-xl",
+						hasActiveFilter &&
+							"border-stroke-soft-900 bg-neutral-alpha-10 text-text-strong-950",
+					)}
+				>
+					<Button.Icon>
+						<Icon name="calendar" className="h-4 w-4" />
+					</Button.Icon>
+					{formatDisplayLabel()}
+					<Button.Icon>
+						<Icon name="chevron-down" className="h-3.5 w-3.5" />
+					</Button.Icon>
+				</Button.Root>
+			</Popover.Trigger>
+
+			<Popover.Content align={align} showArrow={false} className="w-auto p-0">
+				<div className="flex divide-x divide-stroke-soft-200">
+					{/* Left: Presets */}
+					<div className="w-44 px-2">
+						<div className="relative py-2">
+							{filteredPresets.map((preset, idx) => {
+								const isActive = activePreset === preset.value;
+								return (
+									<button
+										key={preset.value}
+										ref={(el) => {
+											if (el) buttonRefs.current[idx] = el;
+										}}
+										type="button"
+										onPointerEnter={() => setHoverIdx(idx)}
+										onPointerLeave={() => setHoverIdx(undefined)}
+										onClick={() => handlePresetSelect(preset)}
+										className={cn(
+											"flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
+											isActive
+												? "bg-neutral-alpha-10 font-medium text-text-strong-950"
+												: "text-text-strong-950",
+											!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
+										)}
+									>
+										<span>{preset.label}</span>
+										{isActive && (
+											<Icon
+												name="check"
+												className="h-3.5 w-3.5 text-text-strong-950"
+											/>
+										)}
+									</button>
+								);
+							})}
+
+							<AnimatedHoverBackground
+								rect={currentRect}
+								tabElement={currentTab}
+							/>
+						</div>
+					</div>
+
+					{/* Right: Calendar */}
+					<div className="p-2">
+						<LogsCalendar
+							mode="range"
+							selected={calendarRange}
+							onSelect={handleCalendarSelect}
+							numberOfMonths={numberOfMonths}
+							disabled={getDisabledDays()}
+						/>
+						<div className="flex justify-end gap-2 border-stroke-soft-100 border-t pt-2">
+							{(hasActiveFilter ||
+								!!calendarRange?.from ||
+								!!calendarRange?.to) && (
+								<Button.Root
+									size="xsmall"
+									variant="neutral"
+									mode="stroke"
+									className="rounded-xl"
+									onClick={handleClear}
+								>
+									Reset
+								</Button.Root>
+							)}
+							<Button.Root
+								size="xsmall"
+								variant="neutral"
+								className="rounded-xl"
+								onClick={handleApply}
+								disabled={!calendarRange?.from || !calendarRange?.to}
+							>
+								Apply
+							</Button.Root>
+						</div>
+					</div>
+				</div>
+			</Popover.Content>
+		</Popover.Root>
+	);
+};

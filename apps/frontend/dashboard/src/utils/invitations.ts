@@ -65,7 +65,6 @@ export function dedupePendingInvitesByEmail<T extends InvitationLike>(
 		const inviteActionable = isInvitationActionable(invite, now);
 		const existingActionable = isInvitationActionable(existing, now);
 
-		// Prefer a still-valid invite over an expired one for the same email.
 		if (inviteActionable && !existingActionable) {
 			byEmail.set(key, invite);
 			continue;
