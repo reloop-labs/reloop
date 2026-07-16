@@ -1,11 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SettingsPlaceholderPage } from "#/features/settings/settings-placeholder-page";
+import { SecurityPage } from "#/features/settings/security/security-page";
 
 export const Route = createFileRoute("/_dashboard/settings/security")({
-	component: () => (
-		<SettingsPlaceholderPage
-			title="Security"
-			description="Sessions, 2FA, and security preferences will live here."
-		/>
-	),
+	component: SecurityPage,
+	head: () => ({
+		meta: [
+			{ title: "Security · Reloop" },
+			{
+				name: "description",
+				content:
+					"Manage your account security, connected accounts, and active sessions.",
+			},
+		],
+	}),
 });

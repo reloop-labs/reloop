@@ -82,6 +82,12 @@ src/features/settings/
     theme-page.tsx
     theme-toggle.tsx
     sidebar-layout-icon.tsx
+  security/
+    security-page.tsx
+    connected-accounts.tsx
+    session-management.tsx
+    security-utils.tsx
+    session-icons.tsx
 src/features/onboarding/...
 src/features/invite/invite-page.tsx
 ```
