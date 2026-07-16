@@ -10,10 +10,7 @@ import { ThemeProvider } from "@reloop/links/providers/theme-provider";
 import { IconsSprite } from "@reloop/ui/icons-sprite";
 import { RybbitLoader } from "@reloop/ui/rybbit-loader";
 import localFont from "next/font/local";
-
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
+import { Suspense } from "react";
 
 const openRunde = localFont({
 	src: [
@@ -81,7 +78,9 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					{children}
+					{/* Suspense boundary required with cacheComponents for dynamic
+					    params / uncached fetches (preferences, redirect tokens). */}
+					<Suspense fallback={null}>{children}</Suspense>
 					<IconsSprite />
 					<RybbitLoader />
 				</ThemeProvider>

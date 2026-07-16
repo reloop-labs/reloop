@@ -1,14 +1,11 @@
 import { redirect } from "next/navigation";
-
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
+import { Suspense } from "react";
 
 interface RedirectPageProps {
 	params: Promise<{ token: string }>;
 }
 
-export default async function RedirectPage({ params }: RedirectPageProps) {
+async function RedirectBody({ params }: RedirectPageProps) {
 	const { token } = await params;
 	let destinationUrl: string | null = null;
 
@@ -19,7 +16,9 @@ export default async function RedirectPage({ params }: RedirectPageProps) {
 		if (payload.url) {
 			destinationUrl = payload.url;
 		}
-	} catch {}
+	} catch {
+		// Token may only be valid after the tracking endpoint resolves it.
+	}
 
 	const siteUrl = (
 		process.env.NEXT_PUBLIC_URL || "https://local.reloop.sh"
@@ -30,6 +29,7 @@ export default async function RedirectPage({ params }: RedirectPageProps) {
 		const res = await fetch(`${siteUrl}/api/mail/v1/track/click/${token}`, {
 			method: "GET",
 			redirect: "manual",
+			cache: "no-store",
 		});
 
 		const isRedirect = res.status >= 300 && res.status < 400;
@@ -39,7 +39,18 @@ export default async function RedirectPage({ params }: RedirectPageProps) {
 				destinationUrl = location;
 			}
 		}
-	} catch {}
+	} catch {
+		// Fall through to decoded URL or home.
+	}
 
 	redirect(destinationUrl ?? "/");
+	return null;
+}
+
+export default function RedirectPage({ params }: RedirectPageProps) {
+	return (
+		<Suspense fallback={null}>
+			<RedirectBody params={params} />
+		</Suspense>
+	);
 }
