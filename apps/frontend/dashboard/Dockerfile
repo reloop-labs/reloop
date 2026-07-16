@@ -28,14 +28,20 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+# Defaults for local/docker; Coolify injects PORT at runtime.
+# Do NOT set NITRO_PORT — Nitro prefers it over PORT, which breaks Coolify
+# when "Ports Exposes" ≠ 3000 (classic Bad Gateway).
 ENV PORT=3000
 ENV HOST=0.0.0.0
-ENV NITRO_PORT=3000
 ENV NITRO_HOST=0.0.0.0
 
 COPY --from=builder /app/apps/frontend/dashboard/.output ./.output
 COPY --from=builder /app/apps/frontend/dashboard/public ./public
 
 EXPOSE 3000
+
+# Coolify/Traefik health checks; app is mounted at /dashboard.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+	CMD bun -e "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/dashboard/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
 CMD ["bun", "run", ".output/server/index.mjs"]
