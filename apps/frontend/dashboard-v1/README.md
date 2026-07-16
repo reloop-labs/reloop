@@ -93,6 +93,12 @@ src/features/settings/
     account-header.tsx
     account-profile-picture.tsx
     account-danger-zone.tsx
+  workspace/
+    workspace-page.tsx
+    workspace-header.tsx
+    workspace-logo-upload.tsx
+    workspace-slug-input.tsx
+    workspace-danger-zone.tsx
 src/features/onboarding/...
 src/features/invite/invite-page.tsx
 ```
