@@ -1,3 +1,4 @@
+import { DomainApiDetails } from "#/components/api-details/domain";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { Link } from "@tanstack/react-router";
@@ -44,6 +45,7 @@ export function DomainListHeader() {
 						</span>
 					</span>
 				</Link>
+				<DomainApiDetails />
 			</div>
 		</div>
 	);

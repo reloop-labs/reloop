@@ -42,13 +42,10 @@ function getSavedLanguage(availableIds: string[], defaultId: string): string {
 				return alias;
 			}
 		}
-	} catch {
-		// localStorage unavailable
-	}
+	} catch {}
 	return defaultId;
 }
 
-/** Persist preferred API example language across playground pages. */
 export function useApiLanguage<T extends string>(
 	availableIds: string[],
 	defaultId: T,
@@ -69,7 +66,7 @@ export function useApiLanguage<T extends string>(
 		return () => {
 			window.removeEventListener("reloop-lang-change", syncLang);
 		};
-	}, [availableIds, availableIdsStr, defaultId]);
+	}, [availableIdsStr, defaultId]);
 
 	const handleLanguageChange = useCallback((lang: T) => {
 		setSelectedLanguage(lang);
@@ -78,10 +75,9 @@ export function useApiLanguage<T extends string>(
 			window.dispatchEvent(
 				new CustomEvent("reloop-lang-change", { detail: lang }),
 			);
-		} catch {
-			// localStorage unavailable
-		}
+		} catch {}
 	}, []);
 
 	return [selectedLanguage, handleLanguageChange];
 }
+export default useApiLanguage;

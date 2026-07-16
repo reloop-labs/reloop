@@ -1,3 +1,4 @@
+import { WebhooksApiDetails } from "#/components/api-details/webhooks";
 import { useWebhooks } from "#/features/webhooks/components/use-webhooks";
 import { DocsButton } from "#/features/webhooks/components/docs-button";
 import { WebhookError } from "#/features/webhooks/components/webhook-error";
@@ -63,6 +64,7 @@ export function WebhooksPage() {
 							</span>
 						</span>
 					</Button.Root>
+					<WebhooksApiDetails size="xsmall" mode="ghost" />
 				</div>
 			</div>
 

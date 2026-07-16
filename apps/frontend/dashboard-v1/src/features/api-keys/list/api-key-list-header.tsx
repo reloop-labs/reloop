@@ -1,3 +1,4 @@
+import { ApiKeysApiDetails } from "#/components/api-details/api-keys";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { useQueryState } from "nuqs";
@@ -39,6 +40,7 @@ export function ApiKeyListHeader() {
 						</span>
 					</span>
 				</Button.Root>
+				<ApiKeysApiDetails />
 			</div>
 		</div>
 	);

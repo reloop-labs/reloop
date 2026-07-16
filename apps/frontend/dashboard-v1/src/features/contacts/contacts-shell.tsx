@@ -1,3 +1,7 @@
+import { ChannelsApiDetails } from "#/components/api-details/channels";
+import { ContactsApiDetails } from "#/components/api-details/contacts";
+import { GroupsApiDetails } from "#/components/api-details/groups";
+import { PropertiesApiDetails } from "#/components/api-details/properties";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
@@ -131,6 +135,15 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 										</span>
 									)}
 								</Button.Root>
+								{isPropertiesPage ? (
+									<PropertiesApiDetails size="xsmall" mode="ghost" />
+								) : isChannelsPage ? (
+									<ChannelsApiDetails size="xsmall" mode="ghost" />
+								) : isGroupsPage ? (
+									<GroupsApiDetails size="xsmall" mode="ghost" />
+								) : (
+									<ContactsApiDetails size="xsmall" mode="ghost" />
+								)}
 							</div>
 						)}
 					</div>

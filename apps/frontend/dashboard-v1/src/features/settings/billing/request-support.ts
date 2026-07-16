@@ -1,13 +1,13 @@
-import { toast } from "sonner";
+import { useUIStore } from "#/store/use-ui-store";
 
 /**
- * Support chat panel is not ported yet. Queue plan-change requests as toasts
- * so billing CTAs stay usable without the AI/support shell.
+ * Open the Support panel with a pre-filled message (auto-sent when chat is ready).
+ * Matches Next billing CTAs that queue a support message.
  */
 export function requestPlanSupport(message: string) {
-	console.info("[billing] support request:", message);
-	toast.message("Support is coming soon", {
-		description:
-			"Plan changes currently go through support. We logged your request for the next support panel.",
-	});
+	const { setPendingSupportMessage, setAiPanelActiveTab, setIsAiPanelOpen } =
+		useUIStore.getState();
+	setPendingSupportMessage(message);
+	setAiPanelActiveTab("support");
+	setIsAiPanelOpen(true);
 }

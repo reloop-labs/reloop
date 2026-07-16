@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { AnimatePresence } from "framer-motion";
+import { CommandMenuGlobal } from "#/features/dashboard/command-menu";
 import { AiPanel } from "#/features/dashboard/layout/ai-panel";
 import { useUIStore } from "#/store/use-ui-store";
 import { PageHeader } from "./page-header/page-header";
@@ -40,6 +41,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 		return (
 			<div className="flex h-screen flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
 				{children}
+				<CommandMenuGlobal />
 			</div>
 		);
 	}
@@ -54,6 +56,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 				</div>
 				<AnimatePresence>{isAiPanelOpen ? <AiPanel /> : null}</AnimatePresence>
 			</main>
+			<CommandMenuGlobal />
 		</div>
 	);
 }
