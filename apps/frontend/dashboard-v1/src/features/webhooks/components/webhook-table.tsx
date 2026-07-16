@@ -9,7 +9,6 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import { useNavigate } from "@tanstack/react-router";
 import axios from "axios";
 import { useQueryState } from "nuqs";
@@ -18,15 +17,6 @@ import { toast } from "sonner";
 import { DeleteWebhookModal } from "./delete-webhook-modal";
 import { EmptyState } from "./empty-state";
 import { WebhookTableSkeleton } from "./webhook-table-skeleton";
-
-const categoryBadgeColors: Record<string, string> = {
-	domain: "bg-blue-500/10 text-blue-700 dark:bg-blue-400/15 dark:text-blue-300",
-	"api-key":
-		"bg-amber-500/10 text-amber-800 dark:bg-amber-400/15 dark:text-amber-300",
-	contact:
-		"bg-emerald-500/10 text-emerald-800 dark:bg-emerald-400/15 dark:text-emerald-300",
-	email: "bg-violet-500/10 text-violet-800 dark:bg-violet-400/15 dark:text-violet-300",
-};
 
 interface WebhookData {
 	id: string;
@@ -48,9 +38,8 @@ interface WebhookTableProps {
 	onMutate?: () => void;
 }
 
-/** Matches contacts/api-keys row chrome. */
 const GRID =
-	"grid-cols-[minmax(0,1.6fr)_minmax(0,1.1fr)_100px_110px_120px_minmax(40px,auto)]";
+	"grid-cols-[minmax(0,1fr)_100px_110px_120px_minmax(40px,auto)]";
 
 const getStatusColorClass = (status: string) => {
 	switch (status) {
@@ -79,51 +68,6 @@ const getStatusIcon = (status: string) => {
 			return "circle" as const;
 	}
 };
-
-const getEventMeta = (eventId: string) => {
-	const event = WEBHOOK_EVENTS.find((e) => e.id === eventId);
-	if (!event) {
-		return {
-			name: eventId,
-			colorClass: "bg-neutral-alpha-10 text-text-sub-600",
-		};
-	}
-	return {
-		name: event.name,
-		colorClass:
-			categoryBadgeColors[event.category] ??
-			"bg-neutral-alpha-10 text-text-sub-600",
-	};
-};
-
-function EventPills({ events }: { events: string[] }) {
-	const visible = events.slice(0, 2);
-	const overflow = events.length - visible.length;
-
-	return (
-		<div className="flex min-w-0 flex-wrap items-center gap-1">
-			{visible.map((eventId) => {
-				const meta = getEventMeta(eventId);
-				return (
-					<span
-						key={eventId}
-						className={cn(
-							"inline-flex max-w-[140px] truncate rounded-md px-1.5 py-0.5 font-medium text-[10px]",
-							meta.colorClass,
-						)}
-					>
-						{meta.name}
-					</span>
-				);
-			})}
-			{overflow > 0 && (
-				<span className="inline-flex rounded-md bg-neutral-alpha-10 px-1.5 py-0.5 font-medium text-[10px] text-text-sub-600">
-					+{overflow}
-				</span>
-			)}
-		</div>
-	);
-}
 
 function HealthCell({
 	successCount,
@@ -345,19 +289,14 @@ export const WebhookTable = ({
 	return (
 		<>
 			<div className="w-full text-paragraph-sm">
-				{/* Header — matches contacts / api-keys chrome */}
 				<div
 					className={cn(
 						`grid ${GRID} items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40`,
 					)}
 				>
 					<div className="flex items-center gap-1">
-						<Icon name="webhook" className="h-3 w-3" />
-						<span className="text-xs">Endpoint</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<Icon name="zap" className="h-3 w-3" />
-						<span className="text-xs">Events</span>
+						<Icon name="link" className="h-3 w-3" />
+						<span className="text-xs">URL</span>
 					</div>
 					<div className="flex items-center gap-1">
 						<Icon name="activity" className="h-3 w-3" />
@@ -374,7 +313,6 @@ export const WebhookTable = ({
 					<div />
 				</div>
 
-				{/* Body */}
 				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
 					{isLoading ? (
 						<WebhookTableSkeleton rows={loadingRows} />
@@ -396,13 +334,6 @@ export const WebhookTable = ({
 						webhooks.map((webhook) => {
 							const isRowActive = activeDropdownId === webhook.id;
 							const isToggling = isTogglingStatus === webhook.id;
-							const host = (() => {
-								try {
-									return new URL(webhook.url).host;
-								} catch {
-									return webhook.url;
-								}
-							})();
 
 							return (
 								<div
@@ -422,63 +353,20 @@ export const WebhookTable = ({
 										isRowActive && "bg-bg-weak-50/50",
 									)}
 								>
-									{/* Endpoint */}
+									{/* URL only */}
 									<div className="flex min-w-0 items-center gap-2.5 pr-3">
 										<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50/80 dark:border-stroke-soft-100/40">
 											<Icon
-												name="webhook"
+												name="link"
 												className="h-3.5 w-3.5 text-text-sub-600"
 											/>
 										</div>
-										<div className="min-w-0">
-											<p className="truncate font-medium text-label-sm text-text-strong-950">
-												{webhook.name || host}
-											</p>
-											<p className="mt-0.5 truncate font-mono text-[11px] text-text-soft-400">
-												{webhook.url}
-											</p>
-										</div>
+										<p className="min-w-0 truncate font-medium font-mono text-label-sm text-text-strong-950">
+											{webhook.url}
+										</p>
 									</div>
 
-									{/* Events */}
-									<div className="min-w-0 pr-3">
-										{!webhook.events || webhook.events.length === 0 ? (
-											<span className="font-medium text-[12px] text-text-soft-400 italic">
-												All events
-											</span>
-										) : (
-											<Tooltip.Root delayDuration={200}>
-												<Tooltip.Trigger asChild>
-													<div className="w-fit max-w-full">
-														<EventPills events={webhook.events} />
-													</div>
-												</Tooltip.Trigger>
-												<Tooltip.Content
-													sideOffset={6}
-													className="max-w-[280px] rounded-xl p-2"
-												>
-													<div className="flex flex-wrap gap-1">
-														{webhook.events.map((eventId) => {
-															const meta = getEventMeta(eventId);
-															return (
-																<span
-																	key={eventId}
-																	className={cn(
-																		"rounded-md px-1.5 py-0.5 font-medium text-[10px]",
-																		meta.colorClass,
-																	)}
-																>
-																	{meta.name}
-																</span>
-															);
-														})}
-													</div>
-												</Tooltip.Content>
-											</Tooltip.Root>
-										)}
-									</div>
-
-									{/* Status — text + icon, not heavy badge */}
+									{/* Status */}
 									<div className="flex items-center">
 										<div
 											className={cn(
@@ -511,7 +399,7 @@ export const WebhookTable = ({
 										</span>
 									</div>
 
-									{/* Actions — outside navigation so open state is stable */}
+									{/* Actions */}
 									<div
 										className="flex items-center justify-center text-text-soft-400"
 										onClick={(e) => e.stopPropagation()}
