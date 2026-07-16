@@ -43,6 +43,7 @@ import { Route as DashboardSettingsBillingRouteImport } from './routes/_dashboar
 import { Route as DashboardLogsLogIdRouteImport } from './routes/_dashboard/logs/$logId'
 import { Route as DashboardEmailsSentRouteImport } from './routes/_dashboard/emails/sent'
 import { Route as DashboardEmailsReceivedRouteImport } from './routes/_dashboard/emails/received'
+import { Route as DashboardEmailsEmailIdRouteImport } from './routes/_dashboard/emails/$emailId'
 import { Route as DashboardDomainAddRouteImport } from './routes/_dashboard/domain/add'
 import { Route as DashboardDomainDomainIdRouteImport } from './routes/_dashboard/domain/$domainId'
 import { Route as DashboardContactsPropertiesRouteImport } from './routes/_dashboard/contacts/properties'
@@ -231,6 +232,11 @@ const DashboardEmailsReceivedRoute = DashboardEmailsReceivedRouteImport.update({
   path: '/received',
   getParentRoute: () => DashboardEmailsRoute,
 } as any)
+const DashboardEmailsEmailIdRoute = DashboardEmailsEmailIdRouteImport.update({
+  id: '/$emailId',
+  path: '/$emailId',
+  getParentRoute: () => DashboardEmailsRoute,
+} as any)
 const DashboardDomainAddRoute = DashboardDomainAddRouteImport.update({
   id: '/add',
   path: '/add',
@@ -337,6 +343,7 @@ export interface FileRoutesByFullPath {
   '/contacts/properties': typeof DashboardContactsPropertiesRoute
   '/domain/$domainId': typeof DashboardDomainDomainIdRoute
   '/domain/add': typeof DashboardDomainAddRouteWithChildren
+  '/emails/$emailId': typeof DashboardEmailsEmailIdRoute
   '/emails/received': typeof DashboardEmailsReceivedRoute
   '/emails/sent': typeof DashboardEmailsSentRoute
   '/logs/$logId': typeof DashboardLogsLogIdRoute
@@ -378,6 +385,7 @@ export interface FileRoutesByTo {
   '/contacts/detail': typeof DashboardContactsDetailRouteWithChildren
   '/contacts/properties': typeof DashboardContactsPropertiesRoute
   '/domain/$domainId': typeof DashboardDomainDomainIdRoute
+  '/emails/$emailId': typeof DashboardEmailsEmailIdRoute
   '/emails/received': typeof DashboardEmailsReceivedRoute
   '/emails/sent': typeof DashboardEmailsSentRoute
   '/logs/$logId': typeof DashboardLogsLogIdRoute
@@ -428,6 +436,7 @@ export interface FileRoutesById {
   '/_dashboard/contacts/properties': typeof DashboardContactsPropertiesRoute
   '/_dashboard/domain/$domainId': typeof DashboardDomainDomainIdRoute
   '/_dashboard/domain/add': typeof DashboardDomainAddRouteWithChildren
+  '/_dashboard/emails/$emailId': typeof DashboardEmailsEmailIdRoute
   '/_dashboard/emails/received': typeof DashboardEmailsReceivedRoute
   '/_dashboard/emails/sent': typeof DashboardEmailsSentRoute
   '/_dashboard/logs/$logId': typeof DashboardLogsLogIdRoute
@@ -479,6 +488,7 @@ export interface FileRouteTypes {
     | '/contacts/properties'
     | '/domain/$domainId'
     | '/domain/add'
+    | '/emails/$emailId'
     | '/emails/received'
     | '/emails/sent'
     | '/logs/$logId'
@@ -520,6 +530,7 @@ export interface FileRouteTypes {
     | '/contacts/detail'
     | '/contacts/properties'
     | '/domain/$domainId'
+    | '/emails/$emailId'
     | '/emails/received'
     | '/emails/sent'
     | '/logs/$logId'
@@ -569,6 +580,7 @@ export interface FileRouteTypes {
     | '/_dashboard/contacts/properties'
     | '/_dashboard/domain/$domainId'
     | '/_dashboard/domain/add'
+    | '/_dashboard/emails/$emailId'
     | '/_dashboard/emails/received'
     | '/_dashboard/emails/sent'
     | '/_dashboard/logs/$logId'
@@ -841,6 +853,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardEmailsReceivedRouteImport
       parentRoute: typeof DashboardEmailsRoute
     }
+    '/_dashboard/emails/$emailId': {
+      id: '/_dashboard/emails/$emailId'
+      path: '/$emailId'
+      fullPath: '/emails/$emailId'
+      preLoaderRoute: typeof DashboardEmailsEmailIdRouteImport
+      parentRoute: typeof DashboardEmailsRoute
+    }
     '/_dashboard/domain/add': {
       id: '/_dashboard/domain/add'
       path: '/add'
@@ -1035,12 +1054,14 @@ const DashboardDomainRouteWithChildren = DashboardDomainRoute._addFileChildren(
 )
 
 interface DashboardEmailsRouteChildren {
+  DashboardEmailsEmailIdRoute: typeof DashboardEmailsEmailIdRoute
   DashboardEmailsReceivedRoute: typeof DashboardEmailsReceivedRoute
   DashboardEmailsSentRoute: typeof DashboardEmailsSentRoute
   DashboardEmailsIndexRoute: typeof DashboardEmailsIndexRoute
 }
 
 const DashboardEmailsRouteChildren: DashboardEmailsRouteChildren = {
+  DashboardEmailsEmailIdRoute: DashboardEmailsEmailIdRoute,
   DashboardEmailsReceivedRoute: DashboardEmailsReceivedRoute,
   DashboardEmailsSentRoute: DashboardEmailsSentRoute,
   DashboardEmailsIndexRoute: DashboardEmailsIndexRoute,

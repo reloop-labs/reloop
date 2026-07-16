@@ -1,11 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PagePlaceholder } from "#/features/dashboard/page-placeholder";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_dashboard/emails/")({
-	component: () => (
-		<PagePlaceholder
-			title="Emails"
-			description="Email activity overview will live here."
-		/>
-	),
+	beforeLoad: () => {
+		throw redirect({ to: "/emails/sent" });
+	},
 });
