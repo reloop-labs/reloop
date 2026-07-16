@@ -9,40 +9,35 @@ RUN bun --filter=fe-dashboard install
 # Stage 2: Build the application
 FROM base AS builder
 WORKDIR /app
-ENV NEXT_TELEMETRY_DISABLED=1
-# Use ARG for build-time variables that can be overridden
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
-# NEXT_PUBLIC_* are inlined at build time. When NEXT_PUBLIC_URL is omitted, the
-# auth client uses window.location.origin (works for any public hostname).
+# NEXT_PUBLIC_* / VITE_* are inlined at build time. When NEXT_PUBLIC_URL is omitted,
+# the auth client uses window.location.origin (works for any public hostname).
 # Pass --build-arg NEXT_PUBLIC_URL=https://your-domain.com to pin an absolute origin.
 ARG NEXT_PUBLIC_URL
 ENV NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL}
 ARG NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-wss://reloop.sh}
 ENV NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
+ARG VITE_PUBLIC_URL
+ENV VITE_PUBLIC_URL=${VITE_PUBLIC_URL:-${NEXT_PUBLIC_URL}}
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN bun run --filter=fe-dashboard build
 
-# Stage 3: Production server
+# Stage 3: Production server (Nitro output)
 FROM base AS runner
 WORKDIR /app
 
-# Runtime environment variables (can be overridden from outside)
 ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
-ENV HOSTNAME=0.0.0.0
+ENV HOST=0.0.0.0
+ENV NITRO_PORT=3000
+ENV NITRO_HOST=0.0.0.0
 
-# Copy standalone build
+COPY --from=builder /app/apps/frontend/dashboard/.output ./.output
 COPY --from=builder /app/apps/frontend/dashboard/public ./public
-COPY --from=builder /app/apps/frontend/dashboard/.next/standalone ./
-COPY --from=builder /app/apps/frontend/dashboard/.next/standalone/apps/frontend/dashboard ./
-COPY --from=builder /app/apps/frontend/dashboard/.next/static ./.next/static
-
-RUN rm -rf apps
 
 EXPOSE 3000
 
-CMD ["bun", "run", "server.js"]
+CMD ["bun", "run", ".output/server/index.mjs"]

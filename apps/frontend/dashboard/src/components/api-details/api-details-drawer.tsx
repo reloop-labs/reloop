@@ -1,4 +1,4 @@
-import { useApiLanguage } from "@fe/dashboard/hooks/use-api-language";
+import { useApiLanguage } from "#/hooks/use-api-language";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
@@ -35,7 +35,7 @@ const langIcons: Record<string, { path: string; hex: string }> = {
 
 /** Public origin for API sample URLs — same resolution as auth client. */
 function resolveDocBaseUrl(): string {
-	const fromEnv = (process.env.NEXT_PUBLIC_URL || "").trim();
+	const fromEnv = (import.meta.env.VITE_PUBLIC_URL || process.env.NEXT_PUBLIC_URL || "").trim();
 	if (fromEnv) return fromEnv.replace(/\/$/, "");
 	if (typeof window !== "undefined") return window.location.origin;
 	return "";

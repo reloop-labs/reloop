@@ -1,17 +1,25 @@
 {
-	"extends": "@reloop/tsconfig/nextjs.json",
-	"compilerOptions": {
-		"baseUrl": ".",
-		"paths": {
-			"@fe/dashboard/*": ["./src/*"]
-		}
-	},
-	"include": [
-		"./**/*.ts",
-		"./**/*.tsx",
-		"./.next/types/**/*.ts",
-		"./next-env.d.ts",
-		".next/types/**/*.ts"
-	],
-	"exclude": ["./node_modules"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts"],
+  "compilerOptions": {
+    "target": "ES2022",
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "paths": {
+      "#/*": ["./src/*"],
+      "@/*": ["./src/*"]
+    },
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+
+    /* Linting — match monorepo base; unused checks live in Biome */
+    "skipLibCheck": true,
+    "strict": true,
+    "noFallthroughCasesInSwitch": true
+  }
 }

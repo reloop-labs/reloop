@@ -18,8 +18,8 @@ Main workspace app — campaigns, contacts, templates, analytics, and settings.
 | **Directory** | `apps/frontend/dashboard` |
 | **Port** | `3001` |
 | **Local URL** | [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard) |
-| **Direct URL** | [http://localhost:3001](http://localhost:3001) |
-| **Stack** | `Next.js` `React 19` `Tailwind CSS` |
+| **Direct URL** | [http://localhost:3001/dashboard](http://localhost:3001/dashboard) |
+| **Stack** | `TanStack Start` `Vite` `React 19` `Tailwind CSS` |
 
 
 ## Quick Start
@@ -32,7 +32,7 @@ Run from the monorepo root (requires [auth](/setup/backend/auth) running):
 bun fe:dashboard:dev
 ```
 
-The app starts with Turbopack hot reloading on port `3001`.
+The app starts with Vite HMR on port `3001`, base path `/dashboard`.
 
 <Callout type="warn" title="Use the unified domain">
   Open [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard), not `localhost:3001`, so session cookies work with [auth](/setup/backend/auth).
@@ -41,39 +41,35 @@ The app starts with Turbopack hot reloading on port `3001`.
 
 ## Environment Configuration
 
-Variables in `apps/frontend/dashboard/.env` (committed with local defaults — no `bun env:setup` step needed):
+Optional build-time / env overrides (the auth client falls back to the browser origin when unset):
 
 ```bash
 # Optional locally — browser origin is used when unset (via Caddy at local.reloop.sh).
 # Required at Docker/image *build* time for production if you cannot rely on same-origin.
 # NEXT_PUBLIC_URL=https://local.reloop.sh
+# VITE_PUBLIC_URL=https://local.reloop.sh
 
 NEXT_PUBLIC_WS_URL="wss://local.reloop.sh"
-
-# Rybbit analytics (optional)
-NEXT_PUBLIC_RYBBIT_HOST=https://app.rybbit.io
-NEXT_PUBLIC_RYBBIT_SITE_ID=reloop-dashboard
 ```
 
-API calls use relative paths (`/api/*`) via Caddy, so no `NEXT_PUBLIC_API_URL` is required.
+API calls use relative paths (`/api/*`) via Caddy, so no public API URL is required.
 
-Auth (`@reloop/auth/client`) resolves the public origin as: `NEXT_PUBLIC_URL` → `window.location.origin`. For production Docker images you can pass `--build-arg NEXT_PUBLIC_URL=https://your-domain.com`; if omitted, the browser origin is used so same-host reverse-proxy deploys work without a rebuild.
+Auth (`@reloop/auth/client`) resolves the public origin as: `NEXT_PUBLIC_URL` / `VITE_PUBLIC_URL` → `window.location.origin`. For production Docker images you can pass `--build-arg NEXT_PUBLIC_URL=https://your-domain.com`; if omitted, the browser origin is used so same-host reverse-proxy deploys work without a rebuild.
 
 ### Reference Table
 
 | Variable | Required | Default |
 | :--- | :--- | :--- |
-| `NEXT_PUBLIC_URL` | No | Browser origin (`window.location.origin`) |
+| `NEXT_PUBLIC_URL` / `VITE_PUBLIC_URL` | No | Browser origin (`window.location.origin`) |
 | `NEXT_PUBLIC_WS_URL` | No | Current host (template collaboration WebSocket) |
-| `NEXT_PUBLIC_RYBBIT_HOST` | No | Rybbit analytics host |
-| `NEXT_PUBLIC_RYBBIT_SITE_ID` | No | Rybbit site identifier |
 
 
 ## Development Commands
 
 | Command | Description |
 | :--- | :--- |
-| `bun fe:dashboard:dev` | Start dev server with Turbopack |
-| `bun run --filter=fe-dashboard build` | Compile production bundle |
-| `bun run --filter=fe-dashboard start` | Run production build |
-| `bun run --filter=fe-dashboard lint` | Run ESLint checks |
+| `bun fe:dashboard:dev` | Start Vite + TanStack Start dev server |
+| `bun run --filter=fe-dashboard build` | Compile production bundle (Nitro) |
+| `bun run --filter=fe-dashboard preview` | Preview production build |
+| `bun run --filter=fe-dashboard typecheck` | Run TypeScript checks |
+| `bun run --filter=fe-dashboard test` | Run Vitest |

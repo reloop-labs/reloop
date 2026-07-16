@@ -1,6 +1,5 @@
 /**
- * Generates a deterministic Tailwind gradient class pair based on an email address.
- * The same email always produces the same color combination.
+ * Deterministic Tailwind gradient classes from a seed string (email or org id).
  */
 
 const AVATAR_GRADIENTS = [
@@ -33,18 +32,13 @@ function hashString(str: string): number {
 	return Math.abs(hash);
 }
 
-/**
- * Returns a stable `bg-gradient-to-br from-* to-*` Tailwind class string
- * determined solely by the provided email address.
- */
-export function getAvatarGradient(email: string): string {
-	const index = hashString(email) % AVATAR_GRADIENTS.length;
+/** Stable `bg-gradient-to-br from-* to-*` class string from a seed. */
+export function getAvatarGradient(seed: string): string {
+	const index = hashString(seed) % AVATAR_GRADIENTS.length;
 	return `bg-gradient-to-br ${AVATAR_GRADIENTS[index]}`;
 }
 
-/**
- * Returns the first character of a display name or email prefix, uppercased.
- */
+/** First character of display name or email prefix, uppercased. */
 export function getAvatarInitial(name: string | null, email: string): string {
 	if (name && name.length > 0) return name.charAt(0).toUpperCase();
 	const prefix = email.split("@")[0];
