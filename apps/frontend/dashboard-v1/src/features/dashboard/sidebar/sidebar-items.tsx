@@ -4,7 +4,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import { mainNavigation } from "./navigation";
+import { mainNavigation } from "../navigation";
 
 export function SidebarItems({
 	isCollapsed = false,

@@ -61,12 +61,23 @@ src/features/auth/
 src/features/home/home-page.tsx
 src/features/dashboard/
   dashboard-shell.tsx
-  main-sidebar.tsx
-  sidebar-items.tsx
   navigation.ts
-  use-sidebar-collapse.ts
+  page-placeholder.tsx
+  page-header/                # top bar chrome
+    page-header.tsx
+    organization-switcher.tsx
+    user-dropdown.tsx
+    user-avatar.tsx
+    theme-toggle.tsx
+    use-active-organization.ts
+  sidebar/                    # left nav (main + settings)
+    main-sidebar.tsx
+    sidebar-items.tsx
+    settings-sidebar-items.tsx
+    use-sidebar-collapse.ts
 src/features/settings/
-  settings-shell.tsx          # shared narrow column for settings routes
+  settings-shell.tsx
+  settings-placeholder-page.tsx
   theme/
     theme-page.tsx
     theme-toggle.tsx

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SettingsPlaceholderPage } from "#/features/dashboard/settings-placeholder-page";
+import { SettingsPlaceholderPage } from "#/features/settings/settings-placeholder-page";
 
 export const Route = createFileRoute("/_dashboard/settings/workspace")({
 	component: () => (
