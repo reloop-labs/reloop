@@ -354,14 +354,8 @@ export const WebhookTable = ({
 									)}
 								>
 									{/* URL only */}
-									<div className="flex min-w-0 items-center gap-2.5 pr-3">
-										<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50/80 dark:border-stroke-soft-100/40">
-											<Icon
-												name="link"
-												className="h-3.5 w-3.5 text-text-sub-600"
-											/>
-										</div>
-										<p className="min-w-0 truncate font-medium font-mono text-label-sm text-text-strong-950">
+									<div className="min-w-0 pr-3">
+										<p className="truncate font-medium font-mono text-label-sm text-text-strong-950">
 											{webhook.url}
 										</p>
 									</div>

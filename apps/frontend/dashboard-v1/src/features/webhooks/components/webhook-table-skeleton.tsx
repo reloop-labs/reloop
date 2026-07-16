@@ -17,8 +17,7 @@ export const WebhookTableSkeleton = ({
 					key={`skeleton-${index}`}
 					className={`grid ${GRID} items-center px-4 py-2.5`}
 				>
-					<div className="flex items-center gap-2.5 pr-3">
-						<Skeleton className="h-8 w-8 shrink-0 rounded-lg" />
+					<div className="min-w-0 pr-3">
 						<Skeleton className="h-3.5 w-64 max-w-full rounded" />
 					</div>
 					<div className="flex items-center gap-1.5">
