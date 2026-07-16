@@ -28,12 +28,15 @@ import { Route as DashboardDomainRouteImport } from './routes/_dashboard/domain'
 import { Route as DashboardContactsRouteImport } from './routes/_dashboard/contacts'
 import { Route as DashboardApiKeysRouteImport } from './routes/_dashboard/api-keys'
 import { Route as DashboardAgentInboxRouteImport } from './routes/_dashboard/agent-inbox'
+import { Route as DashboardWebhooksIndexRouteImport } from './routes/_dashboard/webhooks/index'
 import { Route as DashboardSettingsIndexRouteImport } from './routes/_dashboard/settings/index'
 import { Route as DashboardLogsIndexRouteImport } from './routes/_dashboard/logs/index'
 import { Route as DashboardEmailsIndexRouteImport } from './routes/_dashboard/emails/index'
 import { Route as DashboardDomainIndexRouteImport } from './routes/_dashboard/domain/index'
 import { Route as DashboardContactsIndexRouteImport } from './routes/_dashboard/contacts/index'
 import { Route as DashboardApiKeysIndexRouteImport } from './routes/_dashboard/api-keys/index'
+import { Route as DashboardWebhooksCreateRouteImport } from './routes/_dashboard/webhooks/create'
+import { Route as DashboardWebhooksWebhookIdRouteImport } from './routes/_dashboard/webhooks/$webhookId'
 import { Route as DashboardSettingsWorkspaceRouteImport } from './routes/_dashboard/settings/workspace'
 import { Route as DashboardSettingsThemeRouteImport } from './routes/_dashboard/settings/theme'
 import { Route as DashboardSettingsTeamsRouteImport } from './routes/_dashboard/settings/teams'
@@ -51,9 +54,11 @@ import { Route as DashboardContactsGroupsRouteImport } from './routes/_dashboard
 import { Route as DashboardContactsDetailRouteImport } from './routes/_dashboard/contacts/detail'
 import { Route as DashboardContactsChannelsRouteImport } from './routes/_dashboard/contacts/channels'
 import { Route as DashboardApiKeysApiKeyIdRouteImport } from './routes/_dashboard/api-keys/$apiKeyId'
+import { Route as DashboardWebhooksWebhookIdIndexRouteImport } from './routes/_dashboard/webhooks/$webhookId/index'
 import { Route as DashboardSettingsBillingIndexRouteImport } from './routes/_dashboard/settings/billing/index'
 import { Route as DashboardDomainAddIndexRouteImport } from './routes/_dashboard/domain/add/index'
 import { Route as DashboardContactsGroupsIndexRouteImport } from './routes/_dashboard/contacts/groups/index'
+import { Route as DashboardWebhooksWebhookIdTestRouteImport } from './routes/_dashboard/webhooks/$webhookId/test'
 import { Route as DashboardSettingsBillingPlansRouteImport } from './routes/_dashboard/settings/billing/plans'
 import { Route as DashboardDomainAddDomainIdRouteImport } from './routes/_dashboard/domain/add/$domainId'
 import { Route as DashboardContactsGroupsGroupIdRouteImport } from './routes/_dashboard/contacts/groups/$groupId'
@@ -153,6 +158,11 @@ const DashboardAgentInboxRoute = DashboardAgentInboxRouteImport.update({
   path: '/agent-inbox',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardWebhooksIndexRoute = DashboardWebhooksIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardWebhooksRoute,
+} as any)
 const DashboardSettingsIndexRoute = DashboardSettingsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -183,6 +193,17 @@ const DashboardApiKeysIndexRoute = DashboardApiKeysIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardApiKeysRoute,
 } as any)
+const DashboardWebhooksCreateRoute = DashboardWebhooksCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => DashboardWebhooksRoute,
+} as any)
+const DashboardWebhooksWebhookIdRoute =
+  DashboardWebhooksWebhookIdRouteImport.update({
+    id: '/$webhookId',
+    path: '/$webhookId',
+    getParentRoute: () => DashboardWebhooksRoute,
+  } as any)
 const DashboardSettingsWorkspaceRoute =
   DashboardSettingsWorkspaceRouteImport.update({
     id: '/workspace',
@@ -275,6 +296,12 @@ const DashboardApiKeysApiKeyIdRoute =
     path: '/$apiKeyId',
     getParentRoute: () => DashboardApiKeysRoute,
   } as any)
+const DashboardWebhooksWebhookIdIndexRoute =
+  DashboardWebhooksWebhookIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardWebhooksWebhookIdRoute,
+  } as any)
 const DashboardSettingsBillingIndexRoute =
   DashboardSettingsBillingIndexRouteImport.update({
     id: '/',
@@ -291,6 +318,12 @@ const DashboardContactsGroupsIndexRoute =
     id: '/',
     path: '/',
     getParentRoute: () => DashboardContactsGroupsRoute,
+  } as any)
+const DashboardWebhooksWebhookIdTestRoute =
+  DashboardWebhooksWebhookIdTestRouteImport.update({
+    id: '/test',
+    path: '/test',
+    getParentRoute: () => DashboardWebhooksWebhookIdRoute,
   } as any)
 const DashboardSettingsBillingPlansRoute =
   DashboardSettingsBillingPlansRouteImport.update({
@@ -334,7 +367,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof DashboardSettingsRouteWithChildren
   '/smtp': typeof DashboardSmtpRoute
   '/templates': typeof DashboardTemplatesRoute
-  '/webhooks': typeof DashboardWebhooksRoute
+  '/webhooks': typeof DashboardWebhooksRouteWithChildren
   '/workflows': typeof DashboardWorkflowsRoute
   '/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
   '/contacts/channels': typeof DashboardContactsChannelsRoute
@@ -353,19 +386,24 @@ export interface FileRoutesByFullPath {
   '/settings/teams': typeof DashboardSettingsTeamsRoute
   '/settings/theme': typeof DashboardSettingsThemeRoute
   '/settings/workspace': typeof DashboardSettingsWorkspaceRoute
+  '/webhooks/$webhookId': typeof DashboardWebhooksWebhookIdRouteWithChildren
+  '/webhooks/create': typeof DashboardWebhooksCreateRoute
   '/api-keys/': typeof DashboardApiKeysIndexRoute
   '/contacts/': typeof DashboardContactsIndexRoute
   '/domain/': typeof DashboardDomainIndexRoute
   '/emails/': typeof DashboardEmailsIndexRoute
   '/logs/': typeof DashboardLogsIndexRoute
   '/settings/': typeof DashboardSettingsIndexRoute
+  '/webhooks/': typeof DashboardWebhooksIndexRoute
   '/contacts/detail/$contactId': typeof DashboardContactsDetailContactIdRoute
   '/contacts/groups/$groupId': typeof DashboardContactsGroupsGroupIdRoute
   '/domain/add/$domainId': typeof DashboardDomainAddDomainIdRoute
   '/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
+  '/webhooks/$webhookId/test': typeof DashboardWebhooksWebhookIdTestRoute
   '/contacts/groups/': typeof DashboardContactsGroupsIndexRoute
   '/domain/add/': typeof DashboardDomainAddIndexRoute
   '/settings/billing/': typeof DashboardSettingsBillingIndexRoute
+  '/webhooks/$webhookId/': typeof DashboardWebhooksWebhookIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/invite': typeof InviteRoute
@@ -377,7 +415,6 @@ export interface FileRoutesByTo {
   '/metrics': typeof DashboardMetricsRoute
   '/smtp': typeof DashboardSmtpRoute
   '/templates': typeof DashboardTemplatesRoute
-  '/webhooks': typeof DashboardWebhooksRoute
   '/workflows': typeof DashboardWorkflowsRoute
   '/': typeof DashboardIndexRoute
   '/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
@@ -394,19 +431,23 @@ export interface FileRoutesByTo {
   '/settings/teams': typeof DashboardSettingsTeamsRoute
   '/settings/theme': typeof DashboardSettingsThemeRoute
   '/settings/workspace': typeof DashboardSettingsWorkspaceRoute
+  '/webhooks/create': typeof DashboardWebhooksCreateRoute
   '/api-keys': typeof DashboardApiKeysIndexRoute
   '/contacts': typeof DashboardContactsIndexRoute
   '/domain': typeof DashboardDomainIndexRoute
   '/emails': typeof DashboardEmailsIndexRoute
   '/logs': typeof DashboardLogsIndexRoute
   '/settings': typeof DashboardSettingsIndexRoute
+  '/webhooks': typeof DashboardWebhooksIndexRoute
   '/contacts/detail/$contactId': typeof DashboardContactsDetailContactIdRoute
   '/contacts/groups/$groupId': typeof DashboardContactsGroupsGroupIdRoute
   '/domain/add/$domainId': typeof DashboardDomainAddDomainIdRoute
   '/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
+  '/webhooks/$webhookId/test': typeof DashboardWebhooksWebhookIdTestRoute
   '/contacts/groups': typeof DashboardContactsGroupsIndexRoute
   '/domain/add': typeof DashboardDomainAddIndexRoute
   '/settings/billing': typeof DashboardSettingsBillingIndexRoute
+  '/webhooks/$webhookId': typeof DashboardWebhooksWebhookIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -426,7 +467,7 @@ export interface FileRoutesById {
   '/_dashboard/settings': typeof DashboardSettingsRouteWithChildren
   '/_dashboard/smtp': typeof DashboardSmtpRoute
   '/_dashboard/templates': typeof DashboardTemplatesRoute
-  '/_dashboard/webhooks': typeof DashboardWebhooksRoute
+  '/_dashboard/webhooks': typeof DashboardWebhooksRouteWithChildren
   '/_dashboard/workflows': typeof DashboardWorkflowsRoute
   '/_dashboard/': typeof DashboardIndexRoute
   '/_dashboard/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
@@ -446,19 +487,24 @@ export interface FileRoutesById {
   '/_dashboard/settings/teams': typeof DashboardSettingsTeamsRoute
   '/_dashboard/settings/theme': typeof DashboardSettingsThemeRoute
   '/_dashboard/settings/workspace': typeof DashboardSettingsWorkspaceRoute
+  '/_dashboard/webhooks/$webhookId': typeof DashboardWebhooksWebhookIdRouteWithChildren
+  '/_dashboard/webhooks/create': typeof DashboardWebhooksCreateRoute
   '/_dashboard/api-keys/': typeof DashboardApiKeysIndexRoute
   '/_dashboard/contacts/': typeof DashboardContactsIndexRoute
   '/_dashboard/domain/': typeof DashboardDomainIndexRoute
   '/_dashboard/emails/': typeof DashboardEmailsIndexRoute
   '/_dashboard/logs/': typeof DashboardLogsIndexRoute
   '/_dashboard/settings/': typeof DashboardSettingsIndexRoute
+  '/_dashboard/webhooks/': typeof DashboardWebhooksIndexRoute
   '/_dashboard/contacts/detail/$contactId': typeof DashboardContactsDetailContactIdRoute
   '/_dashboard/contacts/groups/$groupId': typeof DashboardContactsGroupsGroupIdRoute
   '/_dashboard/domain/add/$domainId': typeof DashboardDomainAddDomainIdRoute
   '/_dashboard/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
+  '/_dashboard/webhooks/$webhookId/test': typeof DashboardWebhooksWebhookIdTestRoute
   '/_dashboard/contacts/groups/': typeof DashboardContactsGroupsIndexRoute
   '/_dashboard/domain/add/': typeof DashboardDomainAddIndexRoute
   '/_dashboard/settings/billing/': typeof DashboardSettingsBillingIndexRoute
+  '/_dashboard/webhooks/$webhookId/': typeof DashboardWebhooksWebhookIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -498,19 +544,24 @@ export interface FileRouteTypes {
     | '/settings/teams'
     | '/settings/theme'
     | '/settings/workspace'
+    | '/webhooks/$webhookId'
+    | '/webhooks/create'
     | '/api-keys/'
     | '/contacts/'
     | '/domain/'
     | '/emails/'
     | '/logs/'
     | '/settings/'
+    | '/webhooks/'
     | '/contacts/detail/$contactId'
     | '/contacts/groups/$groupId'
     | '/domain/add/$domainId'
     | '/settings/billing/plans'
+    | '/webhooks/$webhookId/test'
     | '/contacts/groups/'
     | '/domain/add/'
     | '/settings/billing/'
+    | '/webhooks/$webhookId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/invite'
@@ -522,7 +573,6 @@ export interface FileRouteTypes {
     | '/metrics'
     | '/smtp'
     | '/templates'
-    | '/webhooks'
     | '/workflows'
     | '/'
     | '/api-keys/$apiKeyId'
@@ -539,19 +589,23 @@ export interface FileRouteTypes {
     | '/settings/teams'
     | '/settings/theme'
     | '/settings/workspace'
+    | '/webhooks/create'
     | '/api-keys'
     | '/contacts'
     | '/domain'
     | '/emails'
     | '/logs'
     | '/settings'
+    | '/webhooks'
     | '/contacts/detail/$contactId'
     | '/contacts/groups/$groupId'
     | '/domain/add/$domainId'
     | '/settings/billing/plans'
+    | '/webhooks/$webhookId/test'
     | '/contacts/groups'
     | '/domain/add'
     | '/settings/billing'
+    | '/webhooks/$webhookId'
   id:
     | '__root__'
     | '/_dashboard'
@@ -590,19 +644,24 @@ export interface FileRouteTypes {
     | '/_dashboard/settings/teams'
     | '/_dashboard/settings/theme'
     | '/_dashboard/settings/workspace'
+    | '/_dashboard/webhooks/$webhookId'
+    | '/_dashboard/webhooks/create'
     | '/_dashboard/api-keys/'
     | '/_dashboard/contacts/'
     | '/_dashboard/domain/'
     | '/_dashboard/emails/'
     | '/_dashboard/logs/'
     | '/_dashboard/settings/'
+    | '/_dashboard/webhooks/'
     | '/_dashboard/contacts/detail/$contactId'
     | '/_dashboard/contacts/groups/$groupId'
     | '/_dashboard/domain/add/$domainId'
     | '/_dashboard/settings/billing/plans'
+    | '/_dashboard/webhooks/$webhookId/test'
     | '/_dashboard/contacts/groups/'
     | '/_dashboard/domain/add/'
     | '/_dashboard/settings/billing/'
+    | '/_dashboard/webhooks/$webhookId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -748,6 +807,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAgentInboxRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/webhooks/': {
+      id: '/_dashboard/webhooks/'
+      path: '/'
+      fullPath: '/webhooks/'
+      preLoaderRoute: typeof DashboardWebhooksIndexRouteImport
+      parentRoute: typeof DashboardWebhooksRoute
+    }
     '/_dashboard/settings/': {
       id: '/_dashboard/settings/'
       path: '/'
@@ -789,6 +855,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/api-keys/'
       preLoaderRoute: typeof DashboardApiKeysIndexRouteImport
       parentRoute: typeof DashboardApiKeysRoute
+    }
+    '/_dashboard/webhooks/create': {
+      id: '/_dashboard/webhooks/create'
+      path: '/create'
+      fullPath: '/webhooks/create'
+      preLoaderRoute: typeof DashboardWebhooksCreateRouteImport
+      parentRoute: typeof DashboardWebhooksRoute
+    }
+    '/_dashboard/webhooks/$webhookId': {
+      id: '/_dashboard/webhooks/$webhookId'
+      path: '/$webhookId'
+      fullPath: '/webhooks/$webhookId'
+      preLoaderRoute: typeof DashboardWebhooksWebhookIdRouteImport
+      parentRoute: typeof DashboardWebhooksRoute
     }
     '/_dashboard/settings/workspace': {
       id: '/_dashboard/settings/workspace'
@@ -909,6 +989,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardApiKeysApiKeyIdRouteImport
       parentRoute: typeof DashboardApiKeysRoute
     }
+    '/_dashboard/webhooks/$webhookId/': {
+      id: '/_dashboard/webhooks/$webhookId/'
+      path: '/'
+      fullPath: '/webhooks/$webhookId/'
+      preLoaderRoute: typeof DashboardWebhooksWebhookIdIndexRouteImport
+      parentRoute: typeof DashboardWebhooksWebhookIdRoute
+    }
     '/_dashboard/settings/billing/': {
       id: '/_dashboard/settings/billing/'
       path: '/'
@@ -929,6 +1016,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/contacts/groups/'
       preLoaderRoute: typeof DashboardContactsGroupsIndexRouteImport
       parentRoute: typeof DashboardContactsGroupsRoute
+    }
+    '/_dashboard/webhooks/$webhookId/test': {
+      id: '/_dashboard/webhooks/$webhookId/test'
+      path: '/test'
+      fullPath: '/webhooks/$webhookId/test'
+      preLoaderRoute: typeof DashboardWebhooksWebhookIdTestRouteImport
+      parentRoute: typeof DashboardWebhooksWebhookIdRoute
     }
     '/_dashboard/settings/billing/plans': {
       id: '/_dashboard/settings/billing/plans'
@@ -1124,6 +1218,37 @@ const DashboardSettingsRouteChildren: DashboardSettingsRouteChildren = {
 const DashboardSettingsRouteWithChildren =
   DashboardSettingsRoute._addFileChildren(DashboardSettingsRouteChildren)
 
+interface DashboardWebhooksWebhookIdRouteChildren {
+  DashboardWebhooksWebhookIdTestRoute: typeof DashboardWebhooksWebhookIdTestRoute
+  DashboardWebhooksWebhookIdIndexRoute: typeof DashboardWebhooksWebhookIdIndexRoute
+}
+
+const DashboardWebhooksWebhookIdRouteChildren: DashboardWebhooksWebhookIdRouteChildren =
+  {
+    DashboardWebhooksWebhookIdTestRoute: DashboardWebhooksWebhookIdTestRoute,
+    DashboardWebhooksWebhookIdIndexRoute: DashboardWebhooksWebhookIdIndexRoute,
+  }
+
+const DashboardWebhooksWebhookIdRouteWithChildren =
+  DashboardWebhooksWebhookIdRoute._addFileChildren(
+    DashboardWebhooksWebhookIdRouteChildren,
+  )
+
+interface DashboardWebhooksRouteChildren {
+  DashboardWebhooksWebhookIdRoute: typeof DashboardWebhooksWebhookIdRouteWithChildren
+  DashboardWebhooksCreateRoute: typeof DashboardWebhooksCreateRoute
+  DashboardWebhooksIndexRoute: typeof DashboardWebhooksIndexRoute
+}
+
+const DashboardWebhooksRouteChildren: DashboardWebhooksRouteChildren = {
+  DashboardWebhooksWebhookIdRoute: DashboardWebhooksWebhookIdRouteWithChildren,
+  DashboardWebhooksCreateRoute: DashboardWebhooksCreateRoute,
+  DashboardWebhooksIndexRoute: DashboardWebhooksIndexRoute,
+}
+
+const DashboardWebhooksRouteWithChildren =
+  DashboardWebhooksRoute._addFileChildren(DashboardWebhooksRouteChildren)
+
 interface DashboardRouteChildren {
   DashboardAgentInboxRoute: typeof DashboardAgentInboxRoute
   DashboardApiKeysRoute: typeof DashboardApiKeysRouteWithChildren
@@ -1136,7 +1261,7 @@ interface DashboardRouteChildren {
   DashboardSettingsRoute: typeof DashboardSettingsRouteWithChildren
   DashboardSmtpRoute: typeof DashboardSmtpRoute
   DashboardTemplatesRoute: typeof DashboardTemplatesRoute
-  DashboardWebhooksRoute: typeof DashboardWebhooksRoute
+  DashboardWebhooksRoute: typeof DashboardWebhooksRouteWithChildren
   DashboardWorkflowsRoute: typeof DashboardWorkflowsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
@@ -1153,7 +1278,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardSettingsRoute: DashboardSettingsRouteWithChildren,
   DashboardSmtpRoute: DashboardSmtpRoute,
   DashboardTemplatesRoute: DashboardTemplatesRoute,
-  DashboardWebhooksRoute: DashboardWebhooksRoute,
+  DashboardWebhooksRoute: DashboardWebhooksRouteWithChildren,
   DashboardWorkflowsRoute: DashboardWorkflowsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }

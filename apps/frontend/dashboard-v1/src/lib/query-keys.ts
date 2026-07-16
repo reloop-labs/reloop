@@ -77,6 +77,18 @@ export const queryKeys = {
 			[...queryKeys.contacts.all, "properties", "all"] as const,
 		channels: () => [...queryKeys.contacts.all, "channels"] as const,
 	},
+	webhooks: {
+		all: ["webhooks"] as const,
+		list: (orgId: string) =>
+			[...queryKeys.webhooks.all, "list", orgId] as const,
+		detail: (id: string) =>
+			[...queryKeys.webhooks.all, "detail", id] as const,
+		deliveries: (params: {
+			webhookId: string;
+			page: number;
+			limit: number;
+		}) => [...queryKeys.webhooks.all, "deliveries", params] as const,
+	},
 	metrics: {
 		all: ["metrics"] as const,
 		emailStats: (params: {
