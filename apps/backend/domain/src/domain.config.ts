@@ -17,6 +17,16 @@ export const domainConfig = {
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
 
+	// Domain Connect (Synchronous Flow)
+	DOMAIN_CONNECT_PROVIDER_ID:
+		process.env.DOMAIN_CONNECT_PROVIDER_ID || "reloop.sh",
+	DOMAIN_CONNECT_SERVICE_ID:
+		process.env.DOMAIN_CONNECT_SERVICE_ID || "email-setup",
+	DOMAIN_CONNECT_SIGNING_PRIVATE_KEY:
+		process.env.DOMAIN_CONNECT_SIGNING_PRIVATE_KEY || "",
+	DOMAIN_CONNECT_SIGNING_PUB_KEY_ID:
+		process.env.DOMAIN_CONNECT_SIGNING_PUB_KEY_ID || "_dc",
+
 	constants: {
 		keyLength: 2048,
 		mxPriority: 10,

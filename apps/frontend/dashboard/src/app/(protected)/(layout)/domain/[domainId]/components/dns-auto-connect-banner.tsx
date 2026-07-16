@@ -11,7 +11,9 @@ import { useParams } from "next/navigation";
 import * as React from "react";
 import * as simpleIcons from "simple-icons";
 import useSWR from "swr";
-import { inferDnsProvider } from "../utils";
+import { inferDnsProvider } from "@fe/dashboard/app/(protected)/(layout)/domain/[domainId]/utils";
+import { useDomainConnect } from "@fe/dashboard/app/(protected)/(layout)/domain/[domainId]/hooks/use-domain-connect";
+import Spinner from "@reloop/ui/spinner";
 
 interface DNSAutoConnectBannerProps {
 	domain?: DomainResponse;
@@ -39,6 +41,9 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 }) => {
 	const params = useParams();
 	const domainId = domainIdProp || params?.domainId;
+	const { startAutoConnect, isConnecting } = useDomainConnect(
+		typeof domainId === "string" ? domainId : undefined,
+	);
 	const { data: nameserverData, isLoading } = useSWR<DomainNameserversResponse>(
 		domainId ? `/api/domain/v1/nameservers/${domainId}` : null,
 	);
@@ -61,9 +66,8 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 		return <DNSAutoConnectBannerSkeleton />;
 	}
 
-	const handleAutoConnect = async () => {
-		// This will be hooked up to the backend implementation once available
-		console.log("Auto-populate DNS records for:", domain?.domain);
+	const handleAutoConnect = () => {
+		startAutoConnect();
 	};
 
 	// State: DNS Provider Found (Supported for Auto-connect)
@@ -112,32 +116,42 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 						mode="filled"
 						onClick={handleAutoConnect}
 						className="h-10 shrink-0 gap-2 px-4"
+						disabled={isConnecting}
 					>
-						<Button.Icon
-							as={() => (
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth={2}
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									className="h-3.5 w-3.5"
-								>
-									<title>Sparkles Icon</title>
-									<path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72" />
-									<path d="m14 7 3 3" />
-									<path d="M5 6v4" />
-									<path d="M19 14v4" />
-									<path d="M10 2v2" />
-									<path d="M7 8H3" />
-									<path d="M21 16h-4" />
-									<path d="M11 3H9" />
-								</svg>
-							)}
-						/>
-						<span className="font-semibold text-sm">Auto-populate records</span>
+						{isConnecting ? (
+							<>
+								<Spinner color="currentColor" />
+								<span className="font-semibold text-sm">Connecting...</span>
+							</>
+						) : (
+							<>
+								<Button.Icon
+									as={() => (
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth={2}
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											className="h-3.5 w-3.5"
+										>
+											<title>Sparkles Icon</title>
+											<path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72" />
+											<path d="m14 7 3 3" />
+											<path d="M5 6v4" />
+											<path d="M19 14v4" />
+											<path d="M10 2v2" />
+											<path d="M7 8H3" />
+											<path d="M21 16h-4" />
+											<path d="M11 3H9" />
+										</svg>
+									)}
+								/>
+								<span className="font-semibold text-sm">Auto-populate records</span>
+							</>
+						)}
 					</Button.Root>
 				</div>
 			</div>

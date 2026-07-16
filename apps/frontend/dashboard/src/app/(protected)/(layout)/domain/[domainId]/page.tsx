@@ -7,12 +7,13 @@ import { Icon } from "@reloop/ui/icon";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import axios from "axios";
 import { AnimatePresence, motion } from "motion/react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import * as React from "react";
+import { toast } from "sonner";
 import useSWR from "swr";
-import { DomainErrorState } from "../components/domain-error-state";
-import { DomainNotFound } from "../components/domain-not-found";
+import { DomainErrorState } from "@fe/dashboard/app/(protected)/(layout)/domain/components/domain-error-state";
+import { DomainNotFound } from "@fe/dashboard/app/(protected)/(layout)/domain/components/domain-not-found";
 import { DNSRecordsSection } from "./components/dns-records-section";
 import { DomainConfigurationSection } from "./components/domain-configuration-section";
 import { DomainEvents } from "./components/domain-events";
@@ -21,8 +22,39 @@ import { DomainStats } from "./components/domain-stats";
 
 const DomainPage = () => {
 	const params = useParams();
+	const searchParams = useSearchParams();
+	const router = useRouter();
 	const rawDomainId =
 		typeof params.domainId === "string" ? params.domainId : null;
+
+	React.useEffect(() => {
+		const dcStatus = searchParams?.get("dc_status");
+		if (!dcStatus) return;
+
+		switch (dcStatus) {
+			case "success":
+				toast.success("DNS records configured successfully! Verification started.");
+				break;
+			case "cancelled":
+				toast.info(
+					"Auto-configuration was cancelled. You can try again or configure manually.",
+				);
+				break;
+			case "error": {
+				const errorMsg =
+					searchParams.get("dc_error") || "Auto-configuration failed";
+				toast.error(errorMsg);
+				break;
+			}
+		}
+
+		// Clean query parameters from URL
+		const url = new URL(window.location.href);
+		url.searchParams.delete("dc_status");
+		url.searchParams.delete("dc_error");
+		router.replace(url.pathname + url.search, { scroll: false });
+	}, [searchParams, router]);
+
 	// Never call GET /api/domain/v1/{id} with reserved segments (list, create, domain, …).
 	const domainId = isDomainRecordId(rawDomainId) ? rawDomainId : null;
 	// Domain APIs require session.activeOrganizationId. Gate on isOrgReady so

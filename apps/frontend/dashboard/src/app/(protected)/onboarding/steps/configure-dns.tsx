@@ -15,18 +15,50 @@ import * as Switch from "@reloop/ui/switch";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import { useSearchParams, useRouter } from "next/navigation";
 import * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
-import { DNSRecordSection } from "./configure-dns/components/dns-record-section";
-import { DomainAddedAlert } from "./configure-dns/components/domain-added-alert";
-import { groupDomainDnsRecords } from "./configure-dns/utils/dns-record-groups";
+import { DNSRecordSection } from "@fe/dashboard/app/(protected)/onboarding/steps/configure-dns/components/dns-record-section";
+import { DomainAddedAlert } from "@fe/dashboard/app/(protected)/onboarding/steps/configure-dns/components/domain-added-alert";
+import { groupDomainDnsRecords } from "@fe/dashboard/app/(protected)/onboarding/steps/configure-dns/utils/dns-record-groups";
 
 export const ConfigureDnsStep = () => {
 	const [domainId] = useQueryState("domainId", parseAsString.withDefault(""));
 	const [, setStep] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [isVerifying, setIsVerifying] = React.useState(false);
+	const searchParams = useSearchParams();
+	const router = useRouter();
+
+	React.useEffect(() => {
+		const dcStatus = searchParams?.get("dc_status");
+		if (!dcStatus) return;
+
+		switch (dcStatus) {
+			case "success":
+				toast.success("DNS records configured successfully! Verification started.");
+				setStep(4);
+				break;
+			case "cancelled":
+				toast.info(
+					"Auto-configuration was cancelled. You can try again or configure manually.",
+				);
+				break;
+			case "error": {
+				const errorMsg =
+					searchParams.get("dc_error") || "Auto-configuration failed";
+				toast.error(errorMsg);
+				break;
+			}
+		}
+
+		// Clean query parameters from URL
+		const url = new URL(window.location.href);
+		url.searchParams.delete("dc_status");
+		url.searchParams.delete("dc_error");
+		router.replace(url.pathname + url.search, { scroll: false });
+	}, [searchParams, router, setStep]);
 
 	const { data: domainData, isLoading } = useSWR<DomainResponse>(
 		domainId ? `/api/domain/v1/${domainId}` : null,
