@@ -58,7 +58,12 @@
     "simple-icons": "catalog:ui",
     "sonner": "catalog:ui",
     "tailwindcss": "^4.1.18",
-    "valibot": "catalog:db"
+    "valibot": "catalog:db",
+    "@react-email/editor": "catalog:ui",
+    "@tiptap/react": "catalog:ui",
+    "@tiptap/core": "catalog:ui",
+    "@tiptap/pm": "catalog:ui",
+    "@tiptap/starter-kit": "catalog:ui"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.5",
