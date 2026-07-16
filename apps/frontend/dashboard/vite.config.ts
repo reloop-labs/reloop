@@ -20,10 +20,9 @@ const config = defineConfig({
 		},
 	},
 	define: {
-		// @reloop/auth client resolves public origin via NEXT_PUBLIC_URL (Next-era env).
-		"process.env.NEXT_PUBLIC_URL": JSON.stringify(
-			process.env.NEXT_PUBLIC_URL || process.env.VITE_PUBLIC_URL || "",
-		),
+		// @reloop/auth reads process.env at module init (not import.meta.env).
+		// Vite only exposes VITE_* via import.meta.env; inject for the auth package.
+		"process.env.VITE_PUBLIC_URL": JSON.stringify(process.env.VITE_PUBLIC_URL || ""),
 	},
 	plugins: [
 		devtools(),

@@ -18,7 +18,7 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 					<Link
 						to="/api-keys/$apiKeyId"
 						params={{ apiKeyId: apiKey.id }}
-						className="truncate font-medium text-label-sm text-text-strong-950 hover:underline"
+						className="truncate font-medium text-label-sm text-text-strong-950 group-hover/row:underline"
 					>
 						{displayName}
 					</Link>

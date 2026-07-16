@@ -15,13 +15,18 @@ import { createAuthClient } from "better-auth/react";
 /**
  * Public site origin for Better Auth (reverse-proxied at `/api/auth/v1`).
  *
- * 1. `NEXT_PUBLIC_URL` when set (Docker build-arg / .env)
- * 2. `window.location.origin` in the browser (same-origin reverse proxy)
+ * 1. `VITE_PUBLIC_URL` (Vite apps / dashboard Docker build-arg)
+ * 2. `NEXT_PUBLIC_URL` (Next.js apps)
+ * 3. `window.location.origin` in the browser (same-origin reverse proxy)
  *
  * Do not hardcode `local.reloop.sh` — that breaks production when the env is omitted.
  */
 function resolveAuthClientBaseURL(): string {
-	const fromEnv = (process.env.NEXT_PUBLIC_URL || "").trim();
+	const fromEnv = (
+		process.env.VITE_PUBLIC_URL ||
+		process.env.NEXT_PUBLIC_URL ||
+		""
+	).trim();
 	if (fromEnv) return fromEnv.replace(/\/$/, "");
 	if (typeof window !== "undefined") return window.location.origin;
 	return "";

@@ -11,15 +11,13 @@ FROM base AS builder
 WORKDIR /app
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
-# NEXT_PUBLIC_* / VITE_* are inlined at build time. When NEXT_PUBLIC_URL is omitted,
-# the auth client uses window.location.origin (works for any public hostname).
-# Pass --build-arg NEXT_PUBLIC_URL=https://your-domain.com to pin an absolute origin.
-ARG NEXT_PUBLIC_URL
-ENV NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL}
-ARG NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-wss://reloop.sh}
-ENV NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
+# VITE_* are inlined at build time. When VITE_PUBLIC_URL is omitted, the auth
+# client uses window.location.origin (works for any public hostname).
+# Pass --build-arg VITE_PUBLIC_URL=https://your-domain.com to pin an absolute origin.
 ARG VITE_PUBLIC_URL
-ENV VITE_PUBLIC_URL=${VITE_PUBLIC_URL:-${NEXT_PUBLIC_URL}}
+ENV VITE_PUBLIC_URL=${VITE_PUBLIC_URL}
+ARG VITE_WS_URL=wss://reloop.sh
+ENV VITE_WS_URL=${VITE_WS_URL}
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .

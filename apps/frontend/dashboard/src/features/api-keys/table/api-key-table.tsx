@@ -128,8 +128,6 @@ export function ApiKeyTable({
 							return (
 								<div
 									key={row.id}
-									role="link"
-									tabIndex={0}
 									onClick={() =>
 										void navigate({
 											to: "/api-keys/$apiKeyId",
@@ -147,7 +145,6 @@ export function ApiKeyTable({
 									}}
 									className={cn(
 										`group/row grid w-full cursor-pointer ${API_KEY_TABLE_GRID} items-center px-4 py-2 text-left transition-colors`,
-										"hover:bg-bg-weak-50/50",
 										isRowActive && "bg-bg-weak-50/50",
 									)}
 								>
