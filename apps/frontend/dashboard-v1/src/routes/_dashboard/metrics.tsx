@@ -1,11 +1,15 @@
+import { MetricsPage } from "#/features/metrics/metrics-page";
 import { createFileRoute } from "@tanstack/react-router";
-import { PagePlaceholder } from "#/features/dashboard/page-placeholder";
 
 export const Route = createFileRoute("/_dashboard/metrics")({
-	component: () => (
-		<PagePlaceholder
-			title="Metrics"
-			description="Deliverability and engagement metrics will live here."
-		/>
-	),
+	component: MetricsPage,
+	head: () => ({
+		meta: [
+			{ title: "Metrics · Reloop" },
+			{
+				name: "description",
+				content: "Deliverability and engagement metrics for your emails.",
+			},
+		],
+	}),
 });

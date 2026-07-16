@@ -77,6 +77,14 @@ export const queryKeys = {
 			[...queryKeys.contacts.all, "properties", "all"] as const,
 		channels: () => [...queryKeys.contacts.all, "channels"] as const,
 	},
+	metrics: {
+		all: ["metrics"] as const,
+		emailStats: (params: {
+			startDate: string;
+			endDate: string;
+			domain: string;
+		}) => [...queryKeys.metrics.all, "email-stats", params] as const,
+	},
 	emails: {
 		all: ["emails"] as const,
 		sent: (params: {

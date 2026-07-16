@@ -5,7 +5,8 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Popover from "@reloop/ui/popover";
 import { useEffect, useRef, useState } from "react";
-import type { DateRange } from "react-day-picker";
+import type { DateRange, Matcher } from "react-day-picker";
+import { toast } from "sonner";
 import { LogsCalendar } from "./logs-calendar";
 
 export type DatePreset = {
@@ -83,6 +84,8 @@ interface DateRangeFilterProps {
 		preset: string | null,
 	) => void;
 	numberOfMonths?: number;
+	/** Cap selectable range length (and presets) in days. */
+	maxDays?: number;
 	align?: "start" | "end";
 }
 
@@ -92,6 +95,7 @@ export const DateRangeFilter = ({
 	activePreset,
 	onDateChange,
 	numberOfMonths = 2,
+	maxDays,
 	align = "start",
 }: DateRangeFilterProps) => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -109,6 +113,33 @@ export const DateRangeFilter = ({
 				})()
 			: undefined,
 	);
+
+	const filteredPresets = DATE_PRESETS.filter((preset) => {
+		if (!maxDays) return true;
+		const range = preset.getRange();
+		const diffMs = range.to.getTime() - range.from.getTime();
+		const diffDays = diffMs / (24 * 60 * 60 * 1000);
+		return diffDays <= maxDays;
+	});
+
+	const getDisabledDays = (): Matcher | Matcher[] => {
+		const today = new Date();
+		const disabled: Matcher[] = [{ after: today }];
+
+		if (maxDays && calendarRange?.from && !calendarRange?.to) {
+			const from = calendarRange.from;
+			const minDate = new Date(
+				from.getTime() - (maxDays - 1) * 24 * 60 * 60 * 1000,
+			);
+			const maxDate = new Date(
+				from.getTime() + (maxDays - 1) * 24 * 60 * 60 * 1000,
+			);
+			disabled.push({ before: minDate });
+			disabled.push({ after: maxDate > today ? today : maxDate });
+		}
+
+		return disabled;
+	};
 
 	// Update internal state when props change (e.g. from presets)
 	useEffect(() => {
@@ -152,11 +183,28 @@ export const DateRangeFilter = ({
 	};
 
 	const handleCalendarSelect = (range: DateRange | undefined) => {
+		if (range?.from && range?.to) {
+			const diffTime = Math.abs(range.to.getTime() - range.from.getTime());
+			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+			if (maxDays && diffDays > maxDays) {
+				toast.error(`Maximum date range allowed is ${maxDays} days`);
+				setCalendarRange({ from: range.from, to: undefined });
+				return;
+			}
+		}
 		setCalendarRange(range);
 	};
 
 	const handleApply = () => {
 		if (calendarRange?.from && calendarRange?.to) {
+			const diffTime = Math.abs(
+				calendarRange.to.getTime() - calendarRange.from.getTime(),
+			);
+			const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+			if (maxDays && diffDays > maxDays) {
+				toast.error(`Maximum date range allowed is ${maxDays} days`);
+				return;
+			}
 			const endOfDay = new Date(calendarRange.to);
 			endOfDay.setHours(23, 59, 59, 999);
 			onDateChange(
@@ -202,7 +250,7 @@ export const DateRangeFilter = ({
 					{/* Left: Presets */}
 					<div className="w-44 px-2">
 						<div className="relative py-2">
-							{DATE_PRESETS.map((preset, idx) => {
+							{filteredPresets.map((preset, idx) => {
 								const isActive = activePreset === preset.value;
 								return (
 									<button
@@ -247,7 +295,7 @@ export const DateRangeFilter = ({
 							selected={calendarRange}
 							onSelect={handleCalendarSelect}
 							numberOfMonths={numberOfMonths}
-							disabled={{ after: new Date() }}
+							disabled={getDisabledDays()}
 						/>
 						<div className="flex justify-end gap-2 border-stroke-soft-100 border-t pt-2">
 							{(hasActiveFilter ||

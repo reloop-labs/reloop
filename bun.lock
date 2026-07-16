@@ -746,6 +746,7 @@
         "react-dom": "catalog:ui",
         "react-hook-form": "catalog:ui",
         "react-hotkeys-hook": "catalog:ui",
+        "recharts": "catalog:ui",
         "simple-icons": "catalog:ui",
         "sonner": "catalog:ui",
         "tailwindcss": "^4.1.18",
