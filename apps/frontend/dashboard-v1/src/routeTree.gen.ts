@@ -31,6 +31,7 @@ import { Route as DashboardAgentInboxRouteImport } from './routes/_dashboard/age
 import { Route as DashboardSettingsIndexRouteImport } from './routes/_dashboard/settings/index'
 import { Route as DashboardEmailsIndexRouteImport } from './routes/_dashboard/emails/index'
 import { Route as DashboardContactsIndexRouteImport } from './routes/_dashboard/contacts/index'
+import { Route as DashboardApiKeysIndexRouteImport } from './routes/_dashboard/api-keys/index'
 import { Route as DashboardSettingsWorkspaceRouteImport } from './routes/_dashboard/settings/workspace'
 import { Route as DashboardSettingsThemeRouteImport } from './routes/_dashboard/settings/theme'
 import { Route as DashboardSettingsTeamsRouteImport } from './routes/_dashboard/settings/teams'
@@ -42,7 +43,7 @@ import { Route as DashboardEmailsReceivedRouteImport } from './routes/_dashboard
 import { Route as DashboardContactsPropertiesRouteImport } from './routes/_dashboard/contacts/properties'
 import { Route as DashboardContactsGroupsRouteImport } from './routes/_dashboard/contacts/groups'
 import { Route as DashboardContactsChannelsRouteImport } from './routes/_dashboard/contacts/channels'
-import { Route as DashboardApiKeysApiKeyIdRouteImport } from './routes/_dashboard/api-keys.$apiKeyId'
+import { Route as DashboardApiKeysApiKeyIdRouteImport } from './routes/_dashboard/api-keys/$apiKeyId'
 import { Route as DashboardSettingsBillingIndexRouteImport } from './routes/_dashboard/settings/billing/index'
 import { Route as DashboardSettingsBillingPlansRouteImport } from './routes/_dashboard/settings/billing/plans'
 
@@ -155,6 +156,11 @@ const DashboardContactsIndexRoute = DashboardContactsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardContactsRoute,
 } as any)
+const DashboardApiKeysIndexRoute = DashboardApiKeysIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardApiKeysRoute,
+} as any)
 const DashboardSettingsWorkspaceRoute =
   DashboardSettingsWorkspaceRouteImport.update({
     id: '/workspace',
@@ -266,6 +272,7 @@ export interface FileRoutesByFullPath {
   '/settings/teams': typeof DashboardSettingsTeamsRoute
   '/settings/theme': typeof DashboardSettingsThemeRoute
   '/settings/workspace': typeof DashboardSettingsWorkspaceRoute
+  '/api-keys/': typeof DashboardApiKeysIndexRoute
   '/contacts/': typeof DashboardContactsIndexRoute
   '/emails/': typeof DashboardEmailsIndexRoute
   '/settings/': typeof DashboardSettingsIndexRoute
@@ -278,7 +285,6 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
   '/agent-inbox': typeof DashboardAgentInboxRoute
-  '/api-keys': typeof DashboardApiKeysRouteWithChildren
   '/domain': typeof DashboardDomainRoute
   '/integrations': typeof DashboardIntegrationsRoute
   '/logs': typeof DashboardLogsRoute
@@ -299,6 +305,7 @@ export interface FileRoutesByTo {
   '/settings/teams': typeof DashboardSettingsTeamsRoute
   '/settings/theme': typeof DashboardSettingsThemeRoute
   '/settings/workspace': typeof DashboardSettingsWorkspaceRoute
+  '/api-keys': typeof DashboardApiKeysIndexRoute
   '/contacts': typeof DashboardContactsIndexRoute
   '/emails': typeof DashboardEmailsIndexRoute
   '/settings': typeof DashboardSettingsIndexRoute
@@ -338,6 +345,7 @@ export interface FileRoutesById {
   '/_dashboard/settings/teams': typeof DashboardSettingsTeamsRoute
   '/_dashboard/settings/theme': typeof DashboardSettingsThemeRoute
   '/_dashboard/settings/workspace': typeof DashboardSettingsWorkspaceRoute
+  '/_dashboard/api-keys/': typeof DashboardApiKeysIndexRoute
   '/_dashboard/contacts/': typeof DashboardContactsIndexRoute
   '/_dashboard/emails/': typeof DashboardEmailsIndexRoute
   '/_dashboard/settings/': typeof DashboardSettingsIndexRoute
@@ -377,6 +385,7 @@ export interface FileRouteTypes {
     | '/settings/teams'
     | '/settings/theme'
     | '/settings/workspace'
+    | '/api-keys/'
     | '/contacts/'
     | '/emails/'
     | '/settings/'
@@ -389,7 +398,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/signup'
     | '/agent-inbox'
-    | '/api-keys'
     | '/domain'
     | '/integrations'
     | '/logs'
@@ -410,6 +418,7 @@ export interface FileRouteTypes {
     | '/settings/teams'
     | '/settings/theme'
     | '/settings/workspace'
+    | '/api-keys'
     | '/contacts'
     | '/emails'
     | '/settings'
@@ -448,6 +457,7 @@ export interface FileRouteTypes {
     | '/_dashboard/settings/teams'
     | '/_dashboard/settings/theme'
     | '/_dashboard/settings/workspace'
+    | '/_dashboard/api-keys/'
     | '/_dashboard/contacts/'
     | '/_dashboard/emails/'
     | '/_dashboard/settings/'
@@ -619,6 +629,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardContactsIndexRouteImport
       parentRoute: typeof DashboardContactsRoute
     }
+    '/_dashboard/api-keys/': {
+      id: '/_dashboard/api-keys/'
+      path: '/'
+      fullPath: '/api-keys/'
+      preLoaderRoute: typeof DashboardApiKeysIndexRouteImport
+      parentRoute: typeof DashboardApiKeysRoute
+    }
     '/_dashboard/settings/workspace': {
       id: '/_dashboard/settings/workspace'
       path: '/workspace'
@@ -722,10 +739,12 @@ declare module '@tanstack/react-router' {
 
 interface DashboardApiKeysRouteChildren {
   DashboardApiKeysApiKeyIdRoute: typeof DashboardApiKeysApiKeyIdRoute
+  DashboardApiKeysIndexRoute: typeof DashboardApiKeysIndexRoute
 }
 
 const DashboardApiKeysRouteChildren: DashboardApiKeysRouteChildren = {
   DashboardApiKeysApiKeyIdRoute: DashboardApiKeysApiKeyIdRoute,
+  DashboardApiKeysIndexRoute: DashboardApiKeysIndexRoute,
 }
 
 const DashboardApiKeysRouteWithChildren =
