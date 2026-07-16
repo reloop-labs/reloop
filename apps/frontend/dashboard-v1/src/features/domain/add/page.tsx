@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { useHotkeys } from "react-hotkeys-hook";
 import { DomainPreview } from "#/features/onboarding/domain-preview";
 import { useInvalidateDomains } from "../hooks/use-domains-query";
 import type { DomainListResponse, DomainResponse } from "../types";
@@ -105,8 +106,35 @@ export function AddDomainPage() {
 		}
 	};
 
+	useHotkeys(
+		"mod+enter",
+		(e) => {
+			e.preventDefault();
+			if (status !== "loading") {
+				void handleSubmit(onSubmit)();
+			}
+		},
+		{ enableOnFormTags: true },
+	);
+
+	useHotkeys(
+		"esc",
+		() => {
+			if (
+				document.querySelector(
+					'[role="dialog"], [role="alertdialog"], [data-radix-popper-content-wrapper]',
+				)
+			) {
+				return;
+			}
+			void navigate({ to: "/domain" });
+		},
+		{ enableOnFormTags: true },
+	);
+
 	return (
 		<div className="mx-auto grid min-h-[calc(100vh-64px)] w-full max-w-5xl lg:grid-cols-2">
+			{/* Left: form column */}
 			<div className="mx-auto w-full max-w-md px-6 py-12 lg:px-8">
 				<AddDomainHeader />
 				<form
@@ -116,73 +144,102 @@ export function AddDomainPage() {
 					<DomainInputField
 						register={register}
 						errors={formState.errors}
-						domain={watchedDomain}
 						isLoading={status === "loading"}
+						domain={watchedDomain}
 					/>
 
-					<button
-						type="button"
-						onClick={() => setIsAdvancedOpen((o) => !o)}
-						className="mt-4 flex items-center gap-1.5 font-medium text-text-sub-600 text-xs hover:text-text-strong-950"
-					>
-						<Icon
-							name="chevron-down"
-							className={cn(
-								"h-3.5 w-3.5 transition-transform",
-								isAdvancedOpen && "rotate-180",
-							)}
-						/>
-						Advanced options
-					</button>
-
-					<AnimatePresence initial={false}>
-						{isAdvancedOpen && (
-							<motion.div
-								initial={{ height: 0, opacity: 0 }}
-								animate={{ height: "auto", opacity: 1 }}
-								exit={{ height: 0, opacity: 0 }}
-								className="overflow-hidden"
-							>
-								<div className="pt-4">
-									<AdvancedOptions
-										control={control}
-										register={register}
-										isLoading={status === "loading"}
-										domain={watchedDomain}
-										errors={formState.errors}
-									/>
-								</div>
-							</motion.div>
-						)}
-					</AnimatePresence>
-
-					<div className="mt-8 flex items-center gap-2">
-						<Link
-							to="/domain"
-							className={`${Button.buttonVariants({ variant: "neutral", mode: "stroke", size: "small" }).root()}`}
+					<div className="mt-2 w-full">
+						<button
+							type="button"
+							onClick={() => setIsAdvancedOpen((open) => !open)}
+							className="flex w-full cursor-pointer items-center gap-1.5 py-1 outline-none"
 						>
-							Cancel
-						</Link>
+							<span className="font-medium text-sm text-text-strong-950">
+								Advanced options
+							</span>
+							<Icon
+								name="chevron-down"
+								className={cn(
+									"size-4 shrink-0 text-text-sub-600 transition-transform duration-200",
+									isAdvancedOpen && "rotate-180",
+								)}
+							/>
+						</button>
+						<AnimatePresence initial={false}>
+							{isAdvancedOpen && (
+								<motion.div
+									initial={{ height: 0, opacity: 0 }}
+									animate={{ height: "auto", opacity: 1 }}
+									exit={{ height: 0, opacity: 0 }}
+									transition={{ duration: 0.2, ease: "easeInOut" }}
+									className="overflow-hidden"
+								>
+									<div className="my-2 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
+										<AdvancedOptions
+											control={control}
+											register={register}
+											domain={watchedDomain}
+											isLoading={status === "loading"}
+											errors={formState.errors}
+										/>
+									</div>
+								</motion.div>
+							)}
+						</AnimatePresence>
+					</div>
+
+					<div className="mt-3 flex items-center gap-3">
 						<Button.Root
 							type="submit"
 							variant="neutral"
-							size="small"
-							disabled={status === "loading" || !formState.isValid}
+							mode="filled"
+							size="xsmall"
+							disabled={status === "loading"}
 						>
 							{status === "loading" ? (
 								<>
 									<Spinner size={14} color="currentColor" />
-									Adding…
+									Adding Domain...
 								</>
 							) : (
-								"Continue"
+								<>
+									Add Domain
+									<span className="inline-flex items-center gap-0.5">
+										<Icon
+											name="command"
+											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+										/>
+										<Icon
+											name="enter"
+											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+										/>
+									</span>
+								</>
 							)}
+						</Button.Root>
+						<Button.Root
+							variant="neutral"
+							mode="stroke"
+							size="xsmall"
+							asChild
+							disabled={status === "loading"}
+						>
+							<Link to="/domain">
+								Cancel
+								<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
+									Esc
+								</span>
+							</Link>
 						</Button.Root>
 					</div>
 				</form>
 			</div>
-			<div className="hidden items-center justify-center border-stroke-soft-100 border-l bg-bg-weak-50/30 lg:flex dark:border-stroke-soft-100/40">
-				<DomainPreview domain={watchedDomain} />
+
+			{/* Right: email preview — sticky, aligned with form column */}
+			<div className="sticky top-0 hidden h-[calc(100vh-64px)] items-start justify-center overflow-hidden pt-12 lg:flex">
+				<div className="relative h-full w-full">
+					<DomainPreview domain={watchedDomain} variant="domain" />
+				</div>
 			</div>
 		</div>
 	);

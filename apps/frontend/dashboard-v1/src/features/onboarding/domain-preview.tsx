@@ -3,19 +3,40 @@ import { Icon } from "@reloop/ui/icon";
 export function DomainPreview({
 	domain,
 	logoUrl,
+	variant = "onboarding",
 }: {
 	domain?: string;
 	logoUrl?: string;
+	variant?: "onboarding" | "domain";
 }) {
 	const domainName = domain ? domain.split(".")[0] || "Sender" : "Sender";
 	const displayDomain = domain || "";
 	const senderEmail = domain ? `hello@${domain}` : "";
 	const toEmail = "sundar@google.com";
 	const avatarInitial = domainName[0]?.toUpperCase() || "S";
+	const isDomainVariant = variant === "domain";
+	const skeletonClass = isDomainVariant
+		? "h-4 rounded bg-bg-weak-50"
+		: "h-4 rounded bg-bg-soft-200";
 
 	return (
-		<div className="absolute top-32 left-28">
-			<div className="relative flex h-[520px] w-[480px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-2xl dark:border-stroke-soft-100/40">
+		<div
+			className={
+				isDomainVariant
+					? "absolute top-[176px] left-4"
+					: "absolute top-32 left-28"
+			}
+		>
+			<div
+				className={
+					isDomainVariant
+						? "w-[920px] transform overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 transition-all dark:border-stroke-soft-100/40"
+						: "relative flex h-[520px] w-[480px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-2xl dark:border-stroke-soft-100/40"
+				}
+				style={
+					isDomainVariant ? { maxHeight: "calc(100% + 16px)" } : undefined
+				}
+			>
 				<div className="flex items-center gap-2 border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/40">
 					<div className="flex gap-1.5">
 						<div className="h-3 w-3 rounded-full bg-error-base/80" />
@@ -24,7 +45,13 @@ export function DomainPreview({
 					</div>
 				</div>
 
-				<div className="relative bg-bg-white-0 p-6">
+				<div
+					className={
+						isDomainVariant
+							? "relative bg-bg-white-0 px-6 pt-5 pb-0"
+							: "relative bg-bg-white-0 p-6"
+					}
+				>
 					<div className="mb-5 flex items-start gap-4">
 						{logoUrl ? (
 							<img
@@ -58,16 +85,30 @@ export function DomainPreview({
 								</span>
 							</div>
 
-							<div className="mb-2 flex cursor-pointer items-center gap-1 text-text-soft-400 text-xs">
-								to me{" "}
-								<div className="mt-0.5 h-0 w-0 border-t-[4px] border-t-text-soft-400 border-r-[3px] border-r-transparent border-l-[3px] border-l-transparent" />
-							</div>
+							{!isDomainVariant && (
+								<div className="mb-2 flex cursor-pointer items-center gap-1 text-text-soft-400 text-xs">
+									to me{" "}
+									<div className="mt-0.5 h-0 w-0 border-t-[4px] border-t-text-soft-400 border-r-[3px] border-r-transparent border-l-[3px] border-l-transparent" />
+								</div>
+							)}
 
 							<div className="relative mt-2">
-								<div className="relative rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-4 text-text-sub-600 text-xs leading-relaxed shadow-stroke-soft-200/50 dark:border-stroke-soft-100/40">
+								<div
+									className={
+										isDomainVariant
+											? "relative rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-3 text-text-sub-600 text-xs leading-relaxed shadow-stroke-soft-200/50 dark:border-stroke-soft-100/40"
+											: "relative rounded-lg border border-stroke-soft-100 bg-bg-white-0 p-4 text-text-sub-600 text-xs leading-relaxed shadow-stroke-soft-200/50 dark:border-stroke-soft-100/40"
+									}
+								>
 									<div className="-top-1.5 absolute left-3 h-3 w-3 rotate-45 transform border-stroke-soft-100 border-t border-l bg-bg-white-0 dark:border-stroke-soft-100/40" />
 
-									<div className="grid grid-cols-[100px_1fr] gap-y-2.5">
+									<div
+										className={
+											isDomainVariant
+												? "grid grid-cols-[100px_1fr] gap-y-2"
+												: "grid grid-cols-[100px_1fr] gap-y-2.5"
+										}
+									>
 										<div className="pr-3 text-right text-text-soft-400">
 											from:
 										</div>
@@ -80,7 +121,7 @@ export function DomainPreview({
 													</span>
 												</>
 											) : (
-												<div className="h-4 w-48 rounded bg-bg-soft-200" />
+												<div className={`${skeletonClass} w-48`} />
 											)}
 										</div>
 
@@ -115,7 +156,7 @@ export function DomainPreview({
 													{displayDomain}
 												</span>
 											) : (
-												<div className="h-4 w-32 rounded bg-bg-soft-200" />
+												<div className={`${skeletonClass} w-32`} />
 											)}
 										</div>
 
@@ -128,7 +169,7 @@ export function DomainPreview({
 													{displayDomain}
 												</span>
 											) : (
-												<div className="h-4 w-32 rounded bg-bg-soft-200" />
+												<div className={`${skeletonClass} w-32`} />
 											)}
 										</div>
 
@@ -148,19 +189,21 @@ export function DomainPreview({
 						</div>
 					</div>
 
-					<div className="mt-8 space-y-4 opacity-40 blur-[0.5px]">
-						<div className="h-4 w-full rounded bg-bg-soft-200" />
-						<div className="h-4 w-11/12 rounded bg-bg-soft-200" />
-						<div className="h-4 w-4/5 rounded bg-bg-soft-200" />
+					{!isDomainVariant && (
+						<div className="mt-8 space-y-4 opacity-40 blur-[0.5px]">
+							<div className="h-4 w-full rounded bg-bg-soft-200" />
+							<div className="h-4 w-11/12 rounded bg-bg-soft-200" />
+							<div className="h-4 w-4/5 rounded bg-bg-soft-200" />
 
-						<div className="mt-8 flex h-40 w-full items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50 text-text-soft-400">
-							<Icon name="info" />
-						</div>
+							<div className="mt-8 flex h-40 w-full items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50 text-text-soft-400">
+								<Icon name="info" />
+							</div>
 
-						<div className="mt-6 flex justify-center">
-							<div className="h-10 w-32 rounded-lg bg-primary-lighter" />
+							<div className="mt-6 flex justify-center">
+								<div className="h-10 w-32 rounded-lg bg-primary-lighter" />
+							</div>
 						</div>
-					</div>
+					)}
 				</div>
 			</div>
 		</div>
