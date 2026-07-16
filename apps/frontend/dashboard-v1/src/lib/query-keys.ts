@@ -50,6 +50,14 @@ export const queryKeys = {
 			[...queryKeys.domain.all, "detail", domainId] as const,
 		nameservers: (domainId: string) =>
 			[...queryKeys.domain.all, "nameservers", domainId] as const,
-		list: () => [...queryKeys.domain.all, "list"] as const,
+		list: (params?: {
+			page: number;
+			limit: number;
+			status: string;
+			q: string;
+		}) =>
+			params
+				? ([...queryKeys.domain.all, "list", params] as const)
+				: ([...queryKeys.domain.all, "list"] as const),
 	},
 } as const;

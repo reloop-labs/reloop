@@ -31,6 +31,7 @@ import { Route as DashboardAgentInboxRouteImport } from './routes/_dashboard/age
 import { Route as DashboardSettingsIndexRouteImport } from './routes/_dashboard/settings/index'
 import { Route as DashboardLogsIndexRouteImport } from './routes/_dashboard/logs/index'
 import { Route as DashboardEmailsIndexRouteImport } from './routes/_dashboard/emails/index'
+import { Route as DashboardDomainIndexRouteImport } from './routes/_dashboard/domain/index'
 import { Route as DashboardContactsIndexRouteImport } from './routes/_dashboard/contacts/index'
 import { Route as DashboardApiKeysIndexRouteImport } from './routes/_dashboard/api-keys/index'
 import { Route as DashboardSettingsWorkspaceRouteImport } from './routes/_dashboard/settings/workspace'
@@ -42,12 +43,16 @@ import { Route as DashboardSettingsBillingRouteImport } from './routes/_dashboar
 import { Route as DashboardLogsLogIdRouteImport } from './routes/_dashboard/logs/$logId'
 import { Route as DashboardEmailsSentRouteImport } from './routes/_dashboard/emails/sent'
 import { Route as DashboardEmailsReceivedRouteImport } from './routes/_dashboard/emails/received'
+import { Route as DashboardDomainAddRouteImport } from './routes/_dashboard/domain/add'
+import { Route as DashboardDomainDomainIdRouteImport } from './routes/_dashboard/domain/$domainId'
 import { Route as DashboardContactsPropertiesRouteImport } from './routes/_dashboard/contacts/properties'
 import { Route as DashboardContactsGroupsRouteImport } from './routes/_dashboard/contacts/groups'
 import { Route as DashboardContactsChannelsRouteImport } from './routes/_dashboard/contacts/channels'
 import { Route as DashboardApiKeysApiKeyIdRouteImport } from './routes/_dashboard/api-keys/$apiKeyId'
 import { Route as DashboardSettingsBillingIndexRouteImport } from './routes/_dashboard/settings/billing/index'
+import { Route as DashboardDomainAddIndexRouteImport } from './routes/_dashboard/domain/add/index'
 import { Route as DashboardSettingsBillingPlansRouteImport } from './routes/_dashboard/settings/billing/plans'
+import { Route as DashboardDomainAddDomainIdRouteImport } from './routes/_dashboard/domain/add/$domainId'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -158,6 +163,11 @@ const DashboardEmailsIndexRoute = DashboardEmailsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardEmailsRoute,
 } as any)
+const DashboardDomainIndexRoute = DashboardDomainIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardDomainRoute,
+} as any)
 const DashboardContactsIndexRoute = DashboardContactsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -217,6 +227,16 @@ const DashboardEmailsReceivedRoute = DashboardEmailsReceivedRouteImport.update({
   path: '/received',
   getParentRoute: () => DashboardEmailsRoute,
 } as any)
+const DashboardDomainAddRoute = DashboardDomainAddRouteImport.update({
+  id: '/add',
+  path: '/add',
+  getParentRoute: () => DashboardDomainRoute,
+} as any)
+const DashboardDomainDomainIdRoute = DashboardDomainDomainIdRouteImport.update({
+  id: '/$domainId',
+  path: '/$domainId',
+  getParentRoute: () => DashboardDomainRoute,
+} as any)
 const DashboardContactsPropertiesRoute =
   DashboardContactsPropertiesRouteImport.update({
     id: '/properties',
@@ -246,11 +266,22 @@ const DashboardSettingsBillingIndexRoute =
     path: '/',
     getParentRoute: () => DashboardSettingsBillingRoute,
   } as any)
+const DashboardDomainAddIndexRoute = DashboardDomainAddIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardDomainAddRoute,
+} as any)
 const DashboardSettingsBillingPlansRoute =
   DashboardSettingsBillingPlansRouteImport.update({
     id: '/plans',
     path: '/plans',
     getParentRoute: () => DashboardSettingsBillingRoute,
+  } as any)
+const DashboardDomainAddDomainIdRoute =
+  DashboardDomainAddDomainIdRouteImport.update({
+    id: '/$domainId',
+    path: '/$domainId',
+    getParentRoute: () => DashboardDomainAddRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -262,7 +293,7 @@ export interface FileRoutesByFullPath {
   '/agent-inbox': typeof DashboardAgentInboxRoute
   '/api-keys': typeof DashboardApiKeysRouteWithChildren
   '/contacts': typeof DashboardContactsRouteWithChildren
-  '/domain': typeof DashboardDomainRoute
+  '/domain': typeof DashboardDomainRouteWithChildren
   '/emails': typeof DashboardEmailsRouteWithChildren
   '/integrations': typeof DashboardIntegrationsRoute
   '/logs': typeof DashboardLogsRouteWithChildren
@@ -276,6 +307,8 @@ export interface FileRoutesByFullPath {
   '/contacts/channels': typeof DashboardContactsChannelsRoute
   '/contacts/groups': typeof DashboardContactsGroupsRoute
   '/contacts/properties': typeof DashboardContactsPropertiesRoute
+  '/domain/$domainId': typeof DashboardDomainDomainIdRoute
+  '/domain/add': typeof DashboardDomainAddRouteWithChildren
   '/emails/received': typeof DashboardEmailsReceivedRoute
   '/emails/sent': typeof DashboardEmailsSentRoute
   '/logs/$logId': typeof DashboardLogsLogIdRoute
@@ -287,10 +320,13 @@ export interface FileRoutesByFullPath {
   '/settings/workspace': typeof DashboardSettingsWorkspaceRoute
   '/api-keys/': typeof DashboardApiKeysIndexRoute
   '/contacts/': typeof DashboardContactsIndexRoute
+  '/domain/': typeof DashboardDomainIndexRoute
   '/emails/': typeof DashboardEmailsIndexRoute
   '/logs/': typeof DashboardLogsIndexRoute
   '/settings/': typeof DashboardSettingsIndexRoute
+  '/domain/add/$domainId': typeof DashboardDomainAddDomainIdRoute
   '/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
+  '/domain/add/': typeof DashboardDomainAddIndexRoute
   '/settings/billing/': typeof DashboardSettingsBillingIndexRoute
 }
 export interface FileRoutesByTo {
@@ -299,7 +335,6 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
   '/agent-inbox': typeof DashboardAgentInboxRoute
-  '/domain': typeof DashboardDomainRoute
   '/integrations': typeof DashboardIntegrationsRoute
   '/metrics': typeof DashboardMetricsRoute
   '/smtp': typeof DashboardSmtpRoute
@@ -311,6 +346,7 @@ export interface FileRoutesByTo {
   '/contacts/channels': typeof DashboardContactsChannelsRoute
   '/contacts/groups': typeof DashboardContactsGroupsRoute
   '/contacts/properties': typeof DashboardContactsPropertiesRoute
+  '/domain/$domainId': typeof DashboardDomainDomainIdRoute
   '/emails/received': typeof DashboardEmailsReceivedRoute
   '/emails/sent': typeof DashboardEmailsSentRoute
   '/logs/$logId': typeof DashboardLogsLogIdRoute
@@ -321,10 +357,13 @@ export interface FileRoutesByTo {
   '/settings/workspace': typeof DashboardSettingsWorkspaceRoute
   '/api-keys': typeof DashboardApiKeysIndexRoute
   '/contacts': typeof DashboardContactsIndexRoute
+  '/domain': typeof DashboardDomainIndexRoute
   '/emails': typeof DashboardEmailsIndexRoute
   '/logs': typeof DashboardLogsIndexRoute
   '/settings': typeof DashboardSettingsIndexRoute
+  '/domain/add/$domainId': typeof DashboardDomainAddDomainIdRoute
   '/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
+  '/domain/add': typeof DashboardDomainAddIndexRoute
   '/settings/billing': typeof DashboardSettingsBillingIndexRoute
 }
 export interface FileRoutesById {
@@ -337,7 +376,7 @@ export interface FileRoutesById {
   '/_dashboard/agent-inbox': typeof DashboardAgentInboxRoute
   '/_dashboard/api-keys': typeof DashboardApiKeysRouteWithChildren
   '/_dashboard/contacts': typeof DashboardContactsRouteWithChildren
-  '/_dashboard/domain': typeof DashboardDomainRoute
+  '/_dashboard/domain': typeof DashboardDomainRouteWithChildren
   '/_dashboard/emails': typeof DashboardEmailsRouteWithChildren
   '/_dashboard/integrations': typeof DashboardIntegrationsRoute
   '/_dashboard/logs': typeof DashboardLogsRouteWithChildren
@@ -352,6 +391,8 @@ export interface FileRoutesById {
   '/_dashboard/contacts/channels': typeof DashboardContactsChannelsRoute
   '/_dashboard/contacts/groups': typeof DashboardContactsGroupsRoute
   '/_dashboard/contacts/properties': typeof DashboardContactsPropertiesRoute
+  '/_dashboard/domain/$domainId': typeof DashboardDomainDomainIdRoute
+  '/_dashboard/domain/add': typeof DashboardDomainAddRouteWithChildren
   '/_dashboard/emails/received': typeof DashboardEmailsReceivedRoute
   '/_dashboard/emails/sent': typeof DashboardEmailsSentRoute
   '/_dashboard/logs/$logId': typeof DashboardLogsLogIdRoute
@@ -363,10 +404,13 @@ export interface FileRoutesById {
   '/_dashboard/settings/workspace': typeof DashboardSettingsWorkspaceRoute
   '/_dashboard/api-keys/': typeof DashboardApiKeysIndexRoute
   '/_dashboard/contacts/': typeof DashboardContactsIndexRoute
+  '/_dashboard/domain/': typeof DashboardDomainIndexRoute
   '/_dashboard/emails/': typeof DashboardEmailsIndexRoute
   '/_dashboard/logs/': typeof DashboardLogsIndexRoute
   '/_dashboard/settings/': typeof DashboardSettingsIndexRoute
+  '/_dashboard/domain/add/$domainId': typeof DashboardDomainAddDomainIdRoute
   '/_dashboard/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
+  '/_dashboard/domain/add/': typeof DashboardDomainAddIndexRoute
   '/_dashboard/settings/billing/': typeof DashboardSettingsBillingIndexRoute
 }
 export interface FileRouteTypes {
@@ -394,6 +438,8 @@ export interface FileRouteTypes {
     | '/contacts/channels'
     | '/contacts/groups'
     | '/contacts/properties'
+    | '/domain/$domainId'
+    | '/domain/add'
     | '/emails/received'
     | '/emails/sent'
     | '/logs/$logId'
@@ -405,10 +451,13 @@ export interface FileRouteTypes {
     | '/settings/workspace'
     | '/api-keys/'
     | '/contacts/'
+    | '/domain/'
     | '/emails/'
     | '/logs/'
     | '/settings/'
+    | '/domain/add/$domainId'
     | '/settings/billing/plans'
+    | '/domain/add/'
     | '/settings/billing/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -417,7 +466,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/signup'
     | '/agent-inbox'
-    | '/domain'
     | '/integrations'
     | '/metrics'
     | '/smtp'
@@ -429,6 +477,7 @@ export interface FileRouteTypes {
     | '/contacts/channels'
     | '/contacts/groups'
     | '/contacts/properties'
+    | '/domain/$domainId'
     | '/emails/received'
     | '/emails/sent'
     | '/logs/$logId'
@@ -439,10 +488,13 @@ export interface FileRouteTypes {
     | '/settings/workspace'
     | '/api-keys'
     | '/contacts'
+    | '/domain'
     | '/emails'
     | '/logs'
     | '/settings'
+    | '/domain/add/$domainId'
     | '/settings/billing/plans'
+    | '/domain/add'
     | '/settings/billing'
   id:
     | '__root__'
@@ -469,6 +521,8 @@ export interface FileRouteTypes {
     | '/_dashboard/contacts/channels'
     | '/_dashboard/contacts/groups'
     | '/_dashboard/contacts/properties'
+    | '/_dashboard/domain/$domainId'
+    | '/_dashboard/domain/add'
     | '/_dashboard/emails/received'
     | '/_dashboard/emails/sent'
     | '/_dashboard/logs/$logId'
@@ -480,10 +534,13 @@ export interface FileRouteTypes {
     | '/_dashboard/settings/workspace'
     | '/_dashboard/api-keys/'
     | '/_dashboard/contacts/'
+    | '/_dashboard/domain/'
     | '/_dashboard/emails/'
     | '/_dashboard/logs/'
     | '/_dashboard/settings/'
+    | '/_dashboard/domain/add/$domainId'
     | '/_dashboard/settings/billing/plans'
+    | '/_dashboard/domain/add/'
     | '/_dashboard/settings/billing/'
   fileRoutesById: FileRoutesById
 }
@@ -651,6 +708,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardEmailsIndexRouteImport
       parentRoute: typeof DashboardEmailsRoute
     }
+    '/_dashboard/domain/': {
+      id: '/_dashboard/domain/'
+      path: '/'
+      fullPath: '/domain/'
+      preLoaderRoute: typeof DashboardDomainIndexRouteImport
+      parentRoute: typeof DashboardDomainRoute
+    }
     '/_dashboard/contacts/': {
       id: '/_dashboard/contacts/'
       path: '/'
@@ -728,6 +792,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardEmailsReceivedRouteImport
       parentRoute: typeof DashboardEmailsRoute
     }
+    '/_dashboard/domain/add': {
+      id: '/_dashboard/domain/add'
+      path: '/add'
+      fullPath: '/domain/add'
+      preLoaderRoute: typeof DashboardDomainAddRouteImport
+      parentRoute: typeof DashboardDomainRoute
+    }
+    '/_dashboard/domain/$domainId': {
+      id: '/_dashboard/domain/$domainId'
+      path: '/$domainId'
+      fullPath: '/domain/$domainId'
+      preLoaderRoute: typeof DashboardDomainDomainIdRouteImport
+      parentRoute: typeof DashboardDomainRoute
+    }
     '/_dashboard/contacts/properties': {
       id: '/_dashboard/contacts/properties'
       path: '/properties'
@@ -763,12 +841,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsBillingIndexRouteImport
       parentRoute: typeof DashboardSettingsBillingRoute
     }
+    '/_dashboard/domain/add/': {
+      id: '/_dashboard/domain/add/'
+      path: '/'
+      fullPath: '/domain/add/'
+      preLoaderRoute: typeof DashboardDomainAddIndexRouteImport
+      parentRoute: typeof DashboardDomainAddRoute
+    }
     '/_dashboard/settings/billing/plans': {
       id: '/_dashboard/settings/billing/plans'
       path: '/plans'
       fullPath: '/settings/billing/plans'
       preLoaderRoute: typeof DashboardSettingsBillingPlansRouteImport
       parentRoute: typeof DashboardSettingsBillingRoute
+    }
+    '/_dashboard/domain/add/$domainId': {
+      id: '/_dashboard/domain/add/$domainId'
+      path: '/$domainId'
+      fullPath: '/domain/add/$domainId'
+      preLoaderRoute: typeof DashboardDomainAddDomainIdRouteImport
+      parentRoute: typeof DashboardDomainAddRoute
     }
   }
 }
@@ -802,6 +894,35 @@ const DashboardContactsRouteChildren: DashboardContactsRouteChildren = {
 
 const DashboardContactsRouteWithChildren =
   DashboardContactsRoute._addFileChildren(DashboardContactsRouteChildren)
+
+interface DashboardDomainAddRouteChildren {
+  DashboardDomainAddDomainIdRoute: typeof DashboardDomainAddDomainIdRoute
+  DashboardDomainAddIndexRoute: typeof DashboardDomainAddIndexRoute
+}
+
+const DashboardDomainAddRouteChildren: DashboardDomainAddRouteChildren = {
+  DashboardDomainAddDomainIdRoute: DashboardDomainAddDomainIdRoute,
+  DashboardDomainAddIndexRoute: DashboardDomainAddIndexRoute,
+}
+
+const DashboardDomainAddRouteWithChildren =
+  DashboardDomainAddRoute._addFileChildren(DashboardDomainAddRouteChildren)
+
+interface DashboardDomainRouteChildren {
+  DashboardDomainDomainIdRoute: typeof DashboardDomainDomainIdRoute
+  DashboardDomainAddRoute: typeof DashboardDomainAddRouteWithChildren
+  DashboardDomainIndexRoute: typeof DashboardDomainIndexRoute
+}
+
+const DashboardDomainRouteChildren: DashboardDomainRouteChildren = {
+  DashboardDomainDomainIdRoute: DashboardDomainDomainIdRoute,
+  DashboardDomainAddRoute: DashboardDomainAddRouteWithChildren,
+  DashboardDomainIndexRoute: DashboardDomainIndexRoute,
+}
+
+const DashboardDomainRouteWithChildren = DashboardDomainRoute._addFileChildren(
+  DashboardDomainRouteChildren,
+)
 
 interface DashboardEmailsRouteChildren {
   DashboardEmailsReceivedRoute: typeof DashboardEmailsReceivedRoute
@@ -876,7 +997,7 @@ interface DashboardRouteChildren {
   DashboardAgentInboxRoute: typeof DashboardAgentInboxRoute
   DashboardApiKeysRoute: typeof DashboardApiKeysRouteWithChildren
   DashboardContactsRoute: typeof DashboardContactsRouteWithChildren
-  DashboardDomainRoute: typeof DashboardDomainRoute
+  DashboardDomainRoute: typeof DashboardDomainRouteWithChildren
   DashboardEmailsRoute: typeof DashboardEmailsRouteWithChildren
   DashboardIntegrationsRoute: typeof DashboardIntegrationsRoute
   DashboardLogsRoute: typeof DashboardLogsRouteWithChildren
@@ -893,7 +1014,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAgentInboxRoute: DashboardAgentInboxRoute,
   DashboardApiKeysRoute: DashboardApiKeysRouteWithChildren,
   DashboardContactsRoute: DashboardContactsRouteWithChildren,
-  DashboardDomainRoute: DashboardDomainRoute,
+  DashboardDomainRoute: DashboardDomainRouteWithChildren,
   DashboardEmailsRoute: DashboardEmailsRouteWithChildren,
   DashboardIntegrationsRoute: DashboardIntegrationsRoute,
   DashboardLogsRoute: DashboardLogsRouteWithChildren,

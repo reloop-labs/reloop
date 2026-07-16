@@ -1,11 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PagePlaceholder } from "#/features/dashboard/page-placeholder";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
+/** Layout for /domain, /domain/add, /domain/$domainId — must render Outlet. */
 export const Route = createFileRoute("/_dashboard/domain")({
-	component: () => (
-		<PagePlaceholder
-			title="Domain"
-			description="Sending domains will live here."
-		/>
-	),
+	component: () => <Outlet />,
 });
