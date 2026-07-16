@@ -1,11 +1,24 @@
+import { AgentMailboxList } from "#/features/agent-inbox/components/agent-mailbox-list";
+import { AgentInboxProvider } from "#/features/agent-inbox/components/agent-inbox-provider";
 import { createFileRoute } from "@tanstack/react-router";
-import { PagePlaceholder } from "#/features/dashboard/page-placeholder";
 
 export const Route = createFileRoute("/_dashboard/agent-inbox")({
-	component: () => (
-		<PagePlaceholder
-			title="Agent Inbox"
-			description="Agent mailbox and conversations will live here."
-		/>
-	),
+	component: AgentInboxListRoute,
+	head: () => ({
+		meta: [
+			{ title: "Agent Inbox · Reloop" },
+			{
+				name: "description",
+				content: "Manage agent mailbox addresses and open conversations.",
+			},
+		],
+	}),
 });
+
+function AgentInboxListRoute() {
+	return (
+		<AgentInboxProvider>
+			<AgentMailboxList />
+		</AgentInboxProvider>
+	);
+}

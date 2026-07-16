@@ -14,14 +14,24 @@ function useIsTemplateEditor() {
 }
 
 /**
+ * Full-screen agent mailbox UI lives at /inbox/$mailboxId/*
+ * (matches Next: fixed overlay outside the main layout chrome).
+ */
+function useIsAgentMailbox() {
+	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	return Boolean(pathname.match(/\/inbox\/[^/]+/));
+}
+
+/**
  * App chrome for authenticated dashboard pages.
  * Matches Next dashboard layout: weak outer bg, sidebar, top bar, rounded main panel.
- * Template editor gets a full-viewport shell without sidebar/header.
+ * Template editor and agent mailbox get a full-viewport shell without sidebar/header.
  */
 export function DashboardShell({ children }: { children: ReactNode }) {
 	const isTemplateEditor = useIsTemplateEditor();
+	const isAgentMailbox = useIsAgentMailbox();
 
-	if (isTemplateEditor) {
+	if (isTemplateEditor || isAgentMailbox) {
 		return (
 			<div className="flex h-screen flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
 				{children}

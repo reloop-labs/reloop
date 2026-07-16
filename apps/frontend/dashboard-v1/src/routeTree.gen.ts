@@ -23,6 +23,7 @@ import { Route as DashboardSettingsRouteImport } from './routes/_dashboard/setti
 import { Route as DashboardMetricsRouteImport } from './routes/_dashboard/metrics'
 import { Route as DashboardLogsRouteImport } from './routes/_dashboard/logs'
 import { Route as DashboardIntegrationsRouteImport } from './routes/_dashboard/integrations'
+import { Route as DashboardInboxRouteImport } from './routes/_dashboard/inbox'
 import { Route as DashboardEmailsRouteImport } from './routes/_dashboard/emails'
 import { Route as DashboardDomainRouteImport } from './routes/_dashboard/domain'
 import { Route as DashboardContactsRouteImport } from './routes/_dashboard/contacts'
@@ -46,6 +47,7 @@ import { Route as DashboardSettingsSecurityRouteImport } from './routes/_dashboa
 import { Route as DashboardSettingsProfileRouteImport } from './routes/_dashboard/settings/profile'
 import { Route as DashboardSettingsBillingRouteImport } from './routes/_dashboard/settings/billing'
 import { Route as DashboardLogsLogIdRouteImport } from './routes/_dashboard/logs/$logId'
+import { Route as DashboardInboxMailboxIdRouteImport } from './routes/_dashboard/inbox/$mailboxId'
 import { Route as DashboardEmailsSentRouteImport } from './routes/_dashboard/emails/sent'
 import { Route as DashboardEmailsReceivedRouteImport } from './routes/_dashboard/emails/received'
 import { Route as DashboardEmailsEmailIdRouteImport } from './routes/_dashboard/emails/$emailId'
@@ -58,13 +60,24 @@ import { Route as DashboardContactsChannelsRouteImport } from './routes/_dashboa
 import { Route as DashboardApiKeysApiKeyIdRouteImport } from './routes/_dashboard/api-keys/$apiKeyId'
 import { Route as DashboardWebhooksWebhookIdIndexRouteImport } from './routes/_dashboard/webhooks/$webhookId/index'
 import { Route as DashboardSettingsBillingIndexRouteImport } from './routes/_dashboard/settings/billing/index'
+import { Route as DashboardInboxMailboxIdIndexRouteImport } from './routes/_dashboard/inbox/$mailboxId/index'
 import { Route as DashboardDomainAddIndexRouteImport } from './routes/_dashboard/domain/add/index'
 import { Route as DashboardContactsGroupsIndexRouteImport } from './routes/_dashboard/contacts/groups/index'
 import { Route as DashboardWebhooksWebhookIdTestRouteImport } from './routes/_dashboard/webhooks/$webhookId/test'
 import { Route as DashboardSettingsBillingPlansRouteImport } from './routes/_dashboard/settings/billing/plans'
+import { Route as DashboardInboxMailboxIdYouRouteImport } from './routes/_dashboard/inbox/$mailboxId/you'
+import { Route as DashboardInboxMailboxIdTrashRouteImport } from './routes/_dashboard/inbox/$mailboxId/trash'
+import { Route as DashboardInboxMailboxIdSpamRouteImport } from './routes/_dashboard/inbox/$mailboxId/spam'
+import { Route as DashboardInboxMailboxIdSentRouteImport } from './routes/_dashboard/inbox/$mailboxId/sent'
+import { Route as DashboardInboxMailboxIdNeeds_approvalRouteImport } from './routes/_dashboard/inbox/$mailboxId/needs_approval'
+import { Route as DashboardInboxMailboxIdLabelRouteImport } from './routes/_dashboard/inbox/$mailboxId/label'
+import { Route as DashboardInboxMailboxIdDraftsRouteImport } from './routes/_dashboard/inbox/$mailboxId/drafts'
+import { Route as DashboardInboxMailboxIdArchiveRouteImport } from './routes/_dashboard/inbox/$mailboxId/archive'
+import { Route as DashboardInboxMailboxIdAgentRouteImport } from './routes/_dashboard/inbox/$mailboxId/agent'
 import { Route as DashboardDomainAddDomainIdRouteImport } from './routes/_dashboard/domain/add/$domainId'
 import { Route as DashboardContactsGroupsGroupIdRouteImport } from './routes/_dashboard/contacts/groups/$groupId'
 import { Route as DashboardContactsDetailContactIdRouteImport } from './routes/_dashboard/contacts/detail/$contactId'
+import { Route as DashboardInboxMailboxIdLabelLabelIdRouteImport } from './routes/_dashboard/inbox/$mailboxId/label/$labelId'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -133,6 +146,11 @@ const DashboardLogsRoute = DashboardLogsRouteImport.update({
 const DashboardIntegrationsRoute = DashboardIntegrationsRouteImport.update({
   id: '/integrations',
   path: '/integrations',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardInboxRoute = DashboardInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardEmailsRoute = DashboardEmailsRouteImport.update({
@@ -256,6 +274,11 @@ const DashboardLogsLogIdRoute = DashboardLogsLogIdRouteImport.update({
   path: '/$logId',
   getParentRoute: () => DashboardLogsRoute,
 } as any)
+const DashboardInboxMailboxIdRoute = DashboardInboxMailboxIdRouteImport.update({
+  id: '/$mailboxId',
+  path: '/$mailboxId',
+  getParentRoute: () => DashboardInboxRoute,
+} as any)
 const DashboardEmailsSentRoute = DashboardEmailsSentRouteImport.update({
   id: '/sent',
   path: '/sent',
@@ -321,6 +344,12 @@ const DashboardSettingsBillingIndexRoute =
     path: '/',
     getParentRoute: () => DashboardSettingsBillingRoute,
   } as any)
+const DashboardInboxMailboxIdIndexRoute =
+  DashboardInboxMailboxIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
+  } as any)
 const DashboardDomainAddIndexRoute = DashboardDomainAddIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -344,6 +373,60 @@ const DashboardSettingsBillingPlansRoute =
     path: '/plans',
     getParentRoute: () => DashboardSettingsBillingRoute,
   } as any)
+const DashboardInboxMailboxIdYouRoute =
+  DashboardInboxMailboxIdYouRouteImport.update({
+    id: '/you',
+    path: '/you',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
+  } as any)
+const DashboardInboxMailboxIdTrashRoute =
+  DashboardInboxMailboxIdTrashRouteImport.update({
+    id: '/trash',
+    path: '/trash',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
+  } as any)
+const DashboardInboxMailboxIdSpamRoute =
+  DashboardInboxMailboxIdSpamRouteImport.update({
+    id: '/spam',
+    path: '/spam',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
+  } as any)
+const DashboardInboxMailboxIdSentRoute =
+  DashboardInboxMailboxIdSentRouteImport.update({
+    id: '/sent',
+    path: '/sent',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
+  } as any)
+const DashboardInboxMailboxIdNeeds_approvalRoute =
+  DashboardInboxMailboxIdNeeds_approvalRouteImport.update({
+    id: '/needs_approval',
+    path: '/needs_approval',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
+  } as any)
+const DashboardInboxMailboxIdLabelRoute =
+  DashboardInboxMailboxIdLabelRouteImport.update({
+    id: '/label',
+    path: '/label',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
+  } as any)
+const DashboardInboxMailboxIdDraftsRoute =
+  DashboardInboxMailboxIdDraftsRouteImport.update({
+    id: '/drafts',
+    path: '/drafts',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
+  } as any)
+const DashboardInboxMailboxIdArchiveRoute =
+  DashboardInboxMailboxIdArchiveRouteImport.update({
+    id: '/archive',
+    path: '/archive',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
+  } as any)
+const DashboardInboxMailboxIdAgentRoute =
+  DashboardInboxMailboxIdAgentRouteImport.update({
+    id: '/agent',
+    path: '/agent',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
+  } as any)
 const DashboardDomainAddDomainIdRoute =
   DashboardDomainAddDomainIdRouteImport.update({
     id: '/$domainId',
@@ -362,6 +445,12 @@ const DashboardContactsDetailContactIdRoute =
     path: '/$contactId',
     getParentRoute: () => DashboardContactsDetailRoute,
   } as any)
+const DashboardInboxMailboxIdLabelLabelIdRoute =
+  DashboardInboxMailboxIdLabelLabelIdRouteImport.update({
+    id: '/$labelId',
+    path: '/$labelId',
+    getParentRoute: () => DashboardInboxMailboxIdLabelRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof DashboardIndexRoute
@@ -374,6 +463,7 @@ export interface FileRoutesByFullPath {
   '/contacts': typeof DashboardContactsRouteWithChildren
   '/domain': typeof DashboardDomainRouteWithChildren
   '/emails': typeof DashboardEmailsRouteWithChildren
+  '/inbox': typeof DashboardInboxRouteWithChildren
   '/integrations': typeof DashboardIntegrationsRoute
   '/logs': typeof DashboardLogsRouteWithChildren
   '/metrics': typeof DashboardMetricsRoute
@@ -392,6 +482,7 @@ export interface FileRoutesByFullPath {
   '/emails/$emailId': typeof DashboardEmailsEmailIdRoute
   '/emails/received': typeof DashboardEmailsReceivedRoute
   '/emails/sent': typeof DashboardEmailsSentRoute
+  '/inbox/$mailboxId': typeof DashboardInboxMailboxIdRouteWithChildren
   '/logs/$logId': typeof DashboardLogsLogIdRoute
   '/settings/billing': typeof DashboardSettingsBillingRouteWithChildren
   '/settings/profile': typeof DashboardSettingsProfileRoute
@@ -413,12 +504,23 @@ export interface FileRoutesByFullPath {
   '/contacts/detail/$contactId': typeof DashboardContactsDetailContactIdRoute
   '/contacts/groups/$groupId': typeof DashboardContactsGroupsGroupIdRoute
   '/domain/add/$domainId': typeof DashboardDomainAddDomainIdRoute
+  '/inbox/$mailboxId/agent': typeof DashboardInboxMailboxIdAgentRoute
+  '/inbox/$mailboxId/archive': typeof DashboardInboxMailboxIdArchiveRoute
+  '/inbox/$mailboxId/drafts': typeof DashboardInboxMailboxIdDraftsRoute
+  '/inbox/$mailboxId/label': typeof DashboardInboxMailboxIdLabelRouteWithChildren
+  '/inbox/$mailboxId/needs_approval': typeof DashboardInboxMailboxIdNeeds_approvalRoute
+  '/inbox/$mailboxId/sent': typeof DashboardInboxMailboxIdSentRoute
+  '/inbox/$mailboxId/spam': typeof DashboardInboxMailboxIdSpamRoute
+  '/inbox/$mailboxId/trash': typeof DashboardInboxMailboxIdTrashRoute
+  '/inbox/$mailboxId/you': typeof DashboardInboxMailboxIdYouRoute
   '/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
   '/webhooks/$webhookId/test': typeof DashboardWebhooksWebhookIdTestRoute
   '/contacts/groups/': typeof DashboardContactsGroupsIndexRoute
   '/domain/add/': typeof DashboardDomainAddIndexRoute
+  '/inbox/$mailboxId/': typeof DashboardInboxMailboxIdIndexRoute
   '/settings/billing/': typeof DashboardSettingsBillingIndexRoute
   '/webhooks/$webhookId/': typeof DashboardWebhooksWebhookIdIndexRoute
+  '/inbox/$mailboxId/label/$labelId': typeof DashboardInboxMailboxIdLabelLabelIdRoute
 }
 export interface FileRoutesByTo {
   '/invite': typeof InviteRoute
@@ -426,6 +528,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
   '/agent-inbox': typeof DashboardAgentInboxRoute
+  '/inbox': typeof DashboardInboxRouteWithChildren
   '/integrations': typeof DashboardIntegrationsRoute
   '/metrics': typeof DashboardMetricsRoute
   '/smtp': typeof DashboardSmtpRoute
@@ -458,12 +561,23 @@ export interface FileRoutesByTo {
   '/contacts/detail/$contactId': typeof DashboardContactsDetailContactIdRoute
   '/contacts/groups/$groupId': typeof DashboardContactsGroupsGroupIdRoute
   '/domain/add/$domainId': typeof DashboardDomainAddDomainIdRoute
+  '/inbox/$mailboxId/agent': typeof DashboardInboxMailboxIdAgentRoute
+  '/inbox/$mailboxId/archive': typeof DashboardInboxMailboxIdArchiveRoute
+  '/inbox/$mailboxId/drafts': typeof DashboardInboxMailboxIdDraftsRoute
+  '/inbox/$mailboxId/label': typeof DashboardInboxMailboxIdLabelRouteWithChildren
+  '/inbox/$mailboxId/needs_approval': typeof DashboardInboxMailboxIdNeeds_approvalRoute
+  '/inbox/$mailboxId/sent': typeof DashboardInboxMailboxIdSentRoute
+  '/inbox/$mailboxId/spam': typeof DashboardInboxMailboxIdSpamRoute
+  '/inbox/$mailboxId/trash': typeof DashboardInboxMailboxIdTrashRoute
+  '/inbox/$mailboxId/you': typeof DashboardInboxMailboxIdYouRoute
   '/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
   '/webhooks/$webhookId/test': typeof DashboardWebhooksWebhookIdTestRoute
   '/contacts/groups': typeof DashboardContactsGroupsIndexRoute
   '/domain/add': typeof DashboardDomainAddIndexRoute
+  '/inbox/$mailboxId': typeof DashboardInboxMailboxIdIndexRoute
   '/settings/billing': typeof DashboardSettingsBillingIndexRoute
   '/webhooks/$webhookId': typeof DashboardWebhooksWebhookIdIndexRoute
+  '/inbox/$mailboxId/label/$labelId': typeof DashboardInboxMailboxIdLabelLabelIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -477,6 +591,7 @@ export interface FileRoutesById {
   '/_dashboard/contacts': typeof DashboardContactsRouteWithChildren
   '/_dashboard/domain': typeof DashboardDomainRouteWithChildren
   '/_dashboard/emails': typeof DashboardEmailsRouteWithChildren
+  '/_dashboard/inbox': typeof DashboardInboxRouteWithChildren
   '/_dashboard/integrations': typeof DashboardIntegrationsRoute
   '/_dashboard/logs': typeof DashboardLogsRouteWithChildren
   '/_dashboard/metrics': typeof DashboardMetricsRoute
@@ -496,6 +611,7 @@ export interface FileRoutesById {
   '/_dashboard/emails/$emailId': typeof DashboardEmailsEmailIdRoute
   '/_dashboard/emails/received': typeof DashboardEmailsReceivedRoute
   '/_dashboard/emails/sent': typeof DashboardEmailsSentRoute
+  '/_dashboard/inbox/$mailboxId': typeof DashboardInboxMailboxIdRouteWithChildren
   '/_dashboard/logs/$logId': typeof DashboardLogsLogIdRoute
   '/_dashboard/settings/billing': typeof DashboardSettingsBillingRouteWithChildren
   '/_dashboard/settings/profile': typeof DashboardSettingsProfileRoute
@@ -517,12 +633,23 @@ export interface FileRoutesById {
   '/_dashboard/contacts/detail/$contactId': typeof DashboardContactsDetailContactIdRoute
   '/_dashboard/contacts/groups/$groupId': typeof DashboardContactsGroupsGroupIdRoute
   '/_dashboard/domain/add/$domainId': typeof DashboardDomainAddDomainIdRoute
+  '/_dashboard/inbox/$mailboxId/agent': typeof DashboardInboxMailboxIdAgentRoute
+  '/_dashboard/inbox/$mailboxId/archive': typeof DashboardInboxMailboxIdArchiveRoute
+  '/_dashboard/inbox/$mailboxId/drafts': typeof DashboardInboxMailboxIdDraftsRoute
+  '/_dashboard/inbox/$mailboxId/label': typeof DashboardInboxMailboxIdLabelRouteWithChildren
+  '/_dashboard/inbox/$mailboxId/needs_approval': typeof DashboardInboxMailboxIdNeeds_approvalRoute
+  '/_dashboard/inbox/$mailboxId/sent': typeof DashboardInboxMailboxIdSentRoute
+  '/_dashboard/inbox/$mailboxId/spam': typeof DashboardInboxMailboxIdSpamRoute
+  '/_dashboard/inbox/$mailboxId/trash': typeof DashboardInboxMailboxIdTrashRoute
+  '/_dashboard/inbox/$mailboxId/you': typeof DashboardInboxMailboxIdYouRoute
   '/_dashboard/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
   '/_dashboard/webhooks/$webhookId/test': typeof DashboardWebhooksWebhookIdTestRoute
   '/_dashboard/contacts/groups/': typeof DashboardContactsGroupsIndexRoute
   '/_dashboard/domain/add/': typeof DashboardDomainAddIndexRoute
+  '/_dashboard/inbox/$mailboxId/': typeof DashboardInboxMailboxIdIndexRoute
   '/_dashboard/settings/billing/': typeof DashboardSettingsBillingIndexRoute
   '/_dashboard/webhooks/$webhookId/': typeof DashboardWebhooksWebhookIdIndexRoute
+  '/_dashboard/inbox/$mailboxId/label/$labelId': typeof DashboardInboxMailboxIdLabelLabelIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -537,6 +664,7 @@ export interface FileRouteTypes {
     | '/contacts'
     | '/domain'
     | '/emails'
+    | '/inbox'
     | '/integrations'
     | '/logs'
     | '/metrics'
@@ -555,6 +683,7 @@ export interface FileRouteTypes {
     | '/emails/$emailId'
     | '/emails/received'
     | '/emails/sent'
+    | '/inbox/$mailboxId'
     | '/logs/$logId'
     | '/settings/billing'
     | '/settings/profile'
@@ -576,12 +705,23 @@ export interface FileRouteTypes {
     | '/contacts/detail/$contactId'
     | '/contacts/groups/$groupId'
     | '/domain/add/$domainId'
+    | '/inbox/$mailboxId/agent'
+    | '/inbox/$mailboxId/archive'
+    | '/inbox/$mailboxId/drafts'
+    | '/inbox/$mailboxId/label'
+    | '/inbox/$mailboxId/needs_approval'
+    | '/inbox/$mailboxId/sent'
+    | '/inbox/$mailboxId/spam'
+    | '/inbox/$mailboxId/trash'
+    | '/inbox/$mailboxId/you'
     | '/settings/billing/plans'
     | '/webhooks/$webhookId/test'
     | '/contacts/groups/'
     | '/domain/add/'
+    | '/inbox/$mailboxId/'
     | '/settings/billing/'
     | '/webhooks/$webhookId/'
+    | '/inbox/$mailboxId/label/$labelId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/invite'
@@ -589,6 +729,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/signup'
     | '/agent-inbox'
+    | '/inbox'
     | '/integrations'
     | '/metrics'
     | '/smtp'
@@ -621,12 +762,23 @@ export interface FileRouteTypes {
     | '/contacts/detail/$contactId'
     | '/contacts/groups/$groupId'
     | '/domain/add/$domainId'
+    | '/inbox/$mailboxId/agent'
+    | '/inbox/$mailboxId/archive'
+    | '/inbox/$mailboxId/drafts'
+    | '/inbox/$mailboxId/label'
+    | '/inbox/$mailboxId/needs_approval'
+    | '/inbox/$mailboxId/sent'
+    | '/inbox/$mailboxId/spam'
+    | '/inbox/$mailboxId/trash'
+    | '/inbox/$mailboxId/you'
     | '/settings/billing/plans'
     | '/webhooks/$webhookId/test'
     | '/contacts/groups'
     | '/domain/add'
+    | '/inbox/$mailboxId'
     | '/settings/billing'
     | '/webhooks/$webhookId'
+    | '/inbox/$mailboxId/label/$labelId'
   id:
     | '__root__'
     | '/_dashboard'
@@ -639,6 +791,7 @@ export interface FileRouteTypes {
     | '/_dashboard/contacts'
     | '/_dashboard/domain'
     | '/_dashboard/emails'
+    | '/_dashboard/inbox'
     | '/_dashboard/integrations'
     | '/_dashboard/logs'
     | '/_dashboard/metrics'
@@ -658,6 +811,7 @@ export interface FileRouteTypes {
     | '/_dashboard/emails/$emailId'
     | '/_dashboard/emails/received'
     | '/_dashboard/emails/sent'
+    | '/_dashboard/inbox/$mailboxId'
     | '/_dashboard/logs/$logId'
     | '/_dashboard/settings/billing'
     | '/_dashboard/settings/profile'
@@ -679,12 +833,23 @@ export interface FileRouteTypes {
     | '/_dashboard/contacts/detail/$contactId'
     | '/_dashboard/contacts/groups/$groupId'
     | '/_dashboard/domain/add/$domainId'
+    | '/_dashboard/inbox/$mailboxId/agent'
+    | '/_dashboard/inbox/$mailboxId/archive'
+    | '/_dashboard/inbox/$mailboxId/drafts'
+    | '/_dashboard/inbox/$mailboxId/label'
+    | '/_dashboard/inbox/$mailboxId/needs_approval'
+    | '/_dashboard/inbox/$mailboxId/sent'
+    | '/_dashboard/inbox/$mailboxId/spam'
+    | '/_dashboard/inbox/$mailboxId/trash'
+    | '/_dashboard/inbox/$mailboxId/you'
     | '/_dashboard/settings/billing/plans'
     | '/_dashboard/webhooks/$webhookId/test'
     | '/_dashboard/contacts/groups/'
     | '/_dashboard/domain/add/'
+    | '/_dashboard/inbox/$mailboxId/'
     | '/_dashboard/settings/billing/'
     | '/_dashboard/webhooks/$webhookId/'
+    | '/_dashboard/inbox/$mailboxId/label/$labelId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -793,6 +958,13 @@ declare module '@tanstack/react-router' {
       path: '/integrations'
       fullPath: '/integrations'
       preLoaderRoute: typeof DashboardIntegrationsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/inbox': {
+      id: '/_dashboard/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof DashboardInboxRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/emails': {
@@ -956,6 +1128,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLogsLogIdRouteImport
       parentRoute: typeof DashboardLogsRoute
     }
+    '/_dashboard/inbox/$mailboxId': {
+      id: '/_dashboard/inbox/$mailboxId'
+      path: '/$mailboxId'
+      fullPath: '/inbox/$mailboxId'
+      preLoaderRoute: typeof DashboardInboxMailboxIdRouteImport
+      parentRoute: typeof DashboardInboxRoute
+    }
     '/_dashboard/emails/sent': {
       id: '/_dashboard/emails/sent'
       path: '/sent'
@@ -1040,6 +1219,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsBillingIndexRouteImport
       parentRoute: typeof DashboardSettingsBillingRoute
     }
+    '/_dashboard/inbox/$mailboxId/': {
+      id: '/_dashboard/inbox/$mailboxId/'
+      path: '/'
+      fullPath: '/inbox/$mailboxId/'
+      preLoaderRoute: typeof DashboardInboxMailboxIdIndexRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
+    }
     '/_dashboard/domain/add/': {
       id: '/_dashboard/domain/add/'
       path: '/'
@@ -1068,6 +1254,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsBillingPlansRouteImport
       parentRoute: typeof DashboardSettingsBillingRoute
     }
+    '/_dashboard/inbox/$mailboxId/you': {
+      id: '/_dashboard/inbox/$mailboxId/you'
+      path: '/you'
+      fullPath: '/inbox/$mailboxId/you'
+      preLoaderRoute: typeof DashboardInboxMailboxIdYouRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
+    }
+    '/_dashboard/inbox/$mailboxId/trash': {
+      id: '/_dashboard/inbox/$mailboxId/trash'
+      path: '/trash'
+      fullPath: '/inbox/$mailboxId/trash'
+      preLoaderRoute: typeof DashboardInboxMailboxIdTrashRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
+    }
+    '/_dashboard/inbox/$mailboxId/spam': {
+      id: '/_dashboard/inbox/$mailboxId/spam'
+      path: '/spam'
+      fullPath: '/inbox/$mailboxId/spam'
+      preLoaderRoute: typeof DashboardInboxMailboxIdSpamRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
+    }
+    '/_dashboard/inbox/$mailboxId/sent': {
+      id: '/_dashboard/inbox/$mailboxId/sent'
+      path: '/sent'
+      fullPath: '/inbox/$mailboxId/sent'
+      preLoaderRoute: typeof DashboardInboxMailboxIdSentRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
+    }
+    '/_dashboard/inbox/$mailboxId/needs_approval': {
+      id: '/_dashboard/inbox/$mailboxId/needs_approval'
+      path: '/needs_approval'
+      fullPath: '/inbox/$mailboxId/needs_approval'
+      preLoaderRoute: typeof DashboardInboxMailboxIdNeeds_approvalRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
+    }
+    '/_dashboard/inbox/$mailboxId/label': {
+      id: '/_dashboard/inbox/$mailboxId/label'
+      path: '/label'
+      fullPath: '/inbox/$mailboxId/label'
+      preLoaderRoute: typeof DashboardInboxMailboxIdLabelRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
+    }
+    '/_dashboard/inbox/$mailboxId/drafts': {
+      id: '/_dashboard/inbox/$mailboxId/drafts'
+      path: '/drafts'
+      fullPath: '/inbox/$mailboxId/drafts'
+      preLoaderRoute: typeof DashboardInboxMailboxIdDraftsRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
+    }
+    '/_dashboard/inbox/$mailboxId/archive': {
+      id: '/_dashboard/inbox/$mailboxId/archive'
+      path: '/archive'
+      fullPath: '/inbox/$mailboxId/archive'
+      preLoaderRoute: typeof DashboardInboxMailboxIdArchiveRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
+    }
+    '/_dashboard/inbox/$mailboxId/agent': {
+      id: '/_dashboard/inbox/$mailboxId/agent'
+      path: '/agent'
+      fullPath: '/inbox/$mailboxId/agent'
+      preLoaderRoute: typeof DashboardInboxMailboxIdAgentRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
+    }
     '/_dashboard/domain/add/$domainId': {
       id: '/_dashboard/domain/add/$domainId'
       path: '/$domainId'
@@ -1088,6 +1337,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/contacts/detail/$contactId'
       preLoaderRoute: typeof DashboardContactsDetailContactIdRouteImport
       parentRoute: typeof DashboardContactsDetailRoute
+    }
+    '/_dashboard/inbox/$mailboxId/label/$labelId': {
+      id: '/_dashboard/inbox/$mailboxId/label/$labelId'
+      path: '/$labelId'
+      fullPath: '/inbox/$mailboxId/label/$labelId'
+      preLoaderRoute: typeof DashboardInboxMailboxIdLabelLabelIdRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdLabelRoute
     }
   }
 }
@@ -1202,6 +1458,67 @@ const DashboardEmailsRouteWithChildren = DashboardEmailsRoute._addFileChildren(
   DashboardEmailsRouteChildren,
 )
 
+interface DashboardInboxMailboxIdLabelRouteChildren {
+  DashboardInboxMailboxIdLabelLabelIdRoute: typeof DashboardInboxMailboxIdLabelLabelIdRoute
+}
+
+const DashboardInboxMailboxIdLabelRouteChildren: DashboardInboxMailboxIdLabelRouteChildren =
+  {
+    DashboardInboxMailboxIdLabelLabelIdRoute:
+      DashboardInboxMailboxIdLabelLabelIdRoute,
+  }
+
+const DashboardInboxMailboxIdLabelRouteWithChildren =
+  DashboardInboxMailboxIdLabelRoute._addFileChildren(
+    DashboardInboxMailboxIdLabelRouteChildren,
+  )
+
+interface DashboardInboxMailboxIdRouteChildren {
+  DashboardInboxMailboxIdAgentRoute: typeof DashboardInboxMailboxIdAgentRoute
+  DashboardInboxMailboxIdArchiveRoute: typeof DashboardInboxMailboxIdArchiveRoute
+  DashboardInboxMailboxIdDraftsRoute: typeof DashboardInboxMailboxIdDraftsRoute
+  DashboardInboxMailboxIdLabelRoute: typeof DashboardInboxMailboxIdLabelRouteWithChildren
+  DashboardInboxMailboxIdNeeds_approvalRoute: typeof DashboardInboxMailboxIdNeeds_approvalRoute
+  DashboardInboxMailboxIdSentRoute: typeof DashboardInboxMailboxIdSentRoute
+  DashboardInboxMailboxIdSpamRoute: typeof DashboardInboxMailboxIdSpamRoute
+  DashboardInboxMailboxIdTrashRoute: typeof DashboardInboxMailboxIdTrashRoute
+  DashboardInboxMailboxIdYouRoute: typeof DashboardInboxMailboxIdYouRoute
+  DashboardInboxMailboxIdIndexRoute: typeof DashboardInboxMailboxIdIndexRoute
+}
+
+const DashboardInboxMailboxIdRouteChildren: DashboardInboxMailboxIdRouteChildren =
+  {
+    DashboardInboxMailboxIdAgentRoute: DashboardInboxMailboxIdAgentRoute,
+    DashboardInboxMailboxIdArchiveRoute: DashboardInboxMailboxIdArchiveRoute,
+    DashboardInboxMailboxIdDraftsRoute: DashboardInboxMailboxIdDraftsRoute,
+    DashboardInboxMailboxIdLabelRoute:
+      DashboardInboxMailboxIdLabelRouteWithChildren,
+    DashboardInboxMailboxIdNeeds_approvalRoute:
+      DashboardInboxMailboxIdNeeds_approvalRoute,
+    DashboardInboxMailboxIdSentRoute: DashboardInboxMailboxIdSentRoute,
+    DashboardInboxMailboxIdSpamRoute: DashboardInboxMailboxIdSpamRoute,
+    DashboardInboxMailboxIdTrashRoute: DashboardInboxMailboxIdTrashRoute,
+    DashboardInboxMailboxIdYouRoute: DashboardInboxMailboxIdYouRoute,
+    DashboardInboxMailboxIdIndexRoute: DashboardInboxMailboxIdIndexRoute,
+  }
+
+const DashboardInboxMailboxIdRouteWithChildren =
+  DashboardInboxMailboxIdRoute._addFileChildren(
+    DashboardInboxMailboxIdRouteChildren,
+  )
+
+interface DashboardInboxRouteChildren {
+  DashboardInboxMailboxIdRoute: typeof DashboardInboxMailboxIdRouteWithChildren
+}
+
+const DashboardInboxRouteChildren: DashboardInboxRouteChildren = {
+  DashboardInboxMailboxIdRoute: DashboardInboxMailboxIdRouteWithChildren,
+}
+
+const DashboardInboxRouteWithChildren = DashboardInboxRoute._addFileChildren(
+  DashboardInboxRouteChildren,
+)
+
 interface DashboardLogsRouteChildren {
   DashboardLogsLogIdRoute: typeof DashboardLogsLogIdRoute
   DashboardLogsIndexRoute: typeof DashboardLogsIndexRoute
@@ -1305,6 +1622,7 @@ interface DashboardRouteChildren {
   DashboardContactsRoute: typeof DashboardContactsRouteWithChildren
   DashboardDomainRoute: typeof DashboardDomainRouteWithChildren
   DashboardEmailsRoute: typeof DashboardEmailsRouteWithChildren
+  DashboardInboxRoute: typeof DashboardInboxRouteWithChildren
   DashboardIntegrationsRoute: typeof DashboardIntegrationsRoute
   DashboardLogsRoute: typeof DashboardLogsRouteWithChildren
   DashboardMetricsRoute: typeof DashboardMetricsRoute
@@ -1322,6 +1640,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardContactsRoute: DashboardContactsRouteWithChildren,
   DashboardDomainRoute: DashboardDomainRouteWithChildren,
   DashboardEmailsRoute: DashboardEmailsRouteWithChildren,
+  DashboardInboxRoute: DashboardInboxRouteWithChildren,
   DashboardIntegrationsRoute: DashboardIntegrationsRoute,
   DashboardLogsRoute: DashboardLogsRouteWithChildren,
   DashboardMetricsRoute: DashboardMetricsRoute,

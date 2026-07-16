@@ -74,7 +74,9 @@
     "y-websocket": "^3.0.0",
     "zustand": "5.0.8",
     "lib0": "^0.2.117",
-    "usehooks-ts": "catalog:ui"
+    "usehooks-ts": "catalog:ui",
+    "jotai": "^2.12.5",
+    "react-resizable-panels": "^2.1.9"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.5",
