@@ -6,7 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import { useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
-import type { CreatedByUser } from "./types";
+import type { CreatedByUser } from "../types";
 
 export function ApiKeyUserFilterDropdown({
 	value,

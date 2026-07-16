@@ -728,6 +728,7 @@
         "@tanstack/react-router-devtools": "latest",
         "@tanstack/react-router-ssr-query": "latest",
         "@tanstack/react-start": "latest",
+        "@tanstack/react-table": "catalog:ui",
         "@tanstack/router-plugin": "^1.132.0",
         "axios": "catalog:",
         "better-auth": "catalog:",

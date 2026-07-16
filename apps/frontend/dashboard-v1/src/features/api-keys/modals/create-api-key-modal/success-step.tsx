@@ -4,7 +4,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import { useState } from "react";
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
-import { ModalHeader } from "./header";
+import { ModalHeader } from "../modal-header";
 
 export function SuccessStep({
 	apiKey,

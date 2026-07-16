@@ -8,8 +8,8 @@ import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { useInvalidateApiKeys } from "./use-api-keys-query";
-import type { ApiKeyData } from "./types";
+import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
+import type { ApiKeyData } from "../types";
 
 export function DeleteApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
 	const [deleteId, setDeleteId] = useQueryState("delete");

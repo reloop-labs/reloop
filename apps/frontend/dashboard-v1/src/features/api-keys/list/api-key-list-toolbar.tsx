@@ -4,9 +4,9 @@ import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import {
 	ApiKeyStatusFilterDropdown,
 	type ApiKeyStatusFilterOption,
-} from "./api-key-status-filter-dropdown";
-import { ApiKeyUserFilterDropdown } from "./api-key-user-filter-dropdown";
-import type { CreatedByUser } from "./types";
+} from "../filters/status-filter-dropdown";
+import { ApiKeyUserFilterDropdown } from "../filters/user-filter-dropdown";
+import type { CreatedByUser } from "../types";
 
 export function ApiKeyListToolbar({
 	availableCreators,

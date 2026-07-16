@@ -5,11 +5,11 @@ import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useMemo } from "react";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { queryKeys } from "#/lib/query-keys";
+import { useApiKeysQuery } from "../hooks/use-api-keys-query";
+import { CreateApiKeyModal } from "../modals/create-api-key-modal";
+import { ApiKeyTable } from "../table/api-key-table";
+import type { CreatedByUser } from "../types";
 import { ApiKeyListToolbar } from "./api-key-list-toolbar";
-import { ApiKeyTable } from "./api-key-table";
-import { CreateApiKeyModal } from "./create-api-key-modal";
-import type { CreatedByUser } from "./types";
-import { useApiKeysQuery } from "./use-api-keys-query";
 
 export function ApiKeyList() {
 	const { activeOrganization } = useActiveOrganization();

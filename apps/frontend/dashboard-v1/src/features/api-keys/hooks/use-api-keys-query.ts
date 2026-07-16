@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "#/lib/query-keys";
-import type { ApiKeyListResponse } from "./types";
+import type { ApiKeyListResponse } from "../types";
 
 export type ApiKeysListParams = {
 	page: number;

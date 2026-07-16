@@ -8,8 +8,8 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import * as v from "valibot";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
-import { useInvalidateApiKeys } from "../use-api-keys-query";
-import type { ApiKeyWithSecret } from "../types";
+import { useInvalidateApiKeys } from "../../hooks/use-api-keys-query";
+import type { ApiKeyWithSecret } from "../../types";
 import { type ApiKeyFormValues, FormStep } from "./form-step";
 import { SuccessStep } from "./success-step";
 

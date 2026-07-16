@@ -100,9 +100,7 @@ export function ApiKeyStatusFilterDropdown({
 										{option.label}
 									</span>
 								</div>
-								{isChecked && (
-									<Icon name="check" className="h-3.5 w-3.5" />
-								)}
+								{isChecked && <Icon name="check" className="h-3.5 w-3.5" />}
 							</button>
 						);
 					})}

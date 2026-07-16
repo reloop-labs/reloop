@@ -1,5 +1,5 @@
-import { ApiKeyList } from "./api-key-list";
-import { ApiKeyListHeader } from "./api-key-list-header";
+import { ApiKeyList } from "./list/api-key-list";
+import { ApiKeyListHeader } from "./list/api-key-list-header";
 
 export function ApiKeysPage() {
 	return (

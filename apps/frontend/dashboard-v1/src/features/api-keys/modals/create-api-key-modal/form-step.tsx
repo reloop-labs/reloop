@@ -4,7 +4,7 @@ import * as Input from "@reloop/ui/input";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import type { UseFormReturn } from "react-hook-form";
-import { ModalHeader } from "./header";
+import { ModalHeader } from "../modal-header";
 
 export type ApiKeyFormValues = {
 	name: string;
