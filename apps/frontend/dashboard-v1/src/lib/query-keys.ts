@@ -19,6 +19,17 @@ export const queryKeys = {
 		all: ["billing"] as const,
 		usage: () => [...queryKeys.billing.all, "usage"] as const,
 	},
+	apiKeys: {
+		all: ["api-keys"] as const,
+		list: (params: {
+			page: number;
+			limit: number;
+			status: string;
+			creator: string;
+			q: string;
+		}) => [...queryKeys.apiKeys.all, "list", params] as const,
+		detail: (id: string) => [...queryKeys.apiKeys.all, "detail", id] as const,
+	},
 	domain: {
 		all: ["domain"] as const,
 		detail: (domainId: string) =>

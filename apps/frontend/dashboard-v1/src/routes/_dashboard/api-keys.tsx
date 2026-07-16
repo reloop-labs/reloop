@@ -1,11 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PagePlaceholder } from "#/features/dashboard/page-placeholder";
+import { ApiKeysPage } from "#/features/api-keys/api-keys-page";
 
 export const Route = createFileRoute("/_dashboard/api-keys")({
-	component: () => (
-		<PagePlaceholder
-			title="API Keys"
-			description="API key management will live here."
-		/>
-	),
+	component: ApiKeysPage,
+	head: () => ({
+		meta: [
+			{ title: "API Keys · Reloop" },
+			{
+				name: "description",
+				content: "Create and manage API keys for your Reloop workspace.",
+			},
+		],
+	}),
 });

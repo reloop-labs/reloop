@@ -127,6 +127,12 @@ src/features/smtp/
 src/features/integrations/
   integrations-page.tsx
   catalog.ts
+src/features/api-keys/
+  api-keys-page.tsx
+  api-key-list.tsx
+  api-key-table.tsx
+  create-api-key-modal/
+  …
 src/hooks/use-api-language.ts
 ```
 
