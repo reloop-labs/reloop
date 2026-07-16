@@ -88,6 +88,11 @@ src/features/settings/
     session-management.tsx
     security-utils.tsx
     session-icons.tsx
+  profile/
+    profile-page.tsx
+    account-header.tsx
+    account-profile-picture.tsx
+    account-danger-zone.tsx
 src/features/onboarding/...
 src/features/invite/invite-page.tsx
 ```

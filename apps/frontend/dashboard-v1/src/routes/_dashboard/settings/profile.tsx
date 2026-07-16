@@ -1,11 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SettingsPlaceholderPage } from "#/features/settings/settings-placeholder-page";
+import { ProfilePage } from "#/features/settings/profile/profile-page";
 
 export const Route = createFileRoute("/_dashboard/settings/profile")({
-	component: () => (
-		<SettingsPlaceholderPage
-			title="Profile"
-			description="Your account profile settings will live here."
-		/>
-	),
+	component: ProfilePage,
+	head: () => ({
+		meta: [
+			{ title: "Profile · Reloop" },
+			{
+				name: "description",
+				content: "Manage your personal profile details.",
+			},
+		],
+	}),
 });
