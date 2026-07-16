@@ -63,7 +63,18 @@
     "@tiptap/react": "catalog:ui",
     "@tiptap/core": "catalog:ui",
     "@tiptap/pm": "catalog:ui",
-    "@tiptap/starter-kit": "catalog:ui"
+    "@tiptap/starter-kit": "catalog:ui",
+    "@tiptap/extension-collaboration": "catalog:ui",
+    "@tiptap/extension-collaboration-caret": "catalog:ui",
+    "@tiptap/extension-drag-handle-react": "catalog:ui",
+    "@tiptap/extension-placeholder": "^3.22.5",
+    "@tiptap/extension-underline": "^3.22.5",
+    "@tiptap/suggestion": "catalog:ui",
+    "yjs": "^13.6.30",
+    "y-websocket": "^3.0.0",
+    "zustand": "5.0.8",
+    "lib0": "^0.2.117",
+    "usehooks-ts": "catalog:ui"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.5",

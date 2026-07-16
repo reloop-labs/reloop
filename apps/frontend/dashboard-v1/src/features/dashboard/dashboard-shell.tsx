@@ -1,12 +1,34 @@
 import type { ReactNode } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import { PageHeader } from "./page-header/page-header";
 import { MainSidebar } from "./sidebar/main-sidebar";
 
 /**
+ * Full-screen template editor lives at /templates/$templateId
+ * (matches Next: outside the main layout chrome).
+ */
+function useIsTemplateEditor() {
+	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	// /templates or /templates/ → list; /templates/<id> → editor
+	return Boolean(pathname.match(/\/templates\/[^/]+/));
+}
+
+/**
  * App chrome for authenticated dashboard pages.
  * Matches Next dashboard layout: weak outer bg, sidebar, top bar, rounded main panel.
+ * Template editor gets a full-viewport shell without sidebar/header.
  */
 export function DashboardShell({ children }: { children: ReactNode }) {
+	const isTemplateEditor = useIsTemplateEditor();
+
+	if (isTemplateEditor) {
+		return (
+			<div className="flex h-screen flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
+				{children}
+			</div>
+		);
+	}
+
 	return (
 		<div className="flex h-screen overflow-hidden bg-bg-weak-50 dark:bg-black">
 			<MainSidebar />

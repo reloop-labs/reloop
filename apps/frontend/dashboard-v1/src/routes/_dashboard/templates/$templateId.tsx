@@ -1,20 +1,20 @@
-import { TemplateDetailPage } from "#/features/templates/detail/template-detail-page";
+import { TemplateEditorPage } from "#/features/templates/editor/template-editor-page";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_dashboard/templates/$templateId")({
-	component: TemplateDetailRoute,
+	component: TemplateEditorRoute,
 	head: () => ({
 		meta: [
-			{ title: "Template · Reloop" },
+			{ title: "Template Editor · Reloop" },
 			{
 				name: "description",
-				content: "View and manage an email template.",
+				content: "Design and edit an email template.",
 			},
 		],
 	}),
 });
 
-function TemplateDetailRoute() {
+function TemplateEditorRoute() {
 	const { templateId } = Route.useParams();
-	return <TemplateDetailPage templateId={templateId} />;
+	return <TemplateEditorPage templateId={templateId} />;
 }
