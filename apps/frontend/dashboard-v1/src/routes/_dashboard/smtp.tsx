@@ -1,11 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PagePlaceholder } from "#/features/dashboard/page-placeholder";
+import { SmtpPage } from "#/features/smtp/smtp-page";
 
 export const Route = createFileRoute("/_dashboard/smtp")({
-	component: () => (
-		<PagePlaceholder
-			title="SMTP"
-			description="SMTP credentials and setup will live here."
-		/>
-	),
+	component: SmtpPage,
+	head: () => ({
+		meta: [
+			{ title: "SMTP Relay · Reloop" },
+			{
+				name: "description",
+				content: "Send emails using SMTP relay with Reloop credentials.",
+			},
+		],
+	}),
 });

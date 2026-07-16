@@ -114,9 +114,20 @@ src/features/settings/
     switch-plan-modal.tsx
     use-billing-usage.ts
     request-support.ts
+  usage/
+    usage-page.tsx
+    usage-section.tsx
   use-org-permissions.ts
 src/features/onboarding/...
 src/features/invite/invite-page.tsx
+src/features/smtp/
+  smtp-page.tsx
+  smtp-code-panel.tsx
+  smtp-code-examples.ts
+src/features/integrations/
+  integrations-page.tsx
+  catalog.ts
+src/hooks/use-api-language.ts
 ```
 
 ## Scripts

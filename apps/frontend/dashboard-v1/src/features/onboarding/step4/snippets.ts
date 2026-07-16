@@ -28,6 +28,7 @@ export const installCommands: Record<LanguageCode, string> = {
 	php: "composer require reloop/reloop-email",
 };
 
+/** `lang` values are Bright aliases (via toBrightLang). */
 export const sendEmailCode: Record<
 	LanguageCode,
 	{ code: string; lang: string }
@@ -124,21 +125,32 @@ Supported SDKs:
 Show me only the integration code I need to add to my project.`;
 }
 
-/** Map our snippet langs to Bright language aliases. */
+/** Map our snippet langs to Bright / lighter language aliases. */
 export function toBrightLang(lang: string): string {
 	const map: Record<string, string> = {
 		typescript: "ts",
 		javascript: "js",
 		bash: "bash",
 		shell: "bash",
+		sh: "bash",
 		markdown: "md",
 		python: "py",
 		go: "go",
 		php: "php",
+		ruby: "rb",
+		rust: "rs",
 		ts: "ts",
 		js: "js",
+		jsx: "jsx",
+		tsx: "tsx",
 		py: "py",
 		md: "md",
+		rb: "rb",
+		rs: "rs",
+		// SMTP / playground language ids
+		nodejs: "js",
+		node: "js",
+		curl: "bash",
 	};
 	return map[lang] ?? lang;
 }

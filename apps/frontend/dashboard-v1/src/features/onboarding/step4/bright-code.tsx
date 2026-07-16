@@ -1,14 +1,15 @@
 /**
  * Bright-engine highlighter (`@code-hike/lighter`) styled to match dashboard
- * `@reloop/ui/code-block`:
- * - transparent code surface (inner white / zinc-950 card provides bg)
- * - design-token-ish token colors via github-light / github-dark by color scheme
- * - line numbers with soft gutter border like the Shiki line-numbers CSS
+ * `@reloop/ui/code-block`.
+ *
+ * Shared by onboarding (step 4 playground) and SMTP — always render the
+ * line-number table on the first paint (plain tokens), then upgrade styles
+ * when async highlight finishes. That avoids gutter / numbers popping in.
  */
 import { highlight, type LanguageAlias, type Token } from "@code-hike/lighter";
 import { cn } from "@reloop/ui/cn";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toBrightLang } from "./snippets";
 
 type BrightCodeProps = {
@@ -29,43 +30,78 @@ function themeForColorScheme(scheme: "light" | "dark") {
 	return scheme === "dark" ? "github-dark" : "github-light";
 }
 
+/** Synchronous plain-text lines — same table layout as highlighted result. */
+function plainLines(code: string): Token[][] {
+	const parts = code.split("\n");
+	return parts.map((line) => [
+		{ content: line.length === 0 ? "\n" : line, style: {} } as Token,
+	]);
+}
+
 const promiseCache = new Map<string, Promise<HighlightResult>>();
+const resultCache = new Map<string, HighlightResult>();
+
+function cacheKey(code: string, lang: string, scheme: "light" | "dark") {
+	return `${themeForColorScheme(scheme)}::${lang}::${code}`;
+}
 
 function getHighlightPromise(
 	code: string,
 	lang: string,
 	scheme: "light" | "dark",
 ): Promise<HighlightResult> {
-	const theme = themeForColorScheme(scheme);
-	const key = `${theme}::${lang}::${code}`;
+	const key = cacheKey(code, lang, scheme);
 	const existing = promiseCache.get(key);
 	if (existing) return existing;
 
-	const promise = highlight(code, lang as LanguageAlias, theme).then(
-		(result) => ({
-			lines: result.lines as unknown as Token[][],
-		}),
-	);
+	const theme = themeForColorScheme(scheme);
+	const promise = highlight(code, lang as LanguageAlias, theme)
+		.then((result) => {
+			const next = { lines: result.lines as unknown as Token[][] };
+			resultCache.set(key, next);
+			return next;
+		})
+		.catch((error) => {
+			console.error("[BrightCode] highlight failed", { lang, theme, error });
+			const next = { lines: plainLines(code) };
+			resultCache.set(key, next);
+			return next;
+		});
+
 	promiseCache.set(key, promise);
 	if (promiseCache.size > 50) {
 		const first = promiseCache.keys().next().value;
-		if (first) promiseCache.delete(first);
+		if (first) {
+			promiseCache.delete(first);
+			resultCache.delete(first);
+		}
 	}
 	return promise;
 }
 
+/** Match root theme script so first paint doesn't flip light → dark. */
+function readDomScheme(): "light" | "dark" {
+	if (typeof document === "undefined") return "light";
+	const root = document.documentElement;
+	if (root.classList.contains("dark")) return "dark";
+	if (root.classList.contains("light")) return "light";
+	return window.matchMedia("(prefers-color-scheme: dark)").matches
+		? "dark"
+		: "light";
+}
+
 function useColorScheme(): "light" | "dark" {
 	const { resolvedTheme } = useTheme();
-	const [scheme, setScheme] = useState<"light" | "dark">("light");
+	const [scheme, setScheme] = useState<"light" | "dark">(readDomScheme);
 
 	useEffect(() => {
 		if (resolvedTheme === "dark" || resolvedTheme === "light") {
 			setScheme(resolvedTheme);
 			return;
 		}
-		const mq = window.matchMedia("(prefers-color-scheme: dark)");
-		const apply = () => setScheme(mq.matches ? "dark" : "light");
+		const apply = () => setScheme(readDomScheme());
 		apply();
+		const mq = window.matchMedia("(prefers-color-scheme: dark)");
 		mq.addEventListener("change", apply);
 		return () => mq.removeEventListener("change", apply);
 	}, [resolvedTheme]);
@@ -84,11 +120,22 @@ export function BrightCode({
 }: BrightCodeProps) {
 	const scheme = useColorScheme();
 	const brightLang = toBrightLang(lang);
-	const [result, setResult] = useState<HighlightResult | null>(null);
+	const key = cacheKey(code, brightLang, scheme);
+
+	// Same structure as the final output on first paint (line numbers included).
+	const fallback = useMemo(() => ({ lines: plainLines(code) }), [code]);
+	const [result, setResult] = useState<HighlightResult>(
+		() => resultCache.get(key) ?? fallback,
+	);
+
+	// When code/lang/theme changes, keep table layout; prefer cache, else plain.
+	useEffect(() => {
+		const cached = resultCache.get(key);
+		setResult(cached ?? fallback);
+	}, [key, fallback]);
 
 	useEffect(() => {
 		let active = true;
-		setResult(null);
 		void getHighlightPromise(code, brightLang, scheme).then((next) => {
 			if (active) setResult(next);
 		});
@@ -98,6 +145,7 @@ export function BrightCode({
 	}, [code, brightLang, scheme]);
 
 	const prePadding = codeExtraPadding ? "pt-4 pb-4" : "pt-1 pb-1.5";
+	const lines = result.lines;
 
 	return (
 		<div
@@ -125,12 +173,17 @@ export function BrightCode({
 				}
 				.reloop-bright-code .bright-line-number {
 					width: 1.5rem;
+					min-width: 1.5rem;
 					padding-right: 0.375rem;
 					text-align: right;
 					font-size: 10.5px;
 					line-height: inherit;
 					color: var(--color-text-soft-400, #a3a3a3);
 					user-select: none;
+					border-right: 1px solid color-mix(in srgb, var(--color-stroke-soft-100, #e5e5e5) 80%, transparent);
+				}
+				.reloop-bright-code[data-color-scheme="dark"] .bright-line-number {
+					border-right-color: color-mix(in srgb, var(--color-stroke-soft-100, #333) 40%, transparent);
 				}
 				/* Hide scrollbar but keep scroll (AI prompt max-height, etc.) */
 				.reloop-bright-code .bright-pre-scroll {
@@ -151,39 +204,29 @@ export function BrightCode({
 						"bright-pre-scroll max-h-[var(--code-max-height)] overflow-y-auto",
 				)}
 			>
-				{!result ? (
-					<code className="whitespace-pre text-text-sub-600">{code}</code>
-				) : (
-					<code className="table w-full border-collapse">
-						{result.lines.map((lineTokens, lineIndex) => (
-							<div
-								key={`line-${lineIndex}-${lineTokens
-									.map((t) => t.content)
-									.join("")
-									.slice(0, 24)}`}
-								className="bright-line table-row"
-							>
-								{lineNumbers && (
-									<span className="bright-line-number table-cell align-top">
-										{lineIndex + 1}
-									</span>
-								)}
-								<span className="table-cell whitespace-pre pl-2">
-									{lineTokens.length === 0
-										? "\n"
-										: lineTokens.map((token, tokenIndex) => (
-												<span
-													key={`${token.content}-${tokenIndex}`}
-													style={token.style}
-												>
-													{token.content}
-												</span>
-											))}
+				<code className="table w-full border-collapse">
+					{lines.map((lineTokens, lineIndex) => (
+						<div key={`line-${lineIndex}`} className="bright-line table-row">
+							{lineNumbers && (
+								<span className="bright-line-number table-cell align-top">
+									{lineIndex + 1}
 								</span>
-							</div>
-						))}
-					</code>
-				)}
+							)}
+							<span className="table-cell whitespace-pre pl-2">
+								{lineTokens.length === 0
+									? "\n"
+									: lineTokens.map((token, tokenIndex) => (
+											<span
+												key={`${tokenIndex}-${token.content.slice(0, 12)}`}
+												style={token.style}
+											>
+												{token.content}
+											</span>
+										))}
+							</span>
+						</div>
+					))}
+				</code>
 			</pre>
 		</div>
 	);

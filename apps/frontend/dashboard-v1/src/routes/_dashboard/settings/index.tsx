@@ -1,11 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SettingsPlaceholderPage } from "#/features/settings/settings-placeholder-page";
+import { UsagePage } from "#/features/settings/usage/usage-page";
 
 export const Route = createFileRoute("/_dashboard/settings/")({
-	component: () => (
-		<SettingsPlaceholderPage
-			title="Usage"
-			description="Workspace usage and limits will live here."
-		/>
-	),
+	component: UsagePage,
+	head: () => ({
+		meta: [
+			{ title: "Usage · Reloop" },
+			{
+				name: "description",
+				content:
+					"Track your plan limits and resource usage for this billing period.",
+			},
+		],
+	}),
 });

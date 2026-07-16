@@ -52,7 +52,8 @@
     "sonner": "catalog:ui",
     "tailwindcss": "^4.1.18",
     "valibot": "catalog:db",
-    "@reloop/pricing": "workspace:*"
+    "@reloop/pricing": "workspace:*",
+    "rc-progress": "^4.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.5",

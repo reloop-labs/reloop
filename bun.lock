@@ -739,6 +739,7 @@
         "next-themes": "catalog:ui",
         "nitro": "npm:nitro-nightly@latest",
         "nuqs": "catalog:ui",
+        "rc-progress": "^4.0.0",
         "react": "catalog:ui",
         "react-dom": "catalog:ui",
         "react-hook-form": "catalog:ui",
