@@ -29,6 +29,7 @@ import { Route as DashboardDomainRouteImport } from './routes/_dashboard/domain'
 import { Route as DashboardContactsRouteImport } from './routes/_dashboard/contacts'
 import { Route as DashboardApiKeysRouteImport } from './routes/_dashboard/api-keys'
 import { Route as DashboardAgentInboxRouteImport } from './routes/_dashboard/agent-inbox'
+import { Route as DashboardWorkflowsIndexRouteImport } from './routes/_dashboard/workflows/index'
 import { Route as DashboardWebhooksIndexRouteImport } from './routes/_dashboard/webhooks/index'
 import { Route as DashboardTemplatesIndexRouteImport } from './routes/_dashboard/templates/index'
 import { Route as DashboardSettingsIndexRouteImport } from './routes/_dashboard/settings/index'
@@ -37,6 +38,7 @@ import { Route as DashboardEmailsIndexRouteImport } from './routes/_dashboard/em
 import { Route as DashboardDomainIndexRouteImport } from './routes/_dashboard/domain/index'
 import { Route as DashboardContactsIndexRouteImport } from './routes/_dashboard/contacts/index'
 import { Route as DashboardApiKeysIndexRouteImport } from './routes/_dashboard/api-keys/index'
+import { Route as DashboardWorkflowsWorkflowIdRouteImport } from './routes/_dashboard/workflows/$workflowId'
 import { Route as DashboardWebhooksCreateRouteImport } from './routes/_dashboard/webhooks/create'
 import { Route as DashboardWebhooksWebhookIdRouteImport } from './routes/_dashboard/webhooks/$webhookId'
 import { Route as DashboardTemplatesTemplateIdRouteImport } from './routes/_dashboard/templates/$templateId'
@@ -178,6 +180,11 @@ const DashboardAgentInboxRoute = DashboardAgentInboxRouteImport.update({
   path: '/agent-inbox',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardWorkflowsIndexRoute = DashboardWorkflowsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardWorkflowsRoute,
+} as any)
 const DashboardWebhooksIndexRoute = DashboardWebhooksIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -218,6 +225,12 @@ const DashboardApiKeysIndexRoute = DashboardApiKeysIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardApiKeysRoute,
 } as any)
+const DashboardWorkflowsWorkflowIdRoute =
+  DashboardWorkflowsWorkflowIdRouteImport.update({
+    id: '/$workflowId',
+    path: '/$workflowId',
+    getParentRoute: () => DashboardWorkflowsRoute,
+  } as any)
 const DashboardWebhooksCreateRoute = DashboardWebhooksCreateRouteImport.update({
   id: '/create',
   path: '/create',
@@ -471,7 +484,7 @@ export interface FileRoutesByFullPath {
   '/smtp': typeof DashboardSmtpRoute
   '/templates': typeof DashboardTemplatesRouteWithChildren
   '/webhooks': typeof DashboardWebhooksRouteWithChildren
-  '/workflows': typeof DashboardWorkflowsRoute
+  '/workflows': typeof DashboardWorkflowsRouteWithChildren
   '/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
   '/contacts/channels': typeof DashboardContactsChannelsRoute
   '/contacts/detail': typeof DashboardContactsDetailRouteWithChildren
@@ -493,6 +506,7 @@ export interface FileRoutesByFullPath {
   '/templates/$templateId': typeof DashboardTemplatesTemplateIdRoute
   '/webhooks/$webhookId': typeof DashboardWebhooksWebhookIdRouteWithChildren
   '/webhooks/create': typeof DashboardWebhooksCreateRoute
+  '/workflows/$workflowId': typeof DashboardWorkflowsWorkflowIdRoute
   '/api-keys/': typeof DashboardApiKeysIndexRoute
   '/contacts/': typeof DashboardContactsIndexRoute
   '/domain/': typeof DashboardDomainIndexRoute
@@ -501,6 +515,7 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof DashboardSettingsIndexRoute
   '/templates/': typeof DashboardTemplatesIndexRoute
   '/webhooks/': typeof DashboardWebhooksIndexRoute
+  '/workflows/': typeof DashboardWorkflowsIndexRoute
   '/contacts/detail/$contactId': typeof DashboardContactsDetailContactIdRoute
   '/contacts/groups/$groupId': typeof DashboardContactsGroupsGroupIdRoute
   '/domain/add/$domainId': typeof DashboardDomainAddDomainIdRoute
@@ -532,7 +547,6 @@ export interface FileRoutesByTo {
   '/integrations': typeof DashboardIntegrationsRoute
   '/metrics': typeof DashboardMetricsRoute
   '/smtp': typeof DashboardSmtpRoute
-  '/workflows': typeof DashboardWorkflowsRoute
   '/': typeof DashboardIndexRoute
   '/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
   '/contacts/channels': typeof DashboardContactsChannelsRoute
@@ -550,6 +564,7 @@ export interface FileRoutesByTo {
   '/settings/workspace': typeof DashboardSettingsWorkspaceRoute
   '/templates/$templateId': typeof DashboardTemplatesTemplateIdRoute
   '/webhooks/create': typeof DashboardWebhooksCreateRoute
+  '/workflows/$workflowId': typeof DashboardWorkflowsWorkflowIdRoute
   '/api-keys': typeof DashboardApiKeysIndexRoute
   '/contacts': typeof DashboardContactsIndexRoute
   '/domain': typeof DashboardDomainIndexRoute
@@ -558,6 +573,7 @@ export interface FileRoutesByTo {
   '/settings': typeof DashboardSettingsIndexRoute
   '/templates': typeof DashboardTemplatesIndexRoute
   '/webhooks': typeof DashboardWebhooksIndexRoute
+  '/workflows': typeof DashboardWorkflowsIndexRoute
   '/contacts/detail/$contactId': typeof DashboardContactsDetailContactIdRoute
   '/contacts/groups/$groupId': typeof DashboardContactsGroupsGroupIdRoute
   '/domain/add/$domainId': typeof DashboardDomainAddDomainIdRoute
@@ -599,7 +615,7 @@ export interface FileRoutesById {
   '/_dashboard/smtp': typeof DashboardSmtpRoute
   '/_dashboard/templates': typeof DashboardTemplatesRouteWithChildren
   '/_dashboard/webhooks': typeof DashboardWebhooksRouteWithChildren
-  '/_dashboard/workflows': typeof DashboardWorkflowsRoute
+  '/_dashboard/workflows': typeof DashboardWorkflowsRouteWithChildren
   '/_dashboard/': typeof DashboardIndexRoute
   '/_dashboard/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
   '/_dashboard/contacts/channels': typeof DashboardContactsChannelsRoute
@@ -622,6 +638,7 @@ export interface FileRoutesById {
   '/_dashboard/templates/$templateId': typeof DashboardTemplatesTemplateIdRoute
   '/_dashboard/webhooks/$webhookId': typeof DashboardWebhooksWebhookIdRouteWithChildren
   '/_dashboard/webhooks/create': typeof DashboardWebhooksCreateRoute
+  '/_dashboard/workflows/$workflowId': typeof DashboardWorkflowsWorkflowIdRoute
   '/_dashboard/api-keys/': typeof DashboardApiKeysIndexRoute
   '/_dashboard/contacts/': typeof DashboardContactsIndexRoute
   '/_dashboard/domain/': typeof DashboardDomainIndexRoute
@@ -630,6 +647,7 @@ export interface FileRoutesById {
   '/_dashboard/settings/': typeof DashboardSettingsIndexRoute
   '/_dashboard/templates/': typeof DashboardTemplatesIndexRoute
   '/_dashboard/webhooks/': typeof DashboardWebhooksIndexRoute
+  '/_dashboard/workflows/': typeof DashboardWorkflowsIndexRoute
   '/_dashboard/contacts/detail/$contactId': typeof DashboardContactsDetailContactIdRoute
   '/_dashboard/contacts/groups/$groupId': typeof DashboardContactsGroupsGroupIdRoute
   '/_dashboard/domain/add/$domainId': typeof DashboardDomainAddDomainIdRoute
@@ -694,6 +712,7 @@ export interface FileRouteTypes {
     | '/templates/$templateId'
     | '/webhooks/$webhookId'
     | '/webhooks/create'
+    | '/workflows/$workflowId'
     | '/api-keys/'
     | '/contacts/'
     | '/domain/'
@@ -702,6 +721,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/templates/'
     | '/webhooks/'
+    | '/workflows/'
     | '/contacts/detail/$contactId'
     | '/contacts/groups/$groupId'
     | '/domain/add/$domainId'
@@ -733,7 +753,6 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/metrics'
     | '/smtp'
-    | '/workflows'
     | '/'
     | '/api-keys/$apiKeyId'
     | '/contacts/channels'
@@ -751,6 +770,7 @@ export interface FileRouteTypes {
     | '/settings/workspace'
     | '/templates/$templateId'
     | '/webhooks/create'
+    | '/workflows/$workflowId'
     | '/api-keys'
     | '/contacts'
     | '/domain'
@@ -759,6 +779,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/templates'
     | '/webhooks'
+    | '/workflows'
     | '/contacts/detail/$contactId'
     | '/contacts/groups/$groupId'
     | '/domain/add/$domainId'
@@ -822,6 +843,7 @@ export interface FileRouteTypes {
     | '/_dashboard/templates/$templateId'
     | '/_dashboard/webhooks/$webhookId'
     | '/_dashboard/webhooks/create'
+    | '/_dashboard/workflows/$workflowId'
     | '/_dashboard/api-keys/'
     | '/_dashboard/contacts/'
     | '/_dashboard/domain/'
@@ -830,6 +852,7 @@ export interface FileRouteTypes {
     | '/_dashboard/settings/'
     | '/_dashboard/templates/'
     | '/_dashboard/webhooks/'
+    | '/_dashboard/workflows/'
     | '/_dashboard/contacts/detail/$contactId'
     | '/_dashboard/contacts/groups/$groupId'
     | '/_dashboard/domain/add/$domainId'
@@ -1002,6 +1025,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAgentInboxRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/workflows/': {
+      id: '/_dashboard/workflows/'
+      path: '/'
+      fullPath: '/workflows/'
+      preLoaderRoute: typeof DashboardWorkflowsIndexRouteImport
+      parentRoute: typeof DashboardWorkflowsRoute
+    }
     '/_dashboard/webhooks/': {
       id: '/_dashboard/webhooks/'
       path: '/'
@@ -1057,6 +1087,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api-keys/'
       preLoaderRoute: typeof DashboardApiKeysIndexRouteImport
       parentRoute: typeof DashboardApiKeysRoute
+    }
+    '/_dashboard/workflows/$workflowId': {
+      id: '/_dashboard/workflows/$workflowId'
+      path: '/$workflowId'
+      fullPath: '/workflows/$workflowId'
+      preLoaderRoute: typeof DashboardWorkflowsWorkflowIdRouteImport
+      parentRoute: typeof DashboardWorkflowsRoute
     }
     '/_dashboard/webhooks/create': {
       id: '/_dashboard/webhooks/create'
@@ -1616,6 +1653,19 @@ const DashboardWebhooksRouteChildren: DashboardWebhooksRouteChildren = {
 const DashboardWebhooksRouteWithChildren =
   DashboardWebhooksRoute._addFileChildren(DashboardWebhooksRouteChildren)
 
+interface DashboardWorkflowsRouteChildren {
+  DashboardWorkflowsWorkflowIdRoute: typeof DashboardWorkflowsWorkflowIdRoute
+  DashboardWorkflowsIndexRoute: typeof DashboardWorkflowsIndexRoute
+}
+
+const DashboardWorkflowsRouteChildren: DashboardWorkflowsRouteChildren = {
+  DashboardWorkflowsWorkflowIdRoute: DashboardWorkflowsWorkflowIdRoute,
+  DashboardWorkflowsIndexRoute: DashboardWorkflowsIndexRoute,
+}
+
+const DashboardWorkflowsRouteWithChildren =
+  DashboardWorkflowsRoute._addFileChildren(DashboardWorkflowsRouteChildren)
+
 interface DashboardRouteChildren {
   DashboardAgentInboxRoute: typeof DashboardAgentInboxRoute
   DashboardApiKeysRoute: typeof DashboardApiKeysRouteWithChildren
@@ -1630,7 +1680,7 @@ interface DashboardRouteChildren {
   DashboardSmtpRoute: typeof DashboardSmtpRoute
   DashboardTemplatesRoute: typeof DashboardTemplatesRouteWithChildren
   DashboardWebhooksRoute: typeof DashboardWebhooksRouteWithChildren
-  DashboardWorkflowsRoute: typeof DashboardWorkflowsRoute
+  DashboardWorkflowsRoute: typeof DashboardWorkflowsRouteWithChildren
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
@@ -1648,7 +1698,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardSmtpRoute: DashboardSmtpRoute,
   DashboardTemplatesRoute: DashboardTemplatesRouteWithChildren,
   DashboardWebhooksRoute: DashboardWebhooksRouteWithChildren,
-  DashboardWorkflowsRoute: DashboardWorkflowsRoute,
+  DashboardWorkflowsRoute: DashboardWorkflowsRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 

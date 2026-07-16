@@ -742,6 +742,7 @@
         "@tiptap/react": "catalog:ui",
         "@tiptap/starter-kit": "catalog:ui",
         "@tiptap/suggestion": "catalog:ui",
+        "@xyflow/react": "^12.6.0",
         "axios": "catalog:",
         "better-auth": "catalog:",
         "bright": "catalog:ui",

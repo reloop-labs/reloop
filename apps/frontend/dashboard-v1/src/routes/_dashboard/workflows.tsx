@@ -1,11 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { PagePlaceholder } from "#/features/dashboard/page-placeholder";
+import { WorkflowsProvider } from "#/features/workflows/components/workflows-provider";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_dashboard/workflows")({
-	component: () => (
-		<PagePlaceholder
-			title="Workflows"
-			description="Automation workflows will live here."
-		/>
-	),
+	component: WorkflowsLayout,
 });
+
+function WorkflowsLayout() {
+	return (
+		<WorkflowsProvider>
+			<Outlet />
+		</WorkflowsProvider>
+	);
+}
