@@ -81,8 +81,11 @@ export const GroupTable = ({
 		const navigate = useNavigate();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
-	const handleRowClick = (_group: Group) => {
-		// Group detail not ported yet
+	const handleRowClick = (group: Group) => {
+		void navigate({
+			to: "/contacts/groups/$groupId",
+			params: { groupId: group.id },
+		});
 	};
 
 	const totalPages = Math.ceil(total / pageSize);

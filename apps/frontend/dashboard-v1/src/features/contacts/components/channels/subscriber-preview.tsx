@@ -130,7 +130,7 @@ export function SubscriberPreview({
 							"border-black/10 dark:border-white/15",
 						)}
 					>
-						<Logo />
+						<Logo className="h-5 w-5" />
 					</div>
 				</div>
 
@@ -194,7 +194,7 @@ export function SubscriberPreview({
 								<div className="-mt-px min-w-0 flex-1">
 									<p
 										className={cn(
-											"font-medium text-sm leading-4",
+											"truncate font-medium text-sm leading-4",
 											"text-text-strong-950 dark:text-white",
 										)}
 									>
@@ -266,7 +266,7 @@ export function SubscriberPreview({
 							"bg-black/5 dark:bg-white/10",
 						)}
 					>
-						<Logo />
+						<Logo className="h-3 w-3" />
 					</div>
 					<span
 						className={cn(

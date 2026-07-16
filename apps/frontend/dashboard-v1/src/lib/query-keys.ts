@@ -54,14 +54,27 @@ export const queryKeys = {
 		}) => [...queryKeys.contacts.all, "list", params] as const,
 		detail: (id: string) =>
 			[...queryKeys.contacts.all, "detail", id] as const,
+		activity: (email: string) =>
+			[...queryKeys.contacts.all, "activity", email] as const,
 		groups: (params: { page: number; limit: number; search: string }) =>
 			[...queryKeys.contacts.all, "groups", params] as const,
+		groupDetail: (id: string) =>
+			[...queryKeys.contacts.all, "group-detail", id] as const,
+		groupContacts: (params: {
+			groupId: string;
+			page: number;
+			limit: number;
+		}) => [...queryKeys.contacts.all, "group-contacts", params] as const,
+		groupCount: (groupId: string) =>
+			[...queryKeys.contacts.all, "group-count", groupId] as const,
 		properties: (params: {
 			page: number;
 			limit: number;
 			search: string;
 			type: string;
 		}) => [...queryKeys.contacts.all, "properties", params] as const,
+		propertiesAll: () =>
+			[...queryKeys.contacts.all, "properties", "all"] as const,
 		channels: () => [...queryKeys.contacts.all, "channels"] as const,
 	},
 	domain: {

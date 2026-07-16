@@ -10,6 +10,7 @@ import { formatRelativeTime } from "#/utils/format-relative-time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { useNavigate } from "@tanstack/react-router";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import { ContactDropdown } from "./contact-dropdown";
@@ -74,6 +75,7 @@ export const ContactTable = ({
 	emptyStateDocsText,
 	emptyStateDocsLink,
 }: ContactTableProps) => {
+	const navigate = useNavigate();
 	const [, setModal] = useQueryState("modal");
 	const [, setId] = useQueryState("id");
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
@@ -92,9 +94,10 @@ export const ContactTable = ({
 	const endIndex = Math.min((currentPage ?? 1) * (pageSize ?? 10), total);
 
 	const handleRowClick = (contact: Contact) => {
-		// Detail page not ported yet — open edit modal for now
-		void setModal("edit-contact");
-		void setId(contact.id);
+		void navigate({
+			to: "/contacts/detail/$contactId",
+			params: { contactId: contact.id },
+		});
 	};
 
 	const handleEdit = (contact: Contact) => {

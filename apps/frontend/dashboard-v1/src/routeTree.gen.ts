@@ -47,12 +47,16 @@ import { Route as DashboardDomainAddRouteImport } from './routes/_dashboard/doma
 import { Route as DashboardDomainDomainIdRouteImport } from './routes/_dashboard/domain/$domainId'
 import { Route as DashboardContactsPropertiesRouteImport } from './routes/_dashboard/contacts/properties'
 import { Route as DashboardContactsGroupsRouteImport } from './routes/_dashboard/contacts/groups'
+import { Route as DashboardContactsDetailRouteImport } from './routes/_dashboard/contacts/detail'
 import { Route as DashboardContactsChannelsRouteImport } from './routes/_dashboard/contacts/channels'
 import { Route as DashboardApiKeysApiKeyIdRouteImport } from './routes/_dashboard/api-keys/$apiKeyId'
 import { Route as DashboardSettingsBillingIndexRouteImport } from './routes/_dashboard/settings/billing/index'
 import { Route as DashboardDomainAddIndexRouteImport } from './routes/_dashboard/domain/add/index'
+import { Route as DashboardContactsGroupsIndexRouteImport } from './routes/_dashboard/contacts/groups/index'
 import { Route as DashboardSettingsBillingPlansRouteImport } from './routes/_dashboard/settings/billing/plans'
 import { Route as DashboardDomainAddDomainIdRouteImport } from './routes/_dashboard/domain/add/$domainId'
+import { Route as DashboardContactsGroupsGroupIdRouteImport } from './routes/_dashboard/contacts/groups/$groupId'
+import { Route as DashboardContactsDetailContactIdRouteImport } from './routes/_dashboard/contacts/detail/$contactId'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -248,6 +252,11 @@ const DashboardContactsGroupsRoute = DashboardContactsGroupsRouteImport.update({
   path: '/groups',
   getParentRoute: () => DashboardContactsRoute,
 } as any)
+const DashboardContactsDetailRoute = DashboardContactsDetailRouteImport.update({
+  id: '/detail',
+  path: '/detail',
+  getParentRoute: () => DashboardContactsRoute,
+} as any)
 const DashboardContactsChannelsRoute =
   DashboardContactsChannelsRouteImport.update({
     id: '/channels',
@@ -271,6 +280,12 @@ const DashboardDomainAddIndexRoute = DashboardDomainAddIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardDomainAddRoute,
 } as any)
+const DashboardContactsGroupsIndexRoute =
+  DashboardContactsGroupsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardContactsGroupsRoute,
+  } as any)
 const DashboardSettingsBillingPlansRoute =
   DashboardSettingsBillingPlansRouteImport.update({
     id: '/plans',
@@ -282,6 +297,18 @@ const DashboardDomainAddDomainIdRoute =
     id: '/$domainId',
     path: '/$domainId',
     getParentRoute: () => DashboardDomainAddRoute,
+  } as any)
+const DashboardContactsGroupsGroupIdRoute =
+  DashboardContactsGroupsGroupIdRouteImport.update({
+    id: '/$groupId',
+    path: '/$groupId',
+    getParentRoute: () => DashboardContactsGroupsRoute,
+  } as any)
+const DashboardContactsDetailContactIdRoute =
+  DashboardContactsDetailContactIdRouteImport.update({
+    id: '/$contactId',
+    path: '/$contactId',
+    getParentRoute: () => DashboardContactsDetailRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -305,7 +332,8 @@ export interface FileRoutesByFullPath {
   '/workflows': typeof DashboardWorkflowsRoute
   '/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
   '/contacts/channels': typeof DashboardContactsChannelsRoute
-  '/contacts/groups': typeof DashboardContactsGroupsRoute
+  '/contacts/detail': typeof DashboardContactsDetailRouteWithChildren
+  '/contacts/groups': typeof DashboardContactsGroupsRouteWithChildren
   '/contacts/properties': typeof DashboardContactsPropertiesRoute
   '/domain/$domainId': typeof DashboardDomainDomainIdRoute
   '/domain/add': typeof DashboardDomainAddRouteWithChildren
@@ -324,8 +352,11 @@ export interface FileRoutesByFullPath {
   '/emails/': typeof DashboardEmailsIndexRoute
   '/logs/': typeof DashboardLogsIndexRoute
   '/settings/': typeof DashboardSettingsIndexRoute
+  '/contacts/detail/$contactId': typeof DashboardContactsDetailContactIdRoute
+  '/contacts/groups/$groupId': typeof DashboardContactsGroupsGroupIdRoute
   '/domain/add/$domainId': typeof DashboardDomainAddDomainIdRoute
   '/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
+  '/contacts/groups/': typeof DashboardContactsGroupsIndexRoute
   '/domain/add/': typeof DashboardDomainAddIndexRoute
   '/settings/billing/': typeof DashboardSettingsBillingIndexRoute
 }
@@ -344,7 +375,7 @@ export interface FileRoutesByTo {
   '/': typeof DashboardIndexRoute
   '/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
   '/contacts/channels': typeof DashboardContactsChannelsRoute
-  '/contacts/groups': typeof DashboardContactsGroupsRoute
+  '/contacts/detail': typeof DashboardContactsDetailRouteWithChildren
   '/contacts/properties': typeof DashboardContactsPropertiesRoute
   '/domain/$domainId': typeof DashboardDomainDomainIdRoute
   '/emails/received': typeof DashboardEmailsReceivedRoute
@@ -361,8 +392,11 @@ export interface FileRoutesByTo {
   '/emails': typeof DashboardEmailsIndexRoute
   '/logs': typeof DashboardLogsIndexRoute
   '/settings': typeof DashboardSettingsIndexRoute
+  '/contacts/detail/$contactId': typeof DashboardContactsDetailContactIdRoute
+  '/contacts/groups/$groupId': typeof DashboardContactsGroupsGroupIdRoute
   '/domain/add/$domainId': typeof DashboardDomainAddDomainIdRoute
   '/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
+  '/contacts/groups': typeof DashboardContactsGroupsIndexRoute
   '/domain/add': typeof DashboardDomainAddIndexRoute
   '/settings/billing': typeof DashboardSettingsBillingIndexRoute
 }
@@ -389,7 +423,8 @@ export interface FileRoutesById {
   '/_dashboard/': typeof DashboardIndexRoute
   '/_dashboard/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
   '/_dashboard/contacts/channels': typeof DashboardContactsChannelsRoute
-  '/_dashboard/contacts/groups': typeof DashboardContactsGroupsRoute
+  '/_dashboard/contacts/detail': typeof DashboardContactsDetailRouteWithChildren
+  '/_dashboard/contacts/groups': typeof DashboardContactsGroupsRouteWithChildren
   '/_dashboard/contacts/properties': typeof DashboardContactsPropertiesRoute
   '/_dashboard/domain/$domainId': typeof DashboardDomainDomainIdRoute
   '/_dashboard/domain/add': typeof DashboardDomainAddRouteWithChildren
@@ -408,8 +443,11 @@ export interface FileRoutesById {
   '/_dashboard/emails/': typeof DashboardEmailsIndexRoute
   '/_dashboard/logs/': typeof DashboardLogsIndexRoute
   '/_dashboard/settings/': typeof DashboardSettingsIndexRoute
+  '/_dashboard/contacts/detail/$contactId': typeof DashboardContactsDetailContactIdRoute
+  '/_dashboard/contacts/groups/$groupId': typeof DashboardContactsGroupsGroupIdRoute
   '/_dashboard/domain/add/$domainId': typeof DashboardDomainAddDomainIdRoute
   '/_dashboard/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
+  '/_dashboard/contacts/groups/': typeof DashboardContactsGroupsIndexRoute
   '/_dashboard/domain/add/': typeof DashboardDomainAddIndexRoute
   '/_dashboard/settings/billing/': typeof DashboardSettingsBillingIndexRoute
 }
@@ -436,6 +474,7 @@ export interface FileRouteTypes {
     | '/workflows'
     | '/api-keys/$apiKeyId'
     | '/contacts/channels'
+    | '/contacts/detail'
     | '/contacts/groups'
     | '/contacts/properties'
     | '/domain/$domainId'
@@ -455,8 +494,11 @@ export interface FileRouteTypes {
     | '/emails/'
     | '/logs/'
     | '/settings/'
+    | '/contacts/detail/$contactId'
+    | '/contacts/groups/$groupId'
     | '/domain/add/$domainId'
     | '/settings/billing/plans'
+    | '/contacts/groups/'
     | '/domain/add/'
     | '/settings/billing/'
   fileRoutesByTo: FileRoutesByTo
@@ -475,7 +517,7 @@ export interface FileRouteTypes {
     | '/'
     | '/api-keys/$apiKeyId'
     | '/contacts/channels'
-    | '/contacts/groups'
+    | '/contacts/detail'
     | '/contacts/properties'
     | '/domain/$domainId'
     | '/emails/received'
@@ -492,8 +534,11 @@ export interface FileRouteTypes {
     | '/emails'
     | '/logs'
     | '/settings'
+    | '/contacts/detail/$contactId'
+    | '/contacts/groups/$groupId'
     | '/domain/add/$domainId'
     | '/settings/billing/plans'
+    | '/contacts/groups'
     | '/domain/add'
     | '/settings/billing'
   id:
@@ -519,6 +564,7 @@ export interface FileRouteTypes {
     | '/_dashboard/'
     | '/_dashboard/api-keys/$apiKeyId'
     | '/_dashboard/contacts/channels'
+    | '/_dashboard/contacts/detail'
     | '/_dashboard/contacts/groups'
     | '/_dashboard/contacts/properties'
     | '/_dashboard/domain/$domainId'
@@ -538,8 +584,11 @@ export interface FileRouteTypes {
     | '/_dashboard/emails/'
     | '/_dashboard/logs/'
     | '/_dashboard/settings/'
+    | '/_dashboard/contacts/detail/$contactId'
+    | '/_dashboard/contacts/groups/$groupId'
     | '/_dashboard/domain/add/$domainId'
     | '/_dashboard/settings/billing/plans'
+    | '/_dashboard/contacts/groups/'
     | '/_dashboard/domain/add/'
     | '/_dashboard/settings/billing/'
   fileRoutesById: FileRoutesById
@@ -820,6 +869,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardContactsGroupsRouteImport
       parentRoute: typeof DashboardContactsRoute
     }
+    '/_dashboard/contacts/detail': {
+      id: '/_dashboard/contacts/detail'
+      path: '/detail'
+      fullPath: '/contacts/detail'
+      preLoaderRoute: typeof DashboardContactsDetailRouteImport
+      parentRoute: typeof DashboardContactsRoute
+    }
     '/_dashboard/contacts/channels': {
       id: '/_dashboard/contacts/channels'
       path: '/channels'
@@ -848,6 +904,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDomainAddIndexRouteImport
       parentRoute: typeof DashboardDomainAddRoute
     }
+    '/_dashboard/contacts/groups/': {
+      id: '/_dashboard/contacts/groups/'
+      path: '/'
+      fullPath: '/contacts/groups/'
+      preLoaderRoute: typeof DashboardContactsGroupsIndexRouteImport
+      parentRoute: typeof DashboardContactsGroupsRoute
+    }
     '/_dashboard/settings/billing/plans': {
       id: '/_dashboard/settings/billing/plans'
       path: '/plans'
@@ -861,6 +924,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/domain/add/$domainId'
       preLoaderRoute: typeof DashboardDomainAddDomainIdRouteImport
       parentRoute: typeof DashboardDomainAddRoute
+    }
+    '/_dashboard/contacts/groups/$groupId': {
+      id: '/_dashboard/contacts/groups/$groupId'
+      path: '/$groupId'
+      fullPath: '/contacts/groups/$groupId'
+      preLoaderRoute: typeof DashboardContactsGroupsGroupIdRouteImport
+      parentRoute: typeof DashboardContactsGroupsRoute
+    }
+    '/_dashboard/contacts/detail/$contactId': {
+      id: '/_dashboard/contacts/detail/$contactId'
+      path: '/$contactId'
+      fullPath: '/contacts/detail/$contactId'
+      preLoaderRoute: typeof DashboardContactsDetailContactIdRouteImport
+      parentRoute: typeof DashboardContactsDetailRoute
     }
   }
 }
@@ -878,16 +955,49 @@ const DashboardApiKeysRouteChildren: DashboardApiKeysRouteChildren = {
 const DashboardApiKeysRouteWithChildren =
   DashboardApiKeysRoute._addFileChildren(DashboardApiKeysRouteChildren)
 
+interface DashboardContactsDetailRouteChildren {
+  DashboardContactsDetailContactIdRoute: typeof DashboardContactsDetailContactIdRoute
+}
+
+const DashboardContactsDetailRouteChildren: DashboardContactsDetailRouteChildren =
+  {
+    DashboardContactsDetailContactIdRoute:
+      DashboardContactsDetailContactIdRoute,
+  }
+
+const DashboardContactsDetailRouteWithChildren =
+  DashboardContactsDetailRoute._addFileChildren(
+    DashboardContactsDetailRouteChildren,
+  )
+
+interface DashboardContactsGroupsRouteChildren {
+  DashboardContactsGroupsGroupIdRoute: typeof DashboardContactsGroupsGroupIdRoute
+  DashboardContactsGroupsIndexRoute: typeof DashboardContactsGroupsIndexRoute
+}
+
+const DashboardContactsGroupsRouteChildren: DashboardContactsGroupsRouteChildren =
+  {
+    DashboardContactsGroupsGroupIdRoute: DashboardContactsGroupsGroupIdRoute,
+    DashboardContactsGroupsIndexRoute: DashboardContactsGroupsIndexRoute,
+  }
+
+const DashboardContactsGroupsRouteWithChildren =
+  DashboardContactsGroupsRoute._addFileChildren(
+    DashboardContactsGroupsRouteChildren,
+  )
+
 interface DashboardContactsRouteChildren {
   DashboardContactsChannelsRoute: typeof DashboardContactsChannelsRoute
-  DashboardContactsGroupsRoute: typeof DashboardContactsGroupsRoute
+  DashboardContactsDetailRoute: typeof DashboardContactsDetailRouteWithChildren
+  DashboardContactsGroupsRoute: typeof DashboardContactsGroupsRouteWithChildren
   DashboardContactsPropertiesRoute: typeof DashboardContactsPropertiesRoute
   DashboardContactsIndexRoute: typeof DashboardContactsIndexRoute
 }
 
 const DashboardContactsRouteChildren: DashboardContactsRouteChildren = {
   DashboardContactsChannelsRoute: DashboardContactsChannelsRoute,
-  DashboardContactsGroupsRoute: DashboardContactsGroupsRoute,
+  DashboardContactsDetailRoute: DashboardContactsDetailRouteWithChildren,
+  DashboardContactsGroupsRoute: DashboardContactsGroupsRouteWithChildren,
   DashboardContactsPropertiesRoute: DashboardContactsPropertiesRoute,
   DashboardContactsIndexRoute: DashboardContactsIndexRoute,
 }

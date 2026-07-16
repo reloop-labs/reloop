@@ -1,6 +1,4 @@
-
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -9,6 +7,7 @@ import {
 	Root as PopoverRoot,
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
+import { useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 
 interface Group {
@@ -29,7 +28,7 @@ export const GroupDropdown = ({
 	isDeleting = false,
 	onOpenChange,
 }: GroupDropdownProps) => {
-			const { activeOrganization } = useActiveOrganization();
+	const navigate = useNavigate();
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -62,10 +61,10 @@ export const GroupDropdown = ({
 	const handleItemClick = (itemId: string) => {
 		if (itemId === "view") {
 			setPopoverOpen(false);
-			if (activeOrganization?.slug) {
-				// detail not ported
-		// was: /contacts/groups/${group.id}
-			}
+			void navigate({
+				to: "/contacts/groups/$groupId",
+				params: { groupId: group.id },
+			});
 		} else if (itemId === "delete") {
 			setPopoverOpen(false);
 			onDelete(group);

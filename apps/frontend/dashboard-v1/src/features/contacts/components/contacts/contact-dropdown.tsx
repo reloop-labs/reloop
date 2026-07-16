@@ -1,6 +1,5 @@
 
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import type { AudienceStatus } from "#/features/contacts/audience";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -10,6 +9,7 @@ import {
 	Root as PopoverRoot,
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
+import { useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
@@ -42,8 +42,8 @@ export const ContactDropdown = ({
 	isDeleting,
 	onOpenChange,
 }: ContactDropdownProps) => {
-			const invalidate = useInvalidateContacts();
-	const { activeOrganization } = useActiveOrganization();
+	const invalidate = useInvalidateContacts();
+	const navigate = useNavigate();
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
 	const [isTogglingStatus, setIsTogglingStatus] = useState(false);
@@ -117,8 +117,10 @@ export const ContactDropdown = ({
 	const handleItemClick = async (itemId: string) => {
 		if (itemId === "view") {
 			setPopoverOpen(false);
-			if (activeOrganization?.slug) {
-			}
+			void navigate({
+				to: "/contacts/detail/$contactId",
+				params: { contactId: contact.id },
+			});
 		} else if (itemId === "toggle-status") {
 			setPopoverOpen(false);
 			await handleToggleStatus();

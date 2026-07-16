@@ -7,6 +7,7 @@ import {
 	useInvalidateContacts,
 } from "../../hooks/use-contacts-query";
 import { ChannelCards } from "./channel-cards";
+import { SubscriberPreview } from "./subscriber-preview";
 
 export function ChannelList() {
 	const { activeOrganization } = useActiveOrganization();
@@ -51,21 +52,34 @@ export function ChannelList() {
 	}
 
 	const allChannels = data?.channels ?? [];
+	const orgName = activeOrganization?.name ?? "Your Organization";
 
 	return (
-		<ChannelCards
-			channels={allChannels}
-			isLoading={isLoading}
-			onAddChannel={() => void setModal("create-channel")}
-			onEdit={(id) => {
-				void setModal("edit-channel");
-				void setId(id);
-			}}
-			onDelete={(id) => {
-				void setModal("delete-channel");
-				void setId(id);
-			}}
-			onToggleVisibility={handleToggleVisibility}
-		/>
+		<div className="flex gap-3">
+			{/* Left: Channel list */}
+			<div className="min-w-0 flex-1">
+				<ChannelCards
+					channels={allChannels}
+					isLoading={isLoading}
+					onAddChannel={() => void setModal("create-channel")}
+					onEdit={(id) => {
+						void setModal("edit-channel");
+						void setId(id);
+					}}
+					onDelete={(id) => {
+						void setModal("delete-channel");
+						void setId(id);
+					}}
+					onToggleVisibility={handleToggleVisibility}
+				/>
+			</div>
+
+			{/* Right: Subscriber preference preview — public channels */}
+			<div className="hidden w-[300px] flex-shrink-0 lg:block">
+				<div className="sticky top-6">
+					<SubscriberPreview channels={allChannels} orgName={orgName} />
+				</div>
+			</div>
+		</div>
 	);
 }

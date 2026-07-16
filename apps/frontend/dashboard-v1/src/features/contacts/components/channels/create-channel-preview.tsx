@@ -143,7 +143,7 @@ export function CreateChannelPreview({
 							"border-black/10 dark:border-white/15",
 						)}
 					>
-						<Logo />
+						<Logo className="h-5 w-5" />
 					</div>
 				</div>
 
@@ -206,31 +206,29 @@ export function CreateChannelPreview({
 										isDarkMode={isDarkMode}
 									/>
 									<div className="-mt-px min-w-0 flex-1">
-										<div className="flex items-center justify-between gap-2">
-											<div className="flex flex-1 items-center justify-between gap-2">
-												{t.name ? (
-													<p
-														className={cn(
-															"font-medium text-sm leading-4",
-															"text-text-strong-950 dark:text-white",
-														)}
-													>
-														{t.name}
-													</p>
-												) : (
-													<Skeleton
-														className={cn(
-															"h-3.5 w-32 rounded-md",
-															"bg-black/5 dark:bg-white/10",
-														)}
-													/>
-												)}
-												{isCurrent && (
-													<span className="rounded-full bg-primary-base px-2 py-0.5 font-semibold text-[10px] text-white">
-														{badgeLabel}
-													</span>
-												)}
-											</div>
+										<div className="flex min-w-0 items-center justify-between gap-2">
+											{t.name ? (
+												<p
+													className={cn(
+														"min-w-0 truncate font-medium text-sm leading-4",
+														"text-text-strong-950 dark:text-white",
+													)}
+												>
+													{t.name}
+												</p>
+											) : (
+												<Skeleton
+													className={cn(
+														"h-3.5 w-32 rounded-md",
+														"bg-black/5 dark:bg-white/10",
+													)}
+												/>
+											)}
+											{isCurrent && (
+												<span className="flex-shrink-0 rounded-full bg-primary-base px-2 py-0.5 font-semibold text-[10px] text-white">
+													{badgeLabel}
+												</span>
+											)}
 										</div>
 										{t.description ? (
 											<p
@@ -330,7 +328,7 @@ export function CreateChannelPreview({
 							"bg-black/5 dark:bg-white/10",
 						)}
 					>
-						<Logo />
+						<Logo className="h-3 w-3" />
 					</div>
 					<span
 						className={cn(
