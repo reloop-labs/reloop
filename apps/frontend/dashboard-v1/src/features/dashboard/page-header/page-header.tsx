@@ -1,28 +1,30 @@
+import { useSupportUnread } from "#/features/dashboard/hooks/use-support-unread";
+import { useUIStore } from "#/store/use-ui-store";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Link, useRouterState } from "@tanstack/react-router";
-import { SETTINGS_ADMIN_HOME } from "../navigation";
 import { OrganizationSwitcher } from "./organization-switcher";
 import { useActiveOrganization } from "./use-active-organization";
 import { UserDropdown } from "./user-dropdown";
 
 /**
  * Top bar for the main content panel: workspace switcher + global actions.
- * Matches the Next dashboard PageHeader chrome.
+ * Matches the Next dashboard PageHeader chrome (without settings gear).
  */
 export function PageHeader() {
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
-	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
 	const {
 		user,
 		organizations,
 		activeOrganization,
 		onOrganizationChange,
 	} = useActiveOrganization();
-
-	// Until org-role permissions land, send everyone to the admin settings home.
-	const settingsHome = SETTINGS_ADMIN_HOME;
+	const {
+		isAiPanelOpen,
+		setIsAiPanelOpen,
+		aiPanelActiveTab,
+		setAiPanelActiveTab,
+	} = useUIStore();
+	const { unreadCount } = useSupportUnread();
 
 	return (
 		<div className="sticky top-0 z-10 flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b pr-3 pl-3 dark:border-stroke-soft-100/40">
@@ -36,25 +38,28 @@ export function PageHeader() {
 			</div>
 
 			<div className="flex items-center gap-2">
-				<Link
-					to={settingsHome}
-					search={{ from: pathWithoutSlug }}
-					title="Settings"
-					className="flex h-8 w-8 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
-				>
-					<Icon name="gear" className="h-4 w-4" />
-				</Link>
-
-				<div className="mx-0.5 h-4 w-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
-
-				{/* AI / Support panels not ported yet — chrome matches Next dashboard. */}
 				<Button.Root
 					variant="neutral"
 					mode="ghost"
 					size="xxsmall"
-					className={cn("gap-1.5 text-text-sub-600 hover:text-text-strong-950")}
+					className={cn(
+						"gap-1.5 text-text-sub-600 hover:text-text-strong-950",
+						isAiPanelOpen &&
+							aiPanelActiveTab === "ai" &&
+							"bg-bg-weak-50 text-text-strong-950",
+					)}
 					type="button"
-					title="Ask AI (coming soon)"
+					title="Ask AI"
+					onClick={() => {
+						if (!isAiPanelOpen) {
+							setAiPanelActiveTab("ai");
+							setIsAiPanelOpen(true);
+						} else if (aiPanelActiveTab === "ai") {
+							setIsAiPanelOpen(false);
+						} else {
+							setAiPanelActiveTab("ai");
+						}
+					}}
 				>
 					<Icon
 						name="sparkling"
@@ -71,12 +76,30 @@ export function PageHeader() {
 					size="xxsmall"
 					className={cn(
 						"relative gap-1.5 text-text-sub-600 hover:text-text-strong-950",
+						isAiPanelOpen &&
+							aiPanelActiveTab === "support" &&
+							"bg-bg-weak-50 text-text-strong-950",
 					)}
 					type="button"
-					title="Support (coming soon)"
+					title="Support"
+					onClick={() => {
+						if (!isAiPanelOpen) {
+							setAiPanelActiveTab("support");
+							setIsAiPanelOpen(true);
+						} else if (aiPanelActiveTab === "support") {
+							setIsAiPanelOpen(false);
+						} else {
+							setAiPanelActiveTab("support");
+						}
+					}}
 				>
 					<Icon name="question" className="h-4 w-4 text-text-sub-600" />
 					<span>Support</span>
+					{unreadCount > 0 ? (
+						<span className="-top-0.5 -right-0.5 absolute flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 font-semibold text-[10px] text-white tabular-nums">
+							{unreadCount > 99 ? "99+" : unreadCount}
+						</span>
+					) : null}
 				</Button.Root>
 
 				<UserDropdown

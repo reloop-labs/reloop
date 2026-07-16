@@ -77,6 +77,10 @@ export const queryKeys = {
 			[...queryKeys.contacts.all, "properties", "all"] as const,
 		channels: () => [...queryKeys.contacts.all, "channels"] as const,
 	},
+	support: {
+		all: ["support"] as const,
+		unreadCount: () => [...queryKeys.support.all, "unread-count"] as const,
+	},
 	templates: {
 		all: ["templates"] as const,
 		list: () => [...queryKeys.templates.all, "list"] as const,
