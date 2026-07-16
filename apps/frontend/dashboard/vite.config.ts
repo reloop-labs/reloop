@@ -26,7 +26,14 @@ const config = defineConfig({
 	},
 	plugins: [
 		devtools(),
-		nitro({ rollupConfig: { external: [/^@sentry\//] } }),
+		nitro({
+			// Explicit: monorepo rootDir scanning often skips app-local server/plugins.
+			// Plugin handles Coolify path-strip loops + /dashboard/assets static map.
+			plugins: [
+				path.resolve(rootDir, "server/plugins/restore-dashboard-basepath.ts"),
+			],
+			rollupConfig: { external: [/^@sentry\//] },
+		}),
 		tailwindcss(),
 		tanstackStart({
 			router: {
