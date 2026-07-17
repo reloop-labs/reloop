@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
@@ -81,6 +82,11 @@ import { Route as DashboardContactsGroupsGroupIdRouteImport } from './routes/_da
 import { Route as DashboardContactsDetailContactIdRouteImport } from './routes/_dashboard/contacts/detail/$contactId'
 import { Route as DashboardInboxMailboxIdLabelLabelIdRouteImport } from './routes/_dashboard/inbox/$mailboxId/label/$labelId'
 
+const VerifyRoute = VerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -471,6 +477,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
+  '/verify': typeof VerifyRoute
   '/agent-inbox': typeof DashboardAgentInboxRoute
   '/api-keys': typeof DashboardApiKeysRouteWithChildren
   '/contacts': typeof DashboardContactsRouteWithChildren
@@ -542,6 +549,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
+  '/verify': typeof VerifyRoute
   '/agent-inbox': typeof DashboardAgentInboxRoute
   '/inbox': typeof DashboardInboxRouteWithChildren
   '/integrations': typeof DashboardIntegrationsRoute
@@ -602,6 +610,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
+  '/verify': typeof VerifyRoute
   '/_dashboard/agent-inbox': typeof DashboardAgentInboxRoute
   '/_dashboard/api-keys': typeof DashboardApiKeysRouteWithChildren
   '/_dashboard/contacts': typeof DashboardContactsRouteWithChildren
@@ -677,6 +686,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/signup'
+    | '/verify'
     | '/agent-inbox'
     | '/api-keys'
     | '/contacts'
@@ -748,6 +758,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/signup'
+    | '/verify'
     | '/agent-inbox'
     | '/inbox'
     | '/integrations'
@@ -807,6 +818,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/onboarding'
     | '/signup'
+    | '/verify'
     | '/_dashboard/agent-inbox'
     | '/_dashboard/api-keys'
     | '/_dashboard/contacts'
@@ -881,10 +893,18 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
   SignupRoute: typeof SignupRoute
+  VerifyRoute: typeof VerifyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify': {
+      id: '/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof VerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -1712,6 +1732,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
   SignupRoute: SignupRoute,
+  VerifyRoute: VerifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
