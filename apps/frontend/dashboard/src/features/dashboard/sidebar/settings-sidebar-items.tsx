@@ -85,7 +85,7 @@ export function SettingsSidebarItems({
 				>
 					<Icon
 						name="arrow-left"
-						className="h-4 w-4 shrink-0 text-text-sub-600 opacity-70 transition-all duration-200 group-hover:text-text-strong-950 group-hover:opacity-100"
+						className="h-4 w-4 shrink-0 text-text-sub-600 opacity-70 transition-all duration-200 group-hover:text-text-strong-950 group-hover:opacity-100 group-hover:-translate-x-0.5"
 					/>
 					{!isCollapsed && (
 						<span className="font-medium text-[13px] text-text-sub-600 transition-colors group-hover:text-text-strong-950">

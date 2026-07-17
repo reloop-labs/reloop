@@ -2,7 +2,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { useRouterState } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useHotkeys } from "react-hotkeys-hook";
 import { SettingsSidebarItems } from "./settings-sidebar-items";
 import { SidebarItems } from "./sidebar-items";
@@ -13,6 +13,7 @@ export function MainSidebar() {
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
 	const isSettings = pathWithoutSlug.startsWith("/settings");
+	const shouldReduceMotion = useReducedMotion();
 
 	useHotkeys("meta+b", (e) => {
 		e.preventDefault();
@@ -77,7 +78,7 @@ export function MainSidebar() {
 			{/* Animated sidebar content — slides on settings ↔ main switch */}
 			<div
 				className={cn(
-					"relative flex-1 overflow-hidden py-2 transition-all",
+					"relative flex-1 overflow-hidden py-2 transition-[padding] duration-200 ease-in-out",
 					isCollapsed ? "px-0" : "px-2",
 				)}
 			>
@@ -94,9 +95,19 @@ export function MainSidebar() {
 					{isSettings ? (
 						<motion.div
 							key="settings"
-							initial={{ x: "100%", opacity: 0 }}
-							animate={{ x: 0, opacity: 1 }}
-							exit={{ x: "100%", opacity: 0 }}
+							initial={{
+								transform: shouldReduceMotion
+									? "translateX(0%)"
+									: "translateX(20%)",
+								opacity: 0,
+							}}
+							animate={{ transform: "translateX(0%)", opacity: 1 }}
+							exit={{
+								transform: shouldReduceMotion
+									? "translateX(0%)"
+									: "translateX(20%)",
+								opacity: 0,
+							}}
 							transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
 							className="scrollbar-hide absolute inset-0 overflow-y-auto overflow-x-hidden py-2"
 							style={{ paddingInline: isCollapsed ? 0 : 8 }}
@@ -106,9 +117,19 @@ export function MainSidebar() {
 					) : (
 						<motion.div
 							key="main"
-							initial={{ x: "-100%", opacity: 0 }}
-							animate={{ x: 0, opacity: 1 }}
-							exit={{ x: "-100%", opacity: 0 }}
+							initial={{
+								transform: shouldReduceMotion
+									? "translateX(0%)"
+									: "translateX(-20%)",
+								opacity: 0,
+							}}
+							animate={{ transform: "translateX(0%)", opacity: 1 }}
+							exit={{
+								transform: shouldReduceMotion
+									? "translateX(0%)"
+									: "translateX(-20%)",
+								opacity: 0,
+							}}
 							transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
 							className="scrollbar-hide absolute inset-0 overflow-y-auto overflow-x-hidden py-2"
 							style={{ paddingInline: isCollapsed ? 0 : 8 }}
