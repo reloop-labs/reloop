@@ -85,7 +85,14 @@ export async function uploadFile(params: {
 			throw new Error("Failed to save upload metadata");
 		}
 
-		const fileUrl = `${uploadConfig.S3.ENDPOINT}/${uploadConfig.S3.BUCKET}/${filePath}`;
+		// Always emit an absolute URL. If S3_ENDPOINT is scheme-less
+		// (e.g. "s3.reloop.sh"), browsers treat it as a path under the app
+		// origin → https://reloop.sh/s3.reloop.sh/... and the image 404s.
+		let endpoint = uploadConfig.S3.ENDPOINT.replace(/\/$/, "");
+		if (!/^https?:\/\//i.test(endpoint)) {
+			endpoint = `https://${endpoint}`;
+		}
+		const fileUrl = `${endpoint}/${uploadConfig.S3.BUCKET}/${filePath}`;
 
 		log.info("File uploaded successfully", {
 			id: newUpload[0].id,

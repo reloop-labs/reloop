@@ -10,6 +10,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { queryKeys } from "#/lib/query-keys";
+import { ensureAbsoluteUrl } from "#/utils/absolute-url";
 
 interface WorkspaceLogoUploadProps {
 	organizationId: string;
@@ -23,13 +24,15 @@ export function WorkspaceLogoUpload({
 	onLogoChange,
 }: WorkspaceLogoUploadProps) {
 	const queryClient = useQueryClient();
-	const [logoPreview, setLogoPreview] = useState(initialLogoUrl || "");
-	const [logoUrl, setLogoUrl] = useState(initialLogoUrl || "");
+	const [logoPreview, setLogoPreview] = useState(
+		ensureAbsoluteUrl(initialLogoUrl),
+	);
+	const [logoUrl, setLogoUrl] = useState(ensureAbsoluteUrl(initialLogoUrl));
 	const [isUploading, setIsUploading] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
-		const next = initialLogoUrl || "";
+		const next = ensureAbsoluteUrl(initialLogoUrl);
 		setLogoUrl(next);
 		// Don't replace a local FileReader data-URL with a remote URL
 		// (onboarding keeps the data-URL in logoPreview for display).
@@ -69,7 +72,7 @@ export function WorkspaceLogoUpload({
 				{ withCredentials: true },
 			);
 
-			const uploadedUrl = uploadData.url as string;
+			const uploadedUrl = ensureAbsoluteUrl(uploadData.url as string);
 			// Keep data-URL in logoPreview (same as onboarding) so the control
 			// always shows the image even if the remote URL is unreachable.
 			setLogoUrl(uploadedUrl);
@@ -93,7 +96,7 @@ export function WorkspaceLogoUpload({
 			toast.success("Logo updated successfully");
 		} catch (error) {
 			console.error("Upload error:", error);
-			setLogoPreview(logoUrl || initialLogoUrl || "");
+			setLogoPreview(logoUrl || ensureAbsoluteUrl(initialLogoUrl));
 			if (axios.isAxiosError(error)) {
 				if (error.response?.status === 401 || error.response?.status === 403) {
 					return;
@@ -115,7 +118,7 @@ export function WorkspaceLogoUpload({
 	};
 
 	// Prefer local data-URL preview first (same as onboarding LogoUpload).
-	const displaySrc = logoPreview || logoUrl;
+	const displaySrc = ensureAbsoluteUrl(logoPreview || logoUrl);
 	const hasLogo = Boolean(displaySrc);
 
 	return (

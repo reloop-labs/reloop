@@ -4,6 +4,7 @@ import { Icon } from "@reloop/ui/icon";
 import { useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import { ensureAbsoluteUrl } from "#/utils/absolute-url";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import type { Organization } from "./use-active-organization";
 
@@ -15,12 +16,13 @@ function OrgAvatar({
 	size: number;
 }) {
 	const [imgError, setImgError] = useState(false);
+	const logoSrc = ensureAbsoluteUrl(org.logo);
 	const gradient = getAvatarGradient(org.id);
 	const initial = getAvatarInitial(org.name, org.name);
 	const dim = size === 20 ? "h-5 w-5" : "h-6 w-6";
 	const textSize = size === 20 ? "text-[10px]" : "text-[11px]";
 
-	if (org.logo && !imgError) {
+	if (logoSrc && !imgError) {
 		return (
 			<div
 				className={cn(
@@ -29,10 +31,11 @@ function OrgAvatar({
 				)}
 			>
 				<img
-					src={org.logo}
+					src={logoSrc}
 					alt={org.name}
 					className="h-full w-full object-cover"
 					onError={() => setImgError(true)}
+					referrerPolicy="no-referrer"
 				/>
 			</div>
 		);

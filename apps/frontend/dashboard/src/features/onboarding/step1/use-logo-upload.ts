@@ -3,6 +3,7 @@ import { parseAsString, useQueryState } from "nuqs";
 import type React from "react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { ensureAbsoluteUrl } from "#/utils/absolute-url";
 
 /**
  * Local object-URL / data-URL preview is kept in React state only.
@@ -58,7 +59,7 @@ export function useLogoUpload() {
 				{ withCredentials: true },
 			);
 
-			const uploadedUrl = uploadData.url as string;
+			const uploadedUrl = ensureAbsoluteUrl(uploadData.url as string);
 			// Permanent absolute URL for org.create + sidebar/domain previews.
 			// Keep the data-URL in logoPreview so the upload control always shows
 			// the image even if the remote URL is slow or briefly unreachable.

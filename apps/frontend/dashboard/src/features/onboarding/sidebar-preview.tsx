@@ -1,4 +1,5 @@
 import { Icon } from "@reloop/ui/icon";
+import { ensureAbsoluteUrl } from "#/utils/absolute-url";
 
 interface SidebarPreviewProps {
 	name: string;
@@ -6,6 +7,8 @@ interface SidebarPreviewProps {
 }
 
 export function SidebarPreview({ name, logo }: SidebarPreviewProps) {
+	const logoSrc = ensureAbsoluteUrl(logo);
+
 	return (
 		<div className="absolute top-32 left-28">
 			<div className="relative flex h-[520px] w-[480px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-2xl dark:border-stroke-soft-100/40">
@@ -23,11 +26,12 @@ export function SidebarPreview({ name, logo }: SidebarPreviewProps) {
 				<div className="flex flex-1 overflow-hidden">
 					<div className="flex w-52 flex-col gap-2 border-stroke-soft-100 border-r dark:border-stroke-soft-100/40">
 						<div className="flex w-full items-center gap-2 border-stroke-soft-100 border-b px-4 py-2 dark:border-stroke-soft-100/40">
-							{logo ? (
+							{logoSrc ? (
 								<img
-									src={logo}
+									src={logoSrc}
 									alt="Logo"
 									className="h-5 w-5 rounded-sm object-cover"
+									referrerPolicy="no-referrer"
 								/>
 							) : (
 								<span className="flex h-6 w-6 items-center justify-center rounded-lg border border-stroke-soft-100 p-1 font-bold text-xs dark:border-stroke-soft-100/40">

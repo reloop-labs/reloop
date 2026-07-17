@@ -5,6 +5,7 @@ import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import type { RefObject } from "react";
+import { ensureAbsoluteUrl } from "#/utils/absolute-url";
 
 export function LogoUpload({
 	fileInputRef,
@@ -23,7 +24,7 @@ export function LogoUpload({
 }) {
 	// Prefer local data-URL preview first so the image always shows while the
 	// remote upload URL settles (and if remote is temporarily unreachable).
-	const displaySrc = logoPreview || logoUrl;
+	const displaySrc = ensureAbsoluteUrl(logoPreview || logoUrl);
 	const hasLogo = Boolean(displaySrc);
 
 	return (

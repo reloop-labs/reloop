@@ -1,6 +1,7 @@
 import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
 import { useEffect, useState } from "react";
+import { ensureAbsoluteUrl } from "#/utils/absolute-url";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 
 type AvatarSize = React.ComponentProps<typeof Avatar.Root>["size"];
@@ -30,7 +31,7 @@ export function UserAvatar({
 	alt,
 }: UserAvatarProps) {
 	const [imageFailed, setImageFailed] = useState(false);
-	const imageSrc = image?.trim() || "";
+	const imageSrc = ensureAbsoluteUrl(image);
 
 	useEffect(() => {
 		setImageFailed(false);

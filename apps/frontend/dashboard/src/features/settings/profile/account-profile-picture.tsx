@@ -9,6 +9,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { queryKeys } from "#/lib/query-keys";
+import { ensureAbsoluteUrl } from "#/utils/absolute-url";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 
 interface AccountProfilePictureProps {
@@ -28,15 +29,17 @@ export function AccountProfilePicture({
 	email,
 }: AccountProfilePictureProps) {
 	const queryClient = useQueryClient();
-	const [imagePreview, setImagePreview] = useState(initialImageUrl || "");
-	const [imageUrl, setImageUrl] = useState(initialImageUrl || "");
+	const [imagePreview, setImagePreview] = useState(
+		ensureAbsoluteUrl(initialImageUrl),
+	);
+	const [imageUrl, setImageUrl] = useState(ensureAbsoluteUrl(initialImageUrl));
 	const [imageFailed, setImageFailed] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	// Keep local state in sync when session user.image arrives/changes after mount.
 	useEffect(() => {
-		const next = initialImageUrl || "";
+		const next = ensureAbsoluteUrl(initialImageUrl);
 		setImageUrl(next);
 		// Don't replace a local FileReader data-URL with a remote URL
 		// (same as onboarding: local preview wins for display).
@@ -46,7 +49,8 @@ export function AccountProfilePicture({
 		setImageFailed(false);
 	}, [initialImageUrl, isUploading]);
 
-	const displaySrc = (imagePreview || imageUrl).trim();
+	// Prefer local data-URL first (same as onboarding).
+	const displaySrc = ensureAbsoluteUrl(imagePreview || imageUrl);
 	const showPhoto = Boolean(displaySrc) && !imageFailed;
 	const fallbackInitial =
 		initials?.trim() || getAvatarInitial(name ?? null, email);
@@ -84,7 +88,7 @@ export function AccountProfilePicture({
 				{ withCredentials: true },
 			);
 
-			const uploadedUrl = uploadData.url as string;
+			const uploadedUrl = ensureAbsoluteUrl(uploadData.url as string);
 			// Keep data-URL in imagePreview (same as onboarding logo upload) so
 			// the photo always shows even if the remote URL is unreachable.
 			setImageUrl(uploadedUrl);
@@ -107,7 +111,7 @@ export function AccountProfilePicture({
 		} catch (error) {
 			console.error("Upload error:", error);
 			// Roll back to the last known good remote URL.
-			setImagePreview(imageUrl || initialImageUrl || "");
+			setImagePreview(imageUrl || ensureAbsoluteUrl(initialImageUrl));
 			setImageFailed(false);
 			if (axios.isAxiosError(error)) {
 				if (error.response?.status === 401 || error.response?.status === 403) {

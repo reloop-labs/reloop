@@ -1,4 +1,5 @@
 import { Icon } from "@reloop/ui/icon";
+import { ensureAbsoluteUrl } from "#/utils/absolute-url";
 
 export function DomainPreview({
 	domain,
@@ -18,6 +19,7 @@ export function DomainPreview({
 	const skeletonClass = isDomainVariant
 		? "h-4 rounded bg-bg-weak-50"
 		: "h-4 rounded bg-bg-soft-200";
+	const logoSrc = ensureAbsoluteUrl(logoUrl);
 
 	return (
 		<div
@@ -53,11 +55,12 @@ export function DomainPreview({
 					}
 				>
 					<div className="mb-5 flex items-start gap-4">
-						{logoUrl ? (
+						{logoSrc ? (
 							<img
-								src={logoUrl}
+								src={logoSrc}
 								alt={domainName}
 								className="h-10 w-10 shrink-0 rounded-full border-2 border-stroke-soft-100 object-cover"
+								referrerPolicy="no-referrer"
 							/>
 						) : domain ? (
 							<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-stroke-soft-100 bg-bg-soft-200 font-bold text-sm">
