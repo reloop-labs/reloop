@@ -20,8 +20,6 @@ const response = await fetch("https://reloop.sh/api/domain/v1/create", {
   },
   body: JSON.stringify({
     domain: "send.example.com",
-    custom_return_path: "inbound",
-    tracking: "tracking",
     click_tracking: true,
     open_tracking: true,
     tls: "opportunistic",
@@ -108,8 +106,6 @@ response = requests.post(
     },
     json={
         "domain": "send.example.com",
-        "custom_return_path": "inbound",
-        "tracking": "tracking",
         "click_tracking": True,
         "open_tracking": True,
         "tls": "opportunistic",
@@ -179,8 +175,6 @@ result = response.json()`,
 // Create a domain
 $payload = [
     'domain' => 'send.example.com',
-    'custom_return_path' => 'inbound',
-    'tracking' => 'tracking',
     'click_tracking' => true,
     'open_tracking' => true,
     'tls' => 'opportunistic',

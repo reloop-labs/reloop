@@ -12,26 +12,8 @@ export namespace DomainModel {
 				pattern: domainPattern.source,
 				description: "Domain name (e.g., send.reloop.com)",
 			}),
-			custom_return_path: t.Optional(
-				t.String({
-					minLength: 1,
-					maxLength: 255,
-					pattern:
-						"^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
-					default: "inbound",
-					description: "Custom return-path subdomain (e.g., inbound)",
-				}),
-			),
-			tracking: t.Optional(
-				t.String({
-					minLength: 1,
-					maxLength: 255,
-					pattern:
-						"^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
-					default: "tracking",
-					description: "Custom tracking subdomain (e.g., tracking)",
-				}),
-			),
+			// custom_return_path and tracking host labels are fixed server-side
+			// (inbound / link) — not accepted from clients.
 			click_tracking: t.Optional(
 				t.Boolean({
 					default: false,
@@ -67,7 +49,6 @@ export namespace DomainModel {
 			examples: [
 				{
 					domain: "send.example.com",
-					custom_return_path: "inbound",
 					click_tracking: true,
 					open_tracking: true,
 					tls: "opportunistic",

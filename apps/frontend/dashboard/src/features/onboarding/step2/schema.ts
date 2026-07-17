@@ -15,24 +15,6 @@ export const domainSchema = v.object({
 	),
 	clickTracking: v.boolean(),
 	openTracking: v.boolean(),
-	customReturnPath: v.optional(
-		v.pipe(
-			v.string(),
-			v.regex(
-				/^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)?$/,
-				"Please enter a valid subdomain format",
-			),
-		),
-	),
-	trackingSubdomain: v.optional(
-		v.pipe(
-			v.string(),
-			v.regex(
-				/^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)?$/,
-				"Please enter a valid subdomain format",
-			),
-		),
-	),
 });
 
 export type DomainFormValues = v.InferInput<typeof domainSchema>;

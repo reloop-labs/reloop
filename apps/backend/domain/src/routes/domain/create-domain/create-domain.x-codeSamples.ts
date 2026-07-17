@@ -9,7 +9,6 @@ const reloop = new Reloop({ apiKey: "rl_123456789" });
 
 const { response: domain, error } = await reloop.domain.create({
   domain: "send.example.com",
-  custom_return_path: "inbound",
   click_tracking: true,
   open_tracking: true,
   tls: "opportunistic",
@@ -25,7 +24,7 @@ if (error) throw error;`,
 		source: `curl -X POST https://reloop.sh/api/domain/v1/create \\
   -H "x-api-key: rl_123456789" \\
   -H "Content-Type: application/json" \\
-  -d '{"domain": "send.example.com","custom_return_path": "inbound","click_tracking": true,"open_tracking": true,"tls": "opportunistic","sending_email": true,"receiving_email": false}'`,
+  -d '{"domain": "send.example.com","click_tracking": true,"open_tracking": true,"tls": "opportunistic","sending_email": true,"receiving_email": false}'`,
 	},
 	{
 		id: "python",
@@ -37,7 +36,6 @@ reloop = Reloop(api_key="rl_123456789")
 
 domain = reloop.domain.create(
     domain="send.example.com",
-    custom_return_path="inbound",
     click_tracking=True,
     open_tracking=True,
     tls="opportunistic",
@@ -53,7 +51,6 @@ domain = reloop.domain.create(
 
 $domain = $reloop->domain->create([
     'domain' => 'send.example.com',
-    'custom_return_path' => 'inbound',
     'click_tracking' => true,
     'open_tracking' => true,
     'tls' => 'opportunistic',
@@ -73,13 +70,11 @@ ReloopClient reloop = new ReloopClient("rl_123456789");
 Domain domain = reloop.domain.create(
     new CreateDomainParams(
         "send.example.com",
-        "inbound",
-        null,
         true,
-        null,
+        true,
         "opportunistic",
         true,
-        true
+        false
     )
 );`,
 	},
@@ -94,12 +89,11 @@ var reloop = new ReloopClient("rl_123456789");
 
 var domain = await reloop.Domain.CreateAsync(new CreateDomainParams(
     Domain: "send.example.com",
-    CustomReturnPath: "inbound",
     ClickTracking: true,
     OpenTracking: true,
     Tls: "opportunistic",
     SendingEmail: true,
-    ReceivingEmail: true
+    ReceivingEmail: false
 ));`,
 	},
 	{
@@ -114,12 +108,11 @@ client, _ := reloop.NewClient(reloop.ClientOptions{
 
 domain, _ := client.Domain.Create(reloop.CreateDomainParams{
     Domain: "send.example.com",
-    CustomReturnPath: reloop.String("inbound"),
     ClickTracking: reloop.Bool(true),
     OpenTracking: reloop.Bool(true),
     Tls: reloop.String("opportunistic"),
     SendingEmail: reloop.Bool(true),
-    ReceivingEmail: reloop.Bool(true),
+    ReceivingEmail: reloop.Bool(false),
 })`,
 	},
 	{
@@ -133,7 +126,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     reloop.domain().create(CreateDomainParams {
         domain: "send.example.com".to_string(),
-        custom_return_path: Some("inbound".to_string()),
         click_tracking: Some(true),
         open_tracking: Some(true),
         tls: Some("opportunistic".to_string()),
@@ -155,7 +147,6 @@ reloop = Reloop::Client.new(api_key: "rl_123456789")
 
 domain = reloop.domain.create(
   domain: "send.example.com",
-  custom_return_path: "inbound",
   click_tracking: true,
   open_tracking: true,
   tls: "opportunistic",
@@ -171,7 +162,6 @@ domain = reloop.domain.create(
 
 {:ok, domain} = Reloop.Services.Domain.create(client, %{
   domain: "send.example.com",
-  custom_return_path: "inbound",
   click_tracking: true,
   open_tracking: true,
   tls: "opportunistic",

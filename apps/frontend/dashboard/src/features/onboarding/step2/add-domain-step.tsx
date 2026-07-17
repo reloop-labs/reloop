@@ -25,8 +25,6 @@ export function AddDomainStep() {
 				domain: domain || "",
 				clickTracking: false,
 				openTracking: false,
-				customReturnPath: "receive",
-				trackingSubdomain: "link",
 			},
 		});
 

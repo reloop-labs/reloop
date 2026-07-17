@@ -27,8 +27,7 @@ export function useAddDomain(setError: UseFormSetError<DomainFormValues>) {
 					domain: values.domain,
 					click_tracking: values.clickTracking,
 					open_tracking: values.openTracking,
-					custom_return_path: values.customReturnPath || "receive",
-					tracking: values.trackingSubdomain || "link",
+					// Return path + tracking host labels are fixed server-side.
 					tls: "opportunistic",
 				},
 				{ withCredentials: true },

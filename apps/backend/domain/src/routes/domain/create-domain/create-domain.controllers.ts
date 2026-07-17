@@ -1,3 +1,4 @@
+import { domainConfig } from "@reloop/domain/domain.config";
 import { DomainErrors } from "@reloop/domain/error/domain.error-response";
 import type { DomainTypes } from "@reloop/domain/types/domain.type";
 import { useLogger } from "evlog/elysia";
@@ -14,8 +15,6 @@ export async function createDomainController({
 	organizationId,
 	userId,
 	domain,
-	custom_return_path: customReturnPath,
-	tracking,
 	click_tracking: clickTracking,
 	open_tracking: openTracking,
 	tls,
@@ -26,6 +25,10 @@ export async function createDomainController({
 	userId: string;
 } & DomainTypes.CreateDomainRequest): Promise<DomainTypes.DomainResponse> {
 	const log = useLogger();
+	// Fixed server defaults — not accepted from the API body.
+	const customReturnPath = domainConfig.constants.defaultCustomReturnPath;
+	const trackingSubdomain = domainConfig.constants.defaultTrackingSubdomain;
+
 	try {
 		if (/^www\./i.test(domain)) {
 			throw DomainErrors.invalidDomain(
@@ -46,7 +49,7 @@ export async function createDomainController({
 			organizationId,
 			domain,
 			customReturnPath,
-			trackingSubdomain: tracking,
+			trackingSubdomain,
 			clickTracking,
 			openTracking,
 			tls,
@@ -62,8 +65,7 @@ export async function createDomainController({
 		const { dnsRecords, receivingMxRecord, trackingRecord } =
 			await generateDnsRecords_step3({
 				domain,
-				customReturnPath,
-				trackingSubdomain: tracking,
+				trackingSubdomain,
 			});
 
 		// Step 4: Create new domain entry
@@ -72,7 +74,7 @@ export async function createDomainController({
 			organizationId,
 			domain,
 			customReturnPath,
-			trackingSubdomain: tracking,
+			trackingSubdomain,
 			clickTracking,
 			openTracking,
 			tls,

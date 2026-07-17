@@ -1,3 +1,4 @@
+import { domainConfig } from "@reloop/domain/domain.config";
 import type { DNSTypes } from "@reloop/domain/types/dns.type";
 import {
 	generateAllDNSRecords,
@@ -11,11 +12,9 @@ import { useLogger } from "evlog/elysia";
 
 export async function generateDnsRecords_step3({
 	domain,
-	trackingSubdomain,
+	trackingSubdomain = domainConfig.constants.defaultTrackingSubdomain,
 }: {
 	domain: string;
-	/** @deprecated Kept for API compat; receiving MX is on the domain apex, not return-path. */
-	customReturnPath?: string;
 	trackingSubdomain?: string;
 }) {
 	const log = useLogger();
@@ -23,16 +22,13 @@ export async function generateDnsRecords_step3({
 
 	const dnsRecords = await generateAllDNSRecords(domain);
 	// Receiving MX lives on the domain being verified so user@domain is delivered
-	// to inbound.{HOST_DOMAIN} (not on the custom return-path subdomain).
+	// to inbound.{HOST_DOMAIN} (not on a custom return-path subdomain).
 	const receivingMxRecord = generateReceivingMXRecordForDomain(domain);
 
-	let trackingRecord: DNSTypes.DNSRecord | undefined;
-	if (trackingSubdomain) {
-		trackingRecord = generateTrackingCNAMERecord(
-			getCustomReturnPathSubString(domain, trackingSubdomain),
-			getDomainHost(domain),
-		);
-	}
+	const trackingRecord: DNSTypes.DNSRecord = generateTrackingCNAMERecord(
+		getCustomReturnPathSubString(domain, trackingSubdomain),
+		getDomainHost(domain),
+	);
 
 	return { dnsRecords, receivingMxRecord, trackingRecord };
 }

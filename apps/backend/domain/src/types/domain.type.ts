@@ -71,8 +71,6 @@ export namespace DomainTypes {
 
 	export interface CreateDomainRequest {
 		domain: string;
-		custom_return_path?: string;
-		tracking?: string;
 		click_tracking?: boolean;
 		open_tracking?: boolean;
 		tls?: "opportunistic" | "enforced";

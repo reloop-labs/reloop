@@ -15,8 +15,6 @@ export const createDomainRoute = new Elysia()
 		async ({ body, organizationId, userId }) => {
 			const {
 				domain,
-				custom_return_path,
-				tracking,
 				click_tracking,
 				open_tracking,
 				sending_email,
@@ -26,8 +24,6 @@ export const createDomainRoute = new Elysia()
 			return await createDomainController({
 				organizationId,
 				domain,
-				custom_return_path,
-				tracking,
 				click_tracking,
 				open_tracking,
 				tls,

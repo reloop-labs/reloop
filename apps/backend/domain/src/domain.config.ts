@@ -30,5 +30,9 @@ export const domainConfig = {
 	constants: {
 		keyLength: 2048,
 		mxPriority: 10,
+		/** Stored default; receiving MX uses the verified domain host, not this label. */
+		defaultCustomReturnPath: "inbound",
+		/** Customer tracking CNAME host label (e.g. link.example.com → link.reloop.sh). */
+		defaultTrackingSubdomain: "link",
 	},
 };

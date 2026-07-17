@@ -9,12 +9,13 @@ import {
 } from "react-hook-form";
 import type { DomainFormValues } from "./schema";
 
+/** Fixed server defaults (must match domain service config). */
+const TRACKING_SUBDOMAIN = "link";
+
 export function AdvancedOptions({
 	control,
-	register,
 	isLoading,
 	domain,
-	errors,
 }: {
 	control: Control<DomainFormValues>;
 	register: UseFormRegister<DomainFormValues>;
@@ -22,39 +23,42 @@ export function AdvancedOptions({
 	domain?: string;
 	errors?: FieldErrors<DomainFormValues>;
 }) {
+	const receivingHost = domain?.trim() || "your-domain.com";
+	const trackingHost = domain?.trim()
+		? `${TRACKING_SUBDOMAIN}.${domain.trim()}`
+		: `${TRACKING_SUBDOMAIN}.your-domain.com`;
+
 	return (
 		<div className="grid grid-cols-1 gap-4">
 			<div className="space-y-1">
 				<Label.Root
-					htmlFor="customReturnPath"
+					htmlFor="receivingDomain"
 					className="block font-medium text-sm text-text-strong-950"
 				>
-					Receiving email path
+					Receiving domain
 				</Label.Root>
-				<Input.Root
-					hasError={!!errors?.customReturnPath}
-					className="w-full rounded-xl"
-					size="small"
-				>
+				<Input.Root className="w-full rounded-xl" size="small">
 					<Input.Wrapper>
 						<Input.Input
-							id="customReturnPath"
-							placeholder="receive"
-							{...register("customReturnPath")}
-							disabled={isLoading}
+							id="receivingDomain"
+							value={receivingHost}
+							readOnly
+							disabled
+							aria-readonly="true"
 						/>
-						{domain && (
-							<span className="flex items-center pr-3 font-medium text-text-sub-600 text-xs">
-								.{domain}
-							</span>
-						)}
 					</Input.Wrapper>
 				</Input.Root>
-				{errors?.customReturnPath?.message && (
-					<p className="text-error-base text-xs">
-						{errors.customReturnPath.message}
-					</p>
-				)}
+				<p className="text-text-sub-600 text-xs leading-relaxed">
+					Send and receive on the same domain (e.g.{" "}
+					<span className="font-medium text-text-strong-950">
+						hello@{receivingHost}
+					</span>
+					). MX points to{" "}
+					<span className="font-mono text-text-strong-950">
+						inbound.reloop.sh
+					</span>
+					. Managed by Reloop — not configurable.
+				</p>
 			</div>
 
 			<div className="space-y-1">
@@ -62,32 +66,30 @@ export function AdvancedOptions({
 					htmlFor="trackingSubdomain"
 					className="block font-medium text-sm text-text-strong-950"
 				>
-					Tracking Subdomain
+					Tracking subdomain
 				</Label.Root>
-				<Input.Root
-					hasError={!!errors?.trackingSubdomain}
-					className="w-full rounded-xl"
-					size="small"
-				>
+				<Input.Root className="w-full rounded-xl" size="small">
 					<Input.Wrapper>
 						<Input.Input
 							id="trackingSubdomain"
-							placeholder="link"
-							{...register("trackingSubdomain")}
-							disabled={isLoading}
+							value={trackingHost}
+							readOnly
+							disabled
+							aria-readonly="true"
 						/>
-						{domain && (
-							<span className="flex items-center pr-3 font-medium text-text-sub-600 text-xs">
-								.{domain}
-							</span>
-						)}
 					</Input.Wrapper>
 				</Input.Root>
-				{errors?.trackingSubdomain?.message && (
-					<p className="text-error-base text-xs">
-						{errors.trackingSubdomain.message}
-					</p>
-				)}
+				<p className="text-text-sub-600 text-xs leading-relaxed">
+					Always{" "}
+					<span className="font-mono text-text-strong-950">
+						{TRACKING_SUBDOMAIN}.{"{domain}"}
+					</span>
+					, CNAME to{" "}
+					<span className="font-mono text-text-strong-950">
+						link.reloop.sh
+					</span>
+					. Managed by Reloop — not configurable.
+				</p>
 			</div>
 
 			<div className="space-y-3">

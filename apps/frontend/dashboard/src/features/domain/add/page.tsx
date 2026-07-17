@@ -34,8 +34,6 @@ export function AddDomainPage() {
 				domain: "",
 				clickTracking: false,
 				openTracking: false,
-				customReturnPath: "receive",
-				trackingSubdomain: "link",
 			},
 		});
 
@@ -52,8 +50,6 @@ export function AddDomainPage() {
 		domain,
 		clickTracking,
 		openTracking,
-		customReturnPath,
-		trackingSubdomain,
 	}: DomainFormValues) => {
 		try {
 			changeStatus("loading");
@@ -63,8 +59,7 @@ export function AddDomainPage() {
 					domain,
 					click_tracking: clickTracking,
 					open_tracking: openTracking,
-					custom_return_path: customReturnPath || "receive",
-					tracking: trackingSubdomain || "link",
+					// Return path + tracking host labels are fixed server-side.
 					tls: "opportunistic",
 				},
 				{ withCredentials: true },
