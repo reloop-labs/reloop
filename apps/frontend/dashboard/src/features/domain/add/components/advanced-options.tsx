@@ -1,6 +1,8 @@
 import * as Checkbox from "@reloop/ui/checkbox";
+import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
+import * as Tooltip from "@reloop/ui/tooltip";
 import {
 	type Control,
 	Controller,
@@ -20,79 +22,104 @@ interface AdvancedOptionsProps {
 	errors?: FieldErrors<DomainFormValues>;
 }
 
+function FieldLabelWithInfo({
+	htmlFor,
+	label,
+	tooltip,
+}: {
+	htmlFor: string;
+	label: string;
+	tooltip: string;
+}) {
+	return (
+		<div className="flex items-center gap-1.5">
+			<Label.Root
+				htmlFor={htmlFor}
+				className="block font-medium text-sm text-text-strong-950"
+			>
+				{label}
+			</Label.Root>
+			<Tooltip.Provider delayDuration={200}>
+				<Tooltip.Root>
+					<Tooltip.Trigger asChild>
+						<button
+							type="button"
+							className="inline-flex size-4 shrink-0 items-center justify-center rounded-full text-text-sub-600 outline-none transition-colors hover:text-text-strong-950 focus-visible:ring-2 focus-visible:ring-stroke-strong-950/20"
+							aria-label={`${label} info`}
+						>
+							<Icon name="info-outline" className="size-3.5" />
+						</button>
+					</Tooltip.Trigger>
+					<Tooltip.Content
+						side="top"
+						variant="light"
+						className="max-w-xs text-balance text-xs leading-relaxed"
+					>
+						{tooltip}
+					</Tooltip.Content>
+				</Tooltip.Root>
+			</Tooltip.Provider>
+		</div>
+	);
+}
+
+function ReadonlyHostField({ id, value }: { id: string; value: string }) {
+	return (
+		<Input.Root className="w-full rounded-xl" size="small">
+			<Input.Wrapper>
+				<Input.Input
+					id={id}
+					value={value}
+					readOnly
+					aria-readonly="true"
+					tabIndex={0}
+					className="font-mono text-text-strong-950"
+				/>
+			</Input.Wrapper>
+		</Input.Root>
+	);
+}
+
 export const AdvancedOptions = ({
 	control,
 	isLoading,
 	domain,
 }: AdvancedOptionsProps) => {
-	const receivingHost = domain?.trim() || "your-domain.com";
-	const trackingHost = domain?.trim()
-		? `${TRACKING_SUBDOMAIN}.${domain.trim()}`
-		: `${TRACKING_SUBDOMAIN}.your-domain.com`;
+	const domainValue = domain?.trim() ?? "";
+	const hasDomain = domainValue.length > 0;
+	const receivingHost = domainValue;
+	const trackingHost = hasDomain ? `${TRACKING_SUBDOMAIN}.${domainValue}` : "";
+
+	const receivingTooltip = hasDomain
+		? `Send and receive on the same domain (e.g. hello@${receivingHost}). MX points to inbound.reloop.sh. Managed by Reloop — not configurable.`
+		: "";
+	const trackingTooltip = hasDomain
+		? `Always ${TRACKING_SUBDOMAIN}.{domain}, CNAME to link.reloop.sh. Managed by Reloop — not configurable.`
+		: "";
 
 	return (
 		<div className="grid grid-cols-1 gap-4">
-			<div className="space-y-1">
-				<Label.Root
-					htmlFor="receivingDomain"
-					className="block font-medium text-sm text-text-strong-950"
-				>
-					Receiving domain
-				</Label.Root>
-				<Input.Root className="w-full rounded-xl" size="small">
-					<Input.Wrapper>
-						<Input.Input
-							id="receivingDomain"
-							value={receivingHost}
-							readOnly
-							disabled
-							aria-readonly="true"
+			{hasDomain && (
+				<>
+					<div className="space-y-1.5">
+						<FieldLabelWithInfo
+							htmlFor="receivingDomain"
+							label="Receiving domain"
+							tooltip={receivingTooltip}
 						/>
-					</Input.Wrapper>
-				</Input.Root>
-				<p className="text-text-sub-600 text-xs leading-relaxed">
-					Send and receive on the same domain (e.g.{" "}
-					<span className="font-medium text-text-strong-950">
-						hello@{receivingHost}
-					</span>
-					). MX points to{" "}
-					<span className="font-mono text-text-strong-950">
-						inbound.reloop.sh
-					</span>
-					. Managed by Reloop — not configurable.
-				</p>
-			</div>
+						<ReadonlyHostField id="receivingDomain" value={receivingHost} />
+					</div>
 
-			<div className="space-y-1">
-				<Label.Root
-					htmlFor="trackingSubdomain"
-					className="block font-medium text-sm text-text-strong-950"
-				>
-					Tracking subdomain
-				</Label.Root>
-				<Input.Root className="w-full rounded-xl" size="small">
-					<Input.Wrapper>
-						<Input.Input
-							id="trackingSubdomain"
-							value={trackingHost}
-							readOnly
-							disabled
-							aria-readonly="true"
+					<div className="space-y-1.5">
+						<FieldLabelWithInfo
+							htmlFor="trackingSubdomain"
+							label="Tracking subdomain"
+							tooltip={trackingTooltip}
 						/>
-					</Input.Wrapper>
-				</Input.Root>
-				<p className="text-text-sub-600 text-xs leading-relaxed">
-					Always{" "}
-					<span className="font-mono text-text-strong-950">
-						{TRACKING_SUBDOMAIN}.{"{domain}"}
-					</span>
-					, CNAME to{" "}
-					<span className="font-mono text-text-strong-950">
-						link.reloop.sh
-					</span>
-					. Managed by Reloop — not configurable.
-				</p>
-			</div>
+						<ReadonlyHostField id="trackingSubdomain" value={trackingHost} />
+					</div>
+				</>
+			)}
 
 			<div className="space-y-3">
 				<p className="font-medium text-sm text-text-strong-950">
