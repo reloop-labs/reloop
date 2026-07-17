@@ -80,7 +80,10 @@ export function generateReceivingMXRecord(
 	rootDomain: string,
 	customReturnPath: string,
 ): DNSTypes.DNSRecord {
-	return generateMXRecord(customReturnPath, rootDomain, hostDomain);
+	// Inbound MTA hostname (see apps/backend/inbound). Must be inbound.{HOST_DOMAIN},
+	// not the bare host domain used for sending SPF/MX.
+	const inboundHost = `inbound.${hostDomain}`;
+	return generateMXRecord(customReturnPath, rootDomain, inboundHost);
 }
 
 export async function generateAllDNSRecords(domain: string): Promise<{

@@ -239,7 +239,7 @@ export namespace DomainModel {
 							recordTypeName: "MX",
 							domain: "example.com",
 							name: "@",
-							value: "email.reloop.sh",
+							value: "inbound.reloop.sh",
 							ttl: "Auto",
 							priority: 10,
 							status: "active",
