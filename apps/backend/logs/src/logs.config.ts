@@ -6,7 +6,9 @@
  *   https://user:pass@clickhouse.example:8443/analytics
  *   clickhouse://...  /  clickhouses://...  (mapped to http/https)
  *
- * Port is taken as-is from the URL — no remapping.
+ * Port is usually taken as-is. The only exception is the classic native
+ * protocol ports: @clickhouse/client speaks HTTP, so 9000 → 8123 and
+ * 9440 → 8443 (common when a provider hands out a native DSN).
  */
 const parseClickHouseUrl = (rawUrl: string) => {
 	const defaults = {
@@ -35,8 +37,16 @@ const parseClickHouseUrl = (rawUrl: string) => {
 			protocol = "https:";
 		}
 
+		// Native TCP ports → HTTP interface ports used by @clickhouse/client.
+		let host = parsed.host;
+		if (parsed.port === "9000") {
+			host = `${parsed.hostname}:8123`;
+		} else if (parsed.port === "9440") {
+			host = `${parsed.hostname}:8443`;
+		}
+
 		return {
-			url: `${protocol}//${parsed.host}`,
+			url: `${protocol}//${host}`,
 			username,
 			password,
 			database,
