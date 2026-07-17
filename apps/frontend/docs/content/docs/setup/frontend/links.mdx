@@ -11,7 +11,7 @@ description: Set up and run the Reloop links app locally.
 
 ## Service Overview
 
-Contact preference center and tracked link redirects for outbound email.
+Contact preference center, tracked link redirects, and open-tracking pixel proxy for outbound email.
 
 | Property | Value |
 | :--- | :--- |
@@ -19,6 +19,7 @@ Contact preference center and tracked link redirects for outbound email.
 | **Port** | `3005` |
 | **Local URL (preferences)** | [https://local.reloop.sh/preferences](https://local.reloop.sh/preferences) |
 | **Local URL (redirect)** | [https://local.reloop.sh/redirect](https://local.reloop.sh/redirect) |
+| **Local URL (open tracking)** | [https://local.reloop.sh/api/mail/v1/track/open](https://local.reloop.sh/api/mail/v1/track/open) (proxied by links when hit via tracking domain) |
 | **Stack** | `Next.js` `React 19` `Tailwind CSS` |
 
 
@@ -45,12 +46,15 @@ NEXT_PUBLIC_URL=https://local.reloop.sh
 # Server-side contacts API (preferences page)
 INTERNAL_API_URL=http://localhost:8014/api/contacts
 
+# Server-side mail API (open-tracking pixel proxy)
+INTERNAL_MAIL_API_URL=http://localhost:8015/api/mail
+
 # Rybbit analytics (optional)
 NEXT_PUBLIC_RYBBIT_HOST=https://app.rybbit.io
 NEXT_PUBLIC_RYBBIT_SITE_ID=reloop-web
 ```
 
-The preferences page calls the [contacts](/setup/backend/contacts) service server-side via `INTERNAL_API_URL`. In production, point this at your internal contacts API endpoint.
+The preferences page calls the [contacts](/setup/backend/contacts) service server-side via `INTERNAL_API_URL`. The open-tracking proxy calls the [mail](/setup/backend/mail) service via `INTERNAL_MAIL_API_URL` (or `NEXT_PUBLIC_URL` as a fallback). In production, point these at your internal service endpoints.
 
 ### Reference Table
 
@@ -58,6 +62,7 @@ The preferences page calls the [contacts](/setup/backend/contacts) service serve
 | :--- | :--- | :--- |
 | `NEXT_PUBLIC_URL` | No | `https://link.reloop.sh` — base URL for redirect and preference links |
 | `INTERNAL_API_URL` | No | `http://localhost:8014/api/contacts` — server-side contacts API |
+| `INTERNAL_MAIL_API_URL` | No | falls back to `{NEXT_PUBLIC_URL}/api/mail` — server-side mail open-tracking proxy |
 | `NEXT_PUBLIC_RYBBIT_HOST` | No | Rybbit analytics host |
 | `NEXT_PUBLIC_RYBBIT_SITE_ID` | No | Rybbit site identifier |
 
@@ -68,6 +73,7 @@ The preferences page calls the [contacts](/setup/backend/contacts) service serve
 | :--- | :--- |
 | `/preferences/[token]` | Manage subscription topics and unsubscribe |
 | `/redirect/[token]` | Track clicks and redirect to destination URL |
+| `/api/mail/v1/track/open/[token]` | Proxy open-tracking pixels to the mail service (custom tracking domains) |
 
 
 ## Development Commands
@@ -84,6 +90,7 @@ The preferences page calls the [contacts](/setup/backend/contacts) service serve
 
 | Layer | Detail |
 | :--- | :--- |
-| **[Mail](/setup/backend/mail)** | Injects `/redirect/[token]` links in outbound HTML. |
+| **[Mail](/setup/backend/mail)** | Injects `/redirect/[token]` click links and `/api/mail/v1/track/open/[token]` open pixels in outbound HTML. |
 | **[Contacts](/setup/backend/contacts)** | Powers preference page data. |
+| **Open-tracking proxy** | Custom tracking domains CNAME to this app; open pixels are proxied to the mail service so tracking still works when `/api/mail` is not on the tracking host. |
 | **Caddy** | Routes `/preferences*` and `/redirect*` to port `3005`. |
