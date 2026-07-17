@@ -18,10 +18,6 @@ export function OnboardingPage() {
 	const { data: session, isPending } = useSessionQuery();
 	const [step] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [name] = useQueryState("name", parseAsString.withDefault(""));
-	const [logoPreview] = useQueryState(
-		"logoPreview",
-		parseAsString.withDefault(""),
-	);
 	const [logoUrl] = useQueryState("logoUrl", parseAsString.withDefault(""));
 	const [domain, setDomain] = useQueryState(
 		"domain",
@@ -120,9 +116,7 @@ export function OnboardingPage() {
 			stepIndicator: "Step 1 of 4",
 			title: "Create your workspace",
 			component: <CreateOrgStep />,
-			preview: (
-				<SidebarPreview name={name} logo={logoUrl || logoPreview || null} />
-			),
+			preview: <SidebarPreview name={name} logo={logoUrl || null} />,
 			fullWidth: false,
 		},
 		2: {

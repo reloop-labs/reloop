@@ -21,7 +21,10 @@ export function LogoUpload({
 	onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 	onUploadClick: () => void;
 }) {
-	const hasLogo = Boolean(logoUrl || logoPreview);
+	// Prefer local data-URL preview first so the image always shows while the
+	// remote upload URL settles (and if remote is temporarily unreachable).
+	const displaySrc = logoPreview || logoUrl;
+	const hasLogo = Boolean(displaySrc);
 
 	return (
 		<div className="flex items-center gap-4">
@@ -46,7 +49,7 @@ export function LogoUpload({
 					<Spinner size={20} color="var(--text-strong-950)" />
 				) : hasLogo ? (
 					<img
-						src={logoUrl || logoPreview}
+						src={displaySrc}
 						alt="Logo preview"
 						className="h-full w-full rounded-xl object-cover"
 					/>

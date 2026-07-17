@@ -4,13 +4,18 @@ import type React from "react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
+/**
+ * Local object-URL / data-URL preview is kept in React state only.
+ * Storing `blob:https://local.reloop.sh/...` in the query string is wrong:
+ * it ties the preview to the app origin, dies on refresh, and after upload
+ * was overridden by a remote URL that often could not load (mixed content).
+ *
+ * `logoUrl` (query state) holds the permanent upload service URL for create-org.
+ */
 export function useLogoUpload() {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [isUploading, setIsUploading] = useState(false);
-	const [logoPreview, setLogoPreview] = useQueryState(
-		"logoPreview",
-		parseAsString.withDefault(""),
-	);
+	const [logoPreview, setLogoPreview] = useState("");
 	const [logoUrl, setLogoUrl] = useQueryState(
 		"logoUrl",
 		parseAsString.withDefault(""),
@@ -22,6 +27,8 @@ export function useLogoUpload() {
 
 	const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
+		// Allow re-selecting the same file after a failed upload.
+		e.target.value = "";
 		if (!file) return;
 
 		if (file.size > 10 * 1024 * 1024) {
@@ -33,8 +40,12 @@ export function useLogoUpload() {
 			return;
 		}
 
-		const previewUrl = URL.createObjectURL(file);
-		setLogoPreview(previewUrl);
+		// Data URL always loads in <img>; no mixed-content / blob-session issues.
+		const reader = new FileReader();
+		reader.onloadend = () => {
+			setLogoPreview(reader.result as string);
+		};
+		reader.readAsDataURL(file);
 
 		setIsUploading(true);
 		try {
@@ -47,7 +58,11 @@ export function useLogoUpload() {
 				{ withCredentials: true },
 			);
 
-			setLogoUrl(uploadData.url);
+			const uploadedUrl = uploadData.url as string;
+			// Permanent absolute URL for org.create + sidebar/domain previews.
+			// Keep the data-URL in logoPreview so the upload control always shows
+			// the image even if the remote URL is slow or briefly unreachable.
+			setLogoUrl(uploadedUrl);
 			toast.success("Logo uploaded successfully");
 		} catch (error) {
 			console.error("Upload error:", error);
