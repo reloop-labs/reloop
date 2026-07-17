@@ -40,10 +40,8 @@ The service starts with hot reloading on port `8016`.
 Variables live in `apps/backend/logs/.env`. Running `bun env:setup` from the root auto-populates this file.
 
 ```bash
-CLICKHOUSE_URL=http://localhost:8123
-CLICKHOUSE_USER=default
-CLICKHOUSE_PASSWORD=reloop123
-CLICKHOUSE_DATABASE=reloop
+# user:password@host:port/database — all ClickHouse settings in one URL
+CLICKHOUSE_URL=http://default:reloop123@localhost:8123/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
 PORT=8016
 BASE_URL="https://local.reloop.sh"
@@ -55,13 +53,12 @@ NODE_ENV=development
 
 | Variable | Required | Default |
 | :--- | :--- | :--- |
-| `CLICKHOUSE_URL` | **YES** | `http://localhost:8123` |
-| `CLICKHOUSE_USER` | **YES** | `default` |
-| `CLICKHOUSE_PASSWORD` | **YES** | `reloop123` |
-| `CLICKHOUSE_DATABASE` | **YES** | `reloop` |
+| `CLICKHOUSE_URL` | **YES** | `http://default:reloop123@localhost:8123/reloop` |
 | `REDIS_URL` | **YES** | `redis://...` |
 | `PORT` | **YES** | `8016` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
+
+`CLICKHOUSE_URL` is a full connection string. Host, credentials, and database are parsed from it — there are no separate `CLICKHOUSE_USER` / `CLICKHOUSE_PASSWORD` / `CLICKHOUSE_DATABASE` env vars.
 
 
 ## Development Commands
