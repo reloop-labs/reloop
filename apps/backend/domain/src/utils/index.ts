@@ -11,6 +11,7 @@ export {
 	generateDMARCRecord,
 	generateMXRecord,
 	generateReceivingMXRecord,
+	generateReceivingMXRecordForDomain,
 	generateSPFRecord,
 	generateTrackingCNAMERecord,
 } from "@reloop/domain/utils/dns-record-generator";
@@ -18,4 +19,5 @@ export {
 	getCustomReturnPathSubString,
 	getDomainHost,
 	getDomainSubString,
+	getReceivingMxName,
 } from "@reloop/domain/utils/domain-formatter";

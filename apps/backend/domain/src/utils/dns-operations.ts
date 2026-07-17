@@ -74,15 +74,23 @@ export function getRecordPurpose(
 	recordTypeName: "MX" | "SPF" | "DKIM" | "DMARC" | "CNAME",
 	name: string,
 	domain: string,
+	value?: string,
 ): "sending" | "receiving" | "tracking" {
 	switch (recordTypeName) {
 		case "MX": {
 			const cleanName = name.trim().toLowerCase();
 			const cleanDomain = domain.trim().toLowerCase();
-			if (cleanName === "@" || cleanName === "" || cleanName === cleanDomain) {
-				return "sending";
+			const cleanValue = (value ?? "").trim().toLowerCase();
+			// Receiving MX is on the customer domain apex (or the product subdomain)
+			// and points at inbound.{HOST_DOMAIN}. Sending / return-path MX lives on
+			// the `send` (or similar) host and points at the bare HOST_DOMAIN.
+			if (cleanValue.startsWith("inbound.")) {
+				return "receiving";
 			}
-			return "receiving";
+			if (cleanName === "@" || cleanName === "" || cleanName === cleanDomain) {
+				return "receiving";
+			}
+			return "sending";
 		}
 		case "SPF":
 		case "DKIM":
@@ -116,7 +124,12 @@ export async function insertDNSRecords(
 			priority: record.priority,
 			status: record.status,
 			recordTypeName,
-			purpose: getRecordPurpose(recordTypeName, record.name, domain),
+			purpose: getRecordPurpose(
+				recordTypeName,
+				record.name,
+				domain,
+				record.value,
+			),
 			domain,
 		});
 	}

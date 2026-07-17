@@ -7,6 +7,7 @@
 - 📚 **Documentation**: [Developer Docs](https://reloop.sh/dev/workflow-service)
 - 🌐 **Production API**: [API Base](https://reloop.sh/api/workflow)
 - 📜 **OpenAPI Spec**: [OpenAPI](https://reloop.sh/api/workflow/openapi)
+- 📊 **Workbench**: [Jobs UI](https://local.reloop.sh/api/workflow/jobs)
 
 ## 🚀 Setup
 

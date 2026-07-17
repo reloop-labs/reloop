@@ -1,31 +1,43 @@
 import { resolveMx, resolveTxt } from "node:dns";
 import { promisify } from "node:util";
 
+function normalizeMxLookupName(name: string): string {
+	const trimmed = name.trim().replace(/\.$/, "");
+	if (trimmed.startsWith("@.")) return trimmed.slice(2);
+	return trimmed;
+}
+
 export async function verifyMxRecord(
 	name: string,
 	value: string,
 	priority: number,
 ): Promise<boolean> {
+	const lookupName = normalizeMxLookupName(name);
+	if (!lookupName || lookupName === "@") {
+		console.error(`Invalid MX lookup name: ${name}`);
+		return false;
+	}
 	try {
 		const resolveMxPromise = promisify(resolveMx);
 
 		const records = await Promise.race([
-			resolveMxPromise(name),
+			resolveMxPromise(lookupName),
 			new Promise<never>((_, reject) =>
 				setTimeout(() => reject(new Error("DNS query timeout")), 10000),
 			),
 		]);
 
+		const expected = value.toLowerCase().replace(/\.$/, "");
+		const expectedPriority = Number(priority);
+
 		return records.some((mx) => {
 			const exchange = mx.exchange.toLowerCase().replace(/\.$/, "");
-			const expected = value.toLowerCase().replace(/\.$/, "");
 			return (
-				(exchange === expected || exchange.endsWith(`.${expected}`)) &&
-				mx.priority === priority
+				exchange === expected && Number(mx.priority) === expectedPriority
 			);
 		});
 	} catch (e) {
-		console.error(`Error verifying MX record for ${name}:`, e);
+		console.error(`Error verifying MX record for ${lookupName}:`, e);
 		return false;
 	}
 }

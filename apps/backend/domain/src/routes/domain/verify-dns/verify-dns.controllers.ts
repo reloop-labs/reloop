@@ -1,4 +1,5 @@
 import { BusEvent, bus } from "@reloop/bus";
+import { ensureReceivingMxRecord } from "@reloop/domain/utils/ensure-receiving-mx";
 import { DOMAIN_VERIFY_WEBHOOK_EVENT } from "@reloop/webhook-events";
 
 import { useLogger } from "evlog/elysia";
@@ -17,10 +18,26 @@ export async function verifyDNSRecordController({
 }) {
 	const log = useLogger();
 	try {
-		const { domainWithRecords } = await fetchDomain_step1({
+		let { domainWithRecords } = await fetchDomain_step1({
 			domainId,
 			organizationId,
 		});
+
+		// Repair legacy receiving MX (wrong name/value) so verification and the
+		// dashboard show the apex/@ → inbound.{HOST_DOMAIN} record users must add.
+		if (domainWithRecords.isReceivingEmailEnabled) {
+			await ensureReceivingMxRecord({
+				domainId,
+				organizationId,
+				userId: domainWithRecords.userId,
+				domain: domainWithRecords.domain,
+			});
+			({ domainWithRecords } = await fetchDomain_step1({
+				domainId,
+				organizationId,
+			}));
+		}
+
 		await updateStatusToVerifying_step2({
 			domainId,
 			domain: domainWithRecords,

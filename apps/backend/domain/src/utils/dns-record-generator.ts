@@ -4,6 +4,7 @@ import { generateDKIMKeyPair } from "@reloop/domain/utils/dkim-key-generator";
 import {
 	getDomainHost,
 	getDomainSubString,
+	getReceivingMxName,
 } from "@reloop/domain/utils/domain-formatter";
 
 export async function generateDKIMRecord(
@@ -61,29 +62,53 @@ export function generateDMARCRecord(
 }
 
 export function generateMXRecord(
-	domain: string,
+	name: string,
 	rootDomain: string,
 	host?: string,
 ): DNSTypes.DNSRecord {
+	const isApex =
+		name === "@" ||
+		name === "" ||
+		name === rootDomain ||
+		name.toLowerCase() === rootDomain.toLowerCase();
+	const recordName = isApex ? "@" : name;
+	// Apex MX must resolve the zone apex — never "@.example.com".
+	const fqdn = isApex ? rootDomain : `${name}.${rootDomain}`;
+
 	return {
 		type: DNSTypes.DNSRecordType.MX,
-		name: domain,
-		fqdn: `${domain}.${rootDomain}`,
+		name: recordName,
+		fqdn,
 		value: host || domainConfig.HOST_DOMAIN,
 		priority: domainConfig.constants.mxPriority,
 		ttl: "Auto",
 	};
 }
 
+/**
+ * Receiving MX: mail for the customer's domain is delivered to the inbound MTA.
+ * Name is the domain being verified (`@` for apex, relative label for subdomains).
+ * Value is always `inbound.{HOST_DOMAIN}` (e.g. inbound.reloop.sh).
+ */
 export function generateReceivingMXRecord(
 	hostDomain: string,
 	rootDomain: string,
-	customReturnPath: string,
+	receivingName: string,
 ): DNSTypes.DNSRecord {
-	// Inbound MTA hostname (see apps/backend/inbound). Must be inbound.{HOST_DOMAIN},
-	// not the bare host domain used for sending SPF/MX.
 	const inboundHost = `inbound.${hostDomain}`;
-	return generateMXRecord(customReturnPath, rootDomain, inboundHost);
+	return generateMXRecord(receivingName, rootDomain, inboundHost);
+}
+
+/** Convenience: build receiving MX for a full customer domain string. */
+export function generateReceivingMXRecordForDomain(
+	domain: string,
+	hostDomain: string = domainConfig.HOST_DOMAIN,
+): DNSTypes.DNSRecord {
+	return generateReceivingMXRecord(
+		hostDomain,
+		getDomainHost(domain),
+		getReceivingMxName(domain),
+	);
 }
 
 export async function generateAllDNSRecords(domain: string): Promise<{

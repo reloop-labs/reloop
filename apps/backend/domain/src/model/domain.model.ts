@@ -239,6 +239,7 @@ export namespace DomainModel {
 							recordTypeName: "MX",
 							domain: "example.com",
 							name: "@",
+							// Receiving: apex MX → inbound MTA (mailboxes are user@example.com)
 							value: "inbound.reloop.sh",
 							ttl: "Auto",
 							priority: 10,

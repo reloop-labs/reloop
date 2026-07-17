@@ -23,3 +23,15 @@ export const getDomainHost = (domain: string) => {
 	}
 	return domain;
 };
+
+/**
+ * DNS "Name" for the receiving MX so mail to `user@{domain}` is delivered.
+ * Apex domains use `@`; subdomain products (e.g. mail.example.com) use the
+ * relative host label (mail).
+ */
+export const getReceivingMxName = (domain: string) => {
+	if (domain.split(".").length >= 3) {
+		return getDomainSubString(domain);
+	}
+	return "@";
+};

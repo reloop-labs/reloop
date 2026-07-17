@@ -19,7 +19,7 @@ Marketing automation — drip campaigns, delays, and multi-step journeys via Bul
 | **Port** | `8017` |
 | **Local URL** | [https://local.reloop.sh/api/workflow](https://local.reloop.sh/api/workflow) |
 | **Swagger UI** | [https://local.reloop.sh/api/workflow/openapi](https://local.reloop.sh/api/workflow/openapi) |
-| **Bull Board** | [https://local.reloop.sh/api/workflow/bull-board](https://local.reloop.sh/api/workflow/bull-board) |
+| **Workbench** | [https://local.reloop.sh/api/workflow/jobs](https://local.reloop.sh/api/workflow/jobs) |
 | **Stack** | `ElysiaJS` `PostgreSQL` `Redis` `NATS` `BullMQ` |
 
 
@@ -47,6 +47,9 @@ PORT=8017
 BASE_URL="https://local.reloop.sh"
 NATS_URL=nats://localhost:4222
 NODE_ENV=development
+# Optional basic-auth for Workbench (/api/workflow/jobs)
+# WORKBENCH_USER=admin
+# WORKBENCH_PASS=secret
 ```
 
 ### Reference Table
@@ -58,6 +61,8 @@ NODE_ENV=development
 | `PORT` | **YES** | `8017` |
 | `BASE_URL` | **YES** | `https://local.reloop.sh` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
+| `WORKBENCH_USER` | NO | empty (open dashboard in dev) |
+| `WORKBENCH_PASS` | NO | empty (open dashboard in dev) |
 
 
 ## Development Commands
@@ -77,4 +82,4 @@ NODE_ENV=development
 | **Triggers** | NATS events (e.g. `contacts.created`) start automation journeys. |
 | **Execution** | BullMQ `workflow-queue` handles delayed steps and transitions. |
 | **Integrations** | Reads contacts/templates and triggers sends via [mail](/setup/backend/mail). |
-| **Monitoring** | Bull Board UI at `/api/workflow/bull-board`. |
+| **Monitoring** | [Workbench](https://getworkbench.dev) UI at `/api/workflow/jobs`. |

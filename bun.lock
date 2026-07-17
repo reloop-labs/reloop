@@ -982,8 +982,6 @@
       "@aws-sdk/s3-request-presigner": "3.1033.0",
       "@better-auth/cli": "1.4.21",
       "@bogeychan/elysia-logger": "0.1.10",
-      "@bull-board/api": "^7.0.0",
-      "@bull-board/elysia": "^7.0.0",
       "@clickhouse/client": "1.12.1",
       "@elysia/opentelemetry": "^1.4.12",
       "@elysiajs/cors": "1.2.0",
