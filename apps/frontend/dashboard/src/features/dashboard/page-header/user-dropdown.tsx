@@ -1,4 +1,3 @@
-import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
@@ -6,6 +5,7 @@ import { Icon } from "@reloop/ui/icon";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useTheme } from "next-themes";
 import { useRef, useState } from "react";
+import { useSignOut } from "#/features/auth/session-query";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { ThemeToggle } from "./theme-toggle";
 import { UserAvatar } from "./user-avatar";
@@ -22,6 +22,7 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const itemRefs = useRef<(HTMLElement | null)[]>([]);
 	const navigate = useNavigate();
+	const signOut = useSignOut();
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const search = useRouterState({ select: (s) => s.location.search });
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
@@ -47,9 +48,8 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 	const currentRect = currentTab?.getBoundingClientRect();
 
 	const handleSignOut = async () => {
-		await authClient.signOut();
-		void navigate({ to: "/login", search: { inviteId: undefined } });
 		setIsOpen(false);
+		await signOut();
 	};
 
 	if (!user) {

@@ -1,5 +1,12 @@
 import { authClient } from "@reloop/auth/client";
-import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+	type QueryClient,
+	queryOptions,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { useCallback } from "react";
 import { queryKeys } from "#/lib/query-keys";
 
 export type SessionData = NonNullable<
@@ -28,4 +35,43 @@ export function useInvalidateSession() {
 	const queryClient = useQueryClient();
 	return () =>
 		queryClient.invalidateQueries({ queryKey: queryKeys.auth.session() });
+}
+
+/**
+ * Drop cached session (and all other queries) after a successful sign-out.
+ *
+ * Required because the dashboard uses a 30s React Query `staleTime`. Without
+ * this, `/login`'s `useRedirectIfAuthenticated` still sees a cached session and
+ * immediately sends the user back into the app.
+ */
+export function clearClientAuthState(queryClient: QueryClient) {
+	// Explicit null so any in-flight subscribers treat the user as signed out
+	// before the rest of the cache is wiped.
+	queryClient.setQueryData(queryKeys.auth.session(), null);
+	queryClient.clear();
+}
+
+/**
+ * Sign out via Better Auth, wipe the client cache, then go to login.
+ * Shared by the user menu and command palette.
+ */
+export async function signOutAndClearSession(
+	queryClient: QueryClient,
+	navigate: (opts: {
+		to: "/login";
+		search: { inviteId: undefined };
+	}) => unknown,
+) {
+	await authClient.signOut();
+	clearClientAuthState(queryClient);
+	await navigate({ to: "/login", search: { inviteId: undefined } });
+}
+
+export function useSignOut() {
+	const queryClient = useQueryClient();
+	const navigate = useNavigate();
+	return useCallback(
+		() => signOutAndClearSession(queryClient, navigate),
+		[queryClient, navigate],
+	);
 }

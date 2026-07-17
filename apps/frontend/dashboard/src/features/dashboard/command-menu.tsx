@@ -1,8 +1,8 @@
+import { useSignOut } from "#/features/auth/session-query";
 import {
 	mainNavigation,
 	settingsNavigation,
 } from "#/features/dashboard/navigation";
-import { authClient } from "@reloop/auth/client";
 import { cn } from "@reloop/ui/cn";
 import * as CommandMenu from "@reloop/ui/command";
 import { Icon } from "@reloop/ui/icon";
@@ -91,6 +91,7 @@ export function CommandMenuGlobal() {
 	const [open, setOpen] = React.useState(false);
 	const [search, setSearch] = React.useState("");
 	const navigate = useNavigate();
+	const signOut = useSignOut();
 	const { setTheme, resolvedTheme } = useTheme();
 	const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -161,9 +162,8 @@ export function CommandMenuGlobal() {
 
 	const handleSignOut = React.useCallback(async () => {
 		setOpen(false);
-		await authClient.signOut();
-		void navigate({ to: "/login", search: { inviteId: undefined } });
-	}, [navigate]);
+		await signOut();
+	}, [signOut]);
 
 	const recents = React.useMemo(() => (open ? getRecents() : []), [open]);
 
