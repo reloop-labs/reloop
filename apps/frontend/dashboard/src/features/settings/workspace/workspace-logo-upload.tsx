@@ -31,8 +31,10 @@ export function WorkspaceLogoUpload({
 	useEffect(() => {
 		const next = initialLogoUrl || "";
 		setLogoUrl(next);
+		// Don't replace a local FileReader data-URL with a remote URL
+		// (onboarding keeps the data-URL in logoPreview for display).
 		if (!isUploading) {
-			setLogoPreview(next);
+			setLogoPreview((prev) => (prev.startsWith("data:") ? prev : next));
 		}
 	}, [initialLogoUrl, isUploading]);
 
@@ -68,8 +70,9 @@ export function WorkspaceLogoUpload({
 			);
 
 			const uploadedUrl = uploadData.url as string;
+			// Keep data-URL in logoPreview (same as onboarding) so the control
+			// always shows the image even if the remote URL is unreachable.
 			setLogoUrl(uploadedUrl);
-			setLogoPreview(uploadedUrl);
 			onLogoChange(uploadedUrl);
 
 			const { error } = await authClient.organization.update({
@@ -111,7 +114,9 @@ export function WorkspaceLogoUpload({
 		fileInputRef.current?.click();
 	};
 
-	const hasLogo = Boolean(logoUrl || logoPreview);
+	// Prefer local data-URL preview first (same as onboarding LogoUpload).
+	const displaySrc = logoPreview || logoUrl;
+	const hasLogo = Boolean(displaySrc);
 
 	return (
 		<div className="flex items-center gap-4">
@@ -138,7 +143,7 @@ export function WorkspaceLogoUpload({
 					<Spinner size={20} color="var(--text-strong-950)" />
 				) : hasLogo ? (
 					<img
-						src={logoUrl || logoPreview}
+						src={displaySrc}
 						alt="Logo preview"
 						className="h-full w-full rounded-xl object-cover"
 					/>

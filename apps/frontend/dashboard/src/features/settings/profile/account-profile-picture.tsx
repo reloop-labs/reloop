@@ -38,9 +38,10 @@ export function AccountProfilePicture({
 	useEffect(() => {
 		const next = initialImageUrl || "";
 		setImageUrl(next);
-		// Don't clobber a local FileReader preview with an empty remote value mid-upload.
+		// Don't replace a local FileReader data-URL with a remote URL
+		// (same as onboarding: local preview wins for display).
 		if (!isUploading) {
-			setImagePreview(next);
+			setImagePreview((prev) => (prev.startsWith("data:") ? prev : next));
 		}
 		setImageFailed(false);
 	}, [initialImageUrl, isUploading]);
@@ -84,8 +85,9 @@ export function AccountProfilePicture({
 			);
 
 			const uploadedUrl = uploadData.url as string;
+			// Keep data-URL in imagePreview (same as onboarding logo upload) so
+			// the photo always shows even if the remote URL is unreachable.
 			setImageUrl(uploadedUrl);
-			setImagePreview(uploadedUrl);
 			setImageFailed(false);
 			onImageChange(uploadedUrl);
 
