@@ -1,6 +1,3 @@
-import { HeadBucketCommand } from "@aws-sdk/client-s3";
-import { inboxConfig } from "@reloop/be-inbox/inbox.config";
-import { s3Client } from "@reloop/be-inbox/lib/s3";
 import { redis } from "@reloop/be-inbox/utils/loader";
 import { bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
@@ -14,11 +11,6 @@ export const healthRoute = new Elysia().get(
 			await redis.healthCheck();
 			await db.execute("SELECT 1 as test");
 			await bus.healthCheck();
-			await s3Client.send(
-				new HeadBucketCommand({
-					Bucket: inboxConfig.S3.BUCKET,
-				}),
-			);
 			const responseTime = Date.now() - startTime;
 
 			return {

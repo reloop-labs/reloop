@@ -19,7 +19,7 @@ Agent Inbox API — mailboxes, threads, and messages from inbound email via NATS
 | **Port** | `8021` |
 | **Local URL** | [https://local.reloop.sh/api/inbox](https://local.reloop.sh/api/inbox) |
 | **Swagger UI** | [https://local.reloop.sh/api/inbox/openapi](https://local.reloop.sh/api/inbox/openapi) |
-| **Stack** | `ElysiaJS` `PostgreSQL` `Redis` `NATS` `MinIO` |
+| **Stack** | `ElysiaJS` `PostgreSQL` `Redis` `NATS` |
 
 
 ## Quick Start
@@ -45,12 +45,6 @@ REDIS_URL=redis://:reloop123@localhost:6379
 PORT=8021
 BASE_URL="https://local.reloop.sh"
 NATS_URL=nats://localhost:4222
-S3_ENDPOINT=http://localhost:9010
-S3_ACCESS_KEY=reloop
-S3_SECRET_KEY=reloop123
-S3_BUCKET=reloop-attachments
-S3_REGION=us-east-1
-S3_FORCE_PATH_STYLE=true
 NODE_ENV=development
 ```
 
@@ -62,7 +56,6 @@ NODE_ENV=development
 | `REDIS_URL` | **YES** | `redis://...` |
 | `PORT` | **YES** | `8021` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
-| `S3_ENDPOINT` | **YES** | `http://localhost:9010` |
 
 
 ## Development Commands
@@ -80,5 +73,5 @@ NODE_ENV=development
 | Layer | Detail |
 | :--- | :--- |
 | **Inbound flow** | [inbound](/setup/backend/inbound) MTA → NATS → inbox persistence. |
-| **Attachments** | Stored in MinIO via S3-compatible endpoint. |
+| **Attachments** | File storage via the [upload](/setup/backend/upload) service (no direct S3 config on inbox). |
 | **Dashboard API** | Mailboxes, threads, and messages at `/api/inbox`. |

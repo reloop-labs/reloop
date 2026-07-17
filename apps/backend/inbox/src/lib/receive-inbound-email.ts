@@ -209,7 +209,7 @@ export async function receiveInboundEmailController(rawMessage: string) {
 				filename: att.filename || "unnamed",
 				contentType: att.contentType || "application/octet-stream",
 				size: att.size || 0,
-				storagePath: "", // TODO: Upload to S3 and store path
+				storagePath: "", // TODO: Upload via be-upload service and store path
 				contentDisposition: (att.contentDisposition as string) || "attachment",
 				contentId: att.contentId || undefined,
 				checksum: att.checksum || undefined,
