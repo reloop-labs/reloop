@@ -22,10 +22,17 @@ export function HomePage() {
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const { data: session, isPending } = useSessionQuery();
-	const { user, activeOrganization } = useActiveOrganization();
+	const {
+		user,
+		activeOrganization,
+		organizations,
+		isPending: orgPending,
+	} = useActiveOrganization();
 
 	useEffect(() => {
-		if (isPending || !session) return;
+		if (isPending || !session || orgPending) return;
+		// User already has a workspace — never bounce them back to onboarding.
+		if (organizations && organizations.length > 0) return;
 
 		let cancelled = false;
 		void (async () => {
@@ -40,7 +47,14 @@ export function HomePage() {
 		return () => {
 			cancelled = true;
 		};
-	}, [session, isPending, navigate, queryClient]);
+	}, [
+		session,
+		isPending,
+		orgPending,
+		organizations,
+		navigate,
+		queryClient,
+	]);
 
 	return (
 		<div className="mx-auto max-w-7xl space-y-8 p-6 lg:p-8">

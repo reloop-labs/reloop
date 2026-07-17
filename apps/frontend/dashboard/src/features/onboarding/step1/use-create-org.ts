@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
+import { organizationsQueryOptions } from "#/features/auth/organizations-query";
 import { queryKeys } from "#/lib/query-keys";
 
 function randomOrgSlug() {
@@ -62,9 +63,23 @@ export function useCreateOrg() {
 					console.error("Error setting active organization:", setActiveError);
 				}
 				await authClient.updateUser({ activeOrganizationId: organization.id });
-				await queryClient.invalidateQueries({
-					queryKey: queryKeys.auth.organizations(),
-				});
+				// Seed the org list immediately so post-auth routing never reads a
+				// stale empty cache (ensureQueryData / stale [] bounce → /onboarding).
+				queryClient.setQueryData(
+					queryKeys.auth.organizations(),
+					(prev: Array<{ id: string }> | undefined) => {
+						const list = prev ?? [];
+						if (list.some((item) => item.id === organization.id)) {
+							return list;
+						}
+						return [...list, organization];
+					},
+				);
+				try {
+					await queryClient.fetchQuery(organizationsQueryOptions());
+				} catch {
+					// Keep the seeded list if the refresh fails.
+				}
 				await queryClient.invalidateQueries({
 					queryKey: queryKeys.auth.session(),
 				});

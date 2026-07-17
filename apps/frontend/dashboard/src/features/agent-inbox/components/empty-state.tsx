@@ -48,7 +48,7 @@ export const AgentInboxEmptyState = ({
 }) => {
 	return (
 		<div className="w-full">
-			<div className="flex flex-col items-center border-stroke-soft-100 border-b bg-bg-soft-200/10 px-6 py-12 text-center dark:border-stroke-soft-100/50 dark:bg-bg-soft-200/15">
+			<div className="flex flex-col items-center border-stroke-soft-100 border-b px-6 py-12 text-center dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/30">
 				<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
 					<Icon name="inbox" className="h-5 w-5 text-text-sub-600" />
 				</div>
@@ -62,6 +62,7 @@ export const AgentInboxEmptyState = ({
 				<div className="flex items-center gap-3">
 					<Button.Root
 						variant="neutral"
+						mode="stroke"
 						size="xsmall"
 						onClick={onAddClick}
 						className="gap-2 rounded-lg"
@@ -69,22 +70,15 @@ export const AgentInboxEmptyState = ({
 						<Icon name="plus" className="h-4 w-4" />
 						Add agent address
 					</Button.Root>
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						asChild
-						className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
+					<a
+						href="https://docs.reloop.sh/integrations/agent-email-inbox"
+						target="_blank"
+						rel="noopener noreferrer"
+						className={`${Button.buttonVariants({ variant: "neutral", mode: "stroke", size: "xsmall" }).root()} gap-2 rounded-lg`}
 					>
-						<a
-							href="https://docs.reloop.sh/integrations/agent-email-inbox"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<Icon name="book-open" className="h-3.5 w-3.5" />
-							Read the docs
-						</a>
-					</Button.Root>
+						<Icon name="book-closed" className="h-3.5 w-3.5" />
+						Learn about agent inbox
+					</a>
 				</div>
 			</div>
 

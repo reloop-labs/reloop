@@ -5,6 +5,7 @@ import axios from "axios";
 import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
+import { organizationsQueryOptions } from "#/features/auth/organizations-query";
 import { queryKeys } from "#/lib/query-keys";
 import type { IntegrationMode, LanguageCode } from "./types";
 
@@ -72,10 +73,10 @@ export function useGenerateApiKey() {
 		await queryClient.invalidateQueries({
 			queryKey: queryKeys.auth.session(),
 		});
-		await queryClient.invalidateQueries({
-			queryKey: queryKeys.auth.organizations(),
-		});
-		void navigate({ to: "/" });
+		// Force a network refetch so Home's post-auth redirect does not see a
+		// stale empty org list and bounce the user back to /onboarding.
+		await queryClient.fetchQuery(organizationsQueryOptions());
+		await navigate({ to: "/" });
 	};
 
 	return {

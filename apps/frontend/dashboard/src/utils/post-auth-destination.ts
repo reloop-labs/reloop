@@ -82,20 +82,25 @@ export async function resolvePostAuthDestination(
 	return "/onboarding";
 }
 
-/** Resolve destination using the shared TanStack Query cache. */
+/**
+ * Resolve destination using the shared TanStack Query cache.
+ *
+ * Uses `fetchQuery` (not `ensureQueryData`) so routing never trusts a stale
+ * empty org list — e.g. after creating a workspace during onboarding, the
+ * cache may still hold `[]` until a network refetch completes. Returning that
+ * empty array would incorrectly send the user back to `/onboarding`.
+ */
 export async function resolvePostAuthDestinationWithQuery(
 	queryClient: QueryClient,
 	options: PostAuthDestinationOptions = {},
 ): Promise<string> {
 	return resolvePostAuthDestination(options, {
 		listOrganizations: async () => {
-			const data = await queryClient.ensureQueryData(
-				organizationsQueryOptions(),
-			);
+			const data = await queryClient.fetchQuery(organizationsQueryOptions());
 			return { data };
 		},
 		listUserInvitations: async () => {
-			const data = await queryClient.ensureQueryData(
+			const data = await queryClient.fetchQuery(
 				userInvitationsQueryOptions(),
 			);
 			return { data };
