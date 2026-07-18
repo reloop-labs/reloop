@@ -2,6 +2,7 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
+import { Logo } from "@reloop/ui/logo";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -13,6 +14,7 @@ import { ComposeModal } from "#/features/agent-inbox/components/compose-modal";
 import { InboxLabelDialog } from "#/features/agent-inbox/components/inbox-label-dialog";
 import { InboxNavUser } from "#/features/agent-inbox/components/inbox-nav-user";
 import { useInboxSidebar } from "#/features/agent-inbox/components/inbox-sidebar-context";
+import { MailboxRail } from "#/features/agent-inbox/components/mailbox-rail";
 import { useInboxFolderStats } from "#/features/agent-inbox/hooks/use-inbox-folder-stats";
 import { useInboxLabels } from "#/features/agent-inbox/hooks/use-inbox-labels";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
@@ -303,141 +305,166 @@ export const InboxSidebar = ({
 
 	return (
 		<>
-			<aside
-				className={cn(
-					"flex h-full shrink-0 select-none flex-col bg-sidebar pb-2 transition-[width] duration-200 ease-in-out",
-					collapsed ? "w-[52px] px-2 pt-2.5" : "w-[240px] px-4 pt-2.5",
-				)}
-			>
-				<div className="flex flex-col gap-2">
-					<InboxNavUser
-						mailbox={mailbox}
-						collapsed={collapsed}
-						onAddMailbox={() => setIsAddMailboxOpen(true)}
-					/>
-
-					<FancyButton.Root
-						onClick={() => setIsComposeOpen(true)}
-						variant="blue"
-						size="xsmall"
-						className={cn("mt-3 mb-1.5 w-full", collapsed && "px-0")}
+			<div className="flex h-full shrink-0">
+				<MailboxRail
+					mailbox={mailbox}
+					onAddMailbox={() => setIsAddMailboxOpen(true)}
+				/>
+				<aside
+					className={cn(
+						"flex h-full shrink-0 select-none flex-col bg-sidebar pb-2 transition-[width] duration-200 ease-in-out",
+						collapsed ? "w-[52px] px-2 pt-2.5" : "w-[240px] px-4 pt-2.5",
+					)}
+				>
+					<div
+						className={cn(
+							"mb-1 flex items-center",
+							collapsed ? "h-10 w-full justify-center" : "gap-2 px-0.5",
+						)}
 					>
-						<FancyButton.Icon
-							as={PencilIcon}
-							className="h-3.5 w-3.5 fill-white text-white"
-						/>
-						{!collapsed && (
+						{collapsed ? (
+							<Logo className="h-8 w-8 shrink-0" />
+						) : (
 							<>
-								<span className="text-sm leading-none">New email</span>
-								<div className="-translate-y-1/2 absolute top-1/2 right-2.5 z-20 flex items-center gap-0.5 opacity-70">
-									<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
-										⌥
-									</KbdKeyOutline>
-									<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
-										n
-									</KbdKeyOutline>
-								</div>
+								<Logo className="-ml-2.5 w-10" />
+								<p className="-ml-2 font-semibold text-mail-foreground">
+									Reloop
+								</p>
+								<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-2 py-0.5 font-bold text-[8px] text-mail-muted uppercase tracking-wide dark:bg-white/[0.06]">
+									Beta
+								</span>
 							</>
 						)}
-					</FancyButton.Root>
-				</div>
+					</div>
 
-				<div
-					onPointerLeave={() => setHoveredEl(undefined)}
-					className="scrollbar-hide relative mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
-				>
-					<NavSection
-						title="Core"
-						items={coreItems}
-						folder={folder}
-						stats={stats}
-						collapsed={collapsed}
-						registerRef={(id, el) => {
-							if (el) navRefs.current[id] = el;
-						}}
-						onHoverItem={(id) => setHoveredEl(navRefs.current[id])}
-						isFirst
-					/>
-					<NavSection
-						title="Management"
-						items={managementItems}
-						folder={folder}
-						stats={stats}
-						collapsed={collapsed}
-						registerRef={(id, el) => {
-							if (el) navRefs.current[id] = el;
-						}}
-						onHoverItem={(id) => setHoveredEl(navRefs.current[id])}
-					/>
+					<div className="flex flex-col gap-2">
+						<InboxNavUser mailbox={mailbox} collapsed={collapsed} />
 
-					{!collapsed && (
-						<div className="pb-4">
-							<div className="mx-2 flex items-center justify-between pt-4 pb-1.5">
-								<span className="font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em]">
-									Labels
-								</span>
-								<button
-									type="button"
-									onClick={() => setIsLabelDialogOpen(true)}
-									className="mr-1 flex h-4 w-4 items-center justify-center hover:bg-transparent"
-									aria-label="Create label"
-								>
-									<Plus className="h-3.5 w-3.5 text-text-soft-400 hover:text-text-strong-950" />
-								</button>
-							</div>
-							<div className="flex flex-col">
-								{labels.map((label) => {
-									const labelKey = `label:${label.id}`;
-									const active = activeLabelId === label.id;
-									return (
-										<Link
-											key={label.id}
-											to="/inbox/$mailboxId/label/$labelId"
-											params={{ mailboxId, labelId: label.id }}
-											ref={(el) => {
-												if (el) navRefs.current[labelKey] = el;
-											}}
-											onPointerEnter={() =>
-												setHoveredEl(navRefs.current[labelKey])
-											}
-											className={cn(
-												"group relative z-10 flex h-8 w-full items-center gap-2.5 rounded-lg px-2.5 font-medium text-[13px] transition-colors",
-												active ? "text-mail-foreground" : "text-mail-muted",
-											)}
-										>
-											<TagIcon
-												className={cn(
-													"h-3.5 w-3.5 shrink-0 transition-all duration-200",
-													label.color === "default" &&
-														(active
-															? "text-mail-foreground"
-															: "text-mail-muted opacity-70 group-hover:text-mail-foreground group-hover:opacity-100"),
-												)}
-												style={{
-													color:
-														label.color === "default" ? undefined : label.color,
+						<FancyButton.Root
+							onClick={() => setIsComposeOpen(true)}
+							variant="blue"
+							size="xsmall"
+							className={cn("mt-3 mb-1.5 w-full", collapsed && "px-0")}
+						>
+							<FancyButton.Icon
+								as={PencilIcon}
+								className="h-3.5 w-3.5 fill-white text-white"
+							/>
+							{!collapsed && (
+								<>
+									<span className="text-sm leading-none">New email</span>
+									<div className="-translate-y-1/2 absolute top-1/2 right-2.5 z-20 flex items-center gap-0.5 opacity-70">
+										<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
+											⌥
+										</KbdKeyOutline>
+										<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
+											n
+										</KbdKeyOutline>
+									</div>
+								</>
+							)}
+						</FancyButton.Root>
+					</div>
+
+					<div
+						onPointerLeave={() => setHoveredEl(undefined)}
+						className="scrollbar-hide relative mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
+					>
+						<NavSection
+							title="Core"
+							items={coreItems}
+							folder={folder}
+							stats={stats}
+							collapsed={collapsed}
+							registerRef={(id, el) => {
+								if (el) navRefs.current[id] = el;
+							}}
+							onHoverItem={(id) => setHoveredEl(navRefs.current[id])}
+							isFirst
+						/>
+						<NavSection
+							title="Management"
+							items={managementItems}
+							folder={folder}
+							stats={stats}
+							collapsed={collapsed}
+							registerRef={(id, el) => {
+								if (el) navRefs.current[id] = el;
+							}}
+							onHoverItem={(id) => setHoveredEl(navRefs.current[id])}
+						/>
+
+						{!collapsed && (
+							<div className="pb-4">
+								<div className="mx-2 flex items-center justify-between pt-4 pb-1.5">
+									<span className="font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em]">
+										Labels
+									</span>
+									<button
+										type="button"
+										onClick={() => setIsLabelDialogOpen(true)}
+										className="mr-1 flex h-4 w-4 items-center justify-center hover:bg-transparent"
+										aria-label="Create label"
+									>
+										<Plus className="h-3.5 w-3.5 text-text-soft-400 hover:text-text-strong-950" />
+									</button>
+								</div>
+								<div className="flex flex-col">
+									{labels.map((label) => {
+										const labelKey = `label:${label.id}`;
+										const active = activeLabelId === label.id;
+										return (
+											<Link
+												key={label.id}
+												to="/inbox/$mailboxId/label/$labelId"
+												params={{ mailboxId, labelId: label.id }}
+												ref={(el) => {
+													if (el) navRefs.current[labelKey] = el;
 												}}
-											/>
-											<span className="relative bottom-px mt-0.5 min-w-0 flex-1 truncate">
-												{label.name}
-											</span>
-										</Link>
-									);
-								})}
+												onPointerEnter={() =>
+													setHoveredEl(navRefs.current[labelKey])
+												}
+												className={cn(
+													"group relative z-10 flex h-8 w-full items-center gap-2.5 rounded-lg px-2.5 font-medium text-[13px] transition-colors",
+													active ? "text-mail-foreground" : "text-mail-muted",
+												)}
+											>
+												<TagIcon
+													className={cn(
+														"h-3.5 w-3.5 shrink-0 transition-all duration-200",
+														label.color === "default" &&
+															(active
+																? "text-mail-foreground"
+																: "text-mail-muted opacity-70 group-hover:text-mail-foreground group-hover:opacity-100"),
+													)}
+													style={{
+														color:
+															label.color === "default"
+																? undefined
+																: label.color,
+													}}
+												/>
+												<span className="relative bottom-px mt-0.5 min-w-0 flex-1 truncate">
+													{label.name}
+												</span>
+											</Link>
+										);
+									})}
+								</div>
 							</div>
-						</div>
-					)}
-					<AnimatedHoverBackground
-						rect={rect}
-						tabElement={currentEl}
-						className="!bg-neutral-alpha-10"
-					/>
-				</div>
+						)}
+						<AnimatedHoverBackground
+							rect={rect}
+							tabElement={currentEl}
+							className="!bg-neutral-alpha-10"
+						/>
+					</div>
 
-				<div className="mt-auto flex w-full py-2">
-					{!collapsed ? <FooterThemeToggle /> : <CollapsedThemeToggle />}
-				</div>
-			</aside>
+					<div className="mt-auto flex w-full py-2">
+						{!collapsed ? <FooterThemeToggle /> : <CollapsedThemeToggle />}
+					</div>
+				</aside>
+			</div>
 
 			<ComposeModal
 				isOpen={isComposeOpen}

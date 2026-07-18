@@ -1,3 +1,18 @@
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import {
+	Archive,
+	Inbox,
+	MailOpen,
+	RefreshCcw,
+	SlidersHorizontal,
+	X,
+} from "lucide-react";
+import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import { toast } from "sonner";
+import { useMediaQuery } from "usehooks-ts";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import {
 	AiSidebar,
@@ -37,21 +52,6 @@ import {
 	findThreadByListId,
 	groupThreadsByConversation,
 } from "#/features/agent-inbox/utils/group-threads";
-import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
-import {
-	Archive,
-	Inbox,
-	MailOpen,
-	RefreshCcw,
-	SlidersHorizontal,
-	X,
-} from "lucide-react";
-import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
-import { toast } from "sonner";
-import { useMediaQuery } from "usehooks-ts";
 
 const INBOX_VIEW_VALUES = ["primary", "alerts", "person", "tag"] as const;
 
@@ -402,7 +402,7 @@ export const AgentInboxContent = ({
 						minSize={25}
 						maxSize={50}
 						className={cn(
-							"mb-1 flex min-h-0 flex-1 flex-col bg-panel-light shadow-sm md:rounded-2xl lg:h-[calc(100dvh-8px)] dark:bg-panel-dark",
+							"mb-1 flex min-h-0 flex-1 flex-col bg-panel-light md:rounded-2xl lg:h-[calc(100dvh-8px)] dark:bg-panel-dark",
 							!isDesktop && selectedThreadId && "hidden",
 						)}
 					>
@@ -598,7 +598,7 @@ export const AgentInboxContent = ({
 							<ResizablePanel
 								defaultSize={65}
 								minSize={30}
-								className="mr-0.5 mb-1 flex min-h-0 flex-col rounded-2xl bg-panel-light shadow-sm lg:h-[calc(100dvh-8px)] dark:bg-panel-dark"
+								className="mr-0.5 mb-1 flex min-h-0 flex-col rounded-2xl bg-panel-light lg:h-[calc(100dvh-8px)] dark:bg-panel-dark"
 							>
 								{detailPane}
 							</ResizablePanel>

@@ -54,7 +54,7 @@ export function MainSidebar() {
 				) : (
 					<>
 						<div className="flex items-center gap-2">
-							<Logo className="w-10" />
+							<Logo className="-ml-1 w-10" />
 							<p className="-ml-2 font-semibold text-text-strong-950">Reloop</p>
 							<span className="inline-flex items-center rounded-full bg-bg-weak-50 px-2 py-0.5 font-bold text-[8px] text-text-sub-600 uppercase tracking-wide dark:bg-white/[0.06]">
 								Beta
