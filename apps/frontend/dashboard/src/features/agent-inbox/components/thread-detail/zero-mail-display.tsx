@@ -1,5 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { AnimatePresence, motion } from "framer-motion";
 import { useState, type ReactNode } from "react";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import {
@@ -65,6 +66,7 @@ export const ZeroMailDisplay = ({
 	onPrint,
 	onApproveSend,
 	onEditReply,
+	forceExpanded = false,
 }: {
 	msg: any;
 	mailbox: AgentMailbox | undefined;
@@ -83,9 +85,12 @@ export const ZeroMailDisplay = ({
 	onPrint: () => void;
 	onApproveSend?: () => void;
 	onEditReply?: () => void;
+	/** Keep the message open while an inline reply is anchored to it. */
+	forceExpanded?: boolean;
 }) => {
 	const isLast = index === totalCount - 1;
 	const [isCollapsed, setIsCollapsed] = useState(!isLast);
+	const collapsed = forceExpanded ? false : isCollapsed;
 
 	const isOutbound = msg.direction === "outbound";
 	const isApproval = msg.status === "needs_approval";
@@ -157,7 +162,7 @@ export const ZeroMailDisplay = ({
 	};
 
 	/** Any expanded message can reply / forward — not only the last one. */
-	const actionsVisible = !isCollapsed;
+	const actionsVisible = !collapsed;
 
 	return (
 		<div
@@ -167,7 +172,10 @@ export const ZeroMailDisplay = ({
 			)}
 		>
 			<div
-				className="flex cursor-pointer flex-col pb-2"
+				className={cn(
+					"flex cursor-pointer flex-col",
+					forceExpanded ? "pb-0" : "pb-2",
+				)}
 				onClick={toggleCollapse}
 				onKeyDown={(e) => {
 					if (e.key === "Enter" || e.key === " ") {
@@ -205,7 +213,7 @@ export const ZeroMailDisplay = ({
 										{senderName}
 									</span>
 									{isOutbound && <YouBadge />}
-									{!isCollapsed && (
+									{!collapsed && (
 										<HoverPopover
 											align="start"
 											side="bottom"
@@ -257,7 +265,7 @@ export const ZeroMailDisplay = ({
 										</HoverPopover>
 									)}
 								</div>
-								{!isCollapsed && (
+								{!collapsed && (
 									<p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-mail-muted text-sm">
 										<span>To:</span>
 										{toRecipients.map((recipient, i) => (
@@ -276,7 +284,7 @@ export const ZeroMailDisplay = ({
 										))}
 									</p>
 								)}
-								{isCollapsed && (
+								{collapsed && (
 									<p className="mt-0.5 line-clamp-1 text-mail-muted text-sm">
 										{bodyText?.slice(0, 120) ||
 											(typeof bodyHtml === "string"
@@ -305,13 +313,18 @@ export const ZeroMailDisplay = ({
 				<div
 					className={cn(
 						"grid overflow-hidden duration-200",
-						isCollapsed ? "grid-rows-[0fr]" : "grid-rows-[1fr]",
+						collapsed ? "grid-rows-[0fr]" : "grid-rows-[1fr]",
 					)}
 					onClick={(e) => e.stopPropagation()}
 					onKeyDown={(e) => e.stopPropagation()}
 				>
 					<div className="min-h-0 overflow-hidden">
-						<div className="px-4 pt-3 pb-2 pl-[3.75rem]">
+						<div
+							className={cn(
+								"px-4 pt-3 pl-[3.75rem]",
+								forceExpanded ? "pb-0" : "pb-2",
+							)}
+						>
 							<MessageBody
 								bodyHtml={bodyHtml}
 								bodyText={bodyText}
@@ -355,13 +368,34 @@ export const ZeroMailDisplay = ({
 								</div>
 							)}
 
-							{actionsVisible && (
-								<MessageActionBar
-									onReply={onReply}
-									onReplyAll={onReplyAll}
-									onForward={onForward}
-								/>
-							)}
+							<div className="relative">
+								<AnimatePresence initial={false}>
+									{actionsVisible && !forceExpanded && (
+										<motion.div
+											key="message-action-bar"
+											initial={false}
+											animate={{ opacity: 1, position: "relative" }}
+											exit={{
+												opacity: 0,
+												position: "absolute",
+												left: 0,
+												right: 0,
+												top: 0,
+											}}
+											transition={{
+												duration: 0.12,
+												ease: [0.23, 1, 0.32, 1],
+											}}
+										>
+											<MessageActionBar
+												onReply={onReply}
+												onReplyAll={onReplyAll}
+												onForward={onForward}
+											/>
+										</motion.div>
+									)}
+								</AnimatePresence>
+							</div>
 						</div>
 					</div>
 				</div>

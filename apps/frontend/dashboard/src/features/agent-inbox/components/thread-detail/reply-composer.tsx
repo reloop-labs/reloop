@@ -1,8 +1,9 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Paperclip } from "lucide-react";
 import {
+	forwardRef,
 	useCallback,
 	useEffect,
 	useLayoutEffect,
@@ -11,7 +12,6 @@ import {
 } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { extractBareEmail, extractDisplayName } from "../../lib/email-address";
 import {
 	type ComposeAttachment,
@@ -32,6 +32,10 @@ interface ReplyComposerProps {
 	fromEmail: string;
 	mode?: ReplyMode;
 	canReplyAll?: boolean;
+	/** Inline under a message vs sticky dock at the bottom of the thread. */
+	variant?: "inline" | "dock";
+	/** Skip enter motion (keyboard `R`/`A` — must feel instant). Exit still runs. */
+	skipEnter?: boolean;
 	/** Plain-text seed (e.g. agent suggested reply) */
 	initialContent?: string;
 	onModeChange?: (mode: ReplyMode) => void;
@@ -65,7 +69,8 @@ const modKey =
 		? "⌘"
 		: "Ctrl";
 
-const easeOut = [0.22, 1, 0.36, 1] as const;
+/** Linear-style expo ease-out — snappy settle, no lag at the start. */
+const easeOut = [0.16, 1, 0.3, 1] as const;
 
 function ModeSwitcher({
 	mode,
@@ -143,362 +148,373 @@ function ModeSwitcher({
 	);
 }
 
-export const ReplyComposer = ({
-	toName,
-	toEmail,
-	fromEmail,
-	mode: modeProp = "reply",
-	canReplyAll = true,
-	initialContent = "",
-	onModeChange,
-	onSend,
-	onClose,
-}: ReplyComposerProps) => {
-	const reduceMotion = useReducedMotion();
-	const [mode, setMode] = useState<ReplyMode>(modeProp);
-	const bareTo = extractBareEmail(toEmail) || toEmail;
-	const displayName =
-		extractDisplayName(toName) ||
-		toName.trim() ||
-		bareTo.split("@")[0] ||
-		bareTo;
-	const bareFrom = extractBareEmail(fromEmail) || fromEmail;
-
-	const fileInputRef = useRef<HTMLInputElement>(null);
-	const editorRef = useRef<ComposeBodyEditorHandle>(null);
-	const seedHtml = initialContent ? plainToHtml(initialContent) : "";
-	const [htmlBody, setHtmlBody] = useState(seedHtml);
-	const [textBody, setTextBody] = useState(initialContent);
-	const [attachments, setAttachments] = useState<ComposeAttachment[]>([]);
-	const htmlRef = useRef(htmlBody);
-	const textRef = useRef(textBody);
-	htmlRef.current = htmlBody;
-	textRef.current = textBody;
-
-	useEffect(() => {
-		setMode(modeProp);
-	}, [modeProp]);
-
-	useEffect(() => {
-		const id = window.setTimeout(() => {
-			editorRef.current?.editor?.commands.focus("end");
-		}, 120);
-		return () => window.clearTimeout(id);
-	}, []);
-
-	const changeMode = (next: ReplyMode) => {
-		setMode(next);
-		onModeChange?.(next);
-	};
-
-	const send = useCallback(async () => {
-		if (!textRef.current.trim()) return;
-		if (attachments.some((a) => a.isUploading)) {
-			toast.error("Please wait for attachments to finish uploading.");
-			return;
-		}
-		const exported = (await editorRef.current?.getEmail()) ?? {
-			html: htmlRef.current,
-			text: textRef.current,
-		};
-		onSend({
-			text: (exported.text || textRef.current).trim(),
-			html: exported.html || htmlRef.current,
-			attachments: toSendAttachments(attachments),
-		});
-	}, [attachments, onSend]);
-
-	const uploadFile = useCallback(async (file: File) => {
-		const tempId = Math.random().toString();
-		setAttachments((prev) => [
-			...prev,
-			{
-				id: tempId,
-				name: file.name,
-				size: formatBytes(file.size),
-				url: "",
-				path: "",
-				content_type: file.type || "application/octet-stream",
-				isUploading: true,
-			},
-		]);
-		try {
-			const data = await uploadComposeFile(file);
-			setAttachments((prev) =>
-				prev.map((att) =>
-					att.id === tempId
-						? { ...att, url: data.url, path: data.path, isUploading: false }
-						: att,
-				),
-			);
-		} catch {
-			toast.error(`Failed to upload ${file.name}`);
-			setAttachments((prev) => prev.filter((att) => att.id !== tempId));
-		}
-	}, []);
-
-	const onDrop = useCallback(
-		(acceptedFiles: File[]) => {
-			for (const file of acceptedFiles) {
-				if (file.size > 10 * 1024 * 1024) {
-					toast.error(`${file.name} is too large. Max size is 10MB.`);
-					continue;
-				}
-				void uploadFile(file);
-			}
+export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
+	function ReplyComposer(
+		{
+			toName,
+			toEmail,
+			fromEmail,
+			mode: modeProp = "reply",
+			canReplyAll = true,
+			variant = "dock",
+			skipEnter = false,
+			initialContent = "",
+			onModeChange,
+			onSend,
+			onClose,
 		},
-		[uploadFile],
-	);
+		ref,
+	) {
+		const reduceMotion = useReducedMotion();
+		const [mode, setMode] = useState<ReplyMode>(modeProp);
+		const bareTo = extractBareEmail(toEmail) || toEmail;
+		const displayName =
+			extractDisplayName(toName) ||
+			toName.trim() ||
+			bareTo.split("@")[0] ||
+			bareTo;
+		const bareFrom = extractBareEmail(fromEmail) || fromEmail;
 
-	const { getRootProps, getInputProps, isDragActive } = useDropzone({
-		onDrop,
-		noClick: true,
-		noKeyboard: true,
-	});
+		const fileInputRef = useRef<HTMLInputElement>(null);
+		const editorRef = useRef<ComposeBodyEditorHandle>(null);
+		const seedHtml = initialContent ? plainToHtml(initialContent) : "";
+		const [htmlBody, setHtmlBody] = useState(seedHtml);
+		const [textBody, setTextBody] = useState(initialContent);
+		const [attachments, setAttachments] = useState<ComposeAttachment[]>([]);
+		const htmlRef = useRef(htmlBody);
+		const textRef = useRef(textBody);
+		htmlRef.current = htmlBody;
+		textRef.current = textBody;
 
-	const canSend =
-		textBody.trim().length > 0 && !attachments.some((a) => a.isUploading);
+		useEffect(() => {
+			setMode(modeProp);
+		}, [modeProp]);
 
-	return (
-		<motion.div
-			initial={
-				reduceMotion ? false : { opacity: 0, y: 16, filter: "blur(2px)" }
+		useEffect(() => {
+			const id = window.setTimeout(() => {
+				editorRef.current?.editor?.commands.focus("end");
+			}, 120);
+			return () => window.clearTimeout(id);
+		}, []);
+
+		const changeMode = (next: ReplyMode) => {
+			setMode(next);
+			onModeChange?.(next);
+		};
+
+		const send = useCallback(async () => {
+			if (!textRef.current.trim()) return;
+			if (attachments.some((a) => a.isUploading)) {
+				toast.error("Please wait for attachments to finish uploading.");
+				return;
 			}
-			animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-			transition={{ duration: 0.32, ease: easeOut }}
-			className="shrink-0"
-		>
-			<div
-				{...getRootProps()}
+			const exported = (await editorRef.current?.getEmail()) ?? {
+				html: htmlRef.current,
+				text: textRef.current,
+			};
+			onSend({
+				text: (exported.text || textRef.current).trim(),
+				html: exported.html || htmlRef.current,
+				attachments: toSendAttachments(attachments),
+			});
+		}, [attachments, onSend]);
+
+		const uploadFile = useCallback(async (file: File) => {
+			const tempId = Math.random().toString();
+			setAttachments((prev) => [
+				...prev,
+				{
+					id: tempId,
+					name: file.name,
+					size: formatBytes(file.size),
+					url: "",
+					path: "",
+					content_type: file.type || "application/octet-stream",
+					isUploading: true,
+				},
+			]);
+			try {
+				const data = await uploadComposeFile(file);
+				setAttachments((prev) =>
+					prev.map((att) =>
+						att.id === tempId
+							? { ...att, url: data.url, path: data.path, isUploading: false }
+							: att,
+					),
+				);
+			} catch {
+				toast.error(`Failed to upload ${file.name}`);
+				setAttachments((prev) => prev.filter((att) => att.id !== tempId));
+			}
+		}, []);
+
+		const onDrop = useCallback(
+			(acceptedFiles: File[]) => {
+				for (const file of acceptedFiles) {
+					if (file.size > 10 * 1024 * 1024) {
+						toast.error(`${file.name} is too large. Max size is 10MB.`);
+						continue;
+					}
+					void uploadFile(file);
+				}
+			},
+			[uploadFile],
+		);
+
+		const { getRootProps, getInputProps, isDragActive } = useDropzone({
+			onDrop,
+			noClick: true,
+			noKeyboard: true,
+		});
+
+		const canSend =
+			textBody.trim().length > 0 && !attachments.some((a) => a.isUploading);
+
+		// Linear-like panel: scale from the trigger edge. Close = exact reverse of open.
+		const duration = reduceMotion ? 0.1 : 0.16;
+		const settled = {
+			opacity: 1,
+			transform: "scale(1)",
+		} as const;
+		const hidden = reduceMotion
+			? { opacity: 0, transform: "scale(1)" }
+			: { opacity: 0, transform: "scale(0.96)" };
+
+		return (
+			<motion.div
+				ref={ref}
+				initial={skipEnter ? false : hidden}
+				animate={settled}
+				exit={hidden}
+				transition={{ duration, ease: easeOut }}
+				style={{
+					transformOrigin:
+						variant === "inline" ? "top center" : "bottom center",
+				}}
 				className={cn(
-					"relative border-mail-border/50 border-t bg-panel-light dark:bg-panel-dark",
-					"shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.12)]",
-					isDragActive && "ring-2 ring-inset ring-mail-foreground/20",
+					"shrink-0",
+					// Match message body indent (avatar + gap) from ZeroMailDisplay
+					variant === "inline" && "mt-1 mr-4 mb-3 ml-[3.75rem]",
 				)}
 			>
-			<input {...getInputProps()} />
-
-			{isDragActive && (
-				<motion.div
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-panel-light/80 text-mail-muted text-sm backdrop-blur-[1px] dark:bg-panel-dark/80"
-				>
-					Drop files to attach
-				</motion.div>
-			)}
-
-			<div className="flex items-center gap-2 px-4 pt-3 pb-1.5">
-				<ModeSwitcher
-					mode={mode}
-					canReplyAll={canReplyAll}
-					onChange={changeMode}
-				/>
-
-				<motion.div
-					key={bareTo}
-					initial={reduceMotion ? false : { opacity: 0, y: 4 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.22, ease: easeOut, delay: 0.04 }}
-					className="min-w-0 flex-1 truncate text-[12px] text-mail-muted"
-				>
-					<span className="text-mail-muted">to </span>
-					<span className="font-medium text-mail-foreground">{displayName}</span>
-					{bareTo ? <span className="text-mail-muted"> · {bareTo}</span> : null}
-				</motion.div>
-
-				<button
-					type="button"
-					onClick={onClose}
-					className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-mail-muted transition-colors duration-150 hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.97]"
-					aria-label="Close reply"
-				>
-					<Icon name="cross" className="h-3.5 w-3.5" />
-				</button>
-			</div>
-
-			<div className="px-2">
-				<ComposeBodyEditor
-					ref={editorRef}
-					content={seedHtml}
-					placeholder={`Write a ${mode === "replyAll" ? "reply to all" : "reply"}…`}
-					showToolbar={false}
-					className="compose-email-editor__content min-h-[120px] max-h-[280px] overflow-y-auto px-3 py-2"
-					onUpdate={(html, text) => {
-						setHtmlBody(html);
-						setTextBody(text);
-					}}
-					onModEnter={() => void send()}
-				/>
-			</div>
-
-			{attachments.length > 0 && (
-				<motion.div
-					initial={reduceMotion ? false : { opacity: 0, y: 6 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.2, ease: easeOut }}
-					className="flex flex-wrap gap-1.5 px-4 pb-2"
-				>
-					{attachments.map((file) => (
-						<div
-							key={file.id}
-							className="inline-flex h-7 max-w-[200px] items-center gap-1.5 rounded-lg border border-mail-border/40 bg-[var(--inbox-muted-bg)] px-2 text-[11px]"
-						>
-							<Paperclip className="h-3 w-3 shrink-0 text-mail-muted" />
-							<span className="min-w-0 truncate font-medium text-mail-foreground">
-								{file.name}
-							</span>
-							<span className="shrink-0 text-mail-muted">{file.size}</span>
-							{file.isUploading ? (
-								<span className="shrink-0 text-mail-muted">…</span>
-							) : (
-								<button
-									type="button"
-									onClick={() =>
-										setAttachments((prev) =>
-											prev.filter((a) => a.id !== file.id),
-										)
-									}
-									aria-label={`Remove ${file.name}`}
-									className="shrink-0 rounded p-0.5 text-mail-muted hover:text-mail-foreground"
-								>
-									<Icon name="cross" className="h-3 w-3" />
-								</button>
-							)}
-						</div>
-					))}
-				</motion.div>
-			)}
-
-			<div className="flex items-center justify-between gap-3 px-4 pt-1 pb-3">
-				<div className="flex items-center gap-1">
-					<button
-						type="button"
-						onClick={() => fileInputRef.current?.click()}
-						className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-mail-muted transition-colors duration-150 hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.97]"
-						aria-label="Attach files"
-					>
-						<Paperclip className="h-4 w-4" />
-					</button>
-					<input
-						ref={fileInputRef}
-						type="file"
-						multiple
-						className="hidden"
-						onChange={(e) => {
-							const files = e.target.files;
-							if (files) onDrop(Array.from(files));
-							e.target.value = "";
-						}}
-					/>
-					<span className="hidden text-[11px] text-mail-muted sm:inline">
-						from {bareFrom}
-					</span>
-				</div>
-
-				<div className="flex items-center gap-1.5">
-					<button
-						type="button"
-						onClick={onClose}
-						className="inline-flex h-8 items-center rounded-lg px-2.5 font-medium text-[12px] text-mail-muted transition-colors duration-150 hover:bg-[var(--inbox-danger-bg)] hover:text-[var(--inbox-danger-fg)] active:scale-[0.97]"
-					>
-						Discard
-					</button>
-					<button
-						type="button"
-						onClick={() => void send()}
-						disabled={!canSend}
-						className={cn(
-							"inline-flex h-8 items-center gap-2 rounded-lg bg-mail-primary px-3 font-semibold text-[12px] text-panel-light transition-[transform,opacity] duration-150",
-							"hover:opacity-90 active:scale-[0.97]",
-							"disabled:pointer-events-none disabled:opacity-35",
-							"dark:text-black",
-						)}
-					>
-						<span>Send</span>
-						<span className="hidden items-center gap-0.5 font-normal opacity-70 sm:inline-flex">
-							<span className="rounded border border-white/25 px-1 text-[10px] leading-4 dark:border-black/25">
-								{modKey}
-							</span>
-							<span className="rounded border border-white/25 px-1 text-[10px] leading-4 dark:border-black/25">
-								↵
-							</span>
-						</span>
-					</button>
-				</div>
-			</div>
-			</div>
-		</motion.div>
-	);
-};
-
-/** Collapsed dock — same shell language as the open composer. */
-export function ReplyComposerAffordance({
-	toName,
-	onReply,
-	onReplyAll,
-}: {
-	toName: string;
-	onReply: () => void;
-	onReplyAll?: () => void;
-}) {
-	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-	const currentTab = buttonRefs.current[hoverIdx ?? -1];
-	const currentRect = currentTab?.getBoundingClientRect();
-
-	return (
-		<div className="shrink-0 border-mail-border/50 border-t bg-panel-light px-4 py-3 dark:bg-panel-dark">
-			<div
-				className="relative flex items-center gap-2"
-				onPointerLeave={() => setHoverIdx(undefined)}
-			>
-				<button
-					ref={(el) => {
-						if (el) buttonRefs.current[0] = el;
-					}}
-					type="button"
-					onPointerEnter={() => setHoverIdx(0)}
-					onClick={onReply}
+				<div
+					{...getRootProps()}
 					className={cn(
-						"relative z-10 group flex h-10 min-w-0 flex-1 items-center gap-2.5 rounded-xl px-3",
-						"text-left transition-[color,transform] duration-150 ease-out",
-						"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mail-foreground/15",
-						"active:scale-[0.99]",
+						"relative bg-panel-light dark:bg-panel-dark",
+						variant === "dock" &&
+							"border-mail-border/50 border-t shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.12)]",
+						variant === "inline" &&
+							"overflow-hidden rounded-3xl border border-mail-border",
+						isDragActive &&
+							(variant === "inline"
+								? "ring-2 ring-mail-primary/40"
+								: "ring-2 ring-inset ring-mail-foreground/20"),
 					)}
 				>
-					<span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[var(--inbox-muted-bg)] text-mail-muted">
-						<Icon name="reply" className="h-3.5 w-3.5" />
-					</span>
-					<span className="min-w-0 flex-1 truncate text-mail-muted text-sm">
-						Reply to{" "}
-						<span className="font-medium text-mail-foreground">{toName}</span>
-						…
-					</span>
-					<span className="hidden shrink-0 text-[11px] text-mail-muted sm:inline">
-						R
-					</span>
-				</button>
-				{onReplyAll && (
-					<button
-						ref={(el) => {
-							if (el) buttonRefs.current[1] = el;
-						}}
-						type="button"
-						onPointerEnter={() => setHoverIdx(1)}
-						onClick={onReplyAll}
-						className="relative z-10 inline-flex h-10 shrink-0 items-center gap-1.5 rounded-xl px-3 font-medium text-[12px] text-mail-muted transition-[color,transform] duration-150 hover:text-mail-foreground active:scale-[0.97]"
-						aria-label="Reply all"
-					>
-						Reply all
-					</button>
-				)}
-				<AnimatedHoverBackground
-					rect={currentRect}
-					tabElement={currentTab}
-					className="rounded-xl !bg-[var(--inbox-hover)]"
-				/>
-			</div>
-		</div>
-	);
-}
+					<input {...getInputProps()} />
+
+					<AnimatePresence>
+						{isDragActive && (
+							<motion.div
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								transition={{ duration: 0.15, ease: easeOut }}
+								className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-panel-light/80 text-mail-muted text-sm backdrop-blur-[1px] dark:bg-panel-dark/80"
+							>
+								Drop files to attach
+							</motion.div>
+						)}
+					</AnimatePresence>
+
+					<div className="flex items-center gap-2 border-mail-border/40 border-b px-4 py-2.5">
+						<ModeSwitcher
+							mode={mode}
+							canReplyAll={canReplyAll}
+							onChange={changeMode}
+						/>
+
+						<motion.div
+							key={bareTo}
+							initial={reduceMotion ? false : { opacity: 0, y: 4 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.22, ease: easeOut, delay: 0.04 }}
+							className="min-w-0 flex-1 truncate text-[12px] text-mail-muted"
+						>
+							<span className="text-mail-muted">to </span>
+							<span className="font-medium text-mail-foreground">
+								{displayName}
+							</span>
+							{bareTo ? (
+								<span className="text-mail-muted"> · {bareTo}</span>
+							) : null}
+						</motion.div>
+
+						<button
+							type="button"
+							onClick={onClose}
+							className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-mail-muted transition-colors duration-150 hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.97]"
+							aria-label="Close reply"
+						>
+							<Icon name="cross" className="h-3.5 w-3.5" />
+						</button>
+					</div>
+
+					{/* Same React Email editor + inbox toolbar as compose modal */}
+					<div className="relative flex min-h-[180px] flex-col">
+						<ComposeBodyEditor
+							ref={editorRef}
+							content={seedHtml}
+							placeholder="Start writing…"
+							className="compose-email-editor__content max-h-[280px] min-h-[160px] flex-1 overflow-y-auto px-4 pb-3"
+							onUpdate={(html, text) => {
+								setHtmlBody(html);
+								setTextBody(text);
+							}}
+							onModEnter={() => void send()}
+						/>
+						<p className="px-4 pb-2 text-[11px] text-mail-muted">
+							Type{" "}
+							<kbd className="rounded border border-mail-border/50 px-1 font-sans text-[10px]">
+								/
+							</kbd>{" "}
+							for formatting commands
+						</p>
+					</div>
+
+					<AnimatePresence initial={false}>
+						{attachments.length > 0 && (
+							<motion.div
+								initial={reduceMotion ? { opacity: 0 } : false}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								transition={{ duration: 0.15, ease: easeOut }}
+								className="flex flex-wrap gap-1.5 px-4 pb-2"
+							>
+								<AnimatePresence initial={false}>
+									{attachments.map((file) => (
+										<motion.div
+											key={file.id}
+											initial={
+												reduceMotion
+													? { opacity: 0 }
+													: {
+															opacity: 0,
+															transform: "translateY(0px) scale(0.95)",
+														}
+											}
+											animate={
+												reduceMotion
+													? { opacity: 1 }
+													: {
+															opacity: 1,
+															transform: "translateY(0px) scale(1)",
+														}
+											}
+											exit={
+												reduceMotion
+													? { opacity: 0 }
+													: {
+															opacity: 0,
+															transform: "translateY(0px) scale(0.95)",
+														}
+											}
+											transition={
+												reduceMotion
+													? { duration: 0.1 }
+													: { duration: 0.18, ease: easeOut }
+											}
+											className="inline-flex h-7 max-w-[200px] items-center gap-1.5 rounded-lg border border-mail-border/40 bg-[var(--inbox-muted-bg)] px-2 text-[11px]"
+										>
+											<Paperclip className="h-3 w-3 shrink-0 text-mail-muted" />
+											<span className="min-w-0 truncate font-medium text-mail-foreground">
+												{file.name}
+											</span>
+											<span className="shrink-0 text-mail-muted">
+												{file.size}
+											</span>
+											{file.isUploading ? (
+												<span className="shrink-0 text-mail-muted">…</span>
+											) : (
+												<button
+													type="button"
+													onClick={() =>
+														setAttachments((prev) =>
+															prev.filter((a) => a.id !== file.id),
+														)
+													}
+													aria-label={`Remove ${file.name}`}
+													className="shrink-0 rounded p-0.5 text-mail-muted hover:text-mail-foreground"
+												>
+													<Icon name="cross" className="h-3 w-3" />
+												</button>
+											)}
+										</motion.div>
+									))}
+								</AnimatePresence>
+							</motion.div>
+						)}
+					</AnimatePresence>
+
+					<div className="flex items-center justify-between gap-3 px-4 pt-1 pb-3">
+						<div className="flex items-center gap-1">
+							<button
+								type="button"
+								onClick={() => fileInputRef.current?.click()}
+								className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-mail-muted transition-colors duration-150 hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.97]"
+								aria-label="Attach files"
+							>
+								<Paperclip className="h-4 w-4" />
+							</button>
+							<input
+								ref={fileInputRef}
+								type="file"
+								multiple
+								className="hidden"
+								onChange={(e) => {
+									const files = e.target.files;
+									if (files) onDrop(Array.from(files));
+									e.target.value = "";
+								}}
+							/>
+							<span className="hidden text-[11px] text-mail-muted sm:inline">
+								from {bareFrom}
+							</span>
+						</div>
+
+						<div className="flex items-center gap-1.5">
+							<button
+								type="button"
+								onClick={onClose}
+								className="inline-flex h-8 items-center rounded-lg px-2.5 font-medium text-[12px] text-mail-muted transition-colors duration-150 hover:bg-[var(--inbox-danger-bg)] hover:text-[var(--inbox-danger-fg)] active:scale-[0.97]"
+							>
+								Discard
+							</button>
+							<button
+								type="button"
+								onClick={() => void send()}
+								disabled={!canSend}
+								className={cn(
+									"inline-flex h-8 items-center gap-2 rounded-lg bg-mail-primary px-3 font-semibold text-[12px] text-panel-light transition-[transform,opacity] duration-150",
+									"hover:opacity-90 active:scale-[0.97]",
+									"disabled:pointer-events-none disabled:opacity-35",
+									"dark:text-black",
+								)}
+							>
+								<span>Send</span>
+								<span className="hidden items-center gap-0.5 font-normal opacity-70 sm:inline-flex">
+									<span className="rounded border border-white/25 px-1 text-[10px] leading-4 dark:border-black/25">
+										{modKey}
+									</span>
+									<span className="rounded border border-white/25 px-1 text-[10px] leading-4 dark:border-black/25">
+										↵
+									</span>
+								</span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</motion.div>
+		);
+	},
+);

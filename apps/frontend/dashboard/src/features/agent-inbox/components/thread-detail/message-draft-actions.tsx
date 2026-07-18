@@ -6,6 +6,9 @@ interface MessageDraftActionsProps {
 	onForward: () => void;
 }
 
+const pressable =
+	"transition-[transform,opacity,background-color,color] duration-150 ease-out active:scale-[0.97]";
+
 /**
  * Three-button action bar shown at the bottom of approval-pending cards.
  * Matches screenshot: [Approve & send] [Edit reply] [Forward]
@@ -21,7 +24,7 @@ export const MessageDraftActions = ({
 			<button
 				type="button"
 				onClick={onApproveSend}
-				className="flex items-center gap-2 rounded-xl bg-mail-primary bg-mail-primary px-4 py-2.5 font-semibold text-panel-light text-xs shadow-sm transition-all hover:opacity-85 dark:text-panel-light"
+				className={`flex items-center gap-2 rounded-xl bg-mail-primary px-4 py-2.5 font-semibold text-panel-light text-xs shadow-sm hover:opacity-85 dark:text-panel-light ${pressable}`}
 			>
 				<Icon name="send" className="h-3.5 w-3.5" />
 				<span>Approve &amp; send</span>
@@ -31,7 +34,7 @@ export const MessageDraftActions = ({
 			<button
 				type="button"
 				onClick={onEditReply}
-				className="flex items-center gap-2 rounded-xl border border-mail-border border-mail-border/30 bg-mail-accent/20 bg-panel-light px-4 py-2.5 font-semibold text-mail-muted text-xs transition-all hover:bg-offset-light hover:text-mail-foreground"
+				className={`flex items-center gap-2 rounded-xl border border-mail-border/30 bg-mail-accent/20 bg-panel-light px-4 py-2.5 font-semibold text-mail-muted text-xs hover:bg-offset-light hover:text-mail-foreground ${pressable}`}
 			>
 				<Icon name="reply" className="h-3.5 w-3.5" />
 				<span>Edit reply</span>
@@ -41,7 +44,7 @@ export const MessageDraftActions = ({
 			<button
 				type="button"
 				onClick={onForward}
-				className="flex items-center gap-2 rounded-xl border border-mail-border border-mail-border/30 bg-mail-accent/20 bg-panel-light px-4 py-2.5 font-semibold text-mail-muted text-xs transition-all hover:bg-offset-light hover:text-mail-foreground"
+				className={`flex items-center gap-2 rounded-xl border border-mail-border/30 bg-mail-accent/20 bg-panel-light px-4 py-2.5 font-semibold text-mail-muted text-xs hover:bg-offset-light hover:text-mail-foreground ${pressable}`}
 			>
 				<Icon name="forward" className="h-3.5 w-3.5" />
 				<span>Forward</span>
