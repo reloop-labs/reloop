@@ -1,0 +1,122 @@
+---
+title: "I Let an AI Agent Read and Reply to My Emails. Here's How the Infrastructure Works."
+description: Building an AI agent that reads and replies to email is easy in LangChain. Owning the send-and-receive layer is the hard part — and why open-source email infrastructure matters.
+keywords:
+  - email infrastructure for AI agents
+  - AI agent inbound email
+  - self-hosted email for agents
+  - open source email API
+  - Reloop agent inbox
+publishedAt: 2026-07-18
+category: AI & Automation
+tags: [ai, agents, inbound, infrastructure, self-host]
+readTime: 8 min read
+author:
+  name: Reloop Labs
+draft: true
+relatedSlugs:
+  - build-ai-agent-sends-emails
+  - vercel-ai-sdk-reloop-notifications
+  - self-hosted-email-infrastructure
+---
+
+Right now, everyone's building AI agents that do everything — book flights, negotiate contracts, run support, chase down leads. They all hit the exact same wall.
+
+An AI can write the perfect reply in two seconds. But if it can't receive what the customer writes back, it's not having a conversation — it's just sending one message into the void.
+
+Building the reply logic in something like LangChain is maybe an hour of work. Getting it to actually send and receive real email is where things get complicated — often taking far longer than the AI part itself.
+
+## The default move: a third-party API key
+
+The obvious first move — grab a Resend or SendGrid key, wire it to the agent, ship it.
+
+It doesn't take much to go wrong this way. An agent that occasionally sends a slightly repetitive or oddly-formatted reply is normal LLM behavior, not a bug. Managed providers run abuse and compliance systems for a reason — unexpected send patterns can get an account restricted, sometimes quickly.
+
+That's the trap: when you send through someone else's platform, you don't own your sending reputation — they do. An autonomous agent is, by definition, going to occasionally do something a little weird. Building on infrastructure where a third-party compliance decision can take your whole send path offline is a real product risk.
+
+Self-hosting doesn't mean Gmail and Outlook stop filtering mail. What changes is who controls your domain, your keys, and your operational rules — and whether a vendor's compliance queue can shut you down overnight.
+
+## Sending is only half the job
+
+For an agent to be useful, it also has to **read replies**.
+
+If your agent offers a calendar slot and the customer writes back *"Actually, can we do Saturday at 2 PM?"*, that reply has to land somewhere your code can process — as structured fields, not a raw MIME blob sitting in someone's personal Gmail.
+
+Many teams still treat email as send-only. Some providers do offer inbound parsing. The harder part is usually the whole loop in one place:
+
+- receive at your domain
+- parse MIME into text, HTML, headers, and attachments
+- keep thread context
+- send authenticated replies from the same identity
+- keep data and ops under your control when you need to
+
+That loop is the product surface agents actually need. The model is the brain. Email is the mouth and the ears.
+
+## Reloop is the plumbing — not the AI
+
+To be clear: **Reloop is not an AI calendar bot.** Reloop is open-source email infrastructure.
+
+Your agent (LangChain, Autogen, a custom Python service, whatever you build) is the brain. Reloop is the send-and-receive layer: APIs, SMTP, inbound mailboxes, parsing, DKIM, and the option to self-host.
+
+Think of it this way: you bring the LLM. Reloop gives that LLM a real mailbox.
+
+Here's how that wiring looks in practice:
+
+### 1. Inbound (the ears)
+
+Point your domain's MX records at your Reloop instance (or use Reloop hosted). When mail hits `support@yourcompany.com`, Reloop accepts it, runs spam checks, and parses the MIME message into plain text, HTML, headers, and attachments.
+
+### 2. Handoff
+
+Reloop stores the message against a mailbox and correlates it into a thread. Your agent reads that clean payload through the inbox APIs — or you work from the agent inbox when you want a human in the loop.
+
+### 3. Your LLM brain
+
+Your code — not Reloop — decides what the message means. Check a calendar. Look up an order. Draft a reply. Apply your own allowlists, rate limits, and approval rules.
+
+### 4. Outbound (the mouth)
+
+Your app sends the reply through Reloop's REST API (or SMTP). Reloop signs the message with DKIM and delivers it. Same domain identity on the way out as on the way in.
+
+When you self-host, that path runs on infrastructure you operate. You own the data plane. You make the operational rules.
+
+## What you get that agents actually need
+
+For agent workflows, the useful Reloop surface looks like this:
+
+- **Inbound + outbound in one stack** — receive at your domain and reply from the same platform
+- **MIME parsing** — plain text, HTML, headers, and attachments ready for your agent context
+- **Thread correlation** — replies stay attached to the conversation
+- **Agent inbox** — a mailbox UI and APIs built for programmatic and human-assisted workflows
+- **DKIM-signed sending** — REST and SMTP with authentication you configure on your domain
+- **Delivery events** — opens, clicks, bounces, and complaints via webhooks so your agent can react to what happened after send
+- **Hosted or self-hosted** — same product idea either way; self-host when ownership and data residency matter
+
+Reloop also covers the rest of a modern email platform — templates, campaigns, contacts, analytics — but for agents, the core loop is inbound, parse, decide, send.
+
+<Callout type="info">
+  **Coming next: inbound notify.** Today your agent pulls new mail from the inbox APIs (or the agent inbox UI). We're building inbound webhooks so Reloop can push a notification to your app the moment a message arrives — same event-driven pattern as delivery webhooks, for the receive side. Not shipped yet; watch the repo for it.
+</Callout>
+
+## Your agent. Your rules.
+
+Owning the email layer doesn't make an unsupervised agent safe. Self-hosting means you own the reputation — and the responsibility.
+
+Allowlist recipients. Rate-limit sends. Keep a human in the loop when it matters.
+
+Reloop moves mail. You decide what the model is allowed to say.
+
+## The takeaway
+
+AI agents are becoming real participants in businesses — negotiating, following up, handling support. But an agent that can't reliably talk to a human, both ways, is just a very good draft generator.
+
+If you're building agents that need to hold a real conversation, you need infrastructure that receives, not just sends — and you need to own it, not rent it.
+
+[Check out Reloop on GitHub](https://github.com/reloop-labs/reloop) and see the inbound flow yourself. Build the brain. Let Reloop be the ears and the mouth.
+
+<Cta
+  title="Give your agent a mailbox"
+  description="Open-source email infrastructure with inbound, outbound, and an agent inbox — hosted or self-hosted."
+  href="/features/ai-agents"
+  label="Explore AI agent email"
+/>

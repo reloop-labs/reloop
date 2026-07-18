@@ -104,7 +104,14 @@ export function FeatureHero({
 				>
 					<div className="mx-auto max-w-[1020px] text-center">
 						{leading}
-						<h1 className="font-serif text-[2.8rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[4.2rem] dark:text-white">
+						<h1
+							className={cn(
+								"font-serif text-text-strong-950 leading-[1.05] tracking-tighter dark:text-white",
+								compact
+									? "text-[2.4rem] sm:text-[3.6rem]"
+									: "text-[2.8rem] sm:text-[4.2rem]",
+							)}
+						>
 							{titleLines.map((line, i) => (
 								<span key={line}>
 									{line}

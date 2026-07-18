@@ -155,34 +155,38 @@ export function PlansPage() {
 				</p>
 			</div>
 
-			<div className="mb-12 overflow-x-auto pb-4">
+			<div className="mb-12 overflow-x-auto pb-4 lg:overflow-visible">
 				<div className={cn("grid min-w-[900px]", GRID_COLS)}>
-					<div className="border-stroke-soft-100 border-b dark:border-stroke-soft-100/40" />
+					<div className="sticky top-0 z-20 border-stroke-soft-100 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]/95" />
 					{pricingPlans.map((plan) => {
 						const price = priceLine(plan);
 						return (
 							<div
 								key={plan.id}
-								className={cn(
-									"flex flex-col gap-4 rounded-t-2xl border-stroke-soft-100 border-b p-4 dark:border-stroke-soft-100/40",
-									isHighlight(plan) && "border-t",
-									cellBg(plan),
-								)}
+								className="sticky top-0 z-20 border-stroke-soft-100 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]/95"
 							>
-								<div>
-									<h2 className="font-medium text-label-md text-text-strong-950">
-										{plan.name}
-									</h2>
-									<div className="mt-2 flex items-baseline gap-1.5">
-										<span className="font-semibold text-text-strong-950 text-title-h6">
-											{price.amount}
-										</span>
-										<span className="text-paragraph-xs text-text-sub-600">
-											{price.caption}
-										</span>
+								<div
+									className={cn(
+										"flex flex-col gap-4 p-4",
+										isHighlight(plan) && "rounded-t-2xl border-t",
+										cellBg(plan),
+									)}
+								>
+									<div>
+										<h2 className="font-medium text-label-md text-text-strong-950">
+											{plan.name}
+										</h2>
+										<div className="mt-2 flex items-baseline gap-1.5">
+											<span className="font-semibold text-text-strong-950 text-title-h6">
+												{price.amount}
+											</span>
+											<span className="text-paragraph-xs text-text-sub-600">
+												{price.caption}
+											</span>
+										</div>
 									</div>
+									{renderCta(plan)}
 								</div>
-								{renderCta(plan)}
 							</div>
 						);
 					})}

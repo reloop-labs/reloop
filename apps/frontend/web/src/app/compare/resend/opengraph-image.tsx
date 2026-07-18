@@ -13,38 +13,71 @@ export default function OpenGraphImage() {
 				display: "flex",
 				flexDirection: "column",
 				justifyContent: "space-between",
-				backgroundColor: "#000000",
+				backgroundColor: "#f7f7f5",
 				padding: "56px",
-				fontFamily: "sans-serif",
+				fontFamily: "Georgia, serif",
 			}}
 		>
 			<div style={{ display: "flex", flexDirection: "column" }}>
-				<span style={{ fontSize: "22px", color: "rgba(255,255,255,0.5)" }}>
-					Reloop / Compare
+				<span
+					style={{
+						fontSize: "14px",
+						letterSpacing: "0.14em",
+						textTransform: "uppercase",
+						color: "rgba(0,0,0,0.45)",
+						fontFamily: "sans-serif",
+					}}
+				>
+					Compare
 				</span>
 				<div
 					style={{
-						fontSize: "52px",
+						fontSize: "58px",
 						fontWeight: 700,
-						color: "#fff",
-						marginTop: "20px",
+						color: "#111",
+						marginTop: "18px",
+						letterSpacing: "-0.04em",
+						lineHeight: 1.05,
 					}}
 				>
 					Reloop vs Resend
 				</div>
 				<div
 					style={{
-						fontSize: "18px",
-						color: "rgba(255,255,255,0.5)",
-						marginTop: "12px",
+						fontSize: "22px",
+						color: "rgba(0,0,0,0.5)",
+						marginTop: "18px",
+						fontFamily: "sans-serif",
+						maxWidth: "820px",
+						lineHeight: 1.4,
 					}}
 				>
-					Open-source email infrastructure vs hosted-only transactional APIs.
+					Own MTA vs Amazon SES. Self-hosting, agent inbox, and developer
+					email—compared honestly.
 				</div>
 			</div>
-			<span style={{ fontSize: "14px", fontWeight: 600, color: "#d97757" }}>
-				reloop.sh
-			</span>
+			<div
+				style={{
+					display: "flex",
+					justifyContent: "space-between",
+					alignItems: "flex-end",
+					fontFamily: "sans-serif",
+				}}
+			>
+				<span style={{ fontSize: "16px", color: "rgba(0,0,0,0.4)" }}>
+					reloop.sh/compare/resend
+				</span>
+				<span
+					style={{
+						fontSize: "14px",
+						fontWeight: 600,
+						color: "#d97757",
+						letterSpacing: "0.04em",
+					}}
+				>
+					RELOOP
+				</span>
+			</div>
 		</div>,
 		{ ...size },
 	);

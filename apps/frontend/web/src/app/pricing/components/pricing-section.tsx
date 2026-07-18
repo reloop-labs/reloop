@@ -217,62 +217,136 @@ function ComparisonCell({
 	);
 }
 
+const COMPARISON_GRID_COLS =
+	"grid-cols-[minmax(160px,34%)_repeat(4,minmax(140px,1fr))]";
+
+function comparisonPriceLine(plan: (typeof pricingPlans)[number]) {
+	if (plan.monthlyPrice === null) {
+		return { amount: "Custom", caption: "pricing" };
+	}
+	if (plan.monthlyPrice === 0) {
+		return { amount: formatPrice(0), caption: "Free for everyone" };
+	}
+	return {
+		amount: formatPrice(plan.monthlyPrice),
+		caption: "per month",
+	};
+}
+
+function highlightColumn(plan: (typeof pricingPlans)[number]) {
+	return plan.highlighted
+		? "border-stroke-soft-200 border-x bg-bg-weak-50/60 dark:border-white/10 dark:bg-white/[0.03]"
+		: "";
+}
+
 function ComparisonTable() {
 	return (
-		<div className="overflow-x-auto">
-			<table className="w-full min-w-[760px] border-collapse">
-				<thead>
-					<tr>
-						<th className="w-[34%] pb-8" aria-hidden />
-						{pricingPlans.map((plan) => (
-							<th
-								key={plan.id}
-								className="pb-8 text-left font-semibold text-[15px] text-text-strong-950 dark:text-white"
+		<div className="overflow-x-auto lg:overflow-visible">
+			<div className={cn("grid min-w-[760px]", COMPARISON_GRID_COLS)}>
+				<div className="sticky top-16 z-20 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95" />
+				{pricingPlans.map((plan) => {
+					const price = comparisonPriceLine(plan);
+					return (
+						<div
+							key={plan.id}
+							className="sticky top-16 z-20 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95"
+						>
+							<div
+								className={cn(
+									"flex flex-col gap-4 px-4 py-5",
+									plan.highlighted &&
+										"rounded-t-2xl border-stroke-soft-200 border-t border-x bg-bg-weak-50/60 dark:border-white/10 dark:bg-white/[0.03]",
+								)}
 							>
-								{plan.name}
-							</th>
+								<div>
+									<div className="flex items-center gap-2">
+										<span className="font-medium text-label-md text-text-strong-950 dark:text-white">
+											{plan.name}
+										</span>
+										{plan.badge ? (
+											<span className="shrink-0 rounded-full bg-primary-base px-2 py-0.5 text-center font-semibold text-[10px] text-white uppercase tracking-[0.14em]">
+												{plan.badge}
+											</span>
+										) : null}
+									</div>
+									<div className="mt-2 flex items-baseline gap-1.5">
+										<span className="font-semibold text-text-strong-950 text-title-h6 dark:text-white">
+											{price.amount}
+										</span>
+										<span className="text-paragraph-xs text-text-sub-600 dark:text-white/50">
+											{price.caption}
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					);
+				})}
+
+				{comparisonSections.map((section, sectionIndex) => (
+					<Fragment key={section.title}>
+						<div
+							className={cn(
+								"pb-3",
+								sectionIndex > 0 ? "pt-10" : "pt-6",
+							)}
+						>
+							<span className="font-medium text-[15px] text-text-strong-950 dark:text-white">
+								{section.title}
+							</span>
+						</div>
+						{pricingPlans.map((plan) => (
+							<div
+								key={plan.id}
+								className={cn(
+									sectionIndex > 0 ? "pt-10" : "pt-6",
+									"pb-3",
+									highlightColumn(plan),
+								)}
+							/>
 						))}
-					</tr>
-				</thead>
-				<tbody>
-					{comparisonSections.map((section, sectionIndex) => (
-						<Fragment key={section.title}>
-							<tr>
-								<td
-									colSpan={pricingPlans.length + 1}
-									className={cn(
-										"pb-4 font-medium text-[15px] text-text-strong-950 dark:text-white",
-										sectionIndex > 0 ? "pt-10" : "pt-2",
-									)}
-								>
-									{section.title}
-								</td>
-							</tr>
-							{section.rows.map((row) => (
-								<tr
-									key={row.key}
-									className="group border-stroke-soft-200 border-b transition-colors last:border-b-0 hover:bg-bg-weak-50/60 dark:border-white/[0.06] dark:hover:bg-white/[0.04]"
-								>
-									<td className="py-4 pr-8 text-[14px] text-text-sub-600 dark:text-white/55">
+
+						{section.rows.map((row) => (
+							<Fragment key={row.key}>
+								<div className="flex items-center border-stroke-soft-200 border-b py-4 pr-8 dark:border-white/[0.06]">
+									<span className="text-[14px] text-text-sub-600 dark:text-white/55">
 										{row.label}
-									</td>
-									{pricingPlans.map((plan) => {
-										const value = plan.comparison[row.key];
-										return (
-											<td key={plan.id} className="py-4">
-												<ComparisonCell
-													value={value as string | boolean}
-													type={row.type}
-												/>
-											</td>
-										);
-									})}
-								</tr>
-							))}
-						</Fragment>
-					))}
-				</tbody>
-			</table>
+									</span>
+								</div>
+								{pricingPlans.map((plan) => {
+									const value = plan.comparison[row.key];
+									return (
+										<div
+											key={plan.id}
+											className={cn(
+												"flex items-center border-stroke-soft-200 border-b px-3 py-4 dark:border-white/[0.06]",
+												highlightColumn(plan),
+											)}
+										>
+											<ComparisonCell
+												value={value as string | boolean}
+												type={row.type}
+											/>
+										</div>
+									);
+								})}
+							</Fragment>
+						))}
+					</Fragment>
+				))}
+
+				<div />
+				{pricingPlans.map((plan) => (
+					<div
+						key={`cap-${plan.id}`}
+						className={cn(
+							"h-8",
+							plan.highlighted && "rounded-b-2xl border-b",
+							highlightColumn(plan),
+						)}
+					/>
+				))}
+			</div>
 		</div>
 	);
 }
