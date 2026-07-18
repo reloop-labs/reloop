@@ -94,3 +94,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Scratch
+scratch/
+

@@ -1,6 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
-import { Copy, MoreVertical, Pin, StickyNote, Trash2, X } from "lucide-react";
+import { Icon } from "@reloop/ui/icon";
+import { Copy, MoreVertical, StickyNote } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
@@ -31,8 +32,27 @@ const colorClass = (color: string) => {
 	return map[color] ?? "border-l-neutral-500";
 };
 
-export const NotesPanel = ({ threadId }: { threadId: string }) => {
-	const [isOpen, setIsOpen] = useState(false);
+export const NotesPanel = ({
+	threadId,
+	open: controlledOpen,
+	onOpenChange,
+	hideTrigger = false,
+}: {
+	threadId: string;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
+	hideTrigger?: boolean;
+}) => {
+	const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+	const isOpen = controlledOpen ?? uncontrolledOpen;
+	const setIsOpen = useCallback(
+		(next: boolean | ((prev: boolean) => boolean)) => {
+			const resolved = typeof next === "function" ? next(isOpen) : next;
+			if (controlledOpen === undefined) setUncontrolledOpen(resolved);
+			onOpenChange?.(resolved);
+		},
+		[controlledOpen, isOpen, onOpenChange],
+	);
 	const [isAdding, setIsAdding] = useState(false);
 	const [newContent, setNewContent] = useState("");
 	const [selectedColor, setSelectedColor] = useState("default");
@@ -120,27 +140,33 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 	);
 
 	return (
-		<div className="relative">
-			<button
-				type="button"
-				onClick={() => setIsOpen((v) => !v)}
-				className={cn(
-					"inline-flex h-7 w-7 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-[var(--inbox-control)] transition-colors hover:bg-[var(--inbox-control-hover)]",
-					notes.length > 0 && "text-amber-400",
-				)}
-				aria-label="Notes"
-			>
-				<StickyNote className="h-3.5 w-3.5" />
-				{notes.length > 0 && (
-					<span className="-top-1 -right-1 absolute flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-amber-500 px-0.5 font-semibold text-[9px] text-black">
-						{notes.length}
-					</span>
-				)}
-			</button>
+		<>
+			{!hideTrigger && (
+				<div className="relative">
+					<button
+						type="button"
+						onClick={() => setIsOpen((v) => !v)}
+						className={cn(
+							"inline-flex h-7 w-7 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-[var(--inbox-control)] transition-colors hover:bg-[var(--inbox-control-hover)]",
+							notes.length > 0 && "text-amber-400",
+						)}
+						aria-label="Notes"
+					>
+						<StickyNote className="h-3.5 w-3.5" />
+						{notes.length > 0 && (
+							<span className="-top-1 -right-1 absolute flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-amber-500 px-0.5 font-semibold text-[9px] text-black">
+								{notes.length}
+							</span>
+						)}
+					</button>
+				</div>
+			)}
 
 			{isOpen && (
 				<div
-					className="absolute top-9 right-0 z-50 flex w-[min(350px,calc(100vw-2rem))] flex-col overflow-hidden rounded-xl border border-mail-border bg-panel-light shadow-xl dark:bg-panel-dark"
+					role="dialog"
+					aria-label="Thread notes"
+					className="absolute top-12 right-3 z-50 flex w-[min(350px,calc(100vw-2rem))] flex-col overflow-hidden rounded-xl border border-mail-border bg-panel-light shadow-xl md:right-5 dark:bg-panel-dark"
 					onClick={(e) => e.stopPropagation()}
 					onKeyDown={(e) => e.stopPropagation()}
 				>
@@ -161,7 +187,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 							className="rounded-md p-1 text-mail-muted hover:bg-[var(--inbox-control-hover)]"
 							aria-label="Close notes"
 						>
-							<X className="h-3.5 w-3.5" />
+							<Icon name="cross" className="h-3.5 w-3.5" />
 						</button>
 					</div>
 
@@ -264,7 +290,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 															updateNote(note.id, { isPinned: !note.isPinned })
 														}
 													>
-														<Pin className="mr-2 h-3.5 w-3.5" />
+														<Icon name="pin" className="mr-2 h-3.5 w-3.5" />
 														{note.isPinned ? "Unpin" : "Pin"}
 													</Dropdown.Item>
 													{NOTE_COLORS.map((c) => (
@@ -279,7 +305,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 														onSelect={() => deleteNote(note.id)}
 														className="text-rose-400"
 													>
-														<Trash2 className="mr-2 h-3.5 w-3.5" />
+														<Icon name="trash" className="mr-2 h-3.5 w-3.5" />
 														Delete
 													</Dropdown.Item>
 												</Dropdown.Content>
@@ -287,7 +313,7 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 										</div>
 										{note.isPinned && (
 											<span className="mt-1 inline-flex items-center gap-1 text-[10px] text-amber-400">
-												<Pin className="h-2.5 w-2.5" /> Pinned
+												<Icon name="pin" className="h-2.5 w-2.5" /> Pinned
 											</span>
 										)}
 									</>
@@ -367,6 +393,6 @@ export const NotesPanel = ({ threadId }: { threadId: string }) => {
 					)}
 				</div>
 			)}
-		</div>
+		</>
 	);
 };

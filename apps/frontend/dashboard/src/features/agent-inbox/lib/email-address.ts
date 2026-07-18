@@ -12,7 +12,9 @@ export function extractBareEmail(value: string): string {
 	const match = current.match(
 		/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/,
 	);
-	return (match?.[0] ?? current).trim();
+	// Never fall back to the raw string — plain names like "Alex Rivers"
+	// are not emails, and treating them as such breaks display-name parsing.
+	return (match?.[0] ?? "").trim();
 }
 
 /** Display name without angle-bracket address parts. */
@@ -27,7 +29,11 @@ export function extractDisplayName(value: string): string {
 		.replace(/[<>"']/g, "")
 		.replace(/\s+/g, " ")
 		.trim();
-	if (!name || name.includes("@") || name.toLowerCase() === bare.toLowerCase()) {
+	if (
+		!name ||
+		name.includes("@") ||
+		(bare.length > 0 && name.toLowerCase() === bare.toLowerCase())
+	) {
 		return "";
 	}
 	return name;

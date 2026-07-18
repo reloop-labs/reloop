@@ -1,3 +1,4 @@
+import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
 
 interface MessageDraftBannerProps {
@@ -6,7 +7,6 @@ interface MessageDraftBannerProps {
 
 /**
  * Amber warning banner shown on approval-pending messages.
- * Matches: "Agent drafted a reply at Today, 10:44 AM · held for your approval before sending"
  */
 export const MessageDraftBanner = ({ messageAt }: MessageDraftBannerProps) => {
 	const timeLabel = dayjs(messageAt).isSame(dayjs(), "day")
@@ -14,18 +14,8 @@ export const MessageDraftBanner = ({ messageAt }: MessageDraftBannerProps) => {
 		: dayjs(messageAt).format("MMM D, h:mm A");
 
 	return (
-		<div className="mb-1 flex w-full items-center gap-2 rounded-lg border border-[#C47839]/10 bg-[#C47839]/5 px-3 py-2 font-medium text-[#C47839] text-xs dark:border-[#C47839]/20 dark:bg-[#C47839]/10 dark:text-[#C47839]">
-			{/* Clock icon */}
-			<svg
-				className="h-3.5 w-3.5 shrink-0 text-[#C47839]"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-				strokeWidth="2"
-			>
-				<circle cx="12" cy="12" r="10" />
-				<polyline points="12 6 12 12 16 14" />
-			</svg>
+		<div className="mb-1 flex w-full items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-2 font-medium text-amber-700 text-xs dark:text-amber-400">
+			<Icon name="clock" className="h-3.5 w-3.5 shrink-0" />
 			<span>
 				Agent drafted a reply at{" "}
 				<span className="font-semibold">{timeLabel}</span>

@@ -10,9 +10,11 @@ import type { AgentMailbox, InboundThread } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
 import { ForwardComposer } from "./forward-composer";
 import type { AttachmentItem } from "./message-attachments";
-import { NotesPanel } from "./note-panel";
 import { RawHeadersModal } from "./raw-headers-modal";
-import { ReplyComposer } from "./reply-composer";
+import {
+	ReplyComposer,
+	ReplyComposerAffordance,
+} from "./reply-composer";
 import type { ThreadParticipant } from "./thread-header";
 import { ThreadHeader } from "./thread-header";
 import { ZeroMailDisplay } from "./zero-mail-display";
@@ -20,41 +22,13 @@ import { ZeroThreadToolbar } from "./zero-thread-toolbar";
 
 const extractSummaryText = (
 	parsed: Record<string, unknown> | null | undefined,
-	preview?: string,
 ): string | null => {
-	if (parsed) {
-		for (const key of [
-			"summary",
-			"aiSummary",
-			"threadSummary",
-			"overview",
-			"description",
-		]) {
-			const val = parsed[key];
-			if (typeof val === "string" && val.trim()) return val.trim();
-		}
+	if (!parsed) return null;
+	for (const key of ["summary", "aiSummary", "threadSummary"]) {
+		const val = parsed[key];
+		if (typeof val === "string" && val.trim()) return val.trim();
 	}
-	if (preview?.trim()) return preview.trim();
 	return null;
-};
-
-const formatThreadDateRange = (messages: Array<{ messageAt?: string }>) => {
-	const dates = messages
-		.map((m) => m.messageAt)
-		.filter(Boolean)
-		.map((d) => dayjs(d as string))
-		.filter((d) => d.isValid())
-		.sort((a, b) => a.valueOf() - b.valueOf());
-	if (dates.length === 0) return null;
-	const first = dates[0]!;
-	const last = dates[dates.length - 1]!;
-	if (first.isSame(last, "day")) {
-		return first.format("MMMM D");
-	}
-	if (first.isSame(last, "year")) {
-		return `${first.format("MMMM D")} - ${last.format("MMMM D")}`;
-	}
-	return `${first.format("MMM D, YYYY")} - ${last.format("MMM D, YYYY")}`;
 };
 
 dayjs.extend(relativeTime);
@@ -100,23 +74,15 @@ interface ThreadDetailProps {
 
 const EmptyState = () => (
 	<div className="flex min-h-[400px] flex-col items-center justify-center gap-1.5 bg-offset-light/10 p-8 text-center dark:bg-transparent">
-		<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-mail-border bg-panel-light shadow-sm dark:border-neutral-850">
-			<Icon
-				name="inbox"
-				className="h-5 w-5 text-mail-muted dark:text-neutral-450"
-			/>
+		<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-mail-border/40 bg-panel-light shadow-sm dark:bg-panel-dark">
+			<Icon name="inbox" className="h-5 w-5 text-mail-muted" />
 		</div>
-		<h3 className="font-semibold text-base text-mail-foreground text-mail-foreground">
-			Select a message to inspect
+		<h3 className="font-semibold text-base text-mail-foreground">
+			Select a conversation
 		</h3>
-		<p className="mx-auto max-w-sm text-mail-muted text-mail-muted text-xs">
-			Click any message on the left to review parsing, timeline, and approval
-			actions.
+		<p className="mx-auto max-w-sm text-mail-muted text-xs">
+			Choose a message from the list to read and reply.
 		</p>
-		<div className="mt-4 flex items-center gap-1.5 text-mail-muted text-mail-muted text-xs">
-			<Icon name="arrow-left" className="h-3.5 w-3.5 animate-pulse" />
-			<span className="font-medium">Pick a message to get started</span>
-		</div>
 	</div>
 );
 
@@ -130,7 +96,6 @@ export const ThreadDetail = ({
 	folder,
 	onBack,
 	showBack,
-	onToggleAi,
 }: ThreadDetailProps) => {
 	const {
 		deleteMessage,
@@ -157,6 +122,10 @@ export const ThreadDetail = ({
 	const [showForwardComposer, setShowForwardComposer] = useState(false);
 	const [isForwarding, setIsForwarding] = useState(false);
 	const [replyMode, setReplyMode] = useState<"reply" | "replyAll">("reply");
+	const [replyTargetPerson, setReplyTargetPerson] = useState<{
+		name: string;
+		email: string;
+	} | null>(null);
 	const [composeParam, setComposeParam] = useQueryState(
 		"compose",
 		parseAsString.withDefault(""),
@@ -208,6 +177,7 @@ export const ThreadDetail = ({
 		setReplySeed("");
 		setOptimisticReplies([]);
 		setShowForwardComposer(false);
+		setReplyTargetPerson(null);
 	}, [thread?.id]);
 
 	useEffect(() => {
@@ -324,17 +294,12 @@ export const ThreadDetail = ({
 		return items;
 	}, [displayMessages]);
 
-	const dateRangeLabel = useMemo(
-		() => formatThreadDateRange(displayMessages),
-		[displayMessages],
-	);
-
 	const aiSummaryText = useMemo(() => {
 		for (const msg of displayMessages) {
 			const fromParsed = extractSummaryText(msg.parsed);
 			if (fromParsed) return fromParsed;
 		}
-		return extractSummaryText(thread?.parsed, thread?.preview);
+		return extractSummaryText(thread?.parsed);
 	}, [displayMessages, thread]);
 
 	// ── Action handlers ───────────────────────────────────────────────────────
@@ -495,7 +460,9 @@ export const ThreadDetail = ({
 			email: {
 				id: `optimistic-${Date.now()}`,
 				fromEmail: mailbox?.email || "me",
-				toEmails: [thread.from.email],
+				toEmails: [
+					replyTargetPerson?.email || thread.from.email,
+				],
 				subject: `Re: ${thread.subject}`,
 				textBody: body,
 				htmlBody: payload.html || null,
@@ -505,6 +472,7 @@ export const ThreadDetail = ({
 			parsed: null,
 		};
 		setOptimisticReplies((prev) => [...prev, optimisticMsg]);
+		setReplyTargetPerson(null);
 		setShowReplyComposer(false);
 
 		const send =
@@ -533,8 +501,33 @@ export const ThreadDetail = ({
 		setShowForwardComposer(true);
 	};
 
-	const openReplyComposer = (mode: "reply" | "replyAll" = "reply") => {
+	const resolveReplyTarget = (msg?: any) => {
+		if (!thread) return { name: "", email: "" };
+		if (!msg) {
+			return {
+				name: thread.from.name || "",
+				email: thread.from.email,
+			};
+		}
+		// Outbound: reply goes back to the original conversation partner.
+		if (msg.direction === "outbound") {
+			return {
+				name: thread.from.name || "",
+				email: thread.from.email,
+			};
+		}
+		const raw = msg.fromEmail || msg.email?.fromEmail || thread.from.email;
+		const name =
+			msg.fromName || msg.email?.fromName || thread.from.name || "";
+		return { name, email: raw };
+	};
+
+	const openReplyComposer = (
+		mode: "reply" | "replyAll" = "reply",
+		msg?: any,
+	) => {
 		setReplyMode(mode);
+		setReplyTargetPerson(resolveReplyTarget(msg));
 		setShowForwardComposer(false);
 		setReplySeed("");
 		setShowReplyComposer(true);
@@ -750,15 +743,19 @@ export const ThreadDetail = ({
 
 	if (!thread) return <EmptyState />;
 
+	const replyTarget =
+		thread.from.name?.trim() ||
+		thread.from.email.split("@")[0] ||
+		thread.from.email;
+
 	return (
-		<div className="flex h-full min-h-0 flex-col rounded-xl bg-panel-light dark:bg-panel-dark">
+		<div className="relative flex h-full min-h-0 flex-col rounded-2xl bg-panel-light dark:bg-panel-dark">
 			<ZeroThreadToolbar
 				isStarred={!!thread.isStarred}
 				isImportant={!!thread.isImportant}
 				folder={folder}
 				showBack={showBack}
 				onClose={onBack}
-				onReplyAll={() => openReplyComposer("replyAll")}
 				onToggleStar={() => void handleToggleStar()}
 				onToggleImportant={() => void handleToggleImportant()}
 				onArchive={() => void handleArchive()}
@@ -768,28 +765,24 @@ export const ThreadDetail = ({
 				onPrint={handlePrint}
 				onMarkSpam={() => void handleMarkSpam(true)}
 				onUnsubscribe={listUnsubscribeUrl ? handleUnsubscribe : undefined}
-				notesSlot={
-					thread.threadId ? <NotesPanel threadId={thread.threadId} /> : null
-				}
 			/>
 
 			<div className="min-h-0 flex-1 overflow-y-auto">
-				{/* Soft refresh indicator while conversation hydrates */}
 				{thread.threadId && isLoadingThread && !threadDataMatches && (
-					<div className="flex items-center justify-center border-mail-border border-b py-1.5">
-						<div className="h-3 w-3 animate-spin rounded-full border-2 border-neutral-900 border-t-transparent dark:border-white dark:border-t-transparent" />
+					<div className="flex items-center justify-center border-mail-border/40 border-b py-1.5">
+						<div className="h-3 w-3 animate-spin rounded-full border-2 border-mail-foreground border-t-transparent" />
 					</div>
 				)}
 
 				{isTranslated && (
-					<div className="mx-4 my-3 flex items-center justify-between gap-3 rounded-lg border border-mail-border bg-[var(--inbox-muted-bg)] p-3 text-xs">
+					<div className="mx-4 my-3 flex items-center justify-between gap-3 rounded-xl border border-mail-border/40 bg-[var(--inbox-muted-bg)] p-3 text-xs">
 						<div className="flex items-center gap-2 text-mail-muted">
 							<Icon name="translate" className="h-4 w-4" />
 							<span>Translated to</span>
 							<select
 								value={targetLanguage}
 								onChange={(e) => handleLanguageChange(e.target.value)}
-								className="cursor-pointer rounded-md border border-mail-border bg-[var(--inbox-control)] px-2 py-1 text-mail-foreground outline-none"
+								className="cursor-pointer rounded-md border border-mail-border/40 bg-[var(--inbox-control)] px-2 py-1 text-mail-foreground outline-none"
 							>
 								<option value="es">Spanish</option>
 								<option value="fr">French</option>
@@ -817,14 +810,10 @@ export const ThreadDetail = ({
 					<ThreadHeader
 						subject={thread.subject}
 						messageCount={displayMessages.length}
-						dateRangeLabel={dateRangeLabel}
 						participants={threadParticipants}
 						summary={aiSummaryText}
 						attachments={threadAttachments}
 						labels={thread.labels}
-						entityTag={thread.entityTag}
-						isImportant={thread.isImportant}
-						isStarred={thread.isStarred}
 					/>
 				)}
 
@@ -841,8 +830,8 @@ export const ThreadDetail = ({
 						translatedTextMap={translatedTextMap}
 						parsedExpanded={parsedExpanded}
 						onToggleParsed={() => setParsedExpanded((v) => !v)}
-						onReply={() => openReplyComposer("reply")}
-						onReplyAll={() => openReplyComposer("replyAll")}
+						onReply={() => openReplyComposer("reply", msg)}
+						onReplyAll={() => openReplyComposer("replyAll", msg)}
 						onForward={() => handleForward()}
 						onDelete={handleDelete}
 						onPrint={handlePrint}
@@ -860,6 +849,7 @@ export const ThreadDetail = ({
 						}}
 						onEditReply={() => {
 							setReplySeed(msg.parsed?.suggestedReply || "");
+							setReplyMode("reply");
 							setShowForwardComposer(false);
 							setShowReplyComposer(true);
 						}}
@@ -867,17 +857,22 @@ export const ThreadDetail = ({
 				))}
 			</div>
 
-			{/* Reply / forward composer / action buttons — pinned outside scroll area */}
 			{showReplyComposer ? (
 				<ReplyComposer
-					key={`${thread.id}-${replySeed.slice(0, 32)}`}
-					toName={thread.from.name || ""}
-					toEmail={thread.from.email}
+					key={`${thread.id}-${replyTargetPerson?.email ?? "default"}-${replySeed.slice(0, 32)}`}
+					toName={
+						replyTargetPerson?.name || thread.from.name || ""
+					}
+					toEmail={replyTargetPerson?.email || thread.from.email}
 					fromEmail={mailbox?.email || "agent@local.reloop.sh"}
+					mode={replyMode}
+					canReplyAll
+					onModeChange={setReplyMode}
 					initialContent={replySeed}
 					onSend={handleSendReply}
 					onClose={() => {
 						setReplySeed("");
+						setReplyTargetPerson(null);
 						setShowReplyComposer(false);
 					}}
 				/>
@@ -900,9 +895,14 @@ export const ThreadDetail = ({
 					}}
 					isSending={isForwarding}
 				/>
-			) : null}
+			) : (
+				<ReplyComposerAffordance
+					toName={replyTarget}
+					onReply={() => openReplyComposer("reply")}
+					onReplyAll={() => openReplyComposer("replyAll")}
+				/>
+			)}
 
-			{/* Raw headers modal */}
 			{rawHeadersExpanded && (
 				<RawHeadersModal
 					thread={thread}

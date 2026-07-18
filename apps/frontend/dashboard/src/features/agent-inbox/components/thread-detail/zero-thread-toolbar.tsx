@@ -1,28 +1,88 @@
 import { cn } from "@reloop/ui/cn";
-import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import {
-	Archive,
-	ArchiveRestore,
-	Inbox,
-	MoreHorizontal,
-	Printer,
-	Reply,
-	Trash2,
-	X,
-	Zap,
-} from "lucide-react";
+import * as Tooltip from "@reloop/ui/tooltip";
 import type { ReactNode } from "react";
 
-const iconBtn =
-	"inline-flex h-7 w-7 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-[var(--inbox-control)] transition-colors hover:bg-[var(--inbox-control-hover)]";
+const iconBtnBase = cn(
+	"inline-flex h-7 w-7 cursor-pointer items-center justify-center overflow-hidden rounded-lg",
+	"transition-[transform,background-color,color] duration-150 ease-out",
+	"active:scale-[0.97]",
+);
+
+type ActionTone =
+	| "neutral"
+	| "star"
+	| "important"
+	| "archive"
+	| "spam"
+	| "print"
+	| "unsubscribe"
+	| "danger";
+
+const toneClass: Record<ActionTone, string> = {
+	neutral:
+		"bg-[var(--inbox-control)] text-mail-muted hover:bg-neutral-200/80 hover:text-mail-foreground dark:hover:bg-white/10",
+	star: "bg-[var(--inbox-control)] text-mail-muted hover:bg-amber-100 hover:text-amber-700 dark:hover:bg-amber-500/15 dark:hover:text-amber-300",
+	important:
+		"bg-[var(--inbox-control)] text-mail-muted hover:bg-orange-100 hover:text-orange-700 dark:hover:bg-orange-500/15 dark:hover:text-orange-300",
+	archive:
+		"bg-[var(--inbox-control)] text-mail-muted hover:bg-sky-100 hover:text-sky-700 dark:hover:bg-sky-500/15 dark:hover:text-sky-300",
+	spam: "bg-[var(--inbox-control)] text-mail-muted hover:bg-rose-100 hover:text-rose-700 dark:hover:bg-rose-500/15 dark:hover:text-rose-300",
+	print:
+		"bg-[var(--inbox-control)] text-mail-muted hover:bg-slate-200/90 hover:text-slate-700 dark:hover:bg-slate-500/20 dark:hover:text-slate-200",
+	unsubscribe:
+		"bg-[var(--inbox-control)] text-mail-muted hover:bg-teal-100 hover:text-teal-700 dark:hover:bg-teal-500/15 dark:hover:text-teal-300",
+	danger:
+		"border border-[var(--inbox-danger-border)] bg-[var(--inbox-danger-bg)] text-[var(--inbox-danger-fg)] hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-500/20 dark:hover:text-red-300",
+};
+
+const ToolbarTooltip = ({
+	label,
+	children,
+}: {
+	label: string;
+	children: ReactNode;
+}) => (
+	<Tooltip.Root>
+		<Tooltip.Trigger asChild>{children}</Tooltip.Trigger>
+		<Tooltip.Content size="xsmall" side="bottom" sideOffset={6}>
+			{label}
+		</Tooltip.Content>
+	</Tooltip.Root>
+);
+
+const ActionButton = ({
+	label,
+	onClick,
+	tone = "neutral",
+	className,
+	children,
+}: {
+	label: string;
+	onClick?: () => void;
+	tone?: ActionTone;
+	className?: string;
+	children: ReactNode;
+}) => (
+	<ToolbarTooltip label={label}>
+		<button
+			type="button"
+			onClick={onClick}
+			aria-label={label}
+			className={cn(iconBtnBase, toneClass[tone], className)}
+		>
+			<span className="relative flex h-3.5 w-3.5 items-center justify-center text-current [&_svg]:h-3.5 [&_svg]:w-3.5">
+				{children}
+			</span>
+		</button>
+	</ToolbarTooltip>
+);
 
 export const ZeroThreadToolbar = ({
 	isStarred,
 	isImportant,
 	folder,
 	onClose,
-	onReplyAll,
 	onToggleStar,
 	onToggleImportant,
 	onArchive,
@@ -32,14 +92,12 @@ export const ZeroThreadToolbar = ({
 	onPrint,
 	onMarkSpam,
 	onUnsubscribe,
-	notesSlot,
 	showBack,
 }: {
 	isStarred: boolean;
 	isImportant?: boolean;
 	folder?: string;
 	onClose?: () => void;
-	onReplyAll: () => void;
 	onToggleStar: () => void;
 	onToggleImportant?: () => void;
 	onArchive: () => void;
@@ -49,173 +107,111 @@ export const ZeroThreadToolbar = ({
 	onPrint: () => void;
 	onMarkSpam: () => void;
 	onUnsubscribe?: () => void;
-	notesSlot?: ReactNode;
 	showBack?: boolean;
 }) => {
 	const inArchive = folder === "archive" || folder === "archived";
 	const inTrash = folder === "trash";
 	const inSpam = folder === "spam";
 	const showRestore = inArchive || inTrash || inSpam;
+	const starLabel = isStarred ? "Unstar" : "Star";
+	const importantLabel = isImportant ? "Unmark important" : "Mark important";
+	const trashLabel = inTrash ? "Delete forever" : "Move to trash";
 
 	return (
-		<div className="flex shrink-0 items-center px-1 pb-[10px] md:px-3 md:pt-3 md:pb-[11px]">
-			<div className="flex flex-1 items-center gap-2">
-				{(showBack || onClose) && (
-					<button
-						type="button"
-						onClick={onClose}
-						className={cn(iconBtn, "md:hidden")}
-						aria-label="Close"
-					>
-						<X className="h-3.5 w-3.5 text-mail-muted" />
-					</button>
-				)}
-				{onClose && (
-					<button
-						type="button"
-						onClick={onClose}
-						className={cn(iconBtn, "hidden md:inline-flex")}
-						aria-label="Close"
-					>
-						<X className="h-3.5 w-3.5 text-mail-muted" />
-					</button>
-				)}
-			</div>
-
-			<div className="flex items-center gap-2">
-				<button
-					type="button"
-					onClick={onReplyAll}
-					className="inline-flex h-7 cursor-pointer items-center justify-center gap-1 overflow-hidden rounded-lg border-none bg-[var(--inbox-control)] px-1.5 transition-colors hover:bg-[var(--inbox-control-hover)]"
-				>
-					<Reply className="h-3.5 w-3.5 text-mail-muted" />
-					<span className="whitespace-nowrap pr-1 text-mail-foreground text-sm leading-none">
-						Reply all
-					</span>
-				</button>
-
-				{notesSlot}
-
-				<button
-					type="button"
-					onClick={onToggleStar}
-					className={iconBtn}
-					aria-label={isStarred ? "Unstar" : "Star"}
-				>
-					<Icon
-						name={isStarred ? "star-filled" : "star"}
-						className={cn(
-							"h-4 w-4",
-							isStarred ? "text-yellow-400" : "text-mail-muted",
-						)}
-					/>
-				</button>
-
-				{onToggleImportant && (
-					<button
-						type="button"
-						onClick={onToggleImportant}
-						className={iconBtn}
-						aria-label={isImportant ? "Unmark important" : "Mark important"}
-					>
-						<Zap
-							className={cn(
-								"h-3.5 w-3.5",
-								isImportant
-									? "fill-amber-400 text-amber-400"
-									: "text-mail-muted",
-							)}
-						/>
-					</button>
-				)}
-
-				{showRestore ? (
-					<button
-						type="button"
-						onClick={inArchive ? onUnarchive : onRestore}
-						className={iconBtn}
-						aria-label="Move to inbox"
-					>
-						{inArchive ? (
-							<ArchiveRestore className="h-3.5 w-3.5 text-mail-muted" />
-						) : (
-							<Inbox className="h-3.5 w-3.5 text-mail-muted" />
-						)}
-					</button>
-				) : (
-					<button
-						type="button"
-						onClick={onArchive}
-						className={iconBtn}
-						aria-label="Archive"
-					>
-						<Archive className="h-3.5 w-3.5 text-mail-muted" />
-					</button>
-				)}
-
-				<button
-					type="button"
-					onClick={onDelete}
-					className="inline-flex h-7 w-7 cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-[var(--inbox-danger-border)] bg-[var(--inbox-danger-bg)] transition-colors hover:opacity-80"
-					aria-label={inTrash ? "Delete forever" : "Move to trash"}
-				>
-					<Trash2 className="h-3.5 w-3.5 text-[var(--inbox-danger-fg)]" />
-				</button>
-
-				<Dropdown.Root>
-					<Dropdown.Trigger asChild>
-						<button type="button" className={iconBtn} aria-label="More actions">
-							<MoreHorizontal className="h-4 w-4 text-mail-muted" />
-						</button>
-					</Dropdown.Trigger>
-					<Dropdown.Content
-						align="end"
-						className="min-w-44 border-mail-border bg-[var(--inbox-control)] p-1"
-					>
-						{showRestore && (
-							<Dropdown.Item
-								className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-control-hover)]"
-								onSelect={inArchive ? onUnarchive : onRestore}
-							>
-								<Inbox className="mr-2 h-4 w-4" />
-								Move to inbox
-							</Dropdown.Item>
-						)}
-						<Dropdown.Item
-							className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-control-hover)]"
-							onSelect={onPrint}
+		<Tooltip.Provider delayDuration={400} skipDelayDuration={0}>
+			<div className="flex shrink-0 items-center px-1 pb-[10px] md:px-3 md:pt-3 md:pb-[11px]">
+				<div className="flex flex-1 items-center gap-2">
+					{(showBack || onClose) && (
+						<ActionButton
+							label="Close"
+							onClick={onClose}
+							tone="neutral"
+							className={showBack ? "inline-flex" : "hidden md:inline-flex"}
 						>
-							<Printer className="mr-2 h-4 w-4" />
-							Print thread
-						</Dropdown.Item>
-						{!inSpam && (
-							<Dropdown.Item
-								className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-control-hover)]"
-								onSelect={onMarkSpam}
-							>
-								Move to spam
-							</Dropdown.Item>
-						)}
-						{onUnsubscribe && (
-							<Dropdown.Item
-								className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-control-hover)]"
-								onSelect={onUnsubscribe}
-							>
-								Unsubscribe
-							</Dropdown.Item>
-						)}
-						{onToggleImportant && (
-							<Dropdown.Item
-								className="rounded-md text-[13px] text-mail-muted hover:bg-[var(--inbox-control-hover)]"
-								onSelect={onToggleImportant}
-							>
-								<Zap className="mr-2 h-4 w-4" />
-								{isImportant ? "Unmark important" : "Mark as important"}
-							</Dropdown.Item>
-						)}
-					</Dropdown.Content>
-				</Dropdown.Root>
+							<Icon name="cross" />
+						</ActionButton>
+					)}
+				</div>
+
+				<div className="flex items-center gap-1">
+					<ActionButton
+						label={starLabel}
+						onClick={onToggleStar}
+						tone="star"
+						className={cn(isStarred && "text-yellow-500")}
+					>
+						<Icon name={isStarred ? "star-filled" : "star"} />
+					</ActionButton>
+
+					{onToggleImportant && (
+						<ActionButton
+							label={importantLabel}
+							onClick={onToggleImportant}
+							tone="important"
+							className={cn(
+								isImportant &&
+									"text-orange-500 fill-orange-500 [&_svg]:fill-orange-500",
+							)}
+						>
+							<Icon name="zap" />
+						</ActionButton>
+					)}
+
+					{showRestore ? (
+						<ActionButton
+							label="Move to inbox"
+							onClick={inArchive ? onUnarchive : onRestore}
+							tone="archive"
+						>
+							<Icon name="inbox" />
+						</ActionButton>
+					) : (
+						<ActionButton
+							label="Archive"
+							onClick={onArchive}
+							tone="archive"
+						>
+							<Icon name="archive" />
+						</ActionButton>
+					)}
+
+					{!inSpam && (
+						<ActionButton
+							label="Move to spam"
+							onClick={onMarkSpam}
+							tone="spam"
+						>
+							<Icon name="alert" />
+						</ActionButton>
+					)}
+
+					<ActionButton
+						label="Print thread"
+						onClick={onPrint}
+						tone="print"
+					>
+						<Icon name="printer" />
+					</ActionButton>
+
+					{onUnsubscribe && (
+						<ActionButton
+							label="Unsubscribe"
+							onClick={onUnsubscribe}
+							tone="unsubscribe"
+						>
+							<Icon name="link" />
+						</ActionButton>
+					)}
+
+					<ActionButton
+						label={trashLabel}
+						onClick={onDelete}
+						tone="danger"
+					>
+						<Icon name="trash" />
+					</ActionButton>
+				</div>
 			</div>
-		</div>
+		</Tooltip.Provider>
 	);
 };
