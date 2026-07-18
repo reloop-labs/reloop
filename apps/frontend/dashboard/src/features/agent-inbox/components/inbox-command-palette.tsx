@@ -41,7 +41,7 @@ type UiIconName = ComponentProps<typeof Icon>["name"];
  * title + muted subtitle, right-aligned type, keycaps after labels.
  */
 const paletteItemClass = cn(
-	"h-10 gap-3 rounded-[8px] px-3 py-0 text-[13px] text-mail-foreground leading-none",
+	"h-10 gap-0.5 rounded-[8px] px-3 py-0 text-[13px] text-mail-foreground leading-none",
 	"data-[selected=true]:bg-black/[0.06] dark:data-[selected=true]:bg-white/[0.1]",
 );
 const paletteGroupClass = cn(
@@ -59,7 +59,7 @@ const paletteInputClass = cn(
 
 function AppIcon({ name }: { name: UiIconName }) {
 	return (
-		<div className="flex size-6 shrink-0 items-center justify-center rounded-[6px] bg-black/[0.05] text-mail-foreground dark:bg-white/[0.08]">
+		<div className="flex size-6 shrink-0 items-center justify-center text-mail-foreground">
 			<Icon name={name} className="h-3.5 w-3.5" />
 		</div>
 	);
@@ -106,7 +106,7 @@ function ItemTitle({ title, subtitle }: { title: string; subtitle?: string }) {
 
 /** Same icon set as the inbox sidebar where possible */
 const FILTER_ICONS: Record<InboxFilterChip, UiIconName> = {
-	unread: "mail",
+	unread: "mail-single",
 	starred: "star",
 	needs_approval: "alert-triangle",
 	has_attachment: "file",
@@ -680,7 +680,7 @@ export const InboxCommandPalette = ({
 
 			{/* Footer — logo left; labels then keycaps right (Raycast order) */}
 			<div className="flex h-10 shrink-0 items-center gap-3 border-black/[0.07] border-t px-3.5 text-[12px] text-mail-muted dark:border-white/[0.08]">
-				<Logo className="h-4 w-4 shrink-0 opacity-40" />
+				<Logo className="w-10 shrink-0" />
 				<div className="ml-auto flex items-center gap-2.5">
 					<span className="inline-flex items-center gap-1.5">
 						<span>Open</span>
