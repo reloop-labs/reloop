@@ -1,5 +1,3 @@
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import type { Domain, DomainListResponse } from "#/features/domain/types";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -14,8 +12,10 @@ import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import * as v from "valibot";
+import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
+import type { Domain, DomainListResponse } from "#/features/domain/types";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import type { AgentMailbox } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
 
@@ -63,7 +63,7 @@ export const AddAgentAddressModal = ({
 	onClose: () => void;
 	onCreated?: (mailbox: AgentMailbox) => void;
 }) => {
-		const navigate = useNavigate();
+	const navigate = useNavigate();
 	const { addMailbox, mailboxes } = useAgentInbox();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -188,7 +188,10 @@ export const AddAgentAddressModal = ({
 			form.reset();
 			onClose();
 			onCreated?.(mailbox);
-			void navigate({ to: "/inbox/$mailboxId", params: { mailboxId: mailbox.id } });
+			void navigate({
+				to: "/inbox/$mailboxId",
+				params: { mailboxId: mailbox.id },
+			});
 		} catch (error) {
 			const errMsg =
 				error instanceof Error
@@ -483,10 +486,13 @@ export const AddAgentAddressModal = ({
 										className="relative z-10 inline cursor-pointer underline underline-offset-2 hover:opacity-80"
 										onClick={() => {
 											if (selectedDomain) {
-											void navigate({ to: "/domain/$domainId", params: { domainId: selectedDomain.id } });
-										} else {
-											void navigate({ to: "/domain" });
-										}
+												void navigate({
+													to: "/domain/$domainId",
+													params: { domainId: selectedDomain.id },
+												});
+											} else {
+												void navigate({ to: "/domain" });
+											}
 										}}
 									>
 										Domain settings

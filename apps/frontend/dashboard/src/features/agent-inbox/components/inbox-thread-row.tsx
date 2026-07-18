@@ -1,14 +1,10 @@
-import { parseEmail } from "#/features/agent-inbox/lib/email-address";
-import {
-	getAvatarGradient,
-	getAvatarInitial,
-} from "#/utils/avatar";
-import * as Checkbox from "@reloop/ui/checkbox";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import dayjs from "dayjs";
 import { User } from "lucide-react";
 import { forwardRef, type ReactNode } from "react";
+import { parseEmail } from "#/features/agent-inbox/lib/email-address";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import type { InboundThread } from "../types";
 import { useInboxMail } from "./use-inbox-mail";
 
@@ -28,7 +24,11 @@ function formatOutboundSnippet(thread: InboundThread): string {
 	const hasSubject = subject.length > 0 && subject !== "(No Subject)";
 	const preview = (thread.preview || "").trim().replace(/\s+/g, " ");
 
-	if (hasSubject && preview && preview.toLowerCase() !== subject.toLowerCase()) {
+	if (
+		hasSubject &&
+		preview &&
+		preview.toLowerCase() !== subject.toLowerCase()
+	) {
 		return `${subject} — ${preview}`;
 	}
 	if (hasSubject) return subject;
@@ -110,6 +110,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 		const listId = thread.id;
 		const isUnread = thread.unread;
 		const isOutbound = thread.direction === "outbound";
+		const isSelectMode = mail.bulkSelected.length > 0;
 		const primaryRecipient = parseEmail(thread.toEmails?.[0] ?? "");
 		const displayName = isOutbound
 			? formatRecipientLabel(thread.toEmails)
@@ -138,7 +139,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				onClick={(e) => onSelect(listId, e)}
 				onMouseEnter={() => onMouseEnter(listId)}
 				className={cn(
-					"group relative mx-[8px] flex cursor-pointer flex-col items-start overflow-visible rounded-[10px] border-transparent py-3 text-left text-sm transition-colors hover:bg-[var(--inbox-hover)] hover:opacity-100",
+					"group relative mx-[8px] flex cursor-pointer flex-col items-start overflow-visible rounded-[18px] border-transparent py-3 text-left text-sm transition-colors hover:bg-[var(--inbox-hover)] hover:opacity-100",
 					(isSelected || isBulkSelected || isKeyboardFocused) &&
 						"bg-[var(--inbox-hover)]",
 				)}
@@ -146,6 +147,7 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				<div
 					className={cn(
 						"-translate-y-1/2 absolute top-[-1px] right-2 z-20 flex items-center gap-1 rounded-xl border border-mail-border/30 bg-panel-light p-1 opacity-0 shadow-xs transition-opacity group-hover:opacity-100 dark:bg-panel-dark",
+						isSelectMode && "pointer-events-none opacity-0",
 					)}
 				>
 					<button
@@ -190,27 +192,36 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 				</div>
 
 				<div className="flex w-full items-start justify-between gap-3 px-4">
-					{mail.bulkSelected.length > 0 ? (
-						<div
-							className="mt-0.5 shrink-0"
-							onClick={(e) => e.stopPropagation()}
-						>
-							<Checkbox.Root
-								checked={isBulkSelected}
-								onCheckedChange={() => onToggleBulk(listId)}
-							/>
-						</div>
-					) : (
-						<div
-							className={cn(
-								"relative mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase",
-								getAvatarGradient(avatarEmail),
-								!isUnread && "border border-mail-border/40",
-							)}
-						>
-							{getAvatarInitial(avatarName, avatarEmail)}
-						</div>
-					)}
+					<button
+						type="button"
+						aria-label={isBulkSelected ? "Deselect thread" : "Select thread"}
+						aria-pressed={isBulkSelected}
+						onClick={(e) => {
+							e.stopPropagation();
+							onToggleBulk(listId, e);
+						}}
+						className={cn(
+							"relative mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
+							"transition-[transform,background-color,box-shadow] duration-150 ease-out",
+							"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zero-blue/35",
+							"active:scale-[0.96]",
+							isBulkSelected
+								? "bg-zero-blue text-white shadow-[0_0_0_1px_rgba(0,111,254,0.25)]"
+								: cn(
+										"font-semibold text-white text-xs uppercase",
+										getAvatarGradient(avatarEmail),
+										!isUnread && "border border-mail-border/40",
+									),
+						)}
+					>
+						{isBulkSelected ? (
+							<Icon name="check" className="h-4 w-4 text-white" />
+						) : (
+							<span className="pointer-events-none select-none">
+								{getAvatarInitial(avatarName, avatarEmail)}
+							</span>
+						)}
+					</button>
 
 					<div className="min-w-0 flex-1">
 						<div className="flex w-full flex-row items-start justify-between gap-2">

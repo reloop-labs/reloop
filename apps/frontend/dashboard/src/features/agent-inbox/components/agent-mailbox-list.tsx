@@ -1,15 +1,11 @@
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
-import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
-import { formatRelativeTime } from "#/utils/format-relative-time";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { Skeleton } from "@reloop/ui/skeleton";
-import axios from "axios";
 import { useNavigate } from "@tanstack/react-router";
+import axios from "axios";
 import {
 	parseAsInteger,
 	parseAsString,
@@ -19,6 +15,10 @@ import {
 import { useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
+import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import { formatRelativeTime } from "#/utils/format-relative-time";
 import type { AgentMailbox } from "../types";
 import { AddAgentAddressModal } from "./add-agent-address-modal";
 import { useAgentInbox } from "./agent-inbox-provider";
@@ -161,9 +161,7 @@ function AgentMailboxActionsDropdown({
 									disabled={busy}
 									className={cn(
 										"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-normal text-xs",
-										item.isDanger
-											? "text-error-base"
-											: "text-text-strong-950",
+										item.isDanger ? "text-error-base" : "text-text-strong-950",
 										!currentRect &&
 											hoverIdx === idx &&
 											(item.isDanger
@@ -177,9 +175,7 @@ function AgentMailboxActionsDropdown({
 											name="loader-2"
 											className={cn(
 												"h-3.5 w-3.5 animate-spin",
-												item.isDanger
-													? "text-error-base"
-													: "text-text-sub-600",
+												item.isDanger ? "text-error-base" : "text-text-sub-600",
 											)}
 										/>
 									) : (
@@ -540,8 +536,7 @@ export const AgentMailboxList = () => {
 		safePage * size,
 	);
 
-	const isFiltered =
-		statusFilter !== null || (searchQuery ?? "").trim() !== "";
+	const isFiltered = statusFilter !== null || (searchQuery ?? "").trim() !== "";
 
 	const handleToggleEnabled = async (mailbox: AgentMailbox) => {
 		const newStatus = mailbox.status === "active" ? "disabled" : "active";

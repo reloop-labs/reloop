@@ -1,6 +1,6 @@
-import { getAvatarInitial } from "#/utils/avatar";
 import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
+import { getAvatarInitial } from "#/utils/avatar";
 
 interface MessageAvatarProps {
 	fromEmail: string;

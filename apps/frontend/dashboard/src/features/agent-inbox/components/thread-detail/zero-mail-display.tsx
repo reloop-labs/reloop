@@ -1,11 +1,8 @@
-import {
-	getAvatarGradient,
-	getAvatarInitial,
-} from "#/utils/avatar";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Forward, MoreHorizontal, Reply, ReplyAll } from "lucide-react";
 import { useState } from "react";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import type { AgentMailbox } from "../../types";
 import { formatMessageTimestamp, formatZeroMessageTime } from "./date-utils";
 import { MessageAttachments } from "./message-attachments";

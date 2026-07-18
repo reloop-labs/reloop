@@ -1,12 +1,15 @@
-import { LABEL_COLORS, resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
-import { cn } from "@reloop/ui/cn";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import * as Modal from "@reloop/ui/modal";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import {
+	LABEL_COLORS,
+	resolveLabelColor,
+} from "#/features/agent-inbox/lib/label-colors";
 
 export const InboxLabelDialog = ({
 	open,
@@ -142,7 +145,9 @@ export const InboxLabelDialog = ({
 									maxLength={40}
 									disabled={isSubmitting}
 									aria-invalid={!!error}
-									aria-describedby={error ? "inbox-label-name-error" : undefined}
+									aria-describedby={
+										error ? "inbox-label-name-error" : undefined
+									}
 									className="min-w-0 flex-1 border-0 bg-transparent p-0 font-medium text-[13px] text-mail-foreground outline-none placeholder:text-mail-muted disabled:opacity-50"
 								/>
 							</div>

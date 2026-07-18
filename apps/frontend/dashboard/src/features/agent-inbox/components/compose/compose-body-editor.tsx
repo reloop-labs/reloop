@@ -155,10 +155,8 @@ export const ComposeBodyEditor = forwardRef<
 		() => ({
 			getEmail: async () =>
 				(await handleRef.current?.getEmail()) ?? { html: "", text: "" },
-			getEmailHTML: async () =>
-				(await handleRef.current?.getEmailHTML()) ?? "",
-			getEmailText: async () =>
-				(await handleRef.current?.getEmailText()) ?? "",
+			getEmailHTML: async () => (await handleRef.current?.getEmailHTML()) ?? "",
+			getEmailText: async () => (await handleRef.current?.getEmailText()) ?? "",
 			getJSON: () =>
 				handleRef.current?.getJSON() ?? { type: "doc", content: [] },
 			get editor() {

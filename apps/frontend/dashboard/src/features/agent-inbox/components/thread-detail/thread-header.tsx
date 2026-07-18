@@ -1,7 +1,3 @@
-import {
-	getAvatarGradient,
-	getAvatarInitial,
-} from "#/utils/avatar";
 import { cn } from "@reloop/ui/cn";
 import {
 	Bell,
@@ -13,6 +9,7 @@ import {
 	User,
 	Zap,
 } from "lucide-react";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import type { AttachmentItem } from "./message-attachments";
 import { MessageAttachments } from "./message-attachments";
 import { ThreadAiSummary } from "./thread-ai-summary";

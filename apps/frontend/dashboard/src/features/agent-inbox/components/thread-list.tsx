@@ -1,7 +1,6 @@
-import * as Checkbox from "@reloop/ui/checkbox";
 import { useCallback, useMemo, useRef, useState } from "react";
+import { Virtuoso } from "react-virtuoso";
 import { toast } from "sonner";
-import { VList, type VListHandle } from "virtua";
 import type { InboundThread } from "../types";
 import { splitPinnedThreads } from "../utils/group-threads";
 import { useAgentInbox } from "./agent-inbox-provider";
@@ -14,7 +13,6 @@ import { useInboxNavigation } from "./use-inbox-navigation";
 
 const PAGE_SIZE = 30;
 const SECTION_HEADER_SIZE = 32;
-const THREAD_ROW_SIZE = 72;
 
 type ListItem =
 	| { type: "header"; key: string; label: string; count: number }
@@ -59,7 +57,6 @@ export const ThreadList = ({
 }: ThreadListProps) => {
 	const { toggleMessageStar, archiveThread, trashThread } = useAgentInbox();
 	const [mail, setMail] = useInboxMail();
-	const vListRef = useRef<VListHandle>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 	const lastBulkIndexRef = useRef<number | null>(null);
@@ -75,6 +72,15 @@ export const ThreadList = ({
 		() => orderedThreads.slice(0, visibleCount),
 		[orderedThreads, visibleCount],
 	);
+
+	const firstTodayThreadId = useMemo(() => {
+		const today = new Date().toDateString();
+		return (
+			visibleThreads.find(
+				(thread) => new Date(thread.receivedAt).toDateString() === today,
+			)?.id ?? null
+		);
+	}, [visibleThreads]);
 
 	const listItems = useMemo(() => {
 		const items: ListItem[] = [];
@@ -153,7 +159,7 @@ export const ThreadList = ({
 
 	const handleRowSelect = useCallback(
 		(id: string, event?: React.MouseEvent) => {
-			if (event?.shiftKey && mail.bulkSelected.length > 0) {
+			if (mail.bulkSelected.length > 0) {
 				handleToggleBulk(id, event);
 				return;
 			}
@@ -193,24 +199,11 @@ export const ThreadList = ({
 		}
 	};
 
-	const handleSelectAll = () => {
-		if (mail.bulkSelected.length === visibleThreads.length) {
-			setMail((prev) => ({ ...prev, bulkSelected: [] }));
-		} else {
-			setMail((prev) => ({
-				...prev,
-				bulkSelected: visibleThreads.map((t) => t.id),
-			}));
-		}
-	};
-
 	const handleLoadMore = useCallback(() => {
 		if (visibleCount < orderedThreads.length) {
 			setVisibleCount((c) => Math.min(c + PAGE_SIZE, orderedThreads.length));
 		}
 	}, [visibleCount, orderedThreads.length]);
-
-	let foundFirstToday = false;
 
 	if (isLoading && threads.length === 0) {
 		return <MailListSpinner />;
@@ -229,54 +222,21 @@ export const ThreadList = ({
 
 	return (
 		<div ref={containerRef} className="flex h-full min-h-0 flex-1 flex-col">
-			{mail.bulkSelected.length > 0 ? (
-				<div className="flex items-center justify-between border-mail-border border-b px-4 py-2">
-					<div className="flex items-center gap-2">
-						<Checkbox.Root
-							checked={mail.bulkSelected.length === visibleThreads.length}
-							onCheckedChange={handleSelectAll}
-						/>
-						<span className="font-medium text-mail-foreground text-sm">
-							{mail.bulkSelected.length} selected
-						</span>
-					</div>
-					<button
-						type="button"
-						onClick={() => setMail((prev) => ({ ...prev, bulkSelected: [] }))}
-						className="font-medium text-mail-foreground text-xs hover:underline"
-					>
-						Clear
-					</button>
-				</div>
-			) : null}
-
 			<div
 				className="relative min-h-0 flex-1 overflow-hidden"
 				id="mail-list-scroll"
 			>
-				<VList
-					ref={vListRef}
-					count={listItems.length}
-					overscan={5}
-					itemSize={THREAD_ROW_SIZE}
+				<Virtuoso
+					data={listItems}
 					className="scrollbar-hide absolute inset-0 overflow-x-hidden"
-					onScroll={() => {
-						const handle = vListRef.current;
-						if (!handle) return;
-						const end = handle.findEndIndex();
-						if (end >= listItems.length - 5) {
-							handleLoadMore();
-						}
-					}}
-				>
-					{(index) => {
-						const item = listItems[index];
-						if (!item) return <div key={index} />;
-
+					overscan={200}
+					defaultItemHeight={72}
+					endReached={handleLoadMore}
+					computeItemKey={(_index, item) => item.key}
+					itemContent={(_index, item) => {
 						if (item.type === "header") {
 							return (
 								<div
-									key={item.key}
 									className="flex h-8 items-center px-5 pt-1"
 									style={{ height: SECTION_HEADER_SIZE }}
 								>
@@ -289,18 +249,9 @@ export const ThreadList = ({
 						}
 
 						const { thread, flatIndex } = item;
-						const dateObj = new Date(thread.receivedAt);
-						const isToday =
-							dateObj.toDateString() === new Date().toDateString();
-						let isFirstToday = false;
-						if (isToday && !foundFirstToday) {
-							isFirstToday = true;
-							foundFirstToday = true;
-						}
 
 						return (
 							<ThreadContextMenu
-								key={thread.id}
 								thread={thread}
 								mailboxId={mailboxId}
 								folder={folder}
@@ -315,7 +266,7 @@ export const ThreadList = ({
 									isSelected={selectedId === thread.id}
 									isKeyboardFocused={focusedIndex === flatIndex}
 									isBulkSelected={mail.bulkSelected.includes(thread.id)}
-									isFirstToday={isFirstToday}
+									isFirstToday={thread.id === firstTodayThreadId}
 									searchQuery={searchQuery}
 									onSelect={handleRowSelect}
 									onMouseEnter={onMouseEnterRow ?? (() => {})}
@@ -327,7 +278,7 @@ export const ThreadList = ({
 							</ThreadContextMenu>
 						);
 					}}
-				</VList>
+				/>
 			</div>
 		</div>
 	);

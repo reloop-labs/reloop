@@ -19,6 +19,7 @@ import { parseAsString, useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
+import { extractBareEmail, formatRecipient } from "../lib/email-address";
 import type { AgentMailbox } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
 import { AiComposePreview } from "./compose/ai-compose-preview";
@@ -28,10 +29,6 @@ import {
 } from "./compose/compose-body-editor";
 import { ScheduleSendPicker } from "./compose/schedule-send-picker";
 import { showUndoSendToast } from "./compose/undo-send-toast";
-import {
-	extractBareEmail,
-	formatRecipient,
-} from "../lib/email-address";
 import { EmailPillsInput, validateEmail } from "./email-pills-input";
 
 /** Portaled compose UI (recipient suggestions + React Email menus). */

@@ -17,10 +17,20 @@ export const AiComposePreview = ({
 
 	return (
 		<motion.div
-			initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
-			animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-			exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }}
-			transition={shouldReduceMotion ? { duration: 0.15, ease: "easeOut" } : { duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+			initial={
+				shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }
+			}
+			animate={
+				shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }
+			}
+			exit={
+				shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }
+			}
+			transition={
+				shouldReduceMotion
+					? { duration: 0.15, ease: "easeOut" }
+					: { duration: 0.22, ease: [0.16, 1, 0.3, 1] }
+			}
 			className="absolute inset-x-3 bottom-3 z-20 rounded-xl border border-violet-500/40 bg-panel-light/95 p-3 shadow-lg backdrop-blur dark:bg-[#202020]/95"
 		>
 			<div className="mb-2 flex items-center justify-between">

@@ -1,13 +1,5 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import {
-	Archive,
-	Inbox,
-	MailOpen,
-	RefreshCcw,
-	SlidersHorizontal,
-	X,
-} from "lucide-react";
 import { parseAsString, parseAsStringLiteral, useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -145,19 +137,6 @@ export const AgentInboxContent = ({
 		showCategoryNavbar,
 	]);
 
-	const handleEnterSelectMode = useCallback(() => {
-		const first = filteredThreads[0];
-		if (!first) {
-			setMail((prev) => ({ ...prev, bulkSelected: [] }));
-			return;
-		}
-		setMail((prev) => ({
-			...prev,
-			bulkSelected:
-				prev.bulkSelected.length > 0 ? prev.bulkSelected : [first.id],
-		}));
-	}, [filteredThreads, setMail]);
-
 	const selectedThread = useMemo(() => {
 		if (!selectedThreadId) return null;
 		return (
@@ -235,6 +214,17 @@ export const AgentInboxContent = ({
 	const handleExitBulkSelection = useCallback(() => {
 		setMail((prev) => ({ ...prev, bulkSelected: [] }));
 	}, [setMail]);
+
+	const allVisibleSelected =
+		filteredThreads.length > 0 &&
+		mail.bulkSelected.length === filteredThreads.length;
+
+	const handleToggleSelectAll = useCallback(() => {
+		setMail((prev) => ({
+			...prev,
+			bulkSelected: allVisibleSelected ? [] : filteredThreads.map((t) => t.id),
+		}));
+	}, [allVisibleSelected, filteredThreads, setMail]);
 
 	const openThreadComposer = useCallback(
 		(thread: InboundThread, mode: "reply" | "replyAll" | "forward") => {
@@ -408,145 +398,160 @@ export const AgentInboxContent = ({
 					>
 						<div className="flex min-h-0 flex-1 flex-col">
 							<div className="sticky top-0 z-15 shrink-0 space-y-3 p-4 pb-2">
-								{mail.bulkSelected.length === 0 ? (
-									<>
-										<div className="flex items-center">
-											<InboxSidebarToggle onClick={toggleSidebar} />
-											<div className="flex min-w-0 flex-1 items-center gap-2">
-												<h1 className="truncate font-medium text-base text-mail-foreground">
-													{folderTitle}
-												</h1>
-											</div>
+								<div className="flex items-center">
+									<InboxSidebarToggle onClick={toggleSidebar} />
+									<div className="flex min-w-0 flex-1 items-center gap-2">
+										<h1 className="truncate font-medium text-base text-mail-foreground">
+											{folderTitle}
+										</h1>
+									</div>
+									{mail.bulkSelected.length === 0 ? (
+										<button
+											type="button"
+											onClick={handleRefresh}
+											disabled={isRefreshing}
+											className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-[var(--inbox-hover)] disabled:opacity-50"
+											aria-label="Refresh"
+										>
+											<Icon
+												name="refresh-cw"
+												className={cn(
+													"h-4 w-4 text-mail-muted",
+													isRefreshing && "animate-spin",
+												)}
+											/>
+										</button>
+									) : (
+										<div className="flex items-center gap-1">
 											<button
 												type="button"
-												onClick={handleEnterSelectMode}
-												className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 font-medium text-mail-muted text-xs transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
+												title="Archive"
+												onClick={() =>
+													void runBulkAction("archive", "Archived")
+												}
+												className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
 											>
-												<Icon name="check" className="h-3.5 w-3.5" />
-												Select
-											</button>
-											<button
-												type="button"
-												onClick={() => setPaletteOpen(true)}
-												className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
-												aria-label="Search & filters"
-												title="Search & filters"
-											>
-												<SlidersHorizontal className="h-4 w-4" />
-											</button>
-											<button
-												type="button"
-												onClick={handleRefresh}
-												disabled={isRefreshing}
-												className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-[var(--inbox-hover)] disabled:opacity-50"
-												aria-label="Refresh"
-											>
-												<RefreshCcw
-													className={cn(
-														"h-4 w-4 text-mail-muted",
-														isRefreshing && "animate-spin",
-													)}
+												<Icon
+													name="archive"
+													className="h-3.5 w-3.5 text-mail-muted"
 												/>
 											</button>
+											<button
+												type="button"
+												title="Trash"
+												onClick={() =>
+													void runBulkAction("trash", "Moved to trash")
+												}
+												className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
+											>
+												<Icon
+													name="trash"
+													className="h-3.5 w-3.5 text-mail-muted"
+												/>
+											</button>
+											<button
+												type="button"
+												title="Spam"
+												onClick={() =>
+													void runBulkAction("spam", "Moved to spam")
+												}
+												className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
+											>
+												<Icon
+													name="alert"
+													className="h-3.5 w-3.5 text-mail-muted"
+												/>
+											</button>
+											<button
+												type="button"
+												title="Star"
+												onClick={() => void runBulkAction("star", "Starred")}
+												className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
+											>
+												<Icon
+													name="star"
+													className="h-3.5 w-3.5 text-mail-muted"
+												/>
+											</button>
+											<button
+												type="button"
+												title="Pin"
+												onClick={() => void runBulkAction("pin", "Pinned")}
+												className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
+											>
+												<Icon
+													name="pin"
+													className="h-3.5 w-3.5 text-mail-muted"
+												/>
+											</button>
+											<button
+												type="button"
+												title="Mark read"
+												onClick={() =>
+													void runBulkAction("read", "Marked as read")
+												}
+												className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
+											>
+												<Icon
+													name="mail"
+													className="h-3.5 w-3.5 text-mail-muted"
+												/>
+											</button>
+											<button
+												type="button"
+												onClick={handleExitBulkSelection}
+												className="inline-flex h-8 items-center gap-2 rounded-lg bg-mail-accent px-2 text-xs"
+											>
+												<Icon name="cross" className="h-3 w-3" />
+												<span>ESC</span>
+											</button>
 										</div>
+									)}
+								</div>
 
-										<InboxSearchTrigger
-											onOpenPalette={() => setPaletteOpen(true)}
-											activeFilterCount={activeFilterCount}
-										/>
-
-										{showCategoryNavbar && (
-											<InboxCategoryNavbar
-												activeView={activeView}
-												onViewChange={(view) => {
-													void setViewParam(view === "primary" ? null : view);
-													resetNavigation();
-												}}
-											/>
-										)}
-									</>
+								{mail.bulkSelected.length === 0 ? (
+									<InboxSearchTrigger
+										onOpenPalette={() => setPaletteOpen(true)}
+										activeFilterCount={activeFilterCount}
+									/>
 								) : (
-									<div className="flex items-center gap-1">
-										<InboxSidebarToggle onClick={toggleSidebar} />
-										<div className="flex flex-1 items-center justify-between gap-2">
-											<div className="font-medium text-mail-foreground text-sm">
-												{mail.bulkSelected.length} selected
-											</div>
-											<div className="flex items-center gap-1">
-												<button
-													type="button"
-													title="Archive"
-													onClick={() =>
-														void runBulkAction("archive", "Archived")
-													}
-													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
-												>
-													<Archive className="h-3.5 w-3.5 text-mail-muted" />
-												</button>
-												<button
-													type="button"
-													title="Trash"
-													onClick={() =>
-														void runBulkAction("trash", "Moved to trash")
-													}
-													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
-												>
-													<Icon
-														name="trash"
-														className="h-3.5 w-3.5 text-mail-muted"
-													/>
-												</button>
-												<button
-													type="button"
-													title="Spam"
-													onClick={() =>
-														void runBulkAction("spam", "Moved to spam")
-													}
-													className="inline-flex h-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] px-2 text-[11px] text-mail-muted hover:bg-[var(--inbox-control-hover)]"
-												>
-													Spam
-												</button>
-												<button
-													type="button"
-													title="Star"
-													onClick={() => void runBulkAction("star", "Starred")}
-													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
-												>
-													<Icon
-														name="star"
-														className="h-3.5 w-3.5 text-mail-muted"
-													/>
-												</button>
-												<button
-													type="button"
-													title="Pin"
-													onClick={() => void runBulkAction("pin", "Pinned")}
-													className="inline-flex h-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] px-2 text-[11px] text-mail-muted hover:bg-[var(--inbox-control-hover)]"
-												>
-													Pin
-												</button>
-												<button
-													type="button"
-													title="Mark read"
-													onClick={() =>
-														void runBulkAction("read", "Marked as read")
-													}
-													className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--inbox-control)] hover:bg-[var(--inbox-control-hover)]"
-												>
-													<MailOpen className="h-3.5 w-3.5 text-mail-muted" />
-												</button>
-												<button
-													type="button"
-													onClick={handleExitBulkSelection}
-													className="inline-flex h-8 items-center gap-2 rounded-lg bg-mail-accent px-2 text-xs"
-												>
-													<X className="h-3 w-3" />
-													<span>ESC</span>
-												</button>
-											</div>
-										</div>
-									</div>
+									<button
+										type="button"
+										onClick={handleToggleSelectAll}
+										title={allVisibleSelected ? "Deselect all" : "Select all"}
+										className={cn(
+											"relative flex h-10 w-full flex-1 select-none items-center justify-start overflow-hidden rounded-2xl border border-mail-border/40 bg-[var(--inbox-control)] pl-3 text-left font-normal text-mail-foreground text-sm shadow-none transition-colors",
+											"hover:bg-[var(--inbox-control-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mail-foreground/15",
+										)}
+									>
+										<span
+											className={cn(
+												"flex h-6 w-6 items-center justify-center rounded-full transition-[transform,background-color] duration-150 ease-out",
+												allVisibleSelected
+													? "bg-zero-blue text-white"
+													: "border border-mail-border/50 bg-panel-light text-mail-muted dark:bg-panel-dark",
+											)}
+										>
+											<Icon name="check" className="h-3.5 w-3.5" />
+										</span>
+										<span className="ml-3 truncate font-medium tabular-nums">
+											{mail.bulkSelected.length} selected
+										</span>
+										<span className="ml-auto pr-3 text-mail-muted text-xs">
+											{allVisibleSelected ? "Deselect all" : "Select all"}
+										</span>
+									</button>
 								)}
+
+								{showCategoryNavbar ? (
+									<InboxCategoryNavbar
+										activeView={activeView}
+										onViewChange={(view) => {
+											void setViewParam(view === "primary" ? null : view);
+											resetNavigation();
+										}}
+									/>
+								) : null}
 							</div>
 
 							<div

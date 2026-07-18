@@ -8,12 +8,9 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import { useMailboxId } from "#/features/agent-inbox/lib/use-mailbox-id";
-import {
-	extractBareEmail,
-	extractDisplayName,
-} from "../lib/email-address";
+import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
+import { extractBareEmail, extractDisplayName } from "../lib/email-address";
 import type { AgentMailbox, BatchThreadAction, InboundThread } from "../types";
 
 const parseEmailAddress = (emailStr: string) =>
@@ -30,7 +27,9 @@ const normalizeFrom = (fromEmail: string, fromName?: string | null) => {
 
 const toEmailList = (value: string | string[] | undefined): string[] => {
 	if (!value) return [];
-	return (Array.isArray(value) ? value : [value]).map((e) => e.trim()).filter(Boolean);
+	return (Array.isArray(value) ? value : [value])
+		.map((e) => e.trim())
+		.filter(Boolean);
 };
 
 function buildOptimisticOutboundThread(input: {
@@ -639,7 +638,9 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			: [];
 
 		const sentIds = new Set(mappedSent.map((t) => t.id));
-		const pendingOptimistic = optimisticOutbound.filter((t) => !sentIds.has(t.id));
+		const pendingOptimistic = optimisticOutbound.filter(
+			(t) => !sentIds.has(t.id),
+		);
 
 		return [...mappedInbound, ...mappedSent, ...pendingOptimistic].sort(
 			(a, b) =>
@@ -1130,12 +1131,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 			return data;
 		},
-		[
-			mailboxes,
-			mutateMessages,
-			mutateSentMessages,
-			removeOptimisticOutbound,
-		],
+		[mailboxes, mutateMessages, mutateSentMessages, removeOptimisticOutbound],
 	);
 
 	const saveDraft = useCallback(

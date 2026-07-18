@@ -1,11 +1,11 @@
-import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
-import type { AgentMailbox } from "#/features/agent-inbox/types";
-import { getAvatarInitial } from "#/utils/avatar";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useMemo } from "react";
+import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
+import type { AgentMailbox } from "#/features/agent-inbox/types";
+import { getAvatarInitial } from "#/utils/avatar";
 
 function mailboxSortKey(m: AgentMailbox) {
 	return (m.label || m.email).toLocaleLowerCase();

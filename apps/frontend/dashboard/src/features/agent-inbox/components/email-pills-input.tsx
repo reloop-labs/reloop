@@ -101,10 +101,7 @@ export const EmailPillsInput = ({
 			if (!el) return;
 			const rect = el.getBoundingClientRect();
 			const width = Math.min(Math.max(rect.width, 280), 420);
-			const left = Math.min(
-				rect.left,
-				window.innerWidth - width - 8,
-			);
+			const left = Math.min(rect.left, window.innerWidth - width - 8);
 			setDropdownPos({
 				top: rect.bottom + 6,
 				left: Math.max(8, left),
@@ -224,9 +221,7 @@ export const EmailPillsInput = ({
 		) {
 			e.preventDefault();
 			setListOpen(true);
-			setHighlight(
-				e.key === "ArrowUp" ? filteredSuggestions.length - 1 : 0,
-			);
+			setHighlight(e.key === "ArrowUp" ? filteredSuggestions.length - 1 : 0);
 			return;
 		}
 

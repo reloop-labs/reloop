@@ -1,7 +1,3 @@
-import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
-import { useInboxLabels } from "#/features/agent-inbox/hooks/use-inbox-labels";
-import { resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
-import type { InboundThread } from "#/features/agent-inbox/types";
 import * as ContextMenu from "@reloop/ui/context-menu";
 import { Icon } from "@reloop/ui/icon";
 import {
@@ -21,6 +17,10 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { toast } from "sonner";
+import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
+import { useInboxLabels } from "#/features/agent-inbox/hooks/use-inbox-labels";
+import { resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
+import type { InboundThread } from "#/features/agent-inbox/types";
 
 const itemClass =
 	"rounded-md text-[13px] text-mail-muted data-[highlighted]:bg-[var(--inbox-control-hover)] data-[highlighted]:text-mail-foreground";
