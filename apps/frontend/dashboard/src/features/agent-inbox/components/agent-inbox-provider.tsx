@@ -8,10 +8,23 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useMailboxId } from "#/features/agent-inbox/lib/use-mailbox-id";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import { extractBareEmail, extractDisplayName } from "../lib/email-address";
-import type { AgentMailbox, BatchThreadAction, InboundThread } from "../types";
+import { findComposeDraft } from "../utils/find-compose-draft";
+import {
+	parseComposeDraft,
+	parseComposeDraftsList,
+} from "../utils/parse-compose-drafts";
+import type {
+	AgentMailbox,
+	BatchThreadAction,
+	ComposeDraft,
+	ComposeDraftKind,
+	InboundThread,
+	SaveComposeDraftInput,
+} from "../types";
 
 const parseEmailAddress = (emailStr: string) =>
 	extractBareEmail(emailStr).toLowerCase();
@@ -182,6 +195,10 @@ interface AgentInboxContextValue {
 	trashThreads: InboundThread[];
 	isLoadingMailboxes: boolean;
 	isLoadingThreads: boolean;
+	mailboxesError: Error | null;
+	threadsError: Error | null;
+	retryMailboxes: () => Promise<void>;
+	retryThreads: () => Promise<void>;
 	getMailbox: (id: string) => AgentMailbox | undefined;
 	addMailbox: (input: NewAgentAddressInput) => Promise<AgentMailbox>;
 	updateMailboxDisplayName: (id: string, displayName: string) => Promise<void>;
@@ -259,53 +276,19 @@ interface AgentInboxContextValue {
 	} | void>;
 	/** Remove a pending optimistic Sent row (e.g. after Undo cancel). */
 	removeOptimisticOutbound: (pendingId: string) => void;
-	saveDraft: (input: {
-		id?: string;
-		mailboxId: string;
-		to?: string[];
-		cc?: string[];
-		bcc?: string[];
-		subject?: string;
-		html?: string;
-		text?: string;
-		attachments?: Array<{
-			id?: string;
-			filename?: string;
-			path?: string;
-			url?: string;
-			content_type?: string;
-			size?: string;
-		}>;
-	}) => Promise<{ id: string } | null>;
-	getDraft: (id: string) => Promise<{
-		id: string;
-		mailboxId: string;
-		to: string[];
-		cc: string[];
-		bcc: string[];
-		subject: string;
-		html: string;
-		text: string;
-		attachments: Array<{
-			id?: string;
-			filename?: string;
-			path?: string;
-			url?: string;
-			content_type?: string;
-			size?: string;
-		}>;
-	} | null>;
+	saveDraft: (input: SaveComposeDraftInput) => Promise<{ id: string }>;
+	getDraft: (id: string) => Promise<ComposeDraft | null>;
 	deleteDraft: (id: string) => Promise<void>;
-	listComposeDrafts: (mailboxId: string) => Promise<
-		Array<{
-			id: string;
-			mailboxId: string;
-			to: string[];
-			subject: string;
-			text: string;
-			updatedAt: string;
-		}>
-	>;
+	listComposeDrafts: (
+		mailboxId: string,
+		filters?: { threadId?: string; kind?: ComposeDraftKind },
+	) => Promise<ComposeDraft[]>;
+	findDraft: (input: {
+		mailboxId: string;
+		threadId: string;
+		kind: ComposeDraftKind;
+	}) => Promise<ComposeDraft | null>;
+	refreshDrafts: (mailboxId?: string) => Promise<void>;
 }
 
 const AgentInboxContext = createContext<AgentInboxContextValue | null>(null);
@@ -432,21 +415,39 @@ const mapBackendThreadToInbound = (
 };
 
 export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
+	const queryClient = useQueryClient();
 	const routeMailboxId = useMailboxId();
 	const [optimisticOutbound, setOptimisticOutbound] = useState<InboundThread[]>(
 		[],
 	);
 	const pendingRefreshTimers = useRef<Map<string, number>>(new Map());
 
+	const refreshDrafts = useCallback(
+		async (mailboxId?: string) => {
+			await queryClient.invalidateQueries({
+				predicate: (query) => {
+					const key = query.queryKey[1];
+					if (typeof key !== "string") return false;
+					if (!key.includes("/api/inbox/v1/drafts")) return false;
+					if (!mailboxId) return true;
+					return key.includes(`mailboxId=${encodeURIComponent(mailboxId)}`);
+				},
+			});
+		},
+		[queryClient],
+	);
+
 	const {
 		data: mailboxesData,
 		isLoading: isLoadingMailboxes,
+		error: mailboxesQueryError,
 		mutate: mutateMailboxes,
 	} = useSWR<BackendMailbox[]>("/api/inbox/v1/mailboxes/list");
 
 	const {
 		data: messagesData,
 		isLoading: isLoadingInboundThreads,
+		error: inboundThreadsError,
 		mutate: mutateMessages,
 	} = useSWR<BackendMessage[]>("/api/inbox/v1/messages");
 
@@ -457,6 +458,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 	const {
 		data: sentMessagesData,
 		isLoading: isLoadingSentMessages,
+		error: sentMessagesError,
 		mutate: mutateSentMessages,
 	} = useSWR<BackendSentMessage[]>(sentListUrl);
 
@@ -465,6 +467,29 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 	>("/api/inbox/v1/threads?limit=200");
 
 	const isLoadingThreads = isLoadingInboundThreads || isLoadingSentMessages;
+
+	const mailboxesError =
+		mailboxesQueryError instanceof Error
+			? mailboxesQueryError
+			: mailboxesQueryError
+				? new Error("Failed to load mailboxes")
+				: null;
+
+	const threadsErrorRaw = inboundThreadsError || sentMessagesError;
+	const threadsError =
+		threadsErrorRaw instanceof Error
+			? threadsErrorRaw
+			: threadsErrorRaw
+				? new Error("Failed to load messages")
+				: null;
+
+	const retryMailboxes = useCallback(async () => {
+		await mutateMailboxes();
+	}, [mutateMailboxes]);
+
+	const retryThreads = useCallback(async () => {
+		await Promise.all([mutateMessages(), mutateSentMessages()]);
+	}, [mutateMessages, mutateSentMessages]);
 
 	const removeOptimisticOutbound = useCallback((pendingId: string) => {
 		setOptimisticOutbound((prev) => prev.filter((t) => t.id !== pendingId));
@@ -1135,100 +1160,90 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 	);
 
 	const saveDraft = useCallback(
-		async (input: {
-			id?: string;
-			mailboxId: string;
-			to?: string[];
-			cc?: string[];
-			bcc?: string[];
-			subject?: string;
-			html?: string;
-			text?: string;
-			attachments?: Array<{
-				id?: string;
-				filename?: string;
-				path?: string;
-				url?: string;
-				content_type?: string;
-				size?: string;
-			}>;
-		}) => {
+		async (input: SaveComposeDraftInput) => {
+			const body = {
+				mailboxId: input.mailboxId,
+				kind: input.kind,
+				threadId: input.threadId,
+				inReplyToMessageId: input.inReplyToMessageId,
+				to: input.to,
+				cc: input.cc,
+				bcc: input.bcc,
+				subject: input.subject,
+				html: input.html,
+				text: input.text,
+				attachments: input.attachments,
+			};
 			if (input.id) {
 				const res = await fetch(`/api/inbox/v1/drafts/${input.id}`, {
 					method: "PATCH",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						to: input.to,
-						cc: input.cc,
-						bcc: input.bcc,
-						subject: input.subject,
-						html: input.html,
-						text: input.text,
-						attachments: input.attachments,
-					}),
+					body: JSON.stringify(body),
 				});
 				if (!res.ok) throw new Error("Failed to update draft");
 				const data = (await res.json()) as { id: string };
+				void refreshDrafts(input.mailboxId);
 				return data;
 			}
 			const res = await fetch("/api/inbox/v1/drafts", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(input),
+				body: JSON.stringify(body),
 			});
 			if (!res.ok) throw new Error("Failed to create draft");
-			return (await res.json()) as { id: string };
+			const data = (await res.json()) as { id: string };
+			void refreshDrafts(input.mailboxId);
+			return data;
 		},
-		[],
+		[refreshDrafts],
 	);
 
 	const getDraft = useCallback(async (id: string) => {
 		const res = await fetch(`/api/inbox/v1/drafts/${id}`);
 		if (!res.ok) return null;
-		return (await res.json()) as {
-			id: string;
+		return parseComposeDraft(await res.json());
+	}, []);
+
+	const deleteDraft = useCallback(
+		async (id: string) => {
+			const res = await fetch(`/api/inbox/v1/drafts/${id}`, {
+				method: "DELETE",
+			});
+			if (!res.ok) throw new Error("Failed to delete draft");
+			void refreshDrafts();
+		},
+		[refreshDrafts],
+	);
+
+	const listComposeDrafts = useCallback(
+		async (
+			mailboxId: string,
+			filters?: { threadId?: string; kind?: ComposeDraftKind },
+		) => {
+			const params = new URLSearchParams({ mailboxId });
+			if (filters?.threadId) params.set("threadId", filters.threadId);
+			if (filters?.kind) params.set("kind", filters.kind);
+			const res = await fetch(`/api/inbox/v1/drafts?${params.toString()}`);
+			if (!res.ok) return [];
+			return parseComposeDraftsList(await res.json());
+		},
+		[],
+	);
+
+	const findDraft = useCallback(
+		async (input: {
 			mailboxId: string;
-			to: string[];
-			cc: string[];
-			bcc: string[];
-			subject: string;
-			html: string;
-			text: string;
-			attachments: Array<{
-				id?: string;
-				filename?: string;
-				path?: string;
-				url?: string;
-				content_type?: string;
-				size?: string;
-			}>;
-		};
-	}, []);
-
-	const deleteDraft = useCallback(async (id: string) => {
-		const res = await fetch(`/api/inbox/v1/drafts/${id}`, {
-			method: "DELETE",
-		});
-		if (!res.ok) throw new Error("Failed to delete draft");
-	}, []);
-
-	const listComposeDrafts = useCallback(async (mailboxId: string) => {
-		const res = await fetch(
-			`/api/inbox/v1/drafts?mailboxId=${encodeURIComponent(mailboxId)}`,
-		);
-		if (!res.ok) return [];
-		const data = (await res.json()) as {
-			drafts?: Array<{
-				id: string;
-				mailboxId: string;
-				to: string[];
-				subject: string;
-				text: string;
-				updatedAt: string;
-			}>;
-		};
-		return data.drafts ?? [];
-	}, []);
+			threadId: string;
+			kind: ComposeDraftKind;
+		}) => {
+			const drafts = await listComposeDrafts(input.mailboxId, {
+				threadId: input.threadId,
+				kind: input.kind,
+			});
+			return findComposeDraft(drafts, input);
+		},
+		[listComposeDrafts],
+	);
 
 	const refresh = useCallback(async () => {
 		await Promise.all([
@@ -1247,6 +1262,10 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			trashThreads,
 			isLoadingMailboxes,
 			isLoadingThreads,
+			mailboxesError,
+			threadsError,
+			retryMailboxes,
+			retryThreads,
 			getMailbox,
 			addMailbox,
 			updateMailboxDisplayName,
@@ -1271,6 +1290,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			getDraft,
 			deleteDraft,
 			listComposeDrafts,
+			findDraft,
+			refreshDrafts,
 		}),
 		[
 			mailboxes,
@@ -1279,6 +1300,10 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			trashThreads,
 			isLoadingMailboxes,
 			isLoadingThreads,
+			mailboxesError,
+			threadsError,
+			retryMailboxes,
+			retryThreads,
 			getMailbox,
 			addMailbox,
 			updateMailboxDisplayName,
@@ -1303,6 +1328,8 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			getDraft,
 			deleteDraft,
 			listComposeDrafts,
+			findDraft,
+			refreshDrafts,
 		],
 	);
 

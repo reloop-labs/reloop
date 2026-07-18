@@ -1,15 +1,20 @@
-import { Check, Copy, Loader2 } from "lucide-react";
+import { Skeleton } from "@reloop/ui/skeleton";
+import { Check, Copy } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
+import { LoadingDot } from "../shared/loading-dot";
 
 export const InboxNavUser = ({
 	mailbox,
 	collapsed,
+	loading = false,
 }: {
 	mailbox: AgentMailbox;
 	collapsed: boolean;
+	/** True while mailbox metadata is still resolving. */
+	loading?: boolean;
 }) => {
 	const { updateMailboxDisplayName } = useAgentInbox();
 	const [copied, setCopied] = useState(false);
@@ -103,6 +108,19 @@ export const InboxNavUser = ({
 		return null;
 	}
 
+	if (loading) {
+		return (
+			<div
+				className="flex min-h-[2.5rem] flex-col justify-center gap-1.5 overflow-visible text-left"
+				aria-busy="true"
+			>
+				<span className="sr-only">Loading mailbox</span>
+				<Skeleton className="h-4 w-28 bg-[var(--inbox-skeleton)]" />
+				<Skeleton className="h-3.5 w-40 bg-[var(--inbox-skeleton)]" />
+			</div>
+		);
+	}
+
 	return (
 		<div className="flex flex-col overflow-visible text-left">
 			<div className="flex min-h-[1.25rem] items-center gap-1.5 font-medium text-[14px] text-mail-foreground leading-snug">
@@ -145,7 +163,11 @@ export const InboxNavUser = ({
 					>
 						<span className="sr-only">{isSavingName ? "Saving" : "Saved"}</span>
 						{isSavingName ? (
-							<Loader2 className="size-3 animate-spin text-mail-muted" />
+							<LoadingDot
+								label="Saving"
+								className="text-mail-muted"
+								style={{ fontSize: 10 }}
+							/>
 						) : (
 							<Check className="size-3 text-green-500" />
 						)}

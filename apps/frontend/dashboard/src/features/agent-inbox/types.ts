@@ -101,6 +101,54 @@ export type BatchThreadAction =
 	| "pin"
 	| "unpin";
 
+export type ComposeDraftKind =
+	| "compose"
+	| "reply"
+	| "reply_all"
+	| "forward";
+
+export type ComposeDraftAttachment = {
+	id?: string;
+	filename?: string;
+	path?: string;
+	url?: string;
+	content_type?: string;
+	size?: string;
+};
+
+/** Persisted compose / reply / forward draft from `/api/inbox/v1/drafts`. */
+export type ComposeDraft = {
+	id: string;
+	mailboxId: string;
+	kind: ComposeDraftKind;
+	threadId: string | null;
+	inReplyToMessageId: string | null;
+	to: string[];
+	cc: string[];
+	bcc: string[];
+	subject: string;
+	html: string;
+	text: string;
+	attachments: ComposeDraftAttachment[];
+	createdAt: string;
+	updatedAt: string;
+};
+
+export type SaveComposeDraftInput = {
+	id?: string;
+	mailboxId: string;
+	kind?: ComposeDraftKind;
+	threadId?: string | null;
+	inReplyToMessageId?: string | null;
+	to?: string[];
+	cc?: string[];
+	bcc?: string[];
+	subject?: string;
+	html?: string;
+	text?: string;
+	attachments?: ComposeDraftAttachment[];
+};
+
 export const INBOX_VIEWS: {
 	id: InboxView;
 	label: string;

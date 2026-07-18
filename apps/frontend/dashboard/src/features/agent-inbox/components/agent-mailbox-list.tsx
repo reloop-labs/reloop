@@ -22,7 +22,8 @@ import { formatRelativeTime } from "#/utils/format-relative-time";
 import type { AgentMailbox } from "../types";
 import { AddAgentAddressModal } from "./add-agent-address-modal";
 import { useAgentInbox } from "./agent-inbox-provider";
-import { AgentInboxEmptyState } from "./empty-state";
+import { AgentInboxEmptyState } from "./shared/empty-state";
+import { LoadingDot } from "./shared/loading-dot";
 
 const TABLE_GRID =
 	"grid grid-cols-[minmax(0,1fr)_120px_140px_32px] items-center px-4";
@@ -171,13 +172,18 @@ function AgentMailboxActionsDropdown({
 									)}
 								>
 									{busy ? (
-										<Icon
-											name="loader-2"
+										<span
 											className={cn(
-												"h-3.5 w-3.5 animate-spin",
-												item.isDanger ? "text-error-base" : "text-text-sub-600",
+												item.isDanger
+													? "text-error-base"
+													: "text-text-sub-600",
 											)}
-										/>
+										>
+											<LoadingDot
+												label="Working"
+												style={{ fontSize: 12 }}
+											/>
+										</span>
 									) : (
 										<Icon
 											name={item.icon}

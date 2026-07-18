@@ -12,6 +12,7 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
+import { NotFound } from "#/components/not-found";
 import { ThemeProvider } from "#/providers/theme-provider";
 
 import appCss from "../styles.css?url";
@@ -47,6 +48,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 	}),
 	component: RootComponent,
 	shellComponent: RootDocument,
+	notFoundComponent: NotFound,
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {

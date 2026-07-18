@@ -1,6 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { motion, useReducedMotion } from "framer-motion";
-import { Loader2, Sparkles, X } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
+import { LoadingDot } from "../shared/loading-dot";
 
 export const AiComposePreview = ({
 	html,
@@ -49,7 +50,7 @@ export const AiComposePreview = ({
 			</div>
 			{loading ? (
 				<div className="flex items-center gap-2 py-4 text-mail-muted text-sm">
-					<Loader2 className="h-4 w-4 animate-spin" />
+					<LoadingDot label="Generating" style={{ fontSize: 14 }} />
 					Generating…
 				</div>
 			) : (

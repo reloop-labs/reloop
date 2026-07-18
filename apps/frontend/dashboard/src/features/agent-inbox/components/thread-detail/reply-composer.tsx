@@ -7,7 +7,9 @@ import { Paperclip } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
+import { useDraftAutosave } from "../../hooks/use-draft-autosave";
 import { extractBareEmail, extractDisplayName } from "../../lib/email-address";
+import type { ComposeDraftKind } from "../../types";
 import {
 	type ComposeAttachment,
 	formatBytes,
@@ -18,8 +20,21 @@ import {
 	ComposeBodyEditor,
 	type ComposeBodyEditorHandle,
 } from "../compose/compose-body-editor";
+import { LoadingDot } from "../shared/loading-dot";
 
 type ReplyMode = "reply" | "replyAll";
+
+export type ReplyDraftContext = {
+	mailboxId: string;
+	threadId: string;
+	kind: Extract<ComposeDraftKind, "reply" | "reply_all">;
+	inReplyToMessageId: string;
+	subject: string;
+	draftId: string | null;
+	onDraftIdChange: (id: string) => void;
+	/** Explicit Discard — delete draft then close. */
+	onDiscardDraft?: () => void;
+};
 
 interface ReplyComposerProps {
 	toName: string;
@@ -33,6 +48,9 @@ interface ReplyComposerProps {
 	skipEnter?: boolean;
 	/** Plain-text seed (e.g. agent suggested reply) */
 	initialContent?: string;
+	/** HTML seed when reopening a saved draft */
+	initialHtml?: string;
+	draft?: ReplyDraftContext;
 	onModeChange?: (mode: ReplyMode) => void;
 	onSend: (payload: {
 		text: string;
@@ -76,6 +94,8 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 			variant = "dock",
 			skipEnter = false,
 			initialContent = "",
+			initialHtml = "",
+			draft,
 			onSend,
 			onClose,
 		},
@@ -92,7 +112,8 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 
 		const fileInputRef = useRef<HTMLInputElement>(null);
 		const editorRef = useRef<ComposeBodyEditorHandle>(null);
-		const seedHtml = initialContent ? plainToHtml(initialContent) : "";
+		const seedHtml =
+			initialHtml || (initialContent ? plainToHtml(initialContent) : "");
 		const [htmlBody, setHtmlBody] = useState(seedHtml);
 		const [textBody, setTextBody] = useState(initialContent);
 		const [attachments, setAttachments] = useState<ComposeAttachment[]>([]);
@@ -100,6 +121,31 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 		const textRef = useRef(textBody);
 		htmlRef.current = htmlBody;
 		textRef.current = textBody;
+
+		useDraftAutosave({
+			enabled: !!draft,
+			hasContent: textBody.trim().length > 0,
+			draftId: draft?.draftId ?? null,
+			onDraftIdChange: draft?.onDraftIdChange ?? (() => {}),
+			mailboxId: draft?.mailboxId ?? "",
+			kind: draft?.kind ?? "reply",
+			threadId: draft?.threadId,
+			inReplyToMessageId: draft?.inReplyToMessageId,
+			to: [bareTo].filter(Boolean),
+			subject: draft?.subject,
+			html: htmlBody,
+			text: textBody,
+			attachments: attachments
+				.filter((a) => !a.isUploading)
+				.map((a) => ({
+					id: a.id,
+					filename: a.name,
+					path: a.url || a.path,
+					url: a.url,
+					content_type: a.content_type,
+					size: a.size,
+				})),
+		});
 
 		useEffect(() => {
 			const id = window.setTimeout(() => {
@@ -328,7 +374,12 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 												{file.size}
 											</span>
 											{file.isUploading ? (
-												<span className="shrink-0 text-mail-muted">…</span>
+												<span className="shrink-0 text-mail-muted">
+													<LoadingDot
+														label="Uploading"
+														style={{ fontSize: 10 }}
+													/>
+												</span>
 											) : (
 												<button
 													type="button"
@@ -379,7 +430,10 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 						<div className="flex items-center gap-2">
 							<button
 								type="button"
-								onClick={onClose}
+								onClick={() => {
+									if (draft?.onDiscardDraft) draft.onDiscardDraft();
+									else onClose();
+								}}
 								className="inline-flex h-8 items-center rounded-lg px-2.5 font-medium text-[12px] text-mail-muted transition-colors duration-150 hover:bg-[var(--inbox-danger-bg)] hover:text-[var(--inbox-danger-fg)] active:scale-[0.97]"
 							>
 								Discard

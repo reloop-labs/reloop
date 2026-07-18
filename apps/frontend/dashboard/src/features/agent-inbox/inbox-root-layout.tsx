@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { AgentInboxProvider } from "./components/agent-inbox-provider";
 import { InboxHotkeysProvider } from "./components/inbox-hotkeys-provider";
-import { InboxSidebarProvider } from "./components/inbox-sidebar-context";
+import { InboxSidebarProvider } from "./components/sidebar/inbox-sidebar-context";
 import "./inbox.css";
 
 export default function AgentInboxSectionLayout({

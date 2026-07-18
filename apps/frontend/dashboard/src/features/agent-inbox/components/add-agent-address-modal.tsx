@@ -5,7 +5,6 @@ import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Modal from "@reloop/ui/modal";
-import Spinner from "@reloop/ui/spinner";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Resolver } from "react-hook-form";
@@ -18,6 +17,7 @@ import type { Domain, DomainListResponse } from "#/features/domain/types";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import type { AgentMailbox } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
+import { LoadingDot } from "./shared/loading-dot";
 
 /** RFC 5321/5322 unquoted local-part (dot-atom), max 64 chars */
 const EMAIL_LOCAL_PART_REGEX =
@@ -524,7 +524,10 @@ export const AddAgentAddressModal = ({
 								>
 									{isSubmitting ? (
 										<>
-											<Spinner size={12} color="currentColor" />
+											<LoadingDot
+												label="Creating"
+												style={{ fontSize: 12 }}
+											/>
 											Creating...
 										</>
 									) : (

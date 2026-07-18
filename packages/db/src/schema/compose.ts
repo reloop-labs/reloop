@@ -22,6 +22,13 @@ export const pendingOutboundStatusEnum = pgEnum("pending_outbound_status", [
 	"failed",
 ]);
 
+export const composeDraftKindEnum = pgEnum("compose_draft_kind", [
+	"compose",
+	"reply",
+	"reply_all",
+	"forward",
+]);
+
 export const composeDraft = pgTable(
 	"compose_draft",
 	{
@@ -34,6 +41,9 @@ export const composeDraft = pgTable(
 		mailboxId: text("mailbox_id")
 			.notNull()
 			.references(() => mailbox.id, { onDelete: "cascade" }),
+		kind: composeDraftKindEnum("kind").notNull().default("compose"),
+		threadId: text("thread_id"),
+		inReplyToMessageId: text("in_reply_to_message_id"),
 		to: jsonb("to").$type<string[]>().notNull().default([]),
 		cc: jsonb("cc").$type<string[]>().notNull().default([]),
 		bcc: jsonb("bcc").$type<string[]>().notNull().default([]),
@@ -63,6 +73,11 @@ export const composeDraft = pgTable(
 		index("compose_draft_idx_org").on(table.organizationId),
 		index("compose_draft_idx_mailbox").on(table.mailboxId),
 		index("compose_draft_idx_updated").on(table.updatedAt),
+		index("compose_draft_idx_mailbox_thread_kind").on(
+			table.mailboxId,
+			table.threadId,
+			table.kind,
+		),
 	],
 );
 

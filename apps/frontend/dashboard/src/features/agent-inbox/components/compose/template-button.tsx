@@ -1,5 +1,6 @@
 import * as Popover from "@reloop/ui/popover";
-import { FileText, Loader2, Search } from "lucide-react";
+import { FileText, Search } from "lucide-react";
+import { LoadingDot } from "../shared/loading-dot";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type TemplateListItem = {
@@ -117,8 +118,8 @@ export const TemplateButton = ({
 				</div>
 				<div className="max-h-[240px] overflow-y-auto p-1">
 					{loading ? (
-						<div className="flex items-center justify-center py-6">
-							<Loader2 className="h-4 w-4 animate-spin text-mail-muted" />
+						<div className="flex items-center justify-center py-6 text-mail-muted">
+							<LoadingDot label="Loading templates" style={{ fontSize: 14 }} />
 						</div>
 					) : filtered.length === 0 ? (
 						<p className="px-3 py-6 text-center text-mail-muted text-xs">
@@ -134,7 +135,12 @@ export const TemplateButton = ({
 								className="flex w-full items-start gap-2 rounded-md px-2 py-2 text-left hover:bg-black/5 dark:hover:bg-white/10"
 							>
 								{applying === t.id ? (
-									<Loader2 className="mt-0.5 h-3.5 w-3.5 animate-spin text-mail-muted" />
+									<span className="mt-0.5 text-mail-muted">
+										<LoadingDot
+											label="Applying template"
+											style={{ fontSize: 12 }}
+										/>
+									</span>
 								) : (
 									<FileText className="mt-0.5 h-3.5 w-3.5 text-mail-muted" />
 								)}

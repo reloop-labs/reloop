@@ -10,7 +10,6 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
 	FileText,
 	Image as ImageIcon,
-	Loader2,
 	Paperclip,
 	Sparkles,
 	X as XIcon,
@@ -19,17 +18,18 @@ import { parseAsString, useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
-import { extractBareEmail, formatRecipient } from "../lib/email-address";
-import type { AgentMailbox } from "../types";
-import { useAgentInbox } from "./agent-inbox-provider";
-import { AiComposePreview } from "./compose/ai-compose-preview";
+import { extractBareEmail, formatRecipient } from "../../lib/email-address";
+import type { AgentMailbox } from "../../types";
+import { useAgentInbox } from "../agent-inbox-provider";
+import { AiComposePreview } from "./ai-compose-preview";
 import {
 	ComposeBodyEditor,
 	type ComposeBodyEditorHandle,
-} from "./compose/compose-body-editor";
-import { ScheduleSendPicker } from "./compose/schedule-send-picker";
-import { showUndoSendToast } from "./compose/undo-send-toast";
-import { EmailPillsInput, validateEmail } from "./email-pills-input";
+} from "./compose-body-editor";
+import { ScheduleSendPicker } from "./schedule-send-picker";
+import { showUndoSendToast } from "./undo-send-toast";
+import { EmailPillsInput, validateEmail } from "../shared/email-pills-input";
+import { LoadingDot } from "../shared/loading-dot";
 
 /** Portaled compose UI (recipient suggestions + React Email menus). */
 const isComposeFloatingUi = (target: EventTarget | null) =>
@@ -300,6 +300,7 @@ export const ComposeModal = ({
 					const saved = await saveDraft({
 						id: currentDraftId.current || undefined,
 						mailboxId: mailbox.id,
+						kind: "compose",
 						to,
 						cc,
 						bcc,
@@ -418,6 +419,45 @@ export const ComposeModal = ({
 			} catch {
 				/* ignore */
 			}
+		}
+		void setDraftId(null);
+		resetComposer();
+		onClose();
+	};
+
+	const saveDraftAndClose = async () => {
+		setShowDiscard(false);
+		if (draftTimer.current) {
+			window.clearTimeout(draftTimer.current);
+			draftTimer.current = null;
+		}
+		try {
+			const saved = await saveDraft({
+				id: currentDraftId.current || undefined,
+				mailboxId: mailbox.id,
+				kind: "compose",
+				to,
+				cc,
+				bcc,
+				subject,
+				html: htmlBody,
+				text: textBody,
+				attachments: attachments
+					.filter((a) => !a.isUploading)
+					.map((a) => ({
+						id: a.id,
+						filename: a.name,
+						path: a.url || a.path,
+						url: a.url,
+						content_type: a.content_type,
+						size: a.size,
+					})),
+			});
+			if (saved?.id) currentDraftId.current = saved.id;
+			toast.success("Draft saved");
+		} catch {
+			toast.error("Couldn't save draft");
+			return;
 		}
 		void setDraftId(null);
 		resetComposer();
@@ -871,7 +911,11 @@ export const ComposeModal = ({
 										title="Generate subject from body"
 									>
 										{subjectGenerating ? (
-											<Loader2 className="h-3.5 w-3.5 animate-spin" />
+											<LoadingDot
+												label="Generating subject"
+												className="text-mail-muted"
+												style={{ fontSize: 12 }}
+											/>
 										) : (
 											<Sparkles className="h-3.5 w-3.5" />
 										)}
@@ -922,7 +966,11 @@ export const ComposeModal = ({
 										title="AI draft"
 									>
 										{aiLoading ? (
-											<Loader2 className="h-3.5 w-3.5 animate-spin" />
+											<LoadingDot
+												label="Generating draft"
+												className="text-mail-muted"
+												style={{ fontSize: 12 }}
+											/>
 										) : (
 											<Sparkles className="h-3.5 w-3.5" />
 										)}
@@ -1002,7 +1050,11 @@ export const ComposeModal = ({
 																	<div className="flex min-w-0 flex-1 items-center gap-2.5">
 																		<div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-[var(--inbox-hover)]">
 																			{file.isUploading ? (
-																				<Loader2 className="h-3.5 w-3.5 animate-spin text-mail-muted" />
+																				<LoadingDot
+																					label="Uploading"
+																					className="text-mail-muted"
+																					style={{ fontSize: 11 }}
+																				/>
 																			) : (
 																				<AttachmentGlyph
 																					contentType={file.content_type}
@@ -1061,7 +1113,11 @@ export const ComposeModal = ({
 															className="inline-flex max-w-[180px] items-center gap-1.5 rounded-lg border border-mail-border/40 bg-[var(--inbox-hover)] px-2 py-1 text-[11px] text-mail-foreground"
 														>
 															{file.isUploading ? (
-																<Loader2 className="h-3 w-3 shrink-0 animate-spin" />
+																<LoadingDot
+																	label="Uploading"
+																	className="shrink-0 text-mail-muted"
+																	style={{ fontSize: 10 }}
+																/>
 															) : (
 																<AttachmentGlyph
 																	contentType={file.content_type}
@@ -1160,16 +1216,16 @@ export const ComposeModal = ({
 					<div className="px-5 pt-5 pb-2">
 						<Modal.Title asChild>
 							<h3 className="font-semibold text-label-md text-mail-foreground">
-								Discard message?
+								Save draft?
 							</h3>
 						</Modal.Title>
 						<Modal.Description asChild>
 							<p className="mt-1.5 text-[13px] text-mail-muted leading-snug">
-								Your draft will be deleted. This can’t be undone.
+								Save this message to Drafts, or discard it permanently.
 							</p>
 						</Modal.Description>
 					</div>
-					<div className="flex justify-end gap-2 px-5 py-4">
+					<div className="flex flex-wrap justify-end gap-2 px-5 py-4">
 						<Button.Root
 							type="button"
 							variant="neutral"
@@ -1178,6 +1234,15 @@ export const ComposeModal = ({
 							onClick={() => setShowDiscard(false)}
 						>
 							Keep editing
+						</Button.Root>
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="filled"
+							size="xsmall"
+							onClick={() => void saveDraftAndClose()}
+						>
+							Save draft
 						</Button.Root>
 						<Button.Root
 							type="button"

@@ -200,10 +200,20 @@ export namespace MailModel {
 		size: t.Optional(t.String()),
 	});
 
+	export const draftKind = t.Union([
+		t.Literal("compose"),
+		t.Literal("reply"),
+		t.Literal("reply_all"),
+		t.Literal("forward"),
+	]);
+
 	export const draftItem = t.Object({
 		id: t.String(),
 		organizationId: t.String(),
 		mailboxId: t.String(),
+		kind: draftKind,
+		threadId: t.Union([t.String(), t.Null()]),
+		inReplyToMessageId: t.Union([t.String(), t.Null()]),
 		to: t.Array(t.String()),
 		cc: t.Array(t.String()),
 		bcc: t.Array(t.String()),

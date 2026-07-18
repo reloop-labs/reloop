@@ -3,6 +3,7 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { Logo } from "@reloop/ui/logo";
+import { Skeleton } from "@reloop/ui/skeleton";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -10,11 +11,13 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { AddAgentAddressModal } from "#/features/agent-inbox/components/add-agent-address-modal";
-import { ComposeModal } from "#/features/agent-inbox/components/compose-modal";
-import { InboxLabelDialog } from "#/features/agent-inbox/components/inbox-label-dialog";
-import { InboxNavUser } from "#/features/agent-inbox/components/inbox-nav-user";
-import { useInboxSidebar } from "#/features/agent-inbox/components/inbox-sidebar-context";
-import { MailboxRail } from "#/features/agent-inbox/components/mailbox-rail";
+import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
+import { ComposeModal } from "#/features/agent-inbox/components/compose/compose-modal";
+import { MailboxRail } from "#/features/agent-inbox/components/mailbox-rail/mailbox-rail";
+import { SectionError } from "#/features/agent-inbox/components/shared/section-error";
+import { InboxLabelDialog } from "#/features/agent-inbox/components/sidebar/inbox-label-dialog";
+import { InboxNavUser } from "#/features/agent-inbox/components/sidebar/inbox-nav-user";
+import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
 import { useInboxFolderStats } from "#/features/agent-inbox/hooks/use-inbox-folder-stats";
 import { useInboxLabels } from "#/features/agent-inbox/hooks/use-inbox-labels";
 import { resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
@@ -70,6 +73,7 @@ const NavLink = ({
 	item,
 	active,
 	count,
+	countLoading = false,
 	collapsed,
 	refCallback,
 	onPointerEnter,
@@ -77,6 +81,7 @@ const NavLink = ({
 	item: NavItem;
 	active: boolean;
 	count?: number;
+	countLoading?: boolean;
 	collapsed: boolean;
 	refCallback?: (el: HTMLAnchorElement | null) => void;
 	onPointerEnter?: () => void;
@@ -103,11 +108,14 @@ const NavLink = ({
 					<span className="relative bottom-px mt-0.5 min-w-0 flex-1 truncate text-left">
 						{item.label}
 					</span>
-					{item.showCount && count !== undefined && (
-						<span className="mr-[3px] shrink-0 text-mail-muted tabular-nums">
-							{count.toLocaleString()}
-						</span>
-					)}
+					{item.showCount &&
+						(countLoading ? (
+							<Skeleton className="mr-[3px] h-3 w-5 shrink-0 rounded-sm bg-[var(--inbox-skeleton)]" />
+						) : count !== undefined ? (
+							<span className="mr-[3px] shrink-0 text-mail-muted tabular-nums">
+								{count.toLocaleString()}
+							</span>
+						) : null)}
 				</>
 			)}
 		</>
@@ -150,6 +158,7 @@ const NavSection = ({
 	items,
 	folder,
 	stats,
+	countsLoading = false,
 	collapsed,
 	registerRef,
 	onHoverItem,
@@ -159,6 +168,7 @@ const NavSection = ({
 	items: NavItem[];
 	folder: string;
 	stats: ReturnType<typeof useInboxFolderStats>;
+	countsLoading?: boolean;
 	collapsed: boolean;
 	registerRef: (id: string, el: HTMLAnchorElement | null) => void;
 	onHoverItem: (id: string) => void;
@@ -183,6 +193,7 @@ const NavSection = ({
 				item={item}
 				active={folder === item.id}
 				count={stats[item.id as keyof typeof stats] as number | undefined}
+				countLoading={countsLoading}
 				collapsed={collapsed}
 				refCallback={(el) => registerRef(item.id, el)}
 				onPointerEnter={() => onHoverItem(item.id)}
@@ -200,8 +211,26 @@ export const InboxSidebar = ({
 }) => {
 	const navigate = useNavigate();
 	const { collapsed, registerOpenCompose } = useInboxSidebar();
+	const {
+		isLoadingMailboxes,
+		isLoadingThreads,
+		mailboxesError,
+		retryMailboxes,
+		getMailbox,
+	} = useAgentInbox();
+	const mailboxReady = !!getMailbox(mailbox.id) && !!mailbox.email;
 	const stats = useInboxFolderStats(mailbox.id);
-	const { labels, addLabel } = useInboxLabels(mailbox.id);
+	const {
+		labels,
+		addLabel,
+		isLoading: isLoadingLabels,
+		labelsError,
+		refreshLabels,
+	} = useInboxLabels(mailboxReady ? mailbox.id : "");
+	/** Counts depend on thread data — skeleton until mailbox + threads settle. */
+	const countsLoading =
+		!mailboxReady || isLoadingMailboxes || isLoadingThreads;
+	const labelsLoading = !mailboxReady || isLoadingLabels;
 
 	const [isComposeOpen, setIsComposeOpen] = useState(false);
 	const [isAddMailboxOpen, setIsAddMailboxOpen] = useState(false);
@@ -324,7 +353,7 @@ export const InboxSidebar = ({
 		<>
 			<div className="flex h-full shrink-0">
 				<MailboxRail
-					mailbox={mailbox}
+					activeMailboxId={mailbox.id}
 					onAddMailbox={() => setIsAddMailboxOpen(true)}
 				/>
 				<aside
@@ -355,13 +384,33 @@ export const InboxSidebar = ({
 					</div>
 
 					<div className="flex flex-col gap-2">
-						<InboxNavUser mailbox={mailbox} collapsed={collapsed} />
+						{mailboxesError && !mailboxReady ? (
+							<SectionError
+								compact
+								message="Couldn't load mailbox"
+								onRetry={() => void retryMailboxes()}
+							/>
+						) : (
+							<InboxNavUser
+								mailbox={mailbox}
+								collapsed={collapsed}
+								loading={!mailboxReady}
+							/>
+						)}
 
 						<FancyButton.Root
-							onClick={() => setIsComposeOpen(true)}
+							onClick={() => {
+								if (!mailboxReady) return;
+								setIsComposeOpen(true);
+							}}
 							variant="neutral"
 							size="xsmall"
-							className={cn("mt-3 mb-1.5 w-full", collapsed && "px-0")}
+							className={cn(
+								// Avoid FancyButton's default `transition` animating opacity when
+								// the button mounts / leaves a loading-disabled state.
+								"mt-3 mb-1.5 w-full !transition-none after:!transition-none",
+								collapsed && "px-0",
+							)}
 						>
 							<FancyButton.Icon
 								as={PencilIcon}
@@ -392,6 +441,7 @@ export const InboxSidebar = ({
 							items={coreItems}
 							folder={folder}
 							stats={stats}
+							countsLoading={countsLoading}
 							collapsed={collapsed}
 							registerRef={(id, el) => {
 								if (el) navRefs.current[id] = el;
@@ -404,6 +454,7 @@ export const InboxSidebar = ({
 							items={managementItems}
 							folder={folder}
 							stats={stats}
+							countsLoading={countsLoading}
 							collapsed={collapsed}
 							registerRef={(id, el) => {
 								if (el) navRefs.current[id] = el;
@@ -420,7 +471,8 @@ export const InboxSidebar = ({
 									<button
 										type="button"
 										onClick={() => setIsLabelDialogOpen(true)}
-										className="flex size-5 items-center justify-center rounded-md text-text-soft-400 hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
+										disabled={!mailboxReady}
+										className="flex size-5 items-center justify-center rounded-md text-text-soft-400 hover:bg-[var(--inbox-hover)] hover:text-mail-foreground disabled:opacity-40"
 										aria-label="Create label (⌥L)"
 										title="Create label (⌥L)"
 									>
@@ -428,7 +480,27 @@ export const InboxSidebar = ({
 									</button>
 								</div>
 								<div className="flex flex-col">
-									{labels.length === 0 ? (
+									{labelsError ? (
+										<SectionError
+											compact
+											message="Couldn't load labels"
+											onRetry={() => void refreshLabels()}
+										/>
+									) : labelsLoading ? (
+										<div className="space-y-1 px-0.5 py-1" aria-busy="true">
+											<span className="sr-only">Loading labels</span>
+											{/* biome-ignore lint/suspicious/noArrayIndexKey: static skeleton */}
+											{[0, 1, 2].map((i) => (
+												<div
+													key={i}
+													className="flex h-8 items-center gap-2.5 px-2.5"
+												>
+													<Skeleton className="size-2.5 shrink-0 rounded-full bg-[var(--inbox-skeleton)]" />
+													<Skeleton className="h-3 flex-1 rounded-sm bg-[var(--inbox-skeleton)]" />
+												</div>
+											))}
+										</div>
+									) : labels.length === 0 ? (
 										<button
 											type="button"
 											onClick={() => setIsLabelDialogOpen(true)}
@@ -459,7 +531,9 @@ export const InboxSidebar = ({
 													}
 													className={cn(
 														"group relative z-10 flex h-8 w-full items-center gap-2.5 rounded-lg px-2.5 font-medium text-[13px]",
-														active ? "text-mail-foreground" : "text-mail-muted",
+														active
+															? "text-mail-foreground"
+															: "text-mail-muted",
 													)}
 												>
 													<span

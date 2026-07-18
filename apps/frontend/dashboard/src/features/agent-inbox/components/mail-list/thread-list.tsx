@@ -1,12 +1,12 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Virtuoso } from "react-virtuoso";
 import { toast } from "sonner";
-import type { InboundThread } from "../types";
-import { splitPinnedThreads } from "../utils/group-threads";
-import { useAgentInbox } from "./agent-inbox-provider";
+import type { InboundThread } from "../../types";
+import { splitPinnedThreads } from "../../utils/group-threads";
+import { useAgentInbox } from "../agent-inbox-provider";
 import { InboxListEmptyState } from "./inbox-empty-state";
 import { InboxThreadRow } from "./inbox-thread-row";
-import { MailListSpinner } from "./mail-skeleton";
+import { MailListSkeleton } from "./mail-list-skeleton";
 import { ThreadContextMenu } from "./thread-context-menu";
 import { useInboxMail } from "./use-inbox-mail";
 import { useInboxNavigation } from "./use-inbox-navigation";
@@ -206,7 +206,7 @@ export const ThreadList = ({
 	}, [visibleCount, orderedThreads.length]);
 
 	if (isLoading && threads.length === 0) {
-		return <MailListSpinner />;
+		return <MailListSkeleton />;
 	}
 
 	if (threads.length === 0) {

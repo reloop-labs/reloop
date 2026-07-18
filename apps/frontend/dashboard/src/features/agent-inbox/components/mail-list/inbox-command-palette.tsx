@@ -29,8 +29,8 @@ import {
 } from "#/features/agent-inbox/lib/inbox-search-query";
 import { useMailboxId } from "#/features/agent-inbox/lib/use-mailbox-id";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
-import type { InboundThread } from "../types";
-import { useInboxSidebar } from "./inbox-sidebar-context";
+import type { InboundThread } from "../../types";
+import { useInboxSidebar } from "../sidebar/inbox-sidebar-context";
 
 export { applyInboxFilters } from "#/features/agent-inbox/lib/inbox-search-query";
 

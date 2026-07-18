@@ -7,8 +7,14 @@ import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
-import type { AgentMailbox, InboundThread } from "../../types";
+import { buildDisplayMessages } from "#/features/agent-inbox/utils/build-display-messages";
+import type {
+	AgentMailbox,
+	ComposeDraftKind,
+	InboundThread,
+} from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
+import { ThreadMessagesSkeleton } from "./detail-panel-skeleton";
 import { ForwardComposer } from "./forward-composer";
 import type { AttachmentItem } from "./message-attachments";
 import { RawHeadersModal } from "./raw-headers-modal";
@@ -17,6 +23,22 @@ import type { ThreadParticipant } from "./thread-header";
 import { ThreadHeader } from "./thread-header";
 import { ZeroMailDisplay } from "./zero-mail-display";
 import { ZeroThreadToolbar } from "./zero-thread-toolbar";
+
+function replyModeToKind(mode: "reply" | "replyAll"): ComposeDraftKind {
+	return mode === "replyAll" ? "reply_all" : "reply";
+}
+
+function replySubject(subject: string) {
+	const trimmed = subject.trim();
+	if (!trimmed) return "Re:";
+	return /^re:/i.test(trimmed) ? trimmed : `Re: ${trimmed}`;
+}
+
+function forwardSubject(subject: string) {
+	const trimmed = subject.trim();
+	if (!trimmed) return "Fwd:";
+	return /^(fwd|fw):/i.test(trimmed) ? trimmed : `Fwd: ${trimmed}`;
+}
 
 /** Prefer the inbound/email id the reply API expects; fall back to list id. */
 function resolveReplyMessageId(msg: {
@@ -119,6 +141,9 @@ export const ThreadDetail = ({
 		sendReplyAll,
 		sendForward,
 		refresh,
+		findDraft,
+		getDraft,
+		deleteDraft,
 	} = useAgentInbox();
 
 	// ── UI state ──────────────────────────────────────────────────────────────
@@ -127,6 +152,8 @@ export const ThreadDetail = ({
 	const [rawHeadersExpanded, setRawHeadersExpanded] = useState(false);
 	const [showReplyComposer, setShowReplyComposer] = useState(false);
 	const [replySeed, setReplySeed] = useState("");
+	const [replyInitialHtml, setReplyInitialHtml] = useState("");
+	const [replyDraftId, setReplyDraftId] = useState<string | null>(null);
 	/** List message id the composer is anchored under (inline in the thread). */
 	const [replyAnchorMessageId, setReplyAnchorMessageId] = useState<
 		string | null
@@ -137,17 +164,33 @@ export const ThreadDetail = ({
 	);
 	const [showForwardComposer, setShowForwardComposer] = useState(false);
 	const [isForwarding, setIsForwarding] = useState(false);
+	/** List message id the forward composer is anchored under. */
+	const [forwardAnchorMessageId, setForwardAnchorMessageId] = useState<
+		string | null
+	>(null);
+	const [forwardDraftId, setForwardDraftId] = useState<string | null>(null);
+	const [forwardSeed, setForwardSeed] = useState("");
+	const [forwardInitialHtml, setForwardInitialHtml] = useState("");
+	const [forwardInitialTo, setForwardInitialTo] = useState<string[]>([]);
+	const [forwardInitialCc, setForwardInitialCc] = useState<string[]>([]);
 	const [replyMode, setReplyMode] = useState<"reply" | "replyAll">("reply");
 	const [replyTargetPerson, setReplyTargetPerson] = useState<{
 		name: string;
 		email: string;
 	} | null>(null);
 	const replyComposerRef = useRef<HTMLDivElement>(null);
+	const forwardComposerRef = useRef<HTMLDivElement>(null);
 	const reduceMotion = useReducedMotion();
 	/** Keyboard `R`/`A` — no enter animation / no smooth scroll. */
 	const [skipReplyEnter, setSkipReplyEnter] = useState(false);
+	/** Keyboard `F` — no enter animation / no smooth scroll. */
+	const [skipForwardEnter, setSkipForwardEnter] = useState(false);
 	const [composeParam, setComposeParam] = useQueryState(
 		"compose",
+		parseAsString.withDefault(""),
+	);
+	const [draftIdParam, setDraftIdParam] = useQueryState(
+		"draftId",
 		parseAsString.withDefault(""),
 	);
 
@@ -195,85 +238,119 @@ export const ThreadDetail = ({
 		setIsTranslating(false);
 		setShowReplyComposer(false);
 		setReplySeed("");
+		setReplyInitialHtml("");
+		setReplyDraftId(null);
 		setReplyAnchorMessageId(null);
 		setReplyApiMessageId(null);
 		setSkipReplyEnter(false);
+		setSkipForwardEnter(false);
 		setOptimisticReplies([]);
 		setShowForwardComposer(false);
+		setForwardAnchorMessageId(null);
+		setForwardDraftId(null);
+		setForwardSeed("");
+		setForwardInitialHtml("");
+		setForwardInitialTo([]);
+		setForwardInitialCc([]);
 		setReplyTargetPerson(null);
 	}, [thread?.id]);
 
+	/** True while we have a threadId but not the full conversation yet. */
+	const awaitingFullThread =
+		!!thread?.threadId && isLoadingThread && !threadDataMatches;
+
 	// ── Build display messages list ───────────────────────────────────────────
-	const displayMessages = useMemo(() => {
-		if (!thread) return [];
-
-		// Base: either thread API messages or single inbound fallback
-		let base: any[];
-		if (
-			threadDataMatches &&
-			threadData?.messages &&
-			threadData.messages.length > 0
-		) {
-			const sorted = [...threadData.messages].sort(
-				(a, b) =>
-					new Date(a.messageAt).getTime() - new Date(b.messageAt).getTime(),
-			);
-			base = sorted.map((msg) => {
-				if (msg.inboundEmailId === thread.id || msg.id === thread.id) {
-					return { ...msg, parsed: thread.parsed || msg.parsed };
-				}
-				return msg;
-			});
-		} else {
-			base = [
-				{
-					id: thread.id,
-					direction: thread.direction || "inbound",
-					fromEmail: thread.from.email,
-					fromName: thread.from.name || null,
-					messageAt: thread.receivedAt,
-					subject: thread.subject,
-					email: {
-						id: thread.id,
-						fromEmail: thread.from.email,
-						toEmails: thread.toEmails || [mailbox?.email || ""],
-						subject: thread.subject,
-						textBody: thread.bodyText,
-						htmlBody: thread.bodyHtml,
-						attachments: thread.attachments || [],
-						createdAt: thread.receivedAt,
-					},
-					parsed: thread.parsed,
-				},
-			];
-		}
-
-		// Append any optimistic outbound replies not yet returned from the API
-		const apiIds = new Set(base.map((m) => m.id));
-		const pending = optimisticReplies.filter((r) => !apiIds.has(r.id));
-		return [...base, ...pending];
-	}, [threadData, threadDataMatches, thread, mailbox, optimisticReplies]);
+	const displayMessages = useMemo(
+		() =>
+			buildDisplayMessages({
+				thread,
+				threadData,
+				threadDataMatches,
+				isLoadingThread,
+				mailboxEmail: mailbox?.email || "",
+				optimisticReplies,
+			}),
+		[
+			threadData,
+			threadDataMatches,
+			isLoadingThread,
+			thread,
+			mailbox?.email,
+			optimisticReplies,
+		],
+	);
 
 	useEffect(() => {
 		if (!composeParam || !thread) return;
-		if (composeParam === "forward") {
-			setShowReplyComposer(false);
-			setReplyAnchorMessageId(null);
-			setReplyApiMessageId(null);
-			setShowForwardComposer(true);
-		} else if (composeParam === "reply" || composeParam === "replyAll") {
+		let cancelled = false;
+		void (async () => {
 			const last = displayMessages[displayMessages.length - 1];
-			setReplyMode(composeParam);
-			setShowForwardComposer(false);
-			setReplySeed("");
-			setReplyTargetPerson(null);
-			setReplyAnchorMessageId(last?.id ?? null);
-			setReplyApiMessageId(resolveReplyMessageId(last) ?? messageId ?? null);
-			setSkipReplyEnter(false);
-			setShowReplyComposer(true);
-		}
-		void setComposeParam(null);
-	}, [composeParam, thread, setComposeParam, displayMessages, messageId]);
+			const fromUrl = draftIdParam ? await getDraft(draftIdParam) : null;
+			if (cancelled) return;
+
+			if (composeParam === "forward") {
+				setShowReplyComposer(false);
+				setReplyAnchorMessageId(null);
+				setReplyApiMessageId(null);
+				setForwardAnchorMessageId(last?.id ?? null);
+				setSkipForwardEnter(false);
+				if (fromUrl?.kind === "forward") {
+					setForwardDraftId(fromUrl.id);
+					setForwardSeed(fromUrl.text);
+					setForwardInitialHtml(fromUrl.html);
+					setForwardInitialTo(fromUrl.to);
+					setForwardInitialCc(fromUrl.cc);
+				} else {
+					setForwardDraftId(null);
+					setForwardSeed("");
+					setForwardInitialHtml("");
+					setForwardInitialTo([]);
+					setForwardInitialCc([]);
+				}
+				setShowForwardComposer(true);
+			} else if (composeParam === "reply" || composeParam === "replyAll") {
+				const mode = composeParam;
+				const kind = replyModeToKind(mode);
+				setReplyMode(mode);
+				setShowForwardComposer(false);
+				setForwardAnchorMessageId(null);
+				setReplyTargetPerson(null);
+				setReplyAnchorMessageId(last?.id ?? null);
+				setReplyApiMessageId(
+					fromUrl?.inReplyToMessageId ||
+						resolveReplyMessageId(last) ||
+						messageId ||
+						null,
+				);
+				setSkipReplyEnter(false);
+				if (fromUrl && (fromUrl.kind === kind || fromUrl.kind === "reply")) {
+					setReplyDraftId(fromUrl.id);
+					setReplySeed(fromUrl.text);
+					setReplyInitialHtml(fromUrl.html);
+					if (fromUrl.kind === "reply_all") setReplyMode("replyAll");
+				} else {
+					setReplyDraftId(null);
+					setReplySeed("");
+					setReplyInitialHtml("");
+				}
+				setShowReplyComposer(true);
+			}
+			void setComposeParam(null);
+			if (draftIdParam) void setDraftIdParam(null);
+		})();
+		return () => {
+			cancelled = true;
+		};
+	}, [
+		composeParam,
+		thread,
+		setComposeParam,
+		displayMessages,
+		messageId,
+		draftIdParam,
+		setDraftIdParam,
+		getDraft,
+	]);
 
 	useEffect(() => {
 		if (!showReplyComposer) return;
@@ -284,10 +361,29 @@ export const ThreadDetail = ({
 		});
 	}, [showReplyComposer, replyAnchorMessageId, skipReplyEnter, reduceMotion]);
 
+	useEffect(() => {
+		if (!showForwardComposer) return;
+		forwardComposerRef.current?.scrollIntoView({
+			behavior:
+				skipForwardEnter || reduceMotion ? "auto" : "smooth",
+			block: "nearest",
+		});
+	}, [
+		showForwardComposer,
+		forwardAnchorMessageId,
+		skipForwardEnter,
+		reduceMotion,
+	]);
+
 	const closeReplyComposer = () => {
 		// Keep anchor/seed through the exit so AnimatePresence can reverse the open scale.
 		setSkipReplyEnter(false);
 		setShowReplyComposer(false);
+	};
+
+	const closeForwardComposer = () => {
+		setSkipForwardEnter(false);
+		setShowForwardComposer(false);
 	};
 
 	useEffect(() => {
@@ -316,6 +412,16 @@ export const ThreadDetail = ({
 		replyTargetPerson,
 		reduceMotion,
 	]);
+
+	useEffect(() => {
+		if (showForwardComposer) return;
+		if (!forwardAnchorMessageId) return;
+		const ms = reduceMotion ? 100 : 160;
+		const id = window.setTimeout(() => {
+			setForwardAnchorMessageId(null);
+		}, ms);
+		return () => window.clearTimeout(id);
+	}, [showForwardComposer, forwardAnchorMessageId, reduceMotion]);
 
 	const threadParticipants = useMemo((): ThreadParticipant[] => {
 		const seen = new Set<string>();
@@ -547,7 +653,9 @@ export const ThreadDetail = ({
 			parsed: null,
 		};
 		setOptimisticReplies((prev) => [...prev, optimisticMsg]);
+		const draftToDelete = replyDraftId;
 		closeReplyComposer();
+		setReplyDraftId(null);
 
 		const send =
 			replyMode === "replyAll"
@@ -557,6 +665,13 @@ export const ThreadDetail = ({
 		toast.promise(send, {
 			loading: "Sending reply...",
 			success: async () => {
+				if (draftToDelete) {
+					try {
+						await deleteDraft(draftToDelete);
+					} catch {
+						/* best-effort */
+					}
+				}
 				await Promise.all([mutateThread(), refresh()]);
 				setOptimisticReplies([]);
 				return `Reply sent to ${thread.from.email} successfully`;
@@ -570,8 +685,47 @@ export const ThreadDetail = ({
 		});
 	};
 
-	const handleForward = (_msgId?: string) => {
+	const openForwardComposer = (
+		msg?: any,
+		opts?: { viaKeyboard?: boolean },
+	) => {
+		const anchor =
+			msg ?? displayMessages[displayMessages.length - 1] ?? null;
 		closeReplyComposer();
+		setForwardAnchorMessageId(anchor?.id ?? null);
+		setSkipForwardEnter(!!opts?.viaKeyboard);
+
+		const threadKey = thread?.threadId;
+		const mailboxKey = mailbox?.id;
+		if (mailboxKey && threadKey) {
+			void findDraft({
+				mailboxId: mailboxKey,
+				threadId: threadKey,
+				kind: "forward",
+			}).then((existing) => {
+				if (existing) {
+					setForwardDraftId(existing.id);
+					setForwardSeed(existing.text);
+					setForwardInitialHtml(existing.html);
+					setForwardInitialTo(existing.to);
+					setForwardInitialCc(existing.cc);
+				} else {
+					setForwardDraftId(null);
+					setForwardSeed("");
+					setForwardInitialHtml("");
+					setForwardInitialTo([]);
+					setForwardInitialCc([]);
+				}
+				setShowForwardComposer(true);
+			});
+			return;
+		}
+
+		setForwardDraftId(null);
+		setForwardSeed("");
+		setForwardInitialHtml("");
+		setForwardInitialTo([]);
+		setForwardInitialCc([]);
 		setShowForwardComposer(true);
 	};
 
@@ -603,15 +757,44 @@ export const ThreadDetail = ({
 	) => {
 		const anchor =
 			msg ?? displayMessages[displayMessages.length - 1] ?? null;
+		const apiId = resolveReplyMessageId(anchor) ?? messageId ?? null;
 		setReplyMode(mode);
 		setReplyTargetPerson(resolveReplyTarget(msg ?? anchor));
 		setShowForwardComposer(false);
-		setReplySeed("");
+		setForwardAnchorMessageId(null);
 		setReplyAnchorMessageId(anchor?.id ?? null);
-		setReplyApiMessageId(
-			resolveReplyMessageId(anchor) ?? messageId ?? null,
-		);
+		setReplyApiMessageId(apiId);
 		setSkipReplyEnter(!!opts?.viaKeyboard);
+
+		const kind = replyModeToKind(mode);
+		const threadKey = thread?.threadId;
+		const mailboxKey = mailbox?.id;
+		if (mailboxKey && threadKey) {
+			void findDraft({
+				mailboxId: mailboxKey,
+				threadId: threadKey,
+				kind,
+			}).then((existing) => {
+				if (existing) {
+					setReplyDraftId(existing.id);
+					setReplySeed(existing.text);
+					setReplyInitialHtml(existing.html);
+					if (existing.inReplyToMessageId) {
+						setReplyApiMessageId(existing.inReplyToMessageId);
+					}
+				} else {
+					setReplyDraftId(null);
+					setReplySeed("");
+					setReplyInitialHtml("");
+				}
+				setShowReplyComposer(true);
+			});
+			return;
+		}
+
+		setReplyDraftId(null);
+		setReplySeed("");
+		setReplyInitialHtml("");
 		setShowReplyComposer(true);
 	};
 
@@ -621,7 +804,9 @@ export const ThreadDetail = ({
 	useHotkeys("a", () =>
 		openReplyComposer("replyAll", undefined, { viaKeyboard: true }),
 	);
-	useHotkeys("f", () => handleForward());
+	useHotkeys("f", () =>
+		openForwardComposer(undefined, { viaKeyboard: true }),
+	);
 	useHotkeys("s", () => {
 		void handleToggleStar();
 	});
@@ -656,10 +841,19 @@ export const ThreadDetail = ({
 			attachments: data.attachments,
 		});
 
+		const draftToDelete = forwardDraftId;
 		toast.promise(fwdPromise, {
 			loading: "Forwarding message…",
-			success: () => {
-				setShowForwardComposer(false);
+			success: async () => {
+				if (draftToDelete) {
+					try {
+						await deleteDraft(draftToDelete);
+					} catch {
+						/* best-effort */
+					}
+				}
+				setForwardDraftId(null);
+				closeForwardComposer();
 				setIsForwarding(false);
 				return `Forwarded to ${toList.join(", ")} successfully`;
 			},
@@ -832,6 +1026,56 @@ export const ThreadDetail = ({
 	const replyIsAnchored =
 		!!replyAnchorMessageId &&
 		displayMessages.some((m) => m.id === replyAnchorMessageId);
+	const forwardIsAnchored =
+		!!forwardAnchorMessageId &&
+		displayMessages.some((m) => m.id === forwardAnchorMessageId);
+
+	const forwardSourceMsg =
+		displayMessages.find((m) => m.id === forwardAnchorMessageId) ??
+		displayMessages[displayMessages.length - 1] ??
+		null;
+
+	const forwardOriginalFrom = (() => {
+		if (!forwardSourceMsg) {
+			return thread.from.name
+				? `${thread.from.name} <${thread.from.email}>`
+				: thread.from.email;
+		}
+		const email =
+			forwardSourceMsg.fromEmail ||
+			forwardSourceMsg.email?.fromEmail ||
+			thread.from.email;
+		const name =
+			forwardSourceMsg.fromName ||
+			forwardSourceMsg.email?.fromName ||
+			"";
+		return name ? `${name} <${email}>` : email;
+	})();
+
+	const replyKind = replyModeToKind(replyMode);
+	const conversationThreadId = thread.threadId || null;
+
+	const discardReplyDraft = () => {
+		const id = replyDraftId;
+		setReplyDraftId(null);
+		closeReplyComposer();
+		if (id) {
+			void deleteDraft(id).catch(() => {
+				/* ignore */
+			});
+		}
+	};
+
+	const discardForwardDraft = () => {
+		const id = forwardDraftId;
+		setForwardDraftId(null);
+		closeForwardComposer();
+		if (id) {
+			void deleteDraft(id).catch(() => {
+				/* ignore */
+			});
+		}
+	};
 
 	const replyComposerElement = (
 		<ReplyComposer
@@ -847,8 +1091,70 @@ export const ThreadDetail = ({
 			skipEnter={skipReplyEnter}
 			onModeChange={setReplyMode}
 			initialContent={replySeed}
+			initialHtml={replyInitialHtml}
+			draft={
+				mailbox && conversationThreadId && replyApiMessageId
+					? {
+							mailboxId: mailbox.id,
+							threadId: conversationThreadId,
+							kind: replyKind as "reply" | "reply_all",
+							inReplyToMessageId: replyApiMessageId,
+							subject: replySubject(thread.subject),
+							draftId: replyDraftId,
+							onDraftIdChange: setReplyDraftId,
+							onDiscardDraft: discardReplyDraft,
+						}
+					: undefined
+			}
 			onSend={handleSendReply}
 			onClose={closeReplyComposer}
+		/>
+	);
+
+	const forwardComposerElement = (
+		<ForwardComposer
+			ref={forwardComposerRef}
+			key="inline-forward"
+			originalFrom={forwardOriginalFrom}
+			originalDate={dayjs(
+				forwardSourceMsg?.messageAt || thread.receivedAt,
+			).format("ddd, MMM D, YYYY [at] h:mm A")}
+			originalSubject={
+				forwardSourceMsg?.subject ||
+				forwardSourceMsg?.email?.subject ||
+				thread.subject
+			}
+			originalBodyText={(
+				forwardSourceMsg?.email?.textBody ||
+				thread.bodyText ||
+				""
+			).substring(0, 300)}
+			fromEmail={mailbox?.email || "agent@local.reloop.sh"}
+			skipEnter={skipForwardEnter}
+			initialTo={forwardInitialTo}
+			initialCc={forwardInitialCc}
+			initialContent={forwardSeed}
+			initialHtml={forwardInitialHtml}
+			draft={
+				mailbox && conversationThreadId
+					? {
+							mailboxId: mailbox.id,
+							threadId: conversationThreadId,
+							kind: "forward",
+							inReplyToMessageId:
+								resolveReplyMessageId(forwardSourceMsg) ||
+								messageId ||
+								"",
+							subject: forwardSubject(thread.subject),
+							draftId: forwardDraftId,
+							onDraftIdChange: setForwardDraftId,
+							onDiscardDraft: discardForwardDraft,
+						}
+					: undefined
+			}
+			onSend={handleSendForward}
+			onClose={closeForwardComposer}
+			isSending={isForwarding}
 		/>
 	);
 
@@ -872,12 +1178,6 @@ export const ThreadDetail = ({
 			/>
 
 			<div className="min-h-0 flex-1 overflow-y-auto">
-				{thread.threadId && isLoadingThread && !threadDataMatches && (
-					<div className="flex items-center justify-center border-mail-border/40 border-b py-1.5">
-						<div className="h-3 w-3 animate-spin rounded-full border-2 border-mail-foreground border-t-transparent" />
-					</div>
-				)}
-
 				{isTranslated && (
 					<div className="mx-4 my-3 flex items-center justify-between gap-3 rounded-xl border border-mail-border/40 bg-[var(--inbox-muted-bg)] p-3 text-xs">
 						<div className="flex items-center gap-2 text-mail-muted">
@@ -910,10 +1210,14 @@ export const ThreadDetail = ({
 					</div>
 				)}
 
-				{displayMessages.length > 0 && (
+				{(displayMessages.length > 0 || awaitingFullThread) && (
 					<ThreadHeader
 						subject={thread.subject}
-						messageCount={displayMessages.length}
+						messageCount={
+							awaitingFullThread
+								? (thread.messageCount ?? 1)
+								: displayMessages.length
+						}
 						participants={threadParticipants}
 						summary={aiSummaryText}
 						attachments={threadAttachments}
@@ -921,89 +1225,85 @@ export const ThreadDetail = ({
 					/>
 				)}
 
-				{displayMessages.map((msg, index) => (
-					<Fragment key={msg.id}>
-						<ZeroMailDisplay
-							msg={msg}
-							mailbox={mailbox}
-							index={index}
-							totalCount={displayMessages.length}
-							isTranslated={isTranslated}
-							targetLanguage={targetLanguage}
-							translatedHtmlMap={translatedHtmlMap}
-							translatedTextMap={translatedTextMap}
-							parsedExpanded={parsedExpanded}
-							onToggleParsed={() => setParsedExpanded((v) => !v)}
-							forceExpanded={
-								showReplyComposer && replyAnchorMessageId === msg.id
-							}
-							onReply={() => openReplyComposer("reply", msg)}
-							onReplyAll={() => openReplyComposer("replyAll", msg)}
-							onForward={() => handleForward()}
-							onDelete={handleDelete}
-							onPrint={handlePrint}
-							onApproveSend={() => {
-								const suggested = msg.parsed?.suggestedReply || "";
-								if (!suggested.trim()) return;
-								void handleSendReply({
-									text: suggested,
-									html: `<p>${suggested
-										.replaceAll("&", "&amp;")
-										.replaceAll("<", "&lt;")
-										.replaceAll(">", "&gt;")
-										.replaceAll("\n", "<br />")}</p>`,
-									replyToId:
-										resolveReplyMessageId(msg) ?? messageId ?? undefined,
-								});
-							}}
-							onEditReply={() => {
-								setReplySeed(msg.parsed?.suggestedReply || "");
-								setReplyMode("reply");
-								setReplyTargetPerson(resolveReplyTarget(msg));
-								setReplyAnchorMessageId(msg.id);
-								setReplyApiMessageId(
-									resolveReplyMessageId(msg) ?? messageId ?? null,
-								);
-								setSkipReplyEnter(false);
-								setShowForwardComposer(false);
-								setShowReplyComposer(true);
-							}}
-						/>
+				{awaitingFullThread ? (
+					<ThreadMessagesSkeleton />
+				) : (
+					<>
+						{displayMessages.map((msg, index) => (
+							<Fragment key={msg.id}>
+								<ZeroMailDisplay
+									msg={msg}
+									mailbox={mailbox}
+									index={index}
+									totalCount={displayMessages.length}
+									isTranslated={isTranslated}
+									targetLanguage={targetLanguage}
+									translatedHtmlMap={translatedHtmlMap}
+									translatedTextMap={translatedTextMap}
+									parsedExpanded={parsedExpanded}
+									onToggleParsed={() => setParsedExpanded((v) => !v)}
+									forceExpanded={
+										(showReplyComposer && replyAnchorMessageId === msg.id) ||
+										(showForwardComposer && forwardAnchorMessageId === msg.id)
+									}
+									onReply={() => openReplyComposer("reply", msg)}
+									onReplyAll={() => openReplyComposer("replyAll", msg)}
+									onForward={() => openForwardComposer(msg)}
+									onDelete={handleDelete}
+									onPrint={handlePrint}
+									onApproveSend={() => {
+										const suggested = msg.parsed?.suggestedReply || "";
+										if (!suggested.trim()) return;
+										void handleSendReply({
+											text: suggested,
+											html: `<p>${suggested
+												.replaceAll("&", "&amp;")
+												.replaceAll("<", "&lt;")
+												.replaceAll(">", "&gt;")
+												.replaceAll("\n", "<br />")}</p>`,
+											replyToId:
+												resolveReplyMessageId(msg) ?? messageId ?? undefined,
+										});
+									}}
+									onEditReply={() => {
+										setReplySeed(msg.parsed?.suggestedReply || "");
+										setReplyMode("reply");
+										setReplyTargetPerson(resolveReplyTarget(msg));
+										setReplyAnchorMessageId(msg.id);
+										setReplyApiMessageId(
+											resolveReplyMessageId(msg) ?? messageId ?? null,
+										);
+										setSkipReplyEnter(false);
+										setShowForwardComposer(false);
+										setForwardAnchorMessageId(null);
+										setShowReplyComposer(true);
+									}}
+								/>
+								<AnimatePresence>
+									{showReplyComposer && replyAnchorMessageId === msg.id
+										? replyComposerElement
+										: null}
+								</AnimatePresence>
+								<AnimatePresence>
+									{showForwardComposer && forwardAnchorMessageId === msg.id
+										? forwardComposerElement
+										: null}
+								</AnimatePresence>
+							</Fragment>
+						))}
 						<AnimatePresence>
-							{showReplyComposer &&
-							replyAnchorMessageId === msg.id
+							{showReplyComposer && !replyIsAnchored
 								? replyComposerElement
 								: null}
 						</AnimatePresence>
-					</Fragment>
-				))}
-				<AnimatePresence>
-					{showReplyComposer && !replyIsAnchored
-						? replyComposerElement
-						: null}
-				</AnimatePresence>
+						<AnimatePresence>
+							{showForwardComposer && !forwardIsAnchored
+								? forwardComposerElement
+								: null}
+						</AnimatePresence>
+					</>
+				)}
 			</div>
-
-			{showForwardComposer ? (
-				<ForwardComposer
-					originalFrom={
-						thread.from.name
-							? `${thread.from.name} <${thread.from.email}>`
-							: thread.from.email
-					}
-					originalDate={dayjs(thread.receivedAt).format(
-						"ddd, MMM D, YYYY [at] h:mm A",
-					)}
-					originalSubject={thread.subject}
-					originalBodyText={thread.bodyText?.substring(0, 300)}
-					fromEmail={mailbox?.email || "agent@local.reloop.sh"}
-					onSend={handleSendForward}
-					onClose={() => {
-						setShowForwardComposer(false);
-					}}
-					isSending={isForwarding}
-				/>
-			) : null}
 
 			{rawHeadersExpanded && (
 				<RawHeadersModal

@@ -1,20 +1,19 @@
-import { AgentInboxLayoutWrapper } from "#/features/agent-inbox/components/agent-inbox-layout-wrapper";
+import { AgentInboxLayoutWrapper } from "#/features/agent-inbox/components/layout/agent-inbox-layout-wrapper";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
-import { AgentInboxSkeleton } from "#/features/agent-inbox/components/agent-inbox-skeleton";
-import { AgentMailboxNotFound } from "#/features/agent-inbox/components/agent-mailbox-not-found";
+import { AgentMailboxNotFound } from "#/features/agent-inbox/components/shared/agent-mailbox-not-found";
 import { useMailboxId } from "#/features/agent-inbox/lib/use-mailbox-id";
 import { useInboxPathname } from "#/features/agent-inbox/lib/use-inbox-path";
+import { stubMailbox } from "#/features/agent-inbox/lib/stub-mailbox";
 import { useMemo, type ReactNode } from "react";
 
 export function MailboxLayout({ children }: { children: ReactNode }) {
 	const mailboxId = useMailboxId();
 	const pathname = useInboxPathname();
-	const { getMailbox, isLoadingMailboxes } = useAgentInbox();
-	const mailbox = mailboxId ? getMailbox(mailboxId) : undefined;
+	const { getMailbox, isLoadingMailboxes, mailboxesError } = useAgentInbox();
+	const resolved = mailboxId ? getMailbox(mailboxId) : undefined;
 
 	const folder = useMemo(() => {
 		if (!pathname || !mailboxId) return "inbox";
-		// Router paths are relative to basepath (/dashboard stripped)
 		const base = `/inbox/${mailboxId}`;
 		if (pathname === base || pathname === `${base}/`) return "inbox";
 		const suffix = pathname.startsWith(base)
@@ -27,16 +26,7 @@ export function MailboxLayout({ children }: { children: ReactNode }) {
 		return suffix.split("/")[0] || "inbox";
 	}, [pathname, mailboxId]);
 
-	if (isLoadingMailboxes) {
-		return (
-			<>
-				<AgentInboxSkeleton />
-				<div style={{ display: "none" }}>{children}</div>
-			</>
-		);
-	}
-
-	if (!mailbox) {
+	if (!mailboxId) {
 		return (
 			<>
 				<AgentMailboxNotFound />
@@ -45,9 +35,16 @@ export function MailboxLayout({ children }: { children: ReactNode }) {
 		);
 	}
 
+	// Mailboxes finished loading and this id is unknown — keep rail via stub
+	// only while loading/error; otherwise show not-found inside the shell.
+	const mailboxMissing =
+		!resolved && !isLoadingMailboxes && !mailboxesError;
+
+	const mailbox = resolved ?? stubMailbox(mailboxId);
+
 	return (
 		<AgentInboxLayoutWrapper mailbox={mailbox} folder={folder}>
-			{children}
+			{mailboxMissing ? <AgentMailboxNotFound /> : children}
 		</AgentInboxLayoutWrapper>
 	);
 }

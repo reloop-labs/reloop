@@ -1,22 +1,23 @@
-import { AgentInboxContent } from "#/features/agent-inbox/components/agent-inbox-content";
-import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
-import { useInboxSidebar } from "#/features/agent-inbox/components/inbox-sidebar-context";
-import { useLabelThreadIds } from "#/features/agent-inbox/hooks/use-inbox-labels";
-import { useMailboxId } from "#/features/agent-inbox/lib/use-mailbox-id";
-import { filterInboxThreads } from "#/features/agent-inbox/utils/inbox-folder-filters";
 import { cn } from "@reloop/ui/cn";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { FileText, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
+import { AgentInboxContent } from "#/features/agent-inbox/components/mail-list/agent-inbox-content";
+import { ListPanelSkeleton } from "#/features/agent-inbox/components/mail-list/list-panel-skeleton";
+import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
+import { useComposeDrafts } from "#/features/agent-inbox/hooks/use-compose-drafts";
+import { useLabelThreadIds } from "#/features/agent-inbox/hooks/use-inbox-labels";
+import { useFolderMailbox } from "#/features/agent-inbox/lib/use-folder-mailbox";
+import { filterInboxThreads } from "#/features/agent-inbox/utils/inbox-folder-filters";
 
 export function InboxFolderPage() {
-	const mailboxId = useMailboxId();
-	const { getMailbox, threads } = useAgentInbox();
-	const mailbox = mailboxId ? getMailbox(mailboxId) : undefined;
+	const { mailbox, mailboxId } = useFolderMailbox();
+	const { threads } = useAgentInbox();
 
 	const filteredThreads = useMemo(
-		() => filterInboxThreads(threads, mailboxId),
+		() => (mailboxId ? filterInboxThreads(threads, mailboxId) : []),
 		[threads, mailboxId],
 	);
 
@@ -32,9 +33,8 @@ export function InboxFolderPage() {
 }
 
 export function AgentFolderPage() {
-	const mailboxId = useMailboxId();
-	const { getMailbox, threads } = useAgentInbox();
-	const mailbox = mailboxId ? getMailbox(mailboxId) : undefined;
+	const { mailbox, mailboxId } = useFolderMailbox();
+	const { threads } = useAgentInbox();
 
 	const filteredThreads = useMemo(
 		() =>
@@ -59,9 +59,8 @@ export function AgentFolderPage() {
 }
 
 export function SentFolderPage() {
-	const mailboxId = useMailboxId();
-	const { getMailbox, threads } = useAgentInbox();
-	const mailbox = mailboxId ? getMailbox(mailboxId) : undefined;
+	const { mailbox, mailboxId } = useFolderMailbox();
+	const { threads } = useAgentInbox();
 
 	const filteredThreads = useMemo(
 		() =>
@@ -83,9 +82,8 @@ export function SentFolderPage() {
 }
 
 export function YouFolderPage() {
-	const mailboxId = useMailboxId();
-	const { getMailbox, threads } = useAgentInbox();
-	const mailbox = mailboxId ? getMailbox(mailboxId) : undefined;
+	const { mailbox, mailboxId } = useFolderMailbox();
+	const { threads } = useAgentInbox();
 
 	const filteredThreads = useMemo(
 		() =>
@@ -107,9 +105,8 @@ export function YouFolderPage() {
 }
 
 export function SpamFolderPage() {
-	const mailboxId = useMailboxId();
-	const { getMailbox, threads } = useAgentInbox();
-	const mailbox = mailboxId ? getMailbox(mailboxId) : undefined;
+	const { mailbox, mailboxId } = useFolderMailbox();
+	const { threads } = useAgentInbox();
 
 	const filteredThreads = useMemo(
 		() =>
@@ -134,9 +131,8 @@ export function SpamFolderPage() {
 }
 
 export function ArchiveFolderPage() {
-	const mailboxId = useMailboxId();
-	const { getMailbox, archivedThreads } = useAgentInbox();
-	const mailbox = mailboxId ? getMailbox(mailboxId) : undefined;
+	const { mailbox, mailboxId } = useFolderMailbox();
+	const { archivedThreads } = useAgentInbox();
 
 	const filteredThreads = useMemo(
 		() => archivedThreads.filter((t) => t.mailboxId === mailboxId),
@@ -155,9 +151,8 @@ export function ArchiveFolderPage() {
 }
 
 export function TrashFolderPage() {
-	const mailboxId = useMailboxId();
-	const { getMailbox, trashThreads } = useAgentInbox();
-	const mailbox = mailboxId ? getMailbox(mailboxId) : undefined;
+	const { mailbox, mailboxId } = useFolderMailbox();
+	const { trashThreads } = useAgentInbox();
 
 	if (!mailbox) return null;
 
@@ -169,9 +164,8 @@ export function TrashFolderPage() {
 }
 
 export function NeedsApprovalFolderPage() {
-	const mailboxId = useMailboxId();
-	const { getMailbox, threads } = useAgentInbox();
-	const mailbox = mailboxId ? getMailbox(mailboxId) : undefined;
+	const { mailbox, mailboxId } = useFolderMailbox();
+	const { threads } = useAgentInbox();
 
 	const filteredThreads = useMemo(
 		() =>
@@ -196,11 +190,10 @@ export function NeedsApprovalFolderPage() {
 }
 
 export function LabelFolderPage() {
-	const mailboxId = useMailboxId();
 	const { labelId } = useParams({ strict: false }) as { labelId?: string };
-	const { getMailbox, threads } = useAgentInbox();
+	const { mailbox, mailboxId } = useFolderMailbox();
+	const { threads } = useAgentInbox();
 	const { threadIds } = useLabelThreadIds(labelId ?? "");
-	const mailbox = mailboxId ? getMailbox(mailboxId) : undefined;
 
 	const filteredThreads = useMemo(() => {
 		const assignedIds = new Set(threadIds);
@@ -223,40 +216,59 @@ export function LabelFolderPage() {
 	);
 }
 
-type DraftRow = {
-	id: string;
-	mailboxId: string;
-	to: string[];
-	subject: string;
-	text: string;
-	updatedAt: string;
-};
+function draftKindLabel(kind: string) {
+	switch (kind) {
+		case "reply":
+			return "Reply";
+		case "reply_all":
+			return "Reply all";
+		case "forward":
+			return "Forward";
+		default:
+			return "Compose";
+	}
+}
+
+function draftComposeParam(
+	kind: string,
+): "reply" | "replyAll" | "forward" | null {
+	if (kind === "reply") return "reply";
+	if (kind === "reply_all") return "replyAll";
+	if (kind === "forward") return "forward";
+	return null;
+}
 
 export function DraftsFolderPage() {
-	const mailboxId = useMailboxId();
 	const navigate = useNavigate();
-	const { getMailbox, listComposeDrafts, deleteDraft } = useAgentInbox();
+	const { mailbox, mailboxId } = useFolderMailbox();
+	const { deleteDraft } = useAgentInbox();
 	const { openCompose } = useInboxSidebar();
-	const mailbox = mailboxId ? getMailbox(mailboxId) : undefined;
-	const [drafts, setDrafts] = useState<DraftRow[]>([]);
-	const [loading, setLoading] = useState(true);
-
-	const load = useCallback(async () => {
-		if (!mailboxId) return;
-		setLoading(true);
-		try {
-			const rows = await listComposeDrafts(mailboxId);
-			setDrafts(rows);
-		} finally {
-			setLoading(false);
-		}
-	}, [mailboxId, listComposeDrafts]);
-
-	useEffect(() => {
-		void load();
-	}, [load]);
+	const { drafts, isLoading, refresh } = useComposeDrafts(mailboxId);
 
 	if (!mailbox) return null;
+
+	const openDraft = (d: (typeof drafts)[number]) => {
+		if (!mailboxId) return;
+		const compose = draftComposeParam(d.kind);
+		if (compose && d.threadId) {
+			void navigate({
+				to: "/inbox/$mailboxId",
+				params: { mailboxId },
+				search: {
+					threadId: d.threadId,
+					draftId: d.id,
+					compose,
+				} as never,
+			});
+			return;
+		}
+		void navigate({
+			to: "/inbox/$mailboxId",
+			params: { mailboxId },
+			search: { draftId: d.id } as never,
+		});
+		openCompose();
+	};
 
 	return (
 		<div className="flex h-full min-h-0 flex-1 flex-col rounded-2xl bg-panel-light p-4 shadow-sm md:m-1 dark:bg-panel-dark">
@@ -264,29 +276,19 @@ export function DraftsFolderPage() {
 				<div>
 					<h1 className="font-semibold text-lg text-mail-foreground">Drafts</h1>
 					<p className="text-mail-muted text-sm">
-						Saved compose drafts for {mailbox.email}
+						Saved drafts for {mailbox.email}
 					</p>
 				</div>
-				<button
-					type="button"
-					onClick={openCompose}
-					className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-mail-primary px-3 text-sm text-white"
-				>
-					<Plus className="h-4 w-4" />
-					New
-				</button>
 			</div>
 
-			{loading ? (
-				<div className="flex flex-1 items-center justify-center">
-					<div className="h-4 w-4 animate-spin rounded-full border-2 border-neutral-900 border-t-transparent dark:border-white dark:border-t-transparent" />
-				</div>
+			{isLoading ? (
+				<ListPanelSkeleton className="min-h-0 flex-1 shadow-none" />
 			) : drafts.length === 0 ? (
 				<div className="flex flex-1 flex-col items-center justify-center gap-2 text-center">
 					<FileText className="h-8 w-8 text-mail-muted" />
 					<p className="font-medium text-mail-foreground">No drafts yet</p>
 					<p className="text-mail-muted text-sm">
-						Start composing and drafts autosave every few seconds.
+						Compose and reply drafts autosave every few seconds.
 					</p>
 				</div>
 			) : (
@@ -299,18 +301,16 @@ export function DraftsFolderPage() {
 							<button
 								type="button"
 								className="min-w-0 flex-1 text-left"
-								onClick={() => {
-									void navigate({
-										to: "/inbox/$mailboxId",
-										params: { mailboxId },
-										search: { draftId: d.id } as never,
-									});
-									openCompose();
-								}}
+								onClick={() => openDraft(d)}
 							>
-								<p className="truncate font-medium text-mail-foreground text-sm">
-									{d.subject || "(No subject)"}
-								</p>
+								<div className="mb-0.5 flex items-center gap-2">
+									<span className="rounded-md bg-[var(--inbox-muted-bg)] px-1.5 py-0.5 font-medium text-[10px] text-mail-muted uppercase tracking-wide">
+										{draftKindLabel(d.kind)}
+									</span>
+									<p className="truncate font-medium text-mail-foreground text-sm">
+										{d.subject || "(No subject)"}
+									</p>
+								</div>
 								<p className="truncate text-mail-muted text-xs">
 									{d.to?.length ? `To: ${d.to.join(", ")}` : "No recipients"}
 									{d.text ? ` — ${d.text.slice(0, 80)}` : ""}
@@ -328,7 +328,7 @@ export function DraftsFolderPage() {
 									void deleteDraft(d.id)
 										.then(() => {
 											toast.success("Draft deleted");
-											void load();
+											void refresh();
 										})
 										.catch(() => toast.error("Failed to delete draft"));
 								}}

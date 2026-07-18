@@ -5,7 +5,7 @@ import { User } from "lucide-react";
 import { forwardRef, type ReactNode } from "react";
 import { parseEmail } from "#/features/agent-inbox/lib/email-address";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
-import type { InboundThread } from "../types";
+import type { InboundThread } from "../../types";
 import { useInboxMail } from "./use-inbox-mail";
 
 function formatRecipientLabel(addresses: string[] | undefined): string {

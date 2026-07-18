@@ -18,6 +18,26 @@ const draftAttachmentSchema = t.Object({
 	size: t.Optional(t.String()),
 });
 
+const draftKindSchema = t.Union([
+	t.Literal("compose"),
+	t.Literal("reply"),
+	t.Literal("reply_all"),
+	t.Literal("forward"),
+]);
+
+const draftBodyFields = {
+	to: t.Optional(t.Array(t.String())),
+	cc: t.Optional(t.Array(t.String())),
+	bcc: t.Optional(t.Array(t.String())),
+	subject: t.Optional(t.String()),
+	html: t.Optional(t.String()),
+	text: t.Optional(t.String()),
+	attachments: t.Optional(t.Array(draftAttachmentSchema)),
+	kind: t.Optional(draftKindSchema),
+	threadId: t.Optional(t.Union([t.String(), t.Null()])),
+	inReplyToMessageId: t.Optional(t.Union([t.String(), t.Null()])),
+};
+
 export const draftsRoutes = new Elysia({
 	prefix: "/v1/drafts",
 	name: "DraftsRoutes",
@@ -26,12 +46,18 @@ export const draftsRoutes = new Elysia({
 	.get(
 		"/",
 		async ({ query, organizationId }) => {
-			return listDraftsController(organizationId, query.mailboxId);
+			return listDraftsController(organizationId, {
+				mailboxId: query.mailboxId,
+				threadId: query.threadId,
+				kind: query.kind,
+			});
 		},
 		{
 			auth: true,
 			query: t.Object({
 				mailboxId: t.Optional(t.String()),
+				threadId: t.Optional(t.String()),
+				kind: t.Optional(draftKindSchema),
 			}),
 			response: {
 				200: MailModel.draftListResponse,
@@ -76,13 +102,7 @@ export const draftsRoutes = new Elysia({
 			auth: true,
 			body: t.Object({
 				mailboxId: t.String(),
-				to: t.Optional(t.Array(t.String())),
-				cc: t.Optional(t.Array(t.String())),
-				bcc: t.Optional(t.Array(t.String())),
-				subject: t.Optional(t.String()),
-				html: t.Optional(t.String()),
-				text: t.Optional(t.String()),
-				attachments: t.Optional(t.Array(draftAttachmentSchema)),
+				...draftBodyFields,
 			}),
 			response: {
 				200: MailModel.draftItem,
@@ -107,13 +127,7 @@ export const draftsRoutes = new Elysia({
 			params: t.Object({ id: t.String() }),
 			body: t.Object({
 				mailboxId: t.Optional(t.String()),
-				to: t.Optional(t.Array(t.String())),
-				cc: t.Optional(t.Array(t.String())),
-				bcc: t.Optional(t.Array(t.String())),
-				subject: t.Optional(t.String()),
-				html: t.Optional(t.String()),
-				text: t.Optional(t.String()),
-				attachments: t.Optional(t.Array(draftAttachmentSchema)),
+				...draftBodyFields,
 			}),
 			response: {
 				200: MailModel.draftItem,

@@ -34,6 +34,8 @@
 	--inbox-active: var(--inbox-hover);
 	--inbox-menu: var(--bg-white-0);
 	--inbox-muted-bg: var(--bg-weak-50);
+	/* Contrasts on both sidebar (weak-50) and panel (white) — muted-bg does not. */
+	--inbox-skeleton: var(--bg-soft-200);
 	--inbox-danger-bg: #fff1f2;
 	--inbox-danger-border: #fecdd3;
 	--inbox-danger-fg: #e11d48;
@@ -65,6 +67,8 @@
 	--inbox-active: var(--inbox-hover);
 	--inbox-menu: #0a0a0a;
 	--inbox-muted-bg: rgba(255, 255, 255, 0.03);
+	/* Visible on black sidebar and near-black panel surfaces. */
+	--inbox-skeleton: rgba(255, 255, 255, 0.1);
 	--inbox-danger-bg: #411d23;
 	--inbox-danger-border: #6e2532;
 	--inbox-danger-fg: #f43f5e;

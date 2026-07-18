@@ -13,7 +13,7 @@ type ApiLabel = {
 };
 
 export const useInboxLabels = (mailboxId: string) => {
-	const { data, mutate, isLoading } = useSWR<ApiLabel[]>(
+	const { data, mutate, isLoading, error } = useSWR<ApiLabel[]>(
 		mailboxId ? `/api/inbox/v1/labels?mailboxId=${mailboxId}` : null,
 	);
 
@@ -107,10 +107,18 @@ export const useInboxLabels = (mailboxId: string) => {
 
 	const getLabelCount = useCallback((_labelId: string) => 0, []);
 
+	const labelsError =
+		error instanceof Error
+			? error
+			: error
+				? new Error("Failed to load labels")
+				: null;
+
 	return useMemo(
 		() => ({
 			labels,
 			isLoading,
+			labelsError,
 			addLabel,
 			deleteLabel,
 			getLabelCount,
@@ -123,6 +131,7 @@ export const useInboxLabels = (mailboxId: string) => {
 		[
 			labels,
 			isLoading,
+			labelsError,
 			addLabel,
 			deleteLabel,
 			getLabelCount,

@@ -1,5 +1,5 @@
 import { Mail } from "lucide-react";
-import { AiSidebarToggle } from "./ai-sidebar";
+import { AiSidebarToggle } from "../ai-sidebar";
 import { InboxEmptyStateIcon } from "./inbox-empty-state-icon";
 import { InboxListEmptyIcon } from "./inbox-list-empty-icon";
 

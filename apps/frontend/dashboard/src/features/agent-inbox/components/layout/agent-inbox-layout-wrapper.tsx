@@ -1,4 +1,4 @@
-import { InboxSidebar } from "#/features/agent-inbox/components/inbox-sidebar";
+import { InboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
 
 export const AgentInboxLayoutWrapper = ({

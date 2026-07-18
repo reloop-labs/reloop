@@ -6,6 +6,8 @@ import { useMemo } from "react";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
+import { SectionError } from "../shared/section-error";
+import { MailboxRailSkeleton } from "./mailbox-rail-skeleton";
 
 function mailboxSortKey(m: AgentMailbox) {
 	return (m.label || m.email).toLocaleLowerCase();
@@ -83,14 +85,19 @@ const RailMailboxAvatar = ({
 };
 
 export function MailboxRail({
-	mailbox,
+	activeMailboxId,
 	onAddMailbox,
 }: {
-	mailbox: AgentMailbox;
+	activeMailboxId: string;
 	onAddMailbox: () => void;
 }) {
 	const navigate = useNavigate();
-	const { mailboxes } = useAgentInbox();
+	const {
+		mailboxes,
+		isLoadingMailboxes,
+		mailboxesError,
+		retryMailboxes,
+	} = useAgentInbox();
 
 	const sortedMailboxes = useMemo(
 		() =>
@@ -101,7 +108,7 @@ export function MailboxRail({
 	);
 
 	const switchMailbox = (id: string) => {
-		if (id === mailbox.id) return;
+		if (id === activeMailboxId) return;
 		void navigate({ to: "/inbox/$mailboxId", params: { mailboxId: id } });
 	};
 
@@ -120,22 +127,35 @@ export function MailboxRail({
 			</Link>
 
 			<div className="scrollbar-hide flex min-h-0 w-full flex-1 flex-col items-center gap-2 overflow-x-hidden overflow-y-auto pt-0.5">
-				{sortedMailboxes.map((m) => (
-					<RailMailboxAvatar
-						key={m.id}
-						mailbox={m}
-						active={m.id === mailbox.id}
-						onClick={() => switchMailbox(m.id)}
+				{mailboxesError ? (
+					<SectionError
+						compact
+						message="Failed to load"
+						onRetry={() => void retryMailboxes()}
+						className="px-1"
 					/>
-				))}
-				<button
-					type="button"
-					onClick={onAddMailbox}
-					className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-[#929292]/50 border-dashed bg-transparent text-[#929292] hover:bg-[var(--inbox-hover)] hover:text-mail-foreground focus:outline-none active:scale-[0.97]"
-					aria-label="Add mailbox"
-				>
-					<Plus className="size-4" />
-				</button>
+				) : isLoadingMailboxes && sortedMailboxes.length === 0 ? (
+					<MailboxRailSkeleton />
+				) : (
+					<>
+						{sortedMailboxes.map((m) => (
+							<RailMailboxAvatar
+								key={m.id}
+								mailbox={m}
+								active={m.id === activeMailboxId}
+								onClick={() => switchMailbox(m.id)}
+							/>
+						))}
+						<button
+							type="button"
+							onClick={onAddMailbox}
+							className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-[#929292]/50 border-dashed bg-transparent text-[#929292] hover:bg-[var(--inbox-hover)] hover:text-mail-foreground focus:outline-none active:scale-[0.97]"
+							aria-label="Add mailbox"
+						>
+							<Plus className="size-4" />
+						</button>
+					</>
+				)}
 			</div>
 		</nav>
 	);

@@ -10,28 +10,30 @@ import {
 	AiSidebar,
 	useAiSidebar,
 } from "#/features/agent-inbox/components/ai-sidebar";
-import { InboxCategoryNavbar } from "#/features/agent-inbox/components/inbox-category-navbar";
+import { InboxCategoryNavbar } from "#/features/agent-inbox/components/mail-list/inbox-category-navbar";
 import {
 	applyInboxFilters,
 	InboxCommandPalette,
 	InboxSearchTrigger,
 	useInboxActiveFilterCount,
-} from "#/features/agent-inbox/components/inbox-command-palette";
-import { InboxEmptyState } from "#/features/agent-inbox/components/inbox-empty-state";
-import { useInboxSidebar } from "#/features/agent-inbox/components/inbox-sidebar-context";
-import { InboxSidebarToggle } from "#/features/agent-inbox/components/inbox-sidebar-toggle";
-import { MailDisplaySkeleton } from "#/features/agent-inbox/components/mail-skeleton";
-import { ThreadDetail } from "#/features/agent-inbox/components/thread-detail";
+} from "#/features/agent-inbox/components/mail-list/inbox-command-palette";
+import { InboxEmptyState } from "#/features/agent-inbox/components/mail-list/inbox-empty-state";
+import { useInboxSidebar } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-context";
+import { InboxSidebarToggle } from "#/features/agent-inbox/components/sidebar/inbox-sidebar-toggle";
 import {
 	ThreadList,
 	useInboxNavigation,
-} from "#/features/agent-inbox/components/thread-list";
+} from "#/features/agent-inbox/components/mail-list/thread-list";
+import { LoadingDot } from "#/features/agent-inbox/components/shared/loading-dot";
+import { SectionError } from "#/features/agent-inbox/components/shared/section-error";
+import { ThreadDetail } from "#/features/agent-inbox/components/thread-detail";
+import { DetailPanelSkeleton } from "#/features/agent-inbox/components/thread-detail/detail-panel-skeleton";
 import {
 	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "#/features/agent-inbox/components/ui/resizable";
-import { useInboxMail } from "#/features/agent-inbox/components/use-inbox-mail";
+import { useInboxMail } from "#/features/agent-inbox/components/mail-list/use-inbox-mail";
 import { useInboxUndo } from "#/features/agent-inbox/hooks/use-inbox-undo";
 import type {
 	AgentMailbox,
@@ -75,8 +77,17 @@ export const AgentInboxContent = ({
 	folder: string;
 	threads: InboundThread[];
 }) => {
-	const { markMessageRead, batchThreads, refresh, isLoadingThreads } =
-		useAgentInbox();
+	const {
+		markMessageRead,
+		batchThreads,
+		refresh,
+		isLoadingThreads,
+		isLoadingMailboxes,
+		getMailbox,
+		threadsError,
+		retryThreads,
+	} = useAgentInbox();
+	const mailboxReady = !!getMailbox(mailbox.id) && !!mailbox.email;
 	const { toggleSidebar, openCompose } = useInboxSidebar();
 	const { open: aiOpen, setOpen: setAiOpen, toggle: toggleAi } = useAiSidebar();
 	const { pushBatchUndo, undo } = useInboxUndo();
@@ -136,6 +147,12 @@ export const AgentInboxContent = ({
 		activeView,
 		showCategoryNavbar,
 	]);
+
+	/** Row skeleton until mailbox metadata + first thread fetch settle. */
+	const listLoading =
+		(isLoadingThreads || !mailboxReady || isLoadingMailboxes) &&
+		filteredThreads.length === 0 &&
+		!threadsError;
 
 	const selectedThread = useMemo(() => {
 		if (!selectedThreadId) return null;
@@ -365,10 +382,18 @@ export const AgentInboxContent = ({
 			showBack={!isDesktop}
 			onToggleAi={toggleAi}
 		/>
-	) : selectedThreadId && isLoadingThreads ? (
+	) : isLoadingThreads && filteredThreads.length === 0 ? (
+		<DetailPanelSkeleton />
+	) : selectedThreadId && threadsError ? (
 		<div className="flex h-full min-h-0 flex-col rounded-xl bg-panel-light dark:bg-panel-dark">
-			<MailDisplaySkeleton />
+			<SectionError
+				message="Couldn't load this conversation"
+				onRetry={() => void retryThreads()}
+				className="flex-1"
+			/>
 		</div>
+	) : selectedThreadId && isLoadingThreads ? (
+		<DetailPanelSkeleton />
 	) : (
 		<InboxEmptyState onCompose={openCompose} onOpenAi={toggleAi} />
 	);
@@ -413,13 +438,18 @@ export const AgentInboxContent = ({
 											className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-[var(--inbox-hover)] disabled:opacity-50"
 											aria-label="Refresh"
 										>
-											<Icon
-												name="refresh-cw"
-												className={cn(
-													"h-4 w-4 text-mail-muted",
-													isRefreshing && "animate-spin",
-												)}
-											/>
+											{isRefreshing ? (
+												<LoadingDot
+													label="Refreshing"
+													className="text-mail-muted"
+													style={{ fontSize: 12 }}
+												/>
+											) : (
+												<Icon
+													name="refresh-cw"
+													className="h-4 w-4 text-mail-muted"
+												/>
+											)}
 										</button>
 									) : (
 										<div className="flex items-center gap-1">
@@ -558,42 +588,50 @@ export const AgentInboxContent = ({
 								ref={listContainerRef}
 								className="relative z-1 flex min-h-0 flex-1 flex-col overflow-hidden"
 							>
-								<ThreadList
-									threads={filteredThreads}
-									mailboxId={mailbox.id}
-									folder={folder}
-									sectionLabel={
-										showCategoryNavbar
-											? activeView === "primary"
-												? "Primary"
-												: activeView === "alerts"
-													? "Alerts"
-													: activeView === "person"
-														? "Person"
-														: "Tag"
-											: folderTitle
-									}
-									selectedId={selectedThreadId}
-									onSelect={handleSelectThread}
-									isLoading={isLoadingThreads}
-									hasFilters={
-										searchQuery !== "" ||
-										activeFilterCount > 0 ||
-										(showCategoryNavbar && activeView !== "primary")
-									}
-									onClearFilters={() => {
-										setSearchQuery(null);
-										setFilterParam(null);
-										void setViewParam(null);
-										resetNavigation();
-									}}
-									focusedIndex={focusedIndex}
-									onMouseEnterRow={handleMouseEnter}
-									searchQuery={searchQuery}
-									onReply={(t) => openThreadComposer(t, "reply")}
-									onReplyAll={(t) => openThreadComposer(t, "replyAll")}
-									onForward={(t) => openThreadComposer(t, "forward")}
-								/>
+								{threadsError && filteredThreads.length === 0 ? (
+									<SectionError
+										message="Couldn't load messages"
+										onRetry={() => void retryThreads()}
+										className="flex-1"
+									/>
+								) : (
+									<ThreadList
+										threads={filteredThreads}
+										mailboxId={mailbox.id}
+										folder={folder}
+										sectionLabel={
+											showCategoryNavbar
+												? activeView === "primary"
+													? "Primary"
+													: activeView === "alerts"
+														? "Alerts"
+														: activeView === "person"
+															? "Person"
+															: "Tag"
+												: folderTitle
+										}
+										selectedId={selectedThreadId}
+										onSelect={handleSelectThread}
+										isLoading={listLoading}
+										hasFilters={
+											searchQuery !== "" ||
+											activeFilterCount > 0 ||
+											(showCategoryNavbar && activeView !== "primary")
+										}
+										onClearFilters={() => {
+											setSearchQuery(null);
+											setFilterParam(null);
+											void setViewParam(null);
+											resetNavigation();
+										}}
+										focusedIndex={focusedIndex}
+										onMouseEnterRow={handleMouseEnter}
+										searchQuery={searchQuery}
+										onReply={(t) => openThreadComposer(t, "reply")}
+										onReplyAll={(t) => openThreadComposer(t, "replyAll")}
+										onForward={(t) => openThreadComposer(t, "forward")}
+									/>
+								)}
 							</div>
 						</div>
 					</ResizablePanel>

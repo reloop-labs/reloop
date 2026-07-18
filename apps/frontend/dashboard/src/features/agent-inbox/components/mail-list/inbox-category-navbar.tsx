@@ -1,8 +1,8 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { User } from "lucide-react";
-import type { InboxView } from "../types";
-import { INBOX_VIEWS } from "../types";
+import type { InboxView } from "../../types";
+import { INBOX_VIEWS } from "../../types";
 
 const ACTIVE_STYLES = {
 	primary: {
