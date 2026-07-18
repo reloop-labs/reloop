@@ -26,14 +26,9 @@ export function AnimatedHoverBackground({
 						isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10",
 						className,
 					)}
-					initial={{
-						pointerEvents: "none",
-						width: rect.width,
-						height: rect.height,
-						left,
-						top,
-						opacity: 0,
-					}}
+					// Avoid opacity 0→1 on every remount/remeasure — that flash
+					// showed up as sidebar text flicker when inbox data refreshed.
+					initial={false}
 					animate={{
 						pointerEvents: "none",
 						width: rect.width,

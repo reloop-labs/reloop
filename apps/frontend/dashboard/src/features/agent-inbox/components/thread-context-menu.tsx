@@ -1,5 +1,6 @@
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import { useInboxLabels } from "#/features/agent-inbox/hooks/use-inbox-labels";
+import { resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
 import type { InboundThread } from "#/features/agent-inbox/types";
 import * as ContextMenu from "@reloop/ui/context-menu";
 import { Icon } from "@reloop/ui/icon";
@@ -278,8 +279,7 @@ export const ThreadContextMenu = ({
 										<span
 											className="h-2 w-2 shrink-0 rounded-full"
 											style={{
-												backgroundColor:
-													label.color === "default" ? "#9B9B9B" : label.color,
+												backgroundColor: resolveLabelColor(label.color),
 											}}
 										/>
 										{label.name}

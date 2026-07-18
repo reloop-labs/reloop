@@ -17,6 +17,7 @@ import { useInboxSidebar } from "#/features/agent-inbox/components/inbox-sidebar
 import { MailboxRail } from "#/features/agent-inbox/components/mailbox-rail";
 import { useInboxFolderStats } from "#/features/agent-inbox/hooks/use-inbox-folder-stats";
 import { useInboxLabels } from "#/features/agent-inbox/hooks/use-inbox-labels";
+import { resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
@@ -42,10 +43,6 @@ const AlertIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
 
 const AgentIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
 	<Icon name="agent" {...props} />
-);
-
-const TagIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
-	<Icon name="tag" {...props} />
 );
 
 const TrashIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
@@ -85,7 +82,7 @@ const NavLink = ({
 	onPointerEnter?: () => void;
 }) => {
 	const className = cn(
-		"group relative z-10 flex h-8 w-full items-center rounded-lg px-2.5 font-medium text-[13px] transition-colors",
+		"group relative z-10 flex h-8 w-full items-center rounded-lg px-2.5 font-medium text-[13px]",
 		active && "text-mail-foreground",
 		!active && "text-mail-muted",
 		collapsed ? "justify-center" : "gap-2.5",
@@ -95,7 +92,7 @@ const NavLink = ({
 		<>
 			<item.icon
 				className={cn(
-					"h-3.5 w-3.5 shrink-0 transition-all duration-200",
+					"h-3.5 w-3.5 shrink-0",
 					active
 						? "text-mail-foreground"
 						: "text-mail-muted opacity-70 group-hover:text-mail-foreground group-hover:opacity-100",
@@ -220,12 +217,27 @@ export const InboxSidebar = ({
 	const currentEl = hoveredEl ?? activeEl;
 
 	useLayoutEffect(() => {
-		if (currentEl) {
-			setRect(currentEl.getBoundingClientRect());
-		} else {
+		if (!currentEl) {
 			setRect(undefined);
+			return;
 		}
-	}, [currentEl, folder, labels, stats]);
+		const next = currentEl.getBoundingClientRect();
+		setRect((prev) => {
+			if (
+				prev &&
+				prev.top === next.top &&
+				prev.left === next.left &&
+				prev.width === next.width &&
+				prev.height === next.height
+			) {
+				return prev;
+			}
+			return next;
+		});
+		// Remeasure only when the active/hovered element or folder changes —
+		// not when folder counts update after mark-as-read (that was causing
+		// the hover pill to re-spring and flicker sidebar text).
+	}, [currentEl, folder]);
 
 	useEffect(() => {
 		registerOpenCompose(() => setIsComposeOpen(true));
@@ -403,53 +415,61 @@ export const InboxSidebar = ({
 									<button
 										type="button"
 										onClick={() => setIsLabelDialogOpen(true)}
-										className="mr-1 flex h-4 w-4 items-center justify-center hover:bg-transparent"
+										className="flex size-5 items-center justify-center rounded-md text-text-soft-400 hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
 										aria-label="Create label"
 									>
-										<Plus className="h-3.5 w-3.5 text-text-soft-400 hover:text-text-strong-950" />
+										<Plus className="h-3.5 w-3.5" />
 									</button>
 								</div>
 								<div className="flex flex-col">
-									{labels.map((label) => {
-										const labelKey = `label:${label.id}`;
-										const active = activeLabelId === label.id;
-										return (
-											<Link
-												key={label.id}
-												to="/inbox/$mailboxId/label/$labelId"
-												params={{ mailboxId, labelId: label.id }}
-												ref={(el) => {
-													if (el) navRefs.current[labelKey] = el;
-												}}
-												onPointerEnter={() =>
-													setHoveredEl(navRefs.current[labelKey])
-												}
-												className={cn(
-													"group relative z-10 flex h-8 w-full items-center gap-2.5 rounded-lg px-2.5 font-medium text-[13px] transition-colors",
-													active ? "text-mail-foreground" : "text-mail-muted",
-												)}
-											>
-												<TagIcon
-													className={cn(
-														"h-3.5 w-3.5 shrink-0 transition-all duration-200",
-														label.color === "default" &&
-															(active
-																? "text-mail-foreground"
-																: "text-mail-muted opacity-70 group-hover:text-mail-foreground group-hover:opacity-100"),
-													)}
-													style={{
-														color:
-															label.color === "default"
-																? undefined
-																: label.color,
+									{labels.length === 0 ? (
+										<button
+											type="button"
+											onClick={() => setIsLabelDialogOpen(true)}
+											className="group relative z-10 mx-0.5 flex flex-col items-start gap-0.5 rounded-lg px-2.5 py-2.5 text-left hover:bg-[var(--inbox-hover)]"
+										>
+											<span className="font-medium text-[12px] text-mail-muted group-hover:text-mail-foreground">
+												No labels yet
+											</span>
+											<span className="text-[11px] text-text-soft-400">
+												Create one to organize mail
+											</span>
+										</button>
+									) : (
+										labels.map((label) => {
+											const labelKey = `label:${label.id}`;
+											const active = activeLabelId === label.id;
+											const swatch = resolveLabelColor(label.color);
+											return (
+												<Link
+													key={label.id}
+													to="/inbox/$mailboxId/label/$labelId"
+													params={{ mailboxId, labelId: label.id }}
+													ref={(el) => {
+														if (el) navRefs.current[labelKey] = el;
 													}}
-												/>
-												<span className="relative bottom-px mt-0.5 min-w-0 flex-1 truncate">
-													{label.name}
-												</span>
-											</Link>
-										);
-									})}
+													onPointerEnter={() =>
+														setHoveredEl(navRefs.current[labelKey])
+													}
+													className={cn(
+														"group relative z-10 flex h-8 w-full items-center gap-2.5 rounded-lg px-2.5 font-medium text-[13px]",
+														active
+															? "text-mail-foreground"
+															: "text-mail-muted",
+													)}
+												>
+													<span
+														className="size-2.5 shrink-0 rounded-full ring-1 ring-black/5 dark:ring-white/10"
+														style={{ backgroundColor: swatch }}
+														aria-hidden
+													/>
+													<span className="relative bottom-px mt-0.5 min-w-0 flex-1 truncate">
+														{label.name}
+													</span>
+												</Link>
+											);
+										})
+									)}
 								</div>
 							</div>
 						)}
@@ -485,8 +505,8 @@ export const InboxSidebar = ({
 			<InboxLabelDialog
 				open={isLabelDialogOpen}
 				onOpenChange={setIsLabelDialogOpen}
-				onSubmit={async (name) => {
-					const id = await addLabel(name);
+				onSubmit={async (name, color) => {
+					const id = await addLabel(name, color);
 					if (id) {
 						toast.success(`Label "${name}" created`);
 						void navigate({
@@ -495,6 +515,7 @@ export const InboxSidebar = ({
 						});
 					} else {
 						toast.error("Failed to create label");
+						throw new Error("Failed to create label");
 					}
 				}}
 			/>

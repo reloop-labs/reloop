@@ -96,7 +96,7 @@ export function MailboxRail({
 				to="/"
 				title="Back to dashboard"
 				aria-label="Back to dashboard"
-				className="mb-3 flex size-8 shrink-0 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
+				className="mb-3 flex size-8 shrink-0 items-center justify-center rounded-lg text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
 			>
 				<Icon name="arrow-left" className="h-4 w-4" />
 			</Link>
@@ -113,7 +113,7 @@ export function MailboxRail({
 				<button
 					type="button"
 					onClick={onAddMailbox}
-					className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-[#929292]/50 border-dashed bg-transparent text-[#929292] transition duration-200 ease-out hover:bg-[var(--inbox-hover)] hover:text-mail-foreground focus:outline-none active:scale-[0.97]"
+					className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-[#929292]/50 border-dashed bg-transparent text-[#929292] hover:bg-[var(--inbox-hover)] hover:text-mail-foreground focus:outline-none active:scale-[0.97]"
 					aria-label="Add mailbox"
 				>
 					<Plus className="size-4" />
