@@ -1,6 +1,64 @@
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { useTheme } from "next-themes";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { type EmailTheme, processEmailHtmlForDisplay } from "./email-html";
+
+function ImagePrivacyBanner({
+	showing,
+	onToggle,
+}: {
+	showing: boolean;
+	onToggle: () => void;
+}) {
+	return (
+		<div
+			className={cn(
+				"mb-3 flex items-center gap-2.5 rounded-xl px-3 py-2",
+				"border border-mail-border/40 bg-[var(--inbox-muted-bg)]",
+				"animate-in fade-in-0 slide-in-from-top-1 duration-200",
+			)}
+		>
+			<span
+				className={cn(
+					"inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
+					showing
+						? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+						: "bg-[var(--inbox-control)] text-mail-muted",
+				)}
+			>
+				<Icon
+					name={showing ? "image-upload" : "shield"}
+					className="h-3.5 w-3.5"
+				/>
+			</span>
+			<div className="min-w-0 flex-1">
+				<p className="font-medium text-[12px] text-mail-foreground leading-snug">
+					{showing ? "Images are visible" : "Images blocked for privacy"}
+				</p>
+				<p className="mt-0.5 text-[11px] text-mail-muted leading-snug">
+					{showing
+						? "Remote images in this message can load now."
+						: "Remote images stay hidden until you choose to load them."}
+				</p>
+			</div>
+			<button
+				type="button"
+				onClick={onToggle}
+				className={cn(
+					"inline-flex h-7 shrink-0 items-center rounded-lg px-2.5",
+					"font-medium text-[12px] transition-[transform,background-color,color] duration-150 ease-out",
+					"active:scale-[0.97]",
+					showing
+						? "bg-[var(--inbox-control)] text-mail-muted hover:bg-[var(--inbox-control-hover)] hover:text-mail-foreground"
+						: "bg-mail-primary text-panel-light hover:opacity-90 dark:text-black",
+				)}
+			>
+				{showing ? "Hide" : "Show images"}
+			</button>
+		</div>
+	);
+}
 
 const LANGUAGE_NAMES: Record<string, string> = {
 	es: "Spanish",
@@ -137,29 +195,11 @@ export const MessageBody = ({
 						Translation
 					</div>
 				)}
-				{hasBlockedImages && !showImages && (
-					<div className="mb-2 flex items-center justify-start bg-amber-600/20 px-2 py-1 text-amber-600 text-sm">
-						<p>Images in this message have been blocked.</p>
-						<button
-							type="button"
-							onClick={() => setShowImages(true)}
-							className="ml-2 cursor-pointer underline"
-						>
-							Show images
-						</button>
-					</div>
-				)}
-				{hasBlockedImages && showImages && (
-					<div className="mb-2 flex items-center justify-start bg-amber-600/20 px-2 py-1 text-amber-600 text-sm">
-						<p>Images are visible for this message.</p>
-						<button
-							type="button"
-							onClick={() => setShowImages(false)}
-							className="ml-2 cursor-pointer underline"
-						>
-							Hide images
-						</button>
-					</div>
+				{hasBlockedImages && (
+					<ImagePrivacyBanner
+						showing={showImages}
+						onToggle={() => setShowImages((v) => !v)}
+					/>
 				)}
 				<div
 					ref={hostRef}
