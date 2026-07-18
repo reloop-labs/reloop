@@ -13,31 +13,31 @@
 	font-family: var(--font-geist-sans, var(--font-sans));
 
 	/* Light mode (default) — mirrors Zero panelLight surfaces */
-	--sidebar-background: hsl(0 0% 96%);
-	--mail-background: hsl(0 0% 100%);
-	--mail-foreground: hsl(240 10% 3.9%);
-	--mail-muted: hsl(240 3.8% 46.1%);
-	--mail-border: hsl(240 5.9% 90%);
-	--mail-primary: hsl(240 5.9% 10%);
-	--mail-accent: hsl(240 4.8% 95.9%);
-	--panel-light: #ffffff;
-	--panel-dark: #fafafa;
-	--offset-light: #f5f5f5;
-	--offset-dark: #ebebeb;
+	--sidebar-background: var(--bg-weak-50);
+	--mail-background: var(--bg-white-0);
+	--mail-foreground: var(--text-strong-950);
+	--mail-muted: var(--text-sub-600);
+	--mail-border: var(--stroke-soft-100);
+	--mail-primary: var(--text-strong-950);
+	--mail-accent: var(--bg-weak-50);
+	--panel-light: var(--bg-white-0);
+	--panel-dark: var(--bg-weak-50);
+	--offset-light: var(--bg-weak-50);
+	--offset-dark: var(--bg-soft-200);
 	--zero-blue: #006ffe;
 	--zero-blue-hover: #0056cc;
 
 	/* Semantic controls (theme-aware replacements for hardcoded hex) */
-	--inbox-control: #e8e8e8;
-	--inbox-control-hover: #dcdcdc;
-	--inbox-hover: #eaeaea;
+	--inbox-control: var(--bg-weak-50);
+	--inbox-control-hover: var(--bg-soft-200);
+	--inbox-hover: var(--bg-weak-50);
 	--inbox-active: var(--inbox-hover);
-	--inbox-menu: #ffffff;
-	--inbox-muted-bg: #f4f4f5;
+	--inbox-menu: var(--bg-white-0);
+	--inbox-muted-bg: var(--bg-weak-50);
 	--inbox-danger-bg: #fff1f2;
 	--inbox-danger-border: #fecdd3;
 	--inbox-danger-fg: #e11d48;
-	--inbox-compose-bar: #f4f6f0;
+	--inbox-compose-bar: var(--bg-weak-50);
 
 	background-color: var(--sidebar-background);
 	color: var(--mail-foreground);
@@ -45,30 +45,30 @@
 }
 
 .inbox-zero-theme.dark {
-	--sidebar-background: hsl(240 3.9% 7%);
-	--mail-background: hsl(240 3.9% 7%);
-	--mail-foreground: hsl(0 0% 98%);
-	--mail-muted: hsl(240 5% 64.9%);
-	--mail-border: hsl(240 3.7% 20%);
-	--mail-primary: hsl(0 0% 98%);
-	--mail-accent: hsl(240 3.7% 15.9%);
-	--panel-light: #ffffff;
-	--panel-dark: #1a1a1a;
-	--offset-light: #f5f5f5;
-	--offset-dark: #0a0a0a;
+	--sidebar-background: #000000;
+	--mail-background: #0a0a0a;
+	--mail-foreground: var(--text-strong-950);
+	--mail-muted: var(--text-sub-600);
+	--mail-border: var(--stroke-soft-100);
+	--mail-primary: var(--text-strong-950);
+	--mail-accent: rgba(255, 255, 255, 0.04);
+	--panel-light: rgba(255, 255, 255, 0.02);
+	--panel-dark: #0a0a0a;
+	--offset-light: rgba(255, 255, 255, 0.02);
+	--offset-dark: #000000;
 	--zero-blue: #006ffe;
 	--zero-blue-hover: #0056cc;
 
-	--inbox-control: #313131;
-	--inbox-control-hover: #404040;
-	--inbox-hover: #202020;
+	--inbox-control: rgba(255, 255, 255, 0.04);
+	--inbox-control-hover: rgba(255, 255, 255, 0.08);
+	--inbox-hover: rgba(255, 255, 255, 0.04);
 	--inbox-active: var(--inbox-hover);
-	--inbox-menu: #131313;
-	--inbox-muted-bg: #262626;
+	--inbox-menu: #0a0a0a;
+	--inbox-muted-bg: rgba(255, 255, 255, 0.03);
 	--inbox-danger-bg: #411d23;
 	--inbox-danger-border: #6e2532;
 	--inbox-danger-fg: #f43f5e;
-	--inbox-compose-bar: #171b13;
+	--inbox-compose-bar: rgba(255, 255, 255, 0.02);
 
 	color-scheme: dark;
 }

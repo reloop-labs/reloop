@@ -1,3 +1,13 @@
+import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
+import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Plus } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+import { toast } from "sonner";
 import { AddAgentAddressModal } from "#/features/agent-inbox/components/add-agent-address-modal";
 import { ComposeModal } from "#/features/agent-inbox/components/compose-modal";
 import { InboxLabelDialog } from "#/features/agent-inbox/components/inbox-label-dialog";
@@ -6,17 +16,7 @@ import { useInboxSidebar } from "#/features/agent-inbox/components/inbox-sidebar
 import { useInboxFolderStats } from "#/features/agent-inbox/hooks/use-inbox-folder-stats";
 import { useInboxLabels } from "#/features/agent-inbox/hooks/use-inbox-labels";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
-import { cn } from "@reloop/ui/cn";
-import * as FancyButton from "@reloop/ui/fancy-button";
-import { Icon } from "@reloop/ui/icon";
-import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
-import { Plus } from "lucide-react";
-import { Link } from "@tanstack/react-router";
-import { useNavigate } from "@tanstack/react-router";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
-import { toast } from "sonner";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
 const InboxIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
 	<Icon name="inbox" {...props} />
@@ -72,22 +72,33 @@ const NavLink = ({
 	active,
 	count,
 	collapsed,
+	refCallback,
+	onPointerEnter,
 }: {
 	item: NavItem;
 	active: boolean;
 	count?: number;
 	collapsed: boolean;
+	refCallback?: (el: HTMLAnchorElement | null) => void;
+	onPointerEnter?: () => void;
 }) => {
 	const className = cn(
-		"flex w-full items-center rounded-lg px-2 py-1.5 text-[13px] transition-colors hover:bg-[var(--inbox-hover)]",
-		active && "bg-[var(--inbox-active)] font-medium text-mail-foreground",
+		"group relative z-10 flex h-8 w-full items-center rounded-lg px-2.5 font-medium text-[13px] transition-colors",
+		active && "text-mail-foreground",
 		!active && "text-mail-muted",
-		collapsed ? "justify-center" : "gap-2",
+		collapsed ? "justify-center" : "gap-2.5",
 	);
 
 	const content = (
 		<>
-			<item.icon className="h-3.5 w-3.5 shrink-0" />
+			<item.icon
+				className={cn(
+					"h-3.5 w-3.5 shrink-0 transition-all duration-200",
+					active
+						? "text-mail-foreground"
+						: "text-mail-muted opacity-70 group-hover:text-mail-foreground group-hover:opacity-100",
+				)}
+			/>
 			{!collapsed && (
 				<>
 					<span className="relative bottom-px mt-0.5 min-w-0 flex-1 truncate text-left">
@@ -106,6 +117,8 @@ const NavLink = ({
 	if (item.external && item.href) {
 		return (
 			<a
+				ref={refCallback}
+				onPointerEnter={onPointerEnter}
 				href={item.href}
 				target="_blank"
 				rel="noopener noreferrer"
@@ -121,6 +134,8 @@ const NavLink = ({
 		// Dynamic folder paths — cast until all inbox routes are in the route tree.
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		<Link
+			ref={refCallback}
+			onPointerEnter={onPointerEnter}
 			to={item.to as any}
 			params={item.params as any}
 			className={className}
@@ -137,18 +152,31 @@ const NavSection = ({
 	folder,
 	stats,
 	collapsed,
+	registerRef,
+	onHoverItem,
+	isFirst = false,
 }: {
 	title: string;
 	items: NavItem[];
 	folder: string;
 	stats: ReturnType<typeof useInboxFolderStats>;
 	collapsed: boolean;
+	registerRef: (id: string, el: HTMLAnchorElement | null) => void;
+	onHoverItem: (id: string) => void;
+	isFirst?: boolean;
 }) => (
-	<div className="space-y-1 pb-2">
+	<div className="pb-2">
 		{collapsed ? (
 			<div className="mx-2 mt-1 mb-2 h-px bg-[var(--inbox-muted-bg)]" />
 		) : (
-			<p className="mx-2 mb-2 text-[#898989] text-[13px]">{title}</p>
+			<p
+				className={cn(
+					"mx-2 pb-1.5 font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em]",
+					isFirst ? "pt-1.5" : "pt-4",
+				)}
+			>
+				{title}
+			</p>
 		)}
 		{items.map((item) => (
 			<NavLink
@@ -157,6 +185,8 @@ const NavSection = ({
 				active={folder === item.id}
 				count={stats[item.id as keyof typeof stats] as number | undefined}
 				collapsed={collapsed}
+				refCallback={(el) => registerRef(item.id, el)}
+				onPointerEnter={() => onHoverItem(item.id)}
 			/>
 		))}
 	</div>
@@ -177,6 +207,23 @@ export const InboxSidebar = ({
 	const [isComposeOpen, setIsComposeOpen] = useState(false);
 	const [isAddMailboxOpen, setIsAddMailboxOpen] = useState(false);
 	const [isLabelDialogOpen, setIsLabelDialogOpen] = useState(false);
+
+	const [hoveredEl, setHoveredEl] = useState<HTMLAnchorElement | undefined>(
+		undefined,
+	);
+	const [rect, setRect] = useState<DOMRect | undefined>(undefined);
+	const navRefs = useRef<Record<string, HTMLAnchorElement>>({});
+
+	const activeEl = navRefs.current[folder];
+	const currentEl = hoveredEl ?? activeEl;
+
+	useLayoutEffect(() => {
+		if (currentEl) {
+			setRect(currentEl.getBoundingClientRect());
+		} else {
+			setRect(undefined);
+		}
+	}, [currentEl, folder, labels, stats]);
 
 	useEffect(() => {
 		registerOpenCompose(() => setIsComposeOpen(true));
@@ -213,6 +260,7 @@ export const InboxSidebar = ({
 			to: "/inbox/$mailboxId/drafts",
 			params: mailboxParams,
 			icon: DraftIcon,
+			showCount: true,
 		},
 		{
 			id: "sent",
@@ -294,13 +342,21 @@ export const InboxSidebar = ({
 					</FancyButton.Root>
 				</div>
 
-				<div className="scrollbar-hide mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+				<div
+					onPointerLeave={() => setHoveredEl(undefined)}
+					className="scrollbar-hide relative mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
+				>
 					<NavSection
 						title="Core"
 						items={coreItems}
 						folder={folder}
 						stats={stats}
 						collapsed={collapsed}
+						registerRef={(id, el) => {
+							if (el) navRefs.current[id] = el;
+						}}
+						onHoverItem={(id) => setHoveredEl(navRefs.current[id])}
+						isFirst
 					/>
 					<NavSection
 						title="Management"
@@ -308,38 +364,55 @@ export const InboxSidebar = ({
 						folder={folder}
 						stats={stats}
 						collapsed={collapsed}
+						registerRef={(id, el) => {
+							if (el) navRefs.current[id] = el;
+						}}
+						onHoverItem={(id) => setHoveredEl(navRefs.current[id])}
 					/>
 
 					{!collapsed && (
 						<div className="pb-4">
-							<div className="mx-2 mb-4 flex items-center justify-between">
-								<span className="text-[#898989] text-[13px]">Labels</span>
+							<div className="mx-2 flex items-center justify-between pt-4 pb-1.5">
+								<span className="font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em]">
+									Labels
+								</span>
 								<button
 									type="button"
 									onClick={() => setIsLabelDialogOpen(true)}
 									className="mr-1 flex h-4 w-4 items-center justify-center hover:bg-transparent"
 									aria-label="Create label"
 								>
-									<Plus className="h-3 w-3 text-[#898989]" />
+									<Plus className="h-3.5 w-3.5 text-text-soft-400 hover:text-text-strong-950" />
 								</button>
 							</div>
-							<div className="space-y-1">
+							<div className="flex flex-col">
 								{labels.map((label) => {
+									const labelKey = `label:${label.id}`;
 									const active = activeLabelId === label.id;
 									return (
 										<Link
 											key={label.id}
 											to="/inbox/$mailboxId/label/$labelId"
 											params={{ mailboxId, labelId: label.id }}
+											ref={(el) => {
+												if (el) navRefs.current[labelKey] = el;
+											}}
+											onPointerEnter={() =>
+												setHoveredEl(navRefs.current[labelKey])
+											}
 											className={cn(
-												"flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-[13px] transition-colors hover:bg-[var(--inbox-hover)]",
-												active
-													? "bg-[var(--inbox-active)] font-medium text-mail-foreground"
-													: "text-mail-muted",
+												"group relative z-10 flex h-8 w-full items-center gap-2.5 rounded-lg px-2.5 font-medium text-[13px] transition-colors",
+												active ? "text-mail-foreground" : "text-mail-muted",
 											)}
 										>
 											<TagIcon
-												className="h-3.5 w-3.5 shrink-0"
+												className={cn(
+													"h-3.5 w-3.5 shrink-0 transition-all duration-200",
+													label.color === "default" &&
+														(active
+															? "text-mail-foreground"
+															: "text-mail-muted opacity-70 group-hover:text-mail-foreground group-hover:opacity-100"),
+												)}
 												style={{
 													color:
 														label.color === "default" ? undefined : label.color,
@@ -354,6 +427,11 @@ export const InboxSidebar = ({
 							</div>
 						</div>
 					)}
+					<AnimatedHoverBackground
+						rect={rect}
+						tabElement={currentEl}
+						className="!bg-neutral-alpha-10"
+					/>
 				</div>
 
 				<div className="mt-auto flex w-full py-2">
@@ -371,7 +449,10 @@ export const InboxSidebar = ({
 				onClose={() => setIsAddMailboxOpen(false)}
 				onCreated={(created) => {
 					toast.success("Mailbox added");
-					void navigate({ to: "/inbox/$mailboxId", params: { mailboxId: created.id } });
+					void navigate({
+						to: "/inbox/$mailboxId",
+						params: { mailboxId: created.id },
+					});
 				}}
 			/>
 			<InboxLabelDialog
@@ -381,7 +462,10 @@ export const InboxSidebar = ({
 					const id = await addLabel(name);
 					if (id) {
 						toast.success(`Label "${name}" created`);
-						void navigate({ to: "/inbox/$mailboxId/label/$labelId", params: { mailboxId: mailbox.id, labelId: id } });
+						void navigate({
+							to: "/inbox/$mailboxId/label/$labelId",
+							params: { mailboxId: mailbox.id, labelId: id },
+						});
 					} else {
 						toast.error("Failed to create label");
 					}

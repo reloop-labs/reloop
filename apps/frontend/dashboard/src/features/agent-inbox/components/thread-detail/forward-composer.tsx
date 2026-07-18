@@ -144,7 +144,7 @@ export const ForwardComposer = ({
 		<div
 			{...getRootProps()}
 			className={cn(
-				"mx-5 my-4 rounded-xl border border-mail-border bg-panel-light shadow-sm dark:bg-panel-dark",
+				"mx-5 my-4 rounded-xl border border-mail-border bg-panel-light shadow-sm",
 				isDragActive && "ring-2 ring-mail-primary/40",
 			)}
 		>
@@ -283,7 +283,7 @@ export const ForwardComposer = ({
 						<button
 							type="submit"
 							disabled={!canSend}
-							className="flex items-center gap-1.5 rounded-lg bg-mail-primary px-4 py-1.5 font-semibold text-label-sm text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
+							className="flex items-center gap-1.5 rounded-lg bg-mail-primary px-4 py-1.5 font-semibold text-label-sm text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 dark:text-black"
 						>
 							{isSending ? <span>Sending…</span> : <span>Forward</span>}
 						</button>

@@ -88,7 +88,7 @@ export const ZeroThreadToolbar = ({
 					onClick={onReplyAll}
 					className="inline-flex h-7 cursor-pointer items-center justify-center gap-1 overflow-hidden rounded-lg border-none bg-[var(--inbox-control)] px-1.5 transition-colors hover:bg-[var(--inbox-control-hover)]"
 				>
-					<Reply className="h-3.5 w-3.5 text-[#9B9B9B]" />
+					<Reply className="h-3.5 w-3.5 text-mail-muted" />
 					<span className="whitespace-nowrap pr-1 text-mail-foreground text-sm leading-none">
 						Reply all
 					</span>
@@ -106,7 +106,7 @@ export const ZeroThreadToolbar = ({
 						name={isStarred ? "star-filled" : "star"}
 						className={cn(
 							"h-4 w-4",
-							isStarred ? "text-yellow-400" : "text-[#9D9D9D]",
+							isStarred ? "text-yellow-400" : "text-mail-muted",
 						)}
 					/>
 				</button>

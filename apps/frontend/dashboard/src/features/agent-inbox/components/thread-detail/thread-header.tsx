@@ -181,7 +181,7 @@ export const ThreadHeader = ({
 										key={badge.key}
 										title={badge.label}
 										className={cn(
-											"inline-flex h-6 w-6 items-center justify-center rounded-md border-2 border-white transition-transform dark:border-[#1A1A1A]",
+											"inline-flex h-6 w-6 items-center justify-center rounded-md border-2 border-panel-light transition-transform dark:border-panel-dark",
 											badge.bg,
 											index > 0 && "-ml-1.5",
 										)}
@@ -202,7 +202,7 @@ export const ThreadHeader = ({
 						{visiblePeople.map((person) => (
 							<div
 								key={person.email}
-								className="inline-flex items-center justify-start gap-1.5 overflow-hidden rounded-full border border-mail-border bg-white p-1 pr-2 dark:bg-[#262626]"
+								className="inline-flex items-center justify-start gap-1.5 overflow-hidden rounded-full border border-mail-border bg-panel-light p-1 pr-2"
 								title={`${person.name || person.email} <${person.email}>`}
 							>
 								<div

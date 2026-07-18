@@ -10,7 +10,7 @@ export type InboxFolderStats = {
 	sent: number;
 	archive: number;
 	spam: number;
-	bin: number;
+	trash: number;
 };
 
 export const useInboxFolderStats = (mailboxId: string): InboxFolderStats => {
@@ -41,7 +41,7 @@ export const useInboxFolderStats = (mailboxId: string): InboxFolderStats => {
 			spam: mailboxThreads.filter(
 				(t) => t.direction === "inbound" && t.status === "blocked",
 			).length,
-			bin: 0,
+			trash: 0,
 		};
 	}, [threads, archivedThreads, mailboxId]);
 };
