@@ -37,11 +37,20 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 	const isAgentMailbox = useIsAgentMailbox();
 	const isAiPanelOpen = useUIStore((s) => s.isAiPanelOpen);
 
-	if (isTemplateEditor || isAgentMailbox) {
+	if (isTemplateEditor) {
 		return (
 			<div className="flex h-screen flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
 				{children}
 				<CommandMenuGlobal />
+			</div>
+		);
+	}
+
+	// Agent mailbox owns ⌘K via InboxCommandPalette — no global command menu.
+	if (isAgentMailbox) {
+		return (
+			<div className="flex h-screen flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
+				{children}
 			</div>
 		);
 	}

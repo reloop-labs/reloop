@@ -1,3 +1,4 @@
+import { parseEmail } from "#/features/agent-inbox/lib/email-address";
 import {
 	getAvatarGradient,
 	getAvatarInitial,
@@ -10,6 +11,30 @@ import { User } from "lucide-react";
 import { forwardRef, type ReactNode } from "react";
 import type { InboundThread } from "../types";
 import { useInboxMail } from "./use-inbox-mail";
+
+function formatRecipientLabel(addresses: string[] | undefined): string {
+	if (!addresses?.length) return "No recipients";
+	return addresses
+		.map((addr) => {
+			const { name, email } = parseEmail(addr);
+			return name || email.split("@")[0] || email;
+		})
+		.filter(Boolean)
+		.join(", ");
+}
+
+function formatOutboundSnippet(thread: InboundThread): string {
+	const subject = (thread.subject || "").trim();
+	const hasSubject = subject.length > 0 && subject !== "(No Subject)";
+	const preview = (thread.preview || "").trim().replace(/\s+/g, " ");
+
+	if (hasSubject && preview && preview.toLowerCase() !== subject.toLowerCase()) {
+		return `${subject} — ${preview}`;
+	}
+	if (hasSubject) return subject;
+	if (preview) return preview;
+	return "(No Subject)";
+}
 
 const formatReceivedAt = (dateStr: string, isFirstToday: boolean) => {
 	const date = dayjs(dateStr);
@@ -84,14 +109,26 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 		const [mail] = useInboxMail();
 		const listId = thread.id;
 		const isUnread = thread.unread;
-		const displayName =
-			thread.from.name || thread.from.email.split("@")[0] || thread.from.email;
+		const isOutbound = thread.direction === "outbound";
+		const primaryRecipient = parseEmail(thread.toEmails?.[0] ?? "");
+		const displayName = isOutbound
+			? formatRecipientLabel(thread.toEmails)
+			: thread.from.name ||
+				thread.from.email.split("@")[0] ||
+				thread.from.email;
+		const avatarName = isOutbound
+			? primaryRecipient.name || null
+			: (thread.from.name ?? null);
+		const avatarEmail = isOutbound
+			? primaryRecipient.email || thread.from.email
+			: thread.from.email;
 		const messageCount = thread.messageCount ?? 1;
-		const snippet = thread.preview || thread.subject;
+		const snippet = isOutbound
+			? formatOutboundSnippet(thread)
+			: thread.preview || thread.subject;
 		const showAlert =
 			thread.status === "needs_approval" || !!thread.isImportant;
-		const showPerson =
-			thread.direction !== "outbound" && thread.status !== "handled";
+		const showPerson = !isOutbound && thread.status !== "handled";
 		const showTag = (thread.labels?.length ?? 0) > 0;
 
 		return (
@@ -167,11 +204,11 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 						<div
 							className={cn(
 								"relative mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-semibold text-white text-xs uppercase",
-								getAvatarGradient(thread.from.email),
+								getAvatarGradient(avatarEmail),
 								!isUnread && "border border-mail-border/40",
 							)}
 						>
-							{getAvatarInitial(thread.from.name ?? null, thread.from.email)}
+							{getAvatarInitial(avatarName, avatarEmail)}
 						</div>
 					)}
 
@@ -193,7 +230,6 @@ export const InboxThreadRow = forwardRef<HTMLDivElement, InboxThreadRowProps>(
 									)}
 								>
 									{highlightMatches(displayName, searchQuery)}
-									{thread.direction === "outbound" ? ", You" : ""}
 									{messageCount > 1 && (
 										<span className="ml-1 font-normal text-mail-muted">
 											[{messageCount}]

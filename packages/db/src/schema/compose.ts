@@ -16,6 +16,7 @@ const createPendingOutboundId = () => `pout_${createId()}`;
 
 export const pendingOutboundStatusEnum = pgEnum("pending_outbound_status", [
 	"pending",
+	"sending",
 	"cancelled",
 	"sent",
 	"failed",

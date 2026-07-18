@@ -1,8 +1,88 @@
 import { cron, Patterns } from "@elysiajs/cron";
 import { db } from "@reloop/db/client";
 import { pendingOutboundEmail } from "@reloop/db/schema";
-import { and, eq, lte } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { proxySendToMailService } from "../routes/messages/messages.helper";
+
+type PendingPayload = {
+	to: string | string[];
+	subject: string;
+	text?: string;
+	html?: string;
+	cc?: string | string[];
+	bcc?: string | string[];
+	attachments?: Array<{
+		content?: string;
+		filename?: string;
+		path?: string;
+		content_type?: string;
+		content_id?: string;
+	}>;
+	threadId?: string;
+	headers?: Record<string, string>;
+	userId?: string;
+};
+
+type ClaimedPending = {
+	id: string;
+	organizationId: string;
+	mailboxId: string;
+	payload: PendingPayload;
+};
+
+/**
+ * Atomically claim due rows so multiple inbox workers cannot flush the same
+ * pending email (which previously created duplicate email_log rows).
+ */
+async function claimDuePending(limit = 50): Promise<ClaimedPending[]> {
+	const result = await db.execute(sql`
+		WITH due AS (
+			SELECT id
+			FROM pending_outbound_email
+			WHERE
+				(
+					status = 'pending'
+					AND send_at <= now()
+				)
+				OR (
+					status = 'sending'
+					AND updated_at < now() - interval '5 minutes'
+				)
+			ORDER BY send_at ASC
+			LIMIT ${limit}
+			FOR UPDATE SKIP LOCKED
+		)
+		UPDATE pending_outbound_email AS p
+		SET
+			status = 'sending',
+			updated_at = now(),
+			error = null
+		FROM due
+		WHERE p.id = due.id
+		RETURNING
+			p.id,
+			p.organization_id AS "organizationId",
+			p.mailbox_id AS "mailboxId",
+			p.payload
+	`);
+
+	const rows = (result.rows ?? result) as Array<{
+		id: string;
+		organizationId: string;
+		mailboxId: string;
+		payload: PendingPayload | string;
+	}>;
+
+	return rows.map((row) => ({
+		id: row.id,
+		organizationId: row.organizationId,
+		mailboxId: row.mailboxId,
+		payload:
+			typeof row.payload === "string"
+				? (JSON.parse(row.payload) as PendingPayload)
+				: row.payload,
+	}));
+}
 
 /**
  * Flush due pending outbound emails (scheduled sends + undo window).
@@ -13,15 +93,7 @@ export const pendingOutboundCron = cron({
 	pattern: Patterns.everySenconds(15),
 	async run() {
 		try {
-			const now = new Date();
-			const due = await db.query.pendingOutboundEmail.findMany({
-				where: and(
-					eq(pendingOutboundEmail.status, "pending"),
-					lte(pendingOutboundEmail.sendAt, now),
-				),
-				limit: 50,
-			});
-
+			const due = await claimDuePending(50);
 			if (due.length === 0) return;
 
 			console.log(`[Cron] Flushing ${due.length} pending outbound email(s)`);

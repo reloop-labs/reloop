@@ -388,7 +388,7 @@ export const AgentInboxContent = ({
 			<InboxCommandPalette
 				open={paletteOpen}
 				onOpenChange={setPaletteOpen}
-				threads={filteredThreads}
+				threads={groupedThreads}
 				onSelectThread={handleSelectThread}
 			/>
 			<div className="relative flex min-h-0 min-w-0 flex-1 rounded-inherit p-0 lg:h-[calc(100dvh-8px)]">
@@ -429,7 +429,8 @@ export const AgentInboxContent = ({
 												type="button"
 												onClick={() => setPaletteOpen(true)}
 												className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
-												aria-label="Filters"
+												aria-label="Search & filters"
+												title="Search & filters"
 											>
 												<SlidersHorizontal className="h-4 w-4" />
 											</button>
