@@ -4,13 +4,37 @@ import { db } from "@reloop/db/client";
 import { emailLog } from "@reloop/db/schema";
 
 function parseFromName(from: string): string {
-	// Handle "Display Name <email@domain.com>" format
+	// Handle "Display Name <email@domain.com>" format (incl. nested wrappers)
 	const displayNameMatch = from.match(/^(.+?)\s*<[^>]+>$/);
 	if (displayNameMatch?.[1]) {
-		return displayNameMatch[1].trim();
+		const name = displayNameMatch[1].trim().replace(/^["']|["']$/g, "");
+		if (name && !name.includes("<") && !name.includes("@")) return name;
 	}
-	// Fall back to local part of plain email
-	return from.split("@")[0] ?? from;
+	const bare = parseFromEmail(from);
+	return bare.split("@")[0] ?? from;
+}
+
+function parseFromEmail(from: string): string {
+	let current = from.trim();
+	for (let i = 0; i < 5; i++) {
+		const angled = current.match(/<([^<>]+@[^<>]+)>/);
+		if (angled?.[1]) {
+			current = angled[1].trim();
+			continue;
+		}
+		break;
+	}
+	const match = current.match(
+		/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/,
+	);
+	return (match?.[0] ?? current).trim();
+}
+
+function resolveLogUserId(userId?: string): string | undefined {
+	// Internal cron/flush uses a synthetic "system" principal for auth headers.
+	// email_log.user_id FKs to user — never persist that placeholder.
+	if (!userId || userId === "system") return undefined;
+	return userId;
 }
 
 export async function createEmailLog_step4({
@@ -32,9 +56,9 @@ export async function createEmailLog_step4({
 			messageId: `msg_${Date.now()}_${Math.random().toString(36).slice(2)}`,
 			organizationId,
 			domainId: domainId,
-			userId,
+			userId: resolveLogUserId(userId),
 			apikeyId,
-			fromEmail: body.from,
+			fromEmail: parseFromEmail(body.from),
 			fromName: parseFromName(body.from),
 			toEmails: Array.isArray(body.to) ? body.to : [body.to],
 			ccEmails: body.cc

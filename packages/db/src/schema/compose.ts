@@ -96,6 +96,8 @@ export const pendingOutboundEmail = pgTable(
 				}>;
 				threadId?: string;
 				headers?: Record<string, string>;
+				/** Authenticated composer; used when the cron flushes to mail. */
+				userId?: string;
 			}>()
 			.notNull(),
 		error: text("error"),

@@ -5,13 +5,24 @@ import {
 	type ClipboardEvent,
 	type KeyboardEvent,
 	useEffect,
+	useId,
 	useLayoutEffect,
 	useMemo,
 	useRef,
 	useState,
 } from "react";
 import { createPortal } from "react-dom";
+import {
+	formatRecipient,
+	parseEmail,
+	validateEmail,
+} from "#/features/agent-inbox/lib/email-address";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
+
+export {
+	parseEmail,
+	validateEmail,
+} from "#/features/agent-inbox/lib/email-address";
 
 interface EmailPillsInputProps {
 	emails: string[];
@@ -22,26 +33,13 @@ interface EmailPillsInputProps {
 	suggestions?: string[];
 }
 
-export const parseEmail = (input: string) => {
-	const match = input.match(/^(?:["']?([^"']+)["']?\s+)?<([^>]+)>$/);
-	if (match) {
-		return {
-			name: match[1]?.trim() || "",
-			email: match[2]?.trim() || "",
-		};
-	}
-	return {
-		name: "",
-		email: input.trim(),
-	};
-};
-
-export const validateEmail = (emailStr: string) => {
-	const { email } = parseEmail(emailStr);
-	return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
-};
-
 type DropdownPos = { top: number; left: number; width: number };
+
+type ParsedSuggestion = {
+	raw: string;
+	name: string;
+	email: string;
+};
 
 export const EmailPillsInput = ({
 	emails,
@@ -51,30 +49,49 @@ export const EmailPillsInput = ({
 	suggestions = [],
 }: EmailPillsInputProps) => {
 	const shouldReduceMotion = useReducedMotion();
+	const listboxId = useId();
+	const optionIdPrefix = useId();
 	const [inputValue, setInputValue] = useState("");
 	const [highlight, setHighlight] = useState(0);
+	const [listOpen, setListOpen] = useState(false);
 	const [dropdownPos, setDropdownPos] = useState<DropdownPos | null>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const rootRef = useRef<HTMLDivElement>(null);
+	const listRef = useRef<HTMLDivElement>(null);
+	const optionRefs = useRef<Array<HTMLDivElement | null>>([]);
+	const ignoreBlurCommit = useRef(false);
 
-	const filteredSuggestions = useMemo(() => {
+	const selectedEmails = useMemo(
+		() => new Set(emails.map((e) => parseEmail(e).email.toLowerCase())),
+		[emails],
+	);
+
+	const filteredSuggestions = useMemo((): ParsedSuggestion[] => {
 		const q = inputValue.trim().toLowerCase();
 		if (q.length < 1) return [];
-		return suggestions
-			.filter((s) => {
-				const { email } = parseEmail(s);
-				if (emails.some((e) => parseEmail(e).email === email)) return false;
-				return s.toLowerCase().includes(q);
-			})
-			.slice(0, 6);
-	}, [inputValue, suggestions, emails]);
+		const out: ParsedSuggestion[] = [];
+		for (const s of suggestions) {
+			const { name, email } = parseEmail(s);
+			if (!email || selectedEmails.has(email.toLowerCase())) continue;
+			const haystack = `${name} ${email} ${s}`.toLowerCase();
+			if (!haystack.includes(q)) continue;
+			out.push({ raw: formatRecipient(name, email), name, email });
+			if (out.length >= 8) break;
+		}
+		return out;
+	}, [inputValue, suggestions, selectedEmails]);
+
+	const isListVisible = listOpen && filteredSuggestions.length > 0;
 
 	useEffect(() => {
 		setHighlight(0);
-	}, [filteredSuggestions.length]);
+		if (filteredSuggestions.length > 0 && inputValue.trim().length > 0) {
+			setListOpen(true);
+		}
+	}, [filteredSuggestions.length, inputValue]);
 
 	useLayoutEffect(() => {
-		if (filteredSuggestions.length === 0) {
+		if (!isListVisible) {
 			setDropdownPos(null);
 			return;
 		}
@@ -83,10 +100,15 @@ export const EmailPillsInput = ({
 			const el = rootRef.current;
 			if (!el) return;
 			const rect = el.getBoundingClientRect();
+			const width = Math.min(Math.max(rect.width, 280), 420);
+			const left = Math.min(
+				rect.left,
+				window.innerWidth - width - 8,
+			);
 			setDropdownPos({
-				top: rect.bottom + 4,
-				left: rect.left,
-				width: Math.max(rect.width, 240),
+				top: rect.bottom + 6,
+				left: Math.max(8, left),
+				width,
 			});
 		};
 
@@ -97,7 +119,14 @@ export const EmailPillsInput = ({
 			window.removeEventListener("resize", update);
 			window.removeEventListener("scroll", update, true);
 		};
-	}, [filteredSuggestions.length, inputValue]);
+	}, [isListVisible, inputValue, emails.length]);
+
+	useEffect(() => {
+		if (!isListVisible) return;
+		optionRefs.current[highlight]?.scrollIntoView({
+			block: "nearest",
+		});
+	}, [highlight, isListVisible]);
 
 	const addEmails = (newEmailsStr: string) => {
 		const initialSplit = newEmailsStr
@@ -107,30 +136,46 @@ export const EmailPillsInput = ({
 		const parsed: string[] = [];
 
 		for (const item of initialSplit) {
-			if (/<[^\s@]+@[^\s@]+\.[^\s@]+>/.test(item)) {
-				parsed.push(item);
+			if (/<[^>]+@[^>]+>/.test(item)) {
+				const { name, email } = parseEmail(item);
+				parsed.push(formatRecipient(name, email));
 			} else {
 				const spaceSplit = item
 					.split(/\s+/)
 					.map((s) => s.trim())
 					.filter(Boolean);
-				parsed.push(...spaceSplit);
+				for (const part of spaceSplit) {
+					const { name, email } = parseEmail(part);
+					parsed.push(formatRecipient(name, email));
+				}
 			}
 		}
 
 		if (parsed.length === 0) return;
 
-		const updated = [...emails, ...parsed].filter(
-			(val, idx, self) => self.indexOf(val) === idx,
-		);
+		const seen = new Set(emails.map((e) => parseEmail(e).email.toLowerCase()));
+		const updated = [...emails];
+		for (const val of parsed) {
+			const key = parseEmail(val).email.toLowerCase();
+			if (!key || seen.has(key)) continue;
+			seen.add(key);
+			updated.push(val);
+		}
 		onChange(updated);
 		setInputValue("");
+		setListOpen(false);
+		setHighlight(0);
+	};
+
+	const selectSuggestion = (suggestion: ParsedSuggestion) => {
+		addEmails(suggestion.raw);
+		requestAnimationFrame(() => inputRef.current?.focus());
 	};
 
 	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
 		if (disabled) return;
 
-		if (filteredSuggestions.length > 0) {
+		if (isListVisible) {
 			if (e.key === "ArrowDown") {
 				e.preventDefault();
 				setHighlight((h) => (h + 1) % filteredSuggestions.length);
@@ -144,38 +189,79 @@ export const EmailPillsInput = ({
 				);
 				return;
 			}
-			if (e.key === "Enter" || e.key === "Tab") {
+			if (e.key === "Home") {
+				e.preventDefault();
+				setHighlight(0);
+				return;
+			}
+			if (e.key === "End") {
+				e.preventDefault();
+				setHighlight(filteredSuggestions.length - 1);
+				return;
+			}
+			if (e.key === "Enter") {
+				e.preventDefault();
+				const pick = filteredSuggestions[highlight];
+				if (pick) selectSuggestion(pick);
+				return;
+			}
+			if (e.key === "Tab") {
 				const pick = filteredSuggestions[highlight];
 				if (pick) {
 					e.preventDefault();
-					addEmails(pick);
-					return;
+					selectSuggestion(pick);
 				}
+				return;
 			}
 			if (e.key === "Escape") {
 				e.preventDefault();
-				setInputValue("");
+				setListOpen(false);
 				return;
 			}
+		} else if (
+			filteredSuggestions.length > 0 &&
+			(e.key === "ArrowDown" || e.key === "ArrowUp")
+		) {
+			e.preventDefault();
+			setListOpen(true);
+			setHighlight(
+				e.key === "ArrowUp" ? filteredSuggestions.length - 1 : 0,
+			);
+			return;
 		}
 
 		const shouldCommit =
 			e.key === "Enter" ||
 			e.key === "," ||
 			e.key === ";" ||
-			e.key === "Tab" ||
+			(e.key === "Tab" && inputValue.trim().length > 0) ||
 			(e.key === " " && inputValue.includes("@"));
 
 		if (shouldCommit) {
-			e.preventDefault();
-			if (inputValue.trim()) addEmails(inputValue);
+			if (inputValue.trim()) {
+				e.preventDefault();
+				addEmails(inputValue);
+			}
 		} else if (e.key === "Backspace" && !inputValue && emails.length > 0) {
 			onChange(emails.slice(0, -1));
+		} else if (e.key === "Escape" && inputValue) {
+			e.preventDefault();
+			setInputValue("");
+			setListOpen(false);
 		}
 	};
 
 	const handleBlur = () => {
-		if (inputValue.trim()) addEmails(inputValue);
+		if (ignoreBlurCommit.current) {
+			ignoreBlurCommit.current = false;
+			return;
+		}
+		// Close list; commit typed address after a tick so option clicks win.
+		window.setTimeout(() => {
+			if (document.activeElement === inputRef.current) return;
+			setListOpen(false);
+			if (inputValue.trim()) addEmails(inputValue);
+		}, 0);
 	};
 
 	const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
@@ -188,60 +274,116 @@ export const EmailPillsInput = ({
 		onChange(emails.filter((_, idx) => idx !== indexToRemove));
 	};
 
+	const activeOptionId = isListVisible
+		? `${optionIdPrefix}-${highlight}`
+		: undefined;
+
 	const suggestionsDropdown =
-		filteredSuggestions.length > 0 && dropdownPos
+		isListVisible && dropdownPos
 			? createPortal(
 					<div
+						ref={listRef}
+						id={listboxId}
+						role="listbox"
+						aria-label="Recipient suggestions"
 						data-compose-floating-ui="email-suggestions"
 						style={{
 							position: "fixed",
 							top: dropdownPos.top,
 							left: dropdownPos.left,
 							width: dropdownPos.width,
-							zIndex: 200,
+							zIndex: 260,
 						}}
-						className="max-h-48 overflow-y-auto rounded-lg border border-mail-border bg-panel-light py-1 shadow-lg dark:bg-panel-dark"
+						className={cn(
+							"overflow-hidden rounded-xl border border-mail-border/60 bg-panel-light shadow-[0_12px_40px_rgba(0,0,0,0.12)]",
+							"dark:border-mail-border/50 dark:bg-panel-dark dark:shadow-[0_12px_40px_rgba(0,0,0,0.45)]",
+						)}
 					>
-						{filteredSuggestions.map((s, i) => {
-							const { name, email } = parseEmail(s);
-							return (
-								<button
-									key={s}
-									type="button"
-									className={cn(
-										"flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm hover:bg-[var(--inbox-hover)]",
-										i === highlight && "bg-[var(--inbox-hover)]",
-									)}
-									onMouseDown={(e) => {
-										e.preventDefault();
-										addEmails(s);
-									}}
-								>
+						<div className="border-mail-border/40 border-b px-3 py-2">
+							<p className="font-medium text-[11px] text-mail-muted tracking-wide uppercase">
+								Suggestions
+							</p>
+						</div>
+						<div className="max-h-56 overflow-y-auto p-1">
+							{filteredSuggestions.map((s, i) => {
+								const selected = i === highlight;
+								return (
 									<div
+										key={s.email}
+										ref={(el) => {
+											optionRefs.current[i] = el;
+										}}
+										id={`${optionIdPrefix}-${i}`}
+										role="option"
+										aria-selected={selected}
 										className={cn(
-											"flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] text-white uppercase",
-											getAvatarGradient(email),
+											"flex w-full cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left transition-colors duration-100 ease-out",
+											selected
+												? "bg-mail-foreground/[0.07] ring-1 ring-mail-border/50 dark:bg-white/[0.08]"
+												: "hover:bg-[var(--inbox-hover)]",
 										)}
+										onMouseEnter={() => setHighlight(i)}
+										onMouseDown={(e) => {
+											e.preventDefault();
+											ignoreBlurCommit.current = true;
+											selectSuggestion(s);
+										}}
 									>
-										{getAvatarInitial(name || null, email)}
-									</div>
-									<div className="min-w-0 flex-1">
-										{name ? (
-											<>
-												<p className="truncate font-medium text-mail-foreground">
-													{name}
+										<div
+											className={cn(
+												"flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-semibold text-[11px] text-white uppercase",
+												getAvatarGradient(s.email),
+											)}
+										>
+											{getAvatarInitial(s.name || null, s.email)}
+										</div>
+										<div className="min-w-0 flex-1">
+											{s.name ? (
+												<>
+													<p className="truncate font-medium text-[13px] text-mail-foreground leading-5">
+														{s.name}
+													</p>
+													<p className="truncate text-[12px] text-mail-muted leading-4">
+														{s.email}
+													</p>
+												</>
+											) : (
+												<p className="truncate font-medium text-[13px] text-mail-foreground">
+													{s.email}
 												</p>
-												<p className="truncate text-mail-muted text-xs">
-													{email}
-												</p>
-											</>
-										) : (
-											<p className="truncate text-mail-foreground">{email}</p>
-										)}
+											)}
+										</div>
+										{selected ? (
+											<span className="shrink-0 rounded-md bg-mail-foreground/10 px-1.5 py-0.5 font-medium text-[10px] text-mail-muted">
+												↵
+											</span>
+										) : null}
 									</div>
-								</button>
-							);
-						})}
+								);
+							})}
+						</div>
+						<div className="flex items-center gap-2 border-mail-border/40 border-t px-3 py-1.5 text-[10px] text-mail-muted">
+							<span className="inline-flex items-center gap-1">
+								<kbd className="rounded border border-mail-border/50 px-1 font-sans">
+									↑↓
+								</kbd>
+								navigate
+							</span>
+							<span className="text-mail-border">·</span>
+							<span className="inline-flex items-center gap-1">
+								<kbd className="rounded border border-mail-border/50 px-1 font-sans">
+									↵
+								</kbd>
+								select
+							</span>
+							<span className="text-mail-border">·</span>
+							<span className="inline-flex items-center gap-1">
+								<kbd className="rounded border border-mail-border/50 px-1 font-sans">
+									esc
+								</kbd>
+								close
+							</span>
+						</div>
 					</div>,
 					document.body,
 				)
@@ -251,6 +393,11 @@ export const EmailPillsInput = ({
 		<div ref={rootRef} className="relative min-w-0 flex-1">
 			<div
 				onClick={() => inputRef.current?.focus()}
+				onKeyDown={(e) => {
+					if (e.key === "Enter" || e.key === " ") {
+						inputRef.current?.focus();
+					}
+				}}
 				className="flex min-h-8 cursor-text flex-wrap items-center gap-1.5"
 			>
 				<AnimatePresence initial={false}>
@@ -313,6 +460,7 @@ export const EmailPillsInput = ({
 								<span className="max-w-[240px] truncate">{display}</span>
 								<button
 									type="button"
+									aria-label={`Remove ${email}`}
 									onClick={(e) => {
 										e.stopPropagation();
 										removeEmail(idx);
@@ -338,8 +486,20 @@ export const EmailPillsInput = ({
 					}
 					ref={inputRef}
 					type="text"
+					role="combobox"
+					aria-expanded={isListVisible}
+					aria-controls={listboxId}
+					aria-autocomplete="list"
+					aria-activedescendant={activeOptionId}
+					aria-haspopup="listbox"
+					autoComplete="off"
+					autoCorrect="off"
+					spellCheck={false}
 					value={inputValue}
-					onChange={(e) => setInputValue(e.target.value)}
+					onChange={(e) => {
+						setInputValue(e.target.value);
+						setListOpen(true);
+					}}
 					onKeyDown={handleKeyDown}
 					onBlur={handleBlur}
 					onPaste={handlePaste}

@@ -99,6 +99,8 @@ export async function proxySendToMailService(
 
 	if (!apiKey && !cookie) {
 		headers["x-internal-secret"] = inboxConfig.RELOOP_INTERNAL_SECRET;
+		// Internal auth requires x-user-id; prefer the composer. "system" is auth-only
+		// and must not be written to email_log.user_id (FK to user).
 		headers["x-user-id"] = params.userId ?? "system";
 		headers["x-organization-id"] = params.organizationId;
 	}
@@ -112,10 +114,20 @@ export async function proxySendToMailService(
 	if (!response.ok) {
 		const errorBody = await response.text();
 		log.error(`[INBOX] Mail service error: ${response.status} ${errorBody}`);
+		let why = `Mail service returned ${response.status}`;
+		try {
+			const parsed = JSON.parse(errorBody) as {
+				message?: string;
+				why?: string;
+			};
+			why = parsed.why || parsed.message || why;
+		} catch {
+			if (errorBody) why = errorBody.slice(0, 500);
+		}
 		throw createError({
 			status: response.status as 500,
-			message: "Failed to send email",
-			why: `Mail service returned ${response.status}`,
+			message: why,
+			why,
 			fix: "Check mail service logs for details",
 		});
 	}

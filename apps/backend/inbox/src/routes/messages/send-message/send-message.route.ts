@@ -5,12 +5,13 @@ import { sendMessageController } from "./send-message.controllers";
 
 export const sendMessageRoute = new Elysia().use(authMiddleware).post(
 	"/send",
-	async ({ body, organizationId, request }) => {
+	async ({ body, organizationId, userId, request }) => {
 		return sendMessageController(
 			organizationId,
 			body,
 			request.headers.get("x-api-key") ?? "",
 			request.headers.get("cookie") ?? undefined,
+			userId,
 		);
 	},
 	{

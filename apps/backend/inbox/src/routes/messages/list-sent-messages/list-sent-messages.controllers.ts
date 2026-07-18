@@ -1,6 +1,11 @@
 import { db } from "@reloop/db/client";
 import { emailLog, mailbox } from "@reloop/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
+
+function bareEmail(value: string): string {
+	const match = value.match(/<([^>]+)>/);
+	return (match?.[1] ?? value).trim().toLowerCase();
+}
 
 export async function getSentMessagesController(
 	organizationId: string,
@@ -15,11 +20,20 @@ export async function getSentMessagesController(
 				eq(mailbox.organizationId, organizationId),
 			),
 		});
-		if (mbx) {
-			conditions.push(eq(emailLog.fromEmail, mbx.email));
-		} else {
-			// If mailbox ID is specified but not found, return empty list
+		if (!mbx) {
 			return [];
+		}
+
+		const email = bareEmail(mbx.email);
+		// Match bare address or "Name <address>" stored in fromEmail.
+		const mailboxMatch = or(
+			eq(emailLog.fromEmail, mbx.email),
+			eq(emailLog.fromEmail, email),
+			sql`lower(${emailLog.fromEmail}) = ${email}`,
+			sql`lower(${emailLog.fromEmail}) like ${`%<${email}>%`}`,
+		);
+		if (mailboxMatch) {
+			conditions.push(mailboxMatch);
 		}
 	}
 

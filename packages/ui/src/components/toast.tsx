@@ -17,6 +17,10 @@ const Toaster = (props: ToasterProps) => {
 						"flex items-center gap-3 w-full px-4 py-3 rounded-xl shadow-lg dark:bg-neutral-900 dark:text-white bg-white text-neutral-900 border border-neutral-200 dark:border-neutral-800",
 					title: "text-sm font-medium",
 					description: "text-sm dark:text-neutral-400 text-neutral-600",
+					actionButton:
+						"shrink-0 rounded-md bg-neutral-900 px-2.5 py-1 text-xs font-medium text-white dark:bg-white dark:text-neutral-900",
+					cancelButton:
+						"shrink-0 rounded-md px-2.5 py-1 text-xs font-medium text-neutral-600 dark:text-neutral-400",
 					success:
 						"dark:bg-neutral-900 dark:text-white bg-white text-neutral-900",
 					error:
@@ -33,7 +37,7 @@ const Toaster = (props: ToasterProps) => {
 
 const customToast = (
 	renderFunc: (t: string | number) => React.ReactElement,
-	options: ToasterProps = {},
+	options: Parameters<typeof sonnerToast.custom>[1] = {},
 ) => {
 	return sonnerToast.custom(renderFunc, options);
 };

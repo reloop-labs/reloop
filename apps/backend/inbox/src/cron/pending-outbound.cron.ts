@@ -32,6 +32,7 @@ export const pendingOutboundCron = cron({
 						{
 							mailboxId: row.mailboxId,
 							organizationId: row.organizationId,
+							userId: row.payload.userId,
 							to: row.payload.to,
 							subject: row.payload.subject,
 							text: row.payload.text,

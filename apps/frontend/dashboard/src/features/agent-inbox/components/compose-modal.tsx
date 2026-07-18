@@ -5,6 +5,7 @@ import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import * as Modal from "@reloop/ui/modal";
 import * as Popover from "@reloop/ui/popover";
+import { toast } from "@reloop/ui/toast";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
 	FileText,
@@ -18,7 +19,6 @@ import { parseAsString, useQueryState } from "nuqs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import type { AgentMailbox } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
 import { AiComposePreview } from "./compose/ai-compose-preview";
@@ -27,6 +27,11 @@ import {
 	type ComposeBodyEditorHandle,
 } from "./compose/compose-body-editor";
 import { ScheduleSendPicker } from "./compose/schedule-send-picker";
+import { showUndoSendToast } from "./compose/undo-send-toast";
+import {
+	extractBareEmail,
+	formatRecipient,
+} from "../lib/email-address";
 import { EmailPillsInput, validateEmail } from "./email-pills-input";
 
 /** Portaled compose UI (recipient suggestions + React Email menus). */
@@ -101,8 +106,14 @@ export const ComposeModal = ({
 	onClose,
 	mailbox,
 }: ComposeModalProps) => {
-	const { sendMessage, threads, saveDraft, deleteDraft, getDraft } =
-		useAgentInbox();
+	const {
+		sendMessage,
+		removeOptimisticOutbound,
+		threads,
+		saveDraft,
+		deleteDraft,
+		getDraft,
+	} = useAgentInbox();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [draftId, setDraftId] = useQueryState(
 		"draftId",
@@ -148,12 +159,9 @@ export const ComposeModal = ({
 		const map = new Map<string, string>();
 		for (const t of threads) {
 			if (!t.from?.email) continue;
-			const key = t.from.email.toLowerCase();
-			if (map.has(key)) continue;
-			map.set(
-				key,
-				t.from.name ? `${t.from.name} <${t.from.email}>` : t.from.email,
-			);
+			const key = extractBareEmail(t.from.email).toLowerCase();
+			if (!key || map.has(key)) continue;
+			map.set(key, formatRecipient(t.from.name, t.from.email));
 		}
 		return Array.from(map.values());
 	}, [threads]);
@@ -482,27 +490,27 @@ export const ComposeModal = ({
 					html: exported.html || htmlBody,
 					text: exported.text || textBody,
 				};
-				toast.success(scheduleAt ? "Email scheduled" : "Email sent", {
-					duration: UNDO_WINDOW_SECONDS * 1000,
-					action: {
-						label: "Undo",
-						onClick: () => {
-							void (async () => {
-								try {
-									await fetch(
-										`/api/inbox/v1/messages/pending/${pendingId}/cancel`,
-										{ method: "POST" },
-									);
-									localStorage.setItem(
-										UNDO_STORAGE_KEY,
-										JSON.stringify(restorePayload),
-									);
-									toast.success("Send cancelled");
-								} catch {
-									toast.error("Failed to undo send");
-								}
-							})();
-						},
+				showUndoSendToast({
+					variant: scheduleAt ? "schedule" : "send",
+					seconds: UNDO_WINDOW_SECONDS,
+					onUndo: async () => {
+						try {
+							const cancelRes = await fetch(
+								`/api/inbox/v1/messages/pending/${pendingId}/cancel`,
+								{ method: "POST" },
+							);
+							if (!cancelRes.ok) {
+								throw new Error("Cancel failed");
+							}
+							removeOptimisticOutbound(pendingId);
+							localStorage.setItem(
+								UNDO_STORAGE_KEY,
+								JSON.stringify(restorePayload),
+							);
+							toast.success("Send cancelled");
+						} catch {
+							toast.error("Failed to undo send");
+						}
 					},
 				});
 			} else {

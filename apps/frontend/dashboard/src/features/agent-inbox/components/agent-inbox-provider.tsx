@@ -3,10 +3,81 @@ import {
 	type ReactNode,
 	useCallback,
 	useContext,
+	useEffect,
 	useMemo,
+	useRef,
+	useState,
 } from "react";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
+import { useMailboxId } from "#/features/agent-inbox/lib/use-mailbox-id";
+import {
+	extractBareEmail,
+	extractDisplayName,
+} from "../lib/email-address";
 import type { AgentMailbox, BatchThreadAction, InboundThread } from "../types";
+
+const parseEmailAddress = (emailStr: string) =>
+	extractBareEmail(emailStr).toLowerCase();
+
+const normalizeFrom = (fromEmail: string, fromName?: string | null) => {
+	const email = extractBareEmail(fromEmail);
+	const name =
+		extractDisplayName(fromName || "") ||
+		extractDisplayName(fromEmail) ||
+		undefined;
+	return { name, email };
+};
+
+const toEmailList = (value: string | string[] | undefined): string[] => {
+	if (!value) return [];
+	return (Array.isArray(value) ? value : [value]).map((e) => e.trim()).filter(Boolean);
+};
+
+function buildOptimisticOutboundThread(input: {
+	pendingId: string;
+	mailboxId: string;
+	fromEmail: string;
+	fromName?: string;
+	to: string | string[];
+	subject: string;
+	text?: string;
+	html?: string;
+}): InboundThread {
+	const toEmails = toEmailList(input.to);
+	const now = new Date().toISOString();
+	const previewSource = (input.text || "").trim();
+	return {
+		id: input.pendingId,
+		mailboxId: input.mailboxId,
+		messageId: input.pendingId,
+		from: normalizeFrom(input.fromEmail, input.fromName),
+		subject: input.subject || "(No Subject)",
+		preview: previewSource
+			? previewSource.substring(0, 120) +
+				(previewSource.length > 120 ? "..." : "")
+			: "",
+		bodyText: input.text || "",
+		bodyHtml: input.html,
+		receivedAt: now,
+		status: "handled",
+		securityLevel: 5,
+		unread: false,
+		isStarred: false,
+		isArchived: false,
+		isImportant: false,
+		isPinned: false,
+		messageCount: 1,
+		isSpam: false,
+		isTrashed: false,
+		direction: "outbound",
+		toEmails,
+		attachments: [],
+		timeline: [
+			{ label: "Email composed", at: now, state: "done" },
+			{ label: "Sending…", at: now, state: "active" },
+		],
+	};
+}
 
 export type NewAgentAddressInput = {
 	label: string;
@@ -187,6 +258,8 @@ interface AgentInboxContextValue {
 		messageId?: string;
 		success?: boolean;
 	} | void>;
+	/** Remove a pending optimistic Sent row (e.g. after Undo cancel). */
+	removeOptimisticOutbound: (pendingId: string) => void;
 	saveDraft: (input: {
 		id?: string;
 		mailboxId: string;
@@ -257,7 +330,7 @@ const mapMessageToThread = (msg: BackendMessage): InboundThread => {
 		mailboxId: msg.mailboxId,
 		threadId: msg.threadId || undefined,
 		messageId: msg.id,
-		from: { name: msg.fromName || undefined, email: msg.fromEmail },
+		from: normalizeFrom(msg.fromEmail, msg.fromName),
 		subject: msg.subject || "(No Subject)",
 		preview:
 			msg.snippet ||
@@ -360,6 +433,12 @@ const mapBackendThreadToInbound = (
 };
 
 export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
+	const routeMailboxId = useMailboxId();
+	const [optimisticOutbound, setOptimisticOutbound] = useState<InboundThread[]>(
+		[],
+	);
+	const pendingRefreshTimers = useRef<Map<string, number>>(new Map());
+
 	const {
 		data: mailboxesData,
 		isLoading: isLoadingMailboxes,
@@ -372,17 +451,69 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 		mutate: mutateMessages,
 	} = useSWR<BackendMessage[]>("/api/inbox/v1/messages");
 
+	const sentListUrl = routeMailboxId
+		? `/api/inbox/v1/messages/sent?mailboxId=${encodeURIComponent(routeMailboxId)}`
+		: "/api/inbox/v1/messages/sent";
+
 	const {
 		data: sentMessagesData,
 		isLoading: isLoadingSentMessages,
 		mutate: mutateSentMessages,
-	} = useSWR<BackendSentMessage[]>("/api/inbox/v1/messages/sent");
+	} = useSWR<BackendSentMessage[]>(sentListUrl);
 
 	const { data: allThreadsData, mutate: mutateThreads } = useSWR<
 		BackendThread[]
 	>("/api/inbox/v1/threads?limit=200");
 
 	const isLoadingThreads = isLoadingInboundThreads || isLoadingSentMessages;
+
+	const removeOptimisticOutbound = useCallback((pendingId: string) => {
+		setOptimisticOutbound((prev) => prev.filter((t) => t.id !== pendingId));
+		for (const key of [pendingId, `${pendingId}:retry`]) {
+			const timer = pendingRefreshTimers.current.get(key);
+			if (timer !== undefined) {
+				window.clearTimeout(timer);
+				pendingRefreshTimers.current.delete(key);
+			}
+		}
+	}, []);
+
+	useEffect(() => {
+		return () => {
+			for (const timer of pendingRefreshTimers.current.values()) {
+				window.clearTimeout(timer);
+			}
+			pendingRefreshTimers.current.clear();
+		};
+	}, []);
+
+	// Drop optimistic rows once a matching email_log row appears (pending id ≠ log id).
+	useEffect(() => {
+		if (!sentMessagesData?.length) return;
+		const sentKeys = new Set(
+			sentMessagesData.map(
+				(m) =>
+					`${(m.subject || "").toLowerCase()}|${(m.toEmails ?? [])
+						.map(parseEmailAddress)
+						.sort()
+						.join(",")}`,
+			),
+		);
+		setOptimisticOutbound((prev) => {
+			if (prev.length === 0) return prev;
+			const next = prev.filter((opt) => {
+				const ageMs = Date.now() - new Date(opt.receivedAt).getTime();
+				if (ageMs > 90_000) return false;
+				const key = `${opt.subject.toLowerCase()}|${(opt.toEmails ?? [])
+					.map(parseEmailAddress)
+					.sort()
+					.join(",")}`;
+				if (sentKeys.has(key) && ageMs > 10_000) return false;
+				return true;
+			});
+			return next.length === prev.length ? prev : next;
+		});
+	}, [sentMessagesData]);
 
 	const mailboxes = useMemo(() => {
 		if (!mailboxesData) return [];
@@ -446,11 +577,6 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 					})
 			: [];
 
-		const parseEmail = (emailStr: string) => {
-			const match = emailStr.match(/<([^>]+)>/);
-			return (match?.[1] ?? emailStr).trim().toLowerCase();
-		};
-
 		const mappedSent = sentMessagesData
 			? sentMessagesData.map((msg) => {
 					const receivedAtDate = msg.createdAt;
@@ -459,9 +585,9 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 							? receivedAtDate
 							: receivedAtDate.toISOString();
 
-					const fromEmailParsed = parseEmail(msg.fromEmail);
+					const fromEmailParsed = parseEmailAddress(msg.fromEmail);
 					const mailbox = mailboxes.find(
-						(mb) => parseEmail(mb.email) === fromEmailParsed,
+						(mb) => parseEmailAddress(mb.email) === fromEmailParsed,
 					);
 
 					return {
@@ -469,7 +595,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 						mailboxId: mailbox?.id ?? "",
 						threadId: undefined,
 						messageId: msg.id,
-						from: { name: msg.fromName || undefined, email: msg.fromEmail },
+						from: normalizeFrom(msg.fromEmail, msg.fromName),
 						subject: msg.subject || "(No Subject)",
 						preview: msg.textBody
 							? msg.textBody.substring(0, 120) +
@@ -512,11 +638,20 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 				})
 			: [];
 
-		return [...mappedInbound, ...mappedSent].sort(
+		const sentIds = new Set(mappedSent.map((t) => t.id));
+		const pendingOptimistic = optimisticOutbound.filter((t) => !sentIds.has(t.id));
+
+		return [...mappedInbound, ...mappedSent, ...pendingOptimistic].sort(
 			(a, b) =>
 				new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime(),
 		);
-	}, [messagesData, sentMessagesData, mailboxes, allThreadsData]);
+	}, [
+		messagesData,
+		sentMessagesData,
+		mailboxes,
+		allThreadsData,
+		optimisticOutbound,
+	]);
 
 	const archivedThreads = useMemo(() => {
 		if (!allThreadsData) return [];
@@ -949,11 +1084,58 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 
 			if (!data.pending) {
 				await Promise.all([mutateMessages(), mutateSentMessages()]);
+				return data;
+			}
+
+			// Undo / scheduled path: show in Sent immediately, refresh after flush.
+			if (data.id) {
+				const mailbox = mailboxes.find((m) => m.id === input.mailboxId);
+				const optimistic = buildOptimisticOutboundThread({
+					pendingId: data.id,
+					mailboxId: input.mailboxId,
+					fromEmail: mailbox?.email || "",
+					fromName: mailbox?.label,
+					to: input.to,
+					subject: input.subject,
+					text: input.text,
+					html: input.html,
+				});
+				setOptimisticOutbound((prev) => [
+					optimistic,
+					...prev.filter((t) => t.id !== data.id),
+				]);
+
+				const sendAtMs = data.sendAt
+					? new Date(data.sendAt).getTime()
+					: Date.now() + (input.undoWindowSeconds ?? 15) * 1000;
+				const delayMs = Math.max(sendAtMs - Date.now() + 2_000, 2_000);
+
+				const existing = pendingRefreshTimers.current.get(data.id);
+				if (existing !== undefined) window.clearTimeout(existing);
+
+				const pendingId = data.id;
+				const timer = window.setTimeout(() => {
+					pendingRefreshTimers.current.delete(pendingId);
+					void mutateSentMessages().then(() => {
+						// Cron can lag; one more refresh shortly after.
+						const retry = window.setTimeout(() => {
+							pendingRefreshTimers.current.delete(`${pendingId}:retry`);
+							void mutateSentMessages();
+						}, 15_000);
+						pendingRefreshTimers.current.set(`${pendingId}:retry`, retry);
+					});
+				}, delayMs);
+				pendingRefreshTimers.current.set(pendingId, timer);
 			}
 
 			return data;
 		},
-		[mutateMessages, mutateSentMessages],
+		[
+			mailboxes,
+			mutateMessages,
+			mutateSentMessages,
+			removeOptimisticOutbound,
+		],
 	);
 
 	const saveDraft = useCallback(
@@ -1088,6 +1270,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			sendReplyAll,
 			sendForward,
 			sendMessage,
+			removeOptimisticOutbound,
 			saveDraft,
 			getDraft,
 			deleteDraft,
@@ -1119,6 +1302,7 @@ export const AgentInboxProvider = ({ children }: { children: ReactNode }) => {
 			sendReplyAll,
 			sendForward,
 			sendMessage,
+			removeOptimisticOutbound,
 			saveDraft,
 			getDraft,
 			deleteDraft,
