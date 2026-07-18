@@ -23,7 +23,7 @@ import { MessageParsedData } from "./message-parsed-data";
 const YouBadge = ({ className }: { className?: string }) => (
 	<span
 		className={cn(
-			"inline-flex shrink-0 items-center rounded-full bg-[var(--inbox-muted-bg)] px-1.5 py-0.5 font-medium font-medium text-[10px] text-mail-muted ring-1 ring-mail-border/40 ring-inset",
+			"inline-flex shrink-0 items-center rounded-full bg-(--inbox-muted-bg) px-1.5 py-0.5 font-semibold text-[10px] text-mail-muted ring-1 ring-mail-border/40 ring-inset",
 			className,
 		)}
 	>

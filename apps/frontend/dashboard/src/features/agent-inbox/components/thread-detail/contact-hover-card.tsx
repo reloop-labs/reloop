@@ -62,7 +62,7 @@ export function ContactHoverCard({
 								{displayName}
 							</p>
 							{isYou && (
-								<span className="inline-flex shrink-0 items-center rounded-full bg-[var(--inbox-muted-bg)] px-1.5 py-0.5 font-medium text-[10px] text-mail-muted ring-1 ring-mail-border/40 ring-inset">
+								<span className="inline-flex shrink-0 items-center rounded-full bg-(--inbox-muted-bg) px-1.5 py-0.5 font-medium text-[10px] text-mail-muted ring-1 ring-mail-border/40 ring-inset">
 									You
 								</span>
 							)}
