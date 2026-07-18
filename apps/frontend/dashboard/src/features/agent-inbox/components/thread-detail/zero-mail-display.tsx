@@ -38,11 +38,11 @@ const DetailsRow = ({
 	label: string;
 	children: ReactNode;
 }) => (
-	<div className="grid grid-cols-[52px_minmax(0,1fr)] items-start gap-x-2 gap-y-0.5">
-		<span className="pt-0.5 text-right font-normal text-[12px] text-mail-muted">
+	<div className="grid grid-cols-[52px_auto] items-center gap-x-2">
+		<span className="text-right font-normal text-[12px] text-mail-muted">
 			{label}
 		</span>
-		<div className="min-w-0 text-[12px] text-mail-foreground leading-relaxed">
+		<div className="whitespace-nowrap text-[12px] text-mail-foreground leading-none">
 			{children}
 		</div>
 	</div>
@@ -218,7 +218,7 @@ export const ZeroMailDisplay = ({
 											align="start"
 											side="bottom"
 											sideOffset={-3}
-											contentClassName="w-[320px] p-3"
+											contentClassName="w-max max-w-[min(520px,calc(100vw-2rem))] overflow-x-auto p-3"
 											trigger={
 												<button
 													type="button"
@@ -230,17 +230,17 @@ export const ZeroMailDisplay = ({
 										>
 											<div className="space-y-2">
 												<DetailsRow label="from">
-													<span className="inline-flex flex-wrap items-center gap-1.5 break-all">
+													<span className="inline-flex items-center gap-1.5 whitespace-nowrap">
 														{fromDetails}
 														{isOutbound && <YouBadge />}
 													</span>
 												</DetailsRow>
 												<DetailsRow label="to">
-													<span className="inline-flex flex-wrap items-center gap-1.5">
+													<span className="inline-flex items-center gap-1.5 whitespace-nowrap">
 														{toRecipients.map((recipient, i) => (
 															<span
 																key={`details-${recipient.email}-${i}`}
-																className="inline-flex items-center gap-1.5 break-all"
+																className="inline-flex items-center gap-1.5 whitespace-nowrap"
 															>
 																{i > 0 && (
 																	<span className="text-mail-muted">,</span>
@@ -256,7 +256,7 @@ export const ZeroMailDisplay = ({
 												</DetailsRow>
 												{msg.subject || email?.subject ? (
 													<DetailsRow label="subject">
-														<span className="break-words">
+														<span className="whitespace-nowrap">
 															{msg.subject || email?.subject}
 														</span>
 													</DetailsRow>
