@@ -5,13 +5,13 @@ import { Plus } from "lucide-react";
 import { useMemo } from "react";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
 import type { AgentMailbox } from "#/features/agent-inbox/types";
-import { getAvatarInitial } from "#/utils/avatar";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 
 function mailboxSortKey(m: AgentMailbox) {
 	return (m.label || m.email).toLocaleLowerCase();
 }
 
-/** Zero-style filled circle check for the active mailbox. */
+/** Active mailbox badge — black fill, white check, thin white border. */
 const CircleCheckBadge = ({ className }: { className?: string }) => (
 	<svg
 		width="16"
@@ -22,11 +22,20 @@ const CircleCheckBadge = ({ className }: { className?: string }) => (
 		className={className}
 		aria-hidden
 	>
+		<circle
+			cx="10"
+			cy="10"
+			r="8.25"
+			fill="#000000"
+			stroke="#ffffff"
+			strokeWidth="1.5"
+		/>
 		<path
-			fill="#006ffe"
-			fillRule="evenodd"
-			clipRule="evenodd"
-			d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18ZM13.8566 8.19113C14.1002 7.85614 14.0261 7.38708 13.6911 7.14345C13.3561 6.89982 12.8871 6.97388 12.6434 7.30887L9.15969 12.099L7.28033 10.2197C6.98744 9.92678 6.51256 9.92678 6.21967 10.2197C5.92678 10.5126 5.92678 10.9874 6.21967 11.2803L8.71967 13.7803C8.87477 13.9354 9.08999 14.0149 9.30867 13.9977C9.52734 13.9805 9.72754 13.8685 9.85655 13.6911L13.8566 8.19113Z"
+			d="M6.4 10.15L8.85 12.55L13.6 7.45"
+			stroke="#ffffff"
+			strokeWidth="1.75"
+			strokeLinecap="round"
+			strokeLinejoin="round"
 		/>
 	</svg>
 );
@@ -39,30 +48,39 @@ const RailMailboxAvatar = ({
 	mailbox: AgentMailbox;
 	active: boolean;
 	onClick: () => void;
-}) => (
-	<button
-		type="button"
-		onClick={onClick}
-		title={mailbox.label || mailbox.email}
-		aria-label={mailbox.label || mailbox.email}
-		aria-current={active ? "true" : undefined}
-		className="relative flex shrink-0 cursor-pointer items-center justify-center overflow-visible pb-1.5 focus:outline-none"
-	>
-		<div
-			className={cn(
-				"relative rounded-lg",
-				active && "ring-2 ring-[#006ffe] ring-offset-0",
-			)}
+}) => {
+	const displayName = mailbox.label || mailbox.email;
+
+	return (
+		<button
+			type="button"
+			onClick={onClick}
+			title={displayName}
+			aria-label={displayName}
+			aria-current={active ? "true" : undefined}
+			className="relative flex shrink-0 cursor-pointer items-center justify-center overflow-visible pb-1.5 focus:outline-none"
 		>
-			<div className="flex size-7 items-center justify-center rounded-lg bg-[#2B2B2B] font-semibold text-white text-xs uppercase">
-				{getAvatarInitial(mailbox.label, mailbox.email)}
+			<div
+				className={cn(
+					"relative rounded-lg",
+					active && "ring-2 ring-black ring-offset-0",
+				)}
+			>
+				<div
+					className={cn(
+						"flex size-7 items-center justify-center rounded-lg font-semibold text-white text-xs uppercase",
+						getAvatarGradient(displayName),
+					)}
+				>
+					{getAvatarInitial(mailbox.label, mailbox.email)}
+				</div>
+				{active && (
+					<CircleCheckBadge className="-right-1.5 -bottom-2 absolute z-10 size-4" />
+				)}
 			</div>
-			{active && (
-				<CircleCheckBadge className="-right-1.5 -bottom-2 absolute z-10 size-4 rounded-full bg-[var(--sidebar-background)]" />
-			)}
-		</div>
-	</button>
-);
+		</button>
+	);
+};
 
 export function MailboxRail({
 	mailbox,

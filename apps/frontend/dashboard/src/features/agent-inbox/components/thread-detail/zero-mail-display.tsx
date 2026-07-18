@@ -1,7 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState, type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import {
 	extractBareEmail,
@@ -23,7 +23,7 @@ import { MessageParsedData } from "./message-parsed-data";
 const YouBadge = ({ className }: { className?: string }) => (
 	<span
 		className={cn(
-			"inline-flex shrink-0 items-center rounded-md bg-[var(--inbox-muted-bg)] px-1.5 py-0.5 font-medium text-[10px] text-mail-muted ring-1 ring-mail-border/40 ring-inset",
+			"inline-flex shrink-0 items-center rounded-full bg-[var(--inbox-muted-bg)] px-1.5 py-0.5 font-medium font-medium text-[10px] text-mail-muted ring-1 ring-mail-border/40 ring-inset",
 			className,
 		)}
 	>
@@ -120,12 +120,12 @@ export const ZeroMailDisplay = ({
 
 	const mailboxEmail = extractBareEmail(mailbox?.email || "").toLowerCase();
 	const rawTo = email?.toEmails ?? msg.toEmails ?? mailbox?.email ?? [];
-	const toList: string[] = (
-		Array.isArray(rawTo) ? rawTo : [rawTo]
-	).flatMap((addr) => {
-		if (addr == null || addr === "") return [];
-		return [String(addr)];
-	});
+	const toList: string[] = (Array.isArray(rawTo) ? rawTo : [rawTo]).flatMap(
+		(addr) => {
+			if (addr == null || addr === "") return [];
+			return [String(addr)];
+		},
+	);
 	const toRecipients = (
 		toList.length > 0 ? toList : mailbox?.email ? [mailbox.email] : []
 	)
@@ -273,9 +273,7 @@ export const ZeroMailDisplay = ({
 												key={`${recipient.email}-${i}`}
 												className="inline-flex items-center gap-1.5"
 											>
-												{i > 0 && (
-													<span className="text-mail-muted/60">,</span>
-												)}
+												{i > 0 && <span className="text-mail-muted/60">,</span>}
 												<span className="text-mail-muted">
 													{recipient.email}
 												</span>

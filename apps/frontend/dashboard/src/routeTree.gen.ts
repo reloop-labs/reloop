@@ -9,97 +9,81 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VerifyRouteImport } from './routes/verify'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as InviteRouteImport } from './routes/invite'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
+import { Route as InviteRouteImport } from './routes/invite'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as DashboardIndexRouteImport } from './routes/_dashboard/index'
-import { Route as DashboardWorkflowsRouteImport } from './routes/_dashboard/workflows'
-import { Route as DashboardWebhooksRouteImport } from './routes/_dashboard/webhooks'
-import { Route as DashboardTemplatesRouteImport } from './routes/_dashboard/templates'
-import { Route as DashboardSmtpRouteImport } from './routes/_dashboard/smtp'
-import { Route as DashboardSettingsRouteImport } from './routes/_dashboard/settings'
-import { Route as DashboardMetricsRouteImport } from './routes/_dashboard/metrics'
-import { Route as DashboardLogsRouteImport } from './routes/_dashboard/logs'
-import { Route as DashboardIntegrationsRouteImport } from './routes/_dashboard/integrations'
-import { Route as DashboardInboxRouteImport } from './routes/_dashboard/inbox'
-import { Route as DashboardEmailsRouteImport } from './routes/_dashboard/emails'
-import { Route as DashboardDomainRouteImport } from './routes/_dashboard/domain'
-import { Route as DashboardContactsRouteImport } from './routes/_dashboard/contacts'
-import { Route as DashboardApiKeysRouteImport } from './routes/_dashboard/api-keys'
 import { Route as DashboardAgentInboxRouteImport } from './routes/_dashboard/agent-inbox'
-import { Route as DashboardWorkflowsIndexRouteImport } from './routes/_dashboard/workflows/index'
-import { Route as DashboardWebhooksIndexRouteImport } from './routes/_dashboard/webhooks/index'
-import { Route as DashboardTemplatesIndexRouteImport } from './routes/_dashboard/templates/index'
-import { Route as DashboardSettingsIndexRouteImport } from './routes/_dashboard/settings/index'
-import { Route as DashboardLogsIndexRouteImport } from './routes/_dashboard/logs/index'
-import { Route as DashboardEmailsIndexRouteImport } from './routes/_dashboard/emails/index'
-import { Route as DashboardDomainIndexRouteImport } from './routes/_dashboard/domain/index'
-import { Route as DashboardContactsIndexRouteImport } from './routes/_dashboard/contacts/index'
+import { Route as DashboardApiKeysRouteImport } from './routes/_dashboard/api-keys'
+import { Route as DashboardContactsRouteImport } from './routes/_dashboard/contacts'
+import { Route as DashboardDomainRouteImport } from './routes/_dashboard/domain'
+import { Route as DashboardEmailsRouteImport } from './routes/_dashboard/emails'
+import { Route as DashboardInboxRouteImport } from './routes/_dashboard/inbox'
+import { Route as DashboardIntegrationsRouteImport } from './routes/_dashboard/integrations'
+import { Route as DashboardLogsRouteImport } from './routes/_dashboard/logs'
+import { Route as DashboardMetricsRouteImport } from './routes/_dashboard/metrics'
+import { Route as DashboardSettingsRouteImport } from './routes/_dashboard/settings'
+import { Route as DashboardSmtpRouteImport } from './routes/_dashboard/smtp'
+import { Route as DashboardTemplatesRouteImport } from './routes/_dashboard/templates'
+import { Route as DashboardWebhooksRouteImport } from './routes/_dashboard/webhooks'
+import { Route as DashboardWorkflowsRouteImport } from './routes/_dashboard/workflows'
 import { Route as DashboardApiKeysIndexRouteImport } from './routes/_dashboard/api-keys/index'
-import { Route as DashboardWorkflowsWorkflowIdRouteImport } from './routes/_dashboard/workflows/$workflowId'
-import { Route as DashboardWebhooksCreateRouteImport } from './routes/_dashboard/webhooks/create'
-import { Route as DashboardWebhooksWebhookIdRouteImport } from './routes/_dashboard/webhooks/$webhookId'
-import { Route as DashboardTemplatesTemplateIdRouteImport } from './routes/_dashboard/templates/$templateId'
-import { Route as DashboardSettingsWorkspaceRouteImport } from './routes/_dashboard/settings/workspace'
-import { Route as DashboardSettingsThemeRouteImport } from './routes/_dashboard/settings/theme'
-import { Route as DashboardSettingsTeamsRouteImport } from './routes/_dashboard/settings/teams'
-import { Route as DashboardSettingsSecurityRouteImport } from './routes/_dashboard/settings/security'
-import { Route as DashboardSettingsProfileRouteImport } from './routes/_dashboard/settings/profile'
-import { Route as DashboardSettingsBillingRouteImport } from './routes/_dashboard/settings/billing'
-import { Route as DashboardLogsLogIdRouteImport } from './routes/_dashboard/logs/$logId'
-import { Route as DashboardInboxMailboxIdRouteImport } from './routes/_dashboard/inbox/$mailboxId'
-import { Route as DashboardEmailsSentRouteImport } from './routes/_dashboard/emails/sent'
-import { Route as DashboardEmailsReceivedRouteImport } from './routes/_dashboard/emails/received'
-import { Route as DashboardEmailsEmailIdRouteImport } from './routes/_dashboard/emails/$emailId'
-import { Route as DashboardDomainAddRouteImport } from './routes/_dashboard/domain/add'
-import { Route as DashboardDomainDomainIdRouteImport } from './routes/_dashboard/domain/$domainId'
-import { Route as DashboardContactsPropertiesRouteImport } from './routes/_dashboard/contacts/properties'
-import { Route as DashboardContactsGroupsRouteImport } from './routes/_dashboard/contacts/groups'
-import { Route as DashboardContactsDetailRouteImport } from './routes/_dashboard/contacts/detail'
-import { Route as DashboardContactsChannelsRouteImport } from './routes/_dashboard/contacts/channels'
 import { Route as DashboardApiKeysApiKeyIdRouteImport } from './routes/_dashboard/api-keys/$apiKeyId'
-import { Route as DashboardWebhooksWebhookIdIndexRouteImport } from './routes/_dashboard/webhooks/$webhookId/index'
-import { Route as DashboardSettingsBillingIndexRouteImport } from './routes/_dashboard/settings/billing/index'
-import { Route as DashboardInboxMailboxIdIndexRouteImport } from './routes/_dashboard/inbox/$mailboxId/index'
-import { Route as DashboardDomainAddIndexRouteImport } from './routes/_dashboard/domain/add/index'
-import { Route as DashboardContactsGroupsIndexRouteImport } from './routes/_dashboard/contacts/groups/index'
-import { Route as DashboardWebhooksWebhookIdTestRouteImport } from './routes/_dashboard/webhooks/$webhookId/test'
-import { Route as DashboardSettingsBillingPlansRouteImport } from './routes/_dashboard/settings/billing/plans'
-import { Route as DashboardInboxMailboxIdYouRouteImport } from './routes/_dashboard/inbox/$mailboxId/you'
-import { Route as DashboardInboxMailboxIdTrashRouteImport } from './routes/_dashboard/inbox/$mailboxId/trash'
-import { Route as DashboardInboxMailboxIdSpamRouteImport } from './routes/_dashboard/inbox/$mailboxId/spam'
-import { Route as DashboardInboxMailboxIdSentRouteImport } from './routes/_dashboard/inbox/$mailboxId/sent'
-import { Route as DashboardInboxMailboxIdNeeds_approvalRouteImport } from './routes/_dashboard/inbox/$mailboxId/needs_approval'
-import { Route as DashboardInboxMailboxIdLabelRouteImport } from './routes/_dashboard/inbox/$mailboxId/label'
-import { Route as DashboardInboxMailboxIdDraftsRouteImport } from './routes/_dashboard/inbox/$mailboxId/drafts'
-import { Route as DashboardInboxMailboxIdArchiveRouteImport } from './routes/_dashboard/inbox/$mailboxId/archive'
-import { Route as DashboardInboxMailboxIdAgentRouteImport } from './routes/_dashboard/inbox/$mailboxId/agent'
-import { Route as DashboardDomainAddDomainIdRouteImport } from './routes/_dashboard/domain/add/$domainId'
-import { Route as DashboardContactsGroupsGroupIdRouteImport } from './routes/_dashboard/contacts/groups/$groupId'
+import { Route as DashboardContactsIndexRouteImport } from './routes/_dashboard/contacts/index'
+import { Route as DashboardContactsChannelsRouteImport } from './routes/_dashboard/contacts/channels'
+import { Route as DashboardContactsDetailRouteImport } from './routes/_dashboard/contacts/detail'
+import { Route as DashboardContactsGroupsRouteImport } from './routes/_dashboard/contacts/groups'
+import { Route as DashboardContactsPropertiesRouteImport } from './routes/_dashboard/contacts/properties'
+import { Route as DashboardDomainIndexRouteImport } from './routes/_dashboard/domain/index'
+import { Route as DashboardDomainDomainIdRouteImport } from './routes/_dashboard/domain/$domainId'
+import { Route as DashboardDomainAddRouteImport } from './routes/_dashboard/domain/add'
+import { Route as DashboardEmailsIndexRouteImport } from './routes/_dashboard/emails/index'
+import { Route as DashboardEmailsEmailIdRouteImport } from './routes/_dashboard/emails/$emailId'
+import { Route as DashboardEmailsReceivedRouteImport } from './routes/_dashboard/emails/received'
+import { Route as DashboardEmailsSentRouteImport } from './routes/_dashboard/emails/sent'
+import { Route as DashboardInboxMailboxIdRouteImport } from './routes/_dashboard/inbox/$mailboxId'
+import { Route as DashboardLogsIndexRouteImport } from './routes/_dashboard/logs/index'
+import { Route as DashboardLogsLogIdRouteImport } from './routes/_dashboard/logs/$logId'
+import { Route as DashboardSettingsIndexRouteImport } from './routes/_dashboard/settings/index'
+import { Route as DashboardSettingsBillingRouteImport } from './routes/_dashboard/settings/billing'
+import { Route as DashboardSettingsProfileRouteImport } from './routes/_dashboard/settings/profile'
+import { Route as DashboardSettingsSecurityRouteImport } from './routes/_dashboard/settings/security'
+import { Route as DashboardSettingsTeamsRouteImport } from './routes/_dashboard/settings/teams'
+import { Route as DashboardSettingsThemeRouteImport } from './routes/_dashboard/settings/theme'
+import { Route as DashboardSettingsWorkspaceRouteImport } from './routes/_dashboard/settings/workspace'
+import { Route as DashboardTemplatesIndexRouteImport } from './routes/_dashboard/templates/index'
+import { Route as DashboardTemplatesTemplateIdRouteImport } from './routes/_dashboard/templates/$templateId'
+import { Route as DashboardWebhooksIndexRouteImport } from './routes/_dashboard/webhooks/index'
+import { Route as DashboardWebhooksWebhookIdRouteImport } from './routes/_dashboard/webhooks/$webhookId'
+import { Route as DashboardWebhooksCreateRouteImport } from './routes/_dashboard/webhooks/create'
+import { Route as DashboardWorkflowsIndexRouteImport } from './routes/_dashboard/workflows/index'
+import { Route as DashboardWorkflowsWorkflowIdRouteImport } from './routes/_dashboard/workflows/$workflowId'
 import { Route as DashboardContactsDetailContactIdRouteImport } from './routes/_dashboard/contacts/detail/$contactId'
+import { Route as DashboardContactsGroupsIndexRouteImport } from './routes/_dashboard/contacts/groups/index'
+import { Route as DashboardContactsGroupsGroupIdRouteImport } from './routes/_dashboard/contacts/groups/$groupId'
+import { Route as DashboardDomainAddIndexRouteImport } from './routes/_dashboard/domain/add/index'
+import { Route as DashboardDomainAddDomainIdRouteImport } from './routes/_dashboard/domain/add/$domainId'
+import { Route as DashboardInboxMailboxIdIndexRouteImport } from './routes/_dashboard/inbox/$mailboxId/index'
+import { Route as DashboardInboxMailboxIdAgentRouteImport } from './routes/_dashboard/inbox/$mailboxId/agent'
+import { Route as DashboardInboxMailboxIdArchiveRouteImport } from './routes/_dashboard/inbox/$mailboxId/archive'
+import { Route as DashboardInboxMailboxIdDraftsRouteImport } from './routes/_dashboard/inbox/$mailboxId/drafts'
+import { Route as DashboardInboxMailboxIdLabelRouteImport } from './routes/_dashboard/inbox/$mailboxId/label'
+import { Route as DashboardInboxMailboxIdNeeds_approvalRouteImport } from './routes/_dashboard/inbox/$mailboxId/needs_approval'
+import { Route as DashboardInboxMailboxIdSentRouteImport } from './routes/_dashboard/inbox/$mailboxId/sent'
+import { Route as DashboardInboxMailboxIdSpamRouteImport } from './routes/_dashboard/inbox/$mailboxId/spam'
+import { Route as DashboardInboxMailboxIdTrashRouteImport } from './routes/_dashboard/inbox/$mailboxId/trash'
+import { Route as DashboardInboxMailboxIdYouRouteImport } from './routes/_dashboard/inbox/$mailboxId/you'
+import { Route as DashboardSettingsBillingIndexRouteImport } from './routes/_dashboard/settings/billing/index'
+import { Route as DashboardSettingsBillingPlansRouteImport } from './routes/_dashboard/settings/billing/plans'
+import { Route as DashboardWebhooksWebhookIdIndexRouteImport } from './routes/_dashboard/webhooks/$webhookId/index'
+import { Route as DashboardWebhooksWebhookIdTestRouteImport } from './routes/_dashboard/webhooks/$webhookId/test'
 import { Route as DashboardInboxMailboxIdLabelLabelIdRouteImport } from './routes/_dashboard/inbox/$mailboxId/label/$labelId'
 
-const VerifyRoute = VerifyRouteImport.update({
-  id: '/verify',
-  path: '/verify',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/_dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InviteRoute = InviteRouteImport.update({
@@ -107,8 +91,24 @@ const InviteRoute = InviteRouteImport.update({
   path: '/invite',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/_dashboard',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyRoute = VerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
@@ -116,64 +116,9 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardWorkflowsRoute = DashboardWorkflowsRouteImport.update({
-  id: '/workflows',
-  path: '/workflows',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardWebhooksRoute = DashboardWebhooksRouteImport.update({
-  id: '/webhooks',
-  path: '/webhooks',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardTemplatesRoute = DashboardTemplatesRouteImport.update({
-  id: '/templates',
-  path: '/templates',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardSmtpRoute = DashboardSmtpRouteImport.update({
-  id: '/smtp',
-  path: '/smtp',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardMetricsRoute = DashboardMetricsRouteImport.update({
-  id: '/metrics',
-  path: '/metrics',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardLogsRoute = DashboardLogsRouteImport.update({
-  id: '/logs',
-  path: '/logs',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardIntegrationsRoute = DashboardIntegrationsRouteImport.update({
-  id: '/integrations',
-  path: '/integrations',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardInboxRoute = DashboardInboxRouteImport.update({
-  id: '/inbox',
-  path: '/inbox',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardEmailsRoute = DashboardEmailsRouteImport.update({
-  id: '/emails',
-  path: '/emails',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardDomainRoute = DashboardDomainRouteImport.update({
-  id: '/domain',
-  path: '/domain',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardContactsRoute = DashboardContactsRouteImport.update({
-  id: '/contacts',
-  path: '/contacts',
+const DashboardAgentInboxRoute = DashboardAgentInboxRouteImport.update({
+  id: '/agent-inbox',
+  path: '/agent-inbox',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardApiKeysRoute = DashboardApiKeysRouteImport.update({
@@ -181,162 +126,80 @@ const DashboardApiKeysRoute = DashboardApiKeysRouteImport.update({
   path: '/api-keys',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardAgentInboxRoute = DashboardAgentInboxRouteImport.update({
-  id: '/agent-inbox',
-  path: '/agent-inbox',
+const DashboardContactsRoute = DashboardContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardWorkflowsIndexRoute = DashboardWorkflowsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardWorkflowsRoute,
+const DashboardDomainRoute = DashboardDomainRouteImport.update({
+  id: '/domain',
+  path: '/domain',
+  getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardWebhooksIndexRoute = DashboardWebhooksIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardWebhooksRoute,
+const DashboardEmailsRoute = DashboardEmailsRouteImport.update({
+  id: '/emails',
+  path: '/emails',
+  getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardTemplatesIndexRoute = DashboardTemplatesIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardTemplatesRoute,
+const DashboardInboxRoute = DashboardInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardSettingsIndexRoute = DashboardSettingsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardSettingsRoute,
+const DashboardIntegrationsRoute = DashboardIntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
+  getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardLogsIndexRoute = DashboardLogsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardLogsRoute,
+const DashboardLogsRoute = DashboardLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardEmailsIndexRoute = DashboardEmailsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardEmailsRoute,
+const DashboardMetricsRoute = DashboardMetricsRouteImport.update({
+  id: '/metrics',
+  path: '/metrics',
+  getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardDomainIndexRoute = DashboardDomainIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardDomainRoute,
+const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardContactsIndexRoute = DashboardContactsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardContactsRoute,
+const DashboardSmtpRoute = DashboardSmtpRouteImport.update({
+  id: '/smtp',
+  path: '/smtp',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardTemplatesRoute = DashboardTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardWebhooksRoute = DashboardWebhooksRouteImport.update({
+  id: '/webhooks',
+  path: '/webhooks',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardWorkflowsRoute = DashboardWorkflowsRouteImport.update({
+  id: '/workflows',
+  path: '/workflows',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardApiKeysIndexRoute = DashboardApiKeysIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardApiKeysRoute,
 } as any)
-const DashboardWorkflowsWorkflowIdRoute =
-  DashboardWorkflowsWorkflowIdRouteImport.update({
-    id: '/$workflowId',
-    path: '/$workflowId',
-    getParentRoute: () => DashboardWorkflowsRoute,
+const DashboardApiKeysApiKeyIdRoute =
+  DashboardApiKeysApiKeyIdRouteImport.update({
+    id: '/$apiKeyId',
+    path: '/$apiKeyId',
+    getParentRoute: () => DashboardApiKeysRoute,
   } as any)
-const DashboardWebhooksCreateRoute = DashboardWebhooksCreateRouteImport.update({
-  id: '/create',
-  path: '/create',
-  getParentRoute: () => DashboardWebhooksRoute,
-} as any)
-const DashboardWebhooksWebhookIdRoute =
-  DashboardWebhooksWebhookIdRouteImport.update({
-    id: '/$webhookId',
-    path: '/$webhookId',
-    getParentRoute: () => DashboardWebhooksRoute,
-  } as any)
-const DashboardTemplatesTemplateIdRoute =
-  DashboardTemplatesTemplateIdRouteImport.update({
-    id: '/$templateId',
-    path: '/$templateId',
-    getParentRoute: () => DashboardTemplatesRoute,
-  } as any)
-const DashboardSettingsWorkspaceRoute =
-  DashboardSettingsWorkspaceRouteImport.update({
-    id: '/workspace',
-    path: '/workspace',
-    getParentRoute: () => DashboardSettingsRoute,
-  } as any)
-const DashboardSettingsThemeRoute = DashboardSettingsThemeRouteImport.update({
-  id: '/theme',
-  path: '/theme',
-  getParentRoute: () => DashboardSettingsRoute,
-} as any)
-const DashboardSettingsTeamsRoute = DashboardSettingsTeamsRouteImport.update({
-  id: '/teams',
-  path: '/teams',
-  getParentRoute: () => DashboardSettingsRoute,
-} as any)
-const DashboardSettingsSecurityRoute =
-  DashboardSettingsSecurityRouteImport.update({
-    id: '/security',
-    path: '/security',
-    getParentRoute: () => DashboardSettingsRoute,
-  } as any)
-const DashboardSettingsProfileRoute =
-  DashboardSettingsProfileRouteImport.update({
-    id: '/profile',
-    path: '/profile',
-    getParentRoute: () => DashboardSettingsRoute,
-  } as any)
-const DashboardSettingsBillingRoute =
-  DashboardSettingsBillingRouteImport.update({
-    id: '/billing',
-    path: '/billing',
-    getParentRoute: () => DashboardSettingsRoute,
-  } as any)
-const DashboardLogsLogIdRoute = DashboardLogsLogIdRouteImport.update({
-  id: '/$logId',
-  path: '/$logId',
-  getParentRoute: () => DashboardLogsRoute,
-} as any)
-const DashboardInboxMailboxIdRoute = DashboardInboxMailboxIdRouteImport.update({
-  id: '/$mailboxId',
-  path: '/$mailboxId',
-  getParentRoute: () => DashboardInboxRoute,
-} as any)
-const DashboardEmailsSentRoute = DashboardEmailsSentRouteImport.update({
-  id: '/sent',
-  path: '/sent',
-  getParentRoute: () => DashboardEmailsRoute,
-} as any)
-const DashboardEmailsReceivedRoute = DashboardEmailsReceivedRouteImport.update({
-  id: '/received',
-  path: '/received',
-  getParentRoute: () => DashboardEmailsRoute,
-} as any)
-const DashboardEmailsEmailIdRoute = DashboardEmailsEmailIdRouteImport.update({
-  id: '/$emailId',
-  path: '/$emailId',
-  getParentRoute: () => DashboardEmailsRoute,
-} as any)
-const DashboardDomainAddRoute = DashboardDomainAddRouteImport.update({
-  id: '/add',
-  path: '/add',
-  getParentRoute: () => DashboardDomainRoute,
-} as any)
-const DashboardDomainDomainIdRoute = DashboardDomainDomainIdRouteImport.update({
-  id: '/$domainId',
-  path: '/$domainId',
-  getParentRoute: () => DashboardDomainRoute,
-} as any)
-const DashboardContactsPropertiesRoute =
-  DashboardContactsPropertiesRouteImport.update({
-    id: '/properties',
-    path: '/properties',
-    getParentRoute: () => DashboardContactsRoute,
-  } as any)
-const DashboardContactsGroupsRoute = DashboardContactsGroupsRouteImport.update({
-  id: '/groups',
-  path: '/groups',
-  getParentRoute: () => DashboardContactsRoute,
-} as any)
-const DashboardContactsDetailRoute = DashboardContactsDetailRouteImport.update({
-  id: '/detail',
-  path: '/detail',
+const DashboardContactsIndexRoute = DashboardContactsIndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => DashboardContactsRoute,
 } as any)
 const DashboardContactsChannelsRoute =
@@ -345,99 +208,182 @@ const DashboardContactsChannelsRoute =
     path: '/channels',
     getParentRoute: () => DashboardContactsRoute,
   } as any)
-const DashboardApiKeysApiKeyIdRoute =
-  DashboardApiKeysApiKeyIdRouteImport.update({
-    id: '/$apiKeyId',
-    path: '/$apiKeyId',
-    getParentRoute: () => DashboardApiKeysRoute,
+const DashboardContactsDetailRoute = DashboardContactsDetailRouteImport.update({
+  id: '/detail',
+  path: '/detail',
+  getParentRoute: () => DashboardContactsRoute,
+} as any)
+const DashboardContactsGroupsRoute = DashboardContactsGroupsRouteImport.update({
+  id: '/groups',
+  path: '/groups',
+  getParentRoute: () => DashboardContactsRoute,
+} as any)
+const DashboardContactsPropertiesRoute =
+  DashboardContactsPropertiesRouteImport.update({
+    id: '/properties',
+    path: '/properties',
+    getParentRoute: () => DashboardContactsRoute,
   } as any)
-const DashboardWebhooksWebhookIdIndexRoute =
-  DashboardWebhooksWebhookIdIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardWebhooksWebhookIdRoute,
-  } as any)
-const DashboardSettingsBillingIndexRoute =
-  DashboardSettingsBillingIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardSettingsBillingRoute,
-  } as any)
-const DashboardInboxMailboxIdIndexRoute =
-  DashboardInboxMailboxIdIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardInboxMailboxIdRoute,
-  } as any)
-const DashboardDomainAddIndexRoute = DashboardDomainAddIndexRouteImport.update({
+const DashboardDomainIndexRoute = DashboardDomainIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => DashboardDomainAddRoute,
+  getParentRoute: () => DashboardDomainRoute,
 } as any)
+const DashboardDomainDomainIdRoute = DashboardDomainDomainIdRouteImport.update({
+  id: '/$domainId',
+  path: '/$domainId',
+  getParentRoute: () => DashboardDomainRoute,
+} as any)
+const DashboardDomainAddRoute = DashboardDomainAddRouteImport.update({
+  id: '/add',
+  path: '/add',
+  getParentRoute: () => DashboardDomainRoute,
+} as any)
+const DashboardEmailsIndexRoute = DashboardEmailsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardEmailsRoute,
+} as any)
+const DashboardEmailsEmailIdRoute = DashboardEmailsEmailIdRouteImport.update({
+  id: '/$emailId',
+  path: '/$emailId',
+  getParentRoute: () => DashboardEmailsRoute,
+} as any)
+const DashboardEmailsReceivedRoute = DashboardEmailsReceivedRouteImport.update({
+  id: '/received',
+  path: '/received',
+  getParentRoute: () => DashboardEmailsRoute,
+} as any)
+const DashboardEmailsSentRoute = DashboardEmailsSentRouteImport.update({
+  id: '/sent',
+  path: '/sent',
+  getParentRoute: () => DashboardEmailsRoute,
+} as any)
+const DashboardInboxMailboxIdRoute = DashboardInboxMailboxIdRouteImport.update({
+  id: '/$mailboxId',
+  path: '/$mailboxId',
+  getParentRoute: () => DashboardInboxRoute,
+} as any)
+const DashboardLogsIndexRoute = DashboardLogsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardLogsRoute,
+} as any)
+const DashboardLogsLogIdRoute = DashboardLogsLogIdRouteImport.update({
+  id: '/$logId',
+  path: '/$logId',
+  getParentRoute: () => DashboardLogsRoute,
+} as any)
+const DashboardSettingsIndexRoute = DashboardSettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardSettingsRoute,
+} as any)
+const DashboardSettingsBillingRoute =
+  DashboardSettingsBillingRouteImport.update({
+    id: '/billing',
+    path: '/billing',
+    getParentRoute: () => DashboardSettingsRoute,
+  } as any)
+const DashboardSettingsProfileRoute =
+  DashboardSettingsProfileRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => DashboardSettingsRoute,
+  } as any)
+const DashboardSettingsSecurityRoute =
+  DashboardSettingsSecurityRouteImport.update({
+    id: '/security',
+    path: '/security',
+    getParentRoute: () => DashboardSettingsRoute,
+  } as any)
+const DashboardSettingsTeamsRoute = DashboardSettingsTeamsRouteImport.update({
+  id: '/teams',
+  path: '/teams',
+  getParentRoute: () => DashboardSettingsRoute,
+} as any)
+const DashboardSettingsThemeRoute = DashboardSettingsThemeRouteImport.update({
+  id: '/theme',
+  path: '/theme',
+  getParentRoute: () => DashboardSettingsRoute,
+} as any)
+const DashboardSettingsWorkspaceRoute =
+  DashboardSettingsWorkspaceRouteImport.update({
+    id: '/workspace',
+    path: '/workspace',
+    getParentRoute: () => DashboardSettingsRoute,
+  } as any)
+const DashboardTemplatesIndexRoute = DashboardTemplatesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardTemplatesRoute,
+} as any)
+const DashboardTemplatesTemplateIdRoute =
+  DashboardTemplatesTemplateIdRouteImport.update({
+    id: '/$templateId',
+    path: '/$templateId',
+    getParentRoute: () => DashboardTemplatesRoute,
+  } as any)
+const DashboardWebhooksIndexRoute = DashboardWebhooksIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardWebhooksRoute,
+} as any)
+const DashboardWebhooksWebhookIdRoute =
+  DashboardWebhooksWebhookIdRouteImport.update({
+    id: '/$webhookId',
+    path: '/$webhookId',
+    getParentRoute: () => DashboardWebhooksRoute,
+  } as any)
+const DashboardWebhooksCreateRoute = DashboardWebhooksCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => DashboardWebhooksRoute,
+} as any)
+const DashboardWorkflowsIndexRoute = DashboardWorkflowsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardWorkflowsRoute,
+} as any)
+const DashboardWorkflowsWorkflowIdRoute =
+  DashboardWorkflowsWorkflowIdRouteImport.update({
+    id: '/$workflowId',
+    path: '/$workflowId',
+    getParentRoute: () => DashboardWorkflowsRoute,
+  } as any)
+const DashboardContactsDetailContactIdRoute =
+  DashboardContactsDetailContactIdRouteImport.update({
+    id: '/$contactId',
+    path: '/$contactId',
+    getParentRoute: () => DashboardContactsDetailRoute,
+  } as any)
 const DashboardContactsGroupsIndexRoute =
   DashboardContactsGroupsIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => DashboardContactsGroupsRoute,
   } as any)
-const DashboardWebhooksWebhookIdTestRoute =
-  DashboardWebhooksWebhookIdTestRouteImport.update({
-    id: '/test',
-    path: '/test',
-    getParentRoute: () => DashboardWebhooksWebhookIdRoute,
+const DashboardContactsGroupsGroupIdRoute =
+  DashboardContactsGroupsGroupIdRouteImport.update({
+    id: '/$groupId',
+    path: '/$groupId',
+    getParentRoute: () => DashboardContactsGroupsRoute,
   } as any)
-const DashboardSettingsBillingPlansRoute =
-  DashboardSettingsBillingPlansRouteImport.update({
-    id: '/plans',
-    path: '/plans',
-    getParentRoute: () => DashboardSettingsBillingRoute,
+const DashboardDomainAddIndexRoute = DashboardDomainAddIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardDomainAddRoute,
+} as any)
+const DashboardDomainAddDomainIdRoute =
+  DashboardDomainAddDomainIdRouteImport.update({
+    id: '/$domainId',
+    path: '/$domainId',
+    getParentRoute: () => DashboardDomainAddRoute,
   } as any)
-const DashboardInboxMailboxIdYouRoute =
-  DashboardInboxMailboxIdYouRouteImport.update({
-    id: '/you',
-    path: '/you',
-    getParentRoute: () => DashboardInboxMailboxIdRoute,
-  } as any)
-const DashboardInboxMailboxIdTrashRoute =
-  DashboardInboxMailboxIdTrashRouteImport.update({
-    id: '/trash',
-    path: '/trash',
-    getParentRoute: () => DashboardInboxMailboxIdRoute,
-  } as any)
-const DashboardInboxMailboxIdSpamRoute =
-  DashboardInboxMailboxIdSpamRouteImport.update({
-    id: '/spam',
-    path: '/spam',
-    getParentRoute: () => DashboardInboxMailboxIdRoute,
-  } as any)
-const DashboardInboxMailboxIdSentRoute =
-  DashboardInboxMailboxIdSentRouteImport.update({
-    id: '/sent',
-    path: '/sent',
-    getParentRoute: () => DashboardInboxMailboxIdRoute,
-  } as any)
-const DashboardInboxMailboxIdNeeds_approvalRoute =
-  DashboardInboxMailboxIdNeeds_approvalRouteImport.update({
-    id: '/needs_approval',
-    path: '/needs_approval',
-    getParentRoute: () => DashboardInboxMailboxIdRoute,
-  } as any)
-const DashboardInboxMailboxIdLabelRoute =
-  DashboardInboxMailboxIdLabelRouteImport.update({
-    id: '/label',
-    path: '/label',
-    getParentRoute: () => DashboardInboxMailboxIdRoute,
-  } as any)
-const DashboardInboxMailboxIdDraftsRoute =
-  DashboardInboxMailboxIdDraftsRouteImport.update({
-    id: '/drafts',
-    path: '/drafts',
-    getParentRoute: () => DashboardInboxMailboxIdRoute,
-  } as any)
-const DashboardInboxMailboxIdArchiveRoute =
-  DashboardInboxMailboxIdArchiveRouteImport.update({
-    id: '/archive',
-    path: '/archive',
+const DashboardInboxMailboxIdIndexRoute =
+  DashboardInboxMailboxIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
     getParentRoute: () => DashboardInboxMailboxIdRoute,
   } as any)
 const DashboardInboxMailboxIdAgentRoute =
@@ -446,23 +392,77 @@ const DashboardInboxMailboxIdAgentRoute =
     path: '/agent',
     getParentRoute: () => DashboardInboxMailboxIdRoute,
   } as any)
-const DashboardDomainAddDomainIdRoute =
-  DashboardDomainAddDomainIdRouteImport.update({
-    id: '/$domainId',
-    path: '/$domainId',
-    getParentRoute: () => DashboardDomainAddRoute,
+const DashboardInboxMailboxIdArchiveRoute =
+  DashboardInboxMailboxIdArchiveRouteImport.update({
+    id: '/archive',
+    path: '/archive',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
   } as any)
-const DashboardContactsGroupsGroupIdRoute =
-  DashboardContactsGroupsGroupIdRouteImport.update({
-    id: '/$groupId',
-    path: '/$groupId',
-    getParentRoute: () => DashboardContactsGroupsRoute,
+const DashboardInboxMailboxIdDraftsRoute =
+  DashboardInboxMailboxIdDraftsRouteImport.update({
+    id: '/drafts',
+    path: '/drafts',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
   } as any)
-const DashboardContactsDetailContactIdRoute =
-  DashboardContactsDetailContactIdRouteImport.update({
-    id: '/$contactId',
-    path: '/$contactId',
-    getParentRoute: () => DashboardContactsDetailRoute,
+const DashboardInboxMailboxIdLabelRoute =
+  DashboardInboxMailboxIdLabelRouteImport.update({
+    id: '/label',
+    path: '/label',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
+  } as any)
+const DashboardInboxMailboxIdNeeds_approvalRoute =
+  DashboardInboxMailboxIdNeeds_approvalRouteImport.update({
+    id: '/needs_approval',
+    path: '/needs_approval',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
+  } as any)
+const DashboardInboxMailboxIdSentRoute =
+  DashboardInboxMailboxIdSentRouteImport.update({
+    id: '/sent',
+    path: '/sent',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
+  } as any)
+const DashboardInboxMailboxIdSpamRoute =
+  DashboardInboxMailboxIdSpamRouteImport.update({
+    id: '/spam',
+    path: '/spam',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
+  } as any)
+const DashboardInboxMailboxIdTrashRoute =
+  DashboardInboxMailboxIdTrashRouteImport.update({
+    id: '/trash',
+    path: '/trash',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
+  } as any)
+const DashboardInboxMailboxIdYouRoute =
+  DashboardInboxMailboxIdYouRouteImport.update({
+    id: '/you',
+    path: '/you',
+    getParentRoute: () => DashboardInboxMailboxIdRoute,
+  } as any)
+const DashboardSettingsBillingIndexRoute =
+  DashboardSettingsBillingIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardSettingsBillingRoute,
+  } as any)
+const DashboardSettingsBillingPlansRoute =
+  DashboardSettingsBillingPlansRouteImport.update({
+    id: '/plans',
+    path: '/plans',
+    getParentRoute: () => DashboardSettingsBillingRoute,
+  } as any)
+const DashboardWebhooksWebhookIdIndexRoute =
+  DashboardWebhooksWebhookIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardWebhooksWebhookIdRoute,
+  } as any)
+const DashboardWebhooksWebhookIdTestRoute =
+  DashboardWebhooksWebhookIdTestRouteImport.update({
+    id: '/test',
+    path: '/test',
+    getParentRoute: () => DashboardWebhooksWebhookIdRoute,
   } as any)
 const DashboardInboxMailboxIdLabelLabelIdRoute =
   DashboardInboxMailboxIdLabelLabelIdRouteImport.update({
@@ -898,32 +898,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/verify': {
-      id: '/verify'
-      path: '/verify'
-      fullPath: '/verify'
-      preLoaderRoute: typeof VerifyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/_dashboard': {
+      id: '/_dashboard'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invite': {
@@ -933,11 +912,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InviteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_dashboard': {
-      id: '/_dashboard'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof DashboardRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify': {
+      id: '/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof VerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_dashboard/': {
@@ -947,88 +947,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/workflows': {
-      id: '/_dashboard/workflows'
-      path: '/workflows'
-      fullPath: '/workflows'
-      preLoaderRoute: typeof DashboardWorkflowsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/webhooks': {
-      id: '/_dashboard/webhooks'
-      path: '/webhooks'
-      fullPath: '/webhooks'
-      preLoaderRoute: typeof DashboardWebhooksRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/templates': {
-      id: '/_dashboard/templates'
-      path: '/templates'
-      fullPath: '/templates'
-      preLoaderRoute: typeof DashboardTemplatesRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/smtp': {
-      id: '/_dashboard/smtp'
-      path: '/smtp'
-      fullPath: '/smtp'
-      preLoaderRoute: typeof DashboardSmtpRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/settings': {
-      id: '/_dashboard/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof DashboardSettingsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/metrics': {
-      id: '/_dashboard/metrics'
-      path: '/metrics'
-      fullPath: '/metrics'
-      preLoaderRoute: typeof DashboardMetricsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/logs': {
-      id: '/_dashboard/logs'
-      path: '/logs'
-      fullPath: '/logs'
-      preLoaderRoute: typeof DashboardLogsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/integrations': {
-      id: '/_dashboard/integrations'
-      path: '/integrations'
-      fullPath: '/integrations'
-      preLoaderRoute: typeof DashboardIntegrationsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/inbox': {
-      id: '/_dashboard/inbox'
-      path: '/inbox'
-      fullPath: '/inbox'
-      preLoaderRoute: typeof DashboardInboxRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/emails': {
-      id: '/_dashboard/emails'
-      path: '/emails'
-      fullPath: '/emails'
-      preLoaderRoute: typeof DashboardEmailsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/domain': {
-      id: '/_dashboard/domain'
-      path: '/domain'
-      fullPath: '/domain'
-      preLoaderRoute: typeof DashboardDomainRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/_dashboard/contacts': {
-      id: '/_dashboard/contacts'
-      path: '/contacts'
-      fullPath: '/contacts'
-      preLoaderRoute: typeof DashboardContactsRouteImport
+    '/_dashboard/agent-inbox': {
+      id: '/_dashboard/agent-inbox'
+      path: '/agent-inbox'
+      fullPath: '/agent-inbox'
+      preLoaderRoute: typeof DashboardAgentInboxRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/_dashboard/api-keys': {
@@ -1038,68 +961,89 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardApiKeysRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/agent-inbox': {
-      id: '/_dashboard/agent-inbox'
-      path: '/agent-inbox'
-      fullPath: '/agent-inbox'
-      preLoaderRoute: typeof DashboardAgentInboxRouteImport
+    '/_dashboard/contacts': {
+      id: '/_dashboard/contacts'
+      path: '/contacts'
+      fullPath: '/contacts'
+      preLoaderRoute: typeof DashboardContactsRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/workflows/': {
-      id: '/_dashboard/workflows/'
-      path: '/'
-      fullPath: '/workflows/'
-      preLoaderRoute: typeof DashboardWorkflowsIndexRouteImport
-      parentRoute: typeof DashboardWorkflowsRoute
+    '/_dashboard/domain': {
+      id: '/_dashboard/domain'
+      path: '/domain'
+      fullPath: '/domain'
+      preLoaderRoute: typeof DashboardDomainRouteImport
+      parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/webhooks/': {
-      id: '/_dashboard/webhooks/'
-      path: '/'
-      fullPath: '/webhooks/'
-      preLoaderRoute: typeof DashboardWebhooksIndexRouteImport
-      parentRoute: typeof DashboardWebhooksRoute
+    '/_dashboard/emails': {
+      id: '/_dashboard/emails'
+      path: '/emails'
+      fullPath: '/emails'
+      preLoaderRoute: typeof DashboardEmailsRouteImport
+      parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/templates/': {
-      id: '/_dashboard/templates/'
-      path: '/'
-      fullPath: '/templates/'
-      preLoaderRoute: typeof DashboardTemplatesIndexRouteImport
-      parentRoute: typeof DashboardTemplatesRoute
+    '/_dashboard/inbox': {
+      id: '/_dashboard/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof DashboardInboxRouteImport
+      parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/settings/': {
-      id: '/_dashboard/settings/'
-      path: '/'
-      fullPath: '/settings/'
-      preLoaderRoute: typeof DashboardSettingsIndexRouteImport
-      parentRoute: typeof DashboardSettingsRoute
+    '/_dashboard/integrations': {
+      id: '/_dashboard/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof DashboardIntegrationsRouteImport
+      parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/logs/': {
-      id: '/_dashboard/logs/'
-      path: '/'
-      fullPath: '/logs/'
-      preLoaderRoute: typeof DashboardLogsIndexRouteImport
-      parentRoute: typeof DashboardLogsRoute
+    '/_dashboard/logs': {
+      id: '/_dashboard/logs'
+      path: '/logs'
+      fullPath: '/logs'
+      preLoaderRoute: typeof DashboardLogsRouteImport
+      parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/emails/': {
-      id: '/_dashboard/emails/'
-      path: '/'
-      fullPath: '/emails/'
-      preLoaderRoute: typeof DashboardEmailsIndexRouteImport
-      parentRoute: typeof DashboardEmailsRoute
+    '/_dashboard/metrics': {
+      id: '/_dashboard/metrics'
+      path: '/metrics'
+      fullPath: '/metrics'
+      preLoaderRoute: typeof DashboardMetricsRouteImport
+      parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/domain/': {
-      id: '/_dashboard/domain/'
-      path: '/'
-      fullPath: '/domain/'
-      preLoaderRoute: typeof DashboardDomainIndexRouteImport
-      parentRoute: typeof DashboardDomainRoute
+    '/_dashboard/settings': {
+      id: '/_dashboard/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRoute
     }
-    '/_dashboard/contacts/': {
-      id: '/_dashboard/contacts/'
-      path: '/'
-      fullPath: '/contacts/'
-      preLoaderRoute: typeof DashboardContactsIndexRouteImport
-      parentRoute: typeof DashboardContactsRoute
+    '/_dashboard/smtp': {
+      id: '/_dashboard/smtp'
+      path: '/smtp'
+      fullPath: '/smtp'
+      preLoaderRoute: typeof DashboardSmtpRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/templates': {
+      id: '/_dashboard/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof DashboardTemplatesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/webhooks': {
+      id: '/_dashboard/webhooks'
+      path: '/webhooks'
+      fullPath: '/webhooks'
+      preLoaderRoute: typeof DashboardWebhooksRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/workflows': {
+      id: '/_dashboard/workflows'
+      path: '/workflows'
+      fullPath: '/workflows'
+      preLoaderRoute: typeof DashboardWorkflowsRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/_dashboard/api-keys/': {
       id: '/_dashboard/api-keys/'
@@ -1108,144 +1052,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardApiKeysIndexRouteImport
       parentRoute: typeof DashboardApiKeysRoute
     }
-    '/_dashboard/workflows/$workflowId': {
-      id: '/_dashboard/workflows/$workflowId'
-      path: '/$workflowId'
-      fullPath: '/workflows/$workflowId'
-      preLoaderRoute: typeof DashboardWorkflowsWorkflowIdRouteImport
-      parentRoute: typeof DashboardWorkflowsRoute
+    '/_dashboard/api-keys/$apiKeyId': {
+      id: '/_dashboard/api-keys/$apiKeyId'
+      path: '/$apiKeyId'
+      fullPath: '/api-keys/$apiKeyId'
+      preLoaderRoute: typeof DashboardApiKeysApiKeyIdRouteImport
+      parentRoute: typeof DashboardApiKeysRoute
     }
-    '/_dashboard/webhooks/create': {
-      id: '/_dashboard/webhooks/create'
-      path: '/create'
-      fullPath: '/webhooks/create'
-      preLoaderRoute: typeof DashboardWebhooksCreateRouteImport
-      parentRoute: typeof DashboardWebhooksRoute
-    }
-    '/_dashboard/webhooks/$webhookId': {
-      id: '/_dashboard/webhooks/$webhookId'
-      path: '/$webhookId'
-      fullPath: '/webhooks/$webhookId'
-      preLoaderRoute: typeof DashboardWebhooksWebhookIdRouteImport
-      parentRoute: typeof DashboardWebhooksRoute
-    }
-    '/_dashboard/templates/$templateId': {
-      id: '/_dashboard/templates/$templateId'
-      path: '/$templateId'
-      fullPath: '/templates/$templateId'
-      preLoaderRoute: typeof DashboardTemplatesTemplateIdRouteImport
-      parentRoute: typeof DashboardTemplatesRoute
-    }
-    '/_dashboard/settings/workspace': {
-      id: '/_dashboard/settings/workspace'
-      path: '/workspace'
-      fullPath: '/settings/workspace'
-      preLoaderRoute: typeof DashboardSettingsWorkspaceRouteImport
-      parentRoute: typeof DashboardSettingsRoute
-    }
-    '/_dashboard/settings/theme': {
-      id: '/_dashboard/settings/theme'
-      path: '/theme'
-      fullPath: '/settings/theme'
-      preLoaderRoute: typeof DashboardSettingsThemeRouteImport
-      parentRoute: typeof DashboardSettingsRoute
-    }
-    '/_dashboard/settings/teams': {
-      id: '/_dashboard/settings/teams'
-      path: '/teams'
-      fullPath: '/settings/teams'
-      preLoaderRoute: typeof DashboardSettingsTeamsRouteImport
-      parentRoute: typeof DashboardSettingsRoute
-    }
-    '/_dashboard/settings/security': {
-      id: '/_dashboard/settings/security'
-      path: '/security'
-      fullPath: '/settings/security'
-      preLoaderRoute: typeof DashboardSettingsSecurityRouteImport
-      parentRoute: typeof DashboardSettingsRoute
-    }
-    '/_dashboard/settings/profile': {
-      id: '/_dashboard/settings/profile'
-      path: '/profile'
-      fullPath: '/settings/profile'
-      preLoaderRoute: typeof DashboardSettingsProfileRouteImport
-      parentRoute: typeof DashboardSettingsRoute
-    }
-    '/_dashboard/settings/billing': {
-      id: '/_dashboard/settings/billing'
-      path: '/billing'
-      fullPath: '/settings/billing'
-      preLoaderRoute: typeof DashboardSettingsBillingRouteImport
-      parentRoute: typeof DashboardSettingsRoute
-    }
-    '/_dashboard/logs/$logId': {
-      id: '/_dashboard/logs/$logId'
-      path: '/$logId'
-      fullPath: '/logs/$logId'
-      preLoaderRoute: typeof DashboardLogsLogIdRouteImport
-      parentRoute: typeof DashboardLogsRoute
-    }
-    '/_dashboard/inbox/$mailboxId': {
-      id: '/_dashboard/inbox/$mailboxId'
-      path: '/$mailboxId'
-      fullPath: '/inbox/$mailboxId'
-      preLoaderRoute: typeof DashboardInboxMailboxIdRouteImport
-      parentRoute: typeof DashboardInboxRoute
-    }
-    '/_dashboard/emails/sent': {
-      id: '/_dashboard/emails/sent'
-      path: '/sent'
-      fullPath: '/emails/sent'
-      preLoaderRoute: typeof DashboardEmailsSentRouteImport
-      parentRoute: typeof DashboardEmailsRoute
-    }
-    '/_dashboard/emails/received': {
-      id: '/_dashboard/emails/received'
-      path: '/received'
-      fullPath: '/emails/received'
-      preLoaderRoute: typeof DashboardEmailsReceivedRouteImport
-      parentRoute: typeof DashboardEmailsRoute
-    }
-    '/_dashboard/emails/$emailId': {
-      id: '/_dashboard/emails/$emailId'
-      path: '/$emailId'
-      fullPath: '/emails/$emailId'
-      preLoaderRoute: typeof DashboardEmailsEmailIdRouteImport
-      parentRoute: typeof DashboardEmailsRoute
-    }
-    '/_dashboard/domain/add': {
-      id: '/_dashboard/domain/add'
-      path: '/add'
-      fullPath: '/domain/add'
-      preLoaderRoute: typeof DashboardDomainAddRouteImport
-      parentRoute: typeof DashboardDomainRoute
-    }
-    '/_dashboard/domain/$domainId': {
-      id: '/_dashboard/domain/$domainId'
-      path: '/$domainId'
-      fullPath: '/domain/$domainId'
-      preLoaderRoute: typeof DashboardDomainDomainIdRouteImport
-      parentRoute: typeof DashboardDomainRoute
-    }
-    '/_dashboard/contacts/properties': {
-      id: '/_dashboard/contacts/properties'
-      path: '/properties'
-      fullPath: '/contacts/properties'
-      preLoaderRoute: typeof DashboardContactsPropertiesRouteImport
-      parentRoute: typeof DashboardContactsRoute
-    }
-    '/_dashboard/contacts/groups': {
-      id: '/_dashboard/contacts/groups'
-      path: '/groups'
-      fullPath: '/contacts/groups'
-      preLoaderRoute: typeof DashboardContactsGroupsRouteImport
-      parentRoute: typeof DashboardContactsRoute
-    }
-    '/_dashboard/contacts/detail': {
-      id: '/_dashboard/contacts/detail'
-      path: '/detail'
-      fullPath: '/contacts/detail'
-      preLoaderRoute: typeof DashboardContactsDetailRouteImport
+    '/_dashboard/contacts/': {
+      id: '/_dashboard/contacts/'
+      path: '/'
+      fullPath: '/contacts/'
+      preLoaderRoute: typeof DashboardContactsIndexRouteImport
       parentRoute: typeof DashboardContactsRoute
     }
     '/_dashboard/contacts/channels': {
@@ -1255,40 +1073,201 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardContactsChannelsRouteImport
       parentRoute: typeof DashboardContactsRoute
     }
-    '/_dashboard/api-keys/$apiKeyId': {
-      id: '/_dashboard/api-keys/$apiKeyId'
-      path: '/$apiKeyId'
-      fullPath: '/api-keys/$apiKeyId'
-      preLoaderRoute: typeof DashboardApiKeysApiKeyIdRouteImport
-      parentRoute: typeof DashboardApiKeysRoute
+    '/_dashboard/contacts/detail': {
+      id: '/_dashboard/contacts/detail'
+      path: '/detail'
+      fullPath: '/contacts/detail'
+      preLoaderRoute: typeof DashboardContactsDetailRouteImport
+      parentRoute: typeof DashboardContactsRoute
     }
-    '/_dashboard/webhooks/$webhookId/': {
-      id: '/_dashboard/webhooks/$webhookId/'
-      path: '/'
-      fullPath: '/webhooks/$webhookId/'
-      preLoaderRoute: typeof DashboardWebhooksWebhookIdIndexRouteImport
-      parentRoute: typeof DashboardWebhooksWebhookIdRoute
+    '/_dashboard/contacts/groups': {
+      id: '/_dashboard/contacts/groups'
+      path: '/groups'
+      fullPath: '/contacts/groups'
+      preLoaderRoute: typeof DashboardContactsGroupsRouteImport
+      parentRoute: typeof DashboardContactsRoute
     }
-    '/_dashboard/settings/billing/': {
-      id: '/_dashboard/settings/billing/'
-      path: '/'
-      fullPath: '/settings/billing/'
-      preLoaderRoute: typeof DashboardSettingsBillingIndexRouteImport
-      parentRoute: typeof DashboardSettingsBillingRoute
+    '/_dashboard/contacts/properties': {
+      id: '/_dashboard/contacts/properties'
+      path: '/properties'
+      fullPath: '/contacts/properties'
+      preLoaderRoute: typeof DashboardContactsPropertiesRouteImport
+      parentRoute: typeof DashboardContactsRoute
     }
-    '/_dashboard/inbox/$mailboxId/': {
-      id: '/_dashboard/inbox/$mailboxId/'
+    '/_dashboard/domain/': {
+      id: '/_dashboard/domain/'
       path: '/'
-      fullPath: '/inbox/$mailboxId/'
-      preLoaderRoute: typeof DashboardInboxMailboxIdIndexRouteImport
-      parentRoute: typeof DashboardInboxMailboxIdRoute
+      fullPath: '/domain/'
+      preLoaderRoute: typeof DashboardDomainIndexRouteImport
+      parentRoute: typeof DashboardDomainRoute
     }
-    '/_dashboard/domain/add/': {
-      id: '/_dashboard/domain/add/'
+    '/_dashboard/domain/$domainId': {
+      id: '/_dashboard/domain/$domainId'
+      path: '/$domainId'
+      fullPath: '/domain/$domainId'
+      preLoaderRoute: typeof DashboardDomainDomainIdRouteImport
+      parentRoute: typeof DashboardDomainRoute
+    }
+    '/_dashboard/domain/add': {
+      id: '/_dashboard/domain/add'
+      path: '/add'
+      fullPath: '/domain/add'
+      preLoaderRoute: typeof DashboardDomainAddRouteImport
+      parentRoute: typeof DashboardDomainRoute
+    }
+    '/_dashboard/emails/': {
+      id: '/_dashboard/emails/'
       path: '/'
-      fullPath: '/domain/add/'
-      preLoaderRoute: typeof DashboardDomainAddIndexRouteImport
-      parentRoute: typeof DashboardDomainAddRoute
+      fullPath: '/emails/'
+      preLoaderRoute: typeof DashboardEmailsIndexRouteImport
+      parentRoute: typeof DashboardEmailsRoute
+    }
+    '/_dashboard/emails/$emailId': {
+      id: '/_dashboard/emails/$emailId'
+      path: '/$emailId'
+      fullPath: '/emails/$emailId'
+      preLoaderRoute: typeof DashboardEmailsEmailIdRouteImport
+      parentRoute: typeof DashboardEmailsRoute
+    }
+    '/_dashboard/emails/received': {
+      id: '/_dashboard/emails/received'
+      path: '/received'
+      fullPath: '/emails/received'
+      preLoaderRoute: typeof DashboardEmailsReceivedRouteImport
+      parentRoute: typeof DashboardEmailsRoute
+    }
+    '/_dashboard/emails/sent': {
+      id: '/_dashboard/emails/sent'
+      path: '/sent'
+      fullPath: '/emails/sent'
+      preLoaderRoute: typeof DashboardEmailsSentRouteImport
+      parentRoute: typeof DashboardEmailsRoute
+    }
+    '/_dashboard/inbox/$mailboxId': {
+      id: '/_dashboard/inbox/$mailboxId'
+      path: '/$mailboxId'
+      fullPath: '/inbox/$mailboxId'
+      preLoaderRoute: typeof DashboardInboxMailboxIdRouteImport
+      parentRoute: typeof DashboardInboxRoute
+    }
+    '/_dashboard/logs/': {
+      id: '/_dashboard/logs/'
+      path: '/'
+      fullPath: '/logs/'
+      preLoaderRoute: typeof DashboardLogsIndexRouteImport
+      parentRoute: typeof DashboardLogsRoute
+    }
+    '/_dashboard/logs/$logId': {
+      id: '/_dashboard/logs/$logId'
+      path: '/$logId'
+      fullPath: '/logs/$logId'
+      preLoaderRoute: typeof DashboardLogsLogIdRouteImport
+      parentRoute: typeof DashboardLogsRoute
+    }
+    '/_dashboard/settings/': {
+      id: '/_dashboard/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof DashboardSettingsIndexRouteImport
+      parentRoute: typeof DashboardSettingsRoute
+    }
+    '/_dashboard/settings/billing': {
+      id: '/_dashboard/settings/billing'
+      path: '/billing'
+      fullPath: '/settings/billing'
+      preLoaderRoute: typeof DashboardSettingsBillingRouteImport
+      parentRoute: typeof DashboardSettingsRoute
+    }
+    '/_dashboard/settings/profile': {
+      id: '/_dashboard/settings/profile'
+      path: '/profile'
+      fullPath: '/settings/profile'
+      preLoaderRoute: typeof DashboardSettingsProfileRouteImport
+      parentRoute: typeof DashboardSettingsRoute
+    }
+    '/_dashboard/settings/security': {
+      id: '/_dashboard/settings/security'
+      path: '/security'
+      fullPath: '/settings/security'
+      preLoaderRoute: typeof DashboardSettingsSecurityRouteImport
+      parentRoute: typeof DashboardSettingsRoute
+    }
+    '/_dashboard/settings/teams': {
+      id: '/_dashboard/settings/teams'
+      path: '/teams'
+      fullPath: '/settings/teams'
+      preLoaderRoute: typeof DashboardSettingsTeamsRouteImport
+      parentRoute: typeof DashboardSettingsRoute
+    }
+    '/_dashboard/settings/theme': {
+      id: '/_dashboard/settings/theme'
+      path: '/theme'
+      fullPath: '/settings/theme'
+      preLoaderRoute: typeof DashboardSettingsThemeRouteImport
+      parentRoute: typeof DashboardSettingsRoute
+    }
+    '/_dashboard/settings/workspace': {
+      id: '/_dashboard/settings/workspace'
+      path: '/workspace'
+      fullPath: '/settings/workspace'
+      preLoaderRoute: typeof DashboardSettingsWorkspaceRouteImport
+      parentRoute: typeof DashboardSettingsRoute
+    }
+    '/_dashboard/templates/': {
+      id: '/_dashboard/templates/'
+      path: '/'
+      fullPath: '/templates/'
+      preLoaderRoute: typeof DashboardTemplatesIndexRouteImport
+      parentRoute: typeof DashboardTemplatesRoute
+    }
+    '/_dashboard/templates/$templateId': {
+      id: '/_dashboard/templates/$templateId'
+      path: '/$templateId'
+      fullPath: '/templates/$templateId'
+      preLoaderRoute: typeof DashboardTemplatesTemplateIdRouteImport
+      parentRoute: typeof DashboardTemplatesRoute
+    }
+    '/_dashboard/webhooks/': {
+      id: '/_dashboard/webhooks/'
+      path: '/'
+      fullPath: '/webhooks/'
+      preLoaderRoute: typeof DashboardWebhooksIndexRouteImport
+      parentRoute: typeof DashboardWebhooksRoute
+    }
+    '/_dashboard/webhooks/$webhookId': {
+      id: '/_dashboard/webhooks/$webhookId'
+      path: '/$webhookId'
+      fullPath: '/webhooks/$webhookId'
+      preLoaderRoute: typeof DashboardWebhooksWebhookIdRouteImport
+      parentRoute: typeof DashboardWebhooksRoute
+    }
+    '/_dashboard/webhooks/create': {
+      id: '/_dashboard/webhooks/create'
+      path: '/create'
+      fullPath: '/webhooks/create'
+      preLoaderRoute: typeof DashboardWebhooksCreateRouteImport
+      parentRoute: typeof DashboardWebhooksRoute
+    }
+    '/_dashboard/workflows/': {
+      id: '/_dashboard/workflows/'
+      path: '/'
+      fullPath: '/workflows/'
+      preLoaderRoute: typeof DashboardWorkflowsIndexRouteImport
+      parentRoute: typeof DashboardWorkflowsRoute
+    }
+    '/_dashboard/workflows/$workflowId': {
+      id: '/_dashboard/workflows/$workflowId'
+      path: '/$workflowId'
+      fullPath: '/workflows/$workflowId'
+      preLoaderRoute: typeof DashboardWorkflowsWorkflowIdRouteImport
+      parentRoute: typeof DashboardWorkflowsRoute
+    }
+    '/_dashboard/contacts/detail/$contactId': {
+      id: '/_dashboard/contacts/detail/$contactId'
+      path: '/$contactId'
+      fullPath: '/contacts/detail/$contactId'
+      preLoaderRoute: typeof DashboardContactsDetailContactIdRouteImport
+      parentRoute: typeof DashboardContactsDetailRoute
     }
     '/_dashboard/contacts/groups/': {
       id: '/_dashboard/contacts/groups/'
@@ -1297,74 +1276,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardContactsGroupsIndexRouteImport
       parentRoute: typeof DashboardContactsGroupsRoute
     }
-    '/_dashboard/webhooks/$webhookId/test': {
-      id: '/_dashboard/webhooks/$webhookId/test'
-      path: '/test'
-      fullPath: '/webhooks/$webhookId/test'
-      preLoaderRoute: typeof DashboardWebhooksWebhookIdTestRouteImport
-      parentRoute: typeof DashboardWebhooksWebhookIdRoute
+    '/_dashboard/contacts/groups/$groupId': {
+      id: '/_dashboard/contacts/groups/$groupId'
+      path: '/$groupId'
+      fullPath: '/contacts/groups/$groupId'
+      preLoaderRoute: typeof DashboardContactsGroupsGroupIdRouteImport
+      parentRoute: typeof DashboardContactsGroupsRoute
     }
-    '/_dashboard/settings/billing/plans': {
-      id: '/_dashboard/settings/billing/plans'
-      path: '/plans'
-      fullPath: '/settings/billing/plans'
-      preLoaderRoute: typeof DashboardSettingsBillingPlansRouteImport
-      parentRoute: typeof DashboardSettingsBillingRoute
+    '/_dashboard/domain/add/': {
+      id: '/_dashboard/domain/add/'
+      path: '/'
+      fullPath: '/domain/add/'
+      preLoaderRoute: typeof DashboardDomainAddIndexRouteImport
+      parentRoute: typeof DashboardDomainAddRoute
     }
-    '/_dashboard/inbox/$mailboxId/you': {
-      id: '/_dashboard/inbox/$mailboxId/you'
-      path: '/you'
-      fullPath: '/inbox/$mailboxId/you'
-      preLoaderRoute: typeof DashboardInboxMailboxIdYouRouteImport
-      parentRoute: typeof DashboardInboxMailboxIdRoute
+    '/_dashboard/domain/add/$domainId': {
+      id: '/_dashboard/domain/add/$domainId'
+      path: '/$domainId'
+      fullPath: '/domain/add/$domainId'
+      preLoaderRoute: typeof DashboardDomainAddDomainIdRouteImport
+      parentRoute: typeof DashboardDomainAddRoute
     }
-    '/_dashboard/inbox/$mailboxId/trash': {
-      id: '/_dashboard/inbox/$mailboxId/trash'
-      path: '/trash'
-      fullPath: '/inbox/$mailboxId/trash'
-      preLoaderRoute: typeof DashboardInboxMailboxIdTrashRouteImport
-      parentRoute: typeof DashboardInboxMailboxIdRoute
-    }
-    '/_dashboard/inbox/$mailboxId/spam': {
-      id: '/_dashboard/inbox/$mailboxId/spam'
-      path: '/spam'
-      fullPath: '/inbox/$mailboxId/spam'
-      preLoaderRoute: typeof DashboardInboxMailboxIdSpamRouteImport
-      parentRoute: typeof DashboardInboxMailboxIdRoute
-    }
-    '/_dashboard/inbox/$mailboxId/sent': {
-      id: '/_dashboard/inbox/$mailboxId/sent'
-      path: '/sent'
-      fullPath: '/inbox/$mailboxId/sent'
-      preLoaderRoute: typeof DashboardInboxMailboxIdSentRouteImport
-      parentRoute: typeof DashboardInboxMailboxIdRoute
-    }
-    '/_dashboard/inbox/$mailboxId/needs_approval': {
-      id: '/_dashboard/inbox/$mailboxId/needs_approval'
-      path: '/needs_approval'
-      fullPath: '/inbox/$mailboxId/needs_approval'
-      preLoaderRoute: typeof DashboardInboxMailboxIdNeeds_approvalRouteImport
-      parentRoute: typeof DashboardInboxMailboxIdRoute
-    }
-    '/_dashboard/inbox/$mailboxId/label': {
-      id: '/_dashboard/inbox/$mailboxId/label'
-      path: '/label'
-      fullPath: '/inbox/$mailboxId/label'
-      preLoaderRoute: typeof DashboardInboxMailboxIdLabelRouteImport
-      parentRoute: typeof DashboardInboxMailboxIdRoute
-    }
-    '/_dashboard/inbox/$mailboxId/drafts': {
-      id: '/_dashboard/inbox/$mailboxId/drafts'
-      path: '/drafts'
-      fullPath: '/inbox/$mailboxId/drafts'
-      preLoaderRoute: typeof DashboardInboxMailboxIdDraftsRouteImport
-      parentRoute: typeof DashboardInboxMailboxIdRoute
-    }
-    '/_dashboard/inbox/$mailboxId/archive': {
-      id: '/_dashboard/inbox/$mailboxId/archive'
-      path: '/archive'
-      fullPath: '/inbox/$mailboxId/archive'
-      preLoaderRoute: typeof DashboardInboxMailboxIdArchiveRouteImport
+    '/_dashboard/inbox/$mailboxId/': {
+      id: '/_dashboard/inbox/$mailboxId/'
+      path: '/'
+      fullPath: '/inbox/$mailboxId/'
+      preLoaderRoute: typeof DashboardInboxMailboxIdIndexRouteImport
       parentRoute: typeof DashboardInboxMailboxIdRoute
     }
     '/_dashboard/inbox/$mailboxId/agent': {
@@ -1374,26 +1311,89 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardInboxMailboxIdAgentRouteImport
       parentRoute: typeof DashboardInboxMailboxIdRoute
     }
-    '/_dashboard/domain/add/$domainId': {
-      id: '/_dashboard/domain/add/$domainId'
-      path: '/$domainId'
-      fullPath: '/domain/add/$domainId'
-      preLoaderRoute: typeof DashboardDomainAddDomainIdRouteImport
-      parentRoute: typeof DashboardDomainAddRoute
+    '/_dashboard/inbox/$mailboxId/archive': {
+      id: '/_dashboard/inbox/$mailboxId/archive'
+      path: '/archive'
+      fullPath: '/inbox/$mailboxId/archive'
+      preLoaderRoute: typeof DashboardInboxMailboxIdArchiveRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
     }
-    '/_dashboard/contacts/groups/$groupId': {
-      id: '/_dashboard/contacts/groups/$groupId'
-      path: '/$groupId'
-      fullPath: '/contacts/groups/$groupId'
-      preLoaderRoute: typeof DashboardContactsGroupsGroupIdRouteImport
-      parentRoute: typeof DashboardContactsGroupsRoute
+    '/_dashboard/inbox/$mailboxId/drafts': {
+      id: '/_dashboard/inbox/$mailboxId/drafts'
+      path: '/drafts'
+      fullPath: '/inbox/$mailboxId/drafts'
+      preLoaderRoute: typeof DashboardInboxMailboxIdDraftsRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
     }
-    '/_dashboard/contacts/detail/$contactId': {
-      id: '/_dashboard/contacts/detail/$contactId'
-      path: '/$contactId'
-      fullPath: '/contacts/detail/$contactId'
-      preLoaderRoute: typeof DashboardContactsDetailContactIdRouteImport
-      parentRoute: typeof DashboardContactsDetailRoute
+    '/_dashboard/inbox/$mailboxId/label': {
+      id: '/_dashboard/inbox/$mailboxId/label'
+      path: '/label'
+      fullPath: '/inbox/$mailboxId/label'
+      preLoaderRoute: typeof DashboardInboxMailboxIdLabelRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
+    }
+    '/_dashboard/inbox/$mailboxId/needs_approval': {
+      id: '/_dashboard/inbox/$mailboxId/needs_approval'
+      path: '/needs_approval'
+      fullPath: '/inbox/$mailboxId/needs_approval'
+      preLoaderRoute: typeof DashboardInboxMailboxIdNeeds_approvalRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
+    }
+    '/_dashboard/inbox/$mailboxId/sent': {
+      id: '/_dashboard/inbox/$mailboxId/sent'
+      path: '/sent'
+      fullPath: '/inbox/$mailboxId/sent'
+      preLoaderRoute: typeof DashboardInboxMailboxIdSentRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
+    }
+    '/_dashboard/inbox/$mailboxId/spam': {
+      id: '/_dashboard/inbox/$mailboxId/spam'
+      path: '/spam'
+      fullPath: '/inbox/$mailboxId/spam'
+      preLoaderRoute: typeof DashboardInboxMailboxIdSpamRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
+    }
+    '/_dashboard/inbox/$mailboxId/trash': {
+      id: '/_dashboard/inbox/$mailboxId/trash'
+      path: '/trash'
+      fullPath: '/inbox/$mailboxId/trash'
+      preLoaderRoute: typeof DashboardInboxMailboxIdTrashRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
+    }
+    '/_dashboard/inbox/$mailboxId/you': {
+      id: '/_dashboard/inbox/$mailboxId/you'
+      path: '/you'
+      fullPath: '/inbox/$mailboxId/you'
+      preLoaderRoute: typeof DashboardInboxMailboxIdYouRouteImport
+      parentRoute: typeof DashboardInboxMailboxIdRoute
+    }
+    '/_dashboard/settings/billing/': {
+      id: '/_dashboard/settings/billing/'
+      path: '/'
+      fullPath: '/settings/billing/'
+      preLoaderRoute: typeof DashboardSettingsBillingIndexRouteImport
+      parentRoute: typeof DashboardSettingsBillingRoute
+    }
+    '/_dashboard/settings/billing/plans': {
+      id: '/_dashboard/settings/billing/plans'
+      path: '/plans'
+      fullPath: '/settings/billing/plans'
+      preLoaderRoute: typeof DashboardSettingsBillingPlansRouteImport
+      parentRoute: typeof DashboardSettingsBillingRoute
+    }
+    '/_dashboard/webhooks/$webhookId/': {
+      id: '/_dashboard/webhooks/$webhookId/'
+      path: '/'
+      fullPath: '/webhooks/$webhookId/'
+      preLoaderRoute: typeof DashboardWebhooksWebhookIdIndexRouteImport
+      parentRoute: typeof DashboardWebhooksWebhookIdRoute
+    }
+    '/_dashboard/webhooks/$webhookId/test': {
+      id: '/_dashboard/webhooks/$webhookId/test'
+      path: '/test'
+      fullPath: '/webhooks/$webhookId/test'
+      preLoaderRoute: typeof DashboardWebhooksWebhookIdTestRouteImport
+      parentRoute: typeof DashboardWebhooksWebhookIdRoute
     }
     '/_dashboard/inbox/$mailboxId/label/$labelId': {
       id: '/_dashboard/inbox/$mailboxId/label/$labelId'

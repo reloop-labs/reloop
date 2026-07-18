@@ -1,15 +1,10 @@
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Paperclip } from "lucide-react";
-import {
-	forwardRef,
-	useCallback,
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from "react";
+import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { extractBareEmail, extractDisplayName } from "../../lib/email-address";
@@ -72,101 +67,21 @@ const modKey =
 /** Linear-style expo ease-out — snappy settle, no lag at the start. */
 const easeOut = [0.16, 1, 0.3, 1] as const;
 
-function ModeSwitcher({
-	mode,
-	canReplyAll,
-	onChange,
-}: {
-	mode: ReplyMode;
-	canReplyAll: boolean;
-	onChange: (mode: ReplyMode) => void;
-}) {
-	const replyRef = useRef<HTMLButtonElement>(null);
-	const replyAllRef = useRef<HTMLButtonElement>(null);
-	const [pill, setPill] = useState({ left: 0, width: 0 });
-
-	const measure = useCallback(() => {
-		const el = mode === "reply" ? replyRef.current : replyAllRef.current;
-		if (!el) return;
-		setPill({ left: el.offsetLeft, width: el.offsetWidth });
-	}, [mode]);
-
-	useLayoutEffect(() => {
-		measure();
-	}, [measure]);
-
-	useEffect(() => {
-		window.addEventListener("resize", measure);
-		return () => window.removeEventListener("resize", measure);
-	}, [measure]);
-
-	return (
-		<div
-			className="relative inline-flex h-7 items-center rounded-lg bg-[var(--inbox-muted-bg)] p-0.5"
-			role="group"
-			aria-label="Reply mode"
-		>
-			<motion.span
-				aria-hidden
-				className="absolute top-0.5 bottom-0.5 rounded-md bg-panel-light shadow-sm dark:bg-panel-dark"
-				initial={false}
-				animate={{ left: pill.left, width: pill.width }}
-				transition={{ type: "spring", bounce: 0, duration: 0.28 }}
-			/>
-			<button
-				ref={replyRef}
-				type="button"
-				onClick={() => onChange("reply")}
-				aria-pressed={mode === "reply"}
-				className={cn(
-					"relative z-10 inline-flex h-6 items-center gap-1 rounded-md px-2 font-medium text-[12px] transition-colors duration-200",
-					mode === "reply"
-						? "text-mail-foreground"
-						: "text-mail-muted hover:text-mail-foreground",
-				)}
-			>
-				<Icon name="reply" className="h-3 w-3" />
-				Reply
-			</button>
-			{canReplyAll && (
-				<button
-					ref={replyAllRef}
-					type="button"
-					onClick={() => onChange("replyAll")}
-					aria-pressed={mode === "replyAll"}
-					className={cn(
-						"relative z-10 inline-flex h-6 items-center gap-1 rounded-md px-2 font-medium text-[12px] transition-colors duration-200",
-						mode === "replyAll"
-							? "text-mail-foreground"
-							: "text-mail-muted hover:text-mail-foreground",
-					)}
-				>
-					Reply all
-				</button>
-			)}
-		</div>
-	);
-}
-
 export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 	function ReplyComposer(
 		{
 			toName,
 			toEmail,
 			fromEmail,
-			mode: modeProp = "reply",
-			canReplyAll = true,
 			variant = "dock",
 			skipEnter = false,
 			initialContent = "",
-			onModeChange,
 			onSend,
 			onClose,
 		},
 		ref,
 	) {
 		const reduceMotion = useReducedMotion();
-		const [mode, setMode] = useState<ReplyMode>(modeProp);
 		const bareTo = extractBareEmail(toEmail) || toEmail;
 		const displayName =
 			extractDisplayName(toName) ||
@@ -187,20 +102,11 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 		textRef.current = textBody;
 
 		useEffect(() => {
-			setMode(modeProp);
-		}, [modeProp]);
-
-		useEffect(() => {
 			const id = window.setTimeout(() => {
 				editorRef.current?.editor?.commands.focus("end");
 			}, 120);
 			return () => window.clearTimeout(id);
 		}, []);
-
-		const changeMode = (next: ReplyMode) => {
-			setMode(next);
-			onModeChange?.(next);
-		};
 
 		const send = useCallback(async () => {
 			if (!textRef.current.trim()) return;
@@ -328,19 +234,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 					</AnimatePresence>
 
 					<div className="flex items-center gap-2 border-mail-border/40 border-b px-4 py-2.5">
-						<ModeSwitcher
-							mode={mode}
-							canReplyAll={canReplyAll}
-							onChange={changeMode}
-						/>
-
-						<motion.div
-							key={bareTo}
-							initial={reduceMotion ? false : { opacity: 0, y: 4 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.22, ease: easeOut, delay: 0.04 }}
-							className="min-w-0 flex-1 truncate text-[12px] text-mail-muted"
-						>
+						<div className="min-w-0 flex-1 truncate text-[12px] text-mail-muted">
 							<span className="text-mail-muted">to </span>
 							<span className="font-medium text-mail-foreground">
 								{displayName}
@@ -348,7 +242,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 							{bareTo ? (
 								<span className="text-mail-muted"> · {bareTo}</span>
 							) : null}
-						</motion.div>
+						</div>
 
 						<button
 							type="button"
@@ -482,7 +376,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 							</span>
 						</div>
 
-						<div className="flex items-center gap-1.5">
+						<div className="flex items-center gap-2">
 							<button
 								type="button"
 								onClick={onClose}
@@ -490,27 +384,24 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 							>
 								Discard
 							</button>
-							<button
+							<FancyButton.Root
 								type="button"
-								onClick={() => void send()}
+								variant="neutral"
+								size="xsmall"
 								disabled={!canSend}
-								className={cn(
-									"inline-flex h-8 items-center gap-2 rounded-lg bg-mail-primary px-3 font-semibold text-[12px] text-panel-light transition-[transform,opacity] duration-150",
-									"hover:opacity-90 active:scale-[0.97]",
-									"disabled:pointer-events-none disabled:opacity-35",
-									"dark:text-black",
-								)}
+								onClick={() => void send()}
+								className="min-w-[132px] justify-between pr-2 pl-3"
 							>
-								<span>Send</span>
-								<span className="hidden items-center gap-0.5 font-normal opacity-70 sm:inline-flex">
-									<span className="rounded border border-white/25 px-1 text-[10px] leading-4 dark:border-black/25">
+								<span className="text-sm leading-none">Send</span>
+								<div className="flex items-center gap-0.5 opacity-70">
+									<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
 										{modKey}
-									</span>
-									<span className="rounded border border-white/25 px-1 text-[10px] leading-4 dark:border-black/25">
+									</KbdKeyOutline>
+									<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
 										↵
-									</span>
-								</span>
-							</button>
+									</KbdKeyOutline>
+								</div>
+							</FancyButton.Root>
 						</div>
 					</div>
 				</div>

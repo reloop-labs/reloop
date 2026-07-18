@@ -1,8 +1,8 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import type { ReactNode } from "react";
-import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import { toast } from "sonner";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import { HoverPopover } from "./hover-popover";
 
 export function ContactHoverCard({
@@ -62,13 +62,15 @@ export function ContactHoverCard({
 								{displayName}
 							</p>
 							{isYou && (
-								<span className="inline-flex shrink-0 items-center rounded-md bg-[var(--inbox-muted-bg)] px-1.5 py-0.5 font-medium text-[10px] text-mail-muted ring-1 ring-mail-border/40 ring-inset">
+								<span className="inline-flex shrink-0 items-center rounded-full bg-[var(--inbox-muted-bg)] px-1.5 py-0.5 font-medium text-[10px] text-mail-muted ring-1 ring-mail-border/40 ring-inset">
 									You
 								</span>
 							)}
 						</div>
 						{domain ? (
-							<p className="mt-0.5 truncate text-mail-muted text-xs">{domain}</p>
+							<p className="mt-0.5 truncate text-mail-muted text-xs">
+								{domain}
+							</p>
 						) : null}
 					</div>
 				</div>
