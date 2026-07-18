@@ -1,4 +1,5 @@
 import { cn } from "@reloop/ui/cn";
+import { motion, useReducedMotion } from "framer-motion";
 import { Loader2, Sparkles, X } from "lucide-react";
 
 export const AiComposePreview = ({
@@ -12,10 +13,16 @@ export const AiComposePreview = ({
 	onAccept: () => void;
 	onReject: () => void;
 }) => {
-	if (!loading && !html) return null;
+	const shouldReduceMotion = useReducedMotion();
 
 	return (
-		<div className="absolute inset-x-3 bottom-3 z-20 rounded-xl border border-violet-500/40 bg-panel-light/95 p-3 shadow-lg backdrop-blur dark:bg-[#202020]/95">
+		<motion.div
+			initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.98 }}
+			animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+			exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }}
+			transition={shouldReduceMotion ? { duration: 0.15, ease: "easeOut" } : { duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+			className="absolute inset-x-3 bottom-3 z-20 rounded-xl border border-violet-500/40 bg-panel-light/95 p-3 shadow-lg backdrop-blur dark:bg-[#202020]/95"
+		>
 			<div className="mb-2 flex items-center justify-between">
 				<div className="flex items-center gap-1.5 font-medium text-violet-400 text-xs">
 					<Sparkles className="h-3.5 w-3.5" />
@@ -63,6 +70,6 @@ export const AiComposePreview = ({
 					</button>
 				</div>
 			)}
-		</div>
+		</motion.div>
 	);
 };

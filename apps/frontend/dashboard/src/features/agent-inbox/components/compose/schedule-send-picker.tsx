@@ -1,4 +1,5 @@
 import { cn } from "@reloop/ui/cn";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Clock, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -12,6 +13,7 @@ export const ScheduleSendPicker = ({
 	disabled?: boolean;
 }) => {
 	const [open, setOpen] = useState(false);
+	const shouldReduceMotion = useReducedMotion();
 	const initial = useMemo(() => {
 		if (!value) return { date: "", time: "" };
 		const d = new Date(value);
@@ -46,7 +48,7 @@ export const ScheduleSendPicker = ({
 				disabled={disabled}
 				onClick={() => setOpen((v) => !v)}
 				className={cn(
-					"inline-flex h-8 items-center gap-1.5 rounded-lg border border-mail-border/50 bg-transparent px-2.5 font-medium text-[12px] text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground disabled:opacity-40",
+					"inline-flex h-8 items-center gap-1.5 rounded-lg border border-mail-border/50 bg-transparent px-2.5 font-medium text-[12px] text-mail-muted transition-[transform,background-color,color] duration-150 ease-out hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.97] disabled:opacity-40",
 					value && "border-mail-foreground/20 bg-[var(--inbox-hover)] text-mail-foreground",
 				)}
 				title={
@@ -70,8 +72,16 @@ export const ScheduleSendPicker = ({
 				)}
 			</button>
 
-			{open && (
-				<div className="absolute bottom-full left-0 z-50 mb-2 w-[260px] rounded-lg border border-mail-border bg-panel-light p-3 shadow-lg dark:bg-panel-dark">
+			<AnimatePresence>
+				{open && (
+					<motion.div
+						initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 4 }}
+						animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+						exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 4 }}
+						transition={shouldReduceMotion ? { duration: 0.1 } : { duration: 0.16, ease: [0.23, 1, 0.32, 1] }}
+						style={{ transformOrigin: "bottom left" }}
+						className="absolute bottom-full left-0 z-50 mb-2 w-[260px] rounded-lg border border-mail-border bg-panel-light p-3 shadow-lg dark:bg-panel-dark"
+					>
 					<p className="mb-2 font-medium text-mail-foreground text-xs">
 						Schedule send
 					</p>
@@ -112,8 +122,9 @@ export const ScheduleSendPicker = ({
 							</button>
 						</div>
 					</div>
-				</div>
-			)}
+					</motion.div>
+				)}
+			</AnimatePresence>
 		</div>
 	);
 };
