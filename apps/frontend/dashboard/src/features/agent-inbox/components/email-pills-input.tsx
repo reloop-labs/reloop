@@ -1,10 +1,6 @@
-import {
-	getAvatarGradient,
-	getAvatarInitial,
-} from "#/utils/avatar";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
 	type ClipboardEvent,
 	type KeyboardEvent,
@@ -13,6 +9,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 
 interface EmailPillsInputProps {
 	emails: string[];
@@ -49,6 +46,7 @@ export const EmailPillsInput = ({
 	disabled = false,
 	suggestions = [],
 }: EmailPillsInputProps) => {
+	const shouldReduceMotion = useReducedMotion();
 	const [inputValue, setInputValue] = useState("");
 	const [highlight, setHighlight] = useState(0);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -163,17 +161,46 @@ export const EmailPillsInput = ({
 					{emails.map((emailStr, idx) => {
 						const isValid = validateEmail(emailStr);
 						const { name, email } = parseEmail(emailStr);
-						const display = name || email.split("@")[0] || email;
+						const display = email;
 
 						return (
 							<motion.div
-								key={`${emailStr}-${idx}`}
-								initial={{ opacity: 0, scale: 0.8 }}
-								animate={{ opacity: 1, scale: 1 }}
-								exit={{ opacity: 0, scale: 0.8 }}
-								transition={{ duration: 0.15 }}
+								key={emailStr}
+								layout={!shouldReduceMotion}
+								initial={
+									shouldReduceMotion
+										? { opacity: 0 }
+										: { opacity: 0, scale: 0.8 }
+								}
+								animate={
+									shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }
+								}
+								exit={
+									shouldReduceMotion
+										? { opacity: 0 }
+										: {
+												opacity: 0,
+												scale: 0.8,
+												width: 0,
+												paddingLeft: 0,
+												paddingRight: 0,
+												marginLeft: 0,
+												marginRight: 0,
+												borderWidth: 0,
+											}
+								}
+								transition={
+									shouldReduceMotion
+										? { duration: 0.1 }
+										: {
+												layout: { type: "spring", stiffness: 600, damping: 48 },
+												opacity: { duration: 0.12, ease: "easeOut" },
+												scale: { duration: 0.12, ease: "easeOut" },
+												default: { duration: 0.14, ease: [0.16, 1, 0.3, 1] },
+											}
+								}
 								className={cn(
-									"inline-flex items-center gap-1.5 rounded-full border py-0.5 pr-1.5 pl-0.5 font-medium text-xs",
+									"inline-flex items-center gap-1.5 rounded-full border py-0.5 pr-1.5 pl-0.5 font-medium text-xs whitespace-nowrap overflow-hidden",
 									isValid
 										? "border-mail-border/60 bg-mail-accent/40 text-mail-muted"
 										: "border-red-200 bg-red-50 text-red-600 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400",
@@ -187,7 +214,7 @@ export const EmailPillsInput = ({
 								>
 									{getAvatarInitial(name || null, email)}
 								</div>
-								<span className="max-w-[180px] truncate">{display}</span>
+								<span className="max-w-[240px] truncate">{display}</span>
 								<button
 									type="button"
 									onClick={(e) => {
@@ -203,7 +230,16 @@ export const EmailPillsInput = ({
 						);
 					})}
 				</AnimatePresence>
-				<input
+				<motion.input
+					layout={!shouldReduceMotion}
+					transition={
+						shouldReduceMotion
+							? { duration: 0.1 }
+							: {
+									layout: { type: "spring", stiffness: 600, damping: 48 },
+									default: { duration: 0.14, ease: [0.16, 1, 0.3, 1] },
+								}
+					}
 					ref={inputRef}
 					type="text"
 					value={inputValue}
