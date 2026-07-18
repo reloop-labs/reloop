@@ -46,8 +46,8 @@ export const ScheduleSendPicker = ({
 				disabled={disabled}
 				onClick={() => setOpen((v) => !v)}
 				className={cn(
-					"inline-flex h-8 items-center gap-1 rounded-md border border-[#E7E7E7] bg-transparent px-2 text-mail-foreground text-sm transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-[#2B2B2B] dark:hover:bg-[var(--inbox-control-hover)]",
-					value && "border-zero-blue/40 bg-zero-blue/5",
+					"inline-flex h-8 items-center gap-1.5 rounded-lg border border-mail-border/50 bg-transparent px-2.5 font-medium text-[12px] text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground disabled:opacity-40",
+					value && "border-mail-foreground/20 bg-[var(--inbox-hover)] text-mail-foreground",
 				)}
 				title={
 					value
@@ -55,9 +55,9 @@ export const ScheduleSendPicker = ({
 						: "Send later"
 				}
 			>
-				<Clock className="h-3.5 w-3.5 text-[#9A9A9A]" />
+				<Clock className="h-3.5 w-3.5" />
 				{value ? (
-					<span className="hidden text-xs sm:inline">
+					<span className="text-[12px]">
 						{new Date(value).toLocaleString(undefined, {
 							month: "short",
 							day: "numeric",
@@ -65,7 +65,9 @@ export const ScheduleSendPicker = ({
 							minute: "2-digit",
 						})}
 					</span>
-				) : null}
+				) : (
+					<span>Later</span>
+				)}
 			</button>
 
 			{open && (

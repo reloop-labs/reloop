@@ -1,14 +1,17 @@
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
+import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import * as Modal from "@reloop/ui/modal";
 import * as Popover from "@reloop/ui/popover";
 import { EditorContent } from "@tiptap/react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-	Command,
-	CornerDownLeft,
+	FileText,
+	Image as ImageIcon,
 	Loader2,
 	Paperclip,
-	Plus,
 	Sparkles,
 	Type,
 	X as XIcon,
@@ -23,10 +26,6 @@ import { useAgentInbox } from "./agent-inbox-provider";
 import { AiComposePreview } from "./compose/ai-compose-preview";
 import { ComposeToolbar } from "./compose/compose-toolbar";
 import { ScheduleSendPicker } from "./compose/schedule-send-picker";
-import {
-	type AppliedTemplate,
-	TemplateButton,
-} from "./compose/template-button";
 import { useComposeEditor } from "./compose/use-compose-editor";
 import { EmailPillsInput, validateEmail } from "./email-pills-input";
 
@@ -65,14 +64,19 @@ const formatBytes = (bytes: number, decimals = 1) => {
 	return `${Number.parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`;
 };
 
-const attachmentIcon = (contentType: string) => {
-	if (contentType.includes("pdf")) return "📄";
-	if (contentType.includes("excel") || contentType.includes("spreadsheet"))
-		return "📊";
-	if (contentType.includes("word") || contentType.includes("wordprocessing"))
-		return "📝";
-	if (contentType.startsWith("image/")) return "🖼️";
-	return "📎";
+const AttachmentGlyph = ({ contentType }: { contentType: string }) => {
+	if (contentType.startsWith("image/")) {
+		return <ImageIcon className="h-3.5 w-3.5 text-mail-muted" />;
+	}
+	if (
+		contentType.includes("pdf") ||
+		contentType.includes("word") ||
+		contentType.includes("sheet") ||
+		contentType.includes("excel")
+	) {
+		return <FileText className="h-3.5 w-3.5 text-mail-muted" />;
+	}
+	return <Paperclip className="h-3.5 w-3.5 text-mail-muted" />;
 };
 
 export const ComposeModal = ({
@@ -110,8 +114,15 @@ export const ComposeModal = ({
 	const [aiLoading, setAiLoading] = useState(false);
 	const [aiPreviewHtml, setAiPreviewHtml] = useState<string | null>(null);
 	const [subjectGenerating, setSubjectGenerating] = useState(false);
+	const [toError, setToError] = useState<string | null>(null);
 	const draftTimer = useRef<number | null>(null);
 	const currentDraftId = useRef<string | null>(null);
+
+	const modKey =
+		typeof navigator !== "undefined" &&
+		/Mac|iPhone|iPod|iPad/i.test(navigator.platform)
+			? "⌘"
+			: "Ctrl";
 
 	const recipientSuggestions = useMemo(() => {
 		const map = new Map<string, string>();
@@ -157,6 +168,7 @@ export const ComposeModal = ({
 		setTextBody("");
 		setAiPreviewHtml(null);
 		setShowToolbar(false);
+		setToError(null);
 		currentDraftId.current = null;
 		editor?.commands.clearContent();
 	}, [reset, editor]);
@@ -388,7 +400,7 @@ export const ComposeModal = ({
 
 	const onSubmit = async (data: ComposeFormValues) => {
 		if (data.to.length === 0) {
-			toast.error("Please specify at least one recipient.");
+			setToError("Add at least one recipient");
 			return;
 		}
 		if (
@@ -396,9 +408,10 @@ export const ComposeModal = ({
 			data.cc.some((e) => !validateEmail(e)) ||
 			data.bcc.some((e) => !validateEmail(e))
 		) {
-			toast.error("Please fix invalid email addresses before sending.");
+			setToError("Fix invalid email addresses before sending");
 			return;
 		}
+		setToError(null);
 		if (attachments.some((att) => att.isUploading)) {
 			toast.error("Please wait for attachments to finish uploading.");
 			return;
@@ -540,17 +553,12 @@ export const ComposeModal = ({
 		}
 	};
 
-	const applyTemplate = (tpl: AppliedTemplate) => {
-		if (tpl.subject) setValue("subject", tpl.subject);
-		setHtmlBody(tpl.html);
-		editor?.commands.setContent(tpl.html);
-		setTextBody(editor?.getText() || "");
-		toast.success(`Applied “${tpl.name}”`);
-	};
-
 	const removeAttachment = (indexToRemove: number) => {
 		setAttachments((prev) => prev.filter((_, idx) => idx !== indexToRemove));
 	};
+
+	const toolBtnClass =
+		"inline-flex h-8 items-center gap-1.5 rounded-lg border border-mail-border/50 bg-transparent px-2.5 font-medium text-[12px] text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground disabled:opacity-40";
 
 	return (
 		<>
@@ -562,8 +570,7 @@ export const ComposeModal = ({
 			>
 				<Modal.Content
 					showClose={false}
-					overlayClassName="bg-black/50 p-4"
-					className="flex w-full max-w-[750px] flex-col items-center gap-1 border-none bg-transparent p-0 shadow-none"
+					className="flex max-h-[min(720px,90dvh)] w-full flex-col overflow-hidden rounded-3xl border border-mail-border/40 p-0 sm:max-w-[680px]"
 					aria-describedby={undefined}
 					onEscapeKeyDown={(e) => {
 						e.preventDefault();
@@ -573,25 +580,10 @@ export const ComposeModal = ({
 						if (isSending) e.preventDefault();
 					}}
 				>
-					<Modal.Title className="sr-only">New Email</Modal.Title>
-					<div className="flex w-full justify-start">
-						<button
-							type="button"
-							onClick={requestClose}
-							disabled={isSending}
-							className="flex cursor-pointer items-center gap-1 rounded-lg bg-[#F0F0F0] px-2 py-1 transition-colors hover:bg-gray-100 disabled:opacity-40 dark:bg-[var(--inbox-muted-bg)] dark:hover:bg-[var(--inbox-control-hover)]"
-						>
-							<XIcon className="mt-0.5 h-3.5 w-3.5 text-mail-muted" />
-							<span className="font-medium text-mail-muted text-sm dark:text-white">
-								esc
-							</span>
-						</button>
-					</div>
-
 					<form
 						onSubmit={handleSubmit(onSubmit)}
 						{...getRootProps()}
-						className="relative mb-12 flex max-h-[min(560px,85dvh)] w-full flex-col overflow-hidden rounded-2xl border border-[#E7E7E7] bg-[#FAFAFA] shadow-sm dark:border-[#252525] dark:bg-[#202020]"
+						className="relative flex min-h-0 flex-1 flex-col"
 					>
 						<input {...getInputProps()} />
 						<input
@@ -613,45 +605,98 @@ export const ComposeModal = ({
 									initial={{ opacity: 0 }}
 									animate={{ opacity: 1 }}
 									exit={{ opacity: 0 }}
-									className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-3 rounded-2xl bg-[#FAFAFA]/90 backdrop-blur-sm dark:bg-[#202020]/90"
+									className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-3 rounded-3xl bg-panel-light/95 dark:bg-panel-dark/95"
 								>
 									<Paperclip className="h-7 w-7 text-mail-muted" />
 									<p className="font-medium text-mail-foreground text-sm">
-										Drop files here to attach
+										Drop files to attach
 									</p>
+									<p className="text-[12px] text-mail-muted">Max 10MB each</p>
 								</motion.div>
 							)}
 						</AnimatePresence>
 
-						<div className="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto rounded-2xl">
-							<div className="shrink-0 overflow-visible border-[#E7E7E7] border-b pb-2 dark:border-[#252525]">
-								<div className="flex justify-between px-3 pt-3">
-									<div className="flex w-full min-w-0 items-center gap-2">
-										<p className="shrink-0 font-medium text-[#8C8C8C] text-sm">
-											To:
+						{/* Header */}
+						<div className="shrink-0 border-mail-border/40 border-b px-5 pt-5 pb-3">
+							<div className="mb-3 flex items-center justify-between gap-3">
+								<div className="flex items-center gap-2.5">
+									<Icon
+										name="pencil"
+										className="h-4 w-4 text-mail-foreground"
+									/>
+									<Modal.Title asChild>
+										<h2 className="font-semibold text-label-md text-mail-foreground">
+											New email
+										</h2>
+									</Modal.Title>
+								</div>
+								<button
+									type="button"
+									onClick={requestClose}
+									disabled={isSending}
+									className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-mail-muted transition-transform duration-150 ease-out hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.95] disabled:opacity-50"
+									aria-label="Close"
+								>
+									<Icon name="cross" className="h-3.5 w-3.5" />
+								</button>
+							</div>
+						</div>
+
+						{/* Fields + editor */}
+						<div className="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto">
+							<div className="shrink-0 border-mail-border/40 border-b px-5">
+								{/* From */}
+								<div className="grid grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-b py-2">
+									<span className="font-medium text-[12px] text-mail-muted leading-none">
+										From
+									</span>
+									<div className="flex h-8 min-w-0 items-center">
+										<p className="truncate font-medium text-[13px] text-mail-foreground">
+											{mailbox.email}
 										</p>
+									</div>
+								</div>
+
+								{/* To */}
+								<div className="grid grid-cols-[3.75rem_minmax(0,1fr)_auto] items-center gap-x-2 border-mail-border/30 border-b py-2">
+									<span className="font-medium text-[12px] text-mail-muted leading-none">
+										To
+									</span>
+									<div className="min-w-0">
 										<Controller
 											name="to"
 											control={control}
 											render={({ field }) => (
 												<EmailPillsInput
 													emails={field.value}
-													onChange={field.onChange}
-													placeholder="Enter email address"
+													onChange={(emails) => {
+														field.onChange(emails);
+														if (toError) setToError(null);
+													}}
+													placeholder="Add recipients…"
 													disabled={isSending}
 													suggestions={recipientSuggestions}
 												/>
 											)}
 										/>
+										{toError && (
+											<p
+												className="mt-1 text-[12px] text-error-base leading-snug"
+												role="alert"
+											>
+												{toError}
+											</p>
+										)}
 									</div>
-									<div className="flex shrink-0 items-center gap-2">
+									<div className="flex shrink-0 items-center gap-0.5 self-center">
 										<button
 											type="button"
 											tabIndex={-1}
 											onClick={() => setShowCc((v) => !v)}
 											className={cn(
-												"cursor-pointer rounded-sm px-1 py-0.5 font-medium text-[#8C8C8C] text-sm transition-colors hover:bg-gray-50 hover:text-[#A8A8A8] dark:hover:bg-[var(--inbox-control-hover)]",
-												showCc && "text-mail-foreground",
+												"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
+												showCc &&
+													"bg-[var(--inbox-hover)] text-mail-foreground",
 											)}
 										>
 											Cc
@@ -661,101 +706,100 @@ export const ComposeModal = ({
 											tabIndex={-1}
 											onClick={() => setShowBcc((v) => !v)}
 											className={cn(
-												"cursor-pointer rounded-sm px-1 py-0.5 font-medium text-[#8C8C8C] text-sm transition-colors hover:bg-gray-50 hover:text-[#A8A8A8] dark:hover:bg-[var(--inbox-control-hover)]",
-												showBcc && "text-mail-foreground",
+												"rounded-md px-1.5 py-1 font-medium text-[11px] text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
+												showBcc &&
+													"bg-[var(--inbox-hover)] text-mail-foreground",
 											)}
 										>
 											Bcc
 										</button>
-										<button
-											type="button"
-											tabIndex={-1}
-											onClick={requestClose}
-											disabled={isSending}
-											className="cursor-pointer rounded-sm px-1 py-0.5 text-[#8C8C8C] transition-colors hover:bg-gray-50 hover:text-[#A8A8A8] dark:hover:bg-[var(--inbox-control-hover)]"
-											aria-label="Close"
-										>
-											<XIcon className="h-3.5 w-3.5 text-[#9A9A9A]" />
-										</button>
 									</div>
 								</div>
 
-								{(showCc || showBcc) && (
-									<div className="flex flex-col gap-2 pt-2">
-										{showCc && (
-											<div className="flex items-center gap-2 px-3">
-												<p className="shrink-0 font-medium text-[#8C8C8C] text-sm">
-													Cc:
-												</p>
-												<Controller
-													name="cc"
-													control={control}
-													render={({ field }) => (
-														<EmailPillsInput
-															emails={field.value}
-															onChange={field.onChange}
-															placeholder="Enter email for Cc"
-															disabled={isSending}
-															suggestions={recipientSuggestions}
-														/>
-													)}
+								{showCc && (
+									<div className="grid grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-b py-2">
+										<span className="font-medium text-[12px] text-mail-muted leading-none">
+											Cc
+										</span>
+										<Controller
+											name="cc"
+											control={control}
+											render={({ field }) => (
+												<EmailPillsInput
+													emails={field.value}
+													onChange={field.onChange}
+													placeholder="Add Cc…"
+													disabled={isSending}
+													suggestions={recipientSuggestions}
 												/>
-											</div>
-										)}
-										{showBcc && (
-											<div className="flex items-center gap-2 px-3">
-												<p className="shrink-0 font-medium text-[#8C8C8C] text-sm">
-													Bcc:
-												</p>
-												<Controller
-													name="bcc"
-													control={control}
-													render={({ field }) => (
-														<EmailPillsInput
-															emails={field.value}
-															onChange={field.onChange}
-															placeholder="Enter email for Bcc"
-															disabled={isSending}
-															suggestions={recipientSuggestions}
-														/>
-													)}
-												/>
-											</div>
-										)}
+											)}
+										/>
 									</div>
 								)}
+
+								{showBcc && (
+									<div className="grid grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-b py-2">
+										<span className="font-medium text-[12px] text-mail-muted leading-none">
+											Bcc
+										</span>
+										<Controller
+											name="bcc"
+											control={control}
+											render={({ field }) => (
+												<EmailPillsInput
+													emails={field.value}
+													onChange={field.onChange}
+													placeholder="Add Bcc…"
+													disabled={isSending}
+													suggestions={recipientSuggestions}
+												/>
+											)}
+										/>
+									</div>
+								)}
+
+								{/* Subject */}
+								<div className="grid grid-cols-[3.75rem_minmax(0,1fr)_auto] items-center gap-x-2 py-2">
+									<span className="font-medium text-[12px] text-mail-muted leading-none">
+										Subject
+									</span>
+									<input
+										className="h-8 w-full min-w-0 bg-transparent font-medium text-[13px] text-mail-foreground outline-none placeholder:text-mail-muted"
+										placeholder="What’s this about?"
+										disabled={isSending}
+										{...register("subject")}
+									/>
+									<button
+										type="button"
+										tabIndex={-1}
+										disabled={
+											isSending || subjectGenerating || !textBody.trim()
+										}
+										onClick={() => void generateSubject()}
+										className="flex size-8 shrink-0 items-center justify-center rounded-lg text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground disabled:opacity-40"
+										aria-label="Generate subject"
+										title="Generate subject from body"
+									>
+										{subjectGenerating ? (
+											<Loader2 className="h-3.5 w-3.5 animate-spin" />
+										) : (
+											<Sparkles className="h-3.5 w-3.5" />
+										)}
+									</button>
+								</div>
 							</div>
 
-							<div className="flex items-center gap-2 border-[#E7E7E7] border-b p-3 dark:border-[#252525]">
-								<p className="shrink-0 font-medium text-[#8C8C8C] text-sm">
-									Subject:
-								</p>
-								<input
-									className="h-4 w-full bg-transparent font-normal text-black text-sm leading-normal outline-none placeholder:text-[#797979] dark:text-white/90"
-									placeholder="Re: Design review feedback"
-									disabled={isSending}
-									{...register("subject")}
-								/>
-								<button
-									type="button"
-									tabIndex={-1}
-									disabled={isSending || subjectGenerating || !textBody.trim()}
-									onClick={() => void generateSubject()}
-									className="rounded p-1 text-mail-muted transition-colors hover:bg-gray-50 disabled:opacity-40 dark:hover:bg-[var(--inbox-control-hover)]"
-									aria-label="Generate subject"
-								>
-									{subjectGenerating ? (
-										<Loader2 className="h-3.5 w-3.5 animate-spin" />
-									) : (
-										<Sparkles className="h-3.5 w-3.5" />
-									)}
-								</button>
-							</div>
+							{showToolbar && (
+								<div className="shrink-0 border-mail-border/40 border-b px-3 py-2">
+									<ComposeToolbar editor={editor} />
+								</div>
+							)}
 
-							<div className="relative flex-1 overflow-y-auto border-[#E7E7E7] border-t bg-white px-3 py-3 dark:border-[#252525] dark:bg-[#202020]">
+							{/* Body */}
+							<div className="relative flex min-h-[220px] flex-1 flex-col px-5 py-4">
 								<div
 									className={cn(
-										"min-h-[200px]",
+										"min-h-[200px] flex-1 cursor-text",
 										(aiLoading || aiPreviewHtml) && "blur-sm",
 									)}
 									onClick={() => editor?.commands.focus()}
@@ -764,10 +808,32 @@ export const ComposeModal = ({
 									{editor ? (
 										<EditorContent editor={editor} />
 									) : (
-										<div className="min-h-[200px] text-mail-muted text-sm">
+										<div className="text-mail-muted text-sm">
 											Loading editor…
 										</div>
 									)}
+								</div>
+								<div className="mt-2 flex items-center justify-between">
+									<p className="text-[11px] text-mail-muted">
+										Type{" "}
+										<kbd className="rounded border border-mail-border/50 px-1 font-sans text-[10px]">
+											/
+										</kbd>{" "}
+										for formatting commands
+									</p>
+									<button
+										type="button"
+										disabled={isSending || aiLoading || !textBody.trim()}
+										onClick={() => void generateBody()}
+										className="flex h-7 w-7 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground disabled:opacity-40"
+										title="AI draft"
+									>
+										{aiLoading ? (
+											<Loader2 className="h-3.5 w-3.5 animate-spin" />
+										) : (
+											<Sparkles className="h-3.5 w-3.5" />
+										)}
+									</button>
 								</div>
 								<AiComposePreview
 									html={aiPreviewHtml}
@@ -782,101 +848,53 @@ export const ComposeModal = ({
 									onReject={() => setAiPreviewHtml(null)}
 								/>
 							</div>
-						</div>
 
-						<div className="inline-flex w-full shrink-0 flex-col gap-2 self-stretch rounded-b-2xl bg-white px-3 py-3 dark:bg-[#202020]">
-							{showToolbar && <ComposeToolbar editor={editor} />}
-							<div className="flex items-center justify-between gap-2">
-								<div className="flex flex-wrap items-center gap-2">
-									<button
-										type="submit"
-										disabled={
-											isSending ||
-											to.length === 0 ||
-											attachments.some((att) => att.isUploading)
-										}
-										className="inline-flex h-8 items-center gap-2 rounded-md bg-black px-3 text-sm text-white transition-opacity disabled:pointer-events-none disabled:opacity-40 dark:bg-white dark:text-black"
-									>
-										<span>
-											{isSending
-												? "Sending…"
-												: scheduleAt
-													? "Schedule"
-													: "Send"}
+							{/* Attachments strip */}
+							{attachments.length > 0 && (
+								<div className="shrink-0 border-mail-border/40 border-t px-5 py-3">
+									<div className="mb-2 flex items-center justify-between">
+										<span className="font-medium text-[11px] text-mail-muted uppercase tracking-wide">
+											Attachments ({attachments.length})
 										</span>
-										<span className="hidden h-5 items-center gap-0.5 rounded-sm bg-white/10 px-1 sm:inline-flex dark:bg-black/10">
-											<Command className="h-3.5 w-3.5" />
-											<CornerDownLeft className="h-3.5 w-3.5" />
-										</span>
-									</button>
-
-									<ScheduleSendPicker
-										value={scheduleAt}
-										onChange={setScheduleAt}
-										disabled={isSending}
-									/>
-
-									<button
-										type="button"
-										onClick={() => fileInputRef.current?.click()}
-										disabled={isSending}
-										className="inline-flex h-8 cursor-pointer items-center gap-1 rounded-md border border-[#E7E7E7] bg-transparent px-2 text-mail-foreground text-sm transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-[#2B2B2B] dark:hover:bg-[var(--inbox-control-hover)]"
-									>
-										<Plus className="h-3 w-3 text-[#9A9A9A]" />
-										<span className="hidden px-0.5 md:inline">Add</span>
-									</button>
-
-									<TemplateButton
-										onApply={applyTemplate}
-										disabled={isSending}
-									/>
-
-									{attachments.length > 0 && (
 										<Popover.Root>
 											<Popover.Trigger asChild>
 												<button
 													type="button"
-													className="flex cursor-pointer items-center gap-1.5 rounded-md border border-[#E7E7E7] bg-white/5 px-2 py-1 text-sm hover:bg-black/5 dark:border-[#2B2B2B] dark:hover:bg-white/10"
+													className="text-[11px] text-mail-muted hover:text-mail-foreground"
 												>
-													<Paperclip className="h-3.5 w-3.5 text-[#9A9A9A]" />
-													<span className="font-medium">
-														{attachments.length}
-													</span>
+													Manage
 												</button>
 											</Popover.Trigger>
 											<Popover.Content
-												align="start"
+												align="end"
 												sideOffset={6}
 												showArrow={false}
-												className="z-[100] w-[340px] rounded-lg border border-[#E7E7E7] bg-white p-0 shadow-lg dark:border-[#2B2B2B] dark:bg-[#202020]"
+												className="z-[100] w-[320px] rounded-xl border border-mail-border/40 bg-panel-light p-0 shadow-lg dark:bg-panel-dark"
 											>
-												<div className="border-[#E7E7E7] border-b p-3 dark:border-[#2B2B2B]">
-													<h4 className="font-semibold text-sm">Attachments</h4>
-												</div>
-												<div className="max-h-[250px] space-y-0.5 overflow-y-auto p-1.5">
+												<div className="max-h-[240px] space-y-0.5 overflow-y-auto p-1.5">
 													{attachments.map((file, idx) => (
 														<div
 															key={file.id}
 															className={cn(
-																"flex items-center justify-between gap-3 rounded-md px-1.5 py-1.5 hover:bg-black/5 dark:hover:bg-white/10",
+																"flex items-center justify-between gap-3 rounded-lg px-2 py-1.5 hover:bg-[var(--inbox-hover)]",
 																file.isUploading && "opacity-60",
 															)}
 														>
-															<div className="flex min-w-0 flex-1 items-center gap-3">
-																<div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[#F0F0F0] dark:bg-[#2C2C2C]">
+															<div className="flex min-w-0 flex-1 items-center gap-2.5">
+																<div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-[var(--inbox-hover)]">
 																	{file.isUploading ? (
-																		<Loader2 className="h-3.5 w-3.5 animate-spin" />
+																		<Loader2 className="h-3.5 w-3.5 animate-spin text-mail-muted" />
 																	) : (
-																		<span className="text-sm">
-																			{attachmentIcon(file.content_type)}
-																		</span>
+																		<AttachmentGlyph
+																			contentType={file.content_type}
+																		/>
 																	)}
 																</div>
 																<div className="min-w-0 flex-1">
-																	<p className="truncate text-sm">
+																	<p className="truncate text-[12px] text-mail-foreground">
 																		{file.name}
 																	</p>
-																	<p className="text-mail-muted text-xs">
+																	<p className="text-[11px] text-mail-muted">
 																		{file.size}
 																	</p>
 																</div>
@@ -884,7 +902,8 @@ export const ComposeModal = ({
 															<button
 																type="button"
 																onClick={() => removeAttachment(idx)}
-																className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-black/5"
+																className="flex size-6 items-center justify-center rounded-md hover:bg-[var(--inbox-hover)]"
+																aria-label={`Remove ${file.name}`}
 															>
 																<XIcon className="h-3.5 w-3.5 text-mail-muted" />
 															</button>
@@ -893,35 +912,111 @@ export const ComposeModal = ({
 												</div>
 											</Popover.Content>
 										</Popover.Root>
-									)}
-
-									<button
-										type="button"
-										tabIndex={-1}
-										onClick={() => setShowToolbar((v) => !v)}
-										className={cn(
-											"inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#E7E7E7] transition-colors hover:bg-gray-50 dark:border-[#2B2B2B] dark:hover:bg-[var(--inbox-control-hover)]",
-											showToolbar && "bg-[var(--inbox-muted-bg)]",
-										)}
-										aria-label="Formatting"
-									>
-										<Type className="h-4 w-4 text-mail-muted" />
-									</button>
+									</div>
+									<div className="flex flex-wrap gap-1.5">
+										{attachments.map((file, idx) => (
+											<span
+												key={file.id}
+												className="inline-flex max-w-[180px] items-center gap-1.5 rounded-lg border border-mail-border/40 bg-[var(--inbox-hover)] px-2 py-1 text-[11px] text-mail-foreground"
+											>
+												{file.isUploading ? (
+													<Loader2 className="h-3 w-3 shrink-0 animate-spin" />
+												) : (
+													<AttachmentGlyph contentType={file.content_type} />
+												)}
+												<span className="truncate">{file.name}</span>
+												<button
+													type="button"
+													onClick={() => removeAttachment(idx)}
+													className="shrink-0 text-mail-muted hover:text-mail-foreground"
+													aria-label={`Remove ${file.name}`}
+												>
+													<XIcon className="h-3 w-3" />
+												</button>
+											</span>
+										))}
+									</div>
 								</div>
+							)}
+						</div>
 
+						{/* Footer */}
+						<div className="flex shrink-0 items-center justify-between gap-3 border-mail-border/40 border-t px-5 py-3.5">
+							<div className="flex flex-wrap items-center gap-1.5">
 								<button
 									type="button"
-									disabled={isSending || aiLoading || !textBody.trim()}
-									onClick={() => void generateBody()}
-									className="inline-flex h-8 items-center gap-1.5 rounded-md border border-violet-500/50 px-2.5 text-sm text-violet-400 transition-colors hover:bg-violet-500/10 disabled:opacity-40"
+									onClick={() => fileInputRef.current?.click()}
+									disabled={isSending}
+									className={toolBtnClass}
 								>
-									{aiLoading ? (
-										<Loader2 className="h-3.5 w-3.5 animate-spin" />
-									) : (
-										<Sparkles className="h-3.5 w-3.5" />
-									)}
-									<span>Generate</span>
+									<Paperclip className="h-3.5 w-3.5" />
+									Attach
 								</button>
+								<button
+									type="button"
+									tabIndex={-1}
+									onClick={() => setShowToolbar((v) => !v)}
+									className={cn(
+										toolBtnClass,
+										showToolbar &&
+											"bg-[var(--inbox-hover)] text-mail-foreground",
+									)}
+									aria-pressed={showToolbar}
+								>
+									<Type className="h-3.5 w-3.5" />
+									Format
+								</button>
+								<ScheduleSendPicker
+									value={scheduleAt}
+									onChange={setScheduleAt}
+									disabled={isSending}
+								/>
+							</div>
+
+							<div className="flex items-center gap-2">
+								{scheduleAt && (
+									<span className="mr-auto truncate text-[11px] text-mail-muted">
+										Scheduled{" "}
+										{new Date(scheduleAt).toLocaleString(undefined, {
+											dateStyle: "medium",
+											timeStyle: "short",
+										})}
+									</span>
+								)}
+								<Button.Root
+									type="button"
+									variant="neutral"
+									mode="stroke"
+									size="xsmall"
+									disabled={isSending}
+									onClick={requestClose}
+								>
+									Cancel
+									<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-mail-border bg-offset-light/50 p-px font-medium text-[10px]">
+										Esc
+									</span>
+								</Button.Root>
+								<FancyButton.Root
+									type="submit"
+									variant="neutral"
+									size="xsmall"
+									disabled={isSending || attachments.some((a) => a.isUploading)}
+									className="min-w-[132px] justify-between pl-3 pr-2"
+								>
+									<span className="text-sm leading-none">
+										{isSending ? "Sending…" : scheduleAt ? "Schedule" : "Send"}
+									</span>
+									{!isSending && (
+										<div className="flex items-center gap-0.5 opacity-70">
+											<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
+												{modKey}
+											</KbdKeyOutline>
+											<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
+												↵
+											</KbdKeyOutline>
+										</div>
+									)}
+								</FancyButton.Root>
 							</div>
 						</div>
 					</form>
@@ -929,32 +1024,38 @@ export const ComposeModal = ({
 			</Modal.Root>
 
 			<Modal.Root open={showDiscard} onOpenChange={setShowDiscard}>
-				<Modal.Content className="max-w-sm p-5">
-					<Modal.Title asChild>
-						<h3 className="font-semibold text-mail-foreground">
-							Discard message?
-						</h3>
-					</Modal.Title>
-					<Modal.Description asChild>
-						<p className="mt-1 text-mail-muted text-sm">
-							Your draft will be deleted and this can’t be undone.
-						</p>
-					</Modal.Description>
-					<div className="mt-4 flex justify-end gap-2">
-						<button
+				<Modal.Content className="max-w-sm overflow-hidden rounded-3xl border border-mail-border/40 p-0">
+					<div className="px-5 pt-5 pb-2">
+						<Modal.Title asChild>
+							<h3 className="font-semibold text-label-md text-mail-foreground">
+								Discard message?
+							</h3>
+						</Modal.Title>
+						<Modal.Description asChild>
+							<p className="mt-1.5 text-[13px] text-mail-muted leading-snug">
+								Your draft will be deleted. This can’t be undone.
+							</p>
+						</Modal.Description>
+					</div>
+					<div className="flex justify-end gap-2 px-5 py-4">
+						<Button.Root
 							type="button"
+							variant="neutral"
+							mode="stroke"
+							size="xsmall"
 							onClick={() => setShowDiscard(false)}
-							className="rounded-md px-3 py-1.5 text-sm hover:bg-[var(--inbox-hover)]"
 						>
 							Keep editing
-						</button>
-						<button
+						</Button.Root>
+						<Button.Root
 							type="button"
+							variant="error"
+							mode="filled"
+							size="xsmall"
 							onClick={() => void confirmDiscard()}
-							className="rounded-md bg-red-600 px-3 py-1.5 text-sm text-white"
 						>
 							Discard
-						</button>
+						</Button.Root>
 					</div>
 				</Modal.Content>
 			</Modal.Root>

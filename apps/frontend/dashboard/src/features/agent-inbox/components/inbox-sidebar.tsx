@@ -248,6 +248,11 @@ export const InboxSidebar = ({
 		setIsComposeOpen(true);
 	});
 
+	useHotkeys("alt+l", (e) => {
+		e.preventDefault();
+		setIsLabelDialogOpen(true);
+	});
+
 	const mailboxId = mailbox.id;
 	const mailboxParams = { mailboxId };
 
@@ -354,7 +359,7 @@ export const InboxSidebar = ({
 
 						<FancyButton.Root
 							onClick={() => setIsComposeOpen(true)}
-							variant="blue"
+							variant="neutral"
 							size="xsmall"
 							className={cn("mt-3 mb-1.5 w-full", collapsed && "px-0")}
 						>
@@ -416,7 +421,8 @@ export const InboxSidebar = ({
 										type="button"
 										onClick={() => setIsLabelDialogOpen(true)}
 										className="flex size-5 items-center justify-center rounded-md text-text-soft-400 hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
-										aria-label="Create label"
+										aria-label="Create label (⌥L)"
+										title="Create label (⌥L)"
 									>
 										<Plus className="h-3.5 w-3.5" />
 									</button>
@@ -426,7 +432,7 @@ export const InboxSidebar = ({
 										<button
 											type="button"
 											onClick={() => setIsLabelDialogOpen(true)}
-											className="group relative z-10 mx-0.5 flex flex-col items-start gap-0.5 rounded-lg px-2.5 py-2.5 text-left hover:bg-[var(--inbox-hover)]"
+											className="group relative z-10 flex flex-col items-start gap-0.5 rounded-lg px-2.5 py-2.5 text-left hover:bg-[var(--inbox-hover)]"
 										>
 											<span className="font-medium text-[12px] text-mail-muted group-hover:text-mail-foreground">
 												No labels yet
@@ -453,9 +459,7 @@ export const InboxSidebar = ({
 													}
 													className={cn(
 														"group relative z-10 flex h-8 w-full items-center gap-2.5 rounded-lg px-2.5 font-medium text-[13px]",
-														active
-															? "text-mail-foreground"
-															: "text-mail-muted",
+														active ? "text-mail-foreground" : "text-mail-muted",
 													)}
 												>
 													<span

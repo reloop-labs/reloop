@@ -1,9 +1,12 @@
 import { LABEL_COLORS, resolveLabelColor } from "#/features/agent-inbox/lib/label-colors";
 import { cn } from "@reloop/ui/cn";
 import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import * as Modal from "@reloop/ui/modal";
 import { useEffect, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 
 export const InboxLabelDialog = ({
 	open,
@@ -17,22 +20,30 @@ export const InboxLabelDialog = ({
 	const [name, setName] = useState("");
 	const [color, setColor] = useState<string>(LABEL_COLORS[0].hex);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (!open) {
 			setName("");
 			setColor(LABEL_COLORS[0].hex);
 			setIsSubmitting(false);
+			setError(null);
 		}
 	}, [open]);
 
 	const trimmed = name.trim();
 	const previewColor = resolveLabelColor(color);
-	const canSubmit = trimmed.length > 0 && !isSubmitting;
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!canSubmit) return;
+	const handleSubmit = async (e?: React.FormEvent) => {
+		e?.preventDefault();
+		if (isSubmitting) return;
+
+		if (!trimmed) {
+			setError("Enter a label name");
+			return;
+		}
+
+		setError(null);
 		setIsSubmitting(true);
 		try {
 			await onSubmit(trimmed, color);
@@ -41,6 +52,23 @@ export const InboxLabelDialog = ({
 			setIsSubmitting(false);
 		}
 	};
+
+	useHotkeys(
+		"mod+enter",
+		(e) => {
+			e.preventDefault();
+			if (!open || isSubmitting) return;
+			void handleSubmit();
+		},
+		{ enableOnFormTags: ["INPUT"], enabled: open },
+		[open, isSubmitting, trimmed, color],
+	);
+
+	const modKey =
+		typeof navigator !== "undefined" &&
+		/Mac|iPhone|iPod|iPad/i.test(navigator.platform)
+			? "⌘"
+			: "Ctrl";
 
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
@@ -89,7 +117,14 @@ export const InboxLabelDialog = ({
 							>
 								Label preview
 							</label>
-							<div className="flex items-center gap-2.5 rounded-2xl border border-mail-border/40 bg-[var(--inbox-hover)] px-3.5 py-2.5 focus-within:border-mail-primary/40 focus-within:ring-2 focus-within:ring-mail-primary/15">
+							<div
+								className={cn(
+									"flex items-center gap-2.5 rounded-2xl border bg-[var(--inbox-hover)] px-3.5 py-2.5 focus-within:ring-2",
+									error
+										? "border-error-base focus-within:ring-error-base/20"
+										: "border-mail-border/40 focus-within:border-mail-primary/40 focus-within:ring-mail-primary/15",
+								)}
+							>
 								<span
 									className="size-2.5 shrink-0 rounded-full"
 									style={{ backgroundColor: previewColor }}
@@ -98,14 +133,28 @@ export const InboxLabelDialog = ({
 								<input
 									id="inbox-label-name"
 									value={name}
-									onChange={(e) => setName(e.target.value)}
+									onChange={(e) => {
+										setName(e.target.value);
+										if (error) setError(null);
+									}}
 									placeholder="Type a name…"
 									autoFocus
 									maxLength={40}
 									disabled={isSubmitting}
+									aria-invalid={!!error}
+									aria-describedby={error ? "inbox-label-name-error" : undefined}
 									className="min-w-0 flex-1 border-0 bg-transparent p-0 font-medium text-[13px] text-mail-foreground outline-none placeholder:text-mail-muted disabled:opacity-50"
 								/>
 							</div>
+							{error && (
+								<p
+									id="inbox-label-name-error"
+									className="text-[12px] text-error-base leading-snug"
+									role="alert"
+								>
+									{error}
+								</p>
+							)}
 						</div>
 
 						<div className="flex flex-col gap-2">
@@ -156,16 +205,31 @@ export const InboxLabelDialog = ({
 							onClick={() => onOpenChange(false)}
 						>
 							Cancel
+							<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-mail-border bg-offset-light/50 p-px font-medium text-[10px]">
+								Esc
+							</span>
 						</Button.Root>
-						<Button.Root
+						<FancyButton.Root
 							type="submit"
-							variant="primary"
-							mode="filled"
+							variant="neutral"
 							size="xsmall"
-							disabled={!canSubmit}
+							disabled={isSubmitting}
+							className="min-w-[148px] pr-14"
 						>
-							{isSubmitting ? "Creating…" : "Create label"}
-						</Button.Root>
+							<span className="text-sm leading-none">
+								{isSubmitting ? "Creating…" : "Create label"}
+							</span>
+							{!isSubmitting && (
+								<div className="-translate-y-1/2 absolute top-1/2 right-2.5 z-20 flex items-center gap-0.5 opacity-70">
+									<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
+										{modKey}
+									</KbdKeyOutline>
+									<KbdKeyOutline className="h-4 w-4 border-white/30 font-sans text-[9px] text-white">
+										↵
+									</KbdKeyOutline>
+								</div>
+							)}
+						</FancyButton.Root>
 					</div>
 				</form>
 			</Modal.Content>

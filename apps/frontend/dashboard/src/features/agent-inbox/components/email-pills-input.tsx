@@ -157,7 +157,7 @@ export const EmailPillsInput = ({
 		<div className="relative min-w-0 flex-1">
 			<div
 				onClick={() => inputRef.current?.focus()}
-				className="flex min-h-[32px] cursor-text flex-wrap items-center gap-1.5 py-0.5"
+				className="flex min-h-8 cursor-text flex-wrap items-center gap-1.5"
 			>
 				<AnimatePresence initial={false}>
 					{emails.map((emailStr, idx) => {
@@ -213,7 +213,7 @@ export const EmailPillsInput = ({
 					onPaste={handlePaste}
 					disabled={disabled}
 					placeholder={emails.length === 0 ? placeholder : ""}
-					className="min-w-[120px] flex-1 bg-transparent py-1 text-mail-foreground outline-none placeholder:text-[#797979]"
+					className="min-w-[120px] flex-1 bg-transparent py-0 text-[13px] text-mail-foreground outline-none placeholder:text-mail-muted"
 				/>
 			</div>
 

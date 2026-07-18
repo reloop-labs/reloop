@@ -94,10 +94,10 @@ export const TemplateButton = ({
 				<button
 					type="button"
 					disabled={disabled}
-					className="inline-flex h-8 items-center gap-1 rounded-md border border-[#E7E7E7] bg-transparent px-2 text-mail-foreground text-sm transition-colors hover:bg-gray-50 disabled:opacity-40 dark:border-[#2B2B2B] dark:hover:bg-[var(--inbox-control-hover)]"
+					className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-mail-border/50 bg-transparent px-2.5 font-medium text-[12px] text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground disabled:opacity-40"
 				>
-					<FileText className="h-3.5 w-3.5 text-[#9A9A9A]" />
-					<span className="hidden md:inline">Templates</span>
+					<FileText className="h-3.5 w-3.5" />
+					Templates
 				</button>
 			</Popover.Trigger>
 			<Popover.Content

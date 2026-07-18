@@ -22,7 +22,7 @@ export const ComposeToolbar = ({ editor }: { editor: Editor | null }) => {
 	if (!editor) return null;
 
 	return (
-		<div className="flex flex-wrap gap-1 rounded-md border border-[#E7E7E7] p-1.5 dark:border-[#2B2B2B]">
+		<div className="flex flex-wrap gap-1 p-1.5">
 			<button
 				type="button"
 				tabIndex={-1}
