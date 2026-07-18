@@ -5,10 +5,12 @@ import {
 	type ClipboardEvent,
 	type KeyboardEvent,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
 	useRef,
 	useState,
 } from "react";
+import { createPortal } from "react-dom";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 
 interface EmailPillsInputProps {
@@ -39,6 +41,8 @@ export const validateEmail = (emailStr: string) => {
 	return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 };
 
+type DropdownPos = { top: number; left: number; width: number };
+
 export const EmailPillsInput = ({
 	emails,
 	onChange,
@@ -49,7 +53,9 @@ export const EmailPillsInput = ({
 	const shouldReduceMotion = useReducedMotion();
 	const [inputValue, setInputValue] = useState("");
 	const [highlight, setHighlight] = useState(0);
+	const [dropdownPos, setDropdownPos] = useState<DropdownPos | null>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const rootRef = useRef<HTMLDivElement>(null);
 
 	const filteredSuggestions = useMemo(() => {
 		const q = inputValue.trim().toLowerCase();
@@ -66,6 +72,32 @@ export const EmailPillsInput = ({
 	useEffect(() => {
 		setHighlight(0);
 	}, [filteredSuggestions.length]);
+
+	useLayoutEffect(() => {
+		if (filteredSuggestions.length === 0) {
+			setDropdownPos(null);
+			return;
+		}
+
+		const update = () => {
+			const el = rootRef.current;
+			if (!el) return;
+			const rect = el.getBoundingClientRect();
+			setDropdownPos({
+				top: rect.bottom + 4,
+				left: rect.left,
+				width: Math.max(rect.width, 240),
+			});
+		};
+
+		update();
+		window.addEventListener("resize", update);
+		window.addEventListener("scroll", update, true);
+		return () => {
+			window.removeEventListener("resize", update);
+			window.removeEventListener("scroll", update, true);
+		};
+	}, [filteredSuggestions.length, inputValue]);
 
 	const addEmails = (newEmailsStr: string) => {
 		const initialSplit = newEmailsStr
@@ -120,6 +152,11 @@ export const EmailPillsInput = ({
 					return;
 				}
 			}
+			if (e.key === "Escape") {
+				e.preventDefault();
+				setInputValue("");
+				return;
+			}
 		}
 
 		const shouldCommit =
@@ -151,8 +188,67 @@ export const EmailPillsInput = ({
 		onChange(emails.filter((_, idx) => idx !== indexToRemove));
 	};
 
+	const suggestionsDropdown =
+		filteredSuggestions.length > 0 && dropdownPos
+			? createPortal(
+					<div
+						data-compose-floating-ui="email-suggestions"
+						style={{
+							position: "fixed",
+							top: dropdownPos.top,
+							left: dropdownPos.left,
+							width: dropdownPos.width,
+							zIndex: 200,
+						}}
+						className="max-h-48 overflow-y-auto rounded-lg border border-mail-border bg-panel-light py-1 shadow-lg dark:bg-panel-dark"
+					>
+						{filteredSuggestions.map((s, i) => {
+							const { name, email } = parseEmail(s);
+							return (
+								<button
+									key={s}
+									type="button"
+									className={cn(
+										"flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm hover:bg-[var(--inbox-hover)]",
+										i === highlight && "bg-[var(--inbox-hover)]",
+									)}
+									onMouseDown={(e) => {
+										e.preventDefault();
+										addEmails(s);
+									}}
+								>
+									<div
+										className={cn(
+											"flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] text-white uppercase",
+											getAvatarGradient(email),
+										)}
+									>
+										{getAvatarInitial(name || null, email)}
+									</div>
+									<div className="min-w-0 flex-1">
+										{name ? (
+											<>
+												<p className="truncate font-medium text-mail-foreground">
+													{name}
+												</p>
+												<p className="truncate text-mail-muted text-xs">
+													{email}
+												</p>
+											</>
+										) : (
+											<p className="truncate text-mail-foreground">{email}</p>
+										)}
+									</div>
+								</button>
+							);
+						})}
+					</div>,
+					document.body,
+				)
+			: null;
+
 	return (
-		<div className="relative min-w-0 flex-1">
+		<div ref={rootRef} className="relative min-w-0 flex-1">
 			<div
 				onClick={() => inputRef.current?.focus()}
 				className="flex min-h-8 cursor-text flex-wrap items-center gap-1.5"
@@ -200,7 +296,7 @@ export const EmailPillsInput = ({
 											}
 								}
 								className={cn(
-									"inline-flex items-center gap-1.5 rounded-full border py-0.5 pr-1.5 pl-0.5 font-medium text-xs whitespace-nowrap overflow-hidden",
+									"inline-flex items-center gap-1.5 overflow-hidden whitespace-nowrap rounded-full border py-0.5 pr-1.5 pl-0.5 font-medium text-xs",
 									isValid
 										? "border-mail-border/60 bg-mail-accent/40 text-mail-muted"
 										: "border-red-200 bg-red-50 text-red-600 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-400",
@@ -252,51 +348,7 @@ export const EmailPillsInput = ({
 					className="min-w-[120px] flex-1 bg-transparent py-0 text-[13px] text-mail-foreground outline-none placeholder:text-mail-muted"
 				/>
 			</div>
-
-			{filteredSuggestions.length > 0 && (
-				<div className="absolute top-full left-0 z-50 mt-1 max-h-48 w-full min-w-[240px] overflow-y-auto rounded-lg border border-mail-border bg-panel-light py-1 shadow-lg dark:bg-panel-dark">
-					{filteredSuggestions.map((s, i) => {
-						const { name, email } = parseEmail(s);
-						return (
-							<button
-								key={s}
-								type="button"
-								className={cn(
-									"flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm hover:bg-[var(--inbox-hover)]",
-									i === highlight && "bg-[var(--inbox-hover)]",
-								)}
-								onMouseDown={(e) => {
-									e.preventDefault();
-									addEmails(s);
-								}}
-							>
-								<div
-									className={cn(
-										"flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] text-white uppercase",
-										getAvatarGradient(email),
-									)}
-								>
-									{getAvatarInitial(name || null, email)}
-								</div>
-								<div className="min-w-0 flex-1">
-									{name ? (
-										<>
-											<p className="truncate font-medium text-mail-foreground">
-												{name}
-											</p>
-											<p className="truncate text-mail-muted text-xs">
-												{email}
-											</p>
-										</>
-									) : (
-										<p className="truncate text-mail-foreground">{email}</p>
-									)}
-								</div>
-							</button>
-						);
-					})}
-				</div>
-			)}
+			{suggestionsDropdown}
 		</div>
 	);
 };

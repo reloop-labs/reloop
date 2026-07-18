@@ -1,7 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { EditorContent } from "@tiptap/react";
-import { Paperclip, Type, X as XIcon } from "lucide-react";
+import { Paperclip, X as XIcon } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
@@ -12,8 +11,10 @@ import {
 	toSendAttachments,
 	uploadComposeFile,
 } from "../compose/compose-attachments";
-import { ComposeToolbar } from "../compose/compose-toolbar";
-import { useComposeEditor } from "../compose/use-compose-editor";
+import {
+	ComposeBodyEditor,
+	type ComposeBodyEditorHandle,
+} from "../compose/compose-body-editor";
 import { EmailPillsInput, validateEmail } from "../email-pills-input";
 
 export interface ForwardFormValues {
@@ -50,7 +51,7 @@ export const ForwardComposer = ({
 	isSending,
 }: ForwardComposerProps) => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const [showToolbar, setShowToolbar] = useState(false);
+	const editorRef = useRef<ComposeBodyEditorHandle>(null);
 	const [htmlBody, setHtmlBody] = useState("");
 	const [textBody, setTextBody] = useState("");
 	const [attachments, setAttachments] = useState<ComposeAttachment[]>([]);
@@ -73,14 +74,6 @@ export const ForwardComposer = ({
 		!hasInvalidCc &&
 		!isSending &&
 		!attachments.some((a) => a.isUploading);
-
-	const editor = useComposeEditor({
-		placeholder: "Add a note (optional)…",
-		onUpdate: (html, text) => {
-			setHtmlBody(html);
-			setTextBody(text);
-		},
-	});
 
 	const uploadFile = useCallback(async (file: File) => {
 		const tempId = Math.random().toString();
@@ -130,12 +123,16 @@ export const ForwardComposer = ({
 		noKeyboard: true,
 	});
 
-	const onSubmit = (data: { to: string[]; cc: string[] }) => {
+	const onSubmit = async (data: { to: string[]; cc: string[] }) => {
+		const exported = (await editorRef.current?.getEmail()) ?? {
+			html: htmlBody,
+			text: textBody,
+		};
 		onSend({
 			to: data.to,
 			cc: data.cc,
-			text: textBody.trim(),
-			html: htmlBody,
+			text: (exported.text || textBody).trim(),
+			html: exported.html || htmlBody,
 			attachments: toSendAttachments(attachments),
 		});
 	};
@@ -149,7 +146,12 @@ export const ForwardComposer = ({
 			)}
 		>
 			<input {...getInputProps()} />
-			<form onSubmit={handleSubmit(onSubmit)}>
+			<form
+				onSubmit={(e) => {
+					e.preventDefault();
+					void handleSubmit(onSubmit)(e);
+				}}
+			>
 				<div className="flex items-center justify-between border-mail-border border-b px-4 py-3">
 					<div className="flex items-center gap-2">
 						<svg
@@ -216,14 +218,15 @@ export const ForwardComposer = ({
 					</div>
 				</div>
 
-				{showToolbar && (
-					<div className="border-mail-border border-b px-4 py-2">
-						<ComposeToolbar editor={editor} />
-					</div>
-				)}
-
 				<div className="px-4 py-3">
-					<EditorContent editor={editor} />
+					<ComposeBodyEditor
+						ref={editorRef}
+						placeholder="Add a note (optional)…"
+						onUpdate={(html, text) => {
+							setHtmlBody(html);
+							setTextBody(text);
+						}}
+					/>
 
 					{attachments.length > 0 && (
 						<div className="mt-3 flex flex-wrap gap-2">
@@ -286,19 +289,6 @@ export const ForwardComposer = ({
 							className="flex items-center gap-1.5 rounded-lg bg-mail-primary px-4 py-1.5 font-semibold text-label-sm text-white transition-all hover:opacity-90 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 dark:text-black"
 						>
 							{isSending ? <span>Sending…</span> : <span>Forward</span>}
-						</button>
-
-						<button
-							type="button"
-							className={cn(
-								"rounded-lg p-1.5 text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
-								showToolbar &&
-									"bg-[var(--inbox-muted-bg)] text-mail-foreground",
-							)}
-							title="Formatting"
-							onClick={() => setShowToolbar((v) => !v)}
-						>
-							<Type className="h-4 w-4" />
 						</button>
 
 						<button

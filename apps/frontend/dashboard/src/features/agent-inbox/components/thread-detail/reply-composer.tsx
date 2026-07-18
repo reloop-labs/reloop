@@ -1,7 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { EditorContent } from "@tiptap/react";
-import { Paperclip, Type, X as XIcon } from "lucide-react";
+import { Paperclip, X as XIcon } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
@@ -11,8 +10,10 @@ import {
 	toSendAttachments,
 	uploadComposeFile,
 } from "../compose/compose-attachments";
-import { ComposeToolbar } from "../compose/compose-toolbar";
-import { useComposeEditor } from "../compose/use-compose-editor";
+import {
+	ComposeBodyEditor,
+	type ComposeBodyEditorHandle,
+} from "../compose/compose-body-editor";
 
 interface ReplyComposerProps {
 	toName: string;
@@ -54,10 +55,9 @@ export const ReplyComposer = ({
 }: ReplyComposerProps) => {
 	const displayTo = toName ? `${toName} <${toEmail}>` : toEmail;
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const [showToolbar, setShowToolbar] = useState(false);
-	const [htmlBody, setHtmlBody] = useState(() =>
-		initialContent ? plainToHtml(initialContent) : "",
-	);
+	const editorRef = useRef<ComposeBodyEditorHandle>(null);
+	const seedHtml = initialContent ? plainToHtml(initialContent) : "";
+	const [htmlBody, setHtmlBody] = useState(seedHtml);
 	const [textBody, setTextBody] = useState(initialContent);
 	const [attachments, setAttachments] = useState<ComposeAttachment[]>([]);
 	const htmlRef = useRef(htmlBody);
@@ -65,26 +65,22 @@ export const ReplyComposer = ({
 	htmlRef.current = htmlBody;
 	textRef.current = textBody;
 
-	const editor = useComposeEditor({
-		content: initialContent ? plainToHtml(initialContent) : "",
-		placeholder: `Reply to ${toName || toEmail.split("@")[0]}...`,
-		onUpdate: (html, text) => {
-			setHtmlBody(html);
-			setTextBody(text);
-		},
-		onModEnter: () => {
-			if (!textRef.current.trim()) return;
-			if (attachments.some((a) => a.isUploading)) {
-				toast.error("Please wait for attachments to finish uploading.");
-				return;
-			}
-			onSend({
-				text: textRef.current.trim(),
-				html: htmlRef.current,
-				attachments: toSendAttachments(attachments),
-			});
-		},
-	});
+	const send = useCallback(async () => {
+		if (!textRef.current.trim()) return;
+		if (attachments.some((a) => a.isUploading)) {
+			toast.error("Please wait for attachments to finish uploading.");
+			return;
+		}
+		const exported = (await editorRef.current?.getEmail()) ?? {
+			html: htmlRef.current,
+			text: textRef.current,
+		};
+		onSend({
+			text: (exported.text || textRef.current).trim(),
+			html: exported.html || htmlRef.current,
+			attachments: toSendAttachments(attachments),
+		});
+	}, [attachments, onSend]);
 
 	const uploadFile = useCallback(async (file: File) => {
 		const tempId = Math.random().toString();
@@ -168,14 +164,17 @@ export const ReplyComposer = ({
 				</button>
 			</div>
 
-			{showToolbar && (
-				<div className="border-mail-border border-b px-4 py-2">
-					<ComposeToolbar editor={editor} />
-				</div>
-			)}
-
 			<div className="px-4 py-3">
-				<EditorContent editor={editor} />
+				<ComposeBodyEditor
+					ref={editorRef}
+					content={seedHtml}
+					placeholder={`Reply to ${toName || toEmail.split("@")[0]}…`}
+					onUpdate={(html, text) => {
+						setHtmlBody(html);
+						setTextBody(text);
+					}}
+					onModEnter={() => void send()}
+				/>
 				{attachments.length > 0 && (
 					<div className="mt-3 flex flex-wrap gap-2">
 						{attachments.map((file) => (
@@ -210,30 +209,11 @@ export const ReplyComposer = ({
 				<div className="flex items-center gap-2">
 					<button
 						type="button"
-						onClick={() => {
-							if (!canSend) return;
-							onSend({
-								text: textBody.trim(),
-								html: htmlBody,
-								attachments: toSendAttachments(attachments),
-							});
-						}}
+						onClick={() => void send()}
 						disabled={!canSend}
 						className="flex items-center gap-1.5 rounded-lg bg-mail-primary px-4 py-1.5 font-semibold text-label-sm text-panel-light transition-all hover:opacity-90 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 dark:text-black"
 					>
 						<span>Send</span>
-					</button>
-
-					<button
-						type="button"
-						className={cn(
-							"rounded-lg p-1.5 text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
-							showToolbar && "bg-[var(--inbox-muted-bg)] text-mail-foreground",
-						)}
-						title="Formatting"
-						onClick={() => setShowToolbar((v) => !v)}
-					>
-						<Type className="h-4 w-4" />
 					</button>
 
 					<button

@@ -5,7 +5,6 @@ import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import * as Modal from "@reloop/ui/modal";
 import * as Popover from "@reloop/ui/popover";
-import { EditorContent } from "@tiptap/react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
 	FileText,
@@ -13,7 +12,6 @@ import {
 	Loader2,
 	Paperclip,
 	Sparkles,
-	Type,
 	X as XIcon,
 } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
@@ -24,10 +22,29 @@ import { toast } from "sonner";
 import type { AgentMailbox } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
 import { AiComposePreview } from "./compose/ai-compose-preview";
-import { ComposeToolbar } from "./compose/compose-toolbar";
+import {
+	ComposeBodyEditor,
+	type ComposeBodyEditorHandle,
+} from "./compose/compose-body-editor";
 import { ScheduleSendPicker } from "./compose/schedule-send-picker";
-import { useComposeEditor } from "./compose/use-compose-editor";
 import { EmailPillsInput, validateEmail } from "./email-pills-input";
+
+/** Portaled compose UI (recipient suggestions + React Email menus). */
+const isComposeFloatingUi = (target: EventTarget | null) =>
+	target instanceof Element &&
+	Boolean(
+		target.closest(
+			[
+				"[data-compose-floating-ui]",
+				"[data-re-slash-command]",
+				"[data-re-bubble-menu]",
+				"[data-re-node-selector-content]",
+				"[data-re-link-selector-form]",
+				"[data-re-btn-bm-toolbar]",
+				"[data-tippy-root]",
+			].join(", "),
+		),
+	);
 
 interface ComposeModalProps {
 	isOpen: boolean;
@@ -109,6 +126,8 @@ export const ComposeModal = ({
 	const [attachments, setAttachments] = useState<AttachmentItem[]>([]);
 	const [htmlBody, setHtmlBody] = useState("");
 	const [textBody, setTextBody] = useState("");
+	const [editorContent, setEditorContent] = useState("");
+	const [editorKey, setEditorKey] = useState(0);
 	const [showDiscard, setShowDiscard] = useState(false);
 	const [aiLoading, setAiLoading] = useState(false);
 	const [aiPreviewHtml, setAiPreviewHtml] = useState<string | null>(null);
@@ -116,6 +135,7 @@ export const ComposeModal = ({
 	const [toError, setToError] = useState<string | null>(null);
 	const draftTimer = useRef<number | null>(null);
 	const currentDraftId = useRef<string | null>(null);
+	const editorRef = useRef<ComposeBodyEditorHandle>(null);
 	const shouldReduceMotion = useReducedMotion();
 
 	const modKey =
@@ -140,15 +160,11 @@ export const ComposeModal = ({
 
 	const submitRef = useRef<() => void>(() => {});
 
-	const editor = useComposeEditor({
-		placeholder: "Start writing...",
-		editable: !isSending,
-		onUpdate: (html, text) => {
-			setHtmlBody(html);
-			setTextBody(text);
-		},
-		onModEnter: () => submitRef.current(),
-	});
+	const remountEditor = useCallback((html = "") => {
+		setEditorContent(html);
+		setHtmlBody(html);
+		setEditorKey((k) => k + 1);
+	}, []);
 
 	const hasContent =
 		to.length > 0 ||
@@ -169,8 +185,8 @@ export const ComposeModal = ({
 		setAiPreviewHtml(null);
 		setToError(null);
 		currentDraftId.current = null;
-		editor?.commands.clearContent();
-	}, [reset, editor]);
+		remountEditor("");
+	}, [reset, remountEditor]);
 
 	useEffect(() => {
 		if (!isOpen) return;
@@ -212,9 +228,8 @@ export const ComposeModal = ({
 							}),
 						),
 					);
-					setHtmlBody(draft.html || "");
 					setTextBody(draft.text || "");
-					if (draft.html) editor?.commands.setContent(draft.html);
+					remountEditor(draft.html || "");
 					return;
 				} catch {
 					/* fall through */
@@ -242,9 +257,8 @@ export const ComposeModal = ({
 					if ((data.cc?.length ?? 0) > 0) setShowCc(true);
 					if ((data.bcc?.length ?? 0) > 0) setShowBcc(true);
 					if (data.html) {
-						setHtmlBody(data.html);
 						setTextBody(data.text || "");
-						editor?.commands.setContent(data.html);
+						remountEditor(data.html);
 					}
 					return;
 				}
@@ -261,7 +275,15 @@ export const ComposeModal = ({
 		return () => {
 			cancelled = true;
 		};
-	}, [isOpen, draftId, getDraft, reset, resetComposer, setFocus, editor]);
+	}, [
+		isOpen,
+		draftId,
+		getDraft,
+		reset,
+		resetComposer,
+		setFocus,
+		remountEditor,
+	]);
 
 	// Autosave draft every 3s
 	useEffect(() => {
@@ -416,8 +438,10 @@ export const ComposeModal = ({
 			return;
 		}
 
-		const html = editor?.getHTML() || htmlBody;
-		const text = editor?.getText() || textBody;
+		const exported = (await editorRef.current?.getEmail()) ?? {
+			html: htmlBody,
+			text: textBody,
+		};
 
 		setIsSending(true);
 		try {
@@ -425,8 +449,8 @@ export const ComposeModal = ({
 				mailboxId: mailbox.id,
 				to: data.to,
 				subject: data.subject || "(No Subject)",
-				text,
-				html,
+				text: exported.text || textBody,
+				html: exported.html || htmlBody,
 				cc: data.cc.length > 0 ? data.cc : undefined,
 				bcc: data.bcc.length > 0 ? data.bcc : undefined,
 				attachments: attachments
@@ -455,8 +479,8 @@ export const ComposeModal = ({
 					cc: data.cc,
 					bcc: data.bcc,
 					subject: data.subject,
-					html,
-					text,
+					html: exported.html || htmlBody,
+					text: exported.text || textBody,
 				};
 				toast.success(scheduleAt ? "Email scheduled" : "Email sent", {
 					duration: UNDO_WINDOW_SECONDS * 1000,
@@ -500,7 +524,7 @@ export const ComposeModal = ({
 	};
 
 	const generateSubject = async () => {
-		const text = editor?.getText() || textBody;
+		const text = editorRef.current?.editor?.getText() || textBody;
 		if (!text.trim()) {
 			toast.error("Write some content first");
 			return;
@@ -523,7 +547,7 @@ export const ComposeModal = ({
 	};
 
 	const generateBody = async () => {
-		const prompt = editor?.getText() || textBody;
+		const prompt = editorRef.current?.editor?.getText() || textBody;
 		if (!prompt.trim()) {
 			toast.error("Write a prompt or draft first");
 			return;
@@ -576,7 +600,17 @@ export const ComposeModal = ({
 						requestClose();
 					}}
 					onPointerDownOutside={(e) => {
-						if (isSending) e.preventDefault();
+						if (isSending || isComposeFloatingUi(e.target)) {
+							e.preventDefault();
+						}
+					}}
+					onInteractOutside={(e) => {
+						if (isSending || isComposeFloatingUi(e.target)) {
+							e.preventDefault();
+						}
+					}}
+					onFocusOutside={(e) => {
+						if (isComposeFloatingUi(e.target)) e.preventDefault();
 					}}
 				>
 					<form
@@ -840,29 +874,34 @@ export const ComposeModal = ({
 								</div>
 							</div>
 
-							<div className="shrink-0 border-mail-border/40 border-b px-3 py-2">
-								<ComposeToolbar editor={editor} />
-							</div>
-
-							{/* Body */}
-							<div className="relative flex min-h-[220px] flex-1 flex-col px-5 py-4">
+							{/* Body — React Email editor, inbox toolbar design */}
+							<div
+								className={cn(
+									"relative flex min-h-[220px] flex-1 flex-col",
+									(aiLoading || aiPreviewHtml) && "pointer-events-none",
+								)}
+							>
 								<div
 									className={cn(
-										"min-h-[200px] flex-1 cursor-text",
+										"flex min-h-[200px] flex-1 flex-col",
 										(aiLoading || aiPreviewHtml) && "blur-sm",
 									)}
-									onClick={() => editor?.commands.focus()}
-									onKeyDown={() => {}}
 								>
-									{editor ? (
-										<EditorContent editor={editor} />
-									) : (
-										<div className="text-mail-muted text-sm">
-											Loading editor…
-										</div>
-									)}
+									<ComposeBodyEditor
+										ref={editorRef}
+										editorKey={editorKey}
+										content={editorContent}
+										editable={!isSending}
+										placeholder="Start writing…"
+										className="compose-email-editor__content min-h-[200px] flex-1 px-5 pb-4"
+										onUpdate={(html, text) => {
+											setHtmlBody(html);
+											setTextBody(text);
+										}}
+										onModEnter={() => submitRef.current()}
+									/>
 								</div>
-								<div className="mt-2 flex items-center justify-between">
+								<div className="mt-auto flex items-center justify-between px-5 py-2">
 									<p className="text-[11px] text-mail-muted">
 										Type{" "}
 										<kbd className="rounded border border-mail-border/50 px-1 font-sans text-[10px]">
@@ -891,9 +930,7 @@ export const ComposeModal = ({
 											loading={aiLoading}
 											onAccept={() => {
 												if (!aiPreviewHtml) return;
-												editor?.commands.setContent(aiPreviewHtml);
-												setHtmlBody(aiPreviewHtml);
-												setTextBody(editor?.getText() || "");
+												remountEditor(aiPreviewHtml);
 												setAiPreviewHtml(null);
 											}}
 											onReject={() => setAiPreviewHtml(null)}
