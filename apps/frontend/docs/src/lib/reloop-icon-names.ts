@@ -164,6 +164,7 @@ export const RELOOP_ICON_NAMES = new Set<string>([
 	"send-2",
 	"sent",
 	"server",
+	"shapes",
 	"share",
 	"shield",
 	"shield-check",

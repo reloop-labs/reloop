@@ -3056,6 +3056,40 @@ export const IconsSprite = () => (
 					fill="currentColor"
 				/>
 			</symbol>
+			<symbol
+				id="shapes"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M8.3 10a.7.7 0 0 1-.626-1.079L11.5 3.6c.358-.636 1.272-.636 1.63 0l3.826 5.321A.7.7 0 0 1 16.3 10Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+				<rect
+					x="3"
+					y="14"
+					width="7"
+					height="7"
+					rx="1"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+				<circle
+					cx="17.5"
+					cy="17.5"
+					r="3.5"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 		</defs>
 	</svg>
 );
