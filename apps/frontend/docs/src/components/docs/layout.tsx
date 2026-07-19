@@ -49,7 +49,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 			{/* Unified Header - Borderless */}
 			<header className="z-50 flex h-12 w-full shrink-0 bg-bg-weak-50/80 dark:bg-black/80">
 				{/* Desktop Logo Area - Only visible on LG+ */}
-				<div className="hidden shrink-0 items-center px-4 pt-1 lg:flex lg:w-72">
+				<div className="hidden shrink-0 items-center px-4 pt-1 lg:flex lg:w-[270px]">
 					<a href="/" className="flex items-center">
 						<Logo className="ml-2 h-12 w-12" />
 					</a>
@@ -80,7 +80,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 					role="dialog"
 					aria-modal={open}
 					aria-label="Documentation Navigation"
-					className={`fixed inset-y-0 left-0 z-50 w-72 border-stroke-soft-100 border-r bg-bg-white-0 p-0 transition-transform duration-300 ease-out focus:outline-none dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a] ${
+					className={`fixed inset-y-0 left-0 z-50 w-[270px] border-stroke-soft-100 border-r bg-bg-white-0 p-0 transition-transform duration-300 ease-out focus:outline-none dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a] ${
 						open ? "translate-x-0" : "-translate-x-full"
 					}`}
 				>
@@ -104,7 +104,7 @@ export function DocsLayout({ children, tree, pathname }: DocsLayoutProps) {
 				</div>
 
 				{/* Desktop Sidebar - Only visible on LG+ */}
-				<div className="hidden shrink-0 lg:flex lg:w-72">
+				<div className="hidden shrink-0 lg:flex lg:w-[270px]">
 					<Sidebar tree={tree} pathname={pathname} />
 				</div>
 

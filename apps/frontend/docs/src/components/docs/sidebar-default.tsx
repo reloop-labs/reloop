@@ -56,11 +56,9 @@ export function DefaultSidebarFolder({
 				className={cn(
 					"group relative z-10 flex w-full items-center justify-between rounded-lg px-2 font-medium transition-all",
 					depth === 0 ? "h-9 text-[15px]" : "h-8 text-[14px]",
-					isDirectlyActive
-						? "text-primary-base"
-						: isParentActive
-							? "text-primary-base"
-							: "text-text-sub-600 hover:text-primary-base",
+					isActive
+						? "text-text-strong-950"
+						: "text-text-sub-600 hover:text-text-strong-950",
 				)}
 			>
 				<div className="relative z-10 flex w-full min-w-0 items-center gap-2 text-left">
@@ -69,8 +67,8 @@ export function DefaultSidebarFolder({
 							className={cn(
 								"flex h-4 w-4 shrink-0 items-center justify-center transition-colors",
 								isActive
-									? "text-primary-base"
-									: "text-text-sub-600 opacity-70 group-hover:text-primary-base group-hover:opacity-100",
+									? "text-text-strong-950"
+									: "text-text-sub-600 opacity-70 group-hover:text-text-strong-950 group-hover:opacity-100",
 							)}
 						>
 							{node.icon}
@@ -82,8 +80,8 @@ export function DefaultSidebarFolder({
 					className={cn(
 						"relative z-10 h-3.5 w-3.5 transition-transform duration-200",
 						isActive
-							? "text-primary-base"
-							: "text-text-sub-600 opacity-50 group-hover:text-primary-base",
+							? "text-text-sub-600 opacity-60"
+							: "text-text-sub-600 opacity-50 group-hover:opacity-60",
 						isOpen && "rotate-90",
 					)}
 				/>
@@ -98,7 +96,7 @@ export function DefaultSidebarFolder({
 						transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
 						style={{ overflow: "hidden" }}
 					>
-						<div className="mt-px flex flex-col space-y-px border-stroke-soft-100/30 border-l pb-0.5 pl-3">
+						<div className="mt-px ml-4 flex flex-col space-y-px border-stroke-soft-100/30 border-l pb-0.5 pl-4">
 							{node.children.map((child: PageTreeItem, index: number) => (
 								<DefaultSidebarSection
 									key={index}
@@ -156,18 +154,18 @@ export function DefaultSidebarLink({
 				"group relative z-10 flex items-center gap-2 rounded-lg px-2 transition-colors",
 				depth === 0 ? "h-9 text-[15px]" : "h-8 text-[14px]",
 				isActive
-					? "text-primary-base"
-					: "text-text-sub-600 hover:text-primary-base",
+					? "text-text-strong-950"
+					: "text-text-sub-600 hover:text-text-strong-950",
 			)}
 		>
-			<div className="relative z-10 flex w-full items-center gap-2 text-left">
+			<div className="relative z-10 flex w-full min-w-0 items-center gap-2 text-left">
 				{node.icon && (
 					<span
 						className={cn(
-							"flex h-3.5 w-3.5 shrink-0 items-center justify-center transition-colors",
+							"flex h-4 w-4 shrink-0 items-center justify-center transition-colors",
 							isActive
-								? "text-primary-base"
-								: "text-text-sub-600 opacity-70 group-hover:text-primary-base group-hover:opacity-100",
+								? "text-text-strong-950"
+								: "text-text-sub-600 opacity-70 group-hover:text-text-strong-950 group-hover:opacity-100",
 						)}
 					>
 						{node.icon}
@@ -176,6 +174,17 @@ export function DefaultSidebarLink({
 				<span className="truncate font-medium">{node.name as string}</span>
 			</div>
 		</Link>
+	);
+}
+
+function SectionHeader({ name }: { name: string }) {
+	const id = name.toLowerCase().replace(/\s+/g, "-");
+	return (
+		<div id={id} className="scroll-mt-8 px-2.5 pt-4 pb-1.5">
+			<h4 className="font-semibold text-[10px] text-text-soft-400 uppercase tracking-[0.06em]">
+				{name}
+			</h4>
+		</div>
 	);
 }
 
@@ -189,25 +198,19 @@ export function DefaultSidebarSection({
 	depth?: number;
 }) {
 	if (node.type === "separator") {
-		const name = node.name as string;
-		const id = name.toLowerCase().replace(/\s+/g, "-");
 		return (
-			<div id={id} className="mt-4 mb-1.5 scroll-mt-8 px-2">
-				<h4 className="font-semibold text-sm uppercase">{name}</h4>
+			<div data-sidebar-section>
+				<SectionHeader name={node.name as string} />
 			</div>
 		);
 	}
 
 	if (node.type === "folder") {
 		if (depth === 0) {
-			const name = node.name as string;
-			const id = name.toLowerCase().replace(/\s+/g, "-");
 			return (
-				<div className="space-y-px">
-					<div id={id} className="mt-4 mb-1.5 scroll-mt-8 px-2">
-						<h4 className="font-semibold text-sm uppercase">{name}</h4>
-					</div>
-					<div className="mt-px flex flex-col space-y-px border-stroke-soft-100/30 pb-0.5">
+				<div className="flex flex-col" data-sidebar-section>
+					<SectionHeader name={node.name as string} />
+					<div className="flex flex-col gap-px">
 						{node.children.map((child: PageTreeItem, index: number) => (
 							<DefaultSidebarSection
 								key={index}

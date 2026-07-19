@@ -89,22 +89,27 @@ figure {
 	display: none;
 }
 
-/* Thin scrollbar for sidebar - matching dashboard */
-aside::-webkit-scrollbar {
-	width: 4px;
+/* Thin single-line scrollbar for docs sidebar nav */
+aside nav {
+	scrollbar-width: thin;
+	scrollbar-color: var(--color-stroke-soft-200) transparent;
 }
 
-aside::-webkit-scrollbar-track {
+aside nav::-webkit-scrollbar {
+	width: 2px;
+}
+
+aside nav::-webkit-scrollbar-track {
 	background: transparent;
 }
 
-aside::-webkit-scrollbar-thumb {
-	background: var(--color-stroke-soft-100);
-	border-radius: 4px;
+aside nav::-webkit-scrollbar-thumb {
+	background: var(--color-stroke-soft-200);
+	border-radius: 999px;
 }
 
-aside::-webkit-scrollbar-thumb:hover {
-	background: var(--color-text-sub-600);
+aside nav::-webkit-scrollbar-thumb:hover {
+	background: var(--color-text-soft-400);
 }
 
 /* API reference surface borders — match docs design tokens */

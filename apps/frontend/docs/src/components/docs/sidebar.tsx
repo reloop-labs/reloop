@@ -335,7 +335,7 @@ export function Sidebar({
 						method={currentMethod}
 					/>
 
-					<div className="z-10 flex flex-col gap-px">
+					<div className="z-10 flex flex-col gap-px pt-3">
 						{filteredTree.map((node, index) => {
 							if (activeTab?.url === "/api") {
 								return (
