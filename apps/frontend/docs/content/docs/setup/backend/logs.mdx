@@ -4,14 +4,14 @@ icon: file-text
 description: Set up, configure, and run the Reloop logs microservice locally.
 ---
 
-<Callout type="info" title="Complete Base Setup First" variant="note">
-  Ensure you've finished the [Setup](/docs/setup) and have ClickHouse running (`bun docker:up`).
-</Callout>
-
-
-## Service Overview
-
 Event logging and analytics — ingests delivery/tracking events into ClickHouse.
+
+<Tip>
+Run [`bun setup`](/docs/setup) once so ClickHouse is up (`bun docker:up`). Env files come from `bun setup` / `bun env:setup`.
+</Tip>
+
+
+## Overview
 
 | Property | Value |
 | :--- | :--- |
@@ -19,25 +19,21 @@ Event logging and analytics — ingests delivery/tracking events into ClickHouse
 | **Port** | `8016` |
 | **Local URL** | [https://local.reloop.sh/api/logs](https://local.reloop.sh/api/logs) |
 | **Swagger UI** | [https://local.reloop.sh/api/logs/openapi](https://local.reloop.sh/api/logs/openapi) |
-| **Stack** | `ElysiaJS` `ClickHouse` `Redis` `NATS` |
+| **Stack** | ElysiaJS · ClickHouse · Redis · NATS |
 
 
-## Quick Start
-
-<Callout icon="union" variant="info">
-Run from the monorepo root:
-</Callout>
+## Quick start
 
 ```bash
 bun run --filter=be-logs dev
 ```
 
-The service starts with hot reloading on port `8016`.
+Or `bun backend:dev` / `bun dev`.
 
 
-## Environment Configuration
+## Environment
 
-Variables live in `apps/backend/logs/.env`. Running `bun env:setup` from the root auto-populates this file.
+`apps/backend/logs/.env` — from `bun setup` / `bun env:setup`.
 
 ```bash
 # user:password@host:port/database — all ClickHouse settings in one URL
@@ -49,8 +45,6 @@ NATS_URL=nats://localhost:4222
 NODE_ENV=development
 ```
 
-### Reference Table
-
 | Variable | Required | Default |
 | :--- | :--- | :--- |
 | `CLICKHOUSE_URL` | **YES** | `http://default:reloop123@localhost:8123/reloop` |
@@ -58,10 +52,10 @@ NODE_ENV=development
 | `PORT` | **YES** | `8016` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 
-`CLICKHOUSE_URL` is a full connection string. Host, credentials, and database are parsed from it — there are no separate `CLICKHOUSE_USER` / `CLICKHOUSE_PASSWORD` / `CLICKHOUSE_DATABASE` env vars.
+`CLICKHOUSE_URL` is a full connection string — host, credentials, and database are parsed from it. There are no separate `CLICKHOUSE_USER` / `CLICKHOUSE_PASSWORD` / `CLICKHOUSE_DATABASE` vars.
 
 
-## Development Commands
+## Commands
 
 | Command | Description |
 | :--- | :--- |
@@ -75,7 +69,25 @@ NODE_ENV=development
 
 | Layer | Detail |
 | :--- | :--- |
-| **Ingestion** | Subscribes to NATS delivery and tracking events. |
-| **Storage** | Batches writes to ClickHouse `logs` table (MergeTree). |
-| **Query API** | Powers dashboard analytics (opens, clicks, bounces). |
-| **Schema** | Defined in `apps/backend/logs/src/utils/clickhouse.ts`. |
+| **Ingestion** | Subscribes to NATS delivery and tracking events |
+| **Storage** | Batches writes to ClickHouse `logs` table (MergeTree) |
+| **Query API** | Powers dashboard analytics (opens, clicks, bounces) |
+| **Schema** | Defined in `apps/backend/logs/src/utils/clickhouse.ts` |
+
+
+## Next
+
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap
+  </Card>
+  <Card icon="globe" title="Port reference" href="/setup/port">
+    ClickHouse and gateway ports
+  </Card>
+  <Card icon="mail-single" title="Mail" href="/setup/backend/mail">
+    Source of delivery events
+  </Card>
+  <Card icon="webhook" title="Webhook" href="/setup/backend/webhook">
+    Parallel event delivery path
+  </Card>
+</CardGroup>

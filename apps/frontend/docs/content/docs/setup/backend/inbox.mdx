@@ -4,14 +4,14 @@ icon: inbox
 description: Set up, configure, and run the Reloop inbox microservice locally.
 ---
 
-<Callout type="info" title="Complete Base Setup First" variant="note">
-  Ensure you've finished the [Setup](/docs/setup) — before proceeding.
-</Callout>
-
-
-## Service Overview
-
 Agent Inbox API — mailboxes, threads, and messages from inbound email via NATS.
+
+<Tip>
+Run [`bun setup`](/docs/setup) once from the monorepo root. For live inbound mail, also start [inbound](/docs/setup/backend/inbound) with `bun docker:up:edge`.
+</Tip>
+
+
+## Overview
 
 | Property | Value |
 | :--- | :--- |
@@ -19,25 +19,21 @@ Agent Inbox API — mailboxes, threads, and messages from inbound email via NATS
 | **Port** | `8021` |
 | **Local URL** | [https://local.reloop.sh/api/inbox](https://local.reloop.sh/api/inbox) |
 | **Swagger UI** | [https://local.reloop.sh/api/inbox/openapi](https://local.reloop.sh/api/inbox/openapi) |
-| **Stack** | `ElysiaJS` `PostgreSQL` `Redis` `NATS` |
+| **Stack** | ElysiaJS · PostgreSQL · Redis · NATS |
 
 
-## Quick Start
-
-<Callout icon="union" variant="info">
-Run from the monorepo root (requires [inbound](/setup/backend/inbound) via Docker):
-</Callout>
+## Quick start
 
 ```bash
 bun be:inbox:dev
 ```
 
-The service starts with hot reloading on port `8021`.
+Or `bun backend:dev` / `bun dev`.
 
 
-## Environment Configuration
+## Environment
 
-Variables live in `apps/backend/inbox/.env`. Running `bun env:setup` from the root auto-populates this file.
+`apps/backend/inbox/.env` — from `bun setup` / `bun env:setup`.
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -48,8 +44,6 @@ NATS_URL=nats://localhost:4222
 NODE_ENV=development
 ```
 
-### Reference Table
-
 | Variable | Required | Default |
 | :--- | :--- | :--- |
 | `PG_URL` | **YES** | `postgresql://...` |
@@ -58,7 +52,7 @@ NODE_ENV=development
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 
 
-## Development Commands
+## Commands
 
 | Command | Description |
 | :--- | :--- |
@@ -72,6 +66,24 @@ NODE_ENV=development
 
 | Layer | Detail |
 | :--- | :--- |
-| **Inbound flow** | [inbound](/setup/backend/inbound) MTA → NATS → inbox persistence. |
-| **Attachments** | File storage via the [upload](/setup/backend/upload) service (no direct S3 config on inbox). |
-| **Dashboard API** | Mailboxes, threads, and messages at `/api/inbox`. |
+| **Inbound flow** | [inbound](/docs/setup/backend/inbound) MTA → NATS → inbox persistence |
+| **Attachments** | File storage via [upload](/docs/setup/backend/upload) (no direct S3 config on inbox) |
+| **Dashboard API** | Mailboxes, threads, and messages at `/api/inbox` |
+
+
+## Next
+
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap
+  </Card>
+  <Card icon="mail-receive" title="Inbound" href="/setup/backend/inbound">
+    MX edge that feeds this service
+  </Card>
+  <Card icon="image-upload" title="Upload" href="/setup/backend/upload">
+    Attachment storage
+  </Card>
+  <Card icon="home" title="Dashboard" href="/setup/frontend/dashboard">
+    Agent Inbox UI
+  </Card>
+</CardGroup>

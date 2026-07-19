@@ -4,14 +4,14 @@ icon: smtp
 description: Set up and run the Reloop outbound SMTP engine locally in Docker.
 ---
 
-<Callout type="info" title="Complete Base Setup First" variant="note">
-  Ensure you've finished the [Setup](/docs/setup) and have Docker Desktop running.
-</Callout>
+Outbound KumoMTA engine — accepts mail from [mail](/docs/setup/backend/mail) and delivers via SMTP (Mailpit locally).
+
+<Tip>
+Run [`bun setup`](/docs/setup) for core Docker first. SMTP is on the **edge** profile — start it with `bun docker:up:edge` or `bun setup --with-edge` (needs free ports `465` / `587`).
+</Tip>
 
 
-## Service Overview
-
-Outbound KumoMTA engine — accepts mail from [mail](/setup/backend/mail) and delivers via SMTP (Mailpit locally).
+## Overview
 
 | Property | Value |
 | :--- | :--- |
@@ -19,24 +19,22 @@ Outbound KumoMTA engine — accepts mail from [mail](/setup/backend/mail) and de
 | **Docker service** | `smtp` (container `reloop-smtp`) |
 | **SMTP ports** | `465`, `587`, `2025`, `2465`, `2587` |
 | **HTTP port** | `8020` |
-| **Stack** | `KumoMTA` `Lua` |
+| **Stack** | KumoMTA · Lua |
 
 
-## Quick Start
-
-<Callout icon="union" variant="info">
-Starts with the full Docker stack:
-</Callout>
+## Quick start
 
 ```bash
-bun docker:up
+bun docker:up:edge
 ```
 
-Or start only SMTP + Mailpit from `local/`:
+Or with bootstrap:
 
 ```bash
-cd local && docker compose up -d smtp reloop-mailpit
+bun setup --with-edge
 ```
+
+View captured mail at [http://localhost:8025](http://localhost:8025) (Mailpit, core stack).
 
 
 ## Configuration
@@ -49,20 +47,39 @@ Key variables in `local/docker-compose.yml`:
 | `NATS_URL` | `reloop-nats:4222` |
 
 
-## Container Commands
+## Commands
 
 | Command | Description |
 | :--- | :--- |
-| `docker compose up -d smtp` | Start SMTP container |
+| `bun docker:up:edge` | Start smtp + inbound |
+| `docker compose -f local/docker-compose.yml --profile edge up -d smtp` | Start SMTP only |
 | `docker logs -f reloop-smtp` | Stream logs |
-| `docker compose stop smtp` | Stop container |
+| `docker compose -f local/docker-compose.yml stop smtp` | Stop container |
 
 
 ## Architecture
 
 | Layer | Detail |
 | :--- | :--- |
-| **Submission** | Accepts outbound mail on ports `465`/`587`/`2025`/`2465`/`2587` from clients and the mail service. |
-| **Policies** | Lua scripts in `apps/backend/smtp/policy/` handle routing and DKIM. |
-| **Local delivery** | Captured by Mailpit at [http://localhost:8025](http://localhost:8025). |
-| **Inbound** | Port `25` MX is handled by [inbound](/setup/backend/inbound), not this service. |
+| **Submission** | Accepts outbound mail on ports `465` / `587` / `2025` / `2465` / `2587` |
+| **Policies** | Lua scripts in `apps/backend/smtp/policy/` handle routing and DKIM |
+| **Local delivery** | Captured by Mailpit at [http://localhost:8025](http://localhost:8025) |
+| **Inbound** | Port `25` MX is handled by [inbound](/docs/setup/backend/inbound), not this service |
+
+
+## Next
+
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap
+  </Card>
+  <Card icon="globe" title="Port reference" href="/setup/port">
+    Edge ports and conflicts
+  </Card>
+  <Card icon="mail-single" title="Mail" href="/setup/backend/mail">
+    HTTP send API that hands off here
+  </Card>
+  <Card icon="mail-receive" title="Inbound" href="/setup/backend/inbound">
+    MX receiver on port `25`
+  </Card>
+</CardGroup>

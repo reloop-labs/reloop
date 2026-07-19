@@ -4,14 +4,14 @@ icon: users
 description: Set up, configure, and run the Reloop contacts microservice locally.
 ---
 
-<Callout type="info" title="Complete Base Setup First" variant="note">
-  Ensure you've finished the [Setup](/docs/setup) — before proceeding.
-</Callout>
-
-
-## Service Overview
-
 Subscriber profiles, groups, channels, custom properties, and suppression lists.
+
+<Tip>
+Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
+</Tip>
+
+
+## Overview
 
 | Property | Value |
 | :--- | :--- |
@@ -19,25 +19,21 @@ Subscriber profiles, groups, channels, custom properties, and suppression lists.
 | **Port** | `8014` |
 | **Local URL** | [https://local.reloop.sh/api/contacts](https://local.reloop.sh/api/contacts) |
 | **Swagger UI** | [https://local.reloop.sh/api/contacts/openapi](https://local.reloop.sh/api/contacts/openapi) |
-| **Stack** | `ElysiaJS` `PostgreSQL` `Redis` `NATS` |
+| **Stack** | ElysiaJS · PostgreSQL · Redis · NATS |
 
 
-## Quick Start
-
-<Callout icon="union" variant="info">
-Run from the monorepo root:
-</Callout>
+## Quick start
 
 ```bash
 bun be:contacts:dev
 ```
 
-The service starts with hot reloading on port `8014`.
+Or `bun backend:dev` / `bun dev`.
 
 
-## Environment Configuration
+## Environment
 
-Variables live in `apps/backend/contacts/.env`. Running `bun env:setup` from the root auto-populates this file.
+`apps/backend/contacts/.env` — from `bun setup` / `bun env:setup`.
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -49,9 +45,7 @@ PREFERENCES_SECRET="reloop-preferences-secret-key-change-in-prod"
 NODE_ENV=development
 ```
 
-`PREFERENCES_SECRET` signs preference-center tokens consumed by the [Links](/setup/frontend/links) app. The service **refuses to start in production** if this is left at the default dev value.
-
-### Reference Table
+`PREFERENCES_SECRET` signs preference-center tokens for [Links](/docs/setup/frontend/links). The service **refuses to start in production** if left at the default.
 
 | Variable | Required | Default |
 | :--- | :--- | :--- |
@@ -60,10 +54,10 @@ NODE_ENV=development
 | `PORT` | **YES** | `8014` |
 | `BASE_URL` | **YES** | `https://local.reloop.sh` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
-| `PREFERENCES_SECRET` | Prod only | Dev default in `.env.dev` — must be a strong random value in production |
+| `PREFERENCES_SECRET` | Prod only | Dev default in `.env.dev` |
 
 
-## Development Commands
+## Commands
 
 | Command | Description |
 | :--- | :--- |
@@ -77,7 +71,25 @@ NODE_ENV=development
 
 | Layer | Detail |
 | :--- | :--- |
-| **Audience** | Contacts, groups, channels, and custom properties per organization. |
-| **Preferences** | Powers the [Links](/setup/frontend/links) preference center. |
-| **Events** | Lifecycle events published to NATS under `contacts.*`. |
-| **Schema** | `contact`, `channel`, `group` in `packages/db/src/schema/`. |
+| **Audience** | Contacts, groups, channels, and custom properties per organization |
+| **Preferences** | Powers the [Links](/docs/setup/frontend/links) preference center |
+| **Events** | Lifecycle events published to NATS under `contacts.*` |
+| **Schema** | `contact`, `channel`, `group` in `packages/db/src/schema/` |
+
+
+## Next
+
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap
+  </Card>
+  <Card icon="globe" title="Port reference" href="/setup/port">
+    Gateway routes and ports
+  </Card>
+  <Card icon="link" title="Links" href="/setup/frontend/links">
+    Preference center UI
+  </Card>
+  <Card icon="workflow" title="Workflow" href="/setup/backend/workflow">
+    Automations triggered by contacts
+  </Card>
+</CardGroup>

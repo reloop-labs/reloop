@@ -4,14 +4,14 @@ icon: code
 description: Set up, configure, and run the Reloop API key microservice locally.
 ---
 
-<Callout type="info" title="Complete Base Setup First" variant="note">
-  Ensure you've finished the [Setup](/docs/setup) — before proceeding.
-</Callout>
-
-
-## Service Overview
-
 Generation, hashing, validation, and revocation of developer API keys.
+
+<Tip>
+Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
+</Tip>
+
+
+## Overview
 
 | Property | Value |
 | :--- | :--- |
@@ -19,25 +19,21 @@ Generation, hashing, validation, and revocation of developer API keys.
 | **Port** | `8012` |
 | **Local URL** | [https://local.reloop.sh/api/api-key](https://local.reloop.sh/api/api-key) |
 | **Swagger UI** | [https://local.reloop.sh/api/api-key/openapi](https://local.reloop.sh/api/api-key/openapi) |
-| **Stack** | `ElysiaJS` `Better Auth API Key` `PostgreSQL` `Redis` `NATS` |
+| **Stack** | ElysiaJS · Better Auth API Key · PostgreSQL · Redis · NATS |
 
 
-## Quick Start
-
-<Callout icon="union" variant="info">
-Run from the monorepo root:
-</Callout>
+## Quick start
 
 ```bash
 bun be:api-key:dev
 ```
 
-The service starts with hot reloading on port `8012`.
+Or `bun backend:dev` / `bun dev`.
 
 
-## Environment Configuration
+## Environment
 
-Variables live in `apps/backend/api-key/.env`. Running `bun env:setup` from the root auto-populates this file.
+`apps/backend/api-key/.env` — from `bun setup` / `bun env:setup`.
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -48,8 +44,6 @@ NATS_URL=nats://localhost:4222
 NODE_ENV=development
 ```
 
-### Reference Table
-
 | Variable | Required | Default |
 | :--- | :--- | :--- |
 | `PG_URL` | **YES** | `postgresql://...` |
@@ -59,7 +53,7 @@ NODE_ENV=development
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 
 
-## Development Commands
+## Commands
 
 | Command | Description |
 | :--- | :--- |
@@ -73,7 +67,25 @@ NODE_ENV=development
 
 | Layer | Detail |
 | :--- | :--- |
-| **Auth** | `@better-auth/api-key` handles SHA-256 hashing and key formatting. |
-| **Caching** | Validated keys are cached in Redis for fast lookups. |
-| **Events** | Key lifecycle events published to NATS under `api-key.*`. |
-| **Schema** | `apikey` table in `packages/db/src/schema/api-key.ts`. |
+| **Auth** | `@better-auth/api-key` handles SHA-256 hashing and key formatting |
+| **Caching** | Validated keys are cached in Redis for fast lookups |
+| **Events** | Key lifecycle events published to NATS under `api-key.*` |
+| **Schema** | `apikey` table in `packages/db/src/schema/api-key.ts` |
+
+
+## Next
+
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap
+  </Card>
+  <Card icon="globe" title="Port reference" href="/setup/port">
+    Gateway routes and ports
+  </Card>
+  <Card icon="lock" title="Auth" href="/setup/backend/auth">
+    Sessions and organizations
+  </Card>
+  <Card icon="mail-single" title="Mail" href="/setup/backend/mail">
+    API that validates keys on send
+  </Card>
+</CardGroup>

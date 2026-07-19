@@ -4,14 +4,14 @@ icon: doughnut
 description: Set up, configure, and run the Reloop credits microservice locally.
 ---
 
-<Callout type="info" title="Complete Base Setup First" variant="note">
-  Ensure you've finished the [Setup](/docs/setup) — before proceeding.
-</Callout>
-
-
-## Service Overview
-
 Subscription tiers, credit balances, usage tracking, and Stripe billing integration.
+
+<Tip>
+Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
+</Tip>
+
+
+## Overview
 
 | Property | Value |
 | :--- | :--- |
@@ -19,25 +19,21 @@ Subscription tiers, credit balances, usage tracking, and Stripe billing integrat
 | **Port** | `8023` |
 | **Local URL** | [https://local.reloop.sh/api/credits](https://local.reloop.sh/api/credits) |
 | **Swagger UI** | [https://local.reloop.sh/api/credits/openapi](https://local.reloop.sh/api/credits/openapi) |
-| **Stack** | `ElysiaJS` `PostgreSQL` `NATS` |
+| **Stack** | ElysiaJS · PostgreSQL · NATS |
 
 
-## Quick Start
-
-<Callout icon="union" variant="info">
-Run from the monorepo root:
-</Callout>
+## Quick start
 
 ```bash
 bun be:credits:dev
 ```
 
-The service starts with hot reloading on port `8023`.
+Or `bun backend:dev` / `bun dev`.
 
 
-## Environment Configuration
+## Environment
 
-Variables live in `apps/backend/credits/.env`. Running `bun env:setup` from the root auto-populates this file.
+`apps/backend/credits/.env` — from `bun setup` / `bun env:setup`.
 
 ```bash
 PORT=8023
@@ -46,8 +42,6 @@ INITIAL_CREDITS=100
 NATS_URL=nats://localhost:4222
 ```
 
-### Reference Table
-
 | Variable | Required | Default |
 | :--- | :--- | :--- |
 | `PORT` | **YES** | `8023` |
@@ -55,7 +49,7 @@ NATS_URL=nats://localhost:4222
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 
 
-## Development Commands
+## Commands
 
 | Command | Description |
 | :--- | :--- |
@@ -69,7 +63,25 @@ NATS_URL=nats://localhost:4222
 
 | Layer | Detail |
 | :--- | :--- |
-| **Credits** | Tracks balances and blocks sends when credits reach zero. |
-| **Stripe** | Manages subscriptions, invoices, and billing webhooks. |
-| **Events** | Publishes `billing.quota-warning` and related NATS subjects. |
-| **Schema** | `plan`, `subscription`, `credit_ledger` in `packages/db/src/schema/billing.ts`. |
+| **Credits** | Tracks balances and blocks sends when credits reach zero |
+| **Stripe** | Manages subscriptions, invoices, and billing webhooks |
+| **Events** | Publishes `billing.quota-warning` and related NATS subjects |
+| **Schema** | `plan`, `subscription`, `credit_ledger` in `packages/db/src/schema/billing.ts` |
+
+
+## Next
+
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap
+  </Card>
+  <Card icon="globe" title="Port reference" href="/setup/port">
+    Gateway routes and ports
+  </Card>
+  <Card icon="mail-single" title="Mail" href="/setup/backend/mail">
+    Sends that consume credits
+  </Card>
+  <Card icon="mail" title="Email" href="/setup/backend/email">
+    Platform billing notifications
+  </Card>
+</CardGroup>

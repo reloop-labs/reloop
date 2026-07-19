@@ -4,14 +4,14 @@ icon: modules
 description: Set up, configure, and run the Reloop workflow microservice locally.
 ---
 
-<Callout type="info" title="Complete Base Setup First" variant="note">
-  Ensure you've finished the [Setup](/docs/setup) — before proceeding.
-</Callout>
-
-
-## Service Overview
-
 Marketing automation — drip campaigns, delays, and multi-step journeys via BullMQ.
+
+<Tip>
+Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
+</Tip>
+
+
+## Overview
 
 | Property | Value |
 | :--- | :--- |
@@ -20,25 +20,21 @@ Marketing automation — drip campaigns, delays, and multi-step journeys via Bul
 | **Local URL** | [https://local.reloop.sh/api/workflow](https://local.reloop.sh/api/workflow) |
 | **Swagger UI** | [https://local.reloop.sh/api/workflow/openapi](https://local.reloop.sh/api/workflow/openapi) |
 | **Workbench** | [https://local.reloop.sh/api/workflow/jobs](https://local.reloop.sh/api/workflow/jobs) |
-| **Stack** | `ElysiaJS` `PostgreSQL` `Redis` `NATS` `BullMQ` |
+| **Stack** | ElysiaJS · PostgreSQL · Redis · NATS · BullMQ |
 
 
-## Quick Start
-
-<Callout icon="union" variant="info">
-Run from the monorepo root:
-</Callout>
+## Quick start
 
 ```bash
 bun be:workflow:dev
 ```
 
-The service starts with hot reloading on port `8017`.
+Or `bun backend:dev` / `bun dev`.
 
 
-## Environment Configuration
+## Environment
 
-Variables live in `apps/backend/workflow/.env`. Running `bun env:setup` from the root auto-populates this file.
+`apps/backend/workflow/.env` — from `bun setup` / `bun env:setup`.
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -52,8 +48,6 @@ NODE_ENV=development
 # WORKBENCH_PASS=secret
 ```
 
-### Reference Table
-
 | Variable | Required | Default |
 | :--- | :--- | :--- |
 | `PG_URL` | **YES** | `postgresql://...` |
@@ -61,11 +55,11 @@ NODE_ENV=development
 | `PORT` | **YES** | `8017` |
 | `BASE_URL` | **YES** | `https://local.reloop.sh` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
-| `WORKBENCH_USER` | NO | empty (open dashboard in dev) |
-| `WORKBENCH_PASS` | NO | empty (open dashboard in dev) |
+| `WORKBENCH_USER` | No | empty (open in dev) |
+| `WORKBENCH_PASS` | No | empty (open in dev) |
 
 
-## Development Commands
+## Commands
 
 | Command | Description |
 | :--- | :--- |
@@ -79,7 +73,25 @@ NODE_ENV=development
 
 | Layer | Detail |
 | :--- | :--- |
-| **Triggers** | NATS events (e.g. `contacts.created`) start automation journeys. |
-| **Execution** | BullMQ `workflow-queue` handles delayed steps and transitions. |
-| **Integrations** | Reads contacts/templates and triggers sends via [mail](/setup/backend/mail). |
-| **Monitoring** | [Workbench](https://getworkbench.dev) UI at `/api/workflow/jobs`. |
+| **Triggers** | NATS events (e.g. `contacts.created`) start automation journeys |
+| **Execution** | BullMQ `workflow-queue` handles delayed steps and transitions |
+| **Integrations** | Reads contacts/templates and triggers sends via [mail](/docs/setup/backend/mail) |
+| **Monitoring** | [Workbench](https://getworkbench.dev) UI at `/api/workflow/jobs` |
+
+
+## Next
+
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap
+  </Card>
+  <Card icon="globe" title="Port reference" href="/setup/port">
+    Gateway routes and ports
+  </Card>
+  <Card icon="users" title="Contacts" href="/setup/backend/contacts">
+    Trigger source for journeys
+  </Card>
+  <Card icon="mail-single" title="Mail" href="/setup/backend/mail">
+    Sends from workflow steps
+  </Card>
+</CardGroup>

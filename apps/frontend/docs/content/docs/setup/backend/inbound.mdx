@@ -4,14 +4,14 @@ icon: mail-receive
 description: Set up and run the Reloop inbound MX receiver locally in Docker.
 ---
 
-<Callout type="info" title="Complete Base Setup First" variant="note">
-  Ensure you've finished the [Setup](/docs/setup) and have Docker Desktop running.
-</Callout>
+Inbound KumoMTA MX receiver — accepts external mail, scans with RSpamD, forwards to [inbox](/docs/setup/backend/inbox) via NATS.
+
+<Tip>
+Run [`bun setup`](/docs/setup) for core Docker first. Inbound is on the **edge** profile — start it with `bun docker:up:edge` or `bun setup --with-edge` (needs free port `25`).
+</Tip>
 
 
-## Service Overview
-
-Inbound KumoMTA MX receiver — accepts external mail, scans with RSpamD, forwards to [inbox](/setup/backend/inbox) via NATS.
+## Overview
 
 | Property | Value |
 | :--- | :--- |
@@ -19,24 +19,22 @@ Inbound KumoMTA MX receiver — accepts external mail, scans with RSpamD, forwar
 | **Docker service** | `inbound` (container `reloop-inbound`) |
 | **SMTP port** | `25` |
 | **HTTP port** | `8030` (health check) |
-| **Stack** | `KumoMTA` `Lua` `RSpamD` |
+| **Stack** | KumoMTA · Lua · RSpamD |
 
 
-## Quick Start
-
-<Callout icon="union" variant="info">
-Starts with the full Docker stack:
-</Callout>
+## Quick start
 
 ```bash
-bun docker:up
+bun docker:up:edge
 ```
 
-Or start only inbound from `local/`:
+Or with bootstrap:
 
 ```bash
-cd local && docker compose up -d inbound
+bun setup --with-edge
 ```
+
+Health check: [http://localhost:8030/health](http://localhost:8030/health).
 
 
 ## Configuration
@@ -51,11 +49,12 @@ Key variables in `local/docker-compose.yml`:
 | `KUMOMTA_CHECK_RECIPIENT_URL` | `http://host.docker.internal:8011/api/domain` |
 
 
-## Container Commands
+## Commands
 
 | Command | Description |
 | :--- | :--- |
-| `docker compose up -d inbound` | Start inbound container |
+| `bun docker:up:edge` | Start smtp + inbound |
+| `docker compose -f local/docker-compose.yml --profile edge up -d inbound` | Start inbound only |
 | `docker logs -f reloop-inbound` | Stream logs |
 | `curl http://localhost:8030/health` | Health check |
 
@@ -69,7 +68,25 @@ External Sender → Port 25 → Recipient Check → RSpamD → NATS → Inbox
 
 | Layer | Detail |
 | :--- | :--- |
-| **MX reception** | Accepts inbound mail on port `25`. |
-| **Validation** | [domain](/setup/backend/domain) service verifies recipients. |
-| **Forwarding** | Accepted messages published to NATS for inbox, then assigned to the `null` queue. |
-| **Receive-only** | No SMTP AUTH, no HTTP inject, no outbound delivery — submission is [smtp](/setup/backend/smtp) only. |
+| **MX reception** | Accepts inbound mail on port `25` |
+| **Validation** | [domain](/docs/setup/backend/domain) service verifies recipients |
+| **Forwarding** | Accepted messages published to NATS for inbox, then assigned to the `null` queue |
+| **Receive-only** | No SMTP AUTH, no HTTP inject, no outbound delivery — submission is [smtp](/docs/setup/backend/smtp) only |
+
+
+## Next
+
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap
+  </Card>
+  <Card icon="globe" title="Port reference" href="/setup/port">
+    Port `25` and edge conflicts
+  </Card>
+  <Card icon="inbox" title="Inbox" href="/setup/backend/inbox">
+    Persists messages from NATS
+  </Card>
+  <Card icon="globe" title="Domain" href="/setup/backend/domain">
+    Recipient validation API
+  </Card>
+</CardGroup>

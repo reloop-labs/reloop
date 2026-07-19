@@ -4,14 +4,14 @@ icon: image-upload
 description: Set up, configure, and run the Reloop upload microservice locally.
 ---
 
-<Callout type="info" title="Complete Base Setup First" variant="note">
-  Ensure you've finished the [Setup](/docs/setup) and have MinIO running (`bun docker:up`).
-</Callout>
-
-
-## Service Overview
-
 File uploads — logos, attachments, and assets stored in MinIO/S3.
+
+<Tip>
+Run [`bun setup`](/docs/setup) once so MinIO is up (`bun docker:up`). Env files come from `bun setup` / `bun env:setup`. Console: [http://localhost:9001](http://localhost:9001) (`reloop` / `reloop123`).
+</Tip>
+
+
+## Overview
 
 | Property | Value |
 | :--- | :--- |
@@ -19,25 +19,21 @@ File uploads — logos, attachments, and assets stored in MinIO/S3.
 | **Port** | `8018` |
 | **Local URL** | [https://local.reloop.sh/api/upload](https://local.reloop.sh/api/upload) |
 | **Swagger UI** | [https://local.reloop.sh/api/upload/openapi](https://local.reloop.sh/api/upload/openapi) |
-| **Stack** | `ElysiaJS` `PostgreSQL` `MinIO/S3` `NATS` |
+| **Stack** | ElysiaJS · PostgreSQL · MinIO/S3 · NATS |
 
 
-## Quick Start
-
-<Callout icon="union" variant="info">
-Run from the monorepo root:
-</Callout>
+## Quick start
 
 ```bash
 bun be:upload:dev
 ```
 
-The service starts with hot reloading on port `8018`.
+Or `bun backend:dev` / `bun dev`.
 
 
-## Environment Configuration
+## Environment
 
-Variables live in `apps/backend/upload/.env`. Running `bun env:setup` from the root auto-populates this file.
+`apps/backend/upload/.env` — from `bun setup` / `bun env:setup`.
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -54,8 +50,6 @@ NATS_URL=nats://localhost:4222
 NODE_ENV=development
 ```
 
-### Reference Table
-
 | Variable | Required | Default |
 | :--- | :--- | :--- |
 | `PG_URL` | **YES** | `postgresql://...` |
@@ -66,7 +60,7 @@ NODE_ENV=development
 | `PORT` | **YES** | `8018` |
 
 
-## Development Commands
+## Commands
 
 | Command | Description |
 | :--- | :--- |
@@ -80,6 +74,24 @@ NODE_ENV=development
 
 | Layer | Detail |
 | :--- | :--- |
-| **Storage** | Files uploaded to MinIO locally (`localhost:9010`), S3 in production. |
-| **Metadata** | File index stored in Postgres (`upload` table). |
-| **Signed URLs** | Generates presigned upload/download URLs for the dashboard. |
+| **Storage** | Files uploaded to MinIO locally (`localhost:9010`), S3 in production |
+| **Metadata** | File index stored in Postgres (`upload` table) |
+| **Signed URLs** | Generates presigned upload/download URLs for the dashboard |
+
+
+## Next
+
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap
+  </Card>
+  <Card icon="globe" title="Port reference" href="/setup/port">
+    MinIO ports `9010` / `9001`
+  </Card>
+  <Card icon="inbox" title="Inbox" href="/setup/backend/inbox">
+    Attachments via upload
+  </Card>
+  <Card icon="layout" title="Template" href="/setup/backend/template">
+    Assets used in templates
+  </Card>
+</CardGroup>

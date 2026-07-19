@@ -4,14 +4,14 @@ icon: mail-single
 description: Set up, configure, and run the Reloop mail microservice locally.
 ---
 
-<Callout type="info" title="Complete Base Setup First" variant="note">
-  Ensure you've finished the [Setup](/docs/setup) — before proceeding.
-</Callout>
-
-
-## Service Overview
-
 Outbound transactional email API — send requests, template compilation, tracking, and SMTP handoff.
+
+<Tip>
+Run [`bun setup`](/docs/setup) once from the monorepo root. For real SMTP delivery locally, also start the edge stack: `bun docker:up:edge` (see [SMTP](/docs/setup/backend/smtp)). Mailpit still captures mail without edge for many flows.
+</Tip>
+
+
+## Overview
 
 | Property | Value |
 | :--- | :--- |
@@ -19,25 +19,21 @@ Outbound transactional email API — send requests, template compilation, tracki
 | **Port** | `8015` |
 | **Local URL** | [https://local.reloop.sh/api/mail](https://local.reloop.sh/api/mail) |
 | **Swagger UI** | [https://local.reloop.sh/api/mail/openapi](https://local.reloop.sh/api/mail/openapi) |
-| **Stack** | `ElysiaJS` `PostgreSQL` `Redis` `NATS` `BullMQ` |
+| **Stack** | ElysiaJS · PostgreSQL · Redis · NATS · BullMQ |
 
 
-## Quick Start
-
-<Callout icon="union" variant="info">
-Run from the monorepo root (requires [SMTP](/setup/backend/smtp) via Docker):
-</Callout>
+## Quick start
 
 ```bash
 bun be:mail:dev
 ```
 
-The service starts with hot reloading on port `8015`.
+Or `bun backend:dev` / `bun dev`.
 
 
-## Environment Configuration
+## Environment
 
-Variables live in `apps/backend/mail/.env`. Running `bun env:setup` from the root auto-populates this file.
+`apps/backend/mail/.env` — from `bun setup` / `bun env:setup`.
 
 ```bash
 PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
@@ -50,19 +46,17 @@ TRACKING_SECRET=reloop_tracking_secret_default_123
 NODE_ENV=development
 ```
 
-### Reference Table
-
 | Variable | Required | Default |
 | :--- | :--- | :--- |
 | `PG_URL` | **YES** | `postgresql://...` |
 | `REDIS_URL` | **YES** | `redis://...` |
 | `PORT` | **YES** | `8015` |
 | `KUMOMTA_HTTP_URL` | **YES** | `http://localhost:8020` |
-| `TRACKING_SECRET` | No | `reloop_tracking_secret_default_123` — signs tracked link and open-pixel tokens |
+| `TRACKING_SECRET` | No | Signs tracked link and open-pixel tokens |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
 
 
-## Development Commands
+## Commands
 
 | Command | Description |
 | :--- | :--- |
@@ -76,7 +70,25 @@ NODE_ENV=development
 
 | Layer | Detail |
 | :--- | :--- |
-| **Send pipeline** | Validates API keys, compiles templates, injects tracking links. |
-| **Queues** | BullMQ workers dispatch via Redis (`mail-queue`, `mail-retry-queue`). |
-| **MTA handoff** | Delivers to the [SMTP](/setup/backend/smtp) engine on port `8020`. |
-| **Schema** | `email_log` in `packages/db/src/schema/email.ts`. |
+| **Send pipeline** | Validates API keys, compiles templates, injects tracking links |
+| **Queues** | BullMQ workers dispatch via Redis (`mail-queue`, `mail-retry-queue`) |
+| **MTA handoff** | Delivers to the [SMTP](/docs/setup/backend/smtp) engine on port `8020` |
+| **Schema** | `email_log` in `packages/db/src/schema/email.ts` |
+
+
+## Next
+
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap
+  </Card>
+  <Card icon="smtp" title="SMTP" href="/setup/backend/smtp">
+    Outbound KumoMTA edge
+  </Card>
+  <Card icon="layout" title="Template" href="/setup/backend/template">
+    HTML compilation source
+  </Card>
+  <Card icon="link" title="Links" href="/setup/frontend/links">
+    Click and open tracking
+  </Card>
+</CardGroup>

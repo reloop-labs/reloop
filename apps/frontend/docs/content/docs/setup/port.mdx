@@ -3,56 +3,80 @@ title: Port
 description: Local ports for frontends, backend APIs, Docker infrastructure, and mail services.
 ---
 
-All services bind to localhost when running locally. Use [https://local.reloop.sh](https://local.reloop.sh) for day-to-day development — Caddy routes traffic and keeps session cookies scoped correctly.
+Use [https://local.reloop.sh](https://local.reloop.sh) for day-to-day work. Caddy routes traffic and keeps auth cookies scoped correctly.
 
-<Callout type="warn" title="Port conflicts">
-  Before `bun docker:up`, free **80**, **443**, **5432**, **6379**, and ClickHouse **9000** / MinIO **9010**. Optional edge mail (`bun docker:up:edge`) also needs **25**, **465**, and **587**.
-</Callout>
+## Free these ports first
+
+Stop anything already bound before `bun docker:up`.
+
+| Required for | Ports | Service |
+| :--- | :--- | :--- |
+| Core (`bun docker:up`) | `80`, `443` | Caddy |
+| Core | `5432` | PostgreSQL |
+| Core | `6379` | Redis |
+| Core | `9000` | ClickHouse (native) |
+| Core | `9010` | MinIO (API) |
+| Edge only (`bun docker:up:edge`) | `25`, `465`, `587` | SMTP / inbound |
+
+<Tip>
+Core is enough for dashboard + Mailpit. Edge is only needed for real SMTP/MX.
+</Tip>
 
 
 ## Unified Gateway
 
 | Route | Service | Port |
 | :--- | :--- | :--- |
-| [https://local.reloop.sh/](https://local.reloop.sh/) | Web | `3000` |
-| [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard) | Dashboard | `3001` |
+| [https://local.reloop.sh/](https://local.reloop.sh/) | [Web](/docs/setup/frontend/web) | `3000` |
+| [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard) | [Dashboard](/docs/setup/frontend/dashboard) | `3001` |
 | [https://local.reloop.sh/console](https://local.reloop.sh/console) | Console | `3002` |
-| [https://local.reloop.sh/docs](https://local.reloop.sh/docs) | Docs | `3003` |
-| [https://local.reloop.sh/preferences](https://local.reloop.sh/preferences) | Links | `3005` |
-| [https://local.reloop.sh/api/auth](https://local.reloop.sh/api/auth) | Auth API | `8000` |
-| [https://local.reloop.sh/api/admin](https://local.reloop.sh/api/admin) | Admin API | `8024` |
-| [https://local.reloop.sh/api/...](https://local.reloop.sh/api/...) | Backend APIs | `8011`–`8024` |
+| [https://local.reloop.sh/docs](https://local.reloop.sh/docs) | [Docs](/docs/setup/frontend/docs) | `3003` |
+| [https://local.reloop.sh/preferences](https://local.reloop.sh/preferences) | [Links](/docs/setup/frontend/links) | `3005` |
+| [https://local.reloop.sh/api/auth](https://local.reloop.sh/api/auth) | [Auth](/docs/setup/backend/auth) | `8000` |
+| [https://local.reloop.sh/api/domain](https://local.reloop.sh/api/domain) | [Domain](/docs/setup/backend/domain) | `8011` |
+| [https://local.reloop.sh/api/api-key](https://local.reloop.sh/api/api-key) | [API Key](/docs/setup/backend/api-key) | `8012` |
+| [https://local.reloop.sh/api/webhook](https://local.reloop.sh/api/webhook) | [Webhook](/docs/setup/backend/webhook) | `8013` |
+| [https://local.reloop.sh/api/contacts](https://local.reloop.sh/api/contacts) | [Contacts](/docs/setup/backend/contacts) | `8014` |
+| [https://local.reloop.sh/api/mail](https://local.reloop.sh/api/mail) | [Mail](/docs/setup/backend/mail) | `8015` |
+| [https://local.reloop.sh/api/logs](https://local.reloop.sh/api/logs) | [Logs](/docs/setup/backend/logs) | `8016` |
+| [https://local.reloop.sh/api/workflow](https://local.reloop.sh/api/workflow) | [Workflow](/docs/setup/backend/workflow) | `8017` |
+| [https://local.reloop.sh/api/upload](https://local.reloop.sh/api/upload) | [Upload](/docs/setup/backend/upload) | `8018` |
+| [https://local.reloop.sh/api/template](https://local.reloop.sh/api/template) | [Template](/docs/setup/backend/template) | `8019` |
+| [https://local.reloop.sh/api/inbox](https://local.reloop.sh/api/inbox) | [Inbox](/docs/setup/backend/inbox) | `8021` |
+| [https://local.reloop.sh/api/email](https://local.reloop.sh/api/email) | [Email](/docs/setup/backend/email) | `8022` |
+| [https://local.reloop.sh/api/credits](https://local.reloop.sh/api/credits) | [Credits](/docs/setup/backend/credits) | `8023` |
+| [https://local.reloop.sh/api/admin](https://local.reloop.sh/api/admin) | Admin | `8024` |
 
 
 ## Frontend
 
 | App | Direct URL | Port |
 | :--- | :--- | :--- |
-| Web | [http://localhost:3000](http://localhost:3000) | `3000` |
-| Dashboard | [http://localhost:3001](http://localhost:3001) | `3001` |
+| [Web](/docs/setup/frontend/web) | [http://localhost:3000](http://localhost:3000) | `3000` |
+| [Dashboard](/docs/setup/frontend/dashboard) | [http://localhost:3001](http://localhost:3001) | `3001` |
 | Console | [http://localhost:3002](http://localhost:3002) | `3002` |
-| Docs | [http://localhost:3003](http://localhost:3003) | `3003` |
-| Links | [http://localhost:3005](http://localhost:3005) | `3005` |
+| [Docs](/docs/setup/frontend/docs) | [http://localhost:3003](http://localhost:3003) | `3003` |
+| [Links](/docs/setup/frontend/links) | [http://localhost:3005](http://localhost:3005) | `3005` |
 
 
 ## Backend APIs
 
 | Service | Caddy route | Port |
 | :--- | :--- | :--- |
-| Auth | `/api/auth` | `8000` |
-| Domain | `/api/domain` | `8011` |
-| API Key | `/api/api-key` | `8012` |
-| Webhook | `/api/webhook` | `8013` |
-| Contacts | `/api/contacts` | `8014` |
-| Mail | `/api/mail` | `8015` |
-| Logs | `/api/logs` | `8016` |
-| Workflow | `/api/workflow` | `8017` |
-| Upload | `/api/upload` | `8018` |
-| Template | `/api/template` | `8019` |
-| Inbox | `/api/inbox` | `8021` |
-| Email | `/api/email` | `8022` |
-| Credits | `/api/credits` | `8023` |
-| Admin | `/api/admin` | `8024` |
+| [Auth](/docs/setup/backend/auth) | [`/api/auth`](https://local.reloop.sh/api/auth) | `8000` |
+| [Domain](/docs/setup/backend/domain) | [`/api/domain`](https://local.reloop.sh/api/domain) | `8011` |
+| [API Key](/docs/setup/backend/api-key) | [`/api/api-key`](https://local.reloop.sh/api/api-key) | `8012` |
+| [Webhook](/docs/setup/backend/webhook) | [`/api/webhook`](https://local.reloop.sh/api/webhook) | `8013` |
+| [Contacts](/docs/setup/backend/contacts) | [`/api/contacts`](https://local.reloop.sh/api/contacts) | `8014` |
+| [Mail](/docs/setup/backend/mail) | [`/api/mail`](https://local.reloop.sh/api/mail) | `8015` |
+| [Logs](/docs/setup/backend/logs) | [`/api/logs`](https://local.reloop.sh/api/logs) | `8016` |
+| [Workflow](/docs/setup/backend/workflow) | [`/api/workflow`](https://local.reloop.sh/api/workflow) | `8017` |
+| [Upload](/docs/setup/backend/upload) | [`/api/upload`](https://local.reloop.sh/api/upload) | `8018` |
+| [Template](/docs/setup/backend/template) | [`/api/template`](https://local.reloop.sh/api/template) | `8019` |
+| [Inbox](/docs/setup/backend/inbox) | [`/api/inbox`](https://local.reloop.sh/api/inbox) | `8021` |
+| [Email](/docs/setup/backend/email) | [`/api/email`](https://local.reloop.sh/api/email) | `8022` |
+| [Credits](/docs/setup/backend/credits) | [`/api/credits`](https://local.reloop.sh/api/credits) | `8023` |
+| Admin | [`/api/admin`](https://local.reloop.sh/api/admin) | `8024` |
 
 
 ## Docker & Mail
@@ -60,18 +84,18 @@ All services bind to localhost when running locally. Use [https://local.reloop.s
 | Service | Port | Notes |
 | :--- | :--- | :--- |
 | Caddy | `80`, `443` | Reverse proxy / TLS (core) |
-| Mailpit | `8025` | Captured outbound mail UI (core) |
-| SMTP (outbound) | `465`, `587`, `2025`, `2465`, `2587`, `8020` | KumoMTA edge — `bun docker:up:edge` |
-| Inbound (MX) | `25`, `8030` | KumoMTA edge — `bun docker:up:edge` |
+| Mailpit | `8025` | [http://localhost:8025](http://localhost:8025) — captured outbound mail (core) |
+| [SMTP](/docs/setup/backend/smtp) (outbound) | `465`, `587`, `2025`, `2465`, `2587`, `8020` | KumoMTA edge — `bun docker:up:edge` |
+| [Inbound](/docs/setup/backend/inbound) (MX) | `25`, `8030` | KumoMTA edge — `bun docker:up:edge` |
 
 
 ## Infrastructure
 
-| Service | Port |
-| :--- | :--- |
-| PostgreSQL | `5432` |
-| Redis | `6379` |
-| ClickHouse | `8123` (HTTP), `9000` (native) |
-| NATS | `4222` |
-| MinIO | `9010` (API), `9001` (console) |
-| RSpamD | `11333` |
+| Service | Port | Notes |
+| :--- | :--- | :--- |
+| PostgreSQL | `5432` | Shared DB for all backends |
+| Redis | `6379` | Sessions, OTP, caches |
+| ClickHouse | `8123` (HTTP), `9000` (native) | [Logs](/docs/setup/backend/logs) analytics |
+| NATS | `4222` | Event bus between services |
+| MinIO | `9010` (API), `9001` (console) | [Upload](/docs/setup/backend/upload) object storage — [console](http://localhost:9001) |
+| RSpamD | `11333` | Spam checks for [inbound](/docs/setup/backend/inbound) |

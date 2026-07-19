@@ -4,18 +4,18 @@ icon: mail
 description: Set up, configure, and run the Reloop platform email microservice locally.
 ---
 
-<Callout type="info" title="Complete Base Setup First" variant="note">
-  Ensure you've finished the [Setup](/docs/setup) — before proceeding.
-</Callout>
-
-<Callout type="warn" title="Not the same as Mail">
-  **Email** sends platform notifications to Reloop users (invites, password resets). **Mail** is the customer-facing send API for their audiences.
-</Callout>
-
-
-## Service Overview
-
 Platform transactional emails triggered by NATS events (invites, OTPs, billing alerts).
+
+<Tip>
+Run [`bun setup`](/docs/setup) once from the monorepo root. Env files come from `bun setup` / `bun env:setup`.
+</Tip>
+
+<Warning>
+**Email** ≠ **Mail**. Email sends platform notifications to Reloop users (invites, password resets). [Mail](/docs/setup/backend/mail) is the customer-facing send API for their audiences.
+</Warning>
+
+
+## Overview
 
 | Property | Value |
 | :--- | :--- |
@@ -23,25 +23,21 @@ Platform transactional emails triggered by NATS events (invites, OTPs, billing a
 | **Port** | `8022` |
 | **Local URL** | [https://local.reloop.sh/api/email](https://local.reloop.sh/api/email) |
 | **Swagger UI** | [https://local.reloop.sh/api/email/openapi](https://local.reloop.sh/api/email/openapi) |
-| **Stack** | `ElysiaJS` `Redis` `NATS` |
+| **Stack** | ElysiaJS · Redis · NATS |
 
 
-## Quick Start
-
-<Callout icon="union" variant="info">
-Run from the monorepo root:
-</Callout>
+## Quick start
 
 ```bash
 bun be:email:dev
 ```
 
-The service starts with hot reloading on port `8022`.
+Or `bun backend:dev` / `bun dev`. Locally, when `RELOOP_API_KEY` / `RELOOP_SENDER_DOMAIN` are unset, platform mail can fall back to Mailpit SMTP.
 
 
-## Environment Configuration
+## Environment
 
-Variables live in `apps/backend/email/.env`. Running `bun env:setup` from the root auto-populates this file.
+`apps/backend/email/.env` — from `bun setup` / `bun env:setup`.
 
 ```bash
 EMAIL_PORT=8022
@@ -53,18 +49,16 @@ RELOOP_SENDER_DOMAIN=
 NODE_ENV=development
 ```
 
-### Reference Table
-
 | Variable | Required | Default | Notes |
 | :--- | :--- | :--- | :--- |
 | `EMAIL_PORT` / `PORT` | **YES** | `8022` | Listening port |
 | `BASE_URL` | **YES** | `https://local.reloop.sh` | Platform base URL |
 | `NATS_URL` | **YES** | `nats://localhost:4222` | Event subscriptions |
-| `RELOOP_API_KEY` | **YES** | — | Internal key for send authorization |
-| `RELOOP_SENDER_DOMAIN` | **YES** | — | From-address domain |
+| `RELOOP_API_KEY` | Prod | — | Internal key for send authorization |
+| `RELOOP_SENDER_DOMAIN` | Prod | — | From-address domain |
 
 
-## Development Commands
+## Commands
 
 | Command | Description |
 | :--- | :--- |
@@ -78,6 +72,24 @@ NODE_ENV=development
 
 | Layer | Detail |
 | :--- | :--- |
-| **Triggers** | Subscribes to NATS subjects (`auth.*`, `billing.*`, etc.). |
-| **Delivery** | Sends via the [mail](/setup/backend/mail) pipeline using `RELOOP_API_KEY`. |
-| **Schema** | `email_log` in `packages/db/src/schema/email.ts`. |
+| **Triggers** | Subscribes to NATS subjects (`auth.*`, `billing.*`, etc.) |
+| **Delivery** | Sends via the [mail](/docs/setup/backend/mail) pipeline using `RELOOP_API_KEY` when set |
+| **Schema** | `email_log` in `packages/db/src/schema/email.ts` |
+
+
+## Next
+
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap
+  </Card>
+  <Card icon="mail-single" title="Mail" href="/setup/backend/mail">
+    Customer send API (different service)
+  </Card>
+  <Card icon="lock" title="Auth" href="/setup/backend/auth">
+    Triggers invites and OTP emails
+  </Card>
+  <Card icon="globe" title="Port reference" href="/setup/port">
+    Gateway routes and ports
+  </Card>
+</CardGroup>

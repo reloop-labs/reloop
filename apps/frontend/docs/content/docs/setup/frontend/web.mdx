@@ -4,14 +4,14 @@ icon: globe
 description: Set up and run the Reloop marketing web app locally.
 ---
 
-<Callout type="info" title="Complete Base Setup First" variant="note">
-  Ensure you've finished the [Setup](/docs/setup) — before proceeding.
-</Callout>
-
-
-## Service Overview
-
 Public marketing site — landing pages, pricing, and product content.
+
+<Tip>
+Run [`bun setup`](/docs/setup) once from the monorepo root before starting individual apps.
+</Tip>
+
+
+## Overview
 
 | Property | Value |
 | :--- | :--- |
@@ -19,25 +19,33 @@ Public marketing site — landing pages, pricing, and product content.
 | **Port** | `3000` |
 | **Local URL** | [https://local.reloop.sh](https://local.reloop.sh) |
 | **Direct URL** | [http://localhost:3000](http://localhost:3000) |
-| **Stack** | `Next.js` `React 19` `Tailwind CSS` |
+| **Stack** | Next.js · React 19 · Tailwind CSS |
 
 
-## Quick Start
+## Quick start
 
-<Callout icon="union" variant="info">
-Run from the monorepo root:
-</Callout>
+From the monorepo root (after [`bun setup`](/docs/setup)):
 
 ```bash
 bun fe:web:dev
 ```
 
-The app starts with Turbopack hot reloading on port `3000`.
+Or start every frontend together:
+
+```bash
+bun frontend:dev
+```
+
+Turbopack serves the app on port `3000`. Prefer [https://local.reloop.sh](https://local.reloop.sh) when Caddy is running.
+
+<Warning>
+Use `https://local.reloop.sh`, not `localhost:3000`, when testing flows that share cookies or link into the dashboard.
+</Warning>
 
 
-## Environment Configuration
+## Environment
 
-Variables in `apps/frontend/web/.env` (committed with local defaults — no `bun env:setup` step needed):
+Committed local defaults live in `apps/frontend/web/.env` (and `.env.dev`). Fresh clones already have them; `bun env:setup` / `bun setup` recreate or merge missing keys.
 
 ```bash
 NEXT_PUBLIC_URL=https://local.reloop.sh
@@ -49,8 +57,6 @@ NEXT_PUBLIC_RYBBIT_HOST=https://app.rybbit.io
 NEXT_PUBLIC_RYBBIT_SITE_ID=reloop-web
 ```
 
-### Reference Table
-
 | Variable | Required | Default |
 | :--- | :--- | :--- |
 | `NEXT_PUBLIC_URL` | No | `https://reloop.sh` — canonical site URL for metadata and OG tags |
@@ -59,7 +65,7 @@ NEXT_PUBLIC_RYBBIT_SITE_ID=reloop-web
 | `NEXT_PUBLIC_RYBBIT_SITE_ID` | No | Rybbit site identifier |
 
 
-## Development Commands
+## Commands
 
 | Command | Description |
 | :--- | :--- |
@@ -67,3 +73,15 @@ NEXT_PUBLIC_RYBBIT_SITE_ID=reloop-web
 | `bun run --filter=fe-web build` | Compile production bundle |
 | `bun run --filter=fe-web start` | Run production build |
 | `bun run --filter=fe-web lint` | Run ESLint checks |
+
+
+## Next
+
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap
+  </Card>
+  <Card icon="globe" title="Port reference" href="/setup/port">
+    Gateway routes and ports
+  </Card>
+</CardGroup>

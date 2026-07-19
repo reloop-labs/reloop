@@ -4,41 +4,49 @@ icon: link
 description: Set up and run the Reloop links app locally.
 ---
 
-<Callout type="info" title="Complete Base Setup First" variant="note">
-  Ensure you've finished the [Setup](/docs/setup) — before proceeding.
-</Callout>
-
-
-## Service Overview
-
 Contact preference center, tracked link redirects, and open-tracking pixel proxy for outbound email.
+
+<Tip>
+Run [`bun setup`](/docs/setup) once from the monorepo root before starting individual apps. Preferences need [contacts](/docs/setup/backend/contacts) and [mail](/docs/setup/backend/mail) running (`bun dev` or `bun backend:dev`).
+</Tip>
+
+
+## Overview
 
 | Property | Value |
 | :--- | :--- |
 | **Directory** | `apps/frontend/links` |
 | **Port** | `3005` |
-| **Local URL (preferences)** | [https://local.reloop.sh/preferences](https://local.reloop.sh/preferences) |
-| **Local URL (redirect)** | [https://local.reloop.sh/redirect](https://local.reloop.sh/redirect) |
-| **Local URL (open tracking)** | [https://local.reloop.sh/api/mail/v1/track/open](https://local.reloop.sh/api/mail/v1/track/open) (proxied by links when hit via tracking domain) |
-| **Stack** | `Next.js` `React 19` `Tailwind CSS` |
+| **Preferences** | [https://local.reloop.sh/preferences](https://local.reloop.sh/preferences) |
+| **Redirect** | [https://local.reloop.sh/redirect](https://local.reloop.sh/redirect) |
+| **Open tracking** | [https://local.reloop.sh/api/mail/v1/track/open](https://local.reloop.sh/api/mail/v1/track/open) |
+| **Stack** | Next.js · React 19 · Tailwind CSS |
 
 
-## Quick Start
+## Quick start
 
-<Callout icon="union" variant="info">
-Run from the monorepo root:
-</Callout>
+From the monorepo root (after [`bun setup`](/docs/setup)):
 
 ```bash
 bun fe:links:dev
 ```
 
-The app starts with Turbopack hot reloading on port `3005`.
+Or start every frontend together:
+
+```bash
+bun frontend:dev
+```
+
+Turbopack serves the app on port `3005`. Prefer the `local.reloop.sh` URLs above when Caddy is running.
+
+<Warning>
+Use `https://local.reloop.sh/...`, not `localhost:3005`, so redirects and cookies match production-style hosts.
+</Warning>
 
 
-## Environment Configuration
+## Environment
 
-Variables in `apps/frontend/links/.env` (committed with local defaults — no `bun env:setup` step needed):
+Committed local defaults live in `apps/frontend/links/.env` (and `.env.dev`). Fresh clones already have them; `bun env:setup` / `bun setup` recreate or merge missing keys.
 
 ```bash
 NEXT_PUBLIC_URL=https://local.reloop.sh
@@ -56,15 +64,14 @@ NEXT_PUBLIC_RYBBIT_HOST=https://app.rybbit.io
 NEXT_PUBLIC_RYBBIT_SITE_ID=reloop-web
 ```
 
-The preferences page calls the [contacts](/setup/backend/contacts) service server-side via `INTERNAL_API_URL`. The open-tracking proxy calls the [mail](/setup/backend/mail) service via `INTERNAL_MAIL_API_URL` (or `NEXT_PUBLIC_URL` as a fallback). In production, point these at your internal service endpoints.
-
-### Reference Table
+Preferences call [contacts](/docs/setup/backend/contacts) via `INTERNAL_API_URL`. Open-tracking proxies to [mail](/docs/setup/backend/mail) via `INTERNAL_MAIL_API_URL` (or `NEXT_PUBLIC_URL` as a fallback).
 
 | Variable | Required | Default |
 | :--- | :--- | :--- |
 | `NEXT_PUBLIC_URL` | No | `https://link.reloop.sh` — base URL for redirect and preference links |
-| `INTERNAL_API_URL` | No | `http://localhost:8014/api/contacts` — server-side contacts API |
-| `INTERNAL_MAIL_API_URL` | No | falls back to `{NEXT_PUBLIC_URL}/api/mail` — server-side mail open-tracking proxy |
+| `REDIRECT_SECRET` | No | Shared secret with mail / auth / email backends |
+| `INTERNAL_API_URL` | No | `http://localhost:8014/api/contacts` |
+| `INTERNAL_MAIL_API_URL` | No | Falls back to `{NEXT_PUBLIC_URL}/api/mail` |
 | `NEXT_PUBLIC_RYBBIT_HOST` | No | Rybbit analytics host |
 | `NEXT_PUBLIC_RYBBIT_SITE_ID` | No | Rybbit site identifier |
 
@@ -75,10 +82,20 @@ The preferences page calls the [contacts](/setup/backend/contacts) service serve
 | :--- | :--- |
 | `/preferences/[token]` | Manage subscription topics and unsubscribe |
 | `/redirect/[token]` | Track clicks and redirect to destination URL |
-| `/api/mail/v1/track/open/[token]` | Proxy open-tracking pixels to the mail service (custom tracking domains) |
+| `/api/mail/v1/track/open/[token]` | Proxy open-tracking pixels to the mail service |
 
 
-## Development Commands
+## Architecture
+
+| Layer | Detail |
+| :--- | :--- |
+| **[Mail](/docs/setup/backend/mail)** | Injects `/redirect/[token]` click links and open pixels in outbound HTML |
+| **[Contacts](/docs/setup/backend/contacts)** | Powers preference page data |
+| **Open-tracking proxy** | Custom tracking domains CNAME here; pixels proxy to mail when `/api/mail` is not on the tracking host |
+| **Caddy** | Routes `/preferences*` and `/redirect*` to port `3005` |
+
+
+## Commands
 
 | Command | Description |
 | :--- | :--- |
@@ -88,11 +105,19 @@ The preferences page calls the [contacts](/setup/backend/contacts) service serve
 | `bun run --filter=fe-links lint` | Run ESLint checks |
 
 
-## Architecture
+## Next
 
-| Layer | Detail |
-| :--- | :--- |
-| **[Mail](/setup/backend/mail)** | Injects `/redirect/[token]` click links and `/api/mail/v1/track/open/[token]` open pixels in outbound HTML. |
-| **[Contacts](/setup/backend/contacts)** | Powers preference page data. |
-| **Open-tracking proxy** | Custom tracking domains CNAME to this app; open pixels are proxied to the mail service so tracking still works when `/api/mail` is not on the tracking host. |
-| **Caddy** | Routes `/preferences*` and `/redirect*` to port `3005`. |
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap
+  </Card>
+  <Card icon="globe" title="Port reference" href="/setup/port">
+    Gateway routes and ports
+  </Card>
+  <Card icon="users" title="Contacts" href="/setup/backend/contacts">
+    Preferences data API
+  </Card>
+  <Card icon="mail-single" title="Mail" href="/setup/backend/mail">
+    Tracking links and open pixels
+  </Card>
+</CardGroup>

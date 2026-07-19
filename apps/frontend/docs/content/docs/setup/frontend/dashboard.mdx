@@ -4,14 +4,14 @@ icon: home
 description: Set up and run the Reloop dashboard app locally.
 ---
 
-<Callout type="info" title="Complete Base Setup First" variant="note">
-  Ensure you've finished the [Setup](/docs/setup) — before proceeding.
-</Callout>
-
-
-## Service Overview
-
 Main workspace app — campaigns, contacts, templates, analytics, and settings.
+
+<Tip>
+Run [`bun setup`](/docs/setup) once from the monorepo root before starting individual apps. The dashboard needs [auth](/docs/setup/backend/auth) (and usually the rest of `bun backend:dev` or `bun dev`).
+</Tip>
+
+
+## Overview
 
 | Property | Value |
 | :--- | :--- |
@@ -19,29 +19,35 @@ Main workspace app — campaigns, contacts, templates, analytics, and settings.
 | **Port** | `3001` |
 | **Local URL** | [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard) |
 | **Direct URL** | [http://localhost:3001/dashboard](http://localhost:3001/dashboard) |
-| **Stack** | `TanStack Start` `Vite` `React 19` `Tailwind CSS` |
+| **Stack** | TanStack Start · Vite · React 19 · Tailwind CSS |
 
 
-## Quick Start
+## Quick start
 
-<Callout icon="union" variant="info">
-Run from the monorepo root (requires [auth](/setup/backend/auth) running):
-</Callout>
+From the monorepo root (after [`bun setup`](/docs/setup)):
 
 ```bash
 bun fe:dashboard:dev
 ```
 
-The app starts with Vite HMR on port `3001`, base path `/dashboard`.
+Or start every frontend together:
 
-<Callout type="warn" title="Use the unified domain">
-  Open [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard), not `localhost:3001`, so session cookies work with [auth](/setup/backend/auth).
-</Callout>
+```bash
+bun frontend:dev
+```
+
+Vite HMR serves the app on port `3001` with base path `/dashboard`.
+
+<Warning>
+Open [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard), not `localhost:3001`, so session cookies work with [auth](/docs/setup/backend/auth). Local OTP is `888888`.
+</Warning>
 
 
-## Environment Configuration
+## Environment
 
-Optional build-time / env overrides (the auth client falls back to the browser origin when unset):
+No committed `.env` is required for local same-origin use via Caddy. The auth client falls back to the browser origin when public URL vars are unset.
+
+Optional overrides:
 
 ```bash
 # Optional locally — browser origin is used when unset (via Caddy at local.reloop.sh).
@@ -52,11 +58,9 @@ Optional build-time / env overrides (the auth client falls back to the browser o
 NEXT_PUBLIC_WS_URL="wss://local.reloop.sh"
 ```
 
-API calls use relative paths (`/api/*`) via Caddy, so no public API URL is required.
+API calls use relative paths (`/api/*`) through Caddy, so no public API URL is required.
 
 Auth (`@reloop/auth/client`) resolves the public origin as: `NEXT_PUBLIC_URL` / `VITE_PUBLIC_URL` → `window.location.origin`. For production Docker images you can pass `--build-arg NEXT_PUBLIC_URL=https://your-domain.com`; if omitted, the browser origin is used so same-host reverse-proxy deploys work without a rebuild.
-
-### Reference Table
 
 | Variable | Required | Default |
 | :--- | :--- | :--- |
@@ -64,7 +68,7 @@ Auth (`@reloop/auth/client`) resolves the public origin as: `NEXT_PUBLIC_URL` / 
 | `NEXT_PUBLIC_WS_URL` | No | Current host (template collaboration WebSocket) |
 
 
-## Development Commands
+## Commands
 
 | Command | Description |
 | :--- | :--- |
@@ -73,3 +77,21 @@ Auth (`@reloop/auth/client`) resolves the public origin as: `NEXT_PUBLIC_URL` / 
 | `bun run --filter=fe-dashboard preview` | Preview production build |
 | `bun run --filter=fe-dashboard typecheck` | Run TypeScript checks |
 | `bun run --filter=fe-dashboard test` | Run Vitest |
+
+
+## Next
+
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap
+  </Card>
+  <Card icon="globe" title="Port reference" href="/setup/port">
+    Gateway routes and ports
+  </Card>
+  <Card icon="lock" title="Auth" href="/setup/backend/auth">
+    Sessions and local OTP
+  </Card>
+  <Card icon="browser" title="Web" href="/setup/frontend/web">
+    Marketing site setup
+  </Card>
+</CardGroup>

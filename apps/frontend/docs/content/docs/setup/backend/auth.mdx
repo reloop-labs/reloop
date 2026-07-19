@@ -4,14 +4,14 @@ icon: key-new
 description: Set up, configure, and run the Reloop auth microservice locally.
 ---
 
-<Callout type="info" title="Complete Base Setup First" variant="note">
-  Ensure you've finished the [Setup](/docs/setup) — before proceeding.
-</Callout>
-
-
-## Service Overview
-
 User signup, login, sessions, organizations, and workspace membership via **Better Auth**.
+
+<Tip>
+Run [`bun setup`](/docs/setup) once from the monorepo root (Postgres + Redis via Docker). Env files come from `bun setup` / `bun env:setup`.
+</Tip>
+
+
+## Overview
 
 | Property | Value |
 | :--- | :--- |
@@ -19,29 +19,25 @@ User signup, login, sessions, organizations, and workspace membership via **Bett
 | **Port** | `8000` |
 | **Local URL** | [https://local.reloop.sh/api/auth](https://local.reloop.sh/api/auth) |
 | **Swagger UI** | [https://local.reloop.sh/api/auth/openapi](https://local.reloop.sh/api/auth/openapi) |
-| **Stack** | `ElysiaJS` `Better Auth` `PostgreSQL` `Redis` `NATS` |
+| **Stack** | ElysiaJS · Better Auth · PostgreSQL · Redis · NATS |
 
 
-## Quick Start
-
-<Callout icon="union" variant="info">
-Run from the monorepo root (requires Docker Postgres + Redis):
-</Callout>
+## Quick start
 
 ```bash
 bun be:auth:dev
 ```
 
-The service starts with hot reloading on port `8000`.
+Or start every backend: `bun backend:dev` / `bun dev`.
 
-<Callout type="warn" title="Use the unified domain">
-  Access the dashboard at [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard), not `localhost:3001`. Session cookies are scoped to `local.reloop.sh`.
-</Callout>
+<Warning>
+Open the dashboard at [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard), not `localhost:3001`. Session cookies are scoped to `local.reloop.sh`. Local OTP is `888888`.
+</Warning>
 
 
-## Environment Configuration
+## Environment
 
-Variables live in `apps/backend/auth/.env`. Running `bun env:setup` from the root auto-populates this file.
+`apps/backend/auth/.env` — created/merged by `bun setup` / `bun env:setup` from `.env.dev`.
 
 ```bash
 # Database & Cache
@@ -68,23 +64,19 @@ GITHUB_CLIENT_ID=
 GITHUB_CLIENT_SECRET=
 ```
 
-### Reference Table
-
 | Variable | Required | Default | Notes |
 | :--- | :--- | :--- | :--- |
 | `PG_URL` | **YES** | `postgresql://...` | Shared Postgres from Docker |
 | `REDIS_URL` | **YES** | `redis://...` | Sessions and rate limits |
 | `BETTER_AUTH_SECRET` | **YES** | — | Session encryption key |
-| `BASE_URL` | **YES** | `https://local.reloop.sh` | Public site origin. Local: Caddy host. Production: `https://reloop.sh` (or your domain) — used for OAuth callbacks and invite links |
+| `BASE_URL` | **YES** | `https://local.reloop.sh` | Public origin for OAuth / invites |
 | `PORT` | **YES** | `8000` | Host port |
 | `NATS_URL` | **YES** | `nats://localhost:4222` | Event bus |
-| `DEFAULT_OTP` | **NO** | `888888` | Dev OTP bypass for first login |
-| `DISABLE_SIGNUP` | **NO** | `false` | Set `true` after creating admin account |
+| `DEFAULT_OTP` | No | `888888` | Dev OTP bypass |
+| `DISABLE_SIGNUP` | No | `false` | Set `true` after creating an admin |
 
 
-## Development Commands
-
-All commands run from the **monorepo root**.
+## Commands
 
 | Command | Description |
 | :--- | :--- |
@@ -98,7 +90,25 @@ All commands run from the **monorepo root**.
 
 | Layer | Detail |
 | :--- | :--- |
-| **Sessions** | Better Auth manages login, OAuth, and cookie-based sessions via Redis + Postgres. |
-| **Multi-tenancy** | Users belong to organizations through the `member` table (`packages/db/src/schema/auth.ts`). |
-| **Events** | Auth lifecycle events published to NATS under `auth.*`. |
-| **First login** | Use OTP `888888` locally when `DEFAULT_OTP` is set. |
+| **Sessions** | Better Auth manages login, OAuth, and cookie sessions via Redis + Postgres |
+| **Multi-tenancy** | Users belong to organizations through `member` (`packages/db/src/schema/auth.ts`) |
+| **Events** | Auth lifecycle events published to NATS under `auth.*` |
+| **First login** | Use OTP `888888` locally when `DEFAULT_OTP` is set |
+
+
+## Next
+
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap
+  </Card>
+  <Card icon="globe" title="Port reference" href="/setup/port">
+    Gateway routes and ports
+  </Card>
+  <Card icon="home" title="Dashboard" href="/setup/frontend/dashboard">
+    Product UI that consumes auth
+  </Card>
+  <Card icon="key-new" title="API Key" href="/setup/backend/api-key">
+    Developer API keys
+  </Card>
+</CardGroup>

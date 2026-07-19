@@ -5,6 +5,8 @@ description: Monorepo layout and technology stack.
 
 Reloop is a Bun monorepo — Next.js frontends, ElysiaJS microservices, shared packages, and Docker infrastructure.
 
+Local URL: [https://local.reloop.sh](https://local.reloop.sh). Bootstrap with [`bun setup`](/docs/setup).
+
 
 ## Structure
 
@@ -12,86 +14,120 @@ Reloop is a Bun monorepo — Next.js frontends, ElysiaJS microservices, shared p
 reloop/
 ├── apps/
 │   ├── backend/         # ElysiaJS APIs + KumoMTA (smtp, inbound)
-│   └── frontend/        # web, dashboard, docs, links
+│   └── frontend/        # web, dashboard, docs, links, console
 ├── packages/            # @reloop/ui, @reloop/db, @reloop/bus, …
-└── local/               # Docker Compose for local dev
+└── local/               # Docker Compose, Caddy, TLS, bun setup
 ```
 
+| Path | Role |
+| :--- | :--- |
+| `apps/frontend/*` | Product UI and docs sites |
+| `apps/backend/*` | HTTP APIs and mail edge |
+| `packages/*` | Shared libraries |
+| `local/` | Compose stack, Caddy, [`bun setup`](/docs/setup) |
 
-## Frontend
+
+## Frontend apps
 
 <CardGroup cols={2}>
-  <Card icon="browser" title="Next.js" href="https://nextjs.org/">
-    Web, dashboard, docs, and links apps.
+  <Card icon="browser" title="Web" href="/setup/frontend/web">
+    Marketing site — port `3000`
   </Card>
-  <Card icon="palette" title="Tailwind CSS" href="https://tailwindcss.com/">
-    Utility-first styling across all frontends.
+  <Card icon="layout" title="Dashboard" href="/setup/frontend/dashboard">
+    Product UI — port `3001`
   </Card>
-  <Card icon="shapes" title="Radix UI" href="https://www.radix-ui.com/">
-    Headless primitives in `@reloop/ui`.
+  <Card icon="book-open" title="Docs" href="/setup/frontend/docs">
+    This documentation — port `3003`
   </Card>
-  <Card icon="rotate" title="SWR" href="https://swr.vercel.app/">
-    Client data fetching and cache.
+  <Card icon="mail-single" title="Links" href="/setup/frontend/links">
+    Preferences and redirects — port `3005`
   </Card>
 </CardGroup>
 
+Stack: [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/), [Radix UI](https://www.radix-ui.com/) via `@reloop/ui`, [SWR](https://swr.vercel.app/).
 
-## Backend
 
-<CardGroup cols={2}>
-  <Card icon="zap" title="ElysiaJS" href="https://elysiajs.com/">
-    Microservice framework for all backend APIs.
+## Backend services
+
+<CardGroup cols={3}>
+  <Card icon="lock" title="Auth" href="/setup/backend/auth">
+    Sessions and orgs — `8000`
   </Card>
-  <Card icon="code" title="TypeScript" href="https://www.typescriptlang.org/">
-    Shared types across apps and packages.
+  <Card icon="globe" title="Domain" href="/setup/backend/domain">
+    Sending domains — `8011`
   </Card>
-  <Card icon="lock" title="Better Auth" href="https://www.better-auth.com/">
-    Sessions, orgs, and OAuth in `apps/backend/auth`.
+  <Card icon="key-new" title="API Key" href="/setup/backend/api-key">
+    API keys — `8012`
   </Card>
-  <Card icon="envelope" title="KumoMTA" href="https://kumomta.com/">
-    Outbound SMTP and inbound MX with Lua policies.
+  <Card icon="webhook" title="Webhook" href="/setup/backend/webhook">
+    Event delivery — `8013`
+  </Card>
+  <Card icon="users" title="Contacts" href="/setup/backend/contacts">
+    Audience — `8014`
+  </Card>
+  <Card icon="mail-single" title="Mail" href="/setup/backend/mail">
+    Send API — `8015`
+  </Card>
+  <Card icon="logs" title="Logs" href="/setup/backend/logs">
+    Analytics — `8016`
+  </Card>
+  <Card icon="workflow" title="Workflow" href="/setup/backend/workflow">
+    Automations — `8017`
+  </Card>
+  <Card icon="file-upload" title="Upload" href="/setup/backend/upload">
+    Attachments — `8018`
+  </Card>
+  <Card icon="layout" title="Template" href="/setup/backend/template">
+    Templates — `8019`
+  </Card>
+  <Card icon="inbox" title="Inbox" href="/setup/backend/inbox">
+    Inbound mail — `8021`
+  </Card>
+  <Card icon="envelope" title="Email" href="/setup/backend/email">
+    Platform email — `8022`
+  </Card>
+  <Card icon="billing-custom" title="Credits" href="/setup/backend/credits">
+    Usage / billing — `8023`
+  </Card>
+  <Card icon="server" title="SMTP" href="/setup/backend/smtp">
+    Outbound edge — Docker
+  </Card>
+  <Card icon="inbox" title="Inbound" href="/setup/backend/inbound">
+    MX edge — Docker
   </Card>
 </CardGroup>
 
+Stack: [ElysiaJS](https://elysiajs.com/), [Better Auth](https://www.better-auth.com/), [KumoMTA](https://kumomta.com/) for smtp/inbound.
 
-## Data
+
+## Data & infrastructure
+
+Started by `bun docker:up` (core). Optional smtp/inbound via `bun docker:up:edge`.
 
 <CardGroup cols={2}>
   <Card icon="database" title="PostgreSQL" href="https://www.postgresql.org/">
-    Primary relational database.
+    Primary DB — port `5432`
   </Card>
   <Card icon="code" title="Drizzle ORM" href="https://orm.drizzle.team/">
-    Schema and queries in `@reloop/db`.
+    Schema in `@reloop/db`
   </Card>
   <Card icon="server" title="Redis" href="https://redis.io/">
-    Sessions, cache, and background queues.
+    Sessions and cache — `6379`
   </Card>
-  <Card icon="chart-bar" title="ClickHouse" href="https://clickhouse.com/">
-    Email and analytics logs.
+  <Card icon="fat-row" title="ClickHouse" href="https://clickhouse.com/">
+    Logs analytics — `8123` / `9000`
   </Card>
   <Card icon="folder-open" title="MinIO" href="https://min.io/">
-    S3-compatible uploads and attachments.
-  </Card>
-</CardGroup>
-
-
-## Infrastructure
-
-<CardGroup cols={2}>
-  <Card icon="rocket" title="Bun" href="https://bun.sh/">
-    Runtime and package manager.
-  </Card>
-  <Card icon="boxes" title="Turborepo" href="https://turbo.build/">
-    Monorepo task runner and build cache.
-  </Card>
-  <Card icon="cubes" title="Docker" href="https://www.docker.com/">
-    Local Postgres, Redis, mail stack, and more.
+    Object storage — `9010` / console `9001`
   </Card>
   <Card icon="share-nodes" title="NATS" href="https://nats.io/">
-    Event bus between microservices.
+    Event bus — `4222`
   </Card>
   <Card icon="globe" title="Caddy" href="https://caddyserver.com/">
-    Local TLS and reverse proxy for `local.reloop.sh`.
+    TLS proxy for `local.reloop.sh`
+  </Card>
+  <Card icon="mail-single" title="Mailpit" href="http://localhost:8025">
+    Captured mail UI — `8025`
   </Card>
 </CardGroup>
 
@@ -99,25 +135,43 @@ reloop/
 ## Tooling
 
 <CardGroup cols={2}>
-  <Card icon="sparkles" title="Biome" href="https://biomejs.dev/">
-    Lint and format.
+  <Card icon="rocket" title="Bun" href="https://bun.sh/">
+    Runtime and package manager
   </Card>
-  <Card icon="shield-check" title="Husky" href="https://typicode.github.io/husky">
-    Git pre-commit hooks.
+  <Card icon="boxes" title="Turborepo" href="https://turbo.build/">
+    Task runner and build cache
+  </Card>
+  <Card icon="cubes" title="Docker" href="https://www.docker.com/">
+    Local infra via `local/docker-compose.yml`
+  </Card>
+  <Card icon="sparkles" title="Biome" href="https://biomejs.dev/">
+    Lint and format
   </Card>
 </CardGroup>
 
 
-## Shared Packages
+## Shared packages
 
 | Package | Purpose |
 | :--- | :--- |
 | `@reloop/ui` | Design system and components |
 | `@reloop/db` | Drizzle schema and Postgres client |
-| `@reloop/auth` | Shared auth utilities |
+| `@reloop/auth` | Shared auth client utilities |
 | `@reloop/bus` | NATS messaging wrapper |
 | `@reloop/cache` | Redis caching helpers |
 | `@reloop/apikey` | API key hashing and verification |
 | `@reloop/webhook-events` | Webhook event types |
 | `@reloop/tailwind` | Shared Tailwind config |
 | `@reloop/tsconfig` | Shared TypeScript config |
+
+
+## Next
+
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap with `bun setup`
+  </Card>
+  <Card icon="globe" title="Port reference" href="/setup/port">
+    Gateway routes and every local port
+  </Card>
+</CardGroup>
