@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 # Function to populate .env file from .env.dev
 populate_env() {
@@ -39,7 +40,7 @@ populate_env() {
 # Ensure we are in the root directory (assuming script is in local/)
 cd "$(dirname "$0")/.." || exit
 
-# List of services to populate
+# Backend services
 populate_env "apps/backend/api-key"
 populate_env "apps/backend/auth"
 populate_env "apps/backend/credits"
@@ -53,7 +54,15 @@ populate_env "apps/backend/upload"
 populate_env "apps/backend/webhook"
 populate_env "apps/backend/inbox"
 populate_env "apps/backend/workflow"
+populate_env "apps/backend/admin"
 
+# Database package (drizzle-kit / seed)
+populate_env "packages/db"
+
+# Frontend apps with local defaults
+populate_env "apps/frontend/web"
+populate_env "apps/frontend/docs"
+populate_env "apps/frontend/links"
 
 echo "--------------------------------------------------"
 echo "Setup complete!"

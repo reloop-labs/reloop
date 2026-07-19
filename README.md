@@ -66,6 +66,8 @@ Use Reloop as a **hosted service** (Reloop Labs handles the infrastructure) or *
 ```bash
 git clone https://github.com/reloop-labs/reloop.git
 cd reloop
+bun setup
+bun dev
 ```
 
 For full setup instructions — prerequisites, environment config, Docker services, database setup, and per-service commands — see the **[Setup Guide →](https://reloop.sh/docs/setup)**

@@ -43,6 +43,9 @@ yarn-error.log*
 .env*
 !.env.prod
 !.env.dev
+!apps/frontend/web/.env
+!apps/frontend/docs/.env
+!apps/frontend/links/.env
 .env*.local
 
 # vercel

@@ -6,7 +6,7 @@ description: Local ports for frontends, backend APIs, Docker infrastructure, and
 All services bind to localhost when running locally. Use [https://local.reloop.sh](https://local.reloop.sh) for day-to-day development — Caddy routes traffic and keeps session cookies scoped correctly.
 
 <Callout type="warn" title="Port conflicts">
-  Stop any local PostgreSQL (`5432`), Redis (`6379`), or web servers on `80`/`443` before running `bun docker:up`.
+  Before `bun docker:up`, free **80**, **443**, **5432**, **6379**, and ClickHouse **9000** / MinIO **9010**. Optional edge mail (`bun docker:up:edge`) also needs **25**, **465**, and **587**.
 </Callout>
 
 
@@ -16,10 +16,12 @@ All services bind to localhost when running locally. Use [https://local.reloop.s
 | :--- | :--- | :--- |
 | [https://local.reloop.sh/](https://local.reloop.sh/) | Web | `3000` |
 | [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard) | Dashboard | `3001` |
+| [https://local.reloop.sh/console](https://local.reloop.sh/console) | Console | `3002` |
 | [https://local.reloop.sh/docs](https://local.reloop.sh/docs) | Docs | `3003` |
 | [https://local.reloop.sh/preferences](https://local.reloop.sh/preferences) | Links | `3005` |
 | [https://local.reloop.sh/api/auth](https://local.reloop.sh/api/auth) | Auth API | `8000` |
-| [https://local.reloop.sh/api/...](https://local.reloop.sh/api/...) | Backend APIs | `8011`–`8023` |
+| [https://local.reloop.sh/api/admin](https://local.reloop.sh/api/admin) | Admin API | `8024` |
+| [https://local.reloop.sh/api/...](https://local.reloop.sh/api/...) | Backend APIs | `8011`–`8024` |
 
 
 ## Frontend
@@ -28,6 +30,7 @@ All services bind to localhost when running locally. Use [https://local.reloop.s
 | :--- | :--- | :--- |
 | Web | [http://localhost:3000](http://localhost:3000) | `3000` |
 | Dashboard | [http://localhost:3001](http://localhost:3001) | `3001` |
+| Console | [http://localhost:3002](http://localhost:3002) | `3002` |
 | Docs | [http://localhost:3003](http://localhost:3003) | `3003` |
 | Links | [http://localhost:3005](http://localhost:3005) | `3005` |
 
@@ -49,16 +52,17 @@ All services bind to localhost when running locally. Use [https://local.reloop.s
 | Inbox | `/api/inbox` | `8021` |
 | Email | `/api/email` | `8022` |
 | Credits | `/api/credits` | `8023` |
+| Admin | `/api/admin` | `8024` |
 
 
 ## Docker & Mail
 
 | Service | Port | Notes |
 | :--- | :--- | :--- |
-| SMTP (outbound) | `465`, `587`, `2025`, `2465`, `2587`, `8020` | KumoMTA — HTTP health on `8020` |
-| Inbound (MX) | `25`, `8030` | KumoMTA — health on `8030` |
-| Mailpit | `8025` | Captured outbound mail UI |
-| Caddy | `80`, `443` | Reverse proxy / TLS |
+| Caddy | `80`, `443` | Reverse proxy / TLS (core) |
+| Mailpit | `8025` | Captured outbound mail UI (core) |
+| SMTP (outbound) | `465`, `587`, `2025`, `2465`, `2587`, `8020` | KumoMTA edge — `bun docker:up:edge` |
+| Inbound (MX) | `25`, `8030` | KumoMTA edge — `bun docker:up:edge` |
 
 
 ## Infrastructure
@@ -67,7 +71,7 @@ All services bind to localhost when running locally. Use [https://local.reloop.s
 | :--- | :--- |
 | PostgreSQL | `5432` |
 | Redis | `6379` |
-| ClickHouse | `8123` |
+| ClickHouse | `8123` (HTTP), `9000` (native) |
 | NATS | `4222` |
-| MinIO | `9010`, `9011` |
+| MinIO | `9010` (API), `9001` (console) |
 | RSpamD | `11333` |

@@ -98,7 +98,9 @@ services:
       MP_ENABLE_CHAOS: "true"
     restart: unless-stopped
 
+  # Optional mail edge (bind ports 25/465/587). Started via: bun docker:up:edge
   smtp:
+    profiles: ["edge"]
     build:
       context: ../apps/backend/smtp
       dockerfile: Dockerfile
@@ -127,9 +129,13 @@ services:
     depends_on:
       reloop-mailpit:
         condition: service_started
+      reloop-nats:
+        condition: service_started
     restart: unless-stopped
 
+  # Optional inbound MX (binds host port 25). Started via: bun docker:up:edge
   inbound:
+    profiles: ["edge"]
     build:
       context: ../apps/backend/inbound
       dockerfile: Dockerfile

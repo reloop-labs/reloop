@@ -3,10 +3,10 @@ title: Setup
 description: Clone, install, and run the Reloop monorepo locally.
 ---
 
-Run the full stack behind [https://local.reloop.sh](https://local.reloop.sh). Complete these steps in order from the **monorepo root**.
+Run the full stack behind [https://local.reloop.sh](https://local.reloop.sh). From the **monorepo root**, one command prepares everything.
 
-<Callout type="warn" title="Run steps in order">
-  Skipping or reordering steps can cause database connection errors or broken routing.
+<Callout type="info" title="One-command setup">
+  Prefer `bun setup` — it narrates each step (hosts, TLS, Docker, env, database) and only pauses when the OS needs sudo or a missing tool.
 </Callout>
 
 
@@ -16,10 +16,49 @@ Run the full stack behind [https://local.reloop.sh](https://local.reloop.sh). Co
 | :--- | :--- |
 | [Bun](https://bun.sh/get) | v1.3.0+ |
 | [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Postgres, Redis, ClickHouse, Caddy, NATS, mail stack |
+| [mkcert](https://github.com/FiloSottile/mkcert) | Local TLS for Caddy (`brew install mkcert` on macOS) |
 | Git | Clone the repository |
 
 
 ## Quick Start
+
+```bash
+git clone git@github.com:reloop-labs/reloop.git
+cd reloop
+bun setup
+bun dev
+```
+
+Or setup and start in one step:
+
+```bash
+bun setup --start
+```
+
+Open [https://local.reloop.sh](https://local.reloop.sh). Use the dashboard at [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard) — not `localhost:3001` — so auth cookies work.
+
+Local signup/login OTP: `888888`.
+
+`bun setup` will:
+
+1. Check Bun and Docker
+2. Add `local.reloop.sh` to `/etc/hosts` (sudo once if needed)
+3. Generate trusted TLS certs with mkcert into `local/certs/`
+4. Run `bun install` when needed
+5. Copy `.env.dev` → `.env` for backends, `packages/db`, and frontends
+6. Start Docker infrastructure and wait for Postgres
+7. Apply the database schema with `bun db:push`
+
+Flags: `--start`, `--force`, `--skip-docker`, `--skip-hosts`, `--skip-tls`, `--with-edge` (optional smtp/inbound; needs free ports `25`/`465`/`587`).
+
+
+## Manual setup
+
+Use these steps if you need to debug a specific stage. Run them in order from the monorepo root.
+
+<Callout type="warn" title="Run steps in order">
+  Skipping or reordering steps can cause database connection errors or broken routing.
+</Callout>
 
 ### 1. Clone and install
 
@@ -43,34 +82,52 @@ On Windows (PowerShell as Administrator):
 Add-Content -Path $env:windir\System32\drivers\etc\hosts -Value "127.0.0.1`tlocal.reloop.sh"
 ```
 
-### 3. Start Docker
+### 3. Generate TLS certs
+
+Caddy serves HTTPS using PEMs in `local/certs/` (gitignored). Generate them once:
+
+```bash
+brew install mkcert   # macOS
+mkcert -install
+mkdir -p local/certs
+mkcert -cert-file local/certs/local.reloop.sh.pem \
+  -key-file local/certs/local.reloop.sh-key.pem \
+  local.reloop.sh "*.local.reloop.sh"
+```
+
+### 4. Start Docker
 
 ```bash
 bun docker:up
 ```
 
+Optional real SMTP/MX edge (often blocked by host mail or privileged port `25`):
+
+```bash
+bun docker:up:edge
+```
+
 <Callout type="warn" title="Port conflicts">
-  Stop local PostgreSQL (`5432`), Redis (`6379`), or anything on `80`/`443` before starting Docker. See [Port](/docs/setup/port) for the full list.
+  Stop local PostgreSQL (`5432`), Redis (`6379`), or anything on `80`/`443` before starting Docker. Edge mail also needs `25`/`465`/`587`. See [Port](/docs/setup/port) for the full list.
 </Callout>
 
-### 4. Initialize database
+### 5. Initialize database
 
 Wait a few seconds for Postgres to become healthy, then:
 
 ```bash
 bun db:push
-bun db:seed
 ```
 
-### 5. Configure environment
+### 6. Configure environment
 
 ```bash
 bun env:setup
 ```
 
-This copies each backend service `.env.dev` template to `.env` (13 microservices under `apps/backend/`). Frontend apps ship with committed `.env` files and do not need this step. To do one service manually: `cp apps/backend/auth/.env.dev apps/backend/auth/.env`.
+This copies each service `.env.dev` template to `.env` for backend services, `packages/db`, and frontend apps (`web`, `docs`, `links`). Frontend apps also ship committed `.env` files with local defaults so a fresh clone can run without this step for those apps. To do one service manually: `cp apps/backend/auth/.env.dev apps/backend/auth/.env`.
 
-### 6. Start dev servers
+### 7. Start dev servers
 
 ```bash
 bun dev
@@ -83,21 +140,22 @@ bun frontend:dev   # frontends only
 bun backend:dev    # backends only
 ```
 
-Open [https://local.reloop.sh](https://local.reloop.sh). Use the dashboard at [https://local.reloop.sh/dashboard](https://local.reloop.sh/dashboard) — not `localhost:3001` — so auth cookies work.
-
 
 ## Development Commands
 
 | Command | Description |
 | :--- | :--- |
+| `bun setup` | One-command local bootstrap (hosts, TLS, Docker, env, DB) |
+| `bun setup --start` | Bootstrap, then start `bun dev` |
 | `bun dev` | Start all frontend and backend dev servers |
 | `bun frontend:dev` | Frontends only |
 | `bun backend:dev` | Backends only |
-| `bun docker:up` | Start Docker infrastructure |
+| `bun docker:up` | Start core Docker infrastructure (Postgres, Redis, Caddy, Mailpit, …) |
+| `bun docker:up:edge` | Start optional smtp/inbound (KumoMTA; ports `25`/`465`/`587`) |
 | `bun docker:down` | Stop Docker containers |
 | `bun env:setup` | Generate service `.env` files |
 | `bun db:push` | Apply Drizzle schema to Postgres |
-| `bun db:seed` | Seed default workspace data |
+| `bun db:seed` | Run DB seed script |
 | `bun db:studio` | Open Drizzle Studio |
 | `bun run check` | Lint and format checks |
 

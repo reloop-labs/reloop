@@ -55,15 +55,13 @@ Follow the [Setup Guide](https://reloop.sh/docs/setup) to run Reloop locally. Th
 ```bash
 git clone https://github.com/reloop-labs/reloop.git
 cd reloop
-bun install
-bun docker:up
-bun db:push
-bun db:seed
-bun env:setup
+bun setup
 bun dev
 ```
 
-See [reloop.sh/docs/setup](https://reloop.sh/docs/setup) for the full walkthrough including port references, per-service setup, and environment configuration.
+Or `bun setup --start` to bootstrap and start the stack in one go. Prerequisites: Bun v1.3+, Docker Desktop, and [mkcert](https://github.com/FiloSottile/mkcert) for local TLS.
+
+See [reloop.sh/docs/setup](https://reloop.sh/docs/setup) for the full walkthrough including manual steps, port references, per-service setup, and environment configuration.
 
 ---
 
