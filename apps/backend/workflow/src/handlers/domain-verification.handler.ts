@@ -1,3 +1,4 @@
+import type { WorkflowJobData } from "@be/workflow/queues/workflow.queue";
 import {
 	verifyCnameRecord,
 	verifyDkimRecord,
@@ -8,8 +9,12 @@ import {
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import type { Job } from "bullmq";
 import { and, eq, isNull } from "drizzle-orm";
-import { log } from "evlog";
+import { createError, log } from "evlog";
+
+const DNS_FIX_GUIDANCE =
+	"Update the failing DNS records at your DNS provider, wait for propagation, then retry verification from the dashboard.";
 
 function buildFailureReason(checks: Record<string, boolean>): string {
 	const failed = Object.entries(checks)
@@ -29,6 +34,15 @@ function buildFailureReason(checks: Record<string, boolean>): string {
 	return `Your ${rest}, and ${last} records are missing or incorrect`;
 }
 
+function domainVerificationIncompleteError(domainName: string, why: string) {
+	return createError({
+		status: 422,
+		message: `Domain verification failed for ${domainName}`,
+		why,
+		fix: DNS_FIX_GUIDANCE,
+	});
+}
+
 async function markDomainFailed(
 	domainId: string,
 	reason: string,
@@ -44,15 +58,18 @@ async function markDomainFailed(
 }
 
 export async function processDomainVerification({
+	job,
 	domainId,
 	organizationId,
 	isLastAttempt,
 }: {
+	job: Job<WorkflowJobData>;
 	domainId: string;
 	organizationId: string;
 	isLastAttempt: boolean;
 }): Promise<void> {
 	log.info({ message: "Processing domain verification job", domainId });
+	await job.log("Starting domain verification");
 
 	// Fetch domain with DNS records
 	const domainWithRecords = await db.query.domain.findFirst({
@@ -70,6 +87,7 @@ export async function processDomainVerification({
 
 	if (!domainWithRecords) {
 		log.error({ message: "Domain not found", domainId });
+		await job.log("Domain not found — aborting");
 		return;
 	}
 
@@ -88,6 +106,9 @@ export async function processDomainVerification({
 			domainId,
 		});
 		await markDomainFailed(domainId, "Missing mandatory DKIM record");
+		await job.log(
+			`Missing required DNS config: DKIM. Fix: ${DNS_FIX_GUIDANCE}`,
+		);
 		return;
 	}
 
@@ -124,6 +145,9 @@ export async function processDomainVerification({
 			domainId,
 			`Missing required records when sending is enabled: ${missing}`,
 		);
+		await job.log(
+			`Missing required DNS config: ${missing}. Fix: ${DNS_FIX_GUIDANCE}`,
+		);
 		return;
 	}
 
@@ -145,6 +169,9 @@ export async function processDomainVerification({
 			domainId,
 			"Missing receiving MX record when receiving is enabled",
 		);
+		await job.log(
+			`Missing required DNS config: receiving MX. Fix: ${DNS_FIX_GUIDANCE}`,
+		);
 		return;
 	}
 
@@ -164,6 +191,9 @@ export async function processDomainVerification({
 		await markDomainFailed(
 			domainId,
 			"Missing CNAME record when tracking is enabled",
+		);
+		await job.log(
+			`Missing required DNS config: CNAME. Fix: ${DNS_FIX_GUIDANCE}`,
 		);
 		return;
 	}
@@ -258,6 +288,9 @@ export async function processDomainVerification({
 		mxOk,
 		cnameOk,
 	});
+	await job.log(
+		`DNS results: DKIM=${dkimOk} SPF=${spfOk} DMARC=${dmarcOk} MX=${mxOk} CNAME=${cnameOk}`,
+	);
 
 	const activeRecordIds = new Set(activeResults.map((item) => item.record.id));
 	const inactiveRecords = records.filter((r) => !activeRecordIds.has(r.id));
@@ -309,6 +342,7 @@ export async function processDomainVerification({
 		});
 
 		log.info({ message: "Domain verified successfully", domainId, domainName });
+		await job.log("Domain verified successfully");
 		return;
 	}
 
@@ -334,6 +368,9 @@ export async function processDomainVerification({
 			mxOk,
 			cnameOk,
 		});
+		await job.log(
+			`Verification failed (final attempt): ${failureReason}. Fix: ${DNS_FIX_GUIDANCE}`,
+		);
 		// Do not throw after final failure write — status is already persisted
 		return;
 	}
@@ -349,6 +386,7 @@ export async function processDomainVerification({
 		mxOk,
 		cnameOk,
 	});
+	await job.log(`Verification incomplete — will retry: ${failureReason}`);
 
-	throw new Error(`Verification failed for ${domainName}: ${failureReason}`);
+	throw domainVerificationIncompleteError(domainName, failureReason);
 }

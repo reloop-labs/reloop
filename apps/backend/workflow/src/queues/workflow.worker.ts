@@ -6,7 +6,7 @@ import {
 } from "@be/workflow/queues/domain-verify-schedule";
 import { workflowConfig } from "@be/workflow/workflow.config";
 import { type Job, Worker } from "bullmq";
-import { log } from "evlog";
+import { EvlogError, log } from "evlog";
 import { WORKFLOW_QUEUE, type WorkflowJobData } from "./workflow.queue";
 
 const connection = {
@@ -25,6 +25,7 @@ async function processWorkflow(job: Job<WorkflowJobData>): Promise<void> {
 
 	if (jobData.type === "verify-domain") {
 		await processDomainVerification({
+			job,
 			domainId: jobData.workflowId,
 			organizationId: jobData.organizationId,
 			isLastAttempt,
@@ -88,6 +89,8 @@ export function startWorkflowWorker(): Worker {
 			jobId: job?.id,
 			workflowId: job?.data.workflowId,
 			error: err.message,
+			...(err instanceof EvlogError && err.why ? { why: err.why } : {}),
+			...(err instanceof EvlogError && err.fix ? { fix: err.fix } : {}),
 		});
 	});
 
