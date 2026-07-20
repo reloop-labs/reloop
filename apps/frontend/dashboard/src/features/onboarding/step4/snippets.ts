@@ -24,7 +24,7 @@ export const nodeInstallCommands: Record<PackageManager, string> = {
 export const installCommands: Record<LanguageCode, string> = {
 	nodejs: nodeInstallCommands.npm,
 	python: "pip install reloop-email",
-	go: "go get github.com/reloop-labs/reloop-email",
+	go: "go get github.com/reloop-labs/reloop-go/v2",
 	php: "composer require reloop/reloop-email",
 };
 
@@ -36,7 +36,7 @@ export const sendEmailCode: Record<
 	nodejs: {
 		code: `import { Reloop } from "reloop-email";
 
-const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
+const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
 
 const { response, error } = await reloop.mail.send({
   from: "sender@example.com",
@@ -56,13 +56,13 @@ from reloop_email import Reloop
 reloop = Reloop(api_key=os.environ["RELOOP_API_KEY"])
 
 result = reloop.mail.send(
-    from_email="sender@example.com",
+    from_="sender@example.com",
     to="recipient@example.com",
     subject="Hello from Reloop!",
     text="Hello World!",
 )
 
-print(result)`,
+print(result.message_id, result.id)`,
 		lang: "py",
 	},
 	go: {
@@ -71,37 +71,43 @@ print(result)`,
 import (
   "fmt"
   "os"
-  reloopemail "github.com/reloop-labs/reloop-email"
+
+  reloop "github.com/reloop-labs/reloop-go/v2"
 )
 
 func main() {
-  reloop, _ := reloopemail.NewClient(reloopemail.ClientOptions{
+  client, err := reloop.NewClient(reloop.ClientOptions{
     APIKey: os.Getenv("RELOOP_API_KEY"),
   })
+  if err != nil {
+    panic(err)
+  }
 
-  result, err := reloop.Mail().Send(&reloopemail.MailRequest{
+  result, err := client.Mail.Send(reloop.SendMailParams{
     From:    "sender@example.com",
     To:      "recipient@example.com",
     Subject: "Hello from Reloop!",
-    Text:    "Hello World!",
+    Text:    reloop.String("Hello World!"),
   })
   if err != nil {
     fmt.Println("Error:", err)
     return
   }
-  fmt.Println("Success:", result)
+  fmt.Println(result.MessageID, result.ID)
 }`,
 		lang: "go",
 	},
 	php: {
 		code: `$reloop = Reloop::client(getenv('RELOOP_API_KEY'));
 
-$reloop->emails->send([
+$result = $reloop->mail->send([
   'from' => 'sender@example.com',
   'to' => 'recipient@example.com',
   'subject' => 'Hello from Reloop!',
   'text' => 'Hello World!',
-]);`,
+]);
+
+echo $result->message_id, $result->id;`,
 		lang: "php",
 	},
 };
@@ -119,7 +125,7 @@ Requirements:
 
 Supported SDKs:
 - Node.js / Python: reloop-email
-- Go: github.com/reloop-labs/reloop-email
+- Go: github.com/reloop-labs/reloop-go/v2
 - PHP: reloop/reloop-email
 
 Show me only the integration code I need to add to my project.`;
