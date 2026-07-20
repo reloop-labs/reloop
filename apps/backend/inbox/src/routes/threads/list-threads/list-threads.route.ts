@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { getThreadsController } from "./list-threads.controllers";
+import { listThreadsXCodeSamples } from "./list-threads.x-codeSamples";
 
 export const listThreadsRoute = new Elysia().use(authMiddleware).get(
 	"/",
@@ -60,6 +61,7 @@ export const listThreadsRoute = new Elysia().use(authMiddleware).get(
 			summary: "List Threads",
 			description:
 				"Retrieve email conversations (threads) for the active organization",
+			"x-codeSamples": listThreadsXCodeSamples,
 		},
 	},
 );

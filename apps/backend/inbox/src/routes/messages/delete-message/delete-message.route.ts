@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { deleteMessageController } from "./delete-message.controllers";
+import { deleteMessageXCodeSamples } from "./delete-message.x-codeSamples";
 
 export const deleteMessageRoute = new Elysia().use(authMiddleware).delete(
 	"/:id",
@@ -24,6 +25,7 @@ export const deleteMessageRoute = new Elysia().use(authMiddleware).delete(
 			tags: ["Messages"],
 			summary: "Delete Message",
 			description: "Permanently delete an email message",
+			"x-codeSamples": deleteMessageXCodeSamples,
 		},
 	},
 );

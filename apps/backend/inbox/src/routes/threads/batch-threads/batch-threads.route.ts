@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { batchThreadsController } from "./batch-threads.controllers";
+import { batchThreadsXCodeSamples } from "./batch-threads.x-codeSamples";
 
 const batchAction = t.Union([
 	t.Literal("archive"),
@@ -47,6 +48,7 @@ export const batchThreadsRoute = new Elysia().use(authMiddleware).post(
 			summary: "Batch Thread Actions",
 			description:
 				"Apply archive, trash, restore, star, read, important, or spam actions to multiple threads",
+			"x-codeSamples": batchThreadsXCodeSamples,
 		},
 	},
 );

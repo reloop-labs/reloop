@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { sendMessageController } from "./send-message.controllers";
+import { sendMessageXCodeSamples } from "./send-message.x-codeSamples";
 
 export const sendMessageRoute = new Elysia().use(authMiddleware).post(
 	"/send",
@@ -71,6 +72,7 @@ export const sendMessageRoute = new Elysia().use(authMiddleware).post(
 			tags: ["Messages"],
 			summary: "Send Email",
 			description: "Send a new email message on behalf of a mailbox",
+			"x-codeSamples": sendMessageXCodeSamples,
 		},
 	},
 );

@@ -68,7 +68,12 @@ function normalizeRouteKey(pathValue: string, method: string): string {
 		.replace(/\/tpl_[^/\s?]+/g, "/{id}")
 		.replace(/\/ver_[^/\s?]+/g, "/{versionId}")
 		.replace(/\/wh_[^/\s?]+/g, "/{webhook_id}")
-		.replace(/\/del_[^/\s?]+/g, "/{delivery_id}");
+		.replace(/\/del_[^/\s?]+/g, "/{delivery_id}")
+		.replace(/\/mbx_[^/\s?]+/g, "/{id}")
+		.replace(/\/msg_[^/\s?]+/g, "/{id}")
+		.replace(/\/thr_[^/\s?]+/g, "/{id}")
+		.replace(/\/pnd_[^/\s?]+/g, "/{id}")
+		.replace(/\/att_[^/\s?]+/g, "/{attachmentId}");
 	const normalized = templated.replace(/\/+$/, "") || "/";
 	let routeKey = `${method}:${normalized}`;
 	if (normalized.startsWith("/api/webhook/")) {
@@ -207,6 +212,7 @@ const services = [
 	{ name: "mail", dir: path.join(BACKEND_ROOT, "mail/src/routes") },
 	{ name: "template", dir: path.join(BACKEND_ROOT, "template/src/routes") },
 	{ name: "webhook", dir: path.join(BACKEND_ROOT, "webhook/src/routes") },
+	{ name: "inbox", dir: path.join(BACKEND_ROOT, "inbox/src/routes") },
 ];
 
 const sampleIndex = new Map<string, SampleSource>();

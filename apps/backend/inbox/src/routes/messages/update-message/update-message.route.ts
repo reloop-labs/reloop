@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { updateMessageController } from "./update-message.controllers";
+import { updateMessageXCodeSamples } from "./update-message.x-codeSamples";
 
 export const updateMessageRoute = new Elysia().use(authMiddleware).patch(
 	"/:id",
@@ -37,6 +38,7 @@ export const updateMessageRoute = new Elysia().use(authMiddleware).patch(
 			summary: "Update Message Status",
 			description:
 				"Update status attributes (isRead, isStarred, isSpam) of a message",
+			"x-codeSamples": updateMessageXCodeSamples,
 		},
 	},
 );

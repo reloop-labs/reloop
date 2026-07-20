@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { getThreadController } from "./get-thread.controllers";
+import { getThreadXCodeSamples } from "./get-thread.x-codeSamples";
 
 export const getThreadRoute = new Elysia().use(authMiddleware).get(
 	"/:id",
@@ -25,6 +26,7 @@ export const getThreadRoute = new Elysia().use(authMiddleware).get(
 			summary: "Get Thread",
 			description:
 				"Retrieve a specific thread by ID, including its conversation messages and attachments",
+			"x-codeSamples": getThreadXCodeSamples,
 		},
 	},
 );

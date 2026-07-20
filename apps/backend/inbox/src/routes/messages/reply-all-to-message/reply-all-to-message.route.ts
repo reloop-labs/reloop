@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { replyAllToMessageController } from "./reply-all-to-message.controllers";
+import { replyAllToMessageXCodeSamples } from "./reply-all-to-message.x-codeSamples";
 
 export const replyAllToMessageRoute = new Elysia().use(authMiddleware).post(
 	"/:id/reply-all",
@@ -53,6 +54,7 @@ export const replyAllToMessageRoute = new Elysia().use(authMiddleware).post(
 			summary: "Reply All to Message",
 			description:
 				"Reply all to an email message, copying all original recipients",
+			"x-codeSamples": replyAllToMessageXCodeSamples,
 		},
 	},
 );

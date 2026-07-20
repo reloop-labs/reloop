@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { getMailboxController } from "./get-mailbox.controllers";
+import { getMailboxXCodeSamples } from "./get-mailbox.x-codeSamples";
 
 export const getMailboxRoute = new Elysia().use(authMiddleware).get(
 	"/:id",
@@ -24,6 +25,7 @@ export const getMailboxRoute = new Elysia().use(authMiddleware).get(
 			tags: ["Mailboxes"],
 			summary: "Get Mailbox",
 			description: "Retrieve details of a specific mailbox by ID",
+			"x-codeSamples": getMailboxXCodeSamples,
 		},
 	},
 );

@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { toggleThreadStarController } from "./toggle-thread-star.controllers";
+import { toggleThreadStarXCodeSamples } from "./toggle-thread-star.x-codeSamples";
 
 export const toggleThreadStarRoute = new Elysia().use(authMiddleware).patch(
 	"/:id/star",
@@ -28,6 +29,7 @@ export const toggleThreadStarRoute = new Elysia().use(authMiddleware).patch(
 			tags: ["Threads"],
 			summary: "Toggle Thread Star",
 			description: "Direct endpoint to toggle starred status of a thread",
+			"x-codeSamples": toggleThreadStarXCodeSamples,
 		},
 	},
 );

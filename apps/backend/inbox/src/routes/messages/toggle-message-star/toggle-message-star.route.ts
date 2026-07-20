@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { toggleStarController } from "./toggle-message-star.controllers";
+import { toggleMessageStarXCodeSamples } from "./toggle-message-star.x-codeSamples";
 
 export const toggleMessageStarRoute = new Elysia().use(authMiddleware).patch(
 	"/:id/star",
@@ -28,6 +29,7 @@ export const toggleMessageStarRoute = new Elysia().use(authMiddleware).patch(
 			tags: ["Messages"],
 			summary: "Toggle Message Star",
 			description: "Direct endpoint to toggle starred status of a message",
+			"x-codeSamples": toggleMessageStarXCodeSamples,
 		},
 	},
 );

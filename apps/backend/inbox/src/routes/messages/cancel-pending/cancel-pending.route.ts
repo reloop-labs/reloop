@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { cancelPendingController } from "./cancel-pending.controllers";
+import { cancelPendingXCodeSamples } from "./cancel-pending.x-codeSamples";
 
 export const cancelPendingRoute = new Elysia().use(authMiddleware).post(
 	"/pending/:id/cancel",
@@ -24,6 +25,7 @@ export const cancelPendingRoute = new Elysia().use(authMiddleware).post(
 			summary: "Cancel Pending Send",
 			description:
 				"Cancel a scheduled or undo-window pending outbound email before it is sent",
+			"x-codeSamples": cancelPendingXCodeSamples,
 		},
 	},
 );

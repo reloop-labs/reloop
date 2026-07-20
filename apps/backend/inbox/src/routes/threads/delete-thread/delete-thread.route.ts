@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { deleteThreadController } from "./delete-thread.controllers";
+import { deleteThreadXCodeSamples } from "./delete-thread.x-codeSamples";
 
 export const deleteThreadRoute = new Elysia().use(authMiddleware).delete(
 	"/:id",
@@ -25,6 +26,7 @@ export const deleteThreadRoute = new Elysia().use(authMiddleware).delete(
 			summary: "Delete Thread",
 			description:
 				"Permanently delete a thread and all of its conversation logs",
+			"x-codeSamples": deleteThreadXCodeSamples,
 		},
 	},
 );

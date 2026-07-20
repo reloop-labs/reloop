@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { replyToMessageController } from "./reply-to-message.controllers";
+import { replyToMessageXCodeSamples } from "./reply-to-message.x-codeSamples";
 
 export const replyToMessageRoute = new Elysia().use(authMiddleware).post(
 	"/:id/reply",
@@ -58,6 +59,7 @@ export const replyToMessageRoute = new Elysia().use(authMiddleware).post(
 			summary: "Reply to Message",
 			description:
 				"Reply to an email message, preserving thread context and header references",
+			"x-codeSamples": replyToMessageXCodeSamples,
 		},
 	},
 );

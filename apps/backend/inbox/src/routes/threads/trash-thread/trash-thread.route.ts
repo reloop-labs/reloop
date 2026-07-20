@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { trashThreadController } from "./trash-thread.controllers";
+import { trashThreadXCodeSamples } from "./trash-thread.x-codeSamples";
 
 export const trashThreadRoute = new Elysia().use(authMiddleware).post(
 	"/:id/trash",
@@ -24,6 +25,7 @@ export const trashThreadRoute = new Elysia().use(authMiddleware).post(
 			tags: ["Threads"],
 			summary: "Move Thread to Trash",
 			description: "Soft-delete a thread by moving it to the trash folder",
+			"x-codeSamples": trashThreadXCodeSamples,
 		},
 	},
 );

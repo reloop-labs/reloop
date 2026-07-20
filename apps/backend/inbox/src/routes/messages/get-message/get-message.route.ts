@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { getMessageController } from "./get-message.controllers";
+import { getMessageXCodeSamples } from "./get-message.x-codeSamples";
 
 export const getMessageRoute = new Elysia().use(authMiddleware).get(
 	"/:id",
@@ -24,6 +25,7 @@ export const getMessageRoute = new Elysia().use(authMiddleware).get(
 			tags: ["Messages"],
 			summary: "Get Message",
 			description: "Retrieve details of a single email message by ID",
+			"x-codeSamples": getMessageXCodeSamples,
 		},
 	},
 );

@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { getRawMessageController } from "./get-raw-message.controllers";
+import { getRawMessageXCodeSamples } from "./get-raw-message.x-codeSamples";
 
 export const getRawMessageRoute = new Elysia().use(authMiddleware).get(
 	"/:id/raw",
@@ -25,6 +26,7 @@ export const getRawMessageRoute = new Elysia().use(authMiddleware).get(
 			summary: "Get Raw Message",
 			description:
 				"Retrieve the raw, RFC822 formatted string content of a message",
+			"x-codeSamples": getRawMessageXCodeSamples,
 		},
 	},
 );

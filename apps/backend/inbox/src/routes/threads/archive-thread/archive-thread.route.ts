@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { archiveThreadController } from "./archive-thread.controllers";
+import { archiveThreadXCodeSamples } from "./archive-thread.x-codeSamples";
 
 export const archiveThreadRoute = new Elysia().use(authMiddleware).post(
 	"/:id/archive",
@@ -24,6 +25,7 @@ export const archiveThreadRoute = new Elysia().use(authMiddleware).post(
 			tags: ["Threads"],
 			summary: "Archive Thread",
 			description: "Archive a thread to hide it from active list",
+			"x-codeSamples": archiveThreadXCodeSamples,
 		},
 	},
 );

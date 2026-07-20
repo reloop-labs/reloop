@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { getSentMessagesController } from "./list-sent-messages.controllers";
+import { listSentMessagesXCodeSamples } from "./list-sent-messages.x-codeSamples";
 
 export const listSentMessagesRoute = new Elysia().use(authMiddleware).get(
 	"/sent",
@@ -43,6 +44,7 @@ export const listSentMessagesRoute = new Elysia().use(authMiddleware).get(
 			summary: "List Sent Messages",
 			description:
 				"Retrieve sent emails (outbound logs) for the active organization",
+			"x-codeSamples": listSentMessagesXCodeSamples,
 		},
 	},
 );

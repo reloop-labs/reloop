@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia } from "elysia";
 import { getMailboxesController } from "./list-mailboxes.controllers";
+import { listMailboxesXCodeSamples } from "./list-mailboxes.x-codeSamples";
 
 export const listMailboxesRoute = new Elysia().use(authMiddleware).get(
 	"/list",
@@ -21,6 +22,7 @@ export const listMailboxesRoute = new Elysia().use(authMiddleware).get(
 			summary: "List Mailboxes",
 			description:
 				"Retrieve all mailboxes associated with the active organization",
+			"x-codeSamples": listMailboxesXCodeSamples,
 		},
 	},
 );

@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { updateThreadController } from "./update-thread.controllers";
+import { updateThreadXCodeSamples } from "./update-thread.x-codeSamples";
 
 export const updateThreadRoute = new Elysia().use(authMiddleware).patch(
 	"/:id",
@@ -51,6 +52,7 @@ export const updateThreadRoute = new Elysia().use(authMiddleware).patch(
 			summary: "Update Thread",
 			description:
 				"Update thread-wide attributes like read/starred/important status or workflow state",
+			"x-codeSamples": updateThreadXCodeSamples,
 		},
 	},
 );

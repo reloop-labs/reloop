@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { getThreadAttachmentController } from "./get-thread-attachment.controllers";
+import { getThreadAttachmentXCodeSamples } from "./get-thread-attachment.x-codeSamples";
 
 export const getThreadAttachmentRoute = new Elysia().use(authMiddleware).get(
 	"/:id/attachments/:attachmentId",
@@ -26,6 +27,7 @@ export const getThreadAttachmentRoute = new Elysia().use(authMiddleware).get(
 			summary: "Get Thread Attachment",
 			description:
 				"Retrieve an attachment within a specific thread conversation",
+			"x-codeSamples": getThreadAttachmentXCodeSamples,
 		},
 	},
 );

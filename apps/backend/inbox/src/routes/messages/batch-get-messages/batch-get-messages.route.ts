@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/be-inbox/middleware/auth";
 import { MailModel } from "@reloop/be-inbox/model/mail.model";
 import { Elysia, t } from "elysia";
 import { batchGetMessagesController } from "./batch-get-messages.controllers";
+import { batchGetMessagesXCodeSamples } from "./batch-get-messages.x-codeSamples";
 
 export const batchGetMessagesRoute = new Elysia().use(authMiddleware).post(
 	"/batch",
@@ -24,6 +25,7 @@ export const batchGetMessagesRoute = new Elysia().use(authMiddleware).post(
 			tags: ["Messages"],
 			summary: "Batch Get Messages",
 			description: "Retrieve multiple email messages by their IDs (max 100)",
+			"x-codeSamples": batchGetMessagesXCodeSamples,
 		},
 	},
 );
