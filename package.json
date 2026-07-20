@@ -71,7 +71,7 @@
 				"@better-fetch/fetch": "1.1.18",
 				"react-markdown": "10.1.0",
 				"rehype-highlight": "7.0.2",
-				"shiki": "3.14.0",
+				"@code-hike/lighter": "^1.0.3",
 				"ajv": "8.17.1",
 				"bright": "^1.0.0",
 				"swr": "2.3.6",

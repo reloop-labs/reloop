@@ -1,4 +1,4 @@
-export const updateWebhookXCodeSamples = [
+export const listWebhookDeliveriesXCodeSamples = [
 	{
 		id: "node",
 		lang: "javascript",
@@ -7,8 +7,10 @@ export const updateWebhookXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.webhook.update("wh_123456789", {
-  status: "paused",
+const { response, error } = await reloop.webhook.listDeliveries("wh_123456789", {
+  page: 1,
+  limit: 10,
+  status: "failed",
 });
 if (error) throw error;`,
 	},
@@ -16,10 +18,8 @@ if (error) throw error;`,
 		id: "curl",
 		lang: "bash",
 		label: "cURL",
-		source: `curl -X PATCH https://reloop.sh/api/webhook/v1/wh_123456789 \\
-  -H "x-api-key: rl_123456789" \\
-  -H "Content-Type: application/json" \\
-  -d '{"status":"paused"}'`,
+		source: `curl -X GET "https://reloop.sh/api/webhook/v1/wh_123456789/deliveries?page=1&limit=10&status=failed" \\
+  -H "x-api-key: rl_123456789"`,
 	},
 	{
 		id: "python",

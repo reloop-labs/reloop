@@ -11,7 +11,7 @@ import {
 	siRuby,
 	siRust,
 } from "simple-icons";
-// Bright-based code card (lighter highlighter) — do not use @reloop/ui CodeBlock/Shiki.
+// Bright-based code card via shared `@reloop/ui` CodeBlock.
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
 import { useApiLanguage } from "#/hooks/use-api-language";
 import {

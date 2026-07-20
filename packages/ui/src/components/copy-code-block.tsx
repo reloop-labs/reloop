@@ -370,16 +370,10 @@ export function CopyCodeBlock({
 				<CodeBlock
 					code={code}
 					lang={lang}
-					className={cn(
-						codeExtraPadding
-							? "[&>pre]:!pt-4 [&>pre]:!pb-4"
-							: "[&>pre]:!pt-1 [&>pre]:!pb-1.5",
-						"[&>pre]:!px-2 [&_.line]:!pl-8 [&_.line::before]:!w-6 [&_.line::before]:!pr-1.5 text-[12.5px] leading-5 sm:text-[13px] sm:leading-[1.3125rem] [&_.line::before]:text-[10.5px]",
-						maxHeight &&
-							"[&>pre]:!max-h-[var(--code-max-height)] [&>pre]:!overflow-y-auto",
-					)}
 					hideLineNumbers={hideLineNumbers}
 					noScroll={noScroll}
+					maxHeight={maxHeight}
+					codeExtraPadding={codeExtraPadding}
 				/>
 			</div>
 		</div>

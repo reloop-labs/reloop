@@ -1,21 +1,68 @@
 export const getWebhookXCodeSamples = [
 	{
 		id: "node",
-		lang: "js",
+		lang: "javascript",
 		label: "Node.js",
-		source: `const response = await fetch("https://reloop.sh/webhook/v1/wh_123456789", {
-  headers: {
-    "Authorization": "Bearer rl_123456789"
-  }
-});
+		source: `import { Reloop } from "reloop-email";
 
-const webhook = await response.json();`,
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { response, error } = await reloop.webhook.get("wh_123456789");
+if (error) throw error;`,
 	},
 	{
 		id: "curl",
 		lang: "bash",
 		label: "cURL",
-		source: `curl "https://reloop.sh/webhook/v1/wh_123456789" \\
-  -H "Authorization: Bearer rl_123456789"`,
+		source: `curl -X GET https://reloop.sh/api/webhook/v1/wh_123456789 \\
+  -H "x-api-key: rl_123456789"`,
+	},
+	{
+		id: "python",
+		lang: "python",
+		label: "Python",
+		source: `# Webhook SDK support coming soon`,
+	},
+	{
+		id: "php",
+		lang: "php",
+		label: "PHP",
+		source: `// Webhook SDK support coming soon`,
+	},
+	{
+		id: "java",
+		lang: "java",
+		label: "Java",
+		source: `// Webhook SDK support coming soon`,
+	},
+	{
+		id: "dotnet",
+		lang: "csharp",
+		label: ".NET",
+		source: `// Webhook SDK support coming soon`,
+	},
+	{
+		id: "go",
+		lang: "go",
+		label: "Go",
+		source: `// Webhook SDK support coming soon`,
+	},
+	{
+		id: "rust",
+		lang: "rust",
+		label: "Rust",
+		source: `// Webhook SDK support coming soon`,
+	},
+	{
+		id: "ruby",
+		lang: "ruby",
+		label: "Ruby",
+		source: `# Webhook SDK support coming soon`,
+	},
+	{
+		id: "elixir",
+		lang: "elixir",
+		label: "Elixir",
+		source: `# Webhook SDK support coming soon`,
 	},
 ];

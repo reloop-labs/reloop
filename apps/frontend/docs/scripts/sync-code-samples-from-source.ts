@@ -66,8 +66,15 @@ function normalizeRouteKey(pathValue: string, method: string): string {
 		.replace(/\/prop_[^/\s?]+/g, "/{contact_property_id}")
 		.replace(/\/key_[^/\s?]+/g, "/{api_key_id}")
 		.replace(/\/tpl_[^/\s?]+/g, "/{id}")
-		.replace(/\/ver_[^/\s?]+/g, "/{versionId}");
-	return `${method}:${templated}`;
+		.replace(/\/ver_[^/\s?]+/g, "/{versionId}")
+		.replace(/\/wh_[^/\s?]+/g, "/{webhook_id}")
+		.replace(/\/del_[^/\s?]+/g, "/{delivery_id}");
+	const normalized = templated.replace(/\/+$/, "") || "/";
+	let routeKey = `${method}:${normalized}`;
+	if (normalized.startsWith("/api/webhook/")) {
+		routeKey = routeKey.replace("{id}", "{webhook_id}");
+	}
+	return routeKey;
 }
 
 function extractSamples(filePath: string): SampleSource | null {
@@ -199,6 +206,7 @@ const services = [
 	{ name: "domain", dir: path.join(BACKEND_ROOT, "domain/src/routes") },
 	{ name: "mail", dir: path.join(BACKEND_ROOT, "mail/src/routes") },
 	{ name: "template", dir: path.join(BACKEND_ROOT, "template/src/routes") },
+	{ name: "webhook", dir: path.join(BACKEND_ROOT, "webhook/src/routes") },
 ];
 
 const sampleIndex = new Map<string, SampleSource>();

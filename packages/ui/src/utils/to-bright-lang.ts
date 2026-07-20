@@ -1,0 +1,35 @@
+/** Map snippet / API lang ids to Bright (`@code-hike/lighter`) aliases. */
+export function toBrightLang(lang: string): string {
+	const map: Record<string, string> = {
+		typescript: "ts",
+		javascript: "js",
+		bash: "bash",
+		shell: "bash",
+		sh: "bash",
+		markdown: "md",
+		python: "py",
+		go: "go",
+		php: "php",
+		ruby: "rb",
+		rust: "rs",
+		java: "java",
+		csharp: "csharp",
+		dotnet: "csharp",
+		elixir: "elixir",
+		html: "html",
+		json: "json",
+		ts: "ts",
+		js: "js",
+		jsx: "jsx",
+		tsx: "tsx",
+		py: "py",
+		md: "md",
+		rb: "rb",
+		rs: "rs",
+		nodejs: "js",
+		node: "js",
+		curl: "bash",
+		text: "text",
+	};
+	return map[lang] ?? lang;
+}

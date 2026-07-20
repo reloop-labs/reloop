@@ -3,6 +3,7 @@ import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
 import { auditLogHook } from "@reloop/webhook/utils/audit-log";
 import { Elysia } from "elysia";
 import { triggerWebhookController } from "./trigger-webhook.controllers";
+import { triggerWebhookXCodeSamples } from "./trigger-webhook.x-codeSamples";
 
 export const triggerWebhookRoute = new Elysia().use(authMiddleware).post(
 	"/trigger",
@@ -29,6 +30,7 @@ export const triggerWebhookRoute = new Elysia().use(authMiddleware).post(
 			tags: ["Webhooks"],
 			summary: "Trigger webhooks",
 			description: "Triggers webhooks subscribed to a specific event",
+			"x-codeSamples": triggerWebhookXCodeSamples,
 		},
 	},
 );

@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/webhook/middleware/auth";
 import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
 import { Elysia, t } from "elysia";
 import { listWebhookDeliveriesController } from "./list-webhook-deliveries.controllers";
+import { listWebhookDeliveriesXCodeSamples } from "./list-webhook-deliveries.x-codeSamples";
 
 export const listWebhookDeliveriesRoute = new Elysia().use(authMiddleware).get(
 	"/:webhook_id/deliveries",
@@ -28,6 +29,7 @@ export const listWebhookDeliveriesRoute = new Elysia().use(authMiddleware).get(
 			summary: "List webhook deliveries",
 			description:
 				"Fetches a paginated list of delivery attempts for a specific webhook",
+			"x-codeSamples": listWebhookDeliveriesXCodeSamples,
 		},
 	},
 );

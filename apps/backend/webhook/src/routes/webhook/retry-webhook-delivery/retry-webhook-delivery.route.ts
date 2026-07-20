@@ -2,6 +2,7 @@ import { authMiddleware } from "@reloop/webhook/middleware/auth";
 import { WebhookModel } from "@reloop/webhook/routes/webhook/webhook.model";
 import { Elysia, t } from "elysia";
 import { retryWebhookDeliveryController } from "./retry-webhook-delivery.controllers";
+import { retryWebhookDeliveryXCodeSamples } from "./retry-webhook-delivery.x-codeSamples";
 
 export const retryWebhookDeliveryRoute = new Elysia().use(authMiddleware).post(
 	"/deliveries/:delivery_id/retry",
@@ -32,6 +33,7 @@ export const retryWebhookDeliveryRoute = new Elysia().use(authMiddleware).post(
 			tags: ["Webhooks"],
 			summary: "Retry webhook delivery",
 			description: "Manually re-enqueues a specific webhook delivery attempt",
+			"x-codeSamples": retryWebhookDeliveryXCodeSamples,
 		},
 	},
 );

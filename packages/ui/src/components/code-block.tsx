@@ -1,160 +1,232 @@
-/** biome-ignore-all lint/security/noDangerouslySetInnerHtml: Shiki generates safe HTML for code highlighting */
+/**
+ * Bright-engine highlighter (`@code-hike/lighter`) for shared code surfaces.
+ */
 "use client";
 
+import { highlight, type LanguageAlias, type Token } from "@code-hike/lighter";
 import { cn } from "@reloop/ui/cn";
-import { useEffect, useRef, useState } from "react";
-import { codeToHtml } from "shiki";
-import { reloopShikiTheme } from "../themes/reloop-shiki-theme";
+import { toBrightLang } from "../utils/to-bright-lang";
+import { useTheme } from "next-themes";
+import { useEffect, useMemo, useState } from "react";
 
 interface Props {
 	code: string;
 	lang?: string;
-	theme?: string;
 	className?: string;
 	hideLineNumbers?: boolean;
+	lineNumbers?: boolean;
 	noScroll?: boolean;
+	maxHeight?: string;
+	codeExtraPadding?: boolean;
+	/** @deprecated Ignored — Bright uses github-light / github-dark themes. */
+	theme?: string;
+	/** @deprecated Ignored — Bright highlights client-side. */
 	defaultHtml?: string;
+}
+
+type HighlightResult = {
+	lines: Token[][];
+};
+
+function themeForColorScheme(scheme: "light" | "dark") {
+	return scheme === "dark" ? "github-dark" : "github-light";
+}
+
+function plainLines(code: string): Token[][] {
+	const parts = code.split("\n");
+	return parts.map((line) => [
+		{ content: line.length === 0 ? "\n" : line, style: {} } as Token,
+	]);
+}
+
+const promiseCache = new Map<string, Promise<HighlightResult>>();
+const resultCache = new Map<string, HighlightResult>();
+
+function cacheKey(code: string, lang: string, scheme: "light" | "dark") {
+	return `${themeForColorScheme(scheme)}::${lang}::${code}`;
+}
+
+function getHighlightPromise(
+	code: string,
+	lang: string,
+	scheme: "light" | "dark",
+): Promise<HighlightResult> {
+	const key = cacheKey(code, lang, scheme);
+	const existing = promiseCache.get(key);
+	if (existing) return existing;
+
+	const theme = themeForColorScheme(scheme);
+	const promise = highlight(code, lang as LanguageAlias, theme)
+		.then((result) => {
+			const next = { lines: result.lines as unknown as Token[][] };
+			resultCache.set(key, next);
+			return next;
+		})
+		.catch((error) => {
+			console.error("[CodeBlock] highlight failed", { lang, theme, error });
+			const next = { lines: plainLines(code) };
+			resultCache.set(key, next);
+			return next;
+		});
+
+	promiseCache.set(key, promise);
+	if (promiseCache.size > 50) {
+		const first = promiseCache.keys().next().value;
+		if (first) {
+			promiseCache.delete(first);
+			resultCache.delete(first);
+		}
+	}
+	return promise;
+}
+
+function readDomScheme(): "light" | "dark" {
+	if (typeof document === "undefined") return "light";
+	const root = document.documentElement;
+	if (root.classList.contains("dark")) return "dark";
+	if (root.classList.contains("light")) return "light";
+	return window.matchMedia("(prefers-color-scheme: dark)").matches
+		? "dark"
+		: "light";
+}
+
+function useColorScheme(): "light" | "dark" {
+	const { resolvedTheme } = useTheme();
+	const [scheme, setScheme] = useState<"light" | "dark">(readDomScheme);
+
+	useEffect(() => {
+		if (resolvedTheme === "dark" || resolvedTheme === "light") {
+			setScheme(resolvedTheme);
+			return;
+		}
+		const apply = () => setScheme(readDomScheme());
+		apply();
+		const mq = window.matchMedia("(prefers-color-scheme: dark)");
+		mq.addEventListener("change", apply);
+		return () => mq.removeEventListener("change", apply);
+	}, [resolvedTheme]);
+
+	return scheme;
 }
 
 export const CodeBlock = ({
 	code,
 	lang = "javascript",
-	theme: themeOverride,
 	className,
 	hideLineNumbers = false,
+	lineNumbers: lineNumbersProp,
 	noScroll = false,
-	defaultHtml,
+	maxHeight,
+	codeExtraPadding = false,
 }: Props) => {
-	const [html, setHtml] = useState<string>(defaultHtml || "");
-	const [mounted, setMounted] = useState(false);
-	const isFirstRun = useRef(true);
+	const scheme = useColorScheme();
+	const showLineNumbers = lineNumbersProp ?? !hideLineNumbers;
+	const brightLang = toBrightLang(lang);
+	const key = cacheKey(code, brightLang, scheme);
 
-	// Handle mounting to avoid hydration mismatch
-	useEffect(() => {
-		setMounted(true);
-	}, []);
-
-	// Default to the Reloop CSS-variables theme so highlighting follows design tokens.
-	// Pass `theme` to opt into a bundled Shiki theme instead.
-	const shikiTheme = themeOverride ?? reloopShikiTheme;
-	const usesReloopTheme = !themeOverride;
+	const fallback = useMemo(() => ({ lines: plainLines(code) }), [code]);
+	const [result, setResult] = useState<HighlightResult>(
+		() => resultCache.get(key) ?? fallback,
+	);
 
 	useEffect(() => {
-		// Don't run on the server or before mount
-		if (!mounted) return;
+		const cached = resultCache.get(key);
+		setResult(cached ?? fallback);
+	}, [key, fallback]);
 
-		// Skip the very first run if we already have server-rendered HTML
-		if (isFirstRun.current && defaultHtml) {
-			isFirstRun.current = false;
-			return;
-		}
-		isFirstRun.current = false;
-
-		// Track whether this effect invocation is still current
+	useEffect(() => {
 		let active = true;
-
-		codeToHtml(code, {
-			lang,
-			theme: shikiTheme,
-			transformers: [
-				{
-					pre(node) {
-						this.addClassToHast(
-							node,
-							cn(
-								"py-4",
-								!noScroll && "overflow-x-auto",
-								noScroll && "whitespace-pre-wrap break-all",
-								!hideLineNumbers && "line-numbers",
-							),
-						);
-					},
-					line(node) {
-						this.addClassToHast(node, "line");
-					},
-				},
-			],
-		})
-			.then((result) => {
-				if (active) setHtml(result);
-			})
-			.catch(() => {
-				// Silently ignore – fallback will remain visible
-			});
-
+		void getHighlightPromise(code, brightLang, scheme).then((next) => {
+			if (active) setResult(next);
+		});
 		return () => {
 			active = false;
 		};
-	}, [mounted, code, lang, shikiTheme, hideLineNumbers, noScroll, defaultHtml]);
+	}, [code, brightLang, scheme]);
 
-	// ── Shared wrapper classes ──────────────────────────────────────────
-	const wrapperClassName = cn(
-		usesReloopTheme && "reloop-code-block",
-		"[&>pre]:!bg-transparent text-sm leading-6 [&>pre]:p-4",
-		className,
-	);
-
-	// ── Render ──────────────────────────────────────────────────────────
-	// Show the highlighted HTML if available, otherwise show a plain-text
-	// fallback so the code is always visible (no flash of empty space).
+	const prePadding = codeExtraPadding ? "pt-4 pb-4" : "pt-1 pb-1.5";
+	const lines = result.lines;
 
 	return (
-		<>
+		<div
+			className={cn(
+				"reloop-bright-code text-[12.5px] leading-5 sm:text-[13px] sm:leading-[1.3125rem]",
+				className,
+			)}
+			data-color-scheme={scheme}
+			style={
+				maxHeight
+					? ({ "--code-max-height": maxHeight } as React.CSSProperties)
+					: undefined
+			}
+		>
 			<style>{`
-				.reloop-code-block {
-					--shiki-background: transparent;
-					--shiki-foreground: var(--color-text-strong-950, #171717);
-					--shiki-token-keyword: var(--color-text-strong-950, #171717);
-					--shiki-token-string: var(--color-primary-base, #d97757);
-					--shiki-token-string-expression: var(--color-primary-base, #d97757);
-					--shiki-token-comment: var(--color-text-soft-400, #a3a3a3);
-					--shiki-token-function: var(--color-text-strong-950, #171717);
-					--shiki-token-constant: var(--color-text-sub-600, #5c5c5c);
-					--shiki-token-parameter: var(--color-text-sub-600, #5c5c5c);
-					--shiki-token-punctuation: var(--color-text-soft-400, #a3a3a3);
-					--shiki-token-link: var(--color-primary-base, #d97757);
+				.reloop-bright-code {
+					background: transparent;
+					color: var(--color-text-strong-950, #171717);
 				}
-
-				.line-numbers {
-					counter-reset: line;
+				.reloop-bright-code .bright-pre {
+					margin: 0;
+					background: transparent !important;
+					font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+						"Liberation Mono", "Courier New", monospace;
 				}
-				.line-numbers .line {
-					position: relative;
-					padding-left: 3.25rem;
-				}
-				.line-numbers .line::before {
-					content: counter(line);
-					counter-increment: line;
-					position: absolute;
-					left: 0;
-					width: 2.5rem;
+				.reloop-bright-code .bright-line-number {
+					width: 1.5rem;
+					min-width: 1.5rem;
+					padding-right: 0.375rem;
 					text-align: right;
-					padding-right: 0.75rem;
-					font-size: 0.75rem;
-					color: var(--color-text-soft-400);
+					font-size: 10.5px;
+					line-height: inherit;
+					color: var(--color-text-soft-400, #a3a3a3);
 					user-select: none;
-					border-right: 1px solid var(--color-border-soft-200);
+					border-right: 1px solid color-mix(in srgb, var(--color-stroke-soft-100, #e5e5e5) 80%, transparent);
+				}
+				.reloop-bright-code[data-color-scheme="dark"] .bright-line-number {
+					border-right-color: color-mix(in srgb, var(--color-stroke-soft-100, #333) 40%, transparent);
+				}
+				.reloop-bright-code .bright-pre-scroll {
+					scrollbar-width: none;
+					-ms-overflow-style: none;
+				}
+				.reloop-bright-code .bright-pre-scroll::-webkit-scrollbar {
+					display: none;
 				}
 			`}</style>
-
-			{html ? (
-				<div
-					dangerouslySetInnerHTML={{ __html: html }}
-					className={wrapperClassName}
-				/>
-			) : (
-				<div className={wrapperClassName}>
-					<pre
-						className={cn(
-							"!bg-transparent p-4",
-							!noScroll && "overflow-x-auto",
-							noScroll && "whitespace-pre-wrap break-all",
-						)}
-					>
-						<code>{code}</code>
-					</pre>
-				</div>
-			)}
-		</>
+			<pre
+				className={cn(
+					"bright-pre m-0 px-2 font-mono",
+					prePadding,
+					!noScroll && "overflow-x-auto",
+					noScroll && "whitespace-pre-wrap break-all",
+					maxHeight &&
+						"bright-pre-scroll max-h-[var(--code-max-height)] overflow-y-auto",
+				)}
+			>
+				<code className="table w-full border-collapse">
+					{lines.map((lineTokens, lineIndex) => (
+						<div key={`line-${lineIndex}`} className="bright-line table-row">
+							{showLineNumbers && (
+								<span className="bright-line-number table-cell align-top">
+									{lineIndex + 1}
+								</span>
+							)}
+							<span className="table-cell whitespace-pre pl-2">
+								{lineTokens.length === 0
+									? "\n"
+									: lineTokens.map((token, tokenIndex) => (
+											<span
+												key={`${tokenIndex}-${token.content.slice(0, 12)}`}
+												style={token.style}
+											>
+												{token.content}
+											</span>
+										))}
+							</span>
+						</div>
+					))}
+				</code>
+			</pre>
+		</div>
 	);
 };

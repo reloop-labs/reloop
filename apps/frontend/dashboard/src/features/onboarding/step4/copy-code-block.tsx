@@ -1,6 +1,6 @@
 /**
- * Matches `@reloop/ui/copy-code-block` card chrome from the Next dashboard.
- * Only difference: code surface uses Bright (lighter) instead of Shiki.
+ * Dashboard CopyCodeBlock — same card chrome as `@reloop/ui/copy-code-block`
+ * with rounded-full tab pills (npm / pnpm / yarn / bun).
  */
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";

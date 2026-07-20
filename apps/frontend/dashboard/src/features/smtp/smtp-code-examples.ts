@@ -15,7 +15,7 @@ export type SmtpLanguageConfig = {
 };
 
 /** Languages shown in the SMTP code panel. */
-/** `shikiLang` is fed to Bright (`@code-hike/lighter`) via BrightCode. */
+/** `shikiLang` is the Bright language alias passed to CodeBlock. */
 export const SMTP_LANGUAGES: readonly SmtpLanguageConfig[] = [
 	{
 		id: "nodejs",
