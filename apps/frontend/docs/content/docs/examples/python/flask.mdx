@@ -19,7 +19,7 @@ pip install reloop-python
 ```python
 import os
 from flask import Flask, jsonify
-from reloop import Reloop
+from reloop_email import Reloop
 
 app = Flask(__name__)
 reloop = Reloop(api_key=os.environ.get("RELOOP_API_KEY"))
@@ -27,8 +27,8 @@ reloop = Reloop(api_key=os.environ.get("RELOOP_API_KEY"))
 @app.route("/send-email", methods=["POST"])
 def send_email():
     try:
-        response = reloop.emails.send(
-            sender="onboarding@reloop.dev",
+        response = reloop.mail.send(
+            from_="onboarding@reloop.dev",
             to="delivered@resend.dev",
             subject="Hello from Flask",
             html="<p>Congrats on sending your first email via Reloop from Flask!</p>"

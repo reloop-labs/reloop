@@ -7,11 +7,11 @@ export const triggerWebhookXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.webhook.trigger({
+const { webhook, webhookError } = await reloop.webhook.trigger({
   event: "domain.created",
   payload: { domainId: "dom_123456789" },
 });
-if (error) throw error;`,
+if (webhookError) throw webhookError;`,
 	},
 	{
 		id: "curl",

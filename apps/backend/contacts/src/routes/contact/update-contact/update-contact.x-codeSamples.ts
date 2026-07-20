@@ -7,8 +7,8 @@ export const updateContactXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: contact, error } = await reloop.contacts.update("con_123456789", { firstName: "Jane" });
-if (error) throw error;`,
+const { contact, contactError } = await reloop.contacts.update("con_123456789", { firstName: "Jane" });
+if (contactError) throw contactError;`,
 	},
 	{
 		id: "curl",

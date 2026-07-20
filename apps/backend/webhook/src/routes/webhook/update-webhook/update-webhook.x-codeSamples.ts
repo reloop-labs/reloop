@@ -7,10 +7,10 @@ export const updateWebhookXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.webhook.update("wh_123456789", {
+const { webhook, webhookError } = await reloop.webhook.update("wh_123456789", {
   status: "paused",
 });
-if (error) throw error;`,
+if (webhookError) throw webhookError;`,
 	},
 	{
 		id: "curl",

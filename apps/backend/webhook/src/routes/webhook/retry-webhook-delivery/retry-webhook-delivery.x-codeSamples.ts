@@ -7,8 +7,8 @@ export const retryWebhookDeliveryXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.webhook.retryDelivery("del_123456789");
-if (error) throw error;`,
+const { webhook, webhookError } = await reloop.webhook.retryDelivery("del_123456789");
+if (webhookError) throw webhookError;`,
 	},
 	{
 		id: "curl",

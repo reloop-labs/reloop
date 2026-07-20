@@ -7,8 +7,8 @@ export const getWebhookXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.webhook.get("wh_123456789");
-if (error) throw error;`,
+const { webhook, webhookError } = await reloop.webhook.get("wh_123456789");
+if (webhookError) throw webhookError;`,
 	},
 	{
 		id: "curl",

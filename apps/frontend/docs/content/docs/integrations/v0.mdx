@@ -32,7 +32,7 @@ const reloop = new Reloop(process.env.RELOOP_API_KEY);
 export async function POST(req: Request) {
   const { name, email, message } = await req.json();
 
-  const data = await reloop.emails.send({
+  const data = await reloop.mail.send({
     from: 'support@yourdomain.com',
     to: 'info@yourdomain.com',
     subject: `New form submission from ${name}`,

@@ -2,9 +2,9 @@
 /**
  * Keep SDK code samples in sync across backend, dashboard, and docs.
  *
- * 1. Canonical: apps/backend/*/route x-codeSamples.ts files
+ * 1. Canonical: apps/backend route x-codeSamples.ts files
  * 2. Dashboard: generate api-keys-code-examples.ts
- * 3. Docs: sync MDX codeSamples from x-codeSamples (api-key + contacts + domain)
+ * 3. Docs: sync MDX codeSamples from x-codeSamples (api-key + contacts + domain + mail)
  *
  * From monorepo root:
  *   bun run sync:sdk-samples
@@ -43,7 +43,7 @@ console.log(CHECK ? "Checking SDK samples…" : "Syncing SDK samples…");
 run(path.join(SCRIPTS, "sync-dashboard-api-key-samples.ts"));
 run(
 	path.join(DOCS_SCRIPTS, "sync-code-samples-from-source.ts"),
-	["api-key", "contacts", "domain"],
+	["api-key", "contacts", "domain", "mail"],
 	path.join(REPO_ROOT, "apps/frontend/docs"),
 );
 console.log(CHECK ? "All SDK sample checks passed." : "SDK samples synced.");

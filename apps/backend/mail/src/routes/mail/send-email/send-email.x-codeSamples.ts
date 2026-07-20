@@ -7,7 +7,7 @@ export const sendEmailXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.mail.send({
+const { response, emailError } = await reloop.mail.send({
   from: "Reloop <hello@send.example.com>",
   to: "user@example.com",
   subject: "Welcome to Reloop",
@@ -16,7 +16,7 @@ const { response, error } = await reloop.mail.send({
   reply_to: "support@example.com",
   tags: [{ name: "campaign", value: "welcome" }],
 });
-if (error) throw error;`,
+if (emailError) throw emailError;`,
 	},
 	{
 		id: "curl",
@@ -31,7 +31,7 @@ if (error) throw error;`,
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
@@ -77,6 +77,7 @@ params.put("subject", "Welcome to Reloop");
 params.put("html", "<p>Thanks for signing up.</p>");
 params.put("text", "Thanks for signing up.");
 params.put("reply_to", "support@example.com");
+params.put("tags", List.of(Map.of("name", "campaign", "value", "welcome")));
 SendMailResponse result = reloop.mail.send(params);`,
 	},
 	{
@@ -95,13 +96,14 @@ var result = await reloop.Mail.SendAsync(new Dictionary<string, object?>
     ["html"] = "<p>Thanks for signing up.</p>",
     ["text"] = "Thanks for signing up.",
     ["reply_to"] = "support@example.com",
+    ["tags"] = new object[] { new { name = "campaign", value = "welcome" } },
 });`,
 	},
 	{
 		id: "go",
 		lang: "go",
 		label: "Go",
-		source: `import reloop "github.com/reloop-labs/reloop-go"
+		source: `import reloop "github.com/reloop-labs/reloop-go/v2"
 
 client, _ := reloop.NewClient(reloop.ClientOptions{
     APIKey: "rl_123456789",
@@ -109,11 +111,14 @@ client, _ := reloop.NewClient(reloop.ClientOptions{
 
 result, _ := client.Mail.Send(reloop.SendMailParams{
     From:    "Reloop <hello@send.example.com>",
-    To:      reloop.StringSlice("user@example.com"),
+    To:      "user@example.com",
     Subject: "Welcome to Reloop",
     HTML:    reloop.String("<p>Thanks for signing up.</p>"),
     Text:    reloop.String("Thanks for signing up."),
-    ReplyTo: reloop.String("support@example.com"),
+    ReplyTo: "support@example.com",
+    Tags: []reloop.SendMailTag{
+        {Name: "campaign", Value: "welcome"},
+    },
 })`,
 	},
 	{
@@ -134,6 +139,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "html": "<p>Thanks for signing up.</p>",
         "text": "Thanks for signing up.",
         "reply_to": "support@example.com",
+        "tags": [{"name": "campaign", "value": "welcome"}],
     })).await?;
 
     Ok(())

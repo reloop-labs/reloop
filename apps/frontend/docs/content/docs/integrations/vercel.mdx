@@ -32,7 +32,7 @@ import Reloop from 'reloop-email';
 const reloop = new Reloop(process.env.RELOOP_API_KEY);
 
 export async function POST() {
-  const data = await reloop.emails.send({
+  const data = await reloop.mail.send({
     from: 'onboarding@yourdomain.com',
     to: 'user@example.com',
     subject: 'Welcome!',

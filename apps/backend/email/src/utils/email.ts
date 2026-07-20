@@ -34,7 +34,7 @@ export async function sendEmail(options: SendEmailOptions) {
 				...{ to: options.to, subject: options.subject },
 				message: "Sending email via Reloop SDK",
 			});
-			const { response, error } = await reloop.mail.send({
+			const { response, emailError } = await reloop.mail.send({
 				from: options.from,
 				to: Array.isArray(options.to) ? options.to : [options.to],
 				subject: options.subject,
@@ -42,8 +42,8 @@ export async function sendEmail(options: SendEmailOptions) {
 				text: options.text,
 			});
 
-			if (error) {
-				throw error;
+			if (emailError) {
+				throw emailError;
 			}
 
 			return response;

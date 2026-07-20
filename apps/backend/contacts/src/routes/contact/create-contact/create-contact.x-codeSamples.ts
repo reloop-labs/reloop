@@ -7,7 +7,7 @@ export const createContactXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: contact, error } = await reloop.contacts.create({
+const { contact, contactError } = await reloop.contacts.create({
   email: "john.doe@example.com",
   firstName: "John",
   lastName: "Doe",
@@ -16,7 +16,7 @@ const { response: contact, error } = await reloop.contacts.create({
   groupIds: ["grp_123456789"],
   channels: [{ channelId: "chn_123456789", subscription: "opt_in" }],
 });
-if (error) throw error;`,
+if (contactError) throw contactError;`,
 	},
 	{
 		id: "curl",

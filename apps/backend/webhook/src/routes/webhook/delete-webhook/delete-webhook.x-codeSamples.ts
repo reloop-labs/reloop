@@ -7,8 +7,8 @@ export const deleteWebhookXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.webhook.delete("wh_123456789");
-if (error) throw error;`,
+const { webhook, webhookError } = await reloop.webhook.delete("wh_123456789");
+if (webhookError) throw webhookError;`,
 	},
 	{
 		id: "curl",

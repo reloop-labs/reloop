@@ -7,12 +7,12 @@ export const listWebhookDeliveriesXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.webhook.listDeliveries("wh_123456789", {
+const { deliveries, webhookError } = await reloop.webhook.listDeliveries("wh_123456789", {
   page: 1,
   limit: 10,
   status: "failed",
 });
-if (error) throw error;`,
+if (webhookError) throw webhookError;`,
 	},
 	{
 		id: "curl",

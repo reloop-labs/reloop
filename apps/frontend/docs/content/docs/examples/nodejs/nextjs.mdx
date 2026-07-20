@@ -36,7 +36,7 @@ const reloop = new Reloop(process.env.RELOOP_API_KEY);
 
 export async function POST() {
   try {
-    const data = await reloop.emails.send({
+    const data = await reloop.mail.send({
       from: 'onboarding@reloop.dev',
       to: 'delivered@resend.dev',
       subject: 'Hello World',

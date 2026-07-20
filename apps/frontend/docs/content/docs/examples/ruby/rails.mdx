@@ -40,7 +40,7 @@ class EmailsController < ApplicationController
     reloop = Reloop::Client.new(api_key: ENV['RELOOP_API_KEY'])
     
     begin
-      response = reloop.emails.send(
+      response = reloop.mail.send(
         from: 'onboarding@reloop.dev',
         to: 'delivered@resend.dev',
         subject: 'Hello from Rails',

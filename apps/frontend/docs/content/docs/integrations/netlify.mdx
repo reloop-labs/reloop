@@ -32,7 +32,7 @@ import Reloop from 'reloop-email';
 const reloop = new Reloop(process.env.RELOOP_API_KEY);
 
 export const handler: Handler = async (event, context) => {
-  const result = await reloop.emails.send({
+  const result = await reloop.mail.send({
     from: 'hello@yourdomain.com',
     to: 'customer@example.com',
     subject: 'Netlify Alert',

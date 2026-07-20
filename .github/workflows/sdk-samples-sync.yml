@@ -4,8 +4,13 @@ on:
   pull_request:
     paths:
       - "apps/backend/api-key/**"
+      - "apps/backend/contacts/**"
+      - "apps/backend/domain/**"
+      - "apps/backend/mail/**"
+      - "apps/backend/webhook/**"
       - "apps/frontend/dashboard/src/components/api-details/api-keys-code-examples.ts"
-      - "apps/frontend/docs/content/docs/api/api-key/**"
+      - "apps/frontend/dashboard/src/features/onboarding/step4/snippets.ts"
+      - "apps/frontend/docs/content/docs/api/**"
       - "apps/frontend/docs/scripts/**"
       - "scripts/**"
       - ".github/workflows/sdk-samples-sync.yml"
@@ -14,8 +19,13 @@ on:
       - main
     paths:
       - "apps/backend/api-key/**"
+      - "apps/backend/contacts/**"
+      - "apps/backend/domain/**"
+      - "apps/backend/mail/**"
+      - "apps/backend/webhook/**"
       - "apps/frontend/dashboard/src/components/api-details/api-keys-code-examples.ts"
-      - "apps/frontend/docs/content/docs/api/api-key/**"
+      - "apps/frontend/dashboard/src/features/onboarding/step4/snippets.ts"
+      - "apps/frontend/docs/content/docs/api/**"
       - "apps/frontend/docs/scripts/**"
       - "scripts/**"
       - ".github/workflows/sdk-samples-sync.yml"

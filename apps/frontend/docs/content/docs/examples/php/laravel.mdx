@@ -43,7 +43,7 @@ class EmailController extends Controller
         $reloop = new ReloopClient(env('RELOOP_API_KEY'));
 
         try {
-            $response = $reloop->emails.send([
+            $response = $reloop->mail->send([
                 'from' => 'onboarding@reloop.dev',
                 'to' => 'delivered@resend.dev',
                 'subject' => 'Hello from Laravel',

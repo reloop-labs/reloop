@@ -31,7 +31,7 @@ import Reloop from 'reloop-email';
 
 const reloop = new Reloop(process.env.RELOOP_API_KEY);
 
-reloop.emails.send({
+reloop.mail.send({
   from: 'hello@yourdomain.com',
   to: 'friend@example.com',
   subject: 'Greetings from Replit',

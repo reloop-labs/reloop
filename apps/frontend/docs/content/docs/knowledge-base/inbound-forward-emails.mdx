@@ -33,7 +33,7 @@ Reloop's inbound email feature can be used to forward received emails to another
       if (event.type === 'email.received') {
         const email = await reloop.emails.receiving.get(event.data.email_id);
 
-        await reloop.emails.send({
+        await reloop.mail.send({
           from: 'forwarding@yourdomain.com',
           to: 'destination@example.com',
           subject: `Fwd: ${email.data.subject}`,

@@ -7,12 +7,12 @@ export const listContactsXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: contacts, error } = await reloop.contacts.list({
+const { contacts, contactError } = await reloop.contacts.list({
   page: 1,
   limit: 10,
   status: "subscribed",
 });
-if (error) throw error;`,
+if (contactError) throw contactError;`,
 	},
 	{
 		id: "curl",

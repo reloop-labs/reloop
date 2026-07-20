@@ -38,14 +38,14 @@ export const sendEmailCode: Record<
 
 const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY! });
 
-const { response, error } = await reloop.mail.send({
+const { response, emailError } = await reloop.mail.send({
   from: "sender@example.com",
   to: "recipient@example.com",
   subject: "Hello from Reloop!",
   text: "Hello World!",
 });
 
-if (error) throw error;
+if (emailError) throw emailError;
 console.log(response.messageId, response.id);`,
 		lang: "ts",
 	},

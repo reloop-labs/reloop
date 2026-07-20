@@ -32,15 +32,15 @@ Use the client within your Django views:
 ```python
 from django.http import JsonResponse
 from django.conf import settings
-from reloop import Reloop
+from reloop_email import Reloop
 
 reloop = Reloop(api_key=settings.RELOOP_API_KEY)
 
 def send_email_view(request):
     if request.method == 'POST':
         try:
-            response = reloop.emails.send(
-                sender="onboarding@reloop.dev",
+            response = reloop.mail.send(
+                from_="onboarding@reloop.dev",
                 to="delivered@resend.dev",
                 subject="Hello from Django",
                 html="<p>Congrats on sending your first email via Reloop from Django!</p>"

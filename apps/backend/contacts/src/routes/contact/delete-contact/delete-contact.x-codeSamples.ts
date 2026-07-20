@@ -7,8 +7,8 @@ export const deleteContactXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.contacts.delete("con_123456789");
-if (error) throw error;`,
+const { contact, contactError } = await reloop.contacts.delete("con_123456789");
+if (contactError) throw contactError;`,
 	},
 	{
 		id: "curl",

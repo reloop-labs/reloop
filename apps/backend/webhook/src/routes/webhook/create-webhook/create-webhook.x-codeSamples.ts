@@ -7,12 +7,12 @@ export const createWebhookXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.webhook.create({
+const { webhook, webhookError } = await reloop.webhook.create({
   description: "Production webhook",
   url: "https://example.com/webhooks/reloop",
   events: ["domain.created", "domain.deleted"],
 });
-if (error) throw error;`,
+if (webhookError) throw webhookError;`,
 	},
 	{
 		id: "curl",
