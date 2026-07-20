@@ -4,8 +4,9 @@ import {
 	DOMAIN_VERIFY_BACKOFF_TYPE,
 	getDomainVerifyBackoffDelay,
 } from "@be/workflow/queues/domain-verify-schedule";
+import { isLastAttempt, type WorkflowJob } from "@be/workflow/queues/workflow-job";
 import { workflowConfig } from "@be/workflow/workflow.config";
-import { type Job, Worker } from "bullmq";
+import { Worker } from "bullmq";
 import { EvlogError, log } from "evlog";
 import { WORKFLOW_QUEUE, type WorkflowJobData } from "./workflow.queue";
 
@@ -13,7 +14,7 @@ const connection = {
 	url: workflowConfig.REDIS_URL,
 };
 
-async function processWorkflow(job: Job<WorkflowJobData>): Promise<void> {
+async function processWorkflow(job: WorkflowJob): Promise<void> {
 	const jobData = job.data;
 	log.info({
 		message: "Processing workflow job",
@@ -21,17 +22,18 @@ async function processWorkflow(job: Job<WorkflowJobData>): Promise<void> {
 		type: jobData.type,
 	});
 
-	const isLastAttempt = job.attemptsMade + 1 >= (job.opts.attempts ?? 1);
+	const lastAttempt = isLastAttempt(job);
 
 	if (jobData.type === "verify-domain") {
 		await processDomainVerification({
 			job,
 			domainId: jobData.workflowId,
 			organizationId: jobData.organizationId,
-			isLastAttempt,
+			isLastAttempt: lastAttempt,
 		});
 	} else if (jobData.type === "deliver-webhook") {
 		await processWebhookDelivery({
+			job,
 			deliveryId: jobData.payload.deliveryId as string,
 			webhookId: jobData.payload.webhookId as string,
 			webhookUrl: jobData.payload.webhookUrl as string,
@@ -43,7 +45,7 @@ async function processWorkflow(job: Job<WorkflowJobData>): Promise<void> {
 			eventId: jobData.payload.eventId as string,
 			eventType: jobData.payload.eventType as string,
 			payload: jobData.payload.payload as Record<string, unknown>,
-			isLastAttempt,
+			isLastAttempt: lastAttempt,
 			attemptNumber: job.attemptsMade + 1,
 		});
 	}

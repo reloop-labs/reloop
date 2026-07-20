@@ -1,11 +1,23 @@
 import { createHmac } from "node:crypto";
 import dns from "node:dns";
 import net from "node:net";
+import {
+	createWorkflowError,
+	failJobOrRetry,
+	logJob,
+	type WorkflowJob,
+} from "@be/workflow/queues/workflow-job";
 import { decryptSecret } from "@reloop/db";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { eq, sql } from "drizzle-orm";
-import { log } from "evlog";
+import { EvlogError, log } from "evlog";
+
+const WEBHOOK_ENDPOINT_FIX =
+	"Check that your webhook endpoint is reachable, returns a 2xx status, and accepts the Reloop signature headers.";
+
+const WEBHOOK_SSRF_FIX =
+	"Use a publicly reachable HTTPS endpoint. Private, loopback, and link-local addresses are blocked.";
 
 function isPrivateIP(ip: string): boolean {
 	if (net.isIPv4(ip)) {
@@ -54,6 +66,7 @@ function isPrivateIP(ip: string): boolean {
 }
 
 export async function processWebhookDelivery({
+	job,
 	deliveryId,
 	webhookId,
 	webhookUrl,
@@ -65,6 +78,7 @@ export async function processWebhookDelivery({
 	isLastAttempt,
 	attemptNumber,
 }: {
+	job: WorkflowJob;
 	deliveryId: string;
 	webhookId: string;
 	webhookUrl: string;
@@ -76,6 +90,11 @@ export async function processWebhookDelivery({
 	isLastAttempt: boolean;
 	attemptNumber: number;
 }): Promise<void> {
+	await logJob(
+		job,
+		`Starting webhook delivery (attempt ${attemptNumber}, event=${eventType})`,
+	);
+
 	const timestamp = Math.floor(Date.now() / 1000);
 	const body = JSON.stringify({
 		id: eventId,
@@ -117,9 +136,12 @@ export async function processWebhookDelivery({
 
 		for (const ip of ips) {
 			if (isPrivateIP(ip)) {
-				throw new Error(
-					`SSRF Prevention: Outbound request to private/local IP address ${ip} is blocked.`,
-				);
+				throw createWorkflowError({
+					status: 403,
+					message: "Webhook delivery blocked",
+					why: `Outbound request to private/local IP address ${ip} is blocked`,
+					fix: WEBHOOK_SSRF_FIX,
+				});
 			}
 		}
 
@@ -130,12 +152,22 @@ export async function processWebhookDelivery({
 			networkError instanceof Error
 				? networkError.message
 				: String(networkError);
+		const why =
+			networkError instanceof EvlogError && networkError.why
+				? networkError.why
+				: errMsg;
+		const fix =
+			networkError instanceof EvlogError && networkError.fix
+				? networkError.fix
+				: WEBHOOK_ENDPOINT_FIX;
 
 		log.error({
 			message: "Webhook delivery network error",
 			deliveryId,
 			webhookId,
 			error: errMsg,
+			why,
+			fix,
 		});
 
 		const status = isLastAttempt ? "failed" : "retrying";
@@ -181,6 +213,10 @@ export async function processWebhookDelivery({
 				webhookId,
 				consecutiveFailures: currentConsecutiveFailures,
 			});
+			await logJob(
+				job,
+				`Webhook disabled after ${currentConsecutiveFailures} consecutive failures`,
+			);
 			await db
 				.update(schema.webhook)
 				.set({
@@ -190,7 +226,15 @@ export async function processWebhookDelivery({
 				.where(eq(schema.webhook.id, webhookId));
 		}
 
-		throw networkError; // BullMQ will retry
+		await failJobOrRetry({
+			job,
+			isLastAttempt,
+			message: "Webhook delivery failed",
+			why,
+			fix,
+			status: 502,
+		});
+		return;
 	}
 
 	const durationMs = Date.now() - startTime;
@@ -203,6 +247,7 @@ export async function processWebhookDelivery({
 		status: response.status,
 		succeeded,
 	});
+	await logJob(job, `Webhook response received: HTTP ${response.status}`);
 
 	const status = succeeded ? "success" : isLastAttempt ? "failed" : "retrying";
 
@@ -261,6 +306,10 @@ export async function processWebhookDelivery({
 			webhookId,
 			consecutiveFailures: currentConsecutiveFailures,
 		});
+		await logJob(
+			job,
+			`Webhook disabled after ${currentConsecutiveFailures} consecutive failures`,
+		);
 		await db
 			.update(schema.webhook)
 			.set({
@@ -270,9 +319,17 @@ export async function processWebhookDelivery({
 			.where(eq(schema.webhook.id, webhookId));
 	}
 
-	if (!succeeded) {
-		throw new Error(
-			`Webhook endpoint returned HTTP ${response.status}: ${responseText.slice(0, 200)}`,
-		);
+	if (succeeded) {
+		await logJob(job, "Webhook delivered successfully");
+		return;
 	}
+
+	await failJobOrRetry({
+		job,
+		isLastAttempt,
+		message: "Webhook delivery failed",
+		why: `Webhook endpoint returned HTTP ${response.status}: ${responseText.slice(0, 200)}`,
+		fix: WEBHOOK_ENDPOINT_FIX,
+		status: 502,
+	});
 }

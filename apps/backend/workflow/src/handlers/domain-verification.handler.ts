@@ -1,4 +1,8 @@
-import type { WorkflowJobData } from "@be/workflow/queues/workflow.queue";
+import {
+	failJobOrRetry,
+	logJob,
+	type WorkflowJob,
+} from "@be/workflow/queues/workflow-job";
 import {
 	verifyCnameRecord,
 	verifyDkimRecord,
@@ -9,9 +13,8 @@ import {
 import { BusEvent, bus } from "@reloop/bus";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
-import type { Job } from "bullmq";
 import { and, eq, isNull } from "drizzle-orm";
-import { createError, log } from "evlog";
+import { log } from "evlog";
 
 const DNS_FIX_GUIDANCE =
 	"Update the failing DNS records at your DNS provider, wait for propagation, then retry verification from the dashboard.";
@@ -34,15 +37,6 @@ function buildFailureReason(checks: Record<string, boolean>): string {
 	return `Your ${rest}, and ${last} records are missing or incorrect`;
 }
 
-function domainVerificationIncompleteError(domainName: string, why: string) {
-	return createError({
-		status: 422,
-		message: `Domain verification failed for ${domainName}`,
-		why,
-		fix: DNS_FIX_GUIDANCE,
-	});
-}
-
 async function markDomainFailed(
 	domainId: string,
 	reason: string,
@@ -63,13 +57,13 @@ export async function processDomainVerification({
 	organizationId,
 	isLastAttempt,
 }: {
-	job: Job<WorkflowJobData>;
+	job: WorkflowJob;
 	domainId: string;
 	organizationId: string;
 	isLastAttempt: boolean;
 }): Promise<void> {
 	log.info({ message: "Processing domain verification job", domainId });
-	await job.log("Starting domain verification");
+	await logJob(job, "Starting domain verification");
 
 	// Fetch domain with DNS records
 	const domainWithRecords = await db.query.domain.findFirst({
@@ -87,7 +81,7 @@ export async function processDomainVerification({
 
 	if (!domainWithRecords) {
 		log.error({ message: "Domain not found", domainId });
-		await job.log("Domain not found — aborting");
+		await logJob(job, "Domain not found — aborting");
 		return;
 	}
 
@@ -106,7 +100,8 @@ export async function processDomainVerification({
 			domainId,
 		});
 		await markDomainFailed(domainId, "Missing mandatory DKIM record");
-		await job.log(
+		await logJob(
+			job,
 			`Missing required DNS config: DKIM. Fix: ${DNS_FIX_GUIDANCE}`,
 		);
 		return;
@@ -145,7 +140,8 @@ export async function processDomainVerification({
 			domainId,
 			`Missing required records when sending is enabled: ${missing}`,
 		);
-		await job.log(
+		await logJob(
+			job,
 			`Missing required DNS config: ${missing}. Fix: ${DNS_FIX_GUIDANCE}`,
 		);
 		return;
@@ -169,7 +165,8 @@ export async function processDomainVerification({
 			domainId,
 			"Missing receiving MX record when receiving is enabled",
 		);
-		await job.log(
+		await logJob(
+			job,
 			`Missing required DNS config: receiving MX. Fix: ${DNS_FIX_GUIDANCE}`,
 		);
 		return;
@@ -192,7 +189,8 @@ export async function processDomainVerification({
 			domainId,
 			"Missing CNAME record when tracking is enabled",
 		);
-		await job.log(
+		await logJob(
+			job,
 			`Missing required DNS config: CNAME. Fix: ${DNS_FIX_GUIDANCE}`,
 		);
 		return;
@@ -288,7 +286,8 @@ export async function processDomainVerification({
 		mxOk,
 		cnameOk,
 	});
-	await job.log(
+	await logJob(
+		job,
 		`DNS results: DKIM=${dkimOk} SPF=${spfOk} DMARC=${dmarcOk} MX=${mxOk} CNAME=${cnameOk}`,
 	);
 
@@ -342,36 +341,7 @@ export async function processDomainVerification({
 		});
 
 		log.info({ message: "Domain verified successfully", domainId, domainName });
-		await job.log("Domain verified successfully");
-		return;
-	}
-
-	if (isLastAttempt) {
-		await db
-			.update(schema.domain)
-			.set({
-				status: "failed",
-				systemVerified: false,
-				verificationFailedReason: failureReason,
-				isTrackingDomain: false,
-			})
-			.where(eq(schema.domain.id, domainId));
-
-		log.warn({
-			message:
-				"Domain verification failed — one or more DNS records did not match",
-			domainId,
-			domainName,
-			dkimOk,
-			spfOk,
-			dmarcOk,
-			mxOk,
-			cnameOk,
-		});
-		await job.log(
-			`Verification failed (final attempt): ${failureReason}. Fix: ${DNS_FIX_GUIDANCE}`,
-		);
-		// Do not throw after final failure write — status is already persisted
+		await logJob(job, "Domain verified successfully");
 		return;
 	}
 
@@ -386,7 +356,25 @@ export async function processDomainVerification({
 		mxOk,
 		cnameOk,
 	});
-	await job.log(`Verification incomplete — will retry: ${failureReason}`);
 
-	throw domainVerificationIncompleteError(domainName, failureReason);
+	if (isLastAttempt) {
+		await db
+			.update(schema.domain)
+			.set({
+				status: "failed",
+				systemVerified: false,
+				verificationFailedReason: failureReason,
+				isTrackingDomain: false,
+			})
+			.where(eq(schema.domain.id, domainId));
+	}
+
+	await failJobOrRetry({
+		job,
+		isLastAttempt,
+		message: `Domain verification failed for ${domainName}`,
+		why: failureReason,
+		fix: DNS_FIX_GUIDANCE,
+		status: 422,
+	});
 }
