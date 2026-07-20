@@ -7,8 +7,11 @@ export const getDomainXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.domain.get("dom_123456789");
-if (error) throw error;`,
+const { domain, domainError } = await reloop.domain.get("dom_123456789");
+
+if (domainError) throw domainError;
+
+console.log(domain.id, domain.domain, domain.status);`,
 	},
 	{
 		id: "curl",

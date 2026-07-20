@@ -13,7 +13,7 @@ export const getDomainNameserversRoute = new Elysia().use(authMiddleware).get(
 		});
 	},
 	{
-		auth: true,
+		authSession: true,
 		params: t.Object({
 			domain_id: t.String(),
 		}),
@@ -25,7 +25,8 @@ export const getDomainNameserversRoute = new Elysia().use(authMiddleware).get(
 		detail: {
 			tags: ["Domains"],
 			summary: "Domain Nameservers",
-			description: "Returns nameservers for a domain",
+			description:
+				"Returns nameservers for a domain. Session-only — not available with API keys.",
 			"x-codeSamples": getDomainNameserversXCodeSamples,
 		},
 	},

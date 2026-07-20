@@ -60,6 +60,16 @@ function mountApp(redis: MemoryRedis, opts: { internalSecret?: string } = {}) {
 			{ auth: true },
 		)
 		.get(
+			"/auth-session",
+			({ userId, organizationId, platformRole, authType }) => ({
+				userId,
+				organizationId,
+				platformRole,
+				authType,
+			}),
+			{ authSession: true },
+		)
+		.get(
 			"/auth-no-org",
 			({ userId, organizationId, platformRole, authType }) => ({
 				userId,
@@ -465,6 +475,82 @@ describe("createAuthPlugin — authKey", () => {
 		);
 
 		expect(res.status).toBe(401);
+	});
+});
+
+describe("createAuthPlugin — authSession", () => {
+	test("authSession: valid session with org returns 200", async () => {
+		const redis = new MemoryRedis();
+		const token = "tok-session-only";
+		sessions.set(token, {
+			userId: "user-s",
+			role: "user",
+			activeOrganizationId: "org-s",
+		});
+
+		const res = await mountApp(redis).handle(
+			new Request("http://localhost/auth-session", {
+				headers: { cookie: cookieFor(token) },
+			}),
+		);
+
+		expect(res.status).toBe(200);
+		const body = (await res.json()) as AuthContext;
+		expect(body).toEqual({
+			userId: "user-s",
+			organizationId: "org-s",
+			platformRole: "user",
+			authType: "session",
+		});
+	});
+
+	test("authSession: API key is rejected even when valid", async () => {
+		const redis = new MemoryRedis();
+		const raw = makeRawKey();
+		const hashed = hashApiKey(raw);
+		await createApiKeyCredentialCache(redis).write(hashed, {
+			userId: "key-user",
+			organizationId: "key-org",
+			apiKeyId: "key-id-session",
+		});
+
+		const res = await mountApp(redis).handle(
+			new Request("http://localhost/auth-session", {
+				headers: { "x-api-key": raw },
+			}),
+		);
+
+		expect(res.status).toBe(401);
+	});
+
+	test("authSession: API key does not override a valid session", async () => {
+		const redis = new MemoryRedis();
+		const raw = makeRawKey();
+		const hashed = hashApiKey(raw);
+		await createApiKeyCredentialCache(redis).write(hashed, {
+			userId: "key-user",
+			organizationId: "key-org",
+			apiKeyId: "key-id-session-2",
+		});
+		const token = "tok-session-with-key";
+		sessions.set(token, {
+			userId: "session-user",
+			activeOrganizationId: "session-org",
+		});
+
+		const res = await mountApp(redis).handle(
+			new Request("http://localhost/auth-session", {
+				headers: {
+					"x-api-key": raw,
+					cookie: cookieFor(token),
+				},
+			}),
+		);
+
+		expect(res.status).toBe(200);
+		const body = (await res.json()) as AuthContext;
+		expect(body.authType).toBe("session");
+		expect(body.userId).toBe("session-user");
 	});
 });
 

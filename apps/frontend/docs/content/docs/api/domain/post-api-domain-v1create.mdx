@@ -22,16 +22,18 @@ _apiData:
         
         const reloop = new Reloop({ apiKey: "rl_123456789" });
         
-        const { response: domain, error } = await reloop.domain.create({
+        const { domain, domainError } = await reloop.domain.create({
           domain: "send.example.com",
-          custom_return_path: "inbound",
           click_tracking: true,
           open_tracking: true,
           tls: "opportunistic",
           sending_email: true,
-          receiving_email: true,
+          receiving_email: false,
         });
-        if (error) throw error;
+        
+        if (domainError) throw domainError;
+        
+        console.log(domain.id, domain.domain);
     - id: curl
       lang: bash
       label: cURL
@@ -39,7 +41,7 @@ _apiData:
         curl -X POST https://reloop.sh/api/domain/v1/create \\
           -H "x-api-key: rl_123456789" \\
           -H "Content-Type: application/json" \\
-          -d '{"domain": "send.example.com","custom_return_path": "inbound","click_tracking": true,"open_tracking": true,"tls": "opportunistic","sending_email": true,"receiving_email": true}'
+          -d '{"domain": "send.example.com","click_tracking": true,"open_tracking": true,"tls": "opportunistic","sending_email": true,"receiving_email": false}'
     - id: python
       lang: python
       label: Python
@@ -50,12 +52,11 @@ _apiData:
         
         domain = reloop.domain.create(
             domain="send.example.com",
-            custom_return_path="inbound",
             click_tracking=True,
             open_tracking=True,
             tls="opportunistic",
             sending_email=True,
-            receiving_email=True,
+            receiving_email=False,
         )
     - id: php
       lang: php
@@ -65,12 +66,11 @@ _apiData:
         
         $domain = $reloop->domain->create([
             'domain' => 'send.example.com',
-            'custom_return_path' => 'inbound',
             'click_tracking' => true,
             'open_tracking' => true,
             'tls' => 'opportunistic',
             'sending_email' => true,
-            'receiving_email' => true,
+            'receiving_email' => false,
         ]);
     - id: java
       lang: java
@@ -84,13 +84,11 @@ _apiData:
         Domain domain = reloop.domain.create(
             new CreateDomainParams(
                 "send.example.com",
-                "inbound",
-                null,
                 true,
-                null,
+                true,
                 "opportunistic",
                 true,
-                true
+                false
             )
         );
     - id: dotnet
@@ -104,12 +102,11 @@ _apiData:
         
         var domain = await reloop.Domain.CreateAsync(new CreateDomainParams(
             Domain: "send.example.com",
-            CustomReturnPath: "inbound",
             ClickTracking: true,
             OpenTracking: true,
             Tls: "opportunistic",
             SendingEmail: true,
-            ReceivingEmail: true
+            ReceivingEmail: false
         ));
     - id: go
       lang: go
@@ -123,12 +120,11 @@ _apiData:
         
         domain, _ := client.Domain.Create(reloop.CreateDomainParams{
             Domain: "send.example.com",
-            CustomReturnPath: reloop.String("inbound"),
             ClickTracking: reloop.Bool(true),
             OpenTracking: reloop.Bool(true),
             Tls: reloop.String("opportunistic"),
             SendingEmail: reloop.Bool(true),
-            ReceivingEmail: reloop.Bool(true),
+            ReceivingEmail: reloop.Bool(false),
         })
     - id: rust
       lang: rust
@@ -141,12 +137,11 @@ _apiData:
         
             reloop.domain().create(CreateDomainParams {
                 domain: "send.example.com".to_string(),
-                custom_return_path: Some("inbound".to_string()),
                 click_tracking: Some(true),
                 open_tracking: Some(true),
                 tls: Some("opportunistic".to_string()),
                 sending_email: Some(true),
-                receiving_email: Some(true),
+                receiving_email: Some(false),
                 ..Default::default()
             }).await?;
         
@@ -162,12 +157,11 @@ _apiData:
         
         domain = reloop.domain.create(
           domain: "send.example.com",
-          custom_return_path: "inbound",
           click_tracking: true,
           open_tracking: true,
           tls: "opportunistic",
           sending_email: true,
-          receiving_email: true,
+          receiving_email: false,
         )
     - id: elixir
       lang: elixir
@@ -177,12 +171,11 @@ _apiData:
         
         {:ok, domain} = Reloop.Services.Domain.create(client, %{
           domain: "send.example.com",
-          custom_return_path: "inbound",
           click_tracking: true,
           open_tracking: true,
           tls: "opportunistic",
           sending_email: true,
-          receiving_email: true
+          receiving_email: false
         })
 ---
 

@@ -31,6 +31,7 @@ Service-to-service authentication via headers `x-internal-secret`, `x-user-id`, 
 | Macro | Behavior |
 |-------|----------|
 | `auth` | Session or API Key; fail-closed organization |
+| `authSession` | Session only; fail-closed organization (rejects API keys) |
 | `authNoOrg` | Session or API Key; organization optional |
 | `authKey` | API Key only; fail-closed organization |
 | `authAdmin` | Session; Platform Admin required |

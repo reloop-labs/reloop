@@ -7,8 +7,11 @@ export const verifyDNSXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.domain.verify("dom_123456789");
-if (error) throw error;`,
+const { domain, domainError } = await reloop.domain.verify("dom_123456789");
+
+if (domainError) throw domainError;
+
+console.log(domain.id, domain.status);`,
 	},
 	{
 		id: "curl",

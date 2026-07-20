@@ -7,7 +7,7 @@ export const createDomainXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: domain, error } = await reloop.domain.create({
+const { domain, domainError } = await reloop.domain.create({
   domain: "send.example.com",
   click_tracking: true,
   open_tracking: true,
@@ -15,7 +15,10 @@ const { response: domain, error } = await reloop.domain.create({
   sending_email: true,
   receiving_email: false,
 });
-if (error) throw error;`,
+
+if (domainError) throw domainError;
+
+console.log(domain.id, domain.domain);`,
 	},
 	{
 		id: "curl",

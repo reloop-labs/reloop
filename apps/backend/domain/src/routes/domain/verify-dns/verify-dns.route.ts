@@ -54,7 +54,7 @@ export const verifyDNSRecordRoute = new Elysia()
 			});
 		},
 		{
-			auth: true,
+			authSession: true,
 			rateLimit: true,
 			params: t.Object({
 				domain_id: t.String(),
@@ -74,7 +74,7 @@ export const verifyDNSRecordRoute = new Elysia()
 				tags: ["Domains"],
 				summary: "Forward DNS Records",
 				description:
-					"Forwards DNS configuration records of a domain to an email address",
+					"Forwards DNS configuration records of a domain to an email address. Session-only — not available with API keys.",
 			},
 			afterResponse: auditLogHook({ action: "forwarded", successStatus: 200 }),
 		},

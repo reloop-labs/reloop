@@ -7,12 +7,15 @@ export const listDomainsXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: domains, error } = await reloop.domain.list({
+const { domains, domainError } = await reloop.domain.list({
   page: 1,
   limit: 10,
   status: "active",
 });
-if (error) throw error;`,
+
+if (domainError) throw domainError;
+
+console.log(domains.total, domains.domains);`,
 	},
 	{
 		id: "curl",

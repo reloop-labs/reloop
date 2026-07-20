@@ -7,10 +7,15 @@ export const updateDomainXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: domain, error } = await reloop.domain.update("dom_123456789", {
+const { domain, domainError } = await reloop.domain.update("dom_123456789", {
   click_tracking: false,
+  open_tracking: true,
+  sending_email: true,
 });
-if (error) throw error;`,
+
+if (domainError) throw domainError;
+
+console.log(domain.id, domain.isClickTrackingEnabled);`,
 	},
 	{
 		id: "curl",

@@ -11,88 +11,75 @@
  */
 export const codeExamples = {
 	javascript: {
-		create: `// Create a domain
-const response = await fetch("https://reloop.sh/api/domain/v1/create", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "x-api-key": "rl_123456789",
-  },
-  body: JSON.stringify({
-    domain: "send.example.com",
-    click_tracking: true,
-    open_tracking: true,
-    tls: "opportunistic",
-    sending_email: true,
-    receiving_email: false,
-  }),
+		create: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { domain, domainError } = await reloop.domain.create({
+  domain: "send.example.com",
+  click_tracking: true,
+  open_tracking: true,
+  tls: "opportunistic",
+  sending_email: true,
+  receiving_email: false,
 });
 
-const domain = await response.json();`,
-		list: `// List domains
-const response = await fetch(
-  "https://reloop.sh/api/domain/v1/list?page=1&limit=10&status=active",
-  {
-    headers: {
-      "x-api-key": "rl_123456789",
-    },
-  },
-);
+if (domainError) throw domainError;
 
-const domains = await response.json();`,
-		get: `// Get a domain by ID
-const response = await fetch(
-  "https://reloop.sh/api/domain/v1/dom_123456789",
-  {
-    headers: {
-      "x-api-key": "rl_123456789",
-    },
-  },
-);
+console.log(domain.id, domain.domain);`,
+		list: `import { Reloop } from "reloop-email";
 
-const domain = await response.json();`,
-		update: `// Update domain settings
-const response = await fetch(
-  "https://reloop.sh/api/domain/v1/dom_123456789",
-  {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": "rl_123456789",
-    },
-    body: JSON.stringify({
-      click_tracking: false,
-      open_tracking: true,
-      sending_email: true,
-    }),
-  },
-);
+const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const domain = await response.json();`,
-		delete: `// Delete a domain by ID
-const response = await fetch(
-  "https://reloop.sh/api/domain/v1/dom_123456789",
-  {
-    method: "DELETE",
-    headers: {
-      "x-api-key": "rl_123456789",
-    },
-  },
-);
+const { domains, domainError } = await reloop.domain.list({
+  page: 1,
+  limit: 10,
+  status: "active",
+});
 
-const result = await response.json();`,
-		verify: `// Start DNS verification
-const response = await fetch(
-  "https://reloop.sh/api/domain/v1/verify/dom_123456789",
-  {
-    method: "POST",
-    headers: {
-      "x-api-key": "rl_123456789",
-    },
-  },
-);
+if (domainError) throw domainError;
 
-const result = await response.json();`,
+console.log(domains.total, domains.domains);`,
+		get: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { domain, domainError } = await reloop.domain.get("dom_123456789");
+
+if (domainError) throw domainError;
+
+console.log(domain.id, domain.domain, domain.status);`,
+		update: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { domain, domainError } = await reloop.domain.update("dom_123456789", {
+  click_tracking: false,
+  open_tracking: true,
+  sending_email: true,
+});
+
+if (domainError) throw domainError;
+
+console.log(domain.id, domain.isClickTrackingEnabled);`,
+		delete: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { domain, domainError } = await reloop.domain.delete("dom_123456789");
+
+if (domainError) throw domainError;
+
+console.log(domain.id);`,
+		verify: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { domain, domainError } = await reloop.domain.verify("dom_123456789");
+
+if (domainError) throw domainError;
+
+console.log(domain.id, domain.status);`,
 	},
 	python: {
 		create: `# Create a domain

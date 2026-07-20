@@ -4,6 +4,7 @@ import { resolveApiKeyOrInternal } from "@reloop/auth/middleware/resolve/resolve
 import { resolveCollabAuth } from "@reloop/auth/middleware/resolve/resolve-collab-auth";
 import { resolveInternalAuth } from "@reloop/auth/middleware/resolve/resolve-internal-auth";
 import { resolvePlatformAdmin } from "@reloop/auth/middleware/resolve/resolve-platform-admin";
+import { resolveSessionAuth } from "@reloop/auth/middleware/resolve/resolve-session-auth";
 import { resolveSessionOrApiKey } from "@reloop/auth/middleware/resolve/resolve-session-or-api-key";
 import { resolveSupportSession } from "@reloop/auth/middleware/resolve/resolve-support-session";
 import {
@@ -40,6 +41,23 @@ export function createAuthPlugin(config: AuthMiddlewareConfig) {
 			},
 			detail: {
 				security: [{ apiKey: [] }],
+			},
+		},
+
+		authSession: {
+			async resolve({ status, request: { headers } }) {
+				const ctx = await resolveSessionAuth(headers, deps, {
+					requireOrg: true,
+				});
+				if (!ctx?.organizationId) {
+					return status(401, UNAUTH);
+				}
+				return {
+					userId: ctx.userId,
+					organizationId: ctx.organizationId,
+					platformRole: ctx.platformRole,
+					authType: ctx.authType,
+				};
 			},
 		},
 
