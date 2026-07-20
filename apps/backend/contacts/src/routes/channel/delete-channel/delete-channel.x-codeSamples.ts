@@ -7,8 +7,13 @@ export const deleteChannelXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.contacts.channels.delete("chn_123456789");
-if (error) throw error;`,
+const { channel, channelError } = await reloop.contacts.channels.delete(
+  "chn_123456789",
+);
+
+if (channelError) throw channelError;
+
+console.log(channel.id, channel.success);`,
 	},
 	{
 		id: "curl",

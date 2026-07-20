@@ -7,8 +7,14 @@ export const updateGroupXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: group, error } = await reloop.contacts.updateGroup("grp_123456789", { name: "Loyal Customers" });
-if (error) throw error;`,
+const { group, groupError } = await reloop.contacts.groups.update(
+  "grp_123456789",
+  { name: "Loyal Customers" },
+);
+
+if (groupError) throw groupError;
+
+console.log(group.id, group.name);`,
 	},
 	{
 		id: "curl",

@@ -7,8 +7,14 @@ export const updateChannelXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: channel, error } = await reloop.contacts.channels.update("chn_123456789", { name: "Marketing News" });
-if (error) throw error;`,
+const { channel, channelError } = await reloop.contacts.channels.update(
+  "chn_123456789",
+  { name: "Marketing News" },
+);
+
+if (channelError) throw channelError;
+
+console.log(channel.id, channel.name);`,
 	},
 	{
 		id: "curl",

@@ -71,11 +71,14 @@ if (error) throw error;`,
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.contacts.channels.addContact("chn_123456789", {
-  contact_id: "con_123456789",
-  subscription: "opt_in",
-});
-if (error) throw error;`,
+const { channel, channelError } = await reloop.contacts.channels.addContact(
+  "chn_123456789",
+  { contact_id: "con_123456789", subscription: "opt_in" },
+);
+
+if (channelError) throw channelError;
+
+console.log(channel.subscriptionId, channel.contact.id);`,
 		},
 		updateChannel: {
 			filename: "update_contact_channel.js",
@@ -83,11 +86,14 @@ if (error) throw error;`,
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.contacts.channels.updateSubscription("chn_123456789", {
-  contact_id: "con_123456789",
-  subscription: "opt_out",
-});
-if (error) throw error;`,
+const { channel, channelError } = await reloop.contacts.channels.updateSubscription(
+  "chn_123456789",
+  { contact_id: "con_123456789", subscription: "opt_out" },
+);
+
+if (channelError) throw channelError;
+
+console.log(channel.status, channel.success);`,
 		},
 		addGroup: {
 			filename: "add_contact_group.js",
@@ -95,8 +101,14 @@ if (error) throw error;`,
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.contacts.groups.addContact("grp_123456789", { contact_id: "con_123456789" });
-if (error) throw error;`,
+const { group, groupError } = await reloop.contacts.groups.addContact(
+  "grp_123456789",
+  { contact_id: "con_123456789" },
+);
+
+if (groupError) throw groupError;
+
+console.log(group.id, group.success);`,
 		},
 		deleteGroup: {
 			filename: "delete_contact_group.js",
@@ -104,8 +116,14 @@ if (error) throw error;`,
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.contacts.groups.removeContact("grp_123456789", { contact_id: "con_123456789" });
-if (error) throw error;`,
+const { group, groupError } = await reloop.contacts.groups.removeContact(
+  "grp_123456789",
+  { contact_id: "con_123456789" },
+);
+
+if (groupError) throw groupError;
+
+console.log(group.id, group.success);`,
 		},
 	},
 	python: {

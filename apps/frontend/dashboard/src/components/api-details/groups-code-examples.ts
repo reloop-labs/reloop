@@ -6,8 +6,13 @@ export const codeExamples = {
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: group, error } = await reloop.contacts.createGroup({ name: "Beta Testers" });
-if (error) throw error;`,
+const { group, groupError } = await reloop.contacts.groups.create({
+  name: "Beta Testers",
+});
+
+if (groupError) throw groupError;
+
+console.log(group.id, group.name);`,
 		},
 		get: {
 			filename: "get_group.js",
@@ -15,8 +20,11 @@ if (error) throw error;`,
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: group, error } = await reloop.contacts.getGroup("grp_123456789");
-if (error) throw error;`,
+const { group, groupError } = await reloop.contacts.groups.get("grp_123456789");
+
+if (groupError) throw groupError;
+
+console.log(group.id, group.name);`,
 		},
 		list: {
 			filename: "list_groups.js",
@@ -24,8 +32,14 @@ if (error) throw error;`,
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: groups, error } = await reloop.contacts.listGroups({ page: 1, limit: 10 });
-if (error) throw error;`,
+const { groups, groupError } = await reloop.contacts.groups.list({
+  page: 1,
+  limit: 10,
+});
+
+if (groupError) throw groupError;
+
+console.log(groups.total, groups.groups);`,
 		},
 		update: {
 			filename: "update_group.js",
@@ -33,8 +47,14 @@ if (error) throw error;`,
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: group, error } = await reloop.contacts.updateGroup("grp_123456789", { name: "Loyal Customers" });
-if (error) throw error;`,
+const { group, groupError } = await reloop.contacts.groups.update(
+  "grp_123456789",
+  { name: "Loyal Customers" },
+);
+
+if (groupError) throw groupError;
+
+console.log(group.id, group.name);`,
 		},
 		delete: {
 			filename: "delete_group.js",
@@ -42,8 +62,11 @@ if (error) throw error;`,
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.contacts.deleteGroup("grp_123456789");
-if (error) throw error;`,
+const { group, groupError } = await reloop.contacts.groups.delete("grp_123456789");
+
+if (groupError) throw groupError;
+
+console.log(group.id, group.success);`,
 		},
 		getContacts: {
 			filename: "get_group_contacts.js",
@@ -51,11 +74,14 @@ if (error) throw error;`,
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.contacts.groups.listContacts("grp_123456789", {
-  page: 1,
-  limit: 10,
-});
-if (error) throw error;`,
+const { contacts, groupError } = await reloop.contacts.groups.listContacts(
+  "grp_123456789",
+  { page: 1, limit: 10 },
+);
+
+if (groupError) throw groupError;
+
+console.log(contacts.total, contacts.contacts);`,
 		},
 	},
 	python: {

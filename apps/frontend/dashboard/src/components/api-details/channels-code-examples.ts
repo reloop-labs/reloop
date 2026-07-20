@@ -6,13 +6,16 @@ export const codeExamples = {
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: channel, error } = await reloop.contacts.channels.create({
+const { channel, channelError } = await reloop.contacts.channels.create({
   name: "Product Updates",
   description: "Get the latest news about our products",
   defaultSubscription: "opt_in",
   visibility: "public",
 });
-if (error) throw error;`,
+
+if (channelError) throw channelError;
+
+console.log(channel.id, channel.name);`,
 		},
 		get: {
 			filename: "get_channel.js",
@@ -20,8 +23,13 @@ if (error) throw error;`,
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: channel, error } = await reloop.contacts.channels.get("chn_123456789");
-if (error) throw error;`,
+const { channel, channelError } = await reloop.contacts.channels.get(
+  "chn_123456789",
+);
+
+if (channelError) throw channelError;
+
+console.log(channel.id, channel.name);`,
 		},
 		list: {
 			filename: "list_channels.js",
@@ -29,8 +37,14 @@ if (error) throw error;`,
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: channels, error } = await reloop.contacts.channels.list({ page: 1, limit: 10 });
-if (error) throw error;`,
+const { channels, channelError } = await reloop.contacts.channels.list({
+  page: 1,
+  limit: 10,
+});
+
+if (channelError) throw channelError;
+
+console.log(channels.total, channels.channels);`,
 		},
 		update: {
 			filename: "update_channel.js",
@@ -38,8 +52,14 @@ if (error) throw error;`,
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: channel, error } = await reloop.contacts.channels.update("chn_123456789", { name: "Marketing News" });
-if (error) throw error;`,
+const { channel, channelError } = await reloop.contacts.channels.update(
+  "chn_123456789",
+  { name: "Marketing News" },
+);
+
+if (channelError) throw channelError;
+
+console.log(channel.id, channel.name);`,
 		},
 		delete: {
 			filename: "delete_channel.js",
@@ -47,8 +67,13 @@ if (error) throw error;`,
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.contacts.channels.delete("chn_123456789");
-if (error) throw error;`,
+const { channel, channelError } = await reloop.contacts.channels.delete(
+  "chn_123456789",
+);
+
+if (channelError) throw channelError;
+
+console.log(channel.id, channel.success);`,
 		},
 	},
 	python: {

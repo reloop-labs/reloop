@@ -7,8 +7,14 @@ export const addContactToGroupXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.contacts.groups.addContact("grp_123456789", { contact_id: "con_123456789" });
-if (error) throw error;`,
+const { group, groupError } = await reloop.contacts.groups.addContact(
+  "grp_123456789",
+  { contact_id: "con_123456789" },
+);
+
+if (groupError) throw groupError;
+
+console.log(group.id, group.success);`,
 	},
 	{
 		id: "curl",

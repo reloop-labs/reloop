@@ -7,12 +7,15 @@ export const createPropertyXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: property, error } = await reloop.contacts.createProperty({
+const { property, propertyError } = await reloop.contacts.properties.create({
   name: "company_name",
   type: "string",
   fallbackValue: "Unknown",
 });
-if (error) throw error;`,
+
+if (propertyError) throw propertyError;
+
+console.log(property.id, property.propertyName);`,
 	},
 	{
 		id: "curl",

@@ -7,10 +7,14 @@ export const updatePropertyXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: property, error } = await reloop.contacts.updateProperty("prop_123456789", {
-  fallbackValue: "N/A",
-});
-if (error) throw error;`,
+const { property, propertyError } = await reloop.contacts.properties.update(
+  "prop_123456789",
+  { fallbackValue: "N/A" },
+);
+
+if (propertyError) throw propertyError;
+
+console.log(property.id, property.defaultValue);`,
 	},
 	{
 		id: "curl",

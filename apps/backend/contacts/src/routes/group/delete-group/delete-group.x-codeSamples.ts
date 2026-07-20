@@ -7,8 +7,11 @@ export const deleteGroupXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.contacts.deleteGroup("grp_123456789");
-if (error) throw error;`,
+const { group, groupError } = await reloop.contacts.groups.delete("grp_123456789");
+
+if (groupError) throw groupError;
+
+console.log(group.id, group.success);`,
 	},
 	{
 		id: "curl",

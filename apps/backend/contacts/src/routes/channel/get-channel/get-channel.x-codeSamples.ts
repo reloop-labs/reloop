@@ -7,8 +7,13 @@ export const getChannelXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: channel, error } = await reloop.contacts.channels.get("chn_123456789");
-if (error) throw error;`,
+const { channel, channelError } = await reloop.contacts.channels.get(
+  "chn_123456789",
+);
+
+if (channelError) throw channelError;
+
+console.log(channel.id, channel.name);`,
 	},
 	{
 		id: "curl",

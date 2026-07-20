@@ -6,12 +6,15 @@ export const codeExamples = {
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: property, error } = await reloop.contacts.createProperty({
+const { property, propertyError } = await reloop.contacts.properties.create({
   name: "company_name",
   type: "string",
   fallbackValue: "Unknown",
 });
-if (error) throw error;`,
+
+if (propertyError) throw propertyError;
+
+console.log(property.id, property.propertyName);`,
 		},
 		list: {
 			filename: "list_properties.js",
@@ -19,8 +22,14 @@ if (error) throw error;`,
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: properties, error } = await reloop.contacts.listProperties({ page: 1, limit: 10 });
-if (error) throw error;`,
+const { properties, propertyError } = await reloop.contacts.properties.list({
+  page: 1,
+  limit: 10,
+});
+
+if (propertyError) throw propertyError;
+
+console.log(properties.total, properties.properties);`,
 		},
 		update: {
 			filename: "update_property.js",
@@ -28,10 +37,14 @@ if (error) throw error;`,
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: property, error } = await reloop.contacts.updateProperty("prop_123456789", {
-  fallbackValue: "N/A",
-});
-if (error) throw error;`,
+const { property, propertyError } = await reloop.contacts.properties.update(
+  "prop_123456789",
+  { fallbackValue: "N/A" },
+);
+
+if (propertyError) throw propertyError;
+
+console.log(property.id, property.defaultValue);`,
 		},
 		delete: {
 			filename: "delete_property.js",
@@ -39,8 +52,13 @@ if (error) throw error;`,
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.contacts.deleteProperty("prop_123456789");
-if (error) throw error;`,
+const { property, propertyError } = await reloop.contacts.properties.delete(
+  "prop_123456789",
+);
+
+if (propertyError) throw propertyError;
+
+console.log(property.id, property.success);`,
 		},
 	},
 	python: {

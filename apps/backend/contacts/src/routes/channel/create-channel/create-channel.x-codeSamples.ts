@@ -7,13 +7,16 @@ export const createChannelXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: channel, error } = await reloop.contacts.channels.create({
+const { channel, channelError } = await reloop.contacts.channels.create({
   name: "Product Updates",
   description: "Get the latest news about our products",
   defaultSubscription: "opt_in",
   visibility: "public",
 });
-if (error) throw error;`,
+
+if (channelError) throw channelError;
+
+console.log(channel.id, channel.name);`,
 	},
 	{
 		id: "curl",

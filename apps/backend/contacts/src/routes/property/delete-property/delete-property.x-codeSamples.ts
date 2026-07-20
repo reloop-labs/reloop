@@ -7,8 +7,13 @@ export const deletePropertyXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response, error } = await reloop.contacts.deleteProperty("prop_123456789");
-if (error) throw error;`,
+const { property, propertyError } = await reloop.contacts.properties.delete(
+  "prop_123456789",
+);
+
+if (propertyError) throw propertyError;
+
+console.log(property.id, property.success);`,
 	},
 	{
 		id: "curl",

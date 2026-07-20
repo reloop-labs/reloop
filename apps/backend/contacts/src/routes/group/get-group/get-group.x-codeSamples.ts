@@ -7,8 +7,11 @@ export const getGroupXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: group, error } = await reloop.contacts.getGroup("grp_123456789");
-if (error) throw error;`,
+const { group, groupError } = await reloop.contacts.groups.get("grp_123456789");
+
+if (groupError) throw groupError;
+
+console.log(group.id, group.name);`,
 	},
 	{
 		id: "curl",

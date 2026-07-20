@@ -7,8 +7,14 @@ export const listChannelsXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: channels, error } = await reloop.contacts.channels.list({ page: 1, limit: 10 });
-if (error) throw error;`,
+const { channels, channelError } = await reloop.contacts.channels.list({
+  page: 1,
+  limit: 10,
+});
+
+if (channelError) throw channelError;
+
+console.log(channels.total, channels.channels);`,
 	},
 	{
 		id: "curl",

@@ -7,8 +7,13 @@ export const createGroupXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: group, error } = await reloop.contacts.createGroup({ name: "Beta Testers" });
-if (error) throw error;`,
+const { group, groupError } = await reloop.contacts.groups.create({
+  name: "Beta Testers",
+});
+
+if (groupError) throw groupError;
+
+console.log(group.id, group.name);`,
 	},
 	{
 		id: "curl",

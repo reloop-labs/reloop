@@ -7,8 +7,14 @@ export const listGroupsXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: groups, error } = await reloop.contacts.listGroups({ page: 1, limit: 10 });
-if (error) throw error;`,
+const { groups, groupError } = await reloop.contacts.groups.list({
+  page: 1,
+  limit: 10,
+});
+
+if (groupError) throw groupError;
+
+console.log(groups.total, groups.groups);`,
 	},
 	{
 		id: "curl",

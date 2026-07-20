@@ -7,8 +7,14 @@ export const listPropertiesXCodeSamples = [
 
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
-const { response: properties, error } = await reloop.contacts.listProperties({ page: 1, limit: 10 });
-if (error) throw error;`,
+const { properties, propertyError } = await reloop.contacts.properties.list({
+  page: 1,
+  limit: 10,
+});
+
+if (propertyError) throw propertyError;
+
+console.log(properties.total, properties.properties);`,
 	},
 	{
 		id: "curl",
