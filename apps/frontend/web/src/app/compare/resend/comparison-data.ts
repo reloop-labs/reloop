@@ -1,4 +1,4 @@
-import type { ComparisonCategory } from "../components/comparison-tabs";
+import type { ComparisonCategory } from "../components/comparison-matrix";
 
 /**
  * Feature matrix for Reloop vs Resend.
@@ -50,7 +50,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 				label: "Scheduled delivery",
 				reloop: {
 					value: "No",
-					note: "API field exists; production scheduling is not wired end-to-end",
+					note: "Scheduling engine is currently in development",
 				},
 				competitor: "Yes",
 			},

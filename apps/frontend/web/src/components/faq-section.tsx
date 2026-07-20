@@ -35,7 +35,12 @@ export function FaqSection({
 						{eyebrow}
 					</p>
 					<h2
-						className={`font-serif text-[2.6rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.4rem] lg:text-[4.2rem] dark:text-white ${compact ? "mt-3.5" : "mt-4"}`}
+						className={cn(
+							"font-serif text-text-strong-950 leading-[1.05] tracking-tighter dark:text-white",
+							compact
+								? "mt-3.5 text-[2rem] sm:text-[2.4rem] lg:text-[2.8rem]"
+								: "mt-4 text-[2.6rem] sm:text-[3.4rem] lg:text-[4.2rem]",
+						)}
 					>
 						{title}
 					</h2>

@@ -1,4 +1,7 @@
 import { Icon } from "@reloop/ui/icon";
+import { Logo } from "@reloop/ui/logo";
+import { competitorBrands } from "../competitor-brands";
+import { BrandIcon } from "./brand-icon";
 
 export type ComparisonCell =
 	| string
@@ -120,39 +123,63 @@ export function ComparisonTable({
 	competitorName: string;
 	features: ComparisonFeatureRow[];
 }) {
+	const competitorIcon = competitorBrands.find(
+		(brand) => brand.name === competitorName,
+	)?.icon;
+
 	return (
-		<div className="overflow-hidden rounded-3xl border border-stroke-soft-200 dark:border-white/10">
-			<div className="overflow-x-auto">
-				<table className="w-full min-w-[640px] text-left text-[14px]">
-					<thead>
-						<tr className="border-stroke-soft-200 border-b bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.03]">
-							<th className="px-5 py-4 font-semibold text-text-strong-950 dark:text-white">
-								Feature
-							</th>
-							<th className="px-5 py-4 font-semibold text-primary-base">
-								Reloop
-							</th>
-							<th className="px-5 py-4 font-semibold text-text-strong-950 dark:text-white">
-								{competitorName}
-							</th>
-						</tr>
-					</thead>
-					<tbody className="divide-y divide-stroke-soft-200 dark:divide-white/10">
-						{features.map((row) => (
-							<tr key={row.label}>
-								<td className="px-5 py-4 text-text-sub-600 dark:text-white/50">
-									{row.label}
-								</td>
-								<td className="px-5 py-4">
-									<CellValue cell={row.reloop} highlight />
-								</td>
-								<td className="px-5 py-4">
-									<CellValue cell={row.competitor} />
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
+		<div className="mx-auto max-w-3xl overflow-x-auto pb-2">
+			<div className="grid min-w-[560px] grid-cols-[minmax(140px,1.1fr)_minmax(140px,1fr)_minmax(140px,1fr)]">
+				{/* Header */}
+				<div className="sticky top-0 z-10 border-b border-stroke-soft-200 bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+					<div className="p-4 font-medium text-[15px] text-text-strong-950 dark:text-white">
+						Feature
+					</div>
+				</div>
+				<div className="sticky top-0 z-10 border-b border-stroke-soft-200 bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+					<div className="flex items-center gap-2.5 rounded-t-2xl border-x border-t border-stroke-soft-200 bg-bg-weak-50/60 p-4 dark:border-white/10 dark:bg-white/[0.03]">
+						<span className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm dark:bg-white">
+							<Logo className="size-full text-text-strong-950" />
+						</span>
+						<span className="font-medium text-[15px] text-text-strong-950 dark:text-white">
+							Reloop
+						</span>
+					</div>
+				</div>
+				<div className="sticky top-0 z-10 border-b border-stroke-soft-200 bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+					<div className="flex items-center gap-2.5 p-4">
+						{competitorIcon ? (
+							<span className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm dark:bg-white">
+								<BrandIcon icon={competitorIcon} className="size-4" />
+							</span>
+						) : null}
+						<span className="font-medium text-[15px] text-text-strong-950 dark:text-white">
+							{competitorName}
+						</span>
+					</div>
+				</div>
+
+				{/* Rows */}
+				{features.map((row) => (
+					<div key={row.label} className="contents">
+						<div className="flex items-center border-b border-stroke-soft-200 py-3.5 pr-4 dark:border-white/10">
+							<span className="text-[14px] text-text-sub-600 dark:text-white/50">
+								{row.label}
+							</span>
+						</div>
+						<div className="flex items-center border-x border-b border-stroke-soft-200 bg-bg-weak-50/60 px-4 py-3.5 dark:border-white/10 dark:bg-white/[0.03]">
+							<CellValue cell={row.reloop} />
+						</div>
+						<div className="flex items-center border-b border-stroke-soft-200 px-4 py-3.5 dark:border-white/10">
+							<CellValue cell={row.competitor} />
+						</div>
+					</div>
+				))}
+
+				{/* Column footers */}
+				<div />
+				<div className="h-6 rounded-b-2xl border-x border-b border-stroke-soft-200 bg-bg-weak-50/60 dark:border-white/10 dark:bg-white/[0.03]" />
+				<div />
 			</div>
 		</div>
 	);
