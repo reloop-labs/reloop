@@ -513,7 +513,7 @@ export function VersionSidebar() {
 			</div>
 
 			{/* Version List */}
-			<div className="hide-scrollbar flex-1 overflow-y-auto px-4 pb-6">
+			<div className="flex-1 overflow-y-auto px-4 pb-6">
 				{isLoading ? (
 					<div className="flex items-center justify-center py-12">
 						<Loader2

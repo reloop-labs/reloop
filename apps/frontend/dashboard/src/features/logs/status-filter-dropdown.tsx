@@ -122,7 +122,7 @@ export const StatusFilterDropdown = ({
 			</Dropdown.Trigger>
 			<Dropdown.Content
 				align="start"
-				className="scrollbar-hide max-h-[320px] w-60 overflow-y-auto p-2"
+				className="max-h-[320px] w-60 overflow-y-auto p-2"
 			>
 				<div className="relative">
 					{statusFilterOptions.map((option, idx) => {

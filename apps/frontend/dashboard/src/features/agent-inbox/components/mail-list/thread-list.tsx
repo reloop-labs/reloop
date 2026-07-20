@@ -228,7 +228,7 @@ export const ThreadList = ({
 			>
 				<Virtuoso
 					data={listItems}
-					className="scrollbar-hide absolute inset-0 overflow-x-hidden"
+					className="absolute inset-0 overflow-x-hidden"
 					overscan={200}
 					defaultItemHeight={72}
 					endReached={handleLoadMore}

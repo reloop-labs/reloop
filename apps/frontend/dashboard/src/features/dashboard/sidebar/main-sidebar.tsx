@@ -82,15 +82,6 @@ export function MainSidebar() {
 					isCollapsed ? "px-0" : "px-2",
 				)}
 			>
-				<style>{`
-					.scrollbar-hide {
-						scrollbar-width: none;
-						-ms-overflow-style: none;
-					}
-					.scrollbar-hide::-webkit-scrollbar {
-						display: none;
-					}
-				`}</style>
 				<AnimatePresence mode="popLayout" initial={false}>
 					{isSettings ? (
 						<motion.div
@@ -109,7 +100,7 @@ export function MainSidebar() {
 								opacity: 0,
 							}}
 							transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
-							className="scrollbar-hide absolute inset-0 overflow-y-auto overflow-x-hidden py-2"
+							className="absolute inset-0 overflow-y-auto overflow-x-hidden py-2"
 							style={{ paddingInline: isCollapsed ? 0 : 8 }}
 						>
 							<SettingsSidebarItems isCollapsed={isCollapsed} />
@@ -131,7 +122,7 @@ export function MainSidebar() {
 								opacity: 0,
 							}}
 							transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
-							className="scrollbar-hide absolute inset-0 overflow-y-auto overflow-x-hidden py-2"
+							className="absolute inset-0 overflow-y-auto overflow-x-hidden py-2"
 							style={{ paddingInline: isCollapsed ? 0 : 8 }}
 						>
 							<SidebarItems isCollapsed={isCollapsed} />

@@ -89,29 +89,6 @@ figure {
 	display: none;
 }
 
-/* Thin single-line scrollbar for docs sidebar nav */
-aside nav {
-	scrollbar-width: thin;
-	scrollbar-color: var(--color-stroke-soft-200) transparent;
-}
-
-aside nav::-webkit-scrollbar {
-	width: 2px;
-}
-
-aside nav::-webkit-scrollbar-track {
-	background: transparent;
-}
-
-aside nav::-webkit-scrollbar-thumb {
-	background: var(--color-stroke-soft-200);
-	border-radius: 999px;
-}
-
-aside nav::-webkit-scrollbar-thumb:hover {
-	background: var(--color-text-soft-400);
-}
-
 /* API reference surface borders — match docs design tokens */
 .api-status-tabs {
 	border-color: var(--color-stroke-soft-200);

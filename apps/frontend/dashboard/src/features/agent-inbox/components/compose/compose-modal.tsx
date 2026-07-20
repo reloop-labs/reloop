@@ -721,7 +721,7 @@ export const ComposeModal = ({
 						</div>
 
 						{/* Fields + editor */}
-						<div className="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto">
+						<div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
 							<div className="shrink-0 border-mail-border/40 border-b px-5">
 								{/* From */}
 								<div className="grid grid-cols-[3.75rem_minmax(0,1fr)] items-center gap-x-2 border-mail-border/30 border-b py-2">

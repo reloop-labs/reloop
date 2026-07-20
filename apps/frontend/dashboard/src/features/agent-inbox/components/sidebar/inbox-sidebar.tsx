@@ -434,7 +434,7 @@ export const InboxSidebar = ({
 
 					<div
 						onPointerLeave={() => setHoveredEl(undefined)}
-						className="scrollbar-hide relative mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
+						className="relative mt-5 min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
 					>
 						<NavSection
 							title="Core"

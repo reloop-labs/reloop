@@ -183,7 +183,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 			</div>
 
 			{/* ── Scrollable Body ── */}
-			<div className="hide-scrollbar mt-2 flex-1 overflow-y-auto">
+			<div className="mt-2 flex-1 overflow-y-auto">
 				{isLoading ? (
 					<div className="flex items-center justify-center py-6">
 						<Loader2
@@ -536,7 +536,7 @@ export function ScorePanel({ onClose }: PanelProps) {
 			</div>
 
 			{/* Audits Checklist */}
-			<div className="hide-scrollbar flex-1 overflow-y-auto px-5 py-4">
+			<div className="flex-1 overflow-y-auto px-5 py-4">
 				<div className="space-y-2.5">
 					{filteredAudits.map((audit) => (
 						<div
@@ -774,7 +774,7 @@ export function TestPanel({ onClose }: PanelProps) {
 				</button>
 			</div>
 
-			<div className="hide-scrollbar flex flex-1 flex-col justify-between overflow-y-auto px-5 pb-5">
+			<div className="flex flex-1 flex-col justify-between overflow-y-auto px-5 pb-5">
 				<div className="space-y-5">
 					<p className="text-paragraph-sm text-text-sub-600 leading-normal dark:text-zinc-400">
 						Verify exactly how this email template will render across different
@@ -826,7 +826,7 @@ export function TestPanel({ onClose }: PanelProps) {
 								<span className="block font-bold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-zinc-400">
 									Template Variables
 								</span>
-								<div className="hide-scrollbar max-h-[250px] space-y-3.5 overflow-y-auto pr-1">
+								<div className="max-h-[250px] space-y-3.5 overflow-y-auto pr-1">
 									{detectedVars.map((v) => (
 										<div key={v.name} className="flex flex-col gap-1.5">
 											<div className="flex items-center justify-between">

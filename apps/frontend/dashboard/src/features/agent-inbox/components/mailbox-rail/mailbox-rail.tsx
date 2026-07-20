@@ -126,7 +126,7 @@ export function MailboxRail({
 				<Icon name="arrow-left" className="h-4 w-4" />
 			</Link>
 
-			<div className="scrollbar-hide flex min-h-0 w-full flex-1 flex-col items-center gap-2 overflow-x-hidden overflow-y-auto pt-0.5">
+			<div className="flex min-h-0 w-full flex-1 flex-col items-center gap-2 overflow-x-hidden overflow-y-auto pt-0.5">
 				{mailboxesError ? (
 					<SectionError
 						compact

@@ -93,7 +93,7 @@ export function ReferralField() {
 								autoFocus
 							/>
 						</div>
-						<div className="scrollbar-hide relative flex max-h-[380px] flex-col overflow-y-auto">
+						<div className="relative flex max-h-[380px] flex-col overflow-y-auto">
 							{filteredOptions.map((option) => {
 								const isChecked = referral === option.id;
 								return (

@@ -485,9 +485,6 @@ export const InboxCommandPalette = ({
 					"h-auto max-h-[min(420px,60vh)]",
 					"bg-transparent",
 					"[&>[cmdk-list-sizer]]:divide-y-0",
-					"[&::-webkit-scrollbar]:w-1.5",
-					"[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-black/10",
-					"dark:[&::-webkit-scrollbar-thumb]:bg-white/15",
 				)}
 			>
 				<CommandMenu.Empty className="px-4 py-10 text-center text-[13px] text-mail-muted">

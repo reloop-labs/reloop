@@ -300,7 +300,7 @@ export function Sidebar({
 			{/* Navigation tree */}
 			<nav
 				ref={navRef}
-				className="relative flex-1 overflow-y-auto px-2 pt-0 pb-0"
+				className="scrollbar-thin relative flex-1 overflow-y-auto px-2 pt-0 pb-0"
 				onPointerLeave={() => setHoveredEl(null)}
 				onScroll={() => {
 					if (navRef.current) {

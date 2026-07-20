@@ -245,7 +245,7 @@ export function EmailsCard() {
 				</div>
 
 				{/* List or Empty State */}
-				<div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
+				<div className="min-h-0 flex-1 overflow-y-auto">
 					{activeTab === "sent" ? (
 						hasSentLogs ? (
 							<div>
