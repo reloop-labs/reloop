@@ -1,9 +1,12 @@
 import { BusEvent, bus } from "@reloop/bus";
+import { db } from "@reloop/db/client";
+import * as schema from "@reloop/db/schema";
 import { emailConfig } from "@reloop/email/email.config";
 import DnsConfigEmail from "@reloop/email/emails/dns-config";
 import DomainVerifiedEmail from "@reloop/email/emails/domain-verified";
 import { render, toPlainText } from "@reloop/email/render";
 import { sendEmail } from "@reloop/email/utils/email";
+import { and, eq, isNull } from "drizzle-orm";
 import { log } from "evlog";
 import React from "react";
 
@@ -13,9 +16,29 @@ export async function initDomainSubscribers() {
 		BusEvent.DOMAIN_VERIFIED,
 		async (payload) => {
 			try {
+				const domain = await db.query.domain.findFirst({
+					where: and(
+						eq(schema.domain.id, payload.domainId),
+						eq(schema.domain.organizationId, payload.organizationId),
+						isNull(schema.domain.deletedAt),
+					),
+					with: {
+						user: true,
+					},
+				});
+
+				if (!domain?.user?.email) {
+					log.error({
+						message: "Domain owner not found for verified email",
+						domainId: payload.domainId,
+						organizationId: payload.organizationId,
+					});
+					return;
+				}
+
 				const html = await render(
 					React.createElement(DomainVerifiedEmail, {
-						fullName: "User", // Default to User if not provided in payload
+						fullName: domain.user.name || "User",
 						domain: payload.domain,
 						dashboardUrl: `${emailConfig.BASE_URL}/dashboard/domain`,
 					}),
@@ -25,7 +48,7 @@ export async function initDomainSubscribers() {
 
 				await sendEmail({
 					from: `Reloop <support@${emailConfig.RELOOP_SENDER_DOMAIN || "reloop.dev"}>`,
-					to: "admin@example.com", // This should probably come from organization/user
+					to: domain.user.email,
 					subject: `Domain ${payload.domain} has been verified`,
 					html,
 					text,
