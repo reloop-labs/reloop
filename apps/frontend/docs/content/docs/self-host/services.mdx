@@ -8,14 +8,14 @@ Reloop is built using a highly modular microservice architecture. This separatio
 
 ## Component Breakdown
 
-The Reloop stack consists of **18 application services** (3 frontends, 15 backends) and **10 external backing systems**.
+The Reloop stack consists of **19 application services** (3 frontends, 16 backends) and **9 external backing systems**.
 
 ### 1. Frontend Services (3)
 * **`web`**: The main public landing page and landing website.
 * **`dashboard`**: The developer console where users manage domains, write templates, view delivery metrics, configure webhooks, and generate API keys.
 * **`docs`**: The documentation portal you are viewing right now.
 
-### 2. Backend Services (15)
+### 2. Backend Services (16)
 * **`auth`**: Handles user registrations, authentications, and organization-scoped permission checks.
 * **`api-key`**: Validates developer API tokens for programmatic integrations.
 * **`domain`**: Verifies and manages domain records configurations (SPF, DKIM, MX, DMARC).
@@ -31,13 +31,13 @@ The Reloop stack consists of **18 application services** (3 frontends, 15 backen
 * **`inbox`**: Manages receiving inbox threads and incoming messages.
 * **`smtp`**: Outbound SMTP submission server using KumoMTA.
 * **`inbound`**: Inbound MX SMTP processing receiver using KumoMTA.
+* **`spam`**: Anti-spam scoring backend using Rspamd (called by inbound over HTTP).
 
-### 3. Supporting Infrastructure (10)
+### 3. Supporting Infrastructure (9)
 * **PostgreSQL**: Stores persistent relational data.
 * **Redis**: Coordinates task queues for BullMQ worker threads.
 * **ClickHouse**: Optimized column database for rapid analytics queries.
 * **MinIO**: S3-compliant file storage.
 * **NATS JetStream**: Real-time event broker.
-* **Rspamd**: Anti-spam scoring system.
 * **Mailpit**: SMTP sandbox mail catcher.
 * **Caddy**: High-performance reverse proxy and automatic SSL manager.

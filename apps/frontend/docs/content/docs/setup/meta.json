@@ -28,6 +28,7 @@
 		"backend/credits",
 		"backend/smtp",
 		"backend/inbound",
+		"backend/spam",
 		"---Database Schema---",
 		"database-schema/index",
 		"database-schema/auth",

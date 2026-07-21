@@ -11,7 +11,7 @@ constants.nats_url = os.getenv("NATS_URL") or "reloop-nats:4222"
 -- 3. RSpamD URL for spam scanning
 local default_rspamd_url
 if constants.env == "development" then
-  default_rspamd_url = "http://reloop-rspamd:11333/checkv2"
+  default_rspamd_url = "http://reloop-spam:11333/checkv2"
 else
   default_rspamd_url = "http://localhost:11333/checkv2"
 end

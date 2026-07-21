@@ -152,14 +152,14 @@ services:
       - INBOUND_HOSTNAME=${INBOUND_HOSTNAME:-inbound.reloop.sh}
       - NATS_URL=${NATS_URL:-reloop-nats:4222}
       - NODE_ENV=development
-      - KUMOMTA_RSPAMD_URL=${KUMOMTA_RSPAMD_URL:-http://reloop-rspamd:11333/checkv2}
+      - KUMOMTA_RSPAMD_URL=${KUMOMTA_RSPAMD_URL:-http://reloop-spam:11333/checkv2}
       - KUMOMTA_CHECK_RECIPIENT_URL=${KUMOMTA_CHECK_RECIPIENT_URL:-http://host.docker.internal:8011/api/domain}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
       reloop-nats:
         condition: service_started
-      reloop-rspamd:
+      reloop-spam:
         condition: service_started
     restart: unless-stopped
 
@@ -189,16 +189,18 @@ services:
     command: "-js" # Enable JetStream for persistence
     restart: unless-stopped
 
-  reloop-rspamd:
-    image: rspamd/rspamd:latest
-    container_name: reloop-rspamd
+  reloop-spam:
+    build:
+      context: ../apps/backend/spam
+      dockerfile: Dockerfile
+    container_name: reloop-spam
     ports:
       - "11332:11332" # Scan port (normal worker)
       - "11333:11333" # Scan / Controller port
       - "11334:11334" # Web UI / Controller
     volumes:
       - ../docker-data/rspamd/lib:/var/lib/rspamd
-      - ./rspamd/local.d:/etc/rspamd/local.d
+      - ../apps/backend/spam/local.d:/etc/rspamd/local.d
     restart: unless-stopped
     depends_on:
       reloop-redis:

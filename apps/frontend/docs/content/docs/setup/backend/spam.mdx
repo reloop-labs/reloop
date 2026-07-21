@@ -1,0 +1,90 @@
+---
+title: Spam
+icon: shield
+description: Set up and run the Reloop spam scanning backend (Rspamd) locally in Docker.
+---
+
+Rspamd spam scanner — scores inbound mail for the [inbound](/docs/setup/backend/inbound) MX receiver via HTTP `/checkv2`.
+
+<Tip>
+Run [`bun setup`](/docs/setup) for core Docker first. Spam starts with the core Compose stack (not the edge profile) because inbound depends on it.
+</Tip>
+
+
+## Overview
+
+| Property | Value |
+| :--- | :--- |
+| **Directory** | `apps/backend/spam` |
+| **Docker service** | `reloop-spam` (container `reloop-spam`) |
+| **Scan ports** | `11332`, `11333` |
+| **Web UI** | `11334` |
+| **Stack** | Rspamd · Redis |
+
+
+## Quick start
+
+```bash
+bun docker:up
+```
+
+Or rebuild after config changes:
+
+```bash
+docker compose -f local/docker-compose.yml up -d --build reloop-spam
+```
+
+Controller / scan endpoint: [http://localhost:11333](http://localhost:11333).
+
+
+## Configuration
+
+Local overrides live in `apps/backend/spam/local.d/` (mounted into the container). Redis defaults point at `reloop-redis`.
+
+Inbound wires to this service with:
+
+| Variable | Default |
+| :--- | :--- |
+| `KUMOMTA_RSPAMD_URL` | `http://reloop-spam:11333/checkv2` |
+
+
+## Commands
+
+| Command | Description |
+| :--- | :--- |
+| `bun docker:up` | Start core stack including spam |
+| `docker compose -f local/docker-compose.yml up -d --build reloop-spam` | Rebuild and start spam only |
+| `docker logs -f reloop-spam` | Stream logs |
+| `docker compose -f local/docker-compose.yml stop reloop-spam` | Stop container |
+
+
+## Architecture
+
+```
+Inbound (KumoMTA) → HTTP POST /checkv2 → Spam (Rspamd) → score / action / symbols
+```
+
+| Layer | Detail |
+| :--- | :--- |
+| **Scan API** | Accepts raw message bodies on `/checkv2` (port `11333`) |
+| **Headers** | Inbound injects `X-Spam-*` from the response for [inbox](/docs/setup/backend/inbox) |
+| **State** | Uses [Redis](/docs/setup) (`reloop-redis`) for learning / fuzzy storage |
+| **Separate deploy** | Not baked into the inbound image — own Dockerfile and CI (`be-spam`) |
+
+
+## Next
+
+<CardGroup cols={2}>
+  <Card icon="rocket" title="Setup" href="/setup">
+    One-command local bootstrap
+  </Card>
+  <Card icon="globe" title="Port reference" href="/setup/port">
+    Scan ports and conflicts
+  </Card>
+  <Card icon="mail-receive" title="Inbound" href="/setup/backend/inbound">
+    MX receiver that calls this service
+  </Card>
+  <Card icon="inbox" title="Inbox" href="/setup/backend/inbox">
+    Persists `X-Spam-*` scores from NATS
+  </Card>
+</CardGroup>

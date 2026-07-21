@@ -17,8 +17,8 @@ For detailed setup and development instructions, please refer to the [Setup Guid
 ## Architecture
 
 ```
-External Sender → Port 25 (SMTP) → Recipient Check → RSpamD Scan → NATS → Inbox Service
-                                                              ↘ discard (null queue, no SMTP egress)
+External Sender → Port 25 (SMTP) → Recipient Check → Spam (Rspamd) → NATS → Inbox Service
+                                                                 ↘ discard (null queue, no SMTP egress)
 ```
 
 ## Ports
@@ -34,7 +34,7 @@ External Sender → Port 25 (SMTP) → Recipient Check → RSpamD Scan → NATS 
 |----------|---------|-------------|
 | `INBOUND_HOSTNAME` | `inbound.reloop.sh` | EHLO hostname |
 | `NATS_URL` | `reloop-nats:4222` | NATS server URL |
-| `KUMOMTA_RSPAMD_URL` | `http://reloop-rspamd:11333/checkv2` | RSpamD scan endpoint |
+| `KUMOMTA_RSPAMD_URL` | `http://reloop-spam:11333/checkv2` | Spam (Rspamd) scan endpoint |
 | `KUMOMTA_CHECK_RECIPIENT_URL` | `http://host.docker.internal:8011/api/domain` | Recipient validation endpoint |
 | `NODE_ENV` | `production` | Environment |
 

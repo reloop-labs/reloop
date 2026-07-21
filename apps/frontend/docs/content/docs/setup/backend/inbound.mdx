@@ -4,7 +4,7 @@ icon: mail-receive
 description: Set up and run the Reloop inbound MX receiver locally in Docker.
 ---
 
-Inbound KumoMTA MX receiver — accepts external mail, scans with RSpamD, forwards to [inbox](/docs/setup/backend/inbox) via NATS.
+Inbound KumoMTA MX receiver — accepts external mail, scans with [spam](/docs/setup/backend/spam) (Rspamd), forwards to [inbox](/docs/setup/backend/inbox) via NATS.
 
 <Tip>
 Run [`bun setup`](/docs/setup) for core Docker first. Inbound is on the **edge** profile — start it with `bun docker:up:edge` or `bun setup --with-edge` (needs free port `25`).
@@ -19,7 +19,7 @@ Run [`bun setup`](/docs/setup) for core Docker first. Inbound is on the **edge**
 | **Docker service** | `inbound` (container `reloop-inbound`) |
 | **SMTP port** | `25` |
 | **HTTP port** | `8030` (health check) |
-| **Stack** | KumoMTA · Lua · RSpamD |
+| **Stack** | KumoMTA · Lua · [spam](/docs/setup/backend/spam) |
 
 
 ## Quick start
@@ -45,7 +45,7 @@ Key variables in `local/docker-compose.yml`:
 | :--- | :--- |
 | `INBOUND_HOSTNAME` | `inbound.reloop.sh` |
 | `NATS_URL` | `reloop-nats:4222` |
-| `KUMOMTA_RSPAMD_URL` | `http://reloop-rspamd:11333/checkv2` |
+| `KUMOMTA_RSPAMD_URL` | `http://reloop-spam:11333/checkv2` |
 | `KUMOMTA_CHECK_RECIPIENT_URL` | `http://host.docker.internal:8011/api/domain` |
 
 
@@ -62,14 +62,15 @@ Key variables in `local/docker-compose.yml`:
 ## Architecture
 
 ```
-External Sender → Port 25 → Recipient Check → RSpamD → NATS → Inbox
-                                                    ↘ discard (no SMTP egress)
+External Sender → Port 25 → Recipient Check → Spam (Rspamd) → NATS → Inbox
+                                                         ↘ discard (no SMTP egress)
 ```
 
 | Layer | Detail |
 | :--- | :--- |
 | **MX reception** | Accepts inbound mail on port `25` |
 | **Validation** | [domain](/docs/setup/backend/domain) service verifies recipients |
+| **Spam scan** | [spam](/docs/setup/backend/spam) backend scores mail via `/checkv2` |
 | **Forwarding** | Accepted messages published to NATS for inbox, then assigned to the `null` queue |
 | **Receive-only** | No SMTP AUTH, no HTTP inject, no outbound delivery — submission is [smtp](/docs/setup/backend/smtp) only |
 
@@ -88,5 +89,8 @@ External Sender → Port 25 → Recipient Check → RSpamD → NATS → Inbox
   </Card>
   <Card icon="globe" title="Domain" href="/setup/backend/domain">
     Recipient validation API
+  </Card>
+  <Card icon="shield" title="Spam" href="/setup/backend/spam">
+    Rspamd scan backend for inbound
   </Card>
 </CardGroup>
