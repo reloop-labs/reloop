@@ -14,6 +14,8 @@ import { inferDnsProvider } from "../utils";
 interface DNSAutoConnectBannerProps {
 	domain?: DomainResponse;
 	domainId?: string;
+	/** When true, show even if domain status is not pending/failed (e.g. setup flow). */
+	forceShow?: boolean;
 }
 
 const DNSAutoConnectBannerSkeleton = () => (
@@ -34,6 +36,7 @@ const DNSAutoConnectBannerSkeleton = () => (
 export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 	domain,
 	domainId: domainIdProp,
+	forceShow = false,
 }) => {
 	const domainId = domainIdProp || domain?.id;
 	const { data: nameserverData, isPending: isLoading } = useDomainNameserversQuery(
@@ -50,7 +53,7 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 	const status = domain?.status || "pending";
 
 	// Show only if domain status is "pending" or "failed" and DNS is not yet configured
-	if (status !== "pending" && status !== "failed") {
+	if (!forceShow && status !== "pending" && status !== "failed") {
 		return null;
 	}
 

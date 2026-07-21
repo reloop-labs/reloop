@@ -1,6 +1,5 @@
 import * as Button from "@reloop/ui/button";
 import { Skeleton } from "@reloop/ui/skeleton";
-import * as Switch from "@reloop/ui/switch";
 import { useNavigate } from "@tanstack/react-router";
 import axios from "axios";
 import * as React from "react";
@@ -9,13 +8,11 @@ import { toast } from "sonner";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { DomainNotFound } from "../../components/domain-not-found";
 import { DNSAutoConnectBanner } from "../../detail/components/dns-auto-connect-banner";
-import { groupDomainDnsRecords } from "../../detail/components/dns-record-groups";
-import { useDomainActions } from "../../detail/hooks/use-domain-actions";
+import { DNSRecordsSection } from "../../detail/components/dns-records-section";
 import {
 	useDomainDetailQuery,
 	useInvalidateDomains,
 } from "../../hooks/use-domains-query";
-import { DNSRecordSection } from "./components/dns-record-section";
 import { ForwardDNSRecordsButton } from "./components/forward-dns-records";
 
 export function DomainSetupPage({ domainId }: { domainId: string }) {
@@ -30,8 +27,6 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 		canFetch,
 	);
 	const showLoading = !canFetch || isPending || (isFetching && !domainData);
-
-	const { handleUpdateDomain } = useDomainActions(domainId, domainData);
 
 	useHotkeys("esc", () => {
 		void navigate({ to: "/domain" });
@@ -80,10 +75,6 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 		);
 	}
 
-	const groups = domainData
-		? groupDomainDnsRecords(domainData.dnsRecords)
-		: null;
-
 	return (
 		<div className="mx-auto max-w-3xl space-y-6 p-6 lg:p-8">
 			<div className="flex items-start justify-between gap-4 pt-6">
@@ -106,50 +97,11 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 				</div>
 			</div>
 
-			{!showLoading && domainData && (
-				<div className="flex items-center gap-4 rounded-xl border border-stroke-soft-100 px-4 py-3 dark:border-stroke-soft-100/40">
-					<div className="flex flex-1 items-center justify-between gap-3">
-						<div>
-							<p className="font-medium text-sm text-text-strong-950">
-								Click tracking
-							</p>
-							<p className="text-paragraph-xs text-text-sub-600">
-								Track link clicks in your emails
-							</p>
-						</div>
-						<Switch.Root
-							checked={domainData.isClickTrackingEnabled}
-							onCheckedChange={(v) =>
-								void handleUpdateDomain(
-									{ isClickTrackingEnabled: v },
-									v ? "Click tracking enabled" : "Click tracking disabled",
-								)
-							}
-						/>
-					</div>
-					<div className="flex flex-1 items-center justify-between gap-3">
-						<div>
-							<p className="font-medium text-sm text-text-strong-950">
-								Open tracking
-							</p>
-							<p className="text-paragraph-xs text-text-sub-600">
-								Track when emails are opened
-							</p>
-						</div>
-						<Switch.Root
-							checked={domainData.isOpenTrackingEnabled}
-							onCheckedChange={(v) =>
-								void handleUpdateDomain(
-									{ isOpenTrackingEnabled: v },
-									v ? "Open tracking enabled" : "Open tracking disabled",
-								)
-							}
-						/>
-					</div>
-				</div>
-			)}
-
-			<DNSAutoConnectBanner domain={domainData} domainId={domainId} />
+			<DNSAutoConnectBanner
+				domain={domainData}
+				domainId={domainId}
+				forceShow
+			/>
 
 			{showLoading ? (
 				<div className="space-y-4">
@@ -157,38 +109,12 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 					<Skeleton className="h-40 w-full rounded-xl" />
 				</div>
 			) : (
-				groups && (
-					<div className="space-y-6">
-						{(groups.sendingRecords.length > 0 ||
-							groups.dkimRecords.length > 0 ||
-							groups.dmarcRecords.length > 0) && (
-							<DNSRecordSection
-								title="Sending records"
-								records={[
-									...groups.sendingRecords,
-									...groups.dkimRecords,
-									...groups.dmarcRecords,
-								]}
-								isLoading={false}
-								docsUrl="https://reloop.sh/docs/domains"
-							/>
-						)}
-						{groups.receivingRecords.length > 0 && (
-							<DNSRecordSection
-								title="Receiving records"
-								records={groups.receivingRecords}
-								isLoading={false}
-							/>
-						)}
-						{groups.trackingRecords.length > 0 && (
-							<DNSRecordSection
-								title="Tracking records"
-								records={groups.trackingRecords}
-								isLoading={false}
-							/>
-						)}
-					</div>
-				)
+				<DNSRecordsSection
+					domain={domainData}
+					isLoading={false}
+					className="mb-0 mt-0"
+					showAutoConnectBanner={false}
+				/>
 			)}
 
 			<div className="flex items-center justify-between gap-3 border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/40">

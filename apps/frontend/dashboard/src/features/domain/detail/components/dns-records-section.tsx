@@ -12,11 +12,15 @@ import { DNSRecordTable } from "./dns-record-table";
 interface DNSRecordsSectionProps {
 	domain?: DomainResponse;
 	isLoading?: boolean;
+	className?: string;
+	showAutoConnectBanner?: boolean;
 }
 
 export const DNSRecordsSection = ({
 	domain,
 	isLoading,
+	className,
+	showAutoConnectBanner = true,
 }: DNSRecordsSectionProps) => {
 	const {
 		dkimRecords,
@@ -35,9 +39,12 @@ export const DNSRecordsSection = ({
 				!(domain?.status !== "pending" && domain?.status !== "failed")
 					? "mt-6"
 					: "",
+				className,
 			)}
 		>
-			{domain?.status && <DNSAutoConnectBanner domain={domain} />}
+			{showAutoConnectBanner && domain?.status && (
+				<DNSAutoConnectBanner domain={domain} />
+			)}
 
 			{/* Domain Verification Group */}
 			<div className="my-6 rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
