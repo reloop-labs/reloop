@@ -39,17 +39,39 @@ result = reloop.webhook.create({
 if result.webhook_error:
     raise result.webhook_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `// Webhook SDK support coming soon — use the REST API via Guzzle`,
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$webhook = $reloop->webhook->create([
+    'description' => 'Production webhook',
+    'url' => 'https://example.com/webhooks/reloop',
+    'events' => ['domain.created', 'domain.deleted'],
+]);`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `// Webhook SDK support coming soon — use the REST API`,
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.WebhookModels.CreateWebhookParams;
+import java.util.List;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+CreateWebhookParams params = new CreateWebhookParams();
+params.description = "Production webhook";
+params.url = "https://example.com/webhooks/reloop";
+params.events = List.of("domain.created", "domain.deleted");
+var webhook = reloop.webhook.create(params);`,
 	},
 	{
 		id: "dotnet",

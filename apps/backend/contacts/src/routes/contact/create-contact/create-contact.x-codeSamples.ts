@@ -55,37 +55,56 @@ result = reloop.contacts.create({
 if result.contact_error:
     raise result.contact_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
 
 $contact = $reloop->contacts->create([
     'email' => 'john.doe@example.com',
-    'first_name' => 'John',
-    'last_name' => 'Doe',
+    'firstName' => 'John',
+    'lastName' => 'Doe',
     'status' => 'subscribed',
-    'properties' => ['company' => 'Reloop', 'role' => 'Developer'],
-    'group_ids' => ['grp_123456789'],
-    'channels' => [['channel_id' => 'chn_123456789', 'subscription' => 'opt_in']],
+    'properties' => [
+        'company' => 'Reloop',
+        'role' => 'Developer',
+    ],
+    'groupIds' => ['grp_123456789'],
+    'channels' => [
+        [
+            'channelId' => 'chn_123456789',
+            'subscription' => 'opt_in',
+        ],
+    ],
 ]);`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+import sh.reloop.models.ContactModels.CreateContactParams;
+import java.util.Map;
+import java.util.List;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-Contact contact = reloop.contacts.create(Map.of(
-    "email", "john.doe@example.com",
-    "firstName", "John",
-    "lastName", "Doe",
-    "status", "subscribed"
-));`,
+CreateContactParams params = new CreateContactParams();
+params.email = "john.doe@example.com";
+params.firstName = "John";
+params.lastName = "Doe";
+params.status = "subscribed";
+params.properties = Map.of("company", "Reloop", "role", "Developer");
+params.groupIds = List.of("grp_123456789");
+params.channels = List.of(Map.of("channelId", "chn_123456789", "subscription", "opt_in"));
+var contact = reloop.contacts.create(params);`,
 	},
 	{
 		id: "dotnet",

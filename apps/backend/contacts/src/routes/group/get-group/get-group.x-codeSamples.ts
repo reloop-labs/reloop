@@ -35,24 +35,31 @@ if result.group_error:
 
 print(result.group["id"], result.group["name"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$group = $reloop->contacts->getGroup('grp_123456789');`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$group = $reloop->contacts->groups->get('grp_123456789');
+echo $group['id'] . ' ' . $group['name'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.contacts.getGroup("grp_123456789");`,
+var group = reloop.contacts.groups.get("grp_123456789");
+System.out.println(group.id + " " + group.name);`,
 	},
 	{
 		id: "dotnet",

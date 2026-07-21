@@ -51,12 +51,29 @@ _apiData:
       lang: php
       label: PHP
       source: |-
-        // Inbox SDK support coming soon — use the REST API
+        <?php
+        
+        require 'vendor/autoload.php';
+        
+        use Reloop\Reloop;
+        
+        $reloop = Reloop::client('rl_123456789');
+        
+        $message = $reloop->inbox->messages->replyAll('msg_123456789', [
+            'html' => '<p>Thanks everyone.</p>',
+        ]);
     - id: java
       lang: java
       label: Java
       source: |-
-        // Inbox SDK support coming soon — use the REST API
+        import sh.reloop.ReloopClient;
+        import sh.reloop.models.InboxModels.ReplyMessageParams;
+        
+        ReloopClient reloop = new ReloopClient("rl_123456789");
+        
+        ReplyMessageParams params = new ReplyMessageParams();
+        params.html = "<p>Thanks everyone.</p>";
+        var message = reloop.inbox.messages.replyAll("msg_123456789", params);
     - id: dotnet
       lang: csharp
       label: .NET

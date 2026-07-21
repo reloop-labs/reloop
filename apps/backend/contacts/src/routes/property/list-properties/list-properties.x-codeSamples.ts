@@ -41,24 +41,38 @@ if result.property_error:
 
 print(result.properties["total"], result.properties["properties"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$properties = $reloop->contacts->listProperties(['page' => 1, 'limit' => 10]);`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$properties = $reloop->contacts->properties->list([
+    'page' => 1,
+    'limit' => 10,
+]);
+echo $properties['total'] . ' ' . $properties['properties'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+import sh.reloop.models.ContactModels.ListPropertiesParams;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.contacts.listProperties(Map.of("page", 1, "limit", 10));`,
+ListPropertiesParams params = new ListPropertiesParams();
+params.page = 1;
+params.limit = 10;
+var properties = reloop.contacts.properties.list(params);
+System.out.println(properties.total + " " + properties.properties);`,
 	},
 	{
 		id: "dotnet",

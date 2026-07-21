@@ -7,6 +7,7 @@ export const languages = [
 	{ id: "nodejs", label: "Node", shikiLang: "javascript" },
 	{ id: "python", label: "Python", shikiLang: "python" },
 	{ id: "php", label: "PHP", shikiLang: "php" },
+	{ id: "java", label: "Java", shikiLang: "java" },
 ] as const;
 
 export const operations = [
@@ -242,29 +243,154 @@ if result.api_key_error:
 print(result.api_key["id"], result.api_key["enabled"])`,
 	},
 	php: {
-		create: `$reloop = Reloop::client('rl_123456789');
+		create: `<?php
 
-$apiKey = $reloop->apiKeys->create(['name' => 'Production Key']);`,
-		list: `$reloop = Reloop::client('rl_123456789');
+require 'vendor/autoload.php';
 
-$apiKeys = $reloop->apiKeys->list(['page' => 1, 'limit' => 10]);`,
-		get: `$reloop = Reloop::client('rl_123456789');
+use Reloop\\Reloop;
 
-$reloop->apiKeys->get('key_123456789');`,
-		update: `$reloop = Reloop::client('rl_123456789');
+$reloop = Reloop::client('rl_123456789');
 
-$apiKey = $reloop->apiKeys->update('key_123456789', ['name' => 'Updated Key Name']);`,
-		delete: `$reloop = Reloop::client('rl_123456789');
+$apiKey = $reloop->apiKey->create([
+    'name' => 'Production Key',
+]);
+echo $apiKey['id'] . ' ' . $apiKey['key'] . PHP_EOL;`,
+		list: `<?php
 
-$reloop->apiKeys->delete('key_123456789');`,
-		rotate: `$reloop = Reloop::client('rl_123456789');
+require 'vendor/autoload.php';
 
-$reloop->apiKeys->rotate('key_123456789');`,
-		enable: `$reloop = Reloop::client('rl_123456789');
+use Reloop\\Reloop;
 
-$reloop->apiKeys->enable('key_123456789');`,
-		disable: `$reloop = Reloop::client('rl_123456789');
+$reloop = Reloop::client('rl_123456789');
 
-$reloop->apiKeys->disable('key_123456789');`,
+$apiKeys = $reloop->apiKey->list([
+    'page' => 1,
+    'limit' => 10,
+    'enabled' => true,
+]);
+echo $apiKeys['total'] . ' ' . $apiKeys['apiKeys'] . PHP_EOL;`,
+		get: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$apiKey = $reloop->apiKey->get('key_123456789');
+echo $apiKey['id'] . ' ' . $apiKey['name'] . ' ' . $apiKey['enabled'] . PHP_EOL;`,
+		update: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$apiKey = $reloop->apiKey->update('key_123456789', [
+    'name' => 'Updated Key Name',
+]);
+echo $apiKey['id'] . ' ' . $apiKey['name'] . PHP_EOL;`,
+		delete: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$apiKey = $reloop->apiKey->delete('key_123456789');
+echo $apiKey['id'] . ' ' . $apiKey['message'] . PHP_EOL;`,
+		rotate: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$apiKey = $reloop->apiKey->rotate('key_123456789');
+echo $apiKey['id'] . ' ' . $apiKey['key'] . PHP_EOL;`,
+		enable: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$apiKey = $reloop->apiKey->enable('key_123456789');
+echo $apiKey['id'] . ' ' . $apiKey['enabled'] . PHP_EOL;`,
+		disable: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$apiKey = $reloop->apiKey->disable('key_123456789');
+echo $apiKey['id'] . ' ' . $apiKey['enabled'] . PHP_EOL;`,
+	},
+	java: {
+		create: `import sh.reloop.ReloopClient;
+import sh.reloop.models.ApiKeyModels.CreateApiKeyParams;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+CreateApiKeyParams params = new CreateApiKeyParams();
+params.name = "Production Key";
+var apiKey = reloop.apiKey.create(params);
+System.out.println(apiKey.id + " " + apiKey.key);`,
+		list: `import sh.reloop.ReloopClient;
+import sh.reloop.models.ApiKeyModels.ApiKeyListParams;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+ApiKeyListParams params = new ApiKeyListParams();
+params.page = 1;
+params.limit = 10;
+params.enabled = true;
+var apiKeys = reloop.apiKey.list(params);
+System.out.println(apiKeys.total + " " + apiKeys.apiKeys);`,
+		get: `import sh.reloop.ReloopClient;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+var apiKey = reloop.apiKey.get("key_123456789");
+System.out.println(apiKey.id + " " + apiKey.name + " " + apiKey.enabled);`,
+		update: `import sh.reloop.ReloopClient;
+import sh.reloop.models.ApiKeyModels.UpdateApiKeyParams;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+UpdateApiKeyParams params = new UpdateApiKeyParams();
+params.name = "Updated Key Name";
+var apiKey = reloop.apiKey.update("key_123456789", params);
+System.out.println(apiKey.id + " " + apiKey.name);`,
+		delete: `import sh.reloop.ReloopClient;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+var apiKey = reloop.apiKey.delete("key_123456789");
+System.out.println(apiKey.id + " " + apiKey.message);`,
+		rotate: `import sh.reloop.ReloopClient;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+var apiKey = reloop.apiKey.rotate("key_123456789");
+System.out.println(apiKey.id + " " + apiKey.key);`,
+		enable: `import sh.reloop.ReloopClient;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+var apiKey = reloop.apiKey.enable("key_123456789");
+System.out.println(apiKey.id + " " + apiKey.enabled);`,
+		disable: `import sh.reloop.ReloopClient;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+var apiKey = reloop.apiKey.disable("key_123456789");
+System.out.println(apiKey.id + " " + apiKey.enabled);`,
 	},
 };

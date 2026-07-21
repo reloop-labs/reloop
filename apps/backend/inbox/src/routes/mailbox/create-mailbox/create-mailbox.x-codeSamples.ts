@@ -39,17 +39,38 @@ result = reloop.inbox.mailboxes.create({
 if result.mailbox_error:
     raise result.mailbox_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$mailbox = $reloop->inbox->mailboxes->create([
+    'domainId' => 'dom_123456789',
+    'email' => 'support@example.com',
+    'displayName' => 'Support',
+]);`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.InboxModels.CreateMailboxParams;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+CreateMailboxParams params = new CreateMailboxParams();
+params.domainId = "dom_123456789";
+params.email = "support@example.com";
+params.displayName = "Support";
+var mailbox = reloop.inbox.mailboxes.create(params);`,
 	},
 	{
 		id: "dotnet",

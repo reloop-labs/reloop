@@ -68,35 +68,48 @@ _apiData:
       lang: php
       label: PHP
       source: |-
+        <?php
+        
+        require 'vendor/autoload.php';
+        
+        use Reloop\Reloop;
+        
         $reloop = Reloop::client('rl_123456789');
         
-        $result = $reloop->mail->send([
+        $response = $reloop->mail->send([
             'from' => 'Reloop <hello@send.example.com>',
             'to' => 'user@example.com',
             'subject' => 'Welcome to Reloop',
             'html' => '<p>Thanks for signing up.</p>',
             'text' => 'Thanks for signing up.',
             'reply_to' => 'support@example.com',
-            'tags' => [['name' => 'campaign', 'value' => 'welcome']],
+            'tags' => [
+                [
+                    'name' => 'campaign',
+                    'value' => 'welcome',
+                ],
+            ],
         ]);
     - id: java
       lang: java
       label: Java
       source: |-
         import sh.reloop.ReloopClient;
-        import java.util.*;
+        import sh.reloop.models.MailModels.SendMailParams;
+        import sh.reloop.models.MailModels.SendMailTag;
+        import java.util.List;
         
         ReloopClient reloop = new ReloopClient("rl_123456789");
         
-        Map<String, Object> params = new HashMap<>();
-        params.put("from", "Reloop <hello@send.example.com>");
-        params.put("to", "user@example.com");
-        params.put("subject", "Welcome to Reloop");
-        params.put("html", "<p>Thanks for signing up.</p>");
-        params.put("text", "Thanks for signing up.");
-        params.put("reply_to", "support@example.com");
-        params.put("tags", List.of(Map.of("name", "campaign", "value", "welcome")));
-        SendMailResponse result = reloop.mail.send(params);
+        SendMailParams params = new SendMailParams();
+        params.from = "Reloop <hello@send.example.com>";
+        params.to = "user@example.com";
+        params.subject = "Welcome to Reloop";
+        params.html = "<p>Thanks for signing up.</p>";
+        params.text = "Thanks for signing up.";
+        params.replyTo = "support@example.com";
+        params.tags = List.of(new SendMailTag("campaign", "welcome"));
+        var response = reloop.mail.send(params);
     - id: dotnet
       lang: csharp
       label: .NET

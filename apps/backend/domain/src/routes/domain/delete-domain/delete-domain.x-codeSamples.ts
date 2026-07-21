@@ -35,24 +35,31 @@ if result.domain_error:
 
 print(result.domain["id"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$result = $reloop->domain->delete('dom_123456789');`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$domain = $reloop->domain->delete('dom_123456789');
+echo $domain['id'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-var result = reloop.domain.delete("dom_123456789");`,
+var domain = reloop.domain.delete("dom_123456789");
+System.out.println(domain.id);`,
 	},
 	{
 		id: "dotnet",

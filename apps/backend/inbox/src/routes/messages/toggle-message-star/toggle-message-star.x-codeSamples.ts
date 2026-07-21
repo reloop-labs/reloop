@@ -35,17 +35,34 @@ result = reloop.inbox.messages.setStar("msg_123456789", {
 if result.message_error:
     raise result.message_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$message = $reloop->inbox->messages->setStar('msg_123456789', [
+    'isStarred' => true,
+]);`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.InboxModels.SetStarParams;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+SetStarParams params = new SetStarParams();
+params.isStarred = true;
+var message = reloop.inbox.messages.setStar("msg_123456789", params);`,
 	},
 	{
 		id: "dotnet",

@@ -51,11 +51,17 @@ if result.domain_error:
 
 print(result.domain["id"], result.domain["domain"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
 
 $domain = $reloop->domain->create([
     'domain' => 'send.example.com',
@@ -64,27 +70,27 @@ $domain = $reloop->domain->create([
     'tls' => 'opportunistic',
     'sending_email' => true,
     'receiving_email' => false,
-]);`,
+]);
+echo $domain['id'] . ' ' . $domain['domain'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+import sh.reloop.models.DomainModels.CreateDomainParams;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-Domain domain = reloop.domain.create(
-    new CreateDomainParams(
-        "send.example.com",
-        true,
-        true,
-        "opportunistic",
-        true,
-        false
-    )
-);`,
+CreateDomainParams params = new CreateDomainParams();
+params.domain = "send.example.com";
+params.clickTracking = true;
+params.openTracking = true;
+params.tls = "opportunistic";
+params.sendingEmail = true;
+params.receivingEmail = false;
+var domain = reloop.domain.create(params);
+System.out.println(domain.id + " " + domain.domain);`,
 	},
 	{
 		id: "dotnet",

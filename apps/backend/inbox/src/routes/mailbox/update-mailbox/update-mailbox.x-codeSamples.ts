@@ -35,17 +35,34 @@ result = reloop.inbox.mailboxes.update("mbx_123456789", {
 if result.mailbox_error:
     raise result.mailbox_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$mailbox = $reloop->inbox->mailboxes->update('mbx_123456789', [
+    'status' => 'disabled',
+]);`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.InboxModels.UpdateMailboxParams;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+UpdateMailboxParams params = new UpdateMailboxParams();
+params.status = "disabled";
+var mailbox = reloop.inbox.mailboxes.update("mbx_123456789", params);`,
 	},
 	{
 		id: "dotnet",

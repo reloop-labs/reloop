@@ -41,24 +41,38 @@ if result.channel_error:
 
 print(result.channels["total"], result.channels["channels"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$channels = $reloop->contacts->channels->list(['page' => 1, 'limit' => 10]);`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$channels = $reloop->contacts->channels->list([
+    'page' => 1,
+    'limit' => 10,
+]);
+echo $channels['total'] . ' ' . $channels['channels'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+import sh.reloop.models.ContactModels.ListChannelsParams;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.contacts.channels.list(Map.of("page", 1, "limit", 10));`,
+ListChannelsParams params = new ListChannelsParams();
+params.page = 1;
+params.limit = 10;
+var channels = reloop.contacts.channels.list(params);
+System.out.println(channels.total + " " + channels.channels);`,
 	},
 	{
 		id: "dotnet",

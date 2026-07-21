@@ -43,24 +43,40 @@ if result.domain_error:
 
 print(result.domains["total"], result.domains["domains"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$domains = $reloop->domain->list(['page' => 1, 'limit' => 10, 'status' => 'active']);`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$domains = $reloop->domain->list([
+    'page' => 1,
+    'limit' => 10,
+    'status' => 'active',
+]);
+echo $domains['total'] . ' ' . $domains['domains'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+import sh.reloop.models.DomainModels.ListDomainsParams;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-DomainListResponse domains = reloop.domain.list(new ListDomainsParams(1, 10, null, "active"));`,
+ListDomainsParams params = new ListDomainsParams();
+params.page = 1;
+params.limit = 10;
+params.status = "active";
+var domains = reloop.domain.list(params);
+System.out.println(domains.total + " " + domains.domains);`,
 	},
 	{
 		id: "dotnet",

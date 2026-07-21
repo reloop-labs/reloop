@@ -35,17 +35,35 @@ result = reloop.inbox.messages.batch({
 if result.message_error:
     raise result.message_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$messages = $reloop->inbox->messages->batch([
+    'ids' => ['msg_123456789', 'msg_987654321'],
+]);`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.InboxModels.BatchMessagesParams;
+import java.util.List;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+BatchMessagesParams params = new BatchMessagesParams();
+params.ids = List.of("msg_123456789", "msg_987654321");
+var messages = reloop.inbox.messages.batch(params);`,
 	},
 	{
 		id: "dotnet",

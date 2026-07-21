@@ -41,24 +41,36 @@ if result.group_error:
 
 print(result.group["id"], result.group["name"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$group = $reloop->contacts->createGroup(['name' => 'Beta Testers']);`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$group = $reloop->contacts->groups->create([
+    'name' => 'Beta Testers',
+]);
+echo $group['id'] . ' ' . $group['name'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+import sh.reloop.models.ContactModels.CreateGroupParams;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.contacts.createGroup(Map.of("name", "Beta Testers"));`,
+CreateGroupParams params = new CreateGroupParams();
+params.name = "Beta Testers";
+var group = reloop.contacts.groups.create(params);
+System.out.println(group.id + " " + group.name);`,
 	},
 	{
 		id: "dotnet",

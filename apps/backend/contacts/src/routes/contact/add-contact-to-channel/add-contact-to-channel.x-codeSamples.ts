@@ -43,24 +43,38 @@ if result.channel_error:
 
 print(result.channel["subscriptionId"], result.channel["contact"].id)`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$reloop->contacts->channels->addContact('chn_123456789', ['contact_id' => 'con_123456789', 'subscription' => 'opt_in']);`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$channel = $reloop->contacts->channels->addContact('chn_123456789', [
+    'contact_id' => 'con_123456789',
+    'subscription' => 'opt_in',
+]);
+echo $channel['subscriptionId'] . ' ' . $channel['contact'].id . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+import sh.reloop.models.ContactModels.AddChannelContactParams;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.contacts.channels.addContact("chn_123456789", Map.of("contact_id", "con_123456789", "subscription", "opt_in"));`,
+AddChannelContactParams params = new AddChannelContactParams();
+params.contactId = "con_123456789";
+params.subscription = "opt_in";
+var channel = reloop.contacts.channels.addContact("chn_123456789", params);
+System.out.println(channel.subscriptionId + " " + channel.contact.id);`,
 	},
 	{
 		id: "dotnet",

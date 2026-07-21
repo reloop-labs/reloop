@@ -41,24 +41,36 @@ if result.api_key_error:
 
 print(result.api_key["id"], result.api_key["key"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$apiKey = $reloop->apiKeys->create(['name' => 'Production Key']);`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$apiKey = $reloop->apiKey->create([
+    'name' => 'Production Key',
+]);
+echo $apiKey['id'] . ' ' . $apiKey['key'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+import sh.reloop.models.ApiKeyModels.CreateApiKeyParams;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-ApiKeyWithKey apiKey = reloop.apiKeys.create(new CreateApiKeyParams("Production Key"));`,
+CreateApiKeyParams params = new CreateApiKeyParams();
+params.name = "Production Key";
+var apiKey = reloop.apiKey.create(params);
+System.out.println(apiKey.id + " " + apiKey.key);`,
 	},
 	{
 		id: "dotnet",

@@ -37,24 +37,31 @@ if result.property_error:
 
 print(result.property["id"], result.property["success"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$reloop->contacts->deleteProperty('prop_123456789');`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$property = $reloop->contacts->properties->delete('prop_123456789');
+echo $property['id'] . ' ' . $property['success'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.contacts.deleteProperty("prop_123456789");`,
+var property = reloop.contacts.properties.delete("prop_123456789");
+System.out.println(property.id + " " + property.success);`,
 	},
 	{
 		id: "dotnet",

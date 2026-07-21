@@ -37,17 +37,38 @@ result = reloop.webhook.listDeliveries("wh_123456789", {
 if result.webhook_error:
     raise result.webhook_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `// Webhook SDK support coming soon`,
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$deliveries = $reloop->webhook->listDeliveries('wh_123456789', [
+    'page' => 1,
+    'limit' => 10,
+    'status' => 'failed',
+]);`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `// Webhook SDK support coming soon`,
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.WebhookModels.ListWebhookDeliveriesParams;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+ListWebhookDeliveriesParams params = new ListWebhookDeliveriesParams();
+params.page = 1;
+params.limit = 10;
+params.status = "failed";
+var deliveries = reloop.webhook.listDeliveries("wh_123456789", params);`,
 	},
 	{
 		id: "dotnet",

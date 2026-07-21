@@ -37,17 +37,38 @@ result = reloop.webhook.list({
 if result.webhook_error:
     raise result.webhook_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `// Webhook SDK support coming soon`,
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$webhooks = $reloop->webhook->list([
+    'page' => 1,
+    'limit' => 10,
+    'status' => 'active',
+]);`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `// Webhook SDK support coming soon`,
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.WebhookModels.ListWebhooksParams;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+ListWebhooksParams params = new ListWebhooksParams();
+params.page = 1;
+params.limit = 10;
+params.status = "active";
+var webhooks = reloop.webhook.list(params);`,
 	},
 	{
 		id: "dotnet",

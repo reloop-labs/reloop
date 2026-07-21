@@ -31,17 +31,34 @@ result = reloop.inbox.threads.list({
 if result.thread_error:
     raise result.thread_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$threads = $reloop->inbox->threads->list([
+    'limit' => 50,
+]);`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.InboxModels.ListThreadsParams;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+ListThreadsParams params = new ListThreadsParams();
+params.limit = 50;
+var threads = reloop.inbox.threads.list(params);`,
 	},
 	{
 		id: "dotnet",

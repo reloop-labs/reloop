@@ -41,17 +41,40 @@ result = reloop.inbox.messages.send({
 if result.message_error:
     raise result.message_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$message = $reloop->inbox->messages->send([
+    'mailboxId' => 'mbx_123456789',
+    'to' => 'user@example.com',
+    'subject' => 'Hello from Reloop Inbox',
+    'html' => '<p>Thanks for reaching out.</p>',
+]);`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.InboxModels.SendMessageParams;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+SendMessageParams params = new SendMessageParams();
+params.mailboxId = "mbx_123456789";
+params.to = "user@example.com";
+params.subject = "Hello from Reloop Inbox";
+params.html = "<p>Thanks for reaching out.</p>";
+var message = reloop.inbox.messages.send(params);`,
 	},
 	{
 		id: "dotnet",

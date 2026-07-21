@@ -43,24 +43,38 @@ if result.channel_error:
 
 print(result.channel["status"], result.channel["success"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$reloop->contacts->channels->updateSubscription('chn_123456789', ['contact_id' => 'con_123456789', 'subscription' => 'opt_out']);`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$channel = $reloop->contacts->channels->updateSubscription('chn_123456789', [
+    'contact_id' => 'con_123456789',
+    'subscription' => 'opt_out',
+]);
+echo $channel['status'] . ' ' . $channel['success'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+import sh.reloop.models.ContactModels.UpdateChannelSubscriptionParams;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.contacts.channels.updateSubscription("chn_123456789", Map.of("contact_id", "con_123456789", "subscription", "opt_out"));`,
+UpdateChannelSubscriptionParams params = new UpdateChannelSubscriptionParams();
+params.contactId = "con_123456789";
+params.subscription = "opt_out";
+var channel = reloop.contacts.channels.updateSubscription("chn_123456789", params);
+System.out.println(channel.status + " " + channel.success);`,
 	},
 	{
 		id: "dotnet",

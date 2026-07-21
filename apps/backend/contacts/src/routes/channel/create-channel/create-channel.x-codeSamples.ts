@@ -47,34 +47,42 @@ if result.channel_error:
 
 print(result.channel["id"], result.channel["name"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
 
 $channel = $reloop->contacts->channels->create([
     'name' => 'Product Updates',
     'description' => 'Get the latest news about our products',
-    'default_subscription' => 'opt_in',
+    'defaultSubscription' => 'opt_in',
     'visibility' => 'public',
-]);`,
+]);
+echo $channel['id'] . ' ' . $channel['name'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+import sh.reloop.models.ContactModels.CreateChannelParams;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.contacts.channels.create(Map.of(
-    "name", "Product Updates",
-    "description", "Get the latest news about our products",
-    "defaultSubscription", "opt_in",
-    "visibility", "public"
-));`,
+CreateChannelParams params = new CreateChannelParams();
+params.name = "Product Updates";
+params.description = "Get the latest news about our products";
+params.defaultSubscription = "opt_in";
+params.visibility = "public";
+var channel = reloop.contacts.channels.create(params);
+System.out.println(channel.id + " " + channel.name);`,
 	},
 	{
 		id: "dotnet",

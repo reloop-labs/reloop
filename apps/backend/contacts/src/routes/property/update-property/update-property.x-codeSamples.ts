@@ -42,24 +42,36 @@ if result.property_error:
 
 print(result.property["id"], result.property["defaultValue"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$property = $reloop->contacts->updateProperty('prop_123456789', ['fallback_value' => 'N/A']);`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$property = $reloop->contacts->properties->update('prop_123456789', [
+    'fallbackValue' => 'N/A',
+]);
+echo $property['id'] . ' ' . $property['defaultValue'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+import sh.reloop.models.ContactModels.UpdatePropertyParams;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.contacts.updateProperty("prop_123456789", Map.of("fallbackValue", "N/A"));`,
+UpdatePropertyParams params = new UpdatePropertyParams();
+params.fallbackValue = "N/A";
+var property = reloop.contacts.properties.update("prop_123456789", params);
+System.out.println(property.id + " " + property.defaultValue);`,
 	},
 	{
 		id: "dotnet",
