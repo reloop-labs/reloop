@@ -5,7 +5,9 @@ import { domainsRoute } from "@reloop/admin/routes/admin/domains/domains.route";
 import { emailsRoute } from "@reloop/admin/routes/admin/emails/emails.route";
 import { organizationsRoute } from "@reloop/admin/routes/admin/organizations/organizations.route";
 import { overviewRoute } from "@reloop/admin/routes/admin/overview/overview.route";
+import { searchRoute } from "@reloop/admin/routes/admin/search/search.route";
 import { supportRoute } from "@reloop/admin/routes/admin/support/support.route";
+import { usersRoute } from "@reloop/admin/routes/admin/users/users.route";
 import { Elysia } from "elysia";
 
 export const adminRoutes = new Elysia({
@@ -14,6 +16,8 @@ export const adminRoutes = new Elysia({
 })
 	.use(authMiddleware)
 	.use(overviewRoute)
+	.use(searchRoute)
+	.use(usersRoute)
 	.use(organizationsRoute)
 	.use(domainsRoute)
 	.use(creditsRoute)

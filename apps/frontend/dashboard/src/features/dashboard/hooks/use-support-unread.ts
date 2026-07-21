@@ -24,6 +24,8 @@ export function clearSupportUnreadInCache(
 export function useSupportUnread() {
 	const queryClient = useQueryClient();
 	const { isAiPanelOpen, aiPanelActiveTab } = useUIStore();
+	// Ask AI is currently disabled — panel is support-only, but keep the
+	// tab check so re-enabling AI does not mark support as "open" incorrectly.
 	const supportOpen = isAiPanelOpen && aiPanelActiveTab === "support";
 
 	const { data: count = 0, refetch: mutateUnread } = useQuery({

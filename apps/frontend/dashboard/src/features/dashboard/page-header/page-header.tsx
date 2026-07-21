@@ -10,6 +10,8 @@ import { UserDropdown } from "./user-dropdown";
 /**
  * Top bar for the main content panel: workspace switcher + global actions.
  * Matches the Next dashboard PageHeader chrome (without settings gear).
+ *
+ * Ask AI entry is hidden until the assistant API is wired up.
  */
 export function PageHeader() {
 	const {
@@ -25,6 +27,8 @@ export function PageHeader() {
 		setAiPanelActiveTab,
 	} = useUIStore();
 	const { unreadCount } = useSupportUnread();
+
+	const supportOpen = isAiPanelOpen && aiPanelActiveTab === "support";
 
 	return (
 		<div className="sticky top-0 z-10 flex h-11 shrink-0 items-center justify-between border-stroke-soft-100 border-b pr-3 pl-3 dark:border-stroke-soft-100/40">
@@ -43,42 +47,8 @@ export function PageHeader() {
 					mode="ghost"
 					size="xxsmall"
 					className={cn(
-						"gap-1.5 text-text-sub-600 hover:text-text-strong-950",
-						isAiPanelOpen &&
-							aiPanelActiveTab === "ai" &&
-							"bg-bg-weak-50 text-text-strong-950",
-					)}
-					type="button"
-					title="Ask AI"
-					onClick={() => {
-						if (!isAiPanelOpen) {
-							setAiPanelActiveTab("ai");
-							setIsAiPanelOpen(true);
-						} else if (aiPanelActiveTab === "ai") {
-							setIsAiPanelOpen(false);
-						} else {
-							setAiPanelActiveTab("ai");
-						}
-					}}
-				>
-					<Icon
-						name="sparkling"
-						className="h-4 w-4 text-purple-600 dark:text-purple-400"
-					/>
-					<span className="bg-gradient-to-r from-[#A855F7] to-[#EC4899] bg-clip-text font-medium text-transparent">
-						Ask AI
-					</span>
-				</Button.Root>
-
-				<Button.Root
-					variant="neutral"
-					mode="ghost"
-					size="xxsmall"
-					className={cn(
 						"relative gap-1.5 text-text-sub-600 hover:text-text-strong-950",
-						isAiPanelOpen &&
-							aiPanelActiveTab === "support" &&
-							"bg-bg-weak-50 text-text-strong-950",
+						supportOpen && "bg-bg-weak-50 text-text-strong-950",
 					)}
 					type="button"
 					title="Support"
@@ -90,6 +60,7 @@ export function PageHeader() {
 							setIsAiPanelOpen(false);
 						} else {
 							setAiPanelActiveTab("support");
+							setIsAiPanelOpen(true);
 						}
 					}}
 				>

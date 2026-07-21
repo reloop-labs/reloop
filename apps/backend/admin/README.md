@@ -38,3 +38,14 @@ Only users with `user.role === "super-admin"` (Better Auth platform role) can ac
 - Credits top-up (`POST /api/credits/v1/topup`)
 
 Org-level `member.role = admin` is **not** sufficient.
+
+## Operator console features
+
+- **⌘K / Ctrl+K** — global search (users, orgs, domains) + quick actions + page jump
+- **Overview** — attention queue, usage-ranked quick actions, clickable KPIs, recent audit
+- **User hub** — `/users/:id` (orgs, credits, support threads, ban / promote / impersonate)
+- **Support side panel** — top-up, impersonate, open user/org hub, failed emails, suspend
+- Sidebar: Overview, Support, Audit, Organizations, Users.
+- Domains, emails, and credit ledgers live on **org hubs** (utility routes `/domains`, `/emails`, `/credits` remain for deep links from Overview / hubs).
+- Deep links: `/domains?status=failed`, `/emails?status=bounced`, `/credits?organizationId=…`, `/organizations?status=suspended`, `/users?q=…`, `/support?c=…`
+- Quick-action order is personal (localStorage) based on frequency + recency

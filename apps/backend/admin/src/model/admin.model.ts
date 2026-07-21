@@ -13,6 +13,31 @@ export namespace AdminModel {
 		q: t.Optional(t.String()),
 	});
 
+	export const overviewAttentionItem = t.Object({
+		id: t.String(),
+		severity: t.Union([
+			t.Literal("critical"),
+			t.Literal("warning"),
+			t.Literal("info"),
+		]),
+		title: t.String(),
+		description: t.String(),
+		href: t.String(),
+		count: t.Number(),
+	});
+
+	export const overviewRecentAuditItem = t.Object({
+		id: t.String(),
+		actorUserId: t.String(),
+		actorEmail: t.Union([t.String(), t.Null()]),
+		actorName: t.Union([t.String(), t.Null()]),
+		action: t.String(),
+		resourceType: t.String(),
+		resourceId: t.Union([t.String(), t.Null()]),
+		organizationId: t.Union([t.String(), t.Null()]),
+		createdAt: t.Date(),
+	});
+
 	export const overviewResponse = t.Object({
 		users: t.Number(),
 		organizations: t.Object({
@@ -34,6 +59,97 @@ export namespace AdminModel {
 		credits: t.Object({
 			totalRemaining: t.Number(),
 		}),
+		support: t.Object({
+			openConversations: t.Number(),
+			unreadMessages: t.Number(),
+		}),
+		attention: t.Array(overviewAttentionItem),
+		recentAudit: t.Array(overviewRecentAuditItem),
+	});
+
+	export const searchUserItem = t.Object({
+		id: t.String(),
+		name: t.String(),
+		email: t.String(),
+		role: t.String(),
+		banned: t.Boolean(),
+	});
+
+	export const searchOrganizationItem = t.Object({
+		id: t.String(),
+		name: t.String(),
+		slug: t.String(),
+		status: t.String(),
+	});
+
+	export const searchDomainItem = t.Object({
+		id: t.String(),
+		domain: t.String(),
+		status: t.String(),
+		organizationId: t.String(),
+		organizationName: t.String(),
+	});
+
+	export const searchResponse = t.Object({
+		users: t.Array(searchUserItem),
+		organizations: t.Array(searchOrganizationItem),
+		domains: t.Array(searchDomainItem),
+	});
+
+	export const userDetail = t.Object({
+		id: t.String(),
+		name: t.String(),
+		email: t.String(),
+		image: t.Union([t.String(), t.Null()]),
+		role: t.String(),
+		banned: t.Boolean(),
+		banReason: t.Union([t.String(), t.Null()]),
+		banExpires: t.Union([t.Date(), t.Null()]),
+		emailVerified: t.Boolean(),
+		activeOrganizationId: t.Union([t.String(), t.Null()]),
+		createdAt: t.Date(),
+		updatedAt: t.Date(),
+		organizations: t.Array(
+			t.Object({
+				memberId: t.String(),
+				role: t.String(),
+				joinedAt: t.Date(),
+				id: t.String(),
+				name: t.String(),
+				slug: t.String(),
+				status: t.String(),
+				billingEmail: t.Union([t.String(), t.Null()]),
+				domainCount: t.Number(),
+				creditsRemaining: t.Union([t.Number(), t.Null()]),
+				creditsUsed: t.Union([t.Number(), t.Null()]),
+				monthlyCredits: t.Union([t.Number(), t.Null()]),
+			}),
+		),
+		apiKeys: t.Array(
+			t.Object({
+				id: t.String(),
+				name: t.Union([t.String(), t.Null()]),
+				prefix: t.Union([t.String(), t.Null()]),
+				start: t.Union([t.String(), t.Null()]),
+				enabled: t.Boolean(),
+				organizationId: t.String(),
+				organizationName: t.String(),
+				requestCount: t.Number(),
+				lastRequest: t.Union([t.Date(), t.Null()]),
+				expiresAt: t.Union([t.Date(), t.Null()]),
+				createdAt: t.Date(),
+			}),
+		),
+		supportConversations: t.Array(
+			t.Object({
+				id: t.String(),
+				status: t.Union([t.Literal("open"), t.Literal("closed")]),
+				organizationId: t.Union([t.String(), t.Null()]),
+				lastMessageAt: t.Date(),
+				lastMessagePreview: t.Union([t.String(), t.Null()]),
+				createdAt: t.Date(),
+			}),
+		),
 	});
 
 	export const organizationItem = t.Object({
@@ -42,6 +158,7 @@ export namespace AdminModel {
 		slug: t.String(),
 		status: t.String(),
 		createdAt: t.Date(),
+		billingEmail: t.Union([t.String(), t.Null()]),
 		memberCount: t.Number(),
 		domainCount: t.Number(),
 		creditsRemaining: t.Union([t.Number(), t.Null()]),
@@ -58,25 +175,34 @@ export namespace AdminModel {
 		slug: t.String(),
 		status: t.String(),
 		createdAt: t.Date(),
+		updatedAt: t.Date(),
 		billingEmail: t.Union([t.String(), t.Null()]),
-		members: t.Array(
-			t.Object({
-				id: t.String(),
-				role: t.String(),
-				userId: t.String(),
-				userName: t.String(),
-				userEmail: t.String(),
-				createdAt: t.Date(),
+		billingName: t.Union([t.String(), t.Null()]),
+		logo: t.Union([t.String(), t.Null()]),
+		externalCustomerId: t.Union([t.String(), t.Null()]),
+		counts: t.Object({
+			members: t.Number(),
+			domains: t.Number(),
+			apiKeys: t.Number(),
+			templates: t.Number(),
+			webhooks: t.Number(),
+			emails: t.Number(),
+			supportThreads: t.Number(),
+		}),
+		emailStats: t.Object({
+			today: t.Object({
+				sent: t.Number(),
+				failed: t.Number(),
+				bounced: t.Number(),
+				delivered: t.Number(),
 			}),
-		),
-		domains: t.Array(
-			t.Object({
-				id: t.String(),
-				domain: t.String(),
-				status: t.String(),
-				createdAt: t.Date(),
+			week: t.Object({
+				sent: t.Number(),
+				failed: t.Number(),
+				bounced: t.Number(),
+				delivered: t.Number(),
 			}),
-		),
+		}),
 		credits: t.Union([
 			t.Object({
 				creditsUsed: t.Number(),
@@ -88,6 +214,101 @@ export namespace AdminModel {
 			}),
 			t.Null(),
 		]),
+		members: t.Array(
+			t.Object({
+				id: t.String(),
+				role: t.String(),
+				userId: t.String(),
+				userName: t.String(),
+				userEmail: t.String(),
+				userImage: t.Union([t.String(), t.Null()]),
+				userBanned: t.Boolean(),
+				userRole: t.String(),
+				createdAt: t.Date(),
+			}),
+		),
+		domains: t.Array(
+			t.Object({
+				id: t.String(),
+				domain: t.String(),
+				status: t.String(),
+				systemVerified: t.Boolean(),
+				createdAt: t.Date(),
+			}),
+		),
+		apiKeys: t.Array(
+			t.Object({
+				id: t.String(),
+				name: t.Union([t.String(), t.Null()]),
+				prefix: t.Union([t.String(), t.Null()]),
+				start: t.Union([t.String(), t.Null()]),
+				enabled: t.Boolean(),
+				userId: t.String(),
+				userEmail: t.String(),
+				requestCount: t.Number(),
+				lastRequest: t.Union([t.Date(), t.Null()]),
+				expiresAt: t.Union([t.Date(), t.Null()]),
+				createdAt: t.Date(),
+			}),
+		),
+		templates: t.Array(
+			t.Object({
+				id: t.String(),
+				name: t.String(),
+				status: t.String(),
+				subject: t.Union([t.String(), t.Null()]),
+				fromEmail: t.Union([t.String(), t.Null()]),
+				currentVersion: t.Number(),
+				updatedAt: t.Date(),
+				createdAt: t.Date(),
+			}),
+		),
+		webhooks: t.Array(
+			t.Object({
+				id: t.String(),
+				name: t.String(),
+				url: t.String(),
+				status: t.String(),
+				createdAt: t.Date(),
+				updatedAt: t.Date(),
+			}),
+		),
+		recentEmails: t.Array(
+			t.Object({
+				id: t.String(),
+				fromEmail: t.String(),
+				toEmails: t.Any(),
+				subject: t.String(),
+				status: t.String(),
+				createdAt: t.Date(),
+				sentAt: t.Union([t.Date(), t.Null()]),
+			}),
+		),
+		supportConversations: t.Array(
+			t.Object({
+				id: t.String(),
+				userId: t.String(),
+				status: t.Union([t.Literal("open"), t.Literal("closed")]),
+				lastMessageAt: t.Date(),
+				lastMessagePreview: t.Union([t.String(), t.Null()]),
+				createdAt: t.Date(),
+				userName: t.Union([t.String(), t.Null()]),
+				userEmail: t.Union([t.String(), t.Null()]),
+			}),
+		),
+		recentAudit: t.Array(
+			t.Object({
+				id: t.String(),
+				actorUserId: t.String(),
+				actorEmail: t.Union([t.String(), t.Null()]),
+				actorName: t.Union([t.String(), t.Null()]),
+				action: t.String(),
+				resourceType: t.String(),
+				resourceId: t.Union([t.String(), t.Null()]),
+				metadata: t.Any(),
+				createdAt: t.Date(),
+			}),
+		),
 	});
 
 	export const updateOrgStatusBody = t.Object({

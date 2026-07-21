@@ -1,14 +1,27 @@
 "use client";
 
-import { ConfirmActionDialog } from "@fe/console/components/confirm-action-dialog";
+import { InlineActionPanel } from "@fe/console/components/inline-action-panel";
+import { StatusPill } from "@fe/console/components/ui/status-pill";
 import { adminGet, adminPatch, adminPost } from "@fe/console/lib/admin-api";
+import { formatNumber, formatRelativeTime } from "@fe/console/lib/format";
 import type { SupportConversation } from "@fe/console/lib/support-types";
 import { authClient } from "@reloop/auth/client";
 import { PLATFORM_ADMIN_ROLE } from "@reloop/auth/roles";
 import * as Avatar from "@reloop/ui/avatar";
-import * as Badge from "@reloop/ui/badge";
 import { cn } from "@reloop/ui/cn";
-import { Ban, Clock3, ExternalLink } from "lucide-react";
+import {
+	Ban,
+	ChevronDown,
+	ChevronRight,
+	Copy,
+	CreditCard,
+	ExternalLink,
+	Globe,
+	Mail,
+	UserRound,
+	UserRoundSearch,
+	Users,
+} from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -21,6 +34,15 @@ type OrgDetail = {
 	status: string;
 	createdAt: string;
 	billingEmail: string | null;
+	counts?: {
+		members: number;
+		domains: number;
+		apiKeys: number;
+		templates: number;
+		webhooks: number;
+		emails: number;
+		supportThreads: number;
+	};
 	members: Array<{
 		id: string;
 		role: string;
@@ -58,31 +80,6 @@ type AdminUser = {
 	image?: string | null;
 };
 
-function formatJoined(value: string | Date | null | undefined) {
-	if (!value) return null;
-	try {
-		return new Date(value).toLocaleDateString(undefined, {
-			day: "numeric",
-			month: "short",
-		});
-	} catch {
-		return null;
-	}
-}
-
-function formatDate(value: string | Date | null | undefined) {
-	if (!value) return "—";
-	try {
-		return new Date(value).toLocaleString(undefined, {
-			month: "short",
-			day: "numeric",
-			year: "numeric",
-		});
-	} catch {
-		return String(value);
-	}
-}
-
 function avatarInitials(name: string | null, email: string | null) {
 	const parts = (name || "").trim().split(/\s+/).filter(Boolean);
 	if (parts.length >= 2) {
@@ -95,52 +92,6 @@ function avatarInitials(name: string | null, email: string | null) {
 	return local.slice(0, 2).toUpperCase();
 }
 
-function DetailRow({
-	label,
-	value,
-	mono,
-}: {
-	label: string;
-	value: React.ReactNode;
-	mono?: boolean;
-}) {
-	return (
-		<div className="flex items-start justify-between gap-3 py-1.5">
-			<span className="shrink-0 text-[12px] text-text-sub-600">{label}</span>
-			<span
-				className={cn(
-					"min-w-0 text-right text-[12px] text-text-strong-950",
-					mono && "break-all font-mono text-[11px]",
-				)}
-			>
-				{value ?? "—"}
-			</span>
-		</div>
-	);
-}
-
-function Section({
-	title,
-	action,
-	children,
-}: {
-	title: string;
-	action?: React.ReactNode;
-	children: React.ReactNode;
-}) {
-	return (
-		<section className="border-stroke-soft-100 border-b px-4 py-4 last:border-b-0">
-			<div className="mb-2.5 flex items-center justify-between gap-2">
-				<h3 className="font-semibold text-[12px] text-text-sub-600 uppercase tracking-wide">
-					{title}
-				</h3>
-				{action}
-			</div>
-			{children}
-		</section>
-	);
-}
-
 async function fetchAdminUser(userId: string): Promise<AdminUser | null> {
 	const { data, error } = await authClient.admin.getUser({
 		query: { id: userId },
@@ -149,16 +100,85 @@ async function fetchAdminUser(userId: string): Promise<AdminUser | null> {
 	return data as AdminUser;
 }
 
+function ActionLink({
+	href,
+	icon: Icon,
+	label,
+	hint,
+}: {
+	href: string;
+	icon: React.ComponentType<{ className?: string }>;
+	label: string;
+	hint?: string;
+}) {
+	return (
+		<Link
+			href={href}
+			className="group flex items-center gap-2.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2.5 transition-colors hover:border-stroke-soft-200 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:hover:bg-white/[0.04]"
+		>
+			<span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-bg-weak-50 text-text-sub-600 dark:bg-white/[0.06]">
+				<Icon className="h-3.5 w-3.5" />
+			</span>
+			<span className="min-w-0 flex-1">
+				<span className="block font-medium text-[12px] text-text-strong-950">
+					{label}
+				</span>
+				{hint ? (
+					<span className="block truncate text-[11px] text-text-sub-600">
+						{hint}
+					</span>
+				) : null}
+			</span>
+			<ExternalLink className="h-3.5 w-3.5 shrink-0 text-text-soft-400 opacity-0 transition-opacity group-hover:opacity-100" />
+		</Link>
+	);
+}
+
+function Collapsible({
+	title,
+	defaultOpen = false,
+	badge,
+	children,
+}: {
+	title: string;
+	defaultOpen?: boolean;
+	badge?: React.ReactNode;
+	children: React.ReactNode;
+}) {
+	const [open, setOpen] = useState(defaultOpen);
+	return (
+		<div className="border-stroke-soft-100 border-t dark:border-stroke-soft-100/40">
+			<button
+				type="button"
+				onClick={() => setOpen((v) => !v)}
+				className="flex w-full items-center gap-2 px-4 py-3 text-left hover:bg-bg-weak-50/80 dark:hover:bg-white/[0.03]"
+			>
+				{open ? (
+					<ChevronDown className="h-3.5 w-3.5 text-text-soft-400" />
+				) : (
+					<ChevronRight className="h-3.5 w-3.5 text-text-soft-400" />
+				)}
+				<span className="flex-1 font-semibold text-[11px] text-text-sub-600 uppercase tracking-wide">
+					{title}
+				</span>
+				{badge}
+			</button>
+			{open ? <div className="px-4 pb-4">{children}</div> : null}
+		</div>
+	);
+}
+
 export function SupportContextPanel({
 	conversation,
 }: {
 	conversation: SupportConversation;
 }) {
-	const [amount, setAmount] = useState("");
-	const [adjustment, setAdjustment] = useState<"add" | "remove">("add");
+	const [amount, setAmount] = useState("1000");
 	const [reason, setReason] = useState("");
 	const [applying, setApplying] = useState(false);
+	const [showTopupConfirm, setShowTopupConfirm] = useState(false);
 	const [suspendOpen, setSuspendOpen] = useState(false);
+	const [impersonateOpen, setImpersonateOpen] = useState(false);
 
 	const { data: user, isLoading: userLoading } = useSWR(
 		conversation.userId ? ["support-user", conversation.userId] : null,
@@ -182,34 +202,31 @@ export function SupportContextPanel({
 	const displayImage = user?.image || conversation.userImage;
 	const role = user?.role || "user";
 	const isPlatformAdmin = role === PLATFORM_ADMIN_ROLE;
-	const memberRole = org?.members.find(
-		(m) => m.userId === conversation.userId,
-	)?.role;
-	const joined = formatJoined(user?.createdAt);
 	const balance = org?.credits?.creditsRemaining ?? null;
+	const lowCredits = balance !== null && balance <= 100;
 
-	const planLabel = useMemo(() => {
-		if (!org?.credits) return "No plan";
-		// Credits service currently provisions a Free-tier monthly allotment
-		return "Free plan";
-	}, [org?.credits]);
+	const failedDomains = useMemo(
+		() => (org?.domains ?? []).filter((d) => d.status === "failed"),
+		[org?.domains],
+	);
 
-	const metaLine = [planLabel, joined ? `Joined ${joined}` : null]
-		.filter(Boolean)
-		.join(" · ");
+	const copyEmail = async () => {
+		try {
+			await navigator.clipboard.writeText(displayEmail);
+			toast.success("Email copied");
+		} catch {
+			toast.error("Could not copy");
+		}
+	};
 
-	const applyAdjustment = async () => {
+	const applyTopup = async () => {
 		if (!org) {
-			toast.error("No organization to adjust credits for");
+			toast.error("No organization to top up");
 			return;
 		}
 		const value = Number(amount);
 		if (!Number.isFinite(value) || value <= 0) {
 			toast.error("Enter a positive amount");
-			return;
-		}
-		if (adjustment === "remove") {
-			toast.error("Credit removal isn’t available yet — use Add credits");
 			return;
 		}
 		setApplying(true);
@@ -219,348 +236,446 @@ export function SupportContextPanel({
 				amount: value,
 				reason:
 					reason.trim() ||
-					`Support adjustment for ${displayEmail} (${conversation.id})`,
+					`Support top-up for ${displayEmail} (${conversation.id})`,
 			});
 			toast.success(`Added ${value.toLocaleString()} credits`);
-			setAmount("");
 			setReason("");
+			setShowTopupConfirm(false);
 			void mutateOrg();
 		} catch (e) {
-			toast.error(
-				e instanceof Error ? e.message : "Failed to apply adjustment",
-			);
+			toast.error(e instanceof Error ? e.message : "Failed to top up");
 		} finally {
 			setApplying(false);
 		}
 	};
 
 	return (
-		<aside className="flex w-[22rem] shrink-0 flex-col overflow-hidden border-stroke-soft-100 border-l bg-bg-weak-50/40">
-			<div className="min-h-0 flex-1 overflow-y-auto p-3">
-				{/* Top fold — account / credits card */}
-				<div className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm">
-					<div className="flex items-center gap-3 px-4 pt-4 pb-3">
-						<Avatar.Root size="40" color="blue" className="shrink-0">
-							{displayImage ? (
-								<Avatar.Image src={displayImage} alt={displayName} />
-							) : (
-								<Avatar.Image asChild>
-									<div className="flex h-full w-full items-center justify-center rounded-full bg-blue-100 font-semibold text-[13px] text-blue-900 uppercase">
-										{avatarInitials(displayName, displayEmail)}
-									</div>
-								</Avatar.Image>
-							)}
-						</Avatar.Root>
-						<div className="min-w-0">
-							<p className="truncate font-semibold text-[14px] text-text-strong-950">
-								{displayEmail}
-							</p>
-							<p className="mt-0.5 truncate text-[12px] text-text-sub-600">
-								{userLoading ? "Loading…" : metaLine || "—"}
-							</p>
-						</div>
-					</div>
-
-					<div className="border-stroke-soft-100 border-t px-4 py-3">
-						<p className="text-[12px] text-text-sub-600">Current balance</p>
-						<p className="mt-0.5 font-semibold text-[20px] text-text-strong-950 tabular-nums tracking-tight">
-							{orgLoading
-								? "…"
-								: balance === null
-									? "No credits"
-									: `${balance.toLocaleString()} credits`}
-						</p>
-
-						<div className="mt-3 grid grid-cols-[1fr_auto] gap-2">
-							<input
-								type="number"
-								min={1}
-								step={1}
-								value={amount}
-								onChange={(e) => setAmount(e.target.value)}
-								placeholder="Amount"
-								disabled={!org}
-								className="h-9 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-3 text-[13px] text-text-strong-950 outline-none placeholder:text-text-soft-400 focus:border-stroke-strong-950 disabled:opacity-50"
-							/>
-							<select
-								value={adjustment}
-								onChange={(e) =>
-									setAdjustment(e.target.value as "add" | "remove")
-								}
-								disabled={!org}
-								className="h-9 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 text-[13px] text-text-strong-950 outline-none focus:border-stroke-strong-950 disabled:opacity-50"
-							>
-								<option value="add">Add credits</option>
-								<option value="remove">Remove credits</option>
-							</select>
-						</div>
-
-						<textarea
-							value={reason}
-							onChange={(e) => setReason(e.target.value)}
-							placeholder="Reason (shown in audit log)"
-							rows={2}
-							disabled={!org}
-							className="mt-2 w-full resize-none rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-3 py-2 text-[13px] text-text-strong-950 outline-none placeholder:text-text-soft-400 focus:border-stroke-strong-950 disabled:opacity-50"
-						/>
-
-						<button
-							type="button"
-							onClick={() => void applyAdjustment()}
-							disabled={!org || applying || !amount.trim()}
-							className="mt-2 flex h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-stroke-soft-200 bg-bg-white-0 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 disabled:cursor-not-allowed disabled:opacity-50"
-						>
-							{applying ? "Applying…" : "Apply adjustment"}
-							<ExternalLink className="h-3.5 w-3.5 text-text-sub-600" />
-						</button>
-					</div>
-
-					<div className="space-y-2 border-stroke-soft-100 border-t px-4 py-3">
-						{org ? (
-							<Link
-								href={`/credits?organizationId=${org.id}`}
-								className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-stroke-soft-200 bg-bg-white-0 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50"
-							>
-								<Clock3 className="h-3.5 w-3.5 text-text-sub-600" />
-								View usage history
-							</Link>
+		<aside className="flex w-[300px] shrink-0 flex-col overflow-hidden border-stroke-soft-100 border-l bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-black/20 xl:w-[320px]">
+			{/* Customer identity */}
+			<div className="border-stroke-soft-100 border-b bg-bg-white-0 px-4 py-4 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+				<div className="flex items-start gap-3">
+					<Avatar.Root size="40" color="blue" className="shrink-0">
+						{displayImage ? (
+							<Avatar.Image src={displayImage} alt={displayName} />
 						) : (
-							<button
-								type="button"
-								disabled
-								className="flex h-9 w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg border border-stroke-soft-200 font-medium text-[13px] text-text-soft-400 opacity-50"
-							>
-								<Clock3 className="h-3.5 w-3.5" />
-								View usage history
-							</button>
+							<Avatar.Image asChild>
+								<div className="flex h-full w-full items-center justify-center rounded-full bg-blue-100 font-semibold text-[13px] text-blue-900 uppercase dark:bg-blue-500/20 dark:text-blue-200">
+									{avatarInitials(displayName, displayEmail)}
+								</div>
+							</Avatar.Image>
 						)}
+					</Avatar.Root>
+					<div className="min-w-0 flex-1">
+						<p className="truncate font-semibold text-[14px] text-text-strong-950">
+							{userLoading ? "Loading…" : displayName}
+						</p>
 						<button
 							type="button"
-							onClick={() => setSuspendOpen(true)}
-							disabled={!org || org.status === "suspended"}
-							className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-stroke-soft-200 bg-bg-white-0 font-medium text-[13px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 disabled:cursor-not-allowed disabled:opacity-50"
+							onClick={() => void copyEmail()}
+							className="mt-0.5 flex max-w-full items-center gap-1 truncate text-[12px] text-text-sub-600 hover:text-text-strong-950"
+							title="Copy email"
 						>
-							<Ban className="h-3.5 w-3.5 text-text-sub-600" />
-							{org?.status === "suspended"
-								? "Account suspended"
-								: "Suspend account"}
+							<span className="truncate">{displayEmail}</span>
+							<Copy className="h-3 w-3 shrink-0 opacity-60" />
 						</button>
+						<div className="mt-2 flex flex-wrap gap-1.5">
+							<StatusPill
+								status={user?.banned ? "banned" : "active"}
+							/>
+							{isPlatformAdmin ? (
+								<StatusPill status="super-admin" />
+							) : (
+								<StatusPill status={role} tone="gray" />
+							)}
+							{conversation.status === "open" ? (
+								<StatusPill status="open" />
+							) : (
+								<StatusPill status="closed" />
+							)}
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div className="min-h-0 flex-1 overflow-y-auto">
+				{/* Snapshot */}
+				<div className="space-y-2 border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/40">
+					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wide">
+						At a glance
+					</p>
+					<div className="grid grid-cols-2 gap-2">
+						<div
+							className={cn(
+								"rounded-xl border px-3 py-2.5",
+								lowCredits
+									? "border-orange-500/30 bg-orange-500/10"
+									: "border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]",
+							)}
+						>
+							<p className="text-[10px] text-text-sub-600 uppercase tracking-wide">
+								Credits
+							</p>
+							<p
+								className={cn(
+									"mt-0.5 font-semibold text-[16px] tabular-nums",
+									lowCredits
+										? "text-orange-700 dark:text-orange-400"
+										: "text-text-strong-950",
+								)}
+							>
+								{orgLoading
+									? "…"
+									: balance === null
+										? "—"
+										: formatNumber(balance)}
+							</p>
+							{lowCredits ? (
+								<p className="mt-0.5 text-[10px] font-medium text-orange-700 dark:text-orange-400">
+									Low balance
+								</p>
+							) : null}
+						</div>
+						<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2.5 dark:border-stroke-soft-100/40 dark:bg-[#0c0c0c]">
+							<p className="text-[10px] text-text-sub-600 uppercase tracking-wide">
+								Org
+							</p>
+							<p className="mt-0.5 truncate font-semibold text-[13px] text-text-strong-950">
+								{orgLoading ? "…" : org?.name || "None"}
+							</p>
+							{org ? (
+								<p className="mt-0.5 truncate text-[10px] text-text-sub-600">
+									{org.status} · {org.slug}
+								</p>
+							) : null}
+						</div>
+					</div>
+					{failedDomains.length > 0 ? (
+						<div className="rounded-xl border border-red-500/25 bg-red-500/10 px-3 py-2">
+							<p className="font-medium text-[11px] text-red-700 dark:text-red-400">
+								{failedDomains.length} failed domain
+								{failedDomains.length === 1 ? "" : "s"}
+							</p>
+							<p className="mt-0.5 truncate text-[11px] text-red-700/80 dark:text-red-400/80">
+								{failedDomains.map((d) => d.domain).join(", ")}
+							</p>
+						</div>
+					) : null}
+				</div>
+
+				{/* Act now — credits */}
+				<div className="space-y-2 border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/40">
+					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wide">
+						Resolve with credits
+					</p>
+					{!org ? (
+						<p className="text-[12px] text-text-sub-600">
+							No organization linked — open the user hub to pick context.
+						</p>
+					) : showTopupConfirm ? (
+						<InlineActionPanel
+							title={`Add ${Number(amount) || 0} credits?`}
+							description={`To ${org.name}. Logged in audit.`}
+							confirmLabel={applying ? "Applying…" : "Confirm top-up"}
+							onCancel={() => setShowTopupConfirm(false)}
+							onConfirm={() => applyTopup()}
+						>
+							<div className="grid gap-2">
+								<input
+									type="number"
+									min={1}
+									value={amount}
+									onChange={(e) => setAmount(e.target.value)}
+									className="h-9 w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-3 text-[13px] outline-none focus:border-stroke-strong-950 dark:bg-transparent"
+									placeholder="Amount"
+								/>
+								<input
+									value={reason}
+									onChange={(e) => setReason(e.target.value)}
+									className="h-9 w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-3 text-[13px] outline-none focus:border-stroke-strong-950 dark:bg-transparent"
+									placeholder="Reason (optional)"
+								/>
+							</div>
+						</InlineActionPanel>
+					) : (
+						<div className="space-y-2">
+							<div className="flex gap-2">
+								<input
+									type="number"
+									min={1}
+									value={amount}
+									onChange={(e) => setAmount(e.target.value)}
+									className="h-9 min-w-0 flex-1 rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-3 text-[13px] outline-none focus:border-stroke-strong-950 dark:bg-transparent"
+									placeholder="Amount"
+								/>
+								<button
+									type="button"
+									onClick={() => setShowTopupConfirm(true)}
+									disabled={!amount.trim()}
+									className="flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-text-strong-950 px-3 font-medium text-[12px] text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-black"
+								>
+									<CreditCard className="h-3.5 w-3.5" />
+									Top up
+								</button>
+							</div>
+							<input
+								value={reason}
+								onChange={(e) => setReason(e.target.value)}
+								className="h-9 w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-3 text-[13px] outline-none focus:border-stroke-strong-950 dark:bg-transparent"
+								placeholder="Reason for audit (optional)"
+							/>
+							<div className="flex flex-wrap gap-1.5">
+								{[500, 1000, 5000].map((n) => (
+									<button
+										key={n}
+										type="button"
+										onClick={() => setAmount(String(n))}
+										className={cn(
+											"rounded-full px-2.5 py-1 font-medium text-[11px] transition-colors",
+											amount === String(n)
+												? "bg-text-strong-950 text-white dark:bg-white dark:text-black"
+												: "bg-bg-white-0 text-text-sub-600 ring-1 ring-stroke-soft-100 hover:text-text-strong-950 dark:bg-transparent dark:ring-stroke-soft-100/40",
+										)}
+									>
+										+{n.toLocaleString()}
+									</button>
+								))}
+							</div>
+						</div>
+					)}
+				</div>
+
+				{/* Navigate */}
+				<div className="space-y-2 border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/40">
+					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wide">
+						Jump to
+					</p>
+					<div className="space-y-1.5">
+						<ActionLink
+							href={`/users/${conversation.userId}`}
+							icon={UserRound}
+							label="User hub"
+							hint="Ban, promote, memberships"
+						/>
+						{org ? (
+							<>
+								<ActionLink
+									href={`/organizations/${org.id}`}
+									icon={Users}
+									label="Organization hub"
+									hint={org.name}
+								/>
+								<ActionLink
+									href={`/credits?organizationId=${org.id}`}
+									icon={CreditCard}
+									label="Credits ledger"
+									hint={`${formatNumber(balance)} remaining`}
+								/>
+								<ActionLink
+									href={`/emails?organizationId=${org.id}&status=failed`}
+									icon={Mail}
+									label="Failed emails"
+									hint="Delivery issues for this org"
+								/>
+								{failedDomains.length > 0 ? (
+									<ActionLink
+										href={`/organizations/${org.id}`}
+										icon={Globe}
+										label="Domains"
+										hint={`${failedDomains.length} failed`}
+									/>
+								) : null}
+							</>
+						) : null}
 					</div>
 				</div>
 
-				{/* Deeper context below the fold */}
-				<div className="mt-3 overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0">
-					<Section title="User">
-						{userLoading ? (
-							<p className="text-[12px] text-text-sub-600">Loading…</p>
-						) : (
-							<div className="divide-y divide-stroke-soft-100">
-								<DetailRow label="Name" value={displayName} />
-								<DetailRow
-									label="Type"
-									value={isPlatformAdmin ? "Super admin" : "User"}
-								/>
-								<DetailRow
-									label="Role"
-									value={
-										<Badge.Root
-											variant="light"
-											color={isPlatformAdmin ? "purple" : "gray"}
-										>
-											{role}
-										</Badge.Root>
-									}
-								/>
-								<DetailRow
-									label="Status"
-									value={
-										<Badge.Root
-											variant="light"
-											color={user?.banned ? "red" : "green"}
-										>
-											{user?.banned ? "Banned" : "Active"}
-										</Badge.Root>
-									}
-								/>
-								{user?.banned && user.banReason ? (
-									<DetailRow label="Ban reason" value={user.banReason} />
-								) : null}
-								<DetailRow
-									label="Email verified"
-									value={user?.emailVerified ? "Yes" : "No"}
-								/>
-								{memberRole ? (
-									<DetailRow label="Org role" value={memberRole} />
-								) : null}
-								<DetailRow label="User ID" value={conversation.userId} mono />
-							</div>
-						)}
-					</Section>
+				{/* Sensitive actions */}
+				<div className="space-y-2 border-stroke-soft-100 border-b px-4 py-3 dark:border-stroke-soft-100/40">
+					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wide">
+						Sensitive
+					</p>
+					{impersonateOpen ? (
+						<InlineActionPanel
+							title={`Impersonate ${displayEmail}?`}
+							description="Opens the customer dashboard as this user."
+							confirmLabel="Impersonate"
+							destructive
+							onCancel={() => setImpersonateOpen(false)}
+							onConfirm={async () => {
+								const { error } = await authClient.admin.impersonateUser({
+									userId: conversation.userId,
+								});
+								if (error) {
+									toast.error(error.message || "Failed to impersonate");
+									throw new Error(error.message);
+								}
+								toast.success("Impersonation started");
+								window.location.href = "/dashboard";
+							}}
+						/>
+					) : (
+						<button
+							type="button"
+							onClick={() => {
+								setSuspendOpen(false);
+								setImpersonateOpen(true);
+							}}
+							disabled={!!user?.banned}
+							className="flex h-9 w-full items-center justify-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 font-medium text-[12px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-transparent"
+						>
+							<UserRoundSearch className="h-3.5 w-3.5 text-text-sub-600" />
+							Impersonate customer
+						</button>
+					)}
+					{suspendOpen && org ? (
+						<InlineActionPanel
+							title={`Suspend ${org.name}?`}
+							description="All members lose access until reactivated."
+							confirmLabel="Suspend org"
+							destructive
+							onCancel={() => setSuspendOpen(false)}
+							onConfirm={async () => {
+								await adminPatch(`/organizations/${org.id}/status`, {
+									status: "suspended",
+									reason: `Suspended from support chat (${conversation.id})`,
+								});
+								toast.success("Organization suspended");
+								setSuspendOpen(false);
+								void mutateOrg();
+							}}
+						/>
+					) : (
+						<button
+							type="button"
+							onClick={() => {
+								setImpersonateOpen(false);
+								setSuspendOpen(true);
+							}}
+							disabled={!org || org.status === "suspended"}
+							className="flex h-9 w-full items-center justify-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 font-medium text-[12px] text-text-strong-950 transition-colors hover:bg-bg-weak-50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-transparent"
+						>
+							<Ban className="h-3.5 w-3.5 text-text-sub-600" />
+							{org?.status === "suspended" ? "Org already suspended" : "Suspend org"}
+						</button>
+					)}
+				</div>
 
-					<Section
+				{/* Details */}
+				<Collapsible
+					title="Customer details"
+					defaultOpen={false}
+					badge={
+						<span className="text-[10px] text-text-soft-400">
+							{user?.createdAt
+								? `Joined ${formatRelativeTime(String(user.createdAt))}`
+								: null}
+						</span>
+					}
+				>
+					{userLoading ? (
+						<p className="text-[12px] text-text-sub-600">Loading…</p>
+					) : (
+						<div className="space-y-2 text-[12px]">
+							<div className="flex justify-between gap-2">
+								<span className="text-text-sub-600">Email verified</span>
+								<span className="font-medium">
+									{user?.emailVerified ? "Yes" : "No"}
+								</span>
+							</div>
+							{user?.banned && user.banReason ? (
+								<div className="flex justify-between gap-2">
+									<span className="text-text-sub-600">Ban reason</span>
+									<span className="max-w-[55%] text-right font-medium">
+										{user.banReason}
+									</span>
+								</div>
+							) : null}
+							<div className="flex justify-between gap-2">
+								<span className="text-text-sub-600">User ID</span>
+								<span className="max-w-[55%] break-all text-right font-mono text-[10px]">
+									{conversation.userId}
+								</span>
+							</div>
+						</div>
+					)}
+				</Collapsible>
+
+				{org ? (
+					<Collapsible
 						title="Organization"
-						action={
-							org ? (
-								<Link
-									href={`/organizations/${org.id}`}
-									className="text-[11px] text-primary-base hover:underline"
-								>
-									Open →
-								</Link>
-							) : null
-						}
+						defaultOpen
+						badge={<StatusPill status={org.status} />}
 					>
-						{!orgId ? (
-							<p className="text-[12px] text-text-sub-600">
-								No organization linked to this conversation.
-							</p>
-						) : orgLoading ? (
-							<p className="text-[12px] text-text-sub-600">Loading…</p>
-						) : orgError || !org ? (
+						{orgError ? (
 							<p className="text-[12px] text-text-sub-600">
 								Couldn’t load organization.
 							</p>
 						) : (
-							<div className="divide-y divide-stroke-soft-100">
-								<DetailRow label="Name" value={org.name} />
-								<DetailRow label="Slug" value={org.slug} mono />
-								<DetailRow
-									label="Status"
-									value={
-										<Badge.Root
-											variant="light"
-											color={
-												org.status === "active"
-													? "green"
-													: org.status === "suspended"
-														? "red"
-														: "gray"
-											}
-										>
-											{org.status}
-										</Badge.Root>
-									}
-								/>
-								<DetailRow
-									label="Billing email"
-									value={org.billingEmail || "—"}
-								/>
-								<DetailRow label="Created" value={formatDate(org.createdAt)} />
-								<DetailRow label="Org ID" value={org.id} mono />
+							<div className="space-y-3">
+								<div className="space-y-2 text-[12px]">
+									<div className="flex justify-between gap-2">
+										<span className="text-text-sub-600">Name</span>
+										<span className="font-medium">{org.name}</span>
+									</div>
+									<div className="flex justify-between gap-2">
+										<span className="text-text-sub-600">Slug</span>
+										<span className="font-mono text-[11px]">{org.slug}</span>
+									</div>
+									<div className="flex justify-between gap-2">
+										<span className="text-text-sub-600">Members</span>
+										<span className="font-medium">
+											{org.counts?.members ?? org.members.length}
+										</span>
+									</div>
+									<div className="flex justify-between gap-2">
+										<span className="text-text-sub-600">Domains</span>
+										<span className="font-medium">
+											{org.counts?.domains ?? org.domains.length}
+										</span>
+									</div>
+								</div>
+								{org.domains.length > 0 ? (
+									<div className="space-y-1">
+										<p className="text-[11px] text-text-sub-600">Domains</p>
+										{org.domains.slice(0, 5).map((d) => (
+											<div
+												key={d.id}
+												className="flex items-center justify-between gap-2 rounded-lg bg-bg-weak-50 px-2 py-1.5 dark:bg-white/[0.04]"
+											>
+												<span className="truncate font-medium text-[11px]">
+													{d.domain}
+												</span>
+												<StatusPill status={d.status} />
+											</div>
+										))}
+									</div>
+								) : null}
 							</div>
 						)}
-					</Section>
+					</Collapsible>
+				) : null}
 
-					{org ? (
-						<Section title={`Members (${org.members.length})`}>
-							{org.members.length === 0 ? (
-								<p className="text-[12px] text-text-sub-600">No members</p>
-							) : (
-								<div className="space-y-1.5">
-									{org.members.map((m) => {
-										const isCustomer = m.userId === conversation.userId;
-										return (
-											<div
-												key={m.id}
-												className={cn(
-													"rounded-xl px-2.5 py-2",
-													isCustomer ? "bg-blue-50" : "bg-bg-weak-50",
-												)}
-											>
-												<div className="flex items-start justify-between gap-2">
-													<div className="min-w-0">
-														<p className="truncate font-medium text-[12px] text-text-strong-950">
-															{m.userName}
-															{isCustomer ? " · customer" : ""}
-														</p>
-														<p className="truncate text-[11px] text-text-sub-600">
-															{m.userEmail}
-														</p>
-													</div>
-													<Badge.Root variant="light" color="gray">
-														{m.role}
-													</Badge.Root>
-												</div>
-											</div>
-										);
-									})}
-								</div>
-							)}
-						</Section>
-					) : null}
-
-					{org ? (
-						<Section title={`Domains (${org.domains.length})`}>
-							{org.domains.length === 0 ? (
-								<p className="text-[12px] text-text-sub-600">No domains</p>
-							) : (
-								<div className="space-y-1.5">
-									{org.domains.map((d) => (
-										<div
-											key={d.id}
-											className="flex items-center justify-between gap-2 rounded-xl bg-bg-weak-50 px-2.5 py-2"
-										>
-											<p className="min-w-0 truncate font-medium text-[12px] text-text-strong-950">
-												{d.domain}
-											</p>
-											<Badge.Root
-												variant="light"
-												color={d.status === "active" ? "green" : "gray"}
-											>
-												{d.status}
-											</Badge.Root>
-										</div>
-									))}
-								</div>
-							)}
-						</Section>
-					) : null}
-
-					<Section title="Conversation">
-						<div className="divide-y divide-stroke-soft-100">
-							<DetailRow
-								label="Status"
-								value={
-									<Badge.Root
-										variant="light"
-										color={conversation.status === "open" ? "green" : "gray"}
-									>
-										{conversation.status}
-									</Badge.Root>
-								}
-							/>
-							<DetailRow
-								label="Started"
-								value={formatDate(conversation.createdAt)}
-							/>
-							<DetailRow
-								label="Last message"
-								value={formatDate(conversation.lastMessageAt)}
-							/>
-							<DetailRow label="Thread ID" value={conversation.id} mono />
+				<Collapsible title="Thread" defaultOpen={false}>
+					<div className="space-y-2 text-[12px]">
+						<div className="flex justify-between gap-2">
+							<span className="text-text-sub-600">Status</span>
+							<StatusPill status={conversation.status} />
 						</div>
-					</Section>
-				</div>
+						<div className="flex justify-between gap-2">
+							<span className="text-text-sub-600">Started</span>
+							<span className="font-medium">
+								{formatRelativeTime(conversation.createdAt)}
+							</span>
+						</div>
+						<div className="flex justify-between gap-2">
+							<span className="text-text-sub-600">Last message</span>
+							<span className="font-medium">
+								{formatRelativeTime(conversation.lastMessageAt)}
+							</span>
+						</div>
+					</div>
+				</Collapsible>
 			</div>
-
-			{org ? (
-				<ConfirmActionDialog
-					open={suspendOpen}
-					onOpenChange={setSuspendOpen}
-					title="Suspend account"
-					description={`Suspend ${org.name}? Members will lose access until reactivated.`}
-					confirmLabel="Suspend"
-					destructive
-					onConfirm={async () => {
-						await adminPatch(`/organizations/${org.id}/status`, {
-							status: "suspended",
-							reason: `Suspended from support chat (${conversation.id})`,
-						});
-						toast.success("Organization suspended");
-						void mutateOrg();
-					}}
-				/>
-			) : null}
 		</aside>
 	);
 }

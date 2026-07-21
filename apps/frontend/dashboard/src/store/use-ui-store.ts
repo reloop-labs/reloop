@@ -7,9 +7,6 @@ interface UIState {
 	isAiPanelOpen: boolean;
 	setIsAiPanelOpen: (value: boolean) => void;
 	toggleAiPanel: () => void;
-	isAiPanelExpanded: boolean;
-	setIsAiPanelExpanded: (value: boolean) => void;
-	toggleAiPanelExpand: () => void;
 	aiPanelActiveTab: "ai" | "support";
 	setAiPanelActiveTab: (tab: "ai" | "support") => void;
 	/** A message queued to be auto-sent when the support chat opens. */
@@ -37,11 +34,8 @@ export const useUIStore = create<UIState>((set) => ({
 	setIsAiPanelOpen: (value) => set({ isAiPanelOpen: value }),
 	toggleAiPanel: () =>
 		set((state) => ({ isAiPanelOpen: !state.isAiPanelOpen })),
-	isAiPanelExpanded: false,
-	setIsAiPanelExpanded: (value) => set({ isAiPanelExpanded: value }),
-	toggleAiPanelExpand: () =>
-		set((state) => ({ isAiPanelExpanded: !state.isAiPanelExpanded })),
-	aiPanelActiveTab: "ai",
+	// Default to support while Ask AI is disabled (no API yet).
+	aiPanelActiveTab: "support",
 	setAiPanelActiveTab: (tab) => set({ aiPanelActiveTab: tab }),
 	pendingSupportMessage: null,
 	setPendingSupportMessage: (value) => set({ pendingSupportMessage: value }),

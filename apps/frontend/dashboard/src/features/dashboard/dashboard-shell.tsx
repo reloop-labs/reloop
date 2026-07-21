@@ -30,7 +30,8 @@ function useIsAgentMailbox() {
  * App chrome for authenticated dashboard pages.
  * Matches Next dashboard layout: weak outer bg, sidebar, top bar, rounded main panel.
  * Template editor and agent mailbox get a full-viewport shell without sidebar/header.
- * Ask AI / Support slide-in panel mounts beside the main content (Next layout).
+ * Support slide-in panel mounts beside the main content.
+ * (Ask AI is hidden until assistant API integration.)
  */
 export function DashboardShell({ children }: { children: ReactNode }) {
 	const isTemplateEditor = useIsTemplateEditor();

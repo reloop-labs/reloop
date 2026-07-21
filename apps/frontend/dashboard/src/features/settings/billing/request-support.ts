@@ -8,6 +8,7 @@ export function requestPlanSupport(message: string) {
 	const { setPendingSupportMessage, setAiPanelActiveTab, setIsAiPanelOpen } =
 		useUIStore.getState();
 	setPendingSupportMessage(message);
+	// Always open Support (Ask AI is hidden until API lands).
 	setAiPanelActiveTab("support");
 	setIsAiPanelOpen(true);
 }

@@ -1,10 +1,21 @@
 "use client";
 
+import {
+	DataTable,
+	PageFrame,
+	PageHeading,
+} from "@fe/console/components/ui/page-frame";
+import { StatusPill } from "@fe/console/components/ui/status-pill";
 import { adminGet } from "@fe/console/lib/admin-api";
-import * as Badge from "@reloop/ui/badge";
+import {
+	formatRecipients,
+	formatRelativeTime,
+} from "@fe/console/lib/format";
 import * as Button from "@reloop/ui/button";
 import * as Input from "@reloop/ui/input";
-import { useState } from "react";
+import Link from "next/link";
+import { parseAsString, useQueryState } from "nuqs";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 
 type EmailItem = {
@@ -21,125 +32,140 @@ type EmailItem = {
 type EmailsResponse = { items: EmailItem[]; total: number };
 
 export default function EmailsPage() {
-	const [q, setQ] = useState("");
-	const [search, setSearch] = useState("");
-	const [status, setStatus] = useState("");
+	const [q, setQ] = useQueryState("q", parseAsString.withDefault(""));
+	const [status, setStatus] = useQueryState(
+		"status",
+		parseAsString.withDefault(""),
+	);
+	const [organizationId, setOrganizationId] = useQueryState(
+		"organizationId",
+		parseAsString.withDefault(""),
+	);
+	const [draftQ, setDraftQ] = useState(q);
+
+	useEffect(() => {
+		setDraftQ(q);
+	}, [q]);
 
 	const { data, isLoading } = useSWR<EmailsResponse>(
-		["/emails", search, status],
+		["/emails", q, status, organizationId],
 		() =>
 			adminGet<EmailsResponse>("/emails", {
-				q: search || undefined,
+				q: q || undefined,
 				status: status || undefined,
+				organizationId: organizationId || undefined,
 				limit: 50,
 			}),
 	);
 
 	return (
-		<div className="space-y-6">
-			<div className="flex flex-wrap items-end justify-between gap-3">
-				<div>
-					<h1 className="font-semibold text-text-strong-950 text-title-h4">
-						Emails
-					</h1>
-					<p className="mt-1 text-paragraph-sm text-text-sub-600">
-						Cross-org email investigation ({data?.total ?? 0} matching)
-					</p>
-				</div>
-				<form
-					className="flex flex-wrap gap-2"
-					onSubmit={(e) => {
-						e.preventDefault();
-						setSearch(q);
-					}}
-				>
-					<Input.Root className="w-56">
-						<Input.Wrapper>
-							<Input.Input
-								placeholder="Search from / subject / to"
-								value={q}
-								onChange={(e) => setQ(e.target.value)}
-							/>
-						</Input.Wrapper>
-					</Input.Root>
-					<select
-						className="h-10 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 text-paragraph-sm"
-						value={status}
-						onChange={(e) => setStatus(e.target.value)}
+		<PageFrame>
+			<PageHeading
+				title="Emails"
+				description="Cross-org delivery investigation. Prefer the organization hub emails tab for day-to-day debugging."
+				meta={
+					<span className="rounded-full bg-bg-weak-50 px-2.5 py-1 font-medium text-[12px] text-text-sub-600 tabular-nums dark:bg-white/[0.06]">
+						{data?.total ?? 0} matching
+						{status ? ` · ${status}` : ""}
+					</span>
+				}
+				actions={
+					<form
+						className="flex flex-wrap gap-2"
+						onSubmit={(e) => {
+							e.preventDefault();
+							setQ(draftQ.trim() || null);
+						}}
 					>
-						<option value="">All statuses</option>
-						<option value="bounced">Bounced</option>
-						<option value="failed">Failed</option>
-						<option value="spam">Spam</option>
-						<option value="sent">Sent</option>
-						<option value="delivered">Delivered</option>
-						<option value="pending">Pending</option>
-					</select>
-					<Button.Root type="submit" variant="neutral" mode="stroke">
-						Search
-					</Button.Root>
-				</form>
-			</div>
+						<Input.Root className="w-56">
+							<Input.Wrapper>
+								<Input.Input
+									placeholder="Search from / subject / to"
+									value={draftQ}
+									onChange={(e) => setDraftQ(e.target.value)}
+								/>
+							</Input.Wrapper>
+						</Input.Root>
+						<select
+							className="h-10 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 text-[13px] dark:bg-transparent"
+							value={status}
+							onChange={(e) => setStatus(e.target.value || null)}
+						>
+							<option value="">All statuses</option>
+							<option value="bounced">Bounced</option>
+							<option value="failed">Failed</option>
+							<option value="spam">Spam</option>
+							<option value="sent">Sent</option>
+							<option value="delivered">Delivered</option>
+							<option value="pending">Pending</option>
+						</select>
+						{organizationId ? (
+							<>
+								<Button.Root asChild variant="neutral" mode="stroke">
+									<Link href={`/organizations/${organizationId}`}>
+										Org hub
+									</Link>
+								</Button.Root>
+								<Button.Root
+									type="button"
+									variant="neutral"
+									mode="ghost"
+									onClick={() => setOrganizationId(null)}
+								>
+									Clear org
+								</Button.Root>
+							</>
+						) : null}
+						<Button.Root type="submit" variant="neutral" mode="stroke">
+							Search
+						</Button.Root>
+					</form>
+				}
+			/>
 
-			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100">
-				<table className="w-full text-left text-paragraph-sm">
-					<thead className="bg-bg-weak-50 text-[12px] text-text-sub-600 uppercase">
-						<tr>
-							<th className="px-4 py-3 font-medium">When</th>
-							<th className="px-4 py-3 font-medium">From</th>
-							<th className="px-4 py-3 font-medium">Subject</th>
-							<th className="px-4 py-3 font-medium">Status</th>
-							<th className="px-4 py-3 font-medium">Org</th>
+			{organizationId ? (
+				<p className="rounded-xl bg-bg-weak-50 px-3 py-2 text-[12px] text-text-sub-600 dark:bg-white/[0.04]">
+					Filtered to organization{" "}
+					<code className="font-mono text-[11px]">{organizationId}</code>
+				</p>
+			) : null}
+
+			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
+				<DataTable
+					headers={["When", "From", "To", "Subject", "Status", "Org"]}
+					colSpan={6}
+					loading={isLoading}
+					empty={!isLoading && !data?.items.length}
+				>
+					{data?.items.map((email) => (
+						<tr
+							key={email.id}
+							className="border-stroke-soft-100 border-t dark:border-stroke-soft-100/40"
+						>
+							<td className="whitespace-nowrap px-4 py-3 text-text-sub-600">
+								{formatRelativeTime(email.createdAt)}
+							</td>
+							<td className="px-4 py-3">{email.fromEmail}</td>
+							<td className="max-w-[160px] truncate px-4 py-3 text-text-sub-600">
+								{formatRecipients(email.toEmails)}
+							</td>
+							<td className="max-w-[220px] truncate px-4 py-3">
+								{email.subject}
+							</td>
+							<td className="px-4 py-3">
+								<StatusPill status={email.status} />
+							</td>
+							<td className="px-4 py-3">
+								<Button.Root asChild size="xsmall" variant="neutral" mode="ghost">
+									<Link href={`/organizations/${email.organizationId}`}>
+										Open hub
+									</Link>
+								</Button.Root>
+							</td>
 						</tr>
-					</thead>
-					<tbody>
-						{isLoading ? (
-							<tr>
-								<td className="px-4 py-6 text-text-sub-600" colSpan={5}>
-									Loading...
-								</td>
-							</tr>
-						) : !data?.items.length ? (
-							<tr>
-								<td className="px-4 py-6 text-text-sub-600" colSpan={5}>
-									No emails found
-								</td>
-							</tr>
-						) : (
-							data.items.map((email) => (
-								<tr key={email.id} className="border-stroke-soft-100 border-t">
-									<td className="px-4 py-3 text-text-sub-600">
-										{new Date(email.createdAt).toLocaleString()}
-									</td>
-									<td className="px-4 py-3">{email.fromEmail}</td>
-									<td className="max-w-xs truncate px-4 py-3">
-										{email.subject}
-									</td>
-									<td className="px-4 py-3">
-										<Badge.Root
-											variant="light"
-											color={
-												email.status === "bounced" ||
-												email.status === "failed" ||
-												email.status === "spam"
-													? "red"
-													: email.status === "delivered"
-														? "green"
-														: "gray"
-											}
-										>
-											{email.status}
-										</Badge.Root>
-									</td>
-									<td className="px-4 py-3 font-mono text-[11px] text-text-sub-600">
-										{email.organizationId}
-									</td>
-								</tr>
-							))
-						)}
-					</tbody>
-				</table>
+					))}
+				</DataTable>
 			</div>
-		</div>
+		</PageFrame>
 	);
 }
