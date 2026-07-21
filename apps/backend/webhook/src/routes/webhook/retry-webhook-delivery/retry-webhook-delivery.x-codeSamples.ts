@@ -17,11 +17,17 @@ if (webhookError) throw webhookError;`,
 		source: `curl -X POST https://reloop.sh/api/webhook/deliveries/del_123456789/retry \\
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `# Webhook SDK support coming soon`,
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.webhook.retryDelivery("del_123456789")
+if result.webhook_error:
+    raise result.webhook_error`,
 	},
 	{
 		id: "php",

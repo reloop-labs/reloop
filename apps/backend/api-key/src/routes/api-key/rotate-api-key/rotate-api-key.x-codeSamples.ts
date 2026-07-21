@@ -20,15 +20,20 @@ console.log(apiKey.id, apiKey.key);`,
 		source: `curl -X POST https://reloop.sh/api/api-key/v1/rotate/key_123456789 \\
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-reloop.api_keys.rotate("key_123456789")`,
+result = reloop.api_key.rotate("key_123456789")
+
+if result.api_key_error:
+    raise result.api_key_error
+
+print(result.api_key["id"], result.api_key["key"])`,
 	},
 	{
 		id: "php",

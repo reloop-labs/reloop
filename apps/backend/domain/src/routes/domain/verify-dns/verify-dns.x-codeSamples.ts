@@ -20,15 +20,20 @@ console.log(domain.id, domain.status);`,
 		source: `curl -X POST https://reloop.sh/api/domain/v1/verify/dom_123456789 \\
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-result = reloop.domain.verify("dom_123456789")`,
+result = reloop.domain.verify("dom_123456789")
+
+if result.domain_error:
+    raise result.domain_error
+
+print(result.domain["id"], result.domain["status"])`,
 	},
 	{
 		id: "php",

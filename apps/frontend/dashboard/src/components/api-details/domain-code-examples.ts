@@ -82,80 +82,77 @@ if (domainError) throw domainError;
 console.log(domain.id, domain.status);`,
 	},
 	python: {
-		create: `# Create a domain
-import requests
+		create: `from reloop_email import Reloop
 
-response = requests.post(
-    "https://reloop.sh/api/domain/v1/create",
-    headers={
-        "Content-Type": "application/json",
-        "x-api-key": "rl_123456789",
-    },
-    json={
-        "domain": "send.example.com",
-        "click_tracking": True,
-        "open_tracking": True,
-        "tls": "opportunistic",
-        "sending_email": True,
-        "receiving_email": False,
-    },
-)
+reloop = Reloop(api_key="rl_123456789")
 
-domain = response.json()`,
-		list: `# List domains
-import requests
+result = reloop.domain.create({
+    "domain": "send.example.com",
+    "click_tracking": True,
+    "open_tracking": True,
+    "tls": "opportunistic",
+    "sending_email": True,
+    "receiving_email": False,
+})
 
-response = requests.get(
-    "https://reloop.sh/api/domain/v1/list",
-    params={"page": 1, "limit": 10, "status": "active"},
-    headers={"x-api-key": "rl_123456789"},
-)
+if result.domain_error:
+    raise result.domain_error
 
-domains = response.json()`,
-		get: `# Get a domain by ID
-import requests
+print(result.domain["id"], result.domain["domain"])`,
+		list: `from reloop_email import Reloop
 
-response = requests.get(
-    "https://reloop.sh/api/domain/v1/dom_123456789",
-    headers={"x-api-key": "rl_123456789"},
-)
+reloop = Reloop(api_key="rl_123456789")
 
-domain = response.json()`,
-		update: `# Update domain settings
-import requests
+result = reloop.domain.list({"page": 1, "limit": 10, "status": "active"})
 
-response = requests.patch(
-    "https://reloop.sh/api/domain/v1/dom_123456789",
-    headers={
-        "Content-Type": "application/json",
-        "x-api-key": "rl_123456789",
-    },
-    json={
-        "click_tracking": False,
-        "open_tracking": True,
-        "sending_email": True,
-    },
-)
+if result.domain_error:
+    raise result.domain_error
 
-domain = response.json()`,
-		delete: `# Delete a domain by ID
-import requests
+print(result.domains["total"], result.domains["domains"])`,
+		get: `from reloop_email import Reloop
 
-response = requests.delete(
-    "https://reloop.sh/api/domain/v1/dom_123456789",
-    headers={"x-api-key": "rl_123456789"},
-)
+reloop = Reloop(api_key="rl_123456789")
 
-result = response.json()`,
-		verify: `# Start DNS verification
-import requests
+result = reloop.domain.get("dom_123456789")
 
-response = requests.post(
-    "https://reloop.sh/api/domain/v1/verify/dom_123456789",
-    headers={"x-api-key": "rl_123456789"},
-)
+if result.domain_error:
+    raise result.domain_error
 
-result = response.json()`,
+print(result.domain["id"], result.domain["domain"], result.domain["status"])`,
+		update: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.domain.update("dom_123456789", {
+    "click_tracking": False,
+    "open_tracking": True,
+    "sending_email": True,
+})
+
+if result.domain_error:
+    raise result.domain_error
+
+print(result.domain["id"], result.domain["isClickTrackingEnabled"])`,
+		delete: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.domain.delete("dom_123456789")
+
+if result.domain_error:
+    raise result.domain_error
+
+print(result.domain["id"])`,
+		verify: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.domain.verify("dom_123456789")
+
+if result.domain_error:
+    raise result.domain_error
+
+print(result.domain["id"], result.domain["status"])`,
 	},
 	php: {
 		create: `<?php

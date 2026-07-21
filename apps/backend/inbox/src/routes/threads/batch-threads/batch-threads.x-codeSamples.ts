@@ -22,11 +22,20 @@ if (threadError) throw threadError;`,
   -H "Content-Type: application/json" \
   -d '{"ids":["thr_123456789","thr_987654321"],"action":"archive"}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.inbox.threads.batch({
+  "ids": ["thr_123456789", "thr_987654321"],
+  "action": "archive",
+})
+if result.thread_error:
+    raise result.thread_error`,
 	},
 	{
 		id: "php",

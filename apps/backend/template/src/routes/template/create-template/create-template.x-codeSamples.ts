@@ -26,26 +26,19 @@ const template = await reloop.template.create({
     "content": []
   }'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `from reloop_email import Reloop
 
-response = requests.post(
-    "https://reloop.sh/template/v1/create",
-    headers={
-        "Authorization": "Bearer rl_123456789",
-        "Content-Type": "application/json",
-    },
-    json={
-        "name": "Welcome Email",
-        "subject": "Welcome to Reloop!",
-        "content": [],
-    },
-)
+reloop = Reloop(api_key="rl_123456789")
 
-template = response.json()`,
+const template = reloop.template.create({
+  name: "Welcome Email",
+  subject: "Welcome to Reloop!",
+  content: []
+});`,
 	},
 	{
 		id: "php",

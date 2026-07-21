@@ -29,22 +29,27 @@ console.log(domain.id, domain.domain);`,
   -H "Content-Type: application/json" \\
   -d '{"domain": "send.example.com","click_tracking": true,"open_tracking": true,"tls": "opportunistic","sending_email": true,"receiving_email": false}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-domain = reloop.domain.create(
-    domain="send.example.com",
-    click_tracking=True,
-    open_tracking=True,
-    tls="opportunistic",
-    sending_email=True,
-    receiving_email=False,
-)`,
+result = reloop.domain.create({
+  "domain": "send.example.com",
+  "click_tracking": True,
+  "open_tracking": True,
+  "tls": "opportunistic",
+  "sending_email": True,
+  "receiving_email": False,
+})
+
+if result.domain_error:
+    raise result.domain_error
+
+print(result.domain["id"], result.domain["domain"])`,
 	},
 	{
 		id: "php",

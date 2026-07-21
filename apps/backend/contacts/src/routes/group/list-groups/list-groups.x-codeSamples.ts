@@ -23,15 +23,23 @@ console.log(groups.total, groups.groups);`,
 		source: `curl "https://reloop.sh/api/contacts/v1/groups/list?page=1&limit=10" \\
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-groups = reloop.contacts.list_groups(page=1, limit=10)`,
+result = reloop.contacts.groups.list({
+  "page": 1,
+  "limit": 10,
+})
+
+if result.group_error:
+    raise result.group_error
+
+print(result.groups["total"], result.groups["groups"])`,
 	},
 	{
 		id: "php",

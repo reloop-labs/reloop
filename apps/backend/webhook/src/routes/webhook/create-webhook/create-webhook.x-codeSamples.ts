@@ -23,22 +23,21 @@ if (webhookError) throw webhookError;`,
   -H "Content-Type: application/json" \\
   -d '{"description":"Production webhook","url":"https://example.com/webhooks/reloop","events":["domain.created","domain.deleted"]}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `# Webhook SDK support coming soon — use the REST API:
-import httpx
+		source: `from reloop_email import Reloop
 
-httpx.post(
-    "https://reloop.sh/api/webhook/v1/",
-    headers={"x-api-key": "rl_123456789"},
-    json={
-        "description": "Production webhook",
-        "url": "https://example.com/webhooks/reloop",
-        "events": ["domain.created", "domain.deleted"],
-    },
-)`,
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.webhook.create({
+  "description": "Production webhook",
+  "url": "https://example.com/webhooks/reloop",
+  "events": ["domain.created", "domain.deleted"],
+})
+if result.webhook_error:
+    raise result.webhook_error`,
 	},
 	{
 		id: "php",

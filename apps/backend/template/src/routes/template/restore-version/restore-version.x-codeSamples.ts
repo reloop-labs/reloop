@@ -16,20 +16,15 @@ const template = await reloop.template.restoreVersion("tpl_123456789", "ver_1234
 		source: `curl -X POST https://reloop.sh/template/v1/tpl_123456789/versions/ver_123456789/restore \\
   -H "Authorization: Bearer rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `from reloop_email import Reloop
 
-response = requests.post(
-    "https://reloop.sh/template/v1/tpl_123456789/versions/ver_123456789/restore",
-    headers={
-        "Authorization": "Bearer rl_123456789",
-    },
-)
+reloop = Reloop(api_key="rl_123456789")
 
-template = response.json()`,
+const template = reloop.template.restoreVersion("tpl_123456789", "ver_123456789");`,
 	},
 	{
 		id: "php",

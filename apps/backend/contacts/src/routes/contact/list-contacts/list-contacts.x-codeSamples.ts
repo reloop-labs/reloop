@@ -21,15 +21,21 @@ if (contactError) throw contactError;`,
 		source: `curl "https://reloop.sh/api/contacts/list?page=1&limit=10&status=subscribed" \\
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-contacts = reloop.contacts.list(page=1, limit=10, status="subscribed")`,
+result = reloop.contacts.list({
+  "page": 1,
+  "limit": 10,
+  "status": "subscribed",
+})
+if result.contact_error:
+    raise result.contact_error`,
 	},
 	{
 		id: "php",

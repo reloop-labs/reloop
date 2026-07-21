@@ -24,15 +24,22 @@ console.log(apiKey.id, apiKey.name);`,
   -H "Content-Type: application/json" \\
   -d '{"name": "Updated Key Name"}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-api_key = reloop.api_keys.update("key_123456789", name="Updated Key Name")`,
+result = reloop.api_key.update("key_123456789", {
+  "name": "Updated Key Name",
+})
+
+if result.api_key_error:
+    raise result.api_key_error
+
+print(result.api_key["id"], result.api_key["name"])`,
 	},
 	{
 		id: "php",

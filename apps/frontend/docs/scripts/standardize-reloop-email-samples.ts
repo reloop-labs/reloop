@@ -43,7 +43,7 @@ function standardize(content: string): string {
 		"const reloop = new Reloop({ apiKey: $1$2$1 })",
 	);
 
-	// Python
+	// Python SDK v2
 	next = next.replace(
 		/from reloop import Reloop/g,
 		"from reloop_email import Reloop",
@@ -51,6 +51,16 @@ function standardize(content: string): string {
 	next = next.replace(
 		/from reloop import ReloopClient/g,
 		"from reloop_email import Reloop",
+	);
+	next = next.replace(/pip install reloop-python/g, "pip install reloop-email");
+	next = next.replace(/reloop\.api_keys\b/g, "reloop.api_key");
+	next = next.replace(
+		/reloop\.contacts\.create_property\b/g,
+		"reloop.contacts.properties.create",
+	);
+	next = next.replace(
+		/reloop\.contacts\.create_group\b/g,
+		"reloop.contacts.groups.create",
 	);
 	next = next.replace(
 		/source: `reloop = Reloop\(api_key=/g,

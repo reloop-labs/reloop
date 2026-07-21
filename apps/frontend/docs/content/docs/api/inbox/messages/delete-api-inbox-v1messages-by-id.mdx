@@ -34,7 +34,13 @@ _apiData:
       lang: python
       label: Python
       source: |-
-        # Inbox SDK support coming soon — use the REST API
+        from reloop_email import Reloop
+        
+        reloop = Reloop(api_key="rl_123456789")
+        
+        result = reloop.inbox.messages.delete("msg_123456789")
+        if result.message_error:
+            raise result.message_error
     - id: php
       lang: php
       label: PHP

@@ -26,15 +26,24 @@ console.log(domain.id, domain.isClickTrackingEnabled);`,
   -H "Content-Type: application/json" \\
   -d '{"click_tracking": false}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-domain = reloop.domain.update("dom_123456789", click_tracking=False)`,
+result = reloop.domain.update("dom_123456789", {
+  "click_tracking": False,
+  "open_tracking": True,
+  "sending_email": True,
+})
+
+if result.domain_error:
+    raise result.domain_error
+
+print(result.domain["id"], result.domain["isClickTrackingEnabled"])`,
 	},
 	{
 		id: "php",

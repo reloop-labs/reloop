@@ -79,48 +79,76 @@ console.log(channel.id, channel.success);`,
 	python: {
 		add: {
 			filename: "create_channel.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-channel = reloop.contacts.channels.create(
-    name="Product Updates",
-    description="Get the latest news about our products",
-    default_subscription="opt_in",
-    visibility="public",
-)`,
+result = reloop.contacts.channels.create({
+    "name": "Product Updates",
+    "description": "Get the latest news about our products",
+    "defaultSubscription": "opt_in",
+    "visibility": "public",
+})
+
+if result.channel_error:
+    raise result.channel_error
+
+print(result.channel["id"], result.channel["name"])`,
 		},
 		get: {
 			filename: "get_channel.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-channel = reloop.contacts.channels.get("chn_123456789")`,
+result = reloop.contacts.channels.get("chn_123456789")
+
+if result.channel_error:
+    raise result.channel_error
+
+print(result.channel["id"], result.channel["name"])`,
 		},
 		list: {
 			filename: "list_channels.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-channels = reloop.contacts.channels.list(page=1, limit=10)`,
+result = reloop.contacts.channels.list({"page": 1, "limit": 10})
+
+if result.channel_error:
+    raise result.channel_error
+
+print(result.channels["total"], result.channels["channels"])`,
 		},
 		update: {
 			filename: "update_channel.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-channel = reloop.contacts.channels.update("chn_123456789", name="Marketing News")`,
+result = reloop.contacts.channels.update(
+    "chn_123456789",
+    {"name": "Marketing News"},
+)
+
+if result.channel_error:
+    raise result.channel_error
+
+print(result.channel["id"], result.channel["name"])`,
 		},
 		delete: {
 			filename: "delete_channel.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts.channels.delete("chn_123456789")`,
+result = reloop.contacts.channels.delete("chn_123456789")
+
+if result.channel_error:
+    raise result.channel_error
+
+print(result.channel["id"], result.channel["success"])`,
 		},
 	},
 	php: {

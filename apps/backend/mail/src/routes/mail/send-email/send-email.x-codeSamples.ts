@@ -27,7 +27,7 @@ if (emailError) throw emailError;`,
   -H "Content-Type: application/json" \\
   -d '{"from":"Reloop <hello@send.example.com>","to":"user@example.com","subject":"Welcome to Reloop","html":"<p>Thanks for signing up.</p>","text":"Thanks for signing up.","reply_to":"support@example.com","tags":[{"name":"campaign","value":"welcome"}]}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
@@ -35,15 +35,22 @@ if (emailError) throw emailError;`,
 
 reloop = Reloop(api_key="rl_123456789")
 
-result = reloop.mail.send(
-    from_="Reloop <hello@send.example.com>",
-    to="user@example.com",
-    subject="Welcome to Reloop",
-    html="<p>Thanks for signing up.</p>",
-    text="Thanks for signing up.",
-    reply_to="support@example.com",
-    tags=[{"name": "campaign", "value": "welcome"}],
-)`,
+result = reloop.mail.send({
+  "from": "Reloop <hello@send.example.com>",
+  "to": "user@example.com",
+  "subject": "Welcome to Reloop",
+  "html": "<p>Thanks for signing up.</p>",
+  "text": "Thanks for signing up.",
+  "reply_to": "support@example.com",
+  "tags": [
+    {
+      "name": "campaign",
+      "value": "welcome",
+    },
+  ],
+})
+if result.email_error:
+    raise result.email_error`,
 	},
 	{
 		id: "php",

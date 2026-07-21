@@ -22,11 +22,20 @@ if (messageError) throw messageError;`,
   -H "Content-Type: application/json" \
   -d '{"to":"colleague@example.com","html":"<p>See the thread below.</p>"}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.inbox.messages.forward("msg_123456789", {
+  "to": "colleague@example.com",
+  "html": "<p>See the thread below.</p>",
+})
+if result.message_error:
+    raise result.message_error`,
 	},
 	{
 		id: "php",

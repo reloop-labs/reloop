@@ -26,19 +26,24 @@ console.log(property.id, property.propertyName);`,
   -H "Content-Type: application/json" \\
   -d '{"name": "company_name","type": "string","fallbackValue": "Unknown"}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-property = reloop.contacts.create_property(
-    name="company_name",
-    type="string",
-    fallback_value="Unknown",
-)`,
+result = reloop.contacts.properties.create({
+  "name": "company_name",
+  "type": "string",
+  "fallbackValue": "Unknown",
+})
+
+if result.property_error:
+    raise result.property_error
+
+print(result.property["id"], result.property["propertyName"])`,
 	},
 	{
 		id: "php",

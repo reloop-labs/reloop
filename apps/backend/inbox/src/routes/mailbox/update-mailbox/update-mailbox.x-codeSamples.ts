@@ -21,11 +21,19 @@ if (mailboxError) throw mailboxError;`,
   -H "Content-Type: application/json" \
   -d '{"status":"disabled"}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.inbox.mailboxes.update("mbx_123456789", {
+  "status": "disabled",
+})
+if result.mailbox_error:
+    raise result.mailbox_error`,
 	},
 	{
 		id: "php",

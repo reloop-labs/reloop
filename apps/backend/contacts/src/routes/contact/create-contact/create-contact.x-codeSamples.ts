@@ -27,23 +27,33 @@ if (contactError) throw contactError;`,
   -H "Content-Type: application/json" \\
   -d '{"email": "john.doe@example.com","firstName": "John","lastName": "Doe","status": "subscribed","properties": {"company": "Reloop","role": "Developer"},"groupIds": ["grp_123456789"],"channels": [{"channelId": "chn_123456789","subscription": "opt_in"}]}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-contact = reloop.contacts.create(
-    email="john.doe@example.com",
-    first_name="John",
-    last_name="Doe",
-    status="subscribed",
-    properties={"company": "Reloop", "role": "Developer"},
-    group_ids=["grp_123456789"],
-    channels=[{"channel_id": "chn_123456789", "subscription": "opt_in"}],
-)`,
+result = reloop.contacts.create({
+  "email": "john.doe@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "status": "subscribed",
+  "properties": {
+    "company": "Reloop",
+    "role": "Developer",
+  },
+  "groupIds": ["grp_123456789"],
+  "channels": [
+    {
+      "channelId": "chn_123456789",
+      "subscription": "opt_in",
+    },
+  ],
+})
+if result.contact_error:
+    raise result.contact_error`,
 	},
 	{
 		id: "php",

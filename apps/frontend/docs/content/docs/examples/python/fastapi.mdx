@@ -13,7 +13,7 @@ Reloop can be easily integrated into any FastAPI application.
 Install the official Python SDK:
 
 ```bash
-pip install reloop-python
+pip install reloop-email
 ```
 
 ## Setup Environment Variables
@@ -39,13 +39,15 @@ reloop = Reloop(api_key=os.environ.get("RELOOP_API_KEY"))
 @app.post("/send-email")
 async def send_email():
     try:
-        response = reloop.mail.send(
-            from_="onboarding@reloop.dev",
-            to="delivered@resend.dev",
-            subject="Hello from FastAPI",
-            html="<p>Congrats on sending your first email via Reloop from FastAPI!</p>"
-        )
-        return response
+        result = reloop.mail.send({
+            "from": "onboarding@reloop.dev",
+            "to": "delivered@resend.dev",
+            "subject": "Hello from FastAPI",
+            "html": "<p>Congrats on sending your first email via Reloop from FastAPI!</p>",
+        })
+        if result.email_error:
+            raise result.email_error
+        return result.response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 ```

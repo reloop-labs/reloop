@@ -21,11 +21,19 @@ if (threadError) throw threadError;`,
   -H "Content-Type: application/json" \
   -d '{"isRead":true}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.inbox.threads.setRead("thr_123456789", {
+  "isRead": True,
+})
+if result.thread_error:
+    raise result.thread_error`,
 	},
 	{
 		id: "php",

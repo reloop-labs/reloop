@@ -25,15 +25,23 @@ console.log(channel.subscriptionId, channel.contact.id);`,
   -H "Content-Type: application/json" \\
   -d '{"contact_id": "con_123456789","subscription": "opt_in"}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts.channels.add_contact("chn_123456789", contact_id="con_123456789", subscription="opt_in")`,
+result = reloop.contacts.channels.addContact("chn_123456789", {
+  "contact_id": "con_123456789",
+  "subscription": "opt_in",
+})
+
+if result.channel_error:
+    raise result.channel_error
+
+print(result.channel["subscriptionId"], result.channel["contact"].id)`,
 	},
 	{
 		id: "php",

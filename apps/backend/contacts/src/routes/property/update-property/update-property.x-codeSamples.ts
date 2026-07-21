@@ -25,15 +25,22 @@ console.log(property.id, property.defaultValue);`,
   -H "Content-Type: application/json" \\
   -d '{"fallbackValue": "N/A"}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-property = reloop.contacts.update_property("prop_123456789", fallback_value="N/A")`,
+result = reloop.contacts.properties.update("prop_123456789", {
+  "fallbackValue": "N/A",
+})
+
+if result.property_error:
+    raise result.property_error
+
+print(result.property["id"], result.property["defaultValue"])`,
 	},
 	{
 		id: "php",

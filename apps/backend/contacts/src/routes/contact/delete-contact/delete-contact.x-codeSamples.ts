@@ -17,15 +17,17 @@ if (contactError) throw contactError;`,
 		source: `curl -X DELETE https://reloop.sh/api/contacts/con_123456789 \\
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts.delete("con_123456789")`,
+result = reloop.contacts.delete("con_123456789")
+if result.contact_error:
+    raise result.contact_error`,
 	},
 	{
 		id: "php",

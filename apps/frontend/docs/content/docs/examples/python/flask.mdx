@@ -11,7 +11,7 @@ Integrate Reloop into your Flask application.
 ## Installation
 
 ```bash
-pip install reloop-python
+pip install reloop-email
 ```
 
 ## Sending an Email
@@ -27,13 +27,15 @@ reloop = Reloop(api_key=os.environ.get("RELOOP_API_KEY"))
 @app.route("/send-email", methods=["POST"])
 def send_email():
     try:
-        response = reloop.mail.send(
-            from_="onboarding@reloop.dev",
-            to="delivered@resend.dev",
-            subject="Hello from Flask",
-            html="<p>Congrats on sending your first email via Reloop from Flask!</p>"
-        )
-        return jsonify(response)
+        result = reloop.mail.send({
+            "from": "onboarding@reloop.dev",
+            "to": "delivered@resend.dev",
+            "subject": "Hello from Flask",
+            "html": "<p>Congrats on sending your first email via Reloop from Flask!</p>",
+        })
+        if result.email_error:
+            raise result.email_error
+        return jsonify(result.response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

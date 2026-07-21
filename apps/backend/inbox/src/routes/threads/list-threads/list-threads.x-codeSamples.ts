@@ -17,11 +17,19 @@ if (threadError) throw threadError;`,
 		source: `curl -X GET "https://reloop.sh/api/inbox/v1/threads?limit=50" \
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.inbox.threads.list({
+  "limit": 50,
+})
+if result.thread_error:
+    raise result.thread_error`,
 	},
 	{
 		id: "php",

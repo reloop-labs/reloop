@@ -16,24 +16,15 @@ const templates = await reloop.template.list({ page: 1, limit: 10 });`,
 		source: `curl "https://reloop.sh/template/v1/list?page=1&limit=10" \\
   -H "Authorization: Bearer rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `from reloop_email import Reloop
 
-response = requests.get(
-    "https://reloop.sh/template/v1/list",
-    headers={
-        "Authorization": "Bearer rl_123456789",
-    },
-    params={
-        "page": 1,
-        "limit": 10,
-    },
-)
+reloop = Reloop(api_key="rl_123456789")
 
-templates = response.json()`,
+const templates = reloop.template.list({ page: 1, limit: 10 });`,
 	},
 	{
 		id: "php",

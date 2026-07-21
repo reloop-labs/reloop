@@ -85,8 +85,12 @@ params = {
     "html": "<strong>It works!</strong>",
 }
 
-email = reloop.emails.send(params)
-print(f"Email sent: {email['id']}")`,
+result = reloop.mail.send(params)
+
+if result.email_error:
+    raise result.email_error
+
+print(f"Email sent: {result.response['id']}")`,
 	},
 	{
 		slug: "go",

@@ -37,11 +37,16 @@ _apiData:
       lang: python
       label: Python
       source: |-
-        from reloop import Reloop
+        from reloop_email import Reloop
         
         reloop = Reloop(api_key="rl_123456789")
         
-        reloop.api_keys.disable("key_123456789")
+        result = reloop.api_key.disable("key_123456789")
+        
+        if result.api_key_error:
+            raise result.api_key_error
+        
+        print(result.api_key["id"], result.api_key["enabled"])
     - id: php
       lang: php
       label: PHP

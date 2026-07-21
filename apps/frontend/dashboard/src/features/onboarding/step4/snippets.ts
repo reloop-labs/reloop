@@ -55,14 +55,17 @@ from reloop_email import Reloop
 
 reloop = Reloop(api_key=os.environ["RELOOP_API_KEY"])
 
-result = reloop.mail.send(
-    from_="sender@example.com",
-    to="recipient@example.com",
-    subject="Hello from Reloop!",
-    text="Hello World!",
-)
+result = reloop.mail.send({
+    "from": "sender@example.com",
+    "to": "recipient@example.com",
+    "subject": "Hello from Reloop!",
+    "text": "Hello World!",
+})
 
-print(result.message_id, result.id)`,
+if result.email_error:
+    raise result.email_error
+
+print(result.response["messageId"], result.response["id"])`,
 		lang: "py",
 	},
 	go: {

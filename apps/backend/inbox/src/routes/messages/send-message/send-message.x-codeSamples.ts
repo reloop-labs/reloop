@@ -24,11 +24,22 @@ if (messageError) throw messageError;`,
   -H "Content-Type: application/json" \
   -d '{"mailboxId":"mbx_123456789","to":"user@example.com","subject":"Hello from Reloop Inbox","html":"<p>Thanks for reaching out.</p>"}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.inbox.messages.send({
+  "mailboxId": "mbx_123456789",
+  "to": "user@example.com",
+  "subject": "Hello from Reloop Inbox",
+  "html": "<p>Thanks for reaching out.</p>",
+})
+if result.message_error:
+    raise result.message_error`,
 	},
 	{
 		id: "php",

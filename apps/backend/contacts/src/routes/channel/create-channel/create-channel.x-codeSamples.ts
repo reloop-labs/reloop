@@ -27,20 +27,25 @@ console.log(channel.id, channel.name);`,
   -H "Content-Type: application/json" \\
   -d '{"name": "Product Updates","description": "Get the latest news about our products","defaultSubscription": "opt_in","visibility": "public"}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-channel = reloop.contacts.channels.create(
-    name="Product Updates",
-    description="Get the latest news about our products",
-    default_subscription="opt_in",
-    visibility="public",
-)`,
+result = reloop.contacts.channels.create({
+  "name": "Product Updates",
+  "description": "Get the latest news about our products",
+  "defaultSubscription": "opt_in",
+  "visibility": "public",
+})
+
+if result.channel_error:
+    raise result.channel_error
+
+print(result.channel["id"], result.channel["name"])`,
 	},
 	{
 		id: "php",

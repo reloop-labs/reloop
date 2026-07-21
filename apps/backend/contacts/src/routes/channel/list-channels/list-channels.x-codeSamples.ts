@@ -23,15 +23,23 @@ console.log(channels.total, channels.channels);`,
 		source: `curl "https://reloop.sh/api/contacts/v1/channels/list?page=1&limit=10" \\
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-channels = reloop.contacts.channels.list(page=1, limit=10)`,
+result = reloop.contacts.channels.list({
+  "page": 1,
+  "limit": 10,
+})
+
+if result.channel_error:
+    raise result.channel_error
+
+print(result.channels["total"], result.channels["channels"])`,
 	},
 	{
 		id: "php",

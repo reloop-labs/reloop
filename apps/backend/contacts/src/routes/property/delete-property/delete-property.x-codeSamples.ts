@@ -22,15 +22,20 @@ console.log(property.id, property.success);`,
 		source: `curl -X DELETE https://reloop.sh/api/contacts/v1/properties/prop_123456789 \\
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts.delete_property("prop_123456789")`,
+result = reloop.contacts.properties.delete("prop_123456789")
+
+if result.property_error:
+    raise result.property_error
+
+print(result.property["id"], result.property["success"])`,
 	},
 	{
 		id: "php",

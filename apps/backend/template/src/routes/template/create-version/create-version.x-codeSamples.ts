@@ -26,26 +26,19 @@ const version = await reloop.template.createVersion("tpl_123456789", {
     "name": "v1.0.0"
   }'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `from reloop_email import Reloop
 
-response = requests.post(
-    "https://reloop.sh/template/v1/tpl_123456789/versions",
-    headers={
-        "Authorization": "Bearer rl_123456789",
-        "Content-Type": "application/json",
-    },
-    json={
-        "content": [],
-        "isMajor": True,
-        "name": "v1.0.0",
-    },
-)
+reloop = Reloop(api_key="rl_123456789")
 
-version = response.json()`,
+const version = reloop.template.createVersion("tpl_123456789", {
+  content: [],
+  isMajor: true,
+  name: "v1.0.0"
+});`,
 	},
 	{
 		id: "php",

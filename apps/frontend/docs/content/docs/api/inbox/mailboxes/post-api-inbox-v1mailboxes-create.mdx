@@ -40,7 +40,17 @@ _apiData:
       lang: python
       label: Python
       source: |-
-        # Inbox SDK support coming soon — use the REST API
+        from reloop_email import Reloop
+        
+        reloop = Reloop(api_key="rl_123456789")
+        
+        result = reloop.inbox.mailboxes.create({
+          "domainId": "dom_123456789",
+          "email": "support@example.com",
+          "displayName": "Support",
+        })
+        if result.mailbox_error:
+            raise result.mailbox_error
     - id: php
       lang: php
       label: PHP

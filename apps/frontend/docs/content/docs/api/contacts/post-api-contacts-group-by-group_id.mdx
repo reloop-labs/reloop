@@ -42,11 +42,18 @@ _apiData:
       lang: python
       label: Python
       source: |-
-        from reloop import Reloop
+        from reloop_email import Reloop
         
         reloop = Reloop(api_key="rl_123456789")
         
-        reloop.contacts.groups.add_contact("grp_123456789", contact_id="con_123456789")
+        result = reloop.contacts.groups.addContact("grp_123456789", {
+          "contact_id": "con_123456789",
+        })
+        
+        if result.group_error:
+            raise result.group_error
+        
+        print(result.group["id"], result.group["success"])
     - id: php
       lang: php
       label: PHP

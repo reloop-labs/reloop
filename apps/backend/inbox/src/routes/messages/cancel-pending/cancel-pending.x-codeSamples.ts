@@ -17,11 +17,17 @@ if (messageError) throw messageError;`,
 		source: `curl -X POST https://reloop.sh/api/inbox/v1/messages/pending/pnd_123456789/cancel \
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.inbox.messages.cancelPending("pnd_123456789")
+if result.message_error:
+    raise result.message_error`,
 	},
 	{
 		id: "php",

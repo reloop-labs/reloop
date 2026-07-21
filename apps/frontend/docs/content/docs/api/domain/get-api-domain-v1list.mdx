@@ -41,11 +41,20 @@ _apiData:
       lang: python
       label: Python
       source: |-
-        from reloop import Reloop
+        from reloop_email import Reloop
         
         reloop = Reloop(api_key="rl_123456789")
         
-        domains = reloop.domain.list(page=1, limit=10, status="active")
+        result = reloop.domain.list({
+          "page": 1,
+          "limit": 10,
+          "status": "active",
+        })
+        
+        if result.domain_error:
+            raise result.domain_error
+        
+        print(result.domains["total"], result.domains["domains"])
     - id: php
       lang: php
       label: PHP

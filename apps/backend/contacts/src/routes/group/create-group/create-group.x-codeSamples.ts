@@ -24,15 +24,22 @@ console.log(group.id, group.name);`,
   -H "Content-Type: application/json" \\
   -d '{"name": "Beta Testers"}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-group = reloop.contacts.create_group(name="Beta Testers")`,
+result = reloop.contacts.groups.create({
+  "name": "Beta Testers",
+})
+
+if result.group_error:
+    raise result.group_error
+
+print(result.group["id"], result.group["name"])`,
 	},
 	{
 		id: "php",

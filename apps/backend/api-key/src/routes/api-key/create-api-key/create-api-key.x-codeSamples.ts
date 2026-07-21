@@ -24,15 +24,22 @@ console.log(apiKey.id, apiKey.key);`,
   -H "Content-Type: application/json" \\
   -d '{"name": "Production Key"}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-api_key = reloop.api_keys.create(name="Production Key")`,
+result = reloop.api_key.create({
+  "name": "Production Key",
+})
+
+if result.api_key_error:
+    raise result.api_key_error
+
+print(result.api_key["id"], result.api_key["key"])`,
 	},
 	{
 		id: "php",

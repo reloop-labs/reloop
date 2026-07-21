@@ -24,15 +24,24 @@ console.log(apiKeys.total, apiKeys.apiKeys);`,
 		source: `curl "https://reloop.sh/api/api-key/v1/?page=1&limit=10" \\
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-api_keys = reloop.api_keys.list(page=1, limit=10)`,
+result = reloop.api_key.list({
+  "page": 1,
+  "limit": 10,
+  "enabled": True,
+})
+
+if result.api_key_error:
+    raise result.api_key_error
+
+print(result.api_keys["total"], result.api_keys["apiKeys"])`,
 	},
 	{
 		id: "php",

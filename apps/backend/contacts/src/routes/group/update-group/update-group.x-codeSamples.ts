@@ -25,15 +25,22 @@ console.log(group.id, group.name);`,
   -H "Content-Type: application/json" \\
   -d '{"name": "Loyal Customers"}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-group = reloop.contacts.update_group("grp_123456789", name="Loyal Customers")`,
+result = reloop.contacts.groups.update("grp_123456789", {
+  "name": "Loyal Customers",
+})
+
+if result.group_error:
+    raise result.group_error
+
+print(result.group["id"], result.group["name"])`,
 	},
 	{
 		id: "php",

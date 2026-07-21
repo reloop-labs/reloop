@@ -40,11 +40,19 @@ _apiData:
       lang: python
       label: Python
       source: |-
-        from reloop import Reloop
+        from reloop_email import Reloop
         
         reloop = Reloop(api_key="rl_123456789")
         
-        properties = reloop.contacts.list_properties(page=1, limit=10)
+        result = reloop.contacts.properties.list({
+          "page": 1,
+          "limit": 10,
+        })
+        
+        if result.property_error:
+            raise result.property_error
+        
+        print(result.properties["total"], result.properties["properties"])
     - id: php
       lang: php
       label: PHP

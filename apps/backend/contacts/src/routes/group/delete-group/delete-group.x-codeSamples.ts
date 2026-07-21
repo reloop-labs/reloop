@@ -20,15 +20,20 @@ console.log(group.id, group.success);`,
 		source: `curl -X DELETE https://reloop.sh/api/contacts/v1/groups/grp_123456789 \\
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts.delete_group("grp_123456789")`,
+result = reloop.contacts.groups.delete("grp_123456789")
+
+if result.group_error:
+    raise result.group_error
+
+print(result.group["id"], result.group["success"])`,
 	},
 	{
 		id: "php",

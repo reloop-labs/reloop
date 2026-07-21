@@ -21,11 +21,19 @@ if (webhookError) throw webhookError;`,
   -H "Content-Type: application/json" \\
   -d '{"status":"paused"}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `# Webhook SDK support coming soon`,
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.webhook.update("wh_123456789", {
+  "status": "paused",
+})
+if result.webhook_error:
+    raise result.webhook_error`,
 	},
 	{
 		id: "php",

@@ -41,11 +41,18 @@ _apiData:
       lang: python
       label: Python
       source: |-
-        from reloop import Reloop
+        from reloop_email import Reloop
         
         reloop = Reloop(api_key="rl_123456789")
         
-        api_key = reloop.api_keys.update("key_123456789", name="Updated Key Name")
+        result = reloop.api_key.update("key_123456789", {
+          "name": "Updated Key Name",
+        })
+        
+        if result.api_key_error:
+            raise result.api_key_error
+        
+        print(result.api_key["id"], result.api_key["name"])
     - id: php
       lang: php
       label: PHP

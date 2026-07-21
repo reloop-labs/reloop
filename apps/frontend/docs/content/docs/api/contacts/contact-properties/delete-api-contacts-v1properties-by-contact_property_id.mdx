@@ -39,11 +39,16 @@ _apiData:
       lang: python
       label: Python
       source: |-
-        from reloop import Reloop
+        from reloop_email import Reloop
         
         reloop = Reloop(api_key="rl_123456789")
         
-        reloop.contacts.delete_property("prop_123456789")
+        result = reloop.contacts.properties.delete("prop_123456789")
+        
+        if result.property_error:
+            raise result.property_error
+        
+        print(result.property["id"], result.property["success"])
     - id: php
       lang: php
       label: PHP

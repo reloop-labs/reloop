@@ -22,11 +22,22 @@ if (webhookError) throw webhookError;`,
   -H "Content-Type: application/json" \\
   -d '{"event":"domain.created","payload":{"domainId":"dom_123456789"}}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `# Webhook SDK support coming soon`,
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.webhook.trigger({
+  "event": "domain.created",
+  "payload": {
+    "domainId": "dom_123456789",
+  },
+})
+if result.webhook_error:
+    raise result.webhook_error`,
 	},
 	{
 		id: "php",

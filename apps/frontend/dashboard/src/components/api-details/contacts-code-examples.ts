@@ -129,92 +129,145 @@ console.log(group.id, group.success);`,
 	python: {
 		add: {
 			filename: "add_contact.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-contact = reloop.contacts.create(
-    email="john.doe@example.com",
-    first_name="John",
-    last_name="Doe",
-    status="subscribed",
-    properties={"company": "Reloop", "role": "Developer"},
-    group_ids=["grp_123456789"],
-    channels=[{"channel_id": "chn_123456789", "subscription": "opt_in"}],
-)`,
+result = reloop.contacts.create({
+    "email": "john.doe@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "status": "subscribed",
+    "properties": {"company": "Reloop", "role": "Developer"},
+    "groupIds": ["grp_123456789"],
+    "channels": [{"channelId": "chn_123456789", "subscription": "opt_in"}],
+})
+
+if result.contact_error:
+    raise result.contact_error
+
+print(result.contact["id"], result.contact["email"])`,
 		},
 		get: {
 			filename: "get_contact.py",
 			code: `from reloop_email import Reloop
 
-reloop = Reloop(api_key="re_123456789")
+reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts().get("cont_123456789")`,
+result = reloop.contacts.get("cont_123456789")
+
+if result.contact_error:
+    raise result.contact_error
+
+print(result.contact["id"], result.contact["email"])`,
 		},
 		list: {
 			filename: "list_contact.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-contacts = reloop.contacts.list(page=1, limit=10, status="subscribed")`,
+result = reloop.contacts.list({"page": 1, "limit": 10, "status": "subscribed"})
+
+if result.contact_error:
+    raise result.contact_error
+
+print(result.contacts["total"], result.contacts["contacts"])`,
 		},
 		update: {
 			filename: "update_contact.py",
 			code: `from reloop_email import Reloop
 
-reloop = Reloop(api_key="re_123456789")
+reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts().update(
-    "cont_123456789",
-    first_name="Jane",
-    last_name="Smith",
-    unsubscribed=False,
-    properties={
-        "company": "Reloop",
-        "role": "Designer",
-    },
-)`,
+result = reloop.contacts.update("cont_123456789", {
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "status": "subscribed",
+    "properties": {"company": "Reloop", "role": "Designer"},
+})
+
+if result.contact_error:
+    raise result.contact_error
+
+print(result.contact["id"], result.contact["email"])`,
 		},
 		delete: {
 			filename: "delete_contact.py",
 			code: `from reloop_email import Reloop
 
-reloop = Reloop(api_key="re_123456789")
+reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts().delete("cont_123456789")`,
+result = reloop.contacts.delete("cont_123456789")
+
+if result.contact_error:
+    raise result.contact_error
+
+print(result.contact["id"])`,
 		},
 		addChannel: {
 			filename: "add_contact_channel.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts.channels.add_contact("chn_123456789", contact_id="con_123456789", subscription="opt_in")`,
+result = reloop.contacts.channels.add_contact(
+    "chn_123456789",
+    {"contact_id": "con_123456789", "subscription": "opt_in"},
+)
+
+if result.channel_error:
+    raise result.channel_error
+
+print(result.channel["subscriptionId"], result.channel["contact"]["id"])`,
 		},
 		updateChannel: {
 			filename: "update_contact_channel.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts.channels.update_subscription("chn_123456789", contact_id="con_123456789", subscription="opt_out")`,
+result = reloop.contacts.channels.update_subscription(
+    "chn_123456789",
+    {"contact_id": "con_123456789", "subscription": "opt_out"},
+)
+
+if result.channel_error:
+    raise result.channel_error
+
+print(result.channel["status"], result.channel["success"])`,
 		},
 		addGroup: {
 			filename: "add_contact_group.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts.groups.add_contact("grp_123456789", contact_id="con_123456789")`,
+result = reloop.contacts.groups.add_contact(
+    "grp_123456789",
+    {"contact_id": "con_123456789"},
+)
+
+if result.group_error:
+    raise result.group_error
+
+print(result.group["id"], result.group["success"])`,
 		},
 		deleteGroup: {
 			filename: "delete_contact_group.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts.groups.remove_contact("grp_123456789", contact_id="con_123456789")`,
+result = reloop.contacts.groups.remove_contact(
+    "grp_123456789",
+    {"contact_id": "con_123456789"},
+)
+
+if result.group_error:
+    raise result.group_error
+
+print(result.group["id"], result.group["success"])`,
 		},
 	},
 	php: {

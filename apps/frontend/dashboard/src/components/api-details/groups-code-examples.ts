@@ -87,51 +87,87 @@ console.log(contacts.total, contacts.contacts);`,
 	python: {
 		add: {
 			filename: "create_group.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-group = reloop.contacts.create_group(name="Beta Testers")`,
+result = reloop.contacts.groups.create({"name": "Beta Testers"})
+
+if result.group_error:
+    raise result.group_error
+
+print(result.group["id"], result.group["name"])`,
 		},
 		get: {
 			filename: "get_group.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-group = reloop.contacts.get_group("grp_123456789")`,
+result = reloop.contacts.groups.get("grp_123456789")
+
+if result.group_error:
+    raise result.group_error
+
+print(result.group["id"], result.group["name"])`,
 		},
 		list: {
 			filename: "list_groups.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-groups = reloop.contacts.list_groups(page=1, limit=10)`,
+result = reloop.contacts.groups.list({"page": 1, "limit": 10})
+
+if result.group_error:
+    raise result.group_error
+
+print(result.groups["total"], result.groups["groups"])`,
 		},
 		update: {
 			filename: "update_group.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-group = reloop.contacts.update_group("grp_123456789", name="Loyal Customers")`,
+result = reloop.contacts.groups.update(
+    "grp_123456789",
+    {"name": "Loyal Customers"},
+)
+
+if result.group_error:
+    raise result.group_error
+
+print(result.group["id"], result.group["name"])`,
 		},
 		delete: {
 			filename: "delete_group.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts.delete_group("grp_123456789")`,
+result = reloop.contacts.groups.delete("grp_123456789")
+
+if result.group_error:
+    raise result.group_error
+
+print(result.group["id"], result.group["success"])`,
 		},
 		getContacts: {
 			filename: "get_group_contacts.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts.groups.list_contacts("grp_123456789", page=1, limit=10)`,
+result = reloop.contacts.groups.list_contacts(
+    "grp_123456789",
+    {"page": 1, "limit": 10},
+)
+
+if result.group_error:
+    raise result.group_error
+
+print(result.contacts["total"], result.contacts["contacts"])`,
 		},
 	},
 	php: {

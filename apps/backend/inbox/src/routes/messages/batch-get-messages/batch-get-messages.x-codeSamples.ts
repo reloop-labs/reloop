@@ -21,11 +21,19 @@ if (messageError) throw messageError;`,
   -H "Content-Type: application/json" \
   -d '{"ids":["msg_123456789","msg_987654321"]}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.inbox.messages.batch({
+  "ids": ["msg_123456789", "msg_987654321"],
+})
+if result.message_error:
+    raise result.message_error`,
 	},
 	{
 		id: "php",

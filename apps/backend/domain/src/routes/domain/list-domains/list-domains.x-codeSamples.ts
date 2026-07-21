@@ -24,15 +24,24 @@ console.log(domains.total, domains.domains);`,
 		source: `curl "https://reloop.sh/api/domain/v1/list?page=1&limit=10&status=active" \\
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-domains = reloop.domain.list(page=1, limit=10, status="active")`,
+result = reloop.domain.list({
+  "page": 1,
+  "limit": 10,
+  "status": "active",
+})
+
+if result.domain_error:
+    raise result.domain_error
+
+print(result.domains["total"], result.domains["domains"])`,
 	},
 	{
 		id: "php",

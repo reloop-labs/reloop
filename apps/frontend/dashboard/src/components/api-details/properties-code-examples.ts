@@ -64,39 +64,62 @@ console.log(property.id, property.success);`,
 	python: {
 		add: {
 			filename: "create_property.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-property = reloop.contacts.create_property(
-    name="company_name",
-    type="string",
-    fallback_value="Unknown",
-)`,
+result = reloop.contacts.properties.create({
+    "name": "company_name",
+    "type": "string",
+    "fallbackValue": "Unknown",
+})
+
+if result.property_error:
+    raise result.property_error
+
+print(result.property["id"], result.property["propertyName"])`,
 		},
 		list: {
 			filename: "list_properties.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-properties = reloop.contacts.list_properties(page=1, limit=10)`,
+result = reloop.contacts.properties.list({"page": 1, "limit": 10})
+
+if result.property_error:
+    raise result.property_error
+
+print(result.properties["total"], result.properties["properties"])`,
 		},
 		update: {
 			filename: "update_property.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-property = reloop.contacts.update_property("prop_123456789", fallback_value="N/A")`,
+result = reloop.contacts.properties.update(
+    "prop_123456789",
+    {"fallbackValue": "N/A"},
+)
+
+if result.property_error:
+    raise result.property_error
+
+print(result.property["id"], result.property["defaultValue"])`,
 		},
 		delete: {
 			filename: "delete_property.py",
-			code: `from reloop import Reloop
+			code: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts.delete_property("prop_123456789")`,
+result = reloop.contacts.properties.delete("prop_123456789")
+
+if result.property_error:
+    raise result.property_error
+
+print(result.property["id"], result.property["success"])`,
 		},
 	},
 	php: {

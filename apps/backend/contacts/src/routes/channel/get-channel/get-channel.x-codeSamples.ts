@@ -22,15 +22,20 @@ console.log(channel.id, channel.name);`,
 		source: `curl "https://reloop.sh/api/contacts/v1/channels/chn_123456789" \\
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-channel = reloop.contacts.channels.get("chn_123456789")`,
+result = reloop.contacts.channels.get("chn_123456789")
+
+if result.channel_error:
+    raise result.channel_error
+
+print(result.channel["id"], result.channel["name"])`,
 	},
 	{
 		id: "php",

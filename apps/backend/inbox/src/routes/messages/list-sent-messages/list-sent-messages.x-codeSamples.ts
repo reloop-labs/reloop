@@ -19,11 +19,19 @@ if (messageError) throw messageError;`,
 		source: `curl -X GET "https://reloop.sh/api/inbox/v1/messages/sent?mailboxId=mbx_123456789" \
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.inbox.messages.listSent({
+  "mailboxId": "mbx_123456789",
+})
+if result.message_error:
+    raise result.message_error`,
 	},
 	{
 		id: "php",

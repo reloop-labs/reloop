@@ -24,25 +24,18 @@ const updatedTemplate = await reloop.template.update("tpl_123456789", {
     "subject": "Welcome to Reloop! (Updated)"
   }'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `import requests
+		source: `from reloop_email import Reloop
 
-response = requests.put(
-    "https://reloop.sh/template/v1/tpl_123456789",
-    headers={
-        "Authorization": "Bearer rl_123456789",
-        "Content-Type": "application/json",
-    },
-    json={
-        "name": "Updated Welcome Email",
-        "subject": "Welcome to Reloop! (Updated)",
-    },
-)
+reloop = Reloop(api_key="rl_123456789")
 
-updated_template = response.json()`,
+const updatedTemplate = reloop.template.update("tpl_123456789", {
+  name: "Updated Welcome Email",
+  subject: "Welcome to Reloop! (Updated)"
+});`,
 	},
 	{
 		id: "php",

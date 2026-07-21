@@ -23,15 +23,23 @@ console.log(properties.total, properties.properties);`,
 		source: `curl "https://reloop.sh/api/contacts/v1/properties/list?page=1&limit=10" \\
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-properties = reloop.contacts.list_properties(page=1, limit=10)`,
+result = reloop.contacts.properties.list({
+  "page": 1,
+  "limit": 10,
+})
+
+if result.property_error:
+    raise result.property_error
+
+print(result.properties["total"], result.properties["properties"])`,
 	},
 	{
 		id: "php",

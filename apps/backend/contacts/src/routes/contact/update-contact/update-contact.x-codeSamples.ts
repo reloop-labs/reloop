@@ -19,15 +19,19 @@ if (contactError) throw contactError;`,
   -H "Content-Type: application/json" \\
   -d '{"firstName": "Jane"}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-contact = reloop.contacts.update("con_123456789", first_name="Jane")`,
+result = reloop.contacts.update("con_123456789", {
+  "firstName": "Jane",
+})
+if result.contact_error:
+    raise result.contact_error`,
 	},
 	{
 		id: "php",

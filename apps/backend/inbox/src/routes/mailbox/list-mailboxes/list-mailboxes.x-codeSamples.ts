@@ -17,11 +17,17 @@ if (mailboxError) throw mailboxError;`,
 		source: `curl -X GET "https://reloop.sh/api/inbox/v1/mailboxes/list" \
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.inbox.mailboxes.list()
+if result.mailbox_error:
+    raise result.mailbox_error`,
 	},
 	{
 		id: "php",

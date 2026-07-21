@@ -25,15 +25,22 @@ console.log(group.id, group.success);`,
   -H "Content-Type: application/json" \\
   -d '{"contact_id": "con_123456789"}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts.groups.remove_contact("grp_123456789", contact_id="con_123456789")`,
+result = reloop.contacts.groups.removeContact("grp_123456789", {
+  "contact_id": "con_123456789",
+})
+
+if result.group_error:
+    raise result.group_error
+
+print(result.group["id"], result.group["success"])`,
 	},
 	{
 		id: "php",

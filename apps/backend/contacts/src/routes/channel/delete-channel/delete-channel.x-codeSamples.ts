@@ -22,15 +22,20 @@ console.log(channel.id, channel.success);`,
 		source: `curl -X DELETE https://reloop.sh/api/contacts/v1/channels/chn_123456789 \\
   -H "x-api-key: rl_123456789"`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `from reloop import Reloop
+		source: `from reloop_email import Reloop
 
 reloop = Reloop(api_key="rl_123456789")
 
-reloop.contacts.channels.delete("chn_123456789")`,
+result = reloop.contacts.channels.delete("chn_123456789")
+
+if result.channel_error:
+    raise result.channel_error
+
+print(result.channel["id"], result.channel["success"])`,
 	},
 	{
 		id: "php",

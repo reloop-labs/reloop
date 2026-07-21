@@ -21,11 +21,19 @@ if (messageError) throw messageError;`,
   -H "Content-Type: application/json" \
   -d '{"isRead":true}'`,
 	},
-	{
+				{
 		id: "python",
 		lang: "python",
 		label: "Python",
-		source: `# Inbox SDK support coming soon — use the REST API`,
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.inbox.messages.setRead("msg_123456789", {
+  "isRead": True,
+})
+if result.message_error:
+    raise result.message_error`,
 	},
 	{
 		id: "php",
