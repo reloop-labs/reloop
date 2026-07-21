@@ -198,6 +198,9 @@ services:
       - "11332:11332" # Scan port (normal worker)
       - "11333:11333" # Scan / Controller port
       - "11334:11334" # Web UI / Controller
+    environment:
+      - RSPAMD_REDIS_SERVERS=${RSPAMD_REDIS_SERVERS:-reloop-redis:6379}
+      - RSPAMD_REDIS_PASSWORD=${RSPAMD_REDIS_PASSWORD:-reloop123}
     volumes:
       - ../docker-data/rspamd/lib:/var/lib/rspamd
       - ../apps/backend/spam/local.d:/etc/rspamd/local.d

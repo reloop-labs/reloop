@@ -28,7 +28,14 @@ Inbound points at this service via:
 |----------|---------|
 | `KUMOMTA_RSPAMD_URL` | `http://reloop-spam:11333/checkv2` |
 
-Rspamd uses Redis (`reloop-redis`) for learning and fuzzy storage. Local overrides live in `local.d/`.
+Spam Redis — native Rspamd image env (`RSPAMD_` prefix required):
+
+| Variable | Default |
+|----------|---------|
+| `RSPAMD_REDIS_SERVERS` | `reloop-redis:6379` |
+| `RSPAMD_REDIS_PASSWORD` | `reloop123` |
+
+Falls back to those defaults when unset. Local overrides live in `local.d/`.
 
 ## 🔗 Resources & Community
 

@@ -39,7 +39,14 @@ Controller / scan endpoint: [http://localhost:11333](http://localhost:11333).
 
 ## Configuration
 
-Local overrides live in `apps/backend/spam/local.d/` (mounted into the container). Redis defaults point at `reloop-redis`.
+Local overrides live in `apps/backend/spam/local.d/` (mounted into the container).
+
+Spam Redis (set on the **spam** container — native Rspamd `RSPAMD_*` env):
+
+| Variable | Default |
+| :--- | :--- |
+| `RSPAMD_REDIS_SERVERS` | `reloop-redis:6379` |
+| `RSPAMD_REDIS_PASSWORD` | `reloop123` |
 
 Inbound wires to this service with:
 
