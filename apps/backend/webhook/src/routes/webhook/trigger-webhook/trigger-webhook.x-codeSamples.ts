@@ -39,17 +39,39 @@ result = reloop.webhook.trigger({
 if result.webhook_error:
     raise result.webhook_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `// Webhook SDK support coming soon`,
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$webhook = $reloop->webhook->trigger([
+    'event' => 'domain.created',
+    'payload' => [
+        'domainId' => 'dom_123456789',
+    ],
+]);`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `// Webhook SDK support coming soon`,
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.WebhookModels.TriggerWebhookParams;
+import java.util.Map;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+TriggerWebhookParams params = new TriggerWebhookParams();
+params.event = "domain.created";
+params.payload = Map.of("domainId", "dom_123456789");
+var webhook = reloop.webhook.trigger(params);`,
 	},
 	{
 		id: "dotnet",

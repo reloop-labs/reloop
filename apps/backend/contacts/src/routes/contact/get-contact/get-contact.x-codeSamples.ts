@@ -29,24 +29,29 @@ result = reloop.contacts.get("con_123456789")
 if result.contact_error:
     raise result.contact_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$reloop->contacts->get('con_123456789');`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$contact = $reloop->contacts->get('con_123456789');`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.contacts.get("con_123456789");`,
+var contact = reloop.contacts.get("con_123456789");`,
 	},
 	{
 		id: "dotnet",

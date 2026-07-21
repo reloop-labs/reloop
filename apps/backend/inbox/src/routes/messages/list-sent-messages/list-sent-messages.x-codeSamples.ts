@@ -33,17 +33,34 @@ result = reloop.inbox.messages.listSent({
 if result.message_error:
     raise result.message_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$messages = $reloop->inbox->messages->listSent([
+    'mailboxId' => 'mbx_123456789',
+]);`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.InboxModels.ListSentMessagesParams;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+ListSentMessagesParams params = new ListSentMessagesParams();
+params.mailboxId = "mbx_123456789";
+var messages = reloop.inbox.messages.listSent(params);`,
 	},
 	{
 		id: "dotnet",

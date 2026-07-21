@@ -33,24 +33,34 @@ result = reloop.contacts.update("con_123456789", {
 if result.contact_error:
     raise result.contact_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$contact = $reloop->contacts->update('con_123456789', ['first_name' => 'Jane']);`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$contact = $reloop->contacts->update('con_123456789', [
+    'firstName' => 'Jane',
+]);`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+import sh.reloop.models.ContactModels.UpdateContactParams;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.contacts.update("con_123456789", Map.of("firstName", "Jane"));`,
+UpdateContactParams params = new UpdateContactParams();
+params.firstName = "Jane";
+var contact = reloop.contacts.update("con_123456789", params);`,
 	},
 	{
 		id: "dotnet",

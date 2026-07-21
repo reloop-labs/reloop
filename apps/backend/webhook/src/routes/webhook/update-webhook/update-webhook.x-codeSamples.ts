@@ -35,17 +35,34 @@ result = reloop.webhook.update("wh_123456789", {
 if result.webhook_error:
     raise result.webhook_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `// Webhook SDK support coming soon`,
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$webhook = $reloop->webhook->update('wh_123456789', [
+    'status' => 'paused',
+]);`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `// Webhook SDK support coming soon`,
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.WebhookModels.UpdateWebhookParams;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+UpdateWebhookParams params = new UpdateWebhookParams();
+params.status = "paused";
+var webhook = reloop.webhook.update("wh_123456789", params);`,
 	},
 	{
 		id: "dotnet",

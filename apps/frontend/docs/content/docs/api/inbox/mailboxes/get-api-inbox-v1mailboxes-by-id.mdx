@@ -45,12 +45,24 @@ _apiData:
       lang: php
       label: PHP
       source: |-
-        // Inbox SDK support coming soon — use the REST API
+        <?php
+        
+        require 'vendor/autoload.php';
+        
+        use Reloop\Reloop;
+        
+        $reloop = Reloop::client('rl_123456789');
+        
+        $mailbox = $reloop->inbox->mailboxes->get('mbx_123456789');
     - id: java
       lang: java
       label: Java
       source: |-
-        // Inbox SDK support coming soon — use the REST API
+        import sh.reloop.ReloopClient;
+        
+        ReloopClient reloop = new ReloopClient("rl_123456789");
+        
+        var mailbox = reloop.inbox.mailboxes.get("mbx_123456789");
     - id: dotnet
       lang: csharp
       label: .NET

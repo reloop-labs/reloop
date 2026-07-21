@@ -61,19 +61,35 @@ _apiData:
       lang: php
       label: PHP
       source: |-
+        <?php
+        
+        require 'vendor/autoload.php';
+        
+        use Reloop\Reloop;
+        
         $reloop = Reloop::client('rl_123456789');
         
-        $domain = $reloop->domain->update('dom_123456789', ['click_tracking' => false]);
+        $domain = $reloop->domain->update('dom_123456789', [
+            'click_tracking' => false,
+            'open_tracking' => true,
+            'sending_email' => true,
+        ]);
+        echo $domain['id'] . ' ' . $domain['isClickTrackingEnabled'] . PHP_EOL;
     - id: java
       lang: java
       label: Java
       source: |-
         import sh.reloop.ReloopClient;
-        import sh.reloop.models.Models.*;
+        import sh.reloop.models.DomainModels.UpdateDomainParams;
         
         ReloopClient reloop = new ReloopClient("rl_123456789");
         
-        Domain domain = reloop.domain.update("dom_123456789", new UpdateDomainParams(false, null, null, null, null));
+        UpdateDomainParams params = new UpdateDomainParams();
+        params.clickTracking = false;
+        params.openTracking = true;
+        params.sendingEmail = true;
+        var domain = reloop.domain.update("dom_123456789", params);
+        System.out.println(domain.id + " " + domain.isClickTrackingEnabled);
     - id: dotnet
       lang: csharp
       label: .NET

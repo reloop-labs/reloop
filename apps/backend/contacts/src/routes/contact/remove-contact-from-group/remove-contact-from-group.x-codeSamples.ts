@@ -42,24 +42,36 @@ if result.group_error:
 
 print(result.group["id"], result.group["success"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$reloop->contacts->groups->removeContact('grp_123456789', ['contact_id' => 'con_123456789']);`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$group = $reloop->contacts->groups->removeContact('grp_123456789', [
+    'contact_id' => 'con_123456789',
+]);
+echo $group['id'] . ' ' . $group['success'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+import sh.reloop.models.ContactModels.RemoveGroupContactParams;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.contacts.groups.removeContact("grp_123456789", Map.of("contact_id", "con_123456789"));`,
+RemoveGroupContactParams params = new RemoveGroupContactParams();
+params.contactId = "con_123456789";
+var group = reloop.contacts.groups.removeContact("grp_123456789", params);
+System.out.println(group.id + " " + group.success);`,
 	},
 	{
 		id: "dotnet",

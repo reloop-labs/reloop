@@ -57,19 +57,31 @@ _apiData:
       lang: php
       label: PHP
       source: |-
+        <?php
+        
+        require 'vendor/autoload.php';
+        
+        use Reloop\Reloop;
+        
         $reloop = Reloop::client('rl_123456789');
         
-        $apiKey = $reloop->apiKeys->update('key_123456789', ['name' => 'Updated Key Name']);
+        $apiKey = $reloop->apiKey->update('key_123456789', [
+            'name' => 'Updated Key Name',
+        ]);
+        echo $apiKey['id'] . ' ' . $apiKey['name'] . PHP_EOL;
     - id: java
       lang: java
       label: Java
       source: |-
         import sh.reloop.ReloopClient;
-        import sh.reloop.models.Models.*;
+        import sh.reloop.models.ApiKeyModels.UpdateApiKeyParams;
         
         ReloopClient reloop = new ReloopClient("rl_123456789");
         
-        ApiKey apiKey = reloop.apiKeys.update("key_123456789", new UpdateApiKeyParams("Updated Key Name"));
+        UpdateApiKeyParams params = new UpdateApiKeyParams();
+        params.name = "Updated Key Name";
+        var apiKey = reloop.apiKey.update("key_123456789", params);
+        System.out.println(apiKey.id + " " + apiKey.name);
     - id: dotnet
       lang: csharp
       label: .NET

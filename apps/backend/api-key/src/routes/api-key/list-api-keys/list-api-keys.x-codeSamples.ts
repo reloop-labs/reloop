@@ -43,24 +43,40 @@ if result.api_key_error:
 
 print(result.api_keys["total"], result.api_keys["apiKeys"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$apiKeys = $reloop->apiKeys->list(['page' => 1, 'limit' => 10]);`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$apiKeys = $reloop->apiKey->list([
+    'page' => 1,
+    'limit' => 10,
+    'enabled' => true,
+]);
+echo $apiKeys['total'] . ' ' . $apiKeys['apiKeys'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+import sh.reloop.models.ApiKeyModels.ApiKeyListParams;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-ApiKeyListResponse apiKeys = reloop.apiKeys.list(new ApiKeyListParams(1, 10, null, null, null));`,
+ApiKeyListParams params = new ApiKeyListParams();
+params.page = 1;
+params.limit = 10;
+params.enabled = true;
+var apiKeys = reloop.apiKey.list(params);
+System.out.println(apiKeys.total + " " + apiKeys.apiKeys);`,
 	},
 	{
 		id: "dotnet",

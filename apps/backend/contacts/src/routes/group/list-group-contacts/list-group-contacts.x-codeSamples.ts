@@ -41,24 +41,38 @@ if result.group_error:
 
 print(result.contacts["total"], result.contacts["contacts"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$reloop->contacts->groups->listContacts('grp_123456789', ['page' => 1, 'limit' => 10]);`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$contacts = $reloop->contacts->groups->listContacts('grp_123456789', [
+    'page' => 1,
+    'limit' => 10,
+]);
+echo $contacts['total'] . ' ' . $contacts['contacts'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+import sh.reloop.models.ContactModels.ListGroupContactsParams;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.contacts.groups.listContacts("grp_123456789", Map.of("page", 1, "limit", 10));`,
+ListGroupContactsParams params = new ListGroupContactsParams();
+params.page = 1;
+params.limit = 10;
+var contacts = reloop.contacts.groups.listContacts("grp_123456789", params);
+System.out.println(contacts.total + " " + contacts.contacts);`,
 	},
 	{
 		id: "dotnet",

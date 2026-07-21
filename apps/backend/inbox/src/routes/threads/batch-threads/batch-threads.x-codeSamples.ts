@@ -37,17 +37,37 @@ result = reloop.inbox.threads.batch({
 if result.thread_error:
     raise result.thread_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$thread = $reloop->inbox->threads->batch([
+    'ids' => ['thr_123456789', 'thr_987654321'],
+    'action' => 'archive',
+]);`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.InboxModels.BatchThreadsParams;
+import java.util.List;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+BatchThreadsParams params = new BatchThreadsParams();
+params.ids = List.of("thr_123456789", "thr_987654321");
+params.action = "archive";
+var thread = reloop.inbox.threads.batch(params);`,
 	},
 	{
 		id: "dotnet",

@@ -35,24 +35,31 @@ if result.api_key_error:
 
 print(result.api_key["id"], result.api_key["enabled"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$reloop->apiKeys->enable('key_123456789');`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$apiKey = $reloop->apiKey->enable('key_123456789');
+echo $apiKey['id'] . ' ' . $apiKey['enabled'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.apiKeys.enable("key_123456789");`,
+var apiKey = reloop.apiKey.enable("key_123456789");
+System.out.println(apiKey.id + " " + apiKey.enabled);`,
 	},
 	{
 		id: "dotnet",

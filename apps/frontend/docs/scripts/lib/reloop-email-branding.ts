@@ -25,10 +25,10 @@ export const RELOOP_EMAIL = {
 			].join("\n"),
 	},
 	java: {
-		imports: ["import sh.reloop.email.ReloopEmail;", "import java.util.*;"],
-		install: "sh.reloop:reloop-email",
+		imports: ["import sh.reloop.ReloopClient;"],
+		install: "sh.reloop:reloop-java",
 		client: (apiKey: string) =>
-			`ReloopEmail reloop = ReloopEmail.client("${apiKey}");`,
+			`ReloopClient reloop = new ReloopClient("${apiKey}");`,
 	},
 	rust: {
 		imports: ["use reloop_email::ReloopEmail;", "use serde_json::json;"],

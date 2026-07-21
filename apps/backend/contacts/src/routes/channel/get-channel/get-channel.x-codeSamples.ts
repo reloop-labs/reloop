@@ -37,24 +37,31 @@ if result.channel_error:
 
 print(result.channel["id"], result.channel["name"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$channel = $reloop->contacts->channels->get('chn_123456789');`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$channel = $reloop->contacts->channels->get('chn_123456789');
+echo $channel['id'] . ' ' . $channel['name'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.contacts.channels.get("chn_123456789");`,
+var channel = reloop.contacts.channels.get("chn_123456789");
+System.out.println(channel.id + " " + channel.name);`,
 	},
 	{
 		id: "dotnet",

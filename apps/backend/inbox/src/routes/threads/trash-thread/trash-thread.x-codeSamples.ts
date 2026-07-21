@@ -29,17 +29,29 @@ result = reloop.inbox.threads.trash("thr_123456789")
 if result.thread_error:
     raise result.thread_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$thread = $reloop->inbox->threads->trash('thr_123456789');`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `import sh.reloop.ReloopClient;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+var thread = reloop.inbox.threads.trash("thr_123456789");`,
 	},
 	{
 		id: "dotnet",

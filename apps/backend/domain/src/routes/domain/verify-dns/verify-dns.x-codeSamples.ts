@@ -35,24 +35,31 @@ if result.domain_error:
 
 print(result.domain["id"], result.domain["status"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$result = $reloop->domain->verify('dom_123456789');`,
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$domain = $reloop->domain->verify('dom_123456789');
+echo $domain['id'] . ' ' . $domain['status'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-var result = reloop.domain.verify("dom_123456789");`,
+var domain = reloop.domain.verify("dom_123456789");
+System.out.println(domain.id + " " + domain.status);`,
 	},
 	{
 		id: "dotnet",

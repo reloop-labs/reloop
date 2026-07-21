@@ -51,9 +51,10 @@ const LANG_MAP: Record<
 	node: { langKey: "nodejs", label: "Node", shikiLang: "javascript" },
 	python: { langKey: "python", label: "Python", shikiLang: "python" },
 	php: { langKey: "php", label: "PHP", shikiLang: "php" },
+	java: { langKey: "java", label: "Java", shikiLang: "java" },
 };
 
-const DASHBOARD_LANG_ORDER = ["node", "python", "php"] as const;
+const DASHBOARD_LANG_ORDER = ["node", "python", "php", "java"] as const;
 
 type OpMeta = {
 	id: string;

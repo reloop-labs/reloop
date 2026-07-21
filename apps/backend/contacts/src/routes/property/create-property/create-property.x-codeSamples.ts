@@ -45,32 +45,40 @@ if result.property_error:
 
 print(result.property["id"], result.property["propertyName"])`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `$reloop = Reloop::client('rl_123456789');
+		source: `<?php
 
-$property = $reloop->contacts->createProperty([
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$property = $reloop->contacts->properties->create([
     'name' => 'company_name',
     'type' => 'string',
-    'fallback_value' => 'Unknown',
-]);`,
+    'fallbackValue' => 'Unknown',
+]);
+echo $property['id'] . ' ' . $property['propertyName'] . PHP_EOL;`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
 		source: `import sh.reloop.ReloopClient;
-import sh.reloop.models.Models.*;
+import sh.reloop.models.ContactModels.CreatePropertyParams;
 
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
-reloop.contacts.createProperty(Map.of(
-    "name", "company_name",
-    "type", "string",
-    "fallbackValue", "Unknown"
-));`,
+CreatePropertyParams params = new CreatePropertyParams();
+params.name = "company_name";
+params.type = "string";
+params.fallbackValue = "Unknown";
+var property = reloop.contacts.properties.create(params);
+System.out.println(property.id + " " + property.propertyName);`,
 	},
 	{
 		id: "dotnet",

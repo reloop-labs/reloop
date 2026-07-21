@@ -35,17 +35,36 @@ result = reloop.inbox.messages.list({
 if result.message_error:
     raise result.message_error`,
 	},
-	{
+			{
 		id: "php",
 		lang: "php",
 		label: "PHP",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$messages = $reloop->inbox->messages->list([
+    'mailboxId' => 'mbx_123456789',
+    'limit' => 100,
+]);`,
 	},
-	{
+			{
 		id: "java",
 		lang: "java",
 		label: "Java",
-		source: `// Inbox SDK support coming soon — use the REST API`,
+		source: `import sh.reloop.ReloopClient;
+import sh.reloop.models.InboxModels.ListMessagesParams;
+
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+ListMessagesParams params = new ListMessagesParams();
+params.mailboxId = "mbx_123456789";
+params.limit = 100;
+var messages = reloop.inbox.messages.list(params);`,
 	},
 	{
 		id: "dotnet",

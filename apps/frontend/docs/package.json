@@ -10,7 +10,8 @@
 		"sync:code-samples": "bun run scripts/sync-code-samples-from-source.ts",
 		"standardize:reloop-email": "bun run scripts/standardize-reloop-email-samples.ts",
 		"update:go-samples": "bun run scripts/update-go-from-python-samples.ts",
-		"update:java-samples": "bun run scripts/update-java-from-python-samples.ts",
+		"update:java-samples": "bun run scripts/update-java-sdk-v2-samples.ts",
+		"update:php-samples": "bun run scripts/update-php-sdk-v2-samples.ts",
 		"update:rust-samples": "bun run scripts/update-rust-from-python-samples.ts",
 		"update:dotnet-samples": "bun run scripts/update-dotnet-from-python-samples.ts"
 	},
