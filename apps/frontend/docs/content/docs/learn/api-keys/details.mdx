@@ -1,11 +1,28 @@
 ---
-title: Details
-description: Details of API key scopes, environment separation, token rotation, and whitelisting.
+title: Security
+description: Keep Reloop API keys safe.
+sidebarTitle: Security
 ---
 
-### Key Capabilities
+## Store
 
-* **Fine-Grained Scopes**: Authorize keys only for specific operations (e.g. `emails:send`, `contacts:read`, `webhooks:write`).
-* **Environment Separation**: Distinct keys for production, staging, and development environments.
-* **Token Rotation**: Securely rotate active keys without causing downtime.
-* **IP Whitelisting**: Restrict API key usage to specific servers or CIDR ranges.
+| Do | Don’t |
+|----|--------|
+| `RELOOP_API_KEY` in env / secrets | Commit keys to git |
+| One key per app | Share one key everywhere |
+| Clear names (`Production`, `CI`) | Leave keys unnamed |
+
+## If a key leaks
+
+1. **Disable** it (dashboard or code) — access stops now  
+2. **Rotate** or **create** a replacement  
+3. Update apps with the new secret  
+4. **Delete** the old key when nothing uses it  
+
+Same steps work in [dashboard or code](/docs/learn/api-keys/managing-api-keys#manage).
+
+## Remember
+
+- Secret is shown **once** (create / rotate)
+- Later you only see a **prefix** in the list
+- Reloop stores a hash, not the full key

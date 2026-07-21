@@ -1,0 +1,178 @@
+---
+title: Managing API Keys
+description: Create, use, and manage Reloop API keys from the dashboard or with code.
+---
+
+Everything below works from the **dashboard** or with **code**. Pick whichever you prefer — the keys are the same.
+
+Open the UI any time: [API Keys](https://reloop.sh/dashboard/api-keys)
+
+---
+
+## Create
+
+<Tabs>
+  <Tab title="Dashboard">
+    ![Create API Key modal](/docs/images/docs/api-keys/create-form.png)
+
+    1. Go to [API Keys](https://reloop.sh/dashboard/api-keys)
+    2. **Create API key**
+    3. Enter a name (e.g. `Production Server`)
+    4. **Create API Key**
+    5. Copy the secret (or the **.env** tab), then **Done**
+
+    ![API Key created — copy once](/docs/images/docs/api-keys/create-success.png)
+  </Tab>
+  <Tab title="Code">
+    Use any existing key to create another.
+
+    ```javascript
+    import { Reloop } from "reloop-email";
+
+    const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
+
+    const { apiKey, apiKeyError } = await reloop.apiKey.create({
+      name: "Production Server",
+    });
+    if (apiKeyError) throw apiKeyError;
+
+    console.log(apiKey.key); // only returned here
+    ```
+
+    ```bash
+    curl -X POST https://reloop.sh/api/api-key/v1/ \
+      -H "x-api-key: $RELOOP_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{"name": "Production Server"}'
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+Copy the secret immediately. After create (and rotate), it is never shown again.
+</Warning>
+
+---
+
+## Use
+
+Store the secret, then send it on every request as `x-api-key`.
+
+<Tabs>
+  <Tab title="Dashboard → your app">
+    After create, copy from the success modal (**API Key** or **.env**):
+
+    ![Store the key as RELOOP_API_KEY](/docs/images/docs/api-keys/use-env.png)
+
+    Put it in your environment, then call Reloop from your code (next tab).
+  </Tab>
+  <Tab title="Code">
+    ```env
+    RELOOP_API_KEY=rl_prod_YOUR_API_KEY
+    ```
+
+    ```bash
+    curl https://reloop.sh/api/domain/v1/list \
+      -H "x-api-key: $RELOOP_API_KEY"
+    ```
+
+    ```javascript
+    import { Reloop } from "reloop-email";
+
+    const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Manage
+
+Disable, rotate, rename, or delete — dashboard row menu or API.
+
+![API key row actions](/docs/images/docs/api-keys/actions.png)
+
+| Action | What happens |
+|--------|----------------|
+| **Disable / Enable** | Pause or restore access |
+| **Rotate Key** | New secret, same key — copy once, update apps |
+| **Delete API Key** | Gone for good (type the name to confirm) |
+| **Edit** | Rename only |
+
+<Tabs>
+  <Tab title="Dashboard">
+    1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
+    2. Row **···** menu (or open the key)
+    3. Choose **Disable**, **Rotate Key**, **Delete API Key**, or **Edit**
+    4. On rotate: copy the new secret and update every place that used the old one
+  </Tab>
+  <Tab title="Code">
+    ```javascript
+    import { Reloop } from "reloop-email";
+
+    const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
+    const id = "key_123456789";
+
+    await reloop.apiKey.update(id, { name: "CI Pipeline" });
+    await reloop.apiKey.disable(id);
+    await reloop.apiKey.enable(id);
+
+    const { apiKey } = await reloop.apiKey.rotate(id); // apiKey.key once
+    await reloop.apiKey.delete(id);
+    ```
+
+    ```bash
+    curl -X POST https://reloop.sh/api/api-key/v1/disable/key_123456789 \
+      -H "x-api-key: $RELOOP_API_KEY"
+
+    curl -X POST https://reloop.sh/api/api-key/v1/rotate/key_123456789 \
+      -H "x-api-key: $RELOOP_API_KEY"
+
+    curl -X DELETE https://reloop.sh/api/api-key/v1/key_123456789 \
+      -H "x-api-key: $RELOOP_API_KEY"
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## List
+
+See every key for your org — secret never included.
+
+![API Keys table](/docs/images/docs/api-keys/list.png)
+
+<Tabs>
+  <Tab title="Dashboard">
+    [API Keys](https://reloop.sh/dashboard/api-keys) shows name, prefix, last used, status.
+  </Tab>
+  <Tab title="Code">
+    ```javascript
+    const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
+
+    await reloop.apiKey.list({ page: 1, limit: 10 });
+    await reloop.apiKey.get("key_123456789");
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## API reference
+
+<CardGroup cols={2}>
+  <Card icon="plus" title="Create" href="/api/api-key/post-api-api-key-v1">
+    Secret once.
+  </Card>
+  <Card icon="list" title="List" href="/api/api-key/get-api-api-key-v1">
+    All keys.
+  </Card>
+  <Card icon="refresh" title="Rotate" href="/api/api-key/post-api-api-key-v1rotate-by-api_key_id">
+    New secret.
+  </Card>
+  <Card icon="trash" title="Delete" href="/api/api-key/delete-api-api-key-v1by-api_key_id">
+    Remove key.
+  </Card>
+</CardGroup>
+
+[Security](/docs/learn/api-keys/details) · [Full API Key endpoints](/docs/api/api-key)

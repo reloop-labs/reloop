@@ -1,33 +1,16 @@
 ---
 title: "Handling API Keys"
-description: "Best practices for managing and securing your API keys."
+description: "Create and use Reloop API keys from the dashboard or code."
 ---
 
-Best practices for managing and securing your API keys.
+Create keys in the [dashboard](https://reloop.sh/dashboard/api-keys) or with code. Use the secret in your app. Manage with either platform.
 
-## Overview
+## Quick rules
 
-Manage your Reloop account settings effectively to ensure smooth operation.
+- Copy on create/rotate — secret is not shown again  
+- Store as `RELOOP_API_KEY`  
+- Leak? **Disable** → replace → update apps  
 
-## Steps
+## Guide
 
-<Steps>
-  <Step title="Access your settings">
-    Navigate to the [Account Settings](https://app.reloop.dev/settings) page in your Reloop dashboard.
-  </Step>
-  <Step title="Make your changes">
-    Follow the on-screen instructions to update your account configuration.
-  </Step>
-  <Step title="Confirm changes">
-    Review and confirm your changes. Some changes may require email verification.
-  </Step>
-</Steps>
-
-<Note>
-If you need assistance with account changes, contact [Reloop support](https://reloop.dev/help).
-</Note>
-
-## Learn More
-
-- [Handling API Keys](/docs/knowledge-base/handling-api-keys)
-- [Account Quotas and Limits](/docs/knowledge-base/account-quotas-limits)
+[Managing API Keys](/docs/learn/api-keys/managing-api-keys) — dashboard + code for create, use, rotate, delete.
