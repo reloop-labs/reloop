@@ -12,7 +12,7 @@ import * as React from "react";
 import * as simpleIcons from "simple-icons";
 import useSWR from "swr";
 import { inferDnsProvider } from "@fe/dashboard/app/(protected)/(layout)/domain/[domainId]/utils";
-import { useDomainConnect } from "@fe/dashboard/app/(protected)/(layout)/domain/[domainId]/hooks/use-domain-connect";
+import { useDomainConnect } from "@fe/dashboard/features/domain/detail/hooks/use-domain-connect";
 import Spinner from "@reloop/ui/spinner";
 
 interface DNSAutoConnectBannerProps {

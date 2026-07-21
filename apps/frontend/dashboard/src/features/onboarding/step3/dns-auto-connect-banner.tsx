@@ -1,8 +1,10 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import Spinner from "@reloop/ui/spinner";
 import * as React from "react";
 import * as simpleIcons from "simple-icons";
+import { useDomainConnect } from "#/features/domain/detail/hooks/use-domain-connect";
 import type { DomainResponse } from "./domain-types";
 import { inferDnsProvider } from "./infer-dns-provider";
 import { useDomainNameserversQuery } from "./use-domain-query";
@@ -31,6 +33,7 @@ export function DnsAutoConnectBanner({
 	domain?: DomainResponse;
 	domainId: string;
 }) {
+	const { startAutoConnect, isConnecting } = useDomainConnect(domainId);
 	const { data: nameserverData, isLoading } =
 		useDomainNameserversQuery(domainId);
 
@@ -92,13 +95,20 @@ export function DnsAutoConnectBanner({
 						type="button"
 						variant="neutral"
 						mode="filled"
-						onClick={() => {
-							// Backend auto-populate not wired yet — open provider DNS UI.
-							if (provider.url) window.open(provider.url, "_blank");
-						}}
+						onClick={() => void startAutoConnect()}
 						className="h-10 shrink-0 gap-2 px-4"
+						disabled={isConnecting}
 					>
-						<span className="font-semibold text-sm">Open DNS settings</span>
+						{isConnecting ? (
+							<>
+								<Spinner color="currentColor" />
+								<span className="font-semibold text-sm">Connecting...</span>
+							</>
+						) : (
+							<span className="font-semibold text-sm">
+								Auto-populate records
+							</span>
+						)}
 					</Button.Root>
 				</div>
 			</div>

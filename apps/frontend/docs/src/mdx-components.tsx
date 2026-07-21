@@ -2,6 +2,7 @@ import { APIPage } from "@reloop/fe-docs/components/mdx/APIPage";
 import { CardGroup } from "@reloop/fe-docs/components/mdx/CardGroup";
 import {
 	Accordion,
+	AccordionGroup,
 	Callout,
 	Card,
 	CodeBlock,
@@ -116,6 +117,7 @@ export function getMDXComponents(
 			/>
 		),
 		Accordion,
+		AccordionGroup,
 		Callout,
 		CodeBlock,
 		CodeGroup,

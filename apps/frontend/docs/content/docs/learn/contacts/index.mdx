@@ -9,29 +9,47 @@ Reloop **Contacts** enables you to build, manage, and organize your subscriber a
 
 ---
 
-## Dashboard Usage
+## What is a Contact?
 
-The Reloop Dashboard provides a visual and intuitive interface to manage your contact database.
+At its simplest, think of **Contacts** as your digital **phone book**. Just like you save a person's phone number under their name so you don't have to remember the digits, Reloop allows you to save information (like an email address, name, and custom properties) under a single "Contact" entity. 
 
-### 1. Navigating Contacts
-In the left sidebar of the dashboard, expand the **Contacts** accordion. Click on the main navigation link to view your Contact table. Here, you can search for contacts by name or email, filter them by status, and view their metadata.
+Instead of dealing with raw email addresses every time you want to send a message, you interact with a Contact. In Reloop, a contact is a **Global Entity** identified by their unique email address. This means a single contact can belong to multiple groups or channels without being duplicated, ensuring their data—like unsubscribe status—stays perfectly synced everywhere.
 
-### 2. Adding Contacts Manually
-To add a single contact:
-1. Click the **Add Contact** button at the top-right of the Contacts list view.
-2. In the modal, fill in the required fields:
-   * **Email**: The unique email address for the contact.
-   * **First Name** & **Last Name** (Optional): Details to personalize your outbound communications.
-   * **Status**: Set their subscription state to **Subscribed** or **Unsubscribed**.
-3. Optionally choose any **Groups** or **Channels** to enroll the contact in directly.
-4. Click **Add Contact** to save.
+---
 
-### 3. Bulk Importing via CSV
-To import multiple contacts at once:
-1. Navigate to **Contacts** and click the **Bulk Import** button.
-2. Upload a standard CSV file. The columns should match your contact schema (e.g., `email`, `firstName`, `lastName`).
-3. Map the fields in your CSV to the existing properties in Reloop.
-4. Run the import to populate your database instantly.
+## How Contacts Work
+
+Every contact in Reloop stores a core set of information:
+
+| Field | Description |
+|-------|-------------|
+| **Email** | The unique identifier for the contact (required) |
+| **First Name / Last Name** | Optional display name fields |
+| **Status** | `subscribed`, `unsubscribed`, or `blocked` |
+| **Properties** | Custom key-value pairs (e.g., `company`, `plan_tier`) |
+| **Groups** | Organizational labels for segmentation (e.g., "Beta Testers") |
+| **Channels** | Communication channels with per-channel opt-in/opt-out control |
+
+You can add contacts via the API, CSV import, or manually in the dashboard. Once created, contacts can be organized into **Groups** for targeted broadcasts and enrolled in **Channels** to manage subscription preferences per communication type.
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card icon="user-plus" title="Managing Contacts" href="/docs/learn/contacts/managing-contacts">
+    Add, view, update, and delete contacts via the dashboard or API.
+  </Card>
+  <Card icon="sliders" title="Properties" href="/docs/learn/contacts/properties">
+    Extend contacts with custom fields for personalization and filtering.
+  </Card>
+  <Card icon="users" title="Groups" href="/docs/learn/contacts/groups">
+    Organize contacts into groups for targeted broadcasts.
+  </Card>
+  <Card icon="tower-broadcast" title="Channels" href="/docs/learn/contacts/channels">
+    Manage per-channel subscription preferences.
+  </Card>
+</CardGroup>
 
 ---
 

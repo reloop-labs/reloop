@@ -261,6 +261,7 @@ CodeBlock.displayName = "CodeBlock";
 // Mintlify components use sub-components for items
 export const Tabs = MintlifyTabs;
 export const Tab = (MintlifyTabs as any).Item;
+export const AccordionGroup = (Accordion as any).Group;
 const Steps = React.forwardRef<
 	HTMLDivElement,
 	React.ComponentProps<typeof MintlifySteps>

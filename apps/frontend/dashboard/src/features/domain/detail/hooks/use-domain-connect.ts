@@ -29,7 +29,7 @@ export const useDomainConnect = (domainId: string | undefined) => {
 		try {
 			const { data } = await axios.get<DCDiscoveryResult>(
 				`/api/domain/v1/domain-connect/discover/${domainId}`,
-				{ headers: { credentials: "include" } },
+				{ withCredentials: true },
 			);
 			setDiscovery(data);
 			return data;
@@ -53,7 +53,7 @@ export const useDomainConnect = (domainId: string | undefined) => {
 			// 1. Check DC support
 			const { data: disc } = await axios.get<DCDiscoveryResult>(
 				`/api/domain/v1/domain-connect/discover/${domainId}`,
-				{ headers: { credentials: "include" } },
+				{ withCredentials: true },
 			);
 
 			if (!disc.supported) {
@@ -76,7 +76,7 @@ export const useDomainConnect = (domainId: string | undefined) => {
 			setStatus("redirecting");
 			const { data } = await axios.get<DCApplyUrlResult>(
 				`/api/domain/v1/domain-connect/apply-url/${domainId}`,
-				{ headers: { credentials: "include" } },
+				{ withCredentials: true },
 			);
 
 			// 3. Redirect to DNS provider's consent page (same window)

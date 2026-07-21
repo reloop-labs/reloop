@@ -44,7 +44,7 @@ async function fetchDomainDetail(id: string): Promise<DomainResponse> {
 async function fetchNameservers(
 	id: string,
 ): Promise<DomainNameserversResponse> {
-	const res = await fetch(`/api/domain/v1/${id}/nameservers`, {
+	const res = await fetch(`/api/domain/v1/nameservers/${id}`, {
 		credentials: "include",
 	});
 	if (!res.ok) throw new Error(`Failed to load nameservers (${res.status})`);
