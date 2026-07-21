@@ -131,7 +131,7 @@
 			"db": {
 				"@types/pg": "8.15.4",
 				"dotenv-cli": "9.0.0",
-				"drizzle-kit": "0.31.4",
+				"drizzle-kit": "0.31.10",
 				"shx": "0.4.0",
 				"drizzle-orm": "0.44.3",
 				"drizzle-typebox": "0.3.3",
