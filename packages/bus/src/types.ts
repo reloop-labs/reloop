@@ -191,6 +191,11 @@ export interface DnsConfigRequestedPayload {
 		name: string;
 		value: string;
 		priority?: number;
+		ttl?: string;
+		/** Logical record kind: SPF | DKIM | DMARC | MX | CNAME */
+		recordTypeName?: string;
+		/** Why the record exists: sending | receiving | tracking */
+		purpose?: "sending" | "receiving" | "tracking";
 	}>;
 }
 

@@ -87,6 +87,9 @@ export async function forwardDNSController({
 			name: r.name,
 			value: r.value,
 			priority: r.priority ?? undefined,
+			ttl: r.ttl ?? undefined,
+			recordTypeName: r.recordTypeName ?? undefined,
+			purpose: r.purpose ?? undefined,
 		}));
 
 		await bus.publish(BusEvent.DNS_CONFIG_REQUESTED, {

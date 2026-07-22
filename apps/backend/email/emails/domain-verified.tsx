@@ -19,6 +19,12 @@ interface DomainVerifiedEmailProps {
 	dashboardUrl: string;
 	baseUrl?: string;
 	theme?: "light" | "dark";
+	/** Whether sending features are enabled for this domain */
+	isSendingEmailEnabled?: boolean;
+	/** Whether inbound receiving is enabled */
+	isReceivingEmailEnabled?: boolean;
+	/** Whether open/click tracking is enabled */
+	isTrackingEnabled?: boolean;
 }
 
 const defaultBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
@@ -31,9 +37,41 @@ export const DomainVerifiedEmail = ({
 	dashboardUrl = "https://reloop.sh/dashboard",
 	baseUrl = defaultBaseUrl,
 	theme = "light",
+	isSendingEmailEnabled = true,
+	isReceivingEmailEnabled = false,
+	isTrackingEnabled = false,
 }: DomainVerifiedEmailProps) => {
 	const firstName = fullName ? fullName.split(" ").at(0) : "there";
 	const isDark = theme === "dark";
+
+	const unlocked: { title: string; desc: string }[] = [];
+	if (isSendingEmailEnabled) {
+		unlocked.push({
+			title: "Send Transactional Email",
+			desc: "Fire API calls and send from your own domain with full deliverability — SPF, DKIM, and DMARC all configured.",
+		});
+		unlocked.push({
+			title: "Broadcast Campaigns",
+			desc: "Send newsletters and bulk campaigns to your audience under your own brand.",
+		});
+	}
+	if (isReceivingEmailEnabled) {
+		unlocked.push({
+			title: "Receive Inbound Email",
+			desc: "Mail sent to addresses on this domain is delivered to Reloop and available via the API and inbox.",
+		});
+	}
+	if (isTrackingEnabled) {
+		unlocked.push({
+			title: "Open & Click Tracking",
+			desc: "Track engagement on sends using your branded tracking hostname.",
+		});
+	}
+	// Always useful once verified
+	unlocked.push({
+		title: "Track Reputation",
+		desc: "Monitor bounce rates, spam complaints, and delivery health per domain in your dashboard.",
+	});
 
 	const cls = {
 		body: isDark
@@ -80,12 +118,22 @@ export const DomainVerifiedEmail = ({
 
 	const tdBorder = isDark ? "1px solid #222222" : "1px solid #e0e0e0";
 
+	const capabilitySummary = [
+		isSendingEmailEnabled && "send",
+		isReceivingEmailEnabled && "receive",
+		isTrackingEnabled && "track",
+	]
+		.filter(Boolean)
+		.join(", ");
+
+	const previewLine = isSendingEmailEnabled
+		? `${domain} is verified — you can now send emails through Reloop.`
+		: `${domain} is verified on Reloop.`;
+
 	return (
 		<Html>
 			<Head />
-			<Preview>
-				{domain} is verified — you can now send emails through Reloop.
-			</Preview>
+			<Preview>{previewLine}</Preview>
 			<Tailwind>
 				<Body className={cls.body}>
 					<Wrapper baseUrl={baseUrl} theme={theme}>
@@ -98,7 +146,11 @@ export const DomainVerifiedEmail = ({
 							style={{ fontFamily: "Georgia, serif" }}
 						>
 							Your domain is live{" "}
-							<span className={cls.headingMuted}>and ready to send.</span>
+							<span className={cls.headingMuted}>
+								{isSendingEmailEnabled
+									? "and ready to send."
+									: "and ready to use."}
+							</span>
 						</Heading>
 
 						<Hr className={cls.hr} />
@@ -108,9 +160,20 @@ export const DomainVerifiedEmail = ({
 						</Text>
 
 						<Text className={cls.bodyText}>
-							Your sending domain has passed all DNS checks and is now fully
-							verified on Reloop. You can start sending emails from{" "}
-							<strong>{domain}</strong> right now.
+							Your domain has passed all required DNS checks and is now fully
+							verified on Reloop
+							{capabilitySummary ? ` for ${capabilitySummary}` : ""}.{" "}
+							{isSendingEmailEnabled ? (
+								<>
+									You can start sending emails from{" "}
+									<strong>{domain}</strong> right now.
+								</>
+							) : (
+								<>
+									<strong>{domain}</strong> is ready for the features you
+									enabled.
+								</>
+							)}
 						</Text>
 
 						{/* Domain Display */}
@@ -129,76 +192,41 @@ export const DomainVerifiedEmail = ({
 								cellSpacing="0"
 								style={{ marginTop: "24px" }}
 							>
-								<tr>
-									<td style={{ verticalAlign: "top", width: "32px" }}>
-										<Text className={cls.rowNum}>01</Text>
-									</td>
-									<td
-										style={{
-											borderBottom: tdBorder,
-											paddingBottom: "20px",
-											verticalAlign: "top",
-										}}
-									>
-										<Text className={cls.rowTitle}>
-											Send Transactional Email
-										</Text>
-										<Text className={cls.rowDesc}>
-											Fire API calls and send from your own domain with full
-											deliverability — SPF, DKIM, and DMARC all configured.
-										</Text>
-									</td>
-								</tr>
-								<tr>
-									<td
-										style={{
-											verticalAlign: "top",
-											width: "32px",
-											paddingTop: "20px",
-										}}
-									>
-										<Text className={cls.rowNum}>02</Text>
-									</td>
-									<td
-										style={{
-											borderBottom: tdBorder,
-											paddingTop: "20px",
-											paddingBottom: "20px",
-											verticalAlign: "top",
-										}}
-									>
-										<Text className={cls.rowTitle}>Broadcast Campaigns</Text>
-										<Text className={cls.rowDesc}>
-											Send newsletters and bulk campaigns to your audience under
-											your own brand.
-										</Text>
-									</td>
-								</tr>
-								<tr>
-									<td
-										style={{
-											verticalAlign: "top",
-											width: "32px",
-											paddingTop: "20px",
-										}}
-									>
-										<Text className={cls.rowNum}>03</Text>
-									</td>
-									<td style={{ paddingTop: "20px", verticalAlign: "top" }}>
-										<Text className={cls.rowTitle}>Track Reputation</Text>
-										<Text className={cls.rowDesc}>
-											Monitor bounce rates, spam complaints, and delivery health
-											per domain in your dashboard.
-										</Text>
-									</td>
-								</tr>
+								{unlocked.map((item, index) => {
+									const isLast = index === unlocked.length - 1;
+									const num = String(index + 1).padStart(2, "0");
+									return (
+										<tr key={item.title}>
+											<td
+												style={{
+													verticalAlign: "top",
+													width: "32px",
+													paddingTop: index === 0 ? 0 : "20px",
+												}}
+											>
+												<Text className={cls.rowNum}>{num}</Text>
+											</td>
+											<td
+												style={{
+													borderBottom: isLast ? undefined : tdBorder,
+													paddingTop: index === 0 ? 0 : "20px",
+													paddingBottom: isLast ? 0 : "20px",
+													verticalAlign: "top",
+												}}
+											>
+												<Text className={cls.rowTitle}>{item.title}</Text>
+												<Text className={cls.rowDesc}>{item.desc}</Text>
+											</td>
+										</tr>
+									);
+								})}
 							</table>
 						</Section>
 
 						{/* CTA */}
 						<Section className="mt-10">
 							<Button className={cls.btn} href={dashboardUrl}>
-								Start Sending
+								{isSendingEmailEnabled ? "Start Sending" : "Open Dashboard"}
 							</Button>
 						</Section>
 

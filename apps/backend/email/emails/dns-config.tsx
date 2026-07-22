@@ -25,9 +25,18 @@ interface DNSRecord {
 interface DnsConfigEmailProps {
 	fullName: string;
 	domain: string;
+	/** Domain verification (DKIM TXT) */
 	dkimRecords?: DNSRecord[];
-	spfRecords?: DNSRecord[];
+	/** Enable sending (SPF TXT + sending MX) */
+	sendingRecords?: DNSRecord[];
+	/** DMARC */
 	dmarcRecords?: DNSRecord[];
+	/** Enable receiving (receiving MX → inbound.*) */
+	receivingRecords?: DNSRecord[];
+	/** Click/open tracking (CNAME) */
+	trackingRecords?: DNSRecord[];
+	/** @deprecated use sendingRecords — kept for preview / old callers */
+	spfRecords?: DNSRecord[];
 	dashboardUrl: string;
 	baseUrl?: string;
 	theme?: "light" | "dark";
@@ -39,41 +48,63 @@ const defaultBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
 
 const sampleDkim: DNSRecord[] = [
 	{
-		recordType: "CNAME",
-		recordTypeName: "CNAME",
-		name: "reloop1._domainkey.yourdomain.com",
-		value: "reloop1.dkim.reloop.sh",
-		ttl: "auto",
-		priority: null,
-	},
-	{
-		recordType: "CNAME",
-		recordTypeName: "CNAME",
-		name: "reloop2._domainkey.yourdomain.com",
-		value: "reloop2.dkim.reloop.sh",
-		ttl: "auto",
+		recordType: "TXT",
+		recordTypeName: "DKIM",
+		name: "reloop._domainkey",
+		value: "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A...",
+		ttl: "Auto",
 		priority: null,
 	},
 ];
 
-const sampleSpf: DNSRecord[] = [
+const sampleSending: DNSRecord[] = [
 	{
 		recordType: "TXT",
-		recordTypeName: "TXT",
-		name: "yourdomain.com",
-		value: "v=spf1 include:spf.reloop.sh ~all",
-		ttl: "auto",
+		recordTypeName: "SPF",
+		name: "@",
+		value: "v=spf1 include:reloop.sh -all",
+		ttl: "Auto",
 		priority: null,
+	},
+	{
+		recordType: "MX",
+		recordTypeName: "MX",
+		name: "send",
+		value: "reloop.sh",
+		ttl: "Auto",
+		priority: 10,
 	},
 ];
 
 const sampleDmarc: DNSRecord[] = [
 	{
 		recordType: "TXT",
-		recordTypeName: "TXT",
-		name: "_dmarc.yourdomain.com",
-		value: "v=DMARC1; p=none; rua=mailto:dmarc@yourdomain.com",
-		ttl: "auto",
+		recordTypeName: "DMARC",
+		name: "_dmarc",
+		value: "v=DMARC1; p=reject;",
+		ttl: "Auto",
+		priority: null,
+	},
+];
+
+const sampleReceiving: DNSRecord[] = [
+	{
+		recordType: "MX",
+		recordTypeName: "MX",
+		name: "@",
+		value: "inbound.reloop.sh",
+		ttl: "Auto",
+		priority: 10,
+	},
+];
+
+const sampleTracking: DNSRecord[] = [
+	{
+		recordType: "CNAME",
+		recordTypeName: "CNAME",
+		name: "tracking",
+		value: "track.reloop.sh",
+		ttl: "Auto",
 		priority: null,
 	},
 ];
@@ -82,13 +113,24 @@ export const DnsConfigEmail = ({
 	fullName = "User",
 	domain = "yourdomain.com",
 	dkimRecords = sampleDkim,
-	spfRecords = sampleSpf,
+	sendingRecords,
 	dmarcRecords = sampleDmarc,
+	receivingRecords = sampleReceiving,
+	trackingRecords = sampleTracking,
+	spfRecords,
 	dashboardUrl = "https://reloop.sh/dashboard",
 	baseUrl = defaultBaseUrl,
 	theme = "light",
 }: DnsConfigEmailProps) => {
-	const _firstName = fullName ? fullName.split(" ").at(0) : "there";
+	const firstName = fullName ? fullName.split(" ").at(0) : "there";
+	// Prefer explicit sendingRecords; fall back to legacy spfRecords prop, then samples.
+	// Treat "passed empty array" as intentional (no sample fallback).
+	const resolvedSending =
+		sendingRecords !== undefined
+			? sendingRecords
+			: spfRecords !== undefined
+				? spfRecords
+				: sampleSending;
 	const isDark = theme === "dark";
 
 	// ── Design tokens ──────────────────────────────────────────────────────────
@@ -134,9 +176,6 @@ export const DnsConfigEmail = ({
 	};
 
 	// ── Record card renderer ───────────────────────────────────────────────────
-	// Each DNS record becomes a self-contained card.
-	// Fields are stacked vertically — name and value take the full card width,
-	// making it trivial to triple-click and copy each value individually.
 	const RecordCard = ({
 		record,
 		index,
@@ -147,6 +186,11 @@ export const DnsConfigEmail = ({
 		total: number;
 	}) => {
 		const isLast = index === total - 1;
+		const typeLabel = record.recordTypeName || record.recordType;
+		const showPriority =
+			record.priority !== null &&
+			record.priority !== undefined &&
+			record.recordType.toUpperCase() === "MX";
 
 		return (
 			<div
@@ -197,6 +241,18 @@ export const DnsConfigEmail = ({
 							>
 								{record.recordType}
 							</span>
+							{typeLabel !== record.recordType && (
+								<span
+									style={{
+										fontFamily: "monospace",
+										fontSize: "11px",
+										color: color.muted,
+										marginLeft: "8px",
+									}}
+								>
+									{typeLabel}
+								</span>
+							)}
 						</td>
 						<td
 							style={{
@@ -232,7 +288,7 @@ export const DnsConfigEmail = ({
 							</span>
 						</td>
 						<td style={{ verticalAlign: "top", width: "100%" }}>
-							{record.priority !== null && record.priority !== undefined && (
+							{showPriority && (
 								<>
 									<p
 										style={{
@@ -350,14 +406,15 @@ export const DnsConfigEmail = ({
 	const RecordGroup = ({
 		stepNum,
 		title,
+		description,
 		records,
 	}: {
 		stepNum: string;
 		title: string;
+		description?: string;
 		records: DNSRecord[];
 	}) => (
 		<Section style={{ marginTop: "32px" }}>
-			{/* Group header */}
 			<table width="100%" cellPadding="0" cellSpacing="0">
 				<tr>
 					<td
@@ -389,11 +446,22 @@ export const DnsConfigEmail = ({
 						>
 							{title}
 						</p>
+						{description ? (
+							<p
+								style={{
+									margin: "4px 0 0 0",
+									fontSize: "13px",
+									color: color.muted,
+									lineHeight: "1.5",
+								}}
+							>
+								{description}
+							</p>
+						) : null}
 					</td>
 				</tr>
 			</table>
 
-			{/* Cards container */}
 			<div
 				style={{
 					marginTop: "14px",
@@ -405,7 +473,7 @@ export const DnsConfigEmail = ({
 			>
 				{records.map((record, i) => (
 					<RecordCard
-						key={i}
+						key={`${record.recordType}-${record.name}-${record.value}-${i}`}
 						record={record}
 						index={i}
 						total={records.length}
@@ -414,6 +482,50 @@ export const DnsConfigEmail = ({
 			</div>
 		</Section>
 	);
+
+	// Dynamic step numbers for groups that actually have records
+	const groups: {
+		title: string;
+		description?: string;
+		records: DNSRecord[];
+	}[] = [];
+
+	if (dkimRecords.length > 0) {
+		groups.push({
+			title: "Domain Verification (DKIM)",
+			description: "Proves Reloop is authorized to sign mail for this domain.",
+			records: dkimRecords,
+		});
+	}
+	if (resolvedSending.length > 0) {
+		groups.push({
+			title: "Enable Sending (SPF + MX)",
+			description:
+				"Authorizes Reloop to send mail and routes bounce/return-path traffic.",
+			records: resolvedSending,
+		});
+	}
+	if (dmarcRecords.length > 0) {
+		groups.push({
+			title: "Reject Spoofed Emails (DMARC)",
+			description: "Tells receivers how to handle forged mail using your domain.",
+			records: dmarcRecords,
+		});
+	}
+	if (receivingRecords.length > 0) {
+		groups.push({
+			title: "Enable Receiving (MX)",
+			description: "Delivers inbound mail for this domain to Reloop.",
+			records: receivingRecords,
+		});
+	}
+	if (trackingRecords.length > 0) {
+		groups.push({
+			title: "Tracking (CNAME)",
+			description: "Enables open and click tracking under your brand.",
+			records: trackingRecords,
+		});
+	}
 
 	// ──────────────────────────────────────────────────────────────────────────
 	return (
@@ -437,29 +549,30 @@ export const DnsConfigEmail = ({
 
 						<Hr className={cls.hr} />
 
-						{/* ── Record Groups ── */}
-						{dkimRecords.length > 0 && (
-							<RecordGroup
-								stepNum="01"
-								title="Domain Verification (DKIM)"
-								records={dkimRecords}
-							/>
-						)}
+						<Text className={cls.salutation}>
+							Hey, <strong>{firstName}.</strong>
+						</Text>
 
-						{spfRecords.length > 0 && (
-							<RecordGroup
-								stepNum="02"
-								title="Sending Email (SPF)"
-								records={spfRecords}
-							/>
-						)}
+						<Text className={cls.bodyText}>
+							Copy the records below into your DNS provider. Only the groups
+							listed apply to this domain&apos;s current settings.
+						</Text>
 
-						{dmarcRecords.length > 0 && (
+						{groups.map((group, index) => (
 							<RecordGroup
-								stepNum="03"
-								title="Reject Spoofed Emails (DMARC)"
-								records={dmarcRecords}
+								key={group.title}
+								stepNum={String(index + 1).padStart(2, "0")}
+								title={group.title}
+								description={group.description}
+								records={group.records}
 							/>
+						))}
+
+						{groups.length === 0 && (
+							<Text className={cls.bodyText}>
+								No DNS records were found for this domain. Open the dashboard to
+								confirm the domain was set up correctly.
+							</Text>
 						)}
 
 						<Text className={cls.bodyText}>
