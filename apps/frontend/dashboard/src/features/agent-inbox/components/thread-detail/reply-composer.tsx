@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { useDraftAutosave } from "../../hooks/use-draft-autosave";
 import { extractBareEmail, extractDisplayName } from "../../lib/email-address";
 import { plainToHtml } from "../../lib/plain-to-html";
-import { readAiTextStream } from "../../lib/read-ai-text-stream";
+import { readAiTextStreamAfterThink } from "../../lib/read-ai-text-stream-after-think";
 import type { ComposeDraftKind } from "../../types";
 import {
 	type AiDraftPhase,
@@ -230,7 +230,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 					? draftNudge
 					: undefined;
 
-			// Keep current text visible with shimmer until the first token.
+			// Keep current text visible with shimmer until think delay + first token.
 			setAiPhase("thinking");
 
 			try {
@@ -245,14 +245,17 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 				});
 				if (!res.ok) throw new Error("Failed");
 
-				let started = false;
-				const finalText = await readAiTextStream(res, (accumulated) => {
-					if (!started) {
-						started = true;
-						setAiPhase("streaming");
-					}
-					writeStreamedText(accumulated);
-				});
+				const finalText = await readAiTextStreamAfterThink(
+					res,
+					(accumulated) => {
+						writeStreamedText(accumulated);
+					},
+					{
+						minThinkMs: previous.text.trim() ? undefined : 0,
+						onReveal: () => setAiPhase("streaming"),
+						signal: abort.signal,
+					},
+				);
 				if (!finalText.trim()) {
 					remountEditor(previous.html || "");
 					aiRestoreRef.current = null;

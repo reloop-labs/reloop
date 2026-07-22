@@ -96,8 +96,8 @@
 }
 
 /**
- * Thinking phase: keep existing editor text visible with a full-body shimmer
- * until the first streamed token arrives (then content is replaced).
+ * Thinking phase: shimmer the existing editor text for a beat,
+ * then replace it when streaming starts.
  */
 @keyframes ai-body-shimmer {
 	0% {
@@ -112,39 +112,49 @@
 	isolation: isolate;
 }
 
-.inbox-zero-theme .ai-body-thinking .ProseMirror {
-	opacity: 0.42;
-	filter: saturate(0.7);
-	transition:
-		opacity 0.2s ease,
-		filter 0.2s ease;
-}
-
-.inbox-zero-theme .ai-body-thinking::after {
-	content: "";
-	pointer-events: none;
-	position: absolute;
-	inset: 0;
-	z-index: 2;
-	background: linear-gradient(
+.inbox-zero-theme .ai-body-thinking .ProseMirror,
+.inbox-zero-theme .ai-body-thinking .ProseMirror p,
+.inbox-zero-theme .ai-body-thinking .ProseMirror li,
+.inbox-zero-theme .ai-body-thinking .ProseMirror h1,
+.inbox-zero-theme .ai-body-thinking .ProseMirror h2,
+.inbox-zero-theme .ai-body-thinking .ProseMirror h3,
+.inbox-zero-theme .ai-body-thinking .ProseMirror h4 {
+	color: transparent !important;
+	-webkit-text-fill-color: transparent;
+	background-image: linear-gradient(
 		110deg,
-		transparent 0%,
-		transparent 38%,
-		color-mix(in oklab, var(--mail-foreground) 14%, transparent) 50%,
-		transparent 62%,
-		transparent 100%
+		var(--mail-muted) 0%,
+		var(--mail-muted) 38%,
+		var(--mail-foreground) 50%,
+		var(--mail-muted) 62%,
+		var(--mail-muted) 100%
 	);
 	background-size: 220% 100%;
-	animation: ai-body-shimmer 1.7s linear infinite;
+	-webkit-background-clip: text;
+	background-clip: text;
+	animation: ai-body-shimmer 1.8s linear infinite;
+}
+
+.inbox-zero-theme .ai-body-thinking .ProseMirror strong,
+.inbox-zero-theme .ai-body-thinking .ProseMirror em,
+.inbox-zero-theme .ai-body-thinking .ProseMirror a,
+.inbox-zero-theme .ai-body-thinking .ProseMirror span {
+	color: inherit !important;
+	-webkit-text-fill-color: inherit;
+	background: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.inbox-zero-theme .ai-body-thinking::after {
+	.inbox-zero-theme .ai-body-thinking .ProseMirror,
+	.inbox-zero-theme .ai-body-thinking .ProseMirror p,
+	.inbox-zero-theme .ai-body-thinking .ProseMirror li,
+	.inbox-zero-theme .ai-body-thinking .ProseMirror h1,
+	.inbox-zero-theme .ai-body-thinking .ProseMirror h2,
+	.inbox-zero-theme .ai-body-thinking .ProseMirror h3,
+	.inbox-zero-theme .ai-body-thinking .ProseMirror h4 {
 		animation: none;
-		background: none;
-	}
-	.inbox-zero-theme .ai-body-thinking .ProseMirror {
-		opacity: 0.5;
-		filter: none;
+		color: var(--mail-muted) !important;
+		-webkit-text-fill-color: var(--mail-muted);
+		background-image: none;
 	}
 }

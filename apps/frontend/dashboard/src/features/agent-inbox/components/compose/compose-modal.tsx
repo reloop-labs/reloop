@@ -20,7 +20,7 @@ import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { extractBareEmail, formatRecipient } from "../../lib/email-address";
 import { plainToHtml } from "../../lib/plain-to-html";
-import { readAiTextStream } from "../../lib/read-ai-text-stream";
+import { readAiTextStreamAfterThink } from "../../lib/read-ai-text-stream-after-think";
 import type { AgentMailbox } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
 import {
@@ -667,14 +667,17 @@ export const ComposeModal = ({
 			});
 			if (!res.ok) throw new Error("Failed");
 
-			let started = false;
-			const finalText = await readAiTextStream(res, (accumulated) => {
-				if (!started) {
-					started = true;
-					setAiPhase("streaming");
-				}
-				writeStreamedText(accumulated);
-			});
+			const finalText = await readAiTextStreamAfterThink(
+				res,
+				(accumulated) => {
+					writeStreamedText(accumulated);
+				},
+				{
+					minThinkMs: previous.text.trim() ? undefined : 0,
+					onReveal: () => setAiPhase("streaming"),
+					signal: abort.signal,
+				},
+			);
 			if (!finalText.trim()) {
 				restoreEditor(previous);
 				aiRestoreRef.current = null;

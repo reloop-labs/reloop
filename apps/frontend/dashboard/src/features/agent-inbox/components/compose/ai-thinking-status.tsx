@@ -1,6 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { AI_THINK_SHIMMER_MS } from "../../lib/read-ai-text-stream-after-think";
 import { LoadingDot } from "../shared/loading-dot";
 
 type ThinkingPhase = "thinking" | "tone" | "writing";
@@ -18,9 +19,6 @@ const PHASE_LABEL: Record<ThinkingPhase, string> = {
  */
 const FADE_THROUGH_EASE = [0.2, 0, 0, 1] as const;
 const FADE_THROUGH_EXIT_EASE = [0.4, 0, 1, 1] as const;
-
-/** How long to stay on Thinking before moving to tone (if stream hasn't started). */
-const THINKING_MS = 2800;
 
 /**
  * One-way Claude-style status with fade-through phrase swaps + shimmer.
@@ -49,7 +47,7 @@ export const AiThinkingStatus = ({
 		}
 		const id = window.setTimeout(() => {
 			setPhase((current) => (current === "writing" ? current : "tone"));
-		}, THINKING_MS);
+		}, AI_THINK_SHIMMER_MS);
 		return () => window.clearTimeout(id);
 	}, [hasStreamText, reduceMotion]);
 

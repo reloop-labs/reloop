@@ -1,17 +1,17 @@
 import { cn } from "@reloop/ui/cn";
-import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { motion, useReducedMotion } from "framer-motion";
 import { Undo2 } from "lucide-react";
 import { useEffect } from "react";
 import { AiThinkingStatus } from "./ai-thinking-status";
+import { AiStopButton } from "./ai-stop-button";
 
 const MICRO_SCALE_EASE = [0.32, 0.72, 0, 1] as const;
 
 /**
  * Lives in the sparkle-button slot — never beside Send/Cancel.
  *
- * thinking/streaming → status + Esc to cancel
- * review → Undo only (keeping the draft is implicit: edit or send)
+ * thinking/streaming → status + circular stop
+ * review → Undo (Esc still restores; no Esc chrome while generating)
  */
 export const AiComposerSlot = ({
 	loading,
@@ -41,7 +41,7 @@ export const AiComposerSlot = ({
 		return (
 			<div
 				className={cn(
-					"flex min-w-0 max-w-full items-center gap-2",
+					"flex min-w-0 max-w-full items-center gap-2.5",
 					className,
 				)}
 			>
@@ -49,16 +49,7 @@ export const AiComposerSlot = ({
 					hasStreamText={hasStreamText}
 					className="min-w-0"
 				/>
-				<button
-					type="button"
-					onClick={onUndo}
-					className="inline-flex h-7 shrink-0 items-center gap-1 rounded-md px-1.5 text-[11px] text-mail-muted transition-[color,background-color,transform] duration-150 ease-out hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.97]"
-					title="Cancel generation"
-				>
-					<KbdKeyOutline className="h-3.5 min-w-3.5 font-sans text-[8px]">
-						Esc
-					</KbdKeyOutline>
-				</button>
+				<AiStopButton onClick={onUndo} />
 			</div>
 		);
 	}
@@ -86,9 +77,6 @@ export const AiComposerSlot = ({
 		>
 			<Undo2 className="h-3.5 w-3.5" strokeWidth={2} />
 			<span>Undo</span>
-			<KbdKeyOutline className="h-3.5 min-w-3.5 font-sans text-[8px]">
-				Esc
-			</KbdKeyOutline>
 		</motion.button>
 	);
 };
