@@ -1,7 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { motion, useReducedMotion } from "framer-motion";
 import { Sparkles } from "lucide-react";
-import { LoadingDot } from "../shared/loading-dot";
 
 interface AiSparkleButtonProps {
 	onClick: () => void;
@@ -16,7 +15,7 @@ interface AiSparkleButtonProps {
 
 /**
  * Quiet composer action to request an AI draft.
- * Kept export name for existing call sites.
+ * Loading state is shown in the preview panel — this button stays sparkle + label only.
  */
 export const AiSparkleButton = ({
 	onClick,
@@ -53,24 +52,12 @@ export const AiSparkleButton = ({
 				className,
 			)}
 		>
-			{loading ? (
-				<span className="flex items-center gap-1.5 tracking-tight text-mail-foreground/70">
-					<LoadingDot
-						label="Thinking"
-						size={14}
-						dotSize={2}
-						className="text-mail-foreground"
-					/>
-					{variant === "pill" ? <span>Thinking…</span> : null}
-				</span>
-			) : (
-				<span className="flex items-center gap-1.5 tracking-tight">
-					<Sparkles className="h-3.5 w-3.5 shrink-0 text-mail-foreground/70" />
-					{variant === "pill" ? (
-						<span className="text-mail-foreground/70">{label}</span>
-					) : null}
-				</span>
-			)}
+			<span className="flex items-center gap-1.5 tracking-tight">
+				<Sparkles className="h-3.5 w-3.5 shrink-0 text-mail-foreground/70" />
+				{variant === "pill" ? (
+					<span className="text-mail-foreground/70">{label}</span>
+				) : null}
+			</span>
 		</motion.button>
 	);
 };

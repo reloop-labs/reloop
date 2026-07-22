@@ -957,14 +957,15 @@ export const ComposeModal = ({
 											</kbd>{" "}
 											for formatting commands
 										</p>
-										<AiSparkleButton
-											onClick={() => void generateBody()}
-											disabled={isSending || aiLoading || !textBody.trim()}
-											loading={aiLoading}
-											variant="pill"
-											label="Write with AI"
-											title="Write email body with AI"
-										/>
+										{!aiLoading && !aiPreviewText ? (
+											<AiSparkleButton
+												onClick={() => void generateBody()}
+												disabled={isSending || !textBody.trim()}
+												variant="pill"
+												label="Write with AI"
+												title="Write email body with AI"
+											/>
+										) : null}
 									</div>
 								</div>
 

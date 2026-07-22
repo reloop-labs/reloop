@@ -388,14 +388,15 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 								</kbd>{" "}
 								for formatting commands
 							</p>
-							<AiSparkleButton
-								onClick={() => void generateReply()}
-								disabled={!resolvedThreadId || aiLoading}
-								loading={aiLoading}
-								variant="pill"
-								label="Suggest reply"
-								title="Suggest a reply from this thread"
-							/>
+							{!aiLoading && !aiPreviewText ? (
+								<AiSparkleButton
+									onClick={() => void generateReply()}
+									disabled={!resolvedThreadId}
+									variant="pill"
+									label="Suggest reply"
+									title="Suggest a reply from this thread"
+								/>
+							) : null}
 						</div>
 					</div>
 

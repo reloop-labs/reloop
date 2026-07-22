@@ -7,7 +7,7 @@ type ThinkingPhase = "thinking" | "tone" | "writing";
 
 const PHASE_LABEL: Record<ThinkingPhase, string> = {
 	thinking: "Thinking…",
-	tone: "Writing in your tone…",
+	tone: "Thinking in your tone…",
 	writing: "Writing…",
 };
 
