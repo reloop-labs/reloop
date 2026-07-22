@@ -12,12 +12,12 @@ import { extractBareEmail, extractDisplayName } from "../../lib/email-address";
 import { plainToHtml } from "../../lib/plain-to-html";
 import { readAiTextStream } from "../../lib/read-ai-text-stream";
 import type { ComposeDraftKind } from "../../types";
-import { AiComposePreview } from "../compose/ai-compose-preview";
 import {
 	type AiDraftPhase,
 	isAiDraftActive,
 	isAiDraftBusy,
 } from "../compose/ai-draft-phase";
+import { AiComposerSlot } from "../compose/ai-composer-slot";
 import { AiSparkleButton } from "../compose/ai-sparkle-button";
 import {
 	type ComposeAttachment,
@@ -123,10 +123,13 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 		const [aiPhase, setAiPhase] = useState<AiDraftPhase>("idle");
 		const aiAbortRef = useRef<AbortController | null>(null);
 		const aiRestoreRef = useRef<{ html: string; text: string } | null>(null);
+		const reviewArmedRef = useRef(false);
+		const aiPhaseRef = useRef<AiDraftPhase>("idle");
 		const htmlRef = useRef(htmlBody);
 		const textRef = useRef(textBody);
 		htmlRef.current = htmlBody;
 		textRef.current = textBody;
+		aiPhaseRef.current = aiPhase;
 		const aiBusy = isAiDraftBusy(aiPhase);
 		const aiActive = isAiDraftActive(aiPhase);
 
@@ -258,17 +261,23 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 					return;
 				}
 				setAiPhase("review");
+				reviewArmedRef.current = false;
+				window.setTimeout(() => {
+					reviewArmedRef.current = true;
+				}, 120);
 			} catch {
 				if (abort.signal.aborted) {
 					const restore = aiRestoreRef.current;
 					if (restore) remountEditor(restore.html || "");
 					aiRestoreRef.current = null;
+					reviewArmedRef.current = false;
 					setAiPhase("idle");
 					return;
 				}
 				toast.error("Failed to generate reply");
 				remountEditor(previous.html || "");
 				aiRestoreRef.current = null;
+				reviewArmedRef.current = false;
 				setAiPhase("idle");
 			} finally {
 				if (aiAbortRef.current === abort) {
@@ -285,12 +294,14 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 				remountEditor(restore.html || "");
 				aiRestoreRef.current = null;
 			}
+			reviewArmedRef.current = false;
 			setAiPhase("idle");
 		}, [remountEditor]);
 
 		const acceptAiDraft = useCallback(() => {
 			aiAbortRef.current = null;
 			aiRestoreRef.current = null;
+			reviewArmedRef.current = false;
 			setAiPhase("idle");
 		}, []);
 
@@ -442,18 +453,30 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 							onUpdate={(html, text) => {
 								setHtmlBody(html);
 								setTextBody(text);
+								if (
+									aiPhaseRef.current === "review" &&
+									reviewArmedRef.current
+								) {
+									acceptAiDraft();
+								}
 							}}
 							onModEnter={() => void send()}
 						/>
-						<div className="mt-auto flex items-center justify-between px-4 pb-2">
-							<p className="text-[11px] text-mail-muted">
+						<div className="mt-auto flex items-center justify-between gap-3 px-4 pb-2">
+							<p className="min-w-0 truncate text-[11px] text-mail-muted">
 								Type{" "}
 								<kbd className="rounded border border-mail-border/50 px-1 font-sans text-[10px]">
 									/
 								</kbd>{" "}
 								for formatting commands
 							</p>
-							{!aiActive ? (
+							{aiActive ? (
+								<AiComposerSlot
+									loading={aiBusy}
+									hasStreamText={aiPhase === "streaming"}
+									onUndo={rejectAiDraft}
+								/>
+							) : (
 								<AiSparkleButton
 									onClick={() => void generateReply()}
 									disabled={!resolvedThreadId}
@@ -461,21 +484,9 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 									label="Suggest reply"
 									title="Suggest a reply from this thread"
 								/>
-							) : null}
+							)}
 						</div>
 					</div>
-
-					<AnimatePresence>
-						{aiActive ? (
-							<AiComposePreview
-								compact
-								loading={aiBusy}
-								hasStreamText={aiPhase === "streaming"}
-								onAccept={acceptAiDraft}
-								onReject={rejectAiDraft}
-							/>
-						) : null}
-					</AnimatePresence>
 
 					<AnimatePresence initial={false}>
 						{attachments.length > 0 && (

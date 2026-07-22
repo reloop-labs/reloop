@@ -23,12 +23,12 @@ import { plainToHtml } from "../../lib/plain-to-html";
 import { readAiTextStream } from "../../lib/read-ai-text-stream";
 import type { AgentMailbox } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
-import { AiComposePreview } from "./ai-compose-preview";
 import {
 	type AiDraftPhase,
 	isAiDraftActive,
 	isAiDraftBusy,
 } from "./ai-draft-phase";
+import { AiComposerSlot } from "./ai-composer-slot";
 import { AiSparkleButton } from "./ai-sparkle-button";
 import {
 	ComposeBodyEditor,
@@ -148,6 +148,8 @@ export const ComposeModal = ({
 	const [aiPhase, setAiPhase] = useState<AiDraftPhase>("idle");
 	const aiAbortRef = useRef<AbortController | null>(null);
 	const aiRestoreRef = useRef<{ html: string; text: string } | null>(null);
+	const reviewArmedRef = useRef(false);
+	const aiPhaseRef = useRef<AiDraftPhase>("idle");
 	const [subjectGenerating, setSubjectGenerating] = useState(false);
 	const [toError, setToError] = useState<string | null>(null);
 	const draftTimer = useRef<number | null>(null);
@@ -157,6 +159,7 @@ export const ComposeModal = ({
 	const textRef = useRef(textBody);
 	htmlRef.current = htmlBody;
 	textRef.current = textBody;
+	aiPhaseRef.current = aiPhase;
 	const aiBusy = isAiDraftBusy(aiPhase);
 	const aiActive = isAiDraftActive(aiPhase);
 	const shouldReduceMotion = useReducedMotion();
@@ -680,17 +683,23 @@ export const ComposeModal = ({
 				return;
 			}
 			setAiPhase("review");
+			reviewArmedRef.current = false;
+			window.setTimeout(() => {
+				reviewArmedRef.current = true;
+			}, 120);
 		} catch {
 			if (abort.signal.aborted) {
 				const restore = aiRestoreRef.current;
 				if (restore) restoreEditor(restore);
 				aiRestoreRef.current = null;
+				reviewArmedRef.current = false;
 				setAiPhase("idle");
 				return;
 			}
 			toast.error("Failed to generate email");
 			restoreEditor(previous);
 			aiRestoreRef.current = null;
+			reviewArmedRef.current = false;
 			setAiPhase("idle");
 		} finally {
 			if (aiAbortRef.current === abort) {
@@ -707,12 +716,14 @@ export const ComposeModal = ({
 			restoreEditor(restore);
 			aiRestoreRef.current = null;
 		}
+		reviewArmedRef.current = false;
 		setAiPhase("idle");
 	};
 
 	const acceptAiDraft = () => {
 		aiAbortRef.current = null;
 		aiRestoreRef.current = null;
+		reviewArmedRef.current = false;
 		setAiPhase("idle");
 	};
 
@@ -1030,18 +1041,30 @@ export const ComposeModal = ({
 										onUpdate={(html, text) => {
 											setHtmlBody(html);
 											setTextBody(text);
+											if (
+												aiPhaseRef.current === "review" &&
+												reviewArmedRef.current
+											) {
+												acceptAiDraft();
+											}
 										}}
 										onModEnter={() => submitRef.current()}
 									/>
-									<div className="mt-auto flex items-center justify-between px-5 py-2">
-										<p className="text-[11px] text-mail-muted">
+									<div className="mt-auto flex items-center justify-between gap-3 px-5 py-2">
+										<p className="min-w-0 truncate text-[11px] text-mail-muted">
 											Type{" "}
 											<kbd className="rounded border border-mail-border/50 px-1 font-sans text-[10px]">
 												/
 											</kbd>{" "}
 											for formatting commands
 										</p>
-										{!aiActive ? (
+										{aiActive ? (
+											<AiComposerSlot
+												loading={aiBusy}
+												hasStreamText={aiPhase === "streaming"}
+												onUndo={rejectAiDraft}
+											/>
+										) : (
 											<AiSparkleButton
 												onClick={() => void generateBody()}
 												disabled={isSending || !textBody.trim()}
@@ -1049,21 +1072,9 @@ export const ComposeModal = ({
 												label="Write with AI"
 												title="Write email body with AI"
 											/>
-										) : null}
+										)}
 									</div>
 								</div>
-
-								{/* AI status — draft streams into the editor */}
-								<AnimatePresence>
-									{aiActive ? (
-										<AiComposePreview
-											loading={aiBusy}
-											hasStreamText={aiPhase === "streaming"}
-											onAccept={acceptAiDraft}
-											onReject={rejectAiDraft}
-										/>
-									) : null}
-								</AnimatePresence>
 							</div>
 
 							{/* Attachments strip */}
