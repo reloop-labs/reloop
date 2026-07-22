@@ -13,6 +13,8 @@ import { updateContactXCodeSamples } from "../../../../backend/contacts/src/rout
 import { createGroupXCodeSamples } from "../../../../backend/contacts/src/routes/group/create-group/create-group.x-codeSamples";
 import { createPropertyXCodeSamples } from "../../../../backend/contacts/src/routes/property/create-property/create-property.x-codeSamples";
 import { deletePropertyXCodeSamples } from "../../../../backend/contacts/src/routes/property/delete-property/delete-property.x-codeSamples";
+import { listPropertiesXCodeSamples } from "../../../../backend/contacts/src/routes/property/list-properties/list-properties.x-codeSamples";
+import { updatePropertyXCodeSamples } from "../../../../backend/contacts/src/routes/property/update-property/update-property.x-codeSamples";
 import type { LearnCodeSample } from "../components/mdx/CodeSamples";
 import { CodeSamples } from "../components/mdx/CodeSamples";
 
@@ -23,6 +25,8 @@ const registry = {
 	"contacts.update": updateContactXCodeSamples,
 	"contacts.delete": deleteContactXCodeSamples,
 	"contacts.properties.create": createPropertyXCodeSamples,
+	"contacts.properties.list": listPropertiesXCodeSamples,
+	"contacts.properties.update": updatePropertyXCodeSamples,
 	"contacts.properties.delete": deletePropertyXCodeSamples,
 	"contacts.groups.create": createGroupXCodeSamples,
 	"contacts.groups.addMember": addContactToGroupXCodeSamples,

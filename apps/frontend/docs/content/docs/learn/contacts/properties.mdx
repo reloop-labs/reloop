@@ -1,10 +1,10 @@
 ---
 title: Contact Properties
 sidebarTitle: Properties
-description: Create and manage custom Reloop contact properties (string or number fields) for personalization and filtering from the dashboard or API.
+description: Learn how Reloop contact properties (string or number fields) power email personalization and targeting — create, update, and delete them from the dashboard or API.
 faq:
   - question: What are contact properties in Reloop?
-    answer: Contact properties are custom fields on a contact schema — String or Number — with an optional default. Use them for personalization and filtering (for example company or plan_tier).
+    answer: Properties are small details you add to a contact — custom String or Number fields with an optional default. Use them for personalization and targeting (for example company or plan_tier).
   - question: What property types does Reloop support?
     answer: Reloop contact properties support String (free-form text) and Number (integer or decimal), plus an optional fallback default when a contact has no value.
   - question: What happens when I delete a contact property?
@@ -15,9 +15,21 @@ faq:
 
 ## What are contact properties?
 
-**Properties** are custom fields on a contact (`company`, `plan_tier`, …). Types: **String** or **Number**, with an optional default used in templates when a contact has no value.
+**Properties** are custom fields you add to a contact — a bit of context that helps you know who they are and what they need. Types: String or Number, with an optional default used in templates when a contact has no value.
 
 Open the UI: [Contacts → Properties](https://reloop.sh/dashboard/contacts/properties)
+
+![Contact properties in the Reloop dashboard](/docs/images/docs/contacts/properties-list.png)
+
+## Why use properties?
+
+Say you run a SaaS product. You store `company` and `plan_tier` on every contact.
+
+Now your welcome email can say:
+
+> Hi from Acme, thanks for trying our Pro plan!
+
+— automatically, for every contact, using their own company name and plan. And when you want to email only people on a free trial, you can target just the contacts where `plan_tier` is `"Trial"`. No manual list-building, no spreadsheet — the data lives right on the contact.
 
 ---
 
@@ -25,7 +37,7 @@ Open the UI: [Contacts → Properties](https://reloop.sh/dashboard/contacts/prop
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
-    ![Create a contact property](/docs/images/docs/contacts/properties-list.png)
+    ![Create a contact property](/docs/images/docs/contacts/add-property.gif)
 
     1. Go to [Contacts → Properties](https://reloop.sh/dashboard/contacts/properties)
     2. **Add Property**
@@ -34,6 +46,44 @@ Open the UI: [Contacts → Properties](https://reloop.sh/dashboard/contacts/prop
   </Tab>
   <Tab title="Code" icon="code">
     <ContactsCodeSamples id="contacts.properties.create" />
+  </Tab>
+</Tabs>
+
+---
+
+## How do I list or update a property?
+
+Browse the schema or change a property’s optional default — row menu or API. Name and type are fixed after create.
+
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    ![List and update contact properties](/docs/images/docs/contacts/properties-list.png)
+
+    1. Open [Contacts → Properties](https://reloop.sh/dashboard/contacts/properties)
+    2. Review the list — or row **···** → **Edit** to change the default value
+    3. Save
+  </Tab>
+  <Tab title="Code" icon="code">
+    <ContactsCodeSamples id="contacts.properties.list" />
+
+    <ContactsCodeSamples id="contacts.properties.update" />
+  </Tab>
+</Tabs>
+
+---
+
+## How do I set values on a contact?
+
+The Properties page defines the **schema**. Values live on each [contact](/docs/learn/contacts) — set them when you edit a contact in the dashboard or via the update contact API.
+
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    1. Open [Contacts](https://reloop.sh/dashboard/contacts)
+    2. Row **···** → **Edit** (or open the contact)
+    3. Fill custom property fields → Save
+  </Tab>
+  <Tab title="Code" icon="code">
+    <ContactsCodeSamples id="contacts.update" />
   </Tab>
 </Tabs>
 
@@ -62,7 +112,7 @@ Deleting removes the schema. Contacts keep raw values, but the field is no longe
 
 ### What are contact properties in Reloop?
 
-Custom fields on the contact schema — **String** or **Number** — with an optional default. Use them for personalization and filtering (for example `company` or `plan_tier`).
+Properties are small details you add to a contact — custom **String** or **Number** fields with an optional default. Use them for personalization and targeting (for example `company` or `plan_tier`).
 
 ### What property types does Reloop support?
 

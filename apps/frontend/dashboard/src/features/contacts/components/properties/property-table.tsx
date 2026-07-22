@@ -1,4 +1,3 @@
-
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
 import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
@@ -13,8 +12,10 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
+import { EditPropertyRowPanel } from "./edit-property-row-panel";
 import { PropertiesEmptyState } from "./properties-empty-state";
 
 interface Property {
@@ -181,21 +182,25 @@ export const PropertyTable = ({
 	onPageSizeChange,
 	isLoading,
 	loadingRows = 4,
-	onDelete,
+	onDelete: _onDelete,
 	onAddProperty,
 }: PropertyTableProps) => {
 	const [, setModal] = useQueryState("modal");
-	const [_id, setId] = useQueryState("id");
+	const [, setId] = useQueryState("id");
 	const [openPropertyId, setOpenPropertyId] = useState<string | null>(null);
+	const [editingPropertyId, setEditingPropertyId] = useState<string | null>(
+		null,
+	);
 
 	const handleEdit = (property: Property) => {
-		setModal("edit-property");
-		setId(property.id);
+		setEditingPropertyId((prev) =>
+			prev === property.id ? null : property.id,
+		);
 	};
 
 	const handleDelete = (property: Property) => {
-		setModal("delete-property");
-		setId(property.id);
+		void setModal("delete-property");
+		void setId(property.id);
 	};
 
 	const totalPages = Math.ceil(total / pageSize);
@@ -234,64 +239,101 @@ export const PropertyTable = ({
 				) : properties.length === 0 ? (
 					<PropertiesEmptyState onAddProperty={onAddProperty} />
 				) : (
-					properties.map((property) => (
-						<div
-							key={property.id}
-							className={cn(
-								"group/row grid grid-cols-[1fr_100px_1fr_120px_40px] items-center px-4 py-2 text-left transition-colors",
-								"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base",
-								openPropertyId === property.id && "bg-bg-weak-50/50",
-							)}
-						>
-							{/* Name Column */}
-							<div className="flex items-center gap-2">
-								<div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white shadow-sm">
-									<Icon name="tag" className="h-2.5 w-2.5" />
-								</div>
-								<span className="truncate font-medium text-label-sm text-text-strong-950">
-									{property.propertyName}
-								</span>
-							</div>
+					properties.map((property) => {
+						const isEditing = editingPropertyId === property.id;
+						const isRowActive =
+							openPropertyId === property.id || isEditing;
 
-							{/* Type Column */}
-							<div className="flex items-center">
-								<Badge.Root
-									size="small"
-									variant="lighter"
-									color={getBadgeColor(property.propertyType)}
-									className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
+						return (
+							<div key={property.id}>
+								<div
+									className={cn(
+										"group/row grid grid-cols-[1fr_100px_1fr_120px_40px] items-center px-4 py-2 text-left transition-colors",
+										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base",
+										isRowActive && "bg-bg-weak-50/50",
+										isEditing && "bg-bg-weak-50/70",
+									)}
 								>
-									{property.propertyType}
-								</Badge.Root>
-							</div>
+									{/* Name Column */}
+									<div className="flex items-center gap-2">
+										<div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-white shadow-sm">
+											<Icon name="tag" className="h-2.5 w-2.5" />
+										</div>
+										<span className="truncate font-medium text-label-sm text-text-strong-950">
+											{property.propertyName}
+										</span>
+										{isEditing && (
+											<span className="rounded-md bg-bg-white-0 px-1.5 py-0.5 font-medium text-[11px] text-text-sub-600 ring-1 ring-stroke-soft-100">
+												Editing
+											</span>
+										)}
+									</div>
 
-							{/* Default Column */}
-							<div className="flex items-center">
-								<span className="truncate font-medium text-label-sm text-text-strong-950">
-									{property.defaultValue || "-"}
-								</span>
-							</div>
+									{/* Type Column */}
+									<div className="flex items-center">
+										<Badge.Root
+											size="small"
+											variant="lighter"
+											color={getBadgeColor(property.propertyType)}
+											className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
+										>
+											{property.propertyType}
+										</Badge.Root>
+									</div>
 
-							{/* Created At Column */}
-							<div className="flex items-center">
-								<span className="truncate whitespace-nowrap font-medium text-[13px]">
-									{formatRelativeTime(property.createdAt)}
-								</span>
-							</div>
+									{/* Default Column */}
+									<div className="flex items-center">
+										<span className="truncate font-medium text-label-sm text-text-strong-950">
+											{property.defaultValue || "-"}
+										</span>
+									</div>
 
-							{/* Actions Column */}
-							<div className="flex items-center justify-end">
-								<PropertyActionsPopover
-									property={property}
-									onEdit={handleEdit}
-									onDelete={handleDelete}
-									onOpenChange={(open) =>
-										setOpenPropertyId(open ? property.id : null)
-									}
-								/>
+									{/* Created At Column */}
+									<div className="flex items-center">
+										<span className="truncate whitespace-nowrap font-medium text-[13px]">
+											{formatRelativeTime(property.createdAt)}
+										</span>
+									</div>
+
+									{/* Actions Column */}
+									<div className="flex items-center justify-end">
+										<PropertyActionsPopover
+											property={property}
+											onEdit={handleEdit}
+											onDelete={handleDelete}
+											onOpenChange={(open) =>
+												setOpenPropertyId(open ? property.id : null)
+											}
+										/>
+									</div>
+								</div>
+
+								<AnimatePresence initial={false}>
+									{isEditing ? (
+										<motion.div
+											key={`edit-${property.id}`}
+											initial={{ height: 0, opacity: 0 }}
+											animate={{ height: "auto", opacity: 1 }}
+											exit={{ height: 0, opacity: 0 }}
+											transition={{
+												height: {
+													duration: 0.28,
+													ease: [0.32, 0.72, 0, 1],
+												},
+												opacity: { duration: 0.2, ease: "easeOut" },
+											}}
+											className="overflow-hidden"
+										>
+											<EditPropertyRowPanel
+												property={property}
+												onClose={() => setEditingPropertyId(null)}
+											/>
+										</motion.div>
+									) : null}
+								</AnimatePresence>
 							</div>
-						</div>
-					))
+						);
+					})
 				)}
 
 				{/* Pagination Footer */}
