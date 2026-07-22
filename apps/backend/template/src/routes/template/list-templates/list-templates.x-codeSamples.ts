@@ -16,7 +16,7 @@ const templates = await reloop.template.list({ page: 1, limit: 10 });`,
 		source: `curl "https://reloop.sh/template/v1/list?page=1&limit=10" \\
   -H "Authorization: Bearer rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",

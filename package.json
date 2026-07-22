@@ -188,7 +188,9 @@
 				"@aws-sdk/lib-storage": "3.1033.0",
 				"@aws-sdk/s3-request-presigner": "3.1033.0",
 				"ua-parser-js": "2.0.9",
-				"@types/ua-parser-js": "0.7.39"
+				"@types/ua-parser-js": "0.7.39",
+				"ai": "6.0.138",
+				"@ai-sdk/openai": "1.2.5"
 			}
 		}
 	},

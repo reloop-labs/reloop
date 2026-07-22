@@ -24,7 +24,7 @@ const updatedTemplate = await reloop.template.update("tpl_123456789", {
     "subject": "Welcome to Reloop! (Updated)"
   }'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",

@@ -1,4 +1,5 @@
 import { authMiddleware } from "@be/template/middleware/auth";
+import { aiRoute } from "@be/template/routes/template/ai/ai.route";
 import { createTemplateRoute } from "@be/template/routes/template/create-template/create-template.route";
 import { createVersionRoute } from "@be/template/routes/template/create-version/create-version.route";
 import { deleteTemplateRoute } from "@be/template/routes/template/delete-template/delete-template.route";
@@ -27,4 +28,5 @@ export const templateRoutes = new Elysia({
 	.use(updateTemplateRoute)
 	.use(deleteTemplateRoute)
 	.use(duplicateTemplateRoute)
-	.use(testTemplateRoute);
+	.use(testTemplateRoute)
+	.use(aiRoute);

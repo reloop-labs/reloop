@@ -43,7 +43,9 @@
 		"@reloop/auth": "workspace:*",
 		"@reloop/bus": "workspace:*",
 		"@elysiajs/openapi": "catalog:backend",
-		"evlog": "catalog:backend"
+		"evlog": "catalog:backend",
+		"ai": "catalog:backend",
+		"@ai-sdk/openai": "catalog:backend"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

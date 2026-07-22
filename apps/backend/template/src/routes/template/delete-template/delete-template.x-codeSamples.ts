@@ -16,7 +16,7 @@ await reloop.template.delete("tpl_123456789");`,
 		source: `curl -X DELETE https://reloop.sh/template/v1/tpl_123456789 \\
   -H "Authorization: Bearer rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",

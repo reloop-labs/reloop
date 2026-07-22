@@ -26,7 +26,7 @@ const version = await reloop.template.createVersion("tpl_123456789", {
     "name": "v1.0.0"
   }'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",

@@ -16,7 +16,7 @@ const versions = await reloop.template.listVersions("tpl_123456789", { page: 1, 
 		source: `curl "https://reloop.sh/template/v1/tpl_123456789/versions?page=1&limit=10" \\
   -H "Authorization: Bearer rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",

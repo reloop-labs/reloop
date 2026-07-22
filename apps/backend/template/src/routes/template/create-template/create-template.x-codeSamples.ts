@@ -26,7 +26,7 @@ const template = await reloop.template.create({
     "content": []
   }'`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",

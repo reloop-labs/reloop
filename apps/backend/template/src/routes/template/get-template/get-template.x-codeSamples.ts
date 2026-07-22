@@ -16,7 +16,7 @@ const template = await reloop.template.retrieve("tpl_123456789");`,
 		source: `curl https://reloop.sh/template/v1/tpl_123456789 \\
   -H "Authorization: Bearer rl_123456789"`,
 	},
-				{
+	{
 		id: "python",
 		lang: "python",
 		label: "Python",
