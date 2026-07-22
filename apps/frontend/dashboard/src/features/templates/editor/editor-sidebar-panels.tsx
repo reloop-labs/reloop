@@ -27,6 +27,10 @@ import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
 import { DeleteTemplateVariableModal } from "./delete-template-variable-modal";
 import { EditTemplateVariableModal } from "./edit-template-variable-modal";
 import { useEditorStore } from "./use-editor-store";
+import {
+	DEFAULT_TEMPLATE_AI_MODEL,
+	DEFAULT_TEMPLATE_AI_SYSTEM,
+} from "#/features/templates/lib/template-ai-models";
 
 interface PanelProps {
 	onOpenChange?: (open: boolean) => void;
@@ -941,14 +945,13 @@ export function TestPanel({ onClose }: PanelProps) {
 	);
 }
 
+
 /* ------------------------------------------------------------------ */
-/* AI Generator Panel Component                                       */
+/* AI Generator Panel — streams into React Email / TipTap editor      */
 /* ------------------------------------------------------------------ */
 export function AIPanel({ onClose }: PanelProps) {
 	const templateId = useTemplateId();
 	const [prompt, setPrompt] = useState("");
-	const [model, setModel] = useState("gemini-3.6-flash");
-	const [apiKey, setApiKey] = useState("");
 	const [isGenerating, setIsGenerating] = useState(false);
 	const { editor } = useCurrentEditor();
 	const setGeneratingContent = useEditorStore((s) => s.setGeneratingContent);
@@ -971,8 +974,8 @@ export function AIPanel({ onClose }: PanelProps) {
 				credentials: "include",
 				body: JSON.stringify({
 					prompt: prompt.trim(),
-					model,
-					apiKey: apiKey.trim() || undefined,
+					system: DEFAULT_TEMPLATE_AI_SYSTEM,
+					model: DEFAULT_TEMPLATE_AI_MODEL,
 					mode: "text-stream",
 				}),
 			});
@@ -1035,7 +1038,7 @@ export function AIPanel({ onClose }: PanelProps) {
 						<Sparkles className="h-4 w-4 animate-pulse" />
 					</div>
 					<h3 className="font-bold text-sm text-text-strong-950 dark:text-white">
-						AI Generator (Gemini Flash)
+						AI Generator (Gemma 2 9B)
 					</h3>
 				</div>
 				<button
@@ -1054,38 +1057,10 @@ export function AIPanel({ onClose }: PanelProps) {
 					</label>
 					<textarea
 						rows={4}
-						placeholder="Describe your email template changes or generate a new section..."
+						placeholder="Describe your email template — e.g. welcome onboarding with CTA..."
 						value={prompt}
 						onChange={(e) => setPrompt(e.target.value)}
 						className="w-full rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-3 text-xs text-text-strong-950 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-stroke-soft-100/40 dark:bg-zinc-900 dark:text-zinc-100"
-					/>
-				</div>
-
-				<div className="space-y-1.5">
-					<label className="font-semibold text-xs text-text-strong-950 dark:text-zinc-200">
-						AI Model
-					</label>
-					<select
-						value={model}
-						onChange={(e) => setModel(e.target.value)}
-						className="w-full rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-2.5 text-xs text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-zinc-900 dark:text-zinc-100"
-					>
-						<option value="gemini-3.6-flash">Google Gemini 3.6 Flash</option>
-						<option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
-						<option value="gpt-4o">OpenAI GPT-4o</option>
-					</select>
-				</div>
-
-				<div className="space-y-1.5">
-					<label className="font-semibold text-xs text-text-strong-950 dark:text-zinc-200">
-						Custom Gemini API Key (Optional)
-					</label>
-					<input
-						type="password"
-						placeholder="AIzaSy..."
-						value={apiKey}
-						onChange={(e) => setApiKey(e.target.value)}
-						className="w-full rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-2.5 text-xs text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-zinc-900 dark:text-zinc-100"
 					/>
 				</div>
 

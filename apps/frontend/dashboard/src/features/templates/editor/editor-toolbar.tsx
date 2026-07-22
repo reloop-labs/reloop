@@ -25,7 +25,7 @@ const viewModes = [
 
 const TOOLBAR_ITEMS = [
 	{ mode: "visual" as const, label: "Design mode", Icon: Brush },
-	{ mode: "ai" as const, label: "AI Generator (Gemini Flash)", Icon: Sparkles },
+	{ mode: "ai" as const, label: "AI Generator (Gemma 2 9B)", Icon: Sparkles },
 	{ mode: "code" as const, label: "Split view / Code editor", Icon: Code2 },
 	{ mode: "variables" as const, label: "Variables", Icon: Braces },
 	{ mode: "history" as const, label: "Version history", Icon: History },

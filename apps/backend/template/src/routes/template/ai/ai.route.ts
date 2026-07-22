@@ -8,7 +8,7 @@ export const aiRoute = new Elysia().use(authMiddleware).post(
 	async ({ body }) => {
 		const { prompt, system, model, apiKey, mode = "sse-text" } = body;
 
-		const stream = createAIStream({
+		const stream = await createAIStream({
 			prompt,
 			system,
 			model,
@@ -18,8 +18,6 @@ export const aiRoute = new Elysia().use(authMiddleware).post(
 		switch (mode) {
 			case "text-stream":
 			case "text-response":
-				// Return a proper streaming Response with text/plain content type.
-				// Elysia passes through Response objects directly.
 				return stream.toTextStreamResponse();
 
 			case "ui-message-stream":
@@ -29,7 +27,6 @@ export const aiRoute = new Elysia().use(authMiddleware).post(
 			case "sse-text":
 			case "sse-ui":
 			default:
-				// For SSE modes, pipe the text stream as a text/event-stream Response.
 				return new Response(
 					new ReadableStream({
 						async start(controller) {
@@ -82,7 +79,7 @@ export const aiRoute = new Elysia().use(authMiddleware).post(
 			tags: ["Templates", "AI"],
 			summary: "Generate AI email template stream",
 			description:
-				"Streams AI responses using Vercel AI SDK and Elysia's streaming and SSE integration.",
+				"Streams HTML email templates via Gemma (Ollama gemma2:9b by default), Gemini, or OpenAI for the React Email editor.",
 		},
 	},
 );

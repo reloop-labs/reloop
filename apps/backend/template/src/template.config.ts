@@ -9,6 +9,8 @@ export const templateConfig = {
 	NATS_URL: process.env.NATS_URL || "nats://localhost:4222",
 	OTEL_EXPORTER_OTLP_ENDPOINT: process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "",
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
+	OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL || "http://localhost:11434",
+	GEMMA_MODEL: process.env.GEMMA_MODEL || "gemma2:9b",
 
 	constants: {
 		maxTemplateNameLength: 255,
