@@ -10,7 +10,17 @@ faq:
   - question: What happens when I delete a contact property?
     answer: Deleting a property removes the schema definition. Existing contacts keep raw key-value data, but the field is no longer managed globally.
   - question: How do I name a contact property?
-    answer: Use letters, numbers, and underscores only. Names must start with a letter or underscore. Spaces are converted to underscores.
+    answer: Use letters, numbers, and underscores only. Names must start with a letter or underscore. Spaces are converted to underscores. When setting values on a contact, names must be lowercase (a-z, 0-9, underscores).
+  - question: Can I rename a property without losing data?
+    answer: No. After you create a property, you can only change its default (fallback) value. Name and type are fixed. To use a different name, create a new property and set values on contacts under that name.
+  - question: Can two properties have the same name but different casing (for example Company vs company)?
+    answer: No. Property names are unique per organization by exact name. When setting values on a contact, names must be lowercase (a-z, 0-9, underscores) — treat casing variants as unsupported.
+  - question: Can a property have different values for different contacts?
+    answer: Yes. The Properties page defines the shared field (schema). Each contact stores its own value. The optional default is only used when a contact has no value set.
+  - question: Can I set a property via CSV import?
+    answer: No. Reloop does not offer CSV import for custom property values today. Set values when you edit a contact in the dashboard or via the Contacts update API. Export CSV from the contacts list includes email, status, and created-at only.
+  - question: Is there a limit to how many properties I can create?
+    answer: Reloop does not enforce a fixed maximum number of properties per organization. Creating properties is rate-limited (30 create requests per 60 seconds per organization). See Usage Limits in the API docs.
 ---
 
 ## What are contact properties?
@@ -95,7 +105,7 @@ Deleting removes the schema. Contacts keep raw values, but the field is no longe
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
-    ![Delete a contact property](/docs/images/docs/contacts/properties-list.png)
+    ![Delete a contact property](/docs/images/docs/contacts/delete-property.gif)
 
     1. Open [Contacts → Properties](https://reloop.sh/dashboard/contacts/properties)
     2. Row **···** → **Delete**
@@ -124,7 +134,27 @@ Deleting removes the schema definition. Existing contacts keep raw key-value dat
 
 ### How do I name a contact property?
 
-Use letters, numbers, and underscores only. Names must start with a letter or underscore. Spaces become underscores.
+Use letters, numbers, and underscores only. Names must start with a letter or underscore. Spaces become underscores. When setting values on a contact, names must be lowercase (`a-z`, `0-9`, underscores).
+
+### Can I rename a property without losing data?
+
+No. After you create a property, you can only change its **default (fallback)** value — name and type stay fixed. To use a different name, create a new property and set values on contacts under that name.
+
+### Can two properties have the same name but different casing (for example `Company` vs `company`)?
+
+No. Names are unique per organization by exact name. When setting values on a contact, names must be lowercase (`a-z`, `0-9`, underscores) — don’t rely on casing variants as separate fields.
+
+### Can a property have different values for different contacts?
+
+Yes. The Properties page defines the shared field (schema). Each contact stores its own value. The optional default is only a fallback when a contact has no value set.
+
+### Can I set a property via CSV import?
+
+No. There is no CSV import for custom property values today. Set values when you [edit a contact](/docs/learn/contacts#how-do-i-edit-or-unsubscribe-a-contact) in the dashboard or via the Contacts update API. **Export CSV** from the contacts list includes email, status, and created-at only.
+
+### Is there a limit to how many properties I can create?
+
+No fixed maximum per organization. Create is rate-limited (**30** requests per **60** seconds per organization). See [Usage Limits](/docs/api/usage-limits).
 
 ---
 
