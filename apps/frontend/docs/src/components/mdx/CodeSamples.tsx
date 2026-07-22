@@ -60,10 +60,12 @@ function getIconForSample(sampleId: string, lang: string) {
 }
 
 export function CodeSamples({ samples }: { samples: LearnCodeSample[] }) {
-	if (!samples || samples.length === 0) return null;
+	const firstSample = samples?.[0];
+	if (!samples || samples.length === 0 || !firstSample) return null;
 
 	const availableIds = samples.map((sample) => sample.id);
-	const defaultId = availableIds.includes("node") ? "node" : availableIds[0];
+	const defaultId =
+		availableIds.includes("node") ? "node" : (availableIds[0] ?? "node");
 	const [activeTab, setActiveTab] = useApiLanguage(availableIds, defaultId);
 
 	const resolvedActiveTab =
@@ -72,7 +74,7 @@ export function CodeSamples({ samples }: { samples: LearnCodeSample[] }) {
 		:	defaultId;
 
 	const activeSample =
-		samples.find((sample) => sample.id === resolvedActiveTab) || samples[0];
+		samples.find((sample) => sample.id === resolvedActiveTab) ?? firstSample;
 
 	const tabs = samples.map((sample) => ({
 		id: sample.id,

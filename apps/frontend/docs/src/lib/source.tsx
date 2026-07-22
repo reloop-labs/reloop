@@ -251,14 +251,19 @@ export const source = {
 			const { data: frontmatter, content } = matter(fileContent);
 			const toc: TOCItem[] = [];
 			const headingRegex = /^(##|###)\s+(.*)$/gm;
+			const seenSlugs = new Map<string, number>();
 			for (const match of content.matchAll(headingRegex)) {
 				if (!match[1] || !match[2]) continue;
 				const title = match[2].trim();
-				const url = `#${title
-					.toLowerCase()
-					.replace(/[^\w\- ]+/g, "")
-					.replace(/\s+/g, "-")}`;
-				toc.push({ title, url, depth: match[1].length });
+				const base =
+					title
+						.toLowerCase()
+						.replace(/[^\w\- ]+/g, "")
+						.replace(/\s+/g, "-") || "section";
+				const count = seenSlugs.get(base) ?? 0;
+				seenSlugs.set(base, count + 1);
+				const slug = count === 0 ? base : `${base}-${count}`;
+				toc.push({ title, url: `#${slug}`, depth: match[1].length });
 			}
 
 			return {

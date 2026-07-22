@@ -75,8 +75,11 @@ function TabsShell({
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
+	const firstItem = items[0];
+	if (!firstItem) return null;
+
 	const effectiveValue =
-		items.some((item) => item.value === value) ? value : items[0].value;
+		items.some((item) => item.value === value) ? value : firstItem.value;
 	const activeIndex = items.findIndex((item) => item.value === effectiveValue);
 	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
 	const tab = buttonRefs.current[currentIdx];
@@ -163,12 +166,15 @@ function TabsShell({
 
 function SyncedViewModeTabs({ items }: { items: TabItem[] }) {
 	const [viewMode, setViewMode] = useDocsViewMode();
+	const firstItem = items[0];
 	const values = items.map((item) => item.value);
 	const effectiveValue = resolveDocsViewModeValue(
 		values,
 		viewMode,
-		items[0].value,
+		firstItem?.value ?? "",
 	);
+
+	if (!firstItem) return null;
 
 	return (
 		<TabsShell

@@ -56,19 +56,30 @@ const getSlug = (children: React.ReactNode): string => {
 	return "";
 };
 
+function createUniqueSlugger() {
+	const seen = new Map<string, number>();
+	return (children: React.ReactNode): string => {
+		const base = getSlug(children) || "section";
+		const count = seen.get(base) ?? 0;
+		seen.set(base, count + 1);
+		return count === 0 ? base : `${base}-${count}`;
+	};
+}
+
 export function getMDXComponents(
 	components?: MDXComponents & { _apiData?: any },
 ): MDXComponents {
 	const apiData = components?._apiData;
 	const { _apiData: _, ...restComponents } = components || {};
+	const uniqueSlug = createUniqueSlugger();
 	return {
 		h2: ({ children, ...props }) => (
-			<h2 id={getSlug(children)} {...props}>
+			<h2 id={uniqueSlug(children)} {...props}>
 				{children}
 			</h2>
 		),
 		h3: ({ children, ...props }) => (
-			<h3 id={getSlug(children)} {...props}>
+			<h3 id={uniqueSlug(children)} {...props}>
 				{children}
 			</h3>
 		),

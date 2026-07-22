@@ -2,8 +2,8 @@
 title: Contacts
 description: Learn what Reloop contacts are and how to add, search, edit, unsubscribe, and delete contacts from the dashboard or API.
 faq:
-  - question: What is a Reloop contact?
-    answer: A Reloop contact is one person record keyed by a unique email address in your organization. Subscription status, custom properties, groups, and channel preferences all live on that same record.
+  - question: Is each email its own contact?
+    answer: Yes. A Reloop contact is one person record keyed by a unique email address in your organization. Subscription status, custom properties, groups, and channel preferences all live on that same record.
   - question: What happens if I add a duplicate email?
     answer: Email is unique per organization. Creating a contact with an email that already exists returns an error — update the existing contact instead of creating another one.
   - question: What is the difference between unsubscribed and blocked?
@@ -20,6 +20,7 @@ A **contact** is one person in your organization, identified by a unique email (
 
 Open the UI: [Contacts](https://reloop.sh/dashboard/contacts)
 
+![Contacts list in the Reloop dashboard](/docs/images/docs/contacts/list-view.png)
 
 ## Why use contacts instead of raw email lists?
 
@@ -34,7 +35,7 @@ Open the UI: [Contacts](https://reloop.sh/dashboard/contacts)
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
-    ![Add Contact in the dashboard](/docs/images/docs/contacts/dashboard-tabs.png)
+    ![Add a contact in the Reloop dashboard](/docs/images/docs/contacts/add-contact.gif)
 
     1. Go to [Contacts](https://reloop.sh/dashboard/contacts)
     2. **Add Contact** (or `⌘/Ctrl+A`)
@@ -54,7 +55,7 @@ Search by email, filter by status, export CSV. Click a row for detail — proper
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
-    ![Search and filter contacts](/docs/images/docs/contacts/list-view.png)
+    ![Search and filter contacts](/docs/images/docs/contacts/search-filter.gif)
 
     1. Open [Contacts](https://reloop.sh/dashboard/contacts)
     2. Use **Search by email** or filter **All / Subscribed / Unsubscribed**
@@ -115,9 +116,9 @@ Status is `subscribed`, `unsubscribed`, or `blocked` (often from deliverability)
 
 ## FAQ
 
-### What is a Reloop contact?
+### Is each email its own contact?
 
-A Reloop contact is one person record keyed by a unique email address in your organization. Subscription status, custom properties, groups, and channel preferences all live on that same record.
+Yes. A Reloop contact is one person record keyed by a unique email address in your organization. Subscription status, custom properties, groups, and channel preferences all live on that same record.
 
 ### What happens if I add a duplicate email?
 
