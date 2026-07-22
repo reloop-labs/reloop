@@ -5,6 +5,18 @@ import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
 import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
+import {
+	CheckCircle2,
+	FileText,
+	Folder,
+	List,
+	Pencil,
+	Plus,
+	RefreshCw,
+	Share2,
+	Trash2,
+	XCircle,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -43,6 +55,42 @@ function resolveDocBaseUrl(): string {
 
 const docBaseUrl = resolveDocBaseUrl();
 
+function getDefaultOpIcon(id: string): React.ReactNode {
+	switch (id) {
+		case "create":
+		case "add":
+			return <Plus className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+		case "list":
+			return <List className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+		case "get":
+		case "retrieve":
+		case "getContacts":
+			return <FileText className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+		case "update":
+		case "updateChannel":
+		case "edit":
+			return <Pencil className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+		case "delete":
+		case "deleteGroup":
+		case "remove":
+			return <Trash2 className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+		case "rotate":
+			return <RefreshCw className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+		case "enable":
+			return <CheckCircle2 className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+		case "disable":
+			return <XCircle className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+		case "addChannel":
+			return <Share2 className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+		case "addGroup":
+			return <Folder className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+		case "verify":
+			return <CheckCircle2 className="size-4 shrink-0 text-text-sub-500 dark:text-white/60" />;
+		default:
+			return undefined;
+	}
+}
+
 export interface LanguageConfig {
 	id: string;
 	label: string;
@@ -53,10 +101,12 @@ export interface OperationConfig {
 	id: string;
 	label: string;
 	docSlug?: string;
+	icon?: React.ReactNode;
 }
 
 export interface ApiDetailsDrawerProps {
 	title: string;
+	icon?: React.ReactNode;
 	hotkey?: string;
 	languages: readonly LanguageConfig[];
 	operations: readonly OperationConfig[];
@@ -71,6 +121,7 @@ export interface ApiDetailsDrawerProps {
 
 export const ApiDetailsDrawer = ({
 	title,
+	icon,
 	hotkey,
 	languages,
 	operations,
@@ -291,8 +342,9 @@ export const ApiDetailsDrawer = ({
 				<div className="sticky top-0 z-30 border-stroke-soft-100/40 border-b bg-bg-white-0">
 					<Drawer.Header className="pb-3!">
 						<div className="flex flex-1 flex-col gap-1">
-							<Drawer.Title className="font-semibold text-2xl">
-								{title}
+							<Drawer.Title className="flex items-center gap-2.5 font-semibold text-2xl">
+								{icon}
+								<span>{title}</span>
 							</Drawer.Title>
 						</div>
 					</Drawer.Header>
@@ -413,6 +465,7 @@ export const ApiDetailsDrawer = ({
 									titleHref={`${docBaseUrl}/docs/api/${docSection}/${docSlug}`}
 									noScroll={false}
 									codeExtraPadding={codeExtraPadding}
+									icon={op.icon || getDefaultOpIcon(op.id)}
 								/>
 							</section>
 						);

@@ -1,4 +1,5 @@
 import type * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
 import { ApiDetailsDrawer } from "./api-details-drawer";
 import { codeExamples } from "./groups-code-examples";
 
@@ -53,6 +54,7 @@ export const GroupsApiDetails = (props: ButtonProps) => {
 	return (
 		<ApiDetailsDrawer
 			title="Groups API"
+			icon={<Icon name="modules" className="h-6 w-6 text-text-strong-950 dark:text-white" />}
 			languages={languages}
 			operations={operations}
 			codeExamples={codeExamples}

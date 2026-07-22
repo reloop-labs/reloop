@@ -1,4 +1,5 @@
 import type * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
 import { ApiDetailsDrawer } from "./api-details-drawer";
 import { codeExamples } from "./contacts-code-examples";
 
@@ -60,6 +61,7 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 	return (
 		<ApiDetailsDrawer
 			title="Contacts API"
+			icon={<Icon name="contacts" className="h-6 w-6 text-text-strong-950 dark:text-white" />}
 			hotkey="a"
 			languages={languages}
 			operations={operations}

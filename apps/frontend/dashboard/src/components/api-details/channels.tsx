@@ -1,4 +1,5 @@
 import type * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
 import { ApiDetailsDrawer } from "./api-details-drawer";
 import { codeExamples } from "./channels-code-examples";
 
@@ -48,6 +49,7 @@ export const ChannelsApiDetails = (props: ButtonProps) => {
 	return (
 		<ApiDetailsDrawer
 			title="Channels API"
+			icon={<Icon name="notification-indicator" className="h-6 w-6 text-text-strong-950 dark:text-white" />}
 			languages={languages}
 			operations={operations}
 			codeExamples={codeExamples}

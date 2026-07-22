@@ -1,4 +1,5 @@
 import type * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
 import { ApiDetailsDrawer } from "./api-details-drawer";
 import { codeExamples } from "./webhooks-code-examples";
 
@@ -38,6 +39,7 @@ export const WebhooksApiDetails = (props: ButtonProps) => {
 	return (
 		<ApiDetailsDrawer
 			title="Webhooks API"
+			icon={<Icon name="webhook" className="h-6 w-6 text-text-strong-950 dark:text-white" />}
 			hotkey="c"
 			languages={languages}
 			operations={operations}
