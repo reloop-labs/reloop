@@ -12,7 +12,7 @@ import {
 import { useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
+import { useUpdateContactStatusInCache } from "#/features/contacts/hooks/use-contacts-query";
 
 interface Contact {
 	id: string;
@@ -42,7 +42,7 @@ export const ContactDropdown = ({
 	isDeleting,
 	onOpenChange,
 }: ContactDropdownProps) => {
-	const invalidate = useInvalidateContacts();
+	const updateContactStatusInCache = useUpdateContactStatusInCache();
 	const navigate = useNavigate();
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
@@ -105,7 +105,7 @@ export const ContactDropdown = ({
 			}
 
 			toast.success(`Contact ${newStatus}`);
-			await invalidate();
+			updateContactStatusInCache(contact.id, newStatus);
 		} catch (error) {
 			console.error("Failed to toggle status:", error);
 			toast.error("Failed to update contact status");

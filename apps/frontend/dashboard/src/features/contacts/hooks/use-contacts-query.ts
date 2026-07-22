@@ -88,6 +88,95 @@ export function useInvalidateContacts() {
 		queryClient.invalidateQueries({ queryKey: queryKeys.contacts.all });
 }
 
+/**
+ * Patch contact status in cached list/detail queries without reordering rows.
+ * Filtered lists that no longer match the new status drop the contact in place.
+ */
+export function useUpdateContactStatusInCache() {
+	const queryClient = useQueryClient();
+
+	return (contactId: string, newStatus: AudienceStatus) => {
+		const updatedAt = new Date().toISOString();
+
+		const listQueries = queryClient.getQueriesData<ContactListResponse>({
+			queryKey: [...queryKeys.contacts.all, "list"],
+		});
+
+		for (const [queryKey, old] of listQueries) {
+			if (!old) continue;
+
+			const index = old.contacts.findIndex((c) => c.id === contactId);
+			if (index === -1) continue;
+
+			const previousStatus = old.contacts[index].status;
+			if (previousStatus === newStatus) continue;
+
+			// Query key shape: ["contacts", "list", { page, limit, search, status }]
+			const params = queryKey[2] as { status?: string } | undefined;
+			const statusFilter = params?.status ?? "";
+
+			let subscribedDelta = 0;
+			let unsubscribedDelta = 0;
+			if (previousStatus === "subscribed") subscribedDelta -= 1;
+			if (previousStatus === "unsubscribed") unsubscribedDelta -= 1;
+			if (newStatus === "subscribed") subscribedDelta += 1;
+			if (newStatus === "unsubscribed") unsubscribedDelta += 1;
+
+			const noLongerMatchesFilter =
+				!!statusFilter && statusFilter !== newStatus;
+
+			if (noLongerMatchesFilter) {
+				queryClient.setQueryData<ContactListResponse>(queryKey, {
+					...old,
+					contacts: old.contacts.filter((c) => c.id !== contactId),
+					total: Math.max(0, old.total - 1),
+					subscribedContacts: Math.max(
+						0,
+						old.subscribedContacts + subscribedDelta,
+					),
+					unsubscribedContacts: Math.max(
+						0,
+						old.unsubscribedContacts + unsubscribedDelta,
+					),
+				});
+				continue;
+			}
+
+			const contacts = [...old.contacts];
+			contacts[index] = {
+				...contacts[index],
+				status: newStatus,
+				updatedAt,
+			};
+
+			queryClient.setQueryData<ContactListResponse>(queryKey, {
+				...old,
+				contacts,
+				subscribedContacts: Math.max(
+					0,
+					old.subscribedContacts + subscribedDelta,
+				),
+				unsubscribedContacts: Math.max(
+					0,
+					old.unsubscribedContacts + unsubscribedDelta,
+				),
+			});
+		}
+
+		queryClient.setQueryData<ContactDetail>(
+			queryKeys.contacts.detail(contactId),
+			(old) =>
+				old
+					? {
+							...old,
+							status: newStatus,
+							updatedAt,
+						}
+					: old,
+		);
+	};
+}
+
 export type GroupDetail = {
 	id: string;
 	name: string;

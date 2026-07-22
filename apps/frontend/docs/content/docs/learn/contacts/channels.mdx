@@ -1,67 +1,76 @@
 ---
 title: Channels
-description: Configure subscription channels to manage customer preferences and message routing rules.
+description: Per-topic subscription preferences — desktop or code.
 ---
 
-**Channels** represent subscription categories or topics (e.g., "Product Updates", "Monthly Newsletter", or "System Alerts"). Using channels allows you to manage subscriber consent granularly, preventing spam complaints by letting contacts opt out of specific types of content rather than unsubscribing globally.
+**Channels** are subscription topics (Product Updates, Newsletter, Alerts). Contacts opt in or out per channel instead of a global unsubscribe.
 
-![Subscription Channels View](/docs/images/docs/contacts/topics-list.png)
+Open the UI: [Contacts → Channels](https://reloop.sh/dashboard/contacts/channels)
 
----
+## Settings
 
-## Channel Settings
-
-Every subscription channel is defined by two key settings:
-
-* **Default Subscription**:
-  * **Opt-In** (`opt_in`): New contacts added to the workspace are automatically enrolled in this channel.
-  * **Opt-Out** (`opt_out`): Contacts must be manually enrolled in this channel, or opt in themselves.
-* **Visibility**:
-  * **Public** (`public`): The channel is visible to subscribers, allowing them to opt in or out of it on their preferences management page.
-  * **Private** (`private`): The channel is only visible to your internal team inside the Reloop dashboard.
+| Setting | Options |
+|---------|---------|
+| **Default** | `opt_in` — enroll new contacts · `opt_out` — enroll manually |
+| **Visibility** | `public` — preference center · `private` — dashboard only |
 
 ---
 
-## Dashboard Usage
+## Create
 
-You can create, edit, and configure your messaging channels in the dashboard.
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    ![Create a subscription channel](/docs/images/docs/contacts/channels-list.png)
 
-### 1. Creating a Channel
-1. Navigate to **Contacts** in the sidebar and click on the **Channels** tab.
-2. Click the **Create Channel** button.
-3. Configure the fields:
-   * **Channel Name**: A descriptive name (e.g., `Product Updates`).
-   * **Description** (Optional): A description explaining what kind of messages are sent on this channel (maximum 500 characters).
-   * **Default Subscription**: Toggle to automatically enroll new contacts.
-   * **Public Channel**: Toggle to make the channel visible on public subscription preference pages.
-4. Review the preview pane on the right of the modal to see how it will render for subscribers.
-5. Click **Create Channel** to save.
-
-### 2. Editing or Deleting a Channel
-1. Find the target channel in the channels list table.
-2. Click the options menu at the end of the row.
-3. Choose **Edit** to modify its settings, or **Delete** to permanently remove the channel. Note: Deleting a channel will remove all enrollment records associated with it.
+    1. Go to [Contacts → Channels](https://reloop.sh/dashboard/contacts/channels)
+    2. **Create Channel**
+    3. Name, optional description, default subscription, public/private
+    4. Save
+  </Tab>
+  <Tab title="Code" icon="code">
+    <ContactsCodeSamples id="contacts.channels.create" />
+  </Tab>
+</Tabs>
 
 ---
 
-## API Reference
+## Edit / Delete
 
-Use the Channels API to manage subscription channels and user preference topics programmatically.
+Deleting a channel removes its enrollment records.
+
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    ![Edit or delete a channel](/docs/images/docs/contacts/channels-list.png)
+
+    1. Open [Contacts → Channels](https://reloop.sh/dashboard/contacts/channels)
+    2. Row **···** → **Edit** or **Delete**
+    3. Confirm if deleting
+  </Tab>
+  <Tab title="Code" icon="code">
+    <ContactsCodeSamples id="contacts.channels.update" />
+
+    <ContactsCodeSamples id="contacts.channels.delete" />
+  </Tab>
+</Tabs>
+
+---
+
+## API reference
 
 <CardGroup cols={2}>
-  <Card icon="plus" title="Create Channel" href="/api/contacts/channels/post-api-contacts-v1channels-create#channels">
-    Create a new subscription channel.
+  <Card icon="plus" title="Create" href="/api/contacts/channels/post-api-contacts-v1channels-create#channels">
+    New channel.
   </Card>
-  <Card icon="list" title="List Channels" href="/api/contacts/channels/get-api-contacts-v1channels-list#channels">
-    Retrieve all subscription channels.
+  <Card icon="list" title="List" href="/api/contacts/channels/get-api-contacts-v1channels-list#channels">
+    All channels.
   </Card>
-  <Card icon="eye" title="Get Channel Details" href="/api/contacts/channels/get-api-contacts-v1channels-by-channel_id#channels">
-    Retrieve details for a single channel.
+  <Card icon="eye" title="Get" href="/api/contacts/channels/get-api-contacts-v1channels-by-channel_id#channels">
+    Channel details.
   </Card>
-  <Card icon="pen" title="Update Channel" href="/api/contacts/channels/patch-api-contacts-v1channels-by-channel_id#channels">
-    Update settings of an existing channel.
+  <Card icon="pen" title="Update" href="/api/contacts/channels/patch-api-contacts-v1channels-by-channel_id#channels">
+    Change settings.
   </Card>
-  <Card icon="trash" title="Delete Channel" href="/api/contacts/channels/delete-api-contacts-v1channels-by-channel_id#channels">
-    Delete a channel and clear enrollment data.
+  <Card icon="trash" title="Delete" href="/api/contacts/channels/delete-api-contacts-v1channels-by-channel_id#channels">
+    Remove channel.
   </Card>
 </CardGroup>

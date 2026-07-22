@@ -1,59 +1,64 @@
 ---
 title: Properties
-description: Extend your contacts with custom fields for personalized messaging and precise filtering.
+description: Custom string and number fields on contacts — desktop or code.
 ---
 
-**Properties** are custom fields attached to contact records in Reloop. By defining custom properties, you can store structured data points (such as subscription tiers, sign-up sources, account age, or user preferences) and use them to personalize emails and filter contacts.
+**Properties** are custom fields on a contact (`company`, `plan_tier`, …). Types: **String** or **Number**, with an optional default.
 
-![Contact Properties View](/docs/images/docs/contacts/properties-list.png)
-
----
-
-## Key Concepts
-
-* **Supported Types**: Custom properties can be created as either a **String** (free-form text, e.g., `"enterprise"`) or a **Number** (integer/decimal, e.g., `42`).
-* **Default Values**: Optional fallbacks used during email template compilation when a specific contact does not have a value populated for that property.
+Open the UI: [Contacts → Properties](https://reloop.sh/dashboard/contacts/properties)
 
 ---
 
-## Dashboard Usage
+## Create
 
-You can define and manage custom properties directly inside the Reloop Dashboard.
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    ![Create a contact property](/docs/images/docs/contacts/properties-list.png)
 
-### 1. Creating a Custom Property
-1. Navigate to **Contacts** in the sidebar and click on the **Properties** tab.
-2. Click the **Add Property** button.
-3. Configure the fields:
-   * **Name**: The identifier for the custom property. Naming must follow these validation rules:
-     * Only letters, numbers, and underscores are allowed.
-     * The name must start with a letter or underscore.
-     * Spaces will be automatically converted to underscores.
-   * **Type**: Select **String** or **Number**.
-   * **Default Value** (Optional): Provide a fallback value. If the type is **Number**, the fallback must be a valid numeric value.
-4. Click **Add Property** to save.
-
-### 2. Deleting a Custom Property
-1. In the **Properties** list view, locate the property you wish to remove.
-2. Select the dropdown menu options on the property row, and click **Delete**.
-3. Confirming deletion will remove the property schema. Existing contacts will retain their raw key-value values, but the field will no longer be managed globally.
+    1. Go to [Contacts → Properties](https://reloop.sh/dashboard/contacts/properties)
+    2. **Add Property**
+    3. Name (letters, numbers, underscores), type **String** or **Number**, optional default
+    4. Save
+  </Tab>
+  <Tab title="Code" icon="code">
+    <ContactsCodeSamples id="contacts.properties.create" />
+  </Tab>
+</Tabs>
 
 ---
 
-## API Reference
+## Delete
 
-Use the Contact Properties API to programmatically manage custom properties schemas.
+Deleting removes the schema. Contacts keep raw values, but the field is no longer managed globally.
+
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    ![Delete a contact property](/docs/images/docs/contacts/properties-list.png)
+
+    1. Open [Contacts → Properties](https://reloop.sh/dashboard/contacts/properties)
+    2. Row **···** → **Delete**
+    3. Confirm
+  </Tab>
+  <Tab title="Code" icon="code">
+    <ContactsCodeSamples id="contacts.properties.delete" />
+  </Tab>
+</Tabs>
+
+---
+
+## API reference
 
 <CardGroup cols={2}>
-  <Card icon="plus" title="Create Property" href="/api/contacts/contact-properties/post-api-contacts-v1properties-create#contact-properties">
-    Create a new custom contact property schema.
+  <Card icon="plus" title="Create" href="/api/contacts/contact-properties/post-api-contacts-v1properties-create#contact-properties">
+    New property schema.
   </Card>
-  <Card icon="list" title="List Properties" href="/api/contacts/contact-properties/get-api-contacts-v1properties-list#contact-properties">
-    Retrieve all custom contact properties.
+  <Card icon="list" title="List" href="/api/contacts/contact-properties/get-api-contacts-v1properties-list#contact-properties">
+    All properties.
   </Card>
-  <Card icon="pen" title="Update Property" href="/api/contacts/contact-properties/patch-api-contacts-v1properties-by-contact_property_id#contact-properties">
-    Update an existing custom property definition.
+  <Card icon="pen" title="Update" href="/api/contacts/contact-properties/patch-api-contacts-v1properties-by-contact_property_id#contact-properties">
+    Change definition.
   </Card>
-  <Card icon="trash" title="Delete Property" href="/api/contacts/contact-properties/delete-api-contacts-v1properties-by-contact_property_id#contact-properties">
-    Remove a custom property definition.
+  <Card icon="trash" title="Delete" href="/api/contacts/contact-properties/delete-api-contacts-v1properties-by-contact_property_id#contact-properties">
+    Remove schema.
   </Card>
 </CardGroup>

@@ -19,6 +19,7 @@ import {
 import { PromptActions } from "@reloop/fe-docs/components/mdx/PromptActions";
 import { Side, SideBySide } from "@reloop/fe-docs/components/mdx/SideBySide";
 import { SimpleIcon } from "@reloop/fe-docs/components/mdx/SimpleIcon";
+import { ContactsCodeSamples } from "@reloop/fe-docs/lib/contacts-code-samples";
 import { RELOOP_ICON_NAMES } from "@reloop/fe-docs/lib/reloop-icon-names";
 import { Icon as ReloopIcon } from "@reloop/ui/icon";
 import type { MDXComponents } from "mdx/types";
@@ -121,6 +122,7 @@ export function getMDXComponents(
 		Callout,
 		CodeBlock,
 		CodeGroup,
+		ContactsCodeSamples,
 		Steps,
 		Step,
 		Tabs,

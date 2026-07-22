@@ -1,76 +1,131 @@
 ---
-title: Introduction
-description: Manage customer lists, subscriber status, custom traits, and suppression lists in Reloop.
+title: Contacts
+description: One email, one contact — add, find, edit, and delete from the dashboard or with code.
 ---
 
-Reloop **Contacts** enables you to build, manage, and organize your subscriber and customer list. By storing contact information, tracking their subscription status, and appending custom properties, you can design highly personalized and targeted communication workflows.
+Every person you email is a **Contact**: one email, one record. Subscription status, [properties](/docs/learn/contacts/properties), [groups](/docs/learn/contacts/groups), and [channels](/docs/learn/contacts/channels) live on that record — desktop or code.
 
-![Contacts List View](/docs/images/docs/contacts/list-view.png)
-
----
-
-## What is a Contact?
-
-At its simplest, think of **Contacts** as your digital **phone book**. Just like you save a person's phone number under their name so you don't have to remember the digits, Reloop allows you to save information (like an email address, name, and custom properties) under a single "Contact" entity. 
-
-Instead of dealing with raw email addresses every time you want to send a message, you interact with a Contact. In Reloop, a contact is a **Global Entity** identified by their unique email address. This means a single contact can belong to multiple groups or channels without being duplicated, ensuring their data—like unsubscribe status—stays perfectly synced everywhere.
+Open the UI any time: [Contacts](https://reloop.sh/dashboard/contacts)
 
 ---
 
-## How Contacts Work
+## Add
 
-Every contact in Reloop stores a core set of information:
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    ![Add Contact in the dashboard](/docs/images/docs/contacts/dashboard-tabs.png)
 
-| Field | Description |
-|-------|-------------|
-| **Email** | The unique identifier for the contact (required) |
-| **First Name / Last Name** | Optional display name fields |
-| **Status** | `subscribed`, `unsubscribed`, or `blocked` |
-| **Properties** | Custom key-value pairs (e.g., `company`, `plan_tier`) |
-| **Groups** | Organizational labels for segmentation (e.g., "Beta Testers") |
-| **Channels** | Communication channels with per-channel opt-in/opt-out control |
-
-You can add contacts via the API, CSV import, or manually in the dashboard. Once created, contacts can be organized into **Groups** for targeted broadcasts and enrolled in **Channels** to manage subscription preferences per communication type.
+    1. Go to [Contacts](https://reloop.sh/dashboard/contacts)
+    2. **Add Contact** (or `⌘/Ctrl+A`)
+    3. Enter one or more emails — optional groups
+    4. Save
+  </Tab>
+  <Tab title="Code" icon="code">
+    <ContactsCodeSamples id="contacts.create" />
+  </Tab>
+</Tabs>
 
 ---
 
-## Next Steps
+## Find
 
-<CardGroup cols={2}>
-  <Card icon="user-plus" title="Managing Contacts" href="/docs/learn/contacts/managing-contacts">
-    Add, view, update, and delete contacts via the dashboard or API.
-  </Card>
+Search by email, filter by status, export CSV. Click a row for detail — properties, groups, channels, and activity.
+
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    ![Search and filter contacts](/docs/images/docs/contacts/list-view.png)
+
+    1. Open [Contacts](https://reloop.sh/dashboard/contacts)
+    2. Use **Search by email** or filter **All / Subscribed / Unsubscribed**
+    3. Click a row to open detail — or **Export CSV** for an offline copy
+  </Tab>
+  <Tab title="Code" icon="code">
+    <ContactsCodeSamples id="contacts.list" />
+
+    <ContactsCodeSamples id="contacts.get" />
+  </Tab>
+</Tabs>
+
+---
+
+## Edit
+
+Change name, status, or properties — row menu or API.
+
+| Action | What happens |
+|--------|----------------|
+| **Edit** | Update name or properties |
+| **Subscribe / Unsubscribe** | Toggle list status |
+| **View Details** | Full profile, groups, channels, activity |
+
+Status is `subscribed`, `unsubscribed`, or `blocked` (often from deliverability).
+
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    ![Contact row actions](/docs/images/docs/contacts/list-view.png)
+
+    1. Open [Contacts](https://reloop.sh/dashboard/contacts)
+    2. Row **···** menu (or open the contact)
+    3. Choose **Edit**, **Subscribe**, or **Unsubscribe**
+  </Tab>
+  <Tab title="Code" icon="code">
+    <ContactsCodeSamples id="contacts.update" />
+  </Tab>
+</Tabs>
+
+---
+
+## Delete
+
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    ![Delete a contact from the list](/docs/images/docs/contacts/list-view.png)
+
+    1. Open [Contacts](https://reloop.sh/dashboard/contacts)
+    2. Row **···** → **Delete**
+    3. Confirm
+  </Tab>
+  <Tab title="Code" icon="code">
+    <ContactsCodeSamples id="contacts.delete" />
+  </Tab>
+</Tabs>
+
+---
+
+## Related
+
+<CardGroup cols={3}>
   <Card icon="sliders" title="Properties" href="/docs/learn/contacts/properties">
-    Extend contacts with custom fields for personalization and filtering.
+    Custom string and number fields.
   </Card>
   <Card icon="users" title="Groups" href="/docs/learn/contacts/groups">
-    Organize contacts into groups for targeted broadcasts.
+    Lists for targeted sends.
   </Card>
   <Card icon="tower-broadcast" title="Channels" href="/docs/learn/contacts/channels">
-    Manage per-channel subscription preferences.
+    Per-topic subscription preferences.
   </Card>
 </CardGroup>
 
 ---
 
-## API Reference
-
-Use the Contacts API to perform core operations on contact profiles.
+## API reference
 
 <CardGroup cols={2}>
-  <Card icon="plus" title="Create Contact" href="/api/contacts/post-api-contacts-create#contacts">
-    Create a new contact profile.
+  <Card icon="plus" title="Create" href="/api/contacts/post-api-contacts-create#contacts">
+    New contact.
   </Card>
-  <Card icon="list" title="List Contacts" href="/api/contacts/get-api-contacts-list#contacts">
-    Retrieve list of contacts in the workspace.
+  <Card icon="list" title="List" href="/api/contacts/get-api-contacts-list#contacts">
+    Paginated list.
   </Card>
-  <Card icon="eye" title="Retrieve Contact" href="/api/contacts/get-api-contacts-retrieve-by-contact_id#contacts">
-    Retrieve details of a specific contact by ID.
+  <Card icon="eye" title="Retrieve" href="/api/contacts/get-api-contacts-retrieve-by-contact_id#contacts">
+    By ID.
   </Card>
-  <Card icon="pen" title="Update Contact" href="/api/contacts/patch-api-contacts-by-contact_id#contacts">
-    Modify an existing contact profile.
+  <Card icon="pen" title="Update" href="/api/contacts/patch-api-contacts-by-contact_id#contacts">
+    Name, status, properties.
   </Card>
-  <Card icon="trash" title="Delete Contact" href="/api/contacts/delete-api-contacts-by-contact_id#contacts">
-    Delete a contact profile from the workspace.
+  <Card icon="trash" title="Delete" href="/api/contacts/delete-api-contacts-by-contact_id#contacts">
+    Remove contact.
   </Card>
 </CardGroup>
+
+[Full Contacts API](/docs/api/contacts)

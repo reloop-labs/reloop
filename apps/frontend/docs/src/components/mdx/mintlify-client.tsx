@@ -7,7 +7,6 @@ import {
 	Info,
 	Card as MintlifyCard,
 	Steps as MintlifySteps,
-	Tabs as MintlifyTabs,
 	Note,
 	Tip,
 	Warning,
@@ -15,8 +14,10 @@ import {
 import { CopyCodeBlock } from "@reloop/ui/copy-code-block";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { useApiLanguage } from "@reloop/fe-docs/lib/use-api-language";
 import {
 	siDotnet,
+	siElixir,
 	siGnubash,
 	siGo,
 	siJson,
@@ -47,6 +48,7 @@ const LANGUAGE_ICONS: Record<string, any> = {
 	curl: siGnubash,
 	bash: siGnubash,
 	shell: siGnubash,
+	elixir: siElixir,
 };
 
 function getIconForSample(label: string, lang: string) {
@@ -64,6 +66,31 @@ function getIconForSample(label: string, lang: string) {
 		path: icon.path,
 		hex: hex,
 	};
+}
+
+/** Map title/lang to the same language ids used by API reference (`reloop-api-lang`). */
+function resolveLanguageId(title: string, lang: string): string {
+	const t = title.toLowerCase().replace(/\s+/g, "");
+	const l = lang.toLowerCase();
+
+	if (t.includes("node") || ["javascript", "js", "typescript", "ts"].includes(l))
+		return "node";
+	if (t.includes("curl") || ["bash", "shell", "curl"].includes(l)) return "curl";
+	if (t.includes("python") || l === "python") return "python";
+	if (t.includes("php") || l === "php") return "php";
+	if (
+		(t.includes("java") && !t.includes("javascript")) ||
+		l === "java"
+	)
+		return "java";
+	if (t.includes(".net") || t.includes("dotnet") || t.includes("csharp") || ["csharp", "dotnet", "cs"].includes(l))
+		return "dotnet";
+	if (t === "go" || l === "go") return "go";
+	if (t.includes("rust") || l === "rust") return "rust";
+	if (t.includes("ruby") || l === "ruby") return "ruby";
+	if (t.includes("elixir") || l === "elixir") return "elixir";
+
+	return l || t || "code";
 }
 
 function extractCodeAndLanguage(
@@ -143,7 +170,6 @@ const CodeGroup = React.forwardRef<
 	}
 >((props, ref) => {
 	const [mounted, setMounted] = React.useState(false);
-	const [activeTabId, setActiveTabId] = React.useState("0");
 
 	React.useEffect(() => {
 		setMounted(true);
@@ -153,7 +179,7 @@ const CodeGroup = React.forwardRef<
 		React.isValidElement,
 	);
 
-	const tabs = childrenArray.map((child: any, index) => {
+	const samples = childrenArray.map((child: any) => {
 		const childProps = child.props as any;
 
 		const parsed = extractCodeAndLanguage(childProps.children);
@@ -169,17 +195,27 @@ const CodeGroup = React.forwardRef<
 			childProps.label ||
 			parsed?.title ||
 			lang;
+		const id = resolveLanguageId(title, lang);
 
 		return {
-			id: String(index),
-			label: title.toUpperCase(),
-			code: code,
-			lang: lang,
-			si: getIconForSample(title, lang),
+			id,
+			label: title,
+			code,
+			lang,
+			si: getIconForSample(id, lang),
 		};
 	});
 
-	if (!mounted || tabs.length === 0) {
+	const availableIds = samples.map((sample) => sample.id);
+	const defaultId = availableIds.includes("node")
+		? "node"
+		: (availableIds[0] ?? "0");
+	const [activeTabId, setActiveTabId] = useApiLanguage(
+		availableIds,
+		defaultId,
+	);
+
+	if (!mounted || samples.length === 0) {
 		return (
 			<div className="space-y-4 rounded-lg border border-fd-border bg-fd-muted p-4">
 				{props.children}
@@ -187,9 +223,16 @@ const CodeGroup = React.forwardRef<
 		);
 	}
 
-	const activeTab = tabs.find((t) => t.id === activeTabId) || tabs[0];
+	const resolvedActiveTab =
+		activeTabId && samples.some((sample) => sample.id === activeTabId)
+			? activeTabId
+			: defaultId;
+	const activeTab =
+		samples.find((sample) => sample.id === resolvedActiveTab) || samples[0];
 
 	if (!activeTab) return null;
+
+	const tabs = samples.map(({ id, label, si }) => ({ id, label, si }));
 
 	return (
 		<div ref={ref} className={props.className}>
@@ -197,7 +240,7 @@ const CodeGroup = React.forwardRef<
 				code={activeTab.code}
 				lang={activeTab.lang}
 				tabs={tabs}
-				activeTab={activeTabId}
+				activeTab={resolvedActiveTab}
 				onTabChange={setActiveTabId}
 			/>
 		</div>
@@ -258,9 +301,8 @@ const CodeBlock = React.forwardRef<
 });
 CodeBlock.displayName = "CodeBlock";
 
-// Mintlify components use sub-components for items
-export const Tabs = MintlifyTabs;
-export const Tab = (MintlifyTabs as any).Item;
+// Custom docs tabs (dashboard contacts-style UI with optional icons)
+export { Tab, Tabs } from "./Tabs";
 export const AccordionGroup = (Accordion as any).Group;
 const Steps = React.forwardRef<
 	HTMLDivElement,

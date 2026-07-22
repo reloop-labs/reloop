@@ -76,7 +76,7 @@ export async function listContactsController({
 				),
 			db.query.contact.findMany({
 				where: and(...whereConditions),
-				orderBy: desc(schema.contact.createdAt),
+				orderBy: [desc(schema.contact.createdAt), desc(schema.contact.id)],
 				limit,
 				offset,
 			}),

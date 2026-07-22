@@ -1,5 +1,5 @@
 {
 	"title": "Contacts",
 	"icon": "users",
-	"pages": ["index", "managing-contacts", "properties", "groups", "channels"]
+	"pages": ["index", "properties", "groups", "channels"]
 }
