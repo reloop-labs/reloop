@@ -6,6 +6,7 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
+import { tsdBasepathPlugin } from "./server/plugins/tsd-basepath";
 
 const base = "/dashboard/";
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
@@ -26,6 +27,9 @@ const config = defineConfig({
 	},
 	plugins: [
 		devtools(),
+		// Must run after devtools inject so `/__tsd/*` becomes `/dashboard/__tsd/*`
+		// (Caddy only proxies `/dashboard*` to this Vite server).
+		tsdBasepathPlugin("/dashboard"),
 		nitro({
 			// Explicit: monorepo rootDir scanning often skips app-local server/plugins.
 			// Plugin handles Coolify path-strip loops + /dashboard/assets static map.

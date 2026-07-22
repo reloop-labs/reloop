@@ -89,8 +89,8 @@ export const queryKeys = {
 	},
 	webhooks: {
 		all: ["webhooks"] as const,
-		list: (orgId: string) =>
-			[...queryKeys.webhooks.all, "list", orgId] as const,
+		list: (orgId: string, limit = 100) =>
+			[...queryKeys.webhooks.all, "list", orgId, limit] as const,
 		detail: (id: string) =>
 			[...queryKeys.webhooks.all, "detail", id] as const,
 		deliveries: (params: {

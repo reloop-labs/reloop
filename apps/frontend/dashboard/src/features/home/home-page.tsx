@@ -4,15 +4,54 @@ import { navigatePostAuth } from "#/utils/navigate-post-auth";
 import { resolvePostAuthDestinationWithQuery } from "#/utils/post-auth-destination";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import { ActivityChartCard } from "./components/activity-chart-card";
 import { AgentInboxCard } from "./components/agent-inbox-card";
-import { AgentIntegrationsCard } from "./components/agent-integrations-card";
 import { AuditLogsCard } from "./components/audit-logs-card";
 import { DomainCard } from "./components/domain-card";
 import { EmailsCard } from "./components/emails-card";
-import { FrameworkIntegrationsCard } from "./components/framework-integrations-card";
 import { WebhooksCard } from "./components/webhooks-card";
+
+/**
+ * Below-fold marketing/integration cards pull simple-icons + Bright code blocks
+ * (~multi-MB). Lazy-load so they are not on the home critical path.
+ */
+const AgentIntegrationsCard = lazy(() =>
+	import("./components/agent-integrations-card").then((m) => ({
+		default: m.AgentIntegrationsCard,
+	})),
+);
+const FrameworkIntegrationsCard = lazy(() =>
+	import("./components/framework-integrations-card").then((m) => ({
+		default: m.FrameworkIntegrationsCard,
+	})),
+);
+
+function CardChunkFallback({ className }: { className?: string }) {
+	return (
+		<div
+			className={
+				className ??
+				"h-[280px] animate-pulse rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-white/5 dark:bg-white/[0.02]"
+			}
+			aria-hidden
+		/>
+	);
+}
+
+function LazyCard({
+	children,
+	fallbackClassName,
+}: {
+	children: ReactNode;
+	fallbackClassName?: string;
+}) {
+	return (
+		<Suspense fallback={<CardChunkFallback className={fallbackClassName} />}>
+			{children}
+		</Suspense>
+	);
+}
 
 /**
  * Dashboard overview — matches Next home: org greeting + feature cards.
@@ -80,10 +119,14 @@ export function HomePage() {
 			<div className="grid gap-6 lg:grid-cols-3">
 				<div className="flex flex-col gap-6 lg:col-span-1">
 					<WebhooksCard />
-					<FrameworkIntegrationsCard />
+					<LazyCard>
+						<FrameworkIntegrationsCard />
+					</LazyCard>
 				</div>
 				<div className="h-fit lg:col-span-2">
-					<AgentIntegrationsCard />
+					<LazyCard fallbackClassName="h-[360px] animate-pulse rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-white/5 dark:bg-white/[0.02]">
+						<AgentIntegrationsCard />
+					</LazyCard>
 				</div>
 			</div>
 		</div>

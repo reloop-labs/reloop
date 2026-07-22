@@ -1,6 +1,15 @@
 import { authClient } from "@reloop/auth/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+	createContext,
+	createElement,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+	type ReactNode,
+} from "react";
 import { useOrganizationsQuery } from "#/features/auth/organizations-query";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { queryKeys } from "#/lib/query-keys";
@@ -12,11 +21,28 @@ export type Organization = {
 	logo?: string | null;
 };
 
-/**
- * Session-backed active org for chrome (header switcher).
- * Syncs Better Auth session + durable user preference on first load.
- */
-export function useActiveOrganization() {
+export type ActiveOrganizationValue = {
+	user: {
+		id: string;
+		name: string;
+		email: string;
+		image?: string | null;
+		[key: string]: unknown;
+	} | null;
+	organizations: Organization[] | undefined;
+	activeOrganization: Organization | null;
+	/** Resolved org id as soon as session (or list) provides it — use for query gates. */
+	activeOrganizationId: string | null;
+	sessionActiveOrganizationId: string | null;
+	hasInitialized: boolean;
+	isPending: boolean;
+	onOrganizationChange: (organization: Organization) => Promise<void>;
+};
+
+const ActiveOrganizationContext =
+	createContext<ActiveOrganizationValue | null>(null);
+
+function useActiveOrganizationState(): ActiveOrganizationValue {
 	const queryClient = useQueryClient();
 	const { data: session, isPending: sessionPending } = useSessionQuery();
 	const userId = session?.user?.id ?? null;
@@ -27,6 +53,7 @@ export function useActiveOrganization() {
 	} = useOrganizationsQuery(!!userId);
 
 	const [hasInitialized, setHasInitialized] = useState(false);
+	/** True only while the user is switching orgs (or cold setActive when session has none). */
 	const [isSwitching, setIsSwitching] = useState(false);
 	const [confirmedSessionOrgId, setConfirmedSessionOrgId] = useState<
 		string | null
@@ -50,13 +77,28 @@ export function useActiveOrganization() {
 		organizations?.[0]?.id ??
 		null;
 
-	const activeOrganization = useMemo(() => {
-		if (!organizations?.length) return null;
-		return (
-			organizations.find((org) => org.id === resolvedActiveOrgId) ??
-			organizations[0] ??
-			null
-		);
+	/**
+	 * Full org from the list when available. Before the list loads, expose a
+	 * provisional stub so home cards can start fetches with the session org id.
+	 */
+	const activeOrganization = useMemo((): Organization | null => {
+		if (organizations?.length) {
+			return (
+				(organizations.find((org) => org.id === resolvedActiveOrgId) as
+					| Organization
+					| undefined) ??
+				(organizations[0] as Organization | undefined) ??
+				null
+			);
+		}
+		if (resolvedActiveOrgId) {
+			return {
+				id: resolvedActiveOrgId,
+				name: "",
+				slug: "",
+			};
+		}
+		return null;
 	}, [organizations, resolvedActiveOrgId]);
 
 	// Re-sync when the authenticated user changes.
@@ -92,22 +134,33 @@ export function useActiveOrganization() {
 				return;
 			}
 
-			if (
-				sessionActiveOrganizationId === preferredOrgId &&
-				userActiveOrganizationId === preferredOrgId
-			) {
+			// Happy path: session already points at the preferred org.
+			// Do not block the UI on repairing the durable user preference.
+			if (sessionActiveOrganizationId === preferredOrgId) {
 				setConfirmedSessionOrgId(preferredOrgId);
 				setHasInitialized(true);
+				if (userActiveOrganizationId !== preferredOrgId) {
+					void authClient
+						.updateUser({ activeOrganizationId: preferredOrgId })
+						.then(() =>
+							queryClient.invalidateQueries({
+								queryKey: queryKeys.auth.session(),
+							}),
+						)
+						.catch((error) => {
+							console.error("Error repairing user active organization", error);
+						});
+				}
 				return;
 			}
 
+			// Session has no usable active org — must setActive before APIs that
+			// rely on session org context. This path is uncommon after first login.
 			setIsSwitching(true);
 			try {
-				if (sessionActiveOrganizationId !== preferredOrgId) {
-					await authClient.organization.setActive({
-						organizationId: preferredOrgId,
-					});
-				}
+				await authClient.organization.setActive({
+					organizationId: preferredOrgId,
+				});
 				if (userActiveOrganizationId !== preferredOrgId) {
 					await authClient.updateUser({
 						activeOrganizationId: preferredOrgId,
@@ -165,12 +218,45 @@ export function useActiveOrganization() {
 	);
 
 	return {
-		user: session?.user ?? null,
+		user: (session?.user as ActiveOrganizationValue["user"]) ?? null,
 		organizations: organizations as Organization[] | undefined,
-		activeOrganization: activeOrganization as Organization | null,
+		activeOrganization,
+		activeOrganizationId: resolvedActiveOrgId,
 		sessionActiveOrganizationId: effectiveSessionOrgId,
 		hasInitialized,
+		// Preference repair no longer sets isSwitching — only real setActive does.
 		isPending: sessionPending || organizationsPending || isSwitching,
 		onOrganizationChange,
 	};
+}
+
+/**
+ * Mount once under the authenticated dashboard layout.
+ * All `useActiveOrganization()` consumers share this state (no multi-setActive races).
+ */
+export function ActiveOrganizationProvider({
+	children,
+}: {
+	children: ReactNode;
+}) {
+	const value = useActiveOrganizationState();
+	return createElement(
+		ActiveOrganizationContext.Provider,
+		{ value },
+		children,
+	);
+}
+
+/**
+ * Session-backed active org for chrome and feature queries.
+ * Must be used under `ActiveOrganizationProvider` (dashboard layout).
+ */
+export function useActiveOrganization(): ActiveOrganizationValue {
+	const ctx = useContext(ActiveOrganizationContext);
+	if (!ctx) {
+		throw new Error(
+			"useActiveOrganization must be used within ActiveOrganizationProvider",
+		);
+	}
+	return ctx;
 }

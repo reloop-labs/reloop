@@ -1,4 +1,3 @@
-import { IconsSprite } from "@reloop/ui/icons-sprite";
 import { Toaster } from "@reloop/ui/toast";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { TanStackDevtools } from "@tanstack/react-devtools";
@@ -12,6 +11,7 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
+import { LazyIconsSprite } from "#/components/lazy-icons-sprite";
 import { NotFound } from "#/components/not-found";
 import { ThemeProvider } from "#/providers/theme-provider";
 
@@ -79,7 +79,8 @@ function RootComponent() {
 				<Tooltip.Provider>
 					<Outlet />
 				</Tooltip.Provider>
-				<IconsSprite />
+				{/* ~300KB SVG symbol sheet — async chunk, not on critical path */}
+				<LazyIconsSprite />
 				<Toaster />
 				{import.meta.env.DEV ? (
 					<TanStackDevtools

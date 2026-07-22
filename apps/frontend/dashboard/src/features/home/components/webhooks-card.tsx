@@ -7,7 +7,8 @@ import { Link } from "@tanstack/react-router";
 import { useWebhooks } from "#/features/webhooks/components/use-webhooks";
 
 export function WebhooksCard() {
-		const { webhooks, isTotalEmpty } = useWebhooks();
+	// Home card only renders 3 rows — avoid pulling the full page list (limit 100).
+	const { webhooks, isTotalEmpty } = useWebhooks({ limit: 5 });
 
 	return (
 		<div className="group flex w-full flex-col">

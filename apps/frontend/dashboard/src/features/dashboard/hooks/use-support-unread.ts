@@ -4,7 +4,7 @@ import { queryKeys } from "#/lib/query-keys";
 import { useUIStore } from "#/store/use-ui-store";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 async function fetchUnreadCount() {
 	const { data } = await axios.get<{ count: number }>(
@@ -28,11 +28,38 @@ export function useSupportUnread() {
 	// tab check so re-enabling AI does not mark support as "open" incorrectly.
 	const supportOpen = isAiPanelOpen && aiPanelActiveTab === "support";
 
+	// Defer non-critical support work off the initial paint critical path.
+	// Enable after idle (or 2s), or immediately when the support panel opens.
+	const [networkEnabled, setNetworkEnabled] = useState(false);
+	useEffect(() => {
+		if (supportOpen) {
+			setNetworkEnabled(true);
+			return;
+		}
+		let cancelled = false;
+		const enable = () => {
+			if (!cancelled) setNetworkEnabled(true);
+		};
+		if (typeof requestIdleCallback === "function") {
+			const id = requestIdleCallback(enable, { timeout: 2000 });
+			return () => {
+				cancelled = true;
+				cancelIdleCallback(id);
+			};
+		}
+		const timer = setTimeout(enable, 2000);
+		return () => {
+			cancelled = true;
+			clearTimeout(timer);
+		};
+	}, [supportOpen]);
+
 	const { data: count = 0, refetch: mutateUnread } = useQuery({
 		queryKey: queryKeys.support.unreadCount(),
 		queryFn: fetchUnreadCount,
-		refetchInterval: 30_000,
-		refetchOnWindowFocus: true,
+		enabled: networkEnabled,
+		refetchInterval: networkEnabled ? 30_000 : false,
+		refetchOnWindowFocus: networkEnabled,
 	});
 
 	const clearUnread = useCallback(() => {
@@ -51,16 +78,16 @@ export function useSupportUnread() {
 		[mutateUnread],
 	);
 
-	// Keep a lightweight WS connection for live badge updates while logged in
+	// WebSocket only after idle (or when panel is open) — not on first paint.
 	useSupportSocket({
-		enabled: true,
+		enabled: networkEnabled,
 		onEvent,
 	});
 
 	useEffect(() => {
-		if (!supportOpen) return;
+		if (!supportOpen || !networkEnabled) return;
 		void mutateUnread();
-	}, [supportOpen, mutateUnread]);
+	}, [supportOpen, networkEnabled, mutateUnread]);
 
 	return {
 		unreadCount: count,

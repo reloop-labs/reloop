@@ -16,7 +16,7 @@ import { ArrowRight, MoreHorizontal, Plus } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryState } from "nuqs";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSWR } from "#/features/home/lib/use-swr-compat";
 import { DeleteDomainModal } from "#/features/domain/components/delete-domain";
@@ -35,113 +35,17 @@ interface DomainListResponse {
 	total: number;
 }
 
-interface EmailStatsResponse {
-	dates: string[];
-	sent: number[];
-	delivered: number[];
-	bounced: number[];
-	complaint: number[];
-	rate: number[];
-}
-
+/**
+ * Decorative sparkline for the domain row.
+ * Does not hit the stats API — per-domain stats on home caused N+1 heavy aggregates.
+ * Real activity lives on the activity chart / domain detail.
+ */
 const DomainSparkline = ({ domainId }: { domainId: string }) => {
-	// Date range for the 7-day activity graph
-	const { start_date, end_date } = useMemo(() => {
-		const now = new Date();
-		const toDate = new Date(now);
-		toDate.setHours(23, 59, 59, 999);
-		const fromDate = new Date(now);
-		fromDate.setDate(now.getDate() - 6); // 7 days inclusive
-		fromDate.setHours(0, 0, 0, 0);
-		return {
-			start_date: fromDate.toISOString(),
-			end_date: toDate.toISOString(),
-		};
-	}, []);
-
-	const { data: statsData } = useSWR<EmailStatsResponse>(
-		domainId
-			? `/api/logs/v1/emails/stats?domain_id=${domainId}&start_date=${start_date}&end_date=${end_date}`
-			: null,
-	);
-
-	// Generate SVG path based on the statsData.sent array
-	const pathData = useMemo(() => {
-		// Generate list of 7 YYYY-MM-DD date strings in UTC for the past 7 days
-		const days: string[] = [];
-		for (let i = 6; i >= 0; i--) {
-			const d = new Date();
-			d.setUTCDate(d.getUTCDate() - i);
-			const year = d.getUTCFullYear();
-			const month = String(d.getUTCMonth() + 1).padStart(2, "0");
-			const day = String(d.getUTCDate()).padStart(2, "0");
-			days.push(`${year}-${month}-${day}`);
-		}
-
-		// Map API dates/values to a lookup map of YYYY-MM-DD -> sent count
-		const statsMap = new Map<string, number>();
-		if (statsData?.dates && statsData?.sent) {
-			statsData.dates.forEach((dateStr, idx) => {
-				const date = new Date(dateStr);
-				const year = date.getUTCFullYear();
-				const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-				const day = String(date.getUTCDate()).padStart(2, "0");
-				const key = `${year}-${month}-${day}`;
-				statsMap.set(key, statsData.sent[idx] || 0);
-			});
-		}
-
-		// Reconstruct the 7 points, filling with 0 if no data exists
-		const points = days.map((key) => statsMap.get(key) || 0);
-
-		if (!statsData) {
-			// Fallback placeholder/default path if no data is loaded yet
-			return {
-				line: "M0 14 C 10 10, 15 18, 25 10 C 35 4, 40 16, 50 12 C 60 8, 65 4, 75 14 C 85 20, 90 8, 100 11",
-				fill: "M0 14 C 10 10, 15 18, 25 10 C 35 4, 40 16, 50 12 C 60 8, 65 4, 75 14 C 85 20, 90 8, 100 11 L 100 24 L 0 24 Z",
-			};
-		}
-
-		const n = points.length;
-		const width = 100;
-		const height = 24;
-		const padding = 3; // padding top/bottom to prevent clipping
-		const usableHeight = height - padding * 2;
-
-		const maxVal = Math.max(...points, 1); // avoid division by zero
-
-		// Map each point to (x, y) coordinates
-		const coords = points.map((val, idx) => {
-			const x = n > 1 ? (idx / (n - 1)) * width : width / 2;
-			// invert y so higher count is closer to top (0 is top, height is bottom)
-			const y = height - padding - (val / maxVal) * usableHeight;
-			return { x, y };
-		});
-
-		if (coords.length === 0 || !coords[0]) {
-			return { line: "", fill: "" };
-		}
-
-		// Build a smooth cubic bezier line using coordinate interpolation
-		let linePath = `M ${coords[0].x.toFixed(1)} ${coords[0].y.toFixed(1)}`;
-		for (let i = 0; i < coords.length - 1; i++) {
-			const p0 = coords[i];
-			const p1 = coords[i + 1];
-			if (!p0 || !p1) continue;
-			// Control points in the middle
-			const cp1x = p0.x + (p1.x - p0.x) / 3;
-			const cp1y = p0.y;
-			const cp2x = p0.x + (2 * (p1.x - p0.x)) / 3;
-			const cp2y = p1.y;
-			linePath += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p1.x.toFixed(1)} ${p1.y.toFixed(1)}`;
-		}
-
-		const fillPath = `${linePath} L 100 24 L 0 24 Z`;
-		return { line: linePath, fill: fillPath };
-	}, [statsData]);
-
-	// Unique gradient ID for each sparkline to avoid conflicts in page DOM
-	const gradientId = useMemo(() => `sparkline-grad-${domainId}`, [domainId]);
+	const pathData = {
+		line: "M0 14 C 10 10, 15 18, 25 10 C 35 4, 40 16, 50 12 C 60 8, 65 4, 75 14 C 85 20, 90 8, 100 11",
+		fill: "M0 14 C 10 10, 15 18, 25 10 C 35 4, 40 16, 50 12 C 60 8, 65 4, 75 14 C 85 20, 90 8, 100 11 L 100 24 L 0 24 Z",
+	};
+	const gradientId = `sparkline-grad-${domainId}`;
 
 	return (
 		<svg
@@ -149,6 +53,7 @@ const DomainSparkline = ({ domainId }: { domainId: string }) => {
 			viewBox="0 0 100 24"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"
+			aria-hidden
 		>
 			<defs>
 				<linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">

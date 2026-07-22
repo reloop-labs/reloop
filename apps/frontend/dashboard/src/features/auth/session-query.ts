@@ -17,6 +17,15 @@ export function sessionQueryOptions() {
 	return queryOptions({
 		queryKey: queryKeys.auth.session(),
 		queryFn: async (): Promise<SessionData | null> => {
+			// Better Auth client needs an absolute baseURL or a browser origin.
+			// Node `fetch` rejects relative URLs → "Failed to parse URL from /api/auth/...".
+			// Do not return null here: dehydrating a fake unauthenticated session would
+			// bounce signed-in users to /login on hydrate.
+			if (typeof window === "undefined") {
+				throw new Error(
+					"sessionQuery is browser-only (auth client has no absolute baseURL on SSR)",
+				);
+			}
 			const { data, error } = await authClient.getSession();
 			if (error) {
 				throw new Error(error.message || "Failed to load session");
@@ -27,7 +36,11 @@ export function sessionQueryOptions() {
 }
 
 export function useSessionQuery() {
-	return useQuery(sessionQueryOptions());
+	return useQuery({
+		...sessionQueryOptions(),
+		// Skip on the server — no absolute auth baseURL without VITE_PUBLIC_URL.
+		enabled: typeof window !== "undefined",
+	});
 }
 
 /** Call after sign-in / sign-out so session cache stays correct. */

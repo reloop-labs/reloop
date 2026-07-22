@@ -44,13 +44,13 @@ export type WebhookDetailData = WebhookData & {
 	organizationId?: string;
 };
 
-export function useWebhooksListQuery(enabled = true) {
+export function useWebhooksListQuery(enabled = true, limit = 100) {
 	const { activeOrganization } = useActiveOrganization();
 	return useQuery({
-		queryKey: queryKeys.webhooks.list(activeOrganization?.id ?? ""),
+		queryKey: queryKeys.webhooks.list(activeOrganization?.id ?? "", limit),
 		queryFn: async () => {
 			const res = await fetch(
-				`/api/webhook/v1/?organizationId=${activeOrganization?.id}&limit=100`,
+				`/api/webhook/v1/?organizationId=${activeOrganization?.id}&limit=${limit}`,
 				{ credentials: "include" },
 			);
 			if (!res.ok) throw new Error(`Failed to load webhooks (${res.status})`);
@@ -80,7 +80,8 @@ export function useInvalidateWebhooks() {
 		queryClient.invalidateQueries({ queryKey: queryKeys.webhooks.all });
 }
 
-export function useWebhooks() {
+export function useWebhooks(options?: { limit?: number }) {
+	const limit = options?.limit ?? 100;
 	const { activeOrganization } = useActiveOrganization();
 	const [statusFilter, setStatusFilter] = useState("all");
 	const [searchQuery, setSearchQuery] = useState("");
@@ -88,6 +89,7 @@ export function useWebhooks() {
 
 	const { data, error, isPending, isFetching, refetch } = useWebhooksListQuery(
 		!!activeOrganization?.id,
+		limit,
 	);
 
 	const isLoading = isPending || (isFetching && !data);
