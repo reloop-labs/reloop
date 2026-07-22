@@ -1,5 +1,5 @@
 import { cn } from "@reloop/ui/cn";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { LoadingDot } from "../shared/loading-dot";
 
@@ -14,65 +14,63 @@ interface AiSparkleButtonProps {
 	className?: string;
 }
 
+/**
+ * Quiet composer action to request an AI draft.
+ * Kept export name for existing call sites.
+ */
 export const AiSparkleButton = ({
 	onClick,
 	disabled = false,
 	loading = false,
-	label,
-	title = "AI draft",
+	label = "Write with AI",
+	title = "Write with AI",
 	variant = "pill",
 	size = "sm",
 	className,
 }: AiSparkleButtonProps) => {
+	const reduceMotion = useReducedMotion();
+	const idle = disabled || loading;
+
 	return (
 		<motion.button
 			type="button"
 			onClick={onClick}
-			disabled={disabled || loading}
-			whileHover={disabled || loading ? undefined : { scale: 1.02 }}
-			whileTap={disabled || loading ? undefined : { scale: 0.97 }}
-			transition={{ type: "spring", stiffness: 400, damping: 25 }}
+			disabled={idle}
+			whileTap={idle || reduceMotion ? undefined : { scale: 0.97 }}
+			transition={{ type: "spring", stiffness: 500, damping: 32 }}
 			title={title}
+			aria-busy={loading}
 			className={cn(
-				"relative inline-flex items-center justify-center font-medium transition-all duration-200 select-none outline-none",
-				"disabled:opacity-40 disabled:pointer-events-none",
-				// Apple-style clean monochrome glass pill
-				variant === "pill" && [
-					"h-7 px-2.5 gap-1.5 rounded-lg text-[12px]",
-					"bg-transparent text-mail-muted hover:text-mail-foreground",
-					"hover:bg-[var(--inbox-hover)]",
-				],
-				// Icon-only variant
+				"relative inline-flex select-none items-center justify-center font-medium outline-none",
+				"text-mail-muted transition-[color,background-color,opacity] duration-150 ease-out",
+				"hover:bg-[var(--inbox-hover)] hover:text-mail-foreground",
+				"focus-visible:ring-2 focus-visible:ring-mail-foreground/20",
+				"disabled:pointer-events-none disabled:opacity-40",
+				variant === "pill" && ["h-7 gap-1.5 rounded-md px-2 text-[12px]"],
 				variant === "icon" && [
-					size === "sm" ? "h-7 w-7 rounded-lg" : "h-8 w-8 rounded-xl",
-					"text-mail-muted hover:text-mail-foreground",
-					"hover:bg-[var(--inbox-hover)]",
+					size === "sm" ? "h-7 w-7 rounded-md" : "h-8 w-8 rounded-lg",
 				],
 				className,
 			)}
 		>
-			<div className="flex items-center gap-1.5">
-				{loading ? (
+			{loading ? (
+				<span className="flex items-center gap-1.5 tracking-tight text-mail-foreground/70">
 					<LoadingDot
-						label="Generating"
+						label="Thinking"
+						size={14}
+						dotSize={2}
 						className="text-mail-foreground"
 					/>
-				) : (
-					<motion.div
-						whileHover={{ rotate: 12, scale: 1.1 }}
-						transition={{ type: "spring", stiffness: 300, damping: 18 }}
-						className="shrink-0"
-					>
-						<Sparkles className="h-3.5 w-3.5 text-mail-foreground" />
-					</motion.div>
-				)}
-
-				{(label || variant === "pill") && (
-					<span className="text-[12px] font-medium tracking-tight text-mail-foreground/50 hover:text-mail-foreground/80 transition-opacity">
-						{loading ? "Generating…" : label || "AI Draft"}
-					</span>
-				)}
-			</div>
+					{variant === "pill" ? <span>Thinking…</span> : null}
+				</span>
+			) : (
+				<span className="flex items-center gap-1.5 tracking-tight">
+					<Sparkles className="h-3.5 w-3.5 shrink-0 text-mail-foreground/70" />
+					{variant === "pill" ? (
+						<span className="text-mail-foreground/70">{label}</span>
+					) : null}
+				</span>
+			)}
 		</motion.button>
 	);
 };

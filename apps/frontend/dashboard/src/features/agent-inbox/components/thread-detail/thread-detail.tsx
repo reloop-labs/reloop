@@ -3,13 +3,14 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { AnimatePresence, useReducedMotion } from "framer-motion";
 import { parseAsString, useQueryState } from "nuqs";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import { buildDisplayMessages } from "#/features/agent-inbox/utils/build-display-messages";
 import type {
 	AgentMailbox,
+	ComposeDraft,
 	ComposeDraftKind,
 	InboundThread,
 } from "../../types";
@@ -21,6 +22,7 @@ import { RawHeadersModal } from "./raw-headers-modal";
 import { ReplyComposer } from "./reply-composer";
 import type { ThreadParticipant } from "./thread-header";
 import { ThreadHeader } from "./thread-header";
+import { ThreadSavedDraftBar } from "./thread-saved-draft-bar";
 import { ZeroMailDisplay } from "./zero-mail-display";
 import { ZeroThreadToolbar } from "./zero-thread-toolbar";
 
@@ -154,6 +156,10 @@ export const ThreadDetail = ({
 	const [replySeed, setReplySeed] = useState("");
 	const [replyInitialHtml, setReplyInitialHtml] = useState("");
 	const [replyDraftId, setReplyDraftId] = useState<string | null>(null);
+	/** Saved reply draft for this thread — shown when composer is closed. */
+	const [savedReplyDraft, setSavedReplyDraft] = useState<ComposeDraft | null>(
+		null,
+	);
 	/** List message id the composer is anchored under (inline in the thread). */
 	const [replyAnchorMessageId, setReplyAnchorMessageId] = useState<
 		string | null
@@ -240,6 +246,7 @@ export const ThreadDetail = ({
 		setReplySeed("");
 		setReplyInitialHtml("");
 		setReplyDraftId(null);
+		setSavedReplyDraft(null);
 		setReplyAnchorMessageId(null);
 		setReplyApiMessageId(null);
 		setSkipReplyEnter(false);
@@ -380,6 +387,44 @@ export const ThreadDetail = ({
 		setSkipReplyEnter(false);
 		setShowReplyComposer(false);
 	};
+
+	const refreshSavedReplyDraft = useCallback(async () => {
+		const mailboxKey = mailbox?.id;
+		const threadKey = thread?.threadId;
+		if (!mailboxKey || !threadKey) {
+			setSavedReplyDraft(null);
+			return;
+		}
+		const [reply, replyAll] = await Promise.all([
+			findDraft({
+				mailboxId: mailboxKey,
+				threadId: threadKey,
+				kind: "reply",
+			}),
+			findDraft({
+				mailboxId: mailboxKey,
+				threadId: threadKey,
+				kind: "reply_all",
+			}),
+		]);
+		const candidates = [reply, replyAll].filter(
+			(d): d is ComposeDraft =>
+				!!d && (!!d.text.trim() || !!d.html.trim()),
+		);
+		candidates.sort(
+			(a, b) =>
+				new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+		);
+		setSavedReplyDraft(candidates[0] ?? null);
+	}, [mailbox?.id, thread?.threadId, findDraft]);
+
+	useEffect(() => {
+		if (showReplyComposer) return;
+		const timer = window.setTimeout(() => {
+			void refreshSavedReplyDraft();
+		}, 500);
+		return () => window.clearTimeout(timer);
+	}, [refreshSavedReplyDraft, showReplyComposer, replyDraftId]);
 
 	const closeForwardComposer = () => {
 		setSkipForwardEnter(false);
@@ -1056,14 +1101,22 @@ export const ThreadDetail = ({
 	const conversationThreadId = thread.threadId || null;
 
 	const discardReplyDraft = () => {
-		const id = replyDraftId;
+		const id = replyDraftId || savedReplyDraft?.id || null;
 		setReplyDraftId(null);
+		setSavedReplyDraft(null);
 		closeReplyComposer();
 		if (id) {
 			void deleteDraft(id).catch(() => {
 				/* ignore */
 			});
 		}
+	};
+
+	const continueSavedReplyDraft = () => {
+		if (!savedReplyDraft) return;
+		const mode =
+			savedReplyDraft.kind === "reply_all" ? "replyAll" : "reply";
+		openReplyComposer(mode);
 	};
 
 	const discardForwardDraft = () => {
@@ -1302,6 +1355,13 @@ export const ThreadDetail = ({
 								? forwardComposerElement
 								: null}
 						</AnimatePresence>
+						{!showReplyComposer && savedReplyDraft ? (
+							<ThreadSavedDraftBar
+								draft={savedReplyDraft}
+								onContinue={continueSavedReplyDraft}
+								onDiscard={discardReplyDraft}
+							/>
+						) : null}
 					</>
 				)}
 			</div>

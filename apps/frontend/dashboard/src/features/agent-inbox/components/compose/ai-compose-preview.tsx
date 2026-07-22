@@ -1,109 +1,172 @@
 import { cn } from "@reloop/ui/cn";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Check, Sparkles, X } from "lucide-react";
-import { LoadingDot } from "../shared/loading-dot";
+import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
+import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { AiThinkingStatus } from "./ai-thinking-status";
+
+const easeOut = [0.16, 1, 0.3, 1] as const;
+
+const modKey =
+	typeof navigator !== "undefined" &&
+	/Mac|iPhone|iPad|iPod/.test(navigator.platform)
+		? "⌘"
+		: "Ctrl";
 
 export const AiComposePreview = ({
-	html,
+	text,
 	loading,
 	onAccept,
 	onReject,
+	className,
+	/** Shorter chrome for the inline reply composer. */
+	compact = false,
 }: {
-	html: string | null;
+	/** Plain-text draft (grows while streaming). */
+	text: string | null;
 	loading: boolean;
 	onAccept: () => void;
 	onReject: () => void;
+	className?: string;
+	compact?: boolean;
 }) => {
-	const shouldReduceMotion = useReducedMotion();
+	const reduceMotion = useReducedMotion();
+	const hasText = Boolean(text?.trim());
+	const ready = !loading && hasText;
+	const draftScrollRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (!hasText || !draftScrollRef.current) return;
+		draftScrollRef.current.scrollTop = draftScrollRef.current.scrollHeight;
+	}, [text, hasText]);
+
+	useEffect(() => {
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (event.key === "Escape") {
+				event.preventDefault();
+				event.stopPropagation();
+				onReject();
+				return;
+			}
+			if (
+				ready &&
+				event.key === "Enter" &&
+				(event.metaKey || event.ctrlKey)
+			) {
+				event.preventDefault();
+				event.stopPropagation();
+				onAccept();
+			}
+		};
+		window.addEventListener("keydown", onKeyDown, true);
+		return () => window.removeEventListener("keydown", onKeyDown, true);
+	}, [onAccept, onReject, ready]);
 
 	return (
-		<motion.div
-			initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
-			animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-			exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 4 }}
-			transition={
-				shouldReduceMotion
-					? { duration: 0.15 }
-					: { duration: 0.22, ease: [0.16, 1, 0.3, 1] }
+		<motion.section
+			role="region"
+			aria-label={loading ? "Thinking" : "Suggested draft"}
+			aria-live="polite"
+			initial={
+				reduceMotion
+					? { opacity: 0 }
+					: { opacity: 0, transform: "translateY(6px)" }
 			}
-			className="mt-2 mx-5 mb-3 rounded-xl border border-mail-border/30 bg-[var(--inbox-hover)]/30 backdrop-blur-md overflow-hidden"
+			animate={
+				reduceMotion
+					? { opacity: 1 }
+					: { opacity: 1, transform: "translateY(0px)" }
+			}
+			exit={
+				reduceMotion
+					? { opacity: 0 }
+					: { opacity: 0, transform: "translateY(4px)" }
+			}
+			transition={
+				reduceMotion
+					? { duration: 0.12 }
+					: { duration: 0.2, ease: easeOut }
+			}
+			className={cn(
+				"border-mail-border/40 border-t bg-[var(--inbox-muted-bg)]/55",
+				className,
+			)}
 		>
-			{/* Header */}
-			<div className="flex items-center justify-between px-3.5 pt-3 pb-2 border-b border-mail-border/20">
-				<div className="flex items-center gap-2">
-					<Sparkles className="h-3.5 w-3.5 text-mail-foreground/70" />
-					<span className="font-semibold text-[12px] text-mail-foreground tracking-tight">
-						AI Draft
-					</span>
-					{loading && (
-						<div className="flex items-center gap-1.5 text-[11px] text-mail-foreground pl-1">
-							<LoadingDot label="Generating" />
-							<span className="opacity-50">Generating…</span>
-						</div>
-					)}
-				</div>
+			<div
+				className={cn(
+					"flex items-center justify-between gap-3",
+					compact ? "px-4 py-2.5" : "px-5 py-3",
+					hasText && (compact ? "pb-1.5" : "pb-2"),
+				)}
+			>
+				{loading ? (
+					<AiThinkingStatus hasStreamText={hasText} />
+				) : (
+					<div className="flex min-w-0 items-center gap-2">
+						<span className="font-medium text-[11px] text-mail-muted uppercase tracking-[0.06em]">
+							Suggestion
+						</span>
+						<span className="truncate text-[12px] text-mail-muted/80">
+							Review, then use it in the editor
+						</span>
+					</div>
+				)}
 				<button
 					type="button"
 					onClick={onReject}
-					className="flex items-center justify-center w-5 h-5 rounded text-mail-muted hover:text-mail-foreground hover:bg-[var(--inbox-hover)] transition-colors"
-					aria-label="Dismiss"
+					className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-mail-muted transition-colors duration-150 hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
 				>
-					<X className="h-3 w-3" />
+					Esc
 				</button>
 			</div>
 
-			{/* Content Body */}
-			<div className="px-3.5 py-3 text-[13px] leading-relaxed text-mail-foreground">
-				<AnimatePresence mode="wait">
-					{loading ? (
-						<div className="space-y-2 py-1">
-							<div className="h-3 w-[90%] animate-pulse rounded bg-mail-border/40" />
-							<div className="h-3 w-[98%] animate-pulse rounded bg-mail-border/40" />
-							<div className="h-3 w-[75%] animate-pulse rounded bg-mail-border/40" />
-						</div>
-					) : (
-						<motion.div
-							key="content"
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							transition={{ duration: 0.15 }}
-							className={cn(
-								"max-h-48 overflow-y-auto text-[13px] leading-relaxed text-mail-foreground",
-								"prose prose-sm dark:prose-invert max-w-none",
-								"[&>p]:my-1.5 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0",
-							)}
-							// biome-ignore lint/security/noDangerouslySetInnerHtml: AI preview HTML
-							dangerouslySetInnerHTML={{ __html: html || "" }}
-						/>
-					)}
-				</AnimatePresence>
-			</div>
-
-			{/* Footer Actions */}
-			{!loading && html && (
-				<div className="flex items-center justify-between px-3.5 py-2.5 bg-[var(--inbox-hover)]/40 border-t border-mail-border/40">
-					<span className="text-[11px] text-mail-muted">
-						Review and accept to replace editor content
-					</span>
-					<div className="flex items-center gap-2">
-						<button
-							type="button"
-							onClick={onReject}
-							className="rounded-lg px-2.5 py-1 text-[12px] font-medium text-mail-muted hover:text-mail-foreground hover:bg-[var(--inbox-hover)] transition-colors"
-						>
-							Discard
-						</button>
-						<button
-							type="button"
-							onClick={onAccept}
-							className="inline-flex items-center gap-1.5 rounded-lg bg-mail-foreground text-mail-background px-3 py-1 text-[12px] font-semibold hover:opacity-90 transition-opacity"
-						>
-							<Check className="h-3 w-3" />
-							Accept
-						</button>
+			{hasText ? (
+				<div className={cn(compact ? "px-4 pb-3" : "px-5 pb-3")}>
+					<div
+						ref={draftScrollRef}
+						className="max-h-[220px] overflow-y-auto whitespace-pre-wrap text-[13px] leading-[1.55] text-mail-foreground"
+					>
+						{text}
+						{loading ? (
+							<span
+								aria-hidden
+								className="ml-0.5 inline-block h-[1em] w-[2px] translate-y-[2px] animate-pulse bg-mail-foreground/70 align-baseline"
+							/>
+						) : null}
 					</div>
 				</div>
-			)}
-		</motion.div>
+			) : null}
+
+			{ready ? (
+				<div
+					className={cn(
+						"flex items-center justify-end gap-2 border-mail-border/30 border-t",
+						compact ? "px-4 py-2" : "px-5 py-2.5",
+					)}
+				>
+					<button
+						type="button"
+						onClick={onReject}
+						className="inline-flex h-7 items-center rounded-md px-2.5 font-medium text-[12px] text-mail-muted transition-[color,background-color,transform] duration-150 ease-out hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.97]"
+					>
+						Discard
+					</button>
+					<button
+						type="button"
+						onClick={onAccept}
+						className="inline-flex h-7 items-center gap-1.5 rounded-md bg-mail-foreground px-2.5 font-medium text-[12px] text-mail-background transition-[opacity,transform] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
+					>
+						<span>Use draft</span>
+						<span className="flex items-center gap-0.5 opacity-70">
+							<KbdKeyOutline className="h-3.5 w-3.5 border-mail-background/25 font-sans text-[8px] text-mail-background">
+								{modKey === "⌘" ? "⌘" : "⌃"}
+							</KbdKeyOutline>
+							<KbdKeyOutline className="h-3.5 w-3.5 border-mail-background/25 font-sans text-[8px] text-mail-background">
+								↵
+							</KbdKeyOutline>
+						</span>
+					</button>
+				</div>
+			) : null}
+		</motion.section>
 	);
 };

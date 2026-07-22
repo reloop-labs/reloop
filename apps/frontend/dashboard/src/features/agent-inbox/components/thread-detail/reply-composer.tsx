@@ -9,6 +9,8 @@ import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { useDraftAutosave } from "../../hooks/use-draft-autosave";
 import { extractBareEmail, extractDisplayName } from "../../lib/email-address";
+import { plainToHtml } from "../../lib/plain-to-html";
+import { readAiTextStream } from "../../lib/read-ai-text-stream";
 import type { ComposeDraftKind } from "../../types";
 import { AiComposePreview } from "../compose/ai-compose-preview";
 import { AiSparkleButton } from "../compose/ai-sparkle-button";
@@ -68,18 +70,6 @@ interface ReplyComposerProps {
 	onClose: () => void;
 }
 
-function plainToHtml(text: string) {
-	const escaped = text
-		.replaceAll("&", "&amp;")
-		.replaceAll("<", "&lt;")
-		.replaceAll(">", "&gt;")
-		.replaceAll('"', "&quot;");
-	return escaped
-		.split(/\n\s*\n/)
-		.map((p) => `<p>${p.replaceAll("\n", "<br />")}</p>`)
-		.join("");
-}
-
 const modKey =
 	typeof navigator !== "undefined" &&
 	/Mac|iPhone|iPad|iPod/.test(navigator.platform)
@@ -126,7 +116,8 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 		const [textBody, setTextBody] = useState(initialContent);
 		const [attachments, setAttachments] = useState<ComposeAttachment[]>([]);
 		const [aiLoading, setAiLoading] = useState(false);
-		const [aiPreviewHtml, setAiPreviewHtml] = useState<string | null>(null);
+		const [aiPreviewText, setAiPreviewText] = useState<string | null>(null);
+		const aiAbortRef = useRef<AbortController | null>(null);
 		const htmlRef = useRef(htmlBody);
 		const textRef = useRef(textBody);
 		htmlRef.current = htmlBody;
@@ -200,8 +191,11 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 				toast.error("Open a thread to draft an AI reply");
 				return;
 			}
+			aiAbortRef.current?.abort();
+			const abort = new AbortController();
+			aiAbortRef.current = abort;
 			setAiLoading(true);
-			setAiPreviewHtml(null);
+			setAiPreviewText("");
 			try {
 				const draftNudge = textRef.current.trim();
 				// Short editor text is treated as a nudge ("be brief"); long drafts are ignored.
@@ -212,23 +206,36 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 				const res = await fetch("/api/inbox/v1/ai/reply", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
+					signal: abort.signal,
 					body: JSON.stringify({
 						threadId: resolvedThreadId,
 						...(instruction ? { instruction } : {}),
 					}),
 				});
 				if (!res.ok) throw new Error("Failed");
-				const data = (await res.json()) as { html?: string; text?: string };
-				setAiPreviewHtml(
-					data.html || (data.text ? plainToHtml(data.text) : null),
-				);
-			} catch {
+				const finalText = await readAiTextStream(res, setAiPreviewText);
+				if (!finalText.trim()) {
+					setAiPreviewText(null);
+					toast.error("Failed to generate reply");
+				}
+			} catch (error) {
+				if (abort.signal.aborted) return;
 				toast.error("Failed to generate reply");
-				setAiPreviewHtml(null);
+				setAiPreviewText(null);
 			} finally {
-				setAiLoading(false);
+				if (aiAbortRef.current === abort) {
+					aiAbortRef.current = null;
+					setAiLoading(false);
+				}
 			}
 		}, [resolvedThreadId]);
+
+		const dismissAiPreview = useCallback(() => {
+			aiAbortRef.current?.abort();
+			aiAbortRef.current = null;
+			setAiLoading(false);
+			setAiPreviewText(null);
+		}, []);
 
 		const uploadFile = useCallback(async (file: File) => {
 			const tempId = Math.random().toString();
@@ -386,23 +393,24 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 								disabled={!resolvedThreadId || aiLoading}
 								loading={aiLoading}
 								variant="pill"
-								label="AI Draft"
-								title="Generate reply from thread context"
+								label="Suggest reply"
+								title="Suggest a reply from this thread"
 							/>
 						</div>
 					</div>
 
 					<AnimatePresence>
-						{(aiLoading || aiPreviewHtml) && (
+						{(aiLoading || aiPreviewText) && (
 							<AiComposePreview
-								html={aiPreviewHtml}
+								compact
+								text={aiPreviewText}
 								loading={aiLoading}
 								onAccept={() => {
-									if (!aiPreviewHtml) return;
-									remountEditor(aiPreviewHtml);
-									setAiPreviewHtml(null);
+									if (!aiPreviewText?.trim()) return;
+									remountEditor(plainToHtml(aiPreviewText));
+									setAiPreviewText(null);
 								}}
-								onReject={() => setAiPreviewHtml(null)}
+								onReject={dismissAiPreview}
 							/>
 						)}
 					</AnimatePresence>

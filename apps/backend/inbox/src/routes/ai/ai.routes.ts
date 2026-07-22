@@ -48,8 +48,8 @@ export const aiRoutes = new Elysia({
 				subject: t.Optional(t.String()),
 				to: t.Optional(t.Array(t.String())),
 			}),
+			// Streaming text/plain Response — no JSON 200 schema.
 			response: {
-				200: MailModel.aiComposeResponse,
 				400: MailModel.ErrorResponseSchema,
 				401: MailModel.ErrorResponseSchema,
 				403: MailModel.ErrorResponseSchema,
@@ -57,8 +57,9 @@ export const aiRoutes = new Elysia({
 			},
 			detail: {
 				tags: ["AI"],
-				summary: "Generate Compose",
-				description: "Generate email body HTML and text from a prompt",
+				summary: "Generate Compose (stream)",
+				description:
+					"Stream a plain-text email body draft from a prompt (text/plain)",
 			},
 		},
 	)
@@ -77,8 +78,8 @@ export const aiRoutes = new Elysia({
 				tone: t.Optional(t.String()),
 				instruction: t.Optional(t.String()),
 			}),
+			// Streaming text/plain Response — no JSON 200 schema.
 			response: {
-				200: MailModel.aiComposeResponse,
 				400: MailModel.ErrorResponseSchema,
 				401: MailModel.ErrorResponseSchema,
 				403: MailModel.ErrorResponseSchema,
@@ -87,9 +88,9 @@ export const aiRoutes = new Elysia({
 			},
 			detail: {
 				tags: ["AI"],
-				summary: "Generate Reply",
+				summary: "Generate Reply (stream)",
 				description:
-					"Generate a draft reply from thread conversation context (loaded server-side)",
+					"Stream a plain-text reply draft from thread context (text/plain)",
 			},
 		},
 	);

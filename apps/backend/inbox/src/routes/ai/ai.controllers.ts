@@ -1,7 +1,7 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { db } from "@reloop/db/client";
 import { mailbox } from "@reloop/db/schema";
-import { generateText } from "ai";
+import { generateText, streamText } from "ai";
 import { and, eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { useLogger } from "evlog/elysia";
@@ -39,19 +39,13 @@ function heuristicSubject(text: string) {
 	return firstLine.slice(0, 80);
 }
 
-function heuristicCompose(prompt: string) {
+function heuristicComposeText(prompt: string) {
 	const paragraphs = prompt
 		.split(/\n\s*\n/)
 		.map((p) => p.trim())
 		.filter(Boolean);
-
 	const blocks = paragraphs.length > 0 ? paragraphs : [prompt.trim()];
-	const text = blocks.join("\n\n");
-	const html = blocks
-		.map((p) => `<p>${escapeHtml(p).replaceAll("\n", "<br />")}</p>`)
-		.join("\n");
-
-	return { html, text };
+	return blocks.join("\n\n");
 }
 
 function bodyExcerpt(
@@ -162,7 +156,7 @@ function compactThreadForPrompt(input: {
 	return lines.join("\n").trim();
 }
 
-function heuristicReply(threadContext: string) {
+function heuristicReplyText(threadContext: string) {
 	const lastInbound = threadContext
 		.split("---")
 		.filter((block) => block.includes("[inbound]"))
@@ -174,16 +168,40 @@ function heuristicReply(threadContext: string) {
 		.replace(/\s+/g, " ")
 		.trim()
 		.slice(0, 120);
-	const text = snippet
+	return snippet
 		? `Thanks for your message. Regarding: "${snippet}${snippet.length >= 120 ? "…" : ""}" — I'll follow up shortly.`
 		: "Thanks for your message. I'll follow up shortly.";
-	return { html: plainTextToHtml(text), text };
 }
 
 function getOpenRouter() {
 	const apiKey = inboxConfig.OPENROUTER_API_KEY;
 	if (!apiKey) return null;
 	return createOpenRouter({ apiKey });
+}
+
+function plainTextStreamResponse(stream: ReadableStream<Uint8Array>) {
+	return new Response(stream, {
+		headers: {
+			"Content-Type": "text/plain; charset=utf-8",
+			"Cache-Control": "no-cache",
+			"X-Content-Type-Options": "nosniff",
+		},
+	});
+}
+
+/** Fake token stream so fallbacks still feel progressive in the UI. */
+function chunkedPlainTextStream(text: string, delayMs = 14) {
+	const encoder = new TextEncoder();
+	const chunks = text.match(/[\s\S]{1,5}/g) ?? [text];
+	return new ReadableStream<Uint8Array>({
+		async start(controller) {
+			for (const chunk of chunks) {
+				controller.enqueue(encoder.encode(chunk));
+				await new Promise((resolve) => setTimeout(resolve, delayMs));
+			}
+			controller.close();
+		},
+	});
 }
 
 async function callGemmaOllama(prompt: string): Promise<string | null> {
@@ -206,6 +224,104 @@ async function callGemmaOllama(prompt: string): Promise<string | null> {
 	}
 }
 
+/** Stream Ollama /api/generate NDJSON into a plain-text byte stream. */
+async function streamGemmaOllama(
+	prompt: string,
+): Promise<ReadableStream<Uint8Array> | null> {
+	try {
+		const baseUrl = inboxConfig.OLLAMA_BASE_URL.replace(/\/$/, "");
+		const res = await fetch(`${baseUrl}/api/generate`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				model: inboxConfig.GEMMA_MODEL,
+				prompt,
+				stream: true,
+			}),
+		});
+		if (!res.ok || !res.body) return null;
+
+		const encoder = new TextEncoder();
+		const decoder = new TextDecoder();
+		const reader = res.body.getReader();
+		let buffer = "";
+
+		return new ReadableStream<Uint8Array>({
+			async pull(controller) {
+				while (true) {
+					const { done, value } = await reader.read();
+					if (done) {
+						controller.close();
+						return;
+					}
+					buffer += decoder.decode(value, { stream: true });
+					const lines = buffer.split("\n");
+					buffer = lines.pop() ?? "";
+					let enqueued = false;
+					for (const line of lines) {
+						const trimmed = line.trim();
+						if (!trimmed) continue;
+						try {
+							const parsed = JSON.parse(trimmed) as {
+								response?: string;
+								done?: boolean;
+							};
+							if (parsed.response) {
+								controller.enqueue(encoder.encode(parsed.response));
+								enqueued = true;
+							}
+							if (parsed.done) {
+								controller.close();
+								return;
+							}
+						} catch {
+							// skip malformed NDJSON lines
+						}
+					}
+					if (enqueued) return;
+				}
+			},
+			cancel() {
+				void reader.cancel();
+			},
+		});
+	} catch {
+		return null;
+	}
+}
+
+async function streamPlainTextFromPrompt(
+	prompt: string,
+	fallbackText: string,
+): Promise<Response> {
+	const log = useLogger();
+
+	// Prefer OpenRouter streaming for low time-to-first-token when configured.
+	const openrouter = getOpenRouter();
+	if (openrouter) {
+		try {
+			const result = streamText({
+				model: openrouter("openai/gpt-4o-mini"),
+				prompt,
+			});
+			return result.toTextStreamResponse();
+		} catch (error) {
+			log.warn(
+				`[AI] OpenRouter stream failed: ${
+					error instanceof Error ? error.message : String(error)
+				}`,
+			);
+		}
+	}
+
+	const ollamaStream = await streamGemmaOllama(prompt);
+	if (ollamaStream) {
+		return plainTextStreamResponse(ollamaStream);
+	}
+
+	return plainTextStreamResponse(chunkedPlainTextStream(fallbackText));
+}
+
 export async function generateSubjectController(input: { text: string }) {
 	const log = useLogger();
 	const text = input.text.trim();
@@ -219,7 +335,6 @@ export async function generateSubjectController(input: { text: string }) {
 		});
 	}
 
-	// 1. Try local Ollama / Gemma 2
 	const gemmaPrompt = `Write a concise email subject line (max 80 characters) for the following email body. Return ONLY the subject line, no quotes, no conversational text:\n\n${text}`;
 	const gemmaResult = await callGemmaOllama(gemmaPrompt);
 	if (gemmaResult) {
@@ -230,7 +345,6 @@ export async function generateSubjectController(input: { text: string }) {
 		};
 	}
 
-	// 2. Try OpenRouter if configured
 	const openrouter = getOpenRouter();
 	if (openrouter) {
 		try {
@@ -246,7 +360,8 @@ export async function generateSubjectController(input: { text: string }) {
 			};
 		} catch (error) {
 			log.warn(
-				`[AI] Subject generation failed, using fallback: ${error instanceof Error ? error.message : String(error)
+				`[AI] Subject generation failed, using fallback: ${
+					error instanceof Error ? error.message : String(error)
 				}`,
 			);
 		}
@@ -260,7 +375,6 @@ export async function generateComposeController(input: {
 	subject?: string;
 	to?: string[];
 }) {
-	const log = useLogger();
 	const prompt = input.prompt.trim();
 
 	if (!prompt) {
@@ -278,35 +392,9 @@ export async function generateComposeController(input: {
 		`Prompt: ${prompt}`,
 	].filter(Boolean);
 
-	// 1. Try local Ollama / Gemma 2
-	const gemmaPrompt = `Compose a professional email from the following context. Return plain text only (no markdown fences or commentary). Use short paragraphs:\n\n${contextParts.join("\n")}`;
-	const gemmaResult = await callGemmaOllama(gemmaPrompt);
+	const fullPrompt = `Compose a professional email from the following context. Return plain text only (no markdown fences or commentary). Use short paragraphs:\n\n${contextParts.join("\n")}`;
 
-	if (gemmaResult) {
-		const body = gemmaResult.trim();
-		return { html: plainTextToHtml(body), text: body };
-	}
-
-	// 2. Try OpenRouter if configured
-	const openrouter = getOpenRouter();
-	if (openrouter) {
-		try {
-			const { text } = await generateText({
-				model: openrouter("openai/gpt-4o-mini"),
-				prompt: `Compose a professional email from the following context. Return plain text only (no markdown fences). Use short paragraphs.\n\n${contextParts.join("\n")}`,
-			});
-
-			const body = text.trim();
-			return { html: plainTextToHtml(body), text: body };
-		} catch (error) {
-			log.warn(
-				`[AI] Compose generation failed, using fallback: ${error instanceof Error ? error.message : String(error)
-				}`,
-			);
-		}
-	}
-
-	return heuristicCompose(prompt);
+	return streamPlainTextFromPrompt(fullPrompt, heuristicComposeText(prompt));
 }
 
 function buildReplySystemPrompt(input: {
@@ -343,7 +431,6 @@ export async function generateReplyController(input: {
 	tone?: string;
 	instruction?: string;
 }) {
-	const log = useLogger();
 	const threadId = input.threadId.trim();
 
 	if (!threadId) {
@@ -400,30 +487,11 @@ export async function generateReplyController(input: {
 	});
 	const fullPrompt = `${systemPrompt}\n\n${threadContext}`;
 
-	// 1. Try local Ollama / Gemma 2
-	const gemmaResult = await callGemmaOllama(fullPrompt);
-	if (gemmaResult) {
-		const body = gemmaResult.trim();
-		return { html: plainTextToHtml(body), text: body };
-	}
-
-	// 2. Try OpenRouter if configured
-	const openrouter = getOpenRouter();
-	if (openrouter) {
-		try {
-			const { text } = await generateText({
-				model: openrouter("openai/gpt-4o-mini"),
-				prompt: fullPrompt,
-			});
-			const body = text.trim();
-			return { html: plainTextToHtml(body), text: body };
-		} catch (error) {
-			log.warn(
-				`[AI] Reply generation failed, using fallback: ${error instanceof Error ? error.message : String(error)
-				}`,
-			);
-		}
-	}
-
-	return heuristicReply(threadContext);
+	return streamPlainTextFromPrompt(
+		fullPrompt,
+		heuristicReplyText(threadContext),
+	);
 }
+
+/** Convert streamed plain text into editor HTML. */
+export { plainTextToHtml };

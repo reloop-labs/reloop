@@ -19,6 +19,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { extractBareEmail, formatRecipient } from "../../lib/email-address";
+import { plainToHtml } from "../../lib/plain-to-html";
+import { readAiTextStream } from "../../lib/read-ai-text-stream";
 import type { AgentMailbox } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
 import { AiComposePreview } from "./ai-compose-preview";
@@ -139,7 +141,8 @@ export const ComposeModal = ({
 	const [editorKey, setEditorKey] = useState(0);
 	const [showDiscard, setShowDiscard] = useState(false);
 	const [aiLoading, setAiLoading] = useState(false);
-	const [aiPreviewHtml, setAiPreviewHtml] = useState<string | null>(null);
+	const [aiPreviewText, setAiPreviewText] = useState<string | null>(null);
+	const aiAbortRef = useRef<AbortController | null>(null);
 	const [subjectGenerating, setSubjectGenerating] = useState(false);
 	const [toError, setToError] = useState<string | null>(null);
 	const draftTimer = useRef<number | null>(null);
@@ -188,7 +191,7 @@ export const ComposeModal = ({
 		setScheduleAt(undefined);
 		setHtmlBody("");
 		setTextBody("");
-		setAiPreviewHtml(null);
+		setAiPreviewText(null);
 		setToError(null);
 		currentDraftId.current = null;
 		remountEditor("");
@@ -598,13 +601,17 @@ export const ComposeModal = ({
 			toast.error("Write a prompt or draft first");
 			return;
 		}
+		aiAbortRef.current?.abort();
+		const abort = new AbortController();
+		aiAbortRef.current = abort;
 		setAiLoading(true);
-		setAiPreviewHtml(null);
+		setAiPreviewText("");
 		try {
 			if (!subject.trim()) await generateSubject();
 			const res = await fetch("/api/inbox/v1/ai/compose", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
+				signal: abort.signal,
 				body: JSON.stringify({
 					prompt,
 					subject: watch("subject"),
@@ -612,14 +619,28 @@ export const ComposeModal = ({
 				}),
 			});
 			if (!res.ok) throw new Error("Failed");
-			const data = (await res.json()) as { html?: string };
-			setAiPreviewHtml(data.html || `<p>${prompt}</p>`);
+			const finalText = await readAiTextStream(res, setAiPreviewText);
+			if (!finalText.trim()) {
+				setAiPreviewText(null);
+				toast.error("Failed to generate email");
+			}
 		} catch {
+			if (abort.signal.aborted) return;
 			toast.error("Failed to generate email");
-			setAiPreviewHtml(null);
+			setAiPreviewText(null);
 		} finally {
-			setAiLoading(false);
+			if (aiAbortRef.current === abort) {
+				aiAbortRef.current = null;
+				setAiLoading(false);
+			}
 		}
+	};
+
+	const dismissAiPreview = () => {
+		aiAbortRef.current?.abort();
+		aiAbortRef.current = null;
+		setAiLoading(false);
+		setAiPreviewText(null);
 	};
 
 	const removeAttachment = (indexToRemove: number) => {
@@ -906,7 +927,7 @@ export const ComposeModal = ({
 										loading={subjectGenerating}
 										variant="icon"
 										size="sm"
-										title="Generate subject from body"
+										title="Suggest subject from body"
 									/>
 								</div>
 							</div>
@@ -941,24 +962,24 @@ export const ComposeModal = ({
 											disabled={isSending || aiLoading || !textBody.trim()}
 											loading={aiLoading}
 											variant="pill"
-											label="AI Draft"
-											title="Generate AI draft"
+											label="Write with AI"
+											title="Write email body with AI"
 										/>
 									</div>
 								</div>
 
-								{/* AI preview — inline, slides in below the editor */}
+								{/* AI suggestion — streams under the editor */}
 								<AnimatePresence>
-									{(aiLoading || aiPreviewHtml) && (
+									{(aiLoading || aiPreviewText) && (
 										<AiComposePreview
-											html={aiPreviewHtml}
+											text={aiPreviewText}
 											loading={aiLoading}
 											onAccept={() => {
-												if (!aiPreviewHtml) return;
-												remountEditor(aiPreviewHtml);
-												setAiPreviewHtml(null);
+												if (!aiPreviewText?.trim()) return;
+												remountEditor(plainToHtml(aiPreviewText));
+												setAiPreviewText(null);
 											}}
-											onReject={() => setAiPreviewHtml(null)}
+											onReject={dismissAiPreview}
 										/>
 									)}
 								</AnimatePresence>
