@@ -44,7 +44,10 @@ export async function getThreadController(id: string, organizationId: string) {
 						? {
 								id: email.id,
 								fromEmail: email.fromEmail,
+								fromName: email.fromName,
 								toEmails: email.toEmails,
+								ccEmails: email.ccEmails,
+								replyTo: email.replyTo,
 								subject: email.subject,
 								textBody: email.textBody,
 								htmlBody: email.htmlBody,

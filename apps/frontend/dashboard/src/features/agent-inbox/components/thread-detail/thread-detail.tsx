@@ -1089,6 +1089,7 @@ export const ThreadDetail = ({
 			canReplyAll
 			variant="inline"
 			skipEnter={skipReplyEnter}
+			threadId={conversationThreadId}
 			onModeChange={setReplyMode}
 			initialContent={replySeed}
 			initialHtml={replyInitialHtml}

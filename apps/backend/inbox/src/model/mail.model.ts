@@ -487,7 +487,10 @@ export namespace MailModel {
 	export const threadMessageEmailInbound = t.Object({
 		id: t.String(),
 		fromEmail: t.String(),
+		fromName: t.Union([t.String(), t.Null()]),
 		toEmails: t.Array(t.String()),
+		ccEmails: t.Union([t.Array(t.String()), t.Null(), t.Undefined()]),
+		replyTo: t.Union([t.String(), t.Null()]),
 		subject: t.Union([t.String(), t.Null()]),
 		textBody: t.Union([t.String(), t.Null()]),
 		htmlBody: t.Union([t.String(), t.Null()]),

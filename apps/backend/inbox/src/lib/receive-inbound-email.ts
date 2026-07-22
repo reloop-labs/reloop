@@ -164,6 +164,22 @@ export async function receiveInboundEmailController(rawMessage: string) {
 			});
 		}
 
+		if (messageId) {
+			const existingInbound = await db.query.inboundEmail.findFirst({
+				where: and(
+					eq(inboundEmail.mailboxId, mailboxRecord.id),
+					eq(inboundEmail.messageId, messageId),
+				),
+				columns: { id: true, threadId: true },
+			});
+			if (existingInbound) {
+				log.info(
+					`[INBOX] Duplicate email skipped for messageId: ${messageId}`,
+				);
+				return { id: existingInbound.id, threadId: existingInbound.threadId };
+			}
+		}
+
 		const inserted = await db
 			.insert(inboundEmail)
 			.values({

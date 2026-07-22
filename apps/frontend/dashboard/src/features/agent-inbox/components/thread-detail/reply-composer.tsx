@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { useDraftAutosave } from "../../hooks/use-draft-autosave";
 import { extractBareEmail, extractDisplayName } from "../../lib/email-address";
 import type { ComposeDraftKind } from "../../types";
+import { AiComposePreview } from "../compose/ai-compose-preview";
+import { AiSparkleButton } from "../compose/ai-sparkle-button";
 import {
 	type ComposeAttachment,
 	formatBytes,
@@ -46,6 +48,8 @@ interface ReplyComposerProps {
 	variant?: "inline" | "dock";
 	/** Skip enter motion (keyboard `R`/`A` — must feel instant). Exit still runs. */
 	skipEnter?: boolean;
+	/** Thread ID for context-aware AI reply drafts (loaded server-side). */
+	threadId?: string | null;
 	/** Plain-text seed (e.g. agent suggested reply) */
 	initialContent?: string;
 	/** HTML seed when reopening a saved draft */
@@ -93,6 +97,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 			fromEmail,
 			variant = "dock",
 			skipEnter = false,
+			threadId = null,
 			initialContent = "",
 			initialHtml = "",
 			draft,
@@ -109,18 +114,37 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 			bareTo.split("@")[0] ||
 			bareTo;
 		const bareFrom = extractBareEmail(fromEmail) || fromEmail;
+		const resolvedThreadId = threadId || draft?.threadId || null;
 
 		const fileInputRef = useRef<HTMLInputElement>(null);
 		const editorRef = useRef<ComposeBodyEditorHandle>(null);
 		const seedHtml =
 			initialHtml || (initialContent ? plainToHtml(initialContent) : "");
+		const [editorKey, setEditorKey] = useState(0);
+		const [editorContent, setEditorContent] = useState(seedHtml);
 		const [htmlBody, setHtmlBody] = useState(seedHtml);
 		const [textBody, setTextBody] = useState(initialContent);
 		const [attachments, setAttachments] = useState<ComposeAttachment[]>([]);
+		const [aiLoading, setAiLoading] = useState(false);
+		const [aiPreviewHtml, setAiPreviewHtml] = useState<string | null>(null);
 		const htmlRef = useRef(htmlBody);
 		const textRef = useRef(textBody);
 		htmlRef.current = htmlBody;
 		textRef.current = textBody;
+
+		const remountEditor = useCallback((html = "") => {
+			setEditorContent(html);
+			setHtmlBody(html);
+			setTextBody(
+				html
+					.replace(/<br\s*\/?>/gi, "\n")
+					.replace(/<\/p>/gi, "\n\n")
+					.replace(/<[^>]+>/g, "")
+					.replace(/\n{3,}/g, "\n\n")
+					.trim(),
+			);
+			setEditorKey((k) => k + 1);
+		}, []);
 
 		useDraftAutosave({
 			enabled: !!draft,
@@ -170,6 +194,41 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 				attachments: toSendAttachments(attachments),
 			});
 		}, [attachments, onSend]);
+
+		const generateReply = useCallback(async () => {
+			if (!resolvedThreadId) {
+				toast.error("Open a thread to draft an AI reply");
+				return;
+			}
+			setAiLoading(true);
+			setAiPreviewHtml(null);
+			try {
+				const draftNudge = textRef.current.trim();
+				// Short editor text is treated as a nudge ("be brief"); long drafts are ignored.
+				const instruction =
+					draftNudge.length > 0 && draftNudge.length <= 280
+						? draftNudge
+						: undefined;
+				const res = await fetch("/api/inbox/v1/ai/reply", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						threadId: resolvedThreadId,
+						...(instruction ? { instruction } : {}),
+					}),
+				});
+				if (!res.ok) throw new Error("Failed");
+				const data = (await res.json()) as { html?: string; text?: string };
+				setAiPreviewHtml(
+					data.html || (data.text ? plainToHtml(data.text) : null),
+				);
+			} catch {
+				toast.error("Failed to generate reply");
+				setAiPreviewHtml(null);
+			} finally {
+				setAiLoading(false);
+			}
+		}, [resolvedThreadId]);
 
 		const uploadFile = useCallback(async (file: File) => {
 			const tempId = Math.random().toString();
@@ -304,7 +363,8 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 					<div className="relative flex min-h-[180px] flex-col">
 						<ComposeBodyEditor
 							ref={editorRef}
-							content={seedHtml}
+							editorKey={editorKey}
+							content={editorContent}
 							placeholder="Start writing…"
 							className="compose-email-editor__content max-h-[280px] min-h-[160px] flex-1 overflow-y-auto px-4 pb-3"
 							onUpdate={(html, text) => {
@@ -313,14 +373,39 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 							}}
 							onModEnter={() => void send()}
 						/>
-						<p className="px-4 pb-2 text-[11px] text-mail-muted">
-							Type{" "}
-							<kbd className="rounded border border-mail-border/50 px-1 font-sans text-[10px]">
-								/
-							</kbd>{" "}
-							for formatting commands
-						</p>
+						<div className="mt-auto flex items-center justify-between px-4 pb-2">
+							<p className="text-[11px] text-mail-muted">
+								Type{" "}
+								<kbd className="rounded border border-mail-border/50 px-1 font-sans text-[10px]">
+									/
+								</kbd>{" "}
+								for formatting commands
+							</p>
+							<AiSparkleButton
+								onClick={() => void generateReply()}
+								disabled={!resolvedThreadId || aiLoading}
+								loading={aiLoading}
+								variant="pill"
+								label="AI Draft"
+								title="Generate reply from thread context"
+							/>
+						</div>
 					</div>
+
+					<AnimatePresence>
+						{(aiLoading || aiPreviewHtml) && (
+							<AiComposePreview
+								html={aiPreviewHtml}
+								loading={aiLoading}
+								onAccept={() => {
+									if (!aiPreviewHtml) return;
+									remountEditor(aiPreviewHtml);
+									setAiPreviewHtml(null);
+								}}
+								onReject={() => setAiPreviewHtml(null)}
+							/>
+						)}
+					</AnimatePresence>
 
 					<AnimatePresence initial={false}>
 						{attachments.length > 0 && (
