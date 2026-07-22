@@ -1,7 +1,7 @@
 import { inboxConfig } from "../apps/backend/inbox/src/inbox.config";
 
 async function testGemmaAIIntegration() {
-  console.log("🚀 Testing Reloop Backend AI Route logic with Google Gemma 2 (gemma2:2b)...\n");
+  console.log("🚀 Testing Reloop Backend AI Route logic with Google Gemma 2 9B (gemma2:9b)...\n");
   console.log(`📍 Gemma Endpoint: ${inboxConfig.OLLAMA_BASE_URL}`);
   console.log(`📦 Model: ${inboxConfig.GEMMA_MODEL}\n`);
 

@@ -13,5 +13,5 @@ export const inboxConfig = {
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
 	OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY || "",
 	OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL || "http://localhost:11434",
-	GEMMA_MODEL: process.env.GEMMA_MODEL || "gemma2:2b",
+	GEMMA_MODEL: process.env.GEMMA_MODEL || "gemma2:9b",
 };

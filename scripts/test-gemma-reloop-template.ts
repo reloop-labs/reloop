@@ -2,7 +2,7 @@ import { fetch } from "bun";
 
 // Configuration for Gemma API (Local Ollama or Cloudflare Tunnel)
 const GEMMA_API_URL = process.env.GEMMA_API_URL || "http://localhost:11434/api/generate";
-const MODEL_NAME = process.env.GEMMA_MODEL || "gemma2:2b";
+const MODEL_NAME = process.env.GEMMA_MODEL || "gemma2:9b";
 
 interface GemmaResponse {
   model: string;
