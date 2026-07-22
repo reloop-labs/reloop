@@ -213,13 +213,15 @@ export function EditContactForm({
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					firstName: firstName || undefined,
-					lastName: lastName || undefined,
+					// Send empty strings so cleared fields are updated (undefined = skip)
+					firstName,
+					lastName,
 					status: isSubscribed ? "subscribed" : "unsubscribed",
-					properties:
-						Object.keys(propertiesPayload).length > 0
-							? propertiesPayload
-							: undefined,
+					// Always send properties once defs are loaded — empty {} clears all
+					// (backend upsert is replacement mode)
+					...(propertiesData
+						? { properties: propertiesPayload }
+						: {}),
 				}),
 			});
 
