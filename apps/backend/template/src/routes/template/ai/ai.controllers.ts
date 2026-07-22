@@ -60,7 +60,7 @@ export function createAIStream({
       <td>
         <h1 style="color: #ffffff; font-size: 24px; font-weight: 700; margin-top: 0; margin-bottom: 16px; tracking: -0.02em;">Generated with AI</h1>
         <p style="color: #a1a1aa; font-size: 15px; line-height: 1.6; margin-bottom: 24px;">Here is your custom email template generated for: <strong>"${prompt}"</strong>.</p>
-        
+
         <div style="background-color: #09090b; border: 1px dashed #3f3f46; border-radius: 12px; padding: 20px; margin-bottom: 28px;">
           <p style="color: #e4e4e7; font-size: 14px; margin: 0; line-height: 1.5;">Welcome to our platform! We're excited to help you get started with modern, automated workflows.</p>
         </div>

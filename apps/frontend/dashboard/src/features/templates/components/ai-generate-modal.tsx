@@ -109,6 +109,7 @@ Output only the pure HTML template code without markdown backticks or extra conv
 				headers: {
 					"Content-Type": "application/json",
 				},
+				credentials: "include",
 				body: JSON.stringify({
 					prompt: prompt.trim(),
 					system: systemPrompt,
@@ -163,20 +164,18 @@ Output only the pure HTML template code without markdown backticks or extra conv
 				templateName.trim() ||
 				prompt.slice(0, 40) + (prompt.length > 40 ? "..." : "");
 
-			// 3. Update template content and subject
+			const contentBlock = [{ type: "html", html: previewHtml }];
+
+			// 3. Update template metadata (name, subject, previewText)
 			const updateRes = await fetch(`/api/template/v1/${newTemplate.id}`, {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
+				credentials: "include",
 				body: JSON.stringify({
 					name,
 					subject: `AI Template: ${name}`,
 					previewText: prompt.slice(0, 100),
-					content: [
-						{
-							type: "html",
-							html: previewHtml,
-						},
-					],
+					content: contentBlock,
 				}),
 			});
 
@@ -184,10 +183,36 @@ Output only the pure HTML template code without markdown backticks or extra conv
 				throw new Error("Failed to populate template content");
 			}
 
+			// 4. Create an initial version so the editor's initializeEditor()
+			//    finds real content in versionList[0] rather than falling through
+			//    to an empty template. Without this the editor opens blank.
+			const versionRes = await fetch(
+				`/api/template/v1/${newTemplate.id}/versions`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					credentials: "include",
+					body: JSON.stringify({
+						content: contentBlock,
+						subject: `AI Template: ${name}`,
+						previewText: prompt.slice(0, 100),
+						name: "AI Generated",
+						renderedHtml: previewHtml,
+					}),
+				},
+			);
+
+			if (!versionRes.ok) {
+				// Non-fatal — the template baseline content is still saved above.
+				console.warn(
+					"[AIGenerateModal] Failed to create initial version, editor will fall back to template content.",
+				);
+			}
+
+			// 5. Navigate into editor
 			toast.success("Template created! Redirecting to editor...");
 			onOpenChange(false);
 
-			// 4. Navigate into editor
 			void navigate({
 				to: "/templates/$templateId",
 				params: { templateId: newTemplate.id },
@@ -235,7 +260,7 @@ Output only the pure HTML template code without markdown backticks or extra conv
 						<div className="flex items-center justify-between">
 							<label
 								htmlFor="ai-prompt-instructions"
-								className="font-semibold text-xs text-text-strong-950 uppercase tracking-wider dark:text-zinc-200"
+								className="font-semibold text-text-strong-950 text-xs uppercase tracking-wider dark:text-zinc-200"
 							>
 								Prompt Instructions
 							</label>
@@ -310,7 +335,7 @@ Output only the pure HTML template code without markdown backticks or extra conv
 					{/* Model Selection Chips */}
 					<div className="flex items-center justify-between gap-4 border-stroke-soft-200/60 border-t pt-4 dark:border-stroke-soft-100/40">
 						<div className="flex items-center gap-2">
-							<span className="font-semibold text-xs text-text-strong-950 uppercase tracking-wider dark:text-zinc-200">
+							<span className="font-semibold text-text-strong-950 text-xs uppercase tracking-wider dark:text-zinc-200">
 								AI Model:
 							</span>
 							<div className="flex gap-2">
@@ -354,10 +379,10 @@ Output only the pure HTML template code without markdown backticks or extra conv
 
 					{/* Live Stream / Result View */}
 					{generatedContent && (
-						<div className="fade-in space-y-3 animate-in duration-300">
+						<div className="fade-in animate-in space-y-3 duration-300">
 							<div className="flex items-center justify-between border-stroke-soft-200/60 border-t pt-4 dark:border-stroke-soft-100/40">
 								<div className="flex items-center gap-2">
-									<h3 className="font-semibold text-xs text-text-strong-950 uppercase tracking-wider dark:text-zinc-200">
+									<h3 className="font-semibold text-text-strong-950 text-xs uppercase tracking-wider dark:text-zinc-200">
 										Generated Template Output
 									</h3>
 									{isGenerating && (

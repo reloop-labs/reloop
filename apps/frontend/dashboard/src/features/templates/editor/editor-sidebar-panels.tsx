@@ -968,6 +968,7 @@ export function AIPanel({ onClose }: PanelProps) {
 			const response = await fetch("/api/template/v1/ai", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
+				credentials: "include",
 				body: JSON.stringify({
 					prompt: prompt.trim(),
 					model,
@@ -976,8 +977,14 @@ export function AIPanel({ onClose }: PanelProps) {
 				}),
 			});
 
-			if (!response.ok || !response.body) {
-				throw new Error("Failed to generate content");
+			if (!response.ok) {
+				const errData = await response.json().catch(() => null);
+				throw new Error(
+					errData?.message || errData?.error || "Failed to generate content",
+				);
+			}
+			if (!response.body) {
+				throw new Error("No response body received from server");
 			}
 
 			const reader = response.body.getReader();
@@ -998,6 +1005,18 @@ export function AIPanel({ onClose }: PanelProps) {
 
 			if (editor && cleanHtml) {
 				editor.commands.setContent(cleanHtml);
+
+				if (templateId) {
+					await fetch(`/api/template/v1/${templateId}`, {
+						method: "PUT",
+						headers: { "Content-Type": "application/json" },
+						credentials: "include",
+						body: JSON.stringify({
+							content: [{ type: "html", html: cleanHtml }],
+						}),
+					}).catch(() => null);
+				}
+
 				toast.success("AI generated content applied to editor!");
 			}
 		} catch (error: any) {

@@ -1,11 +1,11 @@
 import { ErrorResponseSchema } from "@be/template/error/template.error";
 import { authMiddleware } from "@be/template/middleware/auth";
-import { Elysia, sse, t } from "elysia";
+import { Elysia, t } from "elysia";
 import { createAIStream } from "./ai.controllers";
 
 export const aiRoute = new Elysia().use(authMiddleware).post(
 	"/ai",
-	async function* ({ body }) {
+	async ({ body }) => {
 		const { prompt, system, model, apiKey, mode = "sse-text" } = body;
 
 		const stream = createAIStream({
@@ -17,37 +17,40 @@ export const aiRoute = new Elysia().use(authMiddleware).post(
 
 		switch (mode) {
 			case "text-stream":
-				return stream.textStream;
-
-			case "ui-message-stream":
-				return stream.toUIMessageStream();
-
-			case "sse-text":
-				return sse(stream.textStream);
-
-			case "sse-ui":
-				return sse(stream.toUIMessageStream());
-
 			case "text-response":
+				// Return a proper streaming Response with text/plain content type.
+				// Elysia passes through Response objects directly.
 				return stream.toTextStreamResponse();
 
+			case "ui-message-stream":
 			case "ui-message-response":
 				return stream.toUIMessageStreamResponse();
 
-			case "manual-sse":
-				for await (const data of stream.textStream) {
-					yield sse({
-						data,
-						event: "message",
-					});
-				}
-				yield sse({
-					event: "done",
-				});
-				return;
-
+			case "sse-text":
+			case "sse-ui":
 			default:
-				return sse(stream.textStream);
+				// For SSE modes, pipe the text stream as a text/event-stream Response.
+				return new Response(
+					new ReadableStream({
+						async start(controller) {
+							const encoder = new TextEncoder();
+							for await (const chunk of stream.textStream) {
+								controller.enqueue(
+									encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`),
+								);
+							}
+							controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+							controller.close();
+						},
+					}),
+					{
+						headers: {
+							"Content-Type": "text/event-stream",
+							"Cache-Control": "no-cache",
+							Connection: "keep-alive",
+						},
+					},
+				);
 		}
 	},
 	{
