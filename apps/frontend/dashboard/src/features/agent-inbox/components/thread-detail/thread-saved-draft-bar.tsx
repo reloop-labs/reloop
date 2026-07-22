@@ -1,7 +1,10 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { motion, useReducedMotion } from "framer-motion";
 import { FilePenLine } from "lucide-react";
 import type { ComposeDraft } from "../../types";
+
+const easeOut = [0.16, 1, 0.3, 1] as const;
 
 function draftPreview(draft: ComposeDraft) {
 	const raw = (draft.text || draft.html.replace(/<[^>]+>/g, " "))
@@ -22,8 +25,19 @@ export const ThreadSavedDraftBar = ({
 	onDiscard: () => void;
 	className?: string;
 }) => {
+	const reduceMotion = useReducedMotion();
+	const duration = reduceMotion ? 0.12 : 0.2;
+	const settled = { opacity: 1, transform: "translateY(0px)" } as const;
+	const hidden = reduceMotion
+		? { opacity: 0, transform: "translateY(0px)" }
+		: { opacity: 0, transform: "translateY(6px)" };
+
 	return (
-		<div
+		<motion.div
+			initial={hidden}
+			animate={settled}
+			exit={hidden}
+			transition={{ duration, ease: easeOut }}
 			className={cn(
 				"mx-4 mb-3 flex items-center gap-3 rounded-2xl border border-mail-border/50 bg-panel-light px-3.5 py-2.5 shadow-sm dark:bg-panel-dark",
 				className,
@@ -50,18 +64,18 @@ export const ThreadSavedDraftBar = ({
 			<button
 				type="button"
 				onClick={onDiscard}
-				className="inline-flex h-7 shrink-0 items-center rounded-lg px-2.5 font-medium text-[12px] text-mail-muted transition-colors duration-150 hover:bg-[var(--inbox-danger-bg)] hover:text-[var(--inbox-danger-fg)]"
+				className="inline-flex h-7 shrink-0 items-center rounded-lg px-2.5 font-medium text-[12px] text-mail-muted transition-colors duration-150 hover:bg-[var(--inbox-danger-bg)] hover:text-[var(--inbox-danger-fg)] active:scale-[0.97]"
 			>
 				Discard
 			</button>
 			<button
 				type="button"
 				onClick={onContinue}
-				className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-lg bg-mail-foreground px-2.5 font-medium text-[12px] text-mail-background transition-opacity duration-150 hover:opacity-90"
+				className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-lg bg-mail-foreground px-2.5 font-medium text-[12px] text-mail-background transition-[opacity,transform] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
 			>
 				<Icon name="reply" className="h-3 w-3" />
 				Continue
 			</button>
-		</div>
+		</motion.div>
 	);
 };

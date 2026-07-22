@@ -1355,13 +1355,16 @@ export const ThreadDetail = ({
 								? forwardComposerElement
 								: null}
 						</AnimatePresence>
-						{!showReplyComposer && savedReplyDraft ? (
-							<ThreadSavedDraftBar
-								draft={savedReplyDraft}
-								onContinue={continueSavedReplyDraft}
-								onDiscard={discardReplyDraft}
-							/>
-						) : null}
+						<AnimatePresence>
+							{!showReplyComposer && savedReplyDraft ? (
+								<ThreadSavedDraftBar
+									key={savedReplyDraft.id}
+									draft={savedReplyDraft}
+									onContinue={continueSavedReplyDraft}
+									onDiscard={discardReplyDraft}
+								/>
+							) : null}
+						</AnimatePresence>
 					</>
 				)}
 			</div>
