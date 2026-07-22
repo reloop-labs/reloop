@@ -22,6 +22,7 @@ import { extractBareEmail, formatRecipient } from "../../lib/email-address";
 import type { AgentMailbox } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
 import { AiComposePreview } from "./ai-compose-preview";
+import { AiSparkleButton } from "./ai-sparkle-button";
 import {
 	ComposeBodyEditor,
 	type ComposeBodyEditorHandle,
@@ -899,43 +900,21 @@ export const ComposeModal = ({
 										disabled={isSending}
 										{...register("subject")}
 									/>
-									<button
-										type="button"
-										tabIndex={-1}
-										disabled={
-											isSending || subjectGenerating || !textBody.trim()
-										}
+									<AiSparkleButton
 										onClick={() => void generateSubject()}
-										className="flex size-8 shrink-0 items-center justify-center rounded-lg text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground disabled:opacity-40"
-										aria-label="Generate subject"
+										disabled={isSending || subjectGenerating || !textBody.trim()}
+										loading={subjectGenerating}
+										variant="icon"
+										size="sm"
 										title="Generate subject from body"
-									>
-										{subjectGenerating ? (
-											<LoadingDot
-												label="Generating subject"
-												className="text-mail-muted"
-												style={{ fontSize: 12 }}
-											/>
-										) : (
-											<Sparkles className="h-3.5 w-3.5" />
-										)}
-									</button>
+									/>
 								</div>
 							</div>
 
-							{/* Body — React Email editor, inbox toolbar design */}
-							<div
-								className={cn(
-									"relative flex min-h-[220px] flex-1 flex-col",
-									(aiLoading || aiPreviewHtml) && "pointer-events-none",
-								)}
-							>
-								<div
-									className={cn(
-										"flex min-h-[200px] flex-1 flex-col",
-										(aiLoading || aiPreviewHtml) && "blur-sm",
-									)}
-								>
+							{/* Body — editor + inline AI preview below */}
+							<div className="flex flex-col">
+								{/* Editor — always fully visible */}
+								<div className="flex min-h-[200px] flex-1 flex-col">
 									<ComposeBodyEditor
 										ref={editorRef}
 										editorKey={editorKey}
@@ -949,33 +928,26 @@ export const ComposeModal = ({
 										}}
 										onModEnter={() => submitRef.current()}
 									/>
+									<div className="mt-auto flex items-center justify-between px-5 py-2">
+										<p className="text-[11px] text-mail-muted">
+											Type{" "}
+											<kbd className="rounded border border-mail-border/50 px-1 font-sans text-[10px]">
+												/
+											</kbd>{" "}
+											for formatting commands
+										</p>
+										<AiSparkleButton
+											onClick={() => void generateBody()}
+											disabled={isSending || aiLoading || !textBody.trim()}
+											loading={aiLoading}
+											variant="pill"
+											label="AI Draft"
+											title="Generate AI draft"
+										/>
+									</div>
 								</div>
-								<div className="mt-auto flex items-center justify-between px-5 py-2">
-									<p className="text-[11px] text-mail-muted">
-										Type{" "}
-										<kbd className="rounded border border-mail-border/50 px-1 font-sans text-[10px]">
-											/
-										</kbd>{" "}
-										for formatting commands
-									</p>
-									<button
-										type="button"
-										disabled={isSending || aiLoading || !textBody.trim()}
-										onClick={() => void generateBody()}
-										className="flex h-7 w-7 items-center justify-center rounded-lg text-mail-muted transition-colors hover:bg-[var(--inbox-hover)] hover:text-mail-foreground disabled:opacity-40"
-										title="AI draft"
-									>
-										{aiLoading ? (
-											<LoadingDot
-												label="Generating draft"
-												className="text-mail-muted"
-												style={{ fontSize: 12 }}
-											/>
-										) : (
-											<Sparkles className="h-3.5 w-3.5" />
-										)}
-									</button>
-								</div>
+
+								{/* AI preview — inline, slides in below the editor */}
 								<AnimatePresence>
 									{(aiLoading || aiPreviewHtml) && (
 										<AiComposePreview

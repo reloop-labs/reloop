@@ -91,7 +91,6 @@
 				"y-indexeddb": "^9.0.12",
 				"calligraph": "^1.4.1",
 				"react-dom": "19.2.0",
-				"@dot-loaders/react": "^0.1.0",
 				"react-dropzone": "14.3.8",
 				"input-otp": "^1.4.2",
 				"@types/mdx": "2.0.13",

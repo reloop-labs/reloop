@@ -21,7 +21,7 @@ export const TriggerWebhookModal = ({
 	onClose,
 	webhookId,
 }: TriggerWebhookModalProps) => {
-	const [eventId, setEventId] = useState(defaultEventId);
+	const [eventId, setEventId] = useState<string>(defaultEventId);
 	const [payload, setPayload] = useState(
 		JSON.stringify(
 			{

@@ -1,4 +1,4 @@
-import { Loader } from "@dot-loaders/react";
+import { LoadingDot } from "../agent-inbox/components/shared/loading-dot";
 
 export function AuthSessionLoader() {
 	return (
@@ -8,7 +8,7 @@ export function AuthSessionLoader() {
 			aria-live="polite"
 		>
 			<span className="sr-only">Loading</span>
-			<Loader loader="pulse" />
+			<LoadingDot size={24} dotSize={3} />
 		</div>
 	);
 }

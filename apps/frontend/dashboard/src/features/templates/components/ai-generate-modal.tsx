@@ -303,16 +303,14 @@ Output only the pure HTML template code without markdown backticks or extra conv
 							</div>
 						)}
 
-						<Textarea.Root>
-							<Textarea.Input
-								id="ai-prompt-instructions"
-								rows={3}
-								placeholder="E.g. Create a sleek dark-mode onboarding email for a developer platform with a primary CTA button, social links, and clear feature callouts..."
-								value={prompt}
-								onChange={(e) => setPrompt(e.target.value)}
-								className="text-sm"
-							/>
-						</Textarea.Root>
+						<Textarea.Root
+							id="ai-prompt-instructions"
+							rows={3}
+							placeholder="E.g. Create a sleek dark-mode onboarding email for a developer platform with a primary CTA button, social links, and clear feature callouts..."
+							value={prompt}
+							onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setPrompt(e.target.value)}
+							className="text-sm"
+						/>
 
 						{/* Quick Starter Chips */}
 						<div className="flex flex-wrap items-center gap-2">

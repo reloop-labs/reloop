@@ -1,8 +1,8 @@
-import { Loader } from "@dot-loaders/react";
+import { LoadingDot } from "../agent-inbox/components/shared/loading-dot";
 
 /**
  * Placeholder for the main content panel while session is still resolving.
- * Displays the pulse dot loader animation centered in the content panel.
+ * Displays the dot matrix loader animation centered in the content panel.
  */
 export function DashboardContentSkeleton() {
 	return (
@@ -12,7 +12,7 @@ export function DashboardContentSkeleton() {
 			aria-live="polite"
 		>
 			<span className="sr-only">Loading dashboard</span>
-			<Loader loader="pulse" />
+			<LoadingDot size={24} dotSize={3} />
 		</div>
 	);
 }
