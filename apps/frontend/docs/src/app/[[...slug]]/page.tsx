@@ -80,6 +80,36 @@ function getJsonLd(page: any, canonicalUrl: string) {
 		} as any);
 	}
 
+	const faqItems = Array.isArray(page.data.faq)
+		? page.data.faq.filter(
+				(item: unknown): item is { question: string; answer: string } =>
+					!!item &&
+					typeof item === "object" &&
+					typeof (item as { question?: unknown }).question === "string" &&
+					typeof (item as { answer?: unknown }).answer === "string",
+			)
+		: [];
+
+	if (faqItems.length > 0) {
+		baseGraph.push({
+			"@type": "FAQPage",
+			"@id": `${canonicalUrl}#faq`,
+			url: canonicalUrl,
+			mainEntity: faqItems.map(
+				(item: { question: string; answer: string }) => ({
+					"@type": "Question",
+					name: item.question,
+					acceptedAnswer: {
+						"@type": "Answer",
+						text: item.answer,
+					},
+				}),
+			),
+			isPartOf: { "@id": `${siteUrl}/#website` },
+			about: { "@id": `${siteUrl}/#organization` },
+		} as any);
+	}
+
 	return {
 		"@context": "https://schema.org",
 		"@graph": baseGraph,

@@ -278,6 +278,7 @@ export const source = {
 						/>
 					),
 					toc,
+					faq: Array.isArray(frontmatter.faq) ? frontmatter.faq : null,
 					_apiData: frontmatter._apiData || null,
 					_openapi: frontmatter._openapi || null,
 					raw: fileContent,

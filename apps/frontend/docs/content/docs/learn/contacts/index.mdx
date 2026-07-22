@@ -1,15 +1,37 @@
 ---
 title: Contacts
-description: One email, one contact — add, find, edit, and delete from the dashboard or with code.
+description: Learn what Reloop contacts are and how to add, search, edit, unsubscribe, and delete contacts from the dashboard or API.
+faq:
+  - question: What is a Reloop contact?
+    answer: A Reloop contact is one person record keyed by a unique email address in your organization. Subscription status, custom properties, groups, and channel preferences all live on that same record.
+  - question: What happens if I add a duplicate email?
+    answer: Email is unique per organization. Creating a contact with an email that already exists returns an error — update the existing contact instead of creating another one.
+  - question: What is the difference between unsubscribed and blocked?
+    answer: Unsubscribed means the contact opted out of your list. Blocked usually comes from deliverability issues such as a hard bounce or spam complaint, with a suppression reason on the contact.
+  - question: Can I export my contacts?
+    answer: Yes. From the contacts list in the dashboard, use Export CSV to download email, status, and created-at for the current view.
+  - question: How do I manage contacts with code?
+    answer: Use the Reloop SDK or REST API to create, list, get, update, and delete contacts. The same operations are available in the dashboard under Contacts.
 ---
 
-Every person you email is a **Contact**: one email, one record. Subscription status, [properties](/docs/learn/contacts/properties), [groups](/docs/learn/contacts/groups), and [channels](/docs/learn/contacts/channels) live on that record — desktop or code.
+## What is a Reloop contact?
 
-Open the UI any time: [Contacts](https://reloop.sh/dashboard/contacts)
+A **contact** is one person in your organization, identified by a unique email (`con_…`). Subscription status, [properties](/docs/learn/contacts/properties), [groups](/docs/learn/contacts/groups), and [channels](/docs/learn/contacts/channels) stay on that record — so consent and traits stay consistent wherever you send.
+
+Open the UI: [Contacts](https://reloop.sh/dashboard/contacts)
 
 ---
 
-## Add
+## Why use contacts instead of raw email lists?
+
+- One email → one identity (no duplicate profiles across campaigns)
+- Status and suppression travel with the person, not a single send
+- Attach traits, segments, and per-topic preferences without juggling spreadsheets
+- Same record from the **dashboard** or with **code**
+
+---
+
+## How do I add a contact?
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
@@ -27,7 +49,7 @@ Open the UI any time: [Contacts](https://reloop.sh/dashboard/contacts)
 
 ---
 
-## Find
+## How do I find or search contacts?
 
 Search by email, filter by status, export CSV. Click a row for detail — properties, groups, channels, and activity.
 
@@ -48,7 +70,7 @@ Search by email, filter by status, export CSV. Click a row for detail — proper
 
 ---
 
-## Edit
+## How do I edit or unsubscribe a contact?
 
 Change name, status, or properties — row menu or API.
 
@@ -75,7 +97,7 @@ Status is `subscribed`, `unsubscribed`, or `blocked` (often from deliverability)
 
 ---
 
-## Delete
+## How do I delete a contact?
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
@@ -89,6 +111,30 @@ Status is `subscribed`, `unsubscribed`, or `blocked` (often from deliverability)
     <ContactsCodeSamples id="contacts.delete" />
   </Tab>
 </Tabs>
+
+---
+
+## FAQ
+
+### What is a Reloop contact?
+
+A Reloop contact is one person record keyed by a unique email address in your organization. Subscription status, custom properties, groups, and channel preferences all live on that same record.
+
+### What happens if I add a duplicate email?
+
+Email is unique per organization. Creating a contact with an email that already exists returns an error — [update](#how-do-i-edit-or-unsubscribe-a-contact) the existing contact instead of creating another one.
+
+### What is the difference between unsubscribed and blocked?
+
+**Unsubscribed** means the contact opted out of your list. **Blocked** usually comes from deliverability issues such as a hard bounce or spam complaint, with a suppression reason on the contact.
+
+### Can I export my contacts?
+
+Yes. From the contacts list in the dashboard, use **Export CSV** to download email, status, and created-at for the current view.
+
+### How do I manage contacts with code?
+
+Use the Reloop SDK or REST API to create, list, get, update, and delete contacts — same operations as the dashboard. Jump to the [API reference](#api-reference) below.
 
 ---
 

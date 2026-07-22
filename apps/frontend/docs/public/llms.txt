@@ -27,7 +27,10 @@ Important notes:
 - [Broadcasts](https://docs.reloop.dev/docs/learn/broadcasts): Send marketing and bulk emails
 - [Automations](https://docs.reloop.dev/docs/learn/automations): Set up automated email workflows
 - [Templates](https://docs.reloop.dev/docs/learn/templates): Create and manage email templates
-- [Contacts](https://docs.reloop.dev/docs/learn/contacts): Manage contacts and contact segments
+- [Contacts](https://docs.reloop.dev/docs/learn/contacts): What Reloop contacts are and how to add, search, edit, and delete them
+- [Contact Properties](https://docs.reloop.dev/docs/learn/contacts/properties): Custom string and number fields for personalization
+- [Contact Groups](https://docs.reloop.dev/docs/learn/contacts/groups): Segment contacts into lists for targeted sends
+- [Contact Channels](https://docs.reloop.dev/docs/learn/contacts/channels): Per-topic subscription preferences and opt-in defaults
 - [Domains](https://docs.reloop.dev/docs/learn/domains): Configure and verify sending domains with DNS records
 - [Logs](https://docs.reloop.dev/docs/learn/logs): View email activity and delivery logs
 - [API Keys](https://docs.reloop.dev/docs/learn/api-keys): Create and manage API keys for authentication

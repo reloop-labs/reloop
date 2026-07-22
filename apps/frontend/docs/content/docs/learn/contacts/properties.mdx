@@ -1,15 +1,27 @@
 ---
-title: Properties
-description: Custom string and number fields on contacts — desktop or code.
+title: Contact Properties
+sidebarTitle: Properties
+description: Create and manage custom Reloop contact properties (string or number fields) for personalization and filtering from the dashboard or API.
+faq:
+  - question: What are contact properties in Reloop?
+    answer: Contact properties are custom fields on a contact schema — String or Number — with an optional default. Use them for personalization and filtering (for example company or plan_tier).
+  - question: What property types does Reloop support?
+    answer: Reloop contact properties support String (free-form text) and Number (integer or decimal), plus an optional fallback default when a contact has no value.
+  - question: What happens when I delete a contact property?
+    answer: Deleting a property removes the schema definition. Existing contacts keep raw key-value data, but the field is no longer managed globally.
+  - question: How do I name a contact property?
+    answer: Use letters, numbers, and underscores only. Names must start with a letter or underscore. Spaces are converted to underscores.
 ---
 
-**Properties** are custom fields on a contact (`company`, `plan_tier`, …). Types: **String** or **Number**, with an optional default.
+## What are contact properties?
+
+**Properties** are custom fields on a contact (`company`, `plan_tier`, …). Types: **String** or **Number**, with an optional default used in templates when a contact has no value.
 
 Open the UI: [Contacts → Properties](https://reloop.sh/dashboard/contacts/properties)
 
 ---
 
-## Create
+## How do I create a contact property?
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
@@ -27,7 +39,7 @@ Open the UI: [Contacts → Properties](https://reloop.sh/dashboard/contacts/prop
 
 ---
 
-## Delete
+## How do I delete a contact property?
 
 Deleting removes the schema. Contacts keep raw values, but the field is no longer managed globally.
 
@@ -43,6 +55,26 @@ Deleting removes the schema. Contacts keep raw values, but the field is no longe
     <ContactsCodeSamples id="contacts.properties.delete" />
   </Tab>
 </Tabs>
+
+---
+
+## FAQ
+
+### What are contact properties in Reloop?
+
+Custom fields on the contact schema — **String** or **Number** — with an optional default. Use them for personalization and filtering (for example `company` or `plan_tier`).
+
+### What property types does Reloop support?
+
+**String** (free-form text) and **Number** (integer or decimal), plus an optional fallback when a contact has no value.
+
+### What happens when I delete a contact property?
+
+Deleting removes the schema definition. Existing contacts keep raw key-value data, but the field is no longer managed globally.
+
+### How do I name a contact property?
+
+Use letters, numbers, and underscores only. Names must start with a letter or underscore. Spaces become underscores.
 
 ---
 

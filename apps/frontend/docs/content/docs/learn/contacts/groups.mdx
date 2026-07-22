@@ -1,15 +1,27 @@
 ---
-title: Groups
-description: Segment contacts into lists for targeted sends — desktop or code.
+title: Contact Groups
+sidebarTitle: Groups
+description: Segment Reloop contacts into groups for targeted email sends. Create groups and add or remove members from the dashboard or API.
+faq:
+  - question: What are contact groups in Reloop?
+    answer: Groups are lists or segments you send to — for example VIP Customers or Beta Testers. One contact can belong to many groups; the person stays a single contact record.
+  - question: Does putting a contact in a group change their subscription status?
+    answer: No. Groups organize contacts for targeting. Subscription status and channel preferences stay on the contact record itself.
+  - question: How do I add contacts to a group?
+    answer: Open the group in the dashboard and use Add Contacts to Group, or call the Groups API to add a member by contact ID or email.
+  - question: What happens when I remove a contact from a group?
+    answer: The contact leaves that group only. Their profile, status, properties, and other group memberships are unchanged.
 ---
 
-**Groups** are lists you send to — VIP Customers, Beta Testers, New Registrants. Same contact, many groups.
+## What are contact groups?
+
+**Groups** are lists you send to — VIP Customers, Beta Testers, New Registrants. Same contact, many groups; the person stays one record.
 
 Open the UI: [Contacts → Groups](https://reloop.sh/dashboard/contacts/groups)
 
 ---
 
-## Create
+## How do I create a group?
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
@@ -27,7 +39,7 @@ Open the UI: [Contacts → Groups](https://reloop.sh/dashboard/contacts/groups)
 
 ---
 
-## Add members
+## How do I add contacts to a group?
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
@@ -45,7 +57,7 @@ Open the UI: [Contacts → Groups](https://reloop.sh/dashboard/contacts/groups)
 
 ---
 
-## Remove members
+## How do I remove contacts from a group?
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
@@ -59,6 +71,26 @@ Open the UI: [Contacts → Groups](https://reloop.sh/dashboard/contacts/groups)
     <ContactsCodeSamples id="contacts.groups.removeMember" />
   </Tab>
 </Tabs>
+
+---
+
+## FAQ
+
+### What are contact groups in Reloop?
+
+Lists or segments you send to — for example VIP Customers or Beta Testers. One contact can belong to many groups; the person stays a single [contact](/docs/learn/contacts) record.
+
+### Does putting a contact in a group change their subscription status?
+
+No. Groups organize contacts for targeting. Subscription status and [channel](/docs/learn/contacts/channels) preferences stay on the contact itself.
+
+### How do I add contacts to a group?
+
+Open the group in the dashboard and use **Add Contacts to Group**, or call the Groups API to add a member by contact ID or email.
+
+### What happens when I remove a contact from a group?
+
+The contact leaves that group only. Their profile, status, properties, and other group memberships are unchanged.
 
 ---
 
