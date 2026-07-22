@@ -87,6 +87,10 @@ export async function processDomainVerification({
 
 	const domainName = domainWithRecords.domain;
 	const records = domainWithRecords.dnsRecords;
+	// Capture verification state before any updates so we only emit transition events
+	// (e.g. pending/failed → verified), never verified → verified on re-checks.
+	const wasAlreadyVerified = domainWithRecords.systemVerified;
+	const previousStatus = domainWithRecords.status;
 	log.info({ message: "Fetched DNS records from database", domainId, records });
 
 	// Find mandatory DKIM verification record
@@ -334,14 +338,35 @@ export async function processDomainVerification({
 			})
 			.where(eq(schema.domain.id, domainId));
 
-		await bus.publish(BusEvent.DOMAIN_VERIFIED, {
-			domainId,
-			domain: domainName,
-			organizationId,
-		});
-
-		log.info({ message: "Domain verified successfully", domainId, domainName });
-		await logJob(job, "Domain verified successfully");
+		// Only notify on a real transition into verified. Re-running verification
+		// while already verified (dashboard re-check, stale DNS health check, etc.)
+		// must not re-send the "domain verified" email or re-fire webhooks.
+		if (!wasAlreadyVerified) {
+			await bus.publish(BusEvent.DOMAIN_VERIFIED, {
+				domainId,
+				domain: domainName,
+				organizationId,
+			});
+			log.info({
+				message: "Domain verified successfully (state transition)",
+				domainId,
+				domainName,
+				previousStatus,
+			});
+			await logJob(job, "Domain verified successfully");
+		} else {
+			log.info({
+				message:
+					"Domain still verified after re-check — skipping DOMAIN_VERIFIED event",
+				domainId,
+				domainName,
+				previousStatus,
+			});
+			await logJob(
+				job,
+				"Domain still verified after re-check — no notification sent",
+			);
+		}
 		return;
 	}
 
@@ -358,15 +383,24 @@ export async function processDomainVerification({
 	});
 
 	if (isLastAttempt) {
-		await db
-			.update(schema.domain)
-			.set({
-				status: "failed",
-				systemVerified: false,
-				verificationFailedReason: failureReason,
-				isTrackingDomain: false,
-			})
-			.where(eq(schema.domain.id, domainId));
+		// Only flip to failed when not already failed with the same outcome.
+		// Still clear systemVerified if we were previously verified (verified → failed).
+		const alreadyFailed =
+			previousStatus === "failed" &&
+			!wasAlreadyVerified &&
+			domainWithRecords.verificationFailedReason === failureReason;
+
+		if (!alreadyFailed) {
+			await db
+				.update(schema.domain)
+				.set({
+					status: "failed",
+					systemVerified: false,
+					verificationFailedReason: failureReason,
+					isTrackingDomain: false,
+				})
+				.where(eq(schema.domain.id, domainId));
+		}
 	}
 
 	await failJobOrRetry({
