@@ -112,14 +112,20 @@ export async function applyUrlController({
 	params.set("redirect_uri", callbackUrl);
 	params.set("state", state);
 
-	// 9. Sign the query string (if private key is configured)
+	// 9. Sign the query string (required for syncPubKeyDomain templates / Cloudflare)
 	const privateKey = domainConfig.DOMAIN_CONNECT_SIGNING_PRIVATE_KEY;
-	if (privateKey) {
-		const queryString = params.toString();
-		const signature = signDomainConnectRequest(queryString, privateKey);
-		params.set("sig", signature);
-		params.set("key", domainConfig.DOMAIN_CONNECT_SIGNING_PUB_KEY_ID || "_dc");
+	if (!privateKey) {
+		throw DomainErrors.invalidDomain(
+			domainRecord.domain,
+			"Domain Connect signing key is not configured",
+		);
 	}
+
+	const queryString = params.toString();
+	const signature = signDomainConnectRequest(queryString, privateKey);
+	// Cloudflare requires `sig` to be the last query parameter; `key` must come before it.
+	params.set("key", domainConfig.DOMAIN_CONNECT_SIGNING_PUB_KEY_ID || "_dc");
+	params.set("sig", signature);
 
 	// 10. Build the full apply URL
 	const providerId = domainConfig.DOMAIN_CONNECT_PROVIDER_ID || "reloop.sh";

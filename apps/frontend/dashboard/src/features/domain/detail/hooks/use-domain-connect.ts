@@ -16,9 +16,24 @@ interface DCApplyUrlResult {
 
 type DCStatus = "idle" | "discovering" | "redirecting" | "error";
 
+/**
+ * Open the DNS provider URL in a new tab. Falls back to same-tab if the popup
+ * is blocked (common after async work).
+ */
+function openApplyUrl(url: string) {
+	const providerTab = window.open(url, "_blank");
+	if (providerTab) {
+		providerTab.focus();
+		return;
+	}
+	window.location.assign(url);
+}
+
 export const useDomainConnect = (domainId: string | undefined) => {
 	const [status, setStatus] = React.useState<DCStatus>("idle");
-	const [discovery, setDiscovery] = React.useState<DCDiscoveryResult | null>(null);
+	const [discovery, setDiscovery] = React.useState<DCDiscoveryResult | null>(
+		null,
+	);
 
 	/**
 	 * Discover if the domain's DNS provider supports Domain Connect.
@@ -40,7 +55,7 @@ export const useDomainConnect = (domainId: string | undefined) => {
 	}, [domainId]);
 
 	/**
-	 * Full auto-connect flow: discover → get apply URL → redirect.
+	 * Full auto-connect flow: discover → get apply URL → open provider consent in a new tab.
 	 */
 	const startAutoConnect = React.useCallback(async () => {
 		if (!domainId) {
@@ -79,8 +94,15 @@ export const useDomainConnect = (domainId: string | undefined) => {
 				{ withCredentials: true },
 			);
 
-			// 3. Redirect to DNS provider's consent page (same window)
-			window.location.href = data.applyUrl;
+			if (!data.applyUrl) {
+				toast.error("Failed to start auto-configuration");
+				setStatus("error");
+				return;
+			}
+
+			// 3. Open DNS provider consent page (new tab, or same tab if blocked)
+			openApplyUrl(data.applyUrl);
+			setStatus("idle");
 		} catch (error) {
 			const errorMessage = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to start auto-configuration"
