@@ -87,8 +87,8 @@
     "y-websocket": "^3.0.0",
     "yjs": "^13.6.30",
     "zustand": "5.0.8",
-    "ai": "catalog:",
-    "@ai-sdk/react": "catalog:"
+    "ai": "catalog:ui",
+    "@ai-sdk/react": "catalog:ui"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.5",
