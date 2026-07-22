@@ -1,23 +1,41 @@
 ---
 title: Contact Groups
 sidebarTitle: Groups
-description: Segment Reloop contacts into groups for targeted email sends. Create groups and add or remove members from the dashboard or API.
+description: Learn how Reloop contact groups segment people for targeted sends — create groups, rename them, and add or remove members from the dashboard or API.
 faq:
   - question: What are contact groups in Reloop?
-    answer: Groups are lists or segments you send to — for example VIP Customers or Beta Testers. One contact can belong to many groups; the person stays a single contact record.
+    answer: Groups are lists you send to — for example VIP Customers or Free Trial. One contact can belong to many groups; the person stays a single contact record.
   - question: Does putting a contact in a group change their subscription status?
     answer: No. Groups organize contacts for targeting. Subscription status and channel preferences stay on the contact record itself.
   - question: Can I add contacts to a group in bulk?
     answer: Yes. Open the group in the dashboard and use Add Contacts to Group, or call the Groups API to add a member by contact ID or email.
   - question: What happens when I remove a contact from a group?
     answer: The contact leaves that group only. Their profile, status, properties, and other group memberships are unchanged.
+  - question: Can I rename a group?
+    answer: Yes. Update changes the group name only — from the group detail header in the dashboard or via the Groups update API.
+  - question: Does deleting a group delete its contacts?
+    answer: No. Deleting soft-deletes the group. Contacts stay in your organization; they are no longer targeted via that group.
+  - question: Can I import group members via CSV?
+    answer: No. Reloop does not offer CSV import for group members today. Add members in the dashboard or via the API. Export CSV from a group detail includes email, status, and created-at only.
+  - question: Is there a limit on how many groups or members I can have?
+    answer: Reloop does not enforce a fixed maximum number of groups or members per organization. Create, add, and remove are rate-limited (30 requests per 60 seconds per organization). List endpoints paginate with a max page size of 100. See Usage Limits in the API docs.
 ---
 
 ## What are contact groups?
 
-**Groups** are lists you send to — VIP Customers, Beta Testers, New Registrants. Same contact, many groups; the person stays one record.
+Groups are simply lists you send to. Put contacts into a group, and you can target just that group — without changing anything about who they are.
+
+One [contact](/docs/learn/contacts) can sit in many groups; the person stays a single record.
 
 Open the UI: [Contacts → Groups](https://reloop.sh/dashboard/contacts/groups)
+
+![Contact groups in the Reloop dashboard](/docs/images/docs/contacts/groups-list.png)
+
+## Why use groups?
+
+Say you run a SaaS product. You put trial users in a **Free Trial** group and paying customers in **VIP**.
+
+When you send an upgrade campaign, you target Free Trial — not your whole list. Membership is just a list; subscription status stays on the contact. No spreadsheet of “who’s in which campaign.”
 
 ---
 
@@ -25,7 +43,7 @@ Open the UI: [Contacts → Groups](https://reloop.sh/dashboard/contacts/groups)
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
-    ![Create a contact group](/docs/images/docs/contacts/groups-list.png)
+    ![Create a contact group](/docs/images/docs/contacts/create-group.gif)
 
     1. Go to [Contacts → Groups](https://reloop.sh/dashboard/contacts/groups)
     2. **Create Group**
@@ -39,11 +57,34 @@ Open the UI: [Contacts → Groups](https://reloop.sh/dashboard/contacts/groups)
 
 ---
 
+## How do I list or rename a group?
+
+Browse your groups or rename one — update changes the **name** only.
+
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    ![List and rename contact groups](/docs/images/docs/contacts/rename-group.gif)
+
+    1. Open [Contacts → Groups](https://reloop.sh/dashboard/contacts/groups)
+    2. Click a group to open detail
+    3. Edit the name in the header → Save
+  </Tab>
+  <Tab title="Code" icon="code">
+    <ContactsCodeSamples id="contacts.groups.list" />
+
+    <ContactsCodeSamples id="contacts.groups.get" />
+
+    <ContactsCodeSamples id="contacts.groups.update" />
+  </Tab>
+</Tabs>
+
+---
+
 ## How do I add contacts to a group?
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
-    ![Add contacts to a group](/docs/images/docs/contacts/groups-list.png)
+    ![Add contacts to a group](/docs/images/docs/contacts/add-contact-to-group.gif)
 
     1. Open a group from [Groups](https://reloop.sh/dashboard/contacts/groups)
     2. **Add Contacts to Group**
@@ -59,9 +100,11 @@ Open the UI: [Contacts → Groups](https://reloop.sh/dashboard/contacts/groups)
 
 ## How do I remove contacts from a group?
 
+Removing a member leaves the contact in your organization — they just leave that list.
+
 <Tabs>
   <Tab title="Desktop" icon="monitor">
-    ![Remove a contact from a group](/docs/images/docs/contacts/groups-list.png)
+    ![Remove a contact from a group](/docs/images/docs/contacts/remove-contact-from-group.gif)
 
     1. Open the group
     2. Member row **···** → **Remove from Group**
@@ -74,11 +117,30 @@ Open the UI: [Contacts → Groups](https://reloop.sh/dashboard/contacts/groups)
 
 ---
 
+## How do I delete a group?
+
+Deleting soft-deletes the group. Contacts are not deleted.
+
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    ![Delete a contact group](/docs/images/docs/contacts/groups-list.png)
+
+    1. Open [Contacts → Groups](https://reloop.sh/dashboard/contacts/groups) (or open the group)
+    2. Row **···** → **Delete** (or delete from detail)
+    3. Confirm
+  </Tab>
+  <Tab title="Code" icon="code">
+    <ContactsCodeSamples id="contacts.groups.delete" />
+  </Tab>
+</Tabs>
+
+---
+
 ## FAQ
 
 ### What are contact groups in Reloop?
 
-Lists or segments you send to — for example VIP Customers or Beta Testers. One contact can belong to many groups; the person stays a single [contact](/docs/learn/contacts) record.
+Lists you send to — for example VIP Customers or Free Trial. One contact can belong to many groups; the person stays a single [contact](/docs/learn/contacts) record.
 
 ### Does putting a contact in a group change their subscription status?
 
@@ -90,7 +152,23 @@ Yes. Open the group in the dashboard and use **Add Contacts to Group**, or call 
 
 ### What happens when I remove a contact from a group?
 
-The contact leaves that group only. Their profile, status, properties, and other group memberships are unchanged.
+The contact leaves that group only. Their profile, status, [properties](/docs/learn/contacts/properties), and other group memberships are unchanged.
+
+### Can I rename a group?
+
+Yes. Update changes the group **name** only — from the group detail header in the dashboard or via the Groups update API.
+
+### Does deleting a group delete its contacts?
+
+No. Deleting soft-deletes the group. Contacts stay in your organization; they are no longer targeted via that group.
+
+### Can I import group members via CSV?
+
+No. There is no CSV import for group members today. Add members in the dashboard or via the API. **Export CSV** from a group detail includes email, status, and created-at only.
+
+### Is there a limit on how many groups or members I can have?
+
+No fixed maximum per organization. Create, add, and remove are rate-limited (**30** requests per **60** seconds per organization). List endpoints paginate (max page size **100**). See [Usage Limits](/docs/api/usage-limits).
 
 ---
 

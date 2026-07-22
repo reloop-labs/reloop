@@ -5,12 +5,11 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useQueryState } from "nuqs";
+import { useState } from "react";
 import { GroupDropdown } from "./group-dropdown";
 import { GroupsEmptyState } from "./groups-empty-state";
-
-// ... [rest of interface code]
 
 interface Group {
 	id: string;
@@ -31,7 +30,6 @@ interface GroupTableProps {
 	isLoading?: boolean;
 	loadingRows?: number;
 	onAddGroup?: () => void;
-	onDelete?: (contact_group_id: string) => void;
 }
 
 const GroupSkeleton = () => (
@@ -52,7 +50,10 @@ const GroupContactsCount = ({ groupId }: { groupId: string }) => {
 	const { data, isPending: isLoading } = useQuery({
 		queryKey: ["contacts", "group-count", groupId],
 		queryFn: async () => {
-			const res = await fetch(`/api/contacts/v1/groups/${groupId}/contacts?limit=1`, { credentials: "include" });
+			const res = await fetch(
+				`/api/contacts/v1/groups/${groupId}/contacts?limit=1`,
+				{ credentials: "include" },
+			);
 			if (!res.ok) throw new Error("Failed");
 			return res.json() as Promise<{ total: number }>;
 		},
@@ -76,9 +77,10 @@ export const GroupTable = ({
 	isLoading,
 	loadingRows = 6,
 	onAddGroup,
-	onDelete,
 }: GroupTableProps) => {
-		const navigate = useNavigate();
+	const navigate = useNavigate();
+	const [, setModal] = useQueryState("modal");
+	const [, setId] = useQueryState("id");
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	const handleRowClick = (group: Group) => {
@@ -86,6 +88,11 @@ export const GroupTable = ({
 			to: "/contacts/groups/$groupId",
 			params: { groupId: group.id },
 		});
+	};
+
+	const handleDelete = (group: Group) => {
+		void setModal("delete-group");
+		void setId(group.id);
 	};
 
 	const totalPages = Math.ceil(total / pageSize);
@@ -160,7 +167,7 @@ export const GroupTable = ({
 								>
 									<GroupDropdown
 										group={group}
-										onDelete={() => onDelete?.(group.id)}
+										onDelete={handleDelete}
 										onOpenChange={(open) =>
 											setActiveDropdownId(open ? group.id : null)
 										}

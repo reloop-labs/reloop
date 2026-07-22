@@ -11,6 +11,10 @@ import { listContactsXCodeSamples } from "../../../../backend/contacts/src/route
 import { removeContactFromGroupXCodeSamples } from "../../../../backend/contacts/src/routes/contact/remove-contact-from-group/remove-contact-from-group.x-codeSamples";
 import { updateContactXCodeSamples } from "../../../../backend/contacts/src/routes/contact/update-contact/update-contact.x-codeSamples";
 import { createGroupXCodeSamples } from "../../../../backend/contacts/src/routes/group/create-group/create-group.x-codeSamples";
+import { deleteGroupXCodeSamples } from "../../../../backend/contacts/src/routes/group/delete-group/delete-group.x-codeSamples";
+import { getGroupXCodeSamples } from "../../../../backend/contacts/src/routes/group/get-group/get-group.x-codeSamples";
+import { listGroupsXCodeSamples } from "../../../../backend/contacts/src/routes/group/list-groups/list-groups.x-codeSamples";
+import { updateGroupXCodeSamples } from "../../../../backend/contacts/src/routes/group/update-group/update-group.x-codeSamples";
 import { createPropertyXCodeSamples } from "../../../../backend/contacts/src/routes/property/create-property/create-property.x-codeSamples";
 import { deletePropertyXCodeSamples } from "../../../../backend/contacts/src/routes/property/delete-property/delete-property.x-codeSamples";
 import { listPropertiesXCodeSamples } from "../../../../backend/contacts/src/routes/property/list-properties/list-properties.x-codeSamples";
@@ -29,6 +33,10 @@ const registry = {
 	"contacts.properties.update": updatePropertyXCodeSamples,
 	"contacts.properties.delete": deletePropertyXCodeSamples,
 	"contacts.groups.create": createGroupXCodeSamples,
+	"contacts.groups.list": listGroupsXCodeSamples,
+	"contacts.groups.get": getGroupXCodeSamples,
+	"contacts.groups.update": updateGroupXCodeSamples,
+	"contacts.groups.delete": deleteGroupXCodeSamples,
 	"contacts.groups.addMember": addContactToGroupXCodeSamples,
 	"contacts.groups.removeMember": removeContactFromGroupXCodeSamples,
 	"contacts.channels.create": createChannelXCodeSamples,
