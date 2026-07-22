@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "reloop",
@@ -633,7 +632,6 @@
         "@ai-sdk/react": "catalog:ui",
         "@codemirror/lang-html": "^6.4.11",
         "@codemirror/view": "^6.43.6",
-        "@dot-loaders/react": "catalog:ui",
         "@hookform/resolvers": "catalog:ui",
         "@number-flow/react": "catalog:ui",
         "@react-email/editor": "catalog:ui",
