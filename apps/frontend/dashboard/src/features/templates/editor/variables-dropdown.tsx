@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
-import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
+import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
 import { useEditorStore } from "./use-editor-store";
 
 interface VariablesDropdownProps {

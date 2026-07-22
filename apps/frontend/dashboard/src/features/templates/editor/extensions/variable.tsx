@@ -2,9 +2,9 @@ import { EmailNode } from "@react-email/editor/core";
 import { mergeAttributes, nodeInputRule, nodePasteRule } from "@tiptap/core";
 import { NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
 import { AlertTriangle } from "lucide-react";
-import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
 import type React from "react";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
+import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
 
 const fetcher = (url: string) =>
 	fetch(url, { credentials: "include" }).then((r) => r.json());

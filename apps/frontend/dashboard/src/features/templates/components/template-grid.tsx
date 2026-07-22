@@ -1,5 +1,3 @@
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import type { Template } from "#/features/templates/hooks/use-templates-query";
 import { StarterKit } from "@react-email/editor/extensions";
 import { EmailTheming } from "@react-email/editor/plugins";
 import * as Button from "@reloop/ui/button";
@@ -11,12 +9,14 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { EditorContent, useEditor } from "@tiptap/react";
 import { useNavigate } from "@tanstack/react-router";
+import { EditorContent, useEditor } from "@tiptap/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import type { Template } from "#/features/templates/hooks/use-templates-query";
 import { DeleteTemplateModal } from "./delete-template-modal";
 import "@react-email/editor/themes/default.css";
 

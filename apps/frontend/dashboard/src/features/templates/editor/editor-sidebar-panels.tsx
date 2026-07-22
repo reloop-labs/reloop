@@ -20,10 +20,10 @@ import {
 	Trash2,
 	X,
 } from "lucide-react";
-import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
+import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
 import { DeleteTemplateVariableModal } from "./delete-template-variable-modal";
 import { EditTemplateVariableModal } from "./edit-template-variable-modal";
 import { useEditorStore } from "./use-editor-store";
@@ -936,6 +936,154 @@ export function TestPanel({ onClose }: PanelProps) {
 						</div>
 					</div>
 				)}
+			</div>
+		</div>
+	);
+}
+
+/* ------------------------------------------------------------------ */
+/* AI Generator Panel Component                                       */
+/* ------------------------------------------------------------------ */
+export function AIPanel({ onClose }: PanelProps) {
+	const templateId = useTemplateId();
+	const [prompt, setPrompt] = useState("");
+	const [model, setModel] = useState("gemini-3.6-flash");
+	const [apiKey, setApiKey] = useState("");
+	const [isGenerating, setIsGenerating] = useState(false);
+	const { editor } = useCurrentEditor();
+	const setGeneratingContent = useEditorStore((s) => s.setGeneratingContent);
+	const setIsGeneratingStore = useEditorStore((s) => s.setIsGenerating);
+
+	const handleGenerate = async () => {
+		if (!prompt.trim()) {
+			toast.error("Please enter a prompt");
+			return;
+		}
+
+		setIsGenerating(true);
+		setIsGeneratingStore(true);
+		setGeneratingContent("");
+
+		try {
+			const response = await fetch("/api/template/v1/ai", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					prompt: prompt.trim(),
+					model,
+					apiKey: apiKey.trim() || undefined,
+					mode: "text-stream",
+				}),
+			});
+
+			if (!response.ok || !response.body) {
+				throw new Error("Failed to generate content");
+			}
+
+			const reader = response.body.getReader();
+			const decoder = new TextDecoder();
+			let accumulated = "";
+
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+				const chunk = decoder.decode(value, { stream: true });
+				accumulated += chunk;
+				setGeneratingContent(accumulated);
+			}
+
+			const cleanHtml = accumulated
+				.replace(/^```(?:html)?\s*/i, "")
+				.replace(/\s*```$/i, "");
+
+			if (editor && cleanHtml) {
+				editor.commands.setContent(cleanHtml);
+				toast.success("AI generated content applied to editor!");
+			}
+		} catch (error: any) {
+			toast.error(error.message || "AI generation failed");
+		} finally {
+			setIsGenerating(false);
+			setIsGeneratingStore(false);
+		}
+	};
+
+	return (
+		<div className="flex h-full w-full flex-col overflow-hidden rounded-[24px] border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+			<div className="flex items-center justify-between border-stroke-soft-200/60 border-b px-5 py-4 dark:border-stroke-soft-100/40">
+				<div className="flex items-center gap-2">
+					<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-500 dark:bg-indigo-500/20 dark:text-indigo-400">
+						<Sparkles className="h-4 w-4 animate-pulse" />
+					</div>
+					<h3 className="font-bold text-sm text-text-strong-950 dark:text-white">
+						AI Generator (Gemini Flash)
+					</h3>
+				</div>
+				<button
+					type="button"
+					onClick={onClose}
+					className="rounded-lg p-1 text-text-sub-600 hover:bg-bg-weak-50 dark:text-zinc-400 dark:hover:bg-zinc-800"
+				>
+					<X className="h-4 w-4" />
+				</button>
+			</div>
+
+			<div className="flex-1 space-y-4 overflow-y-auto p-5">
+				<div className="space-y-1.5">
+					<label className="font-semibold text-xs text-text-strong-950 dark:text-zinc-200">
+						Prompt
+					</label>
+					<textarea
+						rows={4}
+						placeholder="Describe your email template changes or generate a new section..."
+						value={prompt}
+						onChange={(e) => setPrompt(e.target.value)}
+						className="w-full rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-3 text-xs text-text-strong-950 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-stroke-soft-100/40 dark:bg-zinc-900 dark:text-zinc-100"
+					/>
+				</div>
+
+				<div className="space-y-1.5">
+					<label className="font-semibold text-xs text-text-strong-950 dark:text-zinc-200">
+						AI Model
+					</label>
+					<select
+						value={model}
+						onChange={(e) => setModel(e.target.value)}
+						className="w-full rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-2.5 text-xs text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-zinc-900 dark:text-zinc-100"
+					>
+						<option value="gemini-3.6-flash">Google Gemini 3.6 Flash</option>
+						<option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
+						<option value="gpt-4o">OpenAI GPT-4o</option>
+					</select>
+				</div>
+
+				<div className="space-y-1.5">
+					<label className="font-semibold text-xs text-text-strong-950 dark:text-zinc-200">
+						Custom Gemini API Key (Optional)
+					</label>
+					<input
+						type="password"
+						placeholder="AIzaSy..."
+						value={apiKey}
+						onChange={(e) => setApiKey(e.target.value)}
+						className="w-full rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-2.5 text-xs text-text-strong-950 dark:border-stroke-soft-100/40 dark:bg-zinc-900 dark:text-zinc-100"
+					/>
+				</div>
+
+				<Button.Root
+					variant="primary"
+					size="small"
+					onClick={() => void handleGenerate()}
+					disabled={isGenerating || !prompt.trim()}
+					className="w-full justify-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white"
+				>
+					{isGenerating ? (
+						<Loader2 className="h-4 w-4 animate-spin" />
+					) : (
+						<Sparkles className="h-4 w-4" />
+					)}
+					{isGenerating ? "Generating..." : "Generate with AI"}
+				</Button.Root>
 			</div>
 		</div>
 	);

@@ -1,16 +1,16 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Link } from "@tanstack/react-router";
-import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
 import { useEffect, useRef, useState } from "react";
-import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
 import { useDebounceCallback } from "usehooks-ts";
+import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
+import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
 
 const fetcher = (url: string) =>
 	fetch(url, { credentials: "include" }).then((res) => res.json());
 
 export const TemplateName = () => {
-		const templateId = useTemplateId();
+	const templateId = useTemplateId();
 
 	const { data, mutate, isLoading } = useSWR(
 		templateId ? `/api/template/v1/${templateId}` : null,

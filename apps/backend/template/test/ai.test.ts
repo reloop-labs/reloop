@@ -100,7 +100,7 @@ describe("AI Template Endpoint Integration", () => {
 
 		expect(response.status).toBe(200);
 		const text = await response.text();
-		expect(text).toContain("Generated template response for");
+		expect(text).toContain("Generated with AI");
 	});
 
 	test("POST /ai with text-stream mode returns response", async () => {
@@ -117,7 +117,7 @@ describe("AI Template Endpoint Integration", () => {
 
 		expect(response.status).toBe(200);
 		const text = await response.text();
-		expect(text).toContain("Generated template response for");
+		expect(text).toContain("Generated with AI");
 	});
 
 	test("POST /ai with manual-sse mode streams data and done event", async () => {

@@ -1,7 +1,3 @@
-import {
-	getAvatarGradient,
-	getAvatarInitial,
-} from "#/utils/avatar";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -21,9 +17,10 @@ import {
 	Smartphone,
 	Tablet,
 } from "lucide-react";
-import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 
 interface TemplateVersion {
 	id: string;

@@ -190,7 +190,8 @@
 				"ua-parser-js": "2.0.9",
 				"@types/ua-parser-js": "0.7.39",
 				"ai": "6.0.138",
-				"@ai-sdk/openai": "1.2.5"
+				"@ai-sdk/openai": "1.2.5",
+				"@ai-sdk/google": "^1.1.18"
 			}
 		}
 	},

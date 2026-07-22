@@ -6,12 +6,13 @@ import { createAIStream } from "./ai.controllers";
 export const aiRoute = new Elysia().use(authMiddleware).post(
 	"/ai",
 	async function* ({ body }) {
-		const { prompt, system, model, mode = "sse-text" } = body;
+		const { prompt, system, model, apiKey, mode = "sse-text" } = body;
 
 		const stream = createAIStream({
 			prompt,
 			system,
 			model,
+			apiKey,
 		});
 
 		switch (mode) {
@@ -55,6 +56,7 @@ export const aiRoute = new Elysia().use(authMiddleware).post(
 			prompt: t.String({ minLength: 1 }),
 			system: t.Optional(t.String()),
 			model: t.Optional(t.String()),
+			apiKey: t.Optional(t.String()),
 			mode: t.Optional(
 				t.Union([
 					t.Literal("text-stream"),

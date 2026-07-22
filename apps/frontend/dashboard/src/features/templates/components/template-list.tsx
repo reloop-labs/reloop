@@ -1,15 +1,17 @@
-import {
-	createTemplate,
-	useInvalidateTemplates,
-	useTemplatesQuery,
-} from "#/features/templates/hooks/use-templates-query";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import Spinner from "@reloop/ui/spinner";
 import { useNavigate } from "@tanstack/react-router";
+import { Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import {
+	createTemplate,
+	useInvalidateTemplates,
+	useTemplatesQuery,
+} from "#/features/templates/hooks/use-templates-query";
+import { AIGenerateModal } from "./ai-generate-modal";
 import { EmptyState } from "./empty-state";
 import { TemplateGrid } from "./template-grid";
 
@@ -18,6 +20,7 @@ export function TemplateList() {
 	const invalidate = useInvalidateTemplates();
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isCreating, setIsCreating] = useState(false);
+	const [isAiModalOpen, setIsAiModalOpen] = useState(false);
 
 	const { data, error, isPending, isFetching, refetch } = useTemplatesQuery();
 	const isLoading = isPending || (isFetching && !data);
@@ -56,6 +59,17 @@ export function TemplateList() {
 				<div className="flex items-center gap-2">
 					<Button.Root
 						variant="neutral"
+						mode="stroke"
+						size="xsmall"
+						onClick={() => setIsAiModalOpen(true)}
+						className="border-indigo-500/30 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 text-indigo-600 hover:border-indigo-500/50 hover:bg-indigo-500/20 dark:text-indigo-400"
+					>
+						<Sparkles className="h-4 w-4 text-indigo-500 animate-pulse" />
+						Generate with AI
+					</Button.Root>
+
+					<Button.Root
+						variant="neutral"
 						size="xsmall"
 						onClick={() => void handleCreateTemplate()}
 						disabled={isCreating}
@@ -69,6 +83,8 @@ export function TemplateList() {
 					</Button.Root>
 				</div>
 			</div>
+
+			<AIGenerateModal open={isAiModalOpen} onOpenChange={setIsAiModalOpen} />
 			<div>
 				{error ? (
 					<div className="flex flex-col items-center justify-center gap-2 p-4">

@@ -1,15 +1,16 @@
-import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { imageSlashCommand } from "@react-email/editor/plugins";
 import {
 	BubbleMenu,
 	defaultSlashCommands,
 	SlashCommand,
 } from "@react-email/editor/ui";
+import { generateJSON } from "@tiptap/html";
 import { EditorContext } from "@tiptap/react";
 import { Braces } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
+import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
 import { AddTemplateVariableModal } from "./add-template-variable-modal";
 import {
@@ -352,10 +353,41 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 						? `version ${sourceToLoad.version} (${sourceToLoad.name || (sourceToLoad.isMajor ? "published" : "draft")})`
 						: "template baseline",
 				);
-				editor?.commands.setContent({
-					type: "doc",
-					content: sourceToLoad.content as Record<string, unknown>[],
-				});
+
+				const rawContent = sourceToLoad.content;
+				if (Array.isArray(rawContent)) {
+					const firstItem = rawContent[0];
+					if (
+						firstItem &&
+						typeof firstItem === "object" &&
+						"html" in firstItem &&
+						typeof firstItem.html === "string"
+					) {
+						const safeHtml = firstItem.html;
+						if (editor) {
+							const extensions = editor.extensionManager.extensions;
+							try {
+								const jsonDoc = generateJSON(safeHtml, extensions as any);
+								editor.commands.setContent(jsonDoc);
+							} catch {
+								editor.commands.setContent(safeHtml);
+							}
+						}
+					} else {
+						editor?.commands.setContent({
+							type: "doc",
+							content: rawContent as Record<string, unknown>[],
+						});
+					}
+				} else if (typeof rawContent === "string" && editor) {
+					const extensions = editor.extensionManager.extensions;
+					try {
+						const jsonDoc = generateJSON(rawContent, extensions as any);
+						editor.commands.setContent(jsonDoc);
+					} catch {
+						editor.commands.setContent(rawContent);
+					}
+				}
 			}
 
 			// Load subject and details from the source, or resolve from the best available

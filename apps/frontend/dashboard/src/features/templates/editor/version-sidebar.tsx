@@ -1,8 +1,3 @@
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import {
-	getAvatarGradient,
-	getAvatarInitial,
-} from "#/utils/avatar";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -12,11 +7,13 @@ import * as Modal from "@reloop/ui/modal";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useCurrentEditor } from "@tiptap/react";
 import { Clock, Eye, Loader2, Trash2, UploadCloud, X } from "lucide-react";
-import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
+import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import { PreviewModal } from "./preview-modal"; // Cache bust
 import { useEditorStore } from "./use-editor-store";
 

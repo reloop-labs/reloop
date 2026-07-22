@@ -1,4 +1,3 @@
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -6,14 +5,15 @@ import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import * as Popover from "@reloop/ui/popover";
 import * as Textarea from "@reloop/ui/textarea";
+import { useNavigate } from "@tanstack/react-router";
 import { useCurrentEditor } from "@tiptap/react";
 import { ChevronDown, ChevronUp, Save } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
-import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
+import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
 import { CollabPresence } from "./collobration/Collabpresence";
 import type { ConnectionStatus as ConnectionStatusType } from "./collobration/hooks/useCollaboration";
 import { DiffViewer } from "./diff-viewer"; // Cache bust
@@ -283,7 +283,7 @@ export const EditorHeaderActions = ({
 	connectionStatus,
 	isSynced,
 }: EditorHeaderActionsProps) => {
-		const templateId = useTemplateId();
+	const templateId = useTemplateId();
 	const navigate = useNavigate();
 	const { editor } = useCurrentEditor();
 	const {
@@ -473,7 +473,10 @@ export const EditorHeaderActions = ({
 
 			const newTemplate = await response.json();
 			toast.success("Template duplicated successfully");
-			void navigate({ to: "/templates/$templateId", params: { templateId: newTemplate.id } });
+			void navigate({
+				to: "/templates/$templateId",
+				params: { templateId: newTemplate.id },
+			});
 		} catch (error) {
 			console.error("Failed to duplicate template:", error);
 			toast.error("Failed to duplicate template");

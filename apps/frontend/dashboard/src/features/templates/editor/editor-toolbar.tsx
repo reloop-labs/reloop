@@ -1,12 +1,21 @@
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { cn } from "@reloop/ui/cn";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { Award, Braces, Brush, Code2, History, Send } from "lucide-react";
+import {
+	Award,
+	Braces,
+	Brush,
+	Code2,
+	History,
+	Send,
+	Sparkles,
+} from "lucide-react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useLayoutEffect, useRef, useState } from "react";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
 const viewModes = [
 	"visual",
+	"ai",
 	"code",
 	"history",
 	"variables",
@@ -16,6 +25,7 @@ const viewModes = [
 
 const TOOLBAR_ITEMS = [
 	{ mode: "visual" as const, label: "Design mode", Icon: Brush },
+	{ mode: "ai" as const, label: "AI Generator (Gemini Flash)", Icon: Sparkles },
 	{ mode: "code" as const, label: "Split view / Code editor", Icon: Code2 },
 	{ mode: "variables" as const, label: "Variables", Icon: Braces },
 	{ mode: "history" as const, label: "Version history", Icon: History },

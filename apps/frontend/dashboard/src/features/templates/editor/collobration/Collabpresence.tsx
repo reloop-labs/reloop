@@ -1,9 +1,6 @@
-import {
-	getAvatarGradient,
-	getAvatarInitial,
-} from "#/utils/avatar";
 import { cn } from "@reloop/ui/cn";
 import type React from "react";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import type { ConnectionStatus as ConnectionStatusType } from "./hooks/useCollaboration";
 import type { PresenceUser } from "./hooks/usePresence";
 import { usePresenceOthers, usePresenceSelf } from "./PresenceProvider";

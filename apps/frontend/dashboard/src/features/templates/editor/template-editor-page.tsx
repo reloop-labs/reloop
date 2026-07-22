@@ -4,6 +4,7 @@ import { CodeEditor } from "./code-view";
 import { FullEmailBuilder } from "./editor";
 import { EditorProvider } from "./editor-provider";
 import {
+	AIPanel,
 	ScorePanel,
 	TestPanel,
 	VariablesPanel,
@@ -16,6 +17,7 @@ import { VersionSidebar } from "./version-sidebar";
 
 const viewModes = [
 	"visual",
+	"ai",
 	"code",
 	"history",
 	"variables",
@@ -63,10 +65,15 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 											viewMode === "code" ? "calc(50vw - 48px)" : "340px",
 									}}
 								>
+									{viewMode === "ai" && (
+										<AIPanel onClose={() => void setViewMode("visual")} />
+									)}
 									{viewMode === "code" && <CodeEditor />}
 									{viewMode === "history" && <VersionSidebar />}
 									{viewMode === "variables" && (
-										<VariablesPanel onClose={() => void setViewMode("visual")} />
+										<VariablesPanel
+											onClose={() => void setViewMode("visual")}
+										/>
 									)}
 									{viewMode === "score" && (
 										<ScorePanel onClose={() => void setViewMode("visual")} />

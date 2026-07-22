@@ -45,7 +45,8 @@
 		"@elysiajs/openapi": "catalog:backend",
 		"evlog": "catalog:backend",
 		"ai": "catalog:backend",
-		"@ai-sdk/openai": "catalog:backend"
+		"@ai-sdk/openai": "catalog:backend",
+		"@ai-sdk/google": "catalog:backend"
 	},
 	"devDependencies": {
 		"@reloop/tsconfig": "workspace:*",

@@ -1,6 +1,6 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { queryKeys } from "#/lib/query-keys";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export type Template = {
 	id: string;

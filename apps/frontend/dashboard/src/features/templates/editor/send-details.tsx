@@ -1,11 +1,11 @@
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
-import type { DomainListResponse } from "#/features/domain/types";
 import { cn } from "@reloop/ui/cn";
 import * as Tooltip from "@reloop/ui/tooltip";
+import { Link } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle, ArrowRight, XCircle } from "lucide-react";
-import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import type { DomainListResponse } from "#/features/domain/types";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
 import { useEditorStore } from "./use-editor-store";
 
