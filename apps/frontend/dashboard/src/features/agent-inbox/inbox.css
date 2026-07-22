@@ -94,3 +94,57 @@
 .inbox-zero-theme .inbox-muted-surface {
 	background-color: var(--inbox-muted-bg);
 }
+
+/**
+ * Thinking phase: keep existing editor text visible with a full-body shimmer
+ * until the first streamed token arrives (then content is replaced).
+ */
+@keyframes ai-body-shimmer {
+	0% {
+		background-position: 100% 0;
+	}
+	100% {
+		background-position: -100% 0;
+	}
+}
+
+.inbox-zero-theme .ai-body-thinking {
+	isolation: isolate;
+}
+
+.inbox-zero-theme .ai-body-thinking .ProseMirror {
+	opacity: 0.42;
+	filter: saturate(0.7);
+	transition:
+		opacity 0.2s ease,
+		filter 0.2s ease;
+}
+
+.inbox-zero-theme .ai-body-thinking::after {
+	content: "";
+	pointer-events: none;
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	background: linear-gradient(
+		110deg,
+		transparent 0%,
+		transparent 38%,
+		color-mix(in oklab, var(--mail-foreground) 14%, transparent) 50%,
+		transparent 62%,
+		transparent 100%
+	);
+	background-size: 220% 100%;
+	animation: ai-body-shimmer 1.7s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.inbox-zero-theme .ai-body-thinking::after {
+		animation: none;
+		background: none;
+	}
+	.inbox-zero-theme .ai-body-thinking .ProseMirror {
+		opacity: 0.5;
+		filter: none;
+	}
+}

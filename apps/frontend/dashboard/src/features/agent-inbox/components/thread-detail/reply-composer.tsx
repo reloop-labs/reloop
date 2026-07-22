@@ -13,6 +13,11 @@ import { plainToHtml } from "../../lib/plain-to-html";
 import { readAiTextStream } from "../../lib/read-ai-text-stream";
 import type { ComposeDraftKind } from "../../types";
 import { AiComposePreview } from "../compose/ai-compose-preview";
+import {
+	type AiDraftPhase,
+	isAiDraftActive,
+	isAiDraftBusy,
+} from "../compose/ai-draft-phase";
 import { AiSparkleButton } from "../compose/ai-sparkle-button";
 import {
 	type ComposeAttachment,
@@ -115,13 +120,15 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 		const [htmlBody, setHtmlBody] = useState(seedHtml);
 		const [textBody, setTextBody] = useState(initialContent);
 		const [attachments, setAttachments] = useState<ComposeAttachment[]>([]);
-		const [aiLoading, setAiLoading] = useState(false);
-		const [aiPreviewText, setAiPreviewText] = useState<string | null>(null);
+		const [aiPhase, setAiPhase] = useState<AiDraftPhase>("idle");
 		const aiAbortRef = useRef<AbortController | null>(null);
+		const aiRestoreRef = useRef<{ html: string; text: string } | null>(null);
 		const htmlRef = useRef(htmlBody);
 		const textRef = useRef(textBody);
 		htmlRef.current = htmlBody;
 		textRef.current = textBody;
+		const aiBusy = isAiDraftBusy(aiPhase);
+		const aiActive = isAiDraftActive(aiPhase);
 
 		const remountEditor = useCallback((html = "") => {
 			setEditorContent(html);
@@ -135,6 +142,19 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 					.trim(),
 			);
 			setEditorKey((k) => k + 1);
+		}, []);
+
+		/** Replace editor contents with streamed plain text (old text is wiped). */
+		const writeStreamedText = useCallback((plain: string) => {
+			const html = plainToHtml(plain);
+			const editor = editorRef.current?.editor;
+			if (editor && !editor.isDestroyed) {
+				editor.commands.setContent(html || "<p></p>");
+			}
+			setHtmlBody(html);
+			setTextBody(plain);
+			htmlRef.current = html;
+			textRef.current = plain;
 		}, []);
 
 		useDraftAutosave({
@@ -194,15 +214,23 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 			aiAbortRef.current?.abort();
 			const abort = new AbortController();
 			aiAbortRef.current = abort;
-			setAiLoading(true);
-			setAiPreviewText("");
+
+			const previous = {
+				html: htmlRef.current,
+				text: textRef.current,
+			};
+			aiRestoreRef.current = previous;
+
+			const draftNudge = textRef.current.trim();
+			const instruction =
+				draftNudge.length > 0 && draftNudge.length <= 280
+					? draftNudge
+					: undefined;
+
+			// Keep current text visible with shimmer until the first token.
+			setAiPhase("thinking");
+
 			try {
-				const draftNudge = textRef.current.trim();
-				// Short editor text is treated as a nudge ("be brief"); long drafts are ignored.
-				const instruction =
-					draftNudge.length > 0 && draftNudge.length <= 280
-						? draftNudge
-						: undefined;
 				const res = await fetch("/api/inbox/v1/ai/reply", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
@@ -213,28 +241,57 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 					}),
 				});
 				if (!res.ok) throw new Error("Failed");
-				const finalText = await readAiTextStream(res, setAiPreviewText);
+
+				let started = false;
+				const finalText = await readAiTextStream(res, (accumulated) => {
+					if (!started) {
+						started = true;
+						setAiPhase("streaming");
+					}
+					writeStreamedText(accumulated);
+				});
 				if (!finalText.trim()) {
-					setAiPreviewText(null);
+					remountEditor(previous.html || "");
+					aiRestoreRef.current = null;
+					setAiPhase("idle");
 					toast.error("Failed to generate reply");
+					return;
 				}
-			} catch (error) {
-				if (abort.signal.aborted) return;
+				setAiPhase("review");
+			} catch {
+				if (abort.signal.aborted) {
+					const restore = aiRestoreRef.current;
+					if (restore) remountEditor(restore.html || "");
+					aiRestoreRef.current = null;
+					setAiPhase("idle");
+					return;
+				}
 				toast.error("Failed to generate reply");
-				setAiPreviewText(null);
+				remountEditor(previous.html || "");
+				aiRestoreRef.current = null;
+				setAiPhase("idle");
 			} finally {
 				if (aiAbortRef.current === abort) {
 					aiAbortRef.current = null;
-					setAiLoading(false);
 				}
 			}
-		}, [resolvedThreadId]);
+		}, [resolvedThreadId, remountEditor, writeStreamedText]);
 
-		const dismissAiPreview = useCallback(() => {
+		const rejectAiDraft = useCallback(() => {
 			aiAbortRef.current?.abort();
 			aiAbortRef.current = null;
-			setAiLoading(false);
-			setAiPreviewText(null);
+			const restore = aiRestoreRef.current;
+			if (restore) {
+				remountEditor(restore.html || "");
+				aiRestoreRef.current = null;
+			}
+			setAiPhase("idle");
+		}, [remountEditor]);
+
+		const acceptAiDraft = useCallback(() => {
+			aiAbortRef.current = null;
+			aiRestoreRef.current = null;
+			setAiPhase("idle");
 		}, []);
 
 		const uploadFile = useCallback(async (file: File) => {
@@ -367,11 +424,19 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 					</div>
 
 					{/* Same React Email editor + inbox toolbar as compose modal */}
-					<div className="relative flex min-h-[180px] flex-col">
+					<div
+						className={cn(
+							"relative flex min-h-[180px] flex-col",
+							aiPhase === "thinking" &&
+								textBody.trim().length > 0 &&
+								"ai-body-thinking",
+						)}
+					>
 						<ComposeBodyEditor
 							ref={editorRef}
 							editorKey={editorKey}
 							content={editorContent}
+							editable={!aiBusy}
 							placeholder="Start writing…"
 							className="compose-email-editor__content max-h-[280px] min-h-[160px] flex-1 overflow-y-auto px-4 pb-3"
 							onUpdate={(html, text) => {
@@ -388,7 +453,7 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 								</kbd>{" "}
 								for formatting commands
 							</p>
-							{!aiLoading && !aiPreviewText ? (
+							{!aiActive ? (
 								<AiSparkleButton
 									onClick={() => void generateReply()}
 									disabled={!resolvedThreadId}
@@ -401,19 +466,15 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 					</div>
 
 					<AnimatePresence>
-						{(aiLoading || aiPreviewText) && (
+						{aiActive ? (
 							<AiComposePreview
 								compact
-								text={aiPreviewText}
-								loading={aiLoading}
-								onAccept={() => {
-									if (!aiPreviewText?.trim()) return;
-									remountEditor(plainToHtml(aiPreviewText));
-									setAiPreviewText(null);
-								}}
-								onReject={dismissAiPreview}
+								loading={aiBusy}
+								hasStreamText={aiPhase === "streaming"}
+								onAccept={acceptAiDraft}
+								onReject={rejectAiDraft}
 							/>
-						)}
+						) : null}
 					</AnimatePresence>
 
 					<AnimatePresence initial={false}>

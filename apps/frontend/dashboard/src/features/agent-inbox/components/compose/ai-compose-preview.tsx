@@ -1,13 +1,10 @@
 import { cn } from "@reloop/ui/cn";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { useEffect } from "react";
 import { AiThinkingStatus } from "./ai-thinking-status";
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
-/** animate-text `soft-blur-in` settle, whole-target, UI-budget (not per-char). */
-const SOFT_BLUR_EASE = [0.22, 1, 0.36, 1] as const;
-/** animate-text `micro-scale-fade` enter. */
 const MICRO_SCALE_EASE = [0.32, 0.72, 0, 1] as const;
 
 const modKey =
@@ -16,32 +13,28 @@ const modKey =
 		? "⌘"
 		: "Ctrl";
 
+/**
+ * Single-row strip for AI drafts that stream into the editor.
+ * Thinking / streaming: status + Esc.
+ * Review: status + Discard / Keep on the same row.
+ */
 export const AiComposePreview = ({
-	text,
 	loading,
+	hasStreamText = false,
 	onAccept,
 	onReject,
 	className,
-	/** Shorter chrome for the inline reply composer. */
 	compact = false,
 }: {
-	/** Plain-text draft (grows while streaming). */
-	text: string | null;
 	loading: boolean;
+	hasStreamText?: boolean;
 	onAccept: () => void;
 	onReject: () => void;
 	className?: string;
 	compact?: boolean;
 }) => {
 	const reduceMotion = useReducedMotion();
-	const hasText = Boolean(text?.trim());
-	const ready = !loading && hasText;
-	const draftScrollRef = useRef<HTMLDivElement>(null);
-
-	useEffect(() => {
-		if (!hasText || !draftScrollRef.current) return;
-		draftScrollRef.current.scrollTop = draftScrollRef.current.scrollHeight;
-	}, [text, hasText]);
+	const ready = !loading;
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
@@ -68,7 +61,7 @@ export const AiComposePreview = ({
 	return (
 		<motion.section
 			role="region"
-			aria-label={loading ? "Thinking" : "Suggested draft"}
+			aria-label={loading ? "Writing draft" : "Review AI draft"}
 			aria-live="polite"
 			initial={
 				reduceMotion
@@ -98,12 +91,45 @@ export const AiComposePreview = ({
 			<div
 				className={cn(
 					"flex items-center justify-between gap-3",
-					compact ? "px-4 py-2.5" : "px-5 py-3",
-					hasText && (compact ? "pb-1.5" : "pb-2"),
+					compact ? "h-10 px-4" : "h-11 px-5",
 				)}
 			>
 				{loading ? (
-					<AiThinkingStatus hasStreamText={hasText} />
+					<AiThinkingStatus hasStreamText={hasStreamText} />
+				) : (
+					<motion.p
+						initial={
+							reduceMotion
+								? { opacity: 0 }
+								: { opacity: 0, scale: 0.98 }
+						}
+						animate={{ opacity: 1, scale: 1 }}
+						transition={
+							reduceMotion
+								? { duration: 0.12 }
+								: { duration: 0.2, ease: MICRO_SCALE_EASE }
+						}
+						className="min-w-0 truncate text-[12px] text-mail-muted"
+					>
+						<span className="font-medium text-mail-foreground">
+							AI draft
+						</span>
+						<span className="text-mail-muted/70"> · </span>
+						<span>Replace previous text?</span>
+					</motion.p>
+				)}
+
+				{loading ? (
+					<button
+						type="button"
+						onClick={onReject}
+						className="inline-flex h-7 shrink-0 items-center gap-1 rounded-md px-2 text-[11px] text-mail-muted transition-[color,background-color,transform] duration-150 ease-out hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.97]"
+					>
+						Cancel
+						<KbdKeyOutline className="h-3.5 min-w-3.5 font-sans text-[8px]">
+							Esc
+						</KbdKeyOutline>
+					</button>
 				) : (
 					<motion.div
 						initial={
@@ -115,111 +141,26 @@ export const AiComposePreview = ({
 						transition={
 							reduceMotion
 								? { duration: 0.12 }
-								: { duration: 0.24, ease: MICRO_SCALE_EASE }
+								: { duration: 0.2, ease: MICRO_SCALE_EASE }
 						}
-						className="flex min-w-0 items-center gap-2"
-					>
-						<span className="font-medium text-[11px] text-mail-muted uppercase tracking-[0.06em]">
-							Suggestion
-						</span>
-						<span className="truncate text-[12px] text-mail-muted/80">
-							Review, then use it in the editor
-						</span>
-					</motion.div>
-				)}
-				<button
-					type="button"
-					onClick={onReject}
-					className="shrink-0 rounded-md px-1.5 py-0.5 text-[11px] text-mail-muted transition-colors duration-150 hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"
-				>
-					Esc
-				</button>
-			</div>
-
-			<AnimatePresence initial={false}>
-				{hasText ? (
-					<motion.div
-						key="stream-body"
-						initial={
-							reduceMotion
-								? { opacity: 0 }
-								: {
-										opacity: 0,
-										y: 8,
-										filter: "blur(6px)",
-									}
-						}
-						animate={{
-							opacity: 1,
-							y: 0,
-							filter: "blur(0px)",
-						}}
-						exit={
-							reduceMotion
-								? { opacity: 0 }
-								: { opacity: 0, y: -4 }
-						}
-						transition={
-							reduceMotion
-								? { duration: 0.12 }
-								: { duration: 0.28, ease: SOFT_BLUR_EASE }
-						}
-						className={cn(compact ? "px-4 pb-3" : "px-5 pb-3")}
-					>
-						<div
-							ref={draftScrollRef}
-							className="max-h-[220px] overflow-y-auto whitespace-pre-wrap text-[13px] leading-[1.55] text-mail-foreground"
-						>
-							{text}
-							{loading ? (
-								<span
-									aria-hidden
-									className="ml-0.5 inline-block h-[1em] w-[2px] translate-y-[2px] animate-pulse bg-mail-foreground/70 align-baseline"
-								/>
-							) : null}
-						</div>
-					</motion.div>
-				) : null}
-			</AnimatePresence>
-
-			<AnimatePresence initial={false}>
-				{ready ? (
-					<motion.div
-						key="actions"
-						initial={
-							reduceMotion
-								? { opacity: 0 }
-								: { opacity: 0, scale: 0.96 }
-						}
-						animate={{ opacity: 1, scale: 1 }}
-						exit={
-							reduceMotion
-								? { opacity: 0 }
-								: { opacity: 0, scale: 0.96 }
-						}
-						transition={
-							reduceMotion
-								? { duration: 0.1 }
-								: { duration: 0.22, ease: MICRO_SCALE_EASE }
-						}
-						className={cn(
-							"flex items-center justify-end gap-2 border-mail-border/30 border-t",
-							compact ? "px-4 py-2" : "px-5 py-2.5",
-						)}
+						className="flex shrink-0 items-center gap-1.5"
 					>
 						<button
 							type="button"
 							onClick={onReject}
-							className="inline-flex h-7 items-center rounded-md px-2.5 font-medium text-[12px] text-mail-muted transition-[color,background-color,transform] duration-150 ease-out hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.97]"
+							className="inline-flex h-7 items-center gap-1.5 rounded-md px-2.5 font-medium text-[12px] text-mail-muted transition-[color,background-color,transform] duration-150 ease-out hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.97]"
 						>
 							Discard
+							<KbdKeyOutline className="h-3.5 min-w-3.5 font-sans text-[8px]">
+								Esc
+							</KbdKeyOutline>
 						</button>
 						<button
 							type="button"
 							onClick={onAccept}
 							className="inline-flex h-7 items-center gap-1.5 rounded-md bg-mail-foreground px-2.5 font-medium text-[12px] text-mail-background transition-[opacity,transform] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
 						>
-							<span>Use draft</span>
+							Keep
 							<span className="flex items-center gap-0.5 opacity-70">
 								<KbdKeyOutline className="h-3.5 w-3.5 border-mail-background/25 font-sans text-[8px] text-mail-background">
 									{modKey === "⌘" ? "⌘" : "⌃"}
@@ -230,8 +171,8 @@ export const AiComposePreview = ({
 							</span>
 						</button>
 					</motion.div>
-				) : null}
-			</AnimatePresence>
+				)}
+			</div>
 		</motion.section>
 	);
 };

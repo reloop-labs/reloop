@@ -24,6 +24,11 @@ import { readAiTextStream } from "../../lib/read-ai-text-stream";
 import type { AgentMailbox } from "../../types";
 import { useAgentInbox } from "../agent-inbox-provider";
 import { AiComposePreview } from "./ai-compose-preview";
+import {
+	type AiDraftPhase,
+	isAiDraftActive,
+	isAiDraftBusy,
+} from "./ai-draft-phase";
 import { AiSparkleButton } from "./ai-sparkle-button";
 import {
 	ComposeBodyEditor,
@@ -140,14 +145,20 @@ export const ComposeModal = ({
 	const [editorContent, setEditorContent] = useState("");
 	const [editorKey, setEditorKey] = useState(0);
 	const [showDiscard, setShowDiscard] = useState(false);
-	const [aiLoading, setAiLoading] = useState(false);
-	const [aiPreviewText, setAiPreviewText] = useState<string | null>(null);
+	const [aiPhase, setAiPhase] = useState<AiDraftPhase>("idle");
 	const aiAbortRef = useRef<AbortController | null>(null);
+	const aiRestoreRef = useRef<{ html: string; text: string } | null>(null);
 	const [subjectGenerating, setSubjectGenerating] = useState(false);
 	const [toError, setToError] = useState<string | null>(null);
 	const draftTimer = useRef<number | null>(null);
 	const currentDraftId = useRef<string | null>(null);
 	const editorRef = useRef<ComposeBodyEditorHandle>(null);
+	const htmlRef = useRef(htmlBody);
+	const textRef = useRef(textBody);
+	htmlRef.current = htmlBody;
+	textRef.current = textBody;
+	const aiBusy = isAiDraftBusy(aiPhase);
+	const aiActive = isAiDraftActive(aiPhase);
 	const shouldReduceMotion = useReducedMotion();
 
 	const modKey =
@@ -175,6 +186,28 @@ export const ComposeModal = ({
 		setEditorKey((k) => k + 1);
 	}, []);
 
+	const writeStreamedText = useCallback((plain: string) => {
+		const html = plainToHtml(plain);
+		const editor = editorRef.current?.editor;
+		if (editor && !editor.isDestroyed) {
+			editor.commands.setContent(html || "<p></p>");
+		}
+		setHtmlBody(html);
+		setTextBody(plain);
+		htmlRef.current = html;
+		textRef.current = plain;
+	}, []);
+
+	const restoreEditor = useCallback(
+		(snapshot: { html: string; text: string }) => {
+			setTextBody(snapshot.text);
+			textRef.current = snapshot.text;
+			htmlRef.current = snapshot.html;
+			remountEditor(snapshot.html || "");
+		},
+		[remountEditor],
+	);
+
 	const hasContent =
 		to.length > 0 ||
 		cc.length > 0 ||
@@ -191,7 +224,8 @@ export const ComposeModal = ({
 		setScheduleAt(undefined);
 		setHtmlBody("");
 		setTextBody("");
-		setAiPreviewText(null);
+		setAiPhase("idle");
+		aiRestoreRef.current = null;
 		setToError(null);
 		currentDraftId.current = null;
 		remountEditor("");
@@ -572,8 +606,9 @@ export const ComposeModal = ({
 		void handleSubmit(onSubmit)();
 	};
 
-	const generateSubject = async () => {
-		const text = editorRef.current?.editor?.getText() || textBody;
+	const generateSubject = async (fromText?: string) => {
+		const text =
+			fromText ?? editorRef.current?.editor?.getText() ?? textBody;
 		if (!text.trim()) {
 			toast.error("Write some content first");
 			return;
@@ -596,7 +631,7 @@ export const ComposeModal = ({
 	};
 
 	const generateBody = async () => {
-		const prompt = editorRef.current?.editor?.getText() || textBody;
+		const prompt = editorRef.current?.editor?.getText() || textRef.current;
 		if (!prompt.trim()) {
 			toast.error("Write a prompt or draft first");
 			return;
@@ -604,10 +639,19 @@ export const ComposeModal = ({
 		aiAbortRef.current?.abort();
 		const abort = new AbortController();
 		aiAbortRef.current = abort;
-		setAiLoading(true);
-		setAiPreviewText("");
+
+		const previous = {
+			html: htmlRef.current,
+			text: textRef.current,
+		};
+		aiRestoreRef.current = previous;
+
+		// Keep current text visible with shimmer until the first token.
+		setAiPhase("thinking");
+
 		try {
-			if (!subject.trim()) await generateSubject();
+			if (!subject.trim()) await generateSubject(prompt);
+
 			const res = await fetch("/api/inbox/v1/ai/compose", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -619,28 +663,57 @@ export const ComposeModal = ({
 				}),
 			});
 			if (!res.ok) throw new Error("Failed");
-			const finalText = await readAiTextStream(res, setAiPreviewText);
+
+			let started = false;
+			const finalText = await readAiTextStream(res, (accumulated) => {
+				if (!started) {
+					started = true;
+					setAiPhase("streaming");
+				}
+				writeStreamedText(accumulated);
+			});
 			if (!finalText.trim()) {
-				setAiPreviewText(null);
+				restoreEditor(previous);
+				aiRestoreRef.current = null;
+				setAiPhase("idle");
 				toast.error("Failed to generate email");
+				return;
 			}
+			setAiPhase("review");
 		} catch {
-			if (abort.signal.aborted) return;
+			if (abort.signal.aborted) {
+				const restore = aiRestoreRef.current;
+				if (restore) restoreEditor(restore);
+				aiRestoreRef.current = null;
+				setAiPhase("idle");
+				return;
+			}
 			toast.error("Failed to generate email");
-			setAiPreviewText(null);
+			restoreEditor(previous);
+			aiRestoreRef.current = null;
+			setAiPhase("idle");
 		} finally {
 			if (aiAbortRef.current === abort) {
 				aiAbortRef.current = null;
-				setAiLoading(false);
 			}
 		}
 	};
 
-	const dismissAiPreview = () => {
+	const rejectAiDraft = () => {
 		aiAbortRef.current?.abort();
 		aiAbortRef.current = null;
-		setAiLoading(false);
-		setAiPreviewText(null);
+		const restore = aiRestoreRef.current;
+		if (restore) {
+			restoreEditor(restore);
+			aiRestoreRef.current = null;
+		}
+		setAiPhase("idle");
+	};
+
+	const acceptAiDraft = () => {
+		aiAbortRef.current = null;
+		aiRestoreRef.current = null;
+		setAiPhase("idle");
 	};
 
 	const removeAttachment = (indexToRemove: number) => {
@@ -664,6 +737,10 @@ export const ComposeModal = ({
 					aria-describedby={undefined}
 					onEscapeKeyDown={(e) => {
 						e.preventDefault();
+						if (aiActive) {
+							rejectAiDraft();
+							return;
+						}
 						requestClose();
 					}}
 					onPointerDownOutside={(e) => {
@@ -932,15 +1009,22 @@ export const ComposeModal = ({
 								</div>
 							</div>
 
-							{/* Body — editor + inline AI preview below */}
+							{/* Body — editor + inline AI status below */}
 							<div className="flex flex-col">
 								{/* Editor — always fully visible */}
-								<div className="flex min-h-[200px] flex-1 flex-col">
+								<div
+									className={cn(
+										"flex min-h-[200px] flex-1 flex-col",
+										aiPhase === "thinking" &&
+											textBody.trim().length > 0 &&
+											"ai-body-thinking",
+									)}
+								>
 									<ComposeBodyEditor
 										ref={editorRef}
 										editorKey={editorKey}
 										content={editorContent}
-										editable={!isSending}
+										editable={!isSending && !aiBusy}
 										placeholder="Start writing…"
 										className="compose-email-editor__content min-h-[200px] flex-1 px-5 pb-4"
 										onUpdate={(html, text) => {
@@ -957,7 +1041,7 @@ export const ComposeModal = ({
 											</kbd>{" "}
 											for formatting commands
 										</p>
-										{!aiLoading && !aiPreviewText ? (
+										{!aiActive ? (
 											<AiSparkleButton
 												onClick={() => void generateBody()}
 												disabled={isSending || !textBody.trim()}
@@ -969,20 +1053,16 @@ export const ComposeModal = ({
 									</div>
 								</div>
 
-								{/* AI suggestion — streams under the editor */}
+								{/* AI status — draft streams into the editor */}
 								<AnimatePresence>
-									{(aiLoading || aiPreviewText) && (
+									{aiActive ? (
 										<AiComposePreview
-											text={aiPreviewText}
-											loading={aiLoading}
-											onAccept={() => {
-												if (!aiPreviewText?.trim()) return;
-												remountEditor(plainToHtml(aiPreviewText));
-												setAiPreviewText(null);
-											}}
-											onReject={dismissAiPreview}
+											loading={aiBusy}
+											hasStreamText={aiPhase === "streaming"}
+											onAccept={acceptAiDraft}
+											onReject={rejectAiDraft}
 										/>
-									)}
+									) : null}
 								</AnimatePresence>
 							</div>
 
