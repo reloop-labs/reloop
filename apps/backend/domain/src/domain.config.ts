@@ -22,8 +22,12 @@ export const domainConfig = {
 		process.env.DOMAIN_CONNECT_PROVIDER_ID || "reloop.sh",
 	DOMAIN_CONNECT_SERVICE_ID:
 		process.env.DOMAIN_CONNECT_SERVICE_ID || "email-setup",
-	DOMAIN_CONNECT_SIGNING_PRIVATE_KEY:
-		process.env.DOMAIN_CONNECT_SIGNING_PRIVATE_KEY || "",
+	// Coolify/Docker often store multiline PEMs with literal `\n` — normalize those.
+	DOMAIN_CONNECT_SIGNING_PRIVATE_KEY: (
+		process.env.DOMAIN_CONNECT_SIGNING_PRIVATE_KEY || ""
+	)
+		.replace(/\\n/g, "\n")
+		.trim(),
 	DOMAIN_CONNECT_SIGNING_PUB_KEY_ID:
 		process.env.DOMAIN_CONNECT_SIGNING_PUB_KEY_ID || "_dc",
 
