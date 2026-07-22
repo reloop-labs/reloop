@@ -34,6 +34,7 @@
 		"@reloop/cache": "workspace:*",
 		"@reloop/db": "workspace:*",
 		"@reloop/webhook-events": "workspace:*",
+		"@reloop/webhook-delivery": "workspace:*",
 		"better-auth": "catalog:",
 		"bullmq": "catalog:backend",
 		"dotenv": "catalog:backend",

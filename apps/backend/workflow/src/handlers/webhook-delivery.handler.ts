@@ -1,6 +1,3 @@
-import { createHmac } from "node:crypto";
-import dns from "node:dns";
-import net from "node:net";
 import {
 	createWorkflowError,
 	failJobOrRetry,
@@ -10,8 +7,19 @@ import {
 import { decryptSecret } from "@reloop/db";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
+import {
+	WEBHOOK_DISABLE_AFTER_CONSECUTIVE_FAILURES,
+	WEBHOOK_RESPONSE_BODY_MAX_CHARS,
+	buildDeliveryHeaders,
+	buildWebhookEnvelope,
+	getWebhookRetryDelayMs,
+	postWebhook,
+	serializeWebhookEnvelope,
+	signWebhookBody,
+	type WebhookHttpError,
+} from "@reloop/webhook-delivery";
 import { eq, sql } from "drizzle-orm";
-import { EvlogError, log } from "evlog";
+import { log } from "evlog";
 
 const WEBHOOK_ENDPOINT_FIX =
 	"Check that your webhook endpoint is reachable, returns a 2xx status, and accepts the Reloop signature headers.";
@@ -19,158 +27,155 @@ const WEBHOOK_ENDPOINT_FIX =
 const WEBHOOK_SSRF_FIX =
 	"Use a publicly reachable HTTPS endpoint. Private, loopback, and link-local addresses are blocked.";
 
-function isPrivateIP(ip: string): boolean {
-	if (net.isIPv4(ip)) {
-		const parts = ip.split(".").map(Number);
-		if (parts.length !== 4) return true;
+function truncateBody(body: string): string {
+	if (body.length <= WEBHOOK_RESPONSE_BODY_MAX_CHARS) return body;
+	return `${body.slice(0, WEBHOOK_RESPONSE_BODY_MAX_CHARS)}…[truncated]`;
+}
 
-		// Loopback: 127.0.0.0/8
-		if (parts[0] === 127) return true;
-
-		// Private Class A: 10.0.0.0/8
-		if (parts[0] === 10) return true;
-
-		// Private Class B: 172.16.0.0/12 (172.16.x.x - 172.31.x.x)
-		if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true;
-
-		// Private Class C: 192.168.0.0/16
-		if (parts[0] === 192 && parts[1] === 168) return true;
-
-		// Link-local: 169.254.0.0/16
-		if (parts[0] === 169 && parts[1] === 254) return true;
-
-		// Unspecified/Broadcast/Multicast
-		if (parts[0] === 0 || parts[0] >= 224) return true;
-
-		return false;
-	}
-
-	if (net.isIPv6(ip)) {
-		const normalized = ip.toLowerCase();
-		if (normalized === "::1" || normalized === "::") return true;
-		if (
-			normalized.startsWith("fe8") ||
-			normalized.startsWith("fe9") ||
-			normalized.startsWith("fea") ||
-			normalized.startsWith("feb")
-		) {
-			return true;
-		}
-		if (normalized.startsWith("fc") || normalized.startsWith("fd")) {
-			return true;
-		}
-		return false;
-	}
-
-	return true;
+function isHttpError(err: unknown): err is Error & WebhookHttpError {
+	if (!(err instanceof Error) || !("kind" in err)) return false;
+	const kind = (err as { kind?: unknown }).kind;
+	return kind === "ssrf" || kind === "network" || kind === "timeout";
 }
 
 export async function processWebhookDelivery({
 	job,
 	deliveryId,
-	webhookId,
-	webhookUrl,
-	webhookSecret,
-	customHeaders,
-	eventId,
-	eventType,
-	payload,
 	isLastAttempt,
 	attemptNumber,
 }: {
 	job: WorkflowJob;
 	deliveryId: string;
-	webhookId: string;
-	webhookUrl: string;
-	webhookSecret: string;
-	customHeaders: Record<string, string> | null;
-	eventId: string;
-	eventType: string;
-	payload: Record<string, unknown>;
 	isLastAttempt: boolean;
 	attemptNumber: number;
 }): Promise<void> {
 	await logJob(
 		job,
-		`Starting webhook delivery (attempt ${attemptNumber}, event=${eventType})`,
+		`Starting webhook delivery (attempt ${attemptNumber}, deliveryId=${deliveryId})`,
 	);
 
-	const timestamp = Math.floor(Date.now() / 1000);
-	const body = JSON.stringify({
-		id: eventId,
-		event: eventType,
-		payload,
-		timestamp,
+	const delivery = await db.query.webhookDelivery.findFirst({
+		where: eq(schema.webhookDelivery.id, deliveryId),
+		with: {
+			webhook: true,
+			event: true,
+		},
 	});
 
-	// Decrypt the stored secret
-	const decryptedSecret = decryptSecret(webhookSecret);
+	if (!delivery) {
+		await logJob(job, `Delivery ${deliveryId} not found — skipping`);
+		return;
+	}
 
-	const signature = createHmac("sha256", decryptedSecret)
-		.update(`${timestamp}.${body}`)
-		.digest("hex");
+	const webhook = delivery.webhook;
+	if (!webhook || webhook.deletedAt) {
+		await db
+			.update(schema.webhookDelivery)
+			.set({
+				status: "failed",
+				errorMessage: "Webhook endpoint was deleted",
+				completedAt: new Date(),
+				attemptNumber,
+				lastAttemptAt: new Date(),
+			})
+			.where(eq(schema.webhookDelivery.id, deliveryId));
+		await logJob(job, "Webhook deleted — marking delivery failed");
+		return;
+	}
 
-	const headers: Record<string, string> = {
-		"Content-Type": "application/json",
-		"X-Webhook-Signature": `t=${timestamp},v1=${signature}`,
-		"X-Webhook-Timestamp": timestamp.toString(),
-		"User-Agent": "Reloop-Webhooks/1.0",
-		...(customHeaders || {}),
-	};
+	if (webhook.status !== "active") {
+		await db
+			.update(schema.webhookDelivery)
+			.set({
+				status: "failed",
+				errorMessage: `Webhook is ${webhook.status}`,
+				completedAt: new Date(),
+				attemptNumber,
+				lastAttemptAt: new Date(),
+			})
+			.where(eq(schema.webhookDelivery.id, deliveryId));
+		await logJob(job, `Webhook status=${webhook.status} — not delivering`);
+		return;
+	}
 
-	const startTime = Date.now();
+	const eventId = delivery.webhookEventId ?? delivery.id;
+	const eventType = delivery.eventType;
+	const eventData = delivery.eventData as Record<string, unknown>;
+	const createdAt = delivery.event?.createdAt ?? delivery.createdAt;
 
-	let response: Response;
+	const envelope = buildWebhookEnvelope({
+		id: eventId,
+		type: eventType,
+		createdAt,
+		data: eventData,
+	});
+	const rawBody = serializeWebhookEnvelope(envelope);
+	const timestamp = Math.floor(Date.now() / 1000);
+	const secret = decryptSecret(webhook.secret);
+	const signatureHex = signWebhookBody(secret, rawBody, timestamp);
+	const headers = buildDeliveryHeaders({
+		eventId,
+		timestampSeconds: timestamp,
+		signatureHex,
+		customHeaders: webhook.customHeaders as Record<string, string> | null,
+	});
+
+	const requestBodyJson = envelope as unknown as Record<string, unknown>;
+
+	let result:
+		| {
+				ok: true;
+				status: number;
+				headers: Record<string, string>;
+				body: string;
+				durationMs: number;
+		  }
+		| {
+				ok: false;
+				error: Error & Partial<WebhookHttpError>;
+				durationMs: number;
+		  };
+
 	try {
-		// SSRF Guard
-		const parsedUrl = new URL(webhookUrl);
-		let ips: string[] = [];
-		if (net.isIP(parsedUrl.hostname)) {
-			ips = [parsedUrl.hostname];
-		} else {
-			const lookupResults = await dns.promises.lookup(parsedUrl.hostname, {
-				all: true,
-			});
-			ips = lookupResults.map((r) => r.address);
-		}
+		const allowHttp = process.env.NODE_ENV === "development";
+		const response = await postWebhook({
+			url: webhook.url,
+			headers,
+			body: rawBody,
+			allowHttp,
+		});
+		result = {
+			ok: true,
+			status: response.status,
+			headers: response.headers,
+			body: response.body,
+			durationMs: response.durationMs,
+		};
+	} catch (err) {
+		const e = err instanceof Error ? err : new Error(String(err));
+		const durationMs = isHttpError(err) ? err.durationMs : 0;
+		result = { ok: false, error: e as Error & Partial<WebhookHttpError>, durationMs };
+	}
 
-		for (const ip of ips) {
-			if (isPrivateIP(ip)) {
-				throw createWorkflowError({
-					status: 403,
-					message: "Webhook delivery blocked",
-					why: `Outbound request to private/local IP address ${ip} is blocked`,
-					fix: WEBHOOK_SSRF_FIX,
-				});
-			}
-		}
-
-		response = await fetch(webhookUrl, { method: "POST", headers, body });
-	} catch (networkError) {
-		const durationMs = Date.now() - startTime;
-		const errMsg =
-			networkError instanceof Error
-				? networkError.message
-				: String(networkError);
-		const why =
-			networkError instanceof EvlogError && networkError.why
-				? networkError.why
-				: errMsg;
-		const fix =
-			networkError instanceof EvlogError && networkError.fix
-				? networkError.fix
-				: WEBHOOK_ENDPOINT_FIX;
+	if (!result.ok) {
+		const errMsg = result.error.message;
+		const isSsrf = result.error.kind === "ssrf";
+		const why = errMsg;
+		const fix = isSsrf ? WEBHOOK_SSRF_FIX : WEBHOOK_ENDPOINT_FIX;
 
 		log.error({
-			message: "Webhook delivery network error",
+			message: "Webhook delivery network/ssrf error",
 			deliveryId,
-			webhookId,
+			webhookId: webhook.id,
 			error: errMsg,
-			why,
-			fix,
+			kind: result.error.kind,
 		});
 
-		const status = isLastAttempt ? "failed" : "retrying";
+		const status = isLastAttempt || isSsrf ? "failed" : "retrying";
+		const nextRetryAt =
+			status === "retrying"
+				? new Date(Date.now() + getWebhookRetryDelayMs(attemptNumber))
+				: null;
 
 		await db
 			.update(schema.webhookDelivery)
@@ -178,52 +183,39 @@ export async function processWebhookDelivery({
 				status,
 				attemptNumber,
 				errorMessage: errMsg,
-				durationMs,
-				completedAt: new Date(),
+				requestUrl: webhook.url,
+				requestHeaders: headers,
+				requestBody: requestBodyJson,
+				durationMs: result.durationMs,
+				// Only set completedAt on terminal states
+				completedAt: status === "failed" ? new Date() : null,
 				lastAttemptAt: new Date(),
+				nextRetryAt,
 			})
 			.where(eq(schema.webhookDelivery.id, deliveryId));
 
-		// Insert attempt record
 		await db.insert(schema.webhookDeliveryAttempt).values({
 			webhookDeliveryId: deliveryId,
 			attemptNumber,
 			status: "failed",
-			durationMs,
+			durationMs: result.durationMs,
 			errorMessage: errMsg,
 			createdAt: new Date(),
 		});
 
-		const updatedWebhookResult = await db
-			.update(schema.webhook)
-			.set({
-				failureCount: sql`${schema.webhook.failureCount} + 1`,
-				consecutiveFailures: sql`${schema.webhook.consecutiveFailures} + 1`,
-				lastTriggeredAt: new Date(),
-				updatedAt: new Date(),
-			})
-			.where(eq(schema.webhook.id, webhookId))
-			.returning({ consecutiveFailures: schema.webhook.consecutiveFailures });
-
-		const currentConsecutiveFailures =
-			updatedWebhookResult[0]?.consecutiveFailures ?? 0;
-		if (currentConsecutiveFailures >= 10) {
-			log.warn({
-				message: "Webhook disabled due to consecutive failures exceeding limit",
-				webhookId,
-				consecutiveFailures: currentConsecutiveFailures,
-			});
-			await logJob(
+		// SSRF is non-retryable; terminal fail counters now.
+		if (status === "failed") {
+			await recordTerminalWebhookOutcome({
+				webhookId: webhook.id,
+				succeeded: false,
 				job,
-				`Webhook disabled after ${currentConsecutiveFailures} consecutive failures`,
-			);
-			await db
-				.update(schema.webhook)
-				.set({
-					status: "failed",
-					updatedAt: new Date(),
-				})
-				.where(eq(schema.webhook.id, webhookId));
+			});
+		}
+
+		if (isSsrf) {
+			// Do not retry SSRF — permanent configuration error.
+			await logJob(job, `SSRF blocked (final): ${why}`);
+			return;
 		}
 
 		await failJobOrRetry({
@@ -237,49 +229,98 @@ export async function processWebhookDelivery({
 		return;
 	}
 
-	const durationMs = Date.now() - startTime;
-	const responseText = await response.text();
-	const succeeded = response.ok;
+	const responseText = truncateBody(result.body);
+	const succeeded = result.status >= 200 && result.status < 300;
+	const status = succeeded ? "success" : isLastAttempt ? "failed" : "retrying";
+	const nextRetryAt =
+		status === "retrying"
+			? new Date(Date.now() + getWebhookRetryDelayMs(attemptNumber))
+			: null;
 
 	log.info({
 		message: "Webhook response received",
 		deliveryId,
-		status: response.status,
+		status: result.status,
 		succeeded,
 	});
-	await logJob(job, `Webhook response received: HTTP ${response.status}`);
-
-	const status = succeeded ? "success" : isLastAttempt ? "failed" : "retrying";
+	await logJob(job, `Webhook response received: HTTP ${result.status}`);
 
 	await db
 		.update(schema.webhookDelivery)
 		.set({
 			status,
 			attemptNumber,
-			responseStatus: response.status,
+			responseStatus: result.status,
 			responseBody: responseText,
-			responseHeaders: Object.fromEntries(response.headers.entries()),
-			durationMs,
-			completedAt: new Date(),
+			responseHeaders: result.headers,
+			requestUrl: webhook.url,
+			requestHeaders: headers,
+			requestBody: requestBodyJson,
+			durationMs: result.durationMs,
+			completedAt: status === "success" || status === "failed" ? new Date() : null,
 			lastAttemptAt: new Date(),
+			nextRetryAt,
+			errorMessage: succeeded
+				? null
+				: `HTTP ${result.status}: ${responseText.slice(0, 200)}`,
 		})
 		.where(eq(schema.webhookDelivery.id, deliveryId));
 
-	// Insert attempt record
 	await db.insert(schema.webhookDeliveryAttempt).values({
 		webhookDeliveryId: deliveryId,
 		attemptNumber,
 		status: succeeded ? "success" : "failed",
-		responseStatus: response.status,
+		responseStatus: result.status,
 		responseBody: responseText,
-		responseHeaders: Object.fromEntries(response.headers.entries()),
-		durationMs,
+		responseHeaders: result.headers,
+		durationMs: result.durationMs,
 		errorMessage: succeeded
 			? null
-			: `HTTP ${response.status}: ${responseText.slice(0, 200)}`,
+			: `HTTP ${result.status}: ${responseText.slice(0, 200)}`,
 		createdAt: new Date(),
 	});
 
+	if (succeeded || isLastAttempt) {
+		await recordTerminalWebhookOutcome({
+			webhookId: webhook.id,
+			succeeded,
+			job,
+		});
+	} else {
+		// Intermediate failure — update lastTriggeredAt only
+		await db
+			.update(schema.webhook)
+			.set({
+				lastTriggeredAt: new Date(),
+				updatedAt: new Date(),
+			})
+			.where(eq(schema.webhook.id, webhook.id));
+	}
+
+	if (succeeded) {
+		await logJob(job, "Webhook delivered successfully");
+		return;
+	}
+
+	await failJobOrRetry({
+		job,
+		isLastAttempt,
+		message: "Webhook delivery failed",
+		why: `Webhook endpoint returned HTTP ${result.status}: ${responseText.slice(0, 200)}`,
+		fix: WEBHOOK_ENDPOINT_FIX,
+		status: 502,
+	});
+}
+
+async function recordTerminalWebhookOutcome({
+	webhookId,
+	succeeded,
+	job,
+}: {
+	webhookId: string;
+	succeeded: boolean;
+	job: WorkflowJob;
+}): Promise<void> {
 	const updatedWebhookResult = await db
 		.update(schema.webhook)
 		.set({
@@ -298,17 +339,18 @@ export async function processWebhookDelivery({
 		.where(eq(schema.webhook.id, webhookId))
 		.returning({ consecutiveFailures: schema.webhook.consecutiveFailures });
 
-	const currentConsecutiveFailures =
+	const consecutive =
 		updatedWebhookResult[0]?.consecutiveFailures ?? 0;
-	if (currentConsecutiveFailures >= 10) {
+
+	if (!succeeded && consecutive >= WEBHOOK_DISABLE_AFTER_CONSECUTIVE_FAILURES) {
 		log.warn({
 			message: "Webhook disabled due to consecutive failures exceeding limit",
 			webhookId,
-			consecutiveFailures: currentConsecutiveFailures,
+			consecutiveFailures: consecutive,
 		});
 		await logJob(
 			job,
-			`Webhook disabled after ${currentConsecutiveFailures} consecutive failures`,
+			`Webhook disabled after ${consecutive} consecutive terminal failures`,
 		);
 		await db
 			.update(schema.webhook)
@@ -318,18 +360,7 @@ export async function processWebhookDelivery({
 			})
 			.where(eq(schema.webhook.id, webhookId));
 	}
-
-	if (succeeded) {
-		await logJob(job, "Webhook delivered successfully");
-		return;
-	}
-
-	await failJobOrRetry({
-		job,
-		isLastAttempt,
-		message: "Webhook delivery failed",
-		why: `Webhook endpoint returned HTTP ${response.status}: ${responseText.slice(0, 200)}`,
-		fix: WEBHOOK_ENDPOINT_FIX,
-		status: 502,
-	});
 }
+
+// Re-export for tests / typing consistency
+export { createWorkflowError };

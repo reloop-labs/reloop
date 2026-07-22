@@ -3,6 +3,7 @@ import {
 	DOMAIN_VERIFY_BACKOFF_TYPE,
 	DOMAIN_VERIFY_INITIAL_DELAY_MS,
 } from "@be/workflow/queues/domain-verify-schedule";
+import { startWebhookDeliveryWorker } from "@be/workflow/queues/webhook-delivery.worker";
 import { workflowQueue } from "@be/workflow/queues/workflow.queue";
 import { startWorkflowWorker } from "@be/workflow/queues/workflow.worker";
 import { initWebhookSubscribers } from "@be/workflow/subscribers/webhook.subscriber";
@@ -70,8 +71,9 @@ export const loader = async () => {
 			},
 		);
 
-		// Initialize other NATS subscribers
+		// Initialize webhook dispatcher (NATS queue group) + delivery worker
 		await initWebhookSubscribers();
+		startWebhookDeliveryWorker();
 
 		startWorkflowWorker();
 	} catch (e) {

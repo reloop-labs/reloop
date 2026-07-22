@@ -1,12 +1,29 @@
-import { WEBHOOK_EVENTS, type WebhookEventName } from "@reloop/webhook-events";
+import {
+	ACTIVE_WEBHOOK_EVENTS,
+	WEBHOOK_EVENTS,
+	type WebhookEventName,
+} from "@reloop/webhook-events";
 import { t } from "elysia";
 
 export namespace WebhookModel {
+	// Allow http for local/dev endpoints; delivery still prefers https in prod.
 	const urlPattern = /^https?:\/\/.+/;
 	const maskedSecretExample = "***masked***";
-	const eventIds = WEBHOOK_EVENTS.map((event) => event.id);
-	const eventRegex = new RegExp(
-		`^(${eventIds.join("|").replace(/\./g, "\\.")})$`,
+
+	/** Events allowed on create / trigger (subscribable). */
+	const activeEventIds = ACTIVE_WEBHOOK_EVENTS.map((event) => event.id);
+	const activeEventRegex = new RegExp(
+		`^(${activeEventIds.join("|").replace(/\./g, "\\.")})$`,
+	);
+
+	/**
+	 * Full catalog + loose string for response validation.
+	 * Existing webhooks may still hold inactive/legacy event IDs
+	 * (e.g. domain.list, contact.create) — list/get must not 500 on those.
+	 */
+	const knownEventIds = WEBHOOK_EVENTS.map((event) => event.id);
+	const knownEventRegex = new RegExp(
+		`^(${knownEventIds.join("|").replace(/\./g, "\\.")})$`,
 	);
 
 	export const webhookIdParam = t.String({
@@ -29,12 +46,12 @@ export namespace WebhookModel {
 			}),
 			events: t.Array(
 				t.String({
-					pattern: eventRegex.source,
-					error: "Invalid event ID provided",
+					pattern: activeEventRegex.source,
+					error: "Invalid or inactive event ID provided",
 				}),
 				{
 					minItems: 1,
-					description: "Array of event IDs to subscribe to",
+					description: "Array of active event IDs to subscribe to",
 					error: "Please provide at least one valid event ID to subscribe to",
 				},
 			),
@@ -44,7 +61,7 @@ export namespace WebhookModel {
 				{
 					description: "My Webhook",
 					url: "https://example.com/webhooks/reloop",
-					events: ["domain.created", "domain.deleted"],
+					events: ["email.sent", "email.delivered", "domain.create"],
 				},
 			],
 		},
@@ -183,8 +200,10 @@ export namespace WebhookModel {
 			consecutiveFailures: t.Number({
 				description: "Consecutive failure count",
 			}),
-			events: t.Array(t.String({ pattern: eventRegex.source }), {
-				description: "Array of subscribed event IDs",
+			// Do NOT restrict to active-only — existing rows may hold inactive/legacy IDs.
+			events: t.Array(t.String({ minLength: 1 }), {
+				description:
+					"Subscribed event IDs (includes inactive/legacy if already stored)",
 			}),
 			createdAt: t.String({ description: "Creation timestamp" }),
 			updatedAt: t.String({ description: "Last update timestamp" }),
@@ -209,6 +228,7 @@ export namespace WebhookModel {
 					successCount: 10,
 					failureCount: 1,
 					consecutiveFailures: 0,
+					events: ["email.sent", "domain.create"],
 					createdAt: "2026-03-29T10:00:00Z",
 					updatedAt: "2026-03-29T10:00:00Z",
 				},
@@ -281,12 +301,14 @@ export namespace WebhookModel {
 	export type DeleteWebhookResponse = typeof deleteWebhookResponse.static;
 	export const triggerWebhookBody = t.Object(
 		{
+			// Manual trigger: allow any known catalog event so users can test
+			// existing inactive/legacy subscriptions too.
 			event: t.String({
-				pattern: eventRegex.source,
+				pattern: knownEventRegex.source,
 				error: "Invalid event ID provided",
 			}),
 			payload: t.Record(t.String(), t.Any(), {
-				description: "Event payload",
+				description: "Event payload (becomes envelope.data)",
 			}),
 			organizationId: t.Optional(
 				t.String({
@@ -302,10 +324,10 @@ export namespace WebhookModel {
 		{
 			examples: [
 				{
-					event: "domain.created",
+					event: "domain.create",
 					payload: {
-						id: "dom_123456789",
-						name: "example.com",
+						domainId: "dom_123456789",
+						domain: "example.com",
 					},
 					organizationId: "org_123456789",
 				},

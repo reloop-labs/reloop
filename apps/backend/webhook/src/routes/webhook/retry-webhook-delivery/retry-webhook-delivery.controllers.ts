@@ -1,3 +1,10 @@
+import { createId } from "@paralleldrive/cuid2";
+import {
+	WEBHOOK_DELIVERY_JOB,
+	WEBHOOK_DELIVERY_QUEUE,
+	WEBHOOK_MAX_ATTEMPTS,
+	webhookDeliveryJobOptions,
+} from "@reloop/webhook-delivery";
 import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { Queue } from "bullmq";
@@ -5,19 +12,23 @@ import { eq } from "drizzle-orm";
 import { createError } from "evlog";
 import { webhookConfig } from "../../../webhook.config";
 
-const workflowQueue = new Queue("workflow-queue", {
+const webhookDeliveryQueue = new Queue(WEBHOOK_DELIVERY_QUEUE, {
 	connection: {
 		url: webhookConfig.REDIS_URL,
 	},
 });
 
+/**
+ * Manual replay: creates a *new* delivery row (audit-friendly) and enqueues it.
+ * Does not mutate the original delivery's status history.
+ */
 export async function retryWebhookDeliveryController({
 	deliveryId,
 	organizationId,
 }: {
 	deliveryId: string;
 	organizationId: string;
-}): Promise<{ success: boolean; message: string }> {
+}): Promise<{ success: boolean; message: string; newDeliveryId?: string }> {
 	const delivery = await db.query.webhookDelivery.findFirst({
 		where: eq(schema.webhookDelivery.id, deliveryId),
 		with: {
@@ -36,62 +47,45 @@ export async function retryWebhookDeliveryController({
 
 	if (
 		delivery.webhook.status === "disabled" ||
-		delivery.webhook.status === "failed"
+		delivery.webhook.status === "failed" ||
+		delivery.webhook.status === "paused"
 	) {
 		throw createError({
 			status: 400,
 			message: "Webhook is not active",
-			why: `Cannot retry delivery because the webhook is currently "${delivery.webhook.status}".`,
-			fix: "Enable the webhook first before retrying delivery.",
+			why: `Cannot replay delivery because the webhook is currently "${delivery.webhook.status}".`,
+			fix: "Enable the webhook first before replaying delivery.",
 		});
 	}
 
-	const nextAttemptNumber = delivery.attemptNumber + 1;
+	const newDeliveryId = `whde_${createId()}`;
 
-	// Reset status to pending in DB
-	await db
-		.update(schema.webhookDelivery)
-		.set({
-			status: "pending",
-			attemptNumber: nextAttemptNumber,
-			errorMessage: null,
-			errorDetails: null,
-			responseStatus: null,
-			responseBody: null,
-			responseHeaders: null,
-			completedAt: null,
-			durationMs: null,
-		})
-		.where(eq(schema.webhookDelivery.id, deliveryId));
+	await db.insert(schema.webhookDelivery).values({
+		id: newDeliveryId,
+		webhookId: delivery.webhookId,
+		webhookEventId: delivery.webhookEventId,
+		replayOfDeliveryId: delivery.id,
+		eventType: delivery.eventType,
+		eventData: delivery.eventData,
+		status: "pending",
+		requestUrl: delivery.webhook.url,
+		attemptNumber: 0,
+		maxAttempts: WEBHOOK_MAX_ATTEMPTS,
+	});
 
-	// Add to workflow queue
-	await workflowQueue.add(
-		"deliver-webhook",
+	const opts = webhookDeliveryJobOptions(newDeliveryId);
+	await webhookDeliveryQueue.add(
+		WEBHOOK_DELIVERY_JOB,
+		{ deliveryId: newDeliveryId },
 		{
-			workflowId: delivery.webhookId,
-			organizationId: delivery.webhook.organizationId,
-			type: "deliver-webhook",
-			payload: {
-				deliveryId: delivery.id,
-				webhookId: delivery.webhookId,
-				webhookUrl: delivery.webhook.url,
-				webhookSecret: delivery.webhook.secret,
-				customHeaders: delivery.webhook.customHeaders,
-				eventId: delivery.webhookEventId,
-				eventType: delivery.eventType,
-				payload: delivery.eventData,
-				maxRetries: delivery.webhook.maxRetries ?? 3,
-				retryBackoffMultiplier: delivery.webhook.retryBackoffMultiplier ?? 2,
-			},
-		},
-		{
-			jobId: `${delivery.id}-retry-${Date.now()}`,
-			attempts: 1, // Only 1 attempt for manual retries
+			...opts,
+			// Manual replays still get full automatic retry schedule
 		},
 	);
 
 	return {
 		success: true,
-		message: "Webhook delivery retry initiated",
+		message: "Webhook delivery replay initiated",
+		newDeliveryId,
 	};
 }

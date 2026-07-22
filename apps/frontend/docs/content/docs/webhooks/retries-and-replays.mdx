@@ -3,38 +3,42 @@ title: Retries and Replays
 description: Learn how to use retries and replays to handle webhook failures.
 ---
 
-Reloop ensures that your webhooks are delivered reliably. If your server is down or returns an error, we will automatically retry the delivery.
+Reloop delivers webhooks with at-least-once semantics. If your server is down or returns a non-2xx status, we automatically retry the delivery.
 
 ## Automatic Retries
 
-We attempt to deliver each webhook message based on a schedule with exponential backoff.
+Each delivery is attempted up to **7 times** with a fixed schedule. Delays are measured from the previous failure:
 
-Each message is attempted based on the following schedule, where each period is started following the failure of the preceding attempt:
+| Attempt | Delay after previous failure |
+| --- | --- |
+| 1 | Immediate |
+| 2 | 5 seconds |
+| 3 | 5 minutes |
+| 4 | 30 minutes |
+| 5 | 2 hours |
+| 6 | 5 hours |
+| 7 | 10 hours |
 
-- Immediately
-- 5 seconds
-- 5 minutes
-- 30 minutes
-- 2 hours
-- 5 hours
-- 10 hours
+SSRF-blocked or non-HTTPS endpoints are **not** retried (terminal failure).
+
+After many consecutive **terminal** failures on an endpoint, Reloop may disable the webhook (`status: failed`). Re-enable it from the dashboard after fixing your endpoint.
 
 ## Manual Replays
 
-You can manually replay any webhook message, whether it previously `failed` or `succeeded`. This is useful for testing your endpoint or recovering from downtime.
+You can manually replay any delivery from the dashboard or API. Replay creates a **new** delivery row (linked to the original) so history stays intact, then enqueues it on the delivery queue with the full automatic retry schedule.
 
 <Steps>
   <Step title="Go to Webhooks">
-    Navigate to the [Webhooks](https://app.reloop.dev/webhooks) page in your dashboard.
+    Navigate to the Webhooks page in your dashboard.
   </Step>
   <Step title="Select an Endpoint">
-    Click on the Webhook Endpoint you are currently using.
+    Open the webhook endpoint you are using.
   </Step>
-  <Step title="Find a Message">
-    Locate the specific Webhook Message you want to replay from the delivery logs.
+  <Step title="Find a Delivery">
+    Locate the delivery in the delivery logs.
   </Step>
   <Step title="Click Replay">
-    Click on the "Replay" button to trigger a manual redelivery.
+    Trigger a manual redelivery.
   </Step>
 </Steps>
 

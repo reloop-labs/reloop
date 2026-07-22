@@ -1,5 +1,4 @@
 import { processDomainVerification } from "@be/workflow/handlers/domain-verification.handler";
-import { processWebhookDelivery } from "@be/workflow/handlers/webhook-delivery.handler";
 import {
 	DOMAIN_VERIFY_BACKOFF_TYPE,
 	getDomainVerifyBackoffDelay,
@@ -32,21 +31,13 @@ async function processWorkflow(job: WorkflowJob): Promise<void> {
 			isLastAttempt: lastAttempt,
 		});
 	} else if (jobData.type === "deliver-webhook") {
-		await processWebhookDelivery({
-			job,
-			deliveryId: jobData.payload.deliveryId as string,
-			webhookId: jobData.payload.webhookId as string,
-			webhookUrl: jobData.payload.webhookUrl as string,
-			webhookSecret: jobData.payload.webhookSecret as string,
-			customHeaders: jobData.payload.customHeaders as Record<
-				string,
-				string
-			> | null,
-			eventId: jobData.payload.eventId as string,
-			eventType: jobData.payload.eventType as string,
-			payload: jobData.payload.payload as Record<string, unknown>,
-			isLastAttempt: lastAttempt,
-			attemptNumber: job.attemptsMade + 1,
+		// Legacy jobs on workflow-queue — log and skip (delivery moved to
+		// webhook-delivery-queue). Safe no-op so old jobs drain without crash.
+		log.warn({
+			message:
+				"Ignoring legacy deliver-webhook job on workflow-queue; use webhook-delivery-queue",
+			workflowId: jobData.workflowId,
+			payload: jobData.payload,
 		});
 	}
 

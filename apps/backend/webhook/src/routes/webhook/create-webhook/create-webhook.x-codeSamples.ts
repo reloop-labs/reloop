@@ -10,7 +10,7 @@ const reloop = new Reloop({ apiKey: "rl_123456789" });
 const { webhook, webhookError } = await reloop.webhook.create({
   description: "Production webhook",
   url: "https://example.com/webhooks/reloop",
-  events: ["domain.created", "domain.deleted"],
+  events: ["domain.create", "domain.delete", "email.delivered"],
 });
 if (webhookError) throw webhookError;`,
 	},
@@ -21,7 +21,7 @@ if (webhookError) throw webhookError;`,
 		source: `curl -X POST https://reloop.sh/api/webhook/v1/ \\
   -H "x-api-key: rl_123456789" \\
   -H "Content-Type: application/json" \\
-  -d '{"description":"Production webhook","url":"https://example.com/webhooks/reloop","events":["domain.created","domain.deleted"]}'`,
+  -d '{"description":"Production webhook","url":"https://example.com/webhooks/reloop","events":["domain.create","domain.delete"]}'`,
 	},
 				{
 		id: "python",
@@ -34,7 +34,7 @@ reloop = Reloop(api_key="rl_123456789")
 result = reloop.webhook.create({
   "description": "Production webhook",
   "url": "https://example.com/webhooks/reloop",
-  "events": ["domain.created", "domain.deleted"],
+  "events": ["domain.create", "domain.delete"],
 })
 if result.webhook_error:
     raise result.webhook_error`,
@@ -54,7 +54,7 @@ $reloop = Reloop::client('rl_123456789');
 $webhook = $reloop->webhook->create([
     'description' => 'Production webhook',
     'url' => 'https://example.com/webhooks/reloop',
-    'events' => ['domain.created', 'domain.deleted'],
+    'events' => ['domain.create', 'domain.delete'],
 ]);`,
 	},
 			{
@@ -70,7 +70,7 @@ ReloopClient reloop = new ReloopClient("rl_123456789");
 CreateWebhookParams params = new CreateWebhookParams();
 params.description = "Production webhook";
 params.url = "https://example.com/webhooks/reloop";
-params.events = List.of("domain.created", "domain.deleted");
+params.events = List.of("domain.create", "domain.delete");
 var webhook = reloop.webhook.create(params);`,
 	},
 	{

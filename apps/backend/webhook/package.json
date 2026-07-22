@@ -41,6 +41,7 @@
 		"@reloop/auth": "workspace:*",
 		"@reloop/bus": "workspace:*",
 		"@reloop/webhook-events": "workspace:*",
+		"@reloop/webhook-delivery": "workspace:*",
 		"@elysiajs/openapi": "catalog:backend",
 		"evlog": "catalog:backend"
 	},

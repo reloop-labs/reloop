@@ -4,7 +4,7 @@ export const EMAIL_SENT_WEBHOOK_EVENT = {
 	id: "email.sent",
 	name: "email.sent",
 	category: "email",
-	description: "Triggered when an email is sent successfully",
+	description: "Triggered when an email is accepted for delivery",
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
@@ -20,7 +20,7 @@ export const EMAIL_DELIVERY_DELAYED_WEBHOOK_EVENT = {
 	id: "email.delivery_delayed",
 	name: "email.delivery_delayed",
 	category: "email",
-	description: "Triggered when email delivery is delayed",
+	description: "Triggered when email delivery is delayed (transient failure)",
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
@@ -36,7 +36,7 @@ export const EMAIL_BOUNCED_WEBHOOK_EVENT = {
 	id: "email.bounced",
 	name: "email.bounced",
 	category: "email",
-	description: "Triggered when email delivery fails",
+	description: "Triggered when email delivery permanently fails",
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
@@ -45,7 +45,7 @@ export const EMAIL_OPENED_WEBHOOK_EVENT = {
 	name: "email.opened",
 	category: "email",
 	description: "Triggered when a recipient opens an email",
-	isActive: true,
+	isActive: false,
 } as const satisfies WebhookEventDefinition;
 
 export const EMAIL_CLICKED_WEBHOOK_EVENT = {
@@ -53,7 +53,7 @@ export const EMAIL_CLICKED_WEBHOOK_EVENT = {
 	name: "email.clicked",
 	category: "email",
 	description: "Triggered when a recipient clicks a link in an email",
-	isActive: true,
+	isActive: false,
 } as const satisfies WebhookEventDefinition;
 
 export const EMAIL_WEBHOOK_EVENTS = [
@@ -65,3 +65,8 @@ export const EMAIL_WEBHOOK_EVENTS = [
 	EMAIL_OPENED_WEBHOOK_EVENT,
 	EMAIL_CLICKED_WEBHOOK_EVENT,
 ] as const satisfies readonly WebhookEventDefinition[];
+
+/** Phase-1 wired email events (active + delivered by the pipeline). */
+export const EMAIL_ACTIVE_WEBHOOK_EVENTS = EMAIL_WEBHOOK_EVENTS.filter(
+	(e) => e.isActive,
+);

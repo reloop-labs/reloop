@@ -23,7 +23,11 @@ All BullMQ jobs on `workflow-queue` follow this default flow. Helpers live in `s
 4. **Final attempt** — persist terminal status first, then `failJobOrRetry` (it logs the fix and returns without throwing).
 5. **Use `isLastAttempt(job)`** from the shared module (the worker already passes this into handlers).
 
-Current job types: `verify-domain`, `deliver-webhook`.
+Current job types on `workflow-queue`: `verify-domain`.
+
+Webhook HTTP delivery runs on a dedicated BullMQ queue `webhook-delivery-queue`
+(job name `deliver-webhook`). See `@reloop/webhook-delivery` for signing,
+SSRF-safe HTTP client, and the fixed retry schedule.
 
 ---
 

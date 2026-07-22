@@ -2,6 +2,7 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import * as Select from "@reloop/ui/select";
+import { ACTIVE_WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import axios from "axios";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -13,21 +14,14 @@ interface TriggerWebhookModalProps {
 	webhookId: string;
 }
 
-const WEBHOOK_EVENTS = [
-	{ id: "domain.create", name: "domain.create" },
-	{ id: "domain.update", name: "domain.update" },
-	{ id: "domain.delete", name: "domain.delete" },
-	{ id: "contact.create", name: "contact.create" },
-	{ id: "contact.update", name: "contact.update" },
-	{ id: "contact.delete", name: "contact.delete" },
-];
+const defaultEventId = ACTIVE_WEBHOOK_EVENTS[0]?.id ?? "email.sent";
 
 export const TriggerWebhookModal = ({
 	isOpen,
 	onClose,
 	webhookId,
 }: TriggerWebhookModalProps) => {
-	const [eventId, setEventId] = useState("domain.create");
+	const [eventId, setEventId] = useState(defaultEventId);
 	const [payload, setPayload] = useState(
 		JSON.stringify(
 			{
@@ -96,7 +90,7 @@ export const TriggerWebhookModal = ({
 								<Select.Value />
 							</Select.Trigger>
 							<Select.Content>
-								{WEBHOOK_EVENTS.map((event) => (
+								{ACTIVE_WEBHOOK_EVENTS.map((event) => (
 									<Select.Item key={event.id} value={event.id}>
 										{event.name}
 									</Select.Item>

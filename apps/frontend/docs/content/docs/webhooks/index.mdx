@@ -46,21 +46,24 @@ When you send an email or trigger an event, Reloop will send a payload like this
 
 ```json
 {
+  "id": "whev_01h…",
   "type": "email.bounced",
-  "created_at": "2023-11-22T23:41:12.126Z",
+  "created_at": "2026-07-22T23:41:12.126Z",
   "data": {
     "email_id": "em_123456789",
     "from": "Acme <onboarding@reloop.dev>",
     "to": ["delivered@reloop.dev"],
     "subject": "Sending this example",
-    "bounce": {
-      "message": "The recipient's email address is on the suppression list.",
-      "subType": "Suppressed",
-      "type": "Permanent"
+    "status": "bounced",
+    "error": {
+      "code": 550,
+      "message": "The recipient's email address is on the suppression list."
     }
   }
 }
 ```
+
+Headers include `Reloop-Id`, `Reloop-Timestamp`, and `Reloop-Signature` for verification.
 
 ### 4. Update and deploy your production endpoint.
 
@@ -85,7 +88,8 @@ Update your webhook URL in the [Reloop Dashboard](https://app.reloop.dev/webhook
 ## FAQ
 
 ### What is the retry schedule?
-If your server returns an error, we retry with exponential backoff:
+If your server returns a non-2xx response, we retry up to 7 attempts:
+- Immediate
 - 5 seconds
 - 5 minutes
 - 30 minutes
@@ -93,11 +97,8 @@ If your server returns an error, we retry with exponential backoff:
 - 5 hours
 - 10 hours
 
-### What IPs do webhooks POST from?
-Webhooks are sent from the following IP addresses:
-- `44.228.126.217`
-- `50.112.21.217`
-- `52.24.126.164`
+### How do I verify authenticity?
+Use your endpoint secret (`whsec_…`) to verify `Reloop-Signature`. See [Verify Webhooks Requests](/docs/webhooks/verify-webhooks-requests).
 - `54.148.139.208`
 - `2600:1f24:64:8000::/52`
 

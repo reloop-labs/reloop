@@ -27,5 +27,5 @@ export function getDomainVerifyBackoffDelay(attemptsMade: number): number {
 	if (index < 0 || index >= DOMAIN_VERIFY_BACKOFF_DELAYS_MS.length) {
 		return 0;
 	}
-	return DOMAIN_VERIFY_BACKOFF_DELAYS_MS[index];
+	return DOMAIN_VERIFY_BACKOFF_DELAYS_MS[index] ?? 0;
 }

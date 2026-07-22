@@ -3,7 +3,10 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
+import {
+	ACTIVE_WEBHOOK_EVENTS,
+	WEBHOOK_EVENTS,
+} from "@reloop/webhook-events";
 import { useMemo, useState } from "react";
 
 interface WebhookEventSelectorProps {
@@ -46,8 +49,8 @@ export const WebhookEventSelector = ({
 
 	const filteredEvents = useMemo(() => {
 		const query = searchQuery.toLowerCase().trim();
-		if (!query) return WEBHOOK_EVENTS;
-		return WEBHOOK_EVENTS.filter(
+		if (!query) return ACTIVE_WEBHOOK_EVENTS;
+		return ACTIVE_WEBHOOK_EVENTS.filter(
 			(event) =>
 				event.name.toLowerCase().includes(query) ||
 				event.id.toLowerCase().includes(query) ||
@@ -56,7 +59,7 @@ export const WebhookEventSelector = ({
 	}, [searchQuery]);
 
 	const groupedEvents = useMemo(() => {
-		const groups: Record<string, (typeof WEBHOOK_EVENTS)[number][]> = {};
+		const groups: Record<string, (typeof ACTIVE_WEBHOOK_EVENTS)[number][]> = {};
 		for (const event of filteredEvents) {
 			const group = groups[event.category] ?? [];
 			group.push(event);
@@ -75,10 +78,22 @@ export const WebhookEventSelector = ({
 
 	const selectedCount = value.length;
 
+	// Resolve display names from full catalog so inactive/legacy IDs still show.
 	const selectedEvents = useMemo(() => {
 		return value
-			.map((id) => WEBHOOK_EVENTS.find((e) => e.id === id))
-			.filter((e): e is (typeof WEBHOOK_EVENTS)[number] => !!e);
+			.map((id) => {
+				const fromActive = ACTIVE_WEBHOOK_EVENTS.find((e) => e.id === id);
+				if (fromActive) return fromActive;
+				const fromAll = WEBHOOK_EVENTS.find((e) => e.id === id);
+				if (fromAll) return fromAll;
+				return {
+					id,
+					name: id,
+					category: "other",
+					description: id,
+					isActive: false,
+				};
+			});
 	}, [value]);
 
 	return (

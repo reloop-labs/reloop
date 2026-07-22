@@ -2,7 +2,10 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
-import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
+import {
+	ACTIVE_WEBHOOK_EVENTS,
+	WEBHOOK_EVENTS,
+} from "@reloop/webhook-events";
 import axios from "axios";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useRef, useState } from "react";
@@ -34,44 +37,32 @@ const categoryBadgeColors: Record<string, { light: string; dark: string }> = {
 
 const getPayloadForEvent = (
 	eventId: string,
-	category: string,
+	_category: string,
 ): Record<string, unknown> => {
-	const base = {
+	// Manual trigger payload becomes envelope.data on delivery
+	if (eventId.startsWith("email.")) {
+		return {
+			email_id: "em_test_a1b2c3",
+			from: "hello@example.com",
+			to: ["user@example.com"],
+			subject: "Test email event",
+			status: eventId.replace("email.", ""),
+			...(eventId === "email.bounced" ||
+			eventId === "email.delivery_delayed" ||
+			eventId === "email.complained"
+				? {
+						error: {
+							code: 550,
+							message: "Simulated failure for webhook test",
+						},
+					}
+				: {}),
+		};
+	}
+	return {
 		id: `evt_${Math.random().toString(36).substring(2, 12)}`,
 		type: eventId,
-		created: Math.floor(Date.now() / 1000),
 	};
-	if (category === "domain") {
-		return {
-			...base,
-			data: {
-				domain_id: "dom_a1b2c3d4",
-				name: "example.com",
-				status: "active",
-			},
-		};
-	}
-	if (category === "api-key") {
-		return {
-			...base,
-			data: {
-				api_key_id: "key_x1y2z3",
-				name: "Production Key",
-				prefix: "sk_live_",
-			},
-		};
-	}
-	if (category === "contact") {
-		return {
-			...base,
-			data: {
-				contact_id: "ctr_q1w2e3",
-				email: "jane@example.com",
-				name: "Jane Doe",
-			},
-		};
-	}
-	return { ...base, data: {} };
 };
 
 export const TriggerWebhookTester = ({
@@ -79,11 +70,25 @@ export const TriggerWebhookTester = ({
 	webhookEvents,
 }: TriggerWebhookTesterProps) => {
 	const invalidate = useInvalidateWebhooks();
+	// Prefer the webhook's actual subscriptions (including legacy inactive IDs).
 	const filteredEvents = useMemo(() => {
-		if (webhookEvents) {
-			return WEBHOOK_EVENTS.filter((e) => webhookEvents.includes(e.id));
+		if (webhookEvents && webhookEvents.length > 0) {
+			return webhookEvents.map((id) => {
+				const known =
+					ACTIVE_WEBHOOK_EVENTS.find((e) => e.id === id) ??
+					WEBHOOK_EVENTS.find((e) => e.id === id);
+				return (
+					known ?? {
+						id,
+						name: id,
+						category: "other",
+						description: id,
+						isActive: false,
+					}
+				);
+			});
 		}
-		return WEBHOOK_EVENTS;
+		return ACTIVE_WEBHOOK_EVENTS;
 	}, [webhookEvents]);
 
 	const [selectedEventId, setSelectedEventId] = useState<string>(

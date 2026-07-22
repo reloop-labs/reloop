@@ -8,7 +8,7 @@ export const triggerWebhookXCodeSamples = [
 const reloop = new Reloop({ apiKey: "rl_123456789" });
 
 const { webhook, webhookError } = await reloop.webhook.trigger({
-  event: "domain.created",
+  event: "domain.create",
   payload: { domainId: "dom_123456789" },
 });
 if (webhookError) throw webhookError;`,
@@ -20,7 +20,7 @@ if (webhookError) throw webhookError;`,
 		source: `curl -X POST https://reloop.sh/api/webhook/v1/trigger \\
   -H "x-api-key: rl_123456789" \\
   -H "Content-Type: application/json" \\
-  -d '{"event":"domain.created","payload":{"domainId":"dom_123456789"}}'`,
+  -d '{"event":"domain.create","payload":{"domainId":"dom_123456789"}}'`,
 	},
 				{
 		id: "python",
@@ -31,7 +31,7 @@ if (webhookError) throw webhookError;`,
 reloop = Reloop(api_key="rl_123456789")
 
 result = reloop.webhook.trigger({
-  "event": "domain.created",
+  "event": "domain.create",
   "payload": {
     "domainId": "dom_123456789",
   },
@@ -52,7 +52,7 @@ use Reloop\Reloop;
 $reloop = Reloop::client('rl_123456789');
 
 $webhook = $reloop->webhook->trigger([
-    'event' => 'domain.created',
+    'event' => 'domain.create',
     'payload' => [
         'domainId' => 'dom_123456789',
     ],
@@ -69,7 +69,7 @@ import java.util.Map;
 ReloopClient reloop = new ReloopClient("rl_123456789");
 
 TriggerWebhookParams params = new TriggerWebhookParams();
-params.event = "domain.created";
+params.event = "domain.create";
 params.payload = Map.of("domainId", "dom_123456789");
 var webhook = reloop.webhook.trigger(params);`,
 	},

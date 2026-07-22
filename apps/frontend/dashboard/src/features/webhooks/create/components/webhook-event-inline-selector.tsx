@@ -2,7 +2,7 @@
 import * as Checkbox from "@reloop/ui/checkbox";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
+import { ACTIVE_WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import { AnimatePresence, LayoutGroup, motion } from "motion/react";
 import { memo, useCallback, useMemo } from "react";
 
@@ -30,7 +30,7 @@ const categoryCheckboxColors: Record<string, string> = {
 };
 
 interface WebhookEventRowProps {
-	event: (typeof WEBHOOK_EVENTS)[number];
+	event: (typeof ACTIVE_WEBHOOK_EVENTS)[number];
 	isChecked: boolean;
 	onToggle: (id: string) => void;
 }
@@ -99,8 +99,8 @@ export const WebhookEventInlineSelector = ({
 		[value, onChange],
 	);
 
-	const eventsMap = new Map<string, (typeof WEBHOOK_EVENTS)[number]>(
-		WEBHOOK_EVENTS.map((e) => [e.id, e]),
+	const eventsMap = new Map<string, (typeof ACTIVE_WEBHOOK_EVENTS)[number]>(
+		ACTIVE_WEBHOOK_EVENTS.map((e) => [e.id, e]),
 	);
 
 	const categoryLabels: Record<string, string> = {
@@ -113,11 +113,11 @@ export const WebhookEventInlineSelector = ({
 	const groupedEvents = useMemo(() => {
 		const groups: {
 			category: string;
-			events: (typeof WEBHOOK_EVENTS)[number][];
+			events: (typeof ACTIVE_WEBHOOK_EVENTS)[number][];
 		}[] = [];
 		const seen = new Map<string, number>();
 
-		for (const event of WEBHOOK_EVENTS) {
+		for (const event of ACTIVE_WEBHOOK_EVENTS) {
 			const existingIdx = seen.get(event.category);
 			if (existingIdx !== undefined) {
 				groups[existingIdx]?.events.push(event);

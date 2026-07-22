@@ -1,5 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
 import { relations } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
 	boolean,
 	index,
@@ -9,6 +10,7 @@ import {
 	pgTable,
 	text,
 	timestamp,
+	uniqueIndex,
 	varchar,
 } from "drizzle-orm/pg-core";
 import { organization, user } from "./auth";
@@ -16,7 +18,7 @@ import { organization, user } from "./auth";
 const createWebhookId = () => `wh_${createId()}`;
 const createWebhookSubscriptionId = () => `whsub_${createId()}`;
 const createWebhookDeliveryId = () => `whde_${createId()}`;
-const createWebhookEventId = () => `evt_${createId()}`;
+const createWebhookEventId = () => `whev_${createId()}`;
 const createWebhookDeliveryAttemptId = () => `whda_${createId()}`;
 
 export const webhookStatusEnum = pgEnum("webhook_status", [
@@ -121,6 +123,11 @@ export const webhookEvent = pgTable(
 		event: text("event").notNull(),
 		payload: jsonb("payload").$type<Record<string, unknown>>().notNull(),
 		source: varchar("source", { length: 100 }).notNull(),
+		/**
+		 * Dedupes fan-out for the same source occurrence
+		 * (e.g. `${orgId}:email.delivered:${emailLogId}:Delivery`).
+		 */
+		idempotencyKey: text("idempotency_key"),
 		organizationId: text("organization_id")
 			.notNull()
 			.references(() => organization.id, { onDelete: "cascade" }),
@@ -134,6 +141,10 @@ export const webhookEvent = pgTable(
 		index("webhook_event_idx_user_id").on(table.userId),
 		index("webhook_event_idx_created_at").on(table.createdAt),
 		index("webhook_event_idx_org_event").on(table.organizationId, table.event),
+		index("webhook_event_idx_idempotency_key").on(table.idempotencyKey),
+		uniqueIndex("webhook_event_uidx_idempotency_key")
+			.on(table.idempotencyKey)
+			.where(sql`${table.idempotencyKey} is not null`),
 	],
 );
 
@@ -149,6 +160,8 @@ export const webhookDelivery = pgTable(
 		webhookEventId: text("webhook_event_id").references(() => webhookEvent.id, {
 			onDelete: "set null",
 		}),
+		/** When set, this delivery is a manual replay of another delivery. */
+		replayOfDeliveryId: text("replay_of_delivery_id"),
 		eventType: text("event_type").notNull(),
 		eventData: jsonb("event_data").$type<Record<string, unknown>>().notNull(),
 		status: webhookDeliveryStatusEnum("status").notNull().default("pending"),
@@ -158,8 +171,8 @@ export const webhookDelivery = pgTable(
 		responseStatus: integer("response_status"),
 		responseBody: text("response_body"),
 		responseHeaders: jsonb("response_headers").$type<Record<string, string>>(),
-		attemptNumber: integer("attempt_number").notNull().default(1),
-		maxAttempts: integer("max_attempts").notNull().default(3),
+		attemptNumber: integer("attempt_number").notNull().default(0),
+		maxAttempts: integer("max_attempts").notNull().default(7),
 		nextRetryAt: timestamp("next_retry_at"),
 		lastAttemptAt: timestamp("last_attempt_at"),
 		errorMessage: text("error_message"),
@@ -187,6 +200,7 @@ export const webhookDelivery = pgTable(
 			table.nextRetryAt,
 		),
 		index("webhook_delivery_idx_event_instance").on(table.webhookEventId),
+		index("webhook_delivery_idx_replay_of").on(table.replayOfDeliveryId),
 	],
 );
 
@@ -250,10 +264,6 @@ export const webhookEventSubscriptionRelations = relations(
 		webhook: one(webhook, {
 			fields: [webhookEventSubscription.webhookId],
 			references: [webhook.id],
-		}),
-		organization: one(organization, {
-			fields: [webhookEventSubscription.webhookId],
-			references: [organization.id],
 		}),
 	}),
 );

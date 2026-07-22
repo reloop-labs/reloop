@@ -71,10 +71,12 @@ NODE_ENV=development
 
 | Layer | Detail |
 | :--- | :--- |
-| **Event capture** | Subscribes to NATS subjects (`kumomta.event.*`, `tracking.*`) |
-| **Delivery** | BullMQ workers sign payloads with `x-reloop-signature` and POST to subscribers |
-| **Retries** | Failed deliveries retry with exponential backoff |
-| **Schema** | `webhook`, `webhook_delivery` in `packages/db/src/schema/webhook.ts` |
+| **Control plane** | This service — CRUD endpoints, list deliveries, manual replay |
+| **Dispatcher** | `be-workflow` NATS queue group `webhook-dispatcher` (email lifecycle + manual trigger) |
+| **Delivery** | Dedicated BullMQ queue `webhook-delivery-queue`; signs with `Reloop-Signature` |
+| **Retries** | Fixed 7-attempt schedule (5s → 5m → 30m → 2h → 5h → 10h) |
+| **Helpers** | `@reloop/webhook-delivery` (envelope, HMAC, SSRF client) |
+| **Schema** | `packages/db/src/schema/webhook.ts` |
 
 
 ## Next
