@@ -12,6 +12,14 @@ faq:
     answer: Yes. From the contacts list in the dashboard, use Export CSV to download email, status, and created-at for the current view.
   - question: How do I manage contacts with code?
     answer: Use the Reloop SDK or REST API to create, list, get, update, and delete contacts. The same operations are available in the dashboard under Contacts.
+  - question: Does Reloop sync contacts with external CRMs (Salesforce, HubSpot, etc.)?
+    answer: Reloop does not include a built-in two-way CRM sync. Sync contacts yourself with the Contacts API and webhooks, or connect tools like Zapier and n8n to move data between Reloop and your CRM.
+  - question: Are there webhooks for contact events (created, updated, unsubscribed, deleted)?
+    answer: Yes. Subscribe to contact.create, contact.update, contact.delete, contact.subscribed, contact.unsubscribed, and contact.blocked. Configure endpoints in the dashboard or Webhooks API.
+  - question: Is there a rate limit on the Contacts API?
+    answer: Yes. Contacts endpoints are rate-limited per organization (for example, create 200/min, list and get 60/min, update and delete 30/min). Exceeding a limit returns 429 with Retry-After. See Usage Limits in the API docs.
+  - question: Is there a cap on total contacts per plan or organization?
+    answer: Reloop does not enforce a fixed total-contact cap per plan. Storage is unbounded by a hard contact quota; API rate limits still apply when you create or update contacts in bulk.
 ---
 
 ## What is a Reloop contact?
@@ -101,7 +109,7 @@ Status is `subscribed`, `unsubscribed`, or `blocked` (often from deliverability)
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
-    ![Delete a contact from the list](/docs/images/docs/contacts/list-view.png)
+    ![Delete a contact from the list](/docs/images/docs/contacts/delete-contact.gif)
 
     1. Open [Contacts](https://reloop.sh/dashboard/contacts)
     2. Row **···** → **Delete**
@@ -135,6 +143,22 @@ Yes. From the contacts list in the dashboard, use **Export CSV** to download ema
 ### How do I manage contacts with code?
 
 Use the Reloop SDK or REST API to create, list, get, update, and delete contacts — same operations as the dashboard. Jump to the [API reference](#api-reference) below.
+
+### Does Reloop sync contacts with external CRMs (Salesforce, HubSpot, etc.)?
+
+No built-in two-way CRM sync. Use the [Contacts API](#api-reference) and [webhooks](/docs/webhooks) to sync yourself, or connect [Zapier](/docs/integrations/zapier) / [n8n](/docs/integrations/n8n) between Reloop and your CRM.
+
+### Are there webhooks for contact events (created, updated, unsubscribed, deleted)?
+
+Yes — `contact.create`, `contact.update`, `contact.delete`, `contact.subscribed`, `contact.unsubscribed`, and `contact.blocked`. See [Contact webhooks](/docs/webhooks/contacts/created) and [event types](/docs/webhooks/event-types).
+
+### Is there a rate limit on the Contacts API?
+
+Yes. Limits are per organization (e.g. create **200**/min, list/get **60**/min, update/delete **30**/min). Over the limit → `429` with `Retry-After`. Full table: [Usage Limits](/docs/api/usage-limits).
+
+### Is there a cap on total contacts per plan or organization?
+
+No fixed total-contact cap per plan. You can store as many contacts as you need; bulk create/update is still gated by [API rate limits](/docs/api/usage-limits).
 
 ---
 
