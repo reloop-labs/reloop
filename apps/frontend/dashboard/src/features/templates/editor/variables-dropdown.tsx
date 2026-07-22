@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
+import { mapTemplateVariables } from "#/features/templates/lib/template-variables";
 import { useEditorStore } from "./use-editor-store";
 
 interface VariablesDropdownProps {
@@ -24,15 +25,9 @@ export const VariablesDropdown = forwardRef(
 			fetcher,
 		);
 
-		const rawVars = templateData?.variables ?? [];
-		const variables = rawVars
-			.map((v: any) => {
-				if (typeof v === "string") {
-					return v.replace(/^\{\{|\}\}$/g, "").trim();
-				}
-				return v?.name ?? "";
-			})
-			.filter(Boolean);
+		const variables = mapTemplateVariables(templateData?.variables).map(
+			(v) => v.name,
+		);
 
 		const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -79,9 +74,16 @@ export const VariablesDropdown = forwardRef(
 				const { editor, range } = props;
 				editor.chain().focus().deleteRange(range).run();
 
-				// Open global create variable modal
-				useEditorStore.getState().setIsCreatingVar(true);
+				// Defer so TipTap suggestion onExit finishes before Radix modal opens
+				window.setTimeout(() => {
+					useEditorStore.getState().setIsCreatingVar(true);
+				}, 0);
 			}
+		};
+
+		const preventEditorBlur = (e: React.MouseEvent) => {
+			// Keep suggestion open until click handler runs (TipTap closes on blur)
+			e.preventDefault();
 		};
 
 		return (
@@ -102,6 +104,7 @@ export const VariablesDropdown = forwardRef(
 							<button
 								key={item}
 								type="button"
+								onMouseDown={preventEditorBlur}
 								onClick={() => selectItem(index)}
 								className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left font-medium text-xs transition-colors ${
 									isSelected
@@ -120,6 +123,7 @@ export const VariablesDropdown = forwardRef(
 				{/* Create Option */}
 				<button
 					type="button"
+					onMouseDown={preventEditorBlur}
 					onClick={() => selectItem(filtered.length)}
 					className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left font-semibold text-xs transition-colors ${
 						selectedIndex === filtered.length

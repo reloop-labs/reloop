@@ -5,6 +5,7 @@ import { AlertTriangle } from "lucide-react";
 import type React from "react";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
+import { normalizeTemplateVariableName } from "#/features/templates/lib/template-variables";
 
 const fetcher = (url: string) =>
 	fetch(url, { credentials: "include" }).then((r) => r.json());
@@ -29,9 +30,9 @@ export function VariableNodeView({
 	const variables = templateData?.variables ?? [];
 	const matchedVar = variables.find((v: any) => {
 		if (typeof v === "string") {
-			return v.replace(/^\{\{|\}\}$/g, "").trim() === name;
+			return normalizeTemplateVariableName(v) === name;
 		}
-		return v?.name === name;
+		return normalizeTemplateVariableName(v?.name ?? "") === name;
 	});
 
 	const hasDefaultValue =

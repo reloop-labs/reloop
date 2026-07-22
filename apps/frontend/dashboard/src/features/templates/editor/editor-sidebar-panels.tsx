@@ -20,10 +20,14 @@ import {
 	Trash2,
 	X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
+import {
+	mapTemplateVariables,
+	normalizeTemplateVariableName,
+} from "#/features/templates/lib/template-variables";
 import { DeleteTemplateVariableModal } from "./delete-template-variable-modal";
 import { EditTemplateVariableModal } from "./edit-template-variable-modal";
 import { useEditorStore } from "./use-editor-store";
@@ -70,22 +74,42 @@ export function VariablesPanel({ onClose }: PanelProps) {
 	}
 
 	const rawVars = templateData?.variables ?? [];
-	const detectedVars: MappedVariable[] = rawVars.map(
-		(v: any): MappedVariable => {
+	const detectedVars: MappedVariable[] = mapTemplateVariables(rawVars);
+	const repairedKeyRef = useRef<string | null>(null);
+
+	// Persist cleanup for names corrupted by the old brace-stripping bug (`{first_name}`)
+	useEffect(() => {
+		if (!templateId || !Array.isArray(rawVars) || rawVars.length === 0) return;
+
+		const needsRepair = rawVars.some((v: unknown) => {
 			if (typeof v === "string") {
-				return {
-					name: v.replace(/^\{\{|\}\}$/g, "").trim(),
-					type: "string" as const,
-					defaultValue: null,
-				};
+				return v !== normalizeTemplateVariableName(v);
 			}
-			return {
-				name: v?.name ?? "",
-				type: (v?.type ?? "string") as "string" | "number",
-				defaultValue: v?.defaultValue ?? null,
-			};
-		},
-	);
+			if (v && typeof v === "object" && "name" in v) {
+				const name = String((v as { name?: string }).name ?? "");
+				return name !== normalizeTemplateVariableName(name);
+			}
+			return false;
+		});
+
+		if (!needsRepair) return;
+		if (repairedKeyRef.current === templateId) return;
+		repairedKeyRef.current = templateId;
+
+		const cleaned = mapTemplateVariables(rawVars);
+		void fetch(`/api/template/v1/${templateId}`, {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			credentials: "include",
+			body: JSON.stringify({ variables: cleaned }),
+		})
+			.then((res) => {
+				if (res.ok) return mutate();
+			})
+			.catch(() => {
+				repairedKeyRef.current = null;
+			});
+	}, [templateId, rawVars, mutate]);
 
 	const { editor } = useCurrentEditor();
 
@@ -118,6 +142,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 				headers: {
 					"Content-Type": "application/json",
 				},
+				credentials: "include",
 				body: JSON.stringify({
 					variables: updatedVariables,
 				}),
@@ -150,6 +175,7 @@ export function VariablesPanel({ onClose }: PanelProps) {
 				headers: {
 					"Content-Type": "application/json",
 				},
+				credentials: "include",
 				body: JSON.stringify({
 					variables: updatedVariables,
 				}),
@@ -173,17 +199,29 @@ export function VariablesPanel({ onClose }: PanelProps) {
 	return (
 		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a]">
 			{/* ── Header ── */}
-			<div className="flex shrink-0 items-center justify-between pt-3 pr-4 pb-3 pl-6">
+			<div className="flex shrink-0 items-center justify-between gap-2 pt-3 pr-4 pb-3 pl-6">
 				<h2 className="font-semibold text-lg text-zinc-900 dark:text-zinc-50">
 					Variable
 				</h2>
-				<button
-					type="button"
-					onClick={() => onClose()}
-					className="rounded-lg p-1.5 text-zinc-400 transition-all hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-300"
-				>
-					<X size={18} />
-				</button>
+				<div className="flex items-center gap-1">
+					<Button.Root
+						type="button"
+						variant="neutral"
+						mode="stroke"
+						size="xxsmall"
+						onClick={() => setIsCreatingVar(true)}
+					>
+						<Plus size={12} />
+						Create
+					</Button.Root>
+					<button
+						type="button"
+						onClick={() => onClose()}
+						className="rounded-lg p-1.5 text-zinc-400 transition-all hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-300"
+					>
+						<X size={18} />
+					</button>
+				</div>
 			</div>
 
 			{/* ── Scrollable Body ── */}
@@ -203,22 +241,17 @@ export function VariablesPanel({ onClose }: PanelProps) {
 						<p className="font-medium text-text-strong-950 text-xs dark:text-zinc-300">
 							No variables yet
 						</p>
-						<p className="mt-2 mb-4 text-[11px] text-text-soft-400 leading-normal dark:text-zinc-500">
-							Type{" "}
+						<p className="mt-2 text-[11px] text-text-soft-400 leading-normal dark:text-zinc-500">
+							Create a variable or type{" "}
+							<code className="rounded bg-bg-soft-200 px-1 font-mono dark:bg-zinc-800">
+								{"{{variable}}"}
+							</code>{" "}
+							or{" "}
 							<code className="rounded bg-bg-soft-200 px-1 font-mono dark:bg-zinc-800">
 								{"{{{variable}}}"}
 							</code>{" "}
 							in your email
 						</p>
-						<Button.Root
-							type="button"
-							variant="neutral"
-							size="xxsmall"
-							onClick={() => setIsCreatingVar(true)}
-						>
-							<Plus size={12} />
-							Create Variable
-						</Button.Root>
 					</div>
 				) : (
 					<div className="space-y-2 px-5">
@@ -232,8 +265,8 @@ export function VariablesPanel({ onClose }: PanelProps) {
 									{/* Top Row: Name and Type Badge */}
 									<div className="flex items-center justify-between">
 										<div className="flex min-w-0 items-center gap-1.5">
-											<span className="truncate font-semibold text-text-strong-950 text-xs dark:text-zinc-100">
-												{"{{{ "} {v.name} {" }}}"}
+											<span className="truncate font-mono font-semibold text-text-strong-950 text-xs dark:text-zinc-100">
+												{key}
 											</span>
 										</div>
 
@@ -652,22 +685,7 @@ export function TestPanel({ onClose }: PanelProps) {
 	}
 
 	const rawVars = templateData?.variables ?? [];
-	const detectedVars: MappedVariable[] = rawVars.map(
-		(v: any): MappedVariable => {
-			if (typeof v === "string") {
-				return {
-					name: v.replace(/^\{\{|\}\}$/g, "").trim(),
-					type: "string" as const,
-					defaultValue: null,
-				};
-			}
-			return {
-				name: v?.name ?? "",
-				type: (v?.type ?? "string") as "string" | "number",
-				defaultValue: v?.defaultValue ?? null,
-			};
-		},
-	);
+	const detectedVars: MappedVariable[] = mapTemplateVariables(rawVars);
 
 	// State for variable values entered by the user
 	const [variableValues, setVariableValues] = useState<Record<string, string>>(

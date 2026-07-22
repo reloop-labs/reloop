@@ -121,12 +121,16 @@ export const AddTemplateVariableModal = ({
 	};
 
 	const handleFormSubmit = handleSubmit(async (data) => {
-		await onAdd(
-			data.variableName,
-			data.variableType,
-			data.defaultValue.trim() || null,
-		);
-		handleOpenChange(false);
+		try {
+			await onAdd(
+				data.variableName,
+				data.variableType,
+				data.defaultValue.trim() || null,
+			);
+			handleOpenChange(false);
+		} catch {
+			// Keep modal open on failure; caller surfaces the error toast
+		}
 	});
 
 	const variableNameRegister = register("variableName");

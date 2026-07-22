@@ -9,6 +9,10 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
+import {
+	formatTemplateVariable,
+	mapTemplateVariables,
+} from "#/features/templates/lib/template-variables";
 import { DeleteTemplateVariableModal } from "../delete-template-variable-modal";
 import Breadcrumb from "./breadcrumb";
 import { ColorPicker } from "./color-picker";
@@ -73,12 +77,8 @@ function VariableInspectorCard({ name }: { name: string }) {
 		(url) => fetch(url, { credentials: "include" }).then((res) => res.json()),
 	);
 
-	const variables = templateData?.variables ?? [];
-	const matchedVar = variables.find((v: any) => {
-		const vName =
-			typeof v === "string" ? v.replace(/^\{\{|\}\}$/g, "").trim() : v?.name;
-		return vName === name;
-	});
+	const variables = mapTemplateVariables(templateData?.variables);
+	const matchedVar = variables.find((v) => v.name === name);
 
 	const varType = matchedVar?.type ?? "string";
 	const defaultValue = matchedVar?.defaultValue ?? "";
@@ -105,18 +105,9 @@ function VariableInspectorCard({ name }: { name: string }) {
 				type: localType,
 				defaultValue: localDefaultValue,
 			};
-			const updatedVariables = variables.map((v: any) => {
-				const vName =
-					typeof v === "string"
-						? v.replace(/^\{\{|\}\}$/g, "").trim()
-						: v?.name;
-				if (vName === name) {
-					return updatedVar;
-				}
-				return typeof v === "string"
-					? { name: vName, type: "string", defaultValue: "" }
-					: v;
-			});
+			const updatedVariables = variables.map((v) =>
+				v.name === name ? updatedVar : v,
+			);
 
 			// Capture the selection before mutation
 			const selectionRange = editor
@@ -128,6 +119,7 @@ function VariableInspectorCard({ name }: { name: string }) {
 				headers: {
 					"Content-Type": "application/json",
 				},
+				credentials: "include",
 				body: JSON.stringify({
 					variables: updatedVariables,
 				}),
@@ -170,19 +162,14 @@ function VariableInspectorCard({ name }: { name: string }) {
 		if (!templateId) return;
 		setIsDeleting(true);
 		try {
-			const updatedVariables = variables.filter((v: any) => {
-				const vName =
-					typeof v === "string"
-						? v.replace(/^\{\{|\}\}$/g, "").trim()
-						: v?.name;
-				return vName !== name;
-			});
+			const updatedVariables = variables.filter((v) => v.name !== name);
 
 			const response = await fetch(`/api/template/v1/${templateId}`, {
 				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
 				},
+				credentials: "include",
 				body: JSON.stringify({
 					variables: updatedVariables,
 				}),
@@ -213,9 +200,7 @@ function VariableInspectorCard({ name }: { name: string }) {
 				{/* ── Name (Read-only reference) ── */}
 				<div className="flex flex-col gap-1">
 					<div className="select-all font-mono font-semibold text-text-strong-950 dark:text-zinc-200">
-						{"{{{ "}
-						{name}
-						{" }}}"}
+						{formatTemplateVariable(name, 3)}
 					</div>
 				</div>
 

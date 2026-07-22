@@ -1,6 +1,9 @@
 import { TemplateErrors } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
-import { extractVariablesFromContent } from "@be/template/utils/extract-variables";
+import {
+	extractVariablesFromContent,
+	normalizeVariableName,
+} from "@be/template/utils/extract-variables";
 import type { TemplateBlock } from "@reloop/db/schema";
 import { log } from "evlog";
 
@@ -25,7 +28,7 @@ export async function createTemplate(params: {
 			content && content.length > 0 ? extractVariablesFromContent(content) : [];
 
 		const variables = rawVariables.map((raw) => ({
-			name: raw.replace(/^\{\{|\}\}$/g, "").trim(),
+			name: normalizeVariableName(raw),
 			type: "string" as const,
 			defaultValue: null,
 		}));

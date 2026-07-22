@@ -1,62 +1,109 @@
 import type { TemplateBlock } from "@reloop/db/schema";
 
-const VARIABLE_REGEX = /\{\{\{([^{}]+)\}\}\}/g;
+/** Supported: {{{name}}} (3) or {{name}} (2). Single {name} is not supported. */
+const TRIPLE_BRACE_REGEX = /\{\{\{([^{}]+)\}\}\}/g;
+const DOUBLE_BRACE_REGEX = /\{\{([^{}]+)\}\}/g;
 
 /**
- * Extract all unique {{{variable}}} placeholders from a TipTap JSON content tree.
+ * Normalize a placeholder or stored key to the bare variable name.
  *
- * Walks the content recursively, inspecting:
- *   - Text node content strings
- *   - Node attribute values (strings only — e.g. link hrefs, button labels)
+ * Supported placeholder forms: `{{name}}` (2) and `{{{name}}}` (3).
+ * Single-brace `{name}` is NOT a valid syntax — brace characters on a stored
+ * key are only stripped as repair for legacy corruption.
+ */
+export function normalizeVariableName(raw: string): string {
+	const trimmed = raw.trim();
+
+	const triple = trimmed.match(/^\{\{\{\s*([^{}]+?)\s*\}\}\}$/);
+	if (triple) return triple[1].trim();
+
+	const double = trimmed.match(/^\{\{\s*([^{}]+?)\s*\}\}$/);
+	if (double) return double[1].trim();
+
+	// Legacy repair only — not a supported placeholder form
+	if (/[{}]/.test(trimmed)) {
+		return trimmed.replace(/[{}]/g, "").trim();
+	}
+
+	return trimmed;
+}
+
+/**
+ * Extract unique variables from TipTap / email-editor content.
  *
- * @param content - Array of TipTap/email-editor block nodes
- * @returns De-duplicated, sorted array of full placeholder strings, e.g. ["{{{company.name}}}", "{{{user.firstName}}}"]
+ * Only `{{name}}` and `{{{name}}}` text placeholders are recognized,
+ * plus TipTap `variable` nodes (`attrs.name`).
  */
 export function extractVariablesFromContent(
 	content: TemplateBlock[] | Record<string, unknown>[],
 ): string[] {
 	const found = new Set<string>();
 
+	function addName(name: string) {
+		const normalized = normalizeVariableName(name);
+		if (normalized) {
+			found.add(`{{{${normalized}}}}`);
+		}
+	}
+
 	function extractFromString(value: string) {
 		let match: RegExpExecArray | null;
-		VARIABLE_REGEX.lastIndex = 0;
+		TRIPLE_BRACE_REGEX.lastIndex = 0;
 		// biome-ignore lint/suspicious/noAssignInExpressions: intentional regex loop
-		while ((match = VARIABLE_REGEX.exec(value)) !== null) {
-			found.add(match[0]); // e.g. "{{user.firstName}}"
+		while ((match = TRIPLE_BRACE_REGEX.exec(value)) !== null) {
+			addName(match[1]);
+		}
+		DOUBLE_BRACE_REGEX.lastIndex = 0;
+		// biome-ignore lint/suspicious/noAssignInExpressions: intentional regex loop
+		while ((match = DOUBLE_BRACE_REGEX.exec(value)) !== null) {
+			// Skip matches nested inside an already-handled triple-brace placeholder
+			const start = match.index;
+			if (
+				value[start - 1] === "{" ||
+				value[start + match[0].length] === "}"
+			) {
+				continue;
+			}
+			addName(match[1]);
 		}
 	}
 
 	function walkNode(node: Record<string, unknown>) {
-		// Inspect text content
+		if (node.type === "variable") {
+			const attrs = node.attrs as Record<string, unknown> | undefined;
+			if (typeof attrs?.name === "string" && attrs.name.trim()) {
+				addName(attrs.name);
+			}
+		}
+
 		if (typeof node.text === "string") {
 			extractFromString(node.text);
 		}
 
-		// Inspect all string attribute values (href, src, alt, label, etc.)
 		const attrs = node.attrs ?? node.props;
 		if (attrs && typeof attrs === "object") {
-			for (const val of Object.values(attrs as Record<string, unknown>)) {
+			for (const [key, val] of Object.entries(
+				attrs as Record<string, unknown>,
+			)) {
+				if (node.type === "variable" && key === "name") continue;
 				if (typeof val === "string") {
 					extractFromString(val);
 				}
 			}
 		}
 
-		// Recurse into content array
 		if (Array.isArray(node.content)) {
 			for (const child of node.content) {
 				walkNode(child as Record<string, unknown>);
 			}
 		}
 
-		// Recurse into children array (email-editor block format)
 		if (Array.isArray(node.children)) {
 			for (const child of node.children) {
 				walkNode(child as Record<string, unknown>);
 			}
 		}
 
-		// Recurse into marks (inline marks like links carry href)
 		if (Array.isArray(node.marks)) {
 			for (const mark of node.marks) {
 				walkNode(mark as Record<string, unknown>);

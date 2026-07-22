@@ -1,7 +1,10 @@
 import { TemplateErrors } from "@be/template/error/template.error";
 import { templateModel } from "@be/template/model/template.model";
 import { templateVersionModel } from "@be/template/model/template-version.model";
-import { extractVariablesFromContent } from "@be/template/utils/extract-variables";
+import {
+	extractVariablesFromContent,
+	normalizeVariableName,
+} from "@be/template/utils/extract-variables";
 import type * as schema from "@reloop/db/schema";
 import type { TemplateBlock } from "@reloop/db/schema";
 import { log } from "evlog";
@@ -86,9 +89,13 @@ export async function createVersion(params: {
 			const rawVariables = extractVariablesFromContent(content);
 			const existingVars = existing.variables ?? [];
 			variables = rawVariables.map((raw) => {
-				const name = raw.replace(/^\{\{|\}\}$/g, "").trim();
-				const existingVar = existingVars.find((v) => v.name === name);
-				if (existingVar) return existingVar;
+				const name = normalizeVariableName(raw);
+				const existingVar = existingVars.find(
+					(v) => normalizeVariableName(v.name) === name,
+				);
+				if (existingVar) {
+					return { ...existingVar, name };
+				}
 				return {
 					name,
 					type: "string" as const,

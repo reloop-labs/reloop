@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
+import { mapTemplateVariables } from "#/features/templates/lib/template-variables";
 import { AddTemplateVariableModal } from "./add-template-variable-modal";
 import {
 	getRandomColor,
@@ -140,7 +141,12 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 		type: "string" | "number",
 		defaultValue: string | null,
 	) => {
-		if (!name.trim() || !roomId) return;
+		if (!name.trim()) {
+			throw new Error("Variable name is required");
+		}
+		if (!roomId) {
+			throw new Error("Template not loaded");
+		}
 
 		setIsSavingConfig(true);
 		try {
@@ -154,7 +160,6 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 						attrs: { name },
 					})
 					.run();
-				toast.success(`Inserted variable ${name}`);
 			} else {
 				const placeholder = `{{{${name}}}}`;
 				navigator.clipboard.writeText(placeholder);
@@ -162,26 +167,12 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 			}
 
 			// 2. Add to template variables list in DB
-			const rawVars = templateData?.variables ?? [];
-			const detectedVars = rawVars.map((v: any) => {
-				if (typeof v === "string") {
-					return {
-						name: v.replace(/^\{\{|\}\}$/g, "").trim(),
-						type: "string" as const,
-						defaultValue: null,
-					};
-				}
-				return {
-					name: v?.name ?? "",
-					type: (v?.type ?? "string") as "string" | "number",
-					defaultValue: v?.defaultValue ?? null,
-				};
-			});
+			const detectedVars = mapTemplateVariables(templateData?.variables);
 
 			const newVar = { name, type, defaultValue };
-			const exists = detectedVars.some((v: any) => v.name === name);
+			const exists = detectedVars.some((v) => v.name === name);
 			const updatedVariables = exists
-				? detectedVars.map((v: any) => (v.name === name ? newVar : v))
+				? detectedVars.map((v) => (v.name === name ? newVar : v))
 				: [...detectedVars, newVar];
 
 			const response = await fetch(`/api/template/v1/${roomId}`, {
@@ -189,20 +180,24 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 				headers: {
 					"Content-Type": "application/json",
 				},
+				credentials: "include",
 				body: JSON.stringify({
 					variables: updatedVariables,
 				}),
 			});
 
 			if (!response.ok) {
-				const err = await response.json();
-				throw new Error(err.message || "Failed to save variable configuration");
+				const err = await response.json().catch(() => null);
+				throw new Error(
+					err?.message || err?.error || "Failed to save variable configuration",
+				);
 			}
 
-			toast.success(`Variable ${name} configured successfully`);
-			mutate();
+			toast.success(`Variable ${name} created`);
+			await mutate();
 		} catch (error: any) {
 			toast.error(error.message || "Something went wrong");
+			throw error;
 		} finally {
 			setIsSavingConfig(false);
 		}
