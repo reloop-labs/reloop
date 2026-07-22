@@ -1,10 +1,14 @@
 import { cn } from "@reloop/ui/cn";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { AiThinkingStatus } from "./ai-thinking-status";
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
+/** animate-text `soft-blur-in` settle, whole-target, UI-budget (not per-char). */
+const SOFT_BLUR_EASE = [0.22, 1, 0.36, 1] as const;
+/** animate-text `micro-scale-fade` enter. */
+const MICRO_SCALE_EASE = [0.32, 0.72, 0, 1] as const;
 
 const modKey =
 	typeof navigator !== "undefined" &&
@@ -101,14 +105,27 @@ export const AiComposePreview = ({
 				{loading ? (
 					<AiThinkingStatus hasStreamText={hasText} />
 				) : (
-					<div className="flex min-w-0 items-center gap-2">
+					<motion.div
+						initial={
+							reduceMotion
+								? { opacity: 0 }
+								: { opacity: 0, scale: 0.96 }
+						}
+						animate={{ opacity: 1, scale: 1 }}
+						transition={
+							reduceMotion
+								? { duration: 0.12 }
+								: { duration: 0.24, ease: MICRO_SCALE_EASE }
+						}
+						className="flex min-w-0 items-center gap-2"
+					>
 						<span className="font-medium text-[11px] text-mail-muted uppercase tracking-[0.06em]">
 							Suggestion
 						</span>
 						<span className="truncate text-[12px] text-mail-muted/80">
 							Review, then use it in the editor
 						</span>
-					</div>
+					</motion.div>
 				)}
 				<button
 					type="button"
@@ -119,54 +136,102 @@ export const AiComposePreview = ({
 				</button>
 			</div>
 
-			{hasText ? (
-				<div className={cn(compact ? "px-4 pb-3" : "px-5 pb-3")}>
-					<div
-						ref={draftScrollRef}
-						className="max-h-[220px] overflow-y-auto whitespace-pre-wrap text-[13px] leading-[1.55] text-mail-foreground"
+			<AnimatePresence initial={false}>
+				{hasText ? (
+					<motion.div
+						key="stream-body"
+						initial={
+							reduceMotion
+								? { opacity: 0 }
+								: {
+										opacity: 0,
+										y: 8,
+										filter: "blur(6px)",
+									}
+						}
+						animate={{
+							opacity: 1,
+							y: 0,
+							filter: "blur(0px)",
+						}}
+						exit={
+							reduceMotion
+								? { opacity: 0 }
+								: { opacity: 0, y: -4 }
+						}
+						transition={
+							reduceMotion
+								? { duration: 0.12 }
+								: { duration: 0.28, ease: SOFT_BLUR_EASE }
+						}
+						className={cn(compact ? "px-4 pb-3" : "px-5 pb-3")}
 					>
-						{text}
-						{loading ? (
-							<span
-								aria-hidden
-								className="ml-0.5 inline-block h-[1em] w-[2px] translate-y-[2px] animate-pulse bg-mail-foreground/70 align-baseline"
-							/>
-						) : null}
-					</div>
-				</div>
-			) : null}
+						<div
+							ref={draftScrollRef}
+							className="max-h-[220px] overflow-y-auto whitespace-pre-wrap text-[13px] leading-[1.55] text-mail-foreground"
+						>
+							{text}
+							{loading ? (
+								<span
+									aria-hidden
+									className="ml-0.5 inline-block h-[1em] w-[2px] translate-y-[2px] animate-pulse bg-mail-foreground/70 align-baseline"
+								/>
+							) : null}
+						</div>
+					</motion.div>
+				) : null}
+			</AnimatePresence>
 
-			{ready ? (
-				<div
-					className={cn(
-						"flex items-center justify-end gap-2 border-mail-border/30 border-t",
-						compact ? "px-4 py-2" : "px-5 py-2.5",
-					)}
-				>
-					<button
-						type="button"
-						onClick={onReject}
-						className="inline-flex h-7 items-center rounded-md px-2.5 font-medium text-[12px] text-mail-muted transition-[color,background-color,transform] duration-150 ease-out hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.97]"
+			<AnimatePresence initial={false}>
+				{ready ? (
+					<motion.div
+						key="actions"
+						initial={
+							reduceMotion
+								? { opacity: 0 }
+								: { opacity: 0, scale: 0.96 }
+						}
+						animate={{ opacity: 1, scale: 1 }}
+						exit={
+							reduceMotion
+								? { opacity: 0 }
+								: { opacity: 0, scale: 0.96 }
+						}
+						transition={
+							reduceMotion
+								? { duration: 0.1 }
+								: { duration: 0.22, ease: MICRO_SCALE_EASE }
+						}
+						className={cn(
+							"flex items-center justify-end gap-2 border-mail-border/30 border-t",
+							compact ? "px-4 py-2" : "px-5 py-2.5",
+						)}
 					>
-						Discard
-					</button>
-					<button
-						type="button"
-						onClick={onAccept}
-						className="inline-flex h-7 items-center gap-1.5 rounded-md bg-mail-foreground px-2.5 font-medium text-[12px] text-mail-background transition-[opacity,transform] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
-					>
-						<span>Use draft</span>
-						<span className="flex items-center gap-0.5 opacity-70">
-							<KbdKeyOutline className="h-3.5 w-3.5 border-mail-background/25 font-sans text-[8px] text-mail-background">
-								{modKey === "⌘" ? "⌘" : "⌃"}
-							</KbdKeyOutline>
-							<KbdKeyOutline className="h-3.5 w-3.5 border-mail-background/25 font-sans text-[8px] text-mail-background">
-								↵
-							</KbdKeyOutline>
-						</span>
-					</button>
-				</div>
-			) : null}
+						<button
+							type="button"
+							onClick={onReject}
+							className="inline-flex h-7 items-center rounded-md px-2.5 font-medium text-[12px] text-mail-muted transition-[color,background-color,transform] duration-150 ease-out hover:bg-[var(--inbox-hover)] hover:text-mail-foreground active:scale-[0.97]"
+						>
+							Discard
+						</button>
+						<button
+							type="button"
+							onClick={onAccept}
+							className="inline-flex h-7 items-center gap-1.5 rounded-md bg-mail-foreground px-2.5 font-medium text-[12px] text-mail-background transition-[opacity,transform] duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
+						>
+							<span>Use draft</span>
+							<span className="flex items-center gap-0.5 opacity-70">
+								<KbdKeyOutline className="h-3.5 w-3.5 border-mail-background/25 font-sans text-[8px] text-mail-background">
+									{modKey === "⌘" ? "⌘" : "⌃"}
+								</KbdKeyOutline>
+								<KbdKeyOutline className="h-3.5 w-3.5 border-mail-background/25 font-sans text-[8px] text-mail-background">
+									↵
+								</KbdKeyOutline>
+							</span>
+						</button>
+					</motion.div>
+				) : null}
+			</AnimatePresence>
 		</motion.section>
 	);
 };
