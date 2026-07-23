@@ -78,7 +78,7 @@ export function DeveloperPlayground({
 		<div className="flex flex-col gap-4">
 			<IntegrationModeTabs value={mode} onChange={onModeChange} />
 			{isAi ? (
-				<AiPromptBlock prompt={aiPrompt} className="max-w-xl" />
+				<AiPromptBlock prompt={aiPrompt} />
 			) : (
 				<div className="flex flex-col gap-4">
 					<IntegrationLanguagePills value={lang} onChange={onLangChange} />
