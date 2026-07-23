@@ -1,11 +1,9 @@
 import * as Button from "@reloop/ui/button";
-import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { useQueryState } from "nuqs";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
@@ -19,7 +17,6 @@ export function DeleteApiKeyModal({
 	onDeleteSuccess?: () => void;
 }) {
 	const [deleteId, setDeleteId] = useQueryState("delete");
-	const [confirmationText, setConfirmationText] = useState("");
 	const [isDeleting, setIsDeleting] = useState(false);
 	const invalidate = useInvalidateApiKeys();
 
@@ -28,7 +25,7 @@ export function DeleteApiKeyModal({
 		apiKeyToDelete?.name ||
 		apiKeyToDelete?.start ||
 		apiKeyToDelete?.prefix ||
-		"Unnamed";
+		"Unnamed key";
 
 	const handleDelete = async () => {
 		if (!apiKeyToDelete) return;
@@ -39,7 +36,6 @@ export function DeleteApiKeyModal({
 			});
 			toast.success("API key deleted successfully");
 			void setDeleteId(null);
-			setConfirmationText("");
 			await invalidate();
 			onDeleteSuccess?.();
 		} catch (error) {
@@ -53,22 +49,15 @@ export function DeleteApiKeyModal({
 	};
 
 	useHotkeys(
-		"mod+enter",
+		"enter",
 		(e) => {
 			e.preventDefault();
-			if (confirmationText === displayName && !isDeleting) {
+			if (apiKeyToDelete && !isDeleting) {
 				void handleDelete();
 			}
 		},
-		{ enableOnFormTags: ["INPUT"], enabled: !!deleteId },
+		{ enabled: !!deleteId },
 	);
-
-	useEffect(() => {
-		if (!deleteId) {
-			const t = setTimeout(() => setConfirmationText(""), 300);
-			return () => clearTimeout(t);
-		}
-	}, [deleteId]);
 
 	return (
 		<Modal.Root
@@ -78,59 +67,78 @@ export function DeleteApiKeyModal({
 			}}
 		>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-stroke-soft-100 p-0 sm:max-w-[420px] dark:border-stroke-soft-100/40"
-				showClose={false}
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 sm:max-w-[460px] dark:border-stroke-soft-100/40"
+				showClose={true}
 			>
-				<div className="px-5 pt-5 pb-4">
-					<div className="flex h-10 w-10 items-center justify-center rounded-full bg-error-base/10 text-error-base">
-						<Icon name="trash" className="h-5 w-5" />
-					</div>
-					<Modal.Title className="mt-3 font-semibold text-label-md text-text-strong-950">
+				{/* Header */}
+				<div className="pr-6">
+					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 						Delete API key
 					</Modal.Title>
-					<p className="mt-1 text-paragraph-sm text-text-sub-600">
-						This cannot be undone. Type{" "}
-						<span className="font-medium text-text-strong-950">
-							{displayName}
-						</span>{" "}
-						to confirm.
+					<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
+						Are you sure you want to delete this API key? This action cannot be
+						undone.
 					</p>
-					<div className="mt-4">
-						<Input.Root size="small">
-							<Input.Wrapper>
-								<Input.Input
-									value={confirmationText}
-									onChange={(e) => setConfirmationText(e.target.value)}
-									placeholder={displayName}
-									autoFocus
-								/>
-							</Input.Wrapper>
-						</Input.Root>
+				</div>
+
+				{/* Key Details Card */}
+				<div className="mt-5 space-y-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
+					<div>
+						<p className="font-normal text-text-sub-600 text-xs">
+							API key name
+						</p>
+						<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
+							{displayName}
+						</p>
+					</div>
+					<div>
+						<p className="font-normal text-text-sub-600 text-xs">
+							API key prefix
+						</p>
+						<div className="mt-1 flex items-center">
+							<span className="font-medium font-mono text-sm">
+								{apiKeyToDelete?.start || apiKeyToDelete?.prefix || "rl_..."}
+							</span>
+						</div>
 					</div>
 				</div>
-				<div className="flex justify-end gap-2 border-stroke-soft-100 border-t px-5 py-3.5 dark:border-stroke-soft-100/50">
+
+				{/* Warning Banner */}
+				<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
+					<span className="font-bold text-[#6D4000] dark:text-amber-100">
+						Warning:
+					</span>{" "}
+					Deleting this API key will permanently remove it along with all its
+					permissions. Any services using this API key will stop working
+					immediately.
+				</div>
+
+				{/* Footer Actions */}
+				<div className="mt-6 flex items-center justify-end gap-3">
 					<Button.Root
+						type="button"
 						variant="neutral"
-						mode="stroke"
-						size="xsmall"
+						mode="ghost"
+						size="small"
 						onClick={() => void setDeleteId(null)}
 						disabled={isDeleting}
 					>
 						Cancel
 					</Button.Root>
 					<Button.Root
-						variant="error"
-						size="xsmall"
-						disabled={confirmationText !== displayName || isDeleting}
+						type="button"
+						variant="primary"
+						size="small"
+						disabled={isDeleting}
 						onClick={() => void handleDelete()}
 					>
 						{isDeleting ? (
 							<>
-								<Spinner size={12} color="currentColor" />
+								<Spinner size={14} color="currentColor" />
 								Deleting...
 							</>
 						) : (
-							"Delete key"
+							"Delete API key"
 						)}
 					</Button.Root>
 				</div>

@@ -1,11 +1,10 @@
 import * as Button from "@reloop/ui/button";
-import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 import * as Modal from "@reloop/ui/modal";
+import Spinner from "@reloop/ui/spinner";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import axios from "axios";
 import { useQueryState } from "nuqs";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useInvalidateDomains } from "../hooks/use-domains-query";
@@ -14,9 +13,6 @@ import type { Domain } from "../types";
 export function DeleteDomainModal({ domains }: { domains: Domain[] }) {
 	const [deleteId, setDeleteId] = useQueryState("delete");
 	const [isDeleting, setIsDeleting] = useState(false);
-	const [isValidationPhraseCopied, setIsValidationPhraseCopied] =
-		useState(false);
-	const [confirmationText, setConfirmationText] = useState("");
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const navigate = useNavigate();
 	const invalidate = useInvalidateDomains();
@@ -38,7 +34,6 @@ export function DeleteDomainModal({ domains }: { domains: Domain[] }) {
 			await invalidate();
 			toast.success(`${domainToDelete.domain} deleted successfully`);
 			void setDeleteId(null);
-			setConfirmationText("");
 			if (isOnDetailPage) {
 				setTimeout(() => {
 					void navigate({ to: "/domain" });
@@ -55,22 +50,15 @@ export function DeleteDomainModal({ domains }: { domains: Domain[] }) {
 	};
 
 	useHotkeys(
-		"mod+enter",
+		"enter",
 		(e) => {
 			e.preventDefault();
-			if (confirmationText === domainToDelete?.domain && !isDeleting) {
+			if (domainToDelete && !isDeleting) {
 				void handleDelete();
 			}
 		},
-		{ enableOnFormTags: ["INPUT"], enabled: !!deleteId },
+		{ enabled: !!deleteId },
 	);
-
-	useEffect(() => {
-		if (!deleteId) {
-			const t = setTimeout(() => setConfirmationText(""), 300);
-			return () => clearTimeout(t);
-		}
-	}, [deleteId]);
 
 	return (
 		<Modal.Root
@@ -80,109 +68,78 @@ export function DeleteDomainModal({ domains }: { domains: Domain[] }) {
 			}}
 		>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-stroke-soft-100 p-0 sm:max-w-[480px] dark:border-stroke-soft-100/40"
-				showClose={false}
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 sm:max-w-[460px] dark:border-stroke-soft-100/40"
+				showClose={true}
 			>
-				<form
-					onSubmit={(e) => {
-						e.preventDefault();
-						if (confirmationText === domainToDelete?.domain && !isDeleting) {
-							void handleDelete();
-						}
-					}}
-				>
-					<div className="px-5 pt-5 pb-4">
-						<div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-error-base/10">
-							<Icon name="trash" className="h-4 w-4 text-error-base" />
-						</div>
-						<Modal.Title className="font-semibold text-label-md text-text-strong-950">
-							Delete domain?
-						</Modal.Title>
-						<p className="mt-1 text-paragraph-sm text-text-sub-600">
-							This will stop all email delivery through this domain. Type{" "}
-							<span className="font-medium text-text-strong-950">
-								{domainToDelete?.domain}
-							</span>{" "}
-							to confirm.
+				{/* Header */}
+				<div className="pr-6">
+					<Modal.Title className="text-xl font-bold tracking-tight text-text-strong-950">
+						Delete domain
+					</Modal.Title>
+					<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
+						Are you sure you want to delete this domain? This will also disconnect
+						any active connectors and remove all routes associated with this domain.
+						This action cannot be undone.
+					</p>
+				</div>
+
+				{/* Domain Details Card */}
+				<div className="mt-5 space-y-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
+					<div>
+						<p className="text-xs text-text-sub-600 font-normal">Domain name</p>
+						<p className="mt-0.5 truncate text-sm font-semibold text-text-strong-950">
+							{domainToDelete?.domain}
 						</p>
-
-						<div className="mt-4 flex items-center gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
-							<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-error-base/10 text-error-base">
-								<Icon name="globe" className="h-5 w-5" />
-							</div>
-							<div className="min-w-0 flex-1">
-								<p className="truncate font-medium text-sm text-text-strong-950">
-									{domainToDelete?.domain}
-								</p>
-								<p className="mt-0.5 truncate font-mono text-text-sub-600 text-xs">
-									{domainToDelete?.id}
-								</p>
-							</div>
-							<button
-								type="button"
-								onClick={async () => {
-									try {
-										if (domainToDelete?.domain) {
-											await navigator.clipboard.writeText(
-												domainToDelete.domain,
-											);
-											setIsValidationPhraseCopied(true);
-											setTimeout(
-												() => setIsValidationPhraseCopied(false),
-												2000,
-											);
-										}
-									} catch {
-										toast.error("Failed to copy domain name");
-									}
-								}}
-								className="text-text-sub-600 transition-colors hover:text-text-strong-950"
-							>
-								<Icon
-									name={isValidationPhraseCopied ? "check" : "copy"}
-									className={`h-3.5 w-3.5 ${isValidationPhraseCopied ? "text-success-base" : ""}`}
-								/>
-							</button>
-						</div>
-
-						<div className="mt-4">
-							<Input.Root size="small">
-								<Input.Wrapper>
-									<Input.Input
-										value={confirmationText}
-										onChange={(e) => setConfirmationText(e.target.value)}
-										placeholder={domainToDelete?.domain}
-										autoFocus
-									/>
-								</Input.Wrapper>
-							</Input.Root>
-						</div>
 					</div>
-
-					<div className="flex justify-end gap-2 border-stroke-soft-100 border-t px-5 py-3.5 dark:border-stroke-soft-100/50">
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="stroke"
-							size="xsmall"
-							onClick={() => void setDeleteId(null)}
-							disabled={isDeleting}
-						>
-							Cancel
-						</Button.Root>
-						<Button.Root
-							type="submit"
-							variant="error"
-							size="xsmall"
-							disabled={
-								isDeleting || confirmationText !== domainToDelete?.domain
-							}
-						>
-							{isDeleting ? "Deleting..." : "Delete domain"}
-						</Button.Root>
+					<div>
+						<p className="text-xs text-text-sub-600 font-normal">Domain ID</p>
+						<p className="mt-0.5 break-all font-mono text-sm text-text-strong-950 dark:text-text-sub-600">
+							{domainToDelete?.id}
+						</p>
 					</div>
-				</form>
+				</div>
+
+				{/* Warning Banner */}
+				<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-xs leading-relaxed text-[#8A5300] dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
+					<span className="font-bold text-[#6D4000] dark:text-amber-100">
+						Warning:
+					</span>{" "}
+					Deleting this domain will permanently remove it along with all its routes
+					and connections. Any services using this domain will stop working. The
+					associated DNS records will not be removed and must be deleted manually.
+				</div>
+
+				{/* Footer Actions */}
+				<div className="mt-6 flex items-center justify-end gap-3">
+					<Button.Root
+						type="button"
+						variant="neutral"
+						mode="ghost"
+						size="small"
+						onClick={() => void setDeleteId(null)}
+						disabled={isDeleting}
+					>
+						Cancel
+					</Button.Root>
+					<Button.Root
+						type="button"
+						variant="primary"
+						size="small"
+						disabled={isDeleting}
+						onClick={() => void handleDelete()}
+					>
+						{isDeleting ? (
+							<>
+								<Spinner size={14} color="currentColor" />
+								Deleting...
+							</>
+						) : (
+							"Delete domain"
+						)}
+					</Button.Root>
+				</div>
 			</Modal.Content>
 		</Modal.Root>
 	);
 }
+
