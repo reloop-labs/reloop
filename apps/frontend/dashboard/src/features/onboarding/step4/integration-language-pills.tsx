@@ -3,21 +3,49 @@ import { AnimatePresence, motion } from "framer-motion";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { siGo, siNodedotjs, siPhp, siPython } from "simple-icons";
-import type { LanguageCode } from "./types";
+import type { IntegrationChoice } from "./types";
 
-const languages = [
-	{ id: "nodejs" as LanguageCode, label: "Node.js", icon: siNodedotjs },
-	{ id: "python" as LanguageCode, label: "Python", icon: siPython },
-	{ id: "go" as LanguageCode, label: "Go", icon: siGo },
-	{ id: "php" as LanguageCode, label: "PHP", icon: siPhp },
-] as const;
+type PillItem =
+	| { id: "ai"; label: string; hex: string; iconSvg: React.ReactNode }
+	| {
+			id: Exclude<IntegrationChoice, "ai">;
+			label: string;
+			hex: string;
+			iconPath: string;
+	  };
+
+// Sparkle SVG path (matches @reloop/ui sparkling icon shape)
+const SparkleIcon = ({ color }: { color: string }) => (
+	<svg
+		viewBox="0 0 16 16"
+		className="size-3.5 shrink-0"
+		fill={color}
+		xmlns="http://www.w3.org/2000/svg"
+		aria-hidden="true"
+	>
+		<path d="M8 1s-.75 3.25-2.5 4.5S1 8 1 8s3.25.75 4.5 2.5S8 15 8 15s.75-3.25 2.5-4.5S15 8 15 8s-3.25-.75-4.5-2.5S8 1 8 1Z" />
+	</svg>
+);
+
+const pills: PillItem[] = [
+	{
+		id: "ai",
+		label: "AI",
+		hex: "6366f1",
+		iconSvg: <SparkleIcon color="#6366f1" />,
+	},
+	{ id: "nodejs", label: "Node.js", hex: siNodedotjs.hex, iconPath: siNodedotjs.path },
+	{ id: "python", label: "Python", hex: siPython.hex, iconPath: siPython.path },
+	{ id: "go", label: "Go", hex: siGo.hex, iconPath: siGo.path },
+	{ id: "php", label: "PHP", hex: siPhp.hex, iconPath: siPhp.path },
+];
 
 export function IntegrationLanguagePills({
 	value,
 	onChange,
 }: {
-	value: LanguageCode;
-	onChange: (lang: LanguageCode) => void;
+	value: IntegrationChoice;
+	onChange: (choice: IntegrationChoice) => void;
 }) {
 	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(
 		undefined,
@@ -36,13 +64,13 @@ export function IntegrationLanguagePills({
 		setMounted(true);
 	}, []);
 
-	const activeTabIndex = languages.findIndex((lang) => lang.id === value);
+	const activeTabIndex = pills.findIndex((p) => p.id === value);
 	const highlightedTabIndex =
 		hoveredTabIdx !== undefined ? hoveredTabIdx : activeTabIndex;
-	const highlightedBrandColor =
-		highlightedTabIndex >= 0
-			? `#${languages[highlightedTabIndex]?.icon.hex}`
-			: undefined;
+	const highlightedPill = pills[highlightedTabIndex];
+	const highlightedBrandColor = highlightedPill
+		? `#${highlightedPill.hex}`
+		: undefined;
 
 	useEffect(() => {
 		if (!mounted) {
@@ -57,19 +85,12 @@ export function IntegrationLanguagePills({
 				return;
 			}
 
-			const position = {
-				width: button.offsetWidth,
-				height: button.offsetHeight,
-				left: button.offsetLeft,
-				top: button.offsetTop,
-			};
-
 			const pillInset = { x: 6, y: 3 };
 			setPillPosition({
-				width: position.width - pillInset.x * 2,
-				height: position.height - pillInset.y * 2 - 2,
-				left: position.left + pillInset.x,
-				top: position.top + pillInset.y,
+				width: button.offsetWidth - pillInset.x * 2,
+				height: button.offsetHeight - pillInset.y * 2 - 2,
+				left: button.offsetLeft + pillInset.x,
+				top: button.offsetTop + pillInset.y,
 			});
 		};
 
@@ -90,51 +111,51 @@ export function IntegrationLanguagePills({
 	return (
 		<div
 			ref={containerRef}
-			className="relative flex min-w-0 items-center overflow-x-auto"
+			className="relative flex min-w-0 flex-wrap items-center gap-1"
 		>
-			{languages.map((lang, index) => {
-				const isActive = value === lang.id;
-				const brandColor = `#${lang.icon.hex}`;
+			{pills.map((pill, index) => {
+				const isActive = value === pill.id;
 				const isHighlighted = index === highlightedTabIndex;
+				const brandColor = `#${pill.hex}`;
 
-				let textColorStyle: React.CSSProperties | undefined;
-				if (isHighlighted && pillPosition) {
-					textColorStyle = { color: "#ffffff" };
-				} else if (isActive) {
-					textColorStyle = { color: brandColor };
-				}
+				const iconColor = isHighlighted && pillPosition ? "#ffffff" : brandColor;
+				const textColor = isHighlighted && pillPosition ? "#ffffff" : isActive ? brandColor : undefined;
 
 				return (
 					<button
-						key={lang.id}
+						key={pill.id}
 						ref={(el) => {
 							tabButtonRefs.current[index] = el;
 						}}
 						type="button"
-						onClick={() => onChange(lang.id)}
+						onClick={() => onChange(pill.id)}
 						onPointerEnter={() => setHoveredTabIdx(index)}
 						onPointerLeave={() => setHoveredTabIdx(undefined)}
 						className={cn(
-							"relative z-10 flex shrink-0 items-center gap-2 px-4 py-2.5 font-medium text-sm transition-colors duration-150",
+							"relative z-10 flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 font-medium text-sm transition-colors duration-150",
 							isActive
-								? "text-text-strong-950 dark:text-white"
-								: "text-text-sub-600 dark:text-white/70",
+								? "border-transparent text-text-strong-950"
+								: "border-stroke-soft-100 text-text-sub-600 dark:border-stroke-soft-100/40 dark:text-white/70",
 						)}
-						style={textColorStyle}
+						style={{ color: textColor }}
 					>
-						<svg
-							viewBox="0 0 24 24"
-							className="size-3.5 shrink-0 transition-colors duration-150"
-							fill="currentColor"
-							xmlns="http://www.w3.org/2000/svg"
-							style={{
-								color: isHighlighted && pillPosition ? "#ffffff" : brandColor,
-							}}
-							aria-hidden="true"
-						>
-							<path d={lang.icon.path} />
-						</svg>
-						{lang.label}
+						{"iconSvg" in pill ? (
+							<span style={{ color: iconColor }}>
+								{pill.iconSvg}
+							</span>
+						) : (
+							<svg
+								viewBox="0 0 24 24"
+								className="size-3.5 shrink-0 transition-colors duration-150"
+								fill="currentColor"
+								xmlns="http://www.w3.org/2000/svg"
+								style={{ color: iconColor }}
+								aria-hidden="true"
+							>
+								<path d={pill.iconPath} />
+							</svg>
+						)}
+						{pill.label}
 					</button>
 				);
 			})}
@@ -142,9 +163,7 @@ export function IntegrationLanguagePills({
 				{pillPosition && highlightedTabIndex !== -1 ? (
 					<motion.div
 						className="pointer-events-none absolute top-0 left-0 rounded-full"
-						style={{
-							backgroundColor: highlightedBrandColor || undefined,
-						}}
+						style={{ backgroundColor: highlightedBrandColor }}
 						initial={{ ...pillPosition, opacity: 0 }}
 						animate={{ ...pillPosition, opacity: 1 }}
 						exit={{ ...pillPosition, opacity: 0 }}

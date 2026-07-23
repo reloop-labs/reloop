@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
 	siBun,
@@ -16,7 +15,6 @@ import {
 import { AiPromptBlock } from "./ai-prompt-block";
 import { CopyCodeBlock } from "./copy-code-block";
 import { IntegrationLanguagePills } from "./integration-language-pills";
-import { IntegrationModeTabs } from "./integration-mode-tabs";
 import {
 	buildAiPrompt,
 	installCommands,
@@ -25,8 +23,7 @@ import {
 	nodeInstallCommands,
 	sendEmailCode,
 } from "./snippets";
-
-import type { IntegrationMode, LanguageCode, PackageManager } from "./types";
+import type { IntegrationChoice, LanguageCode, PackageManager } from "./types";
 
 const langIcons = {
 	nodejs: siNodedotjs,
@@ -48,22 +45,25 @@ const pkgManagerTabs = [
 	{ id: "bun" as PackageManager, label: "bun", si: siBun },
 ];
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+	return (
+		<p className="font-medium text-sm text-text-strong-950">{children}</p>
+	);
+}
+
 export function DeveloperPlayground({
 	apiKey,
-	mode,
-	lang,
-	onModeChange,
-	onLangChange,
+	choice,
+	onChoiceChange,
 }: {
 	apiKey: string;
-	mode: IntegrationMode;
-	lang: LanguageCode;
-	onModeChange: (mode: IntegrationMode) => void;
-	onLangChange: (lang: LanguageCode) => void;
+	choice: IntegrationChoice;
+	onChoiceChange: (choice: IntegrationChoice) => void;
 }) {
 	const [pkgManager, setPkgManager] = useState<PackageManager>("npm");
 
-	const isAi = mode === "ai";
+	const isAi = choice === "ai";
+	const lang = isAi ? "nodejs" : (choice as LanguageCode);
 	const isNode = lang === "nodejs";
 	const installCode = isNode
 		? nodeInstallCommands[pkgManager]
@@ -75,46 +75,61 @@ export function DeveloperPlayground({
 	const aiPrompt = buildAiPrompt(apiKey);
 
 	return (
-		<div className="flex flex-col gap-4">
-			<IntegrationModeTabs value={mode} onChange={onModeChange} />
+		<div className="flex flex-col gap-5">
+			<div className="flex flex-col gap-2">
+				<SectionLabel>Choose your integration</SectionLabel>
+				<IntegrationLanguagePills value={choice} onChange={onChoiceChange} />
+			</div>
+
 			{isAi ? (
 				<AiPromptBlock prompt={aiPrompt} />
 			) : (
-				<div className="flex flex-col gap-4">
-					<IntegrationLanguagePills value={lang} onChange={onLangChange} />
+				<>
+					<div className="flex flex-col gap-1.5">
+						<SectionLabel>Install the Reloop SDK</SectionLabel>
+						<CopyCodeBlock
+							code={installCode}
+							lang="bash"
+							label={installLabel}
+							si={installIcon}
+							tabs={isNode ? pkgManagerTabs : undefined}
+							activeTab={isNode ? pkgManager : undefined}
+							onTabChange={
+								isNode
+									? (id) => setPkgManager(id as PackageManager)
+									: undefined
+							}
+							minHeight="auto"
+							codeExtraPadding
+						/>
+					</div>
 
-					<CopyCodeBlock
-						code={installCode}
-						lang="bash"
-						label={installLabel}
-						si={installIcon}
-						tabs={isNode ? pkgManagerTabs : undefined}
-						activeTab={isNode ? pkgManager : undefined}
-						onTabChange={
-							isNode
-								? (id) => setPkgManager(id as PackageManager)
-								: undefined
-						}
-						codeExtraPadding
-					/>
+					<div className="flex flex-col gap-1.5">
+						<SectionLabel>
+							Add your API key to <code className="font-mono">.env</code>
+						</SectionLabel>
+						<CopyCodeBlock
+							code={`RELOOP_API_KEY=${apiKey}`}
+							lang="bash"
+							copyValue={`RELOOP_API_KEY=${apiKey}`}
+							label=".env"
+							si={siDotenv}
+							minHeight="auto"
+							codeExtraPadding
+						/>
+					</div>
 
-					<CopyCodeBlock
-						code={`RELOOP_API_KEY=${apiKey}`}
-						lang="bash"
-						copyValue={`RELOOP_API_KEY=${apiKey}`}
-						label=".env"
-						si={siDotenv}
-						codeExtraPadding
-					/>
-
-					<CopyCodeBlock
-						code={sendEmailCode[lang].code}
-						lang={sendEmailCode[lang].lang}
-						label={langFileLabels[lang]}
-						si={langIcons[lang]}
-						codeExtraPadding
-					/>
-				</div>
+					<div className="flex flex-col gap-1.5">
+						<SectionLabel>Send your first request</SectionLabel>
+						<CopyCodeBlock
+							code={sendEmailCode[lang].code}
+							lang={sendEmailCode[lang].lang}
+							label={langFileLabels[lang]}
+							si={langIcons[lang]}
+							codeExtraPadding
+						/>
+					</div>
+				</>
 			)}
 		</div>
 	);

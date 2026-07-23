@@ -7,27 +7,14 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { organizationsQueryOptions } from "#/features/auth/organizations-query";
 import { queryKeys } from "#/lib/query-keys";
-import type { IntegrationMode, LanguageCode } from "./types";
+import type { IntegrationChoice, LanguageCode } from "./types";
 
 const languageCodes: LanguageCode[] = ["nodejs", "python", "go", "php"];
 
-function parseLanguage(value: string): LanguageCode {
-	if (languageCodes.includes(value as LanguageCode)) {
-		return value as LanguageCode;
-	}
-	return "nodejs";
-}
-
-function parseIntegrationState(
-	langParam: string,
-	modeParam: string,
-): { mode: IntegrationMode; lang: LanguageCode } {
-	if (langParam === "ai") {
-		return { mode: "ai", lang: "nodejs" };
-	}
-	const lang = parseLanguage(langParam);
-	const mode: IntegrationMode = modeParam === "manual" ? "manual" : "ai";
-	return { mode, lang };
+function parseChoice(value: string): IntegrationChoice {
+	if (value === "ai") return "ai";
+	if (languageCodes.includes(value as LanguageCode)) return value as LanguageCode;
+	return "ai";
 }
 
 export function useGenerateApiKey() {
@@ -37,17 +24,13 @@ export function useGenerateApiKey() {
 		"apiKey",
 		parseAsString.withDefault(""),
 	);
-	const [modeParam, setModeParam] = useQueryState(
-		"mode",
-		parseAsString.withDefault("ai"),
-	);
-	const [langParam, setLangParam] = useQueryState(
+	const [choiceParam, setChoiceParam] = useQueryState(
 		"lang",
-		parseAsString.withDefault("nodejs"),
+		parseAsString.withDefault("ai"),
 	);
 	const [loading, setLoading] = useState(false);
 
-	const { mode, lang } = parseIntegrationState(langParam, modeParam);
+	const choice = parseChoice(choiceParam);
 
 	const generateKey = async () => {
 		setLoading(true);
@@ -82,10 +65,8 @@ export function useGenerateApiKey() {
 	return {
 		apiKey,
 		loading,
-		mode,
-		lang,
-		setModeParam,
-		setLangParam,
+		choice,
+		setChoice: setChoiceParam,
 		generateKey,
 		finishOnboarding,
 	};

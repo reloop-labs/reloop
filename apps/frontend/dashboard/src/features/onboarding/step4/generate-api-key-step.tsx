@@ -1,16 +1,13 @@
 import { PostGenerate } from "./post-generate";
 import { PreGenerate } from "./pre-generate";
-import type { LanguageCode } from "./types";
 import { useGenerateApiKey } from "./use-generate-api-key";
 
 export function GenerateApiKeyStep() {
 	const {
 		apiKey,
 		loading,
-		mode,
-		lang,
-		setModeParam,
-		setLangParam,
+		choice,
+		setChoice,
 		generateKey,
 		finishOnboarding,
 	} = useGenerateApiKey();
@@ -33,10 +30,8 @@ export function GenerateApiKeyStep() {
 			</h1>
 			<PostGenerate
 				apiKey={apiKey}
-				mode={mode}
-				lang={lang}
-				onModeChange={setModeParam}
-				onLangChange={(l: LanguageCode) => setLangParam(l)}
+				choice={choice}
+				onChoiceChange={setChoice}
 				onDone={() => {
 					void finishOnboarding();
 				}}

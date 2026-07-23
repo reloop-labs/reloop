@@ -3,21 +3,17 @@ import { Icon } from "@reloop/ui/icon";
 import { useHotkeys } from "react-hotkeys-hook";
 import { CopyCodeBlock } from "./copy-code-block";
 import { DeveloperPlayground } from "./developer-playground";
-import type { IntegrationMode, LanguageCode } from "./types";
+import type { IntegrationChoice } from "./types";
 
 export function PostGenerate({
 	apiKey,
-	mode,
-	lang,
-	onModeChange,
-	onLangChange,
+	choice,
+	onChoiceChange,
 	onDone,
 }: {
 	apiKey: string;
-	mode: IntegrationMode;
-	lang: LanguageCode;
-	onModeChange: (mode: IntegrationMode) => void;
-	onLangChange: (lang: LanguageCode) => void;
+	choice: IntegrationChoice;
+	onChoiceChange: (choice: IntegrationChoice) => void;
 	onDone: () => void;
 }) {
 	useHotkeys(
@@ -48,10 +44,8 @@ export function PostGenerate({
 
 			<DeveloperPlayground
 				apiKey={apiKey}
-				mode={mode}
-				lang={lang}
-				onModeChange={onModeChange}
-				onLangChange={onLangChange}
+				choice={choice}
+				onChoiceChange={onChoiceChange}
 			/>
 
 			<div className="flex items-center justify-end gap-3 pb-4">
