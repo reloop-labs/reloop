@@ -146,8 +146,8 @@ const promiseToast = <T,>(
 	promise: Promise<T> | (() => Promise<T>),
 	data: {
 		loading: string;
-		success: string | ((data: T) => string);
-		error: string | ((error: any) => string);
+		success: string | ((data: T) => string | Promise<string>);
+		error: string | ((error: any) => string | Promise<string>);
 	},
 ) => {
 	const id = sonnerToast.custom(
@@ -158,19 +158,19 @@ const promiseToast = <T,>(
 	const promiseObj = typeof promise === "function" ? promise() : promise;
 
 	promiseObj
-		.then((result) => {
+		.then(async (result) => {
 			const msg =
 				typeof data.success === "function"
-					? data.success(result)
+					? await data.success(result)
 					: data.success;
 			sonnerToast.custom(
 				() => <AnimatedToastContent type="success" message={msg} />,
 				{ id, duration: 4000 },
 			);
 		})
-		.catch((err) => {
+		.catch(async (err) => {
 			const msg =
-				typeof data.error === "function" ? data.error(err) : data.error;
+				typeof data.error === "function" ? await data.error(err) : data.error;
 			sonnerToast.custom(
 				() => <AnimatedToastContent type="error" message={msg} />,
 				{ id, duration: 5000 },

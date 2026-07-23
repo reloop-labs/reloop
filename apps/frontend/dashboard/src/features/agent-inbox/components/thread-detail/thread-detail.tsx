@@ -5,7 +5,7 @@ import { AnimatePresence, useReducedMotion } from "framer-motion";
 import { parseAsString, useQueryState } from "nuqs";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { toast } from "sonner";
+import { toast } from "@reloop/ui/toast";
 import { useSWR } from "#/features/agent-inbox/lib/use-swr-compat";
 import { buildDisplayMessages } from "#/features/agent-inbox/utils/build-display-messages";
 import type {

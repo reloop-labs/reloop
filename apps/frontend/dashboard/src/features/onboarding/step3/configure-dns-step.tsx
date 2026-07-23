@@ -121,6 +121,7 @@ export function ConfigureDnsStep() {
 							checked
 								? "Sending enabled successfully"
 								: "Sending disabled successfully",
+							checked ? "Enabling email sending..." : "Disabling email sending...",
 						)
 					}
 				>
@@ -158,6 +159,7 @@ export function ConfigureDnsStep() {
 								checked
 									? "Receiving enabled successfully"
 									: "Receiving disabled successfully",
+								checked ? "Enabling email receiving..." : "Disabling email receiving...",
 							)
 						}
 					>

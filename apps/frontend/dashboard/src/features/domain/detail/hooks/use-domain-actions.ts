@@ -1,6 +1,6 @@
 import axios from "axios";
 import * as React from "react";
-import { toast } from "sonner";
+import { toast } from "@reloop/ui/toast";
 import { useInvalidateDomains } from "../../hooks/use-domains-query";
 import type { DomainResponse } from "../../types";
 
@@ -43,7 +43,7 @@ export function useDomainActions(
 	}, [domainId, invalidate]);
 
 	const handleUpdateDomain = React.useCallback(
-		async (
+		(
 			payload: Partial<
 				Pick<
 					DomainResponse,
@@ -59,7 +59,7 @@ export function useDomainActions(
 		) => {
 			if (!domainId || !domainData) {
 				toast.error("Domain information not available");
-				return;
+				return Promise.resolve();
 			}
 
 			const apiPayload: {
