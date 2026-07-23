@@ -22,8 +22,8 @@ export function PreGenerate({
 
 	return (
 		<div className="flex flex-col items-center px-6 py-12 text-center">
-			<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
-				<Icon name="key-new" className="h-5 w-5 text-text-sub-600" />
+			<div className="mb-6 flex items-center justify-center">
+				<Icon name="key-new" className="h-10 w-10 text-text-sub-600" />
 			</div>
 			<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
 				Create your API key
