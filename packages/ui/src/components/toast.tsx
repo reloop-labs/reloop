@@ -13,13 +13,14 @@ const CheckIcon = ({ className }: { className?: string }) => (
 		className={className}
 		fill="none"
 		viewBox="0 0 24 24"
-		strokeWidth="2.5"
-		stroke="currentColor"
 	>
+		<circle cx="12" cy="12" r="10" className="fill-success-light/20" />
 		<path
 			strokeLinecap="round"
 			strokeLinejoin="round"
-			d="m4.5 12.75 6 6 9-13.5"
+			stroke="currentColor"
+			strokeWidth="1.75"
+			d="M9 12.5L11.25 14.75L15.5 9.5M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
 		/>
 	</svg>
 );
@@ -73,9 +74,7 @@ function AnimatedToastContent({
 				>
 					{type === "loading" && <Spinner size={16} color="currentColor" />}
 					{type === "success" && (
-						<div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success-light/20 text-success-base">
-							<CheckIcon className="h-3.5 w-3.5" />
-						</div>
+						<CheckIcon className="h-5 w-5 shrink-0 text-success-base" />
 					)}
 					{type === "error" && (
 						<div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-error-light/20 text-error-base">
@@ -98,11 +97,7 @@ const Toaster = (props: ToasterProps) => {
 			position="bottom-right"
 			icons={{
 				loading: <Spinner size={16} color="currentColor" />,
-				success: (
-					<div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success-light/20 text-success-base">
-						<CheckIcon className="h-3.5 w-3.5" />
-					</div>
-				),
+				success: <CheckIcon className="h-5 w-5 shrink-0 text-success-base" />,
 				error: (
 					<div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-error-light/20 text-error-base">
 						<ErrorIcon className="h-3.5 w-3.5" />
