@@ -128,7 +128,7 @@ export function ApiKeyHeader({
 									<Icon name="loader-2" className="h-4 w-4 animate-spin" />
 								) : (
 									<Icon
-										name={apiKey.enabled ? "pause" : "play"}
+										name={apiKey.enabled ? "cross-circle" : "check-circle"}
 										className="h-4 w-4"
 									/>
 								)}

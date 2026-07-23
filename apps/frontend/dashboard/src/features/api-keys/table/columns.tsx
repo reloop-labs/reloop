@@ -2,6 +2,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Link } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
+import { AnimatePresence, motion } from "framer-motion";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import type { ApiKeyData } from "../types";
 
@@ -74,15 +75,26 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 				<div className="flex items-center">
 					<div
 						className={cn(
-							"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
+							"relative flex items-center overflow-hidden py-0.5 font-medium text-[13px] capitalize transition-colors duration-200 min-h-[22px]",
 							enabled ? "text-success-base" : "text-error-base",
 						)}
 					>
-						<Icon
-							name={enabled ? "check-circle" : "cross-circle"}
-							className="h-3.5 w-3.5"
-						/>
-						{enabled ? "Active" : "Disabled"}
+						<AnimatePresence mode="popLayout" initial={false}>
+							<motion.div
+								key={enabled ? "active" : "disabled"}
+								initial={{ y: "-100%", opacity: 0 }}
+								animate={{ y: "0%", opacity: 1 }}
+								exit={{ y: "100%", opacity: 0 }}
+								transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+								className="flex items-center gap-2"
+							>
+								<Icon
+									name={enabled ? "check-circle" : "cross-circle"}
+									className="h-3.5 w-3.5 shrink-0"
+								/>
+								<span>{enabled ? "Active" : "Disabled"}</span>
+							</motion.div>
+						</AnimatePresence>
 					</div>
 				</div>
 			);

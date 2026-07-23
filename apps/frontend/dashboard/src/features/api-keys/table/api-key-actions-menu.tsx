@@ -30,7 +30,9 @@ export function ApiKeyActionsMenu({
 		{
 			id: "toggle" as const,
 			label: apiKey.enabled ? "Disable" : "Enable",
-			icon: (apiKey.enabled ? "pause" : "play") as "pause" | "play",
+			icon: (apiKey.enabled ? "cross-circle" : "check-circle") as
+				| "cross-circle"
+				| "check-circle",
 			isDanger: false,
 		},
 		{

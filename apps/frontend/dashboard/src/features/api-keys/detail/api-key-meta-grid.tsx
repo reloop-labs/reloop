@@ -2,6 +2,7 @@ import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
@@ -85,15 +86,26 @@ export function ApiKeyMetaGrid({
 			<MetaField icon="activity-2" label="Status" isLoading={isLoading}>
 				<div
 					className={cn(
-						"flex w-fit items-center gap-1.5 font-medium text-sm capitalize",
+						"relative flex items-center overflow-hidden py-0.5 font-medium text-sm capitalize transition-colors duration-200 min-h-[22px]",
 						apiKey?.enabled ? "text-success-base" : "text-error-base",
 					)}
 				>
-					<Icon
-						name={apiKey?.enabled ? "check-circle" : "cross-circle"}
-						className="h-3.5 w-3.5"
-					/>
-					{apiKey?.enabled ? "Active" : "Disabled"}
+					<AnimatePresence mode="popLayout" initial={false}>
+						<motion.div
+							key={apiKey?.enabled ? "active" : "disabled"}
+							initial={{ y: "-100%", opacity: 0 }}
+							animate={{ y: "0%", opacity: 1 }}
+							exit={{ y: "100%", opacity: 0 }}
+							transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+							className="flex items-center gap-1.5"
+						>
+							<Icon
+								name={apiKey?.enabled ? "check-circle" : "cross-circle"}
+								className="h-3.5 w-3.5 shrink-0"
+							/>
+							<span>{apiKey?.enabled ? "Active" : "Disabled"}</span>
+						</motion.div>
+					</AnimatePresence>
 				</div>
 			</MetaField>
 
