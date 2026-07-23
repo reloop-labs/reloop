@@ -34,6 +34,9 @@ export function CreateOrgStep() {
 
 	return (
 		<div>
+			<h1 className="mb-4 font-semibold text-[26px] text-text-strong-950 tracking-tight">
+				Create your workspace
+			</h1>
 			<LogoUpload
 				fileInputRef={fileInputRef}
 				isUploading={isUploading}

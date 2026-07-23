@@ -59,6 +59,9 @@ export function AddDomainStep() {
 
 	return (
 		<div className="space-y-6">
+			<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+				Add Domain
+			</h1>
 			<form
 				onSubmit={handleSubmit(submitDomain)}
 				className="flex w-full flex-col"

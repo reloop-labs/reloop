@@ -16,19 +16,31 @@ export function GenerateApiKeyStep() {
 	} = useGenerateApiKey();
 
 	if (!apiKey) {
-		return <PreGenerate loading={loading} onGenerate={generateKey} />;
+		return (
+			<>
+				<h1 className="mb-4 font-semibold text-[26px] text-text-strong-950 tracking-tight">
+					Generate API key
+				</h1>
+				<PreGenerate loading={loading} onGenerate={generateKey} />
+			</>
+		);
 	}
 
 	return (
-		<PostGenerate
-			apiKey={apiKey}
-			mode={mode}
-			lang={lang}
-			onModeChange={setModeParam}
-			onLangChange={(l: LanguageCode) => setLangParam(l)}
-			onDone={() => {
-				void finishOnboarding();
-			}}
-		/>
+		<>
+			<h1 className="mb-4 font-semibold text-[26px] text-text-strong-950 tracking-tight">
+				Generate API key
+			</h1>
+			<PostGenerate
+				apiKey={apiKey}
+				mode={mode}
+				lang={lang}
+				onModeChange={setModeParam}
+				onLangChange={(l: LanguageCode) => setLangParam(l)}
+				onDone={() => {
+					void finishOnboarding();
+				}}
+			/>
+		</>
 	);
 }

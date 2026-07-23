@@ -2,7 +2,7 @@ import NumberFlow from "@number-flow/react";
 import { cn } from "@reloop/ui/cn";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
 import { Logo } from "@reloop/ui/logo";
-import { Calligraph } from "calligraph";
+
 import type { Variants } from "framer-motion";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { parseAsInteger, useQueryState } from "nuqs";
@@ -18,75 +18,42 @@ const AnimatedHeight = ({
 	skipAnimation: boolean;
 }) => {
 	const innerRef = useRef<HTMLDivElement>(null);
-	const [height, setHeight] = useState<number | undefined>(undefined);
-	const [isAnimating, setIsAnimating] = useState(false);
+	const [height, setHeight] = useState<number | "auto">("auto");
 
 	useEffect(() => {
 		if (!innerRef.current) return;
-		const ro = new ResizeObserver((entries: ResizeObserverEntry[]) => {
-			const entry = entries[0];
-			if (!entry) return;
-			setHeight(entry.contentRect.height);
+		// Snapshot the initial height synchronously so the first render
+		// doesn't animate from 0.
+		setHeight(innerRef.current.offsetHeight);
+		const ro = new ResizeObserver(() => {
+			if (innerRef.current) {
+				setHeight(innerRef.current.offsetHeight);
+			}
 		});
 		ro.observe(innerRef.current);
 		return () => ro.disconnect();
 	}, []);
 
-	useEffect(() => {
-		if (skipAnimation || height === undefined) return;
-		setIsAnimating(true);
-		const timer = setTimeout(() => setIsAnimating(false), 300);
-		return () => clearTimeout(timer);
-	}, [height, skipAnimation]);
-
 	return (
-		<div
-			style={{
-				height: height === undefined ? "auto" : height,
-				transition: skipAnimation
-					? "none"
-					: "height 0.28s cubic-bezier(0.23, 1, 0.32, 1)",
-				overflow: isAnimating ? "hidden" : "visible",
-			}}
+		<motion.div
+			animate={{ height }}
+			transition={
+				skipAnimation || height === "auto"
+					? { duration: 0 }
+					: { duration: 0.32, ease: [0.23, 1, 0.32, 1] }
+			}
+			style={{ overflow: "hidden" }}
 		>
 			<div ref={innerRef} className="p-1.5">
 				{children}
 			</div>
-		</div>
+		</motion.div>
 	);
 };
 
-const ScrambleTitle = ({
-	text,
-	skipAnimation,
-}: {
-	text: string;
-	skipAnimation: boolean;
-}) => {
-	if (skipAnimation) {
-		return (
-			<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-				{text}
-			</h1>
-		);
-	}
-	return (
-		<Calligraph
-			as="h1"
-			className="font-semibold text-[26px] text-text-strong-950 tracking-tight"
-			animation="snappy"
-			trend={-1}
-			drift={{ x: 4, y: 0 }}
-			stagger={0.015}
-		>
-			{text}
-		</Calligraph>
-	);
-};
 
 interface SplitLayoutProps {
 	stepIndicator: string;
-	title?: string;
 	children: React.ReactNode;
 	previewContent?: React.ReactNode;
 	fullWidth?: boolean;
@@ -102,7 +69,6 @@ interface SplitLayoutProps {
 
 export function SplitLayout({
 	stepIndicator,
-	title,
 	children,
 	previewContent,
 	fullWidth = false,
@@ -340,13 +306,6 @@ export function SplitLayout({
 										{onBack && <KbdEsc />}
 									</div>
 								</motion.button>
-
-								{title && (
-									<ScrambleTitle
-										text={title}
-										skipAnimation={shouldSkipMotion}
-									/>
-								)}
 
 								<AnimatedHeight skipAnimation={shouldSkipMotion}>
 									<AnimatePresence

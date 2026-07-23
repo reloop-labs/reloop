@@ -60,6 +60,9 @@ export function ConfigureDnsStep() {
 	return (
 		<div className="pb-10">
 			<div className="relative mx-auto mb-8 flex flex-col">
+				<h1 className="mb-6 font-semibold text-[26px] text-text-strong-950 tracking-tight">
+					Configure DNS
+				</h1>
 				<DomainAddedAlert domainName={domainData?.domain} />
 				<div className="mt-6">
 					<DnsAutoConnectBanner domain={domainData} domainId={domainId} />

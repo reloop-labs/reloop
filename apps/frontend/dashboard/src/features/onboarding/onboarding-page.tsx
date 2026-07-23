@@ -46,7 +46,6 @@ export function OnboardingPage() {
 		return (
 			<SplitLayout
 				stepIndicator="Step 1 of 4"
-				title="Create your workspace"
 				previewContent={
 					<div className="flex h-full flex-col gap-4 p-8">
 						<Skeleton className="h-8 w-1/3 rounded-lg" />
@@ -104,7 +103,6 @@ export function OnboardingPage() {
 		number,
 		{
 			stepIndicator: string;
-			title?: string;
 			component: React.ReactNode;
 			preview: React.ReactNode;
 			fullWidth: boolean;
@@ -114,21 +112,18 @@ export function OnboardingPage() {
 	> = {
 		1: {
 			stepIndicator: "Step 1 of 4",
-			title: "Create your workspace",
 			component: <CreateOrgStep />,
 			preview: <SidebarPreview name={name} logo={logoUrl || null} />,
 			fullWidth: false,
 		},
 		2: {
 			stepIndicator: "Step 2 of 4",
-			title: "Add Domain",
 			component: <AddDomainStep />,
 			preview: <DomainPreview domain={domain} logoUrl={logoUrl || undefined} />,
 			fullWidth: false,
 		},
 		3: {
 			stepIndicator: "Step 3 of 4",
-			title: "Configure DNS",
 			component: <ConfigureDnsStep />,
 			preview: null,
 			fullWidth: true,
@@ -136,7 +131,6 @@ export function OnboardingPage() {
 		},
 		4: {
 			stepIndicator: "Step 4 of 4",
-			title: "Generate API key",
 			component: <GenerateApiKeyStep />,
 			preview: null,
 			fullWidth: true,
@@ -154,7 +148,6 @@ export function OnboardingPage() {
 	return (
 		<SplitLayout
 			stepIndicator={currentConfig.stepIndicator}
-			title={currentConfig.title}
 			previewContent={currentConfig.preview}
 			fullWidth={currentConfig.fullWidth}
 			previewSize="medium"
