@@ -37,8 +37,8 @@ export function DomainInputField({
 	}, [domain, domainParts]);
 
 	return (
-		<section className="space-y-1">
-			<div className="space-y-1">
+		<section className="space-y-2">
+			<div>
 				<Label.Root
 					htmlFor="domain"
 					className="block font-medium text-sm text-text-strong-950"
@@ -51,7 +51,7 @@ export function DomainInputField({
 				<Input.Root
 					hasError={!!errors?.domain?.message}
 					className="w-full rounded-xl"
-					size="small"
+					size="medium"
 				>
 					<Input.Wrapper>
 						<Input.Input

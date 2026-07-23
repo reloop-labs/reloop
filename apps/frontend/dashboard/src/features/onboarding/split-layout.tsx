@@ -54,12 +54,16 @@ const ScrambleTitle = ({
 	skipAnimation: boolean;
 }) => {
 	if (skipAnimation) {
-		return <h1 className="font-semibold text-title-h5">{text}</h1>;
+		return (
+			<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+				{text}
+			</h1>
+		);
 	}
 	return (
 		<Calligraph
 			as="h1"
-			className="font-semibold text-title-h5"
+			className="font-semibold text-[26px] text-text-strong-950 tracking-tight"
 			animation="snappy"
 			trend={-1}
 			drift={{ x: 4, y: 0 }}

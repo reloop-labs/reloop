@@ -1,6 +1,5 @@
 import * as Button from "@reloop/ui/button";
-import { Icon } from "@reloop/ui/icon";
-import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import Spinner from "@reloop/ui/spinner";
 
 export function ConfigureDnsActions({
@@ -16,21 +15,18 @@ export function ConfigureDnsActions({
 		<div className="mt-8 flex items-center justify-end gap-3">
 			<Button.Root
 				variant="neutral"
-				mode="stroke"
-				size="xsmall"
+				mode="ghost"
+				size="small"
 				onClick={onSkip}
-				className="gap-1.5"
+				className="gap-1.5 rounded-xl"
 			>
 				Skip
-				<span className="inline-flex items-center gap-0.5">
-					<KbdKeyOutline>⌥</KbdKeyOutline>
-					<KbdKeyOutline>S</KbdKeyOutline>
-				</span>
 			</Button.Root>
-			<Button.Root
+			<FancyButton.Root
 				onClick={onVerify}
-				size="xsmall"
-				variant="neutral"
+				size="small"
+				variant="blue"
+				className="rounded-xl"
 				disabled={isVerifying}
 			>
 				{isVerifying ? (
@@ -39,21 +35,9 @@ export function ConfigureDnsActions({
 						Verifying...
 					</>
 				) : (
-					<>
-						Verify DNS Records
-						<span className="inline-flex items-center gap-0.5">
-							<Icon
-								name="command"
-								className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-							/>
-							<Icon
-								name="enter"
-								className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-							/>
-						</span>
-					</>
+					"Verify DNS Records"
 				)}
-			</Button.Root>
+			</FancyButton.Root>
 		</div>
 	);
 }

@@ -1,6 +1,5 @@
 import * as Button from "@reloop/ui/button";
-import { Icon } from "@reloop/ui/icon";
-import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import Spinner from "@reloop/ui/spinner";
 
 export function FormActions({
@@ -15,22 +14,19 @@ export function FormActions({
 			<Button.Root
 				type="button"
 				variant="neutral"
-				mode="stroke"
-				size="xsmall"
+				mode="ghost"
+				size="small"
+				className="rounded-xl"
 				onClick={onSkip}
 				disabled={isLoading}
 			>
 				Skip
-				<span className="inline-flex items-center gap-0.5">
-					<KbdKeyOutline>⌥</KbdKeyOutline>
-					<KbdKeyOutline>S</KbdKeyOutline>
-				</span>
 			</Button.Root>
-			<Button.Root
+			<FancyButton.Root
 				type="submit"
-				variant="neutral"
-				mode="filled"
-				size="xsmall"
+				variant="blue"
+				size="small"
+				className="rounded-xl"
 				disabled={isLoading}
 			>
 				{isLoading ? (
@@ -39,21 +35,9 @@ export function FormActions({
 						Adding Domain...
 					</>
 				) : (
-					<>
-						Add Domain
-						<span className="inline-flex items-center gap-0.5">
-							<Icon
-								name="command"
-								className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-							/>
-							<Icon
-								name="enter"
-								className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-							/>
-						</span>
-					</>
+					"Add Domain"
 				)}
-			</Button.Root>
+			</FancyButton.Root>
 		</div>
 	);
 }

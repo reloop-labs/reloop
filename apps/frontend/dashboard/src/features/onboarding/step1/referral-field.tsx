@@ -43,10 +43,10 @@ export function ReferralField() {
 				"flex flex-col transition-all duration-200",
 				referral === "other"
 					? "gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4"
-					: "gap-1",
+					: "space-y-2",
 			)}
 		>
-			<motion.div layout className="flex flex-col gap-1">
+			<motion.div layout className="space-y-2">
 				<Label.Root htmlFor="referral">How did you hear about us?</Label.Root>
 				<Popover.Root
 					open={isOpen}
@@ -59,8 +59,8 @@ export function ReferralField() {
 						<Button.Root
 							variant="neutral"
 							mode="stroke"
-							size="small"
-							className="w-full justify-between gap-1.5 rounded-xl font-medium text-sm"
+							size="medium"
+							className="h-10 w-full justify-between gap-1.5 rounded-xl px-3 font-medium text-sm"
 						>
 							<span className="flex items-center gap-2">
 								{selectedOption?.iconSlug && (
@@ -162,10 +162,10 @@ export function ReferralField() {
 						animate={{ opacity: 1, height: "auto" }}
 						exit={{ opacity: 0, height: 0 }}
 						transition={{ type: "spring", stiffness: 300, damping: 30 }}
-						className="flex flex-col gap-1 overflow-hidden"
+						className="space-y-2 overflow-hidden"
 					>
 						<Label.Root htmlFor="other-referral">Please specify</Label.Root>
-						<Input.Root size="small" className="rounded-xl bg-bg-white-0">
+						<Input.Root size="medium" className="rounded-xl bg-bg-white-0">
 							<Input.Wrapper>
 								<Input.Input
 									id="other-referral"

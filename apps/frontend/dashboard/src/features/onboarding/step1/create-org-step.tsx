@@ -1,4 +1,4 @@
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import Spinner from "@reloop/ui/spinner";
 import { motion } from "framer-motion";
 import { CompanyNameField } from "./company-name-field";
@@ -48,10 +48,10 @@ export function CreateOrgStep() {
 				<ReferralField />
 			</motion.div>
 
-			<Button.Root
-				variant="neutral"
-				className="mt-6 w-full"
-				mode="filled"
+			<FancyButton.Root
+				variant="blue"
+				size="medium"
+				className="mt-6 w-full rounded-xl"
 				onClick={createAndContinue}
 				disabled={!canSubmit}
 			>
@@ -65,7 +65,7 @@ export function CreateOrgStep() {
 				) : (
 					"Create workspace"
 				)}
-			</Button.Root>
+			</FancyButton.Root>
 		</div>
 	);
 }

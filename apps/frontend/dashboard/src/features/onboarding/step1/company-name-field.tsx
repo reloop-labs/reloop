@@ -7,9 +7,12 @@ export function CompanyNameField() {
 	const [name, setName] = useQueryState("name", parseAsString.withDefault(""));
 
 	return (
-		<motion.div layout className="flex flex-col gap-1">
-			<Label.Root htmlFor="company-name">Company name</Label.Root>
-			<Input.Root size="small" className="rounded-xl">
+		<motion.div layout className="space-y-2">
+			<Label.Root htmlFor="company-name">
+				Company name
+				<Label.Asterisk />
+			</Label.Root>
+			<Input.Root size="medium" className="rounded-xl">
 				<Input.Wrapper>
 					<Input.Input
 						id="company-name"

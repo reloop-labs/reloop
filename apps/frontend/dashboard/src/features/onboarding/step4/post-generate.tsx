@@ -1,7 +1,5 @@
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { KbdCommand } from "@reloop/ui/kbd-command";
-import { KbdEnter } from "@reloop/ui/kbd-enter";
 import { useHotkeys } from "react-hotkeys-hook";
 import { CopyCodeBlock } from "./copy-code-block";
 import { DeveloperPlayground } from "./developer-playground";
@@ -56,19 +54,15 @@ export function PostGenerate({
 			/>
 
 			<div className="flex items-center justify-end gap-3 pb-4">
-				<Button.Root
-					variant="neutral"
-					mode="filled"
-					size="xsmall"
+				<FancyButton.Root
+					variant="blue"
+					size="small"
+					className="rounded-xl"
 					onClick={onDone}
 				>
 					<Icon name="check-circle" className="h-3.5 w-3.5" />
 					Go to Dashboard
-					<span className="inline-flex items-center gap-0.5">
-						<KbdCommand />
-						<KbdEnter />
-					</span>
-				</Button.Root>
+				</FancyButton.Root>
 			</div>
 		</div>
 	);

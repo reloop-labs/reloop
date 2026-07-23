@@ -1,4 +1,4 @@
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -31,26 +31,20 @@ export function PreGenerate({
 				security, we won&apos;t show it again.
 			</p>
 			<div className="flex items-center gap-3">
-				<Button.Root variant="neutral" onClick={onGenerate} disabled={loading}>
+				<FancyButton.Root
+					variant="blue"
+					size="small"
+					className="rounded-xl"
+					onClick={onGenerate}
+					disabled={loading}
+				>
 					{loading ? (
 						<Spinner size={16} />
 					) : (
 						<Icon name="key-new" className="h-4 w-4" />
 					)}
 					{loading ? "Creating key…" : "Create your API key"}
-					{!loading && (
-						<span className="inline-flex items-center gap-0.5">
-							<Icon
-								name="command"
-								className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-							/>
-							<Icon
-								name="enter"
-								className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-							/>
-						</span>
-					)}
-				</Button.Root>
+				</FancyButton.Root>
 			</div>
 		</div>
 	);
