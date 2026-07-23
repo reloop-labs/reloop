@@ -3,8 +3,6 @@ import { parseAsString, useQueryState } from "nuqs";
 import * as React from "react";
 import { type Resolver, useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
-import { AdvancedOptions } from "./advanced-options";
-import { AdvancedOptionsToggle } from "./advanced-options-toggle";
 import { DomainInputField } from "./domain-input-field";
 import { FormActions } from "./form-actions";
 import { type DomainFormValues, domainSchema } from "./schema";
@@ -15,7 +13,6 @@ export function AddDomainStep() {
 		"domain",
 		parseAsString.withDefault(""),
 	);
-	const [isAdvancedOpen, setIsAdvancedOpen] = React.useState(true);
 
 	const { register, handleSubmit, formState, setError, watch, control } =
 		useForm<DomainFormValues>({
@@ -64,7 +61,7 @@ export function AddDomainStep() {
 			</h1>
 			<form
 				onSubmit={handleSubmit(submitDomain)}
-				className="flex w-full flex-col"
+				className="flex w-full flex-col gap-6"
 			>
 				<DomainInputField
 					register={register}
@@ -72,19 +69,6 @@ export function AddDomainStep() {
 					isLoading={isLoading}
 					domain={watchedDomain}
 				/>
-
-				<AdvancedOptionsToggle
-					open={isAdvancedOpen}
-					onToggle={() => setIsAdvancedOpen((open) => !open)}
-				>
-					<AdvancedOptions
-						control={control}
-						register={register}
-						domain={watchedDomain}
-						isLoading={isLoading}
-						errors={formState.errors}
-					/>
-				</AdvancedOptionsToggle>
 
 				<FormActions isLoading={isLoading} onSkip={skipDns} />
 			</form>
