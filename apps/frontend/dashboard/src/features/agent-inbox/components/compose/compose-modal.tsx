@@ -189,17 +189,29 @@ export const ComposeModal = ({
 		setEditorKey((k) => k + 1);
 	}, []);
 
-	const writeStreamedText = useCallback((plain: string) => {
-		const html = plainToHtml(plain);
-		const editor = editorRef.current?.editor;
-		if (editor && !editor.isDestroyed) {
-			editor.commands.setContent(html || "<p></p>");
-		}
-		setHtmlBody(html);
-		setTextBody(plain);
-		htmlRef.current = html;
-		textRef.current = plain;
-	}, []);
+	const writeStreamedText = useCallback(
+		(plain: string) => {
+			let bodyText = plain;
+			const subjectMatch = plain.match(/^Subject:\s*([^\r\n]+)\r?\n+/i);
+			if (subjectMatch) {
+				const extractedSubject = subjectMatch[1].trim();
+				if (extractedSubject) {
+					setValue("subject", extractedSubject);
+				}
+				bodyText = plain.slice(subjectMatch[0].length);
+			}
+			const html = plainToHtml(bodyText);
+			const editor = editorRef.current?.editor;
+			if (editor && !editor.isDestroyed) {
+				editor.commands.setContent(html || "<p></p>");
+			}
+			setHtmlBody(html);
+			setTextBody(bodyText);
+			htmlRef.current = html;
+			textRef.current = bodyText;
+		},
+		[setValue],
+	);
 
 	const restoreEditor = useCallback(
 		(snapshot: { html: string; text: string }) => {
@@ -625,7 +637,10 @@ export const ComposeModal = ({
 			});
 			if (!res.ok) throw new Error("Failed");
 			const data = (await res.json()) as { subject?: string };
-			if (data.subject) setValue("subject", data.subject);
+			if (data.subject) {
+				const cleaned = data.subject.replace(/^Subject:\s*/i, "").trim();
+				setValue("subject", cleaned);
+			}
 		} catch {
 			toast.error("Failed to generate subject");
 		} finally {

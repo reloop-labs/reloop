@@ -40,27 +40,35 @@ export async function readAiTextStreamAfterThink(
 		onChunk(text);
 	};
 
+	const emitOrBuffer = (text: string) => {
+		assertNotAborted();
+		buffered = text;
+		if (revealed) {
+			reveal(buffered);
+		} else if (Date.now() - startedAt >= minThinkMs && buffered) {
+			reveal(buffered);
+		}
+	};
+
 	const tryReveal = () => {
 		if (revealed || !buffered) return;
 		if (Date.now() - startedAt < minThinkMs) return;
 		reveal(buffered);
 	};
 
-	const poll = window.setInterval(tryReveal, 40);
+	const poll = globalThis.setInterval(tryReveal, 40);
 	try {
 		const finalText = await readAiTextStream(response, (accumulated) => {
-			assertNotAborted();
-			buffered = accumulated;
-			tryReveal();
+			emitOrBuffer(accumulated);
 		});
 
 		if (!revealed && finalText.trim()) {
 			const wait = Math.max(0, minThinkMs - (Date.now() - startedAt));
 			if (wait > 0) {
 				await new Promise<void>((resolve, reject) => {
-					const id = window.setTimeout(resolve, wait);
+					const id = globalThis.setTimeout(resolve, wait);
 					const onAbort = () => {
-						window.clearTimeout(id);
+						globalThis.clearTimeout(id);
 						reject(new DOMException("Aborted", "AbortError"));
 					};
 					if (signal?.aborted) {
@@ -71,10 +79,12 @@ export async function readAiTextStreamAfterThink(
 				});
 			}
 			reveal(finalText);
+		} else if (revealed && finalText.trim()) {
+			reveal(finalText);
 		}
 
 		return finalText;
 	} finally {
-		window.clearInterval(poll);
+		globalThis.clearInterval(poll);
 	}
 }

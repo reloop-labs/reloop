@@ -149,15 +149,20 @@ export const ReplyComposer = forwardRef<HTMLDivElement, ReplyComposerProps>(
 
 		/** Replace editor contents with streamed plain text (old text is wiped). */
 		const writeStreamedText = useCallback((plain: string) => {
-			const html = plainToHtml(plain);
+			let bodyText = plain;
+			const subjectMatch = plain.match(/^Subject:\s*[^\r\n]+\r?\n+/i);
+			if (subjectMatch) {
+				bodyText = plain.slice(subjectMatch[0].length);
+			}
+			const html = plainToHtml(bodyText);
 			const editor = editorRef.current?.editor;
 			if (editor && !editor.isDestroyed) {
 				editor.commands.setContent(html || "<p></p>");
 			}
 			setHtmlBody(html);
-			setTextBody(plain);
+			setTextBody(bodyText);
 			htmlRef.current = html;
-			textRef.current = plain;
+			textRef.current = bodyText;
 		}, []);
 
 		useDraftAutosave({

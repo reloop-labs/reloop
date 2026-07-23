@@ -335,11 +335,12 @@ export async function generateSubjectController(input: { text: string }) {
 		});
 	}
 
-	const gemmaPrompt = `Write a concise email subject line (max 80 characters) for the following email body. Return ONLY the subject line, no quotes, no conversational text:\n\n${text}`;
+	const gemmaPrompt = `Write a concise email subject line (max 80 characters) for the following email body. Return ONLY the subject line text (no quotes, no "Subject:" prefix, no conversational text):\n\n${text}`;
 	const gemmaResult = await callGemmaOllama(gemmaPrompt);
 	if (gemmaResult) {
 		return {
 			subject: gemmaResult
+				.replace(/^Subject:\s*/i, "")
 				.replace(/^["']|["']$/g, "")
 				.slice(0, 120),
 		};
@@ -350,11 +351,12 @@ export async function generateSubjectController(input: { text: string }) {
 		try {
 			const { text: subject } = await generateText({
 				model: openrouter("openai/gpt-4o-mini"),
-				prompt: `Write a concise email subject line (max 80 characters) for the following email body. Return only the subject, no quotes.\n\n${text}`,
+				prompt: `Write a concise email subject line (max 80 characters) for the following email body. Return only the subject text (no quotes, no "Subject:" prefix).\n\n${text}`,
 			});
 			return {
 				subject: subject
 					.trim()
+					.replace(/^Subject:\s*/i, "")
 					.replace(/^["']|["']$/g, "")
 					.slice(0, 120),
 			};
@@ -367,7 +369,7 @@ export async function generateSubjectController(input: { text: string }) {
 		}
 	}
 
-	return { subject: heuristicSubject(text) };
+	return { subject: heuristicSubject(text).replace(/^Subject:\s*/i, "") };
 }
 
 export async function generateComposeController(input: {
@@ -392,7 +394,7 @@ export async function generateComposeController(input: {
 		`Prompt: ${prompt}`,
 	].filter(Boolean);
 
-	const fullPrompt = `Compose a professional email from the following context. Return plain text only (no markdown fences or commentary). Use short paragraphs:\n\n${contextParts.join("\n")}`;
+	const fullPrompt = `Compose a professional email body based on the following context. Return plain text ONLY (no markdown fences, no "Subject:" line, no commentary). Use short paragraphs:\n\n${contextParts.join("\n")}`;
 
 	return streamPlainTextFromPrompt(fullPrompt, heuristicComposeText(prompt));
 }
