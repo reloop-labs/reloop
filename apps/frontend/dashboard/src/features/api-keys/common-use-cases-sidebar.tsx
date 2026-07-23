@@ -3,33 +3,33 @@ import { Icon } from "@reloop/ui/icon";
 export function CommonUseCasesSidebar() {
 	const useCases = [
 		{
-			title: "Publish web apps and APIs to the Internet",
+			title: "Send transactional email",
 			description:
-				"Learn how to expose your HTTP applications and webhooks to the public Internet through Reloop securely.",
-			href: "https://reloop.sh/docs/learn/api-keys",
+				"Password resets, receipts, and app notifications via the REST API.",
+			href: "https://reloop.sh/docs/api/mail/post-api-mail-v1send",
 		},
 		{
-			title: "Deploy highly available workers",
+			title: "Connect via SMTP",
 			description:
-				"Set up multiple API key worker credentials for production-grade reliability, distribution, and failover.",
-			href: "https://reloop.sh/docs/learn/api-keys",
+				"Use your current mail library—point Nodemailer, Laravel, or Rails at Reloop.",
+			href: "https://reloop.sh/docs/examples/smtp/introduction",
 		},
 		{
-			title: "Connect AI Agents to private services",
+			title: "React to delivery events",
 			description:
-				"Enable LLM agents and background workers to communicate with private services in your environment.",
-			href: "https://reloop.sh/docs/learn/api-keys",
+				"Webhooks for bounces, opens, and clicks so you can act without polling.",
+			href: "https://reloop.sh/docs/learn/webhooks",
 		},
 	];
 
 	return (
 		<div className="space-y-4">
 			<div>
-				<h2 className="text-lg font-bold tracking-tight text-text-strong-950">
-					Common use cases
+				<h2 className="font-semibold text-lg text-text-strong-950 tracking-tight">
+					Use your key to…
 				</h2>
-				<p className="mt-1 text-xs leading-relaxed text-text-sub-600">
-					Learn how to use Reloop API keys for different scenarios.
+				<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
+					Same key for API and SMTP—pick the path that fits your stack.
 				</p>
 			</div>
 
@@ -40,7 +40,7 @@ export function CommonUseCasesSidebar() {
 						href={item.href}
 						target="_blank"
 						rel="noreferrer"
-						className="group flex flex-col rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-5 shadow-sm transition-all duration-200 hover:border-stroke-soft-200 hover:shadow-md dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20"
+						className="group flex flex-col rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-5 transition-all duration-200 hover:border-stroke-soft-200 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20"
 					>
 						<div className="flex items-center justify-between gap-2">
 							<h3 className="font-semibold text-sm text-text-strong-950 transition-colors group-hover:text-[#1868DF] dark:group-hover:text-blue-400">
@@ -51,7 +51,7 @@ export function CommonUseCasesSidebar() {
 								className="h-4 w-4 shrink-0 text-text-sub-600 transition-transform group-hover:translate-x-0.5"
 							/>
 						</div>
-						<p className="mt-2 text-xs leading-relaxed text-text-sub-600">
+						<p className="mt-2 text-text-sub-600 text-xs leading-relaxed">
 							{item.description}
 						</p>
 					</a>

@@ -3,7 +3,6 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ApiKeysApiDetails } from "#/components/api-details/api-keys";
 
 export function ApiKeyListHeader() {
 	const [, setModal] = useQueryState("modal");
@@ -28,7 +27,7 @@ export function ApiKeyListHeader() {
 					</h1>
 				</div>
 				<p className="mt-1 text-sm text-text-sub-600">
-					Manage API keys to authenticate programmatic requests to Reloop.
+					Create keys to send email from your app over the API or SMTP.
 				</p>
 			</div>
 
@@ -67,7 +66,6 @@ export function ApiKeyListHeader() {
 					<Icon name="plus" className="h-4 w-4" />
 					Create API key
 				</FancyButton.Root>
-				<ApiKeysApiDetails />
 			</div>
 		</div>
 	);
