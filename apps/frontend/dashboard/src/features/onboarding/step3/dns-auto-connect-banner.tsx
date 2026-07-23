@@ -28,11 +28,14 @@ function BannerSkeleton() {
 
 export function DnsAutoConnectBanner({
 	domain,
-	domainId,
+	domainId: domainIdProp,
+	forceShow = true,
 }: {
 	domain?: DomainResponse;
-	domainId: string;
+	domainId?: string;
+	forceShow?: boolean;
 }) {
+	const domainId = domainIdProp || domain?.id || "";
 	const { startAutoConnect, isConnecting } = useDomainConnect(domainId);
 	const { data: nameserverData, isLoading } =
 		useDomainNameserversQuery(domainId);
@@ -44,7 +47,7 @@ export function DnsAutoConnectBanner({
 
 	const status = domain?.status || "pending";
 
-	if (status !== "pending" && status !== "failed") {
+	if (!forceShow && status !== "pending" && status !== "failed" && status !== "verifying") {
 		return null;
 	}
 

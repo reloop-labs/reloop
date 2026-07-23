@@ -91,7 +91,7 @@ export function ConfigureDnsStep() {
 					</p>
 				</div>
 				<div className="mt-6">
-					<DnsAutoConnectBanner domain={domainData} domainId={domainId} />
+					<DnsAutoConnectBanner domain={domainData} domainId={domainId || domainData?.id} forceShow />
 				</div>
 
 				<DnsFeatureSection

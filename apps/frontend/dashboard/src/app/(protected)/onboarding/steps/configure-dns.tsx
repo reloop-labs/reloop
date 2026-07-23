@@ -170,7 +170,7 @@ export const ConfigureDnsStep = () => {
 					</p>
 				</div>
 				<div className="mt-6">
-					<DNSAutoConnectBanner domain={domainData} domainId={domainId} />
+					<DNSAutoConnectBanner domain={domainData} domainId={domainId || domainData?.id} forceShow />
 				</div>
 
 				{/* Domain Verification Group */}

@@ -18,6 +18,7 @@ import Spinner from "@reloop/ui/spinner";
 interface DNSAutoConnectBannerProps {
 	domain?: DomainResponse;
 	domainId?: string;
+	forceShow?: boolean;
 }
 
 const DNSAutoConnectBannerSkeleton = () => (
@@ -38,9 +39,10 @@ const DNSAutoConnectBannerSkeleton = () => (
 export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 	domain,
 	domainId: domainIdProp,
+	forceShow = false,
 }) => {
 	const params = useParams();
-	const domainId = domainIdProp || params?.domainId;
+	const domainId = domainIdProp || domain?.id || params?.domainId;
 	const { startAutoConnect, isConnecting } = useDomainConnect(
 		typeof domainId === "string" ? domainId : undefined,
 	);
@@ -57,8 +59,8 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 
 	const status = domain?.status || "pending";
 
-	// Show only if domain status is "pending" or "failed" and DNS is not yet configured
-	if (status !== "pending" && status !== "failed") {
+	// Show if pending, failed, verifying or forceShow is set
+	if (!forceShow && status !== "pending" && status !== "failed" && status !== "verifying") {
 		return null;
 	}
 
