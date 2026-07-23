@@ -89,9 +89,10 @@ export function ApiKeyList() {
 
 	return (
 		<div className="pb-8">
-			{deletedName && (
-				<AnimatePresence>
+			<AnimatePresence>
+				{deletedName && (
 					<motion.div
+						key="deleted-banner"
 						initial={{ opacity: 0, y: -8, height: 0 }}
 						animate={{ opacity: 1, y: 0, height: "auto" }}
 						exit={{ opacity: 0, y: -8, height: 0 }}
@@ -111,12 +112,13 @@ export function ApiKeyList() {
 							</button>
 						</div>
 					</motion.div>
-				</AnimatePresence>
-			)}
+				)}
+			</AnimatePresence>
 
-			{rotatedName && (
-				<AnimatePresence>
+			<AnimatePresence>
+				{rotatedName && (
 					<motion.div
+						key="rotated-banner"
 						initial={{ opacity: 0, y: -8, height: 0 }}
 						animate={{ opacity: 1, y: 0, height: "auto" }}
 						exit={{ opacity: 0, y: -8, height: 0 }}
@@ -136,8 +138,8 @@ export function ApiKeyList() {
 							</button>
 						</div>
 					</motion.div>
-				</AnimatePresence>
-			)}
+				)}
+			</AnimatePresence>
 
 			{error ? (
 				<div className="flex flex-col items-center justify-center gap-2 p-4">
