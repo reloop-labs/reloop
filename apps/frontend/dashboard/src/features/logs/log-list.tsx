@@ -186,17 +186,6 @@ export function LogList({
 		}
 	};
 
-	if (error) {
-		return (
-			<div className="flex flex-col items-center justify-center gap-2 p-8">
-				<Icon name="alert-circle" className="h-8 w-8 text-error-base" />
-				<p className="text-center text-sm text-text-sub-600">
-					Failed to load logs
-				</p>
-			</div>
-		);
-	}
-
 	return (
 		<div className="flex min-h-0 flex-col">
 			<div className="relative mt-6 flex items-center gap-2 py-3">
@@ -307,32 +296,41 @@ export function LogList({
 						!isMobile && "sticky top-4 w-[540px] flex-shrink-0 self-start",
 					)}
 				>
-					<LogTable
-						logs={data?.logs || []}
-						isLoading={isLoading}
-						loadingRows={pageSize}
-						selectedLogId={selectedLogId}
-						onRowClick={(logId) => {
-							void setSelectedLogId(logId);
-							if (isMobile) {
-								setDrawerOpen(true);
-							}
-						}}
-						hasFilters={!!hasAnyFilter}
-						onClearFilters={handleClearAll}
-						total={totalLogs}
-						currentPage={currentPage ?? 1}
-						pageSize={pageSize ?? 25}
-						totalPages={totalPages}
-						startIndex={startIndex}
-						endIndex={endIndex}
-						onPageChange={(p) => void setCurrentPage(p)}
-						onPageSizeChange={(value) => {
-							void setPageSize(value);
-							void setCurrentPage(1);
-						}}
-						isMobile={isMobile}
-					/>
+					{error ? (
+						<div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-8 dark:border-stroke-soft-100/40">
+							<Icon name="alert-circle" className="h-8 w-8 text-error-base" />
+							<p className="text-center text-sm text-text-sub-600">
+								Failed to load logs
+							</p>
+						</div>
+					) : (
+						<LogTable
+							logs={data?.logs || []}
+							isLoading={isLoading}
+							loadingRows={8}
+							selectedLogId={selectedLogId}
+							onRowClick={(logId) => {
+								void setSelectedLogId(logId);
+								if (isMobile) {
+									setDrawerOpen(true);
+								}
+							}}
+							hasFilters={!!hasAnyFilter}
+							onClearFilters={handleClearAll}
+							total={totalLogs}
+							currentPage={currentPage ?? 1}
+							pageSize={pageSize ?? 25}
+							totalPages={totalPages}
+							startIndex={startIndex}
+							endIndex={endIndex}
+							onPageChange={(p) => void setCurrentPage(p)}
+							onPageSizeChange={(value) => {
+								void setPageSize(value);
+								void setCurrentPage(1);
+							}}
+							isMobile={isMobile}
+						/>
+					)}
 				</div>
 
 				{/* RIGHT — Inline detail panel */}

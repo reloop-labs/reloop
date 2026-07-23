@@ -1,4 +1,3 @@
-
 import * as Badge from "@reloop/ui/badge";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -167,6 +166,10 @@ function PropertyValue({
 	);
 }
 
+function PropertyValueSkeleton({ className }: { className?: string }) {
+	return <Skeleton className={cn("h-3.5 rounded-md", className)} />;
+}
+
 /**
  * Inline log detail panel — used in the right-side split panel of the logs list.
  * Also used inside the drawer for the mobile/narrow-viewport experience.
@@ -174,91 +177,119 @@ function PropertyValue({
 export function LogDetailPanel({ logId }: LogDetailPanelProps) {
 	const { data: log, isPending: isLoading } = useLogDetailQuery(logId);
 
+	if (!isLoading && !log) return null;
+
 	const statusProps = log ? getStatusProps(log.status_code) : null;
 	const metadataEntries = log ? Object.entries(log.metadata || {}) : [];
-	const hasRequestDetails =
-		log?.requestDetails && Object.keys(log.requestDetails).length > 0;
+	const hasRequestBody =
+		!!log?.request_body && Object.keys(log.request_body).length > 0;
+	const hasResponseBody = metadataEntries.length > 0;
 
-	/* ── Loading ── */
-	if (isLoading) {
-		return (
-			<div className="flex flex-col gap-4 p-5">
-				{/* Title skeleton */}
-				<div className="border-stroke-soft-100 border-b pb-4 dark:border-stroke-soft-100/40">
-					<Skeleton className="h-5 w-56 rounded" />
-					<Skeleton className="mt-2 h-3.5 w-36 rounded" />
-				</div>
-				{/* Property rows */}
-				<div className="space-y-3">
-					{Array.from({ length: 6 }).map((_, i) => (
-						<div key={i} className="grid grid-cols-[120px_1fr] gap-4">
-							<Skeleton className="h-3.5 w-20 rounded" />
-							<Skeleton className="h-3.5 w-32 rounded" />
-						</div>
-					))}
-				</div>
-				<Skeleton className="mt-4 h-40 rounded-xl" />
-			</div>
-		);
+	const method = log?.requestDetails?.method as string | undefined;
+	const endpoint = log?.requestDetails?.endpoint as string | undefined;
+	const displayEndpoint = endpoint ? stripBasePath(endpoint) : undefined;
+	const ipAddress = log?.requestDetails?.ipAddress as string | undefined;
+	const userAgent = log?.requestDetails?.userAgent as string | undefined;
+
+	let origin: string | undefined;
+	if (endpoint) {
+		try {
+			origin = new URL(endpoint).origin;
+		} catch {
+			origin = undefined;
+		}
 	}
 
-	if (!log) return null;
-
-	const method = log.requestDetails?.method as string | undefined;
-	const endpoint = log.requestDetails?.endpoint as string | undefined;
-	const displayEndpoint = endpoint ? stripBasePath(endpoint) : undefined;
+	const requestCode = hasRequestBody
+		? JSON.stringify(log?.request_body ?? {}, null, 2)
+		: "";
+	const responseCode = hasResponseBody
+		? JSON.stringify(log?.metadata ?? {}, null, 2)
+		: "";
 
 	return (
 		<div className="flex flex-col">
 			{/* ── Panel Header ── */}
 			<div className="flex items-start justify-between gap-3 px-5 pt-4">
 				<div className="min-w-0 flex-1">
-					<h2 className="truncate font-semibold text-sm text-text-strong-950">
-						{method && displayEndpoint ? (
-							<>
-								<span
-									className={cn(
-										"mr-1.5 font-bold uppercase",
-										getMethodColorClass(method),
-									)}
-								>
-									{method}
+					{isLoading ? (
+						<>
+							<div className="flex items-center gap-2">
+								<PropertyValueSkeleton className="h-4 w-12" />
+								<PropertyValueSkeleton className="h-4 w-48" />
+							</div>
+							<div className="mt-2 flex items-center gap-2">
+								<PropertyValueSkeleton className="w-36" />
+								<span className="text-text-disabled-300">·</span>
+								<PropertyValueSkeleton className="w-16" />
+							</div>
+						</>
+					) : (
+						<>
+							<h2 className="truncate font-semibold text-sm text-text-strong-950">
+								{method && displayEndpoint ? (
+									<>
+										<span
+											className={cn(
+												"mr-1.5 font-bold uppercase",
+												getMethodColorClass(method),
+											)}
+										>
+											{method}
+										</span>
+										<span>{displayEndpoint}</span>
+									</>
+								) : (
+									log?.event
+								)}
+							</h2>
+							<div className="mt-1 flex items-center gap-2 text-text-sub-600 text-xs">
+								<span>
+									{log?.created_at
+										? new Date(log.created_at).toLocaleString()
+										: null}
 								</span>
-								<span>{displayEndpoint}</span>
-							</>
-						) : (
-							log.event
-						)}
-					</h2>
-					<div className="mt-1 flex items-center gap-2 text-text-sub-600 text-xs">
-						<span>{new Date(log.created_at).toLocaleString()}</span>
-						<span className="text-text-disabled-300">·</span>
-						<span>{formatRelativeTime(log.created_at)}</span>
-					</div>
+								<span className="text-text-disabled-300">·</span>
+								<span>
+									{log?.created_at ? formatRelativeTime(log.created_at) : null}
+								</span>
+							</div>
+						</>
+					)}
 				</div>
-				<Link
-					to="/logs/$logId"
-					params={{ logId: log.uuid }}
-					className="shrink-0 rounded-md p-1 text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
-					title="View full details"
-				>
-					<Icon name="arrows-expand-diagonal" className="h-3.5 w-3.5" />
-				</Link>
+				{log ? (
+					<Link
+						to="/logs/$logId"
+						params={{ logId: log.uuid }}
+						className="shrink-0 rounded-md p-1 text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
+						title="View full details"
+					>
+						<Icon name="arrows-expand-diagonal" className="h-3.5 w-3.5" />
+					</Link>
+				) : (
+					<span className="shrink-0 rounded-md p-1 text-text-soft-400">
+						<Icon name="arrows-expand-diagonal" className="h-3.5 w-3.5" />
+					</span>
+				)}
 			</div>
 
 			{/* ── Body ── */}
 			<div className="flex-1 space-y-4 p-5">
-				{/* Diagnostic card */}
-				<DiagnosticCard log={log} />
+				{/* Diagnostic card — only once we know it's an error */}
+				{!isLoading && log && <DiagnosticCard log={log} />}
 
-				{/* Property table */}
+				{/* Property table — labels always present */}
 				<div className="rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
 					<div className="divide-y divide-stroke-soft-100 px-4 dark:divide-stroke-soft-100/40">
 						<PropertyRow label="Status">
-							{statusProps ? (
+							{isLoading ? (
+								<PropertyValueSkeleton className="h-[18px] w-14 rounded-md" />
+							) : statusProps ? (
 								<Badge.Root
 									variant="lighter"
-									color={statusProps.color as any}
+									color={
+										statusProps.color as "gray" | "blue" | "orange" | "red"
+									}
 									className="h-[18px] rounded-md px-1.5 font-semibold text-[10px] tracking-normal"
 								>
 									{statusProps.label}
@@ -269,84 +300,69 @@ export function LogDetailPanel({ logId }: LogDetailPanelProps) {
 						</PropertyRow>
 
 						<PropertyRow label="Request ID">
-							<PropertyValue value={log.uuid} mono copyable maxLength={26} />
+							{isLoading ? (
+								<PropertyValueSkeleton className="w-44 font-mono" />
+							) : (
+								<PropertyValue value={log?.uuid} mono copyable maxLength={26} />
+							)}
 						</PropertyRow>
 
 						<PropertyRow label="Time">
-							<PropertyValue
-								value={new Date(log.created_at).toLocaleString()}
-							/>
+							{isLoading ? (
+								<PropertyValueSkeleton className="w-40" />
+							) : (
+								<PropertyValue
+									value={
+										log?.created_at
+											? new Date(log.created_at).toLocaleString()
+											: undefined
+									}
+								/>
+							)}
 						</PropertyRow>
 
-						{hasRequestDetails && log.requestDetails.ipAddress && (
-							<PropertyRow label="IP address">
-								<PropertyValue
-									value={log.requestDetails.ipAddress as string}
-									mono
-									copyable
-								/>
-							</PropertyRow>
-						)}
-						{hasRequestDetails && log.requestDetails.userAgent && (
-							<PropertyRow label="Source">
-								<PropertyValue
-									value={log.requestDetails.userAgent as string}
-									maxLength={55}
-								/>
-							</PropertyRow>
-						)}
+						<PropertyRow label="IP address">
+							{isLoading ? (
+								<PropertyValueSkeleton className="w-28" />
+							) : (
+								<PropertyValue value={ipAddress} mono copyable />
+							)}
+						</PropertyRow>
 
-						{hasRequestDetails &&
-							log.requestDetails.endpoint &&
-							(() => {
-								try {
-									const origin = new URL(log.requestDetails.endpoint as string)
-										.origin;
-									return (
-										<PropertyRow label="Origin">
-											<PropertyValue value={origin} mono maxLength={50} />
-										</PropertyRow>
-									);
-								} catch {
-									return null;
-								}
-							})()}
+						<PropertyRow label="Source">
+							{isLoading ? (
+								<PropertyValueSkeleton className="w-52" />
+							) : (
+								<PropertyValue value={userAgent} maxLength={55} />
+							)}
+						</PropertyRow>
+
+						<PropertyRow label="Origin">
+							{isLoading ? (
+								<PropertyValueSkeleton className="w-36" />
+							) : (
+								<PropertyValue value={origin} mono maxLength={50} />
+							)}
+						</PropertyRow>
 					</div>
 				</div>
 
-				{/* Request body */}
-				{log.request_body && Object.keys(log.request_body).length > 0 && (
-					<div>
-						<CopyCodeBlock
-							code={JSON.stringify(log.request_body, null, 2)}
-							lang="json"
-							label="Request body"
-						/>
-					</div>
-				)}
+				{/* Same CopyCodeBlock chrome for loading / empty / loaded — no layout swap */}
+				<CopyCodeBlock
+					code={isLoading ? "" : requestCode}
+					lang="json"
+					label="Request body"
+					loading={isLoading}
+					emptyMessage="No request body"
+				/>
 
-				{/* Response body */}
-				{metadataEntries.length > 0 ? (
-					<div>
-						<CopyCodeBlock
-							code={JSON.stringify(log.metadata, null, 2)}
-							lang="json"
-							label="Response body"
-						/>
-					</div>
-				) : (
-					<div className="rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-						<div className="flex items-center gap-2 border-stroke-soft-100 border-b px-4 py-2.5 dark:border-stroke-soft-100/40">
-							<Icon name="code" className="h-3.5 w-3.5 text-text-sub-600" />
-							<span className="font-medium text-[11px] text-text-sub-600 uppercase tracking-wider">
-								Response body
-							</span>
-						</div>
-						<div className="py-4 text-center text-text-soft-400 text-xs">
-							No response body
-						</div>
-					</div>
-				)}
+				<CopyCodeBlock
+					code={isLoading ? "" : responseCode}
+					lang="json"
+					label="Response body"
+					loading={isLoading}
+					emptyMessage="No response body"
+				/>
 			</div>
 		</div>
 	);

@@ -4,7 +4,7 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { useCurrentEditor } from "@tiptap/react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
@@ -199,7 +199,7 @@ function VariableInspectorCard({ name }: { name: string }) {
 			<div className="flex flex-col gap-4 px-4 py-2">
 				{/* ── Name (Read-only reference) ── */}
 				<div className="flex flex-col gap-1">
-					<div className="select-all font-mono font-semibold text-text-strong-950 dark:text-zinc-200">
+					<div className="select-all font-mono font-semibold text-text-strong-950">
 						{formatTemplateVariable(name, 3)}
 					</div>
 				</div>
@@ -275,7 +275,7 @@ function VariableInspectorCard({ name }: { name: string }) {
 
 				{/* ── Default Value ── */}
 				<div className="flex flex-col gap-1.5">
-					<label className="font-semibold text-text-sub-600 text-xs dark:text-zinc-400">
+					<label className="font-semibold text-text-sub-600 text-xs">
 						Default Value
 					</label>
 					<Input.Root size="small" className="rounded-xl">

@@ -1,14 +1,6 @@
 import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import {
-	Grid2X2,
-	PanelBottom,
-	PanelLeft,
-	PanelRight,
-	PanelTop,
-	Square,
-	SquareRoundCorner,
-} from "lucide-react";
 import { useState } from "react";
 
 /* ------------------------------------------------------------------ */
@@ -30,7 +22,7 @@ function ModeToggle({
 	onToggle: (v: boolean) => void;
 }) {
 	return (
-		<div className="flex items-center gap-0.5 rounded-xl border border-stroke-sub-300 bg-bg-white-0 p-0.5">
+		<div className="flex items-center gap-0.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-0.5">
 			<Button.Root
 				type="button"
 				variant="neutral"
@@ -40,11 +32,11 @@ function ModeToggle({
 				onClick={() => onToggle(true)}
 				className={`flex h-7 w-7 items-center justify-center rounded-lg outline-none ring-0 transition-all duration-150 ${
 					linked
-						? "bg-bg-soft-200 text-text-strong-950 shadow-xs"
+						? "bg-bg-soft-200 text-text-strong-950 shadow-regular-xs"
 						: "text-text-soft-400 hover:text-text-sub-600"
 				}`}
 			>
-				<Square className="h-3.5 w-3.5" />
+				<Icon name="box" className="h-3.5 w-3.5" />
 			</Button.Root>
 			<Button.Root
 				type="button"
@@ -55,11 +47,11 @@ function ModeToggle({
 				onClick={() => onToggle(false)}
 				className={`flex h-7 w-7 items-center justify-center rounded-lg outline-none ring-0 transition-all duration-150 ${
 					!linked
-						? "bg-bg-soft-200 text-text-strong-950 shadow-xs"
+						? "bg-bg-soft-200 text-text-strong-950 shadow-regular-xs"
 						: "text-text-soft-400 hover:text-text-sub-600"
 				}`}
 			>
-				<Grid2X2 className="h-3.5 w-3.5" />
+				<Icon name="grid" className="h-3.5 w-3.5" />
 			</Button.Root>
 		</div>
 	);
@@ -78,7 +70,7 @@ function PillInput({
 	return (
 		<Input.Root
 			size="xsmall"
-			className="flex-1 rounded-xl border border-stroke-sub-300 shadow-none before:hidden"
+			className="flex-1 rounded-xl border border-stroke-soft-200 shadow-none before:hidden"
 		>
 			<Input.Wrapper>
 				{icon && <span className="shrink-0 text-text-sub-600">{icon}</span>}
@@ -132,7 +124,9 @@ export function SpacingControl({
 	if (linked) {
 		return (
 			<div className="flex min-h-9 items-center gap-3 px-4 py-1.5">
-				<span className="w-1/3 min-w-0 shrink-0 text-sm">{label}</span>
+				<span className="w-1/3 min-w-0 shrink-0 text-label-sm text-text-sub-600">
+					{label}
+				</span>
 				<div className="flex w-2/3 min-w-0 items-center justify-end gap-2">
 					<PillInput
 						value={value.top}
@@ -149,7 +143,7 @@ export function SpacingControl({
 		<div className="flex flex-col gap-2 px-4 py-2">
 			{/* Header row */}
 			<div className="flex items-center justify-between">
-				<span className="text-sm">{label}</span>
+				<span className="text-label-sm text-text-sub-600">{label}</span>
 				<ModeToggle linked={linked} onToggle={setLinked} />
 			</div>
 
@@ -160,9 +154,9 @@ export function SpacingControl({
 					onChange={(v) => handleChange("top", v)}
 					icon={
 						variant === "sides" ? (
-							<PanelTop className="h-3.5 w-3.5" />
+							<Icon name="arrow-top" className="h-3.5 w-3.5" />
 						) : (
-							<SquareRoundCorner className="h-3.5 w-3.5" />
+							<Icon name="box" className="h-3.5 w-3.5" />
 						)
 					}
 				/>
@@ -171,9 +165,9 @@ export function SpacingControl({
 					onChange={(v) => handleChange("right", v)}
 					icon={
 						variant === "sides" ? (
-							<PanelRight className="h-3.5 w-3.5" />
+							<Icon name="arrow-right" className="h-3.5 w-3.5" />
 						) : (
-							<SquareRoundCorner className="h-3.5 w-3.5 rotate-90" />
+							<Icon name="box" className="h-3.5 w-3.5" />
 						)
 					}
 				/>
@@ -182,9 +176,9 @@ export function SpacingControl({
 					onChange={(v) => handleChange("bottom", v)}
 					icon={
 						variant === "sides" ? (
-							<PanelBottom className="h-3.5 w-3.5" />
+							<Icon name="arrow-down" className="h-3.5 w-3.5" />
 						) : (
-							<SquareRoundCorner className="h-3.5 w-3.5 rotate-180" />
+							<Icon name="box" className="h-3.5 w-3.5" />
 						)
 					}
 				/>
@@ -193,9 +187,9 @@ export function SpacingControl({
 					onChange={(v) => handleChange("left", v)}
 					icon={
 						variant === "sides" ? (
-							<PanelLeft className="h-3.5 w-3.5" />
+							<Icon name="arrow-left" className="h-3.5 w-3.5" />
 						) : (
-							<SquareRoundCorner className="-rotate-90 h-3.5 w-3.5" />
+							<Icon name="box" className="h-3.5 w-3.5" />
 						)
 					}
 				/>

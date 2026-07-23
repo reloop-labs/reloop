@@ -9,7 +9,7 @@ import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import * as v from "valibot";

@@ -1,5 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
@@ -261,15 +262,15 @@ function PublishModal({
 							Cancel
 							<KbdEsc />
 						</Button.Root>
-						<Button.Root
+						<FancyButton.Root
 							type="button"
-							variant="primary"
+							variant="neutral"
 							size="xsmall"
 							onClick={() => onConfirm(description)}
 							disabled={isPublishing}
 						>
 							{isPublishing ? "Publishing..." : "Confirm & Publish"}
-						</Button.Root>
+						</FancyButton.Root>
 					</Modal.Footer>
 				</div>
 			</Modal.Content>
@@ -565,14 +566,14 @@ export const EditorHeaderActions = ({
 			</Button.Root>
 
 			{/* Publish Button */}
-			<Button.Root
-				variant="primary"
+			<FancyButton.Root
+				variant="neutral"
 				size="xsmall"
 				onClick={() => setIsPublishModalOpen(true)}
 				disabled={isPublishing}
 			>
 				{isPublishing ? "Publishing..." : "Publish"}
-			</Button.Root>
+			</FancyButton.Root>
 
 			{/* Delete Confirmation Modal */}
 			<DeleteModal

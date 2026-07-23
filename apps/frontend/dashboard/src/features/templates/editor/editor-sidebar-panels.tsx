@@ -1,12 +1,13 @@
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
-import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useCurrentEditor } from "@tiptap/react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
@@ -862,26 +863,25 @@ export function TestPanel({ onClose }: PanelProps) {
 							</div>
 						)}
 
-						<Button.Root
+						<FancyButton.Root
 							type="submit"
-							variant="primary"
-							mode="filled"
+							variant="neutral"
 							size="small"
 							disabled={sending || !fromEmail}
-							className="w-full justify-center gap-1.5 rounded-xl py-2.5 font-medium"
+							className="w-full justify-center gap-1.5"
 						>
 							{sending ? (
 								<>
-									<Spinner size={13} />
+									<Spinner size={13} color="#fff" />
 									Sending...
 								</>
 							) : (
 								<>
-									<Icon name="send" className="h-3.5 w-3.5" />
+									<FancyButton.Icon as={Icon} name="send" />
 									Send Test Email
 								</>
 							)}
-						</Button.Root>
+						</FancyButton.Root>
 					</form>
 				</div>
 
@@ -1054,20 +1054,20 @@ export function AIPanel({ onClose }: PanelProps) {
 					/>
 				</div>
 
-				<Button.Root
-					variant="primary"
+				<FancyButton.Root
+					variant="neutral"
 					size="small"
 					onClick={() => void handleGenerate()}
 					disabled={isGenerating || !prompt.trim()}
-					className="w-full justify-center "
+					className="w-full justify-center"
 				>
 					{isGenerating ? (
-						<Spinner size={16} />
+						<Spinner size={16} color="#fff" />
 					) : (
-						<Icon name="sparkling" className="h-4 w-4" />
+						<FancyButton.Icon as={Icon} name="sparkling" />
 					)}
 					{isGenerating ? "Generating..." : "Generate with AI"}
-				</Button.Root>
+				</FancyButton.Root>
 			</div>
 		</div>
 	);

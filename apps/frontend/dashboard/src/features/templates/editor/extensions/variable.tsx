@@ -1,7 +1,7 @@
 import { EmailNode } from "@react-email/editor/core";
+import { Icon } from "@reloop/ui/icon";
 import { mergeAttributes, nodeInputRule, nodePasteRule } from "@tiptap/core";
 import { NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
-import { AlertTriangle } from "lucide-react";
 import type React from "react";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
@@ -73,13 +73,9 @@ export function VariableNodeView({
 			{!hasDefaultValue && (
 				<span
 					title="There is no default value for this variable, please provide a default value."
-					className="mr-0.5 inline-block shrink-0 align-middle"
+					className="mr-0.5 inline-block shrink-0 align-middle text-error-base"
 				>
-					<AlertTriangle
-						size={14}
-						className="text-red-500"
-						style={{ color: "#ef4444" }}
-					/>
+					<Icon name="alert-triangle" className="h-3.5 w-3.5 text-error-base" />
 				</span>
 			)}
 		</NodeViewWrapper>

@@ -2,11 +2,12 @@ import { html } from "@codemirror/lang-html";
 import { EditorView } from "@codemirror/view";
 import { composeReactEmail } from "@react-email/editor/core";
 import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
+import Spinner from "@reloop/ui/spinner";
 import { generateJSON } from "@tiptap/html";
 import { useCurrentEditor } from "@tiptap/react";
 import { xcodeDark } from "@uiw/codemirror-theme-xcode";
 import CodeMirror from "@uiw/react-codemirror";
-import { Check, Code2, Copy, Loader2, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useEditorStore } from "./use-editor-store";
@@ -167,16 +168,14 @@ export function CodeEditor() {
 	}, [htmlCode]);
 
 	return (
-		<div className="flex h-full w-full flex-col overflow-hidden">
-			<div className="flex h-10 shrink-0 items-center justify-between px-3">
+		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
+			<div className="flex h-10 shrink-0 items-center justify-between border-stroke-soft-200 border-b px-3 dark:border-stroke-soft-100/40">
 				<div className="flex items-center gap-1.5 p-0">
-					<Code2 size={14} className="text-foreground" />
-					<span className="mr-1 font-semibold text-foreground text-xs">
+					<Icon name="code" className="h-3.5 w-3.5 text-text-sub-600" />
+					<span className="mr-1 font-semibold text-label-xs text-text-strong-950">
 						HTML code editor
 					</span>
-					{isLoading && (
-						<Loader2 size={12} className="animate-spin text-foreground/50" />
-					)}
+					{isLoading && <Spinner size={12} />}
 				</div>
 				<div className="flex items-center gap-1.5">
 					<Button.Root
@@ -186,9 +185,9 @@ export function CodeEditor() {
 						size="xxsmall"
 						onClick={handleFormat}
 						disabled={isLoading}
-						className="h-7 gap-1 rounded-md px-2 font-medium text-[11px] text-foreground/70 hover:bg-neutral-100 hover:text-foreground dark:hover:bg-neutral-800"
+						className="h-7 gap-1 rounded-md px-2 font-medium text-[11px] text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950"
 					>
-						<RefreshCw size={12} />
+						<Icon name="refresh-cw" className="h-3 w-3" />
 						Format
 					</Button.Root>
 					<Button.Root
@@ -198,12 +197,12 @@ export function CodeEditor() {
 						size="xxsmall"
 						onClick={handleCopy}
 						disabled={!htmlCode || isLoading}
-						className="h-7 gap-1 rounded-md px-2 font-medium text-[11px] text-foreground/70 hover:bg-neutral-100 hover:text-foreground dark:hover:bg-neutral-800"
+						className="h-7 gap-1 rounded-md px-2 font-medium text-[11px] text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950"
 					>
 						{copied ? (
-							<Check size={12} className="text-green-600 dark:text-green-400" />
+							<Icon name="check" className="h-3 w-3 text-success-base" />
 						) : (
-							<Copy size={12} />
+							<Icon name="copy" className="h-3 w-3" />
 						)}
 						Copy
 					</Button.Root>

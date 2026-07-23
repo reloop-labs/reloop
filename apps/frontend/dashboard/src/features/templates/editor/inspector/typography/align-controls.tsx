@@ -1,17 +1,12 @@
 import * as ButtonGroup from "@reloop/ui/button-group";
-import {
-	AlignCenter,
-	AlignLeft,
-	AlignRight,
-	type LucideIcon,
-} from "lucide-react";
+import { Icon } from "@reloop/ui/icon";
 
 export type Alignment = "left" | "center" | "right";
 
-const ALIGN_OPTIONS: { value: Alignment; icon: LucideIcon; label: string }[] = [
-	{ value: "left", icon: AlignLeft, label: "Align left" },
-	{ value: "center", icon: AlignCenter, label: "Align center" },
-	{ value: "right", icon: AlignRight, label: "Align right" },
+const ALIGN_OPTIONS: { value: Alignment; icon: string; label: string }[] = [
+	{ value: "left", icon: "align-left", label: "Align left" },
+	{ value: "center", icon: "align-center", label: "Align center" },
+	{ value: "right", icon: "align-right", label: "Align right" },
 ];
 
 export function AlignControls({
@@ -23,7 +18,7 @@ export function AlignControls({
 }) {
 	return (
 		<ButtonGroup.Root className="w-full">
-			{ALIGN_OPTIONS.map(({ value: a, icon: Icon, label }) => (
+			{ALIGN_OPTIONS.map(({ value: a, icon, label }) => (
 				<ButtonGroup.Item
 					key={a}
 					title={label}
@@ -32,7 +27,7 @@ export function AlignControls({
 					onClick={() => setAlignment(a as Alignment)}
 					className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 				>
-					<Icon className="h-4 w-4" strokeWidth={2} />
+					<Icon name={icon} className="h-4 w-4" />
 				</ButtonGroup.Item>
 			))}
 		</ButtonGroup.Root>

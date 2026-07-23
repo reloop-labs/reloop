@@ -1,9 +1,10 @@
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
-import * as Modal from "@reloop/ui/modal";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { motion } from "framer-motion";
+import * as Modal from "@reloop/ui/modal";
+import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
@@ -507,19 +508,19 @@ export function PreviewModal({
 								</Button.Root>
 
 								{/* Restore in Editor */}
-								<Button.Root
-									variant="primary"
+								<FancyButton.Root
+									variant="neutral"
 									size="xsmall"
 									onClick={() => {
 										onRestore(version);
 										onClose();
 									}}
 									disabled={isRestoring}
-									className="ml-2 h-8 gap-1.5 px-3 py-1 font-semibold text-xs shadow-sm"
+									className="ml-2 gap-1.5"
 								>
-									<Icon name="arrow-up-right" className="h-3.5 w-3.5" />
+									<FancyButton.Icon as={Icon} name="arrow-up-right" />
 									<span>Load Version</span>
-								</Button.Root>
+								</FancyButton.Root>
 							</div>
 						</div>
 

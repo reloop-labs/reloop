@@ -1237,60 +1237,6 @@
 	}
 }
 
-/*
- * Overlay scrollbar — thumb floats over content with a transparent track,
- * so bordered cards don't grow a reserved gutter strip on the right.
- * Falls back to overflow: overlay where the engine still supports it.
- */
-.scrollbar-overlay {
-	scrollbar-width: thin;
-	scrollbar-color: color-mix(
-			in srgb,
-			var(--color-stroke-soft-200) 65%,
-			transparent
-		)
-		transparent;
-}
-
-@supports (overflow: overlay) {
-	.scrollbar-overlay {
-		overflow-y: overlay;
-	}
-}
-
-.scrollbar-overlay::-webkit-scrollbar {
-	width: 8px;
-	height: 8px;
-	background: transparent;
-}
-
-.scrollbar-overlay::-webkit-scrollbar-track,
-.scrollbar-overlay::-webkit-scrollbar-track-piece,
-.scrollbar-overlay::-webkit-scrollbar-corner {
-	background: transparent;
-	border: none;
-	box-shadow: none;
-}
-
-.scrollbar-overlay::-webkit-scrollbar-thumb {
-	background-color: color-mix(
-		in srgb,
-		var(--color-stroke-soft-200) 65%,
-		transparent
-	);
-	border-radius: 999px;
-	border: 2px solid transparent;
-	background-clip: content-box;
-}
-
-.scrollbar-overlay::-webkit-scrollbar-thumb:hover {
-	background-color: color-mix(
-		in srgb,
-		var(--color-text-soft-400) 80%,
-		transparent
-	);
-}
-
 .node-container {
 	@apply mx-auto;
 }

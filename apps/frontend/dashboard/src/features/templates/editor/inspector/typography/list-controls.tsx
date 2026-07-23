@@ -1,6 +1,6 @@
 import * as ButtonGroup from "@reloop/ui/button-group";
+import { Icon } from "@reloop/ui/icon";
 import { useCurrentEditor } from "@tiptap/react";
-import { Code, List, ListOrdered, Quote } from "lucide-react";
 
 export function ListControls() {
 	const { editor } = useCurrentEditor();
@@ -24,7 +24,7 @@ export function ListControls() {
 					className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 					title="Quote"
 				>
-					<Quote className="h-4 w-4" />
+					<Icon name="comment-text" className="h-4 w-4" />
 				</ButtonGroup.Item>
 				<ButtonGroup.Item
 					data-state={isCodeActive ? "on" : "off"}
@@ -32,7 +32,7 @@ export function ListControls() {
 					className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 					title="Code"
 				>
-					<Code className="h-4 w-4" />
+					<Icon name="code" className="h-4 w-4" />
 				</ButtonGroup.Item>
 				<ButtonGroup.Item
 					data-state={listType === "bullet" ? "on" : "off"}
@@ -42,7 +42,7 @@ export function ListControls() {
 					className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 					title="Bullet List"
 				>
-					<List className="h-4 w-4" />
+					<Icon name="list-unordered-4-rec" className="h-4 w-4" />
 				</ButtonGroup.Item>
 				<ButtonGroup.Item
 					data-state={listType === "ordered" ? "on" : "off"}
@@ -52,7 +52,7 @@ export function ListControls() {
 					className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 					title="Ordered List"
 				>
-					<ListOrdered className="h-4 w-4" />
+					<Icon name="list" className="h-4 w-4" />
 				</ButtonGroup.Item>
 			</ButtonGroup.Root>
 		</div>

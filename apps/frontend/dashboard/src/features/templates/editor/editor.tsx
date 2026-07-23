@@ -1,9 +1,8 @@
 import { DragHandle } from "@tiptap/extension-drag-handle-react";
-import { EditorContent } from "@tiptap/react";
+import { EditorContent, useCurrentEditor } from "@tiptap/react";
+import { Icon } from "@reloop/ui/icon";
 
 import "@react-email/editor/themes/default.css";
-import { useCurrentEditor } from "@tiptap/react";
-import { GripVertical } from "lucide-react";
 
 // Stable module-level constants — defined outside the component so their
 // object references never change between renders, preventing the infinite
@@ -30,10 +29,10 @@ export function FullEmailBuilder() {
 				computePositionConfig={DRAG_POSITION_CONFIG}
 			>
 				<div
-					className="mr-1 cursor-pointer rounded-sm bg-bg-soft-200 py-px"
+					className="mr-1 cursor-pointer rounded-sm bg-bg-soft-200 py-px text-text-sub-600"
 					title="Drag to reorder"
 				>
-					<GripVertical size={16} />
+					<Icon name="more-vertical" className="h-4 w-4" />
 				</div>
 			</DragHandle>
 			<EditorContent editor={editor} />

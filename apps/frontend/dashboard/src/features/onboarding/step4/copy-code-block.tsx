@@ -37,6 +37,8 @@ export function CopyCodeBlock({
 	codeExtraPadding = false,
 	action,
 	icon,
+	loading = false,
+	emptyMessage,
 }: {
 	code: string;
 	lang: string;
@@ -55,6 +57,10 @@ export function CopyCodeBlock({
 	codeExtraPadding?: boolean;
 	action?: React.ReactNode;
 	icon?: React.ReactNode;
+	/** Keep chrome identical; swap only the inner code surface for skeletons */
+	loading?: boolean;
+	/** Shown inside the code surface when not loading and code is empty */
+	emptyMessage?: string;
 }) {
 	const [copied, setCopied] = useState(false);
 	const [hoveredTabIdx, setHoveredTabIdx] = useState<number | undefined>(
@@ -116,6 +122,7 @@ export function CopyCodeBlock({
 	}, [activeTabIndex, mounted]);
 
 	const handleCopy = async () => {
+		if (loading || !(copyValue ?? code)) return;
 		try {
 			await navigator.clipboard.writeText(copyValue ?? code);
 			setCopied(true);
@@ -126,6 +133,9 @@ export function CopyCodeBlock({
 	};
 
 	const displayLabel = label ?? lang;
+	const isEmpty = !loading && !(code.trim().length > 0);
+	/** Matches ~5 BrightCode lines so loading → content/empty never collapses the card */
+	const codeSurfaceMinClass = "min-h-[7.5rem]";
 
 	const highlightedTabIndex =
 		hoveredTabIdx !== undefined ? hoveredTabIdx : activeTabIndex;
@@ -167,8 +177,9 @@ export function CopyCodeBlock({
 			<button
 				type="button"
 				onClick={handleCopy}
+				disabled={loading || isEmpty}
 				aria-label={copied ? "Copied" : "Copy code"}
-				className="shrink-0 cursor-pointer text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
+				className="shrink-0 cursor-pointer text-text-sub-600 transition-colors hover:text-text-strong-950 disabled:cursor-default disabled:opacity-40 dark:text-white/55 dark:hover:text-white"
 			>
 				<Icon name={copied ? "check" : "copy"} className="size-4 stroke-3" />
 			</button>
@@ -339,21 +350,64 @@ export function CopyCodeBlock({
 
 			{/* Inner code surface — same nested card as the Next dashboard */}
 			<div
-				className="mx-0.5 mb-0.5 overflow-hidden rounded-2xl border border-stroke-soft-100/70 bg-white dark:border-stroke-soft-100/15 dark:bg-zinc-950"
+				className={cn(
+					"mx-0.5 mb-0.5 overflow-hidden rounded-2xl border border-stroke-soft-100/70 bg-white dark:border-stroke-soft-100/15 dark:bg-zinc-950",
+					codeSurfaceMinClass,
+				)}
 				style={
 					maxHeight
 						? ({ "--code-max-height": maxHeight } as React.CSSProperties)
 						: undefined
 				}
 			>
-				<BrightCode
-					code={code}
-					lang={lang}
-					lineNumbers={!hideLineNumbers}
-					noScroll={noScroll}
-					maxHeight={maxHeight}
-					codeExtraPadding={codeExtraPadding}
-				/>
+				{loading ? (
+					<div
+						className={cn(
+							"space-y-0 px-2 font-mono text-[12.5px] leading-5 sm:text-[13px] sm:leading-[1.3125rem]",
+							codeExtraPadding ? "pt-4 pb-4" : "pt-1 pb-1.5",
+							codeSurfaceMinClass,
+						)}
+						aria-hidden
+					>
+						{[88, 72, 80, 56, 64].map((width, i) => (
+							<div
+								key={i}
+								className="flex h-5 items-center gap-1.5 sm:h-[1.3125rem]"
+							>
+								{!hideLineNumbers ? (
+									<span
+										className="inline-block w-6 shrink-0 border-stroke-soft-100/80 border-r pr-1.5 text-right text-[10.5px] text-transparent dark:border-stroke-soft-100/40"
+										aria-hidden
+									>
+										{i + 1}
+									</span>
+								) : null}
+								<span
+									className="inline-block h-3 animate-pulse rounded bg-bg-weak-50 dark:bg-white/10"
+									style={{ width: `${width}%` }}
+								/>
+							</div>
+						))}
+					</div>
+				) : isEmpty && emptyMessage ? (
+					<div
+						className={cn(
+							"flex items-center justify-center px-4 text-text-soft-400 text-xs",
+							codeSurfaceMinClass,
+						)}
+					>
+						{emptyMessage}
+					</div>
+				) : (
+					<BrightCode
+						code={code}
+						lang={lang}
+						lineNumbers={!hideLineNumbers}
+						noScroll={noScroll}
+						maxHeight={maxHeight}
+						codeExtraPadding={codeExtraPadding}
+					/>
+				)}
 			</div>
 		</div>
 	);

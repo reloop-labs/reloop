@@ -1,11 +1,9 @@
-import * as ScrollArea from "@radix-ui/react-scroll-area";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
-import type { ReactNode } from "react";
 import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
 import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
 import type { LogData } from "./types";
@@ -175,52 +173,37 @@ function TruncatedPath({ path }: { path: string }) {
 function LogRowSkeleton() {
 	return (
 		<div className={cn("grid items-center gap-2 px-4 py-2.5", GRID_COLS)}>
-			<Skeleton className="h-5 w-14 rounded-md" />
-			<Skeleton className="h-3.5 w-8 rounded" />
-			<Skeleton className="h-3.5 w-full max-w-[240px] rounded" />
-			<Skeleton className="ml-auto h-3.5 w-12 rounded" />
+			<Skeleton className="h-[18px] w-14 rounded-md" />
+			<Skeleton className="h-3.5 w-9 rounded" />
+			<Skeleton className="h-3.5 w-full max-w-[220px] rounded" />
+			<Skeleton className="ml-auto h-3.5 w-14 rounded" />
 		</div>
 	);
 }
 
-function LogTableBody({
-	children,
-	isMobile,
-}: {
-	children: ReactNode;
-	isMobile?: boolean;
-}) {
-	if (isMobile) {
-		return (
-			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
-				{children}
-			</div>
-		);
-	}
-
-	/*
-	 * Flex + max-height cards need an explicit height box. `h-0 flex-1` claims
-	 * remaining space; absolute Root fills it so Radix Viewport can overflow.
-	 */
+function LogTableHeader() {
 	return (
-		<div className="relative h-0 min-h-0 flex-1">
-			<ScrollArea.Root
-				type="hover"
-				className="absolute inset-0 overflow-hidden"
-			>
-				<ScrollArea.Viewport className="scrollbar-none size-full overscroll-contain rounded-[inherit] [&>div]:!block [&>div]:w-full">
-					<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
-						{children}
-					</div>
-				</ScrollArea.Viewport>
-				<ScrollArea.Scrollbar
-					orientation="vertical"
-					className="z-20 flex w-2.5 touch-none select-none bg-transparent p-0.5 data-[state=hidden]:pointer-events-none data-[state=hidden]:opacity-0"
-				>
-					<ScrollArea.Thumb className="relative flex-1 rounded-full bg-stroke-soft-200 hover:bg-text-soft-400 dark:bg-stroke-soft-100" />
-				</ScrollArea.Scrollbar>
-				<ScrollArea.Corner />
-			</ScrollArea.Root>
+		<div
+			className={cn(
+				"grid items-center gap-2 rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40",
+				GRID_COLS,
+			)}
+		>
+			<div className="flex items-center gap-1.5 text-xs">
+				<Icon name="check-circle" className="h-3.5 w-3.5" />
+				<span>Status</span>
+			</div>
+			<div className="flex items-center gap-1.5 text-xs">
+				<span>Method</span>
+			</div>
+			<div className="flex items-center gap-1.5 text-xs">
+				<Icon name="activity-2" className="h-3.5 w-3.5" />
+				<span>Request</span>
+			</div>
+			<div className="flex items-center justify-end gap-1.5 text-xs">
+				<Icon name="clock" className="h-3.5 w-3.5" />
+				<span>Time</span>
+			</div>
 		</div>
 	);
 }
@@ -228,7 +211,7 @@ function LogTableBody({
 export const LogTable = ({
 	logs,
 	isLoading,
-	loadingRows = 5,
+	loadingRows = 8,
 	selectedLogId,
 	onRowClick,
 	hasFilters,
@@ -243,202 +226,188 @@ export const LogTable = ({
 	onPageSizeChange,
 	isMobile,
 }: LogTableProps) => {
-	const showHeader = isLoading || logs.length > 0;
-
 	return (
 		<div
-			className={cn(
-				"w-full rounded-[14px] border border-stroke-soft-100 bg-bg-white-0 text-paragraph-sm dark:border-stroke-soft-100/40",
-				!isMobile && "flex flex-col overflow-hidden",
-			)}
+			className={cn("w-full text-paragraph-sm", !isMobile && "flex flex-col")}
 			style={!isMobile ? { maxHeight: "calc(100vh - 220px)" } : undefined}
 		>
-			{/* Sticky column headers — outside scroll body */}
-			{showHeader && (
+			{/* Soft overlapping header — always visible (matches API keys / loading shell) */}
+			<LogTableHeader />
+
+			{/* Body card overlaps header */}
+			<div
+				className={cn(
+					"-mt-2.5 flex min-h-0 flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40",
+					!isMobile && "flex-1",
+				)}
+			>
 				<div
 					className={cn(
-						"grid flex-shrink-0 items-center gap-2 border-stroke-soft-100 border-b px-4 py-2.5 text-text-sub-600 dark:border-stroke-soft-100/50",
-						GRID_COLS,
+						"divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50",
+						!isMobile && "min-h-0 flex-1 overflow-y-auto",
 					)}
 				>
-					<div className="flex items-center gap-1.5 text-xs">
-						<Icon name="check-circle" className="h-3.5 w-3.5" />
-						<span className="font-medium">Status</span>
-					</div>
-					<div className="flex items-center gap-1.5 text-xs">
-						<span className="font-medium">Method</span>
-					</div>
-					<div className="flex items-center gap-1.5 text-xs">
-						<Icon name="activity-2" className="h-3.5 w-3.5" />
-						<span className="font-medium">Request</span>
-					</div>
-					<div className="flex items-center justify-end gap-1.5 text-xs">
-						<Icon name="clock" className="h-3.5 w-3.5" />
-						<span className="font-medium">Time</span>
-					</div>
-				</div>
-			)}
-
-			{/* Scrollable Table Body */}
-			<LogTableBody isMobile={isMobile}>
-				{isLoading ? (
-					Array.from({ length: loadingRows }).map((_, i) => (
-						<LogRowSkeleton key={`skel-${i}`} />
-					))
-				) : logs.length === 0 ? (
-					hasFilters ? (
-						<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
-							<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
-								<Icon name="search" className="h-5 w-5 text-text-sub-600" />
-							</div>
-							<h3 className="mb-2 font-semibold text-lg text-text-strong-950">
-								No results found
-							</h3>
-							<p className="mx-auto mb-5 max-w-sm text-balance font-medium text-[12px] text-text-sub-600">
-								No logs match your current filters. Try adjusting your search,
-								date range, or status filters.
-							</p>
-							{onClearFilters && (
-								<Button.Root
-									variant="neutral"
-									mode="stroke"
-									size="xsmall"
-									onClick={onClearFilters}
-									className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
-								>
-									Clear all filters
-								</Button.Root>
-							)}
-						</div>
-					) : (
-						<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
-							<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
-								<Icon name="activity" className="h-5 w-5 text-text-sub-600" />
-							</div>
-							<h3 className="mb-2 font-semibold text-lg text-text-strong-950">
-								No logs yet
-							</h3>
-							<p className="mx-auto mb-5 max-w-[260px] text-balance font-medium text-[12px] text-text-sub-600">
-								Logs will appear here once API requests start flowing through
-								your project.
-							</p>
-						</div>
-					)
-				) : (
-					<Tooltip.Provider delayDuration={400}>
-						{groupLogsByDate(logs).map((group) => (
-							<div key={group.dateKey}>
-								{/* Date section — soft sticky band (API keys header + inbox section tone) */}
-								<div className="sticky top-0 z-10 flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-weak-50/70 px-4 py-1.5 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
-									<Icon
-										name="calendar"
-										className="h-3 w-3 shrink-0 text-text-soft-400"
-									/>
-									<span className="font-medium text-[11px] text-text-sub-600 tracking-wide">
-										{group.dateLabel}
-									</span>
-									<span className="inline-flex h-4 min-w-4 items-center justify-center rounded-md bg-bg-white-0 px-1 font-medium text-[10px] text-text-soft-400 tabular-nums ring-1 ring-stroke-soft-100 dark:bg-bg-white-0/10 dark:ring-stroke-soft-100/40">
-										{group.logs.length}
-									</span>
+					{isLoading ? (
+						Array.from({ length: loadingRows }).map((_, i) => (
+							<LogRowSkeleton key={`skel-${i}`} />
+						))
+					) : logs.length === 0 ? (
+						hasFilters ? (
+							<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
+								<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
+									<Icon name="search" className="h-5 w-5 text-text-sub-600" />
 								</div>
+								<h3 className="mb-2 font-semibold text-lg text-text-strong-950">
+									No results found
+								</h3>
+								<p className="mx-auto mb-5 max-w-sm text-balance font-medium text-[12px] text-text-sub-600">
+									No logs match your current filters. Try adjusting your search,
+									date range, or status filters.
+								</p>
+								{onClearFilters && (
+									<Button.Root
+										variant="neutral"
+										mode="stroke"
+										size="xsmall"
+										onClick={onClearFilters}
+										className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
+									>
+										Clear all filters
+									</Button.Root>
+								)}
+							</div>
+						) : (
+							<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
+								<div className="mb-5 flex h-12 w-12 items-center justify-center rounded-3xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
+									<Icon name="activity" className="h-5 w-5 text-text-sub-600" />
+								</div>
+								<h3 className="mb-2 font-semibold text-lg text-text-strong-950">
+									No logs yet
+								</h3>
+								<p className="mx-auto mb-5 max-w-[260px] text-balance font-medium text-[12px] text-text-sub-600">
+									Logs will appear here once API requests start flowing through
+									your project.
+								</p>
+							</div>
+						)
+					) : (
+						<Tooltip.Provider delayDuration={400}>
+							{groupLogsByDate(logs).map((group) => (
+								<div key={group.dateKey}>
+									{/* Date section — soft sticky band */}
+									<div className="sticky top-0 z-10 flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-weak-50/70 px-4 py-1.5 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
+										<Icon
+											name="calendar"
+											className="h-3 w-3 shrink-0 text-text-soft-400"
+										/>
+										<span className="font-medium text-[11px] text-text-sub-600 tracking-wide">
+											{group.dateLabel}
+										</span>
+										<span className="inline-flex h-4 min-w-4 items-center justify-center rounded-md bg-bg-white-0 px-1 font-medium text-[10px] text-text-soft-400 tabular-nums ring-1 ring-stroke-soft-100 dark:bg-bg-white-0/10 dark:ring-stroke-soft-100/40">
+											{group.logs.length}
+										</span>
+									</div>
 
-								{/* Log rows */}
-								<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
-									{group.logs.map((log) => {
-										const { method, endpoint } = getMethodAndEndpoint(log);
-										const statusProps = getStatusProps(log.status_code);
-										const isSelected = selectedLogId === log.uuid;
-										const primaryPath = endpoint || log.event;
+									{/* Log rows */}
+									<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
+										{group.logs.map((log) => {
+											const { method, endpoint } = getMethodAndEndpoint(log);
+											const statusProps = getStatusProps(log.status_code);
+											const isSelected = selectedLogId === log.uuid;
+											const primaryPath = endpoint || log.event;
 
-										return (
-											<button
-												key={log.uuid}
-												type="button"
-												onClick={() => onRowClick?.(log.uuid)}
-												className={cn(
-													"group/row grid w-full cursor-pointer items-center gap-2 px-4 py-2 text-left transition-colors duration-150",
-													GRID_COLS,
-													isSelected
-														? "bg-bg-weak-50/50"
-														: "hover:bg-bg-weak-50/50 dark:hover:bg-bg-weak-50/10",
-													"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-inset",
-												)}
-											>
-												{/* Status */}
-												<div className="flex w-full flex-shrink-0 items-center justify-start">
-													{statusProps ? (
-														<Badge.Root
-															variant="lighter"
-															color={statusProps.color}
-															className="h-[18px] rounded-md px-1.5 font-semibold text-[10px] tracking-normal"
-														>
-															{statusProps.label}
-														</Badge.Root>
+											return (
+												<button
+													key={log.uuid}
+													type="button"
+													onClick={() => onRowClick?.(log.uuid)}
+													className={cn(
+														"group/row grid w-full cursor-pointer items-center gap-2 px-4 py-2 text-left transition-colors duration-150",
+														GRID_COLS,
+														isSelected
+															? "bg-bg-weak-50/50"
+															: "hover:bg-bg-weak-50/50 dark:hover:bg-bg-weak-50/10",
+														"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-inset",
+													)}
+												>
+													{/* Status */}
+													<div className="flex w-full flex-shrink-0 items-center justify-start">
+														{statusProps ? (
+															<Badge.Root
+																variant="lighter"
+																color={statusProps.color}
+																className="h-[18px] rounded-md px-1.5 font-semibold text-[10px] tracking-normal"
+															>
+																{statusProps.label}
+															</Badge.Root>
+														) : (
+															<span className="font-semibold text-[11px] text-text-soft-400">
+																—
+															</span>
+														)}
+													</div>
+
+													{/* Method */}
+													<span
+														className={cn(
+															"flex-shrink-0 font-semibold text-[11px] uppercase tracking-wide",
+															method
+																? getMethodColorClass(method)
+																: "text-text-soft-400",
+														)}
+													>
+														{method || "—"}
+													</span>
+
+													{/* Endpoint / Event */}
+													{primaryPath ? (
+														<TruncatedPath path={primaryPath} />
 													) : (
-														<span className="font-semibold text-[11px] text-text-soft-400">
+														<span className="text-text-soft-400 text-xs">
 															—
 														</span>
 													)}
-												</div>
 
-												{/* Method */}
-												<span
-													className={cn(
-														"flex-shrink-0 font-semibold text-[11px] uppercase tracking-wide",
-														method
-															? getMethodColorClass(method)
-															: "text-text-soft-400",
-													)}
-												>
-													{method || "—"}
-												</span>
-
-												{/* Endpoint / Event */}
-												{primaryPath ? (
-													<TruncatedPath path={primaryPath} />
-												) : (
-													<span className="text-text-soft-400 text-xs">—</span>
-												)}
-
-												{/* Time */}
-												<span className="flex-shrink-0 text-right text-text-sub-600 text-xs tabular-nums">
-													{formatTime(log.created_at)}
-												</span>
-											</button>
-										);
-									})}
+													{/* Time */}
+													<span className="flex-shrink-0 text-right text-text-sub-600 text-xs tabular-nums">
+														{formatTime(log.created_at)}
+													</span>
+												</button>
+											);
+										})}
+									</div>
 								</div>
-							</div>
-						))}
-					</Tooltip.Provider>
-				)}
-			</LogTableBody>
+							))}
+						</Tooltip.Provider>
+					)}
+				</div>
 
-			{/* Pagination — outside scrollable body, static at bottom of card */}
-			{total > 0 && (
-				<div className="flex flex-shrink-0 items-center justify-between rounded-b-[14px] border-stroke-soft-100 border-t bg-bg-white-0 px-4 py-2 text-label-xs text-text-sub-600 dark:border-stroke-soft-100/40">
-					<div className="flex items-center">
-						<span>
-							Showing {startIndex}–{endIndex} of {total} log
-							{total !== 1 ? "s" : ""}
-						</span>
-						{onPageSizeChange && (
-							<PageSizeDropdown
-								value={pageSize}
-								onValueChange={(value) => onPageSizeChange(value)}
+				{/* Pagination — outside scrollable body */}
+				{!isLoading && total > 0 && (
+					<div className="flex flex-shrink-0 items-center justify-between border-stroke-soft-100 border-t bg-bg-white-0 px-4 py-2 text-label-xs text-text-sub-600 dark:border-stroke-soft-100/40">
+						<div className="flex items-center">
+							<span>
+								Showing {startIndex}–{endIndex} of {total} log
+								{total !== 1 ? "s" : ""}
+							</span>
+							{onPageSizeChange && (
+								<PageSizeDropdown
+									value={pageSize}
+									onValueChange={(value) => onPageSizeChange(value)}
+								/>
+							)}
+						</div>
+						{onPageChange && (
+							<PaginationControls
+								currentPage={currentPage}
+								totalPages={totalPages}
+								onPageChange={onPageChange}
+								isLoading={isLoading}
 							/>
 						)}
 					</div>
-					{onPageChange && (
-						<PaginationControls
-							currentPage={currentPage}
-							totalPages={totalPages}
-							onPageChange={onPageChange}
-							isLoading={isLoading}
-						/>
-					)}
-				</div>
-			)}
+				)}
+			</div>
 		</div>
 	);
 };

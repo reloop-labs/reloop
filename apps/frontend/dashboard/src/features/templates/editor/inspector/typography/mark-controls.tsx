@@ -1,11 +1,13 @@
 import * as ButtonGroup from "@reloop/ui/button-group";
-import {
-	Bold,
-	CaseUpper,
-	Italic,
-	Strikethrough,
-	Underline,
-} from "lucide-react";
+
+/** Letter glyphs — sprite has no bold/italic/underline icons. */
+function Glyph({ children }: { children: React.ReactNode }) {
+	return (
+		<span className="flex h-4 w-4 items-center justify-center font-semibold text-[12px] leading-none">
+			{children}
+		</span>
+	);
+}
 
 export function MarkControls({
 	marks,
@@ -23,7 +25,9 @@ export function MarkControls({
 				onClick={() => toggleMark("bold")}
 				className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 			>
-				<Bold className="h-4 w-4" />
+				<Glyph>
+					<span className="font-bold">B</span>
+				</Glyph>
 			</ButtonGroup.Item>
 			<ButtonGroup.Item
 				title="Italic"
@@ -32,7 +36,9 @@ export function MarkControls({
 				onClick={() => toggleMark("italic")}
 				className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 			>
-				<Italic className="h-4 w-4" />
+				<Glyph>
+					<span className="italic">I</span>
+				</Glyph>
 			</ButtonGroup.Item>
 			<ButtonGroup.Item
 				title="Underline"
@@ -41,7 +47,9 @@ export function MarkControls({
 				onClick={() => toggleMark("underline")}
 				className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 			>
-				<Underline className="h-4 w-4" />
+				<Glyph>
+					<span className="underline">U</span>
+				</Glyph>
 			</ButtonGroup.Item>
 			<ButtonGroup.Item
 				title="Strikethrough"
@@ -50,7 +58,9 @@ export function MarkControls({
 				onClick={() => toggleMark("strike")}
 				className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 			>
-				<Strikethrough className="h-4 w-4" />
+				<Glyph>
+					<span className="line-through">S</span>
+				</Glyph>
 			</ButtonGroup.Item>
 			<ButtonGroup.Item
 				title={
@@ -70,7 +80,9 @@ export function MarkControls({
 				}}
 				className="h-10 flex-1 first:rounded-l-xl last:rounded-r-xl"
 			>
-				<CaseUpper className="h-5 w-5" />
+				<Glyph>
+					<span className="text-[11px] tracking-tight">Aa</span>
+				</Glyph>
 			</ButtonGroup.Item>
 		</ButtonGroup.Root>
 	);

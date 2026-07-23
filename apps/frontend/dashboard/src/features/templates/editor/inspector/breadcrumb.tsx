@@ -1,45 +1,33 @@
 import { Inspector } from "@react-email/editor/ui";
 import * as Button from "@reloop/ui/button";
-import {
-	Box,
-	Braces,
-	Columns,
-	FileText,
-	Image as ImageIcon,
-	Layout,
-	MousePointer2,
-	Quote,
-	Rows,
-	Type,
-} from "lucide-react";
+import { Icon } from "@reloop/ui/icon";
 
-const getIcon = (type: string) => {
+const getIconName = (type: string): string => {
 	switch (type.toLowerCase()) {
 		case "text":
 		case "paragraph":
 		case "heading":
-			return Type;
+			return "type";
 		case "image":
-			return ImageIcon;
+			return "image-upload";
 		case "button":
-			return MousePointer2;
+			return "send";
 		case "section":
 		case "layout":
-			return Layout;
+			return "layout";
 		case "container":
-			return Box;
+			return "box";
 		case "blockquote":
-			return Quote;
+			return "comment-text";
 		case "column":
-			return Columns;
 		case "row":
-			return Rows;
+			return "layout-grid";
 		case "body":
-			return FileText;
+			return "file-text";
 		case "variable":
-			return Braces;
+			return "brackets";
 		default:
-			return Box;
+			return "box";
 	}
 };
 
@@ -52,7 +40,7 @@ const BreadCrumb = () => {
 						segments.map((segment, i) => {
 							const type = segment.node?.nodeType ?? "Layout";
 							const label = type;
-							const Icon = getIcon(type);
+							const iconName = getIconName(type);
 
 							const isFirst = i === 0;
 							const isLast = i === segments.length - 1;
@@ -66,11 +54,11 @@ const BreadCrumb = () => {
 										)}
 										<div className="flex items-center gap-1.5">
 											<Icon
+												name={iconName}
 												className="h-3.5 w-3.5 text-text-strong-950"
-												strokeWidth={2}
 											/>
 											{showLabel && (
-												<span className="font-semibold text-text-strong-950 text-xs capitalize">
+												<span className="font-semibold text-label-xs text-text-strong-950 capitalize">
 													{label}
 												</span>
 											)}
@@ -88,10 +76,10 @@ const BreadCrumb = () => {
 										variant="neutral"
 										mode="ghost"
 										size="xxsmall"
-										className="flex cursor-pointer items-center gap-1.5 rounded px-1 py-0.5 text-text-sub-600 text-xs capitalize outline-none ring-0 transition-colors hover:text-text-strong-950"
+										className="flex cursor-pointer items-center gap-1.5 rounded px-1 py-0.5 text-label-xs text-text-sub-600 capitalize outline-none ring-0 transition-colors hover:text-text-strong-950"
 										onClick={() => segment.focus()}
 									>
-										<Icon className="h-3.5 w-3.5" strokeWidth={2} />
+										<Icon name={iconName} className="h-3.5 w-3.5" />
 										{showLabel && <span>{label}</span>}
 									</Button.Root>
 								</li>

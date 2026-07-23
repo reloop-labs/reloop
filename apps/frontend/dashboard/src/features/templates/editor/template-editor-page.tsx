@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { CodeEditor } from "./code-view";
 import { FullEmailBuilder } from "./editor";
