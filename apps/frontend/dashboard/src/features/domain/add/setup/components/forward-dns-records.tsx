@@ -125,17 +125,46 @@ export const ForwardDNSRecordsButton = ({
 								className="flex flex-col items-center justify-center py-6 text-center"
 							>
 								<motion.div
-									initial={{ scale: shouldReduceMotion ? 1 : 0.6, opacity: 0 }}
-									animate={{ scale: 1, opacity: 1 }}
-									transition={{
-										type: "spring",
-										stiffness: 350,
-										damping: 22,
-										delay: 0.05,
+									initial={{ scale: shouldReduceMotion ? 1 : 0, opacity: 0 }}
+									animate={{
+										scale: shouldReduceMotion ? 1 : [0, 1.15, 1],
+										opacity: 1,
 									}}
-									className="mb-2 rounded-full bg-emerald-500/10 p-3 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
+									transition={{
+										duration: shouldReduceMotion ? 0.2 : 0.4,
+										ease: "easeOut",
+									}}
+									className="mb-2 flex items-center justify-center rounded-full bg-emerald-500/10 p-3 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
 								>
-									<Icon name="check" className="h-6 w-6" />
+									<svg
+										className="h-6 w-6"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+										strokeWidth={3}
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									>
+										<motion.path
+											d="M5 13l4 4L19 7"
+											initial={{
+												pathLength: shouldReduceMotion ? 1 : 0,
+												opacity: shouldReduceMotion ? 1 : 0,
+											}}
+											animate={{ pathLength: 1, opacity: 1 }}
+											transition={{
+												pathLength: {
+													duration: shouldReduceMotion ? 0 : 0.35,
+													ease: [0.65, 0, 0.35, 1],
+													delay: shouldReduceMotion ? 0 : 0.1,
+												},
+												opacity: {
+													duration: shouldReduceMotion ? 0 : 0.05,
+													delay: shouldReduceMotion ? 0 : 0.1,
+												},
+											}}
+										/>
+									</svg>
 								</motion.div>
 								<p className="font-medium text-sm text-text-strong-950">
 									Instructions sent!
