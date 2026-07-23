@@ -75,7 +75,6 @@ export function RotateApiKeyModal({
 			);
 			setRotatedApiKey(response.data);
 			await invalidate();
-			toast.success("API key rotated successfully");
 		} catch (error) {
 			const message = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to rotate API key"
