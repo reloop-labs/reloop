@@ -1,4 +1,5 @@
 import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
@@ -125,9 +126,9 @@ export function DeleteApiKeyModal({
 					>
 						Cancel
 					</Button.Root>
-					<Button.Root
+					<FancyButton.Root
 						type="button"
-						variant="primary"
+						variant="destructive"
 						size="small"
 						disabled={isDeleting}
 						onClick={() => void handleDelete()}
@@ -140,7 +141,7 @@ export function DeleteApiKeyModal({
 						) : (
 							"Delete API key"
 						)}
-					</Button.Root>
+					</FancyButton.Root>
 				</div>
 			</Modal.Content>
 		</Modal.Root>
