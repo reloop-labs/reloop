@@ -7,7 +7,7 @@ import * as Label from "@reloop/ui/label";
 import * as Popover from "@reloop/ui/popover";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -17,9 +17,16 @@ interface ForwardDNSRecordsButtonProps {
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const layoutSpringConfig = {
+	type: "spring" as const,
+	duration: 0.3,
+	bounce: 0,
+};
+
 export const ForwardDNSRecordsButton = ({
 	domainId,
 }: ForwardDNSRecordsButtonProps) => {
+	const shouldReduceMotion = useReducedMotion();
 	const [isOpen, setIsOpen] = useState(false);
 	const [email, setEmail] = useState("");
 	const [error, setError] = useState<string | null>(null);
@@ -91,7 +98,10 @@ export const ForwardDNSRecordsButton = ({
 					variant="neutral"
 					mode="stroke"
 					size="small"
-					className={cn("gap-1.5 rounded-xl", isOpen && "bg-bg-weak-50")}
+					className={cn(
+						"gap-1.5 rounded-xl transition-transform duration-150 ease-out active:scale-[0.98]",
+						isOpen && "bg-bg-weak-50",
+					)}
 				>
 					<Icon name="mail-single" className="h-4 w-4" />
 					Forward records
@@ -103,140 +113,165 @@ export const ForwardDNSRecordsButton = ({
 				showArrow={false}
 				className="w-[300px] overflow-hidden p-4"
 			>
-				{!isSent && (
-					<div className="space-y-1 text-left">
-						<h3 className="font-semibold text-sm text-text-strong-950">
-							Forward DNS records
-						</h3>
-						<p className="text-text-sub-600 text-xs leading-relaxed">
-							Send these DNS instructions directly to a teammate or domain
-							administrator — they'll get everything needed to complete setup.
-						</p>
-					</div>
-				)}
-
-				<AnimatePresence mode="wait">
-					{isSent ? (
-						<motion.div
-							key="success"
-							initial={{ opacity: 0, scale: 0.9 }}
-							animate={{ opacity: 1, scale: 1 }}
-							exit={{ opacity: 0, scale: 0.9 }}
-							transition={{ duration: 0.2 }}
-							className="flex flex-col items-center justify-center py-6 text-center"
-						>
-							<div className="mb-2 rounded-full bg-emerald-500/10 p-3 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
-								<Icon name="check" className="h-6 w-6" />
-							</div>
-							<p className="font-medium text-sm text-text-strong-950">
-								Instructions sent!
-							</p>
-							<p className="mt-1 text-text-sub-600 text-xs">
-								Sent to{" "}
-								<span className="font-medium text-text-strong-950">
-									{email}
-								</span>
-							</p>
-						</motion.div>
-					) : (
-						<motion.form
-							key="form"
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							exit={{ opacity: 0 }}
-							transition={{ duration: 0.2 }}
-							onSubmit={handleForward}
-							className="mt-3 flex flex-col gap-3"
-						>
-							<div className="space-y-1.5 text-left">
-								<Label.Root
-									htmlFor="forward-email"
-									className="block font-medium text-text-strong-950 text-xs"
+				<motion.div layout transition={layoutSpringConfig}>
+					<AnimatePresence mode="wait">
+						{isSent ? (
+							<motion.div
+								key="success"
+								initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.9 }}
+								animate={{ opacity: 1, scale: 1 }}
+								exit={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.9 }}
+								transition={{ duration: 0.2 }}
+								className="flex flex-col items-center justify-center py-6 text-center"
+							>
+								<motion.div
+									initial={{ scale: shouldReduceMotion ? 1 : 0.6, opacity: 0 }}
+									animate={{ scale: 1, opacity: 1 }}
+									transition={{
+										type: "spring",
+										stiffness: 350,
+										damping: 22,
+										delay: 0.05,
+									}}
+									className="mb-2 rounded-full bg-emerald-500/10 p-3 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
 								>
-									Email
-									<Label.Asterisk />
-								</Label.Root>
+									<Icon name="check" className="h-6 w-6" />
+								</motion.div>
+								<p className="font-medium text-sm text-text-strong-950">
+									Instructions sent!
+								</p>
+								<p className="mt-1 text-text-sub-600 text-xs">
+									Sent to{" "}
+									<span className="font-medium text-text-strong-950">
+										{email}
+									</span>
+								</p>
+							</motion.div>
+						) : (
+							<motion.div
+								key="form"
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								transition={{ duration: 0.2 }}
+							>
+								<div className="space-y-1 text-left">
+									<h3 className="font-semibold text-sm text-text-strong-950">
+										Forward DNS records
+									</h3>
+									<p className="text-text-sub-600 text-xs leading-relaxed">
+										Send these DNS instructions directly to a teammate or domain
+										administrator — they'll get everything needed to complete setup.
+									</p>
+								</div>
 
-								<Input.Root
-									size="small"
-									hasError={!!error}
-									className="w-full rounded-xl"
+								<form
+									onSubmit={handleForward}
+									className="mt-3 flex flex-col gap-3"
 								>
-									<Input.Wrapper>
-										<Input.Input
-											id="forward-email"
-											type="email"
-											placeholder="enter@example.com"
-											value={email}
-											onChange={(e) => handleEmailChange(e.target.value)}
-											disabled={isSending}
-											autoFocus
-										/>
-									</Input.Wrapper>
-								</Input.Root>
-
-								{error && <p className="text-error-base text-xs">{error}</p>}
-							</div>
-
-							<div className="flex items-center justify-end gap-2 pt-1">
-								<Button.Root
-									type="button"
-									variant="neutral"
-									mode="ghost"
-									size="xsmall"
-									onClick={() => setIsOpen(false)}
-									disabled={isSending}
-									className="rounded-lg"
-								>
-									Cancel
-								</Button.Root>
-								<FancyButton.Root
-									type="submit"
-									variant="blue"
-									size="xsmall"
-									disabled={isSending}
-									className={cn(
-										"min-w-[130px] justify-center overflow-hidden rounded-lg transition-all duration-200",
-										isSending && "pointer-events-none opacity-90",
-									)}
-								>
-									<AnimatePresence mode="popLayout" initial={false}>
-										<motion.span
-											key={isSending ? "sending" : "idle"}
-											transition={{
-												type: "spring",
-												duration: 0.25,
-												bounce: 0,
-											}}
-											initial={{
-												opacity: 0,
-												y: -14,
-											}}
-											animate={{
-												opacity: 1,
-												y: 0,
-											}}
-											exit={{
-												opacity: 0,
-												y: 14,
-											}}
-											className="flex items-center justify-center gap-1.5"
+									<div className="space-y-1.5 text-left">
+										<Label.Root
+											htmlFor="forward-email"
+											className="block font-medium text-text-strong-950 text-xs"
 										>
-											{isSending ? (
-												<>
-													<Spinner size={12} color="currentColor" />
-													<span>Sending...</span>
-												</>
-											) : (
-												"Send instructions"
+											Email
+											<Label.Asterisk />
+										</Label.Root>
+
+										<Input.Root
+											size="small"
+											hasError={!!error}
+											className="w-full rounded-xl"
+										>
+											<Input.Wrapper>
+												<Input.Input
+													id="forward-email"
+													type="email"
+													placeholder="enter@example.com"
+													value={email}
+													onChange={(e) => handleEmailChange(e.target.value)}
+													disabled={isSending}
+													autoFocus
+												/>
+											</Input.Wrapper>
+										</Input.Root>
+
+										<AnimatePresence>
+											{error && (
+												<motion.p
+													initial={{ opacity: 0, height: 0 }}
+													animate={{ opacity: 1, height: "auto" }}
+													exit={{ opacity: 0, height: 0 }}
+													transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
+													className="overflow-hidden text-error-base text-xs"
+												>
+													{error}
+												</motion.p>
 											)}
-										</motion.span>
-									</AnimatePresence>
-								</FancyButton.Root>
-							</div>
-						</motion.form>
+										</AnimatePresence>
+									</div>
+
+									<div className="flex items-center justify-end gap-2 pt-1">
+										<Button.Root
+											type="button"
+											variant="neutral"
+											mode="ghost"
+											size="xsmall"
+											onClick={() => setIsOpen(false)}
+											disabled={isSending}
+											className="rounded-lg"
+										>
+											Cancel
+										</Button.Root>
+										<FancyButton.Root
+											type="submit"
+											variant="blue"
+											size="xsmall"
+											disabled={isSending}
+											className={cn(
+												"min-w-[130px] justify-center overflow-hidden rounded-lg transition-opacity duration-200 ease-out",
+												isSending && "pointer-events-none opacity-90",
+											)}
+										>
+											<AnimatePresence mode="popLayout" initial={false}>
+												<motion.span
+													key={isSending ? "sending" : "idle"}
+													transition={{
+														type: "spring",
+														duration: 0.2,
+														bounce: 0,
+													}}
+													initial={{
+														opacity: 0,
+														y: shouldReduceMotion ? 0 : -8,
+													}}
+													animate={{
+														opacity: 1,
+														y: 0,
+													}}
+													exit={{
+														opacity: 0,
+														y: shouldReduceMotion ? 0 : 8,
+													}}
+													className="flex items-center justify-center gap-1.5"
+												>
+													{isSending ? (
+														<>
+															<Spinner size={12} color="currentColor" />
+															<span>Sending...</span>
+														</>
+													) : (
+														"Send instructions"
+													)}
+												</motion.span>
+											</AnimatePresence>
+										</FancyButton.Root>
+									</div>
+								</form>
+						</motion.div>
 					)}
-				</AnimatePresence>
+					</AnimatePresence>
+				</motion.div>
 			</Popover.Content>
 		</Popover.Root>
 	);
