@@ -85,10 +85,8 @@ export function RotateApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
 			}}
 		>
 			<Modal.Content
-				className={`overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 ${
-					!rotatedApiKey ? "p-6" : "p-0"
-				}`}
-				showClose={!rotatedApiKey}
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 sm:max-w-[460px] dark:border-stroke-soft-100/40"
+				showClose={true}
 				onEscapeKeyDown={(e) => {
 					if (rotatedApiKey) e.preventDefault();
 				}}
