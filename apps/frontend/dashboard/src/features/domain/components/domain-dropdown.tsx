@@ -48,7 +48,10 @@ export function DomainDropdown({
 	};
 
 	return (
-		<div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+		<div
+			onClick={(e) => e.stopPropagation()}
+			onKeyDown={(e) => e.stopPropagation()}
+		>
 			<Dropdown.Root open={open} onOpenChange={handleOpenChange}>
 				<Dropdown.Trigger asChild>
 					<Button.Root

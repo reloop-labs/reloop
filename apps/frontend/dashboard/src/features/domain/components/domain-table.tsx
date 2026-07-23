@@ -7,11 +7,7 @@ import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
 import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import type { Domain } from "../types";
-import {
-	getStatusColorClass,
-	getStatusIcon,
-	getStatusLabel,
-} from "../utils";
+import { getStatusColorClass, getStatusIcon, getStatusLabel } from "../utils";
 import { DomainDropdown } from "./domain-dropdown";
 import { DomainSkeleton } from "./domain-skeleton";
 import { EmptyState } from "./empty-state";

@@ -1,6 +1,9 @@
 import type * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { ApiDetailsDrawer } from "./api-details-drawer";
+import {
+	ApiDetailsDrawer,
+	type ApiDetailsDrawerProps,
+} from "./api-details-drawer";
 import { codeExamples } from "./domain-code-examples";
 
 /** Real Domain Service routes (prefix `/api/domain`). There is no `/api/domain/v1/domain`. */
@@ -57,7 +60,10 @@ const languages = [
 
 type ButtonProps = React.ComponentPropsWithoutRef<typeof Button.Root>;
 
-export const DomainApiDetails = (props: ButtonProps) => {
+export const DomainApiDetails = ({
+	renderTrigger,
+	...buttonProps
+}: ButtonProps & Pick<ApiDetailsDrawerProps, "renderTrigger">) => {
 	return (
 		<ApiDetailsDrawer
 			title="Domain API"
@@ -66,8 +72,9 @@ export const DomainApiDetails = (props: ButtonProps) => {
 			operations={operations}
 			codeExamples={codeExamples}
 			docSection="domain"
-			buttonProps={props}
+			buttonProps={buttonProps}
 			codeExtraPadding={true}
+			renderTrigger={renderTrigger}
 		/>
 	);
 };

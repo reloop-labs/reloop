@@ -1,10 +1,9 @@
-
-import type { DomainResponse } from "#/features/domain/types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { format } from "date-fns";
+import type { DomainResponse } from "#/features/domain/types";
 
 interface StatusTimelineProps {
 	domain: DomainResponse;

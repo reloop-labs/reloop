@@ -15,7 +15,11 @@ import { DomainEvents } from "./components/domain-events";
 import { DomainHeader } from "./components/domain-header";
 import { DomainStats } from "./components/domain-stats";
 
-export function DomainDetailPage({ domainId: rawDomainId }: { domainId: string }) {
+export function DomainDetailPage({
+	domainId: rawDomainId,
+}: {
+	domainId: string;
+}) {
 	const domainId = isDomainRecordId(rawDomainId) ? rawDomainId : null;
 	const { hasInitialized, isPending: orgPending } = useActiveOrganization();
 	const [activeTab, setActiveTab] = useQueryState(

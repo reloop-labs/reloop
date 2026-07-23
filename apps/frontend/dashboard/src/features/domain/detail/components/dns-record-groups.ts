@@ -1,4 +1,3 @@
-
 import type { DNSRecord } from "#/features/domain/types";
 
 const _normalizeLabel = (value: string) => value.trim().toLowerCase();

@@ -22,10 +22,11 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 	const { hasInitialized, isPending: orgPending } = useActiveOrganization();
 	const canFetch = Boolean(domainId && hasInitialized && !orgPending);
 
-	const { data: domainData, isPending, isFetching } = useDomainDetailQuery(
-		domainId,
-		canFetch,
-	);
+	const {
+		data: domainData,
+		isPending,
+		isFetching,
+	} = useDomainDetailQuery(domainId, canFetch);
 	const showLoading = !canFetch || isPending || (isFetching && !domainData);
 
 	useHotkeys("esc", () => {
@@ -97,11 +98,7 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 				</div>
 			</div>
 
-			<DNSAutoConnectBanner
-				domain={domainData}
-				domainId={domainId}
-				forceShow
-			/>
+			<DNSAutoConnectBanner domain={domainData} domainId={domainId} forceShow />
 
 			{showLoading ? (
 				<div className="space-y-4">

@@ -1,12 +1,11 @@
-
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import type { DomainResponse } from "#/features/domain/types";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import * as Switch from "@reloop/ui/switch";
 import { useRef, useState } from "react";
+import type { DomainResponse } from "#/features/domain/types";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useClipboard } from "../hooks/use-clipboard";
 import { useDomainActions } from "../hooks/use-domain-actions";
 
@@ -134,7 +133,9 @@ export const DomainConfigurationSection = ({
 			{/* Click Tracking Card */}
 			<div
 				onClick={() =>
-					!isLoading && !isClickTrackingPending && onToggleClickTracking(!isClickTrackingEnabled)
+					!isLoading &&
+					!isClickTrackingPending &&
+					onToggleClickTracking(!isClickTrackingEnabled)
 				}
 				className={cn(
 					"cursor-pointer select-none rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 transition-colors duration-300 hover:bg-bg-weak-50/10 dark:border-stroke-soft-100/10 dark:hover:bg-bg-weak-50/5",
@@ -165,7 +166,9 @@ export const DomainConfigurationSection = ({
 			{/* Open Tracking Card */}
 			<div
 				onClick={() =>
-					!isLoading && !isOpenTrackingPending && onToggleOpenTracking(!isOpenTrackingEnabled)
+					!isLoading &&
+					!isOpenTrackingPending &&
+					onToggleOpenTracking(!isOpenTrackingEnabled)
 				}
 				className={cn(
 					"cursor-pointer select-none rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 transition-colors duration-300 hover:bg-bg-weak-50/10 dark:border-stroke-soft-100/10 dark:hover:bg-bg-weak-50/5",

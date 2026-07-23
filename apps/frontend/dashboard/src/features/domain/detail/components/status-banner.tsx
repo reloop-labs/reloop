@@ -1,7 +1,6 @@
-
-import type { DomainStatus } from "#/features/domain/types";
 import * as Alert from "@reloop/ui/alert";
 import { Skeleton } from "@reloop/ui/skeleton";
+import type { DomainStatus } from "#/features/domain/types";
 
 interface StatusBannerProps {
 	status: DomainStatus;

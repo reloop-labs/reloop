@@ -1,8 +1,7 @@
-
-import type { DNSRecord } from "#/features/domain/types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import type * as React from "react";
+import type { DNSRecord } from "#/features/domain/types";
 import { DNSRecordTable } from "./dns-record-table";
 
 interface DNSRecordSectionProps {

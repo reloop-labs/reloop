@@ -1,8 +1,7 @@
-
-import type { DomainResponse } from "#/features/domain/types";
-import { getVerificationFailedMessage } from "#/features/domain/utils";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import type { DomainResponse } from "#/features/domain/types";
+import { getVerificationFailedMessage } from "#/features/domain/utils";
 import { StatusTimeline, StatusTimelineSkeleton } from "./status-timeline";
 
 export const DomainEvents = ({

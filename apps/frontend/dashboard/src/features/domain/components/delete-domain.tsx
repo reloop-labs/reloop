@@ -10,7 +10,13 @@ import { toast } from "sonner";
 import { useInvalidateDomains } from "../hooks/use-domains-query";
 import type { Domain } from "../types";
 
-export function DeleteDomainModal({ domains }: { domains: Domain[] }) {
+export function DeleteDomainModal({
+	domains,
+	onDeleteSuccess,
+}: {
+	domains: Domain[];
+	onDeleteSuccess?: (deletedName: string) => void;
+}) {
 	const [deleteId, setDeleteId] = useQueryState("delete");
 	const [isDeleting, setIsDeleting] = useState(false);
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -28,11 +34,13 @@ export function DeleteDomainModal({ domains }: { domains: Domain[] }) {
 		if (!domainToDelete) return;
 		setIsDeleting(true);
 		try {
+			const deletedName = domainToDelete.domain;
 			await axios.delete(`/api/domain/v1/${domainToDelete.id}`, {
 				withCredentials: true,
 			});
 			await invalidate();
-			toast.success(`${domainToDelete.domain} deleted successfully`);
+			toast.success(`${deletedName} deleted successfully`);
+			onDeleteSuccess?.(deletedName);
 			void setDeleteId(null);
 			if (isOnDetailPage) {
 				setTimeout(() => {
@@ -77,9 +85,9 @@ export function DeleteDomainModal({ domains }: { domains: Domain[] }) {
 						Delete domain
 					</Modal.Title>
 					<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
-						Are you sure you want to delete this domain? This will also disconnect
-						any active connectors and remove all routes associated with this domain.
-						This action cannot be undone.
+						Are you sure you want to delete this domain? This will also
+						disconnect any active connectors and remove all routes associated
+						with this domain. This action cannot be undone.
 					</p>
 				</div>
 
@@ -104,9 +112,10 @@ export function DeleteDomainModal({ domains }: { domains: Domain[] }) {
 					<span className="font-bold text-[#6D4000] dark:text-amber-100">
 						Warning:
 					</span>{" "}
-					Deleting this domain will permanently remove it along with all its routes
-					and connections. Any services using this domain will stop working. The
-					associated DNS records will not be removed and must be deleted manually.
+					Deleting this domain will permanently remove it along with all its
+					routes and connections. Any services using this domain will stop
+					working. The associated DNS records will not be removed and must be
+					deleted manually.
 				</div>
 
 				{/* Footer Actions */}
@@ -142,4 +151,3 @@ export function DeleteDomainModal({ domains }: { domains: Domain[] }) {
 		</Modal.Root>
 	);
 }
-

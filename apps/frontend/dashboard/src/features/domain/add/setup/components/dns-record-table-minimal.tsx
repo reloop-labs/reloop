@@ -1,9 +1,9 @@
-import type { DNSRecord } from "#/features/domain/types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useMemo, useState } from "react";
+import type { DNSRecord } from "#/features/domain/types";
 
 interface DNSRecordTableMinimalProps {
 	records?: DNSRecord[];

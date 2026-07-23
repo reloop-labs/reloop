@@ -1,15 +1,14 @@
-
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
+import * as Tooltip from "@reloop/ui/tooltip";
+import * as React from "react";
 import type { DNSRecord } from "#/features/domain/types";
 import {
 	getStatusColorClass,
 	getStatusIcon,
 	getStatusLabel,
 } from "#/features/domain/utils";
-import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
-import { Skeleton } from "@reloop/ui/skeleton";
-import * as Tooltip from "@reloop/ui/tooltip";
-import * as React from "react";
 import { useClipboard } from "../hooks/use-clipboard";
 
 interface DNSRecordTableProps {

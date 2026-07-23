@@ -1,4 +1,3 @@
-import type { DomainResponse } from "#/features/domain/types";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
@@ -7,6 +6,7 @@ import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import * as React from "react";
 import * as simpleIcons from "simple-icons";
+import type { DomainResponse } from "#/features/domain/types";
 import { useDomainNameserversQuery } from "../../hooks/use-domains-query";
 import { useDomainConnect } from "../hooks/use-domain-connect";
 import { inferDnsProvider } from "../utils";
@@ -55,7 +55,12 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 	const status = domain?.status || "pending";
 
 	// Show only if domain status is "pending", "verifying", or "failed" and DNS is not yet configured
-	if (!forceShow && status !== "pending" && status !== "failed" && status !== "verifying") {
+	if (
+		!forceShow &&
+		status !== "pending" &&
+		status !== "failed" &&
+		status !== "verifying"
+	) {
 		return null;
 	}
 

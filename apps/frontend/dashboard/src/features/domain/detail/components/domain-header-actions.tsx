@@ -1,6 +1,3 @@
-
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import type { Domain } from "#/features/domain/types";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -11,6 +8,8 @@ import {
 } from "@reloop/ui/popover";
 import { useQueryState } from "nuqs";
 import { useMemo, useRef, useState } from "react";
+import type { Domain } from "#/features/domain/types";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
 interface DomainHeaderActionsProps {
 	domain?: Domain;

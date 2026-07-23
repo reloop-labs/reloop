@@ -1,11 +1,11 @@
-import { AnimatedClock } from "../../animated-clock";
-import type { DomainResponse } from "#/features/domain/types";
-import { getStatusColorClass, getStatusIcon } from "#/features/domain/utils";
-import { formatRelativeTime } from "#/utils/format-relative-time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import type * as React from "react";
+import type { DomainResponse } from "#/features/domain/types";
+import { getStatusColorClass, getStatusIcon } from "#/features/domain/utils";
+import { formatRelativeTime } from "#/utils/format-relative-time";
+import { AnimatedClock } from "../../animated-clock";
 import { DNSProviderInfo } from "./dns-provider-info";
 
 interface DomainStatsProps {

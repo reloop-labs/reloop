@@ -1,6 +1,6 @@
+import { toast } from "@reloop/ui/toast";
 import axios from "axios";
 import * as React from "react";
-import { toast } from "@reloop/ui/toast";
 import { useInvalidateDomains } from "../../hooks/use-domains-query";
 import type { DomainResponse } from "../../types";
 
@@ -33,7 +33,8 @@ export function useDomainActions(
 						"DNS verification started! Verification will continue in the background.",
 					error: (error) =>
 						axios.isAxiosError(error)
-							? error.response?.data?.message || "Failed to start DNS verification"
+							? error.response?.data?.message ||
+								"Failed to start DNS verification"
 							: "Failed to start DNS verification",
 				},
 			);
@@ -101,7 +102,8 @@ export function useDomainActions(
 					success: successMessage,
 					error: (error) =>
 						axios.isAxiosError(error)
-							? error.response?.data?.message || "Failed to update domain settings"
+							? error.response?.data?.message ||
+								"Failed to update domain settings"
 							: "Failed to update domain settings",
 				},
 			);

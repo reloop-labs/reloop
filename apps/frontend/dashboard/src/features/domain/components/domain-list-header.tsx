@@ -1,51 +1,73 @@
-import { DomainApiDetails } from "#/components/api-details/domain";
 import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useHotkeys } from "react-hotkeys-hook";
 
 export function DomainListHeader() {
-	const openDocs = () =>
-		window.open("https://reloop.sh/docs/domains", "_blank");
+	const navigate = useNavigate();
 
-	useHotkeys("d", openDocs);
+	const openAddDomain = () => void navigate({ to: "/domain/add" });
+
+	useHotkeys("mod+a", (e) => {
+		e.preventDefault();
+		openAddDomain();
+	});
 
 	return (
-		<div className="flex items-center justify-between pt-10 pb-6">
-			<h1 className="flex items-center justify-center gap-1 font-medium text-2xl">
-				Domains
-			</h1>
-			<div className="flex items-center gap-2">
+		<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
+			<div>
+				<div className="flex items-center gap-2.5">
+					<Icon
+						name="globe"
+						className="h-6 w-6 shrink-0 text-text-strong-950"
+					/>
+					<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+						Domains
+					</h1>
+				</div>
+				<p className="mt-1 text-sm text-text-sub-600">
+					Add and verify custom domains to send emails with maximum
+					deliverability.
+				</p>
+			</div>
+
+			<div className="flex shrink-0 items-center gap-2">
 				<Button.Root
+					type="button"
 					variant="neutral"
 					mode="stroke"
-					size="xsmall"
-					onClick={openDocs}
-					className="gap-1.5"
+					size="small"
+					onClick={() =>
+						window.open("https://reloop.sh/docs/domains", "_blank")
+					}
+					className="gap-1.5 rounded-xl"
 				>
-					<Icon name="file-text" className="h-4 w-4" />
-					Docs
-					<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
-						D
-					</span>
+					<Icon name="video-guide" className="h-4 w-4 text-text-sub-600" />
+					Video guide
 				</Button.Root>
-				<Link
-					to="/domain/add"
-					className={`${Button.buttonVariants({ variant: "neutral", size: "xsmall" }).root()} gap-1.5`}
+				<Button.Root
+					type="button"
+					variant="neutral"
+					mode="stroke"
+					size="small"
+					onClick={() =>
+						window.open("https://reloop.sh/docs/domains", "_blank")
+					}
+					className="rounded-xl"
+				>
+					Documentation
+				</Button.Root>
+				<FancyButton.Root
+					type="button"
+					variant="blue"
+					size="small"
+					onClick={openAddDomain}
+					className="gap-1.5 rounded-xl"
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Add domain
-					<span className="inline-flex items-center gap-0.5">
-						<Icon
-							name="command"
-							className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-						/>
-						<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
-							A
-						</span>
-					</span>
-				</Link>
-				<DomainApiDetails />
+				</FancyButton.Root>
 			</div>
 		</div>
 	);
