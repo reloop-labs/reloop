@@ -1,17 +1,9 @@
-import * as FancyButton from "@reloop/ui/fancy-button";
-import { Icon } from "@reloop/ui/icon";
 import { cn } from "@reloop/ui/cn";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
 
-export function SuccessStep({
-	secret,
-	onDone,
-}: {
-	secret: string;
-	onDone: () => void;
-}) {
+export function SuccessStep({ secret }: { secret: string }) {
 	const [activeTab, setActiveTab] = useState<"key" | "env">("key");
 
 	const display =
@@ -58,32 +50,9 @@ export function SuccessStep({
 
 			{/* Warning Banner */}
 			<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
-				<span className="font-semibold">Warning:</span> The old API key is invalid
-				now. Make sure to copy your new secret key — it won&apos;t be shown
-				again.
-			</div>
-
-			{/* Footer Actions */}
-			<div className="mt-6 flex items-center justify-end">
-				<FancyButton.Root
-					type="button"
-					variant="blue"
-					size="small"
-					onClick={onDone}
-					className="min-w-[100px] justify-center gap-2"
-				>
-					Done
-					<span className="inline-flex items-center gap-0.5 opacity-80">
-						<Icon
-							name="command"
-							className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-						/>
-						<Icon
-							name="enter"
-							className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-						/>
-					</span>
-				</FancyButton.Root>
+				<span className="font-semibold">Warning:</span> The old API key is
+				invalid now. Make sure to copy your new secret key — it won&apos;t
+				be shown again.
 			</div>
 		</div>
 	);

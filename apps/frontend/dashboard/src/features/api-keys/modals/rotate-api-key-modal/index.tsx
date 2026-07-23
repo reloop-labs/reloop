@@ -1,4 +1,9 @@
+import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
+import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
@@ -41,8 +46,7 @@ export function RotateApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
 		apiKeyToRotate?.start ||
 		apiKeyToRotate?.prefix ||
 		"Unnamed key";
-	const keyPrefix =
-		apiKeyToRotate?.start || apiKeyToRotate?.prefix || "rl_...";
+	const keyPrefix = apiKeyToRotate?.start || apiKeyToRotate?.prefix || "rl_...";
 
 	const step = rotatedApiKey ? "success" : "confirm";
 	const header = HEADER_CONTENT[step];
@@ -112,7 +116,10 @@ export function RotateApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
 				}}
 			>
 				{/* Outer motion wrapper — animates height as content changes */}
-				<motion.div layout transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}>
+				<motion.div
+					layout
+					transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+				>
 					<div className="p-6">
 						{/* Header — title & description cross-fade with blur independently */}
 						<div className="relative pr-6">
@@ -127,7 +134,7 @@ export function RotateApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
 									<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 										{header.title}
 									</Modal.Title>
-									<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
+									<p className="mt-2 text-sm text-text-sub-600 leading-relaxed">
 										{header.description}
 									</p>
 								</motion.div>
@@ -147,15 +154,91 @@ export function RotateApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
 									<ConfirmStep
 										displayName={displayName}
 										keyPrefix={keyPrefix}
-										isRotating={isRotating}
-										onClose={handleClose}
-										onRotate={() => void handleRotate()}
 									/>
 								) : (
-									<SuccessStep secret={rotatedApiKey!.key} onDone={handleClose} />
+									<SuccessStep secret={rotatedApiKey!.key} />
 								)}
 							</motion.div>
 						</AnimatePresence>
+
+						{/* Footer — single shared button row, outside the animated body */}
+						<div className="mt-6 flex items-center justify-end gap-3">
+							{step === "confirm" && (
+								<Button.Root
+									type="button"
+									variant="neutral"
+									mode="ghost"
+									size="small"
+									onClick={() => {
+										if (!isRotating) handleClose();
+									}}
+									className={cn(
+										"transition-opacity duration-200",
+										isRotating && "pointer-events-none opacity-50",
+									)}
+								>
+									Cancel
+								</Button.Root>
+							)}
+							<FancyButton.Root
+								type="button"
+								variant="blue"
+								size="small"
+								onClick={() => {
+									if (step === "success") {
+										handleClose();
+									} else if (!isRotating) {
+										void handleRotate();
+									}
+								}}
+								className={cn(
+									"justify-center overflow-hidden transition-all duration-200",
+									step === "confirm" && "min-w-[124px]",
+									step === "success" && "min-w-[100px] gap-2",
+									isRotating && "pointer-events-none opacity-90",
+								)}
+							>
+								<AnimatePresence mode="popLayout" initial={false}>
+									<motion.span
+										key={
+											step === "success"
+												? "done"
+												: isRotating
+													? "rotating"
+													: "idle"
+										}
+										transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+										initial={{ opacity: 0, y: -14 }}
+										animate={{ opacity: 1, y: 0 }}
+										exit={{ opacity: 0, y: 14 }}
+										className="flex items-center justify-center gap-1.5"
+									>
+										{step === "success" ? (
+											<>
+												Close{" "}
+												<span className="inline-flex items-center gap-0.5 opacity-80">
+													<Icon
+														name="command"
+														className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+													/>
+													<Icon
+														name="enter"
+														className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+													/>
+												</span>
+											</>
+										) : isRotating ? (
+											<>
+												<Spinner size={14} color="currentColor" />
+												<span>Rotating...</span>
+											</>
+										) : (
+											"Rotate key"
+										)}
+									</motion.span>
+								</AnimatePresence>
+							</FancyButton.Root>
+						</div>
 					</div>
 				</motion.div>
 			</Modal.Content>

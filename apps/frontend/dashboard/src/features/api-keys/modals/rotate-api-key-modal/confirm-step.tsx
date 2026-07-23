@@ -1,21 +1,9 @@
-import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
-import * as FancyButton from "@reloop/ui/fancy-button";
-import Spinner from "@reloop/ui/spinner";
-import { AnimatePresence, motion } from "framer-motion";
-
 export function ConfirmStep({
 	displayName,
 	keyPrefix,
-	isRotating,
-	onClose,
-	onRotate,
 }: {
 	displayName: string;
 	keyPrefix: string;
-	isRotating: boolean;
-	onClose: () => void;
-	onRotate: () => void;
 }) {
 	return (
 		<div>
@@ -45,70 +33,6 @@ export function ConfirmStep({
 			<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
 				All existing replicas will need to be updated with the new token.
 				Replicas using the old token will lose connectivity.
-			</div>
-
-			{/* Footer Actions */}
-			<div className="mt-6 flex items-center justify-end gap-3">
-				<Button.Root
-					type="button"
-					variant="neutral"
-					mode="ghost"
-					size="small"
-					onClick={() => {
-						if (!isRotating) onClose();
-					}}
-					className={cn(
-						"transition-opacity duration-200",
-						isRotating && "pointer-events-none opacity-50",
-					)}
-				>
-					Cancel
-				</Button.Root>
-				<FancyButton.Root
-					type="button"
-					variant="blue"
-					size="small"
-					onClick={() => {
-						if (!isRotating) onRotate();
-					}}
-					className={cn(
-						"min-w-[124px] justify-center overflow-hidden transition-all duration-200",
-						isRotating && "pointer-events-none opacity-90",
-					)}
-				>
-					<AnimatePresence mode="popLayout" initial={false}>
-						<motion.span
-							key={isRotating ? "rotating" : "idle"}
-							transition={{
-								type: "spring",
-								duration: 0.25,
-								bounce: 0,
-							}}
-							initial={{
-								opacity: 0,
-								y: -14,
-							}}
-							animate={{
-								opacity: 1,
-								y: 0,
-							}}
-							exit={{
-								opacity: 0,
-								y: 14,
-							}}
-							className="flex items-center justify-center gap-1.5"
-						>
-							{isRotating ? (
-								<>
-									<Spinner size={14} color="currentColor" />
-									<span>Rotating...</span>
-								</>
-							) : (
-								"Rotate key"
-							)}
-						</motion.span>
-					</AnimatePresence>
-				</FancyButton.Root>
 			</div>
 		</div>
 	);
