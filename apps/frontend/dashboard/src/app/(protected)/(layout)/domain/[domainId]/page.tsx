@@ -1,4 +1,6 @@
 "use client";
+import { DomainErrorState } from "@fe/dashboard/app/(protected)/(layout)/domain/components/domain-error-state";
+import { DomainNotFound } from "@fe/dashboard/app/(protected)/(layout)/domain/components/domain-not-found";
 import { useUserOrganization } from "@fe/dashboard/providers/org-provider";
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import { isDomainRecordId } from "@fe/dashboard/utils/domain";
@@ -7,13 +9,11 @@ import { Icon } from "@reloop/ui/icon";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
 import axios from "axios";
 import { AnimatePresence, motion } from "motion/react";
-import { useParams, useSearchParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import * as React from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import { DomainErrorState } from "@fe/dashboard/app/(protected)/(layout)/domain/components/domain-error-state";
-import { DomainNotFound } from "@fe/dashboard/app/(protected)/(layout)/domain/components/domain-not-found";
 import { DNSRecordsSection } from "./components/dns-records-section";
 import { DomainConfigurationSection } from "./components/domain-configuration-section";
 import { DomainEvents } from "./components/domain-events";
@@ -33,7 +33,9 @@ const DomainPage = () => {
 
 		switch (dcStatus) {
 			case "success":
-				toast.success("DNS records configured successfully! Verification started.");
+				toast.success(
+					"DNS records configured successfully! Verification started.",
+				);
 				break;
 			case "cancelled":
 				toast.info(
@@ -137,7 +139,7 @@ const DomainPage = () => {
 				onValueChange={setActiveTab}
 				className="mt-7"
 			>
-				<TabMenu.List className="relative h-10 gap-0 border-b! py-0">
+				<TabMenu.List className="relative h-12 gap-0 border-b! py-0">
 					{tabs.map((t, index) => (
 						<TabMenu.Trigger
 							key={t.id}
@@ -148,7 +150,7 @@ const DomainPage = () => {
 							onPointerEnter={() => setHoveredIdx(index)}
 							onPointerLeave={() => setHoveredIdx(undefined)}
 							className={cn(
-								"flex cursor-pointer items-center gap-2 px-2.5 py-0! font-medium text-sm",
+								"flex cursor-pointer items-center gap-2 px-3 py-0! font-medium text-sm",
 								hoveredIdx === undefined &&
 									activeIndex === index &&
 									"text-text-strong-950",
@@ -165,41 +167,41 @@ const DomainPage = () => {
 								initial={{
 									pointerEvents: "none",
 									width: rect.width,
-									height: rect.height - 20,
+									height: rect.height - 14,
 									left:
 										rect.left -
 										(tab?.offsetParent?.getBoundingClientRect().left || 0),
 									top:
 										rect.top -
 										(tab?.offsetParent?.getBoundingClientRect().top || 0) +
-										10,
+										7,
 									opacity: 0,
 								}}
 								animate={{
 									pointerEvents: "none",
 									width: rect.width,
-									height: rect.height - 20,
+									height: rect.height - 14,
 									left:
 										rect.left -
 										(tab?.offsetParent?.getBoundingClientRect().left || 0),
 									top:
 										rect.top -
 										(tab?.offsetParent?.getBoundingClientRect().top || 0) +
-										10,
+										7,
 									opacity: 1,
 								}}
 								exit={{
 									pointerEvents: "none",
 									opacity: 0,
 									width: rect.width,
-									height: rect.height - 20,
+									height: rect.height - 14,
 									left:
 										rect.left -
 										(tab?.offsetParent?.getBoundingClientRect().left || 0),
 									top:
 										rect.top -
 										(tab?.offsetParent?.getBoundingClientRect().top || 0) +
-										10,
+										7,
 								}}
 								transition={{ duration: 0.14 }}
 							/>

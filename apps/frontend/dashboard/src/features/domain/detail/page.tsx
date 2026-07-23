@@ -84,7 +84,7 @@ export function DomainDetailPage({
 				onValueChange={(v) => void setActiveTab(v)}
 				className="mt-7"
 			>
-				<TabMenu.List className="relative h-10 gap-0 border-b! py-0">
+				<TabMenu.List className="relative h-12 gap-0 border-b! py-0">
 					{tabs.map((t, index) => (
 						<TabMenu.Trigger
 							key={t.id}
@@ -95,7 +95,7 @@ export function DomainDetailPage({
 							onPointerEnter={() => setHoveredIdx(index)}
 							onPointerLeave={() => setHoveredIdx(undefined)}
 							className={cn(
-								"flex cursor-pointer items-center gap-2 px-2.5 py-0! font-medium text-sm",
+								"flex cursor-pointer items-center gap-2 px-3 py-0! font-medium text-sm",
 								hoveredIdx === undefined &&
 									activeIndex === index &&
 									"text-text-strong-950",
@@ -112,27 +112,27 @@ export function DomainDetailPage({
 								initial={{
 									pointerEvents: "none",
 									width: rect.width,
-									height: rect.height - 20,
+									height: rect.height - 14,
 									left:
 										rect.left -
 										(tab?.offsetParent?.getBoundingClientRect().left || 0),
 									top:
 										rect.top -
 										(tab?.offsetParent?.getBoundingClientRect().top || 0) +
-										10,
+										7,
 									opacity: 0,
 								}}
 								animate={{
 									pointerEvents: "none",
 									width: rect.width,
-									height: rect.height - 20,
+									height: rect.height - 14,
 									left:
 										rect.left -
 										(tab?.offsetParent?.getBoundingClientRect().left || 0),
 									top:
 										rect.top -
 										(tab?.offsetParent?.getBoundingClientRect().top || 0) +
-										10,
+										7,
 									opacity: 1,
 								}}
 								exit={{ opacity: 0 }}
