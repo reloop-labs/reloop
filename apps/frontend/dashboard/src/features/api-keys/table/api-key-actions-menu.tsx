@@ -83,9 +83,13 @@ export function ApiKeyActionsMenu({
 						variant="neutral"
 						mode="ghost"
 						size="xxsmall"
+						className="aspect-square h-7 w-7 rounded-lg p-0"
 						aria-label={`Actions for ${apiKey.name || apiKey.start || "API key"}`}
 					>
-						<Icon name="more-horizontal" className="h-3 w-3" />
+						<Icon
+							name="more-horizontal"
+							className="h-3.5 w-3.5 text-text-sub-600"
+						/>
 					</Button.Root>
 				</Dropdown.Trigger>
 				<Dropdown.Content

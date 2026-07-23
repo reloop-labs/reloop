@@ -55,14 +55,16 @@ export function DomainDropdown({
 			<Dropdown.Root open={open} onOpenChange={handleOpenChange}>
 				<Dropdown.Trigger asChild>
 					<Button.Root
+						type="button"
 						variant="neutral"
 						mode="ghost"
 						size="xxsmall"
-						className="rounded p-1"
+						className="aspect-square h-7 w-7 rounded-lg p-0"
+						aria-label={`Actions for ${domainName}`}
 					>
 						<Icon
 							name="more-horizontal"
-							className="h-3 w-3 text-text-sub-600 hover:text-text-strong-950"
+							className="h-3.5 w-3.5 text-text-sub-600"
 						/>
 					</Button.Root>
 				</Dropdown.Trigger>
