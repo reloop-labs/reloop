@@ -1,5 +1,6 @@
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as LinkButton from "@reloop/ui/link-button";
 import Spinner from "@reloop/ui/spinner";
@@ -52,34 +53,23 @@ export function SocialLogin({
 		{
 			name: "google" as const,
 			label: "Continue with Google",
-			defaultMode: "filled" as const,
 			icon:
 				loading.name === "google" && loading.loading ? (
-					<Spinner color="var(--text-white-0)" size={16} />
+					<Spinner color="currentColor" size={16} />
 				) : (
 					<svg
+						viewBox="0 0 512 512"
 						xmlns="http://www.w3.org/2000/svg"
-						className="h-4 w-4"
-						fill="none"
+						className="h-4 w-4 shrink-0"
+						fill="currentColor"
+						fillRule="evenodd"
+						clipRule="evenodd"
+						strokeLinejoin="round"
+						strokeMiterlimit={2}
 						aria-hidden="true"
 					>
 						<title>Google</title>
-						<path
-							fill="#4280EF"
-							d="M14.117 7.661c0-.456-.045-.926-.118-1.368H7.63v2.604h3.648a3.07 3.07 0 0 1-1.353 2.044l2.177 1.692c1.28-1.192 2.015-2.927 2.015-4.972"
-						/>
-						<path
-							fill="#34A353"
-							d="M7.63 14.252c1.824 0 3.354-.604 4.472-1.633l-2.177-1.677c-.603.412-1.383.647-2.295.647-1.765 0-3.25-1.191-3.794-2.78L1.6 10.53a6.74 6.74 0 0 0 6.03 3.722"
-						/>
-						<path
-							fill="#F6B704"
-							d="M3.836 8.794a4.1 4.1 0 0 1 0-2.588L1.6 4.47a6.76 6.76 0 0 0 0 6.06z"
-						/>
-						<path
-							fill="#E54335"
-							d="M7.63 3.426A3.68 3.68 0 0 1 10.22 4.44L12.146 2.5A6.5 6.5 0 0 0 7.63.749a6.74 6.74 0 0 0-6.03 3.72l2.236 1.736c.544-1.603 2.03-2.78 3.794-2.78"
-						/>
+						<path d="M32.582 370.734C15.127 336.291 5.12 297.425 5.12 256c0-41.426 10.007-80.291 27.462-114.735C74.705 57.484 161.047 0 261.12 0c69.12 0 126.836 25.367 171.287 66.793l-73.31 73.309c-26.763-25.135-60.276-38.168-97.977-38.168-66.56 0-123.113 44.917-143.36 105.426-5.12 15.36-8.146 31.65-8.146 48.64 0 16.989 3.026 33.28 8.146 48.64l-.303.232h.303c20.247 60.51 76.8 105.426 143.36 105.426 34.443 0 63.534-9.31 86.341-24.67 27.23-18.152 45.382-45.148 51.433-77.032H261.12v-99.142h241.105c3.025 16.757 4.654 34.211 4.654 52.364 0 77.963-27.927 143.592-76.334 188.276-42.356 39.098-100.305 61.905-169.425 61.905-100.073 0-186.415-57.483-228.538-141.032v-.233z" />
 					</svg>
 				),
 			onClick: async () => {
@@ -101,12 +91,11 @@ export function SocialLogin({
 		{
 			name: "github" as const,
 			label: "Continue with GitHub",
-			defaultMode: "lighter" as const,
 			icon:
 				loading.name === "github" && loading.loading ? (
-					<Spinner color="var(--text-white-0)" size={16} />
+					<Spinner color="currentColor" size={16} />
 				) : (
-					<Icon name="github" className="h-5 w-5" />
+					<Icon name="github" className="h-4 w-4 shrink-0" />
 				),
 			onClick: async () => {
 				try {
@@ -125,10 +114,9 @@ export function SocialLogin({
 			},
 		},
 		{
-			defaultMode: "lighter" as const,
 			name: "email" as const,
 			label: "Continue with Email",
-			icon: <Icon name="social-mail" className="h-[17.5px] w-[17.5px]" />,
+			icon: <Icon name="social-mail" className="h-4 w-4 shrink-0" />,
 			onClick: onContinueWithEmail,
 		},
 	];
@@ -141,31 +129,46 @@ export function SocialLogin({
 
 	return (
 		<>
-			<div className="grid grid-cols-1 gap-2">
-				{sortedMethods.map((method) => (
-					<Button.Root
-						key={method.name}
-						disabled={loading.loading}
-						variant="neutral"
-						mode={
-							lastLoggedIn
-								? lastLoggedIn === method.name
-									? "filled"
-									: "lighter"
-								: method.defaultMode
-						}
-						className="relative h-11 w-full rounded-2xl!"
-						onClick={method.onClick}
-					>
-						{method.icon}
-						{method.label}
-						{lastLoggedIn === method.name && (
-							<p className="absolute top-[-10px] right-0 rounded-full bg-primary-base px-2 py-0.5 font-medium text-background-base text-xs">
-								Last used
-							</p>
-						)}
-					</Button.Root>
-				))}
+			<div className="grid grid-cols-1 gap-2.5">
+				{sortedMethods.map((method) => {
+					const isLastUsed = lastLoggedIn === method.name;
+					const isPrimary = lastLoggedIn ? isLastUsed : method.name === "email";
+
+					if (isPrimary) {
+						return (
+							<FancyButton.Root
+								key={method.name}
+								disabled={loading.loading}
+								variant="blue"
+								size="medium"
+								className="relative h-10 w-full rounded-xl justify-center font-medium text-sm gap-2.5"
+								onClick={method.onClick}
+							>
+								{method.icon}
+								<span>{method.label}</span>
+								{isLastUsed && (
+									<span className="absolute -top-2.5 right-3 rounded-full bg-primary-base px-2 py-0.5 font-semibold text-static-white text-[10px] uppercase tracking-wider shadow-sm">
+										Last used
+									</span>
+								)}
+							</FancyButton.Root>
+						);
+					}
+
+					return (
+						<Button.Root
+							key={method.name}
+							disabled={loading.loading}
+							variant="neutral"
+							mode="stroke"
+							className="relative h-10 w-full rounded-xl justify-center font-medium text-sm gap-2.5 flex items-center"
+							onClick={method.onClick}
+						>
+							{method.icon}
+							<span>{method.label}</span>
+						</Button.Root>
+					);
+				})}
 			</div>
 			<p className="pt-5 text-center font-medium text-[13px] text-text-sub-600">
 				Don&apos;t have an account?{" "}

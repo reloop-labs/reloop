@@ -1,6 +1,6 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { authClient } from "@reloop/auth/client";
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import * as Input from "@reloop/ui/input";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
@@ -61,10 +61,10 @@ export function SignupForm() {
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
 			<div className="flex flex-col gap-1">
-				<Input.Root hasError={!!errors.email} className="rounded-2xl!">
+				<Input.Root hasError={!!errors.email} className="rounded-xl!">
 					<Input.Wrapper>
 						<Input.Input
-							className="h-12 font-medium"
+							className="h-10 font-medium"
 							id="email"
 							type="email"
 							placeholder="steve@apple.com"
@@ -77,17 +77,18 @@ export function SignupForm() {
 				)}
 			</div>
 
-			<Button.Root
+			<FancyButton.Root
 				type="submit"
 				disabled={status === "loading" || !isValid}
-				variant="neutral"
-				className="h-11 w-full rounded-2xl!"
+				variant="blue"
+				size="medium"
+				className="mt-2 h-10 w-full rounded-xl font-medium text-sm"
 			>
 				{status === "loading" && (
-					<Spinner size={16} color="var(--text-strong-950)" />
+					<Spinner size={16} color="currentColor" />
 				)}
 				{status === "loading" ? "Sending…" : "Continue"}
-			</Button.Root>
+			</FancyButton.Root>
 		</form>
 	);
 }

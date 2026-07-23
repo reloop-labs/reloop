@@ -1,5 +1,6 @@
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import * as DigitInput from "@reloop/ui/digit-input";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
@@ -143,35 +144,37 @@ export function VerifyOTP({
 					</div>
 				</motion.div>
 			)}
-			<Button.Root
-				type="button"
-				variant={isSuccess ? "success" : "neutral"}
-				className="h-11 w-full rounded-2xl!"
-				mode={!enterCode ? "lighter" : undefined}
-				onClick={() => {
-					if (isSuccess || status === "loading") return;
-					if (!enterCode) {
-						setEnterCode(true);
-					} else {
+			{!enterCode ? (
+				<Button.Root
+					type="button"
+					variant="neutral"
+					mode="stroke"
+					className="h-10 w-full rounded-xl font-medium text-sm gap-2 justify-center flex items-center"
+					onClick={() => setEnterCode(true)}
+				>
+					Enter code manually
+				</Button.Root>
+			) : (
+				<FancyButton.Root
+					type="button"
+					variant="blue"
+					size="medium"
+					className="h-10 w-full rounded-xl font-medium text-sm gap-2 justify-center"
+					onClick={() => {
+						if (isSuccess || status === "loading") return;
 						handleVerify(otpValue);
-					}
-				}}
-				disabled={
-					enterCode &&
-					(otpValue.length !== 6 || status === "loading") &&
-					!isSuccess
-				}
-			>
-				{status === "loading" && <Spinner color="var(--text-strong-950)" />}
-				{isSuccess && <Icon name="check-circle" className="mr-2 h-4 w-4" />}
-				{!enterCode
-					? "Enter code manually"
-					: isSuccess
+					}}
+					disabled={(otpValue.length !== 6 || status === "loading") && !isSuccess}
+				>
+					{status === "loading" && <Spinner color="currentColor" size={16} />}
+					{isSuccess && <Icon name="check-circle" className="h-4 w-4" />}
+					{isSuccess
 						? "Verified successfully!"
 						: status === "loading"
 							? "Verifying..."
 							: `Continue with ${mode} code`}
-			</Button.Root>
+				</FancyButton.Root>
+			)}
 			<div className="mt-4 flex justify-center">
 				<button
 					type="button"
