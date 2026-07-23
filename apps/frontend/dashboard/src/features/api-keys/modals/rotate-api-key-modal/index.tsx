@@ -34,7 +34,13 @@ const HEADER_CONTENT = {
 	},
 } as const;
 
-export function RotateApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
+export function RotateApiKeyModal({
+	apiKeys,
+	onRotateSuccess,
+}: {
+	apiKeys: ApiKeyData[];
+	onRotateSuccess?: (rotatedName: string) => void;
+}) {
 	const [rotateId, setRotateId] = useQueryState("rotate");
 	const [isRotating, setIsRotating] = useState(false);
 	const [rotatedApiKey, setRotatedApiKey] = useState<RotatedKey | null>(null);
@@ -51,7 +57,10 @@ export function RotateApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
 	const step = rotatedApiKey ? "success" : "confirm";
 	const header = HEADER_CONTENT[step];
 
-	const handleClose = () => {
+	const handleClose = (fromSuccessStep?: boolean) => {
+		if (fromSuccessStep && rotatedApiKey) {
+			onRotateSuccess?.(displayName);
+		}
 		void setRotateId(null);
 	};
 
@@ -82,7 +91,7 @@ export function RotateApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
 		(e) => {
 			e.preventDefault();
 			if (!rotatedApiKey) void handleRotate();
-			else handleClose();
+			else handleClose(true);
 		},
 		{ enabled: !!rotateId },
 	);
@@ -103,13 +112,19 @@ export function RotateApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
 				// After rotation, require Done — don't dismiss by backdrop/escape
 				// and lose a secret the user hasn't saved.
 				if (!open && !rotatedApiKey) handleClose();
+				// Allow close via backdrop/X after rotation (fires success callback)
+				if (!open && rotatedApiKey) handleClose(true);
 			}}
 		>
 			<Modal.Content
 				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
 				showClose={true}
 				onEscapeKeyDown={(e) => {
-					if (rotatedApiKey) e.preventDefault();
+					// Block Escape only on success step if key hasn't been copied yet
+					// but still fire the success callback so banner appears
+					if (rotatedApiKey) {
+						e.preventDefault();
+					}
 				}}
 				onPointerDownOutside={(e) => {
 					if (rotatedApiKey) e.preventDefault();
@@ -186,7 +201,7 @@ export function RotateApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
 								size="small"
 								onClick={() => {
 									if (step === "success") {
-										handleClose();
+										handleClose(true);
 									} else if (!isRotating) {
 										void handleRotate();
 									}

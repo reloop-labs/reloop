@@ -30,6 +30,7 @@ export function ApiKeyTable({
 	isLoading,
 	loadingRows = 3,
 	onDeleteSuccess,
+	onRotateSuccess,
 }: {
 	apiKeys: ApiKeyData[];
 	total: number;
@@ -37,6 +38,7 @@ export function ApiKeyTable({
 	isLoading?: boolean;
 	loadingRows?: number;
 	onDeleteSuccess?: (deletedName: string) => void;
+	onRotateSuccess?: (rotatedName: string) => void;
 }) {
 	const navigate = useNavigate();
 	const [, setDeleteId] = useQueryState("delete");
@@ -162,7 +164,7 @@ export function ApiKeyTable({
 				</div>
 			</div>
 			<DeleteApiKeyModal apiKeys={apiKeys} onDeleteSuccess={onDeleteSuccess} />
-			<RotateApiKeyModal apiKeys={apiKeys} />
+			<RotateApiKeyModal apiKeys={apiKeys} onRotateSuccess={onRotateSuccess} />
 			<EditApiKeyModal apiKeys={apiKeys} />
 		</>
 	);

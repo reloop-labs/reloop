@@ -7,7 +7,7 @@ import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
@@ -79,11 +79,27 @@ export function DeleteApiKeyModal({
 		{ enabled: !!deleteId },
 	);
 
+	// Keep a ref so onOpenChange can read the latest deleteState without stale closure
+	const deleteStateRef = useRef(deleteState);
+	useEffect(() => {
+		deleteStateRef.current = deleteState;
+	}, [deleteState]);
+
 	return (
 		<Modal.Root
 			open={!!deleteId}
 			onOpenChange={(open) => {
 				if (!open) {
+					// If the user closes the modal after a successful delete (via X or
+					// backdrop), still fire the success callback so the banner appears.
+					if (deleteStateRef.current === "success") {
+						const name =
+							targetApiKeyRef.current?.name ||
+							targetApiKeyRef.current?.start ||
+							targetApiKeyRef.current?.prefix ||
+							"Unnamed key";
+						onDeleteSuccess?.(name);
+					}
 					void setDeleteId(null);
 					setTimeout(() => {
 						setDeleteState("idle");
