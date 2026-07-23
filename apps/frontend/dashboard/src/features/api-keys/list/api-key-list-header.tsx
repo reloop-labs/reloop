@@ -4,14 +4,16 @@ import { Icon } from "@reloop/ui/icon";
 import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 
-export function ApiKeyListHeader() {
-	const [, setModal] = useQueryState("modal");
+import { useNavigate } from "@tanstack/react-router";
 
-	const openCreateModal = () => void setModal("create-api-key");
+export function ApiKeyListHeader() {
+	const navigate = useNavigate();
+
+	const openCreatePage = () => void navigate({ to: "/api-keys/create" });
 
 	useHotkeys("mod+a", (e) => {
 		e.preventDefault();
-		openCreateModal();
+		openCreatePage();
 	});
 
 	return (
@@ -40,7 +42,7 @@ export function ApiKeyListHeader() {
 					onClick={() =>
 						window.open("https://reloop.sh/docs/learn/api-keys", "_blank")
 					}
-					className="gap-1.5"
+					className="gap-1.5 rounded-xl"
 				>
 					<Icon name="video-guide" className="h-4 w-4 text-text-sub-600" />
 					Video guide
@@ -53,6 +55,7 @@ export function ApiKeyListHeader() {
 					onClick={() =>
 						window.open("https://reloop.sh/docs/learn/api-keys", "_blank")
 					}
+					className="rounded-xl"
 				>
 					Documentation
 				</Button.Root>
@@ -60,8 +63,8 @@ export function ApiKeyListHeader() {
 					type="button"
 					variant="blue"
 					size="small"
-					onClick={openCreateModal}
-					className="gap-1.5"
+					onClick={openCreatePage}
+					className="gap-1.5 rounded-xl"
 				>
 					<Icon name="plus" className="h-4 w-4" />
 					Create API key

@@ -32,6 +32,7 @@ export function CopyCodeBlock({
 	hideLineNumbers = false,
 	noScroll = false,
 	maxHeight,
+	minHeight,
 	title,
 	titleHref,
 	codeExtraPadding = false,
@@ -52,6 +53,7 @@ export function CopyCodeBlock({
 	hideLineNumbers?: boolean;
 	noScroll?: boolean;
 	maxHeight?: string;
+	minHeight?: string;
 	title?: string;
 	titleHref?: string;
 	codeExtraPadding?: boolean;
@@ -135,7 +137,7 @@ export function CopyCodeBlock({
 	const displayLabel = label ?? lang;
 	const isEmpty = !loading && !(code.trim().length > 0);
 	/** Matches ~5 BrightCode lines so loading → content/empty never collapses the card */
-	const codeSurfaceMinClass = "min-h-[7.5rem]";
+	const codeSurfaceMinClass = minHeight === "auto" ? "" : (minHeight ?? "min-h-[7.5rem]");
 
 	const highlightedTabIndex =
 		hoveredTabIdx !== undefined ? hoveredTabIdx : activeTabIndex;

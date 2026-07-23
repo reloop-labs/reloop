@@ -32,6 +32,7 @@ import { Route as DashboardWebhooksRouteImport } from './routes/_dashboard/webho
 import { Route as DashboardWorkflowsRouteImport } from './routes/_dashboard/workflows'
 import { Route as DashboardApiKeysIndexRouteImport } from './routes/_dashboard/api-keys/index'
 import { Route as DashboardApiKeysApiKeyIdRouteImport } from './routes/_dashboard/api-keys/$apiKeyId'
+import { Route as DashboardApiKeysCreateRouteImport } from './routes/_dashboard/api-keys/create'
 import { Route as DashboardContactsIndexRouteImport } from './routes/_dashboard/contacts/index'
 import { Route as DashboardContactsChannelsRouteImport } from './routes/_dashboard/contacts/channels'
 import { Route as DashboardContactsDetailRouteImport } from './routes/_dashboard/contacts/detail'
@@ -197,6 +198,11 @@ const DashboardApiKeysApiKeyIdRoute =
     path: '/$apiKeyId',
     getParentRoute: () => DashboardApiKeysRoute,
   } as any)
+const DashboardApiKeysCreateRoute = DashboardApiKeysCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => DashboardApiKeysRoute,
+} as any)
 const DashboardContactsIndexRoute = DashboardContactsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -493,6 +499,7 @@ export interface FileRoutesByFullPath {
   '/webhooks': typeof DashboardWebhooksRouteWithChildren
   '/workflows': typeof DashboardWorkflowsRouteWithChildren
   '/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
+  '/api-keys/create': typeof DashboardApiKeysCreateRoute
   '/contacts/channels': typeof DashboardContactsChannelsRoute
   '/contacts/detail': typeof DashboardContactsDetailRouteWithChildren
   '/contacts/groups': typeof DashboardContactsGroupsRouteWithChildren
@@ -557,6 +564,7 @@ export interface FileRoutesByTo {
   '/smtp': typeof DashboardSmtpRoute
   '/': typeof DashboardIndexRoute
   '/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
+  '/api-keys/create': typeof DashboardApiKeysCreateRoute
   '/contacts/channels': typeof DashboardContactsChannelsRoute
   '/contacts/detail': typeof DashboardContactsDetailRouteWithChildren
   '/contacts/properties': typeof DashboardContactsPropertiesRoute
@@ -627,6 +635,7 @@ export interface FileRoutesById {
   '/_dashboard/workflows': typeof DashboardWorkflowsRouteWithChildren
   '/_dashboard/': typeof DashboardIndexRoute
   '/_dashboard/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
+  '/_dashboard/api-keys/create': typeof DashboardApiKeysCreateRoute
   '/_dashboard/contacts/channels': typeof DashboardContactsChannelsRoute
   '/_dashboard/contacts/detail': typeof DashboardContactsDetailRouteWithChildren
   '/_dashboard/contacts/groups': typeof DashboardContactsGroupsRouteWithChildren
@@ -702,6 +711,7 @@ export interface FileRouteTypes {
     | '/webhooks'
     | '/workflows'
     | '/api-keys/$apiKeyId'
+    | '/api-keys/create'
     | '/contacts/channels'
     | '/contacts/detail'
     | '/contacts/groups'
@@ -766,6 +776,7 @@ export interface FileRouteTypes {
     | '/smtp'
     | '/'
     | '/api-keys/$apiKeyId'
+    | '/api-keys/create'
     | '/contacts/channels'
     | '/contacts/detail'
     | '/contacts/properties'
@@ -835,6 +846,7 @@ export interface FileRouteTypes {
     | '/_dashboard/workflows'
     | '/_dashboard/'
     | '/_dashboard/api-keys/$apiKeyId'
+    | '/_dashboard/api-keys/create'
     | '/_dashboard/contacts/channels'
     | '/_dashboard/contacts/detail'
     | '/_dashboard/contacts/groups'
@@ -1057,6 +1069,13 @@ declare module '@tanstack/react-router' {
       path: '/$apiKeyId'
       fullPath: '/api-keys/$apiKeyId'
       preLoaderRoute: typeof DashboardApiKeysApiKeyIdRouteImport
+      parentRoute: typeof DashboardApiKeysRoute
+    }
+    '/_dashboard/api-keys/create': {
+      id: '/_dashboard/api-keys/create'
+      path: '/create'
+      fullPath: '/api-keys/create'
+      preLoaderRoute: typeof DashboardApiKeysCreateRouteImport
       parentRoute: typeof DashboardApiKeysRoute
     }
     '/_dashboard/contacts/': {
@@ -1407,11 +1426,13 @@ declare module '@tanstack/react-router' {
 
 interface DashboardApiKeysRouteChildren {
   DashboardApiKeysApiKeyIdRoute: typeof DashboardApiKeysApiKeyIdRoute
+  DashboardApiKeysCreateRoute: typeof DashboardApiKeysCreateRoute
   DashboardApiKeysIndexRoute: typeof DashboardApiKeysIndexRoute
 }
 
 const DashboardApiKeysRouteChildren: DashboardApiKeysRouteChildren = {
   DashboardApiKeysApiKeyIdRoute: DashboardApiKeysApiKeyIdRoute,
+  DashboardApiKeysCreateRoute: DashboardApiKeysCreateRoute,
   DashboardApiKeysIndexRoute: DashboardApiKeysIndexRoute,
 }
 
