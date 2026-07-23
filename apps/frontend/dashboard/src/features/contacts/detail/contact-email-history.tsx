@@ -1,9 +1,12 @@
-import { formatRelativeTime } from "#/utils/format-relative-time";
 import { queryKeys } from "#/lib/query-keys";
+import * as Badge from "@reloop/ui/badge";
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { useMemo } from "react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -37,144 +40,130 @@ interface ContactActivityResponse {
 	limit: number;
 }
 
-// ─── Unified timeline item ───────────────────────────────────────────────────
-
-type TimelineItem =
-	| {
-			kind: "email";
-			id: string;
-			entry: ActivityEntry;
-			timestamp: string;
-	  }
-	| {
-			kind: "contact_created";
-			id: string;
-			timestamp: string;
-	  };
-
-// ─── Config ──────────────────────────────────────────────────────────────────
-
-type EmailStatus =
-	| "pending"
-	| "sent"
+type DisplayStatus =
+	| "clicked"
+	| "opened"
 	| "delivered"
+	| "sent"
+	| "pending"
 	| "failed"
 	| "bounced"
 	| "spam"
 	| "archived";
 
-/** Status pill shown inline in the action text */
-const STATUS_PILL: Record<
-	EmailStatus,
-	{ label: string; cls: string; dotCls: string }
-> = {
-	delivered: {
-		label: "Delivered",
-		cls: "bg-success-base/10 text-success-base",
-		dotCls: "bg-success-base",
-	},
-	sent: {
-		label: "Sent",
-		cls: "bg-blue-50 text-blue-600",
-		dotCls: "bg-blue-500",
-	},
-	pending: {
-		label: "Pending",
-		cls: "bg-warning-base/10 text-warning-base",
-		dotCls: "bg-warning-base",
-	},
-	bounced: {
-		label: "Bounced",
-		cls: "bg-error-base/10 text-error-base",
-		dotCls: "bg-error-base",
-	},
-	failed: {
-		label: "Failed",
-		cls: "bg-error-base/10 text-error-base",
-		dotCls: "bg-error-base",
-	},
-	spam: {
-		label: "Spam",
-		cls: "bg-error-base/10 text-error-base",
-		dotCls: "bg-error-base",
-	},
-	archived: {
-		label: "Archived",
-		cls: "bg-neutral-100 text-text-sub-600",
-		dotCls: "bg-text-soft-400",
-	},
-};
-
-/** Icon shown in the avatar circle for each event type */
-const EVENT_ICON: Record<string, { icon: string; bg: string; text: string }> = {
-	// Email-level
-	email_sent: { icon: "send-1", bg: "bg-blue-100", text: "text-blue-600" },
-	email_delivered: {
-		icon: "check-circle",
-		bg: "bg-emerald-100",
-		text: "text-emerald-600",
-	},
-	email_bounced: {
-		icon: "alert-circle",
-		bg: "bg-red-100",
-		text: "text-red-600",
-	},
-	email_failed: {
-		icon: "cross-circle",
-		bg: "bg-red-100",
-		text: "text-red-600",
-	},
-	email_pending: { icon: "clock", bg: "bg-amber-100", text: "text-amber-600" },
-	email_spam: { icon: "alert-octagon", bg: "bg-red-100", text: "text-red-600" },
-	// Contact created
-	contact_created: {
-		icon: "user-plus",
-		bg: "bg-neutral-100",
-		text: "text-text-sub-600",
-	},
-};
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function getIconConfig(key: string) {
-	return (
-		EVENT_ICON[key] ?? {
-			icon: "mail",
-			bg: "bg-neutral-100",
-			text: "text-text-sub-600",
-		}
-	);
-}
-
 interface ParsedLifecycle {
-	hasSent: boolean;
-	sentTime: string | null;
-	hasDelivered: boolean;
-	deliveredTime: string | null;
 	hasOpened: boolean;
-	openedTime: string | null;
 	openedCount: number;
 	hasClicked: boolean;
-	clickedTime: string | null;
 	clickedCount: number;
 	hasFailed: boolean;
 	failedType: "failed" | "bounced" | "complaint" | null;
-	failedTime: string | null;
 	failedReason: string | null;
+	hasDelivered: boolean;
 }
 
+type TimelineItem =
+	| { kind: "email"; id: string; entry: ActivityEntry; timestamp: string }
+	| { kind: "contact_created"; id: string; timestamp: string };
+
+interface DayGroup {
+	key: string;
+	label: string;
+	items: TimelineItem[];
+}
+
+// ─── Status / visual config (AlignUI semantic tokens — matches email timeline) ─
+
+type BadgeColor =
+	| "blue"
+	| "green"
+	| "orange"
+	| "red"
+	| "yellow"
+	| "purple"
+	| "gray";
+
+const STATUS_META: Record<
+	DisplayStatus,
+	{
+		label: string;
+		icon: string;
+		badgeColor: BadgeColor;
+	}
+> = {
+	// Matches EmailTimeline step colors + AlignUI Badge
+	clicked: {
+		label: "Clicked",
+		icon: "cursor-click",
+		badgeColor: "purple",
+	},
+	opened: {
+		label: "Opened",
+		icon: "eye-outline",
+		badgeColor: "orange",
+	},
+	delivered: {
+		label: "Delivered",
+		icon: "check-circle",
+		badgeColor: "green",
+	},
+	sent: {
+		label: "Sent",
+		icon: "send-1",
+		badgeColor: "blue",
+	},
+	pending: {
+		label: "Pending",
+		icon: "clock",
+		badgeColor: "yellow",
+	},
+	failed: {
+		label: "Failed",
+		icon: "cross-circle",
+		badgeColor: "red",
+	},
+	bounced: {
+		label: "Bounced",
+		icon: "alert-circle",
+		badgeColor: "red",
+	},
+	spam: {
+		label: "Spam",
+		icon: "alert-octagon",
+		badgeColor: "red",
+	},
+	archived: {
+		label: "Archived",
+		icon: "mail",
+		badgeColor: "gray",
+	},
+};
+
+/** Icon node styles — same language as `features/emails/detail/timeline/steps/*` */
+const NODE_STYLE = {
+	email: {
+		box: "border-information-base/20 bg-information-lighter/50 text-information-base",
+		icon: "mail-single" as const,
+	},
+	"email-error": {
+		box: "border-error-light bg-error-lighter text-error-base",
+		icon: "mail-single" as const,
+	},
+	contact: {
+		box: "border-stroke-soft-200 bg-bg-weak-50 text-text-sub-600",
+		icon: "user-plus" as const,
+	},
+} as const;
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
 function parseLifecycle(entry: ActivityEntry): ParsedLifecycle {
-	const sentEvent = entry.events.find((e) => e.type === "sent");
 	const deliveredEvent = entry.events.find((e) => e.type === "delivered");
 	const openedEvents = entry.events.filter((e) => e.type === "opened");
 	const clickedEvents = entry.events.filter((e) => e.type === "clicked");
-
 	const bouncedEvent = entry.events.find((e) => e.type === "bounced");
 	const failedEvent = entry.events.find((e) => e.type === "failed");
 	const complaintEvent = entry.events.find((e) => e.type === "complaint");
-
-	const hasSent = true;
-	const sentTime = entry.sentAt || sentEvent?.createdAt || entry.createdAt;
 
 	const hasDelivered = !!(
 		entry.deliveredAt ||
@@ -182,43 +171,24 @@ function parseLifecycle(entry: ActivityEntry): ParsedLifecycle {
 		openedEvents.length > 0 ||
 		clickedEvents.length > 0
 	);
-	const deliveredTime =
-		entry.deliveredAt ||
-		deliveredEvent?.createdAt ||
-		openedEvents[0]?.createdAt ||
-		clickedEvents[0]?.createdAt ||
-		null;
-
-	const hasOpened = openedEvents.length > 0 || clickedEvents.length > 0;
-	const openedTime =
-		openedEvents[0]?.createdAt || clickedEvents[0]?.createdAt || null;
-	const openedCount = openedEvents.length;
-
-	const hasClicked = clickedEvents.length > 0;
-	const clickedTime = clickedEvents[0]?.createdAt || null;
-	const clickedCount = clickedEvents.length;
 
 	let failedType: "failed" | "bounced" | "complaint" | null = null;
-	let failedTime: string | null = null;
 	let failedReason: string | null = null;
 
 	if (complaintEvent) {
 		failedType = "complaint";
-		failedTime = complaintEvent.createdAt;
 		failedReason =
 			complaintEvent.metadata?.reason ||
 			complaintEvent.metadata?.description ||
 			null;
 	} else if (bouncedEvent) {
 		failedType = "bounced";
-		failedTime = bouncedEvent.createdAt;
 		failedReason =
 			bouncedEvent.metadata?.reason ||
 			bouncedEvent.metadata?.description ||
 			null;
 	} else if (failedEvent || entry.failedAt || entry.status === "failed") {
 		failedType = "failed";
-		failedTime = entry.failedAt || failedEvent?.createdAt || entry.createdAt;
 		failedReason =
 			entry.errorMessage ||
 			failedEvent?.metadata?.reason ||
@@ -227,40 +197,103 @@ function parseLifecycle(entry: ActivityEntry): ParsedLifecycle {
 	}
 
 	return {
-		hasSent,
-		sentTime,
-		hasDelivered,
-		deliveredTime,
-		hasOpened,
-		openedTime,
-		openedCount,
-		hasClicked,
-		clickedTime,
-		clickedCount,
+		hasOpened: openedEvents.length > 0 || clickedEvents.length > 0,
+		openedCount: openedEvents.length,
+		hasClicked: clickedEvents.length > 0,
+		clickedCount: clickedEvents.length,
 		hasFailed: failedType !== null,
 		failedType,
-		failedTime,
 		failedReason,
+		hasDelivered,
 	};
 }
 
-/**
- * Flattens activity entries into a single chronological timeline.
- */
-function buildFlatTimeline(
+function getDisplayStatus(
+	lifecycle: ParsedLifecycle,
+	entryStatus: string,
+): DisplayStatus {
+	if (lifecycle.hasFailed) {
+		if (lifecycle.failedType === "bounced") return "bounced";
+		if (lifecycle.failedType === "complaint") return "spam";
+		return "failed";
+	}
+	if (lifecycle.hasClicked) return "clicked";
+	if (lifecycle.hasOpened) return "opened";
+	if (lifecycle.hasDelivered) return "delivered";
+	if (entryStatus === "pending") return "pending";
+	if (entryStatus === "archived") return "archived";
+	return "sent";
+}
+
+function emailTitle(status: DisplayStatus): string {
+	switch (status) {
+		case "bounced":
+			return "Email bounced";
+		case "failed":
+			return "Email failed";
+		case "spam":
+			return "Email marked as spam";
+		case "clicked":
+			return "Email sent";
+		case "opened":
+			return "Email sent";
+		case "pending":
+			return "Email pending";
+		default:
+			return "Email sent";
+	}
+}
+
+function sameCalendarDay(a: Date, b: Date): boolean {
+	return (
+		a.getFullYear() === b.getFullYear() &&
+		a.getMonth() === b.getMonth() &&
+		a.getDate() === b.getDate()
+	);
+}
+
+function dayKey(iso: string): string {
+	const d = new Date(iso);
+	return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+
+/** Matches reference: "23 JULY 2026" */
+function dayLabel(iso: string): string {
+	const d = new Date(iso);
+	const today = new Date();
+	const yesterday = new Date();
+	yesterday.setDate(today.getDate() - 1);
+
+	if (sameCalendarDay(d, today)) return "TODAY";
+	if (sameCalendarDay(d, yesterday)) return "YESTERDAY";
+
+	const day = d.getDate();
+	const month = d
+		.toLocaleDateString("en-US", { month: "long" })
+		.toUpperCase();
+	const year = d.getFullYear();
+	return `${day} ${month} ${year}`;
+}
+
+/** Matches reference: "9:14 AM" */
+function formatClockTime(iso: string): string {
+	return new Date(iso).toLocaleTimeString(undefined, {
+		hour: "numeric",
+		minute: "2-digit",
+		hour12: true,
+	});
+}
+
+function buildTimelineItems(
 	entries: ActivityEntry[],
 	contactCreatedAt?: string,
 ): TimelineItem[] {
-	const items: TimelineItem[] = [];
-
-	for (const entry of entries) {
-		items.push({
-			kind: "email",
-			id: `email-${entry.id}`,
-			entry,
-			timestamp: entry.createdAt,
-		});
-	}
+	const items: TimelineItem[] = entries.map((entry) => ({
+		kind: "email" as const,
+		id: `email-${entry.id}`,
+		entry,
+		timestamp: entry.createdAt,
+	}));
 
 	if (contactCreatedAt) {
 		items.push({
@@ -270,344 +303,316 @@ function buildFlatTimeline(
 		});
 	}
 
-	// Sort descending (newest first), contact_created always last
-	items.sort((a, b) => {
-		if (a.kind === "contact_created") return 1;
-		if (b.kind === "contact_created") return -1;
-		return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-	});
+	items.sort(
+		(a, b) =>
+			new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+	);
 
 	return items;
 }
 
-// ─── Avatar node ─────────────────────────────────────────────────────────────
+function groupByDay(items: TimelineItem[]): DayGroup[] {
+	const groups: DayGroup[] = [];
+	const indexByKey = new Map<string, number>();
 
-function AvatarNode({ iconKey, isLast }: { iconKey: string; isLast: boolean }) {
-	const cfg = getIconConfig(iconKey);
-	return (
-		<div
-			className="relative flex flex-shrink-0 flex-col items-center"
-			style={{ width: 32 }}
-		>
-			{/* Icon circle */}
-			<div
-				className={cn(
-					"relative z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-stroke-soft-200",
-					cfg.bg,
-				)}
-			>
-				<Icon
-					name={cfg.icon as Parameters<typeof Icon>[0]["name"]}
-					className={cn("h-4 w-4", cfg.text)}
-				/>
-			</div>
-			{/* Vertical connector */}
-			{!isLast && (
-				<div
-					className="-translate-x-1/2 absolute top-8 left-1/2 w-px bg-stroke-soft-200"
-					style={{ height: "calc(100% + 8px)" }}
-				/>
-			)}
-		</div>
-	);
-}
-
-// ─── Status pill ─────────────────────────────────────────────────────────────
-
-function _StatusPill({ status }: { status: string }) {
-	const pill = STATUS_PILL[status as EmailStatus] ?? STATUS_PILL.pending;
-	return (
-		<span
-			className={cn(
-				"inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium text-[11px]",
-				pill.cls,
-			)}
-		>
-			<span
-				className={cn("h-1.5 w-1.5 flex-shrink-0 rounded-full", pill.dotCls)}
-			/>
-			{pill.label}
-		</span>
-	);
-}
-
-// ─── Stepper Component ───────────────────────────────────────────────────────
-
-const STEP_STYLE: Record<string, { activeCls: string; icon: string }> = {
-	Sent: {
-		activeCls: "border-blue-200 bg-blue-50 text-blue-600",
-		icon: "send-1",
-	},
-	Delivered: {
-		activeCls: "border-emerald-200 bg-emerald-50 text-emerald-600",
-		icon: "check-circle",
-	},
-	Opened: {
-		activeCls: "border-orange-200 bg-orange-50 text-orange-600",
-		icon: "eye-outline",
-	},
-	Clicked: {
-		activeCls: "border-purple-200 bg-purple-50 text-purple-600",
-		icon: "cursor-click",
-	},
-	Failed: {
-		activeCls: "border-red-200 bg-red-50 text-red-600",
-		icon: "cross-circle",
-	},
-	Bounced: {
-		activeCls: "border-red-200 bg-red-50 text-red-600",
-		icon: "cross-circle",
-	},
-	Spam: {
-		activeCls: "border-red-200 bg-red-50 text-red-600",
-		icon: "cross-circle",
-	},
-};
-
-function StepperItem({
-	label,
-	isActive,
-	time,
-	isLast,
-	badge,
-}: {
-	label: string;
-	isActive: boolean;
-	time: string | null;
-	isLast: boolean;
-	badge?: string;
-}) {
-	const cfg = STEP_STYLE[label] || {
-		activeCls:
-			"border-information-base/20 bg-information-lighter/50 text-information-base",
-		icon: "send-1",
-	};
-
-	return (
-		<div className="flex flex-1 items-center last:flex-none">
-			<div className="relative flex min-w-[90px] flex-col items-start pr-4">
-				<div className="flex items-center gap-2">
-					<div
-						className={cn(
-							"flex h-8 w-8 items-center justify-center rounded-[8px] border transition-all duration-300",
-							isActive
-								? cfg.activeCls
-								: "border-stroke-soft-200 bg-bg-weak-50 text-text-soft-400/60",
-						)}
-					>
-						<Icon
-							name={cfg.icon as Parameters<typeof Icon>[0]["name"]}
-							className="h-4 w-4"
-						/>
-					</div>
-					<div className="flex flex-col justify-center">
-						<div className="flex items-center gap-1.5">
-							<span
-								className={cn(
-									"font-semibold text-xs leading-none transition-colors",
-									isActive
-										? label === "Failed" ||
-											label === "Bounced" ||
-											label === "Spam"
-											? "text-error-base"
-											: label === "Sent"
-												? "text-information-base"
-												: label === "Delivered"
-													? "text-success-base"
-													: label === "Opened"
-														? "text-orange-600"
-														: "text-purple-600"
-										: "text-text-sub-600",
-								)}
-							>
-								{label}
-							</span>
-							{badge && isActive && (
-								<span className="rounded border border-purple-100 bg-purple-50 px-1 py-0.5 font-semibold text-[9px] text-purple-600 leading-none">
-									{badge}
-								</span>
-							)}
-						</div>
-						{time && isActive && (
-							<span className="mt-1 whitespace-nowrap text-[10px] text-text-soft-400 leading-none">
-								{formatRelativeTime(time)}
-							</span>
-						)}
-					</div>
-				</div>
-			</div>
-			{!isLast && (
-				<div
-					className={cn(
-						"mr-4 h-[1.5px] flex-1 border-stroke-soft-200 border-t-[1.5px] border-dashed",
-					)}
-				/>
-			)}
-		</div>
-	);
-}
-
-function EmailStatusSteps({ lifecycle }: { lifecycle: ParsedLifecycle }) {
-	interface StepItem {
-		label: string;
-		isActive: boolean;
-		time: string | null;
-		badge?: string;
+	for (const item of items) {
+		const key = dayKey(item.timestamp);
+		const existing = indexByKey.get(key);
+		if (existing === undefined) {
+			indexByKey.set(key, groups.length);
+			groups.push({
+				key,
+				label: dayLabel(item.timestamp),
+				items: [item],
+			});
+		} else {
+			groups[existing]?.items.push(item);
+		}
 	}
 
-	const steps: StepItem[] = lifecycle.hasFailed
-		? [
-				{
-					label: "Sent",
-					isActive: lifecycle.hasSent,
-					time: lifecycle.sentTime,
-				},
-				{
-					label:
-						lifecycle.failedType === "bounced"
-							? "Bounced"
-							: lifecycle.failedType === "complaint"
-								? "Spam"
-								: "Failed",
-					isActive: true,
-					time: lifecycle.failedTime,
-				},
-			]
-		: [
-				{
-					label: "Sent",
-					isActive: lifecycle.hasSent,
-					time: lifecycle.sentTime,
-				},
-				{
-					label: "Delivered",
-					isActive: lifecycle.hasDelivered,
-					time: lifecycle.deliveredTime,
-				},
-				{
-					label: "Opened",
-					isActive: lifecycle.hasOpened,
-					time: lifecycle.openedTime,
-					badge:
-						lifecycle.openedCount > 1 ? `${lifecycle.openedCount}x` : undefined,
-				},
-				{
-					label: "Clicked",
-					isActive: lifecycle.hasClicked,
-					time: lifecycle.clickedTime,
-					badge:
-						lifecycle.clickedCount > 1
-							? `${lifecycle.clickedCount}x`
-							: undefined,
-				},
-			];
+	return groups;
+}
+
+// ─── Status badge (AlignUI Badge) ────────────────────────────────────────────
+
+function StatusBadge({
+	label,
+	icon,
+	color,
+}: {
+	label: string;
+	icon?: string;
+	color: BadgeColor;
+}) {
+	return (
+		<Badge.Root
+			size="medium"
+			variant="lighter"
+			color={color}
+			className="h-5 gap-1 rounded-md px-1.5 font-medium"
+		>
+			{icon && (
+				<Badge.Icon
+					as={Icon}
+					name={icon as Parameters<typeof Icon>[0]["name"]}
+					className="size-3"
+				/>
+			)}
+			{label}
+		</Badge.Root>
+	);
+}
+
+// ─── Spine node ──────────────────────────────────────────────────────────────
+
+function TimelineNode({
+	variant,
+	isLast,
+	/** Spacer so the node aligns with the title when a day header sits above content */
+	topOffset = false,
+	/** Draw a connector through the day-header spacer (not used on the very first item) */
+	connectFromAbove = false,
+}: {
+	variant: "email" | "email-error" | "contact";
+	isLast: boolean;
+	topOffset?: boolean;
+	connectFromAbove?: boolean;
+}) {
+	const styles = NODE_STYLE[variant];
+	const lineCls = "w-px bg-stroke-soft-200 dark:bg-stroke-soft-100/40";
 
 	return (
-		<div className="flex w-full items-center px-2 py-1">
-			{steps.map((step, idx) => (
-				<StepperItem
-					key={step.label}
-					label={step.label}
-					isActive={step.isActive}
-					time={step.time}
-					badge={step.badge}
-					isLast={idx === steps.length - 1}
-				/>
+		<div className="flex w-8 shrink-0 flex-col items-center self-stretch">
+			{/* Day-header offset: keep spine continuous when a date sits above the title */}
+			{topOffset && (
+				<div
+					className="flex h-[26px] w-full shrink-0 flex-col items-center"
+					aria-hidden
+				>
+					{connectFromAbove && <div className={cn("h-full", lineCls)} />}
+				</div>
+			)}
+			{/* rounded-[10px] matches EmailTimeline step nodes */}
+			<div
+				className={cn(
+					"relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] border",
+					styles.box,
+				)}
+			>
+				<Icon name={styles.icon} className="h-3.5 w-3.5" />
+			</div>
+			{!isLast && (
+				<div className={cn("min-h-[8px] w-px flex-1", lineCls)} aria-hidden />
+			)}
+		</div>
+	);
+}
+
+// ─── Skeleton ────────────────────────────────────────────────────────────────
+
+function ActivitySkeleton() {
+	return (
+		<div className="space-y-8">
+			{Array.from({ length: 3 }).map((_, groupIdx) => (
+				// biome-ignore lint/suspicious/noArrayIndexKey: skeleton
+				<div key={groupIdx} className="space-y-4">
+					<Skeleton className="ml-11 h-2.5 w-24 rounded" />
+					{Array.from({ length: groupIdx === 0 ? 2 : 1 }).map((__, rowIdx) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: skeleton
+						<div key={rowIdx} className="flex gap-3">
+							<Skeleton className="h-8 w-8 shrink-0 rounded-[10px]" />
+							<div className="min-w-0 flex-1 space-y-2 pt-1">
+								<div className="flex items-start justify-between gap-4">
+									<Skeleton className="h-4 w-44 rounded" />
+									<Skeleton className="h-3 w-14 rounded" />
+								</div>
+								<Skeleton className="h-3.5 w-52 rounded" />
+								<div className="flex gap-1.5 pt-0.5">
+									<Skeleton className="h-5 w-16 rounded-md" />
+								</div>
+							</div>
+						</div>
+					))}
+				</div>
 			))}
 		</div>
 	);
 }
 
-// ─── Detail card (nested below action row) ───────────────────────────────────
+// ─── Rows ────────────────────────────────────────────────────────────────────
 
-function EmailActivityCard({ entry }: { entry: ActivityEntry }) {
-	const lifecycle = parseLifecycle(entry);
-
+function DayHeader({ label, isFirst }: { label: string; isFirst: boolean }) {
+	// Same label language as contact detail property headers
 	return (
-		<div className="mt-2.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-2 py-3">
-			<EmailStatusSteps lifecycle={lifecycle} />
-
-			{lifecycle.hasFailed && lifecycle.failedReason && (
-				<div className="mt-3 rounded-lg border border-red-100 bg-red-50/50 p-2.5">
-					<div className="flex gap-2">
-						<Icon
-							name="alert-circle"
-							className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600"
-						/>
-						<div className="flex flex-col gap-0.5">
-							<span className="font-semibold text-[10px] text-red-800 uppercase leading-none tracking-wide">
-								{lifecycle.failedType === "bounced"
-									? "Bounced"
-									: lifecycle.failedType === "complaint"
-										? "Spam Complaint"
-										: "Delivery Failure"}
-							</span>
-							<p className="font-medium text-[11px] text-red-600 leading-normal">
-								{lifecycle.failedReason}
-							</p>
-						</div>
-					</div>
-				</div>
+		<p
+			className={cn(
+				"font-medium text-[10px] text-text-sub-600 uppercase tracking-wider",
+				isFirst ? "mb-3" : "mb-3 mt-0.5",
 			)}
-		</div>
+		>
+			{label}
+		</p>
 	);
 }
 
-// ─── Email row ───────────────────────────────────────────────────────────────
-
-function EmailRow({
+function EmailActivityRow({
 	entry,
 	isLast,
+	dayLabel: day,
+	isFirstOfDay,
+	isFirstOverall,
 }: {
 	entry: ActivityEntry;
 	isLast: boolean;
-	contactEmail: string;
+	dayLabel?: string;
+	isFirstOfDay: boolean;
+	isFirstOverall: boolean;
 }) {
-	const status = entry.status as EmailStatus;
+	const lifecycle = useMemo(() => parseLifecycle(entry), [entry]);
+	const displayStatus = getDisplayStatus(lifecycle, entry.status);
+	const meta = STATUS_META[displayStatus];
+	const isError = lifecycle.hasFailed;
+	const subject = entry.subject?.trim() || "(no subject)";
+	const title = emailTitle(displayStatus);
+
+	type Pill = { label: string; icon: string; color: BadgeColor };
+	const pills: Pill[] = [];
+
+	// When clicked, show Opened first if we also have opens
+	if (
+		displayStatus === "clicked" &&
+		lifecycle.openedCount > 0 &&
+		lifecycle.openedCount !== lifecycle.clickedCount
+	) {
+		pills.push({
+			label:
+				lifecycle.openedCount > 1
+					? `Opened ${lifecycle.openedCount}×`
+					: "Opened",
+			icon: STATUS_META.opened.icon,
+			color: STATUS_META.opened.badgeColor,
+		});
+	}
+
+	pills.push({
+		label:
+			displayStatus === "opened" && lifecycle.openedCount > 1
+				? `Opened ${lifecycle.openedCount}×`
+				: displayStatus === "clicked" && lifecycle.clickedCount > 1
+					? `Clicked ${lifecycle.clickedCount}×`
+					: meta.label,
+		icon: meta.icon,
+		color: meta.badgeColor,
+	});
+
+	const showDay = isFirstOfDay && !!day;
 
 	return (
-		<div className="relative flex gap-3 pb-6">
-			<AvatarNode iconKey={`email_${status}`} isLast={isLast} />
+		<div className="flex gap-3">
+			<TimelineNode
+				variant={isError ? "email-error" : "email"}
+				isLast={isLast}
+				topOffset={showDay}
+				connectFromAbove={showDay && !isFirstOverall}
+			/>
 
-			<div className="min-w-0 flex-1 pt-0.5">
-				{/* Action line — email detail not ported yet; keep subject styled */}
-				<div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-					<span className="max-w-[320px] truncate font-medium text-[13px] text-text-strong-950 underline decoration-stroke-soft-200 decoration-dashed underline-offset-4">
-						{entry.subject || "(no subject)"}
-					</span>
-					<span className="text-[11px] text-text-soft-400">·</span>
-					<span className="whitespace-nowrap text-[11px] text-text-soft-400">
-						{formatRelativeTime(entry.createdAt)}
+			<div className={cn("min-w-0 flex-1", isLast ? "pb-1" : "pb-8")}>
+				{showDay && day && (
+					<DayHeader label={day} isFirst={isFirstOverall} />
+				)}
+
+				<div className="flex items-start justify-between gap-4">
+					<div className="min-w-0 flex-1">
+						{/* Link style matches Groups/Channels on this page */}
+						<Link
+							to="/emails/$emailId"
+							params={{ emailId: entry.id }}
+							className={cn(
+								"font-medium text-paragraph-sm text-text-strong-950 leading-snug",
+								"underline decoration-stroke-soft-200 decoration-dashed underline-offset-4",
+								"transition-colors hover:text-primary-base hover:decoration-primary-base/40",
+							)}
+						>
+							{title}
+						</Link>
+						<p className="mt-0.5 truncate text-paragraph-xs text-text-sub-600 leading-snug">
+							{subject !== "(no subject)" ? `“${subject}”` : subject}
+							{entry.fromEmail ? (
+								<span className="text-text-soft-400">
+									{" · "}
+									{entry.fromEmail}
+								</span>
+							) : null}
+						</p>
+
+						{pills.length > 0 && (
+							<div className="mt-2 flex flex-wrap items-center gap-1.5">
+								{pills.map((p) => (
+									<StatusBadge
+										key={p.label}
+										label={p.label}
+										icon={p.icon}
+										color={p.color}
+									/>
+								))}
+							</div>
+						)}
+
+						{lifecycle.failedReason && (
+							<p className="mt-1.5 max-w-md truncate text-paragraph-xs text-error-base">
+								{lifecycle.failedReason}
+							</p>
+						)}
+					</div>
+
+					<span className="shrink-0 pt-0.5 text-paragraph-xs text-text-soft-400 tabular-nums">
+						{formatClockTime(entry.createdAt)}
 					</span>
 				</div>
-
-				{/* Nested card with stepper */}
-				<EmailActivityCard entry={entry} />
 			</div>
 		</div>
 	);
 }
-
-// ─── Contact created row ─────────────────────────────────────────────────────
 
 function ContactCreatedRow({
 	timestamp,
 	isLast,
+	dayLabel: day,
+	isFirstOfDay,
+	isFirstOverall,
 }: {
 	timestamp: string;
 	isLast: boolean;
+	dayLabel?: string;
+	isFirstOfDay: boolean;
+	isFirstOverall: boolean;
 }) {
+	const showDay = isFirstOfDay && !!day;
+
 	return (
-		<div className="relative flex gap-3 pb-2">
-			<AvatarNode iconKey="contact_created" isLast={isLast} />
-			<div className="min-w-0 flex-1 pt-0.5">
-				<div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-					<span className="font-semibold text-[13px] text-text-strong-950">
-						Contact created
-					</span>
-					<span className="text-[11px] text-text-soft-400">·</span>
-					<span className="whitespace-nowrap text-[11px] text-text-soft-400">
-						{formatRelativeTime(timestamp)}
+		<div className="flex gap-3">
+			<TimelineNode
+				variant="contact"
+				isLast={isLast}
+				topOffset={showDay}
+				connectFromAbove={showDay && !isFirstOverall}
+			/>
+			<div className={cn("min-w-0 flex-1", isLast ? "pb-1" : "pb-8")}>
+				{showDay && day && (
+					<DayHeader label={day} isFirst={isFirstOverall} />
+				)}
+
+				<div className="flex items-start justify-between gap-4">
+					<div className="min-w-0 flex-1">
+						<p className="font-medium text-paragraph-sm text-text-strong-950 leading-snug">
+							Contact created
+						</p>
+						<p className="mt-0.5 text-paragraph-xs text-text-sub-600 leading-snug">
+							Added to your audience
+						</p>
+					</div>
+					<span className="shrink-0 pt-0.5 text-paragraph-xs text-text-soft-400 tabular-nums">
+						{formatClockTime(timestamp)}
 					</span>
 				</div>
 			</div>
@@ -615,38 +620,9 @@ function ContactCreatedRow({
 	);
 }
 
-// ─── Loading skeleton ────────────────────────────────────────────────────────
+// ─── Main ────────────────────────────────────────────────────────────────────
 
-function TimelineSkeleton() {
-	return (
-		<div className="space-y-0">
-			{Array.from({ length: 4 }).map((_, i) => (
-				// biome-ignore lint/suspicious/noArrayIndexKey: skeleton
-				<div key={i} className="relative flex gap-3 pb-6">
-					<div
-						className="relative flex flex-shrink-0 flex-col items-center"
-						style={{ width: 32 }}
-					>
-						<Skeleton className="h-8 w-8 rounded-full" />
-						{i < 3 && (
-							<div className="-translate-x-1/2 absolute top-8 left-1/2 h-[calc(100%+8px)] w-px bg-stroke-soft-200" />
-						)}
-					</div>
-					<div className="min-w-0 flex-1 space-y-2 pt-1">
-						<div className="flex items-center gap-2">
-							<Skeleton className="h-4 w-32 rounded" />
-							<Skeleton className="h-4 w-20 rounded" />
-							<Skeleton className="h-5 w-16 rounded-full" />
-						</div>
-						{i % 2 === 0 && <Skeleton className="h-14 w-full rounded-xl" />}
-					</div>
-				</div>
-			))}
-		</div>
-	);
-}
-
-// ─── Main component ──────────────────────────────────────────────────────────
+const PAGE_SIZE = 20;
 
 interface ContactEmailHistoryProps {
 	email: string;
@@ -658,23 +634,50 @@ export function ContactEmailHistory({
 	email,
 	contactCreatedAt,
 }: ContactEmailHistoryProps) {
-	const { data, isPending: isLoading } = useQuery({
+	const {
+		data,
+		isPending: isLoading,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+		isError,
+	} = useInfiniteQuery({
 		queryKey: queryKeys.contacts.activity(email),
-		queryFn: async () => {
+		queryFn: async ({ pageParam }) => {
 			const res = await fetch(
-				`/api/logs/v1/emails/contact-activity?email=${encodeURIComponent(email)}&limit=20&page=1`,
+				`/api/logs/v1/emails/contact-activity?email=${encodeURIComponent(email)}&limit=${PAGE_SIZE}&page=${pageParam}`,
 				{ credentials: "include" },
 			);
 			if (!res.ok) throw new Error("Failed to load contact activity");
 			return res.json() as Promise<ContactActivityResponse>;
 		},
+		initialPageParam: 1,
+		getNextPageParam: (lastPage) => {
+			const loaded = lastPage.page * lastPage.limit;
+			if (loaded >= lastPage.total) return undefined;
+			return lastPage.page + 1;
+		},
 		enabled: !!email,
 	});
 
-	const entries = data?.data ?? [];
-	const total = data?.total ?? 0;
+	const entries = useMemo(
+		() => data?.pages.flatMap((page) => page.data) ?? [],
+		[data],
+	);
+	const total = data?.pages[0]?.total ?? 0;
 
-	const timeline = buildFlatTimeline(entries, contactCreatedAt);
+	const dayGroups = useMemo(() => {
+		const items = buildTimelineItems(entries, contactCreatedAt);
+		return groupByDay(items);
+	}, [entries, contactCreatedAt]);
+
+	/** Flatten for continuous spine across day groups */
+	const flatItems = useMemo(
+		() => dayGroups.flatMap((g) => g.items),
+		[dayGroups],
+	);
+
+	const showEmpty = !isLoading && !isError && flatItems.length === 0;
 
 	return (
 		<div className="mt-12 pb-12">
@@ -684,23 +687,35 @@ export function ContactEmailHistory({
 					Activity
 				</h3>
 				{!isLoading && total > 0 && (
-					<span className="rounded-full bg-neutral-alpha-10 px-2 py-0.5 font-medium text-[11px] text-text-sub-600">
+					<span className="rounded-full bg-neutral-alpha-10 px-2 py-0.5 font-medium text-[11px] text-text-sub-600 tabular-nums">
 						{total}
 					</span>
 				)}
 			</div>
-			{/* Timeline */}
+
 			{isLoading ? (
-				<TimelineSkeleton />
-			) : timeline.length === 0 ? (
-				<div className="flex flex-col items-center gap-2 rounded-xl border border-stroke-soft-200 py-10 text-center">
-					<div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-alpha-10">
-						<Icon name="mail" className="h-4 w-4 text-text-sub-600" />
+				<ActivitySkeleton />
+			) : isError ? (
+				<div className="flex flex-col items-center gap-2 rounded-2xl border border-stroke-soft-100 py-10 text-center dark:border-stroke-soft-100/40">
+					<div className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-error-light bg-error-lighter">
+						<Icon name="alert-circle" className="h-4 w-4 text-error-base" />
+					</div>
+					<p className="font-medium text-paragraph-sm text-text-strong-950">
+						Couldn&apos;t load activity
+					</p>
+					<p className="max-w-xs text-paragraph-xs text-text-soft-400">
+						Something went wrong fetching email history for this contact.
+					</p>
+				</div>
+			) : showEmpty ? (
+				<div className="flex flex-col items-center gap-2 rounded-2xl border border-stroke-soft-100 border-dashed py-10 text-center dark:border-stroke-soft-100/40">
+					<div className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-stroke-soft-200 bg-bg-weak-50">
+						<Icon name="mail-single" className="h-4 w-4 text-text-sub-600" />
 					</div>
 					<p className="font-medium text-paragraph-sm text-text-sub-600">
 						No activity yet
 					</p>
-					<p className="max-w-xs text-[12px] text-text-soft-400">
+					<p className="max-w-xs text-paragraph-xs text-text-soft-400">
 						Emails sent to{" "}
 						<span className="font-medium text-text-sub-600">{email}</span> will
 						appear here.
@@ -708,27 +723,70 @@ export function ContactEmailHistory({
 				</div>
 			) : (
 				<div>
-					{timeline.map((item, idx) => {
-						const isLast = idx === timeline.length - 1;
+					{dayGroups.map((group, groupIdx) => {
+						const itemsBefore = dayGroups
+							.slice(0, groupIdx)
+							.reduce((n, g) => n + g.items.length, 0);
 
-						if (item.kind === "email") {
-							return (
-								<EmailRow
-									key={item.id}
-									entry={item.entry}
-									isLast={isLast}
-									contactEmail={email}
-								/>
-							);
-						}
 						return (
-							<ContactCreatedRow
-								key={item.id}
-								timestamp={item.timestamp}
-								isLast={isLast}
-							/>
+							<div key={group.key}>
+								{group.items.map((item, itemIdx) => {
+									const flatIndex = itemsBefore + itemIdx;
+									const isLast = flatIndex === flatItems.length - 1;
+									const isFirstOfDay = itemIdx === 0;
+									const isFirstOverall = flatIndex === 0;
+
+									if (item.kind === "email") {
+										return (
+											<EmailActivityRow
+												key={item.id}
+												entry={item.entry}
+												isLast={isLast}
+												dayLabel={group.label}
+												isFirstOfDay={isFirstOfDay}
+												isFirstOverall={isFirstOverall}
+											/>
+										);
+									}
+
+									return (
+										<ContactCreatedRow
+											key={item.id}
+											timestamp={item.timestamp}
+											isLast={isLast}
+											dayLabel={group.label}
+											isFirstOfDay={isFirstOfDay}
+											isFirstOverall={isFirstOverall}
+										/>
+									);
+								})}
+							</div>
 						);
 					})}
+
+					{hasNextPage && (
+						<div className="ml-11 flex pt-1">
+							<Button.Root
+								variant="neutral"
+								mode="stroke"
+								size="xsmall"
+								onClick={() => void fetchNextPage()}
+								disabled={isFetchingNextPage}
+								className="gap-1.5"
+							>
+								{isFetchingNextPage ? (
+									"Loading…"
+								) : (
+									<>
+										Load more
+										<span className="text-text-soft-400 tabular-nums">
+											{entries.length}/{total}
+										</span>
+									</>
+								)}
+							</Button.Root>
+						</div>
+					)}
 				</div>
 			)}
 		</div>
