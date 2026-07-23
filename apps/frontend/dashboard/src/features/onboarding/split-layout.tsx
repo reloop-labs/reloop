@@ -19,6 +19,7 @@ const AnimatedHeight = ({
 }) => {
 	const innerRef = useRef<HTMLDivElement>(null);
 	const [height, setHeight] = useState<number | undefined>(undefined);
+	const [isAnimating, setIsAnimating] = useState(false);
 
 	useEffect(() => {
 		if (!innerRef.current) return;
@@ -31,6 +32,13 @@ const AnimatedHeight = ({
 		return () => ro.disconnect();
 	}, []);
 
+	useEffect(() => {
+		if (skipAnimation || height === undefined) return;
+		setIsAnimating(true);
+		const timer = setTimeout(() => setIsAnimating(false), 300);
+		return () => clearTimeout(timer);
+	}, [height, skipAnimation]);
+
 	return (
 		<div
 			style={{
@@ -38,10 +46,12 @@ const AnimatedHeight = ({
 				transition: skipAnimation
 					? "none"
 					: "height 0.28s cubic-bezier(0.23, 1, 0.32, 1)",
-				overflow: "hidden",
+				overflow: isAnimating ? "hidden" : "visible",
 			}}
 		>
-			<div ref={innerRef}>{children}</div>
+			<div ref={innerRef} className="p-1.5">
+				{children}
+			</div>
 		</div>
 	);
 };
@@ -254,7 +264,7 @@ export function SplitLayout({
 									"grid-template-columns 0.28s cubic-bezier(0.23, 1, 0.32, 1)",
 							}}
 						>
-							<div className="flex flex-col gap-4 overflow-hidden px-12 pt-9 pb-9">
+							<div className="flex flex-col gap-4 px-12 pt-10 pb-10">
 								<motion.button
 									type="button"
 									onClick={onBack}
