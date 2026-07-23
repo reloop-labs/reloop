@@ -75,9 +75,9 @@ export function DeveloperPlayground({
 	const aiPrompt = buildAiPrompt(apiKey);
 
 	return (
-		<div className="flex flex-col gap-5">
-			<div className="flex flex-col gap-2">
-				<SectionLabel>Choose your integration</SectionLabel>
+		<div className="space-y-6">
+			<div className="space-y-2">
+				<SectionLabel>Choose your language</SectionLabel>
 				<IntegrationLanguagePills value={choice} onChange={onChoiceChange} />
 			</div>
 
@@ -85,7 +85,7 @@ export function DeveloperPlayground({
 				<AiPromptBlock prompt={aiPrompt} />
 			) : (
 				<>
-					<div className="flex flex-col gap-1.5">
+					<div className="space-y-2">
 						<SectionLabel>Install the Reloop SDK</SectionLabel>
 						<CopyCodeBlock
 							code={installCode}
@@ -100,14 +100,11 @@ export function DeveloperPlayground({
 									: undefined
 							}
 							minHeight="auto"
-							codeExtraPadding
 						/>
 					</div>
 
-					<div className="flex flex-col gap-1.5">
-						<SectionLabel>
-							Add your API key to <code className="font-mono">.env</code>
-						</SectionLabel>
+					<div className="space-y-2">
+						<SectionLabel>Add your API key to .env</SectionLabel>
 						<CopyCodeBlock
 							code={`RELOOP_API_KEY=${apiKey}`}
 							lang="bash"
@@ -115,18 +112,17 @@ export function DeveloperPlayground({
 							label=".env"
 							si={siDotenv}
 							minHeight="auto"
-							codeExtraPadding
 						/>
 					</div>
 
-					<div className="flex flex-col gap-1.5">
+					<div className="space-y-2">
 						<SectionLabel>Send your first request</SectionLabel>
 						<CopyCodeBlock
 							code={sendEmailCode[lang].code}
 							lang={sendEmailCode[lang].lang}
 							label={langFileLabels[lang]}
 							si={langIcons[lang]}
-							codeExtraPadding
+							minHeight="auto"
 						/>
 					</div>
 				</>

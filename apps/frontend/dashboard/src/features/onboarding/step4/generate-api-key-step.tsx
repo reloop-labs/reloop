@@ -24,18 +24,13 @@ export function GenerateApiKeyStep() {
 	}
 
 	return (
-		<>
-			<h1 className="mb-4 font-semibold text-[26px] text-text-strong-950 tracking-tight">
-				Generate API key
-			</h1>
-			<PostGenerate
-				apiKey={apiKey}
-				choice={choice}
-				onChoiceChange={setChoice}
-				onDone={() => {
-					void finishOnboarding();
-				}}
-			/>
-		</>
+		<PostGenerate
+			apiKey={apiKey}
+			choice={choice}
+			onChoiceChange={setChoice}
+			onDone={() => {
+				void finishOnboarding();
+			}}
+		/>
 	);
 }

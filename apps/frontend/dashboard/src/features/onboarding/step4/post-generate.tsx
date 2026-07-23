@@ -27,18 +27,25 @@ export function PostGenerate({
 	);
 
 	return (
-		<div className="flex w-full min-w-0 max-w-2xl flex-col gap-6">
-			<div className="flex flex-col gap-1.5">
-				<p className="text-paragraph-xs text-text-sub-600">
-					Your API key — copy it now, you won&apos;t see it again.
-				</p>
+		<div className="w-full min-w-0 max-w-2xl space-y-7">
+			{/* Header */}
+			<div className="space-y-2">
+				<div>
+					<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+						API Key
+					</h1>
+					<p className="text-paragraph-md text-text-sub-600 leading-relaxed">
+						Your API key — copy it now, you won&apos;t see it again.
+					</p>
+				</div>
+
+				{/* Secret Key Display Box */}
 				<CopyCodeBlock
 					code={apiKey}
 					lang="bash"
 					copyValue={apiKey}
 					label="secret key"
 					minHeight="auto"
-					codeExtraPadding
 				/>
 			</div>
 
