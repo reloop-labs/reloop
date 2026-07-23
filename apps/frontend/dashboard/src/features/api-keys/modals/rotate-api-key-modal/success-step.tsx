@@ -1,8 +1,6 @@
-import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import * as Modal from "@reloop/ui/modal";
+import { cn } from "@reloop/ui/cn";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
@@ -21,17 +19,6 @@ export function SuccessStep({
 
 	return (
 		<div>
-			{/* Header */}
-			<div className="pr-6">
-				<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-					API key rotated
-				</Modal.Title>
-				<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
-					Your new API key has been generated. Save this secret key now — for
-					security, you won&apos;t be able to see it again.
-				</p>
-			</div>
-
 			{/* Key Display Card */}
 			<div className="mt-5 space-y-2">
 				<div className="flex items-center gap-4 px-1">

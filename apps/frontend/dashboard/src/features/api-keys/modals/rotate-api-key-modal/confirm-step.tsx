@@ -1,7 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
-import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -20,17 +19,6 @@ export function ConfirmStep({
 }) {
 	return (
 		<div>
-			{/* Header */}
-			<div className="pr-6">
-				<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-					Rotate API key
-				</Modal.Title>
-				<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
-					Refresh the API key to invalidate the current token and generate a new
-					one. This will require updating all replica instances with the new token.
-				</p>
-			</div>
-
 			{/* Key Details Card */}
 			<div className="mt-5 space-y-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
 				<div>
