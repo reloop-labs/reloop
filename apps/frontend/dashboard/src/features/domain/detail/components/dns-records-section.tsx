@@ -75,6 +75,7 @@ export const DNSRecordsSection = ({
 								checked
 									? "Sending enabled successfully"
 									: "Sending disabled successfully",
+								checked ? "Enabling email sending..." : "Disabling email sending...",
 							)
 						}
 					/>
@@ -127,6 +128,7 @@ export const DNSRecordsSection = ({
 									checked
 										? "Receiving enabled successfully"
 										: "Receiving disabled successfully",
+									checked ? "Enabling email receiving..." : "Disabling email receiving...",
 								)
 							}
 						/>

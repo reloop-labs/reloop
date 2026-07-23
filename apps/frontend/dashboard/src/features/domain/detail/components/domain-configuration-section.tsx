@@ -48,6 +48,7 @@ export const DomainConfigurationSection = ({
 			await handleUpdateDomain(
 				{ isClickTrackingEnabled: value },
 				`Click tracking ${value ? "enabled" : "disabled"}`,
+				`${value ? "Enabling" : "Disabling"} click tracking...`,
 			);
 			setClickTrackingFlash(true);
 			setTimeout(() => setClickTrackingFlash(false), 400);
@@ -64,6 +65,7 @@ export const DomainConfigurationSection = ({
 			await handleUpdateDomain(
 				{ isOpenTrackingEnabled: value },
 				`Open tracking ${value ? "enabled" : "disabled"}`,
+				`${value ? "Enabling" : "Disabling"} open tracking...`,
 			);
 			setOpenTrackingFlash(true);
 			setTimeout(() => setOpenTrackingFlash(false), 400);
@@ -78,6 +80,7 @@ export const DomainConfigurationSection = ({
 		handleUpdateDomain(
 			{ tls: value as "opportunistic" | "enforced" },
 			`TLS mode updated to ${value === "enforced" ? "Enforced" : "Opportunistic"}`,
+			"Updating TLS mode...",
 		);
 	};
 

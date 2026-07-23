@@ -18,18 +18,25 @@ export function useDomainActions(
 		}
 		setIsVerifying(true);
 		try {
-			await axios.post(`/api/domain/v1/verify/${domainId}`, undefined, {
-				withCredentials: true,
-			});
-			await invalidate();
-			toast.success(
-				"DNS verification started! Verification will continue in the background.",
+			await toast.promise(
+				axios
+					.post(`/api/domain/v1/verify/${domainId}`, undefined, {
+						withCredentials: true,
+					})
+					.then(async (res) => {
+						await invalidate();
+						return res;
+					}),
+				{
+					loading: "Verifying DNS records...",
+					success:
+						"DNS verification started! Verification will continue in the background.",
+					error: (error) =>
+						axios.isAxiosError(error)
+							? error.response?.data?.message || "Failed to start DNS verification"
+							: "Failed to start DNS verification",
+				},
 			);
-		} catch (error) {
-			const message = axios.isAxiosError(error)
-				? error.response?.data?.message || "Failed to start DNS verification"
-				: "Failed to start DNS verification";
-			toast.error(message);
 		} finally {
 			setIsVerifying(false);
 		}
@@ -48,46 +55,56 @@ export function useDomainActions(
 				>
 			>,
 			successMessage: string,
+			loadingMessage?: string,
 		) => {
 			if (!domainId || !domainData) {
 				toast.error("Domain information not available");
 				return;
 			}
-			try {
-				const apiPayload: {
-					sending_email?: boolean;
-					receiving_email?: boolean;
-					click_tracking?: boolean;
-					open_tracking?: boolean;
-					tls?: "opportunistic" | "enforced";
-				} = {};
-				if (payload.isSendingEmailEnabled !== undefined) {
-					apiPayload.sending_email = payload.isSendingEmailEnabled;
-				}
-				if (payload.isReceivingEmailEnabled !== undefined) {
-					apiPayload.receiving_email = payload.isReceivingEmailEnabled;
-				}
-				if (payload.isClickTrackingEnabled !== undefined) {
-					apiPayload.click_tracking = payload.isClickTrackingEnabled;
-				}
-				if (payload.isOpenTrackingEnabled !== undefined) {
-					apiPayload.open_tracking = payload.isOpenTrackingEnabled;
-				}
-				if (payload.tls !== undefined) {
-					apiPayload.tls = payload.tls;
-				}
 
-				await axios.patch(`/api/domain/v1/${domainId}`, apiPayload, {
-					withCredentials: true,
-				});
-				await invalidate();
-				toast.success(successMessage);
-			} catch (error) {
-				const message = axios.isAxiosError(error)
-					? error.response?.data?.message || "Failed to update domain settings"
-					: "Failed to update domain settings";
-				toast.error(message);
+			const apiPayload: {
+				sending_email?: boolean;
+				receiving_email?: boolean;
+				click_tracking?: boolean;
+				open_tracking?: boolean;
+				tls?: "opportunistic" | "enforced";
+			} = {};
+			if (payload.isSendingEmailEnabled !== undefined) {
+				apiPayload.sending_email = payload.isSendingEmailEnabled;
 			}
+			if (payload.isReceivingEmailEnabled !== undefined) {
+				apiPayload.receiving_email = payload.isReceivingEmailEnabled;
+			}
+			if (payload.isClickTrackingEnabled !== undefined) {
+				apiPayload.click_tracking = payload.isClickTrackingEnabled;
+			}
+			if (payload.isOpenTrackingEnabled !== undefined) {
+				apiPayload.open_tracking = payload.isOpenTrackingEnabled;
+			}
+			if (payload.tls !== undefined) {
+				apiPayload.tls = payload.tls;
+			}
+
+			const defaultLoading = loadingMessage || "Updating domain settings...";
+
+			return toast.promise(
+				axios
+					.patch(`/api/domain/v1/${domainId}`, apiPayload, {
+						withCredentials: true,
+					})
+					.then(async (res) => {
+						await invalidate();
+						return res;
+					}),
+				{
+					loading: defaultLoading,
+					success: successMessage,
+					error: (error) =>
+						axios.isAxiosError(error)
+							? error.response?.data?.message || "Failed to update domain settings"
+							: "Failed to update domain settings",
+				},
+			);
 		},
 		[domainId, domainData, invalidate],
 	);
