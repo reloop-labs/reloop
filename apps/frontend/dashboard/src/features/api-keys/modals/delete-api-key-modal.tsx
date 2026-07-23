@@ -1,14 +1,19 @@
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import type { ApiKeyData } from "../types";
+
+type DeleteState = "idle" | "deleting" | "success";
 
 export function DeleteApiKeyModal({
 	apiKeys,
@@ -18,10 +23,17 @@ export function DeleteApiKeyModal({
 	onDeleteSuccess?: () => void;
 }) {
 	const [deleteId, setDeleteId] = useQueryState("delete");
-	const [isDeleting, setIsDeleting] = useState(false);
+	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
 	const invalidate = useInvalidateApiKeys();
 
-	const apiKeyToDelete = apiKeys.find((k) => k.id === deleteId);
+	// Cache the selected API key so details remain stable when query invalidates upon deletion
+	const targetApiKeyRef = useRef<ApiKeyData | null>(null);
+	const currentApiKey = apiKeys.find((k) => k.id === deleteId);
+	if (currentApiKey) {
+		targetApiKeyRef.current = currentApiKey;
+	}
+	const apiKeyToDelete = currentApiKey || targetApiKeyRef.current;
+
 	const displayName =
 		apiKeyToDelete?.name ||
 		apiKeyToDelete?.start ||
@@ -29,23 +41,31 @@ export function DeleteApiKeyModal({
 		"Unnamed key";
 
 	const handleDelete = async () => {
-		if (!apiKeyToDelete) return;
+		if (!apiKeyToDelete || deleteState !== "idle") return;
 		try {
-			setIsDeleting(true);
+			setDeleteState("deleting");
 			await axios.delete(`/api/api-key/v1/${apiKeyToDelete.id}`, {
 				withCredentials: true,
 			});
-			toast.success("API key deleted successfully");
-			void setDeleteId(null);
+			setDeleteState("success");
 			await invalidate();
-			onDeleteSuccess?.();
+			toast.success("API key deleted successfully");
+
+			// Show checkmark 'Deleted' state for 900ms before closing modal
+			setTimeout(() => {
+				void setDeleteId(null);
+				onDeleteSuccess?.();
+				// Reset internal button state after modal exit animation finishes
+				setTimeout(() => {
+					setDeleteState("idle");
+				}, 300);
+			}, 900);
 		} catch (error) {
 			const message = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to delete API key"
 				: "Failed to delete API key";
 			toast.error(message);
-		} finally {
-			setIsDeleting(false);
+			setDeleteState("idle");
 		}
 	};
 
@@ -53,7 +73,7 @@ export function DeleteApiKeyModal({
 		"enter",
 		(e) => {
 			e.preventDefault();
-			if (apiKeyToDelete && !isDeleting) {
+			if (apiKeyToDelete && deleteState === "idle") {
 				void handleDelete();
 			}
 		},
@@ -64,7 +84,13 @@ export function DeleteApiKeyModal({
 		<Modal.Root
 			open={!!deleteId}
 			onOpenChange={(open) => {
-				if (!open) void setDeleteId(null);
+				if (!open) {
+					void setDeleteId(null);
+					setTimeout(() => {
+						setDeleteState("idle");
+						targetApiKeyRef.current = null;
+					}, 300);
+				}
 			}}
 		>
 			<Modal.Content
@@ -121,8 +147,16 @@ export function DeleteApiKeyModal({
 						variant="neutral"
 						mode="ghost"
 						size="small"
-						onClick={() => void setDeleteId(null)}
-						disabled={isDeleting}
+						onClick={() => {
+							if (deleteState === "idle") {
+								void setDeleteId(null);
+								setDeleteState("idle");
+							}
+						}}
+						className={cn(
+							"transition-opacity duration-200",
+							deleteState !== "idle" && "pointer-events-none opacity-50",
+						)}
 					>
 						Cancel
 					</Button.Root>
@@ -130,17 +164,51 @@ export function DeleteApiKeyModal({
 						type="button"
 						variant="destructive"
 						size="small"
-						disabled={isDeleting}
-						onClick={() => void handleDelete()}
-					>
-						{isDeleting ? (
-							<>
-								<Spinner size={14} color="currentColor" />
-								Deleting...
-							</>
-						) : (
-							"Delete API key"
+						onClick={() => {
+							if (deleteState === "idle") void handleDelete();
+						}}
+						className={cn(
+							"min-w-[134px] justify-center overflow-hidden transition-all duration-200",
+							deleteState !== "idle" && "pointer-events-none opacity-90",
 						)}
+					>
+						<AnimatePresence mode="popLayout" initial={false}>
+							<motion.span
+								key={deleteState}
+								transition={{
+									type: "spring",
+									duration: 0.25,
+									bounce: 0,
+								}}
+								initial={{
+									opacity: 0,
+									y: -14,
+								}}
+								animate={{
+									opacity: 1,
+									y: 0,
+								}}
+								exit={{
+									opacity: 0,
+									y: 14,
+								}}
+								className="flex items-center justify-center gap-1.5"
+							>
+								{deleteState === "deleting" ? (
+									<>
+										<Spinner size={14} color="currentColor" />
+										<span>Deleting...</span>
+									</>
+								) : deleteState === "success" ? (
+									<>
+										<Icon name="check" className="h-4 w-4 shrink-0 text-white" />
+										<span>Deleted</span>
+									</>
+								) : (
+									"Delete API key"
+								)}
+							</motion.span>
+						</AnimatePresence>
 					</FancyButton.Root>
 				</div>
 			</Modal.Content>

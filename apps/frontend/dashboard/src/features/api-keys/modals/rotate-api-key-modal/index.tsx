@@ -26,12 +26,9 @@ export function RotateApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
 		apiKeyToRotate?.name ||
 		apiKeyToRotate?.start ||
 		apiKeyToRotate?.prefix ||
-		"Unnamed";
-	const keyPreview = apiKeyToRotate?.start
-		? `${apiKeyToRotate.start}…`
-		: apiKeyToRotate?.prefix
-			? `${apiKeyToRotate.prefix}…`
-			: "rl_…";
+		"Unnamed key";
+	const keyPrefix =
+		apiKeyToRotate?.start || apiKeyToRotate?.prefix || "rl_...";
 
 	const handleClose = () => {
 		void setRotateId(null);
@@ -60,7 +57,7 @@ export function RotateApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
 	};
 
 	useHotkeys(
-		"mod+enter",
+		"enter",
 		(e) => {
 			e.preventDefault();
 			if (!rotatedApiKey) void handleRotate();
@@ -88,8 +85,10 @@ export function RotateApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
 			}}
 		>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-stroke-soft-100 p-0 sm:max-w-[480px] dark:border-stroke-soft-100/40"
-				showClose={false}
+				className={`overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40 ${
+					!rotatedApiKey ? "p-6" : "p-0"
+				}`}
+				showClose={!rotatedApiKey}
 				onEscapeKeyDown={(e) => {
 					if (rotatedApiKey) e.preventDefault();
 				}}
@@ -100,7 +99,7 @@ export function RotateApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
 				{!rotatedApiKey ? (
 					<ConfirmStep
 						displayName={displayName}
-						keyPreview={keyPreview}
+						keyPrefix={keyPrefix}
 						isRotating={isRotating}
 						onClose={handleClose}
 						onRotate={() => void handleRotate()}

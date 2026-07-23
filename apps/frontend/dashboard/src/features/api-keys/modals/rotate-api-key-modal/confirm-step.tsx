@@ -1,95 +1,126 @@
 import * as Button from "@reloop/ui/button";
-import { Icon } from "@reloop/ui/icon";
+import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import { ModalHeader } from "../modal-header";
+import { AnimatePresence, motion } from "framer-motion";
 
 export function ConfirmStep({
 	displayName,
-	keyPreview,
+	keyPrefix,
 	isRotating,
 	onClose,
 	onRotate,
 }: {
 	displayName: string;
-	keyPreview: string;
+	keyPrefix: string;
 	isRotating: boolean;
 	onClose: () => void;
 	onRotate: () => void;
 }) {
 	return (
-		<div className="flex flex-col">
-			<ModalHeader
-				title="Rotate API key"
-				icon="rotate-cw"
-				iconClassName="text-orange-500"
-				onClose={onClose}
-			/>
-
-			<Modal.Body className="space-y-4 px-5 py-4 pb-5">
-				<p className="text-sm text-text-sub-600 leading-relaxed">
-					This invalidates the current secret immediately and issues a new one.
-					Anything still using the old key will stop working until you update
-					it.
+		<div>
+			{/* Header */}
+			<div className="pr-6">
+				<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+					Rotate API key
+				</Modal.Title>
+				<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
+					Refresh the API key to invalidate the current token and generate a new
+					one. This will require updating all replica instances with the new token.
 				</p>
+			</div>
 
-				<div className="flex items-center gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30">
-					<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-500">
-						<Icon name="key-new" className="h-5 w-5" />
-					</div>
-					<div className="min-w-0 flex-1">
-						<p className="truncate font-medium text-sm text-text-strong-950">
-							{displayName}
-						</p>
-						<p className="mt-0.5 truncate font-mono text-text-sub-600 text-xs">
-							{keyPreview}
-						</p>
+			{/* Key Details Card */}
+			<div className="mt-5 space-y-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
+				<div>
+					<p className="font-normal text-text-sub-600 text-xs">
+						API key name
+					</p>
+					<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
+						{displayName}
+					</p>
+				</div>
+				<div>
+					<p className="font-normal text-text-sub-600 text-xs">
+						API key prefix
+					</p>
+					<div className="mt-1 flex items-center">
+						<span className="font-medium font-mono text-sm">
+							{keyPrefix}
+						</span>
 					</div>
 				</div>
-			</Modal.Body>
+			</div>
 
-			<div className="flex items-center justify-end gap-2 border-stroke-soft-100 border-t px-5 py-3.5 dark:border-stroke-soft-100/50">
+			{/* Warning Banner */}
+			<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
+				All existing replicas will need to be updated with the new token.
+				Replicas using the old token will lose connectivity.
+			</div>
+
+			{/* Footer Actions */}
+			<div className="mt-6 flex items-center justify-end gap-3">
 				<Button.Root
+					type="button"
 					variant="neutral"
-					mode="stroke"
-					size="xsmall"
-					onClick={onClose}
-					disabled={isRotating}
-					className="gap-1.5"
+					mode="ghost"
+					size="small"
+					onClick={() => {
+						if (!isRotating) onClose();
+					}}
+					className={cn(
+						"transition-opacity duration-200",
+						isRotating && "pointer-events-none opacity-50",
+					)}
 				>
 					Cancel
-					<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px] text-text-sub-600">
-						Esc
-					</span>
 				</Button.Root>
-				<Button.Root
-					variant="neutral"
-					size="xsmall"
-					onClick={onRotate}
-					disabled={isRotating}
-					className="gap-2"
-				>
-					{isRotating ? (
-						<>
-							<Spinner size={12} color="currentColor" />
-							Rotating…
-						</>
-					) : (
-						<>
-							Rotate key
-							<span className="inline-flex items-center gap-0.5">
-								<Icon
-									name="command"
-									className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-								/>
-								<Icon
-									name="enter"
-									className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-								/>
-							</span>
-						</>
+				<FancyButton.Root
+					type="button"
+					variant="blue"
+					size="small"
+					onClick={() => {
+						if (!isRotating) onRotate();
+					}}
+					className={cn(
+						"min-w-[124px] justify-center overflow-hidden transition-all duration-200",
+						isRotating && "pointer-events-none opacity-90",
 					)}
-				</Button.Root>
+				>
+					<AnimatePresence mode="popLayout" initial={false}>
+						<motion.span
+							key={isRotating ? "rotating" : "idle"}
+							transition={{
+								type: "spring",
+								duration: 0.25,
+								bounce: 0,
+							}}
+							initial={{
+								opacity: 0,
+								y: -14,
+							}}
+							animate={{
+								opacity: 1,
+								y: 0,
+							}}
+							exit={{
+								opacity: 0,
+								y: 14,
+							}}
+							className="flex items-center justify-center gap-1.5"
+						>
+							{isRotating ? (
+								<>
+									<Spinner size={14} color="currentColor" />
+									<span>Rotating...</span>
+								</>
+							) : (
+								"Rotate key"
+							)}
+						</motion.span>
+					</AnimatePresence>
+				</FancyButton.Root>
 			</div>
 		</div>
 	);
