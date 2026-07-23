@@ -7,7 +7,7 @@ import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { sessionQueryOptions } from "#/features/auth/session-query";
@@ -159,20 +159,46 @@ export function VerifyOTP({
 					type="button"
 					variant="blue"
 					size="medium"
-					className="h-10 w-full rounded-xl font-medium text-sm gap-2 justify-center"
+					className="h-10 w-full overflow-hidden rounded-xl font-medium text-sm gap-2 justify-center"
 					onClick={() => {
 						if (isSuccess || status === "loading") return;
 						handleVerify(otpValue);
 					}}
 					disabled={(otpValue.length !== 6 || status === "loading") && !isSuccess}
 				>
-					{status === "loading" && <Spinner color="currentColor" size={16} />}
-					{isSuccess && <Icon name="check-circle" className="h-4 w-4" />}
-					{isSuccess
-						? "Verified successfully!"
-						: status === "loading"
-							? "Verifying..."
-							: `Continue with ${mode} code`}
+					<AnimatePresence mode="popLayout" initial={false}>
+						<motion.span
+							key={isSuccess ? "success" : status === "loading" ? "loading" : "idle"}
+							transition={{
+								type: "spring",
+								duration: 0.25,
+								bounce: 0,
+							}}
+							initial={{
+								opacity: 0,
+								y: -14,
+							}}
+							animate={{
+								opacity: 1,
+								y: 0,
+							}}
+							exit={{
+								opacity: 0,
+								y: 14,
+							}}
+							className="flex items-center justify-center gap-1.5"
+						>
+							{status === "loading" && <Spinner size={14} color="currentColor" />}
+							{isSuccess && <Icon name="check-circle" className="h-4 w-4 shrink-0" />}
+							<span>
+								{isSuccess
+									? "Verified successfully!"
+									: status === "loading"
+										? "Verifying..."
+										: `Continue with ${mode} code`}
+							</span>
+						</motion.span>
+					</AnimatePresence>
 				</FancyButton.Root>
 			)}
 			<div className="mt-4 flex justify-center">

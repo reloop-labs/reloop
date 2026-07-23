@@ -4,6 +4,7 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import * as Input from "@reloop/ui/input";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
+import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -77,10 +78,40 @@ export function LoginForm() {
 				disabled={status === "loading" || !isValid}
 				variant="blue"
 				size="medium"
-				className="mt-2 h-10 w-full rounded-xl font-medium text-sm"
+				className="mt-2 h-10 w-full overflow-hidden rounded-xl font-medium text-sm"
 			>
-				{status === "loading" && <Spinner color="currentColor" size={16} />}
-				{status === "loading" ? "Continuing..." : "Continue with email"}
+				<AnimatePresence mode="popLayout" initial={false}>
+					<motion.span
+						key={status === "loading" ? "loading" : "idle"}
+						transition={{
+							type: "spring",
+							duration: 0.25,
+							bounce: 0,
+						}}
+						initial={{
+							opacity: 0,
+							y: -14,
+						}}
+						animate={{
+							opacity: 1,
+							y: 0,
+						}}
+						exit={{
+							opacity: 0,
+							y: 14,
+						}}
+						className="flex items-center justify-center gap-1.5"
+					>
+						{status === "loading" ? (
+							<>
+								<Spinner size={14} color="currentColor" />
+								<span>Continuing...</span>
+							</>
+						) : (
+							<span>Continue with email</span>
+						)}
+					</motion.span>
+				</AnimatePresence>
 			</FancyButton.Root>
 		</form>
 	);
