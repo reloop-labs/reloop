@@ -5,9 +5,15 @@ import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
-import { AnimatePresence, motion } from "framer-motion";
+import {
+	AnimatePresence,
+	animate,
+	motion,
+	useMotionValue,
+	type AnimationPlaybackControls,
+} from "framer-motion";
 import { useQueryState } from "nuqs";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useInvalidateApiKeys } from "../../hooks/use-api-keys-query";
@@ -44,6 +50,9 @@ export function RotateApiKeyModal({
 	const [rotateId, setRotateId] = useQueryState("rotate");
 	const [isRotating, setIsRotating] = useState(false);
 	const [rotatedApiKey, setRotatedApiKey] = useState<RotatedKey | null>(null);
+	const [isHolding, setIsHolding] = useState(false);
+	const holdProgress = useMotionValue(0);
+	const animationRef = useRef<AnimationPlaybackControls | null>(null);
 	const invalidate = useInvalidateApiKeys();
 
 	const apiKeyToRotate = apiKeys.find((k) => k.id === rotateId);
@@ -85,6 +94,31 @@ export function RotateApiKeyModal({
 		}
 	};
 
+	const startHold = () => {
+		if (step !== "confirm" || isRotating) return;
+		setIsHolding(true);
+		holdProgress.set(0);
+		animationRef.current = animate(holdProgress, 1, {
+			duration: 1.2,
+			ease: "linear",
+			onComplete: () => {
+				setIsHolding(false);
+				holdProgress.set(0);
+				void handleRotate();
+			},
+		});
+	};
+
+	const cancelHold = () => {
+		if (!isHolding && holdProgress.get() === 0) return;
+		setIsHolding(false);
+		animationRef.current?.stop();
+		animate(holdProgress, 0, {
+			duration: 0.2,
+			ease: "easeOut",
+		});
+	};
+
 	useHotkeys(
 		"enter",
 		(e) => {
@@ -97,6 +131,7 @@ export function RotateApiKeyModal({
 
 	useEffect(() => {
 		if (!rotateId) {
+			cancelHold();
 			const t = setTimeout(() => {
 				setRotatedApiKey(null);
 			}, 300);
@@ -108,6 +143,7 @@ export function RotateApiKeyModal({
 		<Modal.Root
 			open={!!rotateId}
 			onOpenChange={(open) => {
+				if (!open) cancelHold();
 				// After rotation, require Done — don't dismiss by backdrop/escape
 				// and lose a secret the user hasn't saved.
 				if (!open && !rotatedApiKey) handleClose();
@@ -184,7 +220,10 @@ export function RotateApiKeyModal({
 									mode="ghost"
 									size="small"
 									onClick={() => {
-										if (!isRotating) handleClose();
+										if (!isRotating) {
+											cancelHold();
+											handleClose();
+										}
 									}}
 									className={cn(
 										"transition-opacity duration-200",
@@ -198,20 +237,30 @@ export function RotateApiKeyModal({
 								type="button"
 								variant="blue"
 								size="small"
+								onPointerDown={step === "confirm" ? startHold : undefined}
+								onPointerUp={step === "confirm" ? cancelHold : undefined}
+								onPointerLeave={step === "confirm" ? cancelHold : undefined}
+								onPointerCancel={step === "confirm" ? cancelHold : undefined}
 								onClick={() => {
 									if (step === "success") {
 										handleClose(true);
-									} else if (!isRotating) {
-										void handleRotate();
 									}
 								}}
 								className={cn(
-									"justify-center overflow-hidden transition-all duration-200",
-									step === "confirm" && "min-w-[124px]",
+									"relative select-none justify-center overflow-hidden transition-all duration-200",
+									step === "confirm" && "min-w-[134px]",
 									step === "success" && "min-w-[100px] gap-2",
 									isRotating && "pointer-events-none opacity-90",
 								)}
 							>
+								{/* Hold progress overlay fill */}
+								{step === "confirm" && (
+									<motion.div
+										className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
+										style={{ scaleX: holdProgress }}
+									/>
+								)}
+
 								<AnimatePresence mode="popLayout" initial={false}>
 									<motion.span
 										key={
@@ -225,7 +274,7 @@ export function RotateApiKeyModal({
 										initial={{ opacity: 0, y: -14 }}
 										animate={{ opacity: 1, y: 0 }}
 										exit={{ opacity: 0, y: 14 }}
-										className="flex items-center justify-center gap-1.5"
+										className="relative z-10 flex items-center justify-center gap-1.5"
 									>
 										{step === "success" ? (
 											<>
@@ -247,7 +296,7 @@ export function RotateApiKeyModal({
 												<span>Rotating...</span>
 											</>
 										) : (
-											"Rotate key"
+											<span>Hold to rotate</span>
 										)}
 									</motion.span>
 								</AnimatePresence>

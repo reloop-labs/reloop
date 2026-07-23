@@ -5,7 +5,13 @@ import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
-import { AnimatePresence, motion } from "framer-motion";
+import {
+	AnimatePresence,
+	animate,
+	motion,
+	useMotionValue,
+	type AnimationPlaybackControls,
+} from "framer-motion";
 import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -24,6 +30,9 @@ export function DeleteApiKeyModal({
 }) {
 	const [deleteId, setDeleteId] = useQueryState("delete");
 	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
+	const [isHolding, setIsHolding] = useState(false);
+	const holdProgress = useMotionValue(0);
+	const animationRef = useRef<AnimationPlaybackControls | null>(null);
 	const invalidate = useInvalidateApiKeys();
 
 	// Cache the selected API key so details remain stable when query invalidates upon deletion
@@ -68,6 +77,31 @@ export function DeleteApiKeyModal({
 		}
 	};
 
+	const startHold = () => {
+		if (deleteState !== "idle") return;
+		setIsHolding(true);
+		holdProgress.set(0);
+		animationRef.current = animate(holdProgress, 1, {
+			duration: 1.2,
+			ease: "linear",
+			onComplete: () => {
+				setIsHolding(false);
+				holdProgress.set(0);
+				void handleDelete();
+			},
+		});
+	};
+
+	const cancelHold = () => {
+		if (!isHolding && holdProgress.get() === 0) return;
+		setIsHolding(false);
+		animationRef.current?.stop();
+		animate(holdProgress, 0, {
+			duration: 0.2,
+			ease: "easeOut",
+		});
+	};
+
 	useHotkeys(
 		"enter",
 		(e) => {
@@ -90,6 +124,7 @@ export function DeleteApiKeyModal({
 			open={!!deleteId}
 			onOpenChange={(open) => {
 				if (!open) {
+					cancelHold();
 					// If the user closes the modal after a successful delete (via X or
 					// backdrop), still fire the success callback so the banner appears.
 					if (deleteStateRef.current === "success") {
@@ -164,6 +199,7 @@ export function DeleteApiKeyModal({
 						size="small"
 						onClick={() => {
 							if (deleteState === "idle") {
+								cancelHold();
 								void setDeleteId(null);
 								setDeleteState("idle");
 							}
@@ -179,14 +215,21 @@ export function DeleteApiKeyModal({
 						type="button"
 						variant="destructive"
 						size="small"
-						onClick={() => {
-							if (deleteState === "idle") void handleDelete();
-						}}
+						onPointerDown={startHold}
+						onPointerUp={cancelHold}
+						onPointerLeave={cancelHold}
+						onPointerCancel={cancelHold}
 						className={cn(
-							"min-w-[134px] justify-center overflow-hidden transition-all duration-200",
+							"relative min-w-[134px] select-none justify-center overflow-hidden transition-all duration-200",
 							deleteState !== "idle" && "pointer-events-none opacity-90",
 						)}
 					>
+						{/* Hold progress overlay fill */}
+						<motion.div
+							className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
+							style={{ scaleX: holdProgress }}
+						/>
+
 						<AnimatePresence mode="popLayout" initial={false}>
 							<motion.span
 								key={deleteState}
@@ -207,7 +250,7 @@ export function DeleteApiKeyModal({
 									opacity: 0,
 									y: 14,
 								}}
-								className="flex items-center justify-center gap-1.5"
+								className="relative z-10 flex items-center justify-center gap-1.5"
 							>
 								{deleteState === "deleting" ? (
 									<>
@@ -220,7 +263,7 @@ export function DeleteApiKeyModal({
 										<span>Deleted</span>
 									</>
 								) : (
-									"Delete API key"
+									<span>Hold to delete</span>
 								)}
 							</motion.span>
 						</AnimatePresence>
