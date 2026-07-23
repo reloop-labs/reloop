@@ -5,6 +5,7 @@ import type { AiStep } from "./types";
 
 const TOOL_ICONS: Record<string, string> = {
 	get_editor_snapshot: "layout",
+	analyze_references: "image-upload",
 	create_plan: "list",
 	generate_email_html: "code",
 	revise_email_html: "edit-2",

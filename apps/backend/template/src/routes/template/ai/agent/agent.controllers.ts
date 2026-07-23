@@ -1,6 +1,7 @@
 import {
 	TOOL_LABELS,
 	shouldRevise,
+	toolAnalyzeReferences,
 	toolCreatePlan,
 	toolCritiqueEmail,
 	toolExtractVariables,
@@ -105,6 +106,28 @@ export function createAgentEventStream(body: AgentRequestBody): Response {
 					type: "text.delta",
 					text: `${snapResult.summary}.\n`,
 				});
+
+				// 1b) Reference images / vision
+				if (ctx.attachments?.length) {
+					const refResult = await runToolStep(emit, "analyze_references", () =>
+						toolAnalyzeReferences(ctx),
+					);
+					emit({
+						type: "text.delta",
+						text: `${refResult.summary}.\n`,
+					});
+					if (refResult.data.warning) {
+						emit({
+							type: "text.delta",
+							text: `⚠️ ${refResult.data.warning}\n`,
+						});
+					} else if (refResult.data.vision) {
+						emit({
+							type: "text.delta",
+							text: "I'll match layout and palette from your reference image(s).\n",
+						});
+					}
+				}
 
 				// 2) Plan-only
 				if (mode === "plan" && !body.executePlan) {

@@ -1,4 +1,8 @@
-import { createAIStream } from "../ai.controllers";
+import {
+	createAIStream,
+	getVisionCapability,
+	type AIImageInput,
+} from "../ai.controllers";
 import {
 	AGENT_HTML_SYSTEM,
 	PLAN_SYSTEM,
@@ -14,6 +18,15 @@ import type {
 	AgentPlan,
 	EditorSnapshot,
 } from "./types";
+
+function toImageInputs(
+	attachments?: AgentAttachment[],
+): AIImageInput[] | undefined {
+	if (!attachments?.length) return undefined;
+	return attachments
+		.filter((a) => a.mime?.startsWith("image/") || /\.(png|jpe?g|gif|webp)$/i.test(a.url))
+		.map((a) => ({ url: a.url, mime: a.mime }));
+}
 
 export type ToolContext = {
 	messages: AgentChatMessage[];
@@ -83,6 +96,7 @@ export async function toolCreatePlan(
 			prompt: planPrompt,
 			system: PLAN_SYSTEM,
 			model: ctx.model,
+			images: toImageInputs(ctx.attachments),
 		});
 		const raw = await collectStream(stream.textStream);
 		const plan =
@@ -109,36 +123,86 @@ export async function toolCreatePlan(
 	}
 }
 
+/** Tool: check reference images / vision availability. */
+export function toolAnalyzeReferences(
+	ctx: ToolContext,
+): ToolResult<{
+	vision: boolean;
+	imageCount: number;
+	provider?: string;
+	model?: string;
+	warning?: string;
+}> {
+	const images = toImageInputs(ctx.attachments) ?? [];
+	if (images.length === 0) {
+		return {
+			ok: true,
+			data: { vision: false, imageCount: 0 },
+			summary: "No reference images attached",
+		};
+	}
+
+	const cap = getVisionCapability();
+	if (!cap.available) {
+		return {
+			ok: true,
+			data: {
+				vision: false,
+				imageCount: images.length,
+				warning: cap.reason,
+			},
+			summary: `Attached ${images.length} image(s) but vision is unavailable — continuing text-only`,
+		};
+	}
+
+	return {
+		ok: true,
+		data: {
+			vision: true,
+			imageCount: images.length,
+			provider: cap.provider,
+			model: cap.model,
+		},
+		summary: `Using ${cap.provider}/${cap.model} for ${images.length} reference image(s)`,
+	};
+}
+
 /** Tool: generate full email HTML. */
 export async function toolGenerateEmailHtml(
 	ctx: ToolContext,
 	onHtmlChunk?: (chunk: string) => void,
-): Promise<ToolResult<{ html: string }>> {
+): Promise<ToolResult<{ html: string; usedVision: boolean }>> {
 	const prompt = buildConversationPrompt({
 		messages: ctx.messages,
 		editorSnapshot: ctx.editorSnapshot,
 		attachments: ctx.attachments,
 		executePlan: ctx.executePlan,
 	});
+	const images = toImageInputs(ctx.attachments);
+	const vision = getVisionCapability();
+	const usedVision = Boolean(images?.length && vision.available);
 
 	const stream = await createAIStream({
 		prompt,
 		system: AGENT_HTML_SYSTEM,
 		model: ctx.model,
+		images,
 	});
 	const raw = await collectStream(stream.textStream, onHtmlChunk);
 	const html = cleanHtml(raw);
 	if (!html) {
 		return {
 			ok: false,
-			data: { html: "" },
+			data: { html: "", usedVision },
 			summary: "Model returned empty HTML",
 		};
 	}
 	return {
 		ok: true,
-		data: { html },
-		summary: `Generated ${html.length.toLocaleString()} characters of HTML`,
+		data: { html, usedVision },
+		summary: usedVision
+			? `Generated ${html.length.toLocaleString()} chars with vision references`
+			: `Generated ${html.length.toLocaleString()} characters of HTML`,
 	};
 }
 
@@ -146,7 +210,7 @@ export async function toolGenerateEmailHtml(
 export async function toolReviseEmailHtml(
 	ctx: ToolContext,
 	onHtmlChunk?: (chunk: string) => void,
-): Promise<ToolResult<{ html: string }>> {
+): Promise<ToolResult<{ html: string; usedVision: boolean }>> {
 	const prior =
 		ctx.lastHtml ||
 		ctx.editorSnapshot?.renderedHtmlSnippet ||
@@ -166,24 +230,31 @@ export async function toolReviseEmailHtml(
 		prior.slice(0, 14000),
 	].join("\n");
 
+	const images = toImageInputs(ctx.attachments);
+	const vision = getVisionCapability();
+	const usedVision = Boolean(images?.length && vision.available);
+
 	const stream = await createAIStream({
 		prompt,
 		system: AGENT_HTML_SYSTEM,
 		model: ctx.model,
+		images,
 	});
 	const raw = await collectStream(stream.textStream, onHtmlChunk);
 	const html = cleanHtml(raw);
 	if (!html) {
 		return {
 			ok: false,
-			data: { html: prior },
+			data: { html: prior, usedVision },
 			summary: "Revise produced empty HTML; kept previous",
 		};
 	}
 	return {
 		ok: true,
-		data: { html },
-		summary: `Revised HTML (${html.length.toLocaleString()} chars)`,
+		data: { html, usedVision },
+		summary: usedVision
+			? `Revised with vision (${html.length.toLocaleString()} chars)`
+			: `Revised HTML (${html.length.toLocaleString()} chars)`,
 	};
 }
 
@@ -274,6 +345,7 @@ export function shouldRevise(ctx: ToolContext): boolean {
 
 export const TOOL_LABELS: Record<string, string> = {
 	get_editor_snapshot: "Reading template context",
+	analyze_references: "Analyzing reference images",
 	create_plan: "Creating plan",
 	generate_email_html: "Writing email HTML",
 	revise_email_html: "Revising email HTML",

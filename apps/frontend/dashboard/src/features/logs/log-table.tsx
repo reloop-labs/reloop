@@ -176,7 +176,18 @@ function LogRowSkeleton() {
 			<Skeleton className="h-[18px] w-14 rounded-md" />
 			<Skeleton className="h-3.5 w-9 rounded" />
 			<Skeleton className="h-3.5 w-full max-w-[220px] rounded" />
-			<Skeleton className="ml-auto h-3.5 w-14 rounded" />
+			{/* Time — square, no rounded corners */}
+			<Skeleton className="ml-auto h-3.5 w-14 rounded-none" />
+		</div>
+	);
+}
+
+function LogDateBandSkeleton() {
+	return (
+		<div className="sticky top-0 z-10 flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-weak-50/70 px-4 py-1.5 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
+			<Icon name="calendar" className="h-3 w-3 shrink-0 text-text-soft-400" />
+			<Skeleton className="h-3 w-24 rounded-none" />
+			<Skeleton className="h-4 min-w-4 rounded-none" />
 		</div>
 	);
 }
@@ -185,7 +196,7 @@ function LogTableHeader() {
 	return (
 		<div
 			className={cn(
-				"grid items-center gap-2 rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40",
+				"grid items-center gap-2 rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010]",
 				GRID_COLS,
 			)}
 		>
@@ -248,9 +259,12 @@ export const LogTable = ({
 					)}
 				>
 					{isLoading ? (
-						Array.from({ length: loadingRows }).map((_, i) => (
-							<LogRowSkeleton key={`skel-${i}`} />
-						))
+						<>
+							<LogDateBandSkeleton />
+							{Array.from({ length: loadingRows }).map((_, i) => (
+								<LogRowSkeleton key={`skel-${i}`} />
+							))}
+						</>
 					) : logs.length === 0 ? (
 						hasFilters ? (
 							<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-transparent">
@@ -303,7 +317,7 @@ export const LogTable = ({
 										<span className="font-medium text-[11px] text-text-sub-600 tracking-wide">
 											{group.dateLabel}
 										</span>
-										<span className="inline-flex h-4 min-w-4 items-center justify-center rounded-md bg-bg-white-0 px-1 font-medium text-[10px] text-text-soft-400 tabular-nums ring-1 ring-stroke-soft-100 dark:bg-bg-white-0/10 dark:ring-stroke-soft-100/40">
+										<span className="inline-flex h-4 min-w-4 items-center justify-center rounded-none bg-bg-white-0 px-1 font-medium text-[10px] text-text-soft-400 tabular-nums ring-1 ring-stroke-soft-100 dark:bg-bg-white-0/10 dark:ring-stroke-soft-100/40">
 											{group.logs.length}
 										</span>
 									</div>

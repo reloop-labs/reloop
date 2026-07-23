@@ -11,6 +11,13 @@ export const templateConfig = {
 	OTEL_EXPORTER_OTLP_HEADERS: process.env.OTEL_EXPORTER_OTLP_HEADERS || "",
 	OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL || "http://localhost:11434",
 	GEMMA_MODEL: process.env.GEMMA_MODEL || "gemma2:9b",
+	/** Multimodal model used when the agent receives image attachments */
+	VISION_MODEL:
+		process.env.VISION_MODEL ||
+		process.env.GEMINI_VISION_MODEL ||
+		"gemini-2.0-flash",
+	/** Max reference images per agent turn */
+	VISION_MAX_IMAGES: Number(process.env.VISION_MAX_IMAGES || "4"),
 
 	constants: {
 		maxTemplateNameLength: 255,

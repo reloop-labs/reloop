@@ -143,8 +143,12 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 	);
 
 	const send = useCallback(async () => {
-		const text = draft.trim();
-		if (!text || isRunning) return;
+		const text =
+			draft.trim() ||
+			(attachments.length > 0
+				? "Design an email template that matches the attached reference image(s). Keep it email-client safe."
+				: "");
+		if ((!text && attachments.length === 0) || isRunning) return;
 		setLastAiPrompt(text);
 		setDraft("");
 		const atts = [...attachments];
@@ -275,8 +279,8 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 							Build emails message by message
 						</p>
 						<p className="mt-1 max-w-[240px] text-paragraph-xs text-text-soft-400">
-							Like Cursor: plan, generate, then refine with follow-ups. Attach a
-							screenshot to match a design.
+							Like Cursor: plan, generate, then refine. Paste or drop a
+							screenshot — vision models match layout and palette.
 						</p>
 					</div>
 				) : (

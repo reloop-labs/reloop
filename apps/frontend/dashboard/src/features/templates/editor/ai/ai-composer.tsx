@@ -8,7 +8,7 @@ import type { AiAttachment, AiMode } from "./types";
 const EXAMPLES = [
 	"Welcome email for a SaaS free trial with a clear CTA",
 	"Order confirmation with {{order_number}} and line items",
-	"Product launch announcement — bold headline, one image slot",
+	"Match this screenshot’s layout and colors for a product launch email",
 ];
 
 export function AiComposer({
@@ -39,12 +39,32 @@ export function AiComposer({
 	disabled?: boolean;
 }) {
 	const fileRef = useRef<HTMLInputElement>(null);
-	const canSend = value.trim().length > 0 && !isRunning && !uploading && !disabled;
+	const canSend =
+		(value.trim().length > 0 || attachments.length > 0) &&
+		!isRunning &&
+		!uploading &&
+		!disabled;
 
 	const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
 			e.preventDefault();
 			if (canSend) onSend();
+		}
+	};
+
+	const onPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+		const items = e.clipboardData?.items;
+		if (!items) return;
+		const files: File[] = [];
+		for (const item of Array.from(items)) {
+			if (item.kind === "file" && item.type.startsWith("image/")) {
+				const file = item.getAsFile();
+				if (file) files.push(file);
+			}
+		}
+		if (files.length > 0) {
+			e.preventDefault();
+			void onAddFiles(files);
 		}
 	};
 
@@ -75,27 +95,35 @@ export function AiComposer({
 			</div>
 
 			{attachments.length > 0 ? (
-				<div className="mb-2 flex flex-wrap gap-1.5">
-					{attachments.map((a) => (
-						<div
-							key={a.id}
-							className="group relative h-12 w-12 overflow-hidden rounded-lg border border-stroke-soft-100"
-						>
-							<img
-								src={a.previewUrl || a.url}
-								alt={a.name}
-								className="h-full w-full object-cover"
-							/>
-							<button
-								type="button"
-								onClick={() => onRemoveAttachment(a.id)}
-								className="absolute inset-0 flex items-center justify-center bg-bg-strong-950/50 opacity-0 transition-opacity group-hover:opacity-100"
-								aria-label={`Remove ${a.name}`}
+				<div className="mb-2 space-y-1.5">
+					<div className="flex flex-wrap gap-1.5">
+						{attachments.map((a) => (
+							<div
+								key={a.id}
+								className="group relative h-12 w-12 overflow-hidden rounded-lg border border-stroke-soft-100"
 							>
-								<Icon name="cross" className="h-3.5 w-3.5 text-static-white" />
-							</button>
-						</div>
-					))}
+								<img
+									src={a.previewUrl || a.url}
+									alt={a.name}
+									className="h-full w-full object-cover"
+								/>
+								<button
+									type="button"
+									onClick={() => onRemoveAttachment(a.id)}
+									className="absolute inset-0 flex items-center justify-center bg-bg-strong-950/50 opacity-0 transition-opacity group-hover:opacity-100"
+									aria-label={`Remove ${a.name}`}
+								>
+									<Icon name="cross" className="h-3.5 w-3.5 text-static-white" />
+								</button>
+							</div>
+						))}
+					</div>
+					<p className="flex items-center gap-1 text-[10px] text-text-soft-400">
+						<Icon name="image-upload" className="h-3 w-3" />
+						{attachments.length} reference
+						{attachments.length === 1 ? "" : "s"} · vision model will match
+						layout & palette when available
+					</p>
 				</div>
 			) : null}
 
@@ -118,10 +146,11 @@ export function AiComposer({
 					value={value}
 					onChange={(e) => onChange(e.target.value)}
 					onKeyDown={onKeyDown}
+					onPaste={onPaste}
 					placeholder={
 						mode === "plan"
-							? "Describe the email — I'll plan steps first…"
-							: "Message the agent — e.g. welcome email with CTA…"
+							? "Describe the email — or paste a screenshot, I'll plan first…"
+							: "Message the agent — paste or drop a design screenshot…"
 					}
 					disabled={isRunning}
 					className="w-full resize-none bg-transparent px-3 pt-3 pb-1 text-paragraph-xs text-text-strong-950 outline-none placeholder:text-text-soft-400 disabled:opacity-60"
