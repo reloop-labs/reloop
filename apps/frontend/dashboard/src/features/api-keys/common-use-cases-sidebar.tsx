@@ -4,7 +4,7 @@ import { siGo, siNodedotjs, siPython, siRust } from "simple-icons";
 import { ApiKeysApiDetails } from "#/components/api-details/api-keys";
 
 const cardClassName = cn(
-	"group flex w-full flex-col rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 text-left",
+	"group flex w-full flex-col rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 text-left cursor-pointer",
 	"transition-[border-color,background-color,transform] duration-150 ease-out",
 	"hover:border-stroke-soft-200 hover:bg-bg-weak-50/50",
 	"active:scale-[0.99]",
