@@ -34,10 +34,7 @@ export const DNSRecordsSection = ({
 	return (
 		<div
 			className={cn(
-				"mb-24 flex flex-col",
-				!(domain?.status !== "pending" && domain?.status !== "failed")
-					? "mt-6"
-					: "",
+				"mt-6 mb-24 flex flex-col space-y-6",
 				className,
 			)}
 		>
@@ -46,7 +43,7 @@ export const DNSRecordsSection = ({
 			)}
 
 			{/* Domain Verification Group */}
-			<div className="my-6 rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
+			<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 				<div className="mb-4 flex items-center gap-2 text-base text-text-strong-950">
 					<Icon name="shield" className="h-4 w-4 text-text-sub-600" />
 					<h3 className="font-semibold">Domain Verification</h3>
@@ -61,7 +58,7 @@ export const DNSRecordsSection = ({
 			</div>
 
 			{/* Enable Sending Group */}
-			<div className="mb-6 rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
+			<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-2 text-base text-text-strong-950">
 						<Icon name="mail-send" className="h-4 w-4 text-text-sub-600" />
@@ -116,7 +113,7 @@ export const DNSRecordsSection = ({
 
 			{/* Enable Receiving Group */}
 			{receivingRecords.length > 0 && (
-				<div className="mb-6 rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
+				<div className="rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-2 text-base text-text-strong-950">
 							<Icon name="mail-receive" className="h-4 w-4 text-text-sub-600" />
