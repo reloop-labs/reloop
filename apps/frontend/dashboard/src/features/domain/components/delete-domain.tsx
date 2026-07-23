@@ -1,15 +1,26 @@
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import axios from "axios";
+import {
+	AnimatePresence,
+	animate,
+	motion,
+	useMotionValue,
+	type AnimationPlaybackControls,
+} from "framer-motion";
 import { useQueryState } from "nuqs";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useInvalidateDomains } from "../hooks/use-domains-query";
 import type { Domain } from "../types";
+
+type DeleteState = "idle" | "deleting" | "success";
 
 export function DeleteDomainModal({
 	domains,
@@ -19,12 +30,23 @@ export function DeleteDomainModal({
 	onDeleteSuccess?: (deletedName: string) => void;
 }) {
 	const [deleteId, setDeleteId] = useQueryState("delete");
-	const [isDeleting, setIsDeleting] = useState(false);
+	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
+	const [isHolding, setIsHolding] = useState(false);
+	const holdProgress = useMotionValue(0);
+	const animationRef = useRef<AnimationPlaybackControls | null>(null);
+
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const navigate = useNavigate();
 	const invalidate = useInvalidateDomains();
 
-	const domainToDelete = domains.find((domain) => domain.id === deleteId);
+	// Cache the selected domain so details remain stable when query invalidates upon deletion
+	const targetDomainRef = useRef<Domain | null>(null);
+	const currentDomain = domains.find((domain) => domain.id === deleteId);
+	if (currentDomain) {
+		targetDomainRef.current = currentDomain;
+	}
+	const domainToDelete = currentDomain || targetDomainRef.current;
+
 	const isOnDetailPage =
 		pathname.includes("/domain/") &&
 		!pathname.includes("/domain/add") &&
@@ -32,48 +54,97 @@ export function DeleteDomainModal({
 		!pathname.endsWith("/domain/");
 
 	const handleDelete = async () => {
-		if (!domainToDelete) return;
-		setIsDeleting(true);
+		if (!domainToDelete || deleteState !== "idle") return;
 		try {
+			setDeleteState("deleting");
 			const deletedName = domainToDelete.domain;
 			await axios.delete(`/api/domain/v1/${domainToDelete.id}`, {
 				withCredentials: true,
 			});
+			setDeleteState("success");
 			await invalidate();
-			toast.success(`${deletedName} deleted successfully`);
-			onDeleteSuccess?.(deletedName);
-			void setDeleteId(null);
-			if (isOnDetailPage) {
+
+			// Show checkmark 'Deleted' state for 900ms before closing modal
+			setTimeout(() => {
+				onDeleteSuccess?.(deletedName);
+				void setDeleteId(null);
+				if (isOnDetailPage) {
+					setTimeout(() => {
+						void navigate({ to: "/domain" });
+					}, 100);
+				}
+				// Reset internal button state after modal exit animation finishes
 				setTimeout(() => {
-					void navigate({ to: "/domain" });
-				}, 100);
-			}
+					setDeleteState("idle");
+				}, 300);
+			}, 900);
 		} catch (error) {
 			const message = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to delete domain"
 				: "Failed to delete domain";
 			toast.error(message);
-		} finally {
-			setIsDeleting(false);
+			setDeleteState("idle");
 		}
+	};
+
+	const startHold = () => {
+		if (deleteState !== "idle") return;
+		setIsHolding(true);
+		holdProgress.set(0);
+		animationRef.current = animate(holdProgress, 1, {
+			duration: 1.2,
+			ease: "linear",
+			onComplete: () => {
+				setIsHolding(false);
+				holdProgress.set(0);
+				void handleDelete();
+			},
+		});
+	};
+
+	const cancelHold = () => {
+		if (!isHolding && holdProgress.get() === 0) return;
+		setIsHolding(false);
+		animationRef.current?.stop();
+		animate(holdProgress, 0, {
+			duration: 0.2,
+			ease: "easeOut",
+		});
 	};
 
 	useHotkeys(
 		"enter",
 		(e) => {
 			e.preventDefault();
-			if (domainToDelete && !isDeleting) {
+			if (domainToDelete && deleteState === "idle") {
 				void handleDelete();
 			}
 		},
 		{ enabled: !!deleteId },
 	);
 
+	// Keep a ref so onOpenChange can read the latest deleteState without stale closure
+	const deleteStateRef = useRef(deleteState);
+	useEffect(() => {
+		deleteStateRef.current = deleteState;
+	}, [deleteState]);
+
 	return (
 		<Modal.Root
 			open={!!deleteId}
 			onOpenChange={(open) => {
-				if (!open) void setDeleteId(null);
+				if (!open) {
+					cancelHold();
+					if (deleteStateRef.current === "success") {
+						const name = targetDomainRef.current?.domain;
+						if (name) onDeleteSuccess?.(name);
+					}
+					void setDeleteId(null);
+					setTimeout(() => {
+						setDeleteState("idle");
+						targetDomainRef.current = null;
+					}, 300);
+				}
 			}}
 		>
 			<Modal.Content
@@ -120,8 +191,17 @@ export function DeleteDomainModal({
 						variant="neutral"
 						mode="ghost"
 						size="small"
-						onClick={() => void setDeleteId(null)}
-						disabled={isDeleting}
+						onClick={() => {
+							if (deleteState === "idle") {
+								cancelHold();
+								void setDeleteId(null);
+								setDeleteState("idle");
+							}
+						}}
+						className={cn(
+							"transition-opacity duration-200",
+							deleteState !== "idle" && "pointer-events-none opacity-50",
+						)}
 					>
 						Cancel
 					</Button.Root>
@@ -129,17 +209,58 @@ export function DeleteDomainModal({
 						type="button"
 						variant="destructive"
 						size="small"
-						disabled={isDeleting}
-						onClick={() => void handleDelete()}
-					>
-						{isDeleting ? (
-							<>
-								<Spinner size={14} color="currentColor" />
-								Deleting...
-							</>
-						) : (
-							"Delete domain"
+						onPointerDown={startHold}
+						onPointerUp={cancelHold}
+						onPointerLeave={cancelHold}
+						onPointerCancel={cancelHold}
+						className={cn(
+							"relative min-w-[134px] select-none justify-center overflow-hidden transition-all duration-200",
+							deleteState !== "idle" && "pointer-events-none opacity-90",
 						)}
+					>
+						{/* Hold progress overlay fill */}
+						<motion.div
+							className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
+							style={{ scaleX: holdProgress }}
+						/>
+
+						<AnimatePresence mode="popLayout" initial={false}>
+							<motion.span
+								key={deleteState}
+								transition={{
+									type: "spring",
+									duration: 0.25,
+									bounce: 0,
+								}}
+								initial={{
+									opacity: 0,
+									y: -14,
+								}}
+								animate={{
+									opacity: 1,
+									y: 0,
+								}}
+								exit={{
+									opacity: 0,
+									y: 14,
+								}}
+								className="relative z-10 flex items-center justify-center gap-1.5"
+							>
+								{deleteState === "deleting" ? (
+									<>
+										<Spinner size={14} color="currentColor" />
+										<span>Deleting...</span>
+									</>
+								) : deleteState === "success" ? (
+									<>
+										<Icon name="check" className="h-4 w-4 shrink-0 text-white" />
+										<span>Deleted</span>
+									</>
+								) : (
+									<span>Hold to delete</span>
+								)}
+							</motion.span>
+						</AnimatePresence>
 					</FancyButton.Root>
 				</div>
 			</Modal.Content>
