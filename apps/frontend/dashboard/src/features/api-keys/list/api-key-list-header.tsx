@@ -42,7 +42,7 @@ export function ApiKeyListHeader() {
 					}
 					className="gap-1.5"
 				>
-					<Icon name="play" className="h-3.5 w-3.5 text-text-sub-600" />
+					<Icon name="video-guide" className="h-4 w-4 text-text-sub-600" />
 					Video guide
 				</Button.Root>
 				<Button.Root

@@ -3,6 +3,7 @@ import { useUIStore } from "#/store/use-ui-store";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { CopyPromptButton } from "./copy-prompt-button";
 import { OrganizationSwitcher } from "./organization-switcher";
 import { useActiveOrganization } from "./use-active-organization";
 import { UserDropdown } from "./user-dropdown";
@@ -12,6 +13,7 @@ import { UserDropdown } from "./user-dropdown";
  * Matches the Next dashboard PageHeader chrome (without settings gear).
  *
  * Ask AI entry is hidden until the assistant API is wired up.
+ * Copy prompt is always available for Claude / ChatGPT / Cursor / etc.
  */
 export function PageHeader() {
 	const {
@@ -42,6 +44,8 @@ export function PageHeader() {
 			</div>
 
 			<div className="flex items-center gap-2">
+				<CopyPromptButton />
+
 				<Button.Root
 					variant="neutral"
 					mode="ghost"
