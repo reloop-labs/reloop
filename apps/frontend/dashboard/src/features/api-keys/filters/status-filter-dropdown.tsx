@@ -1,9 +1,12 @@
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
-import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import { useRef, useState } from "react";
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "./base-ui-select";
 
 export type ApiKeyStatusFilterOption = "enabled" | "disabled" | null;
 
@@ -35,78 +38,46 @@ export function ApiKeyStatusFilterDropdown({
 	value: ApiKeyStatusFilterOption;
 	onChange: (value: ApiKeyStatusFilterOption) => void;
 }) {
-	const [isOpen, setIsOpen] = useState(false);
-	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-	const currentTab =
-		hoverIdx !== undefined ? buttonRefs.current[hoverIdx] : undefined;
-	const currentRect = currentTab?.getBoundingClientRect();
-
 	const selectedOption =
 		statusFilterOptions.find((o) => o.id === value) || statusFilterOptions[0];
 
 	return (
-		<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
-			<Dropdown.Trigger asChild>
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
-					size="small"
-					className="w-36 justify-between gap-1.5 whitespace-nowrap rounded-xl"
-				>
-					<div className="flex items-center gap-1.5 overflow-hidden">
+		<Select
+			value={value === null ? "all" : value}
+			onValueChange={(val) =>
+				onChange(val === "all" ? null : (val as ApiKeyStatusFilterOption))
+			}
+		>
+			<SelectTrigger className="w-40">
+				<div className="flex min-w-0 items-center gap-2 overflow-hidden">
+					{selectedOption?.icon && (
 						<Icon
-							name={selectedOption?.icon ?? "activity"}
-							className={cn(
-								"h-4 w-4 shrink-0",
-								selectedOption?.colorClass,
-							)}
+							name={selectedOption.icon}
+							className={cn("h-4 w-4 shrink-0", selectedOption.colorClass)}
 						/>
-						<span className="truncate">
-							{selectedOption?.label || "All Status"}
-						</span>
-					</div>
-					<Icon name="chevron-down" className="h-4 w-4 shrink-0 text-text-sub-600" />
-				</Button.Root>
-			</Dropdown.Trigger>
-			<Dropdown.Content align="start" className="w-36 p-2">
-				<div className="relative">
-					{statusFilterOptions.map((option, idx) => {
-						const isChecked = value === option.id;
-						return (
-							<button
-								key={option.id ?? "all"}
-								ref={(el) => {
-									if (el) buttonRefs.current[idx] = el;
-								}}
-								type="button"
-								onPointerEnter={() => setHoverIdx(idx)}
-								onPointerLeave={() => setHoverIdx(undefined)}
-								onClick={() => {
-									onChange(option.id);
-									setIsOpen(false);
-								}}
-								className={cn(
-									"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 font-normal text-xs text-text-strong-950",
-									isChecked && "bg-neutral-alpha-10",
-								)}
-							>
-								<div className="flex items-center gap-2">
-									<Icon
-										name={option.icon}
-										className={cn("h-3.5 w-3.5", option.colorClass)}
-									/>
-									<span className={cn(isChecked && "font-medium")}>
-										{option.label}
-									</span>
-								</div>
-								{isChecked && <Icon name="check" className="h-3.5 w-3.5" />}
-							</button>
-						);
-					})}
-					<AnimatedHoverBackground rect={currentRect} tabElement={currentTab} />
+					)}
+					<SelectValue placeholder="All Status">
+						{selectedOption?.label}
+					</SelectValue>
 				</div>
-			</Dropdown.Content>
-		</Dropdown.Root>
+			</SelectTrigger>
+			<SelectContent
+				alignItemWithTrigger={true}
+				alignOffset={-14}
+				className="w-40"
+			>
+				{statusFilterOptions.map((option) => (
+					<SelectItem key={option.id ?? "all"} value={option.id ?? "all"}>
+						<div className="flex min-w-0 items-center gap-2">
+							<Icon
+								name={option.icon}
+								className={cn("h-4 w-4 shrink-0", option.colorClass)}
+							/>
+							<span className="truncate">{option.label}</span>
+						</div>
+					</SelectItem>
+				))}
+			</SelectContent>
+		</Select>
 	);
 }
