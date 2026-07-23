@@ -1,0 +1,315 @@
+import * as Button from "@reloop/ui/button";
+import { Icon } from "@reloop/ui/icon";
+import { useCurrentEditor } from "@tiptap/react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
+import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
+import { useEditorStore } from "#/features/templates/editor/use-editor-store";
+import { AiComposer } from "./ai-composer";
+import { AiMessageBubble } from "./ai-message";
+import { useAiAttachments } from "./use-ai-attachments";
+import { useTemplateAiAgent } from "./use-template-ai-agent";
+import type { AiPlan, EditorSnapshot } from "./types";
+
+function buildSnapshot(
+	editor: ReturnType<typeof useCurrentEditor>["editor"],
+	subject: string,
+	previewText: string,
+): EditorSnapshot {
+	let renderedHtmlSnippet: string | null = null;
+	let contentJson: string | null = null;
+	try {
+		if (editor) {
+			renderedHtmlSnippet = editor.getHTML().slice(0, 14000);
+			contentJson = JSON.stringify(editor.getJSON()).slice(0, 14000);
+		}
+	} catch {
+		// ignore
+	}
+	return {
+		subject: subject || null,
+		previewText: previewText || null,
+		renderedHtmlSnippet,
+		contentJson,
+	};
+}
+
+function canvasIsEmpty(
+	editor: ReturnType<typeof useCurrentEditor>["editor"],
+): boolean {
+	if (!editor) return true;
+	const text = editor.getText().trim();
+	const html = editor.getHTML().replace(/<[^>]+>/g, "").trim();
+	return text.length === 0 && html.length === 0;
+}
+
+export function AIPanel({ onClose }: { onClose: () => void }) {
+	const templateId = useTemplateId();
+	const { editor } = useCurrentEditor();
+	const subject = useEditorStore((s) => s.subject);
+	const previewText = useEditorStore((s) => s.previewText);
+	const setIsGeneratingStore = useEditorStore((s) => s.setIsGenerating);
+	const setGeneratingContent = useEditorStore((s) => s.setGeneratingContent);
+	const setLastAiPrompt = useEditorStore((s) => s.setLastAiPrompt);
+
+	const [draft, setDraft] = useState("");
+	const [undoStack, setUndoStack] = useState<{
+		json: unknown;
+		html: string;
+	} | null>(null);
+	const scrollRef = useRef<HTMLDivElement>(null);
+
+	const {
+		messages,
+		mode,
+		setMode,
+		isRunning,
+		stop,
+		clearChat,
+		runAgent,
+		pendingPlan,
+		setPendingPlan,
+	} = useTemplateAiAgent();
+
+	const { attachments, uploading, addFiles, remove, clear } =
+		useAiAttachments();
+
+	useEffect(() => {
+		setIsGeneratingStore(isRunning);
+		if (!isRunning) {
+			// keep last content until next run starts
+		}
+	}, [isRunning, setIsGeneratingStore]);
+
+	useEffect(() => {
+		const el = scrollRef.current;
+		if (!el) return;
+		el.scrollTop = el.scrollHeight;
+	}, [messages]);
+
+	const applyHtml = useCallback(
+		async (html: string, opts?: { confirmIfDirty?: boolean }) => {
+			if (!editor || !html) return;
+
+			const dirty = !canvasIsEmpty(editor);
+			if (opts?.confirmIfDirty && dirty) {
+				const ok = window.confirm(
+					"Replace the current template content with the AI result?",
+				);
+				if (!ok) return;
+			}
+
+			try {
+				const prevJson = editor.getJSON();
+				const prevHtml = editor.getHTML();
+				setUndoStack({ json: prevJson, html: prevHtml });
+
+				editor.commands.setContent(html);
+
+				if (templateId) {
+					await fetch(`/api/template/v1/${templateId}`, {
+						method: "PUT",
+						headers: { "Content-Type": "application/json" },
+						credentials: "include",
+						body: JSON.stringify({
+							content: [{ type: "html", html }],
+						}),
+					}).catch(() => null);
+				}
+				toast.success("Applied to canvas");
+			} catch (err) {
+				toast.error(
+					err instanceof Error ? err.message : "Failed to apply HTML",
+				);
+			}
+		},
+		[editor, templateId],
+	);
+
+	const undoApply = useCallback(() => {
+		if (!editor || !undoStack) return;
+		try {
+			editor.commands.setContent(undoStack.json as never);
+			setUndoStack(null);
+			toast.success("Reverted last apply");
+		} catch {
+			toast.error("Could not undo");
+		}
+	}, [editor, undoStack]);
+
+	const snapshot = useMemo(
+		() => buildSnapshot(editor, subject, previewText),
+		[editor, subject, previewText],
+	);
+
+	const send = useCallback(async () => {
+		const text = draft.trim();
+		if (!text || isRunning) return;
+		setLastAiPrompt(text);
+		setDraft("");
+		const atts = [...attachments];
+		clear();
+		setGeneratingContent("");
+
+		await runAgent({
+			userText: text,
+			attachments: atts,
+			editorSnapshot: snapshot,
+			templateId,
+			modeOverride: mode,
+			onHtmlDelta: (h) => setGeneratingContent(h),
+			onHtmlFinal: async (html) => {
+				setGeneratingContent(html);
+				const empty = canvasIsEmpty(editor);
+				await applyHtml(html, { confirmIfDirty: !empty });
+			},
+		});
+	}, [
+		draft,
+		isRunning,
+		attachments,
+		clear,
+		runAgent,
+		snapshot,
+		templateId,
+		mode,
+		setLastAiPrompt,
+		setGeneratingContent,
+		editor,
+		applyHtml,
+	]);
+
+	const executePlan = useCallback(
+		async (plan: AiPlan) => {
+			if (isRunning) return;
+			setPendingPlan(null);
+			setGeneratingContent("");
+			await runAgent({
+				userText: plan.summary,
+				editorSnapshot: snapshot,
+				templateId,
+				executePlan: plan,
+				modeOverride: "agent",
+				onHtmlDelta: (h) => setGeneratingContent(h),
+				onHtmlFinal: async (html) => {
+					setGeneratingContent(html);
+					const empty = canvasIsEmpty(editor);
+					await applyHtml(html, { confirmIfDirty: !empty });
+				},
+			});
+		},
+		[
+			isRunning,
+			runAgent,
+			snapshot,
+			templateId,
+			setPendingPlan,
+			setGeneratingContent,
+			editor,
+			applyHtml,
+		],
+	);
+
+	return (
+		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/40">
+			{/* Header */}
+			<div className="flex shrink-0 items-center justify-between border-stroke-soft-200/60 border-b px-4 py-3 dark:border-stroke-soft-100/40">
+				<div className="flex items-center gap-2">
+					<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-feature-lighter text-feature-base">
+						<Icon name="sparkling" className="h-4 w-4" />
+					</div>
+					<div>
+						<h3 className="font-semibold text-label-sm text-text-strong-950">
+							Template agent
+						</h3>
+						<p className="text-[10px] text-text-soft-400">
+							{mode === "plan" ? "Plan mode" : "Agent mode"} · multi-turn
+						</p>
+					</div>
+				</div>
+				<div className="flex items-center gap-1">
+					{undoStack ? (
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="ghost"
+							size="xxsmall"
+							onClick={undoApply}
+							title="Undo last apply"
+						>
+							Undo
+						</Button.Root>
+					) : null}
+					{messages.length > 0 ? (
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="ghost"
+							size="xxsmall"
+							onClick={clearChat}
+							disabled={isRunning}
+							title="Clear chat"
+						>
+							Clear
+						</Button.Root>
+					) : null}
+					<button
+						type="button"
+						onClick={onClose}
+						className="rounded-lg p-1 text-text-sub-600 hover:bg-bg-weak-50"
+						aria-label="Close"
+					>
+						<Icon name="cross" className="h-4 w-4" />
+					</button>
+				</div>
+			</div>
+
+			{/* Transcript */}
+			<div ref={scrollRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3">
+				{messages.length === 0 ? (
+					<div className="flex h-full flex-col items-center justify-center px-4 py-10 text-center">
+						<div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-feature-lighter text-feature-base">
+							<Icon name="sparkling" className="h-5 w-5" />
+						</div>
+						<p className="font-semibold text-label-sm text-text-strong-950">
+							Build emails message by message
+						</p>
+						<p className="mt-1 max-w-[240px] text-paragraph-xs text-text-soft-400">
+							Like Cursor: plan, generate, then refine with follow-ups. Attach a
+							screenshot to match a design.
+						</p>
+					</div>
+				) : (
+					messages.map((m) => (
+						<AiMessageBubble
+							key={m.id}
+							message={m}
+							isRunning={isRunning}
+							onExecutePlan={executePlan}
+						/>
+					))
+				)}
+			</div>
+
+			{pendingPlan && !messages.some((m) => m.plan?.id === pendingPlan.id) ? (
+				<div className="px-3 pb-1 text-[10px] text-text-soft-400">
+					Plan ready — execute from the card above.
+				</div>
+			) : null}
+
+			<AiComposer
+				mode={mode}
+				onModeChange={setMode}
+				value={draft}
+				onChange={setDraft}
+				onSend={() => void send()}
+				onStop={stop}
+				isRunning={isRunning}
+				attachments={attachments}
+				onAddFiles={addFiles}
+				onRemoveAttachment={remove}
+				uploading={uploading}
+			/>
+		</div>
+	);
+}

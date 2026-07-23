@@ -214,19 +214,20 @@ export function LogDetailPanel({ logId }: LogDetailPanelProps) {
 				<div className="min-w-0 flex-1">
 					{isLoading ? (
 						<>
-							<div className="flex items-center gap-2">
-								<PropertyValueSkeleton className="h-4 w-12" />
-								<PropertyValueSkeleton className="h-4 w-48" />
+							{/* Match loaded title (text-sm) + subtitle (text-xs / mt-1) line boxes */}
+							<div className="flex h-5 items-center gap-1.5">
+								<PropertyValueSkeleton className="h-3 w-10" />
+								<PropertyValueSkeleton className="h-3 w-40" />
 							</div>
-							<div className="mt-2 flex items-center gap-2">
-								<PropertyValueSkeleton className="w-36" />
-								<span className="text-text-disabled-300">·</span>
-								<PropertyValueSkeleton className="w-16" />
+							<div className="mt-1 flex h-4 items-center gap-2">
+								<PropertyValueSkeleton className="h-2.5 w-32" />
+								<span className="text-text-disabled-300 text-xs">·</span>
+								<PropertyValueSkeleton className="h-2.5 w-12" />
 							</div>
 						</>
 					) : (
 						<>
-							<h2 className="truncate font-semibold text-sm text-text-strong-950">
+							<h2 className="flex h-5 items-center truncate font-semibold text-sm text-text-strong-950">
 								{method && displayEndpoint ? (
 									<>
 										<span
@@ -237,13 +238,13 @@ export function LogDetailPanel({ logId }: LogDetailPanelProps) {
 										>
 											{method}
 										</span>
-										<span>{displayEndpoint}</span>
+										<span className="truncate">{displayEndpoint}</span>
 									</>
 								) : (
 									log?.event
 								)}
 							</h2>
-							<div className="mt-1 flex items-center gap-2 text-text-sub-600 text-xs">
+							<div className="mt-1 flex h-4 items-center gap-2 text-text-sub-600 text-xs">
 								<span>
 									{log?.created_at
 										? new Date(log.created_at).toLocaleString()
