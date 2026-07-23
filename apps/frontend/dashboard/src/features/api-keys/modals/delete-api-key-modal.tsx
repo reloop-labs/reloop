@@ -20,7 +20,7 @@ export function DeleteApiKeyModal({
 	onDeleteSuccess,
 }: {
 	apiKeys: ApiKeyData[];
-	onDeleteSuccess?: () => void;
+	onDeleteSuccess?: (deletedName: string) => void;
 }) {
 	const [deleteId, setDeleteId] = useQueryState("delete");
 	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
@@ -49,12 +49,11 @@ export function DeleteApiKeyModal({
 			});
 			setDeleteState("success");
 			await invalidate();
-			toast.success("API key deleted successfully");
 
 			// Show checkmark 'Deleted' state for 900ms before closing modal
 			setTimeout(() => {
 				void setDeleteId(null);
-				onDeleteSuccess?.();
+				onDeleteSuccess?.(displayName);
 				// Reset internal button state after modal exit animation finishes
 				setTimeout(() => {
 					setDeleteState("idle");
