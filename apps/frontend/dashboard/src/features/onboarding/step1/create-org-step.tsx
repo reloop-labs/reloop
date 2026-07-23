@@ -1,6 +1,6 @@
 import * as FancyButton from "@reloop/ui/fancy-button";
 import Spinner from "@reloop/ui/spinner";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { CompanyNameField } from "./company-name-field";
 import { LogoUpload } from "./logo-upload";
 import { ReferralField } from "./referral-field";
@@ -54,20 +54,44 @@ export function CreateOrgStep() {
 			<FancyButton.Root
 				variant="blue"
 				size="medium"
-				className="mt-6 w-full rounded-xl"
+				className="mt-6 h-10 w-full overflow-hidden rounded-xl font-medium text-sm"
 				onClick={createAndContinue}
 				disabled={!canSubmit}
 			>
-				{isCreating ? (
-					<>
-						<Spinner size={16} color="var(--text-white-0)" />
-						Creating...
-					</>
-				) : orgId ? (
-					"Continue"
-				) : (
-					"Create workspace"
-				)}
+				<AnimatePresence mode="popLayout" initial={false}>
+					<motion.span
+						key={isCreating ? "creating" : orgId ? "continue" : "create"}
+						transition={{
+							type: "spring",
+							duration: 0.25,
+							bounce: 0,
+						}}
+						initial={{
+							opacity: 0,
+							y: -14,
+						}}
+						animate={{
+							opacity: 1,
+							y: 0,
+						}}
+						exit={{
+							opacity: 0,
+							y: 14,
+						}}
+						className="flex items-center justify-center gap-1.5"
+					>
+						{isCreating ? (
+							<>
+								<Spinner size={14} color="currentColor" />
+								<span>Creating...</span>
+							</>
+						) : orgId ? (
+							<span>Continue</span>
+						) : (
+							<span>Create workspace</span>
+						)}
+					</motion.span>
+				</AnimatePresence>
 			</FancyButton.Root>
 		</div>
 	);

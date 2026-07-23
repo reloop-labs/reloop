@@ -1,5 +1,6 @@
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { AnimatePresence, motion } from "framer-motion";
 import { useHotkeys } from "react-hotkeys-hook";
 import { CopyCodeBlock } from "./copy-code-block";
 import { DeveloperPlayground } from "./developer-playground";
@@ -59,11 +60,35 @@ export function PostGenerate({
 				<FancyButton.Root
 					variant="blue"
 					size="small"
-					className="rounded-xl"
+					className="min-w-[155px] justify-center overflow-hidden rounded-xl whitespace-nowrap"
 					onClick={onDone}
 				>
-					<Icon name="check-circle" className="h-3.5 w-3.5" />
-					Go to Dashboard
+					<AnimatePresence mode="popLayout" initial={false}>
+						<motion.span
+							key="done"
+							transition={{
+								type: "spring",
+								duration: 0.25,
+								bounce: 0,
+							}}
+							initial={{
+								opacity: 0,
+								y: -14,
+							}}
+							animate={{
+								opacity: 1,
+								y: 0,
+							}}
+							exit={{
+								opacity: 0,
+								y: 14,
+							}}
+							className="flex items-center justify-center gap-1.5"
+						>
+							<Icon name="check-circle" className="h-3.5 w-3.5 shrink-0" />
+							<span>Go to Dashboard</span>
+						</motion.span>
+					</AnimatePresence>
 				</FancyButton.Root>
 			</div>
 		</div>
