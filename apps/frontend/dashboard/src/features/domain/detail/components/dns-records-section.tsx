@@ -1,9 +1,8 @@
-
-import type { DNSRecord, DomainResponse } from "#/features/domain/types";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Switch from "@reloop/ui/switch";
 import { AnimatePresence, motion } from "framer-motion";
+import type { DNSRecord, DomainResponse } from "#/features/domain/types";
 import { useDomainActions } from "../hooks/use-domain-actions";
 import { DNSAutoConnectBanner } from "./dns-auto-connect-banner";
 import { groupDomainDnsRecords } from "./dns-record-groups";
@@ -65,8 +64,8 @@ export const DNSRecordsSection = ({
 			<div className="mb-6 rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-2 text-base text-text-strong-950">
-						<Icon name="mail-single" className="h-4 w-4 text-text-sub-600" />
-						<h3 className="font-semibold">Enable Sending</h3>
+						<Icon name="mail-send" className="h-4 w-4 text-text-sub-600" />
+						<h3 className="font-semibold">Email Sending</h3>
 					</div>
 					<Switch.Root
 						checked={domain?.isSendingEmailEnabled}
@@ -117,8 +116,8 @@ export const DNSRecordsSection = ({
 				<div className="mb-6 rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-2 text-base text-text-strong-950">
-							<Icon name="inbox" className="h-4 w-4 text-text-sub-600" />
-							<h3 className="font-semibold">Enable Receiving</h3>
+							<Icon name="mail-receive" className="h-4 w-4 text-text-sub-600" />
+							<h3 className="font-semibold">Email Receiving</h3>
 						</div>
 						<Switch.Root
 							checked={domain?.isReceivingEmailEnabled}

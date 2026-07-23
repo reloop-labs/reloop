@@ -1,3 +1,5 @@
+import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
 import { parseAsString, useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ConfigureDnsActions } from "./configure-dns-actions";
@@ -5,7 +7,6 @@ import { DnsAutoConnectBanner } from "./dns-auto-connect-banner";
 import { DnsFeatureSection } from "./dns-feature-section";
 import { groupDomainDnsRecords } from "./dns-record-groups";
 import { DnsRecordSection } from "./dns-record-section";
-import { DomainAddedAlert } from "./domain-added-alert";
 import { useDomainQuery } from "./use-domain-query";
 import { useUpdateDomain } from "./use-update-domain";
 import { useVerifyDns } from "./use-verify-dns";
@@ -16,6 +17,19 @@ async function copyToClipboard(text: string) {
 	} catch {
 		// ignore clipboard errors
 	}
+}
+
+function TwitterVerifiedIcon({ className }: { className?: string }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			aria-hidden="true"
+			className={className ?? "size-6 shrink-0 text-success-base"}
+			fill="currentColor"
+		>
+			<path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.79-4-4-4-.495 0-.965.084-1.4.238C14.55 2.475 13.18 1.6 11.6 1.6c-1.58 0-2.95.875-3.6 2.148-.435-.154-.905-.238-1.4-.238-2.21 0-4 1.79-4 4 0 .495.084.965.238 1.4C1.575 9.55.7 10.92.7 12.5c0 1.58.875 2.95 2.148 3.6-.154.435-.238.905-.238 1.4 0 2.21 1.79 4 4 4 .495 0 .965-.084 1.4-.238 1.05 1.273 2.42 2.148 4 2.148 1.58 0 2.95-.875 3.6-2.148.435.154.905.238 1.4.238 2.21 0 4-1.79 4-4 0-.495-.084-.965-.238-1.4 1.273-1.05 2.148-2.42 2.148-4zm-12.71 4.29l-3.58-3.59 1.41-1.41 2.17 2.17 6.18-6.18 1.41 1.41-7.59 7.6z" />
+		</svg>
+	);
 }
 
 export function ConfigureDnsStep() {
@@ -60,10 +74,22 @@ export function ConfigureDnsStep() {
 	return (
 		<div className="pb-10">
 			<div className="relative mx-auto mb-8 flex flex-col">
-				<h1 className="mb-6 font-semibold text-[26px] text-text-strong-950 tracking-tight">
-					Configure DNS
-				</h1>
-				<DomainAddedAlert domainName={domainData?.domain} />
+				<div className="space-y-1">
+					<div className="flex items-center gap-2">
+						<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+							{domainData?.domain || (
+								<Skeleton className="h-8 w-48 rounded-lg" />
+							)}
+						</h1>
+						{domainData?.domain && (
+							<TwitterVerifiedIcon className="size-[18px] shrink-0 text-success-base" />
+						)}
+					</div>
+					<p className="text-paragraph-md text-text-sub-600 leading-relaxed">
+						Domain added · Copy the records below and add them to your DNS
+						provider to start sending emails.
+					</p>
+				</div>
 				<div className="mt-6">
 					<DnsAutoConnectBanner domain={domainData} domainId={domainId} />
 				</div>
@@ -86,8 +112,8 @@ export function ConfigureDnsStep() {
 				</DnsFeatureSection>
 
 				<DnsFeatureSection
-					icon="mail-single"
-					title="Enable Sending"
+					icon="mail-send"
+					title="Email Sending"
 					checked={domainData?.isSendingEmailEnabled}
 					onCheckedChange={(checked) =>
 						handleUpdateDomain(
@@ -123,8 +149,8 @@ export function ConfigureDnsStep() {
 
 				{receivingRecords.length > 0 && (
 					<DnsFeatureSection
-						icon="inbox"
-						title="Enable Receiving"
+						icon="mail-receive"
+						title="Email Receiving"
 						checked={domainData?.isReceivingEmailEnabled}
 						onCheckedChange={(checked) =>
 							handleUpdateDomain(

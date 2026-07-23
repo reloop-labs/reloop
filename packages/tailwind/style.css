@@ -904,13 +904,13 @@
 	--social-amazon: #353e47;
 	--social-zendesk: #16140d;
 
-	--primary-dark: #d97757;
-	--primary-darker: #d97757;
-	--primary-base: #d97757;
-	--primary-link: #bc512d;
-	--primary-alpha-24: #d977573d;
-	--primary-alpha-16: #d9775729;
-	--primary-alpha-10: #d977571a;
+	--primary-dark: #0056cc;
+	--primary-darker: #0056cc;
+	--primary-base: #006ffe;
+	--primary-link: #0056cc;
+	--primary-alpha-24: #006ffe3d;
+	--primary-alpha-16: #006ffe29;
+	--primary-alpha-10: #006ffe1a;
 
 	--static-black: var(--neutral-950);
 	--static-white: var(--neutral-0);
@@ -1097,7 +1097,7 @@
 	--social-tidal: #fff;
 	--social-amazon: #fff;
 	--social-zendesk: #fff;
-	--primary-link: #d97757;
+	--primary-link: #006ffe;
 }
 
 @keyframes spinnerFade {

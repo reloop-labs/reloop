@@ -2,6 +2,8 @@
 
 import { DNSAutoConnectBanner } from "@fe/dashboard/app/(protected)/(layout)/domain/[domainId]/components/dns-auto-connect-banner";
 import { useDomainActions } from "@fe/dashboard/app/(protected)/(layout)/domain/[domainId]/hooks/use-domain-actions";
+import { DNSRecordSection } from "@fe/dashboard/app/(protected)/onboarding/steps/configure-dns/components/dns-record-section";
+import { groupDomainDnsRecords } from "@fe/dashboard/app/(protected)/onboarding/steps/configure-dns/utils/dns-record-groups";
 import type { DomainResponse } from "@fe/dashboard/types/api.types";
 import {
 	isDomainDetailSwrKey,
@@ -10,19 +12,30 @@ import {
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
+import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import * as Switch from "@reloop/ui/switch";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter, useSearchParams } from "next/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
-import { useSearchParams, useRouter } from "next/navigation";
 import * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import useSWR, { mutate } from "swr";
-import { DNSRecordSection } from "@fe/dashboard/app/(protected)/onboarding/steps/configure-dns/components/dns-record-section";
-import { DomainAddedAlert } from "@fe/dashboard/app/(protected)/onboarding/steps/configure-dns/components/domain-added-alert";
-import { groupDomainDnsRecords } from "@fe/dashboard/app/(protected)/onboarding/steps/configure-dns/utils/dns-record-groups";
+
+function TwitterVerifiedIcon({ className }: { className?: string }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			aria-hidden="true"
+			className={className ?? "size-6 shrink-0 text-success-base"}
+			fill="currentColor"
+		>
+			<path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.79-4-4-4-.495 0-.965.084-1.4.238C14.55 2.475 13.18 1.6 11.6 1.6c-1.58 0-2.95.875-3.6 2.148-.435-.154-.905-.238-1.4-.238-2.21 0-4 1.79-4 4 0 .495.084.965.238 1.4C1.575 9.55.7 10.92.7 12.5c0 1.58.875 2.95 2.148 3.6-.154.435-.238.905-.238 1.4 0 2.21 1.79 4 4 4 .495 0 .965-.084 1.4-.238 1.05 1.273 2.42 2.148 4 2.148 1.58 0 2.95-.875 3.6-2.148.435.154.905.238 1.4.238 2.21 0 4-1.79 4-4 0-.495-.084-.965-.238-1.4 1.273-1.05 2.148-2.42 2.148-4zm-12.71 4.29l-3.58-3.59 1.41-1.41 2.17 2.17 6.18-6.18 1.41 1.41-7.59 7.6z" />
+		</svg>
+	);
+}
 
 export const ConfigureDnsStep = () => {
 	const [domainId] = useQueryState("domainId", parseAsString.withDefault(""));
@@ -37,7 +50,9 @@ export const ConfigureDnsStep = () => {
 
 		switch (dcStatus) {
 			case "success":
-				toast.success("DNS records configured successfully! Verification started.");
+				toast.success(
+					"DNS records configured successfully! Verification started.",
+				);
 				setStep(4);
 				break;
 			case "cancelled":
@@ -138,7 +153,22 @@ export const ConfigureDnsStep = () => {
 	return (
 		<div className="pb-10">
 			<div className="relative mx-auto mb-8 flex flex-col">
-				<DomainAddedAlert domainName={domainData?.domain} />
+				<div className="space-y-1">
+					<div className="flex items-center gap-2">
+						<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+							{domainData?.domain || (
+								<Skeleton className="h-8 w-48 rounded-lg" />
+							)}
+						</h1>
+						{domainData?.domain && (
+							<TwitterVerifiedIcon className="size-6 shrink-0 text-success-base" />
+						)}
+					</div>
+					<p className="text-paragraph-md text-text-sub-600 leading-relaxed">
+						Domain added · Copy the records below and add them to your DNS
+						provider to start sending emails.
+					</p>
+				</div>
 				<div className="mt-6">
 					<DNSAutoConnectBanner domain={domainData} domainId={domainId} />
 				</div>
@@ -165,8 +195,8 @@ export const ConfigureDnsStep = () => {
 				<div className="mt-6 rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-2 text-base text-text-strong-950">
-							<Icon name="mail-single" className="h-4 w-4 text-text-sub-600" />
-							<h3 className="font-semibold">Enable Sending</h3>
+							<Icon name="mail-send" className="h-4 w-4 text-text-sub-600" />
+							<h3 className="font-semibold">Email Sending</h3>
 						</div>
 						<Switch.Root
 							checked={domainData?.isSendingEmailEnabled}
@@ -220,8 +250,11 @@ export const ConfigureDnsStep = () => {
 					<div className="mt-6 rounded-2xl border border-stroke-soft-100 p-4 dark:border-stroke-soft-100/10">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-2 text-base text-text-strong-950">
-								<Icon name="inbox" className="h-4 w-4 text-text-sub-600" />
-								<h3 className="font-semibold">Enable Receiving</h3>
+								<Icon
+									name="mail-receive"
+									className="h-4 w-4 text-text-sub-600"
+								/>
+								<h3 className="font-semibold">Email Receiving</h3>
 							</div>
 							<Switch.Root
 								checked={domainData?.isReceivingEmailEnabled}

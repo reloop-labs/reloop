@@ -499,7 +499,7 @@ export const DnsConfigEmail = ({
 	}
 	if (resolvedSending.length > 0) {
 		groups.push({
-			title: "Enable Sending (SPF + MX)",
+			title: "Email Sending (SPF + MX)",
 			description:
 				"Authorizes Reloop to send mail and routes bounce/return-path traffic.",
 			records: resolvedSending,
@@ -508,13 +508,14 @@ export const DnsConfigEmail = ({
 	if (dmarcRecords.length > 0) {
 		groups.push({
 			title: "Reject Spoofed Emails (DMARC)",
-			description: "Tells receivers how to handle forged mail using your domain.",
+			description:
+				"Tells receivers how to handle forged mail using your domain.",
 			records: dmarcRecords,
 		});
 	}
 	if (receivingRecords.length > 0) {
 		groups.push({
-			title: "Enable Receiving (MX)",
+			title: "Email Receiving (MX)",
 			description: "Delivers inbound mail for this domain to Reloop.",
 			records: receivingRecords,
 		});

@@ -1,5 +1,6 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -8,6 +9,7 @@ import Spinner from "@reloop/ui/spinner";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { useNavigate } from "@tanstack/react-router";
 import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -316,16 +318,43 @@ async fn main() -> Result<(), Box<dyn std.error::Error>> {
 							variant="blue"
 							size="small"
 							disabled={isLoading}
-							className="rounded-xl"
-						>
-							{isLoading ? (
-								<span className="flex items-center gap-2">
-									<Spinner size={14} color="currentColor" />
-									Creating...
-								</span>
-							) : (
-								"Create API key"
+							className={cn(
+								"min-w-[134px] justify-center overflow-hidden rounded-xl transition-all duration-200",
+								isLoading && "pointer-events-none opacity-90",
 							)}
+						>
+							<AnimatePresence mode="popLayout" initial={false}>
+								<motion.span
+									key={isLoading ? "creating" : "idle"}
+									transition={{
+										type: "spring",
+										duration: 0.25,
+										bounce: 0,
+									}}
+									initial={{
+										opacity: 0,
+										y: -14,
+									}}
+									animate={{
+										opacity: 1,
+										y: 0,
+									}}
+									exit={{
+										opacity: 0,
+										y: 14,
+									}}
+									className="flex items-center justify-center gap-1.5"
+								>
+									{isLoading ? (
+										<>
+											<Spinner size={14} color="currentColor" />
+											<span>Creating...</span>
+										</>
+									) : (
+										"Create API key"
+									)}
+								</motion.span>
+							</AnimatePresence>
 						</FancyButton.Root>
 					</div>
 				</form>

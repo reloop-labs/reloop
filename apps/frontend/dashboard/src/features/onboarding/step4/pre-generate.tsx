@@ -1,6 +1,8 @@
+import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
+import { AnimatePresence, motion } from "framer-motion";
 import { useHotkeys } from "react-hotkeys-hook";
 
 export function PreGenerate({
@@ -34,16 +36,48 @@ export function PreGenerate({
 				<FancyButton.Root
 					variant="blue"
 					size="small"
-					className="rounded-xl"
+					className={cn(
+						"min-w-[140px] justify-center overflow-hidden rounded-xl transition-all duration-200",
+						loading && "pointer-events-none opacity-90",
+					)}
 					onClick={onGenerate}
 					disabled={loading}
 				>
-					{loading ? (
-						<Spinner size={16} />
-					) : (
-						<Icon name="key-new" className="h-4 w-4" />
-					)}
-					{loading ? "Creating key…" : "Create your API key"}
+					<AnimatePresence mode="popLayout" initial={false}>
+						<motion.span
+							key={loading ? "creating" : "idle"}
+							transition={{
+								type: "spring",
+								duration: 0.25,
+								bounce: 0,
+							}}
+							initial={{
+								opacity: 0,
+								y: -14,
+							}}
+							animate={{
+								opacity: 1,
+								y: 0,
+							}}
+							exit={{
+								opacity: 0,
+								y: 14,
+							}}
+							className="flex items-center justify-center gap-1.5"
+						>
+							{loading ? (
+								<>
+									<Spinner size={14} color="currentColor" />
+									<span>Creating...</span>
+								</>
+							) : (
+								<>
+									<Icon name="key-new" className="h-4 w-4 shrink-0" />
+									<span>Create API key</span>
+								</>
+							)}
+						</motion.span>
+					</AnimatePresence>
 				</FancyButton.Root>
 			</div>
 		</div>
