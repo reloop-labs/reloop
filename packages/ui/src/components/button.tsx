@@ -50,7 +50,7 @@ export const buttonVariants = tv({
 				icon: "-mx-1",
 			},
 			small: {
-				root: "h-9 gap-3 rounded-lg px-3 label-sm",
+				root: "h-9 gap-3 rounded-xl px-3 label-sm",
 				icon: "-mx-1",
 			},
 			xsmall: {

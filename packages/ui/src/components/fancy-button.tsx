@@ -48,6 +48,14 @@ export const fancyButtonVariants = tv({
 					"hover:bg-bg-weak-50 hover:text-text-strong-950 hover:shadow-none",
 				],
 			},
+			ghost: {
+				root: [
+					// base
+					"bg-transparent text-text-sub-600",
+					// hover
+					"hover:bg-bg-weak-50 hover:text-text-strong-950",
+				],
+			},
 		},
 		size: {
 			medium: {
@@ -55,7 +63,7 @@ export const fancyButtonVariants = tv({
 				icon: "-mx-1",
 			},
 			small: {
-				root: "h-9 gap-3 rounded-lg px-3",
+				root: "h-9 gap-3 rounded-xl px-3",
 				icon: "-mx-1",
 			},
 			xsmall: {
