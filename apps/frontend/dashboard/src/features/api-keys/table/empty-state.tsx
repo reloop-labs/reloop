@@ -49,13 +49,14 @@ export function EmptyState({ onCreateApiKey }: { onCreateApiKey: () => void }) {
 			</p>
 			{isFiltered ? (
 				<Button.Root
+					type="button"
 					variant="neutral"
 					mode="stroke"
-					size="xsmall"
+					size="small"
 					onClick={handleClearFilters}
-					className="gap-2 rounded-lg"
+					className="gap-1.5 rounded-xl"
 				>
-					<Icon name="refresh-cw" className="h-3.5 w-3.5" />
+					<Icon name="cross-circle" className="h-4 w-4 text-text-sub-600" />
 					Clear filters
 				</Button.Root>
 			) : (
