@@ -1,6 +1,7 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
@@ -183,41 +184,69 @@ export function AddDomainPage() {
 						</AnimatePresence>
 					</div>
 
-					<div className="mt-3 flex items-center gap-3">
-						<Button.Root
+					<div className="mt-5 flex items-center gap-3">
+						<FancyButton.Root
 							type="submit"
-							variant="neutral"
-							mode="filled"
-							size="xsmall"
+							variant="blue"
+							size="small"
 							disabled={status === "loading"}
-						>
-							{status === "loading" ? (
-								<>
-									<Spinner size={14} color="currentColor" />
-									Adding Domain...
-								</>
-							) : (
-								<>
-									Add Domain
-									<span className="inline-flex items-center gap-0.5">
-										<Icon
-											name="command"
-											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-										/>
-										<Icon
-											name="enter"
-											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-										/>
-									</span>
-								</>
+							className={cn(
+								"min-w-[134px] justify-center overflow-hidden rounded-xl transition-all duration-200",
+								status === "loading" && "pointer-events-none opacity-90",
 							)}
-						</Button.Root>
+						>
+							<AnimatePresence mode="popLayout" initial={false}>
+								<motion.span
+									key={status === "loading" ? "loading" : "idle"}
+									transition={{
+										type: "spring",
+										duration: 0.25,
+										bounce: 0,
+									}}
+									initial={{
+										opacity: 0,
+										y: -14,
+									}}
+									animate={{
+										opacity: 1,
+										y: 0,
+									}}
+									exit={{
+										opacity: 0,
+										y: 14,
+									}}
+									className="flex items-center justify-center gap-1.5"
+								>
+									{status === "loading" ? (
+										<>
+											<Spinner size={14} color="currentColor" />
+											<span>Adding Domain...</span>
+										</>
+									) : (
+										<>
+											<span>Add Domain</span>
+											<span className="inline-flex items-center gap-0.5">
+												<Icon
+													name="command"
+													className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+												/>
+												<Icon
+													name="enter"
+													className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+												/>
+											</span>
+										</>
+									)}
+								</motion.span>
+							</AnimatePresence>
+						</FancyButton.Root>
 						<Button.Root
 							variant="neutral"
 							mode="stroke"
-							size="xsmall"
+							size="small"
 							asChild
 							disabled={status === "loading"}
+							className="rounded-xl"
 						>
 							<Link to="/domain">
 								Cancel

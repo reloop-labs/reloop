@@ -1,7 +1,12 @@
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import Spinner from "@reloop/ui/spinner";
 import { useNavigate } from "@tanstack/react-router";
 import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
 import * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
@@ -96,6 +101,11 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 						</>
 					)}
 				</div>
+				{domainData && (
+					<div className="shrink-0 pt-0.5">
+						<ForwardDNSRecordsButton domainId={domainData.id} />
+					</div>
+				)}
 			</div>
 
 			<DNSAutoConnectBanner domain={domainData} domainId={domainId} forceShow />
@@ -114,26 +124,73 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 				/>
 			)}
 
-			<div className="flex items-center justify-between gap-3 border-stroke-soft-100 border-t pt-6 dark:border-stroke-soft-100/40">
+			<div className="flex items-center justify-end gap-3 pt-6">
 				<Button.Root
+					type="button"
 					variant="neutral"
 					mode="stroke"
 					size="small"
 					onClick={() => void navigate({ to: "/domain" })}
+					className="rounded-xl"
 				>
 					Cancel
 				</Button.Root>
-				<div className="flex items-center gap-2">
-					{domainData && <ForwardDNSRecordsButton domainId={domainData.id} />}
-					<Button.Root
-						variant="neutral"
-						size="small"
-						onClick={() => void handleVerifyAndNavigate()}
-						disabled={isVerifying || showLoading}
-					>
-						{isVerifying ? "Verifying…" : "Verify & finish"}
-					</Button.Root>
-				</div>
+				<FancyButton.Root
+					type="button"
+					variant="blue"
+					size="small"
+					onClick={() => void handleVerifyAndNavigate()}
+					disabled={isVerifying || showLoading}
+					className={cn(
+						"min-w-[134px] justify-center overflow-hidden rounded-xl transition-all duration-200",
+						(isVerifying || showLoading) && "pointer-events-none opacity-90",
+					)}
+				>
+					<AnimatePresence mode="popLayout" initial={false}>
+						<motion.span
+							key={isVerifying ? "verifying" : "idle"}
+							transition={{
+								type: "spring",
+								duration: 0.25,
+								bounce: 0,
+							}}
+							initial={{
+								opacity: 0,
+								y: -14,
+							}}
+							animate={{
+								opacity: 1,
+								y: 0,
+							}}
+							exit={{
+								opacity: 0,
+								y: 14,
+							}}
+							className="flex items-center justify-center gap-1.5"
+						>
+							{isVerifying ? (
+								<>
+									<Spinner size={14} color="currentColor" />
+									<span>Verifying...</span>
+								</>
+							) : (
+								<>
+									<span>Verify & finish</span>
+									<span className="inline-flex items-center gap-0.5">
+										<Icon
+											name="command"
+											className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+										/>
+										<Icon
+											name="enter"
+											className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+										/>
+									</span>
+								</>
+							)}
+						</motion.span>
+					</AnimatePresence>
+				</FancyButton.Root>
 			</div>
 		</div>
 	);

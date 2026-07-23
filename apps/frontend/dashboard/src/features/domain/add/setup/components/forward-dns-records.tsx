@@ -56,8 +56,8 @@ export const ForwardDNSRecordsButton = ({
 				<Button.Root
 					variant="neutral"
 					mode="stroke"
-					size="xsmall"
-					className={cn("gap-1.5", isOpen && "bg-bg-weak-50")}
+					size="small"
+					className={cn("gap-1.5 rounded-xl", isOpen && "bg-bg-weak-50")}
 				>
 					<Icon name="mail-single" className="h-4 w-4" />
 					Forward records
