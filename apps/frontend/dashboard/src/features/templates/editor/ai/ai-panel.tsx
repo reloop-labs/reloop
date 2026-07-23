@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
 import { useEditorStore } from "#/features/templates/editor/use-editor-store";
+import { AiApplyModal } from "./ai-apply-modal";
 import { AiComposer } from "./ai-composer";
 import { AiMessageBubble } from "./ai-message";
 import { useAiAttachments } from "./use-ai-attachments";
@@ -57,6 +58,8 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 		json: unknown;
 		html: string;
 	} | null>(null);
+	const [pendingApplyHtml, setPendingApplyHtml] = useState<string | null>(null);
+	const [showJump, setShowJump] = useState(false);
 	const scrollRef = useRef<HTMLDivElement>(null);
 
 	const {
@@ -69,41 +72,48 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 		runAgent,
 		pendingPlan,
 		setPendingPlan,
-	} = useTemplateAiAgent();
+	} = useTemplateAiAgent(templateId);
 
 	const { attachments, uploading, addFiles, remove, clear } =
 		useAiAttachments();
 
 	useEffect(() => {
 		setIsGeneratingStore(isRunning);
-		if (!isRunning) {
-			// keep last content until next run starts
-		}
 	}, [isRunning, setIsGeneratingStore]);
 
+	// Esc stops generation
+	useEffect(() => {
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === "Escape" && isRunning) {
+				e.preventDefault();
+				stop();
+				toast.message("Generation stopped");
+			}
+		};
+		window.addEventListener("keydown", onKey);
+		return () => window.removeEventListener("keydown", onKey);
+	}, [isRunning, stop]);
+
+	// Auto-scroll unless user scrolled up
 	useEffect(() => {
 		const el = scrollRef.current;
 		if (!el) return;
-		el.scrollTop = el.scrollHeight;
+		const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+		if (distanceFromBottom < 80) {
+			el.scrollTop = el.scrollHeight;
+			setShowJump(false);
+		} else {
+			setShowJump(true);
+		}
 	}, [messages]);
 
-	const applyHtml = useCallback(
-		async (html: string, opts?: { confirmIfDirty?: boolean }) => {
+	const commitApply = useCallback(
+		async (html: string) => {
 			if (!editor || !html) return;
-
-			const dirty = !canvasIsEmpty(editor);
-			if (opts?.confirmIfDirty && dirty) {
-				const ok = window.confirm(
-					"Replace the current template content with the AI result?",
-				);
-				if (!ok) return;
-			}
-
 			try {
 				const prevJson = editor.getJSON();
 				const prevHtml = editor.getHTML();
 				setUndoStack({ json: prevJson, html: prevHtml });
-
 				editor.commands.setContent(html);
 
 				if (templateId) {
@@ -116,7 +126,21 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 						}),
 					}).catch(() => null);
 				}
-				toast.success("Applied to canvas");
+
+				toast.success("Applied to canvas", {
+					action: {
+						label: "Undo",
+						onClick: () => {
+							try {
+								editor.commands.setContent(prevJson as never);
+								setUndoStack(null);
+								toast.message("Reverted");
+							} catch {
+								// ignore
+							}
+						},
+					},
+				});
 			} catch (err) {
 				toast.error(
 					err instanceof Error ? err.message : "Failed to apply HTML",
@@ -124,6 +148,19 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 			}
 		},
 		[editor, templateId],
+	);
+
+	const requestApply = useCallback(
+		async (html: string, opts?: { forceConfirm?: boolean }) => {
+			if (!editor || !html) return;
+			const dirty = !canvasIsEmpty(editor);
+			if (dirty || opts?.forceConfirm) {
+				setPendingApplyHtml(html);
+				return;
+			}
+			await commitApply(html);
+		},
+		[editor, commitApply],
 	);
 
 	const undoApply = useCallback(() => {
@@ -165,7 +202,12 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 			onHtmlFinal: async (html) => {
 				setGeneratingContent(html);
 				const empty = canvasIsEmpty(editor);
-				await applyHtml(html, { confirmIfDirty: !empty });
+				if (empty) {
+					await commitApply(html);
+				} else {
+					// Soft confirm — don't block stream; offer apply modal
+					setPendingApplyHtml(html);
+				}
 			},
 		});
 	}, [
@@ -180,7 +222,7 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 		setLastAiPrompt,
 		setGeneratingContent,
 		editor,
-		applyHtml,
+		commitApply,
 	]);
 
 	const executePlan = useCallback(
@@ -198,7 +240,8 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 				onHtmlFinal: async (html) => {
 					setGeneratingContent(html);
 					const empty = canvasIsEmpty(editor);
-					await applyHtml(html, { confirmIfDirty: !empty });
+					if (empty) await commitApply(html);
+					else setPendingApplyHtml(html);
 				},
 			});
 		},
@@ -210,9 +253,60 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 			setPendingPlan,
 			setGeneratingContent,
 			editor,
-			applyHtml,
+			commitApply,
 		],
 	);
+
+	const retryFromAssistant = useCallback(
+		async (assistantMessageId: string) => {
+			const idx = messages.findIndex((m) => m.id === assistantMessageId);
+			if (idx < 0) return;
+			// Find nearest preceding user message
+			let userId: string | null = null;
+			let userText = "";
+			for (let i = idx - 1; i >= 0; i--) {
+				const m = messages[i];
+				if (m?.role === "user") {
+					userId = m.id;
+					userText = m.content;
+					break;
+				}
+			}
+			if (!userId) return;
+			setGeneratingContent("");
+			await runAgent({
+				userText,
+				retryFromUserMessageId: userId,
+				editorSnapshot: snapshot,
+				templateId,
+				modeOverride: mode,
+				onHtmlDelta: (h) => setGeneratingContent(h),
+				onHtmlFinal: async (html) => {
+					setGeneratingContent(html);
+					const empty = canvasIsEmpty(editor);
+					if (empty) await commitApply(html);
+					else setPendingApplyHtml(html);
+				},
+			});
+		},
+		[
+			messages,
+			runAgent,
+			snapshot,
+			templateId,
+			mode,
+			setGeneratingContent,
+			editor,
+			commitApply,
+		],
+	);
+
+	const jumpToLatest = () => {
+		const el = scrollRef.current;
+		if (!el) return;
+		el.scrollTop = el.scrollHeight;
+		setShowJump(false);
+	};
 
 	return (
 		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/40">
@@ -227,7 +321,8 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 							Template agent
 						</h3>
 						<p className="text-[10px] text-text-soft-400">
-							{mode === "plan" ? "Plan mode" : "Agent mode"} · multi-turn
+							{mode === "plan" ? "Plan mode" : "Agent mode"}
+							{isRunning ? " · generating (Esc to stop)" : " · multi-turn"}
 						</p>
 					</div>
 				</div>
@@ -269,30 +364,55 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 			</div>
 
 			{/* Transcript */}
-			<div ref={scrollRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3">
-				{messages.length === 0 ? (
-					<div className="flex h-full flex-col items-center justify-center px-4 py-10 text-center">
-						<div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-feature-lighter text-feature-base">
-							<Icon name="sparkling" className="h-5 w-5" />
+			<div className="relative min-h-0 flex-1">
+				<div
+					ref={scrollRef}
+					className="h-full space-y-3 overflow-y-auto p-3"
+					onScroll={() => {
+						const el = scrollRef.current;
+						if (!el) return;
+						const distance =
+							el.scrollHeight - el.scrollTop - el.clientHeight;
+						setShowJump(distance > 100);
+					}}
+				>
+					{messages.length === 0 ? (
+						<div className="flex h-full flex-col items-center justify-center px-4 py-10 text-center">
+							<div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-feature-lighter text-feature-base">
+								<Icon name="sparkling" className="h-5 w-5" />
+							</div>
+							<p className="font-semibold text-label-sm text-text-strong-950">
+								Build emails message by message
+							</p>
+							<p className="mt-1 max-w-[240px] text-paragraph-xs text-text-soft-400">
+								Like Cursor: plan, generate, then refine. Paste a screenshot —
+								chat is saved for this template until you clear it.
+							</p>
 						</div>
-						<p className="font-semibold text-label-sm text-text-strong-950">
-							Build emails message by message
-						</p>
-						<p className="mt-1 max-w-[240px] text-paragraph-xs text-text-soft-400">
-							Like Cursor: plan, generate, then refine. Paste or drop a
-							screenshot — vision models match layout and palette.
-						</p>
-					</div>
-				) : (
-					messages.map((m) => (
-						<AiMessageBubble
-							key={m.id}
-							message={m}
-							isRunning={isRunning}
-							onExecutePlan={executePlan}
-						/>
-					))
-				)}
+					) : (
+						messages.map((m) => (
+							<AiMessageBubble
+								key={m.id}
+								message={m}
+								isRunning={isRunning}
+								onExecutePlan={executePlan}
+								onApplyHtml={(html) => void requestApply(html)}
+								onRetry={(assistantId) => void retryFromAssistant(assistantId)}
+							/>
+						))
+					)}
+				</div>
+
+				{showJump && messages.length > 0 ? (
+					<button
+						type="button"
+						onClick={jumpToLatest}
+						className="-translate-x-1/2 absolute bottom-3 left-1/2 z-10 flex items-center gap-1 rounded-full border border-stroke-soft-100 bg-bg-white-0 px-3 py-1 text-[11px] font-medium text-text-sub-600 shadow-regular-sm hover:text-text-strong-950"
+					>
+						<Icon name="arrow-down" className="h-3 w-3" />
+						Latest
+					</button>
+				) : null}
 			</div>
 
 			{pendingPlan && !messages.some((m) => m.plan?.id === pendingPlan.id) ? (
@@ -313,6 +433,23 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 				onAddFiles={addFiles}
 				onRemoveAttachment={remove}
 				uploading={uploading}
+			/>
+
+			<AiApplyModal
+				open={Boolean(pendingApplyHtml)}
+				onOpenChange={(open) => {
+					if (!open) setPendingApplyHtml(null);
+				}}
+				onDismiss={() => {
+					setPendingApplyHtml(null);
+					toast.message("Kept current canvas — use Apply on the message anytime");
+				}}
+				onApply={() => {
+					if (pendingApplyHtml) {
+						void commitApply(pendingApplyHtml);
+					}
+					setPendingApplyHtml(null);
+				}}
 			/>
 		</div>
 	);

@@ -1,4 +1,5 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { clearAiChat, loadAiChat, saveAiChat } from "./ai-storage";
 import type {
 	AgentSseEvent,
 	AiAttachment,
@@ -35,14 +36,19 @@ function parseSseChunk(
 	return { events, rest };
 }
 
-export function useTemplateAiAgent() {
-	const [messages, setMessages] = useState<AiMessage[]>([]);
-	const [mode, setMode] = useState<AiMode>("agent");
+export function useTemplateAiAgent(templateId?: string | null) {
+	const stored = loadAiChat(templateId);
+	const [messages, setMessages] = useState<AiMessage[]>(
+		() => stored?.messages ?? [],
+	);
+	const [mode, setMode] = useState<AiMode>(() => stored?.mode ?? "agent");
 	const [isRunning, setIsRunning] = useState(false);
 	const [pendingPlan, setPendingPlan] = useState<AiPlan | null>(null);
 	const abortRef = useRef<AbortController | null>(null);
-	const messagesRef = useRef<AiMessage[]>([]);
+	const messagesRef = useRef<AiMessage[]>(messages);
 	messagesRef.current = messages;
+	const templateIdRef = useRef(templateId);
+	templateIdRef.current = templateId;
 
 	const stop = useCallback(() => {
 		abortRef.current?.abort();
@@ -50,10 +56,28 @@ export function useTemplateAiAgent() {
 		setIsRunning(false);
 	}, []);
 
+	// Persist chat when it changes (skip while streaming to reduce thrash)
+	useEffect(() => {
+		if (isRunning) return;
+		saveAiChat(templateIdRef.current, { mode, messages });
+	}, [messages, mode, isRunning]);
+
+	// Reload when template id changes
+	useEffect(() => {
+		abortRef.current?.abort();
+		abortRef.current = null;
+		setIsRunning(false);
+		const next = loadAiChat(templateId);
+		setMessages(next?.messages ?? []);
+		setMode(next?.mode ?? "agent");
+		setPendingPlan(null);
+	}, [templateId]);
+
 	const clearChat = useCallback(() => {
 		stop();
 		setMessages([]);
 		setPendingPlan(null);
+		clearAiChat(templateIdRef.current);
 	}, [stop]);
 
 	const runAgent = useCallback(
@@ -64,6 +88,8 @@ export function useTemplateAiAgent() {
 			templateId?: string | null;
 			executePlan?: AiPlan;
 			modeOverride?: AiMode;
+			/** When retrying, omit pushing a new user bubble */
+			retryFromUserMessageId?: string;
 			onHtmlDelta?: (html: string) => void;
 			onHtmlFinal?: (html: string) => void;
 		}) => {
@@ -72,20 +98,50 @@ export function useTemplateAiAgent() {
 			abortRef.current = controller;
 			setIsRunning(true);
 
-			const userMsg: AiMessage | null = input.executePlan
-				? {
-						id: uid("user"),
-						role: "user",
-						content: `Execute plan: ${input.executePlan.summary}`,
-						createdAt: Date.now(),
-					}
-				: {
+			const prior = messagesRef.current;
+			let historyBase = prior;
+			let userMsg: AiMessage;
+
+			if (input.retryFromUserMessageId) {
+				const idx = prior.findIndex(
+					(m) => m.id === input.retryFromUserMessageId && m.role === "user",
+				);
+				if (idx >= 0 && prior[idx]) {
+					userMsg = prior[idx];
+					// Drop failed assistant after this user turn
+					historyBase = prior.slice(0, idx + 1);
+					setMessages(historyBase);
+				} else {
+					userMsg = {
 						id: uid("user"),
 						role: "user",
 						content: input.userText,
 						createdAt: Date.now(),
 						attachments: input.attachments,
 					};
+					historyBase = [...prior, userMsg];
+					setMessages(historyBase);
+				}
+			} else if (input.executePlan) {
+				userMsg = {
+					id: uid("user"),
+					role: "user",
+					content: `Execute plan: ${input.executePlan.summary}`,
+					createdAt: Date.now(),
+				};
+				historyBase = [...prior, userMsg];
+				setMessages(historyBase);
+			} else {
+				userMsg = {
+					id: uid("user"),
+					role: "user",
+					content: input.userText,
+					createdAt: Date.now(),
+					attachments: input.attachments,
+				};
+				historyBase = [...prior, userMsg];
+				setMessages(historyBase);
+			}
 
 			const assistantId = uid("assistant");
 			const assistantMsg: AiMessage = {
@@ -97,19 +153,16 @@ export function useTemplateAiAgent() {
 				status: "streaming",
 			};
 
-			const prior = messagesRef.current;
-			setMessages([...prior, userMsg, assistantMsg]);
+			setMessages([...historyBase, assistantMsg]);
 
-			// Prefer last assistant HTML so revise tools have ground truth
-			const lastAssistantHtml = [...prior]
+			const lastAssistantHtml = [...historyBase]
 				.reverse()
 				.find((m) => m.role === "assistant" && m.html)?.html;
 
 			const history = [
-				...prior
+				...historyBase
 					.filter((m) => m.content.trim().length > 0)
 					.map((m) => ({ role: m.role, content: m.content })),
-				{ role: "user" as const, content: userMsg.content },
 			];
 
 			const patchAssistant = (patch: Partial<AiMessage>) => {
@@ -140,7 +193,6 @@ export function useTemplateAiAgent() {
 							steps[idx] = {
 								...steps[idx],
 								...next,
-								// keep prior summary if not provided
 								summary: extra?.summary ?? steps[idx]?.summary,
 								tool: extra?.tool ?? steps[idx]?.tool,
 							};
@@ -165,10 +217,10 @@ export function useTemplateAiAgent() {
 					body: JSON.stringify({
 						mode: runMode,
 						messages: history,
-						templateId: input.templateId ?? undefined,
+						templateId:
+							input.templateId ?? templateIdRef.current ?? undefined,
 						editorSnapshot: {
 							...input.editorSnapshot,
-							// Prefer last applied AI HTML when present for better revise
 							renderedHtmlSnippet:
 								lastAssistantHtml ||
 								input.editorSnapshot?.renderedHtmlSnippet ||
@@ -278,7 +330,12 @@ export function useTemplateAiAgent() {
 				setMessages((prev) =>
 					prev.map((m) =>
 						m.id === assistantId && m.status === "streaming"
-							? { ...m, status: "done", content: assistantText, html: finalHtml || m.html }
+							? {
+									...m,
+									status: "done",
+									content: assistantText,
+									html: finalHtml || m.html,
+								}
 							: m,
 					),
 				);

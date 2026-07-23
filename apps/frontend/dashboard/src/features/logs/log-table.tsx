@@ -187,7 +187,7 @@ function LogDateBandSkeleton() {
 		<div className="sticky top-0 z-10 flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-weak-50/70 px-4 py-1.5 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
 			<Icon name="calendar" className="h-3 w-3 shrink-0 text-text-soft-400" />
 			<Skeleton className="h-3 w-24 rounded-none" />
-			<Skeleton className="h-4 min-w-4 rounded-none" />
+			<Skeleton className="h-4 min-w-4 rounded-md" />
 		</div>
 	);
 }
@@ -248,7 +248,7 @@ export const LogTable = ({
 			{/* Body card overlaps header */}
 			<div
 				className={cn(
-					"-mt-2.5 flex min-h-0 flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40",
+					"-mt-2.5 flex min-h-0 flex-col overflow-hidden border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40",
 					!isMobile && "flex-1",
 				)}
 			>
@@ -317,7 +317,7 @@ export const LogTable = ({
 										<span className="font-medium text-[11px] text-text-sub-600 tracking-wide">
 											{group.dateLabel}
 										</span>
-										<span className="inline-flex h-4 min-w-4 items-center justify-center rounded-none bg-bg-white-0 px-1 font-medium text-[10px] text-text-soft-400 tabular-nums ring-1 ring-stroke-soft-100 dark:bg-bg-white-0/10 dark:ring-stroke-soft-100/40">
+										<span className="inline-flex h-4 min-w-4 items-center justify-center rounded-md bg-bg-white-0 px-1 font-medium text-[10px] text-text-soft-400 tabular-nums ring-1 ring-stroke-soft-100 dark:bg-bg-white-0/10 dark:ring-stroke-soft-100/40">
 											{group.logs.length}
 										</span>
 									</div>

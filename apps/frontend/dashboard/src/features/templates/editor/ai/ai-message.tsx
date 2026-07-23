@@ -1,4 +1,6 @@
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { AiPlanCard } from "./ai-plan-card";
 import { AiStepCard } from "./ai-step-card";
@@ -7,13 +9,24 @@ import type { AiMessage, AiPlan } from "./types";
 export function AiMessageBubble({
 	message,
 	onExecutePlan,
+	onApplyHtml,
+	onRetry,
 	isRunning,
 }: {
 	message: AiMessage;
 	onExecutePlan?: (plan: AiPlan) => void;
+	onApplyHtml?: (html: string) => void;
+	onRetry?: (userMessageId: string) => void;
 	isRunning?: boolean;
 }) {
 	const isUser = message.role === "user";
+	const showApply =
+		!isUser &&
+		Boolean(message.html) &&
+		(message.status === "done" || message.status === "planned") &&
+		onApplyHtml;
+	const showRetry =
+		!isUser && message.status === "error" && onRetry && message.error;
 
 	return (
 		<div
@@ -85,6 +98,41 @@ export function AiMessageBubble({
 					))}
 				</div>
 			) : null}
+
+			{(showApply || showRetry) && (
+				<div className="flex max-w-[95%] flex-wrap items-center gap-1.5">
+					{showApply && message.html ? (
+						<FancyButton.Root
+							type="button"
+							variant="neutral"
+							size="xsmall"
+							disabled={isRunning}
+							onClick={() => onApplyHtml?.(message.html as string)}
+							className="gap-1.5"
+						>
+							<FancyButton.Icon as={Icon} name="check" />
+							Apply to canvas
+						</FancyButton.Root>
+					) : null}
+					{showRetry ? (
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="stroke"
+							size="xsmall"
+							disabled={isRunning}
+							onClick={() => {
+								// Find preceding user message id is handled by parent
+								onRetry?.(message.id);
+							}}
+							className="gap-1"
+						>
+							<Icon name="refresh-cw" className="h-3 w-3" />
+							Retry
+						</Button.Root>
+					) : null}
+				</div>
+			)}
 		</div>
 	);
 }
