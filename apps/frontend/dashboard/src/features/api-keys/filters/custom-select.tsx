@@ -16,6 +16,22 @@ export type CustomSelectOption<T extends string | null = string | null> = {
 	colorClass?: string;
 };
 
+function OptionIcon({
+	icon,
+	colorClass,
+}: {
+	icon?: string | React.ReactNode;
+	colorClass?: string;
+}) {
+	if (!icon) return null;
+	if (typeof icon === "string") {
+		return (
+			<Icon name={icon} className={cn("h-4 w-4 shrink-0", colorClass)} />
+		);
+	}
+	return <>{icon}</>;
+}
+
 export function CustomSelect<T extends string | null>({
 	value,
 	onChange,
@@ -45,38 +61,25 @@ export function CustomSelect<T extends string | null>({
 	return (
 		<Select value={stringValue} onValueChange={handleValueChange}>
 			<SelectTrigger className={cn("h-9", widthClass)}>
-				<div className="flex items-center gap-2 overflow-hidden min-w-0">
-					{selectedOption?.icon &&
-						(typeof selectedOption.icon === "string" ? (
-							<Icon
-								name={selectedOption.icon}
-								className={cn("h-4 w-4 shrink-0", selectedOption.colorClass)}
-							/>
-						) : (
-							selectedOption.icon
-						))}
-					<SelectValue placeholder={placeholder}>
+				{/* Leading icon must live inside SelectValue so alignItemWithTrigger
+				    matches ItemText (icon + label) to Value (icon + label). */}
+				<SelectValue placeholder={placeholder}>
+					<OptionIcon
+						icon={selectedOption?.icon}
+						colorClass={selectedOption?.colorClass}
+					/>
+					<span className="min-w-0 truncate">
 						{selectedOption?.label || placeholder}
-					</SelectValue>
-				</div>
+					</span>
+				</SelectValue>
 			</SelectTrigger>
-			<SelectContent alignItemWithTrigger={true} className={widthClass}>
+			<SelectContent className={widthClass}>
 				{options.map((option) => {
 					const itemValue = option.id === null ? "__all__" : option.id;
 					return (
 						<SelectItem key={itemValue ?? "all"} value={itemValue}>
-							<div className="flex items-center gap-2 min-w-0 flex-1">
-								{option.icon &&
-									(typeof option.icon === "string" ? (
-										<Icon
-											name={option.icon}
-											className={cn("h-4 w-4 shrink-0", option.colorClass)}
-										/>
-									) : (
-										option.icon
-									))}
-								<span className="truncate">{option.label}</span>
-							</div>
+							<OptionIcon icon={option.icon} colorClass={option.colorClass} />
+							<span className="min-w-0 truncate">{option.label}</span>
 						</SelectItem>
 					);
 				})}

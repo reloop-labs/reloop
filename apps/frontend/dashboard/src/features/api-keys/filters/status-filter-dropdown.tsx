@@ -49,32 +49,26 @@ export function ApiKeyStatusFilterDropdown({
 			}
 		>
 			<SelectTrigger className="w-40">
-				<div className="flex min-w-0 items-center gap-2 overflow-hidden">
-					{selectedOption?.icon && (
+				{/* Leading icon must live inside SelectValue so alignItemWithTrigger
+				    matches ItemText (icon + label) to Value (icon + label). */}
+				<SelectValue placeholder="All Status">
+					{selectedOption?.icon ? (
 						<Icon
 							name={selectedOption.icon}
 							className={cn("h-4 w-4 shrink-0", selectedOption.colorClass)}
 						/>
-					)}
-					<SelectValue placeholder="All Status">
-						{selectedOption?.label}
-					</SelectValue>
-				</div>
+					) : null}
+					<span className="min-w-0 truncate">{selectedOption?.label}</span>
+				</SelectValue>
 			</SelectTrigger>
-			<SelectContent
-				alignItemWithTrigger={true}
-				alignOffset={-14}
-				className="w-40"
-			>
+			<SelectContent className="w-40">
 				{statusFilterOptions.map((option) => (
 					<SelectItem key={option.id ?? "all"} value={option.id ?? "all"}>
-						<div className="flex min-w-0 items-center gap-2">
-							<Icon
-								name={option.icon}
-								className={cn("h-4 w-4 shrink-0", option.colorClass)}
-							/>
-							<span className="truncate">{option.label}</span>
-						</div>
+						<Icon
+							name={option.icon}
+							className={cn("h-4 w-4 shrink-0", option.colorClass)}
+						/>
+						<span className="min-w-0 truncate">{option.label}</span>
 					</SelectItem>
 				))}
 			</SelectContent>

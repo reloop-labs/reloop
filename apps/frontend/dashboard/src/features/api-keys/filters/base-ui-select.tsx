@@ -97,7 +97,9 @@ export function SelectValue({
 	return (
 		<SelectPrimitive.Value
 			className={cn(
-				"flex-1 truncate font-medium text-sm text-text-strong-950 data-placeholder:text-text-sub-600",
+				// flex so leading icons inside Value share the same left edge as ItemText
+				// (alignItemWithTrigger lines Value up with ItemText)
+				"flex min-w-0 flex-1 items-center gap-2 font-medium text-sm text-text-strong-950 data-placeholder:text-text-sub-600",
 				className,
 			)}
 			data-slot="select-value"
@@ -112,7 +114,8 @@ export function SelectPopup({
 	side = "bottom",
 	sideOffset = 4,
 	align = "start",
-	alignOffset = -14,
+	// Ignored while alignItemWithTrigger is active (Base UI aligns Value ↔ ItemText).
+	alignOffset = 0,
 	alignItemWithTrigger = true,
 	anchor,
 	portalProps,
@@ -213,16 +216,19 @@ export const SelectItem = React.forwardRef<
 			onPointerEnter={onPointerEnter}
 			onPointerLeave={onPointerLeave}
 			className={cn(
-				"relative z-10 flex min-h-8 cursor-pointer items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-sm text-text-strong-950 outline-none transition-colors data-disabled:pointer-events-none data-disabled:opacity-64",
+				// pr-8 reserves room for the absolutely-positioned check so selected
+				// and unselected rows share the same content width/alignment
+				"relative z-10 flex min-h-8 cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 pr-8 text-sm text-text-strong-950 outline-none transition-colors data-disabled:pointer-events-none data-disabled:opacity-64",
 				className,
 			)}
 			data-slot="select-item"
 			{...props}
 		>
-			<SelectPrimitive.ItemText className="min-w-0 flex-1 truncate">
+			{/* ItemText left edge is what alignItemWithTrigger lines up with Select.Value */}
+			<SelectPrimitive.ItemText className="flex min-w-0 flex-1 items-center gap-2">
 				{children}
 			</SelectPrimitive.ItemText>
-			<SelectPrimitive.ItemIndicator className="shrink-0 text-text-strong-950">
+			<SelectPrimitive.ItemIndicator className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-text-strong-950">
 				<svg
 					aria-hidden="true"
 					fill="none"

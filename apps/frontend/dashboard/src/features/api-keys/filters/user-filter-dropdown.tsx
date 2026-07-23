@@ -11,6 +11,36 @@ import {
 	SelectValue,
 } from "./base-ui-select";
 
+function UserAvatar({
+	name,
+	email,
+	image,
+}: {
+	name: string | null | undefined;
+	email: string | null | undefined;
+	image?: string | null;
+}) {
+	const safeEmail = email || "unknown@reloop.sh";
+	return (
+		<Avatar.Root size="16" color="blue" className="shrink-0">
+			{image ? (
+				<Avatar.Image src={image} alt={name || "User"} />
+			) : (
+				<Avatar.Image asChild>
+					<div
+						className={cn(
+							"flex h-full w-full items-center justify-center rounded-full font-medium text-[6px] text-white uppercase tracking-wide",
+							getAvatarGradient(safeEmail),
+						)}
+					>
+						{getAvatarInitial(name, safeEmail)}
+					</div>
+				</Avatar.Image>
+			)}
+		</Avatar.Root>
+	);
+}
+
 export function ApiKeyUserFilterDropdown({
 	value,
 	onChange,
@@ -32,48 +62,25 @@ export function ApiKeyUserFilterDropdown({
 			onValueChange={(val) => onChange(val === "all" ? null : (val as string))}
 		>
 			<SelectTrigger className="w-48">
-				<div className="flex min-w-0 items-center gap-2 overflow-hidden">
+				{/* Leading icon must live inside SelectValue so alignItemWithTrigger
+				    matches ItemText (icon + label) to Value (icon + label). */}
+				<SelectValue placeholder="All Users">
 					{selectedCreator ? (
-						<Avatar.Root size="16" color="blue" className="shrink-0">
-							{selectedCreator.image ? (
-								<Avatar.Image
-									src={selectedCreator.image}
-									alt={selectedCreator.name || "User"}
-								/>
-							) : (
-								<Avatar.Image asChild>
-									<div
-										className={cn(
-											"flex h-full w-full items-center justify-center rounded-full font-medium text-[6px] text-white uppercase tracking-wide",
-											getAvatarGradient(
-												selectedCreator.email || "unknown@reloop.sh",
-											),
-										)}
-									>
-										{getAvatarInitial(
-											selectedCreator.name,
-											selectedCreator.email || "unknown@reloop.sh",
-										)}
-									</div>
-								</Avatar.Image>
-							)}
-						</Avatar.Root>
+						<UserAvatar
+							name={selectedCreator.name}
+							email={selectedCreator.email}
+							image={selectedCreator.image}
+						/>
 					) : (
 						<Icon name="user" className="h-4 w-4 shrink-0 text-text-sub-600" />
 					)}
-					<SelectValue placeholder="All Users">{displayLabel}</SelectValue>
-				</div>
+					<span className="min-w-0 truncate">{displayLabel}</span>
+				</SelectValue>
 			</SelectTrigger>
-			<SelectContent
-				alignItemWithTrigger={true}
-				alignOffset={-14}
-				className="w-48"
-			>
+			<SelectContent className="w-48">
 				<SelectItem value="all">
-					<div className="flex min-w-0 items-center gap-2">
-						<Icon name="user" className="h-4 w-4 shrink-0 text-text-sub-600" />
-						<span className="truncate">All Users</span>
-					</div>
+					<Icon name="user" className="h-4 w-4 shrink-0 text-text-sub-600" />
+					<span className="min-w-0 truncate">All Users</span>
 				</SelectItem>
 				{availableCreators.map((creator) => {
 					const label =
@@ -81,33 +88,12 @@ export function ApiKeyUserFilterDropdown({
 						(creator.email ? creator.email.split("@")[0] : "Unknown");
 					return (
 						<SelectItem key={creator.id} value={creator.id}>
-							<div className="flex min-w-0 items-center gap-2">
-								<Avatar.Root size="16" color="blue" className="shrink-0">
-									{creator.image ? (
-										<Avatar.Image
-											src={creator.image}
-											alt={creator.name || "User"}
-										/>
-									) : (
-										<Avatar.Image asChild>
-											<div
-												className={cn(
-													"flex h-full w-full items-center justify-center rounded-full font-medium text-[6px] text-white uppercase tracking-wide",
-													getAvatarGradient(
-														creator.email || "unknown@reloop.sh",
-													),
-												)}
-											>
-												{getAvatarInitial(
-													creator.name,
-													creator.email || "unknown@reloop.sh",
-												)}
-											</div>
-										</Avatar.Image>
-									)}
-								</Avatar.Root>
-								<span className="truncate">{label}</span>
-							</div>
+							<UserAvatar
+								name={creator.name}
+								email={creator.email}
+								image={creator.image}
+							/>
+							<span className="min-w-0 truncate">{label}</span>
 						</SelectItem>
 					);
 				})}
