@@ -1,7 +1,9 @@
 import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
+import { AnimatePresence, motion } from "framer-motion";
 import * as React from "react";
 import * as simpleIcons from "simple-icons";
 import { useDomainConnect } from "#/features/domain/detail/hooks/use-domain-connect";
@@ -94,25 +96,47 @@ export function DnsAutoConnectBanner({
 						</div>
 					</div>
 
-					<Button.Root
+					<FancyButton.Root
 						type="button"
-						variant="neutral"
-						mode="filled"
+						variant="blue"
+						size="small"
 						onClick={() => void startAutoConnect()}
-						className="h-10 shrink-0 gap-2 px-4"
+						className="min-w-[170px] justify-center overflow-hidden rounded-xl px-4 transition-all duration-200"
 						disabled={isConnecting}
 					>
-						{isConnecting ? (
-							<>
-								<Spinner color="currentColor" />
-								<span className="font-semibold text-sm">Connecting...</span>
-							</>
-						) : (
-							<span className="font-semibold text-sm">
-								Auto-populate records
-							</span>
-						)}
-					</Button.Root>
+						<AnimatePresence mode="popLayout" initial={false}>
+							<motion.span
+								key={isConnecting ? "connecting" : "idle"}
+								transition={{
+									type: "spring",
+									duration: 0.25,
+									bounce: 0,
+								}}
+								initial={{
+									opacity: 0,
+									y: -14,
+								}}
+								animate={{
+									opacity: 1,
+									y: 0,
+								}}
+								exit={{
+									opacity: 0,
+									y: 14,
+								}}
+								className="flex items-center justify-center gap-1.5"
+							>
+								{isConnecting ? (
+									<>
+										<Spinner size={14} color="currentColor" />
+										<span>Connecting...</span>
+									</>
+								) : (
+									"Auto-populate records"
+								)}
+							</motion.span>
+						</AnimatePresence>
+					</FancyButton.Root>
 				</div>
 			</div>
 		);

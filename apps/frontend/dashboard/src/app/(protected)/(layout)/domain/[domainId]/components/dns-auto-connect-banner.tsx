@@ -1,19 +1,20 @@
 "use client";
 
-import type {
-	DomainNameserversResponse,
-	DomainResponse,
-} from "@fe/dashboard/types/api.types";
-import * as Button from "@reloop/ui/button";
+import { useDomainConnect } from "@fe/dashboard/features/domain/detail/hooks/use-domain-connect";
+import { inferDnsProvider } from "@fe/dashboard/features/domain/detail/utils";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
+import Spinner from "@reloop/ui/spinner";
+import { AnimatePresence, motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import * as React from "react";
 import * as simpleIcons from "simple-icons";
 import useSWR from "swr";
-import { inferDnsProvider } from "@fe/dashboard/app/(protected)/(layout)/domain/[domainId]/utils";
-import { useDomainConnect } from "@fe/dashboard/features/domain/detail/hooks/use-domain-connect";
-import Spinner from "@reloop/ui/spinner";
+import type {
+	DomainNameserversResponse,
+	DomainResponse,
+} from "#/features/domain/types";
 
 interface DNSAutoConnectBannerProps {
 	domain?: DomainResponse;
@@ -60,7 +61,12 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 	const status = domain?.status || "pending";
 
 	// Show if pending, failed, verifying or forceShow is set
-	if (!forceShow && status !== "pending" && status !== "failed" && status !== "verifying") {
+	if (
+		!forceShow &&
+		status !== "pending" &&
+		status !== "failed" &&
+		status !== "verifying"
+	) {
 		return null;
 	}
 
@@ -112,49 +118,47 @@ export const DNSAutoConnectBanner: React.FC<DNSAutoConnectBannerProps> = ({
 						</div>
 					</div>
 
-					<Button.Root
+					<FancyButton.Root
 						type="button"
-						variant="neutral"
-						mode="filled"
+						variant="blue"
+						size="small"
 						onClick={handleAutoConnect}
-						className="h-10 shrink-0 gap-2 px-4"
+						className="min-w-[170px] justify-center overflow-hidden rounded-xl px-4 transition-all duration-200"
 						disabled={isConnecting}
 					>
-						{isConnecting ? (
-							<>
-								<Spinner color="currentColor" />
-								<span className="font-semibold text-sm">Connecting...</span>
-							</>
-						) : (
-							<>
-								<Button.Icon
-									as={() => (
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											strokeWidth={2}
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											className="h-3.5 w-3.5"
-										>
-											<title>Sparkles Icon</title>
-											<path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72" />
-											<path d="m14 7 3 3" />
-											<path d="M5 6v4" />
-											<path d="M19 14v4" />
-											<path d="M10 2v2" />
-											<path d="M7 8H3" />
-											<path d="M21 16h-4" />
-											<path d="M11 3H9" />
-										</svg>
-									)}
-								/>
-								<span className="font-semibold text-sm">Auto-populate records</span>
-							</>
-						)}
-					</Button.Root>
+						<AnimatePresence mode="popLayout" initial={false}>
+							<motion.span
+								key={isConnecting ? "connecting" : "idle"}
+								transition={{
+									type: "spring",
+									duration: 0.25,
+									bounce: 0,
+								}}
+								initial={{
+									opacity: 0,
+									y: -14,
+								}}
+								animate={{
+									opacity: 1,
+									y: 0,
+								}}
+								exit={{
+									opacity: 0,
+									y: 14,
+								}}
+								className="flex items-center justify-center gap-1.5"
+							>
+								{isConnecting ? (
+									<>
+										<Spinner size={14} color="currentColor" />
+										<span>Connecting...</span>
+									</>
+								) : (
+									"Auto-populate records"
+								)}
+							</motion.span>
+						</AnimatePresence>
+					</FancyButton.Root>
 				</div>
 			</div>
 		);

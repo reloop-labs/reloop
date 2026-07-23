@@ -25,6 +25,7 @@
 			"@reloop/email": ["../../apps/backend/email/index.ts"],
 			"@reloop/logs": ["../../apps/backend/logs/src/*"],
 			"@fe/dashboard": ["../../apps/frontend/dashboard/src/*"],
+			"@fe/dashboard/*": ["../../apps/frontend/dashboard/src/*"],
 			"@be/domain": ["../../apps/backend/domain/src/*"],
 			"@be/domain/*": ["../../apps/backend/domain/src/*"],
 			"@fe/web": ["../../apps/frontend/web/src/*"],
