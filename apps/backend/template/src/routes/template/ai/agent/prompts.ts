@@ -130,6 +130,40 @@ export function extractVariablesFromHtml(html: string): string[] {
 	return [...found];
 }
 
+/**
+ * True when model output looks like leaked agent prompts / raw dumps
+ * rather than email HTML we should apply to the canvas.
+ */
+export function isLeakedOrInvalidEmailHtml(html: string): boolean {
+	const t = html.trim();
+	if (!t) return true;
+
+	// Must contain at least one real HTML tag
+	if (!/<[a-z][\s\S]*>/i.test(t)) return true;
+
+	const leakSignals = [
+		/##\s*Current editor context/i,
+		/##\s*Conversation/i,
+		/Current HTML \(may be truncated\)/i,
+		/Respond with the complete email HTML only/i,
+		/##\s*User request/i,
+		/##\s*Approved plan/i,
+		/You are Reloop's email template/i,
+		/Generate a complete, production-ready HTML/i,
+	];
+	const hits = leakSignals.filter((re) => re.test(t)).length;
+	if (hits >= 1 && t.includes("## ")) return true;
+	if (hits >= 2) return true;
+
+	// Huge blocks of escaped angle brackets often mean prompt dump
+	const escapedTags = (t.match(/&lt;[a-z]/gi) ?? []).length;
+	if (escapedTags > 8 && escapedTags > (t.match(/<[a-z]/gi) ?? []).length) {
+		return true;
+	}
+
+	return false;
+}
+
 export function parsePlanJson(raw: string): AgentPlan | null {
 	const cleaned = raw
 		.replace(/^```(?:json)?\s*/i, "")

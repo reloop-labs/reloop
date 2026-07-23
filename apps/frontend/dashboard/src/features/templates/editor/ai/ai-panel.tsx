@@ -107,9 +107,26 @@ export function AIPanel({ onClose }: { onClose: () => void }) {
 		}
 	}, [messages]);
 
+	const isSafeEmailHtml = (html: string) => {
+		const t = html.trim();
+		if (!t || !/<[a-z][\s\S]*>/i.test(t)) return false;
+		// Block agent prompt dumps that slipped through
+		if (/##\s*Current editor context/i.test(t)) return false;
+		if (/##\s*Conversation/i.test(t)) return false;
+		if (/Respond with the complete email HTML only/i.test(t)) return false;
+		if (/Current HTML \(may be truncated\)/i.test(t)) return false;
+		return true;
+	};
+
 	const commitApply = useCallback(
 		async (html: string) => {
 			if (!editor || !html) return;
+			if (!isSafeEmailHtml(html)) {
+				toast.error(
+					"AI returned invalid content (looks like a prompt dump). Retry — ensure Ollama/Gemini/OpenAI is available.",
+				);
+				return;
+			}
 			try {
 				const prevJson = editor.getJSON();
 				const prevHtml = editor.getHTML();

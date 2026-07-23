@@ -10,6 +10,7 @@ import {
 	buildPlanPrompt,
 	extractVariablesFromHtml,
 	fallbackPlan,
+	isLeakedOrInvalidEmailHtml,
 	parsePlanJson,
 } from "./prompts";
 import type {
@@ -197,6 +198,14 @@ export async function toolGenerateEmailHtml(
 			summary: "Model returned empty HTML",
 		};
 	}
+	if (isLeakedOrInvalidEmailHtml(html)) {
+		return {
+			ok: false,
+			data: { html: "", usedVision },
+			summary:
+				"Model returned invalid/leaked content (prompt dump). Check that Ollama/Gemini/OpenAI is running, then retry.",
+		};
+	}
 	return {
 		ok: true,
 		data: { html, usedVision },
@@ -247,6 +256,14 @@ export async function toolReviseEmailHtml(
 			ok: false,
 			data: { html: prior, usedVision },
 			summary: "Revise produced empty HTML; kept previous",
+		};
+	}
+	if (isLeakedOrInvalidEmailHtml(html)) {
+		return {
+			ok: false,
+			data: { html: prior, usedVision },
+			summary:
+				"Revise returned invalid/leaked content; previous HTML kept. Retry after checking the model.",
 		};
 	}
 	return {

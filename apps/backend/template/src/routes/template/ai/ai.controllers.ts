@@ -256,28 +256,46 @@ async function streamGemmaOllama(
 	}
 }
 
+/**
+ * Offline/dev mock — never dump the full agent prompt into the email body.
+ * Only a short human-readable brief is shown.
+ */
+function extractUserBriefForMock(prompt: string): string {
+	// Prefer the last "User:" turn from agent conversation prompts
+	const userBlocks = [...prompt.matchAll(/(?:^|\n)User:\s*\n([\s\S]*?)(?=\n(?:User|Assistant|##)\b|$)/gi)];
+	const lastUser = userBlocks.at(-1)?.[1]?.trim();
+	const raw = (lastUser || prompt).trim();
+
+	// Drop structural agent sections if they leaked in
+	const cleaned = raw
+		.replace(/##[\s\S]*$/m, "")
+		.replace(/Current HTML[\s\S]*$/i, "")
+		.replace(/Respond with the complete[\s\S]*$/i, "")
+		.replace(/<\/?[^>]+>/g, " ")
+		.replace(/\s+/g, " ")
+		.trim();
+
+	const brief = cleaned.slice(0, 120) || "your request";
+	return brief
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;");
+}
+
 function mockTemplateHtml(prompt: string) {
-	const safe = prompt.replace(/</g, "&lt;");
-	return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notification</title>
-</head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f5; color: #18181b; margin: 0; padding: 40px 20px;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 560px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; border: 1px solid #e4e4e7; padding: 32px;">
-    <tr>
-      <td>
-        <h1 style="color: #09090b; font-size: 24px; font-weight: 700; margin-top: 0; margin-bottom: 16px;">Generated with AI</h1>
-        <p style="color: #52525b; font-size: 15px; line-height: 1.6; margin-bottom: 24px;">Here is your custom email template generated for: <strong>"${safe}"</strong>.</p>
-        <p style="color: #52525b; font-size: 15px; line-height: 1.6; margin-bottom: 28px;">Hi {{first_name}}, welcome — we're excited to help you get started.</p>
-        <a href="https://reloop.dev" style="display: inline-block; background-color: #18181b; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; padding: 12px 24px; border-radius: 8px;">Get Started Now &rarr;</a>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
+	const safe = extractUserBriefForMock(prompt);
+	return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background-color:#ffffff;border-radius:16px;border:1px solid #e4e4e7;">
+  <tr>
+    <td style="padding:32px;">
+      <p style="margin:0 0 8px;font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#71717a;">Preview</p>
+      <h1 style="color:#09090b;font-size:24px;font-weight:700;margin:0 0 16px;line-height:1.25;">You're all set</h1>
+      <p style="color:#52525b;font-size:15px;line-height:1.6;margin:0 0 16px;">Hi {{first_name}} — here's a starter template for <strong>${safe}</strong>.</p>
+      <p style="color:#52525b;font-size:15px;line-height:1.6;margin:0 0 28px;">Connect a model (Ollama/Gemma, Gemini, or OpenAI) for full AI generation. This is a local fallback so the editor never shows raw prompts.</p>
+      <a href="https://reloop.dev" style="display:inline-block;background-color:#18181b;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:12px 24px;border-radius:8px;">Get Started Now &rarr;</a>
+    </td>
+  </tr>
+</table>`;
 }
 
 /**
