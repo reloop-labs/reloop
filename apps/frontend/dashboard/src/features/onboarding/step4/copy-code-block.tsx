@@ -259,10 +259,15 @@ export function CopyCodeBlock({
 								>
 									<svg
 										viewBox="0 0 24 24"
-										className="size-3.5 shrink-0"
+										className={cn(
+											"size-3.5 shrink-0 transition-colors",
+											isActive
+												? ""
+												: "text-text-strong-950 dark:text-white",
+										)}
 										fill="currentColor"
 										xmlns="http://www.w3.org/2000/svg"
-										style={{ color: brandColor }}
+										style={{ color: isActive ? brandColor : undefined }}
 										aria-hidden="true"
 									>
 										<path d={tab.si.path} />
@@ -331,10 +336,9 @@ export function CopyCodeBlock({
 									(si && (
 										<svg
 											viewBox="0 0 24 24"
-											className="size-3.5 shrink-0"
+											className="size-3.5 shrink-0 text-text-strong-950 dark:text-white"
 											fill="currentColor"
 											xmlns="http://www.w3.org/2000/svg"
-											style={{ color: `#${si.hex}` }}
 											aria-hidden="true"
 										>
 											<path d={si.path} />

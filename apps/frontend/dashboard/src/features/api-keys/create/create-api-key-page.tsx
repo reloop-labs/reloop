@@ -116,6 +116,17 @@ export function CreateApiKeyPage() {
 		void navigate({ to: "/api-keys" });
 	};
 
+	const handleContinue = () => {
+		if (createdApiKey?.id) {
+			void navigate({
+				to: "/api-keys/$apiKeyId",
+				params: { apiKeyId: createdApiKey.id },
+			});
+		} else {
+			void navigate({ to: "/api-keys" });
+		}
+	};
+
 	const handleLangChange = (langId: LanguageId) => {
 		setSelectedLang(langId);
 		if (langId === "nodejs") {
@@ -235,7 +246,7 @@ async fn main() -> Result<(), Box<dyn std.error::Error>> {
 		<div className="mx-auto max-w-xl px-6 py-12">
 			{!createdApiKey ? (
 				/* Phase 1: Create Form */
-				<form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+				<form onSubmit={handleSubmit(onSubmit)}>
 					{/* Header Section */}
 					<div>
 						<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
@@ -247,7 +258,7 @@ async fn main() -> Result<(), Box<dyn std.error::Error>> {
 					</div>
 
 					{/* Field */}
-					<div className="space-y-2">
+					<div className="space-y-2 pt-7">
 						<div className="flex items-center gap-1.5">
 							<Label.Root htmlFor="api-key-name">
 								API key name
@@ -288,7 +299,7 @@ async fn main() -> Result<(), Box<dyn std.error::Error>> {
 					</div>
 
 					{/* Action Buttons */}
-					<div className="flex items-center justify-end gap-3 pt-4">
+					<div className="flex items-center justify-end gap-3 pt-5">
 						<Button.Root
 							type="button"
 							variant="neutral"
@@ -399,15 +410,15 @@ async fn main() -> Result<(), Box<dyn std.error::Error>> {
 													width={13}
 													height={13}
 													aria-hidden
-													className="shrink-0"
-													fill={`#${lang.simpleIcon.hex}`}
+													className="shrink-0 text-text-strong-950 dark:text-white"
+													fill="currentColor"
 												>
 													<path d={lang.simpleIcon.path} />
 												</svg>
 											) : (
 												<Icon
 													name={lang.iconName || "terminal"}
-													className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+													className="h-3.5 w-3.5 shrink-0 text-text-strong-950 dark:text-white"
 												/>
 											)}
 											{lang.label}
@@ -489,7 +500,7 @@ async fn main() -> Result<(), Box<dyn std.error::Error>> {
 							type="button"
 							variant="blue"
 							size="small"
-							onClick={handleCancel}
+							onClick={handleContinue}
 							className="rounded-xl"
 						>
 							Continue
