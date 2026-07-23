@@ -117,6 +117,11 @@ export interface ApiDetailsDrawerProps {
 	docSection: string;
 	buttonProps?: React.ComponentPropsWithoutRef<typeof Button.Root>;
 	codeExtraPadding?: boolean;
+	/** Custom trigger (e.g. full-width card). Defaults to the code icon button. */
+	renderTrigger?: (args: {
+		isOpen: boolean;
+		open: () => void;
+	}) => React.ReactNode;
 }
 
 export const ApiDetailsDrawer = ({
@@ -129,6 +134,7 @@ export const ApiDetailsDrawer = ({
 	docSection,
 	buttonProps = {},
 	codeExtraPadding = false,
+	renderTrigger,
 }: ApiDetailsDrawerProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedLanguage, setSelectedLanguage] = useApiLanguage<string>(
@@ -307,36 +313,42 @@ export const ApiDetailsDrawer = ({
 		return `${snakeOp}.${ext}`;
 	};
 
+	const open = () => setIsOpen(true);
+
+	const defaultTrigger = (
+		<Tooltip.Provider>
+			<Tooltip.Root>
+				<Tooltip.Trigger asChild>
+					<Button.Root
+						variant={variant}
+						size={size}
+						mode={mode}
+						className={cn(
+							"aspect-square p-0",
+							isOpen && "bg-bg-weak-50",
+							className,
+						)}
+						onClick={open}
+						{...rest}
+					>
+						<Icon name="code" className="h-4 w-4" />
+					</Button.Root>
+				</Tooltip.Trigger>
+				<Tooltip.Content className="flex items-center gap-2 rounded-lg">
+					<p className="font-medium text-label-sm">{title}</p>
+					{hotkey && (
+						<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
+							{hotkey}
+						</span>
+					)}
+				</Tooltip.Content>
+			</Tooltip.Root>
+		</Tooltip.Provider>
+	);
+
 	return (
 		<Drawer.Root open={isOpen} onOpenChange={setIsOpen}>
-			<Tooltip.Provider>
-				<Tooltip.Root>
-					<Tooltip.Trigger asChild>
-						<Button.Root
-							variant={variant}
-							size={size}
-							mode={mode}
-							className={cn(
-								"aspect-square p-0",
-								isOpen && "bg-bg-weak-50",
-								className,
-							)}
-							onClick={() => setIsOpen(true)}
-							{...rest}
-						>
-							<Icon name="code" className="h-4 w-4" />
-						</Button.Root>
-					</Tooltip.Trigger>
-					<Tooltip.Content className="flex items-center gap-2 rounded-lg">
-						<p className="font-medium text-label-sm">{title}</p>
-						{hotkey && (
-							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
-								{hotkey}
-							</span>
-						)}
-					</Tooltip.Content>
-				</Tooltip.Root>
-			</Tooltip.Provider>
+			{renderTrigger ? renderTrigger({ isOpen, open }) : defaultTrigger}
 
 			<Drawer.Content className="w-[560px] max-w-[90vw]">
 				<div className="sticky top-0 z-30 border-stroke-soft-100/40 border-b bg-bg-white-0">
