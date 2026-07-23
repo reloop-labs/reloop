@@ -1,4 +1,5 @@
 import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
@@ -81,41 +82,35 @@ export function DeleteDomainModal({
 			>
 				{/* Header */}
 				<div className="pr-6">
-					<Modal.Title className="text-xl font-bold tracking-tight text-text-strong-950">
+					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 						Delete domain
 					</Modal.Title>
-					<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
-						Are you sure you want to delete this domain? This will also
-						disconnect any active connectors and remove all routes associated
-						with this domain. This action cannot be undone.
+					<p className="mt-2 text-sm text-text-sub-600 leading-relaxed">
+						Deleting{" "}
+						<span className="font-semibold">{domainToDelete?.domain}</span> will
+						stop email sending and receiving immediately. This action cannot be
+						undone.
 					</p>
 				</div>
 
 				{/* Domain Details Card */}
-				<div className="mt-5 space-y-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
+				<div className="mt-5 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
 					<div>
-						<p className="text-xs text-text-sub-600 font-normal">Domain name</p>
-						<p className="mt-0.5 truncate text-sm font-semibold text-text-strong-950">
+						<p className="font-normal text-text-sub-600 text-xs">Domain name</p>
+						<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
 							{domainToDelete?.domain}
-						</p>
-					</div>
-					<div>
-						<p className="text-xs text-text-sub-600 font-normal">Domain ID</p>
-						<p className="mt-0.5 break-all font-mono text-sm text-text-strong-950 dark:text-text-sub-600">
-							{domainToDelete?.id}
 						</p>
 					</div>
 				</div>
 
 				{/* Warning Banner */}
-				<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-xs leading-relaxed text-[#8A5300] dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
+				<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
 					<span className="font-bold text-[#6D4000] dark:text-amber-100">
-						Warning:
+						Important Note:
 					</span>{" "}
-					Deleting this domain will permanently remove it along with all its
-					routes and connections. Any services using this domain will stop
-					working. The associated DNS records will not be removed and must be
-					deleted manually.
+					DNS records for this domain won't be deleted automatically — you'll
+					need to remove them manually from your DNS provider, or email may
+					continue to be routed incorrectly.
 				</div>
 
 				{/* Footer Actions */}
@@ -130,9 +125,9 @@ export function DeleteDomainModal({
 					>
 						Cancel
 					</Button.Root>
-					<Button.Root
+					<FancyButton.Root
 						type="button"
-						variant="primary"
+						variant="destructive"
 						size="small"
 						disabled={isDeleting}
 						onClick={() => void handleDelete()}
@@ -145,7 +140,7 @@ export function DeleteDomainModal({
 						) : (
 							"Delete domain"
 						)}
-					</Button.Root>
+					</FancyButton.Root>
 				</div>
 			</Modal.Content>
 		</Modal.Root>
