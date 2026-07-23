@@ -1,12 +1,11 @@
-
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { DateRangeFilter } from "./date-range-filter";
 import { useLogsQuery } from "./hooks/use-logs-query";
 import { LogDetailPanel } from "./log-detail-panel";
@@ -305,7 +304,7 @@ export function LogList({
 				<div
 					className={cn(
 						"w-full text-paragraph-sm",
-						!isMobile && "sticky top-4 w-[480px] flex-shrink-0 self-start",
+						!isMobile && "sticky top-4 w-[540px] flex-shrink-0 self-start",
 					)}
 				>
 					<LogTable

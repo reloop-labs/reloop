@@ -1,19 +1,12 @@
-
-import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
-import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-
-interface LogData {
-	uuid: string;
-	event: string;
-	level: string;
-	status_code?: number | null;
-	created_at: string;
-}
+import * as Tooltip from "@reloop/ui/tooltip";
+import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
+import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
+import type { LogData } from "./types";
 
 interface LogTableProps {
 	logs: LogData[];
@@ -38,15 +31,14 @@ interface LogTableProps {
 }
 
 /** Grid template used for the header and every row */
-const GRID_COLS = "grid-cols-[62px_44px_minmax(0,1fr)_90px]";
+const GRID_COLS = "grid-cols-[62px_44px_minmax(0,1fr)_64px]";
 
 /** Returns status label and badge color */
 const getStatusProps = (statusCode: number | null | undefined) => {
 	if (!statusCode) return null;
 
-	// Determine status label & color
 	let label = `${statusCode}`;
-	let color = "gray";
+	let color: "gray" | "blue" | "orange" | "red" = "gray";
 
 	if (statusCode >= 200 && statusCode < 300) {
 		label = `${statusCode} OK`;
@@ -65,8 +57,7 @@ const getStatusProps = (statusCode: number | null | undefined) => {
 	return { label, color };
 };
 
-/** Returns method badge color */
-const getMethodBadgeClass = (method: string) => {
+const getMethodColorClass = (method: string) => {
 	switch (method?.toUpperCase()) {
 		case "GET":
 			return "text-emerald-700 dark:text-emerald-400";
@@ -84,23 +75,11 @@ const getMethodBadgeClass = (method: string) => {
 	}
 };
 
-/** Left border accent for the selected row */
-const getSelectedBorderClass = (
-	statusCode: number | null | undefined,
-	isSelected: boolean,
-) => {
-	if (!isSelected) return "border-l-2 border-l-transparent";
-	if (!statusCode || (statusCode >= 200 && statusCode < 400))
-		return "border-l-2 border-l-primary-base";
-	return "border-l-2 border-l-error-base";
-};
-
-/** Format time as "4:24:00 PM" */
+/** Format time as "4:24 PM" (no seconds — date band provides day context) */
 const formatTime = (dateStr: string) => {
 	return new Date(dateStr).toLocaleTimeString("en-US", {
 		hour: "numeric",
 		minute: "2-digit",
-		second: "2-digit",
 		hour12: true,
 	});
 };
@@ -160,16 +139,49 @@ const stripBasePath = (url: string) => {
 	}
 };
 
-/** Extract method and endpoint from a log event + requestDetails */
-const getMethodAndEndpoint = (
-	log: LogData & { requestDetails?: Record<string, unknown> },
-) => {
-	const method = (log.requestDetails?.method as string) || "";
+/** Extract method and endpoint path from a log */
+const getMethodAndEndpoint = (log: LogData) => {
+	const method =
+		typeof log.requestDetails?.method === "string"
+			? log.requestDetails.method
+			: "";
 	const rawEndpoint =
-		(log.requestDetails?.endpoint as string) || log.event || "";
+		typeof log.requestDetails?.endpoint === "string"
+			? log.requestDetails.endpoint
+			: log.event || "";
 	const endpoint = stripBasePath(rawEndpoint);
 	return { method, endpoint };
 };
+
+function TruncatedPath({ path }: { path: string }) {
+	return (
+		<Tooltip.Root>
+			<Tooltip.Trigger asChild>
+				<span className="min-w-0 truncate font-mono text-text-strong-950 text-xs">
+					{path}
+				</span>
+			</Tooltip.Trigger>
+			<Tooltip.Content
+				side="top"
+				variant="light"
+				className="max-w-sm break-all font-mono text-xs"
+			>
+				{path}
+			</Tooltip.Content>
+		</Tooltip.Root>
+	);
+}
+
+function LogRowSkeleton() {
+	return (
+		<div className={cn("grid items-center gap-2 px-4 py-2.5", GRID_COLS)}>
+			<Skeleton className="h-5 w-14 rounded-md" />
+			<Skeleton className="h-3.5 w-8 rounded" />
+			<Skeleton className="h-3.5 w-full max-w-[240px] rounded" />
+			<Skeleton className="ml-auto h-3.5 w-12 rounded" />
+		</div>
+	);
+}
 
 export const LogTable = ({
 	logs,
@@ -189,6 +201,8 @@ export const LogTable = ({
 	onPageSizeChange,
 	isMobile,
 }: LogTableProps) => {
+	const showHeader = isLoading || logs.length > 0;
+
 	return (
 		<div
 			className={cn(
@@ -197,6 +211,32 @@ export const LogTable = ({
 			)}
 			style={!isMobile ? { maxHeight: "calc(100vh - 220px)" } : undefined}
 		>
+			{/* Sticky column headers — outside scroll body */}
+			{showHeader && (
+				<div
+					className={cn(
+						"grid flex-shrink-0 items-center gap-2 border-stroke-soft-100 border-b px-4 py-2.5 text-text-sub-600 dark:border-stroke-soft-100/50",
+						GRID_COLS,
+					)}
+				>
+					<div className="flex items-center gap-1.5 text-xs">
+						<Icon name="check-circle" className="h-3.5 w-3.5" />
+						<span className="font-medium">Status</span>
+					</div>
+					<div className="flex items-center gap-1.5 text-xs">
+						<span className="font-medium">Method</span>
+					</div>
+					<div className="flex items-center gap-1.5 text-xs">
+						<Icon name="activity-2" className="h-3.5 w-3.5" />
+						<span className="font-medium">Request</span>
+					</div>
+					<div className="flex items-center justify-end gap-1.5 text-xs">
+						<Icon name="clock" className="h-3.5 w-3.5" />
+						<span className="font-medium">Time</span>
+					</div>
+				</div>
+			)}
+
 			{/* Scrollable Table Body */}
 			<div
 				className={cn(
@@ -206,18 +246,7 @@ export const LogTable = ({
 			>
 				{isLoading ? (
 					Array.from({ length: loadingRows }).map((_, i) => (
-						<div
-							key={`skel-${i}`}
-							className={cn(
-								"grid items-center border-l-2 border-l-transparent px-4 py-2.5",
-								GRID_COLS,
-							)}
-						>
-							<Skeleton className="h-5 w-16 rounded-md" />
-							<Skeleton className="h-4 w-10 rounded" />
-							<Skeleton className="h-4 w-full max-w-[280px] rounded" />
-							<Skeleton className="ml-auto h-4 w-20 rounded" />
-						</div>
+						<LogRowSkeleton key={`skel-${i}`} />
 					))
 				) : logs.length === 0 ? (
 					hasFilters ? (
@@ -259,82 +288,88 @@ export const LogTable = ({
 						</div>
 					)
 				) : (
-					groupLogsByDate(logs as any).map((group) => (
-						<div key={group.dateKey}>
-							{/* Date separator */}
-							<div className="sticky top-0 z-10 flex items-center gap-3 border-stroke-soft-100 border-b bg-bg-weak-50 px-4 py-2.5 dark:border-stroke-soft-100/40">
-								<span className="font-medium text-text-sub-600 text-xs uppercase tracking-widest">
-									{group.dateLabel}
-								</span>
-							</div>
+					<Tooltip.Provider delayDuration={400}>
+						{groupLogsByDate(logs).map((group) => (
+							<div key={group.dateKey}>
+								{/* Date separator with count */}
+								<div className="sticky top-0 z-10 flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-weak-50 px-4 py-2 dark:border-stroke-soft-100/40">
+									<span className="font-medium text-text-sub-600 text-xs uppercase tracking-widest">
+										{group.dateLabel}
+									</span>
+									<span className="text-text-soft-400 text-xs tabular-nums">
+										· {group.logs.length}
+									</span>
+								</div>
 
-							{/* Log rows */}
-							<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
-								{group.logs.map((log) => {
-									const logAny = log as any;
-									const { method, endpoint } = getMethodAndEndpoint(logAny);
-									const statusProps = getStatusProps(log.status_code);
-									const isSelected = selectedLogId === log.uuid;
+								{/* Log rows */}
+								<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
+									{group.logs.map((log) => {
+										const { method, endpoint } = getMethodAndEndpoint(log);
+										const statusProps = getStatusProps(log.status_code);
+										const isSelected = selectedLogId === log.uuid;
+										const primaryPath = endpoint || log.event;
 
-									return (
-										<button
-											key={log.uuid}
-											type="button"
-											onClick={() => onRowClick?.(log.uuid)}
-											className={cn(
-												"group/row grid w-full cursor-pointer items-center px-4 py-2 text-left transition-colors",
-												GRID_COLS,
-												getSelectedBorderClass(log.status_code, isSelected),
-												isSelected
-													? "bg-bg-weak-50/80 dark:bg-bg-weak-50/30"
-													: "hover:bg-bg-weak-50/50 dark:hover:bg-bg-weak-50/10",
-												"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-inset",
-											)}
-										>
-											{/* Status */}
-											<div className="flex w-full flex-shrink-0 items-center justify-start">
-												{statusProps ? (
-													<Badge.Root
-														variant="lighter"
-														color={statusProps.color as any}
-														className="h-[18px] rounded-md px-1.5 font-semibold text-[10px] tracking-normal"
-													>
-														{statusProps.label}
-													</Badge.Root>
-												) : (
-													<span className="font-semibold text-[11px] text-text-soft-400">
-														—
-													</span>
-												)}
-											</div>
-
-											{/* Method */}
-											<span
+										return (
+											<button
+												key={log.uuid}
+												type="button"
+												onClick={() => onRowClick?.(log.uuid)}
 												className={cn(
-													"flex-shrink-0 font-semibold text-[11px] uppercase tracking-wide",
-													method
-														? getMethodBadgeClass(method)
-														: "text-text-soft-400",
+													"group/row grid w-full cursor-pointer items-center gap-2 px-4 py-2 text-left transition-colors duration-150",
+													GRID_COLS,
+													isSelected
+														? "bg-bg-weak-50/50"
+														: "hover:bg-bg-weak-50/50 dark:hover:bg-bg-weak-50/10",
+													"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-inset",
 												)}
 											>
-												{method || "—"}
-											</span>
+												{/* Status */}
+												<div className="flex w-full flex-shrink-0 items-center justify-start">
+													{statusProps ? (
+														<Badge.Root
+															variant="lighter"
+															color={statusProps.color}
+															className="h-[18px] rounded-md px-1.5 font-semibold text-[10px] tracking-normal"
+														>
+															{statusProps.label}
+														</Badge.Root>
+													) : (
+														<span className="font-semibold text-[11px] text-text-soft-400">
+															—
+														</span>
+													)}
+												</div>
 
-											{/* Endpoint / Event */}
-											<span className="truncate font-mono text-text-strong-950 text-xs">
-												{endpoint || log.event}
-											</span>
+												{/* Method */}
+												<span
+													className={cn(
+														"flex-shrink-0 font-semibold text-[11px] uppercase tracking-wide",
+														method
+															? getMethodColorClass(method)
+															: "text-text-soft-400",
+													)}
+												>
+													{method || "—"}
+												</span>
 
-											{/* Time */}
-											<span className="flex-shrink-0 text-right text-text-sub-600 text-xs tabular-nums">
-												{formatTime(log.created_at)}
-											</span>
-										</button>
-									);
-								})}
+												{/* Endpoint / Event */}
+												{primaryPath ? (
+													<TruncatedPath path={primaryPath} />
+												) : (
+													<span className="text-text-soft-400 text-xs">—</span>
+												)}
+
+												{/* Time */}
+												<span className="flex-shrink-0 text-right text-text-sub-600 text-xs tabular-nums">
+													{formatTime(log.created_at)}
+												</span>
+											</button>
+										);
+									})}
+								</div>
 							</div>
-						</div>
-					))
+						))}
+					</Tooltip.Provider>
 				)}
 			</div>
 

@@ -48,17 +48,23 @@ export function TemplateList() {
 		}) || [];
 
 	return (
-		<div className="mx-auto max-w-7xl space-y-8 p-6 lg:p-8">
-			<div className="flex items-center justify-between pb-6">
-				<p className="font-medium text-2xl">
-					Template{data?.templates.length !== 1 ? "s" : ""}
-				</p>
+		<div className="mx-auto max-w-7xl space-y-6 p-6 lg:p-8">
+			<div className="flex items-center justify-between pt-2 pb-2">
+				<div>
+					<h1 className="font-semibold text-text-strong-950 text-title-h5">
+						Templates
+					</h1>
+					<p className="mt-1 text-paragraph-sm text-text-sub-600">
+						Design and manage reusable email templates.
+					</p>
+				</div>
 				<div className="flex items-center gap-2">
 					<Button.Root
 						variant="neutral"
 						size="xsmall"
 						onClick={() => void handleCreateTemplate()}
 						disabled={isCreating}
+						className="gap-1.5"
 					>
 						{isCreating ? (
 							<Spinner size={16} />
@@ -74,7 +80,7 @@ export function TemplateList() {
 				{error ? (
 					<div className="flex flex-col items-center justify-center gap-2 p-4">
 						<Icon name="alert-circle" className="h-8 w-8 text-error-base" />
-						<p className="text-center text-sm text-text-sub-600">
+						<p className="text-center text-paragraph-sm text-text-sub-600">
 							Failed to load templates
 						</p>
 						<Button.Root
@@ -91,8 +97,8 @@ export function TemplateList() {
 				) : (
 					<div>
 						<div className="mt-2 flex items-center gap-3">
-							<div className="flex-1">
-								<Input.Root size="small" className="rounded-xl">
+							<div className="max-w-md flex-1">
+								<Input.Root size="small">
 									<Input.Wrapper>
 										<Input.Icon as={Icon} name="search" />
 										<Input.Input
@@ -105,7 +111,7 @@ export function TemplateList() {
 								</Input.Root>
 							</div>
 						</div>
-						<div className="mt-4">
+						<div className="mt-6">
 							<TemplateGrid
 								templates={filteredTemplates}
 								isLoading={isLoading}
