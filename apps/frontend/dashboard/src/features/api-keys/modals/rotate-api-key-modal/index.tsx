@@ -1,5 +1,6 @@
 import * as Modal from "@reloop/ui/modal";
 import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -94,17 +95,35 @@ export function RotateApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
 					if (rotatedApiKey) e.preventDefault();
 				}}
 			>
-				{!rotatedApiKey ? (
-					<ConfirmStep
-						displayName={displayName}
-						keyPrefix={keyPrefix}
-						isRotating={isRotating}
-						onClose={handleClose}
-						onRotate={() => void handleRotate()}
-					/>
-				) : (
-					<SuccessStep secret={rotatedApiKey.key} onDone={handleClose} />
-				)}
+				<AnimatePresence mode="wait" initial={false}>
+					{!rotatedApiKey ? (
+						<motion.div
+							key="confirm"
+							initial={{ opacity: 0, y: 6 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -6 }}
+							transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+						>
+							<ConfirmStep
+								displayName={displayName}
+								keyPrefix={keyPrefix}
+								isRotating={isRotating}
+								onClose={handleClose}
+								onRotate={() => void handleRotate()}
+							/>
+						</motion.div>
+					) : (
+						<motion.div
+							key="success"
+							initial={{ opacity: 0, y: 6 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -6 }}
+							transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+						>
+							<SuccessStep secret={rotatedApiKey.key} onDone={handleClose} />
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</Modal.Content>
 		</Modal.Root>
 	);

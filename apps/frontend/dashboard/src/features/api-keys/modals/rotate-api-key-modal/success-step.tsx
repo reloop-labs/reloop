@@ -3,6 +3,7 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
+import { motion } from "framer-motion";
 import { useState } from "react";
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
 
@@ -48,7 +49,11 @@ export function SuccessStep({
 						>
 							{tab === "key" ? "API Key" : ".env"}
 							{activeTab === tab && (
-								<span className="absolute right-0 bottom-0 left-0 h-[1.5px] rounded-full bg-text-strong-950 dark:bg-white" />
+								<motion.span
+									layoutId="rotate-modal-active-tab"
+									transition={{ type: "spring", stiffness: 400, damping: 30 }}
+									className="absolute right-0 bottom-0 left-0 h-[1.5px] rounded-full bg-text-strong-950 dark:bg-white"
+								/>
 							)}
 						</button>
 					))}
