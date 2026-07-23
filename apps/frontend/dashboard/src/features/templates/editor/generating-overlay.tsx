@@ -20,24 +20,24 @@ const StreamingSkeleton = () => {
 	return (
 		<div className="fade-in mx-auto w-full max-w-[600px] animate-in px-8 py-10 duration-500">
 			<div className="space-y-4">
-				<div className="select-none break-all font-mono text-[10px] text-fg-muted/30 leading-[1.6] transition-all duration-75">
+				<div className="select-none break-all font-mono text-[10px] text-text-soft-400/40 leading-[1.6] transition-all duration-75">
 					{text.substring(0, 150)}
 				</div>
-				<div className="select-none break-all font-mono text-[10px] text-fg-muted/20 leading-[1.6] transition-all duration-75">
+				<div className="select-none break-all font-mono text-[10px] text-text-soft-400/25 leading-[1.6] transition-all duration-75">
 					{text.substring(150, 300)}
 				</div>
-				<div className="select-none break-all font-mono text-[10px] text-fg-muted/10 leading-[1.6] transition-all duration-75">
+				<div className="select-none break-all font-mono text-[10px] text-text-soft-400/15 leading-[1.6] transition-all duration-75">
 					{text.substring(300, 400)}
 				</div>
 			</div>
 
 			<div className="mt-8 flex items-center justify-center gap-3">
 				<div className="flex gap-1">
-					<div className="h-1 w-1 animate-bounce rounded-full bg-brand-default [animation-delay:-0.3s]" />
-					<div className="h-1 w-1 animate-bounce rounded-full bg-brand-default [animation-delay:-0.15s]" />
-					<div className="h-1 w-1 animate-bounce rounded-full bg-brand-default" />
+					<div className="h-1 w-1 animate-bounce rounded-full bg-primary-base [animation-delay:-0.3s]" />
+					<div className="h-1 w-1 animate-bounce rounded-full bg-primary-base [animation-delay:-0.15s]" />
+					<div className="h-1 w-1 animate-bounce rounded-full bg-primary-base" />
 				</div>
-				<span className="font-bold text-[10px] text-fg-muted uppercase tracking-widest opacity-50">
+				<span className="font-semibold text-[10px] text-text-soft-400 uppercase tracking-widest">
 					Generating email template...
 				</span>
 			</div>
@@ -62,7 +62,7 @@ export const GeneratingOverlay = () => {
 					title="Template preview"
 					sandbox=""
 					srcDoc={previewHtml}
-					className="mb-10 h-[300px] w-full overflow-hidden border-none opacity-40 transition-opacity duration-300"
+					className="mb-10 h-[300px] w-full overflow-hidden rounded-xl border border-stroke-soft-100 border-none opacity-40 transition-opacity duration-300"
 					tabIndex={-1}
 					aria-hidden="true"
 				/>

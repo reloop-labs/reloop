@@ -44,7 +44,7 @@ export const DeleteTemplateVariableModal = ({
 					<Modal.Body className="space-y-2">
 						<p className="text-paragraph-sm text-text-sub-600 leading-relaxed">
 							Are you sure you want to delete the variable <br />
-							<code className="rounded bg-bg-soft-200 px-1.5 py-0.5 font-mono text-error-base text-xs dark:bg-zinc-800">
+							<code className="rounded bg-bg-soft-200 px-1.5 py-0.5 font-mono text-error-base text-xs dark:bg-bg-soft-200">
 								{"{{{"} {variableName} {"}}}"}
 							</code>
 							? This action cannot be undone.

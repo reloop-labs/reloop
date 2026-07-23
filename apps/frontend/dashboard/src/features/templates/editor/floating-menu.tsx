@@ -24,10 +24,10 @@ export function FloatingMenu() {
 	return (
 		<Tooltip.Provider>
 			<div className="-translate-x-1/2 absolute bottom-6 left-1/2 z-10">
-				<div className="flex items-center gap-1 rounded-full border border-white/10 bg-bg-strong-950 p-1.5 text-white shadow-2xl backdrop-blur-md">
+				<div className="flex items-center gap-1 rounded-full border border-stroke-soft-100/20 bg-bg-strong-950 p-1.5 text-static-white shadow-regular-md backdrop-blur-md">
 					{floatingCommands.map((item, index) => {
 						return (
-							<Tooltip.Root key={index}>
+							<Tooltip.Root key={item.title ?? index}>
 								<Tooltip.Trigger asChild>
 									<button
 										type="button"
@@ -52,7 +52,7 @@ export function FloatingMenu() {
 												}
 											}
 										}}
-										className="flex items-center justify-center rounded-full p-2 transition-all duration-200 hover:scale-110 hover:bg-white/15 active:scale-95"
+										className="flex items-center justify-center rounded-full p-2 text-static-white transition-colors duration-200 hover:bg-static-white/15 active:scale-95"
 									>
 										<div className="flex size-5 items-center justify-center">
 											{typeof item.icon === "function"

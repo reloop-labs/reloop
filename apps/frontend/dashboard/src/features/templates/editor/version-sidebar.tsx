@@ -5,8 +5,8 @@ import { Icon } from "@reloop/ui/icon";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import * as Tooltip from "@reloop/ui/tooltip";
+import Spinner from "@reloop/ui/spinner";
 import { useCurrentEditor } from "@tiptap/react";
-import { Clock, Eye, Loader2, Trash2, UploadCloud, X } from "lucide-react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -169,7 +169,7 @@ function PublishVersionModal({
 									placeholder="Describe what changed in this version..."
 									value={description}
 									onChange={(e) => setDescription(e.target.value)}
-									className="h-20 w-full rounded-lg border border-stroke-soft-200 bg-white p-2 text-xs text-zinc-900 outline-none focus:border-zinc-500 dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a] dark:text-zinc-50"
+									className="h-20 w-full rounded-lg border border-stroke-soft-200 bg-bg-white-0 p-2 text-paragraph-xs text-text-strong-950 outline-none focus:border-stroke-soft-200 dark:border-stroke-soft-100/40"
 								/>
 							</div>
 						)}
@@ -494,18 +494,18 @@ export function VersionSidebar() {
 	};
 
 	return (
-		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a]">
+		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
 			{/* Header */}
 			<div className="flex shrink-0 items-center justify-between pt-3 pr-4 pb-4 pl-6">
-				<h2 className="font-semibold text-lg text-zinc-900 dark:text-zinc-50">
+				<h2 className="font-semibold text-label-lg text-text-strong-950">
 					Version History
 				</h2>
 				<button
 					type="button"
 					onClick={() => setViewMode("visual")}
-					className="rounded-lg p-1.5 text-zinc-400 transition-all hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-300"
+					className="rounded-lg p-1.5 text-text-soft-400 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
 				>
-					<X size={18} />
+					<Icon name="cross" className="h-[18px] w-[18px]" />
 				</button>
 			</div>
 
@@ -513,21 +513,18 @@ export function VersionSidebar() {
 			<div className="flex-1 overflow-y-auto px-4 pb-6">
 				{isLoading ? (
 					<div className="flex items-center justify-center py-12">
-						<Loader2
-							size={18}
-							className="animate-spin text-text-disabled-300"
-						/>
+						<Spinner size={18} />
 					</div>
 				) : currentList.length === 0 ? (
 					<div className="space-y-3 px-4 py-12 text-center">
-						<div className="mx-auto flex size-10 items-center justify-center rounded-full bg-bg-soft-200 dark:bg-zinc-900">
-							<Clock
-								size={18}
-								className="text-text-disabled-300 dark:text-zinc-500"
+						<div className="mx-auto flex size-10 items-center justify-center rounded-full bg-bg-soft-200">
+							<Icon
+								name="clock"
+								className="h-[18px] w-[18px] text-text-disabled-300"
 							/>
 						</div>
 						<div className="space-y-1">
-							<p className="font-semibold text-text-strong-950 text-xs dark:text-zinc-200">
+							<p className="font-semibold text-text-strong-950 text-xs">
 								No versions yet
 							</p>
 							<p className="mx-auto max-w-[180px] text-[11px] text-text-soft-400 leading-normal">
@@ -566,7 +563,7 @@ export function VersionSidebar() {
 										{currentList.length > 1 && (
 											<div
 												className={cn(
-													"-translate-x-1/2 absolute left-1/2 w-[1px] bg-zinc-200 dark:bg-zinc-800",
+													"-translate-x-1/2 absolute left-1/2 w-[1px] bg-stroke-soft-200",
 													index === 0
 														? "top-[26px] bottom-0"
 														: index === currentList.length - 1
@@ -582,29 +579,29 @@ export function VersionSidebar() {
 												className={cn(
 													"relative z-10 flex h-[20px] w-[40px] select-none items-center justify-center rounded-full font-semibold text-[10px] transition-all",
 													isActive
-														? "bg-black text-white dark:bg-zinc-100 dark:text-black"
-														: "bg-zinc-100 text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400",
+														? "bg-bg-strong-950 text-static-white"
+														: "bg-bg-weak-50 text-text-sub-600",
 												)}
 											>
 												{displayLabel}
 											</span>
 										) : (
 											<div className="relative z-10 flex h-[20px] w-[40px] items-center justify-center">
-												<div className="h-[6px] w-[6px] rounded-full bg-zinc-300 dark:bg-zinc-600" />
+												<div className="h-[6px] w-[6px] rounded-full bg-stroke-soft-200" />
 											</div>
 										)}
 									</div>
 
 									{/* Content Column */}
 									<div className="flex min-w-0 flex-1 flex-col justify-start pt-4 pr-[92px] pb-4 pl-4">
-										<h4 className="break-words font-medium text-sm text-zinc-900 leading-snug dark:text-zinc-100">
+										<h4 className="break-words font-medium text-label-sm text-text-strong-950 leading-snug">
 											{version.description ||
 												version.name ||
 												(version.isMajor
 													? "Published version"
 													: "Draft version")}
 										</h4>
-										<div className="mt-1 flex items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500">
+										<div className="mt-1 flex items-center gap-1.5 text-paragraph-xs text-text-soft-400">
 											<Avatar.Root size="16" color="gray" className="shrink-0">
 												{version.createdBy?.image && (
 													<Avatar.Image
@@ -619,7 +616,7 @@ export function VersionSidebar() {
 												<Avatar.Image asChild>
 													<span
 														className={cn(
-															"flex h-full w-full items-center justify-center font-medium text-[8px] text-white",
+															"flex h-full w-full items-center justify-center font-medium text-[8px] text-static-white",
 															getAvatarGradient(
 																version.createdBy?.email ||
 																	"developer@reloop.co",
@@ -665,7 +662,7 @@ export function VersionSidebar() {
 															<Avatar.Image asChild>
 																<span
 																	className={cn(
-																		"flex h-full w-full items-center justify-center font-medium text-white",
+																		"flex h-full w-full items-center justify-center font-medium text-static-white",
 																		getAvatarGradient(
 																			version.createdBy?.email ||
 																				"developer@reloop.co",
@@ -709,9 +706,9 @@ export function VersionSidebar() {
 														setVersionToPublish(version);
 														setIsPublishModalOpen(true);
 													}}
-													className="size-6 rounded-md p-1 text-zinc-500 transition-all duration-150 ease-out hover:scale-110 hover:bg-zinc-100 active:scale-90 dark:text-zinc-400 dark:hover:bg-zinc-800"
+													className="size-6 rounded-md p-1 text-text-sub-600 transition-all duration-150 ease-out hover:bg-bg-weak-50 active:scale-95"
 												>
-													<UploadCloud size={13} />
+													<Icon name="file-upload" className="h-3.5 w-3.5" />
 												</Button.Root>
 											</Tooltip.Trigger>
 											<Tooltip.Content side="top" variant="light">
@@ -733,9 +730,9 @@ export function VersionSidebar() {
 														setSelectedPreviewVersion(version);
 														setIsPreviewOpen(true);
 													}}
-													className="size-6 rounded-md p-1 text-zinc-500 transition-all duration-150 ease-out hover:scale-110 hover:bg-zinc-100 active:scale-90 dark:text-zinc-400 dark:hover:bg-zinc-800"
+													className="size-6 rounded-md p-1 text-text-sub-600 transition-all duration-150 ease-out hover:bg-bg-weak-50 active:scale-95"
 												>
-													<Eye size={13} />
+													<Icon name="eye-outline" className="h-3.5 w-3.5" />
 												</Button.Root>
 											</Tooltip.Trigger>
 											<Tooltip.Content side="top" variant="light">
@@ -761,12 +758,12 @@ export function VersionSidebar() {
 														setIsDeleteModalOpen(true);
 													}}
 													disabled={isDeleting}
-													className="size-6 rounded-md p-1 text-zinc-500 transition-all duration-150 ease-out hover:scale-110 hover:bg-red-50 hover:text-red-600 active:scale-90 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-red-950/40"
+													className="size-6 rounded-md p-1 text-text-sub-600 transition-all duration-150 ease-out hover:bg-error-lighter hover:text-error-base active:scale-95 disabled:opacity-50"
 												>
 													{isDeleting ? (
-														<Loader2 size={13} className="animate-spin" />
+														<Spinner size={13} />
 													) : (
-														<Trash2 size={13} />
+														<Icon name="trash" className="h-3.5 w-3.5" />
 													)}
 												</Button.Root>
 											</Tooltip.Trigger>

@@ -7,7 +7,6 @@ import * as Popover from "@reloop/ui/popover";
 import * as Textarea from "@reloop/ui/textarea";
 import { useNavigate } from "@tanstack/react-router";
 import { useCurrentEditor } from "@tiptap/react";
-import { ChevronDown, ChevronUp, Save } from "lucide-react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -219,22 +218,21 @@ function PublishModal({
 							<button
 								type="button"
 								onClick={() => setShowDiff((prev) => !prev)}
-								className="flex w-full items-center justify-between bg-bg-weak-50 px-4 py-2.5 transition-colors hover:bg-neutral-100 dark:bg-zinc-900/40 dark:hover:bg-zinc-800"
+								className="flex w-full items-center justify-between bg-bg-weak-50 px-4 py-2.5 transition-colors hover:bg-bg-soft-200"
 							>
 								<div className="flex items-center gap-2">
 									<Icon
 										name="refresh-cw"
 										className="size-4 text-text-sub-600"
 									/>
-									<span className="font-semibold text-text-strong-950 text-xs dark:text-zinc-200">
+									<span className="font-semibold text-label-xs text-text-strong-950">
 										Review changes before publishing
 									</span>
 								</div>
-								{showDiff ? (
-									<ChevronUp className="size-4 text-text-sub-600" />
-								) : (
-									<ChevronDown className="size-4 text-text-sub-600" />
-								)}
+								<Icon
+									name={showDiff ? "chevron-up" : "chevron-down"}
+									className="size-4 text-text-sub-600"
+								/>
 							</button>
 
 							{showDiff && (
@@ -562,7 +560,7 @@ export const EditorHeaderActions = ({
 				disabled={isSavingDraft}
 				className="gap-1.5"
 			>
-				<Save size={14} className="text-text-sub-600" />
+				<Icon name="file-text" className="h-3.5 w-3.5 text-text-sub-600" />
 				{isSavingDraft ? "Saving..." : "Save Draft"}
 			</Button.Root>
 

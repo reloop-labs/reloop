@@ -87,7 +87,7 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 					</AnimatePresence>
 
 					{/* Right panel (Visual builder + inspector) */}
-					<div className="relative m-2 flex flex-1 overflow-hidden rounded-[24px] border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+					<div className="relative m-2 flex flex-1 overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
 						<main className="flex h-full flex-1 flex-col overflow-hidden">
 							<SendDetails />
 							<GeneratingOverlay />
@@ -107,7 +107,7 @@ export function TemplateEditorPage({ templateId }: { templateId: string }) {
 										damping: 33,
 										opacity: { duration: 0.2 },
 									}}
-									className="my-2 mr-2 h-[calc(100%-16px)] shrink-0 overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]"
+									className="my-2 mr-2 h-[calc(100%-16px)] shrink-0 overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-stroke-soft-100/40"
 								>
 									<div className="h-full w-72 overflow-y-auto">
 										<EmailInspector />

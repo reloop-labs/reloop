@@ -1,9 +1,11 @@
+import * as ScrollArea from "@radix-ui/react-scroll-area";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
+import type { ReactNode } from "react";
 import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
 import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
 import type { LogData } from "./types";
@@ -84,15 +86,13 @@ const formatTime = (dateStr: string) => {
 	});
 };
 
-/** Format date header as "APR 3, 2024" */
+/** Format date header as "Jul 23, 2026" */
 const formatDateHeader = (dateStr: string) => {
-	return new Date(dateStr)
-		.toLocaleDateString("en-US", {
-			month: "short",
-			day: "numeric",
-			year: "numeric",
-		})
-		.toUpperCase();
+	return new Date(dateStr).toLocaleDateString("en-US", {
+		month: "short",
+		day: "numeric",
+		year: "numeric",
+	});
 };
 
 /** Get date key "YYYY-MM-DD" for grouping */
@@ -183,6 +183,48 @@ function LogRowSkeleton() {
 	);
 }
 
+function LogTableBody({
+	children,
+	isMobile,
+}: {
+	children: ReactNode;
+	isMobile?: boolean;
+}) {
+	if (isMobile) {
+		return (
+			<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
+				{children}
+			</div>
+		);
+	}
+
+	/*
+	 * Flex + max-height cards need an explicit height box. `h-0 flex-1` claims
+	 * remaining space; absolute Root fills it so Radix Viewport can overflow.
+	 */
+	return (
+		<div className="relative h-0 min-h-0 flex-1">
+			<ScrollArea.Root
+				type="hover"
+				className="absolute inset-0 overflow-hidden"
+			>
+				<ScrollArea.Viewport className="scrollbar-none size-full overscroll-contain rounded-[inherit] [&>div]:!block [&>div]:w-full">
+					<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50">
+						{children}
+					</div>
+				</ScrollArea.Viewport>
+				<ScrollArea.Scrollbar
+					orientation="vertical"
+					className="z-20 flex w-2.5 touch-none select-none bg-transparent p-0.5 data-[state=hidden]:pointer-events-none data-[state=hidden]:opacity-0"
+				>
+					<ScrollArea.Thumb className="relative flex-1 rounded-full bg-stroke-soft-200 hover:bg-text-soft-400 dark:bg-stroke-soft-100" />
+				</ScrollArea.Scrollbar>
+				<ScrollArea.Corner />
+			</ScrollArea.Root>
+		</div>
+	);
+}
+
 export const LogTable = ({
 	logs,
 	isLoading,
@@ -238,12 +280,7 @@ export const LogTable = ({
 			)}
 
 			{/* Scrollable Table Body */}
-			<div
-				className={cn(
-					"divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50",
-					!isMobile && "flex-1 overflow-y-auto",
-				)}
-			>
+			<LogTableBody isMobile={isMobile}>
 				{isLoading ? (
 					Array.from({ length: loadingRows }).map((_, i) => (
 						<LogRowSkeleton key={`skel-${i}`} />
@@ -291,13 +328,17 @@ export const LogTable = ({
 					<Tooltip.Provider delayDuration={400}>
 						{groupLogsByDate(logs).map((group) => (
 							<div key={group.dateKey}>
-								{/* Date separator with count */}
-								<div className="sticky top-0 z-10 flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-weak-50 px-4 py-2 dark:border-stroke-soft-100/40">
-									<span className="font-medium text-text-sub-600 text-xs uppercase tracking-widest">
+								{/* Date section — soft sticky band (API keys header + inbox section tone) */}
+								<div className="sticky top-0 z-10 flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-weak-50/70 px-4 py-1.5 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
+									<Icon
+										name="calendar"
+										className="h-3 w-3 shrink-0 text-text-soft-400"
+									/>
+									<span className="font-medium text-[11px] text-text-sub-600 tracking-wide">
 										{group.dateLabel}
 									</span>
-									<span className="text-text-soft-400 text-xs tabular-nums">
-										· {group.logs.length}
+									<span className="inline-flex h-4 min-w-4 items-center justify-center rounded-md bg-bg-white-0 px-1 font-medium text-[10px] text-text-soft-400 tabular-nums ring-1 ring-stroke-soft-100 dark:bg-bg-white-0/10 dark:ring-stroke-soft-100/40">
+										{group.logs.length}
 									</span>
 								</div>
 
@@ -371,7 +412,7 @@ export const LogTable = ({
 						))}
 					</Tooltip.Provider>
 				)}
-			</div>
+			</LogTableBody>
 
 			{/* Pagination — outside scrollable body, static at bottom of card */}
 			{total > 0 && (

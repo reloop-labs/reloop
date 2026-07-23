@@ -3,23 +3,10 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
+import { Icon } from "@reloop/ui/icon";
+import Spinner from "@reloop/ui/spinner";
 import { useCurrentEditor } from "@tiptap/react";
 import { motion } from "framer-motion";
-import {
-	AlertCircle,
-	Braces,
-	Check,
-	CheckCircle2,
-	Copy,
-	Loader2,
-	Pencil,
-	Plus,
-	Send,
-	ShieldAlert,
-	Sparkles,
-	Trash2,
-	X,
-} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
@@ -46,12 +33,12 @@ const fetcher = (url: string) =>
 
 /* colour palette for variable chips */
 const _CHIP_COLOURS = [
-	"bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/30 dark:text-violet-300 dark:border-violet-800/40",
-	"bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/30 dark:text-sky-300 dark:border-sky-800/40",
-	"bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800/40",
-	"bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800/40",
-	"bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-800/40",
-	"bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-300 dark:border-teal-800/40",
+	"border-feature-base/20 bg-feature-lighter text-feature-base",
+	"border-information-base/20 bg-information-lighter text-information-base",
+	"border-success-base/20 bg-success-lighter text-success-base",
+	"border-warning-base/20 bg-warning-lighter text-warning-base",
+	"border-error-base/20 bg-error-lighter text-error-base",
+	"border-stable-base/20 bg-stable-lighter text-stable-base",
 ];
 
 /* ------------------------------------------------------------------ */
@@ -197,10 +184,10 @@ export function VariablesPanel({ onClose }: PanelProps) {
 	};
 
 	return (
-		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a]">
+		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
 			{/* ── Header ── */}
 			<div className="flex shrink-0 items-center justify-between gap-2 pt-3 pr-4 pb-3 pl-6">
-				<h2 className="font-semibold text-lg text-zinc-900 dark:text-zinc-50">
+				<h2 className="font-semibold text-label-lg text-text-strong-950">
 					Variable
 				</h2>
 				<div className="flex items-center gap-1">
@@ -211,15 +198,15 @@ export function VariablesPanel({ onClose }: PanelProps) {
 						size="xxsmall"
 						onClick={() => setIsCreatingVar(true)}
 					>
-						<Plus size={12} />
+						<Icon name="plus" className="h-3 w-3" />
 						Create
 					</Button.Root>
 					<button
 						type="button"
 						onClick={() => onClose()}
-						className="rounded-lg p-1.5 text-zinc-400 transition-all hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-300"
+						className="rounded-lg p-1.5 text-text-soft-400 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
 					>
-						<X size={18} />
+						<Icon name="cross" className="h-[18px] w-[18px]" />
 					</button>
 				</div>
 			</div>
@@ -228,26 +215,23 @@ export function VariablesPanel({ onClose }: PanelProps) {
 			<div className="mt-2 flex-1 overflow-y-auto">
 				{isLoading ? (
 					<div className="flex items-center justify-center py-6">
-						<Loader2
-							size={14}
-							className="animate-spin text-text-disabled-300 dark:text-zinc-600"
-						/>
+						<Spinner size={14} />
 					</div>
 				) : detectedVars.length === 0 ? (
 					<div className="rounded-xl px-4 py-5 text-center">
 						<div className="mx-auto flex size-8 items-center justify-center">
-							<Braces size={14} />
+							<Icon name="brackets" className="h-3.5 w-3.5 text-text-sub-600" />
 						</div>
-						<p className="font-medium text-text-strong-950 text-xs dark:text-zinc-300">
+						<p className="font-medium text-text-strong-950 text-xs">
 							No variables yet
 						</p>
-						<p className="mt-2 text-[11px] text-text-soft-400 leading-normal dark:text-zinc-500">
+						<p className="mt-2 text-[11px] text-text-soft-400 leading-normal">
 							Create a variable or type{" "}
-							<code className="rounded bg-bg-soft-200 px-1 font-mono dark:bg-zinc-800">
+							<code className="rounded bg-bg-soft-200 px-1 font-mono dark:bg-bg-soft-200">
 								{"{{variable}}"}
 							</code>{" "}
 							or{" "}
-							<code className="rounded bg-bg-soft-200 px-1 font-mono dark:bg-zinc-800">
+							<code className="rounded bg-bg-soft-200 px-1 font-mono dark:bg-bg-soft-200">
 								{"{{{variable}}}"}
 							</code>{" "}
 							in your email
@@ -260,12 +244,12 @@ export function VariablesPanel({ onClose }: PanelProps) {
 							return (
 								<div
 									key={v.name}
-									className="group relative flex flex-col gap-1.5 rounded-2xl border border-stroke-soft-200 bg-white p-3 transition-all hover:border-stroke-soft-300 hover:bg-bg-weak-50 dark:border-stroke-soft-100/10 dark:bg-zinc-900/30 dark:hover:border-stroke-soft-100/20 dark:hover:bg-zinc-800/10"
+									className="group relative flex flex-col gap-1.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-3 transition-all hover:border-stroke-soft-200 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40 "
 								>
 									{/* Top Row: Name and Type Badge */}
 									<div className="flex items-center justify-between">
 										<div className="flex min-w-0 items-center gap-1.5">
-											<span className="truncate font-mono font-semibold text-text-strong-950 text-xs dark:text-zinc-100">
+											<span className="truncate font-mono font-semibold text-text-strong-950 text-xs">
 												{key}
 											</span>
 										</div>
@@ -283,14 +267,14 @@ export function VariablesPanel({ onClose }: PanelProps) {
 									{/* Middle Row: Default value if configured */}
 									<div className="flex min-w-0 items-center justify-between">
 										{v.defaultValue !== null && v.defaultValue !== "" ? (
-											<p className="truncate text-[10px] text-text-sub-600 dark:text-zinc-400">
+											<p className="truncate text-[10px] text-text-sub-600">
 												Default:{" "}
-												<code className="rounded bg-bg-soft-150 px-1 font-mono text-violet-600 dark:bg-zinc-800/80 dark:text-violet-400">
+												<code className="rounded bg-bg-soft-200 px-1 font-mono text-feature-base dark:bg-bg-soft-200">
 													"{v.defaultValue}"
 												</code>
 											</p>
 										) : (
-											<p className="text-[10px] text-text-soft-400 italic dark:text-zinc-500">
+											<p className="text-[10px] text-text-soft-400 italic text-text-strong-950">
 												No default value set
 											</p>
 										)}
@@ -304,9 +288,9 @@ export function VariablesPanel({ onClose }: PanelProps) {
 												size="xxsmall"
 												onClick={() => setEditingVar(v)}
 												title="Configure variable"
-												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
+												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200  dark:hover:bg-bg-soft-200"
 											>
-												<Pencil size={15} />
+												<Icon name="pencil" className="h-3.5 w-3.5" />
 											</Button.Root>
 											<Button.Root
 												type="button"
@@ -315,9 +299,9 @@ export function VariablesPanel({ onClose }: PanelProps) {
 												size="xxsmall"
 												onClick={() => setDeletingVar(v)}
 												title="Delete variable"
-												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-error-lighter hover:text-error-base dark:text-zinc-400 dark:hover:bg-error-base/10 dark:hover:text-error-base"
+												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-error-lighter hover:text-error-base  dark:hover:bg-error-base/10 dark:hover:text-error-base"
 											>
-												<Trash2 size={15} />
+												<Icon name="trash" className="h-3.5 w-3.5" />
 											</Button.Root>
 											<Button.Root
 												type="button"
@@ -326,15 +310,12 @@ export function VariablesPanel({ onClose }: PanelProps) {
 												size="xxsmall"
 												onClick={() => handleCopy(key)}
 												title="Copy placeholder"
-												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200 dark:text-zinc-400 dark:hover:bg-zinc-800"
+												className="size-8 rounded-lg text-text-sub-600 transition-all duration-200 hover:bg-bg-soft-200  dark:hover:bg-bg-soft-200"
 											>
 												{copiedKey === key ? (
-													<Check
-														size={15}
-														className="fade-in zoom-in-50 animate-in text-emerald-500 duration-200"
-													/>
+													<Icon name="check" className="h-3.5 w-3.5 fade-in zoom-in-50 animate-in text-success-base duration-200" />
 												) : (
-													<Copy size={15} />
+													<Icon name="copy" className="h-3.5 w-3.5" />
 												)}
 											</Button.Root>
 										</div>
@@ -452,24 +433,24 @@ export function ScorePanel({ onClose }: PanelProps) {
 	});
 
 	return (
-		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a]">
+		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
 			{/* Header */}
 			<div className="flex shrink-0 items-center justify-between pt-3 pr-4 pb-3 pl-6">
-				<h2 className="font-semibold text-lg text-zinc-900 dark:text-zinc-50">
+				<h2 className="font-semibold text-label-lg text-text-strong-950">
 					Template Score
 				</h2>
 				<button
 					type="button"
 					onClick={() => onClose()}
-					className="rounded-lg p-1.5 text-zinc-400 transition-all hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-300"
+					className="rounded-lg p-1.5 text-text-soft-400 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
 				>
-					<X size={18} />
+					<Icon name="cross" className="h-[18px] w-[18px]" />
 				</button>
 			</div>
 
 			{/* Score Progress Area */}
-			<div className="flex shrink-0 flex-col items-center border-stroke-soft-200 border-b bg-bg-weak-50/50 p-5 dark:border-stroke-soft-100/10 dark:bg-[#0c0c0c]/30">
-				<div className="relative flex size-24 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-zinc-100 dark:bg-zinc-950 dark:ring-zinc-800/40">
+			<div className="flex shrink-0 flex-col items-center border-stroke-soft-200 border-b bg-bg-weak-50/50 p-5 dark:border-stroke-soft-100/40">
+				<div className="relative flex size-24 items-center justify-center rounded-full bg-bg-white-0 shadow-sm ring-1 ring-stroke-soft-100 dark:bg-bg-white-0 dark:ring-stroke-soft-100/40">
 					{/* SVG progress ring */}
 					<svg className="-rotate-90 absolute inset-0 size-full">
 						{/* Background Track */}
@@ -480,7 +461,7 @@ export function ScorePanel({ onClose }: PanelProps) {
 							fill="transparent"
 							stroke="currentColor"
 							strokeWidth={strokeWidth}
-							className="text-zinc-100 dark:text-zinc-800/50"
+							className="text-stroke-soft-200"
 						/>
 						{/* Active track with gradient */}
 						<motion.circle
@@ -512,35 +493,35 @@ export function ScorePanel({ onClose }: PanelProps) {
 
 					{/* Inner Score Text */}
 					<div className="absolute flex flex-col items-center justify-center">
-						<span className="font-extrabold text-2xl text-emerald-600 leading-none dark:text-emerald-400">
+						<span className="font-extrabold text-2xl text-success-base leading-none">
 							98
 						</span>
-						<span className="mt-0.5 text-[10px] text-text-soft-400 dark:text-zinc-500">
+						<span className="mt-0.5 text-[10px] text-text-soft-400">
 							/100
 						</span>
 					</div>
 				</div>
 
-				<span className="mt-3.5 flex items-center gap-1.5 font-semibold text-sm text-text-strong-950 dark:text-white">
-					<Sparkles size={14} className="animate-pulse text-emerald-500" />
+				<span className="mt-3.5 flex items-center gap-1.5 font-semibold text-sm text-text-strong-950">
+					<Icon name="sparkling" className="h-3.5 w-3.5 animate-pulse text-success-base" />
 					Excellent Deliverability
 				</span>
-				<p className="mt-1 max-w-[220px] text-center text-[11px] text-text-soft-400 leading-normal dark:text-zinc-500">
+				<p className="mt-1 max-w-[220px] text-center text-[11px] text-text-soft-400 leading-normal">
 					Your HTML structure and text ratio look solid. Ready to send!
 				</p>
 			</div>
 
 			{/* Interactive Category Tabs */}
 			<div className="px-5 pt-4">
-				<div className="flex rounded-xl bg-bg-soft-100 p-1 dark:bg-zinc-900/60">
+				<div className="flex rounded-xl bg-bg-soft-200 p-1">
 					<button
 						type="button"
 						onClick={() => setActiveTab("all")}
 						className={cn(
 							"flex-grow rounded-lg py-1.5 text-center font-semibold text-[11px] transition-all",
 							activeTab === "all"
-								? "bg-white text-zinc-950 shadow-xs dark:bg-zinc-800 dark:text-white"
-								: "text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-200",
+								? "bg-bg-white-0 text-text-strong-950 shadow-regular-xs dark:bg-bg-soft-200 "
+								: "text-text-sub-600 hover:text-text-strong-950  ",
 						)}
 					>
 						All <span className="ml-0.5 opacity-60">({totalCount})</span>
@@ -551,8 +532,8 @@ export function ScorePanel({ onClose }: PanelProps) {
 						className={cn(
 							"flex-grow rounded-lg py-1.5 text-center font-semibold text-[11px] transition-all",
 							activeTab === "passed"
-								? "bg-white text-emerald-600 shadow-xs dark:bg-zinc-800 dark:text-emerald-400"
-								: "text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-200",
+								? "bg-bg-white-0 text-success-base shadow-regular-xs dark:bg-bg-soft-200 "
+								: "text-text-sub-600 hover:text-text-strong-950  ",
 						)}
 					>
 						Passed <span className="ml-0.5 opacity-60">({passedCount})</span>
@@ -563,8 +544,8 @@ export function ScorePanel({ onClose }: PanelProps) {
 						className={cn(
 							"flex-grow rounded-lg py-1.5 text-center font-semibold text-[11px] transition-all",
 							activeTab === "warning"
-								? "bg-white text-amber-600 shadow-xs dark:bg-zinc-800 dark:text-amber-400"
-								: "text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-200",
+								? "bg-bg-white-0 text-warning-base shadow-regular-xs dark:bg-bg-soft-200 "
+								: "text-text-sub-600 hover:text-text-strong-950  ",
 						)}
 					>
 						Warnings <span className="ml-0.5 opacity-60">({warningCount})</span>
@@ -578,22 +559,16 @@ export function ScorePanel({ onClose }: PanelProps) {
 					{filteredAudits.map((audit) => (
 						<div
 							key={audit.id}
-							className="group flex items-start gap-3 rounded-2xl border border-stroke-soft-200 bg-white p-3.5 transition-all hover:border-stroke-soft-300 hover:shadow-xs dark:border-stroke-soft-100/10 dark:bg-zinc-900/30 dark:hover:border-stroke-soft-100/20"
+							className="group flex items-start gap-3 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-3.5 transition-all hover:border-stroke-soft-200 hover:shadow-regular-xs dark:border-stroke-soft-100/40 "
 						>
 							{audit.status === "passed" ? (
-								<CheckCircle2
-									size={16}
-									className="mt-0.5 shrink-0 text-emerald-500"
-								/>
+								<Icon name="check-circle" className="mt-0.5 h-4 w-4 shrink-0 text-success-base" />
 							) : (
-								<ShieldAlert
-									size={16}
-									className="mt-0.5 shrink-0 text-amber-500"
-								/>
+								<Icon name="alert-triangle" className="mt-0.5 h-4 w-4 shrink-0 text-warning-base" />
 							)}
 							<div className="min-w-0 flex-1">
 								<div className="flex items-center justify-between gap-2">
-									<h4 className="truncate font-semibold text-text-strong-950 text-xs dark:text-zinc-200">
+									<h4 className="truncate font-semibold text-text-strong-950 text-xs">
 										{audit.title}
 									</h4>
 									<Badge.Root
@@ -605,7 +580,7 @@ export function ScorePanel({ onClose }: PanelProps) {
 										{audit.status}
 									</Badge.Root>
 								</div>
-								<p className="mt-1 text-[11px] text-text-soft-400 leading-normal dark:text-zinc-500">
+								<p className="mt-1 text-[11px] text-text-soft-400 leading-normal">
 									{audit.description}
 								</p>
 							</div>
@@ -781,41 +756,38 @@ export function TestPanel({ onClose }: PanelProps) {
 	};
 
 	return (
-		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/10 dark:bg-[#0a0a0a]">
+		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
 			{/* ── Header ── */}
 			<div className="flex shrink-0 items-center justify-between pt-3 pr-4 pb-3 pl-6">
-				<h2 className="font-semibold text-lg text-zinc-900 dark:text-zinc-50">
+				<h2 className="font-semibold text-label-lg text-text-strong-950">
 					Send Test Email
 				</h2>
 				<button
 					type="button"
 					onClick={onClose}
-					className="rounded-lg p-1.5 text-zinc-400 transition-all hover:bg-zinc-100 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-300"
+					className="rounded-lg p-1.5 text-text-soft-400 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
 				>
-					<X size={18} />
+					<Icon name="cross" className="h-[18px] w-[18px]" />
 				</button>
 			</div>
 
 			<div className="flex flex-1 flex-col justify-between overflow-y-auto px-5 pb-5">
 				<div className="space-y-5">
-					<p className="text-paragraph-sm text-text-sub-600 leading-normal dark:text-zinc-400">
+					<p className="text-paragraph-sm text-text-sub-600 leading-normal">
 						Verify exactly how this email template will render across different
 						client mailboxes by sending a live test copy.
 					</p>
 
 					<form onSubmit={handleSendTest} className="space-y-5">
 						{!fromEmail ? (
-							<div className="flex flex-col gap-2.5 rounded-2xl border border-rose-200/60 bg-rose-50/50 p-3.5 dark:border-rose-900/30 dark:bg-rose-950/10">
+							<div className="flex flex-col gap-2.5 rounded-2xl border border-error-base/20 bg-error-lighter p-3.5">
 								<div className="flex items-start gap-2.5">
-									<AlertCircle
-										size={16}
-										className="mt-0.5 shrink-0 text-rose-600 dark:text-rose-400"
-									/>
+									<Icon name="alert-circle" className="mt-0.5 h-4 w-4 shrink-0 text-error-base" />
 									<div className="flex flex-col gap-1">
-										<span className="font-semibold text-rose-700 text-xs dark:text-rose-300">
+										<span className="font-semibold text-error-base text-xs">
 											Missing From Address
 										</span>
-										<p className="text-[11px] text-rose-600/90 leading-normal dark:text-rose-400/80">
+										<p className="text-[11px] text-error-base/90 leading-normal">
 											You must configure a valid "From Email" in the Send
 											Details panel before you can send a test email.
 										</p>
@@ -844,8 +816,8 @@ export function TestPanel({ onClose }: PanelProps) {
 						)}
 
 						{detectedVars.length > 0 && (
-							<div className="space-y-4 border-stroke-soft-200 border-t pt-4 dark:border-stroke-soft-100/10">
-								<span className="block font-bold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-zinc-400">
+							<div className="space-y-4 border-stroke-soft-200 border-t pt-4 dark:border-stroke-soft-100/40">
+								<span className="block font-bold text-[10px] text-text-sub-600 uppercase tracking-wider">
 									Template Variables
 								</span>
 								<div className="max-h-[250px] space-y-3.5 overflow-y-auto pr-1">
@@ -854,7 +826,7 @@ export function TestPanel({ onClose }: PanelProps) {
 											<div className="flex items-center justify-between">
 												<Label.Root
 													htmlFor={v.name}
-													className="font-semibold text-text-strong-950 text-xs dark:text-zinc-300"
+													className="font-semibold text-text-strong-950 text-xs "
 												>
 													{v.name}
 												</Label.Root>
@@ -900,12 +872,12 @@ export function TestPanel({ onClose }: PanelProps) {
 						>
 							{sending ? (
 								<>
-									<Loader2 size={13} className="animate-spin" />
+									<Spinner size={13} />
 									Sending...
 								</>
 							) : (
 								<>
-									<Send size={13} />
+									<Icon name="send" className="h-3.5 w-3.5" />
 									Send Test Email
 								</>
 							)}
@@ -916,41 +888,41 @@ export function TestPanel({ onClose }: PanelProps) {
 				{/* Send Log History */}
 				{recentSends.length > 0 && (
 					<div className="mt-6 border-stroke-soft-200 border-t pt-4 dark:border-stroke-soft-100/20">
-						<span className="mb-2.5 block font-bold text-[10px] text-text-sub-600 uppercase tracking-wider dark:text-zinc-400">
+						<span className="mb-2.5 block font-bold text-[10px] text-text-sub-600 uppercase tracking-wider">
 							Recent Sends
 						</span>
 						<div className="space-y-2">
 							{recentSends.map((send, idx) => (
 								<div
 									key={idx}
-									className="flex items-center justify-between rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-2.5 dark:border-stroke-soft-100/10 dark:bg-zinc-900/20"
+									className="flex items-center justify-between rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-2.5 dark:border-stroke-soft-100/40 "
 								>
 									<div className="flex min-w-0 flex-col">
-										<span className="truncate font-medium text-text-strong-950 text-xs dark:text-zinc-200">
+										<span className="truncate font-medium text-text-strong-950 text-xs">
 											{send.email}
 										</span>
 										<span
 											className={cn(
 												"flex items-center gap-1 font-semibold text-[9px]",
 												send.status === "success"
-													? "text-emerald-500"
+													? "text-success-base"
 													: "text-error-base",
 											)}
 										>
 											{send.status === "success" ? (
 												<>
-													<CheckCircle2 size={10} className="shrink-0" />
+													<Icon name="check-circle" className="h-2.5 w-2.5 shrink-0" />
 													Delivered successfully
 												</>
 											) : (
 												<>
-													<AlertCircle size={10} className="shrink-0" />
+													<Icon name="alert-circle" className="h-2.5 w-2.5 shrink-0" />
 													{send.error || "Failed to send"}
 												</>
 											)}
 										</span>
 									</div>
-									<span className="shrink-0 text-[9px] text-text-soft-400 dark:text-zinc-500">
+									<span className="shrink-0 text-[9px] text-text-soft-400">
 										{formatRelativeTime(send.timestamp.toISOString())}
 									</span>
 								</div>
@@ -1049,28 +1021,28 @@ export function AIPanel({ onClose }: PanelProps) {
 	};
 
 	return (
-		<div className="flex h-full w-full flex-col overflow-hidden rounded-[24px] border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/40 dark:bg-[#0a0a0a]">
+		<div className="flex h-full w-full flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/40">
 			<div className="flex items-center justify-between border-stroke-soft-200/60 border-b px-5 py-4 dark:border-stroke-soft-100/40">
 				<div className="flex items-center gap-2">
-					<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-500 dark:bg-indigo-500/20 dark:text-indigo-400">
-						<Sparkles className="h-4 w-4 animate-pulse" />
+					<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-feature-lighter text-feature-base">
+						<Icon name="sparkling" className="h-4 w-4 animate-pulse" />
 					</div>
-					<h3 className="font-bold text-sm text-text-strong-950 dark:text-white">
+					<h3 className="font-bold text-sm text-text-strong-950">
 						AI Generator (Gemma 2 9B)
 					</h3>
 				</div>
 				<button
 					type="button"
 					onClick={onClose}
-					className="rounded-lg p-1 text-text-sub-600 hover:bg-bg-weak-50 dark:text-zinc-400 dark:hover:bg-zinc-800"
+					className="rounded-lg p-1 text-text-sub-600 hover:bg-bg-weak-50  dark:hover:bg-bg-soft-200"
 				>
-					<X className="h-4 w-4" />
+					<Icon name="cross" className="h-4 w-4" />
 				</button>
 			</div>
 
 			<div className="flex-1 space-y-4 overflow-y-auto p-5">
 				<div className="space-y-1.5">
-					<label className="font-semibold text-xs text-text-strong-950 dark:text-zinc-200">
+					<label className="font-semibold text-xs text-text-strong-950">
 						Prompt
 					</label>
 					<textarea
@@ -1078,7 +1050,7 @@ export function AIPanel({ onClose }: PanelProps) {
 						placeholder="Describe your email template — e.g. welcome onboarding with CTA..."
 						value={prompt}
 						onChange={(e) => setPrompt(e.target.value)}
-						className="w-full rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-3 text-xs text-text-strong-950 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-stroke-soft-100/40 dark:bg-zinc-900 dark:text-zinc-100"
+						className="w-full rounded-xl border border-stroke-soft-200 bg-bg-weak-50 p-3 text-xs text-text-strong-950 focus:outline-none focus:ring-2 focus:ring-primary-base/30 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50 "
 					/>
 				</div>
 
@@ -1087,12 +1059,12 @@ export function AIPanel({ onClose }: PanelProps) {
 					size="small"
 					onClick={() => void handleGenerate()}
 					disabled={isGenerating || !prompt.trim()}
-					className="w-full justify-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white"
+					className="w-full justify-center "
 				>
 					{isGenerating ? (
-						<Loader2 className="h-4 w-4 animate-spin" />
+						<Spinner size={16} />
 					) : (
-						<Sparkles className="h-4 w-4" />
+						<Icon name="sparkling" className="h-4 w-4" />
 					)}
 					{isGenerating ? "Generating..." : "Generate with AI"}
 				</Button.Root>

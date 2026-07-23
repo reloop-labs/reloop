@@ -460,7 +460,7 @@ export const EmailInspector = () => {
 	if (!editor) return null;
 
 	return (
-		<Inspector.Root className="bg-bg-weak-50 dark:bg-[#0a0a0a]">
+		<Inspector.Root className="bg-bg-weak-50">
 			{/* ── Breadcrumb ── */}
 			<Breadcrumb />
 

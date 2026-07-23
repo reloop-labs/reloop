@@ -10,7 +10,6 @@ import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
-import { Braces } from "lucide-react";
 import { useEffect } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -174,9 +173,9 @@ export const EditTemplateVariableModal = ({
 					<form onSubmit={handleFormSubmit}>
 						<Modal.Header className="before:border-stroke-soft-200/50">
 							<div className="flex items-center justify-center gap-1.5">
-								<Braces
-									size={15}
-									className="text-text-strong-950 dark:text-white"
+								<Icon
+									name="brackets"
+									className="h-3.5 w-3.5 text-text-strong-950"
 								/>
 								<div className="flex-1">
 									<Modal.Title className="font-medium">

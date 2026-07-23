@@ -1,14 +1,6 @@
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
-import {
-	Award,
-	Braces,
-	Brush,
-	Code2,
-	History,
-	Send,
-	Sparkles,
-} from "lucide-react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useLayoutEffect, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
@@ -24,13 +16,13 @@ const viewModes = [
 ] as const;
 
 const TOOLBAR_ITEMS = [
-	{ mode: "visual" as const, label: "Design mode", Icon: Brush },
-	{ mode: "ai" as const, label: "AI Generator (Gemma 2 9B)", Icon: Sparkles },
-	{ mode: "code" as const, label: "Split view / Code editor", Icon: Code2 },
-	{ mode: "variables" as const, label: "Variables", Icon: Braces },
-	{ mode: "history" as const, label: "Version history", Icon: History },
-	{ mode: "test" as const, label: "Send test email", Icon: Send },
-	{ mode: "score" as const, label: "Template score", Icon: Award },
+	{ mode: "visual" as const, label: "Design mode", icon: "brush" },
+	{ mode: "ai" as const, label: "AI Generator (Gemma 2 9B)", icon: "sparkling" },
+	{ mode: "code" as const, label: "Split view / Code editor", icon: "code" },
+	{ mode: "variables" as const, label: "Variables", icon: "brackets" },
+	{ mode: "history" as const, label: "Version history", icon: "history" },
+	{ mode: "test" as const, label: "Send test email", icon: "send" },
+	{ mode: "score" as const, label: "Template score", icon: "award" },
 ] as const;
 
 export function EditorToolbar() {
@@ -59,7 +51,7 @@ export function EditorToolbar() {
 
 	return (
 		<div className="relative flex flex-col py-1.5">
-			{TOOLBAR_ITEMS.map(({ mode, label, Icon: IconComponent }, index) => (
+			{TOOLBAR_ITEMS.map(({ mode, label, icon }, index) => (
 				<Tooltip.Root key={mode} delayDuration={2000}>
 					<Tooltip.Trigger asChild>
 						<button
@@ -73,13 +65,13 @@ export function EditorToolbar() {
 							}
 							onPointerLeave={() => setHoveredEl(undefined)}
 							className={cn(
-								"relative z-10 flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 hover:scale-105 active:scale-95",
+								"relative z-10 flex h-10 w-10 items-center justify-center rounded-xl transition-colors duration-200",
 								viewMode === mode
-									? "text-text-strong-950 dark:text-white"
-									: "text-text-sub-600 hover:text-text-strong-950 dark:text-zinc-400 dark:hover:text-white",
+									? "text-text-strong-950"
+									: "text-text-sub-600 hover:text-text-strong-950",
 							)}
 						>
-							<IconComponent className="h-5 w-5" />
+							<Icon name={icon} className="h-5 w-5" />
 						</button>
 					</Tooltip.Trigger>
 					<Tooltip.Content side="right" sideOffset={8}>

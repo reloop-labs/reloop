@@ -1,8 +1,8 @@
 import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { Link } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertCircle, ArrowRight, XCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import type { DomainListResponse } from "#/features/domain/types";
@@ -29,10 +29,12 @@ const FieldRow = ({ label, children, hideBorder, required }: FieldRowProps) => {
 		>
 			<label
 				htmlFor={label}
-				className="w-20 shrink-0 text-sm text-text-sub-600"
+				className="w-20 shrink-0 text-label-sm text-text-sub-600"
 			>
 				{label}
-				{required && <span className="ml-0.5 text-error-base text-xs">*</span>}
+				{required && (
+					<span className="ml-0.5 text-error-base text-paragraph-xs">*</span>
+				)}
 			</label>
 			<div className="flex flex-1 items-center">{children}</div>
 		</div>
@@ -54,14 +56,14 @@ const ErrorTooltipContent = ({ error }: ErrorTooltipContentProps) => {
 	return (
 		<div className="flex w-72 flex-col gap-2 p-0.5 text-left">
 			<div className="flex items-start gap-2.5">
-				<div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-50 dark:bg-red-950/30">
-					<AlertCircle size={13} className="text-red-500 dark:text-red-400" />
+				<div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-error-lighter">
+					<Icon name="alert-circle" className="h-3.5 w-3.5 text-error-base" />
 				</div>
 				<div className="flex flex-col gap-0.5">
-					<h4 className="font-semibold text-text-strong-950 text-xs leading-snug">
+					<h4 className="font-semibold text-label-xs text-text-strong-950 leading-snug">
 						{error.title}
 					</h4>
-					<p className="text-[11px] text-text-sub-600 leading-normal">
+					<p className="text-paragraph-xs text-text-sub-600 leading-normal">
 						{error.description}
 					</p>
 				</div>
@@ -71,10 +73,10 @@ const ErrorTooltipContent = ({ error }: ErrorTooltipContentProps) => {
 				<div className="border-stroke-soft-200 border-t pt-2">
 					<Link
 						to={error.actionLink}
-						className="inline-flex items-center gap-1 font-semibold text-[11px] text-primary-base transition-colors hover:text-primary-hover hover:underline"
+						className="inline-flex items-center gap-1 font-semibold text-paragraph-xs text-primary-base transition-colors hover:text-primary-hover hover:underline"
 					>
 						{error.actionText}
-						<ArrowRight size={11} />
+						<Icon name="arrow-right" className="h-3 w-3" />
 					</Link>
 				</div>
 			)}
@@ -171,10 +173,10 @@ export const SendDetails = () => {
 	}
 
 	return (
-		<div className="mx-auto mt-4 w-full max-w-[600px] overflow-hidden rounded-2xl border border-stroke-soft-200 dark:border-stroke-soft-100/50">
+		<div className="mx-auto mt-4 w-full max-w-[600px] overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50">
 			{/* From Row */}
 			<FieldRow label="From" required>
-				<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-sm text-text-sub-600">
+				<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-label-sm text-text-sub-600">
 					<input
 						value={fromEmail}
 						onChange={(e) => setFromEmail(e.target.value)}
@@ -186,8 +188,8 @@ export const SendDetails = () => {
 							<Tooltip.Provider delayDuration={0}>
 								<Tooltip.Root>
 									<Tooltip.Trigger asChild>
-										<div className="flex cursor-pointer items-center justify-center text-red-500 transition-transform hover:scale-105 dark:text-red-400">
-											<XCircle size={15} />
+										<div className="flex cursor-pointer items-center justify-center text-error-base transition-colors hover:text-error-dark">
+											<Icon name="cross-circle" className="h-4 w-4" />
 										</div>
 									</Tooltip.Trigger>
 									<Tooltip.Content
@@ -205,7 +207,7 @@ export const SendDetails = () => {
 							<button
 								type="button"
 								onClick={() => setShowReplyTo(true)}
-								className="font-medium text-[13px] text-text-soft-400 transition-colors hover:text-text-strong-950"
+								className="font-medium text-paragraph-xs text-text-soft-400 transition-colors hover:text-text-strong-950"
 							>
 								Reply-To
 							</button>
@@ -225,7 +227,7 @@ export const SendDetails = () => {
 						className="overflow-hidden"
 					>
 						<FieldRow label="Reply-To">
-							<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-sm text-text-sub-600">
+							<div className="relative flex w-full flex-1 items-center justify-between gap-2 text-label-sm text-text-sub-600">
 								<input
 									ref={replyToInputRef}
 									value={replyTo}
@@ -236,14 +238,14 @@ export const SendDetails = () => {
 										}
 									}}
 									placeholder="replyto@example.com"
-									className="flex-1 bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+									className="flex-1 bg-transparent text-label-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
 								/>
 								{replyToError && (
 									<Tooltip.Provider delayDuration={0}>
 										<Tooltip.Root>
 											<Tooltip.Trigger asChild>
-												<div className="flex cursor-pointer items-center justify-center text-red-500 transition-transform hover:scale-105 dark:text-red-400">
-													<XCircle size={15} />
+												<div className="flex cursor-pointer items-center justify-center text-error-base transition-colors hover:text-error-dark">
+													<Icon name="cross-circle" className="h-4 w-4" />
 												</div>
 											</Tooltip.Trigger>
 											<Tooltip.Content
@@ -269,7 +271,7 @@ export const SendDetails = () => {
 					value={previewText}
 					onChange={(e) => setPreviewText(e.target.value)}
 					placeholder="Preview text"
-					className="flex-1 bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+					className="flex-1 bg-transparent text-label-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
 				/>
 			</FieldRow>
 
@@ -278,7 +280,7 @@ export const SendDetails = () => {
 					value={subject}
 					onChange={(e) => setSubject(e.target.value)}
 					placeholder="Subject"
-					className="flex-1 bg-transparent font-medium text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+					className="flex-1 bg-transparent font-medium text-label-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
 				/>
 			</FieldRow>
 		</div>

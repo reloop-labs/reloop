@@ -9,6 +9,31 @@ import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
 const fetcher = (url: string) =>
 	fetch(url, { credentials: "include" }).then((res) => res.json());
 
+function TemplateStatusBadge({
+	status,
+}: {
+	status: "draft" | "published" | "archived";
+}) {
+	// Match list page: published is badge-free; draft/archived use muted pills.
+	if (status === "published") return null;
+
+	const label = status === "draft" ? "Draft" : "Archived";
+
+	return (
+		<span
+			className={cn(
+				"ml-2 shrink-0 select-none rounded-full px-2.5 py-1 font-medium text-[11px] leading-none",
+				status === "draft" &&
+					"bg-bg-weak-50 text-text-sub-600 ring-1 ring-stroke-soft-100 ring-inset dark:bg-bg-soft-200 dark:ring-stroke-soft-100/40",
+				status === "archived" &&
+					"bg-faded-lighter text-faded-base ring-1 ring-stroke-soft-100 ring-inset",
+			)}
+		>
+			{label}
+		</span>
+	);
+}
+
 export const TemplateName = () => {
 	const templateId = useTemplateId();
 
@@ -49,7 +74,6 @@ export const TemplateName = () => {
 	// biome-ignore lint/correctness/useExhaustiveDependencies: name changes DOM width, which we need to measure
 	useEffect(() => {
 		if (measureRef.current && inputRef.current) {
-			// Add a small buffer to prevent jitter
 			const width = measureRef.current.offsetWidth;
 			inputRef.current.style.width = `${width}px`;
 		}
@@ -63,7 +87,7 @@ export const TemplateName = () => {
 
 	if (isLoading && !name) {
 		return (
-			<div className="h-7 w-48 animate-pulse rounded-md bg-bg-weak-50 dark:bg-white/5" />
+			<div className="h-7 w-48 animate-pulse rounded-md bg-bg-weak-50" />
 		);
 	}
 
@@ -73,7 +97,7 @@ export const TemplateName = () => {
 				<Icon name="layout" className="size-4 text-text-sub-600" />
 				<Link
 					to="/templates"
-					className="font-medium text-sm hover:text-text-strong-950"
+					className="font-medium text-label-sm text-text-sub-600 hover:text-text-strong-950"
 				>
 					Templates
 				</Link>
@@ -84,7 +108,7 @@ export const TemplateName = () => {
 			<div className="group ml-1 flex items-center">
 				<span
 					ref={measureRef}
-					className="invisible absolute whitespace-pre px-2 py-1 font-bold text-sm"
+					className="invisible absolute whitespace-pre px-2 py-1 font-semibold text-label-sm"
 					aria-hidden="true"
 				>
 					{name || "Template name"}
@@ -94,23 +118,9 @@ export const TemplateName = () => {
 					value={name}
 					onChange={handleChange}
 					placeholder="Template name"
-					className="rounded-md bg-transparent px-2 py-1 font-bold text-sm text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 hover:bg-bg-weak-50 focus:ring-0 dark:text-white dark:hover:bg-white/5"
+					className="rounded-md bg-transparent px-2 py-1 font-semibold text-label-sm text-text-strong-950 outline-none transition-colors placeholder:text-text-soft-400 hover:bg-bg-weak-50 focus:ring-0"
 				/>
-				{data?.status && (
-					<span
-						className={cn(
-							"ml-2 shrink-0 select-none rounded-md border px-1.5 py-0.5 font-semibold text-[10px] capitalize",
-							data.status === "published" &&
-								"border-success-base/20 bg-success-base/5 text-success-base",
-							data.status === "draft" &&
-								"border-amber-600/20 bg-amber-600/5 text-amber-600 dark:text-amber-500",
-							data.status === "archived" &&
-								"border-text-sub-600/20 bg-text-sub-600/5 text-text-sub-600",
-						)}
-					>
-						{data.status}
-					</span>
-				)}
+				{data?.status ? <TemplateStatusBadge status={data.status} /> : null}
 			</div>
 		</div>
 	);

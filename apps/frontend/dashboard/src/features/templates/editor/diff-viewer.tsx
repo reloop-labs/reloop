@@ -16,30 +16,30 @@ export function DiffViewer({
 	viewportWidth = "100%",
 }: DiffViewerProps) {
 	return (
-		<div className="flex h-full flex-col bg-zinc-950 font-sans">
+		<div className="flex h-full flex-col bg-bg-weak-50 font-sans">
 			{/* Subject Diff Banner */}
-			<div className="border-zinc-850 border-b bg-zinc-900/50 p-4">
+			<div className="border-stroke-soft-200 border-b bg-bg-white-0 p-4 dark:border-stroke-soft-100/40">
 				<div className="flex flex-col gap-2">
 					<div className="flex items-center gap-2">
-						<Icon name="info-outline" className="size-4 text-zinc-400" />
-						<span className="font-semibold text-xs text-zinc-300">
+						<Icon name="info-outline" className="size-4 text-text-sub-600" />
+						<span className="font-semibold text-label-xs text-text-strong-950">
 							Subject Line Comparison
 						</span>
 					</div>
 					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-						<div className="rounded-lg border border-red-500/20 bg-red-950/20 p-3">
-							<span className="font-bold text-[10px] text-red-400 uppercase tracking-wider">
+						<div className="rounded-lg border border-error-base/20 bg-error-lighter p-3">
+							<span className="font-bold text-[10px] text-error-base uppercase tracking-wider">
 								Previous
 							</span>
-							<p className="mt-1 break-words font-mono text-red-300 text-xs">
+							<p className="mt-1 break-words font-mono text-error-dark text-paragraph-xs">
 								{oldSubject || "(No subject set)"}
 							</p>
 						</div>
-						<div className="rounded-lg border border-emerald-500/20 bg-emerald-950/20 p-3">
-							<span className="font-bold text-[10px] text-emerald-400 uppercase tracking-wider">
+						<div className="rounded-lg border border-success-base/20 bg-success-lighter p-3">
+							<span className="font-bold text-[10px] text-success-base uppercase tracking-wider">
 								Current
 							</span>
-							<p className="mt-1 break-words font-mono text-emerald-300 text-xs">
+							<p className="mt-1 break-words font-mono text-success-dark text-paragraph-xs">
 								{newSubject || "(No subject set)"}
 							</p>
 						</div>
@@ -51,25 +51,26 @@ export function DiffViewer({
 			<div className="min-h-[300px] flex-1 p-4">
 				<div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-2">
 					{/* Left Frame: Previous Published */}
-					<div className="flex h-full min-h-[250px] flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/20">
-						<div className="flex items-center justify-between border-zinc-800 border-b bg-zinc-900/60 px-4 py-2">
-							<span className="font-semibold text-xs text-zinc-400">
+					<div className="flex h-full min-h-[250px] flex-col overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
+						<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-2 dark:border-stroke-soft-100/40">
+							<span className="font-semibold text-label-xs text-text-sub-600">
 								Previously Published
 							</span>
-							<span className="rounded bg-zinc-800 px-1.5 py-0.5 font-bold font-mono text-[10px] text-zinc-500">
+							<span className="rounded-md bg-bg-soft-200 px-1.5 py-0.5 font-bold font-mono text-[10px] text-text-soft-400">
 								Old
 							</span>
 						</div>
-						<div className="relative flex-1 bg-white">
+						<div className="relative flex-1 bg-bg-white-0">
 							{oldHtml ? (
 								<iframe
 									srcDoc={oldHtml}
 									title="Previously Published Template Preview"
 									className="absolute inset-0 size-full border-0"
 									sandbox="allow-popups-to-escape-sandbox allow-same-origin"
+									style={{ width: viewportWidth }}
 								/>
 							) : (
-								<div className="absolute inset-0 flex items-center justify-center bg-zinc-900 text-xs text-zinc-500">
+								<div className="absolute inset-0 flex items-center justify-center bg-bg-weak-50 text-paragraph-xs text-text-soft-400">
 									No previously published version
 								</div>
 							)}
@@ -77,25 +78,26 @@ export function DiffViewer({
 					</div>
 
 					{/* Right Frame: Current Edits */}
-					<div className="flex h-full min-h-[250px] flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/20">
-						<div className="flex items-center justify-between border-zinc-800 border-b bg-zinc-900/60 px-4 py-2">
-							<span className="font-semibold text-xs text-zinc-300">
+					<div className="flex h-full min-h-[250px] flex-col overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
+						<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-2 dark:border-stroke-soft-100/40">
+							<span className="font-semibold text-label-xs text-text-strong-950">
 								Current Edits (To Publish)
 							</span>
-							<span className="rounded border border-emerald-500/25 bg-emerald-950/40 px-1.5 py-0.5 font-bold font-mono text-[10px] text-emerald-400">
+							<span className="rounded-md border border-success-base/25 bg-success-lighter px-1.5 py-0.5 font-bold font-mono text-[10px] text-success-base">
 								New
 							</span>
 						</div>
-						<div className="relative flex-1 bg-white">
+						<div className="relative flex-1 bg-bg-white-0">
 							{newHtml ? (
 								<iframe
 									srcDoc={newHtml}
 									title="Current Edits Template Preview"
 									className="absolute inset-0 size-full border-0"
 									sandbox="allow-popups-to-escape-sandbox allow-same-origin"
+									style={{ width: viewportWidth }}
 								/>
 							) : (
-								<div className="absolute inset-0 flex items-center justify-center bg-zinc-900 text-xs text-zinc-500">
+								<div className="absolute inset-0 flex items-center justify-center bg-bg-weak-50 text-paragraph-xs text-text-soft-400">
 									Blank template
 								</div>
 							)}

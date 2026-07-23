@@ -24,8 +24,10 @@ function UserAvatar({ user, isSelf = false, statusConfig }: UserAvatarProps) {
 		<div className="group/avatar relative">
 			<div
 				className={cn(
-					"flex h-8 w-8 items-center justify-center rounded-full border-2 font-semibold text-white text-xs uppercase tracking-wide shadow-sm transition-all duration-150",
-					isSelf ? statusConfig?.border || "border-white" : "border-white",
+					"flex h-8 w-8 items-center justify-center rounded-full border-2 font-semibold text-static-white text-xs uppercase tracking-wide shadow-regular-xs transition-all duration-150",
+					isSelf
+						? statusConfig?.border || "border-bg-white-0"
+						: "border-bg-white-0",
 					user.email ? getAvatarGradient(user.email) : "",
 				)}
 				style={
@@ -46,31 +48,34 @@ function UserAvatar({ user, isSelf = false, statusConfig }: UserAvatarProps) {
 			</div>
 
 			{/* Tooltip */}
-			<div className="-translate-x-1/2 pointer-events-none absolute top-full left-1/2 z-50 mt-1.5 whitespace-nowrap rounded bg-gray-900 px-2.5 py-1.5 font-medium text-white text-xs opacity-0 shadow-sm transition-opacity group-hover/avatar:opacity-100">
+			<div className="-translate-x-1/2 pointer-events-none absolute top-full left-1/2 z-50 mt-1.5 whitespace-nowrap rounded-lg bg-bg-strong-950 px-2.5 py-1.5 font-medium text-paragraph-xs text-static-white opacity-0 shadow-regular-sm transition-opacity group-hover/avatar:opacity-100">
 				{isSelf && statusConfig ? (
 					<div className="flex items-center gap-1.5">
-						<span className="text-gray-300">{displayName} (you)</span>
-						<span className="text-gray-500">•</span>
-						<span className="text-white">{statusConfig.label}</span>
+						<span className="text-text-soft-400">{displayName} (you)</span>
+						<span className="text-text-disabled-300">•</span>
+						<span className="text-static-white">{statusConfig.label}</span>
 					</div>
 				) : isSelf ? (
 					`${displayName} (you)`
 				) : (
 					displayName
 				)}
-				<div className="-ml-1 absolute bottom-full left-1/2 border-4 border-transparent border-b-gray-900" />
+				<div className="-ml-1 absolute bottom-full left-1/2 border-4 border-transparent border-b-bg-strong-950" />
 			</div>
 
 			{/* Status dot for self (connection status) */}
 			{isSelf && statusConfig && (
 				<span
-					className={`-right-0.5 -bottom-0.5 absolute z-10 block h-3 w-3 rounded-full border-2 border-white dark:border-gray-950 ${statusConfig.dot}`}
+					className={cn(
+						"-right-0.5 -bottom-0.5 absolute z-10 block h-3 w-3 rounded-full border-2 border-bg-white-0",
+						statusConfig.dot,
+					)}
 				/>
 			)}
 
 			{/* Online dot for others */}
 			{!isSelf && (
-				<span className="-right-0.5 -bottom-0.5 absolute z-10 block h-3 w-3 rounded-full border-2 border-white bg-green-500 dark:border-gray-950" />
+				<span className="-right-0.5 -bottom-0.5 absolute z-10 block h-3 w-3 rounded-full border-2 border-bg-white-0 bg-success-base" />
 			)}
 		</div>
 	);
@@ -96,24 +101,26 @@ export function CollabPresence({ status, isSynced }: CollabPresenceProps) {
 	const statusConfig = status
 		? {
 				connecting: {
-					dot: "bg-yellow-400 animate-pulse",
+					dot: "bg-warning-base animate-pulse",
 					label: "Connecting...",
-					border: "border-yellow-400",
+					border: "border-warning-base",
 				},
 				connected: {
-					dot: isSynced ? "bg-green-500" : "bg-blue-400 animate-pulse",
+					dot: isSynced
+						? "bg-success-base"
+						: "bg-information-base animate-pulse",
 					label: isSynced ? "Live" : "Syncing...",
-					border: isSynced ? "border-green-500" : "border-blue-400",
+					border: isSynced ? "border-success-base" : "border-information-base",
 				},
 				disconnected: {
-					dot: "bg-gray-400",
+					dot: "bg-faded-base",
 					label: "Offline",
-					border: "border-gray-400",
+					border: "border-faded-base",
 				},
 				error: {
-					dot: "bg-red-500",
+					dot: "bg-error-base",
 					label: "Error",
-					border: "border-red-500",
+					border: "border-error-base",
 				},
 			}[status]
 		: null;
@@ -140,18 +147,20 @@ export function CollabPresence({ status, isSynced }: CollabPresenceProps) {
 
 				{/* Overflow badge */}
 				{overflow > 0 && (
-					<div className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-gray-100 font-semibold text-gray-600 text-xs shadow-sm">
+					<div className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-bg-white-0 bg-bg-weak-50 font-semibold text-paragraph-xs text-text-sub-600 shadow-regular-xs">
 						+{overflow}
 					</div>
 				)}
 
 				{/* Connection indicator when no avatars */}
 				{!self && totalOthers === 0 && statusConfig && (
-					<div className="group/avatar relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-gray-300 border-dashed bg-gray-50 transition-colors hover:border-gray-400">
-						<span className={`h-2.5 w-2.5 rounded-full ${statusConfig.dot}`} />
-						<div className="-translate-x-1/2 pointer-events-none absolute top-full left-1/2 z-50 mt-1.5 whitespace-nowrap rounded bg-gray-900 px-2.5 py-1.5 font-medium text-white text-xs opacity-0 shadow-sm transition-opacity group-hover/avatar:opacity-100">
+					<div className="group/avatar relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed border-stroke-soft-200 bg-bg-weak-50 transition-colors hover:border-stroke-soft-200">
+						<span
+							className={cn("h-2.5 w-2.5 rounded-full", statusConfig.dot)}
+						/>
+						<div className="-translate-x-1/2 pointer-events-none absolute top-full left-1/2 z-50 mt-1.5 whitespace-nowrap rounded-lg bg-bg-strong-950 px-2.5 py-1.5 font-medium text-paragraph-xs text-static-white opacity-0 shadow-regular-sm transition-opacity group-hover/avatar:opacity-100">
 							{statusConfig.label}
-							<div className="-ml-1 absolute bottom-full left-1/2 border-4 border-transparent border-b-gray-900" />
+							<div className="-ml-1 absolute bottom-full left-1/2 border-4 border-transparent border-b-bg-strong-950" />
 						</div>
 					</div>
 				)}

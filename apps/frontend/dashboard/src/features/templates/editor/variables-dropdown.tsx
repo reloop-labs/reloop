@@ -1,4 +1,5 @@
-import { Plus } from "lucide-react";
+import { cn } from "@reloop/ui/cn";
+import { Icon } from "@reloop/ui/icon";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
 import { useTemplateId } from "#/features/templates/editor/lib/use-template-id";
@@ -86,15 +87,22 @@ export const VariablesDropdown = forwardRef(
 			e.preventDefault();
 		};
 
+		const itemClass = (isSelected: boolean) =>
+			cn(
+				"flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left font-medium text-label-xs transition-colors",
+				isSelected
+					? "bg-bg-weak-50 text-text-strong-950"
+					: "text-text-sub-600 hover:bg-bg-weak-50 hover:text-text-strong-950",
+			);
+
 		return (
-			<div className="z-50 min-w-[220px] select-none rounded-xl border border-[#333333] bg-[#222222] p-1.5 shadow-2xl">
-				{/* Category Heading to match Slash Command Panelette style */}
-				<div className="px-2.5 py-1 font-bold text-[#888888] text-[10px] uppercase tracking-wider">
+			<div className="z-50 min-w-[220px] select-none rounded-2xl bg-bg-white-0 p-1.5 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50">
+				<div className="px-2.5 py-1 font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider">
 					Variables
 				</div>
 
 				{filtered.length === 0 ? (
-					<div className="px-2.5 py-1.5 text-[#666666] text-xs italic">
+					<div className="px-2.5 py-1.5 text-paragraph-xs text-text-soft-400 italic">
 						No matching variables
 					</div>
 				) : (
@@ -106,32 +114,23 @@ export const VariablesDropdown = forwardRef(
 								type="button"
 								onMouseDown={preventEditorBlur}
 								onClick={() => selectItem(index)}
-								className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left font-medium text-xs transition-colors ${
-									isSelected
-										? "bg-[#383838] text-white"
-										: "text-[#d1d1d6] hover:bg-[#2c2c2c] hover:text-white"
-								}`}
+								className={itemClass(isSelected)}
 							>
-								<span className="truncate">{`{{{ ${item} }}}`}</span>
+								<span className="truncate font-mono">{`{{{ ${item} }}}`}</span>
 							</button>
 						);
 					})
 				)}
 
-				<div className="my-1 border-[#333333] border-t" />
+				<div className="my-1 border-stroke-soft-100 border-t dark:border-stroke-soft-100/40" />
 
-				{/* Create Option */}
 				<button
 					type="button"
 					onMouseDown={preventEditorBlur}
 					onClick={() => selectItem(filtered.length)}
-					className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left font-semibold text-xs transition-colors ${
-						selectedIndex === filtered.length
-							? "bg-[#383838] text-white"
-							: "text-[#d1d1d6] hover:bg-[#2c2c2c] hover:text-white"
-					}`}
+					className={cn(itemClass(selectedIndex === filtered.length), "font-semibold")}
 				>
-					<Plus size={12} className="shrink-0" />
+					<Icon name="plus" className="h-3 w-3 shrink-0" />
 					<span className="truncate">Create new variable...</span>
 				</button>
 			</div>

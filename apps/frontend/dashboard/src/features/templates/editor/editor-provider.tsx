@@ -6,7 +6,7 @@ import {
 } from "@react-email/editor/ui";
 import { generateJSON } from "@tiptap/html";
 import { EditorContext } from "@tiptap/react";
-import { Braces } from "lucide-react";
+import { Icon } from "@reloop/ui/icon";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
@@ -35,7 +35,7 @@ interface EditorProviderProps {
 export const variableSlashCommand = {
 	title: "Variable",
 	description: "Create and insert a dynamic variable",
-	icon: <Braces size={20} />,
+	icon: <Icon name="brackets" className="h-5 w-5" />,
 	category: "Basic",
 	searchTerms: ["variable", "dynamic", "custom", "tag", "bracket"],
 	command: ({ editor, range }: { editor: any; range: any }) => {
@@ -446,7 +446,7 @@ export const EditorProvider = ({ children, roomId }: EditorProviderProps) => {
 			<EditorContext.Provider value={{ editor }}>
 				<div
 					ref={containerRef}
-					className="flex h-screen flex-col overflow-hidden bg-bg-weak-50 dark:bg-black"
+					className="flex h-screen flex-col overflow-hidden bg-bg-weak-50"
 				>
 					<div className="grid shrink-0 grid-cols-3 items-center px-4 pt-2">
 						<div className="flex items-center justify-start">
