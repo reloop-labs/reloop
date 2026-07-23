@@ -103,17 +103,17 @@ export const ForwardDNSRecordsButton = ({
 				showArrow={false}
 				className="w-[300px] overflow-hidden p-4"
 			>
-				<div className="space-y-1 text-left">
-					<h3 className="font-semibold text-sm text-text-strong-950">
-						{isSent ? "DNS records sent!" : "Forward DNS records"}
-					</h3>
-					{!isSent && (
+				{!isSent && (
+					<div className="space-y-1 text-left">
+						<h3 className="font-semibold text-sm text-text-strong-950">
+							Forward DNS records
+						</h3>
 						<p className="text-text-sub-600 text-xs leading-relaxed">
 							Send these DNS instructions directly to a teammate or domain
 							administrator — they'll get everything needed to complete setup.
 						</p>
-					)}
-				</div>
+					</div>
+				)}
 
 				<AnimatePresence mode="wait">
 					{isSent ? (
