@@ -35,22 +35,41 @@ export const DomainConfigurationSection = ({
 			: undefined;
 	const currentTLSRect = currentTLSTab?.getBoundingClientRect();
 
-	const onToggleClickTracking = (value: boolean) => {
-		if (!handleUpdateDomain) return;
+	const [isClickTrackingPending, setIsClickTrackingPending] = useState(false);
+	const [isOpenTrackingPending, setIsOpenTrackingPending] = useState(false);
+	const [clickTrackingFlash, setClickTrackingFlash] = useState(false);
+	const [openTrackingFlash, setOpenTrackingFlash] = useState(false);
 
-		handleUpdateDomain(
-			{ isClickTrackingEnabled: value },
-			`Click tracking ${value ? "enabled" : "disabled"}`,
-		);
+	const onToggleClickTracking = async (value: boolean) => {
+		if (!handleUpdateDomain || isClickTrackingPending) return;
+
+		setIsClickTrackingPending(true);
+		try {
+			await handleUpdateDomain(
+				{ isClickTrackingEnabled: value },
+				`Click tracking ${value ? "enabled" : "disabled"}`,
+			);
+			setClickTrackingFlash(true);
+			setTimeout(() => setClickTrackingFlash(false), 400);
+		} finally {
+			setIsClickTrackingPending(false);
+		}
 	};
 
-	const onToggleOpenTracking = (value: boolean) => {
-		if (!handleUpdateDomain) return;
+	const onToggleOpenTracking = async (value: boolean) => {
+		if (!handleUpdateDomain || isOpenTrackingPending) return;
 
-		handleUpdateDomain(
-			{ isOpenTrackingEnabled: value },
-			`Open tracking ${value ? "enabled" : "disabled"}`,
-		);
+		setIsOpenTrackingPending(true);
+		try {
+			await handleUpdateDomain(
+				{ isOpenTrackingEnabled: value },
+				`Open tracking ${value ? "enabled" : "disabled"}`,
+			);
+			setOpenTrackingFlash(true);
+			setTimeout(() => setOpenTrackingFlash(false), 400);
+		} finally {
+			setIsOpenTrackingPending(false);
+		}
 	};
 
 	const onTLSChange = (value: string) => {
@@ -112,9 +131,12 @@ export const DomainConfigurationSection = ({
 			{/* Click Tracking Card */}
 			<div
 				onClick={() =>
-					!isLoading && onToggleClickTracking(!isClickTrackingEnabled)
+					!isLoading && !isClickTrackingPending && onToggleClickTracking(!isClickTrackingEnabled)
 				}
-				className="cursor-pointer select-none rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 transition-colors hover:bg-bg-weak-50/10 dark:border-stroke-soft-100/10 dark:hover:bg-bg-weak-50/5"
+				className={cn(
+					"cursor-pointer select-none rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 transition-colors duration-300 hover:bg-bg-weak-50/10 dark:border-stroke-soft-100/10 dark:hover:bg-bg-weak-50/5",
+					clickTrackingFlash && "bg-success-base/10 dark:bg-success-base/20",
+				)}
 			>
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-2 text-base text-text-strong-950">
@@ -125,7 +147,8 @@ export const DomainConfigurationSection = ({
 						<Switch.Root
 							checked={isClickTrackingEnabled}
 							onCheckedChange={onToggleClickTracking}
-							disabled={isLoading}
+							disabled={isLoading || isClickTrackingPending}
+							isPending={isClickTrackingPending}
 						/>
 					</div>
 				</div>
@@ -139,9 +162,12 @@ export const DomainConfigurationSection = ({
 			{/* Open Tracking Card */}
 			<div
 				onClick={() =>
-					!isLoading && onToggleOpenTracking(!isOpenTrackingEnabled)
+					!isLoading && !isOpenTrackingPending && onToggleOpenTracking(!isOpenTrackingEnabled)
 				}
-				className="cursor-pointer select-none rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 transition-colors hover:bg-bg-weak-50/10 dark:border-stroke-soft-100/10 dark:hover:bg-bg-weak-50/5"
+				className={cn(
+					"cursor-pointer select-none rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 transition-colors duration-300 hover:bg-bg-weak-50/10 dark:border-stroke-soft-100/10 dark:hover:bg-bg-weak-50/5",
+					openTrackingFlash && "bg-success-base/10 dark:bg-success-base/20",
+				)}
 			>
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-2 text-base text-text-strong-950">
@@ -152,7 +178,8 @@ export const DomainConfigurationSection = ({
 						<Switch.Root
 							checked={isOpenTrackingEnabled}
 							onCheckedChange={onToggleOpenTracking}
-							disabled={isLoading}
+							disabled={isLoading || isOpenTrackingPending}
+							isPending={isOpenTrackingPending}
 						/>
 					</div>
 				</div>

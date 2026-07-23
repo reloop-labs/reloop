@@ -5,12 +5,15 @@ import * as React from "react";
 interface SwitchProps
 	extends React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root> {
 	checkedColor?: string;
+	isPending?: boolean;
+	loading?: boolean;
 }
 
 const Switch = React.forwardRef<
 	React.ComponentRef<typeof SwitchPrimitives.Root>,
 	SwitchProps
->(({ className, disabled, checkedColor, ...rest }, forwardedRef) => {
+>(({ className, disabled, checkedColor, isPending: isPendingProp, loading, ...rest }, forwardedRef) => {
+	const isPending = isPendingProp || loading;
 	const [isChecked, setIsChecked] = React.useState(
 		rest.defaultChecked ?? false,
 	);
@@ -71,9 +74,10 @@ const Switch = React.forwardRef<
 					className={cn(
 						// base
 						"pointer-events-none relative block size-3",
-						"transition-transform duration-200 ease-out",
+						"transition-all duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
 						// checked
 						"data-[state=checked]:translate-x-3",
+						isPending && "animate-pulse opacity-75 scale-95",
 						!disabled && [
 							// before
 							"before:-translate-x-1/2 before:absolute before:inset-y-0 before:left-1/2 before:w-3 before:rounded-full before:bg-static-white",
