@@ -1,6 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
@@ -76,18 +76,8 @@ export function DomainTable({
 						return (
 							<div
 								key={domain.id}
-								role="link"
-								tabIndex={0}
-								onClick={() => goToDomain(domain.id)}
-								onKeyDown={(e) => {
-									if (e.key === "Enter" || e.key === " ") {
-										e.preventDefault();
-										goToDomain(domain.id);
-									}
-								}}
 								className={cn(
-									"group/row grid cursor-pointer grid-cols-[minmax(0,1fr)_120px_140px_32px] items-center px-4 py-2 text-left transition-colors",
-									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base",
+									"grid grid-cols-[minmax(0,1fr)_120px_140px_32px] items-center px-4 py-2 text-left transition-colors",
 									isRowActive && "bg-bg-weak-50/50",
 								)}
 							>
@@ -95,13 +85,17 @@ export function DomainTable({
 									<Icon
 										name="globe"
 										className={cn(
-											"h-4 w-4",
+											"h-4 w-4 shrink-0",
 											getStatusColorClass(domain.status),
 										)}
 									/>
-									<span className="truncate font-medium text-label-sm text-text-strong-950">
+									<Link
+										to="/domain/$domainId"
+										params={{ domainId: domain.id }}
+										className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+									>
 										{domain.domain}
-									</span>
+									</Link>
 								</div>
 								<div className="flex items-center">
 									<div
