@@ -130,23 +130,8 @@ export function ApiKeyTable({
 							return (
 								<div
 									key={row.id}
-									onClick={() =>
-										void navigate({
-											to: "/api-keys/$apiKeyId",
-											params: { apiKeyId: apiKey.id },
-										})
-									}
-									onKeyDown={(e) => {
-										if (e.key === "Enter" || e.key === " ") {
-											e.preventDefault();
-											void navigate({
-												to: "/api-keys/$apiKeyId",
-												params: { apiKeyId: apiKey.id },
-											});
-										}
-									}}
 									className={cn(
-										`group/row grid w-full cursor-pointer ${API_KEY_TABLE_GRID} items-center px-4 py-2 text-left transition-colors`,
+										`group/row grid w-full ${API_KEY_TABLE_GRID} items-center px-4 py-2 text-left transition-colors`,
 										isRowActive && "bg-bg-weak-50/50",
 									)}
 								>

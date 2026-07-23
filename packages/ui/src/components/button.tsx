@@ -87,7 +87,7 @@ export const buttonVariants = tv({
 					// base
 					"bg-bg-white-0 text-primary-base ring-primary-base",
 					// hover
-					"hover:bg-primary-alpha-10 hover:ring-transparent",
+					"hover:bg-primary-alpha-10",
 					// focus
 					"focus-visible:shadow-button-primary-focus",
 				],
@@ -146,7 +146,7 @@ export const buttonVariants = tv({
 					// base
 					"bg-bg-white-0 shadow-regular-xs ring-stroke-soft-200 dark:ring-stroke-soft-100/50",
 					// hover
-					"hover:bg-bg-weak-50 hover:text-text-strong-950 hover:shadow-none hover:ring-transparent",
+					"hover:bg-bg-weak-50/60 hover:text-text-strong-950",
 					// focus
 					"focus-visible:text-text-strong-950 focus-visible:shadow-button-important-focus focus-visible:ring-stroke-strong-950",
 				],
@@ -205,7 +205,7 @@ export const buttonVariants = tv({
 					// base
 					"bg-bg-white-0 text-error-base ring-error-base",
 					// hover
-					"hover:bg-red-alpha-10 hover:ring-transparent",
+					"hover:bg-red-alpha-10",
 					// focus
 					"focus-visible:shadow-button-error-focus",
 				],
@@ -264,7 +264,7 @@ export const buttonVariants = tv({
 					// base
 					"bg-bg-white-0 text-success-base ring-success-base",
 					// hover
-					"hover:bg-green-alpha-10 hover:ring-transparent",
+					"hover:bg-green-alpha-10",
 					// focus
 					"focus-visible:shadow-button-primary-focus",
 				],

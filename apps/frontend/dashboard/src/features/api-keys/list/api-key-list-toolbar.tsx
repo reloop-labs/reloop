@@ -6,6 +6,7 @@ import {
 	type ApiKeyStatusFilterOption,
 } from "../filters/status-filter-dropdown";
 import { ApiKeyUserFilterDropdown } from "../filters/user-filter-dropdown";
+import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import type { CreatedByUser } from "../types";
 
 export function ApiKeyListToolbar({
@@ -30,14 +31,16 @@ export function ApiKeyListToolbar({
 		parseAsInteger.withDefault(1),
 	);
 
+	const invalidate = useInvalidateApiKeys();
+
 	return (
 		<div className="flex items-center gap-2">
 			<div className="flex-1">
-				<Input.Root size="xsmall" className="rounded-[10px]">
+				<Input.Root size="small" className="rounded-xl">
 					<Input.Wrapper>
-						<Input.Icon as={Icon} name="search" size="xsmall" />
+						<Input.Icon as={Icon} name="search" size="small" />
 						<Input.Input
-							placeholder="Search API keys..."
+							placeholder="Search API keys by name prefix..."
 							value={searchQuery}
 							onChange={(e) => {
 								void setSearchQuery(e.target.value);
@@ -63,6 +66,14 @@ export function ApiKeyListToolbar({
 						void setCurrentPage(1);
 					}}
 				/>
+				<button
+					type="button"
+					onClick={() => void invalidate()}
+					className="flex h-9 w-9 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40 shrink-0"
+					title="Refresh API keys"
+				>
+					<Icon name="rotate-cw" className="h-4 w-4" />
+				</button>
 			</div>
 		</div>
 	);

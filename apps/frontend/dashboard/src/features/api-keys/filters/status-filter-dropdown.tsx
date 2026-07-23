@@ -51,14 +51,14 @@ export function ApiKeyStatusFilterDropdown({
 				<Button.Root
 					variant="neutral"
 					mode="stroke"
-					size="xsmall"
-					className="w-36 justify-between gap-1.5 whitespace-nowrap rounded-[10px]"
+					size="small"
+					className="w-36 justify-between gap-1.5 whitespace-nowrap rounded-xl"
 				>
 					<div className="flex items-center gap-1.5 overflow-hidden">
 						<Icon
 							name={selectedOption?.icon ?? "activity"}
 							className={cn(
-								"h-3.5 w-3.5 shrink-0",
+								"h-4 w-4 shrink-0",
 								selectedOption?.colorClass,
 							)}
 						/>
@@ -66,7 +66,7 @@ export function ApiKeyStatusFilterDropdown({
 							{selectedOption?.label || "All Status"}
 						</span>
 					</div>
-					<Icon name="chevron-down" className="h-3.5 w-3.5 shrink-0" />
+					<Icon name="chevron-down" className="h-4 w-4 shrink-0 text-text-sub-600" />
 				</Button.Root>
 			</Dropdown.Trigger>
 			<Dropdown.Content align="start" className="w-36 p-2">

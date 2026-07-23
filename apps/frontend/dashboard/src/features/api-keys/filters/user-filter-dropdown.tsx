@@ -36,8 +36,8 @@ export function ApiKeyUserFilterDropdown({
 				<Button.Root
 					variant="neutral"
 					mode="stroke"
-					size="xsmall"
-					className="w-48 justify-between gap-1.5 whitespace-nowrap rounded-[10px]"
+					size="small"
+					className="w-48 justify-between gap-1.5 whitespace-nowrap rounded-xl"
 				>
 					<div className="flex items-center gap-1.5 overflow-hidden">
 						{selectedCreator ? (
@@ -66,11 +66,11 @@ export function ApiKeyUserFilterDropdown({
 								)}
 							</Avatar.Root>
 						) : (
-							<Icon name="user" className="h-3.5 w-3.5 shrink-0" />
+							<Icon name="user" className="h-4 w-4 shrink-0" />
 						)}
 						<span className="truncate">{displayLabel}</span>
 					</div>
-					<Icon name="chevron-down" className="h-3.5 w-3.5 shrink-0" />
+					<Icon name="chevron-down" className="h-4 w-4 shrink-0 text-text-sub-600" />
 				</Button.Root>
 			</Dropdown.Trigger>
 			<Dropdown.Content align="start" className="w-48 p-2">
