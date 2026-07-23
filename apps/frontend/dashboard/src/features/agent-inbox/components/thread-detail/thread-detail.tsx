@@ -222,7 +222,9 @@ export const ThreadDetail = ({
 		mutate: mutateThread,
 		isLoading: isLoadingThread,
 	} = useSWR<any>(
-		thread?.threadId ? `/api/inbox/v1/threads/${thread.threadId}` : null,
+		(thread?.threadId || thread?.id)
+			? `/api/inbox/v1/threads/${thread.threadId || thread.id}`
+			: null,
 		{
 			revalidateOnFocus: false,
 			keepPreviousData: false,
@@ -230,10 +232,10 @@ export const ThreadDetail = ({
 	);
 
 	const threadDataMatches =
-		!!thread?.threadId &&
+		!!(thread?.threadId || thread?.id) &&
 		!!threadData &&
-		(threadData.id === thread.threadId ||
-			threadData.threadId === thread.threadId);
+		(threadData.id === (thread.threadId || thread.id) ||
+			threadData.threadId === (thread.threadId || thread.id));
 
 	// Reset all local state when the selected thread changes
 	useEffect(() => {
@@ -390,7 +392,7 @@ export const ThreadDetail = ({
 
 	const refreshSavedReplyDraft = useCallback(async () => {
 		const mailboxKey = mailbox?.id;
-		const threadKey = thread?.threadId;
+		const threadKey = thread?.threadId || thread?.id;
 		if (!mailboxKey || !threadKey) {
 			setSavedReplyDraft(null);
 			return;
@@ -740,7 +742,7 @@ export const ThreadDetail = ({
 		setForwardAnchorMessageId(anchor?.id ?? null);
 		setSkipForwardEnter(!!opts?.viaKeyboard);
 
-		const threadKey = thread?.threadId;
+		const threadKey = thread?.threadId || thread?.id;
 		const mailboxKey = mailbox?.id;
 		if (mailboxKey && threadKey) {
 			void findDraft({
@@ -812,7 +814,7 @@ export const ThreadDetail = ({
 		setSkipReplyEnter(!!opts?.viaKeyboard);
 
 		const kind = replyModeToKind(mode);
-		const threadKey = thread?.threadId;
+		const threadKey = thread?.threadId || thread?.id;
 		const mailboxKey = mailbox?.id;
 		if (mailboxKey && threadKey) {
 			void findDraft({
@@ -1098,7 +1100,7 @@ export const ThreadDetail = ({
 	})();
 
 	const replyKind = replyModeToKind(replyMode);
-	const conversationThreadId = thread.threadId || null;
+	const conversationThreadId = thread.threadId || thread.id || null;
 
 	const discardReplyDraft = () => {
 		const id = replyDraftId || savedReplyDraft?.id || null;
