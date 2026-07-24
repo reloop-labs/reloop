@@ -1,5 +1,6 @@
 
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -279,43 +280,60 @@ export function CreateChannelPreview({
 				</div>
 
 				{/* Update button */}
-				<button
+				<FancyButton.Root
 					type="button"
 					onClick={handleUpdate}
-					className={cn(
-						"w-full rounded-xl py-3 font-semibold text-sm transition-all duration-200",
-						saved
-							? "bg-green-500/20 text-green-400"
-							: cn(
-									"bg-primary-base text-white hover:bg-primary-base/90 active:scale-[0.98]",
-									"dark:bg-white dark:text-black dark:hover:bg-white/90",
-								),
-					)}
+					variant={saved ? "success" : "blue"}
+					size="medium"
+					className="w-full justify-center"
 				>
-					{saved ? "✓ Updated!" : "Update"}
-				</button>
+					<AnimatePresence mode="wait" initial={false}>
+						{saved ? (
+							<motion.span
+								key="saved"
+								initial={{ opacity: 0, y: -6 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 6 }}
+								transition={{ duration: 0.15 }}
+								className="flex items-center gap-1.5"
+							>
+								<FancyButton.Icon as={Icon} name="check-circle" />
+								<span>Updated</span>
+							</motion.span>
+						) : (
+							<motion.span
+								key="update"
+								initial={{ opacity: 0, y: -6 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 6 }}
+								transition={{ duration: 0.15 }}
+								className="flex items-center gap-1.5"
+							>
+								<span>Update</span>
+							</motion.span>
+						)}
+					</AnimatePresence>
+				</FancyButton.Root>
 
 				{/* Or divider */}
-				<div className="my-4 flex items-center gap-3">
+				<div className="my-3.5 flex items-center gap-3">
 					<div className="h-px flex-1 bg-black/10 dark:bg-white/10" />
-					<span className="text-[11px] text-text-soft-400 dark:text-white/30">
+					<span className="font-semibold text-[10px] text-text-soft-400 uppercase tracking-wider dark:text-white/30">
 						Or
 					</span>
 					<div className="h-px flex-1 bg-black/10 dark:bg-white/10" />
 				</div>
 
 				{/* Unsubscribe All button */}
-				<button
+				<FancyButton.Root
 					type="button"
 					onClick={handleUnsubscribeAll}
-					className={cn(
-						"w-full rounded-xl border py-3 font-semibold text-sm transition-all active:scale-[0.98]",
-						"border-black/10 text-text-strong-950 hover:bg-black/5",
-						"dark:border-white/15 dark:text-white dark:hover:bg-white/5",
-					)}
+					variant="basic"
+					size="medium"
+					className="w-full justify-center"
 				>
 					Unsubscribe All
-				</button>
+				</FancyButton.Root>
 
 				{/* Footer */}
 				<div className="mt-6 flex items-center justify-center gap-1.5">

@@ -1,5 +1,6 @@
 
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { useEffect, useMemo, useState } from "react";
 
 interface Channel {
@@ -197,34 +198,50 @@ export function SubscriberBrowserPreview({
 				)}
 
 				{/* Update button */}
-				<button
+				<FancyButton.Root
 					type="button"
 					onClick={handleUpdate}
-					className={cn(
-						"w-full rounded-xl py-3 font-semibold text-sm transition-all duration-200",
-						saved
-							? "bg-green-500/20 text-green-400"
-							: "bg-white text-black hover:bg-white/90 active:scale-[0.98]",
-					)}
+					variant={saved ? "success" : "blue"}
+					size="medium"
+					className="w-full justify-center"
 				>
-					{saved ? "✓ Updated!" : "Update"}
-				</button>
+					{saved ? (
+						<span className="flex items-center gap-1.5">
+							<svg
+								className="h-4 w-4"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+								strokeWidth={2.5}
+							>
+								<path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+							<span>Updated</span>
+						</span>
+					) : (
+						<span>Update</span>
+					)}
+				</FancyButton.Root>
 
 				{/* Or divider */}
-				<div className="my-4 flex items-center gap-3">
+				<div className="my-3.5 flex items-center gap-3">
 					<div className="h-px flex-1 bg-white/10" />
-					<span className="text-[11px] text-white/30">Or</span>
+					<span className="font-semibold text-[10px] text-white/30 uppercase tracking-wider">
+						Or
+					</span>
 					<div className="h-px flex-1 bg-white/10" />
 				</div>
 
 				{/* Unsubscribe All button */}
-				<button
+				<FancyButton.Root
 					type="button"
 					onClick={handleUnsubscribeAll}
-					className="w-full rounded-xl border border-white/15 py-3 font-semibold text-sm text-white transition-all hover:bg-white/5 active:scale-[0.98]"
+					variant="basic"
+					size="medium"
+					className="w-full justify-center"
 				>
 					Unsubscribe All
-				</button>
+				</FancyButton.Root>
 
 				{/* Footer */}
 				<div className="mt-6 flex items-center justify-center gap-1.5">

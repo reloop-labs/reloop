@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { useCallback, useState } from "react";
@@ -233,49 +234,50 @@ export function PreferencesContent({
 					)}
 
 					{/* Update Button */}
-					<button
+					<FancyButton.Root
 						type="button"
 						onClick={handleUpdate}
 						disabled={saveState === "saving"}
-						className={cn(
-							"flex w-full items-center justify-center gap-2 rounded-2xl py-4 font-bold text-[15px] transition-all duration-200 active:scale-[0.98]",
+						variant={
 							saveState === "saved"
-								? "bg-green-500/20 text-green-400"
+								? "success"
 								: saveState === "error"
-									? "bg-red-500/20 text-red-400"
-									: "bg-white text-black hover:bg-white/90 disabled:opacity-50",
-						)}
+									? "destructive"
+									: "blue"
+						}
+						size="medium"
+						className="w-full justify-center py-3 font-semibold"
 					>
 						{saveState === "saving" && (
-							<Icon name="spinner" className="h-4 w-4 animate-spin" />
+							<FancyButton.Icon as={Icon} name="spinner" className="animate-spin" />
 						)}
 						{saveState === "saved"
-							? "✓ Updated!"
+							? "✓ Updated Preferences"
 							: saveState === "error"
 								? "Failed to update"
 								: "Update Preferences"}
-					</button>
+					</FancyButton.Root>
 
 					{/* Or Divider */}
-					<div className="my-6 flex items-center gap-4">
+					<div className="my-5 flex items-center gap-4">
 						<div className="h-px flex-1 bg-white/10" />
-						<span className="font-medium text-[11px] text-white/20 uppercase tracking-widest">
+						<span className="font-semibold text-[10px] text-white/30 uppercase tracking-widest">
 							Or
 						</span>
 						<div className="h-px flex-1 bg-white/10" />
 					</div>
 
 					{/* Unsubscribe All Button */}
-					<button
+					<FancyButton.Root
 						type="button"
 						onClick={handleUnsubscribeAll}
 						disabled={unsubscribeAllState === "loading"}
+						variant={unsubscribeAllState === "confirming" ? "destructive" : "basic"}
+						size="medium"
 						className={cn(
-							"w-full rounded-2xl border border-white/10 py-4 font-bold text-[15px] text-white/70 transition-all duration-200",
-							"hover:bg-white/5 hover:text-white active:scale-[0.98] disabled:opacity-50",
-							unsubscribeAllState === "confirming"
-								? "border-red-500/30 bg-red-500/10 text-red-400"
-								: "",
+							"w-full justify-center py-3 font-semibold",
+							unsubscribeAllState === "confirming" &&
+								"border-red-500/30 bg-red-500/10 text-red-400",
 						)}
 					>
 						{unsubscribeAllState === "confirming"
@@ -285,7 +287,7 @@ export function PreferencesContent({
 								: unsubscribeAllState === "done"
 									? "✓ Unsubscribed from all"
 									: "Unsubscribe All"}
-					</button>
+					</FancyButton.Root>
 
 					{/* Footer */}
 					<div className="mt-10 flex flex-col items-center gap-4">
