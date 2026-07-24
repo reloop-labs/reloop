@@ -1,6 +1,8 @@
 
 import * as Button from "@reloop/ui/button";
 import * as Checkbox from "@reloop/ui/checkbox";
+import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { KbdCommand } from "@reloop/ui/kbd-command";
@@ -10,11 +12,12 @@ import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import * as Textarea from "@reloop/ui/textarea";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 import { CreateChannelPreview } from "./create-channel-preview";
 
@@ -178,11 +181,13 @@ export const EditChannelModal = ({
 			>
 				<div className="rounded-2xl border border-stroke-soft-100">
 					<Modal.Header className="before:border-stroke-soft-100 dark:border-stroke-soft-100/40">
-						<div className="flex items-center justify-center">
+						<div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-base/10 text-primary-base dark:bg-white/10 dark:text-white">
 							<Icon name="tag" className="h-4 w-4" />
 						</div>
 						<div className="flex-1">
-							<Modal.Title className="font-semibold">Edit Channel</Modal.Title>
+							<Modal.Title className="font-semibold text-lg text-text-strong-950 dark:text-white">
+								Edit Channel
+							</Modal.Title>
 						</div>
 					</Modal.Header>
 					<div className="flex flex-col lg:flex-row lg:items-stretch lg:divide-x lg:divide-stroke-soft-100 dark:lg:divide-stroke-soft-100/40">
@@ -199,7 +204,7 @@ export const EditChannelModal = ({
 											Channel Name
 											<span className="text-primary-base">*</span>
 										</Label.Root>
-										<Input.Root size="small" className="rounded-xl">
+										<Input.Root size="medium">
 											<Input.Wrapper>
 												<Input.Input
 													id="edit-channel-name"
@@ -256,7 +261,12 @@ export const EditChannelModal = ({
 								<div className="mt-2 space-y-3">
 									<label
 										htmlFor="default-subscription"
-										className="flex w-full cursor-pointer gap-2 rounded-2xl border border-stroke-soft-100 p-3 transition-colors hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40"
+										className={cn(
+											"flex w-full cursor-pointer items-start gap-3 rounded-2xl border p-3.5 transition-all duration-200",
+											defaultSubscription === "opt_in"
+												? "border-primary-base/40 bg-primary-base/[0.03] dark:border-white/20 dark:bg-white/[0.03]"
+												: "border-stroke-soft-100 hover:border-stroke-sub-300 dark:border-stroke-soft-100/40 dark:hover:border-stroke-soft-100/80",
+										)}
 									>
 										<Checkbox.Root
 											id="default-subscription"
@@ -265,12 +275,13 @@ export const EditChannelModal = ({
 												setDefaultSubscription(checked ? "opt_in" : "opt_out")
 											}
 											disabled={isSaving}
+											className="mt-0.5"
 										/>
 										<div className="-mt-px flex-1">
-											<p className="font-medium text-paragraph-sm text-text-strong-950">
+											<p className="font-semibold text-paragraph-sm text-text-strong-950 dark:text-white">
 												Default Subscription
 											</p>
-											<p className="text-paragraph-xs text-text-sub-600">
+											<p className="mt-0.5 text-paragraph-xs text-text-sub-600 dark:text-white/50">
 												{defaultSubscription === "opt_in"
 													? "New contacts are automatically enrolled"
 													: "Contacts must be manually enrolled"}
@@ -280,7 +291,12 @@ export const EditChannelModal = ({
 
 									<label
 										htmlFor="public-visibility"
-										className="flex w-full cursor-pointer gap-2 rounded-2xl border border-stroke-soft-100 p-3 transition-colors hover:bg-bg-weak-50/50 dark:border-stroke-soft-100/40"
+										className={cn(
+											"flex w-full cursor-pointer items-start gap-3 rounded-2xl border p-3.5 transition-all duration-200",
+											visibility === "public"
+												? "border-primary-base/40 bg-primary-base/[0.03] dark:border-white/20 dark:bg-white/[0.03]"
+												: "border-stroke-soft-100 hover:border-stroke-sub-300 dark:border-stroke-soft-100/40 dark:hover:border-stroke-soft-100/80",
+										)}
 									>
 										<Checkbox.Root
 											id="public-visibility"
@@ -289,15 +305,16 @@ export const EditChannelModal = ({
 												setVisibility(checked ? "public" : "private")
 											}
 											disabled={isSaving}
+											className="mt-0.5"
 										/>
 										<div className="-mt-px flex-1">
-											<p className="font-medium text-paragraph-sm text-text-strong-950">
+											<p className="font-semibold text-paragraph-sm text-text-strong-950 dark:text-white">
 												Public Channel
 											</p>
-											<p className="text-paragraph-xs text-text-sub-600">
+											<p className="mt-0.5 text-paragraph-xs text-text-sub-600 dark:text-white/50">
 												{visibility === "public"
-													? "Channel is visible to everyone"
-													: "Channel is only visible to your team"}
+													? "Channel is visible to everyone on subscription pages"
+													: "Channel is private and only visible to your team"}
 											</p>
 										</div>
 									</label>
@@ -308,39 +325,55 @@ export const EditChannelModal = ({
 									type="button"
 									variant="neutral"
 									mode="stroke"
-									size="xsmall"
+									size="small"
 									onClick={() => handleOpenChange(false)}
 									disabled={isSaving}
 								>
 									Cancel
 									<KbdEsc />
 								</Button.Root>
-								<Button.Root
+								<FancyButton.Root
 									type="submit"
-									variant="neutral"
-									size="xsmall"
+									variant="blue"
+									size="small"
 									disabled={isSaving || !name.trim() || isDescriptionOverLimit}
 								>
-									{isSaving ? (
-										<>
-											<Spinner size={14} color="currentColor" />
-											Updating...
-										</>
-									) : (
-										<>
-											Update Channel
-											<span className="inline-flex items-center gap-0.5">
-												<KbdCommand />
-												<KbdEnter />
-											</span>
-										</>
-									)}
-								</Button.Root>
+									<AnimatePresence mode="wait" initial={false}>
+										{isSaving ? (
+											<motion.span
+												key="saving"
+												initial={{ opacity: 0, y: -4 }}
+												animate={{ opacity: 1, y: 0 }}
+												exit={{ opacity: 0, y: 4 }}
+												transition={{ duration: 0.15 }}
+												className="flex items-center gap-2"
+											>
+												<Spinner size={14} color="currentColor" />
+												<span>Updating...</span>
+											</motion.span>
+										) : (
+											<motion.span
+												key="update"
+												initial={{ opacity: 0, y: -4 }}
+												animate={{ opacity: 1, y: 0 }}
+												exit={{ opacity: 0, y: 4 }}
+												transition={{ duration: 0.15 }}
+												className="flex items-center gap-2"
+											>
+												<span>Update Channel</span>
+												<span className="inline-flex items-center gap-0.5 opacity-80">
+													<KbdCommand />
+													<KbdEnter />
+												</span>
+											</motion.span>
+										)}
+									</AnimatePresence>
+								</FancyButton.Root>
 							</Modal.Footer>
 						</form>
 
 						{/* Right Column: Preview */}
-						<div className="hidden flex-1 flex-col bg-bg-weak-50/30 p-6 lg:flex">
+						<div className="hidden flex-1 flex-col bg-bg-weak-50/40 p-6 lg:flex dark:bg-bg-weak-50/10">
 							<div className="sticky top-0">
 								<CreateChannelPreview
 									channel={previewChannel}

@@ -215,6 +215,7 @@ export const ChannelTable = ({
 										channelId={channel.id}
 										channelName={channel.name}
 										visibility={channel.visibility}
+										onEdit={onEdit}
 										onDelete={handleDelete}
 										onToggleVisibility={onToggleVisibility}
 										onOpenChange={(open: boolean) =>

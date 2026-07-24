@@ -7,12 +7,15 @@ import {
 	Root as PopoverRoot,
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
+import { useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 interface ChannelDropdownProps {
 	channelId: string;
 	channelName: string;
 	visibility?: "private" | "public";
+	onEdit?: (id: string) => void;
 	onDelete: (id: string) => void;
 	onToggleVisibility?: (id: string, currentValue: "private" | "public") => void;
 	onOpenChange?: (open: boolean) => void;
@@ -22,10 +25,12 @@ export const ChannelDropdown = ({
 	channelId,
 	channelName: _channelName,
 	visibility = "private",
+	onEdit,
 	onDelete,
 	onToggleVisibility,
 	onOpenChange,
 }: ChannelDropdownProps) => {
+	const navigate = useNavigate();
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -38,6 +43,11 @@ export const ChannelDropdown = ({
 		onOpenChange?.(open);
 	};
 
+	const handleEdit = () => {
+		onEdit?.(channelId);
+		setPopoverOpen(false);
+	};
+
 	const handleDelete = () => {
 		onDelete(channelId);
 		setPopoverOpen(false);
@@ -48,9 +58,30 @@ export const ChannelDropdown = ({
 		setPopoverOpen(false);
 	};
 
+	const handleCopyId = async () => {
+		try {
+			await navigator.clipboard.writeText(channelId);
+			toast.success("Channel ID copied to clipboard");
+		} catch {
+			toast.error("Failed to copy channel ID");
+		}
+		setPopoverOpen(false);
+	};
+
+	const handleViewSubscribers = () => {
+		void navigate({ to: "/contacts", search: { channelId } });
+		setPopoverOpen(false);
+	};
+
 	const visibilityIcon = visibility === "public" ? "lock" : "globe";
 
 	const menuItems = [
+		{
+			icon: "edit" as const,
+			label: "Edit Channel",
+			onClick: handleEdit,
+			hidden: !onEdit,
+		},
 		{
 			icon: visibilityIcon as "lock" | "globe",
 			label: visibility === "public" ? "Set Private" : "Set Public",
@@ -58,10 +89,20 @@ export const ChannelDropdown = ({
 			hidden: !onToggleVisibility,
 		},
 		{
+			icon: "users" as const,
+			label: "View Subscribers",
+			onClick: handleViewSubscribers,
+		},
+		{
+			icon: "copy" as const,
+			label: "Copy Channel ID",
+			onClick: handleCopyId,
+		},
+		{
 			icon: "trash" as const,
 			label: "Delete Channel",
 			onClick: handleDelete,
-			className: "text-error-base",
+			className: "text-error-base hover:bg-error-base/10 dark:hover:bg-error-base/20",
 		},
 	].filter((item) => !item.hidden);
 
@@ -74,7 +115,7 @@ export const ChannelDropdown = ({
 			</PopoverTrigger>
 			<PopoverContent
 				align="end"
-				className="w-44 rounded-xl p-1.5"
+				className="w-48 rounded-xl p-1.5"
 				sideOffset={-6}
 			>
 				<div className="relative">
@@ -89,7 +130,7 @@ export const ChannelDropdown = ({
 							onPointerLeave={() => setHoverIdx(undefined)}
 							onClick={item.onClick}
 							className={cn(
-								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-text-strong-950 text-xs transition-colors",
+								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-text-strong-950 text-xs transition-colors dark:text-white",
 								!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
 								item.className,
 							)}
