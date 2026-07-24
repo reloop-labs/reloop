@@ -10,7 +10,7 @@ import type { ApiKeyData } from "../types";
 
 export type ApiKeyActionsHandlers = {
 	togglingId: string | null;
-	onToggleEnabled: (apiKey: ApiKeyData) => void;
+	onToggleEnabled: (apiKey: ApiKeyData) => Promise<void> | void;
 	onRotateKey: (apiKey: ApiKeyData) => void;
 	onDeleteKey: (id: string) => void;
 	onEditKey?: (id: string) => void;
@@ -29,6 +29,8 @@ export function ApiKeyActionsMenu({
 	const [open, setOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [copiedItem, setCopiedItem] = useState<"prefix" | "id" | null>(null);
+	const [isToggleCompleted, setIsToggleCompleted] = useState(false);
+	const [wasEnabledOnToggle, setWasEnabledOnToggle] = useState(apiKey.enabled);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
 	const menuItems = [
@@ -58,8 +60,19 @@ export function ApiKeyActionsMenu({
 		},
 		{
 			id: "toggle" as const,
-			label: apiKey.enabled ? "Disable" : "Enable",
-			icon: (apiKey.enabled ? "cross-circle" : "check-circle") as
+			label: isToggling
+				? apiKey.enabled
+					? "Disabling..."
+					: "Enabling..."
+				: apiKey.enabled
+					? "Disable"
+					: "Enable",
+			icon: (isToggling
+				? "loader-2"
+				: apiKey.enabled
+					? "cross-circle"
+					: "check-circle") as
+				| "loader-2"
 				| "cross-circle"
 				| "check-circle",
 			isDanger: false,
@@ -84,7 +97,10 @@ export function ApiKeyActionsMenu({
 
 	const handleOpenChange = (next: boolean) => {
 		setOpen(next);
-		if (!next) setHoverIdx(undefined);
+		if (!next) {
+			setHoverIdx(undefined);
+			setIsToggleCompleted(false);
+		}
 		handlers.onOpenChange(next, apiKey.id);
 	};
 
@@ -114,7 +130,7 @@ export function ApiKeyActionsMenu({
 		}
 	};
 
-	const handleItemClick = (id: (typeof menuItems)[number]["id"]) => {
+	const handleItemClick = async (id: (typeof menuItems)[number]["id"]) => {
 		if (id === "view") {
 			void navigate({
 				to: "/api-keys/$apiKeyId",
@@ -129,8 +145,17 @@ export function ApiKeyActionsMenu({
 		} else if (id === "copy_id") {
 			void handleCopyId();
 		} else if (id === "toggle") {
-			handlers.onToggleEnabled(apiKey);
-			handleOpenChange(false);
+			setWasEnabledOnToggle(apiKey.enabled);
+			try {
+				await handlers.onToggleEnabled(apiKey);
+				setIsToggleCompleted(true);
+				setTimeout(() => {
+					setIsToggleCompleted(false);
+					handleOpenChange(false);
+				}, 750);
+			} catch {
+				handleOpenChange(false);
+			}
 		} else if (id === "rotate") {
 			handlers.onRotateKey(apiKey);
 			handleOpenChange(false);
@@ -174,6 +199,12 @@ export function ApiKeyActionsMenu({
 							const isThisCopied =
 								(isCopyPrefix && copiedItem === "prefix") ||
 								(isCopyId && copiedItem === "id");
+							const isToggleItem = item.id === "toggle";
+							const toggleStateKey = isToggleCompleted
+								? "completed"
+								: isToggling
+									? "loading"
+									: "idle";
 
 							return (
 								<button
@@ -185,7 +216,7 @@ export function ApiKeyActionsMenu({
 									onPointerEnter={() => setHoverIdx(idx)}
 									onPointerLeave={() => setHoverIdx(undefined)}
 									onClick={() => handleItemClick(item.id)}
-									disabled={item.id === "toggle" && isToggling}
+									disabled={item.id === "toggle" && (isToggling || isToggleCompleted)}
 									className={cn(
 										"relative flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-normal text-xs transition-colors min-h-[28px]",
 										item.isDanger ? "text-error-base" : "text-text-strong-950",
@@ -193,18 +224,55 @@ export function ApiKeyActionsMenu({
 											hoverIdx === idx &&
 											(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
 										item.id === "toggle" &&
-											isToggling &&
-											"cursor-not-allowed opacity-50",
+											(isToggling || isToggleCompleted) &&
+											"cursor-not-allowed opacity-90",
 									)}
 								>
-									{item.id === "toggle" && isToggling ? (
-										<>
-											<Icon
-												name="loader-2"
-												className="h-3.5 w-3.5 animate-spin text-text-sub-600"
-											/>
-											<span>{item.label}</span>
-										</>
+									{isToggleItem ? (
+										<AnimatePresence mode="popLayout" initial={false}>
+											<motion.div
+												key={toggleStateKey}
+												transition={{
+													type: "spring",
+													duration: 0.25,
+													bounce: 0,
+												}}
+												initial={{ opacity: 0, y: -14 }}
+												animate={{ opacity: 1, y: 0 }}
+												exit={{ opacity: 0, y: 14 }}
+												className="flex items-center gap-2"
+											>
+												{isToggleCompleted ? (
+													<>
+														<Icon
+															name="check-circle"
+															className="h-3.5 w-3.5 shrink-0 text-success-base"
+														/>
+														<span className="text-success-base">
+															{wasEnabledOnToggle ? "Disabled!" : "Enabled!"}
+														</span>
+													</>
+												) : isToggling ? (
+													<>
+														<Icon
+															name="loader-2"
+															className="h-3.5 w-3.5 shrink-0 animate-spin text-text-sub-600"
+														/>
+														<span>
+															{apiKey.enabled ? "Disabling..." : "Enabling..."}
+														</span>
+													</>
+												) : (
+													<>
+														<Icon
+															name={apiKey.enabled ? "cross-circle" : "check-circle"}
+															className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+														/>
+														<span>{apiKey.enabled ? "Disable" : "Enable"}</span>
+													</>
+												)}
+											</motion.div>
+										</AnimatePresence>
 									) : isCopyPrefix || isCopyId ? (
 										<AnimatePresence mode="popLayout" initial={false}>
 											<motion.div

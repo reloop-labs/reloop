@@ -1,183 +1,226 @@
-import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
-import { useEffect } from "react";
-import type { Resolver } from "react-hook-form";
-import { useForm } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import * as v from "valibot";
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import type { ApiKeyData } from "../types";
-import { ModalHeader } from "./modal-header";
 
-const editApiKeySchema = v.object({
-	name: v.pipe(v.string(), v.minLength(1, "Name must be at least 1 character")),
-});
+export interface EditApiKeyModalProps {
+	apiKeys: ApiKeyData[];
+	onEditSuccess?: (updatedName: string) => void;
+}
 
-type EditApiKeyFormValues = v.InferInput<typeof editApiKeySchema>;
-
-export function EditApiKeyModal({ apiKeys }: { apiKeys: ApiKeyData[] }) {
+export function EditApiKeyModal({
+	apiKeys,
+	onEditSuccess,
+}: EditApiKeyModalProps) {
 	const [editId, setEditId] = useQueryState("edit");
 	const invalidate = useInvalidateApiKeys();
 
-	const apiKeyToEdit = apiKeys.find((k) => k.id === editId);
+	const [name, setName] = useState("");
+	const [error, setError] = useState<string | null>(null);
+	const [status, setStatus] = useState<"idle" | "saving" | "success">("idle");
 
-	const form = useForm<EditApiKeyFormValues>({
-		resolver: valibotResolver(
-			editApiKeySchema,
-		) as Resolver<EditApiKeyFormValues>,
-		defaultValues: { name: "" },
-	});
-
-	const {
-		register,
-		handleSubmit,
-		formState: { errors, isSubmitting },
-		reset,
-	} = form;
+	const targetApiKeyRef = useRef<ApiKeyData | null>(null);
+	const currentApiKey = apiKeys.find((k) => k.id === editId);
+	if (currentApiKey) {
+		targetApiKeyRef.current = currentApiKey;
+	}
+	const apiKeyToEdit = currentApiKey || targetApiKeyRef.current;
 
 	useEffect(() => {
 		if (editId && apiKeyToEdit) {
-			reset({ name: apiKeyToEdit.name || "" });
+			setName(apiKeyToEdit.name || "");
 		}
-	}, [editId, apiKeyToEdit, reset]);
+	}, [editId, apiKeyToEdit]);
 
 	const handleClose = () => {
+		setError(null);
+		setStatus("idle");
 		void setEditId(null);
 	};
 
-	const onSubmit = async (data: EditApiKeyFormValues) => {
-		if (!apiKeyToEdit) return;
+	const handleSubmit = async (e?: React.FormEvent) => {
+		e?.preventDefault();
+		if (!apiKeyToEdit || !name.trim() || status !== "idle") return;
+
+		setError(null);
+		setStatus("saving");
 		try {
 			await axios.patch(
 				`/api/api-key/v1/${apiKeyToEdit.id}`,
-				{ name: data.name },
+				{ name: name.trim() },
 				{ withCredentials: true },
 			);
-			await invalidate();
-			toast.success("API key updated successfully");
-			handleClose();
-		} catch (error) {
-			const message = axios.isAxiosError(error)
-				? error.response?.data?.message || "Failed to update API key"
+			setStatus("success");
+			onEditSuccess?.(name.trim());
+		} catch (err) {
+			const message = axios.isAxiosError(err)
+				? err.response?.data?.message || "Failed to update API key"
 				: "Failed to update API key";
+			setError(message);
 			toast.error(message);
+			setStatus("idle");
 		}
 	};
 
+	useEffect(() => {
+		if (status === "success") {
+			const timer = setTimeout(() => {
+				void invalidate();
+				handleClose();
+			}, 1000);
+			return () => clearTimeout(timer);
+		}
+	}, [status, invalidate]);
+
+	const open = !!editId;
+
 	useHotkeys(
-		"mod+enter",
+		"enter",
 		(e) => {
 			e.preventDefault();
-			void handleSubmit(onSubmit)();
+			if (open && status === "idle" && name.trim() && apiKeyToEdit && name !== (apiKeyToEdit.name || "")) {
+				void handleSubmit();
+			}
 		},
-		{ enableOnFormTags: ["INPUT"], enabled: !!editId },
+		{ enableOnFormTags: ["INPUT"], enabled: open && !!apiKeyToEdit },
+		[open, status, name, apiKeyToEdit],
 	);
 
-	useEffect(() => {
-		if (!editId) {
-			const t = setTimeout(() => reset(), 300);
-			return () => clearTimeout(t);
-		}
-	}, [editId, reset]);
-
 	return (
-		<Modal.Root
-			open={!!editId}
-			onOpenChange={(open) => {
-				if (!open) handleClose();
-			}}
-		>
+		<Modal.Root open={open} onOpenChange={(o) => !o && handleClose()}>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-stroke-soft-100 p-0 sm:max-w-[480px] dark:border-stroke-soft-100/40"
-				showClose={false}
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
+				showClose={true}
 			>
-				<form onSubmit={handleSubmit(onSubmit)}>
-					<ModalHeader
-						title="Edit API key"
-						icon="edit"
-						onClose={handleClose}
-					/>
-
-					<Modal.Body className="space-y-4 px-5 py-4 pb-5">
-						<div className="flex flex-col gap-1.5">
-							<label
-								htmlFor="edit-name"
-								className="font-medium text-label-sm text-text-strong-950"
-							>
-								Key name
-								<span className="ml-0.5 text-error-base">*</span>
-							</label>
-							<Input.Root size="xsmall" hasError={!!errors.name}>
-								<Input.Wrapper>
-									<Input.Input
-										id="edit-name"
-										placeholder="e.g. Production Server, Web App"
-										autoFocus
-										{...register("name")}
-										disabled={isSubmitting}
-									/>
-								</Input.Wrapper>
-							</Input.Root>
-							{errors.name && (
-								<p className="text-error-base text-paragraph-xs">
-									{errors.name.message}
-								</p>
-							)}
+				<motion.div
+					layout
+					transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+				>
+					<div className="p-6">
+						<div className="relative pr-6">
+							<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+								Edit API key
+							</Modal.Title>
 						</div>
-					</Modal.Body>
 
-					<div className="flex items-center justify-end gap-2 border-stroke-soft-100 border-t px-5 py-3.5 dark:border-stroke-soft-100/50">
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="stroke"
-							size="xsmall"
-							onClick={handleClose}
-							disabled={isSubmitting}
-							className="gap-1.5"
-						>
-							Cancel
-							<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
-								Esc
-							</span>
-						</Button.Root>
-						<Button.Root
-							type="submit"
-							variant="neutral"
-							size="xsmall"
-							disabled={isSubmitting}
-							className="gap-2"
-						>
-							{isSubmitting ? (
-								<>
-									<Spinner size={12} color="currentColor" />
-									Saving…
-								</>
-							) : (
-								<>
-									Save changes
-									<span className="inline-flex items-center gap-0.5">
-										<Icon
-											name="command"
-											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+						<form onSubmit={handleSubmit} className="mt-5">
+							<div className="space-y-2">
+								<Label.Root htmlFor="edit-api-key-name">
+									Key name
+									<Label.Asterisk />
+								</Label.Root>
+								<Input.Root size="medium" hasError={Boolean(error)}>
+									<Input.Wrapper>
+										<Input.Input
+											id="edit-api-key-name"
+											placeholder="e.g., Production Server, Web App"
+											value={name}
+											onChange={(e) => {
+												setName(e.target.value);
+												if (error) setError(null);
+											}}
+											autoFocus
+											disabled={status !== "idle"}
 										/>
-										<Icon
-											name="enter"
-											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-										/>
-									</span>
-								</>
-							)}
-						</Button.Root>
+									</Input.Wrapper>
+								</Input.Root>
+								{error ? (
+									<p className="text-error-base text-paragraph-xs">
+										{error}
+									</p>
+								) : (
+									<p className="text-paragraph-xs text-text-sub-600">
+										Provide a descriptive name to help you identify this API key later.
+									</p>
+								)}
+							</div>
+
+							<div className="mt-6 flex items-center justify-end gap-3">
+								<Button.Root
+									type="button"
+									variant="neutral"
+									mode="ghost"
+									size="small"
+									onClick={handleClose}
+									className={cn(
+										"transition-opacity duration-200",
+										status !== "idle" && "pointer-events-none opacity-50",
+									)}
+								>
+									Cancel
+								</Button.Root>
+
+								<FancyButton.Root
+									type="submit"
+									variant={status === "success" ? "success" : "blue"}
+									size="small"
+									disabled={
+										status === "saving" ||
+										(status === "idle" && (!name.trim() || name === (apiKeyToEdit?.name || "")))
+									}
+									className={cn(
+										"min-w-[140px] justify-center overflow-hidden transition-all duration-200",
+										status !== "idle" && "pointer-events-none",
+										status === "saving" && "opacity-90",
+									)}
+								>
+									<AnimatePresence mode="popLayout" initial={false}>
+										<motion.span
+											key={status}
+											transition={{
+												type: "spring",
+												duration: 0.25,
+												bounce: 0,
+											}}
+											initial={{ opacity: 0, y: -14 }}
+											animate={{ opacity: 1, y: 0 }}
+											exit={{ opacity: 0, y: 14 }}
+											className="flex items-center justify-center gap-1.5"
+										>
+											{status === "saving" ? (
+												<>
+													<Spinner size={14} color="currentColor" />
+													<span>Saving...</span>
+												</>
+											) : status === "success" ? (
+												<>
+													<Icon name="check-circle" className="h-4 w-4" />
+													<span>Key Updated</span>
+												</>
+											) : (
+												<>
+													Save changes
+													<span className="inline-flex items-center gap-0.5 opacity-80">
+														<Icon
+															name="command"
+															className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+														/>
+														<Icon
+															name="enter"
+															className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+														/>
+													</span>
+												</>
+											)}
+										</motion.span>
+									</AnimatePresence>
+								</FancyButton.Root>
+							</div>
+						</form>
 					</div>
-				</form>
+				</motion.div>
 			</Modal.Content>
 		</Modal.Root>
 	);

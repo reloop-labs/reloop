@@ -10,7 +10,6 @@ import {
 } from "./use-api-keys-query";
 
 export function useToggleApiKey(listParams: ApiKeysListParams) {
-	const queryClient = useQueryClient();
 	const invalidate = useInvalidateApiKeys();
 	const [togglingId, setTogglingId] = useState<string | null>(null);
 
@@ -19,30 +18,12 @@ export function useToggleApiKey(listParams: ApiKeysListParams) {
 
 	const toggleEnabled = useCallback(
 		async (apiKey: ApiKeyData) => {
-			const newEnabled = !apiKey.enabled;
-			const key = queryKeys.apiKeys.list(listParamsRef.current);
-
-			queryClient.setQueryData<ApiKeyListResponse>(key, (current) => {
-				if (!current?.apiKeys) return current;
-				return {
-					...current,
-					apiKeys: current.apiKeys.map((k) =>
-						k.id === apiKey.id ? { ...k, enabled: newEnabled } : k,
-					),
-				};
-			});
-
 			try {
 				setTogglingId(apiKey.id);
 				const endpoint = apiKey.enabled
 					? `/api/api-key/v1/disable/${apiKey.id}`
 					: `/api/api-key/v1/enable/${apiKey.id}`;
 				await axios.post(endpoint, {}, { withCredentials: true });
-				toast.success(
-					newEnabled
-						? "API key enabled successfully"
-						: "API key disabled successfully",
-				);
 			} catch (error) {
 				const message = axios.isAxiosError(error)
 					? error.response?.data?.message || "Failed to toggle API key"
@@ -53,7 +34,7 @@ export function useToggleApiKey(listParams: ApiKeysListParams) {
 				await invalidate();
 			}
 		},
-		[invalidate, queryClient],
+		[invalidate],
 	);
 
 	return { togglingId, toggleEnabled };
