@@ -29,9 +29,9 @@ export function CreateContactPage() {
 	});
 
 	return (
-		<div className="flex h-screen w-full overflow-hidden bg-[#fcfcfc] font-sans text-text-strong-950 dark:bg-bg-weak-50">
-			{/* Left Main Scrollable Workspace */}
-			<div className="relative flex min-w-0 flex-1 flex-col overflow-y-auto">
+		<div className="flex h-dvh max-h-[100dvh] w-full overflow-hidden bg-[#fcfcfc] font-sans text-text-strong-950 dark:bg-bg-weak-50">
+			{/* Left Main Workspace (Locked 100dvh, Overflow Hidden) */}
+			<div className="relative flex h-[100dvh] max-h-[100dvh] min-w-0 flex-1 flex-col overflow-hidden">
 				{/* Top Right Close Button */}
 				<div className="absolute top-6 right-6 z-30 lg:right-10">
 					<button
