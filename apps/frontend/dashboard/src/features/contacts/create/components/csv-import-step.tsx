@@ -13,10 +13,10 @@ import { toast } from "sonner";
 import { GroupSelect } from "#/features/contacts/components/groups/group-select";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 import {
+	buildContactsFromMapping,
 	type ColumnMapping,
 	type ColumnTarget,
 	type ParsedCsvResult,
-	buildContactsFromMapping,
 	parseCsvContent,
 } from "../utils/csv-parser";
 
@@ -333,7 +333,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 					{/* Loading State */}
 					{isParsing && (
 						<div className="flex flex-col items-center justify-center space-y-3 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/30 p-10 text-center">
-							<Spinner size={24} className="text-text-strong-950" />
+							<Spinner size={24} color="currentColor" />
 							<p className="font-medium text-sm text-text-strong-950">
 								Parsing CSV file...
 							</p>
@@ -382,7 +382,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 									<p className="truncate whitespace-nowrap font-normal text-text-sub-600 text-xs">
 										Valid contacts
 									</p>
-									<p className="mt-1 font-semibold text-text-strong-950 text-xl tracking-tight leading-none">
+									<p className="mt-1 font-semibold text-text-strong-950 text-xl leading-none tracking-tight">
 										{parsedResult.validCount}
 									</p>
 								</div>
@@ -392,7 +392,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 									<p className="truncate whitespace-nowrap font-normal text-text-sub-600 text-xs">
 										Invalid emails
 									</p>
-									<p className="mt-1 font-semibold text-text-strong-950 text-xl tracking-tight leading-none">
+									<p className="mt-1 font-semibold text-text-strong-950 text-xl leading-none tracking-tight">
 										{parsedResult.invalidCount}
 									</p>
 								</div>
@@ -402,7 +402,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 									<p className="truncate whitespace-nowrap font-normal text-text-sub-600 text-xs">
 										Duplicates
 									</p>
-									<p className="mt-1 font-semibold text-text-strong-950 text-xl tracking-tight leading-none">
+									<p className="mt-1 font-semibold text-text-strong-950 text-xl leading-none tracking-tight">
 										{parsedResult.duplicateCount}
 									</p>
 								</div>
@@ -412,7 +412,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 									<p className="truncate whitespace-nowrap font-normal text-text-sub-600 text-xs">
 										Total rows
 									</p>
-									<p className="mt-1 font-semibold text-text-strong-950 text-xl tracking-tight leading-none">
+									<p className="mt-1 font-semibold text-text-strong-950 text-xl leading-none tracking-tight">
 										{parsedResult.totalRows}
 									</p>
 								</div>
@@ -421,7 +421,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 							{/* Interactive Column Mapper Table */}
 							<div className="space-y-2.5 pt-1">
 								<div className="flex items-center justify-between">
-									<p className="font-semibold text-xs text-text-strong-950">
+									<p className="font-semibold text-text-strong-950 text-xs">
 										Column Mapping
 									</p>
 									<p className="text-[11px] text-text-sub-600">
@@ -437,7 +437,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 										>
 											{/* Left Column (5/12): CSV Header Name */}
 											<div className="col-span-5 flex min-w-0 items-center justify-start">
-												<span className="inline-flex max-w-full items-center truncate rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2.5 py-1 font-mono text-[11px] font-medium text-text-strong-950">
+												<span className="inline-flex max-w-full items-center truncate rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2.5 py-1 font-medium font-mono text-[11px] text-text-strong-950">
 													{item.csvHeader}
 												</span>
 											</div>
@@ -461,9 +461,11 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 															e.target.value as ColumnTarget,
 														)
 													}
-													className="w-full cursor-pointer rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1.5 font-sans text-xs text-text-strong-950 outline-none transition-colors hover:border-stroke-soft-300 focus:border-stroke-strong-950 disabled:cursor-not-allowed disabled:opacity-50"
+													className="w-full cursor-pointer rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1.5 font-sans text-text-strong-950 text-xs outline-none transition-colors hover:border-stroke-soft-300 focus:border-stroke-strong-950 disabled:cursor-not-allowed disabled:opacity-50"
 												>
-													<option value="email">Email Address (Required)</option>
+													<option value="email">
+														Email Address (Required)
+													</option>
 													<option value="firstName">First Name</option>
 													<option value="lastName">Last Name</option>
 													<option value={`property:${item.csvHeader}`}>
@@ -479,9 +481,6 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 
 							{/* Optional Group Assignment */}
 							<div className="space-y-1.5 pt-1">
-								<Label.Root className="font-medium text-text-strong-950 text-xs">
-									Assign Imported Contacts to Groups (Optional)
-								</Label.Root>
 								<GroupSelect
 									selectedGroupIds={selectedGroupIds}
 									onChange={setSelectedGroupIds}

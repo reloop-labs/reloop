@@ -64,7 +64,9 @@ export const GroupSelect = ({
 
 	return (
 		<div className="flex flex-col gap-1 border-stroke-soft-100 pt-2">
-			<Label.Root htmlFor="groups">Add to Groups</Label.Root>
+			<Label.Root className="font-medium text-text-strong-950 text-xs">
+				Assign Groups to the Imported Contacts (Optional)
+			</Label.Root>{" "}
 			<div className="relative">
 				<label className="group/chips flex min-h-[44px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-2.5 shadow-regular-xs transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-button-important-focus hover:[&:not(:focus-within)]:bg-bg-weak-50">
 					{selectedGroupIds.map((groupId) => {
