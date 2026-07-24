@@ -170,18 +170,21 @@ export function SingleContactForm({ onBack }: SingleContactFormProps) {
 									htmlFor="emails"
 									className="font-medium text-text-strong-950 text-xs"
 								>
-									Email Addresses
+									Email Addresses{" "}
+									<span className="ml-1 font-medium text-text-sub-600">
+										(Press Enter, comma, or space to separate)
+									</span>
 								</Label.Root>
 								<div
-									className="group/chips flex min-h-[96px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-2.5 shadow-sm transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:ring-1 focus-within:ring-stroke-strong-950 hover:[&:not(:focus-within)]:bg-bg-weak-50"
+									className="group/chips flex min-h-[96px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-2.5 shadow-regular-xs transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-button-important-focus hover:[&:not(:focus-within)]:bg-bg-weak-50"
 									onClick={() => inputRef.current?.focus()}
 								>
 									{emailChips.map((chip) => (
 										<span
 											key={chip.id}
-											className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs ${
+											className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-paragraph-xs text-text-strong-950 ${
 												chip.isValid
-													? "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950"
+													? "border-stroke-soft-200 bg-bg-weak-50"
 													: "border-error-base bg-red-50 text-red-600"
 											}`}
 										>
@@ -216,14 +219,10 @@ export function SingleContactForm({ onBack }: SingleContactFormProps) {
 												? "Type email and press Enter or comma..."
 												: ""
 										}
-										className="min-w-[160px] flex-1 bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+										className="min-w-[160px] flex-1 bg-transparent text-paragraph-sm text-text-sub-600 outline-none placeholder:text-text-soft-400"
 										disabled={isCreating}
 									/>
 								</div>
-								<p className="text-text-sub-600 text-xs">
-									Press Enter, comma, or space to separate emails. You can also
-									paste a list of addresses.
-								</p>
 								{emailChips.length > 0 && (
 									<p className="text-text-soft-400 text-xs">
 										{validEmailCount} valid email
