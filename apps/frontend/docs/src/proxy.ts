@@ -38,6 +38,7 @@ export const config = {
 		// - _next/image (image optimization files)
 		// - favicon.ico (favicon file)
 		// - llms.txt (our llms index)
-		"/((?!api|_next/static|_next/image|favicon.ico|llms.txt).*)",
+		// - sitemap.md (semantic markdown sitemap)
+		"/((?!api|_next/static|_next/image|favicon.ico|llms.txt|sitemap.md).*)",
 	],
 };

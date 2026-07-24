@@ -13,6 +13,7 @@ Important notes:
 ## Documentation
 
 - [Full documentation](https://docs.reloop.dev/docs/llms-full.txt): Complete Reloop documentation in a single file
+- [Sitemap](https://reloop.sh/docs/sitemap.md): Semantic markdown map of all documentation pages
 - [Introduction](https://docs.reloop.dev/docs/introduction): Welcome to Reloop documentation
 - [API Reference](https://docs.reloop.dev/docs/api): REST API reference with authentication, response codes, and rate limits
 

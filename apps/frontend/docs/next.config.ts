@@ -49,7 +49,8 @@ const config = {
 				headers: [
 					{
 						key: "Link",
-						value: '</docs/llms.txt>; rel="llms-txt"',
+						value:
+							'</docs/llms.txt>; rel="llms-txt", </docs/sitemap.md>; rel="sitemap"',
 					},
 				],
 			},

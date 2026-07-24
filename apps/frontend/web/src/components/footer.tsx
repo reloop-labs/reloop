@@ -67,13 +67,12 @@ const columns: FooterColumn[] = [
 		],
 	},
 	{
-		group: "Tools",
+		group: "Agents",
 		items: [
-			{ title: "Free tools", href: "/tools" },
-			{ title: "Email validator", href: "/tools/email-validator" },
-			{ title: "Subject tester", href: "/tools/subject-tester" },
-			{ title: "Template generator", href: "/tools/template-generator" },
-			{ title: "Deliverability tester", href: "/tools/deliverability-tester" },
+			{ title: "sitemap.md", href: "/sitemap.md" },
+			{ title: "llms.txt", href: "/docs/llms.txt" },
+			{ title: "docs sitemap", href: "/docs/sitemap.md" },
+			{ title: "rss.xml", href: "/blog/feed.xml" },
 		],
 	},
 	// --- Row 2: Company & Info ---
