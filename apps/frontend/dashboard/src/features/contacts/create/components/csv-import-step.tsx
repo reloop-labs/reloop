@@ -3,6 +3,7 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import * as FileFormatIcon from "@reloop/ui/file-format-icon";
 import * as FileUpload from "@reloop/ui/file-upload";
+import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
@@ -30,6 +31,22 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 			}
 		},
 	});
+
+	const handleDownloadSample = () => {
+		const sampleCsvContent =
+			"email,first_name,last_name\nalice@example.com,Alice,Smith\nbob@example.com,Bob,Jones\ncharlie@example.com,Charlie,Brown\n";
+		const blob = new Blob([sampleCsvContent], {
+			type: "text/csv;charset=utf-8;",
+		});
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement("a");
+		link.setAttribute("href", url);
+		link.setAttribute("download", "sample_contacts.csv");
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		URL.revokeObjectURL(url);
+	};
 
 	const handleUpload = async () => {
 		if (!file) return;
@@ -65,7 +82,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 			{/* Main Card Container */}
 			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50">
 				{/* Top Padded Content Area */}
-				<div className="m-0.5 space-y-6 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 sm:p-7">
+				<div className="m-0.5 space-y-6 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-4 pb-6">
 					{/* Header */}
 					<div>
 						<h2 className="font-semibold text-base text-text-strong-950 tracking-tight">
@@ -115,17 +132,27 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 									or drag & drop it here.
 								</p>
 								<p className="text-text-sub-600 text-xs">
-									JPEG, PNG, PDF, and MP4 formats, up to 50 MB
+									CSV files up to 50 MB
 								</p>
 							</div>
 						)}
 					</FileUpload.Root>
 
 					{/* File Requirements Box */}
-					<div className="space-y-1 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3.5 text-text-sub-600 text-xs">
-						<p className="font-medium text-text-strong-950">
-							CSV File Requirements:
-						</p>
+					<div className="space-y-2 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3.5 text-text-sub-600 text-xs">
+						<div className="flex items-center justify-between">
+							<p className="font-medium text-text-strong-950">
+								CSV File Requirements:
+							</p>
+							<button
+								type="button"
+								onClick={handleDownloadSample}
+								className="inline-flex cursor-pointer items-center gap-1 font-medium text-text-sub-600 text-xs underline underline-offset-2 transition-colors hover:text-text-strong-950"
+							>
+								<Icon name="file-download" className="h-3.5 w-3.5" />
+								Download sample
+							</button>
+						</div>
 						<ul className="list-inside list-disc space-y-0.5 leading-relaxed">
 							<li>
 								Must contain an{" "}
