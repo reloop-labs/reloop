@@ -34,7 +34,6 @@ export function ChannelList() {
 				body: JSON.stringify({ visibility: newValue }),
 			});
 			if (!response.ok) throw new Error("Failed to update visibility");
-			toast.success(`Visibility set to ${newValue}`);
 			await invalidate();
 		} catch {
 			toast.error("Failed to update visibility");
