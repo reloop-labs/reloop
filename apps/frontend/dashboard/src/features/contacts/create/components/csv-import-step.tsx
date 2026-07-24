@@ -1,5 +1,7 @@
 import * as Button from "@reloop/ui/button";
-import { Icon } from "@reloop/ui/icon";
+import { cn } from "@reloop/ui/cn";
+import * as FileFormatIcon from "@reloop/ui/file-format-icon";
+import * as FileUpload from "@reloop/ui/file-upload";
 import Spinner from "@reloop/ui/spinner";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
@@ -58,107 +60,115 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 	};
 
 	return (
-		<div className="w-full max-w-xl mx-auto space-y-6">
-			<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 sm:p-8 shadow-sm shadow-black/[0.03]">
-				<div className="flex items-center justify-between pb-4 mb-6 border-b border-stroke-soft-200/60">
+		<div className="w-full space-y-6 font-sans">
+			{/* Main Card Container */}
+			<div className="rounded-3xl border border-stroke-soft-200 bg-bg-white-0 overflow-hidden">
+				{/* Top Padded Content Area */}
+				<div className="p-6 sm:p-7 space-y-6">
+					{/* Header */}
 					<div>
-						<h2 className="text-xl font-semibold text-text-strong-950 tracking-tight">
+						<h2 className="text-base font-semibold text-text-strong-950 tracking-tight">
 							Import Contacts from CSV
 						</h2>
-						<p className="text-xs text-text-sub-600 mt-1">
+						<p className="text-xs text-text-sub-600 mt-1 leading-relaxed">
 							Upload a spreadsheet to bulk import contacts and custom properties.
 						</p>
 					</div>
-					<Button.Root
-						type="button"
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						onClick={onBack}
-						disabled={isUploading}
-					>
-						<Button.Icon>
-							<Icon name="chevron-left" className="h-3.5 w-3.5" />
-						</Button.Icon>
-						Change Method
-					</Button.Root>
-				</div>
 
-				<div className="space-y-6">
-					{/* Dropzone Container */}
-					<div
+					{/* AlignUI Dropzone Component */}
+					<FileUpload.Root
 						{...getRootProps()}
-						className={`flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed transition-all cursor-pointer text-center ${
-							isDragActive
-								? "border-text-strong-950 bg-bg-weak-50"
-								: file
-									? "border-emerald-500 bg-emerald-50/20"
-									: "border-stroke-soft-200 bg-bg-weak-50/50 hover:bg-bg-weak-50 hover:border-stroke-soft-300"
-						}`}
+						className={cn(
+							"flex flex-col items-center justify-center p-8 rounded-2xl border border-dashed border-stroke-soft-300 bg-bg-weak-50/30 gap-3.5 text-center transition-all cursor-pointer hover:bg-bg-weak-50/70 hover:border-stroke-soft-400",
+							isDragActive && "border-text-strong-950 bg-bg-weak-50/80",
+							file && "border-emerald-500 bg-emerald-50/20",
+						)}
 					>
 						<input {...getInputProps()} />
-						<div className="h-12 w-12 rounded-xl bg-bg-white-0 border border-stroke-soft-200 flex items-center justify-center text-text-strong-950 mb-3 shadow-xs">
-							<Icon name="upload" className="h-6 w-6" />
+
+						{/* AlignUI FileFormatIcon for CSV */}
+						<div className="h-10 w-10 rounded-xl bg-bg-white-0 border border-stroke-soft-200 flex items-center justify-center shadow-xs">
+							<FileFormatIcon.Root format="CSV" color="green" size="small" />
 						</div>
+
 						{file ? (
 							<div className="space-y-1">
-								<p className="text-sm font-semibold text-text-strong-950">{file.name}</p>
+								<p className="text-sm font-semibold text-text-strong-950">
+									{file.name}
+								</p>
 								<p className="text-xs text-text-sub-600">
 									{(file.size / 1024).toFixed(1)} KB • Click or drag to replace
 								</p>
 							</div>
 						) : (
 							<div className="space-y-1">
-								<p className="text-sm font-medium text-text-strong-950">
-									{isDragActive
-										? "Drop the CSV file here..."
-										: "Drag & drop your CSV file here"}
+								<p className="text-sm font-normal text-text-strong-950">
+									<span className="font-medium underline underline-offset-2">
+										Choose a file
+									</span>{" "}
+									or drag & drop it here.
 								</p>
 								<p className="text-xs text-text-sub-600">
-									Supports .csv files up to 10MB
+									JPEG, PNG, PDF, and MP4 formats, up to 50 MB
 								</p>
 							</div>
 						)}
-					</div>
+					</FileUpload.Root>
 
-					<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/40 p-4 space-y-2 text-xs text-text-sub-600">
-						<p className="font-medium text-text-strong-950">CSV File Requirements:</p>
-						<ul className="list-disc list-inside space-y-1 leading-relaxed">
-							<li>Must contain an <code className="bg-bg-white-0 px-1 py-0.5 rounded border text-text-strong-950">email</code> column header.</li>
-							<li>Optional headers: <code className="bg-bg-white-0 px-1 py-0.5 rounded border text-text-strong-950">first_name</code>, <code className="bg-bg-white-0 px-1 py-0.5 rounded border text-text-strong-950">last_name</code>, <code className="bg-bg-white-0 px-1 py-0.5 rounded border text-text-strong-950">phone</code>.</li>
-							<li>Custom columns will automatically map to contact custom attributes.</li>
+					{/* File Requirements Box */}
+					<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3.5 space-y-1 text-xs text-text-sub-600">
+						<p className="font-medium text-text-strong-950">
+							CSV File Requirements:
+						</p>
+						<ul className="list-disc list-inside space-y-0.5 leading-relaxed">
+							<li>
+								Must contain an{" "}
+								<code className="bg-bg-white-0 px-1 py-0.5 rounded border border-stroke-soft-200 text-text-strong-950 font-mono text-[11px]">
+									email
+								</code>{" "}
+								column header.
+							</li>
+							<li>
+								Optional headers:{" "}
+								<code className="bg-bg-white-0 px-1 py-0.5 rounded border border-stroke-soft-200 text-text-strong-950 font-mono text-[11px]">
+									first_name
+								</code>
+								,{" "}
+								<code className="bg-bg-white-0 px-1 py-0.5 rounded border border-stroke-soft-200 text-text-strong-950 font-mono text-[11px]">
+									last_name
+								</code>
+								.
+							</li>
 						</ul>
 					</div>
+				</div>
 
-					<div className="pt-4 flex items-center justify-end gap-3 border-t border-stroke-soft-200/60">
-						<Button.Root
-							type="button"
-							variant="neutral"
-							mode="stroke"
-							size="small"
-							onClick={() => void navigate({ to: "/contacts" })}
-							disabled={isUploading}
-						>
-							Cancel
-						</Button.Root>
-						<Button.Root
-							type="button"
-							variant="neutral"
-							size="small"
-							disabled={!file || isUploading}
-							onClick={handleUpload}
-							className="bg-text-strong-950 text-bg-white-0 hover:bg-black"
-						>
-							{isUploading ? (
-								<>
-									<Spinner size={14} color="currentColor" />
-									Importing CSV...
-								</>
-							) : (
-								"Upload & Start Import"
-							)}
-						</Button.Root>
-					</div>
+				{/* Bottom Footer / Action Bar */}
+				<div className="border-t border-stroke-soft-200 bg-[#f9fafb] px-6 py-4 flex items-center justify-between dark:bg-bg-weak-50/40">
+					<button
+						type="button"
+						onClick={onBack}
+						disabled={isUploading}
+						className="text-sm font-medium text-text-sub-600 hover:text-text-strong-950 transition-colors disabled:opacity-50 cursor-pointer"
+					>
+						Back
+					</button>
+
+					<button
+						type="button"
+						disabled={!file || isUploading}
+						onClick={handleUpload}
+						className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#6366f1] hover:bg-[#4f46e5] text-white font-medium px-4 py-2 text-sm shadow-xs transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+					>
+						{isUploading ? (
+							<>
+								<Spinner size={14} color="currentColor" />
+								Importing...
+							</>
+						) : (
+							"Import"
+						)}
+					</button>
 				</div>
 			</div>
 		</div>

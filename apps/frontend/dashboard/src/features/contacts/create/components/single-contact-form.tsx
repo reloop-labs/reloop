@@ -147,130 +147,126 @@ export function SingleContactForm({ onBack }: SingleContactFormProps) {
 	};
 
 	return (
-		<div className="w-full max-w-xl mx-auto space-y-6">
-			<div className="rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 sm:p-8 shadow-sm shadow-black/[0.03]">
-				<div className="flex items-center justify-between pb-4 mb-6 border-b border-stroke-soft-200/60">
-					<div>
-						<h2 className="text-xl font-semibold text-text-strong-950 tracking-tight">
-							Add Contact Details
-						</h2>
-						<p className="text-xs text-text-sub-600 mt-1">
-							Enter one or more email addresses to register new contacts.
-						</p>
-					</div>
-					<Button.Root
-						type="button"
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						onClick={onBack}
-						disabled={isCreating}
-					>
-						<Button.Icon>
-							<Icon name="chevron-left" className="h-3.5 w-3.5" />
-						</Button.Icon>
-						Change Method
-					</Button.Root>
-				</div>
-
-				<form onSubmit={handleSubmit} className="space-y-5">
-					<div className="flex flex-col gap-1.5">
-						<Label.Root htmlFor="emails" className="text-xs font-medium text-text-strong-950">
-							Email Addresses
-						</Label.Root>
-						<div
-							className="group/chips flex min-h-[96px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-2.5 shadow-sm transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:ring-1 focus-within:ring-stroke-strong-950 hover:[&:not(:focus-within)]:bg-bg-weak-50"
-							onClick={() => inputRef.current?.focus()}
-						>
-							{emailChips.map((chip) => (
-								<span
-									key={chip.id}
-									className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs ${
-										chip.isValid
-											? "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950"
-											: "border-error-base bg-red-50 text-red-600"
-									}`}
-								>
-									<Icon name="mail-single" className="h-3.5 w-3.5 text-text-sub-600" />
-									{chip.email}
-									<button
-										type="button"
-										onClick={(e) => {
-											e.stopPropagation();
-											removeEmailChip(chip.id);
-										}}
-										className="ml-0.5 text-text-sub-600 hover:text-text-strong-950 transition-colors"
-										disabled={isCreating}
-									>
-										<Icon name="cross" className="h-3 w-3" />
-									</button>
-								</span>
-							))}
-							<input
-								ref={inputRef}
-								type="text"
-								value={emailInput}
-								onChange={(e) => setEmailInput(e.target.value)}
-								onKeyDown={handleKeyDown}
-								onPaste={handlePaste}
-								onBlur={() => emailInput && addEmailChip(emailInput)}
-								placeholder={
-									emailChips.length === 0
-										? "Type email and press Enter or comma..."
-										: ""
-								}
-								className="min-w-[160px] flex-1 bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
-								disabled={isCreating}
-							/>
-						</div>
-						{emailChips.length > 0 && (
-							<p className="text-xs text-text-soft-400">
-								{validEmailCount} valid email{validEmailCount !== 1 ? "s" : ""}
-								{emailChips.length - validEmailCount > 0 && (
-									<span className="text-error-base">
-										{" "}
-										• {emailChips.length - validEmailCount} invalid format
-									</span>
-								)}
+		<div className="w-full space-y-6 font-sans">
+			<div className="overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0">
+				<form onSubmit={handleSubmit}>
+					<div className="space-y-6 p-6 sm:p-7">
+						<div>
+							<h2 className="font-semibold text-base text-text-strong-950 tracking-tight">
+								Add Contact Details
+							</h2>
+							<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
+								Enter one or more email addresses to register new contacts.
 							</p>
-						)}
+						</div>
+
+						<div className="space-y-5">
+							<div className="flex flex-col gap-1.5">
+								<Label.Root
+									htmlFor="emails"
+									className="font-medium text-text-strong-950 text-xs"
+								>
+									Email Addresses
+								</Label.Root>
+								<div
+									className="group/chips flex min-h-[96px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-2.5 shadow-sm transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:ring-1 focus-within:ring-stroke-strong-950 hover:[&:not(:focus-within)]:bg-bg-weak-50"
+									onClick={() => inputRef.current?.focus()}
+								>
+									{emailChips.map((chip) => (
+										<span
+											key={chip.id}
+											className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs ${
+												chip.isValid
+													? "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950"
+													: "border-error-base bg-red-50 text-red-600"
+											}`}
+										>
+											<Icon
+												name="mail-single"
+												className="h-3.5 w-3.5 text-text-sub-600"
+											/>
+											{chip.email}
+											<button
+												type="button"
+												onClick={(e) => {
+													e.stopPropagation();
+													removeEmailChip(chip.id);
+												}}
+												className="ml-0.5 text-text-sub-600 transition-colors hover:text-text-strong-950"
+												disabled={isCreating}
+											>
+												<Icon name="cross" className="h-3 w-3" />
+											</button>
+										</span>
+									))}
+									<input
+										ref={inputRef}
+										type="text"
+										value={emailInput}
+										onChange={(e) => setEmailInput(e.target.value)}
+										onKeyDown={handleKeyDown}
+										onPaste={handlePaste}
+										onBlur={() => emailInput && addEmailChip(emailInput)}
+										placeholder={
+											emailChips.length === 0
+												? "Type email and press Enter or comma..."
+												: ""
+										}
+										className="min-w-[160px] flex-1 bg-transparent text-sm text-text-strong-950 outline-none placeholder:text-text-soft-400"
+										disabled={isCreating}
+									/>
+								</div>
+								{emailChips.length > 0 && (
+									<p className="text-text-soft-400 text-xs">
+										{validEmailCount} valid email
+										{validEmailCount !== 1 ? "s" : ""}
+										{emailChips.length - validEmailCount > 0 && (
+											<span className="text-error-base">
+												{" "}
+												• {emailChips.length - validEmailCount} invalid format
+											</span>
+										)}
+									</p>
+								)}
+							</div>
+
+							{/* Group Assignment */}
+							<div className="pt-2">
+								<Label.Root className="mb-1.5 block font-medium text-text-strong-950 text-xs">
+									Assign to Groups (Optional)
+								</Label.Root>
+								<GroupSelect
+									selectedGroupIds={selectedGroupIds}
+									onChange={setSelectedGroupIds}
+									disabled={isCreating}
+									open={true}
+								/>
+							</div>
+						</div>
 					</div>
 
-					{/* Group Assignment */}
-					<div className="pt-2">
-						<Label.Root className="text-xs font-medium text-text-strong-950 mb-1.5 block">
-							Assign to Groups (Optional)
-						</Label.Root>
-						<GroupSelect
-							selectedGroupIds={selectedGroupIds}
-							onChange={setSelectedGroupIds}
-							disabled={isCreating}
-							open={true}
-						/>
-					</div>
-
-					<div className="pt-4 flex items-center justify-end gap-3 border-t border-stroke-soft-200/60">
-						<Button.Root
+					{/* Bottom Footer / Action Bar */}
+					<div className="flex items-center justify-between border-stroke-soft-200 border-t bg-[#f9fafb] px-6 py-4 dark:bg-bg-weak-50/40">
+						<button
 							type="button"
-							variant="neutral"
-							mode="stroke"
-							size="small"
-							onClick={() => void navigate({ to: "/contacts" })}
+							onClick={onBack}
 							disabled={isCreating}
+							className="cursor-pointer font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 disabled:opacity-50"
 						>
-							Cancel
-						</Button.Root>
-						<Button.Root
+							Back
+						</button>
+
+						<button
 							type="submit"
-							variant="neutral"
-							size="small"
-							disabled={isCreating || (validEmailCount === 0 && !emailInput.trim())}
-							className="bg-text-strong-950 text-bg-white-0 hover:bg-black"
+							disabled={
+								isCreating || (validEmailCount === 0 && !emailInput.trim())
+							}
+							className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#6366f1] px-4 py-2 font-medium text-sm text-white shadow-xs transition-all hover:bg-[#4f46e5] disabled:cursor-not-allowed disabled:opacity-40"
 						>
 							{isCreating ? (
 								<>
 									<Spinner size={14} color="currentColor" />
-									Saving Contacts...
+									Saving...
 								</>
 							) : (
 								<>
@@ -278,7 +274,7 @@ export function SingleContactForm({ onBack }: SingleContactFormProps) {
 									{validEmailCount !== 1 ? "s" : ""}
 								</>
 							)}
-						</Button.Root>
+						</button>
 					</div>
 				</form>
 			</div>

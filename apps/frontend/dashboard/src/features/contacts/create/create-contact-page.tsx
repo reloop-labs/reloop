@@ -57,10 +57,10 @@ export function CreateContactPage() {
 			</div>
 
 			{/* Main Content Layout Container - Top anchored so top line & side items NEVER flicker or shift */}
-			<div className="relative z-20 mx-auto w-full max-w-[1280px] px-6 pt-20 pb-16 lg:px-12 lg:pt-28">
+			<div className="relative z-20 mx-auto w-full max-w-[1280px] px-6 pt-[152px] pb-16 lg:px-12 lg:pt-[216px]">
 				<div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:gap-8">
 					{/* Left Column (3/12) - Aligned to top (start) of card */}
-					<div className="flex justify-start pt-8 text-left lg:col-span-3 lg:justify-end lg:text-right">
+					<div className="flex justify-start pt-7 text-left lg:col-span-3 lg:justify-end lg:text-right">
 						<div className="font-semibold text-sm text-text-strong-950">
 							Add Contact
 						</div>
@@ -94,12 +94,12 @@ export function CreateContactPage() {
 						</div>
 
 						{/* Center Card Content (Container for main card and stacked previous card) */}
-						<div className="relative z-20 mx-auto w-full max-w-xl py-8">
+						<div className="relative z-20 w-full p-7">
 							{/* Stacked Previous Card (Method Selection Card sitting above top border line when in step 2) */}
 							<motion.div
 								initial={false}
 								animate={{
-									y: isMethodSelection ? 0 : "calc(-100% - 24px)",
+									y: isMethodSelection ? 0 : "calc(-100% - 20px)",
 									scale: isMethodSelection ? 1 : 0.92,
 									opacity: isMethodSelection ? 1 : 0.65,
 									filter: isMethodSelection ? "blur(0px)" : "blur(0px)",
@@ -158,24 +158,10 @@ export function CreateContactPage() {
 								)}
 							</AnimatePresence>
 						</div>
-
-						{/* Footer note sitting directly centered ON the bottom horizontal dashed line */}
-						<div className="pointer-events-auto absolute inset-x-0 bottom-0 z-20 flex translate-y-1/2 justify-center">
-							<span className="bg-[#fcfcfc] px-3 text-text-sub-600 text-xs dark:bg-bg-weak-50">
-								Looking to configure custom properties?{" "}
-								<button
-									type="button"
-									onClick={() => void navigate({ to: "/contacts/properties" })}
-									className="font-semibold text-text-strong-950 underline hover:text-black"
-								>
-									Get started
-								</button>
-							</span>
-						</div>
 					</motion.div>
 
 					{/* Right Column (3/12) - Aligned to top (start) of card */}
-					<div className="flex justify-start pt-8 lg:col-span-3">
+					<div className="flex justify-start pt-7 lg:col-span-3">
 						<div className="w-full max-w-xs">
 							<CreateContactStepper
 								currentStep={currentStep}
