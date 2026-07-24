@@ -51,7 +51,7 @@ export function MethodSelectionCard({
 							</div>
 						</div>
 						<Icon
-							name="chevron-right"
+							name="arrow-right"
 							className="h-4 w-4 text-text-soft-400 transition-all group-hover:translate-x-0.5 group-hover:text-text-strong-950"
 						/>
 					</button>
@@ -63,9 +63,8 @@ export function MethodSelectionCard({
 						className="group flex w-full items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-4 text-left transition-all hover:border-stroke-soft-300 hover:bg-bg-weak-50/70"
 					>
 						<div className="flex items-center gap-3.5">
-							<div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 transition-transform group-hover:scale-105">
+							<div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 text-text-strong-950">
 								<Icon name="user-plus" className="h-5 w-5" />
-								<span className="-top-0.5 -right-0.5 absolute h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-white" />
 							</div>
 							<div>
 								<div className="font-medium text-sm text-text-strong-950 group-hover:text-black">
@@ -77,7 +76,7 @@ export function MethodSelectionCard({
 							</div>
 						</div>
 						<Icon
-							name="chevron-right"
+							name="arrow-right"
 							className="h-4 w-4 text-text-soft-400 transition-all group-hover:translate-x-0.5 group-hover:text-text-strong-950"
 						/>
 					</button>
@@ -89,7 +88,7 @@ export function MethodSelectionCard({
 						className="group flex w-full items-center justify-between rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-4 text-left transition-all hover:border-stroke-soft-300 hover:bg-bg-weak-50/70"
 					>
 						<div className="flex items-center gap-3.5">
-							<div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950 transition-transform group-hover:scale-105">
+							<div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-200 text-text-strong-950">
 								<Icon name="code" className="h-5 w-5 text-blue-600" />
 							</div>
 							<div>
@@ -102,7 +101,7 @@ export function MethodSelectionCard({
 							</div>
 						</div>
 						<Icon
-							name="chevron-right"
+							name="arrow-right"
 							className="h-4 w-4 text-text-soft-400 transition-all group-hover:translate-x-0.5 group-hover:text-text-strong-950"
 						/>
 					</button>

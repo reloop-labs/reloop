@@ -87,7 +87,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 						<input {...getInputProps()} />
 
 						{/* AlignUI FileFormatIcon for CSV */}
-						<div className="h-10 w-10 rounded-xl bg-bg-white-0 border border-stroke-soft-200 flex items-center justify-center shadow-xs">
+						<div className="h-10 w-10 rounded-xl border border-stroke-soft-200 flex items-center justify-center">
 							<FileFormatIcon.Root format="CSV" color="green" size="small" />
 						</div>
 
