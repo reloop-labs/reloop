@@ -4,6 +4,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { AiImportStep } from "./components/ai-import-step";
 import { ApiSyncStep } from "./components/api-sync-step";
 import {
 	type CreateContactStep,
@@ -40,7 +41,7 @@ export function CreateContactPage() {
 	});
 
 	return (
-		<div className="relative flex min-h-screen w-full flex-col items-center justify-start overflow-x-hidden bg-[#fcfcfc] font-sans text-text-strong-950 dark:bg-bg-weak-50">
+		<div className="relative flex min-h-screen w-full flex-col items-center justify-start overflow-hidden bg-[#fcfcfc] font-sans text-text-strong-950 dark:bg-bg-weak-50">
 			{/* Top Right Close Button */}
 			<div className="absolute top-6 right-6 z-30 lg:right-10">
 				<button
@@ -61,7 +62,7 @@ export function CreateContactPage() {
 				<div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:gap-8">
 					{/* Left Column (3/12) - Aligned to top (start) of card */}
 					<div className="flex justify-start pt-7 text-left lg:col-span-3 lg:justify-end lg:text-right">
-						<div className="font-semibold text-sm text-text-strong-950">
+						<div className="font-medium text-xs text-text-sub-600/70">
 							Add Contact
 						</div>
 					</div>
@@ -151,6 +152,12 @@ export function CreateContactPage() {
 
 										{currentStep === "api-sync" && (
 											<ApiSyncStep
+												onBack={() => setCurrentStep("select-method")}
+											/>
+										)}
+
+										{currentStep === "ai-import" && (
+											<AiImportStep
 												onBack={() => setCurrentStep("select-method")}
 											/>
 										)}

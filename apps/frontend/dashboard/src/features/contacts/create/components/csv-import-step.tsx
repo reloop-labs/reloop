@@ -62,16 +62,17 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 	return (
 		<div className="w-full space-y-6 font-sans">
 			{/* Main Card Container */}
-			<div className="rounded-3xl border border-stroke-soft-200 bg-bg-white-0 overflow-hidden">
+			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50">
 				{/* Top Padded Content Area */}
-				<div className="p-6 sm:p-7 space-y-6">
+				<div className="m-0.5 space-y-6 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-6 sm:p-7">
 					{/* Header */}
 					<div>
-						<h2 className="text-base font-semibold text-text-strong-950 tracking-tight">
+						<h2 className="font-semibold text-base text-text-strong-950 tracking-tight">
 							Import Contacts from CSV
 						</h2>
-						<p className="text-xs text-text-sub-600 mt-1 leading-relaxed">
-							Upload a spreadsheet to bulk import contacts and custom properties.
+						<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
+							Upload a spreadsheet to bulk import contacts and custom
+							properties.
 						</p>
 					</div>
 
@@ -79,7 +80,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 					<FileUpload.Root
 						{...getRootProps()}
 						className={cn(
-							"flex flex-col items-center justify-center p-8 rounded-2xl border border-dashed border-stroke-soft-300 bg-bg-weak-50/30 gap-3.5 text-center transition-all cursor-pointer hover:bg-bg-weak-50/70 hover:border-stroke-soft-400",
+							"flex cursor-pointer flex-col items-center justify-center gap-3.5 rounded-2xl border border-stroke-soft-300 border-dashed bg-bg-weak-50/30 p-8 text-center transition-all hover:border-stroke-soft-400 hover:bg-bg-weak-50/70",
 							isDragActive && "border-text-strong-950 bg-bg-weak-50/80",
 							file && "border-emerald-500 bg-emerald-50/20",
 						)}
@@ -87,28 +88,28 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 						<input {...getInputProps()} />
 
 						{/* AlignUI FileFormatIcon for CSV */}
-						<div className="h-10 w-10 rounded-xl border border-stroke-soft-200 flex items-center justify-center">
+						<div className="flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-200">
 							<FileFormatIcon.Root format="CSV" color="green" size="small" />
 						</div>
 
 						{file ? (
 							<div className="space-y-1">
-								<p className="text-sm font-semibold text-text-strong-950">
+								<p className="font-semibold text-sm text-text-strong-950">
 									{file.name}
 								</p>
-								<p className="text-xs text-text-sub-600">
+								<p className="text-text-sub-600 text-xs">
 									{(file.size / 1024).toFixed(1)} KB • Click or drag to replace
 								</p>
 							</div>
 						) : (
 							<div className="space-y-1">
-								<p className="text-sm font-normal text-text-strong-950">
+								<p className="font-normal text-sm text-text-strong-950">
 									<span className="font-medium underline underline-offset-2">
 										Choose a file
 									</span>{" "}
 									or drag & drop it here.
 								</p>
-								<p className="text-xs text-text-sub-600">
+								<p className="text-text-sub-600 text-xs">
 									JPEG, PNG, PDF, and MP4 formats, up to 50 MB
 								</p>
 							</div>
@@ -116,25 +117,25 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 					</FileUpload.Root>
 
 					{/* File Requirements Box */}
-					<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3.5 space-y-1 text-xs text-text-sub-600">
+					<div className="space-y-1 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3.5 text-text-sub-600 text-xs">
 						<p className="font-medium text-text-strong-950">
 							CSV File Requirements:
 						</p>
-						<ul className="list-disc list-inside space-y-0.5 leading-relaxed">
+						<ul className="list-inside list-disc space-y-0.5 leading-relaxed">
 							<li>
 								Must contain an{" "}
-								<code className="bg-bg-white-0 px-1 py-0.5 rounded border border-stroke-soft-200 text-text-strong-950 font-mono text-[11px]">
+								<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950">
 									email
 								</code>{" "}
 								column header.
 							</li>
 							<li>
 								Optional headers:{" "}
-								<code className="bg-bg-white-0 px-1 py-0.5 rounded border border-stroke-soft-200 text-text-strong-950 font-mono text-[11px]">
+								<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950">
 									first_name
 								</code>
 								,{" "}
-								<code className="bg-bg-white-0 px-1 py-0.5 rounded border border-stroke-soft-200 text-text-strong-950 font-mono text-[11px]">
+								<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950">
 									last_name
 								</code>
 								.
@@ -144,12 +145,12 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 				</div>
 
 				{/* Bottom Footer / Action Bar */}
-				<div className="border-t border-stroke-soft-200 bg-[#f9fafb] px-6 py-4 flex items-center justify-between dark:bg-bg-weak-50/40">
+				<div className="flex items-center justify-between px-6 py-3 dark:bg-bg-weak-50/40">
 					<button
 						type="button"
 						onClick={onBack}
 						disabled={isUploading}
-						className="text-sm font-medium text-text-sub-600 hover:text-text-strong-950 transition-colors disabled:opacity-50 cursor-pointer"
+						className="cursor-pointer font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 disabled:opacity-50"
 					>
 						Back
 					</button>
@@ -158,7 +159,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 						type="button"
 						disabled={!file || isUploading}
 						onClick={handleUpload}
-						className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#6366f1] hover:bg-[#4f46e5] text-white font-medium px-4 py-2 text-sm shadow-xs transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+						className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-[#6366f1] px-5 py-2 font-medium text-sm text-white shadow-xs transition-all hover:bg-[#4f46e5] disabled:cursor-not-allowed disabled:opacity-40"
 					>
 						{isUploading ? (
 							<>
