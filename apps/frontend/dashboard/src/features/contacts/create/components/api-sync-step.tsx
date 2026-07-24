@@ -1,20 +1,87 @@
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { toast } from "sonner";
+import {
+	siCurl,
+	siGo,
+	siNodedotjs,
+	siPhp,
+	siPython,
+	siRuby,
+	siRust,
+} from "simple-icons";
 
 interface ApiSyncStepProps {
 	onBack: () => void;
 }
 
-export function ApiSyncStep({ onBack }: ApiSyncStepProps) {
-	const navigate = useNavigate();
-	const [selectedTab, setSelectedTab] = useState<"curl" | "node">("curl");
-	const [copied, setCopied] = useState(false);
+type ApiLanguageId = "curl" | "node" | "python" | "go" | "php" | "ruby" | "rust";
 
-	const curlSnippet = `curl -X POST https://api.reloop.sh/v1/contacts \\
+interface ApiLanguage {
+	id: ApiLanguageId;
+	label: string;
+	shikiLang: string;
+	filename: string;
+	si: { path: string; hex: string };
+}
+
+const API_LANGUAGES: ApiLanguage[] = [
+	{
+		id: "curl",
+		label: "cURL",
+		shikiLang: "bash",
+		filename: "curl.sh",
+		si: siCurl,
+	},
+	{
+		id: "node",
+		label: "Node.js SDK",
+		shikiLang: "javascript",
+		filename: "index.js",
+		si: siNodedotjs,
+	},
+	{
+		id: "python",
+		label: "Python",
+		shikiLang: "python",
+		filename: "app.py",
+		si: siPython,
+	},
+	{
+		id: "go",
+		label: "Go",
+		shikiLang: "go",
+		filename: "main.go",
+		si: siGo,
+	},
+	{
+		id: "php",
+		label: "PHP",
+		shikiLang: "php",
+		filename: "index.php",
+		si: siPhp,
+	},
+	{
+		id: "ruby",
+		label: "Ruby",
+		shikiLang: "ruby",
+		filename: "app.rb",
+		si: siRuby,
+	},
+	{
+		id: "rust",
+		label: "Rust",
+		shikiLang: "rust",
+		filename: "main.rs",
+		si: siRust,
+	},
+];
+
+const CODE_EXAMPLES: Record<ApiLanguageId, string> = {
+	curl: `curl -X POST https://api.reloop.sh/v1/contacts \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -24,9 +91,9 @@ export function ApiSyncStep({ onBack }: ApiSyncStepProps) {
     "properties": {
       "plan": "pro"
     }
-  }'`;
+  }'`,
 
-	const nodeSnippet = `import { Reloop } from '@reloop/sdk';
+	node: `import { Reloop } from '@reloop/sdk';
 
 const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
 
@@ -37,16 +104,106 @@ await reloop.contacts.create({
   properties: {
     plan: 'pro',
   },
-});`;
+});`,
 
-	const currentSnippet = selectedTab === "curl" ? curlSnippet : nodeSnippet;
+	python: `from reloop import Reloop
+import os
 
-	const handleCopy = () => {
-		void navigator.clipboard.writeText(currentSnippet);
-		setCopied(true);
-		toast.success("Snippet copied to clipboard");
-		setTimeout(() => setCopied(false), 2000);
-	};
+reloop = Reloop(api_key=os.environ.get("RELOOP_API_KEY"))
+
+contact = reloop.contacts.create(
+    email="user@example.com",
+    first_name="Jane",
+    last_name="Doe",
+    properties={
+        "plan": "pro"
+    }
+)`,
+
+	go: `package main
+
+import (
+	"context"
+	"os"
+	"github.com/reloop/reloop-go"
+)
+
+func main() {
+	client := reloop.NewClient(os.Getenv("RELOOP_API_KEY"))
+
+	contact, err := client.Contacts.Create(context.Background(), &reloop.CreateContactParams{
+		Email:     "user@example.com",
+		FirstName: "Jane",
+		LastName:  "Doe",
+		Properties: map[string]interface{}{
+			"plan": "pro",
+		},
+	})
+}`,
+
+	php: `<?php
+
+use Reloop\\Client;
+
+$reloop = new Client(getenv('RELOOP_API_KEY'));
+
+$contact = $reloop->contacts->create([
+    'email' => 'user@example.com',
+    'first_name' => 'Jane',
+    'last_name' => 'Doe',
+    'properties' => [
+        'plan' => 'pro'
+    ]
+]);`,
+
+	ruby: `require 'reloop'
+
+reloop = Reloop::Client.new(api_key: ENV['RELOOP_API_KEY'])
+
+contact = reloop.contacts.create(
+  email: 'user@example.com',
+  first_name: 'Jane',
+  last_name: 'Doe',
+  properties: {
+    plan: 'pro'
+  }
+)`,
+
+	rust: `use reloop::Client;
+use serde_json::json;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std.error::Error>> {
+    let client = Client::new(std::env::var("RELOOP_API_KEY")?);
+
+    let contact = client
+        .contacts()
+        .create(json!({
+            "email": "user@example.com",
+            "first_name": "Jane",
+            "last_name": "Doe",
+            "properties": {
+                "plan": "pro"
+            }
+        }))
+        .await?;
+
+    Ok(())
+}`,
+};
+
+export function ApiSyncStep({ onBack }: ApiSyncStepProps) {
+	const navigate = useNavigate();
+	const [selectedTab, setSelectedTab] = useState<ApiLanguageId>("curl");
+
+	const activeLang =
+		API_LANGUAGES.find((l) => l.id === selectedTab) ?? API_LANGUAGES[0]!;
+
+	const tabs = API_LANGUAGES.map((l) => ({
+		id: l.id,
+		label: l.label,
+		si: l.si,
+	}));
 
 	return (
 		<div className="w-full space-y-6 font-sans">
@@ -66,48 +223,17 @@ await reloop.contacts.create({
 					</div>
 
 					<div className="space-y-4">
-						<div className="flex items-center justify-between">
-							<div className="flex items-center gap-1 rounded-lg border border-stroke-soft-200 bg-bg-weak-50 p-1">
-								<button
-									type="button"
-									onClick={() => setSelectedTab("curl")}
-									className={`cursor-pointer rounded-md px-3 py-1 font-medium text-xs transition-colors ${
-										selectedTab === "curl"
-											? "bg-bg-white-0 text-text-strong-950 shadow-xs"
-											: "text-text-sub-600 hover:text-text-strong-950"
-									}`}
-								>
-									cURL
-								</button>
-								<button
-									type="button"
-									onClick={() => setSelectedTab("node")}
-									className={`cursor-pointer rounded-md px-3 py-1 font-medium text-xs transition-colors ${
-										selectedTab === "node"
-											? "bg-bg-white-0 text-text-strong-950 shadow-xs"
-											: "text-text-sub-600 hover:text-text-strong-950"
-									}`}
-								>
-									Node.js SDK
-								</button>
-							</div>
-
-							<button
-								type="button"
-								onClick={handleCopy}
-								className="inline-flex cursor-pointer items-center gap-1.5 font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950"
-							>
-								<Icon
-									name={copied ? "check-circle" : "copy"}
-									className="h-3.5 w-3.5"
-								/>
-								{copied ? "Copied" : "Copy Code"}
-							</button>
-						</div>
-
-						<div className="relative overflow-x-auto rounded-xl border border-neutral-800 bg-neutral-950 p-4 font-mono text-neutral-100 text-xs">
-							<pre className="whitespace-pre">{currentSnippet}</pre>
-						</div>
+						<CopyCodeBlock
+							key={selectedTab}
+							code={CODE_EXAMPLES[selectedTab]}
+							lang={activeLang.shikiLang}
+							label={activeLang.filename}
+							si={activeLang.si}
+							tabs={tabs}
+							activeTab={selectedTab}
+							onTabChange={(id) => setSelectedTab(id as ApiLanguageId)}
+							codeExtraPadding
+						/>
 
 						<div className="space-y-1 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3.5 text-text-sub-600 text-xs">
 							<p className="font-medium text-text-strong-950">
@@ -159,4 +285,5 @@ await reloop.contacts.create({
 		</div>
 	);
 }
+
 

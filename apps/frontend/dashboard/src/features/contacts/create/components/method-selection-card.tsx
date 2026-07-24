@@ -38,7 +38,7 @@ export function MethodSelectionCard({
 									format="CSV"
 									color="green"
 									size="small"
-									className="h-5 w-5"
+									className="h-6 w-6"
 								/>
 							</div>
 							<div>
@@ -64,7 +64,7 @@ export function MethodSelectionCard({
 					>
 						<div className="flex items-center gap-3.5">
 							<div className="relative flex h-10 w-10 shrink-0 items-center justify-center text-text-strong-950">
-								<Icon name="user-plus" className="h-5 w-5" />
+								<Icon name="keyboard" className="h-6 w-6 text-amber-500" />
 							</div>
 							<div>
 								<div className="font-medium text-sm text-text-strong-950 group-hover:text-black">
@@ -89,7 +89,7 @@ export function MethodSelectionCard({
 					>
 						<div className="flex items-center gap-3.5">
 							<div className="relative flex h-10 w-10 shrink-0 items-center justify-center text-text-strong-950">
-								<Icon name="sparkling" className="h-5 w-5 text-purple-600" />
+								<Icon name="sparkling" className="h-6 w-6 text-purple-600" />
 							</div>
 							<div>
 								<div className="font-medium text-sm text-text-strong-950 group-hover:text-black">
@@ -115,7 +115,7 @@ export function MethodSelectionCard({
 					>
 						<div className="flex items-center gap-3.5">
 							<div className="relative flex h-10 w-10 shrink-0 items-center justify-center text-text-strong-950">
-								<Icon name="code" className="h-5 w-5 text-blue-600" />
+								<Icon name="file-code" className="h-6 w-6 text-blue-600" />
 							</div>
 							<div>
 								<div className="font-medium text-sm text-text-strong-950 group-hover:text-black">
