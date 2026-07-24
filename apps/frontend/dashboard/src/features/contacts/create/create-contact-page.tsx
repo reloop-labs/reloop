@@ -57,7 +57,7 @@ export function CreateContactPage() {
 			</div>
 
 			{/* Main Content Layout Container - Top anchored so top line & side items NEVER flicker or shift */}
-			<div className="relative z-20 mx-auto w-full max-w-[1280px] px-6 lg:px-12 pt-20 lg:pt-28 pb-16">
+			<div className="relative z-20 mx-auto w-full max-w-[1280px] px-6 pt-20 pb-16 lg:px-12 lg:pt-28">
 				<div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:gap-8">
 					{/* Left Column (3/12) - Aligned to top (start) of card */}
 					<div className="flex justify-start pt-8 text-left lg:col-span-3 lg:justify-end lg:text-right">
@@ -100,9 +100,9 @@ export function CreateContactPage() {
 								initial={false}
 								animate={{
 									y: isMethodSelection ? 0 : "calc(-100% - 24px)",
-									scale: isMethodSelection ? 1 : 0.90,
-									opacity: isMethodSelection ? 1 : 0.25,
-									filter: isMethodSelection ? "blur(0px)" : "blur(2px)",
+									scale: isMethodSelection ? 1 : 0.92,
+									opacity: isMethodSelection ? 1 : 0.65,
+									filter: isMethodSelection ? "blur(0px)" : "blur(0px)",
 								}}
 								transition={{
 									duration: 0.4,
@@ -111,7 +111,7 @@ export function CreateContactPage() {
 								style={{ transformOrigin: "bottom center" }}
 								className={`w-full ${
 									!isMethodSelection
-										? "absolute top-2 left-0 right-0 z-10 cursor-pointer hover:opacity-50 transition-opacity"
+										? "absolute top-2 right-0 left-0 z-10 cursor-pointer transition-opacity hover:opacity-100"
 										: "relative z-20"
 								}`}
 								onClick={() => {
@@ -144,11 +144,15 @@ export function CreateContactPage() {
 										)}
 
 										{currentStep === "csv-import" && (
-											<CsvImportStep onBack={() => setCurrentStep("select-method")} />
+											<CsvImportStep
+												onBack={() => setCurrentStep("select-method")}
+											/>
 										)}
 
 										{currentStep === "api-sync" && (
-											<ApiSyncStep onBack={() => setCurrentStep("select-method")} />
+											<ApiSyncStep
+												onBack={() => setCurrentStep("select-method")}
+											/>
 										)}
 									</motion.div>
 								)}
