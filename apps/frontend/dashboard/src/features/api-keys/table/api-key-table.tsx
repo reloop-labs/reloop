@@ -113,70 +113,65 @@ export function ApiKeyTable({
 	return (
 		<>
 			<div className="w-full text-paragraph-sm">
-				<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/40">
-					{/* Table Header */}
-					<div
-						className={`grid ${API_KEY_TABLE_GRID} items-center px-4 pt-3 pb-2.5 font-medium text-text-sub-600 text-xs dark:text-text-sub-600`}
-					>
-						{headerGroup?.headers.map((header) => (
-							<div key={header.id} className="flex items-center gap-1">
-								{header.isPlaceholder
-									? null
-									: flexRender(
-											header.column.columnDef.header,
-											header.getContext(),
-										)}
-							</div>
-						))}
-						{/* spacer matches actions column */}
-						<div />
-					</div>
+				<div
+					className={`grid ${API_KEY_TABLE_GRID} items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 text-xs dark:border-[#101010] dark:bg-bg-weak-50/40`}
+				>
+					{headerGroup?.headers.map((header) => (
+						<div key={header.id} className="flex items-center gap-1">
+							{header.isPlaceholder
+								? null
+								: flexRender(
+										header.column.columnDef.header,
+										header.getContext(),
+									)}
+						</div>
+					))}
+					{/* spacer matches actions column */}
+					<div />
+				</div>
 
-					{/* Rows Inner White Card */}
-					<div className="m-0.5 divide-y divide-stroke-soft-100 overflow-visible rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40 dark:bg-bg-white-0">
-						{isLoading && apiKeys.length === 0 ? (
-							<TableSkeleton rows={loadingRows} />
-						) : rows.length === 0 ? (
-							<EmptyState
-								onCreateApiKey={() => void setModal("create-api-key")}
-							/>
-						) : (
-							rows.map((row) => {
-								const apiKey = row.original;
-								const isRowActive = activeDropdownId === apiKey.id;
-								return (
-									<div
-										key={row.id}
-										className={cn(
-											`group/row grid w-full ${API_KEY_TABLE_GRID} items-center px-4 py-2 text-left transition-colors`,
-											isRowActive && "bg-bg-weak-50/50",
-										)}
-									>
-										{row.getVisibleCells().map((cell) => (
-											<div key={cell.id}>
-												{flexRender(
-													cell.column.columnDef.cell,
-													cell.getContext(),
-												)}
-											</div>
-										))}
-										{/* Actions outside column defs so open state never remounts with columns */}
-										<div
-											onClick={(e) => e.stopPropagation()}
-											onKeyDown={(e) => e.stopPropagation()}
-										>
-											<ApiKeyActionsMenu
-												apiKey={apiKey}
-												handlers={actionsHandlers}
-											/>
+				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-visible rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+					{isLoading && apiKeys.length === 0 ? (
+						<TableSkeleton rows={loadingRows} />
+					) : rows.length === 0 ? (
+						<EmptyState
+							onCreateApiKey={() => void setModal("create-api-key")}
+						/>
+					) : (
+						rows.map((row) => {
+							const apiKey = row.original;
+							const isRowActive = activeDropdownId === apiKey.id;
+							return (
+								<div
+									key={row.id}
+									className={cn(
+										`group/row grid w-full ${API_KEY_TABLE_GRID} items-center px-4 py-2 text-left transition-colors`,
+										isRowActive && "bg-bg-weak-50/50",
+									)}
+								>
+									{row.getVisibleCells().map((cell) => (
+										<div key={cell.id}>
+											{flexRender(
+												cell.column.columnDef.cell,
+												cell.getContext(),
+											)}
 										</div>
+									))}
+									{/* Actions outside column defs so open state never remounts with columns */}
+									<div
+										onClick={(e) => e.stopPropagation()}
+										onKeyDown={(e) => e.stopPropagation()}
+									>
+										<ApiKeyActionsMenu
+											apiKey={apiKey}
+											handlers={actionsHandlers}
+										/>
 									</div>
-								);
-							})
-						)}
-					</div>
+								</div>
+							);
+						})
+					)}
 
-					{/* Table Footer */}
 					<TableFooter total={total} isLoading={isLoading} />
 				</div>
 			</div>

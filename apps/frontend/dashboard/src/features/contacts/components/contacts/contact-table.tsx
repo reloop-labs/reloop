@@ -120,139 +120,137 @@ export const ContactTable = ({
 
 	return (
 		<div className="w-full text-paragraph-sm">
-			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/40">
-				{/* Table Header */}
-				<div className="grid grid-cols-[1fr_minmax(200px,auto)_140px_minmax(40px,auto)] items-center px-4 pt-3 pb-2.5 font-medium text-text-sub-600 dark:text-text-sub-600">
-					<div className="flex items-center gap-1">
-						<Icon name="mail-single" className="h-3 w-3" />
-						<span className="text-xs">Email</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<Icon name="activity" className="h-3 w-3" />
-						<span className="text-xs">Status</span>
-					</div>
-					<div className="flex items-center gap-1">
-						<Icon name="clock" className="h-3 w-3" />
-						<span className="text-xs">Created At</span>
-					</div>
-					<div />
+			{/* Table Header */}
+			<div className="grid grid-cols-[1fr_minmax(200px,auto)_140px_minmax(40px,auto)] items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40">
+				<div className="flex items-center gap-1">
+					<Icon name="mail-single" className="h-3 w-3" />
+					<span className="text-xs">Email</span>
 				</div>
+				<div className="flex items-center gap-1">
+					<Icon name="activity" className="h-3 w-3" />
+					<span className="text-xs">Status</span>
+				</div>
+				<div className="flex items-center gap-1">
+					<Icon name="clock" className="h-3 w-3" />
+					<span className="text-xs">Created At</span>
+				</div>
+				<div />
+			</div>
 
-				{/* Rows Inner White Card */}
-				<div className="m-0.5 divide-y divide-stroke-soft-100 overflow-visible rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40 dark:bg-bg-white-0">
-					{isLoading ? (
-						Array.from({ length: loadingRows }).map((_, i) => (
-							<ContactSkeleton key={`skeleton-${i}`} />
-						))
-					) : contacts.length === 0 ? (
-						<ContactsEmptyState
-							onAddContact={onAddContact}
-							searchQuery={searchQuery}
-							onClearSearch={onClearSearch}
-							title={emptyStateTitle}
-							description={emptyStateDescription}
-							buttonText={emptyStateButtonText}
-						/>
-					) : (
-						contacts.map((contact) => {
-							const isRowActive =
-								activeDropdownId === contact.id ||
-								editingContactId === contact.id;
-							const isEditing = editingContactId === contact.id;
+			{/* Table Body */}
+			<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+				{isLoading ? (
+					Array.from({ length: loadingRows }).map((_, i) => (
+						<ContactSkeleton key={`skeleton-${i}`} />
+					))
+				) : contacts.length === 0 ? (
+					<ContactsEmptyState
+						onAddContact={onAddContact}
+						searchQuery={searchQuery}
+						onClearSearch={onClearSearch}
+						title={emptyStateTitle}
+						description={emptyStateDescription}
+						buttonText={emptyStateButtonText}
+					/>
+				) : (
+					contacts.map((contact) => {
+						const isRowActive =
+							activeDropdownId === contact.id ||
+							editingContactId === contact.id;
+						const isEditing = editingContactId === contact.id;
 
-							return (
-								<div key={contact.id}>
-									<div
-										onClick={() => handleRowClick(contact)}
-										className={cn(
-											"group/row grid cursor-pointer grid-cols-[1fr_minmax(200px,auto)_140px_minmax(40px,auto)] items-center px-4 py-2 text-left transition-colors",
-											"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base",
-											isRowActive && "bg-bg-weak-50/50",
-											isEditing && "bg-bg-weak-50/70",
+						return (
+							<div key={contact.id}>
+								<div
+									onClick={() => handleRowClick(contact)}
+									className={cn(
+										"group/row grid cursor-pointer grid-cols-[1fr_minmax(200px,auto)_140px_minmax(40px,auto)] items-center px-4 py-2 text-left transition-colors",
+										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base",
+										isRowActive && "bg-bg-weak-50/50",
+										isEditing && "bg-bg-weak-50/70",
+									)}
+								>
+									{/* Email Column */}
+									<div className="flex items-center gap-2">
+										<div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-[10px] text-white uppercase tracking-wide shadow-sm">
+											{contact.email.charAt(0).toUpperCase()}
+										</div>
+										<span className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors group-hover/row:text-[#1868DF] dark:group-hover/row:text-blue-400">
+											{contact.email}
+										</span>
+										{isEditing && (
+											<span className="rounded-md bg-bg-white-0 px-1.5 py-0.5 font-medium text-[11px] text-text-sub-600 ring-1 ring-stroke-soft-100">
+												Editing
+											</span>
 										)}
-									>
-										{/* Email Column */}
-										<div className="flex items-center gap-2">
-											<div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-[10px] text-white uppercase tracking-wide shadow-sm">
-												{contact.email.charAt(0).toUpperCase()}
-											</div>
-											<span className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors group-hover/row:text-[#1868DF] dark:group-hover/row:text-blue-400">
-												{contact.email}
-											</span>
-											{isEditing && (
-												<span className="rounded-md bg-bg-white-0 px-1.5 py-0.5 font-medium text-[11px] text-text-sub-600 ring-1 ring-stroke-soft-100">
-													Editing
-												</span>
-											)}
-										</div>
+									</div>
 
-										{/* Status Column */}
-										<div className="flex items-center">
-											<div
-												className={cn(
-													"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
-													getStatusColorClass(contact.status),
-												)}
-											>
-												<Icon
-													name={getStatusIcon(contact.status)}
-													className="h-3.5 w-3.5"
-												/>
-												{getStatusLabel(contact.status)}
-											</div>
-										</div>
-
-										{/* Created Column */}
-										<div>
-											<span className="whitespace-nowrap font-medium text-[13px]">
-												{formatRelativeTime(contact.createdAt)}
-											</span>
-										</div>
-
-										{/* Actions Column */}
+									{/* Status Column */}
+									<div className="flex items-center">
 										<div
-											className="flex items-center justify-center text-text-soft-400"
-											onClick={(e) => e.stopPropagation()}
+											className={cn(
+												"flex items-center gap-2 rounded-lg py-0.5 font-medium text-[13px] capitalize",
+												getStatusColorClass(contact.status),
+											)}
 										>
-											<ContactDropdown
-												contact={contact}
-												onEdit={handleEdit}
-												onDelete={handleDelete}
-												isDeleting={false}
-												onOpenChange={(open) =>
-													setActiveDropdownId(open ? contact.id : null)
-												}
+											<Icon
+												name={getStatusIcon(contact.status)}
+												className="h-3.5 w-3.5"
 											/>
+											{getStatusLabel(contact.status)}
 										</div>
 									</div>
 
-									<AnimatePresence initial={false}>
-										{isEditing ? (
-											<motion.div
-												key={`edit-${contact.id}`}
-												initial={{ height: 0, opacity: 0 }}
-												animate={{ height: "auto", opacity: 1 }}
-												exit={{ height: 0, opacity: 0 }}
-												transition={{
-													height: { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
-													opacity: { duration: 0.2, ease: "easeOut" },
-												}}
-												className="overflow-hidden"
-											>
-												<EditContactRowPanel
-													contactId={contact.id}
-													onClose={() => setEditingContactId(null)}
-												/>
-											</motion.div>
-										) : null}
-									</AnimatePresence>
-								</div>
-							);
-						})
-					)}
-				</div>
+									{/* Created Column */}
+									<div>
+										<span className="whitespace-nowrap font-medium text-[13px]">
+											{formatRelativeTime(contact.createdAt)}
+										</span>
+									</div>
 
-				{/* Pagination Footer */}
+									{/* Actions Column */}
+									<div
+										className="flex items-center justify-center text-text-soft-400"
+										onClick={(e) => e.stopPropagation()}
+									>
+										<ContactDropdown
+											contact={contact}
+											onEdit={handleEdit}
+											onDelete={handleDelete}
+											isDeleting={false}
+											onOpenChange={(open) =>
+												setActiveDropdownId(open ? contact.id : null)
+											}
+										/>
+									</div>
+								</div>
+
+								<AnimatePresence initial={false}>
+									{isEditing ? (
+										<motion.div
+											key={`edit-${contact.id}`}
+											initial={{ height: 0, opacity: 0 }}
+											animate={{ height: "auto", opacity: 1 }}
+											exit={{ height: 0, opacity: 0 }}
+											transition={{
+												height: { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
+												opacity: { duration: 0.2, ease: "easeOut" },
+											}}
+											className="overflow-hidden"
+										>
+											<EditContactRowPanel
+												contactId={contact.id}
+												onClose={() => setEditingContactId(null)}
+											/>
+										</motion.div>
+									) : null}
+								</AnimatePresence>
+							</div>
+						);
+					})
+				)}
+
+				{/* Pagination */}
 				{total > 0 && (
 					<div className="flex items-center justify-between px-4 py-2 text-label-xs text-text-sub-600">
 						<div className="flex items-center">
