@@ -1,7 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -13,12 +12,20 @@ import {
 	siRuby,
 	siRust,
 } from "simple-icons";
+import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
 
 interface ApiSyncStepProps {
 	onBack: () => void;
 }
 
-type ApiLanguageId = "curl" | "node" | "python" | "go" | "php" | "ruby" | "rust";
+type ApiLanguageId =
+	| "curl"
+	| "node"
+	| "python"
+	| "go"
+	| "php"
+	| "ruby"
+	| "rust";
 
 interface ApiLanguage {
 	id: ApiLanguageId;
@@ -214,7 +221,7 @@ export function ApiSyncStep({ onBack }: ApiSyncStepProps) {
 					{/* Header */}
 					<div>
 						<h2 className="font-semibold text-base text-text-strong-950 tracking-tight">
-							Sync Contacts via REST API
+							Sync Contacts via SDK
 						</h2>
 						<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
 							Stream new signups and user updates directly from your backend
@@ -285,5 +292,3 @@ export function ApiSyncStep({ onBack }: ApiSyncStepProps) {
 		</div>
 	);
 }
-
-

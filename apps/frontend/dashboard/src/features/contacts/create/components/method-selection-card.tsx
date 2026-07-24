@@ -84,33 +84,7 @@ export function MethodSelectionCard({
 							/>
 						</button>
 
-						{/* Option 3: Import with AI */}
-						<button
-							type="button"
-							onClick={() => onSelectMethod("ai-import")}
-							className="group flex w-full items-center justify-between rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 text-left transition-all hover:border-stroke-soft-300 hover:bg-bg-weak-50/70"
-						>
-							<div className="flex items-center gap-3.5">
-								<div className="relative flex h-10 w-10 shrink-0 items-center justify-center text-text-strong-950">
-									<Icon name="sparkling" className="h-6 w-6 text-purple-600" />
-								</div>
-								<div>
-									<div className="font-medium text-sm text-text-strong-950 group-hover:text-black">
-										Import with AI
-									</div>
-									<div className="text-text-sub-600 text-xs">
-										Paste raw text or notes and let AI automatically extract
-										contacts.
-									</div>
-								</div>
-							</div>
-							<Icon
-								name="arrow-right"
-								className="h-4 w-4 text-text-soft-400 transition-all group-hover:translate-x-0.5 group-hover:text-text-strong-950"
-							/>
-						</button>
-
-						{/* Option 4: REST API Sync */}
+						{/* Option 3: REST API Sync */}
 						<button
 							type="button"
 							onClick={() => onSelectMethod("api-sync")}
@@ -122,7 +96,7 @@ export function MethodSelectionCard({
 								</div>
 								<div>
 									<div className="font-medium text-sm text-text-strong-950 group-hover:text-black">
-										Sync via REST API
+										Sync via SDK
 									</div>
 									<div className="text-text-sub-600 text-xs">
 										Stream contacts from your backend app using API endpoints.
