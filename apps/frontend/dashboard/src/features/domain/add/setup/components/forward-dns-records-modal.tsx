@@ -95,7 +95,7 @@ export const ForwardDNSRecordsModal = ({
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
 			<Modal.Content className="w-[400px] max-w-[90vw] overflow-hidden p-0">
 				<motion.div
-					animate={{ height: isSent ? 156 : error ? 275 : "auto" }}
+					animate={{ height: isSent ? 156 : error ? 273 : 255 }}
 					transition={shouldReduceMotion ? { duration: 0 } : layoutSpringConfig}
 					className="overflow-hidden"
 				>
@@ -104,9 +104,9 @@ export const ForwardDNSRecordsModal = ({
 							{isSent ? (
 								<motion.div
 									key="success"
-									initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.9 }}
+									initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.95 }}
 									animate={{ opacity: 1, scale: 1 }}
-									exit={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.9 }}
+									exit={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.95 }}
 									transition={{ duration: 0.2 }}
 									className="flex flex-col items-center justify-center py-4 text-center"
 								>
