@@ -40,7 +40,7 @@ export const fancyButtonVariants = tv({
 				],
 			},
 			success: {
-				root: "bg-success-base text-static-white shadow-fancy-buttons-primary",
+				root: "bg-success-base text-static-white shadow-fancy-buttons-success",
 			},
 			basic: {
 				root: [

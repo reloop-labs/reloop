@@ -452,6 +452,8 @@
 		0 1px 2px 0 #0e121b3d, 0 0 0 1px theme(--color-primary-base);
 	--shadow-fancy-buttons-error:
 		0 1px 2px 0 #0e121b3d, 0 0 0 1px theme(--color-error-base);
+	--shadow-fancy-buttons-success:
+		0 1px 2px 0 #0e121b3d, 0 0 0 1px theme(--color-success-base);
 	--shadow-fancy-buttons-stroke:
 		0 1px 3px 0 #0e121b1f, 0 0 0 1px theme(--color-stroke-soft-200);
 

@@ -56,9 +56,7 @@ export const CreateGroupModal = ({
 				handleClose();
 			}, 750);
 		} catch (err) {
-			setError(
-				err instanceof Error ? err.message : "Failed to create group",
-			);
+			setError(err instanceof Error ? err.message : "Failed to create group");
 			setStatus("idle");
 		}
 	};
@@ -125,12 +123,11 @@ export const CreateGroupModal = ({
 									</Input.Wrapper>
 								</Input.Root>
 								{error ? (
-									<p className="text-error-base text-paragraph-xs">
-										{error}
-									</p>
+									<p className="text-error-base text-paragraph-xs">{error}</p>
 								) : (
 									<p className="text-paragraph-xs text-text-sub-600">
-										Provide a descriptive name to help you identify this group later.
+										Provide a descriptive name to help you identify this group
+										later.
 									</p>
 								)}
 							</div>
