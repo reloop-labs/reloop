@@ -66,7 +66,9 @@ function buildLookups() {
 			`${release.version} — ${release.title}`,
 		]),
 	);
-	const langs = new Map(languages.map((lang) => [lang.slug, lang.name]));
+	const langs = new Map<string, string>(
+		languages.map((lang) => [lang.slug, lang.name]),
+	);
 	const glossary = new Map(
 		glossaryTerms.map((term) => [term.slug, term.title]),
 	);
