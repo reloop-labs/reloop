@@ -51,8 +51,8 @@ export const ContactFilterDropdown = ({
 				<Button.Root
 					variant="neutral"
 					mode="stroke"
-					size="xsmall"
-					className="w-48 justify-between gap-1.5 whitespace-nowrap rounded-[10px]"
+					size="small"
+					className="w-48 justify-between gap-1.5 whitespace-nowrap rounded-xl"
 				>
 					<div className="flex items-center gap-1.5 overflow-hidden">
 						<Icon

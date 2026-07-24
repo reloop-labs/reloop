@@ -1,7 +1,8 @@
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { parseAsInteger, useQueryState } from "nuqs";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
@@ -44,7 +45,10 @@ function SummaryCard({
 
 export function ContactList() {
 	const { activeOrganization } = useActiveOrganization();
-	const [searchQuery, setSearchQuery] = useState("");
+	const [searchQuery, setSearchQuery] = useQueryState(
+		"search",
+		parseAsString.withDefault(""),
+	);
 	const [filter, setFilter] = useState<ContactFilterOption>(null);
 	const [, setModal] = useQueryState("modal");
 	const [currentPage, setCurrentPage] = useQueryState(
@@ -53,10 +57,10 @@ export function ContactList() {
 	);
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 
-	const { data, error, isPending, isFetching } = useContactsQuery({
+	const { data, error, isPending, isFetching, refetch } = useContactsQuery({
 		page: currentPage ?? 1,
 		limit: pageSize ?? 10,
-		search: searchQuery,
+		search: searchQuery ?? "",
 		status: filter ?? "",
 		enabled: !!activeOrganization?.id,
 	});
@@ -130,14 +134,14 @@ export function ContactList() {
 
 			<div className="flex items-center gap-2">
 				<div className="flex-1">
-					<Input.Root size="xsmall" className="rounded-[10px]">
+					<Input.Root size="small" className="rounded-xl">
 						<Input.Wrapper>
-							<Input.Icon as={Icon} name="search" size="xsmall" />
+							<Input.Icon as={Icon} name="search" size="small" />
 							<Input.Input
 								placeholder="Search by email"
-								value={searchQuery}
+								value={searchQuery ?? ""}
 								onChange={(e) => {
-									setSearchQuery(e.target.value);
+									void setSearchQuery(e.target.value || null);
 									void setCurrentPage(1);
 								}}
 							/>
@@ -155,10 +159,31 @@ export function ContactList() {
 				<Button.Root
 					variant="neutral"
 					mode="stroke"
-					size="xsmall"
+					size="small"
+					onClick={() => void refetch()}
+					disabled={isFetching}
+					className="h-9 w-9 rounded-xl p-0 flex items-center justify-center shrink-0"
+					title="Refresh contacts"
+					aria-label="Refresh contacts"
+				>
+					<Button.Icon
+						as={Icon}
+						name="refresh-cw"
+						className={cn(
+							"h-4 w-4 text-text-sub-600 transition-transform",
+							isFetching && "animate-spin",
+						)}
+					/>
+				</Button.Root>
+				<Button.Root
+					variant="neutral"
+					mode="stroke"
+					size="small"
 					onClick={() => void handleDownloadCSV()}
 					disabled={!data?.contacts || data.contacts.length === 0}
+					className="h-9 w-9 rounded-xl p-0 flex items-center justify-center shrink-0"
 					title="Export CSV"
+					aria-label="Export CSV"
 				>
 					<Icon name="file-download" className="h-4 w-4" />
 				</Button.Root>
@@ -171,8 +196,8 @@ export function ContactList() {
 					isLoading={isLoading}
 					loadingRows={6}
 					onAddContact={() => void setModal("add-contact")}
-					searchQuery={searchQuery}
-					onClearSearch={() => setSearchQuery("")}
+					searchQuery={searchQuery ?? ""}
+					onClearSearch={() => void setSearchQuery(null)}
 				/>
 			</div>
 		</div>

@@ -1,14 +1,18 @@
+import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { parseAsInteger, useQueryState } from "nuqs";
-import { useState } from "react";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useGroupsQuery } from "../../hooks/use-contacts-query";
 import { GroupTable } from "./group-table";
 
 export function GroupList() {
 	const { activeOrganization } = useActiveOrganization();
-	const [searchQuery, setSearchQuery] = useState("");
+	const [searchQuery, setSearchQuery] = useQueryState(
+		"search",
+		parseAsString.withDefault(""),
+	);
 	const [, setModal] = useQueryState("modal");
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
@@ -19,10 +23,10 @@ export function GroupList() {
 		parseAsInteger.withDefault(10),
 	);
 
-	const { data, error, isPending, isFetching } = useGroupsQuery({
+	const { data, error, isPending, isFetching, refetch } = useGroupsQuery({
 		page: currentPage ?? 1,
 		limit: pageSize ?? 10,
-		search: searchQuery,
+		search: searchQuery ?? "",
 		enabled: !!activeOrganization?.id,
 	});
 	const isLoading = isPending || (isFetching && !data);
@@ -45,27 +49,41 @@ export function GroupList() {
 
 	return (
 		<div>
-			<div className="flex items-center gap-3">
+			<div className="flex items-center gap-2">
 				<div className="flex-1">
-					<Input.Root size="xsmall" className="rounded-[10px]">
+					<Input.Root size="small" className="rounded-xl">
 						<Input.Wrapper>
-							<Input.Icon
-								as={Icon}
-								name="search"
-								size="xsmall"
-								className="h-3.5 w-3.5"
-							/>
+							<Input.Icon as={Icon} name="search" size="small" />
 							<Input.Input
 								placeholder="Search groups..."
-								value={searchQuery}
+								value={searchQuery ?? ""}
 								onChange={(e) => {
-									setSearchQuery(e.target.value);
+									void setSearchQuery(e.target.value || null);
 									void setCurrentPage(1);
 								}}
 							/>
 						</Input.Wrapper>
 					</Input.Root>
 				</div>
+				<Button.Root
+					variant="neutral"
+					mode="stroke"
+					size="small"
+					onClick={() => void refetch()}
+					disabled={isFetching}
+					className="h-9 w-9 rounded-xl p-0 flex items-center justify-center shrink-0"
+					title="Refresh groups"
+					aria-label="Refresh groups"
+				>
+					<Button.Icon
+						as={Icon}
+						name="refresh-cw"
+						className={cn(
+							"h-4 w-4 text-text-sub-600 transition-transform",
+							isFetching && "animate-spin",
+						)}
+					/>
+				</Button.Root>
 			</div>
 			<div className="mt-4">
 				<GroupTable
@@ -81,8 +99,8 @@ export function GroupList() {
 					total={data?.total || 0}
 					isLoading={isLoading}
 					onAddGroup={() => void setModal("create-group")}
-					searchQuery={searchQuery}
-					onClearSearch={() => setSearchQuery("")}
+					searchQuery={searchQuery ?? ""}
+					onClearSearch={() => void setSearchQuery(null)}
 					currentPage={currentPage ?? 1}
 					pageSize={pageSize ?? 10}
 					onPageChange={(p) => void setCurrentPage(p)}
