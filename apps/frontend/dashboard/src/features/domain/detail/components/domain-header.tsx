@@ -1,4 +1,4 @@
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useNavigate } from "@tanstack/react-router";
@@ -10,6 +10,7 @@ import { DeleteDomainModal } from "../../components/delete-domain";
 import type { Domain } from "../../types";
 import { getStatusColorClass, getStatusIcon } from "../../utils";
 import { useDomainActions } from "../hooks/use-domain-actions";
+import { ForwardDNSRecordsButton } from "../../add/setup/components/forward-dns-records";
 import { DomainHeaderActions } from "./domain-header-actions";
 
 export function DomainHeader({
@@ -100,16 +101,25 @@ export function DomainHeader({
 						<Skeleton className="h-9 w-32 rounded-lg" />
 					) : (
 						<>
-							{(status === "pending" || status === "failed") && (
-								<Button.Root
-									variant="neutral"
-									size="xsmall"
-									onClick={() => void handleVerifyDNS()}
-									disabled={isVerifying}
-									className="font-medium"
-								>
-									{status === "failed" ? "Verify DNS Again" : "Verify Domain"}
-								</Button.Root>
+							{(status === "pending" || status === "verifying" || status === "failed") && (
+								<>
+									{domainRecordId && (
+										<ForwardDNSRecordsButton domainId={domainRecordId} />
+									)}
+									<FancyButton.Root
+										variant="blue"
+										size="xsmall"
+										onClick={() => void handleVerifyDNS()}
+										disabled={isVerifying || status === "verifying"}
+										className="font-medium"
+									>
+										{isVerifying || status === "verifying"
+											? "Verifying..."
+											: status === "failed"
+											? "Verify DNS Again"
+											: "Verify Domain"}
+									</FancyButton.Root>
+								</>
 							)}
 							<DomainHeaderActions
 								domain={domain}

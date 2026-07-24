@@ -29,7 +29,7 @@ export const DomainHeaderActions = ({
 
 		items.push({
 			id: "docs",
-			label: "Go to docs",
+			label: "Documentation",
 			icon: "file-text" as const,
 		});
 
