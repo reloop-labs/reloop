@@ -3,13 +3,40 @@ import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import { ForwardDNSRecordsModal } from "../add/setup/components/forward-dns-records-modal";
+import { useDomainActions } from "../detail/hooks/use-domain-actions";
 
 const menuItems = [
 	{
 		id: "view" as const,
 		label: "View Details",
 		icon: "info-outline" as const,
+		isDanger: false,
+	},
+	{
+		id: "copy_name" as const,
+		label: "Copy Domain Name",
+		icon: "copy" as const,
+		isDanger: false,
+	},
+	{
+		id: "copy_id" as const,
+		label: "Copy Domain ID",
+		icon: "copy" as const,
+		isDanger: false,
+	},
+	{
+		id: "reverify" as const,
+		label: "Re-verify DNS",
+		icon: "refresh-cw" as const,
+		isDanger: false,
+	},
+	{
+		id: "forward" as const,
+		label: "Forward Records",
+		icon: "mail-single" as const,
 		isDanger: false,
 	},
 	{
@@ -35,7 +62,9 @@ export function DomainDropdown({
 }) {
 	const [open, setOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const [forwardOpen, setForwardOpen] = useState(false);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
+	const { handleVerifyDNS } = useDomainActions(domainId);
 
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
@@ -71,7 +100,7 @@ export function DomainDropdown({
 				<Dropdown.Content
 					align="end"
 					sideOffset={6}
-					className="w-40 gap-0 rounded-xl p-1.5"
+					className="w-48 gap-0 rounded-xl p-1.5"
 				>
 					<div className="relative">
 						{menuItems.map((item, idx) => (
@@ -84,8 +113,21 @@ export function DomainDropdown({
 								onPointerEnter={() => setHoverIdx(idx)}
 								onPointerLeave={() => setHoverIdx(undefined)}
 								onClick={() => {
-									if (item.id === "delete") onDelete(domainId);
-									else onViewDetails(domainName);
+									if (item.id === "delete") {
+										onDelete(domainId);
+									} else if (item.id === "view") {
+										onViewDetails(domainName);
+									} else if (item.id === "copy_name") {
+										void navigator.clipboard.writeText(domainName);
+										toast.success("Domain name copied to clipboard");
+									} else if (item.id === "copy_id") {
+										void navigator.clipboard.writeText(domainId);
+										toast.success("Domain ID copied to clipboard");
+									} else if (item.id === "reverify") {
+										void handleVerifyDNS();
+									} else if (item.id === "forward") {
+										setForwardOpen(true);
+									}
 									handleOpenChange(false);
 								}}
 								className={cn(
@@ -114,6 +156,13 @@ export function DomainDropdown({
 					</div>
 				</Dropdown.Content>
 			</Dropdown.Root>
+			{domainId && (
+				<ForwardDNSRecordsModal
+					domainId={domainId}
+					open={forwardOpen}
+					onOpenChange={setForwardOpen}
+				/>
+			)}
 		</div>
 	);
 }

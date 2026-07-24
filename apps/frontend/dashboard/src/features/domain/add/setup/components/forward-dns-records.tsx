@@ -129,20 +129,9 @@ export const ForwardDNSRecordsButton = ({
 									transition={{ duration: 0.2 }}
 									className="flex flex-col items-center justify-center py-6 text-center"
 								>
-									<motion.div
-										initial={{ scale: shouldReduceMotion ? 1 : 0, opacity: 0 }}
-										animate={{
-											scale: shouldReduceMotion ? 1 : [0, 1.15, 1],
-											opacity: 1,
-										}}
-										transition={{
-											duration: shouldReduceMotion ? 0.2 : 0.4,
-											ease: "easeOut",
-										}}
-										className="mb-2 flex items-center justify-center rounded-full bg-emerald-500/10 p-3 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
-									>
+									<div className="flex size-10 items-center justify-center rounded-full bg-success-weak-50 text-success-base">
 										<svg
-											className="h-6 w-6"
+											className="size-5"
 											fill="none"
 											viewBox="0 0 24 24"
 											stroke="currentColor"
@@ -170,7 +159,7 @@ export const ForwardDNSRecordsButton = ({
 												}}
 											/>
 										</svg>
-									</motion.div>
+									</div>
 									<p className="font-medium text-sm text-text-strong-950">
 										Instructions sent!
 									</p>
