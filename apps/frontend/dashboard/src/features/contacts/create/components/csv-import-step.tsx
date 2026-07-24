@@ -4,21 +4,29 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import * as FileFormatIcon from "@reloop/ui/file-format-icon";
 import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
-import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import { useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { GroupSelect } from "#/features/contacts/components/groups/group-select";
-import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
+import {
+	useAllPropertiesQuery,
+	useInvalidateContacts,
+} from "#/features/contacts/hooks/use-contacts-query";
 import {
 	buildContactsFromMapping,
-	type ColumnMapping,
-	type ColumnTarget,
 	type ParsedCsvResult,
 	parseCsvContent,
 } from "../utils/csv-parser";
+import {
+	hasEmailMapping,
+	rowsToColumnMappings,
+	seedRowsFromDetectedMappings,
+	suggestPropertyRows,
+	type PropertyMappingRow,
+} from "../utils/property-mapping";
+import { CsvPropertyMapping } from "./csv-property-mapping";
 
 interface CsvImportStepProps {
 	onBack: () => void;
@@ -30,16 +38,40 @@ const BATCH_SIZE = 5; // Concurrency limit for client-side API requests
 export function CsvImportStep({ onBack }: CsvImportStepProps) {
 	const navigate = useNavigate();
 	const invalidate = useInvalidateContacts();
+	const { data: propertiesData } = useAllPropertiesQuery();
+	const orgProperties = propertiesData?.properties ?? [];
 
 	const [file, setFile] = useState<File | null>(null);
 	const [parsedResult, setParsedResult] = useState<ParsedCsvResult | null>(
 		null,
 	);
-	const [mappings, setMappings] = useState<ColumnMapping[]>([]);
+	const [mappingRows, setMappingRows] = useState<PropertyMappingRow[]>([]);
 	const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
 	const [isParsing, setIsParsing] = useState(false);
 	const [isImporting, setIsImporting] = useState(false);
 	const [processedCount, setProcessedCount] = useState(0);
+	/** Track whether we've already auto-suggested custom properties for this file */
+	const didSuggestRef = useRef(false);
+
+	const rebuildContacts = useCallback(
+		(result: ParsedCsvResult, rows: PropertyMappingRow[]) => {
+			const mappings = rowsToColumnMappings(rows);
+			const updated = buildContactsFromMapping(
+				result.headers,
+				result.rawRows,
+				mappings,
+			);
+			setParsedResult({
+				...result,
+				contacts: updated.contacts,
+				validCount: updated.validCount,
+				invalidCount: updated.invalidCount,
+				duplicateCount: updated.duplicateCount,
+				mappings,
+			});
+		},
+		[],
+	);
 
 	const processFile = (inputFile: File) => {
 		if (inputFile.size > MAX_FILE_SIZE_BYTES) {
@@ -49,6 +81,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 
 		setFile(inputFile);
 		setIsParsing(true);
+		didSuggestRef.current = false;
 
 		const reader = new FileReader();
 		reader.onload = (e) => {
@@ -59,23 +92,31 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 				if (result.errors.length > 0) {
 					toast.error(result.errors[0]);
 					setParsedResult(null);
-					setMappings([]);
-				} else if (result.validCount === 0) {
-					toast.error("No valid email addresses found in the CSV file.");
-					setParsedResult(null);
-					setMappings([]);
+					setMappingRows([]);
 				} else {
-					setParsedResult(result);
-					setMappings(result.mappings);
-					toast.success(
-						`Parsed ${result.validCount} valid contact(s) from CSV.`,
-					);
+					// Seed identity mappings (email / first / last); custom props suggested later
+					const rows = seedRowsFromDetectedMappings(result.mappings);
+					setMappingRows(rows);
+					rebuildContacts(result, rows);
+
+					const emailOk = rows.some((r) => r.target === "email");
+					if (!emailOk) {
+						toast.error(
+							"Could not detect an email column — map one in Property mapping.",
+						);
+					} else if (result.validCount === 0) {
+						toast.error("No valid email addresses found in the CSV file.");
+					} else {
+						toast.success(
+							`Parsed ${result.validCount} valid contact(s) from CSV.`,
+						);
+					}
 				}
 			} catch (err) {
 				console.error("Error reading CSV file:", err);
 				toast.error("Failed to parse CSV file content.");
 				setParsedResult(null);
-				setMappings([]);
+				setMappingRows([]);
 			} finally {
 				setIsParsing(false);
 			}
@@ -86,6 +127,24 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 		};
 		reader.readAsText(inputFile);
 	};
+
+	// Auto-suggest custom property mappings once org properties are available
+	useEffect(() => {
+		if (!parsedResult || didSuggestRef.current) return;
+		if (orgProperties.length === 0) return;
+
+		const suggested = suggestPropertyRows(
+			parsedResult.headers,
+			mappingRows,
+			orgProperties,
+		);
+		didSuggestRef.current = true;
+		if (suggested.length === 0) return;
+
+		const next = [...mappingRows, ...suggested];
+		setMappingRows(next);
+		rebuildContacts(parsedResult, next);
+	}, [parsedResult, orgProperties, mappingRows, rebuildContacts]);
 
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		accept: {
@@ -113,31 +172,15 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 	const handleResetFile = () => {
 		setFile(null);
 		setParsedResult(null);
-		setMappings([]);
+		setMappingRows([]);
 		setProcessedCount(0);
+		didSuggestRef.current = false;
 	};
 
-	const handleMappingChange = (csvHeader: string, newTarget: ColumnTarget) => {
+	const handleMappingRowsChange = (rows: PropertyMappingRow[]) => {
 		if (!parsedResult) return;
-
-		const updatedMappings = mappings.map((m) =>
-			m.csvHeader === csvHeader ? { ...m, target: newTarget } : m,
-		);
-		setMappings(updatedMappings);
-
-		const updated = buildContactsFromMapping(
-			parsedResult.headers,
-			parsedResult.rawRows,
-			updatedMappings,
-		);
-
-		setParsedResult({
-			...parsedResult,
-			contacts: updated.contacts,
-			validCount: updated.validCount,
-			invalidCount: updated.invalidCount,
-			duplicateCount: updated.duplicateCount,
-		});
+		setMappingRows(rows);
+		rebuildContacts(parsedResult, rows);
 	};
 
 	const handleDownloadSample = () => {
@@ -241,6 +284,8 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 		? Math.round((processedCount / parsedResult.contacts.length) * 100)
 		: 0;
 
+	const emailMapped = hasEmailMapping(mappingRows);
+
 	return (
 		<div className="w-full space-y-6 font-sans">
 			{/* Main Card Container */}
@@ -323,7 +368,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 										<code className="rounded border border-stroke-soft-200 bg-bg-white-0 px-1 py-0.5 font-mono text-[11px] text-text-strong-950">
 											last_name
 										</code>
-										. Any additional headers map to custom properties.
+										. Map extra columns to Reloop properties after upload.
 									</li>
 								</ul>
 							</div>
@@ -340,7 +385,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 						</div>
 					)}
 
-					{/* Step 2: Parsed File Preview, Column Mapper & Group Selection */}
+					{/* Step 2: Preview, unified mapping & groups */}
 					{parsedResult && !isParsing && (
 						<div className="space-y-5">
 							{/* Selected File Card */}
@@ -377,7 +422,6 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 
 							{/* Summary Stats Container */}
 							<div className="grid grid-cols-2 divide-y divide-stroke-soft-200 overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 sm:grid-cols-4 sm:divide-x sm:divide-y-0">
-								{/* Valid Contacts */}
 								<div className="flex flex-col justify-center px-3.5 py-2.5">
 									<p className="truncate whitespace-nowrap font-normal text-text-sub-600 text-xs">
 										Valid contacts
@@ -387,7 +431,6 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 									</p>
 								</div>
 
-								{/* Invalid Emails */}
 								<div className="flex flex-col justify-center px-3.5 py-2.5">
 									<p className="truncate whitespace-nowrap font-normal text-text-sub-600 text-xs">
 										Invalid emails
@@ -397,7 +440,6 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 									</p>
 								</div>
 
-								{/* Duplicates */}
 								<div className="flex flex-col justify-center px-3.5 py-2.5">
 									<p className="truncate whitespace-nowrap font-normal text-text-sub-600 text-xs">
 										Duplicates
@@ -407,7 +449,6 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 									</p>
 								</div>
 
-								{/* Total Rows */}
 								<div className="flex flex-col justify-center px-3.5 py-2.5">
 									<p className="truncate whitespace-nowrap font-normal text-text-sub-600 text-xs">
 										Total rows
@@ -418,66 +459,13 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 								</div>
 							</div>
 
-							{/* Interactive Column Mapper Table */}
-							<div className="space-y-2.5 pt-1">
-								<div className="flex items-center justify-between">
-									<p className="font-semibold text-text-strong-950 text-xs">
-										Column Mapping
-									</p>
-									<p className="text-[11px] text-text-sub-600">
-										CSV Header → Reloop Property
-									</p>
-								</div>
-
-								<div className="divide-y divide-stroke-soft-200 overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0">
-									{mappings.map((item) => (
-										<div
-											key={item.csvHeader}
-											className="grid grid-cols-12 items-center px-4 py-2.5 text-xs transition-colors hover:bg-bg-weak-50/40"
-										>
-											{/* Left Column (5/12): CSV Header Name */}
-											<div className="col-span-5 flex min-w-0 items-center justify-start">
-												<span className="inline-flex max-w-full items-center truncate rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2.5 py-1 font-medium font-mono text-[11px] text-text-strong-950">
-													{item.csvHeader}
-												</span>
-											</div>
-
-											{/* Center Column (2/12): Arrow (Centered vertically & horizontally) */}
-											<div className="col-span-2 flex items-center justify-center">
-												<Icon
-													name="arrow-right"
-													className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
-												/>
-											</div>
-
-											{/* Right Column (5/12): Reloop Property Dropdown */}
-											<div className="col-span-5 flex items-center justify-end">
-												<select
-													value={item.target}
-													disabled={isImporting}
-													onChange={(e) =>
-														handleMappingChange(
-															item.csvHeader,
-															e.target.value as ColumnTarget,
-														)
-													}
-													className="w-full cursor-pointer rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1.5 font-sans text-text-strong-950 text-xs outline-none transition-colors hover:border-stroke-soft-300 focus:border-stroke-strong-950 disabled:cursor-not-allowed disabled:opacity-50"
-												>
-													<option value="email">
-														Email Address (Required)
-													</option>
-													<option value="firstName">First Name</option>
-													<option value="lastName">Last Name</option>
-													<option value={`property:${item.csvHeader}`}>
-														Property: {item.csvHeader}
-													</option>
-													<option value="skip">Do Not Import (Skip)</option>
-												</select>
-											</div>
-										</div>
-									))}
-								</div>
-							</div>
+							{/* Unified Property Mapping (email, name, custom) */}
+							<CsvPropertyMapping
+								csvHeaders={parsedResult.headers}
+								rows={mappingRows}
+								onChange={handleMappingRowsChange}
+								disabled={isImporting}
+							/>
 
 							{/* Optional Group Assignment */}
 							<div className="space-y-1.5 pt-1">
@@ -533,6 +521,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 						disabled={
 							!parsedResult ||
 							parsedResult.contacts.length === 0 ||
+							!emailMapped ||
 							isImporting ||
 							isParsing
 						}
