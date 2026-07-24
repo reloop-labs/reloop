@@ -1,3 +1,4 @@
+import * as Avatar from "@reloop/ui/avatar";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
 import { useQuery } from "@tanstack/react-query";
@@ -75,10 +76,15 @@ export const GroupSelect = ({
 						return (
 							<span
 								key={groupId}
-								className="inline-flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 text-paragraph-xs text-text-strong-950"
+								className="inline-flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-weak-50 py-0.5 pr-2 pl-0.5 text-paragraph-xs text-text-strong-950 transition-all"
 							>
-								<Icon name="modules" className="h-3 w-3 text-text-sub-600" />
-								{groupName}
+								<Avatar.Root
+									size="20"
+									color="gray"
+								>
+									<Icon name="modules" className="h-3 w-3 text-text-sub-600" />
+								</Avatar.Root>
+								<span className="font-medium">{groupName}</span>
 								<button
 									type="button"
 									onClick={(e) => {
@@ -86,7 +92,7 @@ export const GroupSelect = ({
 										e.stopPropagation();
 										removeGroup(groupId);
 									}}
-									className="ml-0.5 text-text-sub-600 transition-colors hover:text-text-strong-950"
+									className="ml-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full text-text-sub-600 transition-colors hover:bg-stroke-soft-200 hover:text-text-strong-950"
 									disabled={disabled}
 								>
 									<Icon name="cross" className="h-3 w-3" />
