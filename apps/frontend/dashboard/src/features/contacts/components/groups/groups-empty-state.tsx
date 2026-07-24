@@ -1,59 +1,60 @@
 import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 
 interface GroupsEmptyStateProps {
 	onAddGroup?: () => void;
+	searchQuery?: string;
+	onClearSearch?: () => void;
 }
 
-export const GroupsEmptyState = ({ onAddGroup }: GroupsEmptyStateProps) => {
+export function GroupsEmptyState({
+	onAddGroup,
+	searchQuery = "",
+	onClearSearch,
+}: GroupsEmptyStateProps) {
+	const isFiltered = searchQuery.trim() !== "";
+
 	return (
-		<div className="flex flex-col items-center border-stroke-soft-100 bg-bg-soft-200/10 px-6 py-12 text-center dark:border-stroke-soft-100/50 dark:bg-bg-soft-200/15">
-			<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
-				<Icon name="modules" className="h-5 w-5 text-text-sub-600" />
+		<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
+			<div className="mb-4 flex items-center justify-center">
+				<Icon
+					name={isFiltered ? "search" : "modules"}
+					className="h-8 w-8 text-text-sub-600"
+				/>
 			</div>
 			<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
-				No groups yet
+				{isFiltered ? "No groups found" : "Create your first group"}
 			</h3>
-			<p className="mx-auto mb-6 max-w-[300px] text-balance font-medium text-[12px] text-text-sub-600">
-				Organise contacts into segments and target the right people with the
-				right messages.
+			<p className="mx-auto mb-6 max-w-75 text-balance font-medium text-[12px] text-text-sub-600">
+				{isFiltered
+					? "Try adjusting your search query."
+					: "Organise contacts into segments and target the right people with the right messages."}
 			</p>
-			<div className="flex items-center gap-3">
+			{isFiltered ? (
 				<Button.Root
+					type="button"
 					variant="neutral"
 					mode="stroke"
-					size="xsmall"
+					size="small"
+					onClick={onClearSearch}
+					className="gap-1.5 rounded-xl"
+				>
+					<Icon name="cross-circle" className="h-4 w-4 text-text-sub-600" />
+					Clear search
+				</Button.Root>
+			) : (
+				<FancyButton.Root
+					type="button"
+					variant="blue"
+					size="small"
 					onClick={onAddGroup}
-					className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
+					className="gap-1.5 rounded-xl"
 				>
 					<Icon name="plus" className="h-4 w-4" />
-					Create Group
-					<span className="inline-flex items-center gap-0.5">
-						<KbdKeyOutline>c</KbdKeyOutline>
-						<KbdKeyOutline>g</KbdKeyOutline>
-					</span>
-				</Button.Root>
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
-					size="xsmall"
-					asChild
-					className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
-				>
-					<a
-						href="https://reloop.sh/docs/features/contacts/groups"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<Icon name="file-text" className="h-3.5 w-3.5" />
-						Learn about groups
-						<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
-							D
-						</span>
-					</a>
-				</Button.Root>
-			</div>
+					Create group
+				</FancyButton.Root>
+			)}
 		</div>
 	);
-};
+}

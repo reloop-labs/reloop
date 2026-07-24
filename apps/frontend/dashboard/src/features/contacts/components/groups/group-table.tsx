@@ -30,6 +30,8 @@ interface GroupTableProps {
 	isLoading?: boolean;
 	loadingRows?: number;
 	onAddGroup?: () => void;
+	searchQuery?: string;
+	onClearSearch?: () => void;
 }
 
 const GroupSkeleton = () => (
@@ -77,6 +79,8 @@ export const GroupTable = ({
 	isLoading,
 	loadingRows = 6,
 	onAddGroup,
+	searchQuery,
+	onClearSearch,
 }: GroupTableProps) => {
 	const navigate = useNavigate();
 	const [, setModal] = useQueryState("modal");
@@ -124,7 +128,11 @@ export const GroupTable = ({
 						<GroupSkeleton key={`skeleton-${i}`} />
 					))
 				) : groups.length === 0 ? (
-					<GroupsEmptyState onAddGroup={onAddGroup} />
+					<GroupsEmptyState
+						onAddGroup={onAddGroup}
+						searchQuery={searchQuery}
+						onClearSearch={onClearSearch}
+					/>
 				) : (
 					groups.map((group) => {
 						const isRowActive = activeDropdownId === group.id;

@@ -73,6 +73,8 @@ export function GroupList() {
 					total={data?.total || 0}
 					isLoading={isLoading}
 					onAddGroup={() => void setModal("create-group")}
+					searchQuery={searchQuery}
+					onClearSearch={() => setSearchQuery("")}
 					currentPage={currentPage ?? 1}
 					pageSize={pageSize ?? 10}
 					onPageChange={(p) => void setCurrentPage(p)}
