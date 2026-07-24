@@ -2,8 +2,8 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { useState } from "react";
 import {
-	useAllPropertiesQuery,
 	type Property,
+	useAllPropertiesQuery,
 } from "#/features/contacts/hooks/use-contacts-query";
 import {
 	countCustomPropertyMappings,
@@ -16,10 +16,10 @@ import {
 	isIdentityTarget,
 	isPropertyTarget,
 	isRowComplete,
-	propertyTargetName,
-	toPropertyTarget,
 	type MappingRowTarget,
 	type PropertyMappingRow,
+	propertyTargetName,
+	toPropertyTarget,
 } from "../utils/property-mapping";
 import { CsvInlineCreateProperty } from "./csv-inline-create-property";
 
@@ -33,8 +33,7 @@ export type CsvPropertyMappingProps = {
 };
 
 /** Domain-table style grid: CSV | arrow | Reloop | actions */
-const MAPPING_TABLE_GRID =
-	"grid-cols-[minmax(0,1fr)_32px_minmax(0,1fr)_32px]";
+const MAPPING_TABLE_GRID = "grid-cols-[minmax(0,1fr)_32px_minmax(0,1fr)_32px]";
 
 const selectBase =
 	"w-full min-w-0 cursor-pointer rounded-lg border border-transparent bg-transparent px-1.5 py-1 text-text-strong-950 outline-none transition-colors hover:border-stroke-soft-200 hover:bg-bg-weak-50/60 focus:border-stroke-soft-300 focus:bg-bg-white-0 disabled:cursor-not-allowed disabled:opacity-50";
@@ -120,40 +119,34 @@ export function CsvPropertyMapping({
 	return (
 		<div className="space-y-2.5 pt-1">
 			{/* Section title row (outside table) */}
-			<div className="flex flex-wrap items-center justify-between gap-2">
-				<div className="flex items-center gap-2">
-					<p className="font-semibold text-text-strong-950 text-xs">
-						Property mapping
-					</p>
-					{completeCount > 0 && (
-						<span className="inline-flex items-center rounded-full border border-stroke-soft-200 bg-bg-weak-50 px-2 py-0.5 font-medium text-[10px] text-text-sub-600 tabular-nums">
-							{completeCount} mapped
-							{customCount > 0 ? ` · ${customCount} custom` : ""}
-						</span>
-					)}
+			<div>
+				<div className="flex flex-wrap items-center justify-between gap-2">
+					<div className="flex items-center gap-2">
+						<p className="font-semibold text-text-strong-950 text-xs">
+							Property mapping
+						</p>
+					</div>
+
+					<button
+						type="button"
+						disabled={disabled || isCreating}
+						onClick={() => openCreate()}
+						className="inline-flex cursor-pointer items-center gap-1 font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 disabled:cursor-not-allowed disabled:opacity-50"
+					>
+						<Icon name="plus" className="h-3.5 w-3.5" />
+						Create new property
+					</button>
 				</div>
-
-				<button
-					type="button"
-					disabled={disabled || isCreating}
-					onClick={() => openCreate()}
-					className="inline-flex cursor-pointer items-center gap-1 font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950 disabled:cursor-not-allowed disabled:opacity-50"
-				>
-					<Icon name="plus" className="h-3.5 w-3.5" />
-					Create new property
-				</button>
+				<p className="text-[11px] text-text-sub-600">
+					Map CSV columns to email, name, or Reloop properties.
+				</p>
 			</div>
-
-			<p className="text-[11px] text-text-sub-600">
-				Map CSV columns to email, name, or Reloop properties.
-			</p>
-
 			{/* Domain table pattern: weak header strip + overlapping white body */}
 			<div className="w-full text-paragraph-sm">
 				{/* Header — same tokens as DomainTable */}
 				<div
 					className={cn(
-						"hidden items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-white/[0.03] sm:grid",
+						"hidden items-center rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 sm:grid dark:border-[#101010] dark:bg-white/[0.03]",
 						MAPPING_TABLE_GRID,
 					)}
 				>
@@ -188,10 +181,7 @@ export function CsvPropertyMapping({
 								leftOptions = [row.csvHeader, ...leftOptions];
 							}
 
-							let identityOptions = getAvailableIdentityTargets(
-								rows,
-								row.id,
-							);
+							let identityOptions = getAvailableIdentityTargets(rows, row.id);
 							if (
 								isIdentityTarget(row.target) &&
 								!identityOptions.includes(row.target)
@@ -252,9 +242,7 @@ export function CsvPropertyMapping({
 											)}
 										>
 											<option value="">
-												{incomplete && !row.csvHeader
-													? "Select column…"
-													: "—"}
+												{incomplete && !row.csvHeader ? "Select column…" : "—"}
 											</option>
 											{leftOptions.map((header) => (
 												<option key={header} value={header}>
@@ -327,12 +315,12 @@ export function CsvPropertyMapping({
 									</div>
 
 									{/* Actions */}
-									<div className="flex items-center justify-end sm:justify-center text-text-soft-400">
+									<div className="flex items-center justify-end text-text-soft-400 sm:justify-center">
 										<button
 											type="button"
 											disabled={disabled}
 											onClick={() => removeRow(row.id)}
-											className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-text-sub-600 opacity-70 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 hover:opacity-100 group-hover/row:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
+											className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-text-sub-600 opacity-70 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40 group-hover/row:opacity-100"
 											aria-label="Remove mapping"
 										>
 											<Icon name="cross" className="h-3.5 w-3.5" />
