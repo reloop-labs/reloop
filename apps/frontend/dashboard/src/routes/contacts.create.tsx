@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
 import { useSessionQuery } from "#/features/auth/session-query";
-import { CreateContactPage } from "#/features/contacts/create/create-contact-page";
+import { CreateContactPage } from "#/features/contacts/create";
 import { ActiveOrganizationProvider } from "#/features/dashboard/page-header/use-active-organization";
 
 export const Route = createFileRoute("/contacts/create")({

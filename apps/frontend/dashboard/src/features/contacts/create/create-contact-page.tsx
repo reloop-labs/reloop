@@ -1,11 +1,11 @@
 import { Icon } from "@reloop/ui/icon";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
-import { AiPanel } from "#/features/dashboard/layout/ai-panel";
-import { useUIStore } from "#/store/use-ui-store";
 import { useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { AiPanel } from "#/features/dashboard/layout/ai-panel";
+import { useUIStore } from "#/store/use-ui-store";
 import { AiImportStep } from "./components/ai-import-step";
 import { ApiSyncStep } from "./components/api-sync-step";
 import {
@@ -15,21 +15,6 @@ import {
 import { CsvImportStep } from "./components/csv-import-step";
 import { MethodSelectionCard } from "./components/method-selection-card";
 import { SingleContactForm } from "./components/single-contact-form";
-
-const cardVariants = {
-	enter: (direction: number) => ({
-		y: direction > 0 ? "100%" : "-100%",
-		opacity: 0,
-	}),
-	center: {
-		y: 0,
-		opacity: 1,
-	},
-	exit: (direction: number) => ({
-		y: direction > 0 ? "-100%" : "100%",
-		opacity: 0,
-	}),
-};
 
 export function CreateContactPage() {
 	const navigate = useNavigate();
@@ -66,8 +51,8 @@ export function CreateContactPage() {
 				<div className="relative z-20 mx-auto w-full max-w-[1280px] px-6 pt-[152px] pb-16 lg:px-12 lg:pt-[216px]">
 					<div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:gap-8">
 						{/* Left Column (3/12) */}
-						<div className="flex justify-start pt-7 text-left lg:col-span-3 lg:justify-end lg:text-right">
-							<div className="font-medium text-xs text-text-sub-600/70">
+						<div className="flex justify-start px-4 pt-12 text-left lg:col-span-3 lg:justify-end lg:px-4 lg:text-right">
+							<div className="font-medium text-text-sub-600/70 text-xs">
 								Add Contact
 							</div>
 						</div>
@@ -162,7 +147,7 @@ export function CreateContactPage() {
 						</motion.div>
 
 						{/* Right Column (3/12) */}
-						<div className="flex justify-start pt-7 lg:col-span-3">
+						<div className="flex justify-start px-4 pt-12 lg:col-span-3 lg:px-4">
 							<div className="w-full max-w-xs">
 								<CreateContactStepper
 									currentStep={currentStep}
