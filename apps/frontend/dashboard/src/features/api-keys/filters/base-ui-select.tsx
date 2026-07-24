@@ -129,29 +129,31 @@ export function SelectPopup({
 	alignItemWithTrigger?: SelectPrimitive.Positioner.Props["alignItemWithTrigger"];
 	anchor?: SelectPrimitive.Positioner.Props["anchor"];
 }): React.ReactElement {
-	// Event-delegation hover: only elements with data-slot="select-item" light up.
-	// Ignores create-form content / footer buttons. No cloneElement needed.
+	// Hover only on real options ([data-slot=select-item]). Create form / "Add property"
+	// are ignored. Event-delegated so Fragment children still work (no cloneElement).
 	const [hoveredItem, setHoveredItem] = useState<HTMLElement | null>(null);
-	const [shellEl, setShellEl] = useState<HTMLDivElement | null>(null);
 
-	const resolveSelectItem = (target: EventTarget | null): HTMLElement | null => {
-		if (!(target instanceof Element)) return null;
-		const item = target.closest("[data-slot='select-item']");
-		if (!(item instanceof HTMLElement)) return null;
-		if (!shellEl?.contains(item)) return null;
-		return item;
-	};
-
-	const handlePointerMove = (e: React.PointerEvent) => {
-		const item = resolveSelectItem(e.target);
-		setHoveredItem((prev) => (prev === item ? prev : item));
+	const handlePointerMove = (e: React.PointerEvent<HTMLElement>) => {
+		const list = e.currentTarget;
+		const raw = e.target;
+		if (!(raw instanceof Element)) {
+			setHoveredItem(null);
+			return;
+		}
+		const item = raw.closest("[data-slot='select-item']");
+		if (item instanceof HTMLElement && list.contains(item)) {
+			setHoveredItem((prev) => (prev === item ? prev : item));
+		} else {
+			// Pointer over "Add property" / create form — no list highlight
+			setHoveredItem(null);
+		}
 	};
 
 	const handlePointerLeave = () => {
 		setHoveredItem(null);
 	};
 
-	// Clear hover when children swap (list ↔ create form) so the highlight never sticks
+	// Clear hover when popup content swaps (list ↔ create form)
 	React.useEffect(() => {
 		setHoveredItem(null);
 	}, [children]);
@@ -181,28 +183,27 @@ export function SelectPopup({
 					>
 						<ChevronUpIcon className="relative size-4 sm:size-4" />
 					</SelectPrimitive.ScrollUpArrow>
+					{/*
+					 * Outer shell = position:relative hover containing block.
+					 * List uses display:contents so items' offsetParent is this shell,
+					 * matching the absolute AnimatedHoverBackground sibling.
+					 */}
 					<div
-						ref={setShellEl}
-						// w-max so shell can grow with wider content (e.g. create-property form)
-						// while min-w keeps list mode at least as wide as the trigger
-						className="relative h-full w-max min-w-(--anchor-width) rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-none dark:border-stroke-soft-100/50 dark:bg-bg-weak-50"
+						className={cn(
+							"relative h-full w-max min-w-(--anchor-width) max-h-(--available-height) space-y-0.5 overflow-y-auto rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-none dark:border-stroke-soft-100/50 dark:bg-bg-weak-50",
+							className,
+						)}
+						data-slot="select-list"
 						onPointerMove={handlePointerMove}
 						onPointerLeave={handlePointerLeave}
 					>
-						<SelectPrimitive.List
-							className={cn(
-								"relative max-h-(--available-height) space-y-0.5 overflow-y-auto",
-								className,
-							)}
-							data-slot="select-list"
-						>
+						<SelectPrimitive.List className="contents">
 							{children}
-							<AnimatedHoverBackground
-								rect={currentRect}
-								tabElement={hoveredItem ?? undefined}
-								container={shellEl}
-							/>
 						</SelectPrimitive.List>
+						<AnimatedHoverBackground
+							rect={currentRect}
+							tabElement={hoveredItem ?? undefined}
+						/>
 					</div>
 					<SelectPrimitive.ScrollDownArrow
 						className="bottom-0 z-50 flex h-6 w-full cursor-default items-center justify-center before:pointer-events-none before:absolute before:inset-x-px before:bottom-px before:h-[200%] before:rounded-b-xl before:bg-bg-white-0 dark:before:bg-bg-weak-50"

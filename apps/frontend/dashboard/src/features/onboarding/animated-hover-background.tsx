@@ -1,72 +1,31 @@
 import { cn } from "@reloop/ui/cn";
 import { AnimatePresence, motion } from "framer-motion";
-import { useLayoutEffect, useState } from "react";
 
 interface AnimatedHoverBackgroundProps {
-	/** Viewport rect of the hovered item (optional if tabElement + container provided) */
-	rect?: DOMRect | undefined;
-	/** The hovered DOM node */
+	/** Viewport rect of the hovered item — used for width/height */
+	rect: DOMRect | undefined;
+	/** The hovered DOM node — used for offsetLeft/offsetTop relative to offsetParent */
 	tabElement: HTMLElement | undefined;
-	/**
-	 * Position measurements relative to this container (must be position:relative).
-	 * Prefer this over offsetLeft/offsetTop — more reliable inside scroll/portaled lists.
-	 */
-	container?: HTMLElement | null;
 	className?: string;
 	isDanger?: boolean;
 }
 
-type HoverBox = {
-	width: number;
-	height: number;
-	left: number;
-	top: number;
-};
-
-function measureBox(
-	tabElement: HTMLElement,
-	container?: HTMLElement | null,
-	rect?: DOMRect,
-): HoverBox {
-	if (container) {
-		const cr = container.getBoundingClientRect();
-		const ir = tabElement.getBoundingClientRect();
-		return {
-			width: ir.width,
-			height: ir.height,
-			left: ir.left - cr.left + container.scrollLeft,
-			top: ir.top - cr.top + container.scrollTop,
-		};
-	}
-
-	return {
-		width: rect?.width ?? tabElement.offsetWidth,
-		height: rect?.height ?? tabElement.offsetHeight,
-		left: tabElement.offsetLeft,
-		top: tabElement.offsetTop,
-	};
-}
-
+/**
+ * Sliding hover highlight. Position uses offsetLeft/offsetTop so the
+ * containing block must be the same as the absolute parent (position:relative list).
+ */
 export function AnimatedHoverBackground({
 	rect,
 	tabElement,
-	container,
 	className,
 	isDanger = false,
 }: AnimatedHoverBackgroundProps) {
-	const [box, setBox] = useState<HoverBox | null>(null);
-
-	useLayoutEffect(() => {
-		if (!tabElement) {
-			setBox(null);
-			return;
-		}
-		setBox(measureBox(tabElement, container, rect));
-	}, [tabElement, container, rect?.width, rect?.height, rect?.top, rect?.left]);
+	const left = tabElement?.offsetLeft ?? 0;
+	const top = tabElement?.offsetTop ?? 0;
 
 	return (
 		<AnimatePresence>
-			{box && tabElement && (
+			{rect && tabElement && (
 				<motion.div
 					className={cn(
 						"pointer-events-none absolute top-0 left-0 z-0 rounded-lg",
@@ -77,18 +36,18 @@ export function AnimatedHoverBackground({
 					// showed up as sidebar text flicker when inbox data refreshed.
 					initial={false}
 					animate={{
-						width: box.width,
-						height: box.height,
-						left: box.left,
-						top: box.top,
+						width: rect.width,
+						height: rect.height,
+						left,
+						top,
 						opacity: 1,
 					}}
 					exit={{
 						opacity: 0,
-						width: box.width,
-						height: box.height,
-						left: box.left,
-						top: box.top,
+						width: rect.width,
+						height: rect.height,
+						left,
+						top,
 					}}
 					transition={{
 						type: "spring",
