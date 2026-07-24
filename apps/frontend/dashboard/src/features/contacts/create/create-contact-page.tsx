@@ -48,7 +48,7 @@ export function CreateContactPage() {
 				</div>
 
 				{/* Main Content Layout Container */}
-				<div className="relative z-20 mx-auto w-full max-w-[1280px] px-6 pt-[152px] pb-16 lg:px-12 lg:pt-[216px]">
+				<div className="relative z-20 mx-auto w-full max-w-7xl px-6 pt-28 pb-16 lg:px-12">
 					<div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:gap-8">
 						{/* Left Column (3/12) */}
 						<div className="flex justify-start px-4 pt-12 text-left lg:col-span-3 lg:justify-end lg:px-4 lg:text-right">
