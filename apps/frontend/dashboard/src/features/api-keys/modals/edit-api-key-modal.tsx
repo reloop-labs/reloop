@@ -90,7 +90,13 @@ export function EditApiKeyModal({
 		"enter",
 		(e) => {
 			e.preventDefault();
-			if (open && status === "idle" && name.trim() && apiKeyToEdit && name !== (apiKeyToEdit.name || "")) {
+			if (
+				open &&
+				status === "idle" &&
+				name.trim() &&
+				apiKeyToEdit &&
+				name !== (apiKeyToEdit.name || "")
+			) {
 				void handleSubmit();
 			}
 		},
@@ -137,12 +143,11 @@ export function EditApiKeyModal({
 									</Input.Wrapper>
 								</Input.Root>
 								{error ? (
-									<p className="text-error-base text-paragraph-xs">
-										{error}
-									</p>
+									<p className="text-error-base text-paragraph-xs">{error}</p>
 								) : (
 									<p className="text-paragraph-xs text-text-sub-600">
-										Provide a descriptive name to help you identify this API key later.
+										Provide a descriptive name to help you identify this API key
+										later.
 									</p>
 								)}
 							</div>
@@ -168,7 +173,8 @@ export function EditApiKeyModal({
 									size="small"
 									disabled={
 										status === "saving" ||
-										(status === "idle" && (!name.trim() || name === (apiKeyToEdit?.name || "")))
+										(status === "idle" &&
+											(!name.trim() || name === (apiKeyToEdit?.name || "")))
 									}
 									className={cn(
 										"min-w-[140px] justify-center overflow-hidden transition-all duration-200",
@@ -197,7 +203,7 @@ export function EditApiKeyModal({
 											) : status === "success" ? (
 												<>
 													<Icon name="check-circle" className="h-4 w-4" />
-													<span>Key Updated</span>
+													<span>Key Name Updated</span>
 												</>
 											) : (
 												<>
