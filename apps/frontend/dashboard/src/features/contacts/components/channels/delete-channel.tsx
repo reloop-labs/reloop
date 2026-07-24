@@ -33,11 +33,15 @@ interface Channel {
 
 interface DeleteChannelModalProps {
 	channels: Channel[];
+	onDeleteSuccess?: (deletedName: string) => void;
 }
 
 type DeleteState = "idle" | "deleting" | "success";
 
-export const DeleteChannelModal = ({ channels }: DeleteChannelModalProps) => {
+export const DeleteChannelModal = ({
+	channels,
+	onDeleteSuccess,
+}: DeleteChannelModalProps) => {
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const navigate = useNavigate();
 
@@ -81,8 +85,16 @@ export const DeleteChannelModal = ({ channels }: DeleteChannelModalProps) => {
 		enabled: Boolean(channelToDelete && isOpen),
 	});
 
+	const deleteStateRef = useRef(deleteState);
+	useEffect(() => {
+		deleteStateRef.current = deleteState;
+	}, [deleteState]);
+
 	const handleClose = () => {
 		cancelHold();
+		if (deleteStateRef.current === "success" && targetChannelRef.current) {
+			onDeleteSuccess?.(targetChannelRef.current.name);
+		}
 		setModal(null);
 		setId(null);
 	};
@@ -97,12 +109,13 @@ export const DeleteChannelModal = ({ channels }: DeleteChannelModalProps) => {
 			});
 
 			setDeleteState("success");
-			toast.success(`${channelToDelete.name} deleted successfully`);
+			const deletedName = channelToDelete.name;
 
 			const isChannelDetailPage = pathname?.includes(`/${channelToDelete.id}`);
 
 			setTimeout(() => {
 				handleClose();
+				onDeleteSuccess?.(deletedName);
 				if (isChannelDetailPage) {
 					void navigate({ to: "/contacts/channels" });
 				} else {

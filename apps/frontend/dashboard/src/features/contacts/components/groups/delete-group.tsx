@@ -24,7 +24,7 @@ interface DeleteGroupModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	group: Group | null;
-	onDeleteSuccess?: () => void;
+	onDeleteSuccess?: (deletedName: string) => void;
 }
 
 type DeleteState = "idle" | "deleting" | "success";
@@ -92,7 +92,8 @@ export const DeleteGroupModal = ({
 
 			setTimeout(() => {
 				onOpenChange(false);
-				onDeleteSuccess?.();
+				const deletedName = targetGroupRef.current?.name || groupToDelete?.name || "";
+				onDeleteSuccess?.(deletedName);
 				setTimeout(() => {
 					setDeleteState("idle");
 					targetGroupRef.current = null;

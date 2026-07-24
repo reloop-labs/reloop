@@ -1,17 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
-import {
-	type Channel,
-	type Contact,
-	fetchContact,
-	type Group,
-	type Property,
-} from "./hooks/use-contacts-query";
 import { CreateChannelModal } from "./components/channels/create-channel-modal";
 import { DeleteChannelModal } from "./components/channels/delete-channel";
 import { EditChannelModal } from "./components/channels/edit-channel-modal";
-import { AddContactToGroupModal } from "./components/contacts/add-contact-to-group";
 import { AddContactModal } from "./components/contacts/add-contact-modal";
+import { AddContactToGroupModal } from "./components/contacts/add-contact-to-group";
 import { DeleteContactModal } from "./components/contacts/delete-contact-modal";
 import { EditContactModal } from "./components/contacts/edit-contact-modal";
 import { CreateGroupModal } from "./components/groups/create-group-modal";
@@ -20,8 +13,25 @@ import { EditGroupModal } from "./components/groups/edit-group-modal";
 import { AddPropertyModal } from "./components/properties/add-property-modal";
 import { DeletePropertyModal } from "./components/properties/delete-property-modal";
 import { EditPropertyModal } from "./components/properties/edit-property-modal";
+import {
+	type Channel,
+	type Contact,
+	fetchContact,
+	type Group,
+	type Property,
+} from "./hooks/use-contacts-query";
 
-export function ContactsModals() {
+interface ContactsModalsProps {
+	onDeleteChannelSuccess?: (deletedName: string) => void;
+	onDeleteGroupSuccess?: (deletedName: string) => void;
+	onDeletePropertySuccess?: (deletedName: string) => void;
+}
+
+export function ContactsModals({
+	onDeleteChannelSuccess,
+	onDeleteGroupSuccess,
+	onDeletePropertySuccess,
+}: ContactsModalsProps = {}) {
 	const [modal, setModal] = useQueryState("modal", { history: "replace" });
 	const [id, setId] = useQueryState("id", { history: "replace" });
 
@@ -114,16 +124,21 @@ export function ContactsModals() {
 				group={groupsData?.groups?.find((g) => g.id === id) || null}
 			/>
 
-			<DeleteChannelModal channels={channelsData?.channels || []} />
+			<DeleteChannelModal
+				channels={channelsData?.channels || []}
+				onDeleteSuccess={onDeleteChannelSuccess}
+			/>
 			<DeleteGroupModal
 				open={modal === "delete-group"}
 				onOpenChange={handleOpenChange}
 				group={groupsData?.groups?.find((g) => g.id === id) || null}
+				onDeleteSuccess={onDeleteGroupSuccess}
 			/>
 			<DeletePropertyModal
 				open={modal === "delete-property"}
 				onOpenChange={handleOpenChange}
 				property={propertiesData?.properties?.find((p) => p.id === id) || null}
+				onDeleteSuccess={onDeletePropertySuccess}
 			/>
 			<DeleteContactModal
 				open={modal === "delete-contact"}

@@ -43,7 +43,7 @@ interface DeletePropertyModalProps {
 	property: Property | null;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onDeleteSuccess?: () => void;
+	onDeleteSuccess?: (deletedName: string) => void;
 }
 
 type DeleteState = "idle" | "deleting" | "success";
@@ -84,16 +84,17 @@ export const DeletePropertyModal = ({
 			}
 
 			setDeleteState("success");
+			const deletedName = propertyToDelete.propertyName;
 			void invalidate();
 
 			setTimeout(() => {
 				onOpenChange(false);
-				onDeleteSuccess?.();
+				onDeleteSuccess?.(deletedName);
 				setTimeout(() => {
 					setDeleteState("idle");
 					targetPropertyRef.current = null;
 				}, 300);
-			}, 900);
+			}, 750);
 		} catch (error) {
 			console.error("Failed to delete property:", error);
 			toast.error(

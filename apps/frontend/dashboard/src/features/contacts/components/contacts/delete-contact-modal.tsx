@@ -23,7 +23,7 @@ interface DeleteContactModalProps {
 	contact: Contact | null;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onDeleteSuccess?: () => void;
+	onDeleteSuccess?: (deletedName?: string) => void;
 }
 
 export const DeleteContactModal = ({

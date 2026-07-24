@@ -2,7 +2,9 @@ import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
+import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ContactsCommonUseCasesSidebar } from "./common-use-cases-sidebar";
 import { ContactsTabs } from "./components/contacts/contacts-tabs";
@@ -12,6 +14,14 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const navigate = useNavigate();
 	const [, setModal] = useQueryState("modal");
+	const [deletedItemName, setDeletedItemName] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (deletedItemName) {
+			const timer = setTimeout(() => setDeletedItemName(null), 8000);
+			return () => clearTimeout(timer);
+		}
+	}, [deletedItemName]);
 
 	const isPropertiesPage = pathname.includes("/contacts/properties");
 	const isChannelsPage = pathname.includes("/contacts/channels");
@@ -168,6 +178,32 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 					</div>
 				)}
 
+				<AnimatePresence>
+					{deletedItemName && (
+						<motion.div
+							key="deleted-item-banner"
+							initial={{ opacity: 0, y: -8, height: 0 }}
+							animate={{ opacity: 1, y: 0, height: "auto" }}
+							exit={{ opacity: 0, y: -8, height: 0 }}
+							transition={{ duration: 0.2 }}
+							className="mb-4 overflow-hidden"
+						>
+							<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-sm text-[#0F5C34] dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
+								<span>
+									<span className="font-semibold">{deletedItemName}</span> has been successfully deleted.
+								</span>
+								<button
+									type="button"
+									onClick={() => setDeletedItemName(null)}
+									className="p-1 text-[#0F5C34]/70 transition-colors hover:text-[#0F5C34] dark:text-emerald-200/70 dark:hover:text-emerald-200"
+								>
+									<Icon name="close" className="h-4 w-4" />
+								</button>
+							</div>
+						</motion.div>
+					)}
+				</AnimatePresence>
+
 				{isDetailPage || isBulkImportPage ? (
 					<div>{children}</div>
 				) : (
@@ -183,7 +219,11 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 				)}
 			</div>
 
-			<ContactsModals />
+			<ContactsModals
+				onDeleteChannelSuccess={(name) => setDeletedItemName(`Channel "${name}"`)}
+				onDeleteGroupSuccess={(name) => setDeletedItemName(`Group "${name}"`)}
+				onDeletePropertySuccess={(name) => setDeletedItemName(`Property "${name}"`)}
+			/>
 		</>
 	);
 }
