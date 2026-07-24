@@ -1,6 +1,9 @@
 import type * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { ApiDetailsDrawer } from "./api-details-drawer";
+import {
+	ApiDetailsDrawer,
+	type ApiDetailsDrawerProps,
+} from "./api-details-drawer";
 import { codeExamples } from "./properties-code-examples";
 
 const operations = [
@@ -40,7 +43,10 @@ const languages = [
 
 type ButtonProps = React.ComponentPropsWithoutRef<typeof Button.Root>;
 
-export const PropertiesApiDetails = (props: ButtonProps) => {
+export const PropertiesApiDetails = ({
+	renderTrigger,
+	...buttonProps
+}: ButtonProps & Pick<ApiDetailsDrawerProps, "renderTrigger">) => {
 	return (
 		<ApiDetailsDrawer
 			title="Properties API"
@@ -49,8 +55,9 @@ export const PropertiesApiDetails = (props: ButtonProps) => {
 			operations={operations}
 			codeExamples={codeExamples}
 			docSection="contacts/contact-properties"
-			buttonProps={props}
+			buttonProps={buttonProps}
 			codeExtraPadding={true}
+			renderTrigger={renderTrigger}
 		/>
 	);
 };

@@ -1,12 +1,10 @@
-import { ChannelsApiDetails } from "#/components/api-details/channels";
-import { ContactsApiDetails } from "#/components/api-details/contacts";
-import { GroupsApiDetails } from "#/components/api-details/groups";
-import { PropertiesApiDetails } from "#/components/api-details/properties";
 import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
+import { ContactsCommonUseCasesSidebar } from "./common-use-cases-sidebar";
 import { ContactsTabs } from "./components/contacts/contacts-tabs";
 import { ContactsModals } from "./contacts-modals";
 
@@ -59,27 +57,47 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 					? "Bulk Import"
 					: "Contacts";
 
-	const actionLabel = isPropertiesPage
-		? "Add Property"
+	const subtitle = isPropertiesPage
+		? "Manage custom attributes and metadata for your contact audience."
 		: isChannelsPage
-			? "Create Channel"
+			? "Configure communication channels for sending messages."
 			: isGroupsPage
-				? "Create Group"
-				: "Add Contact";
+				? "Organize contacts into custom groups and segments for targeting."
+				: isBulkImportPage
+					? "Bulk import contacts and custom attributes from a CSV file."
+					: "Manage contacts, audiences, and properties for targeted email campaigns.";
+
+	const headerIcon = isPropertiesPage
+		? "tag"
+		: isChannelsPage
+			? "notification-indicator"
+			: isGroupsPage
+				? "modules"
+				: isBulkImportPage
+					? "upload"
+					: "contacts";
+
+	const actionLabel = isPropertiesPage
+		? "Add property"
+		: isChannelsPage
+			? "Create channel"
+			: isGroupsPage
+				? "Create group"
+				: "Add contact";
 
 	return (
 		<>
-			<div className="mx-auto max-w-3xl space-y-8 p-6 lg:p-8">
+			<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
 				{!isDetailPage && (
-					<div className="flex items-center justify-between pb-6">
-						<div className="flex flex-col gap-1">
+					<div className="flex flex-col gap-4 pt-2 pb-4 sm:flex-row sm:items-start sm:justify-between">
+						<div>
 							{isBulkImportPage && (
 								<Button.Root
 									onClick={() => void navigate({ to: "/contacts" })}
 									variant="neutral"
 									mode="stroke"
 									size="xxsmall"
-									className="w-fit"
+									className="mb-2 w-fit"
 								>
 									<Button.Icon>
 										<Icon name="chevron-left" className="h-4 w-4" />
@@ -87,74 +105,82 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 									Back
 								</Button.Root>
 							)}
-							<h1 className="font-medium text-2xl">{title}</h1>
+							<div className="flex items-center gap-2.5">
+								<Icon
+									name={headerIcon}
+									className="h-6 w-6 shrink-0 text-text-strong-950"
+								/>
+								<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+									{title}
+								</h1>
+							</div>
+							<p className="mt-1 text-sm text-text-sub-600">{subtitle}</p>
 						</div>
+
 						{!isBulkImportPage && (
-							<div className="flex items-center gap-2 self-end">
+							<div className="flex shrink-0 items-center gap-2">
 								<Button.Root
+									type="button"
 									variant="neutral"
 									mode="stroke"
-									size="xsmall"
+									size="small"
 									onClick={() =>
-										window.open("https://reloop.sh/docs/features/contacts", "_blank")
+										window.open(
+											"https://reloop.sh/docs/features/contacts",
+											"_blank",
+										)
 									}
-									className="gap-1.5"
+									className="gap-1.5 rounded-xl"
 								>
-									<Icon name="file-text" className="h-4 w-4" />
-									Docs
-									<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
-										D
-									</span>
+									<Icon
+										name="video-guide"
+										className="h-4 w-4 text-text-sub-600"
+									/>
+									Video guide
 								</Button.Root>
 								<Button.Root
+									type="button"
 									variant="neutral"
-									size="xsmall"
+									mode="stroke"
+									size="small"
+									onClick={() =>
+										window.open(
+											"https://reloop.sh/docs/features/contacts",
+											"_blank",
+										)
+									}
+									className="rounded-xl"
+								>
+									Documentation
+								</Button.Root>
+								<FancyButton.Root
+									type="button"
+									variant="blue"
+									size="small"
 									onClick={handleAction}
-									className="gap-2"
+									className="gap-1.5 rounded-xl"
 								>
 									<Icon name="plus" className="h-4 w-4" />
 									{actionLabel}
-									{isGroupsPage ? (
-										<span className="inline-flex items-center gap-0.5 text-[10px] uppercase">
-											<span className="rounded-sm border border-stroke-soft-100/20 px-1">
-												c
-											</span>
-											<span className="rounded-sm border border-stroke-soft-100/20 px-1">
-												g
-											</span>
-										</span>
-									) : (
-										<span className="inline-flex items-center gap-0.5">
-											<Icon
-												name="command"
-												className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-											/>
-											<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
-												A
-											</span>
-										</span>
-									)}
-								</Button.Root>
-								{isPropertiesPage ? (
-									<PropertiesApiDetails size="xsmall" mode="ghost" />
-								) : isChannelsPage ? (
-									<ChannelsApiDetails size="xsmall" mode="ghost" />
-								) : isGroupsPage ? (
-									<GroupsApiDetails size="xsmall" mode="ghost" />
-								) : (
-									<ContactsApiDetails size="xsmall" mode="ghost" />
-								)}
+								</FancyButton.Root>
 							</div>
 						)}
 					</div>
 				)}
 
-				{!isDetailPage && !isBulkImportPage && (
-					<div className="mt-2">
-						<ContactsTabs />
+				{isDetailPage || isBulkImportPage ? (
+					<div>{children}</div>
+				) : (
+					<div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+						<div className="space-y-4 lg:col-span-8 xl:col-span-8">
+							<ContactsTabs />
+							{children}
+						</div>
+						<div className="lg:col-span-4 xl:col-span-4">
+							<ContactsCommonUseCasesSidebar />
+						</div>
 					</div>
 				)}
-				<div className={!isDetailPage ? "mt-4" : ""}>{children}</div>
 			</div>
 
 			<ContactsModals />

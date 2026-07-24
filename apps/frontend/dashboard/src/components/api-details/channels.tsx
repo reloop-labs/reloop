@@ -1,6 +1,9 @@
 import type * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { ApiDetailsDrawer } from "./api-details-drawer";
+import {
+	ApiDetailsDrawer,
+	type ApiDetailsDrawerProps,
+} from "./api-details-drawer";
 import { codeExamples } from "./channels-code-examples";
 
 const operations = [
@@ -45,7 +48,10 @@ const languages = [
 
 type ButtonProps = React.ComponentPropsWithoutRef<typeof Button.Root>;
 
-export const ChannelsApiDetails = (props: ButtonProps) => {
+export const ChannelsApiDetails = ({
+	renderTrigger,
+	...buttonProps
+}: ButtonProps & Pick<ApiDetailsDrawerProps, "renderTrigger">) => {
 	return (
 		<ApiDetailsDrawer
 			title="Channels API"
@@ -54,8 +60,9 @@ export const ChannelsApiDetails = (props: ButtonProps) => {
 			operations={operations}
 			codeExamples={codeExamples}
 			docSection="contacts/channels"
-			buttonProps={props}
+			buttonProps={buttonProps}
 			codeExtraPadding={true}
+			renderTrigger={renderTrigger}
 		/>
 	);
 };

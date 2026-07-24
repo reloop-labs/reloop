@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
 
 const items = [
-	{ title: "Contacts", value: "contacts", iconName: "users", path: "/contacts" },
+	{ title: "Contacts", value: "contacts", iconName: "contacts", path: "/contacts" },
 	{ title: "Properties", value: "properties", iconName: "tag", path: "/contacts/properties" },
 	{ title: "Groups", value: "groups", iconName: "modules", path: "/contacts/groups" },
 	{ title: "Channels", value: "channels", iconName: "notification-indicator", path: "/contacts/channels" },
@@ -33,7 +33,7 @@ export function ContactsTabs() {
 
 	return (
 		<TabMenuHorizontal.Root value={effectiveTabValue}>
-			<TabMenuHorizontal.List className="relative h-10 gap-0 border-b! py-0">
+			<TabMenuHorizontal.List className="relative h-11 gap-0 border-b! py-0">
 				{items.map(({ value, title, iconName, path }, index) => (
 					<TabMenuHorizontal.Trigger
 						ref={(el) => {
@@ -42,7 +42,7 @@ export function ContactsTabs() {
 						onPointerEnter={() => setHoveredIdx(index)}
 						onPointerLeave={() => setHoveredIdx(undefined)}
 						className={cn(
-							"flex cursor-pointer items-center gap-2 px-2.5 py-0! font-medium text-sm",
+							"flex cursor-pointer items-center gap-2 px-3 py-0! font-medium text-sm",
 							hoveredIdx === undefined && activeIndex === index && "text-text-strong-950",
 						)}
 						key={value}
@@ -56,21 +56,21 @@ export function ContactsTabs() {
 				<AnimatePresence>
 					{rect && activeIndex !== -1 ? (
 						<motion.div
-							className="absolute top-0 left-0 rounded-lg bg-neutral-alpha-10"
+							className="absolute top-0 left-0 rounded-xl bg-neutral-alpha-10"
 							initial={{
 								pointerEvents: "none",
 								width: rect.width,
-								height: rect.height - 20,
+								height: rect.height - 14,
 								left: rect.left - (tab?.offsetParent?.getBoundingClientRect().left || 0),
-								top: rect.top - (tab?.offsetParent?.getBoundingClientRect().top || 0) + 10,
+								top: rect.top - (tab?.offsetParent?.getBoundingClientRect().top || 0) + 7,
 								opacity: 0,
 							}}
 							animate={{
 								pointerEvents: "none",
 								width: rect.width,
-								height: rect.height - 20,
+								height: rect.height - 14,
 								left: rect.left - (tab?.offsetParent?.getBoundingClientRect().left || 0),
-								top: rect.top - (tab?.offsetParent?.getBoundingClientRect().top || 0) + 10,
+								top: rect.top - (tab?.offsetParent?.getBoundingClientRect().top || 0) + 7,
 								opacity: 1,
 							}}
 							exit={{ opacity: 0 }}

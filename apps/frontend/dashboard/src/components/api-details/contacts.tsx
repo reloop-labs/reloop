@@ -1,6 +1,9 @@
 import type * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { ApiDetailsDrawer } from "./api-details-drawer";
+import {
+	ApiDetailsDrawer,
+	type ApiDetailsDrawerProps,
+} from "./api-details-drawer";
 import { codeExamples } from "./contacts-code-examples";
 
 const operations = [
@@ -57,7 +60,10 @@ const languages = [
 
 type ButtonProps = React.ComponentPropsWithoutRef<typeof Button.Root>;
 
-export const ContactsApiDetails = (props: ButtonProps) => {
+export const ContactsApiDetails = ({
+	renderTrigger,
+	...buttonProps
+}: ButtonProps & Pick<ApiDetailsDrawerProps, "renderTrigger">) => {
 	return (
 		<ApiDetailsDrawer
 			title="Contacts API"
@@ -67,8 +73,9 @@ export const ContactsApiDetails = (props: ButtonProps) => {
 			operations={operations}
 			codeExamples={codeExamples}
 			docSection="contacts"
-			buttonProps={props}
+			buttonProps={buttonProps}
 			codeExtraPadding={true}
+			renderTrigger={renderTrigger}
 		/>
 	);
 };
