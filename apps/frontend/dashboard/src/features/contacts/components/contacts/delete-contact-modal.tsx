@@ -1,11 +1,25 @@
-import type { AudienceStatus } from "#/features/contacts/audience";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 import * as Modal from "@reloop/ui/modal";
-import { useEffect, useState } from "react";
+import Spinner from "@reloop/ui/spinner";
+import {
+	AnimatePresence,
+	animate,
+	motion,
+	useMotionValue,
+	type AnimationPlaybackControls,
+} from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import {
+	getStatusColorClass,
+	getStatusIcon,
+	getStatusLabel,
+	type AudienceStatus,
+} from "#/features/contacts/audience";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 
 interface Contact {
@@ -23,8 +37,10 @@ interface DeleteContactModalProps {
 	contact: Contact | null;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onDeleteSuccess?: (deletedName?: string) => void;
+	onDeleteSuccess?: (deletedEmail?: string) => void;
 }
+
+type DeleteState = "idle" | "deleting" | "success";
 
 export const DeleteContactModal = ({
 	contact,
@@ -32,44 +48,25 @@ export const DeleteContactModal = ({
 	onOpenChange,
 	onDeleteSuccess,
 }: DeleteContactModalProps) => {
-	const [confirmationEmail, setConfirmationEmail] = useState("");
-	const [isDeleting, setIsDeleting] = useState(false);
-	const [isEmailCopied, setIsEmailCopied] = useState(false);
+	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
+	const [isHolding, setIsHolding] = useState(false);
+	const holdProgress = useMotionValue(0);
+	const animationRef = useRef<AnimationPlaybackControls | null>(null);
 	const invalidate = useInvalidateContacts();
 
-	// Reset confirmation when modal closes or contact changes
-	useEffect(() => {
-		if (!open) {
-			const timer = setTimeout(() => {
-				setConfirmationEmail("");
-			}, 300);
-			return () => clearTimeout(timer);
-		}
-	}, [open]);
-
-	useHotkeys(
-		"mod+enter",
-		(e) => {
-			e.preventDefault();
-			if (open && confirmationEmail === contact?.email && !isDeleting) {
-				handleDelete();
-			}
-		},
-		{ enableOnFormTags: ["INPUT"], enabled: open && !!contact },
-		[open, confirmationEmail, contact, isDeleting],
-	);
+	// Cache target contact so details remain stable during deletion animations
+	const targetContactRef = useRef<Contact | null>(null);
+	if (contact) {
+		targetContactRef.current = contact;
+	}
+	const contactToDelete = contact || targetContactRef.current;
 
 	const handleDelete = async () => {
-		if (!contact) return;
-
-		if (confirmationEmail !== contact.email) {
-			toast.error("Please enter the correct email to confirm deletion");
-			return;
-		}
+		if (!contactToDelete || deleteState !== "idle") return;
 
 		try {
-			setIsDeleting(true);
-			const response = await fetch(`/api/contacts/${contact.id}`, {
+			setDeleteState("deleting");
+			const response = await fetch(`/api/contacts/${contactToDelete.id}`, {
 				method: "DELETE",
 			});
 
@@ -77,159 +74,209 @@ export const DeleteContactModal = ({
 				throw new Error("Failed to delete contact");
 			}
 
-			toast.success("Contact deleted successfully");
-			onOpenChange(false);
-			setConfirmationEmail("");
-			await invalidate();
+			setDeleteState("success");
+			const deletedEmail = contactToDelete.email;
+			void invalidate();
 
-			onDeleteSuccess?.();
+			setTimeout(() => {
+				onOpenChange(false);
+				onDeleteSuccess?.(deletedEmail);
+				setTimeout(() => {
+					setDeleteState("idle");
+					targetContactRef.current = null;
+				}, 300);
+			}, 750);
 		} catch (error) {
 			console.error("Failed to delete contact:", error);
-			toast.error("Failed to delete contact");
-		} finally {
-			setIsDeleting(false);
+			toast.error(
+				error instanceof Error ? error.message : "Failed to delete contact",
+			);
+			setDeleteState("idle");
 		}
 	};
 
+	const startHold = () => {
+		if (deleteState !== "idle") return;
+		setIsHolding(true);
+		holdProgress.set(0);
+		animationRef.current = animate(holdProgress, 1, {
+			duration: 1.2,
+			ease: "linear",
+			onComplete: () => {
+				setIsHolding(false);
+				holdProgress.set(0);
+				void handleDelete();
+			},
+		});
+	};
+
+	const cancelHold = () => {
+		if (!isHolding && holdProgress.get() === 0) return;
+		setIsHolding(false);
+		animationRef.current?.stop();
+		animate(holdProgress, 0, {
+			duration: 0.2,
+			ease: "easeOut",
+		});
+	};
+
+	useHotkeys(
+		"enter",
+		(e) => {
+			e.preventDefault();
+			if (open && contactToDelete && deleteState === "idle") {
+				void handleDelete();
+			}
+		},
+		{ enabled: open && !!contactToDelete },
+		[open, contactToDelete, deleteState],
+	);
+
+	useEffect(() => {
+		if (!open) {
+			cancelHold();
+			const timer = setTimeout(() => {
+				setDeleteState("idle");
+				targetContactRef.current = null;
+			}, 300);
+			return () => clearTimeout(timer);
+		}
+	}, [open]);
+
 	const handleCancel = () => {
+		cancelHold();
 		onOpenChange(false);
 	};
 
 	return (
-		<Modal.Root open={open} onOpenChange={onOpenChange}>
+		<Modal.Root open={open} onOpenChange={(o) => !o && handleCancel()}>
 			<Modal.Content
-				className="rounded-20 border-none p-0 sm:max-w-[480px]"
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 sm:max-w-[460px] dark:border-stroke-soft-100/40"
 				showClose={true}
 			>
-				<div className="rounded-20 border border-stroke-soft-100/50 bg-bg-white-0">
-					{!contact && open ? (
-						<div className="flex h-[200px] flex-col items-center justify-center space-y-4 p-8 text-center">
-							<Icon
-								name="loader-2"
-								className="h-8 w-8 animate-spin text-text-soft-400"
-							/>
-							<p className="text-sm text-text-sub-600">
-								Loading contact details...
+				<motion.div
+					layout
+					transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+				>
+					{/* Header */}
+					<div className="pr-6">
+						<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+							Delete contact
+						</Modal.Title>
+						<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
+							Are you sure you want to delete this contact? This action cannot be
+							undone.
+						</p>
+					</div>
+
+					{/* Details Card */}
+					<div className="mt-5 grid grid-cols-2 gap-4 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
+						<div>
+							<p className="font-normal text-text-sub-600 text-xs">Email</p>
+							<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
+								{contactToDelete?.email || "Unnamed contact"}
 							</p>
 						</div>
-					) : contact ? (
-						<form
-							onSubmit={(e) => {
-								e.preventDefault();
-								if (confirmationEmail === contact.email && !isDeleting) {
-									handleDelete();
-								}
-							}}
+						<div>
+							<p className="font-normal text-text-sub-600 text-xs">Status</p>
+							<div className="mt-1 flex items-center">
+								{contactToDelete ? (
+									<div
+										className={cn(
+											"flex items-center gap-1.5 font-medium text-xs capitalize",
+											getStatusColorClass(contactToDelete.status),
+										)}
+									>
+										<Icon
+											name={getStatusIcon(contactToDelete.status)}
+											className="h-3.5 w-3.5"
+										/>
+										{getStatusLabel(contactToDelete.status)}
+									</div>
+								) : (
+									<span className="font-medium text-xs text-text-sub-600">—</span>
+								)}
+							</div>
+						</div>
+					</div>
+
+					{/* Warning Banner */}
+					<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
+						<span className="font-bold text-[#6D4000] dark:text-amber-100">
+							Warning:
+						</span>{" "}
+						Deleting this contact will permanently remove their profile, activity history, and custom property values across your organization.
+					</div>
+
+					{/* Footer Actions */}
+					<div className="mt-6 flex items-center justify-end gap-3">
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="ghost"
+							size="small"
+							onClick={handleCancel}
+							className={cn(
+								"transition-opacity duration-200",
+								deleteState !== "idle" && "pointer-events-none opacity-50",
+							)}
 						>
-							<div className="p-6">
-								<div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-error-base/10">
-									<Icon name="trash" className="h-4 w-4 text-error-base" />
-								</div>
+							Cancel
+						</Button.Root>
 
-								<Modal.Title className="font-medium text-text-strong-950 text-title-h5">
-									Delete contact?
-								</Modal.Title>
-								<Modal.Description className="mb-6 text-pretty text-sm text-text-sub-600 leading-relaxed">
-									This will permanently delete the contact and all associated
-									data. This action cannot be undone.
-								</Modal.Description>
+						<FancyButton.Root
+							type="button"
+							variant="destructive"
+							size="small"
+							onPointerDown={startHold}
+							onPointerUp={cancelHold}
+							onPointerLeave={cancelHold}
+							onPointerCancel={cancelHold}
+							className={cn(
+								"relative min-w-[134px] select-none justify-center overflow-hidden transition-all duration-200",
+								deleteState !== "idle" && "pointer-events-none opacity-90",
+							)}
+						>
+							{/* Hold progress overlay fill */}
+							<motion.div
+								className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
+								style={{ scaleX: holdProgress }}
+							/>
 
-								{/* Contact Card */}
-								<div className="mb-6 flex items-center gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30">
-									<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-error-base/10 text-error-base">
-										<Icon name="user" className="h-5 w-5" />
-									</div>
-									<div className="min-w-0 flex-1">
-										<p className="truncate font-medium text-sm text-text-strong-950">
-											{contact.email}
-										</p>
-										<p className="mt-0.5 truncate font-medium text-text-sub-600 text-xs capitalize">
-											{contact.status.replace("_", " ")}
-										</p>
-									</div>
-								</div>
-
-								{/* Confirmation Input */}
-								<div className="mb-2">
-									<p className="mb-2 text-sm text-text-sub-600">
-										Type{" "}
-										<span className="inline-flex max-w-xs items-center gap-1 truncate rounded-[6px] border border-stroke-soft-100 bg-bg-weak-50/50 px-1.5 py-0.5 font-medium text-text-strong-950 text-xs dark:border-stroke-soft-100/40 dark:bg-bg-strong-200">
-											{contact.email}
-											<button
-												type="button"
-												onClick={async () => {
-													try {
-														await navigator.clipboard.writeText(contact.email);
-														setIsEmailCopied(true);
-														setTimeout(() => setIsEmailCopied(false), 2000);
-													} catch {
-														toast.error("Failed to copy email");
-													}
-												}}
-												className="text-text-sub-600 transition-colors hover:text-text-strong-950"
-											>
-												<Icon
-													name={isEmailCopied ? "check" : "copy"}
-													className={`h-3 w-3 ${isEmailCopied ? "text-success-base" : ""}`}
-												/>
-											</button>
-										</span>{" "}
-										to confirm
-									</p>
-									<Input.Root size="small" className="rounded-[10px]">
-										<Input.Wrapper>
-											<Input.Input
-												type="text"
-												value={confirmationEmail}
-												onChange={(e) => setConfirmationEmail(e.target.value)}
-												placeholder={contact.email}
-											/>
-										</Input.Wrapper>
-									</Input.Root>
-								</div>
-							</div>
-
-							<div className="flex flex-col-reverse justify-end gap-2 px-6 pb-6 sm:flex-row sm:items-center">
-								<Button.Root
-									type="button"
-									variant="neutral"
-									mode="stroke"
-									onClick={handleCancel}
-									disabled={isDeleting}
-									className="gap-1.5"
+							<AnimatePresence mode="popLayout" initial={false}>
+								<motion.span
+									key={deleteState}
+									transition={{
+										type: "spring",
+										duration: 0.25,
+										bounce: 0,
+									}}
+									initial={{ opacity: 0, y: -14 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: 14 }}
+									className="relative z-10 flex items-center justify-center gap-1.5"
 								>
-									Cancel
-									<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
-										Esc
-									</span>
-								</Button.Root>
-								<Button.Root
-									type="submit"
-									variant="error"
-									disabled={isDeleting || confirmationEmail !== contact.email}
-								>
-									{isDeleting ? (
-										"Deleting..."
-									) : (
+									{deleteState === "deleting" ? (
 										<>
-											Delete contact
-											<span className="inline-flex items-center gap-0.5">
-												<Icon
-													name="command"
-													className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-												/>
-												<Icon
-													name="enter"
-													className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-												/>
-											</span>
+											<Spinner size={14} color="currentColor" />
+											<span>Deleting...</span>
 										</>
+									) : deleteState === "success" ? (
+										<>
+											<Icon
+												name="check-circle"
+												className="h-4 w-4 shrink-0 text-white"
+											/>
+											<span>Deleted</span>
+										</>
+									) : (
+										<span>Hold to delete</span>
 									)}
-								</Button.Root>
-							</div>
-						</form>
-					) : null}
-				</div>
+								</motion.span>
+							</AnimatePresence>
+						</FancyButton.Root>
+					</div>
+				</motion.div>
 			</Modal.Content>
 		</Modal.Root>
 	);
