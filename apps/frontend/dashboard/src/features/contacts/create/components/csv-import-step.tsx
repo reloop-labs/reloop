@@ -88,7 +88,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 						<h2 className="font-semibold text-base text-text-strong-950 tracking-tight">
 							Import Contacts from CSV
 						</h2>
-						<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
+						<p className="text-text-sub-600 text-xs leading-relaxed">
 							Upload a spreadsheet to bulk import contacts and custom
 							properties.
 						</p>
