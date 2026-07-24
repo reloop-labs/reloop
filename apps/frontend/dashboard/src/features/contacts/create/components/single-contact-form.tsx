@@ -1,3 +1,4 @@
+import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
@@ -182,24 +183,27 @@ export function SingleContactForm({ onBack }: SingleContactFormProps) {
 									{emailChips.map((chip) => (
 										<span
 											key={chip.id}
-											className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-paragraph-xs text-text-strong-950 ${
+											className={`inline-flex items-center gap-1.5 rounded-full border py-0.5 pr-2 pl-0.5 text-paragraph-xs transition-all ${
 												chip.isValid
-													? "border-stroke-soft-200 bg-bg-weak-50"
+													? "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950"
 													: "border-error-base bg-red-50 text-red-600"
 											}`}
 										>
-											<Icon
-												name="mail-single"
-												className="h-3.5 w-3.5 text-text-sub-600"
-											/>
-											{chip.email}
+											<Avatar.Root
+												size="20"
+												color={chip.isValid ? "gray" : "red"}
+												className="font-semibold text-[10px]"
+											>
+												{chip.email[0]}
+											</Avatar.Root>
+											<span className="font-medium">{chip.email}</span>
 											<button
 												type="button"
 												onClick={(e) => {
 													e.stopPropagation();
 													removeEmailChip(chip.id);
 												}}
-												className="ml-0.5 text-text-sub-600 transition-colors hover:text-text-strong-950"
+												className="ml-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full text-text-sub-600 transition-colors hover:bg-stroke-soft-200 hover:text-text-strong-950"
 												disabled={isCreating}
 											>
 												<Icon name="cross" className="h-3 w-3" />
