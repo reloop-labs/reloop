@@ -2,8 +2,8 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useState } from "react";
-import { toast } from "sonner";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { ForwardDNSRecordsModal } from "../add/setup/components/forward-dns-records-modal";
 import { useDomainActions } from "../detail/hooks/use-domain-actions";
@@ -63,6 +63,7 @@ export function DomainDropdown({
 	const [open, setOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [forwardOpen, setForwardOpen] = useState(false);
+	const [copiedItem, setCopiedItem] = useState<"name" | "id" | null>(null);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const { handleVerifyDNS } = useDomainActions(domainId);
 
@@ -74,6 +75,32 @@ export function DomainDropdown({
 		setOpen(next);
 		if (!next) setHoverIdx(undefined);
 		onOpenChange?.(next);
+	};
+
+	const handleCopyName = async () => {
+		try {
+			await navigator.clipboard.writeText(domainName);
+			setCopiedItem("name");
+			setTimeout(() => {
+				setCopiedItem(null);
+				handleOpenChange(false);
+			}, 900);
+		} catch {
+			handleOpenChange(false);
+		}
+	};
+
+	const handleCopyId = async () => {
+		try {
+			await navigator.clipboard.writeText(domainId);
+			setCopiedItem("id");
+			setTimeout(() => {
+				setCopiedItem(null);
+				handleOpenChange(false);
+			}, 900);
+		} catch {
+			handleOpenChange(false);
+		}
 	};
 
 	return (
@@ -103,51 +130,96 @@ export function DomainDropdown({
 					className="w-48 gap-0 rounded-xl p-1.5"
 				>
 					<div className="relative">
-						{menuItems.map((item, idx) => (
-							<button
-								key={item.id}
-								ref={(el) => {
-									if (el) buttonRefs.current[idx] = el;
-								}}
-								type="button"
-								onPointerEnter={() => setHoverIdx(idx)}
-								onPointerLeave={() => setHoverIdx(undefined)}
-								onClick={() => {
-									if (item.id === "delete") {
-										onDelete(domainId);
-									} else if (item.id === "view") {
-										onViewDetails(domainName);
-									} else if (item.id === "copy_name") {
-										void navigator.clipboard.writeText(domainName);
-										toast.success("Domain name copied to clipboard");
-									} else if (item.id === "copy_id") {
-										void navigator.clipboard.writeText(domainId);
-										toast.success("Domain ID copied to clipboard");
-									} else if (item.id === "reverify") {
-										void handleVerifyDNS();
-									} else if (item.id === "forward") {
-										setForwardOpen(true);
-									}
-									handleOpenChange(false);
-								}}
-								className={cn(
-									"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-normal text-xs",
-									item.isDanger ? "text-error-base" : "text-text-strong-950",
-									!currentRect &&
-										hoverIdx === idx &&
-										(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
-								)}
-							>
-								<Icon
-									name={item.icon}
+						{menuItems.map((item, idx) => {
+							const isCopyName = item.id === "copy_name";
+							const isCopyId = item.id === "copy_id";
+							const isThisCopied =
+								(isCopyName && copiedItem === "name") ||
+								(isCopyId && copiedItem === "id");
+
+							return (
+								<button
+									key={item.id}
+									ref={(el) => {
+										if (el) buttonRefs.current[idx] = el;
+									}}
+									type="button"
+									onPointerEnter={() => setHoverIdx(idx)}
+									onPointerLeave={() => setHoverIdx(undefined)}
+									onClick={() => {
+										if (item.id === "delete") {
+											onDelete(domainId);
+											handleOpenChange(false);
+										} else if (item.id === "view") {
+											onViewDetails(domainName);
+											handleOpenChange(false);
+										} else if (item.id === "copy_name") {
+											void handleCopyName();
+										} else if (item.id === "copy_id") {
+											void handleCopyId();
+										} else if (item.id === "reverify") {
+											void handleVerifyDNS();
+											handleOpenChange(false);
+										} else if (item.id === "forward") {
+											setForwardOpen(true);
+											handleOpenChange(false);
+										}
+									}}
 									className={cn(
-										"h-3.5 w-3.5",
-										item.isDanger ? "" : "text-text-sub-600",
+										"relative flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-normal text-xs transition-colors min-h-[28px]",
+										item.isDanger ? "text-error-base" : "text-text-strong-950",
+										!currentRect &&
+											hoverIdx === idx &&
+											(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
 									)}
-								/>
-								<span>{item.label}</span>
-							</button>
-						))}
+								>
+									{isCopyName || isCopyId ? (
+										<AnimatePresence mode="popLayout" initial={false}>
+											<motion.div
+												key={isThisCopied ? "copied" : "idle"}
+												transition={{
+													type: "spring",
+													duration: 0.25,
+													bounce: 0,
+												}}
+												initial={{ opacity: 0, y: -14 }}
+												animate={{ opacity: 1, y: 0 }}
+												exit={{ opacity: 0, y: 14 }}
+												className="flex items-center gap-2"
+											>
+												<Icon
+													name={isThisCopied ? "check-circle" : "copy"}
+													className={cn(
+														"h-3.5 w-3.5 shrink-0",
+														isThisCopied
+															? "text-success-base"
+															: "text-text-sub-600",
+													)}
+												/>
+												<span>
+													{isThisCopied
+														? isCopyName
+															? "Copied Name!"
+															: "Copied ID!"
+														: item.label}
+												</span>
+											</motion.div>
+										</AnimatePresence>
+									) : (
+										<>
+											<Icon
+												name={item.icon}
+												className={cn(
+													"h-3.5 w-3.5 shrink-0",
+													item.isDanger ? "" : "text-text-sub-600",
+												)}
+											/>
+											<span>{item.label}</span>
+										</>
+									)}
+								</button>
+							);
+						})}
 						<AnimatedHoverBackground
 							rect={currentRect}
 							tabElement={currentTab}

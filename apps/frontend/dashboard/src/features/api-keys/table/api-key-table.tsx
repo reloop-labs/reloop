@@ -43,6 +43,7 @@ export function ApiKeyTable({
 	const navigate = useNavigate();
 	const [, setDeleteId] = useQueryState("delete");
 	const [, setRotateId] = useQueryState("rotate");
+	const [, setEditId] = useQueryState("edit");
 	const [, setModal] = useQueryState("modal");
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
@@ -65,6 +66,13 @@ export function ApiKeyTable({
 		[setDeleteId],
 	);
 
+	const handleEditKey = useCallback(
+		(id: string) => {
+			void setEditId(id);
+		},
+		[setEditId],
+	);
+
 	const handleOpenChange = useCallback((open: boolean, id: string) => {
 		setActiveDropdownId(open ? id : null);
 	}, []);
@@ -75,6 +83,7 @@ export function ApiKeyTable({
 			onToggleEnabled: toggleEnabled,
 			onRotateKey: handleRotateKey,
 			onDeleteKey: handleDeleteKey,
+			onEditKey: handleEditKey,
 			onOpenChange: handleOpenChange,
 		}),
 		[
@@ -82,6 +91,7 @@ export function ApiKeyTable({
 			toggleEnabled,
 			handleRotateKey,
 			handleDeleteKey,
+			handleEditKey,
 			handleOpenChange,
 		],
 	);

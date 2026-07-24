@@ -2,6 +2,8 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
+import { useNavigate } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import type { ApiKeyData } from "../types";
@@ -11,6 +13,7 @@ export type ApiKeyActionsHandlers = {
 	onToggleEnabled: (apiKey: ApiKeyData) => void;
 	onRotateKey: (apiKey: ApiKeyData) => void;
 	onDeleteKey: (id: string) => void;
+	onEditKey?: (id: string) => void;
 	onOpenChange: (open: boolean, id: string) => void;
 };
 
@@ -21,12 +24,38 @@ export function ApiKeyActionsMenu({
 	apiKey: ApiKeyData;
 	handlers: ApiKeyActionsHandlers;
 }) {
+	const navigate = useNavigate();
 	const isToggling = handlers.togglingId === apiKey.id;
 	const [open, setOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
+	const [copiedItem, setCopiedItem] = useState<"prefix" | "id" | null>(null);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
 	const menuItems = [
+		{
+			id: "view" as const,
+			label: "View details",
+			icon: "info-outline" as const,
+			isDanger: false,
+		},
+		{
+			id: "edit" as const,
+			label: "Edit API key",
+			icon: "edit" as const,
+			isDanger: false,
+		},
+		{
+			id: "copy_prefix" as const,
+			label: "Copy key prefix",
+			icon: "copy" as const,
+			isDanger: false,
+		},
+		{
+			id: "copy_id" as const,
+			label: "Copy key ID",
+			icon: "copy" as const,
+			isDanger: false,
+		},
 		{
 			id: "toggle" as const,
 			label: apiKey.enabled ? "Disable" : "Enable",
@@ -59,11 +88,56 @@ export function ApiKeyActionsMenu({
 		handlers.onOpenChange(next, apiKey.id);
 	};
 
+	const handleCopyPrefix = async () => {
+		try {
+			await navigator.clipboard.writeText(apiKey.start || apiKey.prefix || "");
+			setCopiedItem("prefix");
+			setTimeout(() => {
+				setCopiedItem(null);
+				handleOpenChange(false);
+			}, 900);
+		} catch {
+			handleOpenChange(false);
+		}
+	};
+
+	const handleCopyId = async () => {
+		try {
+			await navigator.clipboard.writeText(apiKey.id);
+			setCopiedItem("id");
+			setTimeout(() => {
+				setCopiedItem(null);
+				handleOpenChange(false);
+			}, 900);
+		} catch {
+			handleOpenChange(false);
+		}
+	};
+
 	const handleItemClick = (id: (typeof menuItems)[number]["id"]) => {
-		if (id === "toggle") handlers.onToggleEnabled(apiKey);
-		if (id === "rotate") handlers.onRotateKey(apiKey);
-		if (id === "delete") handlers.onDeleteKey(apiKey.id);
-		handleOpenChange(false);
+		if (id === "view") {
+			void navigate({
+				to: "/api-keys/$apiKeyId",
+				params: { apiKeyId: apiKey.id },
+			});
+			handleOpenChange(false);
+		} else if (id === "edit") {
+			handlers.onEditKey?.(apiKey.id);
+			handleOpenChange(false);
+		} else if (id === "copy_prefix") {
+			void handleCopyPrefix();
+		} else if (id === "copy_id") {
+			void handleCopyId();
+		} else if (id === "toggle") {
+			handlers.onToggleEnabled(apiKey);
+			handleOpenChange(false);
+		} else if (id === "rotate") {
+			handlers.onRotateKey(apiKey);
+			handleOpenChange(false);
+		} else if (id === "delete") {
+			handlers.onDeleteKey(apiKey.id);
+			handleOpenChange(false);
+		}
 	};
 
 	return (
@@ -72,10 +146,6 @@ export function ApiKeyActionsMenu({
 			onClick={(e) => e.stopPropagation()}
 			onKeyDown={(e) => e.stopPropagation()}
 		>
-			{/*
-			  Local open state only — component sits outside column defs so parent
-			  re-renders (row highlight) never remount this and kill the open animation.
-			*/}
 			<Dropdown.Root open={open} onOpenChange={handleOpenChange}>
 				<Dropdown.Trigger asChild>
 					<Button.Root
@@ -95,48 +165,93 @@ export function ApiKeyActionsMenu({
 				<Dropdown.Content
 					align="end"
 					sideOffset={6}
-					className="w-40 gap-0 rounded-xl p-1.5"
+					className="w-48 gap-0 rounded-xl p-1.5"
 				>
 					<div className="relative">
-						{menuItems.map((item, idx) => (
-							<button
-								key={item.id}
-								ref={(el) => {
-									if (el) buttonRefs.current[idx] = el;
-								}}
-								type="button"
-								onPointerEnter={() => setHoverIdx(idx)}
-								onPointerLeave={() => setHoverIdx(undefined)}
-								onClick={() => handleItemClick(item.id)}
-								disabled={item.id === "toggle" && isToggling}
-								className={cn(
-									"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-xs",
-									item.isDanger ? "text-error-base" : "text-text-strong-950",
-									!currentRect &&
-										hoverIdx === idx &&
-										(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
-									item.id === "toggle" &&
-										isToggling &&
-										"cursor-not-allowed opacity-50",
-								)}
-							>
-								{item.id === "toggle" && isToggling ? (
-									<Icon
-										name="loader-2"
-										className="h-3.5 w-3.5 animate-spin text-text-sub-600"
-									/>
-								) : (
-									<Icon
-										name={item.icon}
-										className={cn(
-											"h-3.5 w-3.5",
-											item.isDanger ? "" : "text-text-sub-600",
-										)}
-									/>
-								)}
-								<span>{item.label}</span>
-							</button>
-						))}
+						{menuItems.map((item, idx) => {
+							const isCopyPrefix = item.id === "copy_prefix";
+							const isCopyId = item.id === "copy_id";
+							const isThisCopied =
+								(isCopyPrefix && copiedItem === "prefix") ||
+								(isCopyId && copiedItem === "id");
+
+							return (
+								<button
+									key={item.id}
+									ref={(el) => {
+										if (el) buttonRefs.current[idx] = el;
+									}}
+									type="button"
+									onPointerEnter={() => setHoverIdx(idx)}
+									onPointerLeave={() => setHoverIdx(undefined)}
+									onClick={() => handleItemClick(item.id)}
+									disabled={item.id === "toggle" && isToggling}
+									className={cn(
+										"relative flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-normal text-xs transition-colors min-h-[28px]",
+										item.isDanger ? "text-error-base" : "text-text-strong-950",
+										!currentRect &&
+											hoverIdx === idx &&
+											(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
+										item.id === "toggle" &&
+											isToggling &&
+											"cursor-not-allowed opacity-50",
+									)}
+								>
+									{item.id === "toggle" && isToggling ? (
+										<>
+											<Icon
+												name="loader-2"
+												className="h-3.5 w-3.5 animate-spin text-text-sub-600"
+											/>
+											<span>{item.label}</span>
+										</>
+									) : isCopyPrefix || isCopyId ? (
+										<AnimatePresence mode="popLayout" initial={false}>
+											<motion.div
+												key={isThisCopied ? "copied" : "idle"}
+												transition={{
+													type: "spring",
+													duration: 0.25,
+													bounce: 0,
+												}}
+												initial={{ opacity: 0, y: -14 }}
+												animate={{ opacity: 1, y: 0 }}
+												exit={{ opacity: 0, y: 14 }}
+												className="flex items-center gap-2"
+											>
+												<Icon
+													name={isThisCopied ? "check-circle" : "copy"}
+													className={cn(
+														"h-3.5 w-3.5 shrink-0",
+														isThisCopied
+															? "text-success-base"
+															: "text-text-sub-600",
+													)}
+												/>
+												<span>
+													{isThisCopied
+														? isCopyPrefix
+															? "Copied prefix!"
+															: "Copied ID!"
+														: item.label}
+												</span>
+											</motion.div>
+										</AnimatePresence>
+									) : (
+										<>
+											<Icon
+												name={item.icon}
+												className={cn(
+													"h-3.5 w-3.5 shrink-0",
+													item.isDanger ? "" : "text-text-sub-600",
+												)}
+											/>
+											<span>{item.label}</span>
+										</>
+									)}
+								</button>
+							);
+						})}
 						<AnimatedHoverBackground
 							rect={currentRect}
 							tabElement={currentTab}

@@ -29,7 +29,7 @@ export const DomainHeaderActions = ({
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [forwardOpen, setForwardOpen] = useState(false);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-	const { handleVerifyDNS } = useDomainActions(domainRecordId, domain as never);
+	const { handleVerifyDNS } = useDomainActions(domainRecordId);
 
 	const headerMenuItems = useMemo(() => {
 		const items = [];

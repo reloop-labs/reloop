@@ -253,7 +253,10 @@ export function DeleteDomainModal({
 									</>
 								) : deleteState === "success" ? (
 									<>
-										<Icon name="check" className="h-4 w-4 shrink-0 text-white" />
+										<Icon
+											name="check-circle"
+											className="h-4 w-4 shrink-0 text-white"
+										/>
 										<span>Deleted</span>
 									</>
 								) : (

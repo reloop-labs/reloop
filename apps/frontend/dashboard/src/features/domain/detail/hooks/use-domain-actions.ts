@@ -6,7 +6,7 @@ import type { DomainResponse } from "../../types";
 
 export function useDomainActions(
 	domainId: string | undefined,
-	domainData: DomainResponse | undefined,
+	domainData?: DomainResponse | undefined,
 ) {
 	const [isVerifying, setIsVerifying] = React.useState(false);
 	const invalidate = useInvalidateDomains();
