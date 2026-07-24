@@ -7,14 +7,17 @@ import Spinner from "@reloop/ui/spinner";
 import { useQuery } from "@tanstack/react-query";
 import {
 	AnimatePresence,
+	type AnimationPlaybackControls,
 	animate,
 	motion,
 	useMotionValue,
-	type AnimationPlaybackControls,
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useInvalidateContacts, type Group } from "#/features/contacts/hooks/use-contacts-query";
+import {
+	type Group,
+	useInvalidateContacts,
+} from "#/features/contacts/hooks/use-contacts-query";
 
 interface DeleteGroupModalProps {
 	open: boolean;

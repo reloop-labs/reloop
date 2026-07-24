@@ -151,7 +151,9 @@ export const CreateGroupModal = ({
 									type="submit"
 									variant={status === "success" ? "success" : "blue"}
 									size="small"
-									disabled={status === "creating" || (status === "idle" && !name.trim())}
+									disabled={
+										status === "creating" || (status === "idle" && !name.trim())
+									}
 									className={cn(
 										"min-w-[140px] justify-center overflow-hidden transition-all duration-200",
 										status !== "idle" && "pointer-events-none",

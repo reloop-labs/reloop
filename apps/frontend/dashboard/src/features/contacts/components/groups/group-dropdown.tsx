@@ -1,4 +1,3 @@
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -7,14 +6,16 @@ import {
 	Root as PopoverRoot,
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
-import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import type { Group } from "#/features/contacts/hooks/use-contacts-query";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
 export interface GroupDropdownProps {
 	group: Group;
+	onEdit?: (group: Group) => void;
 	onDelete: (group: Group) => void;
 	isDeleting?: boolean;
 	onOpenChange?: (open: boolean) => void;
@@ -22,6 +23,7 @@ export interface GroupDropdownProps {
 
 export const GroupDropdown = ({
 	group,
+	onEdit,
 	onDelete,
 	isDeleting = false,
 	onOpenChange,
@@ -91,13 +93,13 @@ export const GroupDropdown = ({
 				{ credentials: "include" },
 			);
 			if (!res.ok) throw new Error("Failed to fetch contacts");
-			const data = (await res.json()) as { contacts: Array<{ id: string; email: string; createdAt: string }> };
+			const data = (await res.json()) as {
+				contacts: Array<{ id: string; email: string; createdAt: string }>;
+			};
 			const contacts = data.contacts || [];
 			const csvLines = [
 				"ID,Email,Created At",
-				...contacts.map(
-					(c) => `"${c.id}","${c.email}","${c.createdAt}"`,
-				),
+				...contacts.map((c) => `"${c.id}","${c.email}","${c.createdAt}"`),
 			];
 			const blob = new Blob([csvLines.join("\n")], {
 				type: "text/csv;charset=utf-8;",
@@ -124,8 +126,12 @@ export const GroupDropdown = ({
 			});
 		} else if (itemId === "edit") {
 			setPopoverOpen(false);
-			void setId(group.id);
-			void setModal("edit-group");
+			if (onEdit) {
+				onEdit(group);
+			} else {
+				void setId(group.id);
+				void setModal("edit-group");
+			}
 		} else if (itemId === "copy-id") {
 			try {
 				await navigator.clipboard.writeText(group.id);

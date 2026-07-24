@@ -1,16 +1,18 @@
-import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
-import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
-import { formatRelativeTime } from "#/utils/format-relative-time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
+import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
+import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
+import type { Group } from "#/features/contacts/hooks/use-contacts-query";
+import { formatRelativeTime } from "#/utils/format-relative-time";
+import { EditGroupRowPanel } from "./edit-group-row-panel";
 import { GroupDropdown } from "./group-dropdown";
 import { GroupsEmptyState } from "./groups-empty-state";
-import type { Group } from "#/features/contacts/hooks/use-contacts-query";
 
 interface GroupTableProps {
 	groups: Group[];
@@ -77,6 +79,11 @@ export const GroupTable = ({
 	const [, setModal] = useQueryState("modal");
 	const [, setId] = useQueryState("id");
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
+	const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
+
+	const handleEdit = (group: Group) => {
+		setEditingGroupId((prev) => (prev === group.id ? null : group.id));
+	};
 
 	const handleDelete = (group: Group) => {
 		void setModal("delete-group");
@@ -118,57 +125,119 @@ export const GroupTable = ({
 						onClearSearch={onClearSearch}
 					/>
 				) : (
-					groups.map((group) => {
-						const isRowActive = activeDropdownId === group.id;
-						return (
-							<div
-								key={group.id}
-								className={cn(
-									"group/row grid w-full grid-cols-[1fr_100px_150px_80px] items-center px-4 py-2 text-left transition-colors",
-									"hover:bg-bg-weak-50/50",
-									isRowActive && "bg-bg-weak-50/50",
-								)}
-							>
-								{/* Name Column */}
-								<div className="flex items-center gap-2">
-									<Icon name="modules" className="h-4 w-4 shrink-0 text-text-sub-600" />
-									<Link
-										to="/contacts/groups/$groupId"
-										params={{ groupId: group.id }}
-										className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
-									>
-										{group.name}
-									</Link>
-								</div>
-
-								{/* Contacts Column */}
-								<div className="flex items-center">
-									<GroupContactsCount groupId={group.id} />
-								</div>
-
-								{/* Created At Column */}
-								<div className="flex items-center">
-									<span className="whitespace-nowrap font-medium text-[13px]">
-										{group.createdAt ? formatRelativeTime(group.createdAt) : "—"}
-									</span>
-								</div>
-
-								{/* Actions Column */}
-								<div
-									className="flex items-center justify-end"
-									onClick={(e) => e.stopPropagation()}
+					<AnimatePresence mode="popLayout" initial={false}>
+						{groups.map((group) => {
+							const isEditing = editingGroupId === group.id;
+							const isRowActive = activeDropdownId === group.id || isEditing;
+							return (
+								<motion.div
+									key={group.id}
+									layout
+									initial={{ opacity: 1, height: "auto" }}
+									exit={{
+										opacity: 0,
+										height: 0,
+										scale: 0.98,
+										transition: {
+											height: {
+												duration: 0.22,
+												ease: [0.32, 0.72, 0, 1],
+											},
+											opacity: { duration: 0.15, ease: "easeOut" },
+											scale: { duration: 0.15, ease: "easeOut" },
+											layout: {
+												duration: 0.25,
+												ease: [0.32, 0.72, 0, 1],
+											},
+										},
+									}}
+									className="overflow-hidden"
 								>
-									<GroupDropdown
-										group={group}
-										onDelete={handleDelete}
-										onOpenChange={(open) =>
-											setActiveDropdownId(open ? group.id : null)
-										}
-									/>
-								</div>
-							</div>
-						);
-					})
+									<div
+										className={cn(
+											"group/row grid w-full grid-cols-[1fr_100px_150px_80px] items-center px-4 py-2 text-left transition-colors",
+											"hover:bg-bg-weak-50/50",
+											isRowActive && "bg-bg-weak-50/50",
+											isEditing && "bg-bg-weak-50/70",
+										)}
+									>
+										{/* Name Column */}
+										<div className="flex items-center gap-2">
+											<Icon
+												name="modules"
+												className="h-4 w-4 shrink-0 text-text-sub-600"
+											/>
+											<Link
+												to="/contacts/groups/$groupId"
+												params={{ groupId: group.id }}
+												className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+											>
+												{group.name}
+											</Link>
+											{isEditing && (
+												<span className="rounded-md bg-bg-white-0 px-1.5 py-0.5 font-medium text-[11px] text-text-sub-600 ring-1 ring-stroke-soft-100">
+													Editing
+												</span>
+											)}
+										</div>
+
+										{/* Contacts Column */}
+										<div className="flex items-center">
+											<GroupContactsCount groupId={group.id} />
+										</div>
+
+										{/* Created At Column */}
+										<div className="flex items-center">
+											<span className="whitespace-nowrap font-medium text-[13px]">
+												{group.createdAt
+													? formatRelativeTime(group.createdAt)
+													: "—"}
+											</span>
+										</div>
+
+										{/* Actions Column */}
+										<div
+											className="flex items-center justify-end"
+											onClick={(e) => e.stopPropagation()}
+										>
+											<GroupDropdown
+												group={group}
+												onEdit={handleEdit}
+												onDelete={handleDelete}
+												onOpenChange={(open) =>
+													setActiveDropdownId(open ? group.id : null)
+												}
+											/>
+										</div>
+									</div>
+
+									<AnimatePresence initial={false}>
+										{isEditing ? (
+											<motion.div
+												key={`edit-${group.id}`}
+												initial={{ height: 0, opacity: 0 }}
+												animate={{ height: "auto", opacity: 1 }}
+												exit={{ height: 0, opacity: 0 }}
+												transition={{
+													height: {
+														duration: 0.28,
+														ease: [0.32, 0.72, 0, 1],
+													},
+													opacity: { duration: 0.2, ease: "easeOut" },
+												}}
+												className="overflow-hidden"
+											>
+												<EditGroupRowPanel
+													group={group}
+													onClose={() => setEditingGroupId(null)}
+												/>
+											</motion.div>
+										) : null}
+									</AnimatePresence>
+								</motion.div>
+							);
+						})}
+					</AnimatePresence>
 				)}
 
 				{/* Pagination Footer */}

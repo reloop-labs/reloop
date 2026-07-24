@@ -69,7 +69,15 @@ export function GroupList() {
 			</div>
 			<div className="mt-4">
 				<GroupTable
-					groups={(data?.groups || []).map((g) => ({ ...g, organizationId: g.organizationId || "", createdAt: g.createdAt || "", updatedAt: g.updatedAt || "", deletedAt: g.deletedAt ?? null })) as any}
+					groups={
+						(data?.groups || []).map((g) => ({
+							...g,
+							organizationId: g.organizationId || "",
+							createdAt: g.createdAt || "",
+							updatedAt: g.updatedAt || "",
+							deletedAt: g.deletedAt ?? null,
+						})) as any
+					}
 					total={data?.total || 0}
 					isLoading={isLoading}
 					onAddGroup={() => void setModal("create-group")}
