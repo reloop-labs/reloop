@@ -1,12 +1,29 @@
+import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
+
+const getBadgeColor = (type: string) => {
+	switch (type?.toLowerCase()) {
+		case "string":
+			return "blue";
+		case "number":
+			return "purple";
+		default:
+			return "gray";
+	}
+};
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import {
+	AnimatePresence,
+	animate,
+	motion,
+	useMotionValue,
+	type AnimationPlaybackControls,
+} from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
@@ -29,61 +46,34 @@ interface DeletePropertyModalProps {
 	onDeleteSuccess?: () => void;
 }
 
+type DeleteState = "idle" | "deleting" | "success";
+
 export const DeletePropertyModal = ({
 	property,
 	open,
 	onOpenChange,
 	onDeleteSuccess,
 }: DeletePropertyModalProps) => {
-	const [confirmationName, setConfirmationName] = useState("");
-	const [status, setStatus] = useState<"idle" | "deleting" | "success">("idle");
-	const [isNameCopied, setIsNameCopied] = useState(false);
+	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
+	const [isHolding, setIsHolding] = useState(false);
+	const holdProgress = useMotionValue(0);
+	const animationRef = useRef<AnimationPlaybackControls | null>(null);
 	const invalidate = useInvalidateContacts();
 
-	const handleClose = () => {
-		setConfirmationName("");
-		setStatus("idle");
-		setIsNameCopied(false);
-		onOpenChange(false);
-	};
+	// Cache target property so details remain stable during deletion animations
+	const targetPropertyRef = useRef<Property | null>(null);
+	if (property) {
+		targetPropertyRef.current = property;
+	}
+	const propertyToDelete = property || targetPropertyRef.current;
 
-	// Reset confirmation when modal closes or property changes
-	useEffect(() => {
-		if (!open) {
-			const timer = setTimeout(() => {
-				setConfirmationName("");
-				setStatus("idle");
-				setIsNameCopied(false);
-			}, 300);
-			return () => clearTimeout(timer);
-		}
-	}, [open]);
-
-	const canSubmit =
-		property &&
-		confirmationName === property.propertyName &&
-		status !== "deleting";
-
-	useHotkeys(
-		"enter",
-		(e) => {
-			e.preventDefault();
-			if (open && canSubmit && status === "idle") {
-				void handleDelete();
-			}
-		},
-		{ enableOnFormTags: ["INPUT"], enabled: open && !!property },
-		[open, confirmationName, property, status, canSubmit],
-	);
-
-	const handleDelete = async (e?: React.FormEvent) => {
-		e?.preventDefault();
-		if (!property || !canSubmit || status !== "idle") return;
+	const handleDelete = async () => {
+		if (!propertyToDelete || deleteState !== "idle") return;
 
 		try {
-			setStatus("deleting");
+			setDeleteState("deleting");
 			const response = await fetch(
-				`/api/contacts/v1/properties/${property.id}`,
+				`/api/contacts/v1/properties/${propertyToDelete.id}`,
 				{
 					method: "DELETE",
 				},
@@ -93,187 +83,211 @@ export const DeletePropertyModal = ({
 				throw new Error("Failed to delete property");
 			}
 
-			setStatus("success");
+			setDeleteState("success");
+			void invalidate();
+
 			setTimeout(() => {
-				void invalidate();
 				onOpenChange(false);
-				setConfirmationName("");
 				onDeleteSuccess?.();
-			}, 750);
+				setTimeout(() => {
+					setDeleteState("idle");
+					targetPropertyRef.current = null;
+				}, 300);
+			}, 900);
 		} catch (error) {
 			console.error("Failed to delete property:", error);
 			toast.error(
 				error instanceof Error ? error.message : "Failed to delete property",
 			);
-			setStatus("idle");
+			setDeleteState("idle");
 		}
 	};
 
+	const startHold = () => {
+		if (deleteState !== "idle") return;
+		setIsHolding(true);
+		holdProgress.set(0);
+		animationRef.current = animate(holdProgress, 1, {
+			duration: 1.2,
+			ease: "linear",
+			onComplete: () => {
+				setIsHolding(false);
+				holdProgress.set(0);
+				void handleDelete();
+			},
+		});
+	};
+
+	const cancelHold = () => {
+		if (!isHolding && holdProgress.get() === 0) return;
+		setIsHolding(false);
+		animationRef.current?.stop();
+		animate(holdProgress, 0, {
+			duration: 0.2,
+			ease: "easeOut",
+		});
+	};
+
+	useHotkeys(
+		"enter",
+		(e) => {
+			e.preventDefault();
+			if (open && propertyToDelete && deleteState === "idle") {
+				void handleDelete();
+			}
+		},
+		{ enabled: open && !!propertyToDelete },
+		[open, propertyToDelete, deleteState],
+	);
+
+	useEffect(() => {
+		if (!open) {
+			cancelHold();
+			const timer = setTimeout(() => {
+				setDeleteState("idle");
+				targetPropertyRef.current = null;
+			}, 300);
+			return () => clearTimeout(timer);
+		}
+	}, [open]);
+
+	const handleCancel = () => {
+		cancelHold();
+		onOpenChange(false);
+	};
+
 	return (
-		<Modal.Root open={open} onOpenChange={(o) => !o && handleClose()}>
+		<Modal.Root open={open} onOpenChange={(o) => !o && handleCancel()}>
 			<Modal.Content
-				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 sm:max-w-[460px] dark:border-stroke-soft-100/40"
 				showClose={true}
 			>
 				<motion.div
 					layout
 					transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
 				>
-					<div className="p-6">
-						{!property && open ? (
-							<div className="flex h-[200px] flex-col items-center justify-center space-y-4 text-center">
-								<Icon
-									name="loader-2"
-									className="h-8 w-8 animate-spin text-text-sub-600"
-								/>
-								<p className="text-sm text-text-sub-600">
-									Loading property details...
-								</p>
+					{/* Header */}
+					<div className="pr-6">
+						<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+							Delete property
+						</Modal.Title>
+						<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
+							Are you sure you want to delete this property? This action cannot be
+							undone.
+						</p>
+					</div>
+
+					{/* Details Card */}
+					<div className="mt-5 grid grid-cols-3 gap-4 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
+						<div>
+							<p className="font-normal text-text-sub-600 text-xs">
+								Property name
+							</p>
+							<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
+								{propertyToDelete?.propertyName || "Unnamed property"}
+							</p>
+						</div>
+						<div>
+							<p className="font-normal text-text-sub-600 text-xs">
+								Property type
+							</p>
+							<div className="mt-1 flex items-center">
+								<Badge.Root
+									size="small"
+									variant="lighter"
+									color={getBadgeColor(propertyToDelete?.propertyType || "String")}
+									className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
+								>
+									{propertyToDelete?.propertyType || "String"}
+								</Badge.Root>
 							</div>
-						) : property ? (
-							<>
-								<div className="relative pr-6">
-									<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-										Delete property?
-									</Modal.Title>
-									<p className="mt-2 text-sm text-text-sub-600 leading-relaxed">
-										This will permanently delete the property and its values
-										from all contacts. This action cannot be undone.
-									</p>
-								</div>
+						</div>
+						<div>
+							<p className="font-normal text-text-sub-600 text-xs">
+								Default value
+							</p>
+							<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
+								{propertyToDelete?.defaultValue ? propertyToDelete.defaultValue : "—"}
+							</p>
+						</div>
+					</div>
 
-								<form onSubmit={handleDelete} className="mt-5 space-y-4">
-									{/* Property Info Card */}
-									<div className="flex items-center gap-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30">
-										<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-error-base/10 text-error-base">
-											<Icon name="tag" className="h-4.5 w-4.5" />
-										</div>
-										<div className="min-w-0 flex-1">
-											<p className="truncate font-medium text-sm text-text-strong-950">
-												{property.propertyName}
-											</p>
-											<p className="mt-0.5 truncate font-medium text-text-sub-600 text-xs capitalize">
-												{property.propertyType} property
-											</p>
-										</div>
-									</div>
+					{/* Warning Banner */}
+					<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
+						<span className="font-bold text-[#6D4000] dark:text-amber-100">
+							Warning:
+						</span>{" "}
+						Deleting this property will permanently remove it along with all its
+						values from all contacts across your organization.
+					</div>
 
-									{/* Confirmation Input */}
-									<div className="space-y-2">
-										<p className="text-paragraph-xs text-text-sub-600">
-											Type{" "}
-											<span className="inline-flex max-w-xs items-center gap-1 truncate rounded-md border border-stroke-soft-100 bg-bg-weak-50/50 px-1.5 py-0.5 font-medium text-text-strong-950 text-xs dark:border-stroke-soft-100/40 dark:bg-bg-strong-200">
-												{property.propertyName}
-												<button
-													type="button"
-													onClick={async () => {
-														try {
-															await navigator.clipboard.writeText(
-																property.propertyName,
-															);
-															setIsNameCopied(true);
-															setTimeout(() => setIsNameCopied(false), 2000);
-														} catch {
-															toast.error("Failed to copy property name");
-														}
-													}}
-													className="text-text-soft-400 transition-colors hover:text-text-strong-950"
-												>
-													<Icon
-														name={isNameCopied ? "check" : "copy"}
-														className={`h-3 w-3 ${isNameCopied ? "text-success-base" : ""}`}
-													/>
-												</button>
-											</span>{" "}
-											to confirm
-										</p>
-										<Input.Root size="medium" className="rounded-xl">
-											<Input.Wrapper>
-												<Input.Input
-													type="text"
-													value={confirmationName}
-													onChange={(e) => setConfirmationName(e.target.value)}
-													placeholder={property.propertyName}
-													disabled={status !== "idle"}
-												/>
-											</Input.Wrapper>
-										</Input.Root>
-									</div>
+					{/* Footer Actions */}
+					<div className="mt-6 flex items-center justify-end gap-3">
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="ghost"
+							size="small"
+							onClick={handleCancel}
+							className={cn(
+								"transition-opacity duration-200",
+								deleteState !== "idle" && "pointer-events-none opacity-50",
+							)}
+						>
+							Cancel
+						</Button.Root>
 
-									{/* Actions */}
-									<div className="mt-6 flex items-center justify-end gap-3">
-										<Button.Root
-											type="button"
-											variant="neutral"
-											mode="ghost"
-											size="small"
-											onClick={handleClose}
-											className={cn(
-												"transition-opacity duration-200",
-												status !== "idle" && "pointer-events-none opacity-50",
-											)}
-										>
-											Cancel
-										</Button.Root>
-										<FancyButton.Root
-											type="submit"
-											variant={status === "success" ? "success" : "destructive"}
-											size="small"
-											disabled={
-												status === "deleting" ||
-												(status === "idle" &&
-													confirmationName !== property.propertyName)
-											}
-											className={cn(
-												"w-[160px] min-w-[160px] justify-center overflow-hidden transition-all duration-200",
-												status === "deleting" && "opacity-90",
-											)}
-										>
-											<AnimatePresence mode="popLayout" initial={false}>
-												<motion.span
-													key={status}
-													transition={{
-														type: "spring",
-														duration: 0.25,
-														bounce: 0,
-													}}
-													initial={{ opacity: 0, y: -14 }}
-													animate={{ opacity: 1, y: 0 }}
-													exit={{ opacity: 0, y: 14 }}
-													className="flex items-center justify-center gap-1.5"
-												>
-													{status === "deleting" ? (
-														<>
-															<Spinner size={14} color="currentColor" />
-															<span>Deleting...</span>
-														</>
-													) : status === "success" ? (
-														<>
-															<Icon name="check-circle" className="h-4 w-4" />
-															<span>Property Deleted</span>
-														</>
-													) : (
-														<>
-															Delete property
-															<span className="inline-flex items-center gap-0.5 opacity-80">
-																<Icon
-																	name="command"
-																	className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-																/>
-																<Icon
-																	name="enter"
-																	className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-																/>
-															</span>
-														</>
-													)}
-												</motion.span>
-											</AnimatePresence>
-										</FancyButton.Root>
-									</div>
-								</form>
-							</>
-						) : null}
+						<FancyButton.Root
+							type="button"
+							variant="destructive"
+							size="small"
+							onPointerDown={startHold}
+							onPointerUp={cancelHold}
+							onPointerLeave={cancelHold}
+							onPointerCancel={cancelHold}
+							className={cn(
+								"relative min-w-[134px] select-none justify-center overflow-hidden transition-all duration-200",
+								deleteState !== "idle" && "pointer-events-none opacity-90",
+							)}
+						>
+							{/* Hold progress overlay fill */}
+							<motion.div
+								className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
+								style={{ scaleX: holdProgress }}
+							/>
+
+							<AnimatePresence mode="popLayout" initial={false}>
+								<motion.span
+									key={deleteState}
+									transition={{
+										type: "spring",
+										duration: 0.25,
+										bounce: 0,
+									}}
+									initial={{ opacity: 0, y: -14 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: 14 }}
+									className="relative z-10 flex items-center justify-center gap-1.5"
+								>
+									{deleteState === "deleting" ? (
+										<>
+											<Spinner size={14} color="currentColor" />
+											<span>Deleting...</span>
+										</>
+									) : deleteState === "success" ? (
+										<>
+											<Icon
+												name="check-circle"
+												className="h-4 w-4 shrink-0 text-white"
+											/>
+											<span>Deleted</span>
+										</>
+									) : (
+										<span>Hold to delete</span>
+									)}
+								</motion.span>
+							</AnimatePresence>
+						</FancyButton.Root>
 					</div>
 				</motion.div>
 			</Modal.Content>
