@@ -21,10 +21,10 @@ import {
 } from "../utils/csv-parser";
 import {
 	hasEmailMapping,
+	type PropertyMappingRow,
 	rowsToColumnMappings,
 	seedRowsFromDetectedMappings,
 	suggestPropertyRows,
-	type PropertyMappingRow,
 } from "../utils/property-mapping";
 import { CsvPropertyMapping } from "./property-mapping";
 
@@ -291,13 +291,13 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 			{/* Main Card Container */}
 			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50">
 				{/* Top Padded Content Area */}
-				<div className="m-0.5 space-y-6 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-4 pb-6">
+				<div className="m-0.5 max-h-[calc(100dvh-520px)] space-y-6 overflow-y-auto rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-4 pb-6">
 					{/* Header */}
 					<div>
 						<h2 className="font-semibold text-base text-text-strong-950 tracking-tight">
 							Import Contacts from CSV
 						</h2>
-						<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
+						<p className="text-text-sub-600 text-xs leading-relaxed">
 							Upload a spreadsheet to bulk import contacts and custom
 							properties.
 						</p>

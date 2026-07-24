@@ -39,7 +39,7 @@ export function AiImportStep({ onBack }: AiImportStepProps) {
 			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50">
 				<form onSubmit={handleAiParse}>
 					{/* Top Padded Content Area */}
-					<div className="m-0.5 space-y-6 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-4 pb-6">
+					<div className="m-0.5 max-h-[calc(100dvh-320px)] overflow-y-auto space-y-6 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-4 pb-6">
 						{/* Header */}
 						<div>
 							<div className="flex items-center gap-2">
