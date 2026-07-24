@@ -5,15 +5,28 @@ import { Icon } from "@reloop/ui/icon";
 interface PropertiesEmptyStateProps {
 	onAddProperty?: () => void;
 	searchQuery?: string;
-	onClearSearch?: () => void;
+	typeFilter?: string;
+	onClearFilters?: () => void;
 }
 
 export function PropertiesEmptyState({
 	onAddProperty,
 	searchQuery = "",
-	onClearSearch,
+	typeFilter = "",
+	onClearFilters,
 }: PropertiesEmptyStateProps) {
-	const isFiltered = searchQuery.trim() !== "";
+	const hasSearch = searchQuery.trim() !== "";
+	const hasTypeFilter = Boolean(typeFilter && typeFilter !== "");
+	const isFiltered = hasSearch || hasTypeFilter;
+
+	let emptyMessage = "Try adjusting your search or filters.";
+	if (hasSearch && hasTypeFilter) {
+		emptyMessage = `No ${typeFilter} properties found matching "${searchQuery}".`;
+	} else if (hasSearch) {
+		emptyMessage = `No properties found matching "${searchQuery}".`;
+	} else if (hasTypeFilter) {
+		emptyMessage = `No ${typeFilter} properties found.`;
+	}
 
 	return (
 		<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
@@ -26,9 +39,9 @@ export function PropertiesEmptyState({
 			<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
 				{isFiltered ? "No properties found" : "Create your first property"}
 			</h3>
-			<p className="mx-auto mb-6 max-w-75 text-balance font-medium text-[12px] text-text-sub-600">
+			<p className="mx-auto mb-6 max-w-80 text-balance font-medium text-[12px] text-text-sub-600">
 				{isFiltered
-					? "Try adjusting your search query."
+					? emptyMessage
 					: "Store custom attributes per contact — like plans, regions, or any data your app tracks."}
 			</p>
 			{isFiltered ? (
@@ -37,11 +50,11 @@ export function PropertiesEmptyState({
 					variant="neutral"
 					mode="stroke"
 					size="small"
-					onClick={onClearSearch}
+					onClick={onClearFilters}
 					className="gap-1.5 rounded-xl"
 				>
 					<Icon name="cross-circle" className="h-4 w-4 text-text-sub-600" />
-					Clear search
+					Clear search & filters
 				</Button.Root>
 			) : (
 				<FancyButton.Root
@@ -58,4 +71,3 @@ export function PropertiesEmptyState({
 		</div>
 	);
 }
-

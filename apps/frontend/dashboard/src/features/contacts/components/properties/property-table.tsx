@@ -42,6 +42,8 @@ interface PropertyTableProps {
 	onDelete?: (propertyId: string) => void;
 	onAddProperty?: () => void;
 	searchQuery?: string;
+	typeFilter?: string;
+	onClearFilters?: () => void;
 	onClearSearch?: () => void;
 }
 
@@ -273,6 +275,8 @@ export const PropertyTable = ({
 	onDelete: _onDelete,
 	onAddProperty,
 	searchQuery,
+	typeFilter,
+	onClearFilters,
 	onClearSearch,
 }: PropertyTableProps) => {
 	const [, setModal] = useQueryState("modal");
@@ -330,7 +334,8 @@ export const PropertyTable = ({
 					<PropertiesEmptyState
 						onAddProperty={onAddProperty}
 						searchQuery={searchQuery}
-						onClearSearch={onClearSearch}
+						typeFilter={typeFilter}
+						onClearFilters={onClearFilters || onClearSearch}
 					/>
 				) : (
 					properties.map((property) => {

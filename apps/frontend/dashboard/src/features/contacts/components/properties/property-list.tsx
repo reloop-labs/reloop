@@ -75,6 +75,12 @@ export function PropertyList() {
 					isLoading={isLoading}
 					onAddProperty={() => void setModal("add-property")}
 					searchQuery={searchQuery ?? ""}
+					typeFilter={typeFilter ?? ""}
+					onClearFilters={() => {
+						void setSearchQuery(null);
+						void setTypeFilter(null);
+						void setCurrentPage(1);
+					}}
 					onClearSearch={() => {
 						void setSearchQuery(null);
 						void setCurrentPage(1);
