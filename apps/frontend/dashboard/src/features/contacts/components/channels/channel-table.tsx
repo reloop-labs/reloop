@@ -154,12 +154,10 @@ export const ChannelTable = ({
 							>
 								{/* Name Column */}
 								<div className="flex items-center gap-2">
-									<div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-neutral-600 to-neutral-500 text-white shadow-sm">
-										<Icon
-											name="notification-indicator"
-											className="h-2.5 w-2.5"
-										/>
-									</div>
+									<Icon
+										name="notification-indicator"
+										className="h-4 w-4 shrink-0 text-text-sub-600"
+									/>
 									<span className="truncate font-medium text-label-sm text-text-strong-950">
 										{channel.name}
 									</span>

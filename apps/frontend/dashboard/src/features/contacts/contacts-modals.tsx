@@ -16,6 +16,7 @@ import { DeleteContactModal } from "./components/contacts/delete-contact-modal";
 import { EditContactModal } from "./components/contacts/edit-contact-modal";
 import { CreateGroupModal } from "./components/groups/create-group-modal";
 import { DeleteGroupModal } from "./components/groups/delete-group";
+import { EditGroupModal } from "./components/groups/edit-group-modal";
 import { AddPropertyModal } from "./components/properties/add-property-modal";
 import { DeletePropertyModal } from "./components/properties/delete-property-modal";
 import { EditPropertyModal } from "./components/properties/edit-property-modal";
@@ -106,6 +107,11 @@ export function ContactsModals() {
 				open={modal === "edit-contact"}
 				onOpenChange={handleOpenChange}
 				contact={(contactData as Contact) || null}
+			/>
+			<EditGroupModal
+				open={modal === "edit-group"}
+				onOpenChange={handleOpenChange}
+				group={groupsData?.groups?.find((g) => g.id === id) || null}
 			/>
 
 			<DeleteChannelModal channels={channelsData?.channels || []} />

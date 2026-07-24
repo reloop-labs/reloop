@@ -8,6 +8,7 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { useNavigate } from "@tanstack/react-router";
+import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 
 interface Group {
@@ -29,8 +30,12 @@ export const GroupDropdown = ({
 	onOpenChange,
 }: GroupDropdownProps) => {
 	const navigate = useNavigate();
+	const [, setModal] = useQueryState("modal");
+	const [, setId] = useQueryState("id");
+
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
+	const [isCopied, setIsCopied] = useState(false);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
 	const menuItems = [
@@ -38,6 +43,30 @@ export const GroupDropdown = ({
 			id: "view",
 			label: "View Details",
 			icon: "info-outline" as const,
+			isDanger: false,
+		},
+		{
+			id: "edit",
+			label: "Edit group",
+			icon: "edit" as const,
+			isDanger: false,
+		},
+		{
+			id: "copy-id",
+			label: isCopied ? "Copied ID!" : "Copy group ID",
+			icon: isCopied ? ("check" as const) : ("copy" as const),
+			isDanger: false,
+		},
+		{
+			id: "add-contacts",
+			label: "Add contacts",
+			icon: "user-plus" as const,
+			isDanger: false,
+		},
+		{
+			id: "export",
+			label: "Export contacts",
+			icon: "download" as const,
 			isDanger: false,
 		},
 		{
@@ -58,13 +87,66 @@ export const GroupDropdown = ({
 	const hoveredItem = menuItems[hoverIdx ?? -1];
 	const isDanger = hoveredItem?.isDanger ?? false;
 
-	const handleItemClick = (itemId: string) => {
+	const handleExport = async () => {
+		try {
+			const res = await fetch(
+				`/api/contacts/v1/groups/${group.id}/contacts?limit=1000`,
+				{ credentials: "include" },
+			);
+			if (!res.ok) throw new Error("Failed to fetch contacts");
+			const data = (await res.json()) as { contacts: Array<{ id: string; email: string; createdAt: string }> };
+			const contacts = data.contacts || [];
+			const csvLines = [
+				"ID,Email,Created At",
+				...contacts.map(
+					(c) => `"${c.id}","${c.email}","${c.createdAt}"`,
+				),
+			];
+			const blob = new Blob([csvLines.join("\n")], {
+				type: "text/csv;charset=utf-8;",
+			});
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = url;
+			link.download = `group-${group.name.toLowerCase().replace(/\s+/g, "-")}-contacts.csv`;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			URL.revokeObjectURL(url);
+		} catch (e) {
+			console.error(e);
+		}
+	};
+
+	const handleItemClick = async (itemId: string) => {
 		if (itemId === "view") {
 			setPopoverOpen(false);
 			void navigate({
 				to: "/contacts/groups/$groupId",
 				params: { groupId: group.id },
 			});
+		} else if (itemId === "edit") {
+			setPopoverOpen(false);
+			void setId(group.id);
+			void setModal("edit-group");
+		} else if (itemId === "copy-id") {
+			try {
+				await navigator.clipboard.writeText(group.id);
+				setIsCopied(true);
+				setTimeout(() => {
+					setIsCopied(false);
+					setPopoverOpen(false);
+				}, 900);
+			} catch {
+				setPopoverOpen(false);
+			}
+		} else if (itemId === "add-contacts") {
+			setPopoverOpen(false);
+			void setId(group.id);
+			void setModal("add-contact-to-group");
+		} else if (itemId === "export") {
+			setPopoverOpen(false);
+			void handleExport();
 		} else if (itemId === "delete") {
 			setPopoverOpen(false);
 			onDelete(group);
@@ -86,7 +168,7 @@ export const GroupDropdown = ({
 			<PopoverContent
 				align="end"
 				sideOffset={-10}
-				className="w-40 rounded-xl p-1.5"
+				className="w-48 rounded-xl p-1.5"
 			>
 				<div className="relative">
 					{menuItems.map((item, idx) => (
@@ -98,7 +180,7 @@ export const GroupDropdown = ({
 							type="button"
 							onPointerEnter={() => setHoverIdx(idx)}
 							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => handleItemClick(item.id)}
+							onClick={() => void handleItemClick(item.id)}
 							disabled={item.id === "delete" && isDeleting}
 							className={cn(
 								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
@@ -116,6 +198,7 @@ export const GroupDropdown = ({
 								className={cn(
 									"h-3.5 w-3.5",
 									item.isDanger ? "" : "text-text-sub-600",
+									item.id === "copy-id" && isCopied ? "text-success-base" : "",
 								)}
 							/>
 							<span>{item.label}</span>

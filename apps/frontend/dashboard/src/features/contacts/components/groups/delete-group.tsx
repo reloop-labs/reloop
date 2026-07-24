@@ -1,11 +1,19 @@
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 import * as Modal from "@reloop/ui/modal";
-import { useEffect, useState } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
-import { toast } from "sonner";
+import Spinner from "@reloop/ui/spinner";
 import { useQuery } from "@tanstack/react-query";
+import {
+	AnimatePresence,
+	animate,
+	motion,
+	useMotionValue,
+	type AnimationPlaybackControls,
+} from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 
 interface Group {
@@ -20,249 +28,265 @@ interface DeleteGroupModalProps {
 	onDeleteSuccess?: () => void;
 }
 
+type DeleteState = "idle" | "deleting" | "success";
+
 export const DeleteGroupModal = ({
 	open,
 	onOpenChange,
 	group,
 	onDeleteSuccess,
 }: DeleteGroupModalProps) => {
-	const [confirmationName, setConfirmationName] = useState("");
-	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [isNameCopied, setIsNameCopied] = useState(false);
+	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
+	const [isHolding, setIsHolding] = useState(false);
+	const holdProgress = useMotionValue(0);
+	const animationRef = useRef<AnimationPlaybackControls | null>(null);
 	const invalidate = useInvalidateContacts();
 
+	// Cache the target group so details remain stable during deletion animations
+	const targetGroupRef = useRef<Group | null>(null);
+	if (group) {
+		targetGroupRef.current = group;
+	}
+	const groupToDelete = group || targetGroupRef.current;
+
 	// Fetch contacts count for the group
-	const {data: contactsData, isPending: isLoadingContacts} = useQuery({
-		queryKey: ["contacts", "legacy", group && open
-			? `/api/contacts/v1/groups/${group.id}/contacts?limit=1`
-			: null],
+	const { data: contactsData, isPending: isLoadingContacts } = useQuery({
+		queryKey: [
+			"contacts",
+			"legacy",
+			groupToDelete && open
+				? `/api/contacts/v1/groups/${groupToDelete.id}/contacts?limit=1`
+				: null,
+		],
 		queryFn: async () => {
-			const url = group && open
-			? `/api/contacts/v1/groups/${group.id}/contacts?limit=1`
-			: null;
-			if (!url) throw new Error("missing url");
-			const res = await fetch(url as string, { credentials: "include" });
-			if (!res.ok) throw new Error("Failed");
-			return res.json() as Promise<{
-		total: number;
-	}>;
+			const url =
+				groupToDelete && open
+					? `/api/contacts/v1/groups/${groupToDelete.id}/contacts?limit=1`
+					: null;
+			if (!url) throw new Error("Missing URL");
+			const res = await fetch(url, { credentials: "include" });
+			if (!res.ok) throw new Error("Failed to fetch contacts count");
+			return res.json() as Promise<{ total: number }>;
 		},
-		enabled: Boolean(group && open
-			? `/api/contacts/v1/groups/${group.id}/contacts?limit=1`
-			: null),
+		enabled: Boolean(groupToDelete && open),
 	});
+
+	const handleDelete = async () => {
+		if (!groupToDelete || deleteState !== "idle") return;
+		try {
+			setDeleteState("deleting");
+			const response = await fetch(
+				`/api/contacts/v1/groups/${groupToDelete.id}`,
+				{
+					method: "DELETE",
+					credentials: "include",
+				},
+			);
+
+			if (!response.ok) {
+				const errorData = await response.json().catch(() => ({}));
+				throw new Error(errorData.message || "Failed to delete group");
+			}
+
+			setDeleteState("success");
+			void invalidate();
+
+			setTimeout(() => {
+				onOpenChange(false);
+				onDeleteSuccess?.();
+				setTimeout(() => {
+					setDeleteState("idle");
+					targetGroupRef.current = null;
+				}, 300);
+			}, 900);
+		} catch (error) {
+			setDeleteState("idle");
+		}
+	};
+
+	const startHold = () => {
+		if (deleteState !== "idle") return;
+		setIsHolding(true);
+		holdProgress.set(0);
+		animationRef.current = animate(holdProgress, 1, {
+			duration: 1.2,
+			ease: "linear",
+			onComplete: () => {
+				setIsHolding(false);
+				holdProgress.set(0);
+				void handleDelete();
+			},
+		});
+	};
+
+	const cancelHold = () => {
+		if (!isHolding && holdProgress.get() === 0) return;
+		setIsHolding(false);
+		animationRef.current?.stop();
+		animate(holdProgress, 0, {
+			duration: 0.2,
+			ease: "easeOut",
+		});
+	};
+
+	useHotkeys(
+		"enter",
+		(e) => {
+			e.preventDefault();
+			if (open && groupToDelete && deleteState === "idle") {
+				void handleDelete();
+			}
+		},
+		{ enabled: open && !!groupToDelete },
+		[open, groupToDelete, deleteState],
+	);
 
 	useEffect(() => {
 		if (!open) {
+			cancelHold();
 			const timer = setTimeout(() => {
-				setConfirmationName("");
-			}, 300); // Wait for transition
+				setDeleteState("idle");
+				targetGroupRef.current = null;
+			}, 300);
 			return () => clearTimeout(timer);
 		}
 	}, [open]);
 
-	useHotkeys(
-		"mod+enter",
-		(e) => {
-			e.preventDefault();
-			if (open && confirmationName === group?.name && !isSubmitting) {
-				handleDelete();
-			}
-		},
-		{ enableOnFormTags: ["INPUT"], enabled: open && !!group },
-		[open, confirmationName, group, isSubmitting],
-	);
-
-	const handleDelete = async () => {
-		if (!group) return;
-
-		if (confirmationName !== group.name) {
-			toast.error("Please enter the correct group name to confirm deletion");
-			return;
-		}
-
-		setIsSubmitting(true);
-		try {
-			const response = await fetch(`/api/contacts/v1/groups/${group.id}`, {
-				method: "DELETE",
-			});
-
-			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.message || "Failed to delete group");
-			}
-
-			toast.success("Group deleted successfully");
-			void invalidate();
-			onOpenChange(false);
-			setConfirmationName("");
-			onDeleteSuccess?.();
-		} catch (error) {
-			toast.error(
-				error instanceof Error ? error.message : "Failed to delete group",
-			);
-		} finally {
-			setIsSubmitting(false);
-		}
-	};
-
 	const handleCancel = () => {
+		cancelHold();
 		onOpenChange(false);
 	};
 
 	return (
-		<Modal.Root open={open} onOpenChange={onOpenChange}>
+		<Modal.Root open={open} onOpenChange={(o) => !o && handleCancel()}>
 			<Modal.Content
-				className="rounded-20 border-none p-0 sm:max-w-[480px]"
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 sm:max-w-[460px] dark:border-stroke-soft-100/40"
 				showClose={true}
 			>
-				<div className="rounded-20 border border-stroke-soft-100/50 bg-bg-white-0">
-					{!group && open ? (
-						<div className="flex h-[200px] flex-col items-center justify-center space-y-4 p-8 text-center">
-							<Icon
-								name="loader-2"
-								className="h-8 w-8 animate-spin text-text-sub-600"
-							/>
-							<p className="text-sm text-text-sub-600">
-								Loading group details...
+				<motion.div
+					layout
+					transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+				>
+					{/* Header */}
+					<div className="pr-6">
+						<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+							Delete group
+						</Modal.Title>
+						<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
+							Are you sure you want to delete this group? This action cannot be
+							undone.
+						</p>
+					</div>
+
+					{/* Details Card */}
+					<div className="mt-5 space-y-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
+						<div>
+							<p className="font-normal text-text-sub-600 text-xs">
+								Group name
+							</p>
+							<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
+								{groupToDelete?.name || "Unnamed group"}
 							</p>
 						</div>
-					) : group ? (
-						<form
-							onSubmit={(e) => {
-								e.preventDefault();
-								if (confirmationName === group.name && !isSubmitting) {
-									handleDelete();
-								}
-							}}
+						<div>
+							<p className="font-normal text-text-sub-600 text-xs">
+								Linked contacts
+							</p>
+							<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
+								{isLoadingContacts ? (
+									<span className="inline-flex items-center gap-1.5 text-text-sub-600">
+										<Icon name="loader-2" className="h-3 w-3 animate-spin" />
+										Loading contacts...
+									</span>
+								) : (
+									<span>
+										{contactsData?.total || 0} contact
+										{contactsData?.total !== 1 ? "s" : ""} will be unlinked
+									</span>
+								)}
+							</p>
+						</div>
+					</div>
+
+					{/* Warning Banner */}
+					<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
+						<span className="font-bold text-[#6D4000] dark:text-amber-100">
+							Warning:
+						</span>{" "}
+						Deleting this group will permanently remove it along with all its
+						settings. Any contacts in this group will be unlinked, but they will
+						not be deleted.
+					</div>
+
+					{/* Footer Actions */}
+					<div className="mt-6 flex items-center justify-end gap-3">
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="ghost"
+							size="small"
+							onClick={handleCancel}
+							className={cn(
+								"transition-opacity duration-200",
+								deleteState !== "idle" && "pointer-events-none opacity-50",
+							)}
 						>
-							<div className="p-6">
-								<div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-error-base/10">
-									<Icon name="trash" className="h-4 w-4 text-error-base" />
-								</div>
+							Cancel
+						</Button.Root>
 
-								<Modal.Title className="font-medium text-text-strong-950 text-title-h5">
-									Delete group?
-								</Modal.Title>
-								<Modal.Description className="mb-6 text-pretty text-sm text-text-sub-600 leading-relaxed">
-									This will permanently delete the group. Any contacts inside
-									this group will be unlinked but{" "}
-									<span className="font-semibold text-text-strong-950">
-										they will not be deleted
-									</span>
-									. This action cannot be undone.
-								</Modal.Description>
+						<FancyButton.Root
+							type="button"
+							variant="destructive"
+							size="small"
+							onPointerDown={startHold}
+							onPointerUp={cancelHold}
+							onPointerLeave={cancelHold}
+							onPointerCancel={cancelHold}
+							className={cn(
+								"relative min-w-[134px] select-none justify-center overflow-hidden transition-all duration-200",
+								deleteState !== "idle" && "pointer-events-none opacity-90",
+							)}
+						>
+							{/* Hold progress overlay fill */}
+							<motion.div
+								className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
+								style={{ scaleX: holdProgress }}
+							/>
 
-								{/* Group Stats Card */}
-								<div className="mb-6 flex items-center gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30">
-									<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-error-base/10 text-error-base">
-										<Icon name="modules" className="h-5 w-5" />
-									</div>
-									<div className="min-w-0 flex-1">
-										<p className="truncate font-medium text-sm text-text-strong-950">
-											{group.name}
-										</p>
-										<p className="mt-0.5 truncate font-medium text-text-sub-600 text-xs">
-											{isLoadingContacts ? (
-												<span className="inline-flex items-center gap-1.5">
-													<Icon
-														name="loader-2"
-														className="h-3 w-3 animate-spin"
-													/>
-													Loading contacts...
-												</span>
-											) : (
-												<span>
-													{contactsData?.total || 0} contact
-													{contactsData?.total !== 1 ? "s" : ""} will be
-													unlinked
-												</span>
-											)}
-										</p>
-									</div>
-								</div>
-
-								{/* Confirmation Input */}
-								<div className="mb-2">
-									<p className="mb-2 text-sm text-text-sub-600">
-										Type{" "}
-										<span className="inline-flex max-w-xs items-center gap-1 truncate rounded-[6px] border border-stroke-soft-100 bg-bg-weak-50/50 px-1.5 py-0.5 font-medium text-text-strong-950 text-xs dark:border-stroke-soft-100/40 dark:bg-bg-strong-200">
-											{group.name}
-											<button
-												type="button"
-												onClick={async () => {
-													try {
-														await navigator.clipboard.writeText(group.name);
-														setIsNameCopied(true);
-														setTimeout(() => setIsNameCopied(false), 2000);
-													} catch {
-														toast.error("Failed to copy group name");
-													}
-												}}
-												className="text-text-sub-600 transition-colors hover:text-text-strong-950"
-											>
-												<Icon
-													name={isNameCopied ? "check" : "copy"}
-													className={`h-3 w-3 ${isNameCopied ? "text-success-base" : ""}`}
-												/>
-											</button>
-										</span>{" "}
-										to confirm
-									</p>
-									<Input.Root size="small" className="rounded-[10px]">
-										<Input.Wrapper>
-											<Input.Input
-												type="text"
-												value={confirmationName}
-												onChange={(e) => setConfirmationName(e.target.value)}
-												placeholder={group.name}
-											/>
-										</Input.Wrapper>
-									</Input.Root>
-								</div>
-							</div>
-
-							<div className="flex flex-col-reverse justify-end gap-2 px-6 pb-6 sm:flex-row sm:items-center">
-								<Button.Root
-									type="button"
-									variant="neutral"
-									mode="stroke"
-									onClick={handleCancel}
-									disabled={isSubmitting}
-									className="gap-1.5"
+							<AnimatePresence mode="popLayout" initial={false}>
+								<motion.span
+									key={deleteState}
+									transition={{
+										type: "spring",
+										duration: 0.25,
+										bounce: 0,
+									}}
+									initial={{ opacity: 0, y: -14 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: 14 }}
+									className="relative z-10 flex items-center justify-center gap-1.5"
 								>
-									Cancel
-									<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
-										Esc
-									</span>
-								</Button.Root>
-								<Button.Root
-									type="submit"
-									variant="error"
-									disabled={isSubmitting || confirmationName !== group.name}
-								>
-									{isSubmitting ? (
-										"Deleting..."
-									) : (
+									{deleteState === "deleting" ? (
 										<>
-											Delete group
-											<span className="inline-flex items-center gap-0.5">
-												<Icon
-													name="command"
-													className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-												/>
-												<Icon
-													name="enter"
-													className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-												/>
-											</span>
+											<Spinner size={14} color="currentColor" />
+											<span>Deleting...</span>
 										</>
+									) : deleteState === "success" ? (
+										<>
+											<Icon
+												name="check"
+												className="h-4 w-4 shrink-0 text-white"
+											/>
+											<span>Deleted</span>
+										</>
+									) : (
+										<span>Hold to delete</span>
 									)}
-								</Button.Root>
-							</div>
-						</form>
-					) : null}
-				</div>
+								</motion.span>
+							</AnimatePresence>
+						</FancyButton.Root>
+					</div>
+				</motion.div>
 			</Modal.Content>
 		</Modal.Root>
 	);
