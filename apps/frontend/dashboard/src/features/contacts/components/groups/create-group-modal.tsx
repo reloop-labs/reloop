@@ -9,7 +9,6 @@ import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { toast } from "sonner";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 
 interface CreateGroupModalProps {
@@ -23,18 +22,22 @@ export const CreateGroupModal = ({
 }: CreateGroupModalProps) => {
 	const invalidate = useInvalidateContacts();
 	const [name, setName] = useState("");
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [status, setStatus] = useState<"idle" | "creating" | "success">("idle");
 
 	const handleClose = () => {
 		setName("");
+		setError(null);
+		setStatus("idle");
 		onOpenChange(false);
 	};
 
 	const handleSubmit = async (e?: React.FormEvent) => {
 		e?.preventDefault();
-		if (!name.trim() || isSubmitting) return;
+		if (!name.trim() || status !== "idle") return;
 
-		setIsSubmitting(true);
+		setError(null);
+		setStatus("creating");
 		try {
 			const response = await fetch("/api/contacts/v1/groups/create", {
 				method: "POST",
@@ -47,15 +50,16 @@ export const CreateGroupModal = ({
 				throw new Error(errorData.message || "Failed to create group");
 			}
 
-			toast.success("Group created successfully");
-			void invalidate();
-			handleClose();
-		} catch (error) {
-			toast.error(
-				error instanceof Error ? error.message : "Failed to create group",
+			setStatus("success");
+			setTimeout(() => {
+				void invalidate();
+				handleClose();
+			}, 750);
+		} catch (err) {
+			setError(
+				err instanceof Error ? err.message : "Failed to create group",
 			);
-		} finally {
-			setIsSubmitting(false);
+			setStatus("idle");
 		}
 	};
 
@@ -63,18 +67,20 @@ export const CreateGroupModal = ({
 		"enter",
 		(e) => {
 			e.preventDefault();
-			if (open && !isSubmitting && name.trim()) {
+			if (open && status === "idle" && name.trim()) {
 				void handleSubmit();
 			}
 		},
 		{ enableOnFormTags: ["INPUT"], enabled: open },
-		[open, isSubmitting, name],
+		[open, status, name],
 	);
 
 	useEffect(() => {
 		if (!open) {
 			const timer = setTimeout(() => {
 				setName("");
+				setError(null);
+				setStatus("idle");
 			}, 300);
 			return () => clearTimeout(timer);
 		}
@@ -103,21 +109,30 @@ export const CreateGroupModal = ({
 									Group name
 									<Label.Asterisk />
 								</Label.Root>
-								<Input.Root size="medium">
+								<Input.Root size="medium" hasError={Boolean(error)}>
 									<Input.Wrapper>
 										<Input.Input
 											id="group-name"
 											placeholder="e.g., VIP Customers, Early Adopters"
 											value={name}
-											onChange={(e) => setName(e.target.value)}
+											onChange={(e) => {
+												setName(e.target.value);
+												if (error) setError(null);
+											}}
 											autoFocus
-											disabled={isSubmitting}
+											disabled={status !== "idle"}
 										/>
 									</Input.Wrapper>
 								</Input.Root>
-								<p className="text-paragraph-xs text-text-sub-600">
-									Provide a descriptive name to help you identify this group later.
-								</p>
+								{error ? (
+									<p className="text-error-base text-paragraph-xs">
+										{error}
+									</p>
+								) : (
+									<p className="text-paragraph-xs text-text-sub-600">
+										Provide a descriptive name to help you identify this group later.
+									</p>
+								)}
 							</div>
 
 							<div className="mt-6 flex items-center justify-end gap-3">
@@ -129,7 +144,7 @@ export const CreateGroupModal = ({
 									onClick={handleClose}
 									className={cn(
 										"transition-opacity duration-200",
-										isSubmitting && "pointer-events-none opacity-50",
+										status !== "idle" && "pointer-events-none opacity-50",
 									)}
 								>
 									Cancel
@@ -137,17 +152,17 @@ export const CreateGroupModal = ({
 
 								<FancyButton.Root
 									type="submit"
-									variant="blue"
+									variant={status === "success" ? "success" : "blue"}
 									size="small"
-									disabled={isSubmitting || !name.trim()}
+									disabled={status !== "idle" || !name.trim()}
 									className={cn(
-										"min-w-[130px] justify-center overflow-hidden transition-all duration-200",
-										isSubmitting && "pointer-events-none opacity-90",
+										"min-w-[140px] justify-center overflow-hidden transition-all duration-200",
+										status === "creating" && "pointer-events-none opacity-90",
 									)}
 								>
 									<AnimatePresence mode="popLayout" initial={false}>
 										<motion.span
-											key={isSubmitting ? "creating" : "idle"}
+											key={status}
 											transition={{
 												type: "spring",
 												duration: 0.25,
@@ -158,10 +173,15 @@ export const CreateGroupModal = ({
 											exit={{ opacity: 0, y: 14 }}
 											className="flex items-center justify-center gap-1.5"
 										>
-											{isSubmitting ? (
+											{status === "creating" ? (
 												<>
 													<Spinner size={14} color="currentColor" />
 													<span>Creating...</span>
+												</>
+											) : status === "success" ? (
+												<>
+													<Icon name="check" className="h-4 w-4" />
+													<span>Group Created</span>
 												</>
 											) : (
 												<>

@@ -39,6 +39,9 @@ export const fancyButtonVariants = tv({
 					"hover:bg-zero-blue-hover",
 				],
 			},
+			success: {
+				root: "bg-success-base text-static-white shadow-fancy-buttons-primary",
+			},
 			basic: {
 				root: [
 					// base
@@ -73,7 +76,7 @@ export const fancyButtonVariants = tv({
 	},
 	compoundVariants: [
 		{
-			variant: ["neutral", "primary", "destructive", "blue"],
+			variant: ["neutral", "primary", "destructive", "blue", "success"],
 			class: {
 				root: [
 					// before
