@@ -1,4 +1,5 @@
 import { Icon } from "@reloop/ui/icon";
+import { motion } from "motion/react";
 import { useUIStore } from "#/store/use-ui-store";
 
 export type CreateContactStep =
@@ -83,7 +84,10 @@ export function CreateContactStepper({
 			</div>
 
 			{/* Support Section */}
-			<div className="space-y-2 border-t border-stroke-soft-200/60 pt-6 text-text-sub-600 text-xs">
+			<motion.div
+				layout
+				className="space-y-2 border-t border-stroke-soft-200/60 pt-6 text-text-sub-600 text-xs"
+			>
 				<p className="font-medium text-text-strong-950">Need assistance?</p>
 				<p className="leading-relaxed text-text-soft-400">
 					Reach out to our support team for help with contact imports, custom
@@ -97,7 +101,7 @@ export function CreateContactStepper({
 					Contact support
 					<Icon name="arrow-right" className="h-3 w-3" />
 				</button>
-			</div>
+			</motion.div>
 		</div>
 	);
 }
