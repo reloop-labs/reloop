@@ -1,5 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import * as FileFormatIcon from "@reloop/ui/file-format-icon";
 import * as FileUpload from "@reloop/ui/file-upload";
 import Spinner from "@reloop/ui/spinner";
@@ -80,7 +81,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 					<FileUpload.Root
 						{...getRootProps()}
 						className={cn(
-							"flex cursor-pointer flex-col items-center justify-center gap-3.5 rounded-2xl border border-stroke-soft-300 border-dashed bg-bg-weak-50/30 p-8 text-center transition-all hover:border-stroke-soft-400 hover:bg-bg-weak-50/70",
+							"flex cursor-pointer flex-col items-center justify-center gap-3.5 rounded-2xl border border-stroke-soft-200 border-dashed bg-bg-weak-50/30 p-8 text-center transition-all hover:border-stroke-soft-400 hover:bg-bg-weak-50/70",
 							isDragActive && "border-text-strong-950 bg-bg-weak-50/80",
 							file && "border-emerald-500 bg-emerald-50/20",
 						)}
@@ -88,9 +89,13 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 						<input {...getInputProps()} />
 
 						{/* AlignUI FileFormatIcon for CSV */}
-						<div className="flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-200">
-							<FileFormatIcon.Root format="CSV" color="green" size="small" />
-						</div>
+
+						<FileFormatIcon.Root
+							format="CSV"
+							color="green"
+							size="small"
+							className="h-10 w-10"
+						/>
 
 						{file ? (
 							<div className="space-y-1">
@@ -145,21 +150,24 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 				</div>
 
 				{/* Bottom Footer / Action Bar */}
-				<div className="flex items-center justify-between px-6 py-3 dark:bg-bg-weak-50/40">
-					<button
+				<div className="flex items-center justify-between px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40">
+					<Button.Root
 						type="button"
+						variant="neutral"
+						mode="ghost"
+						size="small"
 						onClick={onBack}
 						disabled={isUploading}
-						className="cursor-pointer font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 disabled:opacity-50"
 					>
 						Back
-					</button>
+					</Button.Root>
 
-					<button
+					<FancyButton.Root
 						type="button"
+						variant="primary"
+						size="small"
 						disabled={!file || isUploading}
 						onClick={handleUpload}
-						className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-full bg-[#6366f1] px-5 py-2 font-medium text-sm text-white shadow-xs transition-all hover:bg-[#4f46e5] disabled:cursor-not-allowed disabled:opacity-40"
 					>
 						{isUploading ? (
 							<>
@@ -169,7 +177,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 						) : (
 							"Import"
 						)}
-					</button>
+					</FancyButton.Root>
 				</div>
 			</div>
 		</div>
