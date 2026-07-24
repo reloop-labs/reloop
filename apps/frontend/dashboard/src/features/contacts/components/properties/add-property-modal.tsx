@@ -1,17 +1,13 @@
-
-import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { KbdCommand } from "@reloop/ui/kbd-command";
-import { KbdEnter } from "@reloop/ui/kbd-enter";
-import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
@@ -29,15 +25,13 @@ const TYPE_OPTIONS: {
 	icon: string;
 	description: string;
 	color: string;
-	badgeColor: "blue" | "purple";
 }[] = [
 	{
 		value: "string",
 		label: "String",
-		icon: "type",
+		icon: "text",
 		description: "Free-form text",
 		color: "text-primary-base",
-		badgeColor: "blue",
 	},
 	{
 		value: "number",
@@ -45,7 +39,6 @@ const TYPE_OPTIONS: {
 		icon: "hash",
 		description: "Integer or decimal",
 		color: "text-primary-base",
-		badgeColor: "purple",
 	},
 ];
 
@@ -68,29 +61,35 @@ export const AddPropertyModal = ({
 	onOpenChange,
 }: AddPropertyModalProps) => {
 	const invalidate = useInvalidateContacts();
-	const [isCreating, setIsCreating] = useState(false);
+	const [status, setStatus] = useState<"idle" | "creating" | "success">("idle");
 	const [propertyName, setPropertyName] = useState("");
 	const [nameError, setNameError] = useState("");
 	const [propertyType, setPropertyType] = useState<PropertyType>("string");
 	const [defaultValue, setDefaultValue] = useState("");
-	const [showPreview, setShowPreview] = useState(false);
 
 	const nameInputRef = useRef<HTMLInputElement>(null);
 
-	const selectedType = TYPE_OPTIONS.find((t) => t.value === propertyType)!;
-	const previewName = propertyName || "property_name";
-	const previewDefault = defaultValue || null;
-
-	const handleOpenChange = (isOpen: boolean) => {
-		if (!isOpen) {
-			setPropertyName("");
-			setNameError("");
-			setPropertyType("string");
-			setDefaultValue("");
-			setShowPreview(false);
-		}
-		onOpenChange(isOpen);
+	const handleClose = () => {
+		setPropertyName("");
+		setNameError("");
+		setPropertyType("string");
+		setDefaultValue("");
+		setStatus("idle");
+		onOpenChange(false);
 	};
+
+	useEffect(() => {
+		if (!open) {
+			const timer = setTimeout(() => {
+				setPropertyName("");
+				setNameError("");
+				setPropertyType("string");
+				setDefaultValue("");
+				setStatus("idle");
+			}, 300);
+			return () => clearTimeout(timer);
+		}
+	}, [open]);
 
 	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
@@ -112,20 +111,21 @@ export const AddPropertyModal = ({
 			: "";
 
 	const canSubmit =
-		!!propertyName && !nameError && !defaultValueError && !isCreating;
+		!!propertyName && !nameError && !defaultValueError && status !== "creating";
 
 	useHotkeys(
-		"mod+enter",
+		"enter",
 		(e) => {
 			e.preventDefault();
-			if (open && canSubmit) {
-				handleSubmit(new Event("submit") as unknown as React.FormEvent);
+			if (open && canSubmit && status === "idle") {
+				void handleSubmit();
 			}
 		},
-		{ enableOnFormTags: true, enabled: open },
+		{ enableOnFormTags: ["INPUT"], enabled: open },
 		[
 			open,
 			canSubmit,
+			status,
 			propertyName,
 			propertyType,
 			defaultValue,
@@ -133,11 +133,11 @@ export const AddPropertyModal = ({
 		],
 	);
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!canSubmit) return;
+	const handleSubmit = async (e?: React.FormEvent) => {
+		e?.preventDefault();
+		if (!canSubmit || status !== "idle") return;
 
-		setIsCreating(true);
+		setStatus("creating");
 		try {
 			const response = await fetch("/api/contacts/v1/properties/create", {
 				method: "POST",
@@ -154,73 +154,47 @@ export const AddPropertyModal = ({
 				throw new Error(data.message || "Failed to create property");
 			}
 
-			toast.success("Property created successfully");
-			handleOpenChange(false);
-			await invalidate();
+			setStatus("success");
+			setTimeout(() => {
+				void invalidate();
+				handleClose();
+			}, 750);
 		} catch (error) {
 			console.error("Failed to create property:", error);
 			toast.error(
 				error instanceof Error ? error.message : "Failed to create property",
 			);
-		} finally {
-			setIsCreating(false);
+			setStatus("idle");
 		}
 	};
 
 	return (
-		<Modal.Root open={open} onOpenChange={handleOpenChange}>
+		<Modal.Root open={open} onOpenChange={(o) => !o && handleClose()}>
 			<Modal.Content
-				className={cn(
-					"rounded-2xl border border-stroke-soft-100/50 p-0.5 transition-all duration-300",
-					showPreview ? "sm:max-w-[760px]" : "sm:max-w-[480px]",
-				)}
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
 				showClose={true}
 			>
-				<div className="rounded-2xl border border-stroke-soft-100/50">
-					<Modal.Header className="before:border-stroke-soft-200/50">
-						<div className="flex items-center justify-center">
-							<Icon name="tag" className="h-4 w-4" />
+				<motion.div
+					layout
+					transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+				>
+					<div className="p-6">
+						<div className="relative pr-6">
+							<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+								Add property
+							</Modal.Title>
 						</div>
-						<div className="flex-1">
-							<Modal.Title className="font-medium">Add Property</Modal.Title>
-						</div>
-						<button
-							type="button"
-							onClick={() => setShowPreview((v) => !v)}
-							className={cn(
-								"inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 font-medium text-[11px] transition-colors",
-								showPreview
-									? "border-primary-base/30 bg-primary-light/10 text-primary-base"
-									: "border-stroke-soft-100 bg-bg-soft-200/30 text-text-sub-600 hover:border-stroke-soft-200 hover:text-text-strong-950 dark:border-stroke-soft-100/40",
-							)}
-						>
-							<Icon
-								name={showPreview ? "eye-slash-outline" : "eye-outline"}
-								className="h-3 w-3"
-							/>
-							{showPreview ? "Hide preview" : "Preview"}
-						</button>
-					</Modal.Header>
 
-					<form onSubmit={handleSubmit}>
-						<Modal.Body
-							className={cn(
-								"gap-6 sm:gap-8",
-								showPreview
-									? "grid grid-cols-1 sm:grid-cols-2"
-									: "flex flex-col",
-							)}
-						>
-							{/* ── Left: Form fields ───────────────────────────── */}
-							<div className="flex flex-col gap-5">
+						<form onSubmit={handleSubmit} className="mt-5">
+							<div className="space-y-4">
 								{/* Property Name */}
-								<div className="flex flex-col gap-1.5">
+								<div className="space-y-2">
 									<Label.Root htmlFor="propertyName">
 										Name
 										<Label.Asterisk />
 									</Label.Root>
 									<Input.Root
-										size="small"
+										size="medium"
 										hasError={!!nameError}
 										className="rounded-xl"
 									>
@@ -229,7 +203,7 @@ export const AddPropertyModal = ({
 												as={Icon}
 												name="tag"
 												size="small"
-												className="h-3.5 w-3.5"
+												className="h-4 w-4"
 											/>
 											<Input.Input
 												ref={nameInputRef}
@@ -238,23 +212,26 @@ export const AddPropertyModal = ({
 												value={propertyName}
 												onChange={handleNameChange}
 												onBlur={handleSlugify}
-												disabled={isCreating}
+												disabled={status !== "idle"}
 												autoComplete="off"
 												spellCheck={false}
+												autoFocus
 											/>
 										</Input.Wrapper>
 									</Input.Root>
 									{nameError ? (
-										<p className="text-error-base text-xs">{nameError}</p>
+										<p className="text-error-base text-paragraph-xs">
+											{nameError}
+										</p>
 									) : (
-										<p className="text-text-sub-600 text-xs">
+										<p className="text-paragraph-xs text-text-sub-600">
 											Letters, numbers &amp; underscores — spaces auto-convert
 										</p>
 									)}
 								</div>
 
-								{/* Type — card picker */}
-								<div className="flex flex-col gap-2">
+								{/* Property Type */}
+								<div className="space-y-2">
 									<Label.Root>
 										Type
 										<Label.Asterisk />
@@ -268,7 +245,7 @@ export const AddPropertyModal = ({
 													key={opt.value}
 													type="button"
 													onClick={() => setPropertyType(opt.value)}
-													disabled={isCreating}
+													disabled={status !== "idle"}
 													className={cn(
 														"flex flex-col items-start gap-2 rounded-xl border-2 p-3 text-left transition-all duration-150",
 														isSelected
@@ -331,10 +308,12 @@ export const AddPropertyModal = ({
 								</div>
 
 								{/* Default Value */}
-								<div className="flex flex-col gap-1.5">
-									<Label.Root htmlFor="defaultValue">Default Value</Label.Root>
+								<div className="space-y-2">
+									<Label.Root htmlFor="defaultValue">
+										Default Value
+									</Label.Root>
 									<Input.Root
-										size="small"
+										size="medium"
 										className="rounded-xl"
 										hasError={!!defaultValueError}
 									>
@@ -357,7 +336,7 @@ export const AddPropertyModal = ({
 														setDefaultValue(val);
 													}
 												}}
-												disabled={isCreating}
+												disabled={status !== "idle"}
 												inputMode={
 													propertyType === "number" ? "numeric" : "text"
 												}
@@ -365,150 +344,88 @@ export const AddPropertyModal = ({
 										</Input.Wrapper>
 									</Input.Root>
 									{defaultValueError ? (
-										<p className="text-error-base text-xs">
+										<p className="text-error-base text-paragraph-xs">
 											{defaultValueError}
 										</p>
 									) : (
-										<p className="text-text-sub-600 text-xs">
+										<p className="text-paragraph-xs text-text-sub-600">
 											Used when a contact doesn&apos;t have this property set
 										</p>
 									)}
 								</div>
 							</div>
 
-							{showPreview && (
-								<div className="flex flex-col gap-3">
-									<p className="font-medium text-[10px] text-text-sub-600 uppercase tracking-widest">
-										Live preview
-									</p>
+							{/* Actions / Footer */}
+							<div className="mt-6 flex items-center justify-end gap-3">
+								<Button.Root
+									type="button"
+									variant="neutral"
+									mode="ghost"
+									size="small"
+									onClick={handleClose}
+									className={cn(
+										"transition-opacity duration-200",
+										status !== "idle" && "pointer-events-none opacity-50",
+									)}
+								>
+									Cancel
+								</Button.Root>
 
-									{/* Property card */}
-									<div className="rounded-xl border border-stroke-soft-100 bg-bg-soft-200/20 p-4 dark:border-stroke-soft-100/30 dark:bg-bg-soft-200/10">
-										<div className="mb-3 flex items-center gap-2.5">
-											<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-neutral-600 to-neutral-500 shadow-sm">
-												<Icon name="tag" className="h-3.5 w-3.5 text-white" />
-											</div>
-											<div>
-												<p className="font-semibold text-text-strong-950 text-xs">
-													{previewName}
-												</p>
-												<Badge.Root
-													size="small"
-													variant="lighter"
-													color={selectedType.badgeColor}
-													className="mt-0.5 h-5 rounded-md px-1.5 font-medium text-xs capitalize"
-												>
-													{selectedType.label}
-												</Badge.Root>
-											</div>
-										</div>
-
-										<div className="divide-y divide-stroke-soft-100 rounded-lg border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/30 dark:border-stroke-soft-100/30 dark:bg-bg-weak-50/30">
-											<div className="flex items-center justify-between px-3 py-2">
-												<span className="font-medium text-[11px] text-text-sub-600">
-													Name
-												</span>
-												<span className="font-mono font-semibold text-[11px] text-text-strong-950">
-													{previewName}
-												</span>
-											</div>
-											<div className="flex items-center justify-between px-3 py-2">
-												<span className="font-medium text-[11px] text-text-sub-600">
-													Type
-												</span>
-												<Badge.Root
-													size="small"
-													variant="lighter"
-													color={selectedType.badgeColor}
-													className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
-												>
-													{selectedType.label}
-												</Badge.Root>
-											</div>
-											<div className="flex items-center justify-between px-3 py-2">
-												<span className="font-medium text-[11px] text-text-sub-600">
-													Default
-												</span>
-												<span className="font-medium font-mono text-[11px] text-text-strong-950">
-													{previewDefault ?? (
-														<span className="text-text-soft-400">—</span>
-													)}
-												</span>
-											</div>
-										</div>
-									</div>
-
-									{/* JSON snippet */}
-									<div className="rounded-xl border border-stroke-soft-100 bg-bg-soft-200/20 p-4 dark:border-stroke-soft-100/30 dark:bg-bg-soft-200/10">
-										<p className="mb-2 font-medium text-[10px] text-text-sub-600">
-											Contact record snippet
-										</p>
-										<pre className="overflow-x-auto rounded-lg bg-bg-weak-50 p-2.5 font-mono text-[10px] text-text-strong-950 leading-relaxed dark:bg-bg-weak-50/50">
-											<span className="text-text-sub-600">{"{"}</span>
-											{"\n"}
-											{"  "}
-											<span className="text-primary-base">
-												&quot;{previewName}&quot;
-											</span>
-											<span className="text-text-sub-600">: </span>
-											{previewDefault ? (
-												propertyType === "number" ? (
-													<span className="text-violet-500">
-														{previewDefault}
-													</span>
-												) : (
-													<span className="text-success-base">
-														&quot;{previewDefault}&quot;
-													</span>
-												)
+								<FancyButton.Root
+									type="submit"
+									variant={status === "success" ? "success" : "blue"}
+									size="small"
+									disabled={status === "creating" || (status === "idle" && !canSubmit)}
+									className={cn(
+										"w-[156px] min-w-[156px] justify-center overflow-hidden transition-all duration-200",
+										status === "creating" && "opacity-90",
+									)}
+								>
+									<AnimatePresence mode="popLayout" initial={false}>
+										<motion.span
+											key={status}
+											transition={{
+												type: "spring",
+												duration: 0.25,
+												bounce: 0,
+											}}
+											initial={{ opacity: 0, y: -14 }}
+											animate={{ opacity: 1, y: 0 }}
+											exit={{ opacity: 0, y: 14 }}
+											className="flex items-center justify-center gap-1.5"
+										>
+											{status === "creating" ? (
+												<>
+													<Spinner size={14} color="currentColor" />
+													<span>Creating...</span>
+												</>
+											) : status === "success" ? (
+												<>
+													<Icon name="check-circle" className="h-4 w-4" />
+													<span>Property Created</span>
+												</>
 											) : (
-												<span className="text-text-soft-400">null</span>
+												<>
+													Add property
+													<span className="inline-flex items-center gap-0.5 opacity-80">
+														<Icon
+															name="command"
+															className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+														/>
+														<Icon
+															name="enter"
+															className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+														/>
+													</span>
+												</>
 											)}
-											{"\n"}
-											<span className="text-text-sub-600">{"}"}</span>
-										</pre>
-									</div>
-								</div>
-							)}
-						</Modal.Body>
-
-						{/* Footer */}
-						<Modal.Footer className="mt-2 flex items-center justify-end gap-3 border-stroke-soft-100/50">
-							<Button.Root
-								type="button"
-								variant="neutral"
-								mode="stroke"
-								size="xsmall"
-								onClick={() => handleOpenChange(false)}
-								disabled={isCreating}
-							>
-								Cancel
-								<KbdEsc />
-							</Button.Root>
-							<Button.Root
-								type="submit"
-								variant="neutral"
-								size="xsmall"
-								disabled={!canSubmit}
-							>
-								{isCreating ? (
-									<>
-										<Spinner size={14} color="currentColor" />
-										Creating…
-									</>
-								) : (
-									<>
-										Add Property
-										<span className="inline-flex items-center gap-0.5">
-											<KbdCommand />
-											<KbdEnter />
-										</span>
-									</>
-								)}
-							</Button.Root>
-						</Modal.Footer>
-					</form>
-				</div>
+										</motion.span>
+									</AnimatePresence>
+								</FancyButton.Root>
+							</div>
+						</form>
+					</div>
+				</motion.div>
 			</Modal.Content>
 		</Modal.Root>
 	);

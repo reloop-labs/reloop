@@ -1,12 +1,12 @@
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { KbdCommand } from "@reloop/ui/kbd-command";
-import { KbdEnter } from "@reloop/ui/kbd-enter";
-import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
@@ -46,12 +46,13 @@ export function EditPropertyForm({
 	const [fallbackValue, setFallbackValue] = useState(
 		property.defaultValue || "",
 	);
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
 	const invalidate = useInvalidateContacts();
 	const isInline = variant === "inline";
 
 	useEffect(() => {
 		setFallbackValue(property.defaultValue || "");
+		setStatus("idle");
 	}, [property]);
 
 	const fallbackValueError =
@@ -61,32 +62,35 @@ export function EditPropertyForm({
 			? "Must be a valid number"
 			: "";
 
+	const canSubmit = !fallbackValueError && status !== "submitting";
+
 	useHotkeys(
-		"mod+enter",
+		"enter",
 		(e) => {
 			e.preventDefault();
-			if (!isSubmitting && !fallbackValueError) {
+			if (canSubmit && status === "idle") {
 				void handleSubmit();
 			}
 		},
 		{ enableOnFormTags: ["INPUT"] },
-		[isSubmitting, fallbackValue, fallbackValueError],
+		[canSubmit, status, fallbackValue, fallbackValueError],
 	);
 
 	useHotkeys(
 		"escape",
 		(e) => {
 			e.preventDefault();
-			if (!isSubmitting) onCancel();
+			if (status === "idle") onCancel();
 		},
 		{ enableOnFormTags: true },
 	);
 
-	const handleSubmit = async () => {
-		if (fallbackValueError) return;
+	const handleSubmit = async (e?: React.FormEvent) => {
+		e?.preventDefault();
+		if (!canSubmit || status !== "idle") return;
 
 		try {
-			setIsSubmitting(true);
+			setStatus("submitting");
 			const response = await fetch(
 				`/api/contacts/v1/properties/${property.id}`,
 				{
@@ -104,14 +108,15 @@ export function EditPropertyForm({
 				throw new Error("Failed to update property");
 			}
 
-			toast.success("Property updated successfully");
-			await invalidate();
-			onSuccess?.();
+			setStatus("success");
+			setTimeout(() => {
+				void invalidate();
+				onSuccess?.();
+			}, 750);
 		} catch (error) {
 			console.error("Failed to update property:", error);
 			toast.error("Failed to update property");
-		} finally {
-			setIsSubmitting(false);
+			setStatus("idle");
 		}
 	};
 
@@ -127,110 +132,163 @@ export function EditPropertyForm({
 
 	return (
 		<form
-			onSubmit={(e) => {
-				e.preventDefault();
-				if (!isSubmitting) {
-					void handleSubmit();
-				}
-			}}
+			onSubmit={handleSubmit}
 			onClick={(e) => e.stopPropagation()}
-			className={isInline ? "flex flex-col gap-4" : "flex flex-col"}
+			className="space-y-4"
 		>
-			{!isInline && (
-				<div className="mb-6 rounded-xl border border-stroke-soft-100 bg-bg-soft-200/20 p-4 dark:border-stroke-soft-100/30 dark:bg-bg-soft-200/10">
-					<div className="flex items-center gap-3">
-						<div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-neutral-600 to-neutral-500 shadow-sm">
-							<Icon name="tag" className="h-4 w-4 text-white" />
-						</div>
-						<div className="flex flex-1 items-center justify-between gap-2">
-							<p className="font-semibold text-sm text-text-strong-950">
-								{property.propertyName}
-							</p>
-							<div className="flex items-center">
-								<Badge.Root
-									size="small"
-									variant="lighter"
-									color={getBadgeColor(property.propertyType)}
-									className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
-								>
-									{property.propertyType}
-								</Badge.Root>
-							</div>
-						</div>
-					</div>
-				</div>
-			)}
-
-			<div className={isInline ? "max-w-md space-y-1.5" : "mb-4 space-y-1.5"}>
-				<Label.Root htmlFor={`fallback-value-${property.id}`}>
-					Default Value
-				</Label.Root>
-				<Input.Root
-					size="small"
-					className="rounded-xl"
-					hasError={!!fallbackValueError}
-				>
-					<Input.Wrapper>
-						<Input.Input
-							id={`fallback-value-${property.id}`}
-							type="text"
-							className="px-2"
-							value={fallbackValue}
-							onChange={(e) => handleFallbackChange(e.target.value)}
-							placeholder="e.g. unknown"
-							disabled={isSubmitting}
-						/>
-					</Input.Wrapper>
-				</Input.Root>
-				{fallbackValueError ? (
-					<p className="text-error-base text-xs">{fallbackValueError}</p>
-				) : (
-					<p className="text-text-sub-600 text-xs">
-						This value will be used when a contact doesn&apos;t have this
-						property set.
+			<div className="space-y-4">
+				{/* Readonly Property Name */}
+				<div className="space-y-2">
+					<Label.Root
+						htmlFor={`property-name-${property.id}`}
+						className="text-text-sub-600"
+					>
+						Name
+					</Label.Root>
+					<Input.Root
+						size="medium"
+						className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30"
+					>
+						<Input.Wrapper>
+							<Input.Icon
+								as={Icon}
+								name="tag"
+								size="small"
+								className="h-4 w-4 text-text-sub-600"
+							/>
+							<Input.Input
+								id={`property-name-${property.id}`}
+								type="text"
+								value={property.propertyName}
+								readOnly
+								className="cursor-not-allowed font-medium text-text-strong-950 opacity-100 focus:outline-none"
+							/>
+							<Icon
+								name="lock"
+								className="mr-1.5 h-3.5 w-3.5 shrink-0 text-text-sub-600"
+							/>
+						</Input.Wrapper>
+					</Input.Root>
+					<p className="text-paragraph-xs text-text-sub-600">
+						Property name cannot be edited after creation
 					</p>
-				)}
+				</div>
+
+				{/* Default Value */}
+				<div className="space-y-2">
+					<div className="flex items-center gap-2">
+						<Label.Root htmlFor={`fallback-value-${property.id}`}>
+							Default Value
+						</Label.Root>
+						<Badge.Root
+							size="small"
+							variant="lighter"
+							color={getBadgeColor(property.propertyType)}
+							className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
+						>
+							{property.propertyType}
+						</Badge.Root>
+					</div>
+					<Input.Root
+						size="medium"
+						className="rounded-xl"
+						hasError={!!fallbackValueError}
+					>
+						<Input.Wrapper>
+							<Input.Input
+								id={`fallback-value-${property.id}`}
+								type="text"
+								value={fallbackValue}
+								onChange={(e) => handleFallbackChange(e.target.value)}
+								placeholder={
+									property.propertyType?.toLowerCase() === "number"
+										? "e.g., 0"
+										: "e.g., unknown"
+								}
+								disabled={status !== "idle"}
+								autoFocus={isInline}
+							/>
+						</Input.Wrapper>
+					</Input.Root>
+					{fallbackValueError ? (
+						<p className="text-error-base text-paragraph-xs">
+							{fallbackValueError}
+						</p>
+					) : (
+						<p className="text-paragraph-xs text-text-sub-600">
+							Used when a contact doesn&apos;t have this property set
+						</p>
+					)}
+				</div>
 			</div>
 
-			<div
-				className={
-					isInline
-						? "flex items-center justify-end gap-3"
-						: "mt-4 flex items-center justify-end gap-3"
-				}
-			>
+			{/* Actions / Footer */}
+			<div className="mt-6 flex items-center justify-end gap-3">
 				<Button.Root
 					type="button"
 					variant="neutral"
-					mode="stroke"
-					size="xsmall"
+					mode="ghost"
+					size="small"
 					onClick={onCancel}
-					disabled={isSubmitting}
+					disabled={status !== "idle"}
+					className={cn(
+						"transition-opacity duration-200",
+						status !== "idle" && "pointer-events-none opacity-50",
+					)}
 				>
 					Cancel
-					<KbdEsc />
 				</Button.Root>
-				<Button.Root
+				<FancyButton.Root
 					type="submit"
-					variant="neutral"
-					size="xsmall"
-					disabled={isSubmitting || !!fallbackValueError}
-				>
-					{isSubmitting ? (
-						<>
-							<Spinner size={14} color="currentColor" />
-							Updating...
-						</>
-					) : (
-						<>
-							Update Property
-							<span className="inline-flex items-center gap-0.5">
-								<KbdCommand />
-								<KbdEnter />
-							</span>
-						</>
+					variant={status === "success" ? "success" : "blue"}
+					size="small"
+					disabled={status === "submitting" || !!fallbackValueError}
+					className={cn(
+						"w-[172px] min-w-[172px] justify-center overflow-hidden transition-all duration-200",
+						status === "submitting" && "opacity-90",
 					)}
-				</Button.Root>
+				>
+					<AnimatePresence mode="popLayout" initial={false}>
+						<motion.span
+							key={status}
+							transition={{
+								type: "spring",
+								duration: 0.25,
+								bounce: 0,
+							}}
+							initial={{ opacity: 0, y: -14 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: 14 }}
+							className="flex items-center justify-center gap-1.5"
+						>
+							{status === "submitting" ? (
+								<>
+									<Spinner size={14} color="currentColor" />
+									<span>Updating...</span>
+								</>
+							) : status === "success" ? (
+								<>
+									<Icon name="check-circle" className="h-4 w-4" />
+									<span>Property Updated</span>
+								</>
+							) : (
+								<>
+									Update property
+									<span className="inline-flex items-center gap-0.5 opacity-80">
+										<Icon
+											name="command"
+											className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+										/>
+										<Icon
+											name="enter"
+											className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+										/>
+									</span>
+								</>
+							)}
+						</motion.span>
+					</AnimatePresence>
+				</FancyButton.Root>
 			</div>
 		</form>
 	);

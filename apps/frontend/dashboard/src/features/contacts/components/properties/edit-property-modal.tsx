@@ -1,5 +1,5 @@
 import * as Modal from "@reloop/ui/modal";
-import { Icon } from "@reloop/ui/icon";
+import { motion } from "framer-motion";
 import { EditPropertyForm } from "./edit-property-form";
 
 interface Property {
@@ -31,19 +31,20 @@ export const EditPropertyModal = ({
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
 			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[480px]"
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
 				showClose={true}
 			>
-				<div className="rounded-2xl border border-stroke-soft-100/50">
-					<Modal.Header className="before:border-stroke-soft-200/50">
-						<div className="flex items-center justify-center">
-							<Icon name="edit-2" className="h-4 w-4" />
+				<motion.div
+					layout
+					transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+				>
+					<div className="p-6">
+						<div className="relative mb-5 pr-6">
+							<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+								Edit property
+							</Modal.Title>
 						</div>
-						<div className="flex-1">
-							<Modal.Title className="font-medium">Edit Property</Modal.Title>
-						</div>
-					</Modal.Header>
-					<Modal.Body>
+
 						<EditPropertyForm
 							property={property}
 							variant="modal"
@@ -53,8 +54,8 @@ export const EditPropertyModal = ({
 								onEditSuccess?.();
 							}}
 						/>
-					</Modal.Body>
-				</div>
+					</div>
+				</motion.div>
 			</Modal.Content>
 		</Modal.Root>
 	);

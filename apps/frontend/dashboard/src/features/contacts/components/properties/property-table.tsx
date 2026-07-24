@@ -13,6 +13,7 @@ import {
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { AnimatePresence, motion } from "framer-motion";
+import { useNavigate } from "@tanstack/react-router";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { EditPropertyRowPanel } from "./edit-property-row-panel";
@@ -83,8 +84,10 @@ const PropertyActionsPopover = ({
 	onDelete,
 	onOpenChange,
 }: PropertyActionsPopoverProps) => {
+	const navigate = useNavigate();
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
+	const [copiedKey, setCopiedKey] = useState<"name" | "id" | null>(null);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
 	const menuItems = [
@@ -92,6 +95,24 @@ const PropertyActionsPopover = ({
 			id: "edit",
 			label: "Edit property",
 			icon: "edit" as const,
+			isDanger: false,
+		},
+		{
+			id: "copy-name",
+			label: copiedKey === "name" ? "Copied name!" : "Copy name",
+			icon: copiedKey === "name" ? ("check-circle" as const) : ("copy" as const),
+			isDanger: false,
+		},
+		{
+			id: "copy-id",
+			label: copiedKey === "id" ? "Copied ID!" : "Copy property ID",
+			icon: copiedKey === "id" ? ("check-circle" as const) : ("copy" as const),
+			isDanger: false,
+		},
+		{
+			id: "filter-contacts",
+			label: "Filter contacts",
+			icon: "filter" as const,
 			isDanger: false,
 		},
 		{
@@ -107,10 +128,41 @@ const PropertyActionsPopover = ({
 	const hoveredItem = menuItems[hoverIdx ?? -1];
 	const isDanger = hoveredItem?.isDanger ?? false;
 
-	const handleItemClick = (itemId: string) => {
+	const handleItemClick = async (itemId: string) => {
 		if (itemId === "edit") {
 			setPopoverOpen(false);
 			onEdit(property);
+		} else if (itemId === "copy-name") {
+			try {
+				await navigator.clipboard.writeText(property.propertyName);
+				setCopiedKey("name");
+				setTimeout(() => {
+					setCopiedKey(null);
+					setPopoverOpen(false);
+				}, 800);
+			} catch {
+				setPopoverOpen(false);
+			}
+		} else if (itemId === "copy-id") {
+			try {
+				await navigator.clipboard.writeText(property.id);
+				setCopiedKey("id");
+				setTimeout(() => {
+					setCopiedKey(null);
+					setPopoverOpen(false);
+				}, 800);
+			} catch {
+				setPopoverOpen(false);
+			}
+		} else if (itemId === "filter-contacts") {
+			setPopoverOpen(false);
+			void navigate({
+				to: "/contacts",
+				search: (prev: Record<string, unknown>) => ({
+					...prev,
+					search: property.propertyName,
+				}),
+			});
 		} else if (itemId === "delete") {
 			setPopoverOpen(false);
 			onDelete(property);
@@ -133,7 +185,7 @@ const PropertyActionsPopover = ({
 			<PopoverContent
 				align="end"
 				sideOffset={-10}
-				className="w-40 rounded-xl p-1.5"
+				className="w-48 rounded-xl p-1.5"
 			>
 				<div className="relative">
 					{menuItems.map((item, idx) => (
@@ -145,23 +197,57 @@ const PropertyActionsPopover = ({
 							type="button"
 							onPointerEnter={() => setHoverIdx(idx)}
 							onPointerLeave={() => setHoverIdx(undefined)}
-							onClick={() => handleItemClick(item.id)}
+							onClick={() => void handleItemClick(item.id)}
 							className={cn(
-								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
+								"relative flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-medium text-xs transition-colors min-h-[28px]",
 								item.isDanger ? "text-error-base" : "text-text-strong-950",
 								!currentRect &&
 									hoverIdx === idx &&
 									(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
 							)}
 						>
-							<Icon
-								name={item.icon}
-								className={cn(
-									"h-3.5 w-3.5",
-									item.isDanger ? "" : "text-text-sub-600",
-								)}
-							/>
-							<span>{item.label}</span>
+							{item.id === "copy-name" || item.id === "copy-id" ? (
+								<AnimatePresence mode="popLayout" initial={false}>
+									<motion.div
+										key={
+											copiedKey === (item.id === "copy-name" ? "name" : "id")
+												? "copied"
+												: "idle"
+										}
+										transition={{
+											type: "spring",
+											duration: 0.25,
+											bounce: 0,
+										}}
+										initial={{ opacity: 0, y: -14 }}
+										animate={{ opacity: 1, y: 0 }}
+										exit={{ opacity: 0, y: 14 }}
+										className="flex items-center gap-2"
+									>
+										<Icon
+											name={item.icon}
+											className={cn(
+												"h-3.5 w-3.5 shrink-0",
+												copiedKey === (item.id === "copy-name" ? "name" : "id")
+													? "text-success-base"
+													: "text-text-sub-600",
+											)}
+										/>
+										<span>{item.label}</span>
+									</motion.div>
+								</AnimatePresence>
+							) : (
+								<>
+									<Icon
+										name={item.icon}
+										className={cn(
+											"h-3.5 w-3.5 shrink-0",
+											item.isDanger ? "" : "text-text-sub-600",
+										)}
+									/>
+									<span>{item.label}</span>
+								</>
+							)}
 						</button>
 					))}
 					<AnimatedHoverBackground
@@ -265,9 +351,13 @@ export const PropertyTable = ({
 									{/* Name Column */}
 									<div className="flex items-center gap-2">
 										<Icon name="tag" className="h-4 w-4 shrink-0 text-text-sub-600" />
-										<span className="truncate font-medium text-label-sm text-text-strong-950">
+										<button
+											type="button"
+											onClick={() => handleEdit(property)}
+											className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+										>
 											{property.propertyName}
-										</span>
+										</button>
 										{isEditing && (
 											<span className="rounded-md bg-bg-white-0 px-1.5 py-0.5 font-medium text-[11px] text-text-sub-600 ring-1 ring-stroke-soft-100">
 												Editing
