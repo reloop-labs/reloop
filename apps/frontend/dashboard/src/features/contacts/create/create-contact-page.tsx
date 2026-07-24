@@ -76,7 +76,11 @@ export function CreateContactPage() {
 							</div>
 
 							{/* Center Card Content */}
-							<div className="relative z-20 w-full p-7">
+							<div
+								className={`relative z-20 w-full p-7 ${
+									isMethodSelection ? "overflow-hidden" : ""
+								}`}
+							>
 								<motion.div
 									initial={false}
 									animate={{
@@ -115,7 +119,11 @@ export function CreateContactPage() {
 												duration: 0.45,
 												ease: [0.16, 1, 0.3, 1],
 											}}
-											className="relative z-20 w-full"
+											className={`w-full ${
+												isMethodSelection
+													? "pointer-events-none absolute top-7 right-7 left-7 z-10"
+													: "relative z-20"
+											}`}
 										>
 											{currentStep === "single-contact" && (
 												<SingleContactForm
