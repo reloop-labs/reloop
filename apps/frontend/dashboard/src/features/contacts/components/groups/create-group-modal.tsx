@@ -151,10 +151,11 @@ export const CreateGroupModal = ({
 									type="submit"
 									variant={status === "success" ? "success" : "blue"}
 									size="small"
-									disabled={status !== "idle" || !name.trim()}
+									disabled={status === "creating" || (status === "idle" && !name.trim())}
 									className={cn(
 										"min-w-[140px] justify-center overflow-hidden transition-all duration-200",
-										status === "creating" && "pointer-events-none opacity-90",
+										status !== "idle" && "pointer-events-none",
+										status === "creating" && "opacity-90",
 									)}
 								>
 									<AnimatePresence mode="popLayout" initial={false}>
@@ -177,7 +178,7 @@ export const CreateGroupModal = ({
 												</>
 											) : status === "success" ? (
 												<>
-													<Icon name="check" className="h-4 w-4" />
+													<Icon name="check-circle" className="h-4 w-4" />
 													<span>Group Created</span>
 												</>
 											) : (
