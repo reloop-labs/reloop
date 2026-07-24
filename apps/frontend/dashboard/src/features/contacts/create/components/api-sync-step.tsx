@@ -1,4 +1,5 @@
 import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
@@ -49,14 +50,18 @@ await reloop.contacts.create({
 
 	return (
 		<div className="w-full space-y-6 font-sans">
-			<div className="rounded-3xl border border-stroke-soft-200 bg-bg-white-0 overflow-hidden">
-				<div className="p-6 sm:p-7 space-y-6">
+			{/* Main Card Container */}
+			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50">
+				{/* Top Padded Content Area */}
+				<div className="m-0.5 space-y-6 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-4 pb-6">
+					{/* Header */}
 					<div>
-						<h2 className="text-base font-semibold text-text-strong-950 tracking-tight">
+						<h2 className="font-semibold text-base text-text-strong-950 tracking-tight">
 							Sync Contacts via REST API
 						</h2>
-						<p className="text-xs text-text-sub-600 mt-1 leading-relaxed">
-							Stream new signups and user updates directly from your backend application.
+						<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
+							Stream new signups and user updates directly from your backend
+							application.
 						</p>
 					</div>
 
@@ -66,7 +71,7 @@ await reloop.contacts.create({
 								<button
 									type="button"
 									onClick={() => setSelectedTab("curl")}
-									className={`px-3 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+									className={`cursor-pointer rounded-md px-3 py-1 font-medium text-xs transition-colors ${
 										selectedTab === "curl"
 											? "bg-bg-white-0 text-text-strong-950 shadow-xs"
 											: "text-text-sub-600 hover:text-text-strong-950"
@@ -77,7 +82,7 @@ await reloop.contacts.create({
 								<button
 									type="button"
 									onClick={() => setSelectedTab("node")}
-									className={`px-3 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+									className={`cursor-pointer rounded-md px-3 py-1 font-medium text-xs transition-colors ${
 										selectedTab === "node"
 											? "bg-bg-white-0 text-text-strong-950 shadow-xs"
 											: "text-text-sub-600 hover:text-text-strong-950"
@@ -90,57 +95,68 @@ await reloop.contacts.create({
 							<button
 								type="button"
 								onClick={handleCopy}
-								className="inline-flex items-center gap-1.5 text-xs text-text-sub-600 hover:text-text-strong-950 font-medium transition-colors cursor-pointer"
+								className="inline-flex cursor-pointer items-center gap-1.5 font-medium text-text-sub-600 text-xs transition-colors hover:text-text-strong-950"
 							>
-								<Icon name={copied ? "check-circle" : "copy"} className="h-3.5 w-3.5" />
+								<Icon
+									name={copied ? "check-circle" : "copy"}
+									className="h-3.5 w-3.5"
+								/>
 								{copied ? "Copied" : "Copy Code"}
 							</button>
 						</div>
 
-						<div className="relative rounded-xl border border-neutral-800 bg-neutral-950 p-4 font-mono text-xs text-neutral-100 overflow-x-auto">
+						<div className="relative overflow-x-auto rounded-xl border border-neutral-800 bg-neutral-950 p-4 font-mono text-neutral-100 text-xs">
 							<pre className="whitespace-pre">{currentSnippet}</pre>
 						</div>
 
-						<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3.5 text-xs text-text-sub-600 space-y-1">
-							<p className="font-medium text-text-strong-950">API Keys Required</p>
+						<div className="space-y-1 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3.5 text-text-sub-600 text-xs">
+							<p className="font-medium text-text-strong-950">
+								API Keys Required
+							</p>
 							<p className="leading-relaxed">
-								Be sure to pass a valid secret API key in the authorization header. You can generate or view your workspace API keys in API Keys settings.
+								Be sure to pass a valid secret API key in the authorization
+								header. You can generate or view your workspace API keys in API
+								Keys settings.
 							</p>
 						</div>
 					</div>
 				</div>
 
 				{/* Bottom Footer / Action Bar */}
-				<div className="border-t border-stroke-soft-200 bg-[#f9fafb] px-6 py-4 flex items-center justify-between dark:bg-bg-weak-50/40">
-					<button
+				<div className="flex items-center justify-between px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40">
+					<Button.Root
 						type="button"
+						variant="neutral"
+						mode="ghost"
+						size="small"
 						onClick={onBack}
-						className="text-sm font-medium text-text-sub-600 hover:text-text-strong-950 transition-colors cursor-pointer"
 					>
 						Back
-					</button>
+					</Button.Root>
 
-					<div className="flex items-center gap-4">
+					<div className="flex items-center gap-3">
 						<a
 							href="https://reloop.sh/docs/api-reference/contacts"
 							target="_blank"
 							rel="noreferrer"
-							className="inline-flex items-center gap-1 text-xs font-medium text-text-strong-950 hover:underline"
+							className="inline-flex items-center gap-1 font-medium text-text-strong-950 text-xs hover:underline"
 						>
 							API Documentation
 							<Icon name="chevron-right" className="h-3 w-3" />
 						</a>
 
-						<button
+						<FancyButton.Root
 							type="button"
+							variant="primary"
+							size="small"
 							onClick={() => void navigate({ to: "/contacts" })}
-							className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#6366f1] hover:bg-[#4f46e5] text-white font-medium px-4 py-2 text-sm shadow-xs transition-all cursor-pointer"
 						>
 							Done
-						</button>
+						</FancyButton.Root>
 					</div>
 				</div>
 			</div>
 		</div>
 	);
 }
+

@@ -1,4 +1,5 @@
 import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
@@ -148,14 +149,17 @@ export function SingleContactForm({ onBack }: SingleContactFormProps) {
 
 	return (
 		<div className="w-full space-y-6 font-sans">
-			<div className="overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0">
+			{/* Main Card Container */}
+			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50">
 				<form onSubmit={handleSubmit}>
-					<div className="space-y-6 p-6 sm:p-7">
+					{/* Top Padded Content Area */}
+					<div className="m-0.5 space-y-6 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-4 pb-6">
+						{/* Header */}
 						<div>
 							<h2 className="font-semibold text-base text-text-strong-950 tracking-tight">
 								Add Contact Details
 							</h2>
-							<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
+							<p className="text-text-sub-600 text-xs leading-relaxed">
 								Enter one or more email addresses to register new contacts.
 							</p>
 						</div>
@@ -216,6 +220,10 @@ export function SingleContactForm({ onBack }: SingleContactFormProps) {
 										disabled={isCreating}
 									/>
 								</div>
+								<p className="text-text-sub-600 text-xs">
+									Press Enter, comma, or space to separate emails. You can also
+									paste a list of addresses.
+								</p>
 								{emailChips.length > 0 && (
 									<p className="text-text-soft-400 text-xs">
 										{validEmailCount} valid email
@@ -232,9 +240,6 @@ export function SingleContactForm({ onBack }: SingleContactFormProps) {
 
 							{/* Group Assignment */}
 							<div className="pt-2">
-								<Label.Root className="mb-1.5 block font-medium text-text-strong-950 text-xs">
-									Assign to Groups (Optional)
-								</Label.Root>
 								<GroupSelect
 									selectedGroupIds={selectedGroupIds}
 									onChange={setSelectedGroupIds}
@@ -246,35 +251,35 @@ export function SingleContactForm({ onBack }: SingleContactFormProps) {
 					</div>
 
 					{/* Bottom Footer / Action Bar */}
-					<div className="flex items-center justify-between border-stroke-soft-200 border-t bg-[#f9fafb] px-6 py-4 dark:bg-bg-weak-50/40">
-						<button
+					<div className="flex items-center justify-between px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40">
+						<Button.Root
 							type="button"
+							variant="neutral"
+							mode="ghost"
+							size="small"
 							onClick={onBack}
 							disabled={isCreating}
-							className="cursor-pointer font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 disabled:opacity-50"
 						>
 							Back
-						</button>
+						</Button.Root>
 
-						<button
+						<FancyButton.Root
 							type="submit"
+							variant="primary"
+							size="small"
 							disabled={
 								isCreating || (validEmailCount === 0 && !emailInput.trim())
 							}
-							className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#6366f1] px-4 py-2 font-medium text-sm text-white shadow-xs transition-all hover:bg-[#4f46e5] disabled:cursor-not-allowed disabled:opacity-40"
 						>
 							{isCreating ? (
 								<>
 									<Spinner size={14} color="currentColor" />
-									Saving...
+									Creating...
 								</>
 							) : (
-								<>
-									Create {validEmailCount > 0 ? validEmailCount : ""} Contact
-									{validEmailCount !== 1 ? "s" : ""}
-								</>
+								"Create Contacts"
 							)}
-						</button>
+						</FancyButton.Root>
 					</div>
 				</form>
 			</div>

@@ -1,3 +1,5 @@
+import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useNavigate } from "@tanstack/react-router";
@@ -33,21 +35,26 @@ export function AiImportStep({ onBack }: AiImportStepProps) {
 
 	return (
 		<div className="w-full space-y-6 font-sans">
-			<div className="rounded-3xl border border-stroke-soft-200 bg-bg-white-0 overflow-hidden">
+			{/* Main Card Container */}
+			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50">
 				<form onSubmit={handleAiParse}>
-					<div className="p-6 sm:p-7 space-y-6">
+					{/* Top Padded Content Area */}
+					<div className="m-0.5 space-y-6 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-4 pb-6">
+						{/* Header */}
 						<div>
 							<div className="flex items-center gap-2">
-								<h2 className="text-base font-semibold text-text-strong-950 tracking-tight">
+								<h2 className="font-semibold text-base text-text-strong-950 tracking-tight">
 									Import Contacts with AI
 								</h2>
-								<span className="inline-flex items-center gap-1 rounded-md bg-purple-50 px-2 py-0.5 text-[11px] font-medium text-purple-700 border border-purple-200">
+								<span className="inline-flex items-center gap-1 rounded-md border border-purple-200 bg-purple-50 px-2 py-0.5 font-medium text-[11px] text-purple-700">
 									<Icon name="sparkling" className="h-3 w-3" />
 									AI Powered
 								</span>
 							</div>
-							<p className="text-xs text-text-sub-600 mt-1 leading-relaxed">
-								Paste raw text, email threads, or unstructured notes. Reloop AI will automatically extract and structure contact emails and names.
+							<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
+								Paste raw text, email threads, or unstructured notes. Reloop AI
+								will automatically extract and structure contact emails and
+								names.
 							</p>
 						</div>
 
@@ -55,7 +62,7 @@ export function AiImportStep({ onBack }: AiImportStepProps) {
 							<div className="space-y-1.5">
 								<label
 									htmlFor="rawText"
-									className="text-xs font-medium text-text-strong-950 block"
+									className="block font-medium text-text-strong-950 text-xs"
 								>
 									Paste Unstructured Text
 								</label>
@@ -65,17 +72,23 @@ export function AiImportStep({ onBack }: AiImportStepProps) {
 									value={rawText}
 									onChange={(e) => setRawText(e.target.value)}
 									placeholder="e.g. John Doe john@example.com (CEO at Acme Corp), Sarah Smith <sarah@acme.com>..."
-									className="w-full rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3 text-sm text-text-strong-950 placeholder:text-text-soft-400 focus:border-stroke-strong-950 focus:outline-none focus:ring-1 focus:ring-stroke-strong-950 transition-colors"
+									className="w-full rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3 text-sm text-text-strong-950 transition-colors placeholder:text-text-soft-400 focus:border-stroke-strong-950 focus:outline-none focus:ring-1 focus:ring-stroke-strong-950"
 									disabled={isProcessing}
 								/>
 							</div>
 
-							<div className="rounded-xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3.5 text-xs text-text-sub-600 flex items-start gap-2.5">
-								<Icon name="sparkling" className="h-4 w-4 text-purple-600 shrink-0 mt-0.5" />
+							<div className="flex items-start gap-2.5 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3.5 text-text-sub-600 text-xs">
+								<Icon
+									name="sparkling"
+									className="mt-0.5 h-4 w-4 shrink-0 text-purple-600"
+								/>
 								<div className="space-y-0.5">
-									<p className="font-medium text-text-strong-950">How AI Import Works</p>
+									<p className="font-medium text-text-strong-950">
+										How AI Import Works
+									</p>
 									<p className="leading-relaxed">
-										Reloop AI parses emails, first names, last names, and custom attributes from any formatted or unformatted text snippet.
+										Reloop AI parses emails, first names, last names, and custom
+										attributes from any formatted or unformatted text snippet.
 									</p>
 								</div>
 							</div>
@@ -83,20 +96,23 @@ export function AiImportStep({ onBack }: AiImportStepProps) {
 					</div>
 
 					{/* Bottom Footer / Action Bar */}
-					<div className="border-t border-stroke-soft-200 bg-[#f9fafb] px-6 py-4 flex items-center justify-between dark:bg-bg-weak-50/40">
-						<button
+					<div className="flex items-center justify-between px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40">
+						<Button.Root
 							type="button"
+							variant="neutral"
+							mode="ghost"
+							size="small"
 							onClick={onBack}
 							disabled={isProcessing}
-							className="text-sm font-medium text-text-sub-600 hover:text-text-strong-950 transition-colors disabled:opacity-50 cursor-pointer"
 						>
 							Back
-						</button>
+						</Button.Root>
 
-						<button
+						<FancyButton.Root
 							type="submit"
+							variant="primary"
+							size="small"
 							disabled={isProcessing || !rawText.trim()}
-							className="inline-flex items-center justify-center gap-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-medium px-4 py-2 text-sm shadow-xs transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
 						>
 							{isProcessing ? (
 								<>
@@ -105,14 +121,15 @@ export function AiImportStep({ onBack }: AiImportStepProps) {
 								</>
 							) : (
 								<>
-									<Icon name="sparkling" className="h-4 w-4" />
+									<Icon name="sparkling" className="h-3.5 w-3.5" />
 									Extract & Import
 								</>
 							)}
-						</button>
+						</FancyButton.Root>
 					</div>
 				</form>
 			</div>
 		</div>
 	);
 }
+
