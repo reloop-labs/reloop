@@ -1,13 +1,14 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { motion, useReducedMotion } from "framer-motion";
 import {
 	getAvailableCsvHeaders,
 	getAvailableIdentityTargets,
 	getAvailableProperties,
 	isIdentityTarget,
 	isPropertyTarget,
-	propertyTargetName,
 	type PropertyMappingRow,
+	propertyTargetName,
 } from "../../utils/property-mapping";
 import { CsvColumnSelect } from "./csv-column-select";
 import { ReloopFieldSelect } from "./reloop-field-select";
@@ -34,6 +35,8 @@ export function MappingRow({
 	disabled = false,
 	isPendingProperties = false,
 }: MappingRowProps) {
+	const shouldReduceMotion = useReducedMotion();
+
 	let leftOptions = getAvailableCsvHeaders(csvHeaders, allRows, row.id);
 	if (row.csvHeader && !leftOptions.includes(row.csvHeader)) {
 		leftOptions = [row.csvHeader, ...leftOptions];
@@ -44,21 +47,39 @@ export function MappingRow({
 		identityOptions = [row.target, ...identityOptions];
 	}
 
+	const target = row.target;
 	let rightProperties = getAvailableProperties(orgProperties, allRows, row.id);
 	if (
-		isPropertyTarget(row.target) &&
-		!rightProperties.some(
-			(p) => p.propertyName === propertyTargetName(row.target),
-		)
+		isPropertyTarget(target) &&
+		!rightProperties.some((p) => p.propertyName === propertyTargetName(target))
 	) {
 		rightProperties = [
-			{ propertyName: propertyTargetName(row.target) },
+			{ propertyName: propertyTargetName(target) },
 			...rightProperties,
 		];
 	}
 
 	return (
-		<div
+		<motion.div
+			layout
+			initial={
+				shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0, y: -4 }
+			}
+			animate={
+				shouldReduceMotion
+					? { opacity: 1 }
+					: { opacity: 1, height: "auto", y: 0 }
+			}
+			exit={
+				shouldReduceMotion
+					? { opacity: 0 }
+					: { opacity: 0, height: 0, overflow: "hidden" }
+			}
+			transition={{
+				duration: shouldReduceMotion ? 0.1 : 0.22,
+				ease: [0.2, 0, 0, 1],
+				layout: { duration: 0.25, ease: [0.2, 0, 0, 1] },
+			}}
 			className={cn(
 				"group/row grid w-full items-center gap-2 px-4 py-2 text-left transition-colors sm:gap-2",
 				"hover:bg-bg-weak-50/40",
@@ -105,12 +126,12 @@ export function MappingRow({
 					type="button"
 					disabled={disabled}
 					onClick={() => onRemove(row.id)}
-					className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-text-sub-600 opacity-70 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40 group-hover/row:opacity-100"
+					className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-text-sub-600 opacity-70 transition-all hover:bg-bg-weak-50 hover:text-text-strong-950 hover:opacity-100 active:scale-90 disabled:cursor-not-allowed disabled:opacity-40 group-hover/row:opacity-100"
 					aria-label="Remove mapping"
 				>
 					<Icon name="cross" className="h-3.5 w-3.5" />
 				</button>
 			</div>
-		</div>
+		</motion.div>
 	);
 }

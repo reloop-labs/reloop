@@ -1,5 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAllPropertiesQuery } from "#/features/contacts/hooks/use-contacts-query";
 import {
 	createEmptyPropertyRow,
@@ -86,32 +87,38 @@ export function CsvPropertyMapping({
 							</p>
 						</div>
 					) : (
-						rows.map((row) => (
-							<MappingRow
-								key={row.id}
-								row={row}
-								allRows={rows}
-								csvHeaders={csvHeaders}
-								orgProperties={properties}
-								onChange={updateRow}
-								onRemove={removeRow}
-								disabled={disabled}
-								isPendingProperties={isPending}
-							/>
-						))
+						<AnimatePresence initial={false}>
+							{rows.map((row) => (
+								<MappingRow
+									key={row.id}
+									row={row}
+									allRows={rows}
+									csvHeaders={csvHeaders}
+									orgProperties={properties}
+									onChange={updateRow}
+									onRemove={removeRow}
+									disabled={disabled}
+									isPendingProperties={isPending}
+								/>
+							))}
+						</AnimatePresence>
 					)}
 
-					<div className="flex items-center justify-end px-4 py-2 text-label-xs text-text-sub-600">
+					<motion.div
+						layout
+						transition={{ duration: 0.25, ease: [0.2, 0, 0, 1] }}
+						className="flex items-center justify-end px-4 py-2 text-label-xs text-text-sub-600"
+					>
 						<button
 							type="button"
 							disabled={disabled}
 							onClick={addRow}
-							className="inline-flex cursor-pointer items-center gap-1 font-medium text-label-xs text-text-sub-600 transition-colors hover:text-text-strong-950 disabled:cursor-not-allowed disabled:opacity-50"
+							className="inline-flex cursor-pointer items-center gap-1 font-medium text-label-xs text-text-sub-600 transition-all hover:text-text-strong-950 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
 						>
 							<Icon name="plus" className="h-3.5 w-3.5" />
 							Add mapping
 						</button>
-					</div>
+					</motion.div>
 				</div>
 			</div>
 
