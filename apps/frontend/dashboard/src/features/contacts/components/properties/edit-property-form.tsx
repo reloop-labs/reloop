@@ -139,12 +139,14 @@ export function EditPropertyForm({
 			<div className="space-y-4">
 				{/* Readonly Property Name */}
 				<div className="space-y-2">
-					<Label.Root
-						htmlFor={`property-name-${property.id}`}
-						className="text-text-sub-600"
-					>
-						Name
-					</Label.Root>
+					<div className="flex items-center gap-1.5">
+						<Label.Root htmlFor={`property-name-${property.id}`}>
+							Name
+						</Label.Root>
+						<span className="text-text-sub-600 text-xs font-normal">
+							(Property name cannot be edited after creation)
+						</span>
+					</div>
 					<Input.Root
 						size="medium"
 						className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30"
@@ -169,9 +171,6 @@ export function EditPropertyForm({
 							/>
 						</Input.Wrapper>
 					</Input.Root>
-					<p className="text-paragraph-xs text-text-sub-600">
-						Property name cannot be edited after creation
-					</p>
 				</div>
 
 				{/* Default Value */}

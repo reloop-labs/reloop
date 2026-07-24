@@ -1,7 +1,6 @@
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { parseAsInteger, useQueryState } from "nuqs";
-import { useState } from "react";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { usePropertiesQuery } from "../../hooks/use-contacts-query";
 import {
@@ -21,35 +20,40 @@ export function PropertyList() {
 		"propertyLimit",
 		parseAsInteger.withDefault(10),
 	);
-	const [search, setSearch] = useState("");
-	const [filter, setFilter] = useState<PropertyFilters>(null);
+	const [searchQuery, setSearchQuery] = useQueryState(
+		"search",
+		parseAsString.withDefault(""),
+	);
+	const [typeFilter, setTypeFilter] = useQueryState(
+		"type",
+		parseAsString.withDefault(""),
+	);
 
 	const { data, isPending, isFetching } = usePropertiesQuery({
 		page: currentPage ?? 1,
 		limit: pageSize ?? 10,
-		search,
-		type: filter ?? "",
+		search: searchQuery ?? "",
+		type: typeFilter ?? "",
 		enabled: !!activeOrganization?.id,
 	});
 	const isLoading = isPending || (isFetching && !data);
 
 	return (
 		<div>
-			<div className="flex items-center gap-3">
+			<div className="flex items-center gap-2">
 				<div className="flex-1">
-					<Input.Root size="xsmall" className="rounded-[10px]">
+					<Input.Root size="small" className="rounded-xl">
 						<Input.Wrapper>
 							<Input.Icon
 								as={Icon}
 								name="search"
-								size="xsmall"
-								className="h-3.5 w-3.5"
+								size="small"
 							/>
 							<Input.Input
 								placeholder="Search properties..."
-								value={search}
+								value={searchQuery ?? ""}
 								onChange={(e) => {
-									setSearch(e.target.value);
+									void setSearchQuery(e.target.value || null);
 									void setCurrentPage(1);
 								}}
 							/>
@@ -57,9 +61,9 @@ export function PropertyList() {
 					</Input.Root>
 				</div>
 				<PropertyFilterDropdown
-					value={filter}
+					value={(typeFilter as PropertyFilters) || null}
 					onChange={(v) => {
-						setFilter(v);
+						void setTypeFilter(v || null);
 						void setCurrentPage(1);
 					}}
 				/>
@@ -70,8 +74,11 @@ export function PropertyList() {
 					total={data?.total || 0}
 					isLoading={isLoading}
 					onAddProperty={() => void setModal("add-property")}
-					searchQuery={search}
-					onClearSearch={() => setSearch("")}
+					searchQuery={searchQuery ?? ""}
+					onClearSearch={() => {
+						void setSearchQuery(null);
+						void setCurrentPage(1);
+					}}
 					currentPage={currentPage ?? 1}
 					pageSize={pageSize ?? 10}
 					onPageChange={(p) => void setCurrentPage(p)}
