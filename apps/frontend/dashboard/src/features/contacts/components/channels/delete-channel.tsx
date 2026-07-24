@@ -3,6 +3,7 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
+import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
@@ -204,19 +205,14 @@ export const DeleteChannelModal = ({ channels }: DeleteChannelModalProps) => {
 							<p className="font-normal text-text-sub-600 text-xs dark:text-white/50">
 								Linked contacts
 							</p>
-							<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950 dark:text-white">
-								{isLoadingContacts ? (
-									<span className="inline-flex items-center gap-1.5 text-text-sub-600 dark:text-white/50">
-										<Spinner size={12} color="currentColor" />
-										Loading contacts...
-									</span>
-								) : (
-									<span>
-										{contactsData?.total || 0} contact
-										{contactsData?.total !== 1 ? "s" : ""} will be unlinked
-									</span>
-								)}
-							</p>
+							{isLoadingContacts ? (
+								<Skeleton className="mt-1 h-4.5 w-32 rounded-full bg-black/10 dark:bg-white/15" />
+							) : (
+								<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950 dark:text-white">
+									{contactsData?.total || 0} contact
+									{contactsData?.total !== 1 ? "s" : ""} will be unlinked
+								</p>
+							)}
 						</div>
 					</div>
 

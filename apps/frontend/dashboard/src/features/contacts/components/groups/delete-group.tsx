@@ -3,6 +3,7 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
+import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -170,7 +171,7 @@ export const DeleteGroupModal = ({
 						<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 							Delete group
 						</Modal.Title>
-						<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
+						<p className="mt-2 text-sm text-text-sub-600 leading-relaxed">
 							Are you sure you want to delete this group? This action cannot be
 							undone.
 						</p>
@@ -190,19 +191,14 @@ export const DeleteGroupModal = ({
 							<p className="font-normal text-text-sub-600 text-xs">
 								Linked contacts
 							</p>
-							<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
-								{isLoadingContacts ? (
-									<span className="inline-flex items-center gap-1.5 text-text-sub-600">
-										<Icon name="loader-2" className="h-3 w-3 animate-spin" />
-										Loading contacts...
-									</span>
-								) : (
-									<span>
-										{contactsData?.total || 0} contact
-										{contactsData?.total !== 1 ? "s" : ""} will be unlinked
-									</span>
-								)}
-							</p>
+							{isLoadingContacts ? (
+								<Skeleton className="mt-1 h-4.5 w-32 rounded-full bg-black/10 dark:bg-white/15" />
+							) : (
+								<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
+									{contactsData?.total || 0} contact
+									{contactsData?.total !== 1 ? "s" : ""} will be unlinked
+								</p>
+							)}
 						</div>
 					</div>
 
@@ -247,7 +243,7 @@ export const DeleteGroupModal = ({
 						>
 							{/* Hold progress overlay fill */}
 							<motion.div
-								className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
+								className="pointer-events-none absolute inset-0 origin-left bg-white/25"
 								style={{ scaleX: holdProgress }}
 							/>
 
