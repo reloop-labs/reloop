@@ -11,7 +11,7 @@ import {
 	ChevronUpIcon,
 } from "lucide-react";
 import * as React from "react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 
 export const Select: typeof SelectPrimitive.Root = SelectPrimitive.Root;
@@ -129,26 +129,34 @@ export function SelectPopup({
 	alignItemWithTrigger?: SelectPrimitive.Positioner.Props["alignItemWithTrigger"];
 	anchor?: SelectPrimitive.Positioner.Props["anchor"];
 }): React.ReactElement {
-	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-	const listRef = useRef<HTMLDivElement>(null);
-	const itemRefs = useRef<HTMLElement[]>([]);
+	// Event-delegation hover: only elements with data-slot="select-item" light up.
+	// Ignores create-form content / footer buttons. No cloneElement needed.
+	const [hoveredItem, setHoveredItem] = useState<HTMLElement | null>(null);
+	const [shellEl, setShellEl] = useState<HTMLDivElement | null>(null);
 
-	const currentTab =
-		hoverIdx !== undefined ? itemRefs.current[hoverIdx] : undefined;
-	const currentRect = currentTab?.getBoundingClientRect();
+	const resolveSelectItem = (target: EventTarget | null): HTMLElement | null => {
+		if (!(target instanceof Element)) return null;
+		const item = target.closest("[data-slot='select-item']");
+		if (!(item instanceof HTMLElement)) return null;
+		if (!shellEl?.contains(item)) return null;
+		return item;
+	};
 
-	const childrenWithProps = React.Children.map(children, (child, idx) => {
-		if (React.isValidElement(child)) {
-			return React.cloneElement(child as React.ReactElement<any>, {
-				ref: (el: HTMLElement | null) => {
-					if (el) itemRefs.current[idx] = el;
-				},
-				onPointerEnter: () => setHoverIdx(idx),
-				onPointerLeave: () => setHoverIdx(undefined),
-			});
-		}
-		return child;
-	});
+	const handlePointerMove = (e: React.PointerEvent) => {
+		const item = resolveSelectItem(e.target);
+		setHoveredItem((prev) => (prev === item ? prev : item));
+	};
+
+	const handlePointerLeave = () => {
+		setHoveredItem(null);
+	};
+
+	// Clear hover when children swap (list ↔ create form) so the highlight never sticks
+	React.useEffect(() => {
+		setHoveredItem(null);
+	}, [children]);
+
+	const currentRect = hoveredItem?.getBoundingClientRect();
 
 	return (
 		<SelectPrimitive.Portal {...portalProps}>
@@ -174,8 +182,12 @@ export function SelectPopup({
 						<ChevronUpIcon className="relative size-4 sm:size-4" />
 					</SelectPrimitive.ScrollUpArrow>
 					<div
-						ref={listRef}
-						className="relative h-full min-w-(--anchor-width) rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-none dark:border-stroke-soft-100/50 dark:bg-bg-weak-50"
+						ref={setShellEl}
+						// w-max so shell can grow with wider content (e.g. create-property form)
+						// while min-w keeps list mode at least as wide as the trigger
+						className="relative h-full w-max min-w-(--anchor-width) rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-1 shadow-none dark:border-stroke-soft-100/50 dark:bg-bg-weak-50"
+						onPointerMove={handlePointerMove}
+						onPointerLeave={handlePointerLeave}
 					>
 						<SelectPrimitive.List
 							className={cn(
@@ -184,10 +196,11 @@ export function SelectPopup({
 							)}
 							data-slot="select-list"
 						>
-							{childrenWithProps}
+							{children}
 							<AnimatedHoverBackground
 								rect={currentRect}
-								tabElement={currentTab}
+								tabElement={hoveredItem ?? undefined}
+								container={shellEl}
 							/>
 						</SelectPrimitive.List>
 					</div>
@@ -228,7 +241,7 @@ export const SelectItem = React.forwardRef<
 			<SelectPrimitive.ItemText className="flex min-w-0 flex-1 items-center gap-2">
 				{children}
 			</SelectPrimitive.ItemText>
-			<SelectPrimitive.ItemIndicator className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-text-strong-950">
+			<SelectPrimitive.ItemIndicator className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-2.5 text-text-strong-950">
 				<svg
 					aria-hidden="true"
 					fill="none"

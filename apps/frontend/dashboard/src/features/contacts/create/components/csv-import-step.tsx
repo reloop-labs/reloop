@@ -26,7 +26,7 @@ import {
 	suggestPropertyRows,
 	type PropertyMappingRow,
 } from "../utils/property-mapping";
-import { CsvPropertyMapping } from "./csv-property-mapping";
+import { CsvPropertyMapping } from "./property-mapping";
 
 interface CsvImportStepProps {
 	onBack: () => void;
