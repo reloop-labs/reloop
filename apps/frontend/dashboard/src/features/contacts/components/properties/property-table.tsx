@@ -1,7 +1,3 @@
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
-import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
-import { formatRelativeTime } from "#/utils/format-relative-time";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -12,10 +8,14 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
+import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
+import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import { formatRelativeTime } from "#/utils/format-relative-time";
 import { EditPropertyRowPanel } from "./edit-property-row-panel";
 import { PropertiesEmptyState } from "./properties-empty-state";
 
@@ -102,7 +102,8 @@ const PropertyActionsPopover = ({
 		{
 			id: "copy-name",
 			label: copiedKey === "name" ? "Copied name!" : "Copy name",
-			icon: copiedKey === "name" ? ("check-circle" as const) : ("copy" as const),
+			icon:
+				copiedKey === "name" ? ("check-circle" as const) : ("copy" as const),
 			isDanger: false,
 		},
 		{
@@ -287,9 +288,7 @@ export const PropertyTable = ({
 	);
 
 	const handleEdit = (property: Property) => {
-		setEditingPropertyId((prev) =>
-			prev === property.id ? null : property.id,
-		);
+		setEditingPropertyId((prev) => (prev === property.id ? null : property.id));
 	};
 
 	const handleDelete = (property: Property) => {
@@ -338,103 +337,129 @@ export const PropertyTable = ({
 						onClearFilters={onClearFilters || onClearSearch}
 					/>
 				) : (
-					properties.map((property) => {
-						const isEditing = editingPropertyId === property.id;
-						const isRowActive =
-							openPropertyId === property.id || isEditing;
+					<AnimatePresence mode="popLayout" initial={false}>
+						{properties.map((property) => {
+							const isEditing = editingPropertyId === property.id;
+							const isRowActive = openPropertyId === property.id || isEditing;
 
-						return (
-							<div key={property.id}>
-								<div
-									className={cn(
-										"group/row grid grid-cols-[1fr_100px_1fr_120px_40px] items-center px-4 py-2 text-left transition-colors",
-										"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base",
-										isRowActive && "bg-bg-weak-50/50",
-										isEditing && "bg-bg-weak-50/70",
-									)}
+							return (
+								<motion.div
+									key={property.id}
+									layout
+									initial={{ opacity: 1, height: "auto" }}
+									exit={{
+										opacity: 0,
+										height: 0,
+										scale: 0.98,
+										transition: {
+											height: {
+												duration: 0.22,
+												ease: [0.32, 0.72, 0, 1],
+											},
+											opacity: { duration: 0.15, ease: "easeOut" },
+											scale: { duration: 0.15, ease: "easeOut" },
+											layout: {
+												duration: 0.25,
+												ease: [0.32, 0.72, 0, 1],
+											},
+										},
+									}}
+									className="overflow-hidden"
 								>
-									{/* Name Column */}
-									<div className="flex items-center gap-2">
-										<Icon name="tag" className="h-4 w-4 shrink-0 text-text-sub-600" />
-										<button
-											type="button"
-											onClick={() => handleEdit(property)}
-											className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
-										>
-											{property.propertyName}
-										</button>
-										{isEditing && (
-											<span className="rounded-md bg-bg-white-0 px-1.5 py-0.5 font-medium text-[11px] text-text-sub-600 ring-1 ring-stroke-soft-100">
-												Editing
-											</span>
+									<div
+										className={cn(
+											"group/row grid grid-cols-[1fr_100px_1fr_120px_40px] items-center px-4 py-2 text-left transition-colors",
+											"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base",
+											isRowActive && "bg-bg-weak-50/50",
+											isEditing && "bg-bg-weak-50/70",
 										)}
-									</div>
-
-									{/* Type Column */}
-									<div className="flex items-center">
-										<Badge.Root
-											size="small"
-											variant="lighter"
-											color={getBadgeColor(property.propertyType)}
-											className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
-										>
-											{property.propertyType}
-										</Badge.Root>
-									</div>
-
-									{/* Default Column */}
-									<div className="flex items-center">
-										<span className="truncate font-medium text-label-sm text-text-strong-950">
-											{property.defaultValue || "-"}
-										</span>
-									</div>
-
-									{/* Created At Column */}
-									<div className="flex items-center">
-										<span className="truncate whitespace-nowrap font-medium text-[13px]">
-											{formatRelativeTime(property.createdAt)}
-										</span>
-									</div>
-
-									{/* Actions Column */}
-									<div className="flex items-center justify-end">
-										<PropertyActionsPopover
-											property={property}
-											onEdit={handleEdit}
-											onDelete={handleDelete}
-											onOpenChange={(open) =>
-												setOpenPropertyId(open ? property.id : null)
-											}
-										/>
-									</div>
-								</div>
-
-								<AnimatePresence initial={false}>
-									{isEditing ? (
-										<motion.div
-											key={`edit-${property.id}`}
-											initial={{ height: 0, opacity: 0 }}
-											animate={{ height: "auto", opacity: 1 }}
-											exit={{ height: 0, opacity: 0 }}
-											transition={{
-												height: {
-													duration: 0.28,
-													ease: [0.32, 0.72, 0, 1],
-												},
-												opacity: { duration: 0.2, ease: "easeOut" },
-											}}
-											className="overflow-hidden"
-										>
-											<EditPropertyRowPanel
-												property={property}
-												onClose={() => setEditingPropertyId(null)}
+									>
+										{/* Name Column */}
+										<div className="flex items-center gap-2">
+											<Icon
+												name="tag"
+												className="h-4 w-4 shrink-0 text-text-sub-600"
 											/>
-										</motion.div>
-									) : null}
-								</AnimatePresence>
-							</div>
-						);
-					})
+											<button
+												type="button"
+												onClick={() => handleEdit(property)}
+												className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+											>
+												{property.propertyName}
+											</button>
+											{isEditing && (
+												<span className="rounded-md bg-bg-white-0 px-1.5 py-0.5 font-medium text-[11px] text-text-sub-600 ring-1 ring-stroke-soft-100">
+													Editing
+												</span>
+											)}
+										</div>
+
+										{/* Type Column */}
+										<div className="flex items-center">
+											<Badge.Root
+												size="small"
+												variant="lighter"
+												color={getBadgeColor(property.propertyType)}
+												className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
+											>
+												{property.propertyType}
+											</Badge.Root>
+										</div>
+
+										{/* Default Column */}
+										<div className="flex items-center">
+											<span className="truncate font-medium text-label-sm text-text-strong-950">
+												{property.defaultValue || "-"}
+											</span>
+										</div>
+
+										{/* Created At Column */}
+										<div className="flex items-center">
+											<span className="truncate whitespace-nowrap font-medium text-[13px]">
+												{formatRelativeTime(property.createdAt)}
+											</span>
+										</div>
+
+										{/* Actions Column */}
+										<div className="flex items-center justify-end">
+											<PropertyActionsPopover
+												property={property}
+												onEdit={handleEdit}
+												onDelete={handleDelete}
+												onOpenChange={(open) =>
+													setOpenPropertyId(open ? property.id : null)
+												}
+											/>
+										</div>
+									</div>
+
+									<AnimatePresence initial={false}>
+										{isEditing ? (
+											<motion.div
+												key={`edit-${property.id}`}
+												initial={{ height: 0, opacity: 0 }}
+												animate={{ height: "auto", opacity: 1 }}
+												exit={{ height: 0, opacity: 0 }}
+												transition={{
+													height: {
+														duration: 0.28,
+														ease: [0.32, 0.72, 0, 1],
+													},
+													opacity: { duration: 0.2, ease: "easeOut" },
+												}}
+												className="overflow-hidden"
+											>
+												<EditPropertyRowPanel
+													property={property}
+													onClose={() => setEditingPropertyId(null)}
+												/>
+											</motion.div>
+										) : null}
+									</AnimatePresence>
+								</motion.div>
+							);
+						})}
+					</AnimatePresence>
 				)}
 
 				{/* Pagination Footer */}

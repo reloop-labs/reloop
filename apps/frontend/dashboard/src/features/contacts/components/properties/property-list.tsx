@@ -1,3 +1,5 @@
+import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
@@ -29,7 +31,7 @@ export function PropertyList() {
 		parseAsString.withDefault(""),
 	);
 
-	const { data, isPending, isFetching } = usePropertiesQuery({
+	const { data, isPending, isFetching, refetch } = usePropertiesQuery({
 		page: currentPage ?? 1,
 		limit: pageSize ?? 10,
 		search: searchQuery ?? "",
@@ -44,11 +46,7 @@ export function PropertyList() {
 				<div className="flex-1">
 					<Input.Root size="small" className="rounded-xl">
 						<Input.Wrapper>
-							<Input.Icon
-								as={Icon}
-								name="search"
-								size="small"
-							/>
+							<Input.Icon as={Icon} name="search" size="small" />
 							<Input.Input
 								placeholder="Search properties..."
 								value={searchQuery ?? ""}
@@ -67,6 +65,25 @@ export function PropertyList() {
 						void setCurrentPage(1);
 					}}
 				/>
+				<Button.Root
+					variant="neutral"
+					mode="stroke"
+					size="small"
+					onClick={() => void refetch()}
+					disabled={isFetching}
+					className="h-9 w-9 rounded-xl p-0 flex items-center justify-center shrink-0"
+					title="Refresh properties"
+					aria-label="Refresh properties"
+				>
+					<Button.Icon
+						as={Icon}
+						name="refresh-cw"
+						className={cn(
+							"h-4 w-4 text-text-sub-600 transition-transform",
+							isFetching && "animate-spin",
+						)}
+					/>
+				</Button.Root>
 			</div>
 			<div className="mt-4">
 				<PropertyTable
