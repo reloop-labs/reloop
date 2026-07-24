@@ -1,4 +1,5 @@
 import { Icon } from "@reloop/ui/icon";
+import { useUIStore } from "#/store/use-ui-store";
 
 export type CreateContactStep =
 	| "select-method"
@@ -15,13 +16,13 @@ interface CreateContactStepperProps {
 function StepBullet({ status }: { status: "active" | "completed" | "upcoming" }) {
 	if (status === "active" || status === "completed") {
 		return (
-			<span className="flex h-3.5 w-3.5 items-center justify-center shrink-0">
+			<span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
 				<span className="h-1.5 w-1.5 rounded-full bg-text-sub-600/60" />
 			</span>
 		);
 	}
 	return (
-		<span className="flex h-3.5 w-3.5 items-center justify-center shrink-0">
+		<span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
 			<span className="h-1.5 w-1.5 rounded-full border border-stroke-soft-300 bg-transparent" />
 		</span>
 	);
@@ -33,6 +34,12 @@ export function CreateContactStepper({
 }: CreateContactStepperProps) {
 	const isMethodSelection = currentStep === "select-method";
 
+	const handleOpenSupport = () => {
+		const { setAiPanelActiveTab, setIsAiPanelOpen } = useUIStore.getState();
+		setAiPanelActiveTab("support");
+		setIsAiPanelOpen(true);
+	};
+
 	const getStep2Label = () => {
 		switch (currentStep) {
 			case "single-contact":
@@ -40,7 +47,7 @@ export function CreateContactStepper({
 			case "csv-import":
 				return "Upload CSV file";
 			case "api-sync":
-				return "Configure REST API";
+				return "Configure SDK";
 			case "ai-import":
 				return "Import with AI";
 			default:
@@ -56,7 +63,7 @@ export function CreateContactStepper({
 				<button
 					type="button"
 					onClick={() => onStepClick?.("select-method")}
-					className={`flex items-center gap-2.5 text-left transition-colors cursor-pointer w-full ${
+					className={`flex w-full cursor-pointer items-center gap-2.5 text-left transition-colors ${
 						isMethodSelection
 							? "font-medium text-text-sub-600 text-xs"
 							: "font-medium text-text-soft-400 text-xs hover:text-text-sub-600"
@@ -68,28 +75,28 @@ export function CreateContactStepper({
 
 				{/* Step 2: Only show when a method is selected */}
 				{!isMethodSelection && (
-					<div className="flex items-center gap-2.5 text-left transition-colors font-medium text-text-sub-600 text-xs">
+					<div className="flex items-center gap-2.5 text-left font-medium text-text-sub-600 text-xs transition-colors">
 						<StepBullet status="active" />
 						<span>{getStep2Label()}</span>
 					</div>
 				)}
 			</div>
 
-			{/* Documentation Support Section */}
-			<div className="pt-6 border-t border-stroke-soft-200/60 text-xs text-text-sub-600 space-y-2">
+			{/* Support Section */}
+			<div className="space-y-2 border-t border-stroke-soft-200/60 pt-6 text-text-sub-600 text-xs">
 				<p className="font-medium text-text-strong-950">Need assistance?</p>
 				<p className="leading-relaxed text-text-soft-400">
-					Learn how to structure custom attributes and contact tags in our documentation.
+					Reach out to our support team for help with contact imports, custom
+					attributes, or SDK setup.
 				</p>
-				<a
-					href="https://reloop.sh/docs/features/contacts"
-					target="_blank"
-					rel="noreferrer"
-					className="inline-flex items-center gap-1 text-text-strong-950 hover:underline font-medium pt-1"
+				<button
+					type="button"
+					onClick={handleOpenSupport}
+					className="inline-flex cursor-pointer items-center gap-1 pt-1 font-medium text-text-strong-950 text-xs hover:underline"
 				>
-					View docs
+					Contact support
 					<Icon name="arrow-right" className="h-3 w-3" />
-				</a>
+				</button>
 			</div>
 		</div>
 	);
