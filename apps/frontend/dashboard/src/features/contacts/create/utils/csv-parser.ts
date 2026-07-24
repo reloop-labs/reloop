@@ -5,16 +5,27 @@ export interface ParsedContact {
 	properties?: Record<string, string | number>;
 }
 
+export type ColumnTarget =
+	| "email"
+	| "firstName"
+	| "lastName"
+	| "skip"
+	| `property:${string}`;
+
+export interface ColumnMapping {
+	csvHeader: string;
+	target: ColumnTarget;
+}
+
 export interface ParsedCsvResult {
+	headers: string[];
+	rawRows: string[][];
 	contacts: ParsedContact[];
+	mappings: ColumnMapping[];
 	totalRows: number;
 	validCount: number;
 	invalidCount: number;
 	duplicateCount: number;
-	emailHeader: string | null;
-	firstNameHeader: string | null;
-	lastNameHeader: string | null;
-	customHeaders: string[];
 	errors: string[];
 }
 
@@ -23,7 +34,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 /**
  * Parses a raw CSV string into tokens supporting quotes and escaped quotes.
  */
-function parseCsvLine(line: string, delimiter = ","): string[] {
+export function parseCsvLine(line: string, delimiter = ","): string[] {
 	const result: string[] = [];
 	let current = "";
 	let inQuotes = false;
@@ -33,11 +44,9 @@ function parseCsvLine(line: string, delimiter = ","): string[] {
 
 		if (char === '"') {
 			if (inQuotes && line[i + 1] === '"') {
-				// Escaped quote inside quoted field
 				current += '"';
 				i++;
 			} else {
-				// Toggle quote state
 				inQuotes = !inQuotes;
 			}
 		} else if (char === delimiter && !inQuotes) {
@@ -55,7 +64,7 @@ function parseCsvLine(line: string, delimiter = ","): string[] {
 /**
  * Splits a full CSV text into logical rows, preserving multi-line strings enclosed in quotes.
  */
-function splitCsvRows(text: string): string[] {
+export function splitCsvRows(text: string): string[] {
 	const rows: string[] = [];
 	let currentRow = "";
 	let inQuotes = false;
@@ -68,7 +77,7 @@ function splitCsvRows(text: string): string[] {
 			currentRow += char;
 		} else if ((char === "\n" || char === "\r") && !inQuotes) {
 			if (char === "\r" && text[i + 1] === "\n") {
-				i++; // Skip \n in \r\n sequence
+				i++;
 			}
 			if (currentRow.trim().length > 0) {
 				rows.push(currentRow);
@@ -89,7 +98,7 @@ function splitCsvRows(text: string): string[] {
 /**
  * Detects the probable CSV delimiter (, or ; or \t) from the header line.
  */
-function detectDelimiter(headerLine: string): string {
+export function detectDelimiter(headerLine: string): string {
 	const commaCount = (headerLine.match(/,/g) || []).length;
 	const semiCount = (headerLine.match(/;/g) || []).length;
 	const tabCount = (headerLine.match(/\t/g) || []).length;
@@ -100,121 +109,113 @@ function detectDelimiter(headerLine: string): string {
 }
 
 /**
- * Parses raw CSV content into structured contacts and summary stats.
+ * Generates initial automatic column mappings for a set of CSV headers.
  */
-export function parseCsvContent(rawCsvText: string): ParsedCsvResult {
-	const rows = splitCsvRows(rawCsvText);
-	if (rows.length === 0) {
-		return {
-			contacts: [],
-			totalRows: 0,
-			validCount: 0,
-			invalidCount: 0,
-			duplicateCount: 0,
-			emailHeader: null,
-			firstNameHeader: null,
-			lastNameHeader: null,
-			customHeaders: [],
-			errors: ["CSV file is empty"],
-		};
-	}
+export function detectInitialMappings(
+	headers: string[],
+	sampleRow?: string[],
+): ColumnMapping[] {
+	let emailFound = false;
+	let firstNameFound = false;
+	let lastNameFound = false;
 
-	const delimiter = detectDelimiter(rows[0]);
-	const headers = parseCsvLine(rows[0], delimiter).map((h) =>
-		h.replace(/^["']|["']$/g, "").trim(),
-	);
-
-	let emailColIdx = -1;
-	let firstNameColIdx = -1;
-	let lastNameColIdx = -1;
-
-	// Detect column mappings by header name
-	headers.forEach((header, idx) => {
+	const mappings: ColumnMapping[] = headers.map((header, idx) => {
 		const cleanHeader = header.toLowerCase().replace(/[-_ ]/g, "");
+
 		if (
-			emailColIdx === -1 &&
+			!emailFound &&
 			(cleanHeader === "email" ||
 				cleanHeader === "emailaddress" ||
 				cleanHeader === "e-mail" ||
 				cleanHeader === "mail")
 		) {
-			emailColIdx = idx;
-		} else if (
-			firstNameColIdx === -1 &&
+			emailFound = true;
+			return { csvHeader: header, target: "email" };
+		}
+
+		if (
+			!firstNameFound &&
 			(cleanHeader === "firstname" ||
 				cleanHeader === "givenname" ||
 				cleanHeader === "fname" ||
 				cleanHeader === "first")
 		) {
-			firstNameColIdx = idx;
-		} else if (
-			lastNameColIdx === -1 &&
+			firstNameFound = true;
+			return { csvHeader: header, target: "firstName" };
+		}
+
+		if (
+			!lastNameFound &&
 			(cleanHeader === "lastname" ||
 				cleanHeader === "familyname" ||
 				cleanHeader === "lname" ||
 				cleanHeader === "last")
 		) {
-			lastNameColIdx = idx;
+			lastNameFound = true;
+			return { csvHeader: header, target: "lastName" };
 		}
+
+		return { csvHeader: header, target: `property:${header}` };
 	});
 
-	// If no explicit header matched email, search first data row for email format
-	if (emailColIdx === -1 && rows.length > 1) {
-		const sampleCells = parseCsvLine(rows[1], delimiter);
-		const foundIdx = sampleCells.findIndex((cell) =>
+	// If no email header matched, check if sample row cell has email format
+	if (!emailFound && sampleRow) {
+		const sampleIdx = sampleRow.findIndex((cell) =>
 			EMAIL_REGEX.test(cell.replace(/^["']|["']$/g, "").trim()),
 		);
-		if (foundIdx !== -1) {
-			emailColIdx = foundIdx;
+		if (sampleIdx !== -1 && sampleIdx < mappings.length) {
+			mappings[sampleIdx].target = "email";
 		}
 	}
 
-	if (emailColIdx === -1) {
-		return {
-			contacts: [],
-			totalRows: rows.length - 1,
-			validCount: 0,
-			invalidCount: rows.length - 1,
-			duplicateCount: 0,
-			emailHeader: null,
-			firstNameHeader: firstNameColIdx !== -1 ? headers[firstNameColIdx] : null,
-			lastNameHeader: lastNameColIdx !== -1 ? headers[lastNameColIdx] : null,
-			customHeaders: [],
-			errors: ["No 'email' header column could be found in the CSV file."],
-		};
-	}
+	return mappings;
+}
 
-	const emailHeader = headers[emailColIdx];
-	const firstNameHeader =
-		firstNameColIdx !== -1 ? headers[firstNameColIdx] : null;
-	const lastNameHeader =
-		lastNameColIdx !== -1 ? headers[lastNameColIdx] : null;
-
-	const customHeaderIndices: { idx: number; name: string }[] = [];
-	headers.forEach((header, idx) => {
-		if (
-			idx !== emailColIdx &&
-			idx !== firstNameColIdx &&
-			idx !== lastNameColIdx &&
-			header.length > 0
-		) {
-			customHeaderIndices.push({ idx, name: header });
-		}
-	});
-
-	const customHeaders = customHeaderIndices.map((item) => item.name);
-
+/**
+ * Re-builds contact objects and metrics based on active column mappings.
+ */
+export function buildContactsFromMapping(
+	headers: string[],
+	rawRows: string[][],
+	mappings: ColumnMapping[],
+): {
+	contacts: ParsedContact[];
+	validCount: number;
+	invalidCount: number;
+	duplicateCount: number;
+	totalRows: number;
+} {
 	const contacts: ParsedContact[] = [];
 	const seenEmails = new Set<string>();
 	let invalidCount = 0;
 	let duplicateCount = 0;
 
-	for (let i = 1; i < rows.length; i++) {
-		const cells = parseCsvLine(rows[i], delimiter).map((cell) =>
-			cell.replace(/^["']|["']$/g, "").trim(),
-		);
+	const headerMap = headers.map((h, i) => {
+		const mapItem = mappings.find((m) => m.csvHeader === h);
+		return { idx: i, target: mapItem ? mapItem.target : "skip" };
+	});
 
-		const rawEmail = cells[emailColIdx] ? cells[emailColIdx].trim() : "";
+	const emailMapping = headerMap.find((m) => m.target === "email");
+	const firstNameMapping = headerMap.find((m) => m.target === "firstName");
+	const lastNameMapping = headerMap.find((m) => m.target === "lastName");
+	const propertyMappings = headerMap.filter((m) =>
+		m.target.startsWith("property:"),
+	);
+
+	if (!emailMapping) {
+		return {
+			contacts: [],
+			validCount: 0,
+			invalidCount: rawRows.length,
+			duplicateCount: 0,
+			totalRows: rawRows.length,
+		};
+	}
+
+	for (const cells of rawRows) {
+		const rawEmail = cells[emailMapping.idx]
+			? cells[emailMapping.idx].trim()
+			: "";
 		const email = rawEmail.toLowerCase();
 
 		if (!email || !EMAIL_REGEX.test(email)) {
@@ -230,23 +231,24 @@ export function parseCsvContent(rawCsvText: string): ParsedCsvResult {
 		seenEmails.add(email);
 
 		const firstName =
-			firstNameColIdx !== -1 && cells[firstNameColIdx]
-				? cells[firstNameColIdx].trim()
+			firstNameMapping && cells[firstNameMapping.idx]
+				? cells[firstNameMapping.idx].trim()
 				: undefined;
+
 		const lastName =
-			lastNameColIdx !== -1 && cells[lastNameColIdx]
-				? cells[lastNameColIdx].trim()
+			lastNameMapping && cells[lastNameMapping.idx]
+				? cells[lastNameMapping.idx].trim()
 				: undefined;
 
 		const properties: Record<string, string | number> = {};
-		customHeaderIndices.forEach(({ idx, name }) => {
-			if (cells[idx] && cells[idx].trim().length > 0) {
-				const val = cells[idx].trim();
-				// Convert to number if numeric string
-				if (/^-?\d+(\.\d+)?$/.test(val) && val.length < 16) {
-					properties[name] = Number(val);
+		propertyMappings.forEach((m) => {
+			const cellVal = cells[m.idx] ? cells[m.idx].trim() : "";
+			if (cellVal.length > 0) {
+				const propKey = m.target.replace("property:", "");
+				if (/^-?\d+(\.\d+)?$/.test(cellVal) && cellVal.length < 16) {
+					properties[propKey] = Number(cellVal);
 				} else {
-					properties[name] = val;
+					properties[propKey] = cellVal;
 				}
 			}
 		});
@@ -261,14 +263,65 @@ export function parseCsvContent(rawCsvText: string): ParsedCsvResult {
 
 	return {
 		contacts,
-		totalRows: rows.length - 1,
 		validCount: contacts.length,
 		invalidCount,
 		duplicateCount,
-		emailHeader,
-		firstNameHeader,
-		lastNameHeader,
-		customHeaders,
-		errors: [],
+		totalRows: rawRows.length,
+	};
+}
+
+/**
+ * Parses raw CSV content into structured contacts, raw rows, headers, and initial mappings.
+ */
+export function parseCsvContent(rawCsvText: string): ParsedCsvResult {
+	const rows = splitCsvRows(rawCsvText);
+	if (rows.length === 0) {
+		return {
+			headers: [],
+			rawRows: [],
+			contacts: [],
+			mappings: [],
+			totalRows: 0,
+			validCount: 0,
+			invalidCount: 0,
+			duplicateCount: 0,
+			errors: ["CSV file is empty"],
+		};
+	}
+
+	const delimiter = detectDelimiter(rows[0]);
+	const headers = parseCsvLine(rows[0], delimiter).map((h) =>
+		h.replace(/^["']|["']$/g, "").trim(),
+	);
+
+	const rawRows: string[][] = [];
+	for (let i = 1; i < rows.length; i++) {
+		const cells = parseCsvLine(rows[i], delimiter).map((cell) =>
+			cell.replace(/^["']|["']$/g, "").trim(),
+		);
+		rawRows.push(cells);
+	}
+
+	const sampleRow = rawRows.length > 0 ? rawRows[0] : undefined;
+	const mappings = detectInitialMappings(headers, sampleRow);
+
+	const built = buildContactsFromMapping(headers, rawRows, mappings);
+
+	const hasEmailMapping = mappings.some((m) => m.target === "email");
+	const errors: string[] = [];
+	if (!hasEmailMapping) {
+		errors.push("No 'email' header column could be found in the CSV file.");
+	}
+
+	return {
+		headers,
+		rawRows,
+		contacts: built.contacts,
+		mappings,
+		totalRows: built.totalRows,
+		validCount: built.validCount,
+		invalidCount: built.invalidCount,
+		duplicateCount: built.duplicateCount,
+		errors,
 	};
 }

@@ -6,14 +6,19 @@ import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
-import * as Tooltip from "@reloop/ui/tooltip";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { GroupSelect } from "#/features/contacts/components/groups/group-select";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
-import { type ParsedCsvResult, parseCsvContent } from "../utils/csv-parser";
+import {
+	type ColumnMapping,
+	type ColumnTarget,
+	type ParsedCsvResult,
+	buildContactsFromMapping,
+	parseCsvContent,
+} from "../utils/csv-parser";
 
 interface CsvImportStepProps {
 	onBack: () => void;
@@ -30,6 +35,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 	const [parsedResult, setParsedResult] = useState<ParsedCsvResult | null>(
 		null,
 	);
+	const [mappings, setMappings] = useState<ColumnMapping[]>([]);
 	const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
 	const [isParsing, setIsParsing] = useState(false);
 	const [isImporting, setIsImporting] = useState(false);
@@ -53,11 +59,14 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 				if (result.errors.length > 0) {
 					toast.error(result.errors[0]);
 					setParsedResult(null);
+					setMappings([]);
 				} else if (result.validCount === 0) {
 					toast.error("No valid email addresses found in the CSV file.");
 					setParsedResult(null);
+					setMappings([]);
 				} else {
 					setParsedResult(result);
+					setMappings(result.mappings);
 					toast.success(
 						`Parsed ${result.validCount} valid contact(s) from CSV.`,
 					);
@@ -66,6 +75,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 				console.error("Error reading CSV file:", err);
 				toast.error("Failed to parse CSV file content.");
 				setParsedResult(null);
+				setMappings([]);
 			} finally {
 				setIsParsing(false);
 			}
@@ -103,7 +113,31 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 	const handleResetFile = () => {
 		setFile(null);
 		setParsedResult(null);
+		setMappings([]);
 		setProcessedCount(0);
+	};
+
+	const handleMappingChange = (csvHeader: string, newTarget: ColumnTarget) => {
+		if (!parsedResult) return;
+
+		const updatedMappings = mappings.map((m) =>
+			m.csvHeader === csvHeader ? { ...m, target: newTarget } : m,
+		);
+		setMappings(updatedMappings);
+
+		const updated = buildContactsFromMapping(
+			parsedResult.headers,
+			parsedResult.rawRows,
+			updatedMappings,
+		);
+
+		setParsedResult({
+			...parsedResult,
+			contacts: updated.contacts,
+			validCount: updated.validCount,
+			invalidCount: updated.invalidCount,
+			duplicateCount: updated.duplicateCount,
+		});
 	};
 
 	const handleDownloadSample = () => {
@@ -153,7 +187,6 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 
 							if (response.ok) {
 								successCount++;
-								// Also assign to group if backend groupIds payload needs fallback endpoint
 								if (selectedGroupIds.length > 0) {
 									for (const groupId of selectedGroupIds) {
 										await fetch(`/api/contacts/group/${groupId}`, {
@@ -166,7 +199,6 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 							} else if (response.status === 409) {
 								skippedCount++;
 							} else {
-								// Treat any error gracefully as skipped/failed
 								skippedCount++;
 							}
 						} catch (error) {
@@ -226,7 +258,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 						</p>
 					</div>
 
-					{/* Step 1: Upload State (No file selected or parsing failed) */}
+					{/* Step 1: Upload State */}
 					{!parsedResult && !isParsing && (
 						<>
 							<FileUpload.Root
@@ -298,7 +330,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 						</>
 					)}
 
-					{/* Loading State during CSV file parsing */}
+					{/* Loading State */}
 					{isParsing && (
 						<div className="flex flex-col items-center justify-center space-y-3 rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/30 p-10 text-center">
 							<Spinner size={24} className="text-text-strong-950" />
@@ -308,7 +340,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 						</div>
 					)}
 
-					{/* Step 2: Parsed File Preview & Group Selection */}
+					{/* Step 2: Parsed File Preview, Column Mapper & Group Selection */}
 					{parsedResult && !isParsing && (
 						<div className="space-y-5">
 							{/* Selected File Card */}
@@ -343,8 +375,8 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 								)}
 							</div>
 
-							{/* Summary Stats Container - Single Horizontal Minimal Row */}
-							<div className="grid grid-cols-2 overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-stroke-soft-200">
+							{/* Summary Stats Container */}
+							<div className="grid grid-cols-2 divide-y divide-stroke-soft-200 overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0 sm:grid-cols-4 sm:divide-x sm:divide-y-0">
 								{/* Valid Contacts */}
 								<div className="flex flex-col justify-center px-3.5 py-2.5">
 									<p className="truncate whitespace-nowrap font-normal text-text-sub-600 text-xs">
@@ -386,47 +418,61 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 								</div>
 							</div>
 
-							{/* Detected Column Mapping Badges */}
-							<div className="space-y-2 rounded-xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3.5 text-xs">
-								<p className="font-medium text-text-strong-950">
-									Detected Column Mappings:
-								</p>
-								<div className="flex flex-wrap items-center gap-1.5 pt-1">
-									<span className="inline-flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-1 font-mono text-[11px] text-text-strong-950">
-										<Icon
-											name="mail-single"
-											className="h-3 w-3 text-emerald-600"
-										/>
-										Email: {parsedResult.emailHeader}
-									</span>
+							{/* Interactive Column Mapper Table */}
+							<div className="space-y-2.5 pt-1">
+								<div className="flex items-center justify-between">
+									<p className="font-semibold text-xs text-text-strong-950">
+										Column Mapping
+									</p>
+									<p className="text-[11px] text-text-sub-600">
+										CSV Header → Reloop Property
+									</p>
+								</div>
 
-									{parsedResult.firstNameHeader && (
-										<span className="inline-flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-1 font-mono text-[11px] text-text-strong-950">
-											<Icon
-												name="user-single"
-												className="h-3 w-3 text-blue-600"
-											/>
-											First Name: {parsedResult.firstNameHeader}
-										</span>
-									)}
-
-									{parsedResult.lastNameHeader && (
-										<span className="inline-flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-1 font-mono text-[11px] text-text-strong-950">
-											<Icon
-												name="user-single"
-												className="h-3 w-3 text-blue-600"
-											/>
-											Last Name: {parsedResult.lastNameHeader}
-										</span>
-									)}
-
-									{parsedResult.customHeaders.map((header) => (
-										<span
-											key={header}
-											className="inline-flex items-center gap-1 rounded-md border border-stroke-soft-200 bg-bg-white-0 px-2 py-1 font-mono text-[11px] text-text-sub-600"
+								<div className="divide-y divide-stroke-soft-200 overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-white-0">
+									{mappings.map((item) => (
+										<div
+											key={item.csvHeader}
+											className="grid grid-cols-12 items-center px-4 py-2.5 text-xs transition-colors hover:bg-bg-weak-50/40"
 										>
-											Property: {header}
-										</span>
+											{/* Left Column (5/12): CSV Header Name */}
+											<div className="col-span-5 flex min-w-0 items-center justify-start">
+												<span className="inline-flex max-w-full items-center truncate rounded-md border border-stroke-soft-200 bg-bg-weak-50 px-2.5 py-1 font-mono text-[11px] font-medium text-text-strong-950">
+													{item.csvHeader}
+												</span>
+											</div>
+
+											{/* Center Column (2/12): Arrow (Centered vertically & horizontally) */}
+											<div className="col-span-2 flex items-center justify-center">
+												<Icon
+													name="arrow-right"
+													className="h-3.5 w-3.5 shrink-0 text-text-sub-600"
+												/>
+											</div>
+
+											{/* Right Column (5/12): Reloop Property Dropdown */}
+											<div className="col-span-5 flex items-center justify-end">
+												<select
+													value={item.target}
+													disabled={isImporting}
+													onChange={(e) =>
+														handleMappingChange(
+															item.csvHeader,
+															e.target.value as ColumnTarget,
+														)
+													}
+													className="w-full cursor-pointer rounded-lg border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1.5 font-sans text-xs text-text-strong-950 outline-none transition-colors hover:border-stroke-soft-300 focus:border-stroke-strong-950 disabled:cursor-not-allowed disabled:opacity-50"
+												>
+													<option value="email">Email Address (Required)</option>
+													<option value="firstName">First Name</option>
+													<option value="lastName">Last Name</option>
+													<option value={`property:${item.csvHeader}`}>
+														Property: {item.csvHeader}
+													</option>
+													<option value="skip">Do Not Import (Skip)</option>
+												</select>
+											</div>
+										</div>
 									))}
 								</div>
 							</div>
