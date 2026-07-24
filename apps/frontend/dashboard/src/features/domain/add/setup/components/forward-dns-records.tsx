@@ -191,12 +191,12 @@ export const ForwardDNSRecordsButton = ({
 
 									<form
 										onSubmit={handleForward}
-										className="mt-3 flex flex-col gap-3"
+										className="mt-3 flex flex-col"
 									>
-										<div className="space-y-1.5 text-left">
+										<div className="text-left">
 											<Label.Root
 												htmlFor="forward-email"
-												className="block font-medium text-text-strong-950 text-xs"
+												className="mb-1.5 block font-medium text-text-strong-950 text-xs"
 											>
 												Email
 												<Label.Asterisk />
@@ -230,7 +230,7 @@ export const ForwardDNSRecordsButton = ({
 															duration: 0.15,
 															ease: [0.23, 1, 0.32, 1],
 														}}
-														className="overflow-hidden text-error-base text-xs"
+														className="mt-1 overflow-hidden font-medium text-error-base text-xs"
 													>
 														{error}
 													</motion.p>
@@ -238,7 +238,7 @@ export const ForwardDNSRecordsButton = ({
 											</AnimatePresence>
 										</div>
 
-										<div className="flex items-center justify-end gap-2 pt-1">
+										<div className="mt-3 flex items-center justify-end gap-2">
 											<Button.Root
 												type="button"
 												variant="neutral"
