@@ -7,6 +7,7 @@ import {
 	Root as PopoverRoot,
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
+import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
@@ -54,7 +55,7 @@ export const GroupDropdown = ({
 		{
 			id: "copy-id",
 			label: isCopied ? "Copied ID!" : "Copy group ID",
-			icon: isCopied ? ("check" as const) : ("copy" as const),
+			icon: isCopied ? ("check-circle" as const) : ("copy" as const),
 			isDanger: false,
 		},
 		{
@@ -66,7 +67,7 @@ export const GroupDropdown = ({
 		{
 			id: "export",
 			label: "Export contacts",
-			icon: "download" as const,
+			icon: "file-download" as const,
 			isDanger: false,
 		},
 		{
@@ -183,7 +184,7 @@ export const GroupDropdown = ({
 							onClick={() => void handleItemClick(item.id)}
 							disabled={item.id === "delete" && isDeleting}
 							className={cn(
-								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
+								"relative flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-medium text-xs transition-colors min-h-[28px]",
 								item.isDanger ? "text-error-base" : "text-text-strong-950",
 								!currentRect &&
 									hoverIdx === idx &&
@@ -193,15 +194,42 @@ export const GroupDropdown = ({
 									"cursor-not-allowed opacity-50",
 							)}
 						>
-							<Icon
-								name={item.icon}
-								className={cn(
-									"h-3.5 w-3.5",
-									item.isDanger ? "" : "text-text-sub-600",
-									item.id === "copy-id" && isCopied ? "text-success-base" : "",
-								)}
-							/>
-							<span>{item.label}</span>
+							{item.id === "copy-id" ? (
+								<AnimatePresence mode="popLayout" initial={false}>
+									<motion.div
+										key={isCopied ? "copied" : "idle"}
+										transition={{
+											type: "spring",
+											duration: 0.25,
+											bounce: 0,
+										}}
+										initial={{ opacity: 0, y: -14 }}
+										animate={{ opacity: 1, y: 0 }}
+										exit={{ opacity: 0, y: 14 }}
+										className="flex items-center gap-2"
+									>
+										<Icon
+											name={isCopied ? "check-circle" : "copy"}
+											className={cn(
+												"h-3.5 w-3.5 shrink-0",
+												isCopied ? "text-success-base" : "text-text-sub-600",
+											)}
+										/>
+										<span>{isCopied ? "Copied ID!" : "Copy group ID"}</span>
+									</motion.div>
+								</AnimatePresence>
+							) : (
+								<>
+									<Icon
+										name={item.icon}
+										className={cn(
+											"h-3.5 w-3.5 shrink-0",
+											item.isDanger ? "" : "text-text-sub-600",
+										)}
+									/>
+									<span>{item.label}</span>
+								</>
+							)}
 						</button>
 					))}
 					<AnimatedHoverBackground

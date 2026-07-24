@@ -274,7 +274,7 @@ export const DeleteGroupModal = ({
 									) : deleteState === "success" ? (
 										<>
 											<Icon
-												name="check"
+												name="check-circle"
 												className="h-4 w-4 shrink-0 text-white"
 											/>
 											<span>Deleted</span>

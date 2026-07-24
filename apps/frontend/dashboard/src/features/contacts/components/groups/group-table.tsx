@@ -4,7 +4,7 @@ import { formatRelativeTime } from "#/utils/format-relative-time";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
@@ -82,17 +82,9 @@ export const GroupTable = ({
 	searchQuery,
 	onClearSearch,
 }: GroupTableProps) => {
-	const navigate = useNavigate();
 	const [, setModal] = useQueryState("modal");
 	const [, setId] = useQueryState("id");
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
-
-	const handleRowClick = (group: Group) => {
-		void navigate({
-			to: "/contacts/groups/$groupId",
-			params: { groupId: group.id },
-		});
-	};
 
 	const handleDelete = (group: Group) => {
 		void setModal("delete-group");
@@ -139,19 +131,22 @@ export const GroupTable = ({
 						return (
 							<div
 								key={group.id}
-								onClick={() => handleRowClick(group)}
 								className={cn(
-									"group/row grid w-full cursor-pointer grid-cols-[1fr_100px_150px_80px] items-center px-4 py-2 text-left transition-colors",
-									"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-base focus-visible:outline-offset-[-1px]",
+									"group/row grid w-full grid-cols-[1fr_100px_150px_80px] items-center px-4 py-2 text-left transition-colors",
+									"hover:bg-bg-weak-50/50",
 									isRowActive && "bg-bg-weak-50/50",
 								)}
 							>
 								{/* Name Column */}
 								<div className="flex items-center gap-2">
 									<Icon name="modules" className="h-4 w-4 shrink-0 text-text-sub-600" />
-									<span className="truncate font-medium text-label-sm text-text-strong-950">
+									<Link
+										to="/contacts/groups/$groupId"
+										params={{ groupId: group.id }}
+										className="truncate font-medium text-label-sm text-text-strong-950 transition-colors hover:text-[#1868DF] hover:underline dark:hover:text-blue-400"
+									>
 										{group.name}
-									</span>
+									</Link>
 								</div>
 
 								{/* Contacts Column */}
