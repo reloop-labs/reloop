@@ -36,7 +36,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 		if (isPropertiesPage) void setModal("add-property");
 		else if (isChannelsPage) void setModal("create-channel");
 		else if (isGroupsPage) void setModal("create-group");
-		else void setModal("add-contact");
+		else void navigate({ to: "/contacts/create" });
 	};
 
 	useHotkeys(

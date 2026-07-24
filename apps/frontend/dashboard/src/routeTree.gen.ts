@@ -30,6 +30,7 @@ import { Route as DashboardSmtpRouteImport } from './routes/_dashboard/smtp'
 import { Route as DashboardTemplatesRouteImport } from './routes/_dashboard/templates'
 import { Route as DashboardWebhooksRouteImport } from './routes/_dashboard/webhooks'
 import { Route as DashboardWorkflowsRouteImport } from './routes/_dashboard/workflows'
+import { Route as ContactsCreateRouteImport } from './routes/contacts.create'
 import { Route as DashboardApiKeysIndexRouteImport } from './routes/_dashboard/api-keys/index'
 import { Route as DashboardApiKeysApiKeyIdRouteImport } from './routes/_dashboard/api-keys/$apiKeyId'
 import { Route as DashboardApiKeysCreateRouteImport } from './routes/_dashboard/api-keys/create'
@@ -186,6 +187,11 @@ const DashboardWorkflowsRoute = DashboardWorkflowsRouteImport.update({
   id: '/workflows',
   path: '/workflows',
   getParentRoute: () => DashboardRoute,
+} as any)
+const ContactsCreateRoute = ContactsCreateRouteImport.update({
+  id: '/contacts/create',
+  path: '/contacts/create',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardApiKeysIndexRoute = DashboardApiKeysIndexRouteImport.update({
   id: '/',
@@ -498,6 +504,7 @@ export interface FileRoutesByFullPath {
   '/templates': typeof DashboardTemplatesRouteWithChildren
   '/webhooks': typeof DashboardWebhooksRouteWithChildren
   '/workflows': typeof DashboardWorkflowsRouteWithChildren
+  '/contacts/create': typeof ContactsCreateRoute
   '/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
   '/api-keys/create': typeof DashboardApiKeysCreateRoute
   '/contacts/channels': typeof DashboardContactsChannelsRoute
@@ -562,6 +569,7 @@ export interface FileRoutesByTo {
   '/integrations': typeof DashboardIntegrationsRoute
   '/metrics': typeof DashboardMetricsRoute
   '/smtp': typeof DashboardSmtpRoute
+  '/contacts/create': typeof ContactsCreateRoute
   '/': typeof DashboardIndexRoute
   '/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
   '/api-keys/create': typeof DashboardApiKeysCreateRoute
@@ -633,6 +641,7 @@ export interface FileRoutesById {
   '/_dashboard/templates': typeof DashboardTemplatesRouteWithChildren
   '/_dashboard/webhooks': typeof DashboardWebhooksRouteWithChildren
   '/_dashboard/workflows': typeof DashboardWorkflowsRouteWithChildren
+  '/contacts/create': typeof ContactsCreateRoute
   '/_dashboard/': typeof DashboardIndexRoute
   '/_dashboard/api-keys/$apiKeyId': typeof DashboardApiKeysApiKeyIdRoute
   '/_dashboard/api-keys/create': typeof DashboardApiKeysCreateRoute
@@ -710,6 +719,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/webhooks'
     | '/workflows'
+    | '/contacts/create'
     | '/api-keys/$apiKeyId'
     | '/api-keys/create'
     | '/contacts/channels'
@@ -774,6 +784,7 @@ export interface FileRouteTypes {
     | '/integrations'
     | '/metrics'
     | '/smtp'
+    | '/contacts/create'
     | '/'
     | '/api-keys/$apiKeyId'
     | '/api-keys/create'
@@ -844,6 +855,7 @@ export interface FileRouteTypes {
     | '/_dashboard/templates'
     | '/_dashboard/webhooks'
     | '/_dashboard/workflows'
+    | '/contacts/create'
     | '/_dashboard/'
     | '/_dashboard/api-keys/$apiKeyId'
     | '/_dashboard/api-keys/create'
@@ -906,6 +918,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   SignupRoute: typeof SignupRoute
   VerifyRoute: typeof VerifyRoute
+  ContactsCreateRoute: typeof ContactsCreateRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1056,6 +1069,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/workflows'
       preLoaderRoute: typeof DashboardWorkflowsRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/contacts/create': {
+      id: '/contacts/create'
+      path: '/contacts/create'
+      fullPath: '/contacts/create'
+      preLoaderRoute: typeof ContactsCreateRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_dashboard/api-keys/': {
       id: '/_dashboard/api-keys/'
@@ -1754,6 +1774,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   SignupRoute: SignupRoute,
   VerifyRoute: VerifyRoute,
+  ContactsCreateRoute: ContactsCreateRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
