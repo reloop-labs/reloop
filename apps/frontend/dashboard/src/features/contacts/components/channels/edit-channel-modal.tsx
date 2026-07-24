@@ -33,6 +33,7 @@ interface EditChannelModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	channel: Channel | null;
+	onUpdateSuccess?: (updatedName: string) => void;
 }
 
 const MAX_DESCRIPTION_LENGTH = 500;
@@ -41,6 +42,7 @@ export const EditChannelModal = ({
 	open,
 	onOpenChange,
 	channel,
+	onUpdateSuccess,
 }: EditChannelModalProps) => {
 	const invalidate = useInvalidateContacts();
 	const {data: channelsData} = useQuery({
@@ -54,7 +56,7 @@ export const EditChannelModal = ({
 		},
 		enabled: Boolean(open ? "/api/contacts/v1/channels/list?limit=10" : null),
 	});
-	const [isSaving, setIsSaving] = useState(false);
+	const [status, setStatus] = useState<"idle" | "saving" | "success">("idle");
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [nameError, setNameError] = useState<string | null>(null);
@@ -72,6 +74,7 @@ export const EditChannelModal = ({
 			setVisibility(channel.visibility || "private");
 			setDefaultSubscription(channel.defaultSubscription || "opt_in");
 			setNameError(null);
+			setStatus("idle");
 		}
 	}, [channel, open]);
 
@@ -84,6 +87,7 @@ export const EditChannelModal = ({
 				setName("");
 				setDescription("");
 				setNameError(null);
+				setStatus("idle");
 			}
 			onOpenChange(isOpen);
 		},
@@ -114,12 +118,16 @@ export const EditChannelModal = ({
 				return;
 			}
 
-			setIsSaving(true);
+			if (status !== "idle") return;
+
+			setStatus("saving");
+			const updatedChannelName = name.trim();
+
 			try {
 				await axios.patch(
 					`/api/contacts/v1/channels/${channel.id}`,
 					{
-						name: name.trim(),
+						name: updatedChannelName,
 						description: description.trim() || undefined,
 						visibility,
 						defaultSubscription,
@@ -127,17 +135,20 @@ export const EditChannelModal = ({
 					{ withCredentials: true },
 				);
 
-				toast.success("Channel updated successfully");
-				handleOpenChange(false);
-				await invalidate();
+				setStatus("success");
+
+				setTimeout(() => {
+					onUpdateSuccess?.(updatedChannelName);
+					handleOpenChange(false);
+					void invalidate();
+				}, 750);
 			} catch (error) {
 				console.error("Failed to update channel:", error);
 				const errorMessage = axios.isAxiosError(error)
 					? error.response?.data?.message || "Failed to update channel"
 					: "Failed to update channel";
 				toast.error(errorMessage);
-			} finally {
-				setIsSaving(false);
+				setStatus("idle");
 			}
 		},
 		[
@@ -146,9 +157,12 @@ export const EditChannelModal = ({
 			description,
 			visibility,
 			defaultSubscription,
-			isDescriptionOverLimit, invalidate,
+			isDescriptionOverLimit,
+			status,
+			invalidate,
 			handleOpenChange,
 			validateForm,
+			onUpdateSuccess,
 		],
 	);
 
@@ -157,12 +171,12 @@ export const EditChannelModal = ({
 		"mod+enter",
 		(e) => {
 			e.preventDefault();
-			if (open && !isSaving && name.trim() && !isDescriptionOverLimit) {
+			if (open && status === "idle" && name.trim() && !isDescriptionOverLimit) {
 				handleSubmit();
 			}
 		},
 		{ enableOnFormTags: true, enabled: open },
-		[open, isSaving, name, isDescriptionOverLimit, handleSubmit],
+		[open, status, name, isDescriptionOverLimit, handleSubmit],
 	);
 
 	const previewChannel = {
@@ -215,7 +229,7 @@ export const EditChannelModal = ({
 														if (nameError) setNameError(null);
 													}}
 													placeholder="e.g., Product Updates"
-													disabled={isSaving}
+													disabled={status !== "idle"}
 												/>
 											</Input.Wrapper>
 										</Input.Root>
@@ -242,7 +256,7 @@ export const EditChannelModal = ({
 											onChange={(e) => setDescription(e.target.value)}
 											placeholder="Describe this channel..."
 											rows={2}
-											disabled={isSaving}
+											disabled={status !== "idle"}
 											hasError={isDescriptionOverLimit}
 											className="min-h-[60px] resize-none rounded-2xl"
 										/>
@@ -274,7 +288,7 @@ export const EditChannelModal = ({
 											onCheckedChange={(checked) =>
 												setDefaultSubscription(checked ? "opt_in" : "opt_out")
 											}
-											disabled={isSaving}
+											disabled={status !== "idle"}
 											className="mt-0.5"
 										/>
 										<div className="-mt-px flex-1">
@@ -304,7 +318,7 @@ export const EditChannelModal = ({
 											onCheckedChange={(checked) =>
 												setVisibility(checked ? "public" : "private")
 											}
-											disabled={isSaving}
+											disabled={status !== "idle"}
 											className="mt-0.5"
 										/>
 										<div className="-mt-px flex-1">
@@ -327,46 +341,58 @@ export const EditChannelModal = ({
 									mode="stroke"
 									size="small"
 									onClick={() => handleOpenChange(false)}
-									disabled={isSaving}
+									disabled={status !== "idle"}
 								>
 									Cancel
 									<KbdEsc />
 								</Button.Root>
 								<FancyButton.Root
 									type="submit"
-									variant="blue"
+									variant={status === "success" ? "success" : "blue"}
 									size="small"
-									disabled={isSaving || !name.trim() || isDescriptionOverLimit}
+									disabled={
+										status === "saving" ||
+										status === "success" ||
+										(status === "idle" && (!name.trim() || isDescriptionOverLimit))
+									}
+									className={cn(
+										"w-[160px] min-w-[160px] justify-center overflow-hidden transition-all duration-200",
+										status === "saving" && "opacity-90",
+									)}
 								>
-									<AnimatePresence mode="wait" initial={false}>
-										{isSaving ? (
-											<motion.span
-												key="saving"
-												initial={{ opacity: 0, y: -4 }}
-												animate={{ opacity: 1, y: 0 }}
-												exit={{ opacity: 0, y: 4 }}
-												transition={{ duration: 0.15 }}
-												className="flex items-center gap-2"
-											>
-												<Spinner size={14} color="currentColor" />
-												<span>Updating...</span>
-											</motion.span>
-										) : (
-											<motion.span
-												key="update"
-												initial={{ opacity: 0, y: -4 }}
-												animate={{ opacity: 1, y: 0 }}
-												exit={{ opacity: 0, y: 4 }}
-												transition={{ duration: 0.15 }}
-												className="flex items-center gap-2"
-											>
-												<span>Update Channel</span>
-												<span className="inline-flex items-center gap-0.5 opacity-80">
-													<KbdCommand />
-													<KbdEnter />
-												</span>
-											</motion.span>
-										)}
+									<AnimatePresence mode="popLayout" initial={false}>
+										<motion.span
+											key={status}
+											transition={{
+												type: "spring",
+												duration: 0.25,
+												bounce: 0,
+											}}
+											initial={{ opacity: 0, y: -14 }}
+											animate={{ opacity: 1, y: 0 }}
+											exit={{ opacity: 0, y: 14 }}
+											className="flex items-center justify-center gap-1.5"
+										>
+											{status === "saving" ? (
+												<>
+													<Spinner size={14} color="currentColor" />
+													<span>Updating...</span>
+												</>
+											) : status === "success" ? (
+												<>
+													<Icon name="check-circle" className="h-4 w-4" />
+													<span>Channel Updated</span>
+												</>
+											) : (
+												<>
+													<span>Update Channel</span>
+													<span className="inline-flex items-center gap-0.5 opacity-80">
+														<KbdCommand />
+														<KbdEnter />
+													</span>
+												</>
+											)}
+										</motion.span>
 									</AnimatePresence>
 								</FancyButton.Root>
 							</Modal.Footer>

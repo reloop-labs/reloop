@@ -31,6 +31,7 @@ interface Channel {
 interface CreateChannelModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	onCreateSuccess?: (channelName: string) => void;
 }
 
 const MAX_DESCRIPTION_LENGTH = 500;
@@ -38,6 +39,7 @@ const MAX_DESCRIPTION_LENGTH = 500;
 export const CreateChannelModal = ({
 	open,
 	onOpenChange,
+	onCreateSuccess,
 }: CreateChannelModalProps) => {
 	const invalidate = useInvalidateContacts();
 	const { data: channelsData } = useQuery({
@@ -55,7 +57,7 @@ export const CreateChannelModal = ({
 		},
 		enabled: Boolean(open ? "/api/contacts/v1/channels/list?limit=10" : null),
 	});
-	const [isCreating, setIsCreating] = useState(false);
+	const [status, setStatus] = useState<"idle" | "creating" | "success">("idle");
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [nameError, setNameError] = useState<string | null>(null);
@@ -77,6 +79,7 @@ export const CreateChannelModal = ({
 				setNameError(null);
 				setDefaultSubscription("opt_in");
 				setVisibility("private");
+				setStatus("idle");
 			}
 			onOpenChange(isOpen);
 		},
@@ -107,12 +110,16 @@ export const CreateChannelModal = ({
 				return;
 			}
 
-			setIsCreating(true);
+			if (status !== "idle") return;
+
+			setStatus("creating");
+			const createdChannelName = name.trim();
+
 			try {
 				await axios.post(
 					"/api/contacts/v1/channels/create",
 					{
-						name: name.trim(),
+						name: createdChannelName,
 						description: description.trim() || undefined,
 						defaultSubscription,
 						visibility,
@@ -120,17 +127,20 @@ export const CreateChannelModal = ({
 					{ headers: { credentials: "include" } },
 				);
 
-				toast.success("Channel created successfully");
-				handleOpenChange(false);
-				await invalidate();
+				setStatus("success");
+
+				setTimeout(() => {
+					onCreateSuccess?.(createdChannelName);
+					handleOpenChange(false);
+					void invalidate();
+				}, 750);
 			} catch (error) {
 				console.error("Failed to create channel:", error);
 				const errorMessage = axios.isAxiosError(error)
 					? error.response?.data?.message || "Failed to create channel"
 					: "Failed to create channel";
 				toast.error(errorMessage);
-			} finally {
-				setIsCreating(false);
+				setStatus("idle");
 			}
 		},
 		[
@@ -139,9 +149,11 @@ export const CreateChannelModal = ({
 			defaultSubscription,
 			visibility,
 			isDescriptionOverLimit,
+			status,
 			invalidate,
 			handleOpenChange,
 			validateForm,
+			onCreateSuccess,
 		],
 	);
 
@@ -150,12 +162,12 @@ export const CreateChannelModal = ({
 		"mod+enter",
 		(e) => {
 			e.preventDefault();
-			if (open && !isCreating && name.trim() && !isDescriptionOverLimit) {
+			if (open && status === "idle" && name.trim() && !isDescriptionOverLimit) {
 				handleSubmit();
 			}
 		},
 		{ enableOnFormTags: true, enabled: open },
-		[open, isCreating, name, isDescriptionOverLimit, handleSubmit],
+		[open, status, name, isDescriptionOverLimit, handleSubmit],
 	);
 
 	const previewChannel = {
@@ -208,7 +220,7 @@ export const CreateChannelModal = ({
 														if (nameError) setNameError(null);
 													}}
 													placeholder="e.g., Product Updates"
-													disabled={isCreating}
+													disabled={status !== "idle"}
 													autoFocus
 												/>
 											</Input.Wrapper>
@@ -236,7 +248,7 @@ export const CreateChannelModal = ({
 											onChange={(e) => setDescription(e.target.value)}
 											placeholder="Describe this channel..."
 											rows={2}
-											disabled={isCreating}
+											disabled={status !== "idle"}
 											hasError={isDescriptionOverLimit}
 											className="min-h-[60px] resize-none rounded-2xl"
 										/>
@@ -268,7 +280,7 @@ export const CreateChannelModal = ({
 											onCheckedChange={(checked) =>
 												setDefaultSubscription(checked ? "opt_in" : "opt_out")
 											}
-											disabled={isCreating}
+											disabled={status !== "idle"}
 											className="mt-0.5"
 										/>
 										<div className="-mt-px flex-1">
@@ -298,7 +310,7 @@ export const CreateChannelModal = ({
 											onCheckedChange={(checked) =>
 												setVisibility(checked ? "public" : "private")
 											}
-											disabled={isCreating}
+											disabled={status !== "idle"}
 											className="mt-0.5"
 										/>
 										<div className="-mt-px flex-1">
@@ -321,48 +333,58 @@ export const CreateChannelModal = ({
 									mode="stroke"
 									size="small"
 									onClick={() => handleOpenChange(false)}
-									disabled={isCreating}
+									disabled={status !== "idle"}
 								>
 									Cancel
 									<KbdEsc />
 								</Button.Root>
 								<FancyButton.Root
 									type="submit"
-									variant="blue"
+									variant={status === "success" ? "success" : "blue"}
 									size="small"
 									disabled={
-										isCreating || !name.trim() || isDescriptionOverLimit
+										status === "creating" ||
+										status === "success" ||
+										(status === "idle" && (!name.trim() || isDescriptionOverLimit))
 									}
+									className={cn(
+										"w-[160px] min-w-[160px] justify-center overflow-hidden transition-all duration-200",
+										status === "creating" && "opacity-90",
+									)}
 								>
-									<AnimatePresence mode="wait" initial={false}>
-										{isCreating ? (
-											<motion.span
-												key="creating"
-												initial={{ opacity: 0, y: -4 }}
-												animate={{ opacity: 1, y: 0 }}
-												exit={{ opacity: 0, y: 4 }}
-												transition={{ duration: 0.15 }}
-												className="flex items-center gap-2"
-											>
-												<Spinner size={14} color="currentColor" />
-												<span>Creating...</span>
-											</motion.span>
-										) : (
-											<motion.span
-												key="create"
-												initial={{ opacity: 0, y: -4 }}
-												animate={{ opacity: 1, y: 0 }}
-												exit={{ opacity: 0, y: 4 }}
-												transition={{ duration: 0.15 }}
-												className="flex items-center gap-2"
-											>
-												<span>Create Channel</span>
-												<span className="inline-flex items-center gap-0.5 opacity-80">
-													<KbdCommand />
-													<KbdEnter />
-												</span>
-											</motion.span>
-										)}
+									<AnimatePresence mode="popLayout" initial={false}>
+										<motion.span
+											key={status}
+											transition={{
+												type: "spring",
+												duration: 0.25,
+												bounce: 0,
+											}}
+											initial={{ opacity: 0, y: -14 }}
+											animate={{ opacity: 1, y: 0 }}
+											exit={{ opacity: 0, y: 14 }}
+											className="flex items-center justify-center gap-1.5"
+										>
+											{status === "creating" ? (
+												<>
+													<Spinner size={14} color="currentColor" />
+													<span>Creating...</span>
+												</>
+											) : status === "success" ? (
+												<>
+													<Icon name="check-circle" className="h-4 w-4" />
+													<span>Channel Created</span>
+												</>
+											) : (
+												<>
+													<span>Create Channel</span>
+													<span className="inline-flex items-center gap-0.5 opacity-80">
+														<KbdCommand />
+														<KbdEnter />
+													</span>
+												</>
+											)}
+										</motion.span>
 									</AnimatePresence>
 								</FancyButton.Root>
 							</Modal.Footer>

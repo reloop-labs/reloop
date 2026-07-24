@@ -22,12 +22,16 @@ import {
 } from "./hooks/use-contacts-query";
 
 interface ContactsModalsProps {
+	onCreateChannelSuccess?: (channelName: string) => void;
+	onUpdateChannelSuccess?: (updatedName: string) => void;
 	onDeleteChannelSuccess?: (deletedName: string) => void;
 	onDeleteGroupSuccess?: (deletedName: string) => void;
 	onDeletePropertySuccess?: (deletedName: string) => void;
 }
 
 export function ContactsModals({
+	onCreateChannelSuccess,
+	onUpdateChannelSuccess,
 	onDeleteChannelSuccess,
 	onDeleteGroupSuccess,
 	onDeletePropertySuccess,
@@ -97,6 +101,7 @@ export function ContactsModals({
 			<CreateChannelModal
 				open={modal === "create-channel"}
 				onOpenChange={handleOpenChange}
+				onCreateSuccess={onCreateChannelSuccess}
 			/>
 			<CreateGroupModal
 				open={modal === "create-group"}
@@ -107,6 +112,7 @@ export function ContactsModals({
 				open={modal === "edit-channel"}
 				onOpenChange={handleOpenChange}
 				channel={channelsData?.channels?.find((t) => t.id === id) || null}
+				onUpdateSuccess={onUpdateChannelSuccess}
 			/>
 			<EditPropertyModal
 				open={modal === "edit-property"}
