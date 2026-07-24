@@ -79,7 +79,11 @@ export function CsvPropertyMapping({
 				</div>
 
 				{/* Body */}
-				<div className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40">
+				<motion.div
+					layout
+					transition={{ layout: { duration: 0.25, ease: [0.2, 0, 0, 1] } }}
+					className="-mt-2.5 divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40"
+				>
 					{showEmptyState ? (
 						<div className="flex flex-col items-center justify-center gap-1 px-4 py-8 text-center">
 							<p className="text-text-sub-600 text-xs leading-relaxed">
@@ -87,7 +91,7 @@ export function CsvPropertyMapping({
 							</p>
 						</div>
 					) : (
-						<AnimatePresence initial={false}>
+						<AnimatePresence mode="sync" initial={false}>
 							{rows.map((row) => (
 								<MappingRow
 									key={row.id}
@@ -101,25 +105,24 @@ export function CsvPropertyMapping({
 									isPendingProperties={isPending}
 								/>
 							))}
+							<motion.div
+								layout
+								transition={{ duration: 0.25, ease: [0.2, 0, 0, 1] }}
+								className="flex items-center justify-end px-4 py-2 text-label-xs text-text-sub-600"
+							>
+								<button
+									type="button"
+									disabled={disabled}
+									onClick={addRow}
+									className="inline-flex cursor-pointer items-center gap-1 font-medium text-label-xs text-text-sub-600 transition-all hover:text-text-strong-950 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+								>
+									<Icon name="plus" className="h-3.5 w-3.5" />
+									Add mapping
+								</button>
+							</motion.div>
 						</AnimatePresence>
 					)}
-
-					<motion.div
-						layout
-						transition={{ duration: 0.25, ease: [0.2, 0, 0, 1] }}
-						className="flex items-center justify-end px-4 py-2 text-label-xs text-text-sub-600"
-					>
-						<button
-							type="button"
-							disabled={disabled}
-							onClick={addRow}
-							className="inline-flex cursor-pointer items-center gap-1 font-medium text-label-xs text-text-sub-600 transition-all hover:text-text-strong-950 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-						>
-							<Icon name="plus" className="h-3.5 w-3.5" />
-							Add mapping
-						</button>
-					</motion.div>
-				</div>
+				</motion.div>
 			</div>
 
 			{!emailMapped && rows.length > 0 && (
