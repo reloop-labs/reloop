@@ -7,8 +7,15 @@ import * as Label from "@reloop/ui/label";
 import * as Popover from "@reloop/ui/popover";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useState } from "react";
+import {
+	AnimatePresence,
+	type AnimationPlaybackControls,
+	animate,
+	motion,
+	useMotionValue,
+	useReducedMotion,
+} from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface ForwardDNSRecordsButtonProps {
@@ -32,9 +39,24 @@ export const ForwardDNSRecordsButton = ({
 	const [error, setError] = useState<string | null>(null);
 	const [isSending, setIsSending] = useState(false);
 	const [isSent, setIsSent] = useState(false);
+	const [isHolding, setIsHolding] = useState(false);
+
+	const holdProgress = useMotionValue(0);
+	const animationRef = useRef<AnimationPlaybackControls | null>(null);
+
+	const cancelHold = () => {
+		if (!isHolding && holdProgress.get() === 0) return;
+		setIsHolding(false);
+		animationRef.current?.stop();
+		animate(holdProgress, 0, {
+			duration: 0.2,
+			ease: "easeOut",
+		});
+	};
 
 	useEffect(() => {
 		if (!isOpen) {
+			cancelHold();
 			setEmail("");
 			setError(null);
 			setIsSending(false);
@@ -49,20 +71,7 @@ export const ForwardDNSRecordsButton = ({
 		}
 	};
 
-	const handleForward = async (e: React.FormEvent) => {
-		e.preventDefault();
-		const trimmedEmail = email.trim();
-
-		if (!trimmedEmail) {
-			setError("Email is required.");
-			return;
-		}
-
-		if (!EMAIL_REGEX.test(trimmedEmail)) {
-			setError("Please enter a valid email address.");
-			return;
-		}
-
+	const executeForward = async (targetEmail: string) => {
 		if (!domainId || isSending) return;
 
 		setIsSending(true);
@@ -71,7 +80,7 @@ export const ForwardDNSRecordsButton = ({
 		try {
 			await axios.post(
 				`/api/domain/v1/verify/${domainId}/forward-dns`,
-				{ email: trimmedEmail },
+				{ email: targetEmail },
 				{ withCredentials: true },
 			);
 			setIsSending(false);
@@ -89,6 +98,49 @@ export const ForwardDNSRecordsButton = ({
 			toast.error(errorMessage);
 			setIsSending(false);
 		}
+	};
+
+	const startHold = () => {
+		if (isSending || isSent) return;
+		const trimmedEmail = email.trim();
+
+		if (!trimmedEmail) {
+			setError("Email is required.");
+			return;
+		}
+
+		if (!EMAIL_REGEX.test(trimmedEmail)) {
+			setError("Please enter a valid email address.");
+			return;
+		}
+
+		setIsHolding(true);
+		holdProgress.set(0);
+		animationRef.current = animate(holdProgress, 1, {
+			duration: 1.2,
+			ease: "linear",
+			onComplete: () => {
+				setIsHolding(false);
+				holdProgress.set(0);
+				void executeForward(trimmedEmail);
+			},
+		});
+	};
+
+	const handleFormSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		if (isSending || isSent) return;
+		const trimmedEmail = email.trim();
+		if (!trimmedEmail) {
+			setError("Email is required.");
+			return;
+		}
+		if (!EMAIL_REGEX.test(trimmedEmail)) {
+			setError("Please enter a valid email address.");
+			return;
+		}
+		cancelHold();
+		void executeForward(trimmedEmail);
 	};
 
 	return (
@@ -160,7 +212,7 @@ export const ForwardDNSRecordsButton = ({
 											/>
 										</svg>
 									</div>
-									<p className="font-medium text-sm text-text-strong-950">
+									<p className="mt-3 font-medium text-sm text-text-strong-950">
 										Instructions sent!
 									</p>
 									<p className="mt-1 text-text-sub-600 text-xs">
@@ -179,9 +231,9 @@ export const ForwardDNSRecordsButton = ({
 									transition={{ duration: 0.2 }}
 								>
 									<div className="space-y-1 text-left">
-										<h3 className="font-semibold text-sm text-text-strong-950">
+										<p className="font-semibold text-sm text-text-strong-950">
 											Forward DNS records
-										</h3>
+										</p>
 										<p className="text-text-sub-600 text-xs leading-relaxed">
 											Send these DNS instructions directly to a teammate or
 											domain administrator — they'll get everything needed to
@@ -189,10 +241,7 @@ export const ForwardDNSRecordsButton = ({
 										</p>
 									</div>
 
-									<form
-										onSubmit={handleForward}
-										className="mt-3 flex flex-col"
-									>
+									<form onSubmit={handleFormSubmit} className="mt-3 flex flex-col">
 										<div className="text-left">
 											<Label.Root
 												htmlFor="forward-email"
@@ -251,15 +300,24 @@ export const ForwardDNSRecordsButton = ({
 												Cancel
 											</Button.Root>
 											<FancyButton.Root
-												type="submit"
+												type="button"
 												variant="blue"
 												size="xsmall"
 												disabled={isSending}
+												onPointerDown={startHold}
+												onPointerUp={cancelHold}
+												onPointerLeave={cancelHold}
+												onPointerCancel={cancelHold}
 												className={cn(
-													"min-w-[130px] justify-center overflow-hidden rounded-lg transition-opacity duration-200 ease-out",
+													"relative min-w-[130px] select-none justify-center overflow-hidden rounded-lg transition-opacity duration-200 ease-out",
 													isSending && "pointer-events-none opacity-90",
 												)}
 											>
+												{/* Hold progress overlay fill */}
+												<motion.div
+													className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
+													style={{ scaleX: holdProgress }}
+												/>
 												<AnimatePresence mode="popLayout" initial={false}>
 													<motion.span
 														key={isSending ? "sending" : "idle"}
@@ -288,7 +346,7 @@ export const ForwardDNSRecordsButton = ({
 																<span>Sending...</span>
 															</>
 														) : (
-															"Send instructions"
+															"Hold to send"
 														)}
 													</motion.span>
 												</AnimatePresence>

@@ -6,8 +6,15 @@ import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import axios from "axios";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useState } from "react";
+import {
+	AnimatePresence,
+	type AnimationPlaybackControls,
+	animate,
+	motion,
+	useMotionValue,
+	useReducedMotion,
+} from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -32,9 +39,24 @@ export const ForwardDNSRecordsModal = ({
 	const [error, setError] = useState<string | null>(null);
 	const [isSending, setIsSending] = useState(false);
 	const [isSent, setIsSent] = useState(false);
+	const [isHolding, setIsHolding] = useState(false);
+
+	const holdProgress = useMotionValue(0);
+	const animationRef = useRef<AnimationPlaybackControls | null>(null);
+
+	const cancelHold = () => {
+		if (!isHolding && holdProgress.get() === 0) return;
+		setIsHolding(false);
+		animationRef.current?.stop();
+		animate(holdProgress, 0, {
+			duration: 0.2,
+			ease: "easeOut",
+		});
+	};
 
 	useEffect(() => {
 		if (!open) {
+			cancelHold();
 			setEmail("");
 			setError(null);
 			setIsSending(false);
@@ -49,20 +71,7 @@ export const ForwardDNSRecordsModal = ({
 		}
 	};
 
-	const handleForward = async (e: React.FormEvent) => {
-		e.preventDefault();
-		const trimmedEmail = email.trim();
-
-		if (!trimmedEmail) {
-			setError("Email is required.");
-			return;
-		}
-
-		if (!EMAIL_REGEX.test(trimmedEmail)) {
-			setError("Please enter a valid email address.");
-			return;
-		}
-
+	const executeForward = async (targetEmail: string) => {
 		if (!domainId || isSending) return;
 
 		setIsSending(true);
@@ -71,7 +80,7 @@ export const ForwardDNSRecordsModal = ({
 		try {
 			await axios.post(
 				`/api/domain/v1/verify/${domainId}/forward-dns`,
-				{ email: trimmedEmail },
+				{ email: targetEmail },
 				{ withCredentials: true },
 			);
 			setIsSending(false);
@@ -89,6 +98,49 @@ export const ForwardDNSRecordsModal = ({
 			toast.error(errorMessage);
 			setIsSending(false);
 		}
+	};
+
+	const startHold = () => {
+		if (isSending || isSent) return;
+		const trimmedEmail = email.trim();
+
+		if (!trimmedEmail) {
+			setError("Email is required.");
+			return;
+		}
+
+		if (!EMAIL_REGEX.test(trimmedEmail)) {
+			setError("Please enter a valid email address.");
+			return;
+		}
+
+		setIsHolding(true);
+		holdProgress.set(0);
+		animationRef.current = animate(holdProgress, 1, {
+			duration: 1.2,
+			ease: "linear",
+			onComplete: () => {
+				setIsHolding(false);
+				holdProgress.set(0);
+				void executeForward(trimmedEmail);
+			},
+		});
+	};
+
+	const handleFormSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		if (isSending || isSent) return;
+		const trimmedEmail = email.trim();
+		if (!trimmedEmail) {
+			setError("Email is required.");
+			return;
+		}
+		if (!EMAIL_REGEX.test(trimmedEmail)) {
+			setError("Please enter a valid email address.");
+			return;
+		}
+		cancelHold();
+		void executeForward(trimmedEmail);
 	};
 
 	return (
@@ -170,7 +222,7 @@ export const ForwardDNSRecordsModal = ({
 										</Modal.Description>
 									</div>
 
-									<form onSubmit={handleForward} className="mt-4 flex flex-col">
+									<form onSubmit={handleFormSubmit} className="mt-4 flex flex-col">
 										<div className="text-left">
 											<Label.Root
 												htmlFor="forward-email-modal"
@@ -229,15 +281,24 @@ export const ForwardDNSRecordsModal = ({
 												Cancel
 											</Button.Root>
 											<FancyButton.Root
-												type="submit"
+												type="button"
 												variant="blue"
 												size="small"
 												disabled={isSending}
+												onPointerDown={startHold}
+												onPointerUp={cancelHold}
+												onPointerLeave={cancelHold}
+												onPointerCancel={cancelHold}
 												className={cn(
-													"min-w-[130px] justify-center overflow-hidden rounded-xl transition-opacity duration-200 ease-out",
+													"relative min-w-[130px] select-none justify-center overflow-hidden rounded-xl transition-opacity duration-200 ease-out",
 													isSending && "pointer-events-none opacity-90",
 												)}
 											>
+												{/* Hold progress overlay fill */}
+												<motion.div
+													className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
+													style={{ scaleX: holdProgress }}
+												/>
 												<AnimatePresence mode="popLayout" initial={false}>
 													<motion.span
 														key={isSending ? "sending" : "idle"}
@@ -266,7 +327,7 @@ export const ForwardDNSRecordsModal = ({
 																<span>Sending...</span>
 															</>
 														) : (
-															"Send instructions"
+															"Hold to send"
 														)}
 													</motion.span>
 												</AnimatePresence>
