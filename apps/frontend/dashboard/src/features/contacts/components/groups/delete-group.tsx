@@ -14,12 +14,7 @@ import {
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
-
-interface Group {
-	id: string;
-	name: string;
-}
+import { useInvalidateContacts, type Group } from "#/features/contacts/hooks/use-contacts-query";
 
 interface DeleteGroupModalProps {
 	open: boolean;

@@ -158,7 +158,7 @@ export const ChannelTable = ({
 										name="notification-indicator"
 										className="h-4 w-4 shrink-0 text-text-sub-600"
 									/>
-									<span className="truncate font-medium text-label-sm text-text-strong-950">
+									<span className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors group-hover/row:text-[#1868DF] dark:group-hover/row:text-blue-400">
 										{channel.name}
 									</span>
 								</div>

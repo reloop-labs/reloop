@@ -9,12 +9,7 @@ import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
-
-interface Group {
-	id: string;
-	name: string;
-}
+import { useInvalidateContacts, type Group } from "#/features/contacts/hooks/use-contacts-query";
 
 interface EditGroupModalProps {
 	open: boolean;

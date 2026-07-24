@@ -1,15 +1,8 @@
-
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
-import { useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-
-interface Group {
-	id: string;
-	name: string;
-}
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { useRef, useState } from "react";
+import type { Group } from "#/features/contacts/hooks/use-contacts-query";
 
 interface GroupSelectProps {
 	selectedGroupIds: string[];

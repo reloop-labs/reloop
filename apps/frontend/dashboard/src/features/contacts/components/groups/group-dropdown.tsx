@@ -11,11 +11,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
-
-interface Group {
-	id: string;
-	name: string;
-}
+import type { Group } from "#/features/contacts/hooks/use-contacts-query";
 
 export interface GroupDropdownProps {
 	group: Group;

@@ -10,15 +10,7 @@ import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { GroupDropdown } from "./group-dropdown";
 import { GroupsEmptyState } from "./groups-empty-state";
-
-interface Group {
-	id: string;
-	name: string;
-	organizationId: string;
-	createdAt: string;
-	updatedAt: string;
-	deletedAt: string | null;
-}
+import type { Group } from "#/features/contacts/hooks/use-contacts-query";
 
 interface GroupTableProps {
 	groups: Group[];
@@ -143,7 +135,7 @@ export const GroupTable = ({
 									<Link
 										to="/contacts/groups/$groupId"
 										params={{ groupId: group.id }}
-										className="truncate font-medium text-label-sm text-text-strong-950 transition-colors hover:text-[#1868DF] hover:underline dark:hover:text-blue-400"
+										className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
 									>
 										{group.name}
 									</Link>
@@ -157,7 +149,7 @@ export const GroupTable = ({
 								{/* Created At Column */}
 								<div className="flex items-center">
 									<span className="whitespace-nowrap font-medium text-[13px]">
-										{formatRelativeTime(group.createdAt)}
+										{group.createdAt ? formatRelativeTime(group.createdAt) : "—"}
 									</span>
 								</div>
 

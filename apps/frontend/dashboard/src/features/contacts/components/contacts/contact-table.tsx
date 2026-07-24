@@ -174,7 +174,7 @@ export const ContactTable = ({
 										<div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-neutral-600 to-neutral-500 font-semibold text-[10px] text-white uppercase tracking-wide shadow-sm">
 											{contact.email.charAt(0).toUpperCase()}
 										</div>
-										<span className="font-medium text-label-sm text-text-strong-950">
+										<span className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors group-hover/row:text-[#1868DF] dark:group-hover/row:text-blue-400">
 											{contact.email}
 										</span>
 										{isEditing && (
