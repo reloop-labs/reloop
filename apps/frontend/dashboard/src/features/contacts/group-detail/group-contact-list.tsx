@@ -131,17 +131,11 @@ export const GroupContactList = ({ groupId }: { groupId: string }) => {
 				isLoading={isLoading}
 				loadingRows={5}
 				onAddContact={() => void setModal("add-contact-to-group")}
+				searchQuery={searchQuery}
+				onClearSearch={() => setSearchQuery("")}
 				emptyStateTitle="No contacts in this group"
 				emptyStateDescription="This group doesn't have any contacts yet. Add contacts to start segmenting your audience."
 				emptyStateButtonText="Add Contact to Group"
-				emptyStateShortcut={
-					<span className="inline-flex items-center gap-0.5">
-						<KbdKeyOutline>a</KbdKeyOutline>
-						<KbdKeyOutline>c</KbdKeyOutline>
-					</span>
-				}
-				emptyStateDocsText="Learn about groups"
-				emptyStateDocsLink="https://reloop.sh/docs/features/contacts/groups"
 			/>
 		</div>
 	);

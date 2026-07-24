@@ -37,6 +37,8 @@ interface ContactTableProps {
 	isLoading?: boolean;
 	loadingRows?: number;
 	onAddContact?: () => void;
+	searchQuery?: string;
+	onClearSearch?: () => void;
 	emptyStateTitle?: string;
 	emptyStateDescription?: string;
 	emptyStateButtonText?: string;
@@ -70,12 +72,14 @@ export const ContactTable = ({
 	isLoading,
 	loadingRows = 6,
 	onAddContact,
+	searchQuery,
+	onClearSearch,
 	emptyStateTitle,
 	emptyStateDescription,
 	emptyStateButtonText,
-	emptyStateShortcut,
-	emptyStateDocsText,
-	emptyStateDocsLink,
+	emptyStateShortcut: _emptyStateShortcut,
+	emptyStateDocsText: _emptyStateDocsText,
+	emptyStateDocsLink: _emptyStateDocsLink,
 }: ContactTableProps) => {
 	const navigate = useNavigate();
 	const [, setModal] = useQueryState("modal");
@@ -144,12 +148,11 @@ export const ContactTable = ({
 				) : contacts.length === 0 ? (
 					<ContactsEmptyState
 						onAddContact={onAddContact}
+						searchQuery={searchQuery}
+						onClearSearch={onClearSearch}
 						title={emptyStateTitle}
 						description={emptyStateDescription}
 						buttonText={emptyStateButtonText}
-						shortcut={emptyStateShortcut}
-						docsText={emptyStateDocsText}
-						docsLink={emptyStateDocsLink}
 					/>
 				) : (
 					contacts.map((contact) => {

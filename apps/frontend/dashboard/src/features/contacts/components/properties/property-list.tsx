@@ -70,6 +70,8 @@ export function PropertyList() {
 					total={data?.total || 0}
 					isLoading={isLoading}
 					onAddProperty={() => void setModal("add-property")}
+					searchQuery={search}
+					onClearSearch={() => setSearch("")}
 					currentPage={currentPage ?? 1}
 					pageSize={pageSize ?? 10}
 					onPageChange={(p) => void setCurrentPage(p)}

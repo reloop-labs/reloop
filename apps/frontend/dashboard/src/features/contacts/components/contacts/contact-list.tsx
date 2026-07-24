@@ -171,6 +171,8 @@ export function ContactList() {
 					isLoading={isLoading}
 					loadingRows={6}
 					onAddContact={() => void setModal("add-contact")}
+					searchQuery={searchQuery}
+					onClearSearch={() => setSearchQuery("")}
 				/>
 			</div>
 		</div>

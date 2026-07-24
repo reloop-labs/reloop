@@ -40,6 +40,8 @@ interface PropertyTableProps {
 	loadingRows?: number;
 	onDelete?: (propertyId: string) => void;
 	onAddProperty?: () => void;
+	searchQuery?: string;
+	onClearSearch?: () => void;
 }
 
 const getBadgeColor = (type: string) => {
@@ -184,6 +186,8 @@ export const PropertyTable = ({
 	loadingRows = 4,
 	onDelete: _onDelete,
 	onAddProperty,
+	searchQuery,
+	onClearSearch,
 }: PropertyTableProps) => {
 	const [, setModal] = useQueryState("modal");
 	const [, setId] = useQueryState("id");
@@ -237,7 +241,11 @@ export const PropertyTable = ({
 						<PropertySkeleton key={`skeleton-${i}`} />
 					))
 				) : properties.length === 0 ? (
-					<PropertiesEmptyState onAddProperty={onAddProperty} />
+					<PropertiesEmptyState
+						onAddProperty={onAddProperty}
+						searchQuery={searchQuery}
+						onClearSearch={onClearSearch}
+					/>
 				) : (
 					properties.map((property) => {
 						const isEditing = editingPropertyId === property.id;
