@@ -8,8 +8,8 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { useNavigate } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useState } from "react";
-import { toast } from "sonner";
 
 interface ChannelDropdownProps {
 	channelId: string;
@@ -33,6 +33,7 @@ export const ChannelDropdown = ({
 	const navigate = useNavigate();
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
+	const [isCopied, setIsCopied] = useState(false);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
@@ -61,11 +62,14 @@ export const ChannelDropdown = ({
 	const handleCopyId = async () => {
 		try {
 			await navigator.clipboard.writeText(channelId);
-			toast.success("Channel ID copied to clipboard");
+			setIsCopied(true);
+			setTimeout(() => {
+				setIsCopied(false);
+				setPopoverOpen(false);
+			}, 900);
 		} catch {
-			toast.error("Failed to copy channel ID");
+			setPopoverOpen(false);
 		}
-		setPopoverOpen(false);
 	};
 
 	const handleViewSubscribers = () => {
@@ -77,28 +81,33 @@ export const ChannelDropdown = ({
 
 	const menuItems = [
 		{
+			id: "edit",
 			icon: "edit" as const,
 			label: "Edit Channel",
 			onClick: handleEdit,
 			hidden: !onEdit,
 		},
 		{
+			id: "visibility",
 			icon: visibilityIcon as "lock" | "globe",
 			label: visibility === "public" ? "Set Private" : "Set Public",
 			onClick: handleToggleVisibility,
 			hidden: !onToggleVisibility,
 		},
 		{
+			id: "subscribers",
 			icon: "users" as const,
 			label: "View Subscribers",
 			onClick: handleViewSubscribers,
 		},
 		{
-			icon: "copy" as const,
-			label: "Copy Channel ID",
+			id: "copy-id",
+			icon: isCopied ? ("check-circle" as const) : ("copy" as const),
+			label: isCopied ? "Copied ID!" : "Copy channel ID",
 			onClick: handleCopyId,
 		},
 		{
+			id: "delete",
 			icon: "trash" as const,
 			label: "Delete Channel",
 			onClick: handleDelete,
@@ -121,7 +130,7 @@ export const ChannelDropdown = ({
 				<div className="relative">
 					{menuItems.map((item, idx) => (
 						<button
-							key={item.label}
+							key={item.id}
 							ref={(el) => {
 								if (el) buttonRefs.current[idx] = el;
 							}}
@@ -130,13 +139,41 @@ export const ChannelDropdown = ({
 							onPointerLeave={() => setHoverIdx(undefined)}
 							onClick={item.onClick}
 							className={cn(
-								"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-text-strong-950 text-xs transition-colors dark:text-white",
+								"relative flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-lg px-2 py-1.5 font-medium text-text-strong-950 text-xs transition-colors dark:text-white min-h-[28px]",
 								!currentRect && hoverIdx === idx && "bg-neutral-alpha-10",
 								item.className,
 							)}
 						>
-							<Icon name={item.icon} className="h-3.5 w-3.5" />
-							{item.label}
+							{item.id === "copy-id" ? (
+								<AnimatePresence mode="popLayout" initial={false}>
+									<motion.div
+										key={isCopied ? "copied" : "idle"}
+										transition={{
+											type: "spring",
+											duration: 0.25,
+											bounce: 0,
+										}}
+										initial={{ opacity: 0, y: -14 }}
+										animate={{ opacity: 1, y: 0 }}
+										exit={{ opacity: 0, y: 14 }}
+										className="flex items-center gap-2"
+									>
+										<Icon
+											name={isCopied ? "check-circle" : "copy"}
+											className={cn(
+												"h-3.5 w-3.5 shrink-0",
+												isCopied ? "text-success-base" : "text-text-sub-600",
+											)}
+										/>
+										<span>{isCopied ? "Copied ID!" : "Copy channel ID"}</span>
+									</motion.div>
+								</AnimatePresence>
+							) : (
+								<>
+									<Icon name={item.icon} className="h-3.5 w-3.5 shrink-0" />
+									<span>{item.label}</span>
+								</>
+							)}
 						</button>
 					))}
 					<AnimatedHoverBackground rect={currentRect} tabElement={currentTab} />
