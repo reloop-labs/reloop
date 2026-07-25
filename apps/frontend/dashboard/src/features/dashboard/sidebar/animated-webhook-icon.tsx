@@ -5,7 +5,7 @@ type AnimatedWebhookIconProps = {
 };
 
 /**
- * Webhook icon: expands from center + anti-clockwise spin on group hover.
+ * Webhook icon: anti-clockwise spin on group hover.
  * Place inside an element with the `group` class.
  */
 export function AnimatedWebhookIcon({ className }: AnimatedWebhookIconProps) {
