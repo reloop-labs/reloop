@@ -98,6 +98,23 @@ export async function updateWebhookController({
 			throw WebhookErrors.updateFailed(webhookId);
 		}
 
+		// Replace event subscriptions when provided
+		if (body.events !== undefined) {
+			await db
+				.delete(schema.webhookEventSubscription)
+				.where(eq(schema.webhookEventSubscription.webhookId, webhookId));
+
+			if (body.events.length > 0) {
+				await db.insert(schema.webhookEventSubscription).values(
+					body.events.map((eventId) => ({
+						webhookId,
+						eventId,
+						isEnabled: true,
+					})),
+				);
+			}
+		}
+
 		const updatedWebhookWithSubs = await db.query.webhook.findFirst({
 			where: and(
 				eq(schema.webhook.id, updatedWebhook.id),

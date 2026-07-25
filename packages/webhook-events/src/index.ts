@@ -20,7 +20,7 @@ export const WEBHOOK_EVENTS = [
 	...CONTACT_WEBHOOK_EVENTS,
 ] as const;
 
-/** Events customers can subscribe to (phase-1: active email lifecycle). */
+/** Events customers can subscribe to in create/update UI and API validation. */
 export const ACTIVE_WEBHOOK_EVENTS = WEBHOOK_EVENTS.filter((e) => e.isActive);
 
 export const WEBHOOK_EVENTS_BY_ID: ReadonlyMap<

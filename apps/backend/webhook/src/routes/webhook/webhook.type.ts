@@ -45,6 +45,7 @@ export namespace WebhookTypes {
 		description?: string;
 		name?: string;
 		url?: string;
+		events?: WebhookEventName[];
 		secret?: string;
 		status?: "active" | "paused" | "disabled";
 		customHeaders?: Record<string, string>;

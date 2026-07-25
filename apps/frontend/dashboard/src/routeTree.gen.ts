@@ -81,6 +81,7 @@ import { Route as DashboardInboxMailboxIdYouRouteImport } from './routes/_dashbo
 import { Route as DashboardSettingsBillingIndexRouteImport } from './routes/_dashboard/settings/billing/index'
 import { Route as DashboardSettingsBillingPlansRouteImport } from './routes/_dashboard/settings/billing/plans'
 import { Route as DashboardWebhooksWebhookIdIndexRouteImport } from './routes/_dashboard/webhooks/$webhookId/index'
+import { Route as DashboardWebhooksWebhookIdEditRouteImport } from './routes/_dashboard/webhooks/$webhookId/edit'
 import { Route as DashboardWebhooksWebhookIdTestRouteImport } from './routes/_dashboard/webhooks/$webhookId/test'
 import { Route as DashboardInboxMailboxIdLabelLabelIdRouteImport } from './routes/_dashboard/inbox/$mailboxId/label/$labelId'
 
@@ -470,6 +471,12 @@ const DashboardWebhooksWebhookIdIndexRoute =
     path: '/',
     getParentRoute: () => DashboardWebhooksWebhookIdRoute,
   } as any)
+const DashboardWebhooksWebhookIdEditRoute =
+  DashboardWebhooksWebhookIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => DashboardWebhooksWebhookIdRoute,
+  } as any)
 const DashboardWebhooksWebhookIdTestRoute =
   DashboardWebhooksWebhookIdTestRouteImport.update({
     id: '/test',
@@ -550,6 +557,7 @@ export interface FileRoutesByFullPath {
   '/inbox/$mailboxId/trash': typeof DashboardInboxMailboxIdTrashRoute
   '/inbox/$mailboxId/you': typeof DashboardInboxMailboxIdYouRoute
   '/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
+  '/webhooks/$webhookId/edit': typeof DashboardWebhooksWebhookIdEditRoute
   '/webhooks/$webhookId/test': typeof DashboardWebhooksWebhookIdTestRoute
   '/contacts/groups/': typeof DashboardContactsGroupsIndexRoute
   '/domain/add/': typeof DashboardDomainAddIndexRoute
@@ -611,6 +619,7 @@ export interface FileRoutesByTo {
   '/inbox/$mailboxId/trash': typeof DashboardInboxMailboxIdTrashRoute
   '/inbox/$mailboxId/you': typeof DashboardInboxMailboxIdYouRoute
   '/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
+  '/webhooks/$webhookId/edit': typeof DashboardWebhooksWebhookIdEditRoute
   '/webhooks/$webhookId/test': typeof DashboardWebhooksWebhookIdTestRoute
   '/contacts/groups': typeof DashboardContactsGroupsIndexRoute
   '/domain/add': typeof DashboardDomainAddIndexRoute
@@ -688,6 +697,7 @@ export interface FileRoutesById {
   '/_dashboard/inbox/$mailboxId/trash': typeof DashboardInboxMailboxIdTrashRoute
   '/_dashboard/inbox/$mailboxId/you': typeof DashboardInboxMailboxIdYouRoute
   '/_dashboard/settings/billing/plans': typeof DashboardSettingsBillingPlansRoute
+  '/_dashboard/webhooks/$webhookId/edit': typeof DashboardWebhooksWebhookIdEditRoute
   '/_dashboard/webhooks/$webhookId/test': typeof DashboardWebhooksWebhookIdTestRoute
   '/_dashboard/contacts/groups/': typeof DashboardContactsGroupsIndexRoute
   '/_dashboard/domain/add/': typeof DashboardDomainAddIndexRoute
@@ -765,6 +775,7 @@ export interface FileRouteTypes {
     | '/inbox/$mailboxId/trash'
     | '/inbox/$mailboxId/you'
     | '/settings/billing/plans'
+    | '/webhooks/$webhookId/edit'
     | '/webhooks/$webhookId/test'
     | '/contacts/groups/'
     | '/domain/add/'
@@ -826,6 +837,7 @@ export interface FileRouteTypes {
     | '/inbox/$mailboxId/trash'
     | '/inbox/$mailboxId/you'
     | '/settings/billing/plans'
+    | '/webhooks/$webhookId/edit'
     | '/webhooks/$webhookId/test'
     | '/contacts/groups'
     | '/domain/add'
@@ -902,6 +914,7 @@ export interface FileRouteTypes {
     | '/_dashboard/inbox/$mailboxId/trash'
     | '/_dashboard/inbox/$mailboxId/you'
     | '/_dashboard/settings/billing/plans'
+    | '/_dashboard/webhooks/$webhookId/edit'
     | '/_dashboard/webhooks/$webhookId/test'
     | '/_dashboard/contacts/groups/'
     | '/_dashboard/domain/add/'
@@ -1427,6 +1440,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardWebhooksWebhookIdIndexRouteImport
       parentRoute: typeof DashboardWebhooksWebhookIdRoute
     }
+    '/_dashboard/webhooks/$webhookId/edit': {
+      id: '/_dashboard/webhooks/$webhookId/edit'
+      path: '/edit'
+      fullPath: '/webhooks/$webhookId/edit'
+      preLoaderRoute: typeof DashboardWebhooksWebhookIdEditRouteImport
+      parentRoute: typeof DashboardWebhooksWebhookIdRoute
+    }
     '/_dashboard/webhooks/$webhookId/test': {
       id: '/_dashboard/webhooks/$webhookId/test'
       path: '/test'
@@ -1684,12 +1704,14 @@ const DashboardTemplatesRouteWithChildren =
   DashboardTemplatesRoute._addFileChildren(DashboardTemplatesRouteChildren)
 
 interface DashboardWebhooksWebhookIdRouteChildren {
+  DashboardWebhooksWebhookIdEditRoute: typeof DashboardWebhooksWebhookIdEditRoute
   DashboardWebhooksWebhookIdTestRoute: typeof DashboardWebhooksWebhookIdTestRoute
   DashboardWebhooksWebhookIdIndexRoute: typeof DashboardWebhooksWebhookIdIndexRoute
 }
 
 const DashboardWebhooksWebhookIdRouteChildren: DashboardWebhooksWebhookIdRouteChildren =
   {
+    DashboardWebhooksWebhookIdEditRoute: DashboardWebhooksWebhookIdEditRoute,
     DashboardWebhooksWebhookIdTestRoute: DashboardWebhooksWebhookIdTestRoute,
     DashboardWebhooksWebhookIdIndexRoute: DashboardWebhooksWebhookIdIndexRoute,
   }

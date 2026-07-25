@@ -193,7 +193,7 @@ export const DeleteWebhookModal = ({
 							) : null}
 						</p>
 						{displayEvents.length > 0 ? (
-							<div className="mt-2 flex max-h-32 flex-wrap gap-1.5 overflow-y-auto">
+							<div className="mt-1.5 flex max-h-28 flex-wrap gap-1 overflow-y-auto">
 								{displayEvents.map((eventId) => {
 									const definition = WEBHOOK_EVENTS.find(
 										(e) => e.id === eventId,
@@ -207,11 +207,11 @@ export const DeleteWebhookModal = ({
 										<span
 											key={eventId}
 											className={cn(
-												"inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[11px] font-medium",
+												"inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 font-mono text-[10px] font-medium",
 												chipClass,
 											)}
 										>
-											<Icon name={iconName} className="h-3 w-3 shrink-0" />
+											<Icon name={iconName} className="h-2.5 w-2.5 shrink-0" />
 											{eventId}
 										</span>
 									);

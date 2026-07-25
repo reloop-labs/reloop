@@ -185,6 +185,12 @@ export const WebhookHeader = ({
 
 	const getMenuItems = (status: string) => [
 		{
+			id: "edit",
+			label: "Edit webhook",
+			icon: "edit" as const,
+			isDanger: false,
+		},
+		{
 			id: "docs",
 			label: "Go to docs",
 			icon: "file-text" as const,
@@ -211,7 +217,12 @@ export const WebhookHeader = ({
 	const isDanger = hoveredItem?.isDanger ?? false;
 
 	const handleMenuItemClick = (itemId: string) => {
-		if (itemId === "docs") {
+		if (itemId === "edit" && webhook) {
+			void navigate({
+				to: "/webhooks/$webhookId/edit",
+				params: { webhookId: webhook.id },
+			});
+		} else if (itemId === "docs") {
 			window.open("https://reloop.sh/docs/webhooks", "_blank");
 		} else if (itemId === "toggle") {
 			handleToggleStatus();
