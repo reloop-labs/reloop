@@ -5,6 +5,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { queryKeys } from "#/lib/query-keys";
 
@@ -102,7 +103,7 @@ const AccountSkeleton = () => (
 export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 	const queryClient = useQueryClient();
 	const [connecting, setConnecting] = useState<string | null>(null);
-	const [disconnecting, setDisconnecting] = useState<string | null>(null);
+	const [statusMap, setStatusMap] = useState<Record<string, "idle" | "disconnecting" | "success">>({});
 
 	const { data: accounts, isPending: isLoading } = useQuery({
 		queryKey: queryKeys.auth.accounts(),
@@ -136,14 +137,17 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 
 	const handleDisconnect = async (providerId: string) => {
 		try {
-			setDisconnecting(providerId);
+			setStatusMap((prev) => ({ ...prev, [providerId]: "disconnecting" }));
 			const res = await authClient.unlinkAccount({ providerId });
 			if (res.error) throw res.error;
 			await invalidateAccounts();
+			setStatusMap((prev) => ({ ...prev, [providerId]: "success" }));
+			setTimeout(() => {
+				setStatusMap((prev) => ({ ...prev, [providerId]: "idle" }));
+			}, 1500);
 		} catch (error) {
 			console.error(`Failed to disconnect ${providerId}:`, error);
-		} finally {
-			setDisconnecting(null);
+			setStatusMap((prev) => ({ ...prev, [providerId]: "idle" }));
 		}
 	};
 
@@ -199,22 +203,53 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 											</div>
 										</div>
 										{account.providerId !== "credential" ? (
-											<FancyButton.Root
-												variant="basic"
-												size="xsmall"
-												disabled={disconnecting === account.providerId}
-												onClick={() => handleDisconnect(account.providerId)}
-												className="font-medium"
-											>
-												{disconnecting === account.providerId ? (
-													<Spinner size={14} color="var(--text-strong-950)" />
-												) : (
-													<>
-														<FancyButton.Icon as={Icon} name="check" />
-														Disconnect
-													</>
-												)}
-											</FancyButton.Root>
+											(() => {
+												const itemStatus = statusMap[account.providerId] ?? "idle";
+												return (
+													<FancyButton.Root
+														variant={itemStatus === "success" ? "success" : "basic"}
+														size="xsmall"
+														disabled={itemStatus !== "idle"}
+														onClick={() => handleDisconnect(account.providerId)}
+														className={cn(
+															"min-w-[110px] justify-center overflow-hidden transition-all duration-200 font-medium",
+															itemStatus === "disconnecting" && "opacity-90",
+														)}
+													>
+														<AnimatePresence mode="popLayout" initial={false}>
+															<motion.span
+																key={itemStatus}
+																transition={{
+																	type: "spring",
+																	duration: 0.25,
+																	bounce: 0,
+																}}
+																initial={{ opacity: 0, y: -14 }}
+																animate={{ opacity: 1, y: 0 }}
+																exit={{ opacity: 0, y: 14 }}
+																className="flex items-center justify-center gap-1.5 font-medium"
+															>
+																{itemStatus === "disconnecting" ? (
+																	<>
+																		<Spinner size={14} color="var(--text-strong-950)" />
+																		<span>Disconnecting...</span>
+																	</>
+																) : itemStatus === "success" ? (
+																	<>
+																		<Icon name="check-circle" className="h-4 w-4" />
+																		<span>Disconnected</span>
+																	</>
+																) : (
+																	<>
+																		<FancyButton.Icon as={Icon} name="check" />
+																		<span>Disconnect</span>
+																	</>
+																)}
+															</motion.span>
+														</AnimatePresence>
+													</FancyButton.Root>
+												);
+											})()
 										) : (
 											<span className="rounded-full bg-success-base px-1.5 py-0.5 font-semibold text-[10px] text-white">
 												Connected

@@ -4,17 +4,19 @@ import {
 	getAvatarInitial,
 } from "#/utils/avatar";
 import * as Avatar from "@reloop/ui/avatar";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
+import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
 
 interface RevokeInviteModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onConfirm: () => void;
+	onConfirm: () => Promise<void> | void;
 	isRevoking: boolean;
 	inviteEmail: string;
 	inviteRole?: string;
@@ -25,11 +27,26 @@ export const RevokeInviteModal = ({
 	open,
 	onOpenChange,
 	onConfirm,
-	isRevoking,
+	isRevoking: _isRevoking,
 	inviteEmail,
 	inviteRole = "member",
 	invitedAt,
 }: RevokeInviteModalProps) => {
+	const [status, setStatus] = useState<"idle" | "revoking" | "success">("idle");
+
+	const handleRevoke = async () => {
+		setStatus("revoking");
+		try {
+			await onConfirm();
+			setStatus("success");
+			setTimeout(() => {
+				onOpenChange(false);
+				setStatus("idle");
+			}, 1500);
+		} catch {
+			setStatus("idle");
+		}
+	};
 	const getRelativeTime = (date?: Date | string) => {
 		if (!date) return "";
 		const days = Math.floor(
@@ -108,7 +125,7 @@ export const RevokeInviteModal = ({
 						variant="basic"
 						size="xsmall"
 						onClick={() => onOpenChange(false)}
-						disabled={isRevoking}
+						disabled={status !== "idle"}
 						className="justify-center"
 					>
 						Cancel
@@ -116,20 +133,46 @@ export const RevokeInviteModal = ({
 					</FancyButton.Root>
 					<FancyButton.Root
 						type="button"
-						variant="destructive"
+						variant={status === "success" ? "success" : "destructive"}
 						size="xsmall"
-						onClick={onConfirm}
-						disabled={isRevoking}
-					>
-						<FancyButton.Icon as={Icon} name="trash-2" />
-						{isRevoking ? (
-							<>
-								<Spinner size={14} color="currentColor" />
-								Revoking...
-							</>
-						) : (
-							"Revoke invite"
+						className={cn(
+							"min-w-[140px] justify-center overflow-hidden transition-all duration-200 font-medium",
+							status === "revoking" && "opacity-90",
 						)}
+						onClick={handleRevoke}
+						disabled={status !== "idle"}
+					>
+						<AnimatePresence mode="popLayout" initial={false}>
+							<motion.span
+								key={status}
+								transition={{
+									type: "spring",
+									duration: 0.25,
+									bounce: 0,
+								}}
+								initial={{ opacity: 0, y: -14 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 14 }}
+								className="flex items-center justify-center gap-1.5 font-medium"
+							>
+								{status === "revoking" ? (
+									<>
+										<Spinner size={14} color="currentColor" />
+										<span>Revoking...</span>
+									</>
+								) : status === "success" ? (
+									<>
+										<Icon name="check-circle" className="h-4 w-4" />
+										<span>Revoked!</span>
+									</>
+								) : (
+									<>
+										<FancyButton.Icon as={Icon} name="trash-2" />
+										<span>Revoke invite</span>
+									</>
+								)}
+							</motion.span>
+						</AnimatePresence>
 					</FancyButton.Root>
 				</div>
 			</Modal.Content>

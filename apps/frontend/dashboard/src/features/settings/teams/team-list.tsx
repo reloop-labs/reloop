@@ -258,7 +258,6 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 				toast.error(error.message || "Failed to remove member");
 				return;
 			}
-			toast.success("Member removed successfully");
 			await invalidateMembers();
 		} catch (_err) {
 			toast.error("Failed to remove member");
@@ -332,13 +331,6 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 				toast.error(error.message || "Failed to update role");
 				return;
 			}
-			const displayName =
-				member.user.name ||
-				member.user.email.split("@")[0] ||
-				member.user.email;
-			toast.success(
-				`Updated ${displayName} to ${formatRoleLabel(role).toLowerCase()}`,
-			);
 			await invalidateMembers();
 			setChangeRoleModalOpen(false);
 			setMemberToChangeRole(null);
@@ -359,7 +351,6 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 				toast.error(error.message || "Failed to cancel invitation");
 				return;
 			}
-			toast.success("Invitation cancelled");
 			await invalidateInvites();
 		} catch (_err) {
 			toast.error("Failed to cancel invitation");

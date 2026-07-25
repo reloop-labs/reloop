@@ -6,6 +6,7 @@ import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { queryKeys } from "#/lib/query-keys";
@@ -34,7 +35,8 @@ export function AccountProfilePicture({
 	);
 	const [imageUrl, setImageUrl] = useState(ensureAbsoluteUrl(initialImageUrl));
 	const [imageFailed, setImageFailed] = useState(false);
-	const [isUploading, setIsUploading] = useState(false);
+	const [status, setStatus] = useState<"idle" | "uploading" | "success">("idle");
+	const isUploading = status === "uploading";
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	// Keep local state in sync when session user.image arrives/changes after mount.
@@ -77,7 +79,7 @@ export function AccountProfilePicture({
 		};
 		reader.readAsDataURL(file);
 
-		setIsUploading(true);
+		setStatus("uploading");
 		try {
 			const formData = new FormData();
 			formData.append("file", file);
@@ -101,18 +103,23 @@ export function AccountProfilePicture({
 
 			if (error) {
 				toast.error(error.message || "Failed to save profile picture");
+				setStatus("idle");
 				return;
 			}
 
 			await queryClient.invalidateQueries({
 				queryKey: queryKeys.auth.session(),
 			});
-			toast.success("Profile picture updated successfully");
+			setStatus("success");
+			setTimeout(() => {
+				setStatus("idle");
+			}, 1500);
 		} catch (error) {
 			console.error("Upload error:", error);
 			// Roll back to the last known good remote URL.
 			setImagePreview(imageUrl || ensureAbsoluteUrl(initialImageUrl));
 			setImageFailed(false);
+			setStatus("idle");
 			if (axios.isAxiosError(error)) {
 				if (error.response?.status === 401 || error.response?.status === 403) {
 					return;
@@ -124,8 +131,6 @@ export function AccountProfilePicture({
 			} else if (error instanceof Error) {
 				toast.error(error.message || "Failed to upload profile picture.");
 			}
-		} finally {
-			setIsUploading(false);
 		}
 	};
 
@@ -187,24 +192,47 @@ export function AccountProfilePicture({
 						We only support PNGs, JPEGs and GIFs under 10MB
 					</p>
 					<FancyButton.Root
-						variant="basic"
+						variant={status === "success" ? "success" : "basic"}
 						size="xsmall"
 						type="button"
 						onClick={handleFileUploadClick}
-						disabled={isUploading}
-						className="font-medium"
-					>
-						{isUploading ? (
-							<>
-								<Spinner size={14} color="var(--text-strong-950)" />
-								Uploading...
-							</>
-						) : (
-							<>
-								<FancyButton.Icon as={Icon} name="camera" />
-								Upload image
-							</>
+						disabled={status !== "idle"}
+						className={cn(
+							"min-w-[140px] justify-center overflow-hidden transition-all duration-200 font-medium",
+							status === "uploading" && "opacity-90",
 						)}
+					>
+						<AnimatePresence mode="popLayout" initial={false}>
+							<motion.span
+								key={status}
+								transition={{
+									type: "spring",
+									duration: 0.25,
+									bounce: 0,
+								}}
+								initial={{ opacity: 0, y: -14 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 14 }}
+								className="flex items-center justify-center gap-1.5 font-medium"
+							>
+								{status === "uploading" ? (
+									<>
+										<Spinner size={14} color="var(--text-strong-950)" />
+										<span>Uploading...</span>
+									</>
+								) : status === "success" ? (
+									<>
+										<Icon name="check-circle" className="h-4 w-4" />
+										<span>Uploaded</span>
+									</>
+								) : (
+									<>
+										<FancyButton.Icon as={Icon} name="camera" />
+										<span>Upload image</span>
+									</>
+								)}
+							</motion.span>
+						</AnimatePresence>
 					</FancyButton.Root>
 				</div>
 			</div>

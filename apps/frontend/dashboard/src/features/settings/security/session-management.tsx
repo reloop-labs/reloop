@@ -5,6 +5,7 @@ import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useSessionQuery } from "#/features/auth/session-query";
@@ -27,10 +28,12 @@ const BORDER = "border-stroke-soft-100 dark:border-stroke-soft-100/40";
 
 export function SessionManagement({ className }: SessionManagementProps) {
 	const queryClient = useQueryClient();
-	const [terminatingSession, setTerminatingSession] = useState<string | null>(
-		null,
+	const [statusMap, setStatusMap] = useState<
+		Record<string, "idle" | "revoking" | "success">
+	>({});
+	const [statusAll, setStatusAll] = useState<"idle" | "revoking" | "success">(
+		"idle",
 	);
-	const [terminatingAll, setTerminatingAll] = useState(false);
 	const { data: currentSession } = useSessionQuery();
 
 	const {
@@ -51,22 +54,24 @@ export function SessionManagement({ className }: SessionManagementProps) {
 	};
 
 	const handleTerminateSession = async (token: string) => {
-		setTerminatingSession(token);
+		setStatusMap((prev) => ({ ...prev, [token]: "revoking" }));
 		try {
 			const { error } = await authClient.revokeSession({ token });
 			if (error)
 				throw new Error(error.message || "Failed to terminate session");
 			setSessionsCache(sessions.filter((s) => s.token !== token));
-			toast.success("Session terminated successfully");
+			setStatusMap((prev) => ({ ...prev, [token]: "success" }));
+			setTimeout(() => {
+				setStatusMap((prev) => ({ ...prev, [token]: "idle" }));
+			}, 1500);
 		} catch {
 			toast.error("Failed to terminate session");
-		} finally {
-			setTerminatingSession(null);
+			setStatusMap((prev) => ({ ...prev, [token]: "idle" }));
 		}
 	};
 
 	const handleTerminateAllSessions = async () => {
-		setTerminatingAll(true);
+		setStatusAll("revoking");
 		try {
 			const { error } = await authClient.revokeOtherSessions();
 			if (error)
@@ -74,11 +79,13 @@ export function SessionManagement({ className }: SessionManagementProps) {
 			setSessionsCache(
 				sessions.filter((s) => s.token === currentSession?.session?.token),
 			);
-			toast.success("All other sessions terminated successfully");
+			setStatusAll("success");
+			setTimeout(() => {
+				setStatusAll("idle");
+			}, 1500);
 		} catch {
 			toast.error("Failed to terminate all sessions");
-		} finally {
-			setTerminatingAll(false);
+			setStatusAll("idle");
 		}
 	};
 
@@ -97,13 +104,43 @@ export function SessionManagement({ className }: SessionManagementProps) {
 				</div>
 				{sessions.length > 1 && (
 					<FancyButton.Root
-						variant="destructive"
+						variant={statusAll === "success" ? "success" : "destructive"}
 						size="xsmall"
+						className={cn(
+							"min-w-[140px] justify-center overflow-hidden transition-all duration-200 font-medium",
+							statusAll === "revoking" && "opacity-90",
+						)}
 						onClick={handleTerminateAllSessions}
-						disabled={terminatingAll || loading}
+						disabled={statusAll !== "idle" || loading}
 					>
-						{terminatingAll && <Spinner size={12} color="var(--static-white)" />}
-						Revoke All Other
+						<AnimatePresence mode="popLayout" initial={false}>
+							<motion.span
+								key={statusAll}
+								transition={{
+									type: "spring",
+									duration: 0.25,
+									bounce: 0,
+								}}
+								initial={{ opacity: 0, y: -14 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 14 }}
+								className="flex items-center justify-center gap-1.5 font-medium"
+							>
+								{statusAll === "revoking" ? (
+									<>
+										<Spinner size={12} color="var(--static-white)" />
+										<span>Revoking...</span>
+									</>
+								) : statusAll === "success" ? (
+									<>
+										<Icon name="check-circle" className="h-4 w-4" />
+										<span>Revoked!</span>
+									</>
+								) : (
+									"Revoke All Other"
+								)}
+							</motion.span>
+						</AnimatePresence>
 					</FancyButton.Root>
 				)}
 			</div>
@@ -230,18 +267,63 @@ export function SessionManagement({ className }: SessionManagementProps) {
 													Current
 												</div>
 											) : (
-												<FancyButton.Root
-													variant="destructive"
-													size="xsmall"
-													onClick={() => handleTerminateSession(session.token)}
-													disabled={terminatingSession === session.token}
-												>
-													{terminatingSession === session.token ? (
-														<Spinner size={12} color="var(--static-white)" />
-													) : (
-														"Revoke"
-													)}
-												</FancyButton.Root>
+												(() => {
+													const itemStatus =
+														statusMap[session.token] ?? "idle";
+													return (
+														<FancyButton.Root
+															variant={
+																itemStatus === "success"
+																	? "success"
+																	: "destructive"
+															}
+															size="xsmall"
+															className={cn(
+																"min-w-[80px] justify-center overflow-hidden transition-all duration-200 font-medium",
+																itemStatus === "revoking" && "opacity-90",
+															)}
+															onClick={() =>
+																handleTerminateSession(session.token)
+															}
+															disabled={itemStatus !== "idle"}
+														>
+															<AnimatePresence mode="popLayout" initial={false}>
+																<motion.span
+																	key={itemStatus}
+																	transition={{
+																		type: "spring",
+																		duration: 0.25,
+																		bounce: 0,
+																	}}
+																	initial={{ opacity: 0, y: -14 }}
+																	animate={{ opacity: 1, y: 0 }}
+																	exit={{ opacity: 0, y: 14 }}
+																	className="flex items-center justify-center gap-1.5 font-medium"
+																>
+																	{itemStatus === "revoking" ? (
+																		<>
+																			<Spinner
+																				size={12}
+																				color="var(--static-white)"
+																			/>
+																			<span>Revoking...</span>
+																		</>
+																	) : itemStatus === "success" ? (
+																		<>
+																			<Icon
+																				name="check-circle"
+																				className="h-3.5 w-3.5"
+																			/>
+																			<span>Revoked</span>
+																		</>
+																	) : (
+																		"Revoke"
+																	)}
+																</motion.span>
+															</AnimatePresence>
+														</FancyButton.Root>
+													);
+												})()
 											)}
 										</div>
 									</div>

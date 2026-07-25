@@ -1,5 +1,6 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { authClient } from "@reloop/auth/client";
+import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -7,6 +8,7 @@ import * as Label from "@reloop/ui/label";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { useQueryClient } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -81,7 +83,7 @@ function WorkspaceForm({
 	activeOrganization: Organization;
 }) {
 	const queryClient = useQueryClient();
-	const [isSaving, setIsSaving] = useState(false);
+	const [status, setStatus] = useState<"idle" | "saving" | "success">("idle");
 
 	const {
 		register,
@@ -105,7 +107,7 @@ function WorkspaceForm({
 		logoValue !== (activeOrganization.logo || "");
 
 	const handleSaveChanges = async (data: WorkspaceFormValues) => {
-		setIsSaving(true);
+		setStatus("saving");
 		try {
 			const { error } = await authClient.organization.update({
 				organizationId: activeOrganization.id,
@@ -117,24 +119,27 @@ function WorkspaceForm({
 
 			if (error) {
 				toast.error(error.message || "Failed to update workspace");
+				setStatus("idle");
 				return;
 			}
 			await queryClient.invalidateQueries({
 				queryKey: queryKeys.auth.organizations(),
 			});
-			toast.success("Workspace updated successfully");
+			setStatus("success");
+			setTimeout(() => {
+				setStatus("idle");
+			}, 1500);
 		} catch (error) {
 			console.error("Update error:", error);
 			toast.error("Failed to update workspace");
-		} finally {
-			setIsSaving(false);
+			setStatus("idle");
 		}
 	};
 
 	useHotkeys(
 		"mod+enter",
 		() => {
-			if (hasChanges && !isSaving) {
+			if (hasChanges && status === "idle") {
 				void handleSubmit(handleSaveChanges)();
 			}
 		},
@@ -184,29 +189,55 @@ function WorkspaceForm({
 					</div>
 					<div className="flex justify-end">
 						<FancyButton.Root
-							variant="blue"
+							variant={status === "success" ? "success" : "blue"}
 							size="xsmall"
 							type="submit"
-							className="w-40 font-medium"
-							disabled={!hasChanges || isSaving}
-						>
-							{isSaving ? (
-								<Spinner size={14} color="var(--static-white)" />
-							) : (
-								<>
-									Save Changes
-									<span className="inline-flex items-center gap-0.5 opacity-90">
-										<Icon
-											name="command"
-											className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-										/>
-										<Icon
-											name="enter"
-											className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-										/>
-									</span>
-								</>
+							className={cn(
+								"min-w-[160px] justify-center overflow-hidden transition-all duration-200",
+								status === "saving" && "opacity-90",
 							)}
+							disabled={!hasChanges || status !== "idle"}
+						>
+							<AnimatePresence mode="popLayout" initial={false}>
+								<motion.span
+									key={status}
+									transition={{
+										type: "spring",
+										duration: 0.25,
+										bounce: 0,
+									}}
+									initial={{ opacity: 0, y: -14 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: 14 }}
+									className="flex items-center justify-center gap-1.5 font-medium"
+								>
+									{status === "saving" ? (
+										<>
+											<Spinner size={14} color="var(--static-white)" />
+											<span>Saving...</span>
+										</>
+									) : status === "success" ? (
+										<>
+											<Icon name="check-circle" className="h-4 w-4" />
+											<span>Updated</span>
+										</>
+									) : (
+										<>
+											Save Changes
+											<span className="inline-flex items-center gap-0.5 opacity-90">
+												<Icon
+													name="command"
+													className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+												/>
+												<Icon
+													name="enter"
+													className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+												/>
+											</span>
+										</>
+									)}
+								</motion.span>
+							</AnimatePresence>
 						</FancyButton.Root>
 					</div>
 					<WorkspaceDangerZone />

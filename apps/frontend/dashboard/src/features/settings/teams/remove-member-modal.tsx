@@ -1,13 +1,17 @@
 
+import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
+import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
 
 interface RemoveMemberModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onConfirm: () => void;
+	onConfirm: () => Promise<void> | void;
 	isRemoving: boolean;
 	memberName: string;
 	memberEmail: string;
@@ -17,10 +21,25 @@ export const RemoveMemberModal = ({
 	open,
 	onOpenChange,
 	onConfirm,
-	isRemoving,
+	isRemoving: _isRemoving,
 	memberName,
 	memberEmail,
 }: RemoveMemberModalProps) => {
+	const [status, setStatus] = useState<"idle" | "removing" | "success">("idle");
+
+	const handleRemove = async () => {
+		setStatus("removing");
+		try {
+			await onConfirm();
+			setStatus("success");
+			setTimeout(() => {
+				onOpenChange(false);
+				setStatus("idle");
+			}, 1500);
+		} catch {
+			setStatus("idle");
+		}
+	};
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
 			<Modal.Content className="sm:max-w-[400px]" showClose={false}>
@@ -43,26 +62,50 @@ export const RemoveMemberModal = ({
 						variant="basic"
 						size="xsmall"
 						onClick={() => onOpenChange(false)}
-						disabled={isRemoving}
+						disabled={status !== "idle"}
 					>
 						Cancel
 						<KbdEsc />
 					</FancyButton.Root>
 					<FancyButton.Root
 						type="button"
-						variant="destructive"
+						variant={status === "success" ? "success" : "destructive"}
 						size="xsmall"
-						onClick={onConfirm}
-						disabled={isRemoving}
-					>
-						{isRemoving ? (
-							<>
-								<Spinner size={14} color="currentColor" />
-								Removing...
-							</>
-						) : (
-							"Remove member"
+						className={cn(
+							"min-w-[140px] justify-center overflow-hidden transition-all duration-200 font-medium",
+							status === "removing" && "opacity-90",
 						)}
+						onClick={handleRemove}
+						disabled={status !== "idle"}
+					>
+						<AnimatePresence mode="popLayout" initial={false}>
+							<motion.span
+								key={status}
+								transition={{
+									type: "spring",
+									duration: 0.25,
+									bounce: 0,
+								}}
+								initial={{ opacity: 0, y: -14 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 14 }}
+								className="flex items-center justify-center gap-1.5 font-medium"
+							>
+								{status === "removing" ? (
+									<>
+										<Spinner size={14} color="currentColor" />
+										<span>Removing...</span>
+									</>
+								) : status === "success" ? (
+									<>
+										<Icon name="check-circle" className="h-4 w-4" />
+										<span>Removed!</span>
+									</>
+								) : (
+									"Remove member"
+								)}
+							</motion.span>
+						</AnimatePresence>
 					</FancyButton.Root>
 				</Modal.Footer>
 			</Modal.Content>

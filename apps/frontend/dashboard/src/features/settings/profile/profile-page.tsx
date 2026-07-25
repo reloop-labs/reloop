@@ -7,6 +7,7 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import { useQueryClient } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -30,7 +31,7 @@ export function ProfilePage() {
 	const queryClient = useQueryClient();
 	const { data: session } = useSessionQuery();
 	const user = session?.user;
-	const [isSaving, setIsSaving] = useState(false);
+	const [status, setStatus] = useState<"idle" | "saving" | "success">("idle");
 	const [emailCopied, setEmailCopied] = useState(false);
 	const nameParts = user?.name?.split(" ") || [];
 
@@ -75,7 +76,7 @@ export function ProfilePage() {
 
 	const handleSaveChanges = async (data: AccountFormValues) => {
 		const updatedFullName = `${data.firstName} ${data.lastName}`.trim();
-		setIsSaving(true);
+		setStatus("saving");
 		try {
 			const { error } = await authClient.updateUser({
 				name: updatedFullName,
@@ -84,25 +85,28 @@ export function ProfilePage() {
 
 			if (error) {
 				toast.error(error.message || "Failed to update profile");
+				setStatus("idle");
 				return;
 			}
 
 			await queryClient.invalidateQueries({
 				queryKey: queryKeys.auth.session(),
 			});
-			toast.success("Profile updated successfully");
+			setStatus("success");
+			setTimeout(() => {
+				setStatus("idle");
+			}, 1500);
 		} catch (error) {
 			console.error("Update error:", error);
 			toast.error("Failed to update profile");
-		} finally {
-			setIsSaving(false);
+			setStatus("idle");
 		}
 	};
 
 	useHotkeys(
 		"mod+enter",
 		() => {
-			if (hasChanges && !isSaving) {
+			if (hasChanges && status === "idle") {
 				void handleSubmit(handleSaveChanges)();
 			}
 		},
@@ -148,7 +152,7 @@ export function ProfilePage() {
 										id="firstName"
 										type="text"
 										placeholder="First Name"
-										disabled={isSaving}
+										disabled={status !== "idle"}
 										{...register("firstName")}
 									/>
 								</Input.Wrapper>
@@ -166,7 +170,7 @@ export function ProfilePage() {
 										id="lastName"
 										type="text"
 										placeholder="Last Name"
-										disabled={isSaving}
+										disabled={status !== "idle"}
 										{...register("lastName")}
 									/>
 								</Input.Wrapper>
@@ -211,29 +215,55 @@ export function ProfilePage() {
 					</div>
 					<div className="flex justify-end">
 						<FancyButton.Root
-							variant="blue"
+							variant={status === "success" ? "success" : "blue"}
 							size="xsmall"
 							type="submit"
-							className="w-40 font-medium"
-							disabled={!hasChanges || isSaving}
-						>
-							{isSaving ? (
-								<Spinner size={14} color="var(--static-white)" />
-							) : (
-								<>
-									Save Changes
-									<span className="inline-flex items-center gap-0.5 opacity-90">
-										<Icon
-											name="command"
-											className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-										/>
-										<Icon
-											name="enter"
-											className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-										/>
-									</span>
-								</>
+							className={cn(
+								"min-w-[160px] justify-center overflow-hidden transition-all duration-200",
+								status === "saving" && "opacity-90",
 							)}
+							disabled={!hasChanges || status !== "idle"}
+						>
+							<AnimatePresence mode="popLayout" initial={false}>
+								<motion.span
+									key={status}
+									transition={{
+										type: "spring",
+										duration: 0.25,
+										bounce: 0,
+									}}
+									initial={{ opacity: 0, y: -14 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: 14 }}
+									className="flex items-center justify-center gap-1.5 font-medium"
+								>
+									{status === "saving" ? (
+										<>
+											<Spinner size={14} color="var(--static-white)" />
+											<span>Saving...</span>
+										</>
+									) : status === "success" ? (
+										<>
+											<Icon name="check-circle" className="h-4 w-4" />
+											<span>Updated</span>
+										</>
+									) : (
+										<>
+											Save Changes
+											<span className="inline-flex items-center gap-0.5 opacity-90">
+												<Icon
+													name="command"
+													className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+												/>
+												<Icon
+													name="enter"
+													className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+												/>
+											</span>
+										</>
+									)}
+								</motion.span>
+							</AnimatePresence>
 						</FancyButton.Root>
 					</div>
 					<AccountDangerZone />

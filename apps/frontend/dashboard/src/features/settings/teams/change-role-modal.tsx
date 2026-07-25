@@ -11,6 +11,7 @@ import { KbdEnter } from "@reloop/ui/kbd-enter";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
@@ -67,7 +68,7 @@ const getRoleCardStyles = (role: AssignableRole) => {
 interface ChangeRoleModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onConfirm: (role: AssignableRole) => void;
+	onConfirm: (role: AssignableRole) => Promise<boolean | void> | void;
 	isUpdating: boolean;
 	memberName: string;
 	memberEmail: string;
@@ -78,7 +79,7 @@ export const ChangeRoleModal = ({
 	open,
 	onOpenChange,
 	onConfirm,
-	isUpdating,
+	isUpdating: isUpdatingProp,
 	memberName,
 	memberEmail,
 	currentRole,
@@ -98,14 +99,31 @@ export const ChangeRoleModal = ({
 	const displayName = memberName || memberEmail.split("@")[0] || memberEmail;
 	const hasChanges = selectedRole !== initialRole;
 
+	const [status, setStatus] = useState<"idle" | "updating" | "success">("idle");
+	const isUpdating = isUpdatingProp || status === "updating";
+
 	const handleOpenChange = (isOpen: boolean) => {
-		if (!isOpen && isUpdating) return;
+		if (!isOpen && status !== "idle") return;
 		onOpenChange(isOpen);
 	};
 
-	const handleSave = () => {
-		if (!hasChanges || isUpdating) return;
-		onConfirm(selectedRole);
+	const handleSave = async () => {
+		if (!hasChanges || status !== "idle") return;
+		setStatus("updating");
+		try {
+			const res = await onConfirm(selectedRole);
+			if (res !== false) {
+				setStatus("success");
+				setTimeout(() => {
+					onOpenChange(false);
+					setStatus("idle");
+				}, 1500);
+			} else {
+				setStatus("idle");
+			}
+		} catch {
+			setStatus("idle");
+		}
 	};
 
 	useHotkeys(
@@ -267,33 +285,57 @@ export const ChangeRoleModal = ({
 							variant="basic"
 							size="xsmall"
 							onClick={() => handleOpenChange(false)}
-							disabled={isUpdating}
+							disabled={status !== "idle"}
 						>
 							Cancel
 							<KbdEsc />
 						</FancyButton.Root>
 						<FancyButton.Root
 							type="button"
-							variant="blue"
+							variant={status === "success" ? "success" : "blue"}
 							size="xsmall"
-							onClick={handleSave}
-							disabled={isUpdating || !hasChanges}
-						>
-							{isUpdating ? (
-								<>
-									<Spinner size={12} color="currentColor" />
-									Updating...
-								</>
-							) : (
-								<>
-									<FancyButton.Icon as={Icon} name="user-role" />
-									Update role
-									<span className="inline-flex items-center gap-0.5 opacity-90">
-										<KbdCommand />
-										<KbdEnter />
-									</span>
-								</>
+							className={cn(
+								"min-w-[140px] justify-center overflow-hidden transition-all duration-200 font-medium",
+								status === "updating" && "opacity-90",
 							)}
+							onClick={handleSave}
+							disabled={status !== "idle" || !hasChanges}
+						>
+							<AnimatePresence mode="popLayout" initial={false}>
+								<motion.span
+									key={status}
+									transition={{
+										type: "spring",
+										duration: 0.25,
+										bounce: 0,
+									}}
+									initial={{ opacity: 0, y: -14 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: 14 }}
+									className="flex items-center justify-center gap-1.5 font-medium"
+								>
+									{status === "updating" ? (
+										<>
+											<Spinner size={12} color="currentColor" />
+											<span>Updating...</span>
+										</>
+									) : status === "success" ? (
+										<>
+											<Icon name="check-circle" className="h-4 w-4" />
+											<span>Updated!</span>
+										</>
+									) : (
+										<>
+											<FancyButton.Icon as={Icon} name="user-role" />
+											<span>Update role</span>
+											<span className="inline-flex items-center gap-0.5 opacity-90">
+												<KbdCommand />
+												<KbdEnter />
+											</span>
+										</>
+									)}
+								</motion.span>
+							</AnimatePresence>
 						</FancyButton.Root>
 					</div>
 				</div>

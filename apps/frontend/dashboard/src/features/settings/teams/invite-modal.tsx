@@ -89,7 +89,8 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 	const queryClient = useQueryClient();
 	const { activeOrganization } = useActiveOrganization();
 	const orgId = activeOrganization?.id;
-	const [loading, setLoading] = useState(false);
+	const [status, setStatus] = useState<"idle" | "sending" | "success">("idle");
+	const loading = status === "sending";
 	const [inputValue, setInputValue] = useState("");
 	const [inputFocused, setInputFocused] = useState(false);
 	const [emailError, setEmailError] = useState<string | null>(null);
@@ -198,7 +199,7 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 		}
 		if (!orgId) return;
 
-		setLoading(true);
+		setStatus("sending");
 		try {
 			const results = await Promise.allSettled(
 				pendingEmails.map(({ email, role }) =>
@@ -216,13 +217,16 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 			const failCount = results.filter((r) => r.status === "rejected").length;
 
 			if (successCount > 0) {
-				toast.success(
-					`${successCount} invitation${successCount > 1 ? "s" : ""} sent successfully!`,
-				);
 				await queryClient.invalidateQueries({
 					queryKey: queryKeys.organization.invitations(orgId),
 				});
-				handleOpenChange(false);
+				setStatus("success");
+				setTimeout(() => {
+					handleOpenChange(false);
+					setStatus("idle");
+				}, 1500);
+			} else {
+				setStatus("idle");
 			}
 			if (failCount > 0) {
 				toast.error(
@@ -231,8 +235,7 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 			}
 		} catch {
 			toast.error("Failed to invite team members");
-		} finally {
-			setLoading(false);
+			setStatus("idle");
 		}
 	};
 
@@ -523,26 +526,50 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 						</FancyButton.Root>
 						<FancyButton.Root
 							type="button"
-							variant="blue"
+							variant={status === "success" ? "success" : "blue"}
 							size="xsmall"
-							onClick={handleSubmit}
-							disabled={loading || pendingEmails.length === 0}
-						>
-							{loading ? (
-								<>
-									<Spinner size={12} color="currentColor" />
-									Sending...
-								</>
-							) : (
-								<>
-									<FancyButton.Icon as={Icon} name="send-2" />
-									Send invites
-									<span className="inline-flex items-center gap-0.5 opacity-90">
-										<KbdCommand />
-										<KbdEnter />
-									</span>
-								</>
+							className={cn(
+								"min-w-[140px] justify-center overflow-hidden transition-all duration-200 font-medium",
+								status === "sending" && "opacity-90",
 							)}
+							onClick={handleSubmit}
+							disabled={status !== "idle" || pendingEmails.length === 0}
+						>
+							<AnimatePresence mode="popLayout" initial={false}>
+								<motion.span
+									key={status}
+									transition={{
+										type: "spring",
+										duration: 0.25,
+										bounce: 0,
+									}}
+									initial={{ opacity: 0, y: -14 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: 14 }}
+									className="flex items-center justify-center gap-1.5 font-medium"
+								>
+									{status === "sending" ? (
+										<>
+											<Spinner size={12} color="currentColor" />
+											<span>Sending...</span>
+										</>
+									) : status === "success" ? (
+										<>
+											<Icon name="check-circle" className="h-4 w-4" />
+											<span>Sent!</span>
+										</>
+									) : (
+										<>
+											<FancyButton.Icon as={Icon} name="send-2" />
+											<span>Send invites</span>
+											<span className="inline-flex items-center gap-0.5 opacity-90">
+												<KbdCommand />
+												<KbdEnter />
+											</span>
+										</>
+									)}
+								</motion.span>
+							</AnimatePresence>
 						</FancyButton.Root>
 					</div>
 				</div>
