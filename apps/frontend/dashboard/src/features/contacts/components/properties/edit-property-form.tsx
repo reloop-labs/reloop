@@ -134,160 +134,181 @@ export function EditPropertyForm({
 		<form
 			onSubmit={handleSubmit}
 			onClick={(e) => e.stopPropagation()}
-			className="space-y-4"
+			className="w-full font-sans"
 		>
-			<div className="space-y-4">
-				{/* Readonly Property Name */}
-				<div className="space-y-2">
-					<div className="flex items-center gap-1.5">
-						<Label.Root htmlFor={`property-name-${property.id}`}>
-							Name
-						</Label.Root>
-						<span className="text-text-sub-600 text-xs font-normal">
-							(Property name cannot be edited after creation)
-						</span>
+			{/* Table inline: nested gray/white card. Modal: flat. */}
+			<div
+				className={cn(
+					isInline &&
+						"overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50",
+				)}
+			>
+				<div
+					className={cn(
+						"space-y-4",
+						isInline &&
+							"m-0.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-6",
+					)}
+				>
+					{/* Readonly Property Name */}
+					<div className="space-y-2">
+						<div className="flex items-center gap-1.5">
+							<Label.Root htmlFor={`property-name-${property.id}`}>
+								Name
+							</Label.Root>
+							<span className="font-normal text-text-sub-600 text-xs">
+								(Property name cannot be edited after creation)
+							</span>
+						</div>
+						<Input.Root
+							size="medium"
+							className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30"
+						>
+							<Input.Wrapper>
+								<Input.Icon
+									as={Icon}
+									name="tag"
+									size="small"
+									className="h-4 w-4 text-text-sub-600"
+								/>
+								<Input.Input
+									id={`property-name-${property.id}`}
+									type="text"
+									value={property.propertyName}
+									readOnly
+									className="cursor-not-allowed font-medium text-text-strong-950 opacity-100 focus:outline-none"
+								/>
+								<Icon
+									name="lock"
+									className="mr-1.5 h-3.5 w-3.5 shrink-0 text-text-sub-600"
+								/>
+							</Input.Wrapper>
+						</Input.Root>
 					</div>
-					<Input.Root
-						size="medium"
-						className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30"
-					>
-						<Input.Wrapper>
-							<Input.Icon
-								as={Icon}
-								name="tag"
+
+					{/* Default Value */}
+					<div className="space-y-2">
+						<div className="flex items-center gap-2">
+							<Label.Root htmlFor={`fallback-value-${property.id}`}>
+								Default Value
+							</Label.Root>
+							<Badge.Root
 								size="small"
-								className="h-4 w-4 text-text-sub-600"
-							/>
-							<Input.Input
-								id={`property-name-${property.id}`}
-								type="text"
-								value={property.propertyName}
-								readOnly
-								className="cursor-not-allowed font-medium text-text-strong-950 opacity-100 focus:outline-none"
-							/>
-							<Icon
-								name="lock"
-								className="mr-1.5 h-3.5 w-3.5 shrink-0 text-text-sub-600"
-							/>
-						</Input.Wrapper>
-					</Input.Root>
-				</div>
-
-				{/* Default Value */}
-				<div className="space-y-2">
-					<div className="flex items-center gap-2">
-						<Label.Root htmlFor={`fallback-value-${property.id}`}>
-							Default Value
-						</Label.Root>
-						<Badge.Root
-							size="small"
-							variant="lighter"
-							color={getBadgeColor(property.propertyType)}
-							className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
+								variant="lighter"
+								color={getBadgeColor(property.propertyType)}
+								className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
+							>
+								{property.propertyType}
+							</Badge.Root>
+						</div>
+						<Input.Root
+							size="medium"
+							className="rounded-xl"
+							hasError={!!fallbackValueError}
 						>
-							{property.propertyType}
-						</Badge.Root>
+							<Input.Wrapper>
+								<Input.Input
+									id={`fallback-value-${property.id}`}
+									type="text"
+									value={fallbackValue}
+									onChange={(e) => handleFallbackChange(e.target.value)}
+									placeholder={
+										property.propertyType?.toLowerCase() === "number"
+											? "e.g., 0"
+											: "e.g., unknown"
+									}
+									disabled={status !== "idle"}
+									autoFocus={isInline}
+								/>
+							</Input.Wrapper>
+						</Input.Root>
+						{fallbackValueError ? (
+							<p className="text-error-base text-paragraph-xs">
+								{fallbackValueError}
+							</p>
+						) : (
+							<p className="text-paragraph-xs text-text-sub-600">
+								Used when a contact doesn&apos;t have this property set
+							</p>
+						)}
 					</div>
-					<Input.Root
-						size="medium"
-						className="rounded-xl"
-						hasError={!!fallbackValueError}
-					>
-						<Input.Wrapper>
-							<Input.Input
-								id={`fallback-value-${property.id}`}
-								type="text"
-								value={fallbackValue}
-								onChange={(e) => handleFallbackChange(e.target.value)}
-								placeholder={
-									property.propertyType?.toLowerCase() === "number"
-										? "e.g., 0"
-										: "e.g., unknown"
-								}
-								disabled={status !== "idle"}
-								autoFocus={isInline}
-							/>
-						</Input.Wrapper>
-					</Input.Root>
-					{fallbackValueError ? (
-						<p className="text-error-base text-paragraph-xs">
-							{fallbackValueError}
-						</p>
-					) : (
-						<p className="text-paragraph-xs text-text-sub-600">
-							Used when a contact doesn&apos;t have this property set
-						</p>
-					)}
 				</div>
-			</div>
 
-			{/* Actions / Footer */}
-			<div className="mt-6 flex items-center justify-end gap-3">
-				<Button.Root
-					type="button"
-					variant="neutral"
-					mode="ghost"
-					size="small"
-					onClick={onCancel}
-					disabled={status !== "idle"}
+				{/* Actions / Footer */}
+				<div
 					className={cn(
-						"transition-opacity duration-200",
-						status !== "idle" && "pointer-events-none opacity-50",
+						"flex items-center justify-end gap-3",
+						isInline
+							? "px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40"
+							: "mt-6",
 					)}
 				>
-					Cancel
-				</Button.Root>
-				<FancyButton.Root
-					type="submit"
-					variant={status === "success" ? "success" : "blue"}
-					size="small"
-					disabled={status === "submitting" || !!fallbackValueError}
-					className={cn(
-						"w-[172px] min-w-[172px] justify-center overflow-hidden transition-all duration-200",
-						status === "submitting" && "opacity-90",
-					)}
-				>
-					<AnimatePresence mode="popLayout" initial={false}>
-						<motion.span
-							key={status}
-							transition={{
-								type: "spring",
-								duration: 0.25,
-								bounce: 0,
-							}}
-							initial={{ opacity: 0, y: -14 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: 14 }}
-							className="flex items-center justify-center gap-1.5"
-						>
-							{status === "submitting" ? (
-								<>
-									<Spinner size={14} color="currentColor" />
-									<span>Updating...</span>
-								</>
-							) : status === "success" ? (
-								<>
-									<Icon name="check-circle" className="h-4 w-4" />
-									<span>Property Updated</span>
-								</>
-							) : (
-								<>
-									Update property
-									<span className="inline-flex items-center gap-0.5 opacity-80">
-										<Icon
-											name="command"
-											className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-										/>
-										<Icon
-											name="enter"
-											className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-										/>
-									</span>
-								</>
-							)}
-						</motion.span>
-					</AnimatePresence>
-				</FancyButton.Root>
+					<Button.Root
+						type="button"
+						variant="neutral"
+						mode="ghost"
+						size="small"
+						onClick={onCancel}
+						disabled={status !== "idle"}
+						className={cn(
+							"transition-opacity duration-200",
+							status !== "idle" && "pointer-events-none opacity-50",
+						)}
+					>
+						Cancel
+					</Button.Root>
+					<FancyButton.Root
+						type="submit"
+						variant={status === "success" ? "success" : "blue"}
+						size="small"
+						disabled={status === "submitting" || !!fallbackValueError}
+						className={cn(
+							"w-[172px] min-w-[172px] justify-center overflow-hidden transition-all duration-200",
+							status === "submitting" && "opacity-90",
+						)}
+					>
+						<AnimatePresence mode="popLayout" initial={false}>
+							<motion.span
+								key={status}
+								transition={{
+									type: "spring",
+									duration: 0.25,
+									bounce: 0,
+								}}
+								initial={{ opacity: 0, y: -14 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 14 }}
+								className="flex items-center justify-center gap-1.5"
+							>
+								{status === "submitting" ? (
+									<>
+										<Spinner size={14} color="currentColor" />
+										<span>Updating...</span>
+									</>
+								) : status === "success" ? (
+									<>
+										<Icon name="check-circle" className="h-4 w-4" />
+										<span>Property Updated</span>
+									</>
+								) : (
+									<>
+										Update property
+										<span className="inline-flex items-center gap-0.5 opacity-80">
+											<Icon
+												name="command"
+												className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+											/>
+											<Icon
+												name="enter"
+												className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+											/>
+										</span>
+									</>
+								)}
+							</motion.span>
+						</AnimatePresence>
+					</FancyButton.Root>
+				</div>
 			</div>
 		</form>
 	);
