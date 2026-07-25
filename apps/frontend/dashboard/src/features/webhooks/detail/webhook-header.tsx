@@ -1,20 +1,21 @@
+import * as Button from "@reloop/ui/button";
+import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
+import { Skeleton } from "@reloop/ui/skeleton";
+import { useNavigate } from "@tanstack/react-router";
+import axios from "axios";
+import { useState } from "react";
+import { toast } from "sonner";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { WebhookAvatar } from "#/features/webhooks/components/webhook-avatar";
 import {
-	type WebhookDetailData,
 	useInvalidateWebhooks,
+	type WebhookDetailData,
 } from "#/features/webhooks/hooks/use-webhooks-query";
-import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
-import { Skeleton } from "@reloop/ui/skeleton";
-import axios from "axios";
-import { useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { toast } from "sonner";
 import {
-	type WebhookHeaderMenuAction,
 	WebhookHeaderMenu,
+	type WebhookHeaderMenuAction,
 } from "./webhook-header-menu";
 
 function statusBadgeLabel(status: string) {
@@ -238,15 +239,18 @@ export function WebhookHeader({
 								<Icon name="edit" className="h-3.5 w-3.5" />
 								Edit
 							</Button.Root>
-							<Button.Root
-								variant="neutral"
-								mode="stroke"
+							<FancyButton.Root
+								variant="blue"
 								size="xsmall"
-								className="font-semibold"
 								onClick={() => onTriggerTest?.()}
 							>
-								Send test
-							</Button.Root>
+								<FancyButton.Icon
+									as={Icon}
+									name="send-test"
+									className="ml-0.5 h-3.5 w-3.5"
+								/>
+								Send test event
+							</FancyButton.Root>
 							<WebhookHeaderMenu
 								status={webhook.status}
 								onAction={(id) => void handleMenuAction(id)}

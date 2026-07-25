@@ -1,3 +1,4 @@
+import { StripeSecret } from "#/features/webhooks/components/blurred-secret";
 import type { WebhookDetailData } from "#/features/webhooks/hooks/use-webhooks-query";
 import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
 import { cn } from "@reloop/ui/cn";
@@ -6,7 +7,7 @@ import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
 import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import axios from "axios";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { RotateWebhookSecretModal } from "./rotate-webhook-secret-modal";
 
@@ -41,12 +42,14 @@ function IconAction({
 	icon,
 	onClick,
 	disabled,
+	spin,
 	active,
 }: {
 	label: string;
 	icon: string;
 	onClick: () => void;
 	disabled?: boolean;
+	spin?: boolean;
 	active?: boolean;
 }) {
 	return (
@@ -66,7 +69,10 @@ function IconAction({
 						)}
 						aria-label={label}
 					>
-						<Icon name={icon} className="h-4 w-4" />
+						<Icon
+							name={icon}
+							className={cn("h-4 w-4", spin && "animate-spin")}
+						/>
 					</button>
 				</Tooltip.Trigger>
 				<Tooltip.Content side="top" size="small">
@@ -91,7 +97,7 @@ export function WebhookSecretEvents({
 	const [isRotatingSecret, setIsRotatingSecret] = useState(false);
 	const [isRotateModalOpen, setIsRotateModalOpen] = useState(false);
 
-	const handleCopySecret = useCallback(async () => {
+	const handleCopySecret = async () => {
 		if (!webhook?.secret) return;
 		try {
 			await navigator.clipboard.writeText(webhook.secret);
@@ -101,7 +107,7 @@ export function WebhookSecretEvents({
 		} catch {
 			toast.error("Failed to copy secret");
 		}
-	}, [webhook?.secret]);
+	};
 
 	const handleRotateSecret = async () => {
 		if (!webhook) return;
@@ -129,66 +135,40 @@ export function WebhookSecretEvents({
 		}
 	};
 
-	const maskedSecret = !webhook?.secret
-		? "No secret"
-		: isSecretVisible
-			? webhook.secret
-			: webhook.secret.startsWith("whsec_")
-				? `whsec_${"•".repeat(24)}`
-				: "•".repeat(28);
-
 	return (
 		<>
 			<div className="mt-8 grid gap-4 lg:grid-cols-2">
 				{/* Signing secret */}
 				<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 					<div className="space-y-3 p-4">
-						<div className="flex items-start justify-between gap-3">
-							<div>
-								<p className="font-medium text-sm text-text-strong-950">
-									Signing secret
-								</p>
-								<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
-									Used to verify webhook signatures on your server.
-								</p>
-							</div>
-							<button
-								type="button"
-								onClick={() => setIsRotateModalOpen(true)}
-								disabled={!webhook?.secret || isRotatingSecret || isLoading}
-								className={cn(
-									"inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5",
-									"font-medium text-[12px] text-text-sub-600 transition-colors",
-									"hover:bg-bg-weak-50 hover:text-text-strong-950",
-									"disabled:pointer-events-none disabled:opacity-40",
-								)}
-							>
-								<Icon
-									name={isRotatingSecret ? "loader-2" : "rotate-cw"}
-									className={cn(
-										"h-3.5 w-3.5",
-										isRotatingSecret && "animate-spin",
-									)}
-								/>
-								Rotate
-							</button>
+						<div>
+							<p className="font-medium text-sm text-text-strong-950">
+								Signing secret
+							</p>
+							<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
+								Used to verify webhook signatures on your server.
+							</p>
 						</div>
 
 						{isLoading ? (
 							<Skeleton className="h-10 w-full rounded-xl" />
 						) : (
-							<div className="flex items-center gap-1 rounded-xl bg-bg-weak-50 py-1 pr-1 pl-3 dark:bg-bg-weak-50/50">
-								<code
-									className={cn(
-										"min-w-0 flex-1 truncate font-mono text-[13px] text-text-strong-950 tracking-tight",
-										!isSecretVisible && "select-none",
+							<div className="flex items-center gap-2 rounded-xl bg-bg-weak-50 py-2 pr-2 pl-3 dark:bg-bg-weak-50/50">
+								<div className="min-w-0 flex-1 overflow-hidden">
+									{webhook?.secret ? (
+										<StripeSecret
+											secret={webhook.secret}
+											prefixLength={6}
+											revealed={isSecretVisible}
+										/>
+									) : (
+										<span className="font-mono text-[13px] text-text-sub-600">
+											No secret
+										</span>
 									)}
-									title={isSecretVisible ? webhook?.secret ?? undefined : undefined}
-								>
-									{maskedSecret}
-								</code>
+								</div>
 								{webhook?.secret ? (
-									<div className="flex shrink-0 items-center">
+									<div className="flex shrink-0 items-center border-stroke-soft-100 border-l pl-1 dark:border-stroke-soft-100/40">
 										<IconAction
 											label={isSecretVisible ? "Hide secret" : "Show secret"}
 											icon={
@@ -201,6 +181,13 @@ export function WebhookSecretEvents({
 											icon={copiedSecret ? "check" : "copy"}
 											onClick={() => void handleCopySecret()}
 											active={copiedSecret}
+										/>
+										<IconAction
+											label="Rotate secret"
+											icon={isRotatingSecret ? "loader-2" : "refresh-cw"}
+											onClick={() => setIsRotateModalOpen(true)}
+											disabled={isRotatingSecret}
+											spin={isRotatingSecret}
 										/>
 									</div>
 								) : null}

@@ -27,6 +27,21 @@ export const IconsSprite = () => (
 				<stop offset="100%" stopColor="#2DD4BF" />
 			</linearGradient>
 			<symbol
+				id="send-test"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M6 10L2 6L6 2M2 6H16M18 22L22 18L18 14M22 18H8"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol
 				id="video-guide"
 				viewBox="0 0 24 24"
 				fill="none"

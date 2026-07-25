@@ -1,3 +1,4 @@
+import { StripeSecret } from "#/features/webhooks/components/blurred-secret";
 import type { WebhookDetailData } from "#/features/webhooks/hooks/use-webhooks-query";
 import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
 import { formatRelativeTime } from "#/utils/format-relative-time";
@@ -173,7 +174,7 @@ export function WebhookMetaGrid({
 	webhook: WebhookDetailData | undefined | null;
 	isLoading?: boolean;
 }) {
-	const [secretVisible, setSecretVisible] = useState(false);
+	const [secretRevealed, setSecretRevealed] = useState(false);
 
 	if (isLoading) {
 		return (
@@ -206,13 +207,6 @@ export function WebhookMetaGrid({
 			: "None";
 
 	const secret = webhook.secret ?? "";
-	const maskedSecret = !secret
-		? "—"
-		: secretVisible
-			? secret
-			: secret.startsWith("whsec_")
-				? `whsec_${"•".repeat(24)}`
-				: "•".repeat(28);
 
 	const headersJson =
 		webhook.customHeaders && Object.keys(webhook.customHeaders).length > 0
@@ -272,20 +266,29 @@ export function WebhookMetaGrid({
 						</Tooltip.Provider>
 					</div>
 				</div>
-				<span className="min-w-0 flex-1 truncate font-medium font-mono text-sm text-text-strong-950">
-					{maskedSecret}
-				</span>
+				<div className="min-w-0 flex-1 overflow-hidden">
+					{secret ? (
+						<StripeSecret
+							secret={secret}
+							prefixLength={6}
+							revealed={secretRevealed}
+						/>
+					) : (
+						<span className="font-mono text-sm text-text-sub-600">—</span>
+					)}
+				</div>
 				{secret ? (
 					<>
 						<button
 							type="button"
-							onClick={() => setSecretVisible((v) => !v)}
-							className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40"
-							title={secretVisible ? "Hide secret" : "Show secret"}
+							onClick={() => setSecretRevealed((v) => !v)}
+							className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
+							title={secretRevealed ? "Hide secret" : "Show secret"}
+							aria-label={secretRevealed ? "Hide secret" : "Show secret"}
 						>
 							<Icon
-								name={secretVisible ? "eye-outline" : "eye-slash-outline"}
-								className="h-3.5 w-3.5"
+								name={secretRevealed ? "eye-outline" : "eye-slash-outline"}
+								className="h-4 w-4"
 							/>
 						</button>
 						<CopyButton value={secret} />

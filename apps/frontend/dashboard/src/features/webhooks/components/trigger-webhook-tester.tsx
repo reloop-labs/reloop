@@ -1,45 +1,42 @@
+import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
+import * as Label from "@reloop/ui/label";
+import Spinner from "@reloop/ui/spinner";
 import {
 	ACTIVE_WEBHOOK_EVENTS,
 	WEBHOOK_EVENTS,
 } from "@reloop/webhook-events";
 import axios from "axios";
-import { AnimatePresence, motion } from "motion/react";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
 
 interface TriggerWebhookTesterProps {
 	webhookId: string;
 	webhookEvents?: string[];
+	onCancel?: () => void;
 }
-
-type Tab = "timeline" | "response" | "headers";
 
 interface TriggerResult {
 	status: number | null;
 	responseBody: string | null;
-	responseHeaders: Record<string, string> | null;
 	durationMs: number | null;
 	triggeredAt: string | null;
 	error: string | null;
 }
 
-const categoryBadgeColors: Record<string, { light: string; dark: string }> = {
-	domain: { light: "bg-[#0A438A]", dark: "dark:bg-[#1E57A8]" },
-	"api-key": { light: "bg-[#8A5A0A]", dark: "dark:bg-[#A87A1E]" },
-	contact: { light: "bg-[#0A6B3A]", dark: "dark:bg-[#1E8A4E]" },
+const CATEGORY_META: Record<string, { label: string; icon: string }> = {
+	email: { label: "Email", icon: "mail-send" },
+	domain: { label: "Domains", icon: "globe" },
+	"api-key": { label: "API Keys", icon: "key-new" },
+	contact: { label: "Contacts", icon: "contacts" },
+	other: { label: "Other", icon: "webhook" },
 };
 
-const getPayloadForEvent = (
-	eventId: string,
-	_category: string,
-): Record<string, unknown> => {
-	// Manual trigger payload becomes envelope.data on delivery
+const getPayloadForEvent = (eventId: string): Record<string, unknown> => {
 	if (eventId.startsWith("email.")) {
 		return {
 			email_id: "em_test_a1b2c3",
@@ -68,9 +65,10 @@ const getPayloadForEvent = (
 export const TriggerWebhookTester = ({
 	webhookId,
 	webhookEvents,
+	onCancel,
 }: TriggerWebhookTesterProps) => {
 	const invalidate = useInvalidateWebhooks();
-	// Prefer the webhook's actual subscriptions (including legacy inactive IDs).
+
 	const filteredEvents = useMemo(() => {
 		if (webhookEvents && webhookEvents.length > 0) {
 			return webhookEvents.map((id) => {
@@ -91,22 +89,9 @@ export const TriggerWebhookTester = ({
 		return ACTIVE_WEBHOOK_EVENTS;
 	}, [webhookEvents]);
 
-	const [selectedEventId, setSelectedEventId] = useState<string>(
+	const [selectedEventId, setSelectedEventId] = useState(
 		filteredEvents[0]?.id || "",
 	);
-	const [activeTab, setActiveTab] = useState<Tab>("timeline");
-
-	useHotkeys(
-		"mod+enter",
-		(e) => {
-			e.preventDefault();
-			document.getElementById("trigger-webhook-send-btn")?.click();
-		},
-		{ enableOnFormTags: true },
-	);
-
-	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
-	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 	const [isTriggering, setIsTriggering] = useState(false);
 	const [result, setResult] = useState<TriggerResult | null>(null);
 	const [isCopyingPayload, setIsCopyingPayload] = useState(false);
@@ -118,10 +103,19 @@ export const TriggerWebhookTester = ({
 
 	const payload = useMemo(() => {
 		if (!selectedEvent) return {};
-		return getPayloadForEvent(selectedEvent.id, selectedEvent.category);
+		return getPayloadForEvent(selectedEvent.id);
 	}, [selectedEvent]);
 
 	const payloadString = JSON.stringify(payload, null, 2);
+
+	useHotkeys(
+		"mod+enter",
+		(e) => {
+			e.preventDefault();
+			if (!isTriggering && selectedEventId) void handleTrigger();
+		},
+		{ enableOnFormTags: true },
+	);
 
 	const handleSelectEvent = (eventId: string) => {
 		setSelectedEventId(eventId);
@@ -149,39 +143,32 @@ export const TriggerWebhookTester = ({
 				{ webhookId, event: selectedEventId, payload },
 				{ withCredentials: true },
 			);
-			const durationMs = Date.now() - startTime;
 			setResult({
 				status: response.status,
 				responseBody:
 					typeof response.data === "string"
 						? response.data
 						: JSON.stringify(response.data, null, 2),
-				responseHeaders: response.headers as Record<string, string>,
-				durationMs,
+				durationMs: Date.now() - startTime,
 				triggeredAt: new Date().toISOString(),
 				error: null,
 			});
-			setActiveTab("response");
 			toast.success("Test event triggered successfully");
 			await invalidate();
 		} catch (error: unknown) {
 			const durationMs = Date.now() - startTime;
 			if (axios.isAxiosError(error)) {
-				const status = error.response?.status ?? null;
 				setResult({
-					status,
+					status: error.response?.status ?? null,
 					responseBody: error.response?.data
 						? typeof error.response.data === "string"
 							? error.response.data
 							: JSON.stringify(error.response.data, null, 2)
 						: null,
-					responseHeaders:
-						(error.response?.headers as Record<string, string>) ?? null,
 					durationMs,
 					triggeredAt: new Date().toISOString(),
 					error: error.response?.data?.message ?? "Request failed",
 				});
-				setActiveTab("response");
 				toast.error(
 					error.response?.data?.message ?? "Failed to trigger test event",
 				);
@@ -189,7 +176,6 @@ export const TriggerWebhookTester = ({
 				setResult({
 					status: null,
 					responseBody: null,
-					responseHeaders: null,
 					durationMs,
 					triggeredAt: new Date().toISOString(),
 					error: "An unexpected error occurred",
@@ -201,385 +187,244 @@ export const TriggerWebhookTester = ({
 		}
 	};
 
-	const tabs: { id: Tab; label: string; iconName: string }[] = [
-		{ id: "timeline", label: "Timeline", iconName: "activity" },
-		{ id: "response", label: "Response", iconName: "code" },
-		{ id: "headers", label: "Headers", iconName: "list" },
-	];
-
-	const activeIndex = tabs.findIndex((t) => t.id === activeTab);
-	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
-	const currentTabEl = buttonRefs.current[currentIdx];
-	const rect = currentTabEl?.getBoundingClientRect();
-
 	const isSuccess =
 		result?.status != null && result.status >= 200 && result.status < 300;
 
 	return (
-		<div className="flex flex-col gap-6 pb-12">
-			<div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-				{/* ── Left: Event selector + Payload ── */}
-				<div className="flex min-h-0 flex-col gap-4">
-					{/* Event list */}
-					<div className="flex flex-col gap-2">
-						<p className="px-1 font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-							Choose event type
-						</p>
-						<div className="flex max-h-72 flex-col overflow-y-auto rounded-xl border border-stroke-soft-100 dark:border-stroke-soft-100/40">
-							{filteredEvents.map((event, i) => {
-								const isSelected = selectedEventId === event.id;
-								const isLast = i === filteredEvents.length - 1;
-								return (
-									<button
-										key={event.id}
-										type="button"
-										aria-pressed={isSelected}
-										onClick={() => handleSelectEvent(event.id)}
-										className={cn(
-											"flex w-full cursor-pointer items-center justify-between px-4 py-2.5 text-left transition-colors hover:bg-bg-weak-50/50",
-											isSelected && "bg-bg-weak-50/60",
-											!isLast &&
-												"border-stroke-soft-100 border-b dark:border-stroke-soft-100/40",
-										)}
-									>
-										<div className="flex min-w-0 flex-1 items-center gap-3">
-											<div
-												className={cn(
-													"flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-													isSelected
-														? "border-primary-base bg-primary-base"
-														: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40",
-												)}
-											>
-												{isSelected && (
-													<div className="h-1.5 w-1.5 rounded-full bg-white" />
-												)}
-											</div>
-											<span className="truncate font-medium text-label-sm text-text-strong-950">
-												{event.name}
-											</span>
-										</div>
-										<div
+		<div className="space-y-4">
+			<div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+				{/* ── Left: Event picker ── */}
+				<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/40">
+					<div className="m-0.5 space-y-3 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-4 pt-4 pb-3 dark:border-stroke-soft-100/40">
+						<div className="flex items-start justify-between gap-3">
+							<div>
+								<Label.Root>
+									Event to send
+									<Label.Asterisk />
+								</Label.Root>
+								<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
+									Choose one of this webhook&apos;s subscribed event types.
+								</p>
+							</div>
+							{selectedEvent ? (
+								<span className="shrink-0 rounded-full bg-bg-weak-50 px-2.5 py-1 font-mono text-[11px] text-text-sub-600 dark:bg-bg-weak-50/50">
+									{selectedEvent.id}
+								</span>
+							) : null}
+						</div>
+
+						<div className="max-h-[min(420px,55vh)] space-y-1 overflow-y-auto pr-0.5">
+							{filteredEvents.length === 0 ? (
+								<div className="rounded-xl border border-stroke-soft-200 border-dashed px-4 py-8 text-center dark:border-stroke-soft-100/40">
+									<p className="font-medium text-sm text-text-strong-950">
+										No events subscribed
+									</p>
+									<p className="mt-0.5 text-[12px] text-text-sub-600">
+										Edit the webhook to add events first.
+									</p>
+								</div>
+							) : (
+								filteredEvents.map((event) => {
+									const isSelected = selectedEventId === event.id;
+									const meta = CATEGORY_META[event.category];
+									return (
+										<button
+											key={event.id}
+											type="button"
+											onClick={() => handleSelectEvent(event.id)}
 											className={cn(
-												"ml-3 shrink-0 rounded-full px-1.5 py-0.5 font-medium text-[10px] text-white",
-												categoryBadgeColors[event.category]?.light,
-												categoryBadgeColors[event.category]?.dark,
+												"flex w-full items-start gap-3 rounded-xl border px-3 py-2.5 text-left transition-all",
+												isSelected
+													? "border-stroke-soft-200 bg-bg-weak-50 shadow-regular-xs dark:border-stroke-soft-100/50 dark:bg-bg-weak-50/40"
+													: "border-transparent hover:border-stroke-soft-200 hover:bg-bg-weak-50/50 dark:hover:border-stroke-soft-100/40",
 											)}
 										>
-											{event.category
-												.replace("-", " ")
-												.replace(/\b\w/g, (c) => c.toUpperCase())}
-										</div>
-									</button>
-								);
-							})}
-						</div>
-					</div>
-
-					{/* Payload card */}
-					<div className="overflow-hidden rounded-xl border border-stroke-soft-200">
-						<div className="flex items-center justify-between border-stroke-soft-200 border-b bg-bg-weak-50 px-4 py-3">
-							<p className="font-semibold text-paragraph-xs text-text-strong-950">
-								Payload
-							</p>
-							<Button.Root
-								variant="neutral"
-								mode="stroke"
-								size="xxsmall"
-								className="h-7 w-7 p-0"
-								onClick={handleCopyPayload}
-								title="Copy payload"
-							>
-								<Icon
-									name={isCopyingPayload ? "check" : "copy"}
-									className={cn(
-										"h-3.5 w-3.5 transition-colors",
-										isCopyingPayload
-											? "text-success-base"
-											: "text-text-sub-600",
-									)}
-								/>
-							</Button.Root>
-						</div>
-						<pre className="overflow-x-auto bg-bg-weak-25 p-4 font-mono text-[12px] text-text-strong-950 leading-relaxed">
-							{payloadString}
-						</pre>
-					</div>
-
-					{/* Send button */}
-					<Button.Root
-						id="trigger-webhook-send-btn"
-						variant="primary"
-						size="small"
-						className="relative w-full font-semibold"
-						onClick={handleTrigger}
-						disabled={isTriggering || !selectedEventId}
-					>
-						<span className="flex items-center">
-							{isTriggering ? (
-								<Icon name="refresh-cw" className="mr-2 h-4 w-4 animate-spin" />
-							) : (
-								<Icon name="send" className="mr-2 h-4 w-4" />
-							)}
-							{isTriggering ? "Sending..." : "Send test"}
-						</span>
-						{!isTriggering && (
-							<span className="-translate-y-1/2 absolute top-1/2 right-2 inline-flex items-center gap-0.5">
-								<Icon
-									name="command"
-									className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-								/>
-								<Icon
-									name="enter"
-									className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-								/>
-							</span>
-						)}
-					</Button.Root>
-				</div>
-
-				{/* ── Right: Response panel ── */}
-				<div className="flex flex-col overflow-hidden rounded-xl border border-stroke-soft-200">
-					{/* Tabs bar */}
-					<div className="border-stroke-soft-200 border-b bg-bg-weak-50 px-2">
-						<TabMenuHorizontal.Root
-							value={activeTab}
-							onValueChange={(val) => setActiveTab(val as Tab)}
-						>
-							<TabMenuHorizontal.List className="relative h-10 gap-0 border-b! border-transparent! py-0">
-								{tabs.map((tab, index) => (
-									<TabMenuHorizontal.Trigger
-										key={tab.id}
-										value={tab.id}
-										ref={(el) => {
-											if (el) {
-												buttonRefs.current[index] = el;
-											}
-										}}
-										onPointerEnter={() => setHoveredIdx(index)}
-										onPointerLeave={() => setHoveredIdx(undefined)}
-										className={cn(
-											"flex cursor-pointer items-center gap-2 px-2.5 py-0! text-sm transition-colors",
-											hoveredIdx === undefined && activeIndex === index
-												? "text-text-strong-950"
-												: "text-text-sub-600",
-										)}
-									>
-										<Icon name={tab.iconName} className="h-4 w-4" />
-										{tab.label}
-									</TabMenuHorizontal.Trigger>
-								))}
-								<AnimatePresence>
-									{rect && activeIndex !== -1 ? (
-										<motion.div
-											className="absolute top-0 left-0 rounded-lg bg-neutral-alpha-10"
-											initial={{
-												pointerEvents: "none",
-												width: rect.width,
-												height: rect.height - 20,
-												left:
-													rect.left -
-													(currentTabEl?.offsetParent?.getBoundingClientRect()
-														.left || 0),
-												top:
-													rect.top -
-													(currentTabEl?.offsetParent?.getBoundingClientRect()
-														.top || 0) +
-													10,
-												opacity: 0,
-											}}
-											animate={{
-												pointerEvents: "none",
-												width: rect.width,
-												height: rect.height - 20,
-												left:
-													rect.left -
-													(currentTabEl?.offsetParent?.getBoundingClientRect()
-														.left || 0),
-												top:
-													rect.top -
-													(currentTabEl?.offsetParent?.getBoundingClientRect()
-														.top || 0) +
-													10,
-												opacity: 1,
-											}}
-											exit={{
-												pointerEvents: "none",
-												opacity: 0,
-												width: rect.width,
-												height: rect.height - 20,
-												left:
-													rect.left -
-													(currentTabEl?.offsetParent?.getBoundingClientRect()
-														.left || 0),
-												top:
-													rect.top -
-													(currentTabEl?.offsetParent?.getBoundingClientRect()
-														.top || 0) +
-													10,
-											}}
-											transition={{ duration: 0.14 }}
-										/>
-									) : null}
-								</AnimatePresence>
-							</TabMenuHorizontal.List>
-						</TabMenuHorizontal.Root>
-					</div>
-
-					{/* Panel body */}
-					<div className="flex flex-1 flex-col bg-bg-white-0 p-4">
-						{!result ? (
-							/* Empty state */
-							<div className="flex flex-1 flex-col items-center justify-center gap-3 py-16">
-								<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-bg-weak-50">
-									<Icon name="send" className="h-5 w-5 text-text-sub-600" />
-								</div>
-								<div className="text-center">
-									<p className="font-semibold text-paragraph-sm text-text-strong-950">
-										Ready to send
-									</p>
-									<p className="mt-0.5 text-paragraph-xs text-text-sub-600">
-										Pick an event and hit Send test
-									</p>
-								</div>
-							</div>
-						) : (
-							<div className="flex flex-1 flex-col gap-3">
-								{/* Timeline */}
-								{activeTab === "timeline" && (
-									<div className="flex flex-col gap-3">
-										<div className="flex items-center gap-3 rounded-lg border border-stroke-soft-200 bg-bg-weak-25 px-4 py-3">
-											<div
+											<span
 												className={cn(
-													"flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
-													isSuccess
-														? "bg-success-lighter text-success-base"
-														: "bg-error-lighter text-error-base",
+													"mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+													isSelected
+														? "border-text-strong-950 bg-text-strong-950 dark:border-white dark:bg-white"
+														: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50",
 												)}
 											>
-												<Icon
-													name={isSuccess ? "check-circle" : "alert-circle"}
-													className="h-4 w-4"
-												/>
-											</div>
+												{isSelected ? (
+													<span className="h-1.5 w-1.5 rounded-full bg-white dark:bg-black" />
+												) : null}
+											</span>
 											<div className="min-w-0 flex-1">
-												<p className="font-semibold text-paragraph-xs text-text-strong-950">
-													{isSuccess
-														? "Event delivered successfully"
-														: (result.error ?? "Delivery failed")}
-												</p>
-												<p className="text-[11px] text-text-sub-600">
-													{result.triggeredAt
-														? new Date(result.triggeredAt).toLocaleTimeString()
-														: ""}
-													{result.durationMs != null
-														? ` · ${result.durationMs}ms`
-														: ""}
-												</p>
+												<div className="flex flex-wrap items-center gap-2">
+													<span className="font-medium font-mono text-[13px] text-text-strong-950">
+														{event.id}
+													</span>
+													{meta ? (
+														<span className="inline-flex items-center gap-1 rounded-md bg-bg-soft-50 px-1.5 py-0.5 font-medium text-[10px] text-text-sub-600 dark:bg-bg-weak-50/50">
+															<Icon name={meta.icon} className="h-3 w-3" />
+															{meta.label}
+														</span>
+													) : null}
+												</div>
+												{event.description ? (
+													<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
+														{event.description}
+													</p>
+												) : null}
 											</div>
-											{result.status != null && (
-												<span
-													className={cn(
-														"shrink-0 font-mono font-semibold text-sm",
-														isSuccess ? "text-success-base" : "text-error-base",
-													)}
-												>
-													{result.status}
-												</span>
-											)}
-										</div>
-
-										<div className="rounded-lg border border-stroke-soft-200 bg-bg-weak-25 px-4 py-3">
-											<p className="mb-1 font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-												Event
-											</p>
-											<p className="font-medium font-mono text-paragraph-xs text-text-strong-950">
-												{selectedEvent?.name}
-											</p>
-										</div>
-
-										<div className="rounded-lg border border-stroke-soft-200 bg-bg-weak-25 px-4 py-3">
-											<p className="mb-1 font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-												Sent at
-											</p>
-											<p className="font-medium text-paragraph-xs text-text-strong-950">
-												{result.triggeredAt
-													? new Date(result.triggeredAt).toLocaleString()
-													: "—"}
-											</p>
-										</div>
-									</div>
-								)}
-
-								{/* Response */}
-								{activeTab === "response" && (
-									<div className="flex flex-col gap-3">
-										<div className="flex items-center justify-between">
-											<p className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-												Response body
-											</p>
-											{result.status != null && (
-												<span
-													className={cn(
-														"font-mono font-semibold text-xs",
-														isSuccess ? "text-success-base" : "text-error-base",
-													)}
-												>
-													{result.status}
-												</span>
-											)}
-										</div>
-										{result.responseBody ? (
-											<pre className="overflow-x-auto rounded-lg bg-bg-weak-25 p-3 font-mono text-[12px] text-text-strong-950 leading-relaxed">
-												{result.responseBody}
-											</pre>
-										) : (
-											<p className="py-6 text-center text-paragraph-xs text-text-sub-600 italic">
-												No response body
-											</p>
-										)}
-									</div>
-								)}
-
-								{/* Headers */}
-								{activeTab === "headers" && (
-									<div className="flex flex-col gap-3">
-										<p className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-											Response headers
-										</p>
-										{result.responseHeaders &&
-										Object.keys(result.responseHeaders).length > 0 ? (
-											<div className="overflow-hidden rounded-xl border border-stroke-soft-200">
-												{Object.entries(result.responseHeaders).map(
-													([key, value], idx, arr) => (
-														<div
-															key={key}
-															className={cn(
-																"flex items-start gap-4 px-4 py-2.5",
-																idx < arr.length - 1 &&
-																	"border-stroke-soft-200 border-b",
-															)}
-														>
-															<span className="w-40 shrink-0 font-mono text-[11px] text-text-sub-600">
-																{key}
-															</span>
-															<span className="min-w-0 break-all font-mono text-[11px] text-text-strong-950">
-																{value}
-															</span>
-														</div>
-													),
-												)}
-											</div>
-										) : (
-											<p className="py-6 text-center text-paragraph-xs text-text-sub-600 italic">
-												No response headers
-											</p>
-										)}
-									</div>
-								)}
-							</div>
-						)}
+										</button>
+									);
+								})
+							)}
+						</div>
 					</div>
+					<div className="flex items-center justify-end gap-2 px-4 py-2.5">
+						<Button.Root
+							type="button"
+							variant="neutral"
+							mode="stroke"
+							size="xsmall"
+							onClick={onCancel}
+							disabled={isTriggering}
+							className="rounded-xl"
+						>
+							Cancel
+						</Button.Root>
+						<FancyButton.Root
+							type="button"
+							variant="blue"
+							size="xsmall"
+							disabled={isTriggering || !selectedEventId}
+							onClick={() => void handleTrigger()}
+							className="gap-1.5 rounded-xl"
+						>
+							{isTriggering ? (
+								<>
+									<Spinner size={14} color="currentColor" />
+									Sending...
+								</>
+							) : (
+								<>
+									Send test event
+									<span className="inline-flex items-center gap-0.5 opacity-80">
+										<Icon
+											name="command"
+											className="h-3 w-3 rounded-sm border border-white/20 p-px"
+										/>
+										<Icon
+											name="enter"
+											className="h-3 w-3 rounded-sm border border-white/20 p-px"
+										/>
+									</span>
+								</>
+							)}
+						</FancyButton.Root>
+					</div>
+				</div>
+
+				{/* ── Right: Payload + delivery result ── */}
+				<div className="flex min-w-0 flex-col gap-4">
+					{/* Payload card */}
+					<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/40">
+						<div className="m-0.5 space-y-3 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-4 pt-4 pb-3 dark:border-stroke-soft-100/40">
+							<div className="flex items-start justify-between gap-3">
+								<div>
+									<p className="font-medium text-sm text-text-strong-950">
+										Payload
+									</p>
+									<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
+										Sample{" "}
+										<code className="font-mono text-[11px]">data</code> sent
+										with this event.
+									</p>
+								</div>
+								<button
+									type="button"
+									onClick={() => void handleCopyPayload()}
+									className={cn(
+										"inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5",
+										"font-medium text-[12px] text-text-sub-600 transition-colors",
+										"hover:bg-bg-weak-50 hover:text-text-strong-950",
+										isCopyingPayload &&
+											"text-success-base hover:text-success-base",
+									)}
+								>
+									<Icon
+										name={isCopyingPayload ? "check" : "copy"}
+										className="h-3.5 w-3.5"
+									/>
+									{isCopyingPayload ? "Copied" : "Copy"}
+								</button>
+							</div>
+							<pre className="max-h-[min(280px,40vh)] overflow-auto rounded-xl bg-bg-weak-50 p-3 font-mono text-[12px] text-text-strong-950 leading-relaxed dark:bg-bg-weak-50/50">
+								{payloadString}
+							</pre>
+						</div>
+					</div>
+
+					{/* Delivery result */}
+					{result ? (
+						<div
+							className={cn(
+								"overflow-hidden rounded-[18px] border",
+								isSuccess
+									? "border-success-base/25 bg-success-lighter/30 dark:bg-success-base/10"
+									: "border-error-base/25 bg-error-lighter/30 dark:bg-error-base/10",
+							)}
+						>
+							<div className="m-0.5 space-y-3 rounded-2xl border border-stroke-soft-200/60 bg-bg-white-0 px-4 py-4 dark:border-stroke-soft-100/40">
+								<div className="flex items-start gap-3">
+									<div
+										className={cn(
+											"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
+											isSuccess
+												? "bg-success-lighter text-success-base"
+												: "bg-error-lighter text-error-base",
+										)}
+									>
+										<Icon
+											name={isSuccess ? "check-circle" : "alert-circle"}
+											className="h-4 w-4"
+										/>
+									</div>
+									<div className="min-w-0 flex-1">
+										<p className="font-semibold text-sm text-text-strong-950">
+											{isSuccess
+												? "Event delivered successfully"
+												: (result.error ?? "Delivery failed")}
+										</p>
+										<p className="mt-0.5 text-[12px] text-text-sub-600">
+											{result.triggeredAt
+												? new Date(result.triggeredAt).toLocaleString()
+												: ""}
+											{result.durationMs != null
+												? ` · ${result.durationMs}ms`
+												: ""}
+											{result.status != null
+												? ` · HTTP ${result.status}`
+												: ""}
+										</p>
+									</div>
+								</div>
+								{result.responseBody ? (
+									<pre className="max-h-[200px] overflow-auto rounded-xl bg-bg-weak-50 p-3 font-mono text-[11px] text-text-strong-950 leading-relaxed dark:bg-bg-weak-50/50">
+										{result.responseBody}
+									</pre>
+								) : null}
+							</div>
+						</div>
+					) : (
+						<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 border-dashed bg-bg-soft-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20">
+							<div className="flex flex-col items-center justify-center gap-2 px-4 py-10 text-center">
+								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-bg-white-0 ring-1 ring-stroke-soft-100 dark:bg-bg-white-0/5 dark:ring-stroke-soft-100/40">
+									<Icon name="send" className="h-4 w-4 text-text-sub-600" />
+								</div>
+								<p className="font-medium text-sm text-text-strong-950">
+									Ready to send
+								</p>
+								<p className="max-w-[220px] text-[12px] text-text-sub-600 leading-relaxed">
+									Pick an event on the left, then send a test delivery.
+								</p>
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
