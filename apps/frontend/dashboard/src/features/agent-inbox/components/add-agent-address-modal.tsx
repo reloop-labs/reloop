@@ -2,10 +2,14 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
+import Spinner from "@reloop/ui/spinner";
 import { useNavigate } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -17,7 +21,6 @@ import type { Domain, DomainListResponse } from "#/features/domain/types";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import type { AgentMailbox } from "../types";
 import { useAgentInbox } from "./agent-inbox-provider";
-import { LoadingDot } from "./shared/loading-dot";
 
 /** RFC 5321/5322 unquoted local-part (dot-atom), max 64 chars */
 const EMAIL_LOCAL_PART_REGEX =
@@ -113,15 +116,14 @@ export const AddAgentAddressModal = ({
 		return missing;
 	}, [selectedDomain]);
 
-	// Command/Ctrl + Enter to submit form
 	useHotkeys(
 		"mod+enter",
 		(e) => {
 			e.preventDefault();
-			if (!canCreate || isSubmitting) return;
-			form.handleSubmit(onSubmit)();
+			if (hasNoDomains || !canCreate || isSubmitting) return;
+			void form.handleSubmit(onSubmit)();
 		},
-		{ enableOnFormTags: ["INPUT"] },
+		{ enableOnFormTags: ["INPUT"], enabled: isOpen },
 	);
 
 	useEffect(() => {
@@ -131,7 +133,6 @@ export const AddAgentAddressModal = ({
 		}
 	}, [verifiedDomains, form]);
 
-	// Reset state when modal is closed
 	useEffect(() => {
 		if (!isOpen) {
 			const timer = setTimeout(() => {
@@ -140,7 +141,7 @@ export const AddAgentAddressModal = ({
 					const preferred = pickPreferredDomain(verifiedDomains);
 					form.setValue("domain", preferred?.domain ?? "");
 				}
-			}, 300); // Wait for transition
+			}, 300);
 			return () => clearTimeout(timer);
 		}
 	}, [isOpen, form, verifiedDomains]);
@@ -203,19 +204,16 @@ export const AddAgentAddressModal = ({
 		}
 	};
 
-	const domainSettingsPath = selectedDomain ? selectedDomain.id : null;
-
 	return (
 		<Modal.Root
 			open={isOpen}
 			onOpenChange={(open) => {
-				if (!open) onClose();
+				if (!open && !isSubmitting) onClose();
 			}}
 		>
 			<Modal.Content
-				className="overflow-hidden rounded-3xl border border-mail-border border-mail-border/40 p-0 sm:max-w-[480px]"
-				showClose={false}
-				aria-describedby={undefined}
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[460px] dark:border-stroke-soft-100/40"
+				showClose={true}
 				onEscapeKeyDown={(e) => {
 					if (isSubmitting) e.preventDefault();
 				}}
@@ -223,97 +221,56 @@ export const AddAgentAddressModal = ({
 					if (isSubmitting) e.preventDefault();
 				}}
 			>
-				{hasNoDomains ? (
-					<>
-						<div className="flex flex-col border-mail-border border-mail-border/40 border-b">
-							<div className="flex items-start justify-between px-5 pt-5 pb-4">
-								<div className="flex flex-col gap-1">
-									<div className="flex items-center gap-2.5">
-										<Icon
-											name="mail-single"
-											className="h-4 w-4 text-mail-foreground"
-										/>
-										<Modal.Title asChild>
-											<h2 className="font-semibold text-label-md text-mail-foreground">
-												Create Inbox for AI agent
-											</h2>
-										</Modal.Title>
-									</div>{" "}
-								</div>
-								<button
-									type="button"
-									onClick={onClose}
-									className="flex h-7 w-7 items-center justify-center rounded-lg bg-transparent text-mail-muted transition-all hover:bg-[var(--inbox-hover)] active:scale-[0.95]"
-								>
-									<Icon name="cross" className="h-3.5 w-3.5" />
-								</button>
-							</div>
-						</div>
+				<div className="p-6">
+					<div className="pr-6">
+						<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+							{hasNoDomains ? "Connect a domain" : "Add agent address"}
+						</Modal.Title>
+						<p className="text-sm text-text-sub-600 leading-relaxed">
+							{hasNoDomains
+								? "Set up a verified domain before creating email addresses for your AI agents."
+								: "Create a dedicated inbox address for an AI agent on one of your domains."}
+						</p>
+					</div>
 
-						<Modal.Body className="flex flex-col items-center px-5 pt-8 pb-20 text-center">
-							<Icon name="globe" className="h-5 w-5 text-mail-muted" />
-							<h3 className="mt-4 mb-1.5 font-semibold text-base text-mail-foreground">
-								Connect a domain
+					{hasNoDomains ? (
+						<div className="mt-6 flex flex-col items-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 px-5 py-8 text-center dark:border-stroke-soft-100/40">
+							<div className="mb-4 flex items-center justify-center">
+								<Icon name="globe" className="h-8 w-8 text-text-sub-600" />
+							</div>
+							<h3 className="mb-1.5 font-semibold text-base text-text-strong-950">
+								No verified domains yet
 							</h3>
-							<p className="mx-auto mb-6 max-w-[300px] text-balance font-medium text-[12px] text-mail-muted">
-								Set up a domain to create email addresses for your AI agents.
+							<p className="mx-auto mb-5 max-w-75 text-balance font-medium text-[12px] text-text-sub-600">
+								Add and verify a domain to create agent inbox addresses.
 							</p>
-							<div className="flex items-center gap-2">
-								<Button.Root
-									type="button"
-									variant="neutral"
-									size="xsmall"
-									onClick={() => {
-										void navigate({ to: "/domain/add" });
-									}}
-									className="flex items-center gap-1.5"
-								>
-									<Icon name="plus" className="h-3.5 w-3.5" />
-									Add Domain
-								</Button.Root>
-							</div>
-						</Modal.Body>
-					</>
-				) : (
-					<form onSubmit={form.handleSubmit(onSubmit)}>
-						<div className="flex flex-col border-mail-border border-mail-border/40 border-b">
-							<div className="flex items-start justify-between px-5 pt-5 pb-4">
-								<div className="flex flex-col gap-1">
-									<div className="flex items-center gap-2.5">
-										<Icon
-											name="inbox"
-											className="h-4 w-4 text-mail-foreground"
-										/>
-										<Modal.Title asChild>
-											<h2 className="font-semibold text-label-md text-mail-foreground">
-												Create Inbox for AI agent
-											</h2>
-										</Modal.Title>
-									</div>
-								</div>
-								<button
-									type="button"
-									onClick={onClose}
-									className="flex h-7 w-7 items-center justify-center rounded-lg bg-transparent text-mail-muted transition-all hover:bg-[var(--inbox-hover)] active:scale-[0.95]"
-								>
-									<Icon name="cross" className="h-3.5 w-3.5" />
-								</button>
-							</div>
+							<FancyButton.Root
+								type="button"
+								variant="blue"
+								size="small"
+								onClick={() => {
+									onClose();
+									void navigate({ to: "/domain/add" });
+								}}
+								className="gap-1.5 rounded-xl"
+							>
+								<Icon name="plus" className="h-4 w-4" />
+								Add domain
+							</FancyButton.Root>
 						</div>
-
-						<Modal.Body className="space-y-4 px-5 py-4 pb-5">
-							<div className="flex flex-col gap-1.5">
-								<label
-									htmlFor="agent-label"
-									className="font-medium text-label-sm text-mail-foreground"
-								>
+					) : (
+						<form
+							onSubmit={form.handleSubmit(onSubmit)}
+							className="mt-5 space-y-4"
+						>
+							<div className="space-y-2">
+								<Label.Root htmlFor="agent-label">
 									Agent name
-									<span className="ml-0.5 text-error-base">*</span>
-								</label>
+									<Label.Asterisk />
+								</Label.Root>
 								<Input.Root
-									size="xsmall"
+									size="medium"
 									hasError={!!form.formState.errors.label}
-									className="rounded-xl"
 								>
 									<Input.Wrapper>
 										<Input.Input
@@ -325,26 +282,27 @@ export const AddAgentAddressModal = ({
 										/>
 									</Input.Wrapper>
 								</Input.Root>
-								{form.formState.errors.label && (
+								{form.formState.errors.label ? (
 									<p className="text-error-base text-paragraph-xs">
 										{form.formState.errors.label.message}
+									</p>
+								) : (
+									<p className="text-paragraph-xs text-text-sub-600">
+										A display name so you can tell agents apart in the list.
 									</p>
 								)}
 							</div>
 
-							<div className="flex flex-col gap-1.5">
-								<label
-									htmlFor="agent-email"
-									className="font-medium text-label-sm text-mail-foreground"
-								>
+							<div className="space-y-2">
+								<Label.Root htmlFor="agent-email">
 									Email address
-									<span className="ml-0.5 text-error-base">*</span>
-								</label>
+									<Label.Asterisk />
+								</Label.Root>
 								<div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
 									<Input.Root
-										size="xsmall"
+										size="medium"
 										hasError={!!form.formState.errors.localPart}
-										className="min-w-0 rounded-xl"
+										className="min-w-0"
 									>
 										<Input.Wrapper>
 											<Input.Input
@@ -362,21 +320,16 @@ export const AddAgentAddressModal = ({
 
 									<span
 										aria-hidden
-										className="shrink-0 select-none font-medium text-mail-muted text-paragraph-sm"
+										className="shrink-0 select-none font-medium text-paragraph-sm text-text-sub-600"
 									>
 										@
 									</span>
 
 									<div ref={domainFieldRef} className="min-w-0">
 										<Input.Root
-											size="xsmall"
+											size="medium"
 											hasError={!!form.formState.errors.domain}
-											className={cn(
-												"min-w-0 rounded-xl",
-												form.formState.errors.domain
-													? "focus-within:shadow-button-error-focus focus-within:before:ring-error-base"
-													: "focus-within:shadow-button-important-focus focus-within:before:ring-stroke-strong-950",
-											)}
+											className="min-w-0"
 										>
 											<Input.Wrapper className="w-full">
 												<Dropdown.Root
@@ -388,7 +341,7 @@ export const AddAgentAddressModal = ({
 															type="button"
 															disabled={isSubmitting}
 															aria-label="Select domain"
-															className="group/trigger flex h-8 w-full items-center justify-between gap-1 bg-transparent p-0 text-left font-medium text-mail-foreground text-paragraph-sm outline-none ring-0 disabled:pointer-events-none disabled:opacity-50"
+															className="group/trigger flex h-full min-h-10 w-full items-center justify-between gap-1 bg-transparent p-0 text-left font-medium text-paragraph-sm text-text-strong-950 outline-none ring-0 disabled:pointer-events-none disabled:opacity-50"
 														>
 															<span className="truncate">
 																{selectedDomainName || "domain"}
@@ -396,9 +349,9 @@ export const AddAgentAddressModal = ({
 															<Icon
 																name="chevron-down"
 																className={cn(
-																	"size-4 shrink-0 text-mail-muted transition duration-200 ease-out group-hover/trigger:text-mail-foreground group-data-[state=open]/trigger:rotate-180",
+																	"size-4 shrink-0 text-text-sub-600 transition duration-200 ease-out group-hover/trigger:text-text-strong-950 group-data-[state=open]/trigger:rotate-180",
 																	isDropdownOpen &&
-																		"rotate-180 text-mail-foreground",
+																		"rotate-180 text-text-strong-950",
 																)}
 															/>
 														</button>
@@ -428,12 +381,14 @@ export const AddAgentAddressModal = ({
 																			setHoverIdx(undefined)
 																		}
 																		onClick={() => {
-																			form.setValue("domain", d.domain);
+																			form.setValue("domain", d.domain, {
+																				shouldValidate: true,
+																			});
 																			setIsDropdownOpen(false);
 																		}}
 																		className={cn(
 																			"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-xs transition-colors",
-																			"text-mail-foreground",
+																			"text-text-strong-950",
 																			isSelected && "bg-neutral-alpha-10",
 																			!currentRect &&
 																				hoverIdx === idx &&
@@ -446,7 +401,7 @@ export const AddAgentAddressModal = ({
 																		{isSelected && (
 																			<Icon
 																				name="check"
-																				className="h-3.5 w-3.5 shrink-0 text-mail-foreground"
+																				className="h-3.5 w-3.5 shrink-0 text-text-strong-950"
 																			/>
 																		)}
 																	</button>
@@ -473,17 +428,16 @@ export const AddAgentAddressModal = ({
 							</div>
 
 							{selectedDomain && !canCreate && (
-								<div className="rounded-xl border border-error-base/20 bg-error-base/5 px-3 py-2.5 font-medium text-[12px] text-mail-foreground">
-									<Icon
-										name="alert-circle"
-										className="mr-1 inline h-3.5 w-3.5 text-error-base"
-									/>
+								<div className="rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
+									<span className="font-bold text-[#6D4000] dark:text-amber-100">
+										Action needed:
+									</span>{" "}
 									{missingCapabilities.length === 2
 										? "Enable sending and receiving on this domain to create an inbox."
-										: `Enable ${missingCapabilities[0]} on this domain to create an inbox. Both sending and receiving are required.`}{" "}
+										: `Enable ${missingCapabilities[0]} on this domain. Both sending and receiving are required.`}{" "}
 									<button
 										type="button"
-										className="relative z-10 inline cursor-pointer underline underline-offset-2 hover:opacity-80"
+										className="relative z-10 inline cursor-pointer font-medium underline underline-offset-2 hover:opacity-80"
 										onClick={() => {
 											if (selectedDomain) {
 												void navigate({
@@ -499,57 +453,76 @@ export const AddAgentAddressModal = ({
 									</button>
 								</div>
 							)}
-						</Modal.Body>
+						</form>
+					)}
 
-						<div className="flex items-center justify-end border-stroke-soft-100 border-t px-5 py-3.5 dark:border-stroke-soft-200/50">
-							<div className="flex items-center gap-2">
-								<Button.Root
-									type="button"
-									variant="neutral"
-									mode="stroke"
-									size="xsmall"
-									onClick={onClose}
-									disabled={isSubmitting}
-								>
-									Cancel
-									<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-mail-border bg-offset-light/50 p-px font-medium text-[10px]">
-										Esc
-									</span>
-								</Button.Root>
-								<Button.Root
-									type="submit"
-									variant="neutral"
-									size="xsmall"
-									disabled={isSubmitting || !canCreate}
-								>
-									{isSubmitting ? (
-										<>
-											<LoadingDot
-												label="Creating"
-												style={{ fontSize: 12 }}
-											/>
-											Creating...
-										</>
-									) : (
-										<>
-											Create address
-											<span className="inline-flex items-center gap-0.5">
-												<Icon
-													name="command"
-													className="h-4 w-4 rounded-sm border border-mail-border/20 p-px"
-												/>
-												<Icon
-													name="enter"
-													className="h-4 w-4 rounded-sm border border-mail-border/20 p-px"
-												/>
-											</span>
-										</>
-									)}
-								</Button.Root>
-							</div>
+					{!hasNoDomains && (
+						<div className="mt-6 flex items-center justify-end gap-3">
+							<Button.Root
+								type="button"
+								variant="neutral"
+								mode="ghost"
+								size="small"
+								onClick={() => {
+									if (!isSubmitting) onClose();
+								}}
+								className={cn(
+									"transition-opacity duration-200",
+									isSubmitting && "pointer-events-none opacity-50",
+								)}
+							>
+								Cancel
+							</Button.Root>
+							<FancyButton.Root
+								type="button"
+								variant="blue"
+								size="small"
+								onClick={() => {
+									if (!isSubmitting && canCreate) {
+										void form.handleSubmit(onSubmit)();
+									}
+								}}
+								className={cn(
+									"min-w-[150px] justify-center overflow-hidden transition-all duration-200",
+									(isSubmitting || !canCreate) &&
+										"pointer-events-none opacity-90",
+								)}
+							>
+								<AnimatePresence mode="popLayout" initial={false}>
+									<motion.span
+										key={isSubmitting ? "creating" : "idle"}
+										transition={{ type: "spring", duration: 0.25, bounce: 0 }}
+										initial={{ opacity: 0, y: -14 }}
+										animate={{ opacity: 1, y: 0 }}
+										exit={{ opacity: 0, y: 14 }}
+										className="flex items-center justify-center gap-1.5"
+									>
+										{isSubmitting ? (
+											<>
+												<Spinner size={14} color="currentColor" />
+												<span>Creating...</span>
+											</>
+										) : (
+											<>
+												Add address
+												<span className="inline-flex items-center gap-0.5 opacity-80">
+													<Icon
+														name="command"
+														className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+													/>
+													<Icon
+														name="enter"
+														className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+													/>
+												</span>
+											</>
+										)}
+									</motion.span>
+								</AnimatePresence>
+							</FancyButton.Root>
 						</div>
-					</form>
-				)}
+					)}
+				</div>
 			</Modal.Content>
 		</Modal.Root>
 	);

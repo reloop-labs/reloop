@@ -1,8 +1,10 @@
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useReceivedEmailsQuery } from "#/features/emails/hooks/use-emails-query";
+import { queryKeys } from "#/lib/query-keys";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
@@ -12,6 +14,7 @@ import { ReceivedEmailTable } from "./received-email-table";
 
 export function ReceivedEmailList() {
 	const { activeOrganization } = useActiveOrganization();
+	const queryClient = useQueryClient();
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isSearchActive, setIsSearchActive] = useState(false);
 	const [currentPage, setCurrentPage] = useQueryState(
@@ -78,6 +81,12 @@ export function ReceivedEmailList() {
 		void setCurrentPage(1);
 	};
 
+	const handleRefresh = () => {
+		void queryClient.invalidateQueries({
+			queryKey: queryKeys.emails.received(),
+		});
+	};
+
 	if (error) {
 		return (
 			<div className="flex flex-col items-center justify-center gap-2 p-4">
@@ -97,9 +106,9 @@ export function ReceivedEmailList() {
 					className="flex-1"
 					transition={{ type: "spring", stiffness: 350, damping: 30 }}
 				>
-					<Input.Root size="xsmall" className="rounded-[10px]">
+					<Input.Root size="small" className="rounded-xl">
 						<Input.Wrapper>
-							<Input.Icon as={Icon} name="search" size="xsmall" />
+							<Input.Icon as={Icon} name="search" size="small" />
 							<Input.Input
 								placeholder="Search sender or subject..."
 								value={searchQuery}
@@ -158,15 +167,24 @@ export function ReceivedEmailList() {
 							/>
 							{hasAnyFilter && (
 								<Button.Root
+									type="button"
 									variant="neutral"
 									mode="stroke"
-									size="xsmall"
+									size="small"
 									onClick={handleClearAll}
-									className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
+									className="gap-1.5 rounded-xl"
 								>
 									Clear filters
 								</Button.Root>
 							)}
+							<button
+								type="button"
+								onClick={handleRefresh}
+								className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40"
+								title="Refresh received emails"
+							>
+								<Icon name="rotate-cw" className="h-4 w-4" />
+							</button>
 						</motion.div>
 					)}
 				</AnimatePresence>

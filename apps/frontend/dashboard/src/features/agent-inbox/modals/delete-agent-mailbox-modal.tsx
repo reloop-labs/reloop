@@ -16,62 +16,55 @@ import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
-import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
-import type { ApiKeyData } from "../types";
+import type { AgentMailbox } from "../types";
 
 type DeleteState = "idle" | "deleting" | "success";
 
-export function DeleteApiKeyModal({
-	apiKeys,
+export function DeleteAgentMailboxModal({
+	mailboxes,
 	onDeleteSuccess,
 }: {
-	apiKeys: ApiKeyData[];
-	onDeleteSuccess?: (deletedName: string) => void;
+	mailboxes: AgentMailbox[];
+	onDeleteSuccess?: (deletedLabel: string) => void;
 }) {
 	const [deleteId, setDeleteId] = useQueryState("delete");
 	const [deleteState, setDeleteState] = useState<DeleteState>("idle");
 	const [isHolding, setIsHolding] = useState(false);
 	const holdProgress = useMotionValue(0);
 	const animationRef = useRef<AnimationPlaybackControls | null>(null);
-	const invalidate = useInvalidateApiKeys();
 
-	// Cache the selected API key so details remain stable when query invalidates upon deletion
-	const targetApiKeyRef = useRef<ApiKeyData | null>(null);
-	const currentApiKey = apiKeys.find((k) => k.id === deleteId);
-	if (currentApiKey) {
-		targetApiKeyRef.current = currentApiKey;
+	// Cache the selected mailbox so details stay stable when the list refreshes
+	const targetMailboxRef = useRef<AgentMailbox | null>(null);
+	const currentMailbox = mailboxes.find((m) => m.id === deleteId);
+	if (currentMailbox) {
+		targetMailboxRef.current = currentMailbox;
 	}
-	const apiKeyToDelete = currentApiKey || targetApiKeyRef.current;
+	const mailboxToDelete = currentMailbox || targetMailboxRef.current;
 
-	const displayName =
-		apiKeyToDelete?.name ||
-		apiKeyToDelete?.start ||
-		apiKeyToDelete?.prefix ||
-		"Unnamed key";
+	const displayLabel =
+		mailboxToDelete?.label || mailboxToDelete?.email || "Agent address";
+	const displayEmail = mailboxToDelete?.email || "—";
 
 	const handleDelete = async () => {
-		if (!apiKeyToDelete || deleteState !== "idle") return;
+		if (!mailboxToDelete || deleteState !== "idle") return;
 		try {
 			setDeleteState("deleting");
-			await axios.delete(`/api/api-key/v1/${apiKeyToDelete.id}`, {
+			await axios.delete(`/api/inbox/v1/mailboxes/${mailboxToDelete.id}`, {
 				withCredentials: true,
 			});
 			setDeleteState("success");
-			await invalidate();
 
-			// Show checkmark 'Deleted' state for 900ms before closing modal
 			setTimeout(() => {
 				void setDeleteId(null);
-				onDeleteSuccess?.(displayName);
-				// Reset internal button state after modal exit animation finishes
+				onDeleteSuccess?.(displayLabel);
 				setTimeout(() => {
 					setDeleteState("idle");
 				}, 300);
 			}, 900);
 		} catch (error) {
 			const message = axios.isAxiosError(error)
-				? error.response?.data?.message || "Failed to delete API key"
-				: "Failed to delete API key";
+				? error.response?.data?.message || "Failed to delete agent address"
+				: "Failed to delete agent address";
 			toast.error(message);
 			setDeleteState("idle");
 		}
@@ -106,14 +99,13 @@ export function DeleteApiKeyModal({
 		"enter",
 		(e) => {
 			e.preventDefault();
-			if (apiKeyToDelete && deleteState === "idle") {
+			if (mailboxToDelete && deleteState === "idle") {
 				void handleDelete();
 			}
 		},
 		{ enabled: !!deleteId },
 	);
 
-	// Keep a ref so onOpenChange can read the latest deleteState without stale closure
 	const deleteStateRef = useRef(deleteState);
 	useEffect(() => {
 		deleteStateRef.current = deleteState;
@@ -125,20 +117,17 @@ export function DeleteApiKeyModal({
 			onOpenChange={(open) => {
 				if (!open) {
 					cancelHold();
-					// If the user closes the modal after a successful delete (via X or
-					// backdrop), still fire the success callback so the banner appears.
 					if (deleteStateRef.current === "success") {
 						const name =
-							targetApiKeyRef.current?.name ||
-							targetApiKeyRef.current?.start ||
-							targetApiKeyRef.current?.prefix ||
-							"Unnamed key";
+							targetMailboxRef.current?.label ||
+							targetMailboxRef.current?.email ||
+							"Agent address";
 						onDeleteSuccess?.(name);
 					}
 					void setDeleteId(null);
 					setTimeout(() => {
 						setDeleteState("idle");
-						targetApiKeyRef.current = null;
+						targetMailboxRef.current = null;
 					}, 300);
 				}
 			}}
@@ -147,50 +136,42 @@ export function DeleteApiKeyModal({
 				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 sm:max-w-[460px] dark:border-stroke-soft-100/40"
 				showClose={true}
 			>
-				{/* Header */}
 				<div className="pr-6">
 					<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
-						Delete API key
+						Delete agent address
 					</Modal.Title>
 					<p className="text-sm text-text-sub-600 leading-relaxed">
-						Are you sure you want to delete this API key? This action cannot be
-						undone.
+						Are you sure you want to delete this agent address? This action
+						cannot be undone.
 					</p>
 				</div>
 
-				{/* Key Details Card */}
 				<div className="mt-5 space-y-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-4 dark:border-stroke-soft-100/40">
 					<div>
-						<p className="font-normal text-text-sub-600 text-xs">
-							API key name
-						</p>
+						<p className="font-normal text-text-sub-600 text-xs">Agent name</p>
 						<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
-							{displayName}
+							{displayLabel}
 						</p>
 					</div>
 					<div>
 						<p className="font-normal text-text-sub-600 text-xs">
-							API key prefix
+							Email address
 						</p>
-						<div className="mt-1 flex items-center">
-							<span className="font-medium font-mono text-sm">
-								{apiKeyToDelete?.start || apiKeyToDelete?.prefix || "rl_..."}
-							</span>
-						</div>
+						<p className="mt-0.5 truncate font-medium font-mono text-sm text-text-strong-950">
+							{displayEmail}
+						</p>
 					</div>
 				</div>
 
-				{/* Warning Banner */}
 				<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-4 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
 					<span className="font-bold text-[#6D4000] dark:text-amber-100">
 						Warning:
 					</span>{" "}
-					Deleting this API key will permanently remove it along with all its
-					permissions. Any services using this API key will stop working
-					immediately.
+					Deleting this address permanently removes the inbox and all of its
+					messages, drafts, and labels. Agents and integrations using this
+					address will stop receiving mail immediately.
 				</div>
 
-				{/* Footer Actions */}
 				<div className="mt-6 flex items-center justify-end gap-3">
 					<Button.Root
 						type="button"
@@ -224,7 +205,6 @@ export function DeleteApiKeyModal({
 							deleteState !== "idle" && "pointer-events-none opacity-90",
 						)}
 					>
-						{/* Hold progress overlay fill */}
 						<motion.div
 							className="pointer-events-none absolute inset-0 origin-left bg-white/25"
 							style={{ scaleX: holdProgress }}
@@ -238,18 +218,9 @@ export function DeleteApiKeyModal({
 									duration: 0.25,
 									bounce: 0,
 								}}
-								initial={{
-									opacity: 0,
-									y: -14,
-								}}
-								animate={{
-									opacity: 1,
-									y: 0,
-								}}
-								exit={{
-									opacity: 0,
-									y: 14,
-								}}
+								initial={{ opacity: 0, y: -14 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 14 }}
 								className="relative z-10 flex items-center justify-center gap-1.5"
 							>
 								{deleteState === "deleting" ? (

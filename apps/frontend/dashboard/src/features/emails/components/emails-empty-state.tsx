@@ -6,6 +6,8 @@ interface EmailsEmptyStateProps {
 	description?: string;
 	isFiltered?: boolean;
 	onClearFilters?: () => void;
+	/** "sent" (default) or "received" — tweaks empty copy when not filtered */
+	variant?: "sent" | "received";
 }
 
 export const EmailsEmptyState = ({
@@ -13,54 +15,52 @@ export const EmailsEmptyState = ({
 	description,
 	isFiltered = false,
 	onClearFilters,
+	variant = "sent",
 }: EmailsEmptyStateProps) => {
-	const defaultTitle = isFiltered ? "No results found" : "No email logs found";
+	const defaultTitle = isFiltered
+		? "No emails found"
+		: variant === "received"
+			? "No received emails yet"
+			: "No sent emails yet";
 	const defaultDescription = isFiltered
-		? "Try adjusting or clearing your filters to find what you're looking for."
-		: "Send transactional emails via our API or SMTP relay to see delivery logs in real-time.";
+		? "Try adjusting your search or filters."
+		: variant === "received"
+			? "Inbound mail to your agent addresses will show up here."
+			: "Send transactional email via the API or SMTP to see delivery activity here.";
 
 	return (
-		<div className="flex flex-col items-center bg-bg-soft-200/10 px-6 py-12 text-center dark:bg-bg-soft-200/15">
-			<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
-				<Icon name="mail-single" className="h-5 w-5 text-text-sub-600" />
+		<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
+			<div className="mb-4 flex items-center justify-center">
+				<Icon
+					name={
+						isFiltered
+							? "search"
+							: variant === "received"
+								? "mail-receive"
+								: "mail-send"
+					}
+					className="h-8 w-8 text-text-sub-600"
+				/>
 			</div>
 			<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
 				{title || defaultTitle}
 			</h3>
-			<p className="mx-auto mb-6 max-w-[300px] text-balance font-medium text-[12px] text-text-sub-600">
+			<p className="mx-auto mb-6 max-w-75 text-balance font-medium text-[12px] text-text-sub-600">
 				{description || defaultDescription}
 			</p>
-			<div className="flex items-center gap-3">
-				{isFiltered && onClearFilters ? (
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						onClick={onClearFilters}
-						className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
-					>
-						<Icon name="minus-circle" className="h-4 w-4" />
-						Clear Filters
-					</Button.Root>
-				) : (
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="xsmall"
-						asChild
-						className="gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
-					>
-						<a
-							href="https://reloop.sh/docs/emails"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<Icon name="file-text" className="h-3.5 w-3.5" />
-							Learn about emails
-						</a>
-					</Button.Root>
-				)}
-			</div>
+			{isFiltered && onClearFilters ? (
+				<Button.Root
+					type="button"
+					variant="neutral"
+					mode="stroke"
+					size="small"
+					onClick={onClearFilters}
+					className="gap-1.5 rounded-xl"
+				>
+					<Icon name="cross-circle" className="h-4 w-4 text-text-sub-600" />
+					Clear filters
+				</Button.Root>
+			) : null}
 		</div>
 	);
 };

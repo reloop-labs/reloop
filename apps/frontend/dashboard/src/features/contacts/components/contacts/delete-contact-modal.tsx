@@ -6,19 +6,19 @@ import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import {
 	AnimatePresence,
+	type AnimationPlaybackControls,
 	animate,
 	motion,
 	useMotionValue,
-	type AnimationPlaybackControls,
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
 import {
+	type AudienceStatus,
 	getStatusColorClass,
 	getStatusIcon,
 	getStatusLabel,
-	type AudienceStatus,
 } from "#/features/contacts/audience";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 
@@ -163,9 +163,9 @@ export const DeleteContactModal = ({
 						<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 							Delete contact
 						</Modal.Title>
-						<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
-							Are you sure you want to delete this contact? This action cannot be
-							undone.
+						<p className="text-sm text-text-sub-600 leading-relaxed">
+							Are you sure you want to delete this contact? This action cannot
+							be undone.
 						</p>
 					</div>
 
@@ -194,7 +194,9 @@ export const DeleteContactModal = ({
 										{getStatusLabel(contactToDelete.status)}
 									</div>
 								) : (
-									<span className="font-medium text-xs text-text-sub-600">—</span>
+									<span className="font-medium text-text-sub-600 text-xs">
+										—
+									</span>
 								)}
 							</div>
 						</div>
@@ -205,7 +207,9 @@ export const DeleteContactModal = ({
 						<span className="font-bold text-[#6D4000] dark:text-amber-100">
 							Warning:
 						</span>{" "}
-						Deleting this contact will permanently remove their profile, activity history, and custom property values across your organization.
+						Deleting this contact will permanently remove their profile,
+						activity history, and custom property values across your
+						organization.
 					</div>
 
 					{/* Footer Actions */}
@@ -239,7 +243,7 @@ export const DeleteContactModal = ({
 						>
 							{/* Hold progress overlay fill */}
 							<motion.div
-								className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
+								className="pointer-events-none absolute inset-0 origin-left bg-white/25"
 								style={{ scaleX: holdProgress }}
 							/>
 

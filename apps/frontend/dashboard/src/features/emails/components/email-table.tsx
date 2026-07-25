@@ -40,6 +40,7 @@ interface EmailTableProps {
 	onPageSizeChange: (pageSize: number) => void;
 	hasFilters?: boolean;
 	onClearFilters?: () => void;
+	variant?: "sent" | "received";
 }
 
 const gridClass =
@@ -240,6 +241,7 @@ export const EmailTable = ({
 	onPageSizeChange,
 	hasFilters = false,
 	onClearFilters,
+	variant = "sent",
 }: EmailTableProps) => {
 	const navigate = useNavigate();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
@@ -293,6 +295,7 @@ export const EmailTable = ({
 					<EmailsEmptyState
 						isFiltered={hasFilters}
 						onClearFilters={onClearFilters}
+						variant={variant}
 					/>
 				) : (
 					logs.map((log) => {

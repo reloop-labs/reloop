@@ -2,23 +2,24 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useNavigate } from "@tanstack/react-router";
 import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
 import {
 	parseAsInteger,
 	parseAsString,
 	parseAsStringLiteral,
 	useQueryState,
 } from "nuqs";
-import { useMemo, useRef, useState } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
 import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { formatRelativeTime } from "#/utils/format-relative-time";
+import { AgentMailboxListToolbar } from "../list/agent-mailbox-list-toolbar";
+import { DeleteAgentMailboxModal } from "../modals/delete-agent-mailbox-modal";
 import type { AgentMailbox } from "../types";
 import { AddAgentAddressModal } from "./add-agent-address-modal";
 import { useAgentInbox } from "./agent-inbox-provider";
@@ -27,8 +28,6 @@ import { LoadingDot } from "./shared/loading-dot";
 
 const TABLE_GRID =
 	"grid grid-cols-[minmax(0,1fr)_120px_140px_32px] items-center px-4";
-
-const DOCS_URL = "https://docs.reloop.sh/integrations/agent-email-inbox";
 
 type MailboxStatus = AgentMailbox["status"];
 type StatusFilter = MailboxStatus | null;
@@ -49,14 +48,12 @@ function AgentMailboxActionsDropdown({
 	onToggleEnabled,
 	onDelete,
 	isToggling,
-	isDeleting,
 	onOpenChange,
 }: {
 	mailbox: AgentMailbox;
 	onToggleEnabled: (mailbox: AgentMailbox) => void;
 	onDelete: (id: string) => void;
 	isToggling: boolean;
-	isDeleting: boolean;
 	onOpenChange?: (open: boolean) => void;
 }) {
 	const navigate = useNavigate();
@@ -146,9 +143,7 @@ function AgentMailboxActionsDropdown({
 				>
 					<div className="relative">
 						{menuItems.map((item, idx) => {
-							const busy =
-								(item.id === "toggle" && isToggling) ||
-								(item.id === "delete" && isDeleting);
+							const busy = item.id === "toggle" && isToggling;
 							return (
 								<button
 									key={item.id}
@@ -172,13 +167,7 @@ function AgentMailboxActionsDropdown({
 									)}
 								>
 									{busy ? (
-										<span
-											className={cn(
-												item.isDanger
-													? "text-error-base"
-													: "text-text-sub-600",
-											)}
-										>
+										<span className="text-text-sub-600">
 											<LoadingDot
 												label="Working"
 												style={{ fontSize: 12 }}
@@ -231,209 +220,6 @@ function AgentMailboxSkeleton() {
 	);
 }
 
-// ── Status filter ────────────────────────────────────────────────────────────
-
-const statusFilterOptions: {
-	id: StatusFilter;
-	label: string;
-}[] = [
-	{ id: null, label: "All Status" },
-	{ id: "active", label: "Active" },
-	{ id: "disabled", label: "Disabled" },
-];
-
-function MailboxStatusFilterDropdown({
-	value,
-	onChange,
-}: {
-	value: StatusFilter;
-	onChange: (value: StatusFilter) => void;
-}) {
-	const [isOpen, setIsOpen] = useState(false);
-	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-
-	const selectedIdx = statusFilterOptions.findIndex((o) => o.id === value);
-	const activeIdx = hoverIdx !== undefined ? hoverIdx : selectedIdx;
-	const currentTab = buttonRefs.current[activeIdx];
-	const currentRect = currentTab?.getBoundingClientRect();
-
-	const selectedOption = value
-		? statusFilterOptions.find((o) => o.id === value)
-		: null;
-	const displayLabel = selectedOption ? selectedOption.label : "All Status";
-	const displayIcon = selectedOption?.id
-		? getStatusIcon(selectedOption.id)
-		: "activity";
-
-	return (
-		<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
-			<Dropdown.Trigger asChild>
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
-					size="xsmall"
-					className="w-40 justify-between gap-1.5 whitespace-nowrap rounded-[10px]"
-				>
-					<div className="flex items-center gap-1.5 overflow-hidden">
-						<Icon
-							name={displayIcon}
-							className={cn(
-								"h-3.5 w-3.5 shrink-0",
-								selectedOption?.id
-									? getStatusColorClass(selectedOption.id)
-									: "",
-							)}
-						/>
-						<span className="truncate">{displayLabel}</span>
-					</div>
-					<Icon name="chevron-down" className="h-3.5 w-3.5 shrink-0" />
-				</Button.Root>
-			</Dropdown.Trigger>
-			<Dropdown.Content align="start" className="w-40 p-2">
-				<div className="relative">
-					{statusFilterOptions.map((option, idx) => {
-						const isChecked = value === option.id;
-						return (
-							<button
-								key={option.id ?? "all"}
-								ref={(el) => {
-									if (el) buttonRefs.current[idx] = el;
-								}}
-								type="button"
-								onPointerEnter={() => setHoverIdx(idx)}
-								onPointerLeave={() => setHoverIdx(undefined)}
-								onClick={() => {
-									onChange(option.id);
-									setIsOpen(false);
-								}}
-								className={cn(
-									"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 font-normal text-xs text-text-strong-950",
-									isChecked && "bg-neutral-alpha-10",
-								)}
-							>
-								<div className="flex items-center gap-2">
-									{option.id ? (
-										<Icon
-											name={getStatusIcon(option.id)}
-											className={cn(
-												"h-3.5 w-3.5",
-												getStatusColorClass(option.id),
-											)}
-										/>
-									) : (
-										<Icon name="activity" className="h-3.5 w-3.5" />
-									)}
-									<span className={cn(isChecked && "font-medium")}>
-										{option.label}
-									</span>
-								</div>
-								{isChecked && <Icon name="check" className="h-3.5 w-3.5" />}
-							</button>
-						);
-					})}
-					<AnimatedHoverBackground rect={currentRect} tabElement={currentTab} />
-				</div>
-			</Dropdown.Content>
-		</Dropdown.Root>
-	);
-}
-
-// ── Header + toolbar ─────────────────────────────────────────────────────────
-
-function AgentMailboxListHeader({ onAdd }: { onAdd: () => void }) {
-	const openDocs = () => window.open(DOCS_URL, "_blank");
-
-	useHotkeys("d", openDocs);
-	useHotkeys("mod+a", (e) => {
-		e.preventDefault();
-		onAdd();
-	});
-
-	return (
-		<div className="flex items-center justify-between pt-10 pb-6">
-			<h1 className="flex items-center justify-center gap-1 font-medium text-2xl">
-				Agent Inbox
-			</h1>
-			<div className="flex items-center gap-2">
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
-					size="xsmall"
-					onClick={openDocs}
-					className="gap-1.5"
-				>
-					<Icon name="file-text" className="h-4 w-4" />
-					Docs
-					<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-200 p-px font-medium text-[10px] uppercase">
-						D
-					</span>
-				</Button.Root>
-				<Button.Root
-					variant="neutral"
-					size="xsmall"
-					onClick={onAdd}
-					className="gap-1.5"
-				>
-					<Icon name="plus" className="h-4 w-4" />
-					Add agent address
-					<span className="inline-flex items-center gap-0.5">
-						<Icon
-							name="command"
-							className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-						/>
-						<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
-							A
-						</span>
-					</span>
-				</Button.Root>
-			</div>
-		</div>
-	);
-}
-
-function AgentMailboxListToolbar() {
-	const [statusFilter, setStatusFilter] = useQueryState(
-		"status",
-		parseAsStringLiteral(["active", "disabled"] as const),
-	);
-	const [searchQuery, setSearchQuery] = useQueryState(
-		"q",
-		parseAsString.withDefault(""),
-	);
-	const [, setCurrentPage] = useQueryState(
-		"page",
-		parseAsInteger.withDefault(1),
-	);
-
-	return (
-		<div className="flex items-center gap-2">
-			<div className="flex-1">
-				<Input.Root size="xsmall" className="rounded-[10px]">
-					<Input.Wrapper>
-						<Input.Icon as={Icon} name="search" size="xsmall" />
-						<Input.Input
-							placeholder="Search agent addresses..."
-							value={searchQuery}
-							onChange={(e) => {
-								void setSearchQuery(e.target.value);
-								void setCurrentPage(1);
-							}}
-						/>
-					</Input.Wrapper>
-				</Input.Root>
-			</div>
-			<MailboxStatusFilterDropdown
-				value={statusFilter}
-				onChange={(filters) => {
-					void setStatusFilter(filters);
-					void setCurrentPage(1);
-				}}
-			/>
-		</div>
-	);
-}
-
 // ── Filtered empty (inside table card) ───────────────────────────────────────
 
 function FilteredEmptyState({
@@ -463,23 +249,24 @@ function FilteredEmptyState({
 
 	return (
 		<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
-			<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
-				<Icon name="search" className="h-5 w-5 text-text-sub-600" />
+			<div className="mb-4 flex items-center justify-center">
+				<Icon name="search" className="h-8 w-8 text-text-sub-600" />
 			</div>
 			<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
 				{title}
 			</h3>
-			<p className="mx-auto mb-6 max-w-[300px] text-balance font-medium text-[12px] text-text-sub-600">
+			<p className="mx-auto mb-6 max-w-75 text-balance font-medium text-[12px] text-text-sub-600">
 				{description}
 			</p>
 			<Button.Root
+				type="button"
 				variant="neutral"
 				mode="stroke"
-				size="xsmall"
+				size="small"
 				onClick={onClear}
-				className="gap-2 rounded-lg"
+				className="gap-1.5 rounded-xl"
 			>
-				<Icon name="refresh-cw" className="h-3.5 w-3.5" />
+				<Icon name="cross-circle" className="h-4 w-4 text-text-sub-600" />
 				Clear filters
 			</Button.Root>
 		</div>
@@ -492,6 +279,7 @@ export const AgentMailboxList = () => {
 	const navigate = useNavigate();
 	const { mailboxes, refresh, isLoadingMailboxes } = useAgentInbox();
 	const [modal, setModal] = useQueryState("modal");
+	const [, setDeleteId] = useQueryState("delete");
 	const addOpen = modal === "create-agent-mailbox";
 	const setAddOpen = (open: boolean) => {
 		void setModal(open ? "create-agent-mailbox" : null);
@@ -515,8 +303,15 @@ export const AgentMailboxList = () => {
 	);
 
 	const [togglingId, setTogglingId] = useState<string | null>(null);
-	const [deletingId, setDeletingId] = useState<string | null>(null);
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
+	const [deletedName, setDeletedName] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (deletedName) {
+			const timer = setTimeout(() => setDeletedName(null), 8000);
+			return () => clearTimeout(timer);
+		}
+	}, [deletedName]);
 
 	const filteredMailboxes = useMemo(() => {
 		const q = (searchQuery ?? "").trim().toLowerCase();
@@ -562,24 +357,8 @@ export const AgentMailboxList = () => {
 		}
 	};
 
-	const handleDeleteMailbox = async (id: string) => {
-		if (
-			!confirm(
-				"Are you sure you want to permanently delete this inbox address and all its messages?",
-			)
-		) {
-			return;
-		}
-		try {
-			setDeletingId(id);
-			await axios.delete(`/api/inbox/v1/mailboxes/${id}`);
-			toast.success("Inbox address deleted successfully");
-			await refresh();
-		} catch {
-			toast.error("Failed to delete inbox address");
-		} finally {
-			setDeletingId(null);
-		}
+	const openDeleteMailbox = (id: string) => {
+		void setDeleteId(id);
 	};
 
 	const goToMailbox = (id: string) => {
@@ -593,14 +372,40 @@ export const AgentMailboxList = () => {
 	};
 
 	return (
-		<div className="mx-auto max-w-3xl space-y-8 p-6 lg:p-8">
-			<AgentMailboxListHeader onAdd={() => setAddOpen(true)} />
+		<div className="pb-8">
+			<AnimatePresence>
+				{deletedName && (
+					<motion.div
+						key="deleted-banner"
+						initial={{ opacity: 0, y: -8, height: 0 }}
+						animate={{ opacity: 1, y: 0, height: "auto" }}
+						exit={{ opacity: 0, y: -8, height: 0 }}
+						transition={{ duration: 0.2 }}
+						className="mb-4 overflow-hidden"
+					>
+						<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-sm text-[#0F5C34] dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
+							<span>
+								Agent address &quot;
+								<span className="font-semibold">{deletedName}</span>&quot; has
+								been successfully deleted.
+							</span>
+							<button
+								type="button"
+								onClick={() => setDeletedName(null)}
+								className="p-1 text-[#0F5C34]/70 transition-colors hover:text-[#0F5C34] dark:text-emerald-200/70 dark:hover:text-emerald-200"
+							>
+								<Icon name="close" className="h-4 w-4" />
+							</button>
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
 
 			<div className="space-y-4">
 				<AgentMailboxListToolbar />
 
 				<div className="w-full text-paragraph-sm">
-					{/* Table header — matches domain list */}
+					{/* Table header */}
 					<div
 						className={cn(
 							TABLE_GRID,
@@ -701,9 +506,8 @@ export const AgentMailboxList = () => {
 											<AgentMailboxActionsDropdown
 												mailbox={mailbox}
 												onToggleEnabled={handleToggleEnabled}
-												onDelete={handleDeleteMailbox}
+												onDelete={openDeleteMailbox}
 												isToggling={togglingId === mailbox.id}
-												isDeleting={deletingId === mailbox.id}
 												onOpenChange={(open) =>
 													setActiveDropdownId(open ? mailbox.id : null)
 												}
@@ -745,6 +549,13 @@ export const AgentMailboxList = () => {
 			<AddAgentAddressModal
 				isOpen={addOpen}
 				onClose={() => setAddOpen(false)}
+			/>
+			<DeleteAgentMailboxModal
+				mailboxes={mailboxes}
+				onDeleteSuccess={(name) => {
+					setDeletedName(name);
+					void refresh();
+				}}
 			/>
 		</div>
 	);

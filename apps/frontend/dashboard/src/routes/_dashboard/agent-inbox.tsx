@@ -1,4 +1,4 @@
-import { AgentMailboxList } from "#/features/agent-inbox/components/agent-mailbox-list";
+import { AgentInboxPage } from "#/features/agent-inbox/agent-inbox-page";
 import { AgentInboxProvider } from "#/features/agent-inbox/components/agent-inbox-provider";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_dashboard/agent-inbox")({
 function AgentInboxListRoute() {
 	return (
 		<AgentInboxProvider>
-			<AgentMailboxList />
+			<AgentInboxPage />
 		</AgentInboxProvider>
 	);
 }

@@ -27,7 +27,7 @@ export const EditContactModal = ({
 						<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 							Edit contact
 						</Modal.Title>
-						<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
+						<p className="text-sm text-text-sub-600 leading-relaxed">
 							Update this contact&apos;s details, groups, and email preferences.
 						</p>
 					</div>

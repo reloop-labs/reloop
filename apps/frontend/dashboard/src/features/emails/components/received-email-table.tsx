@@ -280,6 +280,7 @@ export const ReceivedEmailTable = ({
 					<EmailsEmptyState
 						isFiltered={hasFilters}
 						onClearFilters={onClearFilters}
+						variant="received"
 					/>
 				) : (
 					logs.map((log) => {

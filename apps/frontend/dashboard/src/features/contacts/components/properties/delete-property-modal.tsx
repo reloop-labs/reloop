@@ -11,6 +11,7 @@ const getBadgeColor = (type: string) => {
 			return "gray";
 	}
 };
+
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
@@ -18,10 +19,10 @@ import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
 import {
 	AnimatePresence,
+	type AnimationPlaybackControls,
 	animate,
 	motion,
 	useMotionValue,
-	type AnimationPlaybackControls,
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -172,9 +173,9 @@ export const DeletePropertyModal = ({
 						<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 							Delete property
 						</Modal.Title>
-						<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
-							Are you sure you want to delete this property? This action cannot be
-							undone.
+						<p className="text-sm text-text-sub-600 leading-relaxed">
+							Are you sure you want to delete this property? This action cannot
+							be undone.
 						</p>
 					</div>
 
@@ -196,7 +197,9 @@ export const DeletePropertyModal = ({
 								<Badge.Root
 									size="small"
 									variant="lighter"
-									color={getBadgeColor(propertyToDelete?.propertyType || "String")}
+									color={getBadgeColor(
+										propertyToDelete?.propertyType || "String",
+									)}
 									className="h-5 rounded-md px-1.5 font-medium text-xs capitalize"
 								>
 									{propertyToDelete?.propertyType || "String"}
@@ -208,7 +211,9 @@ export const DeletePropertyModal = ({
 								Default value
 							</p>
 							<p className="mt-0.5 truncate font-medium text-sm text-text-strong-950">
-								{propertyToDelete?.defaultValue ? propertyToDelete.defaultValue : "—"}
+								{propertyToDelete?.defaultValue
+									? propertyToDelete.defaultValue
+									: "—"}
 							</p>
 						</div>
 					</div>
@@ -253,7 +258,7 @@ export const DeletePropertyModal = ({
 						>
 							{/* Hold progress overlay fill */}
 							<motion.div
-								className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
+								className="pointer-events-none absolute inset-0 origin-left bg-white/25"
 								style={{ scaleX: holdProgress }}
 							/>
 

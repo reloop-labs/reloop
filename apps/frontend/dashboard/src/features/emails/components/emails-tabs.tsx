@@ -38,7 +38,7 @@ export function EmailsTabs() {
 
 	return (
 		<TabMenuHorizontal.Root value={effectiveTabValue}>
-			<TabMenuHorizontal.List className="relative h-10 gap-0 border-b! py-0">
+			<TabMenuHorizontal.List className="relative h-11 gap-0 border-b! py-0">
 				{items.map(({ value, title, iconName, path }, index) => (
 					<TabMenuHorizontal.Trigger
 						ref={(el) => {
@@ -47,7 +47,7 @@ export function EmailsTabs() {
 						onPointerEnter={() => setHoveredIdx(index)}
 						onPointerLeave={() => setHoveredIdx(undefined)}
 						className={cn(
-							"flex cursor-pointer items-center gap-2 px-2.5 py-0! font-medium text-sm",
+							"flex cursor-pointer items-center gap-2 px-3 py-0! font-medium text-sm",
 							hoveredIdx === undefined &&
 								activeIndex === index &&
 								"text-text-strong-950",
@@ -63,31 +63,31 @@ export function EmailsTabs() {
 				<AnimatePresence>
 					{rect && activeIndex !== -1 ? (
 						<motion.div
-							className="absolute top-0 left-0 rounded-lg bg-neutral-alpha-10"
+							className="absolute top-0 left-0 rounded-xl bg-neutral-alpha-10"
 							initial={{
 								pointerEvents: "none",
 								width: rect.width,
-								height: rect.height - 20,
+								height: rect.height - 14,
 								left:
 									rect.left -
 									(tab?.offsetParent?.getBoundingClientRect().left || 0),
 								top:
 									rect.top -
 									(tab?.offsetParent?.getBoundingClientRect().top || 0) +
-									10,
+									7,
 								opacity: 0,
 							}}
 							animate={{
 								pointerEvents: "none",
 								width: rect.width,
-								height: rect.height - 20,
+								height: rect.height - 14,
 								left:
 									rect.left -
 									(tab?.offsetParent?.getBoundingClientRect().left || 0),
 								top:
 									rect.top -
 									(tab?.offsetParent?.getBoundingClientRect().top || 0) +
-									10,
+									7,
 								opacity: 1,
 							}}
 							exit={{ opacity: 0 }}
