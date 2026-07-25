@@ -273,55 +273,82 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 
 						{AVAILABLE_PROVIDERS.filter(
 							(p) => !accounts?.some((a) => a.providerId === p.id),
-						).map((provider) => (
-							<div
-								key={provider.id}
-								className="rounded-xl border border-stroke-soft-100 py-2 pr-2.5 pl-3 dark:border-stroke-soft-100/40"
-							>
-								<div className="flex items-center justify-between">
-									<div className="flex items-center gap-3">
-										<div className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50/60 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
-											{provider.useCustomIcon && provider.id === "google" ? (
-												<GoogleIcon className="h-4 w-4" />
-											) : (
-												<Icon
-													name={provider.icon}
-													className="h-4 w-4 text-text-sub-600"
-												/>
+						).map((provider) => {
+							const isConnecting = connecting === provider.id;
+							return (
+								<div
+									key={provider.id}
+									className="rounded-xl border border-stroke-soft-100 py-2 pr-2.5 pl-3 dark:border-stroke-soft-100/40"
+								>
+									<div className="flex items-center justify-between">
+										<div className="flex items-center gap-3">
+											<div className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke-soft-100 bg-bg-weak-50/60 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
+												{provider.useCustomIcon && provider.id === "google" ? (
+													<GoogleIcon className="h-4 w-4" />
+												) : (
+													<Icon
+														name={provider.icon}
+														className="h-4 w-4 text-text-sub-600"
+													/>
+												)}
+											</div>
+											<div>
+												<p className="font-medium text-label-sm text-text-strong-950">
+													{provider.name}
+												</p>
+												<p className="text-paragraph-xs text-text-sub-600">
+													Connect your {provider.name} account
+												</p>
+											</div>
+										</div>
+										<FancyButton.Root
+											variant="basic"
+											size="xsmall"
+											disabled={isConnecting}
+											onClick={() => handleConnect(provider.id)}
+											className={cn(
+												"min-w-[110px] justify-center overflow-hidden font-medium transition-all duration-200",
+												isConnecting && "opacity-90",
 											)}
-										</div>
-										<div>
-											<p className="font-medium text-label-sm text-text-strong-950">
-												{provider.name}
-											</p>
-											<p className="text-paragraph-xs text-text-sub-600">
-												Connect your {provider.name} account
-											</p>
-										</div>
+										>
+											<AnimatePresence mode="popLayout" initial={false}>
+												<motion.span
+													key={isConnecting ? "connecting" : "idle"}
+													transition={{
+														type: "spring",
+														duration: 0.25,
+														bounce: 0,
+													}}
+													initial={{ opacity: 0, y: -14 }}
+													animate={{ opacity: 1, y: 0 }}
+													exit={{ opacity: 0, y: 14 }}
+													className="flex items-center justify-center gap-1.5 font-medium"
+												>
+													{isConnecting ? (
+														<>
+															<Spinner
+																size={14}
+																color="var(--text-strong-950)"
+															/>
+															<span>Connecting...</span>
+														</>
+													) : (
+														<>
+															<FancyButton.Icon
+																as={Icon}
+																name="plus-circle"
+																className="h-4 w-4"
+															/>
+															<span>Connect</span>
+														</>
+													)}
+												</motion.span>
+											</AnimatePresence>
+										</FancyButton.Root>
 									</div>
-									<FancyButton.Root
-										variant="basic"
-										size="xsmall"
-										disabled={connecting === provider.id}
-										onClick={() => handleConnect(provider.id)}
-										className="font-medium"
-									>
-										{connecting === provider.id ? (
-											<Spinner size={14} color="var(--text-strong-950)" />
-										) : (
-											<>
-												<FancyButton.Icon
-													as={Icon}
-													name="plus-circle"
-													className="h-4 w-4"
-												/>
-												Connect
-											</>
-										)}
-									</FancyButton.Root>
 								</div>
-							</div>
-						))}
+							);
+						})}
 					</>
 				)}
 			</div>
