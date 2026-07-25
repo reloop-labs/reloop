@@ -1,10 +1,10 @@
-import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useNavigate } from "@tanstack/react-router";
 import { useHotkeys } from "react-hotkeys-hook";
+import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { CreateWebhookFormFields } from "./components/create-webhook-form-fields";
 import { useCreateWebhookForm } from "./components/use-create-webhook-form";
 
@@ -24,14 +24,11 @@ export function CreateWebhookPage() {
 	return (
 		<div className="mx-auto w-full max-w-xl space-y-8 p-6 pb-16 lg:p-8">
 			<div>
-				<AnimatedBackButton
-					onClick={() => void navigate({ to: "/webhooks" })}
-				/>
-				<div className="pt-4">
-					<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+				<div className="pt-3">
+					<h1 className="font-semibold text-lg text-text-strong-950 tracking-tight">
 						Create a webhook
 					</h1>
-					<p className="mt-1 text-paragraph-md text-text-sub-600 leading-relaxed">
+					<p className="text-sm text-text-sub-600 leading-relaxed">
 						Register an endpoint to receive signed event payloads in real time.
 					</p>
 				</div>
