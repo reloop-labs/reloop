@@ -1,5 +1,4 @@
 import * as Modal from "@reloop/ui/modal";
-import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import {
 	EditContactForm,
@@ -20,34 +19,33 @@ export const EditContactModal = ({
 	return (
 		<Modal.Root open={open} onOpenChange={onOpenChange}>
 			<Modal.Content
-				className="rounded-2xl border border-stroke-soft-100/50 p-0.5 sm:max-w-[480px]"
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 sm:max-w-[480px] dark:border-stroke-soft-100/40"
 				showClose={true}
 			>
-				<div className="rounded-2xl border border-stroke-soft-100/50">
-					<Modal.Header className="before:border-stroke-soft-200/50">
-						<div className="flex items-center justify-center">
-							<Icon name="edit-2" className="h-4 w-4" />
-						</div>
-						<div className="flex-1">
-							<Modal.Title>Edit Contact</Modal.Title>
-						</div>
-					</Modal.Header>
+				<div className="p-6">
+					<div className="relative mb-5 pr-6">
+						<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+							Edit contact
+						</Modal.Title>
+						<p className="mt-2 text-sm leading-relaxed text-text-sub-600">
+							Update this contact&apos;s details, groups, and email preferences.
+						</p>
+					</div>
+
 					{!contact && open ? (
-						<div className="flex h-[400px] flex-col items-center justify-center space-y-4 p-8 text-center">
+						<div className="flex h-[280px] flex-col items-center justify-center space-y-4 text-center">
 							<Spinner size={32} />
 							<p className="text-sm text-text-sub-600">
 								Loading contact details...
 							</p>
 						</div>
 					) : contact ? (
-						<Modal.Body className="space-y-0">
-							<EditContactForm
-								contact={contact}
-								variant="modal"
-								onCancel={() => onOpenChange(false)}
-								onSuccess={() => onOpenChange(false)}
-							/>
-						</Modal.Body>
+						<EditContactForm
+							contact={contact}
+							variant="modal"
+							onCancel={() => onOpenChange(false)}
+							onSuccess={() => onOpenChange(false)}
+						/>
 					) : null}
 				</div>
 			</Modal.Content>
