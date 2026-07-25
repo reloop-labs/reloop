@@ -14,9 +14,9 @@ export function CreateWebhookFormFields({
 	const events = watch("events");
 
 	return (
-		<div className="space-y-7">
+		<div className="space-y-4">
 			{/* Endpoint URL */}
-			<div className="space-y-2">
+			<div className="space-y-1">
 				<div className="flex items-center gap-1.5">
 					<Label.Root htmlFor="url">
 						Endpoint URL
@@ -38,7 +38,6 @@ export function CreateWebhookFormFields({
 				</div>
 				<Input.Root size="medium" hasError={!!formState.errors.url?.message}>
 					<Input.Wrapper>
-						<Input.Icon as={Icon} name="link" />
 						<Input.Input
 							id="url"
 							placeholder="https://example.com/webhooks/reloop"
@@ -55,7 +54,7 @@ export function CreateWebhookFormFields({
 			</div>
 
 			{/* Description */}
-			<div className="space-y-2">
+			<div className="space-y-1">
 				<div className="flex items-center gap-1.5">
 					<Label.Root htmlFor="description">
 						Description
@@ -93,30 +92,11 @@ export function CreateWebhookFormFields({
 					</p>
 				) : null}
 			</div>
-
-			{/* Events */}
-			<div className="space-y-2">
-				<div className="flex items-center justify-between gap-2">
-					<div className="flex items-center gap-1.5">
-						<Label.Root>
-							Events to subscribe
-							<Label.Asterisk />
-						</Label.Root>
-					</div>
-					{formState.errors.events?.message ? (
-						<p className="text-error-base text-paragraph-xs">
-							{formState.errors.events.message}
-						</p>
-					) : null}
-				</div>
-				<p className="text-paragraph-xs text-text-sub-600">
-					Select the event types your endpoint should receive.
-				</p>
-				<WebhookEventInlineSelector
-					value={events}
-					onChange={(val) => setValue("events", val, { shouldValidate: true })}
-				/>
-			</div>
+			<WebhookEventInlineSelector
+				value={events}
+				onChange={(val) => setValue("events", val, { shouldValidate: true })}
+				error={formState.errors.events?.message}
+			/>
 		</div>
 	);
 }
