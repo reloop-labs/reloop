@@ -14,6 +14,8 @@ interface GroupSelectProps {
 	open?: boolean;
 	/** Field label. Defaults to create-flow copy. */
 	label?: string;
+	/** Small parenthetical hint next to the label, e.g. "for targeting". */
+	labelHint?: string;
 	/** Helper text under the field. Pass empty string to hide. */
 	description?: string;
 	className?: string;
@@ -28,6 +30,7 @@ export const GroupSelect = ({
 	disabled = false,
 	open = true,
 	label = "Assign to Groups (Optional)",
+	labelHint,
 	description = "You can create new groups from the Groups tab.",
 	className,
 	knownGroups,
@@ -89,12 +92,19 @@ export const GroupSelect = ({
 
 	return (
 		<div className={cn("flex flex-col gap-1.5", className)}>
-			<Label.Root
-				htmlFor={id}
-				className="font-medium text-text-strong-950 text-xs"
-			>
-				{label}
-			</Label.Root>
+			<div className="flex flex-wrap items-center gap-1.5">
+				<Label.Root
+					htmlFor={id}
+					className="font-medium text-text-strong-950 text-xs"
+				>
+					{label}
+				</Label.Root>
+				{labelHint ? (
+					<span className="font-normal text-[11px] text-text-soft-400">
+						({labelHint})
+					</span>
+				) : null}
+			</div>
 			<div className="relative">
 				<label
 					className={cn(
