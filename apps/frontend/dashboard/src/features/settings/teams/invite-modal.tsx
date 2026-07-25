@@ -268,10 +268,10 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 					<div className="p-6">
 						{/* Header */}
 						<div className="relative pr-6">
-							<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+							<Modal.Title className="font-semibold text-lg text-text-strong-950">
 								Invite team members
 							</Modal.Title>
-							<Modal.Description className="text-paragraph-sm text-text-sub-600">
+							<Modal.Description className="text-text-sub-600 text-xs">
 								Invitations will be sent via email
 							</Modal.Description>
 						</div>
@@ -282,7 +282,7 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 							<div className="space-y-1.5">
 								<div className="flex items-center gap-2">
 									<span className="font-medium text-label-sm text-text-strong-950">
-										Email addresses
+										Email address
 									</span>
 								</div>
 								<div className="flex gap-2">
