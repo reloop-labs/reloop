@@ -1,13 +1,9 @@
-import type { AudienceStatus } from "#/features/contacts/audience";
-import { GroupSelect } from "#/features/contacts/components/groups/group-select";
-import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import { useQuery } from "@tanstack/react-query";
@@ -15,6 +11,9 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import type { AudienceStatus } from "#/features/contacts/audience";
+import { GroupSelect } from "#/features/contacts/components/groups/group-select";
+import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 
 export interface EditContactFormContact {
 	id: string;
@@ -95,7 +94,7 @@ async function addContactToGroup(contactId: string, groupId: string) {
 		const data = (await response.json().catch(() => ({}))) as {
 			message?: string;
 		};
-		throw new Error(data.message || `Failed to add contact to group`);
+		throw new Error(data.message || "Failed to add contact to group");
 	}
 }
 
@@ -110,7 +109,7 @@ async function removeContactFromGroup(contactId: string, groupId: string) {
 		const data = (await response.json().catch(() => ({}))) as {
 			message?: string;
 		};
-		throw new Error(data.message || `Failed to remove contact from group`);
+		throw new Error(data.message || "Failed to remove contact from group");
 	}
 }
 
@@ -323,9 +322,7 @@ export function EditContactForm({
 				...channelsToRemove.map((channelId) =>
 					updateChannelSubscription(contact.id, channelId, "opt_out"),
 				),
-				...groupsToAdd.map((groupId) =>
-					addContactToGroup(contact.id, groupId),
-				),
+				...groupsToAdd.map((groupId) => addContactToGroup(contact.id, groupId)),
 				...groupsToRemove.map((groupId) =>
 					removeContactFromGroup(contact.id, groupId),
 				),
@@ -358,410 +355,394 @@ export function EditContactForm({
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className={isInline ? "grid gap-4 md:grid-cols-2" : "flex flex-col gap-4"}
+			className="w-full font-sans"
 			onClick={(e) => e.stopPropagation()}
 		>
-			<div
-				className={
-					isInline ? "contents" : "max-h-[60vh] space-y-4 overflow-y-auto px-0"
-				}
-			>
-				{/* Email — modal only; list row already shows it */}
-				{!isInline && (
+			{/* Main Card Container */}
+			<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50">
+				{/* Top Padded Content Area */}
+				<div
+					className={cn(
+						"m-0.5 space-y-5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-6",
+						!isInline && "max-h-[60vh] overflow-y-auto",
+					)}
+				>
+					{/* First Name & Last Name Grid */}
+					<div className="grid gap-4 sm:grid-cols-2">
+						{/* First Name */}
+						<div className="flex flex-col gap-1.5">
+							<Label.Root
+								htmlFor={`firstName-${contact.id}`}
+								className="font-medium text-text-strong-950 text-xs"
+							>
+								First name
+							</Label.Root>
+							<Input.Root size="medium">
+								<Input.Wrapper>
+									<Input.Input
+										id={`firstName-${contact.id}`}
+										type="text"
+										value={firstName}
+										onChange={(e) => setFirstName(e.target.value)}
+										disabled={isSaving}
+										placeholder="First name"
+									/>
+								</Input.Wrapper>
+							</Input.Root>
+						</div>
+
+						{/* Last Name */}
+						<div className="flex flex-col gap-1.5">
+							<Label.Root
+								htmlFor={`lastName-${contact.id}`}
+								className="font-medium text-text-strong-950 text-xs"
+							>
+								Last name
+							</Label.Root>
+							<Input.Root size="medium">
+								<Input.Wrapper>
+									<Input.Input
+										id={`lastName-${contact.id}`}
+										type="text"
+										value={lastName}
+										onChange={(e) => setLastName(e.target.value)}
+										disabled={isSaving}
+										placeholder="Last name"
+									/>
+								</Input.Wrapper>
+							</Input.Root>
+						</div>
+					</div>
+
+					{/* Email — modal only */}
+					{!isInline && (
+						<div className="flex flex-col gap-1.5">
+							<Label.Root
+								htmlFor={`email-${contact.id}`}
+								className="font-medium text-text-strong-950 text-xs"
+							>
+								Email
+							</Label.Root>
+							<Input.Root size="medium">
+								<Input.Wrapper>
+									<Input.Input
+										id={`email-${contact.id}`}
+										type="email"
+										value={email}
+										onChange={(e) => setEmail(e.target.value)}
+										disabled={isSaving}
+										readOnly
+										placeholder={contact.email}
+										className="cursor-not-allowed bg-bg-weak-50"
+									/>
+								</Input.Wrapper>
+							</Input.Root>
+						</div>
+					)}
+
+					{/* Channels */}
 					<div className="flex flex-col gap-1.5">
 						<Label.Root
-							htmlFor={`email-${contact.id}`}
+							htmlFor={`channels-${contact.id}`}
 							className="font-medium text-text-strong-950 text-xs"
 						>
-							Email
+							Channels
 						</Label.Root>
-						<Input.Root size="medium">
-							<Input.Wrapper>
-								<Input.Input
-									id={`email-${contact.id}`}
-									type="email"
-									value={email}
-									onChange={(e) => setEmail(e.target.value)}
-									disabled={isSaving}
-									readOnly
-									placeholder={contact.email}
-									className="cursor-not-allowed bg-bg-weak-50"
-								/>
-							</Input.Wrapper>
-						</Input.Root>
-					</div>
-				)}
-
-				{/* First Name */}
-				<div
-					className={`flex flex-col gap-1.5 ${isInline ? "" : "border-stroke-soft-100 border-t pt-4"}`}
-				>
-					<Label.Root
-						htmlFor={`firstName-${contact.id}`}
-						className="font-medium text-text-strong-950 text-xs"
-					>
-						First name
-					</Label.Root>
-					<Input.Root size="medium">
-						<Input.Wrapper>
-							<Input.Input
-								id={`firstName-${contact.id}`}
-								type="text"
-								value={firstName}
-								onChange={(e) => setFirstName(e.target.value)}
-								disabled={isSaving}
-								placeholder="First name"
-							/>
-						</Input.Wrapper>
-					</Input.Root>
-				</div>
-
-				{/* Last Name */}
-				<div className="flex flex-col gap-1.5">
-					<Label.Root
-						htmlFor={`lastName-${contact.id}`}
-						className="font-medium text-text-strong-950 text-xs"
-					>
-						Last name
-					</Label.Root>
-					<Input.Root size="medium">
-						<Input.Wrapper>
-							<Input.Input
-								id={`lastName-${contact.id}`}
-								type="text"
-								value={lastName}
-								onChange={(e) => setLastName(e.target.value)}
-								disabled={isSaving}
-								placeholder="Last name"
-							/>
-						</Input.Wrapper>
-					</Input.Root>
-				</div>
-
-				{/* Channels */}
-				<div
-					className={`flex flex-col gap-1.5 ${isInline ? "md:col-span-2" : "border-stroke-soft-100 border-t pt-4"}`}
-				>
-					<Label.Root
-						htmlFor={`channels-${contact.id}`}
-						className="font-medium text-text-strong-950 text-xs"
-					>
-						Channels
-					</Label.Root>
-					<div className="relative">
-						<label
-							className={cn(
-								"group/chips flex min-h-[42px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-xs hover:[&:not(:focus-within)]:bg-bg-weak-50/50 dark:border-stroke-soft-100/40",
-								isSaving && "pointer-events-none opacity-50",
-							)}
-						>
-							{selectedChannelIds.map((channelId) => {
-								const channelName = getChannelName(channelId);
-								if (!channelName) return null;
-								return (
-									<span
-										key={channelId}
-										className="inline-flex items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 pl-0.5 text-paragraph-xs text-text-strong-950 transition-all dark:border-stroke-soft-100/40"
-									>
-										<Avatar.Root size="20" color="gray">
-											<Icon
-												name="notification-indicator"
-												className="h-3 w-3 text-text-sub-600"
-											/>
-										</Avatar.Root>
-										<span className="font-medium">{channelName}</span>
-										<button
-											type="button"
-											onClick={(e) => {
-												e.preventDefault();
-												e.stopPropagation();
-												removeChannel(channelId);
-											}}
-											className="ml-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full text-text-sub-600 transition-colors hover:bg-stroke-soft-200 hover:text-text-strong-950"
-											disabled={isSaving}
-											aria-label={`Remove ${channelName}`}
+						<div className="relative">
+							<label
+								className={cn(
+									"group/chips flex min-h-[42px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-xs dark:border-stroke-soft-100/40 hover:[&:not(:focus-within)]:bg-bg-weak-50/50",
+									isSaving && "pointer-events-none opacity-50",
+								)}
+							>
+								{selectedChannelIds.map((channelId) => {
+									const channelName = getChannelName(channelId);
+									if (!channelName) return null;
+									return (
+										<span
+											key={channelId}
+											className="inline-flex items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 pl-0.5 text-paragraph-xs text-text-strong-950 transition-all dark:border-stroke-soft-100/40"
 										>
-											<Icon name="cross" className="h-3 w-3" />
-										</button>
-									</span>
-								);
-							})}
-							<input
-								ref={channelInputRef}
-								id={`channels-${contact.id}`}
-								type="text"
-								value={channelInput}
-								onChange={(e) => {
-									setChannelInput(e.target.value);
-									setShowChannelDropdown(true);
-								}}
-								onFocus={() => setShowChannelDropdown(true)}
-								onBlur={(e) => {
-									const relatedTarget = e.relatedTarget as HTMLElement | null;
-									if (!relatedTarget?.closest("[data-channel-select-dropdown]")) {
-										setShowChannelDropdown(false);
-									}
-								}}
-								placeholder={
-									selectedChannelIds.length === 0 ? "Search channels..." : ""
-								}
-								className="min-w-[80px] flex-1 bg-transparent text-paragraph-sm text-text-sub-600 outline-none placeholder:text-text-soft-400"
-								disabled={isSaving}
-							/>
-						</label>
-						<AnimatePresence>
-							{showChannelDropdown && filteredChannels.length > 0 && (
-								<motion.div
-									data-channel-select-dropdown
-									initial={{ opacity: 0, y: -6, scale: 0.96 }}
-									animate={{ opacity: 1, y: 0, scale: 1 }}
-									exit={{ opacity: 0, y: -6, scale: 0.96 }}
-									transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-									onMouseLeave={() => setHoveredChannelId(null)}
-									className="absolute right-0 left-0 z-50 mt-1.5 max-h-56 overflow-y-auto rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
-								>
-									{filteredChannels.map((channel) => (
-										<button
-											key={channel.id}
-											type="button"
-											onMouseEnter={() => setHoveredChannelId(channel.id)}
-											onMouseDown={(e) => e.preventDefault()}
-											onClick={() => addChannel(channel.id)}
-											className="group relative flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-paragraph-sm text-text-strong-950 transition-colors"
-										>
-											{hoveredChannelId === channel.id && (
-												<motion.span
-													layoutId="channel-dropdown-hover-pill"
-													className="absolute inset-0 rounded-xl bg-bg-weak-50"
-													transition={{
-														type: "spring",
-														stiffness: 500,
-														damping: 38,
-													}}
-												/>
-											)}
-											<span className="relative z-10 flex h-6 w-6 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 text-text-sub-600 transition-colors group-hover:bg-bg-white-0 group-hover:text-text-strong-950">
+											<Avatar.Root size="20" color="gray">
 												<Icon
 													name="notification-indicator"
-													className="h-3.5 w-3.5"
+													className="h-3 w-3 text-text-sub-600"
 												/>
-											</span>
-											<span className="relative z-10 font-medium text-text-strong-950 text-xs">
-												{channel.name}
-											</span>
-											{channel.defaultSubscription === "opt_out" && (
-												<span className="relative z-10 ml-auto text-paragraph-xs text-text-soft-400">
-													Opt-out default
-												</span>
-											)}
-										</button>
-									))}
-								</motion.div>
-							)}
-							{showChannelDropdown &&
-								filteredChannels.length === 0 &&
-								channelInput && (
+											</Avatar.Root>
+											<span className="font-medium">{channelName}</span>
+											<button
+												type="button"
+												onClick={(e) => {
+													e.preventDefault();
+													e.stopPropagation();
+													removeChannel(channelId);
+												}}
+												className="ml-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full text-text-sub-600 transition-colors hover:bg-stroke-soft-200 hover:text-text-strong-950"
+												disabled={isSaving}
+												aria-label={`Remove ${channelName}`}
+											>
+												<Icon name="cross" className="h-3 w-3" />
+											</button>
+										</span>
+									);
+								})}
+								<input
+									ref={channelInputRef}
+									id={`channels-${contact.id}`}
+									type="text"
+									value={channelInput}
+									onChange={(e) => {
+										setChannelInput(e.target.value);
+										setShowChannelDropdown(true);
+									}}
+									onFocus={() => setShowChannelDropdown(true)}
+									onBlur={(e) => {
+										const relatedTarget = e.relatedTarget as HTMLElement | null;
+										if (
+											!relatedTarget?.closest("[data-channel-select-dropdown]")
+										) {
+											setShowChannelDropdown(false);
+										}
+									}}
+									placeholder={
+										selectedChannelIds.length === 0 ? "Search channels..." : ""
+									}
+									className="min-w-[80px] flex-1 bg-transparent text-paragraph-sm text-text-sub-600 outline-none placeholder:text-text-soft-400"
+									disabled={isSaving}
+								/>
+							</label>
+							<AnimatePresence>
+								{showChannelDropdown && filteredChannels.length > 0 && (
 									<motion.div
 										data-channel-select-dropdown
 										initial={{ opacity: 0, y: -6, scale: 0.96 }}
 										animate={{ opacity: 1, y: 0, scale: 1 }}
 										exit={{ opacity: 0, y: -6, scale: 0.96 }}
 										transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-										className="absolute right-0 left-0 z-50 mt-1.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 text-center shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
+										onMouseLeave={() => setHoveredChannelId(null)}
+										className="absolute right-0 left-0 z-50 mt-1.5 max-h-56 overflow-y-auto rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-1.5 shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
 									>
-										<p className="text-paragraph-xs text-text-soft-400">
-											No channels found for &ldquo;{channelInput}&rdquo;
-										</p>
+										{filteredChannels.map((channel) => (
+											<button
+												key={channel.id}
+												type="button"
+												onMouseEnter={() => setHoveredChannelId(channel.id)}
+												onMouseDown={(e) => e.preventDefault()}
+												onClick={() => addChannel(channel.id)}
+												className="group relative flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-paragraph-sm text-text-strong-950 transition-colors"
+											>
+												{hoveredChannelId === channel.id && (
+													<motion.span
+														layoutId="channel-dropdown-hover-pill"
+														className="absolute inset-0 rounded-xl bg-bg-weak-50"
+														transition={{
+															type: "spring",
+															stiffness: 500,
+															damping: 38,
+														}}
+													/>
+												)}
+												<span className="relative z-10 flex h-6 w-6 items-center justify-center rounded-full border border-stroke-soft-100 bg-bg-weak-50 text-text-sub-600 transition-colors group-hover:bg-bg-white-0 group-hover:text-text-strong-950">
+													<Icon
+														name="notification-indicator"
+														className="h-3.5 w-3.5"
+													/>
+												</span>
+												<span className="relative z-10 font-medium text-text-strong-950 text-xs">
+													{channel.name}
+												</span>
+												{channel.defaultSubscription === "opt_out" && (
+													<span className="relative z-10 ml-auto text-paragraph-xs text-text-soft-400">
+														Opt-out default
+													</span>
+												)}
+											</button>
+										))}
 									</motion.div>
 								)}
-						</AnimatePresence>
-					</div>
-					<p className="text-paragraph-xs text-text-soft-400">
-						Channels this contact is enrolled to receive emails from.
-					</p>
-				</div>
-
-				{/* Groups */}
-				<div className={isInline ? "md:col-span-2" : "border-stroke-soft-100 border-t pt-4"}>
-					<GroupSelect
-						id={`groups-${contact.id}`}
-						selectedGroupIds={selectedGroupIds}
-						onChange={setSelectedGroupIds}
-						disabled={isSaving}
-						label="Groups"
-						description="Segments this contact belongs to for targeting."
-						knownGroups={contact.groups}
-					/>
-				</div>
-
-				{/* Custom Properties */}
-				{customProperties.length > 0 && (
-					<div
-						className={`space-y-4 ${isInline ? "md:col-span-2" : "border-stroke-soft-100 border-t pt-4"}`}
-					>
-						<div className="grid gap-4 sm:grid-cols-2">
-							{customProperties.map((property) => (
-								<div key={property.id} className="flex flex-col gap-1.5">
-									<Label.Root
-										htmlFor={`prop-${contact.id}-${property.id}`}
-										className="font-medium text-text-strong-950 text-xs"
-									>
-										{property.propertyName}
-									</Label.Root>
-									<Input.Root size="medium">
-										<Input.Wrapper>
-											<Input.Input
-												id={`prop-${contact.id}-${property.id}`}
-												type={
-													property.propertyType === "number" ? "number" : "text"
-												}
-												value={propertyValues[property.id] ?? ""}
-												onChange={(e) =>
-													handlePropertyChange(property.id, e.target.value)
-												}
-												disabled={isSaving}
-												placeholder={
-													property.defaultValue ||
-													`Enter ${property.propertyName}`
-												}
-											/>
-										</Input.Wrapper>
-									</Input.Root>
-								</div>
-							))}
+								{showChannelDropdown &&
+									filteredChannels.length === 0 &&
+									channelInput && (
+										<motion.div
+											data-channel-select-dropdown
+											initial={{ opacity: 0, y: -6, scale: 0.96 }}
+											animate={{ opacity: 1, y: 0, scale: 1 }}
+											exit={{ opacity: 0, y: -6, scale: 0.96 }}
+											transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+											className="absolute right-0 left-0 z-50 mt-1.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 p-4 text-center shadow-regular-md ring-1 ring-stroke-soft-100 ring-inset dark:ring-stroke-soft-100/50"
+										>
+											<p className="text-paragraph-xs text-text-soft-400">
+												No channels found for &ldquo;{channelInput}&rdquo;
+											</p>
+										</motion.div>
+									)}
+							</AnimatePresence>
 						</div>
+						<p className="text-paragraph-xs text-text-soft-400">
+							Channels this contact is enrolled to receive emails from.
+						</p>
 					</div>
-				)}
 
-				{/* Subscribed Toggle */}
-				<div
-					className={
-						isInline
-							? "md:col-span-2"
-							: "border-stroke-soft-100 border-t pt-2"
-					}
-				>
-					<button
-						type="button"
-						onClick={() => !isSaving && setIsSubscribed(!isSubscribed)}
-						disabled={isSaving}
-						className={cn(
-							"flex w-full cursor-pointer items-center justify-between rounded-2xl border p-4 transition-all duration-200",
-							isSubscribed
-								? "border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 dark:border-emerald-500/30 dark:bg-emerald-500/10"
-								: "border-red-500/20 bg-red-500/5 hover:bg-red-500/10 dark:border-red-500/30 dark:bg-red-500/10",
-							isSaving && "cursor-not-allowed opacity-50",
-						)}
-					>
-						<div className="flex items-center gap-3">
+					{/* Groups */}
+					<div>
+						<GroupSelect
+							id={`groups-${contact.id}`}
+							selectedGroupIds={selectedGroupIds}
+							onChange={setSelectedGroupIds}
+							disabled={isSaving}
+							label="Groups"
+							description="Segments this contact belongs to for targeting."
+							knownGroups={contact.groups}
+						/>
+					</div>
+
+					{/* Custom Properties */}
+					{customProperties.length > 0 && (
+						<div className="space-y-4">
+							<div className="grid gap-4 sm:grid-cols-2">
+								{customProperties.map((property) => (
+									<div key={property.id} className="flex flex-col gap-1.5">
+										<Label.Root
+											htmlFor={`prop-${contact.id}-${property.id}`}
+											className="font-medium text-text-strong-950 text-xs"
+										>
+											{property.propertyName}
+										</Label.Root>
+										<Input.Root size="medium">
+											<Input.Wrapper>
+												<Input.Input
+													id={`prop-${contact.id}-${property.id}`}
+													type={
+														property.propertyType === "number" ? "number" : "text"
+													}
+													value={propertyValues[property.id] ?? ""}
+													onChange={(e) =>
+														handlePropertyChange(property.id, e.target.value)
+													}
+													disabled={isSaving}
+													placeholder={
+														property.defaultValue ||
+														`Enter ${property.propertyName}`
+													}
+												/>
+											</Input.Wrapper>
+										</Input.Root>
+									</div>
+								))}
+							</div>
+						</div>
+					)}
+
+					{/* Subscribed Toggle */}
+					<div>
+						<button
+							type="button"
+							onClick={() => !isSaving && setIsSubscribed(!isSubscribed)}
+							disabled={isSaving}
+							className={cn(
+								"flex w-full cursor-pointer items-center justify-between rounded-2xl border border-stroke-soft-200 bg-bg-weak-50/30 p-3.5 transition-all duration-200 hover:border-stroke-soft-300 hover:bg-bg-weak-50/70",
+								isSaving && "cursor-not-allowed opacity-50",
+							)}
+						>
+							<div className="flex items-center gap-3">
+								<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 shadow-xs">
+									<Icon
+										name={isSubscribed ? "mail-single" : "bell-off"}
+										className="h-4.5 w-4.5 text-text-strong-950"
+									/>
+								</div>
+								<div className="flex flex-col items-start gap-0.5 text-left">
+									<div className="flex items-center gap-2">
+										<span className="font-medium text-xs text-text-strong-950">
+											{isSubscribed ? "Subscribed" : "Unsubscribed"}
+										</span>
+										<span
+											className={cn(
+												"inline-flex items-center rounded-md px-1.5 py-0.5 font-medium text-[10px] leading-none",
+												isSubscribed
+													? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
+													: "bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400",
+											)}
+										>
+											{isSubscribed ? "Active" : "Opted out"}
+										</span>
+									</div>
+									<span className="text-paragraph-xs text-text-sub-600">
+										{isSubscribed
+											? "Receives all emails including marketing and broadcasts"
+											: "Receives transactional emails only"}
+									</span>
+								</div>
+							</div>
 							<div
 								className={cn(
-									"flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors",
+									"flex h-5 w-5 items-center justify-center rounded-md border transition-all duration-200",
 									isSubscribed
-										? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400"
-										: "bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400",
+										? "border-text-strong-950 bg-text-strong-950 dark:border-text-strong-950 dark:bg-text-strong-950"
+										: "border-stroke-soft-300 bg-bg-white-0 dark:border-stroke-soft-300 dark:bg-transparent",
 								)}
 							>
-								<Icon
-									name={isSubscribed ? "mail-single" : "bell-off"}
-									className="h-4.5 w-4.5"
-								/>
+								{isSubscribed && (
+									<Icon
+										name="check"
+										className="h-3.5 w-3.5 text-bg-white-0 dark:text-bg-weak-50"
+									/>
+								)}
 							</div>
-							<div className="flex flex-col items-start gap-0.5 text-left">
-								<span
-									className={cn(
-										"font-semibold text-xs transition-colors",
-										isSubscribed
-											? "text-emerald-600 dark:text-emerald-400"
-											: "text-red-600 dark:text-red-400",
-									)}
-								>
-									{isSubscribed ? "Subscribed" : "Unsubscribed"}
-								</span>
-								<span
-									className={cn(
-										"text-paragraph-xs transition-colors",
-										isSubscribed
-											? "text-emerald-600/80 dark:text-emerald-400/80"
-											: "text-red-600/80 dark:text-red-400/80",
-									)}
-								>
-									{isSubscribed
-										? "Receives all emails including marketing and broadcasts"
-										: "Receives transactional emails only"}
-								</span>
-							</div>
-						</div>
-						<div
-							className={cn(
-								"flex h-5 w-5 items-center justify-center rounded-md border transition-all duration-200",
-								isSubscribed
-									? "border-emerald-600 bg-emerald-600 dark:border-emerald-500 dark:bg-emerald-500"
-									: "border-red-400 bg-bg-white-0 dark:border-red-500/60 dark:bg-transparent",
-							)}
-						>
-							{isSubscribed && (
-								<Icon name="check" className="h-3.5 w-3.5 text-white" />
-							)}
-						</div>
-					</button>
+						</button>
+					</div>
 				</div>
-			</div>
 
-			<div
-				className={`flex items-center justify-end gap-3 ${
-					isInline
-						? "md:col-span-2 pt-2"
-						: "mt-4 border-stroke-soft-100/50 border-t pt-4"
-				}`}
-			>
-				<Button.Root
-					type="button"
-					variant="neutral"
-					mode="ghost"
-					size="small"
-					onClick={onCancel}
-					disabled={isSaving}
-				>
-					Cancel
-					<KbdEsc />
-				</Button.Root>
-				<FancyButton.Root
-					type="submit"
-					variant="primary"
-					size="small"
-					disabled={isSaving}
-					className="min-w-[95px] justify-center font-medium"
-				>
-					<AnimatePresence mode="popLayout" initial={false}>
-						<motion.span
-							key={isSaving ? "saving" : "idle"}
-							transition={{
-								type: "spring",
-								duration: 0.25,
-								bounce: 0,
-							}}
-							initial={{ opacity: 0, y: -14 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: 14 }}
-							className="flex items-center justify-center gap-1.5 font-medium"
-						>
-							{isSaving ? (
-								<>
-									<Spinner size={14} color="currentColor" />
-									<span>Updating...</span>
-								</>
-							) : (
-								<>
-									<span>Update</span>
-									<span className="inline-flex items-center justify-center rounded bg-white/20 px-1 py-0.5 text-[10px] font-mono leading-none">
-										↵
-									</span>
-								</>
-							)}
-						</motion.span>
-					</AnimatePresence>
-				</FancyButton.Root>
+				{/* Bottom Footer / Action Bar */}
+				<div className="flex items-center justify-end gap-3 px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40">
+					<Button.Root
+						type="button"
+						variant="neutral"
+						mode="ghost"
+						size="small"
+						onClick={onCancel}
+						disabled={isSaving}
+					>
+						Cancel
+					</Button.Root>
+
+					<FancyButton.Root
+						type="submit"
+						variant="primary"
+						size="small"
+						disabled={isSaving}
+						className="min-w-[95px] justify-center font-medium"
+					>
+						<AnimatePresence mode="popLayout" initial={false}>
+							<motion.span
+								key={isSaving ? "saving" : "idle"}
+								transition={{
+									type: "spring",
+									duration: 0.25,
+									bounce: 0,
+								}}
+								initial={{ opacity: 0, y: -14 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: 14 }}
+								className="flex items-center justify-center gap-1.5 font-medium"
+							>
+								{isSaving ? (
+									<>
+										<Spinner size={14} color="currentColor" />
+										<span>Updating...</span>
+									</>
+								) : (
+									<>
+										<span>Update</span>
+										<span className="inline-flex items-center justify-center rounded bg-white/20 px-1 py-0.5 font-mono text-[10px] leading-none">
+											↵
+										</span>
+									</>
+								)}
+							</motion.span>
+						</AnimatePresence>
+					</FancyButton.Root>
+				</div>
 			</div>
 		</form>
 	);
