@@ -3,9 +3,9 @@ import { authClient } from "@reloop/auth/client";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
 import { KbdCommand } from "@reloop/ui/kbd-command";
 import { KbdEnter } from "@reloop/ui/kbd-enter";
-import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
@@ -167,7 +167,7 @@ function WorkspaceForm({
 						<Label.Root htmlFor="name">Workspace Name</Label.Root>
 						<Input.Root
 							className="mt-1 w-full"
-							size="small"
+							size="medium"
 							hasError={!!errors.name}
 						>
 							<Input.Wrapper className="w-full">
@@ -192,10 +192,10 @@ function WorkspaceForm({
 					<div className="flex justify-end">
 						<FancyButton.Root
 							variant={status === "success" ? "success" : "blue"}
-							size="xsmall"
+							size="small"
 							type="submit"
 							className={cn(
-								"h-8 min-w-[140px] justify-center overflow-hidden text-xs transition-all duration-200",
+								"min-w-[140px] justify-center overflow-hidden transition-all duration-200",
 								status === "saving" && "opacity-90",
 							)}
 							disabled={!hasChanges || status !== "idle"}

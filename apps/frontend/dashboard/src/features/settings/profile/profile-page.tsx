@@ -146,7 +146,7 @@ export function ProfilePage() {
 							<Label.Root htmlFor="firstName">First Name</Label.Root>
 							<Input.Root
 								className="mt-1 w-full"
-								size="small"
+								size="medium"
 								hasError={!!errors.firstName}
 							>
 								<Input.Wrapper className="w-full">
@@ -164,7 +164,7 @@ export function ProfilePage() {
 							<Label.Root htmlFor="lastName">Last Name</Label.Root>
 							<Input.Root
 								className="mt-1 w-full"
-								size="small"
+								size="medium"
 								hasError={!!errors.lastName}
 							>
 								<Input.Wrapper className="w-full">
@@ -187,7 +187,7 @@ export function ProfilePage() {
 								Read only
 							</span>
 						</Label.Root>
-						<Input.Root className="mt-1 w-full" size="small">
+						<Input.Root className="mt-1 w-full" size="medium">
 							<Input.Wrapper className="w-full pr-1.5!">
 								<Input.Input
 									id="email"
@@ -218,10 +218,10 @@ export function ProfilePage() {
 					<div className="flex justify-end">
 						<FancyButton.Root
 							variant={status === "success" ? "success" : "blue"}
-							size="xsmall"
+							size="small"
 							type="submit"
 							className={cn(
-								"h-8 min-w-[140px] justify-center overflow-hidden text-xs transition-all duration-200",
+								"min-w-[140px] justify-center overflow-hidden transition-all duration-200",
 								status === "saving" && "opacity-90",
 							)}
 							disabled={!hasChanges || status !== "idle"}

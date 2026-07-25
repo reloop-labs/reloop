@@ -20,7 +20,7 @@ export function AccountDangerZone() {
 					</div>
 					{/* Delete flow not ported yet — keep error styling (disabled greys the button). */}
 					<FancyButton.Root variant="destructive" size="xsmall" type="button">
-						<FancyButton.Icon as={Icon} name="trash-2" />
+						<FancyButton.Icon as={Icon} name="trash-2" className="h-4 w-h" />
 						Delete Account
 					</FancyButton.Root>
 				</div>
