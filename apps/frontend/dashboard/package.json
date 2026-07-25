@@ -18,9 +18,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ai-sdk/react": "catalog:ui",
     "@base-ui/react": "1.1.0",
     "@codemirror/lang-html": "^6.4.11",
     "@codemirror/view": "^6.43.6",
+    "@dicebear/core": "9.2.2",
+    "@dicebear/shapes": "9.2.2",
     "@hookform/resolvers": "catalog:ui",
     "@number-flow/react": "catalog:ui",
     "@react-email/editor": "catalog:ui",
@@ -53,6 +56,7 @@
     "@uiw/codemirror-theme-xcode": "^4.25.11",
     "@uiw/react-codemirror": "^4.25.11",
     "@xyflow/react": "^12.6.0",
+    "ai": "catalog:ui",
     "axios": "catalog:",
     "better-auth": "catalog:",
     "bright": "catalog:ui",
@@ -86,9 +90,7 @@
     "y-protocols": "^1.0.7",
     "y-websocket": "^3.0.0",
     "yjs": "^13.6.30",
-    "zustand": "5.0.8",
-    "ai": "catalog:ui",
-    "@ai-sdk/react": "catalog:ui"
+    "zustand": "5.0.8"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.5",

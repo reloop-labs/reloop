@@ -515,12 +515,12 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 	const endIndex = Math.min(currentPage * pageSize, data?.total || 0);
 
 	return (
-		<div className="flex flex-col space-y-6">
+		<div className="flex flex-col space-y-4">
 			{/* Filters */}
-			<div className="flex items-center justify-between gap-4">
+			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<div className="max-w-sm flex-1">
 					<Input.Root size="small">
-						<Input.Wrapper className="rounded-2xl border-0 bg-transparent px-2 focus-within:ring-0">
+						<Input.Wrapper className="rounded-xl bg-bg-weak-50 px-2.5 dark:bg-bg-weak-50/40">
 							<Input.Icon
 								as={() => (
 									<Icon name="search" className="h-4 w-4 text-text-sub-600" />
@@ -528,7 +528,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 							/>
 							<Input.Input
 								type="text"
-								placeholder="Filter by event, status, ID..."
+								placeholder="Filter by event type..."
 								value={searchQuery}
 								onChange={(e) => setSearchQuery(e.target.value)}
 								className="border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
@@ -536,18 +536,16 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 						</Input.Wrapper>
 					</Input.Root>
 				</div>
-				<div className="flex w-fit items-center gap-2">
+				<div className="flex w-fit flex-wrap items-center gap-1.5">
 					{["all", "success", "failed", "retrying"].map((status) => (
-						<Button.Root
+						<button
 							key={status}
-							size="xsmall"
-							mode="stroke"
-							variant="neutral"
+							type="button"
 							className={cn(
-								"rounded-full px-4 font-medium capitalize transition-colors duration-200",
+								"rounded-full px-3 py-1 font-medium text-[12px] capitalize transition-colors",
 								statusFilter === status
-									? "border-stroke-soft-200 bg-bg-weak-50 text-text-strong-950"
-									: "border-transparent text-text-sub-600 hover:border-stroke-soft-200 hover:text-text-strong-950",
+									? "bg-text-strong-950 text-white dark:bg-white dark:text-black"
+									: "bg-bg-weak-50 text-text-sub-600 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:bg-bg-weak-50/40",
 							)}
 							onClick={() => setStatusFilter(status)}
 						>
@@ -557,8 +555,8 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 									? "Succeeded"
 									: status === "failed"
 										? "Failed"
-										: "Retried"}
-						</Button.Root>
+										: "Retrying"}
+						</button>
 					))}
 				</div>
 			</div>

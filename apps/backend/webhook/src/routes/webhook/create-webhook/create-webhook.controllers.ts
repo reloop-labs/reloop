@@ -4,6 +4,7 @@ import { db } from "@reloop/db/client";
 import * as schema from "@reloop/db/schema";
 import { WebhookErrors } from "@reloop/webhook/error/webhook.error-response";
 import type { WebhookEventName } from "@reloop/webhook-events";
+import { eq } from "drizzle-orm";
 import { log } from "evlog";
 import type { WebhookTypes } from "../webhook.type";
 
@@ -64,6 +65,11 @@ export async function createWebhookController({
 			);
 		}
 
+		const creator = await db.query.user.findFirst({
+			where: eq(schema.user.id, userId),
+			columns: { id: true, name: true, email: true, image: true },
+		});
+
 		return {
 			id: newWebhook.id,
 			name: newWebhook.name,
@@ -81,6 +87,14 @@ export async function createWebhookController({
 			failureCount: newWebhook.failureCount,
 			consecutiveFailures: newWebhook.consecutiveFailures,
 			events,
+			createdBy: creator
+				? {
+						id: creator.id,
+						name: creator.name,
+						email: creator.email,
+						image: creator.image,
+					}
+				: undefined,
 			createdAt: newWebhook.createdAt.toISOString(),
 			updatedAt: newWebhook.updatedAt.toISOString(),
 		};
