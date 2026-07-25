@@ -71,10 +71,7 @@ function CopyButton({
 			)}
 			title={copied ? "Copied" : "Copy"}
 		>
-			<Icon
-				name={copied ? "check" : "copy"}
-				className="h-3.5 w-3.5"
-			/>
+			<Icon name={copied ? "check" : "copy"} className="h-3.5 w-3.5" />
 		</button>
 	);
 }
@@ -85,16 +82,22 @@ function CredentialRow({
 	mono,
 	tooltip,
 	trailing,
+	action,
+	copyable = true,
 }: {
 	label: string;
 	value: string;
 	mono?: boolean;
 	tooltip?: string;
 	trailing?: React.ReactNode;
+	/** Replaces the copy button when set (e.g. Get API key on password). */
+	action?: React.ReactNode;
+	copyable?: boolean;
 }) {
 	const [copied, setCopied] = useState(false);
 
 	const handleCopy = useCallback(async () => {
+		if (!copyable) return;
 		try {
 			await navigator.clipboard.writeText(value);
 			setCopied(true);
@@ -102,7 +105,7 @@ function CredentialRow({
 		} catch {
 			// ignore
 		}
-	}, [value]);
+	}, [value, copyable]);
 
 	return (
 		<div className="flex items-center gap-3 border-stroke-soft-100 border-b px-4 py-3 last:border-b-0 dark:border-stroke-soft-100/40">
@@ -123,23 +126,34 @@ function CredentialRow({
 					) : null}
 				</div>
 			</div>
-			<button
-				type="button"
-				onClick={handleCopy}
-				className="group flex min-w-0 flex-1 items-center gap-2 text-left"
-			>
+			{copyable ? (
+				<button
+					type="button"
+					onClick={handleCopy}
+					className="group flex min-w-0 flex-1 items-center gap-2 text-left"
+				>
+					<span
+						className={cn(
+							"truncate font-medium text-sm text-text-strong-950 transition-colors",
+							mono && "font-mono",
+							copied && "text-success-base",
+						)}
+					>
+						{copied ? "Copied" : value}
+					</span>
+				</button>
+			) : (
 				<span
 					className={cn(
-						"truncate font-medium text-sm text-text-strong-950 transition-colors",
+						"min-w-0 flex-1 truncate font-medium text-sm text-text-strong-950",
 						mono && "font-mono",
-						copied && "text-success-base",
 					)}
 				>
-					{copied ? "Copied" : value}
+					{value}
 				</span>
-			</button>
+			)}
 			{trailing}
-			<CopyButton value={value} />
+			{action ?? (copyable ? <CopyButton value={value} /> : null)}
 		</div>
 	);
 }
@@ -232,7 +246,20 @@ export function SmtpPage() {
 							label="Password"
 							value="YOUR_API_KEY"
 							mono
+							copyable={false}
 							tooltip="Use any workspace API key as the SMTP password."
+							action={
+								<FancyButton.Root
+									type="button"
+									variant="blue"
+									size="xsmall"
+									onClick={() => void navigate({ to: "/api-keys/create" })}
+									className="gap-1.5 rounded-lg"
+								>
+									<Icon name="key-new" className="h-3.5 w-3.5" />
+									Get API key
+								</FancyButton.Root>
+							}
 						/>
 					</div>
 
@@ -291,10 +318,8 @@ export function SmtpPage() {
 				</div>
 
 				{/* Code samples */}
-				<div className="min-w-0 lg:col-span-7 lg:sticky lg:top-6 lg:self-start">
-					<div className="rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-5 dark:border-stroke-soft-100/40">
-						<SmtpCodePanel apiKeyPlaceholder="YOUR_API_KEY" />
-					</div>
+				<div className="min-w-0 lg:sticky lg:top-6 lg:col-span-7 lg:self-start">
+					<SmtpCodePanel apiKeyPlaceholder="YOUR_API_KEY" />
 				</div>
 			</div>
 		</div>
