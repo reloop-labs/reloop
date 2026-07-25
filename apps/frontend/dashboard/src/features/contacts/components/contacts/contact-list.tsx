@@ -2,6 +2,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import { useNavigate } from "@tanstack/react-router";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -44,13 +45,13 @@ function SummaryCard({
 }
 
 export function ContactList() {
+	const navigate = useNavigate();
 	const { activeOrganization } = useActiveOrganization();
 	const [searchQuery, setSearchQuery] = useQueryState(
 		"search",
 		parseAsString.withDefault(""),
 	);
 	const [filter, setFilter] = useState<ContactFilterOption>(null);
-	const [, setModal] = useQueryState("modal");
 	const [currentPage, setCurrentPage] = useQueryState(
 		"page",
 		parseAsInteger.withDefault(1),
@@ -195,7 +196,7 @@ export function ContactList() {
 					total={data?.total || 0}
 					isLoading={isLoading}
 					loadingRows={6}
-					onAddContact={() => void setModal("add-contact")}
+					onAddContact={() => void navigate({ to: "/contacts/create" })}
 					searchQuery={searchQuery ?? ""}
 					onClearSearch={() => void setSearchQuery(null)}
 				/>

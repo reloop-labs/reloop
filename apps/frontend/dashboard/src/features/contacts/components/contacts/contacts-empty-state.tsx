@@ -1,6 +1,7 @@
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { useNavigate } from "@tanstack/react-router";
 
 interface ContactsEmptyStateProps {
 	onAddContact?: () => void;
@@ -19,7 +20,16 @@ export function ContactsEmptyState({
 	description,
 	buttonText,
 }: ContactsEmptyStateProps) {
+	const navigate = useNavigate();
 	const isFiltered = searchQuery.trim() !== "";
+
+	const handleAddContact = () => {
+		if (onAddContact) {
+			onAddContact();
+		} else {
+			void navigate({ to: "/contacts/create" });
+		}
+	};
 
 	return (
 		<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
@@ -54,7 +64,7 @@ export function ContactsEmptyState({
 					type="button"
 					variant="blue"
 					size="small"
-					onClick={onAddContact}
+					onClick={handleAddContact}
 					className="gap-1.5 rounded-xl"
 				>
 					<Icon name="plus" className="h-4 w-4" />

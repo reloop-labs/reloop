@@ -3,7 +3,6 @@ import { useQueryState } from "nuqs";
 import { CreateChannelModal } from "./components/channels/create-channel-modal";
 import { DeleteChannelModal } from "./components/channels/delete-channel";
 import { EditChannelModal } from "./components/channels/edit-channel-modal";
-import { AddContactModal } from "./components/contacts/add-contact-modal";
 import { AddContactToGroupModal } from "./components/contacts/add-contact-to-group";
 import { DeleteContactModal } from "./components/contacts/delete-contact-modal";
 import { EditContactModal } from "./components/contacts/edit-contact-modal";
@@ -90,10 +89,6 @@ export function ContactsModals({
 
 	return (
 		<>
-			<AddContactModal
-				open={modal === "add-contact"}
-				onOpenChange={handleOpenChange}
-			/>
 			<AddPropertyModal
 				open={modal === "add-property"}
 				onOpenChange={handleOpenChange}
