@@ -2,15 +2,21 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { AnimatedChannelsIcon } from "./animated-channels-icon";
 import { AnimatedContactsIcon } from "./animated-contacts-icon";
+import { AnimatedGearIcon } from "./animated-gear-icon";
+import { AnimatedGlobeIcon } from "./animated-globe-icon";
 import { AnimatedGroupsIcon } from "./animated-groups-icon";
 import { AnimatedHomeIcon } from "./animated-home-icon";
 import { AnimatedInboxIcon } from "./animated-inbox-icon";
+import { AnimatedIntegrationIcon } from "./animated-integration-icon";
+import { AnimatedKeyIcon } from "./animated-key-icon";
 import { AnimatedLayoutIcon } from "./animated-layout-icon";
 import { AnimatedLogsIcon } from "./animated-logs-icon";
 import { AnimatedMailActionIcon } from "./animated-mail-action-icon";
 import { AnimatedMailIcon } from "./animated-mail-icon";
 import { AnimatedMetricsIcon } from "./animated-metrics-icon";
+import { AnimatedSmtpIcon } from "./animated-smtp-icon";
 import { AnimatedTagIcon } from "./animated-tag-icon";
+import { AnimatedWebhookIcon } from "./animated-webhook-icon";
 import { AnimatedWorkflowIcon } from "./animated-workflow-icon";
 
 type SidebarNavIconProps = {
@@ -63,6 +69,18 @@ export function SidebarNavIcon({
 			return <AnimatedMetricsIcon className={tone} />;
 		case "logs":
 			return <AnimatedLogsIcon className={tone} />;
+		case "key-new":
+			return <AnimatedKeyIcon className={tone} />;
+		case "globe":
+			return <AnimatedGlobeIcon className={tone} />;
+		case "webhook":
+			return <AnimatedWebhookIcon className={tone} />;
+		case "integration":
+			return <AnimatedIntegrationIcon className={tone} />;
+		case "smtp":
+			return <AnimatedSmtpIcon className={tone} />;
+		case "gear":
+			return <AnimatedGearIcon className={tone} />;
 		default:
 			return (
 				<Icon

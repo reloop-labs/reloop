@@ -59,9 +59,19 @@
   --animate-metrics-bar-tall: metrics-bar-tall 0.9s ease-in-out both;
   --animate-metrics-bar-short: metrics-bar-short 0.75s ease-in-out both;
   --animate-logs-flip: logs-flip 0.45s ease-in-out both;
+  --animate-key-flip: logs-flip 0.7s ease-in-out both;
   --animate-logs-draw-1: stroke-draw 0.28s ease-out 0.4s both;
   --animate-logs-draw-2: stroke-draw 0.28s ease-out 0.52s both;
   --animate-logs-draw-3: stroke-draw 0.28s ease-out 0.64s both;
+  --animate-globe-flip: logs-flip 0.7s ease-in-out both;
+  --animate-smtp-race-top: smtp-race 0.4s ease-out both;
+  --animate-smtp-race-bottom: smtp-race 0.4s ease-out 0.14s both;
+  --animate-webhook-burst: webhook-burst 0.85s ease-out both;
+  --animate-integration-square-1: integration-square 0.35s ease-out both;
+  --animate-integration-square-2: integration-square 0.35s ease-out 0.1s both;
+  --animate-integration-square-3: integration-square 0.35s ease-out 0.2s both;
+  --animate-gear-hole-draw: stroke-draw 0.32s ease-out both;
+  --animate-gear-turn: gear-turn 0.7s ease-in-out 0.28s both;
 }
 
 @keyframes stroke-draw {
@@ -120,6 +130,49 @@
   }
   100% {
     transform: rotateY(-360deg);
+  }
+}
+
+@keyframes webhook-burst {
+  0% {
+    transform: scale(0.35) rotate(0deg);
+  }
+  40% {
+    transform: scale(1) rotate(0deg);
+  }
+  100% {
+    transform: scale(1) rotate(-360deg);
+  }
+}
+
+@keyframes integration-square {
+  0% {
+    transform: scale(0.35);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes gear-turn {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes smtp-race {
+  0% {
+    transform: translateX(-10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
   }
 }
 
