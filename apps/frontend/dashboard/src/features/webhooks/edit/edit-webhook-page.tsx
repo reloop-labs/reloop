@@ -1,4 +1,3 @@
-import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import {
 	useWebhookDetailQuery,
 } from "#/features/webhooks/hooks/use-webhooks-query";
@@ -40,15 +39,11 @@ export function EditWebhookPage({ webhookId }: EditWebhookPageProps) {
 	if (isPending) {
 		return (
 			<div className="mx-auto w-full max-w-xl space-y-8 p-6 pb-16 lg:p-8">
-				<div className="pt-1">
-					<AnimatedBackButton onClick={goBack} />
-				</div>
 				<div className="space-y-3">
 					<Skeleton className="h-6 w-40" />
 					<Skeleton className="h-4 w-72" />
 				</div>
 				<div className="space-y-4">
-					<Skeleton className="h-10 w-full rounded-xl" />
 					<Skeleton className="h-10 w-full rounded-xl" />
 					<Skeleton className="h-10 w-full rounded-xl" />
 					<Skeleton className="h-64 w-full rounded-2xl" />
@@ -60,11 +55,6 @@ export function EditWebhookPage({ webhookId }: EditWebhookPageProps) {
 	if (isError || !webhook) {
 		return (
 			<div className="mx-auto w-full max-w-xl space-y-6 p-6 pb-16 lg:p-8">
-				<div className="pt-1">
-					<AnimatedBackButton
-						onClick={() => void navigate({ to: "/webhooks" })}
-					/>
-				</div>
 				<div>
 					<h1 className="font-semibold text-lg text-text-strong-950 tracking-tight">
 						Webhook not found
@@ -90,9 +80,6 @@ export function EditWebhookPage({ webhookId }: EditWebhookPageProps) {
 	return (
 		<div className="mx-auto w-full max-w-xl space-y-8 p-6 pb-16 lg:p-8">
 			<div>
-				<div className="pt-1">
-					<AnimatedBackButton onClick={goBack} />
-				</div>
 				<div className="pt-3">
 					<h1 className="font-semibold text-lg text-text-strong-950 tracking-tight">
 						Edit webhook
