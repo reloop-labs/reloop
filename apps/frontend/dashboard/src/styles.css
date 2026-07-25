@@ -93,6 +93,7 @@
 	--animate-theme-bar-1: theme-bar-1 0.5s ease-out both;
 	--animate-theme-bar-2: theme-bar-2 0.5s ease-out 0.18s both;
 	--animate-theme-bar-3: theme-bar-3 0.5s ease-out 0.36s both;
+	--animate-sidebar-bar-slide: sidebar-bar-slide 0.45s ease-in-out both;
 }
 
 @keyframes stroke-draw {
@@ -237,6 +238,18 @@
 	}
 	to {
 		opacity: 1;
+	}
+}
+
+@keyframes sidebar-bar-slide {
+	0% {
+		transform: translateX(0);
+	}
+	40% {
+		transform: translateX(-3px);
+	}
+	100% {
+		transform: translateX(0);
 	}
 }
 

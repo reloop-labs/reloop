@@ -1,9 +1,9 @@
 import { cn } from "@reloop/ui/cn";
-import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { useRouterState } from "@tanstack/react-router";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useHotkeys } from "react-hotkeys-hook";
+import { AnimatedSidebarToggleIcon } from "./animated-sidebar-toggle-icon";
 import { SettingsSidebarItems } from "./settings-sidebar-items";
 import { SidebarItems } from "./sidebar-items";
 import { useSidebarCollapse } from "./use-sidebar-collapse";
@@ -42,12 +42,10 @@ export function MainSidebar() {
 							type="button"
 							onClick={toggle}
 							title="Toggle Sidebar (Cmd+B)"
-							className="-translate-y-1/2 -right-2.5 absolute top-1/2 z-20 flex h-5 w-5 shrink-0 items-center justify-center text-text-sub-600 transition-colors hover:text-text-strong-950"
+							className="group -translate-y-1/2 -right-2.5 absolute top-1/2 z-20 flex h-5 w-5 shrink-0 items-center justify-center text-text-sub-600 transition-colors hover:text-text-strong-950"
 						>
-							<Icon
-								name="sidebar-left"
-								className="h-3 w-3 transition-transform duration-200"
-								style={{ transform: "rotate(180deg)" }}
+							<AnimatedSidebarToggleIcon
+								className="h-3 w-3 rotate-180"
 							/>
 						</button>
 					</div>
@@ -64,12 +62,9 @@ export function MainSidebar() {
 							type="button"
 							onClick={toggle}
 							title="Toggle Sidebar (Cmd+B)"
-							className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
+							className="group flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:hover:bg-white/5"
 						>
-							<Icon
-								name="sidebar-left"
-								className="h-4 w-4 transition-transform duration-200"
-							/>
+							<AnimatedSidebarToggleIcon className="h-4 w-4" />
 						</button>
 					</>
 				)}
