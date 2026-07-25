@@ -337,7 +337,7 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 															<FancyButton.Icon
 																as={Icon}
 																name="plus-circle"
-																className="h-4 w-4"
+																className="mr-0.5 h-4 w-4 shrink-0"
 															/>
 															<span>Connect</span>
 														</>
