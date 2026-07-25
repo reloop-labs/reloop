@@ -1,6 +1,6 @@
 import { authClient } from "@reloop/auth/client";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
@@ -103,7 +103,9 @@ const AccountSkeleton = () => (
 export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 	const queryClient = useQueryClient();
 	const [connecting, setConnecting] = useState<string | null>(null);
-	const [statusMap, setStatusMap] = useState<Record<string, "idle" | "disconnecting" | "success">>({});
+	const [statusMap, setStatusMap] = useState<
+		Record<string, "idle" | "disconnecting" | "success">
+	>({});
 
 	const { data: accounts, isPending: isLoading } = useQuery({
 		queryKey: queryKeys.auth.accounts(),
@@ -204,15 +206,18 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 										</div>
 										{account.providerId !== "credential" ? (
 											(() => {
-												const itemStatus = statusMap[account.providerId] ?? "idle";
+												const itemStatus =
+													statusMap[account.providerId] ?? "idle";
 												return (
 													<FancyButton.Root
-														variant={itemStatus === "success" ? "success" : "basic"}
+														variant={
+															itemStatus === "success" ? "success" : "basic"
+														}
 														size="xsmall"
 														disabled={itemStatus !== "idle"}
 														onClick={() => handleDisconnect(account.providerId)}
 														className={cn(
-															"min-w-[110px] justify-center overflow-hidden transition-all duration-200 font-medium",
+															"min-w-[110px] justify-center overflow-hidden font-medium transition-all duration-200",
 															itemStatus === "disconnecting" && "opacity-90",
 														)}
 													>
@@ -231,12 +236,18 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 															>
 																{itemStatus === "disconnecting" ? (
 																	<>
-																		<Spinner size={14} color="var(--text-strong-950)" />
+																		<Spinner
+																			size={14}
+																			color="var(--text-strong-950)"
+																		/>
 																		<span>Disconnecting...</span>
 																	</>
 																) : itemStatus === "success" ? (
 																	<>
-																		<Icon name="check-circle" className="h-4 w-4" />
+																		<Icon
+																			name="check-circle"
+																			className="h-4 w-4"
+																		/>
 																		<span>Disconnected</span>
 																	</>
 																) : (
@@ -299,7 +310,11 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 											<Spinner size={14} color="var(--text-strong-950)" />
 										) : (
 											<>
-												<FancyButton.Icon as={Icon} name="plus" />
+												<FancyButton.Icon
+													as={Icon}
+													name="plus-circle"
+													className="h-4 w-4"
+												/>
 												Connect
 											</>
 										)}

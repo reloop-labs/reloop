@@ -1040,6 +1040,16 @@ export const IconsSprite = () => (
 					strokeLinejoin="round"
 				/>
 			</symbol>
+			<symbol id="plus-circle" viewBox="0 0 24 24" fill="none">
+				<circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
+				<path
+					d="M12 8V16M8 12H16"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
 			<symbol
 				id="link"
 				viewBox="0 0 24 24"
@@ -2272,6 +2282,20 @@ export const IconsSprite = () => (
 					clipRule="evenodd"
 					d="M12 4.25C12.4142 4.25 12.75 4.58579 12.75 5V11.25H19C19.4142 11.25 19.75 11.5858 19.75 12C19.75 12.4142 19.4142 12.75 19 12.75H12.75V19C12.75 19.4142 12.4142 19.75 12 19.75C11.5858 19.75 11.25 19.4142 11.25 19V12.75H5C4.58579 12.75 4.25 12.4142 4.25 12C4.25 11.5858 4.58579 11.25 5 11.25H11.25V5C11.25 4.58579 11.5858 4.25 12 4.25Z"
 					fill="currentColor"
+				/>
+			</symbol>
+			<symbol
+				id="connector"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M12 22V17M9 2V8M15 2V8M6 8H18V11C18 14.3137 15.3137 17 12 17C8.68629 17 6 14.3137 6 11V8Z"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
 				/>
 			</symbol>
 			<symbol id="plus-rounded-border" viewBox="0 0 24 24">
