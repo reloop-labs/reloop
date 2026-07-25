@@ -43,8 +43,25 @@
   --animate-contacts-draw-top: stroke-draw 0.3s ease-out both;
   --animate-contacts-draw-bottom: stroke-draw 0.3s ease-out 0.12s both;
   --animate-tag-hole-draw: stroke-draw 0.35s ease-out both;
-  --animate-groups-draw-front: stroke-draw 0.32s ease-out both;
-  --animate-groups-draw-back: stroke-draw 0.28s ease-out 0.1s both;
+  --animate-groups-draw-front: stroke-draw 0.3s ease-out both;
+  --animate-groups-draw-back: stroke-draw 0.32s ease-out 0.12s both;
+  --animate-channels-draw-ring: stroke-draw 0.32s ease-out both;
+  --animate-channels-fill-in: channels-fill-in 0.2s ease-out 0.22s both;
+  --animate-mail-flap-draw: stroke-draw 0.35s ease-out both;
+  --animate-layout-draw-1: stroke-draw 0.22s ease-out both;
+  --animate-layout-draw-2: stroke-draw 0.22s ease-out 0.08s both;
+  --animate-layout-draw-3: stroke-draw 0.22s ease-out 0.16s both;
+  --animate-layout-draw-4: stroke-draw 0.22s ease-out 0.24s both;
+  --animate-workflow-path-draw: stroke-draw 0.45s ease-out both;
+  --animate-mail-arrow-shaft: stroke-draw 0.28s ease-out both;
+  --animate-mail-arrow-tip-left: stroke-draw 0.2s ease-out 0.14s both;
+  --animate-mail-arrow-tip-right: stroke-draw 0.2s ease-out 0.2s both;
+  --animate-metrics-bar-tall: metrics-bar-tall 0.9s ease-in-out both;
+  --animate-metrics-bar-short: metrics-bar-short 0.75s ease-in-out both;
+  --animate-logs-flip: logs-flip 0.45s ease-in-out both;
+  --animate-logs-draw-1: stroke-draw 0.28s ease-out 0.4s both;
+  --animate-logs-draw-2: stroke-draw 0.28s ease-out 0.52s both;
+  --animate-logs-draw-3: stroke-draw 0.28s ease-out 0.64s both;
 }
 
 @keyframes stroke-draw {
@@ -53,6 +70,56 @@
   }
   to {
     stroke-dashoffset: 0;
+  }
+}
+
+@keyframes channels-fill-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes metrics-bar-tall {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  25% {
+    transform: scaleY(0.45);
+  }
+  50% {
+    transform: scaleY(0.85);
+  }
+  75% {
+    transform: scaleY(0.35);
+  }
+}
+
+@keyframes metrics-bar-short {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  30% {
+    transform: scaleY(0.55);
+  }
+  55% {
+    transform: scaleY(1);
+  }
+  80% {
+    transform: scaleY(0.4);
+  }
+}
+
+@keyframes logs-flip {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(-360deg);
   }
 }
 

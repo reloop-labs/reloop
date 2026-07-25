@@ -1,10 +1,17 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { AnimatedChannelsIcon } from "./animated-channels-icon";
 import { AnimatedContactsIcon } from "./animated-contacts-icon";
 import { AnimatedGroupsIcon } from "./animated-groups-icon";
 import { AnimatedHomeIcon } from "./animated-home-icon";
 import { AnimatedInboxIcon } from "./animated-inbox-icon";
+import { AnimatedLayoutIcon } from "./animated-layout-icon";
+import { AnimatedLogsIcon } from "./animated-logs-icon";
+import { AnimatedMailActionIcon } from "./animated-mail-action-icon";
+import { AnimatedMailIcon } from "./animated-mail-icon";
+import { AnimatedMetricsIcon } from "./animated-metrics-icon";
 import { AnimatedTagIcon } from "./animated-tag-icon";
+import { AnimatedWorkflowIcon } from "./animated-workflow-icon";
 
 type SidebarNavIconProps = {
 	name: string;
@@ -40,6 +47,22 @@ export function SidebarNavIcon({
 			return <AnimatedTagIcon className={tone} />;
 		case "modules":
 			return <AnimatedGroupsIcon className={tone} />;
+		case "notification-indicator":
+			return <AnimatedChannelsIcon className={tone} />;
+		case "mail-single":
+			return <AnimatedMailIcon className={tone} />;
+		case "mail-send":
+			return <AnimatedMailActionIcon direction="send" className={tone} />;
+		case "mail-receive":
+			return <AnimatedMailActionIcon direction="receive" className={tone} />;
+		case "layout":
+			return <AnimatedLayoutIcon className={tone} />;
+		case "workflow":
+			return <AnimatedWorkflowIcon className={tone} />;
+		case "fat-row":
+			return <AnimatedMetricsIcon className={tone} />;
+		case "logs":
+			return <AnimatedLogsIcon className={tone} />;
 		default:
 			return (
 				<Icon
