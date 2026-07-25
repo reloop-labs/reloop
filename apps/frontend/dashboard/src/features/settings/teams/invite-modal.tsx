@@ -397,7 +397,7 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 														</span>
 
 														{/* Role Selection */}
-														<div className="flex items-center gap-0.5 rounded-full bg-neutral-alpha-10 p-0.5 dark:bg-neutral-alpha-16">
+														<div className="flex items-center gap-1">
 															{(["member", "admin"] as Role[]).map((r) => {
 																const isSelected = role === r;
 																return (
@@ -424,9 +424,8 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 																						: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/60 dark:bg-bg-white-0/10",
 																				)}
 																				transition={{
-																					type: "spring",
-																					stiffness: 420,
-																					damping: 30,
+																					duration: 0.3,
+																					ease: [0.16, 1, 0.3, 1],
 																				}}
 																			/>
 																		)}
@@ -595,7 +594,11 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 												</>
 											) : (
 												<>
-													<FancyButton.Icon as={Icon} name="send-2" />
+													<FancyButton.Icon
+														as={Icon}
+														name="send-2"
+														className="mr-1 h-4 w-4 rotate-45"
+													/>
 													<span>Send invites</span>
 													<span className="inline-flex items-center gap-0.5 opacity-80">
 														<Icon
