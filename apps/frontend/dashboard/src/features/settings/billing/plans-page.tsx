@@ -5,8 +5,8 @@ import {
 	type PricingPlan,
 	pricingPlans,
 } from "@reloop/pricing";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useNavigate } from "@tanstack/react-router";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
@@ -101,7 +101,7 @@ export function PlansPage() {
 		const isNext = index === nextIndex;
 		return (
 			<FancyButton.Root
-				variant={isNext || isUpgrade ? "blue" : "basic"}
+				variant={isNext ? "blue" : "basic"}
 				size="small"
 				className="w-full rounded-full font-semibold"
 				onClick={() => requestPlan(plan, isUpgrade ? "upgrade" : "downgrade")}
