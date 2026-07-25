@@ -10,32 +10,8 @@ import { SmtpCodePanel } from "./smtp-code-panel";
 
 const DOCS_URL = "https://reloop.sh/docs/examples/smtp/introduction";
 
-const PORT_OPTIONS = [
-	{
-		value: "465",
-		label: "465",
-		hint: "SSL/TLS",
-		primary: true,
-	},
-	{
-		value: "587",
-		label: "587",
-		hint: "STARTTLS",
-		primary: false,
-	},
-	{
-		value: "2587",
-		label: "2587",
-		hint: "STARTTLS",
-		primary: false,
-	},
-	{
-		value: "2465",
-		label: "2465",
-		hint: "TLS",
-		primary: false,
-	},
-] as const;
+/** All supported SMTP ports, shown slash-separated in the credentials table. */
+const SMTP_PORTS = "465 / 587 / 2587 / 2465";
 
 function CopyButton({
 	value,
@@ -160,7 +136,6 @@ function CredentialRow({
 
 export function SmtpPage() {
 	const navigate = useNavigate();
-	const [selectedPort, setSelectedPort] = useState("465");
 
 	return (
 		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
@@ -233,13 +208,9 @@ export function SmtpPage() {
 						<CredentialRow label="Host" value={SMTP_HOST} mono />
 						<CredentialRow
 							label="Port"
-							value={selectedPort}
+							value={SMTP_PORTS}
 							mono
-							trailing={
-								<span className="hidden font-medium text-[11px] text-text-soft-400 sm:inline">
-									{PORT_OPTIONS.find((p) => p.value === selectedPort)?.hint}
-								</span>
-							}
+							tooltip="465 SSL/TLS · 587 STARTTLS · 2587 STARTTLS · 2465 TLS"
 						/>
 						<CredentialRow label="User" value={SMTP_USER} mono />
 						<CredentialRow
@@ -261,43 +232,6 @@ export function SmtpPage() {
 								</FancyButton.Root>
 							}
 						/>
-					</div>
-
-					{/* Port picker */}
-					<div className="space-y-2">
-						<p className="font-medium text-text-sub-600 text-xs">
-							Port options
-						</p>
-						<div className="flex flex-wrap gap-2">
-							{PORT_OPTIONS.map((port) => {
-								const isActive = selectedPort === port.value;
-								return (
-									<button
-										key={port.value}
-										type="button"
-										onClick={() => setSelectedPort(port.value)}
-										className={cn(
-											"inline-flex items-center gap-2 rounded-xl border px-3 py-2 font-medium text-sm transition-colors",
-											isActive
-												? "border-stroke-strong-950 bg-bg-strong-950 text-white dark:border-white dark:bg-white dark:text-text-strong-950"
-												: "border-stroke-soft-100 bg-bg-white-0 text-text-strong-950 hover:bg-bg-weak-50 dark:border-stroke-soft-100/40",
-										)}
-									>
-										<span className="font-mono tabular-nums">{port.label}</span>
-										<span
-											className={cn(
-												"text-[11px]",
-												isActive
-													? "text-white/70 dark:text-text-sub-600"
-													: "text-text-soft-400",
-											)}
-										>
-											{port.hint}
-										</span>
-									</button>
-								);
-							})}
-						</div>
 					</div>
 
 					{/* Password tip */}
