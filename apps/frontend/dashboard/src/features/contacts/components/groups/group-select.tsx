@@ -1,16 +1,25 @@
+import type { Group } from "#/features/contacts/hooks/use-contacts-query";
 import * as Avatar from "@reloop/ui/avatar";
+import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
-import { useRef, useState } from "react";
-import type { Group } from "#/features/contacts/hooks/use-contacts-query";
+import { useMemo, useRef, useState } from "react";
 
 interface GroupSelectProps {
 	selectedGroupIds: string[];
 	onChange: (groupIds: string[]) => void;
 	disabled?: boolean;
 	open?: boolean;
+	/** Field label. Defaults to create-flow copy. */
+	label?: string;
+	/** Helper text under the field. Pass empty string to hide. */
+	description?: string;
+	className?: string;
+	/** Known groups (e.g. contact.groups) so chips resolve before the list loads. */
+	knownGroups?: { id: string; name: string }[];
+	id?: string;
 }
 
 export const GroupSelect = ({
@@ -18,13 +27,17 @@ export const GroupSelect = ({
 	onChange,
 	disabled = false,
 	open = true,
+	label = "Assign to Groups (Optional)",
+	description = "You can create new groups from the Groups tab.",
+	className,
+	knownGroups,
+	id,
 }: GroupSelectProps) => {
 	const [groupInput, setGroupInput] = useState("");
 	const [showGroupDropdown, setShowGroupDropdown] = useState(false);
 	const [hoveredGroupId, setHoveredGroupId] = useState<string | null>(null);
 	const groupInputRef = useRef<HTMLInputElement>(null);
 
-	// Fetch all groups for the organization
 	const { data: allGroupsData } = useQuery({
 		queryKey: ["contacts", "groups", "select"],
 		queryFn: async () => {
@@ -39,6 +52,17 @@ export const GroupSelect = ({
 
 	const allGroups = allGroupsData?.groups || [];
 
+	const nameById = useMemo(() => {
+		const map = new Map<string, string>();
+		for (const g of knownGroups ?? []) {
+			map.set(g.id, g.name);
+		}
+		for (const g of allGroups) {
+			map.set(g.id, g.name);
+		}
+		return map;
+	}, [allGroups, knownGroups]);
+
 	const addGroup = (groupId: string) => {
 		if (!selectedGroupIds.includes(groupId)) {
 			onChange([...selectedGroupIds, groupId]);
@@ -48,12 +72,10 @@ export const GroupSelect = ({
 	};
 
 	const removeGroup = (groupId: string) => {
-		onChange(selectedGroupIds.filter((id) => id !== groupId));
+		onChange(selectedGroupIds.filter((gid) => gid !== groupId));
 	};
 
-	const getGroupName = (groupId: string) => {
-		return allGroups.find((g) => g.id === groupId)?.name || "";
-	};
+	const getGroupName = (groupId: string) => nameById.get(groupId) || "";
 
 	const availableGroups = allGroups.filter(
 		(group) => !selectedGroupIds.includes(group.id),
@@ -66,19 +88,27 @@ export const GroupSelect = ({
 		: availableGroups;
 
 	return (
-		<div className="flex flex-col gap-1 border-stroke-soft-100 pt-2">
-			<Label.Root className="mb-1.5 block font-medium text-text-strong-950 text-xs">
-				Assign to Groups (Optional)
+		<div className={cn("flex flex-col gap-1.5", className)}>
+			<Label.Root
+				htmlFor={id}
+				className="font-medium text-text-strong-950 text-xs"
+			>
+				{label}
 			</Label.Root>
 			<div className="relative">
-				<label className="group/chips flex min-h-[44px] cursor-text flex-wrap content-start rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-3 py-2.5 transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-button-important-focus hover:[&:not(:focus-within)]:bg-bg-weak-50">
+				<label
+					className={cn(
+						"group/chips flex min-h-[42px] cursor-text flex-wrap content-start gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 transition duration-200 ease-out focus-within:border-stroke-strong-950 focus-within:shadow-xs hover:[&:not(:focus-within)]:bg-bg-weak-50/50 dark:border-stroke-soft-100/40",
+						disabled && "pointer-events-none opacity-50",
+					)}
+				>
 					{selectedGroupIds.map((groupId) => {
 						const groupName = getGroupName(groupId);
 						if (!groupName) return null;
 						return (
 							<span
 								key={groupId}
-								className="inline-flex items-center gap-1.5 rounded-full border border-stroke-soft-200 bg-bg-weak-50 py-0.5 pr-2 pl-0.5 text-paragraph-xs text-text-strong-950 transition-all"
+								className="inline-flex items-center gap-1.5 rounded-full border border-stroke-soft-100 bg-bg-weak-50 py-0.5 pr-2 pl-0.5 text-paragraph-xs text-text-strong-950 transition-all dark:border-stroke-soft-100/40"
 							>
 								<Avatar.Root size="20" color="gray">
 									<Icon name="modules" className="h-3 w-3 text-text-sub-600" />
@@ -93,6 +123,7 @@ export const GroupSelect = ({
 									}}
 									className="ml-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full text-text-sub-600 transition-colors hover:bg-stroke-soft-200 hover:text-text-strong-950"
 									disabled={disabled}
+									aria-label={`Remove ${groupName}`}
 								>
 									<Icon name="cross" className="h-3 w-3" />
 								</button>
@@ -101,6 +132,7 @@ export const GroupSelect = ({
 					})}
 					<input
 						ref={groupInputRef}
+						id={id}
 						type="text"
 						value={groupInput}
 						onChange={(e) => {
@@ -109,22 +141,22 @@ export const GroupSelect = ({
 						}}
 						onFocus={() => setShowGroupDropdown(true)}
 						onBlur={(e) => {
-							const relatedTarget = e.relatedTarget as HTMLElement;
-							if (!relatedTarget?.closest(".absolute")) {
+							const relatedTarget = e.relatedTarget as HTMLElement | null;
+							if (!relatedTarget?.closest("[data-group-select-dropdown]")) {
 								setShowGroupDropdown(false);
 							}
 						}}
 						placeholder={
-							selectedGroupIds.length === 0 ? "Search Groups..." : ""
+							selectedGroupIds.length === 0 ? "Search groups..." : ""
 						}
 						className="min-w-[80px] flex-1 bg-transparent text-paragraph-sm text-text-sub-600 outline-none placeholder:text-text-soft-400"
 						disabled={disabled}
 					/>
 				</label>
-				{/* Animated Dropdown Menu */}
 				<AnimatePresence>
 					{showGroupDropdown && filteredGroups.length > 0 && (
 						<motion.div
+							data-group-select-dropdown
 							initial={{ opacity: 0, y: -6, scale: 0.96 }}
 							animate={{ opacity: 1, y: 0, scale: 1 }}
 							exit={{ opacity: 0, y: -6, scale: 0.96 }}
@@ -164,6 +196,7 @@ export const GroupSelect = ({
 					)}
 					{showGroupDropdown && filteredGroups.length === 0 && groupInput && (
 						<motion.div
+							data-group-select-dropdown
 							initial={{ opacity: 0, y: -6, scale: 0.96 }}
 							animate={{ opacity: 1, y: 0, scale: 1 }}
 							exit={{ opacity: 0, y: -6, scale: 0.96 }}
@@ -177,9 +210,9 @@ export const GroupSelect = ({
 					)}
 				</AnimatePresence>
 			</div>
-			<p className="text-paragraph-xs text-text-soft-400">
-				You can create new groups from the Groups tab.
-			</p>
+			{description ? (
+				<p className="text-paragraph-xs text-text-soft-400">{description}</p>
+			) : null}
 		</div>
 	);
 };
