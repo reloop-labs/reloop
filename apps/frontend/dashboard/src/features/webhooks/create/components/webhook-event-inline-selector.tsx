@@ -1,225 +1,250 @@
-/** biome-ignore-all lint/a11y/useSemanticElements: custom checkbox list item elements */
-import * as Checkbox from "@reloop/ui/checkbox";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import * as Input from "@reloop/ui/input";
 import { ACTIVE_WEBHOOK_EVENTS } from "@reloop/webhook-events";
-import { AnimatePresence, LayoutGroup, motion } from "motion/react";
-import { memo, useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 interface WebhookEventInlineSelectorProps {
 	value: string[];
 	onChange: (value: string[]) => void;
 }
 
-const categoryBadgeColors: Record<string, { light: string; dark: string }> = {
-	domain: { light: "bg-[#0A438A]", dark: "dark:bg-[#1E57A8]" },
-	"api-key": { light: "bg-[#8A5A0A]", dark: "dark:bg-[#A87A1E]" },
-	contact: { light: "bg-[#0A6B3A]", dark: "dark:bg-[#1E8A4E]" },
-	email: { light: "bg-[#7C3AED]", dark: "dark:bg-[#8B5CF6]" },
+const CATEGORY_META: Record<
+	string,
+	{ label: string; icon: string }
+> = {
+	email: { label: "Email", icon: "mail-send" },
+	domain: { label: "Domains", icon: "globe" },
+	"api-key": { label: "API Keys", icon: "key-new" },
+	contact: { label: "Contacts", icon: "contacts" },
 };
 
-const categoryCheckboxColors: Record<string, string> = {
-	domain:
-		"[&>[data-state=checked]]:![&>[data-state=checked]>svg>rect:first-of-type]:fill-[#0A438A] dark:[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#1E57A8]",
-	"api-key":
-		"[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#8A5A0A] dark:[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#A87A1E]",
-	contact:
-		"[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#0A6B3A] dark:[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#1E8A4E]",
-	email:
-		"[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#7C3AED] dark:[&>[data-state=checked]>svg>rect:first-of-type]:fill-[#8B5CF6]",
-};
-
-interface WebhookEventRowProps {
-	event: (typeof ACTIVE_WEBHOOK_EVENTS)[number];
-	isChecked: boolean;
-	onToggle: (id: string) => void;
-}
-
-const WebhookEventRow = memo<WebhookEventRowProps>(
-	({ event, isChecked, onToggle }) => (
-		<div
-			tabIndex={0}
-			role="button"
-			aria-pressed={isChecked}
-			onClick={() => onToggle(event.id)}
-			onKeyDown={(e) => {
-				if (e.key === "Enter" || e.key === " ") {
-					e.preventDefault();
-					onToggle(event.id);
-				}
-			}}
-			className={cn(
-				"flex w-full cursor-pointer items-center justify-between px-4 py-2.5 text-left transition-colors hover:bg-bg-weak-50/50",
-				isChecked && "bg-bg-weak-50/60",
-			)}
-		>
-			<div className="flex min-w-0 flex-1 items-center gap-3">
-				<div
-					className={cn("shrink-0", categoryCheckboxColors[event.category])}
-					onClick={(e) => e.stopPropagation()}
-				>
-					<Checkbox.Root
-						checked={isChecked}
-						onCheckedChange={() => onToggle(event.id)}
-					/>
-				</div>
-				<span className="truncate font-medium text-label-sm text-text-strong-950">
-					{event.name}
-				</span>
-			</div>
-			<div
-				className={cn(
-					"ml-3 shrink-0 rounded-full px-1.5 py-0.5 font-medium text-[10px] text-white",
-					categoryBadgeColors[event.category]?.light,
-					categoryBadgeColors[event.category]?.dark,
-				)}
-			>
-				{event.category
-					.replace("-", " ")
-					.replace(/\b\w/g, (c) => c.toUpperCase())}
-			</div>
-		</div>
-	),
-);
-
-WebhookEventRow.displayName = "WebhookEventRow";
+type CategoryFilter = "all" | string;
 
 export const WebhookEventInlineSelector = ({
 	value,
 	onChange,
 }: WebhookEventInlineSelectorProps) => {
+	const [query, setQuery] = useState("");
+	const [category, setCategory] = useState<CategoryFilter>("all");
+
+	const selected = useMemo(() => new Set(value), [value]);
+
+	const categories = useMemo(() => {
+		const seen = new Set<string>();
+		const list: string[] = [];
+		for (const event of ACTIVE_WEBHOOK_EVENTS) {
+			if (!seen.has(event.category)) {
+				seen.add(event.category);
+				list.push(event.category);
+			}
+		}
+		return list;
+	}, []);
+
+	const filteredEvents = useMemo(() => {
+		const q = query.trim().toLowerCase();
+		return ACTIVE_WEBHOOK_EVENTS.filter((event) => {
+			if (category !== "all" && event.category !== category) return false;
+			if (!q) return true;
+			return (
+				event.id.toLowerCase().includes(q) ||
+				event.name.toLowerCase().includes(q) ||
+				event.description.toLowerCase().includes(q)
+			);
+		});
+	}, [query, category]);
+
+	const visibleIds = useMemo(
+		() => filteredEvents.map((e) => e.id),
+		[filteredEvents],
+	);
+
+	const allVisibleSelected =
+		visibleIds.length > 0 && visibleIds.every((id) => selected.has(id));
+
 	const handleToggle = useCallback(
 		(eventId: string) => {
 			onChange(
-				value.includes(eventId)
+				selected.has(eventId)
 					? value.filter((id) => id !== eventId)
 					: [...value, eventId],
 			);
 		},
-		[value, onChange],
+		[value, selected, onChange],
 	);
 
-	const eventsMap = new Map<string, (typeof ACTIVE_WEBHOOK_EVENTS)[number]>(
-		ACTIVE_WEBHOOK_EVENTS.map((e) => [e.id, e]),
-	);
-
-	const categoryLabels: Record<string, string> = {
-		domain: "Domains",
-		"api-key": "API Keys",
-		contact: "Contacts",
-		email: "Email",
+	const handleToggleAllVisible = () => {
+		if (allVisibleSelected) {
+			const remove = new Set<string>(visibleIds);
+			onChange(value.filter((id) => !remove.has(id)));
+		} else {
+			const next = new Set<string>(value);
+			for (const id of visibleIds) next.add(id);
+			onChange([...next]);
+		}
 	};
 
-	const groupedEvents = useMemo(() => {
-		const groups: {
-			category: string;
-			events: (typeof ACTIVE_WEBHOOK_EVENTS)[number][];
-		}[] = [];
-		const seen = new Map<string, number>();
+	const handleClear = () => {
+		onChange([]);
+	};
 
-		for (const event of ACTIVE_WEBHOOK_EVENTS) {
-			const existingIdx = seen.get(event.category);
-			if (existingIdx !== undefined) {
-				groups[existingIdx]?.events.push(event);
-			} else {
-				seen.set(event.category, groups.length);
-				groups.push({
-					category: event.category,
-					events: [event],
-				});
-			}
-		}
-		return groups;
-	}, []);
+	const categoryFilters: { id: CategoryFilter; label: string }[] = [
+		{ id: "all", label: "All" },
+		...categories.map((c) => ({
+			id: c,
+			label: CATEGORY_META[c]?.label ?? c,
+		})),
+	];
 
 	return (
-		<LayoutGroup>
-			<div className="space-y-3">
-				<div className="h-96 divide-y divide-stroke-soft-100 overflow-y-auto rounded-xl border border-stroke-soft-100 dark:divide-stroke-soft-100/40 dark:border-stroke-soft-100/40">
-					{groupedEvents.map((group) => (
-						<div key={group.category}>
-							{/* Category separator / header */}
-							<div className="sticky top-0 z-10 flex items-center gap-3 border-stroke-soft-100 border-b bg-bg-weak-50 px-4 py-2 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/90">
-								<span className="font-semibold text-[10px] text-text-sub-600 uppercase tracking-widest">
-									{categoryLabels[group.category] ?? group.category}
-								</span>
-							</div>
-
-							{/* Event rows */}
-							<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
-								{group.events.map((event) => (
-									<WebhookEventRow
-										key={event.id}
-										event={event}
-										isChecked={value.includes(event.id)}
-										onToggle={handleToggle}
-									/>
-								))}
-							</div>
-						</div>
-					))}
+		<div className="space-y-3">
+			{/* Toolbar */}
+			<div className="flex flex-wrap items-center gap-2">
+				<div className="min-w-[160px] flex-1">
+					<Input.Root size="small" className="rounded-xl">
+						<Input.Wrapper>
+							<Input.Icon as={Icon} name="search" size="small" />
+							<Input.Input
+								placeholder="Search events…"
+								value={query}
+								onChange={(e) => setQuery(e.target.value)}
+							/>
+							{query ? (
+								<button
+									type="button"
+									onClick={() => setQuery("")}
+									className="mr-1 rounded p-0.5 text-text-soft-400 transition-colors hover:text-text-strong-950"
+									aria-label="Clear search"
+								>
+									<Icon name="cross" className="h-3 w-3" />
+								</button>
+							) : null}
+						</Input.Wrapper>
+					</Input.Root>
 				</div>
 
-				<AnimatePresence initial={false}>
-					{value.length > 0 && (
-						<motion.div
-							key="selected-events"
-							initial={{ height: 0, opacity: 0 }}
-							animate={{ height: "auto", opacity: 1 }}
-							exit={{ height: 0, opacity: 0 }}
-							transition={{
-								type: "spring",
-								stiffness: 400,
-								damping: 40,
-							}}
-							className="overflow-hidden"
-						>
-							<div className="rounded-xl border border-stroke-soft-100 bg-bg-soft-50 p-3 dark:border-stroke-soft-100/40 dark:bg-bg-soft-50/50">
-								<div className="mb-2 flex items-center gap-1.5">
-									<Icon
-										name="check-circle"
-										className="h-3.5 w-3.5 text-green-600"
-									/>
-									<span className="font-medium text-label-xs text-text-strong-950">
-										{value.length} event{value.length > 1 ? "s" : ""} selected
-									</span>
-								</div>
-								<div className="flex flex-wrap gap-1.5">
-									<AnimatePresence initial={false}>
-										{value.map((eventId) => {
-											const event = eventsMap.get(eventId);
-											if (!event) return null;
-											return (
-												<motion.button
-													key={event.id}
-													type="button"
-													onClick={() => handleToggle(event.id)}
-													initial={{ opacity: 0, scale: 0.8 }}
-													animate={{ opacity: 1, scale: 1 }}
-													exit={{ opacity: 0, scale: 0.8 }}
-													transition={{
-														type: "spring",
-														stiffness: 400,
-														damping: 40,
-													}}
-													className={cn(
-														"flex items-center gap-1 rounded-full px-2 py-0.5 font-medium text-[11px] text-white transition-opacity hover:opacity-80",
-														categoryBadgeColors[event.category]?.light,
-														categoryBadgeColors[event.category]?.dark,
-													)}
-												>
-													{event.name}
-													<Icon name="plus" className="h-3 w-3 rotate-45" />
-												</motion.button>
-											);
-										})}
-									</AnimatePresence>
-								</div>
-							</div>
-						</motion.div>
-					)}
-				</AnimatePresence>
+				<button
+					type="button"
+					onClick={handleToggleAllVisible}
+					disabled={visibleIds.length === 0}
+					className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 font-medium text-xs text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 disabled:opacity-50 dark:border-stroke-soft-100/40"
+				>
+					{allVisibleSelected ? "Deselect visible" : "Select visible"}
+				</button>
+
+				{value.length > 0 ? (
+					<button
+						type="button"
+						onClick={handleClear}
+						className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 py-2 font-medium text-xs text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40"
+					>
+						Clear ({value.length})
+					</button>
+				) : null}
 			</div>
-		</LayoutGroup>
+
+			{/* Category pills */}
+			{categories.length > 1 ? (
+				<div className="flex flex-wrap gap-1.5">
+					{categoryFilters.map((chip) => {
+						const active = category === chip.id;
+						return (
+							<button
+								key={chip.id}
+								type="button"
+								onClick={() => setCategory(chip.id)}
+								className={cn(
+									"rounded-full px-3 py-1.5 font-medium text-[12px] transition-colors",
+									active
+										? "bg-text-strong-950 text-white dark:bg-white dark:text-black"
+										: "bg-bg-weak-50 text-text-sub-600 hover:bg-bg-soft-200 hover:text-text-strong-950 dark:bg-bg-weak-50/40",
+								)}
+							>
+								{chip.label}
+							</button>
+						);
+					})}
+				</div>
+			) : null}
+
+			{/* Event list */}
+			<div className="overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/40">
+				<div className="max-h-[320px] space-y-0.5 overflow-y-auto p-1.5">
+					{filteredEvents.length === 0 ? (
+						<div className="flex flex-col items-center px-4 py-10 text-center">
+							<Icon name="search" className="mb-3 h-6 w-6 text-text-soft-400" />
+							<p className="font-medium text-sm text-text-strong-950">
+								No events found
+							</p>
+							<p className="mt-1 text-[12px] text-text-sub-600">
+								Try another search or category.
+							</p>
+						</div>
+					) : (
+						filteredEvents.map((event) => {
+							const isChecked = selected.has(event.id);
+							const meta = CATEGORY_META[event.category];
+							return (
+								<button
+									key={event.id}
+									type="button"
+									onClick={() => handleToggle(event.id)}
+									className={cn(
+										"flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left transition-colors",
+										isChecked
+											? "bg-bg-weak-50 dark:bg-bg-weak-50/40"
+											: "hover:bg-bg-weak-50/60 dark:hover:bg-bg-weak-50/20",
+									)}
+								>
+									{/* Check indicator */}
+									<span
+										className={cn(
+											"mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors",
+											isChecked
+												? "border-text-strong-950 bg-text-strong-950 text-white dark:border-white dark:bg-white dark:text-black"
+												: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/50",
+										)}
+									>
+										{isChecked ? (
+											<Icon name="check" className="h-3 w-3" />
+										) : null}
+									</span>
+
+									<div className="min-w-0 flex-1">
+										<div className="flex flex-wrap items-center gap-2">
+											<span className="font-mono font-medium text-[13px] text-text-strong-950">
+												{event.id}
+											</span>
+											{meta ? (
+												<span className="inline-flex items-center gap-1 rounded-md bg-bg-weak-50 px-1.5 py-0.5 font-medium text-[10px] text-text-sub-600 dark:bg-bg-weak-50/50">
+													<Icon name={meta.icon} className="h-3 w-3" />
+													{meta.label}
+												</span>
+											) : null}
+										</div>
+										<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
+											{event.description}
+										</p>
+									</div>
+								</button>
+							);
+						})
+					)}
+				</div>
+
+				{/* Footer count */}
+				<div className="flex items-center justify-between border-stroke-soft-100 border-t px-3.5 py-2.5 dark:border-stroke-soft-100/40">
+					<span className="font-medium text-[12px] text-text-sub-600">
+						{value.length === 0
+							? "No events selected"
+							: `${value.length} event${value.length === 1 ? "" : "s"} selected`}
+					</span>
+					<span className="text-[11px] text-text-soft-400 tabular-nums">
+						{filteredEvents.length} shown
+					</span>
+				</div>
+			</div>
+		</div>
 	);
 };

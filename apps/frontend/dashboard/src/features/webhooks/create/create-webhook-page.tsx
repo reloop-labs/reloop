@@ -1,22 +1,86 @@
-import { CreateWebhookActions } from "./components/create-webhook-actions";
+import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
+import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
+import { Icon } from "@reloop/ui/icon";
+import Spinner from "@reloop/ui/spinner";
+import { useNavigate } from "@tanstack/react-router";
+import { useHotkeys } from "react-hotkeys-hook";
 import { CreateWebhookFormFields } from "./components/create-webhook-form-fields";
-import { CreateWebhookHeader } from "./components/create-webhook-header";
-import { CreateWebhookInfo } from "./components/create-webhook-info";
 import { useCreateWebhookForm } from "./components/use-create-webhook-form";
 
 export function CreateWebhookPage() {
+	const navigate = useNavigate();
 	const { form, isLoading, onSubmit } = useCreateWebhookForm();
 
+	useHotkeys(
+		"mod+enter",
+		(e) => {
+			e.preventDefault();
+			if (!isLoading) void onSubmit();
+		},
+		{ enableOnFormTags: true },
+	);
+
 	return (
-		<div className="mx-auto mb-10 w-full max-w-4xl space-y-6 px-6 lg:px-8">
-			<CreateWebhookHeader />
-			<form
-				onSubmit={onSubmit}
-				className="grid grid-cols-1 gap-8 lg:grid-cols-12"
-			>
+		<div className="mx-auto w-full max-w-xl space-y-8 p-6 pb-16 lg:p-8">
+			<div>
+				<AnimatedBackButton
+					onClick={() => void navigate({ to: "/webhooks" })}
+				/>
+				<div className="pt-4">
+					<h1 className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
+						Create a webhook
+					</h1>
+					<p className="mt-1 text-paragraph-md text-text-sub-600 leading-relaxed">
+						Register an endpoint to receive signed event payloads in real time.
+					</p>
+				</div>
+			</div>
+
+			<form onSubmit={onSubmit}>
 				<CreateWebhookFormFields form={form} />
-				<CreateWebhookInfo />
-				<CreateWebhookActions isLoading={isLoading} />
+
+				<div className="mt-8 flex items-center justify-end gap-3">
+					<Button.Root
+						type="button"
+						variant="neutral"
+						mode="stroke"
+						size="small"
+						onClick={() => void navigate({ to: "/webhooks" })}
+						disabled={isLoading}
+						className="rounded-xl"
+					>
+						Cancel
+					</Button.Root>
+					<FancyButton.Root
+						type="submit"
+						variant="blue"
+						size="small"
+						disabled={isLoading}
+						className="min-w-[140px] gap-1.5 rounded-xl"
+					>
+						{isLoading ? (
+							<>
+								<Spinner size={14} color="currentColor" />
+								Creating...
+							</>
+						) : (
+							<>
+								Create webhook
+								<span className="inline-flex items-center gap-0.5 opacity-80">
+									<Icon
+										name="command"
+										className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+									/>
+									<Icon
+										name="enter"
+										className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
+									/>
+								</span>
+							</>
+						)}
+					</FancyButton.Root>
+				</div>
 			</form>
 		</div>
 	);
