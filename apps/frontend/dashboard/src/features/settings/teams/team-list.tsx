@@ -416,8 +416,6 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 	const handleConfirmRevoke = async () => {
 		if (!inviteToRevoke) return;
 		await handleCancelInvite(inviteToRevoke.id);
-		setModal(null);
-		setInviteId(null);
 	};
 
 	const isLoading = membersLoading || invitesLoading || !membersData;

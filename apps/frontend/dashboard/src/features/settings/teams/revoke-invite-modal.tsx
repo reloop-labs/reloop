@@ -52,8 +52,10 @@ export const RevokeInviteModal = ({
 			setStatus("success");
 			setTimeout(() => {
 				onOpenChange(false);
-				setStatus("idle");
-			}, 1200);
+				setTimeout(() => {
+					setStatus("idle");
+				}, 300);
+			}, 1000);
 		} catch {
 			setStatus("idle");
 		}
@@ -208,15 +210,17 @@ export const RevokeInviteModal = ({
 						onPointerCancel={cancelHold}
 						className={cn(
 							"relative min-w-[134px] select-none justify-center overflow-hidden transition-all duration-200 font-medium",
-							status !== "idle" && "pointer-events-none opacity-90",
+							status === "revoking" && "pointer-events-none opacity-90",
 						)}
-						disabled={status !== "idle"}
+						disabled={status === "revoking"}
 					>
 						{/* Hold progress overlay fill */}
-						<motion.div
-							className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
-							style={{ scaleX: holdProgress }}
-						/>
+						{status === "idle" && (
+							<motion.div
+								className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
+								style={{ scaleX: holdProgress }}
+							/>
+						)}
 
 						<AnimatePresence mode="popLayout" initial={false}>
 							<motion.span
@@ -238,7 +242,10 @@ export const RevokeInviteModal = ({
 									</>
 								) : status === "success" ? (
 									<>
-										<Icon name="check" className="h-4 w-4 shrink-0 text-white" />
+										<Icon
+											name="check-circle"
+											className="h-4 w-4 shrink-0 text-white"
+										/>
 										<span>Revoked</span>
 									</>
 								) : (
