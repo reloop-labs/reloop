@@ -94,7 +94,6 @@ export const TriggerWebhookTester = ({
 	);
 	const [isTriggering, setIsTriggering] = useState(false);
 	const [result, setResult] = useState<TriggerResult | null>(null);
-	const [isCopyingPayload, setIsCopyingPayload] = useState(false);
 
 	const selectedEvent = useMemo(
 		() => filteredEvents.find((e) => e.id === selectedEventId),
@@ -105,8 +104,6 @@ export const TriggerWebhookTester = ({
 		if (!selectedEvent) return {};
 		return getPayloadForEvent(selectedEvent.id);
 	}, [selectedEvent]);
-
-	const payloadString = JSON.stringify(payload, null, 2);
 
 	useHotkeys(
 		"mod+enter",
@@ -120,16 +117,6 @@ export const TriggerWebhookTester = ({
 	const handleSelectEvent = (eventId: string) => {
 		setSelectedEventId(eventId);
 		setResult(null);
-	};
-
-	const handleCopyPayload = async () => {
-		try {
-			await navigator.clipboard.writeText(payloadString);
-			setIsCopyingPayload(true);
-			setTimeout(() => setIsCopyingPayload(false), 2000);
-		} catch {
-			toast.error("Failed to copy payload");
-		}
 	};
 
 	const handleTrigger = async () => {
@@ -319,47 +306,8 @@ export const TriggerWebhookTester = ({
 					</div>
 				</div>
 
-				{/* ── Right: Payload + delivery result ── */}
-				<div className="flex min-w-0 flex-col gap-4">
-					{/* Payload card */}
-					<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/40">
-						<div className="m-0.5 space-y-3 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-4 pt-4 pb-3 dark:border-stroke-soft-100/40">
-							<div className="flex items-start justify-between gap-3">
-								<div>
-									<p className="font-medium text-sm text-text-strong-950">
-										Payload
-									</p>
-									<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
-										Sample{" "}
-										<code className="font-mono text-[11px]">data</code> sent
-										with this event.
-									</p>
-								</div>
-								<button
-									type="button"
-									onClick={() => void handleCopyPayload()}
-									className={cn(
-										"inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5",
-										"font-medium text-[12px] text-text-sub-600 transition-colors",
-										"hover:bg-bg-weak-50 hover:text-text-strong-950",
-										isCopyingPayload &&
-											"text-success-base hover:text-success-base",
-									)}
-								>
-									<Icon
-										name={isCopyingPayload ? "check" : "copy"}
-										className="h-3.5 w-3.5"
-									/>
-									{isCopyingPayload ? "Copied" : "Copy"}
-								</button>
-							</div>
-							<pre className="max-h-[min(280px,40vh)] overflow-auto rounded-xl bg-bg-weak-50 p-3 font-mono text-[12px] text-text-strong-950 leading-relaxed dark:bg-bg-weak-50/50">
-								{payloadString}
-							</pre>
-						</div>
-					</div>
-
-					{/* Delivery result */}
+				{/* ── Right: Delivery result ── */}
+				<div className="min-w-0">
 					{result ? (
 						<div
 							className={cn(
@@ -404,7 +352,7 @@ export const TriggerWebhookTester = ({
 									</div>
 								</div>
 								{result.responseBody ? (
-									<pre className="max-h-[200px] overflow-auto rounded-xl bg-bg-weak-50 p-3 font-mono text-[11px] text-text-strong-950 leading-relaxed dark:bg-bg-weak-50/50">
+									<pre className="max-h-[min(360px,50vh)] overflow-auto rounded-xl bg-bg-weak-50 p-3 font-mono text-[11px] text-text-strong-950 leading-relaxed dark:bg-bg-weak-50/50">
 										{result.responseBody}
 									</pre>
 								) : null}
@@ -412,7 +360,7 @@ export const TriggerWebhookTester = ({
 						</div>
 					) : (
 						<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 border-dashed bg-bg-soft-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20">
-							<div className="flex flex-col items-center justify-center gap-2 px-4 py-10 text-center">
+							<div className="flex flex-col items-center justify-center gap-2 px-4 py-16 text-center">
 								<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-bg-white-0 ring-1 ring-stroke-soft-100 dark:bg-bg-white-0/5 dark:ring-stroke-soft-100/40">
 									<Icon name="send" className="h-4 w-4 text-text-sub-600" />
 								</div>
@@ -420,7 +368,7 @@ export const TriggerWebhookTester = ({
 									Ready to send
 								</p>
 								<p className="max-w-[220px] text-[12px] text-text-sub-600 leading-relaxed">
-									Pick an event on the left, then send a test delivery.
+									Pick an event, then send a test delivery.
 								</p>
 							</div>
 						</div>

@@ -50,37 +50,47 @@ export function WebhookTestPage({ webhookId }: { webhookId: string }) {
 
 	return (
 		<div className="mx-auto w-full max-w-4xl space-y-8 p-6 pb-16 lg:p-8">
-			{/* Header — matches detail page */}
 			<div>
 				<div className="pt-1">
 					<AnimatedBackButton onClick={goBack} />
 				</div>
 
+				{/* Page title — create-style */}
 				<div className="pt-6">
+					<h1 className="font-semibold text-lg text-text-strong-950 tracking-tight">
+						Test webhook events
+					</h1>
+					<p className="mt-1 text-sm text-text-sub-600 leading-relaxed">
+						Send a sample event to verify your endpoint.
+					</p>
+				</div>
+
+				{/* Target webhook identity */}
+				<div className="mt-5">
 					{isLoading ? (
 						<div className="flex items-center gap-3">
 							<Skeleton className="h-10 w-10 shrink-0 rounded-[12px]" />
 							<div className="flex min-w-0 flex-col gap-1.5">
 								<div className="flex items-center gap-2">
-									<Skeleton className="h-6 w-40 rounded-lg" />
+									<Skeleton className="h-5 w-36 rounded-lg" />
 									<Skeleton className="h-5 w-16 rounded-full" />
 								</div>
-								<Skeleton className="h-4 w-72 rounded-lg" />
+								<Skeleton className="h-4 w-56 rounded-lg" />
 							</div>
 						</div>
-					) : (
+					) : webhook ? (
 						<div className="flex min-w-0 items-center gap-3">
 							<WebhookAvatar
-								seed={webhook?.id || displayName}
+								seed={webhook.id || displayName}
 								size="md"
 								alt={`${displayName} avatar`}
 							/>
 							<div className="min-w-0">
 								<div className="flex min-w-0 flex-wrap items-center gap-2">
-									<h1 className="truncate font-semibold text-text-strong-950 text-title-h6 leading-8 tracking-tight">
+									<p className="truncate font-semibold text-text-strong-950 text-title-h6 leading-8 tracking-tight">
 										{displayName}
-									</h1>
-									{webhook?.status ? (
+									</p>
+									{webhook.status ? (
 										<span
 											className={cn(
 												"inline-flex shrink-0 items-center rounded-full px-2 py-0.5 font-medium text-[11px]",
@@ -92,24 +102,18 @@ export function WebhookTestPage({ webhookId }: { webhookId: string }) {
 									) : null}
 								</div>
 								<p className="truncate font-medium font-mono text-[13px] text-text-sub-600 leading-snug">
-									{webhook?.url}
-								</p>
-								<p className="mt-1 text-[13px] text-text-sub-600">
-									Send a test event to this endpoint
+									{webhook.url}
 								</p>
 							</div>
 						</div>
-					)}
+					) : null}
 				</div>
 			</div>
 
 			{isLoading ? (
 				<div className="grid gap-4 lg:grid-cols-2">
 					<Skeleton className="h-80 w-full rounded-[18px]" />
-					<div className="space-y-4">
-						<Skeleton className="h-48 w-full rounded-[18px]" />
-						<Skeleton className="h-32 w-full rounded-[18px]" />
-					</div>
+					<Skeleton className="h-64 w-full rounded-[18px]" />
 				</div>
 			) : webhook ? (
 				<TriggerWebhookTester
