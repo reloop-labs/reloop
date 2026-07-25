@@ -1,13 +1,12 @@
 import type { WebhookDetailData } from "#/features/webhooks/hooks/use-webhooks-query";
 import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
-import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import * as Input from "@reloop/ui/input";
 import { Skeleton } from "@reloop/ui/skeleton";
+import * as Tooltip from "@reloop/ui/tooltip";
 import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import axios from "axios";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { RotateWebhookSecretModal } from "./rotate-webhook-secret-modal";
 
@@ -37,6 +36,47 @@ const CATEGORY_META: Record<
 	},
 };
 
+function IconAction({
+	label,
+	icon,
+	onClick,
+	disabled,
+	active,
+}: {
+	label: string;
+	icon: string;
+	onClick: () => void;
+	disabled?: boolean;
+	active?: boolean;
+}) {
+	return (
+		<Tooltip.Provider delayDuration={200}>
+			<Tooltip.Root>
+				<Tooltip.Trigger asChild>
+					<button
+						type="button"
+						onClick={onClick}
+						disabled={disabled}
+						className={cn(
+							"flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-text-sub-600 transition-colors",
+							"hover:bg-bg-weak-50 hover:text-text-strong-950",
+							"disabled:pointer-events-none disabled:opacity-40",
+							"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-strong-950/20",
+							active && "text-success-base hover:text-success-base",
+						)}
+						aria-label={label}
+					>
+						<Icon name={icon} className="h-4 w-4" />
+					</button>
+				</Tooltip.Trigger>
+				<Tooltip.Content side="top" size="small">
+					{label}
+				</Tooltip.Content>
+			</Tooltip.Root>
+		</Tooltip.Provider>
+	);
+}
+
 /** Always-visible signing secret + subscribed events (above tabs). */
 export function WebhookSecretEvents({
 	webhook,
@@ -51,7 +91,7 @@ export function WebhookSecretEvents({
 	const [isRotatingSecret, setIsRotatingSecret] = useState(false);
 	const [isRotateModalOpen, setIsRotateModalOpen] = useState(false);
 
-	const handleCopySecret = async () => {
+	const handleCopySecret = useCallback(async () => {
 		if (!webhook?.secret) return;
 		try {
 			await navigator.clipboard.writeText(webhook.secret);
@@ -61,7 +101,7 @@ export function WebhookSecretEvents({
 		} catch {
 			toast.error("Failed to copy secret");
 		}
-	};
+	}, [webhook?.secret]);
 
 	const handleRotateSecret = async () => {
 		if (!webhook) return;
@@ -81,6 +121,7 @@ export function WebhookSecretEvents({
 			await invalidate();
 			toast.success("Webhook secret rotated successfully");
 			setIsRotateModalOpen(false);
+			setIsSecretVisible(false);
 		} catch {
 			toast.error("Failed to rotate webhook secret");
 		} finally {
@@ -93,113 +134,90 @@ export function WebhookSecretEvents({
 		: isSecretVisible
 			? webhook.secret
 			: webhook.secret.startsWith("whsec_")
-				? `whsec_${"•".repeat(28)}`
-				: "•".repeat(32);
+				? `whsec_${"•".repeat(24)}`
+				: "•".repeat(28);
 
 	return (
 		<>
 			<div className="mt-8 grid gap-4 lg:grid-cols-2">
 				{/* Signing secret */}
-				<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/40">
-					<div className="m-0.5 space-y-3 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-4 dark:border-stroke-soft-100/40">
-						<div>
-							<div className="flex items-center gap-1.5">
-								<Icon name="key-new" className="h-3.5 w-3.5 text-text-sub-600" />
-								<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
+				<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+					<div className="space-y-3 p-4">
+						<div className="flex items-start justify-between gap-3">
+							<div>
+								<p className="font-medium text-sm text-text-strong-950">
 									Signing secret
-								</span>
+								</p>
+								<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
+									Used to verify webhook signatures on your server.
+								</p>
 							</div>
-							<p className="mt-1 text-[12px] text-text-sub-600 leading-relaxed">
-								Used to verify webhook signatures on your server.
-							</p>
+							<button
+								type="button"
+								onClick={() => setIsRotateModalOpen(true)}
+								disabled={!webhook?.secret || isRotatingSecret || isLoading}
+								className={cn(
+									"inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5",
+									"font-medium text-[12px] text-text-sub-600 transition-colors",
+									"hover:bg-bg-weak-50 hover:text-text-strong-950",
+									"disabled:pointer-events-none disabled:opacity-40",
+								)}
+							>
+								<Icon
+									name={isRotatingSecret ? "loader-2" : "rotate-cw"}
+									className={cn(
+										"h-3.5 w-3.5",
+										isRotatingSecret && "animate-spin",
+									)}
+								/>
+								Rotate
+							</button>
 						</div>
 
 						{isLoading ? (
-							<Skeleton className="h-9 w-full rounded-xl" />
+							<Skeleton className="h-10 w-full rounded-xl" />
 						) : (
-							<Input.Root size="small">
-								<Input.Wrapper>
-									<Input.Input
-										readOnly
-										className="font-medium font-mono text-text-strong-950 text-xs"
-										value={maskedSecret}
-									/>
-									{webhook?.secret ? (
-										<Input.InlineAffix className="mr-1 flex items-center gap-1">
-											<Button.Root
-												variant="neutral"
-												mode="stroke"
-												size="xxsmall"
-												className="h-7 w-7 p-0"
-												onClick={() => setIsSecretVisible((v) => !v)}
-												title={
-													isSecretVisible ? "Hide secret" : "Show secret"
-												}
-											>
-												<Icon
-													name={
-														isSecretVisible
-															? "eye-outline"
-															: "eye-slash-outline"
-													}
-													className="h-3.5 w-3.5 text-text-sub-600"
-												/>
-											</Button.Root>
-											<Button.Root
-												variant="neutral"
-												mode="stroke"
-												size="xxsmall"
-												className="h-7 w-7 p-0"
-												onClick={() => void handleCopySecret()}
-												title="Copy secret"
-											>
-												<Icon
-													name={copiedSecret ? "check" : "copy"}
-													className={cn(
-														"h-3.5 w-3.5",
-														copiedSecret
-															? "text-success-base"
-															: "text-text-sub-600",
-													)}
-												/>
-											</Button.Root>
-											<Button.Root
-												variant="neutral"
-												mode="stroke"
-												size="xxsmall"
-												className="h-7 w-7 p-0"
-												onClick={() => setIsRotateModalOpen(true)}
-												disabled={isRotatingSecret}
-												title="Rotate secret"
-											>
-												<Icon
-													name={isRotatingSecret ? "loader-2" : "rotate-cw"}
-													className={cn(
-														"h-3.5 w-3.5 text-text-sub-600",
-														isRotatingSecret && "animate-spin",
-													)}
-												/>
-											</Button.Root>
-										</Input.InlineAffix>
-									) : null}
-								</Input.Wrapper>
-							</Input.Root>
+							<div className="flex items-center gap-1 rounded-xl bg-bg-weak-50 py-1 pr-1 pl-3 dark:bg-bg-weak-50/50">
+								<code
+									className={cn(
+										"min-w-0 flex-1 truncate font-mono text-[13px] text-text-strong-950 tracking-tight",
+										!isSecretVisible && "select-none",
+									)}
+									title={isSecretVisible ? webhook?.secret ?? undefined : undefined}
+								>
+									{maskedSecret}
+								</code>
+								{webhook?.secret ? (
+									<div className="flex shrink-0 items-center">
+										<IconAction
+											label={isSecretVisible ? "Hide secret" : "Show secret"}
+											icon={
+												isSecretVisible ? "eye-outline" : "eye-slash-outline"
+											}
+											onClick={() => setIsSecretVisible((v) => !v)}
+										/>
+										<IconAction
+											label={copiedSecret ? "Copied" : "Copy secret"}
+											icon={copiedSecret ? "check" : "copy"}
+											onClick={() => void handleCopySecret()}
+											active={copiedSecret}
+										/>
+									</div>
+								) : null}
+							</div>
 						)}
 					</div>
 				</div>
 
 				{/* Subscribed events */}
-				<div className="overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/40">
-					<div className="m-0.5 space-y-3 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-4 dark:border-stroke-soft-100/40">
+				<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+					<div className="space-y-3 p-4">
 						<div className="flex items-start justify-between gap-3">
 							<div>
-								<div className="flex items-center gap-1.5">
-									<Icon name="list" className="h-3.5 w-3.5 text-text-sub-600" />
-									<span className="font-medium text-[10px] text-text-sub-600 uppercase tracking-wider">
-										Subscribed events
-									</span>
-								</div>
-								<p className="mt-1 text-[12px] text-text-sub-600 leading-relaxed">
+								<p className="font-medium text-sm text-text-strong-950">
+									Subscribed events
+								</p>
+								<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
 									Event types this endpoint receives.
 								</p>
 							</div>
@@ -217,7 +235,7 @@ export function WebhookSecretEvents({
 								<Skeleton className="h-7 w-24 rounded-lg" />
 							</div>
 						) : webhook?.events?.length ? (
-							<div className="flex max-h-[140px] flex-wrap gap-1.5 overflow-y-auto">
+							<div className="flex max-h-[120px] flex-wrap gap-1.5 overflow-y-auto">
 								{webhook.events.map((eventId) => {
 									const def = WEBHOOK_EVENTS.find((e) => e.id === eventId);
 									const meta = def ? CATEGORY_META[def.category] : undefined;
