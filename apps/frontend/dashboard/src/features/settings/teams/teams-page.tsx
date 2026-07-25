@@ -54,11 +54,11 @@ export function TeamsPage() {
 				</p>
 			</div>
 
-			<div className="flex items-center gap-3">
+			<div className="flex items-center gap-2">
 				<div className="flex-1">
-					<Input.Root size="xsmall" className="rounded-[10px]!">
+					<Input.Root size="small" className="rounded-xl">
 						<Input.Wrapper>
-							<Input.Icon as={Icon} name="search" size="xsmall" />
+							<Input.Icon as={Icon} name="search" size="small" />
 							<Input.Input
 								placeholder="Search name or email"
 								value={searchQuery}
@@ -73,9 +73,9 @@ export function TeamsPage() {
 				{canInvite && (
 					<FancyButton.Root
 						variant="blue"
-						size="xsmall"
+						size="small"
 						onClick={() => void setModal("invite")}
-						className="rounded-[10px] font-medium"
+						className="h-9 rounded-xl font-medium"
 					>
 						<FancyButton.Icon as={Icon} name="user-plus" />
 						<span>Invite members</span>
