@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { mainNavigation } from "../navigation";
+import { SidebarNavIcon } from "./sidebar-nav-icon";
 
 export function SidebarItems({
 	isCollapsed = false,
@@ -132,16 +133,10 @@ export function SidebarItems({
 									isCollapsed ? "" : "gap-2.5",
 								)}
 							>
-								<Icon
+								<SidebarNavIcon
 									name={iconName}
-									className={cn(
-										"h-4 w-4 shrink-0 transition-all duration-200",
-										isSpecial
-											? ""
-											: activeMainIndex === index
-												? "text-text-strong-950"
-												: "text-text-sub-600 opacity-70 group-hover:text-text-strong-950 group-hover:opacity-100",
-									)}
+									isSpecial={isSpecial}
+									isActive={activeMainIndex === index}
 								/>
 								{!isCollapsed && (
 									<span
@@ -229,14 +224,10 @@ export function SidebarItems({
 																	: "text-text-sub-600 hover:text-text-strong-950",
 															)}
 														>
-															<Icon
+															<SidebarNavIcon
 																name={subIcon}
-																className={cn(
-																	"h-3.5 w-3.5 shrink-0 transition-colors",
-																	isSubActive
-																		? "text-text-strong-950"
-																		: "opacity-70 group-hover:text-text-strong-950 group-hover:opacity-100",
-																)}
+																isActive={isSubActive}
+																className="h-3.5 w-3.5"
 															/>
 															{subLabel}
 														</Link>

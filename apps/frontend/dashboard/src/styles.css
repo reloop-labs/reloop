@@ -35,6 +35,25 @@
 @theme inline {
   --font-sans: "Open Runde", ui-sans-serif, system-ui, sans-serif;
   --font-geist-sans: "Open Runde", ui-sans-serif, system-ui, sans-serif;
+  --animate-door-draw-left: stroke-draw 0.28s ease-out both;
+  --animate-door-draw-top: stroke-draw 0.32s ease-out 0.1s both;
+  --animate-door-draw-right: stroke-draw 0.28s ease-out 0.22s both;
+  --animate-inbox-draw-top: stroke-draw 0.3s ease-out both;
+  --animate-inbox-draw-bottom: stroke-draw 0.3s ease-out 0.12s both;
+  --animate-contacts-draw-top: stroke-draw 0.3s ease-out both;
+  --animate-contacts-draw-bottom: stroke-draw 0.3s ease-out 0.12s both;
+  --animate-tag-hole-draw: stroke-draw 0.35s ease-out both;
+  --animate-groups-draw-front: stroke-draw 0.32s ease-out both;
+  --animate-groups-draw-back: stroke-draw 0.28s ease-out 0.1s both;
+}
+
+@keyframes stroke-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
