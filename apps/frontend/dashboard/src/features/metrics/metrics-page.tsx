@@ -12,11 +12,16 @@ import {
 	getLocalKey,
 	getYearMonthDayKey,
 } from "#/features/metrics/utils";
+import { queryKeys } from "#/lib/query-keys";
+import { Icon } from "@reloop/ui/icon";
+import { useQueryClient } from "@tanstack/react-query";
 import { parseAsString, useQueryState } from "nuqs";
 import { useMemo } from "react";
+import { MetricsListHeader } from "./metrics-list-header";
 
 export function MetricsPage() {
 	const { activeOrganization } = useActiveOrganization();
+	const queryClient = useQueryClient();
 	const [selectedDomain, setSelectedDomain] = useQueryState(
 		"domain",
 		parseAsString.withDefault(""),
@@ -70,12 +75,22 @@ export function MetricsPage() {
 		void setDatePreset(preset || "");
 	};
 
-	const { data } = useEmailStatsQuery({
+	const statsParams = {
 		startDate: effectiveStartDate,
 		endDate: effectiveEndDate,
 		domain: selectedDomain ?? "",
+	};
+
+	const { data, isFetching } = useEmailStatsQuery({
+		...statsParams,
 		enabled: !!activeOrganization?.id,
 	});
+
+	const handleRefresh = () => {
+		void queryClient.invalidateQueries({
+			queryKey: queryKeys.metrics.emailStats(statsParams),
+		});
+	};
 
 	const stats = useMemo(() => {
 		if (!data) return null;
@@ -258,12 +273,12 @@ export function MetricsPage() {
 	}, [data, effectiveStartDate, effectiveEndDate]);
 
 	return (
-		<div className="mx-auto max-w-4xl px-4 py-10 sm:px-8">
-			<div className="flex items-center justify-between pb-10">
-				<div className="flex flex-col gap-1">
-					<h1 className="font-medium text-2xl">Metrics</h1>
-				</div>
-				<div className="flex items-center gap-2">
+		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
+			<MetricsListHeader />
+
+			<div className="pb-8">
+				{/* Toolbar */}
+				<div className="flex flex-wrap items-center gap-2">
 					<DateRangeFilter
 						startDate={effectiveStartDate || null}
 						endDate={effectiveEndDate || null}
@@ -271,59 +286,70 @@ export function MetricsPage() {
 						onDateChange={handleDateChange}
 						numberOfMonths={2}
 						maxDays={30}
-						align="end"
+						align="start"
 					/>
 					<DomainSelector
 						value={selectedDomain ?? ""}
 						onChange={(val: string) => {
 							void setSelectedDomain(val);
 						}}
-						align="end"
+						align="start"
 					/>
+					<button
+						type="button"
+						onClick={handleRefresh}
+						className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40"
+						title="Refresh metrics"
+					>
+						<Icon
+							name="rotate-cw"
+							className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+						/>
+					</button>
 				</div>
-			</div>
 
-			<div className="flex flex-col gap-6 pb-20">
-				<DeliverabilityChart
-					startDate={effectiveStartDate}
-					endDate={effectiveEndDate}
-					domain={selectedDomain ?? ""}
-				/>
+				<div className="mt-4 flex flex-col gap-6">
+					<DeliverabilityChart
+						startDate={effectiveStartDate}
+						endDate={effectiveEndDate}
+						domain={selectedDomain ?? ""}
+					/>
 
-				<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-					<RateChart
-						title="Bounce Rate"
-						rate={stats?.bounceRate || 0}
-						data={
-							stats?.chartData.map((d) => ({
-								date: d.date,
-								rate: d.bounceRate,
-								sent: d.sent,
-								bounced: d.bounced,
-								deliveryRate: d.deliveryRate,
-							})) || []
-						}
-						breakdown={stats?.breakdown.bounce || []}
-						color="#F04438"
-						riskValue={4}
-					/>
-					<RateChart
-						title="Complain Rate"
-						rate={stats?.complaintRate || 0}
-						data={
-							stats?.chartData.map((d) => ({
-								date: d.date,
-								rate: d.complaintRate,
-								sent: d.sent,
-								bounced: d.bounced,
-								deliveryRate: d.deliveryRate,
-							})) || []
-						}
-						breakdown={stats?.breakdown.complaint || []}
-						color="#FDB022"
-						yAxisDomain={[0, 0.2]}
-						riskValue={0.08}
-					/>
+					<div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+						<RateChart
+							title="Bounce Rate"
+							rate={stats?.bounceRate || 0}
+							data={
+								stats?.chartData.map((d) => ({
+									date: d.date,
+									rate: d.bounceRate,
+									sent: d.sent,
+									bounced: d.bounced,
+									deliveryRate: d.deliveryRate,
+								})) || []
+							}
+							breakdown={stats?.breakdown.bounce || []}
+							color="#F04438"
+							riskValue={4}
+						/>
+						<RateChart
+							title="Complain Rate"
+							rate={stats?.complaintRate || 0}
+							data={
+								stats?.chartData.map((d) => ({
+									date: d.date,
+									rate: d.complaintRate,
+									sent: d.sent,
+									bounced: d.bounced,
+									deliveryRate: d.deliveryRate,
+								})) || []
+							}
+							breakdown={stats?.breakdown.complaint || []}
+							color="#FDB022"
+							yAxisDomain={[0, 0.2]}
+							riskValue={0.08}
+						/>
+					</div>
 				</div>
 			</div>
 		</div>

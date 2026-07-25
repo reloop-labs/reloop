@@ -19,6 +19,7 @@ interface TemplateGridProps {
 	isLoading: boolean;
 	loadingRows?: number;
 	onMutate: () => void;
+	onDeleteSuccess?: (deletedName: string) => void;
 }
 
 interface TemplateDropdownProps {
@@ -269,6 +270,7 @@ export const TemplateGrid = ({
 	isLoading,
 	loadingRows = 6,
 	onMutate,
+	onDeleteSuccess,
 }: TemplateGridProps) => {
 	const navigate = useNavigate();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
@@ -294,6 +296,7 @@ export const TemplateGrid = ({
 
 	const handleDeleteConfirm = async () => {
 		if (!templateToDelete) return;
+		const name = templateToDelete.name;
 		try {
 			const res = await fetch(`/api/template/v1/${templateToDelete.id}`, {
 				method: "DELETE",
@@ -301,12 +304,10 @@ export const TemplateGrid = ({
 			});
 			if (!res.ok) throw new Error("delete failed");
 			onMutate();
-			toast.success("Template deleted");
+			onDeleteSuccess?.(name);
 		} catch {
 			toast.error("Failed to delete template");
-		} finally {
-			setIsDeleteModalOpen(false);
-			setTemplateToDelete(null);
+			throw new Error("delete failed");
 		}
 	};
 
@@ -330,12 +331,6 @@ export const TemplateGrid = ({
 						// biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
 						<TemplateSkeleton key={`skeleton-${i}`} />
 					))
-				) : templates.length === 0 ? (
-					<div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/40 px-6 py-16 text-center dark:border-stroke-soft-100/40">
-						<p className="text-paragraph-sm text-text-sub-600">
-							No templates found
-						</p>
-					</div>
 				) : (
 					templates.map((template) => {
 						const isCardActive = activeDropdownId === template.id;
@@ -429,7 +424,7 @@ export const TemplateGrid = ({
 					setIsDeleteModalOpen(false);
 					setTemplateToDelete(null);
 				}}
-				onConfirm={() => void handleDeleteConfirm()}
+				onConfirm={handleDeleteConfirm}
 				templateName={templateToDelete?.name || "Template"}
 			/>
 		</div>

@@ -1,4 +1,4 @@
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useNavigate } from "@tanstack/react-router";
@@ -9,12 +9,19 @@ import {
 	useInvalidateTemplates,
 } from "#/features/templates/hooks/use-templates-query";
 
-export const EmptyState = () => {
+export const EmptyState = ({
+	isFiltered = false,
+	onClearFilters,
+}: {
+	isFiltered?: boolean;
+	onClearFilters?: () => void;
+}) => {
 	const navigate = useNavigate();
 	const invalidate = useInvalidateTemplates();
 	const [isCreating, setIsCreating] = useState(false);
 
 	const handleCreateTemplate = async () => {
+		if (isCreating) return;
 		setIsCreating(true);
 		try {
 			const template = await createTemplate();
@@ -31,50 +38,52 @@ export const EmptyState = () => {
 	};
 
 	return (
-		<div className="flex flex-col items-center rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/40 px-6 py-16 text-center dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/20">
-			<div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
-				<Icon name="file-text" className="h-5 w-5 text-text-sub-600" />
+		<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
+			<div className="mb-4 flex items-center justify-center">
+				<Icon
+					name={isFiltered ? "search" : "layout"}
+					className="h-8 w-8 text-text-sub-600"
+				/>
 			</div>
-			<h3 className="mb-2 font-semibold text-label-lg text-text-strong-950">
-				No templates yet
+			<h3 className="mb-2 font-semibold text-text-strong-950 text-xl">
+				{isFiltered ? "No templates found" : "Create your first template"}
 			</h3>
-			<p className="mx-auto mb-6 max-w-[300px] text-balance text-paragraph-xs text-text-sub-600">
-				Design reusable emails with drag-and-drop. Start from scratch or pick a
-				preset layout.
+			<p className="mx-auto mb-6 max-w-75 text-balance font-medium text-[12px] text-text-sub-600">
+				{isFiltered
+					? "Try adjusting your search or filters."
+					: "Design reusable emails with drag-and-drop, then send them via API or campaigns."}
 			</p>
-			<div className="flex items-center gap-3">
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
-					size="xsmall"
+			{isFiltered && onClearFilters ? (
+				<button
+					type="button"
+					onClick={onClearFilters}
+					className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-stroke-soft-100 bg-bg-white-0 px-3 font-medium text-sm text-text-strong-950 transition-colors hover:bg-bg-weak-50 dark:border-stroke-soft-100/40"
+				>
+					<Icon name="cross-circle" className="h-4 w-4 text-text-sub-600" />
+					Clear filters
+				</button>
+			) : (
+				<FancyButton.Root
+					type="button"
+					variant="blue"
+					size="small"
 					onClick={() => void handleCreateTemplate()}
 					disabled={isCreating}
-					className="gap-2"
+					className="gap-1.5 rounded-xl"
 				>
 					{isCreating ? (
-						<Spinner size={14} />
+						<>
+							<Spinner size={14} color="currentColor" />
+							Creating...
+						</>
 					) : (
-						<Icon name="plus" className="h-4 w-4" />
+						<>
+							<Icon name="plus" className="h-4 w-4" />
+							Create template
+						</>
 					)}
-					{isCreating ? "Creating..." : "Create template"}
-				</Button.Root>
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
-					size="xsmall"
-					asChild
-					className="gap-2"
-				>
-					<a
-						href="https://reloop.sh/docs/templates"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<Icon name="book-open" className="h-3.5 w-3.5" />
-						Read the docs
-					</a>
-				</Button.Root>
-			</div>
+				</FancyButton.Root>
+			)}
 		</div>
 	);
 };

@@ -11,5 +11,5 @@ export interface WebhookData {
 
 export interface DeleteWebhookModalProps {
 	webhook?: WebhookData | null;
-	onSuccess?: () => void;
+	onSuccess?: (deletedName?: string) => void;
 }

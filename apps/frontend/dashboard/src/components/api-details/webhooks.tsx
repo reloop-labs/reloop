@@ -1,6 +1,9 @@
 import type * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { ApiDetailsDrawer } from "./api-details-drawer";
+import {
+	ApiDetailsDrawer,
+	type ApiDetailsDrawerProps,
+} from "./api-details-drawer";
 import { codeExamples } from "./webhooks-code-examples";
 
 const operations = [
@@ -35,18 +38,27 @@ const languages = [
 
 type ButtonProps = React.ComponentPropsWithoutRef<typeof Button.Root>;
 
-export const WebhooksApiDetails = (props: ButtonProps) => {
+export const WebhooksApiDetails = ({
+	renderTrigger,
+	...buttonProps
+}: ButtonProps & Pick<ApiDetailsDrawerProps, "renderTrigger">) => {
 	return (
 		<ApiDetailsDrawer
 			title="Webhooks API"
-			icon={<Icon name="webhook" className="h-6 w-6 text-text-strong-950 dark:text-white" />}
+			icon={
+				<Icon
+					name="webhook"
+					className="h-6 w-6 text-text-strong-950 dark:text-white"
+				/>
+			}
 			hotkey="c"
 			languages={languages}
 			operations={operations}
 			codeExamples={codeExamples}
 			docSection="webhooks"
-			buttonProps={props}
+			buttonProps={buttonProps}
 			codeExtraPadding={true}
+			renderTrigger={renderTrigger}
 		/>
 	);
 };

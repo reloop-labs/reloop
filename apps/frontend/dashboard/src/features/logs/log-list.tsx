@@ -2,10 +2,13 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
+import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
+import { useQueryClient } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "motion/react";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
+import { queryKeys } from "#/lib/query-keys";
 import { DateRangeFilter } from "./date-range-filter";
 import { useLogsQuery } from "./hooks/use-logs-query";
 import { LogDetailPanel } from "./log-detail-panel";
@@ -27,13 +30,13 @@ const OUTCOME_TABS: {
 		id: "succeeded",
 		label: "Success",
 		icon: "check-circle",
-		iconColor: "text-green-500",
+		iconColor: "text-success-base",
 	},
 	{
 		id: "failed",
 		label: "Failed",
 		icon: "cross-circle",
-		iconColor: "text-red-500",
+		iconColor: "text-error-base",
 	},
 ];
 
@@ -61,6 +64,7 @@ export function LogList({
 	hideDocs?: boolean;
 }) {
 	const { activeOrganization } = useActiveOrganization();
+	const queryClient = useQueryClient();
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
@@ -103,11 +107,10 @@ export function LogList({
 		parseAsString.withDefault(""),
 	);
 
-	const activeIdx = OUTCOME_TABS.findIndex((tab) => tab.id === outcomeTab);
-	const activeEl = buttonRefs.current[activeIdx];
-	const currentEl =
-		hoveredIdx !== undefined ? buttonRefs.current[hoveredIdx] : activeEl;
-	const currentRect = currentEl?.getBoundingClientRect();
+	const activeIndex = OUTCOME_TABS.findIndex((tab) => tab.id === outcomeTab);
+	const currentIdx = hoveredIdx !== undefined ? hoveredIdx : activeIndex;
+	const tabEl = buttonRefs.current[currentIdx];
+	const rect = tabEl?.getBoundingClientRect();
 
 	// Mobile drawer state (for narrow viewports)
 	const [drawerOpen, setDrawerOpen] = useState(false);
@@ -119,7 +122,7 @@ export function LogList({
 		}
 	}, [isMobile, selectedLogId]);
 
-	const { data, error, isPending, isFetching } = useLogsQuery({
+	const listParams = {
 		page: currentPage ?? 1,
 		limit: pageSize ?? 25,
 		search: searchQuery ?? "",
@@ -127,7 +130,11 @@ export function LogList({
 		endDate: endDate ?? "",
 		statusCode: statusCode ?? "",
 		outcome: outcomeTab ?? "all",
-		actorId,
+		actorId: actorId ?? "",
+	};
+
+	const { data, error, isPending, isFetching } = useLogsQuery({
+		...listParams,
 		enabled: !!activeOrganization?.id,
 	});
 	const isLoading = isPending || (isFetching && !data);
@@ -161,6 +168,12 @@ export function LogList({
 	const hasAnyFilter =
 		searchQuery || statusCode || startDate || endDate || outcomeTab !== "all";
 
+	const handleRefresh = () => {
+		void queryClient.invalidateQueries({
+			queryKey: [...queryKeys.logs.all, "list"],
+		});
+	};
+
 	const handleDownloadCSV = async () => {
 		if (!data?.logs || data.logs.length === 0) return;
 		try {
@@ -188,50 +201,84 @@ export function LogList({
 
 	return (
 		<div className="flex min-h-0 flex-col">
-			<div className="relative mt-6 flex items-center gap-2 py-3">
-				{OUTCOME_TABS.map((tab, idx) => (
-					<button
-						key={tab.id}
-						ref={(el) => {
-							if (el) buttonRefs.current[idx] = el;
-						}}
-						type="button"
-						onPointerEnter={() => setHoveredIdx(idx)}
-						onPointerLeave={() => setHoveredIdx(undefined)}
-						onClick={() => {
-							void setOutcomeTab(tab.id);
-							void setCurrentPage(1);
-						}}
-						className={cn(
-							"relative z-10 inline-flex items-center gap-1.5 rounded-lg px-3 py-1 font-medium text-sm transition-all",
-							outcomeTab === tab.id
-								? "text-text-strong-950"
-								: "text-text-sub-600 hover:text-text-strong-950",
-						)}
-					>
-						{tab.icon && (
-							<Icon
-								name={tab.icon}
-								className={cn("h-3.5 w-3.5", tab.iconColor)}
+			{/* Outcome tabs — same height as Emails Sent/Received */}
+			<TabMenuHorizontal.Root
+				value={outcomeTab || "all"}
+				onValueChange={(val) => {
+					void setOutcomeTab(val);
+					void setCurrentPage(1);
+				}}
+			>
+				<TabMenuHorizontal.List className="relative h-11 gap-0 border-b-0! py-0 [&_[aria-hidden=true]]:hidden">
+					{OUTCOME_TABS.map((tab, index) => (
+						<TabMenuHorizontal.Trigger
+							key={tab.id}
+							ref={(el) => {
+								if (el) buttonRefs.current[index] = el;
+							}}
+							value={tab.id}
+							onPointerEnter={() => setHoveredIdx(index)}
+							onPointerLeave={() => setHoveredIdx(undefined)}
+							className={cn(
+								"flex cursor-pointer items-center gap-2 px-3 py-0! font-medium text-sm",
+								hoveredIdx === undefined &&
+									activeIndex === index &&
+									"text-text-strong-950",
+							)}
+						>
+							{tab.icon && (
+								<Icon
+									name={tab.icon}
+									className={cn("h-4 w-4", tab.iconColor)}
+								/>
+							)}
+							{tab.label}
+						</TabMenuHorizontal.Trigger>
+					))}
+					<AnimatePresence>
+						{rect && activeIndex !== -1 ? (
+							<motion.div
+								className="absolute top-0 left-0 rounded-xl bg-neutral-alpha-10"
+								initial={{
+									pointerEvents: "none",
+									width: rect.width,
+									height: rect.height - 14,
+									left:
+										rect.left -
+										(tabEl?.offsetParent?.getBoundingClientRect().left || 0),
+									top:
+										rect.top -
+										(tabEl?.offsetParent?.getBoundingClientRect().top || 0) +
+										7,
+									opacity: 0,
+								}}
+								animate={{
+									pointerEvents: "none",
+									width: rect.width,
+									height: rect.height - 14,
+									left:
+										rect.left -
+										(tabEl?.offsetParent?.getBoundingClientRect().left || 0),
+									top:
+										rect.top -
+										(tabEl?.offsetParent?.getBoundingClientRect().top || 0) +
+										7,
+									opacity: 1,
+								}}
+								exit={{ opacity: 0 }}
+								transition={{ duration: 0.14 }}
 							/>
-						)}
-						{tab.label}
-					</button>
-				))}
-				<AnimatedHoverBackground
-					rect={currentRect}
-					tabElement={currentEl}
-					className="bg-bg-weak-50 ring-1 ring-stroke-soft-100 dark:bg-bg-weak-50/20 dark:ring-stroke-soft-100/40"
-				/>
-			</div>
+						) : null}
+					</AnimatePresence>
+				</TabMenuHorizontal.List>
+			</TabMenuHorizontal.Root>
 
-			{/* ── Filter Bar ── */}
-			<div className="flex flex-wrap items-center gap-2 px-0 pt-3 pb-2 dark:border-stroke-soft-100/40">
-				{/* Search */}
-				<div className="w-48">
-					<Input.Root size="xsmall" className="rounded-xl">
+			{/* Filter bar */}
+			<div className="flex flex-wrap items-center gap-2 pt-4">
+				<div className="min-w-[200px] flex-1">
+					<Input.Root size="small" className="rounded-xl">
 						<Input.Wrapper>
-							<Input.Icon as={Icon} name="search" size="xsmall" />
+							<Input.Icon as={Icon} name="search" size="small" />
 							<Input.Input
 								placeholder="Filter by resource ID..."
 								value={searchQuery}
@@ -240,11 +287,23 @@ export function LogList({
 									void setCurrentPage(1);
 								}}
 							/>
+							{(searchQuery ?? "") && (
+								<button
+									type="button"
+									onMouseDown={(e) => e.preventDefault()}
+									onClick={() => {
+										void setSearchQuery("");
+										void setCurrentPage(1);
+									}}
+									className="mr-1 rounded p-0.5 text-text-soft-400 transition-colors hover:bg-neutral-alpha-10 hover:text-text-strong-950"
+								>
+									<Icon name="cross" className="h-3 w-3" />
+								</button>
+							)}
 						</Input.Wrapper>
 					</Input.Root>
 				</div>
 
-				{/* Date */}
 				<DateRangeFilter
 					startDate={startDate || null}
 					endDate={endDate || null}
@@ -252,7 +311,6 @@ export function LogList({
 					onDateChange={handleDateChange}
 				/>
 
-				{/* Status */}
 				<StatusFilterDropdown
 					value={statusCode || null}
 					onChange={(val) => {
@@ -261,34 +319,48 @@ export function LogList({
 					}}
 				/>
 
-				{/* Export CSV */}
 				<Button.Root
+					type="button"
 					variant="neutral"
 					mode="stroke"
-					size="xsmall"
+					size="small"
 					onClick={handleDownloadCSV}
 					disabled={!data?.logs || data.logs.length === 0}
 					title="Export CSV"
+					className="rounded-xl"
 				>
 					<Icon name="file-download" className="h-4 w-4" />
+					<span className="hidden sm:inline">Export</span>
 				</Button.Root>
 
-				<div className="ml-auto flex items-center gap-2">
-					{hasAnyFilter && (
-						<Button.Root
-							variant="neutral"
-							mode="stroke"
-							size="xsmall"
-							onClick={handleClearAll}
-						>
-							Clear all
-						</Button.Root>
-					)}
-				</div>
+				{hasAnyFilter && (
+					<Button.Root
+						type="button"
+						variant="neutral"
+						mode="stroke"
+						size="small"
+						onClick={handleClearAll}
+						className="rounded-xl"
+					>
+						Clear all
+					</Button.Root>
+				)}
+
+				<button
+					type="button"
+					onClick={handleRefresh}
+					className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 text-text-sub-600 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950 dark:border-stroke-soft-100/40"
+					title="Refresh logs"
+				>
+					<Icon
+						name="rotate-cw"
+						className={cn("h-4 w-4", isFetching && "animate-spin")}
+					/>
+				</button>
 			</div>
 
-			{/* ── Split Panel ── */}
-			<div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-start">
+			{/* Split panel */}
+			<div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-start">
 				{/* LEFT — Log list */}
 				<div
 					className={cn(
@@ -340,8 +412,8 @@ export function LogList({
 							<LogDetailPanel logId={selectedLogId} />
 						) : (
 							<div className="flex min-h-[500px] flex-col items-center justify-center gap-1 p-8 text-center">
-								<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/50">
-									<Icon name="search" className="h-5 w-5 text-text-sub-600" />
+								<div className="mb-4 flex items-center justify-center">
+									<Icon name="logs" className="h-8 w-8 text-text-sub-600" />
 								</div>
 								<h3 className="font-semibold text-base text-text-strong-950">
 									Select a log to inspect
@@ -350,12 +422,6 @@ export function LogList({
 									Click any row on the left to view its request details, status,
 									and response body.
 								</p>
-								<div className="mt-4 flex items-center gap-1.5 text-text-soft-400 text-xs">
-									<Icon name="arrow-left" className="h-3.5 w-3.5" />
-									<span className="font-medium">
-										Pick a log entry to get started
-									</span>
-								</div>
 							</div>
 						)}
 					</div>

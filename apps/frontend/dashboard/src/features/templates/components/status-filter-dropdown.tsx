@@ -7,87 +7,53 @@ import {
 } from "#/features/api-keys/filters/base-ui-select";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import type { Template } from "#/features/templates/hooks/use-templates-query";
 
-export type EmailStatus =
-	| "delivered"
-	| "sent"
-	| "failed"
-	| "bounced"
-	| "pending"
-	| "spam"
-	| "opened"
-	| "clicked";
-
-interface StatusSelectorProps {
-	value: string;
-	onChange: (value: string) => void;
-}
+export type TemplateStatusFilter = Template["status"] | null;
 
 const statusOptions: {
-	id: EmailStatus | null;
+	id: TemplateStatusFilter;
 	label: string;
 	icon: string;
 	colorClass: string;
 }[] = [
 	{ id: null, label: "All Status", icon: "activity", colorClass: "" },
 	{
-		id: "delivered",
-		label: "Delivered",
-		icon: "check-circle",
-		colorClass: "text-success-base",
-	},
-	{
-		id: "sent",
-		label: "Sent",
-		icon: "check-circle",
-		colorClass: "text-success-base",
-	},
-	{
-		id: "opened",
-		label: "Opened",
-		icon: "info-outline",
-		colorClass: "text-information-base",
-	},
-	{
-		id: "clicked",
-		label: "Clicked",
-		icon: "info-outline",
-		colorClass: "text-information-base",
-	},
-	{
-		id: "pending",
-		label: "Pending",
+		id: "draft",
+		label: "Draft",
 		icon: "clock",
 		colorClass: "text-warning-base",
 	},
 	{
-		id: "failed",
-		label: "Failed",
-		icon: "cross-circle",
-		colorClass: "text-error-base",
+		id: "published",
+		label: "Published",
+		icon: "check-circle",
+		colorClass: "text-success-base",
 	},
 	{
-		id: "bounced",
-		label: "Bounced",
+		id: "archived",
+		label: "Archived",
 		icon: "cross-circle",
-		colorClass: "text-error-base",
-	},
-	{
-		id: "spam",
-		label: "Spam",
-		icon: "cross-circle",
-		colorClass: "text-error-base",
+		colorClass: "text-text-sub-600",
 	},
 ];
 
-export const StatusSelector = ({ value, onChange }: StatusSelectorProps) => {
+export function TemplateStatusFilterDropdown({
+	value,
+	onChange,
+}: {
+	value: TemplateStatusFilter;
+	onChange: (value: TemplateStatusFilter) => void;
+}) {
 	const selectedOption =
-		statusOptions.find((o) => o.id === (value || null)) || statusOptions[0];
+		statusOptions.find((o) => o.id === value) || statusOptions[0];
 
 	return (
 		<Select
-			value={value === "" ? "all" : value}
-			onValueChange={(val) => onChange(!val || val === "all" ? "" : val)}
+			value={value === null ? "all" : value}
+			onValueChange={(val) =>
+				onChange(!val || val === "all" ? null : (val as Template["status"]))
+			}
 		>
 			<SelectTrigger className="w-40">
 				<SelectValue placeholder="All Status">
@@ -113,4 +79,4 @@ export const StatusSelector = ({ value, onChange }: StatusSelectorProps) => {
 			</SelectContent>
 		</Select>
 	);
-};
+}

@@ -1,13 +1,15 @@
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "#/features/api-keys/filters/base-ui-select";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { queryKeys } from "#/lib/query-keys";
-import * as Button from "@reloop/ui/button";
-import { cn } from "@reloop/ui/cn";
-import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
-import { useRef, useState } from "react";
 
 interface ApiKeyData {
 	id: string;
@@ -26,9 +28,6 @@ interface ApiKeySelectorProps {
 
 export const ApiKeySelector = ({ value, onChange }: ApiKeySelectorProps) => {
 	const { activeOrganization } = useActiveOrganization();
-	const [isOpen, setIsOpen] = useState(false);
-	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
-	const buttonRefs = useRef<HTMLButtonElement[]>([]);
 
 	const { data, isPending: isLoading } = useQuery({
 		queryKey: [...queryKeys.apiKeys.all, "selector"],
@@ -42,123 +41,49 @@ export const ApiKeySelector = ({ value, onChange }: ApiKeySelectorProps) => {
 
 	const apiKeys = data?.apiKeys || [];
 	const selectedKey = apiKeys.find((k) => k.id === value);
-	const currentTab = buttonRefs.current[hoverIdx ?? -1];
-	const currentRect = currentTab?.getBoundingClientRect();
-
-	const handleSelect = (keyId: string | null) => {
-		if (keyId === null) {
-			onChange("");
-			setIsOpen(false);
-			return;
-		}
-		onChange(keyId === value ? "" : keyId);
-		setIsOpen(false);
-	};
+	const displayLabel = selectedKey
+		? selectedKey.name || selectedKey.prefix || "API Key"
+		: "All API Keys";
 
 	return (
-		<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
-			<Dropdown.Trigger asChild>
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
-					size="xsmall"
-					className={cn(
-						"gap-1.5 whitespace-nowrap rounded-xl",
-						value &&
-							"border-stroke-soft-900 bg-neutral-alpha-10 text-text-strong-950",
-					)}
-				>
-					<Button.Icon>
-						<Icon name="key" className="h-3.5 w-3.5" />
-					</Button.Icon>
-					{selectedKey
-						? selectedKey.name || selectedKey.prefix || "API Key"
-						: "API Key"}
-					<Button.Icon>
-						<Icon name="chevron-down" className="h-3.5 w-3.5" />
-					</Button.Icon>
-				</Button.Root>
-			</Dropdown.Trigger>
-			<Dropdown.Content align="start" className="w-64 p-2">
-				<div className="relative max-h-80 overflow-y-auto">
-					<button
-						ref={(el) => {
-							if (el) buttonRefs.current[0] = el;
-						}}
-						type="button"
-						onPointerEnter={() => setHoverIdx(0)}
-						onPointerLeave={() => setHoverIdx(undefined)}
-						onClick={() => handleSelect(null)}
-						className={cn(
-							"flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-xs transition-colors",
-							"text-text-strong-950",
-							value === "" && "bg-neutral-alpha-10",
-							!currentRect && hoverIdx === 0 && "bg-neutral-alpha-10",
-						)}
-					>
-						<div className="flex items-center gap-2">
-							<span className={cn(value === "" && "font-medium")}>
-								All API Keys
+		<Select
+			value={value === "" ? "all" : value}
+			onValueChange={(val) => onChange(!val || val === "all" ? "" : val)}
+		>
+			<SelectTrigger className="w-44">
+				<SelectValue placeholder="All API Keys">
+					<Icon name="key-new" className="h-4 w-4 shrink-0 text-text-sub-600" />
+					<span className="min-w-0 truncate">{displayLabel}</span>
+				</SelectValue>
+			</SelectTrigger>
+			<SelectContent className="w-44">
+				<SelectItem value="all">
+					<Icon name="key-new" className="h-4 w-4 shrink-0 text-text-sub-600" />
+					<span className="min-w-0 truncate">All API Keys</span>
+				</SelectItem>
+				{isLoading ? (
+					<div className="space-y-1 p-1">
+						<Skeleton className="h-8 w-full rounded-lg" />
+						<Skeleton className="h-8 w-full rounded-lg" />
+					</div>
+				) : apiKeys.length === 0 ? (
+					<div className="px-2.5 py-3 text-center text-text-sub-600 text-xs">
+						No API keys found
+					</div>
+				) : (
+					apiKeys.map((key) => (
+						<SelectItem key={key.id} value={key.id}>
+							<Icon
+								name="key-new"
+								className="h-4 w-4 shrink-0 text-text-sub-600"
+							/>
+							<span className="min-w-0 truncate">
+								{key.name || key.prefix || "Unnamed Key"}
 							</span>
-						</div>
-						{value === "" && (
-							<Icon name="check" className="h-3.5 w-3.5 text-text-strong-950" />
-						)}
-					</button>
-
-					{isLoading ? (
-						<div className="space-y-1 p-1">
-							<Skeleton className="h-8 w-full rounded-lg" />
-							<Skeleton className="h-8 w-full rounded-lg" />
-							<Skeleton className="h-8 w-full rounded-lg" />
-						</div>
-					) : apiKeys.length === 0 ? (
-						<div className="p-4 text-center text-text-sub-600 text-xs">
-							No API keys found
-						</div>
-					) : (
-						<div>
-							{apiKeys.map((key, idx) => {
-								const isSelected = key.id === value;
-								const index = idx + 1;
-								return (
-									<button
-										key={key.id}
-										ref={(el) => {
-											if (el) buttonRefs.current[index] = el;
-										}}
-										type="button"
-										onPointerEnter={() => setHoverIdx(index)}
-										onPointerLeave={() => setHoverIdx(undefined)}
-										onClick={() => handleSelect(key.id)}
-										className={cn(
-											"flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-colors",
-											"text-text-strong-950",
-											isSelected && "bg-neutral-alpha-10",
-											!currentRect &&
-												hoverIdx === index &&
-												"bg-neutral-alpha-10",
-										)}
-									>
-										<div className="flex items-center gap-2 truncate">
-											<span className="truncate">
-												{key.name || key.prefix || "Unnamed Key"}
-											</span>
-										</div>
-										{isSelected && (
-											<Icon
-												name="check"
-												className="h-3.5 w-3.5 text-text-strong-950"
-											/>
-										)}
-									</button>
-								);
-							})}
-						</div>
-					)}
-					<AnimatedHoverBackground rect={currentRect} tabElement={currentTab} />
-				</div>
-			</Dropdown.Content>
-		</Dropdown.Root>
+						</SelectItem>
+					))
+				)}
+			</SelectContent>
+		</Select>
 	);
 };

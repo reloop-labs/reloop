@@ -189,12 +189,11 @@ export function SmtpCodePanel({
 	return (
 		<div className="flex min-w-0 flex-col gap-4">
 			<div>
-				<p className="font-medium text-label-md text-text-strong-950">
+				<h2 className="font-semibold text-lg text-text-strong-950 tracking-tight">
 					Send with SMTP
-				</p>
-				<p className="mt-1 text-paragraph-sm text-text-sub-600">
-					Copy a ready-to-run example for your stack. Use your API key as the
-					SMTP password.
+				</h2>
+				<p className="mt-1 text-text-sub-600 text-xs leading-relaxed">
+					Copy a ready-to-run example for your stack. Password is your API key.
 				</p>
 			</div>
 

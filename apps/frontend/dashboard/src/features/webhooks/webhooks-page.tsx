@@ -1,13 +1,12 @@
-import { WebhooksApiDetails } from "#/components/api-details/webhooks";
-import { useWebhooks } from "#/features/webhooks/components/use-webhooks";
-import { DocsButton } from "#/features/webhooks/components/docs-button";
 import { WebhookError } from "#/features/webhooks/components/webhook-error";
 import { WebhookTable } from "#/features/webhooks/components/webhook-table";
 import { WebhookToolbar } from "#/features/webhooks/components/webhook-toolbar";
-import * as Button from "@reloop/ui/button";
+import { useWebhooks } from "#/features/webhooks/components/use-webhooks";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "@tanstack/react-router";
-import { useHotkeys } from "react-hotkeys-hook";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { WebhooksCommonUseCasesSidebar } from "./common-use-cases-sidebar";
+import { WebhooksListHeader } from "./webhooks-list-header";
 
 export function WebhooksPage() {
 	const {
@@ -21,69 +20,95 @@ export function WebhooksPage() {
 		isTotalEmpty,
 		mutate,
 	} = useWebhooks();
-	const navigate = useNavigate();
 
-	const handleCreateWebhook = () => {
-		void navigate({ to: "/webhooks/create" });
-	};
+	const [deletedName, setDeletedName] = useState<string | null>(null);
 
-	useHotkeys(
-		"mod+a",
-		(event) => {
-			event.preventDefault();
-			handleCreateWebhook();
-		},
-		{ enabled: true },
-	);
+	useEffect(() => {
+		if (deletedName) {
+			const timer = setTimeout(() => setDeletedName(null), 8000);
+			return () => clearTimeout(timer);
+		}
+	}, [deletedName]);
 
 	if (error) {
-		return <WebhookError />;
+		return (
+			<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
+				<WebhooksListHeader />
+				<div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+					<div className="lg:col-span-8 xl:col-span-8">
+						<WebhookError />
+					</div>
+					<div className="lg:col-span-4 xl:col-span-4">
+						<WebhooksCommonUseCasesSidebar />
+					</div>
+				</div>
+			</div>
+		);
 	}
 
 	return (
-		<div className="mx-auto max-w-4xl space-y-8 p-6 lg:p-8">
-			<div className="flex items-center justify-between pb-6">
-				<h1 className="font-medium text-2xl">Webhooks</h1>
-				<div className="flex items-center gap-2 self-end">
-					<DocsButton size="xsmall" mode="stroke" />
-					<Button.Root
-						variant="neutral"
-						size="xsmall"
-						onClick={handleCreateWebhook}
-						className="gap-2"
-					>
-						<Icon name="plus" className="h-4 w-4" />
-						Create webhook
-						<span className="inline-flex items-center gap-0.5">
-							<Icon
-								name="command"
-								className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
-							/>
-							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
-								A
-							</span>
-						</span>
-					</Button.Root>
-					<WebhooksApiDetails size="xsmall" mode="ghost" />
+		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
+			<WebhooksListHeader />
+
+			<div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+				<div className="pb-8 lg:col-span-8 xl:col-span-8">
+					<AnimatePresence>
+						{deletedName && (
+							<motion.div
+								key="deleted-banner"
+								initial={{ opacity: 0, y: -8, height: 0 }}
+								animate={{ opacity: 1, y: 0, height: "auto" }}
+								exit={{ opacity: 0, y: -8, height: 0 }}
+								transition={{ duration: 0.2 }}
+								className="mb-4 overflow-hidden"
+							>
+								<div className="flex items-center justify-between rounded-xl border border-[#B7F1D0] bg-[#E8FAF0] px-4 py-3 text-sm text-[#0F5C34] dark:border-emerald-800/40 dark:bg-emerald-950/30 dark:text-emerald-200">
+									<span>
+										Webhook &quot;
+										<span className="font-semibold">{deletedName}</span>&quot;
+										has been successfully deleted.
+									</span>
+									<button
+										type="button"
+										onClick={() => setDeletedName(null)}
+										className="p-1 text-[#0F5C34]/70 transition-colors hover:text-[#0F5C34] dark:text-emerald-200/70 dark:hover:text-emerald-200"
+									>
+										<Icon name="close" className="h-4 w-4" />
+									</button>
+								</div>
+							</motion.div>
+						)}
+					</AnimatePresence>
+
+					{!isTotalEmpty && (
+						<WebhookToolbar
+							searchQuery={searchQuery}
+							onSearchChange={setSearchQuery}
+							statusFilter={statusFilter}
+							onStatusFilterChange={setStatusFilter}
+						/>
+					)}
+
+					<div className={isTotalEmpty ? "" : "mt-4"}>
+						<WebhookTable
+							webhooks={webhooks}
+							isLoading={isLoading}
+							loadingRows={4}
+							isTotalEmpty={isTotalEmpty}
+							searchQuery={searchQuery}
+							statusFilter={statusFilter}
+							onClearFilters={() => {
+								setSearchQuery("");
+								setStatusFilter("all");
+							}}
+							onMutate={mutate}
+							onDeleteSuccess={(name) => setDeletedName(name)}
+						/>
+					</div>
 				</div>
-			</div>
 
-			<div>
-				<WebhookToolbar
-					searchQuery={searchQuery}
-					onSearchChange={setSearchQuery}
-					statusFilter={statusFilter}
-					onStatusFilterChange={setStatusFilter}
-				/>
-
-				<div className="mt-4">
-					<WebhookTable
-						webhooks={webhooks}
-						isLoading={isLoading}
-						loadingRows={4}
-						isTotalEmpty={isTotalEmpty}
-						onMutate={mutate}
-					/>
+				<div className="lg:col-span-4 xl:col-span-4">
+					<WebhooksCommonUseCasesSidebar />
 				</div>
 			</div>
 		</div>

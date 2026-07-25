@@ -35,7 +35,11 @@ interface WebhookTableProps {
 	isLoading?: boolean;
 	loadingRows?: number;
 	isTotalEmpty?: boolean;
+	searchQuery?: string;
+	statusFilter?: string;
+	onClearFilters?: () => void;
 	onMutate?: () => void;
+	onDeleteSuccess?: (deletedName: string) => void;
 }
 
 const GRID =
@@ -245,12 +249,18 @@ export const WebhookTable = ({
 	isLoading,
 	loadingRows = 5,
 	isTotalEmpty,
+	searchQuery = "",
+	statusFilter = "all",
+	onClearFilters,
 	onMutate,
+	onDeleteSuccess,
 }: WebhookTableProps) => {
 	const navigate = useNavigate();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 	const [deleteId, setDeleteId] = useQueryState("delete");
 	const [isTogglingStatus, setIsTogglingStatus] = useState<string | null>(null);
+	const isFiltered =
+		searchQuery.trim() !== "" || statusFilter !== "all";
 
 	const goToDetail = (webhookId: string) => {
 		void navigate({
@@ -319,17 +329,10 @@ export const WebhookTable = ({
 					) : isTotalEmpty ? (
 						<EmptyState />
 					) : webhooks.length === 0 ? (
-						<div className="flex flex-col items-center gap-2 px-6 py-12 text-center">
-							<div className="flex h-10 w-10 items-center justify-center rounded-xl border border-stroke-soft-100 bg-bg-weak-50">
-								<Icon name="search" className="h-4 w-4 text-text-sub-600" />
-							</div>
-							<p className="font-medium text-sm text-text-strong-950">
-								No matching endpoints
-							</p>
-							<p className="max-w-[260px] text-[12px] text-text-sub-600">
-								Try a different search or clear the status filter.
-							</p>
-						</div>
+						<EmptyState
+							isFiltered={isFiltered}
+							onClearFilters={onClearFilters}
+						/>
 					) : (
 						webhooks.map((webhook) => {
 							const isRowActive = activeDropdownId === webhook.id;
@@ -419,6 +422,10 @@ export const WebhookTable = ({
 
 			<DeleteWebhookModal
 				webhook={webhooks.find((w) => w.id === deleteId) || null}
+				onSuccess={(name) => {
+					onDeleteSuccess?.(name || "Webhook");
+					onMutate?.();
+				}}
 			/>
 		</>
 	);
