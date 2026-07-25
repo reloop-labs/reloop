@@ -371,45 +371,43 @@ export function EditContactForm({
 					{/* ── Identity ───────────────────────────────────────── */}
 					<section className="space-y-4">
 						{/* Email — identity key, not editable here */}
-						{!isInline && (
-							<div className="flex flex-col gap-1.5">
-								<div className="flex items-center gap-1.5">
-									<Label.Root
-										htmlFor={`email-${contact.id}`}
-										className="font-medium text-text-strong-950 text-xs"
-									>
-										Email
-									</Label.Root>
-									<span className="font-normal text-text-sub-600 text-xs">
-										(cannot be changed)
-									</span>
-								</div>
-								<Input.Root
-									size="medium"
-									className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30"
+						<div className="flex flex-col gap-1.5">
+							<div className="flex items-center gap-1.5">
+								<Label.Root
+									htmlFor={`email-${contact.id}`}
+									className="font-medium text-text-strong-950 text-xs"
 								>
-									<Input.Wrapper>
-										<Input.Icon
-											as={Icon}
-											name="mail-single"
-											size="small"
-											className="h-4 w-4 text-text-sub-600"
-										/>
-										<Input.Input
-											id={`email-${contact.id}`}
-											type="email"
-											value={email}
-											readOnly
-											className="cursor-not-allowed font-medium text-text-strong-950 opacity-100 focus:outline-none"
-										/>
-										<Icon
-											name="lock"
-											className="mr-1.5 h-3.5 w-3.5 shrink-0 text-text-sub-600"
-										/>
-									</Input.Wrapper>
-								</Input.Root>
+									Email
+								</Label.Root>
+								<span className="font-normal text-text-sub-600 text-xs">
+									(cannot be changed)
+								</span>
 							</div>
-						)}
+							<Input.Root
+								size="medium"
+								className="rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/30"
+							>
+								<Input.Wrapper>
+									<Input.Icon
+										as={Icon}
+										name="mail-single"
+										size="small"
+										className="h-4 w-4 text-text-sub-600"
+									/>
+									<Input.Input
+										id={`email-${contact.id}`}
+										type="email"
+										value={email}
+										readOnly
+										className="cursor-not-allowed font-medium text-text-strong-950 opacity-100 focus:outline-none"
+									/>
+									<Icon
+										name="lock"
+										className="mr-1.5 h-3.5 w-3.5 shrink-0 text-text-sub-600"
+									/>
+								</Input.Wrapper>
+							</Input.Root>
+						</div>
 
 						{/* First Name & Last Name */}
 						<div className="grid gap-4 sm:grid-cols-2">
