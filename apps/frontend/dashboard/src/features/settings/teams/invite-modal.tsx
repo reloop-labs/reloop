@@ -271,7 +271,7 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 							<Modal.Title className="font-semibold text-[26px] text-text-strong-950 tracking-tight">
 								Invite team members
 							</Modal.Title>
-							<Modal.Description className="mt-1 text-paragraph-sm text-text-sub-600">
+							<Modal.Description className="text-paragraph-sm text-text-sub-600">
 								Invitations will be sent via email
 							</Modal.Description>
 						</div>
@@ -397,22 +397,43 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 														</span>
 
 														{/* Role Selection */}
-														<div className="flex items-center gap-1">
-															{(["member", "admin"] as Role[]).map((r) => (
-																<button
-																	key={r}
-																	type="button"
-																	onClick={() => handleRoleChange(email, r)}
-																	className={cn(
-																		"inline-flex rounded-full border px-2.5 py-0.5 font-medium text-[11px] capitalize transition-all active:scale-[0.97]",
-																		role === r
-																			? getRoleBadgeStyles(r)
-																			: "border-transparent text-text-soft-400 hover:text-text-sub-600",
-																	)}
-																>
-																	{r}
-																</button>
-															))}
+														<div className="flex items-center gap-0.5 rounded-full bg-neutral-alpha-10 p-0.5 dark:bg-neutral-alpha-16">
+															{(["member", "admin"] as Role[]).map((r) => {
+																const isSelected = role === r;
+																return (
+																	<button
+																		key={r}
+																		type="button"
+																		onClick={() => handleRoleChange(email, r)}
+																		className={cn(
+																			"relative inline-flex items-center justify-center rounded-full px-2.5 py-0.5 font-medium text-[11px] capitalize transition-colors active:scale-[0.97]",
+																			isSelected
+																				? r === "admin"
+																					? "font-semibold text-feature-base"
+																					: "font-semibold text-text-strong-950"
+																				: "text-text-soft-400 hover:text-text-sub-600",
+																		)}
+																	>
+																		{isSelected && (
+																			<motion.span
+																				layoutId={`pending-role-pill-${email}`}
+																				className={cn(
+																					"absolute inset-0 rounded-full border shadow-xs",
+																					r === "admin"
+																						? "border-feature-light bg-feature-lighter"
+																						: "border-stroke-soft-200 bg-bg-white-0 dark:border-stroke-soft-100/60 dark:bg-bg-white-0/10",
+																				)}
+																				transition={{
+																					type: "spring",
+																					stiffness: 420,
+																					damping: 30,
+																				}}
+																			/>
+																		)}
+																		<span className="relative z-10">{r}</span>
+																	</button>
+																);
+															})}
 														</div>
 
 														{/* Remove */}
@@ -448,10 +469,6 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 													type="button"
 													onClick={() => {
 														setSelectedRole(value);
-														// Apply selected role to all pending emails
-														setPendingEmails((prev) =>
-															prev.map((e) => ({ ...e, role: value })),
-														);
 													}}
 													className={cn(
 														"relative flex flex-col items-start gap-1 rounded-xl border p-3.5 text-left transition-all active:scale-[0.98]",
