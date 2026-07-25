@@ -3,7 +3,7 @@ import { useWebhookDetailQuery } from "#/features/webhooks/hooks/use-webhooks-qu
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { TriggerWebhookTester } from "#/features/webhooks/components/trigger-webhook-tester";
 
 interface WebhookData {

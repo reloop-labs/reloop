@@ -8,7 +8,7 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Resolver } from "react-hook-form";

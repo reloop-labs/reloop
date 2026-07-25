@@ -1,4 +1,4 @@
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useEffect } from "react";
 import { SETTINGS_MEMBER_HOME } from "#/features/dashboard/navigation";
 import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";

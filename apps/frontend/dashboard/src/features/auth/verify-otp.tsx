@@ -6,7 +6,7 @@ import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";

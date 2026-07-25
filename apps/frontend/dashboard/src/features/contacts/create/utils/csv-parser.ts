@@ -164,7 +164,10 @@ export function detectInitialMappings(
 			EMAIL_REGEX.test(cell.replace(/^["']|["']$/g, "").trim()),
 		);
 		if (sampleIdx !== -1 && sampleIdx < mappings.length) {
-			mappings[sampleIdx].target = "email";
+			const mapping = mappings[sampleIdx];
+			if (mapping) {
+				mapping.target = "email";
+			}
 		}
 	}
 
@@ -213,9 +216,7 @@ export function buildContactsFromMapping(
 	}
 
 	for (const cells of rawRows) {
-		const rawEmail = cells[emailMapping.idx]
-			? cells[emailMapping.idx].trim()
-			: "";
+		const rawEmail = cells[emailMapping.idx]?.trim() ?? "";
 		const email = rawEmail.toLowerCase();
 
 		if (!email || !EMAIL_REGEX.test(email)) {
@@ -230,19 +231,17 @@ export function buildContactsFromMapping(
 
 		seenEmails.add(email);
 
-		const firstName =
-			firstNameMapping && cells[firstNameMapping.idx]
-				? cells[firstNameMapping.idx].trim()
-				: undefined;
+		const firstName = firstNameMapping
+			? cells[firstNameMapping.idx]?.trim()
+			: undefined;
 
-		const lastName =
-			lastNameMapping && cells[lastNameMapping.idx]
-				? cells[lastNameMapping.idx].trim()
-				: undefined;
+		const lastName = lastNameMapping
+			? cells[lastNameMapping.idx]?.trim()
+			: undefined;
 
 		const properties: Record<string, string | number> = {};
 		propertyMappings.forEach((m) => {
-			const cellVal = cells[m.idx] ? cells[m.idx].trim() : "";
+			const cellVal = cells[m.idx]?.trim() ?? "";
 			if (cellVal.length > 0) {
 				const propKey = m.target.replace("property:", "");
 				if (/^-?\d+(\.\d+)?$/.test(cellVal) && cellVal.length < 16) {
@@ -289,14 +288,21 @@ export function parseCsvContent(rawCsvText: string): ParsedCsvResult {
 		};
 	}
 
-	const delimiter = detectDelimiter(rows[0]);
-	const headers = parseCsvLine(rows[0], delimiter).map((h) =>
+	const firstRow = rows[0];
+	if (firstRow === undefined) {
+		throw new Error("CSV row invariant violated");
+	}
+
+	const delimiter = detectDelimiter(firstRow);
+	const headers = parseCsvLine(firstRow, delimiter).map((h) =>
 		h.replace(/^["']|["']$/g, "").trim(),
 	);
 
 	const rawRows: string[][] = [];
 	for (let i = 1; i < rows.length; i++) {
-		const cells = parseCsvLine(rows[i], delimiter).map((cell) =>
+		const row = rows[i];
+		if (row === undefined) continue;
+		const cells = parseCsvLine(row, delimiter).map((cell) =>
 			cell.replace(/^["']|["']$/g, "").trim(),
 		);
 		rawRows.push(cells);

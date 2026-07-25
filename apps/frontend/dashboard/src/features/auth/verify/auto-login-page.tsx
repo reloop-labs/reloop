@@ -3,7 +3,7 @@ import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { sessionQueryOptions } from "#/features/auth/session-query";

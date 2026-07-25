@@ -15,7 +15,7 @@ import {
 import { Skeleton } from "@reloop/ui/skeleton";
 import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import axios from "axios";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 

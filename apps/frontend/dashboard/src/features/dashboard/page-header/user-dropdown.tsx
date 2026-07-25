@@ -2,7 +2,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "#/lib/navigation";
 import { useTheme } from "next-themes";
 import { useRef, useState } from "react";
 import { useSignOut } from "#/features/auth/session-query";

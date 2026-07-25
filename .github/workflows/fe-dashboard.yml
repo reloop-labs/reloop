@@ -1,45 +1,145 @@
-name: FE Dashboard Docker
+name: FE Dashboard
 
 on:
   push:
     branches:
       - main
-    paths:
-      - 'apps/frontend/dashboard/**'
-      - 'packages/ui/**'
-      - '.github/workflows/fe-dashboard.yml'
+    paths: &dashboard-paths
+      - "apps/frontend/dashboard/**"
+      - "packages/auth/**"
+      - "packages/pricing/**"
+      - "packages/tailwind/**"
+      - "packages/ui/**"
+      - "packages/webhook-events/**"
+      - "package.json"
+      - "bun.lock"
+      - ".github/workflows/fe-dashboard.yml"
+  pull_request:
+    branches:
+      - main
+    paths: *dashboard-paths
   workflow_dispatch:
+
+concurrency:
+  group: fe-dashboard-${{ github.event_name == 'push' && 'main' || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
-  build_and_publish:
+  validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check Next.js migration surface
+        # The frozen dashboard tree has legacy Biome debt. Keep this migration
+        # gate scoped so restoring Next does not rewrite unrelated product code.
+        run: bun run --filter=fe-dashboard check:migration
+
+      - name: Typecheck dashboard
+        run: bun run --filter=fe-dashboard typecheck
+
+      - name: Test dashboard
+        run: bun run --filter=fe-dashboard test
+
+      - name: Build dashboard
+        run: bun run --filter=fe-dashboard build
+
+      - name: Install Playwright Chromium
+        run: bunx playwright install --with-deps chromium
+
+      - name: Run production browser parity suite
+        run: bun run --filter=fe-dashboard test:browser
+
+  pull-request-image:
+    if: github.event_name == 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Docker Hub
+      - name: Build dashboard image without publishing
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./apps/frontend/dashboard/Dockerfile
+          push: false
+          tags: fe-dashboard:pr
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  publish:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/fe-dashboard
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push web image
-        uses: docker/build-push-action@v5
+      - name: Build and publish immutable dashboard image
+        id: build
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./apps/frontend/dashboard/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/fe-dashboard:latest
-      - name: Trigger Coolify Deploy
-        if: github.event_name != 'pull_request'
+          tags: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke-test immutable image
+        env:
+          IMAGE: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+        run: |
+          docker pull "$IMAGE"
+          container_id="$(docker run --detach --publish 127.0.0.1:3000:3000 "$IMAGE")"
+          trap 'docker rm --force "$container_id"' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:3000/dashboard/healthz >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs "$container_id"
+          exit 1
+
+      - name: Promote immutable image to latest
+        env:
+          IMAGE: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+        run: |
+          docker tag "$IMAGE" "${{ env.IMAGE_NAME }}:latest"
+          docker push "${{ env.IMAGE_NAME }}:latest"
+
+      - name: Trigger Coolify deploy
         run: |
           curl --fail -i -X GET "https://coolify.reloop.sh/api/v1/deploy?uuid=f11m9fnjylmlu6siyya3tpdh&force=false" \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}"
-

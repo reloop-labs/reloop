@@ -1,7 +1,7 @@
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import {

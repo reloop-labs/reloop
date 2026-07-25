@@ -1,6 +1,6 @@
 import { DeleteWebhookModal } from "#/features/webhooks/components/delete-webhook-modal";
 import { useWebhookDetailQuery } from "#/features/webhooks/hooks/use-webhooks-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useQueryState } from "nuqs";
 import { DeliveryLogs } from "./delivery-logs";
 import { WebhookHeader } from "./webhook-header";

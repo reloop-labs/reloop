@@ -4,7 +4,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { ArrowRight } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Link } from "#/lib/navigation";
 import { useSWR } from "#/features/home/lib/use-swr-compat";
 
 interface LogData {

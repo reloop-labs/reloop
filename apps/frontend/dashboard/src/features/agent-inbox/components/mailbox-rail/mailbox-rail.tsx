@@ -1,6 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "#/lib/navigation";
 import { Plus } from "lucide-react";
 import { useMemo } from "react";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";

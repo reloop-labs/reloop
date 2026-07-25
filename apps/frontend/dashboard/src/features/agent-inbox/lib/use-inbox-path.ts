@@ -1,4 +1,4 @@
-import { useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "#/lib/navigation";
 
 /** Current pathname without app basepath quirks (router location). */
 export function useInboxPathname(): string {

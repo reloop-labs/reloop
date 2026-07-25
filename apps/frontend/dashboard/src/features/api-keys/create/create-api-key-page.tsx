@@ -7,7 +7,7 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
@@ -166,11 +166,10 @@ export function CreateApiKeyPage() {
 		}
 	};
 
+	const installCommands = INSTALL_COMMANDS[selectedLang];
 	const currentInstallCmd =
-		INSTALL_COMMANDS[selectedLang]?.[selectedPkg] ||
-		INSTALL_COMMANDS[selectedLang]?.[
-			Object.keys(INSTALL_COMMANDS[selectedLang])[0]
-		] ||
+		installCommands[selectedPkg] ??
+		Object.values(installCommands)[0] ??
 		"npm install reloop-email";
 
 	const activeKeyValue = createdApiKey?.key || "rl_live_your_api_key_here";

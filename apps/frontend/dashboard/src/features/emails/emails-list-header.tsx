@@ -1,6 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "#/lib/navigation";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/emails";
 

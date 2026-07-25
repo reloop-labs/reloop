@@ -1,7 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { Link } from "@tanstack/react-router";
+import { Link } from "#/lib/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";

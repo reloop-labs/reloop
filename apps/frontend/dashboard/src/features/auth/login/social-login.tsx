@@ -4,7 +4,7 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as LinkButton from "@reloop/ui/link-button";
 import Spinner from "@reloop/ui/spinner";
-import { Link } from "@tanstack/react-router";
+import { Link } from "#/lib/navigation";
 import { useEffect, useState } from "react";
 
 /** Public path for OAuth return (includes app basepath). */

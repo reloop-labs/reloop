@@ -3,7 +3,7 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useCallback, useState } from "react";
 import { SMTP_HOST, SMTP_USER } from "./smtp-code-examples";
 import { SmtpCodePanel } from "./smtp-code-panel";

@@ -8,7 +8,7 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useState } from "react";
 

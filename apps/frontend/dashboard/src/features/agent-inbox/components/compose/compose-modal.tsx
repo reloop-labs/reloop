@@ -194,7 +194,7 @@ export const ComposeModal = ({
 			let bodyText = plain;
 			const subjectMatch = plain.match(/^Subject:\s*([^\r\n]+)\r?\n+/i);
 			if (subjectMatch) {
-				const extractedSubject = subjectMatch[1].trim();
+				const extractedSubject = subjectMatch[1]?.trim();
 				if (extractedSubject) {
 					setValue("subject", extractedSubject);
 				}

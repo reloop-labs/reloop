@@ -11,10 +11,12 @@ export function normalizeTemplateVariableName(raw: string): string {
 	const trimmed = raw.trim();
 
 	const triple = trimmed.match(/^\{\{\{\s*([^{}]+?)\s*\}\}\}$/);
-	if (triple) return triple[1].trim();
+	const tripleName = triple?.[1];
+	if (tripleName) return tripleName.trim();
 
 	const double = trimmed.match(/^\{\{\s*([^{}]+?)\s*\}\}$/);
-	if (double) return double[1].trim();
+	const doubleName = double?.[1];
+	if (doubleName) return doubleName.trim();
 
 	// Legacy repair only — single-brace is not a supported syntax
 	if (/[{}]/.test(trimmed)) {

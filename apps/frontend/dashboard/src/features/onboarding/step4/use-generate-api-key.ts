@@ -1,6 +1,6 @@
 import { authClient } from "@reloop/auth/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import axios from "axios";
 import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";

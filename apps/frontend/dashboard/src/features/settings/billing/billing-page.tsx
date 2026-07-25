@@ -9,7 +9,7 @@ import {
 import * as Badge from "@reloop/ui/badge";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useEffect, useState } from "react";
 import { AnimatedForwardButton } from "#/features/dashboard/animated-forward-button";
 import { SETTINGS_MEMBER_HOME } from "#/features/dashboard/navigation";

@@ -4,7 +4,7 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "#/lib/navigation";
 import axios from "axios";
 import {
 	AnimatePresence,

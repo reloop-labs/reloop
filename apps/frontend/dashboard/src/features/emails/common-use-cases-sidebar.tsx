@@ -1,6 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "#/lib/navigation";
 
 const cardClassName = cn(
 	"group flex w-full flex-col rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 text-left cursor-pointer",

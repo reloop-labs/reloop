@@ -3,7 +3,7 @@ import { useActiveOrganization } from "#/features/dashboard/page-header/use-acti
 import { navigatePostAuth } from "#/utils/navigate-post-auth";
 import { resolvePostAuthDestinationWithQuery } from "#/utils/post-auth-destination";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import { ActivityChartCard } from "./components/activity-chart-card";
 import { AgentInboxCard } from "./components/agent-inbox-card";

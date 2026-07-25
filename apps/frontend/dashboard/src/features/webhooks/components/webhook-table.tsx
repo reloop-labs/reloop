@@ -9,7 +9,7 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import axios from "axios";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";

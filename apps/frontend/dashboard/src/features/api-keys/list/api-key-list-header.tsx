@@ -4,7 +4,7 @@ import { Icon } from "@reloop/ui/icon";
 import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 
 export function ApiKeyListHeader() {
 	const navigate = useNavigate();

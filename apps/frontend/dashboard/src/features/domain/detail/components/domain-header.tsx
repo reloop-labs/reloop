@@ -1,7 +1,7 @@
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useHotkeys } from "react-hotkeys-hook";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { formatRelativeTime } from "#/utils/format-relative-time";

@@ -1,10 +1,9 @@
-import { getRouteApi, Link } from "@tanstack/react-router";
-
-const inviteRouteApi = getRouteApi("/invite");
+import { parseAsString, useQueryState } from "nuqs";
+import { Link } from "#/lib/navigation";
 
 /** Stub until organization invite acceptance is ported. */
 export function InvitePage() {
-	const { id } = inviteRouteApi.useSearch();
+	const [id] = useQueryState("id", parseAsString.withDefault(""));
 
 	return (
 		<main className="flex min-h-dvh flex-col items-center justify-center gap-3 p-6">

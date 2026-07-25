@@ -1,6 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "#/lib/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";

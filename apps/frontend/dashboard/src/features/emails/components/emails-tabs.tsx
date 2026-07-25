@@ -1,7 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
-import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "#/lib/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
 

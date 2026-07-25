@@ -1,5 +1,5 @@
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import type React from "react";
 import { useEffect } from "react";

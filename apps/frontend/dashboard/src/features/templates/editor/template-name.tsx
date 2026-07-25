@@ -1,6 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Link } from "@tanstack/react-router";
+import { Link } from "#/lib/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";

@@ -1,7 +1,7 @@
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { Icon } from "@reloop/ui/icon";
 import { ArrowRight } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Link } from "#/lib/navigation";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSWR } from "#/features/home/lib/use-swr-compat";
 

@@ -20,7 +20,7 @@ import {
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";

@@ -1,4 +1,4 @@
-import { useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "#/lib/navigation";
 import { EmailsCommonUseCasesSidebar } from "./common-use-cases-sidebar";
 import { EmailsTabs } from "./components/emails-tabs";
 import { EmailsListHeader } from "./emails-list-header";

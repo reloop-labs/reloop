@@ -1,5 +1,5 @@
 import { cn } from "@reloop/ui/cn";
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useNavigate, useParams } from "#/lib/navigation";
 import { FileText, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";

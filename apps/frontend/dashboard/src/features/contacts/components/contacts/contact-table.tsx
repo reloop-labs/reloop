@@ -1,7 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";

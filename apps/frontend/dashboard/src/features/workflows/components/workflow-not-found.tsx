@@ -2,7 +2,7 @@
 
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 
 export const WorkflowNotFound = () => {
 	const navigate = useNavigate();

@@ -117,7 +117,7 @@ describe("unified mapping rows → contacts", () => {
 				job_title: "Engineer",
 			},
 		});
-		expect(built.contacts[1].properties).toEqual({
+		expect(built.contacts[1]?.properties).toEqual({
 			company_name: "Globex",
 			job_title: "Designer",
 		});
@@ -131,7 +131,7 @@ describe("unified mapping rows → contacts", () => {
 		];
 
 		const built = buildContactsFromMapping(headers, rawRows, mappings);
-		expect(built.contacts[0].properties).toBeUndefined();
+		expect(built.contacts[0]?.properties).toBeUndefined();
 	});
 
 	it("seeds identity then suggests properties", () => {

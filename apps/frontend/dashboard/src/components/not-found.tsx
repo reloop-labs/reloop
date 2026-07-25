@@ -1,6 +1,6 @@
 import { Icon } from "@reloop/ui/icon";
 import { NotFoundIllustration } from "@reloop/ui/not-found-illustration";
-import { Link } from "@tanstack/react-router";
+import { Link } from "#/lib/navigation";
 
 /** App-wide 404 for TanStack Router (root + defaultNotFoundComponent). */
 export function NotFound() {

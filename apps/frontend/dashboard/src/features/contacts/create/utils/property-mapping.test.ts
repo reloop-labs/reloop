@@ -152,8 +152,8 @@ describe("suggestPropertyRows", () => {
 			[{ propertyName: "company" }, { propertyName: "role" }],
 		);
 		expect(rows).toHaveLength(1);
-		expect(rows[0].csvHeader).toBe("company");
-		expect(rows[0].target).toBe("property:company");
+		expect(rows[0]?.csvHeader).toBe("company");
+		expect(rows[0]?.target).toBe("property:company");
 	});
 });
 

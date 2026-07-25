@@ -1,7 +1,7 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
-import { useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "#/lib/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useHotkeys } from "react-hotkeys-hook";
 import { SettingsSidebarItems } from "./settings-sidebar-items";

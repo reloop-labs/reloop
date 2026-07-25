@@ -5,7 +5,7 @@ import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Switch from "@reloop/ui/switch";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import { toast } from "sonner";
 import type { Workflow, WorkflowStatus } from "../workflow-types";
 import { validateWorkflow } from "../workflow-validation";

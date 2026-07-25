@@ -1,6 +1,6 @@
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "#/lib/navigation";
 import type * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 

@@ -63,7 +63,7 @@ export function getRandomColor(seed = ""): string {
 }
 
 function getWsUrl(): string {
-	const fromEnv = import.meta.env.VITE_WS_URL as string | undefined;
+	const fromEnv = process.env.NEXT_PUBLIC_WS_URL;
 	if (fromEnv) return fromEnv;
 	if (typeof window !== "undefined") {
 		const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
