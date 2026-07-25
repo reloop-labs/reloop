@@ -7,7 +7,7 @@ import {
 } from "#/utils/avatar";
 import { isInvitationActionable } from "#/utils/invitations";
 import { authClient } from "@reloop/auth/client";
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
@@ -318,18 +318,17 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 									)}
 								</Input.Wrapper>
 							</Input.Root>
-							<Button.Root
+							<FancyButton.Root
 								type="button"
-								variant="neutral"
-								mode="stroke"
+								variant="basic"
 								size="xsmall"
-								className="rounded-[10px]"
+								className="rounded-[10px] font-medium"
 								onClick={handleAddEmail}
 								disabled={loading || !inputValue.trim()}
 							>
-								<Icon name="plus" className="-mr-1 h-3.5 w-3.5" />
+								<FancyButton.Icon as={Icon} name="plus" />
 								Add
-							</Button.Root>
+							</FancyButton.Root>
 						</div>
 						<AnimatePresence>
 							{emailError && (
@@ -417,16 +416,15 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 												</div>
 
 												{/* Remove */}
-												<Button.Root
+												<FancyButton.Root
 													onClick={() => handleRemovePending(email)}
 													disabled={loading}
-													size="xxsmall"
-													variant="neutral"
-													mode="lighter"
+													size="xsmall"
+													variant="ghost"
 													className="h-6 w-6 rounded-md p-0"
 												>
-													<Icon name="cross" className="h-3 w-3" />
-												</Button.Root>
+													<FancyButton.Icon as={Icon} name="cross" />
+												</FancyButton.Root>
 											</motion.div>
 										))}
 									</AnimatePresence>
@@ -513,20 +511,19 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 							: "No invitations queued"}
 					</p>
 					<div className="flex items-center gap-2">
-						<Button.Root
+						<FancyButton.Root
 							type="button"
-							variant="neutral"
-							mode="stroke"
+							variant="basic"
 							size="xsmall"
 							onClick={() => handleOpenChange(false)}
 							disabled={loading}
 						>
 							Cancel
 							<KbdEsc />
-						</Button.Root>
-						<Button.Root
+						</FancyButton.Root>
+						<FancyButton.Root
 							type="button"
-							variant="neutral"
+							variant="blue"
 							size="xsmall"
 							onClick={handleSubmit}
 							disabled={loading || pendingEmails.length === 0}
@@ -538,15 +535,15 @@ export function InviteModal({ open, onOpenChange }: InviteModalProps) {
 								</>
 							) : (
 								<>
-									<Icon name="send-2" className="-mr-1 h-3.5 w-3.5" />
+									<FancyButton.Icon as={Icon} name="send-2" />
 									Send invites
-									<span className="inline-flex items-center gap-0.5">
+									<span className="inline-flex items-center gap-0.5 opacity-90">
 										<KbdCommand />
 										<KbdEnter />
 									</span>
 								</>
 							)}
-						</Button.Root>
+						</FancyButton.Root>
 					</div>
 				</div>
 			</Modal.Content>

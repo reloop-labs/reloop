@@ -1,5 +1,5 @@
 import { authClient } from "@reloop/auth/client";
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -199,24 +199,22 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 											</div>
 										</div>
 										{account.providerId !== "credential" ? (
-											<Button.Root
-												mode="stroke"
-												variant="neutral"
+											<FancyButton.Root
+												variant="basic"
+												size="xsmall"
 												disabled={disconnecting === account.providerId}
 												onClick={() => handleDisconnect(account.providerId)}
-												className="h-8 px-3"
+												className="font-medium"
 											>
 												{disconnecting === account.providerId ? (
 													<Spinner size={14} color="var(--text-strong-950)" />
 												) : (
-													<div className="flex items-center gap-1.5 text-text-sub-600">
-														<Icon name="check" className="h-3.5 w-3.5" />
-														<span className="font-medium text-xs">
-															Disconnect
-														</span>
-													</div>
+													<>
+														<FancyButton.Icon as={Icon} name="check" />
+														Disconnect
+													</>
 												)}
-											</Button.Root>
+											</FancyButton.Root>
 										) : (
 											<span className="rounded-full bg-success-base px-1.5 py-0.5 font-semibold text-[10px] text-white">
 												Connected
@@ -255,22 +253,22 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 											</p>
 										</div>
 									</div>
-									<Button.Root
-										mode="stroke"
-										variant="neutral"
+									<FancyButton.Root
+										variant="basic"
+										size="xsmall"
 										disabled={connecting === provider.id}
 										onClick={() => handleConnect(provider.id)}
-										className="h-8"
+										className="font-medium"
 									>
 										{connecting === provider.id ? (
 											<Spinner size={14} color="var(--text-strong-950)" />
 										) : (
-											<div className="flex items-center gap-1">
-												<Icon name="plus" className="-ml-[3px] h-3.5 w-3.5" />
-												<span className="font-medium text-xs">Connect</span>
-											</div>
+											<>
+												<FancyButton.Icon as={Icon} name="plus" />
+												Connect
+											</>
 										)}
-									</Button.Root>
+									</FancyButton.Root>
 								</div>
 							</div>
 						))}

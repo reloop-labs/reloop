@@ -1,6 +1,6 @@
 
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
@@ -46,17 +46,14 @@ export const TeamFilterDropdown = ({
 	return (
 		<Dropdown.Root open={isOpen} onOpenChange={setIsOpen}>
 			<Dropdown.Trigger asChild className="w-32">
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
+				<FancyButton.Root
+					variant="basic"
 					size="xsmall"
-					className="flex justify-between rounded-[10px] transition-transform duration-100 ease-out active:scale-[0.98]"
+					className="flex justify-between rounded-[10px] font-medium"
 				>
 					{displayLabel}
-					<Button.Icon>
-						<Icon name="chevron-down" className="h-3.5 w-3.5" />
-					</Button.Icon>
-				</Button.Root>
+					<FancyButton.Icon as={Icon} name="chevron-down" />
+				</FancyButton.Root>
 			</Dropdown.Trigger>
 			<Dropdown.Content align="start" className="w-32 p-1">
 				{/* Filter Options */}

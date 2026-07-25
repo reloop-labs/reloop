@@ -5,7 +5,7 @@ import {
 	type PricingPlan,
 	pricingPlans,
 } from "@reloop/pricing";
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { useNavigate } from "@tanstack/react-router";
@@ -73,44 +73,41 @@ export function PlansPage() {
 
 		if (index === currentIndex) {
 			return (
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
+				<FancyButton.Root
+					variant="basic"
 					size="small"
-					className="w-full rounded-full font-semibold"
+					className="w-full rounded-full font-semibold opacity-60"
 					disabled
 				>
 					Current plan
-				</Button.Root>
+				</FancyButton.Root>
 			);
 		}
 
 		if (plan.monthlyPrice === null) {
 			return (
-				<Button.Root
-					variant="neutral"
-					mode="stroke"
+				<FancyButton.Root
+					variant="basic"
 					size="small"
 					className="w-full rounded-full font-semibold"
 					onClick={() => requestPlan(plan, "enterprise")}
 				>
 					Contact sales
-				</Button.Root>
+				</FancyButton.Root>
 			);
 		}
 
 		const isUpgrade = index > currentIndex;
 		const isNext = index === nextIndex;
 		return (
-			<Button.Root
-				variant="neutral"
-				mode={isNext ? "filled" : "stroke"}
+			<FancyButton.Root
+				variant={isNext || isUpgrade ? "blue" : "basic"}
 				size="small"
 				className="w-full rounded-full font-semibold"
 				onClick={() => requestPlan(plan, isUpgrade ? "upgrade" : "downgrade")}
 			>
 				{isUpgrade ? "Upgrade" : "Downgrade"}
-			</Button.Root>
+			</FancyButton.Root>
 		);
 	}
 

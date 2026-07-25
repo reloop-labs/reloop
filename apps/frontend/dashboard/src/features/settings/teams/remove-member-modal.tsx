@@ -1,5 +1,5 @@
 
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
@@ -38,20 +38,19 @@ export const RemoveMemberModal = ({
 				</div>
 
 				<Modal.Footer className="mt-4 flex items-center justify-end gap-3 border-stroke-soft-100/50">
-					<Button.Root
+					<FancyButton.Root
 						type="button"
-						variant="neutral"
-						mode="stroke"
+						variant="basic"
 						size="xsmall"
 						onClick={() => onOpenChange(false)}
 						disabled={isRemoving}
 					>
 						Cancel
 						<KbdEsc />
-					</Button.Root>
-					<Button.Root
+					</FancyButton.Root>
+					<FancyButton.Root
 						type="button"
-						variant="error"
+						variant="destructive"
 						size="xsmall"
 						onClick={onConfirm}
 						disabled={isRemoving}
@@ -64,7 +63,7 @@ export const RemoveMemberModal = ({
 						) : (
 							"Remove member"
 						)}
-					</Button.Root>
+					</FancyButton.Root>
 				</Modal.Footer>
 			</Modal.Content>
 		</Modal.Root>

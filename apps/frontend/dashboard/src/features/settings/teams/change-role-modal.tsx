@@ -3,7 +3,7 @@ import {
 	getAvatarGradient,
 	getAvatarInitial,
 } from "#/utils/avatar";
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { KbdCommand } from "@reloop/ui/kbd-command";
@@ -262,20 +262,19 @@ export const ChangeRoleModal = ({
 						{hasChanges ? `Will update to ${selectedRole}` : "No changes yet"}
 					</p>
 					<div className="flex items-center gap-2">
-						<Button.Root
+						<FancyButton.Root
 							type="button"
-							variant="neutral"
-							mode="stroke"
+							variant="basic"
 							size="xsmall"
 							onClick={() => handleOpenChange(false)}
 							disabled={isUpdating}
 						>
 							Cancel
 							<KbdEsc />
-						</Button.Root>
-						<Button.Root
+						</FancyButton.Root>
+						<FancyButton.Root
 							type="button"
-							variant="neutral"
+							variant="blue"
 							size="xsmall"
 							onClick={handleSave}
 							disabled={isUpdating || !hasChanges}
@@ -287,15 +286,15 @@ export const ChangeRoleModal = ({
 								</>
 							) : (
 								<>
-									<Icon name="user-role" className="-mr-1 h-3.5 w-3.5" />
+									<FancyButton.Icon as={Icon} name="user-role" />
 									Update role
-									<span className="inline-flex items-center gap-0.5">
+									<span className="inline-flex items-center gap-0.5 opacity-90">
 										<KbdCommand />
 										<KbdEnter />
 									</span>
 								</>
 							)}
-						</Button.Root>
+						</FancyButton.Root>
 					</div>
 				</div>
 			</Modal.Content>

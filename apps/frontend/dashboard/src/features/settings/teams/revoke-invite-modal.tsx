@@ -4,7 +4,7 @@ import {
 	getAvatarInitial,
 } from "#/utils/avatar";
 import * as Avatar from "@reloop/ui/avatar";
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
@@ -103,24 +103,25 @@ export const RevokeInviteModal = ({
 				</div>
 
 				<div className="flex justify-end gap-2 px-5 pb-5 sm:px-6 sm:pb-6">
-					<Button.Root
+					<FancyButton.Root
 						type="button"
-						variant="neutral"
-						mode="stroke"
+						variant="basic"
+						size="xsmall"
 						onClick={() => onOpenChange(false)}
 						disabled={isRevoking}
 						className="justify-center"
 					>
 						Cancel
 						<KbdEsc />
-					</Button.Root>
-					<Button.Root
+					</FancyButton.Root>
+					<FancyButton.Root
 						type="button"
-						variant="error"
+						variant="destructive"
+						size="xsmall"
 						onClick={onConfirm}
 						disabled={isRevoking}
 					>
-						<Icon name="trash-2" className="-mr-1 h-4 w-4 shrink-0" />
+						<FancyButton.Icon as={Icon} name="trash-2" />
 						{isRevoking ? (
 							<>
 								<Spinner size={14} color="currentColor" />
@@ -129,7 +130,7 @@ export const RevokeInviteModal = ({
 						) : (
 							"Revoke invite"
 						)}
-					</Button.Root>
+					</FancyButton.Root>
 				</div>
 			</Modal.Content>
 		</Modal.Root>

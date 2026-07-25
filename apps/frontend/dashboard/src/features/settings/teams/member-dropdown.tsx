@@ -1,6 +1,6 @@
 
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Popover from "@reloop/ui/popover";
@@ -67,17 +67,13 @@ export const MemberDropdown = ({
 	return (
 		<Popover.Root open={popoverOpen} onOpenChange={handleOpenChange}>
 			<Popover.Trigger asChild>
-				<Button.Root
-					variant="neutral"
-					mode="ghost"
-					size="xxsmall"
-					className="rounded p-1"
+				<FancyButton.Root
+					variant="ghost"
+					size="xsmall"
+					className="h-7 w-7 rounded p-0"
 				>
-					<Icon
-						name="more-horizontal"
-						className="h-3 w-3 text-text-sub-600 hover:text-text-strong-950"
-					/>
-				</Button.Root>
+					<FancyButton.Icon as={Icon} name="more-horizontal" />
+				</FancyButton.Root>
 			</Popover.Trigger>
 			<Popover.Content
 				align="end"

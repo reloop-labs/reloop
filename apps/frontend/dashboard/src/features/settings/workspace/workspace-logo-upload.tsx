@@ -1,5 +1,5 @@
 import { authClient } from "@reloop/auth/client";
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
 import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
@@ -159,12 +159,13 @@ export function WorkspaceLogoUpload({
 				<p className="-mt-0.5 pb-2 text-paragraph-xs text-text-sub-600">
 					Recommended size 1:1, up to 10MB.
 				</p>
-				<Button.Root
-					variant="neutral"
-					size="xxsmall"
+				<FancyButton.Root
+					variant="basic"
+					size="xsmall"
 					type="button"
 					onClick={handleFileUploadClick}
 					disabled={isUploading}
+					className="font-medium"
 				>
 					{isUploading ? (
 						<>
@@ -173,11 +174,11 @@ export function WorkspaceLogoUpload({
 						</>
 					) : (
 						<>
-							<Icon name="camera" className="h-4 w-4" />
+							<FancyButton.Icon as={Icon} name="camera" />
 							Upload Logo
 						</>
 					)}
-				</Button.Root>
+				</FancyButton.Root>
 			</div>
 		</div>
 	);

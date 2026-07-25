@@ -6,7 +6,7 @@ import {
 	type PlanId,
 	pricingPlans,
 } from "@reloop/pricing";
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
 import { Circle } from "rc-progress";
 import { useState } from "react";
@@ -181,15 +181,14 @@ function UpgradeBanner({
 					more.
 				</p>
 			</div>
-			<Button.Root
-				variant="neutral"
-				mode="filled"
+			<FancyButton.Root
+				variant="blue"
 				size="xsmall"
 				className="shrink-0 rounded-full font-medium"
 				onClick={onUpgrade}
 			>
 				Upgrade plan
-			</Button.Root>
+			</FancyButton.Root>
 		</div>
 	);
 }

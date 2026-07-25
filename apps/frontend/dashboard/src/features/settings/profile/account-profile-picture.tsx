@@ -1,5 +1,5 @@
 import { authClient } from "@reloop/auth/client";
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
@@ -186,26 +186,26 @@ export function AccountProfilePicture({
 					<p className="-mt-0.5 pb-2 text-paragraph-xs text-text-sub-600">
 						We only support PNGs, JPEGs and GIFs under 10MB
 					</p>
-					<Button.Root
-						variant="neutral"
-						mode="filled"
-						size="xxsmall"
+					<FancyButton.Root
+						variant="basic"
+						size="xsmall"
 						type="button"
 						onClick={handleFileUploadClick}
 						disabled={isUploading}
+						className="font-medium"
 					>
 						{isUploading ? (
 							<>
-								<Spinner size={14} color="var(--bg-white-0)" />
+								<Spinner size={14} color="var(--text-strong-950)" />
 								Uploading...
 							</>
 						) : (
 							<>
-								<Icon name="camera" className="h-4 w-4" />
+								<FancyButton.Icon as={Icon} name="camera" />
 								Upload image
 							</>
 						)}
-					</Button.Root>
+					</FancyButton.Root>
 				</div>
 			</div>
 		</div>

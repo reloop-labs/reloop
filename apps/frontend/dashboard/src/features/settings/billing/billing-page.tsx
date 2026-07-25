@@ -7,7 +7,7 @@ import {
 	pricingPlans,
 } from "@reloop/pricing";
 import * as Badge from "@reloop/ui/badge";
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
@@ -133,15 +133,14 @@ export function BillingPage() {
 							{currentPlan.priceSubline}
 						</p>
 					</div>
-					<Button.Root
-						variant="neutral"
-						mode="stroke"
-						size="xxsmall"
-						className="rounded-full"
+					<FancyButton.Root
+						variant="basic"
+						size="xsmall"
+						className="rounded-full font-medium"
 						onClick={() => setSwitchOpen(true)}
 					>
 						Manage
-					</Button.Root>
+					</FancyButton.Root>
 				</div>
 			</div>
 
@@ -164,11 +163,10 @@ export function BillingPage() {
 							</p>
 						</div>
 						<div className="flex items-center gap-3">
-							<Button.Root
-								variant="neutral"
-								mode="ghost"
+							<FancyButton.Root
+								variant="ghost"
 								size="small"
-								className="rounded-full font-medium text-text-sub-600 hover:text-text-strong-950"
+								className="rounded-full font-medium"
 								onClick={() =>
 									void navigate({
 										to: "/settings/billing/plans",
@@ -177,16 +175,15 @@ export function BillingPage() {
 								}
 							>
 								View all plans
-							</Button.Root>
-							<Button.Root
-								variant="neutral"
-								mode="filled"
+							</FancyButton.Root>
+							<FancyButton.Root
+								variant="blue"
 								size="small"
 								className="rounded-full font-semibold"
 								onClick={handleUpgrade}
 							>
 								Upgrade now
-							</Button.Root>
+							</FancyButton.Root>
 						</div>
 					</div>
 

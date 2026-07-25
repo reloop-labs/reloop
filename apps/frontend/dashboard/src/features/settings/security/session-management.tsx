@@ -1,5 +1,5 @@
 import { authClient } from "@reloop/auth/client";
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -96,16 +96,15 @@ export function SessionManagement({ className }: SessionManagementProps) {
 					</p>
 				</div>
 				{sessions.length > 1 && (
-					<Button.Root
-						variant="error"
-						className="h-7 text-sm"
-						size="xxsmall"
+					<FancyButton.Root
+						variant="destructive"
+						size="xsmall"
 						onClick={handleTerminateAllSessions}
 						disabled={terminatingAll || loading}
 					>
-						{terminatingAll && <Spinner size={12} color="var(--error-base)" />}
+						{terminatingAll && <Spinner size={12} color="var(--static-white)" />}
 						Revoke All Other
-					</Button.Root>
+					</FancyButton.Root>
 				)}
 			</div>
 
@@ -231,20 +230,18 @@ export function SessionManagement({ className }: SessionManagementProps) {
 													Current
 												</div>
 											) : (
-												<Button.Root
-													variant="error"
-													mode="lighter"
-													size="xxsmall"
-													className="text-xs"
+												<FancyButton.Root
+													variant="destructive"
+													size="xsmall"
 													onClick={() => handleTerminateSession(session.token)}
 													disabled={terminatingSession === session.token}
 												>
 													{terminatingSession === session.token ? (
-														<Spinner size={12} color="var(--text-sub-600)" />
+														<Spinner size={12} color="var(--static-white)" />
 													) : (
 														"Revoke"
 													)}
-												</Button.Root>
+												</FancyButton.Root>
 											)}
 										</div>
 									</div>

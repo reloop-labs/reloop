@@ -1,4 +1,4 @@
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import { useNavigate } from "@tanstack/react-router";
@@ -71,24 +71,24 @@ export function TeamsPage() {
 				<TeamFilterDropdown value={filters} onChange={setFilters} />
 
 				{canInvite && (
-					<Button.Root
-						variant="neutral"
+					<FancyButton.Root
+						variant="blue"
 						size="xsmall"
 						onClick={() => void setModal("invite")}
-						className="rounded-[10px]"
+						className="rounded-[10px] font-medium"
 					>
-						<Icon name="user-plus" className="h-4 w-4" />
+						<FancyButton.Icon as={Icon} name="user-plus" />
 						<span>Invite members</span>
-						<span className="inline-flex items-center gap-0.5">
+						<span className="inline-flex items-center gap-0.5 opacity-90">
 							<Icon
 								name="command"
-								className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+								className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
 							/>
-							<span className="flex h-4 w-4 items-center justify-center rounded-sm border border-stroke-soft-100/20 p-px font-medium text-[10px] uppercase">
+							<span className="flex h-3.5 w-3.5 items-center justify-center rounded-sm border border-white/20 p-px font-medium text-[9px] uppercase">
 								a
 							</span>
 						</span>
-					</Button.Root>
+					</FancyButton.Root>
 				)}
 			</div>
 

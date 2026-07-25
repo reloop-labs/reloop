@@ -1,4 +1,4 @@
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 
 export function AccountDangerZone() {
@@ -19,10 +19,10 @@ export function AccountDangerZone() {
 						</p>
 					</div>
 					{/* Delete flow not ported yet — keep error styling (disabled greys the button). */}
-					<Button.Root variant="error" size="xsmall" type="button">
-						<Icon name="trash-2" className="-mr-1 size-3 text-white" />
+					<FancyButton.Root variant="destructive" size="xsmall" type="button">
+						<FancyButton.Icon as={Icon} name="trash-2" />
 						Delete Account
-					</Button.Root>
+					</FancyButton.Root>
 				</div>
 			</div>
 		</div>

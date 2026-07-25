@@ -1,6 +1,6 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { authClient } from "@reloop/auth/client";
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
@@ -183,31 +183,31 @@ function WorkspaceForm({
 						)}
 					</div>
 					<div className="flex justify-end">
-						<Button.Root
-							variant="neutral"
+						<FancyButton.Root
+							variant="blue"
 							size="xsmall"
 							type="submit"
-							className="w-40"
+							className="w-40 font-medium"
 							disabled={!hasChanges || isSaving}
 						>
 							{isSaving ? (
-								<Spinner size={14} color="var(--text-strong-950)" />
+								<Spinner size={14} color="var(--static-white)" />
 							) : (
 								<>
 									Save Changes
-									<span className="inline-flex items-center gap-0.5">
+									<span className="inline-flex items-center gap-0.5 opacity-90">
 										<Icon
 											name="command"
-											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+											className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
 										/>
 										<Icon
 											name="enter"
-											className="h-4 w-4 rounded-sm border border-stroke-soft-100/20 p-px"
+											className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
 										/>
 									</span>
 								</>
 							)}
-						</Button.Root>
+						</FancyButton.Root>
 					</div>
 					<WorkspaceDangerZone />
 				</form>

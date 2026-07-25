@@ -6,7 +6,7 @@ import {
 	type PricingPlan,
 	pricingPlans,
 } from "@reloop/pricing";
-import * as Button from "@reloop/ui/button";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
@@ -236,27 +236,25 @@ export function SwitchPlanModal({
 						</p>
 					</div>
 					<div className="flex items-center gap-3">
-						<Button.Root
+						<FancyButton.Root
 							type="button"
-							variant="neutral"
-							mode="stroke"
+							variant="basic"
 							size="small"
 							className="rounded-full font-medium"
 							onClick={() => onOpenChange(false)}
 						>
 							Cancel
-						</Button.Root>
-						<Button.Root
+						</FancyButton.Root>
+						<FancyButton.Root
 							type="button"
-							variant="neutral"
-							mode="filled"
+							variant="blue"
 							size="small"
 							className="rounded-full font-medium"
 							disabled={selectedId === currentPlanId}
 							onClick={handleSwitch}
 						>
 							Switch plan
-						</Button.Root>
+						</FancyButton.Root>
 					</div>
 				</Modal.Footer>
 			</Modal.Content>
