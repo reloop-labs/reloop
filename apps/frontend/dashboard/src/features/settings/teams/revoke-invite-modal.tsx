@@ -4,14 +4,21 @@ import {
 	getAvatarInitial,
 } from "#/utils/avatar";
 import * as Avatar from "@reloop/ui/avatar";
+import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import {
+	AnimatePresence,
+	animate,
+	motion,
+	useMotionValue,
+	type AnimationPlaybackControls,
+} from "motion/react";
+import { useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 
 interface RevokeInviteModalProps {
 	open: boolean;
@@ -33,8 +40,12 @@ export const RevokeInviteModal = ({
 	invitedAt,
 }: RevokeInviteModalProps) => {
 	const [status, setStatus] = useState<"idle" | "revoking" | "success">("idle");
+	const [isHolding, setIsHolding] = useState(false);
+	const holdProgress = useMotionValue(0);
+	const animationRef = useRef<AnimationPlaybackControls | null>(null);
 
 	const handleRevoke = async () => {
+		if (status !== "idle") return;
 		setStatus("revoking");
 		try {
 			await onConfirm();
@@ -42,11 +53,48 @@ export const RevokeInviteModal = ({
 			setTimeout(() => {
 				onOpenChange(false);
 				setStatus("idle");
-			}, 1500);
+			}, 1200);
 		} catch {
 			setStatus("idle");
 		}
 	};
+
+	const startHold = () => {
+		if (status !== "idle") return;
+		setIsHolding(true);
+		holdProgress.set(0);
+		animationRef.current = animate(holdProgress, 1, {
+			duration: 1.2,
+			ease: "linear",
+			onComplete: () => {
+				setIsHolding(false);
+				holdProgress.set(0);
+				void handleRevoke();
+			},
+		});
+	};
+
+	const cancelHold = () => {
+		if (!isHolding && holdProgress.get() === 0) return;
+		setIsHolding(false);
+		animationRef.current?.stop();
+		animate(holdProgress, 0, {
+			duration: 0.2,
+			ease: "easeOut",
+		});
+	};
+
+	useHotkeys(
+		"enter",
+		(e) => {
+			e.preventDefault();
+			if (open && status === "idle") {
+				void handleRevoke();
+			}
+		},
+		{ enabled: open },
+	);
+
 	const getRelativeTime = (date?: Date | string) => {
 		if (!date) return "";
 		const days = Math.floor(
@@ -71,77 +119,105 @@ export const RevokeInviteModal = ({
 	const timeText = getRelativeTime(invitedAt);
 
 	return (
-		<Modal.Root open={open} onOpenChange={onOpenChange}>
-			<Modal.Content className="!p-0 sm:max-w-[420px]" showClose={false}>
-				<div className="flex flex-col gap-4 p-5 pb-5 sm:p-6">
-					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-error-base/10 text-error-base">
-						<Icon name="bell-off" className="h-6 w-6" />
-					</div>
+		<Modal.Root
+			open={open}
+			onOpenChange={(nextOpen) => {
+				if (!nextOpen) {
+					cancelHold();
+				}
+				onOpenChange(nextOpen);
+			}}
+		>
+			<Modal.Content
+				className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-6 sm:max-w-[460px] dark:border-stroke-soft-100/40"
+				showClose={true}
+			>
+				{/* Header */}
+				<div className="relative pr-6">
+					<Modal.Title className="font-semibold text-lg text-text-strong-950">
+						Revoke invite
+					</Modal.Title>
+					<Modal.Description className="mt-1 text-paragraph-sm text-text-sub-600">
+						Are you sure you want to revoke this invitation? This action cannot be
+						undone.
+					</Modal.Description>
+				</div>
 
-					<div className="flex flex-col space-y-2 text-left">
-						<Modal.Title className="font-semibold text-base text-text-strong-950">
-							Revoke invite?
-						</Modal.Title>
-						<p className="text-paragraph-sm text-text-sub-600 leading-relaxed">
-							This invite will be permanently invalidated. The recipient won't
-							be able to use the link to join, and you'll need to send a new
-							invite if you change your mind.
-						</p>
-					</div>
-
-					<div className="mt-1 mb-2 flex items-center gap-3 rounded-2xl border border-stroke-soft-100 bg-bg-weak-50/80 p-3 dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
-						<Avatar.Root size="32" color="gray" className="flex-shrink-0">
-							<Avatar.Image asChild>
-								<div
-									className={cn(
-										"flex h-full w-full items-center justify-center rounded-full font-semibold text-[11px] text-white uppercase tracking-wide shadow-sm",
-										getAvatarGradient(inviteEmail),
-									)}
-								>
-									{getAvatarInitial(null, inviteEmail)}
-								</div>
-							</Avatar.Image>
-						</Avatar.Root>
-						<div className="min-w-0 flex-1">
-							<div className="truncate font-medium text-label-sm text-text-strong-950">
-								{inviteEmail}
+				{/* Invite Details Card */}
+				<div className="mt-5 flex items-center gap-3 rounded-xl border border-stroke-soft-100 bg-bg-weak-50/50 p-3.5 dark:border-stroke-soft-100/40">
+					<Avatar.Root size="32" color="gray" className="flex-shrink-0">
+						<Avatar.Image asChild>
+							<div
+								className={cn(
+									"flex h-8 w-8 items-center justify-center rounded-full font-semibold text-[11px] text-white uppercase tracking-wide shadow-xs",
+									getAvatarGradient(inviteEmail),
+								)}
+							>
+								{getAvatarInitial(null, inviteEmail)}
 							</div>
-							<div className="mt-0.5 truncate text-text-sub-600 text-xs">
-								{timeText ? `Invited ${timeText} • ` : ""}
-								<span
-									className={cn("font-medium", getRoleTextColor(inviteRole))}
-								>
-									{inviteRole.charAt(0).toUpperCase() + inviteRole.slice(1)}{" "}
-									role
-								</span>
-							</div>
+						</Avatar.Image>
+					</Avatar.Root>
+					<div className="min-w-0 flex-1">
+						<div className="truncate font-medium text-paragraph-sm text-text-strong-950">
+							{inviteEmail}
+						</div>
+						<div className="mt-0.5 truncate text-text-sub-600 text-xs">
+							{timeText ? `Invited ${timeText} • ` : ""}
+							<span className={cn("font-medium", getRoleTextColor(inviteRole))}>
+								{inviteRole.charAt(0).toUpperCase() + inviteRole.slice(1)} role
+							</span>
 						</div>
 					</div>
 				</div>
 
-				<div className="flex justify-end gap-2 px-5 pb-5 sm:px-6 sm:pb-6">
-					<FancyButton.Root
+				{/* Warning Banner */}
+				<div className="mt-4 rounded-xl border border-[#FBE3B5] bg-[#FEF6E6] p-3.5 text-[#8A5300] text-xs leading-relaxed dark:border-amber-800/40 dark:bg-amber-950/30 dark:text-amber-200">
+					<span className="font-semibold">Warning:</span> The recipient won't be
+					able to use the link to join, and you'll need to send a new invite if
+					you change your mind.
+				</div>
+
+				{/* Footer */}
+				<div className="mt-6 flex items-center justify-end gap-3">
+					<Button.Root
 						type="button"
-						variant="basic"
-						size="xsmall"
-						onClick={() => onOpenChange(false)}
+						variant="neutral"
+						mode="ghost"
+						size="small"
+						onClick={() => {
+							if (status === "idle") {
+								cancelHold();
+								onOpenChange(false);
+							}
+						}}
 						disabled={status !== "idle"}
-						className="justify-center"
+						className={cn(
+							"transition-opacity duration-200",
+							status !== "idle" && "pointer-events-none opacity-50",
+						)}
 					>
 						Cancel
-						<KbdEsc />
-					</FancyButton.Root>
+					</Button.Root>
 					<FancyButton.Root
 						type="button"
 						variant={status === "success" ? "success" : "destructive"}
-						size="xsmall"
+						size="small"
+						onPointerDown={startHold}
+						onPointerUp={cancelHold}
+						onPointerLeave={cancelHold}
+						onPointerCancel={cancelHold}
 						className={cn(
-							"min-w-[140px] justify-center overflow-hidden transition-all duration-200 font-medium",
-							status === "revoking" && "opacity-90",
+							"relative min-w-[134px] select-none justify-center overflow-hidden transition-all duration-200 font-medium",
+							status !== "idle" && "pointer-events-none opacity-90",
 						)}
-						onClick={handleRevoke}
 						disabled={status !== "idle"}
 					>
+						{/* Hold progress overlay fill */}
+						<motion.div
+							className="pointer-events-none absolute inset-0 bg-white/25 origin-left"
+							style={{ scaleX: holdProgress }}
+						/>
+
 						<AnimatePresence mode="popLayout" initial={false}>
 							<motion.span
 								key={status}
@@ -153,7 +229,7 @@ export const RevokeInviteModal = ({
 								initial={{ opacity: 0, y: -14 }}
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: 14 }}
-								className="flex items-center justify-center gap-1.5 font-medium"
+								className="relative z-10 flex items-center justify-center gap-1.5 font-medium"
 							>
 								{status === "revoking" ? (
 									<>
@@ -162,14 +238,11 @@ export const RevokeInviteModal = ({
 									</>
 								) : status === "success" ? (
 									<>
-										<Icon name="check-circle" className="h-4 w-4" />
-										<span>Revoked!</span>
+										<Icon name="check" className="h-4 w-4 shrink-0 text-white" />
+										<span>Revoked</span>
 									</>
 								) : (
-									<>
-										<FancyButton.Icon as={Icon} name="trash-2" />
-										<span>Revoke invite</span>
-									</>
+									<span>Hold to revoke</span>
 								)}
 							</motion.span>
 						</AnimatePresence>

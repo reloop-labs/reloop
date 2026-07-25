@@ -392,7 +392,6 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 				await invalidateInvites();
 				return;
 			}
-			toast.success("Invitation resent successfully");
 			await invalidateInvites();
 		} catch (_err) {
 			toast.error("Failed to resend invitation");
@@ -405,7 +404,6 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 	const handleCopyInviteLink = (inviteId: string) => {
 		const inviteLink = `${window.location.origin}/dashboard/accept-invitation?id=${inviteId}`;
 		navigator.clipboard.writeText(inviteLink);
-		toast.success("Invite link copied to clipboard");
 	};
 
 	const handleRevokeInviteClick = (inviteId: string) => {
