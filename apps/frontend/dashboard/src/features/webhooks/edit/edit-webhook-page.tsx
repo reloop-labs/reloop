@@ -98,7 +98,7 @@ export function EditWebhookPage({ webhookId }: EditWebhookPageProps) {
 						Edit webhook
 					</h1>
 					<p className="text-sm text-text-sub-600 leading-relaxed">
-						Update endpoint, events, and delivery status.
+						Update endpoint URL, description, and subscribed events.
 					</p>
 				</div>
 			</div>

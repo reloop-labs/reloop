@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_dashboard/webhooks/$webhookId/edit")({
 			{ title: "Edit Webhook · Reloop" },
 			{
 				name: "description",
-				content: "Update webhook endpoint, events, and status.",
+				content: "Update webhook endpoint, description, and events.",
 			},
 		],
 	}),

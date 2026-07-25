@@ -26,11 +26,6 @@ const editWebhookSchema = v.object({
 			"Please enter a valid URL starting with http:// or https://",
 		),
 	),
-	status: v.union([
-		v.literal("active"),
-		v.literal("paused"),
-		v.literal("disabled"),
-	]),
 	events: v.pipe(
 		v.array(v.string()),
 		v.minLength(1, "At least one event is required"),
@@ -52,7 +47,6 @@ export function useEditWebhookForm(webhook: WebhookDetailData | undefined) {
 		defaultValues: {
 			description: "",
 			url: "",
-			status: "active",
 			events: [],
 		},
 	});
@@ -62,10 +56,6 @@ export function useEditWebhookForm(webhook: WebhookDetailData | undefined) {
 		form.reset({
 			description: webhook.name || "",
 			url: webhook.url || "",
-			status:
-				webhook.status === "failed"
-					? "disabled"
-					: (webhook.status as "active" | "paused" | "disabled"),
 			events: webhook.events || [],
 		});
 	}, [webhook, form]);
@@ -80,7 +70,6 @@ export function useEditWebhookForm(webhook: WebhookDetailData | undefined) {
 				{
 					description: data.description,
 					url: data.url,
-					status: data.status,
 					events: data.events,
 				},
 				{ withCredentials: true },
