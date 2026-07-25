@@ -3,6 +3,8 @@ import { authClient } from "@reloop/auth/client";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { KbdCommand } from "@reloop/ui/kbd-command";
+import { KbdEnter } from "@reloop/ui/kbd-enter";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import { Skeleton } from "@reloop/ui/skeleton";
@@ -193,7 +195,7 @@ function WorkspaceForm({
 							size="xsmall"
 							type="submit"
 							className={cn(
-								"min-w-[160px] justify-center overflow-hidden transition-all duration-200",
+								"h-8 min-w-[140px] justify-center overflow-hidden text-xs transition-all duration-200",
 								status === "saving" && "opacity-90",
 							)}
 							disabled={!hasChanges || status !== "idle"}
@@ -209,30 +211,24 @@ function WorkspaceForm({
 									initial={{ opacity: 0, y: -14 }}
 									animate={{ opacity: 1, y: 0 }}
 									exit={{ opacity: 0, y: 14 }}
-									className="flex items-center justify-center gap-1.5 font-medium"
+									className="flex items-center justify-center gap-1.5 font-medium text-xs"
 								>
 									{status === "saving" ? (
 										<>
-											<Spinner size={14} color="var(--static-white)" />
+											<Spinner size={12} color="var(--static-white)" />
 											<span>Saving...</span>
 										</>
 									) : status === "success" ? (
 										<>
-											<Icon name="check-circle" className="h-4 w-4" />
+											<Icon name="check-circle" className="h-3.5 w-3.5" />
 											<span>Updated</span>
 										</>
 									) : (
 										<>
 											Save Changes
 											<span className="inline-flex items-center gap-0.5 opacity-90">
-												<Icon
-													name="command"
-													className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-												/>
-												<Icon
-													name="enter"
-													className="h-3.5 w-3.5 rounded-sm border border-white/20 p-px"
-												/>
+												<KbdCommand />
+												<KbdEnter />
 											</span>
 										</>
 									)}

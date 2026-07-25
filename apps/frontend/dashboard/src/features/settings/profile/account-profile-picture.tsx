@@ -1,6 +1,6 @@
 import { authClient } from "@reloop/auth/client";
-import * as FancyButton from "@reloop/ui/fancy-button";
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
@@ -35,7 +35,9 @@ export function AccountProfilePicture({
 	);
 	const [imageUrl, setImageUrl] = useState(ensureAbsoluteUrl(initialImageUrl));
 	const [imageFailed, setImageFailed] = useState(false);
-	const [status, setStatus] = useState<"idle" | "uploading" | "success">("idle");
+	const [status, setStatus] = useState<"idle" | "uploading" | "success">(
+		"idle",
+	);
 	const isUploading = status === "uploading";
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -198,7 +200,7 @@ export function AccountProfilePicture({
 						onClick={handleFileUploadClick}
 						disabled={status !== "idle"}
 						className={cn(
-							"min-w-[140px] justify-center overflow-hidden transition-all duration-200 font-medium",
+							"min-w-[140px] justify-center overflow-hidden font-medium transition-all duration-200",
 							status === "uploading" && "opacity-90",
 						)}
 					>
@@ -227,7 +229,11 @@ export function AccountProfilePicture({
 									</>
 								) : (
 									<>
-										<FancyButton.Icon as={Icon} name="camera" />
+										<FancyButton.Icon
+											as={Icon}
+											name="camera"
+											className="mr-0.5 h-4 w-4"
+										/>
 										<span>Upload image</span>
 									</>
 								)}

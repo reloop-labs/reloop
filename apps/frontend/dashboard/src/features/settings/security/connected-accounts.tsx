@@ -252,7 +252,11 @@ export function ConnectedAccounts({ className }: ConnectedAccountsProps) {
 																	</>
 																) : (
 																	<>
-																		<FancyButton.Icon as={Icon} name="check" />
+																		<FancyButton.Icon
+																			as={Icon}
+																			name="check-circle"
+																			className="mr-0.5 h-4 w-4 shrink-0"
+																		/>
 																		<span>Disconnect</span>
 																	</>
 																)}
