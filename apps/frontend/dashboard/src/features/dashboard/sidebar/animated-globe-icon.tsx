@@ -5,7 +5,7 @@ type AnimatedGlobeIconProps = {
 };
 
 /**
- * Domain globe: outer ring stays; verticals draw top→bottom, horizontals L→R.
+ * Domain globe (original icon): outer stays; meridians top→bottom, latitudes L→R.
  * Place inside an element with the `group` class.
  */
 export function AnimatedGlobeIcon({ className }: AnimatedGlobeIconProps) {
@@ -17,31 +17,24 @@ export function AnimatedGlobeIcon({ className }: AnimatedGlobeIconProps) {
 			aria-hidden
 			className={cn("h-4 w-4 shrink-0", className)}
 		>
-			{/* Outer sphere — static */}
-			<circle
-				cx={12}
-				cy={12}
-				r={10}
-				stroke="currentColor"
-				strokeWidth="1.5"
-			/>
-
-			{/* Vertical meridians — top → bottom */}
+			{/* Outer sphere — original arcs, static */}
 			<path
-				d="M12 2V22"
-				pathLength={1}
+				d="M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
 				stroke="currentColor"
 				strokeWidth="1.5"
 				strokeLinecap="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-globe-v-1"
+				strokeLinejoin="round"
 			/>
+
+			{/* Meridians — original curves, top → bottom */}
 			<path
 				d="M12 2C14.2091 2 16 6.47715 16 12C16 17.5228 14.2091 22 12 22"
 				pathLength={1}
 				stroke="currentColor"
 				strokeWidth="1.5"
 				strokeLinecap="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-globe-v-2"
+				strokeLinejoin="round"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-globe-v-1"
 			/>
 			<path
 				d="M12 2C9.79086 2 8 6.47715 8 12C8 17.5228 9.79086 22 12 22"
@@ -49,25 +42,19 @@ export function AnimatedGlobeIcon({ className }: AnimatedGlobeIconProps) {
 				stroke="currentColor"
 				strokeWidth="1.5"
 				strokeLinecap="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-globe-v-3"
+				strokeLinejoin="round"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-globe-v-2"
 			/>
 
-			{/* Horizontal latitudes — left → right */}
-			<path
-				d="M2 12H22"
-				pathLength={1}
-				stroke="currentColor"
-				strokeWidth="1.5"
-				strokeLinecap="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-globe-h-1"
-			/>
+			{/* Latitudes — original curves, left → right */}
 			<path
 				d="M2 12C2 9.79086 6.47715 8 12 8C17.5228 8 22 9.79086 22 12"
 				pathLength={1}
 				stroke="currentColor"
 				strokeWidth="1.5"
 				strokeLinecap="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-globe-h-2"
+				strokeLinejoin="round"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-globe-h-1"
 			/>
 			<path
 				d="M2 12C2 14.2091 6.47715 16 12 16C17.5228 16 22 14.2091 22 12"
@@ -75,7 +62,8 @@ export function AnimatedGlobeIcon({ className }: AnimatedGlobeIconProps) {
 				stroke="currentColor"
 				strokeWidth="1.5"
 				strokeLinecap="round"
-				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-globe-h-3"
+				strokeLinejoin="round"
+				className="[stroke-dasharray:1] [stroke-dashoffset:0] motion-safe:group-hover:animate-globe-h-2"
 			/>
 		</svg>
 	);
