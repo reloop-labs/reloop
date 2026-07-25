@@ -21,8 +21,8 @@ import { useQuery } from "@tanstack/react-query";
 
 dayjs.extend(relativeTime);
 
-const GRID = "grid-cols-[100px_100px_1fr_120px_100px_80px]";
-const SPLIT_GRID = "grid-cols-[72px_76px_minmax(0,1fr)_50px]";
+/** status icon | code | event | time */
+const ROW_GRID = "grid-cols-[20px_auto_minmax(0,1fr)_auto]";
 
 const useMediaQuery = (query: string) => {
 	const [matches, setMatches] = useState(false);
@@ -40,41 +40,42 @@ const useMediaQuery = (query: string) => {
 	return matches;
 };
 
-const DeliverySkeleton = ({ isMobile }: { isMobile: boolean }) => (
-	<div
-		className={cn(
-			"grid w-full items-center gap-4 px-4 py-3",
-			isMobile ? GRID : SPLIT_GRID,
-		)}
-	>
-		<Skeleton className="h-4 w-16" />
-		<Skeleton className="h-5 w-16 rounded-[4px]" />
-		<Skeleton className="h-4 w-full" />
-		{isMobile && (
-			<>
-				<Skeleton className="h-4 w-16" />
-				<Skeleton className="h-4 w-12" />
-			</>
-		)}
+const DeliverySkeleton = () => (
+	<div className={cn("grid w-full items-center gap-3 px-4 py-3", ROW_GRID)}>
+		<Skeleton className="h-4 w-4 rounded-full" />
 		<Skeleton className="h-4 w-8" />
+		<Skeleton className="h-4 w-full max-w-[140px]" />
+		<Skeleton className="h-4 w-14" />
 	</div>
 );
 
-const getStatusColorClass = (status: string) => {
+function statusIcon(status: string): { name: string; className: string } {
 	switch (status) {
 		case "success":
-			return "text-success-base bg-success-lighter";
+			return { name: "check-circle", className: "text-success-base" };
 		case "failed":
-			return "text-error-base bg-error-lighter";
+			return { name: "alert-circle", className: "text-error-base" };
 		case "pending":
-			return "text-warning-base bg-warning-lighter";
+			return { name: "clock", className: "text-warning-base" };
 		case "retrying":
 		case "retried":
-			return "text-warning-base bg-warning-lighter";
+			return { name: "refresh-cw", className: "text-warning-base" };
 		default:
-			return "text-text-sub-600 bg-bg-weak-50";
+			return { name: "circle", className: "text-text-soft-400" };
 	}
-};
+}
+
+function codeClass(status: number | null, deliveryStatus: string) {
+	if (status != null && status >= 200 && status < 300) {
+		return "text-success-base";
+	}
+	if (status != null) {
+		return "text-error-base";
+	}
+	if (deliveryStatus === "success") return "text-success-base";
+	if (deliveryStatus === "failed") return "text-error-base";
+	return "text-text-sub-600";
+}
 
 interface Delivery {
 	id: string;
@@ -575,37 +576,22 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 					{/* Table Header */}
 					<div
 						className={cn(
-							"grid flex-shrink-0 items-center gap-4 border-stroke-soft-100 border-b px-4 py-2.5 text-text-sub-600 dark:border-stroke-soft-100/50",
-							isMobile ? GRID : SPLIT_GRID,
+							"grid flex-shrink-0 items-center gap-3 border-stroke-soft-100 border-b px-4 py-2.5 text-text-sub-600 dark:border-stroke-soft-100/50",
+							ROW_GRID,
 						)}
 					>
-						<div className="flex items-center gap-2 text-xs">
-							<Icon name="clock" className="h-3.5 w-3.5" />
-							<span className="font-medium">Time</span>
+						<div aria-hidden className="w-5" />
+						<div className="flex items-center gap-1.5 text-xs">
+							<Icon name="code" className="h-3.5 w-3.5" />
+							<span className="font-medium">Code</span>
 						</div>
-						<div className="flex items-center gap-2 text-xs">
-							<Icon name="check-circle" className="h-3.5 w-3.5" />
-							<span className="font-medium">Status</span>
-						</div>
-						<div className="flex items-center gap-2 text-xs">
+						<div className="flex items-center gap-1.5 text-xs">
 							<Icon name="activity-2" className="h-3.5 w-3.5" />
 							<span className="font-medium">Event</span>
 						</div>
-						{isMobile && (
-							<>
-								<div className="flex items-center gap-2 whitespace-nowrap text-xs">
-									<Icon name="hash" className="h-3.5 w-3.5" />
-									<span className="font-medium">Delivery ID</span>
-								</div>
-								<div className="flex items-center gap-2 text-xs">
-									<Icon name="clock" className="h-3.5 w-3.5" />
-									<span className="font-medium">Duration</span>
-								</div>
-							</>
-						)}
-						<div className="flex items-center gap-2 text-xs">
-							<Icon name="code" className="h-3.5 w-3.5" />
-							<span className="font-medium">Code</span>
+						<div className="flex items-center gap-1.5 justify-end text-xs">
+							<Icon name="clock" className="h-3.5 w-3.5" />
+							<span className="font-medium">Time</span>
 						</div>
 					</div>
 
@@ -618,7 +604,7 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 					>
 						{isLoading ? (
 							Array.from({ length: 5 }).map((_, i) => (
-								<DeliverySkeleton key={i} isMobile={isMobile} />
+								<DeliverySkeleton key={i} />
 							))
 						) : filteredDeliveries.length === 0 ? (
 							<div className="flex h-32 w-full items-center justify-center text-center text-text-sub-600">
@@ -626,13 +612,8 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 							</div>
 						) : (
 							filteredDeliveries.map((delivery) => {
-								const duration = delivery.completedAt
-									? dayjs(delivery.completedAt).diff(
-											dayjs(delivery.createdAt),
-											"ms",
-										)
-									: null;
 								const isRowActive = selectedDeliveryId === delivery.id;
+								const icon = statusIcon(delivery.status);
 
 								return (
 									<div
@@ -645,51 +626,47 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 											}
 										}}
 										className={cn(
-											"group/row grid w-full cursor-pointer items-center gap-4 px-4 py-3 text-left transition-colors",
-											isMobile ? GRID : SPLIT_GRID,
+											"group/row grid w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors",
+											ROW_GRID,
 											"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-1",
 											isRowActive && "bg-bg-weak-50/50",
 										)}
 									>
-										<div className="font-medium font-mono text-[13px] text-text-strong-950">
-											{dayjs(delivery.createdAt).format("HH:mm:ss")}
-										</div>
-										<div className="flex items-center">
-											<span
-												className={cn(
-													"inline-flex rounded-md border-[1px] border-transparent px-[6px] py-0.5 font-medium text-[10px]",
-													getStatusColorClass(delivery.status),
-												)}
-											>
-												{delivery.status}
-											</span>
-										</div>
-										<div className="truncate font-medium font-mono text-[13px] text-text-strong-950">
+										{/* Status icon */}
+										<Tooltip.Provider delayDuration={200}>
+											<Tooltip.Root>
+												<Tooltip.Trigger asChild>
+													<span className="flex items-center justify-center">
+														<Icon
+															name={icon.name}
+															className={cn("h-4 w-4 shrink-0", icon.className)}
+														/>
+													</span>
+												</Tooltip.Trigger>
+												<Tooltip.Content side="top" size="small">
+													<span className="capitalize">{delivery.status}</span>
+												</Tooltip.Content>
+											</Tooltip.Root>
+										</Tooltip.Provider>
+
+										{/* Code */}
+										<span
+											className={cn(
+												"font-medium font-mono text-[13px] tabular-nums",
+												codeClass(delivery.responseStatus, delivery.status),
+											)}
+										>
+											{delivery.responseStatus ?? "—"}
+										</span>
+
+										{/* Event */}
+										<div className="min-w-0 truncate font-medium font-mono text-[13px] text-text-strong-950">
 											{delivery.eventType}
 										</div>
-										{isMobile && (
-											<>
-												<div className="truncate font-mono text-text-sub-600 text-xs">
-													{delivery.id.replace("dlv_", "").substring(0, 8)}
-												</div>
-												<div className="font-medium text-[13px] text-text-sub-600">
-													{duration ? `${duration.toLocaleString()}ms` : "---"}
-												</div>
-											</>
-										)}
-										<div className="flex items-center">
-											<span
-												className={cn(
-													"font-medium font-mono text-[13px]",
-													delivery.responseStatus &&
-														delivery.responseStatus >= 200 &&
-														delivery.responseStatus < 300
-														? "text-success-base"
-														: "text-error-base",
-												)}
-											>
-												{delivery.responseStatus || "---"}
-											</span>
+
+										{/* Time */}
+										<div className="text-right font-medium font-mono text-[13px] text-text-sub-600 tabular-nums">
+											{dayjs(delivery.createdAt).format("HH:mm:ss")}
 										</div>
 									</div>
 								);
