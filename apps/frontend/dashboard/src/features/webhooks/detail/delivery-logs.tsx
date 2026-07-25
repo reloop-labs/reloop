@@ -564,147 +564,172 @@ export const DeliveryLogs = ({ webhookId }: DeliveryLogsProps) => {
 
 			{/* ── Split Panel ── */}
 			<div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-start">
-				{/* LEFT — Delivery logs list */}
+				{/* LEFT — Delivery logs list (API key table chrome) */}
 				<div
 					className={cn(
-						"w-full rounded-[14px] border border-stroke-soft-100 bg-bg-white-0 text-paragraph-sm dark:border-stroke-soft-100/40",
-						!isMobile &&
-							"sticky top-4 flex w-[480px] shrink-0 flex-col overflow-hidden",
+						"w-full text-paragraph-sm",
+						!isMobile && "sticky top-4 flex w-[480px] shrink-0 flex-col",
 					)}
 					style={!isMobile ? { maxHeight: "calc(100vh - 220px)" } : undefined}
 				>
-					{/* Table Header */}
+					{/* Header — sits above body, overlaps with -mt */}
 					<div
 						className={cn(
-							"grid flex-shrink-0 items-center gap-3 border-stroke-soft-100 border-b px-4 py-2.5 text-text-sub-600 dark:border-stroke-soft-100/50",
+							"grid items-center gap-3 rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40",
 							ROW_GRID,
 						)}
 					>
 						<div aria-hidden className="w-5" />
-						<div className="flex items-center gap-1.5 text-xs">
-							<Icon name="code" className="h-3.5 w-3.5" />
-							<span className="font-medium">Code</span>
+						<div className="flex items-center gap-1">
+							<Icon name="code" className="h-3 w-3" />
+							<span className="text-xs">Code</span>
 						</div>
-						<div className="flex items-center gap-1.5 text-xs">
-							<Icon name="activity-2" className="h-3.5 w-3.5" />
-							<span className="font-medium">Event</span>
+						<div className="flex items-center gap-1">
+							<Icon name="activity-2" className="h-3 w-3" />
+							<span className="text-xs">Event</span>
 						</div>
-						<div className="flex items-center gap-1.5 justify-end text-xs">
-							<Icon name="clock" className="h-3.5 w-3.5" />
-							<span className="font-medium">Time</span>
+						<div className="flex items-center justify-end gap-1">
+							<Icon name="clock" className="h-3 w-3" />
+							<span className="text-xs">Time</span>
 						</div>
 					</div>
 
-					{/* Table Body (Scrollable) */}
+					{/* Body card */}
 					<div
 						className={cn(
-							"divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50",
-							!isMobile && "flex-1 overflow-y-auto",
+							"-mt-2.5 flex min-h-0 flex-1 flex-col divide-y divide-stroke-soft-100 overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:divide-stroke-soft-100/50 dark:border-stroke-soft-100/40",
 						)}
 					>
-						{isLoading ? (
-							Array.from({ length: 5 }).map((_, i) => (
-								<DeliverySkeleton key={i} />
-							))
-						) : filteredDeliveries.length === 0 ? (
-							<div className="flex h-32 w-full items-center justify-center text-center text-text-sub-600">
-								No deliveries found
-							</div>
-						) : (
-							filteredDeliveries.map((delivery) => {
-								const isRowActive = selectedDeliveryId === delivery.id;
-								const icon = statusIcon(delivery.status);
-
-								return (
-									<div
-										key={delivery.id}
-										onClick={() => {
-											if (selectedDeliveryId === delivery.id) {
-												setSelectedDeliveryId(null);
-											} else {
-												setSelectedDeliveryId(delivery.id);
-											}
-										}}
-										className={cn(
-											"group/row grid w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors",
-											ROW_GRID,
-											"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-offset-1",
-											isRowActive && "bg-bg-weak-50/50",
-										)}
-									>
-										{/* Status icon */}
-										<Tooltip.Provider delayDuration={200}>
-											<Tooltip.Root>
-												<Tooltip.Trigger asChild>
-													<span className="flex items-center justify-center">
-														<Icon
-															name={icon.name}
-															className={cn("h-4 w-4 shrink-0", icon.className)}
-														/>
-													</span>
-												</Tooltip.Trigger>
-												<Tooltip.Content side="top" size="small">
-													<span className="capitalize">{delivery.status}</span>
-												</Tooltip.Content>
-											</Tooltip.Root>
-										</Tooltip.Provider>
-
-										{/* Code */}
-										<span
-											className={cn(
-												"font-medium font-mono text-[13px] tabular-nums",
-												codeClass(delivery.responseStatus, delivery.status),
-											)}
-										>
-											{delivery.responseStatus ?? "—"}
-										</span>
-
-										{/* Event */}
-										<div className="min-w-0 truncate font-medium font-mono text-[13px] text-text-strong-950">
-											{delivery.eventType}
-										</div>
-
-										{/* Time */}
-										<div className="text-right font-medium font-mono text-[13px] text-text-sub-600 tabular-nums">
-											{dayjs(delivery.createdAt).format("HH:mm:ss")}
-										</div>
-									</div>
-								);
-							})
-						)}
-					</div>
-
-					{/* Pagination footer (Static at bottom of card) */}
-					{data && data.total > 0 && (
 						<div
 							className={cn(
-								"flex flex-shrink-0 items-center justify-between rounded-b-[14px] border-stroke-soft-100 border-t bg-bg-white-0 px-4 dark:border-stroke-soft-100/50",
-								isMobile
-									? "py-3 text-paragraph-sm text-text-sub-600"
-									: "py-2 text-[11px] text-text-sub-600",
+								"min-h-0 divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/50",
+								!isMobile && "flex-1 overflow-y-auto",
 							)}
 						>
-							<div className="flex items-center gap-3">
-								<span>
-									Showing {startIndex}–{endIndex} of {data.total} deliver
-									{data.total !== 1 ? "ies" : "y"}
-								</span>
-								<PageSizeDropdown
-									value={pageSize}
-									onValueChange={(value) => {
-										setPageSize(value);
-										setCurrentPage(1);
-									}}
+							{isLoading ? (
+								Array.from({ length: 5 }).map((_, i) => (
+									<DeliverySkeleton key={i} />
+								))
+							) : filteredDeliveries.length === 0 ? (
+								<div className="flex h-32 w-full items-center justify-center text-center text-text-sub-600">
+									No deliveries found
+								</div>
+							) : (
+								filteredDeliveries.map((delivery) => {
+									const isRowActive = selectedDeliveryId === delivery.id;
+									const icon = statusIcon(delivery.status);
+
+									return (
+										<div
+											key={delivery.id}
+											role="button"
+											tabIndex={0}
+											onClick={() => {
+												if (selectedDeliveryId === delivery.id) {
+													setSelectedDeliveryId(null);
+												} else {
+													setSelectedDeliveryId(delivery.id);
+												}
+											}}
+											onKeyDown={(e) => {
+												if (e.key === "Enter" || e.key === " ") {
+													e.preventDefault();
+													if (selectedDeliveryId === delivery.id) {
+														setSelectedDeliveryId(null);
+													} else {
+														setSelectedDeliveryId(delivery.id);
+													}
+												}
+											}}
+											className={cn(
+												"group/row grid w-full cursor-pointer items-center gap-3 px-4 py-2.5 text-left transition-colors duration-150",
+												ROW_GRID,
+												"hover:bg-bg-weak-50/50 focus:outline-none focus-visible:bg-bg-weak-50/50",
+												isRowActive && "bg-bg-weak-50/50",
+											)}
+										>
+											{/* Status icon */}
+											<Tooltip.Provider delayDuration={200}>
+												<Tooltip.Root>
+													<Tooltip.Trigger asChild>
+														<span className="flex items-center justify-center">
+															<Icon
+																name={icon.name}
+																className={cn(
+																	"h-3.5 w-3.5 shrink-0",
+																	icon.className,
+																)}
+															/>
+														</span>
+													</Tooltip.Trigger>
+													<Tooltip.Content side="top" size="small">
+														<span className="capitalize">
+															{delivery.status}
+														</span>
+													</Tooltip.Content>
+												</Tooltip.Root>
+											</Tooltip.Provider>
+
+											{/* Code */}
+											<span
+												className={cn(
+													"font-medium font-mono text-[13px] tabular-nums",
+													codeClass(
+														delivery.responseStatus,
+														delivery.status,
+													),
+												)}
+											>
+												{delivery.responseStatus ?? "—"}
+											</span>
+
+											{/* Event */}
+											<div className="min-w-0 truncate font-medium font-mono text-label-sm text-text-strong-950">
+												{delivery.eventType}
+											</div>
+
+											{/* Time */}
+											<div className="text-right font-medium text-[13px] text-text-sub-600 tabular-nums">
+												{dayjs(delivery.createdAt).format("HH:mm:ss")}
+											</div>
+										</div>
+									);
+								})
+							)}
+						</div>
+
+						{/* Pagination footer */}
+						{data && data.total > 0 ? (
+							<div
+								className={cn(
+									"flex shrink-0 items-center justify-between px-4",
+									isMobile
+										? "py-3 text-paragraph-sm text-text-sub-600"
+										: "py-2 text-[11px] text-text-sub-600",
+								)}
+							>
+								<div className="flex items-center gap-3">
+									<span>
+										Showing {startIndex}–{endIndex} of {data.total} deliver
+										{data.total !== 1 ? "ies" : "y"}
+									</span>
+									<PageSizeDropdown
+										value={pageSize}
+										onValueChange={(value) => {
+											setPageSize(value);
+											setCurrentPage(1);
+										}}
+									/>
+								</div>
+								<PaginationControls
+									currentPage={currentPage}
+									totalPages={totalPages}
+									onPageChange={setCurrentPage}
+									isLoading={isLoading}
 								/>
 							</div>
-							<PaginationControls
-								currentPage={currentPage}
-								totalPages={totalPages}
-								onPageChange={setCurrentPage}
-								isLoading={isLoading}
-							/>
-						</div>
-					)}
+						) : null}
+					</div>
 				</div>
 
 				{/* RIGHT — Inline detail panel (Desktop only) */}
