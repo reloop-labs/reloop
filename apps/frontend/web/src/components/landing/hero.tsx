@@ -7,7 +7,7 @@ import Link from "next/link";
 import type React from "react";
 import type { FeatureCtaLink } from "./types";
 
-function HeroCtaLink({
+export function HeroCtaLink({
 	href,
 	label,
 	external,

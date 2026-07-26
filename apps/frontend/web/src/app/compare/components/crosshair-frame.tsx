@@ -18,8 +18,12 @@ export function CrosshairFrame({
 			<div className="pointer-events-none absolute inset-0 z-10 hidden overflow-visible sm:block">
 				<div className="-left-[100vw] -right-[100vw] absolute top-0 border-stroke-soft-200 border-b border-dashed dark:border-white/10" />
 				<div className="-left-[100vw] -right-[100vw] absolute bottom-0 border-stroke-soft-200 border-b border-dashed dark:border-white/10" />
-				<div className="-top-[40vh] -bottom-[40vh] absolute left-0 border-stroke-soft-200 border-r border-dashed dark:border-white/10" />
-				<div className="-top-[40vh] -bottom-[40vh] absolute right-0 border-stroke-soft-200 border-r border-dashed dark:border-white/10" />
+				{/*
+				 * Vertical guides extend downward only so the top fold stays clean.
+				 * Rails begin at the first content frame (e.g. at a glance).
+				 */}
+				<div className="-bottom-[40vh] absolute top-0 left-0 border-stroke-soft-200 border-r border-dashed dark:border-white/10" />
+				<div className="-bottom-[40vh] absolute top-0 right-0 border-stroke-soft-200 border-r border-dashed dark:border-white/10" />
 
 				{/* Corner markers */}
 				<div className="-translate-x-1/2 -translate-y-1/2 absolute top-0 left-0 z-20 size-2 rounded-[1px] border border-stroke-soft-300 bg-bg-white-0 dark:border-white/20 dark:bg-black" />

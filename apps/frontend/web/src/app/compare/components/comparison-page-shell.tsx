@@ -1,9 +1,7 @@
 import type { FeatureCtaLink } from "@reloop/web/components/landing/types";
-import { MarketingPageShell } from "@reloop/web/components/page-shell";
 import type React from "react";
 import { getCompetitorByHref } from "../competitor-brands";
-import { CompareHeroIcons } from "./compare-hero-icons";
-import { CompareStage } from "./compare-stage";
+import { CompareHero } from "./compare-hero";
 
 export function ComparisonPageShell({
 	pagePath,
@@ -12,8 +10,6 @@ export function ComparisonPageShell({
 	primaryCta,
 	secondaryCta,
 	children,
-	/** Soft grid stage behind the hero (Dub-inspired). Default true. */
-	stageHero = true,
 }: {
 	pagePath: string;
 	titleLines: string[];
@@ -21,41 +17,34 @@ export function ComparisonPageShell({
 	primaryCta?: FeatureCtaLink;
 	secondaryCta?: FeatureCtaLink;
 	children: React.ReactNode;
-	stageHero?: boolean;
 }) {
 	const brand = getCompetitorByHref(pagePath);
 
-	const brandPair = brand ? <CompareHeroIcons icon={brand.icon} /> : undefined;
-
-	const heroLeading = stageHero ? (
-		<div className="mb-8 sm:mb-10">
-			<CompareStage>{brandPair}</CompareStage>
-		</div>
-	) : (
-		brandPair
-	);
-
 	return (
-		<div className="relative">
+		<div>
 			{/*
-			 * Full-height dashed side rails at the content max-width (1320px).
-			 * Lives only around compare page content (inside <main>), so the
-			 * site footer never gets the borders.
+			 * Full top fold lives inside the stage card (icons + title + copy + CTAs).
+			 * No side rails here — those start on the content fold below.
 			 */}
-			<div
-				aria-hidden
-				className="pointer-events-none absolute inset-y-0 left-1/2 z-30 hidden w-full max-w-[1320px] -translate-x-1/2 border-stroke-soft-200 border-x border-dashed sm:block dark:border-white/10"
-			/>
-			<MarketingPageShell
+			<CompareHero
 				titleLines={titleLines}
 				description={description}
 				primaryCta={primaryCta}
 				secondaryCta={secondaryCta}
-				compactHero
-				heroLeading={heroLeading}
-			>
+				icon={brand?.icon}
+			/>
+
+			{/*
+			 * Dashed side rails only from the content fold down (at a glance+).
+			 * Hero stays clean; rails live around page body, not the top fold.
+			 */}
+			<div className="relative">
+				<div
+					aria-hidden
+					className="pointer-events-none absolute inset-y-0 left-1/2 z-30 hidden w-full max-w-[1320px] -translate-x-1/2 border-stroke-soft-200 border-x border-dashed sm:block dark:border-white/10"
+				/>
 				{children}
-			</MarketingPageShell>
+			</div>
 		</div>
 	);
 }

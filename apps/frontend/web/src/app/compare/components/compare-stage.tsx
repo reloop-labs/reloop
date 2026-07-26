@@ -2,8 +2,8 @@ import { cn } from "@reloop/ui/cn";
 import type React from "react";
 
 /**
- * Soft grid stage behind compare heroes (Dub-inspired, Reloop tokens).
- * Purely decorative — sits under hero brand tiles.
+ * Soft grid stage for compare heroes (Dub-inspired, Reloop tokens).
+ * Frames the full top fold: brand tiles, title, description, and CTAs.
  */
 export function CompareStage({
 	children,
@@ -13,9 +13,9 @@ export function CompareStage({
 	className?: string;
 }) {
 	return (
-		<div className={cn("relative mx-auto w-full max-w-xl", className)}>
+		<div className={cn("relative mx-auto w-full max-w-[1320px]", className)}>
 			{/* Soft floating stage card */}
-			<div className="relative overflow-hidden rounded-[28px] border border-stroke-soft-200/80 bg-gradient-to-b from-bg-weak-50/90 to-bg-white-0 px-6 py-10 sm:rounded-[32px] sm:px-10 sm:py-12 dark:border-white/10 dark:from-white/[0.04] dark:to-transparent">
+			<div className="relative overflow-hidden rounded-[28px] border border-stroke-soft-200/80 bg-gradient-to-b from-bg-weak-50/90 to-bg-white-0 px-6 py-16 sm:rounded-[32px] sm:px-12 sm:py-24 lg:py-28 dark:border-white/10 dark:from-white/[0.04] dark:to-transparent">
 				{/* Soft color wash */}
 				<div
 					aria-hidden
@@ -55,7 +55,7 @@ export function CompareStage({
 					/>
 				</div>
 
-				<div className="relative z-10 flex justify-center">{children}</div>
+				<div className="relative z-10 w-full text-center">{children}</div>
 			</div>
 		</div>
 	);
