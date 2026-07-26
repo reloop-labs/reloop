@@ -108,7 +108,7 @@ const ResendComparisonPage = () => {
 			}}
 		>
 			{/* Product UI slide comparison */}
-			<CompareSection maxWidth="5xl" flushTop>
+			<CompareSection maxWidth="5xl" flushTop hasDotGrid>
 				<h2 className="mx-auto mb-10 max-w-3xl text-balance text-center font-serif text-[2rem] text-text-strong-950 leading-[1.15] tracking-tighter sm:mb-12 sm:text-[2.4rem] lg:text-[2.8rem] dark:text-white">
 					Reloop is the open-source email infrastructure built for the age of AI
 					agents.

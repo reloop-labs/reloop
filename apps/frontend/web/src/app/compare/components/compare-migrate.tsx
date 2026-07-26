@@ -93,16 +93,14 @@ export function CompareMigrate({
 					>
 						{/* Visual panel */}
 						<div className="relative flex min-h-[168px] flex-col items-center justify-center overflow-hidden border-stroke-soft-200 border-b bg-bg-weak-50/60 px-5 py-7 dark:border-white/10 dark:bg-white/[0.02]">
-							{/* Soft grid */}
+							{/* Square dots pattern background */}
 							<div
 								aria-hidden
-								className="pointer-events-none absolute inset-0 opacity-60 dark:opacity-30"
+								className="pointer-events-none absolute inset-0 text-text-strong-950/25 dark:text-white/25"
 								style={{
-									backgroundImage: `
-										linear-gradient(to right, rgba(0,0,0,0.04) 1px, transparent 1px),
-										linear-gradient(to bottom, rgba(0,0,0,0.04) 1px, transparent 1px)
-									`,
-									backgroundSize: "28px 28px",
+									backgroundImage:
+										"radial-gradient(circle, currentColor 1.5px, transparent 1.5px)",
+									backgroundSize: "24px 24px",
 									maskImage:
 										"radial-gradient(ellipse at 50% 50%, black 20%, transparent 75%)",
 									WebkitMaskImage:

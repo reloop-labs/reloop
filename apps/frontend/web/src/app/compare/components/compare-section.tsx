@@ -17,6 +17,8 @@ export function CompareSection({
 	flushTop = false,
 	/** Drop horizontal padding so gutters (e.g. hatch) can meet the frame rails. */
 	flushX = false,
+	/** Display square dot matrix background. */
+	hasDotGrid = false,
 }: {
 	children: React.ReactNode;
 	className?: string;
@@ -24,6 +26,7 @@ export function CompareSection({
 	noDivider?: boolean;
 	flushTop?: boolean;
 	flushX?: boolean;
+	hasDotGrid?: boolean;
 }) {
 	const maxWidthClass =
 		maxWidth === "full"
@@ -37,7 +40,22 @@ export function CompareSection({
 						: "max-w-2xl";
 
 	return (
-		<section className={cn("relative w-full", className)}>
+		<section className={cn("relative w-full overflow-hidden", className)}>
+			{hasDotGrid && (
+				<div
+					aria-hidden
+					className="pointer-events-none absolute inset-0 text-text-strong-950/20 dark:text-white/20"
+					style={{
+						backgroundImage:
+							"radial-gradient(circle, currentColor 1.5px, transparent 1.5px)",
+						backgroundSize: "24px 24px",
+						maskImage:
+							"radial-gradient(ellipse at 50% 40%, black 40%, transparent 85%)",
+						WebkitMaskImage:
+							"radial-gradient(ellipse at 50% 40%, black 40%, transparent 85%)",
+					}}
+				/>
+			)}
 			{!noDivider && (
 				<div
 					aria-hidden
@@ -46,7 +64,7 @@ export function CompareSection({
 			)}
 			<div
 				className={cn(
-					"mx-auto w-full",
+					"relative z-10 mx-auto w-full",
 					flushX ? "px-0" : "px-4 sm:px-6 lg:px-8",
 					flushTop
 						? "pt-10 pb-16 sm:pt-12 sm:pb-20 lg:pb-24"
