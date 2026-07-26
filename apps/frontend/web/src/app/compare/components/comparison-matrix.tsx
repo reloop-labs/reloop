@@ -364,7 +364,7 @@ export function ComparisonMatrix({
 								{section.label}
 							</span>
 						</div>
-						<div className="sticky top-[156px] z-20 border-stroke-soft-200 border-x border-b bg-bg-weak-50/95 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]" />
+						<div className="sticky top-[156px] z-20 border-stroke-soft-200 border-x border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95" />
 						<div className="sticky top-[156px] z-20 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95" />
 
 						{section.features.map((row) => (
