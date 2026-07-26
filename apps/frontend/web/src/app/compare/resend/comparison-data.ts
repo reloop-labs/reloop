@@ -7,6 +7,69 @@ import type { ComparisonCategory } from "../components/comparison-matrix";
  */
 export const resendComparisonCategories: ComparisonCategory[] = [
 	{
+		id: "pricing-volume",
+		label: "Pricing & Email Volume",
+		icon: "invoice",
+		intro:
+			"Reloop offers transparent email pricing starting with 3,000 free monthly emails with no daily caps, an entry tier at $10/mo for 25,000 emails, cheaper overages ($0.80 vs $1.00 / 1,000), and unlimited free sends when self-hosting.",
+		features: [
+			{
+				label: "Free monthly emails",
+				icon: "send-2",
+				reloop: "3,000 / mo",
+				competitor: "3,000 / mo",
+			},
+			{
+				label: "Daily send limit (Free tier)",
+				icon: "calendar",
+				reloop: {
+					value: "No daily limit",
+					note: "Use full monthly quota anytime",
+				},
+				competitor: {
+					value: "100 / day",
+					note: "Free tier limited to 100 sends/day",
+				},
+			},
+			{
+				label: "Entry paid plan",
+				icon: "invoice",
+				reloop: {
+					value: "$10 / mo",
+					note: "25,000 emails included",
+				},
+				competitor: {
+					value: "$20 / mo",
+					note: "50,000 emails included (no $10 tier)",
+				},
+			},
+			{
+				label: "50,000 emails / mo plan",
+				icon: "mega-phone",
+				reloop: "$20 / mo",
+				competitor: "$20 / mo",
+			},
+			{
+				label: "Overage rate (per 1k emails)",
+				icon: "arrow-swap",
+				reloop: "$0.80 / 1k",
+				competitor: "$1.00 / 1k",
+			},
+			{
+				label: "Self-hosted email sends",
+				icon: "server",
+				reloop: {
+					value: "Unlimited",
+					note: "Free open-source software (own infra)",
+				},
+				competitor: {
+					value: "N/A",
+					note: "Hosted SaaS only; pay per send",
+				},
+			},
+		],
+	},
+	{
 		id: "sending-receiving",
 		label: "Sending & Receiving",
 		icon: "send-2",

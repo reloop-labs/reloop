@@ -4,7 +4,6 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import Link from "next/link";
-import { useState } from "react";
 import { competitorBrands } from "../competitor-brands";
 import { BrandIcon } from "./brand-icon";
 import { CompareTitleIcon } from "./compare-title-icon";
@@ -297,7 +296,7 @@ function CellValue({
 export function ComparisonTable({
 	competitorName,
 	features,
-	title = "Compare plans",
+	title,
 	subtitle = "Find the perfect fit",
 	reloopSub,
 	competitorSub,
@@ -309,14 +308,9 @@ export function ComparisonTable({
 	reloopSub?: string;
 	competitorSub?: string;
 }) {
-	const [activePlan, setActivePlan] = useState<PlanType>("paid");
 	const competitorIcon = competitorBrands.find(
 		(brand) => brand.name === competitorName,
 	)?.icon;
-
-	const currentPlan = planDetails[activePlan];
-	const displayReloopSub = reloopSub ?? currentPlan.reloopSub;
-	const displayCompetitorSub = competitorSub ?? currentPlan.competitorSub;
 
 	return (
 		<div className="w-full overflow-x-auto pb-2 sm:overflow-visible">
@@ -324,10 +318,11 @@ export function ComparisonTable({
 				{/* Header */}
 				<div className="sticky top-16 z-30 border-stroke-soft-200 border-t border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
 					<div className="flex h-full flex-wrap items-center justify-start gap-3 p-4 sm:p-5">
-						<h3 className="font-bold text-[16px] text-text-strong-950 tracking-tight sm:text-[17px] dark:text-white">
-							{title}
-						</h3>
-						<PlanTogglePill activePlan={activePlan} onChange={setActivePlan} />
+						{title ? (
+							<h3 className="font-bold text-[16px] text-text-strong-950 tracking-tight sm:text-[17px] dark:text-white">
+								{title}
+							</h3>
+						) : null}
 					</div>
 				</div>
 				<div className="sticky top-16 z-30 border-stroke-soft-200 border-t border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
@@ -340,12 +335,14 @@ export function ComparisonTable({
 								Reloop
 							</span>
 						</div>
-						<Link
-							href={currentPlan.reloopHref}
-							className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
-						>
-							{displayReloopSub}
-						</Link>
+						{reloopSub ? (
+							<Link
+								href="/pricing"
+								className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
+							>
+								{reloopSub}
+							</Link>
+						) : null}
 					</div>
 				</div>
 				<div className="sticky top-16 z-30 border-stroke-soft-200 border-t border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
@@ -360,9 +357,11 @@ export function ComparisonTable({
 								{competitorName}
 							</span>
 						</div>
-						<span className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
-							{displayCompetitorSub}
-						</span>
+						{competitorSub ? (
+							<span className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
+								{competitorSub}
+							</span>
+						) : null}
 					</div>
 				</div>
 
