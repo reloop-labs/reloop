@@ -40,7 +40,7 @@ const planDetails: Record<
 };
 
 const GRID_COLS =
-	"grid-cols-[1fr_minmax(180px,240px)_minmax(180px,240px)]";
+	"grid-cols-[minmax(220px,1.2fr)_minmax(140px,1fr)_minmax(140px,1fr)]";
 
 function UserIcon({ className }: { className?: string }) {
 	return (
@@ -74,6 +74,11 @@ function StoreIcon({ className }: { className?: string }) {
 			<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
 			<path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" />
 			<path d="M2 7h20" />
+			<path d="M22 7v3a2 2 0 0 1-2 2v0a2 2 0 0 1-2-2V7" />
+			<path d="M18 7v3a2 2 0 0 1-2 2v0a2 2 0 0 1-2-2V7" />
+			<path d="M14 7v3a2 2 0 0 1-2 2v0a2 2 0 0 1-2-2V7" />
+			<path d="M10 7v3a2 2 0 0 1-2 2v0a2 2 0 0 1-2-2V7" />
+			<path d="M6 7v3a2 2 0 0 1-2 2v0a2 2 0 0 1-2-2V7" />
 		</svg>
 	);
 }
@@ -89,9 +94,13 @@ function BuildingIcon({ className }: { className?: string }) {
 			strokeLinejoin="round"
 			className={className}
 		>
-			<rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
-			<path d="M9 22v-4h6v4" />
-			<path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M8 10h.01M8 14h.01M16 10h.01M16 14h.01" />
+			<path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18" />
+			<path d="M6 12H4a2 2 0 0 0-2 2v8" />
+			<path d="M18 9h2a2 2 0 0 1 2 2v11" />
+			<path d="M10 6h4" />
+			<path d="M10 10h4" />
+			<path d="M10 14h4" />
+			<path d="M10 18h4" />
 		</svg>
 	);
 }
@@ -104,7 +113,7 @@ function PlanTogglePill({
 	onChange: (plan: PlanType) => void;
 }) {
 	return (
-		<div className="inline-flex items-center gap-0.5 rounded-full border border-stroke-soft-200 bg-bg-weak-50/80 p-1 dark:border-white/10 dark:bg-white/[0.04]">
+		<div className="flex items-center gap-1 rounded-full border border-stroke-soft-200 bg-bg-weak-50/80 p-1 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
 			<button
 				type="button"
 				onClick={() => onChange("free")}
@@ -347,7 +356,7 @@ export function ComparisonMatrix({
 
 				{categories.map((section) => (
 					<div key={section.id} className="contents">
-						<div className="sticky top-[156px] z-20 flex items-center border-stroke-soft-200 border-b bg-bg-white-0/95 py-3 pr-4 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+						<div className="sticky top-[156px] z-20 flex items-center border-stroke-soft-200 border-b bg-bg-white-0/95 py-3 pr-4 pl-4 sm:pl-6 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
 							<span className="font-bold text-[13px] text-text-strong-950 uppercase tracking-wider dark:text-white">
 								{section.label}
 							</span>
@@ -357,7 +366,7 @@ export function ComparisonMatrix({
 
 						{section.features.map((row) => (
 							<div key={`${section.id}-${row.label}`} className="contents">
-								<div className="flex items-center border-stroke-soft-200 border-b py-4 pr-4 dark:border-white/10">
+								<div className="flex items-center border-stroke-soft-200 border-b py-4 pr-4 pl-4 sm:pl-6 dark:border-white/10">
 									<span className="text-[14px] text-text-sub-600 dark:text-white/50">
 										{row.label}
 									</span>

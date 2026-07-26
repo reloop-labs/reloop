@@ -173,74 +173,98 @@ export function CompareSideTable({
 	const displayCompetitorSub = competitorSub ?? currentPlan.competitorSub;
 
 	return (
-		<div className="w-full overflow-x-auto sm:overflow-visible pb-2">
-			<div className="grid min-w-[560px] grid-cols-[1fr_minmax(180px,240px)_minmax(180px,240px)]">
-				{/* Header */}
-				<div className="sticky top-16 z-30 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
-					<div className="flex h-full flex-wrap items-center justify-start gap-3 p-4 sm:p-5">
-						<h3 className="font-bold text-[16px] text-text-strong-950 tracking-tight sm:text-[17px] dark:text-white">
-							{title}
-						</h3>
-						<PlanTogglePill activePlan={activePlan} onChange={setActivePlan} />
-					</div>
-				</div>
-				<div className="sticky top-16 z-30 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
-					<div className="flex flex-col items-center justify-center gap-1.5 rounded-t-2xl border-stroke-soft-200 border-x border-t bg-bg-weak-50/60 p-5 text-center dark:border-white/10 dark:bg-white/[0.03]">
-						<div className="flex items-center justify-center gap-2">
-							<span className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm dark:bg-white">
-								<Logo className="size-full text-text-strong-950" />
-							</span>
-							<span className="font-bold text-[16px] text-text-strong-950 tracking-tight dark:text-white">
-								Reloop
-							</span>
+		<div className="mx-auto w-full max-w-[1100px]">
+			<div className="grid w-full items-stretch grid-cols-1 sm:grid-cols-[36px_1fr_36px]">
+				{/* Left side hatch gutter */}
+				<div
+					aria-hidden
+					className="hidden min-h-full border-stroke-soft-200 border-r border-dashed text-text-strong-950/15 sm:block dark:border-white/15 dark:text-white/15"
+					style={{
+						backgroundImage:
+							"repeating-linear-gradient(-45deg, transparent 0, transparent 5px, currentColor 5px, currentColor 6.5px)",
+					}}
+				/>
+
+				<div className="w-full min-w-0 overflow-x-auto sm:overflow-visible pb-2">
+					<div className="grid min-w-[500px] grid-cols-[1fr_minmax(200px,300px)_minmax(200px,300px)]">
+						{/* Header */}
+						<div className="sticky top-16 z-30 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+							<div className="flex h-full flex-wrap items-center justify-start gap-3 p-4 sm:p-5">
+								<h3 className="font-bold text-[16px] text-text-strong-950 tracking-tight sm:text-[17px] dark:text-white">
+									{title}
+								</h3>
+								<PlanTogglePill activePlan={activePlan} onChange={setActivePlan} />
+							</div>
 						</div>
-						<Link
-							href={currentPlan.reloopHref}
-							className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
-						>
-							{displayReloopSub}
-						</Link>
-					</div>
-				</div>
-				<div className="sticky top-16 z-30 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
-					<div className="flex flex-col items-center justify-center gap-1.5 p-5 text-center">
-						<div className="flex items-center justify-center gap-2">
-							{competitorIcon ? (
-								<span className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm dark:bg-white">
-									<BrandIcon icon={competitorIcon} className="size-4" />
+						<div className="sticky top-16 z-30 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+							<div className="flex flex-col items-center justify-center gap-1.5 rounded-t-2xl border-stroke-soft-200 border-x border-t bg-bg-weak-50/60 p-5 text-center dark:border-white/10 dark:bg-white/[0.03]">
+								<div className="flex items-center justify-center gap-2">
+									<span className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm dark:bg-white">
+										<Logo className="size-full text-text-strong-950" />
+									</span>
+									<span className="font-bold text-[16px] text-text-strong-950 tracking-tight dark:text-white">
+										Reloop
+									</span>
+								</div>
+								<Link
+									href={currentPlan.reloopHref}
+									className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider transition-colors hover:text-text-strong-950 dark:text-white/50 dark:hover:text-white"
+								>
+									{displayReloopSub}
+								</Link>
+							</div>
+						</div>
+						<div className="sticky top-16 z-30 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+							<div className="flex flex-col items-center justify-center gap-1.5 p-5 text-center">
+								<div className="flex items-center justify-center gap-2">
+									{competitorIcon ? (
+										<span className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm dark:bg-white">
+											<BrandIcon icon={competitorIcon} className="size-4" />
+										</span>
+									) : null}
+									<span className="font-bold text-[16px] text-text-strong-950 tracking-tight dark:text-white">
+										{competitorName}
+									</span>
+								</div>
+								<span className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
+									{displayCompetitorSub}
 								</span>
-							) : null}
-							<span className="font-bold text-[16px] text-text-strong-950 tracking-tight dark:text-white">
-								{competitorName}
-							</span>
+							</div>
 						</div>
-						<span className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-wider dark:text-white/50">
-							{displayCompetitorSub}
-						</span>
+
+						{/* Rows */}
+						{rows.map((row) => (
+							<div key={row.label} className="contents">
+								<div className="flex items-center border-stroke-soft-200 border-b py-4 pr-4 pl-4 sm:pl-6 dark:border-white/10">
+									<span className="text-[14px] text-text-sub-600 dark:text-white/50">
+										{row.label}
+									</span>
+								</div>
+								<div className="flex items-center justify-center border-stroke-soft-200 border-x border-b bg-bg-weak-50/60 px-4 py-4 text-center font-medium text-[15px] text-text-strong-950 dark:border-white/10 dark:bg-white/[0.03] dark:text-white">
+									{row.reloop}
+								</div>
+								<div className="flex items-center justify-center border-stroke-soft-200 border-b px-4 py-4 text-center font-medium text-[15px] text-text-strong-950 dark:border-white/10 dark:text-white">
+									{row.competitor}
+								</div>
+							</div>
+						))}
+
+						{/* Column footers */}
+						<div />
+						<div className="h-6 rounded-b-2xl border-stroke-soft-200 border-x border-b bg-bg-weak-50/60 dark:border-white/10 dark:bg-white/[0.03]" />
+						<div />
 					</div>
 				</div>
 
-				{/* Rows */}
-				{rows.map((row) => (
-					<div key={row.label} className="contents">
-						<div className="flex items-center border-stroke-soft-200 border-b py-4 pr-4 dark:border-white/10">
-							<span className="text-[14px] text-text-sub-600 dark:text-white/50">
-								{row.label}
-							</span>
-						</div>
-						<div className="flex items-center justify-center border-stroke-soft-200 border-x border-b bg-bg-weak-50/60 px-4 py-4 text-center font-medium text-[15px] text-text-strong-950 dark:border-white/10 dark:bg-white/[0.03] dark:text-white">
-							{row.reloop}
-						</div>
-						<div className="flex items-center justify-center border-stroke-soft-200 border-b px-4 py-4 text-center font-medium text-[15px] text-text-strong-950 dark:border-white/10 dark:text-white">
-							{row.competitor}
-						</div>
-					</div>
-				))}
-
-				{/* Column footers */}
-				<div />
-				<div className="h-6 rounded-b-2xl border-stroke-soft-200 border-x border-b bg-bg-weak-50/60 dark:border-white/10 dark:bg-white/[0.03]" />
-				<div />
+				{/* Right side hatch gutter */}
+				<div
+					aria-hidden
+					className="hidden min-h-full border-stroke-soft-200 border-l border-dashed text-text-strong-950/15 sm:block dark:border-white/15 dark:text-white/15"
+					style={{
+						backgroundImage:
+							"repeating-linear-gradient(-45deg, transparent 0, transparent 5px, currentColor 5px, currentColor 6.5px)",
+					}}
+				/>
 			</div>
 		</div>
 	);

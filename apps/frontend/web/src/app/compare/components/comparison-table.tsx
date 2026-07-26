@@ -318,7 +318,7 @@ export function ComparisonTable({
 
 	return (
 		<div className="w-full overflow-x-auto sm:overflow-visible pb-2">
-			<div className="grid min-w-[560px] grid-cols-[1fr_minmax(180px,240px)_minmax(180px,240px)]">
+			<div className="grid min-w-[560px] grid-cols-[minmax(220px,1.2fr)_minmax(140px,1fr)_minmax(140px,1fr)]">
 				{/* Header */}
 				<div className="sticky top-16 z-30 border-b border-stroke-soft-200 bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
 					<div className="flex h-full flex-wrap items-center justify-start gap-3 p-4 sm:p-5">
@@ -370,7 +370,7 @@ export function ComparisonTable({
 					if (isHeader) {
 						return (
 							<div key={row.label} className="contents">
-								<div className="sticky top-[156px] z-20 flex items-center border-stroke-soft-200 border-b bg-bg-white-0/95 py-3 pr-4 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+								<div className="sticky top-[156px] z-20 flex items-center border-stroke-soft-200 border-b bg-bg-white-0/95 py-3 pr-4 pl-4 sm:pl-6 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
 									<span className="font-bold text-[13px] text-text-strong-950 uppercase tracking-wider dark:text-white">
 										{row.label}
 									</span>
@@ -382,7 +382,7 @@ export function ComparisonTable({
 					}
 					return (
 						<div key={row.label} className="contents">
-							<div className="flex items-center border-b border-stroke-soft-200 py-4 pr-4 dark:border-white/10">
+							<div className="flex items-center border-b border-stroke-soft-200 py-4 pr-4 pl-4 sm:pl-6 dark:border-white/10">
 								<span className="text-[14px] text-text-sub-600 dark:text-white/50">
 									{row.label}
 								</span>

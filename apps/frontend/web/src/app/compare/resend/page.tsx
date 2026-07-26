@@ -123,7 +123,7 @@ const ResendComparisonPage = () => {
 			</CompareSection>
 
 			{/* Feature matrix */}
-			<CompareSection maxWidth="full">
+			<CompareSection maxWidth="full" flushX>
 				<div className="mb-10 text-center">
 					<h2 className="mt-3 font-serif text-[2rem] text-text-strong-950 leading-[1.1] tracking-tighter sm:text-[2.4rem] lg:text-[2.8rem] dark:text-white">
 						Reloop &nbsp;&nbsp;vs&nbsp;&nbsp;&nbsp;{resendBrand?.name}
