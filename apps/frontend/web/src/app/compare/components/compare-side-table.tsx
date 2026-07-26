@@ -190,7 +190,7 @@ export function CompareSideTable({
 				<div className="w-full min-w-0 overflow-x-auto sm:overflow-visible pb-2">
 					<div className="grid min-w-[500px] grid-cols-[1fr_minmax(200px,300px)_minmax(200px,300px)]">
 						{/* Header */}
-						<div className="sticky top-16 z-30 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+						<div className="sticky top-16 z-30 border-stroke-soft-200 border-t border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
 							<div className="flex h-full flex-wrap items-center justify-start gap-3 p-4 sm:p-5">
 								<h3 className="font-bold text-[16px] text-text-strong-950 tracking-tight sm:text-[17px] dark:text-white">
 									{title}
@@ -198,8 +198,8 @@ export function CompareSideTable({
 								<PlanTogglePill activePlan={activePlan} onChange={setActivePlan} />
 							</div>
 						</div>
-						<div className="sticky top-16 z-30 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
-							<div className="flex flex-col items-center justify-center gap-1.5 rounded-t-2xl border-stroke-soft-200 border-x border-t bg-bg-weak-50/60 p-5 text-center dark:border-white/10 dark:bg-white/[0.03]">
+						<div className="sticky top-16 z-30 border-stroke-soft-200 border-x border-t border-b bg-bg-weak-50/60 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.03]">
+							<div className="flex flex-col items-center justify-center gap-1.5 p-5 text-center">
 								<div className="flex items-center justify-center gap-2">
 									<span className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm dark:bg-white">
 										<Logo className="size-full text-text-strong-950" />
@@ -216,7 +216,7 @@ export function CompareSideTable({
 								</Link>
 							</div>
 						</div>
-						<div className="sticky top-16 z-30 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+						<div className="sticky top-16 z-30 border-stroke-soft-200 border-t border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
 							<div className="flex flex-col items-center justify-center gap-1.5 p-5 text-center">
 								<div className="flex items-center justify-center gap-2">
 									{competitorIcon ? (
@@ -254,7 +254,7 @@ export function CompareSideTable({
 
 						{/* Column footers */}
 						<div />
-						<div className="h-6 rounded-b-2xl border-stroke-soft-200 border-x border-b bg-bg-weak-50/60 dark:border-white/10 dark:bg-white/[0.03]" />
+						<div className="h-6 border-stroke-soft-200 border-x border-b bg-bg-weak-50/60 dark:border-white/10 dark:bg-white/[0.03]" />
 						<div />
 					</div>
 				</div>

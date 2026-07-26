@@ -3,8 +3,8 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
-import { useState } from "react";
 import Link from "next/link";
+import { useState } from "react";
 import { competitorBrands } from "../competitor-brands";
 import { BrandIcon } from "./brand-icon";
 import { CompareTitleIcon } from "./compare-title-icon";
@@ -226,7 +226,7 @@ function CellValue({
 	if (isYes) {
 		const label = value === "Yes" ? null : value.replace(/^Yes[\s—-]*/i, "");
 		return (
-			<div className="flex flex-col items-center justify-center text-center gap-1.5">
+			<div className="flex flex-col items-center justify-center gap-1.5 text-center">
 				<CheckCircleIcon />
 				{label ? (
 					<span className="font-medium text-[14px] text-text-strong-950 dark:text-white">
@@ -244,7 +244,7 @@ function CellValue({
 
 	if (isNeutralDash) {
 		return (
-			<div className="flex flex-col items-center justify-center text-center gap-1">
+			<div className="flex flex-col items-center justify-center gap-1 text-center">
 				<span className="text-text-sub-600 dark:text-white/30">—</span>
 				{note ? (
 					<span className="text-[12px] text-text-sub-600 leading-snug dark:text-white/40">
@@ -258,7 +258,7 @@ function CellValue({
 	if (isNo) {
 		const label = value === "No" ? null : value.replace(/^No[\s—-]*/i, "");
 		return (
-			<div className="flex flex-col items-center justify-center text-center gap-1.5">
+			<div className="flex flex-col items-center justify-center gap-1.5 text-center">
 				<CrossCircleIcon />
 				{label ? (
 					<span className="font-medium text-[14px] text-text-strong-950 dark:text-white">
@@ -275,7 +275,7 @@ function CellValue({
 	}
 
 	return (
-		<div className="flex flex-col items-center justify-center text-center gap-1">
+		<div className="flex flex-col items-center justify-center gap-1 text-center">
 			<span
 				className={
 					highlight
@@ -319,10 +319,10 @@ export function ComparisonTable({
 	const displayCompetitorSub = competitorSub ?? currentPlan.competitorSub;
 
 	return (
-		<div className="w-full overflow-x-auto sm:overflow-visible pb-2">
+		<div className="w-full overflow-x-auto pb-2 sm:overflow-visible">
 			<div className="grid min-w-[560px] grid-cols-[minmax(220px,1.2fr)_minmax(140px,1fr)_minmax(140px,1fr)]">
 				{/* Header */}
-				<div className="sticky top-16 z-30 border-b border-stroke-soft-200 bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+				<div className="sticky top-16 z-30 border-stroke-soft-200 border-t border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
 					<div className="flex h-full flex-wrap items-center justify-start gap-3 p-4 sm:p-5">
 						<h3 className="font-bold text-[16px] text-text-strong-950 tracking-tight sm:text-[17px] dark:text-white">
 							{title}
@@ -330,8 +330,8 @@ export function ComparisonTable({
 						<PlanTogglePill activePlan={activePlan} onChange={setActivePlan} />
 					</div>
 				</div>
-				<div className="sticky top-16 z-30 border-b border-stroke-soft-200 bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
-					<div className="flex flex-col items-center justify-center gap-1.5 rounded-t-2xl border-x border-t border-stroke-soft-200 bg-bg-weak-50/60 p-5 text-center dark:border-white/10 dark:bg-white/[0.03]">
+				<div className="sticky top-16 z-30 border-stroke-soft-200 border-t border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+					<div className="flex flex-col items-center justify-center gap-1.5 border-stroke-soft-200 border-x border-t bg-bg-weak-50/60 p-5 text-center dark:border-white/10 dark:bg-white/[0.03]">
 						<div className="flex items-center justify-center gap-2">
 							<span className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm dark:bg-white">
 								<Logo className="size-full text-text-strong-950" />
@@ -348,7 +348,7 @@ export function ComparisonTable({
 						</Link>
 					</div>
 				</div>
-				<div className="sticky top-16 z-30 border-b border-stroke-soft-200 bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+				<div className="sticky top-16 z-30 border-stroke-soft-200 border-t border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
 					<div className="flex flex-col items-center justify-center gap-1.5 p-5 text-center">
 						<div className="flex items-center justify-center gap-2">
 							{competitorIcon ? (
@@ -366,34 +366,39 @@ export function ComparisonTable({
 					</div>
 				</div>
 
+				{/* Rows */}
 				{features.map((row) => {
 					const isHeader = !row.reloop && !row.competitor;
 					if (isHeader) {
 						return (
 							<div key={row.label} className="contents">
-								<div className="sticky top-[156px] z-20 flex items-center gap-2.5 border-stroke-soft-200 border-b bg-bg-white-0/95 py-3 pr-4 pl-4 sm:pl-6 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
-									<CompareTitleIcon title={row.label} icon={row.icon} isSection />
+								<div className="sticky top-[156px] z-20 flex items-center gap-2.5 border-stroke-soft-200 border-b bg-bg-white-0/95 py-3 pr-4 pl-4 backdrop-blur-md sm:pl-6 dark:border-white/10 dark:bg-black/95">
+									<CompareTitleIcon
+										title={row.label}
+										icon={row.icon}
+										isSection
+									/>
 									<span className="font-bold text-[13px] text-text-strong-950 uppercase tracking-wider dark:text-white">
 										{row.label}
 									</span>
 								</div>
-								<div className="sticky top-[156px] z-20 border-stroke-soft-200 border-x border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95" />
+								<div className="sticky top-[156px] z-20 border-stroke-soft-200 border-x border-b bg-bg-weak-50/95 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]" />
 								<div className="sticky top-[156px] z-20 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95" />
 							</div>
 						);
 					}
 					return (
 						<div key={row.label} className="contents">
-							<div className="flex items-center gap-2.5 border-b border-stroke-soft-200 py-4 pr-4 pl-4 sm:pl-6 dark:border-white/10">
+							<div className="flex items-center gap-2.5 border-stroke-soft-200 border-b py-4 pr-4 pl-4 sm:pl-6 dark:border-white/10">
 								<CompareTitleIcon title={row.label} icon={row.icon} />
 								<span className="font-medium text-[14px] text-text-strong-950 dark:text-white">
 									{row.label}
 								</span>
 							</div>
-							<div className="flex items-center justify-center border-x border-b border-stroke-soft-200 bg-bg-weak-50/60 px-4 py-4 text-center dark:border-white/10 dark:bg-white/[0.03]">
+							<div className="flex items-center justify-center border-stroke-soft-200 border-x border-b bg-bg-weak-50/60 px-4 py-4 text-center dark:border-white/10 dark:bg-white/[0.03]">
 								<CellValue cell={row.reloop} />
 							</div>
-							<div className="flex items-center justify-center border-b border-stroke-soft-200 px-4 py-4 text-center dark:border-white/10">
+							<div className="flex items-center justify-center border-stroke-soft-200 border-b px-4 py-4 text-center dark:border-white/10">
 								<CellValue cell={row.competitor} />
 							</div>
 						</div>
@@ -402,7 +407,7 @@ export function ComparisonTable({
 
 				{/* Column footers */}
 				<div />
-				<div className="h-6 rounded-b-2xl border-x border-b border-stroke-soft-200 bg-bg-weak-50/60 dark:border-white/10 dark:bg-white/[0.03]" />
+				<div className="h-6 border-stroke-soft-200 border-x border-b bg-bg-weak-50/60 dark:border-white/10 dark:bg-white/[0.03]" />
 				<div />
 			</div>
 		</div>
