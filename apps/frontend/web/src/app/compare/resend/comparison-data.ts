@@ -13,76 +13,6 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 		intro:
 			"Both products support sending and receiving email. Reloop runs its own MTA/MX stack (KumoMTA, Rspamd, two-way agent inbox) and is fully self-hostable, whereas Resend is a hosted DX layer over Amazon SES with webhook-oriented inbound.",
 		features: [
-
-			{
-				label: "REST API",
-				icon: "webhook",
-				reloop: "Yes",
-				competitor: "Yes",
-			},
-			{
-				label: "SMTP",
-				icon: "smtp",
-				reloop: "Yes",
-				competitor: "Yes",
-			},
-			{
-				label: "Official SDKs",
-				icon: "workflow",
-				reloop: "Yes",
-				competitor: "Yes",
-			},
-			{
-				label: "React Email / HTML templates",
-				icon: "file-text",
-				reloop: {
-					value: "Yes",
-					note: "Dashboard React Email editor + send with rendered HTML or template IDs",
-				},
-				competitor: {
-					value: "Yes",
-					note: "React Email first-class; build in your app",
-				},
-			},
-			{
-				label: "Batch / broadcast sending",
-				icon: "mega-phone",
-				reloop: {
-					value: "API",
-					note: "Send via API/SMTP; no separate marketing campaign builder shipping yet",
-				},
-				competitor: {
-					value: "Yes",
-					note: "Audiences / batch APIs on hosted product",
-				},
-			},
-			{
-				label: "Scheduled delivery",
-				icon: "calendar",
-				reloop: {
-					value: "No",
-					note: "Scheduling engine is currently in development",
-				},
-				competitor: "Yes",
-			},
-			{
-				label: "A/B testing",
-				icon: "arrow-swap",
-				reloop: "No",
-				competitor: "No",
-			},
-			{
-				label: "Full message body stored",
-				icon: "message-body",
-				reloop: "Yes",
-				competitor: "Yes",
-			},
-			{
-				label: "Inbound spam scoring",
-				icon: "alert-triangle",
-				reloop: "Yes",
-				competitor: "—",
-			},
 			{
 				label: "Agent inbox",
 				icon: "robot",
@@ -102,8 +32,56 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 				competitor: "No",
 			},
 			{
+				label: "Inbound spam scoring",
+				icon: "alert-triangle",
+				reloop: "Yes",
+				competitor: "—",
+			},
+			{
+				label: "REST API",
+				icon: "webhook",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "SMTP relay",
+				icon: "smtp",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "Official SDKs",
+				icon: "workflow",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "React Email / HTML templates",
+				icon: "file-text",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "Batch / broadcast sending",
+				icon: "mega-phone",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "Scheduled delivery",
+				icon: "calendar",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "A/B testing",
+				icon: "arrow-swap",
+				reloop: "No",
+				competitor: "No",
+			},
+			{
 				label: "MTA",
-				icon: "",
+				icon: "mail-server",
 				reloop: "Yes",
 				competitor: "No"
 			},

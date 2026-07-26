@@ -59,10 +59,9 @@ export function CompareTitleIcon({
 	if (
 		key.includes("mta") ||
 		key.includes("relay") ||
-		key.includes("infrastructure") ||
-		key.includes("server")
+		key.includes("infrastructure")
 	) {
-		return <Icon name="server" className={combinedClassName} />;
+		return <Icon name="mail-server" className={combinedClassName} />;
 	}
 
 	if (
