@@ -367,7 +367,7 @@ export function ComparisonMatrix({
 						{section.features.map((row) => (
 							<div key={`${section.id}-${row.label}`} className="contents">
 								<div className="flex items-center border-stroke-soft-200 border-b py-4 pr-4 pl-4 sm:pl-6 dark:border-white/10">
-									<span className="text-[14px] text-text-sub-600 dark:text-white/50">
+									<span className="font-medium text-[14px] text-text-strong-950 dark:text-white">
 										{row.label}
 									</span>
 								</div>

@@ -114,18 +114,12 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 			},
 			{
 				label: "Full message body stored",
-				reloop: {
-					value: "Yes",
-					note: "Text, HTML, and raw message in inbox",
-				},
+				reloop: "Yes",
 				competitor: "Yes",
 			},
 			{
 				label: "Inbound spam scoring",
-				reloop: {
-					value: "Yes",
-					note: "Rspamd in Reloop’s inbound path",
-				},
+				reloop: "Yes",
 				competitor: "—",
 			},
 			{
@@ -135,10 +129,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 			},
 			{
 				label: "AI compose helpers",
-				reloop: {
-					value: "Yes",
-					note: "Subject/compose assist in inbox",
-				},
+				reloop: "Yes",
 				competitor: "No",
 			},
 		],
