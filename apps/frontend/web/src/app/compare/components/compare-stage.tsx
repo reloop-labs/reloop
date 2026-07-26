@@ -15,16 +15,12 @@ export function CompareStage({
 	return (
 		<div className={cn("relative mx-auto w-full max-w-[1320px]", className)}>
 			{/* Soft floating stage card */}
-			<div className="relative overflow-hidden rounded-[28px] border border-stroke-soft-200/80 bg-gradient-to-b from-bg-weak-50/90 to-bg-white-0 px-6 py-16 sm:rounded-[32px] sm:px-12 sm:py-24 lg:py-28 dark:border-white/10 dark:from-white/[0.04] dark:to-transparent">
-				{/* Soft color wash */}
+			<div className="relative overflow-hidden rounded-[28px] border border-stroke-soft-200/80 bg-bg-white-0 px-6 py-16 sm:rounded-[32px] sm:px-12 sm:py-24 lg:py-28 dark:border-white/10 dark:bg-black">
+				{/* Grid, masked to center */}
 				<div
 					aria-hidden
 					className="pointer-events-none absolute inset-0 overflow-hidden"
 				>
-					<div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(99,102,241,0.06),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_30%_20%,rgba(99,102,241,0.12),transparent_50%)]" />
-					<div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_80%,rgba(16,185,129,0.05),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_70%_80%,rgba(16,185,129,0.1),transparent_50%)]" />
-
-					{/* Grid, masked to center */}
 					<div
 						className="absolute inset-0 opacity-50 dark:opacity-25"
 						style={{
