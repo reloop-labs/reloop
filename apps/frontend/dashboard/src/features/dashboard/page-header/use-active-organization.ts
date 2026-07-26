@@ -3,15 +3,21 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
 	createContext,
 	createElement,
+	type ReactNode,
 	useCallback,
 	useContext,
 	useEffect,
 	useMemo,
 	useState,
-	type ReactNode,
 } from "react";
-import { useOrganizationsQuery } from "#/features/auth/organizations-query";
+import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
+import {
+	useOrganizationsQuery,
+	useUserInvitationsQuery,
+} from "#/features/auth/organizations-query";
+import { resolveOrglessDestination } from "#/features/auth/orgless-destination";
 import { useSessionQuery } from "#/features/auth/session-query";
+import { useAppNavigation, useAppPathname } from "#/lib/navigation";
 import { queryKeys } from "#/lib/query-keys";
 
 export type Organization = {
@@ -39,8 +45,9 @@ export type ActiveOrganizationValue = {
 	onOrganizationChange: (organization: Organization) => Promise<void>;
 };
 
-const ActiveOrganizationContext =
-	createContext<ActiveOrganizationValue | null>(null);
+const ActiveOrganizationContext = createContext<ActiveOrganizationValue | null>(
+	null,
+);
 
 function useActiveOrganizationState(): ActiveOrganizationValue {
 	const queryClient = useQueryClient();
@@ -60,13 +67,11 @@ function useActiveOrganizationState(): ActiveOrganizationValue {
 	>(null);
 
 	const sessionActiveOrganizationId =
-		(
-			session?.session as { activeOrganizationId?: string | null } | undefined
-		)?.activeOrganizationId ?? null;
+		(session?.session as { activeOrganizationId?: string | null } | undefined)
+			?.activeOrganizationId ?? null;
 	const userActiveOrganizationId =
-		(
-			session?.user as { activeOrganizationId?: string | null } | undefined
-		)?.activeOrganizationId ?? null;
+		(session?.user as { activeOrganizationId?: string | null } | undefined)
+			?.activeOrganizationId ?? null;
 
 	const effectiveSessionOrgId =
 		sessionActiveOrganizationId ?? confirmedSessionOrgId;
@@ -240,11 +245,40 @@ export function ActiveOrganizationProvider({
 	children: ReactNode;
 }) {
 	const value = useActiveOrganizationState();
-	return createElement(
-		ActiveOrganizationContext.Provider,
-		{ value },
-		children,
+	const pathname = useAppPathname();
+	const navigation = useAppNavigation();
+	const isOrgless = Boolean(
+		value.user && value.organizations && value.organizations.length === 0,
 	);
+	const shouldCheckInvitations = isOrgless && pathname !== "/onboarding";
+	const {
+		data: invitations,
+		isPending: invitationsPending,
+		isFetched: invitationsFetched,
+	} = useUserInvitationsQuery(shouldCheckInvitations);
+
+	const orglessDestination = resolveOrglessDestination({
+		pathname,
+		organizations: value.organizations,
+		invitations,
+		invitationsSettled: invitationsFetched && !invitationsPending,
+	});
+
+	useEffect(() => {
+		if (!orglessDestination) return;
+		navigation.replace({ to: orglessDestination });
+	}, [navigation, orglessDestination]);
+
+	const isResolvingMembership =
+		Boolean(value.user) &&
+		pathname !== "/onboarding" &&
+		(value.organizations === undefined || isOrgless || !value.hasInitialized);
+
+	if (isResolvingMembership) {
+		return createElement(AuthSessionLoader);
+	}
+
+	return createElement(ActiveOrganizationContext.Provider, { value }, children);
 }
 
 /**

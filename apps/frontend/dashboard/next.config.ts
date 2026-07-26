@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
 
 		return [
 			{
-				source: "/api/script.js",
+				source: "/api/analytics/script.js",
 				destination: "https://rybbit.reloop.sh/api/script.js",
 			},
 			{

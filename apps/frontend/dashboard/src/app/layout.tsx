@@ -8,6 +8,15 @@ export const instant = false;
 export const metadata: Metadata = {
 	title: "Reloop Dashboard",
 	description: "Reloop Dashboard",
+	manifest: "/dashboard/manifest.json",
+	icons: {
+		icon: [
+			{ url: "/dashboard/favicon.ico" },
+			{ url: "/dashboard/icon0.svg", type: "image/svg+xml" },
+			{ url: "/dashboard/icon1.png", type: "image/png" },
+		],
+		apple: "/dashboard/apple-icon.png",
+	},
 };
 
 export default function RootLayout({

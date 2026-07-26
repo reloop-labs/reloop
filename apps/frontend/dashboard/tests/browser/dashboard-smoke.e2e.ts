@@ -62,6 +62,72 @@ async function mockAnonymousBackend(page: Page) {
 	});
 }
 
+const authenticatedSession = {
+	session: {
+		id: "session-1",
+		userId: "user-1",
+		activeOrganizationId: null,
+		expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+	},
+	user: {
+		id: "user-1",
+		name: "Dashboard User",
+		email: "user@example.com",
+		emailVerified: true,
+		activeOrganizationId: null,
+		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+	},
+};
+
+async function mockAuthenticatedOrglessBackend(
+	page: Page,
+	options: {
+		invitation?: Record<string, unknown>;
+		onMutation?: (pathname: string) => void;
+		session?: typeof authenticatedSession | null;
+	} = {},
+) {
+	const invitation = options.invitation;
+
+	await page.route("**/api/**", async (route) => {
+		const pathname = new URL(route.request().url()).pathname;
+		let body: unknown = null;
+
+		if (pathname.endsWith("/get-session")) {
+			body =
+				options.session === undefined ? authenticatedSession : options.session;
+		} else if (pathname.endsWith("/organization/list")) {
+			body = [];
+		} else if (pathname.endsWith("/organization/list-user-invitations")) {
+			body = invitation ? [invitation] : [];
+		} else if (pathname.endsWith("/organization/get-invitation")) {
+			body = invitation ?? null;
+		} else if (
+			route.request().method() !== "GET" &&
+			pathname.endsWith("/organization/accept-invitation")
+		) {
+			options.onMutation?.(pathname);
+			body = { invitation };
+		} else if (
+			route.request().method() !== "GET" &&
+			(pathname.endsWith("/organization/set-active") ||
+				pathname.endsWith("/update-user"))
+		) {
+			options.onMutation?.(pathname);
+			body = { success: true };
+		}
+
+		await route.fulfill({
+			status: 200,
+			contentType: "application/json",
+			body: JSON.stringify(body),
+		});
+	});
+}
+
 function collectNextPagePatterns(directory = appDirectory) {
 	const pageFiles: string[] = [];
 
@@ -187,6 +253,30 @@ test.describe("production shell", () => {
 		expect(await response.json()).toEqual({ status: "ok" });
 	});
 
+	test("serves branded metadata assets under the dashboard base path", async ({
+		request,
+	}) => {
+		const manifestResponse = await request.get(dashboardURL("/manifest.json"));
+		expect(manifestResponse.status()).toBe(200);
+		expect(await manifestResponse.json()).toMatchObject({
+			name: "Reloop",
+			short_name: "Reloop",
+			start_url: "/dashboard",
+		});
+
+		for (const asset of [
+			"/favicon.ico",
+			"/apple-icon.png",
+			"/icon0.svg",
+			"/icon1.png",
+			"/web-app-manifest-192x192.png",
+			"/web-app-manifest-512x512.png",
+		]) {
+			const response = await request.get(dashboardURL(asset));
+			expect(response.status(), asset).toBe(200);
+		}
+	});
+
 	test("loads JavaScript and CSS from the dashboard-prefixed static path", async ({
 		page,
 	}) => {
@@ -233,20 +323,27 @@ test.describe("production shell", () => {
 		const assertNoBrowserErrors = collectBrowserErrors(page, {
 			expectedDocument404: malformedURL,
 		});
+		await mockAnonymousBackend(page);
 		const response = await page.goto(malformedURL, {
-			waitUntil: "networkidle",
+			waitUntil: "domcontentloaded",
 		});
 
 		expect(response?.status()).toBe(404);
 		await expect(
 			page.getByRole("heading", { name: "Page not found" }),
 		).toBeVisible();
-		expect(await page.title()).toBe("Reloop Dashboard");
+		expect(await page.title()).toBe("Page not found");
 		expect(
 			await page
 				.locator('meta[name="description"]')
 				.getAttribute("content"),
-		).toBe("Reloop Dashboard");
+		).toBe("The page you're looking for couldn't be found.");
+		const robotsDirectives = await page
+			.locator('meta[name="robots"]')
+			.evaluateAll((elements) =>
+				elements.map((element) => element.getAttribute("content")),
+			);
+		expect(robotsDirectives).toContain("noindex, nofollow");
 		assertNoBrowserErrors();
 	});
 
@@ -282,6 +379,94 @@ test.describe("production shell", () => {
 		await expect(page).toHaveURL(
 			dashboardURL("/signup?inviteId=invite-001"),
 		);
+		assertNoBrowserErrors();
+	});
+});
+
+test.describe("authenticated organization behavior", () => {
+	test("an orgless direct load is globally redirected to onboarding", async ({
+		page,
+	}) => {
+		const assertNoBrowserErrors = collectBrowserErrors(page);
+		await mockAuthenticatedOrglessBackend(page);
+
+		await page.goto(dashboardURL("/settings"), {
+			waitUntil: "domcontentloaded",
+		});
+
+		await expect(page).toHaveURL(dashboardURL("/onboarding"));
+		await expect(
+			page.getByRole("heading", { name: "Create your workspace" }),
+		).toBeVisible();
+		assertNoBrowserErrors();
+	});
+
+	test("an orgless direct load follows an actionable invitation", async ({
+		page,
+	}) => {
+		const assertNoBrowserErrors = collectBrowserErrors(page);
+		const mutations: string[] = [];
+		const invitation = {
+			id: "invite-001",
+			organizationId: "org-001",
+			email: "user@example.com",
+			role: "member",
+			status: "pending",
+			expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+			inviterId: "owner-1",
+			organizationName: "Invited Workspace",
+			inviterEmail: "owner@example.com",
+		};
+		await mockAuthenticatedOrglessBackend(page, {
+			invitation,
+			onMutation: (pathname) => mutations.push(pathname),
+		});
+
+		await page.goto(dashboardURL("/contacts"), {
+			waitUntil: "domcontentloaded",
+		});
+
+		await expect(page).toHaveURL(dashboardURL("/invite?id=invite-001"));
+		await expect(
+			page.getByRole("heading", { name: "Join Invited Workspace" }),
+		).toBeVisible();
+		await page.getByRole("button", { name: "Accept Invitation" }).click();
+		await expect
+			.poll(() => mutations, { message: "invitation activation mutations" })
+			.toEqual([
+				expect.stringMatching(/\/organization\/accept-invitation$/),
+				expect.stringMatching(/\/organization\/set-active$/),
+				expect.stringMatching(/\/update-user$/),
+			]);
+		assertNoBrowserErrors();
+	});
+});
+
+test.describe("invitation handoff", () => {
+	test("an anonymous invite preserves its id through login", async ({ page }) => {
+		const assertNoBrowserErrors = collectBrowserErrors(page);
+		const invitation = {
+			id: "invite-001",
+			organizationId: "org-001",
+			email: "user@example.com",
+			role: "member",
+			status: "pending",
+			expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+			inviterId: "owner-1",
+			organizationName: "Invited Workspace",
+			inviterEmail: "owner@example.com",
+		};
+		await mockAuthenticatedOrglessBackend(page, {
+			invitation,
+			session: null,
+		});
+
+		await page.goto(dashboardURL("/invite?id=invite-001"), {
+			waitUntil: "domcontentloaded",
+		});
+		await page.getByRole("button", { name: "Login to Accept" }).click();
+
+		await expect(page).toHaveURL(dashboardURL("/login?inviteId=invite-001"));
 		assertNoBrowserErrors();
 	});
 });

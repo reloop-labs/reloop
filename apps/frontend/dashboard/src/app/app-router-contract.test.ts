@@ -40,4 +40,31 @@ describe("App Router provider lifetimes", () => {
 		expect(providers).toContain('from "nuqs/adapters/next/app"');
 		expect(providers.match(/<NuqsAdapter>/g)).toHaveLength(1);
 	});
+
+	it("mounts analytics through the base-path rewrite", () => {
+		const providers = read("./providers.tsx");
+		const config = read("../../next.config.ts");
+
+		expect(providers).toContain("<RybbitLoader");
+		expect(providers).toContain(
+			'scriptSrc="/dashboard/api/analytics/script.js"',
+		);
+		expect(config).toContain('source: "/api/analytics/script.js"');
+	});
+
+	it("publishes branded metadata and no-indexes the not-found route", () => {
+		const layout = read("./layout.tsx");
+		const notFound = read("./not-found.tsx");
+		const manifest = read("../../public/manifest.json");
+
+		expect(layout).toContain('manifest: "/dashboard/manifest.json"');
+		expect(layout).toContain('apple: "/dashboard/apple-icon.png"');
+		expect(notFound).toContain('title: "Page not found"');
+		expect(notFound).toContain("robots: { index: false, follow: false }");
+		expect(JSON.parse(manifest)).toMatchObject({
+			name: "Reloop",
+			short_name: "Reloop",
+			start_url: "/dashboard",
+		});
+	});
 });

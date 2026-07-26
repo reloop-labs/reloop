@@ -1,6 +1,13 @@
 import { Icon } from "@reloop/ui/icon";
 import { NotFoundIllustration } from "@reloop/ui/not-found-illustration";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+	title: "Page not found",
+	description: "The page you're looking for couldn't be found.",
+	robots: { index: false, follow: false },
+};
 
 export default function NotFoundPage() {
 	return (
