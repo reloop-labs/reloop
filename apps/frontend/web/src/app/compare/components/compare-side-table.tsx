@@ -7,6 +7,7 @@ import { useState } from "react";
 import Link from "next/link";
 import type { SimpleIcon } from "simple-icons";
 import { BrandIcon } from "./brand-icon";
+import { CompareTitleIcon } from "./compare-title-icon";
 
 export type PlanType = "free" | "startup" | "paid";
 
@@ -142,6 +143,7 @@ function PlanTogglePill({
 
 export type CompareSideTableRow = {
 	label: string;
+	icon?: React.ReactNode | string;
 	reloop: React.ReactNode;
 	competitor: React.ReactNode;
 };
@@ -235,7 +237,8 @@ export function CompareSideTable({
 						{/* Rows */}
 						{rows.map((row) => (
 							<div key={row.label} className="contents">
-								<div className="flex items-center border-stroke-soft-200 border-b py-4 pr-4 pl-4 sm:pl-6 dark:border-white/10">
+								<div className="flex items-center gap-2.5 border-stroke-soft-200 border-b py-4 pr-4 pl-4 sm:pl-6 dark:border-white/10">
+									<CompareTitleIcon title={row.label} icon={row.icon} />
 									<span className="font-medium text-[14px] text-text-strong-950 dark:text-white">
 										{row.label}
 									</span>

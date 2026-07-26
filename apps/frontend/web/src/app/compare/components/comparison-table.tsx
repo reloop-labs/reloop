@@ -7,6 +7,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { competitorBrands } from "../competitor-brands";
 import { BrandIcon } from "./brand-icon";
+import { CompareTitleIcon } from "./compare-title-icon";
 
 export type PlanType = "free" | "startup" | "paid";
 
@@ -149,6 +150,7 @@ export type ComparisonCell =
 
 export interface ComparisonFeatureRow {
 	label: string;
+	icon?: React.ReactNode | string;
 	reloop: ComparisonCell;
 	competitor: ComparisonCell;
 }
@@ -370,7 +372,8 @@ export function ComparisonTable({
 					if (isHeader) {
 						return (
 							<div key={row.label} className="contents">
-								<div className="sticky top-[156px] z-20 flex items-center border-stroke-soft-200 border-b bg-bg-white-0/95 py-3 pr-4 pl-4 sm:pl-6 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+								<div className="sticky top-[156px] z-20 flex items-center gap-2.5 border-stroke-soft-200 border-b bg-bg-white-0/95 py-3 pr-4 pl-4 sm:pl-6 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+									<CompareTitleIcon title={row.label} icon={row.icon} isSection />
 									<span className="font-bold text-[13px] text-text-strong-950 uppercase tracking-wider dark:text-white">
 										{row.label}
 									</span>
@@ -382,7 +385,8 @@ export function ComparisonTable({
 					}
 					return (
 						<div key={row.label} className="contents">
-							<div className="flex items-center border-b border-stroke-soft-200 py-4 pr-4 pl-4 sm:pl-6 dark:border-white/10">
+							<div className="flex items-center gap-2.5 border-b border-stroke-soft-200 py-4 pr-4 pl-4 sm:pl-6 dark:border-white/10">
+								<CompareTitleIcon title={row.label} icon={row.icon} />
 								<span className="font-medium text-[14px] text-text-strong-950 dark:text-white">
 									{row.label}
 								</span>

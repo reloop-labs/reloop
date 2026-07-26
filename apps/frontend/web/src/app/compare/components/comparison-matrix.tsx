@@ -7,11 +7,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { competitorBrands } from "../competitor-brands";
 import { BrandIcon } from "./brand-icon";
+import { CompareTitleIcon } from "./compare-title-icon";
 import type { ComparisonCell, ComparisonFeatureRow } from "./comparison-table";
 
 export type ComparisonCategory = {
 	id: string;
 	label: string;
+	icon?: React.ReactNode | string;
 	intro?: string;
 	features: ComparisonFeatureRow[];
 };
@@ -356,7 +358,8 @@ export function ComparisonMatrix({
 
 				{categories.map((section) => (
 					<div key={section.id} className="contents">
-						<div className="sticky top-[156px] z-20 flex items-center border-stroke-soft-200 border-b bg-bg-white-0/95 py-3 pr-4 pl-4 sm:pl-6 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+						<div className="sticky top-[156px] z-20 flex items-center gap-2.5 border-stroke-soft-200 border-b bg-bg-white-0/95 py-3 pr-4 pl-4 sm:pl-6 backdrop-blur-md dark:border-white/10 dark:bg-black/95">
+							<CompareTitleIcon title={section.label} icon={section.icon} isSection />
 							<span className="font-bold text-[13px] text-text-strong-950 uppercase tracking-wider dark:text-white">
 								{section.label}
 							</span>
@@ -366,7 +369,8 @@ export function ComparisonMatrix({
 
 						{section.features.map((row) => (
 							<div key={`${section.id}-${row.label}`} className="contents">
-								<div className="flex items-center border-stroke-soft-200 border-b py-4 pr-4 pl-4 sm:pl-6 dark:border-white/10">
+								<div className="flex items-center gap-2.5 border-stroke-soft-200 border-b py-4 pr-4 pl-4 sm:pl-6 dark:border-white/10">
+									<CompareTitleIcon title={row.label} icon={row.icon} />
 									<span className="font-medium text-[14px] text-text-strong-950 dark:text-white">
 										{row.label}
 									</span>
