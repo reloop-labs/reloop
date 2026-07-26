@@ -20,7 +20,9 @@ export function CompareTitleIcon({
 		? "size-4 text-text-strong-950 dark:text-white shrink-0"
 		: "size-4 text-text-sub-600 dark:text-white/60 shrink-0";
 
-	const combinedClassName = className ? `${baseClasses} ${className}` : baseClasses;
+	const combinedClassName = className
+		? `${baseClasses} ${className}`
+		: baseClasses;
 	const key = (typeof icon === "string" ? icon : title).toLowerCase().trim();
 
 	// Match icon sprite names first from @reloop/ui/icon
@@ -69,20 +71,36 @@ export function CompareTitleIcon({
 		return <Icon name="lock" className={combinedClassName} />;
 	}
 
-	if (key.includes("inbound")) {
+	if (
+		key === "inbound" ||
+		key === "inbound email (receiving email)" ||
+		key.startsWith("inbound email (")
+	) {
+		return <Icon name="mail-receive" className={combinedClassName} />;
+	}
+
+	if (
+		key.includes("inbound") ||
+		key.includes("body") ||
+		key.includes("stored") ||
+		key.includes("processing")
+	) {
+		if (key.includes("processing")) {
+			return <Icon name="refresh-cw" className={combinedClassName} />;
+		}
+		if (key.includes("body") || key.includes("stored")) {
+			return <Icon name="message-body" className={combinedClassName} />;
+		}
 		if (key.includes("spam")) {
 			return <Icon name="alert-triangle" className={combinedClassName} />;
 		}
 		if (key.includes("inbox") || key.includes("agent")) {
 			return <Icon name="robot" className={combinedClassName} />;
 		}
-		if (key.includes("ai") || key.includes("compose")) {
+		if (key.includes("compose") || key.includes("helper")) {
 			return <Icon name="sparkling" className={combinedClassName} />;
 		}
-		if (key.includes("body") || key.includes("stored")) {
-			return <Icon name="logs" className={combinedClassName} />;
-		}
-		return <Icon name="smtp" className={combinedClassName} />;
+		return <Icon name="mail-receive" className={combinedClassName} />;
 	}
 
 	if (
@@ -135,11 +153,7 @@ export function CompareTitleIcon({
 		return <Icon name="zap" className={combinedClassName} />;
 	}
 
-	if (
-		key.includes("feedback") ||
-		key.includes("loop") ||
-		key.includes("fbl")
-	) {
+	if (key.includes("feedback") || key.includes("loop") || key.includes("fbl")) {
 		return <Icon name="arrow-swap" className={combinedClassName} />;
 	}
 

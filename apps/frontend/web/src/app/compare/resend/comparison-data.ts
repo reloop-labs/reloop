@@ -103,7 +103,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 	},
 	{
 		id: "inbound",
-		label: "Inbound",
+		label: "Inbound Email (receiving email)",
 		intro:
 			"Both can receive email. Reloop routes inbound through its own MX stack into an agent inbox with full content and Rspamd scoring. Resend’s inbound product is hosted and webhook-oriented.",
 		features: [
