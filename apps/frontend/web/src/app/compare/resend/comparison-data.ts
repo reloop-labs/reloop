@@ -7,18 +7,13 @@ import type { ComparisonCategory } from "../components/comparison-matrix";
  */
 export const resendComparisonCategories: ComparisonCategory[] = [
 	{
-		id: "sending",
-		label: "Sending",
+		id: "sending-receiving",
+		label: "Sending & Receiving",
 		icon: "send-2",
 		intro:
-			"Both products give you a modern send API and SMTP. The gap is ownership: Reloop runs its own MTA stack (KumoMTA) and can be self-hosted; Resend is a hosted DX layer over Amazon SES.",
+			"Both products support sending and receiving email. Reloop runs its own MTA/MX stack (KumoMTA, Rspamd, two-way agent inbox) and is fully self-hostable, whereas Resend is a hosted DX layer over Amazon SES with webhook-oriented inbound.",
 		features: [
-			{
-				label: "Transactional emails",
-				icon: "mail-single",
-				reloop: "Yes",
-				competitor: "Yes",
-			},
+
 			{
 				label: "REST API",
 				icon: "webhook",
@@ -77,66 +72,6 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 				competitor: "No",
 			},
 			{
-				label: "Own sending MTA",
-				icon: "server",
-				reloop: {
-					value: "Yes",
-					note: "KumoMTA in Reloop’s stack",
-				},
-				competitor: {
-					value: "No",
-					note: "Public delivery path uses Amazon SES",
-				},
-			},
-			{
-				label: "Self-hostable",
-				icon: "home",
-				reloop: "Yes",
-				competitor: "No",
-			},
-			{
-				label: "Open-source codebase",
-				icon: "github",
-				reloop: {
-					value: "Yes",
-					note: "Apache 2.0 with Reloop Labs use restrictions—see /license",
-				},
-				competitor: "No",
-			},
-			{
-				label: "Shared IPs",
-				icon: "globe",
-				reloop: "Yes",
-				competitor: "Yes",
-			},
-			{
-				label: "Dedicated IPs",
-				icon: "globe",
-				reloop: {
-					value: "Enterprise",
-					note: "Optional / custom on Enterprise; self-host can use your own IPs",
-				},
-				competitor: {
-					value: "Scale+",
-					note: "Managed dedicated IP pools on higher plans",
-				},
-			},
-		],
-	},
-	{
-		id: "inbound",
-		label: "Inbound Email (receiving email)",
-		icon: "mail-receive",
-		intro:
-			"Both can receive email. Reloop routes inbound through its own MX stack into an agent inbox with full content and Rspamd scoring. Resend’s inbound product is hosted and webhook-oriented.",
-		features: [
-			{
-				label: "Inbound email processing",
-				icon: "refresh-cw",
-				reloop: "Yes",
-				competitor: "Yes",
-			},
-			{
 				label: "Full message body stored",
 				icon: "message-body",
 				reloop: "Yes",
@@ -165,6 +100,36 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 				icon: "sparkling",
 				reloop: "Yes",
 				competitor: "No",
+			},
+			{
+				label: "MTA",
+				icon: "",
+				reloop: "Yes",
+				competitor: "No"
+			},
+			{
+				label: "Self-hostable",
+				icon: "server",
+				reloop: "Yes",
+				competitor: "No",
+			},
+			{
+				label: "Open-source",
+				icon: "github",
+				reloop: "Yes",
+				competitor: "No",
+			},
+			{
+				label: "Shared IPs",
+				icon: "globe",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "Dedicated IPs",
+				icon: "globe",
+				reloop: "Enterprise",
+				competitor: "Scale+"
 			},
 		],
 	},
