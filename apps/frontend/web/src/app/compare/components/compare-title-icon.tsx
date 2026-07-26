@@ -17,7 +17,7 @@ export function CompareTitleIcon({
 	}
 
 	const baseClasses = isSection
-		? "size-4 text-text-strong-950 dark:text-white shrink-0"
+		? "size-[18px] sm:size-5 text-text-strong-950 dark:text-white shrink-0"
 		: "size-4 text-text-sub-600 dark:text-white/60 shrink-0";
 
 	const combinedClassName = className

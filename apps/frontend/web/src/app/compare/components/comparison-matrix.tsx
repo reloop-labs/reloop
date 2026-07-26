@@ -358,7 +358,7 @@ export function ComparisonMatrix({
 
 				{categories.map((section) => (
 					<div key={section.id} className="contents">
-						<div className="sticky top-[156px] z-20 flex items-center gap-2.5 border-stroke-soft-200 border-b bg-bg-white-0/95 py-3 pr-4 pl-4 backdrop-blur-md sm:pl-6 dark:border-white/10 dark:bg-black/95">
+						<div className="sticky top-[168px] z-20 flex items-center gap-2.5 border-stroke-soft-200 border-b bg-bg-white-0/95 py-3 pr-4 pl-4 backdrop-blur-md sm:pl-6 dark:border-white/10 dark:bg-black/95">
 							<CompareTitleIcon
 								title={section.label}
 								icon={section.icon}
@@ -368,8 +368,8 @@ export function ComparisonMatrix({
 								{section.label}
 							</span>
 						</div>
-						<div className="sticky top-[156px] z-20 border-stroke-soft-200 border-x border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95" />
-						<div className="sticky top-[156px] z-20 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95" />
+						<div className="sticky top-[168px] z-20 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95" />
+						<div className="sticky top-[168px] z-20 border-stroke-soft-200 border-b bg-bg-white-0/95 backdrop-blur-md dark:border-white/10 dark:bg-black/95" />
 
 						{section.features.map((row) => (
 							<div key={`${section.id}-${row.label}`} className="contents">
