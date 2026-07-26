@@ -21,7 +21,7 @@ export function ComparisonPageShell({
 	const brand = getCompetitorByHref(pagePath);
 
 	return (
-		<div className="relative overflow-x-clip px-4 sm:px-6 lg:px-8">
+		<div className="relative px-4 sm:px-6 lg:px-8">
 			{/*
 			 * Full-height frame: vertical rails span the entire page.
 			 * Section content is constrained inside each CompareSection / component.
