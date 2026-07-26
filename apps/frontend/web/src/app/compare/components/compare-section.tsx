@@ -15,12 +15,15 @@ export function CompareSection({
 	noDivider = false,
 	/** Tighter top padding after the hero divider. */
 	flushTop = false,
+	/** Drop horizontal padding so gutters (e.g. hatch) can meet the frame rails. */
+	flushX = false,
 }: {
 	children: React.ReactNode;
 	className?: string;
 	maxWidth?: "full" | "5xl" | "4xl" | "3xl" | "2xl";
 	noDivider?: boolean;
 	flushTop?: boolean;
+	flushX?: boolean;
 }) {
 	const maxWidthClass =
 		maxWidth === "full"
@@ -43,7 +46,8 @@ export function CompareSection({
 		>
 			<div
 				className={cn(
-					"mx-auto w-full px-4 sm:px-6 lg:px-8",
+					"mx-auto w-full",
+					flushX ? "px-0" : "px-4 sm:px-6 lg:px-8",
 					flushTop
 						? "pt-10 pb-16 sm:pt-12 sm:pb-20 lg:pb-24"
 						: "py-16 sm:py-20 lg:py-24",
