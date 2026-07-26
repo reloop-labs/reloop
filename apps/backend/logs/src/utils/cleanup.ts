@@ -1,26 +1,20 @@
-import { getClickHouseClient } from "./clickhouse";
+import { db } from "@reloop/db/client";
+import * as schema from "@reloop/db/schema";
+import { lt } from "drizzle-orm";
 
 /**
  * Deletes logs older than the specified number of days.
  * @param days Retention period in days
  */
 export async function cleanupOldLogs(days = 100): Promise<number> {
-	const client = getClickHouseClient();
+	const safeDays = Math.max(1, Math.floor(Number(days)));
 
 	try {
-		// In ClickHouse, ALTER TABLE ... DELETE is asynchronous.
-		// We use it to remove rows based on the timestamp.
-		const safeDays = Math.max(1, Math.floor(Number(days)));
-		await client.exec({
-			query: `
-				ALTER TABLE logs
-				DELETE WHERE created_at < subtractDays(now(), ${safeDays})
-			`,
-		});
-
-		// Since it's async, we don't get an immediate count of deleted rows easily
-		// but the command has been issued.
-		return days;
+		const cutoff = new Date(Date.now() - safeDays * 24 * 60 * 60 * 1000);
+		await db
+			.delete(schema.activityLog)
+			.where(lt(schema.activityLog.createdAt, cutoff));
+		return safeDays;
 	} catch (error) {
 		console.error(`Failed to cleanup logs older than ${days} days:`, error);
 		throw error;
@@ -31,12 +25,8 @@ export async function cleanupOldLogs(days = 100): Promise<number> {
  * Deletes all logs from the database.
  */
 export async function truncateLogs(): Promise<void> {
-	const client = getClickHouseClient();
-
 	try {
-		await client.exec({
-			query: "TRUNCATE TABLE logs",
-		});
+		await db.delete(schema.activityLog);
 	} catch (error) {
 		console.error("Failed to truncate logs table:", error);
 		throw error;

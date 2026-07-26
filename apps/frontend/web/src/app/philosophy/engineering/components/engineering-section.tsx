@@ -72,7 +72,7 @@ const stack: StackItem[] = [
 	{
 		title: "Battle-tested databases",
 		description:
-			"PostgreSQL for relational data, Redis for caching, and ClickHouse for analytics—each chosen for its strengths.",
+			"PostgreSQL for relational data and analytics, Redis for caching—each chosen for its strengths.",
 		icon: "database",
 		iconColor: "text-emerald-500 dark:text-emerald-400",
 		iconBorder: "border-emerald-500/25 dark:border-emerald-400/30",

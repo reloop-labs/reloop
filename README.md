@@ -29,7 +29,7 @@ Reloop gives you the same capabilities as SendGrid, Mailchimp, Resend, and Loops
 - **Email campaigns** — broadcast and sequence campaigns with audience segmentation
 - **Inbound email** — receive, parse, and process incoming mail at your own domain
 - **Email templates** — a visual drag-and-drop editor built for developers and marketers
-- **Real-time analytics** — open rates, click rates, bounces, and delivery events powered by ClickHouse
+- **Real-time analytics** — open rates, click rates, bounces, and delivery events stored in PostgreSQL
 - **Webhooks** — push delivery events to your own endpoints the moment they happen
 - **Contacts & lists** — manage subscribers, tags, and suppression lists
 - **Workflows** — automate multi-step email sequences triggered by user actions

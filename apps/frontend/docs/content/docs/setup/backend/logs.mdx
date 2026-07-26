@@ -4,10 +4,10 @@ icon: file-text
 description: Set up, configure, and run the Reloop logs microservice locally.
 ---
 
-Event logging and analytics — ingests delivery/tracking events into ClickHouse.
+Event logging and analytics — activity logs and email delivery data in PostgreSQL.
 
 <Tip>
-Run [`bun setup`](/docs/setup) once so ClickHouse is up (`bun docker:up`). Env files come from `bun setup` / `bun env:setup`.
+Run [`bun setup`](/docs/setup) once so Postgres is up (`bun docker:up`). Env files come from `bun setup` / `bun env:setup`.
 </Tip>
 
 
@@ -19,7 +19,7 @@ Run [`bun setup`](/docs/setup) once so ClickHouse is up (`bun docker:up`). Env f
 | **Port** | `8016` |
 | **Local URL** | [https://local.reloop.sh/api/logs](https://local.reloop.sh/api/logs) |
 | **Swagger UI** | [https://local.reloop.sh/api/logs/openapi](https://local.reloop.sh/api/logs/openapi) |
-| **Stack** | ElysiaJS · ClickHouse · Redis · NATS |
+| **Stack** | ElysiaJS · PostgreSQL · Redis · NATS |
 
 
 ## Quick start
@@ -36,8 +36,7 @@ Or `bun backend:dev` / `bun dev`.
 `apps/backend/logs/.env` — from `bun setup` / `bun env:setup`.
 
 ```bash
-# user:password@host:port/database — all ClickHouse settings in one URL
-CLICKHOUSE_URL=http://default:reloop123@localhost:8123/reloop
+PG_URL=postgresql://reloop:reloop123@localhost:5432/reloop
 REDIS_URL=redis://:reloop123@localhost:6379
 PORT=8016
 BASE_URL="https://local.reloop.sh"
@@ -47,12 +46,10 @@ NODE_ENV=development
 
 | Variable | Required | Default |
 | :--- | :--- | :--- |
-| `CLICKHOUSE_URL` | **YES** | `http://default:reloop123@localhost:8123/reloop` |
+| `PG_URL` | **YES** | `postgresql://reloop:reloop123@localhost:5432/reloop` |
 | `REDIS_URL` | **YES** | `redis://...` |
 | `PORT` | **YES** | `8016` |
 | `NATS_URL` | **YES** | `nats://localhost:4222` |
-
-`CLICKHOUSE_URL` is a full connection string — host, credentials, and database are parsed from it. There are no separate `CLICKHOUSE_USER` / `CLICKHOUSE_PASSWORD` / `CLICKHOUSE_DATABASE` vars.
 
 
 ## Commands
@@ -69,10 +66,10 @@ NODE_ENV=development
 
 | Layer | Detail |
 | :--- | :--- |
-| **Ingestion** | Subscribes to NATS delivery and tracking events |
-| **Storage** | Batches writes to ClickHouse `logs` table (MergeTree) |
-| **Query API** | Powers dashboard analytics (opens, clicks, bounces) |
-| **Schema** | Defined in `apps/backend/logs/src/utils/clickhouse.ts` |
+| **Ingestion** | Subscribes to NATS delivery and activity events |
+| **Storage** | Writes activity logs to Postgres `activity_log`; email delivery to `email_log` |
+| **Query API** | Powers dashboard activity logs and email delivery analytics |
+| **Schema** | Defined in `packages/db/src/schema/activity-log.ts` |
 
 
 ## Next
@@ -82,7 +79,7 @@ NODE_ENV=development
     One-command local bootstrap
   </Card>
   <Card icon="globe" title="Port reference" href="/setup/port">
-    ClickHouse and gateway ports
+    Postgres and gateway ports
   </Card>
   <Card icon="mail-single" title="Mail" href="/setup/backend/mail">
     Source of delivery events

@@ -1,13 +1,19 @@
+import { db } from "@reloop/db/client";
+import * as schema from "@reloop/db/schema";
 import type { LogsTypes } from "@reloop/logs/types/logs.type";
+import { formatLogDate } from "@reloop/logs/utils/format";
 import {
-	getClickHouseClient,
-	type StoredLogEntry,
-} from "@reloop/logs/utils/clickhouse";
-import {
-	formatClickHouseDate,
-	safeJsonParse,
-	toClickHouseDate,
-} from "@reloop/logs/utils/format";
+	and,
+	count,
+	desc,
+	eq,
+	gte,
+	ilike,
+	lte,
+	or,
+	type SQL,
+	sql,
+} from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 
 export async function listLogsController(
@@ -17,162 +23,118 @@ export async function listLogsController(
 	const log = useLogger();
 	log.info("Listing logs", { query });
 	try {
-		const client = getClickHouseClient();
-		const conditions: string[] = [];
-		const params: Record<string, string | number> = {};
+		const conditions: SQL[] = [
+			eq(schema.activityLog.organizationId, organizationId),
+		];
 
 		if (query.level) {
-			conditions.push("level = {level:String}");
-			params.level = query.level;
+			conditions.push(eq(schema.activityLog.level, query.level));
 		}
 
 		if (query.status_code) {
 			const statuses = query.status_code.split(",");
-			const statusConditions: string[] = [];
-			let statusIdx = 0;
+			const statusConditions: SQL[] = [];
 			for (const status of statuses) {
 				if (status === "successes") {
-					statusConditions.push("(status_code >= 200 AND status_code < 400)");
+					statusConditions.push(
+						and(
+							gte(schema.activityLog.statusCode, 200),
+							sql`${schema.activityLog.statusCode} < 400`,
+						) as SQL,
+					);
 				} else if (status === "errors") {
-					statusConditions.push("(status_code >= 400)");
+					statusConditions.push(gte(schema.activityLog.statusCode, 400));
 				} else {
 					const numericStatus = Number.parseInt(status, 10);
 					if (!Number.isNaN(numericStatus)) {
-						const paramName = `statusCode${statusIdx++}`;
-						statusConditions.push(`status_code = {${paramName}:Int32}`);
-						params[paramName] = numericStatus;
+						statusConditions.push(
+							eq(schema.activityLog.statusCode, numericStatus),
+						);
 					}
 				}
 			}
 			if (statusConditions.length > 0) {
-				conditions.push(`(${statusConditions.join(" OR ")})`);
+				conditions.push(or(...statusConditions) as SQL);
 			}
 		}
 
 		if (query.event) {
-			conditions.push("event ILIKE {eventPattern:String}");
-			params.eventPattern = `%${query.event}%`;
+			conditions.push(ilike(schema.activityLog.event, `%${query.event}%`));
 		}
 
 		if (query.search) {
+			const pattern = `%${query.search}%`;
 			conditions.push(
-				"(event ILIKE {searchPattern:String} OR metadata ILIKE {searchPattern:String})",
+				or(
+					ilike(schema.activityLog.event, pattern),
+					sql`${schema.activityLog.metadata}::text ILIKE ${pattern}`,
+				) as SQL,
 			);
-			params.searchPattern = `%${query.search}%`;
 		}
 
-		conditions.push("organization_id = {organizationId:String}");
-		params.organizationId = organizationId;
-
 		if (query.start_date) {
-			conditions.push("created_at >= {startDate:String}");
-			params.startDate = toClickHouseDate(query.start_date);
+			conditions.push(
+				gte(schema.activityLog.createdAt, new Date(query.start_date)),
+			);
 		}
 
 		if (query.end_date) {
-			conditions.push("created_at <= {endDate:String}");
-			params.endDate = toClickHouseDate(query.end_date);
+			conditions.push(
+				lte(schema.activityLog.createdAt, new Date(query.end_date)),
+			);
 		}
 
-		// Audit-log filters
 		if (query.service) {
-			conditions.push("service = {service:String}");
-			params.service = query.service;
+			conditions.push(eq(schema.activityLog.service, query.service));
 		}
 		if (query.action) {
-			conditions.push("action = {action:String}");
-			params.action = query.action;
+			conditions.push(eq(schema.activityLog.action, query.action));
 		}
 		if (query.resource_type) {
-			conditions.push("resource_type = {resourceType:String}");
-			params.resourceType = query.resource_type;
+			conditions.push(eq(schema.activityLog.resourceType, query.resource_type));
 		}
 		if (query.resource_id) {
-			conditions.push("resource_id = {resourceId:String}");
-			params.resourceId = query.resource_id;
+			conditions.push(eq(schema.activityLog.resourceId, query.resource_id));
 		}
 		if (query.actor_type) {
-			conditions.push("actor_type = {actorType:String}");
-			params.actorType = query.actor_type;
+			conditions.push(eq(schema.activityLog.actorType, query.actor_type));
 		}
 		if (query.actor_id) {
-			conditions.push("actor_id = {actorId:String}");
-			params.actorId = query.actor_id;
+			conditions.push(eq(schema.activityLog.actorId, query.actor_id));
 		}
 		if (query.environment) {
-			conditions.push("environment = {environment:String}");
-			params.environment = query.environment;
+			conditions.push(eq(schema.activityLog.environment, query.environment));
 		}
 
-		const whereClause =
-			conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+		const whereClause = and(...conditions);
 		const limit = Math.min(Math.max(Number(query.limit || 10), 1), 100);
 		const page = Math.max(Number(query.page || 1), 1);
 		const offset = (page - 1) * limit;
 
-		const queryParams = { ...params, limit, offset };
-
-		// Run count, data, and stats queries in parallel
-		const [countResultSet, dataResultSet, statsResultSet] = await Promise.all([
-			client.query({
-				query: `SELECT count() as total FROM logs ${whereClause}`,
-				query_params: queryParams,
-				format: "JSONEachRow",
-			}),
-			client.query({
-				query: `
-					SELECT
-						id,
-						event,
-						level,
-						trace_id,
-						user_id,
-						organization_id,
-						metadata,
-						request_details,
-						request_body,
-						status_code,
-						toString(created_at) AS created_at,
-						actor_type,
-						actor_id,
-						resource_type,
-						resource_id,
-						service,
-						action,
-						ip_address,
-						user_agent,
-						environment
-					FROM logs
-					${whereClause}
-					ORDER BY created_at DESC
-					LIMIT {limit:UInt32} OFFSET {offset:UInt32}
-				`,
-				query_params: queryParams,
-				format: "JSONEachRow",
-			}),
-			client.query({
-				query: `
-					SELECT
-						level,
-						count() as cnt
-					FROM logs
-					${whereClause}
-					GROUP BY level
-				`,
-				query_params: queryParams,
-				format: "JSONEachRow",
-			}),
+		const [countRow, rows, statsRows] = await Promise.all([
+			db
+				.select({ total: count() })
+				.from(schema.activityLog)
+				.where(whereClause)
+				.then((result) => result[0]),
+			db
+				.select()
+				.from(schema.activityLog)
+				.where(whereClause)
+				.orderBy(desc(schema.activityLog.createdAt))
+				.limit(limit)
+				.offset(offset),
+			db
+				.select({
+					level: schema.activityLog.level,
+					cnt: count(),
+				})
+				.from(schema.activityLog)
+				.where(whereClause)
+				.groupBy(schema.activityLog.level),
 		]);
 
-		const countRows = (await countResultSet.json()) as { total: string }[];
-		const totalCount = Number(countRows[0]?.total || 0);
-
-		const rows = (await dataResultSet.json()) as StoredLogEntry[];
-
-		const statsRows = (await statsResultSet.json()) as {
-			level: string;
-			cnt: string;
-		}[];
+		const totalCount = Number(countRow?.total || 0);
 
 		const stats = {
 			debug: 0,
@@ -192,21 +154,20 @@ export async function listLogsController(
 			uuid: row.id,
 			event: row.event,
 			level: row.level,
-			trace_id: row.trace_id,
-			metadata: safeJsonParse(row.metadata, {}),
-			status_code: row.status_code,
-			created_at: formatClickHouseDate(row.created_at),
-			requestDetails: safeJsonParse(row.request_details, {}),
-			request_body: safeJsonParse(row.request_body, {}),
-			// Audit-log fields — normalise empty strings back to null for the API response
-			actor_type: row.actor_type || null,
-			actor_id: row.actor_id || null,
-			resource_type: row.resource_type || null,
-			resource_id: row.resource_id || null,
+			trace_id: row.traceId,
+			metadata: row.metadata ?? {},
+			status_code: row.statusCode,
+			created_at: formatLogDate(row.createdAt),
+			requestDetails: row.requestDetails ?? {},
+			request_body: row.requestBody ?? {},
+			actor_type: row.actorType || null,
+			actor_id: row.actorId || null,
+			resource_type: row.resourceType || null,
+			resource_id: row.resourceId || null,
 			service: row.service || null,
 			action: row.action || null,
-			ip_address: row.ip_address || null,
-			user_agent: row.user_agent || null,
+			ip_address: row.ipAddress || null,
+			user_agent: row.userAgent || null,
 			environment: row.environment || null,
 		}));
 

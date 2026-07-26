@@ -4,7 +4,7 @@ export const agentCardRoute = new Elysia().get("/agent-card.json", () => ({
 	name: "Logs Service",
 	version: "1.0.0",
 	description:
-		"Unified logging service for tracking system events, email delivery status, and click/open tracking using ClickHouse.",
+		"Unified logging service for tracking system events, email delivery status, and click/open tracking using PostgreSQL.",
 	url: "https://reloop.sh",
 	defaultInputModes: ["application/json"],
 	defaultOutputModes: ["application/json"],
@@ -14,7 +14,7 @@ export const agentCardRoute = new Elysia().get("/agent-card.json", () => ({
 			id: "health_check",
 			name: "Health Check",
 			description:
-				"Verify the connection status of the Logs service, Redis, and ClickHouse.",
+				"Verify the connection status of the Logs service, Redis, and PostgreSQL.",
 			method: "GET",
 			path: "/api/logs/health",
 			tags: ["monitoring"],
@@ -65,7 +65,7 @@ export const agentCardRoute = new Elysia().get("/agent-card.json", () => ({
 		},
 	],
 	usage_guidelines:
-		"1. Data is ingested into ClickHouse for high-performance analytical queries.\n2. Email IDs are unique identifiers generated during the sending process.\n3. Retention policies apply to logs; long-term data may be archived.",
+		"1. Activity and email delivery data are stored in PostgreSQL.\n2. Email IDs are unique identifiers generated during the sending process.\n3. Retention policies apply to activity logs; long-term data may be archived.",
 	authentication: {
 		schemes: ["bearer"],
 		headerName: "Authorization",

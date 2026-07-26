@@ -1,8 +1,10 @@
-export function escapeString(value: string): string {
-	return value.replaceAll("\\", "\\\\").replaceAll("'", "\\'");
-}
-
-export function safeJsonParse(value: string, fallback: unknown): unknown {
+export function safeJsonParse(value: unknown, fallback: unknown): unknown {
+	if (value !== null && typeof value === "object") {
+		return value;
+	}
+	if (typeof value !== "string") {
+		return fallback;
+	}
 	try {
 		return JSON.parse(value);
 	} catch {
@@ -10,12 +12,10 @@ export function safeJsonParse(value: string, fallback: unknown): unknown {
 	}
 }
 
-export function formatClickHouseDate(dateStr: string): string {
-	if (!dateStr) return new Date().toISOString();
-	return `${dateStr.replace(" ", "T")}Z`;
-}
-
-export function toClickHouseDate(date: Date | string): string {
-	const iso = typeof date === "string" ? date : date.toISOString();
-	return iso.replace("Z", "").replace("T", " ");
+export function formatLogDate(date: Date | string | null | undefined): string {
+	if (!date) return new Date().toISOString();
+	if (date instanceof Date) return date.toISOString();
+	const parsed = new Date(date);
+	if (Number.isNaN(parsed.getTime())) return new Date().toISOString();
+	return parsed.toISOString();
 }
