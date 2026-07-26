@@ -3,8 +3,8 @@ import type { SimpleIcon } from "simple-icons";
 import { BrandIcon } from "./brand-icon";
 
 /**
- * Dual brand tiles for compare heroes.
- * Soft rounded tiles on a subtle stage — Dub composition, Reloop tokens.
+ * Dual brand app icons for compare heroes.
+ * Solid color tiles with white marks — clean product-icon style.
  */
 export function CompareHeroIcons({
 	icon,
@@ -12,13 +12,13 @@ export function CompareHeroIcons({
 	icon: Pick<SimpleIcon, "hex" | "path">;
 }) {
 	return (
-		<div className="flex items-center justify-center gap-4 sm:gap-6">
-			{/* Reloop tile */}
+		<div className="flex items-center justify-center gap-6 sm:gap-8">
+			{/* Reloop — black tile, white mark */}
 			<div
-				className="relative flex size-[4.5rem] items-center justify-center rounded-[22px] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_28px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.05] sm:size-24 sm:rounded-[26px] dark:bg-white dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] dark:ring-white/10"
+				className="relative flex size-24 items-center justify-center rounded-[26px] bg-[#0a0d12] sm:size-28 sm:rounded-[30px]"
 				aria-hidden
 			>
-				<Logo className="size-full text-text-strong-950 dark:text-[#0a0d12]" />
+				<Logo className="size-[72%] [&_rect]:!fill-white" />
 			</div>
 
 			<span
@@ -28,12 +28,17 @@ export function CompareHeroIcons({
 				vs
 			</span>
 
-			{/* Competitor tile */}
+			{/* Competitor — brand color tile, white mark */}
 			<div
-				className="relative flex size-[4.5rem] items-center justify-center rounded-[20px] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_28px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.05] sm:size-24 sm:rounded-[24px] dark:bg-white dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] dark:ring-white/10"
+				className="relative flex size-24 items-center justify-center rounded-[26px] sm:size-28 sm:rounded-[30px]"
+				style={{ backgroundColor: `#${icon.hex}` }}
 				aria-hidden
 			>
-				<BrandIcon icon={icon} className="size-11 sm:size-14" />
+				<BrandIcon
+					icon={icon}
+					fill="#ffffff"
+					className="size-12 sm:size-14"
+				/>
 			</div>
 		</div>
 	);

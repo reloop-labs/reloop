@@ -21,10 +21,18 @@ export function ComparisonPageShell({
 	const brand = getCompetitorByHref(pagePath);
 
 	return (
-		<div>
+		<div className="relative">
+			{/*
+			 * Full-height dashed side rails at content max-width (1320px),
+			 * from the top fold through the rest of the page body.
+			 */}
+			<div
+				aria-hidden
+				className="pointer-events-none absolute inset-y-0 left-1/2 z-30 hidden w-full max-w-[1320px] -translate-x-1/2 border-stroke-soft-200 border-x border-dashed sm:block dark:border-white/10"
+			/>
+
 			{/*
 			 * Full top fold lives inside the stage card (icons + title + copy + CTAs).
-			 * No side rails here — those start on the content fold below.
 			 */}
 			<CompareHero
 				titleLines={titleLines}
@@ -34,17 +42,7 @@ export function ComparisonPageShell({
 				icon={brand?.icon}
 			/>
 
-			{/*
-			 * Dashed side rails only from the content fold down (at a glance+).
-			 * Hero stays clean; rails live around page body, not the top fold.
-			 */}
-			<div className="relative">
-				<div
-					aria-hidden
-					className="pointer-events-none absolute inset-y-0 left-1/2 z-30 hidden w-full max-w-[1320px] -translate-x-1/2 border-stroke-soft-200 border-x border-dashed sm:block dark:border-white/10"
-				/>
-				{children}
-			</div>
+			{children}
 		</div>
 	);
 }

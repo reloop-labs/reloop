@@ -1,7 +1,6 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion } from "framer-motion";
@@ -203,17 +202,6 @@ export const Header = () => {
 	const [expandedMobile, setExpandedMobile] = useState<string | null>(null);
 	const [mounted, setMounted] = useState(false);
 	const [stars, setStars] = useState<string>("GitHub");
-	const [scrolled, setScrolled] = useState(false);
-
-	useEffect(() => {
-		const onScroll = () => {
-			setScrolled(window.scrollY > 0);
-		};
-
-		onScroll();
-		window.addEventListener("scroll", onScroll, { passive: true });
-		return () => window.removeEventListener("scroll", onScroll);
-	}, []);
 
 	useEffect(() => {
 		setMounted(true);
@@ -262,12 +250,7 @@ export const Header = () => {
 
 	return (
 		<header
-			className={cn(
-				"fixed top-0 right-0 left-0 z-50 bg-bg-white-0 transition-[border-color] duration-200 dark:bg-black",
-				scrolled
-					? "border-stroke-soft-200/70 border-b dark:border-white/10"
-					: "border-transparent border-b",
-			)}
+			className="fixed top-0 right-0 left-0 z-50 border-stroke-soft-200/70 border-b bg-bg-white-0 dark:border-white/10 dark:bg-black"
 			onMouseLeave={() => setActiveMega(null)}
 		>
 			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
