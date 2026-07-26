@@ -27,6 +27,34 @@ export const IconsSprite = () => (
 				<stop offset="100%" stopColor="#2DD4BF" />
 			</linearGradient>
 			<symbol
+				id="paperclip"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M20 5V14.5C20 18.6421 16.6421 22 12.5 22C8.35786 22 5 18.6421 5 14.5L5 7C5 4.23858 7.23858 2 10 2C12.7614 2 15 4.23858 15 7V14.5C15 15.8807 13.8807 17 12.5 17C11.1193 17 10 15.8807 10 14.5V7"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol
+				id="headset"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3ZM21 16v2a4 4 0 0 1-4 4h-5"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol
 				id="send-test"
 				viewBox="0 0 24 24"
 				fill="none"

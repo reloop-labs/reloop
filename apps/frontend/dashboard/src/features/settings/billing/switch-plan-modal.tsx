@@ -39,10 +39,7 @@ const NUMERIC_FEATURES: Array<{
 	},
 ];
 
-const STATIC_FEATURES = [
-	"Transactional & campaign email",
-	"SMTP relay & analytics",
-];
+const STATIC_FEATURES: string[] = [];
 
 function toNumber(value: string): number {
 	const digits = value.replace(/[^0-9]/g, "");
