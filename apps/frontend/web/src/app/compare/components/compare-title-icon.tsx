@@ -23,7 +23,13 @@ export function CompareTitleIcon({
 	const combinedClassName = className
 		? `${baseClasses} ${className}`
 		: baseClasses;
-	const key = (typeof icon === "string" ? icon : title).toLowerCase().trim();
+
+	if (icon && typeof icon === "string") {
+		return <Icon name={icon} className={combinedClassName} />;
+	}
+
+	if (!title) return null;
+	const key = title.toLowerCase().trim();
 
 	// Match icon sprite names first from @reloop/ui/icon
 	if (
@@ -95,7 +101,7 @@ export function CompareTitleIcon({
 			return <Icon name="alert-triangle" className={combinedClassName} />;
 		}
 		if (key.includes("inbox") || key.includes("agent")) {
-			return <Icon name="robot" className={combinedClassName} />;
+			return <Icon name="agent" className={combinedClassName} />;
 		}
 		if (key.includes("compose") || key.includes("helper")) {
 			return <Icon name="sparkling" className={combinedClassName} />;

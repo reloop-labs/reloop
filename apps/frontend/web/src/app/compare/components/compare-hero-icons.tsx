@@ -40,14 +40,12 @@ export function CompareHeroIcons({
 					d="M1 23C1 10.85 10.85 1 23 1H214C228.5 1 240.5 9.5 245.5 22.5L284.5 121L245.5 219.5C240.5 232.5 228.5 241 214 241H23C10.85 241 1 231.15 1 219Z"
 					fill={`url(#${fillL})`}
 					stroke={`url(#${strokeL})`}
-					strokeDasharray="4 4"
 					strokeWidth="1"
 				/>
 				<path
 					d="M318.5 22.5C323.5 9.5 335.5 1 350 1H539C551.15 1 561 10.85 561 23V219C561 231.15 551.15 241 539 241H350C335.5 241 323.5 232.5 318.5 219.5L284.5 121Z"
 					fill={`url(#${fillR})`}
 					stroke={`url(#${strokeR})`}
-					strokeDasharray="4 4"
 					strokeWidth="1"
 				/>
 				<defs>

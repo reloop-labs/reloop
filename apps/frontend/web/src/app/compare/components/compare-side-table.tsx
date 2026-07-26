@@ -180,7 +180,7 @@ export function CompareSideTable({
 				{/* Left side hatch gutter */}
 				<div
 					aria-hidden
-					className="hidden min-h-full border-stroke-soft-200 border-r border-dashed text-text-strong-950/15 sm:block dark:border-white/15 dark:text-white/15"
+					className="hidden min-h-full border-stroke-soft-200 border-r text-text-strong-950/15 sm:block dark:border-white/15 dark:text-white/15"
 					style={{
 						backgroundImage:
 							"repeating-linear-gradient(-45deg, transparent 0, transparent 5px, currentColor 5px, currentColor 6.5px)",
@@ -262,7 +262,7 @@ export function CompareSideTable({
 				{/* Right side hatch gutter */}
 				<div
 					aria-hidden
-					className="hidden min-h-full border-stroke-soft-200 border-l border-dashed text-text-strong-950/15 sm:block dark:border-white/15 dark:text-white/15"
+					className="hidden min-h-full border-stroke-soft-200 border-l text-text-strong-950/15 sm:block dark:border-white/15 dark:text-white/15"
 					style={{
 						backgroundImage:
 							"repeating-linear-gradient(-45deg, transparent 0, transparent 5px, currentColor 5px, currentColor 6.5px)",

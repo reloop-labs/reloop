@@ -26,7 +26,7 @@ export function ComparisonPageShell({
 			 * Full-height frame: vertical rails span the entire page.
 			 * Section content is constrained inside each CompareSection / component.
 			 */}
-			<div className="relative mx-auto w-full max-w-[1028px] border-stroke-soft-200 border-x border-dashed dark:border-white/10">
+			<div className="relative mx-auto w-full max-w-[1028px] border-stroke-soft-200 border-x dark:border-white/10">
 				{/*
 				 * Full top fold lives inside the stage card (icons + title + copy + CTAs).
 				 */}
@@ -41,7 +41,7 @@ export function ComparisonPageShell({
 				{/* Divider between hero and page body (e.g. Product UI) */}
 				<div
 					aria-hidden
-					className="relative left-1/2 w-screen -translate-x-1/2 border-stroke-soft-200 border-t border-dashed dark:border-white/10"
+					className="relative left-1/2 w-screen -translate-x-1/2 border-stroke-soft-200 border-t dark:border-white/10"
 				/>
 
 				{children}

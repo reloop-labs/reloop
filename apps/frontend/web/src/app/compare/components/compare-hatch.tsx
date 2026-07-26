@@ -10,7 +10,7 @@ function HatchCell({ className }: { className?: string }) {
 		<div
 			aria-hidden
 			className={cn(
-				"hidden min-h-[1px] self-stretch border-stroke-soft-200 border-y border-dashed text-text-strong-950/20 sm:block dark:border-white/15 dark:text-white/20",
+				"hidden min-h-[1px] self-stretch border-stroke-soft-200 border-y text-text-strong-950/20 sm:block dark:border-white/15 dark:text-white/20",
 				className,
 			)}
 			style={{
@@ -47,7 +47,7 @@ export function CompareHatchFrame({
 			{/* Center content */}
 			<div
 				className={cn(
-					"min-w-0 px-4 sm:border-stroke-soft-200 sm:border-x sm:border-dashed sm:px-5 lg:px-6 dark:sm:border-white/15",
+					"min-w-0 px-4 sm:border-stroke-soft-200 sm:border-x sm:px-5 lg:px-6 dark:sm:border-white/15",
 					contentClassName,
 				)}
 			>
