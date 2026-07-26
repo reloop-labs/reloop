@@ -37,13 +37,13 @@ export function CompareSection({
 						: "max-w-2xl";
 
 	return (
-		<section
-			className={cn(
-				!noDivider &&
-					"border-stroke-soft-200 border-b border-dashed dark:border-white/10",
-				className,
+		<section className={cn("relative w-full", className)}>
+			{!noDivider && (
+				<div
+					aria-hidden
+					className="pointer-events-none absolute bottom-0 left-1/2 w-screen -translate-x-1/2 border-stroke-soft-200 border-b border-dashed dark:border-white/10"
+				/>
 			)}
-		>
 			<div
 				className={cn(
 					"mx-auto w-full",

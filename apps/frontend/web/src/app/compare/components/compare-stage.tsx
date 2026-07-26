@@ -15,7 +15,7 @@ export function CompareStage({
 	return (
 		<div className={cn("relative mx-auto w-full", className)}>
 			{/* Soft floating stage card */}
-			<div className="relative overflow-hidden rounded-[28px] bg-bg-white-0 px-6 py-16 sm:rounded-[32px] sm:px-12 sm:py-24 lg:py-28 dark:bg-black">
+			<div className="relative overflow-hidden rounded-none bg-bg-white-0 px-6 py-16 sm:px-12 sm:py-24 lg:py-28 dark:bg-black">
 				{/* Grid, masked to center */}
 				<div
 					aria-hidden

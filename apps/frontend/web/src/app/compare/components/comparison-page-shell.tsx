@@ -41,7 +41,7 @@ export function ComparisonPageShell({
 				{/* Divider between hero and page body (e.g. Product UI) */}
 				<div
 					aria-hidden
-					className="w-full border-stroke-soft-200 border-t border-dashed dark:border-white/10"
+					className="relative left-1/2 w-screen -translate-x-1/2 border-stroke-soft-200 border-t border-dashed dark:border-white/10"
 				/>
 
 				{children}
