@@ -181,7 +181,7 @@ const ResendComparisonPage = () => {
 			<CompareSection maxWidth="3xl">
 				<div className="mb-10 text-center">
 					<h2 className="mt-3 font-serif text-[2rem] text-text-strong-950 leading-[1.1] tracking-tighter sm:text-[2.4rem] lg:text-[2.8rem] dark:text-white">
-						Reloop vs {resendBrand?.name}
+						Reloop &nbsp;&nbsp;vs&nbsp;&nbsp;&nbsp;{resendBrand?.name}
 					</h2>
 					<p className="mx-auto mt-3 max-w-xl font-medium text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
 						Reloop is the #1 open-source alternative to{" "}
