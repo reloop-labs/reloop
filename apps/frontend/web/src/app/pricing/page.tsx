@@ -1,10 +1,9 @@
 import { JsonLd } from "@reloop/web/components/json-ld";
 import {
-	FeatureCta,
 	MarketingPageShell,
 	PageSection,
 } from "@reloop/web/components/page-shell";
-import { getSiteUrl, hostedSignupHref } from "@reloop/web/lib/site";
+import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import { PricingFaq } from "./components/pricing-faq";
 import { PricingSection } from "./components/pricing-section";
@@ -168,29 +167,23 @@ const PricingPage = () => {
 	return (
 		<>
 			<JsonLd data={pricingSchema} />
-			<MarketingPageShell
-				titleLines={["Simple, transparent", "pricing."]}
-				compactHero
-			>
-				<PageSection flushTop>
-					<PricingSection />
-				</PageSection>
-				<FeatureCta
-					title="3,000 emails for free"
-					titleMuted="per month."
-					description="No credit card required. Join developers building the future of email on Reloop—hosted or self-hosted."
-					primary={{ label: "Get started", href: hostedSignupHref }}
-					secondary={{
-						label: "Talk to us",
-						href: "/contact",
-					}}
-					compact
-				/>
+			<div className="relative px-4 sm:px-6 lg:px-8">
+				<div className="relative mx-auto w-full max-w-[1028px] border-stroke-soft-200 border-x dark:border-white/10">
+					<MarketingPageShell
+						titleLines={["Simple, transparent", "pricing."]}
+						compactHero
+					>
+						<PageSection flushTop>
+							<PricingSection />
+						</PageSection>
 
-				<PricingFaq />
-			</MarketingPageShell>
+						<PricingFaq />
+					</MarketingPageShell>
+				</div>
+			</div>
 		</>
 	);
 };
 
 export default PricingPage;
+

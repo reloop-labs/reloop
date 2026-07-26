@@ -82,7 +82,7 @@ function PlanColumn({
 	return (
 		<div
 			className={cn(
-				"flex min-h-[640px] flex-col border-stroke-soft-200 p-8 sm:min-h-[680px] lg:p-10 dark:border-white/10",
+				"flex min-h-[640px] flex-col border-stroke-soft-200 p-6 sm:p-8 lg:p-6 xl:p-8 sm:min-h-[680px] dark:border-white/10",
 				borderClasses,
 				plan.highlighted && "bg-bg-weak-50 dark:bg-white/[0.03]",
 			)}
