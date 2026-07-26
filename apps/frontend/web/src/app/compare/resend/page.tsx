@@ -1,12 +1,16 @@
 import { Icon } from "@reloop/ui/icon";
 import { FaqSection } from "@reloop/web/components/faq-section";
-import { PageSection } from "@reloop/web/components/page-shell";
 import { getSiteUrl } from "@reloop/web/lib/site";
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { competitorBrands } from "../competitor-brands";
+import {
+	CompareFeatureSlide,
+	type CompareFeatureSlideItem,
+} from "../components/compare-feature-slide";
 import { CompareOtherLinks } from "../components/compare-other-links";
+import { CompareSection } from "../components/compare-section";
 import { CompareSideTable } from "../components/compare-side-table";
 import { ComparisonMatrix } from "../components/comparison-matrix";
 import { ComparisonPageShell } from "../components/comparison-page-shell";
@@ -15,6 +19,46 @@ import { InfrastructureDiagram } from "../components/infrastructure-diagram";
 import { OptionRow } from "../components/option-row";
 import { ProductPanel } from "../components/product-panel";
 import { resendComparisonCategories } from "./comparison-data";
+
+/** Important product surfaces — temp mock UIs until real screenshots land. */
+const resendFeatureSlides: CompareFeatureSlideItem[] = [
+	{
+		id: "sending",
+		label: "Sending",
+		reloopCaption: "Reloop · transactional send",
+		competitorCaption: "Resend · transactional send",
+	},
+	{
+		id: "inbox",
+		label: "Agent inbox",
+		reloopCaption: "Reloop · two-way agent inbox",
+		competitorCaption: "Resend · inbound",
+	},
+	{
+		id: "templates",
+		label: "Templates",
+		reloopCaption: "Reloop · template editor",
+		competitorCaption: "Resend · templates",
+	},
+	{
+		id: "webhooks",
+		label: "Webhooks",
+		reloopCaption: "Reloop · delivery events",
+		competitorCaption: "Resend · webhooks",
+	},
+	{
+		id: "self-host",
+		label: "Self-host",
+		reloopCaption: "Reloop · self-hosted stack",
+		competitorCaption: "Resend · hosted only",
+	},
+	{
+		id: "domains",
+		label: "Domains",
+		reloopCaption: "Reloop · domain auth",
+		competitorCaption: "Resend · domains",
+	},
+];
 
 // TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
 // See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
@@ -29,7 +73,7 @@ const resendBrand = competitorBrands.find((b) => b.name === "Resend");
 export const metadata: Metadata = {
 	title: "Reloop vs Resend: a detailed comparison",
 	description:
-		"Reloop vs Resend for developer email: own MTA vs Amazon SES, self-hosting, agent inbox, templates, webhooks, and pricing—without the hype.",
+		"Learn how Reloop compares to Resend and why Reloop is the best Resend alternative for all your developer email needs.",
 	keywords: [
 		"Reloop vs Resend",
 		"Resend alternative",
@@ -41,7 +85,7 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: "Reloop vs Resend",
 		description:
-			"Own MTA vs SES-backed API. Self-hosting, agent inbox, and developer email—compared honestly.",
+			"Learn how Reloop compares to Resend and why Reloop is the best Resend alternative for all your developer email needs.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -50,7 +94,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Reloop vs Resend: a detailed comparison",
 		description:
-			"Own MTA vs Amazon SES, self-hosting, agent inbox, templates, and pricing.",
+			"Learn how Reloop compares to Resend and why Reloop is the best Resend alternative for all your developer email needs.",
 	},
 	alternates: { canonical: pageUrl },
 };
@@ -108,7 +152,7 @@ const ResendComparisonPage = () => {
 		<ComparisonPageShell
 			pagePath={pagePath}
 			titleLines={["Reloop vs Resend"]}
-			description="Resend made developer email feel modern. Reloop keeps that DX—and adds an own-MTA stack, self-hosting, and an agent inbox built for two-way email. Here's the honest side-by-side."
+			description="Learn how Reloop compares to Resend and why Reloop is the best Resend alternative for all your developer email needs."
 			primaryCta={{
 				label: "Start for free",
 				href: "/dashboard/signup",
@@ -118,18 +162,32 @@ const ResendComparisonPage = () => {
 				href: "/compare/resend#migrate",
 			}}
 		>
+			{/* Product UI slide comparison */}
+			<CompareSection maxWidth="5xl" flushTop>
+				<h2 className="mx-auto mb-10 max-w-3xl text-balance text-center font-serif text-[2rem] text-text-strong-950 leading-[1.15] tracking-tighter sm:mb-12 sm:text-[2.4rem] lg:text-[2.8rem] dark:text-white">
+					Reloop is the open-source email infrastructure built for the age of AI
+					agents.
+				</h2>
+				{resendBrand ? (
+					<CompareFeatureSlide
+						competitorName="Resend"
+						competitorIcon={resendBrand.icon}
+						features={resendFeatureSlides}
+					/>
+				) : null}
+			</CompareSection>
+
 			{/* Feature matrix */}
-			<PageSection>
+			<CompareSection maxWidth="3xl">
 				<div className="mb-10 text-center">
-					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/45">
-						Feature by feature
-					</p>
 					<h2 className="mt-3 font-serif text-[2rem] text-text-strong-950 leading-[1.1] tracking-tighter sm:text-[2.4rem] lg:text-[2.8rem] dark:text-white">
-						The full comparison matrix
+						Reloop vs {resendBrand?.name}
 					</h2>
-					<p className="mx-auto mt-3 max-w-2xl text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
-						Only claims we can defend from product docs and public Resend
-						docs—no invented wins.
+					<p className="mx-auto mt-3 max-w-xl font-medium text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">
+						Reloop is the #1 open-source alternative to{" "}
+						{resendBrand?.name || "Resend"}.
+						<br /> With Reloop, get everything you need sending, receiving, AI
+						templates, and agent inboxes at a fraction of the cost.
 					</p>
 				</div>
 				<ComparisonMatrix
@@ -143,10 +201,10 @@ const ResendComparisonPage = () => {
 					</Link>
 					—we correct comparison pages when the facts change.
 				</p>
-			</PageSection>
+			</CompareSection>
 
 			{/* Infrastructure */}
-			<PageSection>
+			<CompareSection maxWidth="5xl">
 				<div className="mb-12 text-center">
 					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/45">
 						Architecture
@@ -160,15 +218,13 @@ const ResendComparisonPage = () => {
 						you.
 					</p>
 				</div>
-				<div className="mx-auto max-w-5xl">
-					<CrosshairFrame>
-						<ProductPanel>
-							<div className="p-4 sm:p-8">
-								<InfrastructureDiagram />
-							</div>
-						</ProductPanel>
-					</CrosshairFrame>
-				</div>
+				<CrosshairFrame>
+					<ProductPanel>
+						<div className="p-4 sm:p-8">
+							<InfrastructureDiagram />
+						</div>
+					</ProductPanel>
+				</CrosshairFrame>
 				<div className="mx-auto mt-10 max-w-3xl space-y-5 text-[15px] text-text-sub-600 leading-7 dark:text-white/55">
 					<p>
 						That extra hop is a real architectural difference. It does{" "}
@@ -179,10 +235,10 @@ const ResendComparisonPage = () => {
 						for that. Resend&apos;s delivery ultimately depends on Amazon SES.
 					</p>
 				</div>
-			</PageSection>
+			</CompareSection>
 
 			{/* Ownership — option-row cards */}
-			<PageSection>
+			<CompareSection maxWidth="3xl">
 				<div className="mb-12 text-center">
 					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/45">
 						Tradeoffs
@@ -296,10 +352,10 @@ const ResendComparisonPage = () => {
 						</div>
 					</ProductPanel>
 				</div>
-			</PageSection>
+			</CompareSection>
 
 			{/* Webhooks */}
-			<PageSection>
+			<CompareSection maxWidth="3xl">
 				<div className="mb-12 text-center">
 					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/45">
 						Events
@@ -312,7 +368,7 @@ const ResendComparisonPage = () => {
 						signatures and event names in each docs set.
 					</p>
 				</div>
-				<div className="mx-auto max-w-3xl">
+				<div>
 					<ProductPanel>
 						<div className="p-3 sm:p-5">
 							<CompareSideTable
@@ -411,10 +467,10 @@ const ResendComparisonPage = () => {
 						</div>
 					</ProductPanel>
 				</div>
-			</PageSection>
+			</CompareSection>
 
 			{/* Pricing */}
-			<PageSection>
+			<CompareSection maxWidth="3xl">
 				<div className="mb-12 text-center">
 					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/45">
 						Pricing
@@ -428,7 +484,7 @@ const ResendComparisonPage = () => {
 						you buy.
 					</p>
 				</div>
-				<div className="mx-auto max-w-3xl">
+				<div>
 					<ProductPanel>
 						<div className="p-3 sm:p-5">
 							<CompareSideTable
@@ -512,74 +568,71 @@ const ResendComparisonPage = () => {
 					. Resend figures from their public pricing page—re-check before
 					committing.
 				</p>
-			</PageSection>
+			</CompareSection>
 
 			{/* Fit criteria — two product panels */}
-			<PageSection>
-				<div className="mx-auto max-w-4xl">
-					<div className="grid gap-6 lg:grid-cols-2 lg:items-stretch lg:gap-8">
-						<ProductPanel
-							title="Where Resend fits well"
-							description="Hosted-only, and that's fine by you."
-						>
-							<ul className="space-y-4 px-5 py-5 text-[14px] text-text-sub-600 leading-relaxed sm:px-6 dark:text-white/60">
-								<li className="flex gap-3">
-									<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-text-sub-600/40 dark:bg-white/30" />
-									<span>
-										You&apos;re comfortable being fully hosted, with no option
-										to self-host later if your needs change.
-									</span>
-								</li>
-								<li className="flex gap-3">
-									<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-text-sub-600/40 dark:bg-white/30" />
-									<span>
-										You&apos;re deep in React Email + Resend SDKs, and scheduled
-										sends are a hard requirement today.
-									</span>
-								</li>
-								<li className="flex gap-3">
-									<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-text-sub-600/40 dark:bg-white/30" />
-									<span>
-										You&apos;re okay depending on Amazon SES for the final
-										delivery hop, even though you don&apos;t control that layer.
-									</span>
-								</li>
-							</ul>
-						</ProductPanel>
-						<ProductPanel
-							title="Where Reloop is different"
-							description="Full control — hosted or self-hosted, your call."
-						>
-							<ul className="space-y-4 px-5 py-5 text-[14px] text-text-sub-600 leading-relaxed sm:px-6 dark:text-white/60">
-								<li className="flex gap-3">
-									<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary-base" />
-									<span>
-										You want to read the source and self-host whenever you want,
-										not locked into one deployment model.
-									</span>
-								</li>
-								<li className="flex gap-3">
-									<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary-base" />
-									<span>
-										You need incoming email in an inbox, not just outgoing
-										emails.
-									</span>
-								</li>
-								<li className="flex gap-3">
-									<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary-base" />
-									<span>
-										You&apos;d rather start on a $10/25k plan than be pushed
-										straight into a $20/50k tier.
-									</span>
-								</li>
-							</ul>
-						</ProductPanel>
-					</div>
+			<CompareSection maxWidth="4xl">
+				<div className="grid gap-6 lg:grid-cols-2 lg:items-stretch lg:gap-8">
+					<ProductPanel
+						title="Where Resend fits well"
+						description="Hosted-only, and that's fine by you."
+					>
+						<ul className="space-y-4 px-5 py-5 text-[14px] text-text-sub-600 leading-relaxed sm:px-6 dark:text-white/60">
+							<li className="flex gap-3">
+								<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-text-sub-600/40 dark:bg-white/30" />
+								<span>
+									You&apos;re comfortable being fully hosted, with no option to
+									self-host later if your needs change.
+								</span>
+							</li>
+							<li className="flex gap-3">
+								<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-text-sub-600/40 dark:bg-white/30" />
+								<span>
+									You&apos;re deep in React Email + Resend SDKs, and scheduled
+									sends are a hard requirement today.
+								</span>
+							</li>
+							<li className="flex gap-3">
+								<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-text-sub-600/40 dark:bg-white/30" />
+								<span>
+									You&apos;re okay depending on Amazon SES for the final
+									delivery hop, even though you don&apos;t control that layer.
+								</span>
+							</li>
+						</ul>
+					</ProductPanel>
+					<ProductPanel
+						title="Where Reloop is different"
+						description="Full control — hosted or self-hosted, your call."
+					>
+						<ul className="space-y-4 px-5 py-5 text-[14px] text-text-sub-600 leading-relaxed sm:px-6 dark:text-white/60">
+							<li className="flex gap-3">
+								<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary-base" />
+								<span>
+									You want to read the source and self-host whenever you want,
+									not locked into one deployment model.
+								</span>
+							</li>
+							<li className="flex gap-3">
+								<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary-base" />
+								<span>
+									You need incoming email in an inbox, not just outgoing emails.
+								</span>
+							</li>
+							<li className="flex gap-3">
+								<span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary-base" />
+								<span>
+									You&apos;d rather start on a $10/25k plan than be pushed
+									straight into a $20/50k tier.
+								</span>
+							</li>
+						</ul>
+					</ProductPanel>
 				</div>
-			</PageSection>
+			</CompareSection>
 
 			{/* Migration */}
-			<PageSection narrow>
+			<CompareSection maxWidth="2xl">
 				<div id="migrate" className="scroll-mt-28">
 					<div className="mb-12 text-center">
 						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em] dark:text-white/45">
@@ -660,49 +713,51 @@ const ResendComparisonPage = () => {
 						webhooks are not the migration path today.
 					</p>
 				</div>
-			</PageSection>
+			</CompareSection>
 
-			<FaqSection
-				id="compare-resend-faq"
-				title="Resend vs Reloop FAQ"
-				items={[
-					{
-						question: "Is Reloop API-compatible with Resend?",
-						answer:
-							"No. Reloop has its own REST API and SDKs. Migration is usually a small client swap for standard send payloads—not a drop-in proxy.",
-					},
-					{
-						question: "Does Reloop use Amazon SES like Resend?",
-						answer:
-							"No. Reloop's sending path uses KumoMTA in our stack. Resend's public delivery path uses Amazon SES.",
-					},
-					{
-						question: "Can we still use React Email?",
-						answer:
-							"Yes. Render templates in your application and pass HTML to Reloop, or use Reloop's React Email-based template editor. There is no react field on the send API—only the transport call needs to change.",
-					},
-					{
-						question: "Do you claim better deliverability than Resend?",
-						answer:
-							"No—not on this page. Deliverability depends on content, list quality, domain reputation, and volume. We compare architecture and product surface area, not inbox-placement scores we haven't published.",
-					},
-					{
-						question: "Is Reloop a drop-in Resend replacement?",
-						answer:
-							"No. Endpoints, auth headers, response shape, webhook signing, and event envelopes differ. Plan a small adapter—or use SMTP if that was your Resend integration.",
-					},
-					{
-						question: "Who should evaluate Reloop?",
-						answer:
-							"Teams that want own-MTA sending, an agent inbox for two-way email, source access, or a $10 / 25k tier before larger plans.",
-					},
-				]}
-				compact
-			/>
+			<CompareSection maxWidth="3xl">
+				<FaqSection
+					id="compare-resend-faq"
+					title="Resend vs Reloop FAQ"
+					items={[
+						{
+							question: "Is Reloop API-compatible with Resend?",
+							answer:
+								"No. Reloop has its own REST API and SDKs. Migration is usually a small client swap for standard send payloads—not a drop-in proxy.",
+						},
+						{
+							question: "Does Reloop use Amazon SES like Resend?",
+							answer:
+								"No. Reloop's sending path uses KumoMTA in our stack. Resend's public delivery path uses Amazon SES.",
+						},
+						{
+							question: "Can we still use React Email?",
+							answer:
+								"Yes. Render templates in your application and pass HTML to Reloop, or use Reloop's React Email-based template editor. There is no react field on the send API—only the transport call needs to change.",
+						},
+						{
+							question: "Do you claim better deliverability than Resend?",
+							answer:
+								"No—not on this page. Deliverability depends on content, list quality, domain reputation, and volume. We compare architecture and product surface area, not inbox-placement scores we haven't published.",
+						},
+						{
+							question: "Is Reloop a drop-in Resend replacement?",
+							answer:
+								"No. Endpoints, auth headers, response shape, webhook signing, and event envelopes differ. Plan a small adapter—or use SMTP if that was your Resend integration.",
+						},
+						{
+							question: "Who should evaluate Reloop?",
+							answer:
+								"Teams that want own-MTA sending, an agent inbox for two-way email, source access, or a $10 / 25k tier before larger plans.",
+						},
+					]}
+					compact
+				/>
+			</CompareSection>
 
-			<PageSection narrow>
+			<CompareSection maxWidth="2xl" noDivider>
 				<CompareOtherLinks currentHref={pagePath} />
-			</PageSection>
+			</CompareSection>
 		</ComparisonPageShell>
 	);
 };

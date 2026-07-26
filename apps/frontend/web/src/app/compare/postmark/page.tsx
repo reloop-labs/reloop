@@ -16,7 +16,7 @@ const pageUrl = `${getSiteUrl()}${pagePath}`;
 export const metadata: Metadata = {
 	title: "Reloop vs Postmark | Email Provider Comparison",
 	description:
-		"Reloop vs Postmark for transactional email speed, deliverability reporting, campaigns, and open-source infrastructure.",
+		"Learn how Reloop compares to Postmark and why Reloop is the best Postmark alternative for all your transactional email needs.",
 	keywords: [
 		"Reloop vs Postmark",
 		"Postmark alternative",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: "Reloop vs Postmark",
 		description:
-			"Transactional email specialists—hosted proprietary vs open platform.",
+			"Learn how Reloop compares to Postmark and why Reloop is the best Postmark alternative for all your transactional email needs.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Reloop vs Postmark | Email Provider Comparison",
 		description:
-			"Transactional email speed, deliverability reporting, campaigns, and open-source infrastructure.",
+			"Learn how Reloop compares to Postmark and why Reloop is the best Postmark alternative for all your transactional email needs.",
 	},
 	alternates: { canonical: pageUrl },
 };
@@ -46,7 +46,7 @@ const PostmarkComparisonPage = () => {
 		<ComparisonPageShell
 			pagePath={pagePath}
 			titleLines={["Reloop vs Postmark"]}
-			description="Postmark optimizes for fast transactional delivery and clear telemetry. Reloop matches that core job—and adds campaigns, self-hosting, and source-level transparency."
+			description="Learn how Reloop compares to Postmark and why Reloop is the best Postmark alternative for all your transactional email needs."
 		>
 			<PageSection flushTop narrow>
 				<p className="mx-auto max-w-3xl text-center text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">

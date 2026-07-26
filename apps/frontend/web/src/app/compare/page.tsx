@@ -16,7 +16,7 @@ const comparePageUrl = `${siteUrl}/compare`;
 export const metadata: Metadata = {
 	title: "Compare Reloop | Email Provider Comparisons",
 	description:
-		"Compare Reloop with Resend, SendGrid, Mailgun, AWS SES, Postmark, Loops, and Mailchimp. Open-source, self-hostable email infrastructure.",
+		"Learn how Reloop compares to popular email providers—and why Reloop is the best alternative for all your developer email needs.",
 	keywords: [
 		"email provider comparison",
 		"Reloop vs Resend",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: "Compare Reloop | Email Provider Comparisons",
 		description:
-			"Compare Reloop with Resend, SendGrid, Mailgun, AWS SES, Postmark, Loops, and Mailchimp.",
+			"Learn how Reloop compares to popular email providers—and why Reloop is the best alternative for all your developer email needs.",
 		type: "website",
 		url: comparePageUrl,
 		siteName: "Reloop",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Compare Reloop | Email Provider Comparisons",
 		description:
-			"Compare Reloop with Resend, SendGrid, Mailgun, AWS SES, Postmark, Loops, and Mailchimp.",
+			"Learn how Reloop compares to popular email providers—and why Reloop is the best alternative for all your developer email needs.",
 	},
 	alternates: {
 		canonical: comparePageUrl,
@@ -49,7 +49,7 @@ const CompareIndexPage = () => {
 	return (
 		<MarketingPageShell
 			titleLines={["Reloop vs", "the competition."]}
-			description="Pick a provider to see how Reloop compares."
+			description="Learn how Reloop compares to popular email providers—and why Reloop is the best alternative for all your developer email needs."
 			compactHero
 		>
 			<PageSection flushTop>

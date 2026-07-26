@@ -21,28 +21,31 @@ export function ComparisonPageShell({
 	const brand = getCompetitorByHref(pagePath);
 
 	return (
-		<div className="relative">
+		<div className="relative overflow-x-clip px-4 sm:px-6 lg:px-8">
 			{/*
-			 * Full-height dashed side rails at content max-width (1320px),
-			 * from the top fold through the rest of the page body.
+			 * Full-height frame: vertical rails span the entire page.
+			 * Section content is constrained inside each CompareSection / component.
 			 */}
-			<div
-				aria-hidden
-				className="pointer-events-none absolute inset-y-0 left-1/2 z-30 hidden w-full max-w-[1320px] -translate-x-1/2 border-stroke-soft-200 border-x border-dashed sm:block dark:border-white/10"
-			/>
+			<div className="relative mx-auto w-full max-w-[1320px] border-stroke-soft-200 border-x border-dashed dark:border-white/10">
+				{/*
+				 * Full top fold lives inside the stage card (icons + title + copy + CTAs).
+				 */}
+				<CompareHero
+					titleLines={titleLines}
+					description={description}
+					primaryCta={primaryCta}
+					secondaryCta={secondaryCta}
+					icon={brand?.icon}
+				/>
 
-			{/*
-			 * Full top fold lives inside the stage card (icons + title + copy + CTAs).
-			 */}
-			<CompareHero
-				titleLines={titleLines}
-				description={description}
-				primaryCta={primaryCta}
-				secondaryCta={secondaryCta}
-				icon={brand?.icon}
-			/>
+				{/* Divider between hero and page body (e.g. Product UI) */}
+				<div
+					aria-hidden
+					className="w-full border-stroke-soft-200 border-t border-dashed dark:border-white/10"
+				/>
 
-			{children}
+				{children}
+			</div>
 		</div>
 	);
 }

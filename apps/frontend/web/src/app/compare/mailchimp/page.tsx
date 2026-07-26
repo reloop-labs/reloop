@@ -17,7 +17,7 @@ const pageUrl = `${getSiteUrl()}${pagePath}`;
 export const metadata: Metadata = {
 	title: "Reloop vs Mailchimp | Email Provider Comparison",
 	description:
-		"Reloop vs Mailchimp for newsletters, audience pricing, transactional email, and developer-first campaign APIs.",
+		"Learn how Reloop compares to Mailchimp and why Reloop is the best Mailchimp alternative for all your product and marketing email needs.",
 	keywords: [
 		"Reloop vs Mailchimp",
 		"Mailchimp alternative",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: "Reloop vs Mailchimp",
 		description:
-			"Marketing automation vs API-first email platform with send-based pricing.",
+			"Learn how Reloop compares to Mailchimp and why Reloop is the best Mailchimp alternative for all your product and marketing email needs.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Reloop vs Mailchimp | Email Provider Comparison",
 		description:
-			"Newsletters, audience pricing, transactional email, and developer-first campaign APIs.",
+			"Learn how Reloop compares to Mailchimp and why Reloop is the best Mailchimp alternative for all your product and marketing email needs.",
 	},
 	alternates: { canonical: pageUrl },
 };
@@ -47,7 +47,7 @@ const MailchimpComparisonPage = () => {
 		<ComparisonPageShell
 			pagePath={pagePath}
 			titleLines={["Reloop vs Mailchimp"]}
-			description="Mailchimp owns small-business marketing email. Reloop is for product teams that need campaigns and transactional sends with APIs—not audience-based bills."
+			description="Learn how Reloop compares to Mailchimp and why Reloop is the best Mailchimp alternative for all your product and marketing email needs."
 		>
 			<PageSection flushTop narrow>
 				<div className="mx-auto max-w-3xl space-y-6 text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">

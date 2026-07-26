@@ -24,15 +24,16 @@ export function CompareHero({
 	icon?: Pick<SimpleIcon, "hex" | "path">;
 }) {
 	return (
-		<div className="relative overflow-hidden bg-transparent pt-20 sm:pt-24">
-			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
-				<CompareStage>
-					{icon ? (
-						<div className="mb-8 sm:mb-10">
-							<CompareHeroIcons icon={icon} />
-						</div>
-					) : null}
+		<div className="relative overflow-hidden bg-transparent px-4 pt-20 sm:px-6 sm:pt-24 lg:px-8">
+			{/* Stage fills the frame; text/icons stay readable via their own max-widths */}
+			<CompareStage>
+				{icon ? (
+					<div className="mb-8 sm:mb-10">
+						<CompareHeroIcons icon={icon} />
+					</div>
+				) : null}
 
+				<div className="mx-auto w-full max-w-3xl">
 					<h1 className="font-serif text-[2.4rem] text-text-strong-950 leading-[1.05] tracking-tighter sm:text-[3.6rem] dark:text-white">
 						{titleLines.map((line, i) => (
 							<span key={line}>
@@ -43,7 +44,7 @@ export function CompareHero({
 					</h1>
 
 					{description ? (
-						<p className="mx-auto mt-7 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
+						<p className="mx-auto mt-7 max-w-[620px] text-balance font-medium text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
 							{description}
 						</p>
 					) : null}
@@ -66,8 +67,8 @@ export function CompareHero({
 							) : null}
 						</div>
 					) : null}
-				</CompareStage>
-			</div>
+				</div>
+			</CompareStage>
 		</div>
 	);
 }
