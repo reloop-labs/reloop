@@ -102,14 +102,14 @@ export function EditApiKeyForm({
 			<div
 				className={cn(
 					isInline &&
-						"overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50",
+						"overflow-hidden rounded-[18px] border border-stroke-soft-200 bg-bg-soft-50 dark:border-stroke-soft-100/40 dark:bg-[#0F0F0F]",
 				)}
 			>
 				<div
 					className={cn(
 						"space-y-2",
 						isInline &&
-							"m-0.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-6",
+							"m-0.5 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-6 pt-5 pb-6 dark:border-stroke-soft-100/40",
 					)}
 				>
 					<Label.Root htmlFor={`edit-api-key-name-${apiKey.id}`}>
@@ -144,9 +144,7 @@ export function EditApiKeyForm({
 				<div
 					className={cn(
 						"flex items-center justify-end gap-3",
-						isInline
-							? "px-6 pt-3 pb-3.5 dark:bg-bg-weak-50/40"
-							: "mt-6",
+						isInline ? "px-6 pt-3 pb-3.5" : "mt-6",
 					)}
 				>
 					<Button.Root
