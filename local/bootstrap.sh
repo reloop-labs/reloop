@@ -213,7 +213,7 @@ else
   info "Starting core services (Postgres, Redis, Caddy, Mailpit, …)…"
   if ! bun docker:up; then
     fail "Core Docker services failed to start.
-    Free conflicting ports (80, 443, 5432, 6379, 8123, 9000, 9010, 4222) and re-run.
+    Free conflicting ports (80, 443, 5432, 6379, 9010, 4222) and re-run.
     See: https://reloop.sh/docs/setup/port"
   fi
   ok "Core containers started"

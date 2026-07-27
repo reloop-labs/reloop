@@ -96,6 +96,19 @@ export namespace WebhookModel {
 					description: "Webhook URL",
 				}),
 			),
+			events: t.Optional(
+				t.Array(
+					t.String({
+						pattern: activeEventRegex.source,
+						error: "Invalid or inactive event ID provided",
+					}),
+					{
+						minItems: 1,
+						description: "Array of active event IDs to subscribe to",
+						error: "Please provide at least one valid event ID to subscribe to",
+					},
+				),
+			),
 			secret: t.Optional(
 				t.String({
 					minLength: 8,
@@ -153,6 +166,7 @@ export namespace WebhookModel {
 				{
 					name: "Payments Webhook",
 					status: "paused",
+					events: ["email.sent", "email.delivered"],
 					maxRetries: 5,
 				},
 			],
@@ -205,6 +219,17 @@ export namespace WebhookModel {
 				description:
 					"Subscribed event IDs (includes inactive/legacy if already stored)",
 			}),
+			createdBy: t.Optional(
+				t.Object(
+					{
+						id: t.String(),
+						name: t.Union([t.String(), t.Null()]),
+						email: t.String(),
+						image: t.Union([t.String(), t.Null()]),
+					},
+					{ description: "User who created this webhook" },
+				),
+			),
 			createdAt: t.String({ description: "Creation timestamp" }),
 			updatedAt: t.String({ description: "Last update timestamp" }),
 		},

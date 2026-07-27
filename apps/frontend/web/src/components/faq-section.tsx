@@ -10,8 +10,8 @@ export type FaqItem = {
 
 export function FaqSection({
 	items,
-	eyebrow = "FAQ",
-	title = "Question & Answer",
+	eyebrow,
+	title = "Frequently asked questions.",
 	id = "faq",
 	compact = false,
 	plain = false,
@@ -31,15 +31,18 @@ export function FaqSection({
 				className={`mx-auto max-w-3xl px-4 sm:px-6 ${compact ? "py-12 sm:py-14" : "py-16 sm:px-6 sm:py-20 lg:py-24"}`}
 			>
 				<div className="text-center">
-					<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
-						{eyebrow}
-					</p>
+					{eyebrow && (
+						<p className="font-semibold text-[11px] text-text-sub-600 uppercase tracking-[0.16em]">
+							{eyebrow}
+						</p>
+					)}
 					<h2
 						className={cn(
 							"font-serif text-text-strong-950 leading-[1.05] tracking-tighter dark:text-white",
 							compact
-								? "mt-3.5 text-[2rem] sm:text-[2.4rem] lg:text-[2.8rem]"
-								: "mt-4 text-[2.6rem] sm:text-[3.4rem] lg:text-[4.2rem]",
+								? "text-[2rem] sm:text-[2.4rem] lg:text-[2.8rem]"
+								: "text-[2.6rem] sm:text-[3.4rem] lg:text-[4.2rem]",
+							eyebrow && (compact ? "mt-3.5" : "mt-4"),
 						)}
 					>
 						{title}

@@ -27,6 +27,7 @@ export async function getWebhookController({
 				subscriptions: {
 					where: eq(schema.webhookEventSubscription.isEnabled, true),
 				},
+				user: true,
 			},
 		});
 
@@ -51,6 +52,14 @@ export async function getWebhookController({
 			failureCount: webhook.failureCount,
 			consecutiveFailures: webhook.consecutiveFailures,
 			events: webhook.subscriptions.map((s) => s.eventId as WebhookEventName),
+			createdBy: webhook.user
+				? {
+						id: webhook.user.id,
+						name: webhook.user.name,
+						email: webhook.user.email,
+						image: webhook.user.image,
+					}
+				: undefined,
 			createdAt: webhook.createdAt.toISOString(),
 			updatedAt: webhook.updatedAt.toISOString(),
 		};

@@ -1,7 +1,7 @@
 import { createId } from "@paralleldrive/cuid2";
+import { db } from "@reloop/db/client";
+import * as schema from "@reloop/db/schema";
 import { logsConfig } from "@reloop/logs/logs.config";
-import { getClickHouseClient } from "@reloop/logs/utils/clickhouse";
-import { toClickHouseDate } from "@reloop/logs/utils/format";
 import { log } from "evlog";
 
 /** Generate a lowercase prefixed request ID */
@@ -41,46 +41,37 @@ const ENV =
 		: "development";
 
 /**
- * Inserts a structured audit-log row into ClickHouse.
+ * Inserts a structured audit-log row into Postgres.
  * All subscribers call this instead of duplicating insert logic.
  */
 export async function insertAuditLog(entry: AuditLogEntry): Promise<void> {
 	try {
-		const client = getClickHouseClient();
-		await client.insert({
-			table: "logs",
-			values: [
-				{
-					id: entry.trace_id || createRequestId(),
-					event: entry.event,
-					level: entry.level,
-					trace_id: entry.trace_id ?? null,
-					user_id: entry.user_id ?? null,
-					organization_id: entry.organization_id ?? null,
-					metadata: JSON.stringify(entry.metadata),
-					request_details: JSON.stringify(entry.request_details ?? {}),
-					request_body: JSON.stringify(
-						entry.request_body ?? entry.request_details?.requestBody ?? {},
-					),
-					status_code: entry.status_code ?? null,
-					created_at: toClickHouseDate(new Date()),
-					// Audit-log fields — LowCardinality columns use '' as the "no value" sentinel
-					actor_type: entry.actor_type,
-					actor_id: entry.actor_id ?? null,
-					resource_type: entry.resource_type,
-					resource_id: entry.resource_id ?? null,
-					service: entry.service,
-					action: entry.action,
-					ip_address: entry.ip_address ?? null,
-					user_agent: entry.user_agent ?? null,
-					environment: entry.environment ?? ENV,
-				},
-			],
-			format: "JSONEachRow",
+		await db.insert(schema.activityLog).values({
+			id: entry.trace_id || createRequestId(),
+			event: entry.event,
+			level: entry.level,
+			traceId: entry.trace_id ?? null,
+			userId: entry.user_id ?? null,
+			organizationId: entry.organization_id ?? null,
+			metadata: entry.metadata ?? {},
+			requestDetails: entry.request_details ?? {},
+			requestBody:
+				entry.request_body ?? entry.request_details?.requestBody ?? {},
+			statusCode: entry.status_code ?? null,
+			createdAt: new Date(),
+			actorType: entry.actor_type,
+			actorId: entry.actor_id ?? null,
+			resourceType: entry.resource_type,
+			resourceId: entry.resource_id ?? null,
+			service: entry.service,
+			action: entry.action,
+			ipAddress: entry.ip_address ?? null,
+			userAgent: entry.user_agent ?? null,
+			environment: entry.environment ?? ENV,
 		});
 	} catch (error) {
 		log.error({
-			message: "Failed to insert audit log into ClickHouse",
+			message: "Failed to insert audit log into Postgres",
 			error:
 				error instanceof Error
 					? { message: error.message, stack: error.stack }

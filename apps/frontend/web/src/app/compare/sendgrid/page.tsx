@@ -16,7 +16,7 @@ const pageUrl = `${getSiteUrl()}${pagePath}`;
 export const metadata: Metadata = {
 	title: "Reloop vs SendGrid | Email Provider Comparison",
 	description:
-		"Reloop vs SendGrid for transactional email, marketing campaigns, enterprise scale, and escaping Twilio vendor lock-in.",
+		"Learn how Reloop compares to SendGrid and why Reloop is the best SendGrid alternative for all your transactional and marketing email needs.",
 	keywords: [
 		"Reloop vs SendGrid",
 		"SendGrid alternative",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: "Reloop vs SendGrid",
 		description:
-			"Enterprise email platform comparison—hosted, self-hosted, and open source.",
+			"Learn how Reloop compares to SendGrid and why Reloop is the best SendGrid alternative for all your transactional and marketing email needs.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Reloop vs SendGrid | Email Provider Comparison",
 		description:
-			"Transactional email, marketing campaigns, enterprise scale, and escaping Twilio vendor lock-in.",
+			"Learn how Reloop compares to SendGrid and why Reloop is the best SendGrid alternative for all your transactional and marketing email needs.",
 	},
 	alternates: { canonical: pageUrl },
 };
@@ -46,7 +46,7 @@ const SendGridComparisonPage = () => {
 		<ComparisonPageShell
 			pagePath={pagePath}
 			titleLines={["Reloop vs SendGrid"]}
-			description="SendGrid is the incumbent for high-volume email inside Twilio. This comparison is for teams auditing contracts, UI complexity, and whether they need the full proprietary stack."
+			description="Learn how Reloop compares to SendGrid and why Reloop is the best SendGrid alternative for all your transactional and marketing email needs."
 		>
 			<PageSection flushTop narrow>
 				<p className="mx-auto max-w-3xl text-center text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">

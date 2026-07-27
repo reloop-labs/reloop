@@ -15,7 +15,6 @@ Stop anything already bound before `bun docker:up`.
 | Core (`bun docker:up`) | `80`, `443` | Caddy |
 | Core | `5432` | PostgreSQL |
 | Core | `6379` | Redis |
-| Core | `9000` | ClickHouse (native) |
 | Core | `9010` | MinIO (API) |
 | Edge only (`bun docker:up:edge`) | `25`, `465`, `587` | SMTP / inbound |
 
@@ -94,9 +93,8 @@ Core is enough for dashboard + Mailpit. Edge is only needed for real SMTP/MX.
 
 | Service | Port | Notes |
 | :--- | :--- | :--- |
-| PostgreSQL | `5432` | Shared DB for all backends |
+| PostgreSQL | `5432` | Shared DB for all backends (including activity logs) |
 | Redis | `6379` | Sessions, OTP, caches |
-| ClickHouse | `8123` (HTTP), `9000` (native) | [Logs](/docs/setup/backend/logs) analytics |
 | NATS | `4222` | Event bus between services |
 | MinIO | `9010` (API), `9001` (console) | [Upload](/docs/setup/backend/upload) object storage — [console](http://localhost:9001) |
 | Spam (Rspamd) | `11332` / `11333` / `11334` | [spam](/docs/setup/backend/spam) scan + UI for [inbound](/docs/setup/backend/inbound) |

@@ -15,7 +15,6 @@
 		"test": "bun test test/"
 	},
 	"dependencies": {
-		"@clickhouse/client": "catalog:backend",
 		"@elysiajs/cors": "catalog:backend",
 		"@elysiajs/cron": "catalog:backend",
 		"@elysiajs/opentelemetry": "catalog:backend",

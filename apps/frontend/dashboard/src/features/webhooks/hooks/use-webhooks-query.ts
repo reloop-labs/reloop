@@ -3,6 +3,13 @@ import { queryKeys } from "#/lib/query-keys";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 
+export type WebhookCreatedBy = {
+	id: string;
+	name: string | null;
+	email: string;
+	image: string | null;
+};
+
 export type WebhookData = {
 	id: string;
 	name: string;
@@ -21,6 +28,7 @@ export type WebhookData = {
 	retryBackoffMultiplier?: number;
 	filteringOptions?: Record<string, unknown> | null;
 	consecutiveFailures?: number;
+	createdBy?: WebhookCreatedBy;
 	updatedAt?: string;
 };
 

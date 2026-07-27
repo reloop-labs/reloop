@@ -1,7 +1,6 @@
 "use client";
 
 import { authClient } from "@reloop/auth/client";
-import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Logo } from "@reloop/ui/logo";
 import { AnimatePresence, motion } from "framer-motion";
@@ -203,17 +202,6 @@ export const Header = () => {
 	const [expandedMobile, setExpandedMobile] = useState<string | null>(null);
 	const [mounted, setMounted] = useState(false);
 	const [stars, setStars] = useState<string>("GitHub");
-	const [scrolled, setScrolled] = useState(false);
-
-	useEffect(() => {
-		const onScroll = () => {
-			setScrolled(window.scrollY > 0);
-		};
-
-		onScroll();
-		window.addEventListener("scroll", onScroll, { passive: true });
-		return () => window.removeEventListener("scroll", onScroll);
-	}, []);
 
 	useEffect(() => {
 		setMounted(true);
@@ -262,67 +250,64 @@ export const Header = () => {
 
 	return (
 		<header
-			className={cn(
-				"fixed top-0 right-0 left-0 z-50 bg-bg-white-0 transition-[border-color] duration-200 dark:bg-black",
-				scrolled
-					? "border-stroke-soft-200/70 border-b dark:border-white/10"
-					: "border-transparent border-b",
-			)}
+			className="fixed top-0 right-0 left-0 z-50 border-stroke-soft-200/70 border-b bg-bg-white-0 dark:border-white/10 dark:bg-black"
 			onMouseLeave={() => setActiveMega(null)}
 		>
-			<div className="mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8">
-				<div className="grid h-16 grid-cols-[1fr_auto] items-center lg:grid-cols-[1fr_auto_1fr]">
-					<Link
-						href="/"
-						className="flex shrink-0 items-center gap-2.5 justify-self-start"
-						aria-label="Reloop home"
-					>
-						<Logo className="size-11 text-text-strong-950 dark:text-white" />
-						<span className="-ml-3 font-semibold text-[17px] text-text-strong-950 tracking-tight dark:text-white">
-							Reloop
-						</span>
-					</Link>
+			<div className="mx-auto max-w-[1028px] px-4 sm:px-6 lg:px-8">
+				<div className="flex h-16 items-center justify-between gap-4">
+					<div className="flex items-center gap-6 sm:gap-8">
+						<Link
+							href="/"
+							className="flex shrink-0 items-center gap-2.5"
+							aria-label="Reloop home"
+						>
+							<Logo className="size-11 text-text-strong-950 dark:text-white" />
+							<span className="-ml-3 font-semibold text-[17px] text-text-strong-950 tracking-tight dark:text-white">
+								Reloop
+							</span>
+						</Link>
 
-					<nav className="hidden items-center justify-self-center lg:flex">
-						{navItems.map((item) => (
-							<div
-								key={item.title}
-								className="relative"
-								onMouseEnter={() =>
-									item.mega ? setActiveMega(item.title) : setActiveMega(null)
-								}
-							>
-								{item.mega ? (
-									<span
-										className={`inline-flex cursor-default items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
-											activeMega === item.title
-												? "text-text-strong-950 dark:text-white"
-												: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
-										}`}
-									>
-										{item.title}
-										<Icon
-											name="chevron-down"
-											className={`size-3 transition-transform duration-200 ${
-												activeMega === item.title ? "rotate-180" : "opacity-50"
+						<nav className="hidden items-center gap-1 lg:flex">
+							{navItems.map((item) => (
+								<div
+									key={item.title}
+									className="relative"
+									onMouseEnter={() =>
+										item.mega ? setActiveMega(item.title) : setActiveMega(null)
+									}
+								>
+									{item.mega ? (
+										<span
+											className={`inline-flex cursor-default items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
+												activeMega === item.title
+													? "text-text-strong-950 dark:text-white"
+													: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
 											}`}
-										/>
-									</span>
-								) : (
-									<Link
-										href={item.href}
-										className={`inline-flex items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
-											activeMega === item.title
-												? "text-text-strong-950 dark:text-white"
-												: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
-										}`}
-									>
-										{item.title}
-									</Link>
-								)}
-							</div>
-						))}
-					</nav>
+										>
+											{item.title}
+											<Icon
+												name="chevron-down"
+												className={`size-3 transition-transform duration-200 ${
+													activeMega === item.title ? "rotate-180" : "opacity-50"
+												}`}
+											/>
+										</span>
+									) : (
+										<Link
+											href={item.href}
+											className={`inline-flex items-center gap-1 px-3 py-2 font-medium text-[14px] transition-colors ${
+												activeMega === item.title
+													? "text-text-strong-950 dark:text-white"
+													: "text-text-sub-600 hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
+											}`}
+										>
+											{item.title}
+										</Link>
+									)}
+								</div>
+							))}
+						</nav>
+					</div>
 
 					<div className="hidden items-center gap-3 justify-self-end sm:gap-4 lg:flex">
 						<a

@@ -122,6 +122,8 @@ export const RELOOP_ICON_NAMES = new Set<string>([
 	"mail-receive-mask",
 	"mail-send",
 	"mail-send-mask",
+	"mail-server",
+	"mail-server-mask",
 	"mail-single",
 	"map-pin",
 	"maximize",

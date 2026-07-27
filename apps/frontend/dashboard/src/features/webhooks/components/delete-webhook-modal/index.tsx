@@ -17,10 +17,29 @@ import { useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
+import { WEBHOOK_EVENTS } from "@reloop/webhook-events";
 import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
 import type { DeleteWebhookModalProps, WebhookData } from "./types";
 
 type DeleteState = "idle" | "deleting" | "success";
+
+const CATEGORY_ICON: Record<string, string> = {
+	email: "mail-send",
+	domain: "globe",
+	"api-key": "key-new",
+	contact: "contacts",
+};
+
+const CATEGORY_CHIP: Record<string, string> = {
+	email:
+		"border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-800/40 dark:bg-violet-950/40 dark:text-violet-200",
+	domain:
+		"border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800/40 dark:bg-blue-950/40 dark:text-blue-200",
+	"api-key":
+		"border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800/40 dark:bg-amber-950/40 dark:text-amber-200",
+	contact:
+		"border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800/40 dark:bg-emerald-950/40 dark:text-emerald-200",
+};
 
 export const DeleteWebhookModal = ({
 	webhook,
@@ -45,6 +64,7 @@ export const DeleteWebhookModal = ({
 	const displayName =
 		webhookToDelete?.name || webhookToDelete?.url || "Webhook";
 	const displayUrl = webhookToDelete?.url || "—";
+	const displayEvents = webhookToDelete?.events ?? [];
 
 	const isOnDetailPage =
 		pathname.includes("/webhooks/") &&
@@ -162,6 +182,46 @@ export const DeleteWebhookModal = ({
 						<p className="mt-0.5 truncate font-medium font-mono text-sm text-text-strong-950">
 							{displayUrl}
 						</p>
+					</div>
+					<div>
+						<p className="font-normal text-text-sub-600 text-xs">
+							Events
+							{displayEvents.length > 0 ? (
+								<span className="ml-1 tabular-nums">
+									({displayEvents.length})
+								</span>
+							) : null}
+						</p>
+						{displayEvents.length > 0 ? (
+							<div className="mt-1.5 flex max-h-28 flex-wrap gap-1 overflow-y-auto">
+								{displayEvents.map((eventId) => {
+									const definition = WEBHOOK_EVENTS.find(
+										(e) => e.id === eventId,
+									);
+									const category = definition?.category ?? "";
+									const iconName = CATEGORY_ICON[category] ?? "webhook";
+									const chipClass =
+										CATEGORY_CHIP[category] ??
+										"border-stroke-soft-100 bg-bg-white-0 text-text-strong-950 dark:border-stroke-soft-100/40";
+									return (
+										<span
+											key={eventId}
+											className={cn(
+												"inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 font-mono text-[10px] font-medium",
+												chipClass,
+											)}
+										>
+											<Icon name={iconName} className="h-2.5 w-2.5 shrink-0" />
+											{eventId}
+										</span>
+									);
+								})}
+							</div>
+						) : (
+							<p className="mt-0.5 font-medium text-sm text-text-sub-600">
+								No events subscribed
+							</p>
+						)}
 					</div>
 				</div>
 

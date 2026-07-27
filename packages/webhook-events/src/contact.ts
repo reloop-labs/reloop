@@ -5,7 +5,7 @@ export const CONTACT_CREATE_WEBHOOK_EVENT = {
 	name: "contact.create",
 	category: "contact",
 	description: "Triggered when a new contact is created",
-	isActive: false,
+	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
 export const CONTACT_UPDATE_WEBHOOK_EVENT = {
@@ -13,7 +13,7 @@ export const CONTACT_UPDATE_WEBHOOK_EVENT = {
 	name: "contact.update",
 	category: "contact",
 	description: "Triggered when a contact is updated",
-	isActive: false,
+	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
 export const CONTACT_DELETE_WEBHOOK_EVENT = {
@@ -21,7 +21,7 @@ export const CONTACT_DELETE_WEBHOOK_EVENT = {
 	name: "contact.delete",
 	category: "contact",
 	description: "Triggered when a contact is deleted",
-	isActive: false,
+	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
 export const CONTACT_SUBSCRIBED_WEBHOOK_EVENT = {
@@ -29,7 +29,7 @@ export const CONTACT_SUBSCRIBED_WEBHOOK_EVENT = {
 	name: "contact.subscribed",
 	category: "contact",
 	description: "Triggered when a contact subscribes",
-	isActive: false,
+	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
 export const CONTACT_UNSUBSCRIBED_WEBHOOK_EVENT = {
@@ -37,7 +37,7 @@ export const CONTACT_UNSUBSCRIBED_WEBHOOK_EVENT = {
 	name: "contact.unsubscribed",
 	category: "contact",
 	description: "Triggered when a contact unsubscribes",
-	isActive: false,
+	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
 export const CONTACT_BLOCKED_WEBHOOK_EVENT = {
@@ -45,7 +45,7 @@ export const CONTACT_BLOCKED_WEBHOOK_EVENT = {
 	name: "contact.blocked",
 	category: "contact",
 	description: "Triggered when a contact is blocked",
-	isActive: false,
+	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
 export const GROUP_CREATE_WEBHOOK_EVENT = {
@@ -53,7 +53,7 @@ export const GROUP_CREATE_WEBHOOK_EVENT = {
 	name: "contact.group.create",
 	category: "contact",
 	description: "Triggered when a new group is created",
-	isActive: false,
+	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
 export const GROUP_DELETE_WEBHOOK_EVENT = {
@@ -61,7 +61,7 @@ export const GROUP_DELETE_WEBHOOK_EVENT = {
 	name: "contact.group.delete",
 	category: "contact",
 	description: "Triggered when a group is deleted",
-	isActive: false,
+	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
 export const GROUP_UPDATE_WEBHOOK_EVENT = {
@@ -69,7 +69,7 @@ export const GROUP_UPDATE_WEBHOOK_EVENT = {
 	name: "contact.group.update",
 	category: "contact",
 	description: "Triggered when a group is updated",
-	isActive: false,
+	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
 export const CHANNEL_CREATE_WEBHOOK_EVENT = {

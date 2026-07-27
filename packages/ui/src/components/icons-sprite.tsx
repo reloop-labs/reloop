@@ -27,6 +27,49 @@ export const IconsSprite = () => (
 				<stop offset="100%" stopColor="#2DD4BF" />
 			</linearGradient>
 			<symbol
+				id="paperclip"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M20 5V14.5C20 18.6421 16.6421 22 12.5 22C8.35786 22 5 18.6421 5 14.5L5 7C5 4.23858 7.23858 2 10 2C12.7614 2 15 4.23858 15 7V14.5C15 15.8807 13.8807 17 12.5 17C11.1193 17 10 15.8807 10 14.5V7"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol
+				id="headset"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3ZM21 16v2a4 4 0 0 1-4 4h-5"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol
+				id="send-test"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M6 10L2 6L6 2M2 6H16M18 22L22 18L18 14M22 18H8"
+					fill="none"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol
 				id="video-guide"
 				viewBox="0 0 24 24"
 				fill="none"
@@ -1943,6 +1986,56 @@ export const IconsSprite = () => (
 				</g>
 				<path
 					d="M18 13.5V20.5M18 20.5L14.5 17M18 20.5L21.5 17"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+				/>
+			</symbol>
+			<symbol id="mail-server" fill="none" viewBox="0 0 24 24">
+				<defs>
+					<mask id="mail-server-mask">
+						<rect x={0} y={0} width={24} height={24} fill="white" />
+						<circle cx={17.75} cy={17.25} r={6.25} fill="black" />
+					</mask>
+				</defs>
+				<g mask="url(#mail-server-mask)">
+					<path
+						d="M18 8L17 8.66667L16.4376 9.0416C14.8338 10.1108 14.0319 10.6454 13.1652 10.8531C12.3992 11.0366 11.6008 11.0366 10.8348 10.8531C9.96808 10.6454 9.16618 10.1108 7.5624 9.0416L7 8.66667L6 8M10 21H14C16.8003 21 18.2004 21 19.27 20.455C20.2108 19.9757 20.9757 19.2108 21.455 18.27C22 17.2004 22 15.8003 22 13V11C22 8.19974 22 6.79961 21.455 5.73005C20.9757 4.78924 20.2108 4.02433 19.27 3.54497C18.2004 3 16.8003 3 14 3H10C7.19974 3 5.79961 3 4.73005 3.54497C3.78924 4.02433 3.02433 4.78924 2.54497 5.73005C2 6.79961 2 8.19974 2 11V13C2 15.8003 2 17.2004 2.54497 18.27C3.02433 19.2108 3.78924 19.9757 4.73005 20.455C5.79961 21 7.19974 21 10 21Z"
+						stroke="currentColor"
+						strokeWidth="1.5"
+						strokeLinecap="round"
+					/>
+				</g>
+				<rect
+					x={13.5}
+					y={13}
+					width={8.5}
+					height={3.5}
+					rx={0.75}
+					stroke="currentColor"
+					strokeWidth="1.25"
+				/>
+				<rect
+					x={13.5}
+					y={18}
+					width={8.5}
+					height={3.5}
+					rx={0.75}
+					stroke="currentColor"
+					strokeWidth="1.25"
+				/>
+				<circle cx={15.5} cy={14.75} r={0.5} fill="currentColor" />
+				<circle cx={15.5} cy={19.75} r={0.5} fill="currentColor" />
+			</symbol>
+			<symbol id="message-body" fill="none" viewBox="0 0 24 24">
+				<path
+					opacity="0.12"
+					d="M2 10C2 7.19974 2 5.79961 2.54497 4.73005C3.02433 3.78924 3.78924 3.02433 4.73005 2.54497C5.79961 2 7.19974 2 10 2H14C16.8003 2 18.2004 2 19.27 2.54497C20.2108 3.02433 20.9757 3.78924 21.455 4.73005C22 5.79961 22 7.19974 22 10V19.1708C22 20.1969 22 20.71 21.8373 21.0302C21.5642 21.5676 20.996 21.8893 20.3947 21.847C20.0363 21.8218 19.5964 21.5578 18.7165 21.0299C18.1917 20.715 17.9293 20.5576 17.6542 20.4347C17.1972 20.2306 16.7122 20.0963 16.2154 20.0362C15.9163 20 15.6103 20 14.9983 20H10C7.19974 20 5.79961 20 4.73005 19.455C3.78924 18.9757 3.02433 18.2108 2.54497 17.27C2 16.2004 2 14.8003 2 12V10Z"
+					fill="currentColor"
+				/>
+				<path
+					d="M7 8H15M7 12H11M18.7165 21.0299C18.1917 20.715 17.9293 20.5576 17.6542 20.4347C17.1972 20.2306 16.7122 20.0962 16.2154 20.0362C15.9163 20 15.6103 20 14.9983 20H10C7.19974 20 5.79961 20 4.73005 19.455C3.78924 18.9757 3.02433 18.2108 2.54497 17.27C2 16.2004 2 14.8003 2 12V10C2 7.19974 2 5.79961 2.54497 4.73005C3.02433 3.78924 3.78924 3.02433 4.73005 2.54497C5.79961 2 7.19974 2 10 2H14C16.8003 2 18.2004 2 19.27 2.54497C20.2108 3.02433 20.9757 3.78924 21.455 4.73005C22 5.79961 22 7.19974 22 10V19.1708C22 20.1969 22 20.71 21.8373 21.0302C21.5642 21.5676 20.996 21.8893 20.3947 21.847C20.0363 21.8218 19.5964 21.5578 18.7165 21.0299Z"
 					stroke="currentColor"
 					strokeWidth="1.5"
 					strokeLinecap="round"

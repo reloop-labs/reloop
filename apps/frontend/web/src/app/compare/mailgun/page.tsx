@@ -17,7 +17,7 @@ const pageUrl = `${getSiteUrl()}${pagePath}`;
 export const metadata: Metadata = {
 	title: "Reloop vs Mailgun | Email Provider Comparison",
 	description:
-		"How Reloop compares to Mailgun for transactional email, SMTP, inbound parsing, self-hosting, and long-term vendor control.",
+		"Learn how Reloop compares to Mailgun and why Reloop is the best Mailgun alternative for all your developer email API needs.",
 	keywords: [
 		"Reloop vs Mailgun",
 		"Mailgun alternative",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: "Reloop vs Mailgun",
 		description:
-			"Transactional email APIs, SMTP, and infrastructure ownership.",
+			"Learn how Reloop compares to Mailgun and why Reloop is the best Mailgun alternative for all your developer email API needs.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Reloop vs Mailgun | Email Provider Comparison",
 		description:
-			"Transactional email, SMTP, inbound parsing, self-hosting, and long-term vendor control.",
+			"Learn how Reloop compares to Mailgun and why Reloop is the best Mailgun alternative for all your developer email API needs.",
 	},
 	alternates: { canonical: pageUrl },
 };
@@ -47,7 +47,7 @@ const MailgunComparisonPage = () => {
 		<ComparisonPageShell
 			pagePath={pagePath}
 			titleLines={["Reloop vs Mailgun"]}
-			description="Mailgun pioneered developer email APIs for a generation of backends. Here is how Reloop compares for teams re-evaluating Twilio-era contracts and ops complexity."
+			description="Learn how Reloop compares to Mailgun and why Reloop is the best Mailgun alternative for all your developer email API needs."
 		>
 			<PageSection flushTop narrow>
 				<div className="mx-auto max-w-3xl space-y-6 text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">

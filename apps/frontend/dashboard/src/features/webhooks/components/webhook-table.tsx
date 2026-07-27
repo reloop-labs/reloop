@@ -15,6 +15,7 @@ import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { DeleteWebhookModal } from "./delete-webhook-modal";
+
 import { EmptyState } from "./empty-state";
 import { WebhookTableSkeleton } from "./webhook-table-skeleton";
 
@@ -122,7 +123,14 @@ interface WebhookActionsDropdownProps {
 	webhook: WebhookData;
 	isToggling: boolean;
 	onViewDetails: (id: string) => void;
-	onToggleStatus: (id: string, currentStatus: string) => void;
+	onTest: (id: string) => void;
+	onEdit: (id: string) => void;
+	onCopyUrl: (url: string) => void;
+	onCopyId: (id: string) => void;
+	onSetStatus: (
+		id: string,
+		status: "active" | "paused" | "disabled",
+	) => void;
 	onDelete: (id: string) => void;
 	onOpenChange?: (open: boolean) => void;
 }
@@ -131,7 +139,11 @@ const WebhookActionsDropdown = ({
 	webhook,
 	isToggling,
 	onViewDetails,
-	onToggleStatus,
+	onTest,
+	onEdit,
+	onCopyUrl,
+	onCopyId,
+	onSetStatus,
 	onDelete,
 	onOpenChange,
 }: WebhookActionsDropdownProps) => {
@@ -144,27 +156,82 @@ const WebhookActionsDropdown = ({
 		onOpenChange?.(open);
 	};
 
+	const isDisabled = webhook.status === "disabled";
+	const isPaused = webhook.status === "paused";
+	const isActive = webhook.status === "active" || webhook.status === "failed";
+
 	const menuItems = [
 		{
 			id: "view",
 			label: "View details",
 			icon: "info-outline" as const,
 			isDanger: false,
+			dividerAfter: false,
 		},
 		{
-			id: "toggle",
-			label: webhook.status === "disabled" ? "Enable" : "Disable",
-			icon:
-				webhook.status === "disabled"
-					? ("play" as const)
-					: ("pause" as const),
+			id: "test",
+			label: "Send test event",
+			icon: "play" as const,
 			isDanger: false,
+			dividerAfter: false,
+		},
+		{
+			id: "edit",
+			label: "Edit",
+			icon: "edit" as const,
+			isDanger: false,
+			dividerAfter: true,
+		},
+		{
+			id: "copy-url",
+			label: "Copy URL",
+			icon: "copy" as const,
+			isDanger: false,
+			dividerAfter: false,
+		},
+		{
+			id: "copy-id",
+			label: "Copy ID",
+			icon: "copy" as const,
+			isDanger: false,
+			dividerAfter: true,
+		},
+		...(isPaused
+			? [
+					{
+						id: "resume",
+						label: "Resume",
+						icon: "play" as const,
+						isDanger: false,
+						dividerAfter: false,
+					},
+				]
+			: isActive
+				? [
+						{
+							id: "pause",
+							label: "Pause",
+							icon: "pause" as const,
+							isDanger: false,
+							dividerAfter: false,
+						},
+					]
+				: []),
+		{
+			id: "toggle",
+			label: isDisabled ? "Enable" : "Disable",
+			icon: (isDisabled ? "check-circle" : "minus-circle") as
+				| "check-circle"
+				| "minus-circle",
+			isDanger: false,
+			dividerAfter: true,
 		},
 		{
 			id: "delete",
 			label: "Delete",
 			icon: "trash" as const,
 			isDanger: true,
+			dividerAfter: false,
 		},
 	];
 
@@ -175,8 +242,15 @@ const WebhookActionsDropdown = ({
 
 	const handleItemClick = (itemId: string) => {
 		if (itemId === "view") onViewDetails(webhook.id);
-		else if (itemId === "toggle") onToggleStatus(webhook.id, webhook.status);
-		else if (itemId === "delete") onDelete(webhook.id);
+		else if (itemId === "test") onTest(webhook.id);
+		else if (itemId === "edit") onEdit(webhook.id);
+		else if (itemId === "copy-url") onCopyUrl(webhook.url);
+		else if (itemId === "copy-id") onCopyId(webhook.id);
+		else if (itemId === "pause") onSetStatus(webhook.id, "paused");
+		else if (itemId === "resume") onSetStatus(webhook.id, "active");
+		else if (itemId === "toggle") {
+			onSetStatus(webhook.id, isDisabled ? "active" : "disabled");
+		} else if (itemId === "delete") onDelete(webhook.id);
 		setPopoverOpen(false);
 	};
 
@@ -196,41 +270,56 @@ const WebhookActionsDropdown = ({
 				</PopoverTrigger>
 				<PopoverContent
 					align="end"
-					sideOffset={-10}
-					className="w-40 rounded-xl p-1.5"
+					sideOffset={6}
+					className="w-48 rounded-xl p-1.5"
 				>
 					<div className="relative">
 						{menuItems.map((item, idx) => (
-							<button
-								key={item.id}
-								ref={(el) => {
-									if (el) buttonRefs.current[idx] = el;
-								}}
-								type="button"
-								onPointerEnter={() => setHoverIdx(idx)}
-								onPointerLeave={() => setHoverIdx(undefined)}
-								onClick={() => handleItemClick(item.id)}
-								disabled={item.id === "toggle" && isToggling}
-								className={cn(
-									"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
-									item.isDanger ? "text-error-base" : "text-text-strong-950",
-									!currentRect &&
-										hoverIdx === idx &&
-										(item.isDanger ? "bg-red-alpha-10" : "bg-neutral-alpha-10"),
-									item.id === "toggle" &&
-										isToggling &&
-										"cursor-not-allowed opacity-50",
-								)}
-							>
-								<Icon
-									name={item.icon}
+							<div key={item.id}>
+								<button
+									ref={(el) => {
+										if (el) buttonRefs.current[idx] = el;
+									}}
+									type="button"
+									onPointerEnter={() => setHoverIdx(idx)}
+									onPointerLeave={() => setHoverIdx(undefined)}
+									onClick={() => handleItemClick(item.id)}
+									disabled={
+										(item.id === "toggle" ||
+											item.id === "pause" ||
+											item.id === "resume") &&
+										isToggling
+									}
 									className={cn(
-										"h-3.5 w-3.5",
-										item.isDanger ? "" : "text-text-sub-600",
+										"flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 font-medium text-xs transition-colors",
+										item.isDanger
+											? "text-error-base"
+											: "text-text-strong-950",
+										!currentRect &&
+											hoverIdx === idx &&
+											(item.isDanger
+												? "bg-red-alpha-10"
+												: "bg-neutral-alpha-10"),
+										isToggling &&
+											(item.id === "toggle" ||
+												item.id === "pause" ||
+												item.id === "resume") &&
+											"cursor-not-allowed opacity-50",
 									)}
-								/>
-								<span>{item.label}</span>
-							</button>
+								>
+									<Icon
+										name={item.icon}
+										className={cn(
+											"h-3.5 w-3.5",
+											item.isDanger ? "" : "text-text-sub-600",
+										)}
+									/>
+									<span>{item.label}</span>
+								</button>
+								{item.dividerAfter ? (
+									<div className="my-1 h-px bg-stroke-soft-100 dark:bg-stroke-soft-100/40" />
+								) : null}
+							</div>
 						))}
 						<AnimatedHoverBackground
 							rect={currentRect}
@@ -269,12 +358,49 @@ export const WebhookTable = ({
 		});
 	};
 
-	const handleToggleStatus = async (
+	const goToTest = (webhookId: string) => {
+		void navigate({
+			to: "/webhooks/$webhookId/test",
+			params: { webhookId },
+		});
+	};
+
+	const goToEdit = (webhookId: string) => {
+		void navigate({
+			to: "/webhooks/$webhookId/edit",
+			params: { webhookId },
+		});
+	};
+
+	const handleCopyUrl = async (url: string) => {
+		try {
+			await navigator.clipboard.writeText(url);
+			toast.success("Endpoint URL copied");
+		} catch {
+			toast.error("Failed to copy URL");
+		}
+	};
+
+	const handleCopyId = async (id: string) => {
+		try {
+			await navigator.clipboard.writeText(id);
+			toast.success("Webhook ID copied");
+		} catch {
+			toast.error("Failed to copy ID");
+		}
+	};
+
+	const handleSetStatus = async (
 		webhookId: string,
-		currentStatus: string,
+		nextStatus: "active" | "paused" | "disabled",
 	) => {
 		if (isTogglingStatus) return;
-		const nextStatus = currentStatus === "disabled" ? "active" : "disabled";
+
+		const labels: Record<string, string> = {
+			active: "enabled",
+			paused: "paused",
+			disabled: "disabled",
+		};
 
 		try {
 			setIsTogglingStatus(webhookId);
@@ -283,14 +409,10 @@ export const WebhookTable = ({
 				{ status: nextStatus },
 				{ withCredentials: true },
 			);
-			toast.success(
-				`Webhook ${nextStatus === "active" ? "enabled" : "disabled"} successfully`,
-			);
+			toast.success(`Webhook ${labels[nextStatus]} successfully`);
 			onMutate?.();
 		} catch {
-			toast.error(
-				`Failed to ${nextStatus === "active" ? "enable" : "disable"} webhook`,
-			);
+			toast.error(`Failed to update webhook status`);
 		} finally {
 			setIsTogglingStatus(null);
 		}
@@ -406,7 +528,11 @@ export const WebhookTable = ({
 											webhook={webhook}
 											isToggling={isToggling}
 											onViewDetails={goToDetail}
-											onToggleStatus={handleToggleStatus}
+											onTest={goToTest}
+											onEdit={goToEdit}
+											onCopyUrl={handleCopyUrl}
+											onCopyId={handleCopyId}
+											onSetStatus={handleSetStatus}
 											onDelete={(id) => void setDeleteId(id)}
 											onOpenChange={(open) =>
 												setActiveDropdownId(open ? webhook.id : null)

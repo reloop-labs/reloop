@@ -22,6 +22,13 @@
       "when": 1784700000000,
       "tag": "0002_webhook_redesign",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1785300000000,
+      "tag": "0003_activity_log",
+      "breakpoints": true
     }
   ]
 }

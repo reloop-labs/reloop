@@ -1,10 +1,9 @@
+import { db } from "@reloop/db/client";
+import * as schema from "@reloop/db/schema";
 import { LogsErrors } from "@reloop/logs/error/logs.error-response";
 import type { LogsModel } from "@reloop/logs/model/logs.model";
-import {
-	getClickHouseClient,
-	type StoredLogEntry,
-} from "@reloop/logs/utils/clickhouse";
-import { formatClickHouseDate, safeJsonParse } from "@reloop/logs/utils/format";
+import { formatLogDate } from "@reloop/logs/utils/format";
+import { and, eq } from "drizzle-orm";
 import { useLogger } from "evlog/elysia";
 import { getEmailLogController } from "../get-email-log/get-email-log.controllers";
 
@@ -15,41 +14,16 @@ export async function getLogController(
 	const log = useLogger();
 	log.info("Getting log entry", { logId });
 	try {
-		const client = getClickHouseClient();
-
-		const resultSet = await client.query({
-			query: `
-				SELECT
-					id,
-					event,
-					level,
-					trace_id,
-					user_id,
-					organization_id,
-					metadata,
-					request_details,
-					request_body,
-					status_code,
-					toString(created_at) AS created_at,
-					actor_type,
-					actor_id,
-					resource_type,
-					resource_id,
-					service,
-					action,
-					ip_address,
-					user_agent,
-					environment
-				FROM logs
-				WHERE id = {logId:String} AND organization_id = {organizationId:String}
-				LIMIT 1
-			`,
-			query_params: { logId, organizationId },
-			format: "JSONEachRow",
-		});
-
-		const rows = (await resultSet.json()) as StoredLogEntry[];
-		const row = rows[0];
+		const [row] = await db
+			.select()
+			.from(schema.activityLog)
+			.where(
+				and(
+					eq(schema.activityLog.id, logId),
+					eq(schema.activityLog.organizationId, organizationId),
+				),
+			)
+			.limit(1);
 
 		if (!row) {
 			log.warn("Log not found", { logId });
@@ -62,16 +36,16 @@ export async function getLogController(
 			email_log_id?: string;
 			[key: string]: unknown;
 		}
-		const metadata = safeJsonParse(row.metadata, {}) as LogMetadata;
+		const metadata = (row.metadata ?? {}) as LogMetadata;
 		const emailId =
 			metadata.emailId || metadata.email_id || metadata.email_log_id;
 		let emailDetails = null;
 
-		if (emailId && typeof emailId === "string" && row.organization_id) {
+		if (emailId && typeof emailId === "string" && row.organizationId) {
 			try {
 				emailDetails = await getEmailLogController({
 					id: emailId,
-					organizationId: row.organization_id,
+					organizationId: row.organizationId,
 				});
 			} catch {
 				// Silently fail email enrichment
@@ -83,22 +57,21 @@ export async function getLogController(
 			uuid: row.id,
 			event: row.event,
 			level: row.level,
-			trace_id: row.trace_id,
+			trace_id: row.traceId,
 			metadata,
-			created_at: formatClickHouseDate(row.created_at),
-			requestDetails: safeJsonParse(row.request_details, {}),
-			request_body: safeJsonParse(row.request_body, {}),
-			status_code: row.status_code || null,
+			created_at: formatLogDate(row.createdAt),
+			requestDetails: row.requestDetails ?? {},
+			request_body: row.requestBody ?? {},
+			status_code: row.statusCode || null,
 			email: emailDetails || undefined,
-			// Audit-log fields — normalise empty strings back to null for the API response
-			actor_type: row.actor_type || null,
-			actor_id: row.actor_id || null,
-			resource_type: row.resource_type || null,
-			resource_id: row.resource_id || null,
+			actor_type: row.actorType || null,
+			actor_id: row.actorId || null,
+			resource_type: row.resourceType || null,
+			resource_id: row.resourceId || null,
 			service: row.service || null,
 			action: row.action || null,
-			ip_address: row.ip_address || null,
-			user_agent: row.user_agent || null,
+			ip_address: row.ipAddress || null,
+			user_agent: row.userAgent || null,
 			environment: row.environment || null,
 		};
 	} catch (error) {

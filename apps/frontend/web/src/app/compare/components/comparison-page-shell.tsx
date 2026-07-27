@@ -1,8 +1,7 @@
-import { MarketingPageShell } from "@reloop/web/components/page-shell";
 import type { FeatureCtaLink } from "@reloop/web/components/landing/types";
 import type React from "react";
 import { getCompetitorByHref } from "../competitor-brands";
-import { CompareHeroIcons } from "./compare-hero-icons";
+import { CompareHero } from "./compare-hero";
 
 export function ComparisonPageShell({
 	pagePath,
@@ -22,15 +21,31 @@ export function ComparisonPageShell({
 	const brand = getCompetitorByHref(pagePath);
 
 	return (
-		<MarketingPageShell
-			titleLines={titleLines}
-			description={description}
-			primaryCta={primaryCta}
-			secondaryCta={secondaryCta}
-			compactHero
-			heroLeading={brand ? <CompareHeroIcons icon={brand.icon} /> : undefined}
-		>
-			{children}
-		</MarketingPageShell>
+		<div className="relative px-4 sm:px-6 lg:px-8">
+			{/*
+			 * Full-height frame: vertical rails span the entire page.
+			 * Section content is constrained inside each CompareSection / component.
+			 */}
+			<div className="relative mx-auto w-full max-w-[1028px] border-stroke-soft-200 border-x dark:border-white/10">
+				{/*
+				 * Full top fold lives inside the stage card (icons + title + copy + CTAs).
+				 */}
+				<CompareHero
+					titleLines={titleLines}
+					description={description}
+					primaryCta={primaryCta}
+					secondaryCta={secondaryCta}
+					icon={brand?.icon}
+				/>
+
+				{/* Divider between hero and page body (e.g. Product UI) */}
+				<div
+					aria-hidden
+					className="relative left-1/2 w-screen -translate-x-1/2 border-stroke-soft-200 border-t dark:border-white/10"
+				/>
+
+				{children}
+			</div>
+		</div>
 	);
 }

@@ -141,7 +141,6 @@
 				"redis": "5.8.2"
 			},
 			"backend": {
-				"@clickhouse/client": "1.12.1",
 				"dotenv": "16.4.7",
 				"tsdown": "0.12.9",
 				"@elysiajs/static": "1.4.7",

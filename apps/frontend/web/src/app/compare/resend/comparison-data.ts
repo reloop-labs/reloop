@@ -7,170 +7,231 @@ import type { ComparisonCategory } from "../components/comparison-matrix";
  */
 export const resendComparisonCategories: ComparisonCategory[] = [
 	{
-		id: "sending",
-		label: "Sending",
+		id: "pricing-volume",
+		label: "Pricing & Email Volume",
+		icon: "invoice",
 		intro:
-			"Both products give you a modern send API and SMTP. The gap is ownership: Reloop runs its own MTA stack (KumoMTA) and can be self-hosted; Resend is a hosted DX layer over Amazon SES.",
+			"Reloop offers transparent email pricing starting with 3,000 free monthly emails with no daily caps, an entry tier at $10/mo for 25,000 emails, cheaper overages ($0.80 vs $1.00 / 1,000), and unlimited free sends when self-hosting.",
 		features: [
-			{ label: "Transactional emails", reloop: "Yes", competitor: "Yes" },
 			{
-				label: "REST API",
-				reloop: "Yes",
-				competitor: "Yes",
-			},
-			{ label: "SMTP", reloop: "Yes", competitor: "Yes" },
-			{
-				label: "Official SDKs",
-				reloop: "Yes",
-				competitor: "Yes",
+				label: "Free monthly emails",
+				icon: "send-2",
+				reloop: "3,000 / mo",
+				competitor: "3,000 / mo",
 			},
 			{
-				label: "React Email / HTML templates",
+				label: "Daily send limit (Free tier)",
+				icon: "calendar",
 				reloop: {
-					value: "Yes",
-					note: "Dashboard React Email editor + send with rendered HTML or template IDs",
+					value: "No daily limit",
+					note: "Use full monthly quota anytime",
 				},
 				competitor: {
-					value: "Yes",
-					note: "React Email first-class; build in your app",
+					value: "100 / day",
+					note: "Free tier limited to 100 sends/day",
 				},
 			},
 			{
-				label: "Batch / broadcast sending",
+				label: "Entry paid plan",
+				icon: "invoice",
 				reloop: {
-					value: "API",
-					note: "Send via API/SMTP; no separate marketing campaign builder shipping yet",
+					value: "$10 / mo",
+					note: "25,000 emails included",
 				},
 				competitor: {
-					value: "Yes",
-					note: "Audiences / batch APIs on hosted product",
+					value: "$20 / mo",
+					note: "50,000 emails included (no $10 tier)",
 				},
 			},
 			{
-				label: "Scheduled delivery",
-				reloop: {
-					value: "No",
-					note: "Scheduling engine is currently in development",
-				},
-				competitor: "Yes",
+				label: "50,000 emails / mo plan",
+				icon: "mega-phone",
+				reloop: "$20 / mo",
+				competitor: "$20 / mo",
 			},
 			{
-				label: "A/B testing",
-				reloop: "No",
-				competitor: "No",
+				label: "Overage rate (per 1k emails)",
+				icon: "arrow-swap",
+				reloop: "$0.80 / 1k",
+				competitor: "$1.00 / 1k",
 			},
 			{
-				label: "Own sending MTA",
+				label: "Self-hosted email sends",
+				icon: "server",
 				reloop: {
-					value: "Yes",
-					note: "KumoMTA in Reloop’s stack",
+					value: "Unlimited",
+					note: "Free open-source software (own infra)",
 				},
 				competitor: {
-					value: "No",
-					note: "Public delivery path uses Amazon SES",
-				},
-			},
-			{
-				label: "Self-hostable",
-				reloop: "Yes",
-				competitor: "No",
-			},
-			{
-				label: "Open-source codebase",
-				reloop: {
-					value: "Yes",
-					note: "Apache 2.0 with Reloop Labs use restrictions—see /license",
-				},
-				competitor: "No",
-			},
-			{
-				label: "Shared IPs",
-				reloop: "Yes",
-				competitor: "Yes",
-			},
-			{
-				label: "Dedicated IPs",
-				reloop: {
-					value: "Enterprise",
-					note: "Optional / custom on Enterprise; self-host can use your own IPs",
-				},
-				competitor: {
-					value: "Scale+",
-					note: "Managed dedicated IP pools on higher plans",
+					value: "N/A",
+					note: "Hosted SaaS only; pay per send",
 				},
 			},
 		],
 	},
 	{
-		id: "inbound",
-		label: "Inbound",
+		id: "sending-receiving",
+		label: "Sending & Receiving",
+		icon: "send-2",
 		intro:
-			"Both can receive email. Reloop routes inbound through its own MX stack into an agent inbox with full content and Rspamd scoring. Resend’s inbound product is hosted and webhook-oriented.",
+			"Both products support sending and receiving email. Reloop runs its own MTA/MX stack (KumoMTA, Rspamd, two-way agent inbox) and is fully self-hostable, whereas Resend is a hosted DX layer over Amazon SES with webhook-oriented inbound.",
 		features: [
 			{
-				label: "Inbound email processing",
+				label: "Agent inbox",
+				icon: "robot",
 				reloop: "Yes",
-				competitor: "Yes",
+				competitor: "No",
 			},
 			{
-				label: "Full message body stored",
-				reloop: {
-					value: "Yes",
-					note: "Text, HTML, and raw message in inbox",
-				},
-				competitor: "Yes",
+				label: "Inbox for humans",
+				icon: "user-circle",
+				reloop: "Yes",
+				competitor: "No",
+			},
+			{
+				label: "AI composer",
+				icon: "sparkling",
+				reloop: "Yes",
+				competitor: "No",
 			},
 			{
 				label: "Inbound spam scoring",
-				reloop: {
-					value: "Yes",
-					note: "Rspamd in Reloop’s inbound path",
-				},
+				icon: "alert-triangle",
+				reloop: "Yes",
 				competitor: "—",
 			},
 			{
-				label: "Agent inbox UI",
+				label: "REST API",
+				icon: "webhook",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "SMTP relay",
+				icon: "smtp",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "Official SDKs",
+				icon: "workflow",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "React Email / HTML templates",
+				icon: "file-text",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "Batch / broadcast sending",
+				icon: "mega-phone",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "Scheduled delivery",
+				icon: "calendar",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "A/B testing",
+				icon: "arrow-swap",
+				reloop: "No",
+				competitor: "No",
+			},
+			{
+				label: "MTA",
+				icon: "mail-server",
+				reloop: "Yes",
+				competitor: "No"
+			},
+			{
+				label: "Self-hostable",
+				icon: "server",
 				reloop: "Yes",
 				competitor: "No",
 			},
 			{
-				label: "AI compose helpers",
-				reloop: {
-					value: "Yes",
-					note: "Subject/compose assist in inbox",
-				},
+				label: "Open-source",
+				icon: "github",
+				reloop: "Yes",
 				competitor: "No",
+			},
+			{
+				label: "Shared IPs",
+				icon: "globe",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "Dedicated IPs",
+				icon: "globe",
+				reloop: "Enterprise",
+				competitor: "Scale+"
 			},
 		],
 	},
 	{
 		id: "analytics",
 		label: "Data & analytics",
+		icon: "graph-up",
 		intro:
 			"Core delivery telemetry overlaps. We only mark features Reloop implements in product today—no geolocation or client fingerprinting claims.",
 		features: [
-			{ label: "Delivery events", reloop: "Yes", competitor: "Yes" },
-			{ label: "Bounce handling", reloop: "Yes", competitor: "Yes" },
-			{ label: "Complaint / spam events", reloop: "Yes", competitor: "Yes" },
-			{ label: "Open tracking", reloop: "Yes", competitor: "Yes" },
-			{ label: "Click tracking", reloop: "Yes", competitor: "Yes" },
+			{
+				label: "Delivery events",
+				icon: "send-2",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "Bounce handling",
+				icon: "refresh-cw",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "Complaint / spam events",
+				icon: "alert-triangle",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "Open tracking",
+				icon: "eye-outline",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "Click tracking",
+				icon: "mouse",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
 			{
 				label: "Unsubscribe events",
+				icon: "bell-off",
 				reloop: "Yes",
 				competitor: "Yes",
 			},
 			{
 				label: "Dashboard activity / logs",
+				icon: "logs",
 				reloop: "Yes",
 				competitor: "Yes",
 			},
 			{
 				label: "Geolocation on opens",
+				icon: "map-pin",
 				reloop: "No",
 				competitor: "No",
 			},
 			{
 				label: "Email client analytics",
+				icon: "laptop",
 				reloop: "No",
 				competitor: "No",
 			},
@@ -179,11 +240,13 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 	{
 		id: "reliability",
 		label: "Reliability",
+		icon: "server",
 		intro:
 			"This section is about control plane ownership—not a promise that Reloop is faster or more available than Resend. We do not publish third-party latency benchmarks here.",
 		features: [
 			{
 				label: "Direct MTA delivery (no SES hop)",
+				icon: "server",
 				reloop: "Yes",
 				competitor: {
 					value: "No",
@@ -192,6 +255,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 			},
 			{
 				label: "Public status page",
+				icon: "graph-up",
 				reloop: {
 					value: "Yes",
 					note: "status.reloop.sh",
@@ -200,6 +264,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 			},
 			{
 				label: "Self-host = your uptime domain",
+				icon: "home",
 				reloop: {
 					value: "Yes",
 					note: "You operate the stack and SLOs",
@@ -211,12 +276,29 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 	{
 		id: "security",
 		label: "Security",
+		icon: "lock",
 		features: [
-			{ label: "SPF", reloop: "Yes", competitor: "Yes" },
-			{ label: "DKIM", reloop: "Yes", competitor: "Yes" },
-			{ label: "DMARC guidance / records", reloop: "Yes", competitor: "Yes" },
+			{
+				label: "SPF",
+				icon: "lock",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "DKIM",
+				icon: "lock",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
+			{
+				label: "DMARC guidance / records",
+				icon: "lock",
+				reloop: "Yes",
+				competitor: "Yes",
+			},
 			{
 				label: "TLS options",
+				icon: "lock",
 				reloop: {
 					value: "Yes",
 					note: "Domain TLS: opportunistic or enforced",
@@ -225,6 +307,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 			},
 			{
 				label: "Webhook signature verification",
+				icon: "webhook",
 				reloop: {
 					value: "Yes",
 					note: "HMAC-SHA256 (X-Webhook-Signature)",
@@ -236,6 +319,7 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 			},
 			{
 				label: "Account auth",
+				icon: "user-circle",
 				reloop: {
 					value: "Email OTP + OAuth",
 					note: "Google / GitHub",
@@ -247,14 +331,17 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 	{
 		id: "platform",
 		label: "Platform",
+		icon: "modules",
 		features: [
 			{
 				label: "Hosted SaaS",
+				icon: "globe",
 				reloop: "Yes",
 				competitor: "Yes",
 			},
 			{
 				label: "Contacts / audiences",
+				icon: "contacts",
 				reloop: {
 					value: "Yes",
 					note: "Contacts, groups, channels",
@@ -266,16 +353,19 @@ export const resendComparisonCategories: ComparisonCategory[] = [
 			},
 			{
 				label: "Webhook management API",
+				icon: "webhook",
 				reloop: "Yes",
 				competitor: "Yes",
 			},
 			{
 				label: "Agent / AI inbox product",
+				icon: "robot",
 				reloop: "Yes",
 				competitor: "No",
 			},
 			{
 				label: "Vendor lock-in risk",
+				icon: "invoice",
 				reloop: {
 					value: "Lower",
 					note: "Source + self-host path; still evaluate license terms",

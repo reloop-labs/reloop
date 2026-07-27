@@ -1,5 +1,6 @@
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
+import { AnimatedBillingIcon } from "./animated-billing-icon";
 import { AnimatedChannelsIcon } from "./animated-channels-icon";
 import { AnimatedContactsIcon } from "./animated-contacts-icon";
 import { AnimatedGearIcon } from "./animated-gear-icon";
@@ -14,10 +15,16 @@ import { AnimatedLogsIcon } from "./animated-logs-icon";
 import { AnimatedMailActionIcon } from "./animated-mail-action-icon";
 import { AnimatedMailIcon } from "./animated-mail-icon";
 import { AnimatedMetricsIcon } from "./animated-metrics-icon";
+import { AnimatedProfileIcon } from "./animated-profile-icon";
+import { AnimatedSecurityIcon } from "./animated-security-icon";
 import { AnimatedSmtpIcon } from "./animated-smtp-icon";
 import { AnimatedTagIcon } from "./animated-tag-icon";
+import { AnimatedTeamsIcon } from "./animated-teams-icon";
+import { AnimatedThemeIcon } from "./animated-theme-icon";
+import { AnimatedUsageIcon } from "./animated-usage-icon";
 import { AnimatedWebhookIcon } from "./animated-webhook-icon";
 import { AnimatedWorkflowIcon } from "./animated-workflow-icon";
+import { AnimatedWorkspaceIcon } from "./animated-workspace-icon";
 
 type SidebarNavIconProps = {
 	name: string;
@@ -81,6 +88,20 @@ export function SidebarNavIcon({
 			return <AnimatedSmtpIcon className={tone} />;
 		case "gear":
 			return <AnimatedGearIcon className={tone} />;
+		case "doughnut":
+			return <AnimatedUsageIcon className={tone} />;
+		case "billing-custom":
+			return <AnimatedBillingIcon className={tone} />;
+		case "users":
+			return <AnimatedTeamsIcon className={tone} />;
+		case "workspace-custom":
+			return <AnimatedWorkspaceIcon className={tone} />;
+		case "user":
+			return <AnimatedProfileIcon className={tone} />;
+		case "shield-check":
+			return <AnimatedSecurityIcon className={tone} />;
+		case "swatch-book":
+			return <AnimatedThemeIcon className={tone} />;
 		default:
 			return (
 				<Icon

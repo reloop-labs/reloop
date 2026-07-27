@@ -17,7 +17,7 @@ const pageUrl = `${getSiteUrl()}${pagePath}`;
 export const metadata: Metadata = {
 	title: "Reloop vs AWS SES | Email Provider Comparison",
 	description:
-		"Reloop vs Amazon SES: raw cloud email delivery vs a complete platform—TCO, campaigns, dashboards, and self-hosting on AWS.",
+		"Learn how Reloop compares to Amazon SES and why Reloop is the best SES alternative for all your email delivery and platform needs.",
 	keywords: [
 		"Reloop vs AWS SES",
 		"Amazon SES alternative",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: "Reloop vs AWS SES",
 		description:
-			"When SES per-email pricing meets the cost of assembling your own email stack.",
+			"Learn how Reloop compares to Amazon SES and why Reloop is the best SES alternative for all your email delivery and platform needs.",
 		type: "website",
 		url: pageUrl,
 		siteName: "Reloop",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Reloop vs AWS SES | Email Provider Comparison",
 		description:
-			"Raw cloud email delivery vs a complete platform—TCO, campaigns, dashboards, and self-hosting.",
+			"Learn how Reloop compares to Amazon SES and why Reloop is the best SES alternative for all your email delivery and platform needs.",
 	},
 	alternates: { canonical: pageUrl },
 };
@@ -47,7 +47,7 @@ const AwsSesComparisonPage = () => {
 		<ComparisonPageShell
 			pagePath={pagePath}
 			titleLines={["Reloop vs AWS SES"]}
-			description="Amazon SES is cheap per email—but rarely cheap in total. This page compares raw SES delivery to Reloop as a full email platform."
+			description="Learn how Reloop compares to Amazon SES and why Reloop is the best SES alternative for all your email delivery and platform needs."
 		>
 			<PageSection flushTop narrow>
 				<div className="mx-auto max-w-3xl space-y-6 text-[15px] text-text-sub-600 leading-7 sm:text-[17px] dark:text-white/50">

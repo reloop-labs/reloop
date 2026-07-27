@@ -98,6 +98,23 @@ export async function updateWebhookController({
 			throw WebhookErrors.updateFailed(webhookId);
 		}
 
+		// Replace event subscriptions when provided
+		if (body.events !== undefined) {
+			await db
+				.delete(schema.webhookEventSubscription)
+				.where(eq(schema.webhookEventSubscription.webhookId, webhookId));
+
+			if (body.events.length > 0) {
+				await db.insert(schema.webhookEventSubscription).values(
+					body.events.map((eventId) => ({
+						webhookId,
+						eventId,
+						isEnabled: true,
+					})),
+				);
+			}
+		}
+
 		const updatedWebhookWithSubs = await db.query.webhook.findFirst({
 			where: and(
 				eq(schema.webhook.id, updatedWebhook.id),
@@ -107,6 +124,7 @@ export async function updateWebhookController({
 				subscriptions: {
 					where: eq(schema.webhookEventSubscription.isEnabled, true),
 				},
+				user: true,
 			},
 		});
 
@@ -134,6 +152,14 @@ export async function updateWebhookController({
 			events: updatedWebhookWithSubs.subscriptions.map(
 				(s) => s.eventId as WebhookEventName,
 			),
+			createdBy: updatedWebhookWithSubs.user
+				? {
+						id: updatedWebhookWithSubs.user.id,
+						name: updatedWebhookWithSubs.user.name,
+						email: updatedWebhookWithSubs.user.email,
+						image: updatedWebhookWithSubs.user.image,
+					}
+				: undefined,
 			createdAt: updatedWebhookWithSubs.createdAt.toISOString(),
 			updatedAt: updatedWebhookWithSubs.updatedAt.toISOString(),
 		};

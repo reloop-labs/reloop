@@ -1,5 +1,6 @@
-import { getClickHouseClient } from "@reloop/logs/utils/clickhouse";
+import { db } from "@reloop/db/client";
 import { redis } from "@reloop/logs/utils/loader";
+import { sql } from "drizzle-orm";
 import { Elysia } from "elysia";
 
 export const healthRoute = new Elysia().get(
@@ -7,8 +8,7 @@ export const healthRoute = new Elysia().get(
 	async () => {
 		try {
 			const startTime = Date.now();
-			const client = getClickHouseClient();
-			await client.query({ query: "SELECT 1 as test", format: "JSON" });
+			await db.execute(sql`SELECT 1`);
 			await redis.healthCheck();
 			const responseTime = Date.now() - startTime;
 

@@ -62,6 +62,133 @@ function PlanCtaLink({
 	);
 }
 
+function getFeatureIcon(feature: string) {
+	const key = feature.toLowerCase().trim();
+
+	if (key.includes("all ") && key.includes("features")) {
+		return (
+			<Icon
+				name="sparkling"
+				className="mt-0.5 size-4 shrink-0 text-primary-base"
+			/>
+		);
+	}
+	if (
+		key.includes("email") &&
+		(key.includes("month") || key.includes("volume"))
+	) {
+		return (
+			<Icon
+				name="mail-single"
+				className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
+			/>
+		);
+	}
+	if (key.includes("inbox") || key.includes("agent")) {
+		return (
+			<Icon
+				name="agent"
+				className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
+			/>
+		);
+	}
+	if (key.includes("webhook")) {
+		return (
+			<Icon
+				name="webhook"
+				className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
+			/>
+		);
+	}
+	if (key.includes("domain")) {
+		return (
+			<Icon
+				name="globe"
+				className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
+			/>
+		);
+	}
+	if (key.includes("transactional") || key.includes("campaign")) {
+		return (
+			<Icon
+				name="mega-phone"
+				className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
+			/>
+		);
+	}
+	if (key.includes("smtp") || key.includes("analytics")) {
+		return (
+			<Icon
+				name="smtp"
+				className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
+			/>
+		);
+	}
+	if (key.includes("attachment")) {
+		return (
+			<Icon
+				name="paperclip"
+				className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
+			/>
+		);
+	}
+	if (key.includes("support") || key.includes("sla")) {
+		return (
+			<Icon
+				name="headset"
+				className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
+			/>
+		);
+	}
+	if (key.includes("overage")) {
+		return (
+			<Icon
+				name="invoice"
+				className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
+			/>
+		);
+	}
+	if (key.includes("throughput") || key.includes("second")) {
+		return (
+			<Icon
+				name="zap"
+				className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
+			/>
+		);
+	}
+	if (key.includes("validation")) {
+		return (
+			<Icon
+				name="shield"
+				className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
+			/>
+		);
+	}
+	if (key.includes("ip")) {
+		return (
+			<Icon
+				name="mail-server"
+				className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
+			/>
+		);
+	}
+	if (key.includes("security") || key.includes("lock")) {
+		return (
+			<Icon
+				name="lock"
+				className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
+			/>
+		);
+	}
+
+	return (
+		<Icon
+			name="sparkling"
+			className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
+		/>
+	);
+}
+
 function PlanColumn({
 	plan,
 	index,
@@ -82,7 +209,7 @@ function PlanColumn({
 	return (
 		<div
 			className={cn(
-				"flex min-h-[640px] flex-col border-stroke-soft-200 p-8 sm:min-h-[680px] lg:p-10 dark:border-white/10",
+				"flex min-h-[640px] flex-col border-stroke-soft-200 p-6 sm:min-h-[680px] sm:p-8 lg:p-6 xl:p-8 dark:border-white/10",
 				borderClasses,
 				plan.highlighted && "bg-bg-weak-50 dark:bg-white/[0.03]",
 			)}
@@ -123,26 +250,12 @@ function PlanColumn({
 			</div>
 
 			<ul className="mt-10 flex-1 space-y-3">
-				{plan.includesLabel && (
-					<li className="flex items-start gap-3 text-[14px] leading-snug">
-						<Icon
-							name="check-circle"
-							className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/35"
-						/>
-						<span className="font-medium text-text-strong-950 dark:text-white/85">
-							{plan.includesLabel}
-						</span>
-					</li>
-				)}
 				{plan.features.map((feature) => (
 					<li
 						key={feature}
 						className="flex items-start gap-3 text-[14px] leading-snug"
 					>
-						<Icon
-							name="check-circle"
-							className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/35"
-						/>
+						{getFeatureIcon(feature)}
 						<span className="text-text-sub-600 dark:text-white/60">
 							{feature}
 						</span>
@@ -255,7 +368,7 @@ function ComparisonTable() {
 								className={cn(
 									"flex flex-col gap-4 px-4 py-5",
 									plan.highlighted &&
-										"rounded-t-2xl border-stroke-soft-200 border-t border-x bg-bg-weak-50/60 dark:border-white/10 dark:bg-white/[0.03]",
+										"rounded-t-2xl border-stroke-soft-200 border-x border-t bg-bg-weak-50/60 dark:border-white/10 dark:bg-white/[0.03]",
 								)}
 							>
 								<div>
@@ -285,12 +398,7 @@ function ComparisonTable() {
 
 				{comparisonSections.map((section, sectionIndex) => (
 					<Fragment key={section.title}>
-						<div
-							className={cn(
-								"pb-3",
-								sectionIndex > 0 ? "pt-10" : "pt-6",
-							)}
-						>
+						<div className={cn("pb-3", sectionIndex > 0 ? "pt-10" : "pt-6")}>
 							<span className="font-medium text-[15px] text-text-strong-950 dark:text-white">
 								{section.title}
 							</span>
@@ -354,7 +462,7 @@ function ComparisonTable() {
 export function PricingSection() {
 	return (
 		<>
-			<div className="overflow-hidden rounded-4xl border border-stroke-soft-200 sm:grid sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
+			<div className="-mx-4 sm:-mx-6 lg:-mx-8 border-stroke-soft-200 border-y sm:grid sm:grid-cols-2 lg:grid-cols-4 dark:border-white/10">
 				{pricingPlans.map((plan, index) => (
 					<PlanColumn key={plan.id} plan={plan} index={index} />
 				))}

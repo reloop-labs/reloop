@@ -24,13 +24,12 @@ export const API_KEY_DELETE_WEBHOOK_EVENT = {
 	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
-/** Reserved / not wired as outbound webhooks yet. */
 export const API_KEY_REVOKE_WEBHOOK_EVENT = {
 	id: "api-key.revoke",
 	name: "api-key.revoke",
 	category: "api-key",
 	description: "Triggered when an API key is revoked",
-	isActive: false,
+	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
 export const API_KEY_RATE_LIMITED_WEBHOOK_EVENT = {
@@ -38,7 +37,7 @@ export const API_KEY_RATE_LIMITED_WEBHOOK_EVENT = {
 	name: "api-key.rate_limited",
 	category: "api-key",
 	description: "Triggered when an API key exceeds its rate limit",
-	isActive: false,
+	isActive: true,
 } as const satisfies WebhookEventDefinition;
 
 export const API_KEY_LIST_WEBHOOK_EVENT = {

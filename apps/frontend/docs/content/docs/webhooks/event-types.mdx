@@ -14,6 +14,12 @@ Reloop supports the following **active** event types. Each delivery uses a consi
 | `email.bounced` | Permanent delivery failure |
 | `email.delivery_delayed` | Transient failure / delay |
 | `email.complained` | Recipient marked as spam (feedback loop) |
+| `email.failed` | Permanent send failure before delivery |
+| `email.opened` | Recipient opened the email |
+| `email.clicked` | Recipient clicked a link in the email |
+| `email.received` | Inbound email successfully received |
+| `email.scheduled` | Email scheduled for later delivery |
+| `email.suppressed` | Email suppressed (recipient on suppression list) |
 
 ### Email `data` shape
 
@@ -31,7 +37,7 @@ Reloop supports the following **active** event types. Each delivery uses a consi
 }
 ```
 
-`error` is present on bounce, delay, and complaint events.
+`error` is present on bounce, delay, complaint, and failure events.
 
 ## Domain lifecycle
 
@@ -50,6 +56,22 @@ Reloop supports the following **active** event types. Each delivery uses a consi
 | `api-key.create` | API key created |
 | `api-key.update` | API key updated / enabled / disabled / rotated |
 | `api-key.delete` | API key deleted |
+| `api-key.revoke` | API key revoked |
+| `api-key.rate_limited` | API key exceeded its rate limit |
+
+## Contact lifecycle
+
+| Event | Description |
+| --- | --- |
+| `contact.create` | Contact created |
+| `contact.update` | Contact updated |
+| `contact.delete` | Contact deleted |
+| `contact.subscribed` | Contact subscribed |
+| `contact.unsubscribed` | Contact unsubscribed |
+| `contact.blocked` | Contact blocked |
+| `contact.group.create` | Contact group created |
+| `contact.group.update` | Contact group updated |
+| `contact.group.delete` | Contact group deleted |
 
 ## Envelope
 
@@ -61,10 +83,6 @@ Reloop supports the following **active** event types. Each delivery uses a consi
   "data": { }
 }
 ```
-
-## Coming later
-
-Contact events, `email.opened`, and `email.clicked` are reserved in the catalog but not yet active for new subscriptions.
 
 ---
 

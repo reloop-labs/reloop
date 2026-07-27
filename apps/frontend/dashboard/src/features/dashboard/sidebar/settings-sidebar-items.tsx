@@ -4,6 +4,7 @@ import { Link, useRouterState } from "#/lib/navigation";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { settingsNavigation } from "../navigation";
+import { SidebarNavIcon } from "./sidebar-nav-icon";
 
 export function SettingsSidebarItems({
 	isCollapsed = false,
@@ -144,14 +145,9 @@ export function SettingsSidebarItems({
 										isCollapsed ? "" : "gap-2.5",
 									)}
 								>
-									<Icon
+									<SidebarNavIcon
 										name={item.iconName}
-										className={cn(
-											"h-4 w-4 shrink-0 transition-all duration-200",
-											isItemActive
-												? "text-text-strong-950"
-												: "text-text-sub-600 opacity-70 group-hover:text-text-strong-950 group-hover:opacity-100",
-										)}
+										isActive={isItemActive}
 									/>
 									{!isCollapsed && (
 										<span

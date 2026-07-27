@@ -33,10 +33,9 @@ The Reloop stack consists of **19 application services** (3 frontends, 16 backen
 * **`inbound`**: Inbound MX SMTP processing receiver using KumoMTA.
 * **`spam`**: Anti-spam scoring backend using Rspamd (called by inbound over HTTP).
 
-### 3. Supporting Infrastructure (9)
-* **PostgreSQL**: Stores persistent relational data.
+### 3. Supporting Infrastructure (6)
+* **PostgreSQL**: Stores persistent relational data, email delivery logs, and activity logs.
 * **Redis**: Coordinates task queues for BullMQ worker threads.
-* **ClickHouse**: Optimized column database for rapid analytics queries.
 * **MinIO**: S3-compliant file storage.
 * **NATS JetStream**: Real-time event broker.
 * **Mailpit**: SMTP sandbox mail catcher.

@@ -7,6 +7,7 @@ export interface WebhookData {
 	failureCount: number;
 	lastTriggeredAt: string | null;
 	createdAt: string;
+	events?: string[];
 }
 
 export interface DeleteWebhookModalProps {
