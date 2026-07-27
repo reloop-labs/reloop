@@ -1,17 +1,8 @@
-import { createId } from "@paralleldrive/cuid2";
-import { ApiKeyErrors } from "@reloop/api-key/error/api-key.error-response";
+import { toApiKeyWithKeyResponse } from "@reloop/api-key/mappers/api-key-response";
 import type { ApiKeyTypes } from "@reloop/api-key/types/api-key.type";
-import {
-	API_KEY_PREFIX,
-	generateApiKey,
-	getKeyStart,
-	hashApiKey,
-} from "@reloop/auth/apikey";
-import { BusEvent, bus } from "@reloop/bus";
-import { db } from "@reloop/db/client";
-import * as schema from "@reloop/db/schema";
+import { controllerLog } from "@reloop/api-key/utils/controller-log";
+import { apiKeyCredential } from "@reloop/api-key/utils/loader";
 import { API_KEY_CREATE_WEBHOOK_EVENT } from "@reloop/webhook-events";
-import { useLogger } from "evlog/elysia";
 
 export async function createApiKeyController({
 	organizationId,
@@ -22,79 +13,16 @@ export async function createApiKeyController({
 	userId: string;
 	name: string;
 }): Promise<ApiKeyTypes.ApiKeyWithKeyResponse> {
-	const log = useLogger();
-	try {
-		log.info("Generating new api key");
-		const fullKey = generateApiKey();
-		const hashedKey = hashApiKey(fullKey);
-		const keyStart = getKeyStart(fullKey);
-		const keyId = `api_key_${createId()}`;
-		log.info("APi key Generated");
+	const { row, plaintextKey } = await apiKeyCredential.create({
+		organizationId,
+		userId,
+		name,
+		log: controllerLog(),
+	});
 
-		const now = new Date();
-		const expiresAt = null;
-		const enabled = true;
-		const rateLimitEnabled = true;
-		const rateLimitTimeWindow = 1000;
-		const rateLimitMax = 100;
-		const remaining = rateLimitMax;
-
-		log.info("Inserting API key in database");
-		const newApiKey = await db
-			.insert(schema.apikey)
-			.values({
-				id: keyId,
-				name,
-				start: keyStart,
-				prefix: API_KEY_PREFIX,
-				key: hashedKey,
-				organizationId,
-				userId,
-				refillInterval: null,
-				refillAmount: null,
-				lastRefillAt: null,
-				enabled,
-				rateLimitEnabled,
-				rateLimitTimeWindow,
-				rateLimitMax,
-				requestCount: 0,
-				remaining,
-				lastRequest: null,
-				expiresAt,
-				createdAt: now,
-				updatedAt: now,
-				permissions: null,
-				metadata: null,
-			})
-			.returning();
-
-		if (!newApiKey[0]) {
-			log.error("Failed to create API key");
-			throw ApiKeyErrors.createFailed();
-		}
-		log.info("New Api key generated");
-
-		await bus.publish(BusEvent.API_KEY_CREATED, {
-			api_key_id: newApiKey[0].id,
-			organizationId,
-		});
-		log.info("NATS event published");
-
-		const result = {
-			id: newApiKey[0].id,
-			name: newApiKey[0].name,
-			key: fullKey,
-			enabled: newApiKey[0].enabled,
-			createdAt: newApiKey[0].createdAt.toISOString(),
-			updatedAt: newApiKey[0].updatedAt.toISOString(),
-			permissions: newApiKey[0].permissions,
-			object: "api_key" as const,
-			event: API_KEY_CREATE_WEBHOOK_EVENT.id,
-		};
-
-		return result;
-	} catch (_error) {
-		log.error("Error creating API key");
-		throw ApiKeyErrors.createFailed();
-	}
+	return toApiKeyWithKeyResponse(
+		row,
+		plaintextKey,
+		API_KEY_CREATE_WEBHOOK_EVENT.id,
+	);
 }

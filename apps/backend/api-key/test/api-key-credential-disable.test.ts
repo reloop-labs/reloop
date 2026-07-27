@@ -43,23 +43,42 @@ type FakeRow = {
  * Minimal db stand-in for disable/delete mutator paths.
  * Not a full drizzle mock — only methods the mutator uses.
  */
-function createFakeDb(initial: FakeRow) {
-	let row: FakeRow | null = { ...initial };
+type UpdateValues = {
+	enabled?: boolean;
+	updatedAt?: Date;
+	key?: string;
+	start?: string | null;
+	name?: string | null;
+};
 
-	const db = {
-		async transaction<T>(fn: (tx: typeof tx) => Promise<T>): Promise<T> {
-			return fn(tx);
-		},
-		query: {
-			apikey: {
-				findFirst: async () =>
-					row
-						? {
-								...row,
-								user: row.user,
-							}
-						: undefined,
-			},
+function createFakeDb(initial: FakeRow | null) {
+	let row: FakeRow | null = initial ? { ...initial } : null;
+
+	function applyUpdate(values: UpdateValues) {
+		if (!row) return Promise.resolve([]);
+		row = {
+			...row,
+			...values,
+			enabled: values.enabled ?? row.enabled,
+			key: values.key ?? row.key,
+			name: values.name !== undefined ? values.name : row.name,
+			start: values.start !== undefined ? values.start : row.start,
+			updatedAt: values.updatedAt ?? row.updatedAt,
+		};
+		return Promise.resolve([{ ...row }]);
+	}
+
+	const updateChain = {
+		set(values: UpdateValues) {
+			return {
+				where() {
+					return {
+						returning() {
+							return applyUpdate(values);
+						},
+					};
+				},
+			};
 		},
 	};
 
@@ -80,26 +99,7 @@ function createFakeDb(initial: FakeRow) {
 			};
 		},
 		update() {
-			return {
-				set(values: { enabled?: boolean; updatedAt?: Date }) {
-					return {
-						where() {
-							return {
-								returning() {
-									if (!row) return Promise.resolve([]);
-									row = {
-										...row,
-										...values,
-										enabled: values.enabled ?? row.enabled,
-										updatedAt: values.updatedAt ?? row.updatedAt,
-									};
-									return Promise.resolve([{ ...row }]);
-								},
-							};
-						},
-					};
-				},
-			};
+			return updateChain;
 		},
 		delete() {
 			return {
@@ -110,6 +110,69 @@ function createFakeDb(initial: FakeRow) {
 							const id = row.id;
 							row = null;
 							return Promise.resolve([{ id }]);
+						},
+					};
+				},
+			};
+		},
+	};
+
+	const db = {
+		async transaction<T>(fn: (tx: typeof tx) => Promise<T>): Promise<T> {
+			return fn(tx);
+		},
+		query: {
+			apikey: {
+				findFirst: async () =>
+					row
+						? {
+								...row,
+								user: row.user,
+							}
+						: undefined,
+			},
+		},
+		update() {
+			return updateChain;
+		},
+		insert() {
+			return {
+				values(values: Record<string, unknown>) {
+					return {
+						returning() {
+							const now = new Date();
+							const user = {
+								id: String(values.userId ?? "user-1"),
+								name: "Test",
+								image: null as null,
+								email: "t@example.com",
+							};
+							row = {
+								id: String(values.id),
+								organizationId: String(values.organizationId),
+								userId: String(values.userId),
+								key: String(values.key),
+								enabled: Boolean(values.enabled ?? true),
+								name: (values.name as string | null) ?? null,
+								start: (values.start as string | null) ?? null,
+								prefix: (values.prefix as string | null) ?? null,
+								refillInterval: null,
+								refillAmount: null,
+								lastRefillAt: null,
+								rateLimitEnabled: Boolean(values.rateLimitEnabled ?? true),
+								rateLimitTimeWindow: Number(values.rateLimitTimeWindow ?? 1000),
+								rateLimitMax: Number(values.rateLimitMax ?? 100),
+								requestCount: Number(values.requestCount ?? 0),
+								remaining: (values.remaining as number | null) ?? null,
+								lastRequest: null,
+								expiresAt: null,
+								createdAt: (values.createdAt as Date) ?? now,
+								updatedAt: (values.updatedAt as Date) ?? now,
+								permissions: (values.permissions as string | null) ?? null,
+								metadata: (values.metadata as string | null) ?? null,
+								user,
+							};
+							return Promise.resolve([{ ...row }]);
 						},
 					};
 				},
@@ -654,5 +717,535 @@ describe("ApiKeyCredential.delete", () => {
 
 		const after = await validateApiKey(raw, store, stubValidateDb());
 		expect(after).toBeNull();
+	});
+});
+
+describe("ApiKeyCredential.rotate", () => {
+	test("after rotate, previously cached old secret fails validateApiKey", async () => {
+		const oldRaw = generateApiKey();
+		const oldHashed = hashApiKey(oldRaw);
+		const entry: ApiKeyCredentialEntry = {
+			userId: "user-1",
+			organizationId: "org-1",
+			apiKeyId: "key-1",
+		};
+
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		await credentialCache.write(oldHashed, entry);
+
+		const before = await validateApiKey(oldRaw, store, stubValidateDb());
+		expect(before).toEqual({
+			...entry,
+			authType: "apikey",
+		});
+
+		const publishes: unknown[] = [];
+		const { db, getRow } = createFakeDb(sampleRow(oldHashed));
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache,
+			bus: {
+				publish: async (event, payload) => {
+					publishes.push({ event, payload });
+				},
+			},
+		});
+
+		const result = await credential.rotate({
+			id: "key-1",
+			organizationId: "org-1",
+		});
+
+		expect(result.plaintextKey).toMatch(/^rl_prod_/);
+		expect(result.plaintextKey).not.toBe(oldRaw);
+		expect(result.row.key).toBe(hashApiKey(result.plaintextKey));
+		expect(result.row.key).not.toBe(oldHashed);
+		expect(getRow()?.key).toBe(result.row.key);
+		expect(publishes).toEqual([
+			{
+				event: BusEvent.API_KEY_ROTATED,
+				payload: { api_key_id: "key-1", organizationId: "org-1" },
+			},
+		]);
+
+		// Old secret must not authenticate via residual cache
+		const afterOld = await validateApiKey(oldRaw, store, stubValidateDb());
+		expect(afterOld).toBeNull();
+	});
+
+	test("new secret authenticates from DB after rotate (cache was not pre-warmed)", async () => {
+		const oldRaw = generateApiKey();
+		const oldHashed = hashApiKey(oldRaw);
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		const { db, getRow } = createFakeDb(sampleRow(oldHashed));
+
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache,
+			bus: { publish: async () => {} },
+		});
+
+		const { plaintextKey } = await credential.rotate({
+			id: "key-1",
+			organizationId: "org-1",
+		});
+
+		const row = getRow();
+		expect(row).not.toBeNull();
+
+		const afterNew = await validateApiKey(plaintextKey, store, {
+			query: {
+				apikey: {
+					findFirst: async () =>
+						row
+							? {
+									id: row.id,
+									userId: row.userId,
+									organizationId: row.organizationId,
+									key: row.key,
+									enabled: row.enabled,
+								}
+							: undefined,
+				},
+			},
+			update: () => ({
+				set: () => ({
+					where: () => ({
+						catch: () => {},
+					}),
+				}),
+			}),
+		} as never);
+
+		expect(afterNew).toEqual({
+			userId: "user-1",
+			organizationId: "org-1",
+			apiKeyId: "key-1",
+			authType: "apikey",
+		});
+	});
+
+	test("invalidate failure fails the operation after DB rotate", async () => {
+		const hashed = hashApiKey(generateApiKey());
+		const { db, getRow } = createFakeDb(sampleRow(hashed));
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache: {
+				read: async () => undefined,
+				write: async () => {},
+				invalidate: async () => {
+					throw new Error("redis down");
+				},
+				invalidateByApiKeyId: async () => {},
+			},
+			bus: {
+				publish: async () => {
+					throw new Error("should not publish");
+				},
+			},
+		});
+
+		await expect(
+			credential.rotate({ id: "key-1", organizationId: "org-1" }),
+		).rejects.toMatchObject({
+			message: "Failed to revoke API key credential cache",
+		});
+
+		// DB still advanced (new hash) — client must retry rotate to finish revoke
+		expect(getRow()?.key).not.toBe(hashed);
+	});
+
+	test("bus failure after successful invalidate still succeeds", async () => {
+		const hashed = hashApiKey(generateApiKey());
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		const { db } = createFakeDb(sampleRow(hashed));
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache,
+			bus: {
+				publish: async () => {
+					throw new Error("nats down");
+				},
+			},
+		});
+
+		const result = await credential.rotate({
+			id: "key-1",
+			organizationId: "org-1",
+		});
+		expect(result.plaintextKey).toMatch(/^rl_prod_/);
+		expect(result.row.key).not.toBe(hashed);
+	});
+
+	test("not found throws before cache or bus", async () => {
+		const emptyDb = {
+			async transaction<T>(
+				fn: (tx: {
+					select: () => {
+						from: () => {
+							where: () => { for: () => Promise<unknown[]> };
+						};
+					};
+				}) => Promise<T>,
+			): Promise<T> {
+				const tx = {
+					select() {
+						return {
+							from() {
+								return {
+									where() {
+										return {
+											for() {
+												return Promise.resolve([]);
+											},
+										};
+									},
+								};
+							},
+						};
+					},
+				};
+				return fn(tx);
+			},
+			query: { apikey: { findFirst: async () => undefined } },
+		};
+
+		const credential = createApiKeyCredential({
+			db: emptyDb as never,
+			credentialCache: {
+				read: async () => undefined,
+				write: async () => {},
+				invalidate: async () => {
+					throw new Error("should not invalidate");
+				},
+				invalidateByApiKeyId: async () => {
+					throw new Error("should not invalidate by id");
+				},
+			},
+			bus: {
+				publish: async () => {
+					throw new Error("should not publish");
+				},
+			},
+		});
+
+		await expect(
+			credential.rotate({ id: "missing", organizationId: "org-1" }),
+		).rejects.toMatchObject({
+			message: "API key not found",
+		});
+	});
+
+	test("retry after failed invalidate still clears old secret via reverse index", async () => {
+		const oldRaw = generateApiKey();
+		const oldHashed = hashApiKey(oldRaw);
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		await credentialCache.write(oldHashed, {
+			userId: "user-1",
+			organizationId: "org-1",
+			apiKeyId: "key-1",
+		});
+
+		const { db, getRow } = createFakeDb(sampleRow(oldHashed));
+
+		// First rotate: DB updates, primary invalidate throws (simulates partial failure
+		// where reverse index may still map id → old hash).
+		let invalidateCalls = 0;
+		const flakyCache = {
+			read: (hashedKey: string) => credentialCache.read(hashedKey),
+			write: (hashedKey: string, entry: ApiKeyCredentialEntry, ttl?: number) =>
+				credentialCache.write(hashedKey, entry, ttl),
+			invalidate: async (hashedKey: string) => {
+				invalidateCalls += 1;
+				if (invalidateCalls === 1) {
+					throw new Error("redis blip");
+				}
+				return credentialCache.invalidate(hashedKey);
+			},
+			invalidateByApiKeyId: (apiKeyId: string) =>
+				credentialCache.invalidateByApiKeyId(apiKeyId),
+		};
+
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache: flakyCache,
+			bus: { publish: async () => {} },
+		});
+
+		await expect(
+			credential.rotate({ id: "key-1", organizationId: "org-1" }),
+		).rejects.toMatchObject({
+			message: "Failed to revoke API key credential cache",
+		});
+
+		// Old secret still cached after failed first rotate
+		const stillCached = await validateApiKey(oldRaw, store, stubValidateDb());
+		expect(stillCached?.apiKeyId).toBe("key-1");
+
+		// Retry: new DB hash + invalidateByApiKeyId must clear residual old entry
+		const retry = await credential.rotate({
+			id: "key-1",
+			organizationId: "org-1",
+		});
+		expect(retry.row.key).toBe(getRow()?.key);
+
+		const afterRetry = await validateApiKey(oldRaw, store, stubValidateDb());
+		expect(afterRetry).toBeNull();
+	});
+});
+
+describe("ApiKeyCredential.create", () => {
+	test("returns plaintext once and stores only the hash", async () => {
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		const publishes: unknown[] = [];
+		const { db, getRow } = createFakeDb(null);
+
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache,
+			bus: {
+				publish: async (event, payload) => {
+					publishes.push({ event, payload });
+				},
+			},
+		});
+
+		const result = await credential.create({
+			organizationId: "org-1",
+			userId: "user-1",
+			name: "Production",
+		});
+
+		expect(result.plaintextKey).toMatch(/^rl_prod_/);
+		expect(result.row.key).toBe(hashApiKey(result.plaintextKey));
+		expect(result.row.key).not.toBe(result.plaintextKey);
+		expect(result.row.name).toBe("Production");
+		expect(result.row.enabled).toBe(true);
+		expect(result.row.id).toMatch(/^api_key_/);
+		expect(getRow()?.key).toBe(result.row.key);
+		expect(publishes).toEqual([
+			{
+				event: BusEvent.API_KEY_CREATED,
+				payload: {
+					api_key_id: result.row.id,
+					organizationId: "org-1",
+				},
+			},
+		]);
+	});
+
+	test("bus failure after successful insert still succeeds", async () => {
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		const { db } = createFakeDb(null);
+
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache,
+			bus: {
+				publish: async () => {
+					throw new Error("nats down");
+				},
+			},
+		});
+
+		const result = await credential.create({
+			organizationId: "org-1",
+			userId: "user-1",
+			name: "Still ok",
+		});
+		expect(result.plaintextKey).toMatch(/^rl_prod_/);
+		expect(result.row.name).toBe("Still ok");
+	});
+});
+
+describe("ApiKeyCredential.enable", () => {
+	test("enables a disabled key and publishes once", async () => {
+		const hashed = hashApiKey(generateApiKey());
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		const publishes: unknown[] = [];
+		const { db } = createFakeDb(sampleRow(hashed, { enabled: false }));
+
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache,
+			bus: {
+				publish: async (event, payload) => {
+					publishes.push({ event, payload });
+				},
+			},
+		});
+
+		const result = await credential.enable({
+			id: "key-1",
+			organizationId: "org-1",
+		});
+
+		expect(result.alreadyEnabled).toBe(false);
+		expect(result.row.enabled).toBe(true);
+		expect(publishes).toEqual([
+			{
+				event: BusEvent.API_KEY_ENABLED,
+				payload: { api_key_id: "key-1", organizationId: "org-1" },
+			},
+		]);
+	});
+
+	test("already-enabled is idempotent and skips bus", async () => {
+		const hashed = hashApiKey(generateApiKey());
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		const publishes: unknown[] = [];
+		const { db } = createFakeDb(sampleRow(hashed, { enabled: true }));
+
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache,
+			bus: {
+				publish: async (event, payload) => {
+					publishes.push({ event, payload });
+				},
+			},
+		});
+
+		const result = await credential.enable({
+			id: "key-1",
+			organizationId: "org-1",
+		});
+
+		expect(result.alreadyEnabled).toBe(true);
+		expect(result.row.enabled).toBe(true);
+		expect(publishes).toEqual([]);
+	});
+
+	test("missing key throws notFound", async () => {
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		const { db } = createFakeDb(null);
+
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache,
+			bus: { publish: async () => {} },
+		});
+
+		await expect(
+			credential.enable({ id: "missing", organizationId: "org-1" }),
+		).rejects.toMatchObject({
+			message: "API key not found",
+		});
+	});
+
+	test("bus failure after successful enable still succeeds", async () => {
+		const hashed = hashApiKey(generateApiKey());
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		const { db } = createFakeDb(sampleRow(hashed, { enabled: false }));
+
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache,
+			bus: {
+				publish: async () => {
+					throw new Error("nats down");
+				},
+			},
+		});
+
+		const result = await credential.enable({
+			id: "key-1",
+			organizationId: "org-1",
+		});
+		expect(result.row.enabled).toBe(true);
+		expect(result.alreadyEnabled).toBe(false);
+	});
+});
+
+describe("ApiKeyCredential.update", () => {
+	test("renames the key and publishes", async () => {
+		const hashed = hashApiKey(generateApiKey());
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		const publishes: unknown[] = [];
+		const { db, getRow } = createFakeDb(sampleRow(hashed, { name: "Old" }));
+
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache,
+			bus: {
+				publish: async (event, payload) => {
+					publishes.push({ event, payload });
+				},
+			},
+		});
+
+		const result = await credential.update({
+			id: "key-1",
+			organizationId: "org-1",
+			name: "New name",
+		});
+
+		expect(result.row.name).toBe("New name");
+		expect(getRow()?.name).toBe("New name");
+		// Secret material untouched
+		expect(getRow()?.key).toBe(hashed);
+		expect(publishes).toEqual([
+			{
+				event: BusEvent.API_KEY_UPDATED,
+				payload: { api_key_id: "key-1", organizationId: "org-1" },
+			},
+		]);
+	});
+
+	test("missing key throws notFound", async () => {
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		const { db } = createFakeDb(null);
+
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache,
+			bus: { publish: async () => {} },
+		});
+
+		await expect(
+			credential.update({
+				id: "missing",
+				organizationId: "org-1",
+				name: "Nope",
+			}),
+		).rejects.toMatchObject({
+			message: "API key not found",
+		});
+	});
+
+	test("bus failure after successful update still succeeds", async () => {
+		const hashed = hashApiKey(generateApiKey());
+		const store = memoryStore();
+		const credentialCache = createApiKeyCredentialCache(store);
+		const { db } = createFakeDb(sampleRow(hashed, { name: "Old" }));
+
+		const credential = createApiKeyCredential({
+			db,
+			credentialCache,
+			bus: {
+				publish: async () => {
+					throw new Error("nats down");
+				},
+			},
+		});
+
+		const result = await credential.update({
+			id: "key-1",
+			organizationId: "org-1",
+			name: "Still renamed",
+		});
+		expect(result.row.name).toBe("Still renamed");
 	});
 });
