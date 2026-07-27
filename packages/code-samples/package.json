@@ -1,0 +1,29 @@
+{
+	"name": "@reloop/code-samples",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./types": "./src/types.ts",
+		"./helpers": "./src/helpers.ts",
+		"./languages": "./src/languages.ts",
+		"./api-key": "./src/api-key/index.ts",
+		"./contacts": "./src/contacts/index.ts",
+		"./domain": "./src/domain/index.ts",
+		"./webhook": "./src/webhook/index.ts",
+		"./mail": "./src/mail/index.ts",
+		"./logs": "./src/logs/index.ts",
+		"./template": "./src/template/index.ts",
+		"./inbox": "./src/inbox/index.ts"
+	},
+	"scripts": {
+		"typecheck": "tsc --noEmit",
+		"test": "bun test test/"
+	},
+	"devDependencies": {
+		"@reloop/tsconfig": "workspace:*",
+		"@types/node": "catalog:",
+		"typescript": "catalog:"
+	}
+}

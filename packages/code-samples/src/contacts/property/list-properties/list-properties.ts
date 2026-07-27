@@ -1,0 +1,132 @@
+import type { CodeSample } from "../../../types";
+
+export const listPropertiesXCodeSamples: CodeSample[] = [
+	{
+		id: "node",
+		lang: "javascript",
+		label: "Node.js",
+		source: `import { Reloop } from "reloop-email";
+
+const reloop = new Reloop({ apiKey: "rl_123456789" });
+
+const { properties, propertyError } = await reloop.contacts.properties.list({
+  page: 1,
+  limit: 10,
+});
+
+if (propertyError) throw propertyError;
+
+console.log(properties.total, properties.properties);`,
+	},
+	{
+		id: "curl",
+		lang: "bash",
+		label: "cURL",
+		source: `curl "https://reloop.sh/api/contacts/v1/properties/list?page=1&limit=10" \\
+  -H "x-api-key: rl_123456789"`,
+	},
+				{
+		id: "python",
+		lang: "python",
+		label: "Python",
+		source: `from reloop_email import Reloop
+
+reloop = Reloop(api_key="rl_123456789")
+
+result = reloop.contacts.properties.list({
+  "page": 1,
+  "limit": 10,
+})
+
+if result.property_error:
+    raise result.property_error
+
+print(result.properties["total"], result.properties["properties"])`,
+	},
+			{
+		id: "php",
+		lang: "php",
+		label: "PHP",
+		source: `<?php
+
+require 'vendor/autoload.php';
+
+use Reloop\Reloop;
+
+$reloop = Reloop::client('rl_123456789');
+
+$properties = $reloop->contacts->properties->list([
+    'page' => 1,
+    'limit' => 10,
+]);
+echo $properties['total'] . ' ' . $properties['properties'] . PHP_EOL;`,
+	},
+			{
+		id: "java",
+		lang: "java",
+		label: "Java",
+		source: `import sh.reloop.ReloopClient;
+ReloopClient reloop = new ReloopClient("rl_123456789");
+
+ListPropertiesParams params = new ListPropertiesParams();
+params.page = 1;
+params.limit = 10;
+var properties = reloop.contacts.properties.list(params);
+System.out.println(properties.total + " " + properties.properties);`,
+	},
+	{
+		id: "dotnet",
+		lang: "csharp",
+		label: ".NET",
+		source: `using Reloop;
+using Reloop.Models;
+
+var reloop = new ReloopClient("rl_123456789");
+
+await reloop.Contacts.ListPropertiesAsync(new Dictionary<string, object?> { ["page"] = 1, ["limit"] = 10 });`,
+	},
+	{
+		id: "go",
+		lang: "go",
+		label: "Go",
+		source: `import reloop "github.com/reloop-labs/reloop-go"
+
+client, _ := reloop.NewClient(reloop.ClientOptions{
+    APIKey: "rl_123456789",
+})
+
+properties, _ := client.Contacts.ListProperties(map[string]interface{}{"page": 1, "limit": 10})`,
+	},
+	{
+		id: "rust",
+		lang: "rust",
+		label: "Rust",
+		source: `use reloop::ReloopClient;
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let reloop = ReloopClient::new("rl_123456789".to_string(), None);
+
+    reloop.contacts().list_properties(Some(ListPropertiesParams { page: Some(1), limit: Some(10), ..Default::default() })).await?;
+
+    Ok(())
+}`,
+	},
+	{
+		id: "ruby",
+		lang: "ruby",
+		label: "Ruby",
+		source: `require "reloop"
+
+reloop = Reloop::Client.new(api_key: "rl_123456789")
+
+properties = reloop.contacts.list_properties(page: 1, limit: 10)`,
+	},
+	{
+		id: "elixir",
+		lang: "elixir",
+		label: "Elixir",
+		source: `client = Reloop.client("rl_123456789")
+
+{:ok, properties} = Reloop.Services.Contacts.list_properties(client, %{page: 1, limit: 10})`,
+	},
+];
