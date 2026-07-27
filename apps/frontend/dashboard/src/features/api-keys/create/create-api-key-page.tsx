@@ -10,7 +10,7 @@ import * as Tooltip from "@reloop/ui/tooltip";
 import { useNavigate } from "#/lib/navigation";
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
 	siBun,
@@ -108,21 +108,42 @@ export function CreateApiKeyPage() {
 	const {
 		register,
 		handleSubmit,
+		reset,
 		formState: { errors },
 	} = useForm<CreateApiKeyFormValues>({
 		resolver: valibotResolver(createApiKeySchema),
 		defaultValues: { name: "" },
 	});
 
+	// cacheComponents keeps this route mounted under React <Activity>.
+	// Effects clean up/re-run when the page is hidden/shown, but useState does
+	// not — so without an explicit reset, a prior success step (and secret key)
+	// would reappear on the next visit.
+	useEffect(() => {
+		setCreatedApiKey(null);
+		setIsLoading(false);
+		setSelectedLang("nodejs");
+		setSelectedPkg("npm");
+		reset({ name: "" });
+
+		return () => {
+			setCreatedApiKey(null);
+			setIsLoading(false);
+		};
+	}, [reset]);
+
 	const handleCancel = () => {
+		setCreatedApiKey(null);
 		void navigate({ to: "/api-keys" });
 	};
 
 	const handleContinue = () => {
-		if (createdApiKey?.id) {
+		const apiKeyId = createdApiKey?.id;
+		setCreatedApiKey(null);
+		if (apiKeyId) {
 			void navigate({
 				to: "/api-keys/$apiKeyId",
-				params: { apiKeyId: createdApiKey.id },
+				params: { apiKeyId },
 			});
 		} else {
 			void navigate({ to: "/api-keys" });

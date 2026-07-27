@@ -17,7 +17,7 @@ Or in this package:
 bun run dev
 ```
 
-Dev server: [http://localhost:3001/dashboard/](http://localhost:3001/dashboard/)  
+Dev server: [http://localhost:3001/dashboard/](http://localhost:3001/dashboard/)
 Via Caddy: [https://local.reloop.sh/dashboard/](https://local.reloop.sh/dashboard/)
 
 ## Auth routes (current)
@@ -30,7 +30,6 @@ Via Caddy: [https://local.reloop.sh/dashboard/](https://local.reloop.sh/dashboar
 | `/dashboard/verify` | Email OTP and magic-link verification |
 | `/dashboard/onboarding` | Full 4-step onboarding wizard |
 | `/dashboard/invite` | Placeholder (org invite accept) |
-| `/dashboard/accept-invitation` | Compatibility redirect to `/dashboard/invite` |
 
 Auth client is `@reloop/auth/client` (Better Auth at `/api/auth/v1/`). UI components come from `@reloop/ui` and tokens from `@reloop/tailwind`.
 

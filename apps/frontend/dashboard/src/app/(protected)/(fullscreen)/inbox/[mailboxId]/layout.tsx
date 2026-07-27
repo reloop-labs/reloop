@@ -1,5 +1,7 @@
 import { MailboxLayoutClient } from "./layout-client";
 
+export const instant = false;
+
 export default function MailboxRouteLayout({
 	children,
 }: {

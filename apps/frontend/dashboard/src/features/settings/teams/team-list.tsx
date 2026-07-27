@@ -1,18 +1,3 @@
-
-import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
-import { useOrgPermissions } from "#/features/settings/use-org-permissions";
-import { useSessionQuery } from "#/features/auth/session-query";
-import { queryKeys } from "#/lib/query-keys";
-import {
-	getAvatarGradient,
-	getAvatarInitial,
-} from "#/utils/avatar";
-import {
-	dedupePendingInvitesByEmail,
-	isInvitationActionable,
-	isInvitationExpiredPending,
-	isInvitationPending,
-} from "#/utils/invitations";
 import { authClient } from "@reloop/auth/client";
 import * as Avatar from "@reloop/ui/avatar";
 import { cn } from "@reloop/ui/cn";
@@ -22,6 +7,17 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useSessionQuery } from "#/features/auth/session-query";
+import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
+import { useOrgPermissions } from "#/features/settings/use-org-permissions";
+import { queryKeys } from "#/lib/query-keys";
+import { getAvatarGradient, getAvatarInitial } from "#/utils/avatar";
+import {
+	dedupePendingInvitesByEmail,
+	isInvitationActionable,
+	isInvitationExpiredPending,
+	isInvitationPending,
+} from "#/utils/invitations";
 
 interface Member {
 	id: string;
@@ -150,10 +146,7 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 
 	const orgId = activeOrganization?.id;
 
-	const {
-		data: membersData,
-		isPending: membersLoading,
-	} = useQuery({
+	const { data: membersData, isPending: membersLoading } = useQuery({
 		queryKey: queryKeys.organization.members(orgId ?? ""),
 		queryFn: async (): Promise<{ members: Member[] }> => {
 			if (!orgId) return { members: [] };
@@ -165,10 +158,7 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 		enabled: !!orgId,
 	});
 
-	const {
-		data: invites,
-		isPending: invitesLoading,
-	} = useQuery({
+	const { data: invites, isPending: invitesLoading } = useQuery({
 		queryKey: queryKeys.organization.invitations(orgId ?? ""),
 		queryFn: async (): Promise<Invite[]> => {
 			if (!orgId) return [];
@@ -402,7 +392,7 @@ export function TeamList({ searchQuery, filters = "all" }: TeamListProps) {
 	};
 
 	const handleCopyInviteLink = (inviteId: string) => {
-		const inviteLink = `${window.location.origin}/dashboard/accept-invitation?id=${inviteId}`;
+		const inviteLink = `${window.location.origin}/dashboard/invite?id=${inviteId}`;
 		navigator.clipboard.writeText(inviteLink);
 	};
 

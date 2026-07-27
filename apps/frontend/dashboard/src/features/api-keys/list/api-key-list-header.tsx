@@ -1,18 +1,17 @@
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
 
-import { useNavigate } from "#/lib/navigation";
-
 export function ApiKeyListHeader() {
-	const navigate = useNavigate();
+	const [, setModal] = useQueryState("modal");
 
-	const openCreatePage = () => void navigate({ to: "/api-keys/create" });
+	const openCreateModal = () => void setModal("create-api-key");
 
 	useHotkeys("mod+a", (e) => {
 		e.preventDefault();
-		openCreatePage();
+		openCreateModal();
 	});
 
 	return (
@@ -49,7 +48,7 @@ export function ApiKeyListHeader() {
 					type="button"
 					variant="blue"
 					size="small"
-					onClick={openCreatePage}
+					onClick={openCreateModal}
 					className="gap-1.5 rounded-xl"
 				>
 					<Icon name="plus" className="h-4 w-4" />

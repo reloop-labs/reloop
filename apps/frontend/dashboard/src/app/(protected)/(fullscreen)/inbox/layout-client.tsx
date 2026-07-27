@@ -9,13 +9,18 @@ export function InboxLayoutClient({ children }: { children: React.ReactNode }) {
 	const { data: session, isPending } = useSessionQuery();
 	const { isMembershipReady } = useActiveOrganization();
 
-	if (isPending || !session || !isMembershipReady) {
-		return (
-			<div className="flex h-screen flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
-				<DashboardContentSkeleton />
-			</div>
-		);
-	}
+	const loading = isPending || !session || !isMembershipReady;
 
-	return <AgentInboxSectionLayout>{children}</AgentInboxSectionLayout>;
+	return (
+		<AgentInboxSectionLayout>
+			{loading ? (
+				<div className="flex h-screen flex-col overflow-hidden bg-bg-weak-50 dark:bg-black">
+					<DashboardContentSkeleton />
+					<div className="hidden">{children}</div>
+				</div>
+			) : (
+				children
+			)}
+		</AgentInboxSectionLayout>
+	);
 }

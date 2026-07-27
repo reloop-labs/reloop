@@ -1,6 +1,8 @@
 import { pageMetadata } from "#/app/_lib/page-metadata";
 import { InboxLayoutClient } from "./layout-client";
 
+export const instant = false;
+
 export const metadata = pageMetadata(
 	"Inbox · Reloop",
 	"Agent email inbox for conversations and drafts.",

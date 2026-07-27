@@ -18,7 +18,7 @@ function isAuthOrStandalonePath(pathname: string): boolean {
 		path.startsWith("/verify") ||
 		path.startsWith("/invite") ||
 		path.startsWith("/onboarding") ||
-		path.startsWith("/accept-invitation")
+		path.startsWith("/invite")
 	);
 }
 

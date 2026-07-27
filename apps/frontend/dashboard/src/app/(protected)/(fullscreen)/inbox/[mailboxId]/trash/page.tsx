@@ -1,5 +1,12 @@
 import { TrashFolderPage } from "../folder-client";
 
-export default function MailboxTrashRoute() {
+export const instant = false;
+
+export default async function MailboxTrashRoute({
+	params,
+}: {
+	params: Promise<{ mailboxId: string }>;
+}) {
+	await params;
 	return <TrashFolderPage />;
 }

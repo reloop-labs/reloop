@@ -1,5 +1,12 @@
 import { YouFolderPage } from "../folder-client";
 
-export default function MailboxYouRoute() {
+export const instant = false;
+
+export default async function MailboxYouRoute({
+	params,
+}: {
+	params: Promise<{ mailboxId: string }>;
+}) {
+	await params;
 	return <YouFolderPage />;
 }

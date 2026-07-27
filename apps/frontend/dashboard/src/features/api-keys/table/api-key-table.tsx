@@ -7,6 +7,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useCallback, useMemo, useState } from "react";
+import { useNavigate } from "#/lib/navigation";
 import type { ApiKeysListParams } from "../hooks/use-api-keys-query";
 import { useToggleApiKey } from "../hooks/use-toggle-api-key";
 import { DeleteApiKeyModal } from "../modals/delete-api-key-modal";
@@ -42,9 +43,9 @@ export function ApiKeyTable({
 	onRotateSuccess?: (rotatedName: string) => void;
 	onEditSuccess?: (updatedName: string) => void;
 }) {
+	const navigate = useNavigate();
 	const [, setDeleteId] = useQueryState("delete");
 	const [, setRotateId] = useQueryState("rotate");
-	const [, setModal] = useQueryState("modal");
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 	const [editingApiKeyId, setEditingApiKeyId] = useState<string | null>(null);
@@ -134,7 +135,9 @@ export function ApiKeyTable({
 						<TableSkeleton rows={loadingRows} />
 					) : rows.length === 0 ? (
 						<EmptyState
-							onCreateApiKey={() => void setModal("create-api-key")}
+							onCreateApiKey={() =>
+								void navigate({ to: "/api-keys/create" })
+							}
 						/>
 					) : (
 						rows.map((row) => {
