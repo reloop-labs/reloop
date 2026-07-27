@@ -25,7 +25,6 @@ export interface PricingPlan {
 		monthlyEmails: string;
 		dailyLimit: string;
 		overage: string;
-		ratePerSecond: string;
 		// Resources
 		agentInbox: string;
 		webhooks: string;
@@ -37,14 +36,15 @@ export interface PricingPlan {
 		smtpRelay: boolean;
 		scheduledEmails: boolean;
 		emailTemplates: boolean;
+		officialSdks: boolean;
 		// Inbox & AI
 		agentInboxFeature: boolean;
 		inboundEmail: boolean;
 		aiComposer: boolean;
 		humanInbox: boolean;
 		// Deliverability
-		emailValidation: string;
 		emailAuth: boolean;
+		pristineSharedIps: boolean;
 		dedicatedIp: string;
 		spamTesting: boolean;
 		reputationMonitoring: boolean;
@@ -53,7 +53,6 @@ export interface PricingPlan {
 		openClickTracking: boolean;
 		eventLogs: boolean;
 		exportRetention: string;
-		officialSdks: boolean;
 		// Platform
 		hostedReloop: boolean;
 		selfHost: boolean;
@@ -90,7 +89,6 @@ export const pricingPlans: PricingPlan[] = [
 			monthlyEmails: "3,000",
 			dailyLimit: "200",
 			overage: "—",
-			ratePerSecond: "10 / sec",
 			agentInbox: "1 inbox",
 			webhooks: "1 webhook",
 			customDomains: "1 domain",
@@ -104,8 +102,8 @@ export const pricingPlans: PricingPlan[] = [
 			inboundEmail: true,
 			aiComposer: true,
 			humanInbox: true,
-			emailValidation: "100 / mo",
 			emailAuth: true,
+			pristineSharedIps: true,
 			dedicatedIp: "—",
 			spamTesting: true,
 			reputationMonitoring: true,
@@ -147,7 +145,6 @@ export const pricingPlans: PricingPlan[] = [
 			monthlyEmails: "25,000",
 			dailyLimit: "No limit",
 			overage: "$0.80 / 1k",
-			ratePerSecond: "50 / sec",
 			agentInbox: "5 inboxes",
 			webhooks: "5 webhooks",
 			customDomains: "5 domains",
@@ -161,8 +158,8 @@ export const pricingPlans: PricingPlan[] = [
 			inboundEmail: true,
 			aiComposer: true,
 			humanInbox: true,
-			emailValidation: "1,000 / mo",
 			emailAuth: true,
+			pristineSharedIps: true,
 			dedicatedIp: "—",
 			spamTesting: true,
 			reputationMonitoring: true,
@@ -195,9 +192,9 @@ export const pricingPlans: PricingPlan[] = [
 		features: [
 			"50,000 emails / month",
 			"No daily limit",
-			"20 agent inboxes",
-			"20 webhooks",
-			"20 custom domains",
+			"10 agent inboxes",
+			"10 webhooks",
+			"10 custom domains",
 			"5 MB attachments",
 			"Data retention (45 days)",
 			"Dedicated support",
@@ -206,10 +203,9 @@ export const pricingPlans: PricingPlan[] = [
 			monthlyEmails: "50,000",
 			dailyLimit: "No limit",
 			overage: "$0.80 / 1k",
-			ratePerSecond: "100 / sec",
-			agentInbox: "20 inboxes",
-			webhooks: "20 webhooks",
-			customDomains: "20 domains",
+			agentInbox: "10 inboxes",
+			webhooks: "10 webhooks",
+			customDomains: "10 domains",
 			attachmentSize: "5 MB",
 			dataRetention: "45 days",
 			restApi: true,
@@ -220,8 +216,8 @@ export const pricingPlans: PricingPlan[] = [
 			inboundEmail: true,
 			aiComposer: true,
 			humanInbox: true,
-			emailValidation: "5,000 / mo",
 			emailAuth: true,
+			pristineSharedIps: true,
 			dedicatedIp: "—",
 			spamTesting: true,
 			reputationMonitoring: true,
@@ -262,7 +258,6 @@ export const pricingPlans: PricingPlan[] = [
 			monthlyEmails: "Custom",
 			dailyLimit: "No limit",
 			overage: "Custom",
-			ratePerSecond: "Custom",
 			agentInbox: "Custom",
 			webhooks: "Custom",
 			customDomains: "Custom",
@@ -276,8 +271,8 @@ export const pricingPlans: PricingPlan[] = [
 			inboundEmail: true,
 			aiComposer: true,
 			humanInbox: true,
-			emailValidation: "Custom",
 			emailAuth: true,
+			pristineSharedIps: true,
 			dedicatedIp: "Optional / custom",
 			spamTesting: true,
 			reputationMonitoring: true,
@@ -312,7 +307,6 @@ export const comparisonSections: ComparisonSection[] = [
 			{ label: "Monthly emails", key: "monthlyEmails", type: "text" },
 			{ label: "Daily limit", key: "dailyLimit", type: "text" },
 			{ label: "Overage", key: "overage", type: "text" },
-			{ label: "Throughput", key: "ratePerSecond", type: "text" },
 		],
 	},
 	{
@@ -332,6 +326,7 @@ export const comparisonSections: ComparisonSection[] = [
 			{ label: "SMTP relay", key: "smtpRelay", type: "boolean" },
 			{ label: "Scheduled emails", key: "scheduledEmails", type: "boolean" },
 			{ label: "Email templates", key: "emailTemplates", type: "boolean" },
+			{ label: "Official SDKs", key: "officialSdks", type: "boolean" },
 		],
 	},
 	{
@@ -346,8 +341,8 @@ export const comparisonSections: ComparisonSection[] = [
 	{
 		title: "Deliverability",
 		rows: [
-			{ label: "Email validation", key: "emailValidation", type: "text" },
 			{ label: "SPF / DKIM / DMARC", key: "emailAuth", type: "boolean" },
+			{ label: "Pristine shared IPs", key: "pristineSharedIps", type: "boolean" },
 			{ label: "Dedicated IP", key: "dedicatedIp", type: "text" },
 			{ label: "Spam testing", key: "spamTesting", type: "boolean" },
 			{
@@ -368,11 +363,6 @@ export const comparisonSections: ComparisonSection[] = [
 			},
 			{ label: "Event logs", key: "eventLogs", type: "boolean" },
 			{ label: "Export / retention", key: "exportRetention", type: "text" },
-			{
-				label: "Official SDKs & React Email",
-				key: "officialSdks",
-				type: "boolean",
-			},
 		],
 	},
 	{

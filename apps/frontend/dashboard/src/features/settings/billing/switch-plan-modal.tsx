@@ -30,13 +30,7 @@ const NUMERIC_FEATURES: Array<{
 	{ id: "inboxes", key: "agentInbox", suffix: "agent inboxes" },
 	{ id: "webhooks", key: "webhooks", suffix: "webhooks" },
 	{ id: "domains", key: "customDomains", suffix: "custom domains" },
-	{ id: "throughput", key: "ratePerSecond", suffix: "emails / sec throughput" },
 	{ id: "attachments", key: "attachmentSize", suffix: "MB attachments" },
-	{
-		id: "validation",
-		key: "emailValidation",
-		suffix: "email validations / mo",
-	},
 ];
 
 const STATIC_FEATURES: string[] = [];

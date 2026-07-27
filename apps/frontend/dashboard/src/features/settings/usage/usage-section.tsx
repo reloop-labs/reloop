@@ -389,7 +389,7 @@ export function UsageSection() {
 
 			<CategoryCard
 				title="Other Limits"
-				description="Additional plan limits for domains, email verification, and dedicated IPs."
+				description="Additional plan limits for domains and dedicated IPs."
 			>
 				<UsageRow
 					label="Webhooks"
@@ -403,14 +403,6 @@ export function UsageSection() {
 					used={0}
 					total={parseCount(currentPlan.comparison.customDomains)}
 					isUnlimited={currentPlan.comparison.customDomains === "Custom"}
-					isLast={false}
-				/>
-				<UsageRow
-					label="Email validation"
-					used={0}
-					total={parseCount(currentPlan.comparison.emailValidation)}
-					unit="/ mo"
-					isUnlimited={currentPlan.comparison.emailValidation === "Custom"}
 					isLast={false}
 				/>
 				<SpecRow
