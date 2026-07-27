@@ -10,7 +10,6 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import { AuthSessionLoader } from "#/features/auth/auth-session-loader";
 import {
 	useOrganizationsQuery,
 	useUserInvitationsQuery,
@@ -42,6 +41,12 @@ export type ActiveOrganizationValue = {
 	sessionActiveOrganizationId: string | null;
 	hasInitialized: boolean;
 	isPending: boolean;
+	/**
+	 * True when the signed-in user's workspace membership is settled enough for
+	 * page content (org list loaded, active org initialized, not mid orgless redirect).
+	 * False while resolving — layouts should keep chrome mounted and show a content skeleton.
+	 */
+	isMembershipReady: boolean;
 	onOrganizationChange: (organization: Organization) => Promise<void>;
 };
 
@@ -49,7 +54,10 @@ const ActiveOrganizationContext = createContext<ActiveOrganizationValue | null>(
 	null,
 );
 
-function useActiveOrganizationState(): ActiveOrganizationValue {
+function useActiveOrganizationState(): Omit<
+	ActiveOrganizationValue,
+	"isMembershipReady"
+> {
 	const queryClient = useQueryClient();
 	const { data: session, isPending: sessionPending } = useSessionQuery();
 	const userId = session?.user?.id ?? null;
@@ -238,17 +246,21 @@ function useActiveOrganizationState(): ActiveOrganizationValue {
 /**
  * Mount once under the authenticated dashboard layout.
  * All `useActiveOrganization()` consumers share this state (no multi-setActive races).
+ *
+ * Never swaps the tree for a full-screen loader — that caused a flash of dashboard
+ * chrome (sidebar) then full-screen spinner on reload. Layouts keep the shell mounted
+ * and gate page content on `isMembershipReady`.
  */
 export function ActiveOrganizationProvider({
 	children,
 }: {
 	children: ReactNode;
 }) {
-	const value = useActiveOrganizationState();
+	const state = useActiveOrganizationState();
 	const pathname = useAppPathname();
 	const navigation = useAppNavigation();
 	const isOrgless = Boolean(
-		value.user && value.organizations && value.organizations.length === 0,
+		state.user && state.organizations && state.organizations.length === 0,
 	);
 	const shouldCheckInvitations = isOrgless && pathname !== "/onboarding";
 	const {
@@ -259,7 +271,7 @@ export function ActiveOrganizationProvider({
 
 	const orglessDestination = resolveOrglessDestination({
 		pathname,
-		organizations: value.organizations,
+		organizations: state.organizations,
 		invitations,
 		invitationsSettled: invitationsFetched && !invitationsPending,
 	});
@@ -269,14 +281,18 @@ export function ActiveOrganizationProvider({
 		navigation.replace({ to: orglessDestination });
 	}, [navigation, orglessDestination]);
 
-	const isResolvingMembership =
-		Boolean(value.user) &&
-		pathname !== "/onboarding" &&
-		(value.organizations === undefined || isOrgless || !value.hasInitialized);
+	// Mirror the previous full-screen gate, but as a flag for content-only skeletons.
+	const isMembershipReady =
+		pathname === "/onboarding" ||
+		!state.user ||
+		(state.organizations !== undefined &&
+			state.organizations.length > 0 &&
+			state.hasInitialized);
 
-	if (isResolvingMembership) {
-		return createElement(AuthSessionLoader);
-	}
+	const value: ActiveOrganizationValue = {
+		...state,
+		isMembershipReady,
+	};
 
 	return createElement(ActiveOrganizationContext.Provider, { value }, children);
 }
