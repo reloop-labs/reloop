@@ -1,5 +1,7 @@
+import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
+import Spinner from "@reloop/ui/spinner";
 import { AnimatePresence, motion } from "framer-motion";
 import { useHotkeys } from "react-hotkeys-hook";
 import { CopyCodeBlock } from "./copy-code-block";
@@ -11,20 +13,23 @@ export function PostGenerate({
 	choice,
 	onChoiceChange,
 	onDone,
+	finishing = false,
 }: {
 	apiKey: string;
 	choice: IntegrationChoice;
 	onChoiceChange: (choice: IntegrationChoice) => void;
 	onDone: () => void;
+	/** True while preparing session/orgs and navigating to the dashboard. */
+	finishing?: boolean;
 }) {
 	useHotkeys(
 		"mod+enter",
 		(e) => {
 			e.preventDefault();
-			onDone();
+			if (!finishing) onDone();
 		},
 		{ enableOnFormTags: true },
-		[onDone],
+		[onDone, finishing],
 	);
 
 	return (
@@ -60,12 +65,17 @@ export function PostGenerate({
 				<FancyButton.Root
 					variant="blue"
 					size="small"
-					className="min-w-[155px] justify-center overflow-hidden rounded-xl whitespace-nowrap"
+					className={cn(
+						"min-w-[170px] justify-center overflow-hidden rounded-xl whitespace-nowrap transition-all duration-200",
+						finishing && "pointer-events-none opacity-90",
+					)}
 					onClick={onDone}
+					disabled={finishing}
+					aria-busy={finishing}
 				>
 					<AnimatePresence mode="popLayout" initial={false}>
 						<motion.span
-							key="done"
+							key={finishing ? "finishing" : "done"}
 							transition={{
 								type: "spring",
 								duration: 0.25,
@@ -85,8 +95,17 @@ export function PostGenerate({
 							}}
 							className="flex items-center justify-center gap-1.5"
 						>
-							<Icon name="check-circle" className="h-3.5 w-3.5 shrink-0" />
-							<span>Go to Dashboard</span>
+							{finishing ? (
+								<>
+									<Spinner size={14} color="currentColor" />
+									<span>Opening dashboard...</span>
+								</>
+							) : (
+								<>
+									<Icon name="check-circle" className="h-3.5 w-3.5 shrink-0" />
+									<span>Go to Dashboard</span>
+								</>
+							)}
 						</motion.span>
 					</AnimatePresence>
 				</FancyButton.Root>

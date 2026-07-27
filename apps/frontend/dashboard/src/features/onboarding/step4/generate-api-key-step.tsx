@@ -6,6 +6,7 @@ export function GenerateApiKeyStep() {
 	const {
 		apiKey,
 		loading,
+		finishing,
 		choice,
 		setChoice,
 		generateKey,
@@ -28,6 +29,7 @@ export function GenerateApiKeyStep() {
 			apiKey={apiKey}
 			choice={choice}
 			onChoiceChange={setChoice}
+			finishing={finishing}
 			onDone={() => {
 				void finishOnboarding();
 			}}

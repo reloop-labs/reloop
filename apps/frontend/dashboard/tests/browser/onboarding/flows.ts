@@ -108,6 +108,11 @@ export async function completeApiKeyAndGoToDashboard(
 	await expect(goDashboard).toBeVisible();
 	await goDashboard.click({ force: true });
 
+	// Loading state lives inside the CTA while session/org cache warms.
+	await expect(
+		page.getByRole("button", { name: "Opening dashboard..." }),
+	).toBeVisible({ timeout: 10_000 });
+
 	// Client nav from onboarding can race Next instant validation; if we remain
 	// on /onboarding after the click, hard-navigate home (session + org already exist).
 	try {
@@ -116,7 +121,7 @@ export async function completeApiKeyAndGoToDashboard(
 				const path = url.pathname.replace(/\/$/, "") || "/";
 				return path === "/dashboard" && !url.pathname.includes("/onboarding");
 			},
-			{ timeout: 15_000 },
+			{ timeout: 20_000 },
 		);
 	} catch {
 		await page.goto(dashboardURL("/"), { waitUntil: "domcontentloaded" });
