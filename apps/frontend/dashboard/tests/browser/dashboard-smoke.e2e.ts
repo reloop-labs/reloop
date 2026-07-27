@@ -267,8 +267,7 @@ test.describe("production shell", () => {
 		for (const asset of [
 			"/favicon.ico",
 			"/apple-icon.png",
-			"/icon0.svg",
-			"/icon1.png",
+			"/icon.svg",
 			"/web-app-manifest-192x192.png",
 			"/web-app-manifest-512x512.png",
 		]) {

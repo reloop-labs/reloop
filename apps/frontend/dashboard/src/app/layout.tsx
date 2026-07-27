@@ -6,16 +6,32 @@ import { Providers } from "./providers";
 export const instant = false;
 
 export const metadata: Metadata = {
-	title: "Reloop Dashboard",
-	description: "Reloop Dashboard",
+	title: {
+		default: "Reloop Dashboard",
+		template: "%s | Reloop Dashboard",
+	},
+	description:
+		"Manage your email infrastructure, sending domains, API keys, and transactional emails with the Reloop Developer Dashboard.",
 	manifest: "/dashboard/manifest.json",
 	icons: {
 		icon: [
 			{ url: "/dashboard/favicon.ico" },
-			{ url: "/dashboard/icon0.svg", type: "image/svg+xml" },
-			{ url: "/dashboard/icon1.png", type: "image/png" },
+			{ url: "/dashboard/icon.svg", type: "image/svg+xml" },
 		],
 		apple: "/dashboard/apple-icon.png",
+	},
+	openGraph: {
+		title: "Reloop Dashboard",
+		description:
+			"Manage your email infrastructure, sending domains, API keys, and transactional emails with the Reloop Developer Dashboard.",
+		type: "website",
+		siteName: "Reloop",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Reloop Dashboard",
+		description:
+			"Manage your email infrastructure, sending domains, API keys, and transactional emails with the Reloop Developer Dashboard.",
 	},
 };
 
