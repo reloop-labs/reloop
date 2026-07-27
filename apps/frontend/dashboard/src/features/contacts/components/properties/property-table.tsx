@@ -1,5 +1,4 @@
-import { buildAppHref, normalizeAppPathname } from "#/lib/navigation-url";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -89,7 +88,6 @@ const PropertyActionsPopover = ({
 	onOpenChange,
 }: PropertyActionsPopoverProps) => {
 	const router = useRouter();
-	const pathname = usePathname();
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
 	const [copiedKey, setCopiedKey] = useState<"name" | "id" | null>(null);
@@ -162,10 +160,11 @@ const PropertyActionsPopover = ({
 			}
 		} else if (itemId === "filter-contacts") {
 			setPopoverOpen(false);
-			router.push(buildAppHref({ to: "/contacts", search: (prev: Record<string, unknown>) => ({
-					...prev,
-					search: property.propertyName,
-				}) }, { currentPathname: normalizeAppPathname(pathname), currentSearch: typeof window !== "undefined" ? window.location.search : "" }));
+			{
+				const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+				params.set("search", property.propertyName);
+				router.push(`/contacts?${params}`);
+			}
 		} else if (itemId === "delete") {
 			setPopoverOpen(false);
 			onDelete(property);

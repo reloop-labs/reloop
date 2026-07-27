@@ -1,6 +1,6 @@
+import { usePathname } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Logo } from "@reloop/ui/logo";
-import { useRouterPathname } from "#/lib/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useHotkeys } from "react-hotkeys-hook";
 import { AnimatedSidebarToggleIcon } from "./animated-sidebar-toggle-icon";
@@ -10,7 +10,7 @@ import { useSidebarCollapse } from "./use-sidebar-collapse";
 
 export function MainSidebar() {
 	const { isCollapsed, toggle } = useSidebarCollapse();
-	const pathname = useRouterPathname();
+	const pathname = usePathname();
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
 	const isSettings = pathWithoutSlug.startsWith("/settings");
 	const shouldReduceMotion = useReducedMotion();

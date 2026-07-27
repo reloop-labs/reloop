@@ -1,10 +1,10 @@
-import { useRouterState } from "#/lib/navigation";
+import { usePathname } from "next/navigation";
 import { EmailsCommonUseCasesSidebar } from "./common-use-cases-sidebar";
 import { EmailsTabs } from "./components/emails-tabs";
 import { EmailsListHeader } from "./emails-list-header";
 
 export function EmailsShell({ children }: { children: React.ReactNode }) {
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	const pathname = usePathname();
 
 	const isReceivedPage = pathname.includes("/emails/received");
 	const isSentPage =

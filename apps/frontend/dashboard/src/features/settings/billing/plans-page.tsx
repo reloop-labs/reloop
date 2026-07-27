@@ -1,4 +1,3 @@
-import { buildAppHref } from "#/lib/navigation-url";
 import { useRouter } from "next/navigation";
 import {
 	comparisonSections,
@@ -120,7 +119,7 @@ export function PlansPage() {
 					label="Billing"
 					showEscKey={false}
 					onClick={() =>
-						router.push(buildAppHref({ to: "/settings/billing", search: { from: undefined } }))
+						router.push("/settings/billing")
 					}
 				/>
 			</div>

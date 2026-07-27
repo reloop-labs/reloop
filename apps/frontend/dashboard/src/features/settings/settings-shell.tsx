@@ -1,5 +1,5 @@
+import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { useRouterState } from "#/lib/navigation";
 
 /**
  * Most settings pages read best in a narrow column, but a few (e.g. plans
@@ -8,7 +8,7 @@ import { useRouterState } from "#/lib/navigation";
 const FULL_WIDTH_ROUTES = ["/settings/billing/plans"];
 
 export function SettingsShell({ children }: { children: ReactNode }) {
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	const pathname = usePathname();
 	const isFullWidth = FULL_WIDTH_ROUTES.some((route) =>
 		pathname.startsWith(route),
 	);

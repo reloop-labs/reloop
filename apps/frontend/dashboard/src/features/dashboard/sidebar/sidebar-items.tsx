@@ -1,6 +1,7 @@
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Link, useRouterPathname } from "#/lib/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
@@ -18,7 +19,7 @@ export function SidebarItems({
 	const [rect, setRect] = useState<DOMRect | undefined>(undefined);
 	const mainNavRefs = useRef<HTMLAnchorElement[]>([]);
 	const subNavRefs = useRef<Record<string, HTMLAnchorElement[]>>({});
-	const pathname = useRouterPathname();
+	const pathname = usePathname();
 
 	// Router basepath is /dashboard — compare paths without it for active state.
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
@@ -107,12 +108,7 @@ export function SidebarItems({
 									{section}
 								</div>
 							))}
-						<Link
-							to={path}
-							search={
-								path === "/settings" ? { from: pathWithoutSlug } : undefined
-							}
-							ref={(el) => {
+						<Link href={path} ref={(el) => {
 								if (el) mainNavRefs.current[index] = el;
 							}}
 							onPointerEnter={() => setHoveredEl(mainNavRefs.current[index])}
@@ -201,10 +197,7 @@ export function SidebarItems({
 															? pathWithoutSlug === "/settings"
 															: pathWithoutSlug.startsWith(subPath);
 													return (
-														<Link
-															key={subPath}
-															to={subPath}
-															ref={(el) => {
+														<Link href={subPath} key={subPath} ref={(el) => {
 																if (el) {
 																	if (!subNavRefs.current[path]) {
 																		subNavRefs.current[path] = [];

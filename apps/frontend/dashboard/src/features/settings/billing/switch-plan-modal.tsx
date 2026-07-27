@@ -1,4 +1,3 @@
-import { buildAppHref } from "#/lib/navigation-url";
 import { useRouter } from "next/navigation";
 import NumberFlow from "@number-flow/react";
 import {
@@ -96,7 +95,7 @@ export function SwitchPlanModal({
 
 	const goToPlans = () => {
 		onOpenChange(false);
-		router.push(buildAppHref({ to: "/settings/billing/plans", search: { from: undefined } }));
+		router.push("/settings/billing/plans");
 	};
 
 	const handleSwitch = () => {

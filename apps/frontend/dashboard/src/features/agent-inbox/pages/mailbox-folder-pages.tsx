@@ -1,7 +1,5 @@
-import { buildAppHref } from "#/lib/navigation-url";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
-import { useParams } from "#/lib/navigation";
 
 import { FileText, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -193,7 +191,7 @@ export function NeedsApprovalFolderPage() {
 }
 
 export function LabelFolderPage() {
-	const { labelId } = useParams({ strict: false }) as { labelId?: string };
+	const { labelId } = useParams() as { labelId?: string };
 	const { mailbox, mailboxId } = useFolderMailbox();
 	const { threads } = useAgentInbox();
 	const { threadIds } = useLabelThreadIds(labelId ?? "");
@@ -254,14 +252,15 @@ export function DraftsFolderPage() {
 		if (!mailboxId) return;
 		const compose = draftComposeParam(d.kind);
 		if (compose && d.threadId) {
-			router.push(buildAppHref({ to: "/inbox/$mailboxId", params: { mailboxId }, search: {
-					threadId: d.threadId,
-					draftId: d.id,
-					compose,
-				} as never }));
+			const qs = new URLSearchParams({
+				threadId: d.threadId,
+				draftId: d.id,
+				compose,
+			});
+			router.push(`/inbox/${mailboxId}?${qs}`);
 			return;
 		}
-		router.push(buildAppHref({ to: "/inbox/$mailboxId", params: { mailboxId }, search: { draftId: d.id } as never }));
+		router.push(`/inbox/${mailboxId}?draftId=${encodeURIComponent(d.id)}`);
 		openCompose();
 	};
 

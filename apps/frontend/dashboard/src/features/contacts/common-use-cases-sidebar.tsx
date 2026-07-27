@@ -1,10 +1,10 @@
+import { usePathname } from "next/navigation";
 import { ChannelsApiDetails } from "#/components/api-details/channels";
 import { ContactsApiDetails } from "#/components/api-details/contacts";
 import { GroupsApiDetails } from "#/components/api-details/groups";
 import { PropertiesApiDetails } from "#/components/api-details/properties";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { useRouterState } from "#/lib/navigation";
 import { siGo, siNodedotjs, siPhp, siPython } from "simple-icons";
 
 const cardClassName = cn(
@@ -23,7 +23,7 @@ const sdkLanguages = [
 ] as const;
 
 export function ContactsCommonUseCasesSidebar() {
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	const pathname = usePathname();
 
 	const isPropertiesPage = pathname.includes("/contacts/properties");
 	const isChannelsPage = pathname.includes("/contacts/channels");

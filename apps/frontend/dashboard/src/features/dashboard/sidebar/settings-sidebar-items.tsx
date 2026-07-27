@@ -1,6 +1,7 @@
+import { usePathname, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Link, useAppSearch, useRouterPathname } from "#/lib/navigation";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { settingsNavigation } from "../navigation";
@@ -19,8 +20,9 @@ export function SettingsSidebarItems({
 	const backNavRef = useRef<HTMLAnchorElement>(null);
 	const itemRefs = useRef<HTMLAnchorElement[]>([]);
 
-	const pathname = useRouterPathname();
-	const search = useAppSearch();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+	const search = Object.fromEntries(searchParams.entries());
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
 
 	// `from` is preserved when opening settings from the main app.
@@ -66,10 +68,7 @@ export function SettingsSidebarItems({
 			onPointerLeave={() => setHoveredEl(undefined)}
 		>
 			{/* Back to app */}
-			<Link
-				to={backHref}
-				ref={backNavRef}
-				onPointerEnter={() => setHoveredEl(backNavRef.current ?? undefined)}
+			<Link href={backHref} ref={backNavRef} onPointerEnter={() => setHoveredEl(backNavRef.current ?? undefined)}
 				className={cn(
 					"group relative z-10 mb-4 flex h-8 items-center rounded-lg transition-all",
 					isCollapsed
@@ -121,11 +120,7 @@ export function SettingsSidebarItems({
 								: pathWithoutSlug.startsWith(item.path);
 
 						return (
-							<Link
-								key={item.path}
-								to={item.path}
-								search={fromParam ? { from: fromParam } : undefined}
-								ref={(el) => {
+							<Link href={item.path} key={item.path} ref={(el) => {
 									if (el) itemRefs.current[currentIdx] = el;
 								}}
 								onPointerEnter={() =>

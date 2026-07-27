@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
@@ -5,7 +6,6 @@ import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { Logo } from "@reloop/ui/logo";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { Link } from "#/lib/navigation";
 
 import { Plus } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -61,14 +61,11 @@ const PencilIcon = (props: Omit<React.ComponentProps<typeof Icon>, "name">) => (
 type NavItem = {
 	id: string;
 	label: string;
-	/** Registered TanStack path, e.g. `/inbox/$mailboxId/sent` */
-	to: string;
-	params: { mailboxId: string; labelId?: string };
+	/** App-relative path, e.g. `/inbox/{id}/sent` */
+	href: string;
 	icon: React.ComponentType<{ className?: string }>;
 	showCount?: boolean;
 	external?: boolean;
-	/** Only used when external */
-	href?: string;
 };
 
 const NavLink = ({
@@ -123,7 +120,7 @@ const NavLink = ({
 		</>
 	);
 
-	if (item.external && item.href) {
+	if (item.external) {
 		return (
 			<a
 				ref={refCallback}
@@ -140,13 +137,10 @@ const NavLink = ({
 	}
 
 	return (
-		// Dynamic folder paths — cast until all inbox routes are in the route tree.
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		<Link
+			href={item.href}
 			ref={refCallback}
 			onPointerEnter={onPointerEnter}
-			to={item.to as any}
-			params={item.params as any}
 			className={className}
 			title={collapsed ? item.label : undefined}
 		>
@@ -285,38 +279,33 @@ export const InboxSidebar = ({
 	});
 
 	const mailboxId = mailbox.id;
-	const mailboxParams = { mailboxId };
 
 	const coreItems: NavItem[] = [
 		{
 			id: "inbox",
 			label: "Inbox",
-			to: "/inbox/$mailboxId",
-			params: mailboxParams,
+			href: `/inbox/${mailboxId}`,
 			icon: InboxIcon,
 			showCount: true,
 		},
 		{
 			id: "agent",
 			label: "Agent",
-			to: "/inbox/$mailboxId/agent",
-			params: mailboxParams,
+			href: `/inbox/${mailboxId}/agent`,
 			icon: AgentIcon,
 			showCount: true,
 		},
 		{
 			id: "drafts",
 			label: "Drafts",
-			to: "/inbox/$mailboxId/drafts",
-			params: mailboxParams,
+			href: `/inbox/${mailboxId}/drafts`,
 			icon: DraftIcon,
 			showCount: true,
 		},
 		{
 			id: "sent",
 			label: "Sent",
-			to: "/inbox/$mailboxId/sent",
-			params: mailboxParams,
+			href: `/inbox/${mailboxId}/sent`,
 			icon: SentIcon,
 			showCount: true,
 		},
@@ -326,24 +315,21 @@ export const InboxSidebar = ({
 		{
 			id: "archive",
 			label: "Archive",
-			to: "/inbox/$mailboxId/archive",
-			params: mailboxParams,
+			href: `/inbox/${mailboxId}/archive`,
 			icon: ArchiveIcon,
 			showCount: true,
 		},
 		{
 			id: "spam",
 			label: "Spam",
-			to: "/inbox/$mailboxId/spam",
-			params: mailboxParams,
+			href: `/inbox/${mailboxId}/spam`,
 			icon: AlertIcon,
 			showCount: true,
 		},
 		{
 			id: "trash",
 			label: "Bin",
-			to: "/inbox/$mailboxId/trash",
-			params: mailboxParams,
+			href: `/inbox/${mailboxId}/trash`,
 			icon: TrashIcon,
 			showCount: true,
 		},
@@ -521,11 +507,7 @@ export const InboxSidebar = ({
 											const active = activeLabelId === label.id;
 											const swatch = resolveLabelColor(label.color);
 											return (
-												<Link
-													key={label.id}
-													to="/inbox/$mailboxId/label/$labelId"
-													params={{ mailboxId, labelId: label.id }}
-													ref={(el) => {
+												<Link href={`/inbox/${mailboxId}/label/${label.id}`} key={label.id} ref={(el) => {
 														if (el) navRefs.current[labelKey] = el;
 													}}
 													onPointerEnter={() =>

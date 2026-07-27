@@ -1,4 +1,3 @@
-import { buildAppHref } from "#/lib/navigation-url";
 import { useRouter } from "next/navigation";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
@@ -25,7 +24,7 @@ export function TeamsPage() {
 
 	useEffect(() => {
 		if (!isPending && !canManageTeam) {
-			router.push(buildAppHref({ to: SETTINGS_MEMBER_HOME, search: { from: undefined } }));
+			router.push(SETTINGS_MEMBER_HOME);
 		}
 	}, [canManageTeam, isPending, router]);
 

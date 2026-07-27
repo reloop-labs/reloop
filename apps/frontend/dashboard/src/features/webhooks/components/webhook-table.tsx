@@ -1,4 +1,3 @@
-import { buildAppHref } from "#/lib/navigation-url";
 import { useRouter } from "next/navigation";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { formatRelativeTime } from "#/utils/format-relative-time";
@@ -354,15 +353,15 @@ export const WebhookTable = ({
 		searchQuery.trim() !== "" || statusFilter !== "all";
 
 	const goToDetail = (webhookId: string) => {
-		router.push(buildAppHref({ to: "/webhooks/$webhookId", params: { webhookId } }));
+		router.push(`/webhooks/${webhookId}`);
 	};
 
 	const goToTest = (webhookId: string) => {
-		router.push(buildAppHref({ to: "/webhooks/$webhookId/test", params: { webhookId } }));
+		router.push(`/webhooks/${webhookId}/test`);
 	};
 
 	const goToEdit = (webhookId: string) => {
-		router.push(buildAppHref({ to: "/webhooks/$webhookId/edit", params: { webhookId } }));
+		router.push(`/webhooks/${webhookId}/edit`);
 	};
 
 	const handleCopyUrl = async (url: string) => {

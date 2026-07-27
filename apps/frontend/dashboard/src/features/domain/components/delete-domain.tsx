@@ -1,11 +1,10 @@
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import { useRouterState } from "#/lib/navigation";
 
 import axios from "axios";
 import {
@@ -37,7 +36,7 @@ export function DeleteDomainModal({
 	const holdProgress = useMotionValue(0);
 	const animationRef = useRef<AnimationPlaybackControls | null>(null);
 
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	const pathname = usePathname();
 	const router = useRouter();
 	const invalidate = useInvalidateDomains();
 

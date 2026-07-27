@@ -1,6 +1,6 @@
+import { useParams } from "next/navigation";
 import { useInvalidateContacts } from "#/features/contacts/hooks/use-contacts-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useParams } from "#/lib/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import type { Contact } from "./types";
@@ -23,7 +23,7 @@ export const useAddContactToGroup = (
 	open: boolean,
 	onOpenChange: (open: boolean) => void,
 ) => {
-	const { groupId } = useParams({ strict: false }) as { groupId?: string };
+	const { groupId } = useParams() as { groupId?: string };
 	const invalidate = useInvalidateContacts();
 
 	const [isSubmitting, setIsSubmitting] = useState(false);

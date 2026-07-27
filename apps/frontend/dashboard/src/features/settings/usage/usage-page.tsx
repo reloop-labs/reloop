@@ -1,5 +1,4 @@
 
-import { buildAppHref } from "#/lib/navigation-url";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { SETTINGS_MEMBER_HOME } from "#/features/dashboard/navigation";
@@ -16,7 +15,7 @@ export function UsagePage() {
 		if (!rolePending && !canManageBilling) {
 			// Members land on settings via "/settings" — send them to profile
 			// instead of rendering an empty usage page.
-			router.push(buildAppHref({ to: SETTINGS_MEMBER_HOME, search: { from: undefined } }));
+			router.push(SETTINGS_MEMBER_HOME);
 		}
 	}, [canManageBilling, rolePending, router]);
 

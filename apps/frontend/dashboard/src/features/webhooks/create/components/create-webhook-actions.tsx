@@ -1,7 +1,7 @@
+import Link from "next/link";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import { Link } from "#/lib/navigation";
 
 import type { useCreateWebhookForm } from "./use-create-webhook-form";
 
@@ -47,7 +47,7 @@ export function CreateWebhookActions({ isLoading }: CreateWebhookActionsProps) {
 				asChild
 				disabled={isLoading}
 			>
-				<Link to="/webhooks">Cancel</Link>
+				<Link href="/webhooks">Cancel</Link>
 			</Button.Root>
 		</div>
 	);

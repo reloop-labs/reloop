@@ -1,4 +1,4 @@
-import { buildAppHref } from "#/lib/navigation-url";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
@@ -7,7 +7,6 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
-import { Link } from "#/lib/navigation";
 
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
@@ -44,7 +43,7 @@ export function AddDomainPage() {
 	const watchedDomain = watch("domain");
 
 	const goToSetup = (domainId: string) => {
-		router.push(buildAppHref({ to: "/domain/add/$domainId", params: { domainId } }));
+		router.push(`/domain/add/${domainId}`);
 	};
 
 	const onSubmit = async ({
@@ -248,7 +247,7 @@ export function AddDomainPage() {
 							disabled={status === "loading"}
 							className="rounded-xl"
 						>
-							<Link to="/domain">
+							<Link href="/domain">
 								Cancel
 								<span className="flex h-[19px] w-7 items-center justify-center rounded-[5px] border border-stroke-soft-100 bg-bg-weak-50/50 p-px font-medium text-[10px]">
 									Esc

@@ -1,10 +1,10 @@
+import Link from "next/link";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { ArrowRight } from "lucide-react";
-import { Link } from "#/lib/navigation";
 import { useEffect, useState } from "react";
 
 interface Workflow {
@@ -59,10 +59,7 @@ export function WorkflowsCard() {
 	return (
 		<div className="group flex w-full flex-col">
 			{/* Header */}
-			<Link
-				to={"/workflows" as any}
-				className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-3 pb-5 dark:border-white/5 dark:bg-white/[0.02]"
-			>
+			<Link href="/workflows" className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-3 pb-5 dark:border-white/5 dark:bg-white/[0.02]">
 				<span className="flex items-center gap-2 font-medium text-sm text-text-sub-600 dark:text-white/60">
 					<Icon name="workflow" className="h-4 w-4 shrink-0" />
 					Workflows
@@ -139,7 +136,7 @@ export function WorkflowsCard() {
 						asChild
 						className="mt-6 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 					>
-						<Link to={"/workflows" as any}>Start building</Link>
+						<Link href="/workflows">Start building</Link>
 					</Button.Root>
 				</div>
 			)}

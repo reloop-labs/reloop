@@ -931,7 +931,6 @@ export function TestPanel({ onClose }: PanelProps) {
 	);
 }
 
-
 /* ------------------------------------------------------------------ */
 /* AI Generator Panel — agentic chat harness (see ./ai/ai-panel.tsx)  */
 /* ------------------------------------------------------------------ */

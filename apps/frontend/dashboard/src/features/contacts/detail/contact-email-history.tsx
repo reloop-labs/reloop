@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { queryKeys } from "#/lib/query-keys";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
@@ -5,7 +6,6 @@ import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Link } from "#/lib/navigation";
 import { useMemo } from "react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -524,15 +524,11 @@ function EmailActivityRow({
 				<div className="flex items-start justify-between gap-4">
 					<div className="min-w-0 flex-1">
 						{/* Link style matches Groups/Channels on this page */}
-						<Link
-							to="/emails/$emailId"
-							params={{ emailId: entry.id }}
-							className={cn(
+						<Link href={`/emails/${entry.id}`} className={cn(
 								"font-medium text-paragraph-sm text-text-strong-950 leading-snug",
 								"underline decoration-stroke-soft-200 decoration-dashed underline-offset-4",
 								"transition-colors hover:text-primary-base hover:decoration-primary-base/40",
-							)}
-						>
+							)}>
 							{title}
 						</Link>
 						<p className="mt-0.5 truncate text-paragraph-xs text-text-sub-600 leading-snug">

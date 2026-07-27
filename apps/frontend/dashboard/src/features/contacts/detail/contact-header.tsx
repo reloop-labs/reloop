@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
@@ -18,7 +19,6 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { Link } from "#/lib/navigation";
 
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -327,12 +327,7 @@ export const ContactHeader = ({
 						) : contact?.groups && contact.groups.length > 0 ? (
 							<div className="flex flex-wrap gap-2">
 								{contact.groups.map((group) => (
-									<Link
-										key={group.id}
-										to="/contacts/groups/$groupId"
-										params={{ groupId: group.id }}
-										className="font-medium text-paragraph-sm text-text-strong-950 underline decoration-dashed underline-offset-2 transition-colors hover:text-primary-base"
-									>
+									<Link href={`/contacts/groups/${group.id}`} key={group.id} className="font-medium text-paragraph-sm text-text-strong-950 underline decoration-dashed underline-offset-2 transition-colors hover:text-primary-base">
 										{group.name}
 									</Link>
 								))}

@@ -1,3 +1,4 @@
+import { useRouter, usePathname } from "next/navigation";
 import { authClient } from "@reloop/auth/client";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -16,7 +17,6 @@ import {
 } from "#/features/auth/organizations-query";
 import { resolveOrglessDestination } from "#/features/auth/orgless-destination";
 import { useSessionQuery } from "#/features/auth/session-query";
-import { useAppNavigation, useAppPathname } from "#/lib/navigation";
 import { queryKeys } from "#/lib/query-keys";
 
 export type Organization = {
@@ -257,8 +257,8 @@ export function ActiveOrganizationProvider({
 	children: ReactNode;
 }) {
 	const state = useActiveOrganizationState();
-	const pathname = useAppPathname();
-	const navigation = useAppNavigation();
+	const pathname = usePathname();
+	const router = useRouter();
 	const isOrgless = Boolean(
 		state.user && state.organizations && state.organizations.length === 0,
 	);
@@ -278,8 +278,8 @@ export function ActiveOrganizationProvider({
 
 	useEffect(() => {
 		if (!orglessDestination) return;
-		navigation.replace({ to: orglessDestination });
-	}, [navigation, orglessDestination]);
+		router.replace(orglessDestination);
+	}, [router, orglessDestination]);
 
 	// Mirror the previous full-screen gate, but as a flag for content-only skeletons.
 	const isMembershipReady =

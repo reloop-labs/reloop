@@ -1,4 +1,3 @@
-import { buildAppHref } from "#/lib/navigation-url";
 import { useRouter } from "next/navigation";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import * as Button from "@reloop/ui/button";
@@ -96,7 +95,7 @@ export const ChannelDropdown = ({
 	};
 
 	const handleViewSubscribers = () => {
-		router.push(buildAppHref({ to: "/contacts", search: { channelId } }));
+		router.push(`/contacts?channelId=${channelId}`);
 		setPopoverOpen(false);
 	};
 

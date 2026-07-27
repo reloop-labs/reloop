@@ -1,4 +1,3 @@
-import { buildAppHref } from "#/lib/navigation-url";
 import { useRouter } from "next/navigation";
 import {
 	useWebhookDetailQuery,
@@ -32,7 +31,7 @@ export function EditWebhookPage({ webhookId }: EditWebhookPageProps) {
 	);
 
 	const goBack = () => {
-		router.push(buildAppHref({ to: "/webhooks/$webhookId", params: { webhookId } }));
+		router.push(`/webhooks/${webhookId}`);
 	};
 
 	if (isPending) {

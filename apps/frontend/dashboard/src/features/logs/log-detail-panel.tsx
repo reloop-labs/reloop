@@ -1,9 +1,9 @@
+import Link from "next/link";
 import * as Badge from "@reloop/ui/badge";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { Link } from "#/lib/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { CopyCodeBlock } from "#/features/onboarding/step4/copy-code-block";
@@ -259,12 +259,7 @@ export function LogDetailPanel({ logId }: LogDetailPanelProps) {
 					)}
 				</div>
 				{log ? (
-					<Link
-						to="/logs/$logId"
-						params={{ logId: log.uuid }}
-						className="shrink-0 rounded-md p-1 text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950"
-						title="View full details"
-					>
+					<Link href={`/logs/${log.uuid}`} className="shrink-0 rounded-md p-1 text-text-soft-400 transition-colors hover:bg-bg-weak-50 hover:text-text-strong-950" title="View full details">
 						<Icon name="arrows-expand-diagonal" className="h-3.5 w-3.5" />
 					</Link>
 				) : (

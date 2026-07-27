@@ -1,6 +1,6 @@
+import Link from "next/link";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Link } from "#/lib/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { useSWR } from "#/features/templates/editor/lib/use-swr-compat";
@@ -95,10 +95,7 @@ export const TemplateName = () => {
 		<div className="flex items-center">
 			<div className="flex items-center gap-1.5">
 				<Icon name="layout" className="size-4 text-text-sub-600" />
-				<Link
-					to="/templates"
-					className="font-medium text-label-sm text-text-sub-600 hover:text-text-strong-950"
-				>
+				<Link href="/templates" className="font-medium text-label-sm text-text-sub-600 hover:text-text-strong-950">
 					Templates
 				</Link>
 			</div>

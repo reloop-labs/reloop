@@ -1,8 +1,8 @@
+import Link from "next/link";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "#/lib/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
@@ -167,11 +167,7 @@ export const GroupTable = ({
 												name="modules"
 												className="h-4 w-4 shrink-0 text-text-sub-600"
 											/>
-											<Link
-												to="/contacts/groups/$groupId"
-												params={{ groupId: group.id }}
-												className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
-											>
+											<Link href={`/contacts/groups/${group.id}`} className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400">
 												{group.name}
 											</Link>
 											{isEditing && (

@@ -1,4 +1,3 @@
-import { buildAppHref } from "#/lib/navigation-url";
 import { useRouter } from "next/navigation";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { TriggerWebhookTester } from "#/features/webhooks/components/trigger-webhook-tester";
@@ -44,7 +43,7 @@ export function WebhookTestPage({ webhookId }: { webhookId: string }) {
 	const displayName = webhook?.name || webhook?.url || "Webhook";
 
 	const goBack = () => {
-		router.push(buildAppHref({ to: "/webhooks/$webhookId", params: { webhookId } }));
+		router.push(`/webhooks/${webhookId}`);
 	};
 
 	return (

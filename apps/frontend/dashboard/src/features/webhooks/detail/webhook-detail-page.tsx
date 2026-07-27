@@ -1,4 +1,3 @@
-import { buildAppHref } from "#/lib/navigation-url";
 import { useRouter } from "next/navigation";
 import { DeleteWebhookModal } from "#/features/webhooks/components/delete-webhook-modal";
 import { useWebhookDetailQuery } from "#/features/webhooks/hooks/use-webhooks-query";
@@ -89,7 +88,7 @@ export function WebhookDetailPage({ webhookId }: { webhookId: string }) {
 						if (data) void setDeleteId(data.id);
 					}}
 					onTriggerTest={() =>
-						router.push(buildAppHref({ to: "/webhooks/$webhookId/test", params: { webhookId } }))
+						router.push(`/webhooks/${webhookId}/test`)
 					}
 				/>
 

@@ -1,6 +1,6 @@
+import { usePathname } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { useRouterState } from "#/lib/navigation";
 
 const cardClassName = cn(
 	"group flex w-full flex-col rounded-2xl border border-stroke-soft-100 bg-bg-white-0 p-4 text-left cursor-pointer",
@@ -11,7 +11,7 @@ const cardClassName = cn(
 );
 
 export function EmailsCommonUseCasesSidebar() {
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	const pathname = usePathname();
 	const isReceived = pathname.includes("/emails/received");
 
 	const useCases = isReceived

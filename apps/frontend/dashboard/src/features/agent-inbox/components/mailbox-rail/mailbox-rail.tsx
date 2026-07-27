@@ -1,7 +1,7 @@
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Link } from "#/lib/navigation";
 
 import { Plus } from "lucide-react";
 import { useMemo } from "react";
@@ -120,7 +120,7 @@ export function MailboxRail({
 			className="flex h-full w-[52px] shrink-0 flex-col items-center overflow-hidden border-r border-stroke-soft-200/60 bg-sidebar pt-3.5 pb-3 dark:border-white/5"
 		>
 			<Link
-				to="/"
+				href="/"
 				title="Back to dashboard"
 				aria-label="Back to dashboard"
 				className="mb-3 flex size-8 shrink-0 items-center justify-center rounded-lg text-mail-muted hover:bg-[var(--inbox-hover)] hover:text-mail-foreground"

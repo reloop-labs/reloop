@@ -51,7 +51,6 @@ const AnimatedHeight = ({
 	);
 };
 
-
 interface SplitLayoutProps {
 	stepIndicator: string;
 	children: React.ReactNode;

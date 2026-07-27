@@ -1,4 +1,3 @@
-import { buildAppHref } from "#/lib/navigation-url";
 import { useRouter } from "next/navigation";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
@@ -116,9 +115,7 @@ export function AutoLoginPage() {
 									variant="neutral"
 									className="h-11 w-full max-w-sm rounded-2xl!"
 									onClick={() =>
-										router.push(buildAppHref({ to: "/login", search: {
-												inviteId: inviteId || undefined,
-											} }))
+										router.push(inviteId ? `/login?inviteId=${encodeURIComponent(inviteId)}` : "/login")
 									}
 								>
 									Back to Login

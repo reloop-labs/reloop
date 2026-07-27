@@ -1,4 +1,3 @@
-import { buildAppHref } from "#/lib/navigation-url";
 import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import * as CommandMenu from "@reloop/ui/command";
@@ -329,7 +328,7 @@ export const InboxCommandPalette = ({
 	const goToFolder = useCallback(
 		(jump: FolderJump) => {
 			if (!mailboxId) return;
-			router.push(buildAppHref({ to: jump.to, params: { mailboxId } }));
+			router.push(jump.to.replace(/\$mailboxId/g, encodeURIComponent(mailboxId)));
 			if (jump.filter) {
 				void setFilterParam(jump.filter);
 			} else if (jump.id !== "needs-approval") {

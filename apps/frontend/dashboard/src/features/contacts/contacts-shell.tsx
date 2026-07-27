@@ -1,8 +1,7 @@
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { useRouterState } from "#/lib/navigation";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
@@ -13,7 +12,7 @@ import { ContactsTabs } from "./components/contacts/contacts-tabs";
 import { ContactsModals } from "./contacts-modals";
 
 export function ContactsShell({ children }: { children: React.ReactNode }) {
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	const pathname = usePathname();
 	const router = useRouter();
 	const [, setModal] = useQueryState("modal");
 	const [deletedItemName, setDeletedItemName] = useState<string | null>(null);

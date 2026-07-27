@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
@@ -12,7 +13,6 @@ import {
 	MoreHorizontal,
 	Plus,
 } from "lucide-react";
-import { Link } from "#/lib/navigation";
 
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -145,10 +145,7 @@ export function AgentInboxCard() {
 		<div className="group flex w-full flex-col">
 			{/* Header */}
 			<div className="flex items-center justify-between rounded-t-2xl border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-5 pt-1.5 pb-3 dark:border-white/5 dark:bg-white/[0.02]">
-				<Link
-					to="/agent-inbox"
-					className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
-				>
+				<Link href="/agent-inbox" className="flex items-center gap-2 font-medium text-sm text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white">
 					<Icon name="inbox" className="h-4 w-4 shrink-0" />
 					<span>Email Inboxes</span>
 					<span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-zinc-100 px-1.5 font-semibold text-[11px] text-text-sub-600 dark:bg-white/10 dark:text-white/40">
@@ -156,16 +153,10 @@ export function AgentInboxCard() {
 					</span>
 				</Link>
 				<div className="flex items-center gap-1.5">
-					<Link
-						to="/agent-inbox" search={{modal: "create-agent-mailbox"}}
-						className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-stroke-soft-100 bg-white text-text-sub-600 transition-colors hover:bg-bg-weak-50/50 hover:text-text-strong-950 dark:border-white/5 dark:bg-white/[0.02] dark:text-white/60"
-					>
+					<Link href={"/agent-inbox"}>
 						<Plus className="h-3.5 w-3.5" />
 					</Link>
-					<Link
-						to="/agent-inbox"
-						className="flex h-7 w-7 shrink-0 items-center justify-center text-text-sub-600 transition-transform hover:translate-x-0.5 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white"
-					>
+					<Link href="/agent-inbox" className="flex h-7 w-7 shrink-0 items-center justify-center text-text-sub-600 transition-transform hover:translate-x-0.5 hover:text-text-strong-950 dark:text-white/60 dark:hover:text-white">
 						<ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
 					</Link>
 				</div>
@@ -185,10 +176,8 @@ export function AgentInboxCard() {
 								className="group/row flex items-center gap-2 border-stroke-soft-100 border-b py-2.5 dark:border-white/5"
 							>
 								{/* Left: status dot + label (only this navigates) */}
-								<Link
-									to={"/inbox/$mailboxId"} params={{ mailboxId: mb.id }}
-									className="flex min-w-0 flex-1 items-center gap-2 no-underline"
-								>
+								<Link href={`/inbox/${mb.id}`}
+									className="flex min-w-0 flex-1 items-center gap-2 no-underline">
 									<span
 										className={cn(
 											"h-1.5 w-1.5 shrink-0 rounded-full",
@@ -285,7 +274,7 @@ export function AgentInboxCard() {
 						asChild
 						className="mt-6 gap-2 rounded-lg border-stroke-soft-100 text-text-sub-600 hover:text-text-strong-950 dark:border-stroke-soft-100/50"
 					>
-						<Link to="/agent-inbox" search={{modal: "create-agent-mailbox"}}>
+						<Link href="/agent-inbox?modal=create-agent-mailbox">
 							Create email inbox
 						</Link>
 					</Button.Root>

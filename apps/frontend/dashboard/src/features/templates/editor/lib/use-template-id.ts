@@ -1,7 +1,7 @@
-import { useParams } from "#/lib/navigation";
+import { useParams } from "next/navigation";
 
 /** Template id from `/templates/$templateId` (and nested editor routes). */
 export function useTemplateId(): string {
-	const params = useParams({ strict: false }) as { templateId?: string };
+	const params = useParams() as { templateId?: string };
 	return params.templateId ?? "";
 }

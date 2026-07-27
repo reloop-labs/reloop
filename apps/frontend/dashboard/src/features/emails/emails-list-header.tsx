@@ -1,11 +1,11 @@
+import { usePathname } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { useRouterState } from "#/lib/navigation";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/emails";
 
 export function EmailsListHeader() {
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
+	const pathname = usePathname();
 	const isReceived = pathname.includes("/emails/received");
 
 	const title = isReceived ? "Email Received" : "Email Sent";

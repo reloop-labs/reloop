@@ -1,10 +1,10 @@
+import Link from "next/link";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as LinkButton from "@reloop/ui/link-button";
 import Spinner from "@reloop/ui/spinner";
-import { Link } from "#/lib/navigation";
 import { useEffect, useState } from "react";
 
 /** Public path for OAuth return (includes app basepath). */
@@ -149,13 +149,9 @@ export function SocialSignup({
 			</p>
 			<p className="pt-3 text-center font-medium text-[13px] text-text-sub-600">
 				Already have an account?{" "}
-				<Link
-					to="/login"
-					search={{ inviteId }}
-					className={LinkButton.linkButtonVariants({
+				<Link href={"/login"} className={LinkButton.linkButtonVariants({
 						variant: "black",
-					}).root({ className: "text-[13px]!" })}
-				>
+					}).root({ className: "text-[13px]!" })}>
 					Login
 				</Link>
 			</p>

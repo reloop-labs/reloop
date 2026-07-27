@@ -1,4 +1,3 @@
-import { buildAppHref } from "#/lib/navigation-url";
 import { useRouter } from "next/navigation";
 import {
 	defaultPlan,
@@ -41,7 +40,7 @@ export function BillingPage() {
 
 	useEffect(() => {
 		if (!rolePending && !canManageBilling) {
-			router.push(buildAppHref({ to: SETTINGS_MEMBER_HOME, search: { from: undefined } }));
+			router.push(SETTINGS_MEMBER_HOME);
 		}
 	}, [canManageBilling, rolePending, router]);
 
@@ -96,7 +95,7 @@ export function BillingPage() {
 				<AnimatedForwardButton
 					label="All plans"
 					onClick={() =>
-						router.push(buildAppHref({ to: "/settings/billing/plans", search: { from: undefined } }))
+						router.push("/settings/billing/plans")
 					}
 				/>
 			</div>
@@ -164,7 +163,7 @@ export function BillingPage() {
 								size="small"
 								className="rounded-full font-medium"
 								onClick={() =>
-									router.push(buildAppHref({ to: "/settings/billing/plans", search: { from: undefined } }))
+									router.push("/settings/billing/plans")
 								}
 							>
 								View all plans

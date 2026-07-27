@@ -1,4 +1,3 @@
-import { buildAppHref } from "#/lib/navigation-url";
 import { useRouter } from "next/navigation";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
@@ -45,7 +44,7 @@ export function useCreateWebhookForm() {
 			changeStatus("idle");
 			const webhookId = response.data?.webhook?.id || response.data?.id;
 			if (webhookId) {
-				router.push(buildAppHref({ to: "/webhooks/$webhookId", params: { webhookId } }));
+				router.push(`/webhooks/${webhookId}`);
 			} else {
 				router.push("/webhooks");
 			}

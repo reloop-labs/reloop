@@ -1,6 +1,6 @@
+import Link from "next/link";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Link } from "#/lib/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
 import { AnimatePresence, motion } from "framer-motion";
 import { formatRelativeTime } from "#/utils/format-relative-time";
@@ -22,11 +22,7 @@ export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 			const isEditing = meta?.editingApiKeyId === apiKey.id;
 			return (
 				<div className="flex min-w-0 items-center gap-2">
-					<Link
-						to="/api-keys/$apiKeyId"
-						params={{ apiKeyId: apiKey.id }}
-						className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
-						onClick={(e) => {
+					<Link href={`/api-keys/${apiKey.id}`} className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400" onClick={(e) => {
 							if (isEditing) e.preventDefault();
 						}}
 					>

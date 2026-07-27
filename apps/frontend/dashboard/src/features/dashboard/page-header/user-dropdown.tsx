@@ -1,10 +1,8 @@
-import { buildAppHref } from "#/lib/navigation-url";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import { useRouterState } from "#/lib/navigation";
 
 import { useTheme } from "next-themes";
 import { useRef, useState } from "react";
@@ -26,8 +24,9 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 	const itemRefs = useRef<(HTMLElement | null)[]>([]);
 	const router = useRouter();
 	const signOut = useSignOut();
-	const pathname = useRouterState({ select: (s) => s.location.pathname });
-	const search = useRouterState({ select: (s) => s.location.search });
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+	const search = Object.fromEntries(searchParams.entries());
 	const pathWithoutSlug = pathname.replace(/^\/dashboard/, "") || "/";
 	const fromParam =
 		typeof (search as { from?: unknown }).from === "string"
@@ -40,7 +39,7 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 	};
 
 	const goToSettings = (path: string) => {
-		router.push(buildAppHref({ to: path, search: { from: getFrom() } }));
+		router.push(`${path}?from=${encodeURIComponent(getFrom())}`);
 		setIsOpen(false);
 	};
 

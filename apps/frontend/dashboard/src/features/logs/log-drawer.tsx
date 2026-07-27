@@ -1,6 +1,6 @@
+import Link from "next/link";
 import * as Drawer from "@reloop/ui/drawer";
 import { Icon } from "@reloop/ui/icon";
-import { Link } from "#/lib/navigation";
 import { LogDetailPanel } from "./log-detail-panel";
 
 export function LogDrawer({
@@ -20,11 +20,7 @@ export function LogDrawer({
 						<Drawer.Title>Log Details</Drawer.Title>
 					</div>
 					{logId && (
-						<Link
-							to="/logs/$logId"
-							params={{ logId }}
-							className="flex items-center gap-1 text-text-sub-600 text-xs hover:text-text-strong-950"
-						>
+						<Link href={`/logs/${logId}`} className="flex items-center gap-1 text-text-sub-600 text-xs hover:text-text-strong-950">
 							<Icon name="arrows-expand-diagonal" className="h-3.5 w-3.5" />
 							View full
 						</Link>

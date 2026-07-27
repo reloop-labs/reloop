@@ -1,6 +1,6 @@
-import { useParams } from "#/lib/navigation";
+import { useParams } from "next/navigation";
 
 export function useMailboxId(): string {
-	const params = useParams({ strict: false }) as { mailboxId?: string };
+	const params = useParams() as { mailboxId?: string };
 	return params.mailboxId ?? "";
 }

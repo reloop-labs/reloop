@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { authClient } from "@reloop/auth/client";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
@@ -12,7 +13,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { useSessionQuery } from "#/features/auth/session-query";
-import { useAppNavigation } from "#/lib/navigation";
 import { queryKeys } from "#/lib/query-keys";
 import {
 	acceptAndActivateInvitation,
@@ -27,7 +27,7 @@ const variants = {
 };
 
 export function InvitePage() {
-	const navigation = useAppNavigation();
+	const router = useRouter();
 	const queryClient = useQueryClient();
 	const [id] = useQueryState("id", parseAsString.withDefault(""));
 	const { data: session, isPending: isSessionPending } = useSessionQuery();
@@ -84,7 +84,7 @@ export function InvitePage() {
 
 	const handleJoin = async () => {
 		if (!session) {
-			navigation.push({ to: "/login", search: { inviteId: id } });
+			router.push(`/login?inviteId=${encodeURIComponent(id)}`);
 			return;
 		}
 
@@ -162,7 +162,7 @@ export function InvitePage() {
 							size="small"
 							className="w-full justify-center overflow-hidden transition-all duration-200"
 							onClick={() =>
-								navigation.push({ to: session ? "/onboarding" : "/login" })
+								router.push(session ? "/onboarding" : "/login")
 							}
 						>
 							{session ? "Create your organization" : "Go to Login"}
@@ -173,7 +173,7 @@ export function InvitePage() {
 								variant="ghost"
 								size="small"
 								className="w-full justify-center"
-								onClick={() => navigation.push({ to: "/" })}
+								onClick={() => router.push("/")}
 							>
 								Go to dashboard
 							</FancyButton.Root>
