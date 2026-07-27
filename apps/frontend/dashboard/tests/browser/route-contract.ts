@@ -14,7 +14,7 @@ export type DashboardRouteContract = {
 };
 
 /**
- * The 59 unique URL patterns from the final TanStack route tree, with index
+ * The 60 unique URL patterns from the final TanStack route tree, with index
  * routes and their parent layouts normalized to one canonical path.
  *
  * Keep this list as the merge-blocking contract until every route has a
@@ -348,6 +348,12 @@ export const dashboardRouteContracts = [
 	{
 		pattern: "/webhooks/$webhookId",
 		samplePath: "/webhooks/route-contract-webhook",
+		authentication: "required",
+		shell: "dashboard",
+	},
+	{
+		pattern: "/webhooks/$webhookId/edit",
+		samplePath: "/webhooks/route-contract-webhook/edit",
 		authentication: "required",
 		shell: "dashboard",
 	},

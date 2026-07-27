@@ -1,6 +1,6 @@
 # Dashboard browser parity tests
 
-`route-contract.ts` is the merge-blocking inventory of the 59 unique URLs in
+`route-contract.ts` is the merge-blocking inventory of the 60 unique URLs in
 the final TanStack route tree. The smoke suite opens every route as an anonymous
 deep link and intercepts every same-origin `/api/**` request with an inert
 response, so the crawl cannot reach or mutate backend data.

@@ -164,15 +164,15 @@ function collectNextPagePatterns(directory = appDirectory) {
 }
 
 test.describe("route contract", () => {
-	test("contains exactly 59 unique canonical route patterns", () => {
+	test("contains exactly 60 unique canonical route patterns", () => {
 		const patterns = dashboardRouteContracts.map((route) => route.pattern);
 		const samplePaths = dashboardRouteContracts.map(
 			(route) => new URL(route.samplePath, "https://contract.invalid").pathname,
 		);
 
-		expect(patterns).toHaveLength(59);
-		expect(new Set(patterns).size).toBe(59);
-		expect(new Set(samplePaths).size).toBe(59);
+		expect(patterns).toHaveLength(60);
+		expect(new Set(patterns).size).toBe(60);
+		expect(new Set(samplePaths).size).toBe(60);
 	});
 
 	test("has one App Router page for every canonical and compatibility route", () => {
