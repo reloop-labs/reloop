@@ -57,7 +57,7 @@
 		"calligraph": "catalog:ui",
 		"date-fns": "4.1.0",
 		"dayjs": "catalog:ui",
-		"dompurify": "3.4.11",
+		"dompurify": "3.4.12",
 		"framer-motion": "catalog:ui",
 		"jotai": "^2.12.5",
 		"lib0": "^0.2.117",
