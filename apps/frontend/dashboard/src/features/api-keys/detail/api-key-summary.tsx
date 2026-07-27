@@ -94,41 +94,6 @@ export function ApiKeySummary({
 
 	return (
 		<div className="mt-8 grid gap-4 lg:grid-cols-2">
-			{/* Key prefix */}
-			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
-				<div className="space-y-3 p-4">
-					<div>
-						<p className="font-medium text-sm text-text-strong-950">
-							Key prefix
-						</p>
-						<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
-							Visible identifier for this key. The full secret is only shown
-							once at creation.
-						</p>
-					</div>
-
-					{isLoading ? (
-						<Skeleton className="h-10 w-full rounded-xl" />
-					) : (
-						<div className="flex items-center gap-2 rounded-xl bg-bg-weak-50 py-2 pr-2 pl-3 dark:bg-bg-weak-50/50">
-							<code className="min-w-0 flex-1 truncate font-medium font-mono text-[13px] text-text-strong-950">
-								{displayPrefix ? `${displayPrefix}…` : "—"}
-							</code>
-							{displayPrefix ? (
-								<div className="flex shrink-0 items-center border-stroke-soft-100 border-l pl-1 dark:border-stroke-soft-100/40">
-									<IconAction
-										label={copiedPrefix ? "Copied" : "Copy prefix"}
-										icon={copiedPrefix ? "check" : "copy"}
-										onClick={() => void handleCopyPrefix()}
-										active={copiedPrefix}
-									/>
-								</div>
-							) : null}
-						</div>
-					)}
-				</div>
-			</div>
-
 			{/* Usage snapshot */}
 			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
 				<div className="space-y-3 p-4">
@@ -162,6 +127,41 @@ export function ApiKeySummary({
 							isLoading={isLoading}
 						/>
 					</div>
+				</div>
+			</div>
+
+			{/* Key prefix */}
+			<div className="overflow-hidden rounded-2xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40 dark:bg-bg-white-0/5">
+				<div className="space-y-3 p-4">
+					<div>
+						<p className="font-medium text-sm text-text-strong-950">
+							Key prefix
+						</p>
+						<p className="mt-0.5 text-[12px] text-text-sub-600 leading-relaxed">
+							Visible identifier for this key. The full secret is only shown
+							once at creation.
+						</p>
+					</div>
+
+					{isLoading ? (
+						<Skeleton className="h-10 w-full rounded-xl" />
+					) : (
+						<div className="flex items-center gap-2 rounded-xl bg-bg-weak-50 py-2 pr-2 pl-3 dark:bg-bg-weak-50/50">
+							<code className="min-w-0 flex-1 truncate font-medium font-mono text-[13px] text-text-strong-950">
+								{displayPrefix ? `${displayPrefix}…` : "—"}
+							</code>
+							{displayPrefix ? (
+								<div className="flex shrink-0 items-center border-stroke-soft-100 border-l pl-1 dark:border-stroke-soft-100/40">
+									<IconAction
+										label={copiedPrefix ? "Copied" : "Copy prefix"}
+										icon={copiedPrefix ? "check" : "copy"}
+										onClick={() => void handleCopyPrefix()}
+										active={copiedPrefix}
+									/>
+								</div>
+							) : null}
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
