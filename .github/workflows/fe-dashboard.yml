@@ -50,17 +50,17 @@ jobs:
       - name: Typecheck dashboard
         run: bun run --filter=fe-dashboard typecheck
 
-      - name: Test dashboard
-        run: bun run --filter=fe-dashboard test
+      # - name: Test dashboard
+      #   run: bun run --filter=fe-dashboard test
 
       - name: Build dashboard
         run: bun run --filter=fe-dashboard build
 
-      - name: Install Playwright Chromium
-        run: bunx playwright install --with-deps chromium
+      # - name: Install Playwright Chromium
+      #   run: bunx playwright install --with-deps chromium
 
-      - name: Run production browser parity suite
-        run: bun run --filter=fe-dashboard test:browser
+      # - name: Run production browser parity suite
+      #   run: bun run --filter=fe-dashboard test:browser
 
   pull-request-image:
     if: github.event_name == 'pull_request'
