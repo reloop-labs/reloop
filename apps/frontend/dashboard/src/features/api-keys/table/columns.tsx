@@ -6,23 +6,37 @@ import { AnimatePresence, motion } from "framer-motion";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import type { ApiKeyData } from "../types";
 
+export type ApiKeyTableMeta = {
+	editingApiKeyId: string | null;
+};
+
 export const apiKeyColumns: ColumnDef<ApiKeyData>[] = [
 	{
 		id: "name",
 		header: () => <span className="text-xs">Name</span>,
-		cell: ({ row }) => {
+		cell: ({ row, table }) => {
 			const apiKey = row.original;
 			const displayName =
 				apiKey.name || apiKey.start || apiKey.prefix || "Unnamed";
+			const meta = table.options.meta as ApiKeyTableMeta | undefined;
+			const isEditing = meta?.editingApiKeyId === apiKey.id;
 			return (
 				<div className="flex min-w-0 items-center gap-2">
 					<Link
 						to="/api-keys/$apiKeyId"
 						params={{ apiKeyId: apiKey.id }}
 						className="truncate font-semibold text-label-sm text-text-strong-950 underline decoration-dotted underline-offset-2 transition-colors hover:text-[#1868DF] dark:hover:text-blue-400"
+						onClick={(e) => {
+							if (isEditing) e.preventDefault();
+						}}
 					>
 						{displayName}
 					</Link>
+					{isEditing && (
+						<span className="rounded-md bg-bg-white-0 px-1.5 py-0.5 font-medium text-[11px] text-text-sub-600 ring-1 ring-stroke-soft-100">
+							Editing
+						</span>
+					)}
 				</div>
 			);
 		},

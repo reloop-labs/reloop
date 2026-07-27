@@ -1,24 +1,24 @@
 import { cn } from "@reloop/ui/cn";
-import { useNavigate } from "#/lib/navigation";
 import {
 	flexRender,
 	getCoreRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
+import { AnimatePresence, motion } from "framer-motion";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useCallback, useMemo, useState } from "react";
 import type { ApiKeysListParams } from "../hooks/use-api-keys-query";
 import { useToggleApiKey } from "../hooks/use-toggle-api-key";
 import { DeleteApiKeyModal } from "../modals/delete-api-key-modal";
-import { EditApiKeyModal } from "../modals/edit-api-key-modal";
 import { RotateApiKeyModal } from "../modals/rotate-api-key-modal";
 import type { ApiKeyData } from "../types";
 import {
 	type ApiKeyActionsHandlers,
 	ApiKeyActionsMenu,
 } from "./api-key-actions-menu";
-import { apiKeyColumns } from "./columns";
+import { type ApiKeyTableMeta, apiKeyColumns } from "./columns";
 import { API_KEY_TABLE_GRID } from "./constants";
+import { EditApiKeyRowPanel } from "./edit-api-key-row-panel";
 import { EmptyState } from "./empty-state";
 import { TableFooter } from "./table-footer";
 import { TableSkeleton } from "./table-skeleton";
@@ -42,13 +42,12 @@ export function ApiKeyTable({
 	onRotateSuccess?: (rotatedName: string) => void;
 	onEditSuccess?: (updatedName: string) => void;
 }) {
-	const navigate = useNavigate();
 	const [, setDeleteId] = useQueryState("delete");
 	const [, setRotateId] = useQueryState("rotate");
-	const [, setEditId] = useQueryState("edit");
 	const [, setModal] = useQueryState("modal");
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
+	const [editingApiKeyId, setEditingApiKeyId] = useState<string | null>(null);
 
 	const { togglingId, toggleEnabled } = useToggleApiKey(listParams);
 
@@ -68,12 +67,9 @@ export function ApiKeyTable({
 		[setDeleteId],
 	);
 
-	const handleEditKey = useCallback(
-		(id: string) => {
-			void setEditId(id);
-		},
-		[setEditId],
-	);
+	const handleEditKey = useCallback((id: string) => {
+		setEditingApiKeyId((prev) => (prev === id ? null : id));
+	}, []);
 
 	const handleOpenChange = useCallback((open: boolean, id: string) => {
 		setActiveDropdownId(open ? id : null);
@@ -105,6 +101,9 @@ export function ApiKeyTable({
 		getRowId: (row) => row.id,
 		manualPagination: true,
 		pageCount: totalPages,
+		meta: {
+			editingApiKeyId,
+		} satisfies ApiKeyTableMeta,
 	});
 
 	const headerGroup = table.getHeaderGroups()[0];
@@ -140,33 +139,62 @@ export function ApiKeyTable({
 					) : (
 						rows.map((row) => {
 							const apiKey = row.original;
-							const isRowActive = activeDropdownId === apiKey.id;
+							const isEditing = editingApiKeyId === apiKey.id;
+							const isRowActive =
+								activeDropdownId === apiKey.id || isEditing;
 							return (
-								<div
-									key={row.id}
-									className={cn(
-										`group/row grid w-full ${API_KEY_TABLE_GRID} items-center px-4 py-2 text-left transition-colors`,
-										isRowActive && "bg-bg-weak-50/50",
-									)}
-								>
-									{row.getVisibleCells().map((cell) => (
-										<div key={cell.id}>
-											{flexRender(
-												cell.column.columnDef.cell,
-												cell.getContext(),
-											)}
-										</div>
-									))}
-									{/* Actions outside column defs so open state never remounts with columns */}
+								<div key={row.id}>
 									<div
-										onClick={(e) => e.stopPropagation()}
-										onKeyDown={(e) => e.stopPropagation()}
+										className={cn(
+											`group/row grid w-full ${API_KEY_TABLE_GRID} items-center px-4 py-2 text-left transition-colors`,
+											isRowActive && "bg-bg-weak-50/50",
+											isEditing && "bg-bg-weak-50/70",
+										)}
 									>
-										<ApiKeyActionsMenu
-											apiKey={apiKey}
-											handlers={actionsHandlers}
-										/>
+										{row.getVisibleCells().map((cell) => (
+											<div key={cell.id}>
+												{flexRender(
+													cell.column.columnDef.cell,
+													cell.getContext(),
+												)}
+											</div>
+										))}
+										{/* Actions outside column defs so open state never remounts with columns */}
+										<div
+											onClick={(e) => e.stopPropagation()}
+											onKeyDown={(e) => e.stopPropagation()}
+										>
+											<ApiKeyActionsMenu
+												apiKey={apiKey}
+												handlers={actionsHandlers}
+											/>
+										</div>
 									</div>
+
+									<AnimatePresence initial={false}>
+										{isEditing ? (
+											<motion.div
+												key={`edit-${apiKey.id}`}
+												initial={{ height: 0, opacity: 0 }}
+												animate={{ height: "auto", opacity: 1 }}
+												exit={{ height: 0, opacity: 0 }}
+												transition={{
+													height: {
+														duration: 0.28,
+														ease: [0.32, 0.72, 0, 1],
+													},
+													opacity: { duration: 0.2, ease: "easeOut" },
+												}}
+												className="overflow-hidden"
+											>
+												<EditApiKeyRowPanel
+													apiKey={apiKey}
+													onClose={() => setEditingApiKeyId(null)}
+													onSuccess={onEditSuccess}
+												/>
+											</motion.div>
+										) : null}
+									</AnimatePresence>
 								</div>
 							);
 						})
@@ -177,7 +205,6 @@ export function ApiKeyTable({
 			</div>
 			<DeleteApiKeyModal apiKeys={apiKeys} onDeleteSuccess={onDeleteSuccess} />
 			<RotateApiKeyModal apiKeys={apiKeys} onRotateSuccess={onRotateSuccess} />
-			<EditApiKeyModal apiKeys={apiKeys} onEditSuccess={onEditSuccess} />
 		</>
 	);
 }

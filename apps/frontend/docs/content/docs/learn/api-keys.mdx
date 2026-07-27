@@ -1,10 +1,25 @@
 ---
 title: API Keys
-description: Create and use Reloop API keys from the dashboard or with code.
+description: Learn how to create, use, edit, rotate, disable, filter, and delete Reloop API keys from the dashboard or API.
 icon: key-new
+faq:
+  - question: Is an API key secret shown again after creation?
+    answer: No. Reloop displays the full secret key only once when created or rotated. After closing the modal, only the prefix is visible in the dashboard or API lists because Reloop stores a secure hash.
+  - question: How do I edit or rename an API key?
+    answer: Click the row menu (···) next to any API key in the dashboard and select Edit to change its label, or use the Update API Key endpoint in code. Renaming does not affect the secret or key functionality.
+  - question: What happens when I rotate an API key?
+    answer: Rotating invalidates the old secret string immediately and issues a new secret string for the same key ID. You must copy the new secret right away and update your applications.
+  - question: What is the difference between disabling and deleting an API key?
+    answer: Disabling pauses access temporarily — requests using the key will fail with 401 Unauthorized, but you can re-enable it later. Deleting permanently revokes the key and cannot be undone.
+  - question: Can I use the same API key for both REST API and SMTP relay?
+    answer: Yes. Reloop API keys work for both REST API requests (as x-api-key header) and SMTP authentication (using the key as password).
+  - question: What should I do if an API key leaks?
+    answer: Disable or delete the key immediately from the dashboard or API. Create a replacement key, update your application secrets, and delete the compromised key.
 ---
 
-API keys connect your apps to Reloop. You can create and manage them in the **dashboard** or with **code** — both do the same job.
+API keys connect your applications to Reloop. You can create, inspect, edit, rotate, disable, and delete them in the **dashboard** or with **code** — both provide full control over your organization's credentials.
+
+Open the UI any time: [API Keys](https://reloop.sh/dashboard/api-keys)
 
 ![API Keys list in the Reloop dashboard](/docs/images/docs/api-keys/list.png)
 
@@ -13,31 +28,27 @@ API keys connect your apps to Reloop. You can create and manage them in the **da
 | Task | Dashboard | Code |
 |------|-----------|------|
 | **Create** | Click **Create API key** | `reloop.apiKey.create` / cURL |
-| **Use** | Copy secret into your app | Send key on every request |
-| **Manage** | Row menu (rotate, disable, delete) | Same actions via API |
-
-Create with either platform. Use the secret in your app. Manage with either platform.
-
-Open the UI any time: [API Keys](https://reloop.sh/dashboard/api-keys)
+| **Edit / Rename** | Row menu → **Edit** | `reloop.apiKey.update` / cURL |
+| **Rotate** | Row menu → **Rotate Key** | `reloop.apiKey.rotate` / cURL |
+| **Disable / Enable** | Row menu → **Disable** / **Enable** | `reloop.apiKey.disable` / cURL |
+| **Delete** | Row menu → **Delete API Key** | `reloop.apiKey.delete` / cURL |
 
 ---
 
-## Create
+## How do I create an API key?
 
 <Tabs>
-  <Tab title="Dashboard">
-    ![Create API Key modal](/docs/images/docs/api-keys/create-form.png)
+  <Tab title="Desktop" icon="monitor">
+    ![Create an API key in the Reloop dashboard](/docs/images/docs/api-keys/create-api-key.gif)
 
     1. Go to [API Keys](https://reloop.sh/dashboard/api-keys)
-    2. **Create API key**
-    3. Enter a name (e.g. `Production Server`)
-    4. **Create API Key**
-    5. Copy the secret (or the **.env** tab), then **Done**
-
-    ![API Key created — copy once](/docs/images/docs/api-keys/create-success.png)
+    2. Click **Create API key** (or press `⌘/Ctrl+A`)
+    3. Enter a descriptive name (e.g., `Production Server` or `Staging Worker`)
+    4. Click **Create API Key**
+    5. Copy the secret key (or switch to the **.env** tab for a ready-to-paste snippet), then click **Done**
   </Tab>
-  <Tab title="Code">
-    Use any existing key to create another.
+  <Tab title="Code" icon="code">
+    Use an existing API key to programmatically create new keys for services or team members.
 
     ```javascript
     import { Reloop } from "reloop-email";
@@ -49,7 +60,7 @@ Open the UI any time: [API Keys](https://reloop.sh/dashboard/api-keys)
     });
     if (apiKeyError) throw apiKeyError;
 
-    console.log(apiKey.key); // only returned here
+    console.log(apiKey.key); // secret string returned ONCE here
     ```
 
     ```bash
@@ -62,24 +73,24 @@ Open the UI any time: [API Keys](https://reloop.sh/dashboard/api-keys)
 </Tabs>
 
 <Warning>
-Copy the secret immediately. After create (and rotate), it is never shown again.
+Copy the secret key immediately upon creation. Reloop stores a secure hash, so the full secret can never be retrieved again after closing the dialog.
 </Warning>
 
 ---
 
-## Use
+## How do I use an API key?
 
-Store the secret, then send it on every request as `x-api-key`.
+Store the secret key in your environment variables or secret manager, then pass it on every HTTP request as the `x-api-key` header, or initialize the Reloop SDK.
 
 <Tabs>
-  <Tab title="Dashboard → your app">
-    After create, copy from the success modal (**API Key** or **.env**):
+  <Tab title="Desktop" icon="monitor">
+    After creating a key, copy the formatted snippet from the success modal:
 
-    ![Store the key as RELOOP_API_KEY](/docs/images/docs/api-keys/use-env.png)
+    ![Store the key as RELLOOP_API_KEY](/docs/images/docs/api-keys/use-env.png)
 
-    Put it in your environment, then call Reloop from your code (next tab).
+    Add it to your environment file (`.env` or secret store) and reference it in your server code.
   </Tab>
-  <Tab title="Code">
+  <Tab title="Code" icon="code">
     ```env
     RELOOP_API_KEY=rl_prod_YOUR_API_KEY
     ```
@@ -99,48 +110,139 @@ Store the secret, then send it on every request as `x-api-key`.
 
 ---
 
-## Manage
+## How do I edit or rename an API key?
 
-Disable, rotate, rename, or delete — dashboard row menu or API.
-
-![API key row actions](/docs/images/docs/api-keys/actions.png)
-
-| Action | What happens |
-|--------|----------------|
-| **Disable / Enable** | Pause or restore access |
-| **Rotate Key** | New secret, same key — copy once, update apps |
-| **Delete API Key** | Gone for good (type the name to confirm) |
-| **Edit** | Rename only |
+Rename API keys to reflect changing usage, new microservices, or owner changes without invalidating the secret or interrupting service.
 
 <Tabs>
-  <Tab title="Dashboard">
-    1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
-    2. Row **···** menu (or open the key)
-    3. Choose **Disable**, **Rotate Key**, **Delete API Key**, or **Edit**
-    4. On rotate: copy the new secret and update every place that used the old one
+  <Tab title="Desktop" icon="monitor">
+    1. Go to [API Keys](https://reloop.sh/dashboard/api-keys)
+    2. Click the row menu (**···**) next to the key you want to rename
+    3. Select **Edit**
+    4. Update the key name and save changes
   </Tab>
-  <Tab title="Code">
+  <Tab title="Code" icon="code">
     ```javascript
     import { Reloop } from "reloop-email";
 
     const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
-    const id = "key_123456789";
+    const keyId = "key_123456789";
 
-    await reloop.apiKey.update(id, { name: "CI Pipeline" });
-    await reloop.apiKey.disable(id);
-    await reloop.apiKey.enable(id);
-
-    const { apiKey } = await reloop.apiKey.rotate(id); // apiKey.key once
-    await reloop.apiKey.delete(id);
+    const { apiKey } = await reloop.apiKey.update(keyId, {
+      name: "Updated Background Worker",
+    });
     ```
 
     ```bash
+    curl -X PATCH https://reloop.sh/api/api-key/v1/key_123456789 \
+      -H "x-api-key: $RELOOP_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{"name": "Updated Background Worker"}'
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## How do I rotate an API key?
+
+Key rotation revokes the active secret string immediately and generates a fresh secret string for the exact same key record. Use rotation for scheduled security maintenance or routine credential updates.
+
+![API key row actions menu](/docs/images/docs/api-keys/actions.png)
+
+| Step | Action |
+|------|--------|
+| **1. Trigger Rotation** | Select **Rotate Key** from the row menu (or API) |
+| **2. Copy New Secret** | Immediately copy the new secret string from the modal |
+| **3. Update Applications** | Update your server `.env` files or secret manager |
+
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
+    2. Click the row menu (**···**) → **Rotate Key**
+    3. Confirm rotation — the previous secret stops working immediately
+    4. Copy the new secret string and deploy it to your servers
+  </Tab>
+  <Tab title="Code" icon="code">
+    ```javascript
+    import { Reloop } from "reloop-email";
+
+    const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
+    const keyId = "key_123456789";
+
+    const { apiKey } = await reloop.apiKey.rotate(keyId);
+    console.log(apiKey.key); // new secret string returned ONCE
+    ```
+
+    ```bash
+    curl -X POST https://reloop.sh/api/api-key/v1/rotate/key_123456789 \
+      -H "x-api-key: $RELOOP_API_KEY"
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## How do I disable or enable an API key?
+
+Disable a key to temporarily block API and SMTP requests without deleting the key record. Re-enable it whenever you are ready to restore access.
+
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
+    2. Click the row menu (**···**) → **Disable** (or **Enable** if already paused)
+    3. The key status updates instantly to **Disabled**
+  </Tab>
+  <Tab title="Code" icon="code">
+    ```javascript
+    import { Reloop } from "reloop-email";
+
+    const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
+    const keyId = "key_123456789";
+
+    // Pause access
+    await reloop.apiKey.disable(keyId);
+
+    // Restore access
+    await reloop.apiKey.enable(keyId);
+    ```
+
+    ```bash
+    # Disable
     curl -X POST https://reloop.sh/api/api-key/v1/disable/key_123456789 \
       -H "x-api-key: $RELOOP_API_KEY"
 
-    curl -X POST https://reloop.sh/api/api-key/v1/rotate/key_123456789 \
+    # Enable
+    curl -X POST https://reloop.sh/api/api-key/v1/enable/key_123456789 \
       -H "x-api-key: $RELOOP_API_KEY"
+    ```
+  </Tab>
+</Tabs>
 
+---
+
+## How do I delete an API key?
+
+Deleting an API key permanently revokes authentication. Any application using the deleted key will fail with a `401 Unauthorized` response.
+
+<Tabs>
+  <Tab title="Desktop" icon="monitor">
+    1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
+    2. Click the row menu (**···**) → **Delete API Key**
+    3. Enter the key name to confirm permanent removal
+    4. Click **Delete API Key**
+  </Tab>
+  <Tab title="Code" icon="code">
+    ```javascript
+    import { Reloop } from "reloop-email";
+
+    const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
+    const keyId = "key_123456789";
+
+    await reloop.apiKey.delete(keyId);
+    ```
+
+    ```bash
     curl -X DELETE https://reloop.sh/api/api-key/v1/key_123456789 \
       -H "x-api-key: $RELOOP_API_KEY"
     ```
@@ -149,68 +251,102 @@ Disable, rotate, rename, or delete — dashboard row menu or API.
 
 ---
 
-## List
+## How do I search, filter, and audit API keys?
 
-See every key for your org — secret never included.
+The API Keys table provides real-time audit visibility for all organization credentials.
 
 ![API Keys table](/docs/images/docs/api-keys/list.png)
 
-<Tabs>
-  <Tab title="Dashboard">
-    [API Keys](https://reloop.sh/dashboard/api-keys) shows name, prefix, last used, status.
-  </Tab>
-  <Tab title="Code">
-    ```javascript
-    const reloop = new Reloop({ apiKey: process.env.RELOOP_API_KEY });
-
-    await reloop.apiKey.list({ page: 1, limit: 10 });
-    await reloop.apiKey.get("key_123456789");
-    ```
-  </Tab>
-</Tabs>
+- **Search by prefix or name**: Quickly find keys using the search bar (e.g. `rl_prod_` or `Production`).
+- **Filter by Status**: Filter by **All Status**, **Active**, or **Disabled** to identify inactive or paused keys.
+- **Filter by Creator**: Filter by **All Users** or specific team members to inspect who created each key.
+- **Audit Activity**: Check the **Last Used** column to track recent API or SMTP activity per key.
 
 ---
 
-## Security
+## Security & Best Practices
 
-### Store
+### Key Hygiene
 
 | Do | Don’t |
 |----|--------|
-| `RELOOP_API_KEY` in env / secrets | Commit keys to git |
-| One key per app | Share one key everywhere |
-| Clear names (`Production`, `CI`) | Leave keys unnamed |
+| Store `RELOOP_API_KEY` in environment variables | Hardcode API key secrets in source code |
+| Create unique keys for each application/environment | Reuse one API key across staging and production |
+| Use descriptive names (`Prod-Mailer`, `CI-Tester`) | Use ambiguous names (`Key 1`, `Test`) |
+| Periodically rotate long-lived secrets | Keep unrotated production keys indefinitely |
 
-### If a key leaks
+### Leaked Key Incident Response
 
-1. **Disable** it (dashboard or code) — access stops now
-2. **Rotate** or **create** a replacement
-3. Update apps with the new secret
-4. **Delete** the old key when nothing uses it
+If a secret key is exposed in a public repository or client log:
 
-### Remember
+1. **Disable the key immediately** from the dashboard or API to halt unauthorized requests.
+2. **Create a new replacement key** (or rotate the secret).
+3. **Update your production applications** with the new secret key.
+4. **Delete the leaked key** once confirmed no legitimate traffic is using it.
 
-- Secret is shown **once** (create / rotate)
-- Later you only see a **prefix** in the list
-- Reloop stores a hash, not the full key
+---
+
+## FAQ
+
+### Can I view a full API key secret again after closing the modal?
+
+No. Reloop displays the full secret key string only once when created or rotated. After closing the modal, only the prefix (e.g. `rl_prod_17aQUCC-e`) is visible. Reloop stores a secure hash, so if a secret is lost, you must [rotate](#how-do-i-rotate-an-api-key) the key or create a new one.
+
+### What is the difference between disabling and deleting an API key?
+
+**Disabling** pauses access temporarily — requests using the key fail with `401 Unauthorized`, but you can re-enable it later. **Deleting** permanently removes the key record and cannot be undone.
+
+### Can I use the same API key for both REST API and SMTP relay?
+
+Yes. Reloop API keys work across both REST API endpoints (as the `x-api-key` header) and SMTP authentication (using the API key prefix/secret as SMTP credentials).
+
+### How many API keys can an organization create?
+
+Reloop does not enforce a hard limit on total API keys per organization. However, we recommend maintaining clean key hygiene by deleting stale or unused keys.
+
+---
+
+## Related
+
+<CardGroup cols={3}>
+  <Card icon="terminal" title="SDKs" href="/docs/developers">
+    Official Reloop SDK libraries for TypeScript, Python, Go, and more.
+  </Card>
+  <Card icon="smtp" title="SMTP Relay" href="/docs/learn/emails">
+    Use API keys for SMTP email sending.
+  </Card>
+  <Card icon="shield" title="Usage Limits" href="/docs/api/usage-limits">
+    API rate limits and request quotas per organization.
+  </Card>
+</CardGroup>
 
 ---
 
 ## API reference
 
 <CardGroup cols={2}>
-  <Card icon="plus" title="Create" href="/api/api-key/post-api-api-key-v1">
-    Secret once.
+  <Card icon="plus" title="Create API Key" href="/api/api-key/post-api-api-key-v1">
+    Generate new API key and secret.
   </Card>
-  <Card icon="list" title="List" href="/api/api-key/get-api-api-key-v1">
-    All keys.
+  <Card icon="list" title="List API Keys" href="/api/api-key/get-api-api-key-v1">
+    Paginated list of organization keys.
   </Card>
-  <Card icon="refresh" title="Rotate" href="/api/api-key/post-api-api-key-v1rotate-by-api_key_id">
-    New secret.
+  <Card icon="pen" title="Update API Key" href="/api/api-key/patch-api-api-key-v1by-api_key_id">
+    Rename existing API key.
   </Card>
-  <Card icon="trash" title="Delete" href="/api/api-key/delete-api-api-key-v1by-api_key_id">
-    Remove key.
+  <Card icon="refresh" title="Rotate API Key" href="/api/api-key/post-api-api-key-v1rotate-by-api_key_id">
+    Issue new secret, revoke old.
+  </Card>
+  <Card icon="pause" title="Disable API Key" href="/api/api-key/post-api-api-key-v1disable-by-api_key_id">
+    Pause access temporarily.
+  </Card>
+  <Card icon="play" title="Enable API Key" href="/api/api-key/post-api-api-key-v1enable-by-api_key_id">
+    Restore paused access.
+  </Card>
+  <Card icon="trash" title="Delete API Key" href="/api/api-key/delete-api-api-key-v1by-api_key_id">
+    Permanently delete key.
   </Card>
 </CardGroup>
 
-[Full API Key endpoints](/docs/api/api-key)
+[Full API Key Endpoints Reference](/docs/api/api-key)
+
