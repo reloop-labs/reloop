@@ -23,7 +23,7 @@
 		"@base-ui/react": "1.1.0",
 		"@codemirror/lang-html": "^6.4.11",
 		"@codemirror/view": "^6.43.6",
-		"@dicebear/core": "9.2.2",
+		"@dicebear/core": "9.4.1",
 		"@dicebear/shapes": "9.2.2",
 		"@hookform/resolvers": "catalog:ui",
 		"@number-flow/react": "catalog:ui",
