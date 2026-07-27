@@ -84,11 +84,11 @@ Store the secret key in your environment variables or secret manager, then pass 
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
-    After creating a key, copy the formatted snippet from the success modal:
+    Inspect key details, prefix, request count, status, and request activity logs:
 
-    ![Store the key as RELLOOP_API_KEY](/docs/images/docs/api-keys/use-env.png)
+    ![API key details and usage in the Reloop dashboard](/docs/images/docs/api-keys/key-details.png)
 
-    Add it to your environment file (`.env` or secret store) and reference it in your server code.
+    Store your secret in your environment file (`.env` or secret manager) and reference it in your application code.
   </Tab>
   <Tab title="Code" icon="code">
     ```env
@@ -116,6 +116,8 @@ Rename API keys to reflect changing usage, new microservices, or owner changes w
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
+    ![Edit an API key in the Reloop dashboard](/docs/images/docs/api-keys/edit-api-key.gif)
+
     1. Go to [API Keys](https://reloop.sh/dashboard/api-keys)
     2. Click the row menu (**···**) next to the key you want to rename
     3. Select **Edit**
@@ -148,8 +150,6 @@ Rename API keys to reflect changing usage, new microservices, or owner changes w
 
 Key rotation revokes the active secret string immediately and generates a fresh secret string for the exact same key record. Use rotation for scheduled security maintenance or routine credential updates.
 
-![API key row actions menu](/docs/images/docs/api-keys/actions.png)
-
 | Step | Action |
 |------|--------|
 | **1. Trigger Rotation** | Select **Rotate Key** from the row menu (or API) |
@@ -158,6 +158,8 @@ Key rotation revokes the active secret string immediately and generates a fresh 
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
+    ![Rotate an API key in the Reloop dashboard](/docs/images/docs/api-keys/rotate-api-key.gif)
+
     1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
     2. Click the row menu (**···**) → **Rotate Key**
     3. Confirm rotation — the previous secret stops working immediately
@@ -189,6 +191,8 @@ Disable a key to temporarily block API and SMTP requests without deleting the ke
 
 <Tabs>
   <Tab title="Desktop" icon="monitor">
+    ![Disable or enable an API key in the Reloop dashboard](/docs/images/docs/api-keys/disable-api-key.gif)
+
     1. Open [API Keys](https://reloop.sh/dashboard/api-keys)
     2. Click the row menu (**···**) → **Disable** (or **Enable** if already paused)
     3. The key status updates instantly to **Disabled**
