@@ -145,5 +145,22 @@ bun run check:migration  # lint and format-check the Next migration surface
 bun run typecheck
 bun run test
 bun run build
-bun run test:browser     # production standalone route/parity suite
+bun run test:browser              # all Playwright browser suites
+bun run test:browser:auth         # login / signup / session
+bun run test:browser:onboarding   # workspace → skip domain → API key → home
+bun run test:browser:ui
 ```
+
+## Browser E2E (Playwright)
+
+Real flows against the local stack (`https://local.reloop.sh`). Requires Caddy, `be:auth:dev` (with `DEFAULT_OTP=888888`), this app's dev server, and **api-key** for onboarding step 4.
+
+```bash
+bunx playwright install chromium   # once
+bun run test:browser:auth
+bun run test:browser:onboarding
+```
+
+**Routing rules under test:** new accounts without an org → `/onboarding`; users who finished workspace creation → dashboard home `/`.
+
+Details: [`tests/browser/README.md`](./tests/browser/README.md).
