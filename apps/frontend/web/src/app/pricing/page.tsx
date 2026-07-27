@@ -167,23 +167,22 @@ const PricingPage = () => {
 	return (
 		<>
 			<JsonLd data={pricingSchema} />
-			<div className="relative px-4 sm:px-6 lg:px-8">
-				<div className="relative mx-auto w-full max-w-[1028px] border-stroke-soft-200 border-x dark:border-white/10">
-					<MarketingPageShell
-						titleLines={["Simple, transparent", "pricing."]}
-						compactHero
-					>
-						<PageSection flushTop>
-							<PricingSection />
-						</PageSection>
+			<div className="mx-auto flex w-full max-w-5xl flex-col border-stroke-soft-200 border-x pt-6 pb-16 md:max-w-7xl dark:border-white/10">
+				<MarketingPageShell
+					titleLines={["Simple, transparent pricing."]}
+					description="No hidden fees. No surprises. Just pricing that makes sense."
+					compactHero
+					tightHeroBottom
+				>
+					<PageSection flushTop>
+						<PricingSection />
+					</PageSection>
 
-						<PricingFaq />
-					</MarketingPageShell>
-				</div>
+					<PricingFaq />
+				</MarketingPageShell>
 			</div>
 		</>
 	);
 };
 
 export default PricingPage;
-

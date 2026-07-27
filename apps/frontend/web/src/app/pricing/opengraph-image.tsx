@@ -268,7 +268,7 @@ export default function OpenGraphImage() {
 							lineHeight: 1.1,
 						}}
 					>
-						Simple, transparent pricing.
+						Transparent pricing.
 					</span>
 					<span
 						style={{

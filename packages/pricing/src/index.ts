@@ -7,6 +7,7 @@ export interface PricingPlan {
 	monthlyPrice: number | null;
 	priceSubline: string;
 	emailsLabel: string;
+	extraEmailsLabel?: string;
 	includesLabel?: string;
 	ctaLabel: string;
 	ctaHref: string;
@@ -20,20 +21,48 @@ export interface PricingPlan {
 	badge?: string;
 	features: string[];
 	comparison: {
+		// Volume
 		monthlyEmails: string;
+		dailyLimit: string;
 		overage: string;
 		ratePerSecond: string;
-		attachmentSize: string;
-		campaigns: boolean;
-		smtpRelay: boolean;
-		webhooks: string;
-		analytics: boolean;
+		// Resources
 		agentInbox: string;
+		webhooks: string;
 		customDomains: string;
-		support: string;
+		attachmentSize: string;
+		dataRetention: string;
+		// Email API
+		restApi: boolean;
+		smtpRelay: boolean;
+		scheduledEmails: boolean;
+		emailTemplates: boolean;
+		// Inbox & AI
+		agentInboxFeature: boolean;
+		inboundEmail: boolean;
+		aiComposer: boolean;
+		humanInbox: boolean;
+		// Deliverability
 		emailValidation: string;
+		emailAuth: boolean;
 		dedicatedIp: string;
-		sla: string;
+		spamTesting: boolean;
+		reputationMonitoring: boolean;
+		// Analytics
+		deliveryAnalytics: boolean;
+		openClickTracking: boolean;
+		eventLogs: boolean;
+		exportRetention: string;
+		officialSdks: boolean;
+		// Platform
+		hostedReloop: boolean;
+		selfHost: boolean;
+		integrations: boolean;
+		auditLogs: boolean;
+		// Support & Services
+		support: string;
+		// Security & Compliance
+		uptimeSla: string;
 	};
 }
 
@@ -49,27 +78,48 @@ export const pricingPlans: PricingPlan[] = [
 		ctaHref: "/dashboard/signup",
 		features: [
 			"3,000 emails / month",
+			"200 emails / day",
 			"1 agent inbox",
 			"1 webhook",
 			"1 custom domain",
 			"1 MB attachments",
-			"Dedicated support",
+			"Data retention (45 days)",
+			"Community support",
 		],
 		comparison: {
 			monthlyEmails: "3,000",
+			dailyLimit: "200",
 			overage: "—",
 			ratePerSecond: "10 / sec",
-			attachmentSize: "1 MB",
-			campaigns: true,
-			smtpRelay: true,
-			webhooks: "1 webhook",
-			analytics: true,
 			agentInbox: "1 inbox",
+			webhooks: "1 webhook",
 			customDomains: "1 domain",
-			support: "Dedicated",
+			attachmentSize: "1 MB",
+			dataRetention: "45 days",
+			restApi: true,
+			smtpRelay: true,
+			scheduledEmails: true,
+			emailTemplates: true,
+			agentInboxFeature: true,
+			inboundEmail: true,
+			aiComposer: true,
+			humanInbox: true,
 			emailValidation: "100 / mo",
+			emailAuth: true,
 			dedicatedIp: "—",
-			sla: "—",
+			spamTesting: true,
+			reputationMonitoring: true,
+			deliveryAnalytics: true,
+			openClickTracking: true,
+			eventLogs: true,
+			exportRetention: "45 days",
+			officialSdks: true,
+			hostedReloop: true,
+			selfHost: true,
+			integrations: true,
+			auditLogs: true,
+			support: "Community",
+			uptimeSla: "—",
 		},
 	},
 	{
@@ -79,34 +129,54 @@ export const pricingPlans: PricingPlan[] = [
 		monthlyPrice: 10,
 		priceSubline: "/month",
 		emailsLabel: "25,000 emails / month",
+		extraEmailsLabel: "Extra emails: $0.80 / 1,000",
 		includesLabel: "All Free features +",
 		ctaLabel: "Get started",
 		ctaHref: "/dashboard/signup",
 		features: [
 			"25,000 emails / month",
-			"10 agent inboxes",
-			"10 webhooks",
-			"10 custom domains",
-			"Overage at $0.80 / 1,000 emails",
-			"50 emails / second throughput",
+			"No daily limit",
+			"5 agent inboxes",
+			"5 webhooks",
+			"5 custom domains",
 			"5 MB attachments",
+			"Data retention (45 days)",
 			"Dedicated support",
 		],
 		comparison: {
 			monthlyEmails: "25,000",
+			dailyLimit: "No limit",
 			overage: "$0.80 / 1k",
 			ratePerSecond: "50 / sec",
+			agentInbox: "5 inboxes",
+			webhooks: "5 webhooks",
+			customDomains: "5 domains",
 			attachmentSize: "5 MB",
-			campaigns: true,
+			dataRetention: "45 days",
+			restApi: true,
 			smtpRelay: true,
-			webhooks: "10 webhooks",
-			analytics: true,
-			agentInbox: "10 inboxes",
-			customDomains: "10 domains",
-			support: "Dedicated",
+			scheduledEmails: true,
+			emailTemplates: true,
+			agentInboxFeature: true,
+			inboundEmail: true,
+			aiComposer: true,
+			humanInbox: true,
 			emailValidation: "1,000 / mo",
+			emailAuth: true,
 			dedicatedIp: "—",
-			sla: "—",
+			spamTesting: true,
+			reputationMonitoring: true,
+			deliveryAnalytics: true,
+			openClickTracking: true,
+			eventLogs: true,
+			exportRetention: "45 days",
+			officialSdks: true,
+			hostedReloop: true,
+			selfHost: true,
+			integrations: true,
+			auditLogs: true,
+			support: "Dedicated",
+			uptimeSla: "—",
 		},
 	},
 	{
@@ -116,6 +186,7 @@ export const pricingPlans: PricingPlan[] = [
 		monthlyPrice: 20,
 		priceSubline: "/month",
 		emailsLabel: "50,000 emails / month",
+		extraEmailsLabel: "Extra emails: $0.80 / 1,000",
 		includesLabel: "All Individual features +",
 		ctaLabel: "Get started",
 		ctaHref: "/dashboard/signup",
@@ -123,28 +194,48 @@ export const pricingPlans: PricingPlan[] = [
 		highlighted: true,
 		features: [
 			"50,000 emails / month",
+			"No daily limit",
 			"20 agent inboxes",
 			"20 webhooks",
 			"20 custom domains",
-			"100 emails / second throughput",
 			"5 MB attachments",
+			"Data retention (45 days)",
 			"Dedicated support",
 		],
 		comparison: {
 			monthlyEmails: "50,000",
+			dailyLimit: "No limit",
 			overage: "$0.80 / 1k",
 			ratePerSecond: "100 / sec",
-			attachmentSize: "5 MB",
-			campaigns: true,
-			smtpRelay: true,
-			webhooks: "20 webhooks",
-			analytics: true,
 			agentInbox: "20 inboxes",
+			webhooks: "20 webhooks",
 			customDomains: "20 domains",
-			support: "Dedicated",
+			attachmentSize: "5 MB",
+			dataRetention: "45 days",
+			restApi: true,
+			smtpRelay: true,
+			scheduledEmails: true,
+			emailTemplates: true,
+			agentInboxFeature: true,
+			inboundEmail: true,
+			aiComposer: true,
+			humanInbox: true,
 			emailValidation: "5,000 / mo",
+			emailAuth: true,
 			dedicatedIp: "—",
-			sla: "—",
+			spamTesting: true,
+			reputationMonitoring: true,
+			deliveryAnalytics: true,
+			openClickTracking: true,
+			eventLogs: true,
+			exportRetention: "45 days",
+			officialSdks: true,
+			hostedReloop: true,
+			selfHost: true,
+			integrations: true,
+			auditLogs: true,
+			support: "Dedicated",
+			uptimeSla: "—",
 		},
 	},
 	{
@@ -158,29 +249,49 @@ export const pricingPlans: PricingPlan[] = [
 		ctaLabel: "Contact sales",
 		ctaHref: "/contact",
 		features: [
-			"Custom email volume & overage",
-			"Custom agent inboxes & webhooks",
+			"Custom email volume",
+			"No daily limit",
+			"Custom agent inboxes",
+			"Custom webhooks",
 			"Custom domains",
-			"Dedicated throughput limits",
-			"Dedicated IP options",
-			"Advanced security reviews",
+			"Custom attachments",
+			"Data retention (45 days)",
 			"Dedicated support & SLA",
 		],
 		comparison: {
 			monthlyEmails: "Custom",
+			dailyLimit: "No limit",
 			overage: "Custom",
 			ratePerSecond: "Custom",
-			attachmentSize: "Custom",
-			campaigns: true,
-			smtpRelay: true,
-			webhooks: "Custom",
-			analytics: true,
 			agentInbox: "Custom",
+			webhooks: "Custom",
 			customDomains: "Custom",
-			support: "Dedicated",
+			attachmentSize: "Custom",
+			dataRetention: "Custom",
+			restApi: true,
+			smtpRelay: true,
+			scheduledEmails: true,
+			emailTemplates: true,
+			agentInboxFeature: true,
+			inboundEmail: true,
+			aiComposer: true,
+			humanInbox: true,
 			emailValidation: "Custom",
+			emailAuth: true,
 			dedicatedIp: "Optional / custom",
-			sla: "99.99% / custom",
+			spamTesting: true,
+			reputationMonitoring: true,
+			deliveryAnalytics: true,
+			openClickTracking: true,
+			eventLogs: true,
+			exportRetention: "Custom",
+			officialSdks: true,
+			hostedReloop: true,
+			selfHost: true,
+			integrations: true,
+			auditLogs: true,
+			support: "Dedicated",
+			uptimeSla: "99.99% SLA",
 		},
 	},
 ];
@@ -199,39 +310,88 @@ export const comparisonSections: ComparisonSection[] = [
 		title: "Volume",
 		rows: [
 			{ label: "Monthly emails", key: "monthlyEmails", type: "text" },
+			{ label: "Daily limit", key: "dailyLimit", type: "text" },
 			{ label: "Overage", key: "overage", type: "text" },
-		],
-	},
-	{
-		title: "Sending",
-		rows: [
 			{ label: "Throughput", key: "ratePerSecond", type: "text" },
-			{ label: "SMTP relay", key: "smtpRelay", type: "boolean" },
-			{ label: "Max attachment", key: "attachmentSize", type: "text" },
-			{ label: "Campaigns", key: "campaigns", type: "boolean" },
 		],
 	},
 	{
-		title: "Inbound",
+		title: "Resources",
 		rows: [
 			{ label: "Agent inboxes", key: "agentInbox", type: "text" },
 			{ label: "Webhooks", key: "webhooks", type: "text" },
+			{ label: "Custom domains", key: "customDomains", type: "text" },
+			{ label: "Max attachment size", key: "attachmentSize", type: "text" },
+			{ label: "Data retention", key: "dataRetention", type: "text" },
+		],
+	},
+	{
+		title: "Email API",
+		rows: [
+			{ label: "REST API", key: "restApi", type: "boolean" },
+			{ label: "SMTP relay", key: "smtpRelay", type: "boolean" },
+			{ label: "Scheduled emails", key: "scheduledEmails", type: "boolean" },
+			{ label: "Email templates", key: "emailTemplates", type: "boolean" },
+		],
+	},
+	{
+		title: "Inbox & AI",
+		rows: [
+			{ label: "Agent inbox", key: "agentInboxFeature", type: "boolean" },
+			{ label: "Inbound email", key: "inboundEmail", type: "boolean" },
+			{ label: "AI composer", key: "aiComposer", type: "boolean" },
+			{ label: "Human inbox", key: "humanInbox", type: "boolean" },
 		],
 	},
 	{
 		title: "Deliverability",
 		rows: [
-			{ label: "Custom domains", key: "customDomains", type: "text" },
 			{ label: "Email validation", key: "emailValidation", type: "text" },
+			{ label: "SPF / DKIM / DMARC", key: "emailAuth", type: "boolean" },
 			{ label: "Dedicated IP", key: "dedicatedIp", type: "text" },
+			{ label: "Spam testing", key: "spamTesting", type: "boolean" },
+			{
+				label: "Reputation monitoring",
+				key: "reputationMonitoring",
+				type: "boolean",
+			},
 		],
 	},
 	{
-		title: "Support",
+		title: "Analytics",
 		rows: [
-			{ label: "Analytics", key: "analytics", type: "boolean" },
-			{ label: "Support", key: "support", type: "text" },
-			{ label: "SLA", key: "sla", type: "text" },
+			{ label: "Delivery analytics", key: "deliveryAnalytics", type: "boolean" },
+			{
+				label: "Open & click tracking",
+				key: "openClickTracking",
+				type: "boolean",
+			},
+			{ label: "Event logs", key: "eventLogs", type: "boolean" },
+			{ label: "Export / retention", key: "exportRetention", type: "text" },
+			{
+				label: "Official SDKs & React Email",
+				key: "officialSdks",
+				type: "boolean",
+			},
+		],
+	},
+	{
+		title: "Platform",
+		rows: [
+			{ label: "Hosted Reloop", key: "hostedReloop", type: "boolean" },
+			{ label: "Self-host", key: "selfHost", type: "boolean" },
+			{ label: "Integrations", key: "integrations", type: "boolean" },
+			{ label: "Audit logs", key: "auditLogs", type: "boolean" },
+		],
+	},
+	{
+		title: "Support & Services",
+		rows: [{ label: "Support level", key: "support", type: "text" }],
+	},
+	{
+		title: "Security & Compliance",
+		rows: [
+			{ label: "Uptime SLA Guarantee", key: "uptimeSla", type: "text" },
 		],
 	},
 ];

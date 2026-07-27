@@ -87,8 +87,8 @@ export function FeatureHero({
 					? "relative flex min-h-screen items-center justify-center overflow-hidden bg-transparent pt-20 pb-12"
 					: compact
 						? tightBottom
-							? "relative overflow-hidden bg-transparent pt-40 pb-2 sm:pt-44 sm:pb-4"
-							: "relative overflow-hidden bg-transparent pt-40 pb-8 sm:pt-44 sm:pb-10"
+							? "relative overflow-hidden bg-transparent pt-16 pb-12 sm:pt-20 sm:pb-14"
+							: "relative overflow-hidden bg-transparent pt-32 pb-8 sm:pt-36 sm:pb-10"
 						: "relative flex min-h-screen items-center justify-center overflow-hidden bg-transparent pt-48 pb-28 sm:pt-52"
 			}
 		>
@@ -121,7 +121,12 @@ export function FeatureHero({
 						</h1>
 
 						{description && (
-							<p className="mx-auto mt-7 max-w-[620px] text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50">
+							<p
+								className={cn(
+									"mx-auto text-[15px] text-text-sub-600 leading-relaxed sm:text-[17px] dark:text-white/50",
+									compact ? "mt-3 max-w-[620px]" : "mt-7 max-w-[620px]",
+								)}
+							>
 								{description}
 							</p>
 						)}

@@ -1,8 +1,8 @@
-import { PageSection } from "@reloop/web/components/page-shell";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ChangelogGridBody } from "../changelog-grid";
 import { ChangelogReleaseContent } from "../changelog-release-content";
 import {
 	changelogReleases,
@@ -58,44 +58,55 @@ export default async function ChangelogReleasePage({ params }: PageProps) {
 	}
 
 	return (
-		<div className="pb-16 sm:pb-20">
-			<PageSection narrow flushTop>
-				<Link
-					href="/changelog"
-					className="inline-flex items-center gap-1 font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
-				>
-					<span aria-hidden="true">‹</span>
-					All updates
-				</Link>
-
-				<header className="mx-auto mt-10 max-w-2xl sm:mt-12">
-					{release.preview ? (
-						<div className="relative aspect-[16/9] overflow-hidden rounded-xl border border-stroke-soft-200 bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02]">
-							<Image
-								src={release.preview.src}
-								alt={release.preview.alt}
-								fill
-								className="object-cover"
-								sizes="(max-width: 768px) 100vw, 672px"
-								priority
-							/>
-						</div>
-					) : null}
-					<time className="mt-6 block font-medium text-[13px] text-text-sub-600 tabular-nums dark:text-white/55">
-						{release.date}
-					</time>
-					<h1 className="mt-3 font-semibold text-[1.35rem] text-text-strong-950 leading-snug sm:text-[1.5rem] dark:text-white">
-						{release.title}
-					</h1>
-					<p className="mt-2 text-[14px] text-text-sub-600 leading-relaxed sm:text-[15px] dark:text-white/50">
-						{release.description}
-					</p>
-				</header>
-
-				<div className="mx-auto mt-12 max-w-2xl sm:mt-14">
-					<ChangelogReleaseContent release={release} />
+		<div className="min-h-screen bg-white dark:bg-black">
+			<section className="relative overflow-clip border-[#e5e5e5] border-b px-4 dark:border-white/10">
+				<div className="relative z-0 mx-auto max-w-[1080px] border-[#e5e5e5] border-x px-4 pt-36 pb-10 sm:px-12 sm:pt-44 sm:pb-12 dark:border-white/10">
+					<Link
+						href="/changelog"
+						className="inline-flex items-center gap-1 font-medium text-[13px] text-text-sub-600 transition-colors hover:text-text-strong-950 dark:text-white/55 dark:hover:text-white"
+					>
+						<span aria-hidden="true">‹</span>
+						All updates
+					</Link>
 				</div>
-			</PageSection>
+			</section>
+
+			<ChangelogGridBody>
+				<article className="grid grid-cols-1 gap-4 py-12 sm:grid-cols-[10.5rem_minmax(0,1fr)] sm:gap-12 sm:py-16 md:grid-cols-4">
+					<div className="sm:pt-1.5 md:col-span-1">
+						<time className="block text-[13px] text-text-sub-600 tabular-nums dark:text-white/55">
+							{release.date}
+						</time>
+					</div>
+
+					<div className="min-w-0 md:col-span-3">
+						<h1 className="font-semibold text-[1.35rem] text-text-strong-950 leading-snug tracking-tight sm:text-2xl dark:text-white">
+							{release.title}
+						</h1>
+
+						{release.preview ? (
+							<div className="relative mt-5 aspect-video overflow-hidden rounded-lg border border-[#e5e5e5] bg-bg-weak-50 dark:border-white/10 dark:bg-white/[0.02]">
+								<Image
+									src={release.preview.src}
+									alt={release.preview.alt}
+									fill
+									className="object-cover"
+									sizes="(max-width: 768px) 100vw, 720px"
+									priority
+								/>
+							</div>
+						) : null}
+
+						<p className="mt-5 max-w-2xl text-[15px] text-text-sub-600 leading-relaxed dark:text-white/55">
+							{release.description}
+						</p>
+
+						<div className="mt-10 sm:mt-12">
+							<ChangelogReleaseContent release={release} />
+						</div>
+					</div>
+				</article>
+			</ChangelogGridBody>
 		</div>
 	);
 }

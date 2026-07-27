@@ -59,7 +59,9 @@ export function PageSection({
 		? flushTop
 			? "px-4 pt-4 pb-12 sm:px-6 sm:pt-6 sm:pb-14"
 			: "px-4 py-12 sm:px-6 sm:py-14 lg:py-16"
-		: "px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24";
+		: flushTop
+			? "px-4 pt-0 pb-16 sm:px-6 sm:pt-0 sm:pb-20 lg:px-8 lg:pb-24"
+			: "px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24";
 
 	return (
 		<section

@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@reloop/ui/cn";
+import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import {
 	comparisonSections,
@@ -16,49 +17,56 @@ function PlanCtaLink({
 	label,
 	external,
 	variant = "default",
+	size = "medium",
 }: {
 	href: string;
 	label: string;
 	external?: boolean;
 	variant?: "default" | "primary";
+	size?: "medium" | "small" | "xsmall";
 }) {
-	const className = cn(
-		"group inline-flex h-11 items-center justify-center overflow-hidden rounded-full px-5 font-medium text-[14px] transition-colors duration-300",
-		variant === "primary"
-			? "bg-text-strong-950 text-white hover:bg-text-strong-950/90 dark:bg-white dark:text-[#0a0d12] dark:hover:bg-white/90"
-			: "border border-stroke-soft-200 bg-bg-white-0 text-text-strong-950 hover:bg-bg-weak-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1]",
-	);
+	const fancyVariant = variant === "primary" ? "neutral" : "basic";
+	const heightClass =
+		size === "xsmall"
+			? "h-7.5! px-3!"
+			: size === "small"
+				? "h-8.5! px-4!"
+				: "h-11! px-6!";
+	const textSizeClass =
+		size === "xsmall"
+			? "text-[12px]"
+			: size === "small"
+				? "text-[13px]"
+				: "text-[14px]";
 
 	const content = (
-		<span className="inline-flex items-center">
-			<span className="group-hover:-translate-x-1 transition-transform duration-300 ease-out">
-				{label}
-			</span>
-			<Icon
-				name="arrow-up-right"
-				className="ml-0 size-4 max-w-0 shrink-0 translate-x-1 opacity-0 transition-all duration-300 ease-out group-hover:ml-2 group-hover:max-w-4 group-hover:translate-x-0 group-hover:opacity-100"
-				aria-hidden
-			/>
-		</span>
+		<span className={cn("font-semibold", textSizeClass)}>{label}</span>
 	);
 
 	if (external) {
 		return (
-			<a
-				href={href}
-				target="_blank"
-				rel="noopener noreferrer"
-				className={className}
+			<FancyButton.Root
+				asChild
+				variant={fancyVariant}
+				size={size}
+				className={cn("w-full! rounded-full!", heightClass)}
 			>
-				{content}
-			</a>
+				<a href={href} target="_blank" rel="noopener noreferrer">
+					{content}
+				</a>
+			</FancyButton.Root>
 		);
 	}
 
 	return (
-		<Link href={href} className={className}>
-			{content}
-		</Link>
+		<FancyButton.Root
+			asChild
+			variant={fancyVariant}
+			size={size}
+			className={cn("w-full! rounded-full!", heightClass)}
+		>
+			<Link href={href}>{content}</Link>
+		</FancyButton.Root>
 	);
 }
 
@@ -70,6 +78,22 @@ function getFeatureIcon(feature: string) {
 			<Icon
 				name="sparkling"
 				className="mt-0.5 size-4 shrink-0 text-primary-base"
+			/>
+		);
+	}
+	if (key.includes("retention") || key.includes("database")) {
+		return (
+			<Icon
+				name="database"
+				className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
+			/>
+		);
+	}
+	if (key.includes("day") || key.includes("limit")) {
+		return (
+			<Icon
+				name="limit"
+				className="mt-0.5 size-4 shrink-0 text-text-sub-600 dark:text-white/40"
 			/>
 		);
 	}
@@ -209,7 +233,7 @@ function PlanColumn({
 	return (
 		<div
 			className={cn(
-				"flex min-h-[640px] flex-col border-stroke-soft-200 p-6 sm:min-h-[680px] sm:p-8 lg:p-6 xl:p-8 dark:border-white/10",
+				"flex min-h-[460px] flex-col border-stroke-soft-200 p-6 sm:min-h-[480px] sm:p-8 lg:p-6 xl:p-8 dark:border-white/10",
 				borderClasses,
 				plan.highlighted && "bg-bg-weak-50 dark:bg-white/[0.03]",
 			)}
@@ -226,7 +250,7 @@ function PlanColumn({
 					)}
 				</div>
 
-				<div className="mt-6">
+				<div className="mt-6 min-h-[96px]">
 					{isCustom ? (
 						<p className="font-serif text-[2.4rem] text-text-strong-950 leading-none tracking-tighter dark:text-white">
 							Custom
@@ -243,17 +267,29 @@ function PlanColumn({
 							)}
 						</div>
 					)}
-					<p className="mt-2 text-[14px] text-text-sub-600 dark:text-white/55">
+					<p
+						className={cn(
+							"mt-2 text-[14px]",
+							!isCustom && price > 0
+								? "font-medium text-text-strong-950 dark:text-white"
+								: "text-text-sub-600 dark:text-white/55",
+						)}
+					>
 						{isCustom || price === 0 ? plan.priceSubline : plan.emailsLabel}
 					</p>
+					{plan.extraEmailsLabel && (
+						<p className="mt-0.5 text-[12px] text-text-sub-600 dark:text-white/50">
+							{plan.extraEmailsLabel}
+						</p>
+					)}
 				</div>
 			</div>
 
-			<ul className="mt-10 flex-1 space-y-3">
+			<ul className="mt-5 flex-1 space-y-1.5">
 				{plan.features.map((feature) => (
 					<li
 						key={feature}
-						className="flex items-start gap-3 text-[14px] leading-snug"
+						className="flex min-h-[24px] items-center gap-3 text-[14px] leading-snug"
 					>
 						{getFeatureIcon(feature)}
 						<span className="text-text-sub-600 dark:text-white/60">
@@ -265,7 +301,7 @@ function PlanColumn({
 
 			<div
 				className={cn(
-					"mt-10 flex flex-col gap-3",
+					"mt-6 flex flex-col gap-3",
 					plan.secondaryCta && "sm:flex-row sm:items-center",
 				)}
 			>
@@ -389,6 +425,15 @@ function ComparisonTable() {
 										<span className="text-paragraph-xs text-text-sub-600 dark:text-white/50">
 											{price.caption}
 										</span>
+									</div>
+									<div className="mt-4">
+										<PlanCtaLink
+											href={plan.ctaHref}
+											label={plan.ctaLabel}
+											external={plan.ctaExternal}
+											variant={plan.highlighted ? "primary" : "default"}
+											size="xsmall"
+										/>
 									</div>
 								</div>
 							</div>
