@@ -36,7 +36,10 @@ if (emailConfig.NODE_ENV !== "production") {
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
-import { secureHeadersPlugin } from "@reloop/auth/middleware";
+import {
+	requireUserAgentPlugin,
+	secureHeadersPlugin,
+} from "@reloop/auth/middleware";
 import { agentCardRoute } from "@reloop/email/routes/landing/agent-card.route";
 import { healthRoute } from "@reloop/email/routes/landing/health.route";
 import { landingRoute } from "@reloop/email/routes/landing/landing.route";
@@ -48,6 +51,7 @@ const port = emailConfig.PORT;
 
 const app = new Elysia({ prefix: "/api/email", name: "Email Service" })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(requireUserAgentPlugin())
 	.use(cors({ origin: "*" }))
 	.use(
 		openapi({

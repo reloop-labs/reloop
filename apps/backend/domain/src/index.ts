@@ -2,7 +2,10 @@ import "dotenv/config";
 import { opentelemetry } from "@elysia/opentelemetry";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-import { secureHeadersPlugin } from "@reloop/auth/middleware";
+import {
+	requireUserAgentPlugin,
+	secureHeadersPlugin,
+} from "@reloop/auth/middleware";
 import { domainConfig } from "@reloop/domain/domain.config";
 import { domainRoutes } from "@reloop/domain/routes/domain/domain.routes";
 import { agentCardRoute } from "@reloop/domain/routes/landing/agent-card.route";
@@ -48,6 +51,7 @@ const domainService = new Elysia({
 	name: "Domain Service",
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(requireUserAgentPlugin())
 	.use(opentelemetry())
 	.use(
 		openapi({

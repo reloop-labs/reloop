@@ -3,10 +3,10 @@ import { authMiddleware } from "@reloop/be-mail/middleware/auth";
 import { checkRateLimit } from "@reloop/be-mail/middleware/rate-limiter";
 import { MailModel } from "@reloop/be-mail/model/mail.model.js";
 import { auditLogHook } from "@reloop/be-mail/utils/audit-log";
+import { sendEmailXCodeSamples } from "@reloop/code-samples/mail";
 import { Elysia } from "elysia";
 import { evlog } from "evlog/elysia";
 import { sendEmailController } from "./send-email.controllers";
-import { sendEmailXCodeSamples } from "@reloop/code-samples/mail";
 
 export const sendEmailRoute = new Elysia()
 	.use(evlog())
@@ -24,16 +24,26 @@ export const sendEmailRoute = new Elysia()
 			log,
 		}) => {
 			// Rate limit check — runs after auth so we have org/user IDs
-			const rateLimitHeaders = await checkRateLimit({
-				headers: request.headers,
-				activeOrganizationId: organizationId,
-				userId,
-				log,
-			});
-
-			// Apply rate limit headers to the response
-			for (const [key, value] of Object.entries(rateLimitHeaders)) {
-				set.headers[key] = value;
+			try {
+				const rateLimitHeaders = await checkRateLimit({
+					headers: request.headers,
+					activeOrganizationId: organizationId,
+					userId,
+					log,
+				});
+				for (const [key, value] of Object.entries(rateLimitHeaders)) {
+					set.headers[key] = value;
+				}
+			} catch (error) {
+				// Apply ratelimit-* / x-reloop-* headers even on 429
+				const headers = (error as { rateLimitHeaders?: Record<string, string> })
+					.rateLimitHeaders;
+				if (headers) {
+					for (const [key, value] of Object.entries(headers)) {
+						set.headers[key] = value;
+					}
+				}
+				throw error;
 			}
 
 			const requestApiKey = request.headers.get("x-api-key");

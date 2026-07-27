@@ -1,7 +1,10 @@
 import "dotenv/config";
 import cors from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
-import { secureHeadersPlugin } from "@reloop/auth/middleware";
+import {
+	requireUserAgentPlugin,
+	secureHeadersPlugin,
+} from "@reloop/auth/middleware";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
@@ -44,6 +47,7 @@ const port = creditsConfig.PORT;
 
 const app = new Elysia({ prefix: "/api/credits", name: "Credits Service" })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(requireUserAgentPlugin())
 	.use(cors({ origin: "*", credentials: true }))
 	.use(
 		openapi({

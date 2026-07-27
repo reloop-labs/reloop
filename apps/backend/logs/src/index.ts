@@ -4,7 +4,10 @@ import "dotenv/config";
 import { opentelemetry } from "@elysia/opentelemetry";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-import { secureHeadersPlugin } from "@reloop/auth/middleware";
+import {
+	requireUserAgentPlugin,
+	secureHeadersPlugin,
+} from "@reloop/auth/middleware";
 import { logsConfig } from "@reloop/logs/logs.config";
 import { loader } from "@reloop/logs/utils/loader";
 import { Elysia } from "elysia";
@@ -48,6 +51,7 @@ const logsService = new Elysia({
 	name: "Logs Service",
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(requireUserAgentPlugin())
 	.use(opentelemetry())
 	.use(
 		openapi({

@@ -11,6 +11,13 @@ import {
 	KNOWN_INSECURE_INTERNAL_SECRETS,
 	sanitizeInternalSecret,
 } from "@reloop/auth/middleware/internal-secret";
+import {
+	buildRateLimitHeaders,
+	buildReloopQuotaHeaders,
+	RATE_LIMIT_HEADER,
+	RELOOP_QUOTA_HEADER,
+} from "@reloop/auth/middleware/rate-limit-headers";
+import { requireUserAgentPlugin } from "@reloop/auth/middleware/require-user-agent";
 import { extractApiKey } from "@reloop/auth/middleware/resolve/extract-api-key";
 import {
 	resolveInternalAuth,
@@ -171,5 +178,67 @@ describe("secureHeadersPlugin", () => {
 		expect(res.headers.get("Content-Security-Policy")).toBe(
 			SECURE_HEADERS_VALUES.cspDocs,
 		);
+	});
+});
+
+describe("requireUserAgentPlugin", () => {
+	test("rejects API calls without User-Agent", async () => {
+		const app = new Elysia()
+			.use(requireUserAgentPlugin())
+			.get("/v1/keys", () => ({ ok: true }));
+
+		const res = await app.handle(new Request("http://localhost/v1/keys"));
+		expect(res.status).toBe(400);
+		const body = (await res.json()) as { message: string };
+		expect(body.message).toContain("User-Agent");
+	});
+
+	test("allows calls with User-Agent", async () => {
+		const app = new Elysia()
+			.use(requireUserAgentPlugin())
+			.get("/v1/keys", () => ({ ok: true }));
+
+		const res = await app.handle(
+			new Request("http://localhost/v1/keys", {
+				headers: { "user-agent": "ReloopSDK/1.0" },
+			}),
+		);
+		expect(res.status).toBe(200);
+	});
+
+	test("allows health without User-Agent", async () => {
+		const app = new Elysia()
+			.use(requireUserAgentPlugin())
+			.get("/api/api-key/health", () => ({ ok: true }));
+
+		const res = await app.handle(
+			new Request("http://localhost/api/api-key/health"),
+		);
+		expect(res.status).toBe(200);
+	});
+});
+
+describe("rate limit + reloop quota headers", () => {
+	test("buildRateLimitHeaders uses Resend-style names and seconds reset", () => {
+		const h = buildRateLimitHeaders({
+			limit: 100,
+			remaining: 42,
+			resetSeconds: 17,
+			retryAfter: 17,
+		});
+		expect(h[RATE_LIMIT_HEADER.limit]).toBe("100");
+		expect(h[RATE_LIMIT_HEADER.remaining]).toBe("42");
+		expect(h[RATE_LIMIT_HEADER.reset]).toBe("17");
+		expect(h[RATE_LIMIT_HEADER.retryAfter]).toBe("17");
+		expect(h["Retry-After"]).toBe("17");
+	});
+
+	test("buildReloopQuotaHeaders exposes used daily/monthly counts", () => {
+		const h = buildReloopQuotaHeaders({
+			dailyUsed: 12,
+			monthlyUsed: 340,
+		});
+		expect(h[RELOOP_QUOTA_HEADER.daily]).toBe("12");
+		expect(h[RELOOP_QUOTA_HEADER.monthly]).toBe("340");
 	});
 });

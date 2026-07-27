@@ -20,10 +20,21 @@ export {
 	type AuthPlugin,
 	createAuthPlugin,
 } from "@reloop/auth/middleware/plugin/create-auth-plugin";
-
+export {
+	applyResponseHeaders,
+	buildRateLimitHeaders,
+	buildReloopQuotaHeaders,
+	RATE_LIMIT_HEADER,
+	type RateLimitHeaderInput,
+	RELOOP_QUOTA_HEADER,
+	type ReloopQuotaHeaderInput,
+} from "@reloop/auth/middleware/rate-limit-headers";
 export { createSessionCacheRedis } from "@reloop/auth/middleware/redis/create-session-cache-redis";
 export { resolveAuthRedis } from "@reloop/auth/middleware/redis/resolve-auth-redis";
-
+export {
+	type RequireUserAgentOptions,
+	requireUserAgentPlugin,
+} from "@reloop/auth/middleware/require-user-agent";
 export { extractApiKey } from "@reloop/auth/middleware/resolve/extract-api-key";
 export { resolveApiKeyAuth } from "@reloop/auth/middleware/resolve/resolve-api-key-auth";
 export { resolveApiKeyInternalOrSession } from "@reloop/auth/middleware/resolve/resolve-api-key-internal-or-session";

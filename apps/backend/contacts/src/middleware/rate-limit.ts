@@ -1,4 +1,8 @@
 import { redis } from "@be/contacts/utils/loader";
+import {
+	applyResponseHeaders,
+	buildRateLimitHeaders,
+} from "@reloop/auth/middleware";
 import { Elysia } from "elysia";
 import { log } from "evlog";
 
@@ -32,13 +36,22 @@ async function checkRateLimit(
 			};
 		}
 
-		return { limited: false, remaining, retryAfter: 0 };
+		const ttl = await redis.ttl(key);
+		return {
+			limited: false,
+			remaining,
+			retryAfter: ttl > 0 ? ttl : opts.windowSeconds,
+		};
 	} catch (err) {
 		log.error({
 			message: "Rate limiter Redis error — failing open",
 			error: err instanceof Error ? err.message : String(err),
 		});
-		return { limited: false, remaining: opts.max, retryAfter: 0 };
+		return {
+			limited: false,
+			remaining: opts.max,
+			retryAfter: opts.windowSeconds,
+		};
 	}
 }
 
@@ -49,9 +62,6 @@ async function checkRateLimit(
  *  1. organizationId (authenticated requests — correct tenant scoping)
  *  2. IP address from X-Forwarded-For / CF-Connecting-IP (unauthenticated
  *     requests like the public preferences endpoints)
- *
- * L-4 fix: previously the middleware silently skipped rate limiting when
- * organizationId was absent, meaning public endpoints had no effective limit.
  */
 function getRateLimitIdentifier(
 	context: Record<string, unknown>,
@@ -60,7 +70,6 @@ function getRateLimitIdentifier(
 	const organizationId = context.organizationId as string | undefined;
 	if (organizationId) return organizationId;
 
-	// Fallback to IP for unauthenticated callers (public preferences endpoints).
 	const headers = request.headers;
 	const ip =
 		headers.get("cf-connecting-ip") ??
@@ -79,19 +88,20 @@ export function rateLimitPlugin(opts: RateLimitOptions) {
 					context.request,
 				);
 
-				// If we cannot determine any identifier, fail open rather than
-				// blocking all traffic (e.g. local dev without X-Forwarded-For).
 				if (!identifier) return;
 
 				const { status, set } = context;
 				const result = await checkRateLimit(identifier, opts);
 
-				set.headers["X-RateLimit-Limit"] = String(opts.max);
-				set.headers["X-RateLimit-Remaining"] = String(result.remaining);
-				set.headers["X-RateLimit-Window"] = String(opts.windowSeconds);
+				const headers = buildRateLimitHeaders({
+					limit: opts.max,
+					remaining: result.remaining,
+					resetSeconds: result.retryAfter || opts.windowSeconds,
+					retryAfter: result.limited ? result.retryAfter : undefined,
+				});
+				applyResponseHeaders(set.headers as Record<string, string>, headers);
 
 				if (result.limited) {
-					set.headers["Retry-After"] = String(result.retryAfter);
 					return status(429, {
 						message: "Too many requests",
 						why: `You have exceeded the limit of ${opts.max} requests per ${opts.windowSeconds}s window for this operation.`,

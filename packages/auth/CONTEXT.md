@@ -38,6 +38,25 @@ Secrets are stored **hashed** (SHA-256). Plaintext is returned only on create/ro
 
 Use `secureHeadersPlugin({ profile: "api" | "docs" })` on each public Elysia service (Helmet-style): `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, CSP, and HSTS in production. Edge (Cloudflare) still owns volumetric DDoS and coarse bot filtering.
 
+### User-Agent
+
+Public APIs require a non-empty `User-Agent` via `requireUserAgentPlugin()` (health / OpenAPI / landing excluded). Clients should identify themselves (e.g. `MyApp/1.0` or the Reloop SDK UA).
+
+### Rate limit & quota response headers
+
+Use `buildRateLimitHeaders` / `buildReloopQuotaHeaders` (Resend-compatible style):
+
+| Header | Meaning |
+|--------|---------|
+| `ratelimit-limit` | Max requests in the current window |
+| `ratelimit-remaining` | Requests left in the window |
+| `ratelimit-reset` | Seconds until the window resets |
+| `retry-after` | Seconds to wait before retrying (on 429) |
+| `x-reloop-daily-quota` | Used daily email/send quota |
+| `x-reloop-monthly-quota` | Used monthly email/send quota |
+
+Legacy `X-RateLimit-*` aliases are still emitted for older clients.
+
 **AuthContext**:
 The lean identity resolved by shared request-auth middleware for a request: `userId`, `organizationId` (when required), `platformRole`, and `authType` (`session` | `apikey` | `internal`). Optional `apiKeyId` when authenticated via API Key. Profile fields (`userEmail` / `userName` / `userImage`) appear only on profile-capable macros (`authSupport`, `authCollab`).
 

@@ -1,7 +1,10 @@
 import "dotenv/config";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-import { secureHeadersPlugin } from "@reloop/auth/middleware";
+import {
+	requireUserAgentPlugin,
+	secureHeadersPlugin,
+} from "@reloop/auth/middleware";
 import { agentCardRoute } from "@reloop/webhook/routes/landing/agent-card.route";
 import { healthRoute } from "@reloop/webhook/routes/landing/health.route";
 import { landingRoute } from "@reloop/webhook/routes/landing/landing.route";
@@ -48,6 +51,7 @@ const webhookService = new Elysia({
 	name: "Webhook Service",
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(requireUserAgentPlugin())
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(
 		openapi({

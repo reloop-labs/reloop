@@ -8,7 +8,10 @@ import { loader } from "@be/workflow/utils/loader";
 import { workflowConfig } from "@be/workflow/workflow.config";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-import { secureHeadersPlugin } from "@reloop/auth/middleware";
+import {
+	requireUserAgentPlugin,
+	secureHeadersPlugin,
+} from "@reloop/auth/middleware";
 import { Elysia } from "elysia";
 import { initLogger, log, parseError } from "evlog";
 import { evlog } from "evlog/elysia";
@@ -54,6 +57,7 @@ const workflowApi = new Elysia({
 	name: "Workflow Service",
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(requireUserAgentPlugin())
 	.use(
 		evlog({
 			exclude: ["/", "/api/*", "/api/*/", "**/health"],

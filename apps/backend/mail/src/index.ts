@@ -1,7 +1,10 @@
 import "dotenv/config";
 import { openapi } from "@elysiajs/openapi";
 import { serverTiming } from "@elysiajs/server-timing";
-import { secureHeadersPlugin } from "@reloop/auth/middleware";
+import {
+	requireUserAgentPlugin,
+	secureHeadersPlugin,
+} from "@reloop/auth/middleware";
 import { landing } from "@reloop/be-mail/routes/landing/landing.index.js";
 import { mailRoutes } from "@reloop/be-mail/routes/mail/mail.routes.js";
 import { loader } from "@reloop/be-mail/utils/loader.js";
@@ -44,6 +47,7 @@ const mailService = new Elysia({
 	name: "Mail Service",
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(requireUserAgentPlugin())
 	.use(evlog({ exclude: ["/", "/api/*", "/api/*/", "**/health"] }))
 	.use(
 		openapi({

@@ -3,7 +3,10 @@ import { createOTLPDrain } from "evlog/otlp";
 import "dotenv/config";
 import cors from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
-import { secureHeadersPlugin } from "@reloop/auth/middleware";
+import {
+	requireUserAgentPlugin,
+	secureHeadersPlugin,
+} from "@reloop/auth/middleware";
 import { Elysia } from "elysia";
 import { authConfig } from "./auth.config";
 import { landing } from "./landing";
@@ -41,6 +44,7 @@ const port = authConfig.port;
 
 const app = new Elysia({ prefix: "/api/auth", name: "Auth Service" })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(requireUserAgentPlugin())
 	.use(cors({ origin: "*" }))
 	.use(
 		openapi({

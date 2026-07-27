@@ -9,7 +9,10 @@ import { agentCardRoute } from "@reloop/api-key/routes/landing/agent-card.route"
 import { healthRoute } from "@reloop/api-key/routes/landing/health.route";
 import { landingRoute } from "@reloop/api-key/routes/landing/landing.route";
 import { loader } from "@reloop/api-key/utils/loader";
-import { secureHeadersPlugin } from "@reloop/auth/middleware";
+import {
+	requireUserAgentPlugin,
+	secureHeadersPlugin,
+} from "@reloop/auth/middleware";
 import { Elysia } from "elysia";
 import { initLogger } from "evlog";
 import { evlog } from "evlog/elysia";
@@ -48,6 +51,7 @@ const apiKeyService = new Elysia({
 	name: "API Key Service",
 })
 	.use(secureHeadersPlugin({ profile: "api" }))
+	.use(requireUserAgentPlugin())
 	.use(opentelemetry())
 	.use(
 		openapi({
