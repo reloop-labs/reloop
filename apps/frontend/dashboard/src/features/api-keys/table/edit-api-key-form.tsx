@@ -77,6 +77,7 @@ export function EditApiKeyForm({
 				{ withCredentials: true },
 			);
 			setStatus("success");
+			toast.success("API key updated successfully");
 			setTimeout(() => {
 				void invalidate();
 				onSuccess?.(name.trim());

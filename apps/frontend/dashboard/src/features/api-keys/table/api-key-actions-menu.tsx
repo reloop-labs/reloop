@@ -5,6 +5,7 @@ import { Icon } from "@reloop/ui/icon";
 import { useNavigate } from "#/lib/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import type { ApiKeyData } from "../types";
 
@@ -107,12 +108,14 @@ export function ApiKeyActionsMenu({
 	const handleCopyPrefix = async () => {
 		try {
 			await navigator.clipboard.writeText(apiKey.start || apiKey.prefix || "");
+			toast.success("API key prefix copied to clipboard");
 			setCopiedItem("prefix");
 			setTimeout(() => {
 				setCopiedItem(null);
 				handleOpenChange(false);
 			}, 900);
 		} catch {
+			toast.error("Failed to copy prefix");
 			handleOpenChange(false);
 		}
 	};
@@ -120,12 +123,14 @@ export function ApiKeyActionsMenu({
 	const handleCopyId = async () => {
 		try {
 			await navigator.clipboard.writeText(apiKey.id);
+			toast.success("API key ID copied to clipboard");
 			setCopiedItem("id");
 			setTimeout(() => {
 				setCopiedItem(null);
 				handleOpenChange(false);
 			}, 900);
 		} catch {
+			toast.error("Failed to copy ID");
 			handleOpenChange(false);
 		}
 	};
