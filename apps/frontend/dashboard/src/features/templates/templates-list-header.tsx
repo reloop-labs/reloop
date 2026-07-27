@@ -1,8 +1,9 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "#/lib/navigation";
+
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "sonner";
@@ -14,7 +15,7 @@ import {
 const DOCS_URL = "https://reloop.sh/docs/learn/templates";
 
 export function TemplatesListHeader() {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const invalidate = useInvalidateTemplates();
 	const [isCreating, setIsCreating] = useState(false);
 
@@ -24,10 +25,7 @@ export function TemplatesListHeader() {
 		try {
 			const template = await createTemplate();
 			await invalidate();
-			void navigate({
-				to: "/templates/$templateId",
-				params: { templateId: template.id },
-			});
+			router.push(`/templates/${template.id}`);
 		} catch {
 			toast.error("Failed to create template");
 		} finally {

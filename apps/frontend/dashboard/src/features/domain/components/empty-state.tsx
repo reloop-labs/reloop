@@ -1,7 +1,8 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "#/lib/navigation";
+
 import {
 	parseAsInteger,
 	parseAsString,
@@ -10,7 +11,7 @@ import {
 } from "nuqs";
 
 export function EmptyState() {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [statusFilters, setStatusFilters] = useQueryState(
 		"status",
 		parseAsStringLiteral([
@@ -38,7 +39,7 @@ export function EmptyState() {
 		void setCurrentPage(1);
 	};
 
-	const openAddDomain = () => void navigate({ to: "/domain/add" });
+	const openAddDomain = () => router.push("/domain/add");
 
 	return (
 		<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">

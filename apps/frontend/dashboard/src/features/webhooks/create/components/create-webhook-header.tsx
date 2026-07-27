@@ -1,12 +1,12 @@
+import { useRouter } from "next/navigation";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
-import { useNavigate } from "#/lib/navigation";
 
 export function CreateWebhookHeader() {
-	const navigate = useNavigate();
+	const router = useRouter();
 
 	return (
 		<div className="pt-6">
-			<AnimatedBackButton onClick={() => void navigate({ to: "/webhooks" })} />
+			<AnimatedBackButton onClick={() => router.push("/webhooks")} />
 			<div className="pt-4">
 				<h1 className="font-semibold text-text-strong-950 text-title-h6 leading-8">
 					Add webhook

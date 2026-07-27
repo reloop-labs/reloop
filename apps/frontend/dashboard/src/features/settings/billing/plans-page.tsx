@@ -1,3 +1,5 @@
+import { buildAppHref } from "#/lib/navigation-url";
+import { useRouter } from "next/navigation";
 import {
 	comparisonSections,
 	formatPrice,
@@ -8,7 +10,7 @@ import {
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "#/lib/navigation";
+
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { requestPlanSupport } from "./request-support";
 import { useBillingUsage } from "./use-billing-usage";
@@ -26,7 +28,7 @@ function planIndex(id: PlanId): number {
 const GRID_COLS = "grid-cols-[minmax(160px,240px)_repeat(4,minmax(150px,1fr))]";
 
 export function PlansPage() {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { data: usageData } = useBillingUsage();
 
 	const requestPlan = (
@@ -118,10 +120,7 @@ export function PlansPage() {
 					label="Billing"
 					showEscKey={false}
 					onClick={() =>
-						void navigate({
-							to: "/settings/billing",
-							search: { from: undefined },
-						})
+						router.push(buildAppHref({ to: "/settings/billing", search: { from: undefined } }))
 					}
 				/>
 			</div>

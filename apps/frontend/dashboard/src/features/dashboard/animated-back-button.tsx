@@ -1,6 +1,7 @@
+import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
-import { useNavigate } from "#/lib/navigation";
+
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -21,7 +22,7 @@ export function AnimatedBackButton({
 	showText = true,
 	label = "Back",
 }: AnimatedBackButtonProps) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [hovered, setHovered] = useState(false);
 
 	const handleBack = () => {
@@ -29,7 +30,7 @@ export function AnimatedBackButton({
 			onClick();
 			return;
 		}
-		void navigate({ to: ".." });
+		router.back();
 	};
 
 	useHotkeys(

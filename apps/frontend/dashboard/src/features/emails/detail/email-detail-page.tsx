@@ -1,11 +1,12 @@
+import { useRouter } from "next/navigation";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { useEmailDetailQuery } from "#/features/emails/hooks/use-emails-query";
-import { useNavigate } from "#/lib/navigation";
+
 import { EmailDetail } from "./email-detail";
 import { EmailNotFound } from "./email-not-found";
 
 export function EmailDetailPage({ emailId }: { emailId: string }) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { data, error, isPending, isFetching } = useEmailDetailQuery(emailId);
 
 	const isLoading = isPending || (isFetching && !data);
@@ -30,7 +31,7 @@ export function EmailDetailPage({ emailId }: { emailId: string }) {
 		<div className="mx-auto max-w-3xl sm:px-8">
 			<div className="pt-10 pb-8">
 				<AnimatedBackButton
-					onClick={() => void navigate({ to: "/emails/sent" })}
+					onClick={() => router.push("/emails/sent")}
 				/>
 			</div>
 			<EmailDetail email={data} isLoading={isLoading} />

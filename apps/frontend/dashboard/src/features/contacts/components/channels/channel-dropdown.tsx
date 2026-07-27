@@ -1,3 +1,5 @@
+import { buildAppHref } from "#/lib/navigation-url";
+import { useRouter } from "next/navigation";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -8,7 +10,7 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "#/lib/navigation";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useState } from "react";
 
@@ -34,7 +36,7 @@ export const ChannelDropdown = ({
 	onToggleVisibility,
 	onOpenChange,
 }: ChannelDropdownProps) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
 	const [isCopied, setIsCopied] = useState(false);
@@ -94,7 +96,7 @@ export const ChannelDropdown = ({
 	};
 
 	const handleViewSubscribers = () => {
-		void navigate({ to: "/contacts", search: { channelId } });
+		router.push(buildAppHref({ to: "/contacts", search: { channelId } }));
 		setPopoverOpen(false);
 	};
 

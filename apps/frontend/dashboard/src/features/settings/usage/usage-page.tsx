@@ -1,4 +1,6 @@
-import { useNavigate } from "#/lib/navigation";
+
+import { buildAppHref } from "#/lib/navigation-url";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { SETTINGS_MEMBER_HOME } from "#/features/dashboard/navigation";
 import { useBillingUsage } from "#/features/settings/billing/use-billing-usage";
@@ -6,7 +8,7 @@ import { useOrgPermissions } from "#/features/settings/use-org-permissions";
 import { UsageSection } from "./usage-section";
 
 export function UsagePage() {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { canManageBilling, isPending: rolePending } = useOrgPermissions();
 	const { error: usageError, refetch: refetchUsage } = useBillingUsage();
 
@@ -14,12 +16,9 @@ export function UsagePage() {
 		if (!rolePending && !canManageBilling) {
 			// Members land on settings via "/settings" — send them to profile
 			// instead of rendering an empty usage page.
-			void navigate({
-				to: SETTINGS_MEMBER_HOME,
-				search: { from: undefined },
-			});
+			router.push(buildAppHref({ to: SETTINGS_MEMBER_HOME, search: { from: undefined } }));
 		}
-	}, [canManageBilling, rolePending, navigate]);
+	}, [canManageBilling, rolePending, router]);
 
 	if (rolePending || !canManageBilling) {
 		return null;

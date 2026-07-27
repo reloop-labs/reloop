@@ -1,16 +1,17 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "#/lib/navigation";
+
 import { useHotkeys } from "react-hotkeys-hook";
 
 const DOCS_URL = "https://reloop.sh/docs/learn/webhook";
 
 export function WebhooksListHeader() {
-	const navigate = useNavigate();
+	const router = useRouter();
 
 	const openCreate = () => {
-		void navigate({ to: "/webhooks/create" });
+		router.push("/webhooks/create");
 	};
 
 	useHotkeys("mod+a", (e) => {

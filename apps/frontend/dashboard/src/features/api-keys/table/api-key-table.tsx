@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import {
 	flexRender,
@@ -7,7 +8,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useCallback, useMemo, useState } from "react";
-import { useNavigate } from "#/lib/navigation";
+
 import type { ApiKeysListParams } from "../hooks/use-api-keys-query";
 import { useToggleApiKey } from "../hooks/use-toggle-api-key";
 import { DeleteApiKeyModal } from "../modals/delete-api-key-modal";
@@ -43,7 +44,7 @@ export function ApiKeyTable({
 	onRotateSuccess?: (rotatedName: string) => void;
 	onEditSuccess?: (updatedName: string) => void;
 }) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [, setDeleteId] = useQueryState("delete");
 	const [, setRotateId] = useQueryState("rotate");
 	const [pageSize] = useQueryState("limit", parseAsInteger.withDefault(10));
@@ -136,7 +137,7 @@ export function ApiKeyTable({
 					) : rows.length === 0 ? (
 						<EmptyState
 							onCreateApiKey={() =>
-								void navigate({ to: "/api-keys/create" })
+								router.push("/api-keys/create")
 							}
 						/>
 					) : (

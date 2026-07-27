@@ -1,4 +1,5 @@
 
+import { useRouter } from "next/navigation";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import type { AudienceStatus } from "#/features/contacts/audience";
 import * as Button from "@reloop/ui/button";
@@ -9,7 +10,7 @@ import {
 	Root as PopoverRoot,
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
-import { useNavigate } from "#/lib/navigation";
+
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useUpdateContactStatusInCache } from "#/features/contacts/hooks/use-contacts-query";
@@ -43,7 +44,7 @@ export const ContactDropdown = ({
 	onOpenChange,
 }: ContactDropdownProps) => {
 	const updateContactStatusInCache = useUpdateContactStatusInCache();
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
 	const [isTogglingStatus, setIsTogglingStatus] = useState(false);
@@ -117,10 +118,7 @@ export const ContactDropdown = ({
 	const handleItemClick = async (itemId: string) => {
 		if (itemId === "view") {
 			setPopoverOpen(false);
-			void navigate({
-				to: "/contacts/detail/$contactId",
-				params: { contactId: contact.id },
-			});
+			router.push(`/contacts/detail/${contact.id}`);
 		} else if (itemId === "toggle-status") {
 			setPopoverOpen(false);
 			await handleToggleStatus();

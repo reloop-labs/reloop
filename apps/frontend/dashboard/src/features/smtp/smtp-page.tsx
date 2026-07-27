@@ -1,9 +1,10 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { useNavigate } from "#/lib/navigation";
+
 import { useCallback, useState } from "react";
 import { SMTP_HOST, SMTP_USER } from "./smtp-code-examples";
 import { SmtpCodePanel } from "./smtp-code-panel";
@@ -135,7 +136,7 @@ function CredentialRow({
 }
 
 export function SmtpPage() {
-	const navigate = useNavigate();
+	const router = useRouter();
 
 	return (
 		<div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
@@ -182,7 +183,7 @@ export function SmtpPage() {
 						type="button"
 						variant="blue"
 						size="small"
-						onClick={() => void navigate({ to: "/api-keys/create" })}
+						onClick={() => router.push("/api-keys/create")}
 						className="gap-1.5 rounded-xl"
 					>
 						<Icon name="key-new" className="h-4 w-4" />
@@ -224,7 +225,7 @@ export function SmtpPage() {
 									type="button"
 									variant="blue"
 									size="xsmall"
-									onClick={() => void navigate({ to: "/api-keys/create" })}
+									onClick={() => router.push("/api-keys/create")}
 									className="gap-1.5 rounded-lg"
 								>
 									<Icon name="key-new" className="h-3.5 w-3.5" />
@@ -243,7 +244,7 @@ export function SmtpPage() {
 						password.{" "}
 						<button
 							type="button"
-							onClick={() => void navigate({ to: "/api-keys" })}
+							onClick={() => router.push("/api-keys")}
 							className="font-medium underline underline-offset-2 hover:opacity-80"
 						>
 							Manage API keys

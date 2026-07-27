@@ -1,10 +1,12 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate, useRouterState } from "#/lib/navigation";
+import { useRouterState } from "#/lib/navigation";
+
 import axios from "axios";
 import {
 	AnimatePresence,
@@ -51,7 +53,7 @@ export const DeleteWebhookModal = ({
 	const holdProgress = useMotionValue(0);
 	const animationRef = useRef<AnimationPlaybackControls | null>(null);
 	const invalidate = useInvalidateWebhooks();
-	const navigate = useNavigate();
+	const router = useRouter();
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 
 	const targetRef = useRef<WebhookData | null>(null);
@@ -85,7 +87,7 @@ export const DeleteWebhookModal = ({
 			setTimeout(() => {
 				void setDeleteId(null);
 				if (isOnDetailPage) {
-					void navigate({ to: "/webhooks" });
+					router.push("/webhooks");
 				}
 				setTimeout(() => {
 					setDeleteState("idle");

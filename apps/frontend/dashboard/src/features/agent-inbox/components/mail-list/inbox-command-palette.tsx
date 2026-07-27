@@ -1,10 +1,12 @@
+import { buildAppHref } from "#/lib/navigation-url";
+import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import * as CommandMenu from "@reloop/ui/command";
 import { Icon } from "@reloop/ui/icon";
 import { KbdCommand } from "@reloop/ui/kbd-command";
 import { KbdKey } from "@reloop/ui/kbd-key";
 import { Logo } from "@reloop/ui/logo";
-import { useNavigate } from "#/lib/navigation";
+
 import dayjs from "dayjs";
 import { useTheme } from "next-themes";
 import { parseAsString, useQueryState } from "nuqs";
@@ -248,7 +250,7 @@ export const InboxCommandPalette = ({
 	onSelectThread?: (id: string) => void;
 }) => {
 	const { openCompose } = useInboxSidebar();
-	const navigate = useNavigate();
+	const router = useRouter();
 	const mailboxId = useMailboxId();
 	const { resolvedTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
@@ -327,7 +329,7 @@ export const InboxCommandPalette = ({
 	const goToFolder = useCallback(
 		(jump: FolderJump) => {
 			if (!mailboxId) return;
-			void navigate({ to: jump.to, params: { mailboxId } });
+			router.push(buildAppHref({ to: jump.to, params: { mailboxId } }));
 			if (jump.filter) {
 				void setFilterParam(jump.filter);
 			} else if (jump.id !== "needs-approval") {
@@ -335,7 +337,7 @@ export const InboxCommandPalette = ({
 			}
 			onOpenChange(false);
 		},
-		[mailboxId, navigate, setFilterParam, onOpenChange],
+		[mailboxId, router, setFilterParam, onOpenChange],
 	);
 
 	const runAndClose = useCallback(

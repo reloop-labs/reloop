@@ -1,6 +1,8 @@
+import { buildAppHref } from "#/lib/navigation-url";
+import { useRouter } from "next/navigation";
 import { DeleteWebhookModal } from "#/features/webhooks/components/delete-webhook-modal";
 import { useWebhookDetailQuery } from "#/features/webhooks/hooks/use-webhooks-query";
-import { useNavigate } from "#/lib/navigation";
+
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenu from "@reloop/ui/tab-menu-horizontal";
@@ -18,7 +20,7 @@ const TABS = [
 ] as const;
 
 export function WebhookDetailPage({ webhookId }: { webhookId: string }) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [, setDeleteId] = useQueryState("delete");
 	const [activeTab, setActiveTab] = useQueryState(
 		"tab",
@@ -87,10 +89,7 @@ export function WebhookDetailPage({ webhookId }: { webhookId: string }) {
 						if (data) void setDeleteId(data.id);
 					}}
 					onTriggerTest={() =>
-						void navigate({
-							to: "/webhooks/$webhookId/test",
-							params: { webhookId },
-						})
+						router.push(buildAppHref({ to: "/webhooks/$webhookId/test", params: { webhookId } }))
 					}
 				/>
 
@@ -174,7 +173,7 @@ export function WebhookDetailPage({ webhookId }: { webhookId: string }) {
 				<DeleteWebhookModal
 					webhook={data}
 					onSuccess={() => {
-						void navigate({ to: "/webhooks" });
+						router.push("/webhooks");
 					}}
 				/>
 			) : null}

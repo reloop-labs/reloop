@@ -1,14 +1,15 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "#/lib/navigation";
+
 import { useHotkeys } from "react-hotkeys-hook";
 import { CreateWebhookFormFields } from "./components/create-webhook-form-fields";
 import { useCreateWebhookForm } from "./components/use-create-webhook-form";
 
 export function CreateWebhookPage() {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { form, isLoading, onSubmit } = useCreateWebhookForm();
 
 	useHotkeys(
@@ -42,7 +43,7 @@ export function CreateWebhookPage() {
 						variant="neutral"
 						mode="stroke"
 						size="small"
-						onClick={() => void navigate({ to: "/webhooks" })}
+						onClick={() => router.push("/webhooks")}
 						disabled={isLoading}
 						className="rounded-xl"
 					>

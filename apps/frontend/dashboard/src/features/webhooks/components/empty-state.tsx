@@ -1,7 +1,7 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "#/lib/navigation";
 
 export const EmptyState = ({
 	isFiltered = false,
@@ -10,7 +10,7 @@ export const EmptyState = ({
 	isFiltered?: boolean;
 	onClearFilters?: () => void;
 }) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 
 	return (
 		<div className="flex flex-col items-center px-6 py-12 text-center dark:bg-bg-weak-50/30">
@@ -45,7 +45,7 @@ export const EmptyState = ({
 					type="button"
 					variant="blue"
 					size="small"
-					onClick={() => void navigate({ to: "/webhooks/create" })}
+					onClick={() => router.push("/webhooks/create")}
 					className="gap-1.5 rounded-xl"
 				>
 					<Icon name="plus" className="h-4 w-4" />

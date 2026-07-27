@@ -1,3 +1,5 @@
+import { buildAppHref } from "#/lib/navigation-url";
+import { useRouter } from "next/navigation";
 import {
 	useWebhookDetailQuery,
 } from "#/features/webhooks/hooks/use-webhooks-query";
@@ -6,7 +8,7 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "#/lib/navigation";
+
 import { useHotkeys } from "react-hotkeys-hook";
 import { EditWebhookFormFields } from "./components/edit-webhook-form-fields";
 import { useEditWebhookForm } from "./components/use-edit-webhook-form";
@@ -16,7 +18,7 @@ interface EditWebhookPageProps {
 }
 
 export function EditWebhookPage({ webhookId }: EditWebhookPageProps) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { data: webhook, isPending, isError } = useWebhookDetailQuery(webhookId);
 	const { form, isLoading, onSubmit } = useEditWebhookForm(webhook);
 
@@ -30,10 +32,7 @@ export function EditWebhookPage({ webhookId }: EditWebhookPageProps) {
 	);
 
 	const goBack = () => {
-		void navigate({
-			to: "/webhooks/$webhookId",
-			params: { webhookId },
-		});
+		router.push(buildAppHref({ to: "/webhooks/$webhookId", params: { webhookId } }));
 	};
 
 	if (isPending) {
@@ -68,7 +67,7 @@ export function EditWebhookPage({ webhookId }: EditWebhookPageProps) {
 					variant="neutral"
 					mode="stroke"
 					size="small"
-					onClick={() => void navigate({ to: "/webhooks" })}
+					onClick={() => router.push("/webhooks")}
 					className="rounded-xl"
 				>
 					Back to webhooks

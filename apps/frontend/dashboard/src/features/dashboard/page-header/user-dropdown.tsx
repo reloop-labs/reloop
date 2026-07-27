@@ -1,8 +1,11 @@
+import { buildAppHref } from "#/lib/navigation-url";
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate, useRouterState } from "#/lib/navigation";
+import { useRouterState } from "#/lib/navigation";
+
 import { useTheme } from "next-themes";
 import { useRef, useState } from "react";
 import { useSignOut } from "#/features/auth/session-query";
@@ -21,7 +24,7 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const itemRefs = useRef<(HTMLElement | null)[]>([]);
-	const navigate = useNavigate();
+	const router = useRouter();
 	const signOut = useSignOut();
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const search = useRouterState({ select: (s) => s.location.search });
@@ -37,10 +40,7 @@ export function UserDropdown({ user }: { user: HeaderUser | null }) {
 	};
 
 	const goToSettings = (path: string) => {
-		void navigate({
-			to: path,
-			search: { from: getFrom() },
-		});
+		router.push(buildAppHref({ to: path, search: { from: getFrom() } }));
 		setIsOpen(false);
 	};
 

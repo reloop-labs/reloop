@@ -1,3 +1,5 @@
+import { buildAppHref } from "#/lib/navigation-url";
+import { useRouter } from "next/navigation";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -5,7 +7,8 @@ import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
-import { Link, useNavigate } from "#/lib/navigation";
+import { Link } from "#/lib/navigation";
+
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
@@ -22,7 +25,7 @@ import type { DomainFormValues } from "./schema";
 import { domainSchema } from "./schema";
 
 export function AddDomainPage() {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { changeStatus, status } = useLoading();
 	const invalidate = useInvalidateDomains();
 	const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
@@ -41,10 +44,7 @@ export function AddDomainPage() {
 	const watchedDomain = watch("domain");
 
 	const goToSetup = (domainId: string) => {
-		void navigate({
-			to: "/domain/add/$domainId",
-			params: { domainId },
-		});
+		router.push(buildAppHref({ to: "/domain/add/$domainId", params: { domainId } }));
 	};
 
 	const onSubmit = async ({
@@ -123,7 +123,7 @@ export function AddDomainPage() {
 			) {
 				return;
 			}
-			void navigate({ to: "/domain" });
+			router.push("/domain");
 		},
 		{ enableOnFormTags: true },
 	);

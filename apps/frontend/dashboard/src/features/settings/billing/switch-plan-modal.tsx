@@ -1,3 +1,5 @@
+import { buildAppHref } from "#/lib/navigation-url";
+import { useRouter } from "next/navigation";
 import NumberFlow from "@number-flow/react";
 import {
 	defaultPlan,
@@ -11,7 +13,7 @@ import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
-import { useNavigate } from "#/lib/navigation";
+
 import { useEffect, useState } from "react";
 import { requestPlanSupport } from "./request-support";
 
@@ -81,7 +83,7 @@ export function SwitchPlanModal({
 	onOpenChange,
 	currentPlanId,
 }: SwitchPlanModalProps) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [selectedId, setSelectedId] = useState<PlanId>(currentPlanId);
 
 	useEffect(() => {
@@ -94,10 +96,7 @@ export function SwitchPlanModal({
 
 	const goToPlans = () => {
 		onOpenChange(false);
-		void navigate({
-			to: "/settings/billing/plans",
-			search: { from: undefined },
-		});
+		router.push(buildAppHref({ to: "/settings/billing/plans", search: { from: undefined } }));
 	};
 
 	const handleSwitch = () => {

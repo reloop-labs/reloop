@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -7,7 +8,7 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { useNavigate } from "#/lib/navigation";
+
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -93,7 +94,7 @@ const LANG_FILE_LABELS: Record<LanguageId, string> = {
 };
 
 export function CreateApiKeyPage() {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { activeOrganization } = useActiveOrganization();
 	const invalidate = useInvalidateApiKeys();
 	const [isLoading, setIsLoading] = useState(false);
@@ -134,19 +135,16 @@ export function CreateApiKeyPage() {
 
 	const handleCancel = () => {
 		setCreatedApiKey(null);
-		void navigate({ to: "/api-keys" });
+		router.push("/api-keys");
 	};
 
 	const handleContinue = () => {
 		const apiKeyId = createdApiKey?.id;
 		setCreatedApiKey(null);
 		if (apiKeyId) {
-			void navigate({
-				to: "/api-keys/$apiKeyId",
-				params: { apiKeyId },
-			});
+			router.push(`/api-keys/${apiKeyId}`);
 		} else {
-			void navigate({ to: "/api-keys" });
+			router.push("/api-keys");
 		}
 	};
 

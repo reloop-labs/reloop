@@ -1,15 +1,17 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { Link, useNavigate } from "#/lib/navigation";
+import { Link } from "#/lib/navigation";
+
 import { useHotkeys } from "react-hotkeys-hook";
 
 export function DomainNotFound() {
-	const navigate = useNavigate();
+	const router = useRouter();
 
-	useHotkeys("mod+d", () => void navigate({ to: "/domain" }));
+	useHotkeys("mod+d", () => router.push("/domain"));
 	useHotkeys("mod+a", (e) => {
 		e.preventDefault();
-		void navigate({ to: "/domain/add" });
+		router.push("/domain/add");
 	});
 
 	return (
@@ -28,7 +30,7 @@ export function DomainNotFound() {
 			</div>
 			<div className="flex items-center gap-3">
 				<Button.Root
-					onClick={() => void navigate({ to: "/domain" })}
+					onClick={() => router.push("/domain")}
 					variant="neutral"
 					size="xsmall"
 					className="gap-2 rounded-lg"

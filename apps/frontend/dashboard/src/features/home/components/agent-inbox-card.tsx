@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import * as Button from "@reloop/ui/button";
@@ -12,7 +13,7 @@ import {
 	Plus,
 } from "lucide-react";
 import { Link } from "#/lib/navigation";
-import { useNavigate } from "#/lib/navigation";
+
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useSWR } from "#/features/home/lib/use-swr-compat";
@@ -54,7 +55,7 @@ const MailboxActionsDropdown = ({
 	const [open, setOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-	const navigate = useNavigate();
+	const router = useRouter();
 
 	const menuItems = [
 		{ id: "view", label: "View inbox", icon: "inbox" },
@@ -73,7 +74,7 @@ const MailboxActionsDropdown = ({
 	const handleClick = (itemId: string, e: React.MouseEvent) => {
 		e.stopPropagation();
 		handleOpenChange(false);
-		if (itemId === "view") void navigate({ to: "/inbox/$mailboxId", params: { mailboxId: mailbox.id } });
+		if (itemId === "view") router.push(`/inbox/${mailbox.id}`);
 		else if (itemId === "copy-email") {
 			navigator.clipboard.writeText(mailbox.email);
 			toast.success("Email address copied");

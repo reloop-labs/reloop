@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
@@ -5,7 +6,7 @@ import * as FileFormatIcon from "@reloop/ui/file-format-icon";
 import * as FileUpload from "@reloop/ui/file-upload";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "#/lib/navigation";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
@@ -36,7 +37,7 @@ const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB Max Cap
 const BATCH_SIZE = 5; // Concurrency limit for client-side API requests
 
 export function CsvImportStep({ onBack }: CsvImportStepProps) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const invalidate = useInvalidateContacts();
 	const { data: propertiesData } = useAllPropertiesQuery();
 	const orgProperties = propertiesData?.properties ?? [];
@@ -271,7 +272,7 @@ export function CsvImportStep({ onBack }: CsvImportStepProps) {
 				);
 			}
 
-			void navigate({ to: "/contacts" });
+			router.push("/contacts");
 		} catch (err) {
 			console.error("Batch import error:", err);
 			toast.error("An error occurred during import processing.");

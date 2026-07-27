@@ -1,6 +1,7 @@
+import { useRouter } from "next/navigation";
 import { authClient } from "@reloop/auth/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "#/lib/navigation";
+
 import axios from "axios";
 import { parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
@@ -19,7 +20,7 @@ function parseChoice(value: string): IntegrationChoice {
 
 export function useGenerateApiKey() {
 	const queryClient = useQueryClient();
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [apiKey, setApiKey] = useQueryState(
 		"apiKey",
 		parseAsString.withDefault(""),
@@ -59,7 +60,7 @@ export function useGenerateApiKey() {
 		// Force a network refetch so Home's post-auth redirect does not see a
 		// stale empty org list and bounce the user back to /onboarding.
 		await queryClient.fetchQuery(organizationsQueryOptions());
-		await navigate({ to: "/" });
+		await router.push("/");
 	};
 
 	return {

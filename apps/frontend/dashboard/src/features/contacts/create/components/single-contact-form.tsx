@@ -1,10 +1,11 @@
+import { useRouter } from "next/navigation";
 import * as Avatar from "@reloop/ui/avatar";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Label from "@reloop/ui/label";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "#/lib/navigation";
+
 import { type KeyboardEvent, useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import { GroupSelect } from "#/features/contacts/components/groups/group-select";
@@ -25,7 +26,7 @@ const validateEmail = (email: string): boolean => {
 };
 
 export function SingleContactForm({ onBack }: SingleContactFormProps) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const invalidate = useInvalidateContacts();
 	const [isCreating, setIsCreating] = useState(false);
 	const [emailChips, setEmailChips] = useState<EmailChip[]>([]);
@@ -139,7 +140,7 @@ export function SingleContactForm({ onBack }: SingleContactFormProps) {
 			}
 
 			await invalidate();
-			void navigate({ to: "/contacts" });
+			router.push("/contacts");
 		} catch (error) {
 			console.error("Failed to create contacts:", error);
 			toast.error("Failed to create contacts");

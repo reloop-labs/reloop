@@ -1,11 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Switch from "@reloop/ui/switch";
-import { useNavigate } from "#/lib/navigation";
+
 import { toast } from "sonner";
 import type { Workflow, WorkflowStatus } from "../workflow-types";
 import { validateWorkflow } from "../workflow-validation";
@@ -25,7 +26,7 @@ export const WorkflowEditorToolbar = ({
 	onStatusChange,
 	onSave,
 }: WorkflowEditorToolbarProps) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const validation = validateWorkflow(workflow);
 	const isActive = workflow.status === "active";
 
@@ -47,7 +48,7 @@ export const WorkflowEditorToolbar = ({
 		<div className="flex shrink-0 flex-col border-stroke-soft-100 border-b dark:border-stroke-soft-100/50">
 			<div className="flex items-center gap-3 px-4 py-3">
 				<AnimatedBackButton
-					onClick={() => void navigate({ to: "/workflows" })}
+					onClick={() => router.push("/workflows")}
 				/>
 				<input
 					type="text"

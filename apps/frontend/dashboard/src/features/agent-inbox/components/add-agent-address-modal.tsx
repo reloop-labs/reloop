@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -8,7 +9,7 @@ import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "#/lib/navigation";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Resolver } from "react-hook-form";
@@ -66,7 +67,7 @@ export const AddAgentAddressModal = ({
 	onClose: () => void;
 	onCreated?: (mailbox: AgentMailbox) => void;
 }) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { addMailbox, mailboxes } = useAgentInbox();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -189,10 +190,7 @@ export const AddAgentAddressModal = ({
 			form.reset();
 			onClose();
 			onCreated?.(mailbox);
-			void navigate({
-				to: "/inbox/$mailboxId",
-				params: { mailboxId: mailbox.id },
-			});
+			router.push(`/inbox/${mailbox.id}`);
 		} catch (error) {
 			const errMsg =
 				error instanceof Error
@@ -250,7 +248,7 @@ export const AddAgentAddressModal = ({
 								size="small"
 								onClick={() => {
 									onClose();
-									void navigate({ to: "/domain/add" });
+									router.push("/domain/add");
 								}}
 								className="gap-1.5 rounded-xl"
 							>
@@ -440,12 +438,9 @@ export const AddAgentAddressModal = ({
 										className="relative z-10 inline cursor-pointer font-medium underline underline-offset-2 hover:opacity-80"
 										onClick={() => {
 											if (selectedDomain) {
-												void navigate({
-													to: "/domain/$domainId",
-													params: { domainId: selectedDomain.id },
-												});
+												router.push(`/domain/${selectedDomain.id}`);
 											} else {
-												void navigate({ to: "/domain" });
+												router.push("/domain");
 											}
 										}}
 									>

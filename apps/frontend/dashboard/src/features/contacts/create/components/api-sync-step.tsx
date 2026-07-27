@@ -1,7 +1,8 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "#/lib/navigation";
+
 import { useState } from "react";
 import {
 	siCurl,
@@ -200,7 +201,7 @@ async fn main() -> Result<(), Box<dyn std.error::Error>> {
 };
 
 export function ApiSyncStep({ onBack }: ApiSyncStepProps) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [selectedTab, setSelectedTab] = useState<ApiLanguageId>("curl");
 
 	const activeLang =
@@ -282,7 +283,7 @@ export function ApiSyncStep({ onBack }: ApiSyncStepProps) {
 							type="button"
 							variant="primary"
 							size="small"
-							onClick={() => void navigate({ to: "/contacts" })}
+							onClick={() => router.push("/contacts")}
 						>
 							Done
 						</FancyButton.Root>

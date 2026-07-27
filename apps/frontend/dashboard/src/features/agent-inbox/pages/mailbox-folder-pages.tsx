@@ -1,5 +1,8 @@
+import { buildAppHref } from "#/lib/navigation-url";
+import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
-import { useNavigate, useParams } from "#/lib/navigation";
+import { useParams } from "#/lib/navigation";
+
 import { FileText, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -239,7 +242,7 @@ function draftComposeParam(
 }
 
 export function DraftsFolderPage() {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { mailbox, mailboxId } = useFolderMailbox();
 	const { deleteDraft } = useAgentInbox();
 	const { openCompose } = useInboxSidebar();
@@ -251,22 +254,14 @@ export function DraftsFolderPage() {
 		if (!mailboxId) return;
 		const compose = draftComposeParam(d.kind);
 		if (compose && d.threadId) {
-			void navigate({
-				to: "/inbox/$mailboxId",
-				params: { mailboxId },
-				search: {
+			router.push(buildAppHref({ to: "/inbox/$mailboxId", params: { mailboxId }, search: {
 					threadId: d.threadId,
 					draftId: d.id,
 					compose,
-				} as never,
-			});
+				} as never }));
 			return;
 		}
-		void navigate({
-			to: "/inbox/$mailboxId",
-			params: { mailboxId },
-			search: { draftId: d.id } as never,
-		});
+		router.push(buildAppHref({ to: "/inbox/$mailboxId", params: { mailboxId }, search: { draftId: d.id } as never }));
 		openCompose();
 	};
 

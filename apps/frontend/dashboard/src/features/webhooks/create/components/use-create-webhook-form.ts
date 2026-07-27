@@ -1,8 +1,10 @@
+import { buildAppHref } from "#/lib/navigation-url";
+import { useRouter } from "next/navigation";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { useInvalidateWebhooks } from "#/features/webhooks/hooks/use-webhooks-query";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useLoading } from "@reloop/ui/use-loading";
-import { useNavigate } from "#/lib/navigation";
+
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -12,7 +14,7 @@ export function useCreateWebhookForm() {
 	const { activeOrganization } = useActiveOrganization();
 	const { changeStatus, status } = useLoading();
 	const invalidate = useInvalidateWebhooks();
-	const navigate = useNavigate();
+	const router = useRouter();
 
 	const form = useForm<WebhookFormValues>({
 		resolver: valibotResolver(webhookSchema),
@@ -43,12 +45,9 @@ export function useCreateWebhookForm() {
 			changeStatus("idle");
 			const webhookId = response.data?.webhook?.id || response.data?.id;
 			if (webhookId) {
-				void navigate({
-					to: "/webhooks/$webhookId",
-					params: { webhookId },
-				});
+				router.push(buildAppHref({ to: "/webhooks/$webhookId", params: { webhookId } }));
 			} else {
-				void navigate({ to: "/webhooks" });
+				router.push("/webhooks");
 			}
 			toast.success("Webhook created successfully.");
 		} catch (error) {

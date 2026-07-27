@@ -1,3 +1,5 @@
+import { buildAppHref } from "#/lib/navigation-url";
+import { useRouter } from "next/navigation";
 import {
 	defaultPlan,
 	formatPrice,
@@ -9,7 +11,7 @@ import {
 import * as Badge from "@reloop/ui/badge";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "#/lib/navigation";
+
 import { useEffect, useState } from "react";
 import { AnimatedForwardButton } from "#/features/dashboard/animated-forward-button";
 import { SETTINGS_MEMBER_HOME } from "#/features/dashboard/navigation";
@@ -28,7 +30,7 @@ function resolvePlanId(name: string | undefined): PlanId {
 }
 
 export function BillingPage() {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [switchOpen, setSwitchOpen] = useState(false);
 	const { canManageBilling, isPending: rolePending } = useOrgPermissions();
 	const {
@@ -39,12 +41,9 @@ export function BillingPage() {
 
 	useEffect(() => {
 		if (!rolePending && !canManageBilling) {
-			void navigate({
-				to: SETTINGS_MEMBER_HOME,
-				search: { from: undefined },
-			});
+			router.push(buildAppHref({ to: SETTINGS_MEMBER_HOME, search: { from: undefined } }));
 		}
-	}, [canManageBilling, rolePending, navigate]);
+	}, [canManageBilling, rolePending, router]);
 
 	if (rolePending || !canManageBilling) {
 		return null;
@@ -97,10 +96,7 @@ export function BillingPage() {
 				<AnimatedForwardButton
 					label="All plans"
 					onClick={() =>
-						void navigate({
-							to: "/settings/billing/plans",
-							search: { from: undefined },
-						})
+						router.push(buildAppHref({ to: "/settings/billing/plans", search: { from: undefined } }))
 					}
 				/>
 			</div>
@@ -168,10 +164,7 @@ export function BillingPage() {
 								size="small"
 								className="rounded-full font-medium"
 								onClick={() =>
-									void navigate({
-										to: "/settings/billing/plans",
-										search: { from: undefined },
-									})
+									router.push(buildAppHref({ to: "/settings/billing/plans", search: { from: undefined } }))
 								}
 							>
 								View all plans

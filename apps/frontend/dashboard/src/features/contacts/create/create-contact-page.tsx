@@ -1,6 +1,7 @@
+import { useRouter } from "next/navigation";
 import { Icon } from "@reloop/ui/icon";
 import { KbdEsc } from "@reloop/ui/kbd-esc";
-import { useNavigate } from "#/lib/navigation";
+
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -17,7 +18,7 @@ import { MethodSelectionCard } from "./components/method-selection-card";
 import { SingleContactForm } from "./components/single-contact-form";
 
 export function CreateContactPage() {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const isAiPanelOpen = useUIStore((s) => s.isAiPanelOpen);
 	const [currentStep, setCurrentStep] =
 		useState<CreateContactStep>("select-method");
@@ -25,7 +26,7 @@ export function CreateContactPage() {
 	const isMethodSelection = currentStep === "select-method";
 
 	useHotkeys("esc", () => {
-		void navigate({ to: "/contacts" });
+		router.push("/contacts");
 	});
 
 	return (
@@ -36,7 +37,7 @@ export function CreateContactPage() {
 				<div className="absolute top-6 right-6 z-30 lg:right-10">
 					<button
 						type="button"
-						onClick={() => void navigate({ to: "/contacts" })}
+						onClick={() => router.push("/contacts")}
 						className="group flex cursor-pointer items-center gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 px-2.5 py-1 text-text-sub-600 text-xs shadow-xs transition-all hover:bg-bg-weak-50 hover:text-text-strong-950"
 					>
 						<Icon

@@ -1,10 +1,12 @@
+import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
 import { Logo } from "@reloop/ui/logo";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { Link, useNavigate } from "#/lib/navigation";
+import { Link } from "#/lib/navigation";
+
 import { Plus } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -209,7 +211,7 @@ export const InboxSidebar = ({
 	mailbox: AgentMailbox;
 	folder: string;
 }) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { collapsed, registerOpenCompose } = useInboxSidebar();
 	const {
 		isLoadingMailboxes,
@@ -574,10 +576,7 @@ export const InboxSidebar = ({
 				onClose={() => setIsAddMailboxOpen(false)}
 				onCreated={(created) => {
 					toast.success("Mailbox added");
-					void navigate({
-						to: "/inbox/$mailboxId",
-						params: { mailboxId: created.id },
-					});
+					router.push(`/inbox/${created.id}`);
 				}}
 			/>
 			<InboxLabelDialog
@@ -587,10 +586,7 @@ export const InboxSidebar = ({
 					const id = await addLabel(name, color);
 					if (id) {
 						toast.success(`Label "${name}" created`);
-						void navigate({
-							to: "/inbox/$mailboxId/label/$labelId",
-							params: { mailboxId: mailbox.id, labelId: id },
-						});
+						router.push(`/inbox/${mailbox.id}/label/${id}`);
 					} else {
 						toast.error("Failed to create label");
 						throw new Error("Failed to create label");

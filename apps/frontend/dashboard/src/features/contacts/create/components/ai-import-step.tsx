@@ -1,8 +1,9 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "#/lib/navigation";
+
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -11,7 +12,7 @@ interface AiImportStepProps {
 }
 
 export function AiImportStep({ onBack }: AiImportStepProps) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [rawText, setRawText] = useState("");
 	const [isProcessing, setIsProcessing] = useState(false);
 
@@ -24,7 +25,7 @@ export function AiImportStep({ onBack }: AiImportStepProps) {
 			// Simulate AI parsing delay
 			await new Promise((resolve) => setTimeout(resolve, 1000));
 			toast.success("AI parsed contacts successfully!");
-			void navigate({ to: "/contacts" });
+			router.push("/contacts");
 		} catch (error) {
 			console.error("AI import error:", error);
 			toast.error("Failed to parse text with AI");

@@ -1,10 +1,11 @@
+import { useRouter } from "next/navigation";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { WebhookAvatar } from "#/features/webhooks/components/webhook-avatar";
 import {
 	useInvalidateWebhooks,
 	type WebhookDetailData,
 } from "#/features/webhooks/hooks/use-webhooks-query";
-import { useNavigate } from "#/lib/navigation";
+
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
@@ -63,7 +64,7 @@ export function WebhookHeader({
 	onTriggerTest,
 	onRetry,
 }: WebhookHeaderProps) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const invalidate = useInvalidateWebhooks();
 	const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
@@ -97,10 +98,7 @@ export function WebhookHeader({
 	const handleMenuAction = async (id: WebhookHeaderMenuAction) => {
 		if (!webhook) return;
 		if (id === "edit") {
-			void navigate({
-				to: "/webhooks/$webhookId/edit",
-				params: { webhookId: webhook.id },
-			});
+			router.push(`/webhooks/${webhook.id}/edit`);
 			return;
 		}
 		if (id === "docs") {
@@ -139,7 +137,7 @@ export function WebhookHeader({
 		return (
 			<div className="pt-10 pb-2">
 				<AnimatedBackButton
-					onClick={() => void navigate({ to: "/webhooks" })}
+					onClick={() => router.push("/webhooks")}
 				/>
 				<div className="flex items-center justify-between pt-6">
 					<div>
@@ -160,7 +158,7 @@ export function WebhookHeader({
 
 	return (
 		<div className="pt-10 pb-2">
-			<AnimatedBackButton onClick={() => void navigate({ to: "/webhooks" })} />
+			<AnimatedBackButton onClick={() => router.push("/webhooks")} />
 
 			<div className="flex items-start justify-between gap-4 pt-6">
 				<div className="min-w-0">
@@ -230,10 +228,7 @@ export function WebhookHeader({
 								size="xsmall"
 								className="font-semibold"
 								onClick={() =>
-									void navigate({
-										to: "/webhooks/$webhookId/edit",
-										params: { webhookId: webhook.id },
-									})
+									router.push(`/webhooks/${webhook.id}/edit`)
 								}
 							>
 								<Icon name="edit" className="h-3.5 w-3.5" />

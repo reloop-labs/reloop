@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -6,7 +7,7 @@ import {
 	Root as PopoverRoot,
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
-import { useNavigate } from "#/lib/navigation";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
@@ -28,7 +29,7 @@ export const GroupDropdown = ({
 	isDeleting = false,
 	onOpenChange,
 }: GroupDropdownProps) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [, setModal] = useQueryState("modal");
 	const [, setId] = useQueryState("id");
 
@@ -120,10 +121,7 @@ export const GroupDropdown = ({
 	const handleItemClick = async (itemId: string) => {
 		if (itemId === "view") {
 			setPopoverOpen(false);
-			void navigate({
-				to: "/contacts/groups/$groupId",
-				params: { groupId: group.id },
-			});
+			router.push(`/contacts/groups/${group.id}`);
 		} else if (itemId === "edit") {
 			setPopoverOpen(false);
 			if (onEdit) {

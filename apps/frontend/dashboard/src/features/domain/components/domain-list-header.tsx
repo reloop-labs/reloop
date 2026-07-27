@@ -1,13 +1,14 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "#/lib/navigation";
+
 import { useHotkeys } from "react-hotkeys-hook";
 
 export function DomainListHeader() {
-	const navigate = useNavigate();
+	const router = useRouter();
 
-	const openAddDomain = () => void navigate({ to: "/domain/add" });
+	const openAddDomain = () => router.push("/domain/add");
 
 	useHotkeys("mod+a", (e) => {
 		e.preventDefault();

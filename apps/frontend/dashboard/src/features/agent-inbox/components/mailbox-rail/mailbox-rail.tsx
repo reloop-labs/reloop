@@ -1,6 +1,8 @@
+import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Link, useNavigate } from "#/lib/navigation";
+import { Link } from "#/lib/navigation";
+
 import { Plus } from "lucide-react";
 import { useMemo } from "react";
 import { useAgentInbox } from "#/features/agent-inbox/components/agent-inbox-provider";
@@ -91,7 +93,7 @@ export function MailboxRail({
 	activeMailboxId: string;
 	onAddMailbox: () => void;
 }) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const {
 		mailboxes,
 		isLoadingMailboxes,
@@ -109,7 +111,7 @@ export function MailboxRail({
 
 	const switchMailbox = (id: string) => {
 		if (id === activeMailboxId) return;
-		void navigate({ to: "/inbox/$mailboxId", params: { mailboxId: id } });
+		router.push(`/inbox/${id}`);
 	};
 
 	return (

@@ -78,19 +78,16 @@ describe("logout session cache", () => {
 			defaultOptions: { queries: { staleTime: 30_000 } },
 		});
 		seedAuthenticatedCache(queryClient);
-		const navigate = vi.fn().mockResolvedValue(undefined);
+		const push = vi.fn();
 
-		await signOutAndClearSession(queryClient, navigate);
+		await signOutAndClearSession(queryClient, { push });
 
 		expect(signOutMock).toHaveBeenCalledOnce();
 		expect(queryClient.getQueryData(queryKeys.auth.session())).toBeUndefined();
-		expect(navigate).toHaveBeenCalledWith({
-			to: "/login",
-			search: { inviteId: undefined },
-		});
+		expect(push).toHaveBeenCalledWith("/login");
 		// Order: API sign-out first, then navigate (cache already empty)
 		expect(signOutMock.mock.invocationCallOrder[0]).toBeLessThan(
-			navigate.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
+			push.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
 		);
 	});
 });

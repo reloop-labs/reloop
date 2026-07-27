@@ -1,11 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "#/lib/navigation";
 
 export const WorkflowNotFound = () => {
-	const navigate = useNavigate();
+	const router = useRouter();
 
 	return (
 		<div className="mx-auto flex max-w-md flex-col items-center px-8 py-24 text-center">
@@ -18,7 +18,7 @@ export const WorkflowNotFound = () => {
 			<p className="mb-6 text-sm text-text-sub-600">
 				This workflow may have been deleted or the link is incorrect.
 			</p>
-			<AnimatedBackButton onClick={() => void navigate({ to: "/workflows" })} />
+			<AnimatedBackButton onClick={() => router.push("/workflows")} />
 		</div>
 	);
 };

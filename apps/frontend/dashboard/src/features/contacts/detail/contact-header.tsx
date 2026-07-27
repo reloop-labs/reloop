@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import type { AudienceStatus } from "#/features/contacts/audience";
@@ -17,7 +18,8 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { Link, useNavigate } from "#/lib/navigation";
+import { Link } from "#/lib/navigation";
+
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { DeleteContactModal } from "../components/contacts/delete-contact-modal";
@@ -64,7 +66,7 @@ export const ContactHeader = ({
 	propertyValues,
 	enrolledChannels = [],
 }: ContactHeaderProps) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [copied, setCopied] = useState(false);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -91,7 +93,7 @@ export const ContactHeader = ({
 
 	const handleDeleteSuccess = () => {
 		toast.success("Contact deleted");
-		void navigate({ to: "/contacts" });
+		router.push("/contacts");
 	};
 
 	const handleMenuItemClick = (itemId: string) => {
@@ -105,7 +107,7 @@ export const ContactHeader = ({
 	if (!contact && !isLoading) {
 		return (
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton onClick={() => void navigate({ to: "/contacts" })} />
+				<AnimatedBackButton onClick={() => router.push("/contacts")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
 						<div className="flex items-center gap-1.5">
@@ -138,7 +140,7 @@ export const ContactHeader = ({
 	return (
 		<>
 			<div className="pt-10 pb-8">
-				<AnimatedBackButton onClick={() => void navigate({ to: "/contacts" })} />
+				<AnimatedBackButton onClick={() => router.push("/contacts")} />
 				<div className="flex items-center justify-between pt-6">
 					<div>
 						{isLoading ? (

@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
@@ -6,7 +7,7 @@ import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useLoading } from "@reloop/ui/use-loading";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "#/lib/navigation";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
@@ -27,7 +28,7 @@ export function VerifyOTP({
 	inviteId?: string;
 	mode?: "login" | "signup";
 }) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const queryClient = useQueryClient();
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -80,7 +81,7 @@ export function VerifyOTP({
 					{ inviteId: inviteId || null },
 				);
 				timeoutRef.current = setTimeout(() => {
-					void navigatePostAuth(navigate, destination);
+					void navigatePostAuth(router, destination);
 				}, 2000);
 			} else {
 				changeStatus("idle");

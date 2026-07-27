@@ -1,9 +1,10 @@
+import { useRouter } from "next/navigation";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import { navigatePostAuth } from "#/utils/navigate-post-auth";
 import { resolvePostAuthDestinationWithQuery } from "#/utils/post-auth-destination";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "#/lib/navigation";
+
 import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import { ActivityChartCard } from "./components/activity-chart-card";
 import { AgentInboxCard } from "./components/agent-inbox-card";
@@ -58,7 +59,7 @@ function LazyCard({
  * Still redirects orgless users to onboarding / invite.
  */
 export function HomePage() {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const queryClient = useQueryClient();
 	const { data: session, isPending } = useSessionQuery();
 	const {
@@ -79,7 +80,7 @@ export function HomePage() {
 				await resolvePostAuthDestinationWithQuery(queryClient);
 			if (cancelled) return;
 			if (destination !== "/") {
-				await navigatePostAuth(navigate, destination);
+				await navigatePostAuth(router, destination);
 			}
 		})();
 
@@ -91,7 +92,7 @@ export function HomePage() {
 		isPending,
 		orgPending,
 		organizations,
-		navigate,
+		router,
 		queryClient,
 	]);
 

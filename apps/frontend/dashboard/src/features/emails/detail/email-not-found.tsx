@@ -1,14 +1,15 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "#/lib/navigation";
+
 import type * as React from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
 export const EmailNotFound: React.FC = () => {
-	const navigate = useNavigate();
+	const router = useRouter();
 
 	useHotkeys("mod+e", () => {
-		void navigate({ to: "/emails/sent" });
+		router.push("/emails/sent");
 	});
 
 	return (
@@ -27,7 +28,7 @@ export const EmailNotFound: React.FC = () => {
 			</div>
 			<div className="flex items-center justify-center">
 				<Button.Root
-					onClick={() => void navigate({ to: "/emails/sent" })}
+					onClick={() => router.push("/emails/sent")}
 					variant="neutral"
 					size="xsmall"
 					className="gap-2 rounded-lg"

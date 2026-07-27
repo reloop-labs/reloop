@@ -1,5 +1,6 @@
+import { useRouter } from "next/navigation";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useNavigate } from "#/lib/navigation";
+
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import type React from "react";
 import { useEffect } from "react";
@@ -14,7 +15,7 @@ import { ConfigureDnsStep } from "./step3/configure-dns-step";
 import { GenerateApiKeyStep } from "./step4/generate-api-key-step";
 
 export function OnboardingPage() {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { data: session, isPending } = useSessionQuery();
 	const [step] = useQueryState("step", parseAsInteger.withDefault(1));
 	const [name] = useQueryState("name", parseAsString.withDefault(""));
@@ -37,9 +38,9 @@ export function OnboardingPage() {
 	useEffect(() => {
 		if (isPending) return;
 		if (!session) {
-			void navigate({ to: "/login", search: { inviteId: undefined } });
+			router.push("/login");
 		}
-	}, [session, isPending, navigate]);
+	}, [session, isPending, router]);
 
 	if (isPending) {
 		return (

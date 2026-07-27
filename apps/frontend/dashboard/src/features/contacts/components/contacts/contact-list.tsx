@@ -1,8 +1,9 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { useNavigate } from "#/lib/navigation";
+
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -45,7 +46,7 @@ function SummaryCard({
 }
 
 export function ContactList() {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { activeOrganization } = useActiveOrganization();
 	const [searchQuery, setSearchQuery] = useQueryState(
 		"search",
@@ -196,7 +197,7 @@ export function ContactList() {
 					total={data?.total || 0}
 					isLoading={isLoading}
 					loadingRows={6}
-					onAddContact={() => void navigate({ to: "/contacts/create" })}
+					onAddContact={() => router.push("/contacts/create")}
 					searchQuery={searchQuery ?? ""}
 					onClearSearch={() => void setSearchQuery(null)}
 				/>

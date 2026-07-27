@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
@@ -9,7 +10,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { ApiKeyAvatar } from "#/features/api-keys/components/api-key-avatar";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
-import { useNavigate } from "#/lib/navigation";
+
 import { useInvalidateApiKeys } from "../hooks/use-api-keys-query";
 import type { ApiKeyDetail } from "../types";
 import { ApiKeyHeaderMenu, type HeaderMenuAction } from "./api-key-header-menu";
@@ -27,7 +28,7 @@ export function ApiKeyHeader({
 	onRetry?: () => void;
 	onDeleteApiKey?: () => void;
 }) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const invalidate = useInvalidateApiKeys();
 	const [, setRotateId] = useQueryState("rotate");
 	const [, setEditId] = useQueryState("edit");
@@ -101,7 +102,7 @@ export function ApiKeyHeader({
 		return (
 			<div className="pt-10 pb-2">
 				<AnimatedBackButton
-					onClick={() => void navigate({ to: "/api-keys" })}
+					onClick={() => router.push("/api-keys")}
 				/>
 				<div className="flex items-center justify-between pt-6">
 					<div>
@@ -124,7 +125,7 @@ export function ApiKeyHeader({
 
 	return (
 		<div className="pt-10 pb-2">
-			<AnimatedBackButton onClick={() => void navigate({ to: "/api-keys" })} />
+			<AnimatedBackButton onClick={() => router.push("/api-keys")} />
 
 			<div className="flex items-start justify-between gap-4 pt-6">
 				<div className="min-w-0">

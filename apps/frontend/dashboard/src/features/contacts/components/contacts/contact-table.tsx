@@ -1,7 +1,8 @@
+import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useNavigate } from "#/lib/navigation";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
@@ -81,7 +82,7 @@ export const ContactTable = ({
 	emptyStateDocsText: _emptyStateDocsText,
 	emptyStateDocsLink: _emptyStateDocsLink,
 }: ContactTableProps) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [, setModal] = useQueryState("modal");
 	const [, setId] = useQueryState("id");
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
@@ -103,10 +104,7 @@ export const ContactTable = ({
 
 	const handleRowClick = (contact: Contact) => {
 		if (editingContactId === contact.id) return;
-		void navigate({
-			to: "/contacts/detail/$contactId",
-			params: { contactId: contact.id },
-		});
+		router.push(`/contacts/detail/${contact.id}`);
 	};
 
 	const handleEdit = (contact: Contact) => {

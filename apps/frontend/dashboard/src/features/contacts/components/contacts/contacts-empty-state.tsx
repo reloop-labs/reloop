@@ -1,7 +1,7 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "#/lib/navigation";
 
 interface ContactsEmptyStateProps {
 	onAddContact?: () => void;
@@ -20,14 +20,14 @@ export function ContactsEmptyState({
 	description,
 	buttonText,
 }: ContactsEmptyStateProps) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const isFiltered = searchQuery.trim() !== "";
 
 	const handleAddContact = () => {
 		if (onAddContact) {
 			onAddContact();
 		} else {
-			void navigate({ to: "/contacts/create" });
+			router.push("/contacts/create");
 		}
 	};
 

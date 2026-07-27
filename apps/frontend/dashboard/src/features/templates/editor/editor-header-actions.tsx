@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
@@ -6,7 +7,7 @@ import { KbdEsc } from "@reloop/ui/kbd-esc";
 import * as Modal from "@reloop/ui/modal";
 import * as Popover from "@reloop/ui/popover";
 import * as Textarea from "@reloop/ui/textarea";
-import { useNavigate } from "#/lib/navigation";
+
 import { useCurrentEditor } from "@tiptap/react";
 import { parseAsStringLiteral, useQueryState } from "nuqs";
 import { useRef, useState } from "react";
@@ -283,7 +284,7 @@ export const EditorHeaderActions = ({
 	isSynced,
 }: EditorHeaderActionsProps) => {
 	const templateId = useTemplateId();
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { editor } = useCurrentEditor();
 	const {
 		isSavingDraft,
@@ -450,7 +451,7 @@ export const EditorHeaderActions = ({
 				method: "DELETE",
 				credentials: "include",
 			});
-			void navigate({ to: "/templates" });
+			router.push("/templates");
 		} catch (error) {
 			console.error("Failed to delete template:", error);
 			toast.error("Failed to delete template.");
@@ -472,10 +473,7 @@ export const EditorHeaderActions = ({
 
 			const newTemplate = await response.json();
 			toast.success("Template duplicated successfully");
-			void navigate({
-				to: "/templates/$templateId",
-				params: { templateId: newTemplate.id },
-			});
+			router.push(`/templates/${newTemplate.id}`);
 		} catch (error) {
 			console.error("Failed to duplicate template:", error);
 			toast.error("Failed to duplicate template");

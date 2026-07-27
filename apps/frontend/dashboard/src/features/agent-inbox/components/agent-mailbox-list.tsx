@@ -1,9 +1,10 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useNavigate } from "#/lib/navigation";
+
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -56,7 +57,7 @@ function AgentMailboxActionsDropdown({
 	isToggling: boolean;
 	onOpenChange?: (open: boolean) => void;
 }) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [open, setOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
@@ -106,10 +107,7 @@ function AgentMailboxActionsDropdown({
 		} else if (itemId === "delete") {
 			onDelete(mailbox.id);
 		} else if (itemId === "view") {
-			void navigate({
-				to: "/inbox/$mailboxId",
-				params: { mailboxId: mailbox.id },
-			});
+			router.push(`/inbox/${mailbox.id}`);
 		} else if (itemId === "copy") {
 			void navigator.clipboard.writeText(mailbox.email);
 			toast.success("Email copied to clipboard");
@@ -276,7 +274,7 @@ function FilteredEmptyState({
 // ── Main list ────────────────────────────────────────────────────────────────
 
 export const AgentMailboxList = () => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { mailboxes, refresh, isLoadingMailboxes } = useAgentInbox();
 	const [modal, setModal] = useQueryState("modal");
 	const [, setDeleteId] = useQueryState("delete");
@@ -362,7 +360,7 @@ export const AgentMailboxList = () => {
 	};
 
 	const goToMailbox = (id: string) => {
-		void navigate({ to: "/inbox/$mailboxId", params: { mailboxId: id } });
+		router.push(`/inbox/${id}`);
 	};
 
 	const clearFilters = () => {

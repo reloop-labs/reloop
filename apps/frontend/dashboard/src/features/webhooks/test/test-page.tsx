@@ -1,8 +1,10 @@
+import { buildAppHref } from "#/lib/navigation-url";
+import { useRouter } from "next/navigation";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { TriggerWebhookTester } from "#/features/webhooks/components/trigger-webhook-tester";
 import { WebhookAvatar } from "#/features/webhooks/components/webhook-avatar";
 import { useWebhookDetailQuery } from "#/features/webhooks/hooks/use-webhooks-query";
-import { useNavigate } from "#/lib/navigation";
+
 import { cn } from "@reloop/ui/cn";
 import { Skeleton } from "@reloop/ui/skeleton";
 
@@ -35,17 +37,14 @@ function statusBadgeClass(status: string) {
 }
 
 export function WebhookTestPage({ webhookId }: { webhookId: string }) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { data: webhook, isPending: isLoading } =
 		useWebhookDetailQuery(webhookId);
 
 	const displayName = webhook?.name || webhook?.url || "Webhook";
 
 	const goBack = () => {
-		void navigate({
-			to: "/webhooks/$webhookId",
-			params: { webhookId },
-		});
+		router.push(buildAppHref({ to: "/webhooks/$webhookId", params: { webhookId } }));
 	};
 
 	return (

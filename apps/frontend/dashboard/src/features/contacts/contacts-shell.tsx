@@ -1,7 +1,9 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate, useRouterState } from "#/lib/navigation";
+import { useRouterState } from "#/lib/navigation";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
@@ -12,7 +14,7 @@ import { ContactsModals } from "./contacts-modals";
 
 export function ContactsShell({ children }: { children: React.ReactNode }) {
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [, setModal] = useQueryState("modal");
 	const [deletedItemName, setDeletedItemName] = useState<string | null>(null);
 
@@ -36,7 +38,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 		if (isPropertiesPage) void setModal("add-property");
 		else if (isChannelsPage) void setModal("create-channel");
 		else if (isGroupsPage) void setModal("create-group");
-		else void navigate({ to: "/contacts/create" });
+		else router.push("/contacts/create");
 	};
 
 	useHotkeys(
@@ -103,7 +105,7 @@ export function ContactsShell({ children }: { children: React.ReactNode }) {
 						<div>
 							{isBulkImportPage && (
 								<Button.Root
-									onClick={() => void navigate({ to: "/contacts" })}
+									onClick={() => router.push("/contacts")}
 									variant="neutral"
 									mode="stroke"
 									size="xxsmall"

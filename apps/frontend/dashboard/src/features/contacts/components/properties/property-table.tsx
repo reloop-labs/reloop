@@ -1,3 +1,5 @@
+import { buildAppHref, normalizeAppPathname } from "#/lib/navigation-url";
+import { useRouter, usePathname } from "next/navigation";
 import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
@@ -8,7 +10,7 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useNavigate } from "#/lib/navigation";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
@@ -86,7 +88,8 @@ const PropertyActionsPopover = ({
 	onDelete,
 	onOpenChange,
 }: PropertyActionsPopoverProps) => {
-	const navigate = useNavigate();
+	const router = useRouter();
+	const pathname = usePathname();
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
 	const [copiedKey, setCopiedKey] = useState<"name" | "id" | null>(null);
@@ -159,13 +162,10 @@ const PropertyActionsPopover = ({
 			}
 		} else if (itemId === "filter-contacts") {
 			setPopoverOpen(false);
-			void navigate({
-				to: "/contacts",
-				search: (prev: Record<string, unknown>) => ({
+			router.push(buildAppHref({ to: "/contacts", search: (prev: Record<string, unknown>) => ({
 					...prev,
 					search: property.propertyName,
-				}),
-			});
+				}) }, { currentPathname: normalizeAppPathname(pathname), currentSearch: typeof window !== "undefined" ? window.location.search : "" }));
 		} else if (itemId === "delete") {
 			setPopoverOpen(false);
 			onDelete(property);

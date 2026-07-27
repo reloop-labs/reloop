@@ -1,3 +1,5 @@
+import { buildAppHref } from "#/lib/navigation-url";
+import { useRouter } from "next/navigation";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { formatRelativeTime } from "#/utils/format-relative-time";
 import * as Button from "@reloop/ui/button";
@@ -9,7 +11,7 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { useNavigate } from "#/lib/navigation";
+
 import axios from "axios";
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
@@ -344,7 +346,7 @@ export const WebhookTable = ({
 	onMutate,
 	onDeleteSuccess,
 }: WebhookTableProps) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 	const [deleteId, setDeleteId] = useQueryState("delete");
 	const [isTogglingStatus, setIsTogglingStatus] = useState<string | null>(null);
@@ -352,24 +354,15 @@ export const WebhookTable = ({
 		searchQuery.trim() !== "" || statusFilter !== "all";
 
 	const goToDetail = (webhookId: string) => {
-		void navigate({
-			to: "/webhooks/$webhookId",
-			params: { webhookId },
-		});
+		router.push(buildAppHref({ to: "/webhooks/$webhookId", params: { webhookId } }));
 	};
 
 	const goToTest = (webhookId: string) => {
-		void navigate({
-			to: "/webhooks/$webhookId/test",
-			params: { webhookId },
-		});
+		router.push(buildAppHref({ to: "/webhooks/$webhookId/test", params: { webhookId } }));
 	};
 
 	const goToEdit = (webhookId: string) => {
-		void navigate({
-			to: "/webhooks/$webhookId/edit",
-			params: { webhookId },
-		});
+		router.push(buildAppHref({ to: "/webhooks/$webhookId/edit", params: { webhookId } }));
 	};
 
 	const handleCopyUrl = async (url: string) => {

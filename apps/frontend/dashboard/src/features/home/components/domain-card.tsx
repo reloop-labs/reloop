@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import {
@@ -14,7 +15,7 @@ import * as Tooltip from "@reloop/ui/tooltip";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, MoreHorizontal, Plus } from "lucide-react";
 import { Link } from "#/lib/navigation";
-import { useNavigate } from "#/lib/navigation";
+
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -122,7 +123,7 @@ const RowActionsDropdown = ({
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const [popoverOpen, setPopoverOpen] = useState(false);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-		const navigate = useNavigate();
+		const router = useRouter();
 
 	const currentTab = buttonRefs.current[hoverIdx ?? -1];
 	const currentRect = currentTab?.getBoundingClientRect();
@@ -162,7 +163,7 @@ const RowActionsDropdown = ({
 		e.stopPropagation();
 		setPopoverOpen(false);
 		if (itemId === "configure") {
-			void navigate({ to: "/domain/$domainId", params: { domainId: domain.id } });
+			router.push(`/domain/${domain.id}`);
 		} else if (itemId === "copy-id") {
 			navigator.clipboard.writeText(domain.id);
 			toast.success("Domain ID copied to clipboard");

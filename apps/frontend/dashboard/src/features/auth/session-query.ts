@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { authClient } from "@reloop/auth/client";
 import {
 	type QueryClient,
@@ -5,7 +6,7 @@ import {
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
-import { useNavigate } from "#/lib/navigation";
+
 import { useCallback } from "react";
 import { queryKeys } from "#/lib/query-keys";
 
@@ -70,21 +71,18 @@ export function clearClientAuthState(queryClient: QueryClient) {
  */
 export async function signOutAndClearSession(
 	queryClient: QueryClient,
-	navigate: (opts: {
-		to: "/login";
-		search: { inviteId: undefined };
-	}) => unknown,
+	router: { push: (href: string) => void },
 ) {
 	await authClient.signOut();
 	clearClientAuthState(queryClient);
-	await navigate({ to: "/login", search: { inviteId: undefined } });
+	router.push("/login");
 }
 
 export function useSignOut() {
 	const queryClient = useQueryClient();
-	const navigate = useNavigate();
+	const router = useRouter();
 	return useCallback(
-		() => signOutAndClearSession(queryClient, navigate),
-		[queryClient, navigate],
+		() => signOutAndClearSession(queryClient, router),
+		[queryClient, router],
 	);
 }

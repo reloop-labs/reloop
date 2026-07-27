@@ -1,6 +1,8 @@
+import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
-import { Link, useNavigate } from "#/lib/navigation";
+import { Link } from "#/lib/navigation";
+
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useState } from "react";
 import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
@@ -23,7 +25,7 @@ export function DomainTable({
 	isLoading?: boolean;
 	loadingRows?: number;
 }) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 	const [, setDeleteId] = useQueryState("delete");
 	const [currentPage, setCurrentPage] = useQueryState(
@@ -41,7 +43,7 @@ export function DomainTable({
 	const endIndex = Math.min((currentPage ?? 1) * (pageSize ?? 10), total);
 
 	const goToDomain = (id: string) => {
-		void navigate({ to: "/domain/$domainId", params: { domainId: id } });
+		router.push(`/domain/${id}`);
 	};
 
 	return (

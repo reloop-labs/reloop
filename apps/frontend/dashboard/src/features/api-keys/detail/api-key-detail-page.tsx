@@ -1,6 +1,7 @@
+import { useRouter } from "next/navigation";
 import { Icon } from "@reloop/ui/icon";
 import { useQueryState } from "nuqs";
-import { useNavigate } from "#/lib/navigation";
+
 import { useApiKeyDetailQuery } from "../hooks/use-api-key-detail-query";
 import { DeleteApiKeyModal } from "../modals/delete-api-key-modal";
 import { EditApiKeyModal } from "../modals/edit-api-key-modal";
@@ -30,7 +31,7 @@ function toModalKey(apiKey: ApiKeyData | undefined): ApiKeyData[] {
 }
 
 export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [, setDeleteId] = useQueryState("delete");
 
 	const { data, error, isPending, isFetching, refetch } =
@@ -96,7 +97,7 @@ export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
 			<DeleteApiKeyModal
 				apiKeys={apiKeysForModal}
 				onDeleteSuccess={() => {
-					void navigate({ to: "/api-keys" });
+					router.push("/api-keys");
 				}}
 			/>
 			<RotateApiKeyModal apiKeys={apiKeysForModal} />

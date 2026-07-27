@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
@@ -6,7 +7,8 @@ import * as Modal from "@reloop/ui/modal";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate, useRouterState } from "#/lib/navigation";
+import { useRouterState } from "#/lib/navigation";
+
 import axios from "axios";
 import {
 	AnimatePresence,
@@ -43,7 +45,7 @@ export const DeleteChannelModal = ({
 	onDeleteSuccess,
 }: DeleteChannelModalProps) => {
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
-	const navigate = useNavigate();
+	const router = useRouter();
 
 	const [modal, setModal] = useQueryState("modal");
 	const [id, setId] = useQueryState("id");
@@ -117,7 +119,7 @@ export const DeleteChannelModal = ({
 				handleClose();
 				onDeleteSuccess?.(deletedName);
 				if (isChannelDetailPage) {
-					void navigate({ to: "/contacts/channels" });
+					router.push("/contacts/channels");
 				} else {
 					void invalidate();
 				}

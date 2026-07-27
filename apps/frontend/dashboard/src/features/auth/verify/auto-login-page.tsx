@@ -1,9 +1,11 @@
+import { buildAppHref } from "#/lib/navigation-url";
+import { useRouter } from "next/navigation";
 import { authClient } from "@reloop/auth/client";
 import * as Button from "@reloop/ui/button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "#/lib/navigation";
+
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef, useState } from "react";
 import { sessionQueryOptions } from "#/features/auth/session-query";
@@ -19,7 +21,7 @@ import { resolvePostAuthDestinationWithQuery } from "#/utils/post-auth-destinati
  * from the URL, refreshes the session cache, then routes post-auth.
  */
 export function AutoLoginPage() {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const queryClient = useQueryClient();
 	const [otpSentEmail] = useQueryState(
 		"otpSent",
@@ -64,7 +66,7 @@ export function AutoLoginPage() {
 						queryClient,
 						{ inviteId: inviteId || null },
 					);
-					await navigatePostAuth(navigate, destination);
+					await navigatePostAuth(router, destination);
 					return;
 				}
 
@@ -79,7 +81,7 @@ export function AutoLoginPage() {
 		};
 
 		void verify();
-	}, [otpSentEmail, otpValue, inviteId, navigate, queryClient]);
+	}, [otpSentEmail, otpValue, inviteId, router, queryClient]);
 
 	return (
 		<div className="flex h-dvh flex-col items-center justify-center bg-bg-white-0 antialiased">
@@ -114,12 +116,9 @@ export function AutoLoginPage() {
 									variant="neutral"
 									className="h-11 w-full max-w-sm rounded-2xl!"
 									onClick={() =>
-										void navigate({
-											to: "/login",
-											search: {
+										router.push(buildAppHref({ to: "/login", search: {
 												inviteId: inviteId || undefined,
-											},
-										})
+											} }))
 									}
 								>
 									Back to Login

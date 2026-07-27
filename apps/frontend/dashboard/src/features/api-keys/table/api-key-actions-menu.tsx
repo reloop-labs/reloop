@@ -1,8 +1,9 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "#/lib/navigation";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -25,7 +26,7 @@ export function ApiKeyActionsMenu({
 	apiKey: ApiKeyData;
 	handlers: ApiKeyActionsHandlers;
 }) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const isToggling = handlers.togglingId === apiKey.id;
 	const [open, setOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
@@ -137,10 +138,7 @@ export function ApiKeyActionsMenu({
 
 	const handleItemClick = async (id: (typeof menuItems)[number]["id"]) => {
 		if (id === "view") {
-			void navigate({
-				to: "/api-keys/$apiKeyId",
-				params: { apiKeyId: apiKey.id },
-			});
+			router.push(`/api-keys/${apiKey.id}`);
 			handleOpenChange(false);
 		} else if (id === "edit") {
 			handlers.onEditKey?.(apiKey.id);

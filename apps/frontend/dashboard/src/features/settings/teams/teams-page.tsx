@@ -1,7 +1,9 @@
+import { buildAppHref } from "#/lib/navigation-url";
+import { useRouter } from "next/navigation";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Input from "@reloop/ui/input";
-import { useNavigate } from "#/lib/navigation";
+
 import { useQueryState } from "nuqs";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -18,17 +20,14 @@ export function TeamsPage() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [filters, setFilters] = useState<TeamFilterValue>("all");
 	const [modal, setModal] = useQueryState("modal", { history: "replace" });
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { canManageTeam, canInvite, isPending } = useOrgPermissions();
 
 	useEffect(() => {
 		if (!isPending && !canManageTeam) {
-			void navigate({
-				to: SETTINGS_MEMBER_HOME,
-				search: { from: undefined },
-			});
+			router.push(buildAppHref({ to: SETTINGS_MEMBER_HOME, search: { from: undefined } }));
 		}
-	}, [canManageTeam, isPending, navigate]);
+	}, [canManageTeam, isPending, router]);
 
 	useHotkeys(
 		"mod+a",

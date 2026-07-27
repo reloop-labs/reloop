@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { StarterKit } from "@react-email/editor/extensions";
 import { EmailTheming } from "@react-email/editor/plugins";
 import * as Button from "@reloop/ui/button";
@@ -5,7 +6,7 @@ import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useNavigate } from "#/lib/navigation";
+
 import { EditorContent, useEditor } from "@tiptap/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -272,7 +273,7 @@ export const TemplateGrid = ({
 	onMutate,
 	onDeleteSuccess,
 }: TemplateGridProps) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 	const [templateToDelete, setTemplateToDelete] = useState<{
@@ -317,10 +318,7 @@ export const TemplateGrid = ({
 	};
 
 	const openEditor = (id: string) => {
-		void navigate({
-			to: "/templates/$templateId",
-			params: { templateId: id },
-		});
+		router.push(`/templates/${id}`);
 	};
 
 	return (

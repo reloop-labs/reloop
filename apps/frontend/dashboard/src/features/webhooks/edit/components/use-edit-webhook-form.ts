@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { useActiveOrganization } from "#/features/dashboard/page-header/use-active-organization";
 import {
 	type WebhookDetailData,
@@ -5,7 +6,7 @@ import {
 } from "#/features/webhooks/hooks/use-webhooks-query";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useLoading } from "@reloop/ui/use-loading";
-import { useNavigate } from "#/lib/navigation";
+
 import axios from "axios";
 import { useEffect } from "react";
 import type { Resolver } from "react-hook-form";
@@ -38,7 +39,7 @@ export function useEditWebhookForm(webhook: WebhookDetailData | undefined) {
 	const { activeOrganization } = useActiveOrganization();
 	const { changeStatus, status } = useLoading();
 	const invalidate = useInvalidateWebhooks();
-	const navigate = useNavigate();
+	const router = useRouter();
 
 	const form = useForm<EditWebhookFormValues>({
 		resolver: valibotResolver(
@@ -77,10 +78,7 @@ export function useEditWebhookForm(webhook: WebhookDetailData | undefined) {
 			await invalidate();
 			changeStatus("idle");
 			toast.success("Webhook updated successfully");
-			void navigate({
-				to: "/webhooks/$webhookId",
-				params: { webhookId: webhook.id },
-			});
+			router.push(`/webhooks/${webhook.id}`);
 		} catch (error) {
 			changeStatus("idle");
 			if (axios.isAxiosError(error)) {

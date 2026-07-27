@@ -1,10 +1,12 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import * as Modal from "@reloop/ui/modal";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate, useRouterState } from "#/lib/navigation";
+import { useRouterState } from "#/lib/navigation";
+
 import axios from "axios";
 import {
 	AnimatePresence,
@@ -36,7 +38,7 @@ export function DeleteDomainModal({
 	const animationRef = useRef<AnimationPlaybackControls | null>(null);
 
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
-	const navigate = useNavigate();
+	const router = useRouter();
 	const invalidate = useInvalidateDomains();
 
 	// Cache the selected domain so details remain stable when query invalidates upon deletion
@@ -70,7 +72,7 @@ export function DeleteDomainModal({
 				void setDeleteId(null);
 				if (isOnDetailPage) {
 					setTimeout(() => {
-						void navigate({ to: "/domain" });
+						router.push("/domain");
 					}, 100);
 				}
 				// Reset internal button state after modal exit animation finishes

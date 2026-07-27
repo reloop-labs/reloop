@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { PageSizeDropdown } from "#/features/api-keys/table/page-size-dropdown";
 import { PaginationControls } from "#/features/api-keys/table/pagination-controls";
@@ -16,7 +17,7 @@ import {
 	Trigger as PopoverTrigger,
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useNavigate } from "#/lib/navigation";
+
 import { useRef, useState } from "react";
 import { EmailsEmptyState } from "./emails-empty-state";
 
@@ -234,7 +235,7 @@ export const ReceivedEmailTable = ({
 	hasFilters = false,
 	onClearFilters,
 }: ReceivedEmailTableProps) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
 	const totalPages = Math.ceil(totalLogs / pageSize) || 1;
@@ -243,7 +244,7 @@ export const ReceivedEmailTable = ({
 
 	const handleRowClick = (log: ReceivedEmailData) => {
 		// Agent inbox not fully ported — keep path for future inbox route
-		void navigate({ to: "/agent-inbox" });
+		router.push("/agent-inbox");
 	};
 
 	return (
@@ -353,7 +354,7 @@ export const ReceivedEmailTable = ({
 									<ReceivedActionsDropdown
 										log={log}
 										onViewDetails={() => {
-											void navigate({ to: "/agent-inbox" });
+											router.push("/agent-inbox");
 										}}
 										onOpenChange={(open) =>
 											setActiveDropdownId(open ? log.id : null)

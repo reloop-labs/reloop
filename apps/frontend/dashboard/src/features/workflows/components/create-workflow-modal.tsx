@@ -1,11 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import * as Input from "@reloop/ui/input";
 import * as Label from "@reloop/ui/label";
 import * as Modal from "@reloop/ui/modal";
 import * as Textarea from "@reloop/ui/textarea";
-import { useNavigate } from "#/lib/navigation";
+
 import { useState } from "react";
 import { useWorkflows } from "./workflows-provider";
 
@@ -18,7 +19,7 @@ export const CreateWorkflowModal = ({
 	open,
 	onOpenChange,
 }: CreateWorkflowModalProps) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { createWorkflow } = useWorkflows();
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
@@ -38,10 +39,7 @@ export const CreateWorkflowModal = ({
 			description: description.trim() || undefined,
 		});
 		handleClose();
-		void navigate({
-			to: "/workflows/$workflowId",
-			params: { workflowId: workflow.id },
-		});
+		router.push(`/workflows/${workflow.id}`);
 	};
 
 	return (

@@ -1,9 +1,10 @@
+import { useRouter } from "next/navigation";
 import * as Badge from "@reloop/ui/badge";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import * as Tooltip from "@reloop/ui/tooltip";
-import { useNavigate } from "#/lib/navigation";
+
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
@@ -150,7 +151,7 @@ function PropertyValue({
 }
 
 export function LogDetailPage({ logId }: { logId: string }) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { data: logData, error, isPending } = useLogDetailQuery(logId);
 
 	if (isPending) {
@@ -158,7 +159,7 @@ export function LogDetailPage({ logId }: { logId: string }) {
 			<div className="mx-auto max-w-3xl px-6 pb-12 sm:px-8">
 				<div className="pt-10 pb-4">
 					<AnimatedBackButton
-						onClick={() => void navigate({ to: "/logs" })}
+						onClick={() => router.push("/logs")}
 					/>
 				</div>
 				<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/10">
@@ -188,7 +189,7 @@ export function LogDetailPage({ logId }: { logId: string }) {
 			<div className="mx-auto max-w-3xl px-6 sm:px-8">
 				<div className="pt-10 pb-4">
 					<AnimatedBackButton
-						onClick={() => void navigate({ to: "/logs" })}
+						onClick={() => router.push("/logs")}
 					/>
 				</div>
 				<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 p-12 text-center dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/10">
@@ -211,7 +212,7 @@ export function LogDetailPage({ logId }: { logId: string }) {
 	return (
 		<div className="mx-auto max-w-3xl px-6 pb-12 sm:px-8">
 			<div className="pt-10 pb-4">
-				<AnimatedBackButton onClick={() => void navigate({ to: "/logs" })} />
+				<AnimatedBackButton onClick={() => router.push("/logs")} />
 			</div>
 
 			<div className="rounded-xl border border-stroke-soft-100 bg-bg-white-0 shadow-sm dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/10">

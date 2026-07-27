@@ -1,5 +1,6 @@
+import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "#/lib/navigation";
+
 import { useEffect } from "react";
 import { useSessionQuery } from "#/features/auth/session-query";
 import { navigatePostAuth } from "#/utils/navigate-post-auth";
@@ -10,7 +11,7 @@ import { resolvePostAuthDestinationWithQuery } from "#/utils/post-auth-destinati
  * Returns flags so pages can show a loader instead of flashing auth UI.
  */
 export function useRedirectIfAuthenticated(inviteId?: string) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const queryClient = useQueryClient();
 	const { data: session, isPending, isLoading } = useSessionQuery();
 
@@ -22,12 +23,12 @@ export function useRedirectIfAuthenticated(inviteId?: string) {
 				queryClient,
 				{ inviteId: inviteId || null },
 			);
-			if (!cancelled) await navigatePostAuth(navigate, destination);
+			if (!cancelled) await navigatePostAuth(router, destination);
 		})();
 		return () => {
 			cancelled = true;
 		};
-	}, [session, navigate, inviteId, queryClient]);
+	}, [session, router, inviteId, queryClient]);
 
 	const isSessionLoading = isPending || isLoading;
 	const isRedirecting = Boolean(session);

@@ -1,7 +1,9 @@
+import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
 import * as TabMenuHorizontal from "@reloop/ui/tab-menu-horizontal";
-import { useNavigate, useRouterState } from "#/lib/navigation";
+import { useRouterState } from "#/lib/navigation";
+
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
 
@@ -13,7 +15,7 @@ const items = [
 ] as const;
 
 export function ContactsTabs() {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const [hoveredIdx, setHoveredIdx] = useState<number | undefined>(undefined);
 
@@ -47,7 +49,7 @@ export function ContactsTabs() {
 						)}
 						key={value}
 						value={value}
-						onClick={() => void navigate({ to: path })}
+						onClick={() => router.push(path)}
 					>
 						<Icon name={iconName} className="h-4 w-4" />
 						{title}

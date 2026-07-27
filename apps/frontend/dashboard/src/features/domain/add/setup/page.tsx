@@ -1,10 +1,11 @@
+import { useRouter } from "next/navigation";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "#/lib/navigation";
+
 import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import * as React from "react";
@@ -22,7 +23,7 @@ import { ForwardDNSRecordsButton } from "./components/forward-dns-records";
 
 export function DomainSetupPage({ domainId }: { domainId: string }) {
 	const [isVerifying, setIsVerifying] = React.useState(false);
-	const navigate = useNavigate();
+	const router = useRouter();
 	const invalidate = useInvalidateDomains();
 	const { hasInitialized, isPending: orgPending } = useActiveOrganization();
 	const canFetch = Boolean(domainId && hasInitialized && !orgPending);
@@ -35,7 +36,7 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 	const showLoading = !canFetch || isPending || (isFetching && !domainData);
 
 	useHotkeys("esc", () => {
-		void navigate({ to: "/domain" });
+		router.push("/domain");
 	});
 
 	useHotkeys("mod+enter", (e) => {
@@ -57,7 +58,7 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 			toast.success(
 				"DNS verification started! Verification will continue in the background.",
 			);
-			void navigate({ to: "/domain" });
+			router.push("/domain");
 		} catch (error) {
 			const message = axios.isAxiosError(error)
 				? error.response?.data?.message || "Failed to start DNS verification"
@@ -130,7 +131,7 @@ export function DomainSetupPage({ domainId }: { domainId: string }) {
 					variant="neutral"
 					mode="stroke"
 					size="small"
-					onClick={() => void navigate({ to: "/domain" })}
+					onClick={() => router.push("/domain")}
 					className="rounded-xl"
 				>
 					Cancel

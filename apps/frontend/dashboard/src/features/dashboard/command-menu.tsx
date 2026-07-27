@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { useSignOut } from "#/features/auth/session-query";
 import {
 	mainNavigation,
@@ -7,7 +8,7 @@ import { cn } from "@reloop/ui/cn";
 import * as CommandMenu from "@reloop/ui/command";
 import { Icon } from "@reloop/ui/icon";
 import { KbdKeyOutline } from "@reloop/ui/kbd-key-outline";
-import { useNavigate } from "#/lib/navigation";
+
 import {
 	ArrowDown,
 	ArrowUp,
@@ -90,7 +91,7 @@ const settingsItems = settingsNavigation.flatMap((section) => section.items);
 export function CommandMenuGlobal() {
 	const [open, setOpen] = React.useState(false);
 	const [search, setSearch] = React.useState("");
-	const navigate = useNavigate();
+	const router = useRouter();
 	const signOut = useSignOut();
 	const { setTheme, resolvedTheme } = useTheme();
 	const inputRef = React.useRef<HTMLInputElement>(null);
@@ -115,10 +116,10 @@ export function CommandMenuGlobal() {
 			});
 			// Paths come from mainNavigation / settingsNavigation route table.
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			void navigate({ to: item.path as any });
+			router.push(item.path as any);
 			setOpen(false);
 		},
-		[navigate],
+		[router],
 	);
 
 	useHotkeys(

@@ -1,7 +1,8 @@
+import { useRouter } from "next/navigation";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "#/lib/navigation";
+
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -16,7 +17,7 @@ export const EmptyState = ({
 	isFiltered?: boolean;
 	onClearFilters?: () => void;
 }) => {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const invalidate = useInvalidateTemplates();
 	const [isCreating, setIsCreating] = useState(false);
 
@@ -26,10 +27,7 @@ export const EmptyState = ({
 		try {
 			const template = await createTemplate();
 			await invalidate();
-			void navigate({
-				to: "/templates/$templateId",
-				params: { templateId: template.id },
-			});
+			router.push(`/templates/${template.id}`);
 		} catch {
 			toast.error("Failed to create template");
 		} finally {

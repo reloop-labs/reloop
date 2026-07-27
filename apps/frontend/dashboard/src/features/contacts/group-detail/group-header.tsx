@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import {
@@ -20,7 +21,7 @@ import {
 } from "@reloop/ui/popover";
 import { Skeleton } from "@reloop/ui/skeleton";
 import Spinner from "@reloop/ui/spinner";
-import { useNavigate } from "#/lib/navigation";
+
 import { useQueryState } from "nuqs";
 import { useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -54,7 +55,7 @@ const GroupContactsCount = ({ groupId }: { groupId: string }) => {
 
 export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 	const invalidate = useInvalidateContacts();
-	const navigate = useNavigate();
+	const router = useRouter();
 	const [, setModal] = useQueryState("modal", { history: "replace" });
 	const [copied, setCopied] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
@@ -84,7 +85,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 
 	const handleDeleteSuccess = () => {
 		toast.success("Group deleted");
-		void navigate({ to: "/contacts/groups" });
+		router.push("/contacts/groups");
 	};
 
 	const handleEditStart = () => {
@@ -180,7 +181,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 		return (
 			<div className="pt-10 pb-8">
 				<AnimatedBackButton
-					onClick={() => void navigate({ to: "/contacts/groups" })}
+					onClick={() => router.push("/contacts/groups")}
 				/>
 				<div className="flex items-center justify-between pt-6">
 					<div>
@@ -209,7 +210,7 @@ export const GroupHeader = ({ group, isLoading }: GroupHeaderProps) => {
 		<>
 			<div className="pt-10 pb-8">
 				<AnimatedBackButton
-					onClick={() => void navigate({ to: "/contacts/groups" })}
+					onClick={() => router.push("/contacts/groups")}
 				/>
 				<div className="flex items-center justify-between pt-6">
 					<div>

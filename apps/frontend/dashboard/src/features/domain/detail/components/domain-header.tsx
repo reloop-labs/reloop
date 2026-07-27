@@ -1,7 +1,8 @@
+import { useRouter } from "next/navigation";
 import * as FancyButton from "@reloop/ui/fancy-button";
 import { Icon } from "@reloop/ui/icon";
 import { Skeleton } from "@reloop/ui/skeleton";
-import { useNavigate } from "#/lib/navigation";
+
 import { useHotkeys } from "react-hotkeys-hook";
 import { AnimatedBackButton } from "#/features/dashboard/animated-back-button";
 import { formatRelativeTime } from "#/utils/format-relative-time";
@@ -22,7 +23,7 @@ export function DomainHeader({
 	domainId?: string;
 	isLoading?: boolean;
 }) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const domainName = domain?.domain || domainId || "Domain";
 	const domainRecordId = domain?.id || domainId || "";
 	const status = domain?.status || "pending";
@@ -56,7 +57,7 @@ export function DomainHeader({
 
 	return (
 		<div>
-			<AnimatedBackButton onClick={() => void navigate({ to: "/domain" })} />
+			<AnimatedBackButton onClick={() => router.push("/domain")} />
 			<div className="flex items-center justify-between pt-6">
 				<div>
 					{isLoading ? (

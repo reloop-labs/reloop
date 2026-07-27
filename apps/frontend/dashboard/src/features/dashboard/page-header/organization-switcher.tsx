@@ -1,7 +1,8 @@
+import { useRouter } from "next/navigation";
 import { cn } from "@reloop/ui/cn";
 import * as Dropdown from "@reloop/ui/dropdown";
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "#/lib/navigation";
+
 import { useRef, useState } from "react";
 import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { ensureAbsoluteUrl } from "#/utils/absolute-url";
@@ -71,7 +72,7 @@ export function OrganizationSwitcher({
 	const [isOpen, setIsOpen] = useState(false);
 	const [hoverIdx, setHoverIdx] = useState<number | undefined>(undefined);
 	const buttonRefs = useRef<HTMLButtonElement[]>([]);
-	const navigate = useNavigate();
+	const router = useRouter();
 
 	const activeIndex = activeOrganization
 		? organizations?.findIndex((org) => org.id === activeOrganization.id)
@@ -81,7 +82,7 @@ export function OrganizationSwitcher({
 	const currentRect = currentTab?.getBoundingClientRect();
 
 	const handleCreateOrganization = () => {
-		void navigate({ to: "/onboarding" });
+		router.push("/onboarding");
 		setIsOpen(false);
 	};
 
