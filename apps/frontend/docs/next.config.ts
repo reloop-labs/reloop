@@ -20,6 +20,21 @@ const config = {
 			"@mintlify/components",
 		],
 	},
+	async redirects() {
+		return [
+			// Collapsed multi-page API Keys learn section into a single page
+			{
+				source: "/learn/api-keys/managing-api-keys",
+				destination: "/learn/api-keys",
+				permanent: true,
+			},
+			{
+				source: "/learn/api-keys/details",
+				destination: "/learn/api-keys#security",
+				permanent: true,
+			},
+		];
+	},
 	async rewrites() {
 		return [
 			{

@@ -1,9 +1,22 @@
 ---
-title: Managing API Keys
-description: Create, use, and manage Reloop API keys from the dashboard or with code.
+title: API Keys
+description: Create and use Reloop API keys from the dashboard or with code.
+icon: key-new
 ---
 
-Everything below works from the **dashboard** or with **code**. Pick whichever you prefer — the keys are the same.
+API keys connect your apps to Reloop. You can create and manage them in the **dashboard** or with **code** — both do the same job.
+
+![API Keys list in the Reloop dashboard](/docs/images/docs/api-keys/list.png)
+
+## Two ways, same keys
+
+| Task | Dashboard | Code |
+|------|-----------|------|
+| **Create** | Click **Create API key** | `reloop.apiKey.create` / cURL |
+| **Use** | Copy secret into your app | Send key on every request |
+| **Manage** | Row menu (rotate, disable, delete) | Same actions via API |
+
+Create with either platform. Use the secret in your app. Manage with either platform.
 
 Open the UI any time: [API Keys](https://reloop.sh/dashboard/api-keys)
 
@@ -158,6 +171,31 @@ See every key for your org — secret never included.
 
 ---
 
+## Security
+
+### Store
+
+| Do | Don’t |
+|----|--------|
+| `RELOOP_API_KEY` in env / secrets | Commit keys to git |
+| One key per app | Share one key everywhere |
+| Clear names (`Production`, `CI`) | Leave keys unnamed |
+
+### If a key leaks
+
+1. **Disable** it (dashboard or code) — access stops now
+2. **Rotate** or **create** a replacement
+3. Update apps with the new secret
+4. **Delete** the old key when nothing uses it
+
+### Remember
+
+- Secret is shown **once** (create / rotate)
+- Later you only see a **prefix** in the list
+- Reloop stores a hash, not the full key
+
+---
+
 ## API reference
 
 <CardGroup cols={2}>
@@ -175,4 +213,4 @@ See every key for your org — secret never included.
   </Card>
 </CardGroup>
 
-[Security](/docs/learn/api-keys/details) · [Full API Key endpoints](/docs/api/api-key)
+[Full API Key endpoints](/docs/api/api-key)

@@ -1,5 +1,0 @@
-{
-	"title": "API Keys",
-	"icon": "key-new",
-	"pages": ["index", "managing-api-keys", "details"]
-}
