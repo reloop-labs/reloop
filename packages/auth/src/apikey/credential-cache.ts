@@ -24,6 +24,12 @@ export type ApiKeyCredentialEntry = {
 	userId: string;
 	organizationId: string;
 	apiKeyId: string;
+	/**
+	 * Absolute expiry as unix ms, or null if the key never expires.
+	 * Optional for legacy cache rows written before expiry was stored;
+	 * validate treats missing as "no expiry known" and relies on TTL/revoke.
+	 */
+	expiresAtMs?: number | null;
 };
 
 /**

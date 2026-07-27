@@ -1,4 +1,7 @@
 import {
+	API_KEY_CREDENTIAL_CACHE_TTL_SECONDS,
+	type ApiKeyCredentialCache,
+	type ApiKeyCredentialEntry,
 	type ApiKeyCredentialStore,
 	createApiKeyCredentialCache,
 } from "@reloop/auth/apikey/credential-cache";
@@ -38,6 +41,48 @@ function asCredentialStore(redis: ApiKeyCache): ApiKeyCredentialStore {
 	};
 }
 
+/**
+ * Reuse one credential-cache facade per redis handle.
+ * Avoids allocating createApiKeyCredentialCache on every authenticated request.
+ */
+const credentialCacheByRedis = new WeakMap<object, ApiKeyCredentialCache>();
+
+function credentialCacheFor(redis: ApiKeyCache): ApiKeyCredentialCache {
+	const key = redis as object;
+	let cache = credentialCacheByRedis.get(key);
+	if (!cache) {
+		cache = createApiKeyCredentialCache(asCredentialStore(redis));
+		credentialCacheByRedis.set(key, cache);
+	}
+	return cache;
+}
+
+/** True when expiresAt is set and is at or before now. */
+export function isApiKeyExpired(
+	expiresAt: Date | string | number | null | undefined,
+	nowMs: number = Date.now(),
+): boolean {
+	if (expiresAt == null) return false;
+	const ms =
+		expiresAt instanceof Date
+			? expiresAt.getTime()
+			: typeof expiresAt === "number"
+				? expiresAt
+				: Date.parse(expiresAt);
+	if (Number.isNaN(ms)) return false;
+	return ms <= nowMs;
+}
+
+function bumpRequestStats(db: typeof defaultDb, apiKeyId: string): void {
+	db.update(apikey)
+		.set({
+			requestCount: sql`${apikey.requestCount} + 1`,
+			lastRequest: new Date(),
+		})
+		.where(eq(apikey.id, apiKeyId))
+		.catch((err) => console.error("Failed to update API key stats:", err));
+}
+
 export async function validateApiKey(
 	apiKey: string | null | undefined,
 	redis: ApiKeyCache,
@@ -50,18 +95,27 @@ export async function validateApiKey(
 	}
 
 	const hashedKey = hashApiKey(apiKey);
-	const credentialCache = createApiKeyCredentialCache(asCredentialStore(redis));
+	const credentialCache = credentialCacheFor(redis);
+	const nowMs = Date.now();
 
 	const cached = await credentialCache.read(hashedKey);
 
 	if (cached) {
-		db.update(apikey)
-			.set({
-				requestCount: sql`${apikey.requestCount} + 1`,
-				lastRequest: new Date(),
-			})
-			.where(eq(apikey.id, cached.apiKeyId))
-			.catch((err) => console.error("Failed to update API key stats:", err));
+		// Legacy cache entries without expiresAtMs remain valid until revoke/TTL.
+		if (isApiKeyExpired(cached.expiresAtMs, nowMs)) {
+			// Best-effort evict so the next request hits DB (or fails cleanly).
+			try {
+				await credentialCache.invalidate(hashedKey);
+			} catch (err) {
+				console.error(
+					"Failed to invalidate expired API key credential cache:",
+					err,
+				);
+			}
+			return null;
+		}
+
+		bumpRequestStats(db, cached.apiKeyId);
 
 		return {
 			userId: cached.userId,
@@ -75,33 +129,46 @@ export async function validateApiKey(
 		where: and(eq(apikey.key, hashedKey), eq(apikey.enabled, true)),
 	});
 
-	if (apiKeyRecord) {
-		const entry = {
-			userId: apiKeyRecord.userId,
-			organizationId: apiKeyRecord.organizationId,
-			apiKeyId: apiKeyRecord.id,
-		};
-		// Cache is acceleration only — never fail closed on write.
-		// Invalidate (revoke) is the fail-closed path; auth must honor DB truth.
-		try {
-			await credentialCache.write(hashedKey, entry);
-		} catch (err) {
-			console.error("Failed to cache API key credential:", err);
-		}
-
-		db.update(apikey)
-			.set({
-				requestCount: sql`${apikey.requestCount} + 1`,
-				lastRequest: new Date(),
-			})
-			.where(eq(apikey.id, apiKeyRecord.id))
-			.catch((err) => console.error("Failed to update API key stats:", err));
-
-		return {
-			...entry,
-			authType: "apikey",
-		};
+	if (!apiKeyRecord) {
+		return null;
 	}
 
-	return null;
+	if (isApiKeyExpired(apiKeyRecord.expiresAt, nowMs)) {
+		return null;
+	}
+
+	const entry: ApiKeyCredentialEntry = {
+		userId: apiKeyRecord.userId,
+		organizationId: apiKeyRecord.organizationId,
+		apiKeyId: apiKeyRecord.id,
+		expiresAtMs: apiKeyRecord.expiresAt
+			? apiKeyRecord.expiresAt.getTime()
+			: null,
+	};
+
+	// Cache is acceleration only — never fail closed on write.
+	// Invalidate (revoke) is the fail-closed path; auth must honor DB truth.
+	try {
+		// Cap TTL by time-to-expiry so expired keys do not outlive the secret.
+		let ttlSeconds: number | undefined;
+		if (entry.expiresAtMs != null) {
+			const remainingSec = Math.floor((entry.expiresAtMs - nowMs) / 1000);
+			if (remainingSec <= 0) {
+				return null;
+			}
+			ttlSeconds = Math.min(API_KEY_CREDENTIAL_CACHE_TTL_SECONDS, remainingSec);
+		}
+		await credentialCache.write(hashedKey, entry, ttlSeconds);
+	} catch (err) {
+		console.error("Failed to cache API key credential:", err);
+	}
+
+	bumpRequestStats(db, apiKeyRecord.id);
+
+	return {
+		userId: entry.userId,
+		organizationId: entry.organizationId,
+		apiKeyId: entry.apiKeyId,
+		authType: "apikey",
+	};
 }

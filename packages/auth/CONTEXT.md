@@ -14,6 +14,21 @@ A signed-in browser identity backed by Better Auth cookies, optionally validated
 **API Key**:
 A long-lived credential for programmatic access, scoped to a user and organization.
 
+### API Key planes
+
+| Plane | Owner | Responsibility |
+|-------|--------|----------------|
+| **Data plane (verify)** | `@reloop/auth` (`apikey/validate`, credential cache) | Extract → format gate → hash → cache → DB (`enabled`, not expired) → lean AuthContext |
+| **Control plane (manage)** | `apps/backend/api-key` (`createApiKeyCredential`) | create / rotate / enable / disable / delete / update; fail-closed cache invalidate on revoke |
+
+Secrets are stored **hashed** (SHA-256). Plaintext is returned only on create/rotate. Verify cache is **acceleration only**; revoke (disable/delete/rotate) **fail-closed** clears cache. Default cache TTL is 30 days; writes also cap TTL by `expiresAt` when set.
+
+**Enforced on verify today:** format, hash match, `enabled`, `expiresAt` (when non-null).
+
+**Not enforced on verify (schema/API metadata only until product owns them):** `permissions`, per-key `rateLimit*`, `remaining`, `refill*`. Management rate limits use a separate Redis namespace on the control plane.
+
+**Better Auth `apiKey` plugin:** loaded on the auth server for schema compatibility (`defaultPrefix: "rl"`). Product create/rotate/validate go through Reloop modules (`rl_prod` prefix + custom lifecycle). Do not use BA endpoints as a second writer of credential material.
+
 **AuthContext**:
 The lean identity resolved by shared request-auth middleware for a request: `userId`, `organizationId` (when required), `platformRole`, and `authType` (`session` | `apikey` | `internal`). Optional `apiKeyId` when authenticated via API Key. Profile fields (`userEmail` / `userName` / `userImage`) appear only on profile-capable macros (`authSupport`, `authCollab`).
 
