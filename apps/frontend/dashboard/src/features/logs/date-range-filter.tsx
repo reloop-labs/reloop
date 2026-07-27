@@ -1,5 +1,3 @@
-
-import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -7,6 +5,7 @@ import * as Popover from "@reloop/ui/popover";
 import { useEffect, useRef, useState } from "react";
 import type { DateRange, Matcher } from "react-day-picker";
 import { toast } from "sonner";
+import { AnimatedHoverBackground } from "#/features/onboarding/animated-hover-background";
 import { LogsCalendar } from "./logs-calendar";
 
 export type DatePreset = {
@@ -228,9 +227,9 @@ export const DateRangeFilter = ({
 				<Button.Root
 					variant="neutral"
 					mode="stroke"
-					size="xsmall"
+					size="small"
 					className={cn(
-						"gap-1.5 whitespace-nowrap rounded-xl",
+						"h-9 gap-1.5 whitespace-nowrap rounded-xl",
 						hasActiveFilter &&
 							"border-stroke-soft-900 bg-neutral-alpha-10 text-text-strong-950",
 					)}

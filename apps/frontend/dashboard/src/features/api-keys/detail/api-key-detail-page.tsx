@@ -1,6 +1,6 @@
 import { Icon } from "@reloop/ui/icon";
-import { useNavigate } from "#/lib/navigation";
 import { useQueryState } from "nuqs";
+import { useNavigate } from "#/lib/navigation";
 import { useApiKeyDetailQuery } from "../hooks/use-api-key-detail-query";
 import { DeleteApiKeyModal } from "../modals/delete-api-key-modal";
 import { EditApiKeyModal } from "../modals/edit-api-key-modal";
@@ -8,6 +8,7 @@ import { RotateApiKeyModal } from "../modals/rotate-api-key-modal";
 import type { ApiKeyData } from "../types";
 import { ActivitySection } from "./activity-section";
 import { ApiKeyHeader } from "./api-key-header";
+import { ApiKeySummary } from "./api-key-summary";
 
 function toModalKey(apiKey: ApiKeyData | undefined): ApiKeyData[] {
 	if (!apiKey) return [];
@@ -31,6 +32,7 @@ function toModalKey(apiKey: ApiKeyData | undefined): ApiKeyData[] {
 export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
 	const navigate = useNavigate();
 	const [, setDeleteId] = useQueryState("delete");
+
 	const { data, error, isPending, isFetching, refetch } =
 		useApiKeyDetailQuery(apiKeyId);
 
@@ -57,7 +59,7 @@ export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
 
 	if (!data && !isLoading) {
 		return (
-			<div className="mx-auto max-w-3xl sm:px-8">
+			<div className="mx-auto max-w-5xl px-6 pb-12 sm:px-8">
 				<div className="py-12 text-center">
 					<h2 className="mb-2 font-semibold text-2xl text-text-strong-950">
 						API key not found
@@ -73,16 +75,22 @@ export function ApiKeyDetailPage({ apiKeyId }: { apiKeyId: string }) {
 
 	return (
 		<>
-			<div className="mx-auto max-w-5xl px-6 pb-6 sm:px-8">
+			<div className="mx-auto max-w-5xl px-6 pb-12 sm:px-8">
 				<ApiKeyHeader
 					apiKey={data}
 					isLoading={isLoading}
 					isFailed={!!error}
+					onRetry={() => void refetch()}
 					onDeleteApiKey={() => {
 						if (data?.id) void setDeleteId(data.id);
 					}}
 				/>
-				<ActivitySection actorId={data?.id} />
+
+				<ApiKeySummary apiKey={data} isLoading={isLoading} />
+
+				<section className="mt-8">
+					<ActivitySection actorId={data?.id} />
+				</section>
 			</div>
 
 			<DeleteApiKeyModal

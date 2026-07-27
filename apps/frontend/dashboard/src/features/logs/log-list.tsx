@@ -273,10 +273,10 @@ export function LogList({
 				</TabMenuHorizontal.List>
 			</TabMenuHorizontal.Root>
 
-			{/* Filter bar */}
+			{/* Filter bar — all controls share h-9 */}
 			<div className="flex flex-wrap items-center gap-2 pt-4">
 				<div className="min-w-[200px] flex-1">
-					<Input.Root size="small" className="rounded-xl">
+					<Input.Root size="small" className="h-9 rounded-xl">
 						<Input.Wrapper>
 							<Input.Icon as={Icon} name="search" size="small" />
 							<Input.Input
@@ -327,7 +327,7 @@ export function LogList({
 					onClick={handleDownloadCSV}
 					disabled={!data?.logs || data.logs.length === 0}
 					title="Export CSV"
-					className="rounded-xl"
+					className="h-9 rounded-xl"
 				>
 					<Icon name="file-download" className="h-4 w-4" />
 					<span className="hidden sm:inline">Export</span>
@@ -340,7 +340,7 @@ export function LogList({
 						mode="stroke"
 						size="small"
 						onClick={handleClearAll}
-						className="rounded-xl"
+						className="h-9 rounded-xl"
 					>
 						Clear all
 					</Button.Root>
@@ -365,7 +365,7 @@ export function LogList({
 				<div
 					className={cn(
 						"w-full text-paragraph-sm",
-						!isMobile && "sticky top-4 w-[540px] flex-shrink-0 self-start",
+						!isMobile && "sticky top-4 w-[480px] shrink-0 self-start",
 					)}
 				>
 					{error ? (

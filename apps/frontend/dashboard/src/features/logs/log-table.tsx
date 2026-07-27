@@ -1,4 +1,3 @@
-import * as Badge from "@reloop/ui/badge";
 import * as Button from "@reloop/ui/button";
 import { cn } from "@reloop/ui/cn";
 import { Icon } from "@reloop/ui/icon";
@@ -31,31 +30,55 @@ interface LogTableProps {
 }
 
 /** Grid template used for the header and every row */
-const GRID_COLS = "grid-cols-[62px_44px_minmax(0,1fr)_64px]";
+const GRID_COLS = "grid-cols-[20px_auto_minmax(0,1fr)_auto]";
 
-/** Returns status label and badge color */
-const getStatusProps = (statusCode: number | null | undefined) => {
-	if (!statusCode) return null;
-
-	let label = `${statusCode}`;
-	let color: "gray" | "blue" | "orange" | "red" = "gray";
-
-	if (statusCode >= 200 && statusCode < 300) {
-		label = `${statusCode} OK`;
-		color = "gray";
-	} else if (statusCode >= 300 && statusCode < 400) {
-		label = `${statusCode} REDIR`;
-		color = "blue";
-	} else if (statusCode >= 400 && statusCode < 500) {
-		label = `${statusCode} ERR`;
-		color = "orange";
-	} else if (statusCode >= 500) {
-		label = `${statusCode} ERR`;
-		color = "red";
+function statusIcon(statusCode: number | null | undefined): {
+	name: string;
+	className: string;
+	label: string;
+} {
+	if (!statusCode) {
+		return {
+			name: "minus-circle",
+			className: "text-text-soft-400",
+			label: "Unknown",
+		};
 	}
+	if (statusCode >= 200 && statusCode < 300) {
+		return {
+			name: "check-circle",
+			className: "text-success-base",
+			label: `${statusCode} OK`,
+		};
+	}
+	if (statusCode >= 300 && statusCode < 400) {
+		return {
+			name: "arrow-right",
+			className: "text-information-base",
+			label: `${statusCode} Redirect`,
+		};
+	}
+	if (statusCode >= 400 && statusCode < 500) {
+		return {
+			name: "alert-circle",
+			className: "text-warning-base",
+			label: `${statusCode} Client error`,
+		};
+	}
+	return {
+		name: "cross-circle",
+		className: "text-error-base",
+		label: `${statusCode} Server error`,
+	};
+}
 
-	return { label, color };
-};
+function codeClass(statusCode: number | null | undefined) {
+	if (!statusCode) return "text-text-soft-400";
+	if (statusCode >= 200 && statusCode < 300) return "text-success-base";
+	if (statusCode >= 300 && statusCode < 400) return "text-information-base";
+	if (statusCode >= 400 && statusCode < 500) return "text-warning-base";
+	return "text-error-base";
+}
 
 const getMethodColorClass = (method: string) => {
 	switch (method?.toUpperCase()) {
@@ -75,11 +98,12 @@ const getMethodColorClass = (method: string) => {
 	}
 };
 
-/** Format time as "4:24 PM" (no seconds — date band provides day context) */
+/** Format time as "4:24:08 PM" for denser rows */
 const formatTime = (dateStr: string) => {
 	return new Date(dateStr).toLocaleTimeString("en-US", {
 		hour: "numeric",
 		minute: "2-digit",
+		second: "2-digit",
 		hour12: true,
 	});
 };
@@ -155,7 +179,7 @@ function TruncatedPath({ path }: { path: string }) {
 	return (
 		<Tooltip.Root>
 			<Tooltip.Trigger asChild>
-				<span className="min-w-0 truncate font-mono text-text-strong-950 text-xs">
+				<span className="min-w-0 truncate font-medium font-mono text-label-sm text-text-strong-950">
 					{path}
 				</span>
 			</Tooltip.Trigger>
@@ -172,12 +196,13 @@ function TruncatedPath({ path }: { path: string }) {
 
 function LogRowSkeleton() {
 	return (
-		<div className={cn("grid items-center gap-2 px-4 py-2.5", GRID_COLS)}>
-			<Skeleton className="h-[18px] w-14 rounded-md" />
-			<Skeleton className="h-3.5 w-9 rounded" />
-			<Skeleton className="h-3.5 w-full max-w-[220px] rounded" />
-			{/* Time — square, no rounded corners */}
-			<Skeleton className="ml-auto h-3.5 w-14 rounded-none" />
+		<div
+			className={cn("grid w-full items-center gap-3 px-4 py-2.5", GRID_COLS)}
+		>
+			<Skeleton className="h-3.5 w-3.5 rounded-full" />
+			<Skeleton className="h-3.5 w-10 rounded" />
+			<Skeleton className="h-3.5 w-full max-w-[180px] rounded" />
+			<Skeleton className="h-3.5 w-16 rounded" />
 		</div>
 	);
 }
@@ -186,7 +211,7 @@ function LogDateBandSkeleton() {
 	return (
 		<div className="sticky top-0 z-10 flex items-center gap-2 border-stroke-soft-100 border-b bg-bg-weak-50/70 px-4 py-1.5 backdrop-blur-md dark:border-stroke-soft-100/40 dark:bg-bg-weak-50/50">
 			<Icon name="calendar" className="h-3 w-3 shrink-0 text-text-soft-400" />
-			<Skeleton className="h-3 w-24 rounded-none" />
+			<Skeleton className="h-3 w-24 rounded" />
 			<Skeleton className="h-4 min-w-4 rounded-md" />
 		</div>
 	);
@@ -196,24 +221,22 @@ function LogTableHeader() {
 	return (
 		<div
 			className={cn(
-				"grid items-center gap-2 rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010]",
+				"grid items-center gap-3 rounded-t-[14px] border-stroke-soft-100 border-t border-r border-l bg-bg-weak-50/50 px-4 pt-2.5 pb-5 font-medium text-text-sub-600 dark:border-[#101010] dark:bg-bg-weak-50/40",
 				GRID_COLS,
 			)}
 		>
-			<div className="flex items-center gap-1.5 text-xs">
-				<Icon name="check-circle" className="h-3.5 w-3.5" />
-				<span>Status</span>
+			<div aria-hidden className="w-5" />
+			<div className="flex items-center gap-1">
+				<Icon name="code" className="h-3 w-3" />
+				<span className="text-xs">Code</span>
 			</div>
-			<div className="flex items-center gap-1.5 text-xs">
-				<span>Method</span>
+			<div className="flex items-center gap-1">
+				<Icon name="activity-2" className="h-3 w-3" />
+				<span className="text-xs">Request</span>
 			</div>
-			<div className="flex items-center gap-1.5 text-xs">
-				<Icon name="activity-2" className="h-3.5 w-3.5" />
-				<span>Request</span>
-			</div>
-			<div className="flex items-center justify-end gap-1.5 text-xs">
-				<Icon name="clock" className="h-3.5 w-3.5" />
-				<span>Time</span>
+			<div className="flex items-center justify-end gap-1">
+				<Icon name="clock" className="h-3 w-3" />
+				<span className="text-xs">Time</span>
 			</div>
 		</div>
 	);
@@ -242,13 +265,13 @@ export const LogTable = ({
 			className={cn("w-full text-paragraph-sm", !isMobile && "flex flex-col")}
 			style={!isMobile ? { maxHeight: "calc(100vh - 220px)" } : undefined}
 		>
-			{/* Soft overlapping header — always visible (matches API keys / loading shell) */}
+			{/* Soft overlapping header — matches API keys / delivery logs chrome */}
 			<LogTableHeader />
 
 			{/* Body card overlaps header */}
 			<div
 				className={cn(
-					"-mt-2.5 flex min-h-0 flex-col overflow-hidden border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40",
+					"-mt-2.5 flex min-h-0 flex-col overflow-hidden rounded-xl border border-stroke-soft-100 bg-bg-white-0 dark:border-stroke-soft-100/40",
 					!isMobile && "flex-1",
 				)}
 			>
@@ -330,7 +353,7 @@ export const LogTable = ({
 									<div className="divide-y divide-stroke-soft-100 dark:divide-stroke-soft-100/40">
 										{group.logs.map((log) => {
 											const { method, endpoint } = getMethodAndEndpoint(log);
-											const statusProps = getStatusProps(log.status_code);
+											const icon = statusIcon(log.status_code);
 											const isSelected = selectedLogId === log.uuid;
 											const primaryPath = endpoint || log.event;
 
@@ -340,54 +363,59 @@ export const LogTable = ({
 													type="button"
 													onClick={() => onRowClick?.(log.uuid)}
 													className={cn(
-														"group/row grid w-full cursor-pointer items-center gap-2 px-4 py-2 text-left transition-colors duration-150",
+														"group/row grid w-full cursor-pointer items-center gap-3 px-4 py-2.5 text-left transition-colors duration-150",
 														GRID_COLS,
 														isSelected
 															? "bg-bg-weak-50/50"
 															: "hover:bg-bg-weak-50/50 dark:hover:bg-bg-weak-50/10",
-														"focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-base focus-visible:ring-inset",
+														"focus:outline-none focus-visible:bg-bg-weak-50/50",
 													)}
 												>
-													{/* Status */}
-													<div className="flex w-full flex-shrink-0 items-center justify-start">
-														{statusProps ? (
-															<Badge.Root
-																variant="lighter"
-																color={statusProps.color}
-																className="h-[18px] rounded-md px-1.5 font-semibold text-[10px] tracking-normal"
+													{/* Status icon */}
+													<span className="flex items-center justify-center">
+														<Icon
+															name={icon.name}
+															className={cn(
+																"h-3.5 w-3.5 shrink-0",
+																icon.className,
+															)}
+															aria-label={icon.label}
+														/>
+													</span>
+
+													{/* Status code */}
+													<span
+														className={cn(
+															"font-medium font-mono text-[13px] tabular-nums",
+															codeClass(log.status_code),
+														)}
+													>
+														{log.status_code ?? "—"}
+													</span>
+
+													{/* Method + path */}
+													<div className="flex min-w-0 items-center gap-2">
+														{method ? (
+															<span
+																className={cn(
+																	"shrink-0 font-semibold text-[11px] uppercase tracking-wide",
+																	getMethodColorClass(method),
+																)}
 															>
-																{statusProps.label}
-															</Badge.Root>
+																{method}
+															</span>
+														) : null}
+														{primaryPath ? (
+															<TruncatedPath path={primaryPath} />
 														) : (
-															<span className="font-semibold text-[11px] text-text-soft-400">
+															<span className="text-text-soft-400 text-xs">
 																—
 															</span>
 														)}
 													</div>
 
-													{/* Method */}
-													<span
-														className={cn(
-															"flex-shrink-0 font-semibold text-[11px] uppercase tracking-wide",
-															method
-																? getMethodColorClass(method)
-																: "text-text-soft-400",
-														)}
-													>
-														{method || "—"}
-													</span>
-
-													{/* Endpoint / Event */}
-													{primaryPath ? (
-														<TruncatedPath path={primaryPath} />
-													) : (
-														<span className="text-text-soft-400 text-xs">
-															—
-														</span>
-													)}
-
 													{/* Time */}
-													<span className="flex-shrink-0 text-right text-text-sub-600 text-xs tabular-nums">
+													<span className="shrink-0 text-right font-medium text-[13px] text-text-sub-600 tabular-nums">
 														{formatTime(log.created_at)}
 													</span>
 												</button>
@@ -402,8 +430,13 @@ export const LogTable = ({
 
 				{/* Pagination — outside scrollable body */}
 				{!isLoading && total > 0 && (
-					<div className="flex flex-shrink-0 items-center justify-between border-stroke-soft-100 border-t bg-bg-white-0 px-4 py-2 text-label-xs text-text-sub-600 dark:border-stroke-soft-100/40">
-						<div className="flex items-center">
+					<div
+						className={cn(
+							"flex shrink-0 items-center justify-between border-stroke-soft-100 border-t bg-bg-white-0 px-4 text-text-sub-600 dark:border-stroke-soft-100/40",
+							isMobile ? "py-3 text-paragraph-sm" : "py-2 text-[11px]",
+						)}
+					>
+						<div className="flex items-center gap-3">
 							<span>
 								Showing {startIndex}–{endIndex} of {total} log
 								{total !== 1 ? "s" : ""}
